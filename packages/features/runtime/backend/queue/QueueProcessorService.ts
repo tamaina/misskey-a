@@ -48,6 +48,7 @@ import { AggregateRetentionProcessorService } from '@features/statistics/backend
 import { CleanRemoteNotesProcessorService } from '@features/notes/backend/jobs/CleanRemoteNotesProcessorService.js';
 import { QueueLoggerService } from './QueueLoggerService.js';
 import { QUEUE, baseWorkerOptions } from './const.js';
+import { InboxKeyDiscoveryDeferredError, inboxKeyDiscoveryBackoff } from '@features/federation/backend/utility/inbox-key-discovery.js';
 
 // ref. https://github.com/misskey-dev/misskey/pull/7635#issue-971097019
 function httpRelatedBackoff(attemptsMade: number) {
@@ -306,6 +307,10 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					'Queue: Inbox',
 					() => this.inboxProcessorService.process(job),
 					err => {
+						if (err instanceof InboxKeyDiscoveryDeferredError && job.attemptsMade + 1 < (job.opts.attempts ?? 1) && inboxKeyDiscoveryBackoff(err, job) >= 0) {
+							logger.info(`deferring Actor key discovery ${getJobInfo(job)}`);
+							return;
+						}
 						const activityId = job.data.activity ? job.data.activity.id : 'none';
 						logger.error(`failed(${err.name}: ${err.message}) ${getJobInfo(job)} activity=${activityId}`, { job: renderJob(job), e: renderError(err) });
 						this.telemetryService.captureMessage(`Queue: Inbox: ${err.name}: ${err.message}`, {
@@ -323,7 +328,9 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					duration: 1000,
 				},
 				settings: {
-					backoffStrategy: httpRelatedBackoff,
+					backoffStrategy: (attemptsMade, _type, error, job) => error instanceof InboxKeyDiscoveryDeferredError
+						? inboxKeyDiscoveryBackoff(error, job)
+						: httpRelatedBackoff(attemptsMade),
 				},
 			});
 

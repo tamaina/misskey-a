@@ -100,7 +100,7 @@ const processors = [
 	['ImportFollowingProcessorService', ImportFollowingProcessorService, 7],
 	['ImportMutingProcessorService', ImportMutingProcessorService, 7],
 	['ImportUserListsProcessorService', ImportUserListsProcessorService, 10],
-	['InboxProcessorService', InboxProcessorService, 12],
+	['InboxProcessorService', InboxProcessorService, 11],
 	['PostScheduledNoteProcessorService', PostScheduledNoteProcessorService, 4],
 	['RelationshipProcessorService', RelationshipProcessorService, 4],
 	['ResyncChartsProcessorService', ResyncChartsProcessorService, 4],
