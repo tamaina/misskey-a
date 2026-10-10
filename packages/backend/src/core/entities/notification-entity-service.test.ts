@@ -8,7 +8,7 @@ import type { ModuleRef } from '@nestjs/core';
 import type { FollowRequestsRepository, NotesRepository, UsersRepository, MiNote, MiUser } from '@features/persistence/backend/repositories/models.js';
 import type { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
-import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
+import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { RoleEntityService } from '@features/roles/backend/serializers/RoleEntityService.js';
 import type { ChatEntityService } from '@features/chat/backend/serializers/ChatEntityService.js';
@@ -24,6 +24,8 @@ const packedNote = { id: noteId, user: { id: notifierId, host: null } } as unkno
 
 function createService() {
 	const userEntityService = {
+		// Use the real constructor-field predicate without initializing unrelated services.
+		isSuspendedEither: (Reflect.construct(UserEntityService, []) as UserEntityService).isSuspendedEither,
 		pack: vi.fn(async (userId: MiUser['id']) => userId === notifierId ? packedUser : null),
 		packMany: vi.fn(async (users: MiUser[]) => users.map(() => packedUser)),
 	};
@@ -42,7 +44,7 @@ function createService() {
 	const moduleRef = { get: vi.fn((token: string) => services.get(token)) };
 	const notesRepository = { find: vi.fn(async () => [{ id: noteId }]) };
 	const usersRepository = {
-		find: vi.fn(async () => [{ id: notifierId, host: null, isSuspended: false }]),
+		find: vi.fn(async () => [{ id: notifierId, host: null, isSuspended: false, isRemoteSuspended: false }]),
 	};
 	const followRequestsRepository = { find: vi.fn(async () => [{ followerId: notifierId }]) };
 	const cacheService = {

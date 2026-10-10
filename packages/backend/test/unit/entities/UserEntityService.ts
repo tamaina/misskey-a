@@ -33,6 +33,7 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
@@ -143,6 +144,7 @@ describe('UserEntityService', () => {
 			const services = [
 				UserEntityService,
 				ApPersonService,
+				UserSuspendService,
 				NoteEntityService,
 				CustomEmojiService,
 				RoleService,
