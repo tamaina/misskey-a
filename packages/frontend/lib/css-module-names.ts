@@ -38,7 +38,7 @@ export function toBase62(n: number): string {
 
 /** Freeze moved components at their original frontend source identity. */
 export function generateCssModuleName(name: string, filename: string, frontendDirectory: string, production: boolean): string {
-	const relativePath = path.relative(frontendDirectory, filename.split('?')[0]).replaceAll('\\', '/');
+	const relativePath = path.relative(frontendDirectory.replaceAll('\\', '/'), filename.split('?')[0].replaceAll('\\', '/')).replaceAll('\\', '/');
 	const originalPath = (featureCssSourcePaths as Record<string, string>)[relativePath] ?? relativePath;
 	const id = (originalPath + '-' + name).replace(/[\\\/\.\?&=]/g, '-').replace(/(src-|vue-)/g, '');
 	return production ? 'x' + toBase62(hash(id)).substring(0, 4) : id;

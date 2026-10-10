@@ -14,6 +14,8 @@ const historicalSelectors = [
 	['../features/notes/frontend/components/MkNote.vue', 'article', 'x5yeR'],
 	['../features/notes/frontend/components/MkNoteHeader.vue', 'root', 'xCPfz'],
 	['../features/ui/frontend/components/MkButton.vue', 'root', 'xbaFh'],
+	['../features/emojis/frontend/EmojiCatalog.vue', 'emojis', 'xAee3'],
+	['../features/emojis/frontend/EmojiCatalogItem.vue', 'root', 'xC3bi'],
 ];
 
 describe('legacy CSS module source identities', () => {
@@ -22,6 +24,17 @@ describe('legacy CSS module source identities', () => {
 			expect(generateCssModuleName(name, resolve(root, file), root, true)).toBe(expected);
 			expect(generateCssModuleName(name, resolve(root, file) + '?vue&type=style&index=0&module=true', root, true)).toBe(expected);
 		}
+	});
+
+	test.each(['C:/release/packages/frontend', '/tmp/日本語/العربية/packages/frontend'])('retains frozen selectors with Windows paths and multilingual release roots: %s', root => {
+		for (const [file, name, expected] of historicalSelectors) {
+			const filename = root + '/' + file + '?vue&type=style&index=0&module=true';
+			expect(generateCssModuleName(name, filename.replaceAll('/', '\\'), root.replaceAll('/', '\\'), true)).toBe(expected);
+		}
+	});
+
+	test('the main frontend table excludes embed source identities', () => {
+		expect(Object.keys(paths).some(file => file.includes('/embed/'))).toBe(false);
 	});
 
 	test('all frozen paths share names with their historical source in production and development', () => {
