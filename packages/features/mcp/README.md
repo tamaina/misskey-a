@@ -19,9 +19,19 @@ shared API context, original AuthenticateService tuple, assembled router and
 existing feature repositories. It retains authentication only within each HTTP
 request, never across requests or sessions. No separate DB/query/scope is added.
 
-**Access includes the account's public and nonpublic notes.** `users/notes` is
-kindless, so permission=[] tokens retain that native behavior. Tool description
-and any future consent UI must state this explicitly. Note content is untrusted
+**MCP requires a scoped token with `access:mcp`.** Master/session credentials and
+existing tokens without this permission are denied. The connection gate reads
+current shared token/app records on every POST and tool invocation, so revocation
+or removal of this permission takes effect without trusting the native app cache.
+The original nonnull authentication tuple is passed unchanged to native API checks;
+this permission adds no downstream API permissions or visibility. App tokens use
+the current app permission list for the connection gate.
+
+**Access can include the account's public and nonpublic notes.** The existing
+`users/notes` behavior is preserved. Ordinary API authentication and authorization
+are unchanged. The shared permission registry makes this kind selectable in token,
+MiAuth, app and OAuth consent flows. Consent labels explain nonpublic-note access;
+Japanese is the fallback until Crowdin translations arrive. Note content is untrusted
 data. Foreign subjects are denied before native invocation. Observed disconnect,
 deadline and shutdown suppress the transport response and release transport
 state; they do not actively cancel SQL or guarantee that native work stops. Disconnect observation

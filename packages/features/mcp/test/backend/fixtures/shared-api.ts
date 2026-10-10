@@ -45,8 +45,8 @@ afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) awai
 export async function fixture() {
 	const own: MiLocalUser = Object.assign(new MiUser({}), { id: 'aaaaaaaaaaaaaaaa', host: null, uri: null, token: '0123456789abcdef', isSuspended: false, movedToUri: null });
 	const otherId = 'bbbbbbbbbbbbbbbb';
-	const grant: MiAccessToken = Object.assign(new MiAccessToken(), { id: 'cccccccccccccccc', userId: own.id, token: 'synthetic-miauth-credential-32chars', hash: 'synthetic-miauth-credential-32chars', appId: null, permission: [] });
-	const app = Object.assign(new MiApp(), { id: 'dddddddddddddddd', permission: ['read:account'] });
+	const grant: MiAccessToken = Object.assign(new MiAccessToken(), { id: 'cccccccccccccccc', userId: own.id, token: 'synthetic-miauth-credential-32chars', hash: 'synthetic-miauth-credential-32chars', appId: null, permission: ['access:mcp'] });
+	const app = Object.assign(new MiApp(), { id: 'dddddddddddddddd', permission: ['read:account', 'access:mcp'] });
 	const appGrant: MiAccessToken = Object.assign(new MiAccessToken(), { id: 'eeeeeeeeeeeeeeee', userId: own.id, token: 'synthetic-app-token-32characters', hash: 'synthetic-app-hash-32characters', appId: app.id, permission: ['write:notes'] });
 	const rows = new Map<string, MiAccessToken>([[grant.id, grant], [appGrant.id, appGrant]]);
 	const users = mockDeep<UsersRepository>();
@@ -58,6 +58,8 @@ export async function fixture() {
 		const where = options.where;
 		return [...rows.values()].find(row => Array.isArray(where) && where.some(candidate => candidate.hash === row.hash || candidate.token === row.token)) ?? null;
 	});
+	tokens.findOneBy.mockImplementation(async where => Array.isArray(where) ? null : [...rows.values()].find(row => row.id === where.id && row.userId === where.userId) ?? null);
+	apps.findOneBy.mockImplementation(async where => !Array.isArray(where) && where.id === app.id ? app : null);
 	tokens.update.mockResolvedValue({ raw: [], generatedMaps: [], affected: 1 });
 	apps.findOneByOrFail.mockResolvedValue(app);
 	cache.localUserByIdCache.fetch.mockResolvedValue(own);

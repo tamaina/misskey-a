@@ -80,6 +80,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "اعرض معلومات حسابك",
 		"write:account": "تعديل معلومات حسابك",
 		"read:blocks": "اعرض قائمة المستخدمين المحجوبين",
@@ -178,6 +179,7 @@ function accept() {
 {
 	"authPermission": "{name} demana els següents permisos",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Veure la informació del compte.",
 		"write:account": "Editar la informació del compte.",
 		"read:blocks": "Veure la llista d'usuaris bloquejats",
@@ -276,6 +278,7 @@ function accept() {
 {
 	"authPermission": "{name} požaduje tato oprávnění",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Zobrazit informace o účtu",
 		"write:account": "Upravit informace o účtu",
 		"read:blocks": "Zobrazit seznam blokovaných uživatelů",
@@ -374,6 +377,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -472,6 +476,7 @@ function accept() {
 {
 	"authPermission": "{name} fordert folgende Berechtigungen",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Deine Benutzerkontoinformationen lesen",
 		"write:account": "Deine Benutzerkontoinformationen bearbeiten",
 		"read:blocks": "Die Liste deiner blockierten Benutzer lesen",
@@ -570,6 +575,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -668,6 +674,7 @@ function accept() {
 {
 	"authPermission": "{name} solicita los siguientes permisos",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Ver información de la cuenta",
 		"write:account": "Editar información de la cuenta",
 		"read:blocks": "Ver usuarios bloqueados",
@@ -766,6 +773,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Afficher les informations du compte",
 		"write:account": "Mettre à jour les informations de votre compte",
 		"read:blocks": "Voir les comptes bloqués",
@@ -864,6 +872,7 @@ function accept() {
 {
 	"authPermission": "{name} meminta ijin berikut",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Lihat informasi akun",
 		"write:account": "Sunting informasi akun",
 		"read:blocks": "Lihat daftar orang yang diblokir",
@@ -962,6 +971,7 @@ function accept() {
 {
 	"authPermission": "{name} richiede i permessi seguenti",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vedere le informazioni sul profilo",
 		"write:account": "Modificare le informazioni sul profilo",
 		"read:blocks": "Vedere i profili bloccati",
@@ -1060,6 +1070,7 @@ function accept() {
 {
 	"authPermission": "{name}は次の権限を要求しています",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見る",
 		"write:account": "アカウントの情報を変更する",
 		"read:blocks": "ブロックを見る",
@@ -1158,6 +1169,7 @@ function accept() {
 {
 	"authPermission": "{name}に次の権限つけたってやって",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見るで",
 		"write:account": "アカウントの情報を変更するで",
 		"read:blocks": "ブロックを見るで",
@@ -1256,6 +1268,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Ẓreg talɣut n umiḍan-ik·im",
 		"read:blocks": "View your list of blocked users",
@@ -1354,6 +1367,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1452,6 +1466,7 @@ function accept() {
 {
 	"authPermission": "{name}에서 다음 권한을 요청하였습니다",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "계정의 정보를 봅니다",
 		"write:account": "계정의 정보를 변경합니다",
 		"read:blocks": "차단 여부를 확인합니다",
@@ -1550,6 +1565,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1648,6 +1664,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1746,6 +1763,7 @@ function accept() {
 {
 	"authPermission": "{name} żąda następujących uprawnień",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Wyświetl informacje o swoim koncie",
 		"write:account": "Edytuj swoje informacje o koncie",
 		"read:blocks": "Zobacz listę osób, które zablokowałeś(-aś)",
@@ -1844,6 +1862,7 @@ function accept() {
 {
 	"authPermission": "{name} solicita as seguintes permissões",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Visualizar informações da conta",
 		"write:account": "Editar informações da conta",
 		"read:blocks": "Visualizar a sua lista de usuários bloqueados",
@@ -1942,6 +1961,7 @@ function accept() {
 {
 	"authPermission": "{name} Запрашивает следующие разрешения:",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Просматривать данные учётной записи",
 		"write:account": "Изменять данные учётной записи",
 		"read:blocks": "Смотреть список блокировок",
@@ -2040,6 +2060,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vidieť informácie o vašom účte",
 		"write:account": "Upraviť informácie o vašom účte",
 		"read:blocks": "Vidieť zoznam blokovaných používateľov",
@@ -2138,6 +2159,7 @@ function accept() {
 {
 	"authPermission": "{name} ได้ขอสิทธิ์การเข้าถึงดังต่อไปนี้",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "ดูข้อมูลบัญชี",
 		"write:account": "แก้ไขข้อมูลบัญชี",
 		"read:blocks": "ดูรายชื่อผู้ใช้ที่ถูกบล็อก",
@@ -2236,6 +2258,7 @@ function accept() {
 {
 	"authPermission": "{name} aşağıdaki izinleri talep etmektedir.",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Hesap bilgilerini gör",
 		"write:account": "Hesap bilgilerini düzenle",
 		"read:blocks": "Engellenen kullanıcıların listesini görüntüle",
@@ -2334,6 +2357,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2432,6 +2456,7 @@ function accept() {
 {
 	"authPermission": "{name} requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Переглядати дані профілю",
 		"write:account": "Змінити дані акаунту",
 		"read:blocks": "Переглянути список заблокованих",
@@ -2530,6 +2555,7 @@ function accept() {
 {
 	"authPermission": "{name} đang yêu cầu quyền hạn dưới đây",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Xem thông tin tài khoản của bạn",
 		"write:account": "Sửa thông tin tài khoản của bạn",
 		"read:blocks": "Xem danh sách người bạn chặn",
@@ -2628,6 +2654,7 @@ function accept() {
 {
 	"authPermission": "{name} 需要以下权限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看账户信息",
 		"write:account": "更改帐户信息",
 		"read:blocks": "查看屏蔽列表",
@@ -2726,6 +2753,7 @@ function accept() {
 {
 	"authPermission": "{name}要求以下的權限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看我的帳戶資訊",
 		"write:account": "更改我的帳戶資訊",
 		"read:blocks": "查看封鎖名單",

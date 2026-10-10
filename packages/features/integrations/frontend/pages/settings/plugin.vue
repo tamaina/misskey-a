@@ -178,6 +178,7 @@ definePage(() => ({
 	"description": "الوصف",
 	"permission": "أذونات",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "اعرض معلومات حسابك",
 		"write:account": "تعديل معلومات حسابك",
 		"read:blocks": "اعرض قائمة المستخدمين المحجوبين",
@@ -288,6 +289,7 @@ definePage(() => ({
 	"description": "Descripció",
 	"permission": "Permisos",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Veure la informació del compte.",
 		"write:account": "Editar la informació del compte.",
 		"read:blocks": "Veure la llista d'usuaris bloquejats",
@@ -398,6 +400,7 @@ definePage(() => ({
 	"description": "Popis",
 	"permission": "Oprávnění",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Zobrazit informace o účtu",
 		"write:account": "Upravit informace o účtu",
 		"read:blocks": "Zobrazit seznam blokovaných uživatelů",
@@ -508,6 +511,7 @@ definePage(() => ({
 	"description": "Description",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -618,6 +622,7 @@ definePage(() => ({
 	"description": "Beschreibung",
 	"permission": "Berechtigungen",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Deine Benutzerkontoinformationen lesen",
 		"write:account": "Deine Benutzerkontoinformationen bearbeiten",
 		"read:blocks": "Die Liste deiner blockierten Benutzer lesen",
@@ -728,6 +733,7 @@ definePage(() => ({
 	"description": "Description",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -838,6 +844,7 @@ definePage(() => ({
 	"description": "Descripción",
 	"permission": "Permisos",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Ver información de la cuenta",
 		"write:account": "Editar información de la cuenta",
 		"read:blocks": "Ver usuarios bloqueados",
@@ -948,6 +955,7 @@ definePage(() => ({
 	"description": "Description",
 	"permission": "Autorisations\u00a0",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Afficher les informations du compte",
 		"write:account": "Mettre à jour les informations de votre compte",
 		"read:blocks": "Voir les comptes bloqués",
@@ -1058,6 +1066,7 @@ definePage(() => ({
 	"description": "Deskripsi",
 	"permission": "Izin",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Lihat informasi akun",
 		"write:account": "Sunting informasi akun",
 		"read:blocks": "Lihat daftar orang yang diblokir",
@@ -1168,6 +1177,7 @@ definePage(() => ({
 	"description": "Descrizione",
 	"permission": "Autorizzazioni ",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vedere le informazioni sul profilo",
 		"write:account": "Modificare le informazioni sul profilo",
 		"read:blocks": "Vedere i profili bloccati",
@@ -1278,6 +1288,7 @@ definePage(() => ({
 	"description": "説明",
 	"permission": "権限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見る",
 		"write:account": "アカウントの情報を変更する",
 		"read:blocks": "ブロックを見る",
@@ -1388,6 +1399,7 @@ definePage(() => ({
 	"description": "説明",
 	"permission": "権限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見るで",
 		"write:account": "アカウントの情報を変更するで",
 		"read:blocks": "ブロックを見るで",
@@ -1498,6 +1510,7 @@ definePage(() => ({
 	"description": "Description",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Ẓreg talɣut n umiḍan-ik·im",
 		"read:blocks": "View your list of blocked users",
@@ -1608,6 +1621,7 @@ definePage(() => ({
 	"description": "Description",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1718,6 +1732,7 @@ definePage(() => ({
 	"description": "설명",
 	"permission": "권한",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "계정의 정보를 봅니다",
 		"write:account": "계정의 정보를 변경합니다",
 		"read:blocks": "차단 여부를 확인합니다",
@@ -1828,6 +1843,7 @@ definePage(() => ({
 	"description": "Beschrijving",
 	"permission": "Machtigingen",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1938,6 +1954,7 @@ definePage(() => ({
 	"description": "Beskrivelse",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2048,6 +2065,7 @@ definePage(() => ({
 	"description": "Opis",
 	"permission": "Uprawnienia",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Wyświetl informacje o swoim koncie",
 		"write:account": "Edytuj swoje informacje o koncie",
 		"read:blocks": "Zobacz listę osób, które zablokowałeś(-aś)",
@@ -2158,6 +2176,7 @@ definePage(() => ({
 	"description": "Descrição",
 	"permission": "Permissões",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Visualizar informações da conta",
 		"write:account": "Editar informações da conta",
 		"read:blocks": "Visualizar a sua lista de usuários bloqueados",
@@ -2268,6 +2287,7 @@ definePage(() => ({
 	"description": "Описание",
 	"permission": "Разрешения",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Просматривать данные учётной записи",
 		"write:account": "Изменять данные учётной записи",
 		"read:blocks": "Смотреть список блокировок",
@@ -2378,6 +2398,7 @@ definePage(() => ({
 	"description": "Popis",
 	"permission": "Oprávnenia",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vidieť informácie o vašom účte",
 		"write:account": "Upraviť informácie o vašom účte",
 		"read:blocks": "Vidieť zoznam blokovaných používateľov",
@@ -2488,6 +2509,7 @@ definePage(() => ({
 	"description": "คำอธิบาย",
 	"permission": "สิทธิ์",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "ดูข้อมูลบัญชี",
 		"write:account": "แก้ไขข้อมูลบัญชี",
 		"read:blocks": "ดูรายชื่อผู้ใช้ที่ถูกบล็อก",
@@ -2598,6 +2620,7 @@ definePage(() => ({
 	"description": "Açıklama",
 	"permission": "İzinler",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Hesap bilgilerini gör",
 		"write:account": "Hesap bilgilerini düzenle",
 		"read:blocks": "Engellenen kullanıcıların listesini görüntüle",
@@ -2708,6 +2731,7 @@ definePage(() => ({
 	"description": "Description",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2818,6 +2842,7 @@ definePage(() => ({
 	"description": "Опис",
 	"permission": "Права",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Переглядати дані профілю",
 		"write:account": "Змінити дані акаунту",
 		"read:blocks": "Переглянути список заблокованих",
@@ -2928,6 +2953,7 @@ definePage(() => ({
 	"description": "Mô tả",
 	"permission": "Cho phép ",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Xem thông tin tài khoản của bạn",
 		"write:account": "Sửa thông tin tài khoản của bạn",
 		"read:blocks": "Xem danh sách người bạn chặn",
@@ -3038,6 +3064,7 @@ definePage(() => ({
 	"description": "描述",
 	"permission": "权限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看账户信息",
 		"write:account": "更改帐户信息",
 		"read:blocks": "查看屏蔽列表",
@@ -3148,6 +3175,7 @@ definePage(() => ({
 	"description": "描述",
 	"permission": "權限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看我的帳戶資訊",
 		"write:account": "更改我的帳戶資訊",
 		"read:blocks": "查看封鎖名單",

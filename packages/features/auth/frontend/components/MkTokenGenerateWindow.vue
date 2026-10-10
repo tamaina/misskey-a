@@ -157,6 +157,7 @@ function enableAll(): void {
 	"disableAll": "تعطيل الكل",
 	"enableAll": "تشغيل الكل",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "اعرض معلومات حسابك",
 		"write:account": "تعديل معلومات حسابك",
 		"read:blocks": "اعرض قائمة المستخدمين المحجوبين",
@@ -257,6 +258,7 @@ function enableAll(): void {
 	"disableAll": "Deshabilita tot",
 	"enableAll": "Habilita tot",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Veure la informació del compte.",
 		"write:account": "Editar la informació del compte.",
 		"read:blocks": "Veure la llista d'usuaris bloquejats",
@@ -357,6 +359,7 @@ function enableAll(): void {
 	"disableAll": "Vypnout vše",
 	"enableAll": "Povolit vše",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Zobrazit informace o účtu",
 		"write:account": "Upravit informace o účtu",
 		"read:blocks": "Zobrazit seznam blokovaných uživatelů",
@@ -457,6 +460,7 @@ function enableAll(): void {
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -557,6 +561,7 @@ function enableAll(): void {
 	"disableAll": "Alle deaktivieren",
 	"enableAll": "Alle aktivieren",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Deine Benutzerkontoinformationen lesen",
 		"write:account": "Deine Benutzerkontoinformationen bearbeiten",
 		"read:blocks": "Die Liste deiner blockierten Benutzer lesen",
@@ -657,6 +662,7 @@ function enableAll(): void {
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -757,6 +763,7 @@ function enableAll(): void {
 	"disableAll": "Desactivar todo",
 	"enableAll": "Activar todo",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Ver información de la cuenta",
 		"write:account": "Editar información de la cuenta",
 		"read:blocks": "Ver usuarios bloqueados",
@@ -857,6 +864,7 @@ function enableAll(): void {
 	"disableAll": "Tout désactiver",
 	"enableAll": "Tout activer",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Afficher les informations du compte",
 		"write:account": "Mettre à jour les informations de votre compte",
 		"read:blocks": "Voir les comptes bloqués",
@@ -957,6 +965,7 @@ function enableAll(): void {
 	"disableAll": "Nonaktifkan semua",
 	"enableAll": "Aktifkan semua",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Lihat informasi akun",
 		"write:account": "Sunting informasi akun",
 		"read:blocks": "Lihat daftar orang yang diblokir",
@@ -1057,6 +1066,7 @@ function enableAll(): void {
 	"disableAll": "Disabilitare tutto",
 	"enableAll": "Abilita tutto",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vedere le informazioni sul profilo",
 		"write:account": "Modificare le informazioni sul profilo",
 		"read:blocks": "Vedere i profili bloccati",
@@ -1157,6 +1167,7 @@ function enableAll(): void {
 	"disableAll": "全て無効にする",
 	"enableAll": "全て有効にする",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見る",
 		"write:account": "アカウントの情報を変更する",
 		"read:blocks": "ブロックを見る",
@@ -1257,6 +1268,7 @@ function enableAll(): void {
 	"disableAll": "全部使えへんようにする",
 	"enableAll": "全部使えるようにする",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見るで",
 		"write:account": "アカウントの情報を変更するで",
 		"read:blocks": "ブロックを見るで",
@@ -1357,6 +1369,7 @@ function enableAll(): void {
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Ẓreg talɣut n umiḍan-ik·im",
 		"read:blocks": "View your list of blocked users",
@@ -1457,6 +1470,7 @@ function enableAll(): void {
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1557,6 +1571,7 @@ function enableAll(): void {
 	"disableAll": "전체 해제",
 	"enableAll": "전체 선택",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "계정의 정보를 봅니다",
 		"write:account": "계정의 정보를 변경합니다",
 		"read:blocks": "차단 여부를 확인합니다",
@@ -1657,6 +1672,7 @@ function enableAll(): void {
 	"disableAll": "Alle deactiveren",
 	"enableAll": "Alle activeren",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1757,6 +1773,7 @@ function enableAll(): void {
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1857,6 +1874,7 @@ function enableAll(): void {
 	"disableAll": "Wyłącz wszystko",
 	"enableAll": "Włącz wszystko",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Wyświetl informacje o swoim koncie",
 		"write:account": "Edytuj swoje informacje o koncie",
 		"read:blocks": "Zobacz listę osób, które zablokowałeś(-aś)",
@@ -1957,6 +1975,7 @@ function enableAll(): void {
 	"disableAll": "Desabilitar tudo",
 	"enableAll": "Habilitar tudo",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Visualizar informações da conta",
 		"write:account": "Editar informações da conta",
 		"read:blocks": "Visualizar a sua lista de usuários bloqueados",
@@ -2057,6 +2076,7 @@ function enableAll(): void {
 	"disableAll": "Выключить всё",
 	"enableAll": "Включить все",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Просматривать данные учётной записи",
 		"write:account": "Изменять данные учётной записи",
 		"read:blocks": "Смотреть список блокировок",
@@ -2157,6 +2177,7 @@ function enableAll(): void {
 	"disableAll": "Vypnúť všetko",
 	"enableAll": "Povoliť všetko",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vidieť informácie o vašom účte",
 		"write:account": "Upraviť informácie o vašom účte",
 		"read:blocks": "Vidieť zoznam blokovaných používateľov",
@@ -2257,6 +2278,7 @@ function enableAll(): void {
 	"disableAll": "ปิดการใช้งานทั้งหมด",
 	"enableAll": "เปิดใช้งานทั้งหมด",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "ดูข้อมูลบัญชี",
 		"write:account": "แก้ไขข้อมูลบัญชี",
 		"read:blocks": "ดูรายชื่อผู้ใช้ที่ถูกบล็อก",
@@ -2357,6 +2379,7 @@ function enableAll(): void {
 	"disableAll": "Tümünü devre dışı bırak",
 	"enableAll": "Tümünü etkinleştir",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Hesap bilgilerini gör",
 		"write:account": "Hesap bilgilerini düzenle",
 		"read:blocks": "Engellenen kullanıcıların listesini görüntüle",
@@ -2457,6 +2480,7 @@ function enableAll(): void {
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2557,6 +2581,7 @@ function enableAll(): void {
 	"disableAll": "Вимкнути все",
 	"enableAll": "Увімкнути все",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Переглядати дані профілю",
 		"write:account": "Змінити дані акаунту",
 		"read:blocks": "Переглянути список заблокованих",
@@ -2657,6 +2682,7 @@ function enableAll(): void {
 	"disableAll": "Tắt toàn bộ",
 	"enableAll": "Bật toàn bộ",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Xem thông tin tài khoản của bạn",
 		"write:account": "Sửa thông tin tài khoản của bạn",
 		"read:blocks": "Xem danh sách người bạn chặn",
@@ -2757,6 +2783,7 @@ function enableAll(): void {
 	"disableAll": "禁用全部",
 	"enableAll": "启用全部",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看账户信息",
 		"write:account": "更改帐户信息",
 		"read:blocks": "查看屏蔽列表",
@@ -2857,6 +2884,7 @@ function enableAll(): void {
 	"disableAll": "停用全部",
 	"enableAll": "啟用全部",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看我的帳戶資訊",
 		"write:account": "更改我的帳戶資訊",
 		"read:blocks": "查看封鎖名單",

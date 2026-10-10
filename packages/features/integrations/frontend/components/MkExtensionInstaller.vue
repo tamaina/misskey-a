@@ -193,6 +193,7 @@ const emits = defineEmits<{
 	"version": "الإصدار",
 	"permission": "أذونات",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "اعرض معلومات حسابك",
 		"write:account": "تعديل معلومات حسابك",
 		"read:blocks": "اعرض قائمة المستخدمين المحجوبين",
@@ -304,6 +305,7 @@ const emits = defineEmits<{
 	"version": "Versió",
 	"permission": "Permisos",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Veure la informació del compte.",
 		"write:account": "Editar la informació del compte.",
 		"read:blocks": "Veure la llista d'usuaris bloquejats",
@@ -415,6 +417,7 @@ const emits = defineEmits<{
 	"version": "Verze",
 	"permission": "Oprávnění",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Zobrazit informace o účtu",
 		"write:account": "Upravit informace o účtu",
 		"read:blocks": "Zobrazit seznam blokovaných uživatelů",
@@ -526,6 +529,7 @@ const emits = defineEmits<{
 	"version": "Version",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -637,6 +641,7 @@ const emits = defineEmits<{
 	"version": "Version",
 	"permission": "Berechtigungen",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Deine Benutzerkontoinformationen lesen",
 		"write:account": "Deine Benutzerkontoinformationen bearbeiten",
 		"read:blocks": "Die Liste deiner blockierten Benutzer lesen",
@@ -748,6 +753,7 @@ const emits = defineEmits<{
 	"version": "Version",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -859,6 +865,7 @@ const emits = defineEmits<{
 	"version": "Versión",
 	"permission": "Permisos",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Ver información de la cuenta",
 		"write:account": "Editar información de la cuenta",
 		"read:blocks": "Ver usuarios bloqueados",
@@ -970,6 +977,7 @@ const emits = defineEmits<{
 	"version": "Version",
 	"permission": "Autorisations\u00a0",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Afficher les informations du compte",
 		"write:account": "Mettre à jour les informations de votre compte",
 		"read:blocks": "Voir les comptes bloqués",
@@ -1081,6 +1089,7 @@ const emits = defineEmits<{
 	"version": "Versi",
 	"permission": "Izin",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Lihat informasi akun",
 		"write:account": "Sunting informasi akun",
 		"read:blocks": "Lihat daftar orang yang diblokir",
@@ -1192,6 +1201,7 @@ const emits = defineEmits<{
 	"version": "Versione",
 	"permission": "Autorizzazioni ",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vedere le informazioni sul profilo",
 		"write:account": "Modificare le informazioni sul profilo",
 		"read:blocks": "Vedere i profili bloccati",
@@ -1303,6 +1313,7 @@ const emits = defineEmits<{
 	"version": "バージョン",
 	"permission": "権限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見る",
 		"write:account": "アカウントの情報を変更する",
 		"read:blocks": "ブロックを見る",
@@ -1414,6 +1425,7 @@ const emits = defineEmits<{
 	"version": "バージョン",
 	"permission": "権限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見るで",
 		"write:account": "アカウントの情報を変更するで",
 		"read:blocks": "ブロックを見るで",
@@ -1525,6 +1537,7 @@ const emits = defineEmits<{
 	"version": "Version",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Ẓreg talɣut n umiḍan-ik·im",
 		"read:blocks": "View your list of blocked users",
@@ -1636,6 +1649,7 @@ const emits = defineEmits<{
 	"version": "Version",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1747,6 +1761,7 @@ const emits = defineEmits<{
 	"version": "버전",
 	"permission": "권한",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "계정의 정보를 봅니다",
 		"write:account": "계정의 정보를 변경합니다",
 		"read:blocks": "차단 여부를 확인합니다",
@@ -1858,6 +1873,7 @@ const emits = defineEmits<{
 	"version": "Versie",
 	"permission": "Machtigingen",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1969,6 +1985,7 @@ const emits = defineEmits<{
 	"version": "Versjon",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2080,6 +2097,7 @@ const emits = defineEmits<{
 	"version": "Wersja",
 	"permission": "Uprawnienia",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Wyświetl informacje o swoim koncie",
 		"write:account": "Edytuj swoje informacje o koncie",
 		"read:blocks": "Zobacz listę osób, które zablokowałeś(-aś)",
@@ -2191,6 +2209,7 @@ const emits = defineEmits<{
 	"version": "Versão",
 	"permission": "Permissões",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Visualizar informações da conta",
 		"write:account": "Editar informações da conta",
 		"read:blocks": "Visualizar a sua lista de usuários bloqueados",
@@ -2302,6 +2321,7 @@ const emits = defineEmits<{
 	"version": "Версия",
 	"permission": "Разрешения",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Просматривать данные учётной записи",
 		"write:account": "Изменять данные учётной записи",
 		"read:blocks": "Смотреть список блокировок",
@@ -2413,6 +2433,7 @@ const emits = defineEmits<{
 	"version": "Verzia",
 	"permission": "Oprávnenia",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vidieť informácie o vašom účte",
 		"write:account": "Upraviť informácie o vašom účte",
 		"read:blocks": "Vidieť zoznam blokovaných používateľov",
@@ -2524,6 +2545,7 @@ const emits = defineEmits<{
 	"version": "เวอร์ชั่น",
 	"permission": "สิทธิ์",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "ดูข้อมูลบัญชี",
 		"write:account": "แก้ไขข้อมูลบัญชี",
 		"read:blocks": "ดูรายชื่อผู้ใช้ที่ถูกบล็อก",
@@ -2635,6 +2657,7 @@ const emits = defineEmits<{
 	"version": "Sürüm",
 	"permission": "İzinler",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Hesap bilgilerini gör",
 		"write:account": "Hesap bilgilerini düzenle",
 		"read:blocks": "Engellenen kullanıcıların listesini görüntüle",
@@ -2746,6 +2769,7 @@ const emits = defineEmits<{
 	"version": "Version",
 	"permission": "Permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2857,6 +2881,7 @@ const emits = defineEmits<{
 	"version": "Версія",
 	"permission": "Права",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Переглядати дані профілю",
 		"write:account": "Змінити дані акаунту",
 		"read:blocks": "Переглянути список заблокованих",
@@ -2968,6 +2993,7 @@ const emits = defineEmits<{
 	"version": "Phiên bản",
 	"permission": "Cho phép ",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Xem thông tin tài khoản của bạn",
 		"write:account": "Sửa thông tin tài khoản của bạn",
 		"read:blocks": "Xem danh sách người bạn chặn",
@@ -3079,6 +3105,7 @@ const emits = defineEmits<{
 	"version": "版本",
 	"permission": "权限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看账户信息",
 		"write:account": "更改帐户信息",
 		"read:blocks": "查看屏蔽列表",
@@ -3190,6 +3217,7 @@ const emits = defineEmits<{
 	"version": "版本",
 	"permission": "權限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看我的帳戶資訊",
 		"write:account": "更改我的帳戶資訊",
 		"read:blocks": "查看封鎖名單",

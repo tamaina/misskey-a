@@ -151,3 +151,13 @@ it('uses actual SDK callTool AbortSignal and explicitly rejects unsupported stat
 		expect(p.nativeInFlight()).toBe(1); release(); await vi.waitFor(() => { expect(p.nativeInFlight()).toBe(0); });
 	} finally { release(); await client.close(); }
 });
+
+it('requires scoped access:mcp credentials on every transport request without changing native HTTP access', async () => {
+	const { invoke, f, p } = await pilot(); f.grant.permission = [];
+	const denied = await invoke(); expect(denied.statusCode).toBe(403); expect(denied.headers['www-authenticate']).toContain('access:mcp');
+	expect((await f.ordinary({ userId: f.own.id })).statusCode).toBe(200);
+	expect((await invoke(message(), { authorization: `Bearer ${f.own.token}` })).statusCode).toBe(403);
+	f.grant.permission = ['access:mcp']; expect((await invoke()).statusCode).toBe(200);
+	f.grant.permission = ['read:account']; expect((await invoke()).statusCode).toBe(403);
+	expect(p.activeRequests()).toBe(0); expect(p.nativeInFlight()).toBe(0);
+});

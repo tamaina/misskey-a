@@ -464,6 +464,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "يطلب التطبيق الأذون التالية",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "اعرض معلومات حسابك",
 		"write:account": "تعديل معلومات حسابك",
 		"read:blocks": "اعرض قائمة المستخدمين المحجوبين",
@@ -576,6 +577,7 @@ defineExpose({
 	"authPermission": "{name} demana els següents permisos",
 	"authPermissionAsk": "Aquesta aplicació demana els següents permisos",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Veure la informació del compte.",
 		"write:account": "Editar la informació del compte.",
 		"read:blocks": "Veure la llista d'usuaris bloquejats",
@@ -688,6 +690,7 @@ defineExpose({
 	"authPermission": "{name} požaduje tato oprávnění",
 	"authPermissionAsk": "Tato aplikace požaduje následující oprávnění",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Zobrazit informace o účtu",
 		"write:account": "Upravit informace o účtu",
 		"read:blocks": "Zobrazit seznam blokovaných uživatelů",
@@ -800,6 +803,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -912,6 +916,7 @@ defineExpose({
 	"authPermission": "{name} fordert folgende Berechtigungen",
 	"authPermissionAsk": "Diese Anwendung fordert folgende Berechtigungen",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Deine Benutzerkontoinformationen lesen",
 		"write:account": "Deine Benutzerkontoinformationen bearbeiten",
 		"read:blocks": "Die Liste deiner blockierten Benutzer lesen",
@@ -1024,6 +1029,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1136,6 +1142,7 @@ defineExpose({
 	"authPermission": "{name} solicita los siguientes permisos",
 	"authPermissionAsk": "Esta aplicación requiere los siguientes permisos",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Ver información de la cuenta",
 		"write:account": "Editar información de la cuenta",
 		"read:blocks": "Ver usuarios bloqueados",
@@ -1248,6 +1255,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "Cette application nécessite les autorisations suivantes :",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Afficher les informations du compte",
 		"write:account": "Mettre à jour les informations de votre compte",
 		"read:blocks": "Voir les comptes bloqués",
@@ -1360,6 +1368,7 @@ defineExpose({
 	"authPermission": "{name} meminta ijin berikut",
 	"authPermissionAsk": "Aplikasi ini membutuhkan beberapa ijin, yaitu:",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Lihat informasi akun",
 		"write:account": "Sunting informasi akun",
 		"read:blocks": "Lihat daftar orang yang diblokir",
@@ -1472,6 +1481,7 @@ defineExpose({
 	"authPermission": "{name} richiede i permessi seguenti",
 	"authPermissionAsk": "Questa app richiede le seguenti autorizzazioni:",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vedere le informazioni sul profilo",
 		"write:account": "Modificare le informazioni sul profilo",
 		"read:blocks": "Vedere i profili bloccati",
@@ -1584,6 +1594,7 @@ defineExpose({
 	"authPermission": "{name}は次の権限を要求しています",
 	"authPermissionAsk": "このアプリは次の権限を要求しています",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見る",
 		"write:account": "アカウントの情報を変更する",
 		"read:blocks": "ブロックを見る",
@@ -1696,6 +1707,7 @@ defineExpose({
 	"authPermission": "{name}に次の権限つけたってやって",
 	"authPermissionAsk": "このアプリは次の権限を要求しとるで",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見るで",
 		"write:account": "アカウントの情報を変更するで",
 		"read:blocks": "ブロックを見るで",
@@ -1808,6 +1820,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Ẓreg talɣut n umiḍan-ik·im",
 		"read:blocks": "View your list of blocked users",
@@ -1920,6 +1933,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2032,6 +2046,7 @@ defineExpose({
 	"authPermission": "{name}에서 다음 권한을 요청하였습니다",
 	"authPermissionAsk": "이 앱은 다음의 권한을 요청합니다",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "계정의 정보를 봅니다",
 		"write:account": "계정의 정보를 변경합니다",
 		"read:blocks": "차단 여부를 확인합니다",
@@ -2144,6 +2159,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2256,6 +2272,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2368,6 +2385,7 @@ defineExpose({
 	"authPermission": "{name} żąda następujących uprawnień",
 	"authPermissionAsk": "Ta aplikacja wymaga następujących uprawnień:",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Wyświetl informacje o swoim koncie",
 		"write:account": "Edytuj swoje informacje o koncie",
 		"read:blocks": "Zobacz listę osób, które zablokowałeś(-aś)",
@@ -2480,6 +2498,7 @@ defineExpose({
 	"authPermission": "{name} solicita as seguintes permissões",
 	"authPermissionAsk": "O aplicativo solicita as seguintes permissões",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Visualizar informações da conta",
 		"write:account": "Editar informações da conta",
 		"read:blocks": "Visualizar a sua lista de usuários bloqueados",
@@ -2592,6 +2611,7 @@ defineExpose({
 	"authPermission": "{name} Запрашивает следующие разрешения:",
 	"authPermissionAsk": "Приложение запрашивает следующие разрешения:",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Просматривать данные учётной записи",
 		"write:account": "Изменять данные учётной записи",
 		"read:blocks": "Смотреть список блокировок",
@@ -2704,6 +2724,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "Táto aplikácia vyžaduje nasledujúce nastavenia",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Vidieť informácie o vašom účte",
 		"write:account": "Upraviť informácie o vašom účte",
 		"read:blocks": "Vidieť zoznam blokovaných používateľov",
@@ -2816,6 +2837,7 @@ defineExpose({
 	"authPermission": "{name} ได้ขอสิทธิ์การเข้าถึงดังต่อไปนี้",
 	"authPermissionAsk": "แอปพลิเคชันนี้ขอสิทธิ์ดังต่อไปนี้",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "ดูข้อมูลบัญชี",
 		"write:account": "แก้ไขข้อมูลบัญชี",
 		"read:blocks": "ดูรายชื่อผู้ใช้ที่ถูกบล็อก",
@@ -2928,6 +2950,7 @@ defineExpose({
 	"authPermission": "{name} aşağıdaki izinleri talep etmektedir.",
 	"authPermissionAsk": "Bu uygulama aşağıdaki izinleri talep etmektedir",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Hesap bilgilerini gör",
 		"write:account": "Hesap bilgilerini düzenle",
 		"read:blocks": "Engellenen kullanıcıların listesini görüntüle",
@@ -3040,6 +3063,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -3152,6 +3176,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Переглядати дані профілю",
 		"write:account": "Змінити дані акаунту",
 		"read:blocks": "Переглянути список заблокованих",
@@ -3264,6 +3289,7 @@ defineExpose({
 	"authPermission": "{name} đang yêu cầu quyền hạn dưới đây",
 	"authPermissionAsk": "Ứng dụng này yêu cầu các quyền sau",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "Xem thông tin tài khoản của bạn",
 		"write:account": "Sửa thông tin tài khoản của bạn",
 		"read:blocks": "Xem danh sách người bạn chặn",
@@ -3376,6 +3402,7 @@ defineExpose({
 	"authPermission": "{name} 需要以下权限",
 	"authPermissionAsk": "这个应用程序需要以下权限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看账户信息",
 		"write:account": "更改帐户信息",
 		"read:blocks": "查看屏蔽列表",
@@ -3488,6 +3515,7 @@ defineExpose({
 	"authPermission": "{name}要求以下的權限",
 	"authPermissionAsk": "此應用程式需要以下權限",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "查看我的帳戶資訊",
 		"write:account": "更改我的帳戶資訊",
 		"read:blocks": "查看封鎖名單",

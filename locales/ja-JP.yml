@@ -2495,6 +2495,7 @@ _2fa:
   moreDetailedGuideHere: "詳細なガイドはこちら"
 
 _permissions:
+  "access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）"
   "read:account": "アカウントの情報を見る"
   "write:account": "アカウントの情報を変更する"
   "read:blocks": "ブロックを見る"

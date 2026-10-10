@@ -82,6 +82,7 @@ export function createLocalMcpPilot(service: McpApiService, options: LocalMcpOpt
 				if (abort.signal.aborted) { reply.raw.destroy(); return reply; }
 				const status = original instanceof McpSelectionError ? 401 : normalizeError(original).status;
 				if (status === 401) reply.header('WWW-Authenticate', 'Bearer realm="Misskey local MCP pilot"');
+				if (status === 403) reply.header('WWW-Authenticate', 'Bearer realm="Misskey local MCP pilot", error="insufficient_scope", scope="access:mcp"');
 				return reply.code(status).send();
 			}
 			// Each POST has a separate stateless SDK server. Cross-request protocol cancellation is unsupported.

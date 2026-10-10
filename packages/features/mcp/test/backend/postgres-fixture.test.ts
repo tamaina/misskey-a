@@ -55,6 +55,8 @@ describe.skipIf(!enabled)('task-owned native PostgreSQL integration', () => {
 		// Existing AuthenticateService now executes its original lookups/updates against real repositories.
 		f.users.findOneBy.mockImplementation(where => repos.usersRepository.findOneBy(where));
 		f.tokens.findOne.mockImplementation(options => repos.accessTokensRepository.findOne(options));
+		f.tokens.findOneBy.mockImplementation(where => repos.accessTokensRepository.findOneBy(where));
+		f.apps.findOneBy.mockImplementation(where => repos.appsRepository.findOneBy(where));
 		f.tokens.update.mockImplementation((id, patch) => repos.accessTokensRepository.update(id, patch));
 		f.apps.findOneByOrFail.mockImplementation(where => repos.appsRepository.findOneByOrFail(where));
 		f.cache.localUserByIdCache.fetch.mockImplementation(async id => {
@@ -116,10 +118,18 @@ describe.skipIf(!enabled)('task-owned native PostgreSQL integration', () => {
 			await expect(f.invoke({ userId: other.id })).rejects.toMatchObject({ code: 'SUBJECT_MISMATCH' });
 			const denied = await f.ordinary({}, f.grant.token, 'my/apps'); expect(denied.json().error.code).toBe('PERMISSION_DENIED');
 			expect((await f.ordinary({}, f.appGrant.hash, 'my/apps')).statusCode).toBe(200); // app row permissions override access-token row permissions
-			expect(await f.invoke({}, '0123456789abcdef')).toEqual(direct.json()); // native master-token tuple
+			await expect(f.invoke({}, '0123456789abcdef')).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+			expect((await f.ordinary({ userId: own.id }, '0123456789abcdef')).statusCode).toBe(200);
 			await repos.accessTokensRepository.update(f.grant.id, { permission: ['read:account'] });
 			expect((await f.ordinary({}, f.grant.token, 'my/apps')).statusCode).toBe(200);
-			await repos.accessTokensRepository.update(f.grant.id, { permission: [] });
+			await expect(f.invoke()).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+			expect((await transportRequest('tools/list')).statusCode).toBe(403);
+			await repos.accessTokensRepository.update(f.grant.id, { permission: ['access:mcp'] });
+			await f.invoke();
+			await repos.appsRepository.update(f.app.id, { permission: ['read:account'] });
+			await expect(f.invoke({}, f.appGrant.hash)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+			await repos.appsRepository.update(f.app.id, { permission: ['read:account', 'access:mcp'] });
+			await f.invoke({}, f.appGrant.hash);
 			const context = f.module.get(ApiExecutionContextFactory);
 			const revoke = createIRevokeTokenProcedure({ accessTokensRepository: {
 				findOneBy: where => 'token' in where ? repos.accessTokensRepository.findOneBy(where) : typeof where.id === 'string' ? repos.accessTokensRepository.findOneBy({ id: where.id, userId: where.userId }) : Promise.resolve(null),
