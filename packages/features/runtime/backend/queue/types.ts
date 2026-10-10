@@ -12,7 +12,7 @@ import type { MiWebhook, WebhookEventTypes } from '@features/integrations/backen
 import type { IActivity } from '@features/federation/backend/protocol/type.js';
 import type { SystemWebhookPayload } from '@features/integrations/backend/services/SystemWebhookService.js';
 import type { UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
-import type { ParsedDraftSignature } from '@misskey-dev/node-http-message-signatures';
+import type { ParsedDraftSignature, ParsedSignature } from '@misskey-dev/node-http-message-signatures';
 
 export type DeliverJobData = {
 	/** Actor */
@@ -31,7 +31,8 @@ export type DeliverJobData = {
 
 export type InboxJobData = {
 	activity: IActivity;
-	signature: ParsedDraftSignature['value'];
+	/** Includes signature wrappers persisted by previous queue writers. */
+	signature: ParsedDraftSignature['value'] | ParsedSignature | null;
 };
 
 export type RelationshipJobData = {
