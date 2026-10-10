@@ -4,6 +4,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { genEd25519KeyPair } from '@misskey-dev/node-http-message-signatures';
 import { Inject, Injectable } from '@nestjs/common';
 import type { OnApplicationShutdown } from '@nestjs/common';
 import { DataSource, IsNull } from 'typeorm';
@@ -120,6 +121,7 @@ export class SystemAccountService implements OnApplicationShutdown {
 		const secret = generateNativeUserToken();
 
 		const keyPair = await genRsaKeyPair();
+		const ed25519 = await genEd25519KeyPair();
 
 		let account!: MiUser;
 
@@ -150,6 +152,8 @@ export class SystemAccountService implements OnApplicationShutdown {
 			await transactionalEntityManager.insert(MiUserKeypair, {
 				publicKey: keyPair.publicKey,
 				privateKey: keyPair.privateKey,
+				ed25519PublicKey: ed25519.publicKey,
+				ed25519PrivateKey: ed25519.privateKey,
 				userId: account.id,
 			});
 
