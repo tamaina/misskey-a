@@ -1,0 +1,123 @@
+[
+  {
+    "file": "packages/features/auth/frontend/accounts.ts",
+    "currentBodySha256": "70587b15d82bff9c4e9fbc1131cd6b3311faff047b603137186c0a36a76ccff2",
+    "baselineBodySha256": "73914465c9a4e48be220736702fb56ce6f21e7d22c848a532e571796f0920488",
+    "currentLocaleBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "baselineLocaleBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bodyEdits": [
+      {
+        "start": 192,
+        "end": 250,
+        "current": "import { clearSharedFiles } from '@@/js/shared-files.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 6986,
+        "end": 7122,
+        "current": "\n\tif ($i != null && $i.id !== me.id) {\n\t\tawait clearSharedFiles().catch(reason => {\n\t\t\tshowing.value = false;\n\t\t\tthrow reason;\n\t\t});\n\t}\n",
+        "baseline": ""
+      }
+    ],
+    "localeEdits": []
+  },
+  {
+    "file": "packages/features/notes/frontend/components/MkPostForm.vue",
+    "currentBodySha256": "692a9cdb7caf8f0719f83e7cba0e137cf00fe4193d7b1cc97465b895aa3422e9",
+    "baselineBodySha256": "198e6491a43eba8e0fc1a6cdc747041a92b22bd63bb04d5da2cd4badb039900b",
+    "currentLocaleBlocksSha256": "d424b98e6e20ca9cd8847babc784f1de25493cbdd5ffb73b36249fe22f46b395",
+    "baselineLocaleBlocksSha256": "d424b98e6e20ca9cd8847babc784f1de25493cbdd5ffb73b36249fe22f46b395",
+    "bodyEdits": [
+      {
+        "start": 14835,
+        "end": 14914,
+        "current": "\nif (props.initialLocalFiles) {\n\tuploader.addFiles(props.initialLocalFiles);\n}\n",
+        "baseline": ""
+      }
+    ],
+    "localeEdits": []
+  },
+  {
+    "file": "packages/features/share/frontend/pages/share.vue",
+    "currentBodySha256": "28aadf216eaaef4b060f86a919ec44cc2250065ffd24e60d0b8b2ab88cf25a50",
+    "baselineBodySha256": "a960b222ca704a73154bffd8015dda76c5e5cc6c740b9a7d434e8ee0b86db6e6",
+    "currentLocaleBlocksSha256": "81a021c9139884c194406e9cce68604d745d3c54c59fe6af98056053a5dc3865",
+    "baselineLocaleBlocksSha256": "4277ec47053c5f7f3cfa29d8bb800e41933b2ee99de8da52e8e10b2b65db5a96",
+    "bodyEdits": [
+      {
+        "start": 387,
+        "end": 421,
+        "current": "\t\t\t:initialLocalFiles=\"tempFiles\"\n",
+        "baseline": ""
+      },
+      {
+        "start": 936,
+        "end": 1005,
+        "current": "import { ref, computed, onBeforeUnmount, onDeactivated } from 'vue';\n",
+        "baseline": "import { ref, computed } from 'vue';\n"
+      },
+      {
+        "start": 1044,
+        "end": 1172,
+        "current": "import { readSharedFiles, discardSharedFiles } from '@@/js/shared-files.js';\nimport { $i } from '@features/auth/frontend/i.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 1607,
+        "end": 1628,
+        "current": "//#region parameters\n",
+        "baseline": ""
+      },
+      {
+        "start": 1691,
+        "end": 1963,
+        "current": "// merge hash parameters\ntry {\n\tconst hashParams = new URLSearchParams(window.location.hash.slice(1));\n\tfor (const [key, value] of hashParams.entries()) {\n\t\turlParams.set(key, value);\n\t}\n} catch (e) {\n\tconsole.error('Failed to parse hash parameters:', e);\n}\n//#endregion\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 2775,
+        "end": 3245,
+        "current": "const tempFiles = ref([] as File[]);\nconst shareId = urlParams.get('shareId');\nconst shareAccountId = $i?.id ?? null;\n\nfunction discardShare() {\n\treturn discardSharedFiles(shareId, shareAccountId).catch(err => console.error('Failed to clear shared files:', err));\n}\n\nlet disposed = false;\n\nfunction isCurrentShare() {\n\treturn !disposed && ($i?.id ?? null) === shareAccountId;\n}\n\nonBeforeUnmount(() => {\n\tdisposed = true;\n\ttempFiles.value = [];\n\tvoid discardShare();\n});\n",
+        "baseline": ""
+      },
+      {
+        "start": 6853,
+        "end": 7962,
+        "current": "\t//#region Local files\n\t// If the browser supports IndexedDB, try to get the temporary files from temp.\n\tif (shareId && window.indexedDB) {\n\t\ttry {\n\t\t\tconst filesFromIdb = await readSharedFiles(shareId, shareAccountId);\n\t\t\tif (isCurrentShare() && Array.isArray(filesFromIdb) && filesFromIdb.length > 0 && filesFromIdb.every(file => file instanceof Blob)) {\n\t\t\t\ttempFiles.value = filesFromIdb;\n\t\t\t}\n\t\t} catch (err) {\n\t\t\tconsole.error('Failed to read shared files:', err);\n\t\t\tif (isCurrentShare()) os.alert({ type: 'error', title: $locale.value.sfc.error, text: err instanceof Error ? err.message : String(err) });\n\t\t}\n\t}\n\n\tconst fileData = urlParams.get('file');\n\tif (fileData && fileData.startsWith('data:')) {\n\t\ttry {\n\t\t\tconst file = await window.fetch(fileData).then(res => res.blob());\n\t\t\tif (isCurrentShare() && file instanceof Blob) {\n\t\t\t\ttempFiles.value.push(new File([file], 'shared-file', { type: file.type }));\n\t\t\t} else {\n\t\t\t\tconsole.error('Fetched file is not a Blob:', file);\n\t\t\t}\n\t\t} catch (e) {\n\t\t\tconsole.error('Failed to fetch file:', e);\n\t\t}\n\t}\n\t//#endregion\n\n\tif (!isCurrentShare()) return;\n",
+        "baseline": ""
+      },
+      {
+        "start": 8000,
+        "end": 8240,
+        "current": "onDeactivated(() => {\n\tcancelShare();\n\tvoid discardShare();\n});\n\nfunction cancelShare() {\n\tdisposed = true;\n\ttempFiles.value = [];\n\tstate.value = 'fetching';\n}\n\nasync function close(): Promise<void> {\n\tcancelShare();\n\tawait discardShare();\n",
+        "baseline": "function close(): void {\n"
+      },
+      {
+        "start": 8352,
+        "end": 8437,
+        "current": "async function goToMisskey(): Promise<void> {\n\tcancelShare();\n\tawait discardShare();\n",
+        "baseline": "function goToMisskey(): void {\n"
+      },
+      {
+        "start": 8522,
+        "end": 8582,
+        "current": "\t// SWが保存したファイルは投稿が完了するまでIndexedDBに保持\n\tvoid discardShare();\n",
+        "baseline": ""
+      },
+      {
+        "start": 8649,
+        "end": 9060,
+        "current": "const headerActions = computed(() => [\n\t{\n\t\ticon: 'ti ti-dots',\n\t\ttext: $locale.value.sfc.menu,\n\t\thandler: (ev: MouseEvent) => {\n\t\t\tos.popupMenu([\n\t\t\t\t{\n\t\t\t\t\ticon: 'ti ti-home',\n\t\t\t\t\ttext: $locale.value.sfc.goToMisskey,\n\t\t\t\t\taction: () => goToMisskey(),\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\ticon: 'ti ti-x',\n\t\t\t\t\ttext: $locale.value.sfc.close,\n\t\t\t\t\taction: () => close(),\n\t\t\t\t},\n\t\t\t], ev.currentTarget ?? ev.target);\n\t\t},\n\t},\n]);\n",
+        "baseline": "const headerActions = computed(() => []);\n"
+      }
+    ],
+    "localeEdits": [
+      {
+        "start": 1279,
+        "end": 1313,
+        "current": "\t\"menu\": \"メニュー\",\n\t\"error\": \"エラー\",\n",
+        "baseline": ""
+      }
+    ]
+  }
+]
