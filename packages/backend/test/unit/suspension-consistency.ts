@@ -19,9 +19,9 @@ import { createProcedureClient } from '@orpc/server';
 import type { ApiActor, ApiContext, ApiServices } from '@features/api/backend/transport/context.js';
 import { createFederationStatsProcedure } from '@features/federation/backend/endpoints/federation/stats.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
-import { RemoteSuspend1791572713543 as RemoteSuspensionMigration } from '../../migration/1791572713543-RemoteSuspend.js';
-import { FollowingIsFollowerSuspended1791310067731 as SuspensionSchemaMigration } from '../../migration/1791310067731-FollowingIsFollowerSuspended.js';
-import { FollowingIsFollowerSuspendedCopySuspendedState1791310067732 as SuspensionBackfillMigration } from '../../migration/1791310067732-FollowingIsFollowerSuspendedCopySuspendedState.js';
+import { RemoteSuspend1751848750315 as RemoteSuspensionMigration } from '../../migration/1751848750315-RemoteSuspend.js';
+import { FollowingIsFollowerSuspended1752410859370 as SuspensionSchemaMigration } from '../../migration/1752410859370-FollowingIsFollowerSuspended.js';
+import { FollowingIsFollowerSuspendedCopySuspendedState1752410900000 as SuspensionBackfillMigration } from '../../migration/1752410900000-FollowingIsFollowerSuspendedCopySuspendedState.js';
 
 describe('suspension consistency', () => {
 	let app: TestingModule;
@@ -243,7 +243,7 @@ describe('suspension consistency', () => {
 			await runner.release();
 		}
 	});
-	test.each([[false, false], [true, false], [false, true], [true, true]])('remote suspension migration preserves local hold=%s after removing remote hold=%s across down/up', async (localHeld, remoteHeld) => {
+	test.each([[false, false], [true, false], [false, true], [true, true]])('original remote suspension migration preserves following hold for local=%s, remote=%s across down/up', async (localHeld, remoteHeld) => {
 		const actor = await user();
 		const target = await user(null);
 		await follow(actor, target);
@@ -257,10 +257,10 @@ describe('suspension consistency', () => {
 			const migration = new RemoteSuspensionMigration();
 			await migration.down(runner);
 			expect(await runner.query(`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user' AND column_name = 'isRemoteSuspended'`)).toHaveLength(0);
-			expect(await runner.query('SELECT id, "isFollowerSuspended" FROM "following" WHERE "followerId" = $1', [actor.id])).toEqual([{ id: original.id, isFollowerSuspended: localHeld }]);
+			expect(await runner.query('SELECT id, "isFollowerSuspended" FROM "following" WHERE "followerId" = $1', [actor.id])).toEqual([{ id: original.id, isFollowerSuspended: localHeld || remoteHeld }]);
 			await migration.up(runner);
 			expect(await runner.query('SELECT "isSuspended", "isRemoteSuspended" FROM "user" WHERE id = $1', [actor.id])).toEqual([{ isSuspended: localHeld, isRemoteSuspended: false }]);
-			expect(await runner.query('SELECT "isFollowerSuspended" FROM "following" WHERE id = $1', [original.id])).toEqual([{ isFollowerSuspended: localHeld }]);
+			expect(await runner.query('SELECT "isFollowerSuspended" FROM "following" WHERE id = $1', [original.id])).toEqual([{ isFollowerSuspended: localHeld || remoteHeld }]);
 			await runner.commitTransaction();
 			const pending = await users.manager.connection.driver.createSchemaBuilder().log();
 			expect(pending.upQueries).toEqual([]);

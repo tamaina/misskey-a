@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export class FollowingIsFollowerSuspendedCopySuspendedState1791310067732 {
-    name = 'FollowingIsFollowerSuspendedCopySuspendedState1791310067732'
+export class FollowingIsFollowerSuspendedCopySuspendedState1752410900000 {
+    name = 'FollowingIsFollowerSuspendedCopySuspendedState1752410900000'
 
     async up(queryRunner) {
 			// Update existing records based on user suspension status

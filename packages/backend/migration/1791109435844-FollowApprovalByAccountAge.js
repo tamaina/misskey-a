@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export class FollowApprovalByAccountAge1791568703923 {
-    name = 'FollowApprovalByAccountAge1791568703923';
+export class FollowApprovalByAccountAge1791109435844 {
+    name = 'FollowApprovalByAccountAge1791109435844';
 
     /**
      * @param {QueryRunner} queryRunner

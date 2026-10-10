@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export class FollowingIsFollowerSuspended1791310067731 {
-    name = 'FollowingIsFollowerSuspended1791310067731'
+export class FollowingIsFollowerSuspended1752410859370 {
+    name = 'FollowingIsFollowerSuspended1752410859370'
 
     async up(queryRunner) {
         await queryRunner.query(`DROP INDEX "public"."IDX_ce62b50d882d4e9dee10ad0d2f"`);
