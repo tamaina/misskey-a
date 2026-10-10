@@ -21,11 +21,15 @@ Redirect URIs come from fetched metadata and must match exactly.
 
 This compatibility path requires the canonical `/mcp` resource in authorization
 and token requests, binding it to five-minute consent/code state in shared Redis.
-CIMD parsing is selected by that resource; ordinary OAuth without a resource keeps
-the existing IndieAuth JSON/HTML discovery rules. CIMD callbacks currently require
+CIMD discovery also works for ordinary OAuth scopes without a resource. The client
+document determines CIMD versus legacy IndieAuth JSON/HTML parsing. Requesting
+`access:mcp` now requires that resource even for legacy clients; this is an
+intentional compatibility restriction. CIMD callbacks currently require
 HTTPS, so native HTTP loopback callback clients are outside this initial scope.
 Metadata retrieval uses bounded direct public HTTPS without redirects, instance
-proxy settings or private-network exceptions. Code reuse revokes the associated
+proxy settings or private-network exceptions. This stricter retrieval also applies
+to legacy HTTPS client IDs with a non-root path; root legacy IDs keep their
+existing retrieval path. Code reuse revokes the associated
 token row when its replay state remains available. Redis state stores row IDs,
 not bearer credentials, and insertion races fail closed with row cleanup.
 
@@ -97,7 +101,10 @@ AbortSignal behavior.
 The opt-in PostgreSQL fixture executes native authentication, QueryService SQL,
 NoteEntityService packing/private nested-note hiding and token revocation using
 real task-owned repositories. Auxiliary cache, user/media/emoji packing and
-role/rate-limit ports remain mocked; Redis is unverified.
+role/rate-limit ports remain mocked. The separate OAuth fixture uses actual Redis
+for cross-provider consent/code consumption, replay and insertion races; database
+failure injection uses mocked repositories. A crashed worker or failed row cleanup
+can leave an orphan token; durable recovery is outside this change.
 
 Run the synthetic unit suite from the repository root:
 
@@ -113,9 +120,17 @@ node packages/features/mcp/test/run-postgres-fixture.mjs
 
 It creates a new private temporary cluster with TCP disabled, runs only the
 feature fixture, stops the server and retains its directory. It never loads the
-preview/test database configuration. PostgreSQL17 binaries are the default;
+preview/test database configuration. The newest installed PostgreSQL binaries are selected;
 `MISSKEY_PG_BINDIR` can select another installed PostgreSQL binary directory.
-The ordinary unit suite skips this opt-in DB fixture.
+The ordinary unit suite skips this opt-in DB fixture; backend CI explicitly runs
+the launcher in both Node matrices. It also runs the disposable OAuth Redis suite:
+
+```
+node packages/features/auth/test/run-oauth-fixture.mjs
+```
+
+That launcher creates a private Unix socket in a fresh network-disabled container,
+runs the OAuth state/flow suites and removes the container, with no instance config.
 
 The normal-server synthetic tests include SDK initialization/list/call using
 remote request addresses, native MiAuth/app grants, master denial, current scope

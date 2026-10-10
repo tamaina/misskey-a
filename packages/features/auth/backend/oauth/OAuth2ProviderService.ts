@@ -99,6 +99,7 @@ function validateClientId(raw: string): URL {
 
 interface ClientInformation {
 	id: string;
+	cimd: boolean;
 	redirectUris: string[];
 	name: string;
 	logo: string | null;
@@ -136,6 +137,7 @@ interface AuthorizationTransaction {
 
 interface AuthorizationCodeGrant {
 	clientId: string;
+	cimd: boolean;
 	userId: string;
 	redirectUri: string;
 	codeChallenge: string;
@@ -169,13 +171,14 @@ function parseMicroformats(doc: htmlParser.HTMLElement, baseUrl: string, id: str
 	return { name, logo };
 }
 
-async function discoverClientInformation(logger: Logger, httpRequestService: HttpRequestService, id: string, metadataFetcher?: typeof fetchOAuthClientMetadata): Promise<ClientInformation> {
+async function discoverClientInformation(logger: Logger, httpRequestService: HttpRequestService, id: string, metadataFetcher?: typeof fetchOAuthClientMetadata, requireCimd = false): Promise<ClientInformation> {
 	try {
 		const res = await (metadataFetcher ? metadataFetcher(id) : httpRequestService.send(id));
 
 		const redirectUris: string[] = [];
 		let name = id;
 		let logo: string | null = null;
+		let cimd = false;
 
 		// https://indieauth.spec.indieweb.org/#redirect-url
 		// "The client SHOULD publish one or more <link> tags or Link HTTP headers with a rel attribute
@@ -216,22 +219,22 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 			// https://indieauth.spec.indieweb.org/#client-metadata-li-1
 			// "The authorization server MUST verify that the client_id in the document matches the
 			// client_id of the URL where the document was retrieved."
-			if (json.client_id !== id) {
+			// Recognize the client format from its document, independently of the requested resource.
+			// IndieAuth JSON keeps its client_uri-prefix rule when it declares no CIMD auth capabilities.
+			const legacyClientUri = typeof json.client_uri === 'string' && json.client_uri.length > 0 && new URL(id).href.startsWith(json.client_uri);
+			cimd = json.token_endpoint_auth_methods_supported !== undefined || json.token_endpoint_auth_method !== undefined || !legacyClientUri;
+			if (requireCimd && !cimd) throw new InvalidRequestError('Resource authorization requires CIMD client metadata');
+			if (cimd && !metadataFetcher) throw new InvalidRequestError('CIMD requires an HTTPS client ID with a non-root path');
+			if (json.client_id !== (cimd ? id : new URL(id).href)) {
 				throw new InvalidRequestError('client_id in the document does not match the client_id URL');
 			}
 
-			// https://indieauth.spec.indieweb.org/#client-metadata-li-1
-			// "The client_uri MUST be a prefix of the client_id."
-			if (!metadataFetcher && (!json.client_uri || !id.startsWith(json.client_uri))) {
-				throw new InvalidRequestError('client_uri is not a prefix of client_id');
-			}
-
-			if (metadataFetcher) {
+			if (cimd) {
 				if (typeof json.client_name !== 'string' || !json.client_name.trim() || json.client_name.length > 256) {
 					throw new InvalidRequestError('Client metadata requires a client_name');
 				}
 				// The plural capability list takes precedence over the legacy preference.
-				const methods = json.token_endpoint_auth_methods_supported ?? [json.token_endpoint_auth_method ?? 'client_secret_basic'];
+				const methods = json.token_endpoint_auth_methods_supported !== undefined ? json.token_endpoint_auth_methods_supported : [json.token_endpoint_auth_method ?? 'client_secret_basic'];
 				if (!Array.isArray(methods) || !methods.every(method => typeof method === 'string') || !methods.includes('none')) {
 					throw new InvalidRequestError('Client does not support public-client authentication');
 				}
@@ -267,11 +270,11 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 				logo = new URL(json.logo_uri, res.url).toString();
 			}
 
-			if (!metadataFetcher && Array.isArray(json.redirect_uris)) {
+			if (!cimd && Array.isArray(json.redirect_uris)) {
 				redirectUris.push(...json.redirect_uris.filter((uri): uri is string => typeof uri === 'string'));
 			}
 		} else {
-			if (metadataFetcher) throw new InvalidRequestError('Client metadata must be application/json');
+			if (requireCimd) throw new InvalidRequestError('Resource authorization requires application/json client metadata');
 			// Client discovery via HTML microformats (12 February 2022 spec)
 			// https://indieauth.spec.indieweb.org/20220212/#client-information-discovery
 			// "Authorization servers SHOULD support parsing the [h-app] Microformat from the client_id,
@@ -294,8 +297,9 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 		}
 
 		return {
-			id,
-			redirectUris: metadataFetcher ? redirectUris : redirectUris.map(uri => new URL(uri, res.url).toString()),
+			id: cimd ? id : new URL(id).href,
+			cimd,
+			redirectUris: cimd ? redirectUris : redirectUris.map(uri => new URL(uri, res.url).toString()),
 			name: typeof name === 'string' ? name : id,
 			logo,
 		};
@@ -486,12 +490,13 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		}
 
 		const clientUrl = validateClientId(clientId);
+		const strictRetrieval = resource !== undefined || (clientUrl.protocol === 'https:' && clientUrl.pathname !== '/');
 
 		// https://indieauth.spec.indieweb.org/#client-information-discovery
 		// "the server may want to resolve the domain name first and avoid fetching the document
 		// if the IP address is within the loopback range defined by [RFC5735]
 		// or any other implementation-specific internal IP address."
-		if (!resource && (process.env.NODE_ENV !== 'test' || process.env.MISSKEY_TEST_CHECK_IP_RANGE === '1')) {
+		if (!strictRetrieval && (process.env.NODE_ENV !== 'test' || process.env.MISSKEY_TEST_CHECK_IP_RANGE === '1')) {
 			const lookup = await dns.lookup(clientUrl.hostname);
 			if (ipaddr.parse(lookup.address).range() !== 'unicast') {
 				throw new InvalidRequestError('client_id resolves to disallowed IP range.');
@@ -499,7 +504,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		}
 
 		// Find client information from the remote.
-		const clientInfo = await discoverClientInformation(this.#logger, this.httpRequestService, resource ? clientId : clientUrl.href, resource ? this.fetchClientMetadata.bind(this) : undefined);
+		const clientInfo = await discoverClientInformation(this.#logger, this.httpRequestService, strictRetrieval ? clientId : clientUrl.href, strictRetrieval ? this.fetchClientMetadata.bind(this) : undefined, resource !== undefined);
 
 		// Require the redirect URI to be included in an explicit list, per
 		// https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.1.3
@@ -672,6 +677,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				const code = secureRndstr(128);
 				await this.#state.putCode(code, {
 					clientId: transaction.client.id,
+					cimd: transaction.client.cimd,
 					userId: user.id,
 					redirectUri: transaction.request.redirectUri,
 					codeChallenge: transaction.request.codeChallenge,
@@ -724,7 +730,8 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				const redirectUriValue = firstValue(body.redirect_uri);
 				const codeVerifier = firstValue(body.code_verifier);
 				const resource = firstValue(body.resource);
-				if ((body.client_secret !== undefined && (resource !== undefined || firstValue(body.client_secret) !== '')) || body.client_assertion !== undefined || body.client_assertion_type !== undefined || request.headers.authorization !== undefined) {
+				const clientSecret = firstValue(body.client_secret);
+				if ((clientSecret !== undefined && clientSecret !== '') || body.client_assertion !== undefined || body.client_assertion_type !== undefined || request.headers.authorization !== undefined) {
 					throw new InvalidRequestError('Only public-client authentication is supported');
 				}
 
@@ -739,6 +746,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					throw new InvalidGrantError('grant request is invalid');
 				}
 				const granted = claim.grant;
+				if (granted.cimd && body.client_secret !== undefined) throw new InvalidRequestError('Only public-client authentication is supported');
 				if (resource !== granted.resource) throw new InvalidGrantError('grant request is invalid');
 				this.#validateResource(resource, granted.scopes);
 

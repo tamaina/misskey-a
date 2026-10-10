@@ -214,14 +214,12 @@ describe.skipIf(!socket)('synthetic OAuth discovery through native MCP (isolated
 
 	it.each(['json', 'html'])('preserves legacy %s IndieAuth consent and empty-secret token exchange without a resource', async format => {
 		const s = await setup();
-		// Legacy resolver has its own DNS preflight; this fixture never performs external network I/O.
-		vi.spyOn(dns, 'lookup').mockImplementation((async () => ({ address: '203.0.113.10', family: 4 })) as unknown as typeof dns.lookup);
 		const body = format === 'json' ? JSON.stringify({ client_id: clientId, client_uri: 'https://chatgpt.com/', client_name: 'Legacy synthetic client', redirect_uris: [redirectUri] })
 			: `<html><head><link rel="redirect_uri" href="${redirectUri}"></head><body><div class="h-app"><span class="p-name">Legacy synthetic client</span></div></body></html>`;
-		s.httpServices[0].send.mockResolvedValue(new MetadataResponse(body, { url: clientId, headers: { 'content-type': format === 'json' ? 'application/json' : 'text/html' } } as ResponseInit & { url: string }));
+		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(new MetadataResponse(body, { url: clientId, headers: { 'content-type': format === 'json' ? 'application/json' : 'text/html' } } as ResponseInit & { url: string }));
 		const flow = await s.grant({ resource: '', scope: 'read:account' });
-		expect(s.providers[0].fetchClientMetadata).not.toHaveBeenCalled();
-		expect(s.httpServices[0].send).toHaveBeenCalledWith(clientId);
+		expect(s.providers[0].fetchClientMetadata).toHaveBeenCalledWith(clientId);
+		expect(s.httpServices[0].send).not.toHaveBeenCalled();
 		const response = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: clientId, client_secret: '', redirect_uri: redirectUri, code: flow.code, code_verifier: flow.codeVerifier } });
 		expect(response.statusCode).toBe(200);
 		const token = response.json(); expect(token.scope).toBe('read:account');
@@ -229,6 +227,70 @@ describe.skipIf(!socket)('synthetic OAuth discovery through native MCP (isolated
 		expect(row.permission).toEqual(['read:account']);
 		const denied = await s.app.inject({ method: 'POST', url: '/mcp', headers: { host: 'instance.invalid', authorization: `Bearer ${token.access_token}`, accept: 'application/json, text/event-stream' }, payload: { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} } });
 		expect(denied.statusCode).toBe(403);
+	});
+
+	it('accepts globally advertised CIMD for a non-MCP native scope without resource or client_uri', async () => {
+		const s = await setup();
+		expect(s.discovery.authorizationServerMetadata?.client_id_metadata_document_supported).toBe(true);
+		const flow = await s.grant({ resource: '', scope: 'read:account' });
+		expect(s.providers[0].fetchClientMetadata).toHaveBeenCalledWith(clientId);
+		expect(s.httpServices[0].send).not.toHaveBeenCalled();
+		const token = await exchangeAuthorization(issuer, { metadata: s.discovery.authorizationServerMetadata, clientInformation: { client_id: clientId }, authorizationCode: flow.code, codeVerifier: flow.codeVerifier, redirectUri, fetchFn: s.fetchFixture });
+		const row = [...s.f.rows.values()].find(value => value.token === token.access_token)!;
+		expect(row.permission).toEqual(['read:account']);
+		expect(row.userId).toBe(s.f.own.id);
+		const denied = await s.app.inject({ method: 'POST', url: '/mcp', headers: { host: 'instance.invalid', authorization: `Bearer ${token.access_token}`, accept: 'application/json, text/event-stream' }, payload: { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} } });
+		expect(denied.statusCode).toBe(403);
+	});
+
+	it.each(['client_id', 'redirect_uris', 'methods'])('validates no-resource CIMD %s without falling back to generic fetching', async field => {
+		const s = await setup();
+		const document: Record<string, unknown> = { client_id: clientId, client_name: 'Synthetic CIMD', redirect_uris: [redirectUri], token_endpoint_auth_methods_supported: ['none', 'private_key_jwt'], token_endpoint_auth_method: 'private_key_jwt' };
+		if (field === 'client_id') document.client_id = 'https://chatgpt.com/oauth/other.json';
+		if (field === 'redirect_uris') document.redirect_uris = [`${redirectUri}/extra`];
+		if (field === 'methods') document.token_endpoint_auth_methods_supported = ['private_key_jwt'];
+		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(new MetadataResponse(JSON.stringify(document), { headers: { 'content-type': 'application/json' } }));
+		const flow = await s.begin({ resource: '', scope: 'read:account' });
+		expect(flow.page.statusCode).toBeGreaterThanOrEqual(400);
+		expect(flow.page.headers.location).toBeUndefined();
+		expect(s.httpServices[0].send).not.toHaveBeenCalled();
+		expect(s.f.tokens.insert).not.toHaveBeenCalled();
+	});
+
+	it('keeps no-resource CIMD public clients secret-free at token exchange', async () => {
+		const s = await setup(); const flow = await s.grant({ resource: '', scope: 'read:account' });
+		const response = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: clientId, client_secret: '', redirect_uri: redirectUri, code: flow.code, code_verifier: flow.codeVerifier } });
+		expect(response.statusCode).toBeGreaterThanOrEqual(400);
+		expect(s.f.tokens.insert).not.toHaveBeenCalled();
+	});
+
+	it('never falls back to generic HTTP after strict no-resource metadata fetching fails', async () => {
+		const s = await setup();
+		vi.mocked(s.providers[0].fetchClientMetadata).mockRejectedValue(new Error('Synthetic strict metadata rejection'));
+		const flow = await s.begin({ resource: '', scope: 'read:account' });
+		expect(flow.page.statusCode).toBeGreaterThanOrEqual(400);
+		expect(s.providers[0].fetchClientMetadata).toHaveBeenCalledWith(clientId);
+		expect(s.httpServices[0].send).not.toHaveBeenCalled();
+	});
+
+	it.each(['cimd', 'legacy'])('requires canonical resource for access:mcp even with %s metadata', async format => {
+		const s = await setup();
+		if (format === 'legacy') vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(new MetadataResponse(JSON.stringify({ client_id: clientId, client_uri: 'https://chatgpt.com/', client_name: 'Legacy', redirect_uris: [redirectUri] }), { url: clientId, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string }));
+		const flow = await s.begin({ resource: '' });
+		expect(flow.page.statusCode).toBeGreaterThanOrEqual(400);
+		expect(s.providers[0].fetchClientMetadata).not.toHaveBeenCalled();
+		expect(s.f.tokens.insert).not.toHaveBeenCalled();
+	});
+
+	it('preserves root HTTPS IndieAuth consent through the existing generic discovery path', async () => {
+		const s = await setup(); const legacyClient = 'https://legacy.invalid/';
+		vi.spyOn(dns, 'lookup').mockImplementation((async () => ({ address: '203.0.113.10', family: 4 })) as unknown as typeof dns.lookup);
+		s.httpServices[0].send.mockResolvedValue(new MetadataResponse(JSON.stringify({ client_id: legacyClient, client_uri: legacyClient, client_name: 'Legacy root client', redirect_uris: [redirectUri] }), { url: legacyClient, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string }));
+		const flow = await s.grant({ client_id: legacyClient, resource: '', scope: 'read:account' });
+		expect(s.providers[0].fetchClientMetadata).not.toHaveBeenCalled();
+		expect(s.httpServices[0].send).toHaveBeenCalledWith(legacyClient);
+		const response = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: legacyClient, client_secret: '', redirect_uri: redirectUri, code: flow.code, code_verifier: flow.codeVerifier } });
+		expect(response.statusCode).toBe(200); expect(response.json().scope).toBe('read:account');
 	});
 
 	it('rejects code replay on another worker and removes the previously issued native row', async () => {
