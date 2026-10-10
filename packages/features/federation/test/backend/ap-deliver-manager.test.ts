@@ -13,6 +13,7 @@ import type { TestingModule } from '@nestjs/testing';
 import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { IActivity } from '@features/federation/backend/protocol/type.js';
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
+import { UserKeypairService } from '@features/federation/backend/services/UserKeypairService.js';
 import { ApLoggerService } from '@features/federation/backend/services/ApLoggerService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { FollowingsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -58,6 +59,12 @@ describe('ApDeliverManagerService', () => {
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
 				ApDeliverManagerService,
+				{
+					provide: UserKeypairService,
+					useValue: {
+						refreshAndPrepareEd25519KeyPair: vi.fn<UserKeypairService['refreshAndPrepareEd25519KeyPair']>().mockResolvedValue(undefined),
+					},
+				},
 				{
 					provide: DI.followingsRepository,
 					useValue: {
@@ -132,6 +139,7 @@ describe('ApDeliverManagerService', () => {
 				{ id: mockLocalUser.id },
 				mockActivity,
 				expect.any(Map),
+				false,
 			);
 
 			// 呼び出されたinboxesを確認
@@ -165,6 +173,7 @@ describe('ApDeliverManagerService', () => {
 				{ id: mockLocalUser.id },
 				mockActivity,
 				expect.any(Map),
+				false,
 			);
 
 			const [, , inboxes] = queueService.deliverMany.mock.calls[0];
@@ -392,6 +401,12 @@ describe('ApDeliverManagerService (SQL)', () => {
 			imports: [GlobalModule],
 			providers: [
 				ApDeliverManagerService,
+				{
+					provide: UserKeypairService,
+					useValue: {
+						refreshAndPrepareEd25519KeyPair: vi.fn<UserKeypairService['refreshAndPrepareEd25519KeyPair']>().mockResolvedValue(undefined),
+					},
+				},
 				{
 					provide: QueueService,
 					useFactory: () => ({

@@ -21,6 +21,7 @@ function fixture() {
 	const relay = mockDeep<RelayService>();
 	const manager = mockDeep<ReturnType<ApDeliverManagerService['createDeliverManager']>>();
 	delivery.createDeliverManager.mockReturnValue(manager);
+	delivery.prepareActorSigningKey.mockResolvedValue(undefined);
 	const service = new AccountUpdateService(users, entity, renderer, delivery, relay);
 	return { users, entity, renderer, delivery, relay, manager, service };
 }
@@ -72,13 +73,38 @@ describe('suspension account Update publication', () => {
 		expect(f.users.findOneBy).toHaveBeenCalledWith({ id: actor.id });
 		expect(f.manager.addAllKnowingSharedInboxRecipe).toHaveBeenCalledOnce();
 		expect(f.manager.addFollowersRecipe).toHaveBeenCalledOnce();
-		expect(f.relay.deliverToRelays).toHaveBeenCalledWith(actor, expect.objectContaining({ type: 'Update', object: expect.objectContaining({ suspended: isSuspended }) }));
+		expect(f.manager.execute).toHaveBeenCalledWith({ forceMainKey: true });
+		expect(f.relay.deliverToRelays).toHaveBeenCalledWith(actor, expect.objectContaining({ type: 'Update', object: expect.objectContaining({ suspended: isSuspended }) }), true);
 		queued.finish();
 		await Promise.resolve();
 		expect(complete).not.toHaveBeenCalled();
 		relayed.finish();
 		await publication;
 		expect(complete).toHaveBeenCalledOnce();
+	});
+
+	test.each([false, true])('normal Actor rendering waits for preparation; forced RSA skips it: forced=%s', async forced => {
+		const f = fixture();
+		const actor = Object.assign(new MiUser({}), { id: 'actor', host: null, isDeleted: false });
+		f.users.findOneBy.mockResolvedValue(actor);
+		f.entity.isLocalUser.mockReturnValue(true);
+		f.renderer.renderPerson.mockResolvedValue(mockDeep<Awaited<ReturnType<ApRendererService['renderPerson']>>>());
+		f.renderer.renderUpdate.mockReturnValue({ type: 'Update', actor: 'https://local.example/users/actor', object: { type: 'Person', id: 'https://local.example/users/actor' } });
+		f.renderer.addContext.mockReturnValue({ type: 'Update', id: 'update', '@context': [] });
+		const prepared = pending();
+		f.delivery.prepareActorSigningKey.mockReturnValue(prepared.promise);
+		const publication = f.service.publishToFollowers(actor.id, forced);
+		if (forced) {
+			await publication;
+			expect(f.delivery.prepareActorSigningKey).not.toHaveBeenCalled();
+		} else {
+			await vi.waitFor(() => expect(f.delivery.prepareActorSigningKey).toHaveBeenCalledWith(actor.id));
+			expect(f.renderer.renderPerson).not.toHaveBeenCalled();
+			prepared.finish();
+			await publication;
+		}
+		expect(f.renderer.renderPerson).toHaveBeenCalledOnce();
+		expect(f.delivery.deliverToFollowers).toHaveBeenCalledWith(actor, expect.objectContaining({ type: 'Update' }), forced);
 	});
 
 	test('a rejected manager does not abandon waiting for the relay', async () => {

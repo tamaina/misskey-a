@@ -575,7 +575,10 @@ export class ApRendererService {
 			manuallyApprovesFollowers: user.isLocked,
 			discoverable: user.isExplorable,
 			publicKey: this.renderKey(user, keypair, '#main-key'),
-			assertionMethod: [this.renderMultikey(user, keypair.publicKey, '#main-key')],
+			assertionMethod: [
+				this.renderMultikey(user, keypair.publicKey, '#main-key'),
+				...(keypair.ed25519PublicKey ? [this.renderMultikey(user, keypair.ed25519PublicKey, '#ed25519-key')] : []),
+			],
 			isCat: user.isCat,
 			attachment: attachment.length ? attachment : undefined,
 			suspended: user.isSuspended,

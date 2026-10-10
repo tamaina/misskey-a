@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ASSERTION_METHOD_DRAFT_LEVEL } from '@features/federation/backend/protocol/misc/http-signature-capabilities.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
@@ -92,6 +93,7 @@ export class NodeinfoServerService {
 					localComments: 0,
 				},
 				metadata: {
+					httpMessageSignaturesImplementationLevel: ASSERTION_METHOD_DRAFT_LEVEL,
 					nodeName: meta.name,
 					nodeDescription: meta.description,
 					nodeAdmins: [{

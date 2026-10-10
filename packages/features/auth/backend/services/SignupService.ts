@@ -4,6 +4,7 @@
  */
 
 import { generateKeyPair } from 'node:crypto';
+import { genEd25519KeyPair } from '@misskey-dev/node-http-message-signatures';
 import * as v from 'valibot';
 import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import { localUsernameSchema, passwordSchema } from '@features/users/backend/user-validation.schema.js';
@@ -124,6 +125,8 @@ export class SignupService {
 				err ? rej(err) : res([publicKey, privateKey]),
 			));
 
+		const ed25519 = await genEd25519KeyPair();
+
 		let account!: MiUser;
 
 		// Start transaction
@@ -146,6 +149,8 @@ export class SignupService {
 			await transactionalEntityManager.save(new MiUserKeypair({
 				publicKey: keyPair[0],
 				privateKey: keyPair[1],
+				ed25519PublicKey: ed25519.publicKey,
+				ed25519PrivateKey: ed25519.privateKey,
 				userId: account.id,
 			}));
 

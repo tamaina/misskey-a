@@ -30,6 +30,7 @@ import { AccountUpdateService } from '@features/users/backend/services/AccountUp
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { randomString } from '../utils.js';
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
+import { UserKeypairService } from '@features/federation/backend/services/UserKeypairService.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
 import { ApLoggerService } from '@features/federation/backend/services/ApLoggerService.js';
 
@@ -95,6 +96,12 @@ describe('UserSuspendService', () => {
 				UserSuspendService,
 				AccountUpdateService,
 				ApDeliverManagerService,
+				{
+					provide: UserKeypairService,
+					useValue: {
+						refreshAndPrepareEd25519KeyPair: vi.fn<UserKeypairService['refreshAndPrepareEd25519KeyPair']>().mockResolvedValue(undefined),
+					},
+				},
 				{
 					provide: UserEntityService,
 					useFactory: () => ({
@@ -357,7 +364,7 @@ describe('UserSuspendService', () => {
 
 			await userSuspendService.suspend(localUser, moderator);
 			await vi.waitFor(() => expect(queueService.deliverMany).toHaveBeenCalledWith(
-				{ id: localUser.id }, expect.objectContaining({ type: 'Update' }), expect.any(Map),
+				{ id: localUser.id }, expect.objectContaining({ type: 'Update' }), expect.any(Map), true,
 			));
 
 			// ActivityPub配信が呼ばれているかチェック
@@ -382,7 +389,7 @@ describe('UserSuspendService', () => {
 
 			await userSuspendService.unsuspend(localUser, moderator);
 			await vi.waitFor(() => expect(queueService.deliverMany).toHaveBeenCalledWith(
-				{ id: localUser.id }, expect.objectContaining({ type: 'Update' }), expect.any(Map),
+				{ id: localUser.id }, expect.objectContaining({ type: 'Update' }), expect.any(Map), true,
 			));
 
 			// ActivityPub配信が呼ばれているかチェック
