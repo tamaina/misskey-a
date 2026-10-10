@@ -39,7 +39,7 @@ import type {
 	SystemWebhookDeliverQueue,
 	UserWebhookDeliverQueue,
 } from '@features/boot/backend/assembly/QueueModule.js';
-import type httpSignature from '@peertube/http-signature';
+import type { ParsedDraftSignature } from '@misskey-dev/node-http-message-signatures';
 import type * as Bull from 'bullmq';
 
 import { QUEUE_TYPES } from '../../shared/queue-types.js';
@@ -225,7 +225,7 @@ export class QueueService {
 	}
 
 	@bindThis
-	public inbox(activity: IActivity, signature: httpSignature.IParsedSignature) {
+	public inbox(activity: IActivity, signature: ParsedDraftSignature['value']) {
 		const data = {
 			activity: activity,
 			signature,
