@@ -55,8 +55,9 @@ distinct from negotiating a remote peer capability.
 
 ## Local migration rollback
 
-The migration keeps existing local RSA public and private columns intact.
+The original two-step key migrations keep existing local RSA columns intact.
 Rollback restores the old one-key-per-remote-actor schema, preferring the existing
-`#main-key` row and otherwise the lexically first key ID. Secondary remote keys
-and the local Ed25519 columns are removed; rollback does not retain those keys.
+`#main-key` row and otherwise the lexically first key ID. Reverting `1709269211718-APMultipleKeysFix1` removes secondary remote keys.
+Reverting `1708980134301-APMultipleKeys` then removes local Ed25519 columns;
+rollback does not retain those keys.
 The key ID preference does not infer an algorithm or create replacement RSA keys.

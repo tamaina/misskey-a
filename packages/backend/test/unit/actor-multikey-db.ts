@@ -31,7 +31,8 @@ import type { UtilityService } from '@features/federation/backend/services/Utili
 import type { Resolver } from '@features/federation/backend/services/ApResolverService.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { signAsDraftToRequest, parseRequestSignature, verifyDraftSignature } from '@misskey-dev/node-http-message-signatures';
-import { ActivityPubMultipleKeys1791573319995 } from '../../migration/1791573319995-ActivityPubMultipleKeys.js';
+import { APMultipleKeys1708980134301 } from '../../migration/1708980134301-APMultipleKeys.js';
+import { APMultipleKeys1709269211718 } from '../../migration/1709269211718-APMultipleKeysFix1.js';
 import { actor, actorId, host, multikey } from '../misc/public-multikey.js';
 
 const rsa = generateKeyPairSync('rsa', { modulusLength: 2048 });
@@ -360,7 +361,9 @@ describe('actor Multikey database and verification path', () => {
 		await runner.connect();
 		await runner.startTransaction();
 		try {
-			const migration = new ActivityPubMultipleKeys1791573319995();
+			const migration = new APMultipleKeys1708980134301();
+			const fix = new APMultipleKeys1709269211718();
+			await fix.down(runner);
 			await migration.down(runner);
 			const remote: Array<{ keyId: string; keyPem: string }> = await runner.query('SELECT "keyId", "keyPem" FROM "user_publickey" WHERE "userId" = $1', [original.userId]);
 			expect(remote).toEqual([{ keyId: actorId + '#main-key', keyPem: original.publicKey }]);
@@ -369,6 +372,7 @@ describe('actor Multikey database and verification path', () => {
 			expect(local[0].payload).not.toHaveProperty('ed25519PublicKey');
 			expect(local[0].payload).not.toHaveProperty('ed25519PrivateKey');
 			await migration.up(runner);
+			await fix.up(runner);
 			const restored = await runner.manager.getRepository(MiUserKeypair).findOneByOrFail({ userId: original.userId });
 			expect(restored).toMatchObject({ publicKey: original.publicKey, privateKey: original.privateKey, ed25519PublicKey: null, ed25519PrivateKey: null });
 			expect(await runner.manager.getRepository(MiUserPublickey).countBy({ userId: original.userId })).toBe(1);
