@@ -389,7 +389,6 @@ signinFailed: "লগ ইন করা যায়নি। আপনার ব
 or: "অথবা"
 language: "ভাষা"
 uiLanguage: "UI এর ভাষা"
-aboutX: "{x} সম্পর্কে"
 noHistory: "কোনো ইতিহাস নেই"
 signinHistory: "প্রবেশ করার ইতিহাস"
 category: "বিভাগ"

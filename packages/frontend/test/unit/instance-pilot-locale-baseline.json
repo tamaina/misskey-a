@@ -1,0 +1,1885 @@
+{
+	"baseline": "e28462fc8b8565d9f8bf0274a336050cee2bea4a",
+	"languages": [
+		"ar-SA",
+		"ca-ES",
+		"cs-CZ",
+		"da-DK",
+		"de-DE",
+		"en-US",
+		"es-ES",
+		"fr-FR",
+		"id-ID",
+		"it-IT",
+		"ja-JP",
+		"ja-KS",
+		"kab-KAB",
+		"kn-IN",
+		"ko-KR",
+		"nl-NL",
+		"no-NO",
+		"pl-PL",
+		"pt-PT",
+		"ru-RU",
+		"sk-SK",
+		"th-TH",
+		"tr-TR",
+		"ug-CN",
+		"uk-UA",
+		"vi-VN",
+		"zh-CN",
+		"zh-TW",
+		"bn-BD",
+		"el-GR",
+		"fa-IR",
+		"hr-HR",
+		"ht-HT",
+		"hu-HU",
+		"jbo-EN",
+		"ko-GS",
+		"lo-LA",
+		"ro-RO",
+		"si-LK",
+		"sv-SE",
+		"tl-PH",
+		"uz-UZ"
+	],
+	"owners": [
+		{
+			"file": "packages/features/instance/frontend/components/global/MkAd.vue",
+			"originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<div v-if=\"chosen && !shouldHide\">\n\t<div\n\t\tv-if=\"!showMenu\"\n\t\t:class=\"[$style.main, {\n\t\t\t[$style.form_square]: chosen.place === 'square',\n\t\t\t[$style.form_horizontal]: chosen.place === 'horizontal',\n\t\t\t[$style.form_horizontalBig]: chosen.place === 'horizontal-big',\n\t\t\t[$style.form_vertical]: chosen.place === 'vertical',\n\t\t}]\"\n\t>\n\t\t<component\n\t\t\t:is=\"self ? 'MkA' : 'a'\"\n\t\t\t:class=\"$style.link\"\n\t\t\tv-bind=\"self ? {\n\t\t\t\tto: chosen.url.substring(local.length),\n\t\t\t} : {\n\t\t\t\thref: chosen.url,\n\t\t\t\trel: 'nofollow noopener',\n\t\t\t\ttarget: '_blank',\n\t\t\t}\"\n\t\t>\n\t\t\t<img :src=\"chosen.imageUrl\" :class=\"$style.img\">\n\t\t\t<button class=\"_button\" :class=\"$style.i\" @click.prevent.stop=\"toggleMenu\"><i :class=\"$style.iIcon\" class=\"ti ti-info-circle\"></i></button>\n\t\t</component>\n\t</div>\n\t<div v-else :class=\"$style.menu\">\n\t\t<div>Ads by {{ host }}</div>\n\t\t<!--<MkButton class=\"button\" primary>{{ i18n.ts._ad.like }}</MkButton>-->\n\t\t<MkButton v-if=\"chosen.ratio !== 0\" :class=\"$style.menuButton\" @click=\"reduceFrequency\">{{ $locale.sfc.reduceFrequencyOfThisAd }}</MkButton>\n\t\t<button class=\"_textButton\" @click=\"toggleMenu\">{{ $locale.sfc.back }}</button>\n\t</div>\n</div>\n</template>\n\n<script lang=\"ts\" setup>\nimport { ref, computed } from 'vue';\nimport { url as local, host } from '@features/boot/frontend/shared/config.js';\nimport { instance } from '@features/instance/frontend/instance.js';\nimport MkButton from '@features/ui/frontend/components/MkButton.vue';\nimport { store } from '@features/preferences/frontend/store.js';\nimport * as os from '@features/ui/frontend/os.js';\nimport { $i } from '@features/auth/frontend/i.js';\nimport { prefer } from '@features/preferences/frontend/preferences.js';\n\ntype Ad = (typeof instance)['ads'][number];\n\nconst props = defineProps<{\n\tpreferForms?: string[];\n\tspecify?: Ad;\n}>();\n\nconst showMenu = ref(false);\nconst toggleMenu = (): void => {\n\tshowMenu.value = !showMenu.value;\n};\n\nconst choseAd = (): Ad | null => {\n\tif (props.specify) {\n\t\treturn props.specify;\n\t}\n\n\tconst allAds = instance.ads.map(ad => store.s.mutedAds.includes(ad.id) ? {\n\t\t...ad,\n\t\tratio: 0,\n\t} : ad);\n\n\tlet ads = props.preferForms ? allAds.filter(ad => props.preferForms!.includes(ad.place)) : allAds;\n\n\tif (ads.length === 0) {\n\t\tads = allAds.filter(ad => ad.place === 'square');\n\t}\n\n\tconst lowPriorityAds = ads.filter(ad => ad.ratio === 0);\n\tads = ads.filter(ad => ad.ratio !== 0);\n\n\tif (ads.length === 0) {\n\t\tif (lowPriorityAds.length !== 0) {\n\t\t\treturn lowPriorityAds[Math.floor(Math.random() * lowPriorityAds.length)];\n\t\t} else {\n\t\t\treturn null;\n\t\t}\n\t}\n\n\tconst totalFactor = ads.reduce((a, b) => a + b.ratio, 0);\n\tconst r = Math.random() * totalFactor;\n\n\tlet stackedFactor = 0;\n\tfor (const ad of ads) {\n\t\tif (r >= stackedFactor && r <= stackedFactor + ad.ratio) {\n\t\t\treturn ad;\n\t\t} else {\n\t\t\tstackedFactor += ad.ratio;\n\t\t}\n\t}\n\n\treturn null;\n};\n\nconst chosen = ref(choseAd());\n\nconst self = computed(() => chosen.value?.url.startsWith(local));\n\nconst shouldHide = ref(!prefer.s.forceShowAds && $i && $i.policies.canHideAds && (props.specify == null));\n\nfunction reduceFrequency(): void {\n\tif (chosen.value == null) return;\n\tif (store.s.mutedAds.includes(chosen.value.id)) return;\n\tstore.push('mutedAds', chosen.value.id);\n\tos.success();\n\tchosen.value = choseAd();\n\tshowMenu.value = false;\n}\n</script>\n\n<style lang=\"scss\" module>\n.main {\n\ttext-align: center;\n\n\t&.form_square {\n\t\t> .link,\n\t\t> .link > .img {\n\t\t\tmax-width: min(300px, 100%);\n\t\t\tmax-height: 300px;\n\t\t}\n\t}\n\n\t&.form_horizontal {\n\t\t> .link,\n\t\t> .link > .img {\n\t\t\tmax-width: min(600px, 100%);\n\t\t\tmax-height: 80px;\n\t\t}\n\t}\n\n\t&.form_horizontalBig {\n\t\t> .link,\n\t\t> .link > .img {\n\t\t\tmax-width: min(600px, 100%);\n\t\t\tmax-height: 250px;\n\t\t}\n\t}\n\n\t&.form_vertical {\n\t\t> .link,\n\t\t> .link > .img {\n\t\t\tmax-width: min(100px, 100%);\n\t\t}\n\t}\n}\n\n.link {\n\tdisplay: inline-block;\n\tposition: relative;\n\tvertical-align: bottom;\n\n\t&:hover {\n\t\t> .img {\n\t\t\tfilter: contrast(120%);\n\t\t}\n\t}\n}\n\n.img {\n\tdisplay: block;\n\tobject-fit: contain;\n\tmargin: auto;\n\tborder-radius: 5px;\n}\n\n.i {\n\tposition: absolute;\n\ttop: 1px;\n\tright: 1px;\n\tdisplay: grid;\n\tplace-content: center;\n\tbackground: var(--MI_THEME-panel);\n\tborder-radius: 100%;\n\tpadding: 2px;\n}\n\n.iIcon {\n\tfont-size: 14px;\n\tline-height: 17px;\n}\n\n.menu {\n\ttext-align: center;\n\tpadding: 8px;\n\tmargin: 0 auto;\n\tmax-width: 400px;\n\tbackground: var(--MI_THEME-panel);\n\tborder: solid 1px var(--MI_THEME-divider);\n}\n\n.menuButton {\n\tmargin: 8px auto;\n}\n</style>\n\n<locale locale=\"ar-SA\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"قلل عرض هذا الإعلان\",\n\t\"back\": \"رجوع\"\n}\n</locale>\n\n<locale locale=\"ca-ES\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Mostrar menys aquest anunci\",\n\t\"back\": \"Tornar\"\n}\n</locale>\n\n<locale locale=\"cs-CZ\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Zobrazovat tuto reklamu méně\",\n\t\"back\": \"Zpět\"\n}\n</locale>\n\n<locale locale=\"da-DK\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Show this ad less\",\n\t\"back\": \"Back\"\n}\n</locale>\n\n<locale locale=\"de-DE\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Diese Werbung weniger anzeigen\",\n\t\"back\": \"Zurück\"\n}\n</locale>\n\n<locale locale=\"en-US\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Show this ad less\",\n\t\"back\": \"Back\"\n}\n</locale>\n\n<locale locale=\"es-ES\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Mostrar menos este anuncio.\",\n\t\"back\": \"Anterior\"\n}\n</locale>\n\n<locale locale=\"fr-FR\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Voir cette publicité moins souvent\",\n\t\"back\": \"Retour\"\n}\n</locale>\n\n<locale locale=\"id-ID\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Tampilkan iklan ini lebih sedikit\",\n\t\"back\": \"Kembali\"\n}\n</locale>\n\n<locale locale=\"it-IT\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Visualizza questa pubblicità meno spesso\",\n\t\"back\": \"Indietro\"\n}\n</locale>\n\n<locale locale=\"ja-JP\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"この広告の表示頻度を下げる\",\n\t\"back\": \"戻る\"\n}\n</locale>\n\n<locale locale=\"ja-KS\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"この広告ちょっとうざったらしいわ\",\n\t\"back\": \"戻る\"\n}\n</locale>\n\n<locale locale=\"kab-KAB\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Show this ad less\",\n\t\"back\": \"Back\"\n}\n</locale>\n\n<locale locale=\"kn-IN\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Show this ad less\",\n\t\"back\": \"Back\"\n}\n</locale>\n\n<locale locale=\"ko-KR\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"이 광고의 표시 빈도 낮추기\",\n\t\"back\": \"뒤로\"\n}\n</locale>\n\n<locale locale=\"nl-NL\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Show this ad less\",\n\t\"back\": \"Terug\"\n}\n</locale>\n\n<locale locale=\"no-NO\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Show this ad less\",\n\t\"back\": \"Back\"\n}\n</locale>\n\n<locale locale=\"pl-PL\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Pokazuj tę reklamę rzadziej\",\n\t\"back\": \"Wróć\"\n}\n</locale>\n\n<locale locale=\"pt-PT\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Diminuir frequência deste anúncio\",\n\t\"back\": \"Voltar\"\n}\n</locale>\n\n<locale locale=\"ru-RU\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Реже показывать эту рекламу\",\n\t\"back\": \"Выход\"\n}\n</locale>\n\n<locale locale=\"sk-SK\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Túto reklamu zobrazovať menej\",\n\t\"back\": \"Späť\"\n}\n</locale>\n\n<locale locale=\"th-TH\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"แสดงโฆษณานี้ให้น้อยลง\",\n\t\"back\": \"ย้อนกลับ\"\n}\n</locale>\n\n<locale locale=\"tr-TR\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Bu reklamı daha az göster\",\n\t\"back\": \"Geri\"\n}\n</locale>\n\n<locale locale=\"ug-CN\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Show this ad less\",\n\t\"back\": \"Back\"\n}\n</locale>\n\n<locale locale=\"uk-UA\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Показувати цю рекламу менше\",\n\t\"back\": \"Назад\"\n}\n</locale>\n\n<locale locale=\"vi-VN\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"Hiện ít lại\",\n\t\"back\": \"Quay lại\"\n}\n</locale>\n\n<locale locale=\"zh-CN\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"减少此广告的频率\",\n\t\"back\": \"返回\"\n}\n</locale>\n\n<locale locale=\"zh-TW\" lang=\"json\">\n{\n\t\"reduceFrequencyOfThisAd\": \"降低此廣告的頻率 \",\n\t\"back\": \"返回\"\n}\n</locale>\n",
+			"original": {
+				"ar-SA": {
+					"reduceFrequencyOfThisAd": "قلل عرض هذا الإعلان",
+					"back": "رجوع"
+				},
+				"ca-ES": {
+					"reduceFrequencyOfThisAd": "Mostrar menys aquest anunci",
+					"back": "Tornar"
+				},
+				"cs-CZ": {
+					"reduceFrequencyOfThisAd": "Zobrazovat tuto reklamu méně",
+					"back": "Zpět"
+				},
+				"da-DK": {
+					"reduceFrequencyOfThisAd": "Show this ad less",
+					"back": "Back"
+				},
+				"de-DE": {
+					"reduceFrequencyOfThisAd": "Diese Werbung weniger anzeigen",
+					"back": "Zurück"
+				},
+				"en-US": {
+					"reduceFrequencyOfThisAd": "Show this ad less",
+					"back": "Back"
+				},
+				"es-ES": {
+					"reduceFrequencyOfThisAd": "Mostrar menos este anuncio.",
+					"back": "Anterior"
+				},
+				"fr-FR": {
+					"reduceFrequencyOfThisAd": "Voir cette publicité moins souvent",
+					"back": "Retour"
+				},
+				"id-ID": {
+					"reduceFrequencyOfThisAd": "Tampilkan iklan ini lebih sedikit",
+					"back": "Kembali"
+				},
+				"it-IT": {
+					"reduceFrequencyOfThisAd": "Visualizza questa pubblicità meno spesso",
+					"back": "Indietro"
+				},
+				"ja-JP": {
+					"reduceFrequencyOfThisAd": "この広告の表示頻度を下げる",
+					"back": "戻る"
+				},
+				"ja-KS": {
+					"reduceFrequencyOfThisAd": "この広告ちょっとうざったらしいわ",
+					"back": "戻る"
+				},
+				"kab-KAB": {
+					"reduceFrequencyOfThisAd": "Show this ad less",
+					"back": "Back"
+				},
+				"kn-IN": {
+					"reduceFrequencyOfThisAd": "Show this ad less",
+					"back": "Back"
+				},
+				"ko-KR": {
+					"reduceFrequencyOfThisAd": "이 광고의 표시 빈도 낮추기",
+					"back": "뒤로"
+				},
+				"nl-NL": {
+					"reduceFrequencyOfThisAd": "Show this ad less",
+					"back": "Terug"
+				},
+				"no-NO": {
+					"reduceFrequencyOfThisAd": "Show this ad less",
+					"back": "Back"
+				},
+				"pl-PL": {
+					"reduceFrequencyOfThisAd": "Pokazuj tę reklamę rzadziej",
+					"back": "Wróć"
+				},
+				"pt-PT": {
+					"reduceFrequencyOfThisAd": "Diminuir frequência deste anúncio",
+					"back": "Voltar"
+				},
+				"ru-RU": {
+					"reduceFrequencyOfThisAd": "Реже показывать эту рекламу",
+					"back": "Выход"
+				},
+				"sk-SK": {
+					"reduceFrequencyOfThisAd": "Túto reklamu zobrazovať menej",
+					"back": "Späť"
+				},
+				"th-TH": {
+					"reduceFrequencyOfThisAd": "แสดงโฆษณานี้ให้น้อยลง",
+					"back": "ย้อนกลับ"
+				},
+				"tr-TR": {
+					"reduceFrequencyOfThisAd": "Bu reklamı daha az göster",
+					"back": "Geri"
+				},
+				"ug-CN": {
+					"reduceFrequencyOfThisAd": "Show this ad less",
+					"back": "Back"
+				},
+				"uk-UA": {
+					"reduceFrequencyOfThisAd": "Показувати цю рекламу менше",
+					"back": "Назад"
+				},
+				"vi-VN": {
+					"reduceFrequencyOfThisAd": "Hiện ít lại",
+					"back": "Quay lại"
+				},
+				"zh-CN": {
+					"reduceFrequencyOfThisAd": "减少此广告的频率",
+					"back": "返回"
+				},
+				"zh-TW": {
+					"reduceFrequencyOfThisAd": "降低此廣告的頻率 ",
+					"back": "返回"
+				}
+			},
+			"reviewed": {
+				"ar-SA": {
+					"reduceFrequencyOfThisAd": "قلل عرض هذا الإعلان",
+					"back": "رجوع"
+				},
+				"ca-ES": {
+					"reduceFrequencyOfThisAd": "Mostrar menys aquest anunci",
+					"back": "Tornar"
+				},
+				"cs-CZ": {
+					"reduceFrequencyOfThisAd": "Zobrazovat tuto reklamu méně",
+					"back": "Zpět"
+				},
+				"da-DK": {
+					"reduceFrequencyOfThisAd": "Vis denne annonce sjældnere",
+					"back": "Tilbage"
+				},
+				"de-DE": {
+					"reduceFrequencyOfThisAd": "Diese Werbung weniger anzeigen",
+					"back": "Zurück"
+				},
+				"en-US": {
+					"reduceFrequencyOfThisAd": "Show this ad less",
+					"back": "Back"
+				},
+				"es-ES": {
+					"reduceFrequencyOfThisAd": "Mostrar menos este anuncio.",
+					"back": "Anterior"
+				},
+				"fr-FR": {
+					"reduceFrequencyOfThisAd": "Voir cette publicité moins souvent",
+					"back": "Retour"
+				},
+				"id-ID": {
+					"reduceFrequencyOfThisAd": "Tampilkan iklan ini lebih sedikit",
+					"back": "Kembali"
+				},
+				"it-IT": {
+					"reduceFrequencyOfThisAd": "Visualizza questa pubblicità meno spesso",
+					"back": "Indietro"
+				},
+				"ja-JP": {
+					"reduceFrequencyOfThisAd": "この広告の表示頻度を下げる",
+					"back": "戻る"
+				},
+				"ja-KS": {
+					"reduceFrequencyOfThisAd": "この広告ちょっとうざったらしいわ",
+					"back": "戻る"
+				},
+				"kab-KAB": {
+					"reduceFrequencyOfThisAd": "Senqes askan n udellel-a",
+					"back": "Uɣal"
+				},
+				"kn-IN": {
+					"reduceFrequencyOfThisAd": "ಈ ಜಾಹೀರಾತನ್ನು ಕಡಿಮೆ ಬಾರಿ ತೋರಿಸಿ",
+					"back": "ಹಿಂದೆ"
+				},
+				"ko-KR": {
+					"reduceFrequencyOfThisAd": "이 광고의 표시 빈도 낮추기",
+					"back": "뒤로"
+				},
+				"nl-NL": {
+					"reduceFrequencyOfThisAd": "Toon deze advertentie minder vaak",
+					"back": "Terug"
+				},
+				"no-NO": {
+					"reduceFrequencyOfThisAd": "Vis denne annonsen sjeldnere",
+					"back": "Tilbake"
+				},
+				"pl-PL": {
+					"reduceFrequencyOfThisAd": "Pokazuj tę reklamę rzadziej",
+					"back": "Wróć"
+				},
+				"pt-PT": {
+					"reduceFrequencyOfThisAd": "Diminuir frequência deste anúncio",
+					"back": "Voltar"
+				},
+				"ru-RU": {
+					"reduceFrequencyOfThisAd": "Реже показывать эту рекламу",
+					"back": "Выход"
+				},
+				"sk-SK": {
+					"reduceFrequencyOfThisAd": "Túto reklamu zobrazovať menej",
+					"back": "Späť"
+				},
+				"th-TH": {
+					"reduceFrequencyOfThisAd": "แสดงโฆษณานี้ให้น้อยลง",
+					"back": "ย้อนกลับ"
+				},
+				"tr-TR": {
+					"reduceFrequencyOfThisAd": "Bu reklamı daha az göster",
+					"back": "Geri"
+				},
+				"ug-CN": {
+					"reduceFrequencyOfThisAd": "بۇ ئېلاننى ئازراق كۆرسەت",
+					"back": "قايتىش"
+				},
+				"uk-UA": {
+					"reduceFrequencyOfThisAd": "Показувати цю рекламу менше",
+					"back": "Назад"
+				},
+				"vi-VN": {
+					"reduceFrequencyOfThisAd": "Hiện ít lại",
+					"back": "Quay lại"
+				},
+				"zh-CN": {
+					"reduceFrequencyOfThisAd": "减少此广告的频率",
+					"back": "返回"
+				},
+				"zh-TW": {
+					"reduceFrequencyOfThisAd": "降低此廣告的頻率 ",
+					"back": "返回"
+				},
+				"el-GR": {
+					"reduceFrequencyOfThisAd": "Εμφάνιση αυτής της διαφήμισης λιγότερο συχνά",
+					"back": "Πίσω"
+				},
+				"hr-HR": {
+					"reduceFrequencyOfThisAd": "Rjeđe prikazuj ovaj oglas",
+					"back": "Natrag"
+				},
+				"ht-HT": {
+					"reduceFrequencyOfThisAd": "Montre piblisite sa a mwens souvan",
+					"back": "Retounen"
+				},
+				"hu-HU": {
+					"reduceFrequencyOfThisAd": "Ez a hirdetés ritkábban jelenjen meg",
+					"back": "Vissza"
+				},
+				"ro-RO": {
+					"reduceFrequencyOfThisAd": "Afișează acest anunț mai rar",
+					"back": "Înapoi"
+				},
+				"sv-SE": {
+					"reduceFrequencyOfThisAd": "Visa den här annonsen mer sällan",
+					"back": "Tillbaka"
+				},
+				"uz-UZ": {
+					"reduceFrequencyOfThisAd": "Bu reklamani kamroq ko‘rsatish",
+					"back": "qaytish"
+				},
+				"bn-BD": {
+					"reduceFrequencyOfThisAd": "এই বিজ্ঞাপনটি কম দেখান",
+					"back": "পিছনে"
+				},
+				"fa-IR": {
+					"reduceFrequencyOfThisAd": "این تبلیغ را کمتر نشان بده",
+					"back": "بازگشت"
+				},
+				"jbo-EN": {
+					"reduceFrequencyOfThisAd": "ko na cafne jarco ti poi ve skicu lo se vecnu",
+					"back": "ko xruti"
+				},
+				"ko-GS": {
+					"reduceFrequencyOfThisAd": "요 광고 쪼매 덜 비이기",
+					"back": "뒤로"
+				},
+				"lo-LA": {
+					"reduceFrequencyOfThisAd": "ສະແດງໂຄສະນານີ້ໃຫ້ໜ້ອຍລົງ",
+					"back": "ກັບຄືນ"
+				},
+				"si-LK": {
+					"reduceFrequencyOfThisAd": "මෙම දැන්වීම අඩුවෙන් පෙන්වන්න",
+					"back": "ආපසු"
+				},
+				"tl-PH": {
+					"reduceFrequencyOfThisAd": "Ipakita nang mas madalang ang ad na ito",
+					"back": "Bumalik"
+				}
+			},
+			"changes": [
+				{
+					"language": "da-DK",
+					"path": "reduceFrequencyOfThisAd",
+					"original": "Show this ad less",
+					"reviewed": "Vis denne annonce sjældnere"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "reduceFrequencyOfThisAd",
+					"original": "Show this ad less",
+					"reviewed": "Senqes askan n udellel-a"
+				},
+				{
+					"language": "kn-IN",
+					"path": "reduceFrequencyOfThisAd",
+					"original": "Show this ad less",
+					"reviewed": "ಈ ಜಾಹೀರಾತನ್ನು ಕಡಿಮೆ ಬಾರಿ ತೋರಿಸಿ"
+				},
+				{
+					"language": "nl-NL",
+					"path": "reduceFrequencyOfThisAd",
+					"original": "Show this ad less",
+					"reviewed": "Toon deze advertentie minder vaak"
+				},
+				{
+					"language": "no-NO",
+					"path": "reduceFrequencyOfThisAd",
+					"original": "Show this ad less",
+					"reviewed": "Vis denne annonsen sjeldnere"
+				},
+				{
+					"language": "ug-CN",
+					"path": "reduceFrequencyOfThisAd",
+					"original": "Show this ad less",
+					"reviewed": "بۇ ئېلاننى ئازراق كۆرسەت"
+				},
+				{
+					"language": "da-DK",
+					"path": "back",
+					"original": "Back",
+					"reviewed": "Tilbage"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "back",
+					"original": "Back",
+					"reviewed": "Uɣal"
+				},
+				{
+					"language": "kn-IN",
+					"path": "back",
+					"original": "Back",
+					"reviewed": "ಹಿಂದೆ"
+				},
+				{
+					"language": "no-NO",
+					"path": "back",
+					"original": "Back",
+					"reviewed": "Tilbake"
+				},
+				{
+					"language": "ug-CN",
+					"path": "back",
+					"original": "Back",
+					"reviewed": "قايتىش"
+				}
+			],
+			"inactiveOriginal": {
+				"reduceFrequencyOfThisAd": {
+					"bn-BD": "এই বিজ্ঞাপনটি কম দেখান"
+				},
+				"back": {
+					"bn-BD": "পিছনে",
+					"ro-RO": "Înapoi",
+					"sv-SE": "Tillbaka",
+					"uz-UZ": "qaytish"
+				}
+			}
+		},
+		{
+			"file": "packages/features/instance/frontend/components/MkSourceCodeAvailablePopup.vue",
+			"originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<div class=\"_panel _shadow\" :class=\"$style.root\">\n\t<div :class=\"$style.icon\">\n\t\t<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon icon-tabler icon-tabler-brand-open-source\" width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" stroke-width=\"1\" stroke=\"currentColor\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n\t\t\t<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/>\n\t\t\t<path d=\"M12 3a9 9 0 0 1 3.618 17.243l-2.193 -5.602a3 3 0 1 0 -2.849 0l-2.193 5.603a9 9 0 0 1 3.617 -17.244z\"/>\n\t\t</svg>\n\t</div>\n\t<div :class=\"$style.main\">\n\t\t<div :class=\"$style.title\">\n\t\t\t<I18n :src=\"$locale.sfc.aboutX\" tag=\"span\">\n\t\t\t\t<template #x>\n\t\t\t\t\t{{ instance.name ?? host }}\n\t\t\t\t</template>\n\t\t\t</I18n>\n\t\t</div>\n\t\t<div :class=\"$style.text\">\n\t\t\t<I18n :src=\"$locale.sfc.aboutMisskeyThisIsModifiedVersion\" tag=\"span\">\n\t\t\t\t<template #name>\n\t\t\t\t\t{{ instance.name ?? host }}\n\t\t\t\t</template>\n\t\t\t</I18n>\n\t\t\t<I18n :src=\"$locale.sfc.correspondingSourceIsAvailable\" tag=\"span\">\n\t\t\t\t<template #anchor>\n\t\t\t\t\t<MkA to=\"/about-misskey\" class=\"_link\">{{ $locale.sfc.aboutMisskey }}</MkA>\n\t\t\t\t</template>\n\t\t\t</I18n>\n\t\t</div>\n\t\t<div class=\"_buttons\">\n\t\t\t<MkButton @click=\"close\">{{ $locale.sfc.gotIt }}</MkButton>\n\t\t</div>\n\t</div>\n\t<button class=\"_button\" :class=\"$style.close\" @click=\"close\"><i class=\"ti ti-x\"></i></button>\n</div>\n</template>\n\n<script lang=\"ts\" setup>\nimport MkButton from '@features/ui/frontend/components/MkButton.vue';\nimport { host } from '@features/boot/frontend/shared/config.js';\nimport { instance } from '@features/instance/frontend/instance.js';\nimport { miLocalStorage } from '@features/preferences/frontend/local-storage.js';\nimport * as os from '@features/ui/frontend/os.js';\n\nconst emit = defineEmits<{\n\t(ev: 'closed'): void;\n}>();\n\nconst zIndex = os.claimZIndex('low');\n\nfunction close() {\n\tmiLocalStorage.setItem('modifiedVersionMustProminentlyOfferInAgplV3Section13Read', 'true');\n\temit('closed');\n}\n</script>\n\n<style lang=\"scss\" module>\n.root {\n\tposition: fixed;\n\tz-index: v-bind(zIndex);\n\tbottom: var(--MI-margin);\n\tleft: 0;\n\tright: 0;\n\tmargin: auto;\n\tbox-sizing: border-box;\n\twidth: calc(100% - (var(--MI-margin) * 2));\n\tmax-width: 500px;\n\tdisplay: flex;\n}\n\n.icon {\n\ttext-align: center;\n\tpadding-top: 25px;\n\twidth: 100px;\n\tcolor: var(--MI_THEME-accent);\n}\n@media (max-width: 500px) {\n\t.icon {\n\t\twidth: 80px;\n\t}\n}\n@media (max-width: 450px) {\n\t.icon {\n\t\twidth: 70px;\n\t}\n}\n\n.main {\n\tpadding: 25px 25px 25px 0;\n\tflex: 1;\n}\n\n.close {\n\tposition: absolute;\n\ttop: 8px;\n\tright: 8px;\n\tpadding: 8px;\n}\n\n.title {\n\tfont-weight: bold;\n}\n\n.text {\n\tmargin: 0.7em 0 1em 0;\n}\n</style>\n\n<locale lang=\"json\" locale=\"ar-SA\">\n{\n\t\"aboutX\": \"عن {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"The corresponding source code is available at {anchor}\",\n\t\"aboutMisskey\": \"عن Misskey\",\n\t\"gotIt\": \"فهِمت\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ca-ES\">\n{\n\t\"aboutX\": \"Respecte a {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"En {name} fa servir una versió modificada de Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"El codi font corresponent està disponible a {anchor}.\",\n\t\"aboutMisskey\": \"Quant a Misskey\",\n\t\"gotIt\": \"D'acord \"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"cs-CZ\">\n{\n\t\"aboutX\": \"O {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"The corresponding source code is available at {anchor}\",\n\t\"aboutMisskey\": \"O Misskey\",\n\t\"gotIt\": \"Rozumím!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"da-DK\">\n{\n\t\"aboutX\": \"About {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"The corresponding source code is available at {anchor}\",\n\t\"aboutMisskey\": \"About Misskey\",\n\t\"gotIt\": \"Got it!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"de-DE\">\n{\n\t\"aboutX\": \"Über {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} verwendet eine modifizierte Version des ursprünglichen Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"Der entsprechende Quellcode ist verfügbar unter {anchor}\",\n\t\"aboutMisskey\": \"Über Misskey\",\n\t\"gotIt\": \"Verstanden!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"en-US\">\n{\n\t\"aboutX\": \"About {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"The corresponding source code is available at {anchor}\",\n\t\"aboutMisskey\": \"About Misskey\",\n\t\"gotIt\": \"Got it!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"es-ES\">\n{\n\t\"aboutX\": \"Acerca de {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} usa una versión modificada de Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"El código fuente correspondiente se encuentra disponible en {anchor}\",\n\t\"aboutMisskey\": \"Sobre Misskey\",\n\t\"gotIt\": \"¡Lo tengo!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"fr-FR\">\n{\n\t\"aboutX\": \"À propos de {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"Le code source correspondant est disponible à {anchor}\",\n\t\"aboutMisskey\": \"À propos de Misskey\",\n\t\"gotIt\": \"J’ai compris !\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"id-ID\">\n{\n\t\"aboutX\": \"Tentang {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} menggunakan versi modifikasi dari Misskey yang asli.\",\n\t\"correspondingSourceIsAvailable\": \"Sumber kode terkait tersedia di {anchor}\",\n\t\"aboutMisskey\": \"Tentang Misskey\",\n\t\"gotIt\": \"Mengerti\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"it-IT\">\n{\n\t\"aboutX\": \"Informazioni su {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} sta usando una versione modificata diversa da Misskey originale.\",\n\t\"correspondingSourceIsAvailable\": \"Il codice sorgente corrispondente è disponibile su {anchor}.\",\n\t\"aboutMisskey\": \"A proposito di Misskey\",\n\t\"gotIt\": \"ok!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ja-JP\">\n{\n\t\"aboutX\": \"{x}について\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name}はオリジナルのMisskeyを改変したバージョンを使用しています。\",\n\t\"correspondingSourceIsAvailable\": \"対応するソースコードは{anchor}から利用可能です。\",\n\t\"aboutMisskey\": \"Misskeyについて\",\n\t\"gotIt\": \"わかった\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ja-KS\">\n{\n\t\"aboutX\": \"{x}について\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name}はオリジナルのMisskeyをいじったバージョンをつこうてるで。\",\n\t\"correspondingSourceIsAvailable\": \"{anchor}\",\n\t\"aboutMisskey\": \"Misskeyってなんや？\",\n\t\"gotIt\": \"ほい\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"kab-KAB\">\n{\n\t\"aboutX\": \"About {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"The corresponding source code is available at {anchor}\",\n\t\"aboutMisskey\": \"About Misskey\",\n\t\"gotIt\": \"Got it!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"kn-IN\">\n{\n\t\"aboutX\": \"About {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"The corresponding source code is available at {anchor}\",\n\t\"aboutMisskey\": \"About Misskey\",\n\t\"gotIt\": \"ಅರ್ಥವಾಯಿತು!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ko-KR\">\n{\n\t\"aboutX\": \"{x}에 대하여\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name}에서는 원본 미스키를 수정한 버전을 사용하고 있습니다.\",\n\t\"correspondingSourceIsAvailable\": \"소스 코드는 {anchor}에서 받아보실 수 있습니다.\",\n\t\"aboutMisskey\": \"Misskey에 대하여\",\n\t\"gotIt\": \"알겠어요\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"nl-NL\">\n{\n\t\"aboutX\": \"Over {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"De bijbehorende broncode is beschikbaar bij {anchor}\",\n\t\"aboutMisskey\": \"Over Misskey\",\n\t\"gotIt\": \"Begrepen\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"no-NO\">\n{\n\t\"aboutX\": \"Om {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"The corresponding source code is available at {anchor}\",\n\t\"aboutMisskey\": \"Om Misskey\",\n\t\"gotIt\": \"Skjønner\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"pl-PL\">\n{\n\t\"aboutX\": \"O {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"Odpowiedni kod źródłowy jest dostępny pod {anchor}.\",\n\t\"aboutMisskey\": \"O Misskey\",\n\t\"gotIt\": \"Rozumiem!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"pt-PT\">\n{\n\t\"aboutX\": \"Sobre {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} utiliza uma versão modificada do Misskey original.\",\n\t\"correspondingSourceIsAvailable\": \"O código-fonte correspondente está disponível em {anchor}\",\n\t\"aboutMisskey\": \"Sobre Misskey\",\n\t\"gotIt\": \"Entendi\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ru-RU\">\n{\n\t\"aboutX\": \"Описание {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"Соответствующий исходный код можно найти по адресу {anchor} \",\n\t\"aboutMisskey\": \"О Misskey\",\n\t\"gotIt\": \"Ясно!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"sk-SK\">\n{\n\t\"aboutX\": \"O {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"The corresponding source code is available at {anchor}\",\n\t\"aboutMisskey\": \"O Misskey\",\n\t\"gotIt\": \"Rozumiem!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"th-TH\">\n{\n\t\"aboutX\": \"เกี่ยวกับ {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} ใช้ Misskey เวอร์ชันดัดแปลง\",\n\t\"correspondingSourceIsAvailable\": \"ซอร์สโค้ดที่เกี่ยวข้องมีอยู่ที่ {anchor}\",\n\t\"aboutMisskey\": \"เกี่ยวกับ Misskey\",\n\t\"gotIt\": \"เข้าใจแล้ว !\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"tr-TR\">\n{\n\t\"aboutX\": \"{x} hakkında\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} orijinal Misskey'in değiştirilmiş bir sürümünü kullanır.\",\n\t\"correspondingSourceIsAvailable\": \"İlgili kaynak kodu {anchor} adresinde mevcuttur.\",\n\t\"aboutMisskey\": \"Misskey Hakkında\",\n\t\"gotIt\": \"Anladım!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ug-CN\">\n{\n\t\"aboutX\": \"About {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"The corresponding source code is available at {anchor}\",\n\t\"aboutMisskey\": \"About Misskey\",\n\t\"gotIt\": \"Got it!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"uk-UA\">\n{\n\t\"aboutX\": \"Про {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"Відповідний вихідний код доступний за посиланням: {anchor}\",\n\t\"aboutMisskey\": \"Про Misskey\",\n\t\"gotIt\": \"Зрозуміло!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"vi-VN\">\n{\n\t\"aboutX\": \"Giới thiệu {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} uses a modified version of the original Misskey.\",\n\t\"correspondingSourceIsAvailable\": \"Mã nguồn có thể được xem tại {anchor}\",\n\t\"aboutMisskey\": \"Về Misskey\",\n\t\"gotIt\": \"Hiểu rồi!\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"zh-CN\">\n{\n\t\"aboutX\": \"关于 {x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name}正在使用修改后的 Misskey。\",\n\t\"correspondingSourceIsAvailable\": \"对应的源代码可在{anchor}找到\",\n\t\"aboutMisskey\": \"关于 Misskey\",\n\t\"gotIt\": \"好\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"zh-TW\">\n{\n\t\"aboutX\": \"關於{x}\",\n\t\"aboutMisskeyThisIsModifiedVersion\": \"{name} 使用原始 Misskey 的修改版本。\",\n\t\"correspondingSourceIsAvailable\": \"對應的原始碼可以在 {anchor} 處找到。\",\n\t\"aboutMisskey\": \"關於 Misskey\",\n\t\"gotIt\": \"知道了\"\n}\n</locale>\n",
+			"original": {
+				"ar-SA": {
+					"aboutX": "عن {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "عن Misskey",
+					"gotIt": "فهِمت"
+				},
+				"ca-ES": {
+					"aboutX": "Respecte a {x}",
+					"aboutMisskeyThisIsModifiedVersion": "En {name} fa servir una versió modificada de Misskey.",
+					"correspondingSourceIsAvailable": "El codi font corresponent està disponible a {anchor}.",
+					"aboutMisskey": "Quant a Misskey",
+					"gotIt": "D'acord "
+				},
+				"cs-CZ": {
+					"aboutX": "O {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "O Misskey",
+					"gotIt": "Rozumím!"
+				},
+				"da-DK": {
+					"aboutX": "About {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "About Misskey",
+					"gotIt": "Got it!"
+				},
+				"de-DE": {
+					"aboutX": "Über {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} verwendet eine modifizierte Version des ursprünglichen Misskey.",
+					"correspondingSourceIsAvailable": "Der entsprechende Quellcode ist verfügbar unter {anchor}",
+					"aboutMisskey": "Über Misskey",
+					"gotIt": "Verstanden!"
+				},
+				"en-US": {
+					"aboutX": "About {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "About Misskey",
+					"gotIt": "Got it!"
+				},
+				"es-ES": {
+					"aboutX": "Acerca de {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} usa una versión modificada de Misskey.",
+					"correspondingSourceIsAvailable": "El código fuente correspondiente se encuentra disponible en {anchor}",
+					"aboutMisskey": "Sobre Misskey",
+					"gotIt": "¡Lo tengo!"
+				},
+				"fr-FR": {
+					"aboutX": "À propos de {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "Le code source correspondant est disponible à {anchor}",
+					"aboutMisskey": "À propos de Misskey",
+					"gotIt": "J’ai compris !"
+				},
+				"id-ID": {
+					"aboutX": "Tentang {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} menggunakan versi modifikasi dari Misskey yang asli.",
+					"correspondingSourceIsAvailable": "Sumber kode terkait tersedia di {anchor}",
+					"aboutMisskey": "Tentang Misskey",
+					"gotIt": "Mengerti"
+				},
+				"it-IT": {
+					"aboutX": "Informazioni su {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} sta usando una versione modificata diversa da Misskey originale.",
+					"correspondingSourceIsAvailable": "Il codice sorgente corrispondente è disponibile su {anchor}.",
+					"aboutMisskey": "A proposito di Misskey",
+					"gotIt": "ok!"
+				},
+				"ja-JP": {
+					"aboutX": "{x}について",
+					"aboutMisskeyThisIsModifiedVersion": "{name}はオリジナルのMisskeyを改変したバージョンを使用しています。",
+					"correspondingSourceIsAvailable": "対応するソースコードは{anchor}から利用可能です。",
+					"aboutMisskey": "Misskeyについて",
+					"gotIt": "わかった"
+				},
+				"ja-KS": {
+					"aboutX": "{x}について",
+					"aboutMisskeyThisIsModifiedVersion": "{name}はオリジナルのMisskeyをいじったバージョンをつこうてるで。",
+					"correspondingSourceIsAvailable": "{anchor}",
+					"aboutMisskey": "Misskeyってなんや？",
+					"gotIt": "ほい"
+				},
+				"kab-KAB": {
+					"aboutX": "About {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "About Misskey",
+					"gotIt": "Got it!"
+				},
+				"kn-IN": {
+					"aboutX": "About {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "About Misskey",
+					"gotIt": "ಅರ್ಥವಾಯಿತು!"
+				},
+				"ko-KR": {
+					"aboutX": "{x}에 대하여",
+					"aboutMisskeyThisIsModifiedVersion": "{name}에서는 원본 미스키를 수정한 버전을 사용하고 있습니다.",
+					"correspondingSourceIsAvailable": "소스 코드는 {anchor}에서 받아보실 수 있습니다.",
+					"aboutMisskey": "Misskey에 대하여",
+					"gotIt": "알겠어요"
+				},
+				"nl-NL": {
+					"aboutX": "Over {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "De bijbehorende broncode is beschikbaar bij {anchor}",
+					"aboutMisskey": "Over Misskey",
+					"gotIt": "Begrepen"
+				},
+				"no-NO": {
+					"aboutX": "Om {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "Om Misskey",
+					"gotIt": "Skjønner"
+				},
+				"pl-PL": {
+					"aboutX": "O {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "Odpowiedni kod źródłowy jest dostępny pod {anchor}.",
+					"aboutMisskey": "O Misskey",
+					"gotIt": "Rozumiem!"
+				},
+				"pt-PT": {
+					"aboutX": "Sobre {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} utiliza uma versão modificada do Misskey original.",
+					"correspondingSourceIsAvailable": "O código-fonte correspondente está disponível em {anchor}",
+					"aboutMisskey": "Sobre Misskey",
+					"gotIt": "Entendi"
+				},
+				"ru-RU": {
+					"aboutX": "Описание {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "Соответствующий исходный код можно найти по адресу {anchor} ",
+					"aboutMisskey": "О Misskey",
+					"gotIt": "Ясно!"
+				},
+				"sk-SK": {
+					"aboutX": "O {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "O Misskey",
+					"gotIt": "Rozumiem!"
+				},
+				"th-TH": {
+					"aboutX": "เกี่ยวกับ {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} ใช้ Misskey เวอร์ชันดัดแปลง",
+					"correspondingSourceIsAvailable": "ซอร์สโค้ดที่เกี่ยวข้องมีอยู่ที่ {anchor}",
+					"aboutMisskey": "เกี่ยวกับ Misskey",
+					"gotIt": "เข้าใจแล้ว !"
+				},
+				"tr-TR": {
+					"aboutX": "{x} hakkında",
+					"aboutMisskeyThisIsModifiedVersion": "{name} orijinal Misskey'in değiştirilmiş bir sürümünü kullanır.",
+					"correspondingSourceIsAvailable": "İlgili kaynak kodu {anchor} adresinde mevcuttur.",
+					"aboutMisskey": "Misskey Hakkında",
+					"gotIt": "Anladım!"
+				},
+				"ug-CN": {
+					"aboutX": "About {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "About Misskey",
+					"gotIt": "Got it!"
+				},
+				"uk-UA": {
+					"aboutX": "Про {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "Відповідний вихідний код доступний за посиланням: {anchor}",
+					"aboutMisskey": "Про Misskey",
+					"gotIt": "Зрозуміло!"
+				},
+				"vi-VN": {
+					"aboutX": "Giới thiệu {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "Mã nguồn có thể được xem tại {anchor}",
+					"aboutMisskey": "Về Misskey",
+					"gotIt": "Hiểu rồi!"
+				},
+				"zh-CN": {
+					"aboutX": "关于 {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name}正在使用修改后的 Misskey。",
+					"correspondingSourceIsAvailable": "对应的源代码可在{anchor}找到",
+					"aboutMisskey": "关于 Misskey",
+					"gotIt": "好"
+				},
+				"zh-TW": {
+					"aboutX": "關於{x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} 使用原始 Misskey 的修改版本。",
+					"correspondingSourceIsAvailable": "對應的原始碼可以在 {anchor} 處找到。",
+					"aboutMisskey": "關於 Misskey",
+					"gotIt": "知道了"
+				}
+			},
+			"reviewed": {
+				"ar-SA": {
+					"aboutX": "عن {x}",
+					"aboutMisskeyThisIsModifiedVersion": "يستخدم {name} نسخة معدّلة من Misskey الأصلي.",
+					"correspondingSourceIsAvailable": "الشيفرة المصدرية لهذه النسخة متاحة عبر {anchor}",
+					"aboutMisskey": "عن Misskey",
+					"gotIt": "فهِمت"
+				},
+				"ca-ES": {
+					"aboutX": "Respecte a {x}",
+					"aboutMisskeyThisIsModifiedVersion": "En {name} fa servir una versió modificada de Misskey.",
+					"correspondingSourceIsAvailable": "El codi font corresponent està disponible a {anchor}.",
+					"aboutMisskey": "Quant a Misskey",
+					"gotIt": "D'acord "
+				},
+				"cs-CZ": {
+					"aboutX": "O {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} používá upravenou verzi původního Misskey.",
+					"correspondingSourceIsAvailable": "Odpovídající zdrojový kód je dostupný na {anchor}",
+					"aboutMisskey": "O Misskey",
+					"gotIt": "Rozumím!"
+				},
+				"da-DK": {
+					"aboutX": "Om {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} bruger en ændret version af den oprindelige Misskey.",
+					"correspondingSourceIsAvailable": "Den tilhørende kildekode er tilgængelig på {anchor}",
+					"aboutMisskey": "Om Misskey",
+					"gotIt": "Forstået!"
+				},
+				"de-DE": {
+					"aboutX": "Über {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} verwendet eine modifizierte Version des ursprünglichen Misskey.",
+					"correspondingSourceIsAvailable": "Der entsprechende Quellcode ist verfügbar unter {anchor}",
+					"aboutMisskey": "Über Misskey",
+					"gotIt": "Verstanden!"
+				},
+				"en-US": {
+					"aboutX": "About {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+					"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+					"aboutMisskey": "About Misskey",
+					"gotIt": "Got it!"
+				},
+				"es-ES": {
+					"aboutX": "Acerca de {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} usa una versión modificada de Misskey.",
+					"correspondingSourceIsAvailable": "El código fuente correspondiente se encuentra disponible en {anchor}",
+					"aboutMisskey": "Sobre Misskey",
+					"gotIt": "¡Lo tengo!"
+				},
+				"fr-FR": {
+					"aboutX": "À propos de {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} utilise une version modifiée du Misskey original.",
+					"correspondingSourceIsAvailable": "Le code source correspondant est disponible à {anchor}",
+					"aboutMisskey": "À propos de Misskey",
+					"gotIt": "J’ai compris !"
+				},
+				"id-ID": {
+					"aboutX": "Tentang {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} menggunakan versi modifikasi dari Misskey yang asli.",
+					"correspondingSourceIsAvailable": "Sumber kode terkait tersedia di {anchor}",
+					"aboutMisskey": "Tentang Misskey",
+					"gotIt": "Mengerti"
+				},
+				"it-IT": {
+					"aboutX": "Informazioni su {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} sta usando una versione modificata diversa da Misskey originale.",
+					"correspondingSourceIsAvailable": "Il codice sorgente corrispondente è disponibile su {anchor}.",
+					"aboutMisskey": "A proposito di Misskey",
+					"gotIt": "ok!"
+				},
+				"ja-JP": {
+					"aboutX": "{x}について",
+					"aboutMisskeyThisIsModifiedVersion": "{name}はオリジナルのMisskeyを改変したバージョンを使用しています。",
+					"correspondingSourceIsAvailable": "対応するソースコードは{anchor}から利用可能です。",
+					"aboutMisskey": "Misskeyについて",
+					"gotIt": "わかった"
+				},
+				"ja-KS": {
+					"aboutX": "{x}について",
+					"aboutMisskeyThisIsModifiedVersion": "{name}はオリジナルのMisskeyをいじったバージョンをつこうてるで。",
+					"correspondingSourceIsAvailable": "このバージョンのソースコードは{anchor}から見られるで。",
+					"aboutMisskey": "Misskeyってなんや？",
+					"gotIt": "ほい"
+				},
+				"kab-KAB": {
+					"aboutX": "Ɣef {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} iseqdac lqem yettwabeddlen n Misskey aneṣli.",
+					"correspondingSourceIsAvailable": "Tangalt n uɣbalu n lqem-a tella deg {anchor}",
+					"aboutMisskey": "Ɣef Misskey",
+					"gotIt": "Gziɣ!"
+				},
+				"kn-IN": {
+					"aboutX": "{x} ಕುರಿತು",
+					"aboutMisskeyThisIsModifiedVersion": "{name} ಮೂಲ Misskeyಯ ಮಾರ್ಪಡಿಸಿದ ಆವೃತ್ತಿಯನ್ನು ಬಳಸುತ್ತದೆ.",
+					"correspondingSourceIsAvailable": "ಈ ಆವೃತ್ತಿಯ ಮೂಲ ಕೋಡ್ {anchor} ನಲ್ಲಿ ಲಭ್ಯವಿದೆ",
+					"aboutMisskey": "Misskey ಕುರಿತು",
+					"gotIt": "ಅರ್ಥವಾಯಿತು!"
+				},
+				"ko-KR": {
+					"aboutX": "{x}에 대하여",
+					"aboutMisskeyThisIsModifiedVersion": "{name}에서는 원본 미스키를 수정한 버전을 사용하고 있습니다.",
+					"correspondingSourceIsAvailable": "소스 코드는 {anchor}에서 받아보실 수 있습니다.",
+					"aboutMisskey": "Misskey에 대하여",
+					"gotIt": "알겠어요"
+				},
+				"nl-NL": {
+					"aboutX": "Over {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} gebruikt een aangepaste versie van de oorspronkelijke Misskey.",
+					"correspondingSourceIsAvailable": "De bijbehorende broncode is beschikbaar bij {anchor}",
+					"aboutMisskey": "Over Misskey",
+					"gotIt": "Begrepen"
+				},
+				"no-NO": {
+					"aboutX": "Om {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} bruker en endret versjon av den opprinnelige Misskey.",
+					"correspondingSourceIsAvailable": "Den tilhørende kildekoden er tilgjengelig på {anchor}",
+					"aboutMisskey": "Om Misskey",
+					"gotIt": "Skjønner"
+				},
+				"pl-PL": {
+					"aboutX": "O {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} korzysta ze zmodyfikowanej wersji oryginalnego Misskey.",
+					"correspondingSourceIsAvailable": "Odpowiedni kod źródłowy jest dostępny pod {anchor}.",
+					"aboutMisskey": "O Misskey",
+					"gotIt": "Rozumiem!"
+				},
+				"pt-PT": {
+					"aboutX": "Sobre {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} utiliza uma versão modificada do Misskey original.",
+					"correspondingSourceIsAvailable": "O código-fonte correspondente está disponível em {anchor}",
+					"aboutMisskey": "Sobre Misskey",
+					"gotIt": "Entendi"
+				},
+				"ru-RU": {
+					"aboutX": "Описание {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} использует изменённую версию оригинального Misskey.",
+					"correspondingSourceIsAvailable": "Соответствующий исходный код можно найти по адресу {anchor} ",
+					"aboutMisskey": "О Misskey",
+					"gotIt": "Ясно!"
+				},
+				"sk-SK": {
+					"aboutX": "O {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} používa upravenú verziu pôvodného Misskey.",
+					"correspondingSourceIsAvailable": "Príslušný zdrojový kód je dostupný na {anchor}",
+					"aboutMisskey": "O Misskey",
+					"gotIt": "Rozumiem!"
+				},
+				"th-TH": {
+					"aboutX": "เกี่ยวกับ {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} ใช้ Misskey เวอร์ชันดัดแปลง",
+					"correspondingSourceIsAvailable": "ซอร์สโค้ดที่เกี่ยวข้องมีอยู่ที่ {anchor}",
+					"aboutMisskey": "เกี่ยวกับ Misskey",
+					"gotIt": "เข้าใจแล้ว !"
+				},
+				"tr-TR": {
+					"aboutX": "{x} hakkında",
+					"aboutMisskeyThisIsModifiedVersion": "{name} orijinal Misskey'in değiştirilmiş bir sürümünü kullanır.",
+					"correspondingSourceIsAvailable": "İlgili kaynak kodu {anchor} adresinde mevcuttur.",
+					"aboutMisskey": "Misskey Hakkında",
+					"gotIt": "Anladım!"
+				},
+				"ug-CN": {
+					"aboutX": "{x} ھەققىدە",
+					"aboutMisskeyThisIsModifiedVersion": "{name} ئەسلى Misskey نىڭ ئۆزگەرتىلگەن نۇسخىسىنى ئىشلىتىدۇ.",
+					"correspondingSourceIsAvailable": "بۇ نۇسخىنىڭ مەنبە كودى {anchor} دا بار",
+					"aboutMisskey": "Misskey ھەققىدە",
+					"gotIt": "چۈشەندىم!"
+				},
+				"uk-UA": {
+					"aboutX": "Про {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} використовує змінену версію оригінального Misskey.",
+					"correspondingSourceIsAvailable": "Відповідний вихідний код доступний за посиланням: {anchor}",
+					"aboutMisskey": "Про Misskey",
+					"gotIt": "Зрозуміло!"
+				},
+				"vi-VN": {
+					"aboutX": "Giới thiệu {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} sử dụng phiên bản đã chỉnh sửa của Misskey gốc.",
+					"correspondingSourceIsAvailable": "Mã nguồn có thể được xem tại {anchor}",
+					"aboutMisskey": "Về Misskey",
+					"gotIt": "Hiểu rồi!"
+				},
+				"zh-CN": {
+					"aboutX": "关于 {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name}正在使用修改后的 Misskey。",
+					"correspondingSourceIsAvailable": "对应的源代码可在{anchor}找到",
+					"aboutMisskey": "关于 Misskey",
+					"gotIt": "好"
+				},
+				"zh-TW": {
+					"aboutX": "關於{x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} 使用原始 Misskey 的修改版本。",
+					"correspondingSourceIsAvailable": "對應的原始碼可以在 {anchor} 處找到。",
+					"aboutMisskey": "關於 Misskey",
+					"gotIt": "知道了"
+				},
+				"el-GR": {
+					"aboutX": "Σχετικά με {x}",
+					"aboutMisskeyThisIsModifiedVersion": "Το {name} χρησιμοποιεί μια τροποποιημένη έκδοση του αρχικού Misskey.",
+					"correspondingSourceIsAvailable": "Ο αντίστοιχος πηγαίος κώδικας είναι διαθέσιμος στο {anchor}.",
+					"aboutMisskey": "Σχετικά με το Misskey",
+					"gotIt": "Τό'πιασα!"
+				},
+				"hr-HR": {
+					"aboutX": "O {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} koristi izmijenjenu verziju izvornog Misskeyja.",
+					"correspondingSourceIsAvailable": "Odgovarajući izvorni kod dostupan je na {anchor}.",
+					"aboutMisskey": "O Misskeyju",
+					"gotIt": "Razumijem"
+				},
+				"ht-HT": {
+					"aboutX": "Konsènan {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} sèvi ak yon vèsyon modifye Misskey orijinal la.",
+					"correspondingSourceIsAvailable": "Kòd sous ki koresponn lan disponib nan {anchor}.",
+					"aboutMisskey": "Konsènan Misskey",
+					"gotIt": "Konprann"
+				},
+				"hu-HU": {
+					"aboutX": "{x} névjegye",
+					"aboutMisskeyThisIsModifiedVersion": "{name} az eredeti Misskey módosított változatát használja.",
+					"correspondingSourceIsAvailable": "A megfelelő forráskód itt érhető el: {anchor}.",
+					"aboutMisskey": "A Misskey névjegye",
+					"gotIt": "Rendben"
+				},
+				"ro-RO": {
+					"aboutX": "Despre {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} folosește o versiune modificată a software-ului Misskey original.",
+					"correspondingSourceIsAvailable": "Codul sursă corespunzător este disponibil la {anchor}",
+					"aboutMisskey": "Despre Misskey",
+					"gotIt": "Am înțeles!"
+				},
+				"sv-SE": {
+					"aboutX": "Om {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} använder en modifierad version av det ursprungliga Misskey.",
+					"correspondingSourceIsAvailable": "Den tillhörande källkoden finns tillgänglig på {anchor}.",
+					"aboutMisskey": "Om Misskey",
+					"gotIt": "Uppfattat!"
+				},
+				"uz-UZ": {
+					"aboutX": "{x} haqida",
+					"aboutMisskeyThisIsModifiedVersion": "{name} asl Misskey dasturining o‘zgartirilgan versiyasidan foydalanadi.",
+					"correspondingSourceIsAvailable": "Tegishli manba kodi {anchor} orqali mavjud.",
+					"aboutMisskey": "Misskey haqida",
+					"gotIt": "Tushunarli!"
+				},
+				"bn-BD": {
+					"aboutX": "{x} সম্পর্কে",
+					"aboutMisskeyThisIsModifiedVersion": "{name} মূল Misskey-এর একটি পরিবর্তিত সংস্করণ ব্যবহার করছে।",
+					"correspondingSourceIsAvailable": "সংশ্লিষ্ট সোর্স কোড {anchor} থেকে পাওয়া যায়।",
+					"aboutMisskey": "Misskey সম্পর্কে",
+					"gotIt": "বুঝেছি"
+				},
+				"fa-IR": {
+					"aboutX": "دربارهٔ {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} از نسخه‌ای تغییریافته از Misskey اصلی استفاده می‌کند.",
+					"correspondingSourceIsAvailable": "کد منبع مربوطه از طریق {anchor} در دسترس است.",
+					"aboutMisskey": "دربارهٔ Misskey",
+					"gotIt": "متوجه شدم"
+				},
+				"jbo-EN": {
+					"aboutX": "srana la'o gy. {x} .gy.",
+					"aboutMisskeyThisIsModifiedVersion": "la'o gy. {name} .gy. cu pilno la'o gy. Misskey .gy. poi pu se galfi",
+					"correspondingSourceIsAvailable": "lo se ciska poi platu lo samru'e cu se cpacu fi la'o gy. {anchor} .gy.",
+					"aboutMisskey": "srana la'o gy. Misskey .gy.",
+					"gotIt": "mi jimpe"
+				},
+				"ko-GS": {
+					"aboutX": "{x}에 대해서",
+					"aboutMisskeyThisIsModifiedVersion": "{name}넌 원래 Misskey럴 곤친 버전얼 서고 잇십니다.",
+					"correspondingSourceIsAvailable": "요 소스 코드넌 {anchor}서 받아볼 수 잇십니다.",
+					"aboutMisskey": "Misskey넌예",
+					"gotIt": "알것어예"
+				},
+				"lo-LA": {
+					"aboutX": "ກ່ຽວກັບ {x}",
+					"aboutMisskeyThisIsModifiedVersion": "{name} ໃຊ້ Misskey ລຸ້ນທີ່ດັດແປງຈາກຕົ້ນສະບັບ.",
+					"correspondingSourceIsAvailable": "ສາມາດເບິ່ງລະຫັດຕົ້ນສະບັບທີ່ກ່ຽວຂ້ອງໄດ້ທີ່ {anchor}.",
+					"aboutMisskey": "ກ່ຽວກັບ Misskey",
+					"gotIt": "ເຂົ້າໃຈແລ້ວ!"
+				},
+				"si-LK": {
+					"aboutX": "{x} ගැන",
+					"aboutMisskeyThisIsModifiedVersion": "{name} භාවිත කරන්නේ මුල් Misskey හි වෙනස් කළ අනුවාදයකි.",
+					"correspondingSourceIsAvailable": "අදාළ මූලාශ්‍ර කේතය {anchor} වෙතින් ලබා ගත හැක.",
+					"aboutMisskey": "Misskey ගැන",
+					"gotIt": "තේරුණා"
+				},
+				"tl-PH": {
+					"aboutX": "Tungkol sa {x}",
+					"aboutMisskeyThisIsModifiedVersion": "Gumagamit ang {name} ng binagong bersiyon ng orihinal na Misskey.",
+					"correspondingSourceIsAvailable": "Makukuha ang kaukulang source code sa {anchor}.",
+					"aboutMisskey": "Tungkol sa Misskey",
+					"gotIt": "Naiintindihan ko"
+				}
+			},
+			"changes": [
+				{
+					"language": "da-DK",
+					"path": "aboutX",
+					"original": "About {x}",
+					"reviewed": "Om {x}"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "aboutX",
+					"original": "About {x}",
+					"reviewed": "Ɣef {x}"
+				},
+				{
+					"language": "kn-IN",
+					"path": "aboutX",
+					"original": "About {x}",
+					"reviewed": "{x} ಕುರಿತು"
+				},
+				{
+					"language": "ug-CN",
+					"path": "aboutX",
+					"original": "About {x}",
+					"reviewed": "{x} ھەققىدە"
+				},
+				{
+					"language": "ar-SA",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "يستخدم {name} نسخة معدّلة من Misskey الأصلي."
+				},
+				{
+					"language": "cs-CZ",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} používá upravenou verzi původního Misskey."
+				},
+				{
+					"language": "da-DK",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} bruger en ændret version af den oprindelige Misskey."
+				},
+				{
+					"language": "fr-FR",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} utilise une version modifiée du Misskey original."
+				},
+				{
+					"language": "kab-KAB",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} iseqdac lqem yettwabeddlen n Misskey aneṣli."
+				},
+				{
+					"language": "kn-IN",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} ಮೂಲ Misskeyಯ ಮಾರ್ಪಡಿಸಿದ ಆವೃತ್ತಿಯನ್ನು ಬಳಸುತ್ತದೆ."
+				},
+				{
+					"language": "nl-NL",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} gebruikt een aangepaste versie van de oorspronkelijke Misskey."
+				},
+				{
+					"language": "no-NO",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} bruker en endret versjon av den opprinnelige Misskey."
+				},
+				{
+					"language": "pl-PL",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} korzysta ze zmodyfikowanej wersji oryginalnego Misskey."
+				},
+				{
+					"language": "ru-RU",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} использует изменённую версию оригинального Misskey."
+				},
+				{
+					"language": "sk-SK",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} používa upravenú verziu pôvodného Misskey."
+				},
+				{
+					"language": "ug-CN",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} ئەسلى Misskey نىڭ ئۆزگەرتىلگەن نۇسخىسىنى ئىشلىتىدۇ."
+				},
+				{
+					"language": "uk-UA",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} використовує змінену версію оригінального Misskey."
+				},
+				{
+					"language": "vi-VN",
+					"path": "aboutMisskeyThisIsModifiedVersion",
+					"original": "{name} uses a modified version of the original Misskey.",
+					"reviewed": "{name} sử dụng phiên bản đã chỉnh sửa của Misskey gốc."
+				},
+				{
+					"language": "ar-SA",
+					"path": "correspondingSourceIsAvailable",
+					"original": "The corresponding source code is available at {anchor}",
+					"reviewed": "الشيفرة المصدرية لهذه النسخة متاحة عبر {anchor}"
+				},
+				{
+					"language": "cs-CZ",
+					"path": "correspondingSourceIsAvailable",
+					"original": "The corresponding source code is available at {anchor}",
+					"reviewed": "Odpovídající zdrojový kód je dostupný na {anchor}"
+				},
+				{
+					"language": "da-DK",
+					"path": "correspondingSourceIsAvailable",
+					"original": "The corresponding source code is available at {anchor}",
+					"reviewed": "Den tilhørende kildekode er tilgængelig på {anchor}"
+				},
+				{
+					"language": "ja-KS",
+					"path": "correspondingSourceIsAvailable",
+					"original": "{anchor}",
+					"reviewed": "このバージョンのソースコードは{anchor}から見られるで。"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "correspondingSourceIsAvailable",
+					"original": "The corresponding source code is available at {anchor}",
+					"reviewed": "Tangalt n uɣbalu n lqem-a tella deg {anchor}"
+				},
+				{
+					"language": "kn-IN",
+					"path": "correspondingSourceIsAvailable",
+					"original": "The corresponding source code is available at {anchor}",
+					"reviewed": "ಈ ಆವೃತ್ತಿಯ ಮೂಲ ಕೋಡ್ {anchor} ನಲ್ಲಿ ಲಭ್ಯವಿದೆ"
+				},
+				{
+					"language": "no-NO",
+					"path": "correspondingSourceIsAvailable",
+					"original": "The corresponding source code is available at {anchor}",
+					"reviewed": "Den tilhørende kildekoden er tilgjengelig på {anchor}"
+				},
+				{
+					"language": "sk-SK",
+					"path": "correspondingSourceIsAvailable",
+					"original": "The corresponding source code is available at {anchor}",
+					"reviewed": "Príslušný zdrojový kód je dostupný na {anchor}"
+				},
+				{
+					"language": "ug-CN",
+					"path": "correspondingSourceIsAvailable",
+					"original": "The corresponding source code is available at {anchor}",
+					"reviewed": "بۇ نۇسخىنىڭ مەنبە كودى {anchor} دا بار"
+				},
+				{
+					"language": "da-DK",
+					"path": "aboutMisskey",
+					"original": "About Misskey",
+					"reviewed": "Om Misskey"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "aboutMisskey",
+					"original": "About Misskey",
+					"reviewed": "Ɣef Misskey"
+				},
+				{
+					"language": "kn-IN",
+					"path": "aboutMisskey",
+					"original": "About Misskey",
+					"reviewed": "Misskey ಕುರಿತು"
+				},
+				{
+					"language": "ug-CN",
+					"path": "aboutMisskey",
+					"original": "About Misskey",
+					"reviewed": "Misskey ھەققىدە"
+				},
+				{
+					"language": "da-DK",
+					"path": "gotIt",
+					"original": "Got it!",
+					"reviewed": "Forstået!"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "gotIt",
+					"original": "Got it!",
+					"reviewed": "Gziɣ!"
+				},
+				{
+					"language": "ug-CN",
+					"path": "gotIt",
+					"original": "Got it!",
+					"reviewed": "چۈشەندىم!"
+				}
+			],
+			"inactiveOriginal": {
+				"aboutX": {
+					"bn-BD": "{x} সম্পর্কে",
+					"ko-GS": "{x}에 대해서",
+					"lo-LA": "ກ່ຽວກັບ {x}",
+					"ro-RO": "Despre {x}",
+					"sv-SE": "Om {x}",
+					"uz-UZ": "{x} haqida"
+				},
+				"aboutMisskeyThisIsModifiedVersion": {},
+				"correspondingSourceIsAvailable": {
+					"ro-RO": "Codul sursă corespunzător este disponibil la {anchor}"
+				},
+				"aboutMisskey": {
+					"bn-BD": "Misskey সম্পর্কে",
+					"ko-GS": "Misskey넌예",
+					"lo-LA": "ກ່ຽວກັບ Misskey",
+					"ro-RO": "Despre Misskey",
+					"sv-SE": "Om Misskey",
+					"uz-UZ": "Misskey haqida"
+				},
+				"gotIt": {
+					"bn-BD": "বুঝেছি",
+					"el-GR": "Τό'πιασα!",
+					"fa-IR": "متوجه شدم",
+					"hr-HR": "Razumijem",
+					"ht-HT": "Konprann",
+					"hu-HU": "Rendben",
+					"ko-GS": "알것어예",
+					"lo-LA": "ເຂົ້າໃຈແລ້ວ!",
+					"ro-RO": "Am înțeles!",
+					"si-LK": "තේරුණා",
+					"sv-SE": "Uppfattat!",
+					"uz-UZ": "Tushunarli!"
+				}
+			}
+		},
+		{
+			"file": "packages/features/instance/frontend/components/MkDonation.vue",
+			"originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<div class=\"_panel _shadow\" :class=\"$style.root\">\n\t<!-- TODO: インスタンス運営者が任意のテキストとリンクを設定できるようにする -->\n\t<div :class=\"$style.icon\">\n\t\t<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon icon-tabler icon-tabler-pig-money\" width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" stroke-width=\"1\" stroke=\"currentColor\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n\t\t\t<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"></path>\n\t\t\t<path d=\"M15 11v.01\"></path>\n\t\t\t<path d=\"M5.173 8.378a3 3 0 1 1 4.656 -1.377\"></path>\n\t\t\t<path d=\"M16 4v3.803a6.019 6.019 0 0 1 2.658 3.197h1.341a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-1.342c-.336 .95 -.907 1.8 -1.658 2.473v2.027a1.5 1.5 0 0 1 -3 0v-.583a6.04 6.04 0 0 1 -1 .083h-4a6.04 6.04 0 0 1 -1 -.083v.583a1.5 1.5 0 0 1 -3 0v-2l.001 -.027a6 6 0 0 1 3.999 -10.473h2.5l4.5 -3h.001z\"></path>\n\t\t</svg>\n\t</div>\n\t<div :class=\"$style.main\">\n\t\t<div :class=\"$style.title\">{{ $locale.sfc.didYouLikeMisskey }}</div>\n\t\t<div :class=\"$style.text\">\n\t\t\t<I18n :src=\"$locale.sfc.pleaseDonate\" tag=\"span\">\n\t\t\t\t<template #host>\n\t\t\t\t\t{{ instance.name ?? host }}\n\t\t\t\t</template>\n\t\t\t</I18n>\n\t\t\t<div style=\"margin-top: 0.2em;\">\n\t\t\t\t<MkLink target=\"_blank\" url=\"https://misskey-hub.net/docs/for-users/resources/donate/\">{{ $locale.sfc.learnMore }}</MkLink>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"_buttons\">\n\t\t\t<MkButton @click=\"close\">{{ $locale.sfc.remindMeLater }}</MkButton>\n\t\t\t<MkButton @click=\"neverShow\">{{ $locale.sfc.neverShow }}</MkButton>\n\t\t</div>\n\t</div>\n\t<button class=\"_button\" :class=\"$style.close\" @click=\"close\"><i class=\"ti ti-x\"></i></button>\n</div>\n</template>\n\n<script lang=\"ts\" setup>\nimport MkButton from '@features/ui/frontend/components/MkButton.vue';\nimport MkLink from '@features/navigation/frontend/components/MkLink.vue';\nimport { host } from '@features/boot/frontend/shared/config.js';\nimport * as os from '@features/ui/frontend/os.js';\nimport { miLocalStorage } from '@features/preferences/frontend/local-storage.js';\nimport { instance } from '@features/instance/frontend/instance.js';\n\nconst emit = defineEmits<{\n\t(ev: 'closed'): void;\n}>();\n\nconst zIndex = os.claimZIndex('low');\n\nfunction close() {\n\tmiLocalStorage.setItem('latestDonationInfoShownAt', Date.now().toString());\n\temit('closed');\n}\n\nfunction neverShow() {\n\tmiLocalStorage.setItem('neverShowDonationInfo', 'true');\n\tclose();\n}\n</script>\n\n<style lang=\"scss\" module>\n.root {\n\tposition: fixed;\n\tz-index: v-bind(zIndex);\n\tbottom: var(--MI-margin);\n\tleft: 0;\n\tright: 0;\n\tmargin: auto;\n\tbox-sizing: border-box;\n\twidth: calc(100% - (var(--MI-margin) * 2));\n\tmax-width: 500px;\n\tdisplay: flex;\n}\n\n.icon {\n\ttext-align: center;\n\tpadding-top: 25px;\n\twidth: 100px;\n\tcolor: var(--MI_THEME-accent);\n}\n@media (max-width: 500px) {\n\t.icon {\n\t\twidth: 80px;\n\t}\n}\n@media (max-width: 450px) {\n\t.icon {\n\t\twidth: 70px;\n\t}\n}\n\n.main {\n\tpadding: 25px 25px 25px 0;\n\tflex: 1;\n}\n\n.close {\n\tposition: absolute;\n\ttop: 8px;\n\tright: 8px;\n\tpadding: 8px;\n}\n\n.title {\n\tfont-weight: bold;\n}\n\n.text {\n\tmargin: 0.7em 0 1em 0;\n}\n</style>\n\n<locale lang=\"json\" locale=\"ar-SA\">\n{\n\t\"didYouLikeMisskey\": \"هل أعجبك ميسكي؟\",\n\t\"pleaseDonate\": \"يستخدم {host} البرمجية الحرة ميسكي. نتمنى أن تتبرعوا للمشروع مما سيسمح لنا متابعة تطويره!\",\n\t\"learnMore\": \"راجع المزيد\",\n\t\"remindMeLater\": \"ربما لاحقا\",\n\t\"neverShow\": \"لا تظهره مجددًا\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ca-ES\">\n{\n\t\"didYouLikeMisskey\": \"T'està agradant Misskey?\",\n\t\"pleaseDonate\": \"A {host} fem servir el software lliure Misskey. Considera fer un donatiu a Misskey perquè pugui continuar el seu desenvolupament!\",\n\t\"learnMore\": \"Saber-ne més \",\n\t\"remindMeLater\": \"Recorda-m'ho més tard\",\n\t\"neverShow\": \"No mostrar més \"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"cs-CZ\">\n{\n\t\"didYouLikeMisskey\": \"Oblíbili jste si Misskey?\",\n\t\"pleaseDonate\": \"{host} používá bezplatný software Misskey. Velmi bychom ocenili vaše dary, aby mohl vývoj Misskey pokračovat!\",\n\t\"learnMore\": \"Zjistit více\",\n\t\"remindMeLater\": \"Možná později\",\n\t\"neverShow\": \"Znovu nezobrazovat\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"da-DK\">\n{\n\t\"didYouLikeMisskey\": \"Have you taken a liking to Misskey?\",\n\t\"pleaseDonate\": \"{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!\",\n\t\"learnMore\": \"Learn more\",\n\t\"remindMeLater\": \"Maybe later\",\n\t\"neverShow\": \"Don't show again\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"de-DE\">\n{\n\t\"didYouLikeMisskey\": \"Gefällt dir Misskey?\",\n\t\"pleaseDonate\": \"Misskey ist die kostenlose Software, die von {host} verwendet wird. Wir würden uns über Spenden freuen, damit dessen Entwicklung weitergeführt werden kann!\",\n\t\"learnMore\": \"Mehr erfahren\",\n\t\"remindMeLater\": \"Vielleicht später\",\n\t\"neverShow\": \"Nicht wieder anzeigen\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"en-US\">\n{\n\t\"didYouLikeMisskey\": \"Have you taken a liking to Misskey?\",\n\t\"pleaseDonate\": \"{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!\",\n\t\"learnMore\": \"Learn more\",\n\t\"remindMeLater\": \"Maybe later\",\n\t\"neverShow\": \"Don't show again\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"es-ES\">\n{\n\t\"didYouLikeMisskey\": \"¿Te gusta Misskey?\",\n\t\"pleaseDonate\": \"{host} usa el software gratuito Misskey. Por favor ¡Considera donar al proyecto principal para que podamos continuar!\",\n\t\"learnMore\": \"Ver más\",\n\t\"remindMeLater\": \"Recordar después\",\n\t\"neverShow\": \"No mostrar de nuevo\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"fr-FR\">\n{\n\t\"didYouLikeMisskey\": \"Avez-vous aimé Misskey ?\",\n\t\"pleaseDonate\": \"Misskey est le logiciel libre utilisé par {host}. Merci de faire un don pour que nous puissions continuer à le développer !\",\n\t\"learnMore\": \"Plus d'informations\",\n\t\"remindMeLater\": \"Peut-être plus tard\",\n\t\"neverShow\": \"Ne plus afficher\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"id-ID\">\n{\n\t\"didYouLikeMisskey\": \"Apakah kamu mulai menyukai Misskey?\",\n\t\"pleaseDonate\": \"{host} menggunakan perangkat lunak bebas yaitu Misskey. Kami sangat mengapresiasi sekali donasi dari kamu agar pengembangan Misskey tetap dapat berlanjut!\",\n\t\"learnMore\": \"Pelajari lebih lanjut\",\n\t\"remindMeLater\": \"Mungkin nanti\",\n\t\"neverShow\": \"Jangan tampilkan lagi\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"it-IT\">\n{\n\t\"didYouLikeMisskey\": \"Ti piace Misskey?\",\n\t\"pleaseDonate\": \"Misskey è il software libero utilizzato su {host}. Offrendo una donazione è più facile continuare a svilupparlo!\",\n\t\"learnMore\": \"Per saperne di più\",\n\t\"remindMeLater\": \"Rimanda\",\n\t\"neverShow\": \"Non mostrare più\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ja-JP\">\n{\n\t\"didYouLikeMisskey\": \"Misskeyを気に入っていただけましたか？\",\n\t\"pleaseDonate\": \"Misskeyは{host}が使用している無料のソフトウェアです。これからも開発を続けられるように、ぜひ寄付をお願いします！\",\n\t\"learnMore\": \"詳しく\",\n\t\"remindMeLater\": \"また後で\",\n\t\"neverShow\": \"今後表示しない\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ja-KS\">\n{\n\t\"didYouLikeMisskey\": \"Misskey気に入ってくれた？\",\n\t\"pleaseDonate\": \"Misskeyは{host}が使うとる無料のソフトウェアやで。これからも開発を続けれるように、寄付したってな～。\",\n\t\"learnMore\": \"詳しく\",\n\t\"remindMeLater\": \"また後で\",\n\t\"neverShow\": \"今後表示しない\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"kab-KAB\">\n{\n\t\"didYouLikeMisskey\": \"Have you taken a liking to Misskey?\",\n\t\"pleaseDonate\": \"{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!\",\n\t\"learnMore\": \"Learn more\",\n\t\"remindMeLater\": \"Maybe later\",\n\t\"neverShow\": \"Don't show again\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"kn-IN\">\n{\n\t\"didYouLikeMisskey\": \"Have you taken a liking to Misskey?\",\n\t\"pleaseDonate\": \"{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!\",\n\t\"learnMore\": \"Learn more\",\n\t\"remindMeLater\": \"Maybe later\",\n\t\"neverShow\": \"Don't show again\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ko-KR\">\n{\n\t\"didYouLikeMisskey\": \"Misskey가 마음에 드시나요?\",\n\t\"pleaseDonate\": \"Misskey는 {host} 서버의 무료 소프트웨어입니다. 앞으로도 개발을 이어 나가려면 후원이 절실히 필요합니다!\",\n\t\"learnMore\": \"자세히\",\n\t\"remindMeLater\": \"나중에 알림\",\n\t\"neverShow\": \"다시 보지 않기\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"nl-NL\">\n{\n\t\"didYouLikeMisskey\": \"Have you taken a liking to Misskey?\",\n\t\"pleaseDonate\": \"{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!\",\n\t\"learnMore\": \"Meer leren\",\n\t\"remindMeLater\": \"Maybe later\",\n\t\"neverShow\": \"Don't show again\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"no-NO\">\n{\n\t\"didYouLikeMisskey\": \"Likte du Misskey?\",\n\t\"pleaseDonate\": \"{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!\",\n\t\"learnMore\": \"Les mer\",\n\t\"remindMeLater\": \"Kanskje senere\",\n\t\"neverShow\": \"Ikke vis igjen\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"pl-PL\">\n{\n\t\"didYouLikeMisskey\": \"Czy Misskey się tobie spodobało?\",\n\t\"pleaseDonate\": \"{host} używa darmowego oprogramowania — Misskey. Bylibyśmy bardzo wdzięczni za datki, które pozwolą na kontynuację rozwoju Misskey!\",\n\t\"learnMore\": \"Dowiedz się więcej\",\n\t\"remindMeLater\": \"Przypomnij później\",\n\t\"neverShow\": \"Nie pokazuj ponownie\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"pt-PT\">\n{\n\t\"didYouLikeMisskey\": \"Você gostou do Misskey?\",\n\t\"pleaseDonate\": \"O Misskey é um software gratuito utilizado por {host}. Para que possamos continuar o desenvolvimento, pedimos que considerem fazer doações. A sua contribuição é muito importante!\",\n\t\"learnMore\": \"Saiba mais\",\n\t\"remindMeLater\": \"Lembrar mais tarde\",\n\t\"neverShow\": \"Não exibir novamente\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ru-RU\">\n{\n\t\"didYouLikeMisskey\": \"Вам нравится Misskey?\",\n\t\"pleaseDonate\": \"Сайт {host} работает на Misskey. Это бесплатное программное обеспечение, и ваши пожертвования очень бы помогли продолжать его разработку!\",\n\t\"learnMore\": \"Подробнее\",\n\t\"remindMeLater\": \"Напомнить позже\",\n\t\"neverShow\": \"Больше не показывать\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"sk-SK\">\n{\n\t\"didYouLikeMisskey\": \"Páči sa vám Misskey?\",\n\t\"pleaseDonate\": \"Misskey je bezplatný softvér, ktorý používa {host}. Prosím, prispejte, aby sme ho mohli ďalej rozvíjať!\",\n\t\"learnMore\": \"Zistiť viac\",\n\t\"remindMeLater\": \"Pripomenúť neskôr\",\n\t\"neverShow\": \"Nabudúce nezobrazovať\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"th-TH\">\n{\n\t\"didYouLikeMisskey\": \"คุณชอบ Misskey ไหม?\",\n\t\"pleaseDonate\": \"Misskey เป็นซอฟต์แวร์ฟรีที่ใช้งานโดย {host} เราขอขอบคุณการสนับสนุนของคุณอย่างสูงเพื่อให้การพัฒนา Misskey สามารถดำเนินต่อไปได้!\",\n\t\"learnMore\": \"แสดงให้ดูหน่อย\",\n\t\"remindMeLater\": \"ไว้ครั้งหน้าแล้วกัน\",\n\t\"neverShow\": \"ไม่ต้องแสดงข้อความนี้อีก\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"tr-TR\">\n{\n\t\"didYouLikeMisskey\": \"Misskey'i sevdin mi?\",\n\t\"pleaseDonate\": \"{host} ücretsiz yazılım Misskey kullanmaktadır. Misskey'in geliştirilmesinin devam edebilmesi için bağışlarınızı çok takdir ederiz!\",\n\t\"learnMore\": \"Daha fazla bilgi edinin\",\n\t\"remindMeLater\": \"Belki daha sonra\",\n\t\"neverShow\": \"Bir daha gösterme\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"ug-CN\">\n{\n\t\"didYouLikeMisskey\": \"Have you taken a liking to Misskey?\",\n\t\"pleaseDonate\": \"{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!\",\n\t\"learnMore\": \"Learn more\",\n\t\"remindMeLater\": \"Maybe later\",\n\t\"neverShow\": \"Don't show again\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"uk-UA\">\n{\n\t\"didYouLikeMisskey\": \"Вам сподобався Misskey?\",\n\t\"pleaseDonate\": \"{host} використовує вільне програмне забезпечення Misskey. Ми будемо дуже вдячні за ваші донати, щоб розробка Misskey могла тривати!\",\n\t\"learnMore\": \"Докладніше\",\n\t\"remindMeLater\": \"Можливо, пізніше\",\n\t\"neverShow\": \"Більше не показувати\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"vi-VN\">\n{\n\t\"didYouLikeMisskey\": \"Bạn có ưa thích Mískey không?\",\n\t\"pleaseDonate\": \"Misskey là phần mềm miễn phí mà {host} đang sử dụng. Xin mong bạn quyên góp cho chúng tôi để chúng tôi có thể tiếp tục phát triển dịch vụ này. Xin cảm ơn!!\",\n\t\"learnMore\": \"Tìm hiểu thêm\",\n\t\"remindMeLater\": \"Để sau\",\n\t\"neverShow\": \"Không hiển thị nữa\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"zh-CN\">\n{\n\t\"didYouLikeMisskey\": \"您喜欢 Misskey 吗？\",\n\t\"pleaseDonate\": \"Misskey 是 {host} 所使用的免费软件。为了今后也能够维持 Misskey 的开发，请在有余力的情况下进行捐助！\",\n\t\"learnMore\": \"更多信息\",\n\t\"remindMeLater\": \"稍后提醒我\",\n\t\"neverShow\": \"不再显示\"\n}\n</locale>\n\n<locale lang=\"json\" locale=\"zh-TW\">\n{\n\t\"didYouLikeMisskey\": \"您喜歡 Misskey 嗎？\",\n\t\"pleaseDonate\": \"Misskey是由{host}使用的免費軟體。請贊助我們，讓開發的工作能夠持續！\",\n\t\"learnMore\": \"更多資訊\",\n\t\"remindMeLater\": \"以後再說\",\n\t\"neverShow\": \"不再顯示\"\n}\n</locale>\n",
+			"original": {
+				"ar-SA": {
+					"didYouLikeMisskey": "هل أعجبك ميسكي؟",
+					"pleaseDonate": "يستخدم {host} البرمجية الحرة ميسكي. نتمنى أن تتبرعوا للمشروع مما سيسمح لنا متابعة تطويره!",
+					"learnMore": "راجع المزيد",
+					"remindMeLater": "ربما لاحقا",
+					"neverShow": "لا تظهره مجددًا"
+				},
+				"ca-ES": {
+					"didYouLikeMisskey": "T'està agradant Misskey?",
+					"pleaseDonate": "A {host} fem servir el software lliure Misskey. Considera fer un donatiu a Misskey perquè pugui continuar el seu desenvolupament!",
+					"learnMore": "Saber-ne més ",
+					"remindMeLater": "Recorda-m'ho més tard",
+					"neverShow": "No mostrar més "
+				},
+				"cs-CZ": {
+					"didYouLikeMisskey": "Oblíbili jste si Misskey?",
+					"pleaseDonate": "{host} používá bezplatný software Misskey. Velmi bychom ocenili vaše dary, aby mohl vývoj Misskey pokračovat!",
+					"learnMore": "Zjistit více",
+					"remindMeLater": "Možná později",
+					"neverShow": "Znovu nezobrazovat"
+				},
+				"da-DK": {
+					"didYouLikeMisskey": "Have you taken a liking to Misskey?",
+					"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"learnMore": "Learn more",
+					"remindMeLater": "Maybe later",
+					"neverShow": "Don't show again"
+				},
+				"de-DE": {
+					"didYouLikeMisskey": "Gefällt dir Misskey?",
+					"pleaseDonate": "Misskey ist die kostenlose Software, die von {host} verwendet wird. Wir würden uns über Spenden freuen, damit dessen Entwicklung weitergeführt werden kann!",
+					"learnMore": "Mehr erfahren",
+					"remindMeLater": "Vielleicht später",
+					"neverShow": "Nicht wieder anzeigen"
+				},
+				"en-US": {
+					"didYouLikeMisskey": "Have you taken a liking to Misskey?",
+					"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"learnMore": "Learn more",
+					"remindMeLater": "Maybe later",
+					"neverShow": "Don't show again"
+				},
+				"es-ES": {
+					"didYouLikeMisskey": "¿Te gusta Misskey?",
+					"pleaseDonate": "{host} usa el software gratuito Misskey. Por favor ¡Considera donar al proyecto principal para que podamos continuar!",
+					"learnMore": "Ver más",
+					"remindMeLater": "Recordar después",
+					"neverShow": "No mostrar de nuevo"
+				},
+				"fr-FR": {
+					"didYouLikeMisskey": "Avez-vous aimé Misskey ?",
+					"pleaseDonate": "Misskey est le logiciel libre utilisé par {host}. Merci de faire un don pour que nous puissions continuer à le développer !",
+					"learnMore": "Plus d'informations",
+					"remindMeLater": "Peut-être plus tard",
+					"neverShow": "Ne plus afficher"
+				},
+				"id-ID": {
+					"didYouLikeMisskey": "Apakah kamu mulai menyukai Misskey?",
+					"pleaseDonate": "{host} menggunakan perangkat lunak bebas yaitu Misskey. Kami sangat mengapresiasi sekali donasi dari kamu agar pengembangan Misskey tetap dapat berlanjut!",
+					"learnMore": "Pelajari lebih lanjut",
+					"remindMeLater": "Mungkin nanti",
+					"neverShow": "Jangan tampilkan lagi"
+				},
+				"it-IT": {
+					"didYouLikeMisskey": "Ti piace Misskey?",
+					"pleaseDonate": "Misskey è il software libero utilizzato su {host}. Offrendo una donazione è più facile continuare a svilupparlo!",
+					"learnMore": "Per saperne di più",
+					"remindMeLater": "Rimanda",
+					"neverShow": "Non mostrare più"
+				},
+				"ja-JP": {
+					"didYouLikeMisskey": "Misskeyを気に入っていただけましたか？",
+					"pleaseDonate": "Misskeyは{host}が使用している無料のソフトウェアです。これからも開発を続けられるように、ぜひ寄付をお願いします！",
+					"learnMore": "詳しく",
+					"remindMeLater": "また後で",
+					"neverShow": "今後表示しない"
+				},
+				"ja-KS": {
+					"didYouLikeMisskey": "Misskey気に入ってくれた？",
+					"pleaseDonate": "Misskeyは{host}が使うとる無料のソフトウェアやで。これからも開発を続けれるように、寄付したってな～。",
+					"learnMore": "詳しく",
+					"remindMeLater": "また後で",
+					"neverShow": "今後表示しない"
+				},
+				"kab-KAB": {
+					"didYouLikeMisskey": "Have you taken a liking to Misskey?",
+					"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"learnMore": "Learn more",
+					"remindMeLater": "Maybe later",
+					"neverShow": "Don't show again"
+				},
+				"kn-IN": {
+					"didYouLikeMisskey": "Have you taken a liking to Misskey?",
+					"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"learnMore": "Learn more",
+					"remindMeLater": "Maybe later",
+					"neverShow": "Don't show again"
+				},
+				"ko-KR": {
+					"didYouLikeMisskey": "Misskey가 마음에 드시나요?",
+					"pleaseDonate": "Misskey는 {host} 서버의 무료 소프트웨어입니다. 앞으로도 개발을 이어 나가려면 후원이 절실히 필요합니다!",
+					"learnMore": "자세히",
+					"remindMeLater": "나중에 알림",
+					"neverShow": "다시 보지 않기"
+				},
+				"nl-NL": {
+					"didYouLikeMisskey": "Have you taken a liking to Misskey?",
+					"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"learnMore": "Meer leren",
+					"remindMeLater": "Maybe later",
+					"neverShow": "Don't show again"
+				},
+				"no-NO": {
+					"didYouLikeMisskey": "Likte du Misskey?",
+					"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"learnMore": "Les mer",
+					"remindMeLater": "Kanskje senere",
+					"neverShow": "Ikke vis igjen"
+				},
+				"pl-PL": {
+					"didYouLikeMisskey": "Czy Misskey się tobie spodobało?",
+					"pleaseDonate": "{host} używa darmowego oprogramowania — Misskey. Bylibyśmy bardzo wdzięczni za datki, które pozwolą na kontynuację rozwoju Misskey!",
+					"learnMore": "Dowiedz się więcej",
+					"remindMeLater": "Przypomnij później",
+					"neverShow": "Nie pokazuj ponownie"
+				},
+				"pt-PT": {
+					"didYouLikeMisskey": "Você gostou do Misskey?",
+					"pleaseDonate": "O Misskey é um software gratuito utilizado por {host}. Para que possamos continuar o desenvolvimento, pedimos que considerem fazer doações. A sua contribuição é muito importante!",
+					"learnMore": "Saiba mais",
+					"remindMeLater": "Lembrar mais tarde",
+					"neverShow": "Não exibir novamente"
+				},
+				"ru-RU": {
+					"didYouLikeMisskey": "Вам нравится Misskey?",
+					"pleaseDonate": "Сайт {host} работает на Misskey. Это бесплатное программное обеспечение, и ваши пожертвования очень бы помогли продолжать его разработку!",
+					"learnMore": "Подробнее",
+					"remindMeLater": "Напомнить позже",
+					"neverShow": "Больше не показывать"
+				},
+				"sk-SK": {
+					"didYouLikeMisskey": "Páči sa vám Misskey?",
+					"pleaseDonate": "Misskey je bezplatný softvér, ktorý používa {host}. Prosím, prispejte, aby sme ho mohli ďalej rozvíjať!",
+					"learnMore": "Zistiť viac",
+					"remindMeLater": "Pripomenúť neskôr",
+					"neverShow": "Nabudúce nezobrazovať"
+				},
+				"th-TH": {
+					"didYouLikeMisskey": "คุณชอบ Misskey ไหม?",
+					"pleaseDonate": "Misskey เป็นซอฟต์แวร์ฟรีที่ใช้งานโดย {host} เราขอขอบคุณการสนับสนุนของคุณอย่างสูงเพื่อให้การพัฒนา Misskey สามารถดำเนินต่อไปได้!",
+					"learnMore": "แสดงให้ดูหน่อย",
+					"remindMeLater": "ไว้ครั้งหน้าแล้วกัน",
+					"neverShow": "ไม่ต้องแสดงข้อความนี้อีก"
+				},
+				"tr-TR": {
+					"didYouLikeMisskey": "Misskey'i sevdin mi?",
+					"pleaseDonate": "{host} ücretsiz yazılım Misskey kullanmaktadır. Misskey'in geliştirilmesinin devam edebilmesi için bağışlarınızı çok takdir ederiz!",
+					"learnMore": "Daha fazla bilgi edinin",
+					"remindMeLater": "Belki daha sonra",
+					"neverShow": "Bir daha gösterme"
+				},
+				"ug-CN": {
+					"didYouLikeMisskey": "Have you taken a liking to Misskey?",
+					"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"learnMore": "Learn more",
+					"remindMeLater": "Maybe later",
+					"neverShow": "Don't show again"
+				},
+				"uk-UA": {
+					"didYouLikeMisskey": "Вам сподобався Misskey?",
+					"pleaseDonate": "{host} використовує вільне програмне забезпечення Misskey. Ми будемо дуже вдячні за ваші донати, щоб розробка Misskey могла тривати!",
+					"learnMore": "Докладніше",
+					"remindMeLater": "Можливо, пізніше",
+					"neverShow": "Більше не показувати"
+				},
+				"vi-VN": {
+					"didYouLikeMisskey": "Bạn có ưa thích Mískey không?",
+					"pleaseDonate": "Misskey là phần mềm miễn phí mà {host} đang sử dụng. Xin mong bạn quyên góp cho chúng tôi để chúng tôi có thể tiếp tục phát triển dịch vụ này. Xin cảm ơn!!",
+					"learnMore": "Tìm hiểu thêm",
+					"remindMeLater": "Để sau",
+					"neverShow": "Không hiển thị nữa"
+				},
+				"zh-CN": {
+					"didYouLikeMisskey": "您喜欢 Misskey 吗？",
+					"pleaseDonate": "Misskey 是 {host} 所使用的免费软件。为了今后也能够维持 Misskey 的开发，请在有余力的情况下进行捐助！",
+					"learnMore": "更多信息",
+					"remindMeLater": "稍后提醒我",
+					"neverShow": "不再显示"
+				},
+				"zh-TW": {
+					"didYouLikeMisskey": "您喜歡 Misskey 嗎？",
+					"pleaseDonate": "Misskey是由{host}使用的免費軟體。請贊助我們，讓開發的工作能夠持續！",
+					"learnMore": "更多資訊",
+					"remindMeLater": "以後再說",
+					"neverShow": "不再顯示"
+				}
+			},
+			"reviewed": {
+				"ar-SA": {
+					"didYouLikeMisskey": "هل أعجبك ميسكي؟",
+					"pleaseDonate": "يستخدم {host} البرمجية الحرة ميسكي. نتمنى أن تتبرعوا للمشروع مما سيسمح لنا متابعة تطويره!",
+					"learnMore": "راجع المزيد",
+					"remindMeLater": "ربما لاحقا",
+					"neverShow": "لا تظهره مجددًا"
+				},
+				"ca-ES": {
+					"didYouLikeMisskey": "T'està agradant Misskey?",
+					"pleaseDonate": "A {host} fem servir el software lliure Misskey. Considera fer un donatiu a Misskey perquè pugui continuar el seu desenvolupament!",
+					"learnMore": "Saber-ne més ",
+					"remindMeLater": "Recorda-m'ho més tard",
+					"neverShow": "No mostrar més "
+				},
+				"cs-CZ": {
+					"didYouLikeMisskey": "Oblíbili jste si Misskey?",
+					"pleaseDonate": "{host} používá bezplatný software Misskey. Velmi bychom ocenili vaše dary, aby mohl vývoj Misskey pokračovat!",
+					"learnMore": "Zjistit více",
+					"remindMeLater": "Možná později",
+					"neverShow": "Znovu nezobrazovat"
+				},
+				"da-DK": {
+					"didYouLikeMisskey": "Kan du lide Misskey?",
+					"pleaseDonate": "{host} bruger den gratis software Misskey. Vi sætter stor pris på donationer, så udviklingen af Misskey kan fortsætte!",
+					"learnMore": "Læs mere",
+					"remindMeLater": "Måske senere",
+					"neverShow": "Vis ikke igen"
+				},
+				"de-DE": {
+					"didYouLikeMisskey": "Gefällt dir Misskey?",
+					"pleaseDonate": "Misskey ist die kostenlose Software, die von {host} verwendet wird. Wir würden uns über Spenden freuen, damit dessen Entwicklung weitergeführt werden kann!",
+					"learnMore": "Mehr erfahren",
+					"remindMeLater": "Vielleicht später",
+					"neverShow": "Nicht wieder anzeigen"
+				},
+				"en-US": {
+					"didYouLikeMisskey": "Have you taken a liking to Misskey?",
+					"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"learnMore": "Learn more",
+					"remindMeLater": "Maybe later",
+					"neverShow": "Don't show again"
+				},
+				"es-ES": {
+					"didYouLikeMisskey": "¿Te gusta Misskey?",
+					"pleaseDonate": "{host} usa el software gratuito Misskey. Por favor ¡Considera donar al proyecto principal para que podamos continuar!",
+					"learnMore": "Ver más",
+					"remindMeLater": "Recordar después",
+					"neverShow": "No mostrar de nuevo"
+				},
+				"fr-FR": {
+					"didYouLikeMisskey": "Avez-vous aimé Misskey ?",
+					"pleaseDonate": "Misskey est le logiciel libre utilisé par {host}. Merci de faire un don pour que nous puissions continuer à le développer !",
+					"learnMore": "Plus d'informations",
+					"remindMeLater": "Peut-être plus tard",
+					"neverShow": "Ne plus afficher"
+				},
+				"id-ID": {
+					"didYouLikeMisskey": "Apakah kamu mulai menyukai Misskey?",
+					"pleaseDonate": "{host} menggunakan perangkat lunak bebas yaitu Misskey. Kami sangat mengapresiasi sekali donasi dari kamu agar pengembangan Misskey tetap dapat berlanjut!",
+					"learnMore": "Pelajari lebih lanjut",
+					"remindMeLater": "Mungkin nanti",
+					"neverShow": "Jangan tampilkan lagi"
+				},
+				"it-IT": {
+					"didYouLikeMisskey": "Ti piace Misskey?",
+					"pleaseDonate": "Misskey è il software libero utilizzato su {host}. Offrendo una donazione è più facile continuare a svilupparlo!",
+					"learnMore": "Per saperne di più",
+					"remindMeLater": "Rimanda",
+					"neverShow": "Non mostrare più"
+				},
+				"ja-JP": {
+					"didYouLikeMisskey": "Misskeyを気に入っていただけましたか？",
+					"pleaseDonate": "Misskeyは{host}が使用している無料のソフトウェアです。これからも開発を続けられるように、ぜひ寄付をお願いします！",
+					"learnMore": "詳しく",
+					"remindMeLater": "また後で",
+					"neverShow": "今後表示しない"
+				},
+				"ja-KS": {
+					"didYouLikeMisskey": "Misskey気に入ってくれた？",
+					"pleaseDonate": "Misskeyは{host}が使うとる無料のソフトウェアやで。これからも開発を続けれるように、寄付したってな～。",
+					"learnMore": "詳しく",
+					"remindMeLater": "また後で",
+					"neverShow": "今後表示しない"
+				},
+				"kab-KAB": {
+					"didYouLikeMisskey": "Tḥemmleḍ Misskey?",
+					"pleaseDonate": "{host} iseqdac aseɣẓan ilelli Misskey. Ma tzemrem, efket-d tikci i wakken ad tkemmel tneflit n Misskey!",
+					"learnMore": "Issin ugar",
+					"remindMeLater": "Ahat ticki",
+					"neverShow": "Ur t-id-skan ara tikkelt-nniḍen"
+				},
+				"kn-IN": {
+					"didYouLikeMisskey": "ನಿಮಗೆ Misskey ಇಷ್ಟವಾಯಿತೇ?",
+					"pleaseDonate": "{host} ಉಚಿತ ಸಾಫ್ಟ್‌ವೇರ್ ಆದ Misskeyಯನ್ನು ಬಳಸುತ್ತದೆ. Misskeyಯ ಅಭಿವೃದ್ಧಿ ಮುಂದುವರಿಯಲು ದಯವಿಟ್ಟು ದೇಣಿಗೆ ನೀಡಿ!",
+					"learnMore": "ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ",
+					"remindMeLater": "ನಂತರ ನೋಡೋಣ",
+					"neverShow": "ಮತ್ತೆ ತೋರಿಸಬೇಡಿ"
+				},
+				"ko-KR": {
+					"didYouLikeMisskey": "Misskey가 마음에 드시나요?",
+					"pleaseDonate": "Misskey는 {host} 서버의 무료 소프트웨어입니다. 앞으로도 개발을 이어 나가려면 후원이 절실히 필요합니다!",
+					"learnMore": "자세히",
+					"remindMeLater": "나중에 알림",
+					"neverShow": "다시 보지 않기"
+				},
+				"nl-NL": {
+					"didYouLikeMisskey": "Vind je Misskey leuk?",
+					"pleaseDonate": "{host} gebruikt de gratis software Misskey. We stellen donaties zeer op prijs, zodat de ontwikkeling van Misskey kan doorgaan!",
+					"learnMore": "Meer leren",
+					"remindMeLater": "Misschien later",
+					"neverShow": "Niet meer tonen"
+				},
+				"no-NO": {
+					"didYouLikeMisskey": "Likte du Misskey?",
+					"pleaseDonate": "{host} bruker den gratis programvaren Misskey. Vi setter stor pris på donasjoner, slik at utviklingen av Misskey kan fortsette!",
+					"learnMore": "Les mer",
+					"remindMeLater": "Kanskje senere",
+					"neverShow": "Ikke vis igjen"
+				},
+				"pl-PL": {
+					"didYouLikeMisskey": "Czy Misskey się tobie spodobało?",
+					"pleaseDonate": "{host} używa darmowego oprogramowania — Misskey. Bylibyśmy bardzo wdzięczni za datki, które pozwolą na kontynuację rozwoju Misskey!",
+					"learnMore": "Dowiedz się więcej",
+					"remindMeLater": "Przypomnij później",
+					"neverShow": "Nie pokazuj ponownie"
+				},
+				"pt-PT": {
+					"didYouLikeMisskey": "Você gostou do Misskey?",
+					"pleaseDonate": "O Misskey é um software gratuito utilizado por {host}. Para que possamos continuar o desenvolvimento, pedimos que considerem fazer doações. A sua contribuição é muito importante!",
+					"learnMore": "Saiba mais",
+					"remindMeLater": "Lembrar mais tarde",
+					"neverShow": "Não exibir novamente"
+				},
+				"ru-RU": {
+					"didYouLikeMisskey": "Вам нравится Misskey?",
+					"pleaseDonate": "Сайт {host} работает на Misskey. Это бесплатное программное обеспечение, и ваши пожертвования очень бы помогли продолжать его разработку!",
+					"learnMore": "Подробнее",
+					"remindMeLater": "Напомнить позже",
+					"neverShow": "Больше не показывать"
+				},
+				"sk-SK": {
+					"didYouLikeMisskey": "Páči sa vám Misskey?",
+					"pleaseDonate": "Misskey je bezplatný softvér, ktorý používa {host}. Prosím, prispejte, aby sme ho mohli ďalej rozvíjať!",
+					"learnMore": "Zistiť viac",
+					"remindMeLater": "Pripomenúť neskôr",
+					"neverShow": "Nabudúce nezobrazovať"
+				},
+				"th-TH": {
+					"didYouLikeMisskey": "คุณชอบ Misskey ไหม?",
+					"pleaseDonate": "Misskey เป็นซอฟต์แวร์ฟรีที่ใช้งานโดย {host} เราขอขอบคุณการสนับสนุนของคุณอย่างสูงเพื่อให้การพัฒนา Misskey สามารถดำเนินต่อไปได้!",
+					"learnMore": "แสดงให้ดูหน่อย",
+					"remindMeLater": "ไว้ครั้งหน้าแล้วกัน",
+					"neverShow": "ไม่ต้องแสดงข้อความนี้อีก"
+				},
+				"tr-TR": {
+					"didYouLikeMisskey": "Misskey'i sevdin mi?",
+					"pleaseDonate": "{host} ücretsiz yazılım Misskey kullanmaktadır. Misskey'in geliştirilmesinin devam edebilmesi için bağışlarınızı çok takdir ederiz!",
+					"learnMore": "Daha fazla bilgi edinin",
+					"remindMeLater": "Belki daha sonra",
+					"neverShow": "Bir daha gösterme"
+				},
+				"ug-CN": {
+					"didYouLikeMisskey": "Misskey نى ياقتۇردىڭىزمۇ؟",
+					"pleaseDonate": "{host} ھەقسىز يۇمشاق دېتال Misskey نى ئىشلىتىدۇ. Misskey نىڭ تەرەققىياتىنى داۋاملاشتۇرۇش ئۈچۈن ئىئانە قىلىشىڭىزنى ئۈمىد قىلىمىز!",
+					"learnMore": "تېخىمۇ كۆپ بىلىش",
+					"remindMeLater": "كېيىنچە",
+					"neverShow": "قايتا كۆرسەتمە"
+				},
+				"uk-UA": {
+					"didYouLikeMisskey": "Вам сподобався Misskey?",
+					"pleaseDonate": "{host} використовує вільне програмне забезпечення Misskey. Ми будемо дуже вдячні за ваші донати, щоб розробка Misskey могла тривати!",
+					"learnMore": "Докладніше",
+					"remindMeLater": "Можливо, пізніше",
+					"neverShow": "Більше не показувати"
+				},
+				"vi-VN": {
+					"didYouLikeMisskey": "Bạn có ưa thích Mískey không?",
+					"pleaseDonate": "Misskey là phần mềm miễn phí mà {host} đang sử dụng. Xin mong bạn quyên góp cho chúng tôi để chúng tôi có thể tiếp tục phát triển dịch vụ này. Xin cảm ơn!!",
+					"learnMore": "Tìm hiểu thêm",
+					"remindMeLater": "Để sau",
+					"neverShow": "Không hiển thị nữa"
+				},
+				"zh-CN": {
+					"didYouLikeMisskey": "您喜欢 Misskey 吗？",
+					"pleaseDonate": "Misskey 是 {host} 所使用的免费软件。为了今后也能够维持 Misskey 的开发，请在有余力的情况下进行捐助！",
+					"learnMore": "更多信息",
+					"remindMeLater": "稍后提醒我",
+					"neverShow": "不再显示"
+				},
+				"zh-TW": {
+					"didYouLikeMisskey": "您喜歡 Misskey 嗎？",
+					"pleaseDonate": "Misskey是由{host}使用的免費軟體。請贊助我們，讓開發的工作能夠持續！",
+					"learnMore": "更多資訊",
+					"remindMeLater": "以後再說",
+					"neverShow": "不再顯示"
+				},
+				"el-GR": {
+					"didYouLikeMisskey": "Σας αρέσει το Misskey;",
+					"pleaseDonate": "Το {host} χρησιμοποιεί το δωρεάν λογισμικό Misskey. Θα εκτιμούσαμε ιδιαίτερα τη δωρεά σας, ώστε να συνεχιστεί η ανάπτυξη του Misskey!",
+					"learnMore": "Μάθετε περισσότερα",
+					"remindMeLater": "Ίσως αργότερα",
+					"neverShow": "Να μην εμφανιστεί ξανά"
+				},
+				"hr-HR": {
+					"didYouLikeMisskey": "Sviđa li vam se Misskey?",
+					"pleaseDonate": "{host} koristi besplatni softver Misskey. Bili bismo vrlo zahvalni na vašim donacijama kako bi se razvoj Misskeyja mogao nastaviti!",
+					"learnMore": "Saznajte više",
+					"remindMeLater": "Možda kasnije",
+					"neverShow": "Ne prikazuj ponovno"
+				},
+				"ht-HT": {
+					"didYouLikeMisskey": "Èske ou renmen Misskey?",
+					"pleaseDonate": "{host} sèvi ak Misskey, yon lojisyèl gratis. Nou ta apresye don ou anpil pou devlopman Misskey kapab kontinye!",
+					"learnMore": "Aprann plis",
+					"remindMeLater": "Petèt pita",
+					"neverShow": "Pa montre sa ankò"
+				},
+				"hu-HU": {
+					"didYouLikeMisskey": "Tetszik a Misskey?",
+					"pleaseDonate": "{host} az ingyenes Misskey szoftvert használja. Nagyon hálásak lennénk az adományodért, hogy folytatódhasson a Misskey fejlesztése!",
+					"learnMore": "További információ",
+					"remindMeLater": "Talán később",
+					"neverShow": "Ne jelenjen meg újra"
+				},
+				"ro-RO": {
+					"didYouLikeMisskey": "A început sa îți placa Misskey?",
+					"pleaseDonate": "{host} folosește software-ul gratuit, Misskey. Am aprecia foarte mult donațiile dumneavoastră, astfel încât dezvoltarea Misskey să poată continua!",
+					"learnMore": "Află mai multe",
+					"remindMeLater": "Poate mai târziu",
+					"neverShow": "Nu mai afișa"
+				},
+				"sv-SE": {
+					"didYouLikeMisskey": "Tycker du om Misskey?",
+					"pleaseDonate": "Misskey är en gratis programvara som används på {host}. Donera gärna för att göra utvecklingen ständigt, tack!",
+					"learnMore": "Läs mer",
+					"remindMeLater": "Kanske senare",
+					"neverShow": "Visa inte igen"
+				},
+				"uz-UZ": {
+					"didYouLikeMisskey": "Misskey sizga yoqdimi?",
+					"pleaseDonate": "{host} bepul Misskey dasturidan foydalanadi. Misskey rivojlantirilishini davom ettirish uchun xayriyangizdan juda minnatdor bo‘lamiz!",
+					"learnMore": "Batafsilroq",
+					"remindMeLater": "Balki keyinroq",
+					"neverShow": "Boshqa ko‘rsatilmasin"
+				},
+				"bn-BD": {
+					"didYouLikeMisskey": "আপনার কি Misskey ভালো লেগেছে?",
+					"pleaseDonate": "{host} বিনামূল্যের সফটওয়্যার Misskey ব্যবহার করে। Misskey-এর উন্নয়ন চালিয়ে যেতে আপনার অনুদান আমাদের অনেক সাহায্য করবে!",
+					"learnMore": "আরও জানুন",
+					"remindMeLater": "পরে মনে করিয়ে দিন",
+					"neverShow": "আর দেখাবেন না"
+				},
+				"fa-IR": {
+					"didYouLikeMisskey": "آیا از Misskey خوشتان آمده است؟",
+					"pleaseDonate": "{host} از نرم‌افزار رایگان Misskey استفاده می‌کند. با کمک مالی شما می‌توانیم توسعهٔ Misskey را ادامه دهیم!",
+					"learnMore": "بیشتر بدانید",
+					"remindMeLater": "بعداً یادآوری کن",
+					"neverShow": "دیگر نشان نده"
+				},
+				"jbo-EN": {
+					"didYouLikeMisskey": "xu do nelci la'o gy. Misskey .gy.",
+					"pleaseDonate": "la'o gy. {host} .gy. cu pilno la'o gy. Misskey .gy. noi samru'e gi'e se jdima li no .i .e'o ko dunda lo jdini mi te zu'e lo nu lo nu zbasu la'o gy. Misskey .gy. cu ranji",
+					"learnMore": "ko cilre lo zmadu",
+					"remindMeLater": "ko ba gasnu lo nu mi morji ti",
+					"neverShow": "ko na za'u re'u jarco"
+				},
+				"ko-GS": {
+					"didYouLikeMisskey": "Misskey가 맘에 드십니꺼?",
+					"pleaseDonate": "Misskey넌 {host}서 서넌 무료 소프트웨어입니다. 앞으로도 개발얼 이을 수 잇도록 후원해 주이소!",
+					"learnMore": "더 알아보기",
+					"remindMeLater": "나중에 알려 주이소",
+					"neverShow": "다시 비이지 않기"
+				},
+				"lo-LA": {
+					"didYouLikeMisskey": "ເຈົ້າມັກ Misskey ບໍ່?",
+					"pleaseDonate": "{host} ໃຊ້ຊອບແວຟຣີ Misskey. ການບໍລິຈາກຂອງເຈົ້າຈະຊ່ວຍໃຫ້ການພັດທະນາ Misskey ສາມາດດຳເນີນຕໍ່ໄປໄດ້!",
+					"learnMore": "ຮຽນຮູ້ເພີ່ມເຕີມ",
+					"remindMeLater": "ແຈ້ງເຕືອນຂ້ອຍພາຍຫຼັງ",
+					"neverShow": "ບໍ່ຕ້ອງສະແດງອີກ"
+				},
+				"si-LK": {
+					"didYouLikeMisskey": "ඔබ Misskey වලට කැමතිද?",
+					"pleaseDonate": "{host} භාවිත කරන්නේ නොමිලේ ලබා දෙන Misskey මෘදුකාංගයයි. Misskey සංවර්ධනය දිගටම කරගෙන යාමට ඔබගේ පරිත්‍යාග අපට බෙහෙවින් උපකාරී වේ!",
+					"learnMore": "තව දැනගන්න",
+					"remindMeLater": "පසුව මතක් කරන්න",
+					"neverShow": "නැවත නොපෙන්වන්න"
+				},
+				"tl-PH": {
+					"didYouLikeMisskey": "Nagustuhan mo ba ang Misskey?",
+					"pleaseDonate": "Ginagamit ng {host} ang libreng software na Misskey. Malaking tulong ang inyong mga donasyon upang maipagpatuloy ang pagbuo ng Misskey!",
+					"learnMore": "Alamin pa",
+					"remindMeLater": "Ipaalala sa akin mamaya",
+					"neverShow": "Huwag nang ipakita muli"
+				}
+			},
+			"changes": [
+				{
+					"language": "da-DK",
+					"path": "didYouLikeMisskey",
+					"original": "Have you taken a liking to Misskey?",
+					"reviewed": "Kan du lide Misskey?"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "didYouLikeMisskey",
+					"original": "Have you taken a liking to Misskey?",
+					"reviewed": "Tḥemmleḍ Misskey?"
+				},
+				{
+					"language": "kn-IN",
+					"path": "didYouLikeMisskey",
+					"original": "Have you taken a liking to Misskey?",
+					"reviewed": "ನಿಮಗೆ Misskey ಇಷ್ಟವಾಯಿತೇ?"
+				},
+				{
+					"language": "nl-NL",
+					"path": "didYouLikeMisskey",
+					"original": "Have you taken a liking to Misskey?",
+					"reviewed": "Vind je Misskey leuk?"
+				},
+				{
+					"language": "ug-CN",
+					"path": "didYouLikeMisskey",
+					"original": "Have you taken a liking to Misskey?",
+					"reviewed": "Misskey نى ياقتۇردىڭىزمۇ؟"
+				},
+				{
+					"language": "da-DK",
+					"path": "pleaseDonate",
+					"original": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"reviewed": "{host} bruger den gratis software Misskey. Vi sætter stor pris på donationer, så udviklingen af Misskey kan fortsætte!"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "pleaseDonate",
+					"original": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"reviewed": "{host} iseqdac aseɣẓan ilelli Misskey. Ma tzemrem, efket-d tikci i wakken ad tkemmel tneflit n Misskey!"
+				},
+				{
+					"language": "kn-IN",
+					"path": "pleaseDonate",
+					"original": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"reviewed": "{host} ಉಚಿತ ಸಾಫ್ಟ್‌ವೇರ್ ಆದ Misskeyಯನ್ನು ಬಳಸುತ್ತದೆ. Misskeyಯ ಅಭಿವೃದ್ಧಿ ಮುಂದುವರಿಯಲು ದಯವಿಟ್ಟು ದೇಣಿಗೆ ನೀಡಿ!"
+				},
+				{
+					"language": "nl-NL",
+					"path": "pleaseDonate",
+					"original": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"reviewed": "{host} gebruikt de gratis software Misskey. We stellen donaties zeer op prijs, zodat de ontwikkeling van Misskey kan doorgaan!"
+				},
+				{
+					"language": "no-NO",
+					"path": "pleaseDonate",
+					"original": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"reviewed": "{host} bruker den gratis programvaren Misskey. Vi setter stor pris på donasjoner, slik at utviklingen av Misskey kan fortsette!"
+				},
+				{
+					"language": "ug-CN",
+					"path": "pleaseDonate",
+					"original": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+					"reviewed": "{host} ھەقسىز يۇمشاق دېتال Misskey نى ئىشلىتىدۇ. Misskey نىڭ تەرەققىياتىنى داۋاملاشتۇرۇش ئۈچۈن ئىئانە قىلىشىڭىزنى ئۈمىد قىلىمىز!"
+				},
+				{
+					"language": "da-DK",
+					"path": "learnMore",
+					"original": "Learn more",
+					"reviewed": "Læs mere"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "learnMore",
+					"original": "Learn more",
+					"reviewed": "Issin ugar"
+				},
+				{
+					"language": "kn-IN",
+					"path": "learnMore",
+					"original": "Learn more",
+					"reviewed": "ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ"
+				},
+				{
+					"language": "ug-CN",
+					"path": "learnMore",
+					"original": "Learn more",
+					"reviewed": "تېخىمۇ كۆپ بىلىش"
+				},
+				{
+					"language": "da-DK",
+					"path": "remindMeLater",
+					"original": "Maybe later",
+					"reviewed": "Måske senere"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "remindMeLater",
+					"original": "Maybe later",
+					"reviewed": "Ahat ticki"
+				},
+				{
+					"language": "kn-IN",
+					"path": "remindMeLater",
+					"original": "Maybe later",
+					"reviewed": "ನಂತರ ನೋಡೋಣ"
+				},
+				{
+					"language": "nl-NL",
+					"path": "remindMeLater",
+					"original": "Maybe later",
+					"reviewed": "Misschien later"
+				},
+				{
+					"language": "ug-CN",
+					"path": "remindMeLater",
+					"original": "Maybe later",
+					"reviewed": "كېيىنچە"
+				},
+				{
+					"language": "da-DK",
+					"path": "neverShow",
+					"original": "Don't show again",
+					"reviewed": "Vis ikke igen"
+				},
+				{
+					"language": "kab-KAB",
+					"path": "neverShow",
+					"original": "Don't show again",
+					"reviewed": "Ur t-id-skan ara tikkelt-nniḍen"
+				},
+				{
+					"language": "kn-IN",
+					"path": "neverShow",
+					"original": "Don't show again",
+					"reviewed": "ಮತ್ತೆ ತೋರಿಸಬೇಡಿ"
+				},
+				{
+					"language": "nl-NL",
+					"path": "neverShow",
+					"original": "Don't show again",
+					"reviewed": "Niet meer tonen"
+				},
+				{
+					"language": "ug-CN",
+					"path": "neverShow",
+					"original": "Don't show again",
+					"reviewed": "قايتا كۆرسەتمە"
+				}
+			],
+			"inactiveOriginal": {
+				"didYouLikeMisskey": {
+					"ro-RO": "A început sa îți placa Misskey?"
+				},
+				"pleaseDonate": {
+					"ro-RO": "{host} folosește software-ul gratuit, Misskey. Am aprecia foarte mult donațiile dumneavoastră, astfel încât dezvoltarea Misskey să poată continua!",
+					"sv-SE": "Misskey är en gratis programvara som används på {host}. Donera gärna för att göra utvecklingen ständigt, tack!"
+				},
+				"learnMore": {
+					"bn-BD": "আরও জানুন",
+					"el-GR": "Μάθετε περισσότερα",
+					"ro-RO": "Află mai multe",
+					"sv-SE": "Läs mer",
+					"uz-UZ": "Batafsilroq"
+				},
+				"remindMeLater": {
+					"ro-RO": "Poate mai târziu"
+				},
+				"neverShow": {
+					"ro-RO": "Nu mai afișa"
+				}
+			}
+		}
+	],
+	"mappings": [
+		[
+			"aboutX",
+			1,
+			"aboutX"
+		],
+		[
+			"correspondingSourceIsAvailable",
+			1,
+			"correspondingSourceIsAvailable"
+		],
+		[
+			"didYouLikeMisskey",
+			2,
+			"didYouLikeMisskey"
+		],
+		[
+			"pleaseDonate",
+			2,
+			"pleaseDonate"
+		],
+		[
+			"remindMeLater",
+			2,
+			"remindMeLater"
+		]
+	],
+	"sha256": {
+		"ar-SA": "5be309181d859b199598ddf2f7dc78c20525b088beedc80e9eceb15e0f8f5956",
+		"ca-ES": "55c03b592d03b8864147c7dbc596b919454fe7c05e0644ef0e2d2ecc0bc91fae",
+		"cs-CZ": "502b84338dfd849bf360422f5d0d4491ee6968d60971c3849fde90a465c72907",
+		"da-DK": "116d6b870d8735dcc316185328ac75d40d96df8abdfb00dec87e93db817f17a5",
+		"de-DE": "90c56702843c40730f7de28cbe26d57568d2e847653828387fd3e39e93c5261e",
+		"en-US": "116d6b870d8735dcc316185328ac75d40d96df8abdfb00dec87e93db817f17a5",
+		"es-ES": "f9204b64821574ba9ff8ee4a6a1eaaca99b4a193d6f6c001b33a60ae84cec9d0",
+		"fr-FR": "00e92f700d99d0b81cc005891864d70abcf98a5f6a0eed98968670317ff4356a",
+		"id-ID": "5a8041a3a96859f472d187984acf22993f9cfdd873c13df9c668f46dee051775",
+		"it-IT": "81b7860d409a7374d354694387d7b880ad2a2b84460d4881a4b283c5ee1f732f",
+		"ja-JP": "b496e1bc26f474109c932a16807c0381f2562bf8474c711fa72352fe9c8751f8",
+		"ja-KS": "db1a2a229a3c61e4fa0233423c242cecd903482f8fa8218882df10a1b886eb23",
+		"kab-KAB": "116d6b870d8735dcc316185328ac75d40d96df8abdfb00dec87e93db817f17a5",
+		"kn-IN": "116d6b870d8735dcc316185328ac75d40d96df8abdfb00dec87e93db817f17a5",
+		"ko-KR": "2fc0647ce2ee921ecaea0f9ce099c1e27ec789091e6d4f68041fde1283915571",
+		"nl-NL": "514216b32a6649aa3e88b11dc3d75411724f0c6da366777a9c8d0f9e36d87ed4",
+		"no-NO": "c016709101368bb8f0c4b034f30f20ff1f30d7894804ba832577fc659d45d80e",
+		"pl-PL": "10ca70174b68f1989bf26ba3246cfc4e19e7a5c459bdc936dc7902d3adc5e13c",
+		"pt-PT": "f9350d536b113fcaf63901aa87c5d6fd1e4538b9674c8d170e321fa52e3d6b26",
+		"ru-RU": "7e9b270dd1d19c1334aa08abcbd174c515cb2a09706b2d4fd974dddcc86c52e6",
+		"sk-SK": "48335f76697b50849cd0bc6262f2c779bca56edb2e1c8868c00c589fe40b3b89",
+		"th-TH": "a8ad948e4d01bf546c99cef186d4c60ea366f0bf8e100882fb455b2909d84679",
+		"tr-TR": "4e7ffb3d0ba1e6b1cd59ce1657aa0d523005cfebec3bb2820b4246c7df9a7f4c",
+		"ug-CN": "116d6b870d8735dcc316185328ac75d40d96df8abdfb00dec87e93db817f17a5",
+		"uk-UA": "97efcbfc1b4723b8568d324062f5f858a4ca8d04763076a11d48267834dd2bf3",
+		"vi-VN": "3d414b83fada4932f4730c68894c40368f7acdd61bd4cbef3b2c5d3409e084c9",
+		"zh-CN": "6f3c55f890645e42a41b4fa4216b28d3087c2500221901facc26d376b2a96b87",
+		"zh-TW": "54b5b363caef67871c6c89899b63b70f5ed18197fc0693029ddf85edf93eca48"
+	}
+}

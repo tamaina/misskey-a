@@ -14,7 +14,7 @@ import { expect, test } from 'vitest';
 import { createInternationalization, setActiveInternationalization, useLocale, createComponentLocale, createComponentLocalizer } from 'vite-vue-internationalization/runtime';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
 import { languages } from 'i18n';
-import { locales } from './retired-drive-locale-baseline.js';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { startComponentLocales } from '@features/boot/frontend/index.js';
 import proof from './eager-ts-locales.json';

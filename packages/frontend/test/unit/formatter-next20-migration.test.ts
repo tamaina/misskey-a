@@ -17,7 +17,7 @@ import { fireEvent, render, cleanup } from '@testing-library/vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
 import { languages } from 'i18n';
-import { locales } from './retired-drive-locale-baseline.js';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import MkCwButton from '@features/notes/frontend/components/MkCwButton.vue';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';

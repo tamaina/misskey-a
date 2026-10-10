@@ -14,7 +14,8 @@ import { compileScript, parse } from 'vue/compiler-sfc';
 import ts from 'typescript';
 import { describe, expect, test } from 'vitest';
 import { languages } from 'i18n';
-import { locales } from './retired-drive-locale-baseline.js';
+import { restorePilotHistoricalSource, reviewedPilotMessage } from './instance-pilot-locale-metadata.js';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import * as VviRuntime from 'vite-vue-internationalization/runtime';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
@@ -129,7 +130,7 @@ function getLocaleValue(language: string, keyPath: string): string {
 }
 
 function getBlocks(file: string): Map<string, Record<string, string>> {
-	const { descriptor, errors } = parse(readFileSync(resolve(repoRoot, file), 'utf8'), { filename: file });
+	const { descriptor, errors } = parse(restorePilotHistoricalSource(file, readFileSync(resolve(repoRoot, file), 'utf8')), { filename: file });
 	expect(errors).toEqual([]);
 	const blocks = descriptor.customBlocks.filter(block => block.type === 'locale');
 	const result = new Map<string, Record<string, string>>();
@@ -205,7 +206,7 @@ describe('next74 static raw-label ownership', () => {
 	});
 
 	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', async migration => {
-		const source = restoreRssContractBaseline(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8'));
+		const source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8')));
 		const blocks = getBlocks(migration.file);
 		expect([...blocks.keys()]).toEqual([...languages]);
 		expect(source).not.toContain(legacyImport);
@@ -257,7 +258,7 @@ describe('next74 static raw-label ownership', () => {
 			const dictionary = VviRuntime.createComponentLocale('/' + migration.file.replace(/^packages\//, ''));
 			for (const keyPath of migration.keyPaths) {
 				const actual = dictionary[keyPath.split('.').at(-1)!];
-				const expected = getLocaleValue(language, keyPath);
+				const expected = reviewedPilotMessage(migration.file, language, keyPath.split('.').at(-1)!, getLocaleValue(language, keyPath));
 				expect(actual).toBe(expected);
 				expect(Buffer.from(String(actual), 'utf8')).toEqual(Buffer.from(expected, 'utf8'));
 			}

@@ -407,7 +407,6 @@ signinFailed: "Tizimga kirishda xatolik yuz berdi. Iltimos, foydalanuvchi noming
 or: "yoki"
 language: "til"
 uiLanguage: "Interfeys tili"
-aboutX: "{x} haqida"
 emojiStyle: "Emoji ko'rinishi"
 native: "Mahalliy"
 showNoteActionsOnlyHover: "Eslatma amallarini faqat sichqonchani olib borganda ko‘rsatish"

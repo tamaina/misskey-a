@@ -15,7 +15,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { getLocaleMessageNamedKeys } from 'vite-vue-internationalization';
 import * as VviRuntime from 'vite-vue-internationalization/runtime';
 import { languages } from 'i18n';
-import { locales } from './retired-drive-locale-baseline.js';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';

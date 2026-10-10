@@ -17,7 +17,7 @@ import { describe, expect, test } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
 import { languages } from 'i18n';
-import { locales } from './retired-drive-locale-baseline.js';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-with-locale.js';
