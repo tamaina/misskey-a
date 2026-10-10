@@ -49,6 +49,7 @@ export function createAdminShowUserProcedure<Actor extends ApiActor>(deps: Pick<
 				isModerator: isModerator,
 				isSilenced: isSilenced,
 				isSuspended: user.isSuspended,
+				isRemoteSuspended: user.isRemoteSuspended,
 				isHibernated: user.isHibernated,
 				lastActiveDate: user.lastActiveDate ? user.lastActiveDate.toISOString() : null,
 				moderationNote: profile.moderationNote ?? '',

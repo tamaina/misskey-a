@@ -202,6 +202,7 @@ export const moderationContract = {
 	isModerator: v.boolean(),
 	isSilenced: v.boolean(),
 	isSuspended: v.boolean(),
+	isRemoteSuspended: v.boolean(),
 	isHibernated: v.boolean(),
 	lastActiveDate: v.nullable(v.string()),
 	moderationNote: v.string(),

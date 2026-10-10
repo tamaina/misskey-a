@@ -1,0 +1,37 @@
+{
+  "file": "packages/features/moderation/frontend/pages/admin-user.vue",
+  "baselineSha256": "47bf1ac7a3860e3a95a9f25caefc46224271868536cd9424cba211e6569d502b",
+  "currentSha256": "d4991da7fae414f69996784971907e40d329285ed79a3de7844bfdef97c328db",
+  "edits": [
+    {
+      "start": 643,
+      "end": 839,
+      "current": "<span v-if=\"suspended\" class=\"suspended\">Suspended</span>\n\t\t\t\t\t\t<span v-if=\"remoteSuspended\" class=\"suspended\">{{ copyLocaleDictionary($locale.sfc).remoteSuspended ?? $locale.sfc.suspend }}</span>",
+      "baseline": "<span v-if=\"suspended\" class=\"suspended\">Suspended</span>"
+    },
+    {
+      "start": 9648,
+      "end": 9815,
+      "current": "import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';\nimport { computed, defineAsyncComponent, watch, ref, markRaw } from 'vue';",
+      "baseline": "import { computed, defineAsyncComponent, watch, ref, markRaw } from 'vue';"
+    },
+    {
+      "start": 12299,
+      "end": 12404,
+      "current": "const suspended = ref(info.value.isSuspended);\nconst remoteSuspended = ref(info.value.isRemoteSuspended);",
+      "baseline": "const suspended = ref(info.value.isSuspended);"
+    },
+    {
+      "start": 13954,
+      "end": 14051,
+      "current": "\tsuspended.value = info.value.isSuspended;\n\tremoteSuspended.value = info.value.isRemoteSuspended;",
+      "baseline": "\tsuspended.value = info.value.isSuspended;"
+    },
+    {
+      "start": 44237,
+      "end": 44270,
+      "current": "\t\"remoteSuspended\": \"リモートで凍結済み\",\n",
+      "baseline": ""
+    }
+  ]
+}

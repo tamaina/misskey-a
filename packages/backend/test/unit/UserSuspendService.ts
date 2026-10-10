@@ -26,6 +26,7 @@ import { QueueService } from '@features/runtime/backend/services/QueueService.js
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { AccountUpdateService } from '@features/users/backend/services/AccountUpdateService.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { randomString } from '../utils.js';
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
@@ -56,6 +57,7 @@ describe('UserSuspendService', () => {
 			usernameLower: secureRndstr(16).toLowerCase(),
 			host: null,
 			isSuspended: false,
+			isRemoteSuspended: false,
 			...data,
 		} as MiUser;
 
@@ -91,6 +93,7 @@ describe('UserSuspendService', () => {
 			imports: [GlobalModule],
 			providers: [
 				UserSuspendService,
+				AccountUpdateService,
 				ApDeliverManagerService,
 				{
 					provide: UserEntityService,
@@ -342,46 +345,54 @@ describe('UserSuspendService', () => {
 	});
 
 	describe('ActivityPub delivery', () => {
-		test('should deliver Delete activity on suspend of local user', async () => {
+		test('should deliver Update Person activity on suspend of local user', async () => {
 			const localUser = await createUser({ host: null });
 			const moderator = await createUser();
 
 			userEntityService.isLocalUser.mockReturnValue(true);
 			userEntityService.genLocalUserUri.mockReturnValue(`https://example.com/users/${localUser.id}`);
-			apRendererService.renderDelete.mockReturnValue({ type: 'Delete' } as any);
-			apRendererService.addContext.mockReturnValue({ '@context': '...', type: 'Delete' } as any);
+			apRendererService.renderPerson.mockResolvedValue({ type: 'Person' } as any);
+			apRendererService.renderUpdate.mockReturnValue({ type: 'Update' } as any);
+			apRendererService.addContext.mockReturnValue({ '@context': '...', type: 'Update' } as any);
 
 			await userSuspendService.suspend(localUser, moderator);
 			await vi.waitFor(() => expect(queueService.deliverMany).toHaveBeenCalledWith(
-				{ id: localUser.id }, expect.objectContaining({ type: 'Delete' }), expect.any(Map),
+				{ id: localUser.id }, expect.objectContaining({ type: 'Update' }), expect.any(Map),
 			));
 
 			// ActivityPub配信が呼ばれているかチェック
-			expect(userEntityService.isLocalUser).toHaveBeenCalledWith(localUser);
-			expect(apRendererService.renderDelete).toHaveBeenCalled();
+			expect(userEntityService.isLocalUser).toHaveBeenCalledWith(expect.objectContaining({ id: localUser.id, host: null }));
+			expect(apRendererService.renderPerson).toHaveBeenCalled();
+			expect(apRendererService.renderUpdate).toHaveBeenCalled();
+			expect(apRendererService.renderDelete).not.toHaveBeenCalled();
 			expect(apRendererService.addContext).toHaveBeenCalled();
+			expect(apRendererService.renderPerson).toHaveBeenCalledWith(expect.objectContaining({ id: localUser.id, isSuspended: true }));
 		});
 
-		test('should deliver Undo Delete activity on unsuspend of local user', async () => {
+		test('should deliver Update Person activity on unsuspend of local user', async () => {
 			const localUser = await createUser({ host: null, isSuspended: true });
 			const moderator = await createUser();
 
 			userEntityService.isLocalUser.mockReturnValue(true);
 			userEntityService.genLocalUserUri.mockReturnValue(`https://example.com/users/${localUser.id}`);
-			apRendererService.renderDelete.mockReturnValue({ type: 'Delete' } as any);
-			apRendererService.renderUndo.mockReturnValue({ type: 'Undo' } as any);
-			apRendererService.addContext.mockReturnValue({ '@context': '...', type: 'Undo' } as any);
+			apRendererService.renderPerson.mockResolvedValue({ type: 'Person' } as any);
+			apRendererService.renderUpdate.mockReturnValue({ type: 'Update' } as any);
+
+			apRendererService.addContext.mockReturnValue({ '@context': '...', type: 'Update' } as any);
 
 			await userSuspendService.unsuspend(localUser, moderator);
 			await vi.waitFor(() => expect(queueService.deliverMany).toHaveBeenCalledWith(
-				{ id: localUser.id }, expect.objectContaining({ type: 'Undo' }), expect.any(Map),
+				{ id: localUser.id }, expect.objectContaining({ type: 'Update' }), expect.any(Map),
 			));
 
 			// ActivityPub配信が呼ばれているかチェック
-			expect(userEntityService.isLocalUser).toHaveBeenCalledWith(localUser);
-			expect(apRendererService.renderDelete).toHaveBeenCalled();
-			expect(apRendererService.renderUndo).toHaveBeenCalled();
+			expect(userEntityService.isLocalUser).toHaveBeenCalledWith(expect.objectContaining({ id: localUser.id, host: null }));
+			expect(apRendererService.renderPerson).toHaveBeenCalled();
+			expect(apRendererService.renderUpdate).toHaveBeenCalled();
+			expect(apRendererService.renderDelete).not.toHaveBeenCalled();
+			expect(apRendererService.renderUndo).not.toHaveBeenCalled();
 			expect(apRendererService.addContext).toHaveBeenCalled();
+			expect(apRendererService.renderPerson).toHaveBeenCalledWith(expect.objectContaining({ id: localUser.id, isSuspended: false }));
 		});
 
 		test('should not deliver any activity on suspend of remote user', async () => {
@@ -449,6 +460,42 @@ describe('UserSuspendService', () => {
 			// ActivityPub配信が呼ばれていないことを確認
 			expect(queueService.deliver).not.toHaveBeenCalled();
 			expect(queueService.deliverMany).not.toHaveBeenCalled();
+		});
+	});
+	describe('remote suspension flags and events', () => {
+		test('repeated remote suspension reconciles rows without duplicate events or request deletion', async () => {
+			const actor = await createUser({ host: genHost() });
+			const target = await createUser();
+			if (actor.host == null) throw new Error('remote fixture required');
+			const remote = { id: actor.id, host: actor.host };
+			const following = await createFollowing(actor, target);
+			const deleteRequests = vi.spyOn(followRequestsRepository, 'delete');
+			try {
+				await userSuspendService.suspendFromRemote(remote);
+				await vi.waitFor(() => expect(globalEventService.publishInternalEvent).toHaveBeenCalledWith('userChangeSuspendedState', { id: actor.id, isRemoteSuspended: true }));
+				await followingsRepository.update(following.id, { isFollowerSuspended: false });
+				await userSuspendService.suspendFromRemote(remote);
+				expect((await followingsRepository.findOneByOrFail({ id: following.id })).isFollowerSuspended).toBe(true);
+				expect(globalEventService.publishInternalEvent).toHaveBeenCalledTimes(1);
+				expect(deleteRequests).not.toHaveBeenCalled();
+				expect(moderationLogService.log).not.toHaveBeenCalled();
+				expect(queueService.deliverMany).not.toHaveBeenCalled();
+				await userSuspendService.unsuspendFromRemote(remote);
+				await userSuspendService.unsuspendFromRemote(remote);
+				expect((await usersRepository.findOneByOrFail({ id: actor.id })).isRemoteSuspended).toBe(false);
+				expect(globalEventService.publishInternalEvent).toHaveBeenCalledTimes(2);
+			} finally { deleteRequests.mockRestore(); }
+		});
+
+		test('missing IDs and spoofed local-row actors have no remote suspension side effects', async () => {
+			const local = await createUser();
+			for (const id of [secureRndstr(16), local.id]) {
+				await userSuspendService.suspendFromRemote({ id, host: genHost() });
+				await userSuspendService.unsuspendFromRemote({ id, host: genHost() });
+			}
+			expect((await usersRepository.findOneByOrFail({ id: local.id })).isRemoteSuspended).toBe(false);
+			expect(globalEventService.publishInternalEvent).not.toHaveBeenCalled();
+			expect(moderationLogService.log).not.toHaveBeenCalled();
 		});
 	});
 });

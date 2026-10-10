@@ -14,6 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span class="sub"><span class="acct _monospace">@{{ acct(user) }}</span></span>
 					<span class="state">
 						<span v-if="suspended" class="suspended">Suspended</span>
+						<span v-if="remoteSuspended" class="suspended">{{ copyLocaleDictionary($locale.sfc).remoteSuspended ?? $locale.sfc.suspend }}</span>
 						<span v-if="silenced" class="silenced">Silenced</span>
 						<span v-if="moderator" class="moderator">Moderator</span>
 					</span>
@@ -207,6 +208,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { computed, defineAsyncComponent, watch, ref, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@features/boot/frontend/shared/config.js';
@@ -262,6 +264,7 @@ const ap = ref<Misskey.Endpoints['ap/get']['res'] | null>(null);
 const moderator = ref(info.value.isModerator);
 const silenced = ref(info.value.isSilenced);
 const suspended = ref(info.value.isSuspended);
+const remoteSuspended = ref(info.value.isRemoteSuspended);
 const isSystem = ref(user.value.host == null && user.value.username.includes('.'));
 const moderationNote = ref(info.value.moderationNote);
 const filesPaginator = markRaw(new Paginator('admin/drive/files', {
@@ -318,6 +321,7 @@ async function refreshUser() {
 	moderator.value = info.value.isModerator;
 	silenced.value = info.value.isSilenced;
 	suspended.value = info.value.isSuspended;
+	remoteSuspended.value = info.value.isRemoteSuspended;
 	isSystem.value = user.value.host == null && user.value.username.includes('.');
 	moderationNote.value = info.value.moderationNote;
 }
@@ -1259,6 +1263,7 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-JP">
 {
+	"remoteSuspended": "リモートで凍結済み",
 	"isSystemAccount": "システムにより自動で作成・管理されているアカウントです。",
 	"instanceInfo": "サーバー情報",
 	"createdAt": "作成日時",

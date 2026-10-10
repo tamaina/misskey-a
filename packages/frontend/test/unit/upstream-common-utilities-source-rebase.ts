@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreRemoteSuspensionBaseline } from './remote-suspension-source-rebase.js';
 import { createHash } from 'node:crypto';
 import rebases from './upstream-common-utilities-source-rebase.json';
 
@@ -10,6 +11,7 @@ const sha256 = (source: string) => createHash('sha256').update(source).digest('h
 
 /** Reverse exact reviewed PR17994 utility edits while preserving frozen locale proofs. */
 export function restoreCommonUtilitiesBaseline(file: string, source: string): string {
+	source = restoreRemoteSuspensionBaseline(file, source);
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	const localeStart = source.search(/<locale\s/);

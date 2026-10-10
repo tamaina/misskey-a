@@ -165,10 +165,10 @@ export class FanoutTimelineEndpointService {
 				const parentFilter = filter;
 				filter = (note) => {
 					if (!ps.ignoreAuthorFromUserSuspension) {
-						if (note.user!.isSuspended) return false;
+						if (note.user!.isSuspended || note.user!.isRemoteSuspended) return false;
 					}
-					if (note.userId !== note.renoteUserId && note.renote?.user?.isSuspended) return false;
-					if (note.userId !== note.replyUserId && note.reply?.user?.isSuspended) return false;
+					if (note.userId !== note.renoteUserId && (note.renote?.user?.isSuspended || note.renote?.user?.isRemoteSuspended)) return false;
+					if (note.userId !== note.replyUserId && (note.reply?.user?.isSuspended || note.reply?.user?.isRemoteSuspended)) return false;
 
 					return parentFilter(note);
 				};
