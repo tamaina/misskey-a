@@ -38,6 +38,7 @@ type Source = {
 	port?: number;
 	socket?: string;
 	trustProxy?: FastifyServerOptions['trustProxy'];
+	enableMcp?: boolean;
 	chmodSocket?: string;
 	enableIpRateLimit?: boolean;
 	disableHsts?: boolean;
@@ -136,6 +137,8 @@ export type Config = {
 	port: number;
 	socket: string | undefined;
 	trustProxy: NonNullable<FastifyServerOptions['trustProxy']>;
+	/** Explicit opt-in for the existing native API's MCP transport. */
+	enableMcp?: boolean;
 	chmodSocket: string | undefined;
 	enableIpRateLimit: boolean;
 	disableHsts: boolean | undefined;
@@ -293,6 +296,7 @@ export function loadConfig(): Config {
 		publishTarballInsteadOfProvideRepositoryUrl: !!config.publishTarballInsteadOfProvideRepositoryUrl,
 		setupPassword: config.setupPassword,
 		url: url.origin,
+		enableMcp: config.enableMcp === true,
 		port: config.port ?? parseInt(process.env.PORT ?? '', 10),
 		socket: config.socket,
 		trustProxy: config.trustProxy ?? [

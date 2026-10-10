@@ -26,7 +26,8 @@ import { ApiExecutionContextFactory } from '@features/api/backend/transport/ApiE
 import { McpApiService } from '@features/mcp/backend/McpApiService.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import { createLocalMcpPilot } from '../../backend/local-transport.js';
+import Fastify from 'fastify';
+import { registerMcpServer } from '../../backend/server.js';
 import { fixture } from './fixtures/shared-api.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
@@ -86,8 +87,9 @@ describe.skipIf(!enabled)('task-owned native PostgreSQL integration', () => {
 																																																																		{ provide: 'UserEntityService', useValue: userPacking }, { provide: 'DriveFileEntityService', useValue: files }, { provide: 'CustomEmojiService', useValue: emoji }, { provide: 'ReactionService', useValue: reactions }, { provide: 'ReactionsBufferingService', useValue: buffering }, { provide: 'IdService', useValue: idService }, { provide: 'CacheService', useValue: f.cache },
 		] }).compile();
 		await noteModule.init();
-		const local = createLocalMcpPilot(f.module.get(McpApiService), { enabled: true, resource: 'http://127.0.0.1:61836/mcp' });
-		const transportRequest = (method: string, params: object = {}) => local.app.inject({ method: 'POST', url: '/mcp', headers: { host: '127.0.0.1:61836', authorization: `Bearer ${f.grant.token}`, accept: 'application/json, text/event-stream', 'content-type': 'application/json' }, payload: { jsonrpc: '2.0', id: 1, method, params } });
+		const transportApp = Fastify({ logger: false });
+		transportApp.register(app => registerMcpServer(app, f.module.get(McpApiService), { url: 'https://instance.invalid', enableMcp: true }));
+		const transportRequest = (method: string, params: object = {}) => transportApp.inject({ method: 'POST', url: '/mcp', remoteAddress: '203.0.113.10', headers: { host: 'instance.invalid', authorization: `Bearer ${f.grant.token}`, accept: 'application/json, text/event-stream', 'content-type': 'application/json' }, payload: { jsonrpc: '2.0', id: 1, method, params } });
 		try {
 			f.deps.serverSettings.enableFanoutTimeline = false;
 			f.deps.notesRepository.createQueryBuilder.mockImplementation((alias, runner) => repos.notesRepository.createQueryBuilder(alias, runner));
@@ -143,7 +145,7 @@ describe.skipIf(!enabled)('task-owned native PostgreSQL integration', () => {
 			await expect(f.invoke()).rejects.toMatchObject({ code: 'AUTHENTICATION_FAILED' });
 			expect((await transportRequest('tools/list')).statusCode).toBe(401);
 			expect(f.deps.fanoutTimelineEndpointService.timeline).not.toHaveBeenCalled();
-		} finally {await local.app.close(); await noteModule.close();}
+		} finally {await transportApp.close(); await noteModule.close();}
 	}, 30000);
 	it('delayed native work completes after abort: signal forwarding is not active SQL cancellation', async() => {
 		const f = await fixture(); const abort = new AbortController();

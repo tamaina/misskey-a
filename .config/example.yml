@@ -463,3 +463,8 @@ proxyBypassHosts:
 #     # Disable query truncation. If set to true, the full text of the query will be output to the log.
 #     # default: false
 #     disableQueryTruncation: false
+
+# Opt-in MCP transport for existing scoped native tokens with access:mcp.
+# Requires HTTPS url and a proxy preserving canonical Host; disabled by default.
+# Enabling this exposes /mcp. OAuth/CIMD compatibility is a separate capability.
+#enableMcp: false

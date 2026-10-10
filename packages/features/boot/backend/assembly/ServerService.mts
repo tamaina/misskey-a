@@ -32,6 +32,8 @@ import { HealthServerService } from '@features/operations/backend/http/HealthSer
 import { ClientServerService } from '@features/web/backend/http/ClientServerService.js';
 import { OpenApiServerService } from '@features/api/backend/transport/openapi/OpenApiServerService.js';
 import { OAuth2ProviderService } from '@features/auth/backend/oauth/OAuth2ProviderService.js';
+import { McpApiService } from '@features/mcp/backend/McpApiService.js';
+import { registerMcpServer } from '@features/mcp/backend/server.js';
 import { registerHttpAccessLog } from '@features/runtime/backend/http/http-access-log.js';
 
 const _dirname = fileURLToPath(new URL('.', import.meta.url));
@@ -71,6 +73,7 @@ export class ServerService implements OnApplicationShutdown {
 		private globalEventService: GlobalEventService,
 		private loggerService: LoggerService,
 		private oauth2ProviderService: OAuth2ProviderService,
+		private mcpApiService: McpApiService,
 	) {
 		this.logger = this.loggerService.getLogger('server', 'gray');
 	}
@@ -153,6 +156,7 @@ export class ServerService implements OnApplicationShutdown {
 			});
 		}
 
+		fastify.register(app => registerMcpServer(app, this.mcpApiService, this.config));
 		fastify.register(this.apiServerService.createServer, { prefix: '/api' });
 		fastify.register(this.openApiServerService.createServer);
 		fastify.register(this.fileServerService.createServer);
