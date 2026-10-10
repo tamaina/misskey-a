@@ -17,6 +17,7 @@ import {
 } from 'vite';
 import fs from 'node:fs';
 import JSON5 from 'json5';
+import { evaluateStaticSearchExpression } from './static-search-expression.js';
 import { RolldownMagicString } from 'rolldown';
 import type { TransformResult } from 'rolldown';
 import path from 'node:path';
@@ -62,7 +63,7 @@ interface MarkerRelation {
 }
 
 // ロガー
-let logger = {
+const logger = {
 	info: (msg: string, options?: LogOptions) => { },
 	warn: (msg: string, options?: LogOptions) => { },
 	error: (msg: string, options?: LogErrorOptions) => { },
@@ -77,17 +78,17 @@ function initLogger(options: Options) {
 	logger.info = (msg, options) => {
 		msg = `[create-search-index] ${msg}`;
 		viteLogger.info(msg, options);
-	}
+	};
 
 	logger.warn = (msg, options) => {
 		msg = `[create-search-index] ${msg}`;
 		viteLogger.warn(msg, options);
-	}
+	};
 
 	logger.error = (msg, options) => {
 		msg = `[create-search-index] ${msg}`;
 		viteLogger.error(msg, options);
-	}
+	};
 }
 
 //region AST Utility
@@ -100,7 +101,7 @@ type WalkVueNode = RootNode | TemplateChildNode | SimpleExpressionNode;
  * @param context The context value passed to callback. you can update context for children by returning value in callback
  * @param callback Returns false if you don't want to walk inner tree
  */
-function walkVueElements<C extends {} | null>(nodes: WalkVueNode[], context: C, callback: (node: ElementNode, context: C) => C | undefined | void | false): void {
+function walkVueElements<C>(nodes: WalkVueNode[], context: C, callback: (node: ElementNode, context: C) => C | undefined | void | false): void {
 	for (const node of nodes) {
 		let currentContext = context;
 		if (node.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error("Unexpected COMPOUND_EXPRESSION");
@@ -167,7 +168,7 @@ function generateJavaScriptCode(resolvedRootMarkers: SearchIndexItem[]): string 
  */
 function customStringify(obj: unknown): string {
 	return JSON.stringify(obj).replaceAll(/"(.*?)"/g, (all, group) => {
-		// propertyAccessProxy が i18n 参照を "${i18n.xxx}"のような形に変換してるので、これをそのまま`${i18n.xxx}`
+		// 静的解析が i18n 参照を "${i18n.xxx}"のような形に変換してるので、これをそのまま`${i18n.xxx}`
 		// のような形にすると、実行時にi18nのプロパティにアクセスするようになる。
 		// objectのkeyでは``が使えないので、${ が使われている場合にのみ``に置き換えるようにする
 		return group.includes('${') ? '`' + group + '`' : all;
@@ -200,7 +201,8 @@ function extractElementText2Inner(node: TemplateChildNode, processingNodeName: s
 		case NodeTypes.INTERPOLATION: {
 			const expr = node.content;
 			if (expr.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error(`Unexpected COMPOUND_EXPRESSION`);
-			const exprResult = evalExpression(expr.content, componentLocaleModuleId);
+			const exprResult = evaluateStaticSearchExpression(expr.content, componentLocaleModuleId);
+			if (exprResult === undefined) return null;
 			if (typeof exprResult !== 'string') {
 				logger.error(`Result of interpolation node is not string at line ${id}:${node.loc.start.line}`);
 				return null;
@@ -254,13 +256,14 @@ function extractSugarTags(nodes: TemplateChildNode[], id: string, componentLocal
 
 				label = extractElementText(node, id, componentLocaleModuleId);
 				return;
-			case 'SearchText':
+			case 'SearchText': {
 				const content = extractElementText(node, id, componentLocaleModuleId);
 				if (content) {
 					texts.push(content);
 				}
 				return;
-			case 'SearchIcon':
+			}
+			case 'SearchIcon': {
 				if (icon !== undefined) {
 					logger.warn(`Duplicate SearchIcon found, ignoring the second one at ${id}:${node.loc.start.line}`);
 					break; // 2つ目のSearchIconは無視
@@ -278,6 +281,7 @@ function extractSugarTags(nodes: TemplateChildNode[], id: string, componentLocal
 				}
 				icon = getStringProp(findAttribute(iconNode.props, 'class'), id, componentLocaleModuleId);
 				return;
+			}
 		}
 
 		return;
@@ -295,15 +299,17 @@ function getStringProp(attr: AttributeNode | DirectiveNode | null, id: string, c
 			return null;
 		case NodeTypes.ATTRIBUTE:
 			return attr.value?.content ?? null;
-		case NodeTypes.DIRECTIVE:
+		case NodeTypes.DIRECTIVE: {
 			if (attr.exp == null) return null;
 			if (attr.exp.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error('Unexpected COMPOUND_EXPRESSION');
-			const value = evalExpression(attr.exp.content ?? '', componentLocaleModuleId);
+			const value = evaluateStaticSearchExpression(attr.exp.content ?? '', componentLocaleModuleId);
+			if (value === undefined) return null;
 			if (typeof value !== 'string') {
 				logger.error(`Expected string value, got ${typeof value} at ${id}:${attr.loc.start.line}`);
 				return null;
 			}
 			return value;
+		}
 	}
 }
 
@@ -315,15 +321,17 @@ function getStringArrayProp(attr: AttributeNode | DirectiveNode | null, id: stri
 		case NodeTypes.ATTRIBUTE:
 			logger.error(`Expected directive, got attribute at ${id}:${attr.loc.start.line}`);
 			return null;
-		case NodeTypes.DIRECTIVE:
+		case NodeTypes.DIRECTIVE: {
 			if (attr.exp == null) return null;
 			if (attr.exp.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error('Unexpected COMPOUND_EXPRESSION');
-			const value = evalExpression(attr.exp.content ?? '', componentLocaleModuleId);
+			const value = evaluateStaticSearchExpression(attr.exp.content ?? '', componentLocaleModuleId);
+			if (value === undefined) return null;
 			if (!Array.isArray(value) || !value.every(x => typeof x === 'string')) {
 				logger.error(`Expected string array value, got ${typeof value} at ${id}:${attr.loc.start.line}`);
 				return null;
 			}
 			return value;
+		}
 	}
 }
 
@@ -344,7 +352,7 @@ function extractUsageInfoFromTemplateAst(
 
 		// マーカーID取得
 		const markerIdProp = node.props?.find(p => p.name === 'markerId');
-		const markerId = markerIdProp?.type == NodeTypes.ATTRIBUTE ? markerIdProp.value?.content : null;
+		const markerId = markerIdProp?.type === NodeTypes.ATTRIBUTE ? markerIdProp.value?.content : null;
 
 		// SearchMarkerにマーカーIDがない場合はエラー
 		if (markerId == null) {
@@ -406,76 +414,10 @@ function extractUsageInfoFromTemplateAst(
 
 //endregion
 
-//region evalExpression
+//region static search expressions
 
-/**
- * expr を実行します。
- * i18n はそのアクセスを保持するために propertyAccessProxy を使用しています。
- */
-function evalExpression(expr: string, componentLocaleModuleId?: string): unknown {
-	const escapedModuleId = componentLocaleModuleId
-		?.replaceAll('\\', '\\\\')
-		.replaceAll("'", "\\'")
-		.replaceAll('\n', '\\n')
-		.replaceAll('\r', '\\r')
-		.replaceAll('\u2028', '\\u2028')
-		.replaceAll('\u2029', '\\u2029');
-	const localComponentLocale = componentLocaleModuleId == null
-		? undefined
-		: { sfc: propertyAccessProxy([`createComponentLocale('${escapedModuleId}')`]) };
-	const rarResult = Function('i18n', '$locale', `return ${expr}`)(i18nProxy, localComponentLocale);
-	// JSON.stringify を一回通すことで、 AccessProxy を文字列に変換する
-	// Walk してもいいんだけど横着してJSON.stringifyしてる。ビルド時にしか通らないのであんまりパフォーマンス気にする必要ないんで
-	return JSON.parse(JSON.stringify(rarResult));
-}
-
-const propertyAccessProxySymbol = Symbol('propertyAccessProxySymbol');
-
-type AccessProxy = {
-	[propertyAccessProxySymbol]: string[],
-	[k: string]: AccessProxy,
-}
-
-const propertyAccessProxyHandler: ProxyHandler<AccessProxy> = {
-	get(target: AccessProxy, p: string | symbol): any {
-		if (p in target) {
-			return (target as any)[p];
-		}
-		if (p == "toJSON" || p == Symbol.toPrimitive) {
-			return propertyAccessProxyToJSON;
-		}
-		if (typeof p == 'string') {
-			return target[p] = propertyAccessProxy([...target[propertyAccessProxySymbol], p]);
-		}
-		return undefined;
-	}
-}
-
-function propertyAccessProxyToJSON(this: AccessProxy, hint: string) {
-	const expression = this[propertyAccessProxySymbol].reduce((prev, current) => {
-		if (current.match(/^[a-z][0-9a-z]*$/i)) {
-			return `${prev}.${current}`;
-		} else {
-			return `${prev}['${current}']`;
-		}
-	});
-	return '$\{' + expression + '}';
-}
-
-/**
- * プロパティのアクセスを保持するための Proxy オブジェクトを作成します。
- *
- * この関数で生成した proxy は JSON でシリアライズするか、`${}`のように string にすると、 ${property.path} のような形になる。
- * @param path
- */
-function propertyAccessProxy(path: string[]): AccessProxy {
-	const target: AccessProxy = {
-		[propertyAccessProxySymbol]: path,
-	};
-	return new Proxy(target, propertyAccessProxyHandler);
-}
-
-const i18nProxy = propertyAccessProxy(['i18n']);
+// Runtime bindings (for example v-for variables) cannot be resolved at build time.
+// Skip that field without executing it or dropping the other markers in the file.
 
 export function collectFileMarkers(id: string, code: string | RolldownMagicString | undefined, componentLocaleRoot: string): SearchIndexItem[] {
 	try {
@@ -497,13 +439,13 @@ export function collectFileMarkers(id: string, code: string | RolldownMagicStrin
 			return []; // エラーが発生したファイルはスキップ
 		}
 
-		// This is a lazy proxy; passing it for every SFC avoids depending on
-		// whether VVI has already stripped the file's <locale> custom blocks.
+		// Keep source module IDs independent of whether VVI has already
+		// stripped the file's <locale> custom blocks.
 		const componentLocaleModuleId = `/${normalizePath(path.relative(componentLocaleRoot, id.split('?', 1)[0]))}`;
 
 		return extractUsageInfoFromTemplateAst(descriptor.template?.ast, id, componentLocaleModuleId);
 	} catch (error) {
-		let _error = error instanceof Error ? error : new Error(String(error));
+		const _error = error instanceof Error ? error : new Error(String(error));
 		logger.error(`Error analyzing file ${id}:`, { error: _error });
 	}
 
@@ -567,7 +509,7 @@ export class MarkerIdAssigner {
 			} else {
 				// ファイルパスと行番号からハッシュ値を生成
 				// この際実行環境で差が出ないようにファイルパスを正規化
-				const idKey = id.replace(/\\/g, '/').split('packages/frontend/')[1]
+				const idKey = id.replace(/\\/g, '/').split('packages/frontend/')[1];
 				const generatedMarkerId = toBase62(hash(`${idKey}:${node.loc.start.line}`));
 
 				// markerId attribute を追加
@@ -584,7 +526,7 @@ export class MarkerIdAssigner {
 			});
 
 			return nodeMarkerId;
-		})
+		});
 
 		// 2段階目: :children 属性の追加
 		// 最初に親マーカーごとに子マーカーIDを集約する処理を追加
@@ -673,7 +615,7 @@ export default function pluginCreateSearchIndex(options: Options): PluginOption 
 	return [
 		createSearchIndex(options, assigner),
 		pluginCreateSearchIndexVirtualModule(options, assigner),
-	]
+	];
 }
 
 function createSearchIndex(options: Options, assigner: MarkerIdAssigner): Plugin {
@@ -682,7 +624,7 @@ function createSearchIndex(options: Options, assigner: MarkerIdAssigner): Plugin
 
 	function isTargetFile(id: string): boolean {
 		const relativePath = path.posix.relative(root, id);
-		return options.targetFilePaths.some(pat => minimatch(relativePath, pat))
+		return options.targetFilePaths.some(pat => minimatch(relativePath, pat));
 	}
 
 	return {
@@ -715,7 +657,7 @@ export function pluginCreateSearchIndexVirtualModule(options: Options, asigner: 
 
 	function isTargetFile(id: string): boolean {
 		const relativePath = path.posix.relative(root, id);
-		return options.targetFilePaths.some(pat => minimatch(relativePath, pat))
+		return options.targetFilePaths.some(pat => minimatch(relativePath, pat));
 	}
 
 	function parseSearchIndexFileId(id: string): string | null {
@@ -735,7 +677,7 @@ export function pluginCreateSearchIndexVirtualModule(options: Options, asigner: 
 		enforce: 'post',
 
 		async resolveId(id) {
-			if (id == allSearchIndexFile) {
+			if (id === allSearchIndexFile) {
 				return '\0' + allSearchIndexFile;
 			}
 
@@ -747,11 +689,11 @@ export function pluginCreateSearchIndexVirtualModule(options: Options, asigner: 
 		},
 
 		async load(id) {
-			if (id == '\0' + allSearchIndexFile) {
+			if (id === '\0' + allSearchIndexFile) {
 				const files = options.targetFilePaths.map((filePathPattern) => fs.globSync(filePathPattern)).flat();
 				let generatedFile = '';
 				let arrayElements = '';
-				for (let file of files) {
+				for (const file of files) {
 					const normalizedRelative = normalizePath(file);
 					const absoluteId = normalizePath(path.join(process.cwd(), normalizedRelative)) + searchIndexSuffix;
 					const variableName = normalizedRelative.replace(/[\/.-]/g, '_');
