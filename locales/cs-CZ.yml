@@ -249,10 +249,8 @@ uploadFromUrl: "Nahrát z URL adresy"
 uploadFromUrlDescription: "URL adresa souboru, který chcete nahrát"
 uploadFromUrlRequested: "Upload zažádán"
 uploadFromUrlMayTakeTime: "Může trvat nějakou dobu, dokud nebude dokončeno nahrávání."
-uploadNFiles: "Uploadovat {n} souborů"
 explore: "Objevovat"
 messageRead: "Přečtené"
-readAllChatMessages: "Označit všechny zprávy za přečtené"
 startChat: "Začít chat"
 nUsersRead: "přečteno {n} uživateli"
 agree: "Souhlasím"
@@ -483,7 +481,6 @@ s3ForcePathStyleDesc: "Pokud je povolena funkce s3ForcePathStyle, musí být ná
 deleteAll: "Smazat vše"
 showFixedPostForm: "Zobrazit formulář pro nové příspěvky nad časovou osou"
 showFixedPostFormInChannel: "Zobrazit vkládací formulář na vrcholu časové osy (Kanály)"
-newNote: "Nová poznámka"
 sounds: "Zvuky"
 sound: "Zvuky"
 listen: "Poslouchat"
@@ -1044,37 +1041,7 @@ _delivery:
   _type:
     none: "Publikuji"
 _initialAccountSetting:
-  accountCreated: "Váš účet byl úspěšně vytvořen!"
-  letsStartAccountSetup: "Pro začátek si nastavte svůj profil."
   profileSetting: "Nastavení profilu"
-  privacySetting: "Nastavení soukromí"
-  theseSettingsCanEditLater: "Tato nastavení můžete vždy později změnit."
-  youCanEditMoreSettingsInSettingsPageLater: "Na stránce \"Nastavení\" můžete nakonfigurovat mnoho dalších nastavení. Nezapomeňte ji navštívit později."
-  followUsers: "Zkuste sledovat některé uživatele, kteří vás zajímají pro vystavění časový osy."
-  pushNotificationDescription: "Povolení push oznámení vám umožní přijímat oznámení od {name} přímo ve vašem zařízení."
-  initialAccountSettingCompleted: "Nastavení profilu dokončeno!"
-  haveFun: "Užívejte {name}!"
-  skipAreYouSure: "Opravdu chcete přeskočit nastavení profilu?"
-  laterAreYouSure: "Opravdu chcete provést nastavení profilu později?"
-_serverRules:
-  description: "Soubor pravidel, která se zobrazí před registrací. Doporučuje se nastavit shrnutí podmínek služby."
-_serverSettings:
-  iconUrl: "URL ikony"
-_accountMigration:
-  moveFrom: "Migrace jiného účtu na tento účet"
-  moveFromSub: "Vytvořit alias na jiný účet"
-  moveFromLabel: "Původní účet #{n}"
-  moveFromDescription: "Pro účet, ze kterého se chcete přesunout, musíte vytvořit alias na tomto účtu.\nZadejte účet, ze kterého chcete přejít, v následujícím formátu: @username@server.example.com\nChcete-li alias odstranit, ponechte pole prázdné (nedoporučuje se)."
-  moveTo: "Přesunout tenhle účet do jiného"
-  moveToLabel: "Cílový účet pro přesunutí:"
-  moveCannotBeUndone: "Migrace účtu nemůže být vrácena."
-  moveAccountDescription: "Tím dojde k migraci vašeho účtu na jiný účet.\n　・Sledovatelé z tohoto účtu budou automaticky převedeni na nový účet.\n　・Tento účet zruší sledování všech uživatelů, které aktuálně sleduje.\n　・Na tomto účtu nebude možné vytvářet nové poznámky atd.\n\nZatímco migrace sledovaných uživatelů probíhá automaticky, pro migraci seznamu sledovaných uživatelů je nutné připravit některé kroky ručně. Za tímto účelem proveďte export sledovaných, který později naimportujete na nový účet v nabídce nastavení. Stejný postup platí pro seznamy i pro ztlumené a zablokované uživatele.\n\n(Tento výklad platí pro Misskey v13.12.0 a novější. Jiný software ActivityPub, například Mastodon, může fungovat jinak.)"
-  moveAccountHowTo: "Chcete-li migrovat, vytvořte nejprve alias tohoto účtu na účtu, na který chcete přejít.\nPo vytvoření aliasu zadejte účet, na který chcete přejít, v následujícím formátu: @username@server.example.com"
-  startMigration: "Migrovat"
-  migrationConfirm: "Opravdu chcete migrovat tento účet na {account}? Jednou zahájený proces nelze zastavit ani vrátit zpět a tento účet již nebudete moci používat v původním stavu."
-  movedAndCannotBeUndone: "\nTento účet byl převeden.\nMigraci nelze vrátit zpět."
-  postMigrationNote: "Tento účet zruší sledování všech účtů, které aktuálně sleduje, 24 hodin po dokončení migrace.\nPočet sledujících i následovníků se poté vynuluje. Aby se zabránilo tomu, že vaši sledující nebudou moci vidět příspěvky tohoto účtu určené pouze pro sledující, budou však tento účet sledovat i nadále."
-  movedTo: "Cílový účet pro přesunutí:"
 _achievements:
   _types:
     _notes1:
@@ -1328,14 +1295,6 @@ _role:
     canHideAds: "Může schovat reklamy"
   _condition:
     isRemote: "Vzdálený uživatel"
-_sensitiveMediaDetection:
-  description: "Snižuje náročnost moderování serveru díky automatickému rozpoznávání citlivých médií pomocí strojového učení. Tím se mírně zvýší zatížení serveru."
-  sensitivity: "Detekce citlivosti"
-  sensitivityDescription: "Snížení citlivosti povede k menšímu počtu chybných detekcí (falešně pozitivních), zatímco její zvýšení povede k menšímu počtu chybných detekcí (falešně negativních)."
-  setSensitiveFlagAutomatically: "Označit jako citlivé"
-  setSensitiveFlagAutomaticallyDescription: "Výsledky interní detekce se zachovají, i když je tato možnost vypnutá."
-  analyzeVideos: "Povolit analýzy videí"
-  analyzeVideosDescription: "Kromě obrázků analyzuje i videa. Tím se mírně zvýší zatížení serveru."
 _emailUnavailable:
   used: "Tato emailová adresa se již používá"
   format: "Formát této emailové adresy je neplatný"
@@ -1360,7 +1319,6 @@ _ad:
   back: "Zpět"
   reduceFrequencyOfThisAd: "Zobrazovat tuto reklamu méně"
   hide: "Schovat"
-  timezoneinfo: "Den v týdnu se určuje podle časového pásma serveru."
 _forgotPassword:
   enterEmail: "Zadejte emailovou adresu, kterou jste použili při registraci. Na ni vám pak bude zaslán odkaz, pomocí kterého si můžete obnovit heslo."
   ifNoEmail: "Pokud jste při registraci nepoužili email, obraťte se na správce instance."
@@ -1404,10 +1362,6 @@ _aboutMisskey:
   donate: "Přispějte na Misskey"
   morePatrons: "Vážíme si také podpory mnoha dalších pomocníků, kteří zde nejsou uvedeni. Děkujeme! 🥰"
   patrons: "Patroni"
-_displayOfSensitiveMedia:
-  respect: "Skrýt média označená jako citlivá"
-  ignore: "Zobrazit média označená jako citlivá"
-  force: "Skrýt všechna média"
 _instanceTicker:
   none: "Nikdy nezobrazovat"
   remote: "Zobrazit pro vzdálené uživatelé"
@@ -1427,7 +1381,6 @@ _channel:
   usersCount: "{n} Účastníků"
   notesCount: "{n} Poznámek"
   nameAndDescription: "Název a popis"
-  nameOnly: "Pouze název"
 _menuDisplay:
   sideFull: "Postranně"
   sideIcon: "Postranně (Ikony)"
@@ -1529,24 +1482,12 @@ _time:
   day: "Dnů"
 _2fa:
   alreadyRegistered: "Již jste zaregistrovali dvoufaktorové ověřovací zařízení."
-  registerTOTP: "Registrovat aplikaci autentizátoru"
   step1: "Nejprve si do zařízení nainstalujte aplikaci pro ověřování (například {a} nebo {b})."
   step2: "Poté naskenujte QR kód zobrazený na této obrazovce."
   step3Title: "Zadejte ověřovací kód"
   step3: "Pro dokončení nastavení zadejte token poskytnutý vaší aplikací."
   step4: "Od této chvíle budou všechny budoucí pokusy o přihlášení vyžadovat tento přihlašovací token."
-  securityKeyNotSupported: "Váš prohlížeč nepodporuje bezpečnostní klíče."
-  registerTOTPBeforeKey: "Nastavte aplikaci autentizátoru pro registraci bezpečnostního nebo přístupového klíče."
   securityKeyInfo: "Kromě ověřování otiskem prstu nebo PIN můžete nastavit také ověřování pomocí hardwarových bezpečnostních klíčů, které podporují FIDO2, a svůj účet tak dále zabezpečit."
-  registerSecurityKey: "Registrace bezpečnostního nebo přístupového klíče"
-  securityKeyName: "Zadejte název klíče"
-  tapSecurityKey: "Při registraci bezpečnostního nebo přístupového klíče postupujte podle svého prohlížeče."
-  removeKey: "Odstranit bezpečnostní klíč"
-  removeKeyConfirm: "Opravdu chcete odstranit klíč {name}?"
-  whyTOTPOnlyRenew: "Aplikaci autentizátoru nelze odstranit, dokud je zaregistrován bezpečnostní klíč."
-  renewTOTP: "Překonfigurování aplikace autentizátor"
-  renewTOTPConfirm: "Tohle způsobí, že ověřovací kódy z předchozí aplikace přestanou fungovat."
-  renewTOTPOk: "Přenastavit"
   renewTOTPCancel: "Ne děkuji"
 _permissions:
   "read:account": "Zobrazit informace o účtu"
@@ -1586,7 +1527,6 @@ _auth:
   shareAccessTitle: "Udělovat oprávnění k aplikacím"
   shareAccess: "Chcete autorizovat \"{name}\" pro přístup k tomuto účtu?"
   shareAccessAsk: "Opravdu chcete této aplikaci povolit přístup k vašemu účtu?"
-  permission: "{name} požaduje tato oprávnění"
   permissionAsk: "Tato aplikace požaduje následující oprávnění"
   pleaseGoBack: "Vraťte se prosím zpět do aplikace"
   callback: "Návrat k aplikaci"
@@ -1679,7 +1619,6 @@ _visibility:
   followersDescription: "Zviditelnit pouze pro své sledující"
   specified: "Přímý"
   specifiedDescription: "Zviditelnit pouze pro určité uživatele"
-  disableFederation: "Defederace"
   disableFederationDescription: "Nepřenášet do jiných instancí"
 _postForm:
   replyPlaceholder: "Odpovědět na tuto poznámku..."
@@ -1748,13 +1687,10 @@ _timelines:
   social: "Sociální síť"
   global: "Globální"
 _play:
-  new: "Vytvořit Play"
-  edit: "Upravit Play"
   created: "Play vytvořen"
   updated: "Play upraven"
   deleted: "Play smazán"
   pageSetting: "Nastavení Play"
-  editThisPage: "Upravit tenhle Play"
   viewSource: "Zobrazit zdroj"
   my: "Moje Plays"
   liked: "To se mi líbí Plays"
@@ -1857,10 +1793,7 @@ _deck:
   profile: "Profil"
   newProfile: "Nový profil"
   deleteProfile: "Smazat profil"
-  introduction: "Vytvořte si dokonalé rozhraní volným uspořádáním sloupců!"
-  introduction2: "Kliknutím na tlačítko + v pravé části obrazovky můžete kdykoli přidat nové sloupce."
   widgetsIntroduction: "V nabídce sloupce vyberte možnost \"Upravit widgety\" a přidejte widget."
-  useSimpleUiForNonRootPages: "Použít zjednodušené uživatelské rozhraní pro navigaci na stránkách"
   _columns:
     main: "Hlavní"
     widgets: "Widgety"
@@ -1872,27 +1805,14 @@ _deck:
     mentions: "Zmínění"
     direct: "Přímé poznámky"
     roleTimeline: "Časová osa role"
-_dialog:
-  charactersExceeded: "Překročili jste maximální počet znaků! V současné době je na hodnotě {current} z {max}."
-  charactersBelow: "Nedosahujete minimálního limitu znaků! V současné době je na {current} z {min}."
-_disabledTimeline:
-  title: "Časová osa vypnuta"
-  description: "Tuto časovou osu nemůžete používat v rámci svých současných rolí."
 _drivecleaner:
   orderBySizeDesc: "Sestupná velikost souborů"
   orderByCreatedAtAsc: "Vzestupné datumy"
 _webhookSettings:
-  createWebhook: "Vytvořit Webhook"
   name: "Jméno"
-  secret: "Tajné"
   active: "Zapnuto"
   _events:
-    follow: "Při sledování uživatele"
-    followed: "Při sledování"
-    note: "Při zveřejňování poznámky"
-    reply: "Při obdržení odpovědi"
     renote: "Při renotaci poznámky"
-    reaction: "Při obdržení reakce"
     mention: "Při zmínce"
 _abuseReport:
   _notificationRecipient:

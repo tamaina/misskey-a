@@ -928,22 +928,7 @@ _chat:
 _delivery:
   stop: "مُعلّق"
 _initialAccountSetting:
-  accountCreated: "نجح إنشاء حسابك!"
-  letsStartAccountSetup: "إذا كنت جديدًا لنعدّ حسابك الشخصي."
   profileSetting: "إعدادات الملف الشخصي"
-  privacySetting: "إعدادات الخصوصية"
-  theseSettingsCanEditLater: "يمكنك تغيير هذه الإعدادات لاحقًا."
-  skipAreYouSure: "أتريد تخطي إعداد الملف الشخصي؟"
-  laterAreYouSure: "أتريد إعداد الملف الشخصي لاحقًا؟"
-_serverRules:
-  description: "مجموعة من القواعد لعرضها عند التسجيل، من المستحسن كتابة ملخصٍ للشروط الخدمة."
-_accountMigration:
-  moveFrom: "انقل حسابًا آخر لهذا الحساب"
-  moveFromLabel: "الحساب الأصلي #{n}"
-  moveTo: "انقل هذا الحساب لحساب آخر"
-  moveToLabel: "الحساب الوجهة:"
-  moveCannotBeUndone: "لا يمكن التراجع عن نقل الحساب."
-  movedTo: "الحساب الوجهة:"
 _achievements:
   _types:
     _notes1:
@@ -1466,8 +1451,6 @@ _deck:
 _webhookSettings:
   name: "الاسم"
   active: "مُفعّل"
-  _events:
-    reaction: "عند التفاعل"
 _abuseReport:
   _notificationRecipient:
     _recipientType:
@@ -1479,11 +1462,6 @@ _moderationLogTypes:
   createInvitation: "ولِّد دعوة"
 _reversi:
   total: "المجموع"
-  lookingForPlayer: "يبحث عن خصم..."
-  gameCanceled: "أُلغيت اللعبة."
-  opponentHasSettingsChanged: "غيَر الخصم إعدادته."
-  showBoardLabels: "اعرض ترقيم الصفوف والأعمدة على اللوح"
-  useAvatarAsStone: "حوَل الحجارة إلى صور مستخدمين"
 _offlineScreen:
   title: "غير متصل - يتعذر الاتصال بالخادم"
   header: "يتعذر الاتصال بالخادم"

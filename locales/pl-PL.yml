@@ -956,9 +956,6 @@ _delivery:
   stop: "Zawieszono"
   _type:
     none: "Publikowanie"
-_bubbleGame:
-  _score:
-    score: "Wynik"
 _role:
   assignTarget: "Przydziel"
   priority: "Priorytet"
@@ -969,9 +966,6 @@ _role:
   _options:
     canManageCustomEmojis: "Zarządzaj niestandardowymi Emoji"
     canManageAvatarDecorations: "Zarządzaj dekoracjami awatara"
-_sensitiveMediaDetection:
-  description: "Zmniejsza wysiłek związany z moderacją serwera dzięki automatycznemu rozpoznawaniu zawartości NSFW za pomocą uczenia maszynowego. To nieznacznie zwiększy obciążenie serwera."
-  setSensitiveFlagAutomatically: "Oznacz jako NSFW"
 _emailUnavailable:
   used: "Ten adres e-mail jest już używany"
   format: "Format tego adresu e-mail jest nieprawidłowy"
@@ -1157,9 +1151,6 @@ _2fa:
   step2: "Następnie, zeskanuje kod QR z ekranu."
   step3: "Wprowadź token podany w aplikacji, aby ukończyć konfigurację."
   step4: "Od teraz, przy każdej próbie logowania otrzymasz prośbę o token logowania."
-  removeKeyConfirm: "Usunąć kopię zapasową {name}?"
-  renewTOTPConfirm: "Spowoduje to, że kody weryfikacyjne z poprzedniej aplikacji przestaną działać"
-  renewTOTPOk: "Rekonfiguruj"
   renewTOTPCancel: "Nie teraz"
 _permissions:
   "read:account": "Wyświetl informacje o swoim koncie"
@@ -1199,7 +1190,6 @@ _auth:
   shareAccessTitle: "Przyznawanie uprawnień aplikacji"
   shareAccess: "Czy chcesz autoryzować „{name}” do dostępu do tego konta?"
   shareAccessAsk: "Czy na pewno chcesz zezwolić tej aplikacji na dostęp do Twojego konta?"
-  permission: "{name} żąda następujących uprawnień"
   permissionAsk: "Ta aplikacja wymaga następujących uprawnień:"
   pleaseGoBack: "Proszę, wróć do aplikacji"
   callback: "Powracanie do aplikacji"
@@ -1464,17 +1454,10 @@ _deck:
     mentions: "Wspomnienia"
     direct: "Bezpośredni"
 _webhookSettings:
-  createWebhook: "Stwórz Webhook"
   name: "Nazwa"
-  secret: "Sekret"
   active: "Właczono"
   _events:
-    follow: "Po zaobserwowaniu użytkownika"
-    followed: "Po zostaniu zaobserwowanym"
-    note: "Po opublikowaniu wpisu"
-    reply: "Po otrzymaniu odpowiedzi"
     renote: "Po udostępnieniu wpisu"
-    reaction: "Po otrzymaniu reakcji"
     mention: "Po zostaniu wspomnianym"
 _abuseReport:
   _notificationRecipient:
