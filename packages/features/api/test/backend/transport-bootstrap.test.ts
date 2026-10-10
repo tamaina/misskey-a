@@ -15,6 +15,7 @@ import { createUsersRouter } from '../../../users/backend/api.implementation.js'
 import type { MiUserProfile } from '../../../users/backend/models/UserProfile.js';
 import * as v from 'valibot';
 import { DI } from '@/di-symbols.js';
+import { ApiExecutionContextFactory } from '../../backend/transport/ApiExecutionContextFactory.js';
 import { OrpcPilotService } from '../../backend/transport/OrpcPilotService.js';
 
 function injectionToken(value: unknown): InjectionToken {
@@ -23,11 +24,14 @@ function injectionToken(value: unknown): InjectionToken {
 }
 
 test('the real transport composes ready feature routers before the first HTTP request', async () => {
-	const constructorTypes = v.parse(v.array(v.unknown()), Reflect.getMetadata('design:paramtypes', OrpcPilotService));
-	const tokens = constructorTypes.map(injectionToken);
-	const explicit = v.parse(v.array(v.object({ index: v.number(), param: v.unknown() })),
-		Reflect.getMetadata('self:paramtypes', OrpcPilotService) ?? []);
-	for (const parameter of explicit) tokens[parameter.index] = injectionToken(parameter.param);
+	const tokens = [OrpcPilotService, ApiExecutionContextFactory].flatMap(service => {
+		const constructorTypes = v.parse(v.array(v.unknown()), Reflect.getMetadata('design:paramtypes', service));
+		const dependencies = constructorTypes.map(injectionToken);
+		const explicit = v.parse(v.array(v.object({ index: v.number(), param: v.unknown() })),
+			Reflect.getMetadata('self:paramtypes', service) ?? []);
+		for (const parameter of explicit) dependencies[parameter.index] = injectionToken(parameter.param);
+		return dependencies;
+	}).filter(token => token !== ApiExecutionContextFactory);
 
 	const calls: unknown[] = [];
 	const lookups: string[] = [];
@@ -65,7 +69,7 @@ test('the real transport composes ready feature routers before the first HTTP re
 						: typeof token === 'function' && token.name === 'TelemetryService' ? { startSpan: (_name: string, run: () => Promise<unknown>) => run() }
 							: {},
 	}));
-	providers.push(OrpcPilotService, {
+	providers.push(OrpcPilotService, ApiExecutionContextFactory, {
 		provide: delayedProvider,
 		useFactory: async () => {
 			await delay(10);

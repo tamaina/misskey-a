@@ -1,0 +1,82 @@
+# Local MCP pilot
+
+This feature is a draft integration for #10. The normal application server does
+not register `/mcp`. `createLocalMcpPilot(service)` creates a standalone Fastify
+app with the route disabled by default. Local synthetic tests opt in with
+`enabled: true`, an explicit `http://127.0.0.1:<port>/mcp` resource (also localhost
+or IPv6 loopback), and an exact Origin allowlist. Absent Origin is accepted for
+nonbrowser clients. Nonloopback clients, foreign/duplicate critical headers,
+query credentials, non-JSON bodies and bodies over 1 MiB are rejected. Request
+logging and proxy trust are disabled. The pilot uses stateless POST JSON replies,
+one bearer header per request, a 30-second deadline and at most eight active
+requests. Native in-flight permits remain held until the observed authentication
+and tool promises settle, even after transport cancellation. GET/DELETE are
+unsupported. SDK 1.32.0 is pinned.
+
+Only `list_my_notes` is listed. Its descriptive schema comes from the native
+contract; native validation remains authoritative. `McpApiService` reuses the
+shared API context, original AuthenticateService tuple, assembled router and
+existing feature repositories. It retains authentication only within each HTTP
+request, never across requests or sessions. No separate DB/query/scope is added.
+
+**MCP requires a scoped token with `access:mcp`.** Master/session credentials and
+existing tokens without this permission are denied. The connection gate reads
+current shared token/app records on every POST and tool invocation, so revocation
+or removal of this permission takes effect without trusting the native app cache.
+The original nonnull authentication tuple is passed unchanged to native API checks;
+this permission adds no downstream API permissions or visibility. App tokens use
+the current app permission list for the connection gate.
+
+**Access can include the account's public and nonpublic notes.** The existing
+`users/notes` behavior is preserved. Ordinary API authentication and authorization
+are unchanged. The shared permission registry makes this kind selectable in token,
+MiAuth, app and OAuth consent flows. Consent labels explain nonpublic-note access.
+The six existing permission displays translate this label in all 28 SFC locales.
+The legacy global YAML dictionaries retain Japanese fallback until Crowdin updates.
+Note content is untrusted data. Foreign subjects are denied before native invocation. Observed disconnect,
+deadline and shutdown suppress the transport response and release transport
+state; they do not actively cancel SQL or guarantee that native work stops. Disconnect observation
+starts before authentication. Detached work inside existing native services is
+outside these observed promise permits.
+
+Cross-POST `notifications/cancelled` is explicitly unsupported (HTTP 501 after
+authentication, or 503 when the native-work limit is full). Every POST has its own
+stateless SDK server. SDK `callTool` AbortSignal rejects the client promise and
+sends that notification without aborting the original HTTP fetch; it therefore
+does not cancel this pilot's native work or suppress its eventual response by
+itself. Supported disconnect/deadline/shutdown cancellation suppresses replies
+and immediately releases transport state while retaining native-work permits.
+No principal/request correlation map or session architecture is introduced.
+
+The synthetic unit tests exercise Host/Origin/body/auth boundaries, installed SDK
+initialize/list/call, native output/error behavior, revocation, delayed abort,
+repeated cancellation batches, slow-auth disconnect and actual SDK callTool
+AbortSignal behavior.
+The opt-in PostgreSQL fixture executes native authentication, QueryService SQL,
+NoteEntityService packing/private nested-note hiding and token revocation using
+real task-owned repositories. Auxiliary cache, user/media/emoji packing and
+role/rate-limit ports remain mocked; Redis is unverified.
+
+Run the synthetic unit suite from the repository root:
+
+```
+node packages/backend/node_modules/vitest/vitest.mjs run --config packages/features/mcp/test/vitest.config.mjs
+```
+
+Run the isolated PostgreSQL fixture:
+
+```
+node packages/features/mcp/test/run-postgres-fixture.mjs
+```
+
+It creates a new private temporary cluster with TCP disabled, runs only the
+feature fixture, stops the server and retains its directory. It never loads the
+preview/test database configuration. PostgreSQL17 binaries are the default;
+`MISSKEY_PG_BINDIR` can select another installed PostgreSQL binary directory.
+The ordinary unit suite skips this opt-in DB fixture.
+
+Before remote activation, reuse the existing OAuth2ProviderService and review
+protected-resource discovery/challenges, client metadata interoperability and
+resource/audience binding on existing grants/tokens. Choose expiry and optional
+refresh separately. This local manual-bearer pilot does not establish standard
+MCP OAuth compatibility, issue real grants, or complete #10.

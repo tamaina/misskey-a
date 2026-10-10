@@ -48,6 +48,7 @@ export const followingVisibilities = ['public', 'followers', 'private'] as const
 export const followersVisibilities = ['public', 'followers', 'private'] as const;
 
 export const permissions = [
+	'access:mcp',
 	'read:account',
 	'write:account',
 	'read:blocks',

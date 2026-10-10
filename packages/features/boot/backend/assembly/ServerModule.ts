@@ -13,6 +13,8 @@ import { ActivityPubServerService } from '@features/federation/backend/http/Acti
 import { ApiLoggerService } from '@features/api/backend/transport/ApiLoggerService.js';
 import { ApiServerService } from '@features/api/backend/transport/ApiServerService.js';
 import { OrpcPilotService } from '@features/api/backend/transport/OrpcPilotService.js';
+import { ApiExecutionContextFactory } from '@features/api/backend/transport/ApiExecutionContextFactory.js';
+import { McpApiService } from '@features/mcp/backend/McpApiService.js';
 import { AuthenticateService } from '@features/auth/backend/transport/AuthenticateService.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 import { SigninService } from '@features/auth/backend/transport/SigninService.js';
@@ -45,10 +47,10 @@ import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
 import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
 import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
-import { ServerService } from './ServerService.mjs';
-import { CoreModule } from './CoreModule.js';
 import { sessionProviders } from '@features/auth/backend/session.providers.js';
 import { featureProviders } from '@features/index/backend/feature-providers.js';
+import { ServerService } from './ServerService.mjs';
+import { CoreModule } from './CoreModule.js';
 
 @Module({
 	imports: [
@@ -74,6 +76,8 @@ import { featureProviders } from '@features/index/backend/feature-providers.js';
 		ApiLoggerService,
 		ApiServerService,
 		OrpcPilotService,
+		ApiExecutionContextFactory,
+		McpApiService,
 		AuthenticateService,
 		RateLimiterService,
 		SigninService,

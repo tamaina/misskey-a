@@ -22,6 +22,7 @@ import { interpolateLocaleParameters } from '@features/runtime/frontend/interpol
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import proof from './final-screen-locale-migration.json';
+import mcpPermissionLabels from './mcp-permission-labels.json';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const hash = (text: string) => createHash('sha256').update(text).digest('hex');
@@ -56,7 +57,9 @@ function configured(embed: boolean) {
 test('all51 screen sources reverse byte for byte and retain all49336 effective locale strings', () => {
 	let strings = 0;
 	for (const entry of proof) {
-		const source = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8')));
+		const currentSource = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8')));
+		// Keep the original migration proof frozen; current permission labels are checked below.
+		const source = currentSource.replace(/^\t\t"access:mcp": [^\n]*,\n/gm, '');
 		expect(hash(source)).toBe(entry.migratedSha256);
 		const parsed = parse(source, { filename: entry.file });
 		expect(parsed.errors).toEqual([]);
@@ -65,7 +68,12 @@ test('all51 screen sources reverse byte for byte and retain all49336 effective l
 		for (const block of blocks) {
 			const dictionary: Record<string, unknown> = JSON.parse(block.content);
 			expect(Object.keys(dictionary)).toEqual(entry.keys.map(key => key.local));
-			for (const key of entry.keys) expect(dictionary[key.local]).toEqual(at(locales[String(block.attrs.locale)], key.global));
+			for (const key of entry.keys) {
+				const current = at(locales[String(block.attrs.locale)], key.global);
+				const baseline = key.global === '_permissions' && current && typeof current === 'object'
+					? Object.fromEntries(Object.entries(current).filter(([name]) => name !== 'access:mcp')) : current;
+				expect(dictionary[key.local]).toEqual(baseline);
+			}
 			strings += leaves(dictionary).length;
 		}
 		let original = source.slice(0, entry.bodyLength);
@@ -112,11 +120,14 @@ test('real main/embed loaders preserve finite selectors, unknown-key fallback an
 				const raw = createComponentLocale(entry.file.replace('packages/', '/'));
 				for (const key of entry.keys) {
 					const actual = raw[key.local];
-					expect(actual).toEqual(at(locales[language], key.global));
+					const expected = key.global === '_permissions'
+						? { ...at(locales[language], key.global) as Record<string, string>, 'access:mcp': mcpPermissionLabels[language as keyof typeof mcpPermissionLabels] }
+						: at(locales[language], key.global);
+					expect(actual).toEqual(expected);
 					rawChecks += leaves(actual).length;
 					if (actual && typeof actual === 'object') {
 						const dictionary = copyLocaleDictionary(actual);
-						expect(dictionary).toEqual(at(locales[language], key.global));
+						expect(dictionary).toEqual(expected);
 						expect(Reflect.get(dictionary, '__unknown_permission_or_type__')).toBeUndefined();
 						expect(Reflect.get(dictionary, 'constructor')).toBe(Object);
 					}
@@ -139,6 +150,6 @@ test('real main/embed loaders preserve finite selectors, unknown-key fallback an
 			}
 		}
 	}
-	expect(rawChecks).toBe(49336);
+	expect(rawChecks).toBe(49504);
 	expect(formatterChecks).toBe(12096);
 }, 30000);

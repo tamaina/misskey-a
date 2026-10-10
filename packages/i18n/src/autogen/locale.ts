@@ -6507,6 +6507,10 @@ export interface Locale extends ILocale {
     };
     "_permissions": {
         /**
+         * MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）
+         */
+        "access:mcp": string;
+        /**
          * アカウントの情報を見る
          */
         "read:account": string;
