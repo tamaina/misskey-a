@@ -4,6 +4,7 @@
  */
 
 import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
+import { restoreDrivePreprocessingBaseline } from './drive-preprocessing-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -23,6 +24,7 @@ import proof from './final-ts-locale-migration.json';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const hash = (source: string) => createHash('sha256').update(source).digest('hex');
+
 function at(value: unknown, path: string[]): unknown {
 	for (const key of path) {
 		if (!value || typeof value !== 'object') throw new Error(`Missing path: ${path.join('.')}`);
@@ -30,20 +32,32 @@ function at(value: unknown, path: string[]): unknown {
 	}
 	return value;
 }
+
 function leaves(value: unknown): string[] {
 	if (typeof value === 'string') return [value];
 	if (!value || typeof value !== 'object') throw new Error('Expected dictionary');
 	return Object.values(value).flatMap(leaves);
 }
+
 function hook(value: unknown, ...args: unknown[]): unknown {
 	if (typeof value === 'function') return Reflect.apply(value, {}, args);
 	if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
 	throw new Error('Expected Vite hook');
 }
+
+test('reviewed image lifecycle rebase rejects unreviewed source changes', () => {
+	const file = 'packages/features/drive/frontend/composables/use-uploader.ts';
+	const source = readFileSync(resolve(root, file), 'utf8');
+	expect(() => restoreDrivePreprocessingBaseline(file, source)).not.toThrow();
+	expect(() => restoreDrivePreprocessingBaseline(file, source + '\n')).toThrow('Source differs');
+	expect(() => restoreDrivePreprocessingBaseline(file, source.replace('quality: isWebpSupported() ? 0.85 : 0.8', 'quality: 0.1'))).toThrow('Source differs');
+});
+
 const plugin = pluginVvi();
 hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
 hook(plugin.buildStart);
 const owners = new Map<string, string>();
+
 async function ownerScript(file: string): Promise<string> {
 	const cached = owners.get(file);
 	if (cached) return cached;
@@ -56,6 +70,7 @@ async function ownerScript(file: string): Promise<string> {
 	owners.set(file, script);
 	return script;
 }
+
 function evaluate(source: string, legacy?: I18n<typeof locales['ja-JP']>): Record<string, unknown> {
 	const exports: Record<string, unknown> = {};
 	const requireModule = (specifier: string): unknown => {
@@ -74,6 +89,7 @@ function evaluate(source: string, legacy?: I18n<typeof locales['ja-JP']>): Recor
 	runInNewContext(code, { exports, require: requireModule });
 	return exports;
 }
+
 function invoke(module: Record<string, unknown>, name: string, ...args: unknown[]): unknown {
 	const fn = module[name];
 	if (typeof fn !== 'function') throw new Error(`Expected callable export: ${name}`);
@@ -90,7 +106,7 @@ function generated(language: string): LocaleBundle {
 
 test('all39 TS consumers reverse byte for byte and all17 owners retain exactly9100 effective strings', async () => {
 	for (const file of proof.files) {
-		let source = restoreNativeApiSourceBaseline(file.file, readFileSync(resolve(root, file.file), 'utf8'));
+		let source = restoreNativeApiSourceBaseline(file.file, restoreDrivePreprocessingBaseline(file.file, readFileSync(resolve(root, file.file), 'utf8')));
 		expect(hash(source)).toBe(file.migratedSha256);
 		for (const edit of [...file.edits].reverse()) {
 			expect(source.slice(edit.afterStart, edit.afterStart + edit.replacement.length)).toBe(edit.replacement);
