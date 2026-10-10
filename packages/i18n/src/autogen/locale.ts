@@ -12293,40 +12293,6 @@ export interface Locale extends ILocale {
             "text3": string;
         };
     };
-    "_uploader": {
-        /**
-         * 画像の編集
-         */
-        "editImage": string;
-        /**
-         * {x}に圧縮
-         */
-        "compressedToX": ParameterizedString<"x">;
-        /**
-         * {x}%節約
-         */
-        "savedXPercent": ParameterizedString<"x">;
-        /**
-         * アップロードされていないファイルがありますが、中止しますか？
-         */
-        "abortConfirm": string;
-        /**
-         * アップロードされていないファイルがありますが、完了しますか？
-         */
-        "doneConfirm": string;
-        /**
-         * アップロード可能な最大ファイルサイズは{x}です。
-         */
-        "maxFileSizeIsX": ParameterizedString<"x">;
-        /**
-         * アップロード可能なファイル種別
-         */
-        "allowedTypes": string;
-        /**
-         * ファイルはまだアップロードされていません。このダイアログで、アップロード前の確認・リネーム・圧縮・クロッピングなどが行えます。準備が出来たら、「アップロード」ボタンを押してアップロードを開始できます。
-         */
-        "tip": string;
-    };
     "_clientPerformanceIssueTip": {
         /**
          * バッテリー消費が多いと感じたら
@@ -12500,105 +12466,7 @@ export interface Locale extends ILocale {
         "failedToLoadImage": string;
     };
     "_imageEffector": {
-        /**
-         * エフェクト
-         */
-        "title": string;
-        /**
-         * エフェクトを追加
-         */
-        "addEffect": string;
-        /**
-         * 変更を破棄して終了しますか？
-         */
-        "discardChangesConfirm": string;
-        /**
-         * 画像の読み込みに失敗しました
-         */
-        "failedToLoadImage": string;
-        "_fxs": {
-            /**
-             * 色収差
-             */
-            "chromaticAberration": string;
-            /**
-             * グリッチ
-             */
-            "glitch": string;
-            /**
-             * ミラー
-             */
-            "mirror": string;
-            /**
-             * 色の反転
-             */
-            "invert": string;
-            /**
-             * 白黒
-             */
-            "grayscale": string;
-            /**
-             * ぼかし
-             */
-            "blur": string;
-            /**
-             * モザイク
-             */
-            "pixelate": string;
-            /**
-             * 色調補正
-             */
-            "colorAdjust": string;
-            /**
-             * 色の圧縮
-             */
-            "colorClamp": string;
-            /**
-             * 色の圧縮(高度)
-             */
-            "colorClampAdvanced": string;
-            /**
-             * 歪み
-             */
-            "distort": string;
-            /**
-             * 二値化
-             */
-            "threshold": string;
-            /**
-             * 集中線
-             */
-            "zoomLines": string;
-            /**
-             * ストライプ
-             */
-            "stripe": string;
-            /**
-             * ポルカドット
-             */
-            "polkadot": string;
-            /**
-             * チェッカー
-             */
-            "checker": string;
-            /**
-             * ブロックノイズ
-             */
-            "blockNoise": string;
-            /**
-             * ティアリング
-             */
-            "tearing": string;
-            /**
-             * 塗りつぶし
-             */
-            "fill": string;
-        };
         "_fxProps": {
-            /**
-             * 角度
-             */
-            "angle": string;
             /**
              * サイズ
              */
@@ -12628,105 +12496,13 @@ export interface Locale extends ILocale {
              */
             "opacity": string;
             /**
-             * 正規化
-             */
-            "normalize": string;
-            /**
-             * 量
-             */
-            "amount": string;
-            /**
              * 明るさ
              */
             "lightness": string;
             /**
-             * コントラスト
-             */
-            "contrast": string;
-            /**
-             * 色相
-             */
-            "hue": string;
-            /**
-             * 輝度
-             */
-            "brightness": string;
-            /**
-             * 彩度
-             */
-            "saturation": string;
-            /**
-             * 最大値
-             */
-            "max": string;
-            /**
-             * 最小値
-             */
-            "min": string;
-            /**
-             * 方向
-             */
-            "direction": string;
-            /**
-             * 位相
-             */
-            "phase": string;
-            /**
-             * 頻度
-             */
-            "frequency": string;
-            /**
-             * 強さ
-             */
-            "strength": string;
-            /**
-             * ズレ
-             */
-            "glitchChannelShift": string;
-            /**
-             * シード値
-             */
-            "seed": string;
-            /**
-             * 赤色成分
-             */
-            "redComponent": string;
-            /**
-             * 緑色成分
-             */
-            "greenComponent": string;
-            /**
-             * 青色成分
-             */
-            "blueComponent": string;
-            /**
              * しきい値
              */
             "threshold": string;
-            /**
-             * 中心X
-             */
-            "centerX": string;
-            /**
-             * 中心Y
-             */
-            "centerY": string;
-            /**
-             * 密度
-             */
-            "density": string;
-            /**
-             * 線の影の太さ
-             */
-            "zoomLinesOutlineThickness": string;
-            /**
-             * 中心径
-             */
-            "zoomLinesMaskSize": string;
-            /**
-             * 円形
-             */
-            "circle": string;
         };
     };
     /**

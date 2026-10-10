@@ -1986,7 +1986,6 @@ _watermarkEditor:
   angle: "Góc"
 _imageEffector:
   _fxProps:
-    angle: "Góc"
     scale: "Kích thước"
     size: "Kích thước"
     offset: "Vị trí"

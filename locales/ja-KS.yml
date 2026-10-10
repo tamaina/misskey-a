@@ -2902,11 +2902,6 @@ _serverSetupWizard:
     text1: "Misskeyは有志で開発されとる無料のソフトウェアやで。"
     text2: "今後も開発を続けられるように、よかったらぜひカンパをお願いするわ。"
     text3: "支援者向け特典もあるで！"
-_uploader:
-  abortConfirm: "アップロードされてへんファイルがあるんやけど、やめてもええんか？"
-  doneConfirm: "アップロードされてへんファイルがあるんやけど、完了してもええんか？"
-  maxFileSizeIsX: "アップロードできるファイルサイズは{x}までやで。"
-  tip: "ファイルはまだアップロードされてへんで。このダイアログで、アップロードする前に確認・リネーム・圧縮・クロッピングとかをできるで。準備が出来たら、「アップロード」ボタンを押してアップロードしてな。"
 _clientPerformanceIssueTip:
   title: "バッテリーようさん食うなぁと思ったら"
   makeSureDisabledAdBlocker: "アドブロッカーを切ってみてや"
@@ -2934,10 +2929,7 @@ _watermarkEditor:
   angle: "角度"
   failedToLoadImage: "あかん、画像読み込まれへんわ"
 _imageEffector:
-  discardChangesConfirm: "変更をせんで終わるか？"
-  failedToLoadImage: "あかん、画像読み込まれへんわ"
   _fxProps:
-    angle: "角度"
     scale: "大きさ"
     size: "大きさ"
     offset: "位置"

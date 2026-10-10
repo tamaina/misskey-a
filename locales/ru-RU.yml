@@ -2521,9 +2521,7 @@ _watermarkEditor:
   angle: "Угол"
   failedToLoadImage: "Не удалось загрузить изображение"
 _imageEffector:
-  failedToLoadImage: "Не удалось загрузить изображение"
   _fxProps:
-    angle: "Угол"
     scale: "Размер"
     size: "Размер"
     offset: "Позиция"
