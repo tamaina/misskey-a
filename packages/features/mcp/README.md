@@ -1,17 +1,38 @@
-# Local MCP pilot
+# Native API MCP transport
 
-This feature is a draft integration for #10. The normal application server does
-not register `/mcp`. `createLocalMcpPilot(service)` creates a standalone Fastify
-app with the route disabled by default. Local synthetic tests opt in with
-`enabled: true`, an explicit `http://127.0.0.1:<port>/mcp` resource (also localhost
-or IPv6 loopback), and an exact Origin allowlist. Absent Origin is accepted for
-nonbrowser clients. Nonloopback clients, foreign/duplicate critical headers,
-query credentials, non-JSON bodies and bodies over 1 MiB are rejected. Request
-logging and proxy trust are disabled. The pilot uses stateless POST JSON replies,
-one bearer header per request, a 30-second deadline and at most eight active
-requests. Native in-flight permits remain held until the observed authentication
-and tool promises settle, even after transport cancellation. GET/DELETE are
-unsupported. SDK 1.32.0 is pinned.
+This feature implements a small native-token connection under #10. The normal
+application server reserves `/mcp` as HTTP 404 by default. Explicit
+`enableMcp: true` registers the shared handler; public activation requires the
+operator's separate approval. The trusted configured `url` must use HTTPS.
+The canonical `/mcp` service identity represents this instance's native API
+through two transports, not a separate MCP-only permission or token class.
+Existing opaque token storage and ordinary API permissions/lifetimes are retained;
+there are no resource/expiry columns, migrations, new signing keys or grant store.
+
+Use a scoped native API/MiAuth/app credential with `access:mcp` through one bearer
+header on every request. The reference SDK 1.32.0 client supports this connection
+via explicit headers. OAuth discovery/CIMD/refresh compatibility is not provided
+by this integration; an OAuth-only client needs a separate compatibility decision.
+The transport is stateless POST/JSON with MCP 2025-11-25. GET/DELETE are unsupported.
+
+The reverse proxy must preserve the canonical Host and strip X-Forwarded-Host.
+Root server trustProxy settings still determine the IP used by native API policy;
+the MCP authority itself is never inferred from forwarding headers. Present Origin
+must equal the configured origin; absent Origin is accepted for nonbrowser clients.
+Foreign/duplicate critical headers, query credentials, non-JSON and input bodies
+larger than 1 MiB are rejected. Inherited access-log hooks omit MCP request/result
+bodies even when global body capture is enabled. Native tool results larger than
+1 MiB (including both structured and text representations) produce an explicit
+bounded error, never a partial result reported as complete.
+
+The handler uses a 30-second native-request deadline and at most eight concurrent
+observed native requests per worker. Permits remain held until authentication/tool
+promises settle, even after transport cancellation. The existing normal server's
+body-reading timeouts remain its responsibility.
+
+`createLocalMcpPilot(service)` remains a standalone loopback test wrapper around
+the same handler, disabled by default, with explicit HTTP loopback resource,
+request logging/proxy trust disabled and its existing 30-second request timeout.
 
 Only `list_my_notes` is listed. Its descriptive schema comes from the native
 contract; native validation remains authoritative. `McpApiService` reuses the
@@ -43,7 +64,7 @@ Cross-POST `notifications/cancelled` is explicitly unsupported (HTTP 501 after
 authentication, or 503 when the native-work limit is full). Every POST has its own
 stateless SDK server. SDK `callTool` AbortSignal rejects the client promise and
 sends that notification without aborting the original HTTP fetch; it therefore
-does not cancel this pilot's native work or suppress its eventual response by
+does not cancel this handler's native work or suppress its eventual response by
 itself. Supported disconnect/deadline/shutdown cancellation suppresses replies
 and immediately releases transport state while retaining native-work permits.
 No principal/request correlation map or session architecture is introduced.
@@ -75,8 +96,10 @@ preview/test database configuration. PostgreSQL17 binaries are the default;
 `MISSKEY_PG_BINDIR` can select another installed PostgreSQL binary directory.
 The ordinary unit suite skips this opt-in DB fixture.
 
-Before remote activation, reuse the existing OAuth2ProviderService and review
-protected-resource discovery/challenges, client metadata interoperability and
-resource/audience binding on existing grants/tokens. Choose expiry and optional
-refresh separately. This local manual-bearer pilot does not establish standard
-MCP OAuth compatibility, issue real grants, or complete #10.
+The normal-server synthetic tests include SDK initialization/list/call using
+remote request addresses, native MiAuth/app grants, master denial, current scope
+removal, inherited access-log suppression and bounded output. The PostgreSQL
+fixture now executes the same normal-server plugin with real native SQL/serializer
+and revocation ports. Full application boot, live network/proxy behavior and real
+client/account grants remain outside these fixtures. This small transport does
+not complete every acceptance criterion of #10.
