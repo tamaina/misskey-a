@@ -11,8 +11,38 @@ there are no resource/expiry columns, migrations, new signing keys or grant stor
 
 Use a scoped native API/MiAuth/app credential with `access:mcp` through one bearer
 header on every request. The reference SDK 1.32.0 client supports this connection
-via explicit headers. OAuth discovery/CIMD/refresh compatibility is not provided
-by this integration; an OAuth-only client needs a separate compatibility decision.
+via explicit headers. OAuth clients can discover the existing authorization server
+from `/.well-known/oauth-protected-resource/mcp` and bearer challenges. The
+configured issuer is exact, including trailing-slash spelling; success and error
+callbacks include the same issuer. The provider advertises public-client `none`
+and S256. It accepts CIMD metadata with `none` in the supported-method intersection,
+including ChatGPT's plural method list and legacy `private_key_jwt` preference.
+Redirect URIs come from fetched metadata and must match exactly.
+
+This compatibility path requires the canonical `/mcp` resource in authorization
+and token requests, binding it to five-minute consent/code state in shared Redis.
+CIMD discovery also works for ordinary OAuth scopes without a resource. Metadata
+formats overlap, so recognition uses request context: resource-bound requests
+require CIMD; without a resource, a valid IndieAuth `client_uri` prefix selects
+legacy semantics even with optional OAuth authentication fields. Other JSON
+documents use CIMD validation. Legacy no-resource clients retain registered
+loopback callbacks and empty-secret exchange. This does not widen the MCP path.
+Requesting `access:mcp` now requires that resource even for legacy clients; this is an
+intentional compatibility restriction. CIMD callbacks currently require
+HTTPS; this restriction applies to the strict CIMD path, while overlapping
+no-resource legacy documents keep their existing callback rules.
+Metadata retrieval uses bounded direct public HTTPS without redirects, instance
+proxy settings or private-network exceptions. This stricter retrieval also applies
+to legacy HTTPS client IDs with a non-root path; root legacy IDs keep their
+existing retrieval path. Code reuse revokes the associated
+token row when its replay state remains available. Redis state stores row IDs,
+not bearer credentials, and insertion races fail closed with row cleanup.
+
+No DCR, client secrets, signing keys, refresh-token subsystem or token lifetime
+changes are introduced. Public-client CIMD provides metadata identity, not signed
+proof that a caller is ChatGPT. Real ChatGPT consent and availability of a custom
+plugin to dot require separate user-operated checks; synthetic SDK compatibility
+does not establish either one.
 The transport is stateless POST/JSON with MCP 2025-11-25. GET/DELETE are unsupported.
 
 The reverse proxy must preserve the canonical Host and strip X-Forwarded-Host.
@@ -76,7 +106,10 @@ AbortSignal behavior.
 The opt-in PostgreSQL fixture executes native authentication, QueryService SQL,
 NoteEntityService packing/private nested-note hiding and token revocation using
 real task-owned repositories. Auxiliary cache, user/media/emoji packing and
-role/rate-limit ports remain mocked; Redis is unverified.
+role/rate-limit ports remain mocked. The separate OAuth fixture uses actual Redis
+for cross-provider consent/code consumption, replay and insertion races; database
+failure injection uses mocked repositories. A crashed worker or failed row cleanup
+can leave an orphan token; durable recovery is outside this change.
 
 Run the synthetic unit suite from the repository root:
 
@@ -92,9 +125,17 @@ node packages/features/mcp/test/run-postgres-fixture.mjs
 
 It creates a new private temporary cluster with TCP disabled, runs only the
 feature fixture, stops the server and retains its directory. It never loads the
-preview/test database configuration. PostgreSQL17 binaries are the default;
+preview/test database configuration. The newest installed PostgreSQL binaries are selected;
 `MISSKEY_PG_BINDIR` can select another installed PostgreSQL binary directory.
-The ordinary unit suite skips this opt-in DB fixture.
+The ordinary unit suite skips this opt-in DB fixture; backend CI explicitly runs
+the launcher in both Node matrices. It also runs the disposable OAuth Redis suite:
+
+```
+node packages/features/auth/test/run-oauth-fixture.mjs
+```
+
+That launcher creates a private Unix socket in a fresh network-disabled container,
+runs the OAuth state/flow suites and removes the container, with no instance config.
 
 The normal-server synthetic tests include SDK initialization/list/call using
 remote request addresses, native MiAuth/app grants, master denial, current scope
