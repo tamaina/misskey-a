@@ -1,48 +1,56 @@
-# MCP application integration (inactive)
+# Local MCP pilot
 
-This is the first application integration seam for #10. `McpApiService` is a Nest
-provider; it has no HTTP registration, MCP SDK transport, OAuth grant issuance or
-production exposure. `list_my_notes` is the only registered application tool.
+This feature is a draft integration for #10. The normal application server does
+not register `/mcp`. `createLocalMcpPilot(service)` creates a standalone Fastify
+app with the route disabled by default. Local synthetic tests opt in with
+`enabled: true`, an explicit `http://127.0.0.1:<port>/mcp` resource (also localhost
+or IPv6 loopback), and an exact Origin allowlist. Absent Origin is accepted for
+nonbrowser clients. Nonloopback clients, foreign/duplicate critical headers,
+query credentials, non-JSON bodies and bodies over 1 MiB are rejected. Request
+logging and proxy trust are disabled. The pilot uses stateless POST JSON replies,
+one bearer header per request, a 30-second deadline and at most eight active
+requests. GET/DELETE are unsupported. SDK 1.32.1 is pinned.
 
-`ApiExecutionContextFactory` supplies the same authentication, role, IP logging,
-rate-limit and error ports to the HTTP API and this service. The service resolves
-`users/notes` with the shared contract route index and the assembled
-`ApiRouterProvider` router, then calls the native procedure through public oRPC
-APIs. Existing feature providers already hold the normal repositories and
-services. There is no separate database, query implementation or MCP scope.
+Only `list_my_notes` is listed. Its descriptive schema comes from the native
+contract; native validation remains authoritative. `McpApiService` reuses the
+shared API context, original AuthenticateService tuple, assembled router and
+existing feature repositories. It retains authentication only within each HTTP
+request, never across requests or sessions. No separate DB/query/scope is added.
 
-The tool binds `userId` to the authenticated local account. It authenticates once
-within each invocation and preserves the original user/token tuple for native
-middleware. It does not cache that tuple across invocations. Native validation,
-permissions, defaults and packed-note output remain authoritative. In particular,
-`users/notes` is kindless: an empty-permission token is accepted by that endpoint.
-This own-account tool may return the account's own nonpublic notes.
+**Access includes the account's public and nonpublic notes.** `users/notes` is
+kindless, so permission=[] tokens retain that native behavior. Tool description
+and any future consent UI must state this explicitly. Note content is untrusted
+data. Foreign subjects are denied before native invocation. Cancellation
+suppresses the transport response and releases transport state; it does not
+actively cancel SQL or guarantee that native work stops.
 
-MCP diagnostics omit arguments and internal exception messages/names/stacks.
-HTTP diagnostic behavior remains as before. Any future transport must supply a
-trusted credential context; tool arguments are not a credential source.
+The synthetic unit tests exercise Host/Origin/body/auth boundaries, installed SDK
+initialize/list/call, native output/error behavior, revocation and delayed abort.
+The opt-in PostgreSQL fixture executes native authentication, QueryService SQL,
+NoteEntityService packing/private nested-note hiding and token revocation using
+real task-owned repositories. Auxiliary cache, user/media/emoji packing and
+role/rate-limit ports remain mocked; Redis is unverified.
 
-## Isolated synthetic verification
+Run the synthetic unit suite from the repository root:
 
-`test/backend/shared-api.test.ts` uses the actual Nest authentication/context/MCP
-services, actual native `users/notes` and `my/apps` procedures, and the actual HTTP
-adapter with `Fastify.inject`. Repository/cache/fanout ports contain synthetic
-fixtures. Native fanout visibility callbacks and packed-note conversions run;
-this does not test PostgreSQL queries, Redis or the full note serializer.
+```
+node packages/backend/node_modules/vitest/vitest.mjs run --config packages/features/mcp/test/vitest.config.mjs
+```
 
-The test is included in the normal backend unit suite. To run only this test
-without the unit suite's database setup, create a temporary config beside
-`packages/backend/vitest.config.ts`, importing its `baseConfig`, with test
-`include: ['../features/mcp/test/backend/shared-api.test.ts']`, `environment:
-'node'`, `maxWorkers: 1` and no `globalSetup`. Do not run database-resetting setup
-against an existing preview database.
+Run the isolated PostgreSQL fixture:
 
-## Next design boundary
+```
+node packages/features/mcp/test/run-postgres-fixture.mjs
+```
 
-A future remote transport needs protocol/handshake and OAuth resource-server
-review. Existing Misskey OAuth uses authorization code + S256 PKCE and existing
-access-token rows, but those rows currently lack resource/audience binding and
-automatic expiry. Protected-resource metadata, client discovery interoperability,
-expiry and challenge behavior must be decided before enabling remote `/mcp`.
-MiAuth/manual tokens and app/master tokens above are compatibility fixtures, not
-a claim that MCP OAuth authorization is complete. This PR does not close #10.
+It creates a new private temporary cluster with TCP disabled, runs only the
+feature fixture, stops the server and retains its directory. It never loads the
+preview/test database configuration. PostgreSQL17 binaries are the default;
+`MISSKEY_PG_BINDIR` can select another installed PostgreSQL binary directory.
+The ordinary unit suite skips this opt-in DB fixture.
+
+Before remote activation, reuse the existing OAuth2ProviderService and review
+protected-resource discovery/challenges, client metadata interoperability and
+resource/audience binding on existing grants/tokens. Choose expiry and optional
+refresh separately. This local manual-bearer pilot does not establish standard
+MCP OAuth compatibility, issue real grants, or complete #10.
