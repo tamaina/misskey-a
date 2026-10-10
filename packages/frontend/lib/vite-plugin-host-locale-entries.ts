@@ -32,8 +32,7 @@ export function pluginHostLocaleEntries(options: { embed?: boolean } = {}): Plug
 				if (stylesheets && JSON.stringify(css) !== JSON.stringify(stylesheets)) throw new Error('Host templates require locale-independent initial CSS');
 				stylesheets = css;
 				if (!assets.entry.file.startsWith('scripts/')) throw new Error('Unexpected host entry directory');
-				// Main's existing LocaleInliner copies scripts into language directories.
-				entries[locale] = options.embed ? assets.entry.file : `${locale}/${assets.entry.file.slice('scripts/'.length)}`;
+				entries[locale] = assets.entry.file;
 			}
 			await writeFile(resolve(outDir, localeEntryManifestFile), JSON.stringify(parseLocaleEntryManifest({ version: 1, entries })));
 		},

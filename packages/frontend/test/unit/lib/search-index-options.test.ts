@@ -127,6 +127,7 @@ test('an unsupported label only skips that field and retains static labels and s
 	]);
 });
 
+// Transforming every settings/admin SFC under coverage exceeds CI's default 5-second budget.
 test('virtual VVI transform retains every settings/admin file containing search markers', async () => {
 	const vvi = pluginVvi();
 	if (typeof vvi.configResolved !== 'function' || !vvi.transform || typeof vvi.transform === 'function') throw new Error('Expected VVI hooks');
@@ -145,4 +146,4 @@ test('virtual VVI transform retains every settings/admin file containing search 
 		}
 	}
 	expect(checked).toBeGreaterThanOrEqual(29);
-});
+}, 30000);

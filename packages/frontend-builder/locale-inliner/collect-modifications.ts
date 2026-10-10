@@ -10,7 +10,7 @@ import type { ESTree } from 'rolldown/utils';
 import type { LocaleInliner, TextModification } from '../locale-inliner.js';
 import type { Logger } from '../logger.js';
 
-export function collectModifications(sourceCode: string, fileName: string, fileLogger: Logger, inliner: LocaleInliner): TextModification[] {
+export function collectModifications(sourceCode: string, fileName: string, fileLogger: Logger, inliner: Pick<LocaleInliner, 'scriptsDir' | 'i18nFileName' | 'i18nSymbol'>): TextModification[] {
 	if (sourceCode === '') return [];
 	let programNode: ESTree.Program;
 	try {

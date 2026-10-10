@@ -2,6 +2,7 @@ import path from 'path';
 import { createRequire } from 'node:module';
 import pluginVue from '@vitejs/plugin-vue';
 import { pluginHostLocaleEntries } from './lib/vite-plugin-host-locale-entries.js';
+import { pluginNoLegacyLabels } from './lib/vite-plugin-no-legacy-labels.js';
 import { pluginVvi } from './lib/vite-plugin-vvi.js';
 import { pluginFeatureDependencies } from './lib/vite-plugin-feature-dependencies.js';
 import pluginGlsl from 'vite-plugin-glsl';
@@ -149,6 +150,7 @@ export function getConfig(): UserConfig {
 			})),
 			pluginVue(),
 			pluginRemoveUnrefI18n(),
+			pluginNoLegacyLabels(),
 			pluginUnwindCssModuleClassName(),
 			pluginJson5(),
 			pluginGlsl({ minify: true }),
