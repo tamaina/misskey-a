@@ -21,6 +21,11 @@ on:
         description: 'Start Release Candidate'
         default: false
 
+# Serialize release mutations across branches; never cancel an active release.
+concurrency:
+  group: release-manager
+  cancel-in-progress: false
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -110,13 +115,28 @@ jobs:
           throw new Error('Version components must be safe integers');
         }
         // One-time migration from this fork's existing calendar series only.
-        // Once Release Manager rewrites package.json, this branch is unreachable.
-        if (major === 2026 && minor >= 1 && minor <= 12) return '9000.0.0';
-        if (major < 9000) throw new Error('Expected the 2026 calendar series or independent SemVer >= 9000');
-        const next = increment === 'major' ? [major + 1, 0, 0]
+        // Check repository history before Release Manager rewrites any files.
+        const transition = major === 2026 && minor >= 1 && minor <= 12;
+        if (!transition && major < 9000) throw new Error('Expected the 2026 calendar series or independent SemVer >= 9000');
+        const next = transition ? [9000, 0, 0]
+          : increment === 'major' ? [major + 1, 0, 0]
           : increment === 'minor' ? [major, minor + 1, 0]
           : [major, minor, patch + 1];
         if (!next.every(Number.isSafeInteger)) throw new Error('Version increment exceeds safe integers');
+        const tags = await github.paginate(github.rest.git.listMatchingRefs, { ...context.repo, ref: 'tags/' });
+        for (const tag of tags) {
+          const released = /^(?:v)?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-|$)/.exec(tag.ref.slice('refs/tags/'.length));
+          if (!released || Number(released[1]) < 9000) continue;
+          const core = released.slice(1, 4).map(Number);
+          const difference = next.map((value, index) => value - core[index]).find(value => value !== 0) ?? 0;
+          if (difference <= 0) throw new Error('Target must exceed every existing independent release tag; update the release branch');
+        }
+        const prs = await github.paginate(github.rest.pulls.list, {
+          ...context.repo, state: 'open', base: '${{ vars.STABLE_BRANCH }}',
+        });
+        if (prs.some(pr => /^Release: /.test(pr.title))) {
+          throw new Error('An existing release PR must be completed before creating another target');
+        }
         return next.join('.');
       package_jsons_to_rewrite: ${{ vars.PACKAGE_JSONS_TO_REWRITE }}
       use_external_app_to_release: true
