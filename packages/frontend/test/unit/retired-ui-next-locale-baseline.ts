@@ -12,6 +12,7 @@ import { locales as currentLocales } from './retired-ui-locale-baseline.js';
 import baseline from './retired-ui-next-locale-baseline.json';
 import type { Locale } from './retired-ui-next-locale-types.js';
 import { historicalPilotOwnerValue, verifyPilotOwnerLanguages } from './instance-pilot-locale-metadata.js';
+import { historicalFinalOwnerValue } from './final-owner-locale-baseline.js';
 
 export type { Locale } from './retired-ui-next-locale-types.js';
 const root = resolve(import.meta.dirname, '../../../..');
@@ -53,7 +54,7 @@ function ownerValue(index: number, language: string, path: string): string {
 	}
 	const value = valueAt(blocks.get(language), path);
 	if (typeof value !== 'string') throw new Error(`Missing UI owner text: ${index}:${language}:${path}`);
-	return historicalPilotOwnerValue(baseline.owners[index], language, path, value);
+	return historicalPilotOwnerValue(baseline.owners[index], language, path, historicalFinalOwnerValue(baseline.owners[index], language, path, value));
 }
 
 /** Reconstruct historical formatter inputs only after verifying independent,

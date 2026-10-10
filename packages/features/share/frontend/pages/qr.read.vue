@@ -413,15 +413,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="ar-SA" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "لم يُعثر على رمز QR",
+	"chooseCamera": "اختيار الكاميرا",
 	"somethingHappened": "حدث خطأ",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "مسح صورة من الجهاز",
+	"stopQr": "إيقاف قارئ رموز QR",
+	"startQr": "استئناف قارئ رموز QR",
+	"cannotToggleFlash": "تعذّر تشغيل ضوء الكاميرا أو إطفاؤه",
+	"turnOnFlash": "تشغيل ضوء الكاميرا",
+	"turnOffFlash": "إطفاء ضوء الكاميرا",
 	"users": "المستخدمون",
 	"notes": "الملاحظات",
 	"all": "الكل"
@@ -447,15 +447,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="cs-CZ" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Nebyl nalezen žádný QR kód",
+	"chooseCamera": "Vybrat kameru",
 	"somethingHappened": "Jejda. Něco se nepovedlo.",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Skenovat obrázek ze zařízení",
+	"stopQr": "Zastavit čtečku QR kódů",
+	"startQr": "Obnovit čtečku QR kódů",
+	"cannotToggleFlash": "Nelze zapnout nebo vypnout přisvícení",
+	"turnOnFlash": "Zapnout přisvícení",
+	"turnOffFlash": "Vypnout přisvícení",
 	"users": "Uživatelé",
 	"notes": "Poznámky",
 	"all": "Vše"
@@ -464,15 +464,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="da-DK" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Ingen QR-kode fundet",
+	"chooseCamera": "Vælg kamera",
 	"somethingHappened": "An error has occurred",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Scan et billede fra enheden",
+	"stopQr": "Stop QR-kodelæseren",
+	"startQr": "Genoptag QR-kodelæseren",
+	"cannotToggleFlash": "Kan ikke slå kameralyset til eller fra",
+	"turnOnFlash": "Tænd kameralyset",
+	"turnOffFlash": "Sluk kameralyset",
 	"users": "Users",
 	"notes": "Notes",
 	"all": "All"
@@ -532,15 +532,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="fr-FR" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Aucun code QR trouvé",
+	"chooseCamera": "Choisir une caméra",
 	"somethingHappened": "Une erreur est survenue",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Scanner une image depuis l’appareil",
+	"stopQr": "Arrêter le lecteur de codes QR",
+	"startQr": "Reprendre la lecture des codes QR",
+	"cannotToggleFlash": "Impossible d’activer ou de désactiver la lampe",
+	"turnOnFlash": "Allumer la lampe",
+	"turnOffFlash": "Éteindre la lampe",
 	"users": "Utilisateur·rice·s",
 	"notes": "Notes",
 	"all": "Tous"
@@ -549,15 +549,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="id-ID" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Tidak ditemukan kode QR",
+	"chooseCamera": "Pilih kamera",
 	"somethingHappened": "Terjadi kesalahan",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Pindai gambar dari perangkat",
+	"stopQr": "Hentikan pembaca kode QR",
+	"startQr": "Lanjutkan pembaca kode QR",
+	"cannotToggleFlash": "Tidak dapat menyalakan atau mematikan lampu kamera",
+	"turnOnFlash": "Nyalakan lampu kamera",
+	"turnOffFlash": "Matikan lampu kamera",
 	"users": "Pengguna",
 	"notes": "Catatan",
 	"all": "Semua"
@@ -617,15 +617,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="kab-KAB" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Ulac tangalt QR yettwafen",
+	"chooseCamera": "Fren takamiṛat",
 	"somethingHappened": "An error has occurred",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Sken tugna seg yibenk",
+	"stopQr": "Seḥbes imeɣri n tengalin QR",
+	"startQr": "Kemmel taɣuri n tengalin QR",
+	"cannotToggleFlash": "Ur nezmir ara ad nermed neɣ ad nessens tafat n tkamiṛat",
+	"turnOnFlash": "Rmed tafat n tkamiṛat",
+	"turnOffFlash": "Sens tafat n tkamiṛat",
 	"users": "Users",
 	"notes": "Notes",
 	"all": "All"
@@ -634,15 +634,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="kn-IN" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "QR ಕೋಡ್ ಕಂಡುಬಂದಿಲ್ಲ",
+	"chooseCamera": "ಕ್ಯಾಮೆರಾ ಆಯ್ಕೆಮಾಡಿ",
 	"somethingHappened": "An error has occurred",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "ಸಾಧನದಿಂದ ಚಿತ್ರವನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+	"stopQr": "QR ಕೋಡ್ ಓದುವಿಕೆಯನ್ನು ನಿಲ್ಲಿಸಿ",
+	"startQr": "QR ಕೋಡ್ ಓದುವಿಕೆಯನ್ನು ಮುಂದುವರಿಸಿ",
+	"cannotToggleFlash": "ಕ್ಯಾಮೆರಾ ಬೆಳಕನ್ನು ಆನ್ ಅಥವಾ ಆಫ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ",
+	"turnOnFlash": "ಕ್ಯಾಮೆರಾ ಬೆಳಕನ್ನು ಆನ್ ಮಾಡಿ",
+	"turnOffFlash": "ಕ್ಯಾಮೆರಾ ಬೆಳಕನ್ನು ಆಫ್ ಮಾಡಿ",
 	"users": "ಬಳಕೆದಾರ",
 	"notes": "Notes",
 	"all": "All"
@@ -668,15 +668,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="nl-NL" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Geen QR-code gevonden",
+	"chooseCamera": "Camera kiezen",
 	"somethingHappened": "Er is iets misgegaan.",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Een afbeelding van het apparaat scannen",
+	"stopQr": "QR-codelezer stoppen",
+	"startQr": "QR-codelezer hervatten",
+	"cannotToggleFlash": "Kan de cameralamp niet in- of uitschakelen",
+	"turnOnFlash": "Cameralamp inschakelen",
+	"turnOffFlash": "Cameralamp uitschakelen",
 	"users": "Gebruikers",
 	"notes": "Notities",
 	"all": "Alle"
@@ -685,15 +685,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="no-NO" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Ingen QR-kode funnet",
+	"chooseCamera": "Velg kamera",
 	"somethingHappened": "En feil har oppstått",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Skann et bilde fra enheten",
+	"stopQr": "Stopp QR-kodeleseren",
+	"startQr": "Gjenoppta QR-kodeleseren",
+	"cannotToggleFlash": "Kan ikke slå kameralyset på eller av",
+	"turnOnFlash": "Slå på kameralyset",
+	"turnOffFlash": "Slå av kameralyset",
 	"users": "Brukere",
 	"notes": "Notes",
 	"all": "Alle"
@@ -702,15 +702,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="pl-PL" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Nie znaleziono kodu QR",
+	"chooseCamera": "Wybierz kamerę",
 	"somethingHappened": "Coś poszło nie tak",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Skanuj obraz z urządzenia",
+	"stopQr": "Zatrzymaj czytnik kodów QR",
+	"startQr": "Wznów działanie czytnika kodów QR",
+	"cannotToggleFlash": "Nie można włączyć ani wyłączyć lampy",
+	"turnOnFlash": "Włącz lampę",
+	"turnOffFlash": "Wyłącz lampę",
 	"users": "Użytkownicy",
 	"notes": "Wpisy",
 	"all": "Wszystkie"
@@ -736,15 +736,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="ru-RU" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "QR-код не найден",
+	"chooseCamera": "Выбрать камеру",
 	"somethingHappened": "Что-то пошло не так",
 	"scanFile": "Отсканировать изображение с устройства",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"stopQr": "Остановить сканер QR-кодов",
+	"startQr": "Возобновить работу сканера QR-кодов",
+	"cannotToggleFlash": "Не удалось включить или выключить фонарик",
+	"turnOnFlash": "Включить фонарик",
+	"turnOffFlash": "Выключить фонарик",
 	"users": "Пользователи",
 	"notes": "Заметки",
 	"all": "Все"
@@ -753,15 +753,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="sk-SK" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Nenašiel sa žiadny QR kód",
+	"chooseCamera": "Vybrať kameru",
 	"somethingHappened": "Ups. Niečo sa nepodarilo.",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Skenovať obrázok zo zariadenia",
+	"stopQr": "Zastaviť čítačku QR kódov",
+	"startQr": "Obnoviť čítačku QR kódov",
+	"cannotToggleFlash": "Nedá sa zapnúť alebo vypnúť svetlo kamery",
+	"turnOnFlash": "Zapnúť svetlo kamery",
+	"turnOffFlash": "Vypnúť svetlo kamery",
 	"users": "Používatelia",
 	"notes": "Poznámky",
 	"all": "Všetko"
@@ -804,15 +804,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="ug-CN" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "QR كود تېپىلمىدى",
+	"chooseCamera": "كامېرا تاللاش",
 	"somethingHappened": "An error has occurred",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "ئۈسكۈنىدىكى رەسىمنى سىكاننېرلاش",
+	"stopQr": "QR كود ئوقۇغۇچنى توختىتىش",
+	"startQr": "QR كود ئوقۇغۇچنى قايتا داۋاملاشتۇرۇش",
+	"cannotToggleFlash": "كامېرا چىرىغىنى ياندۇرغىلى ياكى ئۆچۈرگىلى بولمىدى",
+	"turnOnFlash": "كامېرا چىرىغىنى ياندۇرۇش",
+	"turnOffFlash": "كامېرا چىرىغىنى ئۆچۈرۈش",
 	"users": "Users",
 	"notes": "Notes",
 	"all": "All"
@@ -821,15 +821,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="uk-UA" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "QR-код не знайдено",
+	"chooseCamera": "Вибрати камеру",
 	"somethingHappened": "Щось пішло не так",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Сканувати зображення з пристрою",
+	"stopQr": "Зупинити сканер QR-кодів",
+	"startQr": "Відновити роботу сканера QR-кодів",
+	"cannotToggleFlash": "Не вдалося ввімкнути або вимкнути ліхтарик",
+	"turnOnFlash": "Увімкнути ліхтарик",
+	"turnOffFlash": "Вимкнути ліхтарик",
 	"users": "Користувачі",
 	"notes": "Записи",
 	"all": "Всі"
@@ -838,15 +838,15 @@ html[data-color-scheme=light] .view {
 
 <locale locale="vi-VN" lang="json">
 {
-	"noQrCodeFound": "No QR code found",
-	"chooseCamera": "Choose camera",
+	"noQrCodeFound": "Không tìm thấy mã QR",
+	"chooseCamera": "Chọn camera",
 	"somethingHappened": "Xảy ra lỗi",
-	"scanFile": "Scan image from device",
-	"stopQr": "Stop QR code reader",
-	"startQr": "Resume QR code reader",
-	"cannotToggleFlash": "Unable to toggle flashlight",
-	"turnOnFlash": "Turn on flashlight",
-	"turnOffFlash": "Turn off flashlight",
+	"scanFile": "Quét ảnh từ thiết bị",
+	"stopQr": "Dừng trình đọc mã QR",
+	"startQr": "Tiếp tục trình đọc mã QR",
+	"cannotToggleFlash": "Không thể bật hoặc tắt đèn pin",
+	"turnOnFlash": "Bật đèn pin",
+	"turnOffFlash": "Tắt đèn pin",
 	"users": "Người dùng",
 	"notes": "Bài Viết",
 	"all": "Tất cả"
