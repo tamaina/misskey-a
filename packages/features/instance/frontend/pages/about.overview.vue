@@ -22,14 +22,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<FormSection>
 		<div class="_gaps_m">
 			<MkKeyValue :copy="version">
-				<template #key>Misskey</template>
+				<template #key>{{ productName }}</template>
 				<template #value>{{ version }}</template>
 			</MkKeyValue>
 			<div v-html="interpolateLocaleParameters($locale.sfc.poweredByMisskeyDescription, { name: instance.name ?? host })">
 			</div>
 			<FormLink to="/about-misskey">
 				<template #icon><i class="ti ti-info-circle"></i></template>
-				{{ $locale.sfc.aboutMisskey }}
+				{{ interpolateLocaleParameters($locale.sfc.aboutMisskey, { productName }) }}
 			</FormLink>
 			<FormLink v-if="instance.repositoryUrl || instance.providesTarball" :to="instance.repositoryUrl || `/tarball/misskey-${version}.tar.gz`" external>
 				<template #icon><i class="ti ti-code"></i></template>
@@ -126,7 +126,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { host, version } from '@features/boot/frontend/shared/config.js';
+import { host, version, productName } from '@features/boot/frontend/shared/config.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import number from '@features/ui/frontend/filters/number.js';
@@ -208,7 +208,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "الوصف",
 	"poweredByMisskeyDescription": "{name} هو إحدى الخِدمات التي تستخدم المنصة مفتوحة المصدر <b>ميسكي</b> (يشار إليه كمثيل ميسكي)",
-	"aboutMisskey": "عن Misskey",
+	"aboutMisskey": "عن {productName}",
 	"sourceCode": "الشفرة المصدرية",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "المدير",
@@ -230,7 +230,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Descripció",
 	"poweredByMisskeyDescription": "{name} És un dels serveis (anomenats instàncies de Misskey) que utilitzen la plataforma de codi obert <b>Misskey</b>.",
-	"aboutMisskey": "Quant a Misskey",
+	"aboutMisskey": "Quant a {productName}",
 	"sourceCode": "Codi font",
 	"sourceCodeIsNotYetProvided": "El codi font encara no es troba disponible. Contacta amb l'administrador per solucionar aquest problema.",
 	"administrator": "Administrador/a",
@@ -252,7 +252,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Popis",
 	"poweredByMisskeyDescription": "{name} je jeden ze serverů využívající open source platformu <b>Misskey<b> (nazývaná \"Misskey instance\").",
-	"aboutMisskey": "O Misskey",
+	"aboutMisskey": "O {productName}",
 	"sourceCode": "Zdrojový kód",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Administrátor",
@@ -274,7 +274,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Description",
 	"poweredByMisskeyDescription": "{name} is one of the services powered by the open source platform <b>Misskey</b> (referred to as a \"Misskey instance\").",
-	"aboutMisskey": "About Misskey",
+	"aboutMisskey": "About {productName}",
 	"sourceCode": "Source code",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Administrator",
@@ -296,7 +296,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Beschreibung",
 	"poweredByMisskeyDescription": "{name} ist einer der durch die Open-Source-Plattform <b>Misskey</b> betriebenen Dienste.",
-	"aboutMisskey": "Über Misskey",
+	"aboutMisskey": "Über {productName}",
 	"sourceCode": "Quellcode",
 	"sourceCodeIsNotYetProvided": "Der Quellcode ist noch nicht verfügbar. Kontaktiere den Administrator, um das Problem zu lösen.",
 	"administrator": "Administrator",
@@ -318,7 +318,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Description",
 	"poweredByMisskeyDescription": "{name} is one of the services powered by the open source platform <b>Misskey</b> (referred to as a \"Misskey instance\").",
-	"aboutMisskey": "About Misskey",
+	"aboutMisskey": "About {productName}",
 	"sourceCode": "Source code",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Administrator",
@@ -340,7 +340,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Descripción",
 	"poweredByMisskeyDescription": "{name} es uno de los servicios (también llamado instancia) que usa la plataforma de código abierto <b>Misskey</b>",
-	"aboutMisskey": "Sobre Misskey",
+	"aboutMisskey": "Sobre {productName}",
 	"sourceCode": "Código fuente",
 	"sourceCodeIsNotYetProvided": "El código fuente aún no está disponible. Contacta con el administrador para solucionarlo.",
 	"administrator": "Administrador",
@@ -362,7 +362,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Description",
 	"poweredByMisskeyDescription": "{name} est l'un des services propulsés par la plateforme ouverte <b>Misskey</b> (appelée \"instance Misskey\").",
-	"aboutMisskey": "À propos de Misskey",
+	"aboutMisskey": "À propos de {productName}",
 	"sourceCode": "Code source",
 	"sourceCodeIsNotYetProvided": "Le code source n'est pas encore disponible. Veuillez signaler ce problème aux administrateurs.",
 	"administrator": "Administrateur",
@@ -384,7 +384,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Deskripsi",
 	"poweredByMisskeyDescription": "{name} adalah sebuah layanan (instance) yang menggunakan platform sumber terbuka <b>Misskey</b>.",
-	"aboutMisskey": "Tentang Misskey",
+	"aboutMisskey": "Tentang {productName}",
 	"sourceCode": "Sumber kode",
 	"sourceCodeIsNotYetProvided": "Sumber kode belum tersedia. Hubungi admin untuk memperbaiki masalah ini.",
 	"administrator": "Admin",
@@ -406,7 +406,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Descrizione",
 	"poweredByMisskeyDescription": "{name} è uno dei servizi (chiamati istanze) che utilizzano la piattaforma open source <b>Misskey</b>.",
-	"aboutMisskey": "A proposito di Misskey",
+	"aboutMisskey": "A proposito di {productName}",
 	"sourceCode": "Codice sorgente",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Amministratore",
@@ -428,7 +428,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "説明",
 	"poweredByMisskeyDescription": "{name}は、オープンソースのプラットフォーム<b>Misskey</b>のサーバーのひとつです。",
-	"aboutMisskey": "Misskeyについて",
+	"aboutMisskey": "{productName}について",
 	"sourceCode": "ソースコード",
 	"sourceCodeIsNotYetProvided": "ソースコードはまだ提供されていません。この問題の修正について管理者に問い合わせてください。",
 	"administrator": "管理者",
@@ -450,7 +450,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "説明",
 	"poweredByMisskeyDescription": "{name}は、オープンソースのプラットフォーム<b>Misskey</b>のサーバーのひとつなんやで。",
-	"aboutMisskey": "Misskeyってなんや？",
+	"aboutMisskey": "{productName}ってなんや？",
 	"sourceCode": "ソースコード",
 	"sourceCodeIsNotYetProvided": "ソースコードはまだ提供されてへんで。問題の修正について管理者に問い合わせてみ。",
 	"administrator": "管理者",
@@ -472,7 +472,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Description",
 	"poweredByMisskeyDescription": "{name} is one of the services powered by the open source platform <b>Misskey</b> (referred to as a \"Misskey instance\").",
-	"aboutMisskey": "About Misskey",
+	"aboutMisskey": "About {productName}",
 	"sourceCode": "Source code",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Administrator",
@@ -494,7 +494,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Description",
 	"poweredByMisskeyDescription": "{name} is one of the services powered by the open source platform <b>Misskey</b> (referred to as a \"Misskey instance\").",
-	"aboutMisskey": "About Misskey",
+	"aboutMisskey": "About {productName}",
 	"sourceCode": "Source code",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Administrator",
@@ -516,7 +516,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "설명",
 	"poweredByMisskeyDescription": "{name} 서버는 오픈소스 플랫폼 <b>Misskey</b>의 서버 가운데 하나입니다.",
-	"aboutMisskey": "Misskey에 대하여",
+	"aboutMisskey": "{productName}에 대하여",
 	"sourceCode": "소스 코드",
 	"sourceCodeIsNotYetProvided": "소스 코드를 아직 제공하지 않습니다. 이 문제를 해결하려면 관리자에게 문의해 주세요.",
 	"administrator": "관리자",
@@ -538,7 +538,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Beschrijving",
 	"poweredByMisskeyDescription": "{name} is één van de services die door het open source platform <b>Misskey</b> wordt geleverd (het wordt ook wel een \"Misskey server genmoemd\").",
-	"aboutMisskey": "Over Misskey",
+	"aboutMisskey": "Over {productName}",
 	"sourceCode": "Source code",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Beheerder",
@@ -560,7 +560,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Beskrivelse",
 	"poweredByMisskeyDescription": "{name} is one of the services powered by the open source platform <b>Misskey</b> (referred to as a \"Misskey instance\").",
-	"aboutMisskey": "Om Misskey",
+	"aboutMisskey": "Om {productName}",
 	"sourceCode": "Source code",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Administrator",
@@ -582,7 +582,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Opis",
 	"poweredByMisskeyDescription": "{name} jest jedną z usług działającą na otwartoźródłowej platformie <b>Misskey</b> (określana jako \"instancja Misskey\").",
-	"aboutMisskey": "O Misskey",
+	"aboutMisskey": "O {productName}",
 	"sourceCode": "Kod źródłowy",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Admin",
@@ -604,7 +604,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Descrição",
 	"poweredByMisskeyDescription": "{name} é uma instância da plataforma de código aberto <b>Misskey</b>.",
-	"aboutMisskey": "Sobre Misskey",
+	"aboutMisskey": "Sobre {productName}",
 	"sourceCode": "Código-fonte",
 	"sourceCodeIsNotYetProvided": "Código-fonte está indisponível. Contate o administrador para resolver esse problema.",
 	"administrator": "Administrador",
@@ -626,7 +626,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Описание",
 	"poweredByMisskeyDescription": "{name} – один из инстансов (также называемый экземпляром Misskey), использующий платформу с открытым исходным кодом <b>Misskey</b>.",
-	"aboutMisskey": "О Misskey",
+	"aboutMisskey": "О {productName}",
 	"sourceCode": "Исходный код",
 	"sourceCodeIsNotYetProvided": "Исходный код пока не доступен. Свяжитесь с администратором, чтобы исправить эту проблему.",
 	"administrator": "Администратор",
@@ -648,7 +648,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Popis",
 	"poweredByMisskeyDescription": "{name} je jedným zo serverov využívajúcich open source platformu <b>Misskey</b> (nazývaných Misskey inštancia).",
-	"aboutMisskey": "O Misskey",
+	"aboutMisskey": "O {productName}",
 	"sourceCode": "Zdrojový kód",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Administrátor",
@@ -670,7 +670,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "คำอธิบาย",
 	"poweredByMisskeyDescription": "{name} เป็นหนึ่งในเซิร์ฟเวอร์ของแพลตฟอร์มโอเพ่นซอร์ส <b>Misskey</b>",
-	"aboutMisskey": "เกี่ยวกับ Misskey",
+	"aboutMisskey": "เกี่ยวกับ {productName}",
 	"sourceCode": "ซอร์สโค้ด",
 	"sourceCodeIsNotYetProvided": "ซอร์สโค้ดยังไม่พร้อมใช้งาน โปรดติดต่อผู้ดูแลระบบเพื่อแก้ไขปัญหานี้",
 	"administrator": "ผู้ดูแลระบบ",
@@ -692,7 +692,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Açıklama",
 	"poweredByMisskeyDescription": "{name}, açık kaynak platformu <b>Misskey</b> (kısaca “Misskey örneği” olarak anılır) tarafından desteklenen hizmetlerden biridir.",
-	"aboutMisskey": "Misskey Hakkında",
+	"aboutMisskey": "{productName} Hakkında",
 	"sourceCode": "Kaynak kodu",
 	"sourceCodeIsNotYetProvided": "Kaynak kodu henüz mevcut değildir. Bu sorunu gidermek için yöneticiyle iletişime geçin.",
 	"administrator": "Yönetici",
@@ -714,7 +714,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Description",
 	"poweredByMisskeyDescription": "{name} is one of the services powered by the open source platform <b>Misskey</b> (referred to as a \"Misskey instance\").",
-	"aboutMisskey": "About Misskey",
+	"aboutMisskey": "About {productName}",
 	"sourceCode": "Source code",
 	"sourceCodeIsNotYetProvided": "Source code is not yet available. Contact the administrator to fix this problem.",
 	"administrator": "Administrator",
@@ -736,7 +736,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Опис",
 	"poweredByMisskeyDescription": "{name} є одним із сервісів (які називаються інстансами Misskey), що використовують платформу з відкритим вихідним кодом <b>Misskey</b>.",
-	"aboutMisskey": "Про Misskey",
+	"aboutMisskey": "Про {productName}",
 	"sourceCode": "Вихідний код",
 	"sourceCodeIsNotYetProvided": "Вихідний код ще недоступний. Зверніться до адміністратора, щоб виправити цю проблему.",
 	"administrator": "Адмін",
@@ -758,7 +758,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "Mô tả",
 	"poweredByMisskeyDescription": "{name} là một trong những chủ máy của <b>Misskey</b> là nền tảng mã nguồn mở",
-	"aboutMisskey": "Về Misskey",
+	"aboutMisskey": "Về {productName}",
 	"sourceCode": "Mã nguồn",
 	"sourceCodeIsNotYetProvided": "Mã nguồn hiện chưa có sẵn, vui lòng liên hệ với quản trị viên để khắc phục sự cố này.",
 	"administrator": "Quản trị viên",
@@ -780,7 +780,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "描述",
 	"poweredByMisskeyDescription": "{name} 是开源平台 <b>Misskey</b> 的服务器之一。",
-	"aboutMisskey": "关于 Misskey",
+	"aboutMisskey": "关于 {productName}",
 	"sourceCode": "源代码",
 	"sourceCodeIsNotYetProvided": "还未提供源代码。要解决此问题请联系管理员。",
 	"administrator": "管理员",
@@ -802,7 +802,7 @@ const initStats = () => misskeyApi('stats', {});
 {
 	"description": "描述",
 	"poweredByMisskeyDescription": "{name}是開放原始碼平臺 <b>Misskey</b> 的伺服器之一。",
-	"aboutMisskey": "關於 Misskey",
+	"aboutMisskey": "關於 {productName}",
 	"sourceCode": "原始碼",
 	"sourceCodeIsNotYetProvided": "尚未提供原始碼，請洽詢管理員解決這個問題。",
 	"administrator": "管理員",

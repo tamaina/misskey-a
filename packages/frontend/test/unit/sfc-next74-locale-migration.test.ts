@@ -208,7 +208,14 @@ describe('next74 static raw-label ownership', () => {
 	});
 
 	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', async migration => {
-		const source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, restoreEmailHistoricalSource(migration.file, restoreFinalOwnerHistoricalSource(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8')))));
+		let source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, restoreEmailHistoricalSource(migration.file, restoreFinalOwnerHistoricalSource(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8')))));
+		if (migration.file === 'packages/features/boot/frontend/pages/welcome.setup.vue') {
+			// Verify the later product label, then preserve this migration's frozen source oracle.
+			expect(source).toContain('<div>Welcome to {{ productName }}!</div>');
+			expect(source).toContain('import { host, version, productName }');
+			source = source.replace('<div>Welcome to {{ productName }}!</div>', '<div>Welcome to Misskey!</div>')
+				.replace('import { host, version, productName }', 'import { host, version }');
+		}
 		const blocks = getBlocks(migration.file);
 		expect([...blocks.keys()]).toEqual([...languages]);
 		expect(source).not.toContain(legacyImport);

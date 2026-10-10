@@ -1,9 +1,14 @@
 <div align="center">
+
+# Misskey 9000
+
 <a href="https://misskey-hub.net">
 	<img src="./assets/title_float.svg" alt="Misskey logo" style="border-radius:50%" width="300"/>
 </a>
 
-**🌎 **Misskey** is an open source, federated social media platform that's free forever! 🚀**
+**🌎 Misskey 9000 is an open source, federated social media platform that's free forever! 🚀**
+
+A fork of [Misskey](https://github.com/misskey-dev/misskey).
 
 [Learn more](https://misskey-hub.net/)
 
@@ -19,7 +24,7 @@
 		<img src="https://custom-icon-badges.herokuapp.com/badge/become_a-contributor-A371F7?logoColor=A371F7&style=for-the-badge&logo=git-merge&labelColor=363B40" alt="become a contributor"/></a>
 
 <a href="https://github.com/tamaina/misskey-a/issues">
-		<img src="https://custom-icon-badges.herokuapp.com/badge/project-issues-5865F2?logoColor=5865F2&style=for-the-badge&logo=github&labelColor=363B40" alt="misskey-a support and feedback"/></a>
+		<img src="https://custom-icon-badges.herokuapp.com/badge/project-issues-5865F2?logoColor=5865F2&style=for-the-badge&logo=github&labelColor=363B40" alt="Misskey 9000 support and feedback"/></a>
 
 <a href="https://www.patreon.com/syuilo">
 		<img src="https://custom-icon-badges.herokuapp.com/badge/become_a-patron-F96854?logoColor=F96854&style=for-the-badge&logo=patreon&labelColor=363B40" alt="become a patron"/></a>

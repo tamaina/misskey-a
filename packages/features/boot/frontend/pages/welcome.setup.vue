@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</g>
 			</svg>
 			<div :class="$style.title">
-				<div>Welcome to Misskey!</div>
+				<div>Welcome to {{ productName }}!</div>
 				<div :class="$style.version">v{{ version }}</div>
 			</div>
 			<div style="padding: 16px 32px 32px 32px;">
@@ -125,7 +125,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { host, version } from '@features/boot/frontend/shared/config.js';
+import { host, version, productName } from '@features/boot/frontend/shared/config.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import * as os from '@features/ui/frontend/os.js';
