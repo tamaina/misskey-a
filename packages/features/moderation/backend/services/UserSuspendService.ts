@@ -5,17 +5,20 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import type { FollowingsRepository, FollowRequestsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiUser } from '@features/users/backend/models/User.js';
+import type { MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
 import { ModerationLogService } from './ModerationLogService.js';
+import { AccountUpdateService } from '@features/users/backend/services/AccountUpdateService.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { ApLoggerService } from '@features/federation/backend/services/ApLoggerService.js';
 
 @Injectable()
 export class UserSuspendService {
+	private logger: Logger;
+
 	constructor(
 		@Inject(DI.usersRepository)
 		private usersRepository: UsersRepository,
@@ -28,10 +31,11 @@ export class UserSuspendService {
 
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
-		private apRendererService: ApRendererService,
-		private apDeliverManagerService: ApDeliverManagerService,
+		private accountUpdateService: AccountUpdateService,
 		private moderationLogService: ModerationLogService,
+		private apLoggerService: ApLoggerService,
 	) {
+		this.logger = this.apLoggerService.logger.createSubLogger('user-suspend');
 	}
 
 	@bindThis
@@ -45,7 +49,20 @@ export class UserSuspendService {
 		});
 
 		(async () => {
-			await this.postSuspend(user).catch(_ => {});
+			await this.postSuspend(user, false).catch(err => {
+				this.logger.error('postSuspend failed', { userId: user.id, err });
+			});
+		})();
+	}
+
+	@bindThis
+	public async suspendFromRemote(user: { id: MiRemoteUser['id']; host: MiRemoteUser['host'] }): Promise<void> {
+		if (!await this.updateSuspendedState(user.id, true, 'isRemoteSuspended')) return;
+
+		(async () => {
+			await this.postSuspend(user, true).catch(err => {
+				this.logger.error('postSuspend from remote failed', { userId: user.id, err });
+			});
 		})();
 	}
 
@@ -60,52 +77,71 @@ export class UserSuspendService {
 		});
 
 		(async () => {
-			await this.postUnsuspend(user).catch(_ => {});
+			await this.postUnsuspend(user, false).catch(err => {
+				this.logger.error('postUnsuspend failed', { userId: user.id, err });
+			});
 		})();
 	}
 
 	@bindThis
-	private async postSuspend(user: { id: MiUser['id']; host: MiUser['host'] }): Promise<void> {
-		this.globalEventService.publishInternalEvent('userChangeSuspendedState', { id: user.id, isSuspended: true });
+	public async unsuspendFromRemote(user: { id: MiRemoteUser['id']; host: MiRemoteUser['host'] }): Promise<void> {
+		if (!await this.updateSuspendedState(user.id, false, 'isRemoteSuspended')) return;
 
-		this.followRequestsRepository.delete({
-			followeeId: user.id,
-		});
-		this.followRequestsRepository.delete({
-			followerId: user.id,
-		});
+		(async () => {
+			await this.postUnsuspend(user, true).catch(err => {
+				this.logger.error('postUnsuspend from remote failed', { userId: user.id, err });
+			});
+		})();
+	}
+
+	@bindThis
+	private async postSuspend(user: { id: MiUser['id']; host: MiUser['host'] }, isFromRemote: boolean): Promise<void> {
+		this.globalEventService.publishInternalEvent(
+			'userChangeSuspendedState',
+			isFromRemote ? { id: user.id, isRemoteSuspended: true } : { id: user.id, isSuspended: true }
+		);
+
+		if (!isFromRemote) {
+			this.followRequestsRepository.delete({
+				followeeId: user.id,
+			});
+			this.followRequestsRepository.delete({
+				followerId: user.id,
+			});
+		}
 
 		if (this.userEntityService.isLocalUser(user)) {
-			const content = this.apRendererService.addContext(this.apRendererService.renderDelete(this.userEntityService.genLocalUserUri(user.id), user));
-			const manager = this.apDeliverManagerService.createDeliverManager(user, content);
-			manager.addAllKnowingSharedInboxRecipe();
-			manager.addFollowersRecipe();
-			await manager.execute();
+			await this.accountUpdateService.publishToFollowersAndSharedInboxAndRelays(user.id);
 		}
 	}
 
 	@bindThis
-	private async postUnsuspend(user: MiUser): Promise<void> {
-		this.globalEventService.publishInternalEvent('userChangeSuspendedState', { id: user.id, isSuspended: false });
+	private async postUnsuspend(user: { id: MiUser['id']; host: MiUser['host'] }, isFromRemote: boolean): Promise<void> {
+		this.globalEventService.publishInternalEvent(
+			'userChangeSuspendedState',
+			isFromRemote ? { id: user.id, isRemoteSuspended: false } : { id: user.id, isSuspended: false }
+		);
 
 		if (this.userEntityService.isLocalUser(user)) {
-			const content = this.apRendererService.addContext(this.apRendererService.renderUndo(this.apRendererService.renderDelete(this.userEntityService.genLocalUserUri(user.id), user), user));
-			const manager = this.apDeliverManagerService.createDeliverManager(user, content);
-			manager.addAllKnowingSharedInboxRecipe();
-			manager.addFollowersRecipe();
-			await manager.execute();
+			await this.accountUpdateService.publishToFollowersAndSharedInboxAndRelays(user.id);
 		}
 	}
 
 	@bindThis
-	private async updateSuspendedState(userId: MiUser['id'], isSuspended: boolean): Promise<void> {
-		await this.usersRepository.manager.transaction(async manager => {
-			// The user row is also locked before inserting a following.
-			await manager.getRepository(this.usersRepository.target).update(userId, { isSuspended });
+	private async updateSuspendedState(userId: MiUser['id'], value: boolean, field: 'isSuspended' | 'isRemoteSuspended' = 'isSuspended'): Promise<boolean> {
+		return await this.usersRepository.manager.transaction(async manager => {
+			const users = manager.getRepository(this.usersRepository.target);
+			// Share the row lock with follow insertion and the other suspension flag.
+			const current = await users.findOne({ where: { id: userId }, lock: { mode: 'for_no_key_update' } });
+			if (current == null || (field === 'isRemoteSuspended' && current.host == null)) return false;
+			const changed = current[field] !== value;
+			await users.update(userId, { [field]: value });
+			current[field] = value;
 			await manager.getRepository(this.followingsRepository.target).update(
 				{ followerId: userId },
-				{ isFollowerSuspended: isSuspended },
+				{ isFollowerSuspended: current.isSuspended || current.isRemoteSuspended },
 			);
+			return changed;
 		});
 	}
 }

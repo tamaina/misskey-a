@@ -22,7 +22,8 @@ export function createUsersProcedure(deps: UsersDependencies) {
 	async function execute(ps: UsersInputs['users'], me: MiLocalUser | null, _token: ApiToken | null, _ip: string) {
 		const query = deps.usersRepository.createQueryBuilder('user')
 			.where('user.isExplorable = TRUE')
-			.andWhere('user.isSuspended = FALSE');
+			.andWhere('user.isSuspended = FALSE')
+			.andWhere('user.isRemoteSuspended = FALSE');
 
 		switch (ps.state) {
 			case 'alive': query.andWhere('user.updatedAt > :date', { date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5) }); break;

@@ -42,7 +42,7 @@ export class ApImageService {
 	@bindThis
 	public async createImage(actor: MiRemoteUser, value: string | IObject): Promise<MiDriveFile | null> {
 		// 投稿者が凍結されていたらスキップ
-		if (actor.isSuspended) {
+		if ((actor.isSuspended || actor.isRemoteSuspended)) {
 			throw new Error('actor has been suspended');
 		}
 

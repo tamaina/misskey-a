@@ -54,6 +54,7 @@ export function createUsersShowProcedure(deps: UsersShowDependencies) {
 			} : {
 				id: In(ps.userIds),
 				isSuspended: false,
+				isRemoteSuspended: false,
 				...(deps.serverSettings.ugcVisibilityForVisitor === 'local' && me == null ? { host: IsNull() } : {}),
 			});
 
@@ -91,7 +92,7 @@ export function createUsersShowProcedure(deps: UsersShowDependencies) {
 				user = await deps.usersRepository.findOneBy(q);
 			}
 
-			if (user == null || (!isModerator && user.isSuspended)) {
+			if (user == null || (!isModerator && deps.userEntityService.isSuspendedEither(user))) {
 				throw apiError(usersShowErrors.noSuchUser);
 			}
 

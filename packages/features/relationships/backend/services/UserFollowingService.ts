@@ -119,7 +119,7 @@ export class UserFollowingService implements OnModuleInit {
 		]) as [MiLocalUser | MiRemoteUser, MiLocalUser | MiRemoteUser];
 
 		// Queued relationship work may outlive the account's active state.
-		if (follower.isSuspended) return;
+		if (this.userEntityService.isSuspendedEither(follower)) return;
 
 		if (this.userEntityService.isRemoteUser(follower) && this.userEntityService.isRemoteUser(followee)) {
 			// What?
@@ -262,7 +262,7 @@ export class UserFollowingService implements OnModuleInit {
 				followerId: follower.id,
 				followeeId: followee.id,
 				withReplies: withReplies,
-				isFollowerSuspended: currentFollower.isSuspended,
+				isFollowerSuspended: this.userEntityService.isSuspendedEither(currentFollower),
 
 				// 非正規化
 				followerHost: follower.host,

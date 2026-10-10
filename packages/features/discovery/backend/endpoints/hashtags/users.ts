@@ -21,7 +21,8 @@ export function createHashtagsUsersProcedure<Actor extends MiLocalUser>(deps: Ha
 		if (!safeForSql(normalizeForSearch(ps.tag))) throw new Error('Injection');
 		const query = deps.usersRepository.createQueryBuilder('user')
 			.where(':tag <@ user.tags', { tag: [normalizeForSearch(ps.tag)] })
-			.andWhere('user.isSuspended = FALSE');
+			.andWhere('user.isSuspended = FALSE')
+			.andWhere('user.isRemoteSuspended = FALSE');
 
 		const recent = new Date(Date.now() - (1000 * 60 * 60 * 24 * 5));
 
