@@ -12,13 +12,13 @@ import { pilotContract } from '@features/index/backend/api.definition.js';
 import { requestRoutes } from '@features/api/shared/api-routing.js';
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
-const repositoryRoot = path.resolve(testDirectory, '../../..');
-const backendSourceRoot = testDirectory;
+const repositoryRoot = path.resolve(testDirectory, '../../../../..');
+const backendSourceRoot = path.resolve(repositoryRoot, 'packages/backend/src');
 const featureRoot = path.resolve(repositoryRoot, 'packages/features');
 const endpointRegistryPath = path.resolve(featureRoot, 'index/backend/endpoint-list.ts');
-const expectedRouteOrder = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-api-registry-order.json'), 'utf8')) as string[];
+const expectedRouteOrder = JSON.parse(readFileSync(path.resolve(repositoryRoot, 'packages/backend/test/fixtures/backend-api-registry-order.json'), 'utf8')) as string[];
 const nativeRoutes = new Set(requestRoutes(pilotContract).map(route => route.name));
-const removedBridgePaths = JSON.parse(readFileSync(path.resolve(testDirectory, '../test/fixtures/backend-feature-bridge-removal.json'), 'utf8')) as string[];
+const removedBridgePaths = JSON.parse(readFileSync(path.resolve(repositoryRoot, 'packages/backend/test/fixtures/backend-feature-bridge-removal.json'), 'utf8')) as string[];
 const removedBridgeStems = new Set(removedBridgePaths.map(bridgePath => path.resolve(repositoryRoot, bridgePath).replace(/\.tsx?$/, '')));
 
 type ModuleReference = { specifier: string; line: number };
