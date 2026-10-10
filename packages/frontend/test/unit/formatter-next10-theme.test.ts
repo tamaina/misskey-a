@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { createApp, defineComponent, h } from 'vue';
 import { cleanup, fireEvent, render } from '@testing-library/vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import { locales } from 'i18n';
+import { locales } from './retired-drive-locale-baseline.js';
 import ThemeInstall from '@features/preferences/frontend/pages/settings/theme.install.vue';
 import ThemeEditor from '@features/preferences/frontend/pages/theme-editor.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
