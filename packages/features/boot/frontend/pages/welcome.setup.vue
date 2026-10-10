@@ -7,45 +7,47 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithAnimBg>
 	<div :class="$style.formContainer">
 		<div :class="$style.form" class="_panel">
-			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="z-index:1;position:relative" viewBox="0 0 854 300">
-				<defs>
-					<linearGradient id="linear" x1="0%" y1="0%" x2="100%" y2="0%">
-						<stop offset="0%" stop-color="#86b300"/><stop offset="100%" stop-color="#4ab300"/>
-					</linearGradient>
-				</defs>
+			<div :class="$style.header">
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="z-index:1;position:relative" viewBox="0 0 854 300">
+					<defs>
+						<linearGradient id="linear" x1="0%" y1="0%" x2="100%" y2="0%">
+							<stop offset="0%" stop-color="#86b300"/><stop offset="100%" stop-color="#4ab300"/>
+						</linearGradient>
+					</defs>
 
-				<g transform="translate(427, 150) scale(1, 1) translate(-427, -150)">
-					<path d="" fill="url(#linear)" opacity="0.4">
-						<animate
-							attributeName="d"
-							dur="20s"
-							repeatCount="indefinite"
-							keyTimes="0;0.333;0.667;1"
-							calcmod="spline"
-							keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
-							begin="0s"
-							values="M0 0L 0 220Q 213.5 260 427 230T 854 255L 854 0 Z;M0 0L 0 245Q 213.5 260 427 240T 854 230L 854 0 Z;M0 0L 0 265Q 213.5 235 427 265T 854 230L 854 0 Z;M0 0L 0 220Q 213.5 260 427 230T 854 255L 854 0 Z"
-						>
-						</animate>
-					</path>
-					<path d="" fill="url(#linear)" opacity="0.4">
-						<animate
-							attributeName="d"
-							dur="20s"
-							repeatCount="indefinite"
-							keyTimes="0;0.333;0.667;1"
-							calcmod="spline"
-							keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
-							begin="-10s"
-							values="M0 0L 0 235Q 213.5 280 427 250T 854 260L 854 0 Z;M0 0L 0 250Q 213.5 220 427 220T 854 240L 854 0 Z;M0 0L 0 245Q 213.5 225 427 250T 854 265L 854 0 Z;M0 0L 0 235Q 213.5 280 427 250T 854 260L 854 0 Z"
-						>
-						</animate>
-					</path>
-				</g>
-			</svg>
-			<div :class="$style.title">
-				<div>Welcome to {{ productName }}!</div>
-				<div :class="$style.version">v{{ version }}</div>
+					<g transform="translate(427, 150) scale(1, 1) translate(-427, -150)">
+						<path d="" fill="url(#linear)" opacity="0.4">
+							<animate
+								attributeName="d"
+								dur="20s"
+								repeatCount="indefinite"
+								keyTimes="0;0.333;0.667;1"
+								calcmod="spline"
+								keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
+								begin="0s"
+								values="M0 0L 0 220Q 213.5 260 427 230T 854 255L 854 0 Z;M0 0L 0 245Q 213.5 260 427 240T 854 230L 854 0 Z;M0 0L 0 265Q 213.5 235 427 265T 854 230L 854 0 Z;M0 0L 0 220Q 213.5 260 427 230T 854 255L 854 0 Z"
+							>
+							</animate>
+						</path>
+						<path d="" fill="url(#linear)" opacity="0.4">
+							<animate
+								attributeName="d"
+								dur="20s"
+								repeatCount="indefinite"
+								keyTimes="0;0.333;0.667;1"
+								calcmod="spline"
+								keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
+								begin="-10s"
+								values="M0 0L 0 235Q 213.5 280 427 250T 854 260L 854 0 Z;M0 0L 0 250Q 213.5 220 427 220T 854 240L 854 0 Z;M0 0L 0 245Q 213.5 225 427 250T 854 265L 854 0 Z;M0 0L 0 235Q 213.5 280 427 250T 854 260L 854 0 Z"
+							>
+							</animate>
+						</path>
+					</g>
+				</svg>
+				<div :class="$style.title">
+					<div>Welcome to {{ productName }}!</div>
+					<div :class="$style.version">v{{ version }}</div>
+				</div>
 			</div>
 			<div style="padding: 16px 32px 32px 32px;">
 				<form v-if="!accountCreated" class="_gaps_m" @submit.prevent="createAccount()">
@@ -212,16 +214,23 @@ function finish() {
 	margin: 0 auto;
 }
 
+.header {
+	display: grid;
+
+	> svg {
+		grid-area: 1 / 1;
+		width: 100%;
+	}
+}
+
 .title {
-	position: absolute;
-	top: 16px;
-	left: 0;
-	right: 0;
+	position: relative;
+	grid-area: 1 / 1;
 	z-index: 1;
 	margin: 0;
 	font-size: 1.5em;
 	text-align: center;
-	padding: 32px;
+	padding: 48px 32px 32px;
 	color: #fff;
 	font-weight: bold;
 }

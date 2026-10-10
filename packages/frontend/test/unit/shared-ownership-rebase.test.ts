@@ -5,6 +5,7 @@
 
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { restoreProductNameBaseline } from './product-name-source-rebase.js';
 import { restoreRssContractBaseline } from './rss-contract-source-rebase.js';
 import { resolve } from 'node:path';
 import { describe, expect, test } from 'vitest';
@@ -19,7 +20,7 @@ describe('shared ownership import-only fixture rebases', () => {
 	test.each(proofs)('$file keeps the verified old source, identical import rewrite and every locale byte', proof => {
 		const rewrite = (source: string) => proof.rewrites.reduce((current, edit) => current.split(edit.source).join(edit.replacement), source);
 		expect(sha256(proof.originalSource)).toBe(proof.oldOriginalSha256);
-		const source = restoreRssContractBaseline(proof.file, restorePilotHistoricalSource(proof.file, restoreFinalOwnerHistoricalSource(proof.file, readFileSync(resolve(root, proof.file), 'utf8'))));
+		const source = restoreRssContractBaseline(proof.file, restorePilotHistoricalSource(proof.file, restoreFinalOwnerHistoricalSource(proof.file, restoreProductNameBaseline(proof.file, readFileSync(resolve(root, proof.file), 'utf8')))));
 		const body = rewrite(proof.migratedBody);
 		expect(source.slice(0, body.length)).toBe(body);
 		const localeBlocks = source.slice(body.length);
