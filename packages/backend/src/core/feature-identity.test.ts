@@ -198,7 +198,7 @@ const services = [
 	['AchievementService', AchievementService, 2],
 	['ApAudienceService', ApAudienceService, 1],
 	['ApDbResolverService', ApDbResolverService, 9],
-	['ApDeliverManagerService', ApDeliverManagerService, 3],
+	['ApDeliverManagerService', ApDeliverManagerService, 5],
 	['ApInboxService', ApInboxService, 27],
 	['ApLoggerService', ApLoggerService, 1],
 	['ApMfmService', ApMfmService, 1],

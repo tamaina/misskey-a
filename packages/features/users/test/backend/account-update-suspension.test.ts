@@ -72,7 +72,8 @@ describe('suspension account Update publication', () => {
 		expect(f.users.findOneBy).toHaveBeenCalledWith({ id: actor.id });
 		expect(f.manager.addAllKnowingSharedInboxRecipe).toHaveBeenCalledOnce();
 		expect(f.manager.addFollowersRecipe).toHaveBeenCalledOnce();
-		expect(f.relay.deliverToRelays).toHaveBeenCalledWith(actor, expect.objectContaining({ type: 'Update', object: expect.objectContaining({ suspended: isSuspended }) }));
+		expect(f.manager.execute).toHaveBeenCalledWith({ forceMainKey: true });
+		expect(f.relay.deliverToRelays).toHaveBeenCalledWith(actor, expect.objectContaining({ type: 'Update', object: expect.objectContaining({ suspended: isSuspended }) }), true);
 		queued.finish();
 		await Promise.resolve();
 		expect(complete).not.toHaveBeenCalled();

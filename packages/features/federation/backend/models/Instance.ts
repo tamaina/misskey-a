@@ -154,6 +154,9 @@ export class MiInstance {
 	})
 	public infoUpdatedAt: Date | null;
 
+	@Column('varchar', { length: 2, default: '00' })
+	public httpMessageSignaturesImplementationLevel: string;
+
 	@Column('varchar', {
 		length: 16384, default: '',
 	})

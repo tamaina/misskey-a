@@ -33,14 +33,18 @@ export class AccountUpdateService {
 	}
 
 	@bindThis
-	public async publishToFollowers(userId: MiUser['id']) {
+	public async publishToFollowers(userId: MiUser['id'], forceMainKey = false) {
 		const user = await this.usersRepository.findOneBy({ id: userId });
 		if (user == null || user.isDeleted) return;
 
 		if (this.userEntityService.isLocalUser(user)) {
 			const content = await this.createUpdatePersonActivity(user);
-			this.apDeliverManagerService.deliverToFollowers(user, content);
-			this.relayService.deliverToRelays(user, content);
+			const deliveries = [
+				this.apDeliverManagerService.deliverToFollowers(user, content, forceMainKey),
+				this.relayService.deliverToRelays(user, content, forceMainKey),
+			];
+			if (forceMainKey) await Promise.all(deliveries);
+			else void Promise.allSettled(deliveries);
 		}
 	}
 
@@ -55,8 +59,8 @@ export class AccountUpdateService {
 			manager.addAllKnowingSharedInboxRecipe();
 			manager.addFollowersRecipe();
 			await Promise.allSettled([
-				manager.execute(),
-				this.relayService.deliverToRelays(user, content),
+				manager.execute({ forceMainKey: true }),
+				this.relayService.deliverToRelays(user, content, true),
 			]);
 		}
 	}
