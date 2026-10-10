@@ -7,6 +7,8 @@ on:
       - develop
     paths:
       - packages/backend/**
+      - packages/features/auth/**
+      - packages/features/mcp/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
@@ -16,6 +18,8 @@ on:
       - master
     paths:
       - packages/backend/**
+      - packages/features/auth/**
+      - packages/features/mcp/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
@@ -62,10 +66,10 @@ jobs:
         submodules: true
     - name: Setup pnpm
       uses: pnpm/action-setup@v6.0.10
-    - name: Install FFmpeg
+    - name: Install FFmpeg and PostgreSQL fixture binaries
       run: |
         sudo apt update
-        sudo apt install -y ffmpeg
+        sudo apt install -y ffmpeg postgresql
     - name: Use Node.js
       uses: actions/setup-node@v7.0.0
       with:
@@ -80,6 +84,10 @@ jobs:
       run: pnpm build
     - name: Test
       run: pnpm --filter backend ${{ matrix.coverage && 'test-and-coverage' || 'test' }}
+    - name: Test OAuth with disposable Redis
+      run: node packages/features/auth/test/run-oauth-fixture.mjs
+    - name: Test MCP with disposable PostgreSQL
+      run: node packages/features/mcp/test/run-postgres-fixture.mjs
     - name: Upload to Codecov
       if: ${{ matrix.coverage }}
       uses: codecov/codecov-action@v7

@@ -2,12 +2,14 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir, userInfo } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 const root = resolve(import.meta.dirname, '../../../..');
-const binaries = process.env.MISSKEY_PG_BINDIR ?? '/usr/lib/postgresql/17/bin';
+const versions = existsSync('/usr/lib/postgresql') ? readdirSync('/usr/lib/postgresql').sort((a, b) => Number(b) - Number(a)) : [];
+const binaries = process.env.MISSKEY_PG_BINDIR ?? versions.map(version => `/usr/lib/postgresql/${version}/bin`).find(path => existsSync(join(path, 'initdb')));
+if (!binaries) throw new Error('PostgreSQL fixture binaries unavailable; set MISSKEY_PG_BINDIR');
 const directory = mkdtempSync(join(tmpdir(), 'misskey-mcp-'));
 const data = join(directory, 'data');
 const socket = join(directory, 'socket');

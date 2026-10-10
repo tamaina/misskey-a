@@ -8,6 +8,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { registerHttpAccessLog } from '@features/runtime/backend/http/http-access-log.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { LogManager } from '@features/runtime/backend/logging/LogManager.js';
 import { McpApiService } from '../../backend/McpApiService.js';
 import { registerMcpServer } from '../../backend/server.js';
@@ -40,8 +41,62 @@ it.each([undefined, false])('reserves disabled /mcp ahead of SPA fallback withou
 	const { app, invoke, f } = await server(enabled);
 	expect((await invoke()).statusCode).toBe(404);
 	expect((await app.inject({ url: '/mcp' })).statusCode).toBe(404);
+	expect((await app.inject({ url: '/.well-known/oauth-protected-resource/mcp' })).statusCode).toBe(404);
 	expect((await app.inject({ url: '/other' })).body).toBe('SPA fallback');
 	expect(f.tokens.findOne).not.toHaveBeenCalled();
+});
+
+it('publishes only configured resource/issuer metadata, independent of request authority', async () => {
+	const { app, f } = await server(true);
+	const response = await app.inject({ url: '/.well-known/oauth-protected-resource/mcp', headers: { host: 'evil.invalid', 'x-forwarded-host': 'evil.invalid' } });
+	expect(response.statusCode).toBe(200);
+	expect(response.headers['access-control-allow-origin']).toBe('*');
+	expect(response.json()).toEqual({ resource, authorization_servers: ['https://instance.invalid'], scopes_supported: ['access:mcp'], bearer_methods_supported: ['header'] });
+	expect(f.tokens.findOne).not.toHaveBeenCalled();
+});
+
+it.each(['initialize', 'tools/list'])('requires bearer auth for %s and advertises protected-resource discovery', async method => {
+	const { app, headers } = await server(true);
+	const { authorization: _credential, ...anonymousHeaders } = headers;
+	const response = await app.inject({ method: 'POST', url: '/mcp', headers: anonymousHeaders, payload: message(method) });
+	expect(response.statusCode).toBe(401);
+	expect(response.headers['www-authenticate']).toBe('Bearer realm="Misskey MCP", resource_metadata="https://instance.invalid/.well-known/oauth-protected-resource/mcp"');
+	expect(response.body).not.toContain('list_my_notes');
+});
+
+it('declares OAuth access:mcp on the tool and challenges invalid or insufficient credentials', async () => {
+	const { invoke, f } = await server(true);
+	expect((await invoke()).json().result.tools[0].securitySchemes).toEqual([{ type: 'oauth2', scopes: ['access:mcp'] }]);
+	const invalid = await invoke(message(), { authorization: 'Bearer SYNTHETIC_INVALID' });
+	expect(invalid.statusCode).toBe(401);
+	expect(invalid.headers['www-authenticate']).toContain('error="invalid_token"');
+	f.grant.permission = [];
+	const denied = await invoke();
+	expect(denied.statusCode).toBe(403);
+	expect(denied.headers['www-authenticate']).toContain('resource_metadata="https://instance.invalid/.well-known/oauth-protected-resource/mcp"');
+	expect(denied.headers['www-authenticate']).toContain('error="insufficient_scope"');
+	expect(denied.headers['www-authenticate']).toContain('scope="access:mcp"');
+});
+
+it.each(['revoked', 'permission removed'] as const)('returns tool reauthorization metadata when a prepared grant is %s', async reason => {
+	const { invoke, f } = await server(true);
+	f.tokens.findOneBy.mockResolvedValueOnce(f.grant).mockResolvedValueOnce(reason === 'revoked' ? null : Object.assign({}, f.grant, { permission: [] }));
+	const response = await invoke(message('tools/call', { name: 'list_my_notes', arguments: {} }));
+	expect(response.statusCode).toBe(200);
+	const result = response.json().result;
+	expect(result.isError).toBe(true);
+	expect(result._meta['mcp/www_authenticate']).toHaveLength(1);
+	expect(result._meta['mcp/www_authenticate'][0]).toContain(reason === 'revoked' ? 'error="invalid_token"' : 'error="insufficient_scope"');
+	expect(result._meta['mcp/www_authenticate'][0]).toContain('resource_metadata="https://instance.invalid/.well-known/oauth-protected-resource/mcp"');
+	expect(JSON.stringify(result._meta)).not.toContain(f.grant.token);
+});
+
+it('does not request OAuth reauthorization for an unrelated native policy error', async () => {
+	const { invoke, f } = await server(true);
+	f.deps.fanoutTimelineEndpointService.timeline.mockRejectedValue(apiError({ code: 'ROLE_PERMISSION_DENIED', kind: 'permission', message: 'Policy denied.', id: 'synthetic-policy-error' }));
+	const response = await invoke(message('tools/call', { name: 'list_my_notes', arguments: {} }));
+	expect(response.json().result.isError).toBe(true);
+	expect(response.json().result).not.toHaveProperty('_meta');
 });
 
 it('rejects enabled non-HTTPS service configuration', async () => {

@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div v-panel class="about">
 					<div ref="containerEl" class="container" :class="{ playing: easterEggEngine != null }">
 						<img src="/client-assets/about-icon.png" alt="" class="icon" draggable="false" @load="iconLoaded" @click="gravity"/>
-						<div class="misskey">Misskey</div>
+						<div class="misskey">{{ productName }}</div>
 						<div class="version">v{{ version }}</div>
 						<span v-for="emoji in easterEggEmojis" :key="emoji.id" class="emoji" :data-physics-x="emoji.left" :data-physics-y="emoji.top" :class="{ _physics_circle_: !emoji.emoji.startsWith(':') }">
 							<MkCustomEmoji v-if="emoji.emoji[0] === ':'" class="emoji" :name="emoji.emoji" :normal="true" :noStyle="true" :fallbackToImage="true"/>
@@ -137,7 +137,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { nextTick, onBeforeUnmount, ref, useTemplateRef, computed } from 'vue';
-import { host, version } from '@features/boot/frontend/shared/config.js';
+import { host, version, productName } from '@features/boot/frontend/shared/config.js';
 import { DEFAULT_EMOJIS } from '@features/emojis/frontend/shared/default-emojis.js';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -485,7 +485,7 @@ const headerActions = computed(() => []);
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: $locale.value.sfc.aboutMisskey,
+	title: interpolateLocaleParameters($locale.value.sfc.aboutMisskey, { productName }),
 	icon: null,
 }));
 </script>
@@ -646,7 +646,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "الداعمون",
 	"aboutMisskeyMorePatrons": "نحن نقدر الدعم الذي قدمه العديد من الأشخاص الذين لم نذكرهم. شكرًا لكم 🥰",
-	"aboutMisskey": "عن Misskey"
+	"aboutMisskey": "عن {productName}"
 }
 </locale>
 
@@ -663,7 +663,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Membres del projecte",
 	"aboutMisskeyPatrons": "Patrocinadors",
 	"aboutMisskeyMorePatrons": "També agraïm el suport d'altres col·laboradors que no surten en aquesta llista. Gràcies! 🥰",
-	"aboutMisskey": "Quant a Misskey"
+	"aboutMisskey": "Quant a {productName}"
 }
 </locale>
 
@@ -680,7 +680,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patroni",
 	"aboutMisskeyMorePatrons": "Vážíme si také podpory mnoha dalších pomocníků, kteří zde nejsou uvedeni. Děkujeme! 🥰",
-	"aboutMisskey": "O Misskey"
+	"aboutMisskey": "O {productName}"
 }
 </locale>
 
@@ -697,7 +697,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
@@ -714,7 +714,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Projektmitglieder",
 	"aboutMisskeyPatrons": "UnterstützerInnen",
 	"aboutMisskeyMorePatrons": "Wir schätzen ebenso die Unterstützung vieler anderer hier nicht gelisteter Personen sehr. Danke! 🥰",
-	"aboutMisskey": "Über Misskey"
+	"aboutMisskey": "Über {productName}"
 }
 </locale>
 
@@ -731,7 +731,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
@@ -748,7 +748,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Miembros del proyecto",
 	"aboutMisskeyPatrons": "Patrocinadores",
 	"aboutMisskeyMorePatrons": "Muchas más personas nos apoyan. Muchas gracias🥰",
-	"aboutMisskey": "Sobre Misskey"
+	"aboutMisskey": "Sobre {productName}"
 }
 </locale>
 
@@ -765,7 +765,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Membres du projet",
 	"aboutMisskeyPatrons": "Contributeurs",
 	"aboutMisskeyMorePatrons": "Nous apprécions vraiment le soutien de nombreuses autres personnes non mentionnées ici. Merci à toutes et à tous ! 🥰",
-	"aboutMisskey": "À propos de Misskey"
+	"aboutMisskey": "À propos de {productName}"
 }
 </locale>
 
@@ -782,7 +782,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Anggota proyek",
 	"aboutMisskeyPatrons": "Pendukung",
 	"aboutMisskeyMorePatrons": "Kami sangat mengapresiasi dukungan dari banyak penolong lain yang tidak tercantum disini. Terima kasih! 🥰",
-	"aboutMisskey": "Tentang Misskey"
+	"aboutMisskey": "Tentang {productName}"
 }
 </locale>
 
@@ -799,7 +799,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Partecipanti al progetto",
 	"aboutMisskeyPatrons": "Sostenitori",
 	"aboutMisskeyMorePatrons": "Apprezziamo sinceramente il supporto di tante altre persone. Grazie mille! 🥰",
-	"aboutMisskey": "A proposito di Misskey"
+	"aboutMisskey": "A proposito di {productName}"
 }
 </locale>
 
@@ -816,7 +816,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "プロジェクトメンバー",
 	"aboutMisskeyPatrons": "支援者",
 	"aboutMisskeyMorePatrons": "他にも多くの方が支援してくれています。ありがとうございます🥰",
-	"aboutMisskey": "Misskeyについて"
+	"aboutMisskey": "{productName}について"
 }
 </locale>
 
@@ -833,7 +833,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "プロジェクトメンバー",
 	"aboutMisskeyPatrons": "支援者",
 	"aboutMisskeyMorePatrons": "他にもぎょうさんの人からサポートしてもろてんねん。ほんまおおきに🥰",
-	"aboutMisskey": "Misskeyってなんや？"
+	"aboutMisskey": "{productName}ってなんや？"
 }
 </locale>
 
@@ -850,7 +850,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
@@ -867,7 +867,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
@@ -884,7 +884,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "프로젝트 구성원",
 	"aboutMisskeyPatrons": "후원자",
 	"aboutMisskeyMorePatrons": "이 외에도 다른 많은 분들이 도움을 주시고 계십니다. 감사합니다🥰",
-	"aboutMisskey": "Misskey에 대하여"
+	"aboutMisskey": "{productName}에 대하여"
 }
 </locale>
 
@@ -901,7 +901,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "Over Misskey"
+	"aboutMisskey": "Over {productName}"
 }
 </locale>
 
@@ -918,7 +918,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "Om Misskey"
+	"aboutMisskey": "Om {productName}"
 }
 </locale>
 
@@ -935,7 +935,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Wspierający",
 	"aboutMisskeyMorePatrons": "Naprawdę doceniam wsparcie ze strony wielu niewymienionych tu osób. Dziękuję! 🥰",
-	"aboutMisskey": "O Misskey"
+	"aboutMisskey": "O {productName}"
 }
 </locale>
 
@@ -952,7 +952,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Membros do projeto",
 	"aboutMisskeyPatrons": "Apoiadores",
 	"aboutMisskeyMorePatrons": "Nós apreciamos o apoio de vários outros apoiadores não listados aqui. Obrigado! 🥰",
-	"aboutMisskey": "Sobre Misskey"
+	"aboutMisskey": "Sobre {productName}"
 }
 </locale>
 
@@ -969,7 +969,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Участники проекта",
 	"aboutMisskeyPatrons": "Материальная поддержка",
 	"aboutMisskeyMorePatrons": "Большое спасибо и многим другим, кто принял участие в этом проекте! 🥰",
-	"aboutMisskey": "О Misskey"
+	"aboutMisskey": "О {productName}"
 }
 </locale>
 
@@ -986,7 +986,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Prispievatelia",
 	"aboutMisskeyMorePatrons": "Takisto oceňujeme podporu mnoých ďalších, ktorí tu nie sú uvedení. Ďakujeme! 🥰",
-	"aboutMisskey": "O Misskey"
+	"aboutMisskey": "O {productName}"
 }
 </locale>
 
@@ -1003,7 +1003,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "สมาชิกในโครงการ",
 	"aboutMisskeyPatrons": "ผู้อุปถัมภ์",
 	"aboutMisskeyMorePatrons": "และอีกหลายท่านที่ไม่ได้เอ่ยนาม ขอบคุณที่ร่วมช่วยเหลือตลอดมานะคะ 🥰",
-	"aboutMisskey": "เกี่ยวกับ Misskey"
+	"aboutMisskey": "เกี่ยวกับ {productName}"
 }
 </locale>
 
@@ -1020,7 +1020,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Proje üyeleri",
 	"aboutMisskeyPatrons": "Müşteriler",
 	"aboutMisskeyMorePatrons": "Burada adı geçmeyen diğer birçok yardımseverin desteğine de teşekkür ederiz. Teşekkürler! 🥰",
-	"aboutMisskey": "Misskey Hakkında"
+	"aboutMisskey": "{productName} Hakkında"
 }
 </locale>
 
@@ -1037,7 +1037,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
@@ -1054,7 +1054,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Підтримали",
 	"aboutMisskeyMorePatrons": "Ми дуже цінуємо підтримку багатьох інших помічників, не перелічених тут. Дякуємо! 🥰",
-	"aboutMisskey": "Про Misskey"
+	"aboutMisskey": "Про {productName}"
 }
 </locale>
 
@@ -1071,7 +1071,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Người ủng hộ",
 	"aboutMisskeyMorePatrons": "Chúng tôi cũng trân trọng sự hỗ trợ của nhiều người đóng góp khác không được liệt kê ở đây. Cảm ơn! 🥰",
-	"aboutMisskey": "Về Misskey"
+	"aboutMisskey": "Về {productName}"
 }
 </locale>
 
@@ -1088,7 +1088,7 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "项目成员",
 	"aboutMisskeyPatrons": "支持者",
 	"aboutMisskeyMorePatrons": "还有很多其它的人也在支持我们，非常感谢🥰",
-	"aboutMisskey": "关于 Misskey"
+	"aboutMisskey": "关于 {productName}"
 }
 </locale>
 
@@ -1105,6 +1105,6 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "專案成員",
 	"aboutMisskeyPatrons": "贊助者",
 	"aboutMisskeyMorePatrons": "還有許許多多幫助我們的其他人，非常感謝你們。 🥰",
-	"aboutMisskey": "關於 Misskey"
+	"aboutMisskey": "關於 {productName}"
 }
 </locale>

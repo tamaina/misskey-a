@@ -4,6 +4,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { restoreProductNameBaseline } from './product-name-source-rebase.js';
 import { restoreRssContractBaseline } from './rss-contract-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
@@ -208,7 +209,7 @@ describe('next74 static raw-label ownership', () => {
 	});
 
 	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', async migration => {
-		const source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, restoreEmailHistoricalSource(migration.file, restoreFinalOwnerHistoricalSource(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8')))));
+		const source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, restoreEmailHistoricalSource(migration.file, restoreFinalOwnerHistoricalSource(migration.file, restoreProductNameBaseline(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8'))))));
 		const blocks = getBlocks(migration.file);
 		expect([...blocks.keys()]).toEqual([...languages]);
 		expect(source).not.toContain(legacyImport);

@@ -16,7 +16,8 @@ import { promises as fsp } from 'fs';
 import locales from 'i18n';
 import meta from '../../package.json';
 import packageInfo from './package.json' with { type: 'json' };
-import featureCssSourcePaths from './lib/feature-css-source-paths.json' with { type: 'json' };
+import { generateCssModuleName, hash, toBase62 } from './lib/css-module-names.js';
+export { hash, toBase62, BASE62_DIGITS } from './lib/css-module-names.js';
 import pluginUnwindCssModuleClassName from './lib/rollup-plugin-unwind-css-module-class-name.js';
 import pluginJson5 from './lib/vite-plugin-json5.js';
 import { searchIndexes } from './lib/search-index-options.js';
@@ -81,36 +82,6 @@ const externalPackages = [
 		},
 	},
 ];
-
-export const hash = (str: string, seed = 0): number => {
-	let h1 = 0xdeadbeef ^ seed,
-		h2 = 0x41c6ce57 ^ seed;
-	for (let i = 0, ch; i < str.length; i++) {
-		ch = str.charCodeAt(i);
-		h1 = Math.imul(h1 ^ ch, 2654435761);
-		h2 = Math.imul(h2 ^ ch, 1597334677);
-	}
-
-	h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-	h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-
-	return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-};
-
-export const BASE62_DIGITS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-export function toBase62(n: number): string {
-	if (n === 0) {
-		return '0';
-	}
-	let result = '';
-	while (n > 0) {
-		result = BASE62_DIGITS[n % BASE62_DIGITS.length] + result;
-		n = Math.floor(n / BASE62_DIGITS.length);
-	}
-
-	return result;
-}
 
 export function getConfig(): UserConfig {
 	const localesHash = toBase62(hash(JSON.stringify(locales)));
@@ -187,14 +158,7 @@ export function getConfig(): UserConfig {
 			},
 			modules: {
 				generateScopedName(name, filename, _css): string {
-					const relativePath = path.relative(__dirname, filename.split('?')[0]).replaceAll('\\', '/');
-					const originalPath = (featureCssSourcePaths as Record<string, string>)[relativePath] ?? relativePath;
-					const id = (originalPath + '-' + name).replace(/[\\\/\.\?&=]/g, '-').replace(/(src-|vue-)/g, '');
-					if (process.env.NODE_ENV === 'production') {
-						return 'x' + toBase62(hash(id)).substring(0, 4);
-					} else {
-						return id;
-					}
+					return generateCssModuleName(name, filename, __dirname, process.env.NODE_ENV === 'production');
 				},
 			},
 		},
