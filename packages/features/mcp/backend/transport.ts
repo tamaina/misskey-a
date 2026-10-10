@@ -27,7 +27,8 @@ export function registerMcpTransport(app: FastifyInstance, service: McpApiServic
 	const active = new Set<AbortController>();
 	let nativeInFlight = 0;
 	const close = () => { for (const controller of active) controller.abort(); };
-	app.addHook('onClose', async () => { close(); });
+	// onClose runs after HTTP drain; cancel active requests before server.close waits for them.
+	app.addHook('preClose', async () => { close(); });
 	const resource = new URL(options.resource ?? '');
 	if (resource.pathname !== '/mcp' || resource.search || resource.hash || resource.username || resource.password
 		|| (options.loopbackOnly ? resource.protocol !== 'http:' || !['127.0.0.1', 'localhost', '[::1]'].includes(resource.hostname) : resource.protocol !== 'https:')) throw new Error('Explicit trusted /mcp resource required');

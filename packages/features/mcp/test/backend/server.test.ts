@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import Fastify from 'fastify';
+import { request as httpRequest } from 'node:http';
 import { afterEach, expect, it, vi } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
@@ -10,6 +11,7 @@ import { registerHttpAccessLog } from '@features/runtime/backend/http/http-acces
 import type { LogManager } from '@features/runtime/backend/logging/LogManager.js';
 import { McpApiService } from '../../backend/McpApiService.js';
 import { registerMcpServer } from '../../backend/server.js';
+import { registerMcpTransport } from '../../backend/transport.js';
 import { fixture } from './fixtures/shared-api.js';
 
 const closures: (() => Promise<unknown>)[] = [];
@@ -78,6 +80,44 @@ it('keeps private request/result bodies out of inherited access logging, even on
 	for (const [record] of logs.mock.calls) { expect(record).not.toHaveProperty('requestBody'); expect(record).not.toHaveProperty('responseBody'); }
 	await app.inject({ method: 'POST', url: '/control', payload: { visible: 'CONTROL_LOG_BODY' } });
 	expect(JSON.stringify(logs.mock.calls)).toContain('CONTROL_LOG_BODY');
+	const missing = await app.inject({ method: 'POST', url: '/unknown', payload: { visible: 'UNKNOWN_ROUTE_LOG_BODY' } });
+	expect(missing.statusCode).toBe(404);
+	expect(JSON.stringify(logs.mock.calls)).toContain('UNKNOWN_ROUTE_LOG_BODY');
+});
+
+it.each(['authentication', 'tool'] as const)('cancels a listening normal transport during Fastify drain, retaining delayed %s permits', async phase => {
+	const f = await fixture();
+	const app = Fastify({ logger: false });
+	let control!: ReturnType<typeof registerMcpTransport>;
+	app.register(async child => { control = registerMcpTransport(child, f.module.get(McpApiService), { resource }); });
+	let release!: () => void; let entered!: () => void; let settled = false;
+	const started = new Promise<void>(resolve => { entered = resolve; });
+	const delayed = new Promise<void>(resolve => { release = resolve; });
+	if (phase === 'authentication') f.tokens.findOne.mockImplementation(async () => { entered(); await delayed; settled = true; return f.grant; });
+	else f.deps.fanoutTimelineEndpointService.timeline.mockImplementation(async () => { entered(); await delayed; settled = true; return []; });
+	let closing: Promise<void> | undefined;
+	try {
+		const address = new URL(await app.listen({ port: 0, host: '127.0.0.1' }));
+		const response = new Promise<number | Error>(resolve => {
+			const request = httpRequest(address, { method: 'POST', path: '/mcp', headers: { host: 'instance.invalid', authorization: `Bearer ${f.grant.token}`, 'content-type': 'application/json', accept: 'application/json, text/event-stream' } }, response => { response.resume(); response.on('end', () => resolve(response.statusCode ?? 0)); });
+			request.on('error', resolve);
+			request.end(JSON.stringify(message('tools/call', { name: 'list_my_notes', arguments: {} })));
+		});
+		await started;
+		expect(control.nativeInFlight()).toBe(1);
+		let closed = false;
+		closing = app.close().then(() => { closed = true; });
+		await vi.waitFor(() => { expect(closed).toBe(true); }, { timeout: 1000 });
+		expect(await response).toBeInstanceOf(Error);
+		expect(control.activeRequests()).toBe(0);
+		expect(settled).toBe(false);
+		expect(control.nativeInFlight()).toBe(1);
+		await app.close(); // Repeated shutdown is idempotent; it cannot release native permits.
+		expect(control.nativeInFlight()).toBe(1);
+		release();
+		await vi.waitFor(() => { expect(control.nativeInFlight()).toBe(0); });
+		expect(settled).toBe(true);
+	} finally { release(); await closing; await app.close(); }
 });
 
 it('returns an explicit bounded error rather than truncated oversized native notes', async () => {
