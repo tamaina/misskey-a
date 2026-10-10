@@ -30,6 +30,7 @@ import { DI } from '@/di-symbols.js';
 import { InboxKeyDiscoveryDeferredError, InboxKeyDiscoveryRefreshError } from '../utility/inbox-key-discovery.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type { InboxJobData } from '@features/runtime/backend/queue/types.js';
+import { normalizeInboxJobSignature } from '../utility/inbox-job-signature.js';
 
 type UpdateInstanceJob = {
 	latestRequestReceivedAt: Date,
@@ -63,7 +64,7 @@ export class InboxProcessorService implements OnApplicationShutdown {
 
 	@bindThis
 	public async process(job: Bull.Job<InboxJobData>): Promise<string> {
-		const signature = job.data.signature;
+		const signature = normalizeInboxJobSignature(job.data.signature);
 		let activity = job.data.activity;
 		let actorUri = getApId(activity.actor);
 
