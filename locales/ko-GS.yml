@@ -412,7 +412,6 @@ signinFailed: "로그인 몬 했십니다. 고 이름이랑 비밀번호 제대�
 or: "아니면"
 language: "언어"
 uiLanguage: "UI 표시 언어"
-aboutX: "{x}에 대해서"
 emojiStyle: "이모지 모양"
 native: "기본"
 popup: "팝업"

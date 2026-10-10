@@ -1822,10 +1822,6 @@ export interface Locale extends ILocale {
      */
     "uiLanguage": string;
     /**
-     * {x}について
-     */
-    "aboutX": ParameterizedString<"x">;
-    /**
      * 絵文字のスタイル
      */
     "emojiStyle": string;
@@ -3713,22 +3709,6 @@ export interface Locale extends ILocale {
      * 今後表示しない
      */
     "neverShow": string;
-    /**
-     * また後で
-     */
-    "remindMeLater": string;
-    /**
-     * Misskeyを気に入っていただけましたか？
-     */
-    "didYouLikeMisskey": string;
-    /**
-     * Misskeyは{host}が使用している無料のソフトウェアです。これからも開発を続けられるように、ぜひ寄付をお願いします！
-     */
-    "pleaseDonate": ParameterizedString<"host">;
-    /**
-     * 対応するソースコードは{anchor}から利用可能です。
-     */
-    "correspondingSourceIsAvailable": ParameterizedString<"anchor">;
     /**
      * ロール
      */

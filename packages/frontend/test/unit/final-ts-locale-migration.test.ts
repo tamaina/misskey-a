@@ -16,7 +16,7 @@ import { expect, test } from 'vitest';
 import { createInternationalization, setActiveInternationalization, createComponentLocale, createComponentLocalizer, useLocale } from 'vite-vue-internationalization/runtime';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
 import { languages } from 'i18n';
-import { locales } from './retired-drive-locale-baseline.js';
+import { locales } from './instance-pilot-locale-catalog.js';
 import type { ParameterizedString } from 'i18n';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';

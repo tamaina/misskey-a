@@ -17,13 +17,14 @@ import { describe, expect, test } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
 import { languages } from 'i18n';
-import { locales } from './retired-drive-locale-baseline.js';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-with-locale.js';
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import migrationInputs from './sfc-static-next22-migration.json';
-import type { Locale } from './retired-ui-next-locale-types.js';
+import type { Locale } from './instance-pilot-locale-types.js';
+import { restorePilotHistoricalSource, reviewedPilotMessage } from './instance-pilot-locale-metadata.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const MagicString = createRequire(resolve(root, 'packages/frontend-builder/package.json'))('magic-string').default;
@@ -52,7 +53,7 @@ describe('next22 raw locale migration', () => {
 	test('preserves all9856 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = restoreCommonUtilitiesBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
+			const source = restoreCommonUtilitiesBaseline(entry.file, restorePilotHistoricalSource(entry.file, readFileSync(resolve(root, entry.file), 'utf8')));
 			expect(createHash('sha256').update(source).digest('hex')).toBe(entry.migratedSha256);
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);
@@ -104,7 +105,7 @@ describe('next22 raw locale migration', () => {
 				const raw = createComponentLocale(entry.file.replace('packages/', '/'));
 				for (const key of entry.keys) {
 					expect(key.formatter).toBe(false);
-					const message = originalValue(language, key.global);
+					const message = reviewedPilotMessage(entry.file, language, key.local, originalValue(language, key.global));
 					expect(Buffer.from(raw[key.local])).toEqual(Buffer.from(message));
 					expect(raw[key.local]).toBe(new I18n({ message }).t('message'));
 					expect(raw[key.local]).toBe(production(message));

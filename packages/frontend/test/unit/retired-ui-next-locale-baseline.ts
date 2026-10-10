@@ -11,6 +11,7 @@ import { languages } from 'i18n';
 import { locales as currentLocales } from './retired-ui-locale-baseline.js';
 import baseline from './retired-ui-next-locale-baseline.json';
 import type { Locale } from './retired-ui-next-locale-types.js';
+import { historicalPilotOwnerValue, verifyPilotOwnerLanguages } from './instance-pilot-locale-metadata.js';
 
 export type { Locale } from './retired-ui-next-locale-types.js';
 const root = resolve(import.meta.dirname, '../../../..');
@@ -47,12 +48,12 @@ function ownerValue(index: number, language: string, path: string): string {
 			if (block.attrs.lang !== 'json' || blocks.has(language)) throw new Error(`Invalid UI locale block: ${filename}:${language}`);
 			blocks.set(language, JSON.parse(block.content));
 		}
-		verifyRetiredUiNextLanguages([...blocks.keys()]);
+		if (!verifyPilotOwnerLanguages(baseline.owners[index], [...blocks.keys()])) verifyRetiredUiNextLanguages([...blocks.keys()]);
 		dictionaries.set(index, blocks);
 	}
 	const value = valueAt(blocks.get(language), path);
 	if (typeof value !== 'string') throw new Error(`Missing UI owner text: ${index}:${language}:${path}`);
-	return value;
+	return historicalPilotOwnerValue(baseline.owners[index], language, path, value);
 }
 
 /** Reconstruct historical formatter inputs only after verifying independent,
