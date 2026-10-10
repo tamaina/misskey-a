@@ -220,9 +220,9 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 			// "The authorization server MUST verify that the client_id in the document matches the
 			// client_id of the URL where the document was retrieved."
 			// Recognize the client format from its document, independently of the requested resource.
-			// IndieAuth JSON keeps its client_uri-prefix rule when it declares no CIMD auth capabilities.
+			// Root/HTTP legacy discovery keeps IndieAuth JSON even with optional RFC7591 auth fields.
 			const legacyClientUri = typeof json.client_uri === 'string' && json.client_uri.length > 0 && new URL(id).href.startsWith(json.client_uri);
-			cimd = json.token_endpoint_auth_methods_supported !== undefined || json.token_endpoint_auth_method !== undefined || !legacyClientUri;
+			cimd = !legacyClientUri || (metadataFetcher !== undefined && (json.token_endpoint_auth_methods_supported !== undefined || json.token_endpoint_auth_method !== undefined));
 			if (requireCimd && !cimd) throw new InvalidRequestError('Resource authorization requires CIMD client metadata');
 			if (cimd && !metadataFetcher) throw new InvalidRequestError('CIMD requires an HTTPS client ID with a non-root path');
 			if (json.client_id !== (cimd ? id : new URL(id).href)) {

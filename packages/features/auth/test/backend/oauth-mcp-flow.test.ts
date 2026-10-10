@@ -282,10 +282,11 @@ describe.skipIf(!socket)('synthetic OAuth discovery through native MCP (isolated
 		expect(s.f.tokens.insert).not.toHaveBeenCalled();
 	});
 
-	it('preserves root HTTPS IndieAuth consent through the existing generic discovery path', async () => {
+	it.each(['absent', 'singular', 'plural'])('preserves root HTTPS IndieAuth with %s auth metadata through existing generic discovery', async authMetadata => {
 		const s = await setup(); const legacyClient = 'https://legacy.invalid/';
 		vi.spyOn(dns, 'lookup').mockImplementation((async () => ({ address: '203.0.113.10', family: 4 })) as unknown as typeof dns.lookup);
-		s.httpServices[0].send.mockResolvedValue(new MetadataResponse(JSON.stringify({ client_id: legacyClient, client_uri: legacyClient, client_name: 'Legacy root client', redirect_uris: [redirectUri] }), { url: legacyClient, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string }));
+		const authFields = authMetadata === 'singular' ? { token_endpoint_auth_method: 'none' } : authMetadata === 'plural' ? { token_endpoint_auth_methods_supported: ['none'] } : {};
+		s.httpServices[0].send.mockResolvedValue(new MetadataResponse(JSON.stringify({ client_id: legacyClient, client_uri: legacyClient, client_name: 'Legacy root client', redirect_uris: [redirectUri], ...authFields }), { url: legacyClient, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string }));
 		const flow = await s.grant({ client_id: legacyClient, resource: '', scope: 'read:account' });
 		expect(s.providers[0].fetchClientMetadata).not.toHaveBeenCalled();
 		expect(s.httpServices[0].send).toHaveBeenCalledWith(legacyClient);
