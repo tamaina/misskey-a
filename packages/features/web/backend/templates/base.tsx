@@ -5,6 +5,7 @@
 
 import { comment, defaultDescription } from './_.js';
 import { Splash } from './_splash.js';
+import { htmlSafeJsonStringify } from '@features/markup/backend/utility/json-stringify-html-safe.js';
 import type { CommonProps } from './_.js';
 import type { PropsWithChildren, Children } from '@kitajs/html';
 
@@ -81,6 +82,7 @@ export function Layout(props: PropsWithChildren<CommonProps<{
 					<script>
 						const VERSION = '{props.version}';
 						const CLIENT_ENTRY = {JSON.stringify(props.frontendViteFiles?.entryJs ?? null)};
+						const CLIENT_LOCALE_ENTRIES = {htmlSafeJsonStringify(props.frontendViteFiles?.localeEntries ?? null)};
 						const LANGS = {JSON.stringify(props.langs)};
 					</script>
 

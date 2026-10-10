@@ -1,6 +1,7 @@
 import path from 'path';
 import { createRequire } from 'node:module';
 import pluginVue from '@vitejs/plugin-vue';
+import { pluginHostLocaleEntries } from './lib/vite-plugin-host-locale-entries.js';
 import { pluginVvi } from './lib/vite-plugin-vvi.js';
 import { pluginFeatureDependencies } from './lib/vite-plugin-feature-dependencies.js';
 import pluginGlsl from 'vite-plugin-glsl';
@@ -138,6 +139,7 @@ export function getConfig(): UserConfig {
 
 		plugins: [
 			pluginFeatureDependencies(__dirname, path.resolve(__dirname, '../features')),
+			pluginHostLocaleEntries(),
 			pluginVvi(),
 			pluginWatchLocales(),
 			...searchIndexes.map(options => pluginCreateSearchIndex({
