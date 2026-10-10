@@ -39,7 +39,7 @@ describe('retained inbox signature formats', () => {
 	test('preserves the existing unsigned job path', () => {
 		expect(normalizeInboxJobSignature(null)).toBeNull();
 		expect(normalizeInboxJobSignature(undefined)).toBeNull();
-		expect(getInboxJobHost({ signature: null, activity: { type: 'Update', actor: 'https://unsigned.example/users/alice' } })).toBe('unsigned.example');
+		expect(getInboxJobHost({ signature: null, activity: { type: 'Update', actor: 'https://unsigned.example/users/alice', object: 'https://unsigned.example/users/alice' } })).toBe('unsigned.example');
 	});
 
 	test.each([false, 123, 'invalid', [], {}, { version: 'unknown', value: {} }, { version: 'draft' }, { version: 'draft', value: null }, { keyId }, { version: 'draft', value: { keyId } }])('explicitly rejects malformed/unknown stored shape: %j', signature => {
@@ -51,6 +51,6 @@ describe('retained inbox signature formats', () => {
 		const signature: ParsedRFC9421Signature = { version: 'rfc9421', value: [] };
 		expect(() => normalizeInboxJobSignature(JSON.parse(JSON.stringify(signature)))).toThrow(UnrecoverableError);
 		expect(() => normalizeInboxJobSignature(signature)).toThrow('RFC9421 HTTP Message Signatures are not supported');
-		expect(getInboxJobHost({ signature, activity: { type: 'Update', actor: { type: 'Person', id: 'https://rfc.example/users/alice' } } })).toBe('rfc.example');
+		expect(getInboxJobHost({ signature, activity: { type: 'Update', actor: { type: 'Person', id: 'https://rfc.example/users/alice' }, object: 'https://rfc.example/users/alice' } })).toBe('rfc.example');
 	});
 });
