@@ -72,7 +72,10 @@ describe('Draft RSA interoperability on captured Node HTTP requests', () => {
 			if (parsed.version !== 'draft') throw new Error('Expected Draft signature');
 			expect(parsed.value.signingString.split('\n')[0]).toBe(`(request-target): post ${target}`);
 			expect(await verifyDraftSignature(parsed.value, key.publicKey)).toBe(true);
-			expect(httpSignature.verifySignature(httpSignature.parseRequest(incoming, { headers: required, authorizationHeaderName: 'signature', clockSkew: 300 }), key.publicKey)).toBe(true);
+			const oldParsed = httpSignature.parseRequest(incoming, { headers: required, authorizationHeaderName: 'signature', clockSkew: 300 });
+			expect(httpSignature.verifySignature(oldParsed, key.publicKey)).toBe(true);
+			const oldQueued = JSON.parse(JSON.stringify(oldParsed));
+			expect(await verifyDraftSignature(oldQueued, key.publicKey)).toBe(true);
 			const accepted = inbox(incoming);
 			expect(accepted.reply.code).toHaveBeenCalledWith(202);
 			const queuedAdd = vi.fn();
