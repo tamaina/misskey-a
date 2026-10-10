@@ -12,8 +12,8 @@ export class ForkRepositoryDefaults1791626147062 {
     }
 
     async down(queryRunner) {
-        // Keep stored administrator URLs; rollback leaves both nullable fields without a default.
-        await queryRunner.query(`ALTER TABLE "meta" ALTER COLUMN "feedbackUrl" DROP DEFAULT`);
-        await queryRunner.query(`ALTER TABLE "meta" ALTER COLUMN "repositoryUrl" DROP DEFAULT`);
+        // Restore the prior schema defaults without changing saved administrator URLs.
+        await queryRunner.query(`ALTER TABLE "meta" ALTER COLUMN "feedbackUrl" SET DEFAULT 'https://github.com/misskey-dev/misskey/issues/new'`);
+        await queryRunner.query(`ALTER TABLE "meta" ALTER COLUMN "repositoryUrl" SET DEFAULT 'https://github.com/misskey-dev/misskey'`);
     }
 }
