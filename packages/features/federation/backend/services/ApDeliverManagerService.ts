@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ModuleRef } from '@nestjs/core';
+import { UserKeypairService } from './UserKeypairService.js';
+import type { AccountUpdateService } from '@features/users/backend/services/AccountUpdateService.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { IsNull, Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
@@ -57,6 +60,7 @@ class DeliverManager {
 		private followingsRepository: FollowingsRepository,
 		private queueService: QueueService,
 		private logger: Logger,
+		private prepareKey: (userId: MiUser['id']) => Promise<void>,
 
 		actor: { id: MiUser['id']; host: null; },
 		activity: IActivity | null,
@@ -123,7 +127,11 @@ class DeliverManager {
 	 * Execute delivers
 	 */
 	@bindThis
-	public async execute(opts: { ignoreSuspend?: boolean } = {}): Promise<void> {
+	public async execute(opts: { ignoreSuspend?: boolean; forceMainKey?: boolean } = {}): Promise<void> {
+		if (!opts.forceMainKey && this.activity != null) {
+			await this.prepareKey(this.actor.id);
+		}
+
 		//#region collect inboxes by recipes
 		// The value flags whether it is shared or not.
 		// key: inbox URL, value: whether it is sharedInbox
@@ -184,7 +192,7 @@ class DeliverManager {
 		//#endregion
 
 		// deliver
-		await this.queueService.deliverMany(this.actor, this.activity, inboxes);
+		await this.queueService.deliverMany(this.actor, this.activity, inboxes, opts.forceMainKey ?? false);
 		this.logger.info(`Deliver queues dispatched: inboxes=${inboxes.size} actorId=${this.actor.id} activityId=${this.activity?.id}`);
 	}
 }
@@ -192,6 +200,8 @@ class DeliverManager {
 @Injectable()
 export class ApDeliverManagerService {
 	private logger: Logger;
+	private readonly keyPreparations = new Map<MiUser['id'], Promise<void>>();
+	private readonly failedKeyPublications = new Set<MiUser['id']>();
 
 	constructor(
 		@Inject(DI.followingsRepository)
@@ -199,8 +209,27 @@ export class ApDeliverManagerService {
 
 		private queueService: QueueService,
 		private apLoggerService: ApLoggerService,
+		private moduleRef: ModuleRef,
+		private userKeypairService: UserKeypairService,
 	) {
 		this.logger = this.apLoggerService.logger.createSubLogger('deliver-manager');
+	}
+
+	@bindThis
+	public prepareActorSigningKey(userId: MiUser['id']): Promise<void> {
+		const existing = this.keyPreparations.get(userId);
+		if (existing) return existing;
+		const preparation = (async () => {
+			const created = await this.userKeypairService.refreshAndPrepareEd25519KeyPair(userId);
+			if (!created && !this.failedKeyPublications.has(userId)) return;
+			this.failedKeyPublications.add(userId);
+			// Await RSA Update enqueueing, not remote publication acknowledgment.
+			await this.moduleRef.get<AccountUpdateService>('AccountUpdateService', { strict: false }).publishToFollowers(userId, true);
+			this.failedKeyPublications.delete(userId);
+		})();
+		this.keyPreparations.set(userId, preparation);
+		void preparation.finally(() => this.keyPreparations.delete(userId)).catch(() => undefined);
+		return preparation;
 	}
 
 	/**
@@ -209,16 +238,17 @@ export class ApDeliverManagerService {
 	 * @param activity Activity
 	 */
 	@bindThis
-	public async deliverToFollowers(actor: { id: MiLocalUser['id']; host: null; }, activity: IActivity): Promise<void> {
+	public async deliverToFollowers(actor: { id: MiLocalUser['id']; host: null; }, activity: IActivity, forceMainKey = false): Promise<void> {
 		const manager = new DeliverManager(
 			this.followingsRepository,
 			this.queueService,
 			this.logger,
+			userId => this.prepareActorSigningKey(userId),
 			actor,
 			activity,
 		);
 		manager.addFollowersRecipe();
-		await manager.execute();
+		await manager.execute({ forceMainKey });
 	}
 
 	/**
@@ -233,6 +263,7 @@ export class ApDeliverManagerService {
 			this.followingsRepository,
 			this.queueService,
 			this.logger,
+			userId => this.prepareActorSigningKey(userId),
 			actor,
 			activity,
 		);
@@ -252,6 +283,7 @@ export class ApDeliverManagerService {
 			this.followingsRepository,
 			this.queueService,
 			this.logger,
+			userId => this.prepareActorSigningKey(userId),
 			actor,
 			activity,
 		);
@@ -265,6 +297,7 @@ export class ApDeliverManagerService {
 			this.followingsRepository,
 			this.queueService,
 			this.logger,
+			userId => this.prepareActorSigningKey(userId),
 			actor,
 			activity,
 		);

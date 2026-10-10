@@ -25,6 +25,8 @@ export type DeliverJobData = {
 	to: string;
 	/** whether it is sharedInbox */
 	isSharedInbox: boolean;
+	/** Force the stable main RSA key for compatibility publication. */
+	forceMainKey?: boolean;
 };
 
 export type InboxJobData = {

@@ -136,7 +136,7 @@ export class QueueService {
 	}
 
 	@bindThis
-	public deliver(user: ThinUser, content: IActivity | null, to: string | null, isSharedInbox: boolean) {
+	public deliver(user: ThinUser, content: IActivity | null, to: string | null, isSharedInbox: boolean, forceMainKey = false) {
 		if (content == null) return null;
 		if (to == null) return null;
 
@@ -151,6 +151,7 @@ export class QueueService {
 			digest,
 			to,
 			isSharedInbox,
+			forceMainKey,
 		};
 
 		const label = to.replace('https://', '').replace('/inbox', '');
@@ -179,7 +180,7 @@ export class QueueService {
 	 * @returns void
 	 */
 	@bindThis
-	public async deliverMany(user: ThinUser, content: IActivity | null, inboxes: Map<string, boolean>) {
+	public async deliverMany(user: ThinUser, content: IActivity | null, inboxes: Map<string, boolean>, forceMainKey = false) {
 		if (content == null) return null;
 		// Defend against nullable inboxes at runtime without mutating the caller's map.
 		const destinations = new Map<string, boolean>();
@@ -217,6 +218,7 @@ export class QueueService {
 				digest,
 				to: d[0],
 				isSharedInbox: d[1],
+				forceMainKey,
 			} as DeliverJobData,
 			opts,
 		})));
