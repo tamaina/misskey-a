@@ -30,9 +30,10 @@ the current app permission list for the connection gate.
 **Access can include the account's public and nonpublic notes.** The existing
 `users/notes` behavior is preserved. Ordinary API authentication and authorization
 are unchanged. The shared permission registry makes this kind selectable in token,
-MiAuth, app and OAuth consent flows. Consent labels explain nonpublic-note access;
-Japanese is the fallback until Crowdin translations arrive. Note content is untrusted
-data. Foreign subjects are denied before native invocation. Observed disconnect,
+MiAuth, app and OAuth consent flows. Consent labels explain nonpublic-note access.
+The six existing permission displays translate this label in all 28 SFC locales.
+The legacy global YAML dictionaries retain Japanese fallback until Crowdin updates.
+Note content is untrusted data. Foreign subjects are denied before native invocation. Observed disconnect,
 deadline and shutdown suppress the transport response and release transport
 state; they do not actively cancel SQL or guarantee that native work stops. Disconnect observation
 starts before authentication. Detached work inside existing native services is

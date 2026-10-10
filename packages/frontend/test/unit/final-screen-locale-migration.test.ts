@@ -21,6 +21,7 @@ import { interpolateLocaleParameters } from '@features/runtime/frontend/interpol
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import proof from './final-screen-locale-migration.json';
+import mcpPermissionLabels from './mcp-permission-labels.json';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const hash = (text: string) => createHash('sha256').update(text).digest('hex');
@@ -118,11 +119,14 @@ test('real main/embed loaders preserve finite selectors, unknown-key fallback an
 				const raw = createComponentLocale(entry.file.replace('packages/', '/'));
 				for (const key of entry.keys) {
 					const actual = raw[key.local];
-					expect(actual).toEqual(at(locales[language], key.global));
+					const expected = key.global === '_permissions'
+						? { ...at(locales[language], key.global) as Record<string, string>, 'access:mcp': mcpPermissionLabels[language as keyof typeof mcpPermissionLabels] }
+						: at(locales[language], key.global);
+					expect(actual).toEqual(expected);
 					rawChecks += leaves(actual).length;
 					if (actual && typeof actual === 'object') {
 						const dictionary = copyLocaleDictionary(actual);
-						expect(dictionary).toEqual(at(locales[language], key.global));
+						expect(dictionary).toEqual(expected);
 						expect(Reflect.get(dictionary, '__unknown_permission_or_type__')).toBeUndefined();
 						expect(Reflect.get(dictionary, 'constructor')).toBe(Object);
 					}
