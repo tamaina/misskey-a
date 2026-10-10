@@ -1,6 +1,7 @@
 import path from 'path';
 import { createRequire } from 'node:module';
 import pluginVue from '@vitejs/plugin-vue';
+import { pluginHostLocaleEntries } from '../frontend/lib/vite-plugin-host-locale-entries.js';
 import { pluginVvi } from '../frontend/lib/vite-plugin-vvi.js';
 import { pluginFeatureDependencies } from '../frontend/lib/vite-plugin-feature-dependencies.js';
 import { defineConfig, type UserConfig } from 'vite';
@@ -93,6 +94,7 @@ export function getConfig(): UserConfig {
 
 		plugins: [
 			pluginFeatureDependencies(__dirname, path.resolve(__dirname, '../features')),
+			pluginHostLocaleEntries({ embed: true }),
 			pluginVvi({ embed: true }),
 			pluginVue(),
 			pluginRemoveUnrefI18n(),

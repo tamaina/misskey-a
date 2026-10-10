@@ -26,6 +26,8 @@ export type MinimumCommonData = {
 
 export type ViteFiles = {
 	entryJs: string | null;
+	/** Locale entry paths resolved at build time, including the main language projection. */
+	localeEntries?: Record<string, string>;
 	css: string[];
 	modulePreloads: string[];
 };

@@ -33,7 +33,7 @@ test('embed dictionary keeps exactly the 504 effective strings and preserves boo
 		expect(messages[language]).toEqual({ _bootErrors: locales[language]._bootErrors, reload: locales[language].reload, _selfXssPrevention: locales[language]._selfXssPrevention });
 	}
 	let source = readFileSync(resolve(root, 'packages/features/boot/frontend/embed/boot.ts'), 'utf8');
-	source = source.replace("import { useLocale, useLocalizer } from 'vite-vue-internationalization/runtime';\nimport type bootMessages from './boot-messages.json';", "import { i18n } from '@features/runtime/frontend/embed/i18n.js';");
+	source = source.replace("import { useLocale, useLocalizer } from 'virtual:vite-vue-internationalization';\nimport type bootMessages from './boot-messages.json';", "import { i18n } from '@features/runtime/frontend/embed/i18n.js';");
 	source = source.replace('\n' + proof.newSetup, '');
 	source = source.replace(proof.newStore, proof.oldStore);
 	for (const [before, after] of proof.rewrites) source = source.split(after).join(before);
