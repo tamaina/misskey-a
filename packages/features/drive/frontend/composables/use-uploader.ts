@@ -111,6 +111,24 @@ function getCompressionSettings(level: 0 | 1 | 2 | 3) {
 	}
 }
 
+function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+	return new Promise((resolve, reject) => {
+		canvas.toBlob(blob => {
+			if (blob == null) reject(new Error('Failed to convert canvas to blob'));
+			else resolve(blob);
+		}, 'image/png');
+	});
+}
+
+function releaseImageResource(release: () => void): void {
+	try {
+		release();
+	} catch (err) {
+		// A cleanup failure must not replace the preprocessing error.
+		console.error('Failed to release image preprocessing resource', err);
+	}
+}
+
 export function useUploader(options: {
 	folderId?: string | null;
 	multiple?: boolean;
@@ -130,6 +148,7 @@ export function useUploader(options: {
 	});
 
 	const items = ref<UploaderItem[]>([]);
+	const imagePreprocessControllers = new WeakMap<UploaderItem, AbortController>();
 
 	function initializeFile(file: File) {
 		const id = genId();
@@ -185,6 +204,7 @@ export function useUploader(options: {
 	}
 
 	function removeItem(item: UploaderItem) {
+		if (imagePreprocessControllers.has(item)) item.abortPreprocess?.();
 		revokeItemObjectUrls(item);
 		items.value.splice(items.value.indexOf(item), 1);
 	}
@@ -636,13 +656,31 @@ export function useUploader(options: {
 		item.preprocessProgress = null;
 
 		if (IMAGE_PREPROCESS_NEEDED_TYPES.includes(item.file.type)) {
+			imagePreprocessControllers.get(item)?.abort();
+			const controller = new AbortController();
+			imagePreprocessControllers.set(item, controller);
+			item.abortPreprocess = () => {
+				controller.abort();
+				if (imagePreprocessControllers.get(item) === controller) {
+					item.abortPreprocess = null;
+					item.preprocessing = false;
+					item.preprocessProgress = null;
+				}
+			};
 			try {
-				await preprocessForImage(item);
+				await preprocessForImage(item, controller.signal);
 			} catch (err) {
-				console.error('Failed to preprocess image', err);
-
-			// nop
+				if (!controller.signal.aborted) console.error('Failed to preprocess image', err);
+			} finally {
+				// Cancelled work may finish after a new attempt has started.
+				if (imagePreprocessControllers.get(item) === controller) {
+					imagePreprocessControllers.delete(item);
+					item.abortPreprocess = null;
+					item.preprocessing = false;
+					item.preprocessProgress = null;
+				}
 			}
+			return;
 		}
 
 		if (VIDEO_PREPROCESS_NEEDED_TYPES.includes(item.file.type)) {
@@ -659,94 +697,104 @@ export function useUploader(options: {
 		item.preprocessProgress = null;
 	}
 
-	async function preprocessForImage(item: UploaderItem): Promise<void> {
+	async function preprocessForImage(item: UploaderItem, signal: AbortSignal): Promise<void> {
+		// Renderers borrow these bitmaps; the uploader owns their lifetime.
 		const imageBitmap = await window.createImageBitmap(item.file);
+		try {
+			signal.throwIfAborted();
+			let preprocessedFile: Blob | File = item.file;
 
-		let preprocessedFile: Blob | File = item.file;
-
-		const needsWatermark = item.watermarkLayers != null && IMAGE_EDITING_SUPPORTED_TYPES.includes(preprocessedFile.type) && $i.policies.watermarkAvailable;
-		if (needsWatermark && item.watermarkLayers != null) {
-			const canvas = window.document.createElement('canvas');
-			const WatermarkRenderer = await import('@features/drive/frontend/utility/watermark/WatermarkRenderer.js').then(x => x.WatermarkRenderer);
-			const renderer = new WatermarkRenderer({
-				canvas: canvas,
-				renderWidth: imageBitmap.width,
-				renderHeight: imageBitmap.height,
-				image: imageBitmap,
-			});
-
-			await renderer.render(item.watermarkLayers);
-
-			preprocessedFile = await new Promise<Blob>((resolve) => {
-				canvas.toBlob((blob) => {
-					if (blob == null) {
-						throw new Error('Failed to convert canvas to blob');
-					}
-					resolve(blob);
-					renderer.destroy();
-				}, 'image/png');
-			});
-		}
-
-		const needsImageFrame = item.imageFrameParams != null && IMAGE_EDITING_SUPPORTED_TYPES.includes(preprocessedFile.type);
-		if (needsImageFrame && item.imageFrameParams != null) {
-			const canvas = window.document.createElement('canvas');
-			const ExifReader = await import('exifreader');
-			const exif = await ExifReader.load(await item.file.arrayBuffer());
-			const ImageFrameRenderer = await import('@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js').then(x => x.ImageFrameRenderer);
-			const frameRenderer = new ImageFrameRenderer({
-				canvas: canvas,
-				image: await window.createImageBitmap(preprocessedFile),
-				exif,
-				caption: item.caption ?? null,
-				filename: item.name,
-			});
-
-			await frameRenderer.render(item.imageFrameParams);
-
-			preprocessedFile = await new Promise<Blob>((resolve) => {
-				canvas.toBlob((blob) => {
-					if (blob == null) {
-						throw new Error('Failed to convert canvas to blob');
-					}
-					resolve(blob);
-					frameRenderer.destroy();
-				}, 'image/png');
-			});
-		}
-
-		const compressionSettings = getCompressionSettings(item.compressionLevel);
-		const needsCompress = item.compressionLevel !== 0 && compressionSettings && IMAGE_EDITING_SUPPORTED_TYPES.includes(preprocessedFile.type) && !(await isAnimated(preprocessedFile));
-
-		if (needsCompress) {
-			const config = {
-				mimeType: (isWebpSupported() ? 'image/webp' : 'image/jpeg') as 'image/webp' | 'image/jpeg',
-				maxWidth: compressionSettings.maxWidth,
-				maxHeight: compressionSettings.maxHeight,
-				quality: isWebpSupported() ? 0.85 : 0.8,
-			};
-
-			try {
-				const result = await readAndCompressImage(preprocessedFile, config);
-				if (result.size < preprocessedFile.size || preprocessedFile.type === 'image/webp') {
-					// The compression may not always reduce the file size
-					// (and WebP is not browser safe yet)
-					preprocessedFile = result;
-					item.compressedSize = result.size;
-					item.suffix = '.' + mimeTypeMap[config.mimeType];
+			const needsWatermark = item.watermarkLayers != null && IMAGE_EDITING_SUPPORTED_TYPES.includes(preprocessedFile.type) && $i.policies.watermarkAvailable;
+			if (needsWatermark && item.watermarkLayers != null) {
+				const canvas = window.document.createElement('canvas');
+				const WatermarkRenderer = await import('@features/drive/frontend/utility/watermark/WatermarkRenderer.js').then(x => x.WatermarkRenderer);
+				signal.throwIfAborted();
+				const renderer = new WatermarkRenderer({
+					canvas: canvas,
+					renderWidth: imageBitmap.width,
+					renderHeight: imageBitmap.height,
+					image: imageBitmap,
+				});
+				try {
+					await renderer.render(item.watermarkLayers);
+					signal.throwIfAborted();
+					preprocessedFile = await canvasToBlob(canvas);
+				} finally {
+					releaseImageResource(() => renderer.destroy());
 				}
-			} catch (err) {
-				console.error('Failed to resize image', err);
+				signal.throwIfAborted();
 			}
-		} else {
-			item.compressedSize = null;
-			item.suffix = '';
+
+			const needsImageFrame = item.imageFrameParams != null && IMAGE_EDITING_SUPPORTED_TYPES.includes(preprocessedFile.type);
+			if (needsImageFrame && item.imageFrameParams != null) {
+				const canvas = window.document.createElement('canvas');
+				const ExifReader = await import('exifreader');
+				signal.throwIfAborted();
+				const exif = await ExifReader.load(await item.file.arrayBuffer());
+				signal.throwIfAborted();
+				const ImageFrameRenderer = await import('@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js').then(x => x.ImageFrameRenderer);
+				signal.throwIfAborted();
+				const frameBitmap = await window.createImageBitmap(preprocessedFile);
+				try {
+					signal.throwIfAborted();
+					const frameRenderer = new ImageFrameRenderer({
+						canvas: canvas,
+						image: frameBitmap,
+						exif,
+						caption: item.caption ?? null,
+						filename: item.name,
+					});
+					try {
+						await frameRenderer.render(item.imageFrameParams);
+						signal.throwIfAborted();
+						preprocessedFile = await canvasToBlob(canvas);
+					} finally {
+						releaseImageResource(() => frameRenderer.destroy());
+					}
+				} finally {
+					releaseImageResource(() => frameBitmap.close());
+				}
+				signal.throwIfAborted();
+			}
+
+			const compressionSettings = getCompressionSettings(item.compressionLevel);
+			const needsCompress = item.compressionLevel !== 0 && compressionSettings && IMAGE_EDITING_SUPPORTED_TYPES.includes(preprocessedFile.type) && !(await isAnimated(preprocessedFile));
+			signal.throwIfAborted();
+			let compressedSize = item.compressedSize;
+			let suffix = item.suffix;
+			if (needsCompress) {
+				const config = {
+					mimeType: (isWebpSupported() ? 'image/webp' : 'image/jpeg') as 'image/webp' | 'image/jpeg',
+					maxWidth: compressionSettings.maxWidth,
+					maxHeight: compressionSettings.maxHeight,
+					quality: isWebpSupported() ? 0.85 : 0.8,
+				};
+				try {
+					const result = await readAndCompressImage(preprocessedFile, config);
+					signal.throwIfAborted();
+					if (result.size < preprocessedFile.size || preprocessedFile.type === 'image/webp') {
+						// Preserve the existing compression selection and output format.
+						preprocessedFile = result;
+						compressedSize = result.size;
+						suffix = '.' + mimeTypeMap[config.mimeType];
+					}
+				} catch (err) {
+					signal.throwIfAborted();
+					console.error('Failed to resize image', err);
+				}
+			} else {
+				compressedSize = null;
+				suffix = '';
+			}
+
+			signal.throwIfAborted();
+			updateItemObjectUrls(item, preprocessedFile);
+			item.preprocessedFile = markRaw(preprocessedFile);
+			item.compressedSize = compressedSize;
+			item.suffix = suffix;
+		} finally {
+			releaseImageResource(() => imageBitmap.close());
 		}
-
-		imageBitmap.close();
-
-		updateItemObjectUrls(item, preprocessedFile);
-		item.preprocessedFile = markRaw(preprocessedFile);
 	}
 
 	async function preprocessForVideo(item: UploaderItem): Promise<void> {
