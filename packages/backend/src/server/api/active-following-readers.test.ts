@@ -18,6 +18,9 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { MiNote } from '@features/notes/backend/models/Note.js';
 
+// These predicates are constructor fields; no injected services are used by them.
+const userEntityPredicates = Reflect.construct(UserEntityService, []) as UserEntityService;
+
 function instance<T extends object>(prototype: T, dependencies: Record<string, unknown>): T {
 	const value = Object.create(prototype);
 	for (const [key, dependency] of Object.entries(dependencies)) {
@@ -189,6 +192,7 @@ test.each([null, 'remote.example'])('queued follow checks current suspension bef
 		usersRepository: { findOneByOrFail: async ({ id }: { id: string }) => id === 'actor'
 			? { id, host, isSuspended: true }
 			: { id, host: 'destination.example', isLocked: true } },
+		userEntityService: userEntityPredicates,
 		createFollowRequest, insertFollowingDoc,
 	});
 	await expect(service.follow({ id: 'actor' }, { id: 'target' })).resolves.toBeUndefined();
@@ -205,7 +209,7 @@ test('inactive reverse and moved-account relations cannot auto-approve a locked 
 		usersRepository: { findOneByOrFail: async ({ id }: { id: string }) => id === 'actor'
 			? { id, host: 'remote.example', isSuspended: false }
 			: { id, host: null, isLocked: true } },
-		userEntityService: { isLocalUser: (user: { host: string | null }) => user.host === null, isRemoteUser: (user: { host: string | null }) => user.host !== null },
+		userEntityService: userEntityPredicates,
 		userBlockingService: { checkBlocked: async () => false },
 		userProfilesRepository: { findOneByOrFail: async () => ({ autoAcceptFollowed: true }) },
 		idService: { parse: () => ({ date: Date.UTC(2020, 0, 1) }) },
