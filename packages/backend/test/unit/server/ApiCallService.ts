@@ -7,18 +7,19 @@ import 'reflect-metadata';
 import { describe, expect, test, vi } from 'vitest';
 import { Test } from '@nestjs/testing';
 import { ModuleRef } from '@nestjs/core';
-import type { InjectionToken, Provider } from '@nestjs/common';
 import Fastify from 'fastify';
 import * as v from 'valibot';
-import { DI } from '@/di-symbols.js';
+import { ApiExecutionContextFactory } from '@features/api/backend/transport/ApiExecutionContextFactory.js';
 import { OrpcPilotService } from '@features/api/backend/transport/OrpcPilotService.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
-import { envOption } from '@/env.js';
 import { logManager } from '@features/runtime/backend/logging/logging-runtime.js';
 import { PrettyConsoleBackend } from '@features/runtime/backend/logging/PrettyConsoleBackend.js';
 import { mockDeep } from 'vitest-mock-extended';
 import { createApiTestRouter } from '@features/index/backend/api.test-fixture.js';
 import { createNotesRouter } from '@features/notes/backend/api.implementation.js';
+import { envOption } from '@/env.js';
+import { DI } from '@/di-symbols.js';
+import type { InjectionToken, Provider } from '@nestjs/common';
 import type { LogBackend } from '@features/runtime/backend/logging/LogBackend.js';
 
 function injectionToken(value: unknown): InjectionToken {
@@ -28,9 +29,12 @@ function injectionToken(value: unknown): InjectionToken {
 
 /** Construct the actual transport with ordinary providers; no database is needed for the failed operation. */
 async function createService() {
-	const tokens = v.parse(v.array(v.unknown()), Reflect.getMetadata('design:paramtypes', OrpcPilotService)).map(injectionToken);
-	const explicit = v.parse(v.array(v.object({ index: v.number(), param: v.unknown() })), Reflect.getMetadata('self:paramtypes', OrpcPilotService) ?? []);
-	for (const parameter of explicit) tokens[parameter.index] = injectionToken(parameter.param);
+	const tokens = [OrpcPilotService, ApiExecutionContextFactory].flatMap(target => {
+		const dependencies = v.parse(v.array(v.unknown()), Reflect.getMetadata('design:paramtypes', target)).map(injectionToken);
+		const explicit = v.parse(v.array(v.object({ index: v.number(), param: v.unknown() })), Reflect.getMetadata('self:paramtypes', target) ?? []);
+		for (const parameter of explicit) dependencies[parameter.index] = injectionToken(parameter.param);
+		return dependencies;
+	});
 	const telemetryService = {
 		startSpan: vi.fn((_name: string, callback: () => unknown) => callback()),
 		captureMessage: vi.fn((_message: string, _details: { level: string; extra: Record<string, unknown> }) => undefined),
@@ -40,7 +44,7 @@ async function createService() {
 	failedOperation.mockRejectedValue(new TypeError('broken endpoint'));
 	const router = createApiTestRouter({ notes: createNotesRouter(notes) });
 	const lookup = { get: () => ({ compose: () => router }) };
-	const providers: Provider[] = [...new Set(tokens)].map(token => ({
+	const providers: Provider[] = [...new Set(tokens)].filter(token => token !== ApiExecutionContextFactory).map(token => ({
 		provide: token,
 		useValue: token === ModuleRef ? lookup
 		: token === DI.config ? { maxFileSize: 1024, enableIpRateLimit: false }
@@ -50,7 +54,7 @@ async function createService() {
 		: typeof token === 'function' && token.name === 'TelemetryService' ? telemetryService
 		: {},
 	}));
-	const nest = await Test.createTestingModule({ providers: [...providers, OrpcPilotService] }).compile();
+	const nest = await Test.createTestingModule({ providers: [...providers, ApiExecutionContextFactory, OrpcPilotService] }).compile();
 	const app = Fastify();
 	await app.register(async api => nest.get(OrpcPilotService).register(api), { prefix: '/api' });
 	return { app, nest, telemetryService, failedOperation };
