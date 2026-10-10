@@ -8,9 +8,9 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
 import { languages } from 'i18n';
-import { locales as currentLocales } from './retired-ui-locale-baseline.js';
+import { locales as currentLocales } from './retired-ui-next-locale-baseline.js';
 import type { ParameterizedString } from 'i18n';
-import type { Locale } from './retired-ui-locale-types.js';
+import type { Locale } from './retired-ui-next-locale-types.js';
 import baseline from './retired-drive-locale-baseline.json';
 
 type RetiredDriveLocale = Locale & {

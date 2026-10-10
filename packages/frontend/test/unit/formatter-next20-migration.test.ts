@@ -25,7 +25,7 @@ import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import migrationInputs from './formatter-next20-migration.json';
 import type { ParameterizedString } from 'i18n';
-import type { Locale } from './retired-ui-locale-types.js';
+import type { Locale } from './retired-ui-next-locale-types.js';
 
 vi.mock('@features/ui/frontend/components/MkButton.vue', async () => {
 	const { defineComponent, h } = await import('vue');

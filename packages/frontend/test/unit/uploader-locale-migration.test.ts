@@ -26,7 +26,7 @@ import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
 import type { ParameterizedString } from 'i18n';
-import type { Locale } from './retired-ui-locale-types.js';
+import type { Locale } from './retired-ui-next-locale-types.js';
 
 const actions = vi.hoisted(() => ({
 	confirm: vi.fn(), abortAll: vi.fn(), upload: vi.fn(), addFiles: vi.fn(), close: vi.fn(),

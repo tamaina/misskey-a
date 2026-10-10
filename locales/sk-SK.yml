@@ -840,14 +840,6 @@ _role:
     low: "Málo"
     middle: "Stredné"
     high: "Vysoká"
-_sensitiveMediaDetection:
-  description: "Strojové učenie sa použije na automatickú detekciu citlivých médií na účely ich moderovania. Mierne sa zvýši zaťaženie servera."
-  sensitivity: "Citlivosť detekcie"
-  sensitivityDescription: "Nižšia citlivosť znižuje počet falošne pozitívnych výsledkov (false positives). Vyššia citlivosť znižuje počet falošne negatívnych výsledkov (false negatives)."
-  setSensitiveFlagAutomatically: "Nastaviť príznak NSFW"
-  setSensitiveFlagAutomaticallyDescription: "Aj keď je toto nastavenie vypnuté, výsledok rozhodnutia je interne uložený."
-  analyzeVideos: "Zapnúť analýzu videa"
-  analyzeVideosDescription: "Okrem obrázkov zapne detekciu aj pre videá. Zaťaženie servera sa mierne zvýši."
 _emailUnavailable:
   used: "Táto emailová adresa sa už používa"
   format: "Formát emailovej adresy je nesprávny"
@@ -1039,7 +1031,6 @@ _2fa:
   step3: "Nastavenie dokončíte zadaním tokenu z vašej aplikácie."
   step4: "Od teraz, všetky ďalšie prihlásenia budú vyžadovať prihlasovací token."
   securityKeyInfo: "Okrem odtlačku prsta alebo PIN autentifikácie si môžete nastaviť autentifikáciu cez hardvérový bezpečnostný kľúč podporujúci FIDO2 a tak ešte viac zabezpečiť svoj účet."
-  removeKeyConfirm: "Naozaj chcete odstrániť \"{name}\"?"
   renewTOTPCancel: "Nie, ďakujem"
 _permissions:
   "read:account": "Vidieť informácie o vašom účte"
@@ -1330,8 +1321,6 @@ _deck:
   profile: "Profil"
   newProfile: "Nový profil"
   deleteProfile: "Odstrániť profil"
-  introduction: "Kombinujte stĺpce a vytvorte si svoje vlastné rozhranie!"
-  introduction2: "Stlačením tlačidla + v pravej časti obrazovky môžete kedykoľvek pridať stĺpce."
   widgetsIntroduction: "V ponuke stĺpca vyberte možnosť \"Upraviť widget\" a pridajte widget"
   _columns:
     main: "Hlavný"
