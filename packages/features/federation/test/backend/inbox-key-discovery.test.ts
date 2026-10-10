@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { generateKeyPairSync, randomUUID } from 'node:crypto';
+import { generateKeyPairSync, randomUUID, sign } from 'node:crypto';
 import { describe, expect, test, vi } from 'vitest';
 import { mock } from 'vitest-mock-extended';
 import * as Bull from 'bullmq';
@@ -60,6 +60,30 @@ function job(): Bull.Job<Parameters<InboxProcessorService['process']>[0]['data']
 }
 
 describe('inbox Actor key discovery', () => {
+	test.each(['rsa', 'ed25519'] as const)('processes a retained wrapped %s job through real verification and rejects tampering', async algorithm => {
+		const { user } = resolverFixture(1000);
+		const keys = algorithm === 'rsa' ? generateKeyPairSync('rsa', { modulusLength: 2048 }) : generateKeyPairSync('ed25519');
+		const keyId = `${uri}#main-key`;
+		const signingString = '(request-target): post /inbox\nhost: receiver.example';
+		const signature = sign(algorithm === 'rsa' ? 'sha256' : null, Buffer.from(signingString), keys.privateKey).toString('base64');
+		const fixture = processorFixture({ user, key: mock<MiUserPublickey>({ keyId, keyPem: keys.publicKey.export({ type: 'spki', format: 'pem' }).toString() }) });
+		const retained = job();
+		retained.data.signature = JSON.parse(JSON.stringify({ version: 'draft', value: { scheme: 'Signature', keyId, signingString, params: { keyId, signature, headers: ['(request-target)', 'host'], algorithm: algorithm === 'rsa' ? 'rsa-sha256' : 'hs2019' } } }));
+		await expect(fixture.processor.process(retained)).resolves.toBe('ok');
+		expect(fixture.resolver.getAuthUserFromApId).toHaveBeenCalledWith(uri, keyId);
+		expect(fixture.perform).toHaveBeenCalledTimes(1);
+		retained.data.signature = JSON.parse(JSON.stringify({ ...retained.data.signature, value: { scheme: 'Signature', keyId, signingString: signingString + 'tampered', params: { keyId, signature, headers: ['(request-target)', 'host'], algorithm: algorithm === 'rsa' ? 'rsa-sha256' : 'hs2019' } } }));
+		await expect(fixture.processor.process(retained)).rejects.toBeInstanceOf(Bull.UnrecoverableError);
+		expect(fixture.perform).toHaveBeenCalledTimes(1);
+	});
+
+	test('unsigned job without an LD signature cannot perform an activity', async () => {
+		const fixture = processorFixture({ user: resolverFixture(1000).user, key: null });
+		const unsigned = job();
+		unsigned.data.signature = null;
+		await expect(fixture.processor.process(unsigned)).rejects.toBeInstanceOf(Bull.UnrecoverableError);
+		expect(fixture.perform).not.toHaveBeenCalled();
+	});
 	test('only a recent Actor suppressing discovery carries cooldown metadata', async () => {
 		const recent = resolverFixture(1000);
 		const auth = await recent.service.getAuthUserFromApId(uri, `${uri}#ed25519-key`);

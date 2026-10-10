@@ -16,6 +16,7 @@ import { ApRequestService } from '../../backend/services/ApRequestService.js';
 import { ApDbResolverService } from '../../backend/services/ApDbResolverService.js';
 import { ActivityPubServerService } from '../../backend/http/ActivityPubServerService.js';
 import { InboxProcessorService } from '../../backend/jobs/InboxProcessorService.js';
+import { normalizeInboxJobSignature } from '../../backend/utility/inbox-job-signature.js';
 import { InboxKeyDiscoveryDeferredError, inboxKeyDiscoveryBackoff } from '../../backend/utility/inbox-key-discovery.js';
 import { MiUserKeypair } from '../../backend/models/UserKeypair.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
@@ -104,7 +105,7 @@ test('Ed sender receives 202 before a recent RSA-only receiver cache delays and 
 		const queued = await inbox.mock.results[0].value as Bull.Job<InboxJobData>;
 		expect(await queued.getState()).toBe('waiting');
 		expect(queued.data.activity).toEqual(activity);
-		expect(queued.data.signature.keyId).toBe(`${uri}#ed25519-key`);
+		expect(normalizeInboxJobSignature(queued.data.signature)?.keyId).toBe(`${uri}#ed25519-key`);
 		expect(perform).not.toHaveBeenCalled();
 		worker = new Bull.Worker(name, async job => processor.process(job), {
 			connection, settings: { backoffStrategy: (_attempt, _type, error, job) => error instanceof InboxKeyDiscoveryDeferredError ? inboxKeyDiscoveryBackoff(error, job) : -1 },

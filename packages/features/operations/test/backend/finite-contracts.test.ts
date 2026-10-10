@@ -28,10 +28,21 @@ import { createAdminQueueShowJobProcedure } from '../../backend/endpoints/admin/
 import { adminQueueShowJobContract } from '../../backend/endpoints/admin/queue/show-job.contract.js';
 import { createAdminQueueQueuesProcedure } from '../../backend/endpoints/admin/queue/queues.js';
 import { createAdminQueueStatsProcedure } from '../../backend/endpoints/admin/queue/stats.js';
+import { createAdminQueueInboxDelayedProcedure } from '../../backend/endpoints/admin/queue/inbox-delayed.js';
 import { createAdminGetTableStatsProcedure } from '../../backend/endpoints/admin/get-table-stats.js';
 import { createAdminGetIndexStatsProcedure } from '../../backend/endpoints/admin/get-index-stats.js';
 const metrics = { meta: { count: 3, prevTS: 1, prevCount: 2 }, data: [1, 2], count: 3 };
 const counts = { waiting: 1, active: 2, completed: 3, failed: 4, delayed: 5 };
+
+test('delayed inbox listing counts mixed retained formats without one unsupported job breaking the response', async () => {
+	const value = { scheme: 'Signature', keyId: 'https://signed.example/key', signingString: 'synthetic', params: { keyId: 'https://signed.example/key', signature: 'AAAA', headers: ['host'] } };
+	const signatures = [value, { version: 'draft', value }, null, { version: 'rfc9421', value: [] }, { version: 'unknown', value }, false, { keyId: 123 }];
+	const jobs = signatures.map(signature => JSON.parse(JSON.stringify({ data: { signature, activity: { type: 'Update', actor: 'https://actor.example/users/alice' } } })));
+	const getJobs = vi.fn(async () => jobs);
+	const result = await createProcedureClient(createAdminQueueInboxDelayedProcedure({ inboxQueue: { getJobs } }), { context: nativeContext() })({});
+	 expect(result).toEqual([['actor.example', 5], ['signed.example', 2]]);
+	 expect(getJobs).toHaveBeenCalledWith(['delayed']);
+});
 const redisInfo = [
 	'redis_version:7.2.0', 'redis_mode:standalone', 'run_id:fixture', 'process_id:123', 'tcp_port:6379',
 	'os:Linux', 'uptime_in_seconds:9', 'total_system_memory:1024', 'maxmemory:512', 'used_memory:128',
