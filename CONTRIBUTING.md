@@ -13,9 +13,7 @@ See [ROADMAP.md](./ROADMAP.md)
 ## Issues
 Before creating an issue, please check the following:
 - To avoid duplication, please search for similar issues before creating a new issue.
-- Do not use Issues to ask questions or troubleshooting.
-	- Issues should only be used to feature requests, suggestions, and bug tracking.
-	- Please ask questions or troubleshooting in [upstream Misskey GitHub Discussions](https://github.com/misskey-dev/misskey/discussions) or [upstream Misskey Discord](https://discord.gg/Wp8gVStHW3).
+- Use [misskey-a Issues](https://github.com/tamaina/misskey-a/issues) for questions, troubleshooting, feature requests, suggestions, and bug reports.
 
 > [!WARNING]
 > Do not close issues that are about to be resolved. It should remain open until a commit that actually resolves it is merged.

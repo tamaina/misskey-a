@@ -4516,9 +4516,9 @@ export type components = {
             description: string | null;
             langs: string[];
             tosUrl: string | null;
-            /** @default https://github.com/misskey-dev/misskey */
+            /** @default https://github.com/tamaina/misskey-a */
             repositoryUrl: string | null;
-            /** @default https://github.com/misskey-dev/misskey/issues/new */
+            /** @default https://github.com/tamaina/misskey-a/issues/new */
             feedbackUrl: string | null;
             defaultDarkTheme: string | null;
             defaultLightTheme: string | null;
@@ -4635,9 +4635,9 @@ export type components = {
             description: string | null;
             langs: string[];
             tosUrl: string | null;
-            /** @default https://github.com/misskey-dev/misskey */
+            /** @default https://github.com/tamaina/misskey-a */
             repositoryUrl: string | null;
-            /** @default https://github.com/misskey-dev/misskey/issues/new */
+            /** @default https://github.com/tamaina/misskey-a/issues/new */
             feedbackUrl: string | null;
             defaultDarkTheme: string | null;
             defaultLightTheme: string | null;
@@ -91414,9 +91414,9 @@ export interface operations {
                         description: string | null;
                         langs: string[];
                         tosUrl: string | null;
-                        /** @default https://github.com/misskey-dev/misskey */
+                        /** @default https://github.com/tamaina/misskey-a */
                         repositoryUrl: string | null;
-                        /** @default https://github.com/misskey-dev/misskey/issues/new */
+                        /** @default https://github.com/tamaina/misskey-a/issues/new */
                         feedbackUrl: string | null;
                         defaultDarkTheme: string | null;
                         defaultLightTheme: string | null;
@@ -91530,9 +91530,9 @@ export interface operations {
                         description: string | null;
                         langs: string[];
                         tosUrl: string | null;
-                        /** @default https://github.com/misskey-dev/misskey */
+                        /** @default https://github.com/tamaina/misskey-a */
                         repositoryUrl: string | null;
-                        /** @default https://github.com/misskey-dev/misskey/issues/new */
+                        /** @default https://github.com/tamaina/misskey-a/issues/new */
                         feedbackUrl: string | null;
                         defaultDarkTheme: string | null;
                         defaultLightTheme: string | null;

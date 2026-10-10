@@ -1,7 +1,4 @@
 contact_links:
-  - name: 💬 Misskey official Discord
-    url: https://discord.gg/Wp8gVStHW3
-    about: Chat freely about Misskey
-  - name: 💬 Upstream Misskey Discussions
-    url: https://github.com/misskey-dev/misskey/discussions
-    about: Upstream Misskey support; misskey-a bugs and feature requests belong in this repository
+  - name: 💬 misskey-a support and feedback
+    url: https://github.com/tamaina/misskey-a/issues
+    about: Ask questions, report bugs, and suggest features for misskey-a
