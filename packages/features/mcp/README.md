@@ -9,7 +9,9 @@ nonbrowser clients. Nonloopback clients, foreign/duplicate critical headers,
 query credentials, non-JSON bodies and bodies over 1 MiB are rejected. Request
 logging and proxy trust are disabled. The pilot uses stateless POST JSON replies,
 one bearer header per request, a 30-second deadline and at most eight active
-requests. GET/DELETE are unsupported. SDK 1.32.1 is pinned.
+requests. Native in-flight permits remain held until the observed authentication
+and tool promises settle, even after transport cancellation. GET/DELETE are
+unsupported. SDK 1.32.0 is pinned.
 
 Only `list_my_notes` is listed. Its descriptive schema comes from the native
 contract; native validation remains authoritative. `McpApiService` reuses the
@@ -20,12 +22,25 @@ request, never across requests or sessions. No separate DB/query/scope is added.
 **Access includes the account's public and nonpublic notes.** `users/notes` is
 kindless, so permission=[] tokens retain that native behavior. Tool description
 and any future consent UI must state this explicitly. Note content is untrusted
-data. Foreign subjects are denied before native invocation. Cancellation
-suppresses the transport response and releases transport state; it does not
-actively cancel SQL or guarantee that native work stops.
+data. Foreign subjects are denied before native invocation. Observed disconnect,
+deadline and shutdown suppress the transport response and release transport
+state; they do not actively cancel SQL or guarantee that native work stops. Disconnect observation
+starts before authentication. Detached work inside existing native services is
+outside these observed promise permits.
+
+Cross-POST `notifications/cancelled` is explicitly unsupported (HTTP 501 after
+authentication, or 503 when the native-work limit is full). Every POST has its own
+stateless SDK server. SDK `callTool` AbortSignal rejects the client promise and
+sends that notification without aborting the original HTTP fetch; it therefore
+does not cancel this pilot's native work or suppress its eventual response by
+itself. Supported disconnect/deadline/shutdown cancellation suppresses replies
+and immediately releases transport state while retaining native-work permits.
+No principal/request correlation map or session architecture is introduced.
 
 The synthetic unit tests exercise Host/Origin/body/auth boundaries, installed SDK
-initialize/list/call, native output/error behavior, revocation and delayed abort.
+initialize/list/call, native output/error behavior, revocation, delayed abort,
+repeated cancellation batches, slow-auth disconnect and actual SDK callTool
+AbortSignal behavior.
 The opt-in PostgreSQL fixture executes native authentication, QueryService SQL,
 NoteEntityService packing/private nested-note hiding and token revocation using
 real task-owned repositories. Auxiliary cache, user/media/emoji packing and
