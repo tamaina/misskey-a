@@ -7,6 +7,9 @@ import { generateKeyPairSync, randomUUID, sign } from 'node:crypto';
 import { describe, expect, test, vi } from 'vitest';
 import { mock } from 'vitest-mock-extended';
 import * as Bull from 'bullmq';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { ActivityPubServerService } from '../../backend/http/ActivityPubServerService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { parseRequestSignature, signAsDraftToRequest, verifyDraftSignature } from '@misskey-dev/node-http-message-signatures';
 import { ApDbResolverService } from '../../backend/services/ApDbResolverService.js';
 import { ApPersonService } from '../../backend/services/ApPersonService.js';
@@ -75,6 +78,65 @@ describe('inbox Actor key discovery', () => {
 		retained.data.signature = JSON.parse(JSON.stringify({ ...retained.data.signature, value: { scheme: 'Signature', keyId, signingString: signingString + 'tampered', params: { keyId, signature, headers: ['(request-target)', 'host'], algorithm: algorithm === 'rsa' ? 'rsa-sha256' : 'hs2019' } } }));
 		await expect(fixture.processor.process(retained)).rejects.toBeInstanceOf(Bull.UnrecoverableError);
 		expect(fixture.perform).toHaveBeenCalledTimes(1);
+	});
+
+	test.each(['missing HTTP signature', 'malformed HTTP signature', 'RFC9421 HTTP signature', 'invalid date', 'tampered LD body', 'unsupported LD type', 'mismatched actor', 'empty LD signature', 'missing LD signature'] as const)('HTTP ingress → queue JSON → processor LD fallback: %s', async scenario => {
+		const { user } = resolverFixture(1000);
+		const rsa = generateKeyPairSync('rsa', { modulusLength: 2048 });
+		const keyId = `${uri}#main-key`;
+		const http = mock<HttpRequestService>();
+		http.send.mockRejectedValue(new Error('Unexpected context fetch: fixture must stay offline'));
+		const signed = await new JsonLd(http).signRsaSignature2017({
+			'@context': 'https://www.w3.org/ns/activitystreams',
+			id: 'https://sender.example/activity/1', type: 'Create', actor: uri,
+			object: { id: 'https://sender.example/notes/1', type: 'Note', attributedTo: uri, content: 'signed content' },
+		}, rsa.privateKey.export({ type: 'pkcs8', format: 'pem' }).toString(), keyId);
+		const body = JSON.parse(JSON.stringify(signed));
+		if (scenario === 'tampered LD body') body.object.content = 'unsigned replacement';
+		if (scenario === 'unsupported LD type') body.signature.type = 'Ed25519Signature2020';
+		if (scenario === 'mismatched actor') body.actor = 'https://sender.example/users/mallory';
+		if (scenario === 'empty LD signature') body.signature = null;
+		if (scenario === 'missing LD signature') delete body.signature;
+		const headers: Record<string, string> = { host: 'recipient.example', date: new Date().toUTCString() };
+		if (scenario === 'malformed HTTP signature') headers.signature = 'malformed';
+		if (scenario === 'RFC9421 HTTP signature') {
+			headers['signature-input'] = 'sig1=("@method");keyid="https://sender.example/users/alice#main-key"';
+			headers.signature = 'sig1=:AAAA:';
+		}
+		if (scenario === 'invalid date') headers.date = 'invalid-date';
+		const request = mock<FastifyRequest>();
+		Object.defineProperty(request, 'raw', { value: { method: 'POST', url: '/inbox', headers, rawHeaders: Object.entries(headers).flat() } });
+		request.headers = headers;
+		request.body = body;
+		request.rawBody = Buffer.from(JSON.stringify(body));
+		const queuedAdd = vi.fn();
+		const queue: QueueService = Object.assign(Object.create(QueueService.prototype), { config: {}, inboxQueue: { add: queuedAdd } });
+		const ingress: ActivityPubServerService = Object.assign(Object.create(ActivityPubServerService.prototype), { meta: { federation: 'all' }, config: { host: headers.host }, queueService: queue });
+		const reply = mock<FastifyReply>();
+		ingress['inbox'](request, reply);
+		if (scenario === 'missing LD signature') {
+			expect(reply.code).toHaveBeenCalledWith(401);
+			expect(queuedAdd).not.toHaveBeenCalled();
+			return;
+		}
+		expect(reply.code).toHaveBeenCalledWith(202);
+		expect(queuedAdd).toHaveBeenCalledOnce();
+		const data = JSON.parse(JSON.stringify(queuedAdd.mock.calls[0][1]));
+		expect(data.signature).toBeNull();
+		expect(data.activity).toEqual(body);
+		const fixture = processorFixture({ user, key: mock<MiUserPublickey>({ keyId, keyPem: rsa.publicKey.export({ type: 'spki', format: 'pem' }).toString() }) });
+		Object.defineProperty(fixture.processor, 'jsonLdService', { value: new JsonLdService(http) });
+		const queued = job();
+		Object.defineProperty(queued, 'data', { value: data });
+		if (['tampered LD body', 'unsupported LD type', 'mismatched actor', 'empty LD signature'].includes(scenario)) {
+			await expect(fixture.processor.process(queued)).rejects.toBeInstanceOf(Bull.UnrecoverableError);
+			expect(fixture.perform).not.toHaveBeenCalled();
+		} else {
+			await expect(fixture.processor.process(queued)).resolves.toBe('ok');
+			expect(fixture.perform).toHaveBeenCalledOnce();
+			expect(fixture.resolver.getAuthUserFromApId).toHaveBeenNthCalledWith(2, uri, keyId);
+		}
+		expect(http.send).not.toHaveBeenCalled();
 	});
 
 	test('unsigned job without an LD signature cannot perform an activity', async () => {

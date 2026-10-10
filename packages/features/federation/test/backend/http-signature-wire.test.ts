@@ -5,12 +5,12 @@
 
 import { createServer, request as httpRequest, type IncomingMessage } from 'node:http';
 import { once } from 'node:events';
-import { generateKeyPairSync } from 'node:crypto';
+import { createHash, generateKeyPairSync } from 'node:crypto';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import httpSignature from '@peertube/http-signature';
-import { parseRequestSignature, verifyDraftSignature } from '@misskey-dev/node-http-message-signatures';
+import { parseRequestSignature, verifyDigestHeader, verifyDraftSignature } from '@misskey-dev/node-http-message-signatures';
 import { genRsaKeyPair } from '@features/federation/backend/utility/gen-key-pair.js';
 import { ApRequestCreator } from '@features/federation/backend/services/ApRequestService.js';
 import { ActivityPubServerService } from '@features/federation/backend/http/ActivityPubServerService.js';
@@ -51,14 +51,14 @@ function replaceHeader(request: IncomingMessage, name: string, value: string) {
 	}
 }
 
-function inbox(raw: IncomingMessage, rawBody = body) {
+function inbox(raw: IncomingMessage, rawBody = body, requestBody: unknown = activity, host = raw.headers.host) {
 	const queue = mockDeep<QueueService>();
-	const service: ActivityPubServerService = Object.assign(Object.create(ActivityPubServerService.prototype), { meta: { federation: 'all' }, config: { host: raw.headers.host }, queueService: queue });
+	const service: ActivityPubServerService = Object.assign(Object.create(ActivityPubServerService.prototype), { meta: { federation: 'all' }, config: { host }, queueService: queue });
 	const request: FastifyRequest = mockDeep<FastifyRequest>();
 	request.raw = raw;
 	request.headers = raw.headers;
 	request.rawBody = Buffer.from(rawBody);
-	request.body = activity;
+	request.body = requestBody;
 	const reply = mockDeep<FastifyReply>();
 	service['inbox'](request, reply);
 	return { queue, reply };
@@ -148,9 +148,31 @@ describe('Draft RSA interoperability on captured Node HTTP requests', () => {
 		}
 	});
 
+	test.each([null, 'invalid', {}, { actor: null, signature: {} }])('rejects invalid activity before parsing or LD fallback: %j', async invalid => {
+		const { incoming } = await capture('/inbox', 'new');
+		replaceHeader(incoming, 'signature', 'malformed');
+		const result = inbox(incoming, body, invalid);
+		expect(result.reply.code).toHaveBeenCalledWith(400);
+		expect(result.queue.inbox).not.toHaveBeenCalled();
+	});
+
+	test.each(['digest mismatch', 'SHA-512 digest', 'host mismatch'] as const)('a parsed HTTP signature with %s does not take the LD parse-failure fallback', async failure => {
+		const { incoming } = await capture('/inbox', 'new');
+		if (failure === 'SHA-512 digest') {
+			replaceHeader(incoming, 'digest', `SHA-512=${createHash('sha512').update(body).digest('base64')}`);
+			expect(await verifyDigestHeader(incoming, body, true)).toBe(true);
+		}
+		const result = inbox(incoming, failure === 'digest mismatch' ? body + ' ' : body,
+			{ ...activity, signature: { type: 'RsaSignature2017', creator: `${activity.actor}#main-key` } },
+			failure === 'host mismatch' ? 'different.example' : incoming.headers.host);
+		expect(result.reply.code).toHaveBeenCalledWith(401);
+		expect(result.queue.inbox).not.toHaveBeenCalled();
+	});
+
 	test('malformed Date is rejected at the inbox boundary before enqueueing', async () => {
 		const { incoming } = await capture('/inbox', 'new');
 		replaceHeader(incoming, 'date', 'invalid-date');
+		expect(() => parseRequestSignature(incoming, { requiredComponents: { draft: required }, clockSkew: { forward: 300_000, delay: 300_000 } })).not.toThrow();
 		const result = inbox(incoming);
 		expect(result.reply.code).toHaveBeenCalledWith(401);
 		expect(result.queue.inbox).not.toHaveBeenCalled();

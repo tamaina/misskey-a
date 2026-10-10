@@ -112,6 +112,16 @@ export class ActivityPubServerService {
 			return;
 		}
 
+		const body = request.body;
+
+		// Reject structurally invalid activities (e.g. missing actor) here instead
+		// of letting them fail deep inside the inbox processor. An actor-less
+		// activity can never be authenticated, so there is no point enqueueing it.
+		if (typeof body !== 'object' || body == null || !('actor' in body) || body.actor == null) {
+			reply.code(400);
+			return;
+		}
+
 		let signature;
 
 		try {
@@ -126,6 +136,13 @@ export class ActivityPubServerService {
 			if (parsed.version !== 'draft') throw new Error('Only draft HTTP signatures are supported');
 			signature = parsed;
 		} catch (_) {
+			if ('signature' in body) {
+				// Preserve the original LD-signature fallback. Queue acceptance is not
+				// authentication: the processor verifies the LD signature and actor.
+				this.queueService.inbox(body as IActivity, null);
+				reply.code(202);
+				return;
+			}
 			reply.code(401);
 			return;
 		}
@@ -181,16 +198,6 @@ export class ActivityPubServerService {
 				reply.code(401);
 				return;
 			}
-		}
-
-		const body = request.body;
-
-		// Reject structurally invalid activities (e.g. missing actor) here instead
-		// of letting them fail deep inside the inbox processor. An actor-less
-		// activity can never be authenticated, so there is no point enqueueing it.
-		if (typeof body !== 'object' || body == null || !('actor' in body) || body.actor == null) {
-			reply.code(400);
-			return;
 		}
 
 		this.queueService.inbox(body as IActivity, signature);
