@@ -55,6 +55,39 @@ test.each(['main', 'embed'])('real %s loader selects the resolved entry and pres
 		});
 		expect(imports).toEqual([`${embed ? '/embed_vite/' : '/vite/'}${map?.['fr-FR'] ?? (embed ? 'scripts/entry.ja-JP.js' : 'fr-FR/entry.ja-JP.js')}`]);
 		expect(storage.get('lang')).toBe('fr-FR');
-		expect(document.documentElement.dir).toBe('rtl');
+		expect(document.documentElement.dir).toBe('ltr');
 	}
 });
+
+for (const app of ['main', 'embed']) {
+	test(`${app} sets validated language and direction before importing on each reload`, async () => {
+		const embed = app === 'embed';
+		const source = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), `../../../${embed ? 'frontend-embed' : 'frontend'}/public/loader/boot.js`), 'utf8').replace('await import(', 'await importProbe(');
+		for (const [stored, browser, expected, direction] of [
+			['ja-JP', 'ar-SA', 'ja-JP', 'ltr'],
+			['ar-SA', 'ja-JP', 'ar-SA', 'rtl'],
+			['ug-CN', 'ja-JP', 'ug-CN', 'rtl'],
+			['fr-FR', 'ja-JP', 'fr-FR', 'ltr'],
+			['invalid', 'ar-SA', 'ar-SA', 'rtl'],
+			['invalid', 'ar', 'ar-SA', 'rtl'],
+			['invalid', 'unknown', 'en-US', 'ltr'],
+		]) {
+			const storage = new Map([['lang', stored]]);
+			const document = { readyState: 'complete', head: { children: [], appendChild() {} }, documentElement: { lang: 'previous', dir: direction === 'rtl' ? 'ltr' : 'rtl', style: { setProperty() {} }, classList: { add() {} } } };
+			const imports: string[] = [];
+			await runInNewContext(source, {
+				URL, URLSearchParams, window: { document, location: { search: '' } }, location: { search: '' }, document,
+				navigator: { language: browser }, localStorage: { getItem: (key: string) => storage.get(key) ?? null, setItem: (key: string, value: string) => storage.set(key, value) },
+				LANGS: ['ja-JP', 'ar-SA', 'ug-CN', 'fr-FR', 'en-US'], CLIENT_ENTRY: 'scripts/legacy.js',
+				CLIENT_LOCALE_ENTRIES: { [expected]: `scripts/${expected}.js` }, CLIENT_LOCALE_DIRECTIONS: { 'ja-JP': 'ltr', 'ar-SA': 'rtl', 'ug-CN': 'rtl', 'fr-FR': 'ltr', 'en-US': 'ltr' }, console: { error() {} },
+				importProbe: async (href: string) => {
+					expect(document.documentElement.lang).toBe(expected);
+					expect(document.documentElement.dir).toBe(direction);
+					imports.push(href);
+				},
+			});
+			expect(imports).toEqual([`${embed ? '/embed_vite/' : '/vite/'}scripts/${expected}.js`]);
+			expect(storage.get('lang')).toBe(expected);
+		}
+	});
+}

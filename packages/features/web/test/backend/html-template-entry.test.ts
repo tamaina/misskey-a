@@ -76,8 +76,9 @@ for (const artifact of ['present', 'absent', 'malformed'] as const) {
 for (const template of [BasePage, BaseEmbed]) {
 	test(`${template.name} serializes locale entry JSON in the existing bootstrap script`, async () => {
 		const files = { entryJs: 'scripts/entry.js', css: ['assets/shared.css'], modulePreloads: [] };
-		const data: CommonData = { version: 'test', config: mockDeep<Config>({ url: 'http://localhost' }), langs: ['ja-JP'], instanceName: 'Synthetic', icon: null, appleTouchIcon: null, themeColor: null, serverErrorImageUrl: '/fixture.png', infoImageUrl: '/fixture.png', notFoundImageUrl: '/fixture.png', instanceUrl: 'http://localhost', now: 0, federationEnabled: false, frontendViteFiles: files, frontendEmbedViteFiles: files, frontendBootloaderJs: null, frontendEmbedBootloaderJs: null, frontendBootloaderCss: null, frontendEmbedBootloaderCss: null };
+		const data: CommonData = { version: 'test', config: mockDeep<Config>({ url: 'http://localhost' }), langs: ['ja-JP', 'ar-SA', 'ug-CN', 'fr-FR', 'kab-KAB'], instanceName: 'Synthetic', icon: null, appleTouchIcon: null, themeColor: null, serverErrorImageUrl: '/fixture.png', infoImageUrl: '/fixture.png', notFoundImageUrl: '/fixture.png', instanceUrl: 'http://localhost', now: 0, federationEnabled: false, frontendViteFiles: files, frontendEmbedViteFiles: files, frontendBootloaderJs: null, frontendEmbedBootloaderJs: null, frontendBootloaderCss: null, frontendEmbedBootloaderCss: null };
 		const baseline = await template(data);
+		expect(baseline).toContain('const CLIENT_LOCALE_DIRECTIONS = {"ja-JP":"ltr","ar-SA":"rtl","ug-CN":"rtl","fr-FR":"ltr","kab-KAB":"ltr"};');
 		const value = '</script><script>example</script>\u2028&';
 		const mapped = await template({ ...data, frontendViteFiles: { ...files, localeEntries: { 'fr-FR': value } }, frontendEmbedViteFiles: { ...files, localeEntries: { 'fr-FR': value } } });
 		expect(mapped).not.toContain(value);

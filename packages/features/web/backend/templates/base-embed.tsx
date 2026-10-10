@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { buildLocaleDirections } from '../locale-direction.js';
 import { comment } from './_.js';
 import type { CommonProps } from './_.js';
 import { Splash } from './_splash.js';
@@ -66,6 +67,7 @@ export function BaseEmbed(props: PropsWithChildren<CommonProps<{
 						const CLIENT_ENTRY = {JSON.stringify(props.frontendEmbedViteFiles?.entryJs ?? null)};
 						const CLIENT_LOCALE_ENTRIES = {htmlSafeJsonStringify(props.frontendEmbedViteFiles?.localeEntries ?? null)};
 						const LANGS = {JSON.stringify(props.langs)};
+						const CLIENT_LOCALE_DIRECTIONS = {htmlSafeJsonStringify(buildLocaleDirections(props.langs))};
 					</script>
 
 					{safeMetaJson != null ? <script type="application/json" id="misskey_meta" data-generated-at={now}>{safeMetaJson}</script> : null}

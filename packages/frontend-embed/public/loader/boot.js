@@ -52,6 +52,8 @@
 		lang = 'en-US';
 	}
 	localStorage.setItem('lang', lang);
+	document.documentElement.lang = lang;
+	document.documentElement.dir = typeof CLIENT_LOCALE_DIRECTIONS !== 'undefined' ? CLIENT_LOCALE_DIRECTIONS?.[lang] ?? 'ltr' : 'ltr';
 	//#endregion
 
 	//#region Script
