@@ -2348,12 +2348,7 @@ _watermarkEditor:
   angle: "Кут"
   failedToLoadImage: "Не вдалося завантажити зображення"
 _imageEffector:
-  failedToLoadImage: "Не вдалося завантажити зображення"
-  _fxs:
-    grayscale: "Чорно-білий"
-    stripe: "Смуги"
   _fxProps:
-    angle: "Кут"
     scale: "Розмір"
     size: "Розмір"
     offset: "Позиція"

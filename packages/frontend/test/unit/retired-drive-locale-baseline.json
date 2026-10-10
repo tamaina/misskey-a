@@ -1,0 +1,309 @@
+{
+	"mappings": [
+		{
+			"global": "_imageEffector._fxProps.amount",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.amount"
+		},
+		{
+			"global": "_imageEffector._fxProps.angle",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.angle"
+		},
+		{
+			"global": "_imageEffector._fxProps.blueComponent",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.blueComponent"
+		},
+		{
+			"global": "_imageEffector._fxProps.brightness",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.brightness"
+		},
+		{
+			"global": "_imageEffector._fxProps.centerX",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.centerX"
+		},
+		{
+			"global": "_imageEffector._fxProps.centerY",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.centerY"
+		},
+		{
+			"global": "_imageEffector._fxProps.circle",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.circle"
+		},
+		{
+			"global": "_imageEffector._fxProps.contrast",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.contrast"
+		},
+		{
+			"global": "_imageEffector._fxProps.density",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.density"
+		},
+		{
+			"global": "_imageEffector._fxProps.direction",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.direction"
+		},
+		{
+			"global": "_imageEffector._fxProps.frequency",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.frequency"
+		},
+		{
+			"global": "_imageEffector._fxProps.glitchChannelShift",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.glitchChannelShift"
+		},
+		{
+			"global": "_imageEffector._fxProps.greenComponent",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.greenComponent"
+		},
+		{
+			"global": "_imageEffector._fxProps.hue",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.hue"
+		},
+		{
+			"global": "_imageEffector._fxProps.max",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.max"
+		},
+		{
+			"global": "_imageEffector._fxProps.min",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.min"
+		},
+		{
+			"global": "_imageEffector._fxProps.normalize",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.normalize"
+		},
+		{
+			"global": "_imageEffector._fxProps.phase",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.phase"
+		},
+		{
+			"global": "_imageEffector._fxProps.redComponent",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.redComponent"
+		},
+		{
+			"global": "_imageEffector._fxProps.saturation",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.saturation"
+		},
+		{
+			"global": "_imageEffector._fxProps.seed",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.seed"
+		},
+		{
+			"global": "_imageEffector._fxProps.strength",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.strength"
+		},
+		{
+			"global": "_imageEffector._fxProps.zoomLinesMaskSize",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.zoomLinesMaskSize"
+		},
+		{
+			"global": "_imageEffector._fxProps.zoomLinesOutlineThickness",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxProps.zoomLinesOutlineThickness"
+		},
+		{
+			"global": "_imageEffector._fxs.blockNoise",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.blockNoise"
+		},
+		{
+			"global": "_imageEffector._fxs.blur",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.blur"
+		},
+		{
+			"global": "_imageEffector._fxs.checker",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.checker"
+		},
+		{
+			"global": "_imageEffector._fxs.chromaticAberration",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.chromaticAberration"
+		},
+		{
+			"global": "_imageEffector._fxs.colorAdjust",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.colorAdjust"
+		},
+		{
+			"global": "_imageEffector._fxs.colorClamp",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.colorClamp"
+		},
+		{
+			"global": "_imageEffector._fxs.colorClampAdvanced",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.colorClampAdvanced"
+		},
+		{
+			"global": "_imageEffector._fxs.distort",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.distort"
+		},
+		{
+			"global": "_imageEffector._fxs.fill",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.fill"
+		},
+		{
+			"global": "_imageEffector._fxs.glitch",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.glitch"
+		},
+		{
+			"global": "_imageEffector._fxs.grayscale",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.grayscale"
+		},
+		{
+			"global": "_imageEffector._fxs.invert",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.invert"
+		},
+		{
+			"global": "_imageEffector._fxs.mirror",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.mirror"
+		},
+		{
+			"global": "_imageEffector._fxs.pixelate",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.pixelate"
+		},
+		{
+			"global": "_imageEffector._fxs.polkadot",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.polkadot"
+		},
+		{
+			"global": "_imageEffector._fxs.stripe",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.stripe"
+		},
+		{
+			"global": "_imageEffector._fxs.tearing",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.tearing"
+		},
+		{
+			"global": "_imageEffector._fxs.threshold",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.threshold"
+		},
+		{
+			"global": "_imageEffector._fxs.zoomLines",
+			"file": "utility/image-compositor-functions/messages.vue",
+			"local": "_imageEffector._fxs.zoomLines"
+		},
+		{
+			"global": "_imageEffector.addEffect",
+			"file": "components/MkImageEffectorDialog.vue",
+			"local": "addEffect"
+		},
+		{
+			"global": "_imageEffector.discardChangesConfirm",
+			"file": "components/MkImageEffectorDialog.vue",
+			"local": "discardChangesConfirm"
+		},
+		{
+			"global": "_imageEffector.failedToLoadImage",
+			"file": "components/MkImageEffectorDialog.vue",
+			"local": "failedToLoadImage"
+		},
+		{
+			"global": "_imageEffector.title",
+			"file": "components/MkImageEffectorDialog.vue",
+			"local": "title"
+		},
+		{
+			"global": "_uploader.abortConfirm",
+			"file": "components/MkUploaderDialog.vue",
+			"local": "uploaderAbortConfirm"
+		},
+		{
+			"global": "_uploader.allowedTypes",
+			"file": "components/MkUploaderDialog.vue",
+			"local": "uploaderAllowedTypes"
+		},
+		{
+			"global": "_uploader.compressedToX",
+			"file": "components/MkUploaderItems.vue",
+			"local": "compressedToX"
+		},
+		{
+			"global": "_uploader.doneConfirm",
+			"file": "components/MkUploaderDialog.vue",
+			"local": "uploaderDoneConfirm"
+		},
+		{
+			"global": "_uploader.editImage",
+			"file": "ts-messages.vue",
+			"local": "_uploader.editImage"
+		},
+		{
+			"global": "_uploader.maxFileSizeIsX",
+			"file": "components/MkUploaderDialog.vue",
+			"local": "uploaderMaxFileSizeIsX"
+		},
+		{
+			"global": "_uploader.savedXPercent",
+			"file": "components/MkUploaderItems.vue",
+			"local": "savedXPercent"
+		},
+		{
+			"global": "_uploader.tip",
+			"file": "components/MkUploaderDialog.vue",
+			"local": "uploaderTip"
+		}
+	],
+	"sha256": {
+		"ar-SA": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"ca-ES": "056310a9d99ab63e2bfa546bb94f21e2dcdbb60bd7f52225126783b70d9b08db",
+		"cs-CZ": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"da-DK": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"de-DE": "7f2618c6641db6f7a8476dd849769505bfcaff05a50f44b882b534f572f122c8",
+		"en-US": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"es-ES": "4c350c96caa8f6c9196fa43d0ac5553789c2e9d8497cebf55ce0fb0ac85f3019",
+		"fr-FR": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"id-ID": "741ad4ecf262bbed2b4ee681c253d4c3fdeba2366390e2de130330f0f6989571",
+		"it-IT": "e020df25890213eeebf5ef1e62f1c52ba39bc0fc9d238b94acdfc4b5baabd56f",
+		"ja-JP": "a0ea1a192b1a013cf40de7be0e94cde493541f113dda3512627e1455d8c2a6dd",
+		"ja-KS": "ee31fdb2721af43ae4a1009b9498bfdfe5e00cb496020fd839175b9f765356d6",
+		"kab-KAB": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"kn-IN": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"ko-KR": "2cbb03d4b19fff43d5b51ce6a95425f44c286896e9c3d8f07a7222f1d651f9ee",
+		"nl-NL": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"no-NO": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"pl-PL": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"pt-PT": "db6a2c65b5671d7504a62bec4b41d0e4a0cd7fa4c55a48c1ad7857fcb66ae933",
+		"ru-RU": "105f38f8ca8f4433bfa4078a19b072e206962ea3954521ade7c8a3314dbb7506",
+		"sk-SK": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"th-TH": "5f9f353c5272f2d26639a82f6f9ad25b72336516b7c6a7d2e730d7f34592fac8",
+		"tr-TR": "41e30deb88e690a0c2d16559f312038869c32c27360cfd0fde16e025a77afed8",
+		"ug-CN": "8e0ccf6a21b32df3c4dd99d5439f4e5e99be74bdef73e95cb5c7f407a1c0106f",
+		"uk-UA": "172052b7733bdeffa88e6aeaac81ab454836081f77b7fb8bbd1770ea99bdb77b",
+		"vi-VN": "6456d9bedf115e7d7f2e2eac82bd16ae905f865a6ab747d0a1d0fbb2d16dc4cf",
+		"zh-CN": "31db9b91964d395b19316817520c0c1b36fab2e1ec7022d58a869d9e5bd08ed7",
+		"zh-TW": "853e1535396d5849139f81dcda4bb8253976d378b623ee8ab22b84f9014ead0b"
+	}
+}

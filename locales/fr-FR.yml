@@ -2278,7 +2278,6 @@ _watermarkEditor:
   angle: "Angle"
 _imageEffector:
   _fxProps:
-    angle: "Angle"
     scale: "Taille"
     size: "Taille"
     offset: "Position"

@@ -2651,8 +2651,6 @@ _search:
   searchScopeAll: "Semua"
   searchScopeLocal: "Lokal"
   searchScopeUser: "Pengguna spesifik"
-_uploader:
-  allowedTypes: "Jenis berkas yang dapat diunggah"
 _watermarkEditor:
   driveFileTypeWarn: "Berkas ini tidak didukung"
   opacity: "Opasitas"
@@ -2665,7 +2663,6 @@ _watermarkEditor:
   angle: "Sudut"
 _imageEffector:
   _fxProps:
-    angle: "Sudut"
     scale: "Ukuran"
     size: "Ukuran"
     offset: "Posisi"
