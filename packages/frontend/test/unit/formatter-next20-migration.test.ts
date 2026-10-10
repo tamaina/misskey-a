@@ -16,14 +16,16 @@ import { describe, expect, test, vi } from 'vitest';
 import { fireEvent, render, cleanup } from '@testing-library/vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { locales } from './retired-drive-locale-baseline.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import MkCwButton from '@features/notes/frontend/components/MkCwButton.vue';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-with-locale.js';
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import migrationInputs from './formatter-next20-migration.json';
-import type { Locale, ParameterizedString } from 'i18n';
+import type { ParameterizedString } from 'i18n';
+import type { Locale } from './retired-ui-locale-types.js';
 
 vi.mock('@features/ui/frontend/components/MkButton.vue', async () => {
 	const { defineComponent, h } = await import('vue');

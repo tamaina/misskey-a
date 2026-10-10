@@ -24,7 +24,8 @@ import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import migrationInputs from './formatter-remaining20-migration.json';
-import type { Locale, ParameterizedString } from 'i18n';
+import type { ParameterizedString } from 'i18n';
+import type { Locale } from './retired-ui-locale-types.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const MagicString = createRequire(resolve(root, 'packages/frontend-builder/package.json'))('magic-string').default;

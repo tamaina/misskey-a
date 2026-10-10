@@ -1005,15 +1005,9 @@ _achievements:
     _markedAsCat:
       title: "أنا قط"
 _role:
-  new: "دور جديد"
   edit: "حرر الأدوار"
-  name: "اسم الدور"
-  description: "وصف الدور"
-  permission: "أذونات الدور"
   assignTarget: "نوع الإسناد"
-  condition: "الشرط"
   options: "خيارات"
-  policies: "السياسة العامة"
   priority: "الأولوية"
   _priority:
     low: "منخفضة"
@@ -1021,9 +1015,7 @@ _role:
     high: "عالية"
   _options:
     canManageCustomEmojis: "إدارة الإيموجي المخصصة"
-    pinMax: "حد عدد الملاحظات المثبتة"
   _condition:
-    isLocal: "مستخدم محلي"
     isRemote: "مستخدم بعيد"
 _emailUnavailable:
   used: "هذا البريد الإلكتروني مستخدم"
@@ -1482,12 +1474,7 @@ _abuseReport:
       mail: "البريد الإلكتروني "
 _moderationLogTypes:
   suspend: "علِق"
-  deleteDriveFile: "حُذف الملف"
   deleteNote: "حُذفت الملاحظة"
-  createGlobalAnnouncement: "أُنشئ إعلان عام"
-  createUserAnnouncement: "أُنشئ إعلان مستخدم"
-  updateGlobalAnnouncement: "حُدث إعلان عام"
-  updateUserAnnouncement: "حُدث إعلان مستخدم"
   resetPassword: "أعد تعيين كلمتك السرية"
   createInvitation: "ولِّد دعوة"
 _reversi:

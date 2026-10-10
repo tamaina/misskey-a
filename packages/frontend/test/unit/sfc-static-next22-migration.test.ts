@@ -16,13 +16,14 @@ import { compileScript, parse } from 'vue/compiler-sfc';
 import { describe, expect, test } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { locales } from './retired-drive-locale-baseline.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-with-locale.js';
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import migrationInputs from './sfc-static-next22-migration.json';
-import type { Locale } from 'i18n';
+import type { Locale } from './retired-ui-locale-types.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const MagicString = createRequire(resolve(root, 'packages/frontend-builder/package.json'))('magic-string').default;

@@ -8,7 +8,7 @@ import { createApp } from 'vue';
 import type { Ref } from 'vue';
 import { cleanup, fireEvent, render } from '@testing-library/vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import { locales } from 'i18n';
+import { locales } from './retired-drive-locale-baseline.js';
 import MkPollEditor from '@features/notes/frontend/components/MkPollEditor.vue';
 import MkTime from '@features/ui/frontend/components/global/MkTime.vue';
 import { lowresTime } from '@features/ui/frontend/shared/use-lowres-time.js';

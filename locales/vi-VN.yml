@@ -1160,22 +1160,11 @@ _initialAccountSetting:
 _initialTutorial:
   launchTutorial: "Bắt đầu hướng dẫn"
   title: "Hướng dẫn"
-  wellDone: "Làm tốt!"
   skipAreYouSure: "Thoát khỏi hướng dẫn?"
   _landing:
     title: "Chào mừng đến với Hướng dẫn"
-    description: "Tại đây, bạn có thể tìm hiểu những điều cơ bản về cách sử dụng Misskey và các tính năng của nó."
-  _note:
-    title: "Bài Viết là gì?"
-    description: "Các bài đăng trên Misskey được gọi là 'Bài Viết'. Ghi chú được sắp xếp theo thứ tự thời gian trên dòng thời gian và được cập nhật theo thời gian thực."
   _timeline:
-    home: "Bạn có thể xem ghi chú từ những tài khoản bạn theo dõi."
-    local: "Bạn có thể xem ghi chú từ tất cả người dùng trên máy chủ này."
     social: "Ghi chú từ dòng thời gian Trang chủ và Địa phương sẽ được hiển thị."
-    global: "Bạn có thể xem ghi chú từ tất cả các máy chủ được kết nối."
-  _postNote:
-    _visibility:
-      home: "Chỉ công khai trên dòng thời gian Trang chủ. Những người truy cập trang cá nhân của bạn, thông qua người theo dõi và thông qua ghi chú lại có thể thấy thông tin đó."
 _timelineDescription:
   home: "Trong dòng thời gian Trang chính, bạn có thể xem ghi chú từ các tài khoản bạn theo dõi."
   local: "Trong dòng thời gian cục bộ, bạn có thể xem ghi chú từ tất cả người dùng trên máy chủ này."
@@ -1385,24 +1374,9 @@ _role:
     middle: "Vừa"
     high: "Cao"
   _options:
-    gtlAvailable: "Xem Timeline xã hội"
-    ltlAvailable: "Xem Timeline trong máy chủ này"
-    canPublicNote: "Cho phép đăng bài công khai"
     canManageCustomEmojis: "Quản lý CustomEmoji"
     canManageAvatarDecorations: "Quản lý trang trí ảnh đại diện"
-    driveCapacity: "Dữ liệu Drive"
-    pinMax: "Giới hạn ghim bài viết"
-    antennaMax: "Giới hạn tạo ăng ten"
     canHideAds: "Tắt quảng cáo"
-  _condition:
-    createdMoreThan: "Trôi qua ～ sau khi lập tài khoản"
-    followersLessThanOrEq: "Người theo dõi ít hơn ～"
-    followersMoreThanOrEq: "Người theo dõi có ～ trở lên"
-    followingLessThanOrEq: "Theo dõi ít hơn ～"
-    followingMoreThanOrEq: "Theo dõi có ～ trở lên"
-    and: "～ mà ～"
-    or: "～ hay là ～"
-    not: "Không phải ～"
 _sensitiveMediaDetection:
   description: "Giảm nỗ lực kiểm duyệt máy chủ thông qua việc tự động nhận dạng media NSFW thông qua học máy. Điều này sẽ làm tăng một chút áp lực trên máy chủ."
   sensitivity: "Phát hiện nhạy cảm"
@@ -1953,13 +1927,7 @@ _abuseReport:
     _recipientType:
       mail: "Email"
 _moderationLogTypes:
-  createRole: "Tạo một vai trò"
-  deleteRole: "Xóa vai trò"
-  updateRole: "Cập nhật vai trò"
-  assignRole: "Chỉ định cho vai trò"
-  unassignRole: "Bỏ gán vai trò"
   suspend: "Vô hiệu hóa"
-  unsuspend: "Rã đông"
   resetPassword: "Đặt lại mật khẩu"
   createInvitation: "Tạo lời mời"
 _reversi:

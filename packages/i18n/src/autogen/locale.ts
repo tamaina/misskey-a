@@ -5408,98 +5408,17 @@ export interface Locale extends ILocale {
     };
     "_chat": {
         /**
-         * メッセージ
-         */
-        "messages": string;
-        /**
-         * まだメッセージはありません
-         */
-        "noMessagesYet": string;
-        /**
-         * 新しいメッセージ
-         */
-        "newMessage": string;
-        /**
-         * 個別
-         */
-        "individualChat": string;
-        /**
-         * 特定ユーザーと個別にメッセージのやりとりができます。
-         */
-        "individualChat_description": string;
-        /**
-         * グループ
-         */
-        "roomChat": string;
-        /**
-         * 複数人でメッセージのやりとりができます。
-         * また、個別のメッセージを許可していないユーザーとでも、相手が受け入れればやりとりできます。
-         */
-        "roomChat_description": string;
-        /**
-         * グループを作成
-         */
-        "createRoom": string;
-        /**
-         * ユーザーを招待してメッセージを送信しましょう
-         */
-        "inviteUserToChat": string;
-        /**
-         * 作成したグループ
-         */
-        "yourRooms": string;
-        /**
-         * 参加中のグループ
-         */
-        "joiningRooms": string;
-        /**
          * 招待
          */
         "invitations": string;
-        /**
-         * 招待はありません
-         */
-        "noInvitations": string;
-        /**
-         * 履歴
-         */
-        "history": string;
         /**
          * 履歴はありません
          */
         "noHistory": string;
         /**
-         * グループはありません
-         */
-        "noRooms": string;
-        /**
-         * ユーザーを招待
-         */
-        "inviteUser": string;
-        /**
-         * 送信した招待
-         */
-        "sentInvitations": string;
-        /**
-         * 参加
-         */
-        "join": string;
-        /**
-         * 無視
-         */
-        "ignore": string;
-        /**
-         * グループから退出
-         */
-        "leave": string;
-        /**
          * メンバー
          */
         "members": string;
-        /**
-         * メッセージを検索
-         */
-        "searchMessages": string;
         /**
          * ホーム
          */
@@ -5509,30 +5428,6 @@ export interface Locale extends ILocale {
          */
         "send": string;
         /**
-         * 改行
-         */
-        "newline": string;
-        /**
-         * このグループをミュート
-         */
-        "muteThisRoom": string;
-        /**
-         * グループを削除
-         */
-        "deleteRoom": string;
-        /**
-         * このサーバー、またはこのアカウントでダイレクトメッセージは有効化されていません。
-         */
-        "chatNotAvailableForThisAccountOrServer": string;
-        /**
-         * このサーバー、またはこのアカウントでダイレクトメッセージは読み取り専用となっています。新たに書き込んだり、グループを作成・参加したりすることはできません。
-         */
-        "chatIsReadOnlyForThisAccountOrServer": string;
-        /**
-         * 相手のアカウントでダイレクトメッセージが使えない状態になっています。
-         */
-        "chatNotAvailableInOtherAccount": string;
-        /**
          * このユーザーとのダイレクトメッセージを開始できません
          */
         "cannotChatWithTheUser": string;
@@ -5540,64 +5435,6 @@ export interface Locale extends ILocale {
          * ダイレクトメッセージが使えない状態になっているか、相手がダイレクトメッセージを開放していません。
          */
         "cannotChatWithTheUser_description": string;
-        /**
-         * あなたはこのグループの参加者ではありませんが、招待が届いています。参加するには、招待を承認してください。
-         */
-        "youAreNotAMemberOfThisRoomButInvited": string;
-        /**
-         * 招待を承認しますか？
-         */
-        "doYouAcceptInvitation": string;
-        /**
-         * ダイレクトメッセージ
-         */
-        "chatWithThisUser": string;
-        /**
-         * このユーザーはフォロワーからのみメッセージを受け付けています。
-         */
-        "thisUserAllowsChatOnlyFromFollowers": string;
-        /**
-         * このユーザーは、このユーザーがフォローしているユーザーからのみメッセージを受け付けています。
-         */
-        "thisUserAllowsChatOnlyFromFollowing": string;
-        /**
-         * このユーザーは相互フォローのユーザーからのみメッセージを受け付けています。
-         */
-        "thisUserAllowsChatOnlyFromMutualFollowing": string;
-        /**
-         * このユーザーは誰からもメッセージを受け付けていません。
-         */
-        "thisUserNotAllowedChatAnyone": string;
-        /**
-         * メッセージを許可する相手
-         */
-        "chatAllowedUsers": string;
-        /**
-         * 自分からメッセージを送った相手とはこの設定に関わらずメッセージの送受信が可能です。
-         */
-        "chatAllowedUsers_note": string;
-        "_chatAllowedUsers": {
-            /**
-             * 誰でも
-             */
-            "everyone": string;
-            /**
-             * 自分のフォロワーのみ
-             */
-            "followers": string;
-            /**
-             * 自分がフォローしているユーザーのみ
-             */
-            "following": string;
-            /**
-             * 相互フォローのユーザーのみ
-             */
-            "mutual": string;
-            /**
-             * 誰も許可しない
-             */
-            "none": string;
-        };
     };
     "_emojiPalette": {
         /**
@@ -6184,10 +6021,6 @@ export interface Locale extends ILocale {
          */
         "title": string;
         /**
-         * よくできました
-         */
-        "wellDone": string;
-        /**
          * チュートリアルを終了しますか？
          */
         "skipAreYouSure": string;
@@ -6196,32 +6029,12 @@ export interface Locale extends ILocale {
              * チュートリアルへようこそ
              */
             "title": string;
-            /**
-             * ここでは、Misskeyの基本的な使い方や機能を確認できます。
-             */
-            "description": string;
         };
         "_note": {
-            /**
-             * ノートって何？
-             */
-            "title": string;
-            /**
-             * Misskeyでの投稿は「ノート」と呼びます。ノートはタイムラインに時系列で並んでいて、リアルタイムで更新されていきます。
-             */
-            "description": string;
             /**
              * 返信することができます。返信に対しての返信も可能で、スレッドのように会話を続けることもできます。
              */
             "reply": string;
-            /**
-             * そのノートを自分のタイムラインに流して共有することができます。テキストを追加して引用することも可能です。
-             */
-            "renote": string;
-            /**
-             * リアクションをつけることができます。詳しくは次のページで解説します。
-             */
-            "reaction": string;
             /**
              * ノートの詳細を表示したり、リンクをコピーしたりなどの様々な操作が行えます。
              */
@@ -6232,99 +6045,15 @@ export interface Locale extends ILocale {
              * リアクションって何？
              */
             "title": string;
-            /**
-             * ノートには「リアクション」をつけることができます。「いいね」では伝わらないニュアンスも、リアクションで簡単・気軽に表現できます。
-             */
-            "description": string;
-            /**
-             * リアクションは、ノートの「＋」ボタンをクリックするとつけられます。試しにこのサンプルのノートにリアクションをつけてみてください！
-             */
-            "letsTryReacting": string;
-            /**
-             * リアクションをつけると先に進めるようになります。
-             */
-            "reactToContinue": string;
-            /**
-             * あなたのノートが誰かにリアクションされると、リアルタイムで通知を受け取ります。
-             */
-            "reactNotification": string;
-            /**
-             * 「ー」ボタンを押すとリアクションを取り消すことができます。
-             */
-            "reactDone": string;
         };
         "_timeline": {
-            /**
-             * タイムラインのしくみ
-             */
-            "title": string;
-            /**
-             * Misskeyには、使い方に応じて複数のタイムラインが用意されています（サーバーによってはいずれかが無効になっていることがあります）。
-             */
-            "description1": string;
-            /**
-             * あなたがフォローしているアカウントの投稿を見られます。
-             */
-            "home": string;
-            /**
-             * このサーバーにいるユーザー全員の投稿を見られます。
-             */
-            "local": string;
             /**
              * ホームタイムラインとローカルタイムラインの投稿が両方表示されます。
              */
             "social": string;
-            /**
-             * 接続している他のすべてのサーバーからの投稿を見られます。
-             */
-            "global": string;
-            /**
-             * それぞれのタイムラインは、画面上部でいつでも切り替えられます。
-             */
-            "description2": string;
-            /**
-             * その他にも、リストタイムラインやチャンネルタイムラインなどがあります。詳しくは{link}をご覧ください。
-             */
-            "description3": ParameterizedString<"link">;
         };
         "_postNote": {
-            /**
-             * ノートの投稿設定
-             */
-            "title": string;
-            /**
-             * Misskeyにノートを投稿する際には、様々なオプションの設定が可能です。投稿フォームはこのようになっています。
-             */
-            "description1": string;
             "_visibility": {
-                /**
-                 * ノートを表示できる相手を制限できます。
-                 */
-                "description": string;
-                /**
-                 * すべてのユーザーに公開。
-                 */
-                "public": string;
-                /**
-                 * ホームタイムラインのみに公開。フォロワー・プロフィールを見に来た人・リノートから、他のユーザーも見ることができます。
-                 */
-                "home": string;
-                /**
-                 * フォロワーにのみ公開。本人以外がリノートすることはできず、またフォロワー以外は閲覧できません。
-                 */
-                "followers": string;
-                /**
-                 * 指定したユーザーにのみ公開され、また相手に通知が入ります。
-                 */
-                "direct": string;
-                /**
-                 * 機密情報は送信する際は注意してください。
-                 */
-                "doNotSendConfidencialOnDirect1": string;
-                /**
-                 * 送信先のサーバーの管理者は投稿内容を見ることが可能なので、信頼できないサーバーのユーザーが含まれる限定公開のノートを作成する際は、機密情報の扱いに注意が必要です。
-                 */
-                "doNotSendConfidencialOnDirect2": string;
                 /**
                  * 他のサーバーに投稿を連合しません。上記の公開範囲に関わらず、他のサーバーのユーザーは、この設定がついたノートを直接閲覧することができなくなります。
                  */
@@ -6332,70 +6061,20 @@ export interface Locale extends ILocale {
             };
             "_cw": {
                 /**
-                 * 内容を隠す（CW）
-                 */
-                "title": string;
-                /**
                  * 本文のかわりに「注釈」に書いた内容が表示されます。「もっと見る」を押すと本文が表示されます。
                  */
                 "description": string;
-                "_exampleNote": {
-                    /**
-                     * 飯テロ注意
-                     */
-                    "cw": string;
-                    /**
-                     * チョコのかかったドーナツを食べました🍩😋
-                     */
-                    "note": string;
-                };
                 /**
                  * サーバーのガイドラインにより必要とされるノートに指定したり、ネタバレ投稿やセンシティブな文章を自主規制したりするときに使います。
                  */
                 "useCases": string;
             };
         };
-        "_howToMakeAttachmentsSensitive": {
-            /**
-             * 添付ファイルをセンシティブにするには？
-             */
-            "title": string;
-            /**
-             * サーバーのガイドラインにより必要とされる際や、そのまま見れる状態にしておくべきではない添付ファイルには、「センシティブ」設定を付けます。
-             */
-            "description": string;
-            /**
-             * 試しに、このフォームに添付された画像をセンシティブにしてみてください！
-             */
-            "tryThisFile": string;
-            "_exampleNote": {
-                /**
-                 * 納豆のフタ開けるのミスったわね…
-                 */
-                "note": string;
-            };
-            /**
-             * 添付ファイルをセンシティブにする際は、そのファイルをクリックしてメニューを開き、「センシティブとして設定」をクリックします。
-             */
-            "method": string;
-            /**
-             * ファイルを添付する際は、サーバーのガイドラインに従ってセンシティブを適切に設定してください。
-             */
-            "sensitiveSucceeded": string;
-            /**
-             * 画像をセンシティブに設定すると先に進めるようになります。
-             */
-            "doItToContinue": string;
-        };
         "_done": {
             /**
              * チュートリアルは終了です🎉
              */
             "title": string;
-            /**
-             * ここで紹介した機能はほんの一部にすぎません。Misskeyの使い方をより詳しく知るには、{link}をご覧ください。
-             */
-            "description": ParameterizedString<"link">;
         };
     };
     "_timelineDescription": {
@@ -7508,135 +7187,21 @@ export interface Locale extends ILocale {
     };
     "_role": {
         /**
-         * ロールの作成
-         */
-        "new": string;
-        /**
          * ロールの編集
          */
         "edit": string;
-        /**
-         * ロール名
-         */
-        "name": string;
-        /**
-         * ロールの説明
-         */
-        "description": string;
-        /**
-         * ロールの権限
-         */
-        "permission": string;
-        /**
-         * <b>モデレーター</b>は基本的なモデレーションに関する操作を行えます。
-         * <b>管理者</b>はサーバーの全ての設定を変更できます。
-         */
-        "descriptionOfPermission": string;
         /**
          * アサイン
          */
         "assignTarget": string;
         /**
-         * <b>マニュアル</b>は誰がこのロールに含まれるかを手動で管理します。
-         * <b>コンディショナル</b>は条件を設定し、それに合致するユーザーが自動で含まれるようになります。
-         */
-        "descriptionOfAssignTarget": string;
-        /**
-         * マニュアル
-         */
-        "manual": string;
-        /**
-         * マニュアルロール
-         */
-        "manualRoles": string;
-        /**
-         * コンディショナル
-         */
-        "conditional": string;
-        /**
-         * コンディショナルロール
-         */
-        "conditionalRoles": string;
-        /**
-         * 条件
-         */
-        "condition": string;
-        /**
-         * これはコンディショナルロールです。
-         */
-        "isConditionalRole": string;
-        /**
-         * 公開ロール
-         */
-        "isPublic": string;
-        /**
-         * ユーザーのプロフィールでこのロールが表示されます。
-         */
-        "descriptionOfIsPublic": string;
-        /**
          * オプション
          */
         "options": string;
         /**
-         * ポリシー
-         */
-        "policies": string;
-        /**
-         * ベースロール
-         */
-        "baseRole": string;
-        /**
-         * ベースロールの値を使用
-         */
-        "useBaseValue": string;
-        /**
-         * アサインするロールを選択
-         */
-        "chooseRoleToAssign": string;
-        /**
-         * アイコン画像のURL
-         */
-        "iconUrl": string;
-        /**
-         * バッジとして表示
-         */
-        "asBadge": string;
-        /**
-         * オンにすると、ユーザー名の横にロールのアイコンが表示されます。
-         */
-        "descriptionOfAsBadge": string;
-        /**
-         * ユーザーを見つけやすくする
-         */
-        "isExplorable": string;
-        /**
-         * オンにすると、「みつける」でメンバー一覧が公開されるほか、ロールのタイムラインが利用可能になります。
-         */
-        "descriptionOfIsExplorable": string;
-        /**
          * 表示順
          */
         "displayOrder": string;
-        /**
-         * 数値が大きいほどUI上で先頭に表示されます。
-         */
-        "descriptionOfDisplayOrder": string;
-        /**
-         * アサイン状態を移行先アカウントにも引き継ぐ
-         */
-        "preserveAssignmentOnMoveAccount": string;
-        /**
-         * オンにすると、このロールが付与されたアカウントが移行された際に、移行先アカウントにもこのロールが引き継がれるようになります。
-         */
-        "preserveAssignmentOnMoveAccount_description": string;
-        /**
-         * モデレーターのメンバー編集を許可
-         */
-        "canEditMembersByModerator": string;
-        /**
-         * オンにすると、管理者に加えてモデレーターもこのロールへユーザーをアサイン/アサイン解除できるようになります。オフにすると管理者のみが行えます。
-         */
-        "descriptionOfCanEditMembersByModerator": string;
         /**
          * 優先度
          */
@@ -7657,38 +7222,6 @@ export interface Locale extends ILocale {
         };
         "_options": {
             /**
-             * グローバルタイムラインの閲覧
-             */
-            "gtlAvailable": string;
-            /**
-             * ローカルタイムラインの閲覧
-             */
-            "ltlAvailable": string;
-            /**
-             * パブリック投稿の許可
-             */
-            "canPublicNote": string;
-            /**
-             * ノート内の最大メンション数
-             */
-            "mentionMax": string;
-            /**
-             * サーバー招待コードの発行
-             */
-            "canInvite": string;
-            /**
-             * 招待コードの作成可能数
-             */
-            "inviteLimit": string;
-            /**
-             * 招待コードの発行間隔
-             */
-            "inviteLimitCycle": string;
-            /**
-             * 招待コードの有効期限
-             */
-            "inviteExpirationTime": string;
-            /**
              * カスタム絵文字の管理
              */
             "canManageCustomEmojis": string;
@@ -7697,151 +7230,11 @@ export interface Locale extends ILocale {
              */
             "canManageAvatarDecorations": string;
             /**
-             * ドライブ容量
-             */
-            "driveCapacity": string;
-            /**
-             * アップロード可能な最大ファイルサイズ
-             */
-            "maxFileSize": string;
-            /**
-             * リバースプロキシやCDNなど、前段で別の設定値が存在する場合があります。
-             */
-            "maxFileSize_caption": string;
-            /**
-             * サーバー全体の最大ファイルサイズ設定は {max} です。これより大きいファイルをアップロードできるようにするには、Misskeyの設定ファイルからこの設定を緩和してください。
-             */
-            "maxFileSize_caption2": ParameterizedString<"max">;
-            /**
-             * ファイルにNSFWを常に付与
-             */
-            "alwaysMarkNsfw": string;
-            /**
-             * アイコンとバナーの更新を許可
-             */
-            "canUpdateBioMedia": string;
-            /**
-             * ノートのピン留めの最大数
-             */
-            "pinMax": string;
-            /**
-             * アンテナの作成可能数
-             */
-            "antennaMax": string;
-            /**
-             * ワードミュートの最大文字数
-             */
-            "wordMuteMax": string;
-            /**
-             * Webhookの作成可能数
-             */
-            "webhookMax": string;
-            /**
-             * クリップの作成可能数
-             */
-            "clipMax": string;
-            /**
-             * クリップ内のノートの最大数
-             */
-            "noteEachClipsMax": string;
-            /**
-             * ユーザーリストの作成可能数
-             */
-            "userListMax": string;
-            /**
-             * ユーザーリスト内のユーザーの最大数
-             */
-            "userEachUserListsMax": string;
-            /**
-             * レートリミット
-             */
-            "rateLimitFactor": string;
-            /**
-             * 小さいほど制限が緩和され、大きいほど制限が強化されます。
-             */
-            "descriptionOfRateLimitFactor": string;
-            /**
              * 広告の非表示
              */
             "canHideAds": string;
-            /**
-             * ノート検索の利用
-             */
-            "canSearchNotes": string;
-            /**
-             * ユーザー検索の利用
-             */
-            "canSearchUsers": string;
-            /**
-             * 翻訳機能の利用
-             */
-            "canUseTranslator": string;
-            /**
-             * チャンネルの作成
-             */
-            "canCreateChannel": string;
-            /**
-             * アイコンデコレーションの最大取付個数
-             */
-            "avatarDecorationLimit": string;
-            /**
-             * アンテナのインポートを許可
-             */
-            "canImportAntennas": string;
-            /**
-             * ブロックのインポートを許可
-             */
-            "canImportBlocking": string;
-            /**
-             * フォローのインポートを許可
-             */
-            "canImportFollowing": string;
-            /**
-             * ミュートのインポートを許可
-             */
-            "canImportMuting": string;
-            /**
-             * リストのインポートを許可
-             */
-            "canImportUserLists": string;
-            /**
-             * ダイレクトメッセージを許可
-             */
-            "chatAvailability": string;
-            /**
-             * アップロード可能なファイル種別
-             */
-            "uploadableFileTypes": string;
-            /**
-             * MIMEタイプを指定します。改行で区切って複数指定できるほか、アスタリスク(*)でワイルドカード指定できます。(例: image/*)
-             */
-            "uploadableFileTypes_caption": string;
-            /**
-             * ファイルによっては種別を判定できないことがあります。そのようなファイルを許可する場合は {x} を指定に追加してください。
-             */
-            "uploadableFileTypes_caption2": ParameterizedString<"x">;
-            /**
-             * サーバーサイドのノートの下書きの作成可能数
-             */
-            "noteDraftLimit": string;
-            /**
-             * 予約投稿の同時作成可能数
-             */
-            "scheduledNoteLimit": string;
-            /**
-             * ウォーターマーク機能の使用可否
-             */
-            "watermarkAvailable": string;
         };
         "_condition": {
-            /**
-             * マニュアルロールにアサイン済み
-             */
-            "roleAssignedTo": string;
-            /**
-             * ローカルユーザー
-             */
-            "isLocal": string;
             /**
              * リモートユーザー
              */
@@ -7854,62 +7247,6 @@ export interface Locale extends ILocale {
              * botユーザー
              */
             "isBot": string;
-            /**
-             * サスペンド済みユーザー
-             */
-            "isSuspended": string;
-            /**
-             * 鍵アカウントユーザー
-             */
-            "isLocked": string;
-            /**
-             * 「アカウントを見つけやすくする」が有効なユーザー
-             */
-            "isExplorable": string;
-            /**
-             * アカウント作成から～以内
-             */
-            "createdLessThan": string;
-            /**
-             * アカウント作成から～経過
-             */
-            "createdMoreThan": string;
-            /**
-             * フォロワー数が～以下
-             */
-            "followersLessThanOrEq": string;
-            /**
-             * フォロワー数が～以上
-             */
-            "followersMoreThanOrEq": string;
-            /**
-             * フォロー数が～以下
-             */
-            "followingLessThanOrEq": string;
-            /**
-             * フォロー数が～以上
-             */
-            "followingMoreThanOrEq": string;
-            /**
-             * 投稿数が～以下
-             */
-            "notesLessThanOrEq": string;
-            /**
-             * 投稿数が～以上
-             */
-            "notesMoreThanOrEq": string;
-            /**
-             * ～かつ～
-             */
-            "and": string;
-            /**
-             * ～または～
-             */
-            "or": string;
-            /**
-             * ～ではない
-             */
-            "not": string;
         };
     };
     "_sensitiveMediaDetection": {
@@ -9050,101 +8387,9 @@ export interface Locale extends ILocale {
          */
         "write:gallery-likes": string;
         /**
-         * Playを見る
-         */
-        "read:flash": string;
-        /**
-         * Playを操作する
-         */
-        "write:flash": string;
-        /**
-         * Playのいいねを見る
-         */
-        "read:flash-likes": string;
-        /**
-         * Playのいいねを操作する
-         */
-        "write:flash-likes": string;
-        /**
-         * ユーザーからの通報を見る
-         */
-        "read:admin:abuse-user-reports": string;
-        /**
          * ユーザーアカウントを削除する
          */
         "write:admin:delete-account": string;
-        /**
-         * ユーザーのすべてのファイルを削除する
-         */
-        "write:admin:delete-all-files-of-a-user": string;
-        /**
-         * データベースインデックスに関する情報を見る
-         */
-        "read:admin:index-stats": string;
-        /**
-         * データベーステーブルに関する情報を見る
-         */
-        "read:admin:table-stats": string;
-        /**
-         * ユーザーのIPアドレスを見る
-         */
-        "read:admin:user-ips": string;
-        /**
-         * インスタンスのメタデータを見る
-         */
-        "read:admin:meta": string;
-        /**
-         * ユーザーのパスワードをリセットする
-         */
-        "write:admin:reset-password": string;
-        /**
-         * ユーザーからの通報を解決する
-         */
-        "write:admin:resolve-abuse-user-report": string;
-        /**
-         * メールを送る
-         */
-        "write:admin:send-email": string;
-        /**
-         * サーバーの情報を見る
-         */
-        "read:admin:server-info": string;
-        /**
-         * モデレーションログを見る
-         */
-        "read:admin:show-moderation-log": string;
-        /**
-         * ユーザーのプライベートな情報を見る
-         */
-        "read:admin:show-user": string;
-        /**
-         * ユーザーを凍結する
-         */
-        "write:admin:suspend-user": string;
-        /**
-         * ユーザーの二要素認証を解除する
-         */
-        "write:admin:unset-mfa": string;
-        /**
-         * ユーザーのアバターを削除する
-         */
-        "write:admin:unset-user-avatar": string;
-        /**
-         * ユーザーのバーナーを削除する
-         */
-        "write:admin:unset-user-banner": string;
-        /**
-         * ユーザーの凍結を解除する
-         */
-        "write:admin:unsuspend-user": string;
-        /**
-         * インスタンスのメタデータを操作する
-         */
-        "write:admin:meta": string;
-        /**
-         * モデレーションノートを操作する
-         */
-        "write:admin:user-note": string;
         /**
          * ロールを操作する
          */
@@ -9154,121 +8399,9 @@ export interface Locale extends ILocale {
          */
         "read:admin:roles": string;
         /**
-         * リレーを操作する
-         */
-        "write:admin:relays": string;
-        /**
-         * リレーを見る
-         */
-        "read:admin:relays": string;
-        /**
-         * 招待コードを操作する
-         */
-        "write:admin:invite-codes": string;
-        /**
-         * 招待コードを見る
-         */
-        "read:admin:invite-codes": string;
-        /**
-         * お知らせを操作する
-         */
-        "write:admin:announcements": string;
-        /**
-         * お知らせを見る
-         */
-        "read:admin:announcements": string;
-        /**
-         * アバターデコレーションを操作する
-         */
-        "write:admin:avatar-decorations": string;
-        /**
-         * アバターデコレーションを見る
-         */
-        "read:admin:avatar-decorations": string;
-        /**
-         * 連合に関する情報を操作する
-         */
-        "write:admin:federation": string;
-        /**
-         * ユーザーアカウントを操作する
-         */
-        "write:admin:account": string;
-        /**
-         * ユーザーに関する情報を見る
-         */
-        "read:admin:account": string;
-        /**
-         * 絵文字を操作する
-         */
-        "write:admin:emoji": string;
-        /**
-         * 絵文字を見る
-         */
-        "read:admin:emoji": string;
-        /**
-         * ジョブキューを操作する
-         */
-        "write:admin:queue": string;
-        /**
-         * ジョブキューに関する情報を見る
-         */
-        "read:admin:queue": string;
-        /**
-         * プロモーションノートを操作する
-         */
-        "write:admin:promo": string;
-        /**
-         * ユーザーのドライブを操作する
-         */
-        "write:admin:drive": string;
-        /**
-         * ユーザーのドライブの関する情報を見る
-         */
-        "read:admin:drive": string;
-        /**
-         * 管理者用のWebsocket APIを使う
-         */
-        "read:admin:stream": string;
-        /**
-         * 広告を操作する
-         */
-        "write:admin:ad": string;
-        /**
-         * 広告を見る
-         */
-        "read:admin:ad": string;
-        /**
-         * 招待コードを作成する
-         */
-        "write:invite-codes": string;
-        /**
-         * 招待コードを取得する
-         */
-        "read:invite-codes": string;
-        /**
-         * クリップのいいねを操作する
-         */
-        "write:clip-favorite": string;
-        /**
-         * クリップのいいねを見る
-         */
-        "read:clip-favorite": string;
-        /**
-         * 連合に関する情報を取得する
-         */
-        "read:federation": string;
-        /**
-         * 違反を報告する
-         */
-        "write:report-abuse": string;
-        /**
          * ダイレクトメッセージを操作する
          */
         "write:chat": string;
-        /**
-         * ダイレクトメッセージを閲覧する
-         */
-        "read:chat": string;
     };
     "_auth": {
         /**
@@ -10292,10 +9425,6 @@ export interface Locale extends ILocale {
          */
         "chooseBlock": string;
         /**
-         * セクションタイトルを入力
-         */
-        "enterSectionTitle": string;
-        /**
          * 種類を選択
          */
         "selectType": string;
@@ -10332,14 +9461,6 @@ export interface Locale extends ILocale {
              * ボタン
              */
             "button": string;
-            /**
-             * 動的ブロック
-             */
-            "dynamic": string;
-            /**
-             * このブロックは廃止されています。今後は{play}を利用してください。
-             */
-            "dynamicDescription": ParameterizedString<"play">;
             /**
              * ノート埋め込み
              */
@@ -10936,89 +10057,13 @@ export interface Locale extends ILocale {
     };
     "_moderationLogTypes": {
         /**
-         * ジョブキューをクリア
-         */
-        "clearQueue": string;
-        /**
-         * キューのジョブを再試行
-         */
-        "promoteQueue": string;
-        /**
-         * ロールを作成
-         */
-        "createRole": string;
-        /**
-         * ロールを削除
-         */
-        "deleteRole": string;
-        /**
-         * ロールを更新
-         */
-        "updateRole": string;
-        /**
-         * ロールへアサイン
-         */
-        "assignRole": string;
-        /**
-         * ロールのアサイン解除
-         */
-        "unassignRole": string;
-        /**
          * 凍結
          */
         "suspend": string;
         /**
-         * 凍結解除
-         */
-        "unsuspend": string;
-        /**
-         * カスタム絵文字追加
-         */
-        "addCustomEmoji": string;
-        /**
-         * カスタム絵文字更新
-         */
-        "updateCustomEmoji": string;
-        /**
-         * カスタム絵文字削除
-         */
-        "deleteCustomEmoji": string;
-        /**
-         * サーバー設定更新
-         */
-        "updateServerSettings": string;
-        /**
-         * ユーザーのモデレーションノート更新
-         */
-        "updateUserNote": string;
-        /**
-         * ファイルを削除
-         */
-        "deleteDriveFile": string;
-        /**
          * ノートを削除
          */
         "deleteNote": string;
-        /**
-         * 全体のお知らせを作成
-         */
-        "createGlobalAnnouncement": string;
-        /**
-         * ユーザーへお知らせを作成
-         */
-        "createUserAnnouncement": string;
-        /**
-         * 全体のお知らせを更新
-         */
-        "updateGlobalAnnouncement": string;
-        /**
-         * ユーザーのお知らせを更新
-         */
-        "updateUserAnnouncement": string;
-        /**
-         * 全体のお知らせを削除
-         */
-        "deleteGlobalAnnouncement": string;
         /**
          * ユーザーのお知らせを削除
          */
@@ -11028,125 +10073,17 @@ export interface Locale extends ILocale {
          */
         "resetPassword": string;
         /**
-         * リモートサーバーを停止
-         */
-        "suspendRemoteInstance": string;
-        /**
-         * リモートサーバーを再開
-         */
-        "unsuspendRemoteInstance": string;
-        /**
-         * リモートサーバーのモデレーションノート更新
-         */
-        "updateRemoteInstanceNote": string;
-        /**
-         * ファイルをセンシティブ付与
-         */
-        "markSensitiveDriveFile": string;
-        /**
-         * ファイルをセンシティブ解除
-         */
-        "unmarkSensitiveDriveFile": string;
-        /**
          * 通報を解決
          */
         "resolveAbuseReport": string;
-        /**
-         * 通報を転送
-         */
-        "forwardAbuseReport": string;
-        /**
-         * 通報のモデレーションノート更新
-         */
-        "updateAbuseReportNote": string;
         /**
          * 招待コードを作成
          */
         "createInvitation": string;
         /**
-         * 広告を作成
-         */
-        "createAd": string;
-        /**
-         * 広告を削除
-         */
-        "deleteAd": string;
-        /**
-         * 広告を更新
-         */
-        "updateAd": string;
-        /**
-         * アイコンデコレーションを作成
-         */
-        "createAvatarDecoration": string;
-        /**
-         * アイコンデコレーションを更新
-         */
-        "updateAvatarDecoration": string;
-        /**
-         * アイコンデコレーションを削除
-         */
-        "deleteAvatarDecoration": string;
-        /**
-         * ユーザーの二要素認証を解除
-         */
-        "unsetMfa": string;
-        /**
-         * ユーザーのアイコンを解除
-         */
-        "unsetUserAvatar": string;
-        /**
-         * ユーザーのバナーを解除
-         */
-        "unsetUserBanner": string;
-        /**
-         * SystemWebhookを作成
-         */
-        "createSystemWebhook": string;
-        /**
-         * SystemWebhookを更新
-         */
-        "updateSystemWebhook": string;
-        /**
-         * SystemWebhookを削除
-         */
-        "deleteSystemWebhook": string;
-        /**
-         * 通報の通知先を作成
-         */
-        "createAbuseReportNotificationRecipient": string;
-        /**
-         * 通報の通知先を更新
-         */
-        "updateAbuseReportNotificationRecipient": string;
-        /**
-         * 通報の通知先を削除
-         */
-        "deleteAbuseReportNotificationRecipient": string;
-        /**
-         * アカウントを削除
-         */
-        "deleteAccount": string;
-        /**
-         * ページを削除
-         */
-        "deletePage": string;
-        /**
-         * Playを削除
-         */
-        "deleteFlash": string;
-        /**
          * ギャラリーの投稿を削除
          */
         "deleteGalleryPost": string;
-        /**
-         * ダイレクトメッセージのグループを削除
-         */
-        "deleteChatRoom": string;
-        /**
-         * プロキシアカウントの説明を更新
-         */
-        "updateProxyAccountDescription": string;
     };
     "_fileViewer": {
         /**
