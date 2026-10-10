@@ -7,6 +7,7 @@ import { existsSync } from 'node:fs';
 import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { restoreProductNameBaseline } from './product-name-source-rebase.js';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -54,7 +55,7 @@ describe('remaining20 formatter locale migration', () => {
 	test('preserves all12628 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = restoreNativeApiSourceBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
+			const source = restoreNativeApiSourceBaseline(entry.file, restoreProductNameBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8')));
 			expect(createHash('sha256').update(source).digest('hex')).toBe(entry.migratedSha256);
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);
@@ -107,7 +108,12 @@ describe('remaining20 formatter locale migration', () => {
 				const raw = createComponentLocale(entry.file.replace('packages/', '/'));
 				for (const key of entry.keys) {
 					const message = originalValue(language, key.global);
-					expect(raw[key.local]).toBe(message);
+					if (key.local === 'aboutMisskey' && (entry.file.endsWith('/about-misskey.vue') || entry.file.endsWith('/about.overview.vue'))) {
+						expect(raw[key.local]).toBe(message.replace('Misskey', '{productName}'));
+						expect(interpolateLocaleParameters(raw[key.local], { productName: 'Misskey 9000' })).toBe(message.replace('Misskey', 'Misskey 9000'));
+					} else {
+						expect(raw[key.local]).toBe(message);
+					}
 					rawChecks++;
 					if (!key.formatter) continue;
 					expect(message.replace(/\{[A-Za-z_$][\w$]*\}/g, '')).not.toContain('{');
