@@ -17,6 +17,7 @@ import {
 } from 'vite';
 import fs from 'node:fs';
 import JSON5 from 'json5';
+import { evaluateStaticSearchExpression } from './static-search-expression.js';
 import { RolldownMagicString } from 'rolldown';
 import type { TransformResult } from 'rolldown';
 import path from 'node:path';
@@ -167,7 +168,7 @@ function generateJavaScriptCode(resolvedRootMarkers: SearchIndexItem[]): string 
  */
 function customStringify(obj: unknown): string {
 	return JSON.stringify(obj).replaceAll(/"(.*?)"/g, (all, group) => {
-		// propertyAccessProxy が i18n 参照を "${i18n.xxx}"のような形に変換してるので、これをそのまま`${i18n.xxx}`
+		// 静的解析が i18n 参照を "${i18n.xxx}"のような形に変換してるので、これをそのまま`${i18n.xxx}`
 		// のような形にすると、実行時にi18nのプロパティにアクセスするようになる。
 		// objectのkeyでは``が使えないので、${ が使われている場合にのみ``に置き換えるようにする
 		return group.includes('${') ? '`' + group + '`' : all;
@@ -200,7 +201,8 @@ function extractElementText2Inner(node: TemplateChildNode, processingNodeName: s
 		case NodeTypes.INTERPOLATION: {
 			const expr = node.content;
 			if (expr.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error(`Unexpected COMPOUND_EXPRESSION`);
-			const exprResult = evalExpression(expr.content, componentLocaleModuleId);
+			const exprResult = evaluateStaticSearchExpression(expr.content, componentLocaleModuleId);
+			if (exprResult === undefined) return null;
 			if (typeof exprResult !== 'string') {
 				logger.error(`Result of interpolation node is not string at line ${id}:${node.loc.start.line}`);
 				return null;
@@ -298,7 +300,8 @@ function getStringProp(attr: AttributeNode | DirectiveNode | null, id: string, c
 		case NodeTypes.DIRECTIVE:
 			if (attr.exp == null) return null;
 			if (attr.exp.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error('Unexpected COMPOUND_EXPRESSION');
-			const value = evalExpression(attr.exp.content ?? '', componentLocaleModuleId);
+			const value = evaluateStaticSearchExpression(attr.exp.content ?? '', componentLocaleModuleId);
+			if (value === undefined) return null;
 			if (typeof value !== 'string') {
 				logger.error(`Expected string value, got ${typeof value} at ${id}:${attr.loc.start.line}`);
 				return null;
@@ -318,7 +321,8 @@ function getStringArrayProp(attr: AttributeNode | DirectiveNode | null, id: stri
 		case NodeTypes.DIRECTIVE:
 			if (attr.exp == null) return null;
 			if (attr.exp.type === NodeTypes.COMPOUND_EXPRESSION) throw new Error('Unexpected COMPOUND_EXPRESSION');
-			const value = evalExpression(attr.exp.content ?? '', componentLocaleModuleId);
+			const value = evaluateStaticSearchExpression(attr.exp.content ?? '', componentLocaleModuleId);
+			if (value === undefined) return null;
 			if (!Array.isArray(value) || !value.every(x => typeof x === 'string')) {
 				logger.error(`Expected string array value, got ${typeof value} at ${id}:${attr.loc.start.line}`);
 				return null;
@@ -406,76 +410,10 @@ function extractUsageInfoFromTemplateAst(
 
 //endregion
 
-//region evalExpression
+//region static search expressions
 
-/**
- * expr を実行します。
- * i18n はそのアクセスを保持するために propertyAccessProxy を使用しています。
- */
-function evalExpression(expr: string, componentLocaleModuleId?: string): unknown {
-	const escapedModuleId = componentLocaleModuleId
-		?.replaceAll('\\', '\\\\')
-		.replaceAll("'", "\\'")
-		.replaceAll('\n', '\\n')
-		.replaceAll('\r', '\\r')
-		.replaceAll('\u2028', '\\u2028')
-		.replaceAll('\u2029', '\\u2029');
-	const localComponentLocale = componentLocaleModuleId == null
-		? undefined
-		: { sfc: propertyAccessProxy([`createComponentLocale('${escapedModuleId}')`]) };
-	const rarResult = Function('i18n', '$locale', `return ${expr}`)(i18nProxy, localComponentLocale);
-	// JSON.stringify を一回通すことで、 AccessProxy を文字列に変換する
-	// Walk してもいいんだけど横着してJSON.stringifyしてる。ビルド時にしか通らないのであんまりパフォーマンス気にする必要ないんで
-	return JSON.parse(JSON.stringify(rarResult));
-}
-
-const propertyAccessProxySymbol = Symbol('propertyAccessProxySymbol');
-
-type AccessProxy = {
-	[propertyAccessProxySymbol]: string[],
-	[k: string]: AccessProxy,
-}
-
-const propertyAccessProxyHandler: ProxyHandler<AccessProxy> = {
-	get(target: AccessProxy, p: string | symbol): any {
-		if (p in target) {
-			return (target as any)[p];
-		}
-		if (p == "toJSON" || p == Symbol.toPrimitive) {
-			return propertyAccessProxyToJSON;
-		}
-		if (typeof p == 'string') {
-			return target[p] = propertyAccessProxy([...target[propertyAccessProxySymbol], p]);
-		}
-		return undefined;
-	}
-}
-
-function propertyAccessProxyToJSON(this: AccessProxy, hint: string) {
-	const expression = this[propertyAccessProxySymbol].reduce((prev, current) => {
-		if (current.match(/^[a-z][0-9a-z]*$/i)) {
-			return `${prev}.${current}`;
-		} else {
-			return `${prev}['${current}']`;
-		}
-	});
-	return '$\{' + expression + '}';
-}
-
-/**
- * プロパティのアクセスを保持するための Proxy オブジェクトを作成します。
- *
- * この関数で生成した proxy は JSON でシリアライズするか、`${}`のように string にすると、 ${property.path} のような形になる。
- * @param path
- */
-function propertyAccessProxy(path: string[]): AccessProxy {
-	const target: AccessProxy = {
-		[propertyAccessProxySymbol]: path,
-	};
-	return new Proxy(target, propertyAccessProxyHandler);
-}
-
-const i18nProxy = propertyAccessProxy(['i18n']);
+// Runtime bindings (for example v-for variables) cannot be resolved at build time.
+// Skip that field without executing it or dropping the other markers in the file.
 
 export function collectFileMarkers(id: string, code: string | RolldownMagicString | undefined, componentLocaleRoot: string): SearchIndexItem[] {
 	try {

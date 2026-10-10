@@ -108,3 +108,41 @@ for (const section of ['settings', 'admin']) {
 		for (const file of files) expect(generated).toContain(resolve(file));
 	});
 }
+
+test('privacy runtime labels do not discard static search markers', () => {
+	const file = resolve('../features/users/frontend/pages/settings/privacy.vue');
+	const assigned = new MarkerIdAssigner().processFile(file, readFileSync(file, 'utf8'))?.code;
+	const markers = collectFileMarkers(file, assigned, resolve('..'));
+	expect(markers.length).toBeGreaterThan(0);
+	expect(markers.some(marker => marker.label.includes('followApprovalTitle'))).toBe(true);
+	expect(markers.flatMap(marker => marker.texts).some(text => text.includes('setting.'))).toBe(false);
+});
+
+test('an unsupported label only skips that field and retains static labels and siblings', () => {
+	const source = `<template><SearchMarker markerId="first" :label="$locale.sfc.title"><SearchLabel>{{ setting.label }}</SearchLabel><SearchText>{{ setting.caption }}</SearchText><SearchText>{{ $locale.sfc.description }}</SearchText></SearchMarker><SearchMarker markerId="second" label="Sibling" /></template>`;
+	const markers = collectFileMarkers(serverRulesFile, source, resolve('..'));
+	expect(markers).toMatchObject([
+		{ id: 'first', label: "${createComponentLocale('/features/instance/frontend/pages/admin/server-rules.vue').title}", texts: ["${createComponentLocale('/features/instance/frontend/pages/admin/server-rules.vue').description}"] },
+		{ id: 'second', label: 'Sibling' },
+	]);
+});
+
+test('virtual VVI transform retains every settings/admin file containing search markers', async () => {
+	const vvi = pluginVvi();
+	if (typeof vvi.configResolved !== 'function' || !vvi.transform || typeof vvi.transform === 'function') throw new Error('Expected VVI hooks');
+	await vvi.configResolved.call({} as never, { root: resolve('.'), command: 'build', base: '/vite/', build: { ssr: false } } as never);
+	let checked = 0;
+	for (const options of searchIndexes) {
+		for (const file of globSync(options.targetFilePaths)) {
+			const id = resolve(file);
+			const source = readFileSync(id, 'utf8');
+			if (!source.includes('<SearchMarker')) continue;
+			const transformed = await vvi.transform.handler.call({} as never, source, id);
+			const code = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? source;
+			const assigned = new MarkerIdAssigner().processFile(id, code)?.code;
+			expect(collectFileMarkers(id, assigned, resolve('..')).length, file).toBeGreaterThan(0);
+			checked++;
+		}
+	}
+	expect(checked).toBeGreaterThanOrEqual(29);
+});
