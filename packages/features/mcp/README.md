@@ -11,8 +11,29 @@ there are no resource/expiry columns, migrations, new signing keys or grant stor
 
 Use a scoped native API/MiAuth/app credential with `access:mcp` through one bearer
 header on every request. The reference SDK 1.32.0 client supports this connection
-via explicit headers. OAuth discovery/CIMD/refresh compatibility is not provided
-by this integration; an OAuth-only client needs a separate compatibility decision.
+via explicit headers. OAuth clients can discover the existing authorization server
+from `/.well-known/oauth-protected-resource/mcp` and bearer challenges. The
+configured issuer is exact, including trailing-slash spelling; success and error
+callbacks include the same issuer. The provider advertises public-client `none`
+and S256. It accepts CIMD metadata with `none` in the supported-method intersection,
+including ChatGPT's plural method list and legacy `private_key_jwt` preference.
+Redirect URIs come from fetched metadata and must match exactly.
+
+This compatibility path requires the canonical `/mcp` resource in authorization
+and token requests, binding it to five-minute consent/code state in shared Redis.
+CIMD parsing is selected by that resource; ordinary OAuth without a resource keeps
+the existing IndieAuth JSON/HTML discovery rules. CIMD callbacks currently require
+HTTPS, so native HTTP loopback callback clients are outside this initial scope.
+Metadata retrieval uses bounded direct public HTTPS without redirects, instance
+proxy settings or private-network exceptions. Code reuse revokes the associated
+token row when its replay state remains available. Redis state stores row IDs,
+not bearer credentials, and insertion races fail closed with row cleanup.
+
+No DCR, client secrets, signing keys, refresh-token subsystem or token lifetime
+changes are introduced. Public-client CIMD provides metadata identity, not signed
+proof that a caller is ChatGPT. Real ChatGPT consent and availability of a custom
+plugin to dot require separate user-operated checks; synthetic SDK compatibility
+does not establish either one.
 The transport is stateless POST/JSON with MCP 2025-11-25. GET/DELETE are unsupported.
 
 The reverse proxy must preserve the canonical Host and strip X-Forwarded-Host.
