@@ -215,7 +215,8 @@ export class ApDeliverManagerService {
 		this.logger = this.apLoggerService.logger.createSubLogger('deliver-manager');
 	}
 
-	private prepareKey(userId: MiUser['id']): Promise<void> {
+	@bindThis
+	public prepareActorSigningKey(userId: MiUser['id']): Promise<void> {
 		const existing = this.keyPreparations.get(userId);
 		if (existing) return existing;
 		const preparation = (async () => {
@@ -242,7 +243,7 @@ export class ApDeliverManagerService {
 			this.followingsRepository,
 			this.queueService,
 			this.logger,
-			userId => this.prepareKey(userId),
+			userId => this.prepareActorSigningKey(userId),
 			actor,
 			activity,
 		);
@@ -262,7 +263,7 @@ export class ApDeliverManagerService {
 			this.followingsRepository,
 			this.queueService,
 			this.logger,
-			userId => this.prepareKey(userId),
+			userId => this.prepareActorSigningKey(userId),
 			actor,
 			activity,
 		);
@@ -282,7 +283,7 @@ export class ApDeliverManagerService {
 			this.followingsRepository,
 			this.queueService,
 			this.logger,
-			userId => this.prepareKey(userId),
+			userId => this.prepareActorSigningKey(userId),
 			actor,
 			activity,
 		);
@@ -296,7 +297,7 @@ export class ApDeliverManagerService {
 			this.followingsRepository,
 			this.queueService,
 			this.logger,
-			userId => this.prepareKey(userId),
+			userId => this.prepareActorSigningKey(userId),
 			actor,
 			activity,
 		);

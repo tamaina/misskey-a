@@ -38,6 +38,7 @@ export class AccountUpdateService {
 		if (user == null || user.isDeleted) return;
 
 		if (this.userEntityService.isLocalUser(user)) {
+			if (!forceMainKey) await this.apDeliverManagerService.prepareActorSigningKey(userId);
 			const content = await this.createUpdatePersonActivity(user);
 			const deliveries = [
 				this.apDeliverManagerService.deliverToFollowers(user, content, forceMainKey),
