@@ -124,20 +124,20 @@ export class ActivityPubServerService {
 				clockSkew: { forward: 300_000, delay: 300_000 },
 			});
 			if (parsed.version !== 'draft') throw new Error('Only draft HTTP signatures are supported');
-			signature = parsed.value;
+			signature = parsed;
 		} catch (_) {
 			reply.code(401);
 			return;
 		}
 
-		if (signature.params.headers.indexOf('host') === -1
+		if (signature.value.params.headers.indexOf('host') === -1
 			|| request.headers.host !== this.config.host) {
 			// Host not specified or not match.
 			reply.code(401);
 			return;
 		}
 
-		if (signature.params.headers.indexOf('digest') === -1) {
+		if (signature.value.params.headers.indexOf('digest') === -1) {
 			// Digest not found.
 			reply.code(401);
 			return;

@@ -31,7 +31,7 @@ export type DeliverJobData = {
 
 export type InboxJobData = {
 	activity: IActivity;
-	/** Includes signature wrappers persisted by previous queue writers. */
+	/** Canonical ParsedSignature wrapper/null, plus flat signatures from older writers. */
 	signature: ParsedDraftSignature['value'] | ParsedSignature | null;
 };
 

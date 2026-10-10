@@ -105,6 +105,8 @@ test('Ed sender receives 202 before a recent RSA-only receiver cache delays and 
 		const queued = await inbox.mock.results[0].value as Bull.Job<InboxJobData>;
 		expect(await queued.getState()).toBe('waiting');
 		expect(queued.data.activity).toEqual(activity);
+		expect(queued.data.signature).toHaveProperty('version', 'draft');
+		expect(queued.data.signature).not.toHaveProperty('keyId');
 		expect(normalizeInboxJobSignature(queued.data.signature)?.keyId).toBe(`${uri}#ed25519-key`);
 		expect(perform).not.toHaveBeenCalled();
 		worker = new Bull.Worker(name, async job => processor.process(job), {
