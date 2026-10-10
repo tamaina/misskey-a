@@ -17,6 +17,7 @@ import * as VviRuntime from 'vite-vue-internationalization/runtime';
 import { languages, locales } from 'i18n';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
+import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
 import type { Component, ComputedRef } from 'vue';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
@@ -1474,8 +1475,8 @@ function getLocaleValue(language: string, keyPath: string): string {
 	return value;
 }
 
-function getBlocks(file: string): Map<string, Record<string, string>> {
-	const { descriptor, errors } = parse(readFileSync(resolve(repoRoot, file), 'utf8'), { filename: file });
+function getBlocks(file: string, source = readFileSync(resolve(repoRoot, file), 'utf8')): Map<string, Record<string, string>> {
+	const { descriptor, errors } = parse(source, { filename: file });
 	expect(errors).toEqual([]);
 	const blocks = descriptor.customBlocks.filter(block => block.type === 'locale');
 	const result = new Map<string, Record<string, string>>();
@@ -1586,8 +1587,8 @@ describe('expanded literal SFC-local locale migration', () => {
 
 	test.each(migrations)('$file preserves every translation, placeholder, occurrence and source boundary', migration => {
 		const { file, sha256, importOffset, keyPaths, references } = migration;
-		const source = readFileSync(resolve(repoRoot, file), 'utf8');
-		const blocks = getBlocks(file);
+		const source = restorePwaShareSourceBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8'));
+		const blocks = getBlocks(file, source);
 		expect([...blocks.keys()]).toEqual(languages);
 		expect(source).not.toMatch(/\bi18n\s*\./);
 		expect(source).not.toContain("from '@features/runtime/frontend/i18n.js'");

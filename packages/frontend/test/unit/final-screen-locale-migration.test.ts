@@ -4,6 +4,7 @@
  */
 
 import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
+import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -54,7 +55,7 @@ function configured(embed: boolean) {
 test('all51 screen sources reverse byte for byte and retain all49336 effective locale strings', () => {
 	let strings = 0;
 	for (const entry of proof) {
-		const source = restoreCommonUtilitiesBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
+		const source = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8')));
 		expect(hash(source)).toBe(entry.migratedSha256);
 		const parsed = parse(source, { filename: entry.file });
 		expect(parsed.errors).toEqual([]);

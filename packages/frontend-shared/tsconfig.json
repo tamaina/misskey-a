@@ -63,6 +63,7 @@
 	},
 	"include": [
 		"@types/**/*.ts",
+		"js/**/*.ts",
 		"../features/*/frontend/shared/**/*.ts"
 	],
 	"exclude": [

@@ -27,6 +27,7 @@
 		"punycode.js": "2.3.1",
 		"shiki": "4.4.3",
 		"tinycolor2": "1.6.0",
-		"vue": "3.5.42"
+		"vue": "3.5.42",
+		"idb-keyval": "6.3.0"
 	}
 }

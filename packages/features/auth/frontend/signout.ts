@@ -4,6 +4,7 @@
  */
 
 import { apiUrl } from '@features/boot/frontend/shared/config.js';
+import { clearSharedFiles } from '@@/js/shared-files.js';
 import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
 import { store } from '@features/preferences/frontend/store.js';
 import { waiting } from '@features/ui/frontend/os.js';
@@ -15,12 +16,16 @@ import { encodePushSubscriptionKey } from '@features/notifications/frontend/util
 export async function signout() {
 	if (!$i) return;
 
-	waiting();
+	const finishWaiting = waiting();
 
 	if (store.s.enablePreferencesAutoCloudBackup) {
 		await cloudBackup();
 	}
 
+	await clearSharedFiles().catch(reason => {
+		finishWaiting();
+		throw reason;
+	});
 	localStorage.clear();
 
 	const idbAbortController = new AbortController();

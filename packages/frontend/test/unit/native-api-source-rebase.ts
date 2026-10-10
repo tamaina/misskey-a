@@ -6,12 +6,13 @@
 import { createHash } from 'node:crypto';
 import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
 import rebases from './native-api-source-rebase.json';
+import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 /** Reverse exact reviewed API edits so the original locale proofs stay frozen. */
 export function restoreNativeApiSourceBaseline(file: string, source: string): string {
-	source = restoreCommonUtilitiesBaseline(file, source);
+	source = restoreCommonUtilitiesBaseline(file, restorePwaShareSourceBaseline(file, source));
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	const localeStart = source.search(/<locale\s/);
