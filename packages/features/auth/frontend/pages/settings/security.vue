@@ -184,7 +184,7 @@ definePage(() => ({
 	"newPasswordRetype": "كرّر كلمة المرور الجديدة:",
 	"retypedNotMatch": "المدخلات لا تتطابق",
 	"security": "الأمان",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "يمكنك ضبط الإعدادات المتعلقة بأمان الحساب، مثل كلمة المرور وطرق تسجيل الدخول وتطبيقات المصادقة ومفاتيح المرور.",
 	"password": "الكلمة السرية",
 	"changePassword": "تغيير الكلمة السرية",
 	"signinHistory": "تاريخ تسجيل الدخول",
@@ -214,7 +214,7 @@ definePage(() => ({
 	"newPasswordRetype": "Nové heslo (znovu)",
 	"retypedNotMatch": "Zadané údaje se neshodují.",
 	"security": "Zabezpečení",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Zde můžete nastavit zabezpečení účtu, například heslo, způsoby přihlašování, ověřovací aplikace a přístupové klíče.",
 	"password": "Heslo",
 	"changePassword": "Změnit heslo",
 	"signinHistory": "Historie přihlášení",
@@ -226,15 +226,15 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"newPassword": "New password",
-	"newPasswordRetype": "Retype new password",
-	"retypedNotMatch": "The inputs do not match.",
+	"newPasswordRetype": "Indtast den nye adgangskode igen",
+	"retypedNotMatch": "De indtastede værdier stemmer ikke overens.",
 	"security": "Security",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Her kan du konfigurere indstillinger for kontosikkerhed, såsom adgangskode, loginmetoder, godkendelsesapps og adgangsnøgler.",
 	"password": "Password",
-	"changePassword": "Change password",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"changePassword": "Skift adgangskode",
+	"signinHistory": "Loginhistorik",
+	"regenerateLoginToken": "Generér et nyt login-token",
+	"regenerateLoginTokenDescription": "Genererer et nyt token, som bruges internt ved login. Dette er normalt ikke nødvendigt. Hvis tokenet genereres igen, bliver du logget ud på alle enheder."
 }
 </locale>
 
@@ -289,7 +289,7 @@ definePage(() => ({
 	"newPasswordRetype": "Répéter le nouveau mot de passe",
 	"retypedNotMatch": "Les saisies ne correspondent pas.",
 	"security": "Sécurité",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Vous pouvez configurer les paramètres de sécurité du compte, comme le mot de passe, les méthodes de connexion, les applications d’authentification et les clés d’accès.",
 	"password": "Mot de passe",
 	"changePassword": "Modifier votre mot de passe",
 	"signinHistory": "Historique de connexion",
@@ -304,7 +304,7 @@ definePage(() => ({
 	"newPasswordRetype": "Ulangi kata sandi baru",
 	"retypedNotMatch": "Input tidak sama",
 	"security": "Keamanan",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Kamu dapat mengatur keamanan akun, seperti kata sandi, metode masuk, aplikasi autentikasi, dan kunci akses.",
 	"password": "Kata sandi",
 	"changePassword": "Ubah kata sandi",
 	"signinHistory": "Riwayat masuk",
@@ -361,30 +361,30 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"newPassword": "New password",
-	"newPasswordRetype": "Retype new password",
-	"retypedNotMatch": "The inputs do not match.",
+	"newPasswordRetype": "Ales asekcem n wawal uffir amaynut",
+	"retypedNotMatch": "Isekcam ur mṣadan ara.",
 	"security": "Taɣellist",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Tzemreḍ ad tesbaduḍ iɣewwaren n tɣellist n umiḍan, am wawal uffir, tarrayin n unekcum, isnasen n usesteb akked tsura n unekcum.",
 	"password": "Awal uffir",
-	"changePassword": "Change password",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"changePassword": "Beddel awal uffir",
+	"signinHistory": "Amazray n unekcum",
+	"regenerateLoginToken": "Sirew tikelt-nniḍen ajuṭun n unekcum",
+	"regenerateLoginTokenDescription": "Yessiraw tikelt-nniḍen ajuṭun yettwasqedcen daxel deg unekcum. Tigawt-a ur tlaq ara s umata. Ma yella yettwasirew tikelt-nniḍen, ad teffɣeḍ seg meṛṛa ibenkan."
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
 	"newPassword": "New password",
-	"newPasswordRetype": "Retype new password",
-	"retypedNotMatch": "The inputs do not match.",
+	"newPasswordRetype": "ಹೊಸ ಗುಪ್ತಪದವನ್ನು ಮತ್ತೊಮ್ಮೆ ನಮೂದಿಸಿ",
+	"retypedNotMatch": "ನಮೂದಿಸಿದ ಮೌಲ್ಯಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ.",
 	"security": "Security",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "ಗುಪ್ತಪದ, ಪ್ರವೇಶ ವಿಧಾನಗಳು, ದೃಢೀಕರಣ ಅಪ್ಲಿಕೇಶನ್‌ಗಳು ಮತ್ತು ಪಾಸ್‌ಕೀಗಳಂತಹ ಖಾತೆಯ ಸುರಕ್ಷತೆಗೆ ಸಂಬಂಧಿಸಿದ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಇಲ್ಲಿ ಹೊಂದಿಸಬಹುದು.",
 	"password": "ಗುಪ್ತಪದ",
-	"changePassword": "Change password",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"changePassword": "ಗುಪ್ತಪದ ಬದಲಾಯಿಸಿ",
+	"signinHistory": "ಪ್ರವೇಶದ ಇತಿಹಾಸ",
+	"regenerateLoginToken": "ಪ್ರವೇಶ ಟೋಕನ್ ಅನ್ನು ಮರುಸೃಷ್ಟಿಸಿ",
+	"regenerateLoginTokenDescription": "ಪ್ರವೇಶದ ವೇಳೆ ಆಂತರಿಕವಾಗಿ ಬಳಸುವ ಟೋಕನ್ ಅನ್ನು ಮರುಸೃಷ್ಟಿಸುತ್ತದೆ. ಸಾಮಾನ್ಯವಾಗಿ ಈ ಕ್ರಿಯೆ ಅಗತ್ಯವಿರುವುದಿಲ್ಲ. ಮರುಸೃಷ್ಟಿಸಿದರೆ, ಎಲ್ಲ ಸಾಧನಗಳಿಂದ ನಿರ್ಗಮಿಸಲಾಗುತ್ತದೆ."
 }
 </locale>
 
@@ -409,7 +409,7 @@ definePage(() => ({
 	"newPasswordRetype": "Nieuw wachtwoord (herhalen)",
 	"retypedNotMatch": "Invoer komt niet overeen",
 	"security": "Beveiliging",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Je kunt instellingen voor accountbeveiliging configureren, zoals je wachtwoord, aanmeldmethoden, authenticatie-apps en passkeys.",
 	"password": "Wachtwoord",
 	"changePassword": "Wachtwoord wijzigen",
 	"signinHistory": "Inloggeschiedenis",
@@ -424,12 +424,12 @@ definePage(() => ({
 	"newPasswordRetype": "Nytt passord (gjenta)",
 	"retypedNotMatch": "Inngangene stemmer ikke overens.",
 	"security": "Sikkerhet",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Du kan konfigurere innstillinger for kontosikkerhet, som passord, innloggingsmetoder, autentiseringsapper og tilgangsnøkler.",
 	"password": "Passord",
 	"changePassword": "Endre passord",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"signinHistory": "Innloggingshistorikk",
+	"regenerateLoginToken": "Generer innloggingstoken på nytt",
+	"regenerateLoginTokenDescription": "Genererer tokenet som brukes internt ved innlogging, på nytt. Dette er vanligvis ikke nødvendig. Hvis tokenet genereres på nytt, blir du logget ut på alle enheter."
 }
 </locale>
 
@@ -439,7 +439,7 @@ definePage(() => ({
 	"newPasswordRetype": "Powtórz nowe hasło",
 	"retypedNotMatch": "Wejście nie zgadza się.",
 	"security": "Bezpieczeństwo",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Możesz skonfigurować ustawienia zabezpieczeń konta, takie jak hasło, metody logowania, aplikacje uwierzytelniające i klucze dostępu.",
 	"password": "Hasło",
 	"changePassword": "Zmień hasło",
 	"signinHistory": "Historia logowania",
@@ -469,7 +469,7 @@ definePage(() => ({
 	"newPasswordRetype": "Новый пароль (ещё раз)",
 	"retypedNotMatch": "Не совпадают",
 	"security": "Безопасность",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Здесь можно настроить безопасность аккаунта: пароль, способы входа, приложения для аутентификации и ключи доступа.",
 	"password": "Пароль",
 	"changePassword": "Изменить пароль",
 	"signinHistory": "Журнал посещений",
@@ -484,7 +484,7 @@ definePage(() => ({
 	"newPasswordRetype": "Nové heslo (znovu)",
 	"retypedNotMatch": "Zadané vstupy nesúhlasia",
 	"security": "Zabezpečenie",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Tu môžete nastaviť zabezpečenie účtu, napríklad heslo, spôsoby prihlasovania, overovacie aplikácie a prístupové kľúče.",
 	"password": "Heslo",
 	"changePassword": "Zmeniť heslo",
 	"signinHistory": "História prihlásení",
@@ -526,15 +526,15 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"newPassword": "New password",
-	"newPasswordRetype": "Retype new password",
-	"retypedNotMatch": "The inputs do not match.",
+	"newPasswordRetype": "يېڭى پارولنى قايتا كىرگۈزۈڭ",
+	"retypedNotMatch": "كىرگۈزگەن مەزمۇنلار ماس كەلمەيدۇ.",
 	"security": "Security",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "بۇ يەردە پارول، كىرىش ئۇسۇللىرى، دەلىللەش ئەپلىرى ۋە كىرىش ئاچقۇچلىرى قاتارلىق ھېسابات بىخەتەرلىكىگە مۇناسىۋەتلىك تەڭشەكلەرنى تەڭشىيەلەيسىز.",
 	"password": "Password",
-	"changePassword": "Change password",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"changePassword": "پارولنى ئۆزگەرتىش",
+	"signinHistory": "كىرىش تارىخى",
+	"regenerateLoginToken": "كىرىش توكىنىنى قايتا ھاسىل قىلىش",
+	"regenerateLoginTokenDescription": "كىرىش جەريانىدا ئىچكى قىسىمدا ئىشلىتىلىدىغان توكىننى قايتا ھاسىل قىلىدۇ. ئادەتتە بۇ مەشغۇلاتنىڭ ھاجىتى يوق. قايتا ھاسىل قىلىنسا، بارلىق ئۈسكۈنىلەردىن چىقىرىلىسىز."
 }
 </locale>
 
@@ -559,7 +559,7 @@ definePage(() => ({
 	"newPasswordRetype": "Nhập lại mật khẩu mới",
 	"retypedNotMatch": "Mật khẩu không trùng khớp.",
 	"security": "Bảo mật",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Bạn có thể cấu hình các thiết lập bảo mật tài khoản, như mật khẩu, phương thức đăng nhập, ứng dụng xác thực và khóa truy cập.",
 	"password": "Mật khẩu",
 	"changePassword": "Đổi mật khẩu",
 	"signinHistory": "Lịch sử đăng nhập",
