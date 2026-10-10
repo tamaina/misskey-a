@@ -34,8 +34,8 @@ test.each([false, true])('resolves supported VVI entry variants before the host 
 		plugin.configResolved.call({} as never, { root, build: { outDir } } as ResolvedConfig);
 		await plugin.closeBundle.call({} as never);
 		const result = parseLocaleEntryManifest(JSON.parse(await readFile(join(outDir, 'locale-entry-manifest.json'), 'utf8')));
-		expect(result.entries['fr-FR']).toBe(`${embed ? 'scripts' : 'fr-FR'}/entry${inline ? '.fr-FR' : ''}.js`);
-		expect(result.entries['ja-JP']).toBe(`${embed ? 'scripts' : 'ja-JP'}/entry${inline ? '.ja-JP' : ''}.js`);
+		expect(result.entries['fr-FR']).toBe(`scripts/entry${inline ? '.fr-FR' : ''}.js`);
+		expect(result.entries['ja-JP']).toBe(`scripts/entry${inline ? '.ja-JP' : ''}.js`);
 	}
 });
 

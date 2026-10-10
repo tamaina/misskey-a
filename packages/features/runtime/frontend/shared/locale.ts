@@ -6,8 +6,10 @@
 import { lang, version } from '@features/boot/frontend/shared/config.js';
 import type { Locale } from 'i18n';
 
-// ここはビルド時に const locale = JSON.parse("...") みたいな感じで置き換えられるので top-level await は消える
-export let locale: Locale = await window.fetch(`/assets/locales/${lang}.${version}.json`).then(r => r.json(), () => null);
+// VVI labels do not depend on this compatibility catalog; a failed catalog must not block boot.
+export let locale: Locale = await window.fetch(`/assets/locales/${lang}.${version}.json`)
+	.then(response => response.ok ? response.json() : null)
+	.catch(() => null);
 
 export function updateLocale(newLocale: Locale): void {
 	locale = newLocale;
