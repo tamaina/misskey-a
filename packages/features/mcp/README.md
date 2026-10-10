@@ -21,11 +21,16 @@ Redirect URIs come from fetched metadata and must match exactly.
 
 This compatibility path requires the canonical `/mcp` resource in authorization
 and token requests, binding it to five-minute consent/code state in shared Redis.
-CIMD discovery also works for ordinary OAuth scopes without a resource. The client
-document determines CIMD versus legacy IndieAuth JSON/HTML parsing. Requesting
-`access:mcp` now requires that resource even for legacy clients; this is an
+CIMD discovery also works for ordinary OAuth scopes without a resource. Metadata
+formats overlap, so recognition uses request context: resource-bound requests
+require CIMD; without a resource, a valid IndieAuth `client_uri` prefix selects
+legacy semantics even with optional OAuth authentication fields. Other JSON
+documents use CIMD validation. Legacy no-resource clients retain registered
+loopback callbacks and empty-secret exchange. This does not widen the MCP path.
+Requesting `access:mcp` now requires that resource even for legacy clients; this is an
 intentional compatibility restriction. CIMD callbacks currently require
-HTTPS, so native HTTP loopback callback clients are outside this initial scope.
+HTTPS; this restriction applies to the strict CIMD path, while overlapping
+no-resource legacy documents keep their existing callback rules.
 Metadata retrieval uses bounded direct public HTTPS without redirects, instance
 proxy settings or private-network exceptions. This stricter retrieval also applies
 to legacy HTTPS client IDs with a non-root path; root legacy IDs keep their

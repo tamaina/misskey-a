@@ -219,11 +219,10 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 			// https://indieauth.spec.indieweb.org/#client-metadata-li-1
 			// "The authorization server MUST verify that the client_id in the document matches the
 			// client_id of the URL where the document was retrieved."
-			// Recognize the client format from its document, independently of the requested resource.
-			// Root/HTTP legacy discovery keeps IndieAuth JSON even with optional RFC7591 auth fields.
+			// Recognize overlapping client formats using the document and resource-request context.
+			// Without a resource, a valid IndieAuth client_uri marker takes precedence over optional auth fields.
 			const legacyClientUri = typeof json.client_uri === 'string' && json.client_uri.length > 0 && new URL(id).href.startsWith(json.client_uri);
-			cimd = !legacyClientUri || (metadataFetcher !== undefined && (json.token_endpoint_auth_methods_supported !== undefined || json.token_endpoint_auth_method !== undefined));
-			if (requireCimd && !cimd) throw new InvalidRequestError('Resource authorization requires CIMD client metadata');
+			cimd = requireCimd || !legacyClientUri;
 			if (cimd && !metadataFetcher) throw new InvalidRequestError('CIMD requires an HTTPS client ID with a non-root path');
 			if (json.client_id !== (cimd ? id : new URL(id).href)) {
 				throw new InvalidRequestError('client_id in the document does not match the client_id URL');

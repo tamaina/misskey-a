@@ -102,7 +102,7 @@ async function setup() {
 		const consent = await app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: f.own.token } });
 		expect(consent.statusCode).toBe(302);
 		const callback = new URL(String(consent.headers.location));
-		expect(callback.origin + callback.pathname).toBe(redirectUri);
+		expect(callback.origin + callback.pathname).toBe(overrides.redirect_uri ?? redirectUri);
 		expect(callback.searchParams.get('iss')).toBe(issuer);
 		expect(callback.searchParams.get('state')).toBe('SYNTHETIC_STATE_SECRET');
 		const code = callback.searchParams.get('code')!; expect(code).toBeTruthy();
@@ -292,6 +292,48 @@ describe.skipIf(!socket)('synthetic OAuth discovery through native MCP (isolated
 		expect(s.httpServices[0].send).toHaveBeenCalledWith(legacyClient);
 		const response = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: legacyClient, client_secret: '', redirect_uri: redirectUri, code: flow.code, code_verifier: flow.codeVerifier } });
 		expect(response.statusCode).toBe(200); expect(response.json().scope).toBe('read:account');
+	});
+
+	it.each(['singular', 'plural'])('preserves overlapping non-root legacy %s metadata and its registered HTTP loopback callback without resource', async methods => {
+		const s = await setup(); const loopback = 'http://127.0.0.1:43123/callback';
+		const authFields = methods === 'singular' ? { token_endpoint_auth_method: 'none' } : { token_endpoint_auth_methods_supported: ['none'] };
+		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(new MetadataResponse(JSON.stringify({ client_id: clientId, client_uri: 'https://chatgpt.com/', client_name: 'Overlapping legacy client', redirect_uris: [loopback], ...authFields }), { url: clientId, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string }));
+		const flow = await s.grant({ resource: '', scope: 'read:account', redirect_uri: loopback });
+		expect(s.providers[0].fetchClientMetadata).toHaveBeenCalledWith(clientId);
+		expect(s.httpServices[0].send).not.toHaveBeenCalled();
+		const response = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: clientId, client_secret: '', redirect_uri: loopback, code: flow.code, code_verifier: flow.codeVerifier } });
+		expect(response.statusCode).toBe(200); expect(response.json().scope).toBe('read:account');
+	});
+
+	it.each(['singular', 'plural'])('forces CIMD validation for overlapping %s metadata when resource is supplied', async methods => {
+		const s = await setup(); const loopback = 'http://127.0.0.1:43123/callback';
+		const authFields = methods === 'singular' ? { token_endpoint_auth_method: 'none' } : { token_endpoint_auth_methods_supported: ['none'] };
+		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(new MetadataResponse(JSON.stringify({ client_id: clientId, client_uri: 'https://chatgpt.com/', client_name: 'Overlapping legacy client', redirect_uris: [loopback], ...authFields }), { url: clientId, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string }));
+		const flow = await s.begin({ redirect_uri: loopback });
+		expect(flow.page.statusCode).toBeGreaterThanOrEqual(400);
+		expect(flow.page.headers.location).toBeUndefined();
+		expect(s.providers[0].fetchClientMetadata).toHaveBeenCalledWith(clientId);
+		expect(s.httpServices[0].send).not.toHaveBeenCalled();
+		expect(s.f.tokens.insert).not.toHaveBeenCalled();
+	});
+
+	it('rejects an empty secret for resource-bound overlapping legacy/CIMD metadata with an HTTPS callback', async () => {
+		const s = await setup();
+		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(new MetadataResponse(JSON.stringify({ client_id: clientId, client_uri: 'https://chatgpt.com/', client_name: 'Overlapping client', redirect_uris: [redirectUri], token_endpoint_auth_methods_supported: ['none'] }), { url: clientId, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string }));
+		const flow = await s.grant();
+		const response = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: clientId, client_secret: '', redirect_uri: redirectUri, code: flow.code, code_verifier: flow.codeVerifier, resource } });
+		expect(response.statusCode).toBeGreaterThanOrEqual(400);
+		expect(s.f.tokens.insert).not.toHaveBeenCalled();
+	});
+
+	it.each(['methods', 'redirect'])('rejects resource-bound overlapping metadata with invalid %s despite its legacy marker', async field => {
+		const s = await setup();
+		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(new MetadataResponse(JSON.stringify({ client_id: clientId, client_uri: 'https://chatgpt.com/', client_name: 'Overlapping client', redirect_uris: [redirectUri], token_endpoint_auth_methods_supported: field === 'methods' ? ['private_key_jwt'] : ['none'] }), { url: clientId, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string }));
+		const flow = await s.begin(field === 'redirect' ? { redirect_uri: `${redirectUri}/extra` } : {});
+		expect(flow.page.statusCode).toBeGreaterThanOrEqual(400);
+		expect(flow.page.headers.location).toBeUndefined();
+		expect(s.httpServices[0].send).not.toHaveBeenCalled();
+		expect(s.f.tokens.insert).not.toHaveBeenCalled();
 	});
 
 	it('rejects code replay on another worker and removes the previously issued native row', async () => {
