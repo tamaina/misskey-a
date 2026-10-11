@@ -36,14 +36,14 @@ test('admin form loads, edits and saves private RPC metadata through its typed c
 		await flush();
 		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent?.includes('Synthetic chain'))!.click();
 		await nextTick();
-		expect([...view.element.querySelectorAll('input:not([type=checkbox])')].map(input => input.value)).toEqual(['123456', '18', 'Synthetic chain', 'Synthetic coin', 'TEST', '', '']);
+		expect([...view.element.querySelectorAll<HTMLInputElement>('input:not([type=checkbox])')].map(input => input.value)).toEqual(['123456', '18', 'Synthetic chain', 'Synthetic coin', 'TEST', '', '']);
 		view.element.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 		await flush();
 		const { hasRpc, ...input } = chain;
 		expect(hasRpc).toBe(true);
 		expect(client.upsertChainSettings).toHaveBeenCalledExactlyOnceWith(input);
 		expect(view.element.querySelector('[role="status"]')?.textContent).toBe('チェーン設定を保存しました。');
-		expect(view.element.querySelectorAll('input:not([type=checkbox])')).toHaveLength(7);
+		expect(view.element.querySelectorAll<HTMLInputElement>('input:not([type=checkbox])')).toHaveLength(7);
 	} finally {
 		view.dispose();
 	}

@@ -6,7 +6,7 @@
 import type { ContractRouterClient } from '@orpc/contract';
 import type { walletContract } from '../backend/api.definition.js';
 
-export type WalletClient = ContractRouterClient<typeof walletContract>;
+export type WalletClient = Pick<ContractRouterClient<typeof walletContract>, 'list' | 'chains' | 'passkeyOptions' | 'begin' | 'verify' | 'unlink'>;
 export interface WalletProvider {
 	on?(event: 'accountsChanged' | 'chainChanged' | 'disconnect', listener: () => void): void;
 	removeListener?(event: 'accountsChanged' | 'chainChanged' | 'disconnect', listener: () => void): void;

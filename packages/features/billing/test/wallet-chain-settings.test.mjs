@@ -47,7 +47,7 @@ test('native chain settings require administrator and scoped app-token permissio
 
 test('strict operational input rejects actor injection, unsafe chain IDs and non-HTTPS RPC before storage', async () => {
 	const f = fixture();
-	for (const input of [{ ...chain, actorId: 'bob' }, { ...chain, chainId: Number.MAX_SAFE_INTEGER + 1 }, { ...chain, rpcUrl: 'http://rpc.example.test' }, { ...chain, price: '1' }]) await assert.rejects(f.client.upsertChainSettings(input));
+	for (const input of [{ ...chain, actorId: 'bob' }, { ...chain, chainId: Number.MAX_SAFE_INTEGER + 1 }, { ...chain, rpcUrl: 'http://rpc.example.test' }, { ...chain, rpcUrl: 'not a URL' }, { ...chain, price: '1' }]) await assert.rejects(f.client.upsertChainSettings(input), error => error.code === 'BAD_REQUEST' || error.code === 'INVALID_PARAM');
 	assert.deepEqual(f.calls, []);
 });
 

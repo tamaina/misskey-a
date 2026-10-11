@@ -62,7 +62,7 @@ export const walletChain = v.strictObject({
 });
 export type LinkedWallet = v.InferOutput<typeof linkedWallet>;
 export type WalletChain = v.InferOutput<typeof walletChain>;
-const httpsUrl = v.pipe(v.string(), v.url(), v.maxLength(2048), v.check(value => new URL(value).protocol === 'https:'));
+const httpsUrl = v.pipe(v.string(), v.url(), v.maxLength(2048), v.check(value => /^https:\/\//i.test(value)));
 export const walletChainSettings = v.strictObject({ ...walletChain.entries, isEnabled: v.boolean(), hasRpc: v.boolean() });
 export const walletChainSettingsInput = v.strictObject({ ...walletChain.entries, isEnabled: v.boolean(), rpcUrl: v.exactOptional(v.nullable(httpsUrl)) });
 export type WalletChainSettings = v.InferOutput<typeof walletChainSettings>;
