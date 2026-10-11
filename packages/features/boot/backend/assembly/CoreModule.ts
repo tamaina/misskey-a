@@ -49,6 +49,7 @@ import { UserListService } from '@features/relationships/backend/services/UserLi
 import { UserMutingService } from '@features/relationships/backend/services/UserMutingService.js';
 import { UserRenoteMutingService } from '@features/relationships/backend/services/UserRenoteMutingService.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
+import { McpEventsService } from '@features/mcp/backend/McpEventsService.js';
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { SearchService } from '@features/note-search/backend/services/SearchService.js';
 import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
@@ -156,6 +157,7 @@ const canonicalServices = {
 	UserRenoteMutingService,
 	UserSuspendService,
 	UserWebhookService,
+	McpEventsService,
 	SystemWebhookService,
 	WebhookTestService,
 	UtilityService,

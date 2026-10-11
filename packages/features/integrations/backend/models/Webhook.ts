@@ -5,6 +5,7 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@features/persistence/backend/models/util/id.js';
+import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { webhookEventTypes } from '../webhook-events.schema.js';
 import type { WebhookEventTypes } from '../webhook-events.schema.js';
@@ -57,6 +58,30 @@ export class MiWebhook {
 		default: true,
 	})
 	public active: boolean;
+
+	@Column('varchar', { length: 16, default: 'legacy' })
+	public mode: 'legacy' | 'mcp';
+
+	@Index('IDX_webhook_mcpTokenId')
+	@Column({ ...id(), nullable: true })
+	public mcpTokenId: string | null;
+
+	@ManyToOne(() => MiAccessToken, { onDelete: 'CASCADE', nullable: true })
+	@JoinColumn({ name: 'mcpTokenId', foreignKeyConstraintName: 'FK_webhook_mcpTokenId' })
+	public mcpToken: MiAccessToken | null;
+
+	@Column('timestamp with time zone', { nullable: true })
+	public mcpExpiresAt: Date | null;
+
+	/** Changes after lapse or unsubscribe so old queued events cannot revive. */
+	@Column('uuid', { nullable: true })
+	public mcpGeneration: string | null;
+
+	@Column('varchar', { length: 1024, nullable: true, select: false })
+	public mcpPreviousSecret: string | null;
+
+	@Column('timestamp with time zone', { nullable: true })
+	public mcpPreviousSecretUntil: Date | null;
 
 	/**
 	 * 直近のリクエスト送信日時
