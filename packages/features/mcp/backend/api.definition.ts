@@ -6,7 +6,7 @@
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import type { Meta } from '@orpc/contract';
-import type { ApiProcedureMetadata } from '@features/api/backend/transport/policy.types.js';
+import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
 import { eventNames } from './events.schema.js';
 
 const url = v.pipe(v.string(), v.minLength(1), v.maxLength(1024));
