@@ -347,20 +347,20 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async getUserAssigns(userId: MiUser['id']) {
+	public async getUserAssigns(userId: MiUser['id'], fresh = false) {
 		const now = Date.now();
-		let assigns = await this.roleAssignmentByUserIdCache.fetch(userId, () => this.roleAssignmentsRepository.findBy({ userId }));
+		let assigns = await (fresh ? this.roleAssignmentsRepository.findBy({ userId }) : this.roleAssignmentByUserIdCache.fetch(userId, () => this.roleAssignmentsRepository.findBy({ userId })));
 		// 期限切れのロールを除外
 		assigns = assigns.filter(a => a.expiresAt == null || (a.expiresAt.getTime() > now));
 		return assigns;
 	}
 
 	@bindThis
-	public async getUserRoles(userId: MiUser['id']) {
-		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
-		const assigns = await this.getUserAssigns(userId);
+	public async getUserRoles(userId: MiUser['id'], fresh = false) {
+		const roles = await (fresh ? this.rolesRepository.findBy({}) : this.rolesCache.fetch(() => this.rolesRepository.findBy({})));
+		const assigns = await this.getUserAssigns(userId, fresh);
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
-		const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
+		const user = roles.some(r => r.target === 'conditional') ? await (fresh ? this.usersRepository.findOneByOrFail({ id: userId }) : this.cacheService.findUserById(userId)) : null;
 		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, assignedRoles, r.condFormula));
 		return [...assignedRoles, ...matchedCondRoles];
 	}
@@ -388,12 +388,12 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async getUserPolicies(userId: MiUser['id'] | null): Promise<RolePolicies> {
+	public async getUserPolicies(userId: MiUser['id'] | null, fresh = false): Promise<RolePolicies> {
 		const basePolicies = { ...DEFAULT_POLICIES, ...this.meta.policies };
 
 		if (userId == null) return basePolicies;
 
-		const roles = await this.getUserRoles(userId);
+		const roles = await this.getUserRoles(userId, fresh);
 
 		function calc<T extends keyof RolePolicies>(name: T, aggregate: (values: RolePolicies[T][]) => RolePolicies[T]) {
 			if (roles.length === 0) return aggregate([basePolicies[name]]);

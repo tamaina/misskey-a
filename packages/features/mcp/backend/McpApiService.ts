@@ -16,7 +16,8 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
 import { createAllowedApiCaller, McpSelectionError } from './api-caller.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
-import type { AccessTokensRepository, AppsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { AccessTokensRepository, AppsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ApiRequestContext } from '@features/api/backend/transport/ApiExecutionContextFactory.js';
 
 /** Application seam only. No HTTP registration or credential/grant issuance. */
@@ -28,6 +29,7 @@ export class McpApiService {
 	constructor(private readonly contexts: ApiExecutionContextFactory, private readonly moduleRef: ModuleRef,
 		@Inject(DI.accessTokensRepository) private readonly tokens: AccessTokensRepository,
 		@Inject(DI.appsRepository) private readonly apps: AppsRepository,
+		@Inject(DI.usersRepository) private readonly users: UsersRepository,
 	) { }
 
 	async prepare(request: ApiRequestContext, signal?: AbortSignal) {
@@ -42,10 +44,10 @@ export class McpApiService {
 		await this.checkAccess(principal.id, tokenId);
 		return { invoke: async (tool: string, input: unknown, invocationSignal?: AbortSignal): Promise<unknown> => {
 			validateSelection(tool, input);
-			const permission = await this.checkAccess(principal.id, tokenId);
+			const { actor, permission } = await this.checkAccess(principal.id, tokenId);
 			const endpointName = tool === 'call_api' && typeof input.endpoint === 'string' ? input.endpoint : tool === 'list_api_endpoints' ? 'available-endpoints' : 'users/notes';
-			const operationContext = this.contexts.create({ ...request, safeDiagnostics: true }, endpointName);
-			const bound: ApiContext = { ...operationContext, services: { ...operationContext.services, authenticate: async () => [principal, { ...token, permission }] } };
+			const operationContext = this.contexts.create({ ...request, safeDiagnostics: true, freshAuthorization: true }, endpointName);
+			const bound: ApiContext = { ...operationContext, services: { ...operationContext.services, authenticate: async () => [actor, { ...token, permission }] } };
 			const generic = () => this.genericCaller ??= createAllowedApiCaller(this.moduleRef.get(ApiRouterProvider, { strict: false }).compose(), pilotContract, this.endpoints.map(endpoint => endpoint.name));
 			if (tool === 'list_api_endpoints') {
 				if (Object.keys(input).some(key => key !== 'endpoint')) throw new ORPCError('BAD_REQUEST', { message: 'Unexpected discovery argument' });
@@ -72,13 +74,14 @@ export class McpApiService {
 		return kind ? [...new Set([...mcpScopes, kind])] : mcpScopes;
 	}
 
-	private async checkAccess(userId: string, tokenId: string): Promise<readonly string[]> {
+	private async checkAccess(userId: string, tokenId: string) {
 		// Use shared repositories; do not trust the native app cache for this connection gate.
 		const grant = await this.tokens.findOneBy({ id: tokenId, userId });
-		if (!grant) throw apiError({ code: 'AUTHENTICATION_FAILED', status: 401, message: 'Authentication failed.', id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14' });
+		const actor = await this.users.findOneBy({ id: userId }) as MiLocalUser | null;
+		if (!grant || !actor || actor.host !== null) throw apiError({ code: 'AUTHENTICATION_FAILED', status: 401, message: 'Authentication failed.', id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14' });
 		const permission = grant.appId ? (await this.apps.findOneBy({ id: grant.appId }))?.permission : grant.permission;
 		if (!permission?.includes('access:mcp')) throw mcpPermissionDenied();
-		return permission;
+		return { actor, permission };
 	}
 
 	async invoke(tool: string, input: unknown, request: ApiRequestContext, signal?: AbortSignal): Promise<unknown> {

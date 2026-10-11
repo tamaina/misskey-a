@@ -36,6 +36,13 @@ import { getPilotApiDescriptors } from '@features/api/backend/transport/openapi/
 import { MyAppsContract } from '@features/auth/backend/api.definition.js';
 import { createMyAppsProcedure } from '@features/auth/backend/endpoints/my/apps.js';
 import { packedNoteSchema } from '@features/notes/backend/note.schema.js';
+import { adListContract } from '@features/instance/backend/endpoints/admin/ad/list.contract.js';
+import { adCreateContract } from '@features/instance/backend/endpoints/admin/ad/create.contract.js';
+import { createAdListProcedure, type AdListDependencies } from '@features/instance/backend/endpoints/admin/ad/list.js';
+import { createAdCreateProcedure, type AdCreateDependencies } from '@features/instance/backend/endpoints/admin/ad/create.js';
+import { moderationContract } from '@features/moderation/backend/api.definition.js';
+import { createAdminSuspendUserProcedure } from '@features/moderation/backend/endpoints/admin/suspend-user.js';
+import type { ModerationApiDependencies } from '@features/moderation/backend/api.implementation.js';
 import { DI } from '@/di-symbols.js';
 import { McpApiService } from '../../../backend/McpApiService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -86,12 +93,22 @@ export async function fixture() {
 	appDeps.appsRepository.find.mockResolvedValue([]);
 	const reactions = mockDeep<NotesCommandDependencies>();
 	reactions.getNote.mockResolvedValue(new MiNote({ id: notes[0].id, userId: own.id }));
+	const ads = mockDeep<AdListDependencies & AdCreateDependencies>();
+	const adQuery = mockDeep<ReturnType<typeof ads.adsRepository.createQueryBuilder>>();
+	ads.adsRepository.createQueryBuilder.mockReturnValue(adQuery);
+	ads.queryService.makePaginationQuery.mockReturnValue(adQuery);
+	adQuery.limit.mockReturnValue(adQuery); adQuery.getMany.mockResolvedValue([]);
+	ads.idService.gen.mockReturnValue('ffffffffffffffff');
+	ads.adsRepository.insertOne.mockImplementation(async values => Object.assign({}, values) as Awaited<ReturnType<typeof ads.adsRepository.insertOne>>);
+	const moderation = mockDeep<Pick<ModerationApiDependencies<MiLocalUser>, 'usersRepository' | 'roleService' | 'userSuspendService'>>();
+	moderation.usersRepository.findOneBy.mockResolvedValue(Object.assign(new MiUser({}), { id: otherId }));
+	moderation.roleService.isModerator.mockResolvedValue(false);
 	const directoryDeps = { readApiEndpoints: getPilotApiDescriptors, accessTokensRepository: tokens, appsRepository: apps };
-	const contract = { instance: { availableEndpoints: availableEndpointsContract }, notes: { notesReactionsCreate: notesReactionsCreateContract }, timelines: { usersNotes: usersNotesContract }, auth: { 'my/apps': MyAppsContract } };
+	const contract = { instance: { availableEndpoints: availableEndpointsContract, adList: adListContract, adCreate: adCreateContract }, moderation: { adminSuspendUser: moderationContract.adminSuspendUser }, notes: { notesReactionsCreate: notesReactionsCreateContract }, timelines: { usersNotes: usersNotesContract }, auth: { 'my/apps': MyAppsContract } };
 	const builder = implement(contract).$context<ApiContext<MiLocalUser>>().use(async ({ context, next }) => {
 		try { return await next(); } catch (error) { throw context.mapError ? context.mapError(error) : normalizeError(error); }
 	});
-	const router = builder.router({ instance: { availableEndpoints: createAvailableEndpointsProcedure<MiLocalUser>(directoryDeps) }, notes: { notesReactionsCreate: createNotesReactionsCreateProcedure(reactions) }, timelines: { usersNotes: createUsersNotesProcedure<MiLocalUser>(deps) }, auth: { 'my/apps': createMyAppsProcedure(appDeps) } });
+	const router = builder.router({ instance: { availableEndpoints: createAvailableEndpointsProcedure<MiLocalUser>(directoryDeps), adList: createAdListProcedure<MiLocalUser>(ads), adCreate: createAdCreateProcedure<MiLocalUser>(ads) }, moderation: { adminSuspendUser: createAdminSuspendUserProcedure<MiLocalUser>(moderation) }, notes: { notesReactionsCreate: createNotesReactionsCreateProcedure(reactions) }, timelines: { usersNotes: createUsersNotesProcedure<MiLocalUser>(deps) }, auth: { 'my/apps': createMyAppsProcedure(appDeps) } });
 	const roles = mockDeep<RoleService>(); roles.getUserPolicies.mockResolvedValue(DEFAULT_POLICIES); roles.getUserRoles.mockResolvedValue([]);
 	const logger = mockDeep<ApiLoggerService>();
 	const telemetry = mockDeep<TelemetryService>(); telemetry.startSpan.mockImplementation((_name, run) => run());
@@ -109,5 +126,5 @@ export async function fixture() {
 	const request = (credential: string | undefined = grant.token) => ({ credential, ip: '127.0.0.1', headers: {} });
 	const invoke = (input: unknown = {}, credential: string | undefined = grant.token) => module.get(McpApiService).invoke('list_my_notes', input, request(credential));
 	const ordinary = (input: object, credential = grant.token, name = 'users/notes') => http.inject({ method: 'POST', url: `/api/${name}`, payload: { ...input, i: credential } });
-	return { cache, users, apps, appDeps, http, own, otherId, grant, appGrant, app, rows, tokens, deps, blocked, module, invoke, ordinary, request, router, logger, telemetry, reactions, notes };
+	return { cache, users, apps, appDeps, http, own, otherId, grant, appGrant, app, rows, tokens, deps, blocked, module, invoke, ordinary, request, router, logger, telemetry, reactions, notes, roles, ads, moderation };
 }
