@@ -62,6 +62,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</ul>
 				</div>
 			</div>
+			<MkPermissionSelect v-if="selectablePermissions" v-model="selectedPermissions" :permissions="selectablePermissions"
+				:administrator="selectedAdministrator" :labels="copyLocaleDictionary($locale.sfc.permissionsLabels)"
+				:disableAllText="i18n.ts.disableAll" :enableAllText="i18n.ts.enableAll" :adminPermissionText="i18n.ts.adminPermission"/>
 			<slot name="consentAdditionalInfo"></slot>
 			<div>
 				<div :class="$style.accountSelectorLabel">
@@ -79,7 +82,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div class="_buttonsCenter">
 				<MkButton rounded @click="clickCancel">{{ $locale.sfc.reject }}</MkButton>
-				<MkButton rounded gradate @click="clickAccept">{{ $locale.sfc.accept }}</MkButton>
+				<MkButton rounded gradate :disabled="selectablePermissions !== undefined && selectedPermissions.length === 0" @click="clickAccept">{{ $locale.sfc.accept }}</MkButton>
 			</div>
 		</div>
 		<div v-else-if="phase === 'success'" key="success" :class="$style.root" class="_gaps_s">
@@ -117,6 +120,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
+import MkPermissionSelect from './MkPermissionSelect.vue';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@features/auth/frontend/accounts.js';
@@ -130,18 +135,25 @@ const props = defineProps<{
 	name?: string;
 	icon?: string;
 	permissions?: (typeof Misskey.permissions[number])[];
+	selectablePermissions?: string[];
 	manualWaiting?: boolean;
 	waitOnDeny?: boolean;
 }>();
 
 const emit = defineEmits<{
-	(ev: 'accept', token: string): void;
+	(ev: 'accept', token: string, permissions?: string[]): void;
 	(ev: 'deny', token: string): void;
 }>();
 
 const waiting = ref(true);
 const _waiting = computed(() => waiting.value || props.manualWaiting);
 const phase = ref<'accountSelect' | 'consent' | 'success' | 'denied' | 'failed'>('accountSelect');
+
+const selectedPermissions = ref<string[]>([]);
+const selectedAdministrator = computed(() => {
+	const user = selectedUser.value ? users.value.get(selectedUser.value) : undefined;
+	return user !== undefined && 'isAdmin' in user && user.isAdmin === true;
+});
 
 const selectedUser = ref<string | null>(null);
 
@@ -216,9 +228,18 @@ function clickAddAccount(ev: PointerEvent) {
 	}], ev.currentTarget ?? ev.target);
 }
 
-function clickChooseAccount() {
+async function clickChooseAccount() {
 	if (selectedUser.value === null) return;
+	if (props.selectablePermissions !== undefined) {
+		const user = users.value.get(selectedUser.value)!;
+		waiting.value = true;
+		try {
+			const details = await misskeyApi('users/show', { userId: user.id }, user.token);
+			users.value.set(user.id, { ...details, token: user.token });
+		} catch { showUI('failed'); return; } finally { waiting.value = false; }
+	}
 
+	selectedPermissions.value = [];
 	phase.value = 'consent';
 }
 
@@ -248,7 +269,7 @@ async function clickAccept() {
 	const token = user.token;
 
 	waiting.value = true;
-	emit('accept', token);
+	emit('accept', token, props.selectablePermissions === undefined ? undefined : [...selectedPermissions.value]);
 }
 
 function showUI(state: 'success' | 'denied' | 'failed') {

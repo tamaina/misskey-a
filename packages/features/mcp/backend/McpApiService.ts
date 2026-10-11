@@ -4,19 +4,26 @@
  */
 import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import * as v from 'valibot';
+import { availableEndpointsResult } from '@features/instance/backend/endpoints/available-endpoints.contract.js';
+import { mcpScopes } from './discovery.js';
 import { ORPCError } from '@orpc/server';
 import { ApiRouterProvider } from '@features/index/backend/api.implementation.js';
+import { endpointPolicies } from '@features/api/backend/transport/endpoint-directory.js';
 import { pilotContract } from '@features/index/backend/api.definition.js';
 import { ApiExecutionContextFactory } from '@features/api/backend/transport/ApiExecutionContextFactory.js';
-import { DI } from '@/di-symbols.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import type { AccessTokensRepository, AppsRepository } from '@features/persistence/backend/repositories/models.js';
+import { DI } from '@/di-symbols.js';
 import { createAllowedApiCaller, McpSelectionError } from './api-caller.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { AccessTokensRepository, AppsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { ApiRequestContext } from '@features/api/backend/transport/ApiExecutionContextFactory.js';
 
 /** Application seam only. No HTTP registration or credential/grant issuance. */
 @Injectable()
 export class McpApiService {
+	private readonly endpoints = endpointPolicies(pilotContract).filter(endpoint => endpoint.mcpSupported);
+	private genericCaller: ReturnType<typeof createAllowedApiCaller> | undefined;
 	private caller: ReturnType<typeof createAllowedApiCaller> | undefined;
 	constructor(private readonly contexts: ApiExecutionContextFactory, private readonly moduleRef: ModuleRef,
 		@Inject(DI.accessTokensRepository) private readonly tokens: AccessTokensRepository,
@@ -33,22 +40,45 @@ export class McpApiService {
 		if (!token?.id) throw mcpPermissionDenied();
 		const tokenId = token.id;
 		await this.checkAccess(principal.id, tokenId);
-		const bound = { ...context, services: { ...context.services, authenticate: async () => authenticated } };
 		return { invoke: async (tool: string, input: unknown, invocationSignal?: AbortSignal): Promise<unknown> => {
 			validateSelection(tool, input);
-			await this.checkAccess(principal.id, tokenId);
+			const permission = await this.checkAccess(principal.id, tokenId);
+			const endpointName = tool === 'call_api' && typeof input.endpoint === 'string' ? input.endpoint : tool === 'list_api_endpoints' ? 'available-endpoints' : 'users/notes';
+			const operationContext = this.contexts.create({ ...request, safeDiagnostics: true }, endpointName);
+			const bound: ApiContext = { ...operationContext, services: { ...operationContext.services, authenticate: async () => [principal, { ...token, permission }] } };
+			const generic = () => this.genericCaller ??= createAllowedApiCaller(this.moduleRef.get(ApiRouterProvider, { strict: false }).compose(), pilotContract, this.endpoints.map(endpoint => endpoint.name));
+			if (tool === 'list_api_endpoints') {
+				if (Object.keys(input).some(key => key !== 'endpoint')) throw new ORPCError('BAD_REQUEST', { message: 'Unexpected discovery argument' });
+				const directory = v.parse(availableEndpointsResult, await generic()('available-endpoints', input, bound, invocationSignal));
+				const supported = new Set(this.endpoints.map(endpoint => endpoint.name));
+				return { ...directory, endpoints: directory.endpoints.filter(name => supported.has(name)), definitions: directory.definitions.filter(endpoint => endpoint.mcpSupported) };
+			}
+			if (tool === 'call_api') {
+				if (typeof input.endpoint !== 'string' || !/^[a-z0-9-]+(?:\/[a-z0-9-]+)*$/.test(input.endpoint)) throw new McpSelectionError('TOOL_UNAVAILABLE');
+				if (!isInputObject(input.arguments) || 'i' in input.arguments) throw new ORPCError('BAD_REQUEST', { message: 'Expected API arguments without credentials' });
+				if (Object.keys(input).some(key => key !== 'endpoint' && key !== 'arguments')) throw new ORPCError('BAD_REQUEST', { message: 'Unexpected invocation argument' });
+				return generic()(input.endpoint, input.arguments, bound, invocationSignal);
+			}
 			if ('userId' in input && input.userId !== principal.id) throw new McpSelectionError('SUBJECT_MISMATCH');
 			const caller = this.caller ??= createAllowedApiCaller(this.moduleRef.get(ApiRouterProvider, { strict: false }).compose(), pilotContract, ['users/notes']);
 			return caller('users/notes', { ...input, userId: principal.id }, bound, invocationSignal);
 		} };
 	}
 
-	private async checkAccess(userId: string, tokenId: string): Promise<void> {
+	/** Advertise the native endpoint's additional scope only after a real permission denial. */
+	requiredScopes(tool: string, input: unknown): readonly string[] {
+		if (tool !== 'call_api' || !isInputObject(input)) return mcpScopes;
+		const kind = this.endpoints.find(endpoint => endpoint.name === input.endpoint)?.policy.kind;
+		return kind ? [...new Set([...mcpScopes, kind])] : mcpScopes;
+	}
+
+	private async checkAccess(userId: string, tokenId: string): Promise<readonly string[]> {
 		// Use shared repositories; do not trust the native app cache for this connection gate.
 		const grant = await this.tokens.findOneBy({ id: tokenId, userId });
 		if (!grant) throw apiError({ code: 'AUTHENTICATION_FAILED', status: 401, message: 'Authentication failed.', id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14' });
 		const permission = grant.appId ? (await this.apps.findOneBy({ id: grant.appId }))?.permission : grant.permission;
 		if (!permission?.includes('access:mcp')) throw mcpPermissionDenied();
+		return permission;
 	}
 
 	async invoke(tool: string, input: unknown, request: ApiRequestContext, signal?: AbortSignal): Promise<unknown> {
@@ -58,11 +88,13 @@ export class McpApiService {
 }
 
 function validateSelection(tool: string, input: unknown): asserts input is Record<string, unknown> {
-	if (tool !== 'list_my_notes') throw new McpSelectionError('TOOL_UNAVAILABLE');
-	if (input === null || typeof input !== 'object' || Array.isArray(input)
-		|| (Object.getPrototypeOf(input) !== Object.prototype && Object.getPrototypeOf(input) !== null)) {
-		throw new ORPCError('BAD_REQUEST', { message: 'Expected an argument object' });
-	}
+	if (!['list_my_notes', 'call_api', 'list_api_endpoints'].includes(tool)) throw new McpSelectionError('TOOL_UNAVAILABLE');
+	if (!isInputObject(input)) throw new ORPCError('BAD_REQUEST', { message: 'Expected an argument object' });
+}
+
+function isInputObject(input: unknown): input is Record<string, unknown> {
+	return input !== null && typeof input === 'object' && !Array.isArray(input)
+		&& (Object.getPrototypeOf(input) === Object.prototype || Object.getPrototypeOf(input) === null);
 }
 
 function mcpPermissionDenied() {

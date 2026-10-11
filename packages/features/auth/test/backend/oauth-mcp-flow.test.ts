@@ -15,6 +15,7 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 import { discoverOAuthServerInfo, exchangeAuthorization, startAuthorization } from '@modelcontextprotocol/sdk/client/auth.js';
 import { OAuth2ProviderService } from '../../backend/oauth/OAuth2ProviderService.js';
 import { MiAccessToken } from '../../backend/models/AccessToken.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
@@ -60,7 +61,7 @@ async function setup() {
 	templates.getCommonData.mockResolvedValue({ config, instanceUrl: issuer, langs: [], frontendViteFiles: { entryJs: null, css: [], modulePreloads: [] } } as unknown as Awaited<ReturnType<HtmlTemplateService['getCommonData']>>);
 	const httpServices = [mockDeep<HttpRequestService>(), mockDeep<HttpRequestService>()];
 	const providers = [0, 1].map(index => {
-		const provider = new OAuth2ProviderService(config, f.tokens, f.users, ids, httpServices[index], f.cache, templates, loggers, redis);
+		const provider = new OAuth2ProviderService(config, f.tokens, f.users, ids, httpServices[index], f.cache, templates, loggers, f.module.get(RoleService), redis);
 		vi.spyOn(provider, 'fetchClientMetadata').mockImplementation(async () => new MetadataResponse(JSON.stringify({
 			client_id: clientId, client_name: 'Synthetic public client', redirect_uris: [redirectUri],
 			grant_types: ['authorization_code'], response_types: ['code'],
@@ -89,9 +90,10 @@ async function setup() {
 		return new Response(response.statusCode === 204 ? null : response.body, { status: response.statusCode, headers: response.headers as Record<string, string> });
 	};
 	const discovery = await discoverOAuthServerInfo(resource, { fetchFn: fetchFixture });
-	const begin = async (overrides: Record<string, string> = {}) => {
+	const begin = async (overrides: Record<string, string> = {}, emptyScope = false) => {
 		const flow = await startAuthorization(issuer, { metadata: discovery.authorizationServerMetadata, clientInformation: { client_id: clientId }, redirectUrl: redirectUri, scope: 'access:mcp', state: 'SYNTHETIC_STATE_SECRET', resource });
 		for (const [key, value] of Object.entries(overrides)) { if (value === '') flow.authorizationUrl.searchParams.delete(key); else flow.authorizationUrl.searchParams.set(key, value); }
+		if (emptyScope) flow.authorizationUrl.searchParams.set('scope', '');
 		const page = await app.inject({ url: flow.authorizationUrl.pathname + flow.authorizationUrl.search });
 		return { ...flow, page };
 	};
@@ -129,7 +131,7 @@ describe.skipIf(!socket)('synthetic OAuth discovery through native MCP (isolated
 		const client = new Client({ name: 'synthetic-oauth-client', version: '0' });
 		await client.connect(new StreamableHTTPClientTransport(new URL(resource), { fetch: s.fetchFixture, requestInit: { headers: { authorization: `Bearer ${token.access_token}` } } }));
 		try {
-			expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes']);
+			expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api']);
 			const result = await client.callTool({ name: 'list_my_notes', arguments: {} });
 			expect(result.structuredContent).toEqual({ notes: (await s.f.ordinary({ userId: s.f.own.id }, token.access_token)).json() });
 			await expect(client.callTool({ name: 'list_my_notes', arguments: { userId: s.f.otherId } })).rejects.toBeDefined();
@@ -340,5 +342,68 @@ describe.skipIf(!socket)('synthetic OAuth discovery through native MCP (isolated
 		const s = await setup(); const flow = await s.grant(); const token = await s.exchange(flow);
 		await expect(s.exchange(flow)).rejects.toBeDefined();
 		expect([...s.f.rows.values()].some(row => row.token === token.access_token)).toBe(false);
+	});
+});
+
+// All credentials and rows below belong solely to the synthetic fixture.
+describe.skipIf(!socket)('user selection for an empty OAuth scope', () => {
+	it.each(['omitted', 'empty'])('selects only explicitly approved permissions for %s scope and returns them to the SDK', async mode => {
+		const s = await setup();
+		const flow = await s.begin({ scope: '' }, mode === 'empty');
+		expect(flow.page.statusCode).toBe(200);
+		expect(flow.page.body).toContain('misskey:oauth:selectable-permissions');
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: 'read:account access:mcp read:account' } });
+		expect(decision.statusCode).toBe(302);
+		const code = new URL(decision.headers.location!).searchParams.get('code')!;
+		const token = await s.exchange({ ...flow, code });
+		expect(token.scope).toBe('read:account access:mcp');
+		expect([...s.f.rows.values()].find(row => row.token === token.access_token)?.permission).toEqual(['read:account', 'access:mcp']);
+	});
+	it.each([false, true])('grants only the selected no-resource permissions for administrator=%s', async administrator => {
+		const s = await setup();
+		vi.mocked(s.f.module.get(RoleService).isAdministrator).mockResolvedValue(administrator);
+		const flow = await s.begin({ scope: '', resource: '' });
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const selected = administrator ? 'read:account write:admin:meta' : 'read:account';
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: selected } });
+		expect(decision.statusCode).toBe(302);
+		const code = new URL(decision.headers.location!).searchParams.get('code')!;
+		const token = await exchangeAuthorization(issuer, { metadata: s.discovery.authorizationServerMetadata, clientInformation: { client_id: clientId }, authorizationCode: code, codeVerifier: flow.codeVerifier, redirectUri, fetchFn: s.fetchFixture });
+		expect(token.scope).toBe(selected);
+		expect([...s.f.rows.values()].find(row => row.token === token.access_token)?.permission).toEqual(selected.split(' '));
+	});
+	it.each(['', 'bogus', 'write:admin:meta', ['read:account']])('rejects empty or ineligible/tampered selection %j without a new token row', async selected => {
+		const s = await setup(); const flow = await s.begin({ scope: '' });
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: selected } });
+		expect(decision.statusCode).toBe(400); expect(decision.json().error).toBe('invalid_scope');
+		expect(s.f.rows.size).toBe(2);
+	});
+	it('keeps a nonempty unknown request invalid, and rejects selection injection into an explicit request', async () => {
+		const s = await setup(); const unknown = await s.begin({ scope: 'bogus' });
+		expect(new URL(unknown.page.headers.location!).searchParams.get('error')).toBe('invalid_scope');
+		const flow = await s.begin(); expect(flow.page.body).not.toContain('misskey:oauth:selectable-permissions');
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: 'access:mcp write:notes' } });
+		expect(decision.statusCode).toBe(400); expect(s.f.rows.size).toBe(2);
+	});
+	it('does not add access:mcp and preserves resource binding at code exchange', async () => {
+		const s = await setup(); const flow = await s.begin({ scope: '' });
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: 'read:account' } });
+		const code = new URL(decision.headers.location!).searchParams.get('code')!;
+		const denied = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: clientId, redirect_uri: redirectUri, code_verifier: flow.codeVerifier, code, resource: 'https://other.invalid/mcp' } });
+		expect(denied.statusCode).toBe(400); expect(denied.json().error).toBe('invalid_grant');
+		expect(s.f.rows.size).toBe(2);
+	});
+	it('preserves no-resource authorization and forbids selecting access:mcp there', async () => {
+		const s = await setup(); const flow = await s.begin({ scope: '', resource: '' });
+		expect(flow.page.statusCode).toBe(200);
+		const selectable = flow.page.body.match(/name="misskey:oauth:selectable-permissions" content="([^"]*)"/)?.[1];
+		expect(selectable).not.toContain('access:mcp');
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const denied = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: 'access:mcp' } });
+		expect(denied.statusCode).toBe(400);
 	});
 });

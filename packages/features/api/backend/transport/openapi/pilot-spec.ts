@@ -4,17 +4,19 @@
  */
 
 import { OpenAPIGenerator } from '@orpc/openapi';
-import { assignExternalOperationIds } from './operation-ids.js';
 import { experimental_ValibotToJsonSchemaConverter } from '@orpc/valibot';
 import { packedJsonValueSchema } from '@features/users/backend/json-value.schema.js';
 import { clientContract } from '@features/index/backend/client.contract.js';
 import { packedSchemas } from '@features/index/backend/packed.schema.js';
 import { pilotContract } from '@features/index/backend/api.definition.js';
+import { galleryFileIdsUnique } from '@features/collections/backend/api.definition.js';
+import { imageCommentLength } from '@features/drive/backend/endpoints/drive/files/create.schema.js';
 import { rawObjectInputGuard } from '../input.schema.js';
 import { apiErrorInfoObject } from '../errors.schema.js';
 import { requestRoutes, nullableResponsePaths } from '../../../shared/api-routing.js';
-import { galleryFileIdsUnique } from '@features/collections/backend/api.definition.js';
-import { imageCommentLength } from '@features/drive/backend/endpoints/drive/files/create.schema.js';
+import { endpointPolicies } from '../endpoint-directory.js';
+import { assignExternalOperationIds } from './operation-ids.js';
+import type { ApiEndpointDescriptor } from '../endpoint-directory.js';
 
 /** JSON Schema exists only as generated external documentation, never request validation. */
 export async function genPilotOpenapiSpec(config: { version: string; apiUrl: string }) {
@@ -174,4 +176,32 @@ function hoistExternalDefinitions(document: { components?: { schemas?: Record<st
 	}
 
 	rewrite(document);
+}
+
+let apiDescriptors: Promise<ApiEndpointDescriptor[]> | undefined;
+/** Cache only public contract/schema data; authorization is checked anew for every request. */
+export function getPilotApiDescriptors(): Promise<ApiEndpointDescriptor[]> {
+	return apiDescriptors ??= (async () => {
+		const spec = await genPilotOpenapiSpec({ version: 'introspection', apiUrl: '/api' });
+		return endpointPolicies(pilotContract).map(endpoint => {
+			const body = spec.paths?.[`/${endpoint.name}`]?.post?.requestBody;
+			const schema = body && !('$ref' in body) ? body.content['application/json']?.schema : undefined;
+			const definitions: Record<string, unknown> = {};
+
+			function bundle(value: unknown): unknown {
+				if (Array.isArray(value)) return value.map(bundle);
+				if (value === null || typeof value !== 'object') return value;
+				if ('$ref' in value && typeof value.$ref === 'string' && value.$ref.startsWith('#/components/schemas/')) {
+					const name = value.$ref.slice('#/components/schemas/'.length);
+					const key = name.replaceAll('~1', '/').replaceAll('~0', '~');
+					if (!(key in definitions)) { definitions[key] = {}; definitions[key] = bundle(spec.components?.schemas?.[key]); }
+					return { $ref: `#/$defs/${name}` };
+				}
+				return Object.fromEntries(Object.entries(value).map(([key, child]) => [key, bundle(child)]));
+			}
+
+			const input = bundle(schema);
+			return { ...endpoint, inputSchema: { ...(input && typeof input === 'object' ? input : {}), $defs: definitions } };
+		});
+	})();
 }

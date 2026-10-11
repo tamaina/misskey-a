@@ -30,7 +30,7 @@ it('allows absent Origin for nonbrowser clients and exact approved Origin, with 
 	const { invoke, f, p } = await pilot();
 	for (const origin of [undefined, 'http://127.0.0.1:61836']) {
 		const response = await invoke(message(), origin ? { origin } : {}); expect(response.statusCode).toBe(200);
-		const tools = response.json().result.tools; expect(tools.map((tool: { name: string }) => tool.name)).toEqual(['list_my_notes']);
+		const tools = response.json().result.tools; expect(tools.map((tool: { name: string }) => tool.name)).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api']);
 		expect(tools[0].description).toContain('nonpublic');
 		expect(tools[0].inputSchema.properties.userId).toBeUndefined();
 		expect(tools[0].inputSchema.properties.limit.maximum).toBe(100);
@@ -70,7 +70,7 @@ it('runs SDK1.32.0 initialize/list/call using explicit bearer headers, preservin
 	const client = new Client({ name: 'synthetic', version: '0' });
 	await client.connect(new StreamableHTTPClientTransport(new URL('http://127.0.0.1:61836/mcp'), { fetch: fetchFixture, requestInit: { headers: { authorization: headers.authorization } } }));
 	try {
-		expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes']);
+		expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api']);
 		const result = await client.callTool({ name: 'list_my_notes', arguments: {} });
 		expect(result.structuredContent).toEqual({ notes: (await f.ordinary({ userId: f.own.id })).json() });
 		const invalid = await client.callTool({ name: 'list_my_notes', arguments: { limit: 101 } });

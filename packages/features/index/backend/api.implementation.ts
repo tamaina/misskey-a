@@ -4,9 +4,6 @@
  */
 
 import { implement } from '@orpc/server';
-import { pilotContract } from './api.definition.js';
-import type { ApiContext } from '@features/api/backend/transport/context.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { normalizeError } from '@features/api/backend/transport/orpc-error.js';
 import { createTestProcedure } from '@features/api/backend/endpoints/test.js';
 import { createClearBrowserCacheProcedure, createClearBrowserCacheGetProcedure } from '@features/api/backend/endpoints/clear-browser-cache.js';
@@ -39,7 +36,10 @@ import { RelationshipsApiProvider } from '@features/relationships/backend/api.im
 import { CollectionsApiProvider } from '@features/collections/backend/api.implementation.js';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { getPilotEndpointDescriptors } from '@features/api/backend/transport/openapi/pilot-spec.js';
+import { getPilotEndpointDescriptors, getPilotApiDescriptors } from '@features/api/backend/transport/openapi/pilot-spec.js';
+import { pilotContract } from './api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 
 export interface ApiRouterFeatures {
 	roles: ReturnType<RolesApiProvider['compose']>;
@@ -107,7 +107,7 @@ export class ApiRouterProvider {
 			pages: this.moduleRef.get(PagesApiProvider, { strict: false }).compose(),
 			channels: this.moduleRef.get(ChannelsApiProvider, { strict: false }).compose(),
 			chat: this.moduleRef.get(ChatApiProvider, { strict: false }).compose(),
-			instance: this.moduleRef.get(InstanceApiProvider, { strict: false }).compose(async () => (await getPilotEndpointDescriptors()).sort((a, b) => a.name.localeCompare(b.name))),
+			instance: this.moduleRef.get(InstanceApiProvider, { strict: false }).compose(async () => (await getPilotEndpointDescriptors()).sort((a, b) => a.name.localeCompare(b.name)), getPilotApiDescriptors),
 			statistics: this.moduleRef.get(StatisticsApiProvider, { strict: false }).compose(),
 			discovery: this.moduleRef.get(DiscoveryApiProvider, { strict: false }).compose(),
 			announcements: this.moduleRef.get(AnnouncementsApiProvider, { strict: false }).compose(),

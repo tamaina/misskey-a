@@ -27,6 +27,12 @@ import { RateLimiterService } from '@features/api/backend/transport/RateLimiterS
 import { normalizeError } from '@features/api/backend/transport/orpc-error.js';
 import { usersNotesContract } from '@features/timelines/backend/endpoints/users/notes.contract.js';
 import { createUsersNotesProcedure } from '@features/timelines/backend/endpoints/users/notes.js';
+import { notesReactionsCreateContract } from '@features/notes/backend/endpoints/notes/reactions/create.contract.js';
+import { createNotesReactionsCreateProcedure } from '@features/notes/backend/endpoints/notes/reactions/create.js';
+import type { NotesCommandDependencies } from '@features/notes/backend/command.dependencies.js';
+import { createAvailableEndpointsProcedure } from '@features/instance/backend/endpoints/available-endpoints.js';
+import { availableEndpointsContract } from '@features/instance/backend/endpoints/available-endpoints.contract.js';
+import { getPilotApiDescriptors } from '@features/api/backend/transport/openapi/pilot-spec.js';
 import { MyAppsContract } from '@features/auth/backend/api.definition.js';
 import { createMyAppsProcedure } from '@features/auth/backend/endpoints/my/apps.js';
 import { packedNoteSchema } from '@features/notes/backend/note.schema.js';
@@ -78,12 +84,15 @@ export async function fixture() {
 	deps.fanoutTimelineEndpointService.timeline.mockImplementation(async options => notes.filter(note => options.redisTimelines.some(key => key.endsWith(`:${note.userId}`)) && (options.noteFilter?.(new MiNote({ id: note.id, userId: note.userId, visibility: note.visibility, visibleUserIds: note.visibleUserIds ?? [], channel: null })) ?? true)).slice(0, options.limit));
 	const appDeps = mockDeep<MyAppsDependencies>();
 	appDeps.appsRepository.find.mockResolvedValue([]);
-	const contract = { timelines: { usersNotes: usersNotesContract }, auth: { 'my/apps': MyAppsContract } };
+	const reactions = mockDeep<NotesCommandDependencies>();
+	reactions.getNote.mockResolvedValue(new MiNote({ id: notes[0].id, userId: own.id }));
+	const directoryDeps = { readApiEndpoints: getPilotApiDescriptors, accessTokensRepository: tokens, appsRepository: apps };
+	const contract = { instance: { availableEndpoints: availableEndpointsContract }, notes: { notesReactionsCreate: notesReactionsCreateContract }, timelines: { usersNotes: usersNotesContract }, auth: { 'my/apps': MyAppsContract } };
 	const builder = implement(contract).$context<ApiContext<MiLocalUser>>().use(async ({ context, next }) => {
 		try { return await next(); } catch (error) { throw context.mapError ? context.mapError(error) : normalizeError(error); }
 	});
-	const router = builder.router({ timelines: { usersNotes: createUsersNotesProcedure<MiLocalUser>(deps) }, auth: { 'my/apps': createMyAppsProcedure(appDeps) } });
-	const roles = mockDeep<RoleService>(); roles.getUserPolicies.mockResolvedValue(DEFAULT_POLICIES);
+	const router = builder.router({ instance: { availableEndpoints: createAvailableEndpointsProcedure<MiLocalUser>(directoryDeps) }, notes: { notesReactionsCreate: createNotesReactionsCreateProcedure(reactions) }, timelines: { usersNotes: createUsersNotesProcedure<MiLocalUser>(deps) }, auth: { 'my/apps': createMyAppsProcedure(appDeps) } });
+	const roles = mockDeep<RoleService>(); roles.getUserPolicies.mockResolvedValue(DEFAULT_POLICIES); roles.getUserRoles.mockResolvedValue([]);
 	const logger = mockDeep<ApiLoggerService>();
 	const telemetry = mockDeep<TelemetryService>(); telemetry.startSpan.mockImplementation((_name, run) => run());
 	const module = await Test.createTestingModule({ providers: [AuthenticateService, ApiExecutionContextFactory, McpApiService, OrpcPilotService,
@@ -100,5 +109,5 @@ export async function fixture() {
 	const request = (credential: string | undefined = grant.token) => ({ credential, ip: '127.0.0.1', headers: {} });
 	const invoke = (input: unknown = {}, credential: string | undefined = grant.token) => module.get(McpApiService).invoke('list_my_notes', input, request(credential));
 	const ordinary = (input: object, credential = grant.token, name = 'users/notes') => http.inject({ method: 'POST', url: `/api/${name}`, payload: { ...input, i: credential } });
-	return { cache, users, apps, appDeps, http, own, otherId, grant, appGrant, app, rows, tokens, deps, blocked, module, invoke, ordinary, request, router, logger, telemetry };
+	return { cache, users, apps, appDeps, http, own, otherId, grant, appGrant, app, rows, tokens, deps, blocked, module, invoke, ordinary, request, router, logger, telemetry, reactions, notes };
 }

@@ -11,6 +11,7 @@ import { adminMetaContract } from './endpoints/admin/meta.contract.js';
 import { adminServerInfoContract } from './endpoints/admin/server-info.contract.js';
 import { updateMetaContract } from './endpoints/admin/update-meta.contract.js';
 import { endpointContract } from './endpoints/endpoint.contract.js';
+import { availableEndpointsContract } from './endpoints/available-endpoints.contract.js';
 import { endpointsContract } from './endpoints/endpoints.contract.js';
 import { onlineUsersCountContract, onlineUsersCountGetContract } from './endpoints/get-online-users-count.contract.js';
 import { metaContract } from './endpoints/meta.contract.js';
@@ -30,6 +31,7 @@ export const instanceApiContract = {
 	updateMeta: updateMetaContract,
 	endpoint: endpointContract,
 	endpoints: endpointsContract,
+	availableEndpoints: availableEndpointsContract,
 	onlineUsersCount: onlineUsersCountContract,
 	onlineUsersCountGet: onlineUsersCountGetContract,
 	meta: metaContract,

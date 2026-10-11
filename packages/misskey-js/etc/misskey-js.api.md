@@ -693,6 +693,12 @@ type AuthSessionUserkeyRequest = ContractRequest<'auth/session/userkey'>;
 type AuthSessionUserkeyResponse = ContractResponse<'auth/session/userkey'>;
 
 // @public (undocumented)
+type AvailableEndpointsRequest = ContractRequest<'available-endpoints'>;
+
+// @public (undocumented)
+type AvailableEndpointsResponse = ContractResponse<'available-endpoints'>;
+
+// @public (undocumented)
 type Blocking = ContractModel<'Blocking'>;
 
 // @public (undocumented)
@@ -2034,6 +2040,8 @@ declare namespace entities {
         EndpointResponse,
         EndpointsRequest,
         EndpointsResponse,
+        AvailableEndpointsRequest,
+        AvailableEndpointsResponse,
         GetOnlineUsersCountRequest,
         GetOnlineUsersCountResponse,
         MetaRequest,
