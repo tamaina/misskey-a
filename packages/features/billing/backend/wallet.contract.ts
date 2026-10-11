@@ -5,9 +5,9 @@
 
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
-import { rawObjectInputGuard } from '@features/api/backend/transport/input.schema.js';
-import { commonErrors } from '@features/api/backend/transport/errors.schema.js';
-import type { ApiProcedureMetadata } from '@features/api/backend/transport/policy.types.js';
+import { rawObjectInputGuard } from '../../api/backend/transport/input.schema.js';
+import { apiErrorData, commonErrors } from '../../api/backend/transport/errors.schema.js';
+import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
 
 const id = v.pipe(v.string(), v.minLength(1), v.maxLength(128));
 const chainId = v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(Number.MAX_SAFE_INTEGER));
@@ -24,7 +24,16 @@ export type LinkedWallet = v.InferOutput<typeof linkedWallet>;
 export type WalletChain = v.InferOutput<typeof walletChain>;
 const read = { requireCredential: true, kind: 'read:account' } as const satisfies ApiProcedureMetadata;
 const write = { requireCredential: true, kind: 'write:account', limit: { duration: 60 * 1000, max: 10 } } as const satisfies ApiProcedureMetadata;
-const procedure = oc.errors(commonErrors);
+const walletFailure = { status: 400, data: apiErrorData };
+export const walletErrors = {
+	WALLET_CHAIN_UNSUPPORTED: walletFailure,
+	WALLET_ALREADY_LINKED: walletFailure,
+	WALLET_CHALLENGE_NOT_FOUND: walletFailure,
+	WALLET_SIGNATURE_INVALID: walletFailure,
+	WALLET_NOT_FOUND: walletFailure,
+	PAYMENT_TRANSACTION_INVALID: walletFailure,
+};
+const procedure = oc.errors({ ...commonErrors, ...walletErrors });
 export const walletContract = {
 	list: procedure.$meta({ ...read, requestName: 'account/wallets/list' })
 		.input(v.intersect([v.strictObject({}), rawObjectInputGuard])).output(v.array(linkedWallet)),

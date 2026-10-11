@@ -8,7 +8,7 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { createPublicClient, getAddress, http, isAddress } from 'viem';
 import { createSiweMessage, generateSiweNonce, verifySiweMessage } from 'viem/siwe';
 import type { Hex } from 'viem';
-import type { LinkedWallet, WalletChain } from './wallet.definition.js';
+import type { LinkedWallet, WalletChain, walletErrors } from './wallet.contract.js';
 
 export const WALLET_CHALLENGE_TTL = 10 * 60 * 1000;
 export interface WalletChallenge {
@@ -43,7 +43,7 @@ export interface WalletDependencies {
 	verify(challenge: WalletChallenge, signature: Hex, rpcUrl: string, now: number): Promise<boolean>;
 }
 
-function walletError(code: string) {
+function walletError(code: keyof typeof walletErrors) {
 	return apiError({ code, message: 'Wallet registration could not be completed.', id: '2c3c4a97-3aca-4a28-b0d6-8359d6751956' });
 }
 

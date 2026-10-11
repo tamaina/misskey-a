@@ -7,7 +7,7 @@ import { implement } from '@orpc/server';
 import * as v from 'valibot';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import { linkedWallet, walletChain, walletContract } from './wallet.definition.js';
+import { linkedWallet, walletChain, walletContract } from './wallet.contract.js';
 import { createWalletService } from './wallet-service.js';
 import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import type { WalletDependencies, WalletRecord } from './wallet-service.js';

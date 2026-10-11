@@ -5,9 +5,9 @@
 
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
-import { rawObjectInputGuard } from '@features/api/backend/transport/input.schema.js';
-import { commonErrors } from '@features/api/backend/transport/errors.schema.js';
-import type { ApiProcedureMetadata } from '@features/api/backend/transport/policy.types.js';
+import { rawObjectInputGuard } from '../../api/backend/transport/input.schema.js';
+import { commonErrors } from '../../api/backend/transport/errors.schema.js';
+import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
 
 const id = v.pipe(v.string(), v.minLength(1), v.maxLength(128));
 const timestamp = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(Number.MAX_SAFE_INTEGER));
@@ -50,3 +50,5 @@ export const billingContract = {
 	} as const satisfies ApiProcedureMetadata)
 		.input(disabledPaymentChain).output(disabledPaymentChain),
 };
+
+export { walletContract } from './wallet.contract.js';

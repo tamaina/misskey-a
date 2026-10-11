@@ -47,7 +47,7 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { linkWallet, WalletLinkCancelled } from './wallet-link.js';
-import type { LinkedWallet, WalletChain } from '../backend/wallet.definition.js';
+import type { LinkedWallet, WalletChain } from '../backend/wallet.contract.js';
 import type { ConnectedWallet, WalletClient, WalletConnector } from './wallet-client.js';
 import type { WalletStep } from './wallet-link.js';
 

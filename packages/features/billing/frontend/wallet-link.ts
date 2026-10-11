@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { WalletChain, LinkedWallet } from '../backend/wallet.definition.js';
+import type { WalletChain, LinkedWallet } from '../backend/wallet.contract.js';
 import type { ConnectedWallet, WalletClient, WalletConnector } from './wallet-client.js';
 
 export type WalletStep = 'connect' | 'switch' | 'sign' | 'verify';

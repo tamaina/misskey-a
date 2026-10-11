@@ -4,7 +4,7 @@
  */
 
 import type { ContractRouterClient } from '@orpc/contract';
-import type { walletContract } from '../backend/wallet.definition.js';
+import type { walletContract } from '../backend/wallet.contract.js';
 
 export type WalletClient = ContractRouterClient<typeof walletContract>;
 export interface WalletProvider {

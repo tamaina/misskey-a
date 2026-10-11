@@ -4,6 +4,7 @@
  */
 
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
+import './setup.js';
 import { test, expect, vi } from 'vitest';
 import { createApp, nextTick } from 'vue';
 import BillingChainSettings from '../../frontend/BillingChainSettings.vue';
