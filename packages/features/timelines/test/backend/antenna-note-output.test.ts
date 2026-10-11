@@ -112,3 +112,31 @@ it('fulfills the completion promise on ordinary close', async () => {
 	const f = fixture(); const pilot = await f.open(); pilot.close();
 	expect(await pilot.closed).toEqual({ reason: 'closed' }); expect(f.subscriber.listenerCount('antennaStream:antenna')).toBe(0);
 });
+
+it('does not retain a timer, listener or output after abort during the initial cache fetch', async () => {
+	vi.useFakeTimers(); const f = fixture(); const abort = new AbortController(); const reason = new Error('SYNTHETIC_INITIAL_ABORT');
+	let entered!: () => void; let release!: () => void;
+	const reached = new Promise<void>(resolve => { entered = resolve; }); const delayed = new Promise<void>(resolve => { release = resolve; });
+	f.cache.userProfileCache.fetch.mockImplementation(async () => { entered(); await delayed; return { mutedInstances: [] } as never; });
+	const pending = f.open(abort.signal).catch(error => error);
+	try {
+		await reached; abort.abort(reason); release(); expect(await pending).toBe(reason);
+		expect(vi.getTimerCount()).toBe(0); expect(f.subscriber.listenerCount('antennaStream:antenna')).toBe(0); expect(f.subscriber.listenerCount('broadcast')).toBe(0);
+		await f.connections[0].init(); await vi.advanceTimersByTimeAsync(20000); f.emit();
+		expect(f.cache.userProfileCache.fetch).toHaveBeenCalledOnce(); expect(f.output).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+	} finally { release(); await pending; f.connections.forEach(connection => { connection.dispose(); }); vi.useRealTimers(); }
+});
+
+it('keeps the first completion result when a delayed reinitialization finishes after abort', async () => {
+	vi.useFakeTimers(); const f = fixture(); const abort = new AbortController();
+	const pilot = await f.open(abort.signal); let entered!: () => void; let release!: () => void;
+	const reached = new Promise<void>(resolve => { entered = resolve; }); const delayed = new Promise<void>(resolve => { release = resolve; });
+	f.cache.userProfileCache.fetch.mockImplementation(async () => { entered(); await delayed; return { mutedInstances: [] } as never; });
+	const pending = f.connections[0].init();
+	try {
+		expect(vi.getTimerCount()).toBe(1); await reached; abort.abort(); const first = await pilot.closed;
+		expect(first).toEqual({ reason: 'closed' }); expect(vi.getTimerCount()).toBe(0);
+		release(); await pending; pilot.close(); expect(await pilot.closed).toBe(first);
+		expect(vi.getTimerCount()).toBe(0); expect(f.subscriber.listenerCount('antennaStream:antenna')).toBe(0); f.emit(); expect(f.output).not.toHaveBeenCalled();
+	} finally { release(); await pending; pilot.close(); vi.useRealTimers(); }
+});

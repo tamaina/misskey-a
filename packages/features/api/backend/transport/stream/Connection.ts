@@ -119,8 +119,10 @@ export default class Connection {
 
 	@bindThis
 	public async init() {
+		if (this.disposed) return;
 		if (this.user != null) {
 			await this.fetch();
+			if (this.disposed) return;
 
 			if (!this.fetchIntervalId) {
 				this.fetchIntervalId = setInterval(this.fetch, 1000 * 10);
@@ -447,6 +449,7 @@ export default class Connection {
 	public dispose() {
 		this.disposed = true;
 		if (this.fetchIntervalId) clearInterval(this.fetchIntervalId);
+		this.fetchIntervalId = null;
 
 		for (const c of this.channels.values()) {
 			if (c.dispose) c.dispose();
