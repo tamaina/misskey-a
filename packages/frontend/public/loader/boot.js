@@ -121,6 +121,17 @@
 			const style = document.createElement('style');
 			style.innerHTML = customCss;
 			document.head.appendChild(style);
+			// Lazy Vite styles arrive after boot. Keep equal-specificity user
+			// overrides last, including the post composer's font-family reset.
+			const observer = new MutationObserver(() => {
+				if (!style.isConnected) {
+					observer.disconnect();
+					return;
+				}
+				const styles = document.head.querySelectorAll('style, link[rel="stylesheet"]');
+				if (styles[styles.length - 1] !== style) document.head.appendChild(style);
+			});
+			observer.observe(document.head, { childList: true, subtree: true, attributes: true, attributeFilter: ['rel'] });
 		}
 	}
 
