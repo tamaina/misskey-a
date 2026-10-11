@@ -53,7 +53,7 @@ test('real user webhook create/list/show handlers retain defaults, timestamps, o
 	ids.gen.mockReturnValue(webhook.id);
 	repository.countBy.mockResolvedValue(0);
 	roles.getUserPolicies.mockResolvedValue(mockDeep<RolePolicies>({ webhookLimit: 3 }));
-	const legacyModel = { ...webhook, user: null, mode: 'legacy' as const, mcpTokenId: null, mcpToken: null, mcpExpiresAt: null, mcpGeneration: null, mcpPreviousSecret: null, mcpPreviousSecretUntil: null };
+	const legacyModel = { ...webhook, user: null, mode: 'legacy' as const, mcpTokenId: null, mcpToken: null, mcpAntennaId: null, mcpAntenna: null, mcpExpiresAt: null, mcpGeneration: null, mcpPreviousSecret: null, mcpPreviousSecretUntil: null };
 	repository.insertOne.mockResolvedValue(legacyModel);
 	repository.findBy.mockResolvedValue([legacyModel]);
 	repository.findOneBy.mockResolvedValue(legacyModel);
