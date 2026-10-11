@@ -1,35 +1,58 @@
 # Billing
 
-Inactive representative application slice for Issue #8. `createBillingRouter`
-uses the existing API authentication/admin middleware and finite Valibot contracts.
-The host must supply repository ports and its existing `ApiContext`; no provider,
-HTTP route, admin navigation entry, production adapter or migration is registered.
+Review prototype for [Issue #8](https://github.com/tamaina/misskey-a/issues/8).
+The billing and wallet routers use the native authentication/policy middleware and
+finite oRPC/Valibot contracts. The host has **not** registered a provider, HTTP
+route, admin/user navigation entry, storage adapter or migration. No account can
+currently use these forms through a running Misskey instance.
 
-- Own history: principal ID selects bounded source payment snapshots. No balance,
-  confirmation, expiry, quote or entitlement writes occur. The adapter must return
-  descending immutable source order IDs with an exclusive cursor, filtering by
-  Misskey user ID. Unexpected owners fail closed; responses project finite fields.
-- Admin chain metadata: chain ID, name, confirmations; disabled only. Upserts use
-  chain ID as identity and supply the authenticated admin ID for future auditing.
-  A production adapter must enforce atomic upsert and a catalog size of at most 100.
-- `BillingChainSettings.vue` takes a typed authenticated client for embedding in
-  the server admin screen after review. It has no identity, RPC URL, price, key or
-  activation input. A moderator is insufficient; app tokens are rejected by the
-  existing unscoped credential-required policy. The UI is not an auth boundary.
+- Own service-payment history projects existing immutable source order snapshots.
+  It never writes balances, quotes, confirmations, expirations or entitlements.
+  Storage must filter by principal, return descending immutable order IDs with an
+  exclusive cursor, and respect the limit. An unexpected owner fails closed.
+- Admin chain metadata uses the chain ID as identity, atomic disabled-only upserts
+  and authenticated admin attribution. The catalog is bounded to 100 entries.
+  `BillingChainSettings.vue` uses Misskey form controls and a typed admin client.
+- Wallet registration follows cfw-fileup's SIWE challenge, ten-minute expiry,
+  exact message, RPC signature verification and global `(chainId, address)`
+  uniqueness. Misskey's native principal selects the account. The public DTO omits
+  owner, proof and RPC details. `WalletStore.complete` requires an atomic unique
+  insert + challenge consumption; the only implementation here is a synthetic
+  transactional fixture. A real DB adapter must enforce this, including rollback.
+- `WalletSettings.vue` belongs in user settings; it lists registered identities
+  separately from the current provider connection and confirms unlink. It takes
+  an authenticated typed client, connector providers and native confirmation
+  callback. `wallet-link.ts` requests connect, chain switch and personal-sign of
+  the server message, with cooperative cancellation before verify. These are
+  reusable view/flow components, not a registered settings page.
+- Reads use `read:account`, wallet writes use `write:account`; chain admin reads
+  and writes use their existing admin-meta scopes plus the native admin boundary.
+  Scoped application tokens are supported; supplying a user ID in input is not.
+- The host must supply sensitive-action reauthentication; no permissive adapter
+  is provided. Current-password/TOTP fields are contract inputs, not a working
+  native authentication adapter. Do not register routes until this is connected.
 
-Synthetic ports in the tests demonstrate account isolation, validation and retry
-semantics, not live persistence or settlement. Source provenance, behavioral
-boundaries, settings catalog and deferred accounting work are recorded in
-[Issue #8](https://github.com/tamaina/misskey-a/issues/8#issuecomment-6106374065).
+Synthetic tests prove the application seam's account isolation, challenge/race
+checks, permission handling and UI flow. They do not prove production transaction
+locking, valid wallet signature interoperability or settlement. The actual viem
+verifier is included, but successful registration tests inject a synthetic verifier
+and provider; no private key, real signature, wallet account or RPC endpoint is used.
+
+Source provenance and behavioral differences are documented in Issue #8 and the
+follow-up PR. Deferred work includes persistent models/adapters, host registration,
+native reauth/passkey support, chain catalog/connector discovery, WalletConnect,
+unknown-chain addition, provider connection events, browser permission revocation,
+SDK generation once routes are public, and every payment/settlement operation.
+There is no balance/credit ledger, price, fee, grant, payment activation or transfer.
 
 Validation after a backend build:
 
 ```sh
-node --test --test-concurrency=1 packages/features/billing/test/native-operations.test.mjs
+node --test --test-concurrency=1 packages/features/billing/test/*.test.mjs
 cd packages/frontend
 node node_modules/vitest/vitest.mjs run --config vitest.billing.config.js --configLoader native --maxWorkers=1
 ```
 
-The focused UI config uses the existing SFC localization plugin. The screenshot
-in `test/fixtures` renders this component with synthetic ports and a standalone
-preview stylesheet; it is not the running server admin screen.
+The focused UI config mounts the actual Misskey controls and isolates unrelated
+navigation/autocomplete/popup infrastructure. Screenshots in `test/fixtures` use
+synthetic clients and a preview shell; they do not show a deployed settings page.

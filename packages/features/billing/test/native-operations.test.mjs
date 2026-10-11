@@ -58,6 +58,7 @@ test('history preserves exact amounts, strips internal fields and never writes',
 	assert.deepEqual(f.calls.map(call => call[0]), ['read', 'read']);
 	assert.deepEqual(f.calls[0][1], { userId: 'alice', limit: 2 });
 	assert.deepEqual(await fixture({ principal: bob }).client.listMyPayments({}), { items: [], nextCursor: null });
+	assert.equal((await fixture({ token: { permission: ['read:account'] } }).client.listMyPayments({})).items.length, 1);
 });
 
 test('principal injection, unknown fields and invalid settings fail before storage', async () => {
@@ -71,8 +72,8 @@ test('principal injection, unknown fields and invalid settings fail before stora
 	assert.deepEqual(f.calls, []);
 });
 
-test('native policy denies anonymous, suspended, moderator and app token access', async () => {
-	for (const params of [{ principal: null }, { principal: { ...alice, isSuspended: true } }, { token: { permission: ['read:account', 'write:admin:meta'] } }]) {
+test('native policy denies anonymous, suspended, moderator and unscoped app token access', async () => {
+	for (const params of [{ principal: null }, { principal: { ...alice, isSuspended: true } }, { token: { permission: [] } }]) {
 		const f = fixture({ ...params, admin: true });
 		await assert.rejects(f.client.listMyPayments({}));
 		await assert.rejects(f.client.listChains({}));
@@ -86,7 +87,7 @@ test('native policy denies anonymous, suspended, moderator and app token access'
 });
 
 test('admin and root upserts retain one disabled identity and actor attribution on retry', async () => {
-	for (const params of [{ admin: true }, { root: true }]) {
+	for (const params of [{ admin: true }, { root: true }, { admin: true, token: { permission: ['read:admin:meta', 'write:admin:meta'] } }]) {
 		const f = fixture(params);
 		assert.deepEqual(await f.client.listChains({}), []);
 		await f.client.upsertChain({ ...chain, name: '  Synthetic chain  ' });

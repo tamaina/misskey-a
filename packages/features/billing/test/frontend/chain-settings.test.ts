@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { test, expect, vi } from 'vitest';
 import { createApp, nextTick } from 'vue';
-import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import BillingChainSettings from '../../frontend/BillingChainSettings.vue';
 
 const chain = { chainId: 123456, name: 'Synthetic chain', confirmationsRequired: 7, isEnabled: false as const };
@@ -32,9 +32,9 @@ test('admin form loads, edits and saves disabled metadata through its typed clie
 	try {
 		view.element.querySelector<HTMLButtonElement>('button')!.click();
 		await flush();
-		view.element.querySelector<HTMLButtonElement>('li button')!.click();
+		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent?.includes('Synthetic chain'))!.click();
 		await nextTick();
-		expect([...view.element.querySelectorAll('input')].map(input => input.value)).toEqual(['123456', 'Synthetic chain', '7']);
+		expect([...view.element.querySelectorAll('input')].map(input => input.value)).toEqual(['123456', '7', 'Synthetic chain']);
 		view.element.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 		await flush();
 		expect(client.upsertChain).toHaveBeenCalledExactlyOnceWith(chain);

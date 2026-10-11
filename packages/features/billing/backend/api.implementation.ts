@@ -5,11 +5,11 @@
 
 import { implement } from '@orpc/server';
 import * as v from 'valibot';
-import type { ApiActor, ApiContext } from '../../api/backend/transport/context.js';
-import { createApiProcedure } from '../../api/backend/transport/api-procedure.js';
-import { requirePrincipal } from '../../api/backend/transport/middleware.js';
-import { billingContract, disabledPaymentChain, paymentSummary } from '../contract/billing.js';
-import type { DisabledPaymentChain, PaymentSummary } from '../contract/billing.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { billingContract, disabledPaymentChain, paymentSummary } from './api.definition.js';
+import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
+import type { DisabledPaymentChain, PaymentSummary } from './api.definition.js';
 
 export interface BillingDependencies {
 	/** Descending immutable source IDs, exclusive cursor, at most limit rows, filtered by userId. */

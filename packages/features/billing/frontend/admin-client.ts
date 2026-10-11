@@ -4,7 +4,7 @@
  */
 
 import type { ContractRouterClient } from '@orpc/contract';
-import type { billingContract } from '../contract/billing.js';
+import type { billingContract } from '../backend/api.definition.js';
 
 /** Host supplies its authenticated native client; the form cannot choose an admin identity. */
 export type BillingAdminClient = Pick<ContractRouterClient<typeof billingContract>, 'listChains' | 'upsertChain'>;

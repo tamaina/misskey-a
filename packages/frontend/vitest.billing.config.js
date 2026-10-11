@@ -4,15 +4,17 @@
  */
 
 import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
 import vue from '@vitejs/plugin-vue';
 import { pluginVvi } from './lib/vite-plugin-vvi.ts';
 
 // Focused form test with the existing SFC translation plugin; no server boot.
 export default defineConfig({
 	plugins: [pluginVvi(), vue()],
-	resolve: { dedupe: ['vue', 'vite-vue-internationalization'] },
+	resolve: { alias: { '@features': fileURLToPath(new URL('../features', import.meta.url)), '@': fileURLToPath(new URL('./src', import.meta.url)), '@@': fileURLToPath(new URL('../frontend-shared', import.meta.url)) }, dedupe: ['vue', 'vite-vue-internationalization'] },
 	cacheDir: '../backend/built/billing-vitest-cache',
 	test: {
+		setupFiles: ['../features/billing/test/frontend/setup.ts'],
 		include: ['../features/billing/test/frontend/*.test.ts'],
 		environment: 'happy-dom',
 		pool: 'threads',
