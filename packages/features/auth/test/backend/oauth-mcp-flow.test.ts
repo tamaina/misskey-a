@@ -90,10 +90,11 @@ async function setup() {
 		return new Response(response.statusCode === 204 ? null : response.body, { status: response.statusCode, headers: response.headers as Record<string, string> });
 	};
 	const discovery = await discoverOAuthServerInfo(resource, { fetchFn: fetchFixture });
-	const begin = async (overrides: Record<string, string> = {}, emptyScope = false) => {
+	const begin = async (overrides: Record<string, string> = {}, emptyScope = false, extraQuery: [string, string][] = []) => {
 		const flow = await startAuthorization(issuer, { metadata: discovery.authorizationServerMetadata, clientInformation: { client_id: clientId }, redirectUrl: redirectUri, scope: 'access:mcp', state: 'SYNTHETIC_STATE_SECRET', resource });
 		for (const [key, value] of Object.entries(overrides)) { if (value === '') flow.authorizationUrl.searchParams.delete(key); else flow.authorizationUrl.searchParams.set(key, value); }
 		if (emptyScope) flow.authorizationUrl.searchParams.set('scope', '');
+		for (const [key, value] of extraQuery) flow.authorizationUrl.searchParams.append(key, value);
 		const page = await app.inject({ url: flow.authorizationUrl.pathname + flow.authorizationUrl.search });
 		return { ...flow, page };
 	};
@@ -363,7 +364,7 @@ describe.skipIf(!socket)('user selection for an empty OAuth scope', () => {
 	it.each([false, true])('grants only the selected no-resource permissions for administrator=%s', async administrator => {
 		const s = await setup();
 		vi.mocked(s.f.module.get(RoleService).isAdministrator).mockResolvedValue(administrator);
-		const flow = await s.begin({ scope: '', resource: '' });
+		const flow = await s.begin({ scope: '', resource: '', misskey_customize_permissions: 'true' });
 		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
 		const selected = administrator ? 'read:account write:admin:meta' : 'read:account';
 		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: selected } });
@@ -398,7 +399,7 @@ describe.skipIf(!socket)('user selection for an empty OAuth scope', () => {
 		expect(s.f.rows.size).toBe(2);
 	});
 	it('preserves no-resource authorization and forbids selecting access:mcp there', async () => {
-		const s = await setup(); const flow = await s.begin({ scope: '', resource: '' });
+		const s = await setup(); const flow = await s.begin({ scope: '', resource: '', misskey_customize_permissions: 'true' });
 		expect(flow.page.statusCode).toBe(200);
 		const selectable = flow.page.body.match(/name="misskey:oauth:selectable-permissions" content="([^"]*)"/)?.[1];
 		expect(selectable).not.toContain('access:mcp');
@@ -455,5 +456,67 @@ describe.skipIf(!socket)('optional native API permissions for explicit MCP conse
 		const code = new URL(decision.headers.location!).searchParams.get('code')!;
 		const denied = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: clientId, redirect_uri: redirectUri, code_verifier: flow.codeVerifier, code, resource: 'https://other.invalid/mcp' } });
 		expect(denied.statusCode).toBe(400); expect(s.f.rows.size).toBe(2);
+	});
+});
+
+describe.skipIf(!socket)('authorization-bound customization mode', () => {
+	const matrix = [false, true].flatMap(mcp => [undefined, '', 'false', 'true'].flatMap(flag => ['explicit', 'omitted', 'empty'].map(scopeMode => ({ mcp, flag, scopeMode }))));
+	it.each(matrix)('handles resource MCP=$mcp, flag=$flag, scope=$scopeMode without implicit grants', async ({ mcp, flag, scopeMode }) => {
+		const s = await setup();
+		const requested = scopeMode === 'explicit' ? (mcp ? 'access:mcp' : 'read:account') : '';
+		const flow = await s.begin({ scope: requested, ...(mcp ? {} : { resource: '' }) }, scopeMode === 'empty', flag === undefined ? [] : [['misskey_customize_permissions', flag]]);
+		const custom = mcp || flag === 'true';
+		if (!custom && scopeMode !== 'explicit') {
+			expect(flow.page.statusCode).toBe(302);
+			expect(new URL(flow.page.headers.location!).searchParams.get('error')).toBe('invalid_scope');
+			expect(flow.page.body).not.toContain('misskey:oauth:selectable-permissions');
+			expect(s.f.tokens.insert).not.toHaveBeenCalled(); return;
+		}
+		expect(flow.page.statusCode).toBe(200);
+		const selectable = flow.page.body.match(/name="misskey:oauth:selectable-permissions" content="([^"]*)"/)?.[1]?.split(' ');
+		expect(selectable !== undefined).toBe(custom);
+		if (custom) {
+			expect(selectable).toContain('write:notes');
+			if (requested) expect(selectable).not.toContain(requested);
+			if (!mcp || requested) expect(selectable).not.toContain('access:mcp');
+		}
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const selected = !custom ? undefined : requested ? 'write:notes' : mcp ? 'read:account access:mcp' : 'read:account';
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, ...(selected === undefined ? {} : { selected_scope: selected }) } });
+		expect(decision.statusCode).toBe(302);
+		const code = new URL(decision.headers.location!).searchParams.get('code')!;
+		const token = await exchangeAuthorization(issuer, { metadata: s.discovery.authorizationServerMetadata, clientInformation: { client_id: clientId }, authorizationCode: code, codeVerifier: flow.codeVerifier, redirectUri, ...(mcp ? { resource } : {}), fetchFn: s.fetchFixture });
+		const expected = [requested, selected].filter(Boolean).join(' ');
+		expect(token.scope).toBe(expected);
+		expect([...s.f.rows.values()].find(row => row.token === token.access_token)?.permission).toEqual(expected.split(' '));
+		const replay = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token } });
+		expect(replay.statusCode).toBe(403);
+	});
+
+	it.each(['TRUE', '1', 'yes', ' true ', 'invalid'])('rejects malformed flag %s before pending consent or grant creation', async flag => {
+		const s = await setup(); const flow = await s.begin({}, false, [['misskey_customize_permissions', flag]]);
+		expect(flow.page.statusCode).toBe(400); expect(flow.page.json().error).toBe('invalid_request');
+		expect(s.providers[0].fetchClientMetadata).not.toHaveBeenCalled(); expect(s.f.tokens.insert).not.toHaveBeenCalled();
+	});
+	it.each([['true', 'true'], ['true', 'false'], ['', 'true']])('rejects duplicate flag %j', async (first, second) => {
+		const s = await setup(); const flow = await s.begin({}, false, [['misskey_customize_permissions', first], ['misskey_customize_permissions', second]]);
+		expect(flow.page.statusCode).toBe(400); expect(flow.page.json().error).toBe('invalid_request');
+		expect(s.f.tokens.insert).not.toHaveBeenCalled();
+	});
+	it.each(['misskey_customize_permissions', 'customizePermissions'].flatMap(field => ['true', true, false, null].map(value => ({ field, value }))))('rejects consent POST mode injection through $field=$value', async ({ field, value }) => {
+		const s = await setup(); const flow = await s.begin({ resource: '', scope: 'read:account' });
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, [field]: value } });
+		expect(decision.statusCode).toBe(400); expect(decision.json().error).toBe('invalid_request');
+		expect(s.f.tokens.insert).not.toHaveBeenCalled();
+	});
+	it('preserves requested ordinary scopes when customization is enabled but optional selection is absent', async () => {
+		const s = await setup(); const flow = await s.begin({ resource: '', scope: 'read:account', misskey_customize_permissions: 'true' });
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token } });
+		expect(decision.statusCode).toBe(302);
+		const code = new URL(decision.headers.location!).searchParams.get('code')!;
+		const token = await exchangeAuthorization(issuer, { metadata: s.discovery.authorizationServerMetadata, clientInformation: { client_id: clientId }, authorizationCode: code, codeVerifier: flow.codeVerifier, redirectUri, fetchFn: s.fetchFixture });
+		expect(token.scope).toBe('read:account');
 	});
 });

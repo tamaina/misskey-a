@@ -26,7 +26,7 @@ import type { Config } from '@/config.js';
 import { secureRndstr } from '../utility/secure-rndstr.js';
 import { fetchOAuthClientMetadata } from './ClientMetadataFetcher.js';
 import { OAuthStateStore } from './OAuthStateStore.js';
-import { eligibleOAuthPermissions, selectedOAuthScopes } from './scope-selection.js';
+import { eligibleOAuthPermissions, selectedOAuthScopes, parsePermissionCustomization } from './scope-selection.js';
 import {
 	AccessDeniedError,
 	InvalidGrantError,
@@ -112,6 +112,7 @@ interface OAuthRequestParameters {
 }
 
 interface AuthorizationRequest {
+	customizePermissions: boolean;
 	clientId: string;
 	redirectUri: string;
 	state?: string;
@@ -122,6 +123,7 @@ interface AuthorizationRequest {
 }
 
 interface AuthorizationRequestSeed {
+	customizePermissions: boolean;
 	clientInfo: ClientInformation;
 	clientId: string;
 	redirectUri: string;
@@ -479,6 +481,8 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		const codeChallengeMethod = firstValue(params.code_challenge_method);
 		const requestedScope = normalizeScope(params.scope);
 		const resource = firstValue(params.resource);
+		const customizePermissions = parsePermissionCustomization(params.misskey_customize_permissions)
+			|| resource === new URL('/mcp', this.config.url).href;
 		this.#validateResource(resource, requestedScope);
 
 		this.#logger.info('Validating authorization parameters');
@@ -515,6 +519,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		}
 
 		return {
+			customizePermissions,
 			clientInfo,
 			clientId: clientInfo.id,
 			redirectUri: redirectUriValue,
@@ -528,7 +533,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 
 	#finalizeAuthorizationRequest(seed: AuthorizationRequestSeed): AuthorizationRequest {
 		const scopes = [...new Set(seed.requestedScope)].filter(scope => (<readonly string[]>kinds).includes(scope));
-		if (seed.requestedScope.length > 0 && !scopes.length) {
+		if (!scopes.length && (seed.requestedScope.length > 0 || !seed.customizePermissions)) {
 			throw new InvalidScopeError('`scope` parameter has no known scope', seed.requestedScope.join(' '));
 		}
 
@@ -546,6 +551,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		}
 
 		return {
+			customizePermissions: seed.customizePermissions,
 			clientId: seed.clientId,
 			redirectUri: seed.redirectUri,
 			state: seed.state,
@@ -628,11 +634,9 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					clientName: clientInfo.name,
 					clientLogo: clientInfo.logo ?? undefined,
 					scope: authorizationRequest.scopes,
-					selectablePermissions: authorizationRequest.scopes.length === 0
-						? eligibleOAuthPermissions(authorizationRequest.resource, true)
-						: authorizationRequest.resource === new URL('/mcp', this.config.url).href
-							? eligibleOAuthPermissions(authorizationRequest.resource, true).filter(scope => scope !== 'access:mcp' && !authorizationRequest.scopes.includes(scope))
-							: undefined,
+					selectablePermissions: authorizationRequest.customizePermissions
+						? eligibleOAuthPermissions(authorizationRequest.resource, true).filter(scope => authorizationRequest.scopes.length === 0 || (scope !== 'access:mcp' && !authorizationRequest.scopes.includes(scope)))
+						: undefined,
 				}));
 			} catch (error) {
 				const OAuthProviderError = normalizeOAuthProviderError(error);
@@ -678,10 +682,14 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 
 				this.#logger.info('Checking user consent');
 				const user = await this.#findUserByLoginToken(loginToken);
-				const allowAdditions = transaction.request.resource === new URL('/mcp', this.config.url).href;
+				const decisionParameters = request.body !== null && typeof request.body === 'object' ? request.body : body;
+				if ('misskey_customize_permissions' in decisionParameters || 'customizePermissions' in decisionParameters) throw new InvalidRequestError('Customization mode is fixed by the authorization request');
+				const allowAdditions = transaction.request.resource === new URL('/mcp', this.config.url).href
+					|| transaction.request.customizePermissions === true;
+				if (!allowAdditions && transaction.request.scopes.length === 0) throw new InvalidScopeError('An explicit scope or permission customization is required');
 				const scopes = selectedOAuthScopes(transaction.request.scopes, body.selected_scope,
 					eligibleOAuthPermissions(transaction.request.resource,
-						(transaction.request.scopes.length === 0 || allowAdditions) && await this.roleService.isAdministrator(user)), allowAdditions);
+						allowAdditions && await this.roleService.isAdministrator(user)), allowAdditions);
 				this.#validateResource(transaction.request.resource, scopes);
 
 				this.#logger.info('Issuing authorization code after consent');

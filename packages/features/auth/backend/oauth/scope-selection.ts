@@ -10,7 +10,14 @@ export function eligibleOAuthPermissions(resource: string | undefined, administr
 		&& (administrator || (!permission.startsWith('read:admin') && !permission.startsWith('write:admin'))));
 }
 
-/** The provider derives optional additions from the stored canonical MCP resource, never a browser flag. */
+/** A namespaced authorization-request extension; empty values are omitted per RFC 6749 §3.1. */
+export function parsePermissionCustomization(value: unknown): boolean {
+	if (value === undefined || value === '' || value === 'false') return false;
+	if (value === 'true') return true;
+	throw new InvalidRequestError('misskey_customize_permissions must be true or false, without duplicates');
+}
+
+/** The provider derives optional additions from the stored authorization transaction, never the consent POST. */
 export function selectedOAuthScopes(requested: readonly string[], selected: unknown, eligible: readonly string[], allowAdditions = false): string[] {
 	if (requested.length > 0 && !allowAdditions) {
 		if (selected !== undefined) throw new InvalidRequestError('Scope selection is unavailable for a nonempty request');
