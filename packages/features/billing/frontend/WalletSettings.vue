@@ -28,8 +28,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkSelect v-model="chainId" :items="chainItems" :disabled="busy || !chains.length"><template #label>{{ $locale.sfc.chain }}</template></MkSelect>
 			<MkButton v-if="authenticateWithPasskey" rounded :disabled="busy" @click="selectPasskeyAuth">{{ usePasskey ? $locale.sfc.usePassword : $locale.sfc.passkey }}</MkButton>
 			<MkInfo v-if="usePasskey">{{ $locale.sfc.passkeyReady }}</MkInfo>
-			<MkInput v-model="password" type="password" autocomplete="current-password" :disabled="busy || usePasskey"><template #label>{{ $locale.sfc.password }}</template></MkInput>
-			<MkInput v-model="twoFactorToken" autocomplete="one-time-code" :disabled="busy || usePasskey"><template #label>{{ $locale.sfc.twoFactor }}</template></MkInput>
+			<form v-if="waitingCredentials" class="_gaps_m" @submit.prevent="submitCredentials">
+				<MkInput v-model="password" type="password" autocomplete="current-password" required><template #label>{{ $locale.sfc.password }}</template></MkInput>
+				<MkInput v-model="twoFactorToken" autocomplete="one-time-code"><template #label>{{ $locale.sfc.twoFactor }}</template></MkInput>
+				<MkButton type="submit" primary rounded>{{ $locale.sfc.continueAuthentication }}</MkButton>
+			</form>
 			<MkInfo v-if="!connectors.length" warn>{{ $locale.sfc.noWallet }}</MkInfo>
 			<div class="_buttons"><MkButton v-for="connector in connectors" :key="connector.id" primary rounded :disabled="busy || chainId === null" @click="link(connector)"><i class="ti ti-wallet"></i> {{ connector.name }} {{ $locale.sfc.link }}</MkButton></div>
 			<div v-if="busy && step" class="_gaps_s" role="status">
@@ -67,6 +70,8 @@ const chainId = ref<number | null>(null);
 const usePasskey = ref(false);
 const password = ref('');
 const twoFactorToken = ref('');
+const waitingCredentials = ref(false);
+let credentialPrompt: { resolve(auth: WalletAuthInput): void; reject(error: WalletLinkCancelled): void } | null = null;
 const busy = ref(false);
 const error = ref(false);
 const registered = ref(false);
@@ -75,7 +80,7 @@ const connection = ref<ConnectedWallet | null>(null);
 let cancelled = false;
 let detachProvider = () => {};
 onMounted(load);
-onBeforeUnmount(() => { cancelled = true; detachProvider(); });
+onBeforeUnmount(() => { cancel(); detachProvider(); });
 
 function clearConnection() { connection.value = null; detachProvider(); }
 
@@ -111,7 +116,29 @@ async function load(): Promise<void> {
 	} catch { error.value = true; } finally { busy.value = false; }
 }
 
-function cancel(): void { cancelled = true; }
+function cancel(): void {
+	cancelled = true;
+	credentialPrompt?.reject(new WalletLinkCancelled());
+	credentialPrompt = null;
+	waitingCredentials.value = false;
+	password.value = ''; twoFactorToken.value = '';
+}
+
+function collectCredentials(): Promise<WalletAuthInput> {
+	password.value = ''; twoFactorToken.value = '';
+	waitingCredentials.value = true;
+	return new Promise((resolve, reject) => { credentialPrompt = { resolve, reject }; });
+}
+
+function submitCredentials(): void {
+	if (!credentialPrompt || cancelled) return;
+	const auth = { ...(password.value ? { currentPassword: password.value } : {}), ...(twoFactorToken.value ? { twoFactorToken: twoFactorToken.value } : {}) };
+	const prompt = credentialPrompt;
+	credentialPrompt = null;
+	waitingCredentials.value = false;
+	password.value = ''; twoFactorToken.value = '';
+	prompt.resolve(auth);
+}
 
 async function link(connector: WalletConnector): Promise<void> {
 	const chain = chains.value.find(value => value.chainId === chainId.value);
@@ -120,24 +147,23 @@ async function link(connector: WalletConnector): Promise<void> {
 	error.value = false;
 	registered.value = false;
 	cancelled = false;
+	password.value = ''; twoFactorToken.value = '';
 	try {
 		const authenticateWithPasskey = props.authenticateWithPasskey;
 		const wallet = await linkWallet({
 			client: props.client,
 			connector,
 			chain,
-			auth: {
-				...(password.value ? { currentPassword: password.value } : {}),
-				...(twoFactorToken.value ? { twoFactorToken: twoFactorToken.value } : {}),
-			},
-			...(usePasskey.value && authenticateWithPasskey ? { authenticate: async () => ({ passkey: await authenticateWithPasskey() }) } : {}),
+			authenticate: usePasskey.value && authenticateWithPasskey
+				? async () => ({ passkey: await authenticateWithPasskey() })
+				: collectCredentials,
 			cancelled: () => cancelled,
 			progress: value => { step.value = value; },
 			connected: value => { connection.value = value; observeProvider(connector.provider); },
 		});
 		wallets.value = [wallet, ...wallets.value.filter(value => value.id !== wallet.id)];
 		registered.value = true;
-	} catch (cause) { if (!(cause instanceof WalletLinkCancelled)) error.value = true; } finally { password.value = ''; twoFactorToken.value = ''; usePasskey.value = false; busy.value = false; step.value = null; }
+	} catch (cause) { if (!(cause instanceof WalletLinkCancelled)) error.value = true; } finally { credentialPrompt = null; waitingCredentials.value = false; password.value = ''; twoFactorToken.value = ''; usePasskey.value = false; busy.value = false; step.value = null; }
 }
 
 async function unlink(wallet: LinkedWallet): Promise<void> {
@@ -174,7 +200,8 @@ async function unlink(wallet: LinkedWallet): Promise<void> {
 	"passkey": "パスキーで再認証",
 	"passkeyReady": "ウォレットの選択とチェーンの切り替えが終わった後に、パスキーで再認証します。",
 	"usePassword": "パスワードで認証する",
-	"authenticate": "パスキーでアカウントを再認証してください。",
+	"authenticate": "アカウントを再認証してください。",
+	"continueAuthentication": "再認証して続ける",
 	"twoFactor": "二段階認証コード（有効な場合）",
 	"noWallet": "利用できるウォレットがありません。",
 	"link": "で登録",

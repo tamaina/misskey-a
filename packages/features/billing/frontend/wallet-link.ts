@@ -14,9 +14,8 @@ export class WalletLinkCancelled extends Error { }
  * Cancellation stops the next step; it cannot undo an already submitted verify request. */
 export async function linkWallet(input: {
 	client: WalletClient; connector: WalletConnector; chain: WalletChain;
-	auth: WalletAuthInput;
-	/** Fresh native authentication happens only after slow wallet selection/switching. */
-	authenticate?(): Promise<WalletAuthInput>;
+	/** Collect fresh native credentials only after wallet selection/switching. */
+	authenticate(): Promise<WalletAuthInput>;
 	cancelled(): boolean; progress(step: WalletStep): void; connected(wallet: ConnectedWallet): void;
 }): Promise<LinkedWallet> {
 	function check(): void { if (input.cancelled()) throw new WalletLinkCancelled(); }
@@ -42,12 +41,9 @@ export async function linkWallet(input: {
 		if (typeof switched !== 'string' || !/^0x[0-9a-fA-F]+$/.test(switched) || BigInt(switched) !== BigInt(input.chain.chainId)) throw new Error('Wallet chain did not change');
 	}
 	input.connected({ address, chainId: input.chain.chainId, connectorId: input.connector.id });
-	let auth = input.auth;
-	if (input.authenticate) {
-		input.progress('authenticate');
-		auth = await input.authenticate();
-		check();
-	}
+	input.progress('authenticate');
+	const auth = await input.authenticate();
+	check();
 	const challenge = await input.client.begin({ chainId: input.chain.chainId, address, ...auth });
 	check();
 	input.progress('sign');

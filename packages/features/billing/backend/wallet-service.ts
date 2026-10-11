@@ -7,6 +7,8 @@
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { createPublicClient, getAddress, http, isAddress } from 'viem';
 import { createSiweMessage, generateSiweNonce, verifySiweMessage } from 'viem/siwe';
+import { createWalletRpcFetch, WALLET_RPC_TIMEOUT } from './wallet-rpc.js';
+import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type * as v from 'valibot';
 import type { webAuthnAuthenticationOptionsSchema, webAuthnAuthenticationResponseSchema } from '../../auth/backend/webauthn.schema.js';
 import type { Hex } from 'viem';
@@ -53,14 +55,19 @@ function walletError(code: keyof typeof walletErrors) {
 }
 
 /** Same SIWE library and RPC verifier as cfw-fileup; no signing or transfer operation. */
-export const walletProof = {
-	nonce: generateSiweNonce,
-	async verify(challenge: WalletChallenge, signature: Hex, rpcUrl: string, now: number): Promise<boolean> {
-		const client = createPublicClient({ transport: http(rpcUrl, { retryCount: 0, timeout: 10000 }) });
-		return verifySiweMessage(client, { address: getAddress(challenge.address), domain: challenge.domain,
-																																					message: challenge.message, nonce: challenge.nonce, signature, time: new Date(now) });
-	},
-};
+export function createWalletProof(native: Pick<HttpRequestService, 'send'>) {
+	const fetchFn = createWalletRpcFetch(native);
+	return {
+		nonce: generateSiweNonce,
+		async verify(challenge: WalletChallenge, signature: Hex, rpcUrl: string, now: number): Promise<boolean> {
+			try {
+				const client = createPublicClient({ transport: http(rpcUrl, { retryCount: 0, timeout: WALLET_RPC_TIMEOUT, fetchFn }) });
+				return await verifySiweMessage(client, { address: getAddress(challenge.address), domain: challenge.domain,
+																																							message: challenge.message, nonce: challenge.nonce, signature, time: new Date(now) });
+			} catch { return false; } // Never propagate viem errors containing private RPC URLs.
+		},
+	};
+}
 
 export function createWalletService(deps: WalletDependencies) {
 	const origin = new URL(deps.origin);

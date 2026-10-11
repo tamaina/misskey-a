@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRouterClient } from '@orpc/server';
-import { createWalletRouter, walletProof, WALLET_CHALLENGE_TTL } from '../../../backend/built/features/billing/backend.js';
+import { createWalletRouter, createWalletProof, WALLET_CHALLENGE_TTL } from '../../../backend/built/features/billing/backend.js';
 
 const actor = { id: 'alice', isSuspended: false, movedToUri: null };
 const address = '0x0000000000000000000000000000000000000001';
@@ -147,5 +147,5 @@ test('reauth, unknown fields and unsupported chain fail before challenge storage
 test('actual viem verifier rejects a domain mismatch before any RPC or signing', async () => {
 	const f = fixture(); const c = await begin(f);
 	const challenge = { ...f.challenges.get(c.nonce), domain: 'wrong.example.test' };
-	assert.equal(await walletProof.verify(challenge, signature, 'https://rpc.example.test', f.deps.now()), false);
+	assert.equal(await createWalletProof({ send: async () => { throw new Error('Unexpected synthetic RPC'); } }).verify(challenge, signature, 'https://rpc.example.test', f.deps.now()), false);
 });

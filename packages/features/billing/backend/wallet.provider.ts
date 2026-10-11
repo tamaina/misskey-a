@@ -7,6 +7,7 @@
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import type { Config } from '@/config.js';
@@ -15,7 +16,7 @@ import { createPostgresWalletChainStore } from './wallet-chain-store.js';
 import { createWalletRouter } from './wallet.implementation.js';
 import { createPostgresWalletStore } from './wallet-store.js';
 import { createWalletAuthentication } from './wallet-authentication.js';
-import { walletProof } from './wallet-service.js';
+import { createWalletProof } from './wallet-service.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { DataSource } from 'typeorm';
@@ -34,7 +35,7 @@ export class WalletApiProvider {
 		});
 		const chainSettings = createPostgresWalletChainStore(get<DataSource>(DI.db));
 		return createWalletRouter<MiLocalUser>({
-			...authentication, ...walletProof,
+			...authentication, ...createWalletProof(this.moduleRef.get(HttpRequestService, { strict: false })),
 			store: createPostgresWalletStore(get<DataSource>(DI.db)),
 			origin: new URL(config.url).origin,
 			id: now => id.gen(now), now: Date.now,

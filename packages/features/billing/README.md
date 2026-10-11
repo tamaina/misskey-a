@@ -28,6 +28,10 @@ DTOs expose only `hasRpc`; SQL parameter and optional access-body logging suppre
 RPC secrets. URLs are stored in the private server database, without a new encryption
 key or credential service. Administrators must trust database backups/access as with
 other native private operational settings. Changes take effect without restart.
+RPC verification uses native HttpRequestService proxy/outgoingAddress and destination
+policy, including allowedPrivateNetworks. Redirects are rejected; configure the final
+RPC URL. Each request has a 10-second timeout, no retries and a 256 KiB streaming
+response cap. Upstream URL/header details are never returned in wallet errors.
 The public catalog includes enabled entries with configured RPC, matching the source;
 begin and verification reread the current enabled flag and configured RPC. Unlike
 the source catalog-only flag, disabling a chain stops further registration and
@@ -36,6 +40,8 @@ A canonical HTTPS
 origin is required for linking. An HTTP development host can still boot and list or
 unlink wallets, but cannot link them.
 
+Password/TOTP fields appear only after wallet selection and chain switching;
+cancellation/unmount clears the pending prompt and retry collects fresh credentials.
 The page uses the existing authenticated Misskey client, confirmation dialog and
 passkey browser adapter. EIP-6963 and an injected EIP-1193 provider are supported.
 Account, chain and disconnect events clear local connection state; page disposal

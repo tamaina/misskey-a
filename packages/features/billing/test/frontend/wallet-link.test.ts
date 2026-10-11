@@ -31,7 +31,7 @@ function fixture() {
 	});
 	return { client, calls, request, cancel: () => { cancelled = true; }, input: {
 		client, connector: { id: 'synthetic', name: 'Synthetic wallet', provider: { request } }, chain,
-		auth: { currentPassword: 'synthetic password' }, cancelled: () => cancelled, progress: vi.fn(), connected: vi.fn(),
+		authenticate: vi.fn(async () => ({ currentPassword: 'synthetic password' })), cancelled: () => cancelled, progress: vi.fn(), connected: vi.fn(),
 	} };
 }
 
@@ -85,5 +85,27 @@ test('passkey authentication starts after provider selection/switch delays beyon
 		await vi.advanceTimersByTimeAsync(182000);
 		expect(await result).toEqual(wallet); expect(authenticate).toHaveBeenCalledOnce();
 		expect(f.input.progress).toHaveBeenCalledWith('authenticate');
+	} finally { vi.useRealTimers(); }
+});
+
+test('password/TOTP collection occurs after provider waits and immediately before begin', async () => {
+	vi.useFakeTimers(); vi.setSystemTime(0);
+	const f = fixture(); const request = f.request.getMockImplementation()!;
+	const authenticate = vi.fn(async () => ({ currentPassword: 'synthetic password', twoFactorToken: `synthetic-window-${Math.floor(Date.now() / 30000)}` }));
+	f.request.mockImplementation(async input => {
+		if (input.method === 'eth_requestAccounts' || input.method === 'wallet_switchEthereumChain') await new Promise(resolve => window.setTimeout(resolve, 91000));
+		return request(input);
+	});
+	f.client.begin = vi.fn(async input => {
+		expect(Date.now()).toBe(182000);
+		expect(input.twoFactorToken).toBe(`synthetic-window-${Math.floor(Date.now() / 30000)}`);
+		return challenge;
+	});
+	try {
+		const result = linkWallet({ ...f.input, authenticate });
+		expect(authenticate).not.toHaveBeenCalled();
+		await vi.advanceTimersByTimeAsync(182000);
+		expect(await result).toEqual(wallet);
+		expect(authenticate).toHaveBeenCalledOnce();
 	} finally { vi.useRealTimers(); }
 });
