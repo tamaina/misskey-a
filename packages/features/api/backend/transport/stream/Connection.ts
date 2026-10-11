@@ -152,10 +152,22 @@ export default class Connection {
 	public sendChannelMessage(id: string, type: string, body: JsonValue) {
 		if (this.disposed) return;
 		if (this.antennaOutput) {
-			if (this.antennaOutput.isOpen() && this.channels.get(id)?.chName === 'antenna' && type === 'note') this.antennaOutput.send(body as Packed<'Note'>);
+			const output = this.antennaOutput;
+			if (output.isOpen() && this.channels.get(id)?.chName === 'antenna' && type === 'note') {
+				try {
+					Promise.resolve(output.send(body as Packed<'Note'>)).catch(error => { this.failAntennaOutput(output, error); });
+				} catch (error) { this.failAntennaOutput(output, error); }
+			}
 			return;
 		}
 		this.sendMessageToWs('channel', { id, type, body });
+	}
+
+	private failAntennaOutput(output: AntennaNoteOutput, error: unknown) {
+		if (this.disposed) return;
+		this.dispose();
+		// Failure observers cannot escape the EventEmitter handler either.
+		try { Promise.resolve(output.failed(error)).catch(() => {}); } catch { }
 	}
 
 	/**
@@ -458,5 +470,6 @@ export { Connection };
 /** Filtered antenna notes only; no transport or persistence semantics implied. */
 export interface AntennaNoteOutput {
 	isOpen(): boolean;
-	send(note: Packed<'Note'>): void;
+	send(note: Packed<'Note'>): void | Promise<void>;
+	failed(error: unknown): void | Promise<void>;
 }
