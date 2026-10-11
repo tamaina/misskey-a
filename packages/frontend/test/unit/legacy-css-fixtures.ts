@@ -80,7 +80,10 @@ export async function compileTargets(root: string) {
 			lib: { entry: resolve(root, 'compatibility-entry.js'), formats: ['iife'], name: 'CompatFixtures', fileName: 'compatibility', cssFileName: 'compatibility' },
 			rolldownOptions: { external: ['vue'], output: { globals: { vue: 'Vue' } }, plugins: [{
 				name: 'compatibility-entry',
-				resolveId(id) { if (id === resolve(root, 'compatibility-entry.js') || sources.has(id)) return id; },
+				resolveId(id) {
+					if (id === resolve(root, 'compatibility-entry.js') || sources.has(id)) return id;
+					return null;
+				},
 				load(id) {
 					if (id !== resolve(root, 'compatibility-entry.js')) return;
 					return [...sources.keys()].map((file, index) => `import C${index} from ${JSON.stringify(file)};`).join('\n') + `export default [${[...sources.keys()].map((_, index) => `C${index}`).join(',')}];`;
