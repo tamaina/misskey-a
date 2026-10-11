@@ -14,7 +14,7 @@ import type { ModuleRef } from '@nestjs/core';
 export async function openAntennaNotePilot(
 	deps: { authenticateService: Pick<AuthenticateService, 'authenticate'>; moduleRef: Pick<ModuleRef, 'create' | 'registerRequestByContextId'>; subscriber: StreamEventEmitter },
 	params: { credential: string; antennaId: string; signal?: AbortSignal },
-	onNote: (note: Packed<'Note'>) => void,
+	onNote: (note: Packed<'Note'>) => void | Promise<void>,
 ) {
 	params.signal?.throwIfAborted();
 	const [user, token] = await deps.authenticateService.authenticate(params.credential);
@@ -24,15 +24,25 @@ export async function openAntennaNotePilot(
 	deps.moduleRef.registerRequestByContextId<ConnectionRequest>({ user, token }, context);
 	const connection = await deps.moduleRef.create(Connection, context);
 	let open = true;
-	const close = () => { open = false; connection.dispose(); params.signal?.removeEventListener('abort', close); };
+	let resolveClosed!: (result: AntennaPilotClosed) => void;
+	// Always fulfills: consumers can inspect failure without an unhandled rejection.
+	const closed = new Promise<AntennaPilotClosed>(resolve => { resolveClosed = resolve; });
+	const stop = (result: AntennaPilotClosed) => {
+		if (!open) return;
+		open = false; connection.dispose(); params.signal?.removeEventListener('abort', close); resolveClosed(result);
+	};
+	const close = () => { stop({ reason: 'closed' }); };
 	try {
-		connection.attachAntennaOutput(deps.subscriber, { isOpen: () => open && !params.signal?.aborted, send: onNote });
+		connection.attachAntennaOutput(deps.subscriber, { isOpen: () => open && !params.signal?.aborted, send: onNote, failed: error => { stop({ reason: 'sink_failed', error }); } });
 		params.signal?.addEventListener('abort', close, { once: true });
 		await connection.init();
 		params.signal?.throwIfAborted();
 		// Native channel scope and antenna ownership checks remain authoritative.
 		if (!await connection.connectChannel('antenna-pilot', { antennaId: params.antennaId }, 'antenna')) throw new Error('Antenna access denied');
 		params.signal?.throwIfAborted();
-		return { close };
+		return { close, closed };
 	} catch (error) { close(); throw error; }
 }
+
+/** The first terminal reason wins; sink failures close the pilot without retry. */
+export type AntennaPilotClosed = { reason: 'closed' } | { reason: 'sink_failed'; error: unknown };

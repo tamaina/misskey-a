@@ -95,3 +95,20 @@ it('cleans a listener installed after abort during the ownership lookup', async 
 	f.antennas.exists.mockImplementation(async () => { entered(); await delayed; return true; });
 	const pending = f.open(abort.signal); await reached; abort.abort(); release(); await expect(pending).rejects.toBeDefined(); expect(f.subscriber.listenerCount('antennaStream:antenna')).toBe(0);
 });
+
+it.each(['sync', 'async'] as const)('closes and reports a %s sink failure without an unhandled event error', async mode => {
+	const f = fixture(); const failure = new Error('SYNTHETIC_SINK_FAILURE');
+	f.output.mockImplementationOnce(() => { if (mode === 'sync') throw failure; return Promise.reject(failure); });
+	const pilot = await f.open();
+	try {
+		f.emit(); expect(await pilot.closed).toEqual({ reason: 'sink_failed', error: failure });
+		expect(f.subscriber.listenerCount('antennaStream:antenna')).toBe(0);
+		f.emit(); await new Promise(resolve => setTimeout(resolve, 0)); expect(f.output).toHaveBeenCalledOnce();
+		pilot.close(); expect(await pilot.closed).toEqual({ reason: 'sink_failed', error: failure });
+	} finally { pilot.close(); }
+});
+
+it('fulfills the completion promise on ordinary close', async () => {
+	const f = fixture(); const pilot = await f.open(); pilot.close();
+	expect(await pilot.closed).toEqual({ reason: 'closed' }); expect(f.subscriber.listenerCount('antennaStream:antenna')).toBe(0);
+});
