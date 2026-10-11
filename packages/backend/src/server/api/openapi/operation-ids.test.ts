@@ -44,7 +44,8 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('-', '_')}`);
 	}
 	const walletPaths = ['account/wallets/link/passkey-options', 'account/wallets/list', 'account/wallets/link/chains',
-		'account/wallets/link/begin', 'account/wallets/link/verify', 'account/wallets/unlink'];
+		'account/wallets/link/begin', 'account/wallets/link/verify', 'account/wallets/unlink',
+		'admin/wallets/chains/list', 'admin/wallets/chains/upsert'];
 	for (const path of walletPaths) {
 		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('/', '___')}`);
 	}

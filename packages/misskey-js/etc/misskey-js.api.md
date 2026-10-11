@@ -583,6 +583,18 @@ type AdminUpdateProxyAccountResponse = ContractResponse<'admin/update-proxy-acco
 type AdminUpdateUserNoteRequest = ContractRequest<'admin/update-user-note'>;
 
 // @public (undocumented)
+type AdminWalletsChainsListRequest = ContractRequest<'admin/wallets/chains/list'>;
+
+// @public (undocumented)
+type AdminWalletsChainsListResponse = ContractResponse<'admin/wallets/chains/list'>;
+
+// @public (undocumented)
+type AdminWalletsChainsUpsertRequest = ContractRequest<'admin/wallets/chains/upsert'>;
+
+// @public (undocumented)
+type AdminWalletsChainsUpsertResponse = ContractResponse<'admin/wallets/chains/upsert'>;
+
+// @public (undocumented)
 type Announcement = ContractModel<'Announcement'>;
 
 // @public (undocumented)
@@ -1695,6 +1707,10 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        AdminWalletsChainsListRequest,
+        AdminWalletsChainsListResponse,
+        AdminWalletsChainsUpsertRequest,
+        AdminWalletsChainsUpsertResponse,
         AccountWalletsLinkPasskeyOptionsRequest,
         AccountWalletsLinkPasskeyOptionsResponse,
         AccountWalletsListRequest,

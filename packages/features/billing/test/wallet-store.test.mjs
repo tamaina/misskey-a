@@ -8,8 +8,9 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { createRouterClient } from '@orpc/server';
-import { createPostgresWalletStore, createWalletAuthentication } from '../../../backend/built/features/billing/backend.js';
+import { createPostgresWalletStore, createWalletAuthentication, createPostgresWalletChainStore } from '../../../backend/built/features/billing/backend.js';
 import { BillingWalletRegistration1791760200000 as Migration } from '../../../backend/migration/1791760200000-BillingWalletRegistration.js';
+import { BillingWalletChainSettings1791763800000 as ChainMigration } from '../../../backend/migration/1791763800000-BillingWalletChainSettings.js';
 import { composeNativeTestRouter, nativeTestDependencies } from '../../api/test/native-router-fixture.mjs';
 
 const require = createRequire(new URL('../../../backend/package.json', import.meta.url));
@@ -31,9 +32,35 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 		await qr.query('CREATE TABLE "user" ("id" varchar(32) PRIMARY KEY)');
 		await qr.query(`INSERT INTO "user" ("id") VALUES ('alice'), ('bob')`);
 		await migration.up(qr); await migration.down(qr); await migration.up(qr);
+		const chainMigration = new ChainMigration();
+		await chainMigration.up(qr); await chainMigration.down(qr); await chainMigration.up(qr);
 		const diff = await db.driver.createSchemaBuilder().log();
 		assert.equal(diff.upQueries.filter(q => q.query.includes('billing_wallet')).length, 0, 'Entity metadata agrees with migration');
 		let now = 1000;
+		const chainStore = createPostgresWalletChainStore(db, () => now);
+		const chain = { chainId: 123456, name: 'Synthetic chain', nativeCurrencyName: 'Synthetic coin', nativeCurrencySymbol: 'TEST', nativeCurrencyDecimals: 18, blockExplorerUrl: null, isEnabled: true };
+		const privateRpc = 'https://synthetic-fixture:fake@rpc.example.test/private-token';
+		assert.deepEqual(await chainStore.chains(), []);
+		const first = await chainStore.upsertSettings({ ...chain, rpcUrl: privateRpc }, 'alice');
+		assert.deepEqual(first, { ...chain, hasRpc: true });
+		assert.equal(JSON.stringify(await chainStore.listSettings()).includes(privateRpc), false);
+		assert.equal(await chainStore.rpcUrl(chain.chainId), privateRpc);
+		assert.equal((await chainStore.chains()).length, 1);
+		await chainStore.upsertSettings(chain, 'bob'); // Omitted URL preserves it on retry.
+		await chainStore.upsertSettings(chain, 'bob');
+		assert.equal((await chainStore.listSettings()).length, 1);
+		assert.equal(await chainStore.rpcUrl(chain.chainId), privateRpc);
+		assert.equal((await qr.query('SELECT "updatedByUserId" FROM "billing_wallet_chain"'))[0].updatedByUserId, 'bob');
+		await chainStore.upsertSettings({ ...chain, isEnabled: false }, 'alice');
+		assert.deepEqual(await chainStore.chains(), []);
+		assert.equal(await chainStore.rpcUrl(chain.chainId), null); // Current disablement stops registration and verification.
+		await chainStore.upsertSettings({ ...chain, rpcUrl: 'https://replacement.example.test' }, 'alice');
+		assert.equal(await chainStore.rpcUrl(chain.chainId), 'https://replacement.example.test');
+		await chainStore.upsertSettings({ ...chain, rpcUrl: null }, 'alice');
+		assert.equal(await chainStore.rpcUrl(chain.chainId), null);
+		assert.deepEqual(await chainStore.chains(), []);
+		assert.equal((await chainStore.listSettings())[0].hasRpc, false);
+
 		const store = createPostgresWalletStore(db, () => now);
 		const address = '0x0000000000000000000000000000000000000001';
 		const challenge = (nonce, userId = 'alice') => ({ nonce, userId, chainId: 123456, address, domain: 'misskey.example.test', uri: 'https://misskey.example.test', message: 'Synthetic exact proof', createdAt: 1000, expiresAt: 601000, usedAt: null });
@@ -58,7 +85,7 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 		});
 		const actor = { id: 'alice', isSuspended: false, movedToUri: null };
 		const dependencies = nativeTestDependencies({ actor, events: [] });
-		dependencies.wallets = { ...auth, store, origin: 'https://misskey.example.test', chains: async () => [], rpcUrl: async () => 'https://rpc.example.test', id: () => 'native-linked', now: () => now, nonce: () => 'nativeNonce0001', verify: async () => true }; // Synthetic signature verifier; no network or signing.
+		dependencies.wallets = { ...auth, store, origin: 'https://misskey.example.test', chainSettings: chainStore, chains: chainStore.chains, rpcUrl: chainStore.rpcUrl, id: () => 'native-linked', now: () => now, nonce: () => 'nativeNonce0001', verify: async () => true }; // Synthetic signature verifier; no network or signing.
 		const context = { credential: 'synthetic', headers: {}, ip: '127.0.0.1', services: { authenticate: async () => [actor, { permission: ['read:account'] }], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } };
 		const router = composeNativeTestRouter(dependencies);
 		const client = createRouterClient(router, { context });
@@ -85,13 +112,19 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 		assert.equal((await store.getChallenge('expireafterlock', 'alice')).usedAt, null);
 		const writeContext = { ...context, services: { ...context.services, authenticate: async () => [actor, { permission: ['read:account', 'write:account'] }] } };
 		const writer = createRouterClient(router, { context: writeContext });
+		await chainStore.upsertSettings({ ...chain, rpcUrl: 'https://rpc.example.test' }, 'alice');
 		const proof = await writer.wallets.begin({ chainId: 123456, address, currentPassword: 'synthetic password', twoFactorToken: 'synthetic OTP' });
+		await chainStore.upsertSettings({ ...chain, isEnabled: false }, 'alice');
+		await assert.rejects(writer.wallets.verify({ ...proof, signature: '0x1234' }), e => e.code === 'WALLET_CHAIN_UNSUPPORTED');
+		await assert.rejects(writer.wallets.begin({ chainId: 123456, address, currentPassword: 'synthetic password', twoFactorToken: 'synthetic OTP' }), e => e.code === 'WALLET_CHAIN_UNSUPPORTED');
+		await chainStore.upsertSettings(chain, 'alice');
 		const linked = await writer.wallets.verify({ ...proof, signature: '0x1234' });
 		assert.equal(linked.id, 'native-linked'); assert.equal((await writer.wallets.list({})).length, 1);
 		await assert.rejects(writer.wallets.verify({ ...proof, signature: '0x1234' }), e => e.code === 'WALLET_CHALLENGE_NOT_FOUND');
 		assert.deepEqual(await writer.wallets.unlink({ walletId: linked.id }), { ok: true });
 		await qr.query(`DELETE FROM "user" WHERE "id" = 'alice'`);
 		assert.equal(await store.getChallenge('rollback', 'alice'), null);
+		assert.equal((await qr.query('SELECT "updatedByUserId" FROM "billing_wallet_chain"'))[0].updatedByUserId, null);
 	} finally {
 		await qr.query(`DROP SCHEMA "${schema}" CASCADE`);
 		await qr.release(); await db.destroy();

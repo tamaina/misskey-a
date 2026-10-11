@@ -62,6 +62,11 @@ export const walletChain = v.strictObject({
 });
 export type LinkedWallet = v.InferOutput<typeof linkedWallet>;
 export type WalletChain = v.InferOutput<typeof walletChain>;
+const httpsUrl = v.pipe(v.string(), v.url(), v.maxLength(2048), v.check(value => new URL(value).protocol === 'https:'));
+export const walletChainSettings = v.strictObject({ ...walletChain.entries, isEnabled: v.boolean(), hasRpc: v.boolean() });
+export const walletChainSettingsInput = v.strictObject({ ...walletChain.entries, isEnabled: v.boolean(), rpcUrl: v.exactOptional(v.nullable(httpsUrl)) });
+export type WalletChainSettings = v.InferOutput<typeof walletChainSettings>;
+export type WalletChainSettingsInput = v.InferOutput<typeof walletChainSettingsInput>;
 const read = { requireCredential: true, kind: 'read:account' } as const satisfies ApiProcedureMetadata;
 const write = { requireCredential: true, kind: 'write:account', limit: { duration: 60 * 1000, max: 10 } } as const satisfies ApiProcedureMetadata;
 const walletFailure = { status: 400, data: apiErrorData };
@@ -76,6 +81,10 @@ export const walletErrors = {
 };
 const walletProcedure = oc.errors({ ...commonErrors, ...walletErrors });
 export const walletContract = {
+	listChainSettings: walletProcedure.$meta({ requireCredential: true, requireAdmin: true, kind: 'read:admin:meta', requestName: 'admin/wallets/chains/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/admin/wallets/chains/list' })
+		.input(v.intersect([v.strictObject({}), rawObjectInputGuard])).output(v.array(walletChainSettings)),
+	upsertChainSettings: walletProcedure.$meta({ requireCredential: true, requireAdmin: true, kind: 'write:admin:meta', requestName: 'admin/wallets/chains/upsert', limit: { duration: 60 * 1000, max: 10 } } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/admin/wallets/chains/upsert' })
+		.input(walletChainSettingsInput).output(walletChainSettings),
 	passkeyOptions: walletProcedure.$meta({ ...write, requestName: 'account/wallets/link/passkey-options' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/account/wallets/link/passkey-options' })
 		.input(v.intersect([v.strictObject({}), rawObjectInputGuard])).output(webAuthnAuthenticationOptionsSchema),
 	list: walletProcedure.$meta({ ...read, requestName: 'account/wallets/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/account/wallets/list' })

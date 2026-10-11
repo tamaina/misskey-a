@@ -6,6 +6,10 @@ type ContractResponse<Route extends keyof ContractEndpoints> = ContractEndpoints
 export type EmptyRequest = Record<string, unknown> | undefined;
 export type EmptyResponse = Record<string, unknown> | undefined;
 
+export type AdminWalletsChainsListRequest = ContractRequest<'admin/wallets/chains/list'>;
+export type AdminWalletsChainsListResponse = ContractResponse<'admin/wallets/chains/list'>;
+export type AdminWalletsChainsUpsertRequest = ContractRequest<'admin/wallets/chains/upsert'>;
+export type AdminWalletsChainsUpsertResponse = ContractResponse<'admin/wallets/chains/upsert'>;
 export type AccountWalletsLinkPasskeyOptionsRequest = ContractRequest<'account/wallets/link/passkey-options'>;
 export type AccountWalletsLinkPasskeyOptionsResponse = ContractResponse<'account/wallets/link/passkey-options'>;
 export type AccountWalletsListRequest = ContractRequest<'account/wallets/list'>;

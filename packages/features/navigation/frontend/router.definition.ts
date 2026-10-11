@@ -464,6 +464,10 @@ export const ROUTE_DEF = [{
 		name: 'modlog',
 		component: page(() => import('@features/moderation/frontend/pages/admin/modlog.vue')),
 	}, {
+		path: '/wallet-chains',
+		name: 'walletChains',
+		component: page(() => import('@features/billing/frontend/pages/admin/wallet-chains.vue')),
+	}, {
 		path: '/settings',
 		name: 'settings',
 		component: page(() => import('@features/instance/frontend/pages/admin/settings.vue')),

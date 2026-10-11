@@ -15,3 +15,5 @@ export { createWalletAuthentication } from './wallet-authentication.js';
 export { WalletApiProvider } from './wallet.provider.js';
 export { MiBillingWallet } from './models/BillingWallet.js';
 export { MiBillingWalletChallenge } from './models/BillingWalletChallenge.js';
+export { createPostgresWalletChainStore } from './wallet-chain-store.js';
+export { MiBillingWalletChain } from './models/BillingWalletChain.js';

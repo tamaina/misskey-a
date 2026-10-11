@@ -179,6 +179,11 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 }, {
 	title: $locale.value.sfc.settings,
 	items: [{
+		icon: 'ti ti-wallet',
+		text: $locale.value.sfc.walletChains,
+		to: '/admin/wallet-chains',
+		active: currentPage.value?.route.name === 'walletChains',
+	}, {
 		icon: 'ti ti-settings',
 		text: $locale.value.sfc.general,
 		to: '/admin/settings',
@@ -832,6 +837,7 @@ definePage(() => INFO.value);
 
 <locale locale="ja-JP" lang="json">
 {
+	"walletChains": "ウォレットのチェーン設定",
 	"controlPanel": "コントロールパネル",
 	"quickAction": "クイックアクション",
 	"lookup": "照会",

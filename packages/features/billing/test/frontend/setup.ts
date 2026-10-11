@@ -11,3 +11,4 @@ vi.mock('@features/navigation/frontend/components/global/MkA.vue', () => ({ defa
 vi.mock('@features/discovery/frontend/utility/autocomplete.js', () => ({ Autocomplete: class { } }));
 vi.mock('@features/ui/frontend/os.js', () => ({ popupMenu: vi.fn() }));
 vi.stubGlobal('ResizeObserver', class { observe() { } disconnect() { } });
+vi.mock('@features/ui/frontend/utility/haptic.js', () => ({ haptic: vi.fn() }));

@@ -2,12 +2,12 @@
 
 Small review slice for [Issue #8](https://github.com/tamaina/misskey-a/issues/8).
 Wallet registration is composed into Misskey's native feature provider/API and
-`/settings/wallets`. The older payment-history and disabled admin-chain prototypes
+`/settings/wallets` and `/admin/wallet-chains`. The older payment-history and disabled payment-chain prototypes
 remain unregistered; this slice performs no payments, balance/credit accounting,
 pricing, entitlements, settlement or transfers.
 
 The host binds the current Misskey principal to a PostgreSQL wallet identity.
-`billing_wallet` and `billing_wallet_challenge` are the only new tables. The local,
+`billing_wallet`, `billing_wallet_challenge` and `billing_wallet_chain` are the new tables. The local,
 unapplied-to-production migration has `up` and `down`; reverting deletes these
 wallet identities and challenges. Normal `read:account`/`write:account` scopes apply,
 including scoped application tokens. No grant or admin-role rules are expanded.
@@ -20,11 +20,19 @@ operation without additional reauthentication. Linking checks a ten-minute SIWE
 message and consumes its challenge atomically with a globally unique wallet insert.
 The server clock is checked again after acquiring the PostgreSQL challenge lock.
 
-`walletChains` in server configuration defaults to an empty catalog. Its entries
-have `chainId`, `name`, `nativeCurrencyName`, `nativeCurrencySymbol`,
-`nativeCurrencyDecimals`, `blockExplorerUrl`, `rpcUrl` and `isEnabled`.
-RPC URLs remain private. The public catalog includes enabled entries with configured
-RPC, matching the source; verification requires configured RPC. A canonical HTTPS
+Native administrator chain settings persist chain/currency/explorer metadata,
+the catalog enabled flag, private HTTPS RPC URL, and last editing admin/time.
+The RPC field is write-only: omitted input retains it, null clears it, and a URL
+replaces it atomically by chain ID. Native admin scopes and roles are enforced.
+DTOs expose only `hasRpc`; SQL parameter and optional access-body logging suppress
+RPC secrets. URLs are stored in the private server database, without a new encryption
+key or credential service. Administrators must trust database backups/access as with
+other native private operational settings. Changes take effect without restart.
+The public catalog includes enabled entries with configured RPC, matching the source;
+begin and verification reread the current enabled flag and configured RPC. Unlike
+the source catalog-only flag, disabling a chain stops further registration and
+verification on it; existing linked identities remain visible and removable.
+A canonical HTTPS
 origin is required for linking. An HTTP development host can still boot and list or
 unlink wallets, but cannot link them.
 
@@ -41,7 +49,7 @@ diverge. Do not merge both duplicate pilots.
 After the normal backend build, run focused synthetic tests:
 
 ```sh
-node --test --test-concurrency=1 packages/features/billing/test/native-operations.test.mjs packages/features/billing/test/wallet-registration.test.mjs packages/features/billing/test/wallet-authentication.test.mjs
+node --test --test-concurrency=1 packages/features/billing/test/native-operations.test.mjs packages/features/billing/test/wallet-registration.test.mjs packages/features/billing/test/wallet-authentication.test.mjs packages/features/billing/test/wallet-chain-settings.test.mjs
 ```
 
 The optional `wallet-store.test.mjs` requires `MISSKEY_BILLING_TEST_DATABASE_URL` for

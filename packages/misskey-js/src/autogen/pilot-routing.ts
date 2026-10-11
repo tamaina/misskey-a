@@ -3,6 +3,144 @@ import type { AnyContractRouter } from '@orpc/contract';
 
 export default {
 	"wallets": {
+		"listChainSettings": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"WALLET_CHAIN_UNSUPPORTED": {
+						"status": 400
+					},
+					"WALLET_REAUTHENTICATION_REQUIRED": {
+						"status": 403
+					},
+					"WALLET_ALREADY_LINKED": {
+						"status": 400
+					},
+					"WALLET_CHALLENGE_NOT_FOUND": {
+						"status": 400
+					},
+					"WALLET_SIGNATURE_INVALID": {
+						"status": 400
+					},
+					"WALLET_NOT_FOUND": {
+						"status": 400
+					},
+					"PAYMENT_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta",
+					"requestName": "admin/wallets/chains/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/wallets/chains/list"
+				}
+			}
+		},
+		"upsertChainSettings": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"WALLET_CHAIN_UNSUPPORTED": {
+						"status": 400
+					},
+					"WALLET_REAUTHENTICATION_REQUIRED": {
+						"status": 403
+					},
+					"WALLET_ALREADY_LINKED": {
+						"status": 400
+					},
+					"WALLET_CHALLENGE_NOT_FOUND": {
+						"status": 400
+					},
+					"WALLET_SIGNATURE_INVALID": {
+						"status": 400
+					},
+					"WALLET_NOT_FOUND": {
+						"status": 400
+					},
+					"PAYMENT_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"requestName": "admin/wallets/chains/upsert",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/wallets/chains/upsert"
+				}
+			}
+		},
 		"passkeyOptions": {
 			"~orpc": {
 				"errorMap": {

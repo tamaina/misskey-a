@@ -7,7 +7,7 @@ import { implement } from '@orpc/server';
 import * as v from 'valibot';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
-import { linkedWallet, walletChain, walletContract } from './api.definition.js';
+import { linkedWallet, walletChain, walletChainSettings, walletContract } from './api.definition.js';
 import { createWalletService } from './wallet-service.js';
 import type { ApiActor, ApiContext } from '@features/api/backend/transport/context.js';
 import type { WalletDependencies, WalletRecord } from './wallet-service.js';
@@ -24,6 +24,19 @@ export function createWalletRouter<Actor extends ApiActor>(deps: WalletDependenc
 	const service = createWalletService(deps);
 	const procedure = createApiProcedure<Actor>();
 	return implement(walletContract).$context<ApiContext<Actor>>().router({
+		listChainSettings: procedure(walletContract.listChainSettings).handler(async () => {
+			if (!deps.chainSettings) throw new Error('Wallet chain administration unavailable');
+			return v.parse(v.array(walletChainSettings), await deps.chainSettings.listSettings());
+		}),
+		upsertChainSettings: procedure(walletContract.upsertChainSettings).use(requirePrincipal<Actor>()).handler(async ({ input, context }) => {
+			if (!deps.chainSettings) throw new Error('Wallet chain administration unavailable');
+			try {
+				return v.parse(walletChainSettings, await deps.chainSettings.upsertSettings(input, context.principal.id));
+			} catch {
+				// Driver exceptions may contain bound RPC credentials; never forward their detail/cause.
+				throw new Error('Wallet chain settings could not be saved');
+			}
+		}),
 		passkeyOptions: procedure(walletContract.passkeyOptions).use(requirePrincipal<Actor>()).handler(({ context }) => {
 			if (!deps.passkeyOptions) throw new Error('Passkey authentication unavailable');
 			return deps.passkeyOptions(context.principal.id);

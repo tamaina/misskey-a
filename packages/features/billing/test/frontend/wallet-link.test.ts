@@ -72,7 +72,7 @@ test('passkey authentication starts after provider selection/switch delays beyon
 		response: { clientDataJSON: 'synthetic', authenticatorData: 'synthetic', signature: 'synthetic' } };
 	const authenticate = vi.fn(async () => { issuedAt = Date.now(); return { passkey }; });
 	f.request.mockImplementation(async input => {
-		if (input.method === 'eth_requestAccounts' || input.method === 'wallet_switchEthereumChain') await new Promise(resolve => setTimeout(resolve, 91000));
+		if (input.method === 'eth_requestAccounts' || input.method === 'wallet_switchEthereumChain') await new Promise(resolve => window.setTimeout(resolve, 91000));
 		return request(input);
 	});
 	f.client.begin = vi.fn(async input => {

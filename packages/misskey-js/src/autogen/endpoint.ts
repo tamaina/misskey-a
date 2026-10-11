@@ -1,6 +1,10 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	AdminWalletsChainsListRequest,
+	AdminWalletsChainsListResponse,
+	AdminWalletsChainsUpsertRequest,
+	AdminWalletsChainsUpsertResponse,
 	AccountWalletsLinkPasskeyOptionsRequest,
 	AccountWalletsLinkPasskeyOptionsResponse,
 	AccountWalletsListRequest,
@@ -744,6 +748,8 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
+	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };
 	'account/wallets/list': { req: AccountWalletsListRequest; res: AccountWalletsListResponse };
 	'account/wallets/link/chains': { req: AccountWalletsLinkChainsRequest; res: AccountWalletsLinkChainsResponse };

@@ -16,6 +16,12 @@ const labelAddition = '\t"wallets": "ウォレット",\n';
  * language, key, access-range and full-source reconstruction proofs stay frozen.
  */
 export function restoreWalletSettingsBaseline(file: string, source: string): string {
+	if (file === 'packages/features/navigation/frontend/pages/admin/index.vue') {
+		if (sha256(source) !== '7305c8073d05991bd85fff5c59f46c64aaa92b7e95405c325a72be883dae35c9') throw new Error(`Wallet admin source differs from reviewed edits: ${file}`);
+		const restored = source.replace("\t\ticon: 'ti ti-wallet',\n\t\ttext: $locale.value.sfc.walletChains,\n\t\tto: '/admin/wallet-chains',\n\t\tactive: currentPage.value?.route.name === 'walletChains',\n\t}, {\n", '').replace("\t\"walletChains\": \"ウォレットのチェーン設定\",\n", '');
+		if (sha256(restored) !== '3ab426cb4b30b81518fbdfb2bd55f6f879d00acd957da2e88d1d6b9d55713623') throw new Error(`Wallet admin baseline was not restored: ${file}`);
+		return restored;
+	}
 	if (file !== filePath) return source;
 	if (sha256(source) !== currentSha256) throw new Error(`Wallet settings source differs from reviewed edits: ${file}`);
 	const restored = source.replace(menuAddition, '').replace(labelAddition, '');

@@ -6,13 +6,12 @@
 
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import * as v from 'valibot';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
-import { walletChain } from './api.definition.js';
+import { createPostgresWalletChainStore } from './wallet-chain-store.js';
 import { createWalletRouter } from './wallet.implementation.js';
 import { createPostgresWalletStore } from './wallet-store.js';
 import { createWalletAuthentication } from './wallet-authentication.js';
@@ -33,15 +32,13 @@ export class WalletApiProvider {
 			auth: this.moduleRef.get(UserAuthService, { strict: false }),
 			passkeys: this.moduleRef.get(WebAuthnService, { strict: false }),
 		});
-		// Configuration remains private; the public DTO deliberately excludes RPC endpoints.
-		const catalog = config.walletChains ?? [];
+		const chainSettings = createPostgresWalletChainStore(get<DataSource>(DI.db));
 		return createWalletRouter<MiLocalUser>({
 			...authentication, ...walletProof,
 			store: createPostgresWalletStore(get<DataSource>(DI.db)),
 			origin: new URL(config.url).origin,
 			id: now => id.gen(now), now: Date.now,
-			chains: async () => catalog.filter(chain => chain.isEnabled && chain.rpcUrl).map(({ rpcUrl, isEnabled, ...chain }) => v.parse(walletChain, chain)),
-			rpcUrl: async chainId => catalog.find(chain => chain.chainId === chainId)?.rpcUrl ?? null,
+			chainSettings, chains: chainSettings.chains, rpcUrl: chainSettings.rpcUrl,
 		});
 	}
 }

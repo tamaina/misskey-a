@@ -32,6 +32,7 @@ export interface WalletStore {
 }
 export type WalletAuthentication = { currentPassword?: string; twoFactorToken?: string; passkey?: v.InferOutput<typeof webAuthnAuthenticationResponseSchema> };
 export interface WalletDependencies {
+	chainSettings?: import('./wallet-chain-store.js').WalletChainSettingsStore;
 	passkeyOptions?(userId: string): Promise<v.InferOutput<typeof webAuthnAuthenticationOptionsSchema>>;
 	store: WalletStore;
 	/** Server configuration's canonical public origin, never the request Host header. */

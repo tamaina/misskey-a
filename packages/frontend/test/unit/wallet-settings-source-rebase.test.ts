@@ -32,3 +32,12 @@ describe('reviewed wallet settings source preservation', () => {
 		expect(restoreWalletSettingsBaseline('another.vue', source)).toBe(source);
 	});
 });
+
+const adminFile = 'packages/features/navigation/frontend/pages/admin/index.vue';
+const adminSource = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../../..', adminFile), 'utf8');
+test('admin navigation preserves every historical source byte and rejects unrelated edits', () => {
+	const restored = restoreWalletSettingsBaseline(adminFile, adminSource);
+	expect(restored).not.toContain("to: '/admin/wallet-chains'");
+	expect(restored).not.toContain('"walletChains":');
+	expect(() => restoreWalletSettingsBaseline(adminFile, adminSource.replace('"general":', '"changedGeneral":'))).toThrow('source differs');
+});
