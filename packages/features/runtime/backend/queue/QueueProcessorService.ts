@@ -84,6 +84,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 	private deliverQueueWorker: Bull.Worker;
 	private inboxQueueWorker: Bull.Worker;
 	private userWebhookDeliverQueueWorker: Bull.Worker;
+	private mcpAntennaDeliverQueueWorker: Bull.Worker;
 	private systemWebhookDeliverQueueWorker: Bull.Worker;
 	private relationshipQueueWorker: Bull.Worker;
 	private objectStorageQueueWorker: Bull.Worker;
@@ -380,6 +381,21 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		}
 		//#endregion
 
+		// Same processor/backoff; a distinct queue isolates antenna dedup retention.
+		{
+			const logger = this.logger.createSubLogger('mcp-antenna');
+			this.mcpAntennaDeliverQueueWorker = new Bull.Worker(QUEUE.MCP_ANTENNA_DELIVER, job => runQueueJob(
+				this.telemetryService, 'Queue: McpAntennaDeliver',
+				() => this.userWebhookDeliverProcessorService.process(job),
+				() => logger.error(`delivery failed ${getJobInfo(job)}`),
+			), {
+				...baseWorkerOptions(this.config, QUEUE.MCP_ANTENNA_DELIVER), autorun: false, concurrency: 64,
+				limiter: { max: 64, duration: 1000 }, settings: { backoffStrategy: httpRelatedBackoff },
+			});
+			this.mcpAntennaDeliverQueueWorker.on('error', () => logger.error('queue error'))
+				.on('stalled', jobId => logger.warn(`stalled id=${jobId}`));
+		}
+
 		//#region system-webhook deliver
 		{
 			const logger = this.logger.createSubLogger('system-webhook');
@@ -553,7 +569,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 	public async waitUntilReady(): Promise<void> {
 		await Promise.all([
 			this.systemQueueWorker, this.dbQueueWorker, this.deliverQueueWorker,
-			this.inboxQueueWorker, this.userWebhookDeliverQueueWorker, this.systemWebhookDeliverQueueWorker,
+			this.inboxQueueWorker, this.userWebhookDeliverQueueWorker, this.mcpAntennaDeliverQueueWorker, this.systemWebhookDeliverQueueWorker,
 			this.relationshipQueueWorker, this.objectStorageQueueWorker,
 			this.endedPollNotificationQueueWorker, this.postScheduledNoteQueueWorker,
 		].map(worker => worker.waitUntilReady()));
@@ -567,6 +583,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			this.deliverQueueWorker.run(),
 			this.inboxQueueWorker.run(),
 			this.userWebhookDeliverQueueWorker.run(),
+			this.mcpAntennaDeliverQueueWorker.run(),
 			this.systemWebhookDeliverQueueWorker.run(),
 			this.relationshipQueueWorker.run(),
 			this.objectStorageQueueWorker.run(),
@@ -583,6 +600,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 			this.deliverQueueWorker.close(),
 			this.inboxQueueWorker.close(),
 			this.userWebhookDeliverQueueWorker.close(),
+			this.mcpAntennaDeliverQueueWorker.close(),
 			this.systemWebhookDeliverQueueWorker.close(),
 			this.relationshipQueueWorker.close(),
 			this.objectStorageQueueWorker.close(),

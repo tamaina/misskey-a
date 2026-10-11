@@ -17,6 +17,7 @@ export const QUEUE = {
 	RELATIONSHIP: 'relationship',
 	OBJECT_STORAGE: 'objectStorage',
 	USER_WEBHOOK_DELIVER: 'userWebhookDeliver',
+	MCP_ANTENNA_DELIVER: 'mcpAntennaDeliver',
 	SYSTEM_WEBHOOK_DELIVER: 'systemWebhookDeliver',
 };
 

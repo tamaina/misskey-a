@@ -15,6 +15,7 @@ import {
 	InboxJobData,
 	RelationshipJobData,
 	UserWebhookDeliverJobData,
+	McpWebhookDeliverJobData,
 	SystemWebhookDeliverJobData,
 	PostScheduledNoteJobData,
 } from '@features/runtime/backend/queue/types.js';
@@ -28,6 +29,7 @@ export type InboxQueue = Bull.Queue<InboxJobData>;
 export type DbQueue = Bull.Queue;
 export type RelationshipQueue = Bull.Queue<RelationshipJobData>;
 export type ObjectStorageQueue = Bull.Queue;
+export type McpAntennaDeliverQueue = Bull.Queue<McpWebhookDeliverJobData>;
 export type UserWebhookDeliverQueue = Bull.Queue<UserWebhookDeliverJobData>;
 export type SystemWebhookDeliverQueue = Bull.Queue<SystemWebhookDeliverJobData>;
 
@@ -89,6 +91,12 @@ const $userWebhookDeliver: Provider = {
 	inject: [DI.config],
 };
 
+const $mcpAntennaDeliver: Provider = {
+	provide: 'queue:mcpAntennaDeliver',
+	useFactory: (config: Config) => createQueue<McpWebhookDeliverJobData>(QUEUE.MCP_ANTENNA_DELIVER, config),
+	inject: [DI.config],
+};
+
 const $systemWebhookDeliver: Provider = {
 	provide: 'queue:systemWebhookDeliver',
 	useFactory: (config: Config) => createQueue<SystemWebhookDeliverJobData>(QUEUE.SYSTEM_WEBHOOK_DELIVER, config),
@@ -108,6 +116,7 @@ const $systemWebhookDeliver: Provider = {
 		$relationship,
 		$objectStorage,
 		$userWebhookDeliver,
+		$mcpAntennaDeliver,
 		$systemWebhookDeliver,
 	],
 	exports: [
@@ -120,6 +129,7 @@ const $systemWebhookDeliver: Provider = {
 		$relationship,
 		$objectStorage,
 		$userWebhookDeliver,
+		$mcpAntennaDeliver,
 		$systemWebhookDeliver,
 	],
 })
@@ -135,6 +145,7 @@ export class QueueModule implements OnApplicationShutdown {
 		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
 		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
 		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
+		@Inject('queue:mcpAntennaDeliver') public mcpAntennaDeliverQueue: McpAntennaDeliverQueue,
 		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {}
 
@@ -153,6 +164,7 @@ export class QueueModule implements OnApplicationShutdown {
 				this.relationshipQueue.close(),
 				this.objectStorageQueue.close(),
 				this.userWebhookDeliverQueue.close(),
+				this.mcpAntennaDeliverQueue.close(),
 				this.systemWebhookDeliverQueue.close(),
 			]);
 		})();

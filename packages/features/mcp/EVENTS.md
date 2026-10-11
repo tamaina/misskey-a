@@ -31,6 +31,7 @@ recall a request already sent.
 `antenna.note` takes strict `{ antennaId }` arguments and also requires
 `read:account`. Its persisted subscription resumes live Pub/Sub observation after
 restart; it does not replay downtime events. Queued deliveries reuse the native
-antenna filters and grant checks. Shared BullMQ job IDs deduplicate across
+antenna filters and grant checks. A dedicated antenna queue isolates its retained BullMQ job IDs from legacy
+count cleanup and deduplicates across
 processes while retained (at least 24 hours after completion); HTTP retries may
 repeat delivery.

@@ -35,15 +35,20 @@ function providerToken(provider: Provider): InjectionToken {
 }
 
 describe('feature service composition adapter', () => {
-	test('the pre-migration contract plus explicit MCP Events additions preserve every alias target', () => {
+	test('the pre-migration contract plus explicit MCP Events and antenna additions preserve every alias target', () => {
 		const baseline = JSON.parse(readFileSync(new URL('../../test/fixtures/core-provider-contract.json', import.meta.url), 'utf8')) as {
 			providers: string[]; exports: string[]; aliases: { name: string; target: string }[];
 		};
 		for (const entries of [baseline.providers, baseline.exports]) {
 			entries.splice(entries.indexOf('class:SystemWebhookService'), 0, 'class:McpEventsService');
 			entries.splice(entries.indexOf('alias:SystemWebhookService'), 0, 'alias:McpEventsService');
+			for (const prefix of ['class:', 'alias:']) {
+				entries.splice(entries.indexOf(`${prefix}AntennaService`) + 1, 0, `${prefix}AntennaNoteAccessService`, `${prefix}AntennaEventSubscriptionService`);
+				entries.splice(entries.indexOf(`${prefix}McpEventsService`) + 1, 0, `${prefix}NoteStreamingHidingService`);
+			}
 		}
 		baseline.aliases.push({ name: 'McpEventsService', target: 'McpEventsService' });
+		for (const name of ['AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService']) baseline.aliases.push({ name, target: name });
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
 		const describeToken = (entry: Provider | InjectionToken): string => {

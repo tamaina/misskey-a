@@ -38,6 +38,7 @@ import type {
 	SystemQueue,
 	SystemWebhookDeliverQueue,
 	UserWebhookDeliverQueue,
+	McpAntennaDeliverQueue,
 } from '@features/boot/backend/assembly/QueueModule.js';
 import type { ParsedSignature } from '@misskey-dev/node-http-message-signatures';
 import type * as Bull from 'bullmq';
@@ -105,6 +106,7 @@ export class QueueService {
 		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
 		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
 		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
+		@Inject('queue:mcpAntennaDeliver') public mcpAntennaDeliverQueue: McpAntennaDeliverQueue,
 		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {
 		for (const def of REPEATABLE_SYSTEM_JOB_DEF) {
@@ -704,14 +706,14 @@ export class QueueService {
 		});
 	}
 
-	/** Shared Redis atomically owns one job per persisted generation/antenna/note. */
+	/** Isolated retention prevents legacy queue count cleanup evicting antenna IDs. */
 	public antennaWebhookDeliver(webhook: MiWebhook, antennaId: string, noteId: string, createdAt: number) {
 		if (webhook.mode !== 'mcp' || !webhook.active || webhook.mcpAntennaId !== antennaId || !webhook.mcpGeneration
 			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now()) return;
 		const eventId = createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, 'antenna', antennaId, noteId])).digest('hex');
 		const data: UserWebhookDeliverJobData = { mode: 'mcp', type: 'antenna', webhookId: webhook.id, userId: webhook.userId,
 			generation: webhook.mcpGeneration, antennaId, noteId, createdAt, eventId };
-		return this.userWebhookDeliverQueue.add(webhook.id, data, { jobId: eventId, attempts: 4,
+		return this.mcpAntennaDeliverQueue.add(webhook.id, data, { jobId: eventId, attempts: 4,
 			backoff: { type: 'custom' }, removeOnComplete: { age: 86400 }, removeOnFail: { age: 86400 } });
 	}
 
