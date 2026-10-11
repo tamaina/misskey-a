@@ -12,6 +12,9 @@ import { AuthenticateService } from '@features/auth/backend/transport/Authentica
 import { ApiExecutionContextFactory } from '@features/api/backend/transport/ApiExecutionContextFactory.js';
 import { pilotContract } from '@features/index/backend/api.definition.js';
 import { misskeyErrorBody } from '@features/api/backend/transport/orpc-error.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { apiPolicy } from '@features/api/backend/transport/middleware.js';
+import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 import { McpApiService } from '../../backend/McpApiService.js';
 import { createAllowedApiCaller } from '../../backend/api-caller.js';
 import { fixture } from './fixtures/shared-api.js';
@@ -120,11 +123,76 @@ it('passes the original nonnull grant tuple to native procedures and never upgra
 	const f = await fixture(); const protectedCall = createAllowedApiCaller(f.router, pilotContract, ['my/apps']);
 	const observed = implement(usersNotesContract).$context<ApiContext<MiLocalUser>>().handler(async ({ input, context }) => {
 		const tuple = await context.services!.authenticate(context.credential);
-		expect(tuple[1]).toBe(f.grant); expect(tuple[1]?.permission).toEqual(['access:mcp']);
+		expect(tuple[1]?.id).toBe(f.grant.id); expect(tuple[1]?.permission).toEqual(['access:mcp']);
 		await expect(protectedCall('my/apps', {}, context)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
 		return call(f.router.timelines.usersNotes, input, { context });
 	});
 	const provider = f.module.get(ApiRouterProvider);
 	vi.spyOn(provider, 'compose').mockReturnValue(Object.assign({}, provider.compose(), { timelines: Object.assign({}, f.router.timelines, { usersNotes: observed }) }));
 	expect(await f.invoke()).toEqual((await f.ordinary({ userId: f.own.id })).json());
+});
+
+it('discovers current token API candidates and provides native input definitions', async () => {
+	const f = await fixture(); const service = f.module.get(McpApiService);
+	const list = await service.invoke('list_api_endpoints', { endpoint: 'users/notes' }, f.request()) as { endpoints: string[]; definitions: { inputSchema: unknown }[] };
+	expect(list.endpoints).toContain('users/notes'); expect(list.endpoints).not.toContain('notes/reactions/create');
+	expect(list.endpoints).not.toContain('miauth/gen-token'); expect(list.endpoints).not.toContain('admin/meta');
+	expect(JSON.stringify(list.definitions[0].inputSchema)).toContain('userId');
+	const api = await f.ordinary({}, f.grant.token, 'available-endpoints'); expect(api.statusCode).toBe(200);
+	expect(api.json().endpoints).toContain('users/notes'); expect(api.json().endpoints).not.toContain('notes/reactions/create');
+	f.grant.permission.push('write:reactions');
+	expect((await f.ordinary({}, f.grant.token, 'available-endpoints')).json().endpoints).toContain('notes/reactions/create');
+	f.rows.delete(f.grant.id); expect((await f.ordinary({}, f.grant.token, 'available-endpoints')).statusCode).toBe(401);
+});
+it('routes generic reads and writes through native validation/permissions, with fresh revocation and no arbitrary URLs', async () => {
+	const f = await fixture(); const prepared = await f.module.get(McpApiService).prepare(f.request());
+	const visiblePrivate = f.notes.find(note => note.userId === f.otherId && note.visibility === 'specified')!;
+	visiblePrivate.visibleUserIds = [f.own.id];
+	const read = { endpoint: 'users/notes', arguments: { userId: f.otherId } };
+	const viewed = await prepared.invoke('call_api', read);
+	expect(viewed).toEqual((await f.ordinary(read.arguments)).json());
+	expect(viewed).toContainEqual(expect.objectContaining({ id: visiblePrivate.id, visibility: 'specified' }));
+	const write = { endpoint: 'notes/reactions/create', arguments: { noteId: 'aaaaaaaaaaaaaaa0', reaction: '❤️' } };
+	await expect(prepared.invoke('call_api', write)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+	expect(f.reactions.createReaction).not.toHaveBeenCalled();
+	f.grant.permission.push('write:reactions');
+	await prepared.invoke('call_api', write); expect(f.reactions.createReaction).toHaveBeenCalledTimes(1);
+	f.grant.permission = ['access:mcp'];
+	await expect(prepared.invoke('call_api', write)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+	await expect(prepared.invoke('call_api', { endpoint: 'users/notes', arguments: { userId: f.own.id, limit: '1' } })).rejects.toBeDefined();
+	for (const endpoint of ['https://remote.invalid/api', '../users/notes', '/users/notes', 'miauth/gen-token', 'i/regenerate-token', 'i/webhooks/create', 'admin/meta', 'not-found']) {
+		await expect(prepared.invoke('call_api', { endpoint, arguments: {} })).rejects.toMatchObject({ code: 'TOOL_UNAVAILABLE' });
+	}
+	await expect(prepared.invoke('call_api', { endpoint: 'users/notes', arguments: { userId: f.own.id, i: f.own.token } })).rejects.toBeDefined();
+	f.grant.permission = ['access:mcp', 'write:reactions']; f.own.movedToUri = 'https://other.invalid';
+	await expect(prepared.invoke('call_api', write)).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_MOVED' });
+	f.own.movedToUri = null; f.own.isSuspended = true;
+	await expect(prepared.invoke('call_api', write)).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_SUSPENDED' });
+	f.rows.delete(f.grant.id); await expect(prepared.invoke('call_api', read)).rejects.toMatchObject({ code: 'AUTHENTICATION_FAILED' });
+});
+
+it('refreshes app permissions for native discovery and excludes denied definitions without caching grants', async () => {
+	const f = await fixture();
+	const first = await f.ordinary({ endpoint: 'notes/reactions/create' }, f.appGrant.hash, 'available-endpoints');
+	expect(first.statusCode).toBe(200); expect(first.headers['cache-control']).toBe('no-store');
+	expect(first.json().definitions).toEqual([]);
+	f.apps.findOneBy.mockResolvedValue(Object.assign({}, f.app, { permission: ['access:mcp', 'write:reactions'] }));
+	const refreshed = await f.ordinary({ endpoint: 'notes/reactions/create' }, f.appGrant.hash, 'available-endpoints');
+	expect(refreshed.json().permissions).toEqual(['access:mcp', 'write:reactions']);
+	expect(refreshed.json().definitions).toContainEqual(expect.objectContaining({ name: 'notes/reactions/create', permission: 'write:reactions' }));
+	f.apps.findOneBy.mockResolvedValue(null);
+	expect((await f.ordinary({}, f.appGrant.hash, 'available-endpoints')).statusCode).toBe(401);
+	expect((await f.http.inject({ method: 'POST', url: '/api/available-endpoints', payload: {} })).statusCode).toBe(401);
+});
+it('preserves a declared native rate limit before executing a generic tool handler', async () => {
+	const f = await fixture();
+	const limiter = f.module.get(RateLimiterService);
+	vi.mocked(limiter.limit).mockResolvedValue({ code: 'RATE_LIMIT_EXCEEDED', info: { resetMs: Date.now() + 60000 } } as Awaited<ReturnType<RateLimiterService['limit']>>);
+	const handler = vi.fn(async ({ input, context }: { input: { userId: string }; context: ApiContext<MiLocalUser> }) => call(f.router.timelines.usersNotes, input, { context }));
+	const limited = createApiProcedure<MiLocalUser>()(usersNotesContract)
+		.use(apiPolicy<MiLocalUser>({ name: 'users/notes', limit: { duration: 60000, max: 1 } })).handler(handler);
+	const provider = f.module.get(ApiRouterProvider);
+	vi.spyOn(provider, 'compose').mockReturnValue(Object.assign({}, provider.compose(), { timelines: Object.assign({}, f.router.timelines, { usersNotes: limited }) }));
+	await expect(f.module.get(McpApiService).invoke('call_api', { endpoint: 'users/notes', arguments: { userId: f.own.id } }, f.request())).rejects.toMatchObject({ code: 'RATE_LIMIT_EXCEEDED' });
+	expect(limiter.limit).toHaveBeenCalled(); expect(handler).not.toHaveBeenCalled();
 });

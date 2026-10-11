@@ -78,6 +78,16 @@ it('declares OAuth access:mcp on the tool and challenges invalid or insufficient
 	expect(denied.headers['www-authenticate']).toContain('scope="access:mcp"');
 });
 
+it('advertises generic write potential and challenges the native endpoint permission', async () => {
+	const { invoke } = await server(true);
+	const tools = (await invoke()).json().result.tools;
+	expect(tools.find((tool: { name: string }) => tool.name === 'call_api').annotations).toEqual({ readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: true });
+	const response = await invoke(message('tools/call', { name: 'call_api', arguments: { endpoint: 'notes/reactions/create', arguments: { noteId: 'aaaaaaaaaaaaaaa0', reaction: '❤️' } } }));
+	const result = response.json().result;
+	expect(result.isError).toBe(true);
+	expect(result._meta['mcp/www_authenticate'][0]).toContain('scope="access:mcp write:reactions"');
+});
+
 it.each(['revoked', 'permission removed'] as const)('returns tool reauthorization metadata when a prepared grant is %s', async reason => {
 	const { invoke, f } = await server(true);
 	f.tokens.findOneBy.mockResolvedValueOnce(f.grant).mockResolvedValueOnce(reason === 'revoked' ? null : Object.assign({}, f.grant, { permission: [] }));
@@ -198,7 +208,7 @@ it('runs the SDK against the normal-server plugin and rejects revocation, inject
 	const client = new Client({ name: 'synthetic-native-token', version: '0' });
 	await client.connect(new StreamableHTTPClientTransport(new URL(resource), { fetch: fetchFixture, requestInit: { headers: { authorization: headers.authorization } } }));
 	try {
-		expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes']);
+		expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api']);
 		expect((await client.callTool({ name: 'list_my_notes', arguments: {} })).structuredContent).toEqual({ notes: (await f.ordinary({ userId: f.own.id })).json() });
 		await expect(client.callTool({ name: 'list_my_notes', arguments: { userId: f.otherId } })).rejects.toBeDefined();
 		await expect(client.callTool({ name: 'notes/delete', arguments: {} })).rejects.toBeDefined();

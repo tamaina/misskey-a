@@ -34,10 +34,8 @@ export interface ApiPolicy {
 /** Preserve the existing secure, rate, credential, role, then token-scope ordering. */
 export function apiPolicy<Actor extends ApiActor>(policy: ApiPolicy) {
 	return os.$context<AuthenticatedContext<Actor>>().middleware(async ({ context, next }) => {
-		const { principal, token, services } = context;
-		if (policy.secure && (principal === null || token !== null)) throw apiError({
-			code: 'ACCESS_DENIED', message: 'Access denied.', id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
-		});
+		const { principal, services } = context;
+		assertSecurePolicy(policy, context);
 		if (policy.limit) {
 			const actor = services.limitActor(principal, context.ip);
 			const factor = principal ? await services.rateLimitFactor(principal) : 1;
@@ -49,43 +47,56 @@ export function apiPolicy<Actor extends ApiActor>(policy: ApiPolicy) {
 				}, result.info);
 			}
 		}
-		const requiresPrincipal = policy.requireCredential || policy.requireModerator || policy.requireAdmin;
-		if (requiresPrincipal) {
-			if (principal === null) throw credentialRequired();
-			if (principal.isSuspended) throw apiError({
-				code: 'YOUR_ACCOUNT_SUSPENDED', message: 'Your account has been suspended.',
-				id: 'a8c724b3-6e9c-4b46-b1a8-bc3ed6258370', kind: 'permission',
+		await assertApiAuthorization(policy, context);
+		return next();
+	});
+}
+
+/** Static endpoint authorization only: no input/visibility checks or rate-limit consumption. */
+export async function assertApiAuthorization<Actor extends ApiActor>(policy: ApiPolicy, context: AuthenticatedContext<Actor>): Promise<void> {
+	const { principal, token } = context;
+	assertSecurePolicy(policy, context);
+	const requiresPrincipal = policy.requireCredential || policy.requireModerator || policy.requireAdmin;
+	if (requiresPrincipal) {
+		if (principal === null) throw credentialRequired();
+		if (principal.isSuspended) throw apiError({
+			code: 'YOUR_ACCOUNT_SUSPENDED', message: 'Your account has been suspended.',
+			id: 'a8c724b3-6e9c-4b46-b1a8-bc3ed6258370', kind: 'permission',
+		});
+	}
+	if (policy.prohibitMoved && principal?.movedToUri) throw apiError({
+		code: 'YOUR_ACCOUNT_MOVED', message: 'You have moved your account.',
+		id: '56f20ec9-fd06-4fa5-841b-edd6d7d4fa31', kind: 'permission',
+	});
+	if (policy.requireModerator || policy.requireAdmin || policy.requiredRolePolicy !== undefined) {
+		if (principal === null) throw credentialRequired();
+		const authorization = context.authorization;
+		if (!authorization) throw apiError(internalError);
+		if (authorization.rootUserId() !== principal.id) {
+			const roles = await authorization.roles(principal);
+			if (policy.requireModerator && !roles.some(role => role.isModerator || role.isAdministrator)) throw apiError({
+				code: 'ROLE_PERMISSION_DENIED', message: 'You are not assigned to a moderator role.',
+				id: 'd33d5333-db36-423d-a8f9-1a2b9549da41', kind: 'permission',
+			});
+			if (policy.requireAdmin && !roles.some(role => role.isAdministrator)) throw apiError({
+				code: 'ROLE_PERMISSION_DENIED', message: 'You are not assigned to an administrator role.',
+				id: 'c3d38592-54c0-429d-be96-5636b0431a61', kind: 'permission',
+			});
+			if (policy.requiredRolePolicy !== undefined && !(await authorization.policyAllowed(principal, policy.requiredRolePolicy)) && !roles.some(role => role.isAdministrator)) throw apiError({
+				code: 'ROLE_PERMISSION_DENIED', message: 'You are not assigned to a required role.',
+				id: '7f86f06f-7e15-4057-8561-f4b6d4ac755a', kind: 'permission',
 			});
 		}
-		if (policy.prohibitMoved && principal?.movedToUri) throw apiError({
-			code: 'YOUR_ACCOUNT_MOVED', message: 'You have moved your account.',
-			id: '56f20ec9-fd06-4fa5-841b-edd6d7d4fa31', kind: 'permission',
-		});
-		if (policy.requireModerator || policy.requireAdmin || policy.requiredRolePolicy !== undefined) {
-			if (principal === null) throw credentialRequired();
-			const authorization = context.authorization;
-			if (!authorization) throw apiError(internalError);
-			if (authorization.rootUserId() !== principal.id) {
-				const roles = await authorization.roles(principal);
-				if (policy.requireModerator && !roles.some(role => role.isModerator || role.isAdministrator)) throw apiError({
-					code: 'ROLE_PERMISSION_DENIED', message: 'You are not assigned to a moderator role.',
-					id: 'd33d5333-db36-423d-a8f9-1a2b9549da41', kind: 'permission',
-				});
-				if (policy.requireAdmin && !roles.some(role => role.isAdministrator)) throw apiError({
-					code: 'ROLE_PERMISSION_DENIED', message: 'You are not assigned to an administrator role.',
-					id: 'c3d38592-54c0-429d-be96-5636b0431a61', kind: 'permission',
-				});
-				if (policy.requiredRolePolicy !== undefined && !(await authorization.policyAllowed(principal, policy.requiredRolePolicy)) && !roles.some(role => role.isAdministrator)) throw apiError({
-					code: 'ROLE_PERMISSION_DENIED', message: 'You are not assigned to a required role.',
-					id: '7f86f06f-7e15-4057-8561-f4b6d4ac755a', kind: 'permission',
-				});
-			}
-		}
-		if (token && ((policy.kind && !token.permission.includes(policy.kind)) || (!policy.kind && requiresPrincipal))) throw apiError({
-			code: 'PERMISSION_DENIED', message: 'Your app does not have the necessary permissions to use this endpoint.',
-			id: '1370e5b7-d4eb-4566-bb1d-7748ee6a1838', kind: 'permission',
-		});
-		return next();
+	}
+	if (token && ((policy.kind && !token.permission.includes(policy.kind)) || (!policy.kind && requiresPrincipal))) throw apiError({
+		code: 'PERMISSION_DENIED', message: 'Your app does not have the necessary permissions to use this endpoint.',
+		id: '1370e5b7-d4eb-4566-bb1d-7748ee6a1838', kind: 'permission',
+	});
+}
+
+function assertSecurePolicy(policy: ApiPolicy, { principal, token }: AuthenticatedContext<ApiActor>) {
+	if (policy.secure && (principal === null || token !== null)) throw apiError({
+		code: 'ACCESS_DENIED', message: 'Access denied.', id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e',
 	});
 }
 

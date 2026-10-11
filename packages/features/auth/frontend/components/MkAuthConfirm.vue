@@ -62,6 +62,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</ul>
 				</div>
 			</div>
+			<MkPermissionSelect v-if="selectablePermissions" v-model="selectedPermissions" :permissions="selectablePermissions"
+				:administrator="selectedAdministrator" :labels="copyLocaleDictionary($locale.sfc.permissionsLabels)"
+				:disableAllText="$locale.sfc.disableAll" :enableAllText="$locale.sfc.enableAll" :adminPermissionText="$locale.sfc.adminPermission"/>
 			<slot name="consentAdditionalInfo"></slot>
 			<div>
 				<div :class="$style.accountSelectorLabel">
@@ -79,7 +82,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div class="_buttonsCenter">
 				<MkButton rounded @click="clickCancel">{{ $locale.sfc.reject }}</MkButton>
-				<MkButton rounded gradate @click="clickAccept">{{ $locale.sfc.accept }}</MkButton>
+				<MkButton rounded gradate :disabled="selectablePermissions !== undefined && selectedPermissions.length === 0" @click="clickAccept">{{ $locale.sfc.accept }}</MkButton>
 			</div>
 		</div>
 		<div v-else-if="phase === 'success'" key="success" :class="$style.root" class="_gaps_s">
@@ -117,6 +120,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
+import MkPermissionSelect from './MkPermissionSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@features/auth/frontend/accounts.js';
@@ -130,18 +134,25 @@ const props = defineProps<{
 	name?: string;
 	icon?: string;
 	permissions?: (typeof Misskey.permissions[number])[];
+	selectablePermissions?: string[];
 	manualWaiting?: boolean;
 	waitOnDeny?: boolean;
 }>();
 
 const emit = defineEmits<{
-	(ev: 'accept', token: string): void;
+	(ev: 'accept', token: string, permissions?: string[]): void;
 	(ev: 'deny', token: string): void;
 }>();
 
 const waiting = ref(true);
 const _waiting = computed(() => waiting.value || props.manualWaiting);
 const phase = ref<'accountSelect' | 'consent' | 'success' | 'denied' | 'failed'>('accountSelect');
+
+const selectedPermissions = ref<string[]>([]);
+const selectedAdministrator = computed(() => {
+	const user = selectedUser.value ? users.value.get(selectedUser.value) : undefined;
+	return user !== undefined && 'isAdmin' in user && user.isAdmin === true;
+});
 
 const selectedUser = ref<string | null>(null);
 
@@ -216,9 +227,18 @@ function clickAddAccount(ev: PointerEvent) {
 	}], ev.currentTarget ?? ev.target);
 }
 
-function clickChooseAccount() {
+async function clickChooseAccount() {
 	if (selectedUser.value === null) return;
+	if (props.selectablePermissions !== undefined) {
+		const user = users.value.get(selectedUser.value)!;
+		waiting.value = true;
+		try {
+			const details = await misskeyApi('users/show', { userId: user.id }, user.token);
+			users.value.set(user.id, { ...details, token: user.token });
+		} catch { showUI('failed'); return; } finally { waiting.value = false; }
+	}
 
+	selectedPermissions.value = [];
 	phase.value = 'consent';
 }
 
@@ -248,7 +268,7 @@ async function clickAccept() {
 	const token = user.token;
 
 	waiting.value = true;
-	emit('accept', token);
+	emit('accept', token, props.selectablePermissions === undefined ? undefined : [...selectedPermissions.value]);
 }
 
 function showUI(state: 'success' | 'denied' | 'failed') {
@@ -562,7 +582,10 @@ defineExpose({
 	"authDenied": "رُفض الوصول",
 	"somethingHappened": "حدث خطأ",
 	"existingAccount": "الحسابات الموجودة",
-	"createAccount": "أنشئ حسابًا"
+	"createAccount": "أنشئ حسابًا",
+	"disableAll": "تعطيل الكل",
+	"enableAll": "تشغيل الكل",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -675,7 +698,10 @@ defineExpose({
 	"authDenied": "Accés denegat",
 	"somethingHappened": "S'ha produït un error",
 	"existingAccount": "Compte existent",
-	"createAccount": "Crea un compte"
+	"createAccount": "Crea un compte",
+	"disableAll": "Deshabilita tot",
+	"enableAll": "Habilita tot",
+	"adminPermission": "Permisos d'administrador "
 }
 </locale>
 
@@ -788,7 +814,10 @@ defineExpose({
 	"authDenied": "Přístup odepřen",
 	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"existingAccount": "Existující účet",
-	"createAccount": "Vytvořit účet"
+	"createAccount": "Vytvořit účet",
+	"disableAll": "Vypnout vše",
+	"enableAll": "Povolit vše",
+	"adminPermission": "Administrátorská práva"
 }
 </locale>
 
@@ -901,7 +930,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -1014,7 +1046,10 @@ defineExpose({
 	"authDenied": "Zugriff verweigert",
 	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"existingAccount": "Bestehendes Benutzerkonto",
-	"createAccount": "Benutzerkonto erstellen"
+	"createAccount": "Benutzerkonto erstellen",
+	"disableAll": "Alle deaktivieren",
+	"enableAll": "Alle aktivieren",
+	"adminPermission": "Administratorberechtigung"
 }
 </locale>
 
@@ -1127,7 +1162,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -1240,7 +1278,10 @@ defineExpose({
 	"authDenied": "Acceso denegado",
 	"somethingHappened": "Ocurrió un error",
 	"existingAccount": "Cuenta existente",
-	"createAccount": "Crear cuenta"
+	"createAccount": "Crear cuenta",
+	"disableAll": "Desactivar todo",
+	"enableAll": "Activar todo",
+	"adminPermission": "Permiso de administrador"
 }
 </locale>
 
@@ -1353,7 +1394,10 @@ defineExpose({
 	"authDenied": "Accès refusé",
 	"somethingHappened": "Une erreur est survenue",
 	"existingAccount": "Compte existant",
-	"createAccount": "Créer un compte"
+	"createAccount": "Créer un compte",
+	"disableAll": "Tout désactiver",
+	"enableAll": "Tout activer",
+	"adminPermission": "Droits de l'administrateur"
 }
 </locale>
 
@@ -1466,7 +1510,10 @@ defineExpose({
 	"authDenied": "Akses ditolak",
 	"somethingHappened": "Terjadi kesalahan",
 	"existingAccount": "Akun yang ada",
-	"createAccount": "Buat akun"
+	"createAccount": "Buat akun",
+	"disableAll": "Nonaktifkan semua",
+	"enableAll": "Aktifkan semua",
+	"adminPermission": "Wewenang Izin Admin"
 }
 </locale>
 
@@ -1579,7 +1626,10 @@ defineExpose({
 	"authDenied": "Accesso negato",
 	"somethingHappened": "Si è verificato un problema",
 	"existingAccount": "Profilo esistente",
-	"createAccount": "Crea il tuo profilo"
+	"createAccount": "Crea il tuo profilo",
+	"disableAll": "Disabilitare tutto",
+	"enableAll": "Abilita tutto",
+	"adminPermission": "Privilegi amministrativi"
 }
 </locale>
 
@@ -1692,7 +1742,10 @@ defineExpose({
 	"authDenied": "アクセスを拒否しました",
 	"somethingHappened": "問題が発生しました",
 	"existingAccount": "既存のアカウント",
-	"createAccount": "アカウントを作成"
+	"createAccount": "アカウントを作成",
+	"disableAll": "全て無効にする",
+	"enableAll": "全て有効にする",
+	"adminPermission": "管理者権限"
 }
 </locale>
 
@@ -1805,7 +1858,10 @@ defineExpose({
 	"authDenied": "アクセスを拒否ったで",
 	"somethingHappened": "なんかあかんわ",
 	"existingAccount": "前に作ったアカウント",
-	"createAccount": "アカウントを作るで"
+	"createAccount": "アカウントを作るで",
+	"disableAll": "全部使えへんようにする",
+	"enableAll": "全部使えるようにする",
+	"adminPermission": "管理者権限"
 }
 </locale>
 
@@ -1918,7 +1974,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -2031,7 +2090,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -2144,7 +2206,10 @@ defineExpose({
 	"authDenied": "접근이 거부되었습니다",
 	"somethingHappened": "오류가 발생했습니다",
 	"existingAccount": "기존 계정",
-	"createAccount": "계정 만들기"
+	"createAccount": "계정 만들기",
+	"disableAll": "전체 해제",
+	"enableAll": "전체 선택",
+	"adminPermission": "관리자 권한"
 }
 </locale>
 
@@ -2257,7 +2322,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "Er is iets misgegaan.",
 	"existingAccount": "Bestaand gebruikersaccount",
-	"createAccount": "Gebruikersaccount maken"
+	"createAccount": "Gebruikersaccount maken",
+	"disableAll": "Alle deactiveren",
+	"enableAll": "Alle activeren",
+	"adminPermission": "Administratorrechten"
 }
 </locale>
 
@@ -2370,7 +2438,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "En feil har oppstått",
 	"existingAccount": "Existing account",
-	"createAccount": "Opprett konto"
+	"createAccount": "Opprett konto",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -2483,7 +2554,10 @@ defineExpose({
 	"authDenied": "Odmowa dostępu",
 	"somethingHappened": "Coś poszło nie tak",
 	"existingAccount": "Istniejące konto",
-	"createAccount": "Utwórz konto"
+	"createAccount": "Utwórz konto",
+	"disableAll": "Wyłącz wszystko",
+	"enableAll": "Włącz wszystko",
+	"adminPermission": "Uprawnienia administracyjne"
 }
 </locale>
 
@@ -2596,7 +2670,10 @@ defineExpose({
 	"authDenied": "Acesso negado",
 	"somethingHappened": "Ocorreu um erro",
 	"existingAccount": "Contas existentes",
-	"createAccount": "Criar conta"
+	"createAccount": "Criar conta",
+	"disableAll": "Desabilitar tudo",
+	"enableAll": "Habilitar tudo",
+	"adminPermission": "Permissões de administrador"
 }
 </locale>
 
@@ -2709,7 +2786,10 @@ defineExpose({
 	"authDenied": "Доступ закрыт",
 	"somethingHappened": "Что-то пошло не так",
 	"existingAccount": "Существующая учётная запись",
-	"createAccount": "Новая учётная запись"
+	"createAccount": "Новая учётная запись",
+	"disableAll": "Выключить всё",
+	"enableAll": "Включить все",
+	"adminPermission": "Доступ администратора"
 }
 </locale>
 
@@ -2822,7 +2902,10 @@ defineExpose({
 	"authDenied": "Prístup zamietnutý",
 	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"existingAccount": "Existujúci účet",
-	"createAccount": "Vytvoriť účet"
+	"createAccount": "Vytvoriť účet",
+	"disableAll": "Vypnúť všetko",
+	"enableAll": "Povoliť všetko",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -2935,7 +3018,10 @@ defineExpose({
 	"authDenied": "ปฏิเสธการเข้าใช้",
 	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"existingAccount": "บัญชีที่มีอยู่แล้ว",
-	"createAccount": "สร้างบัญชี"
+	"createAccount": "สร้างบัญชี",
+	"disableAll": "ปิดการใช้งานทั้งหมด",
+	"enableAll": "เปิดใช้งานทั้งหมด",
+	"adminPermission": "สิทธิ์ของผู้ดูแลระบบ"
 }
 </locale>
 
@@ -3048,7 +3134,10 @@ defineExpose({
 	"authDenied": "Erişim reddedildi",
 	"somethingHappened": "Bir hata oluştu",
 	"existingAccount": "Mevcut hesap",
-	"createAccount": "Hesap oluştur"
+	"createAccount": "Hesap oluştur",
+	"disableAll": "Tümünü devre dışı bırak",
+	"enableAll": "Tümünü etkinleştir",
+	"adminPermission": "Yönetici İzinleri"
 }
 </locale>
 
@@ -3161,7 +3250,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -3274,7 +3366,10 @@ defineExpose({
 	"authDenied": "У доступі відмовлено",
 	"somethingHappened": "Щось пішло не так",
 	"existingAccount": "Існуючий акаунт",
-	"createAccount": "Створити акаунт"
+	"createAccount": "Створити акаунт",
+	"disableAll": "Вимкнути все",
+	"enableAll": "Увімкнути все",
+	"adminPermission": "Права адміністратора"
 }
 </locale>
 
@@ -3387,7 +3482,10 @@ defineExpose({
 	"authDenied": "Truy cập bị từ chối",
 	"somethingHappened": "Xảy ra lỗi",
 	"existingAccount": "Tài khoản hiện có",
-	"createAccount": "Tạo tài khoản"
+	"createAccount": "Tạo tài khoản",
+	"disableAll": "Tắt toàn bộ",
+	"enableAll": "Bật toàn bộ",
+	"adminPermission": "Quyền quản trị viên"
 }
 </locale>
 
@@ -3500,7 +3598,10 @@ defineExpose({
 	"authDenied": "拒绝访问",
 	"somethingHappened": "出错了",
 	"existingAccount": "现有的账户",
-	"createAccount": "注册账户"
+	"createAccount": "注册账户",
+	"disableAll": "禁用全部",
+	"enableAll": "启用全部",
+	"adminPermission": "管理员权限"
 }
 </locale>
 
@@ -3613,6 +3714,9 @@ defineExpose({
 	"authDenied": "拒絕訪問",
 	"somethingHappened": "發生錯誤",
 	"existingAccount": "現有帳戶",
-	"createAccount": "建立帳戶"
+	"createAccount": "建立帳戶",
+	"disableAll": "停用全部",
+	"enableAll": "啟用全部",
+	"adminPermission": "管理員權限"
 }
 </locale>

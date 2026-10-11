@@ -35,6 +35,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
 	expect(spec.paths?.['/admin/avatar-decorations/create']?.post?.operationId).toBe('post___admin___avatar-decorations___create');
 	expect(spec.paths?.['/get-avatar-decorations']?.post?.operationId).toBe('post___get-avatar-decorations');
+	expect(spec.paths?.['/available-endpoints']?.post?.operationId).toBe('post___available-endpoints');
 	expect(spec.paths?.['/hashtags/trend']?.get?.operationId).toBe('get___hashtags___trend');
 	expect(spec.paths?.['/hashtags/trend']?.post?.operationId).toBe('post___hashtags___trend');
 	expect(spec.paths?.['/clear-browser-cache']?.get?.operationId).toBe('get___clear_browser_cache');
@@ -46,7 +47,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		const operation = item?.[method];
 		return operation ? [operation.operationId] : [];
 	}));
-	expect(identifiers).toHaveLength(465);
+	expect(identifiers).toHaveLength(466);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

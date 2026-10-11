@@ -383,6 +383,8 @@ import type {
 	EndpointResponse,
 	EndpointsRequest,
 	EndpointsResponse,
+	AvailableEndpointsRequest,
+	AvailableEndpointsResponse,
 	GetOnlineUsersCountRequest,
 	GetOnlineUsersCountResponse,
 	MetaRequest,
@@ -970,6 +972,7 @@ export type Endpoints = {
 	'admin/update-meta': { req: AdminUpdateMetaRequest; res: EmptyResponse };
 	'endpoint': { req: EndpointRequest; res: EndpointResponse };
 	'endpoints': { req: EndpointsRequest; res: EndpointsResponse };
+	'available-endpoints': { req: AvailableEndpointsRequest; res: AvailableEndpointsResponse };
 	'get-online-users-count': { req: GetOnlineUsersCountRequest; res: GetOnlineUsersCountResponse };
 	'meta': { req: MetaRequest; res: MetaResponse };
 	'ping': { req: PingRequest; res: PingResponse };

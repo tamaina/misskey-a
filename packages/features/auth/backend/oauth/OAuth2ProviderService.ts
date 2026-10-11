@@ -11,6 +11,22 @@ import ipaddr from 'ipaddr.js';
 import fastifyCors from '@fastify/cors';
 import { verifyChallenge } from 'pkce-challenge';
 import { permissions as kinds } from 'misskey-js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
+import { StatusError } from '@features/runtime/backend/http/status-error.js';
+import { HtmlTemplateService } from '@features/web/backend/http/HtmlTemplateService.js';
+import { OAuthPage } from '@features/auth/backend/templates/oauth.js';
+import { DI } from '@/di-symbols.js';
+import type { Config } from '@/config.js';
+import { secureRndstr } from '../utility/secure-rndstr.js';
+import { fetchOAuthClientMetadata } from './ClientMetadataFetcher.js';
+import { OAuthStateStore } from './OAuthStateStore.js';
+import { eligibleOAuthPermissions, selectedOAuthScopes } from './scope-selection.js';
 import {
 	AccessDeniedError,
 	InvalidGrantError,
@@ -20,23 +36,9 @@ import {
 	UnsupportedGrantTypeError,
 	UnsupportedResponseTypeError,
 } from './errors.js';
-import { secureRndstr } from '../utility/secure-rndstr.js';
-import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js';
-import { bindThis } from '@features/runtime/backend/decorators.js';
-import type { AccessTokensRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { CacheService } from '@features/users/backend/services/CacheService.js';
-import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type * as Redis from 'ioredis';
-import { OAuthStateStore } from './OAuthStateStore.js';
-import { fetchOAuthClientMetadata } from './ClientMetadataFetcher.js';
-import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { Logger } from '@features/runtime/backend/logging/logger.js';
-import { StatusError } from '@features/runtime/backend/http/status-error.js';
-import { HtmlTemplateService } from '@features/web/backend/http/HtmlTemplateService.js';
-import { OAuthPage } from '@features/auth/backend/templates/oauth.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { AccessTokensRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { FastifyInstance, FastifyReply } from 'fastify';
 
 // TODO: Consider migrating to @node-oauth/oauth2-server once
@@ -456,6 +458,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		private cacheService: CacheService,
 		private htmlTemplateService: HtmlTemplateService,
 		loggerService: LoggerService,
+		private roleService: RoleService,
 		@Inject(DI.redis) redis: Redis.Redis,
 	) {
 		this.#state = new OAuthStateStore(redis);
@@ -525,7 +528,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 
 	#finalizeAuthorizationRequest(seed: AuthorizationRequestSeed): AuthorizationRequest {
 		const scopes = [...new Set(seed.requestedScope)].filter(scope => (<readonly string[]>kinds).includes(scope));
-		if (!seed.requestedScope.length || !scopes.length) {
+		if (seed.requestedScope.length > 0 && !scopes.length) {
 			throw new InvalidScopeError('`scope` parameter has no known scope', seed.requestedScope.join(' '));
 		}
 
@@ -595,7 +598,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		fastify.addHook('onRequest', (request, reply, done) => {
 			// クリックジャッキング防止のためiFrameの中に入れられないようにする
 			reply.header('X-Frame-Options', 'DENY');
-			reply.header('Content-Security-Policy', "frame-ancestors 'none'");
+			reply.header('Content-Security-Policy', 'frame-ancestors \'none\'');
 			done();
 		});
 
@@ -625,6 +628,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					clientName: clientInfo.name,
 					clientLogo: clientInfo.logo ?? undefined,
 					scope: authorizationRequest.scopes,
+					selectablePermissions: authorizationRequest.scopes.length === 0 ? eligibleOAuthPermissions(authorizationRequest.resource, true) : undefined,
 				}));
 			} catch (error) {
 				const OAuthProviderError = normalizeOAuthProviderError(error);
@@ -670,6 +674,9 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 
 				this.#logger.info('Checking user consent');
 				const user = await this.#findUserByLoginToken(loginToken);
+				const scopes = selectedOAuthScopes(transaction.request.scopes, body.selected_scope,
+					eligibleOAuthPermissions(transaction.request.resource, transaction.request.scopes.length === 0 && await this.roleService.isAdministrator(user)));
+				this.#validateResource(transaction.request.resource, scopes);
 
 				this.#logger.info('Issuing authorization code after consent');
 
@@ -680,7 +687,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					userId: user.id,
 					redirectUri: transaction.request.redirectUri,
 					codeChallenge: transaction.request.codeChallenge,
-					scopes: transaction.request.scopes,
+					scopes,
 					resource: transaction.request.resource,
 				});
 
