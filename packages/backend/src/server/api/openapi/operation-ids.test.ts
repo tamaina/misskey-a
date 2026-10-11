@@ -43,11 +43,16 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	for (const path of ['signup-pending', 'signin-flow', 'signin-with-passkey']) {
 		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('-', '_')}`);
 	}
+	const walletPaths = ['account/wallets/link/passkey-options', 'account/wallets/list', 'account/wallets/link/chains',
+		'account/wallets/link/begin', 'account/wallets/link/verify', 'account/wallets/unlink'];
+	for (const path of walletPaths) {
+		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('/', '___')}`);
+	}
 	const identifiers = Object.values(spec.paths ?? {}).flatMap(item => (['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'] as const).flatMap(method => {
 		const operation = item?.[method];
 		return operation ? [operation.operationId] : [];
 	}));
-	expect(identifiers).toHaveLength(466);
+	expect(identifiers).toHaveLength(466 + walletPaths.length);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

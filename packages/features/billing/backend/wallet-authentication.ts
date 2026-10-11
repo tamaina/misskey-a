@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { createHash } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { toWebAuthnAuthenticationOptions } from '@features/auth/backend/webauthn.schema.js';
@@ -13,12 +12,10 @@ import type { WebAuthnService } from '@features/auth/backend/services/WebAuthnSe
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { WalletAuthentication } from './wallet-service.js';
 
-export const WALLET_RECENT_AUTH_SECONDS = 5 * 60;
 export interface WalletAuthenticationDependencies {
 	profiles: Pick<UserProfilesRepository, 'findOneByOrFail'>;
 	auth: Pick<UserAuthService, 'twoFactorAuthenticate'>;
 	passkeys: Pick<WebAuthnService, 'initiateAuthentication' | 'verifyAuthentication'>;
-	recent: { get(key: string): Promise<string | null>; setex(key: string, seconds: number, value: string): Promise<unknown> };
 	passwordMatches?: typeof bcrypt.compare;
 }
 
@@ -30,10 +27,8 @@ export function createWalletAuthentication(deps: WalletAuthenticationDependencie
 		async reauthenticate(userId: string, input: WalletAuthentication, credential?: string | null) {
 			const fail = () => apiError({ code: 'WALLET_REAUTHENTICATION_REQUIRED', message: 'Authenticate again to register a wallet.', id: '930b9449-6451-4148-82c4-547986f1942a' });
 			if (!credential) throw fail();
-			// A different app token or login token cannot borrow this account's recent proof.
-			const key = `billing:wallet:reauth:${userId}:${createHash('sha256').update(credential).digest('hex')}`;
-			const explicit = input.passkey !== undefined || input.currentPassword !== undefined || input.twoFactorToken !== undefined;
-			if (!explicit && await deps.recent.get(key) === 'verified') return;
+			// Native browser logins reuse user.token; it cannot identify a recent-auth session.
+			// Require explicit password/TOTP or a fresh one-use native passkey response on every begin.
 			try {
 				if (input.passkey !== undefined) {
 					if (!await deps.passkeys.verifyAuthentication(userId, input.passkey)) throw fail();
@@ -45,7 +40,6 @@ export function createWalletAuthentication(deps: WalletAuthenticationDependencie
 						await deps.auth.twoFactorAuthenticate(profile, input.twoFactorToken);
 					}
 				}
-				await deps.recent.setex(key, WALLET_RECENT_AUTH_SECONDS, 'verified');
 			} catch { throw fail(); }
 		},
 	};

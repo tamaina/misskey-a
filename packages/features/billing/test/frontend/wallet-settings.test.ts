@@ -79,16 +79,17 @@ test('account/chain/disconnect changes clear the page connection and dispose pro
 	expect(f.listeners.size).toBe(0);
 });
 
-test('native passkey response is forwarded to registration and cleared after use', async () => {
+test('native passkey is requested after wallet selection, forwarded once and not retained', async () => {
 	const passkey = { id: 'synthetic-key', rawId: 'synthetic', type: 'public-key' as const, clientExtensionResults: {},
 		response: { clientDataJSON: 'synthetic', authenticatorData: 'synthetic', signature: 'synthetic' } };
 	const authenticate = vi.fn(async () => passkey);
 	const f = await fixture(true, authenticate);
 	try {
 		await flush(); button(f.element, 'パスキーで再認証').click(); await flush();
-		expect(authenticate).toHaveBeenCalledOnce(); expect(f.element.textContent).toContain('パスキーの応答');
+		expect(authenticate).not.toHaveBeenCalled(); expect(f.element.textContent).toContain('切り替えが終わった後');
 		button(f.element, 'Synthetic wallet').click(); await flush();
 		expect(f.client.begin).toHaveBeenCalledWith({ chainId: 123456, address: wallet.address, passkey });
-		expect(f.element.textContent).not.toContain('パスキーの応答');
+		expect(authenticate).toHaveBeenCalledOnce();
+		expect(f.element.textContent).not.toContain('切り替えが終わった後');
 	} finally { f.dispose(); }
 });

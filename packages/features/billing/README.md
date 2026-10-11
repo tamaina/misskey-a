@@ -12,8 +12,10 @@ unapplied-to-production migration has `up` and `down`; reverting deletes these
 wallet identities and challenges. Normal `read:account`/`write:account` scopes apply,
 including scoped application tokens. No grant or admin-role rules are expanded.
 
-The native authentication adapter supports password/TOTP and existing passkeys,
-with a credential-bound five-minute recent-auth proof. Unlink remains an owner-only
+The native authentication adapter requires explicit password/TOTP or a fresh
+one-use native passkey response on every registration begin. Native browser logins
+share the same stored account token, so it cannot safely identify a recent-auth
+session. This is stricter than the source five-minute recent-auth window. Unlink remains an owner-only
 operation without additional reauthentication. Linking checks a ten-minute SIWE
 message and consumes its challenge atomically with a globally unique wallet insert.
 The server clock is checked again after acquiring the PostgreSQL challenge lock.

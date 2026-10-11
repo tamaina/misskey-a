@@ -50,13 +50,11 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 		assert.equal((await store.getChallenge('duplicate', 'bob')).usedAt, null);
 		assert.equal(await store.unlink(raced.find(Boolean).id, 'bob'), false);
 
-		const recent = new Map();
 		const auth = createWalletAuthentication({
 			profiles: { findOneByOrFail: async () => ({ password: 'synthetic hash', twoFactorEnabled: true }) },
 			passwordMatches: async (password, hash) => password === 'synthetic password' && hash === 'synthetic hash',
 			auth: { twoFactorAuthenticate: async (_profile, token) => { assert.equal(token, 'synthetic OTP'); } },
 			passkeys: { initiateAuthentication: async () => ({ challenge: 'fixture', userVerification: 'required' }), verifyAuthentication: async () => false },
-			recent: { get: async key => recent.get(key) ?? null, setex: async (key, _seconds, value) => { recent.set(key, value); } },
 		});
 		const actor = { id: 'alice', isSuspended: false, movedToUri: null };
 		const dependencies = nativeTestDependencies({ actor, events: [] });

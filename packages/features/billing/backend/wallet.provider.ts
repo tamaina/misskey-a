@@ -19,7 +19,6 @@ import { createWalletAuthentication } from './wallet-authentication.js';
 import { walletProof } from './wallet-service.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
-import type { Redis } from 'ioredis';
 import type { DataSource } from 'typeorm';
 
 @Injectable()
@@ -33,7 +32,6 @@ export class WalletApiProvider {
 			profiles: get<UserProfilesRepository>(DI.userProfilesRepository),
 			auth: this.moduleRef.get(UserAuthService, { strict: false }),
 			passkeys: this.moduleRef.get(WebAuthnService, { strict: false }),
-			recent: get<Redis>(DI.redis),
 		});
 		// Configuration remains private; the public DTO deliberately excludes RPC endpoints.
 		const catalog = config.walletChains ?? [];

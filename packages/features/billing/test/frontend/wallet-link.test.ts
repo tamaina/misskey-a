@@ -63,3 +63,27 @@ test('switch failure, rejected signature and unchanged chain do not register an 
 		await expect(linkWallet(f.input)).rejects.toThrow(); expect(f.client.verify).not.toHaveBeenCalled();
 	}
 });
+
+test('passkey authentication starts after provider selection/switch delays beyond native 90-second TTL', async () => {
+	vi.useFakeTimers(); vi.setSystemTime(0);
+	const f = fixture(); const request = f.request.getMockImplementation()!;
+	let issuedAt = -1;
+	const passkey = { id: 'synthetic-key', rawId: 'synthetic', type: 'public-key' as const, clientExtensionResults: {},
+		response: { clientDataJSON: 'synthetic', authenticatorData: 'synthetic', signature: 'synthetic' } };
+	const authenticate = vi.fn(async () => { issuedAt = Date.now(); return { passkey }; });
+	f.request.mockImplementation(async input => {
+		if (input.method === 'eth_requestAccounts' || input.method === 'wallet_switchEthereumChain') await new Promise(resolve => setTimeout(resolve, 91000));
+		return request(input);
+	});
+	f.client.begin = vi.fn(async input => {
+		expect(issuedAt).toBe(182000); expect(Date.now() - issuedAt).toBeLessThan(90000);
+		expect(input.passkey).toEqual(passkey); return challenge;
+	});
+	try {
+		const result = linkWallet({ ...f.input, authenticate });
+		expect(authenticate).not.toHaveBeenCalled();
+		await vi.advanceTimersByTimeAsync(182000);
+		expect(await result).toEqual(wallet); expect(authenticate).toHaveBeenCalledOnce();
+		expect(f.input.progress).toHaveBeenCalledWith('authenticate');
+	} finally { vi.useRealTimers(); }
+});

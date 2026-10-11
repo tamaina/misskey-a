@@ -11,7 +11,7 @@ export { createWalletRouter } from './wallet.implementation.js';
 export { createWalletService, walletProof, WALLET_CHALLENGE_TTL } from './wallet-service.js';
 export type { WalletDependencies, WalletStore } from './wallet-service.js';
 export { createPostgresWalletStore } from './wallet-store.js';
-export { createWalletAuthentication, WALLET_RECENT_AUTH_SECONDS } from './wallet-authentication.js';
+export { createWalletAuthentication } from './wallet-authentication.js';
 export { WalletApiProvider } from './wallet.provider.js';
 export { MiBillingWallet } from './models/BillingWallet.js';
 export { MiBillingWalletChallenge } from './models/BillingWalletChallenge.js';

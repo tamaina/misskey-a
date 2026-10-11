@@ -7,7 +7,7 @@
 import type { WalletChain, LinkedWallet } from '../backend/api.definition.js';
 import type { ConnectedWallet, WalletAuthInput, WalletClient, WalletConnector } from './wallet-client.js';
 
-export type WalletStep = 'connect' | 'switch' | 'sign' | 'verify';
+export type WalletStep = 'connect' | 'switch' | 'authenticate' | 'sign' | 'verify';
 export class WalletLinkCancelled extends Error { }
 
 /** cfw-fileup's connect -> switch -> begin -> personal_sign -> verify flow.
@@ -15,6 +15,8 @@ export class WalletLinkCancelled extends Error { }
 export async function linkWallet(input: {
 	client: WalletClient; connector: WalletConnector; chain: WalletChain;
 	auth: WalletAuthInput;
+	/** Fresh native authentication happens only after slow wallet selection/switching. */
+	authenticate?(): Promise<WalletAuthInput>;
 	cancelled(): boolean; progress(step: WalletStep): void; connected(wallet: ConnectedWallet): void;
 }): Promise<LinkedWallet> {
 	function check(): void { if (input.cancelled()) throw new WalletLinkCancelled(); }
@@ -40,7 +42,13 @@ export async function linkWallet(input: {
 		if (typeof switched !== 'string' || !/^0x[0-9a-fA-F]+$/.test(switched) || BigInt(switched) !== BigInt(input.chain.chainId)) throw new Error('Wallet chain did not change');
 	}
 	input.connected({ address, chainId: input.chain.chainId, connectorId: input.connector.id });
-	const challenge = await input.client.begin({ chainId: input.chain.chainId, address, ...input.auth });
+	let auth = input.auth;
+	if (input.authenticate) {
+		input.progress('authenticate');
+		auth = await input.authenticate();
+		check();
+	}
+	const challenge = await input.client.begin({ chainId: input.chain.chainId, address, ...auth });
 	check();
 	input.progress('sign');
 	const signature = await provider.request({ method: 'personal_sign', params: [challenge.message, address] });
