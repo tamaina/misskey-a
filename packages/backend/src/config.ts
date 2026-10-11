@@ -34,6 +34,8 @@ type SentryBackendConfig = {
  * 設定ファイルの型
  */
 type Source = {
+	/** Optional read-only wallet verification catalog. No payments or charging policy. */
+	walletChains?: { chainId: number; name: string; nativeCurrencyName: string; nativeCurrencySymbol: string; nativeCurrencyDecimals: number; blockExplorerUrl: string | null; rpcUrl: string; isEnabled: boolean }[];
 	url?: string;
 	port?: number;
 	socket?: string;
@@ -133,6 +135,7 @@ type Source = {
 };
 
 export type Config = {
+	walletChains?: Source['walletChains'];
 	url: string;
 	port: number;
 	socket: string | undefined;
@@ -297,6 +300,7 @@ export function loadConfig(): Config {
 		setupPassword: config.setupPassword,
 		url: url.origin,
 		enableMcp: config.enableMcp === true,
+		walletChains: config.walletChains,
 		port: config.port ?? parseInt(process.env.PORT ?? '', 10),
 		socket: config.socket,
 		trustProxy: config.trustProxy ?? [

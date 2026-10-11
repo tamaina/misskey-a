@@ -78,6 +78,8 @@ import { MiRole } from '@features/roles/backend/models/Role.js';
 import { MiRoleAssignment } from '@features/roles/backend/models/RoleAssignment.js';
 import { MiFlash } from '@features/play/backend/models/Flash.js';
 import { MiFlashLike } from '@features/play/backend/models/FlashLike.js';
+import { MiBillingWallet } from '@features/billing/backend/models/BillingWallet.js';
+import { MiBillingWalletChallenge } from '@features/billing/backend/models/BillingWalletChallenge.js';
 import { MiUserMemo } from '@features/users/backend/models/UserMemo.js';
 import { MiChatMessage } from '@features/chat/backend/models/ChatMessage.js';
 import { MiChatRoom } from '@features/chat/backend/models/ChatRoom.js';
@@ -247,6 +249,8 @@ export const entities = [
 	MiFlash,
 	MiFlashLike,
 	MiUserMemo,
+	MiBillingWallet,
+	MiBillingWalletChallenge,
 	MiChatMessage,
 	MiChatRoom,
 	MiChatRoomMembership,

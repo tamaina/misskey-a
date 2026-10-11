@@ -62,6 +62,46 @@ import { VoidSchema } from 'valibot';
 // @public (undocumented)
 type AbuseReportNotificationRecipient = ContractModel<'AbuseReportNotificationRecipient'>;
 
+// Warning: (ae-forgotten-export) The symbol "ContractRequest" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+type AccountWalletsLinkBeginRequest = ContractRequest<'account/wallets/link/begin'>;
+
+// Warning: (ae-forgotten-export) The symbol "ContractResponse" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+type AccountWalletsLinkBeginResponse = ContractResponse<'account/wallets/link/begin'>;
+
+// @public (undocumented)
+type AccountWalletsLinkChainsRequest = ContractRequest<'account/wallets/link/chains'>;
+
+// @public (undocumented)
+type AccountWalletsLinkChainsResponse = ContractResponse<'account/wallets/link/chains'>;
+
+// @public (undocumented)
+type AccountWalletsLinkPasskeyOptionsRequest = ContractRequest<'account/wallets/link/passkey-options'>;
+
+// @public (undocumented)
+type AccountWalletsLinkPasskeyOptionsResponse = ContractResponse<'account/wallets/link/passkey-options'>;
+
+// @public (undocumented)
+type AccountWalletsLinkVerifyRequest = ContractRequest<'account/wallets/link/verify'>;
+
+// @public (undocumented)
+type AccountWalletsLinkVerifyResponse = ContractResponse<'account/wallets/link/verify'>;
+
+// @public (undocumented)
+type AccountWalletsListRequest = ContractRequest<'account/wallets/list'>;
+
+// @public (undocumented)
+type AccountWalletsListResponse = ContractResponse<'account/wallets/list'>;
+
+// @public (undocumented)
+type AccountWalletsUnlinkRequest = ContractRequest<'account/wallets/unlink'>;
+
+// @public (undocumented)
+type AccountWalletsUnlinkResponse = ContractResponse<'account/wallets/unlink'>;
+
 // @public (undocumented)
 export type Acct = {
     username: string;
@@ -86,13 +126,9 @@ type AchievementName = ContractModel<'AchievementName'>;
 // @public (undocumented)
 type Ad = ContractModel<'Ad'>;
 
-// Warning: (ae-forgotten-export) The symbol "ContractRequest" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 type AdminAbuseReportNotificationRecipientCreateRequest = ContractRequest<'admin/abuse-report/notification-recipient/create'>;
 
-// Warning: (ae-forgotten-export) The symbol "ContractResponse" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 type AdminAbuseReportNotificationRecipientCreateResponse = ContractResponse<'admin/abuse-report/notification-recipient/create'>;
 
@@ -1659,6 +1695,18 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        AccountWalletsLinkPasskeyOptionsRequest,
+        AccountWalletsLinkPasskeyOptionsResponse,
+        AccountWalletsListRequest,
+        AccountWalletsListResponse,
+        AccountWalletsLinkChainsRequest,
+        AccountWalletsLinkChainsResponse,
+        AccountWalletsLinkBeginRequest,
+        AccountWalletsLinkBeginResponse,
+        AccountWalletsLinkVerifyRequest,
+        AccountWalletsLinkVerifyResponse,
+        AccountWalletsUnlinkRequest,
+        AccountWalletsUnlinkResponse,
         ChatMessagesCreateToUserRequest,
         ChatMessagesCreateToUserResponse,
         ChatMessagesCreateToRoomRequest,

@@ -110,6 +110,10 @@ export const ROUTE_DEF = [{
 		name: 'email',
 		component: page(() => import('@features/auth/frontend/pages/settings/email.vue')),
 	}, {
+		path: '/wallets',
+		name: 'wallets',
+		component: page(() => import('@features/billing/frontend/pages/settings/wallets.vue')),
+	}, {
 		path: '/security',
 		name: 'security',
 		component: page(() => import('@features/auth/frontend/pages/settings/security.vue')),

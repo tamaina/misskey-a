@@ -1,58 +1,60 @@
-# Billing
+# Billing wallet registration
 
-Review prototype for [Issue #8](https://github.com/tamaina/misskey-a/issues/8).
-The billing and wallet routers use the native authentication/policy middleware and
-finite oRPC/Valibot contracts. The host has **not** registered a provider, HTTP
-route, admin/user navigation entry, storage adapter or migration. No account can
-currently use these forms through a running Misskey instance.
+Small review slice for [Issue #8](https://github.com/tamaina/misskey-a/issues/8).
+Wallet registration is composed into Misskey's native feature provider/API and
+`/settings/wallets`. The older payment-history and disabled admin-chain prototypes
+remain unregistered; this slice performs no payments, balance/credit accounting,
+pricing, entitlements, settlement or transfers.
 
-- Own service-payment history projects existing immutable source order snapshots.
-  It never writes balances, quotes, confirmations, expirations or entitlements.
-  Storage must filter by principal, return descending immutable order IDs with an
-  exclusive cursor, and respect the limit. An unexpected owner fails closed.
-- Admin chain metadata uses the chain ID as identity, atomic disabled-only upserts
-  and authenticated admin attribution. The catalog is bounded to 100 entries.
-  `BillingChainSettings.vue` uses Misskey form controls and a typed admin client.
-- Wallet registration follows cfw-fileup's SIWE challenge, ten-minute expiry,
-  exact message, RPC signature verification and global `(chainId, address)`
-  uniqueness. Misskey's native principal selects the account. The public DTO omits
-  owner, proof and RPC details. `WalletStore.complete` requires an atomic unique
-  insert + challenge consumption; the only implementation here is a synthetic
-  transactional fixture. A real DB adapter must enforce this, including rollback.
-- `WalletSettings.vue` belongs in user settings; it lists registered identities
-  separately from the current provider connection and confirms unlink. It takes
-  an authenticated typed client, connector providers and native confirmation
-  callback. `wallet-link.ts` requests connect, chain switch and personal-sign of
-  the server message, with cooperative cancellation before verify. These are
-  reusable view/flow components, not a registered settings page.
-- Reads use `read:account`, wallet writes use `write:account`; chain admin reads
-  and writes use their existing admin-meta scopes plus the native admin boundary.
-  Scoped application tokens are supported; supplying a user ID in input is not.
-- The host must supply sensitive-action reauthentication; no permissive adapter
-  is provided. Current-password/TOTP fields are contract inputs, not a working
-  native authentication adapter. Do not register routes until this is connected.
+The host binds the current Misskey principal to a PostgreSQL wallet identity.
+`billing_wallet` and `billing_wallet_challenge` are the only new tables. The local,
+unapplied-to-production migration has `up` and `down`; reverting deletes these
+wallet identities and challenges. Normal `read:account`/`write:account` scopes apply,
+including scoped application tokens. No grant or admin-role rules are expanded.
 
-Synthetic tests prove the application seam's account isolation, challenge/race
-checks, permission handling and UI flow. They do not prove production transaction
-locking, valid wallet signature interoperability or settlement. The actual viem
-verifier is included, but successful registration tests inject a synthetic verifier
-and provider; no private key, real signature, wallet account or RPC endpoint is used.
+The native authentication adapter supports password/TOTP and existing passkeys,
+with a credential-bound five-minute recent-auth proof. Unlink remains an owner-only
+operation without additional reauthentication. Linking checks a ten-minute SIWE
+message and consumes its challenge atomically with a globally unique wallet insert.
+The server clock is checked again after acquiring the PostgreSQL challenge lock.
 
-Source provenance and behavioral differences are documented in Issue #8 and the
-follow-up PR. Deferred work includes persistent models/adapters, host registration,
-native reauth/passkey support, chain catalog/connector discovery, WalletConnect,
-unknown-chain addition, provider connection events, browser permission revocation,
-SDK generation once routes are public, and every payment/settlement operation.
-There is no balance/credit ledger, price, fee, grant, payment activation or transfer.
+`walletChains` in server configuration defaults to an empty catalog. Its entries
+have `chainId`, `name`, `nativeCurrencyName`, `nativeCurrencySymbol`,
+`nativeCurrencyDecimals`, `blockExplorerUrl`, `rpcUrl` and `isEnabled`.
+RPC URLs remain private. The public catalog includes enabled entries with configured
+RPC, matching the source; verification requires configured RPC. A canonical HTTPS
+origin is required for linking. An HTTP development host can still boot and list or
+unlink wallets, but cannot link them.
 
-Validation after a backend build:
+The page uses the existing authenticated Misskey client, confirmation dialog and
+passkey browser adapter. EIP-6963 and an injected EIP-1193 provider are supported.
+Account, chain and disconnect events clear local connection state; page disposal
+removes its listeners. WalletConnect, adding unknown chains and revoking browser
+wallet permissions remain deferred.
+
+Source provenance, account mapping and necessary behavioral differences are recorded
+in Issue #8 / draft PR #64. #64 is the successor containing #57's pilot; their histories
+diverge. Do not merge both duplicate pilots.
+
+After the normal backend build, run focused synthetic tests:
 
 ```sh
-node --test --test-concurrency=1 packages/features/billing/test/*.test.mjs
-cd packages/frontend
-node node_modules/vitest/vitest.mjs run --config vitest.billing.config.js --configLoader native --maxWorkers=1
+node --test --test-concurrency=1 packages/features/billing/test/native-operations.test.mjs packages/features/billing/test/wallet-registration.test.mjs packages/features/billing/test/wallet-authentication.test.mjs
 ```
 
-The focused UI config mounts the actual Misskey controls and isolates unrelated
-navigation/autocomplete/popup infrastructure. Screenshots in `test/fixtures` use
-synthetic clients and a preview shell; they do not show a deployed settings page.
+The optional `wallet-store.test.mjs` requires `MISSKEY_BILLING_TEST_DATABASE_URL` for
+a disposable loopback PostgreSQL database. It creates and removes its own random
+schema, tests migration apply/down/reapply, real uniqueness/locking/rollback,
+native account-scoped list and synthetic begin/verify/unlink. CI runs it explicitly
+against its existing test service. Never point this test at a production database.
+
+Frontend tests use the real Misskey controls with synthetic providers and clients:
+
+```sh
+cd packages/frontend
+RAYON_NUM_THREADS=1 pnpm exec vitest run --config vitest.billing.config.js --maxWorkers=1
+```
+
+Successful registration tests use a synthetic signature verifier. They do not prove
+valid wallet-signature interoperability or any live billing integration. No real
+wallet request, signature, key, RPC endpoint or payment is used in these tests.

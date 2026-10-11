@@ -1,6 +1,18 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	AccountWalletsLinkPasskeyOptionsRequest,
+	AccountWalletsLinkPasskeyOptionsResponse,
+	AccountWalletsListRequest,
+	AccountWalletsListResponse,
+	AccountWalletsLinkChainsRequest,
+	AccountWalletsLinkChainsResponse,
+	AccountWalletsLinkBeginRequest,
+	AccountWalletsLinkBeginResponse,
+	AccountWalletsLinkVerifyRequest,
+	AccountWalletsLinkVerifyResponse,
+	AccountWalletsUnlinkRequest,
+	AccountWalletsUnlinkResponse,
 	ChatMessagesCreateToUserRequest,
 	ChatMessagesCreateToUserResponse,
 	ChatMessagesCreateToRoomRequest,
@@ -732,6 +744,12 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };
+	'account/wallets/list': { req: AccountWalletsListRequest; res: AccountWalletsListResponse };
+	'account/wallets/link/chains': { req: AccountWalletsLinkChainsRequest; res: AccountWalletsLinkChainsResponse };
+	'account/wallets/link/begin': { req: AccountWalletsLinkBeginRequest; res: AccountWalletsLinkBeginResponse };
+	'account/wallets/link/verify': { req: AccountWalletsLinkVerifyRequest; res: AccountWalletsLinkVerifyResponse };
+	'account/wallets/unlink': { req: AccountWalletsUnlinkRequest; res: AccountWalletsUnlinkResponse };
 	'clear-browser-cache': { req: EmptyRequest; res: EmptyResponse };
 	'chat/messages/create-to-user': { req: ChatMessagesCreateToUserRequest; res: ChatMessagesCreateToUserResponse };
 	'chat/messages/create-to-room': { req: ChatMessagesCreateToRoomRequest; res: ChatMessagesCreateToRoomResponse };

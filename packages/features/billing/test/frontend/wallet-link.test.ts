@@ -16,10 +16,10 @@ function fixture() {
 	const calls: string[] = [];
 	let currentChain = '0x1';
 	let cancelled = false;
-	const client: WalletClient = {
-		list: vi.fn(async () => []), chains: vi.fn(async () => [chain]), unlink: vi.fn(async () => ({ ok: true as const })),
-		begin: vi.fn(async () => { calls.push('begin'); return challenge; }),
-		verify: vi.fn(async () => { calls.push('verify'); return wallet; }),
+	const client: WalletClient = { passkeyOptions: vi.fn(),
+																																list: vi.fn(async () => []), chains: vi.fn(async () => [chain]), unlink: vi.fn(async () => ({ ok: true as const })),
+																																begin: vi.fn(async () => { calls.push('begin'); return challenge; }),
+																																verify: vi.fn(async () => { calls.push('verify'); return wallet; }),
 	};
 	const request = vi.fn(async (input: { method: string; params?: readonly unknown[] }): Promise<unknown> => {
 		calls.push(input.method);

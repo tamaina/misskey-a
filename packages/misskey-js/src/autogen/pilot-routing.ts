@@ -2,6 +2,420 @@
 import type { AnyContractRouter } from '@orpc/contract';
 
 export default {
+	"wallets": {
+		"passkeyOptions": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"WALLET_CHAIN_UNSUPPORTED": {
+						"status": 400
+					},
+					"WALLET_REAUTHENTICATION_REQUIRED": {
+						"status": 403
+					},
+					"WALLET_ALREADY_LINKED": {
+						"status": 400
+					},
+					"WALLET_CHALLENGE_NOT_FOUND": {
+						"status": 400
+					},
+					"WALLET_SIGNATURE_INVALID": {
+						"status": 400
+					},
+					"WALLET_NOT_FOUND": {
+						"status": 400
+					},
+					"PAYMENT_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "account/wallets/link/passkey-options"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/wallets/link/passkey-options"
+				}
+			}
+		},
+		"list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"WALLET_CHAIN_UNSUPPORTED": {
+						"status": 400
+					},
+					"WALLET_REAUTHENTICATION_REQUIRED": {
+						"status": 403
+					},
+					"WALLET_ALREADY_LINKED": {
+						"status": 400
+					},
+					"WALLET_CHALLENGE_NOT_FOUND": {
+						"status": 400
+					},
+					"WALLET_SIGNATURE_INVALID": {
+						"status": 400
+					},
+					"WALLET_NOT_FOUND": {
+						"status": 400
+					},
+					"PAYMENT_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "account/wallets/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/wallets/list"
+				}
+			}
+		},
+		"chains": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"WALLET_CHAIN_UNSUPPORTED": {
+						"status": 400
+					},
+					"WALLET_REAUTHENTICATION_REQUIRED": {
+						"status": 403
+					},
+					"WALLET_ALREADY_LINKED": {
+						"status": 400
+					},
+					"WALLET_CHALLENGE_NOT_FOUND": {
+						"status": 400
+					},
+					"WALLET_SIGNATURE_INVALID": {
+						"status": 400
+					},
+					"WALLET_NOT_FOUND": {
+						"status": 400
+					},
+					"PAYMENT_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "account/wallets/link/chains"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/wallets/link/chains"
+				}
+			}
+		},
+		"begin": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"WALLET_CHAIN_UNSUPPORTED": {
+						"status": 400
+					},
+					"WALLET_REAUTHENTICATION_REQUIRED": {
+						"status": 403
+					},
+					"WALLET_ALREADY_LINKED": {
+						"status": 400
+					},
+					"WALLET_CHALLENGE_NOT_FOUND": {
+						"status": 400
+					},
+					"WALLET_SIGNATURE_INVALID": {
+						"status": 400
+					},
+					"WALLET_NOT_FOUND": {
+						"status": 400
+					},
+					"PAYMENT_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "account/wallets/link/begin"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/wallets/link/begin"
+				}
+			}
+		},
+		"verify": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"WALLET_CHAIN_UNSUPPORTED": {
+						"status": 400
+					},
+					"WALLET_REAUTHENTICATION_REQUIRED": {
+						"status": 403
+					},
+					"WALLET_ALREADY_LINKED": {
+						"status": 400
+					},
+					"WALLET_CHALLENGE_NOT_FOUND": {
+						"status": 400
+					},
+					"WALLET_SIGNATURE_INVALID": {
+						"status": 400
+					},
+					"WALLET_NOT_FOUND": {
+						"status": 400
+					},
+					"PAYMENT_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "account/wallets/link/verify"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/wallets/link/verify"
+				}
+			}
+		},
+		"unlink": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"WALLET_CHAIN_UNSUPPORTED": {
+						"status": 400
+					},
+					"WALLET_REAUTHENTICATION_REQUIRED": {
+						"status": 403
+					},
+					"WALLET_ALREADY_LINKED": {
+						"status": 400
+					},
+					"WALLET_CHALLENGE_NOT_FOUND": {
+						"status": 400
+					},
+					"WALLET_SIGNATURE_INVALID": {
+						"status": 400
+					},
+					"WALLET_NOT_FOUND": {
+						"status": 400
+					},
+					"PAYMENT_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "account/wallets/unlink"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/wallets/unlink"
+				}
+			}
+		}
+	},
 	"clearBrowserCache": {
 		"~orpc": {
 			"errorMap": {},

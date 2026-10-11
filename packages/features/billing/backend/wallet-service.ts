@@ -7,8 +7,10 @@
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { createPublicClient, getAddress, http, isAddress } from 'viem';
 import { createSiweMessage, generateSiweNonce, verifySiweMessage } from 'viem/siwe';
+import type * as v from 'valibot';
+import type { webAuthnAuthenticationOptionsSchema, webAuthnAuthenticationResponseSchema } from '../../auth/backend/webauthn.schema.js';
 import type { Hex } from 'viem';
-import type { LinkedWallet, WalletChain, walletErrors } from './wallet.contract.js';
+import type { LinkedWallet, WalletChain, walletErrors } from './api.definition.js';
 
 export const WALLET_CHALLENGE_TTL = 10 * 60 * 1000;
 export interface WalletChallenge {
@@ -28,12 +30,14 @@ export interface WalletStore {
 	/** Delete only WHERE id = walletId AND userId = principalId. */
 	unlink(walletId: string, principalId: string): Promise<boolean>;
 }
+export type WalletAuthentication = { currentPassword?: string; twoFactorToken?: string; passkey?: v.InferOutput<typeof webAuthnAuthenticationResponseSchema> };
 export interface WalletDependencies {
+	passkeyOptions?(userId: string): Promise<v.InferOutput<typeof webAuthnAuthenticationOptionsSchema>>;
 	store: WalletStore;
 	/** Server configuration's canonical public origin, never the request Host header. */
 	origin: string;
 	/** Owns the source's sensitive-action reauthentication. Must fail closed until a native adapter is supplied. */
-	reauthenticate(userId: string, input: { currentPassword?: string; twoFactorToken?: string }): Promise<void>;
+	reauthenticate(userId: string, input: WalletAuthentication, credential?: string | null): Promise<void>;
 	/** Enabled source chain catalog with configured RPC; no URLs/credentials in returned DTOs. */
 	chains(): Promise<readonly WalletChain[]>;
 	rpcUrl(chainId: number): Promise<string | null>;
@@ -59,12 +63,17 @@ export const walletProof = {
 
 export function createWalletService(deps: WalletDependencies) {
 	const origin = new URL(deps.origin);
-	if (origin.protocol !== 'https:' || origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash) {
-		throw new Error('Wallet registration requires a canonical HTTPS origin');
+
+	function requireSecureOrigin() {
+		if (origin.protocol !== 'https:' || origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash) {
+			throw new Error('Wallet registration requires a canonical HTTPS origin');
+		}
 	}
+
 	return {
-		async begin(userId: string, input: { chainId: number; address: string; currentPassword?: string; twoFactorToken?: string }) {
-			await deps.reauthenticate(userId, input);
+		async begin(userId: string, input: { chainId: number; address: string } & WalletAuthentication, credential?: string | null) {
+			requireSecureOrigin();
+			await deps.reauthenticate(userId, input, credential);
 			if (!await deps.rpcUrl(input.chainId)) throw walletError('WALLET_CHAIN_UNSUPPORTED');
 			if (!isAddress(input.address)) throw walletError('PAYMENT_TRANSACTION_INVALID');
 			const address = input.address.toLowerCase();
@@ -90,6 +99,7 @@ export function createWalletService(deps: WalletDependencies) {
 			return { nonce, message };
 		},
 		async verify(userId: string, input: { nonce: string; message: string; signature: string }) {
+			requireSecureOrigin();
 			const challenge = await deps.store.getChallenge(input.nonce, userId);
 			const now = deps.now();
 			if (!challenge || challenge.nonce !== input.nonce || challenge.userId !== userId || challenge.usedAt !== null || challenge.expiresAt <= now

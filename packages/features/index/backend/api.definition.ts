@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { walletContract } from '../../billing/backend/api.definition.js';
 import { instanceApiContract } from '../../instance/backend/api.definition.js';
 import { statisticsContract } from '../../statistics/backend/endpoints/statistics.contract.js';
 import { discoveryContract } from '../../discovery/backend/endpoints/discovery.contract.js';
@@ -35,6 +36,7 @@ import { rolesContract } from '../../roles/backend/api.definition.js';
 import { clearBrowserCacheContract, clearBrowserCacheGetContract } from '../../api/backend/endpoints/clear-browser-cache.contract.js';
 
 export const pilotContract: {
+	wallets: typeof walletContract;
 	clearBrowserCache: typeof clearBrowserCacheContract;
 	clearBrowserCacheGet: typeof clearBrowserCacheGetContract;
 	chat: typeof chatApiContract;
@@ -67,6 +69,7 @@ export const pilotContract: {
 	collections: typeof collectionsContract;
 	drive: typeof drivePilotContract;
 } = {
+	wallets: walletContract,
 	clearBrowserCache: clearBrowserCacheContract,
 	clearBrowserCacheGet: clearBrowserCacheGetContract,
 	chat: chatApiContract,

@@ -13,8 +13,8 @@ import type { WalletClient } from '../../frontend/wallet-client.js';
 const wallet = { id: 'wallet1', address: '0x0000000000000000000000000000000000000001', chainId: 123456, label: null, createdAt: 1, updatedAt: 1 };
 const chain = { chainId: 123456, name: 'Synthetic chain', nativeCurrencyName: 'Test', nativeCurrencySymbol: 'TEST', nativeCurrencyDecimals: 18, blockExplorerUrl: null };
 
-async function fixture(confirm = true) {
-	const client: WalletClient = { list: vi.fn(async () => [wallet]), chains: vi.fn(async () => [chain]),
+async function fixture(confirm = true, authenticateWithPasskey?: () => Promise<NonNullable<Parameters<WalletClient['begin']>[0]['passkey']>>) {
+	const client: WalletClient = { passkeyOptions: vi.fn(), list: vi.fn(async () => [wallet]), chains: vi.fn(async () => [chain]),
 																																begin: vi.fn(async () => ({ nonce: 'nonce0001', message: 'Synthetic ownership proof' })),
 																																verify: vi.fn(async () => wallet), unlink: vi.fn(async () => ({ ok: true as const })),
 	};
@@ -24,11 +24,14 @@ async function fixture(confirm = true) {
 		if (input.method === 'personal_sign') return '0x1234';
 		throw new Error('Unexpected request');
 	});
+	const listeners = new Map<string, () => void>();
+	const on = vi.fn((event: string, callback: () => void) => { listeners.set(event, callback); });
+	const removeListener = vi.fn((event: string) => { listeners.delete(event); });
 	const confirmUnlink = vi.fn(async () => confirm);
-	const app = createApp(WalletSettings, { client, connectors: [{ id: 'synthetic', name: 'Synthetic wallet', provider: { request } }], confirmUnlink });
+	const app = createApp(WalletSettings, { client, connectors: [{ id: 'synthetic', name: 'Synthetic wallet', provider: { request, on, removeListener } }], confirmUnlink, authenticateWithPasskey });
 	const i18n = createInternationalization({ initialLocale: 'ja-JP' }); await i18n.ready; app.use(i18n);
 	const element = window.document.createElement('div'); window.document.body.append(element); app.mount(element);
-	return { client, request, confirmUnlink, element, dispose: () => { app.unmount(); element.remove(); } };
+	return { client, request, confirmUnlink, listeners, removeListener, element, dispose: () => { app.unmount(); element.remove(); } };
 }
 
 async function flush() { for (let i = 0; i < 10; i++) { await Promise.resolve(); await nextTick(); } }
@@ -61,5 +64,31 @@ test('cancelled unlink does not delete; rejected signing does not register or ex
 		button(f.element, 'Synthetic wallet').click(); await flush();
 		expect(f.client.verify).not.toHaveBeenCalled(); expect(f.element.querySelector('[role="alert"]')).not.toBeNull();
 		expect(f.element.textContent).not.toContain('sensitive synthetic error');
+	} finally { f.dispose(); }
+});
+
+test('account/chain/disconnect changes clear the page connection and dispose provider listeners', async () => {
+	const f = await fixture();
+	try {
+		await flush(); button(f.element, 'Synthetic wallet').click(); await flush();
+		expect(f.element.textContent).toContain('接続中'); expect(f.listeners.size).toBe(3);
+		f.listeners.get('accountsChanged')!(); await flush();
+		expect(f.element.textContent).not.toContain('接続中'); expect(f.listeners.size).toBe(0);
+		button(f.element, 'Synthetic wallet').click(); await flush(); expect(f.listeners.size).toBe(3);
+	} finally { f.dispose(); }
+	expect(f.listeners.size).toBe(0);
+});
+
+test('native passkey response is forwarded to registration and cleared after use', async () => {
+	const passkey = { id: 'synthetic-key', rawId: 'synthetic', type: 'public-key' as const, clientExtensionResults: {},
+		response: { clientDataJSON: 'synthetic', authenticatorData: 'synthetic', signature: 'synthetic' } };
+	const authenticate = vi.fn(async () => passkey);
+	const f = await fixture(true, authenticate);
+	try {
+		await flush(); button(f.element, 'パスキーで再認証').click(); await flush();
+		expect(authenticate).toHaveBeenCalledOnce(); expect(f.element.textContent).toContain('パスキーの応答');
+		button(f.element, 'Synthetic wallet').click(); await flush();
+		expect(f.client.begin).toHaveBeenCalledWith({ chainId: 123456, address: wallet.address, passkey });
+		expect(f.element.textContent).not.toContain('パスキーの応答');
 	} finally { f.dispose(); }
 });

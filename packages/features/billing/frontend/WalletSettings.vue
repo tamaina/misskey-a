@@ -26,6 +26,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #label>{{ $locale.sfc.register }}</template>
 		<div class="_gaps_m">
 			<MkSelect v-model="chainId" :items="chainItems" :disabled="busy || !chains.length"><template #label>{{ $locale.sfc.chain }}</template></MkSelect>
+			<MkButton v-if="authenticateWithPasskey" rounded :disabled="busy" @click="authenticatePasskey">{{ $locale.sfc.passkey }}</MkButton>
+			<MkInfo v-if="passkey">{{ $locale.sfc.passkeyReady }}</MkInfo>
 			<MkInput v-model="password" type="password" autocomplete="current-password" :disabled="busy"><template #label>{{ $locale.sfc.password }}</template></MkInput>
 			<MkInput v-model="twoFactorToken" autocomplete="one-time-code" :disabled="busy"><template #label>{{ $locale.sfc.twoFactor }}</template></MkInput>
 			<MkInfo v-if="!connectors.length" warn>{{ $locale.sfc.noWallet }}</MkInfo>
@@ -45,10 +47,10 @@ import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
-import { computed, onBeforeUnmount, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { linkWallet, WalletLinkCancelled } from './wallet-link.js';
-import type { LinkedWallet, WalletChain } from '../backend/wallet.contract.js';
-import type { ConnectedWallet, WalletClient, WalletConnector } from './wallet-client.js';
+import type { LinkedWallet, WalletChain } from '../backend/api.definition.js';
+import type { ConnectedWallet, WalletAuthInput, WalletClient, WalletConnector, WalletProvider } from './wallet-client.js';
 import type { WalletStep } from './wallet-link.js';
 
 const props = defineProps<{
@@ -56,11 +58,13 @@ const props = defineProps<{
 	connectors: readonly WalletConnector[];
 	/** Host binds Misskey's native confirmation dialog; cancellation returns false. */
 	confirmUnlink(wallet: LinkedWallet): Promise<boolean>;
+	authenticateWithPasskey?(): Promise<NonNullable<WalletAuthInput['passkey']>>;
 }>();
 const wallets = ref<LinkedWallet[]>([]);
 const chains = ref<WalletChain[]>([]);
 const chainItems = computed(() => chains.value.map(chain => ({ value: chain.chainId, label: `${chain.name} (${chain.chainId})` })));
 const chainId = ref<number | null>(null);
+const passkey = ref<WalletAuthInput['passkey']>();
 const password = ref('');
 const twoFactorToken = ref('');
 const busy = ref(false);
@@ -69,7 +73,25 @@ const registered = ref(false);
 const step = ref<WalletStep | null>(null);
 const connection = ref<ConnectedWallet | null>(null);
 let cancelled = false;
-onBeforeUnmount(() => { cancelled = true; });
+let detachProvider = () => {};
+onMounted(load);
+onBeforeUnmount(() => { cancelled = true; detachProvider(); });
+
+function clearConnection() { connection.value = null; detachProvider(); }
+
+function observeProvider(provider: WalletProvider) {
+	detachProvider();
+	const events = ['accountsChanged', 'chainChanged', 'disconnect'] as const;
+	for (const event of events) provider.on?.(event, clearConnection);
+	detachProvider = () => { for (const event of events) provider.removeListener?.(event, clearConnection); };
+}
+
+async function authenticatePasskey() {
+	if (busy.value || !props.authenticateWithPasskey) return;
+	busy.value = true; error.value = false;
+	try { passkey.value = await props.authenticateWithPasskey(); password.value = ''; twoFactorToken.value = ''; } catch { passkey.value = undefined; error.value = true; } finally { busy.value = false; }
+}
+
 const sortedWallets = computed(() => [...wallets.value].sort((a, b) => Number(isConnected(b)) - Number(isConnected(a))));
 
 function isConnected(wallet: LinkedWallet): boolean {
@@ -104,16 +126,17 @@ async function link(connector: WalletConnector): Promise<void> {
 			connector,
 			chain,
 			auth: {
+				...(passkey.value ? { passkey: passkey.value } : {}),
 				...(password.value ? { currentPassword: password.value } : {}),
 				...(twoFactorToken.value ? { twoFactorToken: twoFactorToken.value } : {}),
 			},
 			cancelled: () => cancelled,
 			progress: value => { step.value = value; },
-			connected: value => { connection.value = value; },
+			connected: value => { connection.value = value; observeProvider(connector.provider); },
 		});
 		wallets.value = [wallet, ...wallets.value.filter(value => value.id !== wallet.id)];
 		registered.value = true;
-	} catch (cause) { if (!(cause instanceof WalletLinkCancelled)) error.value = true; } finally { password.value = ''; twoFactorToken.value = ''; busy.value = false; step.value = null; }
+	} catch (cause) { if (!(cause instanceof WalletLinkCancelled)) error.value = true; } finally { passkey.value = undefined; password.value = ''; twoFactorToken.value = ''; busy.value = false; step.value = null; }
 }
 
 async function unlink(wallet: LinkedWallet): Promise<void> {
@@ -124,7 +147,7 @@ async function unlink(wallet: LinkedWallet): Promise<void> {
 		if (!await props.confirmUnlink(wallet)) return;
 		await props.client.unlink({ walletId: wallet.id });
 		wallets.value = wallets.value.filter(value => value.id !== wallet.id);
-		if (isConnected(wallet)) connection.value = null;
+		if (isConnected(wallet)) clearConnection();
 	} catch { error.value = true; } finally { busy.value = false; }
 }
 </script>
@@ -147,6 +170,8 @@ async function unlink(wallet: LinkedWallet): Promise<void> {
 	"registered": "ウォレットを登録しました。",
 	"chain": "チェーン",
 	"password": "現在のパスワード",
+	"passkey": "パスキーで再認証",
+	"passkeyReady": "パスキーの応答を受け取りました。ウォレットの登録に進んでください。",
 	"twoFactor": "二段階認証コード（有効な場合）",
 	"noWallet": "利用できるウォレットがありません。",
 	"link": "で登録",

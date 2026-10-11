@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { WalletChain, LinkedWallet } from '../backend/wallet.contract.js';
-import type { ConnectedWallet, WalletClient, WalletConnector } from './wallet-client.js';
+import type { WalletChain, LinkedWallet } from '../backend/api.definition.js';
+import type { ConnectedWallet, WalletAuthInput, WalletClient, WalletConnector } from './wallet-client.js';
 
 export type WalletStep = 'connect' | 'switch' | 'sign' | 'verify';
 export class WalletLinkCancelled extends Error { }
@@ -14,7 +14,7 @@ export class WalletLinkCancelled extends Error { }
  * Cancellation stops the next step; it cannot undo an already submitted verify request. */
 export async function linkWallet(input: {
 	client: WalletClient; connector: WalletConnector; chain: WalletChain;
-	auth: { currentPassword?: string; twoFactorToken?: string };
+	auth: WalletAuthInput;
 	cancelled(): boolean; progress(step: WalletStep): void; connected(wallet: ConnectedWallet): void;
 }): Promise<LinkedWallet> {
 	function check(): void { if (input.cancelled()) throw new WalletLinkCancelled(); }
