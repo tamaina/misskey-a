@@ -50,6 +50,9 @@ import { ApQuestionService } from '@features/federation/backend/services/ApQuest
 
 import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
 
+import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
+import { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';
+import { AntennaEventSubscriptionService } from '@features/timelines/backend/services/AntennaEventSubscriptionService.js';
 import { AntennaService } from '@features/timelines/backend/services/AntennaService.js';
 
 import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
@@ -213,6 +216,9 @@ const services = [
 	['ApQuestionService', ApQuestionService, 7],
 	['AnnouncementService', AnnouncementService, 7],
 	['AntennaService', AntennaService, 8],
+	['AntennaNoteAccessService', AntennaNoteAccessService, 1],
+	['NoteStreamingHidingService', NoteStreamingHidingService, 2],
+	['AntennaEventSubscriptionService', AntennaEventSubscriptionService, 4],
 	['AvatarDecorationService', AvatarDecorationService, 5],
 	['CaptchaService', CaptchaService, 3],
 	['ChannelFollowingService', ChannelFollowingService, 6],

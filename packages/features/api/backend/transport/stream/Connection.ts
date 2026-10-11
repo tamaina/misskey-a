@@ -384,6 +384,12 @@ export default class Connection {
 		return true;
 	}
 
+	public async packAntennaNote(id: string, noteId: string) {
+		const channel = this.channels.get(id);
+		if (this.disposed || !(channel instanceof AntennaChannel)) return null;
+		return channel.packNote(noteId);
+	}
+
 	@bindThis
 	public getChannelConstructor(name: string): ChannelConstructor<boolean> {
 		switch (name) {

@@ -32,7 +32,7 @@ try {
 	while (!existsSync(socket) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 100));
 	if (!existsSync(socket)) throw new Error('Synthetic Redis socket did not become ready');
 	run(process.execPath, ['--max-old-space-size=1536', 'packages/backend/node_modules/vitest/vitest.mjs', 'run',
-		'--config', 'packages/features/auth/test/vitest.oauth-fixture.config.mjs'],
+		'--config', process.env.MISSKEY_REDIS_FIXTURE_CONFIG ?? 'packages/features/auth/test/vitest.oauth-fixture.config.mjs'],
 	{ ...process.env, NODE_ENV: 'test', MISSKEY_OAUTH_REDIS_SOCKET: socket });
 } finally {
 	if (started) run('docker', ['rm', '--force', container]);

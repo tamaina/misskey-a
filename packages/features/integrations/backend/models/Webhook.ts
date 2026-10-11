@@ -6,6 +6,7 @@
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
+import { MiAntenna } from '@features/timelines/backend/models/Antenna.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { webhookEventTypes } from '../webhook-events.schema.js';
 import type { WebhookEventTypes } from '../webhook-events.schema.js';
@@ -69,6 +70,14 @@ export class MiWebhook {
 	@ManyToOne(() => MiAccessToken, { onDelete: 'CASCADE', nullable: true })
 	@JoinColumn({ name: 'mcpTokenId', foreignKeyConstraintName: 'FK_webhook_mcpTokenId' })
 	public mcpToken: MiAccessToken | null;
+
+	@Index('IDX_webhook_mcpAntennaId')
+	@Column({ ...id(), nullable: true })
+	public mcpAntennaId: string | null;
+
+	@ManyToOne(() => MiAntenna, { onDelete: 'CASCADE', nullable: true })
+	@JoinColumn({ name: 'mcpAntennaId', foreignKeyConstraintName: 'FK_webhook_mcpAntennaId' })
+	public mcpAntenna: MiAntenna | null;
 
 	@Column('timestamp with time zone', { nullable: true })
 	public mcpExpiresAt: Date | null;
