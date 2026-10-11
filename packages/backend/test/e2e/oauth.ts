@@ -83,13 +83,14 @@ function getMeta(html: string): { transactionId: string | undefined, clientName:
 	};
 }
 
-function fetchDecision(transactionId: string, user: misskey.entities.SignupResponse, { cancel }: { cancel?: boolean } = {}): Promise<Response> {
+function fetchDecision(transactionId: string, user: misskey.entities.SignupResponse, { cancel, selectedScope }: { cancel?: boolean; selectedScope?: string } = {}): Promise<Response> {
 	return fetch(new URL('/oauth/decision', host), {
 		method: 'post',
 		body: new URLSearchParams({
 			transaction_id: transactionId,
 			login_token: user.token,
 			cancel: cancel ? 'cancel' : '',
+			...(selectedScope === undefined ? {} : { selected_scope: selectedScope }),
 		}),
 		redirect: 'manual',
 		headers: {
@@ -502,35 +503,52 @@ describe('OAuth', () => {
 
 	// https://datatracker.ietf.org/doc/html/rfc6749.html#section-3.3
 	describe('Scope', () => {
-		// "If the client omits the scope parameter when requesting
-		// authorization, the authorization server MUST either process the
-		// request using a pre-defined default value or fail the request
-		// indicating an invalid scope."
-		// (And Misskey does the latter)
-		test('Missing scope', async () => {
-			const client = new AuthorizationCode(clientConfig);
+		// Missing and empty scopes require an explicit selection rather than a default grant.
+		for (const scope of [undefined, '']) {
+			test(`${scope === undefined ? 'Missing' : 'Empty'} scope grants only explicitly selected permissions`, async () => {
+				const client = new AuthorizationCode(clientConfig);
+				const { code_challenge, code_verifier } = await pkceChallenge(128);
+				const response = await fetch(client.authorizeURL({
+					redirect_uri,
+					...(scope === undefined ? {} : { scope }),
+					state: 'state',
+					code_challenge,
+					code_challenge_method: 'S256',
+				} as AuthorizationParamsExtended), { redirect: 'manual' });
+				assert.strictEqual(response.status, 200);
+				const html = await response.text();
+				const doc = htmlParser.parse(html);
+				assert.strictEqual(doc.querySelector('meta[name="misskey:oauth:scope"]')?.attributes.content, '');
+				const selectable = doc.querySelector('meta[name="misskey:oauth:selectable-permissions"]')?.attributes.content.split(' ') ?? [];
+				assert.ok(selectable.includes('read:account'));
+				assert.ok(!selectable.includes('access:mcp'));
+				const { transactionId } = getMeta(html);
+				assert.ok(transactionId);
+				const decision = await fetchDecision(transactionId, alice, { selectedScope: 'read:account' });
+				assert.strictEqual(decision.status, 302);
+				const location = decision.headers.get('location');
+				assert.ok(location);
+				const code = new URL(location).searchParams.get('code');
+				assert.ok(code);
+				const token = await client.getToken({ code, redirect_uri, code_verifier } as AuthorizationTokenConfigExtended);
+				assert.strictEqual(token.token.scope, 'read:account');
+			});
 
-			const response = await fetch(client.authorizeURL({
-				redirect_uri,
-				state: 'state',
-				code_challenge: 'A'.repeat(43),
-				code_challenge_method: 'S256',
-			} as AuthorizationParamsExtended), { redirect: 'manual' });
-			assertIndirectError(response, 'invalid_scope');
-		});
-
-		test('Empty scope', async () => {
-			const client = new AuthorizationCode(clientConfig);
-
-			const response = await fetch(client.authorizeURL({
-				redirect_uri,
-				scope: '',
-				state: 'state',
-				code_challenge: 'A'.repeat(43),
-				code_challenge_method: 'S256',
-			} as AuthorizationParamsExtended), { redirect: 'manual' });
-			assertIndirectError(response, 'invalid_scope');
-		});
+			test(`${scope === undefined ? 'Missing' : 'Empty'} scope cannot issue a grant without selection`, async () => {
+				const client = new AuthorizationCode(clientConfig);
+				const response = await fetch(client.authorizeURL({
+					redirect_uri,
+					...(scope === undefined ? {} : { scope }),
+					state: 'state',
+					code_challenge: 'A'.repeat(43),
+					code_challenge_method: 'S256',
+				} as AuthorizationParamsExtended));
+				assert.strictEqual(response.status, 200);
+				const decision = await fetchDecisionFromResponse(response, alice);
+				assert.strictEqual(decision.status, 400);
+				assert.strictEqual((await decision.json() as { error: string }).error, 'invalid_scope');
+			});
+		}
 
 		test('Unknown scopes', async () => {
 			const client = new AuthorizationCode(clientConfig);
@@ -1080,7 +1098,6 @@ describe('OAuth', () => {
 					await assertDirectError(response, 400, 'invalid_request');
 				});
 			});
-
 
 			test('Disallow loopback', async () => {
 				await sendEnvUpdateRequest({ key: 'MISSKEY_TEST_CHECK_IP_RANGE', value: '1' });
