@@ -13,6 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				:icon="logo"
 				:permissions="permissions"
 				:selectablePermissions="selectablePermissions"
+				:selectablePermissionsLabel="permissions.length > 0 ? $locale.sfc.additionalPermissions : undefined"
 				:waitOnDeny="true"
 				@accept="onAccept"
 				@deny="onDeny"
@@ -113,3 +114,15 @@ definePage(() => ({
 	overflow-y: scroll;
 }
 </style>
+
+<locale locale="ja-JP" lang="json">
+{
+	"additionalPermissions": "追加で許可するAPI権限（任意）"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"additionalPermissions": "Additional API permissions (optional)"
+}
+</locale>

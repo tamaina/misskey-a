@@ -628,7 +628,11 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					clientName: clientInfo.name,
 					clientLogo: clientInfo.logo ?? undefined,
 					scope: authorizationRequest.scopes,
-					selectablePermissions: authorizationRequest.scopes.length === 0 ? eligibleOAuthPermissions(authorizationRequest.resource, true) : undefined,
+					selectablePermissions: authorizationRequest.scopes.length === 0
+						? eligibleOAuthPermissions(authorizationRequest.resource, true)
+						: authorizationRequest.resource === new URL('/mcp', this.config.url).href
+							? eligibleOAuthPermissions(authorizationRequest.resource, true).filter(scope => scope !== 'access:mcp' && !authorizationRequest.scopes.includes(scope))
+							: undefined,
 				}));
 			} catch (error) {
 				const OAuthProviderError = normalizeOAuthProviderError(error);
@@ -674,8 +678,10 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 
 				this.#logger.info('Checking user consent');
 				const user = await this.#findUserByLoginToken(loginToken);
+				const allowAdditions = transaction.request.resource === new URL('/mcp', this.config.url).href;
 				const scopes = selectedOAuthScopes(transaction.request.scopes, body.selected_scope,
-					eligibleOAuthPermissions(transaction.request.resource, transaction.request.scopes.length === 0 && await this.roleService.isAdministrator(user)));
+					eligibleOAuthPermissions(transaction.request.resource,
+						(transaction.request.scopes.length === 0 || allowAdditions) && await this.roleService.isAdministrator(user)), allowAdditions);
 				this.#validateResource(transaction.request.resource, scopes);
 
 				this.#logger.info('Issuing authorization code after consent');
