@@ -80,6 +80,8 @@ test.each([[true, 'body { color: red; }'], [false, ''], [false, null]])('loader 
 
 // Audit every main-client SFC module, including new sources outside the frozen
 // path table. An unrelated class must never acquire any of these 15 hashes.
+// Parsing every localized SFC exceeds the default 5s under coverage; keep a
+// bounded 30s budget for this exhaustive audit without reducing its scope.
 test('reported selectors have one actual module owner across the main frontend', () => {
 	const owners = new Map<string, Set<string>>(targets.map(target => [target[2], new Set()]));
 	for (const base of [resolve(frontendRoot, 'src'), resolve(frontendRoot, '../features')]) {
@@ -95,4 +97,4 @@ test('reported selectors have one actual module owner across the main frontend',
 		}
 	}
 	for (const [component, key, selector] of targets) expect([...owners.get(selector)!]).toEqual([`${resolve(frontendRoot, sourceFile(component))}.${key}`]);
-});
+}, 30000);
