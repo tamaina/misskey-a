@@ -27,11 +27,10 @@ export function endpointPolicies(contract: unknown) {
 		}
 		if (!isContractProcedure(node)) throw new Error('Missing API procedure');
 		const meta: ApiProcedureMetadata = node['~orpc'].meta;
-		// Auth issuance/session management and administrative capabilities need separate review.
+		// Auth issuance/session management remains outside the scoped MCP boundary.
 		// This boundary uses contract ownership and native policy, not a parallel endpoint whitelist.
 		const mcpSupported = route.path[0] !== 'auth' && route.path[0] !== 'integrations' && !route.multipart && !route.ignoreBody
-			&& !(meta.requireCredential && !meta.kind) && !meta.secure && !meta.requireAdmin && !meta.requireModerator
-			&& !meta.kind?.startsWith('read:admin') && !meta.kind?.startsWith('write:admin');
+			&& !((meta.requireCredential || meta.requireAdmin || meta.requireModerator) && !meta.kind) && !meta.secure;
 		return { name: route.name, policy: { ...meta, name: route.name }, mcpSupported };
 	});
 }

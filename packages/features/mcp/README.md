@@ -64,7 +64,7 @@ body-reading timeouts remain its responsibility.
 the same handler, disabled by default, with explicit HTTP loopback resource,
 request logging/proxy trust disabled and its existing 30-second request timeout.
 
-Only `list_my_notes` is listed. Its descriptive schema comes from the native
+`list_my_notes`, `list_api_endpoints` and `call_api` are listed. Its descriptive schema comes from the native
 contract; native validation remains authoritative. `McpApiService` reuses the
 shared API context, original AuthenticateService tuple, assembled router and
 existing feature repositories. It retains authentication only within each HTTP
@@ -85,7 +85,7 @@ all native permissions on the client's behalf or update existing tokens.
 existing tokens without this permission are denied. The connection gate reads
 current shared token/app records on every POST and tool invocation, so revocation
 or removal of this permission takes effect without trusting the native app cache.
-The original nonnull authentication tuple is passed unchanged to native API checks;
+The nonnull scoped grant identity and fresh native permissions are passed to native API checks;
 this permission adds no downstream API permissions or visibility. App tokens use
 the current app permission list for the connection gate.
 
@@ -95,7 +95,7 @@ are unchanged. The shared permission registry makes this kind selectable in toke
 MiAuth, app and OAuth consent flows. Consent labels explain nonpublic-note access.
 The six existing permission displays translate this label in all 28 SFC locales.
 The legacy global YAML dictionaries retain Japanese fallback until Crowdin updates.
-Note content is untrusted data. Foreign subjects are denied before native invocation. Observed disconnect,
+Note content is untrusted data. The compatibility `list_my_notes` tool denies foreign subjects before native invocation; generic API calls retain native visibility checks. Observed disconnect,
 deadline and shutdown suppress the transport response and release transport
 state; they do not actively cancel SQL or guarantee that native work stops. Disconnect observation
 starts before authentication. Detached work inside existing native services is
@@ -155,3 +155,21 @@ fixture now executes the same normal-server plugin with real native SQL/serializ
 and revocation ports. Full application boot, live network/proxy behavior and real
 client/account grants remain outside these fixtures. This small transport does
 not complete every acceptance criterion of #10.
+
+Administrative APIs are available through discovery and `call_api` when the
+native permission and current administrator, moderator or role policy both allow
+them. MCP reads the account, grant/app permissions, role definitions and unexpired
+assignments afresh for each invocation. Role/policy results are reused only within
+that invocation; ordinary HTTP cache behavior is unchanged. Native middleware and
+handlers still enforce input, limits, visibility, sensitive-target restrictions and
+moderation logging. Administrative permissions may expose instance configuration
+(including configuration secrets through `admin/meta`) or permit instance-wide
+writes; grant only the native scopes the client needs.
+
+Auth-owned credential/session operations, integrations/webhooks, `secure` session
+APIs, credential/role-required APIs with no native scope, multipart and raw HTTP
+routes remain unsupported. API tags are documentation, not authorization gates.
+Discovery lists policy candidates and cannot evaluate handler-only runtime
+conditions: for example `reset-db` rejects a non-test runtime before deleting data,
+while `test` only returns validated input. Neither endpoint is invoked by the
+administrative test fixture.

@@ -27,6 +27,8 @@ export interface ApiRequestContext {
 	response?: { header(name: string, value: string): void };
 	/** Transport hygiene only: omit sensitive diagnostics from MCP logs and wire errors. */
 	safeDiagnostics?: boolean;
+	/** Read current authorization state for each MCP operation, without shared role caches. */
+	freshAuthorization?: boolean;
 }
 
 @Injectable()
@@ -45,12 +47,25 @@ export class ApiExecutionContextFactory {
 
 	create(request: ApiRequestContext, name: string): ApiExecutionContext<MiLocalUser> {
 		const { credential, upload } = request;
+		const fresh = request.freshAuthorization === true;
+		const roleReads = new Map<string, ReturnType<RoleService['getUserRoles']>>();
+		const policyReads = new Map<string, ReturnType<RoleService['getUserPolicies']>>();
+		const readRoles = (id: string) => {
+			if (!fresh) return this.roles.getUserRoles(id);
+			if (!roleReads.has(id)) roleReads.set(id, this.roles.getUserRoles(id, true));
+			return roleReads.get(id)!;
+		};
+		const readPolicies = (id: string) => {
+			if (!fresh) return this.roles.getUserPolicies(id);
+			if (!policyReads.has(id)) policyReads.set(id, this.roles.getUserPolicies(id, true));
+			return policyReads.get(id)!;
+		};
 		return {
 			authorization: {
 				rootUserId: () => this.settings.rootUserId,
-				roles: actor => this.roles.getUserRoles(actor.id),
+				roles: actor => readRoles(actor.id),
 				policyAllowed: async (actor, key) => {
-					const policies = await this.roles.getUserPolicies(actor.id);
+					const policies = await readPolicies(actor.id);
 					return Boolean(Object.entries(policies).find(([name]) => name === key)?.[1]);
 				},
 			},
@@ -78,7 +93,7 @@ export class ApiExecutionContextFactory {
 					}
 					return getIpHash(ip);
 				},
-				rateLimitFactor: async actor => (await this.roles.getUserPolicies(actor.id)).rateLimitFactor,
+				rateLimitFactor: async actor => (await readPolicies(actor.id)).rateLimitFactor,
 				limit: async (limit, actor, factor) => {
 					const result = await this.limiter.limit(limit, actor, factor);
 					return result === null ? null : { info: { ...result.info } };
