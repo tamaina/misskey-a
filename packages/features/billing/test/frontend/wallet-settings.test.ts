@@ -18,7 +18,7 @@ async function fixture(confirm = true, authenticateWithPasskey?: () => Promise<N
 																																begin: vi.fn(async () => ({ nonce: 'nonce0001', message: 'Synthetic ownership proof' })),
 																																verify: vi.fn(async () => wallet), unlink: vi.fn(async () => ({ ok: true as const })),
 	};
-	const request = vi.fn(async (input: { method: string }) => {
+	const request = vi.fn(async (input: { method: string }): Promise<unknown> => {
 		if (input.method === 'eth_requestAccounts') return [wallet.address];
 		if (input.method === 'eth_chainId') return '0x1e240';
 		if (input.method === 'personal_sign') return '0x1234';
