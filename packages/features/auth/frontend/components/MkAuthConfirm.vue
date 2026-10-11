@@ -62,6 +62,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</ul>
 				</div>
 			</div>
+			<div v-if="selectablePermissionsLabel && selectablePermissions" :class="$style.accountSelectorLabel">{{ selectablePermissionsLabel }}</div>
 			<MkPermissionSelect v-if="selectablePermissions" v-model="selectedPermissions" :permissions="selectablePermissions"
 				:administrator="selectedAdministrator" :labels="copyLocaleDictionary($locale.sfc.permissionsLabels)"
 				:disableAllText="$locale.sfc.disableAll" :enableAllText="$locale.sfc.enableAll" :adminPermissionText="$locale.sfc.adminPermission"/>
@@ -82,7 +83,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div class="_buttonsCenter">
 				<MkButton rounded @click="clickCancel">{{ $locale.sfc.reject }}</MkButton>
-				<MkButton rounded gradate :disabled="selectablePermissions !== undefined && selectedPermissions.length === 0" @click="clickAccept">{{ $locale.sfc.accept }}</MkButton>
+				<MkButton rounded gradate :disabled="selectablePermissions !== undefined && !permissions?.length && selectedPermissions.length === 0" @click="clickAccept">{{ $locale.sfc.accept }}</MkButton>
 			</div>
 		</div>
 		<div v-else-if="phase === 'success'" key="success" :class="$style.root" class="_gaps_s">
@@ -135,6 +136,7 @@ const props = defineProps<{
 	icon?: string;
 	permissions?: (typeof Misskey.permissions[number])[];
 	selectablePermissions?: string[];
+	selectablePermissionsLabel?: string;
 	manualWaiting?: boolean;
 	waitOnDeny?: boolean;
 }>();

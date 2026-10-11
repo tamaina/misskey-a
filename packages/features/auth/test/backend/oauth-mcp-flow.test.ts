@@ -383,7 +383,7 @@ describe.skipIf(!socket)('user selection for an empty OAuth scope', () => {
 	it('keeps a nonempty unknown request invalid, and rejects selection injection into an explicit request', async () => {
 		const s = await setup(); const unknown = await s.begin({ scope: 'bogus' });
 		expect(new URL(unknown.page.headers.location!).searchParams.get('error')).toBe('invalid_scope');
-		const flow = await s.begin(); expect(flow.page.body).not.toContain('misskey:oauth:selectable-permissions');
+		const flow = await s.begin({ scope: 'read:account', resource: '' }); expect(flow.page.body).not.toContain('misskey:oauth:selectable-permissions');
 		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
 		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: 'access:mcp write:notes' } });
 		expect(decision.statusCode).toBe(400); expect(s.f.rows.size).toBe(2);
@@ -405,5 +405,55 @@ describe.skipIf(!socket)('user selection for an empty OAuth scope', () => {
 		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
 		const denied = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: 'access:mcp' } });
 		expect(denied.statusCode).toBe(400);
+	});
+});
+
+describe.skipIf(!socket)('optional native API permissions for explicit MCP consent', () => {
+	it.each([
+		['access:mcp', undefined, 'access:mcp'],
+		['access:mcp', '', 'access:mcp'],
+		['access:mcp', 'read:account write:notes read:account', 'access:mcp read:account write:notes'],
+		['access:mcp read:account', 'write:notes', 'access:mcp read:account write:notes'],
+		['read:account', 'write:notes', 'read:account write:notes'],
+	])('preserves requested %s and grants only optional %s', async (scope, selected, expected) => {
+		const s = await setup(); const flow = await s.begin({ scope: scope! });
+		expect(flow.page.statusCode).toBe(200);
+		const selectable = flow.page.body.match(/name="misskey:oauth:selectable-permissions" content="([^"]*)"/)?.[1]?.split(' ');
+		expect(selectable).toContain('write:notes');
+		for (const requested of scope!.split(' ')) expect(selectable).not.toContain(requested);
+		expect(selectable).not.toContain('access:mcp');
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, ...(selected === undefined ? {} : { selected_scope: selected }) } });
+		expect(decision.statusCode).toBe(302);
+		const code = new URL(decision.headers.location!).searchParams.get('code')!;
+		const token = await s.exchange({ ...flow, code });
+		expect(token.scope).toBe(expected);
+		expect([...s.f.rows.values()].find(row => row.token === token.access_token)?.permission).toEqual(expected!.split(' '));
+		const replay = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: 'write:notes' } });
+		expect(replay.statusCode).toBe(403);
+	});
+	it.each(['bogus', 'access:mcp', 'write:admin:meta', ['write:notes']])('rejects ineligible optional selection %j', async selected => {
+		const s = await setup(); const flow = await s.begin();
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: selected } });
+		expect(decision.statusCode).toBe(400); expect(s.f.rows.size).toBe(2);
+	});
+	it.each(['access:mcp', 'access:mcp write:admin:meta'])('rechecks administrator authority at consent for %s', async scope => {
+		const s = await setup();
+		vi.mocked(s.f.module.get(RoleService).isAdministrator).mockResolvedValue(true);
+		const flow = await s.begin({ scope });
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		vi.mocked(s.f.module.get(RoleService).isAdministrator).mockResolvedValue(false);
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: scope === 'access:mcp' ? 'write:admin:meta' : '' } });
+		expect(decision.statusCode).toBe(400); expect(s.f.rows.size).toBe(2);
+	});
+	it('does not accept a browser resource override and binds the combined scope at exchange', async () => {
+		const s = await setup(); const flow = await s.begin();
+		const transaction = flow.page.body.match(/name="misskey:oauth:transaction-id" content="([^"]+)"/)?.[1];
+		const decision = await s.app.inject({ method: 'POST', url: '/oauth/decision', payload: { transaction_id: transaction, login_token: s.f.own.token, selected_scope: 'read:account', resource: 'https://other.invalid/mcp' } });
+		expect(decision.statusCode).toBe(302);
+		const code = new URL(decision.headers.location!).searchParams.get('code')!;
+		const denied = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: clientId, redirect_uri: redirectUri, code_verifier: flow.codeVerifier, code, resource: 'https://other.invalid/mcp' } });
+		expect(denied.statusCode).toBe(400); expect(s.f.rows.size).toBe(2);
 	});
 });

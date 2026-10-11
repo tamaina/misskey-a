@@ -70,6 +70,17 @@ shared API context, original AuthenticateService tuple, assembled router and
 existing feature repositories. It retains authentication only within each HTTP
 request, never across requests or sessions. No separate DB/query/scope is added.
 
+For consent bound to the canonical `/mcp` resource, explicitly requested scopes
+remain separate from optional native API permissions. Optional permissions start
+OFF and exclude the requested scopes and `access:mcp`; accepting without additions
+retains exactly the requested grant. The server derives this mode from the stored
+consent transaction, rechecks the consenting user's current administrator status,
+and stores/returns exactly the requested scopes plus approved additions. Empty
+scope requests still require an explicit nonempty selection, with no automatic
+MCP permission. Explicit non-MCP requests do not permit additions. Discovery
+continues to advertise only `access:mcp`; this consent behavior does not request
+all native permissions on the client's behalf or update existing tokens.
+
 **MCP requires a scoped token with `access:mcp`.** Master/session credentials and
 existing tokens without this permission are denied. The connection gate reads
 current shared token/app records on every POST and tool invocation, so revocation

@@ -10,14 +10,17 @@ export function eligibleOAuthPermissions(resource: string | undefined, administr
 		&& (administrator || (!permission.startsWith('read:admin') && !permission.startsWith('write:admin'))));
 }
 
-/** Only a server-stored empty request enables selection; never trust a browser mode flag. */
-export function selectedOAuthScopes(requested: readonly string[], selected: unknown, eligible: readonly string[]): string[] {
-	if (requested.length > 0) {
+/** The provider derives optional additions from the stored canonical MCP resource, never a browser flag. */
+export function selectedOAuthScopes(requested: readonly string[], selected: unknown, eligible: readonly string[], allowAdditions = false): string[] {
+	if (requested.length > 0 && !allowAdditions) {
 		if (selected !== undefined) throw new InvalidRequestError('Scope selection is unavailable for a nonempty request');
 		return [...requested];
 	}
+	if (requested.length > 0 && selected === undefined) selected = '';
 	if (typeof selected !== 'string' || selected.length > 4096) throw new InvalidScopeError('Select permissions explicitly');
 	const scopes = [...new Set(selected.split(/\s+/).filter(Boolean))];
-	if (scopes.length === 0 || scopes.some(scope => !eligible.includes(scope))) throw new InvalidScopeError('Invalid selected permissions');
-	return scopes;
+	if ((requested.length === 0 && scopes.length === 0)
+		|| scopes.some(scope => !eligible.includes(scope) || (requested.length > 0 && (requested.includes(scope) || scope === 'access:mcp')))
+		|| (allowAdditions && requested.some(scope => !eligible.includes(scope)))) throw new InvalidScopeError('Invalid selected permissions');
+	return [...new Set([...requested, ...scopes])];
 }
