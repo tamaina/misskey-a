@@ -51,6 +51,7 @@ beforeEach(() => {
 	repo.countBy.mockImplementation(async () => rows.size);
 	repo.save.mockImplementation(async values => { const row = Object.assign(new MiWebhook(), values); rows.set(row.id, row); return row; });
 	deps.webhooks.update.mockImplementation(async (where, values) => { for (const row of rows.values()) if (typeof where === 'object' && Object.entries(where).every(([key, value]) => row[key as keyof MiWebhook] === value)) Object.assign(row, values); return {} as never; });
+	repo.update.mockImplementation(deps.webhooks.update);
 	const manager = mockDeep<WebhooksRepository['manager']>(); manager.getRepository.mockReturnValue(repo as never);
 	deps.webhooks.manager.transaction.mockImplementation(async (...args) => (args.at(-1) as unknown as (manager: unknown) => Promise<unknown>)(manager) as never);
 	deps.http.sendMcpWebhook.mockImplementation(async (_url, body) => ({ status: 200, ok: true, text: JSON.stringify({ challenge: JSON.parse(body).challenge }) }));
@@ -144,4 +145,23 @@ it('validates modern per-request metadata/header matching and unsupported versio
 	expect(() => modernRequest(body, { 'mcp-method': 'events/subscribe', 'mcp-protocol-version': '2026-07-28' })).toThrow(McpEventError);
 	expect(() => modernRequest({ ...body, params: {} }, {})).toThrow();
 	expect(modernRequest({ ...body, params: { _meta: { ...params._meta, 'io.modelcontextprotocol/protocolVersion': 'next' } } }, { 'mcp-method': body.method, 'mcp-protocol-version': 'next' }).unsupported).toBe('next');
+});
+
+it('retries a live key rotation after DNS with current signatures instead of suppressing the event', async () => {
+	const { id } = await subscribe(); const generation = rows.get(id)!.mcpGeneration!;
+	const logger = mockDeep<QueueLoggerService>(); logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, deps.webhooks, deps.http, service, logger);
+	const nextSecret = 'whsec_' + Buffer.alloc(32, 43).toString('base64');
+	const job = { data: { mode: 'mcp', type: 'mention', webhookId: id, userId: 'account', generation, noteId: 'note', createdAt: 1000, eventId: 'rotation-event' } } as Bull.Job<UserWebhookDeliverJobData>;
+	let attemptedSend = false;
+	deps.http.sendMcpWebhook.mockImplementationOnce(async (_url, _body, _headers, _signal, beforeSend) => {
+		rows.set(id, Object.assign(new MiWebhook(), rows.get(id), { secret: nextSecret, mcpPreviousSecret: secret, mcpPreviousSecretUntil: new Date(Date.now() + 60000) }));
+		await beforeSend?.(); attemptedSend = true; return { ok: true, status: 200, text: '' };
+	});
+	await expect(worker.process(job)).rejects.toThrow('MCP callback request failed'); expect(attemptedSend).toBe(false);
+	deps.http.sendMcpWebhook.mockImplementationOnce(async (_url, body, headers, _signal, beforeSend) => {
+		await beforeSend?.(); expect(headers).toEqual(signedHeaders('rotation-event', id, nextSecret, body, secret, Number(headers['webhook-timestamp']) * 1000));
+		return { ok: true, status: 200, text: '' };
+	});
+	expect(await worker.process(job)).toBe('Success'); expect(rows.get(id)!.mcpGeneration).toBe(generation);
 });

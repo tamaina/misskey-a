@@ -7,11 +7,12 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { userInfo } from 'node:os';
 import { randomUUID } from 'node:crypto';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { createRepositorySet } from '@features/persistence/backend/repositories/factory.js';
+import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { McpEventsWebhook1791763200000 } from '../../../../backend/migration/1791763200000-McpEventsWebhook.js';
 import { McpEventsService } from '../../backend/McpEventsService.js';
@@ -34,6 +35,37 @@ describe.skipIf(!socket)('isolated MCP Events PostgreSQL fixture', () => {
 		await migration.down(runner); await migration.up(runner);
 		const ddl = await db.driver.createSchemaBuilder().log(); expect(ddl.upQueries.map(query => query.query)).toEqual([]);
 		await runner.release();
+	});
+	it('serializes unsubscribe after an in-flight refresh without reviving its generation', async () => {
+		const repos = createRepositorySet(db);
+		const user = await repos.usersRepository.save(new MiUser({ id: 'race_account', host: null, username: 'synthetic_race', usernameLower: 'synthetic_race' }));
+		const grant = await repos.accessTokensRepository.save({ id: 'race_grant', userId: user.id, token: 'SYNTHETIC_RACE', hash: 'SYNTHETIC_RACE', permission: ['access:mcp', 'read:notifications'] });
+		const http = mockDeep<HttpRequestService>(); const roles = mockDeep<RoleService>(); const noteEntity = mockDeep<NoteEntityService>();
+		http.sendMcpWebhook.mockImplementation(async (_url, body) => ({ status: 200, ok: true, text: JSON.stringify({ challenge: JSON.parse(body).challenge }) })); roles.getUserPolicies.mockResolvedValue({ webhookLimit: 5 } as never);
+		const service = new McpEventsService(repos.webhooksRepository, repos.accessTokensRepository, repos.appsRepository, repos.usersRepository, repos.notesRepository, http, roles, noteEntity);
+		const context: ApiContext<MiLocalUser> = { credential: 'SYNTHETIC_RACE', ip: '127.0.0.1', headers: {}, services: { authenticate: async () => [user as MiLocalUser, grant], limitActor: () => user.id, rateLimitFactor: async () => 1, limit: async () => null } };
+		const input = { name: 'note.mentioned', arguments: {}, delivery: { mode: 'webhook', url: 'https://callback.example/race', secret: 'whsec_' + Buffer.alloc(32, 42).toString('base64') } };
+		const { id } = await service.invoke('events/subscribe', input, context) as { id: string };
+		const original = await repos.webhooksRepository.findOneByOrFail({ id });
+		let entered!: () => void; let release!: () => void;
+		const saved = new Promise<void>(resolve => { entered = resolve; }); const delayed = new Promise<void>(resolve => { release = resolve; });
+		const save = Repository.prototype.save;
+		const spy = vi.spyOn(Repository.prototype, 'save').mockImplementation(async function (this: Repository<MiWebhook>, ...args) {
+			if (this.target === MiWebhook) { entered(); await delayed; }
+			return save.apply(this, args);
+		});
+		let refresh: Promise<unknown> | undefined; let unsubscribe: Promise<unknown> | undefined;
+		try {
+			refresh = service.invoke('events/subscribe', input, context); await saved;
+			let completed = false;
+			unsubscribe = service.invoke('events/unsubscribe', { name: input.name, arguments: {}, delivery: { mode: 'webhook', url: input.delivery.url } }, context).then(result => { completed = true; return result; });
+			await new Promise(resolve => setTimeout(resolve, 50)); expect(completed).toBe(false);
+			release(); await refresh; await unsubscribe;
+			const revoked = await repos.webhooksRepository.findOneByOrFail({ id }); expect(revoked.active).toBe(false); expect(revoked.secret).toBe('');
+			spy.mockRestore(); await service.invoke('events/subscribe', input, context);
+			expect((await repos.webhooksRepository.findOneByOrFail({ id })).mcpGeneration).not.toBe(original.mcpGeneration);
+			expect(await service.authorizeDelivery(id, user.id, original.mcpGeneration!, 'note', 'mention')).toBeNull();
+		} finally { release(); await Promise.allSettled([refresh, unsubscribe]); spy.mockRestore(); await repos.usersRepository.delete(user.id); }
 	});
 	it('persists grant-bound subscriptions, refreshes idempotently and cascades grant revocation', async () => {
 		const repos = createRepositorySet(db);

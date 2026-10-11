@@ -47,7 +47,9 @@ export class UserWebhookDeliverProcessorService {
 		try {
 			response = await this.httpRequestService.sendMcpWebhook(webhook.url, body, signedHeaders(data.eventId, webhook.id, webhook.secret, body, previous), undefined, async () => {
 				const current = await authorize();
-				if (!current || current.url !== webhook.url || current.secret !== webhook.secret) throw new Bull.UnrecoverableError('MCP delivery suppressed');
+				if (!current) throw new Bull.UnrecoverableError('MCP delivery suppressed');
+				// A live key rotation is retryable: the next attempt signs current state.
+				if (current.url !== webhook.url || current.secret !== webhook.secret) throw new Error('MCP delivery state changed');
 			});
 		} catch (error) {
 			if (error instanceof Bull.UnrecoverableError) return 'Suppressed';
@@ -64,6 +66,10 @@ export class UserWebhookDeliverProcessorService {
 	@bindThis
 	public async process(job: Bull.Job<UserWebhookDeliverJobData>): Promise<string> {
 		if (job.data.mode === 'mcp') return this.processMcp(job.data);
+		// Older producers can serialize MCP rows as legacy jobs. Fail closed also
+		// when grant cascade deletion has removed the row, without loading secrets.
+		const current = await this.webhooksRepository.findOne({ where: { id: job.data.webhookId }, select: { mode: true } });
+		if (!current || current.mode !== 'legacy') return 'Suppressed';
 		try {
 			this.logger.debug(`delivering ${job.data.webhookId}`);
 

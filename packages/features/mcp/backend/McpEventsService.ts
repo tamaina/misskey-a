@@ -66,7 +66,10 @@ export class McpEventsService {
 			const tokenId = await bind(ctx.principal.id, ctx.token?.id);
 			const id = subscriptionId(ctx.principal.id, tokenId, this.url(ps.delivery.url), ps.name);
 			// Tombstone rather than delete: refreshing after unsubscribe gets a new generation.
-			await this.webhooks.update({ id, userId: ctx.principal.id, mcpTokenId: tokenId, mode: 'mcp' }, { active: false, secret: '', mcpPreviousSecret: null, mcpPreviousSecretUntil: null });
+			await this.webhooks.manager.transaction(async manager => {
+				await manager.getRepository(this.users.target).createQueryBuilder('user').where('user.id = :userId', { userId: ctx.principal.id }).setLock('pessimistic_write').getOneOrFail();
+				await manager.getRepository(MiWebhook).update({ id, userId: ctx.principal.id, mcpTokenId: tokenId, mode: 'mcp' }, { active: false, secret: '', mcpPreviousSecret: null, mcpPreviousSecretUntil: null });
+			});
 			return {};
 		}));
 		throw new McpEventError(-32601, 'Method unavailable');

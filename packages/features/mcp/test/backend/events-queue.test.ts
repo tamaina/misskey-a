@@ -46,6 +46,7 @@ it('reuses existing mention/reply selection, querying MCP state separately from 
 });
 it('preserves the legacy payload and headers without entering MCP delivery', async () => {
 	const webhooks = mockDeep<WebhooksRepository>(); const http = mockDeep<HttpRequestService>(); const events = mockDeep<McpEventsService>(); const logger = mockDeep<QueueLoggerService>(); logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	webhooks.findOne.mockResolvedValue({ mode: 'legacy' } as MiWebhook);
 	http.send.mockResolvedValue({ status: 200 } as never);
 	const config = { url: 'https://misskey.example', host: 'misskey.example' } as Config;
 	const worker = new UserWebhookDeliverProcessorService(config, webhooks, http, events, logger);
@@ -54,4 +55,15 @@ it('preserves the legacy payload and headers without entering MCP delivery', asy
 	expect(http.send).toHaveBeenCalledWith(data.to, { method: 'POST', headers: { 'User-Agent': 'Misskey-Hooks', 'X-Misskey-Host': config.host, 'X-Misskey-Hook-Id': data.webhookId, 'X-Misskey-Hook-Secret': data.secret, 'Content-Type': 'application/json' },
 		body: JSON.stringify({ server: config.url, hookId: data.webhookId, userId: data.userId, eventId: data.eventId, createdAt: data.createdAt, type: data.type, body: data.content }) });
 	expect(events.authorizeDelivery).not.toHaveBeenCalled();
+});
+
+it.each([true, false, null])('suppresses mode-less legacy jobs for MCP rows (active=%s) or deleted grants', async active => {
+	const webhooks = mockDeep<WebhooksRepository>(); const http = mockDeep<HttpRequestService>(); const events = mockDeep<McpEventsService>(); const logger = mockDeep<QueueLoggerService>(); logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	webhooks.findOne.mockResolvedValue(active === null ? null : { ...mcp, active });
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, webhooks, http, events, logger);
+	const data = { type: 'mention', content, webhookId: 'sub', userId: 'account', to: mcp.url, secret: mcp.secret, createdAt: 1000, eventId: 'old-producer' } as const;
+	expect(await worker.process({ data } as Bull.Job<UserWebhookDeliverJobData>)).toBe('Suppressed');
+	expect(webhooks.findOne).toHaveBeenCalledWith({ where: { id: 'sub' }, select: { mode: true } });
+	expect(http.send).not.toHaveBeenCalled(); expect(http.sendMcpWebhook).not.toHaveBeenCalled();
+	expect(webhooks.update).not.toHaveBeenCalled();
 });

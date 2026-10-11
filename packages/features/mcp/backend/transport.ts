@@ -121,8 +121,9 @@ export function registerMcpTransport(app: FastifyInstance, service: McpApiServic
 			};
 			// SDK 1 remains the legacy path; MCP 2 requests use explicit per-request metadata.
 			const rpcBody = request.body;
-			const hasMeta = rpcBody && typeof rpcBody === 'object' && 'params' in rpcBody && rpcBody.params && typeof rpcBody.params === 'object' && '_meta' in rpcBody.params;
-			if (hasMeta || request.headers['mcp-method'] || request.headers['mcp-protocol-version'] === '2026-07-28'
+			const meta = rpcBody && typeof rpcBody === 'object' && 'params' in rpcBody && rpcBody.params && typeof rpcBody.params === 'object' && '_meta' in rpcBody.params ? rpcBody.params._meta : undefined;
+			const hasModernMeta = meta && typeof meta === 'object' && ('io.modelcontextprotocol/protocolVersion' in meta || 'io.modelcontextprotocol/clientCapabilities' in meta);
+			if (hasModernMeta || request.headers['mcp-method'] || request.headers['mcp-protocol-version'] === '2026-07-28'
 				|| rpcBody && typeof rpcBody === 'object' && 'method' in rpcBody && (rpcBody.method === 'server/discover' || typeof rpcBody.method === 'string' && rpcBody.method.startsWith('events/'))) {
 				let id: string | number | undefined;
 				try {
