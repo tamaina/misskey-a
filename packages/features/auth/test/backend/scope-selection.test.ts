@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { expect, it } from 'vitest';
-import { eligibleOAuthPermissions, selectedOAuthScopes } from '../../backend/oauth/scope-selection.js';
+import { eligibleOAuthPermissions, selectedOAuthScopes, parsePermissionCustomization } from '../../backend/oauth/scope-selection.js';
 
 it('starts from no grant and validates the exact selected known permissions', () => {
 	const eligible = eligibleOAuthPermissions(undefined, false);
@@ -26,4 +26,10 @@ it('accepts only eligible optional additions in the server-authorized MCP mode',
 		expect(() => selectedOAuthScopes(['access:mcp', 'read:account'], selection, eligible, true)).toThrow();
 	}
 	expect(() => selectedOAuthScopes(['access:mcp', 'write:admin:meta'], '', eligible, true)).toThrow();
+});
+
+it('parses only strict authorization extension values, treating empty as omitted', () => {
+	for (const value of [undefined, '', 'false']) expect(parsePermissionCustomization(value)).toBe(false);
+	expect(parsePermissionCustomization('true')).toBe(true);
+	for (const value of ['1', 'TRUE', ' true ', true, ['true'], ['true', 'false']]) expect(() => parsePermissionCustomization(value)).toThrow();
 });

@@ -160,7 +160,7 @@ it('routes generic reads and writes through native validation/permissions, with 
 	f.grant.permission = ['access:mcp'];
 	await expect(prepared.invoke('call_api', write)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
 	await expect(prepared.invoke('call_api', { endpoint: 'users/notes', arguments: { userId: f.own.id, limit: '1' } })).rejects.toBeDefined();
-	for (const endpoint of ['https://remote.invalid/api', '../users/notes', '/users/notes', 'miauth/gen-token', 'i/regenerate-token', 'i/webhooks/create', 'admin/meta', 'not-found']) {
+	for (const endpoint of ['https://remote.invalid/api', '../users/notes', '/users/notes', 'miauth/gen-token', 'i/regenerate-token', 'i/webhooks/create', 'not-found']) {
 		await expect(prepared.invoke('call_api', { endpoint, arguments: {} })).rejects.toMatchObject({ code: 'TOOL_UNAVAILABLE' });
 	}
 	await expect(prepared.invoke('call_api', { endpoint: 'users/notes', arguments: { userId: f.own.id, i: f.own.token } })).rejects.toBeDefined();

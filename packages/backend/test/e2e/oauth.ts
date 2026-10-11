@@ -40,6 +40,7 @@ const basicAuthParams: AuthorizationParamsExtended = {
 };
 
 interface AuthorizationParamsExtended {
+	misskey_customize_permissions?: 'true' | 'false';
 	redirect_uri: string;
 	scope: string | string[];
 	state: string;
@@ -503,13 +504,30 @@ describe('OAuth', () => {
 
 	// https://datatracker.ietf.org/doc/html/rfc6749.html#section-3.3
 	describe('Scope', () => {
-		// Missing and empty scopes require an explicit selection rather than a default grant.
+		// Ordinary OAuth requires an explicit customization opt-in for scope selection.
 		for (const scope of [undefined, '']) {
+			test(`${scope === undefined ? 'Missing' : 'Empty'} scope without customization fails authorization`, async () => {
+				const client = new AuthorizationCode(clientConfig);
+				const response = await fetch(client.authorizeURL({
+					redirect_uri,
+					...(scope === undefined ? {} : { scope }),
+					state: 'state',
+					code_challenge: 'A'.repeat(43),
+					code_challenge_method: 'S256',
+				} as AuthorizationParamsExtended), { redirect: 'manual' });
+				assertIndirectError(response, 'invalid_scope');
+				assert.ok(!new URL(response.headers.get('location')!).searchParams.has('code'));
+				const html = await response.text();
+				assert.strictEqual(getMeta(html).transactionId, undefined);
+				assert.ok(!html.includes('misskey:oauth:selectable-permissions'));
+			});
+
 			test(`${scope === undefined ? 'Missing' : 'Empty'} scope grants only explicitly selected permissions`, async () => {
 				const client = new AuthorizationCode(clientConfig);
 				const { code_challenge, code_verifier } = await pkceChallenge(128);
 				const response = await fetch(client.authorizeURL({
 					redirect_uri,
+					misskey_customize_permissions: 'true',
 					...(scope === undefined ? {} : { scope }),
 					state: 'state',
 					code_challenge,
@@ -538,6 +556,7 @@ describe('OAuth', () => {
 				const client = new AuthorizationCode(clientConfig);
 				const response = await fetch(client.authorizeURL({
 					redirect_uri,
+					misskey_customize_permissions: 'true',
 					...(scope === undefined ? {} : { scope }),
 					state: 'state',
 					code_challenge: 'A'.repeat(43),
