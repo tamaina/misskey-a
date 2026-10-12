@@ -229,13 +229,12 @@ describe('inbox resolver exhaustion', () => {
 		}
 	}, 20000);
 
-	test('a cold long chain fails visibly without automatic retries', async () => {
+	test('a cold long chain propagates the existing resolver budget error', async () => {
 		const f = fixture(500);
-		await expect(f.processor.process(await f.job())).rejects.toBeInstanceOf(Bull.UnrecoverableError);
+		await expect(f.processor.process(await f.job())).rejects.toMatchObject({ id: limitErrorId });
 		expect(f.http.getActivityJson).toHaveBeenCalledTimes(257);
 		expect(f.resolvers[0].getHistory()).toHaveLength(257);
 		expect(f.created).not.toHaveBeenCalled();
-		expect(f.logger.warn).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ errorId: limitErrorId, activityId: 'https://sender.example/activities/fixture', actorUri }));
 	});
 	test.each([256, 257])('preserves the existing successful boundary of %i remote resolutions', async length => {
 		const f = fixture(length);
@@ -276,7 +275,7 @@ describe('inbox resolver exhaustion', () => {
 		await expect(f.processor.process(await f.job())).resolves.toBe('ok');
 		expect(f.created).toHaveBeenCalledTimes(8);
 	});
-	test.each([new Error('recursion limit exceeded'), new IdentifiableError('another-error-id', 'recursion limit exceeded')])('only the exact identifiable limit error is reclassified: %s', async error => {
+	test.each([new IdentifiableError(limitErrorId, 'hit recursion limit'), new Error('recursion limit exceeded'), new IdentifiableError('another-error-id', 'recursion limit exceeded')])('preserves resolver and other retryable errors unchanged: %s', async error => {
 		const f = fixture(1);
 		vi.spyOn(f.inbox, 'performActivity').mockRejectedValue(error);
 		await expect(f.processor.process(await f.job())).rejects.toBe(error);
@@ -290,7 +289,7 @@ describe('inbox resolver exhaustion', () => {
 		await expect(f.processor.process(job)).rejects.toBeInstanceOf(Bull.UnrecoverableError);
 		expect(f.http.getActivityJson).not.toHaveBeenCalled();
 	});
-	test('BullMQ retains the failed activity, continues other jobs, allows manual recovery, and retries HTTP failures', async () => {
+	test('BullMQ exhausts finite retries, retains failure, continues other jobs, and permits later recovery', async () => {
 		const f = fixture(500);
 		const connection = { host: '127.0.0.1', port: Number(process.env.INBOX_RECURSION_TEST_REDIS_PORT ?? 56312), maxRetriesPerRequest: null };
 		const name = `inbox-recursion-${randomUUID()}`;
@@ -312,11 +311,11 @@ describe('inbox resolver exhaustion', () => {
 			const queued = await queue.add('activity', data, options);
 			await waitFor(queued, 'failed');
 			const failed = await queue.getJob(queued.id!);
-			expect(failed?.attemptsMade).toBe(1);
-			expect(failed?.attemptsStarted).toBe(1);
+			expect(failed?.attemptsMade).toBe(8);
+			expect(failed?.attemptsStarted).toBe(8);
 			expect(failed?.data).toEqual(data);
 			expect(failed?.failedReason).toContain('recursion limit');
-			expect(f.http.getActivityJson).toHaveBeenCalledTimes(257);
+			expect(f.http.getActivityJson).toHaveBeenCalledTimes(257 * 8);
 			expect(f.created).not.toHaveBeenCalled();
 			const short = await queue.add('activity', (await f.job(noteUri(499))).data, options);
 			await waitFor(short, 'completed');

@@ -292,10 +292,6 @@ export class InboxProcessorService implements OnApplicationShutdown {
 			}
 		} catch (e) {
 			if (e instanceof IdentifiableError) {
-				if (e.id === 'd592da9f-822f-4d91-83d7-4ceefabcf3d2') { // Resolver recursion limit
-					this.logger.warn('inbox activity resolution hit recursion limit; failing without retry', { activityId: activity.id, actorUri: authUser.user.uri, errorId: e.id });
-					throw new Bull.UnrecoverableError(e.message);
-				}
 				if (e.id === '689ee33f-f97c-479a-ac49-1b9f8140af99') {
 					return 'blocked notes with prohibited words';
 				}
