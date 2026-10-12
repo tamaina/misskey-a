@@ -89,8 +89,11 @@ It displays exact token/recipient/base units and the hash-submission deadline be
 any receipt can be checked. It never requests a wallet signature or sends funds.
 
 Account-owned orders bind an idempotency key to the selected wallet and exact quote.
-A submitted transaction is reserved once per chain, then verified on demand. RPC
-uncertainty remains pending. A confirmed order stores one immutable term interval;
+A submitted hash is an order-local retry hint, verified on demand. Only a matching
+confirmed receipt acquires a globally unique paid chain/hash claim, atomically with
+the term. Pending or failed checks hold no global claim. RPC chain mismatch,
+insufficient confirmation depth and replaced blocks remain pending; a revert is
+terminal only after depth and canonical block checks. A confirmed order stores one immutable term interval;
 same-service renewals append under a native account row lock. Lists show at most the
 latest 100 records. Terms are records only: no native role or quota is granted.
 Transfers are recorded per chain/transaction/log index for the two registered

@@ -50,7 +50,7 @@ export function createServiceBillingRouter<Actor extends ApiActor>(deps: Service
 			return publicOrder(await deps.store.createOrder(context.principal.id, input.offerId, input.walletId, input.requestKey, input.quotedOffer));
 		}),
 		checkOrder: procedure(serviceBillingContract.checkOrder).use(account).handler(async ({ input, context }) => {
-			const row = await deps.store.reserveTransaction(context.principal.id, input.orderId, input.txHash?.toLowerCase());
+			const row = await deps.store.submitTransaction(context.principal.id, input.orderId, input.txHash?.toLowerCase());
 			if (row.status !== 'pending' || !row.txHash) return publicOrder(row);
 			const receipt = await deps.readReceipt(row.chainId, row.txHash, row.offer.confirmationsRequired);
 			return publicOrder(await deps.store.applyReceipt(context.principal.id, row.id, row.txHash, receipt));

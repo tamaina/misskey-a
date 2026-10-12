@@ -41,8 +41,8 @@ test('actual viem receipt decoding and confirmation through bounded native trans
 	expect(send.mock.calls[0][1]).toMatchObject({ timeout: 10000, size: 262144, follow: 0, redirect: 'error' });
 });
 
-test('wrong chain or reverted receipt cannot confirm', async () => {
-	expect(await fixture({ chain: 9 }).read(123456, hash, 1)).toEqual({ status: 'invalid' });
+test('RPC chain mismatch is retryable; only confirmed canonical revert is invalid', async () => {
+	expect(await fixture({ chain: 9 }).read(123456, hash, 1)).toEqual({ status: 'pending' });
 	expect(await fixture({ status: '0x0' }).read(123456, hash, 1)).toEqual({ status: 'invalid' });
 });
 
@@ -67,4 +67,25 @@ test('UTC calendar durations preserve time and clamp month/year ends', () => {
 	expect(new Date(addServiceDuration(jan, 1, 'months')).toISOString()).toBe('2024-02-29T12:34:56.789Z');
 	expect(new Date(addServiceDuration(Date.parse('2024-02-29T12:34:56Z'), 1, 'years')).toISOString()).toBe('2025-02-28T12:34:56.000Z');
 	expect(addServiceDuration(jan, 2, 'days')).toBe(jan + 172800000);
+});
+
+test('same requested hash recovers after RPC chain configuration is corrected', async () => {
+	const options = { chain: 9 }; const { read } = fixture(options);
+	expect(await read(123456, hash, 3)).toEqual({ status: 'pending' });
+	options.chain = 123456;
+	expect(await read(123456, hash, 3)).toMatchObject({ status: 'confirmed', evidence: { txHash: hash } });
+});
+
+test('unconfirmed reverted receipt can become a confirmed canonical success', async () => {
+	const options = { status: '0x0', tip: 10 }; const { read } = fixture(options);
+	expect(await read(123456, hash, 3)).toEqual({ status: 'pending' });
+	options.status = '0x1'; options.tip = 12;
+	expect(await read(123456, hash, 3)).toMatchObject({ status: 'confirmed', evidence: { txHash: hash } });
+});
+
+test('orphaned revert is retryable even with sufficient depth; canonical success recovers', async () => {
+	const options = { status: '0x0', canonical: hash }; const { read } = fixture(options);
+	expect(await read(123456, hash, 3)).toEqual({ status: 'pending' });
+	options.status = '0x1'; options.canonical = blockHash;
+	expect(await read(123456, hash, 3)).toMatchObject({ status: 'confirmed', evidence: { txHash: hash } });
 });

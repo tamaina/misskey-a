@@ -22,14 +22,16 @@ export function createServiceReceiptReader(native: Pick<HttpRequestService, 'sen
 		if (!url) return { status: 'pending' };
 		const client = createPublicClient({ transport: http(url, { fetchFn: createWalletRpcFetch(native), retryCount: 0, timeout: WALLET_RPC_TIMEOUT }) });
 		try {
-			if (await client.getChainId() !== chainId) return { status: 'invalid' };
+			if (await client.getChainId() !== chainId) return { status: 'pending' };
 			const receipt = await client.getTransactionReceipt({ hash: txHash as Hex });
-			if (receipt.status !== 'success' || receipt.transactionHash.toLowerCase() !== txHash) return { status: 'invalid' };
+			if (receipt.transactionHash.toLowerCase() !== txHash) return { status: 'pending' };
 			const tip = await client.getBlockNumber({ cacheTime: 0 });
 			if (tip < receipt.blockNumber || tip - receipt.blockNumber + 1n < BigInt(confirmations)) return { status: 'pending' };
 			const block = await client.getBlock({ blockNumber: receipt.blockNumber });
 			// Reject a receipt from a replaced block; no permanent-finality claim is made.
 			if (block.hash !== receipt.blockHash) return { status: 'pending' };
+			// Only a confirmed canonical revert can fail this order; RPC/chain uncertainty is retryable.
+			if (receipt.status !== 'success') return { status: 'invalid' };
 			const timestamp = Number(block.timestamp) * 1000;
 			if (!Number.isSafeInteger(timestamp) || timestamp < 0) return { status: 'invalid' };
 			const transfers: TransferEvidence[] = [];

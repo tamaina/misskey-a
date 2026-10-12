@@ -21,9 +21,9 @@ function unavailable(): never { throw new ORPCError('BILLING_UNAVAILABLE'); }
 
 function conflict(): never { throw new ORPCError('BILLING_CONFLICT'); }
 
-function duplicate(error: unknown): boolean { return typeof error === 'object' && error !== null && 'code' in error && error.code === '23505'; }
+function duplicateClaim(error: unknown): boolean { return typeof error === 'object' && error !== null && 'code' in error && error.code === '23505' && 'constraint' in error && error.constraint === 'billing_service_order_transaction_key'; }
 
-/** Transactions reserve evidence and grant a term exactly once. No wallet funds are held. */
+/** Only matching confirmed receipts acquire a global claim, atomically with their term. */
 export function createServiceBillingStore(db: DataSource, id: (now: number) => string, now = Date.now) {
 	const offers = db.getRepository(MiBillingServiceOffer);
 	const orders = db.getRepository(MiBillingServiceOrder);
@@ -61,44 +61,45 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				return row;
 			});
 		},
-		async reserveTransaction(userId: string, orderId: string, txHash?: string) {
+		/** Stores a per-order retry hint; it is not a global claim until proof matches. */
+		async submitTransaction(userId: string, orderId: string, txHash?: string) {
+			return db.transaction(async manager => {
+				const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
+				if (!row) throw new ORPCError('BILLING_NOT_FOUND');
+				if (txHash && row.txHash && txHash !== row.txHash) conflict();
+				if (row.status !== 'pending') return row;
+				if (row.txHash === null) {
+					if (row.expiresAt <= now()) row.status = 'expired';
+					else if (txHash) row.txHash = txHash;
+					await manager.update(MiBillingServiceOrder, row.id, { status: row.status, txHash: row.txHash });
+				}
+				return row;
+			});
+		},
+		async applyReceipt(userId: string, orderId: string, txHash: string, result: ReceiptResult) {
 			try {
 				return await db.transaction(async manager => {
 					const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
 					if (!row) throw new ORPCError('BILLING_NOT_FOUND');
-					if (txHash && row.txHash && txHash !== row.txHash) conflict();
-					if (row.status !== 'pending') return row;
-					if (row.txHash === null) {
-						if (row.expiresAt <= now()) row.status = 'expired';
-						else if (txHash) row.txHash = txHash;
-						await manager.update(MiBillingServiceOrder, row.id, { status: row.status, txHash: row.txHash });
+					if (row.txHash !== txHash) conflict();
+					if (row.status !== 'pending' || result.status === 'pending') return row;
+					if (result.status === 'invalid' || !matchesOrder(result.evidence, row)) {
+						row.status = 'failed';
+						await manager.update(MiBillingServiceOrder, row.id, { status: row.status });
+						return row;
 					}
+					await manager.getRepository(MiUser).createQueryBuilder('user').select('user.id').where('user.id = :userId', { userId }).setLock('for_no_key_update').getOneOrFail();
+					const latest = await manager.getRepository(MiBillingServiceOrder).createQueryBuilder('term')
+						.where('term."userId" = :userId AND term.status = :status AND term.offer->>\'serviceKey\' = :key', { userId, status: 'paid', key: row.offer.serviceKey })
+						.orderBy('term.endsAt', 'DESC').getOne();
+					row.paidAt = now(); row.startsAt = Math.max(row.paidAt, latest?.endsAt ?? 0);
+					row.endsAt = addServiceDuration(row.startsAt, row.offer.duration, row.offer.durationUnit);
+					if (!Number.isSafeInteger(row.endsAt) || row.endsAt <= row.startsAt) unavailable();
+					row.status = 'paid';
+					await manager.update(MiBillingServiceOrder, row.id, { status: row.status, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
 					return row;
 				});
-			} catch (error) { if (duplicate(error)) conflict(); throw error; }
-		},
-		async applyReceipt(userId: string, orderId: string, txHash: string, result: ReceiptResult) {
-			return db.transaction(async manager => {
-				const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
-				if (!row) throw new ORPCError('BILLING_NOT_FOUND');
-				if (row.txHash !== txHash) conflict();
-				if (row.status !== 'pending' || result.status === 'pending') return row;
-				if (result.status === 'invalid' || !matchesOrder(result.evidence, row)) {
-					row.status = 'failed';
-					await manager.update(MiBillingServiceOrder, row.id, { status: row.status });
-					return row;
-				}
-				await manager.getRepository(MiUser).createQueryBuilder('user').select('user.id').where('user.id = :userId', { userId }).setLock('for_no_key_update').getOneOrFail();
-				const latest = await manager.getRepository(MiBillingServiceOrder).createQueryBuilder('term')
-					.where('term."userId" = :userId AND term.status = :status AND term.offer->>\'serviceKey\' = :key', { userId, status: 'paid', key: row.offer.serviceKey })
-					.orderBy('term.endsAt', 'DESC').getOne();
-				row.paidAt = now(); row.startsAt = Math.max(row.paidAt, latest?.endsAt ?? 0);
-				row.endsAt = addServiceDuration(row.startsAt, row.offer.duration, row.offer.durationUnit);
-				if (!Number.isSafeInteger(row.endsAt) || row.endsAt <= row.startsAt) unavailable();
-				row.status = 'paid';
-				await manager.update(MiBillingServiceOrder, row.id, { status: row.status, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
-				return row;
-			});
+			} catch (error) { if (duplicateClaim(error)) conflict(); throw error; }
 		},
 		async listTransfers(userId: string) {
 			return transfers.find({ where: [{ senderUserId: userId }, { recipientUserId: userId }], order: { id: 'DESC' }, take: 100 });

@@ -11,9 +11,9 @@ import type { ServiceOffer } from '../api.definition.js';
 const integer = { type: 'bigint' as const, transformer: { to: (value: number | null) => value, from: (value: string | null) => value === null ? null : Number(value) } };
 @Entity('billing_service_order')
 @Index('billing_service_order_request_key', ['userId', 'requestKey'], { unique: true })
-@Index('billing_service_order_transaction_key', ['chainId', 'txHash'], { unique: true })
+@Index('billing_service_order_transaction_key', ['chainId', 'txHash'], { unique: true, where: '"status" = \'paid\'' })
 @Check('billing_service_order_status_check', '"status" IN (\'pending\',\'paid\',\'expired\',\'failed\')')
-@Check('billing_service_order_period_check', '("status" = \'paid\' AND "paidAt" IS NOT NULL AND "startsAt" IS NOT NULL AND "endsAt" IS NOT NULL AND "endsAt" > "startsAt") OR ("status" <> \'paid\' AND "paidAt" IS NULL AND "startsAt" IS NULL AND "endsAt" IS NULL)')
+@Check('billing_service_order_period_check', '("status" = \'paid\' AND "txHash" IS NOT NULL AND "paidAt" IS NOT NULL AND "startsAt" IS NOT NULL AND "endsAt" IS NOT NULL AND "endsAt" > "startsAt") OR ("status" <> \'paid\' AND "paidAt" IS NULL AND "startsAt" IS NULL AND "endsAt" IS NULL)')
 export class MiBillingServiceOrder {
 	@PrimaryColumn({ ...id(), primaryKeyConstraintName: 'billing_service_order_pk' }) public id: string;
 	@Column({ ...id(), nullable: true }) public userId: string | null;
