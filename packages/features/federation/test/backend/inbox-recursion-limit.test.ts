@@ -9,6 +9,8 @@ import { mock } from 'vitest-mock-extended';
 import * as Bull from 'bullmq';
 import { signAsDraftToRequest, parseRequestSignature } from '@misskey-dev/node-http-message-signatures';
 import { Resolver } from '@features/federation/backend/services/ApResolverService.js';
+import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 import { ApNoteService } from '@features/federation/backend/services/ApNoteService.js';
 import { ApInboxService } from '@features/federation/backend/services/ApInboxService.js';
 import { InboxProcessorService } from '@features/federation/backend/jobs/InboxProcessorService.js';
@@ -16,7 +18,7 @@ import { IdentifiableError } from '@features/runtime/backend/errors/identifiable
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
-import type { IPost } from '@features/federation/backend/protocol/type.js';
+import type { IPost, IActor } from '@features/federation/backend/protocol/type.js';
 
 vi.mock('@features/runtime/backend/cache/distributed-lock.js', async importOriginal => ({
 	...await importOriginal<object>(), acquireApObjectLock: vi.fn(async () => vi.fn()),
@@ -122,9 +124,111 @@ function fixture(length: number) {
 	return { logger, utility, objects, cache, user, http, factory, resolvers, note, inbox, processor, created, job };
 }
 
+function distinctAuthorFixture(length: number) {
+	const f = fixture(length);
+	f.utility.punyHost.mockImplementation(value => new URL(value).hostname);
+	const storedUsers = new Map<string, MiRemoteUser>([[actorUri, f.user]]);
+	const personCache = new Map<string, MiRemoteUser>([[actorUri, f.user]]);
+	const actors = new Map<string, IActor>();
+	for (let i = 1; i < length; i++) {
+		const uri = `https://sender.example/users/author-${i}`;
+		const note = f.objects.get(noteUri(i));
+		if (!note) throw new Error('Missing synthetic note');
+		note.attributedTo = uri;
+		actors.set(uri, {
+			'@context': 'https://www.w3.org/ns/activitystreams', id: uri, type: 'Person',
+			preferredUsername: `author-${i}`, inbox: `${uri}/inbox`, outbox: `${uri}/outbox`,
+		});
+	}
+	f.http.getActivityJson.mockImplementation(async uri => {
+		const object = f.objects.get(uri) ?? actors.get(uri);
+		if (!object) throw new Error('Unexpected synthetic fetch');
+		return object;
+	});
+	// Preserve the real createPerson transaction and cache-publication ordering.
+	// Only the transaction manager and repositories are synthetic; saved actors
+	// survive subsequent attempts without external cache warming or manual retry.
+	const save = vi.fn(async (entity: unknown) => {
+		if (entity instanceof MiUser) {
+			const remote = entity as MiRemoteUser;
+			storedUsers.set(remote.uri, remote);
+		}
+		return entity;
+	});
+	const person = Object.assign(Object.create(ApPersonService.prototype), {
+		logger: f.logger, utilityService: f.utility,
+		config: { host: 'recipient.example', url: 'https://recipient.example' },
+		apResolverService: f.factory, cacheService: { uriPersonCache: personCache },
+		usersRepository: {
+			findOneBy: async ({ uri }: { uri: string }) => storedUsers.get(uri) ?? null,
+			findOneByOrFail: async ({ id }: { id: string }) => {
+				const user = [...storedUsers.values()].find(user => user.id === id);
+				if (!user) throw new Error('Missing synthetic actor');
+				return user;
+			},
+			update: async () => ({ affected: 1 }),
+		},
+		db: { transaction: async (run: (manager: { save: typeof save }) => Promise<unknown>) => run({ save }) },
+		idService: { gen: () => `actor-${storedUsers.size}` },
+		apNoteService: { extractEmojis: async () => [] }, meta: {},
+		usersChart: { update: vi.fn() }, hashtagService: { updateUsertags: vi.fn() },
+		userEntityService: { isRemoteUser: () => true },
+	}) as ApPersonService;
+	Object.assign(f.note, { apPersonService: person });
+	return { ...f, storedUsers, save };
+}
+
 const limitErrorId = 'd592da9f-822f-4d91-83d7-4ceefabcf3d2';
 
 describe('inbox resolver exhaustion', () => {
+	test('preserves bounded automatic recovery when failed attempts register uncached authors', async () => {
+		const f = distinctAuthorFixture(200);
+		const connection = { host: '127.0.0.1', port: Number(process.env.INBOX_RECURSION_TEST_REDIS_PORT ?? 56312), maxRetriesPerRequest: null };
+		const name = `inbox-author-progress-${randomUUID()}`;
+		const queue = new Bull.Queue<Parameters<InboxProcessorService['process']>[0]['data']>(name, { connection });
+		const attempts: { fetches: number; registeredActors: number; createdNotes: number }[] = [];
+		const errors: Error[] = [];
+		const worker = new Bull.Worker(name, async job => {
+			const start = f.http.getActivityJson.mock.calls.length;
+			try {
+				return await f.processor.process(job);
+			} finally {
+				attempts.push({
+					fetches: f.http.getActivityJson.mock.calls.length - start,
+					registeredActors: f.storedUsers.size - 1,
+					createdNotes: f.created.mock.calls.length,
+				});
+			}
+		}, { connection });
+		worker.on('error', error => errors.push(error));
+		try {
+			await queue.waitUntilReady();
+			const job = await queue.add('activity', (await f.job()).data, {
+				attempts: 8, backoff: { type: 'fixed', delay: 10 }, removeOnFail: false,
+			});
+			const deadline = Date.now() + 10000;
+			while (!['completed', 'failed'].includes(await job.getState())) {
+				if (Date.now() >= deadline) throw new Error('Timed out waiting for isolated author-progress queue');
+				await new Promise(resolve => setTimeout(resolve, 20));
+			}
+			expect(await job.getState()).toBe('completed');
+			const completed = await queue.getJob(job.id!);
+			expect(completed?.attemptsMade).toBe(3);
+			expect(attempts).toEqual([
+				{ fetches: 257, registeredActors: 128, createdNotes: 0 },
+				{ fetches: 257, registeredActors: 192, createdNotes: 0 },
+				{ fetches: 207, registeredActors: 199, createdNotes: 200 },
+			]);
+			expect(f.created).toHaveBeenCalledTimes(200);
+			expect(f.save.mock.calls.filter(([row]) => row instanceof MiUser)).toHaveLength(199);
+			expect(errors).toEqual([]);
+		} finally {
+			await worker.close();
+			await queue.obliterate({ force: true });
+			await queue.close();
+		}
+	}, 20000);
+
 	test('a cold long chain fails visibly without automatic retries', async () => {
 		const f = fixture(500);
 		await expect(f.processor.process(await f.job())).rejects.toBeInstanceOf(Bull.UnrecoverableError);
