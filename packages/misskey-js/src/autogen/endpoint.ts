@@ -1,6 +1,22 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	AdminBillingOffersListRequest,
+	AdminBillingOffersListResponse,
+	AdminBillingOffersUpsertRequest,
+	AdminBillingOffersUpsertResponse,
+	BillingOffersListRequest,
+	BillingOffersListResponse,
+	BillingOrdersCreateRequest,
+	BillingOrdersCreateResponse,
+	BillingOrdersCheckRequest,
+	BillingOrdersCheckResponse,
+	BillingOrdersListRequest,
+	BillingOrdersListResponse,
+	BillingTransfersDetectRequest,
+	BillingTransfersDetectResponse,
+	BillingTransfersListRequest,
+	BillingTransfersListResponse,
 	AdminWalletsChainsListRequest,
 	AdminWalletsChainsListResponse,
 	AdminWalletsChainsUpsertRequest,
@@ -748,6 +764,14 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'admin/billing/offers/list': { req: AdminBillingOffersListRequest; res: AdminBillingOffersListResponse };
+	'admin/billing/offers/upsert': { req: AdminBillingOffersUpsertRequest; res: AdminBillingOffersUpsertResponse };
+	'billing/offers/list': { req: BillingOffersListRequest; res: BillingOffersListResponse };
+	'billing/orders/create': { req: BillingOrdersCreateRequest; res: BillingOrdersCreateResponse };
+	'billing/orders/check': { req: BillingOrdersCheckRequest; res: BillingOrdersCheckResponse };
+	'billing/orders/list': { req: BillingOrdersListRequest; res: BillingOrdersListResponse };
+	'billing/transfers/detect': { req: BillingTransfersDetectRequest; res: BillingTransfersDetectResponse };
+	'billing/transfers/list': { req: BillingTransfersListRequest; res: BillingTransfersListResponse };
 	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
 	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };

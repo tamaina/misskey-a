@@ -2,6 +2,482 @@
 import type { AnyContractRouter } from '@orpc/contract';
 
 export default {
+	"serviceBilling": {
+		"listOfferSettings": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta",
+					"requestName": "admin/billing/offers/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/offers/list"
+				}
+			}
+		},
+		"upsertOffer": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "admin/billing/offers/upsert"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/offers/upsert"
+				}
+			}
+		},
+		"listOffers": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "billing/offers/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/offers/list"
+				}
+			}
+		},
+		"createOrder": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "billing/orders/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/orders/create"
+				}
+			}
+		},
+		"checkOrder": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "billing/orders/check"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/orders/check"
+				}
+			}
+		},
+		"listOrders": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "billing/orders/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/orders/list"
+				}
+			}
+		},
+		"detectTransfer": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "billing/transfers/detect"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/transfers/detect"
+				}
+			}
+		},
+		"listTransfers": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "billing/transfers/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/transfers/list"
+				}
+			}
+		}
+	},
 	"wallets": {
 		"listChainSettings": {
 			"~orpc": {

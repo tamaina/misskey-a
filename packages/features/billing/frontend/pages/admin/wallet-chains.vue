@@ -6,6 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <SearchMarker path="/admin/wallet-chains" :label="$locale.sfc.title" :keywords="['wallet', 'RPC']" icon="ti ti-wallet">
+	<MkA to="/admin/service-offers">{{ $locale.sfc.billing }}</MkA>
 	<BillingChainSettings :client="client"/>
 </SearchMarker>
 </template>
@@ -24,5 +25,5 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-wallet' }));
 </script>
 
 <locale lang="json" locale="ja-JP">
-{"title":"ウォレットのチェーン設定"}
+{"billing":"サービス契約・送金の確認","title":"ウォレットのチェーン設定"}
 </locale>

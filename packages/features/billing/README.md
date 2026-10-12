@@ -1,10 +1,12 @@
-# Billing wallet registration
+# Billing review slices
 
 Small review slice for [Issue #8](https://github.com/tamaina/misskey-a/issues/8).
 Wallet registration is composed into Misskey's native feature provider/API and
 `/settings/wallets` and `/admin/wallet-chains`. The older payment-history and disabled payment-chain prototypes
-remain unregistered; this slice performs no payments, balance/credit accounting,
-pricing, entitlements, settlement or transfers.
+remain unregistered. The continuation records admin-configured fixed service terms
+and detects already-mined transfers between registered accounts. No balance, custody,
+wallet signing, transaction sending, automatic renewal, native role/quota changes or
+usage settlement is implemented. All development checks use synthetic fixtures.
 
 The host binds the current Misskey principal to a PostgreSQL wallet identity.
 `billing_wallet`, `billing_wallet_challenge` and `billing_wallet_chain` are the new tables. The local,
@@ -74,3 +76,37 @@ RAYON_NUM_THREADS=1 pnpm exec vitest run --config vitest.billing.config.js --max
 Successful registration tests use a synthetic signature verifier. They do not prove
 valid wallet-signature interoperability or any live billing integration. No real
 wallet request, signature, key, RPC endpoint or payment is used in these tests.
+
+## Fixed service terms and transfer observation
+
+Native administration is `/admin/service-offers`, linked from wallet-chain settings.
+All prices, recipients, durations and confirmation counts are supplied by the admin;
+there are no monetary defaults or seeded offers. Enabled offers require a configured
+native wallet-chain RPC. Disabling an offer stops new orders/detection; already
+snapshotted orders remain checkable when their chain RPC is available. Catalog size
+is limited to 100. The account page is `/settings/subscriptions`, linked from wallets.
+It displays exact token/recipient/base units and the hash-submission deadline before
+any receipt can be checked. It never requests a wallet signature or sends funds.
+
+Account-owned orders bind an idempotency key to the selected wallet and exact quote.
+A submitted transaction is reserved once per chain, then verified on demand. RPC
+uncertainty remains pending. A confirmed order stores one immutable term interval;
+same-service renewals append under a native account row lock. Lists show at most the
+latest 100 records. Terms are records only: no native role or quota is granted.
+Transfers are recorded per chain/transaction/log index for the two registered
+participants. No scan worker, public address-to-account lookup or notifications are
+added. Participant links become null on account deletion; evidence claims remain
+reserved to prevent replay and historical reassignment. Schema rollback removes all
+three new tables, so it must not be used as an accounting reset.
+
+The new local migration is unapplied to production. Test it only with the same
+explicit disposable loopback database variable described above:
+
+```sh
+node --test --test-concurrency=1 packages/features/billing/test/service-store.test.mjs
+cd packages/backend
+RAYON_NUM_THREADS=1 pnpm exec vitest run --config vitest.config.unit.ts --maxWorkers=1 ../features/billing/test/backend/service-receipt.test.ts
+```
+
+Source provenance and deviations are in Issue #8 and the continuation draft PR.
+Neither synthetic receipts nor transport tests prove live payment interoperability.

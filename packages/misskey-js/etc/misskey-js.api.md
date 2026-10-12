@@ -229,6 +229,18 @@ type AdminAvatarDecorationsListResponse = ContractResponse<'admin/avatar-decorat
 type AdminAvatarDecorationsUpdateRequest = ContractRequest<'admin/avatar-decorations/update'>;
 
 // @public (undocumented)
+type AdminBillingOffersListRequest = ContractRequest<'admin/billing/offers/list'>;
+
+// @public (undocumented)
+type AdminBillingOffersListResponse = ContractResponse<'admin/billing/offers/list'>;
+
+// @public (undocumented)
+type AdminBillingOffersUpsertRequest = ContractRequest<'admin/billing/offers/upsert'>;
+
+// @public (undocumented)
+type AdminBillingOffersUpsertResponse = ContractResponse<'admin/billing/offers/upsert'>;
+
+// @public (undocumented)
 type AdminCaptchaCurrentRequest = ContractRequest<'admin/captcha/current'>;
 
 // @public (undocumented)
@@ -745,6 +757,42 @@ type AvailableEndpointsRequest = ContractRequest<'available-endpoints'>;
 
 // @public (undocumented)
 type AvailableEndpointsResponse = ContractResponse<'available-endpoints'>;
+
+// @public (undocumented)
+type BillingOffersListRequest = ContractRequest<'billing/offers/list'>;
+
+// @public (undocumented)
+type BillingOffersListResponse = ContractResponse<'billing/offers/list'>;
+
+// @public (undocumented)
+type BillingOrdersCheckRequest = ContractRequest<'billing/orders/check'>;
+
+// @public (undocumented)
+type BillingOrdersCheckResponse = ContractResponse<'billing/orders/check'>;
+
+// @public (undocumented)
+type BillingOrdersCreateRequest = ContractRequest<'billing/orders/create'>;
+
+// @public (undocumented)
+type BillingOrdersCreateResponse = ContractResponse<'billing/orders/create'>;
+
+// @public (undocumented)
+type BillingOrdersListRequest = ContractRequest<'billing/orders/list'>;
+
+// @public (undocumented)
+type BillingOrdersListResponse = ContractResponse<'billing/orders/list'>;
+
+// @public (undocumented)
+type BillingTransfersDetectRequest = ContractRequest<'billing/transfers/detect'>;
+
+// @public (undocumented)
+type BillingTransfersDetectResponse = ContractResponse<'billing/transfers/detect'>;
+
+// @public (undocumented)
+type BillingTransfersListRequest = ContractRequest<'billing/transfers/list'>;
+
+// @public (undocumented)
+type BillingTransfersListResponse = ContractResponse<'billing/transfers/list'>;
 
 // @public (undocumented)
 type Blocking = ContractModel<'Blocking'>;
@@ -1707,6 +1755,22 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        AdminBillingOffersListRequest,
+        AdminBillingOffersListResponse,
+        AdminBillingOffersUpsertRequest,
+        AdminBillingOffersUpsertResponse,
+        BillingOffersListRequest,
+        BillingOffersListResponse,
+        BillingOrdersCreateRequest,
+        BillingOrdersCreateResponse,
+        BillingOrdersCheckRequest,
+        BillingOrdersCheckResponse,
+        BillingOrdersListRequest,
+        BillingOrdersListResponse,
+        BillingTransfersDetectRequest,
+        BillingTransfersDetectResponse,
+        BillingTransfersListRequest,
+        BillingTransfersListResponse,
         AdminWalletsChainsListRequest,
         AdminWalletsChainsListResponse,
         AdminWalletsChainsUpsertRequest,

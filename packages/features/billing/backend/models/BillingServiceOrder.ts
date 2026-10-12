@@ -1,0 +1,34 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-FileCopyrightText: tamaina
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { Check, Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { id } from '@features/persistence/backend/models/util/id.js';
+import type { ServiceOffer } from '../api.definition.js';
+const integer = { type: 'bigint' as const, transformer: { to: (value: number | null) => value, from: (value: string | null) => value === null ? null : Number(value) } };
+@Entity('billing_service_order')
+@Index('billing_service_order_request_key', ['userId', 'requestKey'], { unique: true })
+@Index('billing_service_order_transaction_key', ['chainId', 'txHash'], { unique: true })
+@Check('billing_service_order_status_check', '"status" IN (\'pending\',\'paid\',\'expired\',\'failed\')')
+@Check('billing_service_order_period_check', '("status" = \'paid\' AND "paidAt" IS NOT NULL AND "startsAt" IS NOT NULL AND "endsAt" IS NOT NULL AND "endsAt" > "startsAt") OR ("status" <> \'paid\' AND "paidAt" IS NULL AND "startsAt" IS NULL AND "endsAt" IS NULL)')
+export class MiBillingServiceOrder {
+	@PrimaryColumn({ ...id(), primaryKeyConstraintName: 'billing_service_order_pk' }) public id: string;
+	@Column({ ...id(), nullable: true }) public userId: string | null;
+	@ManyToOne(() => MiUser, { onDelete: 'SET NULL' })
+	@JoinColumn({ name: 'userId', foreignKeyConstraintName: 'billing_service_order_user_fk' }) public user: MiUser | null;
+	@Column('varchar', { length: 128 }) public requestKey: string;
+	@Column({ ...id() }) public walletId: string;
+	@Column('jsonb') public offer: ServiceOffer;
+	@Column(integer) public chainId: number;
+	@Column('varchar', { length: 42 }) public payerAddress: string;
+	@Column('varchar', { length: 16, default: 'pending' }) public status: 'pending' | 'paid' | 'expired' | 'failed';
+	@Column('varchar', { length: 66, nullable: true }) public txHash: string | null;
+	@Column(integer) public createdAt: number;
+	@Column(integer) public expiresAt: number;
+	@Column({ ...integer, nullable: true }) public paidAt: number | null;
+	@Column({ ...integer, nullable: true }) public startsAt: number | null;
+	@Column({ ...integer, nullable: true }) public endsAt: number | null;
+}
