@@ -5,6 +5,7 @@
 
 import { parse } from 'vue/compiler-sfc';
 import metadata from './final-owner-locale-baseline.json';
+import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
 
 type Dictionary = Record<string, string>;
 const owners = new Map(metadata.owners.map(owner => [owner.file, owner]));
@@ -72,6 +73,11 @@ export function restoreFinalOwnerHistoricalSource(file: string, source: string):
 		pieces.push(text.slice(previous));
 		return pieces.join('');
 	};
+	try {
+		source = restorePasswordChangeBaseline(file, source);
+	} catch {
+		throw new Error(`Final owner changed original component body: ${file}`);
+	}
 	if (withoutLocales(source) !== withoutLocales(owner.originalSource)) throw new Error(`Final owner changed original component body: ${file}`);
 	return owner.originalSource;
 }
