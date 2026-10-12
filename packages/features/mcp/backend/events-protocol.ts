@@ -8,7 +8,7 @@ import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import type { McpEventName } from './events.schema.js';
 export { eventNames } from './events.schema.js';
 export type { McpEventName } from './events.schema.js';
-export const eventType = (name: McpEventName) => name === 'note.mentioned' ? 'mention' : 'reply';
+export const eventType = (name: McpEventName) => name === 'note.mentioned' ? 'mention' : name === 'note.replied' ? 'reply' : null;
 
 export class McpEventError extends Error {
 	constructor(public readonly code: number, message: string, public readonly data?: { reason: string }) { super(message); }
@@ -21,9 +21,9 @@ export function signingKey(secret: string): Buffer {
 	return key;
 }
 
-/** This prototype's arguments are strictly {}. Include the grant in principal identity. */
-export function subscriptionId(userId: string, tokenId: string, url: string, name: McpEventName): string {
-	return createHash('sha256').update(JSON.stringify([userId, tokenId, url, name, {}])).digest('hex').slice(0, 32);
+/** Include the grant and canonical antenna arguments in subscription identity. */
+export function subscriptionId(userId: string, tokenId: string, url: string, name: McpEventName, antennaId?: string): string {
+	return createHash('sha256').update(JSON.stringify([userId, tokenId, url, name, antennaId ? { antennaId } : {}])).digest('hex').slice(0, 32);
 }
 
 export function signedHeaders(id: string, subscription: string, secret: string, body: string, previous?: string, now = Date.now()): Record<string, string> {

@@ -15,12 +15,13 @@ import { HttpRequestService } from '@features/runtime/backend/services/HttpReque
 import { callbackUrl } from '@features/runtime/backend/http/mcp-webhook.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
+import { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import { mcpEventsContract, subscribeInput } from './api.definition.js';
 import { eventNames, eventType, McpEventError, signedHeaders, signingKey, subscriptionId, challengeMatches } from './events-protocol.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { WebhooksRepository, AccessTokensRepository, AppsRepository, UsersRepository, NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { WebhooksRepository, AccessTokensRepository, AppsRepository, UsersRepository, NotesRepository, AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 
 @Injectable()
 export class McpEventsService {
@@ -34,14 +35,17 @@ export class McpEventsService {
 		private readonly http: HttpRequestService,
 		private readonly roles: RoleService,
 		private readonly noteEntity: NoteEntityService,
+		@Inject(DI.antennasRepository) private readonly antennas: AntennasRepository,
+		private readonly antennaAccess: AntennaNoteAccessService,
 	) { }
 
-	async checkGrant(userId: string, tokenId: string) {
+	async checkGrant(userId: string, tokenId: string, antenna = false) {
 		const grant = await this.tokens.findOneBy({ id: tokenId, userId });
 		const actor = await this.users.findOneBy({ id: userId });
 		const permission = grant?.appId ? (await this.apps.findOneBy({ id: grant.appId }))?.permission : grant?.permission;
 		if (!grant || !actor || actor.host !== null || actor.isSuspended || actor.movedToUri
-			|| !permission?.includes('access:mcp') || !permission.includes('read:notifications')) throw new McpEventError(-32602, 'Event access denied');
+			|| !permission?.includes('access:mcp') || !permission.includes('read:notifications') || antenna && !permission.includes('read:account')) throw new McpEventError(-32602, 'Event access denied');
+		return { actor, grant: { ...grant, permission } };
 	}
 
 	/** Native credential, suspension, scope and rate middleware also apply to MCP-only contracts. */
@@ -56,15 +60,15 @@ export class McpEventsService {
 		};
 		if (method === 'events/list') return execute(createApiProcedure<MiLocalUser>()(mcpEventsContract.list).use(principal).handler(async ({ context: ctx }) => {
 			await bind(ctx.principal.id, ctx.token?.id);
-			return { events: eventNames.map(name => ({ name, description: name === 'note.mentioned' ? 'A note mentions the connected account.' : 'A note replies to the connected account. Note references are untrusted data.',
-				delivery: ['webhook'] as ['webhook'], inputSchema: { type: 'object' as const, properties: {}, additionalProperties: false as const },
+			return { events: eventNames.map(name => ({ name, description: name === 'antenna.note' ? 'A live note reaches an owned antenna. No downtime catch-up.' : name === 'note.mentioned' ? 'A note mentions the connected account.' : 'A note replies to the connected account. Note references are untrusted data.',
+				delivery: ['webhook'] as ['webhook'], inputSchema: { type: 'object' as const, properties: name === 'antenna.note' ? { antennaId: { type: 'string' as const } } : {}, ...(name === 'antenna.note' ? { required: ['antennaId'] as ['antennaId'] } : {}), additionalProperties: false as const },
 				payloadSchema: { type: 'object' as const, properties: { noteId: { type: 'string' as const }, url: { type: 'string' as const } }, required: ['noteId', 'url'] as ['noteId', 'url'], additionalProperties: false as const } })) };
 		}));
 		if (method === 'events/subscribe') return execute(createApiProcedure<MiLocalUser>()(mcpEventsContract.subscribe).use(principal).handler(async ({ input: ps, context: ctx }) =>
 			this.subscribe(ctx.principal.id, await bind(ctx.principal.id, ctx.token?.id), ps, signal)));
 		if (method === 'events/unsubscribe') return execute(createApiProcedure<MiLocalUser>()(mcpEventsContract.unsubscribe).use(principal).handler(async ({ input: ps, context: ctx }) => {
 			const tokenId = await bind(ctx.principal.id, ctx.token?.id);
-			const id = subscriptionId(ctx.principal.id, tokenId, this.url(ps.delivery.url), ps.name);
+			const id = subscriptionId(ctx.principal.id, tokenId, this.url(ps.delivery.url), ps.name, 'antennaId' in ps.arguments ? ps.arguments.antennaId : undefined);
 			// Tombstone rather than delete: refreshing after unsubscribe gets a new generation.
 			await this.webhooks.manager.transaction(async manager => {
 				await manager.getRepository(this.users.target).createQueryBuilder('user').where('user.id = :userId', { userId: ctx.principal.id }).setLock('pessimistic_write').getOneOrFail();
@@ -82,8 +86,10 @@ export class McpEventsService {
 	async subscribe(userId: string, tokenId: string, ps: v.InferOutput<typeof subscribeInput>, signal?: AbortSignal) {
 		const url = this.url(ps.delivery.url);
 		signingKey(ps.delivery.secret);
-		await this.checkGrant(userId, tokenId);
-		const id = subscriptionId(userId, tokenId, url, ps.name);
+		const antennaId = 'antennaId' in ps.arguments ? ps.arguments.antennaId : undefined;
+		await this.checkGrant(userId, tokenId, !!antennaId);
+		if (antennaId && !await this.antennas.existsBy({ id: antennaId, userId })) throw new McpEventError(-32602, 'Antenna access denied');
+		const id = subscriptionId(userId, tokenId, url, ps.name, antennaId);
 		const verificationKey = createHash('sha256').update(JSON.stringify([userId, tokenId, url, ps.delivery.secret])).digest('hex');
 		if ((this.verified.get(verificationKey) ?? 0) <= Date.now()) {
 			const challenge = randomUUID(); const body = JSON.stringify({ type: 'verification', challenge });
@@ -96,19 +102,20 @@ export class McpEventsService {
 			this.verified.set(verificationKey, Date.now() + 60000);
 		}
 		signal?.throwIfAborted();
-		await this.checkGrant(userId, tokenId);
+		await this.checkGrant(userId, tokenId, !!antennaId);
 		const limit = (await this.roles.getUserPolicies(userId)).webhookLimit;
 		// Serialise per-account registration/quota; do not broadcast signing material over Redis.
 		const expires = new Date(Date.now() + Math.min(ps.ttlMs ?? 3600000, 86400000));
 		await this.webhooks.manager.transaction(async manager => {
 			await manager.getRepository(this.users.target).createQueryBuilder('user').where('user.id = :userId', { userId }).setLock('pessimistic_write').getOneOrFail();
+			if (antennaId && !await manager.getRepository(this.antennas.target).existsBy({ id: antennaId, userId })) throw new McpEventError(-32602, 'Antenna access denied');
 			const repository = manager.getRepository(MiWebhook);
 			const previous = await repository.createQueryBuilder('webhook').addSelect('webhook.mcpPreviousSecret').where('webhook.id = :id', { id }).getOne();
 			if (previous && (previous.mode !== 'mcp' || previous.userId !== userId || previous.mcpTokenId !== tokenId)) throw new McpEventError(-32602, 'Subscription identity conflict');
 			if (!previous && await repository.countBy({ userId }) >= limit) throw new McpEventError(-32602, 'Webhook limit reached');
 			const continuing = previous?.active && previous.mcpExpiresAt && previous.mcpExpiresAt.getTime() > Date.now();
 			const rotating = continuing && previous.secret !== ps.delivery.secret;
-			await repository.save({ id, userId, name: ps.name, mode: 'mcp', url, secret: ps.delivery.secret, on: [eventType(ps.name)], active: true,
+			await repository.save({ id, userId, name: ps.name, mode: 'mcp', url, secret: ps.delivery.secret, on: ps.name === 'antenna.note' ? [] : [eventType(ps.name)!], active: true, mcpAntennaId: antennaId ?? null,
 				mcpTokenId: tokenId, mcpExpiresAt: expires, mcpGeneration: continuing ? previous.mcpGeneration : randomUUID(),
 				mcpPreviousSecret: rotating ? previous.secret : continuing ? previous.mcpPreviousSecret : null,
 				mcpPreviousSecretUntil: rotating ? new Date(Date.now() + 60000) : continuing ? previous.mcpPreviousSecretUntil : null });
@@ -116,12 +123,26 @@ export class McpEventsService {
 		return { id, refreshBefore: expires.toISOString(), cursor: null, truncated: false };
 	}
 
-	/** Recheck after DNS resolution immediately before opening the outbound connection. */
-	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: 'mention' | 'reply') {
+	private async subscriptionForDelivery(id: string, userId: string, generation: string, type: 'mention' | 'reply' | 'antenna', antennaId?: string) {
 		const webhook = await this.webhooks.createQueryBuilder('webhook').addSelect('webhook.mcpPreviousSecret').where('webhook.id = :id', { id }).getOne();
 		if (!webhook || webhook.mode !== 'mcp' || webhook.userId !== userId || !webhook.active || webhook.mcpGeneration !== generation
-			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now() || !webhook.mcpTokenId || !webhook.on.includes(type)) return null;
-		try { await this.checkGrant(userId, webhook.mcpTokenId); } catch (error) { if (error instanceof McpEventError) return null; throw error; }
+			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now() || !webhook.mcpTokenId || (type === 'antenna' ? !antennaId || webhook.mcpAntennaId !== antennaId : !!webhook.mcpAntennaId || !webhook.on.includes(type))) return null;
+		return webhook;
+	}
+
+	/** Recheck after DNS resolution immediately before opening the outbound connection. */
+	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: 'mention' | 'reply' | 'antenna', antennaId?: string) {
+		const webhook = await this.subscriptionForDelivery(id, userId, generation, type, antennaId);
+		if (!webhook?.mcpTokenId) return null;
+		try {
+			const { actor, grant } = await this.checkGrant(userId, webhook.mcpTokenId, type === 'antenna');
+			if (type === 'antenna') {
+				if (!await this.antennaAccess.isDeliverable(actor, grant, antennaId!, noteId)) return null;
+				// Packing/cache fetches can overlap unsubscribe, expiry or grant revocation.
+				await this.checkGrant(userId, webhook.mcpTokenId, true);
+				return this.subscriptionForDelivery(id, userId, generation, type, antennaId);
+			}
+		} catch (error) { if (error instanceof McpEventError) return null; throw error; }
 		const note = await this.notes.findOneBy({ id: noteId });
 		if (!note || (type === 'mention' ? !note.mentions.includes(userId) : note.replyUserId !== userId)
 			|| !await this.noteEntity.isVisibleForMe(note, userId)) return null;

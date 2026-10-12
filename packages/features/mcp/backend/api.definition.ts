@@ -10,16 +10,19 @@ import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.ty
 import { eventNames } from './events.schema.js';
 
 const url = v.pipe(v.string(), v.minLength(1), v.maxLength(1024));
-const identity = { name: v.picklist(eventNames), arguments: v.strictObject({}) };
-export const subscribeInput = v.strictObject({ ...identity,
+const identities = [
+	{ name: v.picklist(['note.mentioned', 'note.replied']), arguments: v.strictObject({}) },
+	{ name: v.literal('antenna.note'), arguments: v.strictObject({ antennaId: v.pipe(v.string(), v.minLength(1), v.maxLength(32)) }) },
+] as const;
+export const subscribeInput = v.variant('name', identities.map(identity => v.strictObject({ ...identity,
 	delivery: v.strictObject({ mode: v.literal('webhook'), url, secret: v.pipe(v.string(), v.maxLength(1024)) }),
 	cursor: v.optional(v.null(), null),
 	ttlMs: v.optional(v.nullable(v.pipe(v.number(), v.integer(), v.minValue(1))), 3600000),
-});
-export const unsubscribeInput = v.strictObject({ ...identity, delivery: v.strictObject({ mode: v.literal('webhook'), url }) });
+})));
+export const unsubscribeInput = v.variant('name', identities.map(identity => v.strictObject({ ...identity, delivery: v.strictObject({ mode: v.literal('webhook'), url }) })));
 export const listInput = v.strictObject({ cursor: v.optional(v.null()) });
 const descriptor = v.strictObject({ name: v.picklist(eventNames), description: v.string(), delivery: v.tuple([v.literal('webhook')]),
-	inputSchema: v.strictObject({ type: v.literal('object'), properties: v.strictObject({}), additionalProperties: v.literal(false) }),
+	inputSchema: v.strictObject({ type: v.literal('object'), properties: v.union([v.strictObject({}), v.strictObject({ antennaId: v.strictObject({ type: v.literal('string') }) })]), required: v.optional(v.tuple([v.literal('antennaId')])), additionalProperties: v.literal(false) }),
 	payloadSchema: v.strictObject({ type: v.literal('object'), properties: v.strictObject({ noteId: v.strictObject({ type: v.literal('string') }), url: v.strictObject({ type: v.literal('string') }) }), required: v.tuple([v.literal('noteId'), v.literal('url')]), additionalProperties: v.literal(false) }),
 });
 const procedure = (requestName: string) => oc.$meta({ requestName, requireCredential: true, kind: 'read:notifications', prohibitMoved: true,

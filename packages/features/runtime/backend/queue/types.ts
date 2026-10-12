@@ -140,7 +140,7 @@ export type LegacyUserWebhookDeliverJobData<T extends WebhookEventTypes = Webhoo
 
 /** MCP jobs contain references only; current destination and keys are read at delivery time. */
 export type McpWebhookDeliverJobData = {
-	mode: 'mcp'; type: 'mention' | 'reply'; webhookId: string; userId: string;
+	mode: 'mcp'; type: 'mention' | 'reply' | 'antenna'; antennaId?: string; webhookId: string; userId: string;
 	generation: string; noteId: string; createdAt: number; eventId: string;
 };
 export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEventTypes> = LegacyUserWebhookDeliverJobData<T> | McpWebhookDeliverJobData;

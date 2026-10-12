@@ -20,6 +20,8 @@ import type { NoteEntityService } from '@features/notes/backend/serializers/Note
 import type { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type { WebhooksRepository, AccessTokensRepository, AppsRepository, UsersRepository, NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
+import type { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';
 import type { UserWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
@@ -29,14 +31,14 @@ vi.mock('@features/notes/backend/serializers/NoteEntityService.js', () => ({ Not
 vi.mock('@features/runtime/backend/queue/QueueLoggerService.js', () => ({ QueueLoggerService: class {} }));
 const secret = 'whsec_' + Buffer.alloc(32, 42).toString('base64');
 const input = { name: 'note.mentioned' as const, arguments: {}, delivery: { mode: 'webhook' as const, url: 'https://callback.example/events', secret }, cursor: null, ttlMs: 3600000 };
-const stores = () => ({ webhooks: mockDeep<WebhooksRepository>(), tokens: mockDeep<AccessTokensRepository>(), apps: mockDeep<AppsRepository>(), users: mockDeep<UsersRepository>(), notes: mockDeep<NotesRepository>(), http: mockDeep<HttpRequestService>(), roles: mockDeep<RoleService>(), noteEntity: mockDeep<NoteEntityService>() });
+const stores = () => ({ webhooks: mockDeep<WebhooksRepository>(), tokens: mockDeep<AccessTokensRepository>(), apps: mockDeep<AppsRepository>(), users: mockDeep<UsersRepository>(), notes: mockDeep<NotesRepository>(), http: mockDeep<HttpRequestService>(), roles: mockDeep<RoleService>(), noteEntity: mockDeep<NoteEntityService>(), antennas: mockDeep<AntennasRepository>(), antennaAccess: mockDeep<AntennaNoteAccessService>() });
 let deps: ReturnType<typeof stores>;
 let service: McpEventsService;
 let rows: Map<string, MiWebhook>;
 let actor: MiLocalUser;
 let permission: string[];
 beforeEach(() => {
-	deps = stores(); rows = new Map(); permission = ['access:mcp', 'read:notifications'];
+	deps = stores(); Object.defineProperty(deps.antennas, 'target', { value: 'antenna' }); rows = new Map(); permission = ['access:mcp', 'read:notifications'];
 	actor = { id: 'account', host: null, isSuspended: false, movedToUri: null } as MiLocalUser;
 	deps.users.findOneBy.mockImplementation(async where => !Array.isArray(where) && where.id === actor.id ? actor : null);
 	deps.tokens.findOneBy.mockImplementation(async where => !Array.isArray(where) && where.id === 'grant' && where.userId === actor.id ? { id: 'grant', userId: actor.id, appId: null, permission } as never : null);
@@ -52,12 +54,12 @@ beforeEach(() => {
 	repo.save.mockImplementation(async values => { const row = Object.assign(new MiWebhook(), values); rows.set(row.id, row); return row; });
 	deps.webhooks.update.mockImplementation(async (where, values) => { for (const row of rows.values()) if (typeof where === 'object' && Object.entries(where).every(([key, value]) => row[key as keyof MiWebhook] === value)) Object.assign(row, values); return {} as never; });
 	repo.update.mockImplementation(deps.webhooks.update);
-	const manager = mockDeep<WebhooksRepository['manager']>(); manager.getRepository.mockReturnValue(repo as never);
+	const manager = mockDeep<WebhooksRepository['manager']>(); manager.getRepository.mockImplementation(target => target === deps.antennas.target ? deps.antennas as never : repo as never);
 	deps.webhooks.manager.transaction.mockImplementation(async (...args) => (args.at(-1) as unknown as (manager: unknown) => Promise<unknown>)(manager) as never);
 	deps.http.sendMcpWebhook.mockImplementation(async (_url, body) => ({ status: 200, ok: true, text: JSON.stringify({ challenge: JSON.parse(body).challenge }) }));
 	deps.notes.findOneBy.mockResolvedValue({ id: 'note', mentions: ['account'], replyUserId: 'account' } as never);
 	deps.noteEntity.isVisibleForMe.mockResolvedValue(true); deps.noteEntity.pack.mockResolvedValue({ isHidden: false } as never);
-	service = new McpEventsService(deps.webhooks, deps.tokens, deps.apps, deps.users, deps.notes, deps.http, deps.roles, deps.noteEntity);
+	service = new McpEventsService(deps.webhooks, deps.tokens, deps.apps, deps.users, deps.notes, deps.http, deps.roles, deps.noteEntity, deps.antennas, deps.antennaAccess);
 });
 const context = (): ApiContext<MiLocalUser> => ({ credential: 'synthetic', ip: '127.0.0.1', headers: {}, services: {
 	authenticate: async () => [actor, { id: 'grant', permission }], limitActor: () => 'account', rateLimitFactor: async () => 1, limit: async () => null,
@@ -164,4 +166,49 @@ it('retries a live key rotation after DNS with current signatures instead of sup
 		return { ok: true, status: 200, text: '' };
 	});
 	expect(await worker.process(job)).toBe('Success'); expect(rows.get(id)!.mcpGeneration).toBe(generation);
+});
+
+it('binds antenna arguments to ownership, read:account scope and subscription identity', async () => {
+	const antenna = { ...input, name: 'antenna.note' as const, arguments: { antennaId: 'antenna' } };
+	for (const args of [{}, { antennaId: 'antenna', userId: 'other' }, { antennaId: '' }]) expect(v.safeParse(subscribeInput, { ...antenna, arguments: args }).success).toBe(false);
+	await expect(subscribe(antenna)).rejects.toThrow('Event access denied');
+	expect(deps.http.sendMcpWebhook).not.toHaveBeenCalled();
+	permission.push('read:account');
+	await expect(subscribe(antenna)).rejects.toThrow('Antenna access denied');
+	deps.antennas.existsBy.mockResolvedValue(true);
+	const { id } = await subscribe(antenna);
+	expect(rows.get(id)).toMatchObject({ mcpAntennaId: 'antenna', on: [] });
+	const other = await subscribe({ ...antenna, arguments: { antennaId: 'another' } });
+	expect(other.id).not.toBe(id);
+	expect(id).not.toBe(subscriptionId('account', 'grant', input.delivery.url, 'antenna.note', 'another'));
+	deps.antennaAccess.isDeliverable.mockResolvedValue(true);
+	const generation = rows.get(id)!.mcpGeneration!;
+	expect(await service.authorizeDelivery(id, 'account', generation, 'note', 'antenna', 'antenna')).not.toBeNull();
+	expect(await service.authorizeDelivery(id, 'account', generation, 'note', 'antenna', 'other')).toBeNull();
+	deps.antennaAccess.isDeliverable.mockImplementationOnce(async () => { rows.get(id)!.active = false; return true; });
+	expect(await service.authorizeDelivery(id, 'account', generation, 'note', 'antenna', 'antenna')).toBeNull();
+	rows.get(id)!.active = true;
+	deps.antennaAccess.isDeliverable.mockResolvedValue(false);
+	expect(await service.authorizeDelivery(id, 'account', generation, 'note', 'antenna', 'antenna')).toBeNull();
+	const logger = mockDeep<QueueLoggerService>(); logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, deps.webhooks, deps.http, service, logger);
+	const job = { data: { mode: 'mcp', type: 'antenna', antennaId: 'antenna', webhookId: id, userId: 'account', generation, noteId: 'note', createdAt: 1000, eventId: 'antenna-event' } } as Bull.Job<UserWebhookDeliverJobData>;
+	deps.antennaAccess.isDeliverable.mockResolvedValueOnce(true).mockResolvedValue(false);
+	let sent = false;
+	deps.http.sendMcpWebhook.mockImplementationOnce(async (_url, body, _headers, _signal, beforeSend) => {
+		expect(JSON.parse(body).name).toBe('antenna.note'); await beforeSend?.(); sent = true; return { status: 200, ok: true, text: '' };
+	});
+	expect(await worker.process(job)).toBe('Suppressed'); expect(sent).toBe(false);
+	permission.splice(permission.indexOf('read:account'), 1); deps.antennaAccess.isDeliverable.mockResolvedValue(true);
+	expect(await worker.process(job)).toBe('Suppressed'); permission.push('read:account');
+
+	await service.invoke('events/unsubscribe', { name: antenna.name, arguments: antenna.arguments, delivery: { mode: 'webhook', url: input.delivery.url } }, context());
+	expect(await service.authorizeDelivery(id, 'account', generation, 'note', 'antenna', 'antenna')).toBeNull();
+	expect(rows.get(other.id)!.active).toBe(true);
+});
+
+it('advertises strict antenna arguments separately from empty mention/reply arguments', async () => {
+	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
+	expect(result.events.find(event => event.name === 'antenna.note')?.inputSchema).toEqual({ type: 'object', properties: { antennaId: { type: 'string' } }, required: ['antennaId'], additionalProperties: false });
+	expect(result.events.find(event => event.name === 'note.mentioned')?.inputSchema).toEqual({ type: 'object', properties: {}, additionalProperties: false });
 });

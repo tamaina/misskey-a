@@ -11,7 +11,8 @@ The native grant needs both `access:mcp` and `read:notifications`. Payload data
 is `{ noteId, url }`; consumers can read the note through existing native tools.
 Delivery is webhook-only without replay; cursors are `null`.
 
-Subscriptions bind to the account, grant, canonical callback URL and event name.
+Subscriptions bind to the account, grant, canonical callback URL, event name
+and canonical arguments.
 The default lifetime is one hour and the maximum is one day; `ttlMs: null`
 receives the finite default. Refresh an active subscription before `refreshBefore`.
 Unsubscribe uses the same name, arguments and delivery URL. Expired records and
@@ -26,3 +27,11 @@ HMAC-SHA256 signatures; verify the exact body and deduplicate stable event IDs.
 Key refresh signs with both keys for 60 seconds. A 410 response disables the
 subscription; 413 is not retried. Revocation suppresses queued delivery but cannot
 recall a request already sent.
+
+`antenna.note` takes strict `{ antennaId }` arguments and also requires
+`read:account`. Its persisted subscription resumes live Pub/Sub observation after
+restart; it does not replay downtime events. Queued deliveries reuse the native
+antenna filters and grant checks. A dedicated antenna queue isolates its retained BullMQ job IDs from legacy
+count cleanup and deduplicates across
+processes while retained (at least 24 hours after completion); HTTP retries may
+repeat delivery.

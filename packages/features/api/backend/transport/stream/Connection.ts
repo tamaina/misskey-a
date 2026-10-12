@@ -9,6 +9,7 @@ import { ContextIdFactory, ModuleRef, REQUEST } from '@nestjs/core';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import { isJsonObject } from '@features/runtime/backend/formatting/json-value.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting/json-value.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
@@ -55,6 +56,8 @@ export default class Connection {
 	public user?: MiUser;
 	public token?: MiAccessToken;
 	private wsConnection: WebSocket.WebSocket;
+	private antennaOutput: AntennaNoteOutput | undefined;
+	private disposed = false;
 	private messageQueue = promiseLimit<void>(1);
 	public subscriber: StreamEventEmitter;
 	private channels: Map<string, Channel> = new Map();
@@ -116,8 +119,10 @@ export default class Connection {
 
 	@bindThis
 	public async init() {
+		if (this.disposed) return;
 		if (this.user != null) {
 			await this.fetch();
+			if (this.disposed) return;
 
 			if (!this.fetchIntervalId) {
 				this.fetchIntervalId = setInterval(this.fetch, 1000 * 10);
@@ -127,6 +132,7 @@ export default class Connection {
 
 	@bindThis
 	public async listen(subscriber: EventEmitter, wsConnection: WebSocket.WebSocket) {
+		if (this.antennaOutput || this.disposed) throw new Error('Connection already attached');
 		this.subscriber = subscriber;
 
 		this.wsConnection = wsConnection;
@@ -135,6 +141,35 @@ export default class Connection {
 		this.subscriber.on('broadcast', data => {
 			this.onBroadcastMessage(data);
 		});
+	}
+
+	/** In-process antenna-only pilot. No broadcast, raw note or socket handlers. */
+	public attachAntennaOutput(subscriber: StreamEventEmitter, output: AntennaNoteOutput) {
+		if (this.disposed || this.wsConnection || this.antennaOutput) throw new Error('Connection already attached');
+		this.subscriber = subscriber;
+		this.antennaOutput = output;
+	}
+
+	/** Only receives channel output after the channel's authorization and filters. */
+	public sendChannelMessage(id: string, type: string, body: JsonValue) {
+		if (this.disposed) return;
+		if (this.antennaOutput) {
+			const output = this.antennaOutput;
+			if (output.isOpen() && this.channels.get(id)?.chName === 'antenna' && type === 'note') {
+				try {
+					Promise.resolve(output.send(body as Packed<'Note'>)).catch(error => { this.failAntennaOutput(output, error); });
+				} catch (error) { this.failAntennaOutput(output, error); }
+			}
+			return;
+		}
+		this.sendMessageToWs('channel', { id, type, body });
+	}
+
+	private failAntennaOutput(output: AntennaNoteOutput, error: unknown) {
+		if (this.disposed) return;
+		this.dispose();
+		// Failure observers cannot escape the EventEmitter handler either.
+		try { Promise.resolve(output.failed(error)).catch(() => {}); } catch { }
 	}
 
 	/**
@@ -293,30 +328,31 @@ export default class Connection {
 	 */
 	@bindThis
 	public async connectChannel(id: string, params: JsonObject | undefined, channel: string, pong = false) {
+		if (this.disposed || this.antennaOutput && channel !== 'antenna') return false;
 		if (this.channels.has(id)) {
 			this.disconnectChannel(id);
 		}
 
 		if (this.channels.size >= MAX_CHANNELS_PER_CONNECTION) {
-			return;
+			return false;
 		}
 
 		const channelConstructor = this.getChannelConstructor(channel);
 
 		if (channelConstructor.requireCredential && this.user == null) {
-			return;
+			return false;
 		}
 
 		if (this.token && ((channelConstructor.kind && !this.token.permission.some(p => p === channelConstructor.kind))
 			|| (!channelConstructor.kind && channelConstructor.requireCredential))) {
-			return;
+			return false;
 		}
 
 		// 共有可能チャンネルに接続しようとしていて、かつそのチャンネルに既に接続していたら無意味なので無視
 		if (channelConstructor.shouldShare) {
 			for (const c of this.channels.values()) {
 				if (c.chName === channel) {
-					return;
+					return false;
 				}
 			}
 		}
@@ -327,21 +363,31 @@ export default class Connection {
 			connection: this,
 		}, contextId);
 		const ch: Channel = await this.moduleRef.create<Channel>(channelConstructor, contextId);
-		if (this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return;
+		if (this.antennaOutput ? !this.antennaOutput.isOpen() : this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return false;
 
 		this.channels.set(ch.id, ch);
 		const valid = await ch.init(params ?? {});
+		if (this.disposed || this.antennaOutput && !this.antennaOutput.isOpen()) {
+			ch.dispose?.(); this.channels.delete(ch.id); return false;
+		}
 		if (typeof valid === 'boolean' && !valid) {
 			// 初期化処理の結果、接続拒否されたので切断
 			this.disconnectChannel(id);
-			return;
+			return false;
 		}
 
-		if (pong) {
+		if (pong && !this.antennaOutput) {
 			this.sendMessageToWs('connected', {
 				id: id,
 			});
 		}
+		return true;
+	}
+
+	public async packAntennaNote(id: string, noteId: string) {
+		const channel = this.channels.get(id);
+		if (this.disposed || !(channel instanceof AntennaChannel)) return null;
+		return channel.packNote(noteId);
 	}
 
 	@bindThis
@@ -407,7 +453,9 @@ export default class Connection {
 	 */
 	@bindThis
 	public dispose() {
+		this.disposed = true;
 		if (this.fetchIntervalId) clearInterval(this.fetchIntervalId);
+		this.fetchIntervalId = null;
 
 		for (const c of this.channels.values()) {
 			if (c.dispose) c.dispose();
@@ -427,3 +475,10 @@ export interface ConnectionRequest {
 }
 
 export { Connection };
+
+/** Filtered antenna notes only; no transport or persistence semantics implied. */
+export interface AntennaNoteOutput {
+	isOpen(): boolean;
+	send(note: Packed<'Note'>): void | Promise<void>;
+	failed(error: unknown): void | Promise<void>;
+}
