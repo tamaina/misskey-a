@@ -256,7 +256,7 @@ const services = [
 	['PageService', PageService, 7],
 	['PollService', PollService, 11],
 	['PushNotificationService', PushNotificationService, 5],
-	['QueueService', QueueService, 12],
+	['QueueService', QueueService, 13],
 	['ReactionsBufferingService', ReactionsBufferingService, 4],
 	['ReactionService', ReactionService, 19],
 	['RegistryApiService', RegistryApiService, 3],

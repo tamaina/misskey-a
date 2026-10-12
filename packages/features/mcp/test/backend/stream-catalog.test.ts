@@ -10,7 +10,7 @@ import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting
 
 const sensitive = { text: 'PRIVATE_TEXT', url: 'https://secret.invalid', ip: 'PRIVATE_IP', headers: { authorization: 'PRIVATE_TOKEN' }, value: 'PRIVATE_VALUE', email: 'PRIVATE_EMAIL', var: { secret: 'PRIVATE_VAR' } };
 const occurrence = (channel: string, type: string, body: JsonValue): StreamOccurrence => ({ id: 'occurrence-1', createdAt: 1000, channel, message: { type, body } });
-const projected = (channel: StreamSubscription['channel'], type: string, body: JsonValue, params: JsonObject = {}) => projectFrame({ channel, params }, { type: 'channel', body: { id: 'subscription', type, body } });
+const projected = (channel: StreamSubscription['channel'], type: string, body: JsonValue, params: StreamSubscription['params'] = {}) => projectFrame({ channel, params }, { type: 'channel', body: { id: 'subscription', type, body } });
 
 function bodyFor(type: string): JsonObject {
 	return { ...sensitive, id: 'entity', userId: 'author', toUserId: 'recipient', toRoomId: 'room', visibility: 'public', visibleUserIds: [], type: 'mention', user: { id: 'author', host: 'example.invalid', ...sensitive }, note: { id: 'note', ...sensitive }, emoji: { id: 'emoji', ...sensitive }, emojis: [{ id: 'emoji', ...sensitive }], game: { id: 'game', ...sensitive }, announcement: { id: 'announcement', ...sensitive }, file: { id: 'file', ...sensitive }, pageId: 'page', event: 'changed', key: 'key', scope: ['scope'], createdAt: '2026-10-12T06:00:00.000Z', success: true, choice: 1, deletedAt: '2026-10-12T06:00:00.000Z', index: 2, pos: 4, body: { ...sensitive, userId: 'voter', choice: 1, deletedAt: '2026-10-12T06:00:00.000Z' } };
