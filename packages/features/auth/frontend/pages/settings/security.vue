@@ -74,6 +74,9 @@ const paginator = markRaw(new Paginator('i/signin-history', {
 }));
 
 async function change() {
+	const auth = await os.authenticateDialog();
+	if (auth.canceled) return;
+
 	const { canceled: canceled2, result: newPassword } = await os.inputText({
 		title: $locale.value.sfc.newPassword,
 		type: 'password',
@@ -95,9 +98,6 @@ async function change() {
 		});
 		return;
 	}
-
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
 
 	os.apiWithDialog('i/change-password', {
 		currentPassword: auth.result.password,
