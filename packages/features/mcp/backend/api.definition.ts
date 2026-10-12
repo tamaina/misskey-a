@@ -8,7 +8,7 @@ import * as v from 'valibot';
 import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
 import { eventNames } from './events.schema.js';
-import { streamChannelArguments, streamNoteArguments } from './stream-parameters.js';
+import { streamChannelArguments, streamNoteArguments } from './stream.schema.js';
 
 const url = v.pipe(v.string(), v.minLength(1), v.maxLength(1024));
 const identities = [
