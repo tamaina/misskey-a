@@ -17,7 +17,7 @@ export function createIWebhooksListProcedure(deps: IWebhooksListDependencies) {
 			const me = context.principal;
 			const result = await (async () => {
 				const webhooks = await deps.webhooksRepository.findBy({
-					userId: me.id,
+					userId: me.id, mode: 'legacy',
 				});
 				return webhooks.map(webhook => ({
 					id: webhook.id,

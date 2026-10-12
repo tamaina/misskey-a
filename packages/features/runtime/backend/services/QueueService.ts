@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { toPackedJsonValue, type PackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { MetricsTime, type JobType } from 'bullmq';
@@ -667,6 +667,16 @@ export class QueueService {
 		content: UserWebhookPayload<T>,
 		opts?: { attempts?: number },
 	) {
+		if (webhook.mode === 'mcp') {
+			if ((type !== 'mention' && type !== 'reply') || !('note' in content) || !webhook.mcpGeneration
+				|| !webhook.mcpExpiresAt || new Date(webhook.mcpExpiresAt).getTime() <= Date.now()) return;
+			const eventId = createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, type, content.note.id])).digest('hex');
+			const data: UserWebhookDeliverJobData = { mode: 'mcp', type, webhookId: webhook.id, userId: webhook.userId,
+				generation: webhook.mcpGeneration, noteId: content.note.id, createdAt: new Date(content.note.createdAt).getTime(), eventId };
+			return this.userWebhookDeliverQueue.add(webhook.id, data, { jobId: eventId, attempts: 4,
+				backoff: { type: 'custom' }, removeOnComplete: { age: 86400, count: 1000 }, removeOnFail: { age: 86400, count: 1000 } });
+		}
+
 		const data: UserWebhookDeliverJobData = {
 			type,
 			content,

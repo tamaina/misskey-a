@@ -7,6 +7,7 @@ import { ModuleRef } from '@nestjs/core';
 import * as v from 'valibot';
 import { availableEndpointsResult } from '@features/instance/backend/endpoints/available-endpoints.contract.js';
 import { mcpScopes } from './discovery.js';
+import { McpEventsService } from './McpEventsService.js';
 import { ORPCError } from '@orpc/server';
 import { ApiRouterProvider } from '@features/index/backend/api.implementation.js';
 import { endpointPolicies } from '@features/api/backend/transport/endpoint-directory.js';
@@ -42,7 +43,12 @@ export class McpApiService {
 		if (!token?.id) throw mcpPermissionDenied();
 		const tokenId = token.id;
 		await this.checkAccess(principal.id, tokenId);
-		return { invoke: async (tool: string, input: unknown, invocationSignal?: AbortSignal): Promise<unknown> => {
+		return { events: async (method: string, input: unknown, invocationSignal?: AbortSignal) => {
+			const { actor, permission } = await this.checkAccess(principal.id, tokenId);
+			const operationContext = this.contexts.create({ ...request, safeDiagnostics: true, freshAuthorization: true }, `mcp/${method}`);
+			const bound: ApiContext<MiLocalUser> = { ...operationContext, services: { ...operationContext.services, authenticate: async () => [actor, { ...token, permission }] } };
+			return this.moduleRef.get(McpEventsService, { strict: false }).invoke(method, input, bound, invocationSignal);
+		}, invoke: async (tool: string, input: unknown, invocationSignal?: AbortSignal): Promise<unknown> => {
 			validateSelection(tool, input);
 			const { actor, permission } = await this.checkAccess(principal.id, tokenId);
 			const endpointName = tool === 'call_api' && typeof input.endpoint === 'string' ? input.endpoint : tool === 'list_api_endpoints' ? 'available-endpoints' : 'users/notes';
