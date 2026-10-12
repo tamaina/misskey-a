@@ -12,6 +12,7 @@ import { DeliverProcessorService } from '@features/federation/backend/jobs/Deliv
 import { EndedPollNotificationProcessorService } from '@features/notes/backend/jobs/EndedPollNotificationProcessorService.js';
 import { PostScheduledNoteProcessorService } from '@features/notes/backend/jobs/PostScheduledNoteProcessorService.js';
 import { InboxProcessorService } from '@features/federation/backend/jobs/InboxProcessorService.js';
+import { McpStreamDeliverProcessorService } from '@features/integrations/backend/jobs/McpStreamDeliverProcessorService.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { SystemWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/SystemWebhookDeliverProcessorService.js';
 import { CheckExpiredMutingsProcessorService } from '@features/relationships/backend/jobs/CheckExpiredMutingsProcessorService.js';
@@ -78,6 +79,7 @@ import { RelationshipProcessorService } from '@features/relationships/backend/jo
 		CleanRemoteFilesProcessorService,
 		RelationshipProcessorService,
 		UserWebhookDeliverProcessorService,
+		McpStreamDeliverProcessorService,
 		SystemWebhookDeliverProcessorService,
 		EndedPollNotificationProcessorService,
 		PostScheduledNoteProcessorService,

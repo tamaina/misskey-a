@@ -354,11 +354,11 @@ export class ChatService {
 	}
 
 	@bindThis
-	public async hasPermissionToViewRoomTimeline(meId: MiUser['id'], room: MiChatRoom) {
+	public async hasPermissionToViewRoomTimeline(meId: MiUser['id'], room: MiChatRoom, fresh = false) {
 		if (await this.isRoomMember(room, meId)) {
 			return true;
 		} else {
-			const iAmModerator = await this.roleService.isModerator({ id: meId });
+			const iAmModerator = await this.roleService.isModerator({ id: meId }, fresh);
 			if (iAmModerator) {
 				return true;
 			}

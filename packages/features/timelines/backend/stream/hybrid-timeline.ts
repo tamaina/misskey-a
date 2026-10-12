@@ -40,7 +40,7 @@ export class HybridTimelineChannel extends Channel {
 
 	@bindThis
 	public async init(params: JsonObject): Promise<void> {
-		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null);
+		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null, this.connection.isNativeOutput);
 		if (!policies.ltlAvailable) return;
 
 		this.withRenotes = !!(params.withRenotes ?? true);

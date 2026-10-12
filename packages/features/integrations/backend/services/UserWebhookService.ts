@@ -115,7 +115,7 @@ export class UserWebhookService implements OnApplicationShutdown {
 					this.activeWebhooks.push({ // TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
 						...body,
 						latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
-						mcpExpiresAt: null, mcpPreviousSecretUntil: null,
+						mcpExpiresAt: null, mcpPreviousSecretUntil: null, mcpStream: null, mcpStreamSince: null,
 						mcpToken: null, mcpAntenna: null, // not joined
 						user: null, // joinなカラムは通常取ってこないので
 					});
@@ -129,7 +129,7 @@ export class UserWebhookService implements OnApplicationShutdown {
 						this.activeWebhooks[i] = { // TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
 							...body,
 							latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
-							mcpExpiresAt: null, mcpPreviousSecretUntil: null,
+							mcpExpiresAt: null, mcpPreviousSecretUntil: null, mcpStream: null, mcpStreamSince: null,
 							mcpToken: null, mcpAntenna: null, // not joined
 							user: null, // joinなカラムは通常取ってこないので
 						};
@@ -137,7 +137,7 @@ export class UserWebhookService implements OnApplicationShutdown {
 						this.activeWebhooks.push({ // TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
 							...body,
 							latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
-							mcpExpiresAt: null, mcpPreviousSecretUntil: null,
+							mcpExpiresAt: null, mcpPreviousSecretUntil: null, mcpStream: null, mcpStreamSince: null,
 							mcpToken: null, mcpAntenna: null, // not joined
 							user: null, // joinなカラムは通常取ってこないので
 						});

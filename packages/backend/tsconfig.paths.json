@@ -30,6 +30,7 @@
 			"@misskey-dev/node-http-message-signatures": ["./node_modules/@misskey-dev/node-http-message-signatures"],
 			"@misskey-dev/node-http-message-signatures/node/slacc": ["./node_modules/@misskey-dev/node-http-message-signatures/dist/node/slacc.d.ts"],
 			"bullmq": ["./node_modules/bullmq"],
+			"bullmq/dist/cjs/scripts/addStandardJob-9.js": ["./node_modules/bullmq/dist/esm/scripts/addStandardJob-9.d.ts"],
 			"date-fns": ["./node_modules/date-fns"],
 			"@aws-sdk/client-s3": ["./node_modules/@aws-sdk/client-s3"],
 			"@aws-sdk/lib-storage": ["./node_modules/@aws-sdk/lib-storage"],

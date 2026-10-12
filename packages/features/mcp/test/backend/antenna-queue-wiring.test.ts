@@ -14,6 +14,7 @@ import type { UserWebhookDeliverProcessorService } from '@features/integrations/
 import type { Provider, FactoryProvider } from '@nestjs/common';
 import type { Config } from '@/config.js';
 const mocks = vi.hoisted(() => ({ workers: [] as { name: string; process: (job: unknown) => unknown; options: Record<string, unknown>; run: ReturnType<typeof vi.fn>; close: ReturnType<typeof vi.fn>; waitUntilReady: ReturnType<typeof vi.fn> }[] }));
+vi.mock('@features/mcp/backend/stream-queue-admission.js', async () => ({ ...await vi.importActual<typeof import('@features/mcp/backend/stream-queue-admission.js')>('@features/mcp/backend/stream-queue-admission.js'), reconcileStreamJobs: vi.fn(async () => {}), releaseStreamJob: vi.fn(async () => {}) }));
 vi.mock('bullmq', async () => {
 	const actual = await vi.importActual<typeof import('bullmq')>('bullmq');
 	return { ...actual, Queue: class {

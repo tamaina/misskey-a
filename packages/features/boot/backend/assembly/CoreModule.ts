@@ -52,6 +52,8 @@ import { UserMutingService } from '@features/relationships/backend/services/User
 import { UserRenoteMutingService } from '@features/relationships/backend/services/UserRenoteMutingService.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
+import { McpStreamAccessService } from '@features/mcp/backend/McpStreamAccessService.js';
+import { McpStreamSubscriptionService } from '@features/mcp/backend/McpStreamSubscriptionService.js';
 import { McpEventsService } from '@features/mcp/backend/McpEventsService.js';
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { SearchService } from '@features/note-search/backend/services/SearchService.js';
@@ -163,6 +165,8 @@ const canonicalServices = {
 	UserSuspendService,
 	UserWebhookService,
 	McpEventsService,
+	McpStreamAccessService,
+	McpStreamSubscriptionService,
 	NoteStreamingHidingService,
 	SystemWebhookService,
 	WebhookTestService,

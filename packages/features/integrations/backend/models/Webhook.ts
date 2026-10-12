@@ -10,6 +10,7 @@ import { MiAntenna } from '@features/timelines/backend/models/Antenna.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { webhookEventTypes } from '../webhook-events.schema.js';
 import type { WebhookEventTypes } from '../webhook-events.schema.js';
+import type { StreamSubscription } from '@features/mcp/backend/stream-types.js';
 
 export { webhookEventTypes } from '../webhook-events.schema.js';
 export type { WebhookEventTypes } from '../webhook-events.schema.js';
@@ -74,6 +75,12 @@ export class MiWebhook {
 	@Index('IDX_webhook_mcpAntennaId')
 	@Column({ ...id(), nullable: true })
 	public mcpAntennaId: string | null;
+
+	@Column('jsonb', { nullable: true })
+	public mcpStream: StreamSubscription | null;
+
+	@Column('timestamp with time zone', { nullable: true })
+	public mcpStreamSince: Date | null;
 
 	@ManyToOne(() => MiAntenna, { onDelete: 'CASCADE', nullable: true })
 	@JoinColumn({ name: 'mcpAntennaId', foreignKeyConstraintName: 'FK_webhook_mcpAntennaId' })
