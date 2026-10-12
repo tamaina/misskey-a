@@ -43,6 +43,7 @@ import type { ChannelRequest } from './channel.js';
 import type { ChannelConstructor } from './channel.js';
 import type { Channel } from './channel.js';
 import type { EventEmitter } from 'events';
+import type { StreamChannel } from '@features/mcp/backend/stream-types.js';
 
 const MAX_CHANNELS_PER_CONNECTION = 32;
 const MAX_SUBSCRIBING_NOTES_PER_CONNECTION = 1536;
@@ -59,6 +60,7 @@ export default class Connection {
 	private output: NativeStreamOutput | undefined;
 	private outputChannels: ReadonlySet<string> = new Set();
 	private listeningBroadcast = false;
+	public get isNativeOutput() { return !!this.output; }
 	private disposed = false;
 	private messageQueue = promiseLimit<void>(1);
 	public subscriber: StreamEventEmitter;
@@ -90,7 +92,7 @@ export default class Connection {
 	}
 
 	@bindThis
-	public async fetch() {
+	public async fetch(fresh = false) {
 		if (this.user == null) return;
 		const [
 			userProfile,
@@ -101,13 +103,13 @@ export default class Connection {
 			userIdsWhoBlockingMe,
 			userIdsWhoMeMutingRenotes,
 		] = await Promise.all([
-			this.cacheService.userProfileCache.fetch(this.user.id),
-			this.cacheService.userFollowingsCache.fetch(this.user.id),
-			this.channelFollowingService.userFollowingChannelsCache.fetch(this.user.id),
-			this.channelMutingService.mutingChannelsCache.fetch(this.user.id),
-			this.cacheService.userMutingsCache.fetch(this.user.id),
-			this.cacheService.userBlockedCache.fetch(this.user.id),
-			this.cacheService.renoteMutingsCache.fetch(this.user.id),
+			this.cacheService.userProfileCache.fetch(this.user.id, fresh),
+			this.cacheService.userFollowingsCache.fetch(this.user.id, fresh),
+			this.channelFollowingService.userFollowingChannelsCache.fetch(this.user.id, fresh),
+			this.channelMutingService.mutingChannelsCache.fetch(this.user.id, fresh),
+			this.cacheService.userMutingsCache.fetch(this.user.id, fresh),
+			this.cacheService.userBlockedCache.fetch(this.user.id, fresh),
+			this.cacheService.renoteMutingsCache.fetch(this.user.id, fresh),
 		]);
 		this.userProfile = userProfile;
 		this.following = following;
@@ -250,6 +252,12 @@ export default class Connection {
 		if (updated === 1) {
 			this.subscriber.on(`noteStream:${payload.id}`, this.onNoteStreamMessage);
 		}
+	}
+
+	/** Declarative outbound note subscription; does not expose the socket command dispatcher. */
+	public subscribeNativeNote(noteId: string) {
+		if (!this.output || this.disposed) throw new Error('Native output required');
+		this.onSubscribeNote({ id: noteId });
 	}
 
 	/**
@@ -496,7 +504,7 @@ export interface ConnectionRequest {
 export { Connection };
 
 /** Deliberately limited pilot routes; no client command dispatcher or note subscriptions. */
-export type NativeOutputChannel = 'main' | 'antenna';
+export type NativeOutputChannel = StreamChannel;
 export interface NativeStreamFrame { type: string; body: JsonObject }
 export interface NativeStreamOutput {
 	isOpen(): boolean;

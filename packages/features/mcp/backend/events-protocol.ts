@@ -6,6 +6,7 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 
 import type { McpEventName } from './events.schema.js';
+import type { StreamSubscription } from './stream-types.js';
 export { eventNames } from './events.schema.js';
 export type { McpEventName } from './events.schema.js';
 export const eventType = (name: McpEventName) => name === 'note.mentioned' ? 'mention' : name === 'note.replied' ? 'reply' : null;
@@ -22,8 +23,8 @@ export function signingKey(secret: string): Buffer {
 }
 
 /** Include the grant and canonical antenna arguments in subscription identity. */
-export function subscriptionId(userId: string, tokenId: string, url: string, name: McpEventName, antennaId?: string): string {
-	return createHash('sha256').update(JSON.stringify([userId, tokenId, url, name, antennaId ? { antennaId } : {}])).digest('hex').slice(0, 32);
+export function subscriptionId(userId: string, tokenId: string, url: string, name: McpEventName, antennaId?: string, stream?: StreamSubscription | null): string {
+	return createHash('sha256').update(JSON.stringify([userId, tokenId, url, name, stream ?? (antennaId ? { antennaId } : {})])).digest('hex').slice(0, 32);
 }
 
 export function signedHeaders(id: string, subscription: string, secret: string, body: string, previous?: string, now = Date.now()): Record<string, string> {

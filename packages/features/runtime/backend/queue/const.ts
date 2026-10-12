@@ -18,6 +18,7 @@ export const QUEUE = {
 	OBJECT_STORAGE: 'objectStorage',
 	USER_WEBHOOK_DELIVER: 'userWebhookDeliver',
 	MCP_ANTENNA_DELIVER: 'mcpAntennaDeliver',
+	MCP_STREAM_DELIVER: 'mcpStreamDeliver',
 	SYSTEM_WEBHOOK_DELIVER: 'systemWebhookDeliver',
 };
 

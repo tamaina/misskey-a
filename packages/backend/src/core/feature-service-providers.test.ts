@@ -44,11 +44,11 @@ describe('feature service composition adapter', () => {
 			entries.splice(entries.indexOf('alias:SystemWebhookService'), 0, 'alias:McpEventsService');
 			for (const prefix of ['class:', 'alias:']) {
 				entries.splice(entries.indexOf(`${prefix}AntennaService`) + 1, 0, `${prefix}AntennaNoteAccessService`, `${prefix}AntennaEventSubscriptionService`);
-				entries.splice(entries.indexOf(`${prefix}McpEventsService`) + 1, 0, `${prefix}NoteStreamingHidingService`);
+				entries.splice(entries.indexOf(`${prefix}McpEventsService`) + 1, 0, `${prefix}McpStreamAccessService`, `${prefix}McpStreamSubscriptionService`, `${prefix}NoteStreamingHidingService`);
 			}
 		}
 		baseline.aliases.push({ name: 'McpEventsService', target: 'McpEventsService' });
-		for (const name of ['AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService']) baseline.aliases.push({ name, target: name });
+		for (const name of ['AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService', 'McpStreamAccessService', 'McpStreamSubscriptionService']) baseline.aliases.push({ name, target: name });
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
 		const describeToken = (entry: Provider | InjectionToken): string => {

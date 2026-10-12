@@ -78,7 +78,10 @@ export class RedisKVCache<T> {
 	 *   * Not awaiting here makes the entire cache non-consistent. The prevents many possible uses.
 	 */
 	@bindThis
-	public async fetch(key: string): Promise<T> {
+	public async fetch(key: string, fresh = false): Promise<T> {
+		// Authorization snapshots can use the native fetcher without reading or
+		// publishing stale shared cache state.
+		if (fresh) return this.fetcher(key);
 		const cachedValue = await this.get(key);
 		if (cachedValue !== undefined) {
 			// Cache HIT

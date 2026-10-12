@@ -148,3 +148,8 @@ export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEvent
 export type ThinUser = {
 	id: MiUser['id'];
 };
+
+export type McpStreamDeliverJobData = {
+	webhookId: string; userId: string; generation: string; eventId: string;
+	source: import('@features/mcp/backend/stream-types.js').StreamOccurrence;
+};

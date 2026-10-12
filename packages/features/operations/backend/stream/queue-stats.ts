@@ -4,6 +4,7 @@
  */
 
 import Xev from 'xev';
+import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { isJsonObject } from '@features/runtime/backend/formatting/json-value.js';
@@ -30,7 +31,16 @@ export class QueueStatsChannel extends Channel {
 
 	@bindThis
 	public async init(params: JsonObject) {
-		ev.addListener('queueStats', this.onStats);
+		if (this.connection.isNativeOutput) {
+			this.subscriber.on('statisticsStream:queueStats', this.onNativeStats);
+		} else {
+			ev.addListener('queueStats', this.onStats);
+		}
+	}
+
+	@bindThis
+	private onNativeStats(message: GlobalEvents['statistics']['payload']) {
+		this.onStats(message.body);
 	}
 
 	@bindThis
@@ -58,6 +68,10 @@ export class QueueStatsChannel extends Channel {
 
 	@bindThis
 	public dispose() {
-		ev.removeListener('queueStats', this.onStats);
+		if (this.connection.isNativeOutput) {
+			this.subscriber.off('statisticsStream:queueStats', this.onNativeStats);
+		} else {
+			ev.removeListener('queueStats', this.onStats);
+		}
 	}
 }

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { streamQueueBackendFactory } from '@features/mcp/backend/stream-queue-backend.js';
 import { Inject, Module, OnApplicationShutdown } from '@nestjs/common';
 import * as Bull from 'bullmq';
 import { DI } from '@/di-symbols.js';
@@ -16,6 +17,7 @@ import {
 	RelationshipJobData,
 	UserWebhookDeliverJobData,
 	McpWebhookDeliverJobData,
+	McpStreamDeliverJobData,
 	SystemWebhookDeliverJobData,
 	PostScheduledNoteJobData,
 } from '@features/runtime/backend/queue/types.js';
@@ -29,6 +31,7 @@ export type InboxQueue = Bull.Queue<InboxJobData>;
 export type DbQueue = Bull.Queue;
 export type RelationshipQueue = Bull.Queue<RelationshipJobData>;
 export type ObjectStorageQueue = Bull.Queue;
+export type McpStreamDeliverQueue = Bull.Queue<McpStreamDeliverJobData>;
 export type McpAntennaDeliverQueue = Bull.Queue<McpWebhookDeliverJobData>;
 export type UserWebhookDeliverQueue = Bull.Queue<UserWebhookDeliverJobData>;
 export type SystemWebhookDeliverQueue = Bull.Queue<SystemWebhookDeliverJobData>;
@@ -91,6 +94,12 @@ const $userWebhookDeliver: Provider = {
 	inject: [DI.config],
 };
 
+const $mcpStreamDeliver: Provider = {
+	provide: 'queue:mcpStreamDeliver',
+	useFactory: (config: Config) => new Bull.Queue<McpStreamDeliverJobData>(QUEUE.MCP_STREAM_DELIVER, baseQueueOptions(config, QUEUE.MCP_STREAM_DELIVER), streamQueueBackendFactory),
+	inject: [DI.config],
+};
+
 const $mcpAntennaDeliver: Provider = {
 	provide: 'queue:mcpAntennaDeliver',
 	useFactory: (config: Config) => createQueue<McpWebhookDeliverJobData>(QUEUE.MCP_ANTENNA_DELIVER, config),
@@ -117,6 +126,7 @@ const $systemWebhookDeliver: Provider = {
 		$objectStorage,
 		$userWebhookDeliver,
 		$mcpAntennaDeliver,
+		$mcpStreamDeliver,
 		$systemWebhookDeliver,
 	],
 	exports: [
@@ -130,6 +140,7 @@ const $systemWebhookDeliver: Provider = {
 		$objectStorage,
 		$userWebhookDeliver,
 		$mcpAntennaDeliver,
+		$mcpStreamDeliver,
 		$systemWebhookDeliver,
 	],
 })
@@ -145,6 +156,7 @@ export class QueueModule implements OnApplicationShutdown {
 		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
 		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
 		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
+		@Inject('queue:mcpStreamDeliver') public mcpStreamDeliverQueue: McpStreamDeliverQueue,
 		@Inject('queue:mcpAntennaDeliver') public mcpAntennaDeliverQueue: McpAntennaDeliverQueue,
 		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {}
@@ -165,6 +177,7 @@ export class QueueModule implements OnApplicationShutdown {
 				this.objectStorageQueue.close(),
 				this.userWebhookDeliverQueue.close(),
 				this.mcpAntennaDeliverQueue.close(),
+				this.mcpStreamDeliverQueue.close(),
 				this.systemWebhookDeliverQueue.close(),
 			]);
 		})();
