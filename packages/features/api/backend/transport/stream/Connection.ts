@@ -56,7 +56,9 @@ export default class Connection {
 	public user?: MiUser;
 	public token?: MiAccessToken;
 	private wsConnection: WebSocket.WebSocket;
-	private antennaOutput: AntennaNoteOutput | undefined;
+	private output: NativeStreamOutput | undefined;
+	private outputChannels: ReadonlySet<string> = new Set();
+	private listeningBroadcast = false;
 	private disposed = false;
 	private messageQueue = promiseLimit<void>(1);
 	public subscriber: StreamEventEmitter;
@@ -132,40 +134,47 @@ export default class Connection {
 
 	@bindThis
 	public async listen(subscriber: EventEmitter, wsConnection: WebSocket.WebSocket) {
-		if (this.antennaOutput || this.disposed) throw new Error('Connection already attached');
+		if (this.output || this.wsConnection || this.disposed) throw new Error('Connection already attached');
 		this.subscriber = subscriber;
 
 		this.wsConnection = wsConnection;
 		this.wsConnection.on('message', data => this.messageQueue(() => this.onWsConnectionMessage(data)));
 
-		this.subscriber.on('broadcast', data => {
-			this.onBroadcastMessage(data);
-		});
+		this.subscriber.on('broadcast', this.onBroadcastMessage);
+		this.listeningBroadcast = true;
+	}
+
+	/** Internal outbound seam. Channel initialization still owns authorization and filtering. */
+	public attachNativeOutput(subscriber: StreamEventEmitter, output: NativeStreamOutput, routes: { channels: readonly NativeOutputChannel[]; broadcast?: boolean }) {
+		if (this.disposed || this.wsConnection || this.output) throw new Error('Connection already attached');
+		this.subscriber = subscriber;
+		this.output = output;
+		this.outputChannels = new Set(routes.channels);
+		if (routes.broadcast) {
+			this.subscriber.on('broadcast', this.onBroadcastMessage);
+			this.listeningBroadcast = true;
+		}
 	}
 
 	/** In-process antenna-only pilot. No broadcast, raw note or socket handlers. */
 	public attachAntennaOutput(subscriber: StreamEventEmitter, output: AntennaNoteOutput) {
-		if (this.disposed || this.wsConnection || this.antennaOutput) throw new Error('Connection already attached');
-		this.subscriber = subscriber;
-		this.antennaOutput = output;
+		this.attachNativeOutput(subscriber, {
+			isOpen: () => output.isOpen(),
+			send: frame => {
+				if (frame.type === 'channel' && frame.body.type === 'note') return output.send(frame.body.body as Packed<'Note'>);
+			},
+			failed: error => output.failed(error),
+		}, { channels: ['antenna'] });
 	}
 
 	/** Only receives channel output after the channel's authorization and filters. */
 	public sendChannelMessage(id: string, type: string, body: JsonValue) {
 		if (this.disposed) return;
-		if (this.antennaOutput) {
-			const output = this.antennaOutput;
-			if (output.isOpen() && this.channels.get(id)?.chName === 'antenna' && type === 'note') {
-				try {
-					Promise.resolve(output.send(body as Packed<'Note'>)).catch(error => { this.failAntennaOutput(output, error); });
-				} catch (error) { this.failAntennaOutput(output, error); }
-			}
-			return;
-		}
+		if (this.output && !this.outputChannels.has(this.channels.get(id)?.chName ?? '')) return;
 		this.sendMessageToWs('channel', { id, type, body });
 	}
 
-	private failAntennaOutput(output: AntennaNoteOutput, error: unknown) {
+	private failOutput(output: NativeStreamOutput, error: unknown) {
 		if (this.disposed) return;
 		this.dispose();
 		// Failure observers cannot escape the EventEmitter handler either.
@@ -317,6 +326,14 @@ export default class Connection {
 	 */
 	@bindThis
 	public sendMessageToWs(type: string, payload: JsonObject) {
+		if (this.disposed) return;
+		if (this.output) {
+			const output = this.output;
+			try {
+				if (output.isOpen()) Promise.resolve(output.send({ type, body: payload })).catch(error => { this.failOutput(output, error); });
+			} catch (error) { this.failOutput(output, error); }
+			return;
+		}
 		this.wsConnection.send(JSON.stringify({
 			type: type,
 			body: payload,
@@ -328,7 +345,7 @@ export default class Connection {
 	 */
 	@bindThis
 	public async connectChannel(id: string, params: JsonObject | undefined, channel: string, pong = false) {
-		if (this.disposed || this.antennaOutput && channel !== 'antenna') return false;
+		if (this.disposed || this.output && !this.outputChannels.has(channel)) return false;
 		if (this.channels.has(id)) {
 			this.disconnectChannel(id);
 		}
@@ -363,11 +380,11 @@ export default class Connection {
 			connection: this,
 		}, contextId);
 		const ch: Channel = await this.moduleRef.create<Channel>(channelConstructor, contextId);
-		if (this.antennaOutput ? !this.antennaOutput.isOpen() : this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return false;
+		if (this.output ? !this.output.isOpen() : this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return false;
 
 		this.channels.set(ch.id, ch);
 		const valid = await ch.init(params ?? {});
-		if (this.disposed || this.antennaOutput && !this.antennaOutput.isOpen()) {
+		if (this.disposed || this.output && !this.output.isOpen()) {
 			ch.dispose?.(); this.channels.delete(ch.id); return false;
 		}
 		if (typeof valid === 'boolean' && !valid) {
@@ -376,7 +393,7 @@ export default class Connection {
 			return false;
 		}
 
-		if (pong && !this.antennaOutput) {
+		if (pong && !this.output) {
 			this.sendMessageToWs('connected', {
 				id: id,
 			});
@@ -454,6 +471,8 @@ export default class Connection {
 	@bindThis
 	public dispose() {
 		this.disposed = true;
+		if (this.listeningBroadcast) this.subscriber.off('broadcast', this.onBroadcastMessage);
+		this.listeningBroadcast = false;
 		if (this.fetchIntervalId) clearInterval(this.fetchIntervalId);
 		this.fetchIntervalId = null;
 
@@ -475,6 +494,15 @@ export interface ConnectionRequest {
 }
 
 export { Connection };
+
+/** Deliberately limited pilot routes; no client command dispatcher or note subscriptions. */
+export type NativeOutputChannel = 'main' | 'antenna';
+export interface NativeStreamFrame { type: string; body: JsonObject }
+export interface NativeStreamOutput {
+	isOpen(): boolean;
+	send(frame: NativeStreamFrame): void | Promise<void>;
+	failed(error: unknown): void | Promise<void>;
+}
 
 /** Filtered antenna notes only; no transport or persistence semantics implied. */
 export interface AntennaNoteOutput {
