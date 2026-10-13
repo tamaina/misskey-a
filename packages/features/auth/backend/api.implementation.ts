@@ -117,14 +117,14 @@ import { SigninService } from './transport/SigninService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 
-import type { Context } from '@orpc/server';
+import type { Context, Procedure } from '@orpc/server';
 import type { AnySchema, ErrorMap, Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '@features/api/backend/transport/policy.types.js';
 
 /** Cloning the definition preserves the already captured legacy policy/rate bucket.
  * Do not rebuild createApiProcedure from the alias metadata, or split the quota. */
 export function aliasTwoFactorProcedure<Initial extends Context, Current extends Context, Input extends AnySchema, Output extends AnySchema, Errors extends ErrorMap, Metadata extends Meta & ApiProcedureMetadata, RequestName extends string>(
-	procedure: DecoratedProcedure<Initial, Current, Input, Output, Errors, Metadata>, requestName: RequestName,
+	procedure: Procedure<Initial, Current, Input, Output, Errors, Metadata>, requestName: RequestName,
 ) {
 	const definition = procedure['~orpc'];
 	const { requestName: legacyName, ...metadata } = definition.meta;
