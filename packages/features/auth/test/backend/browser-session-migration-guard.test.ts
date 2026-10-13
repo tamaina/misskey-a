@@ -8,7 +8,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { assertFixtureEnvironment, assertFixtureTarget, verifyBrowserSessionMigration } from './browser-session-migration.mjs';
 
-const options: DataSourceOptions = { type: 'postgres', host: '127.0.0.1', port: 54312, database: 'test-misskey', synchronize: false, dropSchema: false };
+const options: DataSourceOptions = { type: 'postgres', host: '127.0.0.1', port: 54312, database: 'test-misskey', synchronize: false, dropSchema: false, extra: {} };
 
 afterEach(() => vi.unstubAllEnvs());
 
