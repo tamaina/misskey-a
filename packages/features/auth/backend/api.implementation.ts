@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { aliasTwoFactorProcedure } from './2fa-api-aliases.js';
 import { implement } from '@orpc/server';
 import { authContract, authSessionsContract } from './api.definition.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
@@ -160,6 +161,14 @@ export interface AuthRouterDependencies {
 }
 
 export function createAuthRouter(deps: AuthRouterDependencies) {
+	const i2faDone = createI2faDoneProcedure(deps['i/2fa/done']);
+	const i2faRegister = createI2faRegisterProcedure(deps['i/2fa/register']);
+	const i2faUnregister = createI2faUnregisterProcedure(deps['i/2fa/unregister']);
+	const i2faKeyDone = createI2faKeyDoneProcedure(deps['i/2fa/key-done']);
+	const i2faRegisterKey = createI2faRegisterKeyProcedure(deps['i/2fa/register-key']);
+	const i2faRemoveKey = createI2faRemoveKeyProcedure(deps['i/2fa/remove-key']);
+	const i2faUpdateKey = createI2faUpdateKeyProcedure(deps['i/2fa/update-key']);
+	const i2faPasswordLess = createI2faPasswordLessProcedure(deps['i/2fa/password-less']);
 	return implement(authContract).$context<ApiContext<MiLocalUser>>().router({
 		'admin/accounts/create': createAdminAccountsCreateProcedure(deps['admin/accounts/create']),
 		'admin/captcha/current': createAdminCaptchaCurrentProcedure(deps['admin/captcha/current']),
@@ -175,14 +184,22 @@ export function createAuthRouter(deps: AuthRouterDependencies) {
 		'auth/session/show': createAuthSessionShowProcedure(deps['auth/session/show']),
 		'auth/session/userkey': createAuthSessionUserkeyProcedure(deps['auth/session/userkey']),
 		'email-address/available': createEmailAddressAvailableProcedure(deps['email-address/available']),
-		'i/2fa/done': createI2faDoneProcedure(deps['i/2fa/done']),
-		'i/2fa/key-done': createI2faKeyDoneProcedure(deps['i/2fa/key-done']),
-		'i/2fa/password-less': createI2faPasswordLessProcedure(deps['i/2fa/password-less']),
-		'i/2fa/register': createI2faRegisterProcedure(deps['i/2fa/register']),
-		'i/2fa/register-key': createI2faRegisterKeyProcedure(deps['i/2fa/register-key']),
-		'i/2fa/remove-key': createI2faRemoveKeyProcedure(deps['i/2fa/remove-key']),
-		'i/2fa/unregister': createI2faUnregisterProcedure(deps['i/2fa/unregister']),
-		'i/2fa/update-key': createI2faUpdateKeyProcedure(deps['i/2fa/update-key']),
+		'i/2fa/done': i2faDone,
+		'i/2fa/key-done': i2faKeyDone,
+		'i/2fa/password-less': i2faPasswordLess,
+		'i/2fa/register': i2faRegister,
+		'i/2fa/register-key': i2faRegisterKey,
+		'i/2fa/remove-key': i2faRemoveKey,
+		'i/2fa/unregister': i2faUnregister,
+		'i/2fa/update-key': i2faUpdateKey,
+		'i/2fa/totp/done': aliasTwoFactorProcedure(i2faDone, 'i/2fa/totp/done'),
+		'i/2fa/totp/register': aliasTwoFactorProcedure(i2faRegister, 'i/2fa/totp/register'),
+		'i/2fa/totp/remove': aliasTwoFactorProcedure(i2faUnregister, 'i/2fa/totp/remove'),
+		'i/2fa/passkey/done': aliasTwoFactorProcedure(i2faKeyDone, 'i/2fa/passkey/done'),
+		'i/2fa/passkey/register': aliasTwoFactorProcedure(i2faRegisterKey, 'i/2fa/passkey/register'),
+		'i/2fa/passkey/remove': aliasTwoFactorProcedure(i2faRemoveKey, 'i/2fa/passkey/remove'),
+		'i/2fa/passkey/update': aliasTwoFactorProcedure(i2faUpdateKey, 'i/2fa/passkey/update'),
+		'i/2fa/passkey/password-less': aliasTwoFactorProcedure(i2faPasswordLess, 'i/2fa/passkey/password-less'),
 		'i/apps': createIAppsProcedure(deps['i/apps']),
 		'i/authorized-apps': createIAuthorizedAppsProcedure(deps['i/authorized-apps']),
 		'i/change-password': createIChangePasswordProcedure(deps['i/change-password']),
