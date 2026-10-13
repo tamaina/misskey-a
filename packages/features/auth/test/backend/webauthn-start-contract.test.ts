@@ -30,7 +30,7 @@ test.each([false, true])('real registration producer keeps challenge storage and
 	const h = service(withKey);
 	const result = await h.producer.initiateRegistration('user123', 'fixture');
 	expect(v.parse(requiredSchema(I2faRegisterKeyContract['~orpc'].outputSchema), JSON.parse(JSON.stringify(result)))).toEqual(result);
-	expect(result).toMatchObject({ rp: { name: 'Fixture', id: 'example.com' }, user: { id: 'dXNlcjEyMw', name: 'fixture', displayName: '' }, timeout: 60000, attestation: 'none', authenticatorSelection: { residentKey: 'required', requireResidentKey: true, userVerification: 'preferred' }, extensions: { credProps: true }, hints: [] });
+	expect(result).toMatchObject({ rp: { name: 'Fixture', id: 'example.com' }, user: { id: 'dXNlcjEyMw', name: 'fixture', displayName: '' }, timeout: 60000, attestation: 'none', authenticatorSelection: { residentKey: 'required', requireResidentKey: true, userVerification: 'required' }, extensions: { credProps: true }, hints: [] });
 	expect(result.excludeCredentials).toEqual(withKey ? [{ id: 'AQID', type: 'public-key', transports: ['usb'] }] : []);
 	expect(h.keys.findBy).toHaveBeenCalledWith({ userId: 'user123' });
 	expect(h.redis.setex).toHaveBeenCalledWith('webauthn:registrationChallenge:user123', 90, result.challenge);
