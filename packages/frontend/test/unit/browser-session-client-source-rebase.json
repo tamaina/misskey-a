@@ -1,0 +1,58 @@
+[
+  {
+    "file": "packages/features/auth/frontend/accounts.ts",
+    "baselineBodySha256": "70587b15d82bff9c4e9fbc1131cd6b3311faff047b603137186c0a36a76ccff2",
+    "currentBodySha256": "82a5e6e27e1767b569a47d250a7c53666b8951cf8adfe675cab29e1a21b523ac",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 2642,
+        "end": 2703,
+        "current": "const isCredentialRejected = Symbol('isCredentialRejected');\n",
+        "baseline": "const isAccountDeleted = Symbol('isAccountDeleted');\n"
+      },
+      {
+        "start": 3274,
+        "end": 3488,
+        "current": "\t\t\t\tres.json().then(body => {\n\t\t\t\t\tif (res.status >= 400 && res.status < 500 && (!body || typeof body !== 'object' || !('error' in body))) {\n\t\t\t\t\t\tfail2(res);\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdone2(body);\n\t\t\t\t\t}\n\t\t\t\t}, fail2);\n",
+        "baseline": "\t\t\t\tres.json().then(done2, fail2);\n"
+      },
+      {
+        "start": 3545,
+        "end": 3581,
+        "current": "\t\t\t\t\tlet credentialRejected = true;\n",
+        "baseline": ""
+      },
+      {
+        "start": 4606,
+        "end": 4640,
+        "current": "\t\t\t\t\t\tcredentialRejected = false;\n",
+        "baseline": ""
+      },
+      {
+        "start": 4817,
+        "end": 4883,
+        "current": "\t\t\t\t\tfail(credentialRejected ? isCredentialRejected : res.error);\n",
+        "baseline": "\t\t\t\t\tfail(isAccountDeleted);\n"
+      },
+      {
+        "start": 6549,
+        "end": 6716,
+        "current": "\treturn fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(async reason => {\n\t\tif (reason === isCredentialRejected) {\n\t\t\tawait removeAccount(host, me.id);\n",
+        "baseline": "\treturn fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(reason => {\n\t\tif (reason === isAccountDeleted) {\n\t\t\tremoveAccount(host, me.id);\n"
+      },
+      {
+        "start": 6772,
+        "end": 6830,
+        "current": "\t\t\t\tawait login(Object.values(store.s.accountTokens)[0]);\n",
+        "baseline": "\t\t\t\tlogin(Object.values(store.s.accountTokens)[0]);\n"
+      },
+      {
+        "start": 6842,
+        "end": 6891,
+        "current": "\t\t\t\tawait signout('server-rejected-credential');\n",
+        "baseline": "\t\t\t\tsignout();\n"
+      }
+    ]
+  }
+]

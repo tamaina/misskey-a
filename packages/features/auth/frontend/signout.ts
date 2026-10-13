@@ -15,17 +15,19 @@ import { clear } from '@features/runtime/frontend/utility/idb-proxy.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { encodePushSubscriptionKey } from '@features/notifications/frontend/utility/encode-push-subscription-key.js';
 
-export async function signout() {
+// Internal cleanup reasons follow a confirmed server rejection or accepted account deletion.
+export async function signout(reason?: 'server-rejected-credential' | 'account-deletion-accepted') {
 	if (!$i) return;
 
+	const cleanupOnly = reason === 'server-rejected-credential' || reason === 'account-deletion-accepted';
 	let finishWaiting = waiting();
 
 	try {
-		if (store.s.enablePreferencesAutoCloudBackup) {
+		if (!cleanupOnly && store.s.enablePreferencesAutoCloudBackup) {
 			await cloudBackup();
 		}
 
-		for (;;) {
+		for (; !cleanupOnly;) {
 			try {
 				await misskeyApi('i/signout');
 				break;

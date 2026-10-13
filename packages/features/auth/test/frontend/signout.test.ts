@@ -104,6 +104,28 @@ describe('server-first signout', () => {
 		expect(window.document.cookie).not.toContain('synthetic-current');
 	});
 
+	test.each(['server-rejected-credential', 'account-deletion-accepted'] as const)('%s cleans only the device without another authenticated operation', async reason => {
+		m.backup.mockRejectedValue(new Error('synthetic rejected backup'));
+		m.api.mockRejectedValue({ code: 'AUTHENTICATION_FAILED' });
+		await signout(reason);
+		expect(m.backup).not.toHaveBeenCalled();
+		expect(m.api).not.toHaveBeenCalled();
+		expect(m.select).not.toHaveBeenCalled();
+		expect(m.files).toHaveBeenCalledOnce();
+		expect(localStorage.getItem('account')).toBeNull();
+		expect(localStorage.getItem('accounts')).toBeNull();
+		expect(window.document.cookie).not.toContain('synthetic-current');
+		expect(m.reload).toHaveBeenCalledWith('/');
+	});
+
+	test.each(['unexpected-runtime-reason', { type: 'click' }])('unknown runtime argument %j retains manual server-first behavior', async reason => {
+		await signout(reason as Parameters<typeof signout>[0]);
+		expect(m.backup).toHaveBeenCalledOnce();
+		expect(m.api).toHaveBeenCalledWith('i/signout');
+		expect(m.backup.mock.invocationCallOrder[0]).toBeLessThan(m.api.mock.invocationCallOrder[0]);
+		expect(m.files).toHaveBeenCalledOnce();
+	});
+
 	test('backup failure releases waiting without clearing or revoking credentials', async () => {
 		m.backup.mockRejectedValue(new Error('synthetic backup error'));
 		await expect(signout()).rejects.toThrow('synthetic backup error');
