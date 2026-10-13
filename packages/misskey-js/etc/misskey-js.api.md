@@ -1956,6 +1956,10 @@ declare namespace entities {
         IRevokeTokenRequest,
         ISigninHistoryRequest,
         ISigninHistoryResponse,
+        ISessionsRequest,
+        ISessionsResponse,
+        ISessionsRevokeRequest,
+        ISignoutRequest,
         IUpdateEmailRequest,
         IUpdateEmailResponse,
         InviteCreateRequest,
@@ -4038,10 +4042,22 @@ type IRevokeTokenRequest = ContractRequest<'i/revoke-token'>;
 function isAPIError(reason: Record<PropertyKey, unknown>): reason is APIError;
 
 // @public (undocumented)
+type ISessionsRequest = ContractRequest<'i/sessions'>;
+
+// @public (undocumented)
+type ISessionsResponse = ContractResponse<'i/sessions'>;
+
+// @public (undocumented)
+type ISessionsRevokeRequest = ContractRequest<'i/sessions/revoke'>;
+
+// @public (undocumented)
 type ISigninHistoryRequest = ContractRequest<'i/signin-history'>;
 
 // @public (undocumented)
 type ISigninHistoryResponse = ContractResponse<'i/signin-history'>;
+
+// @public (undocumented)
+type ISignoutRequest = ContractRequest<'i/signout'>;
 
 // @public (undocumented)
 function isPureRenote(note: Note): note is PureRenote;
