@@ -47,7 +47,8 @@ describe('feature service composition adapter', () => {
 			entries.splice(entries.indexOf('class:SystemWebhookService'), 0, 'class:McpEventsService');
 			entries.splice(entries.indexOf('alias:SystemWebhookService'), 0, 'alias:McpEventsService');
 			for (const prefix of ['class:', 'alias:']) {
-				entries.push(`${prefix}BrowserSessionService`, `${prefix}ChannelFederationService`);
+				entries.push(`${prefix}BrowserSessionService`);
+				entries.splice(entries.indexOf(`${prefix}ChannelFollowingService`), 0, `${prefix}ChannelFederationService`);
 				entries.splice(entries.indexOf(`${prefix}AntennaService`) + 1, 0, `${prefix}AntennaNoteAccessService`, `${prefix}AntennaEventSubscriptionService`);
 				entries.splice(entries.indexOf(`${prefix}McpEventsService`) + 1, 0, `${prefix}McpStreamAccessService`, `${prefix}McpStreamSubscriptionService`, `${prefix}NoteStreamingHidingService`);
 			}
