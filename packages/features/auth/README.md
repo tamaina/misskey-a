@@ -40,3 +40,17 @@ removes only its own container and temporary directory. Ordinary unit runs skip
 the Redis cases unless this task-owned fixture socket is explicitly supplied.
 The current-Node backend unit CI job runs the explicit fixture so actual Lua
 atomicity is checked independently of those ordinary unit runs.
+
+The unconnected token exchange adapter accepts a server-owned provider snapshot
+and a transaction additionally bound to the exact redirect URI and S256 challenge.
+The current transaction store does not produce these extra bindings; there is no
+runtime bridge. Callback integration must add them before using the adapter.
+It supports client_secret_basic only, form-encodes each credential before Basic
+encoding, and shares one five-second monotonic deadline from before DNS through
+token POST, JWKS GET, and verification. HTTP is created only after authenticated
+TLS and the pinned public peer are checked. Redirects, proxies, compression, and
+connection reuse are unsupported. Each JSON response is limited to 64 KiB, and
+JWKS has at most 32 keys with bounded public RSA fields. Only configured-origin
+JWKS is used; token/key URLs never trigger additional fetches. Errors retain no
+provider body or credential cause. Access/refresh tokens are discarded, email
+claims are not trusted, and the result cannot create a local session or grant.

@@ -29,7 +29,7 @@ const network: ClientMetadataNetwork = {
 	request: https.request,
 };
 
-function publicAddress(address: string): string {
+export function publicAddress(address: string): string {
 	// Zone identifiers and transition/translated ranges must not bypass IPv4 policy.
 	if (address.includes('%') || !ipaddr.isValid(address)) throw new Error('Invalid client metadata address');
 	const parsed = ipaddr.process(address);
