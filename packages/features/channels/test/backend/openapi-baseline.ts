@@ -14,6 +14,7 @@ export function restoreChannelFederationOpenapiBaseline<T extends { paths?: Reco
 	// Normalize exactly as the frozen hash oracle does; preserve the caller's specification.
 	const restored = JSON.parse(JSON.stringify(spec)) as T;
 	const counts = { input: 0, channel: 0, noteChannel: 0, error: 0 };
+
 	function visit(value: unknown, owner: string, path: string[]): void {
 		if (Array.isArray(value)) { value.forEach((child, index) => visit(child, owner, [...path, String(index)])); return; }
 		if (!record(value)) return;
@@ -53,6 +54,7 @@ export function restoreChannelFederationOpenapiBaseline<T extends { paths?: Reco
 		});
 		for (const [key, child] of Object.entries(value)) visit(child, owner, [...path, key]);
 	}
+
 	for (const name of proof.operations) { ok(restored.paths && name in restored.paths); visit(restored.paths[name], name, []); }
 	for (const name of proof.schemas) { ok(restored.components?.schemas && name in restored.components.schemas); visit(restored.components.schemas[name], name, []); }
 	deepStrictEqual(counts, proof.changeCounts, 'Documented channel API change inventory differs');
