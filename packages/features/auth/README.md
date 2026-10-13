@@ -38,3 +38,5 @@ It requires the existing `redis:8` image and task-local installed dependencies,
 uses a temporary Unix socket with no network/published ports/persistence, and
 removes only its own container and temporary directory. Ordinary unit runs skip
 the Redis cases unless this task-owned fixture socket is explicitly supplied.
+The current-Node backend unit CI job runs the explicit fixture so actual Lua
+atomicity is checked independently of those ordinary unit runs.
