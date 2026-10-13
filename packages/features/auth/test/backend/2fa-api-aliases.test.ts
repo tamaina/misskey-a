@@ -92,7 +92,9 @@ test('actual portable generator preserves every legacy operation and public sche
 	const invalid = structuredClone(spec);
 	const channel = invalid.components?.schemas?.Channel;
 	if (channel == null || typeof channel !== 'object') throw new Error('Missing documented Channel schema');
-	Reflect.set(Reflect.get(channel, 'properties'), 'isFederated', { type: 'string' });
+	const properties = Reflect.get(channel, 'properties');
+	if (properties == null) throw new Error('Missing documented Channel properties');
+	properties.isFederated = { type: 'string' };
 	expect(() => restoreChannelFederationOpenapiBaseline(invalid)).toThrow('federation flag differs');
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) expect(schemaHash(legacySpec.paths?.[path]), path).toBe(hash);
 	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(legacySpec.components?.schemas?.[name]), name).toBe(hash);
