@@ -5,10 +5,18 @@
 
 import 'reflect-metadata';
 import { createHash } from 'node:crypto';
+import { FindOperator, IsNull } from 'typeorm';
 import { describe, expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
 import type { BrowserSessionsRepository, MiBrowserSession } from '@features/persistence/backend/repositories/models.js';
+
+function matches(row: MiBrowserSession, criteria: unknown): boolean {
+	if (!criteria || typeof criteria !== 'object' || Array.isArray(criteria)) throw new Error('unsupported synthetic criteria');
+	return Object.entries(criteria).every(([key, value]) => value instanceof FindOperator
+		? value.type === 'isNull' && Reflect.get(row, key) === null
+		: Reflect.get(row, key) === value);
+}
 
 function fixture() {
 	const repository = mockDeep<BrowserSessionsRepository>();
@@ -20,22 +28,18 @@ function fixture() {
 		return { identifiers: [], generatedMaps: [], raw: [] };
 	});
 	repository.findOne.mockImplementation(async options => {
-		const where = options.where as { tokenHash: string };
-		const row = [...rows.values()].find(value => value.tokenHash === where.tokenHash && value.revokedAt === null);
+		const row = [...rows.values()].find(value => matches(value, options.where));
 		if (!row) return null;
 		const { tokenHash: _hash, ...metadata } = row;
 		return metadata as MiBrowserSession;
 	});
 	repository.update.mockImplementation(async (criteria, patch) => {
-		const where = criteria as { id: string; userId?: string; tokenHash?: string };
-		const row = rows.get(where.id);
-		if (!row || row.revokedAt !== null || (where.userId && row.userId !== where.userId) || (where.tokenHash && row.tokenHash !== where.tokenHash)) return { affected: 0, raw: [], generatedMaps: [] };
-		Object.assign(row, patch);
-		return { affected: 1, raw: [], generatedMaps: [] };
+		const selected = [...rows.values()].filter(row => matches(row, criteria));
+		for (const row of selected) Object.assign(row, patch);
+		return { affected: selected.length, raw: [], generatedMaps: [] };
 	});
 	repository.find.mockImplementation(async options => {
-		const where = options?.where as { userId: string };
-		return [...rows.values()].filter(row => row.userId === where.userId).map(row => {
+		return [...rows.values()].filter(row => matches(row, options?.where)).map(row => {
 			const { tokenHash: _hash, ...metadata } = row;
 			return metadata as MiBrowserSession;
 		});
@@ -71,6 +75,8 @@ describe('individual browser session foundation (synthetic persistence only)', (
 		expect(await service.verify(issued.token)).toMatchObject({ id: issued.session.id, userId: 'alice' });
 		expect(await service.verify(issued.token)).not.toBeNull();
 		expect(repository.findOne).toHaveBeenCalledTimes(3);
+		expect(repository.findOne.mock.calls[1][0].where).toEqual({ tokenHash: createHash('sha256').update(issued.token).digest('hex'), revokedAt: IsNull() });
+		expect(repository.update.mock.calls[0][0]).toEqual({ id: issued.session.id, tokenHash: createHash('sha256').update(issued.token).digest('hex'), revokedAt: IsNull() });
 	});
 
 	test('owned revocation rejects other users and invalidates only the selected session', async () => {
