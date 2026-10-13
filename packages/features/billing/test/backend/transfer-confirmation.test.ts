@@ -90,5 +90,5 @@ test('evidence contract excludes extra fields and noncanonical/overflow amounts'
 	const evidence = { chainId: 123456, txHash: hash, timestamp: 1000000, transfers: [{ logIndex: 2, contractAddress: address(3), fromAddress: address(1), toAddress: address(2), amountBaseUnits: '7' }] };
 	expect(v.safeParse(receiptEvidenceSchema, evidence).success).toBe(true);
 	expect(v.safeParse(receiptEvidenceSchema, { ...evidence, balance: '7' }).success).toBe(false);
-	for (const amountBaseUnits of ['0', '01', '-1', (2n ** 256n).toString()]) expect(v.safeParse(receiptEvidenceSchema, { ...evidence, transfers: [{ ...evidence.transfers[0], amountBaseUnits }] }).success).toBe(false);
+	for (const amountBaseUnits of ['0', '01', '-1', 'invalid', '1.5', '1e2', (2n ** 256n).toString()]) expect(v.safeParse(receiptEvidenceSchema, { ...evidence, transfers: [{ ...evidence.transfers[0], amountBaseUnits }] }).success).toBe(false);
 });
