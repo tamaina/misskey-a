@@ -5,7 +5,7 @@
 
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { call } from '@orpc/server';
+import { call, implement } from '@orpc/server';
 import { oc } from '@orpc/contract';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
 import Fastify from 'fastify';
@@ -135,6 +135,16 @@ test('native passkey registration aliases preserve password/MFA validation and p
 	expect(deps.userAuthService.twoFactorAuthenticate).toHaveBeenCalledTimes(4);
 	expect(deps.webAuthnService.initiateRegistration).toHaveBeenCalledTimes(2);
 	expect(deps.webAuthnService.initiateRegistration).toHaveBeenCalledWith(actor.id, actor.id, undefined);
+});
+
+test('cloning accepts the actual ImplementedProcedure factory result and retains its handler', async () => {
+	const contract = oc.$meta({ requestName: 'synthetic-legacy' as const }).input(v.string()).output(v.string());
+	const legacy = implement(contract).$context<{ suffix: string }>().handler(({ input, context }) => input + context.suffix);
+	const canonical = aliasTwoFactorProcedure(legacy, 'synthetic-canonical');
+	expect(canonical['~orpc'].handler).toBe(legacy['~orpc'].handler);
+	expect(legacy['~orpc'].meta.requestName).toBe('synthetic-legacy');
+	expect(canonical['~orpc'].meta.requestName).toBe('synthetic-canonical');
+	await expect(call(canonical, 'synthetic-input', { context: { suffix: '-result' } })).resolves.toBe('synthetic-input-result');
 });
 
 test('cloning retains the captured legacy rate bucket and its error despite canonical routing metadata', async () => {
