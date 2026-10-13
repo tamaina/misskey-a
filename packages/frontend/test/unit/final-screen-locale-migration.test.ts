@@ -9,6 +9,7 @@ import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-sour
 import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
+import { restorePostingRoleBaseline } from './posting-role-source-rebase.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
@@ -59,7 +60,7 @@ function configured(embed: boolean) {
 test('all51 screen sources reverse byte for byte and retain all49336 effective locale strings', () => {
 	let strings = 0;
 	for (const entry of proof) {
-		const currentSource = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, restoreOAuthPermissionBaseline(entry.file, restorePasswordChangeBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8')))));
+		const currentSource = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, restoreOAuthPermissionBaseline(entry.file, restorePasswordChangeBaseline(entry.file, restorePostingRoleBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'))))));
 		// Keep the original migration proof frozen; current permission labels are checked below.
 		const source = currentSource.replace(/^\t\t"access:mcp": [^\n]*,\n/gm, '');
 		expect(hash(source)).toBe(entry.migratedSha256);
