@@ -206,6 +206,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					finished: false,
 					next: 'passkey',
 					authRequest,
+					...(same ? { availableFactors: ['totp', 'passkey'] as ('totp' | 'passkey')[] } : {}),
 				};
 			} else {
 				if (!same || !profile.twoFactorEnabled) {
@@ -217,6 +218,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					return {
 						finished: false,
 						next: 'totp',
+						availableFactors: ['totp'],
 					};
 				}
 			}
