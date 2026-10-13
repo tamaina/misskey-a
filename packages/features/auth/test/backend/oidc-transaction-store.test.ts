@@ -14,9 +14,10 @@ import { OidcTransactionStore } from '../../backend/oidc-transaction-store.js';
 const socket = process.env.MISSKEY_OIDC_REDIS_SOCKET;
 if (socket) {
 	if (!/^\/tmp\/misskey-oidc-[^/]+\/redis\.sock$/.test(socket)) throw new Error('OIDC fixture requires task-owned Unix socket');
+	const fixtureUid = process.getuid?.();
 	const directory = lstatSync(dirname(socket));
 	const endpoint = lstatSync(socket);
-	if (!directory.isDirectory() || directory.uid !== process.getuid() || (directory.mode & 0o077) !== 0 || !endpoint.isSocket() || endpoint.uid !== process.getuid()) throw new Error('OIDC fixture socket ownership mismatch');
+	if (fixtureUid === undefined || !directory.isDirectory() || directory.uid !== fixtureUid || (directory.mode & 0o077) !== 0 || !endpoint.isSocket() || endpoint.uid !== fixtureUid) throw new Error('OIDC fixture socket ownership mismatch');
 }
 const redis = socket ? new Redis({ path: socket, lazyConnect: true }) : undefined;
 afterAll(async () => { await redis?.quit(); });
