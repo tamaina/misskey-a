@@ -19,6 +19,6 @@ test.each(rebases)('$file restores the frozen source and rejects additional sour
 	expect(() => restorePasswordChangeBaseline(proof.file, source + '\n')).toThrow('Source differs');
 	expect(() => restorePasswordChangeBaseline(proof.file, source.replace('currentPassword', 'unreviewedPassword'))).toThrow('Source differs');
 	if (source.includes('<locale')) {
-		expect(() => restorePasswordChangeBaseline(proof.file, source.replace('"password":', '"unexpected":'))).toThrow('Source differs');
+		expect(() => restorePasswordChangeBaseline(proof.file, source.replace(/(<locale[^>]*>\s*\{\s*)"[^"]+"\s*:/, '$1"unexpected":'))).toThrow('Source differs');
 	}
 });
