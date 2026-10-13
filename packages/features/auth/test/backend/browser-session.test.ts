@@ -11,11 +11,15 @@ import { mockDeep } from 'vitest-mock-extended';
 import { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
 import type { BrowserSessionsRepository, MiBrowserSession } from '@features/persistence/backend/repositories/models.js';
 
-function matches(row: MiBrowserSession, criteria: unknown): boolean {
+function matches(row: object, criteria: unknown): boolean {
 	if (!criteria || typeof criteria !== 'object' || Array.isArray(criteria)) throw new Error('unsupported synthetic criteria');
-	return Object.entries(criteria).every(([key, value]) => value instanceof FindOperator
-		? value.type === 'isNull' && Reflect.get(row, key) === null
-		: Reflect.get(row, key) === value);
+	return Object.entries(criteria).every(([key, value]) => {
+		const actual = Reflect.get(row, key);
+		if (!(value instanceof FindOperator)) return value && typeof value === 'object' ? actual !== null && typeof actual === 'object' && matches(actual, value) : actual === value;
+		if (value.type === 'isNull') return actual === null;
+		if (value.type === 'lessThanOrEqual') return actual <= value.value;
+		throw new Error('unsupported synthetic operator');
+	});
 }
 
 function fixture() {
@@ -24,24 +28,25 @@ function fixture() {
 	let sequence = 0;
 	repository.insert.mockImplementation(async entity => {
 		const row = entity as MiBrowserSession;
-		rows.set(row.id, { ...row });
+		rows.set(row.id, { ...row, user: mockDeep({ id: row.userId, host: null, isSuspended: false, isDeleted: false }) });
 		return { identifiers: [], generatedMaps: [], raw: [] };
 	});
 	repository.findOne.mockImplementation(async options => {
 		const row = [...rows.values()].find(value => matches(value, options.where));
 		if (!row) return null;
-		const { tokenHash: _hash, ...metadata } = row;
-		return metadata as MiBrowserSession;
+		if (!options.select || Array.isArray(options.select)) throw new Error('explicit object metadata select required');
+		return Object.fromEntries(Object.entries(options.select).filter(([, selected]) => selected === true).map(([key]) => [key, Reflect.get(row, key)])) as MiBrowserSession;
 	});
 	repository.update.mockImplementation(async (criteria, patch) => {
 		const selected = [...rows.values()].filter(row => matches(row, criteria));
 		for (const row of selected) Object.assign(row, patch);
 		return { affected: selected.length, raw: [], generatedMaps: [] };
 	});
+	repository.existsBy.mockImplementation(async criteria => [...rows.values()].some(row => matches(row, criteria)));
 	repository.find.mockImplementation(async options => {
 		return [...rows.values()].filter(row => matches(row, options?.where)).map(row => {
-			const { tokenHash: _hash, ...metadata } = row;
-			return metadata as MiBrowserSession;
+			if (!options?.select || Array.isArray(options.select)) throw new Error('explicit object metadata select required');
+			return Object.fromEntries(Object.entries(options.select).filter(([, selected]) => selected === true).map(([key]) => [key, Reflect.get(row, key)])) as MiBrowserSession;
 		});
 	});
 	const service = new BrowserSessionService(repository, { gen: () => `session-${++sequence}` });
@@ -74,9 +79,10 @@ describe('individual browser session foundation (synthetic persistence only)', (
 		expect(await service.verify(`bs_${'a'.repeat(43)}`)).toBeNull();
 		expect(await service.verify(issued.token)).toMatchObject({ id: issued.session.id, userId: 'alice' });
 		expect(await service.verify(issued.token)).not.toBeNull();
-		expect(repository.findOne).toHaveBeenCalledTimes(3);
+		expect(repository.findOne).toHaveBeenCalledTimes(5);
 		expect(repository.findOne.mock.calls[1][0].where).toEqual({ tokenHash: createHash('sha256').update(issued.token).digest('hex'), revokedAt: IsNull() });
-		expect(repository.update.mock.calls[0][0]).toEqual({ id: issued.session.id, tokenHash: createHash('sha256').update(issued.token).digest('hex'), revokedAt: IsNull() });
+		expect(repository.findOne.mock.calls[2][0].where).toEqual({ id: issued.session.id, userId: 'alice', revokedAt: IsNull(), user: { id: 'alice', host: IsNull(), isSuspended: false, isDeleted: false } });
+		expect(repository.update).not.toHaveBeenCalled();
 	});
 
 	test('owned revocation rejects other users and invalidates only the selected session', async () => {
@@ -91,7 +97,7 @@ describe('individual browser session foundation (synthetic persistence only)', (
 		expect(await service.revokeOwned('alice', first.session.id)).toBe(false);
 	});
 
-	test('revocation between lookup and touch wins without resurrecting the row', async () => {
+	test('revocation between lookup and final durable read wins without resurrecting the row', async () => {
 		const { service, repository, rows } = fixture();
 		const issued = await service.issue('alice');
 		const original = repository.findOne.getMockImplementation();
@@ -115,6 +121,56 @@ describe('individual browser session foundation (synthetic persistence only)', (
 		expect(listed[0]).not.toHaveProperty('tokenHash');
 		expect(listed[0]).not.toHaveProperty('token');
 		expect(repository.find.mock.calls[0][0]?.select).not.toHaveProperty('tokenHash');
+	});
+
+	test('touches lastUsedAt only after the minute threshold and rechecks active state', async () => {
+		const { service, repository, rows } = fixture();
+		const issued = await service.issue('alice');
+		const row = rows.get(issued.session.id);
+		if (!row) throw new Error('missing row');
+		row.lastUsedAt = new Date(Date.now() - 120_000);
+		expect(await service.verify(issued.token)).not.toBeNull();
+		expect(repository.update).toHaveBeenCalledOnce();
+		expect(repository.update.mock.calls[0][0]).toMatchObject({ id: issued.session.id, revokedAt: IsNull() });
+		expect(row.lastUsedAt.getTime()).toBeGreaterThan(Date.now() - 1000);
+		await service.verify(issued.token);
+		expect(repository.update).toHaveBeenCalledOnce();
+	});
+
+	test('stream durable checks never touch timestamps or cache positive results', async () => {
+		const { service, repository } = fixture();
+		const issued = await service.issue('alice');
+		expect(await service.isActive(issued.session.id, 'alice')).toBe(true);
+		expect(await service.isActive(issued.session.id, 'bob')).toBe(false);
+		expect(repository.update).not.toHaveBeenCalled();
+		await service.revokeOwned('alice', issued.session.id);
+		expect(await service.isActive(issued.session.id, 'alice')).toBe(false);
+	});
+
+	test('durable session gates reject suspension and soft deletion after connection without pubsub', async () => {
+		const { service, rows } = fixture();
+		const issued = await service.issue('alice');
+		const user = rows.get(issued.session.id)?.user;
+		if (!user) throw new Error('missing synthetic owner');
+		expect(await service.isActive(issued.session.id, 'alice')).toBe(true);
+		user.isSuspended = true;
+		expect(await service.isActive(issued.session.id, 'alice')).toBe(false);
+		expect(await service.verify(issued.token)).toBeNull();
+		user.isSuspended = false;
+		user.isDeleted = true;
+		expect(await service.isActive(issued.session.id, 'alice')).toBe(false);
+		expect(await service.verify(issued.token)).toBeNull();
+	});
+
+	test('global invalidation affects all owned sessions and no other user', async () => {
+		const { service } = fixture();
+		const alice1 = await service.issue('alice');
+		const alice2 = await service.issue('alice');
+		const bob = await service.issue('bob');
+		await service.revokeAllOwned('alice');
+		expect(await service.verify(alice1.token)).toBeNull();
+		expect(await service.verify(alice2.token)).toBeNull();
+		expect(await service.verify(bob.token)).not.toBeNull();
 	});
 
 	test('persistence failure does not return an issued secret', async () => {

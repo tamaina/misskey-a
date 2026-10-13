@@ -13,6 +13,7 @@ import { mockDeep } from 'vitest-mock-extended';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { discoverOAuthServerInfo, exchangeAuthorization, startAuthorization } from '@modelcontextprotocol/sdk/client/auth.js';
+import { AuthenticateService } from '../../backend/transport/AuthenticateService.js';
 import { OAuth2ProviderService } from '../../backend/oauth/OAuth2ProviderService.js';
 import { MiAccessToken } from '../../backend/models/AccessToken.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
@@ -61,7 +62,7 @@ async function setup() {
 	templates.getCommonData.mockResolvedValue({ config, instanceUrl: issuer, langs: [], frontendViteFiles: { entryJs: null, css: [], modulePreloads: [] } } as unknown as Awaited<ReturnType<HtmlTemplateService['getCommonData']>>);
 	const httpServices = [mockDeep<HttpRequestService>(), mockDeep<HttpRequestService>()];
 	const providers = [0, 1].map(index => {
-		const provider = new OAuth2ProviderService(config, f.tokens, f.users, ids, httpServices[index], f.cache, templates, loggers, f.module.get(RoleService), redis);
+		const provider = new OAuth2ProviderService(config, f.tokens, f.users, ids, httpServices[index], f.cache, templates, loggers, f.module.get(RoleService), redis, f.module.get(AuthenticateService));
 		vi.spyOn(provider, 'fetchClientMetadata').mockImplementation(async () => new MetadataResponse(JSON.stringify({
 			client_id: clientId, client_name: 'Synthetic public client', redirect_uris: [redirectUri],
 			grant_types: ['authorization_code'], response_types: ['code'],
