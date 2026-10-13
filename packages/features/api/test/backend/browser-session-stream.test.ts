@@ -7,6 +7,7 @@ import { EventEmitter } from 'node:events';
 import { expect, it, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { Connection } from '../../backend/transport/stream/Connection.js';
+import { waitForChannelReady } from '../../../../backend/test-federation/channel-ready.js';
 import type { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { BrowserSessionService } from '@features/auth/backend/services/BrowserSessionService.js';
 import type { StreamEventEmitter } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -284,4 +285,38 @@ it('bounds flooding during channel init and removes a listener installed after o
 	release(); await vi.waitFor(() => { expect(Reflect.get(f.connection, 'drainingBrowserSessionInputs')).toBe(false); });
 	expect(f.events.eventNames()).toEqual([]);
 	expect(f.notifications.readAllNotification).not.toHaveBeenCalled(); expect(f.socket.close).toHaveBeenCalledOnce();
+});
+
+it('acknowledges same-ID reconnect only after ordered channel initialization and durable checks', async () => {
+	const f = fixture(); await f.attach();
+	const client = Object.assign(new EventEmitter(), { send: (type: string, body: unknown) => f.socket.emit('message', Buffer.from(JSON.stringify({ type, body }))) });
+	f.socket.send.mockImplementation(raw => {
+		const frame = JSON.parse(raw);
+		client.emit(frame.type, frame.body);
+	});
+	let releaseFirst!: () => void; let enteredFirst!: () => void;
+	let releaseSecond!: () => void; let enteredSecond!: () => void;
+	const firstGate = new Promise<void>(resolve => { releaseFirst = resolve; });
+	const firstReached = new Promise<void>(resolve => { enteredFirst = resolve; });
+	const secondGate = new Promise<void>(resolve => { releaseSecond = resolve; });
+	const secondReached = new Promise<void>(resolve => { enteredSecond = resolve; });
+	const first = { id: 'owned-channel', chName: 'homeTimeline', init: async () => { enteredFirst(); await firstGate; return true; }, dispose: vi.fn() };
+	const second = { id: 'owned-channel', chName: 'homeTimeline', init: async () => { enteredSecond(); await secondGate; return true; }, dispose: vi.fn() };
+	f.moduleRef.create.mockResolvedValueOnce(first as never).mockResolvedValueOnce(second as never);
+	vi.spyOn(f.connection, 'getChannelConstructor').mockReturnValue({ requireCredential: true, shouldShare: true } as never);
+	// The SDK's initial request has no pong, followed by the fixture's same-ID request.
+	client.send('connect', { id: 'owned-channel', channel: 'homeTimeline' });
+	await firstReached;
+	const trigger = vi.fn();
+	const ready = waitForChannelReady(client, 'owned-channel', 'homeTimeline', undefined, 10_000).then(trigger);
+	expect(trigger).not.toHaveBeenCalled(); expect(f.socket.send).not.toHaveBeenCalled();
+	releaseFirst(); await secondReached;
+	expect(first.dispose).toHaveBeenCalledOnce();
+	expect(trigger).not.toHaveBeenCalled(); expect(f.socket.send).not.toHaveBeenCalled();
+	releaseSecond(); await ready;
+	expect(trigger).toHaveBeenCalledOnce();
+	expect(f.socket.send).toHaveBeenCalledWith(JSON.stringify({ type: 'connected', body: { id: 'owned-channel' } }));
+	expect(f.sessions.isActive).toHaveBeenCalled();
+	expect(client.listenerCount('connected')).toBe(0);
+	f.connection.dispose();
 });

@@ -5,6 +5,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import * as Misskey from 'misskey-js';
 import { WebSocket } from 'ws';
+import { waitForChannelReady, type AcknowledgedChannelStream } from '../channel-ready.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -246,7 +247,7 @@ export async function uploadFile(
 	body.append('name', filename);
 
 	return await fetch(`https://${host}/api/drive/files/create`, { method: 'POST', body })
-		.then(async res => await res.json());
+		.then(async res => await res.json() as Misskey.entities.DriveFile);
 }
 
 export async function addCustomEmoji(
@@ -299,6 +300,7 @@ export async function isFired<C extends keyof Misskey.Channels, T extends keyof 
 			}) as any);
 		});
 
+		await waitForChannelReady(stream as unknown as AcknowledgedChannelStream, connection.id, channel, params, FEDERATION_TIMEOUT);
 		await trigger();
 		return await Promise.race([
 			receivePromise,
