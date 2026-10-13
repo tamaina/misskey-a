@@ -193,3 +193,95 @@ it('reports capacity rather than session revocation to a native sink', () => {
 	expect(output.failed).toHaveBeenCalledOnce(); expect(output.send).not.toHaveBeenCalled();
 	expect(f.sessions.isActive).not.toHaveBeenCalled(); expect(f.events.eventNames()).toEqual([]);
 });
+
+it.each(['positive', 'error'])('bounds browser input under a stalled DB and suppresses a late %s', async result => {
+	const f = fixture(); await f.attach(); f.sessions.isActive.mockClear();
+	let release!: (active: boolean) => void; let reject!: (error: Error) => void;
+	f.sessions.isActive.mockImplementationOnce(() => new Promise((resolve, fail) => { release = resolve; reject = fail; }));
+	const frame = Buffer.from(JSON.stringify({ type: 'readNotification' }));
+	for (let index = 0; index < 64; index++) f.socket.emit('message', frame);
+	expect(f.sessions.isActive).toHaveBeenCalledOnce(); expect(f.notifications.readAllNotification).not.toHaveBeenCalled();
+	expect(Reflect.get(f.connection, 'browserSessionInputs')).toHaveLength(64);
+	expect(f.socket.close).not.toHaveBeenCalled();
+	f.socket.emit('message', frame); f.socket.emit('message', frame);
+	expect(f.socket.close).toHaveBeenCalledWith(1008, 'Session input capacity exceeded'); expect(f.socket.close).toHaveBeenCalledOnce();
+	expect(Reflect.get(f.connection, 'browserSessionInputs')).toEqual([]); expect(Reflect.get(f.connection, 'browserSessionInputBytes')).toBe(0);
+	if (result === 'positive') release(true); else reject(new Error('SYNTHETIC_DB_ERROR'));
+	await Promise.resolve(); await Promise.resolve(); await Promise.resolve();
+	expect(f.notifications.readAllNotification).not.toHaveBeenCalled(); expect(f.sessions.isActive).toHaveBeenCalledOnce(); expect(f.socket.close).toHaveBeenCalledOnce();
+});
+
+it.each(['buffer', 'fragments', 'array-buffer'])('rejects an oversized raw %s before allocating a queued copy', async kind => {
+	const f = fixture(); await f.attach(); f.sessions.isActive.mockClear();
+	const data = kind === 'buffer' ? Buffer.alloc(1024 * 1024 + 1)
+		: kind === 'fragments' ? [Buffer.alloc(600000), Buffer.alloc(600000)] : new ArrayBuffer(1024 * 1024 + 1);
+	const copy = vi.spyOn(Buffer, 'from'); const concat = vi.spyOn(Buffer, 'concat');
+	try {
+		f.socket.emit('message', data);
+		expect(copy).not.toHaveBeenCalled(); expect(concat).not.toHaveBeenCalled();
+	} finally { copy.mockRestore(); concat.mockRestore(); }
+	expect(f.socket.close).toHaveBeenCalledWith(1008, 'Session input capacity exceeded'); expect(f.socket.close).toHaveBeenCalledOnce();
+	expect(f.sessions.isActive).not.toHaveBeenCalled(); expect(Reflect.get(f.connection, 'browserSessionInputs')).toEqual([]);
+});
+
+it('counts combined raw bytes while validation is pending', async () => {
+	const f = fixture(); await f.attach(); f.sessions.isActive.mockClear();
+	let release!: (active: boolean) => void;
+	f.sessions.isActive.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+	f.socket.emit('message', [Buffer.alloc(300000), Buffer.alloc(300000)]);
+	expect(Reflect.get(f.connection, 'browserSessionInputBytes')).toBe(600000);
+	f.socket.emit('message', new ArrayBuffer(600000));
+	expect(f.socket.close).toHaveBeenCalledWith(1008, 'Session input capacity exceeded'); expect(f.socket.close).toHaveBeenCalledOnce();
+	expect(Reflect.get(f.connection, 'browserSessionInputs')).toEqual([]); expect(Reflect.get(f.connection, 'browserSessionInputBytes')).toBe(0);
+	release(true); await Promise.resolve(); await Promise.resolve(); expect(f.notifications.readAllNotification).not.toHaveBeenCalled();
+});
+
+it('releases pending raw frames on ordinary disposal before a late DB result', async () => {
+	const f = fixture(); await f.attach(); f.sessions.isActive.mockClear();
+	let release!: (active: boolean) => void;
+	f.sessions.isActive.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+	for (let index = 0; index < 3; index++) f.socket.emit('message', Buffer.from(JSON.stringify({ type: 'readNotification' })));
+	f.connection.dispose();
+	expect(Reflect.get(f.connection, 'browserSessionInputs')).toEqual([]); expect(Reflect.get(f.connection, 'browserSessionInputBytes')).toBe(0);
+	release(true); await Promise.resolve(); await Promise.resolve();
+	expect(f.notifications.readAllNotification).not.toHaveBeenCalled(); expect(f.sessions.isActive).toHaveBeenCalledOnce();
+});
+
+it('preserves input order and awaits connect before dispatching the next copied raw frame', async () => {
+	const f = fixture(); await f.attach(); f.sessions.isActive.mockClear();
+	let release!: () => void; let entered!: () => void;
+	const gate = new Promise<void>(resolve => { release = resolve; }); const reached = new Promise<void>(resolve => { entered = resolve; });
+	const connect = vi.spyOn(f.connection, 'connectChannel').mockImplementation(async () => { entered(); await gate; return true; });
+	f.socket.emit('message', Buffer.from(JSON.stringify({ type: 'connect', body: { id: 'channel-a', channel: 'main', params: {} } })));
+	const original = Buffer.from(JSON.stringify({ type: 'readNotification' }));
+	const raw = original.buffer.slice(original.byteOffset, original.byteOffset + original.byteLength);
+	f.socket.emit('message', raw); new Uint8Array(raw).fill(0);
+	await reached; expect(f.notifications.readAllNotification).not.toHaveBeenCalled(); expect(f.sessions.isActive).toHaveBeenCalledOnce();
+	release(); await vi.waitFor(() => { expect(f.notifications.readAllNotification).toHaveBeenCalledOnce(); });
+	expect(connect).toHaveBeenCalledWith('channel-a', {}, 'main', undefined); expect(f.sessions.isActive).toHaveBeenCalledTimes(2);
+	f.connection.dispose();
+});
+
+it('bounds flooding during channel init and removes a listener installed after overflow', async () => {
+	const f = fixture(); await f.attach();
+	let release!: () => void; let entered!: () => void;
+	const gate = new Promise<void>(resolve => { release = resolve; }); const reached = new Promise<void>(resolve => { entered = resolve; });
+	const listener = vi.fn();
+	f.moduleRef.create.mockResolvedValue({
+		id: 'pending-channel',
+		init: async () => { entered(); await gate; f.events.on('broadcast', listener); return true; },
+		dispose: () => f.events.off('broadcast', listener),
+	} as never);
+	vi.spyOn(f.connection, 'getChannelConstructor').mockReturnValue({ requireCredential: false } as never);
+	f.socket.emit('message', Buffer.from(JSON.stringify({ type: 'connect', body: { id: 'pending-channel', channel: 'synthetic', params: {} } })));
+	await reached;
+	const frame = Buffer.from(JSON.stringify({ type: 'readNotification' }));
+	for (let index = 0; index < 63; index++) f.socket.emit('message', frame);
+	expect(Reflect.get(f.connection, 'browserSessionInputs')).toHaveLength(64); expect(f.socket.close).not.toHaveBeenCalled();
+	f.socket.emit('message', frame);
+	expect(f.socket.close).toHaveBeenCalledWith(1008, 'Session input capacity exceeded'); expect(f.socket.close).toHaveBeenCalledOnce();
+	expect(Reflect.get(f.connection, 'browserSessionInputs')).toEqual([]); expect(Reflect.get(f.connection, 'browserSessionInputBytes')).toBe(0);
+	release(); await vi.waitFor(() => { expect(Reflect.get(f.connection, 'drainingBrowserSessionInputs')).toBe(false); });
+	expect(f.events.eventNames()).toEqual([]);
+	expect(f.notifications.readAllNotification).not.toHaveBeenCalled(); expect(f.socket.close).toHaveBeenCalledOnce();
+});

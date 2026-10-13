@@ -12,15 +12,12 @@ vi.mock('@features/boot/frontend/shared/config.js', () => ({ apiUrl: '/api' }));
 vi.mock('@@/js/shared-files.js', () => ({ clearSharedFiles: m.files }));
 vi.mock('@features/preferences/frontend/state/utility.js', () => ({ cloudBackup: m.backup }));
 vi.mock('@features/preferences/frontend/store.js', () => ({ store: { s: { enablePreferencesAutoCloudBackup: true } } }));
-vi.mock('@features/ui/frontend/os.js', () => ({ waiting: m.waiting, select: m.select }));
+vi.mock('@features/ui/frontend/os.js', () => ({ waiting: m.waiting }));
+vi.mock('@features/auth/frontend/signout-choice.js', () => ({ signoutChoice: m.select }));
 vi.mock('@features/runtime/frontend/utility/unison-reload.js', () => ({ unisonReload: m.reload }));
 vi.mock('@features/runtime/frontend/utility/idb-proxy.js', () => ({ clear: m.clear }));
 vi.mock('@features/auth/frontend/i.js', () => ({ $i: { token: 'synthetic-current' } }));
 vi.mock('@features/notifications/frontend/utility/encode-push-subscription-key.js', () => ({ encodePushSubscriptionKey: vi.fn() }));
-vi.mock('@features/runtime/frontend/i18n.js', () => ({ i18n: { ts: {
-	logout: 'Logout', retry: 'Retry', signoutLegacySession: 'Server credential remains valid',
-	signoutRevokeFailed: 'Server revocation not confirmed', signoutLocalOnly: 'Logout on this device only',
-} } }));
 
 beforeEach(() => {
 	vi.clearAllMocks();
@@ -76,7 +73,7 @@ describe('server-first signout', () => {
 		m.api.mockRejectedValue({ code: 'SESSION_NOT_REVOCABLE' });
 		m.select.mockResolvedValue({ canceled: false, result: 'local' });
 		await signout();
-		expect(m.select).toHaveBeenCalledWith(expect.objectContaining({ text: 'Server credential remains valid', items: [{ label: 'Logout on this device only', value: 'local' }] }));
+		expect(m.select).toHaveBeenCalledWith({ legacy: true });
 		expect(m.api).toHaveBeenCalledOnce();
 		expect(localStorage.getItem('account')).toBeNull();
 		expect(localStorage.getItem('accounts')).toBeNull();
@@ -91,7 +88,7 @@ describe('server-first signout', () => {
 		});
 		m.select.mockResolvedValue({ canceled: false, result: 'retry' });
 		await signout();
-		expect(m.select).toHaveBeenCalledWith(expect.objectContaining({ text: 'Server revocation not confirmed', items: [{ label: 'Retry', value: 'retry' }, { label: 'Logout on this device only', value: 'local' }] }));
+		expect(m.select).toHaveBeenCalledWith({ legacy: false });
 		expect(m.api).toHaveBeenCalledTimes(2);
 		expect(m.backup).toHaveBeenCalledOnce();
 		expect(m.reload).toHaveBeenCalledOnce();

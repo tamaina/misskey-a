@@ -118,18 +118,6 @@ export interface Locale extends ILocale {
      */
     "logout": string;
     /**
-     * このログインはサーバー側で個別に無効化できません。この端末のログイン情報だけを消去できます。サーバー側の認証情報は引き続き有効です。
-     */
-    "signoutLegacySession": string;
-    /**
-     * サーバー側のログインを無効化できませんでした。再試行するか、この端末のログイン情報だけを消去できます。端末だけからログアウトしても、サーバー側での無効化は確認できません。
-     */
-    "signoutRevokeFailed": string;
-    /**
-     * この端末だけからログアウト
-     */
-    "signoutLocalOnly": string;
-    /**
      * 新規登録
      */
     "signup": string;

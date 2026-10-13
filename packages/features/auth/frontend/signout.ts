@@ -4,12 +4,12 @@
  */
 
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import { signoutChoice } from '@features/auth/frontend/signout-choice.js';
 import { apiUrl } from '@features/boot/frontend/shared/config.js';
 import { clearSharedFiles } from '@@/js/shared-files.js';
 import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
 import { store } from '@features/preferences/frontend/store.js';
-import { select, waiting } from '@features/ui/frontend/os.js';
+import { waiting } from '@features/ui/frontend/os.js';
 import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 import { clear } from '@features/runtime/frontend/utility/idb-proxy.js';
 import { $i } from '@features/auth/frontend/i.js';
@@ -32,14 +32,7 @@ export async function signout() {
 			} catch (error) {
 				finishWaiting();
 				const legacy = (error as { code?: string } | null)?.code === 'SESSION_NOT_REVOCABLE';
-				const choice = await select<'retry' | 'local'>({
-					title: i18n.ts.logout,
-					text: legacy ? i18n.ts.signoutLegacySession : i18n.ts.signoutRevokeFailed,
-					items: [
-						...(!legacy ? [{ label: i18n.ts.retry, value: 'retry' as const }] : []),
-						{ label: i18n.ts.signoutLocalOnly, value: 'local' },
-					],
-				});
+				const choice = await signoutChoice({ legacy });
 				if (choice.canceled || choice.result == null) return;
 				finishWaiting = waiting();
 				if (choice.result === 'local') break;
