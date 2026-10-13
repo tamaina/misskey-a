@@ -6,7 +6,7 @@ import { expect, it } from 'vitest';
 import * as v from 'valibot';
 import { ToolSchema } from '@modelcontextprotocol/sdk/types.js';
 import { AjvJsonSchemaValidator } from '@modelcontextprotocol/sdk/validation/ajv-provider.js';
-import { streamChannelInputSchema } from '../../backend/stream-parameters.js';
+import { streamChannelInputSchema, streamNoteInputSchema } from '../../backend/stream-parameters.js';
 import { streamChannelArguments, streamChannels } from '../../backend/stream.schema.js';
 
 it('exposes discoverable object properties in the MCP channel settings schema', () => {
@@ -17,6 +17,22 @@ it('exposes discoverable object properties in the MCP channel settings schema', 
 		required: ['channel'],
 		additionalProperties: false,
 	});
+});
+
+it('declares 2020-12 only at generated event schema document roots', () => {
+	const dialect = 'https://json-schema.org/draft/2020-12/schema';
+	expect(streamChannelInputSchema.$schema).toBe(dialect);
+	expect(streamNoteInputSchema.$schema).toBe(dialect);
+	const inspect = (value: unknown, documentRoot = false) => {
+		if (!value || typeof value !== 'object') return;
+		if ('$schema' in value) {
+			expect(documentRoot).toBe(true);
+			expect(value.$schema).toBe(dialect);
+		}
+		for (const child of Object.values(value)) inspect(child);
+	};
+	inspect(streamChannelInputSchema, true);
+	inspect(streamNoteInputSchema, true);
 });
 
 // These constraints use draft-07-compatible keywords; the SDK's bundled AJV uses draft-07.
@@ -49,4 +65,27 @@ it('rejects unknown channels and invalid hashtag dimensions', () => {
 		{ channel: 'hashtag', params: { q: [['x'.repeat(101)]] } },
 		{ channel: 'hashtag', params: { q: Array.from({ length: 11 }, () => ['tag']) } },
 	]) expect(validate(input).valid).toBe(false);
+});
+
+it('advertises explicitly typed channel enums in all native branches', () => {
+	const branches = streamChannelInputSchema.oneOf as { properties: { channel: Record<string, unknown> } }[];
+	expect(branches).toHaveLength(streamChannels.length);
+	for (const [index, branch] of branches.entries()) {
+		expect(branch.properties.channel).toEqual({ type: 'string', enum: [streamChannels[index]] });
+	}
+});
+
+it('advertises the finite parameter fields at the object root without weakening branch constraints', () => {
+	const root = streamChannelInputSchema.properties as { params: { properties: Record<string, unknown>; additionalProperties: boolean } };
+	expect(Object.keys(root.params.properties).sort()).toEqual([
+		'antennaId', 'channelId', 'gameId', 'listId', 'otherId', 'q', 'roleId', 'roomId', 'withFiles', 'withRenotes', 'withReplies',
+	]);
+	expect(root.params.additionalProperties).toBe(false);
+	expect(root.params.properties.withFiles).toMatchObject({ type: 'boolean' });
+	expect(root.params.properties.antennaId).toMatchObject({ type: 'string', minLength: 1, maxLength: 32 });
+	const validate = new AjvJsonSchemaValidator().getValidator(validationSchema);
+	// Fields discoverable at the root remain usable only for the native channel that accepts them.
+	expect(validate({ channel: 'main', params: { antennaId: 'antenna' } }).valid).toBe(false);
+	expect(validate({ channel: 'antenna', params: {} }).valid).toBe(false);
+	expect(validate({ channel: 'antenna', params: { antennaId: 'antenna' } }).valid).toBe(true);
 });
