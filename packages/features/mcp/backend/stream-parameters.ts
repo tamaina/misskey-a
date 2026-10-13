@@ -7,15 +7,17 @@ import { toJsonSchema } from '@valibot/to-json-schema';
 import { streamChannelArguments, streamChannels, streamNoteArguments } from './stream.schema.js';
 import type { StreamSubscription } from './stream-types.js';
 const empty = v.strictObject({});
+// MCP clients must support 2020-12; draft-07 support is optional.
+const jsonSchemaOptions = { target: 'draft-2020-12' } as const;
 // Keep native branch constraints, but make literal types and available filters
 // explicit for settings consumers that cannot infer them from const/oneOf.
 const channelSchemas = streamChannelArguments.options.map((option, index) => {
-	const schema = toJsonSchema(option);
+	const schema = toJsonSchema(option, jsonSchemaOptions);
 	return { ...schema, properties: { ...schema.properties, channel: { type: 'string' as const, enum: [streamChannels[index]] } } };
 });
-const parameterProperties: Record<string, unknown> = Object.assign({}, ...streamChannelArguments.options.map(option => toJsonSchema(option.entries.params).properties));
+const parameterProperties: Record<string, unknown> = Object.assign({}, ...streamChannelArguments.options.map(option => toJsonSchema(option.entries.params, jsonSchemaOptions).properties));
 export const streamChannelInputSchema: Record<string, unknown> = {
-	...toJsonSchema(streamChannelArguments),
+	...toJsonSchema(streamChannelArguments, jsonSchemaOptions),
 	oneOf: channelSchemas,
 	// MCP settings discovery expects object properties at the root. Keep the
 	// generated oneOf branches to enforce each native channel's parameters.
@@ -27,7 +29,7 @@ export const streamChannelInputSchema: Record<string, unknown> = {
 	required: ['channel'],
 	additionalProperties: false,
 };
-export const streamNoteInputSchema: Record<string, unknown> = { ...toJsonSchema(streamNoteArguments) };
+export const streamNoteInputSchema: Record<string, unknown> = { ...toJsonSchema(streamNoteArguments, jsonSchemaOptions) };
 export function streamSubscription(name: string, args: unknown): StreamSubscription | null {
 	if (name === 'stream.channel') return v.parse(streamChannelArguments, args) as StreamSubscription;
 	if (name === 'stream.broadcast') { v.parse(empty, args); return { channel: 'broadcast', params: {} }; }

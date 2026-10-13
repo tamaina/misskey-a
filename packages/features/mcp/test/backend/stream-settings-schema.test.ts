@@ -6,7 +6,7 @@ import { expect, it } from 'vitest';
 import * as v from 'valibot';
 import { ToolSchema } from '@modelcontextprotocol/sdk/types.js';
 import { AjvJsonSchemaValidator } from '@modelcontextprotocol/sdk/validation/ajv-provider.js';
-import { streamChannelInputSchema } from '../../backend/stream-parameters.js';
+import { streamChannelInputSchema, streamNoteInputSchema } from '../../backend/stream-parameters.js';
 import { streamChannelArguments, streamChannels } from '../../backend/stream.schema.js';
 
 it('exposes discoverable object properties in the MCP channel settings schema', () => {
@@ -17,6 +17,19 @@ it('exposes discoverable object properties in the MCP channel settings schema', 
 		required: ['channel'],
 		additionalProperties: false,
 	});
+});
+
+it('uses the mandatory MCP 2020-12 dialect for generated event schemas and nested resources', () => {
+	const dialect = 'https://json-schema.org/draft/2020-12/schema';
+	expect(streamChannelInputSchema.$schema).toBe(dialect);
+	expect(streamNoteInputSchema.$schema).toBe(dialect);
+	const inspect = (value: unknown) => {
+		if (!value || typeof value !== 'object') return;
+		if ('$schema' in value) expect(value.$schema).toBe(dialect);
+		for (const child of Object.values(value)) inspect(child);
+	};
+	inspect(streamChannelInputSchema);
+	inspect(streamNoteInputSchema);
 });
 
 // These constraints use draft-07-compatible keywords; the SDK's bundled AJV uses draft-07.
