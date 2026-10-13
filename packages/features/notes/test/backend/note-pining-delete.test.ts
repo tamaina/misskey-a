@@ -26,7 +26,7 @@ function createService() {
 	const notes = mockDeep<NotesRepository>();
 	const pinings = mockDeep<UserNotePiningsRepository>();
 	const users = mockDeep<UserEntityService>();
-	const note = new MiNote();
+	const note = new MiNote({});
 	note.id = 'note-id';
 	note.localOnly = false;
 	note.visibility = 'public';
