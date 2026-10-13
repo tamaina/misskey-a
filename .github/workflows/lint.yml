@@ -7,6 +7,7 @@ on:
       - develop
     paths:
       - packages/backend/**
+      - packages/features/mcp/**
       - packages/frontend/**
       - packages/frontend-shared/**
       - packages/frontend-builder/**
@@ -25,6 +26,7 @@ on:
       - main
     paths:
       - packages/backend/**
+      - packages/features/mcp/**
       - packages/frontend/**
       - packages/frontend-shared/**
       - packages/frontend-builder/**
