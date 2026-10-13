@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { randomUUID } from 'node:crypto';
+import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import * as Reversi from 'misskey-reversi';
@@ -269,6 +271,10 @@ export type EventTypesToEventPayload<T> = EventUnionFromDictionary<UndefinedAsNu
 
 // name/messages(spec) pairs dictionary
 export type GlobalEvents = {
+	statistics: {
+		name: `statisticsStream:${'serverStats' | 'queueStats'}`;
+		payload: { type: 'stats'; body: JsonObject };
+	};
 	internal: {
 		name: 'internal';
 		payload: EventTypesToEventPayload<InternalEventTypes>;
@@ -359,7 +365,15 @@ export class GlobalEventService {
 		this.redisForPub.publish(this.config.host, JSON.stringify({
 			channel: channel,
 			message: message,
+			occurrenceId: randomUUID(),
+			createdAt: Date.now(),
 		}));
+	}
+
+	/** One publisher identity per live sample, shared by all native observers. */
+	@bindThis
+	public publishStatisticsStream(channel: 'serverStats' | 'queueStats', stats: JsonObject): void {
+		this.publish(`statisticsStream:${channel}`, 'stats', stats);
 	}
 
 	@bindThis

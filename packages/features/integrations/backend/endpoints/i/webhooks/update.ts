@@ -19,7 +19,7 @@ export function createIWebhooksUpdateProcedure(deps: IWebhooksUpdateDependencies
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
-			const webhook = await deps.webhooksRepository.findOneBy({ id: ps.webhookId, userId: me.id });
+			const webhook = await deps.webhooksRepository.findOneBy({ id: ps.webhookId, userId: me.id, mode: 'legacy' });
 			if (webhook === null) throw apiError(iWebhooksUpdateErrors.noSuchWebhook);
 			await deps.webhooksRepository.update(webhook.id, { name: ps.name, url: ps.url, secret: ps.secret === null ? '' : ps.secret, on: ps.on, active: ps.active });
 			const updated = await deps.webhooksRepository.findOneByOrFail({ id: ps.webhookId });

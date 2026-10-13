@@ -9,6 +9,7 @@ import { ContextIdFactory, ModuleRef, REQUEST } from '@nestjs/core';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import { isJsonObject } from '@features/runtime/backend/formatting/json-value.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { JsonObject, JsonValue } from '@features/runtime/backend/formatting/json-value.js';
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
@@ -42,6 +43,7 @@ import type { ChannelRequest } from './channel.js';
 import type { ChannelConstructor } from './channel.js';
 import type { Channel } from './channel.js';
 import type { EventEmitter } from 'events';
+import type { StreamChannel } from '@features/mcp/backend/stream-types.js';
 
 const MAX_CHANNELS_PER_CONNECTION = 32;
 const MAX_SUBSCRIBING_NOTES_PER_CONNECTION = 1536;
@@ -55,6 +57,11 @@ export default class Connection {
 	public user?: MiUser;
 	public token?: MiAccessToken;
 	private wsConnection: WebSocket.WebSocket;
+	private output: NativeStreamOutput | undefined;
+	private outputChannels: ReadonlySet<string> = new Set();
+	private listeningBroadcast = false;
+	public get isNativeOutput() { return !!this.output; }
+	private disposed = false;
 	private messageQueue = promiseLimit<void>(1);
 	public subscriber: StreamEventEmitter;
 	private channels: Map<string, Channel> = new Map();
@@ -85,7 +92,7 @@ export default class Connection {
 	}
 
 	@bindThis
-	public async fetch() {
+	public async fetch(fresh = false) {
 		if (this.user == null) return;
 		const [
 			userProfile,
@@ -96,13 +103,13 @@ export default class Connection {
 			userIdsWhoBlockingMe,
 			userIdsWhoMeMutingRenotes,
 		] = await Promise.all([
-			this.cacheService.userProfileCache.fetch(this.user.id),
-			this.cacheService.userFollowingsCache.fetch(this.user.id),
-			this.channelFollowingService.userFollowingChannelsCache.fetch(this.user.id),
-			this.channelMutingService.mutingChannelsCache.fetch(this.user.id),
-			this.cacheService.userMutingsCache.fetch(this.user.id),
-			this.cacheService.userBlockedCache.fetch(this.user.id),
-			this.cacheService.renoteMutingsCache.fetch(this.user.id),
+			this.cacheService.userProfileCache.fetch(this.user.id, fresh),
+			this.cacheService.userFollowingsCache.fetch(this.user.id, fresh),
+			this.channelFollowingService.userFollowingChannelsCache.fetch(this.user.id, fresh),
+			this.channelMutingService.mutingChannelsCache.fetch(this.user.id, fresh),
+			this.cacheService.userMutingsCache.fetch(this.user.id, fresh),
+			this.cacheService.userBlockedCache.fetch(this.user.id, fresh),
+			this.cacheService.renoteMutingsCache.fetch(this.user.id, fresh),
 		]);
 		this.userProfile = userProfile;
 		this.following = following;
@@ -116,8 +123,10 @@ export default class Connection {
 
 	@bindThis
 	public async init() {
+		if (this.disposed) return;
 		if (this.user != null) {
 			await this.fetch();
+			if (this.disposed) return;
 
 			if (!this.fetchIntervalId) {
 				this.fetchIntervalId = setInterval(this.fetch, 1000 * 10);
@@ -127,14 +136,51 @@ export default class Connection {
 
 	@bindThis
 	public async listen(subscriber: EventEmitter, wsConnection: WebSocket.WebSocket) {
+		if (this.output || this.wsConnection || this.disposed) throw new Error('Connection already attached');
 		this.subscriber = subscriber;
 
 		this.wsConnection = wsConnection;
 		this.wsConnection.on('message', data => this.messageQueue(() => this.onWsConnectionMessage(data)));
 
-		this.subscriber.on('broadcast', data => {
-			this.onBroadcastMessage(data);
-		});
+		this.subscriber.on('broadcast', this.onBroadcastMessage);
+		this.listeningBroadcast = true;
+	}
+
+	/** Internal outbound seam. Channel initialization still owns authorization and filtering. */
+	public attachNativeOutput(subscriber: StreamEventEmitter, output: NativeStreamOutput, routes: { channels: readonly NativeOutputChannel[]; broadcast?: boolean }) {
+		if (this.disposed || this.wsConnection || this.output) throw new Error('Connection already attached');
+		this.subscriber = subscriber;
+		this.output = output;
+		this.outputChannels = new Set(routes.channels);
+		if (routes.broadcast) {
+			this.subscriber.on('broadcast', this.onBroadcastMessage);
+			this.listeningBroadcast = true;
+		}
+	}
+
+	/** In-process antenna-only pilot. No broadcast, raw note or socket handlers. */
+	public attachAntennaOutput(subscriber: StreamEventEmitter, output: AntennaNoteOutput) {
+		this.attachNativeOutput(subscriber, {
+			isOpen: () => output.isOpen(),
+			send: frame => {
+				if (frame.type === 'channel' && frame.body.type === 'note') return output.send(frame.body.body as Packed<'Note'>);
+			},
+			failed: error => output.failed(error),
+		}, { channels: ['antenna'] });
+	}
+
+	/** Only receives channel output after the channel's authorization and filters. */
+	public sendChannelMessage(id: string, type: string, body: JsonValue) {
+		if (this.disposed) return;
+		if (this.output && !this.outputChannels.has(this.channels.get(id)?.chName ?? '')) return;
+		this.sendMessageToWs('channel', { id, type, body });
+	}
+
+	private failOutput(output: NativeStreamOutput, error: unknown) {
+		if (this.disposed) return;
+		this.dispose();
+		// Failure observers cannot escape the EventEmitter handler either.
+		try { Promise.resolve(output.failed(error)).catch(() => {}); } catch { }
 	}
 
 	/**
@@ -206,6 +252,12 @@ export default class Connection {
 		if (updated === 1) {
 			this.subscriber.on(`noteStream:${payload.id}`, this.onNoteStreamMessage);
 		}
+	}
+
+	/** Declarative outbound note subscription; does not expose the socket command dispatcher. */
+	public subscribeNativeNote(noteId: string) {
+		if (!this.output || this.disposed) throw new Error('Native output required');
+		this.onSubscribeNote({ id: noteId });
 	}
 
 	/**
@@ -282,6 +334,14 @@ export default class Connection {
 	 */
 	@bindThis
 	public sendMessageToWs(type: string, payload: JsonObject) {
+		if (this.disposed) return;
+		if (this.output) {
+			const output = this.output;
+			try {
+				if (output.isOpen()) Promise.resolve(output.send({ type, body: payload })).catch(error => { this.failOutput(output, error); });
+			} catch (error) { this.failOutput(output, error); }
+			return;
+		}
 		this.wsConnection.send(JSON.stringify({
 			type: type,
 			body: payload,
@@ -293,30 +353,31 @@ export default class Connection {
 	 */
 	@bindThis
 	public async connectChannel(id: string, params: JsonObject | undefined, channel: string, pong = false) {
+		if (this.disposed || this.output && !this.outputChannels.has(channel)) return false;
 		if (this.channels.has(id)) {
 			this.disconnectChannel(id);
 		}
 
 		if (this.channels.size >= MAX_CHANNELS_PER_CONNECTION) {
-			return;
+			return false;
 		}
 
 		const channelConstructor = this.getChannelConstructor(channel);
 
 		if (channelConstructor.requireCredential && this.user == null) {
-			return;
+			return false;
 		}
 
 		if (this.token && ((channelConstructor.kind && !this.token.permission.some(p => p === channelConstructor.kind))
 			|| (!channelConstructor.kind && channelConstructor.requireCredential))) {
-			return;
+			return false;
 		}
 
 		// 共有可能チャンネルに接続しようとしていて、かつそのチャンネルに既に接続していたら無意味なので無視
 		if (channelConstructor.shouldShare) {
 			for (const c of this.channels.values()) {
 				if (c.chName === channel) {
-					return;
+					return false;
 				}
 			}
 		}
@@ -327,21 +388,31 @@ export default class Connection {
 			connection: this,
 		}, contextId);
 		const ch: Channel = await this.moduleRef.create<Channel>(channelConstructor, contextId);
-		if (this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return;
+		if (this.output ? !this.output.isOpen() : this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return false;
 
 		this.channels.set(ch.id, ch);
 		const valid = await ch.init(params ?? {});
+		if (this.disposed || this.output && !this.output.isOpen()) {
+			ch.dispose?.(); this.channels.delete(ch.id); return false;
+		}
 		if (typeof valid === 'boolean' && !valid) {
 			// 初期化処理の結果、接続拒否されたので切断
 			this.disconnectChannel(id);
-			return;
+			return false;
 		}
 
-		if (pong) {
+		if (pong && !this.output) {
 			this.sendMessageToWs('connected', {
 				id: id,
 			});
 		}
+		return true;
+	}
+
+	public async packAntennaNote(id: string, noteId: string) {
+		const channel = this.channels.get(id);
+		if (this.disposed || !(channel instanceof AntennaChannel)) return null;
+		return channel.packNote(noteId);
 	}
 
 	@bindThis
@@ -407,7 +478,11 @@ export default class Connection {
 	 */
 	@bindThis
 	public dispose() {
+		this.disposed = true;
+		if (this.listeningBroadcast) this.subscriber.off('broadcast', this.onBroadcastMessage);
+		this.listeningBroadcast = false;
 		if (this.fetchIntervalId) clearInterval(this.fetchIntervalId);
+		this.fetchIntervalId = null;
 
 		for (const c of this.channels.values()) {
 			if (c.dispose) c.dispose();
@@ -427,3 +502,19 @@ export interface ConnectionRequest {
 }
 
 export { Connection };
+
+/** Deliberately limited pilot routes; no client command dispatcher or note subscriptions. */
+export type NativeOutputChannel = StreamChannel;
+export interface NativeStreamFrame { type: string; body: JsonObject }
+export interface NativeStreamOutput {
+	isOpen(): boolean;
+	send(frame: NativeStreamFrame): void | Promise<void>;
+	failed(error: unknown): void | Promise<void>;
+}
+
+/** Filtered antenna notes only; no transport or persistence semantics implied. */
+export interface AntennaNoteOutput {
+	isOpen(): boolean;
+	send(note: Packed<'Note'>): void | Promise<void>;
+	failed(error: unknown): void | Promise<void>;
+}

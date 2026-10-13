@@ -9,6 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:width="370"
 	:height="400"
 	@close="onClose"
+	@esc="onClose"
 	@closed="emit('closed')"
 >
 	<template #header>{{ $locale.sfc.authentication }}</template>
@@ -21,11 +22,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<form @submit.prevent="done">
 			<div class="_gaps">
-				<MkInput ref="passwordInput" v-model="password" :placeholder="$locale.sfc.password" type="password" autocomplete="current-password webauthn" required :withPasswordToggle="true">
+				<MkInput v-if="props.currentPassword == null" ref="passwordInput" v-model="password" :placeholder="$locale.sfc.password" type="password" autocomplete="current-password webauthn" required :withPasswordToggle="true">
 					<template #prefix><i class="ti ti-password"></i></template>
 				</MkInput>
 
-				<MkInput v-if="$i.twoFactorEnabled" v-model="token" type="text" :pattern="isBackupCode ? '^[A-Z0-9]{32}$' :'^[0-9]{6}$'" autocomplete="one-time-code" required :spellcheck="false" :inputmode="isBackupCode ? undefined : 'numeric'">
+				<MkInput v-if="$i.twoFactorEnabled" ref="tokenInput" v-model="token" type="text" :pattern="isBackupCode ? '^[A-Z0-9]{32}$' :'^[0-9]{6}$'" autocomplete="one-time-code" required :spellcheck="false" :inputmode="isBackupCode ? undefined : 'numeric'">
 					<template #label>{{ $locale.sfc.token }} ({{ $locale.sfc['2fa'] }})</template>
 					<template #prefix><i v-if="isBackupCode" class="ti ti-key"></i><i v-else class="ti ti-123"></i></template>
 					<template #caption><button class="_textButton" type="button" @click="isBackupCode = !isBackupCode">{{ isBackupCode ? $locale.sfc.useTotp : $locale.sfc.useBackupCode }}</button></template>
@@ -47,6 +48,11 @@ import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const $i = ensureSignin();
 
+const props = defineProps<{
+	/** Already collected by a multi-step flow; the server still verifies it on submission. */
+	currentPassword?: string;
+}>();
+
 const emit = defineEmits<{
 	(ev: 'done', v: { password: string; token: string | null; }): void;
 	(ev: 'closed'): void;
@@ -55,7 +61,8 @@ const emit = defineEmits<{
 
 const dialog = useTemplateRef('dialog');
 const passwordInput = useTemplateRef('passwordInput');
-const password = ref('');
+const tokenInput = useTemplateRef('tokenInput');
+const password = ref(props.currentPassword ?? '');
 const isBackupCode = ref(false);
 const token = ref<string | null>(null);
 
@@ -71,6 +78,7 @@ function done() {
 
 onMounted(() => {
 	if (passwordInput.value) passwordInput.value.focus();
+	else if (tokenInput.value) tokenInput.value.focus();
 });
 </script>
 

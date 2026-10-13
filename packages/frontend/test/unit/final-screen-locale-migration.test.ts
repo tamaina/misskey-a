@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
 import { restoreOAuthPermissionBaseline } from './oauth-permission-source-rebase.js';
 import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
 import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
@@ -58,7 +59,7 @@ function configured(embed: boolean) {
 test('all51 screen sources reverse byte for byte and retain all49336 effective locale strings', () => {
 	let strings = 0;
 	for (const entry of proof) {
-		const currentSource = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, restoreOAuthPermissionBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'))));
+		const currentSource = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, restoreOAuthPermissionBaseline(entry.file, restorePasswordChangeBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8')))));
 		// Keep the original migration proof frozen; current permission labels are checked below.
 		const source = currentSource.replace(/^\t\t"access:mcp": [^\n]*,\n/gm, '');
 		expect(hash(source)).toBe(entry.migratedSha256);
