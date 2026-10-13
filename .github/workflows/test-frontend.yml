@@ -7,6 +7,8 @@ on:
       - develop
     paths:
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       # for permissions
       - packages/misskey-js/**
       # for e2e
@@ -18,6 +20,8 @@ on:
       - main
     paths:
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       # for permissions
       - packages/misskey-js/**
       # for e2e
