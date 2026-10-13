@@ -3,7 +3,7 @@ name: Check copyright year
 on:
   push:
     branches:
-      - master
+      - main
       - develop
 
 jobs:

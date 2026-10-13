@@ -53,9 +53,10 @@ test('real user webhook create/list/show handlers retain defaults, timestamps, o
 	ids.gen.mockReturnValue(webhook.id);
 	repository.countBy.mockResolvedValue(0);
 	roles.getUserPolicies.mockResolvedValue(mockDeep<RolePolicies>({ webhookLimit: 3 }));
-	repository.insertOne.mockResolvedValue({ ...webhook, user: null });
-	repository.findBy.mockResolvedValue([{ ...webhook, user: null }]);
-	repository.findOneBy.mockResolvedValue({ ...webhook, user: null });
+	const legacyModel = { ...webhook, user: null, mode: 'legacy' as const, mcpTokenId: null, mcpToken: null, mcpAntennaId: null, mcpAntenna: null, mcpStream: null, mcpStreamSince: null, mcpExpiresAt: null, mcpGeneration: null, mcpPreviousSecret: null, mcpPreviousSecretUntil: null };
+	repository.insertOne.mockResolvedValue(legacyModel);
+	repository.findBy.mockResolvedValue([legacyModel]);
+	repository.findOneBy.mockResolvedValue(legacyModel);
 	const created = await call(CreateEndpoint({ webhooksRepository: repository, idService: ids, globalEventService: mockDeep(), roleService: roles }), v.parse(requiredSchema(iWebhooksCreateContract['~orpc'].inputSchema), params), { context: testContext(me, null) });
 	checkFinite(requiredSchema(iWebhooksCreateContract['~orpc'].outputSchema), created);
 	expect(created.secret).toBe('');
@@ -63,8 +64,8 @@ test('real user webhook create/list/show handlers retain defaults, timestamps, o
 	checkFinite(packedUserWebhookSchema, listed[0]);
 	const show = ShowEndpoint({ webhooksRepository: repository });
 	checkFinite(packedUserWebhookSchema, await call(show, { webhookId: webhook.id }, { context: testContext(me, null) }));
-	expect(repository.findOneBy).toHaveBeenCalledWith({ id: webhook.id, userId: me.id });
-	repository.findOneBy.mockResolvedValue({ ...webhook, user: null, latestSentAt: date, latestStatus: 202 });
+	expect(repository.findOneBy).toHaveBeenCalledWith({ id: webhook.id, userId: me.id, mode: 'legacy' });
+	repository.findOneBy.mockResolvedValue({ ...legacyModel, latestSentAt: date, latestStatus: 202 });
 	expect(await call(show, { webhookId: webhook.id }, { context: testContext(me, null) })).toHaveProperty('latestSentAt', date.toISOString());
 	repository.findOneBy.mockResolvedValue(null);
 	await expect(call(show, { webhookId: webhook.id }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'NO_SUCH_WEBHOOK' });

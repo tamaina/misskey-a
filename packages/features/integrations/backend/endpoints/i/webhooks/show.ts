@@ -20,7 +20,7 @@ export function createIWebhooksShowProcedure(deps: IWebhooksShowDependencies) {
 			const result = await (async () => {
 				const webhook = await deps.webhooksRepository.findOneBy({
 					id: ps.webhookId,
-					userId: me.id,
+					userId: me.id, mode: 'legacy',
 				});
 				if (webhook == null) {
 					throw apiError(iWebhooksShowErrors.noSuchWebhook);

@@ -79701,8 +79701,10 @@ export interface operations {
             content: {
                 'application/json': {
                     password: string;
+                    token?: string | null;
                 } & ({
                     password: string;
+                    token?: string | null;
                 } & unknown);
             };
         };

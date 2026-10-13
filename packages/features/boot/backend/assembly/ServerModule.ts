@@ -46,7 +46,6 @@ import { ChatUserChannel } from '@features/chat/backend/stream/chat-user.js';
 import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
 import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
 import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
-import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { sessionProviders } from '@features/auth/backend/session.providers.js';
 import { featureProviders } from '@features/index/backend/feature-providers.js';
 import { ServerService } from './ServerService.mjs';
@@ -100,7 +99,6 @@ import { CoreModule } from './CoreModule.js';
 		QueueStatsChannel,
 		ServerStatsChannel,
 		UserListChannel,
-		NoteStreamingHidingService,
 		OpenApiServerService,
 		OAuth2ProviderService,
 	],

@@ -65,7 +65,7 @@ export class UserListChannel extends Channel {
 
 		this.subscriber.on('notesStream', this.onNote);
 
-		this.updateListUsers();
+		await this.updateListUsers();
 		this.listUsersClock = setInterval(this.updateListUsers, 5000);
 
 		return true;
