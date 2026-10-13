@@ -308,6 +308,7 @@ export const IRegenerateTokenContract = oc.$meta({
 	secure: true,
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/i/regenerate-token', tags: [] }).errors({ ...commonErrors }).input(objectInput({
 	"password": v.string(),
+	"token": v.exactOptional(v.nullable(v.string())),
 })).output(v.void());
 
 export const IRevokeTokenContract = oc.$meta({
