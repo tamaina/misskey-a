@@ -9,7 +9,7 @@ import { AppEntityService } from './serializers/AppEntityService.js';
 import { AuthSessionEntityService } from './serializers/AuthSessionEntityService.js';
 import { InviteCodeEntityService } from './serializers/InviteCodeEntityService.js';
 import { SigninEntityService } from './serializers/SigninEntityService.js';
-import { UserAuthService } from './services/UserAuthService.js';
+import { TotpService } from './services/TotpService.js';
 import { WebAuthnService } from './services/WebAuthnService.js';
 
 const app = service(AppEntityService, [ports.appsRepository, ports.accessTokensRepository]);
@@ -21,6 +21,6 @@ export const authServices = defineServices({
 });
 
 export const authSecurityServices = defineServices({
-	UserAuthService: service(UserAuthService, [ports.redisClient, ports.usersRepository, ports.userProfilesRepository]),
+	UserAuthService: service(TotpService, [ports.redisClient, ports.usersRepository, ports.userProfilesRepository]),
 	WebAuthnService: service(WebAuthnService, [ports.config, ports.meta, ports.redisClient, ports.userSecurityKeysRepository]),
 });
