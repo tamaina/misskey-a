@@ -31,7 +31,7 @@ type DiffFixture = { element: HTMLDivElement; props: DiffFixtureProps; unmount: 
 
 async function showDiff(input: DiffFixtureProps): Promise<DiffFixture> {
 	const props = reactive(input);
-	const element = document.createElement('div');
+	const element = window.document.createElement('div');
 	const app = createApp({ render: () => h(Suspense, null, { default: () => h(MkCodeDiff, props) }) });
 	app.use(internationalization);
 	app.mount(element);
