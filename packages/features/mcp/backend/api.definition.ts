@@ -28,6 +28,7 @@ export const listInput = v.strictObject({ cursor: v.optional(v.null()) });
 const descriptor = v.strictObject({ name: v.picklist(eventNames), description: v.string(), delivery: v.tuple([v.literal('webhook')]),
 	inputSchema: v.record(v.string(), v.unknown()),
 	payloadSchema: v.record(v.string(), v.unknown()),
+	_meta: v.optional(v.record(v.string(), v.unknown())),
 });
 const procedure = (requestName: string) => oc.$meta({ requestName, requireCredential: true, kind: 'access:mcp', prohibitMoved: true,
 	limit: { duration: 60000, max: 30 } } satisfies Meta & ApiProcedureMetadata);
