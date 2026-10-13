@@ -19,6 +19,8 @@ export class QueueStatsChannel extends Channel {
 	public readonly chName = 'queueStats';
 	public static shouldShare = true;
 	public static requireCredential = false as const;
+	private disposed = false;
+	private readonly pendingLogs = new Map<(statsLog: JsonValue) => void, string>();
 
 	constructor(
 		@Inject(REQUEST)
@@ -50,24 +52,33 @@ export class QueueStatsChannel extends Channel {
 
 	@bindThis
 	public onMessage(type: string, body: JsonValue) {
+		if (this.disposed) return;
 		switch (type) {
-			case 'requestLog':
+			case 'requestLog': {
 				if (!isJsonObject(body)) return;
 				if (typeof body.id !== 'string') return;
 				if (typeof body.length !== 'number') return;
-				ev.once(`queueStatsLog:${body.id}`, statsLog => {
+				const event = `queueStatsLog:${body.id}`;
+				const onLog = (statsLog: JsonValue) => {
+					this.pendingLogs.delete(onLog);
 					this.send('statsLog', statsLog);
-				});
+				};
+				this.pendingLogs.set(onLog, event);
+				ev.once(event, onLog);
 				ev.emit('requestQueueStatsLog', {
 					id: body.id,
 					length: body.length,
 				});
 				break;
+			}
 		}
 	}
 
 	@bindThis
 	public dispose() {
+		this.disposed = true;
+		for (const [listener, event] of this.pendingLogs) ev.removeListener(event, listener);
+		this.pendingLogs.clear();
 		if (this.connection.isNativeOutput) {
 			this.subscriber.off('statisticsStream:queueStats', this.onNativeStats);
 		} else {
