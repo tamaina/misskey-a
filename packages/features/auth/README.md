@@ -18,3 +18,25 @@ requested scopeを任意追加欄に重ねず、`access:mcp`は通常OAuthでは
 交換応答とnative token rowには、実際に同意されたscopeのみを記録する。
 この拡張を利用しない明示scope付き通常OAuthは従来の固定scope同意のまま。
 MCP clientsが独自フラグを送る必要はなく、discovery metadataにも変更を加えない。
+
+## OIDC SP foundation (unconnected pilot)
+
+The ID token verifier, discovery adapter, and transaction store do not register
+HTTP endpoints or issue sessions. Providers must be explicitly enabled by a
+future server-owned configuration. Discovery accepts public HTTPS only, with
+pinned DNS/TLS, no redirects, JSON, and same-origin authorization/token/JWKS
+endpoints. Internal IdPs and cross-origin provider endpoints are unsupported in
+this finite pilot. Identity is issuer + subject, never email matching.
+
+Link transaction context must come from fresh local authentication and a live
+individually revocable session. A stored context alone is not authentication;
+future completion must recheck session/account state and require local MFA.
+
+Run synthetic network and real atomic Redis tests with
+`node packages/features/auth/test/run-oidc-fixture.mjs` from the repository root.
+It requires the existing `redis:8` image and task-local installed dependencies,
+uses a temporary Unix socket with no network/published ports/persistence, and
+removes only its own container and temporary directory. Ordinary unit runs skip
+the Redis cases unless this task-owned fixture socket is explicitly supplied.
+The current-Node backend unit CI job runs the explicit fixture so actual Lua
+atomicity is checked independently of those ordinary unit runs.

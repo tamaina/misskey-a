@@ -18,7 +18,7 @@ test.each(rebases)('$file restores the frozen source and rejects additional sour
 	const restored = restorePasswordChangeBaseline(proof.file, source);
 	expect(createHash('sha256').update(restored).digest('hex')).toBe(proof.baselineSha256);
 	expect(() => restorePasswordChangeBaseline(proof.file, source + '\n')).toThrow('Source differs');
-	expect(() => restorePasswordChangeBaseline(proof.file, source.replace('currentPassword', 'unreviewedPassword'))).toThrow('Source differs');
+	expect(() => restorePasswordChangeBaseline(proof.file, source.replace(proof.edits[0].current, () => proof.edits[0].current + '/* unreviewed */'))).toThrow('Source differs');
 	if (source.includes('<locale')) {
 		expect(() => restorePasswordChangeBaseline(proof.file, source.replace(/(<locale[^>]*>\s*\{\s*)"[^"]+"\s*:/, '$1"unexpected":'))).toThrow('Source differs');
 	}
