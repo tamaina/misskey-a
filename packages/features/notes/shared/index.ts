@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+export { MAX_NOTE_ATTACHMENTS } from './limits.schema.js';
+
 /** Creation-time shape, before persistence replaces related objects with IDs. */
 export interface NoteDraft {
 	renote?: object | null;

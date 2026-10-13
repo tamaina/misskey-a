@@ -53,6 +53,13 @@ export function createNotesCreateProcedure(deps: NotesCreateDependencies) {
 					} catch (err) {
 						// TODO: 他のErrorもここでキャッチしてエラーメッセージを当てるようにしたい
 						if (err instanceof IdentifiableError) {
+							if (readErrorId(err) === 'ebd9b2a9-4d95-4b01-8824-e701629b65e7') throw apiError(notesCreateErrors.cannotCreateNote);
+							if (readErrorId(err) === '80dc1304-d910-4daa-b26f-4220b6c944ff') throw apiError(notesCreateErrors.tooManyFilesAttachedToNote);
+							if (readErrorId(err) === 'd35d80dc-02ba-4c9b-b9b8-905d306dcb67') throw apiError(notesCreateErrors.renoteForbidden);
+							if (readErrorId(err) === '3a97010b-c338-4cdf-a567-24c54b67726e') throw apiError(notesCreateErrors.quoteForbidden);
+							if (readErrorId(err) === '80d26afb-d466-4d86-9c01-11b9cad9da24') throw apiError(notesCreateErrors.directNoteCreationForbidden);
+							if (readErrorId(err) === '5bbfae8d-097c-4c58-93f4-bc242d600529') throw apiError(notesCreateErrors.remoteDirectNoteCreationForbidden);
+
 							if (readErrorId(err) === '689ee33f-f97c-479a-ac49-1b9f8140af99') {
 								throw apiError(notesCreateErrors.containsProhibitedWords);
 							} else if (readErrorId(err) === '9f466dab-c856-48cd-9e65-ff90ff750580') {

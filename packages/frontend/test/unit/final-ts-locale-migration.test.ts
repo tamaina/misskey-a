@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restorePostingRoleBaseline } from './posting-role-source-rebase.js';
 import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
 import { restoreDrivePreprocessingBaseline } from './drive-preprocessing-source-rebase.js';
 import { createHash } from 'node:crypto';
@@ -107,7 +108,7 @@ function generated(language: string): LocaleBundle {
 
 test('all39 TS consumers reverse byte for byte and all17 owners retain exactly9100 effective strings', async () => {
 	for (const file of proof.files) {
-		let source = restoreNativeApiSourceBaseline(file.file, restoreDrivePreprocessingBaseline(file.file, readFileSync(resolve(root, file.file), 'utf8')));
+		let source = restoreNativeApiSourceBaseline(file.file, restoreDrivePreprocessingBaseline(file.file, restorePostingRoleBaseline(file.file, readFileSync(resolve(root, file.file), 'utf8'))));
 		expect(hash(source)).toBe(file.migratedSha256);
 		for (const edit of [...file.edits].reverse()) {
 			expect(source.slice(edit.afterStart, edit.afterStart + edit.replacement.length)).toBe(edit.replacement);
@@ -118,7 +119,7 @@ test('all39 TS consumers reverse byte for byte and all17 owners retain exactly91
 	}
 	let strings = 0;
 	for (const owner of proof.owners) {
-		const source = readFileSync(resolve(root, owner.file), 'utf8');
+		const source = restorePostingRoleBaseline(owner.file, readFileSync(resolve(root, owner.file), 'utf8'));
 		expect(hash(source)).toBe(owner.sha256);
 		const blocks = parse(source, { filename: owner.file }).descriptor.customBlocks;
 		expect(blocks.map(block => block.attrs.locale)).toEqual(languages);
@@ -170,7 +171,7 @@ test.each(languages)('actual utility modules preserve branching, parameters and 
 	for (const suffix of ['/page-editor/common.ts', '/filters/hms.ts', '/get-note-summary.ts']) {
 		const file = proof.files.find(file => file.file.endsWith(suffix));
 		if (!file) throw new Error('Missing utility proof');
-		const current = evaluate(readFileSync(resolve(root, file.file), 'utf8'));
+		const current = evaluate(restorePostingRoleBaseline(file.file, readFileSync(resolve(root, file.file), 'utf8')));
 		const original = evaluate(file.originalSource, legacy);
 		if (suffix.endsWith('/common.ts')) expect(invoke(current, 'getPageBlockList')).toEqual(invoke(original, 'getPageBlockList'));
 		if (suffix.endsWith('/hms.ts')) for (const value of [0, 1, 999, 1000, 61001, 3661999, -1]) {

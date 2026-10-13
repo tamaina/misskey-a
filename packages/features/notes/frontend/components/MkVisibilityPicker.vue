@@ -30,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<span :class="$style.itemDescription">{{ $locale.sfc.followersDescription }}</span>
 			</div>
 		</button>
-		<button key="specified" class="_button" :class="[$style.item, { [$style.active]: v === 'specified' }]" data-index="4" @click="choose('specified')">
+		<button key="specified" :disabled="!props.canCreateSpecifiedNote" class="_button" :class="[$style.item, { [$style.active]: v === 'specified' }]" data-index="4" @click="choose('specified')">
 			<div :class="$style.icon"><i class="ti ti-mail"></i></div>
 			<div :class="$style.body">
 				<span :class="$style.itemTitle">{{ $locale.sfc.specified }}</span>
@@ -51,9 +51,12 @@ const modal = useTemplateRef('modal');
 const props = withDefaults(defineProps<{
 	currentVisibility: typeof Misskey.noteVisibilities[number];
 	isSilenced: boolean;
+	/** 投稿に使用するアカウントのポリシー由来の、指定投稿の可否 */
+	canCreateSpecifiedNote?: boolean;
 	anchorElement?: HTMLElement | null;
 	isReplyVisibilitySpecified?: boolean;
 }>(), {
+	canCreateSpecifiedNote: true,
 });
 
 const emit = defineEmits<{
@@ -64,6 +67,7 @@ const emit = defineEmits<{
 const v = ref(props.currentVisibility);
 
 function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
+	if (visibility === 'specified' && !props.canCreateSpecifiedNote) return;
 	v.value = visibility;
 	emit('changeVisibility', visibility);
 	nextTick(() => {
@@ -113,11 +117,16 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 	width: 100%;
 	box-sizing: border-box;
 
-	&:hover {
+	&:disabled {
+		opacity: 0.8;
+		cursor: not-allowed;
+	}
+
+	&:not(:disabled):hover {
 		background: rgba(0, 0, 0, 0.05);
 	}
 
-	&:active {
+	&:not(:disabled):active {
 		background: rgba(0, 0, 0, 0.1);
 	}
 

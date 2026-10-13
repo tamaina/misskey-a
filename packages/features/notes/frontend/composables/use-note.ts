@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
@@ -161,7 +161,11 @@ export function useNote(
 	const urls = parsed ? extractUrlFromMfm(parsed).filter((url) => appearNote.renote?.url !== url && appearNote.renote?.uri !== url) : null;
 	const isLong = shouldCollapsed(appearNote, urls ?? []);
 	const collapsed = ref(appearNote.cw == null && isLong);
-	const canRenote = ['public', 'home'].includes(appearNote.visibility) || (appearNote.visibility === 'followers' && appearNote.userId === $i?.id);
+	const canReply = computed(() => $i == null || ($i.policies.canNote && $i.policies.mentionLimit > 0));
+	const canRenote = computed(() =>
+		(['public', 'home'].includes(appearNote.visibility) || (appearNote.visibility === 'followers' && appearNote.userId === $i?.id)) &&
+		($i == null || ($i.policies.canNote && $i.policies.renotePolicy !== 'disallow')),
+	);
 	const showTicker = (prefer.s.instanceTicker === 'always') || (prefer.s.instanceTicker === 'remote' && appearNote.user.instance);
 	const renoteCollapsed = ref(prefer.s.collapseRenotes && isRenote && (($i && ($i.id === rawNote.userId || $i.id === appearNote.userId)) || ($appearNote.myReaction != null)));
 
@@ -239,6 +243,7 @@ export function useNote(
 		if (props.mock) return;
 		const isLoggedIn = await pleaseLogin({ openOnRemote: pleaseLoginContext });
 		if (!isLoggedIn) return;
+		if (!canReply.value) return;
 		os.post({
 			reply: appearNote,
 			channel: appearNote.channel,
@@ -449,6 +454,7 @@ export function useNote(
 		urls,
 		isLong,
 		showTicker,
+		canReply,
 		canRenote,
 
 		// アクション関数
