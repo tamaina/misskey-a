@@ -26,7 +26,10 @@ beforeAll(async () => {
 
 beforeEach(() => { preferences.s.dataSaver.code = false; copy.mockReset(); });
 
-async function showDiff(input: Record<string, unknown>) {
+type DiffFixtureProps = { code: string; diffBase: string; forceShow?: boolean; lang?: string; maxHeight?: number };
+type DiffFixture = { element: HTMLDivElement; props: DiffFixtureProps; unmount: () => void };
+
+async function showDiff(input: DiffFixtureProps): Promise<DiffFixture> {
 	const props = reactive(input);
 	const element = document.createElement('div');
 	const app = createApp({ render: () => h(Suspense, null, { default: () => h(MkCodeDiff, props) }) });
