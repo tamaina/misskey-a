@@ -4,7 +4,6 @@
  */
 
 import { createHash } from 'node:crypto';
-import { restoreBrowserSessionClientBaseline } from './browser-session-client-source-rebase.js';
 import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
 import rebases from './native-api-source-rebase.json';
 import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
@@ -14,7 +13,6 @@ const sha256 = (source: string) => createHash('sha256').update(source).digest('h
 
 /** Reverse exact reviewed API edits so the original locale proofs stay frozen. */
 export function restoreNativeApiSourceBaseline(file: string, source: string): string {
-	source = restoreBrowserSessionClientBaseline(file, source);
 	if (file === 'packages/features/ui/frontend/os.ts') source = restorePasswordChangeBaseline(file, source);
 	source = restoreCommonUtilitiesBaseline(file, restorePwaShareSourceBaseline(file, source));
 	const rebase = rebases.find(entry => entry.file === file);

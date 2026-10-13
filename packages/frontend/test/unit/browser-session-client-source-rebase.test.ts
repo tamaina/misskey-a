@@ -16,7 +16,9 @@ const sha256 = (source: string) => createHash('sha256').update(source).digest('h
 test.each(rebases)('$file restores only the reviewed session client delta and rejects body/locale tampering', proof => {
 	const source = readFileSync(resolve(root, proof.file), 'utf8');
 	const restored = restoreBrowserSessionClientBaseline(proof.file, source);
-	expect(sha256(restored)).toBe(proof.baselineBodySha256);
+	const localeStart = restored.search(/<locale\s/);
+	expect(sha256(localeStart < 0 ? restored : restored.slice(0, localeStart))).toBe(proof.baselineBodySha256);
+	expect(sha256(localeStart < 0 ? '' : restored.slice(localeStart))).toBe(proof.localeBlocksSha256);
 	expect(() => restoreBrowserSessionClientBaseline(proof.file, '// unreviewed\n' + source)).toThrow('Source differs');
 	expect(() => restoreBrowserSessionClientBaseline(proof.file, source + '<locale lang="json" locale="ja-JP">{}</locale>')).toThrow('Source differs');
 	expect(() => restoreBrowserSessionClientBaseline(proof.file, restored)).toThrow('Source differs');

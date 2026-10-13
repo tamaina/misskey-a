@@ -54,5 +54,19 @@
         "baseline": "\t\t\t\tsignout();\n"
       }
     ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/pages/settings/other.vue",
+    "baselineBodySha256": "ffbd3854e615d7b0d51bb4020f1715ec4ab1c28775d799dcfae3895b26b0023c",
+    "currentBodySha256": "965580d318e10ffa2bba5104996736b741e0adb72529d915d3cc483a42ea68d7",
+    "localeBlocksSha256": "cf1597dde135d72a41900c4dbb4c9e872498e257a1dc6c621ff00ababd3a7392",
+    "edits": [
+      {
+        "start": 7976,
+        "end": 8021,
+        "current": "\tawait signout('account-deletion-accepted');\n",
+        "baseline": "\tawait signout();\n"
+      }
+    ]
   }
 ]
