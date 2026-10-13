@@ -36,6 +36,7 @@ let credentialResolve: (value: unknown) => void;
 let signal: AbortSignal;
 const emitted = vi.fn();
 const get = vi.fn();
+let testClock = 1800000000000;
 
 function mount(props: Record<string, unknown> = {}) {
 	app = createApp(ConditionalSignin, { ...props, onLogin: emitted });
@@ -46,6 +47,9 @@ function mount(props: Record<string, unknown> = {}) {
 async function settle() {
 	for (let i = 0; i < 15; i++) await Promise.resolve();
 	await nextTick();
+	// Vue's capture handler stamps the event; nested handlers reject stamps at
+	// or before attachment time. A real user event follows rendering in time.
+	vi.setSystemTime(Date.now() + 1);
 }
 
 function chooseCredential() {
@@ -54,6 +58,9 @@ function chooseCredential() {
 }
 
 beforeEach(() => {
+	vi.useFakeTimers({ toFake: ['Date'] });
+	testClock += 1000;
+	vi.setSystemTime(testClock);
 	vi.resetAllMocks();
 	vi.mocked(browserSupportsWebAuthnAutofill).mockResolvedValue(true);
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ context: 'synthetic-context', option } as never).mockResolvedValue({ signinResponse: result } as never);
@@ -65,7 +72,7 @@ beforeEach(() => {
 	element = window.document.createElement('div');
 	window.document.body.append(element);
 });
-afterEach(() => { app?.unmount(); app = undefined; element.remove(); vi.unstubAllGlobals(); });
+afterEach(() => { app?.unmount(); app = undefined; element.remove(); vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 describe('opt-in conditional signin surface', () => {
 	test('default forwards ordinary signin props and emits without invoking autofill', async () => {
