@@ -12,7 +12,8 @@ const jsonSchemaOptions = { target: 'draft-2020-12' } as const;
 // Keep native branch constraints, but make literal types and available filters
 // explicit for settings consumers that cannot infer them from const/oneOf.
 const channelSchemas = streamChannelArguments.options.map((option, index) => {
-	const schema = toJsonSchema(option, jsonSchemaOptions);
+	// Branches inherit the root dialect; they are not embedded schema resources.
+	const { $schema: _branchDialect, ...schema } = toJsonSchema(option, jsonSchemaOptions);
 	return { ...schema, properties: { ...schema.properties, channel: { type: 'string' as const, enum: [streamChannels[index]] } } };
 });
 const parameterProperties: Record<string, unknown> = Object.assign({}, ...streamChannelArguments.options.map(option => toJsonSchema(option.entries.params, jsonSchemaOptions).properties));

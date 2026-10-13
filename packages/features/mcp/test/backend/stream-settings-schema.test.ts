@@ -19,17 +19,20 @@ it('exposes discoverable object properties in the MCP channel settings schema', 
 	});
 });
 
-it('uses the mandatory MCP 2020-12 dialect for generated event schemas and nested resources', () => {
+it('declares 2020-12 only at generated event schema document roots', () => {
 	const dialect = 'https://json-schema.org/draft/2020-12/schema';
 	expect(streamChannelInputSchema.$schema).toBe(dialect);
 	expect(streamNoteInputSchema.$schema).toBe(dialect);
-	const inspect = (value: unknown) => {
+	const inspect = (value: unknown, documentRoot = false) => {
 		if (!value || typeof value !== 'object') return;
-		if ('$schema' in value) expect(value.$schema).toBe(dialect);
+		if ('$schema' in value) {
+			expect(documentRoot).toBe(true);
+			expect(value.$schema).toBe(dialect);
+		}
 		for (const child of Object.values(value)) inspect(child);
 	};
-	inspect(streamChannelInputSchema);
-	inspect(streamNoteInputSchema);
+	inspect(streamChannelInputSchema, true);
+	inspect(streamNoteInputSchema, true);
 });
 
 // These constraints use draft-07-compatible keywords; the SDK's bundled AJV uses draft-07.
