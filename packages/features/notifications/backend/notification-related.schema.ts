@@ -4,6 +4,7 @@
  */
 
 import * as v from 'valibot';
+import { MAX_NOTE_ATTACHMENTS } from '../../notes/shared/limits.schema.js';
 import { packedUserLiteSchema } from '../../users/backend/user.schema.js';
 import { emptyRoleFormulaSchema } from '../../roles/backend/role.schema.js';
 import { packedJsonValueSchema as jsonValueSchema, type PackedJsonValue } from '../../users/backend/json-value.schema.js';
@@ -125,6 +126,11 @@ export const packedRolePoliciesSchema = v.strictObject({
 	'noteDraftLimit': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
 	'scheduledNoteLimit': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
 	'watermarkAvailable': v.boolean(),
+	'canNote': v.boolean(),
+	'renotePolicy': v.picklist(['allow', 'renoteOnly', 'disallow']),
+	'canCreateSpecifiedNote': v.boolean(),
+	'canFederateNote': v.boolean(),
+	'noteFilesLimit': v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(MAX_NOTE_ATTACHMENTS)),
 });
 
 // Compose the complete finite envelope before closing it; stored formula variants retain their explicit legacy boundary.

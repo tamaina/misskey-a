@@ -397,6 +397,62 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkSwitch>
 			</template>
 		</XFolder>
+
+		<XFolder v-if="matchQuery([PostingPolicyMessages.$locale.canNote, 'canNote'])" v-model:policyMeta="policyMetaModel.canNote" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ PostingPolicyMessages.$locale.canNote }}</template>
+			<template #valueText>{{ valuesModel.canNote ? $locale.sfc.yes : $locale.sfc.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canNote" :disabled="disabled">
+					<template #label>{{ $locale.sfc.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([PostingPolicyMessages.$locale.renotePolicy, 'renotePolicy'])" v-model:policyMeta="policyMetaModel.renotePolicy" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ PostingPolicyMessages.$locale.renotePolicy }}</template>
+			<template #valueText>{{ valuesModel.renotePolicy === 'allow' ? PostingPolicyMessages.$locale.renotePolicy_allow : valuesModel.renotePolicy === 'renoteOnly' ? PostingPolicyMessages.$locale.renotePolicy_renoteOnly : PostingPolicyMessages.$locale.renotePolicy_disallow }}</template>
+			<template #default="{ disabled }">
+				<MkSelect
+					v-model="valuesModel.renotePolicy"
+					:disabled="disabled"
+					:items="[
+						{ label: PostingPolicyMessages.$locale.renotePolicy_allow, value: 'allow' },
+						{ label: PostingPolicyMessages.$locale.renotePolicy_renoteOnly, value: 'renoteOnly' },
+						{ label: PostingPolicyMessages.$locale.renotePolicy_disallow, value: 'disallow' },
+					]"
+				>
+					<template #label>{{ $locale.sfc.enable }}</template>
+				</MkSelect>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([PostingPolicyMessages.$locale.canCreateSpecifiedNote, 'canCreateSpecifiedNote'])" v-model:policyMeta="policyMetaModel.canCreateSpecifiedNote" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ PostingPolicyMessages.$locale.canCreateSpecifiedNote }}</template>
+			<template #valueText>{{ valuesModel.canCreateSpecifiedNote ? $locale.sfc.yes : $locale.sfc.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canCreateSpecifiedNote" :disabled="disabled">
+					<template #label>{{ $locale.sfc.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([PostingPolicyMessages.$locale.canFederateNote, 'canFederateNote'])" v-model:policyMeta="policyMetaModel.canFederateNote" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ PostingPolicyMessages.$locale.canFederateNote }}</template>
+			<template #valueText>{{ valuesModel.canFederateNote ? $locale.sfc.yes : $locale.sfc.no }}</template>
+			<template #default="{ disabled }">
+				<MkSwitch v-model="valuesModel.canFederateNote" :disabled="disabled">
+					<template #label>{{ $locale.sfc.enable }}</template>
+				</MkSwitch>
+			</template>
+		</XFolder>
+
+		<XFolder v-if="matchQuery([PostingPolicyMessages.$locale.noteFilesLimit, 'noteFilesLimit'])" v-model:policyMeta="policyMetaModel.noteFilesLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+			<template #label>{{ PostingPolicyMessages.$locale.noteFilesLimit }}</template>
+			<template #valueText>{{ valuesModel.noteFilesLimit }}</template>
+			<template #default="{ disabled }">
+				<MkInput v-model="valuesModel.noteFilesLimit" type="number" :disabled="disabled" :max="MAX_NOTE_ATTACHMENTS" :min="0"/>
+			</template>
+		</XFolder>
 	</div>
 </template>
 
@@ -415,6 +471,8 @@ type PolicyMetaRecord = {
 </script>
 
 <script setup lang="ts">
+import { MAX_NOTE_ATTACHMENTS } from '@features/notes/shared';
+import PostingPolicyMessages from '@features/notes/frontend/posting-policy-messages.vue';
 import { computed, ref, watch } from 'vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import XFolder from '@features/roles/frontend/pages/admin/roles.policy-editor.folder.vue';

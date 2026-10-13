@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { MAX_NOTE_ATTACHMENTS } from '@features/notes/shared';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In } from 'typeorm';
@@ -87,6 +88,11 @@ export type RolePolicies = {
 	noteDraftLimit: number;
 	scheduledNoteLimit: number;
 	watermarkAvailable: boolean;
+	canNote: boolean;
+	renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+	canCreateSpecifiedNote: boolean;
+	canFederateNote: boolean;
+	noteFilesLimit: number;
 };
 
 export const DEFAULT_POLICIES: RolePolicies = {
@@ -135,7 +141,18 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	noteDraftLimit: 10,
 	scheduledNoteLimit: 1,
 	watermarkAvailable: true,
+	canNote: true,
+	renotePolicy: 'allow',
+	canCreateSpecifiedNote: true,
+	canFederateNote: true,
+	noteFilesLimit: MAX_NOTE_ATTACHMENTS,
 };
+
+/** JSON-backed policies must still satisfy the strict integer wire schema. */
+export function normalizeNoteFilesLimit(values: readonly unknown[]): number {
+	const finite = values.filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
+	return Math.min(Math.max(0, ...finite.map(value => Math.floor(value))), MAX_NOTE_ATTACHMENTS);
+}
 
 @Injectable()
 export class RoleService implements OnApplicationShutdown, OnModuleInit {
@@ -391,7 +408,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	public async getUserPolicies(userId: MiUser['id'] | null, fresh = false): Promise<RolePolicies> {
 		const basePolicies = { ...DEFAULT_POLICIES, ...this.meta.policies };
 
-		if (userId == null) return basePolicies;
+		if (userId == null) return { ...basePolicies, noteFilesLimit: normalizeNoteFilesLimit([basePolicies.noteFilesLimit]) };
 
 		const roles = await this.getUserRoles(userId, fresh);
 
@@ -413,6 +430,12 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			if (vs.some(v => v === 'available')) return 'available';
 			if (vs.some(v => v === 'readonly')) return 'readonly';
 			return 'unavailable';
+		}
+
+		function aggregateRenotePolicy(vs: RolePolicies['renotePolicy'][]) {
+			if (vs.some(v => v === 'allow')) return 'allow';
+			if (vs.some(v => v === 'renoteOnly')) return 'renoteOnly';
+			return 'disallow';
 		}
 
 		const serverMaxFileSizeMb = Math.floor(this.config.maxFileSize / (1024 * 1024));
@@ -466,6 +489,11 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			noteDraftLimit: calc('noteDraftLimit', vs => Math.max(...vs)),
 			scheduledNoteLimit: calc('scheduledNoteLimit', vs => Math.max(...vs)),
 			watermarkAvailable: calc('watermarkAvailable', vs => vs.some(v => v === true)),
+			canNote: calc('canNote', vs => vs.some(v => v === true)),
+			renotePolicy: calc('renotePolicy', aggregateRenotePolicy),
+			canCreateSpecifiedNote: calc('canCreateSpecifiedNote', vs => vs.some(v => v === true)),
+			canFederateNote: calc('canFederateNote', vs => vs.some(v => v === true)),
+			noteFilesLimit: calc('noteFilesLimit', normalizeNoteFilesLimit),
 		};
 	}
 

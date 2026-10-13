@@ -4431,6 +4431,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         ReversiGameLite: {
             /** Format: id */
@@ -5272,6 +5278,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition14: {
             /**
@@ -5851,6 +5863,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition34: {
             /**
@@ -6180,6 +6198,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition46: {
             /**
@@ -6509,6 +6533,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition58: {
             /**
@@ -8127,6 +8157,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition108: {
             /**
@@ -8770,6 +8806,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition121: {
             /**
@@ -9413,6 +9455,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition134: {
             /**
@@ -10056,6 +10104,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition147: {
             /**
@@ -11076,6 +11130,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         } & {
             [key: string]: components['schemas']['OrpcDefinition194'];
         };
@@ -11129,6 +11189,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         } & {
             [key: string]: components['schemas']['OrpcDefinition197'];
         };
@@ -17074,6 +17140,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition370: {
             /**
@@ -17403,6 +17475,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition382: {
             /**
@@ -18916,6 +18994,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition440: ContractJsonValue;
         OrpcDefinition441: {
@@ -19502,6 +19586,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition465: {
             /**
@@ -20461,6 +20551,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition499: {
             [key: string]: components['schemas']['OrpcDefinition500'];
@@ -21072,6 +21168,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition523: ContractJsonValue;
         OrpcDefinition524: {
@@ -21779,6 +21881,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition543: ContractJsonValue;
         OrpcDefinition544: ContractJsonValue;
@@ -21832,6 +21940,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         } & {
             [key: string]: components['schemas']['OrpcDefinition546'];
         };
@@ -22163,6 +22277,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition560: {
             /**
@@ -22492,6 +22612,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition572: {
             /**
@@ -23811,6 +23937,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition604: {
             /**
@@ -24140,6 +24272,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition616: {
             /**
@@ -24469,6 +24607,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition628: {
             /**
@@ -24798,6 +24942,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition640: ContractJsonValue;
         OrpcDefinition641: {
@@ -25878,6 +26028,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition699: {
             /**
@@ -26207,6 +26363,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition711: {
             /**
@@ -29214,6 +29376,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition780: {
             /**
@@ -29543,6 +29711,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition792: {
             /**
@@ -29872,6 +30046,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition804: {
             note?: components['schemas']['OrpcDefinition805'] | components['schemas']['OrpcDefinition807'];
@@ -30239,6 +30419,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition820: {
             /**
@@ -30568,6 +30754,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition832: {
             /**
@@ -30897,6 +31089,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition844: {
             /**
@@ -33008,6 +33206,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition892: {
             /**
@@ -33337,6 +33541,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition904: {
             /**
@@ -33980,6 +34190,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition917: {
             /**
@@ -34309,6 +34525,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition929: {
             /**
@@ -34952,6 +35174,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition942: {
             /**
@@ -35595,6 +35823,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition955: {
             /**
@@ -35924,6 +36158,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition967: {
             /**
@@ -36253,6 +36493,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition979: ContractJsonValue;
         OrpcDefinition980: {
@@ -38415,6 +38661,12 @@ export type components = {
             noteDraftLimit: number;
             scheduledNoteLimit: number;
             watermarkAvailable: boolean;
+            canNote: boolean;
+            /** @enum {string} */
+            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+            canCreateSpecifiedNote: boolean;
+            canFederateNote: boolean;
+            noteFilesLimit: number;
         };
         OrpcDefinition1035: ContractJsonValue;
         OrpcDefinition1036: ContractJsonValue;
@@ -83428,6 +83680,12 @@ export interface operations {
                             noteDraftLimit: number;
                             scheduledNoteLimit: number;
                             watermarkAvailable: boolean;
+                            canNote: boolean;
+                            /** @enum {string} */
+                            renotePolicy: 'allow' | 'renoteOnly' | 'disallow';
+                            canCreateSpecifiedNote: boolean;
+                            canFederateNote: boolean;
+                            noteFilesLimit: number;
                         };
                         roles: {
                             /**
@@ -111276,6 +111534,66 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CANNOT_CREATE_NOTE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CONTAINS_TOO_MANY_FILES';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RENOTE_FORBIDDEN';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'QUOTE_FORBIDDEN';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'SPECIFIED_NOTE_CREATION_FORBIDDEN';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'REMOTE_SPECIFIED_NOTE_CREATION_FORBIDDEN';
                             message: string;
                         } | {
                             id: string;

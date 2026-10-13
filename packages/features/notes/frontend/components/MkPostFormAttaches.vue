@@ -31,10 +31,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</MkDraggable>
 	<p
 		:class="[$style.remain, {
-			[$style.exceeded]: props.modelValue.length > 16,
+			[$style.exceeded]: props.modelValue.length > props.noteFilesLimit,
 		}]"
 	>
-		{{ props.modelValue.length }}/16
+		{{ props.modelValue.length }}/{{ props.noteFilesLimit }}
 	</p>
 </div>
 </template>
@@ -51,14 +51,17 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { DI } from '@features/ui/frontend/di.js';
+import { MAX_NOTE_ATTACHMENTS } from '@features/notes/shared';
 import { globalEvents } from '@features/runtime/frontend/events.js';
 import type { Content } from '@features/drive/frontend/components/MkLightbox.item.vue';
 import { isPreviewable, getType } from '@features/drive/frontend/utility/lightbox.js';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	modelValue: Misskey.entities.DriveFile[];
+	/** 投稿に使用するアカウントのポリシー由来の添付上限 */
+	noteFilesLimit?: number;
 	detachMediaFn?: (id: string) => void;
-}>();
+}>(), { noteFilesLimit: MAX_NOTE_ATTACHMENTS });
 
 const mock = inject(DI.mock, false);
 

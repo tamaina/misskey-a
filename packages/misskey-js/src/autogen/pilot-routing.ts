@@ -17666,6 +17666,24 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"CANNOT_CREATE_NOTE": {
+						"status": 400
+					},
+					"CONTAINS_TOO_MANY_FILES": {
+						"status": 400
+					},
+					"RENOTE_FORBIDDEN": {
+						"status": 400
+					},
+					"QUOTE_FORBIDDEN": {
+						"status": 400
+					},
+					"SPECIFIED_NOTE_CREATION_FORBIDDEN": {
+						"status": 400
+					},
+					"REMOTE_SPECIFIED_NOTE_CREATION_FORBIDDEN": {
+						"status": 400
+					},
 					"NO_SUCH_RENOTE_TARGET": {
 						"status": 400
 					},
