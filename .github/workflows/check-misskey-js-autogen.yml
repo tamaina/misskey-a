@@ -4,7 +4,7 @@ name: Check Misskey JS autogen
 on:
   pull_request:
     branches:
-      - master
+      - main
       - develop
       - improve-misskey-js-autogen-check
     paths:

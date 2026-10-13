@@ -3,7 +3,7 @@ name: Lint
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/backend/**
@@ -22,7 +22,7 @@ on:
       - package.json
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/backend/**
       - packages/frontend/**
