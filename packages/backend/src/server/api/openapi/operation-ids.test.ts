@@ -47,7 +47,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		const operation = item?.[method];
 		return operation ? [operation.operationId] : [];
 	}));
-	expect(identifiers).toHaveLength(466);
+	expect(identifiers).toHaveLength(474);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 
