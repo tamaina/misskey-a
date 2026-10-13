@@ -43,12 +43,13 @@ describe('feature service composition adapter', () => {
 			entries.splice(entries.indexOf('class:SystemWebhookService'), 0, 'class:McpEventsService');
 			entries.splice(entries.indexOf('alias:SystemWebhookService'), 0, 'alias:McpEventsService');
 			for (const prefix of ['class:', 'alias:']) {
+				entries.push(`${prefix}BrowserSessionService`);
 				entries.splice(entries.indexOf(`${prefix}AntennaService`) + 1, 0, `${prefix}AntennaNoteAccessService`, `${prefix}AntennaEventSubscriptionService`);
 				entries.splice(entries.indexOf(`${prefix}McpEventsService`) + 1, 0, `${prefix}McpStreamAccessService`, `${prefix}McpStreamSubscriptionService`, `${prefix}NoteStreamingHidingService`);
 			}
 		}
 		baseline.aliases.push({ name: 'McpEventsService', target: 'McpEventsService' });
-		for (const name of ['AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService', 'McpStreamAccessService', 'McpStreamSubscriptionService']) baseline.aliases.push({ name, target: name });
+		for (const name of ['BrowserSessionService', 'AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService', 'McpStreamAccessService', 'McpStreamSubscriptionService']) baseline.aliases.push({ name, target: name });
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
 		const describeToken = (entry: Provider | InjectionToken): string => {
@@ -70,8 +71,8 @@ describe('feature service composition adapter', () => {
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
 		expect(factoryProviders).toHaveLength(24);
-		expect(classProviders).toHaveLength(49);
-		expect(featureServiceExports).toHaveLength(97);
+		expect(classProviders).toHaveLength(50);
+		expect(featureServiceExports).toHaveLength(99);
 		for (const provider of featureServiceProviders) {
 			expect(providers.filter(candidate => providerToken(candidate) === providerToken(provider))).toEqual([provider]);
 		}
@@ -150,7 +151,7 @@ describe('feature service composition adapter', () => {
 			collections: ['serializers/ClipEntityService', 'serializers/NoteFavoriteEntityService', 'services/ClipService', 'services/gallery', 'serializers/GalleryPostEntityService', 'serializers/GalleryLikeEntityService'],
 			pages: ['serializers/PageEntityService', 'serializers/PageLikeEntityService', 'services/PageService'],
 			play: ['serializers/FlashEntityService', 'serializers/FlashLikeEntityService', 'services/FlashService'],
-			auth: ['services/UserAuthService', 'services/WebAuthnService', 'serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],
+			auth: ['services/BrowserSessionService', 'services/UserAuthService', 'services/WebAuthnService', 'serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],
 			channels: ['serializers/ChannelEntityService'],
 			chat: ['serializers/ChatEntityService'],
 			discovery: ['services/UserSearchService', 'serializers/HashtagEntityService'],

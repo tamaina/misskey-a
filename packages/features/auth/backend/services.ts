@@ -9,6 +9,7 @@ import { AppEntityService } from './serializers/AppEntityService.js';
 import { AuthSessionEntityService } from './serializers/AuthSessionEntityService.js';
 import { InviteCodeEntityService } from './serializers/InviteCodeEntityService.js';
 import { SigninEntityService } from './serializers/SigninEntityService.js';
+import { BrowserSessionService } from './services/BrowserSessionService.js';
 import { UserAuthService } from './services/UserAuthService.js';
 import { WebAuthnService } from './services/WebAuthnService.js';
 
@@ -21,6 +22,7 @@ export const authServices = defineServices({
 });
 
 export const authSecurityServices = defineServices({
+	BrowserSessionService: service(BrowserSessionService, [ports.browserSessionsRepository, ports.idService]),
 	UserAuthService: service(UserAuthService, [ports.redisClient, ports.usersRepository, ports.userProfilesRepository]),
 	WebAuthnService: service(WebAuthnService, [ports.config, ports.meta, ports.redisClient, ports.userSecurityKeysRepository]),
 });
