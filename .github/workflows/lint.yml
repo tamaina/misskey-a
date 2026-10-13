@@ -8,6 +8,8 @@ on:
     paths:
       - packages/backend/**
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       - packages/frontend-shared/**
       - packages/frontend-builder/**
       - packages/frontend-embed/**
@@ -26,6 +28,8 @@ on:
     paths:
       - packages/backend/**
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       - packages/frontend-shared/**
       - packages/frontend-builder/**
       - packages/frontend-embed/**
