@@ -11,6 +11,7 @@ import { implement } from '@orpc/server';
 import Fastify from 'fastify';
 import * as v from 'valibot';
 import { AuthenticateService } from '@features/auth/backend/transport/AuthenticateService.js';
+import { BrowserSessionService } from '@features/auth/backend/services/BrowserSessionService.js';
 import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { MiApp } from '@features/auth/backend/models/App.js';
 import { MiNote } from '@features/notes/backend/models/Note.js';
@@ -49,13 +50,17 @@ import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { UsersNotesDependencies } from '@features/timelines/backend/endpoints/users/notes.js';
 import type { MyAppsDependencies } from '@features/auth/backend/endpoints/my/apps.js';
-import type { AccessTokensRepository, AppsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { AccessTokensRepository, AppsRepository, UsersRepository, BrowserSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 
 // No listener, DB, Redis, real token, grant issuance or production data is used.
 const cleanups: (() => Promise<unknown>)[] = [];
 afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); });
 
 export async function fixture() {
+	const browserSessions = mockDeep<BrowserSessionsRepository>();
+	browserSessions.findOne.mockResolvedValue(null);
+	browserSessions.existsBy.mockResolvedValue(false);
+	const browserSessionService = new BrowserSessionService(browserSessions, { gen: () => 'synthetic-browser-session-id' });
 	const own: MiLocalUser = Object.assign(new MiUser({}), { id: 'aaaaaaaaaaaaaaaa', host: null, uri: null, token: '0123456789abcdef', isSuspended: false, movedToUri: null });
 	const otherId = 'bbbbbbbbbbbbbbbb';
 	const grant: MiAccessToken = Object.assign(new MiAccessToken(), { id: 'cccccccccccccccc', userId: own.id, token: 'synthetic-miauth-credential-32chars', hash: 'synthetic-miauth-credential-32chars', appId: null, permission: ['access:mcp'] });
@@ -113,6 +118,7 @@ export async function fixture() {
 	const logger = mockDeep<ApiLoggerService>();
 	const telemetry = mockDeep<TelemetryService>(); telemetry.startSpan.mockImplementation((_name, run) => run());
 	const module = await Test.createTestingModule({ providers: [AuthenticateService, ApiExecutionContextFactory, McpApiService, OrpcPilotService,
+		{ provide: BrowserSessionService, useValue: browserSessionService },
 																																																													{ provide: DI.config, useValue: { maxFileSize: 1024, enableIpRateLimit: false } }, { provide: DI.meta, useValue: { rootUserId: null } },
 																																																													{ provide: DI.usersRepository, useValue: users }, { provide: DI.accessTokensRepository, useValue: tokens }, { provide: DI.appsRepository, useValue: apps },
 																																																													{ provide: CacheService, useValue: cache }, { provide: RoleService, useValue: roles }, { provide: ApiLoggerService, useValue: logger }, { provide: TelemetryService, useValue: telemetry },

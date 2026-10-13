@@ -5,18 +5,19 @@
 
 import { os } from '@orpc/server';
 import { apiError, internalError } from './orpc-error.js';
-import type { ApiActor, ApiContext, ApiToken, RateLimit } from './context.js';
+import type { ApiActor, ApiContext, ApiToken, BrowserSessionIdentity, RateLimit } from './context.js';
 
 export function authentication<Actor extends ApiActor>() {
 	return os.$context<ApiContext<Actor>>().middleware(async ({ context, next }) => {
-		const [principal, token] = await context.services.authenticate(context.credential);
-		return next({ context: { principal, token } });
+		const [principal, token, browserSession] = await context.services.authenticate(context.credential);
+		return next({ context: { principal, token, browserSession } });
 	});
 }
 
 export interface AuthenticatedContext<Actor extends ApiActor> extends ApiContext<Actor> {
 	principal: Actor | null;
 	token: ApiToken | null;
+	browserSession?: BrowserSessionIdentity;
 }
 
 export interface ApiPolicy {

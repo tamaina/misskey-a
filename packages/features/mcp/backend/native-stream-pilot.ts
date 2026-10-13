@@ -16,12 +16,12 @@ export async function openNativeStreamPilot(
 	onEvent: (event: NativeStreamFrame) => void | Promise<void>,
 ) {
 	params.signal?.throwIfAborted();
-	const [user, token] = await deps.authenticateService.authenticate(params.credential);
+	const [user, token, browserSession] = await deps.authenticateService.authenticate(params.credential);
 	params.signal?.throwIfAborted();
 	// MCP requires an opted-in scoped grant; native channel checks remain authoritative.
 	if (!user || user.host !== null || user.isSuspended || user.movedToUri || !token?.id || !token.permission.includes('access:mcp')) throw new Error('Stream access denied');
 	const context = ContextIdFactory.create();
-	deps.moduleRef.registerRequestByContextId<ConnectionRequest>({ user, token }, context);
+	deps.moduleRef.registerRequestByContextId<ConnectionRequest>({ user, token, browserSession }, context);
 	const connection = await deps.moduleRef.create(Connection, context);
 	let open = true;
 	let ready = false;

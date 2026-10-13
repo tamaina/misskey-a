@@ -299,6 +299,10 @@ import type {
 	IRevokeTokenRequest,
 	ISigninHistoryRequest,
 	ISigninHistoryResponse,
+	ISessionsRequest,
+	ISessionsResponse,
+	ISessionsRevokeRequest,
+	ISignoutRequest,
 	IUpdateEmailRequest,
 	IUpdateEmailResponse,
 	InviteCreateRequest,
@@ -933,6 +937,9 @@ export type Endpoints = {
 	'i/regenerate-token': { req: IRegenerateTokenRequest; res: EmptyResponse };
 	'i/revoke-token': { req: IRevokeTokenRequest; res: EmptyResponse };
 	'i/signin-history': { req: ISigninHistoryRequest; res: ISigninHistoryResponse };
+	'i/sessions': { req: ISessionsRequest; res: ISessionsResponse };
+	'i/sessions/revoke': { req: ISessionsRevokeRequest; res: EmptyResponse };
+	'i/signout': { req: ISignoutRequest; res: EmptyResponse };
 	'i/update-email': { req: IUpdateEmailRequest; res: IUpdateEmailResponse };
 	'invite/create': { req: InviteCreateRequest; res: InviteCreateResponse };
 	'invite/delete': { req: InviteDeleteRequest; res: EmptyResponse };

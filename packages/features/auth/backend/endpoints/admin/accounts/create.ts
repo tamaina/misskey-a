@@ -9,6 +9,7 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
 import type { Config } from '@/config.js';
 
+import type { BrowserSessionService } from '../../../services/BrowserSessionService.js';
 import { SignupService } from '../../../services/SignupService.js';
 import { AdminAccountsCreateContract } from '../../../api.definition.js';
 import type { MiMeta, UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -33,6 +34,7 @@ export const meta = {
 	},
 } as const;
 export interface AdminAccountsCreateDependencies {
+	browserSessionService: Pick<BrowserSessionService, 'issue'>;
 	config: Config;
 	serverSettings: MiMeta;
 	usersRepository: UsersRepository;
@@ -65,7 +67,7 @@ export function createAdminAccountsCreateProcedure(deps: AdminAccountsCreateDepe
 				throw apiError(meta.errors.accessDenied);
 			}
 
-			const { account, secret } = await deps.signupService.signup({
+			const { account } = await deps.signupService.signup({
 				username: ps.username,
 				password: ps.password,
 				ignorePreservedUsernames: true,
@@ -75,7 +77,7 @@ export function createAdminAccountsCreateProcedure(deps: AdminAccountsCreateDepe
 				includeSecrets: true,
 			});
 
-			return { ...res, token: secret };
+			return { ...res, token: (await deps.browserSessionService.issue(account.id)).token };
 		})();
 		return { ...toPackedUserDetailed(result), token: result.token };
 	});

@@ -15,6 +15,7 @@ import { Connection } from '@features/api/backend/transport/stream/Connection.js
 import { AntennaChannel } from '../../backend/stream/antenna.js';
 import { AntennaNoteAccessService } from '../../backend/services/AntennaNoteAccessService.js';
 import { openAntennaNotePilot } from '../../backend/stream/antenna-note-pilot.js';
+import type { BrowserSessionService } from '@features/auth/backend/services/BrowserSessionService.js';
 import type { ConnectionRequest } from '@features/api/backend/transport/stream/Connection.js';
 import type { ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
@@ -40,10 +41,11 @@ function fixture() {
 	cache.userMutingsCache.fetch.mockResolvedValue(new Set()); cache.userBlockedCache.fetch.mockResolvedValue(new Set()); cache.renoteMutingsCache.fetch.mockResolvedValue(new Set());
 	const moduleRef = mockDeep<ModuleRef>(); const requests = new Map<object, unknown>();
 	moduleRef.registerRequestByContextId.mockImplementation((request, context) => { requests.set(context, request); });
+	const sessions = mockDeep<BrowserSessionService>(); sessions.isActive.mockResolvedValue(true);
 	const connections: Connection[] = []; const mutingChannels = new Set<string>();
 	moduleRef.create.mockImplementation(async (target, context) => {
 		if (target === Connection) {
-			const connection = new Connection(moduleRef, mockDeep(), cache, { userFollowingChannelsCache: { fetch: async () => new Set() } } as never, { mutingChannelsCache: { fetch: async () => mutingChannels } } as never, mockDeep(), requests.get(context!) as ConnectionRequest);
+			const connection = new Connection(moduleRef, mockDeep(), cache, { userFollowingChannelsCache: { fetch: async () => new Set() } } as never, { mutingChannelsCache: { fetch: async () => mutingChannels } } as never, mockDeep(), requests.get(context!) as ConnectionRequest, sessions);
 			connections.push(connection); return connection as never;
 		}
 		if (target !== AntennaChannel) throw new Error('Unexpected channel');
@@ -52,7 +54,7 @@ function fixture() {
 	const subscriber = new EventEmitter() as StreamEventEmitter; const output = vi.fn();
 	const open = (signal?: AbortSignal) => openAntennaNotePilot({ authenticateService: authenticate, moduleRef, subscriber }, { credential: 'SYNTHETIC_ONLY', antennaId: 'antenna', signal }, output);
 	const emit = () => subscriber.emit('antennaStream:antenna', { type: 'note', body: { id: 'note', text: 'RAW_REDIS_SYNTHETIC' } } as never);
-	return { actor, token, authenticate, antennas, notes, hiding, packed, cache, moduleRef, subscriber, connections, mutingChannels, output, open, emit };
+	return { actor, token, authenticate, antennas, notes, hiding, packed, cache, moduleRef, subscriber, connections, mutingChannels, output, open, emit, sessions };
 }
 
 it.each(['visible', 'specified', 'followers', 'muted', 'blocked', 'instance', 'channel', 'hidden'] as const)('matches WebSocket post-filter antenna output for %s', async scenario => {
@@ -183,4 +185,20 @@ it('creates the native antenna filter through Nest without a server or socket', 
 		f.antennas.exists.mockResolvedValue(true);
 		expect(await module.get(AntennaNoteAccessService).isDeliverable(f.actor, { ...f.token, permission: [] }, 'antenna', 'note')).toBe(false);
 	} finally { await module.close(); }
+});
+
+it('propagates a first-party browser session and stops antenna output on its revocation', async () => {
+	const f = fixture();
+	const browserSession = { id: 'session-a', userId: f.actor.id };
+	f.authenticate.authenticate.mockResolvedValue([f.actor, null, browserSession]);
+	const pilot = await f.open();
+	try {
+		expect(f.moduleRef.registerRequestByContextId).toHaveBeenCalledWith({ user: f.actor, token: null, browserSession }, expect.anything());
+		f.emit(); await vi.waitFor(() => { expect(f.output).toHaveBeenCalledOnce(); }); f.output.mockClear();
+		expect(f.sessions.isActive).toHaveBeenCalledWith(browserSession.id, browserSession.userId);
+		f.subscriber.emit('internal', { type: 'browserSessionRevoked', body: browserSession } as never);
+		expect(await pilot.closed).toEqual({ reason: 'sink_failed', error: expect.objectContaining({ message: 'Session no longer active' }) });
+		f.emit(); await new Promise(resolve => setTimeout(resolve, 0));
+		expect(f.output).not.toHaveBeenCalled(); expect(f.subscriber.eventNames()).toEqual([]);
+	} finally { pilot.close(); }
 });

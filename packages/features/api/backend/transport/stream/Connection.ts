@@ -6,7 +6,8 @@
 import * as WebSocket from 'ws';
 import promiseLimit from 'promise-limit';
 import { ContextIdFactory, ModuleRef, REQUEST } from '@nestjs/core';
-import { Inject, Injectable, Scope } from '@nestjs/common';
+import { Inject, Injectable, Optional, Scope } from '@nestjs/common';
+import { BrowserSessionService } from '@features/auth/backend/services/BrowserSessionService.js';
 import { DI } from '@/di-symbols.js';
 import { isJsonObject } from '@features/runtime/backend/formatting/json-value.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
@@ -39,6 +40,7 @@ import { ChatUserChannel } from '@features/chat/backend/stream/chat-user.js';
 import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
 import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
 import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
+import type { BrowserSessionIdentity } from '../context.js';
 import type { ChannelRequest } from './channel.js';
 import type { ChannelConstructor } from './channel.js';
 import type { Channel } from './channel.js';
@@ -47,6 +49,10 @@ import type { StreamChannel } from '@features/mcp/backend/stream-types.js';
 
 const MAX_CHANNELS_PER_CONNECTION = 32;
 const MAX_SUBSCRIBING_NOTES_PER_CONNECTION = 1536;
+const MAX_PENDING_BROWSER_SESSION_OUTPUTS = 64;
+const MAX_PENDING_BROWSER_SESSION_OUTPUT_BYTES = 1024 * 1024;
+const MAX_PENDING_BROWSER_SESSION_INPUTS = 64;
+const MAX_PENDING_BROWSER_SESSION_INPUT_BYTES = 1024 * 1024;
 
 /**
  * Main stream connection
@@ -62,6 +68,14 @@ export default class Connection {
 	private listeningBroadcast = false;
 	public get isNativeOutput() { return !!this.output; }
 	private disposed = false;
+	private browserSession: ConnectionRequest['browserSession'];
+	private listeningSessionRevocation = false;
+	private browserSessionOutputs: { wire: string; bytes: number }[] = [];
+	private browserSessionOutputBytes = 0;
+	private drainingBrowserSessionOutputs = false;
+	private browserSessionInputs: Buffer[] = [];
+	private browserSessionInputBytes = 0;
+	private drainingBrowserSessionInputs = false;
 	private messageQueue = promiseLimit<void>(1);
 	public subscriber: StreamEventEmitter;
 	private channels: Map<string, Channel> = new Map();
@@ -86,9 +100,44 @@ export default class Connection {
 		private meta: MiMeta,
 		@Inject(REQUEST)
 		request: ConnectionRequest,
+		@Optional() private browserSessionService?: BrowserSessionService,
 	) {
 		if (request.user) this.user = request.user;
 		if (request.token) this.token = request.token;
+		this.browserSession = request.browserSession;
+	}
+
+	/** No positive validity cache and no credential retained on the connection. */
+	public async checkBrowserSession(): Promise<boolean> {
+		if (this.disposed) return false;
+		if (!this.browserSession) return true;
+		try {
+			if (this.user?.id === this.browserSession.userId && await this.browserSessionService?.isActive(this.browserSession.id, this.browserSession.userId)) return !this.disposed;
+		} catch { /* Database failures deny access too. */ }
+		this.closeRevokedSession();
+		return false;
+	}
+
+	private closeRevokedSession(reason = 'Session no longer active') {
+		if (this.disposed) return;
+		const output = this.output;
+		this.dispose();
+		if (this.wsConnection) this.wsConnection.close(1008, reason);
+		if (output) {
+			try { Promise.resolve(output.failed(new Error(reason))).catch(() => {}); } catch { /* Failure observers cannot reopen access. */ }
+		}
+	}
+
+	@bindThis
+	private onSessionRevoked(event: GlobalEvents['internal']['payload']) {
+		if (event.type !== 'browserSessionRevoked' || !this.browserSession) return;
+		if (event.body.userId === this.browserSession.userId && (event.body.id === null || event.body.id === this.browserSession.id)) this.closeRevokedSession();
+	}
+
+	private listenSessionRevocation() {
+		if (!this.browserSession) return;
+		this.subscriber.on('internal', this.onSessionRevoked);
+		this.listeningSessionRevocation = true;
 	}
 
 	@bindThis
@@ -123,7 +172,7 @@ export default class Connection {
 
 	@bindThis
 	public async init() {
-		if (this.disposed) return;
+		if (!await this.checkBrowserSession()) return;
 		if (this.user != null) {
 			await this.fetch();
 			if (this.disposed) return;
@@ -140,10 +189,14 @@ export default class Connection {
 		this.subscriber = subscriber;
 
 		this.wsConnection = wsConnection;
-		this.wsConnection.on('message', data => this.messageQueue(() => this.onWsConnectionMessage(data)));
+		this.listenSessionRevocation();
+		this.wsConnection.on('message', data => this.browserSession
+			? this.enqueueBrowserSessionInput(data)
+			: this.messageQueue(() => this.onWsConnectionMessage(data)));
 
 		this.subscriber.on('broadcast', this.onBroadcastMessage);
 		this.listeningBroadcast = true;
+		await this.checkBrowserSession();
 	}
 
 	/** Internal outbound seam. Channel initialization still owns authorization and filtering. */
@@ -151,6 +204,7 @@ export default class Connection {
 		if (this.disposed || this.wsConnection || this.output) throw new Error('Connection already attached');
 		this.subscriber = subscriber;
 		this.output = output;
+		this.listenSessionRevocation();
 		this.outputChannels = new Set(routes.channels);
 		if (routes.broadcast) {
 			this.subscriber.on('broadcast', this.onBroadcastMessage);
@@ -183,13 +237,54 @@ export default class Connection {
 		try { Promise.resolve(output.failed(error)).catch(() => {}); } catch { }
 	}
 
+	private enqueueBrowserSessionInput(data: WebSocket.RawData) {
+		if (this.disposed) return;
+		if (this.browserSessionInputs.length >= MAX_PENDING_BROWSER_SESSION_INPUTS) {
+			this.closeRevokedSession('Session input capacity exceeded');
+			return;
+		}
+		const bytes = Array.isArray(data) ? data.reduce((total, chunk) => total + chunk.byteLength, 0) : data.byteLength;
+		if (this.browserSessionInputBytes + bytes > MAX_PENDING_BROWSER_SESSION_INPUT_BYTES) {
+			this.closeRevokedSession('Session input capacity exceeded');
+			return;
+		}
+		// Copy only after bounds pass, so mutable caller buffers cannot alter queued commands.
+		const frame = Array.isArray(data) ? Buffer.concat(data)
+			: Buffer.isBuffer(data) ? Buffer.from(data) : Buffer.from(new Uint8Array(data));
+		this.browserSessionInputBytes += bytes;
+		this.browserSessionInputs.push(frame);
+		if (!this.drainingBrowserSessionInputs) {
+			void this.drainBrowserSessionInputs().catch(() => { this.closeRevokedSession('Session input failed'); });
+		}
+	}
+
+	private async drainBrowserSessionInputs() {
+		this.drainingBrowserSessionInputs = true;
+		try {
+			while (!this.disposed && this.browserSessionInputs.length > 0) {
+				// No raw frame is held outside the owned queue across this DB wait.
+				if (!await this.checkBrowserSession()) return;
+				const frame = this.browserSessionInputs[0];
+				if (!frame) return;
+				if (this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) { this.dispose(); return; }
+				await this.dispatchWsConnectionMessage(frame);
+				if (this.disposed) return;
+				this.browserSessionInputs.shift();
+				this.browserSessionInputBytes -= frame.byteLength;
+			}
+		} finally { this.drainingBrowserSessionInputs = false; }
+	}
+
 	/**
 	 * クライアントからメッセージ受信時
 	 */
 	@bindThis
 	private async onWsConnectionMessage(data: WebSocket.RawData) {
-		if (this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return;
+		if (this.wsConnection.readyState !== WebSocket.WebSocket.OPEN || !await this.checkBrowserSession()) return;
+		await this.dispatchWsConnectionMessage(data);
+	}
 
+	private async dispatchWsConnectionMessage(data: WebSocket.RawData) {
 		let obj: JsonObject;
 
 		try {
@@ -335,17 +430,60 @@ export default class Connection {
 	@bindThis
 	public sendMessageToWs(type: string, payload: JsonObject) {
 		if (this.disposed) return;
+		if (this.browserSession) {
+			// The first queued frame remains owned by the array while validation waits.
+			if (this.browserSessionOutputs.length >= MAX_PENDING_BROWSER_SESSION_OUTPUTS) {
+				this.closeRevokedSession('Session output capacity exceeded');
+				return;
+			}
+			let wire: string;
+			try { wire = JSON.stringify({ type, body: payload }); } catch { this.closeRevokedSession(); return; }
+			const bytes = Buffer.byteLength(wire);
+			if (this.browserSessionOutputBytes + bytes > MAX_PENDING_BROWSER_SESSION_OUTPUT_BYTES) {
+				this.closeRevokedSession('Session output capacity exceeded');
+				return;
+			}
+			this.browserSessionOutputBytes += bytes;
+			this.browserSessionOutputs.push({ wire, bytes });
+			if (!this.drainingBrowserSessionOutputs) {
+				void this.drainBrowserSessionOutputs().catch(() => { this.closeRevokedSession(); });
+			}
+			return;
+		}
+		this.sendValidatedMessage(type, payload);
+	}
+
+	private async drainBrowserSessionOutputs() {
+		this.drainingBrowserSessionOutputs = true;
+		try {
+			while (!this.disposed && this.browserSessionOutputs.length > 0) {
+				if (!await this.checkBrowserSession()) return;
+				const frame = this.browserSessionOutputs[0];
+				if (!frame) return;
+				const decoded = JSON.parse(frame.wire) as { type: string; body: JsonObject };
+				await this.sendValidatedMessage(decoded.type, decoded.body);
+				if (this.disposed) return;
+				this.browserSessionOutputs.shift();
+				this.browserSessionOutputBytes -= frame.bytes;
+			}
+		} finally { this.drainingBrowserSessionOutputs = false; }
+	}
+
+	private sendValidatedMessage(type: string, payload: JsonObject): void | Promise<void> {
+		if (this.disposed) return;
 		if (this.output) {
 			const output = this.output;
 			try {
-				if (output.isOpen()) Promise.resolve(output.send({ type, body: payload })).catch(error => { this.failOutput(output, error); });
+				if (output.isOpen()) return Promise.resolve(output.send({ type, body: payload })).catch(error => { this.failOutput(output, error); });
 			} catch (error) { this.failOutput(output, error); }
 			return;
 		}
+		if (this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return;
 		this.wsConnection.send(JSON.stringify({
 			type: type,
 			body: payload,
 		}));
+		return;
 	}
 
 	/**
@@ -353,7 +491,7 @@ export default class Connection {
 	 */
 	@bindThis
 	public async connectChannel(id: string, params: JsonObject | undefined, channel: string, pong = false) {
-		if (this.disposed || this.output && !this.outputChannels.has(channel)) return false;
+		if (!await this.checkBrowserSession() || this.output && !this.outputChannels.has(channel)) return false;
 		if (this.channels.has(id)) {
 			this.disconnectChannel(id);
 		}
@@ -388,11 +526,11 @@ export default class Connection {
 			connection: this,
 		}, contextId);
 		const ch: Channel = await this.moduleRef.create<Channel>(channelConstructor, contextId);
-		if (this.output ? !this.output.isOpen() : this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return false;
+		if (!await this.checkBrowserSession() || (this.output ? !this.output.isOpen() : this.wsConnection.readyState !== WebSocket.WebSocket.OPEN)) { ch.dispose?.(); return false; }
 
 		this.channels.set(ch.id, ch);
 		const valid = await ch.init(params ?? {});
-		if (this.disposed || this.output && !this.output.isOpen()) {
+		if (!await this.checkBrowserSession() || this.output && !this.output.isOpen()) {
 			ch.dispose?.(); this.channels.delete(ch.id); return false;
 		}
 		if (typeof valid === 'boolean' && !valid) {
@@ -412,7 +550,8 @@ export default class Connection {
 	public async packAntennaNote(id: string, noteId: string) {
 		const channel = this.channels.get(id);
 		if (this.disposed || !(channel instanceof AntennaChannel)) return null;
-		return channel.packNote(noteId);
+		const note = await channel.packNote(noteId);
+		return await this.checkBrowserSession() ? note : null;
 	}
 
 	@bindThis
@@ -479,6 +618,12 @@ export default class Connection {
 	@bindThis
 	public dispose() {
 		this.disposed = true;
+		this.browserSessionOutputs.length = 0;
+		this.browserSessionOutputBytes = 0;
+		this.browserSessionInputs.length = 0;
+		this.browserSessionInputBytes = 0;
+		if (this.listeningSessionRevocation) this.subscriber.off('internal', this.onSessionRevoked);
+		this.listeningSessionRevocation = false;
 		if (this.listeningBroadcast) this.subscriber.off('broadcast', this.onBroadcastMessage);
 		this.listeningBroadcast = false;
 		if (this.fetchIntervalId) clearInterval(this.fetchIntervalId);
@@ -497,6 +642,7 @@ export default class Connection {
 }
 
 export interface ConnectionRequest {
+	browserSession?: BrowserSessionIdentity,
 	user: MiUser | null | undefined,
 	token: MiAccessToken | null | undefined,
 }
