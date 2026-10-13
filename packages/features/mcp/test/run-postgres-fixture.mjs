@@ -29,7 +29,7 @@ try {
 	run(join(binaries, 'pg_ctl'), ['-D', data, '-l', join(directory, 'server.log'), '-o', `-c config_file=${config}`, '-w', '-t', '10', 'start']);
 	started = true;
 	run(join(binaries, 'createdb'), ['-h', socket, '-p', '55436', '-U', userInfo().username, 'mcp_synthetic']);
-	run(process.execPath, ['--max-old-space-size=1536', 'packages/backend/node_modules/vitest/vitest.mjs', 'run', '--config', 'packages/features/mcp/test/vitest.fixture.config.mjs'], { ...process.env, MISSKEY_MCP_TEST_DB: '1', MISSKEY_MCP_TEST_SOCKET: socket });
+	run(process.execPath, ['--max-old-space-size=1536', 'packages/backend/node_modules/vitest/vitest.mjs', 'run', '--configLoader', 'runner', '--cache', 'false', '--config', 'packages/features/mcp/test/vitest.fixture.config.mjs'], { ...process.env, MISSKEY_MCP_TEST_DB: '1', MISSKEY_MCP_TEST_SOCKET: socket });
 } finally {
 	if (started) run(join(binaries, 'pg_ctl'), ['-D', data, '-m', 'fast', '-w', '-t', '10', 'stop']);
 	process.stdout.write(`Task-owned fixture retained at ${directory}; TCP disabled.\n`);

@@ -38,7 +38,7 @@ export class GlobalTimelineChannel extends Channel {
 
 	@bindThis
 	public async init(params: JsonObject) {
-		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null);
+		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null, this.connection.isNativeOutput);
 		if (!policies.gtlAvailable) return;
 
 		this.withRenotes = !!(params.withRenotes ?? true);

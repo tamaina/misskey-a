@@ -19,7 +19,7 @@ export function createIWebhooksDeleteProcedure(deps: IWebhooksDeleteDependencies
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
-			const webhook = await deps.webhooksRepository.findOneBy({ id: ps.webhookId, userId: me.id });
+			const webhook = await deps.webhooksRepository.findOneBy({ id: ps.webhookId, userId: me.id, mode: 'legacy' });
 			if (webhook === null) throw apiError(iWebhooksDeleteErrors.noSuchWebhook);
 			await deps.webhooksRepository.delete(webhook.id);
 			void deps.globalEventService.publishInternalEvent('webhookDeleted', webhook);

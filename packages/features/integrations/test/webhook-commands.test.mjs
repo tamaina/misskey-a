@@ -31,7 +31,7 @@ function fixture({ principal = actor, token = null, exists = true } = {}) {
 test('native update scopes ownership, strips undeclared input and clears null secret', async () => {
 	const { calls, webhook, client } = fixture();
 	await client.iWebhooksUpdate({ webhookId: webhook.id, name: 'new', secret: null, future: true });
-	assert.deepEqual(calls[0], ['find', { id: webhook.id, userId: actor.id }]);
+	assert.deepEqual(calls[0], ['find', { id: webhook.id, userId: actor.id, mode: 'legacy' }]);
 	assert.deepEqual(calls[1], ['update', webhook.id, { name: 'new', url: undefined, secret: '', on: undefined, active: undefined }]);
 	assert.deepEqual(calls[2], ['reload', { id: webhook.id }]);
 	assert.deepEqual(calls[3], ['webhookUpdated', webhook]);
@@ -40,7 +40,7 @@ test('native update scopes ownership, strips undeclared input and clears null se
 test('delete publishes the removed webhook after its owned lookup and delete', async () => {
 	const { calls, webhook, client } = fixture();
 	await client.iWebhooksDelete({ webhookId: webhook.id });
-	assert.deepEqual(calls, [['find', { id: webhook.id, userId: actor.id }], ['delete', webhook.id], ['webhookDeleted', webhook]]);
+	assert.deepEqual(calls, [['find', { id: webhook.id, userId: actor.id, mode: 'legacy' }], ['delete', webhook.id], ['webhookDeleted', webhook]]);
 });
 
 test('missing owned webhook keeps distinct endpoint UUIDs without mutation', async () => {

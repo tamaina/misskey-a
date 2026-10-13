@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { reduceOccurrence } from '@features/mcp/backend/stream-catalog.js';
+import type { StreamOccurrence } from '@features/mcp/backend/stream-types.js';
+import { StreamQueueFullError, StreamQueueExpiredError } from '@features/mcp/backend/stream-queue-backend.js';
+import { STREAM_QUEUE_RETENTION_SECONDS, STREAM_QUEUE_MAX_AGE_MS } from '@features/mcp/backend/stream-queue-admission.js';
 import { toPackedJsonValue, type PackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { MetricsTime, type JobType } from 'bullmq';
@@ -38,6 +42,8 @@ import type {
 	SystemQueue,
 	SystemWebhookDeliverQueue,
 	UserWebhookDeliverQueue,
+	McpAntennaDeliverQueue,
+	McpStreamDeliverQueue,
 } from '@features/boot/backend/assembly/QueueModule.js';
 import type { ParsedSignature } from '@misskey-dev/node-http-message-signatures';
 import type * as Bull from 'bullmq';
@@ -105,6 +111,8 @@ export class QueueService {
 		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
 		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
 		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
+		@Inject('queue:mcpStreamDeliver') public mcpStreamDeliverQueue: McpStreamDeliverQueue,
+		@Inject('queue:mcpAntennaDeliver') public mcpAntennaDeliverQueue: McpAntennaDeliverQueue,
 		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {
 		for (const def of REPEATABLE_SYSTEM_JOB_DEF) {
@@ -667,6 +675,16 @@ export class QueueService {
 		content: UserWebhookPayload<T>,
 		opts?: { attempts?: number },
 	) {
+		if (webhook.mode === 'mcp') {
+			if ((type !== 'mention' && type !== 'reply') || !('note' in content) || !webhook.mcpGeneration
+				|| !webhook.mcpExpiresAt || new Date(webhook.mcpExpiresAt).getTime() <= Date.now()) return;
+			const eventId = createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, type, content.note.id])).digest('hex');
+			const data: UserWebhookDeliverJobData = { mode: 'mcp', type, webhookId: webhook.id, userId: webhook.userId,
+				generation: webhook.mcpGeneration, noteId: content.note.id, createdAt: new Date(content.note.createdAt).getTime(), eventId };
+			return this.userWebhookDeliverQueue.add(webhook.id, data, { jobId: eventId, attempts: 4,
+				backoff: { type: 'custom' }, removeOnComplete: { age: 86400, count: 1000 }, removeOnFail: { age: 86400, count: 1000 } });
+		}
+
 		const data: UserWebhookDeliverJobData = {
 			type,
 			content,
@@ -692,6 +710,34 @@ export class QueueService {
 				count: 100,
 			},
 		});
+	}
+
+	public async streamWebhookDeliver(webhook: MiWebhook, source: StreamOccurrence): Promise<'queued' | 'duplicate' | 'full' | 'inactive'> {
+		if (webhook.mode !== 'mcp' || !webhook.active || !webhook.mcpStream || !webhook.mcpGeneration
+			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now()) return 'inactive';
+		const reduced = reduceOccurrence(source);
+		const maxAge = /^statisticsStream:(serverStats|queueStats)$/.test(source.channel) ? 30000 : STREAM_QUEUE_MAX_AGE_MS;
+		if (!reduced || reduced.createdAt > Date.now() + 5000 || reduced.createdAt < Date.now() - maxAge) return 'inactive';
+		const eventId = 'stream-' + createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, reduced.id])).digest('hex');
+		if (await this.mcpStreamDeliverQueue.getJob(eventId)) return 'duplicate';
+		try {
+ await this.mcpStreamDeliverQueue.add(webhook.id, { webhookId: webhook.id, userId: webhook.userId,
+			generation: webhook.mcpGeneration, eventId, source: { id: reduced.id, createdAt: reduced.createdAt, channel: reduced.channel, message: reduced.message } }, { jobId: eventId, attempts: 4,
+			backoff: { type: 'custom' }, removeOnComplete: { age: STREAM_QUEUE_RETENTION_SECONDS },
+			removeOnFail: { age: STREAM_QUEUE_RETENTION_SECONDS } });
+		} catch (error) { if (error instanceof StreamQueueFullError) return 'full'; if (error instanceof StreamQueueExpiredError) return 'inactive'; throw error; }
+		return 'queued';
+	}
+
+	/** Isolated retention prevents legacy queue count cleanup evicting antenna IDs. */
+	public antennaWebhookDeliver(webhook: MiWebhook, antennaId: string, noteId: string, createdAt: number) {
+		if (webhook.mode !== 'mcp' || !webhook.active || webhook.mcpAntennaId !== antennaId || !webhook.mcpGeneration
+			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now()) return;
+		const eventId = createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, 'antenna', antennaId, noteId])).digest('hex');
+		const data: UserWebhookDeliverJobData = { mode: 'mcp', type: 'antenna', webhookId: webhook.id, userId: webhook.userId,
+			generation: webhook.mcpGeneration, antennaId, noteId, createdAt, eventId };
+		return this.mcpAntennaDeliverQueue.add(webhook.id, data, { jobId: eventId, attempts: 4,
+			backoff: { type: 'custom' }, removeOnComplete: { age: 86400 }, removeOnFail: { age: 86400 } });
 	}
 
 	/**

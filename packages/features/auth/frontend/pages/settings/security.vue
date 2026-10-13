@@ -68,12 +68,21 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const paginator = markRaw(new Paginator('i/signin-history', {
 	limit: 5,
 }));
 
 async function change() {
+	const { canceled, result: currentPassword } = await os.inputText({
+		title: $locale.value.sfc.password,
+		type: 'password',
+		autocomplete: 'current-password',
+		minLength: 1,
+	});
+	if (canceled || currentPassword == null || currentPassword === '') return;
+
 	const { canceled: canceled2, result: newPassword } = await os.inputText({
 		title: $locale.value.sfc.newPassword,
 		type: 'password',
@@ -96,12 +105,16 @@ async function change() {
 		return;
 	}
 
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
+	let token: string | null = null;
+	if (ensureSignin().twoFactorEnabled) {
+		const auth = await os.authenticateDialog({ currentPassword });
+		if (auth.canceled) return;
+		token = auth.result.token;
+	}
 
 	os.apiWithDialog('i/change-password', {
-		currentPassword: auth.result.password,
-		token: auth.result.token,
+		currentPassword,
+		token,
 		newPassword,
 	});
 }
