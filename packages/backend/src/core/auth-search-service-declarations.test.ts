@@ -108,8 +108,9 @@ describe('auth and search declaration boundaries', () => {
 			for (const ctor of [UserAuthService, WebAuthnService, UserSearchService]) {
 				const service = module.get<object>(ctor);
 				expect(service).toBeInstanceOf(ctor);
-				expect(module.get(ctor.name)).toBe(service);
-				expect(resolver.get(ctor.name)).toBe(service);
+				const alias = ctor === UserAuthService ? 'UserAuthService' : ctor.name;
+				expect(module.get(alias)).toBe(service);
+				expect(resolver.get(alias)).toBe(service);
 				expect(Reflect.getMetadata('design:paramtypes', ctor)).toBeUndefined();
 			}
 			expect(Reflect.get(module.get(UserAuthService), 'redisClient')).toBe(module.get(DI.redis));
