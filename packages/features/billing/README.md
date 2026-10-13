@@ -1,12 +1,10 @@
-# Billing review slices
+# Billing wallets and fixed service terms
 
 Small review slice for [Issue #8](https://github.com/tamaina/misskey-a/issues/8).
 Wallet registration is composed into Misskey's native feature provider/API and
 `/settings/wallets` and `/admin/wallet-chains`. The older payment-history and disabled payment-chain prototypes
-remain unregistered. The continuation records admin-configured fixed service terms
-and detects already-mined transfers between registered accounts. No balance, custody,
-wallet signing, transaction sending, automatic renewal, native role/quota changes or
-usage settlement is implemented. All development checks use synthetic fixtures.
+remain unregistered. Wallet registration supplies the account identities used by
+the fixed service terms below.
 
 The host binds the current Misskey principal to a PostgreSQL wallet identity.
 `billing_wallet`, `billing_wallet_challenge` and `billing_wallet_chain` are the new tables. The local,
@@ -77,39 +75,31 @@ Successful registration tests use a synthetic signature verifier. They do not pr
 valid wallet-signature interoperability or any live billing integration. No real
 wallet request, signature, key, RPC endpoint or payment is used in these tests.
 
-## Fixed service terms and transfer observation
+## Fixed service terms
 
-Native administration is `/admin/service-offers`, linked from wallet-chain settings.
-All prices, recipients, durations and confirmation counts are supplied by the admin;
-there are no monetary defaults or seeded offers. Enabled offers require a configured
-native wallet-chain RPC. Disabling an offer stops new orders/detection; already
-snapshotted orders remain checkable when their chain RPC is available. Catalog size
-is limited to 100. The account page is `/settings/subscriptions`, linked from wallets.
-It displays exact token/recipient/base units and the hash-submission deadline before
-any receipt can be checked. It never requests a wallet signature or sends funds.
+The independent server slice is [Draft #81](https://github.com/tamaina/misskey-a/pull/81),
+based on [receipt core #103](https://github.com/tamaina/misskey-a/pull/103).
+`/admin/service-offers` accepts administrator-supplied asset, recipient, price,
+duration and confirmation settings. There are no seeded prices or offers.
+`/settings/subscriptions` prepares an account-owned immutable quote and checks a
+submitted transaction hash; this page does not send transactions.
 
-Account-owned orders bind an idempotency key to the selected wallet and exact quote.
-A submitted hash is an order-local retry hint, verified on demand. Only a matching
-confirmed receipt acquires a globally unique paid chain/hash claim, atomically with
-the term. Pending or failed checks hold no global claim. RPC chain mismatch,
-insufficient confirmation depth and replaced blocks remain pending; a revert is
-terminal only after depth and canonical block checks. A confirmed order stores one immutable term interval;
-same-service renewals append under a native account row lock. Lists show at most the
-latest 100 records. Terms are records only: no native role or quota is granted.
-Transfers are recorded per chain/transaction/log index for the two registered
-participants. No scan worker, public address-to-account lookup or notifications are
-added. Participant links become null on account deletion; evidence claims remain
-reserved to prevent replay and historical reassignment. Schema rollback removes all
-three new tables, so it must not be used as an accounting reset.
+A confirmed matching transfer atomically stores the paid order and interval.
+Only paid orders reserve a unique chain/transaction claim. An account row lock
+serializes same-service renewals; request keys preserve retry idempotency.
+An optional eligible ordinary manual role takes effect during the paid interval
+through the native role service. Existing manual assignments remain intact;
+paid roles cannot grant staff privileges through conditional roles. Role reads
+query active paid intervals directly. No quota mapping, ranked plan changes,
+automatic renewal, balance ledger, usage settlement, refund or notification is wired.
 
-The new local migration is unapplied to production. Test it only with the same
-explicit disposable loopback database variable described above:
+P2P routes, models and UI belong to [Draft #126](https://github.com/tamaina/misskey-a/pull/126);
+they are absent from this server slice. Accounting claims are scoped to this slice.
+Account deletion removes the participant reference while retaining paid evidence.
+The new local migration has reversible schema tests and is unapplied to production.
+Reverting it removes its records.
 
-```sh
-node --test --test-concurrency=1 packages/features/billing/test/service-store.test.mjs
-cd packages/backend
-RAYON_NUM_THREADS=1 pnpm exec vitest run --config vitest.config.unit.ts --maxWorkers=1 ../features/billing/test/backend/service-receipt.test.ts
-```
-
-Source provenance and deviations are in Issue #8 and the continuation draft PR.
-Neither synthetic receipts nor transport tests prove live payment interoperability.
+Source provenance and behavioral differences are recorded in Issue #8 and the
+PR body. Synthetic tests do not prove live payment interoperability. After building,
+run `node --test --test-concurrency=1 packages/features/billing/test/service-store.test.mjs`
+with the disposable loopback database variable described above.
