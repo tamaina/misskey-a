@@ -83,3 +83,23 @@ it.each([
 	state.emitters[0].emit(name, stats);
 	expect(wsSend).toHaveBeenCalledOnce(); expect(nativeSend).toHaveBeenCalledOnce();
 });
+
+
+it.each([
+	['serverStats', ServerStatsChannel],
+	['queueStats', QueueStatsChannel],
+] as const)('suppresses %s log output disposed during the same response dispatch', async (name, Constructor) => {
+	const subscriber = new EventEmitter();
+	const send = vi.fn();
+	let second: InstanceType<typeof Constructor>;
+	const first = new Constructor({ id: 'first', connection: { subscriber, isNativeOutput: false, sendChannelMessage: () => second.dispose() } } as unknown as ChannelRequest);
+	second = new Constructor({ id: 'second', connection: { subscriber, isNativeOutput: false, sendChannelMessage: send } } as unknown as ChannelRequest);
+	await first.init({}); await second.init({});
+	first.onMessage('requestLog', { id: 'dispatch', length: 10 });
+	second.onMessage('requestLog', { id: 'dispatch', length: 10 });
+	// EventEmitter snapshots listeners at emit start, so removing the second
+	// callback during the first callback alone cannot suppress its invocation.
+	state.emitters[0].emit(`${name}Log:dispatch`, [{ synthetic: true }]);
+	expect(send).not.toHaveBeenCalled();
+	first.dispose(); second.dispose();
+});

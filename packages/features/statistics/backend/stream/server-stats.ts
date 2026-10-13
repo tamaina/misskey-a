@@ -59,7 +59,7 @@ export class ServerStatsChannel extends Channel {
 				const event = `serverStatsLog:${body.id}`;
 				const onLog = (statsLog: JsonValue) => {
 					this.pendingLogs.delete(onLog);
-					this.send('statsLog', statsLog);
+					if (!this.disposed) this.send('statsLog', statsLog);
 				};
 				this.pendingLogs.set(onLog, event);
 				ev.once(event, onLog);
