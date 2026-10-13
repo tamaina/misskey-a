@@ -3,7 +3,7 @@ name: Test (backend)
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/backend/**
@@ -15,7 +15,7 @@ on:
       - .github/misskey/test.yml
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/backend/**
       - packages/features/auth/**
@@ -86,6 +86,11 @@ jobs:
       run: pnpm --filter backend ${{ matrix.coverage && 'test-and-coverage' || 'test' }}
     - name: Test OAuth with disposable Redis
       run: node packages/features/auth/test/run-oauth-fixture.mjs
+    - name: Test OIDC boundaries with isolated Unix-socket Redis
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: node packages/features/auth/test/run-oidc-fixture.mjs
+    - name: Test antenna delivery identity with disposable Redis
+      run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/mcp/test/vitest.antenna-redis.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
     - name: Test MCP with disposable PostgreSQL
       run: node packages/features/mcp/test/run-postgres-fixture.mjs
     - name: Upload to Codecov

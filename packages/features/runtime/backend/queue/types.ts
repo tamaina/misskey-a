@@ -126,7 +126,8 @@ export type SystemWebhookDeliverJobData<T extends SystemWebhookEventType = Syste
 	eventId: string;
 };
 
-export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEventTypes> = {
+export type LegacyUserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEventTypes> = {
+	mode?: 'legacy';
 	type: T;
 	content: UserWebhookPayload<T>;
 	webhookId: MiWebhook['id'];
@@ -137,6 +138,18 @@ export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEvent
 	eventId: string;
 };
 
+/** MCP jobs contain references only; current destination and keys are read at delivery time. */
+export type McpWebhookDeliverJobData = {
+	mode: 'mcp'; type: 'mention' | 'reply' | 'antenna'; antennaId?: string; webhookId: string; userId: string;
+	generation: string; noteId: string; createdAt: number; eventId: string;
+};
+export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEventTypes> = LegacyUserWebhookDeliverJobData<T> | McpWebhookDeliverJobData;
+
 export type ThinUser = {
 	id: MiUser['id'];
+};
+
+export type McpStreamDeliverJobData = {
+	webhookId: string; userId: string; generation: string; eventId: string;
+	source: import('@features/mcp/backend/stream-types.js').StreamOccurrence;
 };

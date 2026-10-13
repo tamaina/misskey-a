@@ -218,7 +218,7 @@ async function addSecurityKey() {
 	);
 	if (!credential) return;
 
-	const auth2 = await os.authenticateDialog();
+	const auth2 = await os.authenticateDialog({ currentPassword: auth.result.password });
 	if (auth2.canceled) return;
 
 	await os.apiWithDialog('i/2fa/key-done', {

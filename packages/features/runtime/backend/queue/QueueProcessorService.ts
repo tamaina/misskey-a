@@ -12,6 +12,10 @@ import { bindThis } from '../decorators.js';
 import { TelemetryService } from '@features/statistics/backend/services/TelemetryService.js';
 import { CheckModeratorsActivityProcessorService } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
 import { runQueueJob } from './queue-job-runner.js';
+import { McpStreamDeliverProcessorService } from '@features/integrations/backend/jobs/McpStreamDeliverProcessorService.js';
+import { reconcileStreamJobs, releaseStreamJob } from '@features/mcp/backend/stream-queue-admission.js';
+import type { McpStreamDeliverQueue } from '@features/boot/backend/assembly/QueueModule.js';
+import type { McpStreamDeliverJobData } from './types.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { SystemWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/SystemWebhookDeliverProcessorService.js';
 import { EndedPollNotificationProcessorService } from '@features/notes/backend/jobs/EndedPollNotificationProcessorService.js';
@@ -84,6 +88,10 @@ export class QueueProcessorService implements OnApplicationShutdown {
 	private deliverQueueWorker: Bull.Worker;
 	private inboxQueueWorker: Bull.Worker;
 	private userWebhookDeliverQueueWorker: Bull.Worker;
+	private mcpStreamDeliverQueueWorker: Bull.Worker<McpStreamDeliverJobData>;
+	private streamMaintenanceTimer: NodeJS.Timeout | undefined;
+	private streamMaintenance: Promise<void> | undefined;
+	private mcpAntennaDeliverQueueWorker: Bull.Worker;
 	private systemWebhookDeliverQueueWorker: Bull.Worker;
 	private relationshipQueueWorker: Bull.Worker;
 	private objectStorageQueueWorker: Bull.Worker;
@@ -131,6 +139,8 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		private checkModeratorsActivityProcessorService: CheckModeratorsActivityProcessorService,
 		private cleanProcessorService: CleanProcessorService,
 		private cleanRemoteNotesProcessorService: CleanRemoteNotesProcessorService,
+		@Inject('queue:mcpStreamDeliver') private mcpStreamDeliverQueue: McpStreamDeliverQueue,
+		private mcpStreamDeliverProcessorService: McpStreamDeliverProcessorService,
 	) {
 		this.logger = this.queueLoggerService.logger;
 
@@ -380,6 +390,42 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		}
 		//#endregion
 
+		// Same processor/backoff; a distinct queue isolates antenna dedup retention.
+		{
+			const logger = this.logger.createSubLogger('mcp-antenna');
+			this.mcpAntennaDeliverQueueWorker = new Bull.Worker(QUEUE.MCP_ANTENNA_DELIVER, job => runQueueJob(
+				this.telemetryService, 'Queue: McpAntennaDeliver',
+				() => this.userWebhookDeliverProcessorService.process(job),
+				() => logger.error(`delivery failed ${getJobInfo(job)}`),
+			), {
+				...baseWorkerOptions(this.config, QUEUE.MCP_ANTENNA_DELIVER), autorun: false, concurrency: 64,
+				limiter: { max: 64, duration: 1000 }, settings: { backoffStrategy: httpRelatedBackoff },
+			});
+			this.mcpAntennaDeliverQueueWorker.on('error', () => logger.error('queue error'))
+				.on('stalled', jobId => logger.warn(`stalled id=${jobId}`));
+		}
+
+		// Concurrency is bounded per process; retries/concurrent workers can reorder.
+		{
+			const logger = this.logger.createSubLogger('mcp-stream');
+			this.mcpStreamDeliverQueueWorker = new Bull.Worker<McpStreamDeliverJobData>(QUEUE.MCP_STREAM_DELIVER,
+				job => runQueueJob(this.telemetryService, 'Queue: McpStreamDeliver',
+					() => this.mcpStreamDeliverProcessorService.process(job),
+					() => logger.error(`delivery failed id=${job.id}`)), {
+					...baseWorkerOptions(this.config, QUEUE.MCP_STREAM_DELIVER), autorun: false, concurrency: 1,
+					settings: { backoffStrategy: httpRelatedBackoff },
+				});
+			const release = async (job: Bull.Job<McpStreamDeliverJobData> | undefined) => {
+				if (!job?.id) return;
+				const state = await job.getState();
+				if (state === 'completed' || state === 'failed') await releaseStreamJob(this.mcpStreamDeliverQueue, job.id, job.data.webhookId);
+			};
+			this.mcpStreamDeliverQueueWorker.on('completed', job => { void release(job).catch(() => logger.error('capacity release failed')); })
+				.on('failed', job => { void release(job).catch(() => logger.error('capacity release failed')); })
+				.on('error', () => logger.error('queue error'))
+				.on('stalled', jobId => logger.warn(`stalled id=${jobId}`));
+		}
+
 		//#region system-webhook deliver
 		{
 			const logger = this.logger.createSubLogger('system-webhook');
@@ -553,7 +599,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 	public async waitUntilReady(): Promise<void> {
 		await Promise.all([
 			this.systemQueueWorker, this.dbQueueWorker, this.deliverQueueWorker,
-			this.inboxQueueWorker, this.userWebhookDeliverQueueWorker, this.systemWebhookDeliverQueueWorker,
+			this.inboxQueueWorker, this.userWebhookDeliverQueueWorker, this.mcpAntennaDeliverQueueWorker, this.mcpStreamDeliverQueueWorker, this.systemWebhookDeliverQueueWorker,
 			this.relationshipQueueWorker, this.objectStorageQueueWorker,
 			this.endedPollNotificationQueueWorker, this.postScheduledNoteQueueWorker,
 		].map(worker => worker.waitUntilReady()));
@@ -561,12 +607,24 @@ export class QueueProcessorService implements OnApplicationShutdown {
 
 	@bindThis
 	public async start(): Promise<void> {
+		await reconcileStreamJobs(this.mcpStreamDeliverQueue);
+		if (!this.streamMaintenanceTimer) {
+			this.streamMaintenanceTimer = setInterval(() => {
+				if (this.streamMaintenance) return;
+				this.streamMaintenance = reconcileStreamJobs(this.mcpStreamDeliverQueue)
+					.catch(() => { this.logger.error('MCP stream capacity reconciliation failed'); })
+					.finally(() => { this.streamMaintenance = undefined; });
+			}, 60000);
+			this.streamMaintenanceTimer.unref();
+		}
 		await Promise.all([
 			this.systemQueueWorker.run(),
 			this.dbQueueWorker.run(),
 			this.deliverQueueWorker.run(),
 			this.inboxQueueWorker.run(),
 			this.userWebhookDeliverQueueWorker.run(),
+			this.mcpAntennaDeliverQueueWorker.run(),
+			this.mcpStreamDeliverQueueWorker.run(),
 			this.systemWebhookDeliverQueueWorker.run(),
 			this.relationshipQueueWorker.run(),
 			this.objectStorageQueueWorker.run(),
@@ -577,12 +635,17 @@ export class QueueProcessorService implements OnApplicationShutdown {
 
 	@bindThis
 	public async stop(): Promise<void> {
+		clearInterval(this.streamMaintenanceTimer);
+		this.streamMaintenanceTimer = undefined;
+		await this.streamMaintenance;
 		await Promise.all([
 			this.systemQueueWorker.close(),
 			this.dbQueueWorker.close(),
 			this.deliverQueueWorker.close(),
 			this.inboxQueueWorker.close(),
 			this.userWebhookDeliverQueueWorker.close(),
+			this.mcpAntennaDeliverQueueWorker.close(),
+			this.mcpStreamDeliverQueueWorker.close(),
 			this.systemWebhookDeliverQueueWorker.close(),
 			this.relationshipQueueWorker.close(),
 			this.objectStorageQueueWorker.close(),

@@ -3,11 +3,11 @@ name: Check SPDX-License-Identifier
 on:
   push:
     branches:
-      - master
+      - main
       - develop
   pull_request:
     branches-ignore:
-      - master
+      - main
 
 jobs:
   check-spdx-license-id:

@@ -19,6 +19,7 @@ import { createPageEntityService, createPageLikeEntityService, createPageService
 import { playServices } from '@features/play/backend/services.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { ServiceBillingRoleProvider } from '@features/billing/backend/service-role.provider.js';
+import { TotpService } from '@features/auth/backend/services/TotpService.js';
 import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import { featureServiceExports, featureServiceGroups, featureServiceProviders } from '@features/index/backend/feature-service-providers.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
@@ -36,10 +37,25 @@ function providerToken(provider: Provider): InjectionToken {
 }
 
 describe('feature service composition adapter', () => {
-	test('the complete pre-migration provider/export contract and every alias target are preserved', () => {
+	test('the pre-migration contract plus explicit MCP Events and antenna additions preserve every alias target', () => {
 		const baseline = JSON.parse(readFileSync(new URL('../../test/fixtures/core-provider-contract.json', import.meta.url), 'utf8')) as {
 			providers: string[]; exports: string[]; aliases: { name: string; target: string }[];
 		};
+		for (const entries of [baseline.providers, baseline.exports]) {
+			// The class token is identical; only its constructor name changed.
+			expect(entries.filter(entry => entry === 'class:UserAuthService')).toHaveLength(1);
+			entries[entries.indexOf('class:UserAuthService')] = 'class:TotpService';
+			entries.splice(entries.indexOf('class:SystemWebhookService'), 0, 'class:McpEventsService');
+			entries.splice(entries.indexOf('alias:SystemWebhookService'), 0, 'alias:McpEventsService');
+			for (const prefix of ['class:', 'alias:']) {
+				entries.splice(entries.indexOf(`${prefix}AntennaService`) + 1, 0, `${prefix}AntennaNoteAccessService`, `${prefix}AntennaEventSubscriptionService`);
+				entries.splice(entries.indexOf(`${prefix}McpEventsService`) + 1, 0, `${prefix}McpStreamAccessService`, `${prefix}McpStreamSubscriptionService`, `${prefix}NoteStreamingHidingService`);
+			}
+		}
+		expect(baseline.aliases.filter(alias => alias.name === 'UserAuthService')).toEqual([{ name: 'UserAuthService', target: 'UserAuthService' }]);
+		baseline.aliases.find(alias => alias.name === 'UserAuthService')!.target = 'TotpService';
+		baseline.aliases.push({ name: 'McpEventsService', target: 'McpEventsService' });
+		for (const name of ['AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService', 'McpStreamAccessService', 'McpStreamSubscriptionService']) baseline.aliases.push({ name, target: name });
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
 		const describeToken = (entry: Provider | InjectionToken): string => {
@@ -89,7 +105,7 @@ describe('feature service composition adapter', () => {
 			await module.init();
 			for (const provider of classProviders) {
 				const service = module.get(provider.provide);
-				const name = (provider.provide as { name: string }).name;
+				const name = provider.provide === TotpService ? 'UserAuthService' : (provider.provide as { name: string }).name;
 				expect(service).toBeInstanceOf(provider.provide);
 				expect(module.get(name)).toBe(service);
 				if (!pageFactoryProviders.some(pageProvider => pageProvider.provide === provider.provide)) {
@@ -143,7 +159,7 @@ describe('feature service composition adapter', () => {
 			collections: ['serializers/ClipEntityService', 'serializers/NoteFavoriteEntityService', 'services/ClipService', 'services/gallery', 'serializers/GalleryPostEntityService', 'serializers/GalleryLikeEntityService'],
 			pages: ['serializers/PageEntityService', 'serializers/PageLikeEntityService', 'services/PageService'],
 			play: ['serializers/FlashEntityService', 'serializers/FlashLikeEntityService', 'services/FlashService'],
-			auth: ['services/UserAuthService', 'services/WebAuthnService', 'serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],
+			auth: ['services/TotpService', 'services/WebAuthnService', 'serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],
 			channels: ['serializers/ChannelEntityService'],
 			chat: ['serializers/ChatEntityService'],
 			discovery: ['services/UserSearchService', 'serializers/HashtagEntityService'],

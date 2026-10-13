@@ -108,8 +108,9 @@ describe('auth and search declaration boundaries', () => {
 			for (const ctor of [UserAuthService, WebAuthnService, UserSearchService]) {
 				const service = module.get<object>(ctor);
 				expect(service).toBeInstanceOf(ctor);
-				expect(module.get(ctor.name)).toBe(service);
-				expect(resolver.get(ctor.name)).toBe(service);
+				const alias = ctor === UserAuthService ? 'UserAuthService' : ctor.name;
+				expect(module.get(alias)).toBe(service);
+				expect(resolver.get(alias)).toBe(service);
 				expect(Reflect.getMetadata('design:paramtypes', ctor)).toBeUndefined();
 			}
 			expect(Reflect.get(module.get(UserAuthService), 'redisClient')).toBe(module.get(DI.redis));
@@ -161,7 +162,7 @@ describe('auth and search declaration boundaries', () => {
 		vi.mocked(generateRegistrationOptions).mockResolvedValue(options);
 		const service = authSecurityServices.create(inputs).WebAuthnService;
 		expect(await service.initiateRegistration('user', 'name', 'Display')).toBe(options);
-		expect(generateRegistrationOptions).toHaveBeenCalledWith(expect.objectContaining({ rpName: 'Example', rpID: 'example.test', userName: 'name', userDisplayName: 'Display', excludeCredentials: [{ id: 'credential-id', transports: ['internal'] }], authenticatorSelection: { residentKey: 'required', userVerification: 'preferred' } }));
+		expect(generateRegistrationOptions).toHaveBeenCalledWith(expect.objectContaining({ rpName: 'Example', rpID: 'example.test', userName: 'name', userDisplayName: 'Display', excludeCredentials: [{ id: 'credential-id', transports: ['internal'] }], authenticatorSelection: { residentKey: 'required', userVerification: 'required' } }));
 		expect(inputs.redisClient.setex).toHaveBeenCalledWith('webauthn:registrationChallenge:user', 90, 'registration-challenge');
 	});
 
@@ -184,10 +185,10 @@ describe('auth and search declaration boundaries', () => {
 		vi.mocked(generateAuthenticationOptions).mockResolvedValue(options);
 		const service = authSecurityServices.create(inputs).WebAuthnService;
 		await service.initiateAuthentication('user');
-		expect(generateAuthenticationOptions).toHaveBeenNthCalledWith(1, { rpID: 'example.test', allowCredentials: [{ id: 'credential-id', transports: ['internal'] }], userVerification: 'preferred' });
+		expect(generateAuthenticationOptions).toHaveBeenNthCalledWith(1, { rpID: 'example.test', allowCredentials: [{ id: 'credential-id', transports: ['internal'] }], userVerification: 'required' });
 		expect(inputs.redisClient.setex).toHaveBeenCalledWith('webauthn:authenticationChallenge:user', 90, 'authentication-challenge');
 		await service.initiateSignInWithPasskeyAuthentication('context');
-		expect(generateAuthenticationOptions).toHaveBeenNthCalledWith(2, { rpID: 'example.test', userVerification: 'preferred' });
+		expect(generateAuthenticationOptions).toHaveBeenNthCalledWith(2, { rpID: 'example.test', userVerification: 'required' });
 		expect(inputs.redisClient.setex).toHaveBeenCalledWith('webauthn:passkeyChallenge:context', 90, 'authentication-challenge');
 	});
 

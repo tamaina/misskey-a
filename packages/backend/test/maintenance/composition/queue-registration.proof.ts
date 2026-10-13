@@ -106,7 +106,7 @@ const processors = [
 	['ResyncChartsProcessorService', ResyncChartsProcessorService, 4],
 	['SystemWebhookDeliverProcessorService', SystemWebhookDeliverProcessorService, 4],
 	['TickChartsProcessorService', TickChartsProcessorService, 13],
-	['UserWebhookDeliverProcessorService', UserWebhookDeliverProcessorService, 4],
+	['UserWebhookDeliverProcessorService', UserWebhookDeliverProcessorService, 5],
 ] as const;
 
 for (const [name, feature, parameterCount] of processors) {

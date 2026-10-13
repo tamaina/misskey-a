@@ -135,11 +135,7 @@ export default abstract class Channel {
 		const type = payload === undefined ? (typeOrPayload as { type: string, body: JsonValue }).type : (typeOrPayload as string);
 		const body = payload === undefined ? (typeOrPayload as { type: string, body: JsonValue }).body : payload;
 
-		this.connection.sendMessageToWs('channel', {
-			id: this.id,
-			type: type,
-			body: body,
-		});
+		this.connection.sendChannelMessage(this.id, type, body);
 	}
 
 	/**

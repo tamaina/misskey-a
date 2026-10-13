@@ -4,11 +4,11 @@ name: Dockle
 on:
   push:
     branches:
-      - master
+      - main
       - develop
   pull_request:
     branches-ignore:
-      - master
+      - main
 
 jobs:
   dockle:

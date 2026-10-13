@@ -12,6 +12,8 @@ import { WebhookTestService } from '@features/integrations/backend/services/Webh
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
 import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
 import { AccountUpdateService } from '@features/users/backend/services/AccountUpdateService.js';
+import { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';
+import { AntennaEventSubscriptionService } from '@features/timelines/backend/services/AntennaEventSubscriptionService.js';
 import { AntennaService } from '@features/timelines/backend/services/AntennaService.js';
 import { AchievementService } from '@features/users/backend/services/AchievementService.js';
 import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
@@ -49,6 +51,10 @@ import { UserListService } from '@features/relationships/backend/services/UserLi
 import { UserMutingService } from '@features/relationships/backend/services/UserMutingService.js';
 import { UserRenoteMutingService } from '@features/relationships/backend/services/UserRenoteMutingService.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
+import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
+import { McpStreamAccessService } from '@features/mcp/backend/McpStreamAccessService.js';
+import { McpStreamSubscriptionService } from '@features/mcp/backend/McpStreamSubscriptionService.js';
+import { McpEventsService } from '@features/mcp/backend/McpEventsService.js';
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { SearchService } from '@features/note-search/backend/services/SearchService.js';
 import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
@@ -116,6 +122,8 @@ const canonicalServices = {
 	AccountMoveService,
 	AccountUpdateService,
 	AntennaService,
+	AntennaNoteAccessService,
+	AntennaEventSubscriptionService,
 	AchievementService,
 	AvatarDecorationService,
 	CaptchaService,
@@ -156,6 +164,10 @@ const canonicalServices = {
 	UserRenoteMutingService,
 	UserSuspendService,
 	UserWebhookService,
+	McpEventsService,
+	McpStreamAccessService,
+	McpStreamSubscriptionService,
+	NoteStreamingHidingService,
 	SystemWebhookService,
 	WebhookTestService,
 	UtilityService,

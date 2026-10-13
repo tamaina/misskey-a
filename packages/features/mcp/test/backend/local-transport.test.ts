@@ -161,3 +161,11 @@ it('requires scoped access:mcp credentials on every transport request without ch
 	f.grant.permission = ['read:account']; expect((await invoke()).statusCode).toBe(403);
 	expect(p.activeRequests()).toBe(0); expect(p.nativeInFlight()).toBe(0);
 });
+
+it('keeps legacy progress-token metadata on the SDK1 tool-call path', async () => {
+	const { invoke, f } = await pilot();
+	const response = await invoke(message('tools/call', { name: 'list_my_notes', arguments: {}, _meta: { progressToken: 'legacy-progress' } }), { 'mcp-protocol-version': '2025-11-25' });
+	expect(response.statusCode).toBe(200);
+	expect(response.json().result.structuredContent).toEqual({ notes: (await f.ordinary({ userId: f.own.id })).json() });
+	expect(response.json().result).not.toHaveProperty('resultType');
+});
