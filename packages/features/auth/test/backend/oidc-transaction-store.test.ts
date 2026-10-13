@@ -4,13 +4,20 @@
  */
 
 import { createHash } from 'node:crypto';
+import { lstatSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { Redis } from 'ioredis';
 import { afterAll, describe, expect, it } from 'vitest';
 import { OidcTransactionStore } from '../../backend/oidc-transaction-store.js';
 
 // The explicit fixture socket must belong to this test task, never a shared Redis.
 const socket = process.env.MISSKEY_OIDC_REDIS_SOCKET;
-if (socket && !/^\/tmp\/misskey-oidc-[^/]+\/redis\.sock$/.test(socket)) throw new Error('OIDC fixture requires task-owned Unix socket');
+if (socket) {
+	if (!/^\/tmp\/misskey-oidc-[^/]+\/redis\.sock$/.test(socket)) throw new Error('OIDC fixture requires task-owned Unix socket');
+	const directory = lstatSync(dirname(socket));
+	const endpoint = lstatSync(socket);
+	if (!directory.isDirectory() || directory.uid !== process.getuid() || (directory.mode & 0o077) !== 0 || !endpoint.isSocket() || endpoint.uid !== process.getuid()) throw new Error('OIDC fixture socket ownership mismatch');
+}
 const redis = socket ? new Redis({ path: socket, lazyConnect: true }) : undefined;
 afterAll(async () => { await redis?.quit(); });
 const provider = { id: 'synthetic-provider', version: '1', issuer: 'https://issuer.invalid', clientId: 'fixture', enabled: true };
