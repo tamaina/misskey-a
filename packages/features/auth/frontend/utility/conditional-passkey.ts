@@ -41,7 +41,7 @@ export function createConditionalPasskeyLogin<Result>(deps: {
 	login: (result: Result) => void;
 }) {
 	let committed: object | undefined;
-	let active: { controller: AbortController; timer: ReturnType<typeof window.setTimeout>; deadline: number } | undefined;
+	let active: { controller: AbortController; timer: number; deadline: number } | undefined;
 
 	function cancel() {
 		const previous = active;
