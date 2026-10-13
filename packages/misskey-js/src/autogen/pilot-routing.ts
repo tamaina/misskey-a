@@ -17666,6 +17666,9 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"CHANNEL_FEDERATION_REQUIRES_PUBLIC": {
+						"status": 400
+					},
 					"NO_SUCH_RENOTE_TARGET": {
 						"status": 400
 					},

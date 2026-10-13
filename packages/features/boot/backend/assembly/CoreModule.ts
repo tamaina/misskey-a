@@ -58,6 +58,7 @@ import { McpEventsService } from '@features/mcp/backend/McpEventsService.js';
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { SearchService } from '@features/note-search/backend/services/SearchService.js';
 import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
+import { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
 import { ChatService } from '@features/chat/backend/services/ChatService.js';
 import { ReversiService } from '@features/games/backend/services/ReversiService.js';
@@ -174,6 +175,7 @@ const canonicalServices = {
 	SearchService,
 	FanoutTimelineService,
 	FanoutTimelineEndpointService,
+	ChannelFederationService,
 	ChannelFollowingService,
 	ChannelMutingService,
 	ChatService,

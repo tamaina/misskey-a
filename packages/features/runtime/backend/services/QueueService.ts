@@ -154,6 +154,7 @@ export class QueueService {
 		const data: DeliverJobData = {
 			user: {
 				id: user.id,
+				...(user.channelId ? { channelId: user.channelId } : {}),
 			},
 			content: contentBody,
 			digest,

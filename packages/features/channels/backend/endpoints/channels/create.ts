@@ -48,7 +48,8 @@ export function createChannelsCreateProcedure<Actor extends MiLocalUser>(deps: C
 				bannerId: banner ? banner.id : null,
 				isSensitive: ps.isSensitive ?? false,
 				...(ps.color !== undefined ? { color: ps.color } : {}),
-				allowRenoteToExternal: ps.allowRenoteToExternal ?? true,
+				isFederated: ps.isFederated ?? false,
+				allowRenoteToExternal: ps.isFederated ? true : ps.allowRenoteToExternal ?? true,
 			});
 			return toPackedChannel(await deps.channelEntityService.pack(channel, me));
 		});

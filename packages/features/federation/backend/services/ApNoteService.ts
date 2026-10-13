@@ -10,6 +10,7 @@ import { DI } from '@/di-symbols.js';
 import type { PollsRepository, EmojisRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
+import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { acquireApObjectLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import { toArray, toSingle, unique } from '@features/runtime/backend/data/array.js';
@@ -126,7 +127,7 @@ export class ApNoteService {
 	 * Noteを作成します。
 	 */
 	@bindThis
-	public async createNote(value: string | IObject, actor?: MiRemoteUser, resolver?: Resolver, silent = false): Promise<MiNote | null> {
+	public async createNote(value: string | IObject, actor?: MiRemoteUser, resolver?: Resolver, silent = false, approvedChannel?: MiChannel): Promise<MiNote | null> {
 		// eslint-disable-next-line no-param-reassign
 		if (resolver == null) resolver = await this.apResolverService.createResolver();
 
@@ -144,6 +145,8 @@ export class ApNoteService {
 		}
 
 		const note = object as IPost;
+		// Audience is a claim, not Group approval. Only the verified Announce path supplies a channel.
+		if (note.audience != null && !approvedChannel) return null;
 
 		this.logger.debug(`Note fetched: ${JSON.stringify(note, null, 2)}`);
 
@@ -322,6 +325,7 @@ export class ApNoteService {
 				cw,
 				text,
 				localOnly: false,
+				channel: approvedChannel,
 				visibility,
 				visibleUsers,
 				apMentions,

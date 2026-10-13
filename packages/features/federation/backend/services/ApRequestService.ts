@@ -10,6 +10,8 @@ import * as htmlParser from 'node-html-parser';
 import type { CustomSigningKey } from '@misskey-dev/node-http-message-signatures';
 import { parseHttpSignatureImplementationLevel } from '../protocol/misc/http-signature-capabilities.js';
 import { signAsDraftToRequest } from '@misskey-dev/node-http-message-signatures';
+import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { ThinUser } from '@features/runtime/backend/queue/types.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
@@ -21,7 +23,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { validateContentTypeSetAsActivityPub } from '../protocol/misc/validator.js';
 import { assertActivityMatchesUrl, FetchAllowSoftFailMask as FetchAllowSoftFailMask } from '../protocol/misc/check-against-url.js';
-import type { IObject } from '../protocol/type.js';
+import type { IObject, IActivity } from '../protocol/type.js';
 
 type Request = {
 	url: string;
@@ -126,6 +128,8 @@ export class ApRequestService {
 		private config: Config,
 
 		private userKeypairService: UserKeypairService,
+		@Inject(DI.channelsRepository)
+		private channelsRepository: ChannelsRepository,
 		private httpRequestService: HttpRequestService,
 		private loggerService: LoggerService,
 		private utilityService: UtilityService,
@@ -135,10 +139,20 @@ export class ApRequestService {
 	}
 
 	@bindThis
-	public async signedPost(user: { id: MiUser['id'] }, url: string, object: unknown, digest?: string, options: { level?: unknown; forceMainKey?: boolean } = {}): Promise<void> {
+	public async signedPost(user: ThinUser, url: string, object: unknown, digest?: string, options: { level?: unknown; forceMainKey?: boolean } = {}): Promise<void> {
 		const body = typeof object === 'string' ? object : JSON.stringify(object);
 
-		const key = await this.userKeypairService.getLocalUserPrivateKey(user.id, options.forceMainKey ? 'main' : parseHttpSignatureImplementationLevel(options.level));
+		const channel = user.channelId ? await this.channelsRepository.findOne({
+			where: { id: user.channelId },
+			select: { id: true, host: true, isFederated: true, isArchived: true, federationPrivateKey: true },
+		}) : null;
+		if (user.channelId && (!channel || channel.host != null || !channel.federationPrivateKey)) throw new Error('Invalid channel signer');
+		const activity = user.channelId ? JSON.parse(body) as IActivity : null;
+		// Recheck queued publications after OFF. Previously published deletions still propagate.
+		if (channel && (!channel.isFederated || channel.isArchived) && !(typeof activity?.object === 'object' && !Array.isArray(activity.object) && activity.object.type === 'Delete')) return;
+		const key = channel?.federationPrivateKey
+			? await this.userKeypairService.getLocalUserPrivateKey({ keyId: `${this.config.url}/channels/${channel.id}#main-key`, privateKeyPem: channel.federationPrivateKey })
+			: await this.userKeypairService.getLocalUserPrivateKey(user.id, options.forceMainKey ? 'main' : parseHttpSignatureImplementationLevel(options.level));
 
 		const req = await ApRequestCreator.createSignedPost({
 			key,

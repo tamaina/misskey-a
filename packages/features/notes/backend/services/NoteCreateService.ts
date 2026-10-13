@@ -22,6 +22,8 @@ import type { MiUser, MiLocalUser, MiRemoteUser } from '@features/users/backend/
 import type { IPoll } from '../models/Poll.js';
 import { MiPoll } from '../models/Poll.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
+import { assertFederatedChannelNote, CHANNEL_FEDERATION_REQUIRES_PUBLIC } from '@features/channels/backend/utility/federation-policy.js';
+import { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
@@ -231,6 +233,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
 
+		private channelFederationService: ChannelFederationService,
+
 		@Inject(DI.noteThreadMutingsRepository)
 		private noteThreadMutingsRepository: NoteThreadMutingsRepository,
 
@@ -365,7 +369,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				if (renoteChannel == null) {
 					// リノートしたいノートが書き込まれているチャンネルが無い
 					throw new IdentifiableError('b060f9a6-8909-4080-9e0b-94d9fa6f6a77', 'No such channel');
-				} else if (!renoteChannel.allowRenoteToExternal) {
+				} else if (!renoteChannel.isFederated && !renoteChannel.allowRenoteToExternal) {
 					// リノート作成のリクエストだが、対象チャンネルがリノート禁止だった場合
 					throw new IdentifiableError('7e435f4a-780d-4cfc-a15a-42519bd6fb67', 'Channel does not allow renote to external');
 				}
@@ -421,6 +425,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
+		if (channel?.host != null) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Remote channel posting is not available in this pilot.');
+		}
+
 		return this.create(user, {
 			createdAt: data.createdAt,
 			files: files,
@@ -448,6 +456,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 		isBot: MiUser['isBot'];
 		isCat: MiUser['isCat'];
 	}, data: Option, silent = false): Promise<MiNote> {
+		if (data.channel?.isFederated && data.reply && data.reply.channelId !== data.channel.id) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Reply must stay in the federated channel.');
+		}
 		// チャンネル外にリプライしたら対象のスコープに合わせる
 		// (クライアントサイドでやっても良い処理だと思うけどとりあえずサーバーサイドで)
 		if (data.reply && data.channel && data.reply.channelId !== data.channel.id) {
@@ -464,12 +475,27 @@ export class NoteCreateService implements OnApplicationShutdown {
 			data.channel = await this.channelsRepository.findOneBy({ id: data.reply.channelId });
 		}
 
+		if (user.host == null && data.channel?.host != null) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Remote channel posting is not available in this pilot.');
+		}
+		if (data.channel?.isFederated && isCreationRenote(data) && !isCreationQuote(data)) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Pure Renotes in federated channels are not available in this pilot.');
+		}
+
 		if (data.createdAt == null) data.createdAt = new Date();
 		if (data.visibility == null) data.visibility = 'public';
 		if (data.localOnly == null) data.localOnly = false;
+		if (data.channel?.isFederated) assertFederatedChannelNote(data, true);
 		if (data.channel != null) data.visibility = 'public';
 		if (data.channel != null) data.visibleUsers = [];
-		if (data.channel != null) data.localOnly = true;
+		if (data.channel?.isFederated) {
+			const publicAllowed = (await this.roleService.getUserPolicies(user.id)).canPublicNote !== false
+				&& !this.utilityService.isKeyWordIncluded(data.cw ?? '', this.meta.sensitiveWords)
+				&& !this.utilityService.isKeyWordIncluded(data.text ?? '', this.meta.sensitiveWords);
+			assertFederatedChannelNote(data, publicAllowed);
+		} else if (data.channel != null) {
+			data.localOnly = true;
+		}
 
 		if (data.visibility === 'public' && data.channel == null) {
 			const sensitiveWords = this.meta.sensitiveWords;
@@ -571,6 +597,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 				data.localOnly = true;
 			}
 		}
+
+		if (data.channel?.isFederated) assertFederatedChannelNote(data, true);
 
 		if (data.text) {
 			if (data.text.length > DB_MAX_NOTE_TEXT_LENGTH) {
@@ -890,7 +918,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 			nm.notify();
 
 			//#region AP deliver
-			if (!data.localOnly && this.userEntityService.isLocalUser(user)) {
+			if (!data.localOnly && data.channel && this.userEntityService.isLocalUser(user)) {
+				trackPromise(this.channelFederationService.deliverNote(note));
+			} else if (!data.localOnly && this.userEntityService.isLocalUser(user)) {
 				(async () => {
 					const noteActivity = await this.renderNoteOrRenoteActivity(data, note);
 					const dm = this.apDeliverManagerService.createDeliverManager(user, noteActivity);
@@ -1068,7 +1098,12 @@ export class NoteCreateService implements OnApplicationShutdown {
 				select: { followerId: true },
 			});
 
+			const localFollowerIds = new Set((await this.usersRepository.find({
+				where: { id: In(channelFollowings.map(f => f.followerId)), host: IsNull() },
+				select: { id: true },
+			})).map(u => u.id));
 			for (const channelFollowing of channelFollowings) {
+				if (!localFollowerIds.has(channelFollowing.followerId)) continue;
 				this.fanoutTimelineService.push(`homeTimeline:${channelFollowing.followerId}`, note.id, this.meta.perUserHomeTimelineCacheMax, r);
 				if (note.fileIds.length > 0) {
 					this.fanoutTimelineService.push(`homeTimelineWithFiles:${channelFollowing.followerId}`, note.id, this.meta.perUserHomeTimelineCacheMax / 2, r);

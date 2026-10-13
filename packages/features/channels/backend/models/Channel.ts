@@ -98,4 +98,20 @@ export class MiChannel {
 		default: true,
 	})
 	public allowRenoteToExternal: boolean;
+
+	@Column('boolean', { default: false })
+	public isFederated: boolean;
+
+	@Index('IDX_channel_uri', { unique: true })
+	@Column('varchar', { length: 512, nullable: true })
+	public uri: string | null;
+
+	@Column('varchar', { length: 128, nullable: true })
+	public host: string | null;
+
+	@Column('text', { nullable: true, select: false })
+	public federationPrivateKey: string | null;
+
+	@Column('text', { nullable: true })
+	public federationPublicKey: string | null;
 }

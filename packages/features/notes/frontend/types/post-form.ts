@@ -13,6 +13,8 @@ export interface PostFormProps {
 		name: string;
 		color: string;
 		isSensitive: boolean;
+		isFederated?: boolean;
+		host?: string | null;
 		allowRenoteToExternal: boolean;
 		userId: string | null;
 	} | null;

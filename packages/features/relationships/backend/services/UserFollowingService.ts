@@ -28,6 +28,7 @@ import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { Config } from '@/config.js';
 import { AccountMoveService } from '@features/users/backend/services/AccountMoveService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
+import type { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import type { ThinUser } from '@features/runtime/backend/queue/types.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 
@@ -370,8 +371,17 @@ export class UserFollowingService implements OnModuleInit {
 		}
 	}
 
+	private async withChannelFollowRequestLock<T>(followee: { id: string; host: string | null; uri: string | null }, followerId: string, action: () => Promise<T>): Promise<T> {
+		if (followee.host == null || followee.uri == null || !/^\/channels\/[^/]+$/.test(new URL(followee.uri).pathname)) return await action();
+		return await this.moduleRef.get<ChannelFederationService>('ChannelFederationService', { strict: false }).withFollowRequestLock(followee, followerId, action);
+	}
+
 	@bindThis
-	public async unfollow(
+	public async unfollow(...args: Parameters<UserFollowingService['unfollowUnlocked']>): Promise<void> {
+		await this.withChannelFollowRequestLock(args[1], args[0].id, () => this.unfollowUnlocked(...args));
+	}
+
+	private async unfollowUnlocked(
 		follower: {
 			id: MiUser['id']; host: MiUser['host']; uri: MiUser['host']; inbox: MiUser['inbox']; sharedInbox: MiUser['sharedInbox'];
 		},
@@ -397,6 +407,9 @@ export class UserFollowingService implements OnModuleInit {
 		}
 
 		await this.followingsRepository.delete(following.id);
+		if (follower.host == null && followee.uri != null) {
+			await this.moduleRef.get<ChannelFederationService>('ChannelFederationService', { strict: false }).unfollowRemote(follower.id, followee.uri);
+		}
 
 		this.cacheService.userFollowingsCache.refresh(follower.id);
 
@@ -560,7 +573,11 @@ export class UserFollowingService implements OnModuleInit {
 	}
 
 	@bindThis
-	public async cancelFollowRequest(
+	public async cancelFollowRequest(...args: Parameters<UserFollowingService['cancelFollowRequestUnlocked']>): Promise<void> {
+		await this.withChannelFollowRequestLock(args[0], args[1].id, () => this.cancelFollowRequestUnlocked(...args));
+	}
+
+	private async cancelFollowRequestUnlocked(
 		followee: {
 			id: MiUser['id']; host: MiUser['host']; uri: MiUser['host']; inbox: MiUser['inbox']
 		},
@@ -596,7 +613,11 @@ export class UserFollowingService implements OnModuleInit {
 	}
 
 	@bindThis
-	public async acceptFollowRequest(
+	public async acceptFollowRequest(...args: Parameters<UserFollowingService['acceptFollowRequestUnlocked']>): Promise<void> {
+		await this.withChannelFollowRequestLock(args[0], args[1].id, () => this.acceptFollowRequestUnlocked(...args));
+	}
+
+	private async acceptFollowRequestUnlocked(
 		followee: {
 			id: MiUser['id']; host: MiUser['host']; uri: MiUser['host']; inbox: MiUser['inbox']; sharedInbox: MiUser['sharedInbox'];
 		},
@@ -618,6 +639,14 @@ export class UserFollowingService implements OnModuleInit {
 		}
 
 		this.userEntityService.packSelf(followee.id).then(packed => this.globalEventService.publishMainStream(followee.id, 'meUpdated', packed));
+	}
+
+	/** Channel UI cancellation chooses pending/accepted state while holding the same lock as Accept. */
+	public async cancelOrUnfollowChannel(follower: MiLocalUser, followee: MiUser): Promise<void> {
+		await this.withChannelFollowRequestLock(followee, follower.id, async () => {
+			if (await this.followRequestsRepository.existsBy({ followeeId: followee.id, followerId: follower.id })) await this.cancelFollowRequestUnlocked(followee, follower);
+			else await this.unfollowUnlocked(follower, followee);
+		});
 	}
 
 	@bindThis
@@ -750,6 +779,9 @@ export class UserFollowingService implements OnModuleInit {
 		if (!following || !following.followee || !following.follower) return;
 
 		await this.followingsRepository.delete(following.id);
+		if (follower.host == null && followee.uri != null) {
+			await this.moduleRef.get<ChannelFederationService>('ChannelFederationService', { strict: false }).unfollowRemote(follower.id, followee.uri);
+		}
 
 		this.decrementFollowing(following.follower, following.followee);
 	}
