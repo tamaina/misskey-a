@@ -4,6 +4,7 @@
  */
 import 'reflect-metadata';
 import { createHmac } from 'node:crypto';
+import { createRequire } from 'node:module';
 import { beforeEach, expect, it, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
@@ -12,6 +13,8 @@ import { ToolSchema } from '@modelcontextprotocol/sdk/types.js';
 import { McpEventsService } from '../../backend/McpEventsService.js';
 import { McpEventError, challengeMatches, signedHeaders, signingKey, subscriptionId } from '../../backend/events-protocol.js';
 import { subscribeInput } from '../../backend/api.definition.js';
+import { streamChannelInputSchema, streamNoteInputSchema } from '../../backend/stream-parameters.js';
+import { streamEventCatalog } from '../../backend/stream-catalog.js';
 import { modernRequest } from '../../backend/modern-request.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
@@ -218,4 +221,26 @@ it('advertises object input schemas for all six event definitions', async () => 
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
 	expect(result.events).toHaveLength(6);
 	for (const event of result.events) expect(ToolSchema.shape.inputSchema.safeParse(event.inputSchema).success, event.name).toBe(true);
+});
+
+it('keeps the stream catalog outside JSON Schema and preserves it through the native output contract', async () => {
+	// Use the existing SDK's pinned AJV dependency; add no test/package dependency.
+	const backendRequire = createRequire(`${process.cwd()}/package.json`);
+	const sdkRequire = createRequire(backendRequire.resolve('@modelcontextprotocol/sdk/validation/ajv-provider.js'));
+	const { default: Ajv2020 } = sdkRequire('ajv/dist/2020.js') as { default: new (options: { strict: boolean }) => { compile(schema: object): unknown } };
+	const result = await service.invoke('events/list', {}, context()) as { events: {
+		name: string; inputSchema: Record<string, unknown>; payloadSchema: Record<string, unknown>; _meta?: Record<string, unknown>;
+	}[] };
+	for (const event of result.events) {
+		const validator = new Ajv2020({ strict: true });
+		expect(() => validator.compile(event.inputSchema), event.name).not.toThrow();
+		expect(() => validator.compile(event.payloadSchema), event.name).not.toThrow();
+		if (event.name.startsWith('stream.')) {
+			const catalog = event.name === 'stream.channel' ? streamEventCatalog : event.name === 'stream.note' ? streamEventCatalog.note : streamEventCatalog.broadcast;
+			expect(event._meta).toEqual({ 'dev.a9z.p1/event-catalog': catalog });
+			expect(event.payloadSchema).not.toHaveProperty('x-misskey-event-catalog');
+		} else expect(event._meta).toBeUndefined();
+	}
+	expect(result.events.find(event => event.name === 'stream.channel')?.inputSchema).toEqual(streamChannelInputSchema);
+	expect(result.events.find(event => event.name === 'stream.note')?.inputSchema).toEqual(streamNoteInputSchema);
 });
