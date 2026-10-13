@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { aliasTwoFactorContract } from './2fa-api-aliases.contract.js';
 import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
 import * as v from 'valibot';
@@ -448,6 +449,15 @@ export const VerifyEmailContract = oc.$meta({
 	"code": v.string(),
 })).output(v.void());
 
+export const I2faTotpDoneContract = aliasTwoFactorContract(I2faDoneContract, 'i/2fa/totp/done');
+export const I2faTotpRegisterContract = aliasTwoFactorContract(I2faRegisterContract, 'i/2fa/totp/register');
+export const I2faTotpRemoveContract = aliasTwoFactorContract(I2faUnregisterContract, 'i/2fa/totp/remove');
+export const I2faPasskeyDoneContract = aliasTwoFactorContract(I2faKeyDoneContract, 'i/2fa/passkey/done');
+export const I2faPasskeyRegisterContract = aliasTwoFactorContract(I2faRegisterKeyContract, 'i/2fa/passkey/register');
+export const I2faPasskeyRemoveContract = aliasTwoFactorContract(I2faRemoveKeyContract, 'i/2fa/passkey/remove');
+export const I2faPasskeyUpdateContract = aliasTwoFactorContract(I2faUpdateKeyContract, 'i/2fa/passkey/update');
+export const I2faPasskeyPasswordLessContract = aliasTwoFactorContract(I2faPasswordLessContract, 'i/2fa/passkey/password-less');
+
 export const authContract = {
 	'admin/accounts/create': AdminAccountsCreateContract,
 	'admin/captcha/current': AdminCaptchaCurrentContract,
@@ -471,6 +481,14 @@ export const authContract = {
 	'i/2fa/remove-key': I2faRemoveKeyContract,
 	'i/2fa/unregister': I2faUnregisterContract,
 	'i/2fa/update-key': I2faUpdateKeyContract,
+	'i/2fa/totp/done': I2faTotpDoneContract,
+	'i/2fa/totp/register': I2faTotpRegisterContract,
+	'i/2fa/totp/remove': I2faTotpRemoveContract,
+	'i/2fa/passkey/done': I2faPasskeyDoneContract,
+	'i/2fa/passkey/register': I2faPasskeyRegisterContract,
+	'i/2fa/passkey/remove': I2faPasskeyRemoveContract,
+	'i/2fa/passkey/update': I2faPasskeyUpdateContract,
+	'i/2fa/passkey/password-less': I2faPasskeyPasswordLessContract,
 	'i/apps': IAppsContract,
 	'i/authorized-apps': IAuthorizedAppsContract,
 	'i/change-password': IChangePasswordContract,

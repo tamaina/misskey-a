@@ -16,6 +16,8 @@ import type {
 	PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/browser';
 
+import type { I2faRegisterKeyResponse } from './autogen/entities.js';
+
 export * from './autogen/entities.js';
 export * from './autogen/models.js';
 
@@ -188,6 +190,10 @@ export type I2faKeyDoneRequest = {
 	name: string;
 	credential: RegistrationResponseJSON;
 };
+
+// Canonical routes preserve the established browser WebAuthn request/response types.
+export type I2faPasskeyDoneRequest = I2faKeyDoneRequest;
+export type I2faPasskeyRegisterResponse = I2faRegisterKeyResponse;
 
 type Values<T extends Record<PropertyKey, unknown>> = T[keyof T];
 

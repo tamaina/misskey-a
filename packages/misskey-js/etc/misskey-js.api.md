@@ -9,6 +9,7 @@ import { ArraySchema } from 'valibot';
 import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import { BooleanSchema } from 'valibot';
 import { CheckAction } from 'valibot';
+import { ContractProcedure } from '@orpc/contract';
 import { ContractProcedureBuilderWithInputOutput } from '@orpc/contract';
 import type { ContractRouterClient } from '@orpc/contract';
 import { CustomIssue } from 'valibot';
@@ -1613,6 +1614,14 @@ export type Endpoints = Overwrite<ContractEndpoints, {
         req: I2faKeyDoneRequest;
         res: I2faKeyDoneResponse;
     };
+    'i/2fa/passkey/register': {
+        req: I2faRegisterKeyRequest;
+        res: I2faRegisterKeyResponse;
+    };
+    'i/2fa/passkey/done': {
+        req: I2faKeyDoneRequest;
+        res: I2faKeyDoneResponse;
+    };
     'admin/roles/create': {
         req: Overwrite<AdminRolesCreateRequest, {
             policies: PartialRolePolicyOverride;
@@ -1656,6 +1665,8 @@ declare namespace entities {
         SigninWithPasskeyInitResponse,
         SigninWithPasskeyResponse,
         I2faKeyDoneRequest,
+        I2faPasskeyDoneRequest,
+        I2faPasskeyRegisterResponse,
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
@@ -2378,6 +2389,18 @@ declare namespace entities {
         UsersGalleryPostsResponse,
         DriveFilesCreateRequest,
         DriveFilesCreateResponse,
+        I2faTotpDoneRequest,
+        I2faTotpDoneResponse,
+        I2faTotpRegisterRequest,
+        I2faTotpRegisterResponse,
+        I2faTotpRemoveRequest,
+        I2faPasskeyDoneResponse,
+        I2faPasskeyRegisterRequest,
+        I2faPasskeyRemoveRequest,
+        I2faPasskeyRemoveResponse,
+        I2faPasskeyUpdateRequest,
+        I2faPasskeyUpdateResponse,
+        I2faPasskeyPasswordLessRequest,
         UserLite,
         UserDetailedNotMeOnly,
         MeDetailedOnly,
@@ -3484,7 +3507,8 @@ declare namespace entities {
         OrpcDefinition1034,
         OrpcDefinition1035,
         OrpcDefinition1036,
-        OrpcDefinition1037
+        OrpcDefinition1037,
+        OrpcDefinition1038
     }
 }
 export { entities }
@@ -3789,6 +3813,33 @@ type I2faKeyDoneRequest = {
 type I2faKeyDoneResponse = ContractResponse<'i/2fa/key-done'>;
 
 // @public (undocumented)
+type I2faPasskeyDoneRequest = I2faKeyDoneRequest;
+
+// @public (undocumented)
+type I2faPasskeyDoneResponse = ContractResponse<'i/2fa/passkey/done'>;
+
+// @public (undocumented)
+type I2faPasskeyPasswordLessRequest = ContractRequest<'i/2fa/passkey/password-less'>;
+
+// @public (undocumented)
+type I2faPasskeyRegisterRequest = ContractRequest<'i/2fa/passkey/register'>;
+
+// @public (undocumented)
+type I2faPasskeyRegisterResponse = I2faRegisterKeyResponse;
+
+// @public (undocumented)
+type I2faPasskeyRemoveRequest = ContractRequest<'i/2fa/passkey/remove'>;
+
+// @public (undocumented)
+type I2faPasskeyRemoveResponse = ContractResponse<'i/2fa/passkey/remove'>;
+
+// @public (undocumented)
+type I2faPasskeyUpdateRequest = ContractRequest<'i/2fa/passkey/update'>;
+
+// @public (undocumented)
+type I2faPasskeyUpdateResponse = ContractResponse<'i/2fa/passkey/update'>;
+
+// @public (undocumented)
 type I2faPasswordLessRequest = ContractRequest<'i/2fa/password-less'>;
 
 // @public (undocumented)
@@ -3808,6 +3859,21 @@ type I2faRemoveKeyRequest = ContractRequest<'i/2fa/remove-key'>;
 
 // @public (undocumented)
 type I2faRemoveKeyResponse = ContractResponse<'i/2fa/remove-key'>;
+
+// @public (undocumented)
+type I2faTotpDoneRequest = ContractRequest<'i/2fa/totp/done'>;
+
+// @public (undocumented)
+type I2faTotpDoneResponse = ContractResponse<'i/2fa/totp/done'>;
+
+// @public (undocumented)
+type I2faTotpRegisterRequest = ContractRequest<'i/2fa/totp/register'>;
+
+// @public (undocumented)
+type I2faTotpRegisterResponse = ContractResponse<'i/2fa/totp/register'>;
+
+// @public (undocumented)
+type I2faTotpRemoveRequest = ContractRequest<'i/2fa/totp/remove'>;
 
 // @public (undocumented)
 type I2faUnregisterRequest = ContractRequest<'i/2fa/unregister'>;
@@ -4563,6 +4629,9 @@ type OrpcDefinition1036 = ContractModel<'OrpcDefinition1036'>;
 
 // @public (undocumented)
 type OrpcDefinition1037 = ContractModel<'OrpcDefinition1037'>;
+
+// @public (undocumented)
+type OrpcDefinition1038 = ContractModel<'OrpcDefinition1038'>;
 
 // @public (undocumented)
 type OrpcDefinition104 = ContractModel<'OrpcDefinition104'>;

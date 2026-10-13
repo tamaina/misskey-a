@@ -19,6 +19,7 @@ import {
 	MiAntenna,
 	MiApp,
 	MiAuthSession,
+	MiBrowserSession,
 	MiAvatarDecoration,
 	MiBlocking,
 	MiBubbleGameRecord,
@@ -132,6 +133,7 @@ const originalMappings = [
 	['abuseUserReportsRepository', DI.abuseUserReportsRepository, MiAbuseUserReport],
 	['abuseReportNotificationRecipientRepository', DI.abuseReportNotificationRecipientRepository, MiAbuseReportNotificationRecipient],
 	['registrationTicketsRepository', DI.registrationTicketsRepository, MiRegistrationTicket],
+	['browserSessionsRepository', DI.browserSessionsRepository, MiBrowserSession],
 	['authSessionsRepository', DI.authSessionsRepository, MiAuthSession],
 	['accessTokensRepository', DI.accessTokensRepository, MiAccessToken],
 	['signinsRepository', DI.signinsRepository, MiSignin],
@@ -194,7 +196,7 @@ describe('repository factory', () => {
 		const { db, calls } = makeDataSource();
 		const repositories = createRepositorySet(db);
 
-		expect(originalMappings).toHaveLength(76);
+		expect(originalMappings).toHaveLength(77);
 		expect(Object.keys(repositoryFactories)).toEqual(originalMappings.map(([name]) => name));
 		expect(calls).toHaveLength(originalMappings.length);
 		expect(calls.map(call => call.entity)).toEqual(originalMappings.map(([, , entity]) => entity));
