@@ -3,7 +3,7 @@ name: Test (frontend)
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/frontend/**
@@ -15,7 +15,7 @@ on:
       - .github/misskey/test.yml
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/frontend/**
       # for permissions

@@ -3,7 +3,7 @@ name: Test (backend)
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/backend/**
@@ -15,7 +15,7 @@ on:
       - .github/misskey/test.yml
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/backend/**
       - packages/features/auth/**
