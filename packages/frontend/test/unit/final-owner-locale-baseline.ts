@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
 import { parse } from 'vue/compiler-sfc';
 import metadata from './final-owner-locale-baseline.json';
 import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
@@ -74,7 +75,7 @@ export function restoreFinalOwnerHistoricalSource(file: string, source: string):
 		return pieces.join('');
 	};
 	try {
-		source = restorePasswordChangeBaseline(file, source);
+		source = restorePasswordChangeBaseline(file, restoreClientErrorLogBaseline(file, source));
 	} catch {
 		throw new Error(`Final owner changed original component body: ${file}`);
 	}

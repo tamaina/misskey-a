@@ -3,7 +3,7 @@ name: Check the description in CHANGELOG.md
 on:
   pull_request:
     branches:
-      - master
+      - main
       - develop
 
 jobs:
