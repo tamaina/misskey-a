@@ -142590,7 +142590,13 @@ export interface operations {
                         /** @constant */
                         finished: false;
                         /** @enum {string} */
-                        next: 'captcha' | 'password' | 'totp';
+                        next: 'captcha' | 'password';
+                    } | {
+                        /** @constant */
+                        finished: false;
+                        /** @constant */
+                        next: 'totp';
+                        availableFactors?: ('totp' | 'passkey')[];
                     } | {
                         /** @constant */
                         finished: false;
@@ -142616,6 +142622,7 @@ export interface operations {
                                 minPinLength?: boolean;
                             };
                         };
+                        availableFactors?: ('totp' | 'passkey')[];
                     }) | {
                         error: {
                             id?: string;

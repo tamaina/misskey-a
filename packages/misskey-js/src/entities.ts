@@ -158,11 +158,16 @@ export type SigninFlowResponse = {
 	i: string;
 } | {
 	finished: false;
-	next: 'captcha' | 'password' | 'totp';
+	next: 'captcha' | 'password';
+} | {
+	finished: false;
+	next: 'totp';
+	availableFactors?: ('totp' | 'passkey')[];
 } | {
 	finished: false;
 	next: 'passkey';
 	authRequest: PublicKeyCredentialRequestOptionsJSON;
+	availableFactors?: ('totp' | 'passkey')[];
 };
 
 export type SigninWithPasskeyRequest = {
