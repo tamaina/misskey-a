@@ -4,8 +4,11 @@
  */
 
 import { EventEmitter } from 'node:events';
+import { readFileSync } from 'node:fs';
+import { dirname, relative, resolve } from 'node:path';
+import { load } from 'js-yaml';
 import { afterEach, expect, test, vi } from 'vitest';
-import { waitForChannelReady } from '../../../../backend/test-federation/channel-ready.js';
+import { waitForChannelReady } from '../../../../backend/test-federation/test/channel-ready.js';
 
 function harness() {
 	const stream = new EventEmitter();
@@ -71,4 +74,17 @@ test('listeners and timeout are installed before even a synchronous acknowledgem
 	expect(stream.listenerCount('connected')).toBe(0);
 	expect(stream.listenerCount('_disconnected_')).toBe(0);
 	expect(vi.getTimerCount()).toBe(0);
+});
+
+test('real federation tester bind includes the shared readiness helper', () => {
+	const composePath = resolve(process.cwd(), 'test-federation/compose.yml');
+	const compose = load(readFileSync(composePath, 'utf8')) as { services: { tester: { volumes: { type: string; source: string; target: string; read_only: boolean }[] } } };
+	const bind = compose.services.tester.volumes.find(volume => volume.type === 'bind' && volume.target === '/misskey/packages/backend/test-federation/test');
+	expect(bind).toBeDefined();
+	if (!bind) throw new Error('Missing federation tester source bind');
+	const mountedSource = resolve(dirname(composePath), bind.source);
+	const helperPath = resolve(dirname(composePath), 'test/channel-ready.ts');
+	expect(relative(mountedSource, helperPath)).toBe('channel-ready.ts');
+	expect(readFileSync(helperPath, 'utf8')).toContain('export function waitForChannelReady');
+	expect(bind.read_only).toBe(true);
 });

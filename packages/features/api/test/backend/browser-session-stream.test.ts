@@ -7,7 +7,7 @@ import { EventEmitter } from 'node:events';
 import { expect, it, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { Connection } from '../../backend/transport/stream/Connection.js';
-import { waitForChannelReady } from '../../../../backend/test-federation/channel-ready.js';
+import { waitForChannelReady } from '../../../../backend/test-federation/test/channel-ready.js';
 import type { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { BrowserSessionService } from '@features/auth/backend/services/BrowserSessionService.js';
 import type { StreamEventEmitter } from '@features/runtime/backend/services/GlobalEventService.js';
