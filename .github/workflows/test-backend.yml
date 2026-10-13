@@ -197,8 +197,8 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Run migrations
-        run: MISSKEY_CONFIG_YML=test.yml pnpm --filter backend migrate
+        run: |
+          NODE_ENV=production MISSKEY_CONFIG_YML=test.yml node packages/backend/scripts/compile_config.js
+          NODE_ENV=production MISSKEY_CONFIG_YML=test.yml MISSKEY_AUTH_UPGRADE_FIXTURE=1 node packages/features/auth/test/backend/browser-session-upgrade-fixture.mjs
       - name: Check no migrations are remaining
         run: MISSKEY_CONFIG_YML=test.yml pnpm --filter backend check-migrations
-      - name: Check browser-session migration round trip on empty CI fixture
-        run: MISSKEY_CONFIG_YML=test.yml node packages/features/auth/test/backend/browser-session-migration.mjs

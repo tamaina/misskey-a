@@ -1,0 +1,63 @@
+name: Validate auth-only candidate
+
+on:
+  push:
+    branches:
+      - integration/p1-auth-only-*
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 512MiB
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          submodules: true
+      - uses: pnpm/action-setup@v6.0.10
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - name: Install frozen dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build every package serially
+        run: |
+          pnpm build-pre
+          pnpm -r --workspace-concurrency=1 build
+          pnpm build-assets
+      - name: Check every package's types serially
+        run: pnpm -r --workspace-concurrency=1 --if-present typecheck
+      - name: Run all frontend units with one worker
+        run: pnpm --filter frontend exec vitest run --config vitest.config.unit.ts --globals --maxWorkers=1 --maxConcurrency=1
+      - name: Start owned disposable PostgreSQL after build and types
+        run: |
+          docker run --detach --rm --name p1-auth-upgrade-${GITHUB_RUN_ID} --label codex.fixture=p1-auth-upgrade --memory=512m --cpus=1 --publish 127.0.0.1:54312:5432 --env POSTGRES_DB=test-misskey --env POSTGRES_HOST_AUTH_METHOD=trust postgres:18
+          for attempt in $(seq 1 30); do
+            docker exec p1-auth-upgrade-${GITHUB_RUN_ID} pg_isready --quiet --username postgres --dbname test-misskey && break
+            sleep 1
+          done
+          docker exec p1-auth-upgrade-${GITHUB_RUN_ID} pg_isready --quiet --username postgres --dbname test-misskey
+      - name: Verify up-only migration and legacy compatibility
+        run: |
+          mkdir -p .config
+          cp .github/misskey/test.yml .config/test.yml
+          NODE_ENV=production MISSKEY_CONFIG_YML=test.yml node packages/backend/scripts/compile_config.js
+          NODE_ENV=production MISSKEY_CONFIG_YML=test.yml MISSKEY_AUTH_UPGRADE_FIXTURE=1 node packages/features/auth/test/backend/browser-session-upgrade-fixture.mjs
+      - name: Verify source and dependency integrity
+        run: |
+          git diff --exit-code
+          node scripts/check-spdx.mjs --check
+      - name: Stop only the owned disposable container
+        if: always()
+        run: |
+          if docker inspect --format '{{ index .Config.Labels "codex.fixture" }}' p1-auth-upgrade-${GITHUB_RUN_ID} 2>/dev/null | grep -qx p1-auth-upgrade; then
+            docker rm --force p1-auth-upgrade-${GITHUB_RUN_ID}
+          fi
