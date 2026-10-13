@@ -203,6 +203,23 @@ test.each(jwksCases)('rejects non-public or oversized JWKS %s', async (_name, cr
 	await expect(f.exchange(provider, metadata, pending, code, secret)).rejects.toThrow();
 });
 
+test('accepts a real RSA key explicitly permitted to verify', async () => {
+	const f = fixture([{}, { json: { keys: [{ ...publicKey, key_ops: ['verify'] }] } }]);
+	expect(await f.exchange(provider, metadata, pending, code, secret)).toEqual({ issuer, subject: 'synthetic-subject' });
+});
+
+test.each([
+	['sign-only', ['sign']], ['encrypt-only', ['encrypt']], ['empty', []],
+	['non-array', 'verify'], ['null', null], ['non-string', ['verify', 1]],
+	['unknown', ['verify', 'unknown']], ['duplicate', ['verify', 'verify']],
+	['oversized array', Array.from({ length: 9 }, () => 'verify')],
+	['oversized operation', ['verify', 'x'.repeat(17)]],
+])('rejects restricted or malformed real RSA key_ops: %s', async (_name, operations) => {
+	const f = fixture([{}, { json: { keys: [{ ...publicKey, key_ops: operations }] } }]);
+	await expect(f.exchange(provider, metadata, pending, code, secret)).rejects.toThrow('OIDC token exchange failed');
+	expect(f.http.map(call => call.url.href)).toEqual([metadata.token_endpoint, metadata.jwks_uri]);
+});
+
 test('rejects a non-Bearer token response before JWKS fetch', async () => {
 	const f = fixture([{ json: { id_token: token, access_token: 'synthetic', token_type: 'Other' } }]);
 	await expect(f.exchange(provider, metadata, pending, code, secret)).rejects.toThrow();

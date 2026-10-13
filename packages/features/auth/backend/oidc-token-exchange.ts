@@ -35,6 +35,18 @@ function publicKeys(value: unknown): JSONWebKeySet {
 	for (const value of keys) {
 		const key = record(value);
 		if (['k', 'd', 'p', 'q', 'dp', 'dq', 'qi', 'oth'].some(field => key[field] !== undefined)) throw new Error('Private JWKS');
+		let operations: string[] | undefined;
+		if (key.key_ops !== undefined) {
+			if (!Array.isArray(key.key_ops) || key.key_ops.length > 8) throw new Error('Invalid key operations');
+			operations = [];
+			for (const operation of key.key_ops) {
+				bounded(operation, 16);
+				if (!['sign', 'verify', 'encrypt', 'decrypt', 'wrapKey', 'unwrapKey', 'deriveKey', 'deriveBits'].includes(operation) ||
+					operations.includes(operation)) throw new Error('Invalid key operation');
+				operations.push(operation);
+			}
+			if (!operations.includes('verify')) continue;
+		}
 		if (key.kty !== 'RSA' || (key.use !== undefined && key.use !== 'sig') || (key.alg !== undefined && key.alg !== 'RS256')) continue;
 		bounded(key.n, 2048); bounded(key.e, 12);
 		if (!/^[A-Za-z0-9_-]+$/.test(key.n) || !/^[A-Za-z0-9_-]+$/.test(key.e)) throw new Error('Invalid RSA fields');
@@ -42,7 +54,7 @@ function publicKeys(value: unknown): JSONWebKeySet {
 		const exponent = Buffer.from(key.e, 'base64url');
 		if (modulus.length < 256 || modulus.length > 1024 || !modulus[0] || exponent.length < 1 || exponent.length > 8 || !exponent[0]) throw new Error('Invalid RSA size');
 		if (key.kid !== undefined) bounded(key.kid, 256);
-		rsa.push({ kty: 'RSA', n: key.n, e: key.e, alg: 'RS256', use: 'sig', ...(typeof key.kid === 'string' ? { kid: key.kid } : {}) });
+		rsa.push({ kty: 'RSA', n: key.n, e: key.e, alg: 'RS256', use: 'sig', ...(operations ? { key_ops: operations } : {}), ...(typeof key.kid === 'string' ? { kid: key.kid } : {}) });
 	}
 	if (!rsa.length) throw new Error('No trusted RSA key');
 	return { keys: rsa };
