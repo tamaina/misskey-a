@@ -7,6 +7,7 @@ import { createApiProcedure } from '@features/api/backend/transport/api-procedur
 import bcrypt from 'bcryptjs';
 import type { UsersRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { generateNativeUserToken } from '../../utility/token.js';
+import { UserAuthService } from '../../services/UserAuthService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 
 import { IRegenerateTokenContract } from '../../api.definition.js';
@@ -20,6 +21,7 @@ export const meta = {
 export interface IRegenerateTokenDependencies {
 	usersRepository: UsersRepository;
 	userProfilesRepository: UserProfilesRepository;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
 	globalEventService: Pick<GlobalEventService, 'publishInternalEvent' | 'publishMainStream'>;
 }
 export function createIRegenerateTokenProcedure(deps: IRegenerateTokenDependencies) {
@@ -31,6 +33,18 @@ export function createIRegenerateTokenProcedure(deps: IRegenerateTokenDependenci
 			const oldToken = freshUser.token!;
 
 			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
+
+			if (profile.twoFactorEnabled) {
+				if (ps.token == null) {
+					throw new Error('authentication failed');
+				}
+
+				try {
+					await deps.userAuthService.twoFactorAuthenticate(profile, ps.token);
+				} catch (_) {
+					throw new Error('authentication failed');
+				}
+			}
 
 			// Compare password
 			const same = await bcrypt.compare(ps.password, profile.password!);
