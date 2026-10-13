@@ -32,9 +32,12 @@ import { fetchCustomEmojis } from '@features/emojis/frontend/custom-emojis.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { launchPlugins } from '@features/integrations/frontend/plugin.js';
+import { initClientErrorLog, attachClientErrorLog } from '@features/runtime/frontend/error-log.js';
 import { initTelemetry } from '@features/statistics/frontend/telemetry.js';
 
 export async function common(createVue: () => Promise<App<Element>>, internationalization: InternationalizationInstance) {
+	initClientErrorLog();
+
 	console.info(`Misskey v${version}`);
 
 	if (_DEV_) {
@@ -291,6 +294,7 @@ export async function common(createVue: () => Promise<App<Element>>, internation
 	})();
 
 	await initTelemetry(instance, app);
+	attachClientErrorLog(app);
 
 	try {
 		await launchPlugins();

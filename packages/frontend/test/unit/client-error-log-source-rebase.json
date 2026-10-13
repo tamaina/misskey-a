@@ -1,0 +1,233 @@
+[
+	{
+		"file": "packages/features/boot/frontend/boot/common.ts",
+		"currentSha256": "b1d42ba20fb2c0888748ab1050b501c0a165c3ec6925c84895ff2252717ea3c3",
+		"baselineSha256": "60572f31118e34f5d3d7aabba08708a171f2f1da3073fa10c8c603e3b15054f9",
+		"edits": [
+			{
+				"start": 2292,
+				"end": 2392,
+				"current": "import { initClientErrorLog, attachClientErrorLog } from '@features/runtime/frontend/error-log.js';\n",
+				"baseline": ""
+			},
+			{
+				"start": 2592,
+				"end": 2616,
+				"current": "\tinitClientErrorLog();\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 9540,
+				"end": 9568,
+				"current": "\tattachClientErrorLog(app);\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/preferences/frontend/pages/settings/other.vue",
+		"currentSha256": "c33cead4e28dd093b4d49771c92cc264d4627c816ea0b27c1f468c6b180bfb96",
+		"baselineSha256": "5a8c1e9c60358024ac8820181a4e9aa2639c950f2cfee9a6b4598345b148e342",
+		"edits": [
+			{
+				"start": 4133,
+				"end": 4447,
+				"current": "\t\t\t<SearchMarker :keywords=\"['client', 'error', 'log']\">\n\t\t\t\t<MkFolder>\n\t\t\t\t\t<template #icon><SearchIcon><i class=\"ti ti-bug\"></i></SearchIcon></template>\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.clientErrorLogTitle }}</SearchLabel></template>\n\t\t\t\t\t<MkClientErrorLog/>\n\t\t\t\t</MkFolder>\n\t\t\t</SearchMarker>\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 5738,
+				"end": 5786,
+				"current": "import MkClientErrorLog from './error-log.vue';\n",
+				"baseline": ""
+			},
+			{
+				"start": 9833,
+				"end": 9923,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 11216,
+				"end": 11326,
+				"current": "\t\"forceBackup\": \"Còpia de seguretat forçada de la configuració \",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Còpia de seguretat forçada de la configuració \"\n"
+			},
+			{
+				"start": 12495,
+				"end": 12585,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 13754,
+				"end": 13844,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 15158,
+				"end": 15258,
+				"current": "\t\"forceBackup\": \"Erzwungenes Backup der Einstellungen\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Erzwungenes Backup der Einstellungen\"\n"
+			},
+			{
+				"start": 16427,
+				"end": 16517,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 17769,
+				"end": 17882,
+				"current": "\t\"forceBackup\": \"Forzar una copia de seguridad de la configuración\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Forzar una copia de seguridad de la configuración\"\n"
+			},
+			{
+				"start": 19150,
+				"end": 19240,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 20471,
+				"end": 20561,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 21751,
+				"end": 21848,
+				"current": "\t\"forceBackup\": \"Backup forzato delle impostazioni\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Backup forzato delle impostazioni\"\n"
+			},
+			{
+				"start": 22647,
+				"end": 22716,
+				"current": "\t\"forceBackup\": \"設定の強制バックアップ\",\n\t\"clientErrorLogTitle\": \"クライアントエラーログ\"\n",
+				"baseline": "\t\"forceBackup\": \"設定の強制バックアップ\"\n"
+			},
+			{
+				"start": 23510,
+				"end": 23585,
+				"current": "\t\"forceBackup\": \"設定の強制バックアップ\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"設定の強制バックアップ\"\n"
+			},
+			{
+				"start": 24760,
+				"end": 24850,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 26019,
+				"end": 26109,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 26898,
+				"end": 26970,
+				"current": "\t\"forceBackup\": \"설정 강제 백업\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"설정 강제 백업\"\n"
+			},
+			{
+				"start": 28227,
+				"end": 28317,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 29485,
+				"end": 29575,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 30781,
+				"end": 30871,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 32097,
+				"end": 32187,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 33346,
+				"end": 33436,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 34539,
+				"end": 34629,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 35744,
+				"end": 35829,
+				"current": "\t\"forceBackup\": \"บังคับสำรองการตั้งค่า\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"บังคับสำรองการตั้งค่า\"\n"
+			},
+			{
+				"start": 37029,
+				"end": 37123,
+				"current": "\t\"forceBackup\": \"Ayarların zorunlu yedeklenmesi\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Ayarların zorunlu yedeklenmesi\"\n"
+			},
+			{
+				"start": 38292,
+				"end": 38382,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 39583,
+				"end": 39692,
+				"current": "\t\"forceBackup\": \"Примусово створити резервну копію налаштувань\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Примусово створити резервну копію налаштувань\"\n"
+			},
+			{
+				"start": 40890,
+				"end": 40980,
+				"current": "\t\"forceBackup\": \"Force a backup of settings\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"Force a backup of settings\"\n"
+			},
+			{
+				"start": 41686,
+				"end": 41756,
+				"current": "\t\"forceBackup\": \"强制备份设置\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"强制备份设置\"\n"
+			},
+			{
+				"start": 42453,
+				"end": 42523,
+				"current": "\t\"forceBackup\": \"強制備份設定\",\n\t\"clientErrorLogTitle\": \"Client error logs\"\n",
+				"baseline": "\t\"forceBackup\": \"強制備份設定\"\n"
+			}
+		]
+	},
+	{
+		"file": "packages/features/ui/frontend/components/MkFolder.vue",
+		"currentSha256": "a73b822aa6dc3f4a28ba45f81a93d4d1712441d16f71945c164f2658121609f3",
+		"baselineSha256": "50a3ce2640fcad0c04a2049eff0b6d1f54a1b9d48ae0f6ccf383e28e66ed9550",
+		"edits": [
+			{
+				"start": 5958,
+				"end": 6013,
+				"current": "\tconst themeValue = themeManager.currentCompiledTheme;\n",
+				"baseline": "\tconst themeValue = themeManager.currentCompiledTheme!;\n"
+			},
+			{
+				"start": 6089,
+				"end": 6179,
+				"current": "\tconst myBg = themeValue?.panel;\n\tbgSame.value = myBg !== undefined && parentBg === myBg;\n",
+				"baseline": "\tconst myBg = themeValue.panel;\n\tbgSame.value = parentBg === myBg;\n"
+			}
+		]
+	}
+]
