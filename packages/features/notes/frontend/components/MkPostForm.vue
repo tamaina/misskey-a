@@ -699,7 +699,7 @@ function showOtherSettings() {
 			toggleReactionAcceptance();
 		},
 	}, { type: 'divider' }, ...(postAccount.value == null ? [{
-		type: 'button',
+		type: 'button' as const,
 		text: $locale.value.sfc.draftsSaveToDraft,
 		icon: 'ti ti-cloud-upload',
 		action: async () => {
@@ -1392,20 +1392,20 @@ async function openAccountMenu(ev: PointerEvent) {
 	});
 
 	os.popupMenu([...(postAccount.value == null ? [{
-		type: 'button',
+		type: 'button' as const,
 		text: $locale.value.sfc.draftsListDrafts,
 		icon: 'ti ti-cloud-download',
 		action: () => {
 			showDraftsDialog(false);
 		},
 	}, {
-		type: 'button',
+		type: 'button' as const,
 		text: $locale.value.sfc.draftsListScheduledNotes,
 		icon: 'ti ti-clock-down',
 		action: () => {
 			showDraftsDialog(true);
 		},
-	}, { type: 'divider' }] : []), ...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
+	}, { type: 'divider' as const }] : []), ...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);
 }
 
 function showPerUploadItemMenu(item: UploaderItem, ev: PointerEvent) {

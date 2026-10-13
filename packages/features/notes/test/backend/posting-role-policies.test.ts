@@ -9,7 +9,7 @@ import { createProcedureClient } from '@orpc/server';
 import { NoteCreateService } from '../../backend/services/NoteCreateService.js';
 import { RoleService, DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 import type { RolePolicies } from '@features/roles/backend/services/RoleService.js';
-import type { MiRole } from '@features/roles/backend/models/Role.js';
+import { MiRole } from '@features/roles/backend/models/Role.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '../../backend/models/Note.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
@@ -91,15 +91,15 @@ test('role priority, assign/remove and attachment clamp use the real aggregator'
 	const roles: MiRole[] = []; const service = Object.create(RoleService.prototype) as RoleService;
 	setFixture(service, { meta: { policies: {} }, config: { maxFileSize: 32 * 1024 * 1024 }, getUserRoles: vi.fn(async () => roles) });
 	expect((await service.getUserPolicies(user.id, true)).canNote).toBe(true);
-	roles.push(mockDeep<MiRole>({ policies: { canNote: { priority: 1, useDefault: false, value: false }, renotePolicy: { priority: 1, useDefault: false, value: 'disallow' }, noteFilesLimit: { priority: 1, useDefault: false, value: -10 } } }));
+	roles.push(Object.assign(new MiRole(), { policies: { canNote: { priority: 1, useDefault: false, value: false }, renotePolicy: { priority: 1, useDefault: false, value: 'disallow' }, noteFilesLimit: { priority: 1, useDefault: false, value: -10 } } }));
 	expect(await service.getUserPolicies(user.id, true)).toMatchObject({ canNote: false, renotePolicy: 'disallow', noteFilesLimit: 0 });
-	roles.push(mockDeep<MiRole>({ policies: { canNote: { priority: 2, useDefault: false, value: true }, renotePolicy: { priority: 1, useDefault: false, value: 'renoteOnly' }, noteFilesLimit: { priority: 1, useDefault: false, value: 99 } } }));
+	roles.push(Object.assign(new MiRole(), { policies: { canNote: { priority: 2, useDefault: false, value: true }, renotePolicy: { priority: 1, useDefault: false, value: 'renoteOnly' }, noteFilesLimit: { priority: 1, useDefault: false, value: 99 } } }));
 	expect(await service.getUserPolicies(user.id, true)).toMatchObject({ canNote: true, renotePolicy: 'renoteOnly', noteFilesLimit: 16 });
 	roles.splice(0); expect(await service.getUserPolicies(user.id, true)).toMatchObject({ canNote: true, renotePolicy: 'allow', noteFilesLimit: 16 });
 });
 test('all five fields survive /i projection and strict output schema', () => {
 	const me = mock<MeDetailedWireInput>();
-	Object.assign(me, { policies: { ...DEFAULT_POLICIES, canNote: false, renotePolicy: 'renoteOnly', canCreateSpecifiedNote: false, canFederateNote: false, noteFilesLimit: 0 }, pinnedPage: null, roles: [], fields: [], verifiedLinks: [], avatarDecorations: [], pinnedNoteIds: [], pinnedNotes: [], alsoKnownAs: [], unreadAnnouncements: [], mutedWords: [], hardMutedWords: [], mutedInstances: [], mutingNotificationTypes: [], notificationRecieveConfig: {}, emailNotificationTypes: [], securityKeysList: [] });
+	Object.assign(me, { policies: { ...DEFAULT_POLICIES, canNote: false, renotePolicy: 'renoteOnly', canCreateSpecifiedNote: false, canFederateNote: false, noteFilesLimit: 0 }, emojis: {}, achievements: [], pinnedPage: null, badgeRoles: [], roles: [], fields: [], verifiedLinks: [], avatarDecorations: [], pinnedNoteIds: [], pinnedNotes: [], alsoKnownAs: [], unreadAnnouncements: [], mutedWords: [], hardMutedWords: [], mutedInstances: [], mutingNotificationTypes: [], notificationRecieveConfig: {}, emailNotificationTypes: [], securityKeysList: [] });
 	const policies = toPackedUserDetailed(me).policies;
 	expect(policies).toMatchObject({ canNote: false, renotePolicy: 'renoteOnly', canCreateSpecifiedNote: false, canFederateNote: false, noteFilesLimit: 0 }); for (const schema of [packedRolePoliciesSchema, notificationRolePoliciesSchema, metaRolePoliciesSchema]) expect(v.safeParse(schema, policies).success).toBe(true);
 	for (const noteFilesLimit of [-1, 17, 0.5]) expect(v.safeParse(packedRolePoliciesSchema, { ...policies, noteFilesLimit }).success).toBe(false);
@@ -133,4 +133,30 @@ test.each([[0.5, 0], [16.9, 16], [-1, 0], [Infinity, 0], [NaN, 0], ['bad', 0], [
 		expect(policies.noteFilesLimit).toBe(expected);
 		for (const schema of [packedRolePoliciesSchema, notificationRolePoliciesSchema, metaRolePoliciesSchema]) expect(v.safeParse(schema, policies).success).toBe(true);
 	}
+});
+
+test('actual role assign/unassign changes fresh posting policies even with stale assignment cache', async () => {
+	const role = Object.assign(new MiRole(), { id: 'postingrole1', target: 'manual', isPublic: false, policies: { canNote: { priority: 1, useDefault: false, value: false } } });
+	type Assignment = { id: string; roleId: string; userId: string; expiresAt: Date | null };
+	const assignments: Assignment[] = [];
+	const service = Object.create(RoleService.prototype) as RoleService;
+	setFixture(service, {
+		meta: { policies: {} }, config: { maxFileSize: 32 * 1024 * 1024 },
+		rolesRepository: { findBy: async () => [role], findOneByOrFail: async () => role, update: async () => {} },
+		roleAssignmentsRepository: {
+			findBy: async () => [...assignments],
+			findOneBy: async ({ roleId, userId }: { roleId: string; userId: string }) => assignments.find(row => row.roleId === roleId && row.userId === userId) ?? null,
+			insertOne: async (row: Assignment) => { assignments.push(row); return row; },
+			delete: async (id: string) => { const index = assignments.findIndex(row => row.id === id); if (index >= 0) assignments.splice(index, 1); },
+		},
+		rolesCache: { fetch: async () => [role] }, roleAssignmentByUserIdCache: { fetch: async () => [] },
+		idService: { gen: () => 'assignment1' }, globalEventService: { publishInternalEvent: vi.fn() },
+		usersRepository: { findOneByOrFail: async () => user },
+	});
+	expect((await service.getUserPolicies(user.id)).canNote).toBe(true);
+	await service.assign(user.id, role.id);
+	expect((await service.getUserPolicies(user.id)).canNote).toBe(true);
+	expect((await service.getUserPolicies(user.id, true)).canNote).toBe(false);
+	await service.unassign(user.id, role.id);
+	expect((await service.getUserPolicies(user.id, true)).canNote).toBe(true);
 });

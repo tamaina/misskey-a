@@ -89,7 +89,7 @@
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkPostForm.vue",
-		"currentSha256": "8df62bab4840d72c4b69f0fca6e8f4891e4b7b17305615eafc8e8568f74aaa9d",
+		"currentSha256": "cc7848ef3ff88711785b2ee0225fc07df2dd39e87611127dde2cef852209e6bc",
 		"baselineSha256": "2dc2f5b18e7cc5f75809749d20da7250c8bfd9438146924b5441d7e638527a94",
 		"edits": [
 			{
@@ -148,91 +148,97 @@
 			},
 			{
 				"start": 29168,
-				"end": 29228,
-				"current": "\t}, { type: 'divider' }, ...(postAccount.value == null ? [{\n",
-				"baseline": "\t}, { type: 'divider' }, {\n"
+				"end": 29255,
+				"current": "\t}, { type: 'divider' }, ...(postAccount.value == null ? [{\n\t\ttype: 'button' as const,\n",
+				"baseline": "\t}, { type: 'divider' }, {\n\t\ttype: 'button',\n"
 			},
 			{
-				"start": 29519,
-				"end": 29617,
+				"start": 29528,
+				"end": 29626,
 				"current": "\t}] : []), ...(postAccount.value == null && postAccountPolicies.value.scheduledNoteLimit > 0 ? [{\n",
 				"baseline": "\t}, ...($i.policies.scheduledNoteLimit > 0 ? [{\n"
 			},
 			{
-				"start": 32506,
-				"end": 32647,
+				"start": 32515,
+				"end": 32656,
 				"current": "\tif (!renoteTargetNote.value && !quoteId.value && paste.startsWith(url + '/notes/') && postAccountPolicies.value.renotePolicy === 'allow') {\n",
 				"baseline": "\tif (!renoteTargetNote.value && !quoteId.value && paste.startsWith(url + '/notes/')) {\n"
 			},
 			{
-				"start": 36099,
-				"end": 36139,
+				"start": 36108,
+				"end": 36148,
 				"current": "\tif (postAccount.value != null) return;\n",
 				"baseline": ""
 			},
 			{
-				"start": 36971,
-				"end": 37356,
+				"start": 36980,
+				"end": 37365,
 				"current": "\t}, undefined, (err) => {\n\t\treturn {\n\t\t\ttitle: options.isActuallyScheduled ? PostingPolicyMessages.$locale.noteDraftErrors.scheduleTitle : PostingPolicyMessages.$locale.noteDraftErrors.draftTitle,\n\t\t\ttext: getErrorDescription(err.id) ?? (PostingPolicyMessages.$locale.noteCreateErrors.genericDescription + (err.message ? `\\n${err.message}` : '') + (err.id ? `\\n${err.id}` : '')),\n\t\t};\n",
 				"baseline": ""
 			},
 			{
-				"start": 37830,
-				"end": 37859,
+				"start": 37839,
+				"end": 37868,
 				"current": "\tif (!canPost.value) return;\n",
 				"baseline": ""
 			},
 			{
-				"start": 38448,
-				"end": 38478,
+				"start": 38457,
+				"end": 38487,
 				"current": "\t\tif (!canPost.value) return;\n",
 				"baseline": ""
 			},
 			{
-				"start": 41609,
-				"end": 41855,
+				"start": 41618,
+				"end": 41864,
 				"current": "\t// ファイルアップロードにより条件が変わる可能性があるため、再度canPostを確認する\n\tif (!canPost.value) {\n\t\tawait os.alert({\n\t\t\ttype: 'error',\n\t\t\ttitle: PostingPolicyMessages.$locale.cannotPostTitle,\n\t\t\ttext: PostingPolicyMessages.$locale.cannotPostDescription,\n\t\t});\n\t\treturn;\n\t}\n\n",
 				"baseline": ""
 			},
 			{
-				"start": 44069,
-				"end": 44323,
+				"start": 44078,
+				"end": 44332,
 				"current": "\t\t\ttitle: PostingPolicyMessages.$locale.noteCreateErrors.genericTitle,\n\t\t\ttext: getErrorDescription(err.id) ?? (PostingPolicyMessages.$locale.noteCreateErrors.genericDescription + (err.message ? `\\n${err.message}` : '') + (err.id ? `\\n${err.id}` : '')),\n",
 				"baseline": "\t\t\ttext: err.message + '\\n' + (err as any).id,\n"
 			},
 			{
-				"start": 46969,
-				"end": 46969,
+				"start": 46978,
+				"end": 46978,
 				"current": "",
 				"baseline": "const postAccount = ref<Misskey.entities.UserDetailed | null>(null);\n\n"
 			},
 			{
-				"start": 47095,
-				"end": 47136,
+				"start": 47104,
+				"end": 47145,
 				"current": "\t\tif (postAccount.value != null) return;\n",
 				"baseline": ""
 			},
 			{
-				"start": 49199,
-				"end": 49249,
-				"current": "\tos.popupMenu([...(postAccount.value == null ? [{\n",
-				"baseline": "\tos.popupMenu([{\n"
+				"start": 49208,
+				"end": 49285,
+				"current": "\tos.popupMenu([...(postAccount.value == null ? [{\n\t\ttype: 'button' as const,\n",
+				"baseline": "\tos.popupMenu([{\n\t\ttype: 'button',\n"
 			},
 			{
-				"start": 49548,
-				"end": 49665,
-				"current": "\t}, { type: 'divider' }] : []), ...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);\n",
+				"start": 49418,
+				"end": 49445,
+				"current": "\t\ttype: 'button' as const,\n",
+				"baseline": "\t\ttype: 'button',\n"
+			},
+			{
+				"start": 49575,
+				"end": 49701,
+				"current": "\t}, { type: 'divider' as const }] : []), ...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);\n",
 				"baseline": "\t}, { type: 'divider' }, ...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);\n"
 			},
 			{
-				"start": 50013,
-				"end": 50106,
+				"start": 50049,
+				"end": 50142,
 				"current": "\tif (postAccount.value != null || postAccountPolicies.value.scheduledNoteLimit <= 0) return;\n",
 				"baseline": ""
 			},
 			{
-				"start": 51666,
-				"end": 54333,
+				"start": 51702,
+				"end": 54369,
 				"current": "}\n\nfunction getErrorDescription(errId: string): string | null {\n\tswitch (errId) {\n\t\t// Note create errors\n\t\tcase 'f35c0bd4-9dca-4998-ae4b-fa0e7c54d16a':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.rolePolicyDeniedDescription;\n\t\tcase 'b5c90186-4ab0-49c8-9bba-a1f76c282ba4':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.noSuchRenoteTargetDescription;\n\t\tcase '749ee0f6-d3da-459a-bf02-282e2da4292c':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.noSuchReplyTargetDescription;\n\t\tcase 'b98980fa-3780-406c-a935-b6d0eeee10d1':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.cannotReplyToInvisibleNoteDescription;\n\t\tcase 'ed940410-535c-4d5e-bfa3-af798671e93c':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.cannotReplyToSpecifiedVisibilityNoteWithExtendedVisibilityDescription;\n\t\tcase '04da457d-b083-4055-9082-955525eda5a5':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.cannotCreateAlreadyExpiredPollDescription;\n\t\tcase 'b1653923-5453-4edc-b786-7c4f39bb0bbb':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.noSuchChannelDescription;\n\t\tcase 'b390d7e1-8a5e-46ed-b625-06271cafd3d3':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.youHaveBeenBlockedDescription;\n\t\tcase 'b6992544-63e7-67f0-fa7f-32444b1b5306':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.noSuchFileDescription;\n\t\tcase 'aa6e01d3-a85c-669d-758a-76aab43af334':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.containsProhibitedWordsDescription;\n\t\tcase '4de0363a-3046-481b-9b0f-feff3e211025':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.containsTooManyMentionsDescription;\n\t\tcase '8d28ca32-a244-4cf7-bc29-97895fdc3604':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.tooManyFilesDescription;\n\t\tcase 'ae77a039-588a-40c3-8358-cc9c15ec7bbb':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.quoteForbiddenDescription;\n\t\tcase 'fe35a6b4-f595-4cbc-ab56-f31fa68be1f0':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.directNoteCreationForbiddenDescription;\n\t\tcase 'dd9e27c6-7cba-4587-92c7-672c82d9cc46':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.remoteDirectNoteCreationForbiddenDescription;\n\n\t\t// Draft errors\n\t\tcase '9ee33bbe-fde3-4c71-9b51-e50492c6b9c8':\n\t\t\treturn PostingPolicyMessages.$locale.noteDraftErrors.tooManyDraftsDescription;\n\t\tcase '22ae69eb-09e3-4541-a850-773cfa45e693':\n\t\t\treturn PostingPolicyMessages.$locale.noteDraftErrors.tooManyScheduledNotesDescription;\n\t\tcase 'e4bed6c9-017e-4934-aed0-01c22cc60ec1':\n\t\t\treturn PostingPolicyMessages.$locale.noteDraftErrors.scheduleMustBeInFutureDescription;\n\n\t\t// Fallback\n\t\tdefault:\n\t\t\treturn null;\n\t}\n",
 				"baseline": ""
 			}
