@@ -783,18 +783,6 @@ type BillingOrdersListRequest = ContractRequest<'billing/orders/list'>;
 type BillingOrdersListResponse = ContractResponse<'billing/orders/list'>;
 
 // @public (undocumented)
-type BillingTransfersDetectRequest = ContractRequest<'billing/transfers/detect'>;
-
-// @public (undocumented)
-type BillingTransfersDetectResponse = ContractResponse<'billing/transfers/detect'>;
-
-// @public (undocumented)
-type BillingTransfersListRequest = ContractRequest<'billing/transfers/list'>;
-
-// @public (undocumented)
-type BillingTransfersListResponse = ContractResponse<'billing/transfers/list'>;
-
-// @public (undocumented)
 type Blocking = ContractModel<'Blocking'>;
 
 // @public (undocumented)
@@ -1767,10 +1755,6 @@ declare namespace entities {
         BillingOrdersCheckResponse,
         BillingOrdersListRequest,
         BillingOrdersListResponse,
-        BillingTransfersDetectRequest,
-        BillingTransfersDetectResponse,
-        BillingTransfersListRequest,
-        BillingTransfersListResponse,
         AdminWalletsChainsListRequest,
         AdminWalletsChainsListResponse,
         AdminWalletsChainsUpsertRequest,

@@ -13,10 +13,6 @@ import type {
 	BillingOrdersCheckResponse,
 	BillingOrdersListRequest,
 	BillingOrdersListResponse,
-	BillingTransfersDetectRequest,
-	BillingTransfersDetectResponse,
-	BillingTransfersListRequest,
-	BillingTransfersListResponse,
 	AdminWalletsChainsListRequest,
 	AdminWalletsChainsListResponse,
 	AdminWalletsChainsUpsertRequest,
@@ -770,8 +766,6 @@ export type Endpoints = {
 	'billing/orders/create': { req: BillingOrdersCreateRequest; res: BillingOrdersCreateResponse };
 	'billing/orders/check': { req: BillingOrdersCheckRequest; res: BillingOrdersCheckResponse };
 	'billing/orders/list': { req: BillingOrdersListRequest; res: BillingOrdersListResponse };
-	'billing/transfers/detect': { req: BillingTransfersDetectRequest; res: BillingTransfersDetectResponse };
-	'billing/transfers/list': { req: BillingTransfersListRequest; res: BillingTransfersListResponse };
 	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
 	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };

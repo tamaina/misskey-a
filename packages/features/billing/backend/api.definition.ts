@@ -108,9 +108,9 @@ export const walletContract = {
 // Fixed-term service purchases, not automatic debits or a balance ledger.
 const units = v.pipe(v.string(), v.regex(/^[1-9][0-9]{0,77}$/), v.check(value => /^[1-9][0-9]{0,77}$/.test(value) && BigInt(value) < 2n ** 256n));
 const transactionHash = v.pipe(v.string(), v.regex(/^0x[0-9a-fA-F]{64}$/));
-const logIndex = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(Number.MAX_SAFE_INTEGER));
 export const serviceOffer = v.strictObject({
 	id: v.pipe(id, v.maxLength(32)), serviceKey: text, name: text, chainId,
+	roleId: v.exactOptional(v.nullable(v.pipe(id, v.maxLength(32)))),
 	contractAddress: address, recipientAddress: address, tokenSymbol: text,
 	decimals: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(255)),
 	amountBaseUnits: units,
@@ -127,12 +127,6 @@ export const serviceOrder = v.strictObject({
 	paidAt: v.nullable(timestamp), startsAt: v.nullable(timestamp), endsAt: v.nullable(timestamp),
 });
 export type ServiceOrder = v.InferOutput<typeof serviceOrder>;
-export const detectedTransfer = v.strictObject({
-	id, chainId, txHash: transactionHash, logIndex, contractAddress: address,
-	fromAddress: address, toAddress: address, amountBaseUnits: units,
-	senderUserId: v.nullable(id), recipientUserId: v.nullable(id), observedAt: timestamp,
-});
-export type DetectedTransfer = v.InferOutput<typeof detectedTransfer>;
 const serviceProcedure = oc.errors({ ...commonErrors,
 	BILLING_NOT_FOUND: { status: 404, data: apiErrorData },
 	BILLING_UNAVAILABLE: { status: 400, data: apiErrorData },
@@ -149,6 +143,4 @@ export const serviceBillingContract = {
 	createOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/create' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/create' }).input(v.strictObject({ offerId: id, walletId: id, requestKey: text, quotedOffer: serviceOffer })).output(serviceOrder),
 	checkOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/check' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/check' }).input(v.strictObject({ orderId: id, txHash: v.exactOptional(transactionHash) })).output(serviceOrder),
 	listOrders: serviceProcedure.$meta({ ...read, requestName: 'billing/orders/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/list' }).input(empty).output(v.array(serviceOrder)),
-	detectTransfer: serviceProcedure.$meta({ ...write, requestName: 'billing/transfers/detect' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/transfers/detect' }).input(v.strictObject({ offerId: id, txHash: transactionHash, logIndex })).output(v.strictObject({ status: v.picklist(['pending', 'confirmed']), transfer: v.nullable(detectedTransfer) })),
-	listTransfers: serviceProcedure.$meta({ ...read, requestName: 'billing/transfers/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/transfers/list' }).input(empty).output(v.array(detectedTransfer)),
 };

@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { createRouterClient } from '@orpc/server';
-import { createServiceBillingStore, createServiceBillingRouter } from '../../../backend/built/features/billing/backend.js';
+import { createServiceBillingStore, createServiceBillingRouter, activePaidRoleIds } from '../../../backend/built/features/billing/backend.js';
 import { BillingServiceSubscriptions1791838800000 as Migration } from '../../../backend/migration/1791838800000-BillingServiceSubscriptions.js';
 import { BillingWalletRegistration1791760200000 as WalletMigration } from '../../../backend/migration/1791760200000-BillingWalletRegistration.js';
 const require = createRequire(new URL('../../../backend/package.json', import.meta.url));
@@ -19,7 +19,7 @@ const address = n => `0x${n.toString(16).padStart(40, '0')}`;
 const hash = n => `0x${n.toString(16).padStart(64, '0')}`;
 const offer = { id: 'offer', serviceKey: 'synthetic-service', name: 'Synthetic term', chainId: 123456, contractAddress: address(3), recipientAddress: address(9), tokenSymbol: 'TEST', decimals: 6, amountBaseUnits: '7', duration: 1, durationUnit: 'months', confirmationsRequired: 3, isEnabled: true };
 
-test('synthetic PostgreSQL subscriptions and participant-only transfer capture', { skip: !url }, async t => {
+test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url }, async t => {
 	assert.ok(['127.0.0.1', 'localhost', '[::1]'].includes(new URL(url).hostname));
 	const schema = `billing_service_test_${randomUUID().replaceAll('-', '')}`;
 	const db = new DataSource({ type: 'postgres', url, schema, extra: { options: `-c search_path=${schema}`, application_name: 'misskey-billing-service-synthetic' }, entities: (await import('../../../backend/built/postgres.js')).entities });
@@ -33,9 +33,11 @@ test('synthetic PostgreSQL subscriptions and participant-only transfer capture',
 		await qr.query('INSERT INTO "user" ("id") VALUES (\'alice\'), (\'bob\'), (\'carol\')');
 		const migration = new Migration(); await migration.up(qr); await migration.down(qr); await migration.up(qr);
 		await new WalletMigration().up(qr);
-		const pending = (await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_service_(offer|order)"|"billing_detected_transfer"/.test(row.query));
+		const pending = (await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_service_(offer|order)"/.test(row.query));
 		assert.deepEqual(pending, [], 'Migration and entity DDL agree');
 		await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES (\'alice-wallet\',\'alice\',123456,$1,NULL,$3,$3),(\'bob-wallet\',\'bob\',123456,$2,NULL,$3,$3)', [address(1), address(2), now]);
+		await qr.query('CREATE TABLE role (id varchar(32) PRIMARY KEY, target varchar(16), "isAdministrator" boolean, "isModerator" boolean)');
+		await qr.query("INSERT INTO role VALUES ('normal','manual',false,false),('admin','manual',true,false),('auto','conditional',false,false)");
 		await store.saveOffer(offer, 'alice');
 		await t.test('concurrent idempotent creation, input conflict and immutable offer snapshot', async () => {
 			const rows = await Promise.all([store.createOrder('alice', offer.id, 'alice-wallet', 'retry-key', offer), store.createOrder('alice', offer.id, 'alice-wallet', 'retry-key', offer)]);
@@ -103,15 +105,12 @@ test('synthetic PostgreSQL subscriptions and participant-only transfer capture',
 			await qr.query('DROP TRIGGER fail_service_term ON billing_service_order');
 			assert.equal((await store.applyReceipt('alice', a.id, hash(7), proof(ar))).status, 'paid');
 		});
-		await t.test('native account creates quoted term and checks synthetic receipt, then detects its transfer', async () => {
+		await t.test('native account creates quoted term and checks synthetic receipt', async () => {
 			const readReceipt = async (chainId, txHash) => ({ status: 'confirmed', evidence: { chainId, txHash, timestamp: now, transfers: [{ logIndex: 2, contractAddress: offer.contractAddress, fromAddress: address(2), toAddress: txHash === hash(10) ? offer.recipientAddress : address(1), amountBaseUnits: '7' }] } });
 			const client = createRouterClient(createServiceBillingRouter({ store, readReceipt, rpcUrl: async () => 'https://rpc.example.test' }), { context: { credential: 'synthetic', headers: {}, ip: '127.0.0.1', services: { authenticate: async () => [{ id: 'bob', isSuspended: false, movedToUri: null }, { permission: ['read:account', 'write:account'] }], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } } });
 			const order = await client.createOrder({ offerId: offer.id, walletId: 'bob-wallet', requestKey: 'native-term', quotedOffer: offer });
 			assert.equal((await client.checkOrder({ orderId: order.id, txHash: hash(10) })).status, 'paid');
 			assert.equal((await client.checkOrder({ orderId: order.id })).status, 'paid');
-			const detected = await client.detectTransfer({ offerId: offer.id, txHash: hash(11), logIndex: 2 });
-			assert.equal(detected.status, 'confirmed'); assert.equal(detected.transfer.senderUserId, 'bob'); assert.equal(detected.transfer.recipientUserId, 'alice');
-			await assert.rejects(client.detectTransfer({ offerId: offer.id, txHash: hash(11), logIndex: 3 }), error => error.code === 'BILLING_TRANSACTION_INVALID');
 		});
 		await t.test('nonmatching or pending submissions do not exclude a matching confirmed claim', async () => {
 			const client = (userId, readReceipt) => createRouterClient(createServiceBillingRouter({ store, readReceipt, rpcUrl: async () => 'https://rpc.example.test' }), { context: { credential: 'synthetic', headers: {}, ip: '127.0.0.1', services: { authenticate: async () => [{ id: userId, isSuspended: false, movedToUri: null }, { permission: ['read:account', 'write:account'] }], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } } });
@@ -157,18 +156,27 @@ test('synthetic PostgreSQL subscriptions and participant-only transfer capture',
 				assert.equal((await store.applyReceipt('alice', a.id, hash(24), proof(hint))).endsAt, paid.endsAt);
 			} finally { now -= 1800001; }
 		});
-		await t.test('transfer event is participant-only, idempotent and cannot be reassigned after unlink', async () => {
-			const log = { logIndex: 2, contractAddress: address(3), fromAddress: address(1), toAddress: address(2), amountBaseUnits: '7' };
-			await assert.rejects(store.recordTransfer('carol', offer.chainId, hash(8), log, now), error => error.code === 'BILLING_NOT_FOUND');
-			await assert.rejects(store.recordTransfer('alice', offer.chainId, hash(9), log, now - 2001));
-			const rows = await Promise.all([store.recordTransfer('alice', offer.chainId, hash(8), log, now), store.recordTransfer('bob', offer.chainId, hash(8), log, now)]);
-			assert.equal(rows[0].id, rows[1].id); assert.equal((await store.listTransfers('carol')).length, 0);
-			await qr.query('UPDATE billing_wallet SET "userId" = \'carol\' WHERE id = \'alice-wallet\'');
-			await assert.rejects(store.recordTransfer('carol', offer.chainId, hash(8), log, now));
-			assert.equal((await store.recordTransfer('alice', offer.chainId, hash(8), log, now)).id, rows[0].id);
-			await qr.query('DELETE FROM "user" WHERE id = \'alice\'');
-			assert.equal((await store.listTransfers('bob')).find(row => row.txHash === hash(8)).senderUserId, null);
-			assert.equal((await qr.query('SELECT count(*)::int AS count FROM billing_service_order WHERE "txHash" = $1 AND status = \'paid\'', [hash(1)]))[0].count, 1, 'Evidence claim survives account deletion');
+		await t.test('paid roles start and expire exactly, reject elevated mappings', async () => {
+			const mapped = { ...offer, id: 'role-offer', serviceKey: 'role-service', roleId: 'normal' };
+			await assert.rejects(store.saveOffer({ ...mapped, roleId: 'admin' }, 'alice'), error => error.code === 'BILLING_UNAVAILABLE');
+			await assert.rejects(store.saveOffer({ ...mapped, roleId: 'auto' }, 'alice'), error => error.code === 'BILLING_UNAVAILABLE');
+			await store.saveOffer(mapped, 'alice');
+			const order = await store.createOrder('bob', mapped.id, 'bob-wallet', 'role-term', mapped);
+			const hinted = await store.submitTransaction('bob', order.id, hash(71));
+			assert.deepEqual(await activePaidRoleIds(db, 'bob', now), []);
+			const paid = await store.applyReceipt('bob', order.id, hash(71), proof(hinted));
+			assert.deepEqual(await activePaidRoleIds(db, 'bob', paid.startsAt - 1), []);
+			assert.deepEqual(await activePaidRoleIds(db, 'bob', paid.startsAt), ['normal']);
+			assert.deepEqual(await activePaidRoleIds(db, 'bob', paid.endsAt), []);
+			assert.deepEqual(await activePaidRoleIds(db, 'alice', paid.startsAt), []);
+			await qr.query(`UPDATE role SET "isModerator" = true WHERE id = 'normal'`);
+			assert.deepEqual(await activePaidRoleIds(db, 'bob', paid.startsAt), [], 'Later role edits cannot make payment confer moderation');
+			await qr.query(`UPDATE role SET "isModerator" = false WHERE id = 'normal'`);
+			assert.equal((await store.applyReceipt('bob', order.id, hash(71), proof(hinted))).endsAt, paid.endsAt);
+		});
+		await t.test('paid evidence remains claimed after account deletion', async () => {
+			await qr.query("DELETE FROM \"user\" WHERE id = 'alice'");
+			assert.equal((await qr.query(`SELECT count(*)::int AS count FROM billing_service_order WHERE "txHash" = $1 AND status = 'paid'`, [hash(1)]))[0].count, 1);
 		});
 	} finally { await qr.query(`DROP SCHEMA "${schema}" CASCADE`); await qr.release(); await db.destroy(); }
 });

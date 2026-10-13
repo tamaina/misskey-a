@@ -18,12 +18,10 @@ const client: ServiceAccountClient = {
 	createOrder: input => misskeyApi('billing/orders/create', input),
 	checkOrder: input => misskeyApi('billing/orders/check', input),
 	listOrders: input => misskeyApi('billing/orders/list', input),
-	detectTransfer: input => misskeyApi('billing/transfers/detect', input),
-	listTransfers: input => misskeyApi('billing/transfers/list', input),
 };
 const listWallets = () => misskeyApi('account/wallets/list', {});
 definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-receipt' }));
 </script>
 <locale lang="json" locale="ja-JP">
-{"title":"サービス契約・送金の確認"}
+{"title":"サービス契約の確認"}
 </locale>

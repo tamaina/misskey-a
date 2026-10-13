@@ -80,7 +80,6 @@ import { MiFlash } from '@features/play/backend/models/Flash.js';
 import { MiFlashLike } from '@features/play/backend/models/FlashLike.js';
 import { MiBillingServiceOffer } from '@features/billing/backend/models/BillingServiceOffer.js';
 import { MiBillingServiceOrder } from '@features/billing/backend/models/BillingServiceOrder.js';
-import { MiBillingDetectedTransfer } from '@features/billing/backend/models/BillingDetectedTransfer.js';
 import { MiBillingWalletChain } from '@features/billing/backend/models/BillingWalletChain.js';
 import { MiBillingWallet } from '@features/billing/backend/models/BillingWallet.js';
 import { MiBillingWalletChallenge } from '@features/billing/backend/models/BillingWalletChallenge.js';
@@ -256,7 +255,6 @@ export const entities = [
 	MiUserMemo,
 	MiBillingServiceOffer,
 	MiBillingServiceOrder,
-	MiBillingDetectedTransfer,
 	MiBillingWalletChain,
 	MiBillingWallet,
 	MiBillingWalletChallenge,

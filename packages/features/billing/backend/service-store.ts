@@ -9,11 +9,12 @@ import { MiUser } from '@features/users/backend/models/User.js';
 import { MiBillingWallet } from './models/BillingWallet.js';
 import { MiBillingServiceOffer } from './models/BillingServiceOffer.js';
 import { MiBillingServiceOrder } from './models/BillingServiceOrder.js';
-import { MiBillingDetectedTransfer } from './models/BillingDetectedTransfer.js';
-import { addServiceDuration, matchesOrder } from './service-receipt.js';
+import { MiRole } from '@features/roles/backend/models/Role.js';
+import { matchesOrder } from './service-receipt.js';
+import { calculatePaymentQuote } from '../shared/payment-quote.js';
 import type { ServiceOffer } from './api.definition.js';
-import type { ReceiptResult, TransferEvidence } from './service-receipt.js';
-import type { DataSource } from 'typeorm';
+import type { ReceiptResult } from './service-receipt.js';
+import type { DataSource, EntityManager } from 'typeorm';
 
 function sameOffer(left: ServiceOffer, right: ServiceOffer): boolean { return Object.entries(left).every(([key, value]) => right[key as keyof ServiceOffer] === value); }
 
@@ -23,17 +24,24 @@ function conflict(): never { throw new ORPCError('BILLING_CONFLICT'); }
 
 function duplicateClaim(error: unknown): boolean { return typeof error === 'object' && error !== null && 'code' in error && error.code === '23505' && 'constraint' in error && error.constraint === 'billing_service_order_transaction_key'; }
 
+/** Payment can never confer administrative, moderation or conditional roles. */
+async function requirePurchasableRole(manager: EntityManager, roleId?: string | null) {
+	if (!roleId) return;
+	const role = await manager.getRepository(MiRole).createQueryBuilder('role').select(['role.id', 'role.target', 'role.isAdministrator', 'role.isModerator']).where('role.id = :roleId', { roleId }).setLock('pessimistic_read').getOne();
+	if (!role || role.target !== 'manual' || role.isAdministrator || role.isModerator) unavailable();
+}
+
 /** Only matching confirmed receipts acquire a global claim, atomically with their term. */
 export function createServiceBillingStore(db: DataSource, id: (now: number) => string, now = Date.now) {
 	const offers = db.getRepository(MiBillingServiceOffer);
 	const orders = db.getRepository(MiBillingServiceOrder);
-	const transfers = db.getRepository(MiBillingDetectedTransfer);
 	return {
 		async listOffers() { return (await offers.find({ order: { id: 'ASC' }, take: 100 })).map(row => row.terms); },
 		async saveOffer(terms: ServiceOffer, actorId: string) {
 			await db.transaction(async manager => {
 				await manager.query('LOCK TABLE billing_service_offer IN SHARE ROW EXCLUSIVE MODE');
 				if (!await manager.existsBy(MiBillingServiceOffer, { id: terms.id }) && await manager.count(MiBillingServiceOffer) >= 100) unavailable();
+				await requirePurchasableRole(manager, terms.roleId);
 				await manager.upsert(MiBillingServiceOffer, { id: terms.id, terms, updatedAt: new Date(now()), updatedByUserId: actorId }, ['id']);
 			});
 			return terms;
@@ -92,41 +100,23 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 					const latest = await manager.getRepository(MiBillingServiceOrder).createQueryBuilder('term')
 						.where('term."userId" = :userId AND term.status = :status AND term.offer->>\'serviceKey\' = :key', { userId, status: 'paid', key: row.offer.serviceKey })
 						.orderBy('term.endsAt', 'DESC').getOne();
-					row.paidAt = now(); row.startsAt = Math.max(row.paidAt, latest?.endsAt ?? 0);
-					row.endsAt = addServiceDuration(row.startsAt, row.offer.duration, row.offer.durationUnit);
+					await requirePurchasableRole(manager, row.offer.roleId);
+					row.paidAt = now();
+					// The representative slice uses the source kernel's initial/same-plan branches.
+					// Different plan ranks, discounts and assignment trimming remain unimplemented.
+					const quote = calculatePaymentQuote({ quoteCreatedAt: row.paidAt, quoteTtlMs: 30 * 60 * 1000,
+						targetPlanId: row.offer.serviceKey, targetPlanSortOrder: 0,
+						targetPlanPrice: { amountBaseUnits: row.offer.amountBaseUnits, durationDays: row.offer.duration, durationUnit: row.offer.durationUnit },
+						currentPlan: latest?.endsAt && latest.endsAt > row.paidAt ? { id: row.offer.serviceKey, name: latest.offer.name, sortOrder: 0,
+							startsAt: latest.startsAt ?? undefined, expiresAt: latest.endsAt,
+							price: { amountBaseUnits: latest.offer.amountBaseUnits, durationDays: latest.offer.duration, durationUnit: latest.offer.durationUnit } } : null });
+					row.startsAt = quote.effectiveStartsAt; row.endsAt = quote.effectiveExpiresAt;
 					if (!Number.isSafeInteger(row.endsAt) || row.endsAt <= row.startsAt) unavailable();
 					row.status = 'paid';
 					await manager.update(MiBillingServiceOrder, row.id, { status: row.status, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
 					return row;
 				});
 			} catch (error) { if (duplicateClaim(error)) conflict(); throw error; }
-		},
-		async listTransfers(userId: string) {
-			return transfers.find({ where: [{ senderUserId: userId }, { recipientUserId: userId }], order: { id: 'DESC' }, take: 100 });
-		},
-		async recordTransfer(userId: string, chainId: number, txHash: string, log: TransferEvidence, timestamp: number) {
-			return db.transaction(async manager => {
-				// Participant IDs are pinned on first observation, including after unlink/deletion.
-				const identity = { chainId, txHash, logIndex: log.logIndex };
-				const existing = await manager.findOneBy(MiBillingDetectedTransfer, identity);
-				if (existing) {
-					if (existing.senderUserId !== userId && existing.recipientUserId !== userId) throw new ORPCError('BILLING_NOT_FOUND');
-					return existing;
-				}
-				const wallets = await manager.getRepository(MiBillingWallet).createQueryBuilder('wallet')
-					.where('wallet."chainId" = :chainId AND wallet.address IN (:...addresses)', { chainId, addresses: [log.fromAddress, log.toAddress] })
-					.setLock('pessimistic_read').getMany();
-				const sender = wallets.find(wallet => wallet.address === log.fromAddress);
-				const recipient = wallets.find(wallet => wallet.address === log.toAddress);
-				if (!sender || !recipient || sender.userId === recipient.userId || timestamp + 2000 < Math.max(sender.createdAt, recipient.createdAt) || timestamp > now() + 2000 || (sender.userId !== userId && recipient.userId !== userId)) throw new ORPCError('BILLING_NOT_FOUND');
-				const observedAt = now();
-				const row = manager.create(MiBillingDetectedTransfer, { id: id(observedAt), ...identity, ...log, senderUserId: sender.userId, recipientUserId: recipient.userId, observedAt });
-				// Concurrency-safe: an event can never be remapped to newly linked accounts.
-				await manager.createQueryBuilder().insert().into(MiBillingDetectedTransfer).values(row).orIgnore().execute();
-				const recorded = await manager.findOneByOrFail(MiBillingDetectedTransfer, identity);
-				if (recorded.senderUserId !== userId && recorded.recipientUserId !== userId) throw new ORPCError('BILLING_NOT_FOUND');
-				return recorded;
-			});
 		},
 	};
 }

@@ -21,12 +21,6 @@ export type paths = {
     '/billing/orders/list': {
         post: operations['billing___orders___list'];
     };
-    '/billing/transfers/detect': {
-        post: operations['billing___transfers___detect'];
-    };
-    '/billing/transfers/list': {
-        post: operations['billing___transfers___list'];
-    };
     '/admin/wallets/chains/list': {
         post: operations['admin___wallets___chains___list'];
     };
@@ -38494,6 +38488,7 @@ export interface operations {
                         serviceKey: string;
                         name: string;
                         chainId: number;
+                        roleId?: string | null;
                         contractAddress: string;
                         recipientAddress: string;
                         tokenSymbol: string;
@@ -38734,6 +38729,7 @@ export interface operations {
                     serviceKey: string;
                     name: string;
                     chainId: number;
+                    roleId?: string | null;
                     contractAddress: string;
                     recipientAddress: string;
                     tokenSymbol: string;
@@ -38759,6 +38755,7 @@ export interface operations {
                         serviceKey: string;
                         name: string;
                         chainId: number;
+                        roleId?: string | null;
                         contractAddress: string;
                         recipientAddress: string;
                         tokenSymbol: string;
@@ -39009,6 +39006,7 @@ export interface operations {
                         serviceKey: string;
                         name: string;
                         chainId: number;
+                        roleId?: string | null;
                         contractAddress: string;
                         recipientAddress: string;
                         tokenSymbol: string;
@@ -39253,6 +39251,7 @@ export interface operations {
                         serviceKey: string;
                         name: string;
                         chainId: number;
+                        roleId?: string | null;
                         contractAddress: string;
                         recipientAddress: string;
                         tokenSymbol: string;
@@ -39281,6 +39280,7 @@ export interface operations {
                             serviceKey: string;
                             name: string;
                             chainId: number;
+                            roleId?: string | null;
                             contractAddress: string;
                             recipientAddress: string;
                             tokenSymbol: string;
@@ -39546,6 +39546,7 @@ export interface operations {
                             serviceKey: string;
                             name: string;
                             chainId: number;
+                            roleId?: string | null;
                             contractAddress: string;
                             recipientAddress: string;
                             tokenSymbol: string;
@@ -39808,6 +39809,7 @@ export interface operations {
                             serviceKey: string;
                             name: string;
                             chainId: number;
+                            roleId?: string | null;
                             contractAddress: string;
                             recipientAddress: string;
                             tokenSymbol: string;
@@ -39828,508 +39830,6 @@ export interface operations {
                         paidAt: number | null;
                         startsAt: number | null;
                         endsAt: number | null;
-                    }[];
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'ACCESS_DENIED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'INVALID_PARAM';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'BILLING_UNAVAILABLE';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'BILLING_TRANSACTION_INVALID';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 401 */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'AUTHENTICATION_FAILED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'CREDENTIAL_REQUIRED';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 403 */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'ROLE_PERMISSION_DENIED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'YOUR_ACCOUNT_SUSPENDED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'YOUR_ACCOUNT_MOVED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'PERMISSION_DENIED';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 404 */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'BILLING_NOT_FOUND';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 409 */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'BILLING_CONFLICT';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 429 */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'RATE_LIMIT_EXCEEDED';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 500 */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'INTERNAL_ERROR';
-                            message: string;
-                        };
-                    };
-                };
-            };
-        };
-    };
-    billing___transfers___detect: {
-        requestBody: {
-            content: {
-                'application/json': {
-                    offerId: string;
-                    txHash: string;
-                    logIndex: number;
-                };
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        /** @enum {string} */
-                        status: 'pending' | 'confirmed';
-                        transfer: {
-                            id: string;
-                            chainId: number;
-                            txHash: string;
-                            logIndex: number;
-                            contractAddress: string;
-                            fromAddress: string;
-                            toAddress: string;
-                            amountBaseUnits: string;
-                            senderUserId: string | null;
-                            recipientUserId: string | null;
-                            observedAt: number;
-                        } | null;
-                    };
-                };
-            };
-            /** @description 400 */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'ACCESS_DENIED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'INVALID_PARAM';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'BILLING_UNAVAILABLE';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'BILLING_TRANSACTION_INVALID';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 401 */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'AUTHENTICATION_FAILED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'CREDENTIAL_REQUIRED';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 403 */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'ROLE_PERMISSION_DENIED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'YOUR_ACCOUNT_SUSPENDED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'YOUR_ACCOUNT_MOVED';
-                            message: string;
-                        } | {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'PERMISSION_DENIED';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 404 */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'BILLING_NOT_FOUND';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 409 */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'BILLING_CONFLICT';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 429 */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'RATE_LIMIT_EXCEEDED';
-                            message: string;
-                        };
-                    };
-                };
-            };
-            /** @description 500 */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        error: {
-                            id: string;
-                            /** @enum {string} */
-                            kind: 'client' | 'permission' | 'server';
-                            info?: {
-                                [key: string]: unknown;
-                            };
-                            /** @constant */
-                            code: 'INTERNAL_ERROR';
-                            message: string;
-                        };
-                    };
-                };
-            };
-        };
-    };
-    billing___transfers___list: {
-        requestBody: {
-            content: {
-                'application/json': Record<string, never> & unknown;
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    'application/json': {
-                        id: string;
-                        chainId: number;
-                        txHash: string;
-                        logIndex: number;
-                        contractAddress: string;
-                        fromAddress: string;
-                        toAddress: string;
-                        amountBaseUnits: string;
-                        senderUserId: string | null;
-                        recipientUserId: string | null;
-                        observedAt: number;
                     }[];
                 };
             };

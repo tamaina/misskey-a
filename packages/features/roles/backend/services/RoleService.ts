@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
+import { ServiceBillingRoleProvider } from '@features/billing/backend/service-role.provider.js';
 import * as Redis from 'ioredis';
 import { In } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
@@ -176,6 +177,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		private idService: IdService,
 		private moderationLogService: ModerationLogService,
 		private fanoutTimelineService: FanoutTimelineService,
+		@Optional() private serviceBillingRoles?: ServiceBillingRoleProvider,
 	) {
 		this.rolesCache = new MemorySingleCache<MiRole[]>(1000 * 60 * 60); // 1h
 		this.roleAssignmentByUserIdCache = new MemoryKVCache<MiRoleAssignment[]>(1000 * 60 * 5); // 5m
@@ -359,7 +361,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	public async getUserRoles(userId: MiUser['id'], fresh = false) {
 		const roles = await (fresh ? this.rolesRepository.findBy({}) : this.rolesCache.fetch(() => this.rolesRepository.findBy({})));
 		const assigns = await this.getUserAssigns(userId, fresh);
-		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
+		const paidRoleIds = await this.serviceBillingRoles?.roleIds(userId) ?? [];
+		const assignedRoles = roles.filter(r => assigns.some(x => x.roleId === r.id) || (paidRoleIds.includes(r.id) && r.target === 'manual' && !r.isAdministrator && !r.isModerator));
 		const user = roles.some(r => r.target === 'conditional') ? await (fresh ? this.usersRepository.findOneByOrFail({ id: userId }) : this.cacheService.findUserById(userId)) : null;
 		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, assignedRoles, r.condFormula));
 		return [...assignedRoles, ...matchedCondRoles];
@@ -375,7 +378,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		// 期限切れのロールを除外
 		assigns = assigns.filter(a => a.expiresAt == null || (a.expiresAt.getTime() > now));
 		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
-		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
+		const paidRoleIds = await this.serviceBillingRoles?.roleIds(userId) ?? [];
+		const assignedRoles = roles.filter(r => assigns.some(x => x.roleId === r.id) || (paidRoleIds.includes(r.id) && r.target === 'manual' && !r.isAdministrator && !r.isModerator));
 		const assignedBadgeRoles = assignedRoles.filter(r => r.asBadge);
 		const badgeCondRoles = roles.filter(r => r.asBadge && (r.target === 'conditional'));
 		if (badgeCondRoles.length > 0) {

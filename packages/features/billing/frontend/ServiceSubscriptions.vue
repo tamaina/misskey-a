@@ -20,14 +20,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkButton type="submit" :disabled="busy">{{ $locale.sfc.check }}</MkButton>
 		</form>
 	</div>
-	<form class="_gaps_s" @submit.prevent="detect">
-		<MkInfo>{{ $locale.sfc.detectScope }}</MkInfo>
-		<MkInput v-model="transferHash" required :disabled="busy"><template #label>{{ $locale.sfc.hash }}</template></MkInput>
-		<MkInput v-model="logIndex" type="number" :min="0" step="1" required :disabled="busy"><template #label>{{ $locale.sfc.log }}</template></MkInput>
-		<MkButton type="submit" :disabled="busy || !offerId">{{ $locale.sfc.detect }}</MkButton>
-	</form>
-	<MkInfo v-if="pending" role="status">{{ $locale.sfc.pending }}</MkInfo>
-	<MkInfo v-for="transfer in transfers" :key="transfer.id">{{ transfer.fromAddress }} → {{ transfer.toAddress }} / {{ transfer.amountBaseUnits }} / {{ transfer.txHash }}:{{ transfer.logIndex }}</MkInfo>
 </div>
 </template>
 <script setup lang="ts">
@@ -38,22 +30,22 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { formatServiceAmount } from './service-client.js';
 import type { ServiceAccountClient } from './service-client.js';
-import type { DetectedTransfer, LinkedWallet, ServiceOffer, ServiceOrder } from '../backend/api.definition.js';
+import type { LinkedWallet, ServiceOffer, ServiceOrder } from '../backend/api.definition.js';
 const props = defineProps<{ client: ServiceAccountClient; listWallets: () => Promise<LinkedWallet[]> }>();
-const offers = ref<ServiceOffer[]>([]), wallets = ref<LinkedWallet[]>([]), orders = ref<ServiceOrder[]>([]), transfers = ref<DetectedTransfer[]>([]);
-const offerId = ref(''), walletId = ref(''), transferHash = ref(''), logIndex = ref(0), hashes = ref<Record<string, string>>({});
+const offers = ref<ServiceOffer[]>([]), wallets = ref<LinkedWallet[]>([]), orders = ref<ServiceOrder[]>([]);
+const offerId = ref(''), walletId = ref(''), hashes = ref<Record<string, string>>({});
 const offerItems = computed(() => offers.value.map(offer => ({ value: offer.id, label: `${offer.name}: ${formatServiceAmount(offer.amountBaseUnits, offer.decimals)} ${offer.tokenSymbol} / ${offer.duration} ${offer.durationUnit}` })));
 const walletItems = computed(() => wallets.value.map(wallet => ({ value: wallet.id, label: `${wallet.chainId} / ${wallet.address}` })));
-const busy = ref(false), error = ref(false), pending = ref(false);
+const busy = ref(false), error = ref(false);
 let retry: { offerId: string; walletId: string; requestKey: string; quotedOffer: ServiceOffer } | undefined;
 
 async function run(action: () => Promise<void>) {
 	if (busy.value) return;
-	busy.value = true; error.value = false; pending.value = false;
+	busy.value = true; error.value = false;
 	try { await action(); } catch { error.value = true; } finally { busy.value = false; }
 }
 
-async function refreshHistory() { orders.value = await props.client.listOrders({}); transfers.value = await props.client.listTransfers({}); }
+async function refreshHistory() { orders.value = await props.client.listOrders({}); }
 
 async function load() { await run(async () => { offers.value = await props.client.listOffers({}); wallets.value = await props.listWallets(); await refreshHistory(); }); }
 
@@ -70,10 +62,7 @@ async function check(order: ServiceOrder) {
 	await run(async () => { await props.client.checkOrder({ orderId: order.id, ...(!order.txHash && hashes.value[order.id] ? { txHash: hashes.value[order.id] } : {}) }); await refreshHistory(); });
 }
 
-async function detect() {
-	await run(async () => { const result = await props.client.detectTransfer({ offerId: offerId.value, txHash: transferHash.value, logIndex: logIndex.value }); pending.value = result.status === 'pending'; await refreshHistory(); });
-}
 </script>
 <locale lang="json" locale="ja-JP">
-{"scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、役割・利用枠は変更しません。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"読み込む","offer":"サービス・送金検出用トークン","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","deadline":"ハッシュ提出期限"}
+{"scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、管理者が紐付けた通常ロールは確認済み期間内だけ有効です。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"読み込む","offer":"サービス","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","deadline":"ハッシュ提出期限"}
 </locale>

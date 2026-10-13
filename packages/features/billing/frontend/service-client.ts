@@ -7,7 +7,7 @@ import type { ContractRouterClient } from '@orpc/contract';
 import type { serviceBillingContract } from '../backend/api.definition.js';
 export type ServiceBillingClient = ContractRouterClient<typeof serviceBillingContract>;
 export type OfferAdminClient = Pick<ServiceBillingClient, 'listOfferSettings' | 'upsertOffer'>;
-export type ServiceAccountClient = Pick<ServiceBillingClient, 'listOffers' | 'createOrder' | 'checkOrder' | 'listOrders' | 'detectTransfer' | 'listTransfers'>;
+export type ServiceAccountClient = Pick<ServiceBillingClient, 'listOffers' | 'createOrder' | 'checkOrder' | 'listOrders'>;
 
 /** String-only display; never round financial base units through Number. */
 export function formatServiceAmount(value: string, decimals: number): string {

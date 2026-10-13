@@ -24,7 +24,7 @@ export { ServiceBillingApiProvider } from './service.provider.js';
 export { createServiceBillingStore } from './service-store.js';
 export { MiBillingServiceOffer } from './models/BillingServiceOffer.js';
 export { MiBillingServiceOrder } from './models/BillingServiceOrder.js';
-export { MiBillingDetectedTransfer } from './models/BillingDetectedTransfer.js';
 export { createTransferReceiptReader } from './transfer-confirmation.js';
 export { receiptEvidenceSchema, transferEvidenceSchema } from './transfer.schema.js';
 export type { ReceiptReader, ReceiptResult, ReceiptEvidence, TransferEvidence } from './transfer-confirmation.js';
+export { ServiceBillingRoleProvider, activePaidRoleIds } from './service-role.provider.js';
