@@ -4,7 +4,7 @@
  */
 
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { call, implement } from '@orpc/server';
 import { oc } from '@orpc/contract';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
@@ -20,9 +20,11 @@ import { registerPilotHttp } from '@features/api/backend/transport/pilot-http.js
 import { misskeyErrorBody } from '@features/api/backend/transport/orpc-error.js';
 import { requestRoutes } from '@features/api/shared/api-routing.js';
 import { clientContract } from '@features/index/backend/client.contract.js';
+import type { InferContractRouterInputs } from '@orpc/contract';
 import { aliasTwoFactorContract } from '../../backend/2fa-api-aliases.contract.js';
 import { aliasTwoFactorProcedure, createAuthRouter } from '../../backend/api.implementation.js';
 import { authContract } from '../../backend/api.definition.js';
+import baseline from './fixtures/2fa-api-alias-baseline.json';
 import { testContext } from './native-context.js';
 import type { AuthRouterDependencies } from '../../backend/api.implementation.js';
 import type { ApiServices } from '@features/api/backend/transport/context.js';
@@ -81,7 +83,6 @@ function schemaHash(value: unknown): string {
 }
 
 test('actual portable generator preserves every legacy operation and public schema, with eight unique canonical IDs', async () => {
-	const baseline = JSON.parse(readFileSync(new URL('./fixtures/2fa-api-alias-baseline.json', import.meta.url), 'utf8')) as { paths: Record<string, string>; operationHashes: Record<string, string>; schemaHashes: Record<string, string> };
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) expect(schemaHash(spec.paths?.[path]), path).toBe(hash);
@@ -127,10 +128,15 @@ test('native passkey registration aliases preserve password/MFA validation and p
 	const profile = mockDeep<NonNullable<Awaited<ReturnType<typeof deps.userProfilesRepository.findOne>>>>({ userId: actor.id, user: null, twoFactorEnabled: true, password: bcrypt.hashSync('synthetic-password', 4) });
 	deps.userProfilesRepository.findOne.mockResolvedValue(profile);
 	deps.webAuthnService.initiateRegistration.mockResolvedValue({ challenge: 'synthetic', rp: { id: 'synthetic.example', name: 'Synthetic' }, user: { id: 'AQID', name: 'synthetic', displayName: 'Synthetic' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }] });
-	for (const route of [h.router['i/2fa/register-key'], h.router['i/2fa/passkey/register']]) {
-		await expect(call(route, { password: 'synthetic-password' }, { context: testContext(actor) })).rejects.toThrow('authentication failed');
-		await expect(call(route, { password: 'wrong', token: '111111' }, { context: testContext(actor) })).rejects.toMatchObject({ code: 'INCORRECT_PASSWORD' });
-		await expect(call(route, { password: 'synthetic-password', token: '222222' }, { context: testContext(actor) })).resolves.toMatchObject({ challenge: 'synthetic' });
+	type RegistrationInput = InferContractRouterInputs<typeof authContract>['i/2fa/register-key'];
+	const register = [
+		(input: RegistrationInput) => call(h.router['i/2fa/register-key'], input, { context: testContext(actor) }),
+		(input: RegistrationInput) => call(h.router['i/2fa/passkey/register'], input, { context: testContext(actor) }),
+	];
+	for (const run of register) {
+		await expect(run({ password: 'synthetic-password' })).rejects.toThrow('authentication failed');
+		await expect(run({ password: 'wrong', token: '111111' })).rejects.toMatchObject({ code: 'INCORRECT_PASSWORD' });
+		await expect(run({ password: 'synthetic-password', token: '222222' })).resolves.toMatchObject({ challenge: 'synthetic' });
 	}
 	expect(deps.userAuthService.twoFactorAuthenticate).toHaveBeenCalledTimes(4);
 	expect(deps.webAuthnService.initiateRegistration).toHaveBeenCalledTimes(2);
