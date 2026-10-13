@@ -46,14 +46,15 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	const walletPaths = ['account/wallets/link/passkey-options', 'account/wallets/list', 'account/wallets/link/chains',
 		'account/wallets/link/begin', 'account/wallets/link/verify', 'account/wallets/unlink',
 		'admin/wallets/chains/list', 'admin/wallets/chains/upsert'];
-	for (const path of walletPaths) {
+	const peerPaths = ['admin/peer-payments/tokens/list', 'admin/peer-payments/tokens/upsert', 'peer-payments/tokens/list', 'account/wallets/publication/list', 'account/wallets/publication/set', 'users/payment-wallets', 'peer-payments/prepare', 'peer-payments/check', 'peer-payments/list'];
+	for (const path of [...walletPaths, ...peerPaths]) {
 		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('/', '___')}`);
 	}
 	const identifiers = Object.values(spec.paths ?? {}).flatMap(item => (['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'] as const).flatMap(method => {
 		const operation = item?.[method];
 		return operation ? [operation.operationId] : [];
 	}));
-	expect(identifiers).toHaveLength(466 + walletPaths.length);
+	expect(identifiers).toHaveLength(466 + walletPaths.length + peerPaths.length);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 
