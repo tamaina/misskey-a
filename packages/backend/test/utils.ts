@@ -20,6 +20,7 @@ import type * as misskey from 'misskey-js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 import { validateContentTypeSetAsActivityPub } from '@features/federation/backend/protocol/misc/validator.js';
 import { ApiError } from '@features/api/backend/transport/error.js';
+import { MiUser } from '@features/users/backend/models/User.js';
 
 export { server as startServer, jobQueue as startJobQueue } from '@features/boot/backend/node/common.js';
 
@@ -144,6 +145,31 @@ export const signup = async (params?: Partial<misskey.Endpoints['signup']['req']
 	}, params);
 
 	const res = await api('signup', q);
+
+	// Remote actors are a synthetic fixture supported only by the test signup path.
+	// Their browser session correctly fails the local-user gate; use their existing
+	// native credential to preserve these legacy federation simulation tests.
+	if (params?.host != null && typeof res.body?.host === 'string') {
+		if (process.env.NODE_ENV !== 'test' || process.env.CI !== 'true'
+			|| (process.env.MISSKEY_CONFIG_YML !== undefined && process.env.MISSKEY_CONFIG_YML !== 'test.yml')
+			|| config.url !== 'http://misskey.local' || config.port !== 61812
+			|| config.db.host !== '127.0.0.1' || config.db.port !== 54312 || config.db.db !== 'test-misskey'
+			|| config.dbReplications || (config.dbSlaves?.length ?? 0) !== 0
+			|| ('url' in config.db && config.db.url) || ('replication' in config.db && config.db.replication)
+			|| Object.keys(config.db.extra ?? {}).length !== 0) {
+			throw new Error('Remote credential fixtures require the isolated CI test configuration');
+		}
+		const db = await initTestDb(true);
+		try {
+			const remote = await db.getRepository(MiUser).findOne({
+				where: { id: res.body.id, host: res.body.host }, select: { id: true, host: true, token: true },
+			});
+			if (remote?.id !== res.body.id || remote.host !== res.body.host || !remote.token || !/^[a-zA-Z0-9]{16}$/.test(remote.token)) throw new Error('Missing synthetic remote native credential');
+			return { ...res.body, token: remote.token };
+		} finally {
+			await db.destroy();
+		}
+	}
 
 	return res.body;
 };

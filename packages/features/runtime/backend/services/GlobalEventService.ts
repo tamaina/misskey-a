@@ -227,6 +227,7 @@ type UndefinedAsNullAll<T> = {
 };
 
 export interface InternalEventTypes {
+	browserSessionRevoked: { id: string | null; userId: string };
 	userChangeSuspendedState: { id: MiUser['id']; isSuspended: MiUser['isSuspended']; } | { id: MiUser['id']; isRemoteSuspended: MiUser['isRemoteSuspended']; };
 	userChangeDeletedState: { id: MiUser['id']; isDeleted: MiUser['isDeleted']; };
 	userTokenRegenerated: { id: MiUser['id']; oldToken: string; newToken: string; };

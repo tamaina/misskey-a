@@ -10066,6 +10066,153 @@ export default {
 				}
 			}
 		},
+		"i/sessions": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "i/sessions",
+					"requireCredential": true,
+					"secure": true
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sessions",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/sessions/revoke": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "i/sessions/revoke",
+					"requireCredential": true,
+					"secure": true
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sessions/revoke",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/signout": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SESSION_NOT_REVOCABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/signout",
+					"requireCredential": true,
+					"secure": true
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/signout",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
 		"i/update-email": {
 			"~orpc": {
 				"errorMap": {
