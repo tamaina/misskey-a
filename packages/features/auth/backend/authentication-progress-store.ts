@@ -75,6 +75,8 @@ const SAVE = `redis.call('SET', KEYS[1], cjson.encode(row), 'KEEPTTL'); return c
  * Before production use, a controller must reserve ONE verifier owner before
  * consuming backup codes/WebAuthn proofs; a CAS after verification alone can burn
  * multiple external proofs. That reservation protocol is not implemented here.
+ * Redis fact timestamps record metadata arrival for audit; they are not
+ * independent evidence of when a proof was verified or of its freshness.
  * The future controller must enforce current policy, proof freshness and active
  * BrowserSession ownership before claim. Consume deletes BEFORE any future grant;
  * a crash can burn the ticket. There is no Redis/DB exactly-once guarantee.
