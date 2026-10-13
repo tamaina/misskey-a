@@ -126,6 +126,14 @@ export type Endpoints = Overwrite<
 			req: I2faKeyDoneRequest;
 			res: I2faKeyDoneResponse;
 		},
+		'i/2fa/passkey/register': {
+			req: I2faRegisterKeyRequest;
+			res: I2faRegisterKeyResponse;
+		},
+		'i/2fa/passkey/done': {
+			req: I2faKeyDoneRequest;
+			res: I2faKeyDoneResponse;
+		},
 		'admin/roles/create': {
 			req: Overwrite<AdminRolesCreateRequest, { policies: PartialRolePolicyOverride }>;
 			res: AdminRolesCreateResponse;
