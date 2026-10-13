@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { parse } from 'vue/compiler-sfc';
+import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createApp, defineComponent, h, nextTick, onMounted } from 'vue';
 import Signin from '../../frontend/components/MkSignin.vue';
@@ -13,13 +15,12 @@ import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
 
 vi.mock('vue', async original => {
 	const vue = await original<typeof import('vue')>();
-	return { ...vue, Transition: vue.defineComponent({ setup(_, { slots }) { return () => slots.default?.(); } }) };
+	return { ...vue, Transition: vue.defineComponent({ inheritAttrs: false, setup(_, { slots }) { return () => slots.default?.(); } }) };
 });
 
 const state = vi.hoisted(() => ({ handlers: {} as Record<string, (value?: unknown) => void>, requests: [] as unknown[], captcha: vi.fn() }));
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
 vi.mock('@features/auth/frontend/accounts.js', () => ({ login: vi.fn() }));
-vi.mock('@features/runtime/frontend/i18n.js', () => ({ i18n: { ts: { signinWithPasskey: 'Use passkey' } } }));
 vi.mock('@features/moderation/frontend/utility/show-suspended-dialog.js', () => ({ showSuspendedDialog: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({ alert: vi.fn() }));
 vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: vi.fn() }));
@@ -55,6 +56,12 @@ vi.mock('@features/ui/frontend/components/MkButton.vue', () => ({ default: defin
 	props: ['disabled'], setup(props, { attrs, slots }) { return () => h('button', { ...attrs, disabled: props.disabled }, slots.default?.()); },
 }) }));
 
+const internationalization = createInternationalization({ initialLocale: 'en-US' });
+beforeAll(async () => {
+	await internationalization.ready;
+	await internationalization.loadLocale('en-US');
+});
+
 let app: ReturnType<typeof createApp> | undefined;
 let element: HTMLDivElement;
 const emitted = vi.fn();
@@ -67,7 +74,7 @@ const pw = { password: 'synthetic-password', captcha: { hCaptchaResponse: 'h', m
 
 function mount(autoSet = false) {
 	app = createApp(Signin, { autoSet, onLogin: emitted });
-	app.use(createInternationalization({ initialLocale: 'en-US' }));
+	app.use(internationalization);
 	app.config.errorHandler = error => { errors.push(error); };
 	app.component('MkLoading', defineComponent({ render: () => h('span', 'Waiting') }));
 	app.mount(element);
@@ -102,7 +109,7 @@ afterEach(() => {
 
 test('password path shows TOTP without mounting passkey or relying on public MFA flags', async () => {
 	mount(); await passwordPath();
-	expect(page()).toBe('totp'); expect(state.requests).toEqual([]); expect(fallback()?.disabled).toBe(false);
+	expect(page()).toBe('totp'); expect(state.requests).toEqual([]); expect(fallback()?.disabled).toBe(false); expect(fallback()?.textContent).toBe("Sign in with Passkey");
 	expect(misskeyApi).toHaveBeenNthCalledWith(3, 'signin-flow', { username: 'synthetic', password: pw.password, 'hcaptcha-response': 'h', 'm-captcha-response': 'm', 'g-recaptcha-response': 'r', 'turnstile-response': 't', 'testcaptcha-response': 'test' });
 });
 
@@ -185,4 +192,14 @@ test('rejected TOTP does not emit login and leaves explicit fallback available',
 	vi.mocked(misskeyApi).mockRejectedValueOnce(expectedError);
 	state.handlers.totp('wrong'); await settle();
 	expect(emitted).not.toHaveBeenCalled(); expect(login).not.toHaveBeenCalled(); expect(page()).toBe('totp'); expect(fallback()?.disabled).toBe(false);
+});
+
+test('alternative label copies every existing input locale exactly', () => {
+	const dictionaries = (file: string) => parse(readFileSync(new URL(file, import.meta.url), 'utf8')).descriptor.customBlocks
+		.filter(block => block.type === 'locale').map(block => {
+			const dictionary = JSON.parse(block.content) as Record<string, string>;
+			if (file.includes('alternative')) expect(Object.keys(dictionary)).toEqual(['signinWithPasskey']);
+			return [block.attrs.locale, dictionary.signinWithPasskey];
+		});
+	expect(dictionaries('../../frontend/components/MkSignin.passkey-alternative.vue')).toEqual(dictionaries('../../frontend/components/MkSignin.input.vue'));
 });

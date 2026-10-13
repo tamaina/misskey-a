@@ -58,7 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			@useTotp="onUseTotp"
 		/>
 	</Transition>
-	<MkButton v-if="page === 'totp' && passkeyAvailable" transparent rounded :disabled="waiting" style="margin: 0 auto;" @click="onUsePasskey">{{ i18n.ts.signinWithPasskey }}</MkButton>
+	<XPasskeyAlternative v-if="page === 'totp' && passkeyAvailable" :disabled="waiting" @choose="onUsePasskey"/>
 	<div v-if="waiting" :class="$style.waitingRoot">
 		<MkLoading/>
 	</div>
@@ -80,8 +80,7 @@ import XInput from '@features/auth/frontend/components/MkSignin.input.vue';
 import XPassword from '@features/auth/frontend/components/MkSignin.password.vue';
 import XTotp from '@features/auth/frontend/components/MkSignin.totp.vue';
 import XPasskey from '@features/auth/frontend/components/MkSignin.passkey.vue';
-import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { i18n } from '@features/runtime/frontend/i18n.js';
+import XPasskeyAlternative from '@features/auth/frontend/components/MkSignin.passkey-alternative.vue';
 import { login } from '@features/auth/frontend/accounts.js';
 
 const emit = defineEmits<{
