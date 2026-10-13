@@ -18,3 +18,6 @@ export { MiBillingWalletChallenge } from './models/BillingWalletChallenge.js';
 export { createPostgresWalletChainStore } from './wallet-chain-store.js';
 export { MiBillingWalletChain } from './models/BillingWalletChain.js';
 export { createWalletRpcFetch, WALLET_RPC_MAX_BYTES, WALLET_RPC_TIMEOUT } from './wallet-rpc.js';
+export { createTransferReceiptReader } from './transfer-confirmation.js';
+export { receiptEvidenceSchema, transferEvidenceSchema } from './transfer.schema.js';
+export type { ReceiptReader, ReceiptResult, ReceiptEvidence, TransferEvidence } from './transfer-confirmation.js';
