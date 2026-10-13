@@ -7,6 +7,7 @@
 			"@modelcontextprotocol/sdk/client/streamableHttp.js": ["./node_modules/@modelcontextprotocol/sdk/dist/esm/client/streamableHttp.d.ts"],
 			"@modelcontextprotocol/sdk/client/auth.js": ["./node_modules/@modelcontextprotocol/sdk/dist/esm/client/auth.d.ts"],
 			"@modelcontextprotocol/sdk/types.js": ["./node_modules/@modelcontextprotocol/sdk/dist/esm/types.d.ts"],
+			"@modelcontextprotocol/sdk/validation/ajv-provider.js": ["./node_modules/@modelcontextprotocol/sdk/dist/esm/validation/ajv-provider.d.ts"],
 			"@/*": ["./src/*"],
 			"@features/*": ["../features/*/index.ts", "../features/*"],
 			"@kitajs/html": ["./node_modules/@kitajs/html"],
