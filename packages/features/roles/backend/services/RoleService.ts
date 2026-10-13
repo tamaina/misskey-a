@@ -361,10 +361,11 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	public async getUserRoles(userId: MiUser['id'], fresh = false) {
 		const roles = await (fresh ? this.rolesRepository.findBy({}) : this.rolesCache.fetch(() => this.rolesRepository.findBy({})));
 		const assigns = await this.getUserAssigns(userId, fresh);
+		const manualAssignedRoles = roles.filter(r => assigns.some(x => x.roleId === r.id));
 		const paidRoleIds = await this.serviceBillingRoles?.roleIds(userId) ?? [];
 		const assignedRoles = roles.filter(r => assigns.some(x => x.roleId === r.id) || (paidRoleIds.includes(r.id) && r.target === 'manual' && !r.isAdministrator && !r.isModerator));
 		const user = roles.some(r => r.target === 'conditional') ? await (fresh ? this.usersRepository.findOneByOrFail({ id: userId }) : this.cacheService.findUserById(userId)) : null;
-		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, assignedRoles, r.condFormula));
+		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, r.isAdministrator || r.isModerator ? manualAssignedRoles : assignedRoles, r.condFormula));
 		return [...assignedRoles, ...matchedCondRoles];
 	}
 
@@ -378,13 +379,14 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		// 期限切れのロールを除外
 		assigns = assigns.filter(a => a.expiresAt == null || (a.expiresAt.getTime() > now));
 		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
+		const manualAssignedRoles = roles.filter(r => assigns.some(x => x.roleId === r.id));
 		const paidRoleIds = await this.serviceBillingRoles?.roleIds(userId) ?? [];
 		const assignedRoles = roles.filter(r => assigns.some(x => x.roleId === r.id) || (paidRoleIds.includes(r.id) && r.target === 'manual' && !r.isAdministrator && !r.isModerator));
 		const assignedBadgeRoles = assignedRoles.filter(r => r.asBadge);
 		const badgeCondRoles = roles.filter(r => r.asBadge && (r.target === 'conditional'));
 		if (badgeCondRoles.length > 0) {
 			const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
-			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, assignedRoles, r.condFormula));
+			const matchedBadgeCondRoles = badgeCondRoles.filter(r => this.evalCond(user!, r.isAdministrator || r.isModerator ? manualAssignedRoles : assignedRoles, r.condFormula));
 			return [...assignedBadgeRoles, ...matchedBadgeCondRoles];
 		} else {
 			return assignedBadgeRoles;
