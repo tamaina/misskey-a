@@ -5,12 +5,13 @@
 
 import { createHash, randomBytes } from 'node:crypto';
 import { IsNull } from 'typeorm';
+import type { FindOptionsSelect } from 'typeorm';
 import type { BrowserSessionsRepository, MiBrowserSession } from '@features/persistence/backend/repositories/models.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 
 export type BrowserSessionMetadata = Pick<MiBrowserSession, 'id' | 'userId' | 'createdAt' | 'lastUsedAt' | 'revokedAt' | 'sudoUntil'>;
 
-const metadataColumns = ['id', 'userId', 'createdAt', 'lastUsedAt', 'revokedAt', 'sudoUntil'] as const;
+const metadataSelect = { id: true, userId: true, createdAt: true, lastUsedAt: true, revokedAt: true, sudoUntil: true } satisfies FindOptionsSelect<MiBrowserSession>;
 
 /** Foundation only: callers must establish authentication before issuing a credential.
  * No positive validity cache: a revoked session must be rejected on the next check. */
@@ -37,7 +38,7 @@ export class BrowserSessionService {
 		if (!/^bs_[A-Za-z0-9_-]{43}$/.test(token)) return null;
 		const tokenHash = createHash('sha256').update(token).digest('hex');
 		const session = await this.browserSessionsRepository.findOne({
-			where: { tokenHash, revokedAt: IsNull() }, select: [...metadataColumns],
+			where: { tokenHash, revokedAt: IsNull() }, select: metadataSelect,
 		});
 		if (!session) return null;
 		const lastUsedAt = new Date();
@@ -51,7 +52,7 @@ export class BrowserSessionService {
 
 	public async listOwned(userId: string): Promise<BrowserSessionMetadata[]> {
 		return this.browserSessionsRepository.find({
-			where: { userId }, select: [...metadataColumns], order: { createdAt: 'DESC', id: 'DESC' },
+			where: { userId }, select: metadataSelect, order: { createdAt: 'DESC', id: 'DESC' },
 		});
 	}
 

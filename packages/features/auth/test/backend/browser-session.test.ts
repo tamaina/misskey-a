@@ -114,7 +114,7 @@ describe('individual browser session foundation (synthetic persistence only)', (
 		expect(listed[0].id).toBe(alice.session.id);
 		expect(listed[0]).not.toHaveProperty('tokenHash');
 		expect(listed[0]).not.toHaveProperty('token');
-		expect(repository.find.mock.calls[0][0]?.select).not.toContain('tokenHash');
+		expect(repository.find.mock.calls[0][0]?.select).not.toHaveProperty('tokenHash');
 	});
 
 	test('persistence failure does not return an issued secret', async () => {
