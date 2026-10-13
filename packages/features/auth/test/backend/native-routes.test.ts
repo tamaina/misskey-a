@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { call } from '@orpc/server';
+import { testContext } from './native-context.js';
 import { expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
@@ -17,7 +18,6 @@ import { authContract, AppShowContract, AdminCaptchaCurrentContract, I2faKeyDone
 import { createIRevokeTokenProcedure, type TokenRevocationRepository } from '../../backend/endpoints/i/revoke-token.js';
 import { createI2faKeyDoneProcedure } from '../../backend/endpoints/i/2fa/key-done.js';
 import { WebAuthnService } from '../../backend/services/WebAuthnService.js';
-import { testContext } from './native-context.js';
 import type { ApiContext, ApiServices, ApiToken } from '../../../api/backend/transport/context.js';
 import type { MiAccessToken } from '../../backend/models/AccessToken.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';

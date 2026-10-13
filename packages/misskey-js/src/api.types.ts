@@ -1,3 +1,4 @@
+import type { ContractEndpoints } from './contract.types.js';
 import { UserDetailed } from './autogen/models.js';
 import {
 	AdminRolesCreateRequest,
@@ -20,7 +21,6 @@ import {
 	I2faRegisterKeyResponse,
 	I2faKeyDoneRequest,
 } from './entities.js';
-import type { ContractEndpoints } from './contract.types.js';
 
 type Overwrite<T, U extends { [Key in keyof T]?: unknown }> = Omit<
 	T,
