@@ -72,7 +72,7 @@ describe('auth and search declaration boundaries', () => {
 		expect(Object.keys(discoveryServices.definitions)).toEqual(['HashtagEntityService']);
 		expect(Object.keys(discoveryServices.create())).toEqual(['HashtagEntityService']);
 		expect(ports.redisClient.token).toBe(DI.redis);
-		expect(authSecurityServices.ports.map(port => port.name).sort()).toEqual(['config', 'meta', 'redisClient', 'userProfilesRepository', 'userSecurityKeysRepository', 'usersRepository']);
+		expect(authSecurityServices.ports.map(port => port.name).sort()).toEqual(['browserSessionsRepository', 'config', 'idService', 'meta', 'redisClient', 'userProfilesRepository', 'userSecurityKeysRepository', 'usersRepository']);
 	});
 
 	test('plain security factories borrow one Redis object and direct constructors remain equivalent', () => {
