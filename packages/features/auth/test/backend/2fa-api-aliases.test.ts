@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { call } from '@orpc/server';
 import { oc } from '@orpc/contract';
@@ -12,11 +13,6 @@ import bcrypt from 'bcryptjs';
 import { expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import * as v from 'valibot';
-import { authContract } from '../../backend/api.definition.js';
-import { createAuthRouter } from '../../backend/api.implementation.js';
-import type { AuthRouterDependencies } from '../../backend/api.implementation.js';
-import { aliasTwoFactorContract, aliasTwoFactorProcedure } from '../../backend/2fa-api-aliases.js';
-import { testContext } from './native-context.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { commonErrors } from '@features/api/backend/transport/errors.schema.js';
 import { genPilotOpenapiSpec } from '@features/api/backend/transport/openapi/pilot-spec.js';
@@ -24,6 +20,11 @@ import { registerPilotHttp } from '@features/api/backend/transport/pilot-http.js
 import { misskeyErrorBody } from '@features/api/backend/transport/orpc-error.js';
 import { requestRoutes } from '@features/api/shared/api-routing.js';
 import { clientContract } from '@features/index/backend/client.contract.js';
+import { aliasTwoFactorContract } from '../../backend/2fa-api-aliases.contract.js';
+import { aliasTwoFactorProcedure, createAuthRouter } from '../../backend/api.implementation.js';
+import { authContract } from '../../backend/api.definition.js';
+import { testContext } from './native-context.js';
+import type { AuthRouterDependencies } from '../../backend/api.implementation.js';
 import type { ApiServices } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
@@ -57,7 +58,7 @@ test.each(pairs)('%s and %s share schemas, handler and middleware without mutati
 	const newProcedure = h.router[canonical]['~orpc'];
 	expect(oldContract.meta.requestName).toBe(legacy);
 	expect(oldContract.route.path).toBe(`/${legacy}`);
-	expect(newContract.meta).toEqual({ ...oldContract.meta, requestName: canonical });
+	expect(newContract.meta).toEqual({ ...oldContract.meta, requestName: canonical, compatibilityAliasOf: legacy });
 	expect(newContract.route).toEqual({ ...oldContract.route, path: `/${canonical}` });
 	for (const field of ['inputSchema', 'outputSchema', 'errorMap'] as const) expect(newContract[field]).toBe(oldContract[field]);
 	for (const field of ['inputSchema', 'outputSchema', 'middlewares', 'handler'] as const) expect(newProcedure[field]).toBe(oldProcedure[field]);
@@ -69,10 +70,24 @@ test.each(pairs)('%s and %s share schemas, handler and middleware without mutati
 	expect(newProcedure.route).toEqual(newContract.route);
 });
 
-test('actual portable generator keeps all baseline operation IDs and produces eight unique canonical IDs', async () => {
-	const baseline = JSON.parse(readFileSync(new URL('./fixtures/2fa-api-alias-baseline.json', import.meta.url), 'utf8')) as { paths: Record<string, string> };
+function stableJson(value: unknown): string {
+	if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+	if (value !== null && typeof value === 'object') return `{${Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([key, child]) => `${JSON.stringify(key)}:${stableJson(child)}`).join(',')}}`;
+	return JSON.stringify(value);
+}
+
+function schemaHash(value: unknown): string {
+	return createHash('sha256').update(stableJson(JSON.parse(JSON.stringify(value)))).digest('hex');
+}
+
+test('actual portable generator preserves every legacy operation and public schema, with eight unique canonical IDs', async () => {
+	const baseline = JSON.parse(readFileSync(new URL('./fixtures/2fa-api-alias-baseline.json', import.meta.url), 'utf8')) as { paths: Record<string, string>; operationHashes: Record<string, string>; schemaHashes: Record<string, string> };
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
 	const routes = requestRoutes(clientContract);
+	for (const [path, hash] of Object.entries(baseline.operationHashes)) expect(schemaHash(spec.paths?.[path]), path).toBe(hash);
+	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(spec.components?.schemas?.[name]), name).toBe(hash);
+	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
+	expect(Object.keys(spec.components?.schemas ?? {}).filter(name => !(name in baseline.schemaHashes))).toEqual(['OrpcDefinition1038']);
 	expect(Object.keys(baseline.paths)).toHaveLength(444);
 	for (const [path, operationId] of Object.entries(baseline.paths)) expect(spec.paths?.[path]?.post?.operationId).toBe(operationId);
 	const generatedIds = Object.values(spec.paths ?? {}).map(path => path?.post?.operationId);

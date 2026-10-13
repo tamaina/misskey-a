@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { aliasTwoFactorProcedure } from './2fa-api-aliases.js';
-import { implement } from '@orpc/server';
+import { DecoratedProcedure, implement } from '@orpc/server';
 import { authContract, authSessionsContract } from './api.definition.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -117,6 +116,23 @@ import type { SigninWithPasskeyDependencies } from './endpoints/signinWithPasske
 import { SigninService } from './transport/SigninService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
+
+import type { Context } from '@orpc/server';
+import type { AnySchema, ErrorMap, Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '@features/api/backend/transport/policy.types.js';
+
+/** Cloning the definition preserves the already captured legacy policy/rate bucket.
+ * Do not rebuild createApiProcedure from the alias metadata, or split the quota. */
+export function aliasTwoFactorProcedure<Initial extends Context, Current extends Context, Input extends AnySchema, Output extends AnySchema, Errors extends ErrorMap, Metadata extends Meta & ApiProcedureMetadata, RequestName extends string>(
+	procedure: DecoratedProcedure<Initial, Current, Input, Output, Errors, Metadata>, requestName: RequestName,
+) {
+	const definition = procedure['~orpc'];
+	const { requestName: legacyName, ...metadata } = definition.meta;
+	if (!legacyName) throw new Error('A compatibility alias requires a legacy request name');
+	return new DecoratedProcedure({
+		...definition, meta: { ...metadata, requestName, compatibilityAliasOf: legacyName }, route: { ...definition.route, path: `/${requestName}` },
+	});
+}
 
 export interface AuthRouterDependencies {
 	'admin/accounts/create': AdminAccountsCreateDependencies;
@@ -282,13 +298,13 @@ export interface AuthSessionDependencies {
 
 export function createAuthSessionRouter(deps: AuthSessionDependencies) {
 	return {
-authSessions: implement(authSessionsContract).$context<AuthSessionContext>().router({
+		authSessions: implement(authSessionsContract).$context<AuthSessionContext>().router({
 			signup: createSignupProcedure(deps.signup),
 			signupPending: createSignupPendingProcedure(deps.signupPending),
 			signinFlow: createSigninFlowProcedure(deps.signinFlow),
 			signinWithPasskey: createSigninWithPasskeyProcedure(deps.signinWithPasskey),
-		})
-};
+		}),
+	};
 }
 
 @Injectable()

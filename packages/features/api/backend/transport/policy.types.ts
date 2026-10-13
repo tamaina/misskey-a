@@ -11,6 +11,8 @@ export interface RateLimit { key: string; duration: number; max: number; minInte
 /** Portable endpoint declarations; enforcement remains in server middleware. */
 export interface ApiProcedureMetadata {
 	requestName?: string;
+	/** Static documentation ordering only; authorization never derives from this marker. */
+	compatibilityAliasOf?: string;
 	requireCredential?: boolean;
 	requiredRolePolicy?: keyof InferOutput<typeof packedRolePoliciesSchema>;
 	kind?: string;

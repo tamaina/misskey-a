@@ -1,4 +1,3 @@
-import type { ContractEndpoints } from './contract.types.js';
 import { UserDetailed } from './autogen/models.js';
 import {
 	AdminRolesCreateRequest,
@@ -21,6 +20,7 @@ import {
 	I2faRegisterKeyResponse,
 	I2faKeyDoneRequest,
 } from './entities.js';
+import type { ContractEndpoints } from './contract.types.js';
 
 type Overwrite<T, U extends { [Key in keyof T]?: unknown }> = Omit<
 	T,
@@ -123,6 +123,14 @@ export type Endpoints = Overwrite<
 			res: I2faRegisterKeyResponse;
 		},
 		'i/2fa/key-done': {
+			req: I2faKeyDoneRequest;
+			res: I2faKeyDoneResponse;
+		},
+		'i/2fa/passkey/register': {
+			req: I2faRegisterKeyRequest;
+			res: I2faRegisterKeyResponse;
+		},
+		'i/2fa/passkey/done': {
 			req: I2faKeyDoneRequest;
 			res: I2faKeyDoneResponse;
 		},

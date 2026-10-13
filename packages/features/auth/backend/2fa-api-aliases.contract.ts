@@ -5,29 +5,16 @@
 
 import { ContractProcedure } from '@orpc/contract';
 import type { AnySchema, ErrorMap, Meta } from '@orpc/contract';
-import { DecoratedProcedure } from '@orpc/server';
-import type { Context } from '@orpc/server';
-import type { ApiProcedureMetadata } from '@features/api/backend/transport/policy.types.js';
+import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
 
 /** Portable aliases need their own request name/path; all schemas and policy flags stay shared. */
-export function aliasTwoFactorContract<Input extends AnySchema, Output extends AnySchema, Errors extends ErrorMap, Metadata extends Meta & ApiProcedureMetadata>(
-	contract: ContractProcedure<Input, Output, Errors, Metadata>, requestName: string,
+export function aliasTwoFactorContract<Input extends AnySchema, Output extends AnySchema, Errors extends ErrorMap, Metadata extends Meta & ApiProcedureMetadata, RequestName extends string>(
+	contract: ContractProcedure<Input, Output, Errors, Metadata>, requestName: RequestName,
 ) {
 	const definition = contract['~orpc'];
-	const { requestName: _legacyName, ...metadata } = definition.meta;
+	const { requestName: legacyName, ...metadata } = definition.meta;
+	if (!legacyName) throw new Error('A compatibility alias requires a legacy request name');
 	return new ContractProcedure({
-		...definition, meta: { ...metadata, requestName }, route: { ...definition.route, path: `/${requestName}` },
-	});
-}
-
-/** Cloning the definition preserves the already captured legacy policy/rate bucket.
- * Do not rebuild createApiProcedure from the alias metadata, or split the quota. */
-export function aliasTwoFactorProcedure<Initial extends Context, Current extends Context, Input extends AnySchema, Output extends AnySchema, Errors extends ErrorMap, Metadata extends Meta & ApiProcedureMetadata>(
-	procedure: DecoratedProcedure<Initial, Current, Input, Output, Errors, Metadata>, requestName: string,
-) {
-	const definition = procedure['~orpc'];
-	const { requestName: _legacyName, ...metadata } = definition.meta;
-	return new DecoratedProcedure({
-		...definition, meta: { ...metadata, requestName }, route: { ...definition.route, path: `/${requestName}` },
+		...definition, meta: { ...metadata, requestName, compatibilityAliasOf: legacyName }, route: { ...definition.route, path: `/${requestName}` },
 	});
 }

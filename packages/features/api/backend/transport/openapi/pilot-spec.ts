@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { isContractProcedure } from '@orpc/contract';
 import { OpenAPIGenerator } from '@orpc/openapi';
 import { experimental_ValibotToJsonSchemaConverter } from '@orpc/valibot';
 import { packedJsonValueSchema } from '@features/users/backend/json-value.schema.js';
@@ -68,6 +69,26 @@ export async function genPilotOpenapiSpec(config: { version: string; apiUrl: str
 			},
 		},
 	});
+	// Place new compatibility aliases after legacy operations before hoisting
+	// ordinal definitions, preserving every existing generated SDK model name.
+	const aliasPaths = new Set<string>();
+	for (const route of requestRoutes(clientContract)) {
+		let node: unknown = clientContract;
+		for (const key of route.path) {
+			if (node === null || typeof node !== 'object' || !(key in node)) throw new Error('Missing documented API procedure');
+			node = Reflect.get(node, key);
+		}
+		if (!isContractProcedure(node)) throw new Error('Missing documented API procedure');
+		const aliasOf = node['~orpc'].meta.compatibilityAliasOf;
+		if (aliasOf === undefined) continue;
+		if (typeof aliasOf !== 'string' || !aliasOf || !spec.paths?.[`/${aliasOf}`]) throw new Error('Invalid documented compatibility alias');
+		aliasPaths.add(route.httpPath);
+	}
+	const paths = Object.entries(spec.paths ?? {});
+	spec.paths = Object.fromEntries([
+		...paths.filter(([path]) => !aliasPaths.has(path)),
+		...paths.filter(([path]) => aliasPaths.has(path)),
+	]);
 	assignExternalOperationIds(spec);
 	const nullable = new Set((await nullableResponsePaths(pilotContract)).map(path => JSON.stringify(path)));
 	for (const route of requestRoutes(pilotContract)) {
