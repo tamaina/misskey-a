@@ -4,8 +4,9 @@
  */
 import modlogSource from '../../../moderation/frontend/pages/admin/modlog.ModLog.vue?raw';
 import { createApp, h, Suspense, ref, reactive, nextTick } from 'vue';
-import { beforeEach, expect, test, vi } from 'vitest';
+import { beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import { createHighlighter } from 'shiki';
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import MkCodeDiff from '../../frontend/components/MkCodeDiff.vue';
 
 const { copy, preferences } = vi.hoisted(() => ({ copy: vi.fn(), preferences: { s: { dataSaver: { code: false } } } }));
@@ -17,13 +18,19 @@ vi.mock('@features/markup/frontend/utility/code-highlighter.js', () => ({
 	getTheme: (mode: string) => Promise.resolve(mode === 'light' ? 'light-plus' : 'dark-plus'),
 }));
 
+const internationalization = createInternationalization({ initialLocale: 'en-US' });
+beforeAll(async () => {
+	await internationalization.ready;
+	await internationalization.loadLocale('en-US');
+});
+
 beforeEach(() => { preferences.s.dataSaver.code = false; copy.mockReset(); });
 
 async function showDiff(input: Record<string, unknown>) {
 	const props = reactive(input);
 	const element = document.createElement('div');
 	const app = createApp({ render: () => h(Suspense, null, { default: () => h(MkCodeDiff, props) }) });
-	app.config.globalProperties.$locale = { sfc: { code: 'Code', clickToShow: 'Show' } };
+	app.use(internationalization);
 	app.mount(element);
 	if (input.forceShow || !preferences.s.dataSaver.code) await vi.waitFor(() => expect(element.querySelector('.shiki')).not.toBeNull());
 	return { element, props, unmount: () => app.unmount() };
