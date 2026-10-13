@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { PeerPayments1791950000000 as PeerMigration } from '../../../backend/migration/1791950000000-PeerPayments.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -31,7 +32,7 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 		await qr.query(`CREATE SCHEMA "${schema}"`);
 		await qr.query('CREATE TABLE "user" ("id" varchar(32) PRIMARY KEY)');
 		await qr.query(`INSERT INTO "user" ("id") VALUES ('alice'), ('bob')`);
-		await migration.up(qr); await migration.down(qr); await migration.up(qr);
+		await migration.up(qr); await migration.down(qr); await migration.up(qr); await new PeerMigration().up(qr);
 		const chainMigration = new ChainMigration();
 		await chainMigration.up(qr); await chainMigration.down(qr); await chainMigration.up(qr);
 		const diff = await db.driver.createSchemaBuilder().log();

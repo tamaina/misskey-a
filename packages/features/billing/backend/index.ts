@@ -21,3 +21,8 @@ export { createWalletRpcFetch, WALLET_RPC_MAX_BYTES, WALLET_RPC_TIMEOUT } from '
 export { createTransferReceiptReader } from './transfer-confirmation.js';
 export { receiptEvidenceSchema, transferEvidenceSchema } from './transfer.schema.js';
 export type { ReceiptReader, ReceiptResult, ReceiptEvidence, TransferEvidence } from './transfer-confirmation.js';
+export { peerPaymentContract } from './peer.contract.js';
+export { PeerPaymentApiProvider } from './peer.provider.js';
+export { createPeerPaymentRouter } from './peer.implementation.js';
+export { createPeerPaymentStore, publicPeerTransfer } from './peer-store.js';
+export { MiPeerPaymentIntent, MiPeerPaymentToken } from './models/PeerPayment.js';

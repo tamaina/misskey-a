@@ -110,6 +110,10 @@ export const ROUTE_DEF = [{
 		name: 'email',
 		component: page(() => import('@features/auth/frontend/pages/settings/email.vue')),
 	}, {
+		path: '/peer-payments',
+		name: 'peerPayments',
+		component: page(() => import('@features/billing/frontend/pages/settings/peer-payments.vue')),
+	}, {
 		path: '/wallets',
 		name: 'wallets',
 		component: page(() => import('@features/billing/frontend/pages/settings/wallets.vue')),
@@ -463,6 +467,10 @@ export const ROUTE_DEF = [{
 		path: '/modlog',
 		name: 'modlog',
 		component: page(() => import('@features/moderation/frontend/pages/admin/modlog.vue')),
+	}, {
+		path: '/peer-payment-tokens',
+		name: 'peerPaymentTokens',
+		component: page(() => import('@features/billing/frontend/pages/admin/peer-payment-tokens.vue')),
 	}, {
 		path: '/wallet-chains',
 		name: 'walletChains',

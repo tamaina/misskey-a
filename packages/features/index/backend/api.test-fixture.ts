@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { createWalletRouter } from '@features/billing/backend/wallet.implementation.js';
+import { createPeerPaymentRouter } from '@features/billing/backend/peer.implementation.js';
 import { mockDeep } from 'vitest-mock-extended';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
@@ -37,6 +38,7 @@ import { createCollectionsRouter } from '@features/collections/backend/api.imple
 import { createDriveRouter } from '@features/drive/backend/api.implementation.js';
 export function createApiTestFeatures(): ApiRouterFeatures {
 	return {
+		peerPayments: createPeerPaymentRouter<MiLocalUser>(mockDeep<Parameters<typeof createPeerPaymentRouter<MiLocalUser>>[0]>()),
 		wallets: createWalletRouter<MiLocalUser>({ ...mockDeep<Parameters<typeof createWalletRouter<MiLocalUser>>[0]>(), origin: 'https://misskey.example.test' }),
 		roles: createRolesRouter<MiLocalUser>(mockDeep<Parameters<typeof createRolesRouter<MiLocalUser>>[0]>()),
 		moderation: createModerationRouter<MiLocalUser>(mockDeep<Parameters<typeof createModerationRouter<MiLocalUser>>[0]>()),

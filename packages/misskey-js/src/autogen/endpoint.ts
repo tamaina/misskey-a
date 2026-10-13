@@ -1,6 +1,24 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	AdminPeerPaymentsTokensListRequest,
+	AdminPeerPaymentsTokensListResponse,
+	AdminPeerPaymentsTokensUpsertRequest,
+	AdminPeerPaymentsTokensUpsertResponse,
+	PeerPaymentsTokensListRequest,
+	PeerPaymentsTokensListResponse,
+	AccountWalletsPublicationListRequest,
+	AccountWalletsPublicationListResponse,
+	AccountWalletsPublicationSetRequest,
+	AccountWalletsPublicationSetResponse,
+	UsersPaymentWalletsRequest,
+	UsersPaymentWalletsResponse,
+	PeerPaymentsPrepareRequest,
+	PeerPaymentsPrepareResponse,
+	PeerPaymentsCheckRequest,
+	PeerPaymentsCheckResponse,
+	PeerPaymentsListRequest,
+	PeerPaymentsListResponse,
 	AdminWalletsChainsListRequest,
 	AdminWalletsChainsListResponse,
 	AdminWalletsChainsUpsertRequest,
@@ -748,6 +766,15 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'admin/peer-payments/tokens/list': { req: AdminPeerPaymentsTokensListRequest; res: AdminPeerPaymentsTokensListResponse };
+	'admin/peer-payments/tokens/upsert': { req: AdminPeerPaymentsTokensUpsertRequest; res: AdminPeerPaymentsTokensUpsertResponse };
+	'peer-payments/tokens/list': { req: PeerPaymentsTokensListRequest; res: PeerPaymentsTokensListResponse };
+	'account/wallets/publication/list': { req: AccountWalletsPublicationListRequest; res: AccountWalletsPublicationListResponse };
+	'account/wallets/publication/set': { req: AccountWalletsPublicationSetRequest; res: AccountWalletsPublicationSetResponse };
+	'users/payment-wallets': { req: UsersPaymentWalletsRequest; res: UsersPaymentWalletsResponse };
+	'peer-payments/prepare': { req: PeerPaymentsPrepareRequest; res: PeerPaymentsPrepareResponse };
+	'peer-payments/check': { req: PeerPaymentsCheckRequest; res: PeerPaymentsCheckResponse };
+	'peer-payments/list': { req: PeerPaymentsListRequest; res: PeerPaymentsListResponse };
 	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
 	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };

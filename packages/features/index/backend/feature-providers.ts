@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { PeerPaymentApiProvider } from '@features/billing/backend/peer.provider.js';
 import { WalletApiProvider } from '@features/billing/backend/wallet.provider.js';
 import type { Provider } from '@nestjs/common';
 import { ApiRouterProvider } from './api.implementation.js';
@@ -37,6 +38,7 @@ import { DriveApiProvider } from '@features/drive/backend/api.implementation.js'
 export const featureProviders: Provider[] = [
 	ApiRouterProvider,
 	WalletApiProvider,
+	PeerPaymentApiProvider,
 	RolesApiProvider,
 	ModerationApiProvider,
 	AuthApiProvider,
