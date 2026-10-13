@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { implement } from '@orpc/server';
+import { DecoratedProcedure, implement } from '@orpc/server';
 import { authContract, authSessionsContract } from './api.definition.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -120,6 +120,23 @@ import { SigninService } from './transport/SigninService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { RateLimiterService } from '@features/api/backend/transport/RateLimiterService.js';
 
+import type { Context, Procedure } from '@orpc/server';
+import type { AnySchema, ErrorMap, Meta } from '@orpc/contract';
+import type { ApiProcedureMetadata } from '@features/api/backend/transport/policy.types.js';
+
+/** Cloning the definition preserves the already captured legacy policy/rate bucket.
+ * Do not rebuild createApiProcedure from the alias metadata, or split the quota. */
+export function aliasTwoFactorProcedure<Initial extends Context, Current extends Context, Input extends AnySchema, Output extends AnySchema, Errors extends ErrorMap, Metadata extends Meta & ApiProcedureMetadata, RequestName extends string>(
+	procedure: Procedure<Initial, Current, Input, Output, Errors, Metadata>, requestName: RequestName,
+) {
+	const definition = procedure['~orpc'];
+	const { requestName: legacyName, ...metadata } = definition.meta;
+	if (!legacyName) throw new Error('A compatibility alias requires a legacy request name');
+	return new DecoratedProcedure({
+		...definition, meta: { ...metadata, requestName, compatibilityAliasOf: legacyName }, route: { ...definition.route, path: `/${requestName}` },
+	});
+}
+
 export interface AuthRouterDependencies {
 	'admin/accounts/create': AdminAccountsCreateDependencies;
 	'admin/captcha/current': AdminCaptchaCurrentDependencies;
@@ -166,6 +183,14 @@ export interface AuthRouterDependencies {
 }
 
 export function createAuthRouter(deps: AuthRouterDependencies) {
+	const i2faDone = createI2faDoneProcedure(deps['i/2fa/done']);
+	const i2faRegister = createI2faRegisterProcedure(deps['i/2fa/register']);
+	const i2faUnregister = createI2faUnregisterProcedure(deps['i/2fa/unregister']);
+	const i2faKeyDone = createI2faKeyDoneProcedure(deps['i/2fa/key-done']);
+	const i2faRegisterKey = createI2faRegisterKeyProcedure(deps['i/2fa/register-key']);
+	const i2faRemoveKey = createI2faRemoveKeyProcedure(deps['i/2fa/remove-key']);
+	const i2faUpdateKey = createI2faUpdateKeyProcedure(deps['i/2fa/update-key']);
+	const i2faPasswordLess = createI2faPasswordLessProcedure(deps['i/2fa/password-less']);
 	return implement(authContract).$context<ApiContext<MiLocalUser>>().router({
 		'admin/accounts/create': createAdminAccountsCreateProcedure(deps['admin/accounts/create']),
 		'admin/captcha/current': createAdminCaptchaCurrentProcedure(deps['admin/captcha/current']),
@@ -181,14 +206,22 @@ export function createAuthRouter(deps: AuthRouterDependencies) {
 		'auth/session/show': createAuthSessionShowProcedure(deps['auth/session/show']),
 		'auth/session/userkey': createAuthSessionUserkeyProcedure(deps['auth/session/userkey']),
 		'email-address/available': createEmailAddressAvailableProcedure(deps['email-address/available']),
-		'i/2fa/done': createI2faDoneProcedure(deps['i/2fa/done']),
-		'i/2fa/key-done': createI2faKeyDoneProcedure(deps['i/2fa/key-done']),
-		'i/2fa/password-less': createI2faPasswordLessProcedure(deps['i/2fa/password-less']),
-		'i/2fa/register': createI2faRegisterProcedure(deps['i/2fa/register']),
-		'i/2fa/register-key': createI2faRegisterKeyProcedure(deps['i/2fa/register-key']),
-		'i/2fa/remove-key': createI2faRemoveKeyProcedure(deps['i/2fa/remove-key']),
-		'i/2fa/unregister': createI2faUnregisterProcedure(deps['i/2fa/unregister']),
-		'i/2fa/update-key': createI2faUpdateKeyProcedure(deps['i/2fa/update-key']),
+		'i/2fa/done': i2faDone,
+		'i/2fa/key-done': i2faKeyDone,
+		'i/2fa/password-less': i2faPasswordLess,
+		'i/2fa/register': i2faRegister,
+		'i/2fa/register-key': i2faRegisterKey,
+		'i/2fa/remove-key': i2faRemoveKey,
+		'i/2fa/unregister': i2faUnregister,
+		'i/2fa/update-key': i2faUpdateKey,
+		'i/2fa/totp/done': aliasTwoFactorProcedure(i2faDone, 'i/2fa/totp/done'),
+		'i/2fa/totp/register': aliasTwoFactorProcedure(i2faRegister, 'i/2fa/totp/register'),
+		'i/2fa/totp/remove': aliasTwoFactorProcedure(i2faUnregister, 'i/2fa/totp/remove'),
+		'i/2fa/passkey/done': aliasTwoFactorProcedure(i2faKeyDone, 'i/2fa/passkey/done'),
+		'i/2fa/passkey/register': aliasTwoFactorProcedure(i2faRegisterKey, 'i/2fa/passkey/register'),
+		'i/2fa/passkey/remove': aliasTwoFactorProcedure(i2faRemoveKey, 'i/2fa/passkey/remove'),
+		'i/2fa/passkey/update': aliasTwoFactorProcedure(i2faUpdateKey, 'i/2fa/passkey/update'),
+		'i/2fa/passkey/password-less': aliasTwoFactorProcedure(i2faPasswordLess, 'i/2fa/passkey/password-less'),
 		'i/apps': createIAppsProcedure(deps['i/apps']),
 		'i/authorized-apps': createIAuthorizedAppsProcedure(deps['i/authorized-apps']),
 		'i/change-password': createIChangePasswordProcedure(deps['i/change-password']),
@@ -277,13 +310,13 @@ export interface AuthSessionDependencies {
 
 export function createAuthSessionRouter(deps: AuthSessionDependencies) {
 	return {
-authSessions: implement(authSessionsContract).$context<AuthSessionContext>().router({
+		authSessions: implement(authSessionsContract).$context<AuthSessionContext>().router({
 			signup: createSignupProcedure(deps.signup),
 			signupPending: createSignupPendingProcedure(deps.signupPending),
 			signinFlow: createSigninFlowProcedure(deps.signinFlow),
 			signinWithPasskey: createSigninWithPasskeyProcedure(deps.signinWithPasskey),
-		})
-};
+		}),
+	};
 }
 
 @Injectable()

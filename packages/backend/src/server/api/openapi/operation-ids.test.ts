@@ -50,7 +50,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/i/sessions']?.post?.operationId).toBe('post___i___sessions');
 	expect(spec.paths?.['/i/sessions/revoke']?.post?.operationId).toBe('post___i___sessions___revoke');
 	expect(spec.paths?.['/i/signout']?.post?.operationId).toBe('post___i___signout');
-	expect(identifiers).toHaveLength(469);
+	expect(identifiers).toHaveLength(477);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 
