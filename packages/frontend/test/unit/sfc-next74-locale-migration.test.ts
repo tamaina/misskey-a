@@ -23,6 +23,7 @@ import { locales } from './instance-pilot-locale-catalog.js';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import * as VviRuntime from 'vite-vue-internationalization/runtime';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
+import { restoreBrowserSessionClientBaseline } from './browser-session-client-source-rebase.js';
 import type { Component } from 'vue';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
@@ -134,7 +135,7 @@ function getLocaleValue(language: string, keyPath: string): string {
 }
 
 function getBlocks(file: string): Map<string, Record<string, string>> {
-	const { descriptor, errors } = parse(restorePilotHistoricalSource(file, restoreEmailHistoricalSource(file, restoreFinalOwnerHistoricalSource(file, readFileSync(resolve(repoRoot, file), 'utf8')))), { filename: file });
+	const { descriptor, errors } = parse(restorePilotHistoricalSource(file, restoreEmailHistoricalSource(file, restoreFinalOwnerHistoricalSource(file, restoreBrowserSessionClientBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8'))))), { filename: file });
 	expect(errors).toEqual([]);
 	const blocks = descriptor.customBlocks.filter(block => block.type === 'locale');
 	const result = new Map<string, Record<string, string>>();
@@ -210,7 +211,7 @@ describe('next74 static raw-label ownership', () => {
 	});
 
 	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', async migration => {
-		const actualSource = readFileSync(resolve(repoRoot, migration.file), 'utf8');
+		const actualSource = restoreBrowserSessionClientBaseline(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8'));
 		const passwordSource = migration.file === 'packages/features/auth/frontend/components/MkPasswordDialog.vue' ? restorePasswordChangeBaseline(migration.file, actualSource) : actualSource;
 		const source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, restoreEmailHistoricalSource(migration.file, restoreFinalOwnerHistoricalSource(migration.file, restoreProductNameBaseline(migration.file, passwordSource)))));
 		const blocks = getBlocks(migration.file);
