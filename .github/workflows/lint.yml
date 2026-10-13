@@ -9,6 +9,8 @@ on:
       - packages/backend/**
       - packages/features/mcp/**
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       - packages/frontend-shared/**
       - packages/frontend-builder/**
       - packages/frontend-embed/**
@@ -28,6 +30,8 @@ on:
       - packages/backend/**
       - packages/features/mcp/**
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       - packages/frontend-shared/**
       - packages/frontend-builder/**
       - packages/frontend-embed/**
