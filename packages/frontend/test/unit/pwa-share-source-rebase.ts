@@ -11,7 +11,7 @@ const sha256 = (source: string) => createHash('sha256').update(source).digest('h
 
 /** Reverse only the reviewed PWA edits before applying frozen migration proofs. */
 export function restorePwaShareSourceBaseline(file: string, source: string): string {
-	source = restoreBrowserSessionClientBaseline(file, source);
+	if (file === 'packages/features/auth/frontend/accounts.ts') source = restoreBrowserSessionClientBaseline(file, source);
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	const localeStart = source.search(/<locale\s/);
