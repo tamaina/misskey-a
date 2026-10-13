@@ -205,7 +205,7 @@ test('alternative label copies every existing input locale exactly', () => {
 	expect(dictionaries('../../frontend/components/MkSignin.passkey-alternative.vue')).toEqual(dictionaries('../../frontend/components/MkSignin.input.vue'));
 });
 
-test.each([['totp', 'passkey'], ['totp']])('explicit available TOTP keeps the password path TOTP-first: %j', async factors => {
+test.each([{ factors: ['totp', 'passkey'] }, { factors: ['totp'] }])('explicit available TOTP keeps the password path TOTP-first: %j', async ({ factors }) => {
 	vi.mocked(misskeyApi).mockReset().mockResolvedValueOnce({ username: 'synthetic' } as never)
 		.mockResolvedValueOnce({ finished: false, next: 'password' } as never)
 		.mockResolvedValueOnce({ finished: false, next: 'passkey', authRequest: option('explicit'), availableFactors: factors } as never);
