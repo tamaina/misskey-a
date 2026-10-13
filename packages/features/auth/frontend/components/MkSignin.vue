@@ -53,6 +53,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			:credentialRequest="credentialRequest!"
 			:isPerformingPasswordlessLogin="doingPasskeyFromInputPage"
+			:canUseTotp="totpAvailable"
 
 			@done="onPasskeyDone"
 			@useTotp="onUseTotp"
@@ -113,6 +114,7 @@ const credentialRequest = shallowRef<PublicKeyCredentialRequestOptionsJSON | nul
 const passkeyContext = ref('');
 const doingPasskeyFromInputPage = ref(false);
 const passkeyAvailable = ref(false);
+const totpAvailable = ref(true);
 
 function onPasskeyLogin(): void {
 	if (browserSupportsWebAuthn()) {
@@ -155,6 +157,7 @@ function onPasskeyDone(credential: AuthenticationResponseJSON): void {
 }
 
 function onUseTotp(): void {
+	if (!totpAvailable.value) return;
 	credentialRequest.value = null;
 	page.value = 'totp';
 }
@@ -255,16 +258,24 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 					break;
 				}
 				case 'totp': {
+					totpAvailable.value = true;
 					passkeyAvailable.value = false;
 					credentialRequest.value = null;
 					page.value = 'totp';
 					break;
 				}
 				case 'passkey': {
-					// The current server sends this step only when TOTP is enabled.
-					// Independent passkey MFA must expose factor availability before changing that contract.
-					passkeyAvailable.value = browserSupportsWebAuthn();
-					credentialRequest.value = preferPasskey && passkeyAvailable.value ? res.authRequest : null;
+					// Older servers send this step only when TOTP is enabled.
+					const useTotp = res.availableFactors === undefined || res.availableFactors.includes('totp');
+					totpAvailable.value = useTotp;
+					passkeyAvailable.value = browserSupportsWebAuthn() && (res.availableFactors === undefined || res.availableFactors.includes('passkey'));
+					credentialRequest.value = passkeyAvailable.value && (preferPasskey || !useTotp) ? res.authRequest : null;
+					if (!useTotp && !passkeyAvailable.value) {
+						page.value = 'input';
+						password.value = '';
+						await os.alert({ type: 'error', title: $locale.value.sfc.loginFailed, text: $locale.value.sfc.passkeyVerificationFailed });
+						break;
+					}
 					page.value = credentialRequest.value ? 'passkey' : 'totp';
 					break;
 				}

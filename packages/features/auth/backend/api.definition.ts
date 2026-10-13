@@ -16,7 +16,7 @@ import { localUsernameSchema, passwordSchema } from '../../users/backend/user-va
 import { webAuthnRegistrationOptionsSchema, webAuthnAuthenticationOptionsSchema } from './webauthn.schema.js';
 import { packedAppSchema, packedInviteCodeSchema, packedSigninSchema, supportedCaptchaProviders } from './auth.schema.js';
 import { sessionFailureSchema, fastifyFailureSchema } from './session-errors.schema.js';
-import { finishedSigninSchema } from './session.schema.js';
+import { availableSigninFactorsSchema, finishedSigninSchema } from './session.schema.js';
 
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
@@ -512,8 +512,9 @@ export const authSessionsContract = {
 		requireCredential: false,
 	} as const).route({ method: 'POST', path: '/signin-flow', tags: ['auth'], }).errors(httpErrors).input(packedOptionalJsonValueSchema).output(v.union([v.union([
 	finishedSigninSchema,
-	v.strictObject({ finished: v.literal(false), next: v.picklist(['captcha', 'password', 'totp']) }),
-	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authRequest: webAuthnAuthenticationOptionsSchema }),
+	v.strictObject({ finished: v.literal(false), next: v.picklist(['captcha', 'password']) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('totp'), availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authRequest: webAuthnAuthenticationOptionsSchema, availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
 ]), sessionFailureSchema, v.void()])),
 	signinWithPasskey: oc.$meta({
 		requestName: 'signin-with-passkey',
