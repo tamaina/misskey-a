@@ -666,6 +666,9 @@ importers:
 
   packages/frontend:
     dependencies:
+      diff:
+        specifier: 8.0.4
+        version: 8.0.4
       '@analytics/google-analytics':
         specifier: 1.1.0
         version: 1.1.0
@@ -810,9 +813,6 @@ importers:
       tinycolor2:
         specifier: 1.6.0
         version: 1.6.0
-      v-code-diff:
-        specifier: 1.16.0
-        version: 1.16.0(vue@3.5.42(typescript@6.0.3))
       vite-vue-internationalization:
         specifier: 1.1.5
         version: 1.1.5(@oxc-project/types@0.147.0)(@vue/language-core@3.3.11)(oxc-parser@0.127.0)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(sass-embedded@1.103.1)(sass@1.103.1)(terser@5.48.0)(tsx@4.23.13)(yaml@2.9.1))(vue@3.5.42(typescript@6.0.3))
@@ -6052,10 +6052,6 @@ packages:
   headers-polyfill@5.0.1:
     resolution: {integrity: sha512-1TJ6Fih/b8h5TIcv+1+Hw0PDQWJTKDKzFZzcKOiW1wJza3XoAQlkCuXLbymPYB8+ZQyw8mHvdw560e8zVFIWyA==}
 
-  highlight.js@11.12.0:
-    resolution: {integrity: sha512-nbfWpyRMcMrPMmDwJB+dhX/eiaPKtc2RB+0QZskqJ3WjRA/FDS0e9hZrx8EC/lbEv8gXy98FcDbNa/dspAaJMg==}
-    engines: {node: '>=12.0.0'}
-
   hono@4.13.12:
     resolution: {integrity: sha512-6E2QDAc9Ick9Sq77ZrGS/dk2WUYni91aufTw6LJKpV7w8kW5/GxVUc650FOADOmlwg3K+f7Pun6XlV+pYmW6gw==}
     engines: {node: '>=16.9.0'}
@@ -9066,15 +9062,6 @@ packages:
     deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
-  v-code-diff@1.16.0:
-    resolution: {integrity: sha512-xNhzfK/OHgVs86T1Wnjb1YqSAYHXhmwAAYm8G7yVWuc96j9QWyIhG1xirWMjrzlkJr3KRGR+TUKqG23P5bl8Pg==}
-    peerDependencies:
-      '@vue/composition-api': ^1.4.9
-      vue: ^2.6.0 || >=3.0.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
-
   valibot@1.5.0:
     resolution: {integrity: sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ==}
     peerDependencies:
@@ -9266,17 +9253,6 @@ packages:
 
   vue-component-type-helpers@3.3.11:
     resolution: {integrity: sha512-LwcxzeliO9fkQcpJG0PoX8X5kmAhKmH9wkpDLxNabwzkQ9Zeib2YVHwFV4pcWmMLfXVfjr/dSV+DaJ3cIPgSNA==}
-
-  vue-demi@0.14.10:
-    resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
-    engines: {node: '>=12'}
-    hasBin: true
-    peerDependencies:
-      '@vue/composition-api': ^1.0.0-rc.1
-      vue: ^3.0.0-0 || ^2.6.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
 
   vue-docgen-api@4.79.2:
     resolution: {integrity: sha512-n9ENAcs+40awPZMsas7STqjkZiVlIjxIKgiJr5rSohDP0/JCrD9VtlzNojafsA1MChm/hz2h3PDtUedx3lbgfA==}
@@ -14880,8 +14856,6 @@ snapshots:
       '@types/set-cookie-parser': 2.4.10
       set-cookie-parser: 3.1.0
 
-  highlight.js@11.12.0: {}
-
   hono@4.13.12: {}
 
   hosted-git-info@2.8.9: {}
@@ -18244,14 +18218,6 @@ snapshots:
 
   uuid@9.0.1: {}
 
-  v-code-diff@1.16.0(vue@3.5.42(typescript@6.0.3)):
-    dependencies:
-      diff: 5.2.2
-      diff-match-patch: 1.0.5
-      highlight.js: 11.12.0
-      vue: 3.5.42(typescript@6.0.3)
-      vue-demi: 0.14.10(vue@3.5.42(typescript@6.0.3))
-
   valibot@1.5.0(@typescript/typescript6@6.0.2):
     optionalDependencies:
       typescript: '@typescript/typescript6@6.0.2'
@@ -18463,10 +18429,6 @@ snapshots:
       typescript: 5.9.3
 
   vue-component-type-helpers@3.3.11: {}
-
-  vue-demi@0.14.10(vue@3.5.42(typescript@6.0.3)):
-    dependencies:
-      vue: 3.5.42(typescript@6.0.3)
 
   vue-docgen-api@4.79.2(vue@3.5.42(typescript@6.0.3)):
     dependencies:

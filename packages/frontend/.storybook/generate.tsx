@@ -488,6 +488,7 @@ function toStories(component: string): Promise<string> {
 		globSync('../features/collections/frontend/components/MkClipPreview.vue'),
 		globSync('../features/markup/frontend/components/MkCode.core.vue'),
 		globSync('../features/markup/frontend/components/MkCode.vue'),
+		globSync('../features/markup/frontend/components/MkCodeDiff.vue'),
 		globSync('../features/markup/frontend/components/MkCodeEditor.vue'),
 		globSync('../features/markup/frontend/components/MkCodeInline.vue'),
 		globSync('../features/ui/frontend/components/MkColorInput.vue'),
