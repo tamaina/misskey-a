@@ -58,6 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			@useTotp="onUseTotp"
 		/>
 	</Transition>
+	<XPasskeyAlternative v-if="page === 'totp' && passkeyAvailable" :disabled="waiting" @choose="onUsePasskey"/>
 	<div v-if="waiting" :class="$style.waitingRoot">
 		<MkLoading/>
 	</div>
@@ -79,6 +80,7 @@ import XInput from '@features/auth/frontend/components/MkSignin.input.vue';
 import XPassword from '@features/auth/frontend/components/MkSignin.password.vue';
 import XTotp from '@features/auth/frontend/components/MkSignin.totp.vue';
 import XPasskey from '@features/auth/frontend/components/MkSignin.passkey.vue';
+import XPasskeyAlternative from '@features/auth/frontend/components/MkSignin.passkey-alternative.vue';
 import { login } from '@features/auth/frontend/accounts.js';
 
 const emit = defineEmits<{
@@ -110,6 +112,7 @@ const password = ref('');
 const credentialRequest = shallowRef<PublicKeyCredentialRequestOptionsJSON | null>(null);
 const passkeyContext = ref('');
 const doingPasskeyFromInputPage = ref(false);
+const passkeyAvailable = ref(false);
 
 function onPasskeyLogin(): void {
 	if (browserSupportsWebAuthn()) {
@@ -152,7 +155,15 @@ function onPasskeyDone(credential: AuthenticationResponseJSON): void {
 }
 
 function onUseTotp(): void {
+	credentialRequest.value = null;
 	page.value = 'totp';
+}
+
+async function onUsePasskey(): Promise<void> {
+	if (waiting.value || !passkeyAvailable.value || userInfo.value == null) return;
+	waiting.value = true;
+	// Always obtain a fresh challenge after waiting for or returning from TOTP.
+	await tryLogin({ username: userInfo.value.username, password: password.value }, true);
 }
 //#endregion
 
@@ -213,7 +224,7 @@ async function onTotpSubmitted(token: string) {
 	}
 }
 
-async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>): Promise<Misskey.entities.SigninFlowResponse> {
+async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, preferPasskey = false): Promise<Misskey.entities.SigninFlowResponse> {
 	const _req = {
 		username: req.username ?? userInfo.value?.username,
 		...req,
@@ -244,16 +255,17 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>): Promi
 					break;
 				}
 				case 'totp': {
+					passkeyAvailable.value = false;
+					credentialRequest.value = null;
 					page.value = 'totp';
 					break;
 				}
 				case 'passkey': {
-					if (browserSupportsWebAuthn()) {
-						credentialRequest.value = res.authRequest;
-						page.value = 'passkey';
-					} else {
-						page.value = 'totp';
-					}
+					// The current server sends this step only when TOTP is enabled.
+					// Independent passkey MFA must expose factor availability before changing that contract.
+					passkeyAvailable.value = browserSupportsWebAuthn();
+					credentialRequest.value = preferPasskey && passkeyAvailable.value ? res.authRequest : null;
+					page.value = credentialRequest.value ? 'passkey' : 'totp';
 					break;
 				}
 			}
