@@ -1675,5 +1675,20 @@
         "baseline": ""
       }
     ]
+  },
+  {
+    "file": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
+    "baselineBodySha256": "ab1cd4c378eab6ea8a3c721076de6df2f89132698ac156280ba3e97aa32d77d4",
+    "currentBodySha256": "90b19d2ca2efa4bf15cac68aeff24d6c9970e171729dead80adc68d7b3cf053a",
+    "localeBlocksSha256": "f11888bd7ab4ebd6fada0f0b72c1614b3dff27d50e795457cf560c82a7420b2c",
+    "currentFile": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
+    "edits": [
+      {
+        "start": 5788,
+        "end": 5805,
+        "current": "'i/2fa/totp/done'",
+        "baseline": "'i/2fa/done'"
+      }
+    ]
   }
 ]
