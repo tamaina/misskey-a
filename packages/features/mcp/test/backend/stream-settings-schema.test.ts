@@ -50,3 +50,26 @@ it('rejects unknown channels and invalid hashtag dimensions', () => {
 		{ channel: 'hashtag', params: { q: Array.from({ length: 11 }, () => ['tag']) } },
 	]) expect(validate(input).valid).toBe(false);
 });
+
+it('advertises explicitly typed channel enums in all native branches', () => {
+	const branches = streamChannelInputSchema.oneOf as { properties: { channel: Record<string, unknown> } }[];
+	expect(branches).toHaveLength(streamChannels.length);
+	for (const [index, branch] of branches.entries()) {
+		expect(branch.properties.channel).toEqual({ type: 'string', enum: [streamChannels[index]] });
+	}
+});
+
+it('advertises the finite parameter fields at the object root without weakening branch constraints', () => {
+	const root = streamChannelInputSchema.properties as { params: { properties: Record<string, unknown>; additionalProperties: boolean } };
+	expect(Object.keys(root.params.properties).sort()).toEqual([
+		'antennaId', 'channelId', 'gameId', 'listId', 'otherId', 'q', 'roleId', 'roomId', 'withFiles', 'withRenotes', 'withReplies',
+	]);
+	expect(root.params.additionalProperties).toBe(false);
+	expect(root.params.properties.withFiles).toMatchObject({ type: 'boolean' });
+	expect(root.params.properties.antennaId).toMatchObject({ type: 'string', minLength: 1, maxLength: 32 });
+	const validate = new AjvJsonSchemaValidator().getValidator(validationSchema);
+	// Fields discoverable at the root remain usable only for the native channel that accepts them.
+	expect(validate({ channel: 'main', params: { antennaId: 'antenna' } }).valid).toBe(false);
+	expect(validate({ channel: 'antenna', params: {} }).valid).toBe(false);
+	expect(validate({ channel: 'antenna', params: { antennaId: 'antenna' } }).valid).toBe(true);
+});
