@@ -16,8 +16,12 @@ import type { MiChannel } from '../../backend/models/Channel.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { ChannelsRepository, ChannelFollowingsRepository, UsersRepository, NotesRepository, FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { IAnnounce, IObject } from '@features/federation/backend/protocol/type.js';
+import type { IAnnounce, ICreate, IObject } from '@features/federation/backend/protocol/type.js';
 import type { ApResolverService, Resolver } from '@features/federation/backend/services/ApResolverService.js';
+import type { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
+import type { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { ModuleRef } from '@nestjs/core';
 import type * as Redis from 'ioredis';
 
@@ -39,12 +43,12 @@ function fixture() {
 	const resolverService = mockDeep<ApResolverService>();
 	resolverService.createResolver.mockResolvedValue(resolver);
 	const moduleRef = mockDeep<ModuleRef>();
-	const renderer = mockDeep();
-	renderer.addContext.mockImplementation((object: IObject) => ({ ...object, '@context': 'https://www.w3.org/ns/activitystreams' }));
-	const queue = mockDeep();
-	const ids = mockDeep();
+	const renderer = mockDeep<ApRendererService>();
+	renderer.addContext.mockImplementation(<T extends IObject>(object: T) => ({ ...object, id: object.id ?? 'fixture-activity', '@context': 'https://www.w3.org/ns/activitystreams' }));
+	const queue = mockDeep<QueueService>();
+	const ids = mockDeep<IdService>();
 	ids.gen.mockReturnValue('created123');
-	const events = mockDeep();
+	const events = mockDeep<GlobalEventService>();
 	const service = new ChannelFederationService({ url: 'https://local.test' } as never, redis, channels, channelFollowings, users, notes, followings, ids, events, queue, renderer, resolverService, moduleRef);
 	return { service, channels, channelFollowings, users, notes, followings, redis, resolver, moduleRef, queue, events };
 }
@@ -55,7 +59,7 @@ function announcement(): IAnnounce {
 		audience: groupUri, to: [PUBLIC], object: {
 			type: 'Create', id: `${noteUri}/activity`, actor: authorUri, audience: groupUri,
 			object: { type: 'Note', id: noteUri, attributedTo: authorUri, audience: groupUri, to: [PUBLIC], content: 'approved' },
-		},
+		} as ICreate,
 	};
 }
 
@@ -188,7 +192,7 @@ test('an overlapping Undo waits for Accept bridge write, then removes the relati
 		locks.set(String(key), String(value));
 		return 'OK';
 	});
-	f.redis.get.mockImplementation(async key => locks.get(key) ?? null);
+	f.redis.get.mockImplementation(async key => locks.get(String(key)) ?? null);
 	f.redis.del.mockImplementation(async key => Number(locks.delete(String(key))));
 	f.channels.findOneBy.mockResolvedValue(mockDeep<MiChannel>({ id: 'channel123', uri: groupUri }));
 	f.resolver.resolve.mockResolvedValue({ type: 'Group', id: groupUri, _misskey_channel: true });
@@ -213,7 +217,7 @@ test('native Accept consumption and channel cancellation are serialized before c
 		locks.set(String(key), String(value));
 		return 'OK';
 	});
-	f.redis.get.mockImplementation(async key => locks.get(key) ?? null);
+	f.redis.get.mockImplementation(async key => locks.get(String(key)) ?? null);
 	f.redis.del.mockImplementation(async key => Number(locks.delete(String(key))));
 	let pending = true;
 	let nativeFollowing = false;

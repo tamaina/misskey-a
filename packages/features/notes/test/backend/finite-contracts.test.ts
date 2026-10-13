@@ -147,7 +147,7 @@ test.each([false, true])('real Note serializer preserves native undefined and JS
 	ids.parse.mockReturnValue({ date });
 	polls.findOneByOrFail.mockResolvedValue(mockDeep<Awaited<ReturnType<typeof polls.findOneByOrFail>>>({ choices: ['one', 'two'], votes: [2, 0], multiple: false, expiresAt: date }));
 	moduleRef.get.mockReturnValueOnce(users).mockReturnValueOnce(files).mockReturnValueOnce(emoji).mockReturnValueOnce(reaction).mockReturnValueOnce(buffering).mockReturnValueOnce(ids).mockReturnValueOnce(mockDeep());
-	const channel = mockDeep<MiChannel>({ id: 'channel123', name: 'Fixture', color: '#000000', isSensitive: false, allowRenoteToExternal: true, userId: null });
+	const channel = mockDeep<MiChannel>({ id: 'channel123', name: 'Fixture', color: '#000000', isSensitive: false, isFederated: false, host: null, allowRenoteToExternal: true, userId: null });
 	const values = { userId: user.id, userHost: null, text: 'fixture', cw: null, name: null, url: null, uri: null, visibility: 'public', localOnly: false, reactionAcceptance: null, repliesCount: 0, renoteCount: 0, reactions: {}, reactionAndUserPairCache: [], emojis: [], fileIds: [], tags: [], mentions: [], hasPoll: true, replyId: null, renoteId: null, channelId: channel.id, channel, clippedCount: 0 } satisfies Partial<MiNote>;
 	const reply = new MiNote({ ...values, id: 'reply123', hasPoll: false });
 	const note = new MiNote({ ...values, id: 'note123', replyId: reply.id, reply });
@@ -161,7 +161,7 @@ test.each([false, true])('real Note serializer preserves native undefined and JS
 	const wire = JSON.parse(JSON.stringify(raw));
 	expect(Object.hasOwn(wire, 'uri')).toBe(false);
 	expect(v.parse(packedNoteSchema, wire)).toEqual(wire);
-	expect(wire.channel).toEqual({ id: channel.id, name: channel.name, color: channel.color, isSensitive: false, allowRenoteToExternal: true, userId: null });
+	expect(wire.channel).toEqual({ id: channel.id, name: channel.name, color: channel.color, isSensitive: false, isFederated: false, host: null, allowRenoteToExternal: true, userId: null });
 	if (detail) {
 		expect(raw.poll?.expiresAt).toBe(date.toISOString());
 		expect(raw.poll?.choices).toEqual([{ text: 'one', votes: 2, isVoted: false }, { text: 'two', votes: 0, isVoted: false }]);

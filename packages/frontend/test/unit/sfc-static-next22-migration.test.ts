@@ -5,6 +5,7 @@
 
 import { existsSync } from 'node:fs';
 import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
+import { restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -53,7 +54,7 @@ describe('next22 raw locale migration', () => {
 	test('preserves all9856 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = restoreCommonUtilitiesBaseline(entry.file, restorePilotHistoricalSource(entry.file, readFileSync(resolve(root, entry.file), 'utf8')));
+			const source = restoreCommonUtilitiesBaseline(entry.file, restorePilotHistoricalSource(entry.file, restoreChannelFederationSourceBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'))));
 			expect(createHash('sha256').update(source).digest('hex')).toBe(entry.migratedSha256);
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);

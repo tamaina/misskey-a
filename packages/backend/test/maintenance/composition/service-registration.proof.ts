@@ -59,6 +59,7 @@ import { AvatarDecorationService } from '@features/avatar-decorations/backend/se
 
 import { CaptchaService } from '@features/auth/backend/services/CaptchaService.js';
 
+import { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
 
 import { ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
@@ -202,11 +203,11 @@ const services = [
 	['ApAudienceService', ApAudienceService, 1],
 	['ApDbResolverService', ApDbResolverService, 9],
 	['ApDeliverManagerService', ApDeliverManagerService, 5],
-	['ApInboxService', ApInboxService, 27],
+	['ApInboxService', ApInboxService, 28],
 	['ApLoggerService', ApLoggerService, 1],
 	['ApMfmService', ApMfmService, 1],
 	['ApRendererService', ApRendererService, 16],
-	['ApRequestService', ApRequestService, 5],
+	['ApRequestService', ApRequestService, 6],
 	['ApResolverService', ApResolverService, 1],
 	['JsonLdService', JsonLdService, 1],
 	['ApImageService', ApImageService, 5],
@@ -221,7 +222,8 @@ const services = [
 	['AntennaEventSubscriptionService', AntennaEventSubscriptionService, 4],
 	['AvatarDecorationService', AvatarDecorationService, 5],
 	['CaptchaService', CaptchaService, 3],
-	['ChannelFollowingService', ChannelFollowingService, 6],
+	['ChannelFederationService', ChannelFederationService, 13],
+	['ChannelFollowingService', ChannelFollowingService, 8],
 	['ChannelMutingService', ChannelMutingService, 6],
 	['ChartLoggerService', ChartLoggerService, 1],
 	['ChartManagementService', ChartManagementService, 13],
@@ -248,8 +250,8 @@ const services = [
 	['MetaService', MetaService, 4],
 	['MfmService', MfmService, 1],
 	['ModerationLogService', ModerationLogService, 2],
-	['NoteCreateService', NoteCreateService, 41],
-	['NoteDeleteService', NoteDeleteService, 16],
+	['NoteCreateService', NoteCreateService, 42],
+	['NoteDeleteService', NoteDeleteService, 17],
 	['NoteDraftService', NoteDraftService, 10],
 	['NotePiningService', NotePiningService, 10],
 	['NotificationService', NotificationService, 9],

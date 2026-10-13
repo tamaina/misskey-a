@@ -1,0 +1,89 @@
+[
+	{
+		"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+		"currentSha256": "6d2027a2b6b8abc3005a7f79aedb36e79b05bd735b811e2ef56408b418f98536",
+		"baselineSha256": "2dc2f5b18e7cc5f75809749d20da7250c8bfd9438146924b5441d7e638527a94",
+		"edits": [
+			{
+				"start": 19160,
+				"end": 19213,
+				"current": "\tlocalOnly.value = !targetChannel.value.isFederated;\n",
+				"baseline": "\tlocalOnly.value = true; // TODO: チャンネルが連合するようになった折には消す\n"
+			},
+			{
+				"start": 23070,
+				"end": 23124,
+				"current": "\t\tlocalOnly.value = !targetChannel.value.isFederated;\n",
+				"baseline": "\t\tlocalOnly.value = true; // TODO: チャンネルが連合するようになった折には消す\n"
+			},
+			{
+				"start": 23781,
+				"end": 23835,
+				"current": "\t\tlocalOnly.value = !targetChannel.value.isFederated;\n",
+				"baseline": "\t\tlocalOnly.value = true; // TODO: チャンネルが連合するようになった折には消す\n"
+			}
+		]
+	},
+	{
+		"file": "packages/features/channels/frontend/pages/channel-editor.vue",
+		"currentSha256": "b98d468e2367a9094e88450ff4d631e1252fb57fff30ed0ec4ed36669e3df8ad",
+		"baselineSha256": "492e8cdc1d3a33eade0aa59001dda94ab0f351d27b3190aa2121f5cb298d3d6e",
+		"edits": [
+			{
+				"start": 766,
+				"end": 1037,
+				"current": "\t\t\t<MkSwitch v-model=\"isFederated\">\n\t\t\t\t<template #label>{{ $locale.sfc.channelFederation }}</template>\n\t\t\t\t<template #caption>{{ $locale.sfc.channelFederationDescription }}</template>\n\t\t\t</MkSwitch>\n\n\t\t\t<MkSwitch v-model=\"allowRenoteToExternal\" :disabled=\"isFederated\">\n",
+				"baseline": "\t\t\t<MkSwitch v-model=\"allowRenoteToExternal\">\n"
+			},
+			{
+				"start": 4206,
+				"end": 4324,
+				"current": "const isFederated = ref(false);\n\nwatch(isFederated, enabled => { if (enabled) allowRenoteToExternal.value = true; });\n",
+				"baseline": ""
+			},
+			{
+				"start": 5077,
+				"end": 5118,
+				"current": "\tisFederated.value = result.isFederated;\n",
+				"baseline": ""
+			},
+			{
+				"start": 5821,
+				"end": 5930,
+				"current": "\t\tisFederated: isFederated.value,\n\t\tallowRenoteToExternal: isFederated.value || allowRenoteToExternal.value,\n",
+				"baseline": "\t\tallowRenoteToExternal: allowRenoteToExternal.value,\n"
+			},
+			{
+				"start": 11369,
+				"end": 11590,
+				"current": "\t\"channelFederation\": \"Federate this channel\",\n\t\"channelFederationDescription\": \"New posts are public and federated. Local-only posts are rejected and renotes outside the channel are allowed. Existing posts stay local.\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 15420,
+				"end": 15557,
+				"current": "\t\"channelFederation\": \"チャンネルを連合する\",\n\t\"channelFederationDescription\": \"新規投稿は公開・連合されます。ローカル限定の投稿は作成できず、チャンネル外へのリノートを許可します。過去の投稿は公開されません。\",\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/channels/frontend/pages/channel.vue",
+		"currentSha256": "6af7801c883946a3c2ac922d3d995db0ef67b0829a1de0b86db221c67f27c040",
+		"baselineSha256": "c081657742fe47caf88fce524c7b3c3fde840df0b2c42f2ad7f230ec85d458d0",
+		"edits": [
+			{
+				"start": 2497,
+				"end": 2674,
+				"current": "\t\t\t<MkPostForm v-if=\"$i && !channel.host && prefer.r.showFixedPostFormInChannel.value\" :channel=\"channel\" class=\"post-form _panel\" fixed :autofocus=\"deviceKind === 'desktop'\"/>\n",
+				"baseline": "\t\t\t<MkPostForm v-if=\"$i && prefer.r.showFixedPostFormInChannel.value\" :channel=\"channel\" class=\"post-form _panel\" fixed :autofocus=\"deviceKind === 'desktop'\"/>\n"
+			},
+			{
+				"start": 10788,
+				"end": 10877,
+				"current": "\t\tif (!channel.value.host && (($i && $i.id === channel.value.userId) || iAmModerator)) {\n",
+				"baseline": "\t\tif (($i && $i.id === channel.value.userId) || iAmModerator) {\n"
+			}
+		]
+	}
+]
