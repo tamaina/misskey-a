@@ -46,10 +46,11 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	const walletPaths = ['account/wallets/link/passkey-options', 'account/wallets/list', 'account/wallets/link/chains',
 		'account/wallets/link/begin', 'account/wallets/link/verify', 'account/wallets/unlink',
 		'admin/wallets/chains/list', 'admin/wallets/chains/upsert'];
-	const servicePaths = ['admin/billing/offers/list', 'admin/billing/offers/upsert', 'billing/offers/list', 'billing/orders/create', 'billing/orders/check', 'billing/orders/list', 'billing/transfers/detect', 'billing/transfers/list'];
+	const servicePaths = ['admin/billing/offers/list', 'admin/billing/offers/upsert', 'billing/offers/list', 'billing/orders/create', 'billing/orders/check', 'billing/orders/list'];
 	for (const path of [...walletPaths, ...servicePaths]) {
 		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('/', '___')}`);
 	}
+	for (const removed of ['billing/transfers/detect', 'billing/transfers/list']) expect(spec.paths?.[`/${removed}`]).toBeUndefined();
 	const identifiers = Object.values(spec.paths ?? {}).flatMap(item => (['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'] as const).flatMap(method => {
 		const operation = item?.[method];
 		return operation ? [operation.operationId] : [];
