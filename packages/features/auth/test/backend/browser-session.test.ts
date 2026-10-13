@@ -9,7 +9,7 @@ import { FindOperator, IsNull } from 'typeorm';
 import { describe, expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
-import type { BrowserSessionsRepository, MiBrowserSession } from '@features/persistence/backend/repositories/models.js';
+import type { BrowserSessionsRepository, MiBrowserSession, MiUser } from '@features/persistence/backend/repositories/models.js';
 
 function matches(row: object, criteria: unknown): boolean {
 	if (!criteria || typeof criteria !== 'object' || Array.isArray(criteria)) throw new Error('unsupported synthetic criteria');
@@ -28,7 +28,7 @@ function fixture() {
 	let sequence = 0;
 	repository.insert.mockImplementation(async entity => {
 		const row = entity as MiBrowserSession;
-		rows.set(row.id, { ...row, user: mockDeep({ id: row.userId, host: null, isSuspended: false, isDeleted: false }) });
+		rows.set(row.id, { ...row, user: mockDeep<MiUser>({ id: row.userId, host: null, isSuspended: false, isDeleted: false }) });
 		return { identifiers: [], generatedMaps: [], raw: [] };
 	});
 	repository.findOne.mockImplementation(async options => {

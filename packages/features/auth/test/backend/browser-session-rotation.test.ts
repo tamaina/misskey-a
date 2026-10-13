@@ -9,6 +9,7 @@ import bcrypt from 'bcryptjs';
 import type { EntityManager } from 'typeorm';
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
+import type { MiUserProfile } from '../../../persistence/backend/repositories/models.js';
 import { MiUser, MiBrowserSession } from '../../../persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import { createIRegenerateTokenProcedure } from '../../backend/endpoints/i/regenerate-token.js';
@@ -19,7 +20,7 @@ function fixture() {
 	const deps = mockDeep<IRegenerateTokenDependencies>();
 	const user = mockDeep<MiLocalUser>({ id: 'alice', token: 'old-master', isSuspended: false, movedToUri: null });
 	deps.usersRepository.findOneByOrFail.mockResolvedValue(user);
-	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled: true }));
+	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled: true }));
 	const manager = mockDeep<EntityManager>();
 	const browserRows = mockDeep<NonNullable<Parameters<IRegenerateTokenDependencies['browserSessionService']['revokeAllOwned']>[1]>>();
 	manager.getRepository.mockImplementation(entity => {

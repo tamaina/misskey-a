@@ -10,7 +10,8 @@ import { mockDeep } from 'vitest-mock-extended';
 import { AuthenticateService } from '../../backend/transport/AuthenticateService.js';
 import { SigninService } from '../../backend/transport/SigninService.js';
 import type { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
-import type { UsersRepository, MiLocalUser } from '../../../persistence/backend/repositories/models.js';
+import type { UsersRepository, MiUser } from '../../../persistence/backend/repositories/models.js';
+import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import type { CacheService } from '../../../users/backend/services/CacheService.js';
 
 const disposals: (() => void)[] = [];
@@ -51,7 +52,7 @@ test('revoked/unknown browser sessions fail closed without legacy or app fallbac
 });
 
 test('fresh local-user checks reject deleted, remote, suspended and soft-deleted accounts', async () => {
-	for (const user of [null, mockDeep<MiLocalUser>({ id: 'alice', host: 'remote.test' }), mockDeep<MiLocalUser>({ id: 'alice', host: null, isSuspended: true, isDeleted: false }), mockDeep<MiLocalUser>({ id: 'alice', host: null, isSuspended: false, isDeleted: true })]) {
+	for (const user of [null, mockDeep<MiUser>({ id: 'alice', host: 'remote.test' }), mockDeep<MiLocalUser>({ id: 'alice', host: null, isSuspended: true, isDeleted: false }), mockDeep<MiLocalUser>({ id: 'alice', host: null, isSuspended: false, isDeleted: true })]) {
 		const h = authenticationFixture();
 		h.users.findOneBy.mockResolvedValue(user);
 		await expect(h.service.authenticate(`bs_${'a'.repeat(43)}`)).rejects.toThrow('local user not found');

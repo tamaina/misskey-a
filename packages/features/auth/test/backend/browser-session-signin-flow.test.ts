@@ -7,6 +7,7 @@ import { call } from '@orpc/server';
 import bcrypt from 'bcryptjs';
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
+import type { MiUserProfile } from '../../../persistence/backend/repositories/models.js';
 import { createSigninFlowProcedure } from '../../backend/endpoints/signinFlow.js';
 import type { SigninFlowDependencies } from '../../backend/endpoints/signinFlow.js';
 import type { PackedJsonValue } from '../../../users/backend/json-value.schema.js';
@@ -18,7 +19,7 @@ function fixture(twoFactorEnabled = true) {
 	const deps = mockDeep<SigninFlowDependencies>();
 	const user = mockDeep<MiLocalUser>({ id: 'alice', host: null, isSuspended: false, isDeleted: false });
 	deps.usersRepository.findOneBy.mockResolvedValue(user);
-	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled, usePasswordLessLogin: false }));
+	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled, usePasswordLessLogin: false }));
 	deps.userSecurityKeysRepository.countBy.mockResolvedValue(0);
 	deps.loggerService.getLogger.mockReturnValue(mockDeep<Logger>());
 	deps.rateLimiterService.limit.mockResolvedValue(null);

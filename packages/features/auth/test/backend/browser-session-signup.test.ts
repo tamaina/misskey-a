@@ -5,9 +5,9 @@
 
 import { call } from '@orpc/server';
 import { expect, test } from 'vitest';
-import { mockDeep } from 'vitest-mock-extended';
+import { mock, mockDeep } from 'vitest-mock-extended';
+import type { MiUserPending, MiUserProfile } from '../../../persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
-import type { MeDetailedWireInput } from '../../../users/backend/user.schema.js';
 import type { AuthSessionContext } from '../../backend/session.effects.js';
 import { createSignupProcedure } from '../../backend/endpoints/signup.js';
 import type { SignupDependencies } from '../../backend/endpoints/signup.js';
@@ -20,10 +20,12 @@ import { testContext } from './native-context.js';
 const account = mockDeep<MiLocalUser>({ id: 'alice', host: null, token: 'legacy-master' });
 const session = { token: 'bs_synthetic', session: { id: 'session1', userId: 'alice', createdAt: new Date(0), lastUsedAt: new Date(0), revokedAt: null, sudoUntil: null } };
 
+type PackedSelf = Awaited<ReturnType<SignupDependencies['userEntityService']['packSelf']>>;
+
 function packedSelf() {
-	return mockDeep<MeDetailedWireInput>({
+	return Object.assign(mock<PackedSelf>(), {
 		id: 'alice', host: null, emojis: {}, avatarDecorations: [], alsoKnownAs: [], fields: [], verifiedLinks: [], pinnedNoteIds: [], pinnedNotes: [], pinnedPage: null, roles: [],
-		notificationRecieveConfig: {}, unreadAnnouncements: [], mutedWords: [], hardMutedWords: [], mutedInstances: [], mutingNotificationTypes: [], emailNotificationTypes: [], achievements: [], policies: { uploadableFileTypes: [] },
+		notificationRecieveConfig: {}, unreadAnnouncements: [], mutedWords: [], hardMutedWords: [], mutedInstances: [], mutingNotificationTypes: [], emailNotificationTypes: [], achievements: [], policies: mock<PackedSelf['policies']>({ uploadableFileTypes: [] }), securityKeysList: [],
 	});
 }
 
@@ -75,10 +77,10 @@ test('invalid initial setup never creates an account or browser session', async 
 
 test('pending signup awaits the shared signin issuer exactly once', async () => {
 	const deps = mockDeep<SignupPendingDependencies>();
-	deps.userPendingsRepository.findOneByOrFail.mockResolvedValue(mockDeep({ id: 'pending1', username: 'alice', password: 'hashed-synthetic', email: 'alice@example.test' }));
+	deps.userPendingsRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserPending>({ id: 'pending1', username: 'alice', password: 'hashed-synthetic', email: 'alice@example.test' }));
 	deps.idService.parse.mockReturnValue({ date: new Date() });
 	deps.signupService.signup.mockResolvedValue({ account, secret: 'legacy-master' });
-	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep({ userId: 'alice' }));
+	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: 'alice' }));
 	deps.registrationTicketsRepository.findOneBy.mockResolvedValue(null);
 	deps.signinService.signin.mockResolvedValue({ finished: true, id: 'alice', i: 'bs_synthetic' });
 	const context: AuthSessionContext = { request: { ip: '127.0.0.1', headers: {} }, effects: mockDeep(), response: {} };

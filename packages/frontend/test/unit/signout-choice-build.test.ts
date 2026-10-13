@@ -9,8 +9,8 @@ import { resolve } from 'node:path';
 import { expect, test } from 'vitest';
 import { build } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { pluginVvi } from '../../../../frontend/lib/vite-plugin-vvi.js';
-import { pluginNoLegacyLabels } from '../../../../frontend/lib/vite-plugin-no-legacy-labels.js';
+import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
+import { pluginNoLegacyLabels } from '../../lib/vite-plugin-no-legacy-labels.js';
 
 const repository = resolve(process.cwd(), '../..');
 
