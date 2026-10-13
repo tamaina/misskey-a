@@ -210,6 +210,7 @@ describe('2要素認証', () => {
 		assert.deepStrictEqual(signinWithoutTokenResponse.body, {
 			finished: false,
 			next: 'totp',
+			availableFactors: ['totp'],
 		});
 
 		const signinResponse = await api('signin-flow', {
