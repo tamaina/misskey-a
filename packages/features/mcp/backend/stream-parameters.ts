@@ -4,10 +4,21 @@
  */
 import * as v from 'valibot';
 import { toJsonSchema } from '@valibot/to-json-schema';
-import { streamChannelArguments, streamNoteArguments } from './stream.schema.js';
+import { streamChannelArguments, streamChannels, streamNoteArguments } from './stream.schema.js';
 import type { StreamSubscription } from './stream-types.js';
 const empty = v.strictObject({});
-export const streamChannelInputSchema: Record<string, unknown> = { ...toJsonSchema(streamChannelArguments) };
+export const streamChannelInputSchema: Record<string, unknown> = {
+	...toJsonSchema(streamChannelArguments),
+	// MCP settings discovery expects object properties at the root. Keep the
+	// generated oneOf branches to enforce each native channel's parameters.
+	type: 'object',
+	properties: {
+		channel: { type: 'string', enum: [...streamChannels] },
+		params: { type: 'object' },
+	},
+	required: ['channel'],
+	additionalProperties: false,
+};
 export const streamNoteInputSchema: Record<string, unknown> = { ...toJsonSchema(streamNoteArguments) };
 export function streamSubscription(name: string, args: unknown): StreamSubscription | null {
 	if (name === 'stream.channel') return v.parse(streamChannelArguments, args) as StreamSubscription;

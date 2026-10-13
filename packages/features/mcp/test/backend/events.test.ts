@@ -8,6 +8,7 @@ import { beforeEach, expect, it, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import * as Bull from 'bullmq';
+import { ToolSchema } from '@modelcontextprotocol/sdk/types.js';
 import { McpEventsService } from '../../backend/McpEventsService.js';
 import { McpEventError, challengeMatches, signedHeaders, signingKey, subscriptionId } from '../../backend/events-protocol.js';
 import { subscribeInput } from '../../backend/api.definition.js';
@@ -211,4 +212,10 @@ it('advertises strict antenna arguments separately from empty mention/reply argu
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
 	expect(result.events.find(event => event.name === 'antenna.note')?.inputSchema).toEqual({ type: 'object', properties: { antennaId: { type: 'string' } }, required: ['antennaId'], additionalProperties: false });
 	expect(result.events.find(event => event.name === 'note.mentioned')?.inputSchema).toEqual({ type: 'object', properties: {}, additionalProperties: false });
+});
+
+it('advertises object input schemas for all six event definitions', async () => {
+	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
+	expect(result.events).toHaveLength(6);
+	for (const event of result.events) expect(ToolSchema.shape.inputSchema.safeParse(event.inputSchema).success, event.name).toBe(true);
 });
