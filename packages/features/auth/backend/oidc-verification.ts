@@ -18,6 +18,7 @@ export interface OidcProviderMetadata {
 }
 
 function httpsUrl(value: string): void {
+	if (typeof value !== 'string') throw new Error('Invalid OIDC URL');
 	const url = new URL(value);
 	if (url.protocol !== 'https:' || url.username || url.password || url.hash) throw new Error('Invalid OIDC URL');
 }
@@ -26,6 +27,9 @@ function httpsUrl(value: string): void {
 export function validateOidcMetadata(metadata: OidcProviderMetadata, configuredIssuer: string): void {
 	for (const url of [metadata.issuer, metadata.authorization_endpoint, metadata.token_endpoint, metadata.jwks_uri]) httpsUrl(url);
 	if (new URL(metadata.issuer).search || metadata.issuer !== configuredIssuer) throw new Error('OIDC issuer mismatch');
+	for (const capabilities of [metadata.response_types_supported, metadata.id_token_signing_alg_values_supported, metadata.code_challenge_methods_supported, metadata.token_endpoint_auth_methods_supported]) {
+		if (!Array.isArray(capabilities) || capabilities.some(value => typeof value !== 'string')) throw new Error('Invalid OIDC capabilities');
+	}
 	if (!metadata.response_types_supported.includes('code') ||
 		!metadata.id_token_signing_alg_values_supported.includes('RS256') ||
 		!metadata.code_challenge_methods_supported.includes('S256') ||

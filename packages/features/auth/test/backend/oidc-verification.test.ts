@@ -73,5 +73,9 @@ describe('finite OIDC metadata capabilities', () => {
 	it.each(['http://issuer.invalid', 'https://name:secret@issuer.invalid', `${issuer}#fragment`])('rejects unsafe URL %s', url => {
 		expect(() => validateOidcMetadata({ ...metadata, token_endpoint: url }, issuer)).toThrow();
 	});
+	it.each(['code', ['code', 1], null])('rejects malformed capabilities %j', response_types_supported => {
+		const malformed = { ...metadata, response_types_supported } as unknown as typeof metadata;
+		expect(() => validateOidcMetadata(malformed, issuer)).toThrow();
+	});
 	it('rejects issuer mismatch', () => expect(() => validateOidcMetadata(metadata, `${issuer}/other`)).toThrow());
 });
