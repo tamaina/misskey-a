@@ -80,7 +80,7 @@ async function settle() {
 }
 
 function expectCompletion(token = '222222') {
-	expect(os.apiWithDialog).toHaveBeenNthCalledWith(2, 'i/2fa/key-done', {
+	expect(os.apiWithDialog).toHaveBeenNthCalledWith(2, 'i/2fa/passkey/done', {
 		password: 'synthetic-current', token, name: 'Synthetic key', credential,
 	});
 }
@@ -91,7 +91,7 @@ describe('passkey registration', () => {
 		await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledTimes(2));
 		expect(os.authenticateDialog).toHaveBeenNthCalledWith(1);
 		expect(os.authenticateDialog).toHaveBeenNthCalledWith(2, { currentPassword: 'synthetic-current' });
-		expect(os.apiWithDialog).toHaveBeenNthCalledWith(1, 'i/2fa/register-key', { password: 'synthetic-current', token: '111111' });
+		expect(os.apiWithDialog).toHaveBeenNthCalledWith(1, 'i/2fa/passkey/register', { password: 'synthetic-current', token: '111111' });
 		expect(startRegistration).toHaveBeenCalledWith({ optionsJSON: options });
 		expectCompletion();
 	});
