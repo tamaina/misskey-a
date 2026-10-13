@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreChannelFederationOpenapiBaseline } from '@features/channels/test/backend/openapi-baseline.js';
 import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { call, implement } from '@orpc/server';
@@ -85,8 +86,16 @@ function schemaHash(value: unknown): string {
 test('actual portable generator preserves every legacy operation and public schema, with eight unique canonical IDs', async () => {
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
 	const routes = requestRoutes(clientContract);
-	for (const [path, hash] of Object.entries(baseline.operationHashes)) expect(schemaHash(spec.paths?.[path]), path).toBe(hash);
-	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(spec.components?.schemas?.[name]), name).toBe(hash);
+	const originalJson = JSON.stringify(spec);
+	const legacySpec = restoreChannelFederationOpenapiBaseline(spec);
+	expect(JSON.stringify(spec)).toBe(originalJson);
+	const invalid = structuredClone(spec);
+	const channel = invalid.components?.schemas?.Channel;
+	if (channel == null || typeof channel !== 'object') throw new Error('Missing documented Channel schema');
+	Reflect.set(Reflect.get(channel, 'properties'), 'isFederated', { type: 'string' });
+	expect(() => restoreChannelFederationOpenapiBaseline(invalid)).toThrow('federation flag differs');
+	for (const [path, hash] of Object.entries(baseline.operationHashes)) expect(schemaHash(legacySpec.paths?.[path]), path).toBe(hash);
+	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(legacySpec.components?.schemas?.[name]), name).toBe(hash);
 	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
 	expect(Object.keys(spec.components?.schemas ?? {}).filter(name => !(name in baseline.schemaHashes))).toEqual(['OrpcDefinition1038']);
 	expect(Object.keys(baseline.paths)).toHaveLength(444);
