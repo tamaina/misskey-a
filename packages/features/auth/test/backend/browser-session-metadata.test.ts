@@ -4,7 +4,7 @@
  */
 
 import 'reflect-metadata';
-import { DataSource } from 'typeorm';
+import { DataSource, IsNull } from 'typeorm';
 import type { QueryRunner } from 'typeorm';
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
@@ -43,4 +43,18 @@ test('browser session entity metadata matches the additive migration without con
 	runner.query.mockClear();
 	await migration.down(runner);
 	expect(runner.query.mock.calls).toEqual([['DROP TABLE "browser_session"']]);
+});
+
+test('durable session gates generate a joined local-user suspension and deletion predicate', async () => {
+	const source = new MetadataSource({ type: 'postgres', entities, synchronize: false, dropSchema: false });
+	await source.prepare();
+	const query = source.getRepository(MiBrowserSession).createQueryBuilder('session').setFindOptions({
+		where: { id: 'session1', userId: 'alice', revokedAt: IsNull(), user: { id: 'alice', host: IsNull(), isSuspended: false, isDeleted: false } },
+	});
+	const sql = query.getSql();
+	expect(sql).toContain('JOIN "user"');
+	expect(sql).toContain('"revokedAt" IS NULL');
+	expect(sql).toContain('"host" IS NULL');
+	expect(sql).toContain('"isSuspended" =');
+	expect(sql).toContain('"isDeleted" =');
 });

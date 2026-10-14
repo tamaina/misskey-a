@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreUpstreamLocaleBundle, restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 import { existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -13,8 +14,8 @@ import { runInNewContext } from 'node:vm';
 import { createApp } from 'vue';
 import { compileScript, parse } from 'vue/compiler-sfc';
 import { describe, expect, test } from 'vitest';
-import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import { createComponentLocale } from 'vite-vue-internationalization/runtime';
+import { createInternationalization, createComponentLocale } from 'vite-vue-internationalization/runtime';
+import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
 import { languages } from 'i18n';
 import { locales } from './instance-pilot-locale-catalog.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
@@ -41,8 +42,29 @@ function production(message: string, values: Record<string, string | number>): u
 	return (runInNewContext(code.toString()) as (input: typeof values) => unknown)(values);
 }
 
+let historicalLocalePlugin: ReturnType<typeof pluginVvi> | undefined;
+
+function historicalLocaleBundle(language: string): LocaleBundle {
+	const hook = (value: unknown, ...args: unknown[]): unknown => {
+		if (typeof value === 'function') return Reflect.apply(value, {}, args);
+		if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
+		throw new Error('Expected plugin hook');
+	};
+	if (!historicalLocalePlugin) {
+		historicalLocalePlugin = pluginVvi();
+		hook(historicalLocalePlugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
+		hook(historicalLocalePlugin.buildStart);
+	}
+	const source = hook(historicalLocalePlugin.load, `\0virtual:vite-vue-internationalization/locale/${language}`);
+	if (typeof source !== 'string') throw new Error('Expected generated locale loader');
+	const payload: LocaleBundle = {};
+	runInNewContext(source.replaceAll('export const ', 'const ').replace('export default { locale, global, modules };', 'payload.global = global; payload.modules = modules;'), { payload });
+	return restoreUpstreamLocaleBundle(language, payload);
+}
+
 async function activate(language: string) {
-	const runtime = createInternationalization({ initialLocale: language });
+	const payload = historicalLocaleBundle(language);
+	const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
 	await runtime.ready;
 	await runtime.loadLocale(language);
 	runtime.install(createApp({}));
@@ -53,7 +75,7 @@ describe('next2 formatter locale migration', () => {
 	test('preserves all5068 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = readFileSync(resolve(root, entry.file), 'utf8');
+			const source = restoreUpstreamDevelopBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
 			expect(createHash('sha256').update(source).digest('hex')).toBe(entry.migratedSha256);
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);

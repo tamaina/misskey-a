@@ -36,12 +36,14 @@ import { DriveFileEntityService } from '@features/drive/backend/serializers/Driv
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { bindLegacyService, toNestProviders } from './feature-service-provider-types.js';
 
 const legacyServiceBindings = [
+	bindLegacyService(ports.queueService, QueueService),
 	bindLegacyService(ports.httpRequestService, HttpRequestService),
 	bindLegacyService(ports.loggerService, LoggerService),
 	bindLegacyService(ports.idService, IdService),

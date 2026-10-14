@@ -6,14 +6,36 @@
 import { base64URLStringToBuffer, bufferToBase64URLString } from '@simplewebauthn/browser';
 import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 
+type LibraryExtensions = NonNullable<PublicKeyCredentialRequestOptionsJSON['extensions']>;
+type LibraryPrfValues = NonNullable<NonNullable<LibraryExtensions['prf']>['eval']>;
+
+/** Copy extension buffers into DOM-compatible, request-owned ArrayBuffers. */
+function normalizeExtensions(extensions: LibraryExtensions | undefined): AuthenticationExtensionsClientInputs | undefined {
+	if (!extensions) return undefined;
+	const { prf, ...rest } = extensions;
+	const copy = (value: LibraryPrfValues['first']): ArrayBuffer => {
+		const bytes = ArrayBuffer.isView(value) ? new Uint8Array(value.buffer, value.byteOffset, value.byteLength) : new Uint8Array(value);
+		return bytes.slice().buffer;
+	};
+	const values = (value: LibraryPrfValues): AuthenticationExtensionsPRFValues => ({ first: copy(value.first), ...(value.second ? { second: copy(value.second) } : {}) });
+	return {
+		...rest,
+		...(prf ? { prf: {
+			...(prf.eval ? { eval: values(prf.eval) } : {}),
+			...(prf.evalByCredential ? { evalByCredential: Object.fromEntries(Object.entries(prf.evalByCredential).map(([id, value]) => [id, values(value)])) } : {}),
+		} } : {}),
+	};
+}
+
 // Shorter than the server's 90-second challenge TTL, including initialization time.
 export const conditionalPasskeyWaitMs = 75000;
 
 /** Use a request-owned signal rather than the library's shared abort singleton. */
 export async function getConditionalCredential(options: PublicKeyCredentialRequestOptionsJSON, signal: AbortSignal): Promise<AuthenticationResponseJSON> {
+	const { extensions, ...request } = options;
 	const credential = await navigator.credentials.get({
 		mediation: 'conditional', signal,
-		publicKey: { ...options, challenge: base64URLStringToBuffer(options.challenge), allowCredentials: [] },
+		publicKey: { ...request, challenge: base64URLStringToBuffer(options.challenge), allowCredentials: [], ...(extensions ? { extensions: normalizeExtensions(extensions) } : {}) },
 	}) as PublicKeyCredential | null;
 	if (!credential || credential.type !== 'public-key') throw new Error('No public-key credential selected');
 	const response = credential.response as AuthenticatorAssertionResponse;

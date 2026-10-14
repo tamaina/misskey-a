@@ -115,6 +115,7 @@ import XMentionsColumn from '@features/relationships/frontend/ui/deck/mentions-c
 import XDirectColumn from '@features/relationships/frontend/ui/deck/direct-column.vue';
 import XRoleTimelineColumn from '@features/roles/frontend/ui/deck/role-timeline-column.vue';
 import XChatColumn from '@features/chat/frontend/ui/deck/chat-column.vue';
+import XClipColumn from '@features/collections/frontend/ui/deck/clip-column.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { mainRouter } from '@features/navigation/frontend/router.js';
 import { columns, layout, columnTypes, switchProfileMenu, addColumn as addColumnToStore, deleteProfile as deleteProfile_ } from '@features/preferences/frontend/deck.js';
@@ -138,6 +139,7 @@ const columnComponents = {
 	direct: XDirectColumn,
 	roleTimeline: XRoleTimelineColumn,
 	chat: XChatColumn,
+	clip: XClipColumn,
 };
 
 mainRouter.navHook = (path, flag): boolean => {
@@ -422,7 +424,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "الإشارات",
 		"direct": "مباشرة",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "مِشبك"
 	},
 	"deleteAreYouSure": "متأكد من أنك تريد حذف {x}؟",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -454,7 +457,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Mencions",
 		"direct": "Publicacions directes",
 		"roleTimeline": "Línia de temps dels rols",
-		"chat": "Xateja amb aquest usuari"
+		"chat": "Xateja amb aquest usuari",
+		"clip": "Retalls"
 	},
 	"deleteAreYouSure": "Segur que vols esborrar «{x}»?",
 	"deckHowToUseAddColumn_title": "Afegir columna",
@@ -486,7 +490,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Zmínění",
 		"direct": "Přímé poznámky",
 		"roleTimeline": "Časová osa role",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Oříznout"
 	},
 	"deleteAreYouSure": "Jste si jistí že chcete smazat \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -518,7 +523,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Mentions",
 		"direct": "Direct notes",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Clip"
 	},
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -550,7 +556,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Erwähnungen",
 		"direct": "Direktnachrichten",
 		"roleTimeline": "Rollenchronik",
-		"chat": "Mit dem Benutzer chatten"
+		"chat": "Mit dem Benutzer chatten",
+		"clip": "Clip erstellen"
 	},
 	"deleteAreYouSure": "Möchtest du „{x}“ wirklich löschen?",
 	"deckHowToUseAddColumn_title": "Spalte hinzufügen",
@@ -582,7 +589,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Mentions",
 		"direct": "Direct notes",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Clip"
 	},
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -614,7 +622,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Menciones",
 		"direct": "Notas directas",
 		"roleTimeline": "Linea de tiempo del rol",
-		"chat": "Chatear"
+		"chat": "Chatear",
+		"clip": "Clip"
 	},
 	"deleteAreYouSure": "¿Desea borrar \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Añadir columna",
@@ -646,7 +655,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Mentions",
 		"direct": "Direct",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Clip"
 	},
 	"deleteAreYouSure": "Êtes-vous sûr·e de vouloir supprimer « {x} » ?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -678,7 +688,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Sebutan",
 		"direct": "Langsung",
 		"roleTimeline": "Lini masa peran",
-		"chat": "Obrolan pengguna"
+		"chat": "Obrolan pengguna",
+		"clip": "Klip"
 	},
 	"deleteAreYouSure": "Apakah kamu yakin ingin menghapus \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -710,7 +721,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Menzioni",
 		"direct": "Note Dirette",
 		"roleTimeline": "Timeline Ruolo",
-		"chat": "Chatta con questa persona"
+		"chat": "Chatta con questa persona",
+		"clip": "Clip"
 	},
 	"deleteAreYouSure": "Vuoi davvero eliminare \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Aggiungere colonne",
@@ -742,7 +754,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "メンション",
 		"direct": "指名",
 		"roleTimeline": "ロールタイムライン",
-		"chat": "ダイレクトメッセージ"
+		"chat": "ダイレクトメッセージ",
+		"clip": "クリップ"
 	},
 	"deleteAreYouSure": "「{x}」を削除しますか？",
 	"deckHowToUseAddColumn_title": "カラム追加",
@@ -774,7 +787,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "あんた宛て",
 		"direct": "ダイレクト",
 		"roleTimeline": "ロールタイムライン",
-		"chat": "チャットしよか"
+		"chat": "チャットしよか",
+		"clip": "クリップ"
 	},
 	"deleteAreYouSure": "「{x}」はほかしてええか？",
 	"deckHowToUseAddColumn_title": "カラム追加",
@@ -806,7 +820,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Mentions",
 		"direct": "Direct notes",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Clip"
 	},
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -838,7 +853,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "ಹೆಸರಿಸಿದ",
 		"direct": "ನೇರ ಟಿಪ್ಪಣಿಗಳು",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Clip"
 	},
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -870,7 +886,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "받은 멘션",
 		"direct": "다이렉트",
 		"roleTimeline": "역할 타임라인",
-		"chat": "채팅하기"
+		"chat": "채팅하기",
+		"clip": "클립"
 	},
 	"deleteAreYouSure": "\"{x}\" 을(를) 삭제하시겠습니까?",
 	"deckHowToUseAddColumn_title": "칼럼 추가",
@@ -902,7 +919,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Vermeldingen",
 		"direct": "Directe notities",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Clip aanmaken"
 	},
 	"deleteAreYouSure": "Weet je zeker dat je \"{x}\" wil verwijderen?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -934,7 +952,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Mentions",
 		"direct": "Direkte",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Clip"
 	},
 	"deleteAreYouSure": "Er du sikker på at du vil slette \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -966,7 +985,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Wspomnienia",
 		"direct": "Bezpośredni",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Klip"
 	},
 	"deleteAreYouSure": "Czy na pewno chcesz usunąć „{x}”?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -998,7 +1018,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Menções",
 		"direct": "Notas diretas",
 		"roleTimeline": "Linha do tempo do cargo",
-		"chat": "Conversar com usuário"
+		"chat": "Conversar com usuário",
+		"clip": "Clipe"
 	},
 	"deleteAreYouSure": "Deseja excluir \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -1030,7 +1051,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Упоминания",
 		"direct": "Личное",
 		"roleTimeline": "История Ролей",
-		"chat": "Открыть личные сообщения"
+		"chat": "Открыть личные сообщения",
+		"clip": "Подборка"
 	},
 	"deleteAreYouSure": "Хотите удалить «{x}»?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -1062,7 +1084,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Zmienky",
 		"direct": "Priame poznámky",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Klip"
 	},
 	"deleteAreYouSure": "Naozaj chcete odstrániť \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -1094,7 +1117,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "กล่าวถึงคุณ",
 		"direct": "ไดเร็กต์",
 		"roleTimeline": "บทบาทไทม์ไลน์",
-		"chat": "แชตเลย"
+		"chat": "แชตเลย",
+		"clip": "คลิป"
 	},
 	"deleteAreYouSure": "ต้องการลบ “{x}” ใช่ไหม?",
 	"deckHowToUseAddColumn_title": "เพิ่มคอลัมน์",
@@ -1126,7 +1150,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Bahsetmeler",
 		"direct": "Doğrudan notlar",
 		"roleTimeline": "Rol Pano",
-		"chat": "Sohbet"
+		"chat": "Sohbet",
+		"clip": "Klip"
 	},
 	"deleteAreYouSure": "“{x}” öğesini silmek istediğinizden emin misin?",
 	"deckHowToUseAddColumn_title": "Sütun ekle",
@@ -1158,7 +1183,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Mentions",
 		"direct": "Direct notes",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Clip"
 	},
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -1190,7 +1216,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Згадки",
 		"direct": "Особисте",
 		"roleTimeline": "Role Timeline",
-		"chat": "Написати цьому користувачу"
+		"chat": "Написати цьому користувачу",
+		"clip": "Добірка"
 	},
 	"deleteAreYouSure": "Ви впевнені, що хочете видалити \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -1222,7 +1249,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "Lượt nhắc",
 		"direct": "Nhắn riêng",
 		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
+		"chat": "Chat with user",
+		"clip": "Lưu bài viết"
 	},
 	"deleteAreYouSure": "Bạn có chắc muốn xóa \"{x}\"?",
 	"deckHowToUseAddColumn_title": "Add column",
@@ -1254,7 +1282,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "提及",
 		"direct": "指定用户",
 		"roleTimeline": "角色时间线",
-		"chat": "私信"
+		"chat": "私信",
+		"clip": "便签"
 	},
 	"deleteAreYouSure": "要删掉「{x}」吗？",
 	"deckHowToUseAddColumn_title": "添加列",
@@ -1286,7 +1315,8 @@ window.document.documentElement.style.scrollBehavior = 'auto';
 		"mentions": "提及",
 		"direct": "指定使用者",
 		"roleTimeline": "角色時間軸",
-		"chat": "聊天"
+		"chat": "聊天",
+		"clip": "摘錄"
 	},
 	"deleteAreYouSure": "確定要刪掉「{x}」嗎？",
 	"deckHowToUseAddColumn_title": "新增欄位",

@@ -4,12 +4,14 @@
  */
 
 import { createHash } from 'node:crypto';
+import { restoreBrowserSessionClientBaseline } from './browser-session-client-source-rebase.js';
 import rebases from './pwa-share-source-rebase.json';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 /** Reverse only the reviewed PWA edits before applying frozen migration proofs. */
 export function restorePwaShareSourceBaseline(file: string, source: string): string {
+	if (file === 'packages/features/auth/frontend/accounts.ts') source = restoreBrowserSessionClientBaseline(file, source);
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	const localeStart = source.search(/<locale\s/);

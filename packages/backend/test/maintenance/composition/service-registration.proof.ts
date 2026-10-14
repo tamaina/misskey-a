@@ -7,6 +7,9 @@ import 'reflect-metadata';
 import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
 import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
+import { restoreUpstreamConstructorBaseline } from '../../../src/core/upstream-service-wiring-rebase.js';
+
+const historicalConstructorCounts = new Map<object, () => number>();
 
 import { AbuseReportNotificationService } from '@features/moderation/backend/services/AbuseReportNotificationService.js';
 
@@ -49,6 +52,22 @@ import { ApPersonService } from '@features/federation/backend/services/ApPersonS
 import { ApQuestionService } from '@features/federation/backend/services/ApQuestionService.js';
 
 import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
+import { announcementServices } from '@features/announcements/backend/services.js';
+
+function restoreAnnouncementConstructorCount(feature: typeof AnnouncementService): number {
+	const entries = Object.entries(announcementServices.definitions);
+	const dependencies = announcementServices.definitions.AnnouncementService.dependencies;
+	expect(feature.length).toBe(dependencies.length);
+	const current = dependencies.map(dependency => {
+		if (dependency.kind === 'port') return { port: dependency.name };
+		const local = entries.find(([, candidate]) => candidate === dependency);
+		if (!local) throw new Error('Missing published local announcement definition');
+		return { service: local[0] };
+	});
+	return restoreUpstreamConstructorBaseline('announcements', 'AnnouncementService', current).length;
+}
+
+historicalConstructorCounts.set(AnnouncementService, () => restoreAnnouncementConstructorCount(AnnouncementService));
 
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';
@@ -70,6 +89,16 @@ import { ChartManagementService } from '@features/statistics/backend/services/Ch
 import { ChatService } from '@features/chat/backend/services/ChatService.js';
 
 import { ClipService } from '@features/collections/backend/services/ClipService.js';
+import { collectionServices } from '@features/collections/backend/services.js';
+
+function restoreClipConstructorCount(feature: typeof ClipService): number {
+	const dependencies = collectionServices.definitions.ClipService.dependencies;
+	expect(feature.length).toBe(dependencies.length);
+	const baseline = restoreUpstreamConstructorBaseline('collections', 'ClipService', dependencies.map(dependency => ({ port: dependency.name })));
+	return baseline.length;
+}
+
+historicalConstructorCounts.set(ClipService, () => restoreClipConstructorCount(ClipService));
 
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 
@@ -299,7 +328,8 @@ for (const [name, feature, parameterCount] of services) {
 			expect(Reflect.getMetadata('design:paramtypes', feature) ?? []).toHaveLength(parameterCount);
 		} else {
 			expect(registrations[0]).toHaveProperty('useFactory');
-			expect(feature.length).toBe(parameterCount);
+			const historicalParameterCount = historicalConstructorCounts.get(feature)?.() ?? feature.length;
+			expect(historicalParameterCount).toBe(parameterCount);
 		}
 	});
 }

@@ -25,6 +25,7 @@ import { aliasTwoFactorContract } from '../../backend/2fa-api-aliases.contract.j
 import { aliasTwoFactorProcedure, createAuthRouter } from '../../backend/api.implementation.js';
 import { authContract } from '../../backend/api.definition.js';
 import baseline from './fixtures/2fa-api-alias-baseline.json';
+import { restoreAnnouncementOperationBaseline } from '../../../announcements/test/backend/operation-rebase.js';
 import { testContext } from './native-context.js';
 import type { AuthRouterDependencies } from '../../backend/api.implementation.js';
 import type { ApiServices } from '@features/api/backend/transport/context.js';
@@ -82,10 +83,69 @@ function schemaHash(value: unknown): string {
 	return createHash('sha256').update(stableJson(JSON.parse(JSON.stringify(value)))).digest('hex');
 }
 
+// Intentional availability change from PR #124, captured by its actual CI API
+// generator. The frozen alias baseline stays unchanged; no other delta is allowed.
+const availableSigninOperationHash = '964c00bbfe0d53b9f634afffb50031961f7a60ff47c8630a27bc08e206453c89';
+const availableFactorsShape = { type: 'array', items: { enum: ['totp', 'passkey'], type: 'string' }, minItems: 1, maxItems: 2 };
+
+function object(value: unknown): Record<string, unknown> {
+	if (value === null || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid availability inverse boundary');
+	return value as Record<string, unknown>;
+}
+
+function signinOutput(operation: unknown): Record<string, unknown> {
+	const responses = object(object(object(operation).post).responses);
+	const content = object(object(responses['200']).content);
+	return object(object(content['application/json']).schema);
+}
+
+function signinBranches(operation: unknown): unknown[] {
+	const output = signinOutput(operation);
+	expect(Object.keys(output).sort()).toEqual(['$schema', 'anyOf']);
+	expect(output.$schema).toBe('https://json-schema.org/draft/2020-12/schema');
+	if (!Array.isArray(output.anyOf)) throw new Error('Invalid availability outer union');
+	expect(output.anyOf).toHaveLength(3);
+	const success = object(output.anyOf[0]);
+	expect(Object.keys(success)).toEqual(['anyOf']);
+	if (!Array.isArray(success.anyOf)) throw new Error('Invalid availability success union');
+	expect(success.anyOf).toHaveLength(4);
+	return success.anyOf;
+}
+
+function restorePreAvailabilitySigninOperation(operation: unknown): unknown {
+	// This full new-operation hash also guards request/error/security metadata,
+	// WebAuthn constraints, and all fields outside the narrowly reversed response.
+	expect(schemaHash(operation)).toBe(availableSigninOperationHash);
+	const restored: unknown = structuredClone(operation);
+	const branches = signinBranches(restored);
+	expect(branches[0]).toEqual({ type: 'object', properties: { finished: { const: true }, id: { type: 'string' }, i: { type: 'string' } }, required: ['finished', 'id', 'i'], additionalProperties: false });
+	expect(branches[1]).toEqual({ type: 'object', properties: { finished: { const: false }, next: { enum: ['captcha', 'password'], type: 'string' } }, required: ['finished', 'next'], additionalProperties: false });
+	expect(branches[2]).toEqual({ type: 'object', properties: { finished: { const: false }, next: { const: 'totp' }, availableFactors: availableFactorsShape }, required: ['finished', 'next'], additionalProperties: false });
+	const passkey = object(branches[3]);
+	expect(Object.keys(passkey).sort()).toEqual(['additionalProperties', 'properties', 'required', 'type']);
+	expect(passkey.type).toBe('object');
+	expect(passkey.additionalProperties).toBe(false);
+	expect(passkey.required).toEqual(['finished', 'next', 'authRequest']);
+	const properties = object(passkey.properties);
+	expect(Object.keys(properties).sort()).toEqual(['authRequest', 'availableFactors', 'finished', 'next']);
+	expect(properties.finished).toEqual({ const: false });
+	expect(properties.next).toEqual({ const: 'passkey' });
+	expect(properties.availableFactors).toEqual(availableFactorsShape);
+	delete properties.availableFactors;
+	const passwordProperties = object(object(branches[1]).properties);
+	passwordProperties.next = { enum: ['captcha', 'password', 'totp'], type: 'string' };
+	branches.splice(2, 1);
+	expect(schemaHash(restored)).toBe(baseline.operationHashes['/signin-flow']);
+	return restored;
+}
+
 test('actual portable generator preserves every legacy operation and public schema, with eight unique canonical IDs', async () => {
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
 	const routes = requestRoutes(clientContract);
-	for (const [path, hash] of Object.entries(baseline.operationHashes)) expect(schemaHash(spec.paths?.[path]), path).toBe(hash);
+	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
+		const operation = spec.paths?.[path];
+		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreAnnouncementOperationBaseline(path, operation)), path).toBe(hash);
+	}
 	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(spec.components?.schemas?.[name]), name).toBe(hash);
 	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
 	expect(Object.keys(spec.components?.schemas ?? {}).filter(name => !(name in baseline.schemaHashes))).toEqual(['OrpcDefinition1038']);
@@ -100,6 +160,35 @@ test('actual portable generator preserves every legacy operation and public sche
 		expect(spec.paths?.[`/${canonical}`]?.post?.operationId).toBe(`post___${canonical.replaceAll('/', '___')}`);
 	}
 	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
+});
+
+test('availability inverse rejects tampering at every allowed boundary and outside the response', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	const original = spec.paths?.['/signin-flow'];
+	const originalHash = schemaHash(original);
+	expect(schemaHash(restorePreAvailabilitySigninOperation(original))).toBe(baseline.operationHashes['/signin-flow']);
+	expect(schemaHash(original)).toBe(originalHash);
+	const tamper: Array<(operation: unknown) => void> = [
+		operation => { object(object(operation).post).operationId = 'wrong'; },
+		operation => { object(object(operation).post).security = []; },
+		operation => { object(object(operation).post).requestBody = {}; },
+		operation => { object(object(object(operation).post).responses)['403'] = {}; },
+		operation => { object(signinBranches(operation)[0]).additionalProperties = true; },
+		operation => { object(object(signinBranches(operation)[1]).properties).availableFactors = availableFactorsShape; },
+		operation => { object(object(signinBranches(operation)[2]).properties).next = { const: 'password' }; },
+		operation => { object(signinBranches(operation)[2]).required = ['finished', 'next', 'availableFactors']; },
+		operation => { object(object(object(signinBranches(operation)[2]).properties).availableFactors).maxItems = 3; },
+		operation => { object(object(object(signinBranches(operation)[3]).properties).availableFactors).items = { type: 'string' }; },
+		operation => { object(object(object(signinBranches(operation)[3]).properties).authRequest).required = []; },
+		operation => { object(signinBranches(operation)[3]).required = ['finished', 'next', 'authRequest', 'availableFactors']; },
+		operation => { signinBranches(operation).splice(2, 1); },
+		operation => { const outer = signinOutput(operation).anyOf; if (!Array.isArray(outer)) throw new Error('Invalid union'); outer[2] = { type: 'string' }; },
+	];
+	for (const change of tamper) {
+		const changed: unknown = structuredClone(original);
+		change(changed);
+		expect(() => restorePreAvailabilitySigninOperation(changed)).toThrow();
+	}
 });
 
 test('both HTTP namespaces reject anonymous and scoped tokens before malformed input validation', async () => {

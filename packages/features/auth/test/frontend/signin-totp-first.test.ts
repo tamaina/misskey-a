@@ -11,7 +11,8 @@ import { createApp, defineComponent, h, nextTick, onMounted } from 'vue';
 import Signin from '../../frontend/components/MkSignin.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { login } from '../../frontend/accounts.js';
-import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
+import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
+import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 
 vi.mock('vue', async original => {
 	const vue = await original<typeof import('vue')>();
@@ -23,7 +24,7 @@ vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi
 vi.mock('@features/auth/frontend/accounts.js', () => ({ login: vi.fn() }));
 vi.mock('@features/moderation/frontend/utility/show-suspended-dialog.js', () => ({ showSuspendedDialog: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({ alert: vi.fn() }));
-vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: vi.fn() }));
+vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: vi.fn(), startAuthentication: vi.fn() }));
 vi.mock('@features/auth/frontend/components/MkSignin.input.vue', () => ({ default: defineComponent({
 	emits: ['usernameSubmitted', 'passkeyClick'], setup(_, { emit }) {
 		state.handlers.username = value => emit('usernameSubmitted', value);
@@ -45,11 +46,11 @@ vi.mock('@features/auth/frontend/components/MkSignin.totp.vue', () => ({ default
 	},
 }) }));
 vi.mock('@features/auth/frontend/components/MkSignin.passkey.vue', () => ({ default: defineComponent({
-	props: ['credentialRequest', 'isPerformingPasswordlessLogin'], emits: ['done', 'useTotp'], setup(props, { emit }) {
+	props: ['credentialRequest', 'isPerformingPasswordlessLogin', 'canUseTotp'], emits: ['done', 'useTotp'], setup(props, { emit }) {
 		onMounted(() => state.requests.push(props.credentialRequest));
 		state.handlers.credential = value => emit('done', value);
 		state.handlers.cancel = () => emit('useTotp');
-		return () => h('div', { 'data-page': 'passkey', 'data-passwordless': String(props.isPerformingPasswordlessLogin) });
+		return () => h('div', { 'data-page': 'passkey', 'data-passwordless': String(props.isPerformingPasswordlessLogin), 'data-totp-available': String(props.canUseTotp) });
 	},
 }) }));
 vi.mock('@features/ui/frontend/components/MkButton.vue', () => ({ default: defineComponent({
@@ -67,7 +68,7 @@ let element: HTMLDivElement;
 const emitted = vi.fn();
 const errors: unknown[] = [];
 let expectedError: unknown;
-const option = (challenge: string) => ({ challenge, rpId: 'synthetic.example', userVerification: 'required' });
+const option = (challenge: string): PublicKeyCredentialRequestOptionsJSON => ({ challenge, rpId: 'synthetic.example', userVerification: 'required' });
 const finished = { finished: true, i: 'synthetic-session', id: 'synthetic-user' };
 const credential = { id: 'synthetic-key', rawId: 'AA', type: 'public-key', response: { clientDataJSON: 'AA', authenticatorData: 'AA', signature: 'AA' }, clientExtensionResults: {} };
 const pw = { password: 'synthetic-password', captcha: { hCaptchaResponse: 'h', mCaptchaResponse: 'm', reCaptchaResponse: 'r', turnstileResponse: 't', testcaptchaResponse: 'test' } };
@@ -202,4 +203,43 @@ test('alternative label copies every existing input locale exactly', () => {
 			return [block.attrs.locale, dictionary.signinWithPasskey];
 		});
 	expect(dictionaries('../../frontend/components/MkSignin.passkey-alternative.vue')).toEqual(dictionaries('../../frontend/components/MkSignin.input.vue'));
+});
+
+test.each([{ factors: ['totp', 'passkey'] }, { factors: ['totp'] }])('explicit available TOTP keeps the password path TOTP-first: %j', async ({ factors }) => {
+	vi.mocked(misskeyApi).mockReset().mockResolvedValueOnce({ username: 'synthetic' } as never)
+		.mockResolvedValueOnce({ finished: false, next: 'password' } as never)
+		.mockResolvedValueOnce({ finished: false, next: 'passkey', authRequest: option('explicit'), availableFactors: factors } as never);
+	mount(); await passwordPath(); expect(page()).toBe('totp'); expect(state.requests).toEqual([]);
+	expect(fallback() !== null).toBe(factors.includes('passkey'));
+});
+
+test('explicit passkey-only availability uses passkey and cannot fall back to unavailable TOTP', async () => {
+	vi.mocked(misskeyApi).mockReset().mockResolvedValueOnce({ username: 'synthetic' } as never)
+		.mockResolvedValueOnce({ finished: false, next: 'password' } as never)
+		.mockResolvedValueOnce({ finished: false, next: 'passkey', authRequest: option('only-key'), availableFactors: ['passkey'] } as never);
+	mount(); await passwordPath(); expect(page()).toBe('passkey'); expect(state.requests).toEqual([option('only-key')]);
+	expect(element.querySelector('[data-totp-available]')?.getAttribute('data-totp-available')).toBe('false');
+	state.handlers.cancel(); await settle(); expect(page()).toBe('passkey');
+});
+
+test('unsupported passkey-only authentication returns to input instead of inventing a TOTP fallback', async () => {
+	vi.mocked(browserSupportsWebAuthn).mockReturnValue(false);
+	vi.mocked(misskeyApi).mockReset().mockResolvedValueOnce({ username: 'synthetic' } as never)
+		.mockResolvedValueOnce({ finished: false, next: 'password' } as never)
+		.mockResolvedValueOnce({ finished: false, next: 'passkey', authRequest: option('only-key'), availableFactors: ['passkey'] } as never);
+	mount(); await passwordPath(); expect(page()).toBe('input'); expect(state.requests).toEqual([]); expect(emitted).not.toHaveBeenCalled();
+});
+
+test.each([
+	{ canUseTotp: undefined, passwordless: false, visible: true },
+	{ canUseTotp: false, passwordless: false, visible: false },
+	{ canUseTotp: true, passwordless: true, visible: false },
+])('real passkey view preserves legacy fallback and hides unavailable TOTP: %j', async scenario => {
+	const { default: Passkey } = await vi.importActual<typeof import('../../frontend/components/MkSignin.passkey.vue')>('../../frontend/components/MkSignin.passkey.vue');
+	vi.mocked(startAuthentication).mockReturnValue(new Promise<never>(() => {}));
+	app = createApp(Passkey, { credentialRequest: option('synthetic'), ...(scenario.canUseTotp === undefined ? {} : { canUseTotp: scenario.canUseTotp }), isPerformingPasswordlessLogin: scenario.passwordless });
+	app.use(internationalization);
+	app.config.errorHandler = error => { errors.push(error); };
+	app.mount(element); await settle();
+	expect(element.querySelectorAll('button')).toHaveLength(scenario.visible ? 2 : 1);
 });

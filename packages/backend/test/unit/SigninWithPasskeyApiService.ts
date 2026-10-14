@@ -28,7 +28,7 @@ class FakeLimiter {
 }
 
 class FakeSigninService {
-	public signin(...args: Parameters<SigninService['signin']>): ReturnType<SigninService['signin']> {
+	public async signin(...args: Parameters<SigninService['signin']>): ReturnType<SigninService['signin']> {
 		return { finished: true, id: args[2].id, i: 'fixture-session-token' };
 	}
 }
@@ -57,6 +57,7 @@ describe('SigninWithPasskeyApiService', () => {
 	let webAuthnService: WebAuthnService;
 	let idService: IdService;
 	let FakeWebauthnVerify: () => Promise<string>;
+
 	async function createUser(data: Partial<MiUser> = {}) {
 		const user = await usersRepository
 			.save({

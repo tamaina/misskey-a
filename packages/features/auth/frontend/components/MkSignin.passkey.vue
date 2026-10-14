@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<MkButton large primary rounded :disabled="queryingKey" style="margin: 0 auto;" @click="queryKey">{{ $locale.sfc.retry }}</MkButton>
 
-		<MkButton v-if="isPerformingPasswordlessLogin !== true" transparent rounded :disabled="queryingKey" style="margin: 0 auto;" @click="emit('useTotp')">{{ $locale.sfc.useTotp }}</MkButton>
+		<MkButton v-if="isPerformingPasswordlessLogin !== true && canUseTotp !== false" transparent rounded :disabled="queryingKey" style="margin: 0 auto;" @click="emit('useTotp')">{{ $locale.sfc.useTotp }}</MkButton>
 	</div>
 </div>
 </template>
@@ -28,10 +28,11 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 
 import type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	credentialRequest: PublicKeyCredentialRequestOptionsJSON;
 	isPerformingPasswordlessLogin?: boolean;
-}>();
+	canUseTotp?: boolean;
+}>(), { canUseTotp: true });
 
 const emit = defineEmits<{
 	(ev: 'done', credential: AuthenticationResponseJSON): void;

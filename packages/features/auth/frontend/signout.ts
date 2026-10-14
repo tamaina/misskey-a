@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { signoutChoice } from '@features/auth/frontend/signout-choice.js';
 import { apiUrl } from '@features/boot/frontend/shared/config.js';
 import { clearSharedFiles } from '@@/js/shared-files.js';
 import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
@@ -13,75 +15,94 @@ import { clear } from '@features/runtime/frontend/utility/idb-proxy.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { encodePushSubscriptionKey } from '@features/notifications/frontend/utility/encode-push-subscription-key.js';
 
-export async function signout() {
+// Internal cleanup reasons follow a confirmed server rejection or accepted account deletion.
+export async function signout(reason?: 'server-rejected-credential' | 'account-deletion-accepted') {
 	if (!$i) return;
 
-	const finishWaiting = waiting();
-
-	if (store.s.enablePreferencesAutoCloudBackup) {
-		await cloudBackup();
-	}
-
-	await clearSharedFiles().catch(reason => {
-		finishWaiting();
-		throw reason;
-	});
-	localStorage.clear();
-
-	const idbAbortController = new AbortController();
-	const timeout = window.setTimeout(() => idbAbortController.abort(), 5000);
-
-	const idbPromises = ['MisskeyClient'].map((name, i, arr) => new Promise<void>((res, rej) => {
-		const delidb = indexedDB.deleteDatabase(name);
-		delidb.onsuccess = () => res();
-		delidb.onerror = e => rej(e);
-		delidb.onblocked = () => idbAbortController.signal.aborted && rej(new Error('Operation aborted'));
-	}));
+	const cleanupOnly = reason === 'server-rejected-credential' || reason === 'account-deletion-accepted';
+	let finishWaiting = waiting();
 
 	try {
-		await Promise.race([
-			Promise.all([
-				...idbPromises,
-				// idb keyval-storeはidb-keyvalライブラリによる別管理
-				clear(),
-			]),
-			new Promise((_, rej) => idbAbortController.signal.addEventListener('abort', () => rej(new Error('Operation timed out')))),
-		]);
-	} catch {
-		// nothing
-	} finally {
-		window.clearTimeout(timeout);
-	}
+		if (!cleanupOnly && store.s.enablePreferencesAutoCloudBackup) {
+			await cloudBackup();
+		}
 
-	//#region Remove service worker registration
-	try {
-		if (navigator.serviceWorker.controller) {
-			const registration = await navigator.serviceWorker.ready;
-			const push = await registration.pushManager.getSubscription();
-			if (push) {
-				// Service Workerごと登録解除するので、この購読に紐づく全アカウントの登録を解除する
-				await window.fetch(`${apiUrl}/sw/unregister`, {
-					method: 'POST',
-					body: JSON.stringify({
-						endpoint: push.endpoint,
-						auth: encodePushSubscriptionKey(push.getKey('auth')),
-						publickey: encodePushSubscriptionKey(push.getKey('p256dh')),
-					}),
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				});
+		for (; !cleanupOnly;) {
+			try {
+				await misskeyApi('i/signout');
+				break;
+			} catch (error) {
+				finishWaiting();
+				const legacy = (error as { code?: string } | null)?.code === 'SESSION_NOT_REVOCABLE';
+				const choice = await signoutChoice({ legacy });
+				if (choice.canceled || choice.result == null) return;
+				finishWaiting = waiting();
+				if (choice.result === 'local') break;
 			}
 		}
 
-		await navigator.serviceWorker.getRegistrations()
-			.then(registrations => {
-				return Promise.all(registrations.map(registration => registration.unregister()));
-			});
-	} catch {
-		// nothing
-	}
-	//#endregion
+		await clearSharedFiles();
+		// The root token cookie must not authenticate subsequent navigation on a shared device.
+		window.document.cookie = 'token=; Path=/; Max-Age=0; SameSite=Lax';
+		localStorage.clear();
 
-	unisonReload('/');
+		const idbAbortController = new AbortController();
+		const timeout = window.setTimeout(() => idbAbortController.abort(), 5000);
+
+		const idbPromises = ['MisskeyClient'].map((name, i, arr) => new Promise<void>((res, rej) => {
+			const delidb = indexedDB.deleteDatabase(name);
+			delidb.onsuccess = () => res();
+			delidb.onerror = e => rej(e);
+			delidb.onblocked = () => idbAbortController.signal.aborted && rej(new Error('Operation aborted'));
+		}));
+
+		try {
+			await Promise.race([
+				Promise.all([
+					...idbPromises,
+					// idb keyval-storeはidb-keyvalライブラリによる別管理
+					clear(),
+				]),
+				new Promise((_, rej) => idbAbortController.signal.addEventListener('abort', () => rej(new Error('Operation timed out')))),
+			]);
+		} catch {
+			// nothing
+		} finally {
+			window.clearTimeout(timeout);
+		}
+
+		//#region Remove service worker registration
+		try {
+			if (navigator.serviceWorker.controller) {
+				const registration = await navigator.serviceWorker.ready;
+				const push = await registration.pushManager.getSubscription();
+				if (push) {
+					// Service Workerごと登録解除するので、この購読に紐づく全アカウントの登録を解除する
+					await window.fetch(`${apiUrl}/sw/unregister`, {
+						method: 'POST',
+						body: JSON.stringify({
+							endpoint: push.endpoint,
+							auth: encodePushSubscriptionKey(push.getKey('auth')),
+							publickey: encodePushSubscriptionKey(push.getKey('p256dh')),
+						}),
+						headers: {
+							'Content-Type': 'application/json',
+						},
+					});
+				}
+			}
+
+			await navigator.serviceWorker.getRegistrations()
+				.then(registrations => {
+					return Promise.all(registrations.map(registration => registration.unregister()));
+				});
+		} catch {
+			// nothing
+		}
+		//#endregion
+
+		unisonReload('/');
+	} finally {
+		finishWaiting();
+	}
 }

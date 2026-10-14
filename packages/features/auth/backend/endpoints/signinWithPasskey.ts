@@ -124,7 +124,7 @@ export function createSigninWithPasskeyProcedure(deps: SigninWithPasskeyDependen
 					id: '652f899f-66d4-490e-993e-6606c8ec04c3',
 				});
 			}
-			if (user.isSuspended) {
+			if (user.isSuspended || user.isDeleted) {
 				return error(403, {
 					id: 'e03a5f46-d309-4865-9b69-56282d94e1eb',
 				});
@@ -136,7 +136,7 @@ export function createSigninWithPasskeyProcedure(deps: SigninWithPasskeyDependen
 					id: '2d84773e-f7b7-4d0b-8f72-bb69b584c912',
 				});
 			}
-			const signinResponse = deps.signinService.signin(request, reply, user);
+			const signinResponse = await deps.signinService.signin(request, reply, user);
 			return {
 				signinResponse: toFinishedSignin(signinResponse),
 			};
