@@ -24,7 +24,8 @@ import { ports } from '@features/index/backend/service-ports.js';
 import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
-import type { SelectQueryBuilder } from 'typeorm';
+import { FindOperator } from 'typeorm';
+import type { FindOptionsWhere, SelectQueryBuilder } from 'typeorm';
 import type { Inputs } from '@features/index/backend/service-definitions.js';
 
 vi.mock('@simplewebauthn/server', () => ({
@@ -145,10 +146,23 @@ describe('auth and search declaration boundaries', () => {
 		vi.stubEnv('NODE_ENV', 'test');
 		vi.stubEnv('MISSKEY_TEST_CHECK_DUPLICATED_TOTP', '1');
 		const inputs = securityInputs();
+		let remaining = ['used', 'keep'];
+		inputs.userProfilesRepository.update.mockImplementation(async criteria => {
+			const condition = (criteria as FindOptionsWhere<MiUserProfile>).twoFactorBackupSecret;
+
+			if (!(condition instanceof FindOperator)) throw new Error('Expected conditional recovery update');
+			const code: unknown = condition.objectLiteralParameters?.backupCode;
+
+			if (typeof code !== 'string') throw new Error('Expected bound recovery code');
+			const previous = remaining.length;
+			remaining = remaining.filter(value => value !== code);
+			return { affected: previous === remaining.length ? 0 : 1, raw: [], generatedMaps: [] };
+		});
 		const service = authSecurityServices.create(inputs).UserAuthService;
 		const authenticate = service.twoFactorAuthenticate;
 		await authenticate(mockDeep<MiUserProfile>({ userId: 'user', twoFactorBackupSecret: ['used', 'keep'] }), 'used');
-		expect(inputs.userProfilesRepository.update).toHaveBeenCalledWith({ userId: 'user' }, { twoFactorBackupSecret: ['keep'] });
+		expect(inputs.userProfilesRepository.update).toHaveBeenCalledWith(expect.objectContaining({ userId: 'user' }), { twoFactorBackupSecret: expect.any(Function) });
+		expect(remaining).toEqual(['keep']);
 		expect(inputs.redisClient.set).not.toHaveBeenCalled();
 		inputs.redisClient.set.mockResolvedValue(null);
 		const token = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(secret), digits: 6, period: 30 }).generate({ timestamp });
