@@ -202,6 +202,7 @@ describe('2要素認証', () => {
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 		assert.strictEqual(doneResponse.status, 200);
+		assert.strictEqual(doneResponse.body.backupCodes.length, 5);
 
 		const signinWithoutTokenResponse = await api('signin-flow', {
 			...signinParam(),
@@ -210,7 +211,7 @@ describe('2要素認証', () => {
 		assert.deepStrictEqual(signinWithoutTokenResponse.body, {
 			finished: false,
 			next: 'totp',
-			availableFactors: ['totp'],
+			availableFactors: ['totp', 'recovery'],
 		});
 
 		const signinResponse = await api('signin-flow', {
