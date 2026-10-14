@@ -5,7 +5,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import * as Misskey from 'misskey-js';
 import { WebSocket } from 'ws';
-import { waitForChannelReady, type AcknowledgedChannelStream } from './channel-ready.js';
+import { waitForChannelReady, waitForNoteReady, type AcknowledgedChannelStream } from './channel-ready.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -326,8 +326,6 @@ export async function isNoteUpdatedEventFired(
 	// 先にイベントを受け取った場合でもタイマーが残り続けないよう、必ず解除する
 	let timer: ReturnType<typeof setTimeout> | undefined;
 	try {
-		stream.send('s', { id: noteId });
-
 		const receivePromise = new Promise<boolean>((resolve) => {
 			stream.on('noteUpdated', msg => {
 				if (cond(msg)) {
@@ -336,6 +334,7 @@ export async function isNoteUpdatedEventFired(
 			});
 		});
 
+		await waitForNoteReady(stream as unknown as AcknowledgedChannelStream, noteId, FEDERATION_TIMEOUT);
 		await trigger();
 
 		return await Promise.race([

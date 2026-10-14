@@ -10,6 +10,14 @@ export interface AcknowledgedChannelStream {
 	send(type: string, payload: unknown): void;
 }
 
+/** The server serializes note subscriptions and channel connects on one socket. */
+export async function waitForNoteReady(stream: AcknowledgedChannelStream, noteId: string, timeout: number): Promise<void> {
+	stream.send('s', { id: noteId });
+	// An acknowledgement for this later command proves the preceding subscription
+	// has been registered. Opening the socket alone does not provide that guarantee.
+	await waitForChannelReady(stream, crypto.randomUUID(), 'main', {}, timeout);
+}
+
 export function waitForChannelReady(stream: AcknowledgedChannelStream, id: string, channel: string, params: unknown, timeout: number): Promise<void> {
 	return new Promise((resolve, reject) => {
 		let settled = false;
