@@ -508,7 +508,7 @@ const collapsed = ref(appearNote.value.cw == null && isLong);
 	"cwShow": "عرض المزيد",
 	"private": "خاص",
 	"showMore": "عرض المزيد",
-	"showLess": "اغلق",
+	"showLess": "عرض اقل",
 	"more": "المزيد!"
 }
 </locale>

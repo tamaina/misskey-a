@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreUpstreamLocaleBundle } from './upstream-develop-source-rebase.js';
 import { existsSync } from 'node:fs';
 import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
 import { createHash } from 'node:crypto';
@@ -14,8 +15,8 @@ import { runInNewContext } from 'node:vm';
 import { createApp } from 'vue';
 import { compileScript, parse } from 'vue/compiler-sfc';
 import { describe, expect, test } from 'vitest';
-import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import { createComponentLocale } from 'vite-vue-internationalization/runtime';
+import { createInternationalization, createComponentLocale } from 'vite-vue-internationalization/runtime';
+import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
 import { languages } from 'i18n';
 import { locales } from './instance-pilot-locale-catalog.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
@@ -41,8 +42,29 @@ function production(message: string): unknown {
 	return runInNewContext(code.toString());
 }
 
+let historicalLocalePlugin: ReturnType<typeof pluginVvi> | undefined;
+
+function historicalLocaleBundle(language: string): LocaleBundle {
+	const hook = (value: unknown, ...args: unknown[]): unknown => {
+		if (typeof value === 'function') return Reflect.apply(value, {}, args);
+		if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
+		throw new Error('Expected plugin hook');
+	};
+	if (!historicalLocalePlugin) {
+		historicalLocalePlugin = pluginVvi();
+		hook(historicalLocalePlugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
+		hook(historicalLocalePlugin.buildStart);
+	}
+	const source = hook(historicalLocalePlugin.load, `\0virtual:vite-vue-internationalization/locale/${language}`);
+	if (typeof source !== 'string') throw new Error('Expected generated locale loader');
+	const payload: LocaleBundle = {};
+	runInNewContext(source.replaceAll('export const ', 'const ').replace('export default { locale, global, modules };', 'payload.global = global; payload.modules = modules;'), { payload });
+	return restoreUpstreamLocaleBundle(language, payload);
+}
+
 async function activate(language: string) {
-	const runtime = createInternationalization({ initialLocale: language });
+	const payload = historicalLocaleBundle(language);
+	const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
 	await runtime.ready;
 	await runtime.loadLocale(language);
 	runtime.install(createApp({}));

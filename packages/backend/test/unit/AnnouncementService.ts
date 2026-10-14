@@ -10,6 +10,7 @@ import type { Mocked } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { Test } from '@nestjs/testing';
 import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
 import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type {
@@ -31,6 +32,7 @@ import type { TestingModule } from '@nestjs/testing';
 describe('AnnouncementService', () => {
 	let app: TestingModule;
 	let announcementService: AnnouncementService;
+	let queueService: Mocked<QueueService>;
 	let usersRepository: UsersRepository;
 	let announcementsRepository: AnnouncementsRepository;
 	let announcementReadsRepository: AnnouncementReadsRepository;
@@ -89,6 +91,7 @@ describe('AnnouncementService', () => {
 		app.enableShutdownHooks();
 
 		announcementService = app.get<AnnouncementService>(AnnouncementService);
+		queueService = app.get<QueueService>(QueueService) as Mocked<QueueService>;
 		usersRepository = app.get<UsersRepository>(DI.usersRepository);
 		announcementsRepository = app.get<AnnouncementsRepository>(DI.announcementsRepository);
 		announcementReadsRepository = app.get<AnnouncementReadsRepository>(DI.announcementReadsRepository);
@@ -195,6 +198,66 @@ describe('AnnouncementService', () => {
 			expect(globalEventService.publishMainStream.mock.lastCall![1]).toBe('announcementCreated');
 			expect((globalEventService.publishMainStream.mock.lastCall![2] as any).announcement).toBe(result.packed);
 			expect(moderationLogService.log).toHaveBeenCalled();
+		});
+	});
+
+	describe('auto archive', () => {
+		test('excludes expired deadlines but retains future and unset deadlines even before the job runs', async () => {
+			const user = await createUser();
+			const now = Date.now();
+			await createAnnouncement({ autoArchiveAt: new Date(now - 1000) });
+			const future = await createAnnouncement({ autoArchiveAt: new Date(now + 60000) });
+			const indefinite = await createAnnouncement({ autoArchiveAt: null });
+			const result = await announcementService.getUnreadAnnouncements(user);
+			expect(result.map(row => row.id).sort()).toEqual([future.id, indefinite.id].sort());
+		});
+
+		test('archives only the expired current deadline and ignores early and stale jobs', async () => {
+			const previousDeadline = new Date(Date.now() - 60000);
+			const futureDeadline = new Date(Date.now() + 60000);
+			const announcement = await createAnnouncement({ autoArchiveAt: futureDeadline });
+			expect(await announcementService.archiveAnnouncement(announcement.id, futureDeadline)).toBe(false);
+			const currentDeadline = new Date(Date.now() - 1000);
+			await announcementService.update(announcement, { autoArchiveAt: currentDeadline });
+			expect(await announcementService.archiveAnnouncement(announcement.id, previousDeadline)).toBe(false);
+			expect((await announcementsRepository.findOneByOrFail({ id: announcement.id })).isActive).toBe(true);
+			expect(await announcementService.archiveAnnouncement(announcement.id, currentDeadline)).toBe(true);
+			expect((await announcementsRepository.findOneByOrFail({ id: announcement.id })).isActive).toBe(false);
+			expect(await announcementService.archiveAnnouncement(announcement.id, currentDeadline)).toBe(false);
+		});
+
+		test('restores only active scheduled announcements on module initialization', async () => {
+			const deadline = new Date(Date.now() + 60000);
+			const active = await createAnnouncement({ autoArchiveAt: deadline });
+			await createAnnouncement({ autoArchiveAt: deadline, isActive: false });
+			await createAnnouncement({ autoArchiveAt: null });
+			await announcementService.restoreScheduledArchives();
+			expect(queueService.scheduleAnnouncementArchive).toHaveBeenCalledTimes(1);
+			expect(queueService.scheduleAnnouncementArchive).toHaveBeenCalledWith(active.id, deadline);
+		});
+
+		test('creation schedules its deadline and deletion cancels the same job', async () => {
+			const deadline = new Date(Date.now() + 60000);
+			const { raw } = await announcementService.create({ title: 'Scheduled', text: 'Body', autoArchiveAt: deadline });
+			expect(queueService.scheduleAnnouncementArchive).toHaveBeenCalledWith(raw.id, deadline);
+			await announcementService.delete(raw);
+			expect(queueService.clearAnnouncementArchive).toHaveBeenCalledWith(raw.id, deadline);
+		});
+
+		test('changing or clearing a deadline cancels the previous job and preserves omitted deadlines', async () => {
+			const deadline = new Date(Date.now() + 60000);
+			const changedDeadline = new Date(deadline.getTime() + 60000);
+			const announcement = await createAnnouncement({ autoArchiveAt: deadline });
+			await announcementService.update(announcement, { title: 'Unrelated edit' });
+			expect(queueService.clearAnnouncementArchive).not.toHaveBeenCalled();
+			expect(queueService.scheduleAnnouncementArchive).not.toHaveBeenCalled();
+			await announcementService.update(announcement, { autoArchiveAt: changedDeadline });
+			expect(queueService.clearAnnouncementArchive).toHaveBeenCalledWith(announcement.id, deadline);
+			expect(queueService.scheduleAnnouncementArchive).toHaveBeenCalledWith(announcement.id, changedDeadline);
+			const current = await announcementsRepository.findOneByOrFail({ id: announcement.id });
+			await announcementService.update(current, { autoArchiveAt: null });
+			expect(queueService.clearAnnouncementArchive).toHaveBeenLastCalledWith(announcement.id, changedDeadline);
+			expect((await announcementsRepository.findOneByOrFail({ id: announcement.id })).autoArchiveAt).toBeNull();
 		});
 	});
 

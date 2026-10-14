@@ -608,9 +608,9 @@ definePage(() => ({
 	"options": "Opzioni del ruolo",
 	"showRenotes": "Includi le Rinota",
 	"showRepliesToOthersInTimeline": "Risposte altrui nella TL",
-	"withSensitive": "Mostra le Note con allegati espliciti",
+	"withSensitive": "Includi con allegati espliciti",
 	"fileAttachedOnly": "Solo con allegati",
-	"showFixedPostForm": "Visualizzare la finestra di pubblicazione in cima alla timeline",
+	"showFixedPostForm": "Modulo di pubblicazione in cima",
 	"reload": "Ricarica",
 	"timelinesLabels": {
 		"home": "Home",

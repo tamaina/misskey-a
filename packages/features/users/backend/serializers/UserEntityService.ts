@@ -499,7 +499,11 @@ export class UserEntityService implements OnModuleInit {
 		const unreadAnnouncements = isMe && isDetailed ?
 			(await this.announcementService.getUnreadAnnouncements(user)).map((announcement: Omit<MiAnnouncement, 'user'>) => ({
 				createdAt: this.idService.parse(announcement.id).date.toISOString(),
-				...announcement,
+				id: announcement.id, updatedAt: announcement.updatedAt,
+				title: announcement.title, text: announcement.text, imageUrl: announcement.imageUrl,
+				icon: announcement.icon, display: announcement.display,
+				needConfirmationToRead: announcement.needConfirmationToRead, silence: announcement.silence,
+				isActive: announcement.isActive, forExistingUsers: announcement.forExistingUsers, userId: announcement.userId,
 			})) : null;
 
 		const notificationsInfo = isMe && isDetailed ? await this.getNotificationsInfo(user.id) : null;

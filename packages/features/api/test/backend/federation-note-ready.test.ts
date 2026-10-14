@@ -7,7 +7,8 @@ import { EventEmitter } from 'node:events';
 import { expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { Connection } from '../../backend/transport/stream/Connection.js';
-import { waitForNoteReady } from '../../../../backend/test-federation/test/channel-ready.js';
+import { waitForChannelReady, waitForNoteReady } from '../../../../backend/test-federation/test/channel-ready.js';
+import type { BrowserSessionService } from '@features/auth/backend/services/BrowserSessionService.js';
 import type { StreamEventEmitter } from '@features/runtime/backend/services/GlobalEventService.js';
 
 // These unrelated constructors require built game packages; dispatch and the
@@ -15,9 +16,14 @@ import type { StreamEventEmitter } from '@features/runtime/backend/services/Glob
 vi.mock('@features/games/backend/stream/reversi.js', () => ({ ReversiChannel: class {} }));
 vi.mock('@features/games/backend/stream/reversi-game.js', () => ({ ReversiGameChannel: class {} }));
 
-async function fixture() {
+async function fixture(queue: 'legacy' | 'browser-session') {
 	const moduleRef = mockDeep<import('@nestjs/core').ModuleRef>();
-	const connection = new Connection(moduleRef, mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), { user: { id: 'viewer' } as never, token: null });
+	const sessions = mockDeep<BrowserSessionService>();
+	sessions.isActive.mockResolvedValue(true);
+	const connection = new Connection(moduleRef, mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), {
+		user: { id: 'viewer' } as never, token: null,
+		...(queue === 'browser-session' ? { browserSession: { id: 'synthetic-session', userId: 'viewer' } } : {}),
+	}, sessions);
 	connection.following.author = { withReplies: false };
 	const events = new EventEmitter() as StreamEventEmitter;
 	const stream = Object.assign(new EventEmitter(), { send: (type: string, body: unknown) => socket.emit('message', Buffer.from(JSON.stringify({ type, body }))) });
@@ -42,12 +48,12 @@ async function fixture() {
 	return { connection, events, stream, reached, release: () => release(true) };
 }
 
-test.each(['public', 'followers', 'specified'] as const)('real socket dispatch registers note subscription before deletion (%s)', async visibility => {
+test.each((['legacy', 'browser-session'] as const).flatMap(queue => (['public', 'followers', 'specified'] as const).map(visibility => ({ queue, visibility }))))('real $queue socket dispatch registers note subscription before deletion ($visibility)', async ({ queue, visibility }) => {
 	const publish = (events: StreamEventEmitter) => events.emit('noteStream:note', {
 		type: 'deleted', body: { id: 'note', userId: 'author', visibility, visibleUserIds: ['viewer'], body: { deletedAt: 'synthetic-time' } },
 	} as never);
 	// Force the historical ordering without relying on machine speed or a sleep.
-	const early = await fixture();
+	const early = await fixture(queue);
 	const missed = vi.fn(); early.stream.on('noteUpdated', missed);
 	try {
 		early.stream.send('s', { id: 'note' });
@@ -55,10 +61,19 @@ test.each(['public', 'followers', 'specified'] as const)('real socket dispatch r
 		expect(early.events.listenerCount('noteStream:note')).toBe(0);
 		publish(early.events);
 		expect(missed).not.toHaveBeenCalled();
-	} finally { early.release(); early.connection.dispose(); }
+	} finally {
+		early.release();
+		try {
+			await waitForChannelReady(early.stream, crypto.randomUUID(), 'main', {}, 10_000);
+		} finally {
+			early.connection.dispose();
+		}
+		expect(early.events.listenerCount('noteStream:note')).toBe(0);
+	}
 
-	const guarded = await fixture();
+	const guarded = await fixture(queue);
 	const received = vi.fn(); guarded.stream.on('noteUpdated', received);
+	const delivered = new Promise<void>(resolve => guarded.stream.once('noteUpdated', () => resolve()));
 	const trigger = vi.fn(() => {
 		expect(guarded.events.listenerCount('noteStream:note')).toBe(1);
 		publish(guarded.events);
@@ -70,6 +85,7 @@ test.each(['public', 'followers', 'specified'] as const)('real socket dispatch r
 		expect(guarded.events.listenerCount('noteStream:note')).toBe(0);
 		guarded.release();
 		await ready;
+		await delivered;
 		expect(trigger).toHaveBeenCalledOnce();
 		expect(received).toHaveBeenCalledExactlyOnceWith({ id: 'note', type: 'deleted', body: { deletedAt: 'synthetic-time' } });
 		expect(guarded.stream.listenerCount('connected')).toBe(0);

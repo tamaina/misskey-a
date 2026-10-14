@@ -132,7 +132,7 @@ export function registerMcpTransport(app: FastifyInstance, service: McpApiServic
 					let result: unknown;
 					if (message.method === 'server/discover') {
 						if (Object.keys(message.params).length) throw new McpEventError(-32602, 'Unexpected discovery arguments');
-						result = { supportedVersions: ['2026-07-28'], capabilities: { tools: {}, events: {} } };
+						result = { supportedVersions: ['2026-07-28'], capabilities: { tools: {}, events: {} }, cacheScope: 'private', ttlMs: 0 };
 					} else if (['events/list', 'events/subscribe', 'events/unsubscribe'].includes(message.method)) result = await Promise.race([track(prepared.events(message.method, message.params, abort.signal)), cancelled]);
 					else if (message.method === 'tools/list') {
 						if (Object.keys(message.params).length) throw new McpEventError(-32602, 'Unexpected list arguments');
