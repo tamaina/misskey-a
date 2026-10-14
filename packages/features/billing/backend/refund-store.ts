@@ -4,13 +4,15 @@
  */
 import { isDeepStrictEqual } from 'node:util';
 import { ORPCError } from '@orpc/server';
+import { calculateRefundTaxBaseUnits } from '../shared/billing-tax.js';
+import { fundingIntervalAmount } from '../shared/billing-funding.js';
+import { groupBillingRefundLines } from '../shared/billing-refund-groups.js';
+import { splitBillingRefundPeriod } from '../shared/billing-refund-period.js';
+import { MiBillingPolicy } from './models/BillingPolicy.js';
 import { MiBillingServiceOrder } from './models/BillingServiceOrder.js';
 import { MiBillingRefund } from './models/BillingRefund.js';
 import { MiBillingTransactionClaim } from './models/BillingTransactionClaim.js';
 import { lockBillingState, saveBillingState, billingConflict } from './billing-state.js';
-import { fundingIntervalAmount } from '../shared/billing-funding.js';
-import { groupBillingRefundLines } from '../shared/billing-refund-groups.js';
-import { splitBillingRefundPeriod } from '../shared/billing-refund-period.js';
 import type { BillingState } from './billing-state.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import type { ReceiptEvidence, ReceiptReader } from './transfer-confirmation.js';
@@ -170,13 +172,19 @@ export function createRefundStore(db: DataSource, id: () => string, readReceipt:
 					const source = await manager.findOneByOrFail(MiBillingServiceOrder, { id: sourceId, userId: row.userId!, status: 'paid' });
 					const amount = freshQuote.groups.flatMap(group => group.lines).filter(line => line.sourceOrder.id === sourceId).reduce((sum, line) => sum + BigInt(line.amountBaseUnits), 0n);
 					state.refunded[sourceId] = (BigInt(state.refunded[sourceId] ?? '0') + amount).toString();
-					originalPurchases.push({ id: source.id, payerAddress: source.payerAddress, offer: source.offer, cashAmountBaseUnits: source.cashAmountBaseUnits!, txHash: source.txHash, paidAt: source.paidAt });
+					originalPurchases.push({ id: source.id, payerAddress: source.payerAddress, offer: source.offer, cashAmountBaseUnits: source.cashAmountBaseUnits!, receiptSnapshot: source.receiptSnapshot ?? null, txHash: source.txHash, paidAt: source.paidAt });
 				}
 				const cutoff = freshQuote.effectiveCutoffAt, targets = new Set(freshQuote.assignments.map(term => term.id));
 				state.terms = state.terms.flatMap(term => { if (!targets.has(term.id)) return [term]; const kept = splitBillingRefundPeriod(term, cutoff).retainedPeriod; return kept ? [{ ...term, ...kept }] : []; });
 				state.lots = state.lots.flatMap(lot => { if (!targets.has(lot.termId)) return [lot]; const kept = splitBillingRefundPeriod(lot, cutoff).retainedPeriod; return kept ? [{ ...lot, ...kept }] : []; });
 				state.lockRequestId = null; state.revision++; row.data.status = 'completed';
-				row.data.document = { id: row.id, completedAt: now(), requestedCutoffAt: row.data.requestedCutoffAt, effectiveCutoffAt: cutoff, groups: freshQuote.groups, proofs, originalPurchases };
+				await manager.query('SELECT pg_advisory_xact_lock(hashtextextended(\'billing-policy\', 0))');
+				const seller = (await manager.findOneBy(MiBillingPolicy, { id: 'server' }))?.policy.seller ?? null;
+				const taxAdjustments = freshQuote.groups.flatMap(group => group.lines.map(line => {
+					const tax = originalPurchases.find(source => source.id === line.sourceOrder.id)?.receiptSnapshot?.tax;
+					return { lineId: line.id, sourceOrderId: line.sourceOrder.id, tax: tax ? { ...tax, includedBaseUnits: line.amountBaseUnits, ...calculateRefundTaxBaseUnits(line.amountBaseUnits, tax.includedBaseUnits, tax.taxBaseUnits) } : null };
+				}));
+				row.data.document = { adjustmentReason: row.data.events.findLast(event => event.action === 'approved')?.reason ?? row.data.reason, seller, taxAdjustments, id: row.id, completedAt: now(), requestedCutoffAt: row.data.requestedCutoffAt, effectiveCutoffAt: cutoff, groups: freshQuote.groups, proofs, originalPurchases };
 				return save(manager, row, state, actorId, 'completed');
 			});
 		},

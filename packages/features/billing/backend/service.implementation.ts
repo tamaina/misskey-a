@@ -15,6 +15,7 @@ import type { ReceiptReader } from './service-receipt.js';
 
 export interface ServiceBillingDependencies {
 	store: ServiceBillingStore;
+	notifyPurchase?(orderId: string): Promise<void>;
 	readReceipt: ReceiptReader;
 	rpcUrl(chainId: number): Promise<string | null>;
 }
@@ -27,6 +28,9 @@ function publicOrder(row: Awaited<ReturnType<ServiceBillingStore['createOrder']>
 export function createServiceBillingRouter<Actor extends ApiActor>(deps: ServiceBillingDependencies) {
 	const procedure = createApiProcedure<Actor>();
 	const account = requirePrincipal<Actor>();
+
+	function notify(row: Awaited<ReturnType<ServiceBillingStore['createOrder']>>) { if (row.status === 'paid' && deps.notifyPurchase) void deps.notifyPurchase(row.id).catch(() => { console.warn('Purchase receipt notification attempt failed; reservation retained'); }); }
+
 	return implement(serviceBillingContract).$context<ApiContext<Actor>>().router({
 		getReceipt: procedure(serviceBillingContract.getReceipt).use(account).handler(async ({ input, context }) => { const row = await deps.store.getReceipt(context.principal.id, input.orderId); return { order: publicOrder(row), snapshot: row.receiptSnapshot ?? null }; }),
 		listCatalog: procedure(serviceBillingContract.listCatalog).handler(async () => {
@@ -50,13 +54,15 @@ export function createServiceBillingRouter<Actor extends ApiActor>(deps: Service
 		createOrder: procedure(serviceBillingContract.createOrder).use(account).handler(async ({ input, context }) => {
 			const offer = (await deps.store.listOffers()).find(row => row.id === input.offerId);
 			if (!offer || !await deps.rpcUrl(offer.chainId)) throw new ORPCError('BILLING_UNAVAILABLE');
-			return publicOrder(await deps.store.createOrder(context.principal.id, input.offerId, input.walletId, input.requestKey, input.quotedOffer, input.quotedQuote, { headers: context.headers, transportPeerIp: context.transportPeerIp, consent: input.residencyConsent }));
+			const row = await deps.store.createOrder(context.principal.id, input.offerId, input.walletId, input.requestKey, input.quotedOffer, input.quotedQuote, { headers: context.headers, transportPeerIp: context.transportPeerIp, consent: input.residencyConsent });
+			notify(row); return publicOrder(row);
 		}),
 		checkOrder: procedure(serviceBillingContract.checkOrder).use(account).handler(async ({ input, context }) => {
 			const row = await deps.store.submitTransaction(context.principal.id, input.orderId, input.txHash?.toLowerCase());
-			if (row.status !== 'pending' || !row.txHash) return publicOrder(row);
+			if (row.status !== 'pending' || !row.txHash) { notify(row); return publicOrder(row); }
 			const receipt = await deps.readReceipt(row.chainId, row.txHash, row.offer.confirmationsRequired);
-			return publicOrder(await deps.store.applyReceipt(context.principal.id, row.id, row.txHash, receipt));
+			const checked = await deps.store.applyReceipt(context.principal.id, row.id, row.txHash, receipt);
+			notify(checked); return publicOrder(checked);
 		}),
 		listOrders: procedure(serviceBillingContract.listOrders).use(account).handler(async ({ context }) => {
 			const rows = await deps.store.listOrders(context.principal.id);

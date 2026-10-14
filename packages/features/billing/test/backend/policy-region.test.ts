@@ -4,7 +4,7 @@
  */
 import { expect, test } from 'vitest';
 import { trustedRegionSnapshot, isBillingRegionAllowed, validateTrustedProxyCidrs } from '../../backend/policy-region.js';
-import { calculateIncludedTaxBaseUnits } from '../../shared/billing-tax.js';
+import { calculateIncludedTaxBaseUnits, calculateRefundTaxBaseUnits } from '../../shared/billing-tax.js';
 const headers = { 'cf-ipcountry': 'JP', 'cf-region-code': '13', 'cf-ipcity': 'Tokyo', 'x-forwarded-for': '127.0.0.1' };
 test('geography is accepted only from actual trusted socket peer, not forwarded IP or arrays', () => {
 	expect(trustedRegionSnapshot(undefined, headers, ['127.0.0.1/32'])).toBeNull();
@@ -41,4 +41,14 @@ test('custom EU headers cannot override verified country membership', () => {
 		expect(trustedRegionSnapshot('127.0.0.1', { 'cf-ipcountry': 'DE', 'x-misskey-billing-is-eu-country': supplied }, ['127.0.0.1/32'])?.isEUCountry).toBe(true);
 		expect(trustedRegionSnapshot('127.0.0.1', { 'cf-ipcountry': 'JP', 'x-misskey-billing-is-eu-country': supplied }, ['127.0.0.1/32'])?.isEUCountry).toBe(false);
 	}
+});
+
+test('source partial refund tax uses saved tax floor allocation without cumulative over-reversal', () => {
+	let sum = 0n;
+	for (let n = 0; n < 101; n++) sum += BigInt(calculateRefundTaxBaseUnits('1', '101', '10').taxBaseUnits);
+	expect(sum).toBeLessThanOrEqual(10n);
+	expect(calculateRefundTaxBaseUnits('101', '101', '10')).toEqual({ excludedBaseUnits: '91', taxBaseUnits: '10' });
+	expect(calculateRefundTaxBaseUnits('50', '100', '10')).toEqual({ excludedBaseUnits: '45', taxBaseUnits: '5' });
+	expect(calculateRefundTaxBaseUnits('0', '0', '0')).toEqual({ excludedBaseUnits: '0', taxBaseUnits: '0' });
+	expect(() => calculateRefundTaxBaseUnits('1', '0', '0')).toThrow();
 });

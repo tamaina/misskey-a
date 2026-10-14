@@ -5,6 +5,7 @@
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import { commonErrors, apiErrorData } from '../../api/backend/transport/errors.schema.js';
+import { receiptSeller, receiptSnapshot } from './policy.schema.js';
 import { serviceOffer } from './api.definition.js';
 import { receiptEvidenceSchema } from './transfer.schema.js';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
@@ -18,13 +19,13 @@ const term = v.strictObject({ id, orderId: id, offer: serviceOffer, startsAt: ti
 const line = v.strictObject({ id, assignmentId: id, amountBaseUnits: units, sourceOrder: v.strictObject({ id, payerAddress: address, chainId: time, contractAddress: address, decimals: time }) });
 const group = v.strictObject({ id, payerAddress: address, chainId: time, contractAddress: address, decimals: time, amountBaseUnits: units, lines: v.array(line), confirmations: time });
 const quote = v.strictObject({ revision: time, effectiveCutoffAt: time, assignments: v.array(term), groups: v.array(group), reviewReasons: v.array(v.string()) });
-export const refundDocumentSchema = v.strictObject({ id, completedAt: time, requestedCutoffAt: time, effectiveCutoffAt: time, groups: v.array(group),
-	proofs: v.array(v.strictObject({ transferId: id, senderAddress: address, evidence: receiptEvidenceSchema })),
-	originalPurchases: v.array(v.strictObject({ id, payerAddress: address, offer: serviceOffer, cashAmountBaseUnits: units, txHash: v.nullable(hash), paidAt: v.nullable(time) })),
+export const refundDocumentSchema = v.strictObject({ adjustmentReason: v.exactOptional(v.string()), seller: v.exactOptional(v.nullable(receiptSeller)), taxAdjustments: v.exactOptional(v.array(v.strictObject({ lineId: id, sourceOrderId: id, tax: v.nullable(receiptSnapshot.entries.tax) }))), id, completedAt: time, requestedCutoffAt: time, effectiveCutoffAt: time, groups: v.array(group),
+																																																					proofs: v.array(v.strictObject({ transferId: id, senderAddress: address, evidence: receiptEvidenceSchema })),
+																																																					originalPurchases: v.array(v.strictObject({ id, payerAddress: address, offer: serviceOffer, cashAmountBaseUnits: units, receiptSnapshot: v.exactOptional(v.nullable(receiptSnapshot)), txHash: v.nullable(hash), paidAt: v.nullable(time) })),
 });
 export const refundViewSchema = v.strictObject({ id, version: time, status: v.picklist(['requested', 'review_required', 'prepared', 'processing', 'rejected', 'cancelled', 'completed']), requestedMode: v.picklist(['immediate', 'scheduled']), requestedCutoffAt: time, effectiveCutoffAt: v.nullable(time), reason, createdAt: time, quote: v.nullable(quote),
-	transfers: v.array(v.strictObject({ id, status: v.picklist(['prepared', 'broadcast_pending', 'submitted']), senderAddress: v.nullable(address), startedAt: v.nullable(time), txHash: v.nullable(hash) })),
-	events: v.array(v.strictObject({ actorId: id, at: time, action: v.string(), reason: v.string() })), document: v.nullable(refundDocumentSchema),
+																																																	transfers: v.array(v.strictObject({ id, status: v.picklist(['prepared', 'broadcast_pending', 'submitted']), senderAddress: v.nullable(address), startedAt: v.nullable(time), txHash: v.nullable(hash) })),
+																																																	events: v.array(v.strictObject({ actorId: id, at: time, action: v.string(), reason: v.string() })), document: v.nullable(refundDocumentSchema),
 });
 const errors = { ...commonErrors, BILLING_NOT_FOUND: { status: 404, data: apiErrorData }, BILLING_CONFLICT: { status: 409, data: apiErrorData }, BILLING_REVIEW_REQUIRED: { status: 409, data: apiErrorData } };
 const read = { requireCredential: true, kind: 'read:account' } as const;

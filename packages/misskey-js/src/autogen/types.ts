@@ -41589,6 +41589,24 @@ export interface operations {
                             reason: string;
                         }[];
                         document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
                             id: string;
                             completedAt: number;
                             requestedCutoffAt: number;
@@ -41661,6 +41679,42 @@ export interface operations {
                                     isEnabled: boolean;
                                 };
                                 cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
                                 txHash: string | null;
                                 paidAt: number | null;
                             }[];
@@ -41979,6 +42033,24 @@ export interface operations {
                                 reason: string;
                             }[];
                             document: {
+                                adjustmentReason?: string;
+                                seller?: {
+                                    name: string;
+                                    address: string;
+                                    invoiceRegistrationNumber: string;
+                                } | null;
+                                taxAdjustments?: {
+                                    lineId: string;
+                                    sourceOrderId: string;
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    } | null;
+                                }[];
                                 id: string;
                                 completedAt: number;
                                 requestedCutoffAt: number;
@@ -42051,6 +42123,42 @@ export interface operations {
                                         isEnabled: boolean;
                                     };
                                     cashAmountBaseUnits: string;
+                                    receiptSnapshot?: {
+                                        /** @constant */
+                                        version: 1;
+                                        consentedAt: number;
+                                        region: {
+                                            country: string | null;
+                                            isEUCountry: boolean | null;
+                                            city: string | null;
+                                            continent: string | null;
+                                            latitude: string | null;
+                                            longitude: string | null;
+                                            postalCode: string | null;
+                                            metroCode: string | null;
+                                            region: string | null;
+                                            regionCode: string | null;
+                                            timezone: string | null;
+                                        };
+                                        statement: {
+                                            id: string;
+                                            country: string;
+                                            statement: string;
+                                        };
+                                        seller: {
+                                            name: string;
+                                            address: string;
+                                            invoiceRegistrationNumber: string;
+                                        };
+                                        tax: {
+                                            name: string;
+                                            rate: string;
+                                            currencyCode: string;
+                                            includedBaseUnits: string;
+                                            excludedBaseUnits: string;
+                                            taxBaseUnits: string;
+                                        };
+                                    } | null;
                                     txHash: string | null;
                                     paidAt: number | null;
                                 }[];
@@ -42368,6 +42476,24 @@ export interface operations {
                             reason: string;
                         }[];
                         document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
                             id: string;
                             completedAt: number;
                             requestedCutoffAt: number;
@@ -42440,6 +42566,42 @@ export interface operations {
                                     isEnabled: boolean;
                                 };
                                 cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
                                 txHash: string | null;
                                 paidAt: number | null;
                             }[];
@@ -42755,6 +42917,24 @@ export interface operations {
                             reason: string;
                         }[];
                         document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
                             id: string;
                             completedAt: number;
                             requestedCutoffAt: number;
@@ -42827,6 +43007,42 @@ export interface operations {
                                     isEnabled: boolean;
                                 };
                                 cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
                                 txHash: string | null;
                                 paidAt: number | null;
                             }[];
@@ -43059,6 +43275,24 @@ export interface operations {
                 };
                 content: {
                     'application/json': {
+                        adjustmentReason?: string;
+                        seller?: {
+                            name: string;
+                            address: string;
+                            invoiceRegistrationNumber: string;
+                        } | null;
+                        taxAdjustments?: {
+                            lineId: string;
+                            sourceOrderId: string;
+                            tax: {
+                                name: string;
+                                rate: string;
+                                currencyCode: string;
+                                includedBaseUnits: string;
+                                excludedBaseUnits: string;
+                                taxBaseUnits: string;
+                            } | null;
+                        }[];
                         id: string;
                         completedAt: number;
                         requestedCutoffAt: number;
@@ -43131,6 +43365,42 @@ export interface operations {
                                 isEnabled: boolean;
                             };
                             cashAmountBaseUnits: string;
+                            receiptSnapshot?: {
+                                /** @constant */
+                                version: 1;
+                                consentedAt: number;
+                                region: {
+                                    country: string | null;
+                                    isEUCountry: boolean | null;
+                                    city: string | null;
+                                    continent: string | null;
+                                    latitude: string | null;
+                                    longitude: string | null;
+                                    postalCode: string | null;
+                                    metroCode: string | null;
+                                    region: string | null;
+                                    regionCode: string | null;
+                                    timezone: string | null;
+                                };
+                                statement: {
+                                    id: string;
+                                    country: string;
+                                    statement: string;
+                                };
+                                seller: {
+                                    name: string;
+                                    address: string;
+                                    invoiceRegistrationNumber: string;
+                                };
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                };
+                            } | null;
                             txHash: string | null;
                             paidAt: number | null;
                         }[];
@@ -43448,6 +43718,24 @@ export interface operations {
                                 reason: string;
                             }[];
                             document: {
+                                adjustmentReason?: string;
+                                seller?: {
+                                    name: string;
+                                    address: string;
+                                    invoiceRegistrationNumber: string;
+                                } | null;
+                                taxAdjustments?: {
+                                    lineId: string;
+                                    sourceOrderId: string;
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    } | null;
+                                }[];
                                 id: string;
                                 completedAt: number;
                                 requestedCutoffAt: number;
@@ -43520,6 +43808,42 @@ export interface operations {
                                         isEnabled: boolean;
                                     };
                                     cashAmountBaseUnits: string;
+                                    receiptSnapshot?: {
+                                        /** @constant */
+                                        version: 1;
+                                        consentedAt: number;
+                                        region: {
+                                            country: string | null;
+                                            isEUCountry: boolean | null;
+                                            city: string | null;
+                                            continent: string | null;
+                                            latitude: string | null;
+                                            longitude: string | null;
+                                            postalCode: string | null;
+                                            metroCode: string | null;
+                                            region: string | null;
+                                            regionCode: string | null;
+                                            timezone: string | null;
+                                        };
+                                        statement: {
+                                            id: string;
+                                            country: string;
+                                            statement: string;
+                                        };
+                                        seller: {
+                                            name: string;
+                                            address: string;
+                                            invoiceRegistrationNumber: string;
+                                        };
+                                        tax: {
+                                            name: string;
+                                            rate: string;
+                                            currencyCode: string;
+                                            includedBaseUnits: string;
+                                            excludedBaseUnits: string;
+                                            taxBaseUnits: string;
+                                        };
+                                    } | null;
                                     txHash: string | null;
                                     paidAt: number | null;
                                 }[];
@@ -43837,6 +44161,24 @@ export interface operations {
                             reason: string;
                         }[];
                         document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
                             id: string;
                             completedAt: number;
                             requestedCutoffAt: number;
@@ -43909,6 +44251,42 @@ export interface operations {
                                     isEnabled: boolean;
                                 };
                                 cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
                                 txHash: string | null;
                                 paidAt: number | null;
                             }[];
@@ -44229,6 +44607,24 @@ export interface operations {
                             reason: string;
                         }[];
                         document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
                             id: string;
                             completedAt: number;
                             requestedCutoffAt: number;
@@ -44301,6 +44697,42 @@ export interface operations {
                                     isEnabled: boolean;
                                 };
                                 cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
                                 txHash: string | null;
                                 paidAt: number | null;
                             }[];
@@ -44619,6 +45051,24 @@ export interface operations {
                             reason: string;
                         }[];
                         document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
                             id: string;
                             completedAt: number;
                             requestedCutoffAt: number;
@@ -44691,6 +45141,42 @@ export interface operations {
                                     isEnabled: boolean;
                                 };
                                 cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
                                 txHash: string | null;
                                 paidAt: number | null;
                             }[];
@@ -45008,6 +45494,24 @@ export interface operations {
                             reason: string;
                         }[];
                         document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
                             id: string;
                             completedAt: number;
                             requestedCutoffAt: number;
@@ -45080,6 +45584,42 @@ export interface operations {
                                     isEnabled: boolean;
                                 };
                                 cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
                                 txHash: string | null;
                                 paidAt: number | null;
                             }[];
@@ -45395,6 +45935,24 @@ export interface operations {
                             reason: string;
                         }[];
                         document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
                             id: string;
                             completedAt: number;
                             requestedCutoffAt: number;
@@ -45467,6 +46025,42 @@ export interface operations {
                                     isEnabled: boolean;
                                 };
                                 cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
                                 txHash: string | null;
                                 paidAt: number | null;
                             }[];

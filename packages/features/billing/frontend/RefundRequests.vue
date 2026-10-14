@@ -52,7 +52,6 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { discoverWallets } from './wallet-discovery.js';
 import { formatServiceAmount } from './service-client.js';
-import { renderRefundDocument } from './refund-client.js';
 import type { RefundClient } from './refund-client.js';
 import type { WalletConnector } from './wallet-client.js';
 import type { RefundData, RefundQuote } from '../shared/refund-types.js';
@@ -107,8 +106,8 @@ async function send(row: RefundData, group: RefundQuote['groups'][number]) {
 	});
 }
 
-function download(row: RefundData) { if (!row.document) return; const url = URL.createObjectURL(new Blob([renderRefundDocument(row.document)], { type: 'text/html;charset=utf-8' })); const a = window.document.createElement('a'); a.href = url; a.download = `refund-${row.id}.html`; a.click(); window.setTimeout(() => URL.revokeObjectURL(url), 60000); }
+async function download(row: RefundData) { await run(async () => { if (!row.document) return; const { downloadRefundPdf } = await import('./refund-pdf.js'); await downloadRefundPdf(row.document); }); }
 </script>
 <locale lang="json" locale="ja-JP">
-{"scope":"返金申請と確定状況を確認します。全送金のチェーン確認が終わるまで利用期間は変わりません。由来不明の旧購入は自動返金できません。","failed":"処理できませんでした。入力を確認して再読込してください。送信開始済みの返金は再送しないでください。","load":"読み込む","requested":"希望終了日時","effective":"管理者承認の終了日時","now":"空欄なら今すぐ終了を希望します。","keepRequested":"空欄なら当初の希望日時を保持します。","reason":"理由","request":"返金を申請","wallet":"管理者の送金ウォレット","lookup":"申請ID","show":"申請を開く","approve":"再見積・承認","reject":"却下","recipient":"原購入ウォレットへの返金先","rail":"チェーン / ERC20コントラクト","amount":"返金額 / 最小単位 / 小数桁","send":"接続ウォレットで返金を送信","unknown":"送信開始済みです。結果不明でも再送せず、ウォレットの履歴からTx Hashを確認してください。","hash":"送信済みトランザクションハッシュ","submit":"ハッシュを登録・復帰","check":"全送金を再確認して一括失効","cancel":"送信前の申請を取り消す","document":"返金証憑を保存（印刷可）","next":"次のページ"}
+{"scope":"返金申請と確定状況を確認します。全送金のチェーン確認が終わるまで利用期間は変わりません。由来不明の旧購入は自動返金できません。","failed":"処理できませんでした。入力を確認して再読込してください。送信開始済みの返金は再送しないでください。","load":"読み込む","requested":"希望終了日時","effective":"管理者承認の終了日時","now":"空欄なら今すぐ終了を希望します。","keepRequested":"空欄なら当初の希望日時を保持します。","reason":"理由","request":"返金を申請","wallet":"管理者の送金ウォレット","lookup":"申請ID","show":"申請を開く","approve":"再見積・承認","reject":"却下","recipient":"原購入ウォレットへの返金先","rail":"チェーン / ERC20コントラクト","amount":"返金額 / 最小単位 / 小数桁","send":"接続ウォレットで返金を送信","unknown":"送信開始済みです。結果不明でも再送せず、ウォレットの履歴からTx Hashを確認してください。","hash":"送信済みトランザクションハッシュ","submit":"ハッシュを登録・復帰","check":"全送金を再確認して一括失効","cancel":"送信前の申請を取り消す","document":"返金証憑PDFを保存","next":"次のページ"}
 </locale>

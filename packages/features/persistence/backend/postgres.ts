@@ -7,7 +7,6 @@
 import pg from 'pg';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
-import { Config } from '@/config.js';
 import { Logger as MisskeyLogger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 
@@ -81,11 +80,6 @@ import { MiFlash } from '@features/play/backend/models/Flash.js';
 import { MiFlashLike } from '@features/play/backend/models/FlashLike.js';
 import { MiBillingRefund } from '@features/billing/backend/models/BillingRefund.js';
 import { MiBillingTransactionClaim } from '@features/billing/backend/models/BillingTransactionClaim.js';
-import { MiBillingPolicy } from '../../billing/backend/models/BillingPolicy.js';
-import { MiBillingResidencyStatement } from '../../billing/backend/models/BillingResidencyStatement.js';
-import { MiBillingCatalogPrice } from '../../billing/backend/models/BillingCatalogPrice.js';
-import { MiBillingPricingAsset } from '../../billing/backend/models/BillingPricingAsset.js';
-import { MiBillingAssetDeployment } from '../../billing/backend/models/BillingAssetDeployment.js';
 import { MiBillingAccountState } from '@features/billing/backend/models/BillingAccountState.js';
 import { MiBillingServiceOffer } from '@features/billing/backend/models/BillingServiceOffer.js';
 import { MiBillingServiceOrder } from '@features/billing/backend/models/BillingServiceOrder.js';
@@ -101,6 +95,13 @@ import { MiBubbleGameRecord } from '@features/games/backend/models/BubbleGameRec
 import { MiReversiGame } from '@features/games/backend/models/ReversiGame.js';
 import { MiChatApproval } from '@features/chat/backend/models/ChatApproval.js';
 import { MiSystemAccount } from '@features/users/backend/models/SystemAccount.js';
+import { Config } from '@/config.js';
+import { MiBillingAssetDeployment } from '../../billing/backend/models/BillingAssetDeployment.js';
+import { MiBillingPricingAsset } from '../../billing/backend/models/BillingPricingAsset.js';
+import { MiBillingCatalogPrice } from '../../billing/backend/models/BillingCatalogPrice.js';
+import { MiBillingResidencyStatement } from '../../billing/backend/models/BillingResidencyStatement.js';
+import { MiBillingPolicy } from '../../billing/backend/models/BillingPolicy.js';
+import { MiBillingNotification } from '../../billing/backend/models/BillingNotification.js';
 
 pg.types.setTypeParser(20, Number);
 
@@ -265,6 +266,7 @@ export const entities = [
 	MiUserMemo,
 	MiBillingRefund,
 	MiBillingTransactionClaim,
+	MiBillingNotification,
 	MiBillingPolicy,
 	MiBillingResidencyStatement,
 	MiBillingCatalogPrice,

@@ -9,13 +9,14 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { createRouterClient } from '@orpc/server';
-import { createServiceBillingStore, createCatalogAdminStore, createCatalogAdminRouter, createServiceBillingRouter, createBillingPolicyStore, activePaidRoleIds } from '../../../backend/built/features/billing/backend.js';
+import { createServiceBillingStore, createCatalogAdminStore, createCatalogAdminRouter, createServiceBillingRouter, createBillingPolicyStore, createPurchaseNotifier, activePaidRoleIds } from '../../../backend/built/features/billing/backend.js';
 import { BillingServiceSubscriptions1791838800000 as Migration } from '../../../backend/migration/1791838800000-BillingServiceSubscriptions.js';
 import { BillingFundedTerms1792010000000 } from '../../../backend/migration/1792010000000-BillingFundedTerms.js';
 import { BillingWalletRegistration1791760200000 as WalletMigration } from '../../../backend/migration/1791760200000-BillingWalletRegistration.js';
 import { BillingWalletChainSettings1791763800000 } from '../../../backend/migration/1791763800000-BillingWalletChainSettings.js';
 import { BillingCatalogAdministration1792020000000 as CatalogMigration } from '../../../backend/migration/1792020000000-BillingCatalogAdministration.js';
 import { BillingTaxResidency1792021000000 as PolicyMigration } from '../../../backend/migration/1792021000000-BillingTaxResidency.js';
+import { BillingNotifications1792022000000 as NotificationMigration } from '../../../backend/migration/1792022000000-BillingNotifications.js';
 const require = createRequire(new URL('../../../backend/package.json', import.meta.url));
 const { DataSource } = require('typeorm');
 const url = process.env.MISSKEY_BILLING_TEST_DATABASE_URL;
@@ -49,11 +50,12 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 		await qr.query('DELETE FROM billing_service_offer WHERE id=$1', [seed.id]);
 		await new CatalogMigration().down(qr); await new CatalogMigration().up(qr);
 		await new PolicyMigration().up(qr); await new PolicyMigration().down(qr); await new PolicyMigration().up(qr);
+		await new NotificationMigration().up(qr); await new NotificationMigration().down(qr); await new NotificationMigration().up(qr);
 		const pending = (await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_service_(offer|order)"/.test(row.query));
 		assert.deepEqual(pending, [], 'Migration and entity DDL agree');
 		await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES (\'alice-wallet\',\'alice\',123456,$1,NULL,$3,$3),(\'bob-wallet\',\'bob\',123456,$2,NULL,$3,$3)', [address(1), address(2), now]);
 		await qr.query('CREATE TABLE role (id varchar(32) PRIMARY KEY, target varchar(16), "isAdministrator" boolean, "isModerator" boolean)');
-		await qr.query("INSERT INTO role VALUES ('normal','manual',false,false),('admin','manual',true,false),('auto','conditional',false,false)");
+		await qr.query('INSERT INTO role VALUES (\'normal\',\'manual\',false,false),(\'admin\',\'manual\',true,false),(\'auto\',\'conditional\',false,false)');
 		await store.saveOffer(offer, 'alice');
 		await t.test('concurrent idempotent creation, input conflict and immutable offer snapshot', async () => {
 			const rows = await Promise.all([store.createOrder('alice', offer.id, 'alice-wallet', 'retry-key', offer), store.createOrder('alice', offer.id, 'alice-wallet', 'retry-key', offer)]);
@@ -185,9 +187,9 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 			assert.deepEqual(await activePaidRoleIds(db, 'bob', paid.startsAt), ['normal']);
 			assert.deepEqual(await activePaidRoleIds(db, 'bob', paid.endsAt), []);
 			assert.deepEqual(await activePaidRoleIds(db, 'alice', paid.startsAt), []);
-			await qr.query(`UPDATE role SET "isModerator" = true WHERE id = 'normal'`);
+			await qr.query('UPDATE role SET "isModerator" = true WHERE id = \'normal\'');
 			assert.deepEqual(await activePaidRoleIds(db, 'bob', paid.startsAt), [], 'Later role edits cannot make payment confer moderation');
-			await qr.query(`UPDATE role SET "isModerator" = false WHERE id = 'normal'`);
+			await qr.query('UPDATE role SET "isModerator" = false WHERE id = \'normal\'');
 			assert.equal((await store.applyReceipt('bob', order.id, hash(71), proof(hinted))).endsAt, paid.endsAt);
 		});
 		await t.test('scheduled catalog availability and concurrent source price rules are native SQL enforced', async () => {
@@ -237,7 +239,7 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 			await native(true, ['write:admin:meta']).upsertPricingAsset(asset);
 			assert.deepEqual(await native(true, ['read:admin:meta']).listPricingAssets({}), [asset]);
 
-			await qr.query(`INSERT INTO billing_wallet_chain ("chainId",name,"nativeCurrencyName","nativeCurrencySymbol","nativeCurrencyDecimals","blockExplorerUrl","isEnabled","rpcUrl","updatedAt","updatedByUserId") VALUES (123456,'Synthetic','Native','N',18,NULL,true,NULL,$1,'alice') ON CONFLICT DO NOTHING`, [now]);
+			await qr.query('INSERT INTO billing_wallet_chain ("chainId",name,"nativeCurrencyName","nativeCurrencySymbol","nativeCurrencyDecimals","blockExplorerUrl","isEnabled","rpcUrl","updatedAt","updatedByUserId") VALUES (123456,\'Synthetic\',\'Native\',\'N\',18,NULL,true,NULL,$1,\'alice\') ON CONFLICT DO NOTHING', [now]);
 			const deployment = { id: 'managed-deployment', assetId: asset.id, chainId: 123456, tokenSymbol: 'T', tokenName: 'Token', contractAddress: address(99), recipientAddress: address(9), decimals: 6, isEnabled: true };
 			await admin.upsertDeployment(deployment, 'alice');
 			await assert.rejects(admin.upsertDeployment({ ...deployment, id: 'duplicate' }, 'alice'), error => error.code === 'BILLING_CONFLICT');
@@ -264,7 +266,7 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 			await admin.deletePrice(terms.id, 'alice');
 			assert.equal((await admin.listPrices()).some(row => row.priceId === terms.id), false);
 			assert.equal((await store.listOffers()).some(row => row.id === 'reattached-offer'), false);
-			assert.ok((await qr.query("SELECT count(*)::int AS count FROM moderation_log WHERE type='billingCatalog'"))[0].count > 0);
+			assert.ok((await qr.query('SELECT count(*)::int AS count FROM moderation_log WHERE type=\'billingCatalog\''))[0].count > 0);
 			const ddl = (await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_(pricing_asset|asset_deployment|catalog_price)"/.test(row.query));
 			assert.deepEqual(ddl, [], 'Catalog migration and entity DDL agree');
 			await admin.deleteAsset(asset.id, 'alice');
@@ -304,9 +306,37 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 			assert.deepEqual(ddl, [], 'Policy migration and entity DDL agree');
 			await policyStore.upsert({ revision: 2, policy: { ...policy, isEnabled: false } }, 'alice');
 		});
+		await t.test('purchase email reserves one attempt across concurrency and never resends unknown outcomes', async () => {
+			await qr.query('CREATE TABLE user_profile ("userId" varchar(32) PRIMARY KEY, email varchar(128), "emailVerified" boolean)');
+			await qr.query('INSERT INTO user_profile VALUES (\'bob\',\'synthetic@example.invalid\',true),(\'alice\',NULL,false),(\'catalog-buyer\',\'zero@example.invalid\',true)');
+			const paid = (await store.listOrders('bob')).find(row => row.offer.id === 'taxable');
+			let calls = 0;
+			const notify = createPurchaseNotifier(db, 'https://synthetic.example.invalid', async (to, subject, lines) => {
+				calls++; assert.equal(to, 'synthetic@example.invalid'); assert.match(subject, /レシート/);
+				assert.ok(lines.some(line => line.includes('Synthetic seller'))); assert.ok(lines.some(line => line.includes('0.00001 JPY')));
+				throw new Error('Synthetic unknown SMTP outcome');
+			}, () => now);
+			const outcomes = await Promise.allSettled([notify(paid.id), notify(paid.id)]);
+			assert.equal(outcomes.filter(row => row.status === 'rejected').length, 1); assert.equal(calls, 1);
+			await notify(paid.id); assert.equal(calls, 1);
+			await notify((await store.listOrders('alice')).find(row => row.status === 'paid').id); assert.equal(calls, 1);
+			let zeroCalls = 0;
+			const zero = (await store.listOrders('catalog-buyer')).find(row => row.status === 'paid');
+			const zeroNotify = createPurchaseNotifier(db, 'https://synthetic.example.invalid', async (to, _subject, lines) => { zeroCalls++; assert.equal(to, 'zero@example.invalid'); assert.ok(lines.some(line => line === '支払額: 0 TEST')); }, () => now);
+			await Promise.all([zeroNotify(zero.id), zeroNotify(zero.id)]); assert.equal(zeroCalls, 1);
+			const seen = [];
+			const native = createRouterClient(createServiceBillingRouter({ store, readReceipt: async () => ({ status: 'pending' }), rpcUrl: async () => null, notifyPurchase: async orderId => { seen.push(orderId); await zeroNotify(orderId); } }), { context: {
+				credential: 'synthetic', headers: {}, ip: '127.0.0.1', services: { authenticate: async () => [{ id: 'catalog-buyer', isSuspended: false, movedToUri: null }, { permission: ['write:account'] }], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null }, authorization: { rootUserId: () => null, roles: async () => [], policyAllowed: async () => false },
+			} });
+			assert.equal((await native.checkOrder({ orderId: zero.id })).status, 'paid'); await native.checkOrder({ orderId: zero.id });
+			assert.deepEqual(seen, [zero.id, zero.id]); assert.equal(zeroCalls, 1);
+			assert.equal((await qr.query('SELECT count(*)::int AS count FROM billing_notification'))[0].count, 3);
+			await assert.rejects(new NotificationMigration().down(qr), /Cannot discard/);
+			assert.deepEqual((await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_notification"/.test(row.query)), []);
+		});
 		await t.test('paid evidence remains claimed after account deletion', async () => {
-			await qr.query("DELETE FROM \"user\" WHERE id = 'alice'");
-			assert.equal((await qr.query(`SELECT count(*)::int AS count FROM billing_service_order WHERE "txHash" = $1 AND status = 'paid'`, [hash(1)]))[0].count, 1);
+			await qr.query('DELETE FROM "user" WHERE id = \'alice\'');
+			assert.equal((await qr.query('SELECT count(*)::int AS count FROM billing_service_order WHERE "txHash" = $1 AND status = \'paid\'', [hash(1)]))[0].count, 1);
 		});
 	} finally { await qr.query(`DROP SCHEMA "${schema}" CASCADE`); await qr.release(); await db.destroy(); }
 });
