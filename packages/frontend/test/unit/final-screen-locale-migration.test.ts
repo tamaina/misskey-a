@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreUpstreamLocaleBundle } from './upstream-develop-source-rebase.js';
 import { restoreCodeDiffBaseline } from './code-diff-source-rebase.js';
 import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
 import { restoreOAuthPermissionBaseline } from './oauth-permission-source-rebase.js';
@@ -113,8 +114,9 @@ test('real main/embed loaders preserve finite selectors, unknown-key fallback an
 		for (const language of languages) {
 			const source = hook(plugin.load, `\0virtual:vite-vue-internationalization/locale/${language}`);
 			if (typeof source !== 'string') throw new Error('Expected generated loader');
-			const payload: LocaleBundle = {};
+			let payload: LocaleBundle = {};
 			runInNewContext(source.replaceAll('export const ', 'const ').replace('export default { locale, global, modules };', 'payload.global = global; payload.modules = modules;'), { payload });
+			payload = restoreUpstreamLocaleBundle(language, payload);
 			const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
 			await runtime.ready;
 			await runtime.loadLocale(language);
