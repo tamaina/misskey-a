@@ -46,7 +46,9 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	const walletPaths = ['account/wallets/link/passkey-options', 'account/wallets/list', 'account/wallets/link/chains',
 		'account/wallets/link/begin', 'account/wallets/link/verify', 'account/wallets/unlink',
 		'admin/wallets/chains/list', 'admin/wallets/chains/upsert'];
-	const servicePaths = ['admin/billing/offers/list', 'admin/billing/offers/upsert', 'billing/offers/list', 'billing/orders/create', 'billing/orders/check', 'billing/orders/list'];
+	const servicePaths = ['admin/billing/offers/list', 'admin/billing/offers/upsert', 'billing/offers/list', 'billing/orders/create', 'billing/orders/check', 'billing/orders/list', 'billing/orders/quote', 'billing/orders/cancel',
+		'billing/refunds/request', 'billing/refunds/list', 'billing/refunds/show', 'billing/refunds/cancel', 'billing/refunds/document',
+		'admin/billing/refunds/list', 'admin/billing/refunds/show', 'admin/billing/refunds/decide', 'admin/billing/refunds/start', 'admin/billing/refunds/submit', 'admin/billing/refunds/check'];
 	for (const path of [...walletPaths, ...servicePaths]) {
 		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('/', '___')}`);
 	}

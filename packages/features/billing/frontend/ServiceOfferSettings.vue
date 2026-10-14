@@ -56,7 +56,7 @@ async function load() {
 
 async function save() {
 	busy.value = true; error.value = false; saved.value = false;
-	try { const { pricingAssetKey, planGroup, sortOrder, ...base } = draft.value; const input = v.parse(serviceOffer, { ...base, roleId: draft.value.roleId || null, ...(pricingAssetKey?.trim() ? { pricingAssetKey: pricingAssetKey.trim() } : {}), ...(planGroup?.trim() ? { planGroup: planGroup.trim() } : {}), ...(typeof sortOrder === 'number' ? { sortOrder } : {}) }); const savedOffer = await props.client.upsertOffer(input); draft.value = { ...savedOffer, roleId: savedOffer.roleId ?? null, pricingAssetKey: savedOffer.pricingAssetKey ?? null, planGroup: savedOffer.planGroup ?? null, sortOrder: savedOffer.sortOrder ?? null }; offers.value = await props.client.listOfferSettings({}); saved.value = true; } catch { error.value = true; } finally { busy.value = false; }
+	try { const { pricingAssetKey, planGroup, sortOrder, ...base } = draft.value; const input = v.parse(serviceOffer, { ...base, roleId: draft.value.roleId || null, ...(pricingAssetKey?.trim() ? { pricingAssetKey: pricingAssetKey.trim() } : {}), ...(planGroup?.trim() ? { planGroup: planGroup.trim() } : {}), ...(typeof sortOrder === 'number' && !Number.isNaN(sortOrder) ? { sortOrder } : {}) }); const savedOffer = await props.client.upsertOffer(input); draft.value = { ...savedOffer, roleId: savedOffer.roleId ?? null, pricingAssetKey: savedOffer.pricingAssetKey ?? null, planGroup: savedOffer.planGroup ?? null, sortOrder: savedOffer.sortOrder ?? null }; offers.value = await props.client.listOfferSettings({}); saved.value = true; } catch { error.value = true; } finally { busy.value = false; }
 }
 </script>
 <locale lang="json" locale="ja-JP">

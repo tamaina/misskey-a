@@ -1,6 +1,10 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	BillingOrdersCancelRequest,
+	BillingOrdersCancelResponse,
+	BillingOrdersQuoteRequest,
+	BillingOrdersQuoteResponse,
 	AdminBillingOffersListRequest,
 	AdminBillingOffersListResponse,
 	AdminBillingOffersUpsertRequest,
@@ -13,6 +17,28 @@ import type {
 	BillingOrdersCheckResponse,
 	BillingOrdersListRequest,
 	BillingOrdersListResponse,
+	BillingRefundsRequestRequest,
+	BillingRefundsRequestResponse,
+	BillingRefundsListRequest,
+	BillingRefundsListResponse,
+	BillingRefundsShowRequest,
+	BillingRefundsShowResponse,
+	BillingRefundsCancelRequest,
+	BillingRefundsCancelResponse,
+	BillingRefundsDocumentRequest,
+	BillingRefundsDocumentResponse,
+	AdminBillingRefundsListRequest,
+	AdminBillingRefundsListResponse,
+	AdminBillingRefundsShowRequest,
+	AdminBillingRefundsShowResponse,
+	AdminBillingRefundsDecideRequest,
+	AdminBillingRefundsDecideResponse,
+	AdminBillingRefundsStartRequest,
+	AdminBillingRefundsStartResponse,
+	AdminBillingRefundsSubmitRequest,
+	AdminBillingRefundsSubmitResponse,
+	AdminBillingRefundsCheckRequest,
+	AdminBillingRefundsCheckResponse,
 	AdminWalletsChainsListRequest,
 	AdminWalletsChainsListResponse,
 	AdminWalletsChainsUpsertRequest,
@@ -778,12 +804,25 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'billing/orders/cancel': { req: BillingOrdersCancelRequest; res: BillingOrdersCancelResponse };
+	'billing/orders/quote': { req: BillingOrdersQuoteRequest; res: BillingOrdersQuoteResponse };
 	'admin/billing/offers/list': { req: AdminBillingOffersListRequest; res: AdminBillingOffersListResponse };
 	'admin/billing/offers/upsert': { req: AdminBillingOffersUpsertRequest; res: AdminBillingOffersUpsertResponse };
 	'billing/offers/list': { req: BillingOffersListRequest; res: BillingOffersListResponse };
 	'billing/orders/create': { req: BillingOrdersCreateRequest; res: BillingOrdersCreateResponse };
 	'billing/orders/check': { req: BillingOrdersCheckRequest; res: BillingOrdersCheckResponse };
 	'billing/orders/list': { req: BillingOrdersListRequest; res: BillingOrdersListResponse };
+	'billing/refunds/request': { req: BillingRefundsRequestRequest; res: BillingRefundsRequestResponse };
+	'billing/refunds/list': { req: BillingRefundsListRequest; res: BillingRefundsListResponse };
+	'billing/refunds/show': { req: BillingRefundsShowRequest; res: BillingRefundsShowResponse };
+	'billing/refunds/cancel': { req: BillingRefundsCancelRequest; res: BillingRefundsCancelResponse };
+	'billing/refunds/document': { req: BillingRefundsDocumentRequest; res: BillingRefundsDocumentResponse };
+	'admin/billing/refunds/list': { req: AdminBillingRefundsListRequest; res: AdminBillingRefundsListResponse };
+	'admin/billing/refunds/show': { req: AdminBillingRefundsShowRequest; res: AdminBillingRefundsShowResponse };
+	'admin/billing/refunds/decide': { req: AdminBillingRefundsDecideRequest; res: AdminBillingRefundsDecideResponse };
+	'admin/billing/refunds/start': { req: AdminBillingRefundsStartRequest; res: AdminBillingRefundsStartResponse };
+	'admin/billing/refunds/submit': { req: AdminBillingRefundsSubmitRequest; res: AdminBillingRefundsSubmitResponse };
+	'admin/billing/refunds/check': { req: AdminBillingRefundsCheckRequest; res: AdminBillingRefundsCheckResponse };
 	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
 	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };

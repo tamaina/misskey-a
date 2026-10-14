@@ -242,6 +242,42 @@ type AdminBillingOffersUpsertRequest = ContractRequest<'admin/billing/offers/ups
 type AdminBillingOffersUpsertResponse = ContractResponse<'admin/billing/offers/upsert'>;
 
 // @public (undocumented)
+type AdminBillingRefundsCheckRequest = ContractRequest<'admin/billing/refunds/check'>;
+
+// @public (undocumented)
+type AdminBillingRefundsCheckResponse = ContractResponse<'admin/billing/refunds/check'>;
+
+// @public (undocumented)
+type AdminBillingRefundsDecideRequest = ContractRequest<'admin/billing/refunds/decide'>;
+
+// @public (undocumented)
+type AdminBillingRefundsDecideResponse = ContractResponse<'admin/billing/refunds/decide'>;
+
+// @public (undocumented)
+type AdminBillingRefundsListRequest = ContractRequest<'admin/billing/refunds/list'>;
+
+// @public (undocumented)
+type AdminBillingRefundsListResponse = ContractResponse<'admin/billing/refunds/list'>;
+
+// @public (undocumented)
+type AdminBillingRefundsShowRequest = ContractRequest<'admin/billing/refunds/show'>;
+
+// @public (undocumented)
+type AdminBillingRefundsShowResponse = ContractResponse<'admin/billing/refunds/show'>;
+
+// @public (undocumented)
+type AdminBillingRefundsStartRequest = ContractRequest<'admin/billing/refunds/start'>;
+
+// @public (undocumented)
+type AdminBillingRefundsStartResponse = ContractResponse<'admin/billing/refunds/start'>;
+
+// @public (undocumented)
+type AdminBillingRefundsSubmitRequest = ContractRequest<'admin/billing/refunds/submit'>;
+
+// @public (undocumented)
+type AdminBillingRefundsSubmitResponse = ContractResponse<'admin/billing/refunds/submit'>;
+
+// @public (undocumented)
 type AdminCaptchaCurrentRequest = ContractRequest<'admin/captcha/current'>;
 
 // @public (undocumented)
@@ -766,6 +802,12 @@ type BillingOffersListRequest = ContractRequest<'billing/offers/list'>;
 type BillingOffersListResponse = ContractResponse<'billing/offers/list'>;
 
 // @public (undocumented)
+type BillingOrdersCancelRequest = ContractRequest<'billing/orders/cancel'>;
+
+// @public (undocumented)
+type BillingOrdersCancelResponse = ContractResponse<'billing/orders/cancel'>;
+
+// @public (undocumented)
 type BillingOrdersCheckRequest = ContractRequest<'billing/orders/check'>;
 
 // @public (undocumented)
@@ -782,6 +824,42 @@ type BillingOrdersListRequest = ContractRequest<'billing/orders/list'>;
 
 // @public (undocumented)
 type BillingOrdersListResponse = ContractResponse<'billing/orders/list'>;
+
+// @public (undocumented)
+type BillingOrdersQuoteRequest = ContractRequest<'billing/orders/quote'>;
+
+// @public (undocumented)
+type BillingOrdersQuoteResponse = ContractResponse<'billing/orders/quote'>;
+
+// @public (undocumented)
+type BillingRefundsCancelRequest = ContractRequest<'billing/refunds/cancel'>;
+
+// @public (undocumented)
+type BillingRefundsCancelResponse = ContractResponse<'billing/refunds/cancel'>;
+
+// @public (undocumented)
+type BillingRefundsDocumentRequest = ContractRequest<'billing/refunds/document'>;
+
+// @public (undocumented)
+type BillingRefundsDocumentResponse = ContractResponse<'billing/refunds/document'>;
+
+// @public (undocumented)
+type BillingRefundsListRequest = ContractRequest<'billing/refunds/list'>;
+
+// @public (undocumented)
+type BillingRefundsListResponse = ContractResponse<'billing/refunds/list'>;
+
+// @public (undocumented)
+type BillingRefundsRequestRequest = ContractRequest<'billing/refunds/request'>;
+
+// @public (undocumented)
+type BillingRefundsRequestResponse = ContractResponse<'billing/refunds/request'>;
+
+// @public (undocumented)
+type BillingRefundsShowRequest = ContractRequest<'billing/refunds/show'>;
+
+// @public (undocumented)
+type BillingRefundsShowResponse = ContractResponse<'billing/refunds/show'>;
 
 // @public (undocumented)
 type Blocking = ContractModel<'Blocking'>;
@@ -1764,6 +1842,10 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        BillingOrdersCancelRequest,
+        BillingOrdersCancelResponse,
+        BillingOrdersQuoteRequest,
+        BillingOrdersQuoteResponse,
         AdminBillingOffersListRequest,
         AdminBillingOffersListResponse,
         AdminBillingOffersUpsertRequest,
@@ -1776,6 +1858,28 @@ declare namespace entities {
         BillingOrdersCheckResponse,
         BillingOrdersListRequest,
         BillingOrdersListResponse,
+        BillingRefundsRequestRequest,
+        BillingRefundsRequestResponse,
+        BillingRefundsListRequest,
+        BillingRefundsListResponse,
+        BillingRefundsShowRequest,
+        BillingRefundsShowResponse,
+        BillingRefundsCancelRequest,
+        BillingRefundsCancelResponse,
+        BillingRefundsDocumentRequest,
+        BillingRefundsDocumentResponse,
+        AdminBillingRefundsListRequest,
+        AdminBillingRefundsListResponse,
+        AdminBillingRefundsShowRequest,
+        AdminBillingRefundsShowResponse,
+        AdminBillingRefundsDecideRequest,
+        AdminBillingRefundsDecideResponse,
+        AdminBillingRefundsStartRequest,
+        AdminBillingRefundsStartResponse,
+        AdminBillingRefundsSubmitRequest,
+        AdminBillingRefundsSubmitResponse,
+        AdminBillingRefundsCheckRequest,
+        AdminBillingRefundsCheckResponse,
         AdminWalletsChainsListRequest,
         AdminWalletsChainsListResponse,
         AdminWalletsChainsUpsertRequest,

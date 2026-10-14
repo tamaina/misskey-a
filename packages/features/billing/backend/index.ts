@@ -28,3 +28,9 @@ export { createTransferReceiptReader } from './transfer-confirmation.js';
 export { receiptEvidenceSchema, transferEvidenceSchema } from './transfer.schema.js';
 export type { ReceiptReader, ReceiptResult, ReceiptEvidence, TransferEvidence } from './transfer-confirmation.js';
 export { ServiceBillingRoleProvider, activePaidRoleIds } from './service-role.provider.js';
+
+export { createRefundStore, matchesRefund } from './refund-store.js';
+export { createRefundRouter } from './refund.implementation.js';
+export { MiBillingAccountState } from './models/BillingAccountState.js';
+export { MiBillingRefund } from './models/BillingRefund.js';
+export { MiBillingTransactionClaim } from './models/BillingTransactionClaim.js';

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createRefundStore } from './refund-store.js';
+import { createRefundRouter } from './refund.implementation.js';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
@@ -23,7 +25,8 @@ export class ServiceBillingApiProvider {
 		const db = this.moduleRef.get<DataSource>(DI.db, { strict: false });
 		const id = this.moduleRef.get(IdService, { strict: false });
 		const chains = createPostgresWalletChainStore(db);
-		return createServiceBillingRouter<MiLocalUser>({ store: createServiceBillingStore(db, now => id.gen(now)), rpcUrl: chains.rpcUrl,
-																																																			readReceipt: createServiceReceiptReader(this.moduleRef.get(HttpRequestService, { strict: false }), chains.rpcUrl) });
+		const readReceipt = createServiceReceiptReader(this.moduleRef.get(HttpRequestService, { strict: false }), chains.rpcUrl);
+		return { ...createServiceBillingRouter<MiLocalUser>({ store: createServiceBillingStore(db, now => id.gen(now)), rpcUrl: chains.rpcUrl, readReceipt }),
+			...createRefundRouter<MiLocalUser>(createRefundStore(db, () => id.gen(), readReceipt)) };
 	}
 }

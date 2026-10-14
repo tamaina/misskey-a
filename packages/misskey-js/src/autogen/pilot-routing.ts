@@ -3,6 +3,124 @@ import type { AnyContractRouter } from '@orpc/contract';
 
 export default {
 	"serviceBilling": {
+		"cancelOrder": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "billing/orders/cancel"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/orders/cancel"
+				}
+			}
+		},
+		"quoteOrder": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "billing/orders/quote"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/orders/quote"
+				}
+			}
+		},
 		"listOfferSettings": {
 			"~orpc": {
 				"errorMap": {
@@ -356,6 +474,630 @@ export default {
 				"route": {
 					"method": "POST",
 					"path": "/billing/orders/list"
+				}
+			}
+		},
+		"requestRefund": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "billing/refunds/request"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/refunds/request"
+				}
+			}
+		},
+		"listRefunds": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "billing/refunds/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/refunds/list"
+				}
+			}
+		},
+		"showRefund": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "billing/refunds/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/refunds/show"
+				}
+			}
+		},
+		"cancelRefund": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "billing/refunds/cancel"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/refunds/cancel"
+				}
+			}
+		},
+		"refundDocument": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "billing/refunds/document"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/refunds/document"
+				}
+			}
+		},
+		"adminListRefunds": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta",
+					"requestName": "admin/billing/refunds/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/refunds/list"
+				}
+			}
+		},
+		"adminShowRefund": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta",
+					"requestName": "admin/billing/refunds/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/refunds/show"
+				}
+			}
+		},
+		"decideRefund": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "admin/billing/refunds/decide"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/refunds/decide"
+				}
+			}
+		},
+		"startRefundTransfer": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "admin/billing/refunds/start"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/refunds/start"
+				}
+			}
+		},
+		"submitRefundTransfer": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "admin/billing/refunds/submit"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/refunds/submit"
+				}
+			}
+		},
+		"checkRefund": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_REVIEW_REQUIRED": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "admin/billing/refunds/check"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/refunds/check"
 				}
 			}
 		}
