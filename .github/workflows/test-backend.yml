@@ -94,6 +94,8 @@ jobs:
       run: node packages/features/auth/test/run-authentication-progress-fixture.mjs
     - name: Test antenna delivery identity with disposable Redis
       run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/mcp/test/vitest.antenna-redis.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
+    - name: Test recovery codes with isolated PostgreSQL
+      run: node packages/features/auth/test/run-recovery-postgres-fixture.mjs
     - name: Test MCP with disposable PostgreSQL
       run: node packages/features/mcp/test/run-postgres-fixture.mjs
     - name: Upload to Codecov

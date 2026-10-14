@@ -33,6 +33,7 @@ function fixture(ctor: typeof TotpService) {
 	const redis = mockDeep<ConstructorParameters<typeof TotpService>[0]>();
 	const users = mockDeep<ConstructorParameters<typeof TotpService>[1]>();
 	const profiles = mockDeep<ConstructorParameters<typeof TotpService>[2]>();
+	profiles.update.mockResolvedValue({ affected: 1, raw: [], generatedMaps: [] });
 	const profile = mockDeep<MiUserProfile>({ userId: 'synthetic-user', twoFactorSecret: secret, twoFactorBackupSecret: [backup, 'b'.repeat(32)] });
 	return { redis, profiles, profile, service: new ctor(redis, users, profiles) };
 }
@@ -84,7 +85,7 @@ for (const [label, ctor] of [['canonical', TotpService], ['legacy', UserAuthServ
 	test(`${label} consumes only the matching backup code and rejects it after persistence refresh`, async () => {
 		const h = fixture(ctor);
 		await expect(h.service.twoFactorAuthenticate(h.profile, backup)).resolves.toBeUndefined();
-		expect(h.profiles.update).toHaveBeenCalledWith({ userId: h.profile.userId }, { twoFactorBackupSecret: ['b'.repeat(32)] });
+		expect(h.profiles.update).toHaveBeenCalledWith(expect.objectContaining({ userId: h.profile.userId }), { twoFactorBackupSecret: expect.any(Function) });
 		expect(h.redis.set).not.toHaveBeenCalled();
 		h.profile.twoFactorBackupSecret = ['b'.repeat(32)];
 		await expect(h.service.twoFactorAuthenticate(h.profile, backup)).rejects.toThrow('authentication failed');
