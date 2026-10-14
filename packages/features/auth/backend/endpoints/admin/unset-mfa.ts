@@ -8,6 +8,8 @@ import { DataSource } from 'typeorm';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiUserSecurityKey } from '../../models/UserSecurityKey.js';
+import { assertPasswordRecoveryPossible } from '../../mfa-policy.js';
+import { withLockedMfaProfile } from '../../locked-mfa-profile.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
@@ -54,7 +56,8 @@ export function createAdminUnsetMfaProcedure(deps: AdminUnsetMfaDependencies) {
 				throw apiError(meta.errors.accessDenied);
 			}
 
-			await deps.db.transaction(async (transactionalEntityManager) => {
+			await withLockedMfaProfile(deps.db, user.id, undefined, async (profile, transactionalEntityManager) => {
+				assertPasswordRecoveryPossible(profile);
 				// パスキーを全て削除
 				await transactionalEntityManager.delete(MiUserSecurityKey, { userId: user.id });
 
@@ -63,6 +66,7 @@ export function createAdminUnsetMfaProcedure(deps: AdminUnsetMfaDependencies) {
 					twoFactorSecret: null,
 					twoFactorBackupSecret: null,
 					twoFactorEnabled: false,
+					passkeyMfaEnabled: false,
 					usePasswordLessLogin: false,
 				});
 			}).then(() => {

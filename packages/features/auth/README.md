@@ -59,8 +59,30 @@ claims are not trusted, and the result cannot create a local session or grant.
 
 `TotpService.twoFactorAuthenticate` consumes a matching backup code with one
 PostgreSQL compare-and-remove update. It binds the row owner and the loaded
-password/TOTP policy, and authorizes only when exactly one row was changed.
+password/TOTP and independent-passkey policy, and authorizes only when exactly one row was changed.
 A persistence rejection does not fall back to OTP validation. Other concurrently
 consumed codes are not written back from the caller's snapshot. Credential or
 session mutation remains a later operation; failures do not restore a used code.
 This does not enable independent passkey MFA or change recovery-code storage.
+
+### Independent-MFA policy groundwork
+
+`user_profile.passkeyMfaEnabled` is an internal policy with default `false`.
+Registered keys, passwordless convenience settings and recovery-code availability
+never activate it. This slice has no true writer, activation API or UI. Rollback
+refuses to discard an enabled policy. Login and sensitive-operation enforcement,
+fresh session/purpose-bound password + strict-UV reauthentication, and policy
+stamps in authentication progress must be connected before activation is exposed.
+
+Key removal, legacy TOTP removal and admin recovery serialize on the owner profile
+row. Existing password/TOTP proofs run before locking so recovery consumption does
+not deadlock; the locked credential policy must still match before mutation.
+Recovery codes are not remaining factors. Admin all-factor reset requires an
+existing password and atomically clears keys, policies and recovery codes.
+The legacy management routes reject an enabled independent policy, preserving its
+recovery codes until the future fresh-authenticated management flow is available.
+
+This lock protocol currently covers removal/reset. Future activation, key
+enrolment and other factor writers must adopt it before the activation writer is
+connected. The old TOTP-disabled orphan-key behavior is preserved. This groundwork
+does not complete the independent-MFA acceptance criteria in #94 / #144 / #157.

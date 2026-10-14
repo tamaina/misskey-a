@@ -29,6 +29,7 @@ export class TotpService {
 				userId: profile.userId,
 				password: profile.password ?? IsNull(),
 				twoFactorEnabled: profile.twoFactorEnabled === true,
+				passkeyMfaEnabled: profile.passkeyMfaEnabled === true,
 				twoFactorSecret: profile.twoFactorSecret ?? IsNull(),
 				twoFactorBackupSecret: Raw(column => `:backupCode = ANY(${column})`, { backupCode: token }),
 			}, {

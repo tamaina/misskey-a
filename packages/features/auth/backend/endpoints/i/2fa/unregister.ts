@@ -5,6 +5,10 @@
 
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import type { DataSource } from 'typeorm';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { assertLegacyMfaManagement } from '../../../mfa-policy.js';
+import { withLockedMfaProfile } from '../../../locked-mfa-profile.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -27,6 +31,7 @@ export const meta = {
 	},
 } as const;
 export interface I2faUnregisterDependencies {
+	db: DataSource;
 	userProfilesRepository: UserProfilesRepository;
 	userEntityService: Pick<UserEntityService, 'packSelf'>;
 	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
@@ -39,6 +44,7 @@ export function createI2faUnregisterProcedure(deps: I2faUnregisterDependencies) 
 		const result = await (async () => {
 			const token = ps.token;
 			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			assertLegacyMfaManagement(profile);
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -57,11 +63,17 @@ export function createI2faUnregisterProcedure(deps: I2faUnregisterDependencies) 
 				throw apiError(meta.errors.incorrectPassword);
 			}
 
-			await deps.userProfilesRepository.update(me.id, {
-				twoFactorSecret: null,
-				twoFactorBackupSecret: null,
-				twoFactorEnabled: false,
-				usePasswordLessLogin: false,
+			await withLockedMfaProfile(deps.db, me.id, profile, async (current, manager) => {
+				// Independent MFA needs fresh bound reauthentication before this
+				// route may remove TOTP or clear its shared recovery codes.
+				assertLegacyMfaManagement(current);
+				await manager.getRepository(MiUserProfile).update({ userId: me.id }, {
+					twoFactorSecret: null,
+					twoFactorBackupSecret: null,
+					twoFactorEnabled: false,
+					usePasswordLessLogin: false,
+					passkeyMfaEnabled: false,
+				});
 			});
 
 			// Publish meUpdated event

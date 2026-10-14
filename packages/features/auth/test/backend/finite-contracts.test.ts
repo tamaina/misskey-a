@@ -7,7 +7,9 @@ import { testContext } from './native-context.js';
 import { expect, expectTypeOf, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import type { SelectQueryBuilder } from 'typeorm';
+import type { DataSource, EntityManager, SelectQueryBuilder } from 'typeorm';
+import { MiUserProfile as ProfileEntity } from '@features/users/backend/models/UserProfile.js';
+import { MiUserSecurityKey as KeyEntity } from '../../backend/models/UserSecurityKey.js';
 import bcrypt from 'bcryptjs';
 import { packedAppSchema, packedInviteCodeSchema, packedSigninSchema } from '../../backend/auth.schema.js';
 import * as inline from '../../backend/api.definition.js';
@@ -137,11 +139,24 @@ test('real key update/remove handlers return guarded finite empty objects and pr
 	await expect(call(update, { name: 'Fixture', credentialId: 'key123' }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'NO_SUCH_KEY' });
 	profiles.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: me.id, password: bcrypt.hashSync('password', 4), twoFactorEnabled: false }));
 	keys.count.mockResolvedValue(0);
-	const remove = RemoveKeyEndpoint({ userSecurityKeysRepository: keys, userProfilesRepository: profiles, userEntityService: mockDeep(), userAuthService: mockDeep(), globalEventService: mockDeep() });
+	profiles.findOneOrFail.mockResolvedValue(await profiles.findOneByOrFail({ userId: me.id }));
+	const db = mockDeep<DataSource>();
+	const manager = mockDeep<EntityManager>();
+	manager.getRepository.mockImplementation(entity => {
+		if (entity === ProfileEntity) return profiles as unknown as ReturnType<EntityManager['getRepository']>;
+		if (entity === KeyEntity) return keys as unknown as ReturnType<EntityManager['getRepository']>;
+		throw new Error('unsupported synthetic repository');
+	});
+	db.transaction.mockImplementation(async (...args) => {
+		const callback = args.at(-1);
+		if (typeof callback !== 'function') throw new Error('missing synthetic transaction callback');
+		return await callback(manager);
+	});
+	const remove = RemoveKeyEndpoint({ db, userSecurityKeysRepository: keys, userProfilesRepository: profiles, userEntityService: mockDeep(), userAuthService: mockDeep(), globalEventService: mockDeep() });
 	const removed = await call(remove, { password: 'password', credentialId: 'key123' }, { context: testContext(me, null) });
 	expect(v.parse(requiredSchema(I2faRemoveKeyContract['~orpc'].outputSchema), removed)).toEqual({});
 	expect(keys.delete).toHaveBeenCalledWith({ userId: me.id, id: 'key123' });
-	expect(profiles.update).toHaveBeenCalledWith(me.id, { usePasswordLessLogin: false });
+	expect(profiles.update).toHaveBeenCalledWith({ userId: me.id }, { usePasswordLessLogin: false, passkeyMfaEnabled: false });
 	await expect(call(remove, { password: 'wrong', credentialId: 'key123' }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'INCORRECT_PASSWORD' });
 });
 
