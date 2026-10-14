@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createCatalogAdminRouter } from '@features/billing/backend/catalog.implementation.js';
 import { createRefundRouter } from '@features/billing/backend/refund.implementation.js';
 import { createServiceBillingRouter } from '@features/billing/backend/service.implementation.js';
 import { createWalletRouter } from '@features/billing/backend/wallet.implementation.js';
@@ -39,7 +40,7 @@ import { createCollectionsRouter } from '@features/collections/backend/api.imple
 import { createDriveRouter } from '@features/drive/backend/api.implementation.js';
 export function createApiTestFeatures(): ApiRouterFeatures {
 	return {
-		serviceBilling: { ...createServiceBillingRouter<MiLocalUser>(mockDeep<Parameters<typeof createServiceBillingRouter<MiLocalUser>>[0]>()), ...createRefundRouter<MiLocalUser>(mockDeep<Parameters<typeof createRefundRouter<MiLocalUser>>[0]>()) },
+		serviceBilling: { ...createCatalogAdminRouter<MiLocalUser>(mockDeep<Parameters<typeof createCatalogAdminRouter<MiLocalUser>>[0]>(), mockDeep<Parameters<typeof createCatalogAdminRouter<MiLocalUser>>[1]>(), async () => null), ...createServiceBillingRouter<MiLocalUser>(mockDeep<Parameters<typeof createServiceBillingRouter<MiLocalUser>>[0]>()), ...createRefundRouter<MiLocalUser>(mockDeep<Parameters<typeof createRefundRouter<MiLocalUser>>[0]>()) },
 		wallets: createWalletRouter<MiLocalUser>({ ...mockDeep<Parameters<typeof createWalletRouter<MiLocalUser>>[0]>(), origin: 'https://misskey.example.test' }),
 		roles: createRolesRouter<MiLocalUser>(mockDeep<Parameters<typeof createRolesRouter<MiLocalUser>>[0]>()),
 		moderation: createModerationRouter<MiLocalUser>(mockDeep<Parameters<typeof createModerationRouter<MiLocalUser>>[0]>()),

@@ -230,6 +230,60 @@ type AdminAvatarDecorationsListResponse = ContractResponse<'admin/avatar-decorat
 type AdminAvatarDecorationsUpdateRequest = ContractRequest<'admin/avatar-decorations/update'>;
 
 // @public (undocumented)
+type AdminBillingAssetsDeleteRequest = ContractRequest<'admin/billing/assets/delete'>;
+
+// @public (undocumented)
+type AdminBillingAssetsDeleteResponse = ContractResponse<'admin/billing/assets/delete'>;
+
+// @public (undocumented)
+type AdminBillingAssetsListRequest = ContractRequest<'admin/billing/assets/list'>;
+
+// @public (undocumented)
+type AdminBillingAssetsListResponse = ContractResponse<'admin/billing/assets/list'>;
+
+// @public (undocumented)
+type AdminBillingAssetsUpsertRequest = ContractRequest<'admin/billing/assets/upsert'>;
+
+// @public (undocumented)
+type AdminBillingAssetsUpsertResponse = ContractResponse<'admin/billing/assets/upsert'>;
+
+// @public (undocumented)
+type AdminBillingChainsDeleteRequest = ContractRequest<'admin/billing/chains/delete'>;
+
+// @public (undocumented)
+type AdminBillingChainsDeleteResponse = ContractResponse<'admin/billing/chains/delete'>;
+
+// @public (undocumented)
+type AdminBillingChainsTestRpcRequest = ContractRequest<'admin/billing/chains/test-rpc'>;
+
+// @public (undocumented)
+type AdminBillingChainsTestRpcResponse = ContractResponse<'admin/billing/chains/test-rpc'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsDeleteRequest = ContractRequest<'admin/billing/deployments/delete'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsDeleteResponse = ContractResponse<'admin/billing/deployments/delete'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsListRequest = ContractRequest<'admin/billing/deployments/list'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsListResponse = ContractResponse<'admin/billing/deployments/list'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsResolveRequest = ContractRequest<'admin/billing/deployments/resolve'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsResolveResponse = ContractResponse<'admin/billing/deployments/resolve'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsUpsertRequest = ContractRequest<'admin/billing/deployments/upsert'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsUpsertResponse = ContractResponse<'admin/billing/deployments/upsert'>;
+
+// @public (undocumented)
 type AdminBillingOffersListRequest = ContractRequest<'admin/billing/offers/list'>;
 
 // @public (undocumented)
@@ -240,6 +294,24 @@ type AdminBillingOffersUpsertRequest = ContractRequest<'admin/billing/offers/ups
 
 // @public (undocumented)
 type AdminBillingOffersUpsertResponse = ContractResponse<'admin/billing/offers/upsert'>;
+
+// @public (undocumented)
+type AdminBillingPricesAttachDeploymentRequest = ContractRequest<'admin/billing/prices/attach-deployment'>;
+
+// @public (undocumented)
+type AdminBillingPricesAttachDeploymentResponse = ContractResponse<'admin/billing/prices/attach-deployment'>;
+
+// @public (undocumented)
+type AdminBillingPricesDeleteRequest = ContractRequest<'admin/billing/prices/delete'>;
+
+// @public (undocumented)
+type AdminBillingPricesDeleteResponse = ContractResponse<'admin/billing/prices/delete'>;
+
+// @public (undocumented)
+type AdminBillingPricesListRequest = ContractRequest<'admin/billing/prices/list'>;
+
+// @public (undocumented)
+type AdminBillingPricesListResponse = ContractResponse<'admin/billing/prices/list'>;
 
 // @public (undocumented)
 type AdminBillingRefundsCheckRequest = ContractRequest<'admin/billing/refunds/check'>;
@@ -1888,6 +1960,30 @@ declare namespace entities {
         AdminBillingRefundsSubmitResponse,
         AdminBillingRefundsCheckRequest,
         AdminBillingRefundsCheckResponse,
+        AdminBillingPricesListRequest,
+        AdminBillingPricesListResponse,
+        AdminBillingChainsDeleteRequest,
+        AdminBillingChainsDeleteResponse,
+        AdminBillingAssetsListRequest,
+        AdminBillingAssetsListResponse,
+        AdminBillingAssetsUpsertRequest,
+        AdminBillingAssetsUpsertResponse,
+        AdminBillingAssetsDeleteRequest,
+        AdminBillingAssetsDeleteResponse,
+        AdminBillingDeploymentsListRequest,
+        AdminBillingDeploymentsListResponse,
+        AdminBillingDeploymentsUpsertRequest,
+        AdminBillingDeploymentsUpsertResponse,
+        AdminBillingDeploymentsDeleteRequest,
+        AdminBillingDeploymentsDeleteResponse,
+        AdminBillingDeploymentsResolveRequest,
+        AdminBillingDeploymentsResolveResponse,
+        AdminBillingChainsTestRpcRequest,
+        AdminBillingChainsTestRpcResponse,
+        AdminBillingPricesAttachDeploymentRequest,
+        AdminBillingPricesAttachDeploymentResponse,
+        AdminBillingPricesDeleteRequest,
+        AdminBillingPricesDeleteResponse,
         AdminWalletsChainsListRequest,
         AdminWalletsChainsListResponse,
         AdminWalletsChainsUpsertRequest,
@@ -4490,7 +4586,7 @@ type ModerationLog = {
 }[keyof ModerationLogPayloads]);
 
 // @public (undocumented)
-export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetMfa", "unsetUserAvatar", "unsetUserBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
+export const moderationLogTypes: readonly ["billingCatalog", "updateServerSettings", "suspend", "unsuspend", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetMfa", "unsetUserAvatar", "unsetUserBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
 
 // @public (undocumented)
 type MuteCreateRequest = ContractRequest<'mute/create'>;

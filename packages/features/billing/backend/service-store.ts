@@ -4,6 +4,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { recordCatalogAudit } from './catalog-audit.js';
+import { MiBillingWalletChain } from './models/BillingWalletChain.js';
+import { MiBillingCatalogPrice } from './models/BillingCatalogPrice.js';
+import { MiBillingPricingAsset } from './models/BillingPricingAsset.js';
+import { MiBillingAssetDeployment } from './models/BillingAssetDeployment.js';
 import { offerAvailable, catalog, priceId, validPriceCatalog, immutablePriceMatches } from './service-catalog.js';
 import { isDeepStrictEqual } from 'node:util';
 import { lockBillingState, saveBillingState, quoteServiceTerm, applyFundedTerm } from './billing-state.js';
@@ -35,6 +40,18 @@ async function requirePurchasableRole(manager: EntityManager, roleId?: string | 
 }
 
 /** Only matching confirmed receipts acquire a global claim, atomically with their term. */
+async function managedOffer(manager: EntityManager, offer: ServiceOffer, enabled: boolean): Promise<ServiceOffer> {
+	if (!offer.deploymentId) return offer;
+	const deployment = await manager.findOneBy(MiBillingAssetDeployment, { id: offer.deploymentId });
+	if (!deployment) unavailable();
+	const chain = await manager.findOneBy(MiBillingWalletChain, { chainId: deployment!.chainId });
+	if (!chain || (enabled && !chain.isEnabled)) unavailable();
+	const asset = await manager.findOneBy(MiBillingPricingAsset, { id: deployment!.assetId });
+	if (!asset || (enabled && (!asset.data.isEnabled || !deployment!.data.isEnabled))) unavailable();
+	if (offer.pricingAssetKey !== asset!.pricingAssetKey || offer.decimals !== deployment!.data.decimals || offer.chainId !== deployment!.chainId || offer.contractAddress.toLowerCase() !== deployment!.contractAddress || offer.recipientAddress.toLowerCase() !== deployment!.data.recipientAddress) conflict();
+	return { ...offer, currencyCode: asset!.data.currencyCode, tokenSymbol: deployment!.data.tokenSymbol };
+}
+
 export function createServiceBillingStore(db: DataSource, id: (now: number) => string, now = Date.now) {
 	const offers = db.getRepository(MiBillingServiceOffer);
 	const orders = db.getRepository(MiBillingServiceOrder);
@@ -45,7 +62,7 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				if (state.lockRequestId) conflict();
 				const offer = await manager.findOneBy(MiBillingServiceOffer, { id: offerId });
 				if (!offer || !offerAvailable(offer.terms, now())) unavailable();
-				return { revision: state.revision, quote: quoteServiceTerm(state, offer.terms, now()) };
+				return { revision: state.revision, quote: quoteServiceTerm(state, await managedOffer(manager, offer.terms, true), now()) };
 			});
 		},
 		async cancelOrder(userId: string, orderId: string) {
@@ -59,18 +76,33 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 			});
 		},
 		async listOffers() { return (await offers.find({ order: { id: 'ASC' }, take: 1000 })).map(row => row.terms); },
-		async listCatalog() { return catalog(await this.listOffers(), now()); },
+		async listCatalog() {
+			const available = [];
+			for (const offer of await this.listOffers()) {
+				try { available.push(await managedOffer(db.manager, offer, true)); } catch (error) { if (!(error instanceof ORPCError)) throw error; }
+			}
+			return catalog(available, now(), (await db.manager.find(MiBillingCatalogPrice)).map(row => row.terms));
+		},
 		async saveOffer(terms: ServiceOffer, actorId: string) {
 			await db.transaction(async manager => {
 				await manager.query("SELECT pg_advisory_xact_lock(hashtextextended('billing-price-catalog', 0))");
+				terms = await managedOffer(manager, terms, false);
 				const rows = await manager.find(MiBillingServiceOffer);
 				const previous = rows.find(row => row.id === terms.id);
-				const catalogRows = rows.map(row => terms.priceStartsAt != null && priceId(terms) === priceId(row.terms) ? { ...row.terms, priceExpiresAt: terms.priceExpiresAt ?? null } : row.terms);
+				const recorded = await manager.find(MiBillingCatalogPrice);
+				const original = recorded.find(row => row.id === priceId(terms));
+				if (original && !immutablePriceMatches({ ...original.terms, catalogPriceId: priceId(terms) }, { ...terms, catalogPriceId: priceId(terms) })) conflict();
+				const catalogRows = [...rows, ...recorded].map(row => terms.priceStartsAt != null && priceId(terms) === priceId(row.terms) ? { ...row.terms, priceExpiresAt: terms.priceExpiresAt ?? null } : row.terms);
 				if (!validPriceCatalog(terms, catalogRows) || (previous && !immutablePriceMatches(previous.terms, terms))) conflict();
 				await manager.query('LOCK TABLE billing_service_offer IN SHARE ROW EXCLUSIVE MODE');
 				if (!await manager.existsBy(MiBillingServiceOffer, { id: terms.id }) && await manager.count(MiBillingServiceOffer) >= 1000) unavailable();
 				await requirePurchasableRole(manager, terms.roleId);
+				await recordCatalogAudit(manager, actorId, id(now()), 'upsertPrice', terms.id, previous?.terms ?? null, terms);
 				await manager.upsert(MiBillingServiceOffer, { id: terms.id, terms, updatedAt: new Date(now()), updatedByUserId: actorId }, ['id']);
+				if (terms.priceStartsAt != null) {
+					if (!recorded.some(row => row.id === priceId(terms)) && recorded.length >= 1000) unavailable();
+					await manager.upsert(MiBillingCatalogPrice, { id: priceId(terms), terms: { ...terms, catalogPriceId: priceId(terms), isEnabled: terms.isEnabled || rows.some(row => row.id !== terms.id && priceId(row.terms) === priceId(terms) && row.terms.isEnabled) }, updatedAt: new Date(now()), updatedByUserId: actorId }, ['id']);
+				}
 				if (terms.priceStartsAt != null) for (const row of rows) if (row.id !== terms.id && priceId(row.terms) === priceId(terms)) {
 					await manager.update(MiBillingServiceOffer, row.id, { terms: { ...row.terms, priceExpiresAt: terms.priceExpiresAt ?? null }, updatedAt: new Date(now()), updatedByUserId: actorId });
 				}
@@ -87,6 +119,7 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 					return existing;
 				}
 				const offer = await manager.getRepository(MiBillingServiceOffer).findOne({ where: { id: offerId }, lock: { mode: 'pessimistic_read' } });
+				if (offer) offer.terms = await managedOffer(manager, offer.terms, true);
 				const wallet = await manager.findOneBy(MiBillingWallet, { id: walletId, userId });
 				if (!offer || !offerAvailable(offer.terms, now()) || !wallet || wallet.chainId !== offer.terms.chainId) unavailable();
 				if (!sameOffer(offer.terms, quotedOffer)) conflict();

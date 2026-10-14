@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createCatalogAdminStore } from './catalog-store.js';
+import { createCatalogAdminRouter } from './catalog.implementation.js';
+import { createCatalogRpcReader } from './catalog-rpc.js';
+import { createWalletRpcFetch } from './wallet-rpc.js';
 import { createRefundStore } from './refund-store.js';
 import { createRefundRouter } from './refund.implementation.js';
 import { Injectable } from '@nestjs/common';
@@ -26,7 +30,8 @@ export class ServiceBillingApiProvider {
 		const id = this.moduleRef.get(IdService, { strict: false });
 		const chains = createPostgresWalletChainStore(db);
 		const readReceipt = createServiceReceiptReader(this.moduleRef.get(HttpRequestService, { strict: false }), chains.rpcUrl);
-		return { ...createServiceBillingRouter<MiLocalUser>({ store: createServiceBillingStore(db, now => id.gen(now)), rpcUrl: chains.rpcUrl, readReceipt }),
+		const catalogRpc = createCatalogRpcReader(chains.rpcUrl, createWalletRpcFetch(this.moduleRef.get(HttpRequestService, { strict: false })));
+		return { ...createCatalogAdminRouter<MiLocalUser>(createCatalogAdminStore(db, Date.now, () => id.gen()), catalogRpc, chains.rpcUrl), ...createServiceBillingRouter<MiLocalUser>({ store: createServiceBillingStore(db, now => id.gen(now)), rpcUrl: chains.rpcUrl, readReceipt }),
 			...createRefundRouter<MiLocalUser>(createRefundStore(db, () => id.gen(), readReceipt)) };
 	}
 }

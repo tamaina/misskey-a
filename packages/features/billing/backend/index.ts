@@ -34,3 +34,11 @@ export { createRefundRouter } from './refund.implementation.js';
 export { MiBillingAccountState } from './models/BillingAccountState.js';
 export { MiBillingRefund } from './models/BillingRefund.js';
 export { MiBillingTransactionClaim } from './models/BillingTransactionClaim.js';
+
+export { catalogAdminContract } from './catalog.contract.js';
+export { createCatalogAdminStore } from './catalog-store.js';
+export { createCatalogAdminRouter } from './catalog.implementation.js';
+export { MiBillingPricingAsset } from './models/BillingPricingAsset.js';
+export { MiBillingAssetDeployment } from './models/BillingAssetDeployment.js';
+
+export { MiBillingCatalogPrice } from './models/BillingCatalogPrice.js';

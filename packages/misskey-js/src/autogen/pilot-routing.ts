@@ -1157,6 +1157,694 @@ export default {
 					"path": "/admin/billing/refunds/check"
 				}
 			}
+		},
+		"listCatalogPrices": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/prices/list",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/prices/list"
+				}
+			}
+		},
+		"deleteBillingChain": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/chains/delete",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/chains/delete"
+				}
+			}
+		},
+		"listPricingAssets": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/assets/list",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/assets/list"
+				}
+			}
+		},
+		"upsertPricingAsset": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/assets/upsert",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/assets/upsert"
+				}
+			}
+		},
+		"deletePricingAsset": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/assets/delete",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/assets/delete"
+				}
+			}
+		},
+		"listAssetDeployments": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/deployments/list",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/deployments/list"
+				}
+			}
+		},
+		"upsertAssetDeployment": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/deployments/upsert",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/deployments/upsert"
+				}
+			}
+		},
+		"deleteAssetDeployment": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/deployments/delete",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/deployments/delete"
+				}
+			}
+		},
+		"resolveTokenMetadata": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/deployments/resolve",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/deployments/resolve"
+				}
+			}
+		},
+		"testBillingChainRpc": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/chains/test-rpc",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/chains/test-rpc"
+				}
+			}
+		},
+		"attachPriceDeployment": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/prices/attach-deployment",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/prices/attach-deployment"
+				}
+			}
+		},
+		"deleteCatalogPrice": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/prices/delete",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/prices/delete"
+				}
+			}
 		}
 	},
 	"wallets": {

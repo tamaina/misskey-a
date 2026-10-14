@@ -41,6 +41,30 @@ import type {
 	AdminBillingRefundsSubmitResponse,
 	AdminBillingRefundsCheckRequest,
 	AdminBillingRefundsCheckResponse,
+	AdminBillingPricesListRequest,
+	AdminBillingPricesListResponse,
+	AdminBillingChainsDeleteRequest,
+	AdminBillingChainsDeleteResponse,
+	AdminBillingAssetsListRequest,
+	AdminBillingAssetsListResponse,
+	AdminBillingAssetsUpsertRequest,
+	AdminBillingAssetsUpsertResponse,
+	AdminBillingAssetsDeleteRequest,
+	AdminBillingAssetsDeleteResponse,
+	AdminBillingDeploymentsListRequest,
+	AdminBillingDeploymentsListResponse,
+	AdminBillingDeploymentsUpsertRequest,
+	AdminBillingDeploymentsUpsertResponse,
+	AdminBillingDeploymentsDeleteRequest,
+	AdminBillingDeploymentsDeleteResponse,
+	AdminBillingDeploymentsResolveRequest,
+	AdminBillingDeploymentsResolveResponse,
+	AdminBillingChainsTestRpcRequest,
+	AdminBillingChainsTestRpcResponse,
+	AdminBillingPricesAttachDeploymentRequest,
+	AdminBillingPricesAttachDeploymentResponse,
+	AdminBillingPricesDeleteRequest,
+	AdminBillingPricesDeleteResponse,
 	AdminWalletsChainsListRequest,
 	AdminWalletsChainsListResponse,
 	AdminWalletsChainsUpsertRequest,
@@ -826,6 +850,18 @@ export type Endpoints = {
 	'admin/billing/refunds/start': { req: AdminBillingRefundsStartRequest; res: AdminBillingRefundsStartResponse };
 	'admin/billing/refunds/submit': { req: AdminBillingRefundsSubmitRequest; res: AdminBillingRefundsSubmitResponse };
 	'admin/billing/refunds/check': { req: AdminBillingRefundsCheckRequest; res: AdminBillingRefundsCheckResponse };
+	'admin/billing/prices/list': { req: AdminBillingPricesListRequest; res: AdminBillingPricesListResponse };
+	'admin/billing/chains/delete': { req: AdminBillingChainsDeleteRequest; res: AdminBillingChainsDeleteResponse };
+	'admin/billing/assets/list': { req: AdminBillingAssetsListRequest; res: AdminBillingAssetsListResponse };
+	'admin/billing/assets/upsert': { req: AdminBillingAssetsUpsertRequest; res: AdminBillingAssetsUpsertResponse };
+	'admin/billing/assets/delete': { req: AdminBillingAssetsDeleteRequest; res: AdminBillingAssetsDeleteResponse };
+	'admin/billing/deployments/list': { req: AdminBillingDeploymentsListRequest; res: AdminBillingDeploymentsListResponse };
+	'admin/billing/deployments/upsert': { req: AdminBillingDeploymentsUpsertRequest; res: AdminBillingDeploymentsUpsertResponse };
+	'admin/billing/deployments/delete': { req: AdminBillingDeploymentsDeleteRequest; res: AdminBillingDeploymentsDeleteResponse };
+	'admin/billing/deployments/resolve': { req: AdminBillingDeploymentsResolveRequest; res: AdminBillingDeploymentsResolveResponse };
+	'admin/billing/chains/test-rpc': { req: AdminBillingChainsTestRpcRequest; res: AdminBillingChainsTestRpcResponse };
+	'admin/billing/prices/attach-deployment': { req: AdminBillingPricesAttachDeploymentRequest; res: AdminBillingPricesAttachDeploymentResponse };
+	'admin/billing/prices/delete': { req: AdminBillingPricesDeleteRequest; res: AdminBillingPricesDeleteResponse };
 	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
 	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };

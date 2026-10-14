@@ -92,3 +92,21 @@ test('account catalog displays only server-eligible reference and scheduled next
 		expect(view.element.querySelector('s')?.textContent).toContain('987'); expect(view.element.textContent).toContain('456');
 	} finally { view.dispose(); }
 });
+
+test('registered deployment selection supplies exact pricing unit and settlement addresses', async () => {
+	const deployment = { id: 'rail', assetId: 'asset', chainId: 987654, contractAddress: `0x${'3'.repeat(40)}`, recipientAddress: `0x${'4'.repeat(40)}`, tokenSymbol: 'TOKEN', tokenName: 'Synthetic', decimals: 8, isEnabled: true };
+	const asset = { id: 'asset', pricingAssetKey: 'native-unit', name: 'Asset', symbol: 'T', currencyCode: 'JPY', isEnabled: true };
+	const client = { listOfferSettings: vi.fn(async () => [offer]), upsertOffer: vi.fn(async input => input) };
+	const catalogClient = { listAssetDeployments: vi.fn(async () => [deployment]), listPricingAssets: vi.fn(async () => [asset]) };
+	const view = await mount(ServiceOfferSettings, { client, catalogClient });
+	try {
+		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
+		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === offer.name)!.click(); await flush();
+		const select = view.element.querySelector('div[tabindex="0"]')!; select.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+		const call = vi.mocked(os.popupMenu).mock.calls.at(-1)!; const item = call[0][1];
+		if (!item || !('action' in item) || typeof item.action !== 'function') throw new Error('Missing deployment option');
+		item.action(new PointerEvent('click')); call[2]?.onClosing?.(); await flush();
+		submit(view.element.querySelector('form')!); await flush();
+		expect(client.upsertOffer).toHaveBeenCalledExactlyOnceWith({ ...offer, deploymentId: deployment.id, pricingAssetKey: asset.pricingAssetKey, currencyCode: asset.currencyCode, chainId: deployment.chainId, contractAddress: deployment.contractAddress, recipientAddress: deployment.recipientAddress, tokenSymbol: deployment.tokenSymbol, decimals: deployment.decimals });
+	} finally { view.dispose(); }
+});

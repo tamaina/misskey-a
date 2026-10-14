@@ -37,8 +37,8 @@ export function priceHistory(offers: ServiceOffer[]): PriceHistoryPeriod[] {
 	return [...periods.values()];
 }
 
-export function catalog(offers: ServiceOffer[], at: number) {
-	const history = priceHistory(offers);
+export function catalog(offers: ServiceOffer[], at: number, recordedPrices: ServiceOffer[] = offers) {
+	const history = priceHistory(recordedPrices);
 	return offers.filter(offer => offerAvailable(offer, at)).map(offer => {
 		const related = history.filter(period => period.assetId === assetId(offer) && period.planId === offer.serviceKey && period.durationDays === offer.duration && period.durationUnit === offer.durationUnit);
 		return {

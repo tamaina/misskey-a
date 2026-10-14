@@ -15,6 +15,8 @@ import { activePaidRoleIds } from '../../backend/service-role.provider.js';
 import { BillingServiceSubscriptions1791838800000 } from '../../../../backend/migration/1791838800000-BillingServiceSubscriptions.js';
 import { BillingWalletRegistration1791760200000 } from '../../../../backend/migration/1791760200000-BillingWalletRegistration.js';
 import { BillingFundedTerms1792010000000 } from '../../../../backend/migration/1792010000000-BillingFundedTerms.js';
+import { BillingWalletChainSettings1791763800000 } from '../../../../backend/migration/1791763800000-BillingWalletChainSettings.js';
+import { BillingCatalogAdministration1792020000000 } from '../../../../backend/migration/1792020000000-BillingCatalogAdministration.js';
 import { BillingRefunds1792011000000 } from '../../../../backend/migration/1792011000000-BillingRefunds.js';
 import type { ServiceOffer } from '../../backend/api.definition.js';
 import type { ReceiptReader, ReceiptResult } from '../../backend/transfer-confirmation.js';
@@ -64,6 +66,9 @@ test.skipIf(!url)('native PostgreSQL refund API, claims, all-group atomic expiry
 		const funded = new BillingFundedTerms1792010000000(), migration = new BillingRefunds1792011000000();
 		await funded.up(qr); await migration.up(qr); await migration.down(qr); await funded.down(qr); await funded.up(qr); await migration.up(qr);
 		await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES (\'wallet-a\',\'alice\',1,$1,NULL,$3,$3),(\'wallet-b\',\'alice\',1,$2,NULL,$3,$3)', [address(1), address(2), now]);
+		await new BillingWalletChainSettings1791763800000().up(qr);
+		await new BillingCatalogAdministration1792020000000().up(qr);
+		await qr.query('CREATE TABLE moderation_log (id varchar(32) PRIMARY KEY, "userId" varchar(32) NOT NULL, type varchar(128) NOT NULL, info jsonb NOT NULL)');
 		await purchase.saveOffer(offer, 'admin');
 		const first = await buy('first', 'wallet-a', 1); now += day; const second = await buy('second', 'wallet-b', 2);
 		expect(await activePaidRoleIds(db, 'alice', now)).toEqual(['normal']);

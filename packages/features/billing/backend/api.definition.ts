@@ -110,7 +110,7 @@ const units = v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,77})$/), v.check(valu
 const transactionHash = v.pipe(v.string(), v.regex(/^0x[0-9a-fA-F]{64}$/));
 export const serviceOffer = v.pipe(v.strictObject({
 	id: v.pipe(id, v.maxLength(32)), serviceKey: text, name: text, chainId,
-	catalogPriceId: v.exactOptional(text), priceStartsAt: v.exactOptional(timestamp), priceExpiresAt: v.exactOptional(v.nullable(timestamp)),
+	deploymentId: v.exactOptional(v.pipe(id, v.maxLength(32))), currencyCode: v.exactOptional(v.pipe(v.string(), v.regex(/^[A-Z]{3}$/))), catalogPriceId: v.exactOptional(text), priceStartsAt: v.exactOptional(timestamp), priceExpiresAt: v.exactOptional(v.nullable(timestamp)),
 	pricingAssetKey: v.exactOptional(text), planGroup: v.exactOptional(text), sortOrder: v.exactOptional(v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(100000))),
 	roleId: v.exactOptional(v.nullable(v.pipe(id, v.maxLength(32)))),
 	contractAddress: address, recipientAddress: address, tokenSymbol: text,

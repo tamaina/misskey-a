@@ -7,11 +7,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <SearchMarker path="/admin/wallet-chains" :label="$locale.sfc.title" :keywords="['wallet', 'RPC']" icon="ti ti-wallet">
 	<MkA to="/admin/service-offers">{{ $locale.sfc.billing }}</MkA>
-	<BillingChainSettings :client="client"/>
+	<BillingChainSettings :client="client" :catalogClient="nativeCatalogClient"/>
 </SearchMarker>
 </template>
 
 <script setup lang="ts">
+import { nativeCatalogClient } from '../../catalog-client.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import BillingChainSettings from '../../BillingChainSettings.vue';
