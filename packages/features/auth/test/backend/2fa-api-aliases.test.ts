@@ -111,7 +111,32 @@ function signinBranches(operation: unknown): unknown[] {
 	return success.anyOf;
 }
 
+// PR #143 adds only optional state to the two existing MFA responses. The
+// original alias and availability hashes remain frozen and independently checked.
+const progressSigninOperationHash = '12d2bb543a087abcf941f31f8ef2b0326ca02bcfb247109cc8b587f100f8ad99';
+const progressOpaqueShape = { type: 'string', pattern: '^[A-Za-z0-9_-]{43}$' };
+const progressShape = { type: 'object', properties: {
+	ticket: progressOpaqueShape, browserSecret: progressOpaqueShape, nonce: progressOpaqueShape,
+	version: { type: 'integer', minimum: 0, maximum: Number.MAX_SAFE_INTEGER },
+}, required: ['ticket', 'browserSecret', 'nonce', 'version'], additionalProperties: false };
+
+function restorePreProgressSigninOperation(operation: unknown): unknown {
+	expect(schemaHash(operation)).toBe(progressSigninOperationHash);
+	const restored: unknown = structuredClone(operation);
+	const branches = signinBranches(restored);
+	for (const index of [2, 3]) {
+		const branch = object(branches[index]);
+		const properties = object(branch.properties);
+		expect(properties.authenticationProgress).toEqual(progressShape);
+		expect(branch.required).toEqual(index === 2 ? ['finished', 'next'] : ['finished', 'next', 'authRequest']);
+		delete properties.authenticationProgress;
+	}
+	expect(schemaHash(restored)).toBe(availableSigninOperationHash);
+	return restored;
+}
+
 function restorePreAvailabilitySigninOperation(operation: unknown): unknown {
+	operation = restorePreProgressSigninOperation(operation);
 	// This full new-operation hash also guards request/error/security metadata,
 	// WebAuthn constraints, and all fields outside the narrowly reversed response.
 	expect(schemaHash(operation)).toBe(availableSigninOperationHash);
@@ -187,6 +212,26 @@ test('availability inverse rejects tampering at every allowed boundary and outsi
 		const changed: unknown = structuredClone(original);
 		change(changed);
 		expect(() => restorePreAvailabilitySigninOperation(changed)).toThrow();
+	}
+});
+
+test('progress inverse rejects changed state fields and unrelated operation metadata', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	const original = spec.paths?.['/signin-flow'];
+	expect(schemaHash(restorePreProgressSigninOperation(original))).toBe(availableSigninOperationHash);
+	expect(schemaHash(original)).toBe(progressSigninOperationHash);
+	const tamper: Array<(operation: unknown) => void> = [
+		operation => { object(object(operation).post).operationId = 'wrong'; },
+		operation => { delete object(object(signinBranches(operation)[2]).properties).authenticationProgress; },
+		operation => { object(signinBranches(operation)[3]).required = ['finished', 'next', 'authRequest', 'authenticationProgress']; },
+	];
+	for (const index of [2, 3]) for (const field of ['ticket', 'browserSecret', 'nonce', 'version']) {
+		tamper.push(operation => { object(object(object(object(signinBranches(operation)[index]).properties).authenticationProgress).properties)[field] = { type: 'string' }; });
+	}
+	for (const change of tamper) {
+		const changed: unknown = structuredClone(original);
+		change(changed);
+		expect(() => restorePreProgressSigninOperation(changed)).toThrow();
 	}
 });
 
