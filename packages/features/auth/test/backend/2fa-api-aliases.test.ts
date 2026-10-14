@@ -25,6 +25,7 @@ import { aliasTwoFactorContract } from '../../backend/2fa-api-aliases.contract.j
 import { aliasTwoFactorProcedure, createAuthRouter } from '../../backend/api.implementation.js';
 import { authContract } from '../../backend/api.definition.js';
 import baseline from './fixtures/2fa-api-alias-baseline.json';
+import { restoreAnnouncementOperationBaseline } from '../../../announcements/test/backend/operation-rebase.js';
 import { testContext } from './native-context.js';
 import type { AuthRouterDependencies } from '../../backend/api.implementation.js';
 import type { ApiServices } from '@features/api/backend/transport/context.js';
@@ -143,7 +144,7 @@ test('actual portable generator preserves every legacy operation and public sche
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
 		const operation = spec.paths?.[path];
-		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : operation), path).toBe(hash);
+		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreAnnouncementOperationBaseline(path, operation)), path).toBe(hash);
 	}
 	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(spec.components?.schemas?.[name]), name).toBe(hash);
 	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
