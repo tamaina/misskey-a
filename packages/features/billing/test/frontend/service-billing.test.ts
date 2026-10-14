@@ -151,9 +151,9 @@ test('owner history pages remain available when new-purchase region preflight fa
 	} finally { view.dispose(); }
 });
 
-test('native purchase reviews prorated quote before creating and submits the exact reviewed quote', async () => {
+test.each(['7', '0'])('native purchase reviews prorated quote (credit %s) and submits the exact reviewed quote', async credit => {
 	const selected = { ...offer, amountBaseUnits: '14', durationUnit: 'days' as const, planGroup: 'source-group', sortOrder: 2 };
-	const result = { revision: 4, quote: { quoteCreatedAt: 1000, quoteExpiresAt: 901000, baseAmountBaseUnits: '14', discountBaseUnits: '7', payableAmountBaseUnits: '7', discountAssignmentIds: ['old'], effectiveStartsAt: 1000, effectiveExpiresAt: 86401000, currentPlan: { id: 'old-plan', name: 'Old tier', sortOrder: 1, expiresAt: 43201000, priceAmountBaseUnits: '14', priceDurationDays: 1, priceDurationUnit: 'days' } } };
+	const result = { revision: 4, quote: { quoteCreatedAt: 1000, quoteExpiresAt: 901000, baseAmountBaseUnits: '14', discountBaseUnits: credit, payableAmountBaseUnits: (14n - BigInt(credit)).toString(), discountAssignmentIds: ['old'], effectiveStartsAt: 1000, effectiveExpiresAt: 86401000, currentPlan: { id: 'old-plan', name: 'Old tier', sortOrder: 1, expiresAt: credit === '0' ? 1001 : 43201000, priceAmountBaseUnits: '14', priceDurationDays: 1, priceDurationUnit: 'days' } } };
 	const client = { listCatalog: vi.fn(async () => [{ offer: selected, priceHistory: [], priceDisplayWindow: { previousPeriod: null, currentPeriod: null, nextPeriod: null }, dealDisplay: { canShowDeal: false } }]), listOrders: vi.fn(async () => []), quoteOrder: vi.fn(async () => result), createOrder: vi.fn(async (_input: unknown) => ({})) };
 	client.createOrder.mockRejectedValueOnce({ code: 'BILLING_CONFLICT', message: 'Expired quote' });
 	const view = await mount(ServiceSubscriptions, { client, requireQuotePreview: true, listWallets: async () => [{ id: 'wallet', chainId: offer.chainId, address: 'synthetic', label: null, createdAt: 0, updatedAt: 0 }] });
@@ -166,7 +166,7 @@ test('native purchase reviews prorated quote before creating and submits the exa
 		}
 		const form = view.element.querySelector('form')!; submit(form); await flush(); expect(client.createOrder).not.toHaveBeenCalled();
 		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === '日割りと利用期間の見積を確認')!.click(); await flush();
-		expect(view.element.textContent).toContain('今回の支払額: 0.000007 TEST'); expect(view.element.textContent).toContain('Old tier'); expect(view.element.textContent).toContain('元の価格で按分');
+		expect(view.element.textContent).toContain(`今回の支払額: ${credit === '0' ? '0.000014' : '0.000007'} TEST`); expect(view.element.textContent).toContain('Old tier'); expect(view.element.textContent).toContain('元の価格で按分');
 		submit(form); await flush(); expect(client.quoteOrder).toHaveBeenCalledTimes(1); expect(client.createOrder.mock.calls[0][0]).toMatchObject({ quotedQuote: result });
 		expect(view.element.textContent).not.toContain('今回の支払額:');
 		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === '日割りと利用期間の見積を確認')!.click(); await flush(); expect(client.quoteOrder).toHaveBeenCalledTimes(2);
