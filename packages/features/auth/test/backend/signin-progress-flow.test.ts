@@ -40,7 +40,7 @@ test.each([false, true])('password-first challenge %s gives state without a sess
 	const h = harness(keys); expect(await h.invoke(h.request)).toMatchObject({ finished: false, next: keys ? 'passkey' : 'totp', authenticationProgress: h.challenge }); expect(h.deps.signinService.signin).not.toHaveBeenCalled();
 });
 test.each(['totp', 'passkey'] as const)('%s consumes state before session issue and rejects replay', async factor => {
-	const h = harness(factor === 'passkey'); await h.invoke(h.request); const proof = factor === 'totp' ? { token: '123456' } : { credential: { id: 'synthetic-key' } }; const body = { ...h.request, authenticationProgress: h.challenge, ...proof };
+	const h = harness(factor === 'passkey'); await h.invoke(h.request); const proof: Record<string, PackedJsonValue> = factor === 'totp' ? { token: '123456' } : { credential: { id: 'synthetic-key' } }; const body = { ...h.request, authenticationProgress: h.challenge, ...proof };
 	expect(await h.invoke(body)).toMatchObject({ finished: true, i: 'synthetic-browser-session' }); expect(h.deps.progressStore.consume.mock.invocationCallOrder[0]).toBeLessThan(h.deps.signinService.signin.mock.invocationCallOrder[0]);
 	expect(await h.invoke(body)).toHaveProperty('error'); expect(h.deps.signinService.signin).toHaveBeenCalledOnce();
 	if (factor === 'totp') expect(h.deps.userAuthService.twoFactorAuthenticate).toHaveBeenCalledOnce(); else expect(h.deps.webAuthnService.verifyAuthentication).toHaveBeenCalledOnce();
