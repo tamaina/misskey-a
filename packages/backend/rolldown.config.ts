@@ -94,6 +94,8 @@ export default defineConfig((args) => {
 	// 通常のビルド時にexternalとするモジュール
 	const externalModules: ExternalOption = [
 		/^slacc-.*/,
+		// Nest's ESM decorators need the native polyfill initialized before bundled feature imports.
+		'reflect-metadata',
 		'class-transformer',
 		'class-validator',
 		/^@sentry\/.*/,

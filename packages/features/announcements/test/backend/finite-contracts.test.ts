@@ -210,9 +210,13 @@ test('archive update validates dates, preserves omission and supports clearing',
 	for (const autoArchiveAt of [-1, 8.64e15 + 1]) await expect(client.update({ id: row.id, autoArchiveAt })).rejects.toMatchObject({ code: 'INVALID_AUTO_ARCHIVE_AT', data: { id: '01b83d7b-2fd5-4d7c-86c4-d03144d16355' } });
 	expect(dependencies.announcementService.update).not.toHaveBeenCalled();
 	await client.update({ id: row.id });
-	expect(dependencies.announcementService.update).toHaveBeenLastCalledWith(row, expect.objectContaining({ autoArchiveAt: undefined }), actor);
+	expect(dependencies.announcementService.update.mock.lastCall?.[1]).not.toHaveProperty('autoArchiveAt');
+	expect(dependencies.announcementService.update.mock.lastCall?.[2]).toBe(actor);
 	await client.update({ id: row.id, autoArchiveAt: null });
 	expect(dependencies.announcementService.update).toHaveBeenLastCalledWith(row, expect.objectContaining({ autoArchiveAt: null }), actor);
+	const deadline = Date.now() + 60000;
+	await client.update({ id: row.id, autoArchiveAt: deadline });
+	expect(dependencies.announcementService.update).toHaveBeenLastCalledWith(row, expect.objectContaining({ autoArchiveAt: new Date(deadline) }), actor);
 });
 
 test('archive input rejects fractional and non-finite dates', () => {

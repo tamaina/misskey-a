@@ -29,7 +29,8 @@ export function createAnnouncementUpdateProcedure<Actor extends ApiActor>(deps: 
 			await deps.announcementService.update(row, {
 				updatedAt: new Date(), title: input.title, text: input.text, imageUrl: input.imageUrl || null,
 				display: input.display, icon: input.icon, forExistingUsers: input.forExistingUsers,
-				silence: input.silence, needConfirmationToRead: input.needConfirmationToRead, isActive: input.isActive, autoArchiveAt,
+				silence: input.silence, needConfirmationToRead: input.needConfirmationToRead, isActive: input.isActive,
+				...(autoArchiveAt === undefined ? {} : { autoArchiveAt }),
 			}, actor);
 		});
 }
