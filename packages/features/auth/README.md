@@ -86,3 +86,48 @@ This lock protocol currently covers removal/reset. Future activation, key
 enrolment and other factor writers must adopt it before the activation writer is
 connected. The old TOTP-disabled orphan-key behavior is preserved. This groundwork
 does not complete the independent-MFA acceptance criteria in #94 / #144 / #157.
+
+### Fresh passkey reauthentication (unconnected verifier)
+
+`FreshPasskeyReauthentication` accepts a server-owned, live individual browser
+session only. Shared native tokens and delegated tokens cannot establish its
+identity. It checks a fresh password before generating a dedicated required-UV
+challenge whose deadline starts before password verification and is never extended
+beyond 90 seconds. Redis anchors the absolute deadline before the password proof;
+queued creation cannot renew it. The challenge binds the exact user,
+session, purpose, password/TOTP/independent-passkey policy and registered key
+material. Existing per-user WebAuthn challenges are not reused.
+
+Redis atomically consumes the bound challenge before assertion verification, so
+only one concurrent verifier can proceed. Failure burns it. Completion verifies
+strict UV, RP, origin and key ownership, compares the key counter on update, and
+rechecks policy/session and the original deadline. The result is internal
+metadata, not a reusable grant, sudo state or activation credential. A future
+mutation must recheck session and policy within its own locked transaction.
+
+This verifier has no DI registration, endpoint or UI and never changes an MFA
+policy. It is independent of the unmerged login-progress connection in #143.
+Activation remains blocked until both sign-in paths, password/email/token/account
+deletion, factor management/key display and every factor writer share the final
+enforcement and locking protocol.
+
+Legacy uncompressed P-256 keys are normalized to COSE, as in the existing named
+WebAuthn flow. Their representation update shares the counter compare-and-update;
+the policy stamp binds normalized key material so this conversion alone is not a
+policy change.
+
+Remaining runtime connections before activation:
+
+| Surface | Required connection |
+| --- | --- |
+| `signinFlow.ts`, `signinWithPasskey.ts` | Read the same explicit policy, require its factors, bind progress to current policy and issue a session only after final verification. |
+| `i/change-password`, `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Apply current independent MFA policy and operation-specific fresh verification before the sensitive mutation. |
+| `i/2fa/*`, admin `unset-mfa` | Join all enrolment/policy writers to the profile lock; require exact operation/target bindings and recheck live session/policy inside the mutation transaction. |
+| User self serializer `securityKeysList` and factor display | Represent independent policy consistently and gate sensitive key/recovery display through its dedicated fresh purpose. |
+
+The current verifier supports only `activate-passkey-mfa` and
+`show-recovery-codes`. Other actions need their own concrete purpose/target
+bindings; neither a generic sudo purpose nor this metadata authorizes them.
+
+Run its real atomic Redis regression with
+`MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/auth/test/vitest.fresh-reauthentication.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs`.
