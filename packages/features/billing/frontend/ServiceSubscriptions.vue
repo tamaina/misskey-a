@@ -10,6 +10,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkButton :disabled="busy" @click="load">{{ $locale.sfc.load }}</MkButton>
 	<form class="_gaps_m" @submit.prevent="create">
 		<MkSelect v-model="offerId" :items="offerItems" :disabled="busy"><template #label>{{ $locale.sfc.offer }}</template></MkSelect>
+		<MkInfo v-for="item in catalogItems.filter(row => row.offer.id === offerId)" :key="item.offer.id">
+			<template v-if="item.dealDisplay.canShowDeal && item.dealDisplay.referenceAmountBaseUnits != null">{{ $locale.sfc.reference }}: <s>{{ formatServiceAmount(item.dealDisplay.referenceAmountBaseUnits, item.offer.decimals) }} {{ item.offer.tokenSymbol }}</s><br></template>
+			<template v-if="item.priceDisplayWindow.previousPeriod">{{ $locale.sfc.previous }}: {{ formatServiceAmount(item.priceDisplayWindow.previousPeriod.amountBaseUnits, item.offer.decimals) }} {{ item.offer.tokenSymbol }}<br></template>
+			{{ $locale.sfc.current }}: {{ formatServiceAmount(item.offer.amountBaseUnits, item.offer.decimals) }} {{ item.offer.tokenSymbol }}
+			<template v-if="item.priceDisplayWindow.nextPeriod"><br>{{ $locale.sfc.next }}: {{ formatServiceAmount(item.priceDisplayWindow.nextPeriod.amountBaseUnits, item.offer.decimals) }} {{ item.offer.tokenSymbol }} / {{ new Date(item.priceDisplayWindow.nextPeriod.startsAt).toISOString() }}</template>
+		</MkInfo>
 		<MkSelect v-model="walletId" :items="walletItems" :disabled="busy"><template #label>{{ $locale.sfc.wallet }}</template></MkSelect>
 		<MkButton type="submit" :disabled="busy || !offerId || !walletId">{{ $locale.sfc.create }}</MkButton>
 	</form>
@@ -31,9 +37,10 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { formatServiceAmount } from './service-client.js';
 import type { ServiceAccountClient } from './service-client.js';
-import type { LinkedWallet, ServiceOffer, ServiceOrder } from '../backend/api.definition.js';
+import type { LinkedWallet, ServiceOffer, ServiceOrder, CatalogOffer } from '../backend/api.definition.js';
 const props = defineProps<{ client: ServiceAccountClient; listWallets: () => Promise<LinkedWallet[]> }>();
 const offers = ref<ServiceOffer[]>([]), wallets = ref<LinkedWallet[]>([]), orders = ref<ServiceOrder[]>([]);
+const catalogItems = ref<CatalogOffer[]>([]);
 const offerId = ref(''), walletId = ref(''), hashes = ref<Record<string, string>>({});
 const offerItems = computed(() => offers.value.map(offer => ({ value: offer.id, label: `${offer.name}: ${formatServiceAmount(offer.amountBaseUnits, offer.decimals)} ${offer.tokenSymbol} / ${offer.duration} ${offer.durationUnit}` })));
 const walletItems = computed(() => wallets.value.map(wallet => ({ value: wallet.id, label: `${wallet.chainId} / ${wallet.address}` })));
@@ -48,7 +55,7 @@ async function run(action: () => Promise<void>) {
 
 async function refreshHistory() { orders.value = await props.client.listOrders({}); }
 
-async function load() { await run(async () => { offers.value = await props.client.listOffers({}); wallets.value = await props.listWallets(); await refreshHistory(); }); }
+async function load() { await run(async () => { catalogItems.value = await props.client.listCatalog({}); offers.value = catalogItems.value.map(item => item.offer); wallets.value = await props.listWallets(); await refreshHistory(); }); }
 
 async function create() {
 	await run(async () => {
@@ -67,5 +74,5 @@ async function check(order: ServiceOrder) {
 
 </script>
 <locale lang="json" locale="ja-JP">
-{"scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、管理者が紐付けた通常ロールは確認済み期間内だけ有効です。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"読み込む","offer":"サービス","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","cancel":"送信前の注文を取り消す","deadline":"ハッシュ提出期限"}
+{"reference":"基準価格（元の販売期間条件を満たす価格）","previous":"前の価格","current":"現在価格","next":"次の価格","scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、管理者が紐付けた通常ロールは確認済み期間内だけ有効です。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"読み込む","offer":"サービス","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","cancel":"送信前の注文を取り消す","deadline":"ハッシュ提出期限"}
 </locale>

@@ -40,7 +40,7 @@ test('real native admin form preserves large base units and explicit offer confi
 });
 test('account retry reuses its idempotency key, checks order hash ', async () => {
 	const order = { id: 'order', offer, payerAddress: `0x${'1'.padStart(40, '0')}`, status: 'pending' as const, txHash: null, createdAt: 1000, expiresAt: 1801000, paidAt: null, startsAt: null, endsAt: null };
-	const client = { quoteOrder: vi.fn(async () => ({ revision: 0, quote: { quoteCreatedAt: 1000, quoteExpiresAt: 901000, baseAmountBaseUnits: offer.amountBaseUnits, discountBaseUnits: '0', payableAmountBaseUnits: offer.amountBaseUnits, discountAssignmentIds: [], effectiveStartsAt: 1000, effectiveExpiresAt: 100000, currentPlan: null } })), cancelOrder: vi.fn(async () => ({ ok: true })), listOffers: vi.fn(async () => [offer]), listOrders: vi.fn(async () => [order]), listTransfers: vi.fn(async () => []), createOrder: vi.fn(async () => order), checkOrder: vi.fn(async () => order), detectTransfer: vi.fn(async () => ({ status: 'pending' as const, transfer: null })) };
+	const client = { listCatalog: vi.fn(async () => [{ offer, priceHistory: [], priceDisplayWindow: { previousPeriod: null, currentPeriod: null, nextPeriod: null }, dealDisplay: { canShowDeal: false, referenceAmountBaseUnits: null, reason: 'reference_not_higher' as const, checkedFrom: 0, checkedTo: 1000, referenceSoldMs: 0, totalSoldMs: 0, referenceLastSoldAt: null } }]), quoteOrder: vi.fn(async () => ({ revision: 0, quote: { quoteCreatedAt: 1000, quoteExpiresAt: 901000, baseAmountBaseUnits: offer.amountBaseUnits, discountBaseUnits: '0', payableAmountBaseUnits: offer.amountBaseUnits, discountAssignmentIds: [], effectiveStartsAt: 1000, effectiveExpiresAt: 100000, currentPlan: null } })), cancelOrder: vi.fn(async () => ({ ok: true })), listOffers: vi.fn(async () => [offer]), listOrders: vi.fn(async () => [order]), listTransfers: vi.fn(async () => []), createOrder: vi.fn(async () => order), checkOrder: vi.fn(async () => order), detectTransfer: vi.fn(async () => ({ status: 'pending' as const, transfer: null })) };
 	client.createOrder.mockRejectedValueOnce(new Error('synthetic private failure'));
 	const view = await mount(ServiceSubscriptions, { client, listWallets: async () => [{ id: 'wallet', chainId: offer.chainId, address: order.payerAddress, label: null, createdAt: 1, updatedAt: 1 }] });
 	try {
@@ -65,4 +65,30 @@ test('amount display keeps exact integer precision and token decimals', () => {
 	expect(formatServiceAmount('7', 6)).toBe('0.000007');
 	expect(formatServiceAmount('7000000', 6)).toBe('7');
 	expect(formatServiceAmount('7', 0)).toBe('7');
+});
+
+test('scheduled admin price retains exact timestamps when its minute-level fields are unchanged', async () => {
+	const scheduled = { ...offer, priceStartsAt: Date.UTC(2026, 9, 15, 2, 3, 4, 567), priceExpiresAt: Date.UTC(2026, 10, 15, 2, 3, 4, 567) };
+	const client = { listOfferSettings: vi.fn(async () => [scheduled]), upsertOffer: vi.fn(async () => scheduled) };
+	const view = await mount(ServiceOfferSettings, { client });
+	try {
+		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
+		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === offer.name)!.click(); await flush();
+		submit(view.element.querySelector('form')!); await flush();
+		expect(client.upsertOffer).toHaveBeenCalledExactlyOnceWith(scheduled);
+	} finally { view.dispose(); }
+});
+test('account catalog displays only server-eligible reference and scheduled next price', async () => {
+	const period = { id: 'future', priceId: 'future', assetId: 'T', planId: offer.serviceKey, amountBaseUnits: '456000000', durationDays: 1, durationUnit: 'months' as const, isEnabled: true, startsAt: Date.UTC(2026, 10, 1), expiresAt: null };
+	const item = { offer, priceHistory: [period], priceDisplayWindow: { previousPeriod: null, currentPeriod: null, nextPeriod: period }, dealDisplay: { canShowDeal: true, referenceAmountBaseUnits: '987000000', reason: 'eligible' as const, checkedFrom: 0, checkedTo: 1000, referenceSoldMs: 1000, totalSoldMs: 1000, referenceLastSoldAt: 1000 } };
+	const client = { listCatalog: vi.fn(async () => [item]), listOrders: vi.fn(async () => []) };
+	const view = await mount(ServiceSubscriptions, { client, listWallets: async () => [] });
+	try {
+		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
+		view.element.querySelector('div[tabindex="0"]')!.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+		const call = vi.mocked(os.popupMenu).mock.calls.at(-1)!; const option = call[0][0];
+		if (!option || !('action' in option) || typeof option.action !== 'function') throw new Error('Expected offer option');
+		option.action(new PointerEvent('click')); call[2]?.onClosing?.(); await flush();
+		expect(view.element.querySelector('s')?.textContent).toContain('987'); expect(view.element.textContent).toContain('456');
+	} finally { view.dispose(); }
 });

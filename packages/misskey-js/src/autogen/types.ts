@@ -3,6 +3,9 @@
 
 import type { PackedJsonValue as ContractJsonValue } from '#native-json-value';
 export type paths = {
+    '/billing/catalog/list': {
+        post: operations['billing___catalog___list'];
+    };
     '/billing/orders/cancel': {
         post: operations['billing___orders___cancel'];
     };
@@ -38543,6 +38546,330 @@ export type components = {
 };
 export type $defs = Record<string, never>;
 export interface operations {
+    billing___catalog___list: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never> & unknown;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        offer: {
+                            id: string;
+                            serviceKey: string;
+                            name: string;
+                            chainId: number;
+                            catalogPriceId?: string;
+                            priceStartsAt?: number;
+                            priceExpiresAt?: number | null;
+                            pricingAssetKey?: string;
+                            planGroup?: string;
+                            sortOrder?: number;
+                            roleId?: string | null;
+                            contractAddress: string;
+                            recipientAddress: string;
+                            tokenSymbol: string;
+                            decimals: number;
+                            amountBaseUnits: string;
+                            duration: number;
+                            /** @enum {string} */
+                            durationUnit: 'days' | 'months' | 'years';
+                            confirmationsRequired: number;
+                            isEnabled: boolean;
+                        };
+                        priceHistory: {
+                            id: string;
+                            priceId: string;
+                            assetId: string;
+                            planId: string;
+                            amountBaseUnits: string;
+                            durationDays: number;
+                            /** @enum {string} */
+                            durationUnit: 'days' | 'months' | 'years';
+                            isEnabled: boolean;
+                            startsAt: number;
+                            expiresAt: number | null;
+                        }[];
+                        priceDisplayWindow: {
+                            previousPeriod: {
+                                id: string;
+                                priceId: string;
+                                assetId: string;
+                                planId: string;
+                                amountBaseUnits: string;
+                                durationDays: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                isEnabled: boolean;
+                                startsAt: number;
+                                expiresAt: number | null;
+                            } | null;
+                            currentPeriod: {
+                                id: string;
+                                priceId: string;
+                                assetId: string;
+                                planId: string;
+                                amountBaseUnits: string;
+                                durationDays: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                isEnabled: boolean;
+                                startsAt: number;
+                                expiresAt: number | null;
+                            } | null;
+                            nextPeriod: {
+                                id: string;
+                                priceId: string;
+                                assetId: string;
+                                planId: string;
+                                amountBaseUnits: string;
+                                durationDays: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                isEnabled: boolean;
+                                startsAt: number;
+                                expiresAt: number | null;
+                            } | null;
+                        };
+                        dealDisplay: {
+                            canShowDeal: boolean;
+                            referenceAmountBaseUnits: string | null;
+                            /** @enum {string} */
+                            reason: 'eligible' | 'no_reference_price' | 'reference_not_higher' | 'sold_less_than_half_recent_period' | 'sold_less_than_two_weeks' | 'reference_too_old';
+                            checkedFrom: number;
+                            checkedTo: number;
+                            referenceSoldMs: number;
+                            totalSoldMs: number;
+                            referenceLastSoldAt: number | null;
+                        };
+                    }[];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     billing___orders___cancel: {
         requestBody: {
             content: {
@@ -39060,6 +39387,9 @@ export interface operations {
                         serviceKey: string;
                         name: string;
                         chainId: number;
+                        catalogPriceId?: string;
+                        priceStartsAt?: number;
+                        priceExpiresAt?: number | null;
                         pricingAssetKey?: string;
                         planGroup?: string;
                         sortOrder?: number;
@@ -39304,6 +39634,9 @@ export interface operations {
                     serviceKey: string;
                     name: string;
                     chainId: number;
+                    catalogPriceId?: string;
+                    priceStartsAt?: number;
+                    priceExpiresAt?: number | null;
                     pricingAssetKey?: string;
                     planGroup?: string;
                     sortOrder?: number;
@@ -39333,6 +39666,9 @@ export interface operations {
                         serviceKey: string;
                         name: string;
                         chainId: number;
+                        catalogPriceId?: string;
+                        priceStartsAt?: number;
+                        priceExpiresAt?: number | null;
                         pricingAssetKey?: string;
                         planGroup?: string;
                         sortOrder?: number;
@@ -39587,6 +39923,9 @@ export interface operations {
                         serviceKey: string;
                         name: string;
                         chainId: number;
+                        catalogPriceId?: string;
+                        priceStartsAt?: number;
+                        priceExpiresAt?: number | null;
                         pricingAssetKey?: string;
                         planGroup?: string;
                         sortOrder?: number;
@@ -39835,6 +40174,9 @@ export interface operations {
                         serviceKey: string;
                         name: string;
                         chainId: number;
+                        catalogPriceId?: string;
+                        priceStartsAt?: number;
+                        priceExpiresAt?: number | null;
                         pricingAssetKey?: string;
                         planGroup?: string;
                         sortOrder?: number;
@@ -39890,6 +40232,9 @@ export interface operations {
                             serviceKey: string;
                             name: string;
                             chainId: number;
+                            catalogPriceId?: string;
+                            priceStartsAt?: number;
+                            priceExpiresAt?: number | null;
                             pricingAssetKey?: string;
                             planGroup?: string;
                             sortOrder?: number;
@@ -40180,6 +40525,9 @@ export interface operations {
                             serviceKey: string;
                             name: string;
                             chainId: number;
+                            catalogPriceId?: string;
+                            priceStartsAt?: number;
+                            priceExpiresAt?: number | null;
                             pricingAssetKey?: string;
                             planGroup?: string;
                             sortOrder?: number;
@@ -40467,6 +40815,9 @@ export interface operations {
                             serviceKey: string;
                             name: string;
                             chainId: number;
+                            catalogPriceId?: string;
+                            priceStartsAt?: number;
+                            priceExpiresAt?: number | null;
                             pricingAssetKey?: string;
                             planGroup?: string;
                             sortOrder?: number;
@@ -40773,6 +41124,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -40881,6 +41235,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -41153,6 +41510,9 @@ export interface operations {
                                         serviceKey: string;
                                         name: string;
                                         chainId: number;
+                                        catalogPriceId?: string;
+                                        priceStartsAt?: number;
+                                        priceExpiresAt?: number | null;
                                         pricingAssetKey?: string;
                                         planGroup?: string;
                                         sortOrder?: number;
@@ -41261,6 +41621,9 @@ export interface operations {
                                         serviceKey: string;
                                         name: string;
                                         chainId: number;
+                                        catalogPriceId?: string;
+                                        priceStartsAt?: number;
+                                        priceExpiresAt?: number | null;
                                         pricingAssetKey?: string;
                                         planGroup?: string;
                                         sortOrder?: number;
@@ -41532,6 +41895,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -41640,6 +42006,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -41909,6 +42278,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -42017,6 +42389,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -42316,6 +42691,9 @@ export interface operations {
                                 serviceKey: string;
                                 name: string;
                                 chainId: number;
+                                catalogPriceId?: string;
+                                priceStartsAt?: number;
+                                priceExpiresAt?: number | null;
                                 pricingAssetKey?: string;
                                 planGroup?: string;
                                 sortOrder?: number;
@@ -42587,6 +42965,9 @@ export interface operations {
                                         serviceKey: string;
                                         name: string;
                                         chainId: number;
+                                        catalogPriceId?: string;
+                                        priceStartsAt?: number;
+                                        priceExpiresAt?: number | null;
                                         pricingAssetKey?: string;
                                         planGroup?: string;
                                         sortOrder?: number;
@@ -42695,6 +43076,9 @@ export interface operations {
                                         serviceKey: string;
                                         name: string;
                                         chainId: number;
+                                        catalogPriceId?: string;
+                                        priceStartsAt?: number;
+                                        priceExpiresAt?: number | null;
                                         pricingAssetKey?: string;
                                         planGroup?: string;
                                         sortOrder?: number;
@@ -42966,6 +43350,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -43074,6 +43461,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -43348,6 +43738,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -43456,6 +43849,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -43728,6 +44124,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -43836,6 +44235,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -44107,6 +44509,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -44215,6 +44620,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -44484,6 +44892,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;
@@ -44592,6 +45003,9 @@ export interface operations {
                                     serviceKey: string;
                                     name: string;
                                     chainId: number;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
                                     pricingAssetKey?: string;
                                     planGroup?: string;
                                     sortOrder?: number;

@@ -176,6 +176,37 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 			await qr.query(`UPDATE role SET "isModerator" = false WHERE id = 'normal'`);
 			assert.equal((await store.applyReceipt('bob', order.id, hash(71), proof(hinted))).endsAt, paid.endsAt);
 		});
+		await t.test('scheduled catalog availability and concurrent source price rules are native SQL enforced', async () => {
+			const originalTime = now;
+			try {
+				const scheduled = { ...offer, serviceKey: 'scheduled-plan', priceStartsAt: now + 10, priceExpiresAt: now + 20 };
+				const results = await Promise.allSettled([store.saveOffer({ ...scheduled, id: 'scheduled-a' }, 'alice'), store.saveOffer({ ...scheduled, id: 'scheduled-b' }, 'alice')]);
+				assert.equal(results.filter(result => result.status === 'fulfilled').length, 1);
+				const price = (await store.listOffers()).find(row => row.serviceKey === 'scheduled-plan');
+				await assert.rejects(store.quoteOrder('bob', price.id), error => error.code === 'BILLING_UNAVAILABLE');
+				now += 10;
+				assert.equal((await store.quoteOrder('bob', price.id)).quote.baseAmountBaseUnits, price.amountBaseUnits);
+				assert.equal((await store.listCatalog()).filter(row => row.offer.id === price.id).length, 1);
+				await assert.rejects(store.saveOffer({ ...price, amountBaseUnits: '8' }, 'alice'), error => error.code === 'BILLING_CONFLICT');
+				const shared = { ...scheduled, id: 'shared-first', serviceKey: 'shared-plan', catalogPriceId: 'logical-price', pricingAssetKey: 'same-pricing-units' };
+				await store.saveOffer(shared, 'alice');
+				await store.saveOffer({ ...shared, id: 'shared-second', chainId: 123457, contractAddress: address(4) }, 'alice');
+				assert.equal((await store.listCatalog()).find(row => row.offer.id === shared.id).priceHistory.length, 1);
+				await store.saveOffer({ ...shared, priceExpiresAt: now + 100 }, 'alice');
+				assert.equal((await store.listOffers()).find(row => row.id === 'shared-second').priceExpiresAt, now + 100);
+				const free = { ...scheduled, id: 'free-price', serviceKey: 'free-plan', amountBaseUnits: '0', priceExpiresAt: now + 100 };
+				await store.saveOffer(free, 'alice');
+				const zero = await store.createOrder('carol', free.id, 'bob-wallet', 'invalid-owner-free', free).catch(error => error);
+				assert.equal(zero.code, 'BILLING_UNAVAILABLE');
+				await qr.query('INSERT INTO "user" (id) VALUES ($1)', ['catalog-buyer']);
+				await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES ($1,$2,123456,$3,NULL,$4,$4)', ['catalog-wallet', 'catalog-buyer', address(5), now]);
+				const zeroQuote = await store.quoteOrder('catalog-buyer', free.id);
+				const zeroPaid = await store.createOrder('catalog-buyer', free.id, 'catalog-wallet', 'free-order', free, zeroQuote);
+				assert.equal(zeroPaid.status, 'paid'); assert.equal(zeroPaid.txHash, null); assert.equal(zeroPaid.cashAmountBaseUnits, '0');
+				now += 10;
+				await assert.rejects(store.createOrder('bob', price.id, 'bob-wallet', 'expired-price', price), error => error.code === 'BILLING_UNAVAILABLE');
+			} finally { now = originalTime; }
+		});
 		await t.test('paid evidence remains claimed after account deletion', async () => {
 			await qr.query("DELETE FROM \"user\" WHERE id = 'alice'");
 			assert.equal((await qr.query(`SELECT count(*)::int AS count FROM billing_service_order WHERE "txHash" = $1 AND status = 'paid'`, [hash(1)]))[0].count, 1);

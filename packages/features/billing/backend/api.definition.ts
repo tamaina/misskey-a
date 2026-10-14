@@ -106,10 +106,11 @@ export const walletContract = {
 };
 
 // Fixed-term service purchases, not automatic debits or a balance ledger.
-const units = v.pipe(v.string(), v.regex(/^[1-9][0-9]{0,77}$/), v.check(value => /^[1-9][0-9]{0,77}$/.test(value) && BigInt(value) < 2n ** 256n));
+const units = v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,77})$/), v.check(value => /^(0|[1-9][0-9]{0,77})$/.test(value) && BigInt(value) < 2n ** 256n));
 const transactionHash = v.pipe(v.string(), v.regex(/^0x[0-9a-fA-F]{64}$/));
-export const serviceOffer = v.strictObject({
+export const serviceOffer = v.pipe(v.strictObject({
 	id: v.pipe(id, v.maxLength(32)), serviceKey: text, name: text, chainId,
+	catalogPriceId: v.exactOptional(text), priceStartsAt: v.exactOptional(timestamp), priceExpiresAt: v.exactOptional(v.nullable(timestamp)),
 	pricingAssetKey: v.exactOptional(text), planGroup: v.exactOptional(text), sortOrder: v.exactOptional(v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(100000))),
 	roleId: v.exactOptional(v.nullable(v.pipe(id, v.maxLength(32)))),
 	contractAddress: address, recipientAddress: address, tokenSymbol: text,
@@ -119,7 +120,7 @@ export const serviceOffer = v.strictObject({
 	durationUnit: v.picklist(['days', 'months', 'years']),
 	confirmationsRequired: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100000)),
 	isEnabled: v.boolean(),
-});
+}), v.check(offer => offer.amountBaseUnits !== '0' || offer.priceStartsAt != null, 'Zero base price requires a dated catalog entry'));
 export type ServiceOffer = v.InferOutput<typeof serviceOffer>;
 const nonnegativeUnits = v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,77})$/));
 export const paymentQuoteSchema = v.strictObject({
@@ -127,6 +128,13 @@ export const paymentQuoteSchema = v.strictObject({
 	discountAssignmentIds: v.array(id), effectiveStartsAt: timestamp, effectiveExpiresAt: timestamp,
 	currentPlan: v.nullable(v.strictObject({ id, name: text, sortOrder: v.number(), expiresAt: timestamp, priceAmountBaseUnits: nonnegativeUnits, priceDurationDays: v.number(), priceDurationUnit: v.picklist(['days', 'months', 'years']) })),
 });
+const pricePeriod = v.strictObject({ id, priceId: id, assetId: v.string(), planId: text, amountBaseUnits: nonnegativeUnits,
+	durationDays: v.number(), durationUnit: v.picklist(['days', 'months', 'years']), isEnabled: v.boolean(), startsAt: timestamp, expiresAt: v.nullable(timestamp) });
+export const catalogOffer = v.strictObject({ offer: serviceOffer, priceHistory: v.array(pricePeriod),
+	priceDisplayWindow: v.strictObject({ previousPeriod: v.nullable(pricePeriod), currentPeriod: v.nullable(pricePeriod), nextPeriod: v.nullable(pricePeriod) }),
+	dealDisplay: v.strictObject({ canShowDeal: v.boolean(), referenceAmountBaseUnits: v.nullable(nonnegativeUnits), reason: v.picklist(['eligible', 'no_reference_price', 'reference_not_higher', 'sold_less_than_half_recent_period', 'sold_less_than_two_weeks', 'reference_too_old']),
+		checkedFrom: v.number(), checkedTo: timestamp, referenceSoldMs: v.number(), totalSoldMs: v.number(), referenceLastSoldAt: v.nullable(timestamp) }) });
+export type CatalogOffer = v.InferOutput<typeof catalogOffer>;
 export const serviceQuote = v.strictObject({ revision: timestamp, quote: paymentQuoteSchema });
 
 export const serviceOrder = v.strictObject({
@@ -147,6 +155,7 @@ const adminRead = { requireCredential: true, requireAdmin: true, kind: 'read:adm
 const adminWrite = { ...adminRead, kind: 'write:admin:meta', limit: write.limit } as const;
 const empty = v.intersect([v.strictObject({}), rawObjectInputGuard]);
 export const serviceBillingContract = {
+	listCatalog: serviceProcedure.$meta({ ...read, requestName: 'billing/catalog/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/catalog/list' }).input(empty).output(v.array(catalogOffer)),
 	cancelOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/cancel' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/cancel' }).input(v.strictObject({ orderId: id })).output(v.strictObject({ ok: v.literal(true) })),
 	quoteOrder: serviceProcedure.$meta({ ...read, requestName: 'billing/orders/quote' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/quote' }).input(v.strictObject({ offerId: id })).output(serviceQuote),
 	listOfferSettings: serviceProcedure.$meta({ ...adminRead, requestName: 'admin/billing/offers/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/admin/billing/offers/list' }).input(empty).output(v.array(serviceOffer)),

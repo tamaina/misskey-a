@@ -1,6 +1,8 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	BillingCatalogListRequest,
+	BillingCatalogListResponse,
 	BillingOrdersCancelRequest,
 	BillingOrdersCancelResponse,
 	BillingOrdersQuoteRequest,
@@ -804,6 +806,7 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'billing/catalog/list': { req: BillingCatalogListRequest; res: BillingCatalogListResponse };
 	'billing/orders/cancel': { req: BillingOrdersCancelRequest; res: BillingOrdersCancelResponse };
 	'billing/orders/quote': { req: BillingOrdersQuoteRequest; res: BillingOrdersQuoteResponse };
 	'admin/billing/offers/list': { req: AdminBillingOffersListRequest; res: AdminBillingOffersListResponse };

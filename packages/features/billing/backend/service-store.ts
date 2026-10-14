@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { offerAvailable, catalog, validPriceCatalog, immutablePriceMatches } from './service-catalog.js';
 import { isDeepStrictEqual } from 'node:util';
 import { lockBillingState, saveBillingState, quoteServiceTerm, applyFundedTerm } from './billing-state.js';
 import type { PaymentQuote } from '../shared/payment-quote.js';
@@ -43,7 +44,7 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				const state = await lockBillingState(manager, userId);
 				if (state.lockRequestId) conflict();
 				const offer = await manager.findOneBy(MiBillingServiceOffer, { id: offerId });
-				if (!offer?.terms.isEnabled) unavailable();
+				if (!offer || !offerAvailable(offer.terms, now())) unavailable();
 				return { revision: state.revision, quote: quoteServiceTerm(state, offer.terms, now()) };
 			});
 		},
@@ -57,13 +58,22 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				return { ok: true as const };
 			});
 		},
-		async listOffers() { return (await offers.find({ order: { id: 'ASC' }, take: 100 })).map(row => row.terms); },
+		async listOffers() { return (await offers.find({ order: { id: 'ASC' }, take: 1000 })).map(row => row.terms); },
+		async listCatalog() { return catalog(await this.listOffers(), now()); },
 		async saveOffer(terms: ServiceOffer, actorId: string) {
 			await db.transaction(async manager => {
+				await manager.query("SELECT pg_advisory_xact_lock(hashtextextended('billing-price-catalog', 0))");
+				const rows = await manager.find(MiBillingServiceOffer);
+				const previous = rows.find(row => row.id === terms.id);
+				const catalogRows = rows.map(row => terms.catalogPriceId && terms.catalogPriceId === row.terms.catalogPriceId ? { ...row.terms, priceExpiresAt: terms.priceExpiresAt ?? null } : row.terms);
+				if (!validPriceCatalog(terms, catalogRows) || (previous && !immutablePriceMatches(previous.terms, terms))) conflict();
 				await manager.query('LOCK TABLE billing_service_offer IN SHARE ROW EXCLUSIVE MODE');
-				if (!await manager.existsBy(MiBillingServiceOffer, { id: terms.id }) && await manager.count(MiBillingServiceOffer) >= 100) unavailable();
+				if (!await manager.existsBy(MiBillingServiceOffer, { id: terms.id }) && await manager.count(MiBillingServiceOffer) >= 1000) unavailable();
 				await requirePurchasableRole(manager, terms.roleId);
 				await manager.upsert(MiBillingServiceOffer, { id: terms.id, terms, updatedAt: new Date(now()), updatedByUserId: actorId }, ['id']);
+				if (terms.catalogPriceId) for (const row of rows) if (row.id !== terms.id && row.terms.catalogPriceId === terms.catalogPriceId) {
+					await manager.update(MiBillingServiceOffer, row.id, { terms: { ...row.terms, priceExpiresAt: terms.priceExpiresAt ?? null }, updatedAt: new Date(now()), updatedByUserId: actorId });
+				}
 			});
 			return terms;
 		},
@@ -78,11 +88,11 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				}
 				const offer = await manager.getRepository(MiBillingServiceOffer).findOne({ where: { id: offerId }, lock: { mode: 'pessimistic_read' } });
 				const wallet = await manager.findOneBy(MiBillingWallet, { id: walletId, userId });
-				if (!offer?.terms.isEnabled || !wallet || wallet.chainId !== offer.terms.chainId) unavailable();
+				if (!offer || !offerAvailable(offer.terms, now()) || !wallet || wallet.chainId !== offer.terms.chainId) unavailable();
 				if (!sameOffer(offer.terms, quotedOffer)) conflict();
 				const createdAt = now();
 				if (state.lockRequestId) conflict();
-				if (offer.terms.planGroup && !quotedQuote) conflict();
+				if ((offer.terms.planGroup || offer.terms.amountBaseUnits === '0') && !quotedQuote) conflict();
 				const pendingOrders = await manager.findBy(MiBillingServiceOrder, { userId, status: 'pending' });
 				if (pendingOrders.some(row => row.quote && (row.txHash || row.expiresAt > createdAt))) conflict();
 				let quote: PaymentQuote | null = null;

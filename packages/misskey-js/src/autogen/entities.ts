@@ -6,6 +6,8 @@ type ContractResponse<Route extends keyof ContractEndpoints> = ContractEndpoints
 export type EmptyRequest = Record<string, unknown> | undefined;
 export type EmptyResponse = Record<string, unknown> | undefined;
 
+export type BillingCatalogListRequest = ContractRequest<'billing/catalog/list'>;
+export type BillingCatalogListResponse = ContractResponse<'billing/catalog/list'>;
 export type BillingOrdersCancelRequest = ContractRequest<'billing/orders/cancel'>;
 export type BillingOrdersCancelResponse = ContractResponse<'billing/orders/cancel'>;
 export type BillingOrdersQuoteRequest = ContractRequest<'billing/orders/quote'>;

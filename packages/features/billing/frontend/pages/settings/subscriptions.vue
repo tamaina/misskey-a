@@ -17,6 +17,7 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import ServiceSubscriptions from '../../ServiceSubscriptions.vue';
 import type { ServiceAccountClient } from '../../service-client.js';
 const client: ServiceAccountClient = {
+	listCatalog: input => misskeyApi('billing/catalog/list', input),
 	cancelOrder: input => misskeyApi('billing/orders/cancel', input),
 	quoteOrder: input => misskeyApi('billing/orders/quote', input),
 	listOffers: input => misskeyApi('billing/offers/list', input),

@@ -796,6 +796,12 @@ type AvailableEndpointsRequest = ContractRequest<'available-endpoints'>;
 type AvailableEndpointsResponse = ContractResponse<'available-endpoints'>;
 
 // @public (undocumented)
+type BillingCatalogListRequest = ContractRequest<'billing/catalog/list'>;
+
+// @public (undocumented)
+type BillingCatalogListResponse = ContractResponse<'billing/catalog/list'>;
+
+// @public (undocumented)
 type BillingOffersListRequest = ContractRequest<'billing/offers/list'>;
 
 // @public (undocumented)
@@ -1842,6 +1848,8 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        BillingCatalogListRequest,
+        BillingCatalogListResponse,
         BillingOrdersCancelRequest,
         BillingOrdersCancelResponse,
         BillingOrdersQuoteRequest,
