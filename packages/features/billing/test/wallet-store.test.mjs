@@ -22,7 +22,7 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 	assert.ok(['127.0.0.1', 'localhost', '[::1]'].includes(parsed.hostname), 'Synthetic database must be on loopback');
 	const schema = `billing_test_${randomUUID().replaceAll('-', '')}`;
 	const db = new DataSource({ type: 'postgres', url, schema, extra: { options: `-c search_path=${schema}`, application_name: 'misskey-billing-synthetic' },
-		entities: (await import('../../../backend/built/postgres.js')).entities,
+																													entities: (await import('../../../backend/built/postgres.js')).entities,
 	});
 	await db.initialize();
 	const qr = db.createQueryRunner();
@@ -30,12 +30,23 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 	try {
 		await qr.query(`CREATE SCHEMA "${schema}"`);
 		await qr.query('CREATE TABLE "user" ("id" varchar(32) PRIMARY KEY)');
-		await qr.query(`INSERT INTO "user" ("id") VALUES ('alice'), ('bob')`);
+		await qr.query('INSERT INTO "user" ("id") VALUES (\'alice\'), (\'bob\')');
 		await migration.up(qr); await migration.down(qr); await migration.up(qr);
 		const chainMigration = new ChainMigration();
 		await chainMigration.up(qr); await chainMigration.down(qr); await chainMigration.up(qr);
 		const diff = await db.driver.createSchemaBuilder().log();
-		assert.equal(diff.upQueries.filter(q => q.query.includes('billing_wallet')).length, 0, 'Entity metadata agrees with migration');
+		// Check DDL targeting wallet tables/indexes, not another table merely referencing a wallet chain.
+		const isWalletDdl = q => {
+			const query = q.query.replace(/"[^"]+"\./g, '');
+			return /(?:TABLE|ON) "billing_wallet(?:_challenge|_chain)?"/.test(query) || /(?:CREATE|DROP) (?:UNIQUE )?INDEX "billing_wallet[^"]*"/.test(query);
+		};
+		assert.deepEqual(diff.upQueries.filter(isWalletDdl), [], 'Entity metadata agrees with wallet migration');
+		await qr.query('ALTER TABLE billing_wallet ADD COLUMN synthetic_drift integer');
+		assert.ok((await db.driver.createSchemaBuilder().log()).upQueries.some(isWalletDdl), 'Wallet DDL drift is still detected');
+		await qr.query('ALTER TABLE billing_wallet DROP COLUMN synthetic_drift');
+		await qr.query('CREATE INDEX billing_wallet_synthetic_drift ON billing_wallet (label)');
+		assert.ok((await db.driver.createSchemaBuilder().log()).upQueries.some(isWalletDdl), 'Wallet index DDL drift is still detected');
+		await qr.query('DROP INDEX billing_wallet_synthetic_drift');
 		let now = 1000;
 		const chainStore = createPostgresWalletChainStore(db, () => now);
 		const chain = { chainId: 123456, name: 'Synthetic chain', nativeCurrencyName: 'Synthetic coin', nativeCurrencySymbol: 'TEST', nativeCurrencyDecimals: 18, blockExplorerUrl: null, isEnabled: true };
@@ -97,7 +108,7 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 		await store.unlink('wallet-bob', 'bob');
 
 		await store.insertChallenge(challenge('rollback'));
-		await qr.query(`CREATE FUNCTION fail_wallet_consumption() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW."usedAt" IS NOT NULL THEN RAISE EXCEPTION 'synthetic rollback'; END IF; RETURN NEW; END $$`);
+		await qr.query('CREATE FUNCTION fail_wallet_consumption() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW."usedAt" IS NOT NULL THEN RAISE EXCEPTION \'synthetic rollback\'; END IF; RETURN NEW; END $$');
 		await qr.query('CREATE TRIGGER fail_consumption BEFORE UPDATE ON "billing_wallet_challenge" FOR EACH ROW EXECUTE FUNCTION fail_wallet_consumption()');
 		await assert.rejects(store.complete(challenge('rollback'), wallet('rollback-wallet'), now), /synthetic rollback/);
 		assert.equal(await store.find(123456, address), null);
@@ -105,7 +116,7 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 		await qr.query('DROP TRIGGER fail_consumption ON "billing_wallet_challenge"');
 		await store.insertChallenge(challenge('expireafterlock'));
 		const lock = db.createQueryRunner(); await lock.startTransaction();
-		await lock.query(`SELECT * FROM "billing_wallet_challenge" WHERE "nonce" = 'expireafterlock' FOR UPDATE`);
+		await lock.query('SELECT * FROM "billing_wallet_challenge" WHERE "nonce" = \'expireafterlock\' FOR UPDATE');
 		const waiting = store.complete(challenge('expireafterlock'), wallet('expired-wallet'), now);
 		now = 601000; await lock.commitTransaction(); await lock.release();
 		assert.equal(await waiting, null);
@@ -122,7 +133,7 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 		assert.equal(linked.id, 'native-linked'); assert.equal((await writer.wallets.list({})).length, 1);
 		await assert.rejects(writer.wallets.verify({ ...proof, signature: '0x1234' }), e => e.code === 'WALLET_CHALLENGE_NOT_FOUND');
 		assert.deepEqual(await writer.wallets.unlink({ walletId: linked.id }), { ok: true });
-		await qr.query(`DELETE FROM "user" WHERE "id" = 'alice'`);
+		await qr.query('DELETE FROM "user" WHERE "id" = \'alice\'');
 		assert.equal(await store.getChallenge('rollback', 'alice'), null);
 		assert.equal((await qr.query('SELECT "updatedByUserId" FROM "billing_wallet_chain"'))[0].updatedByUserId, null);
 	} finally {

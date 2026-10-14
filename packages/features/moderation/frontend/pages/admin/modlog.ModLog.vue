@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					'deleteChatRoom',
 				].includes(log.type)
 			}"
-		>{{ copyLocaleDictionary($locale.sfc.moderationLogTypesLabels)[log.type] }}</b>
+		>{{ log.type === 'billingCatalog' ? $locale.sfc.billingCatalogLabel : copyLocaleDictionary($locale.sfc.moderationLogTypesLabels)[log.type] }}</b>
 		<span v-if="log.type === 'billingCatalog'">: {{ log.info.action }} ({{ log.info.resourceId }})</span>
 		<span v-else-if="log.type === 'updateUserNote'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
 		<span v-else-if="log.type === 'suspend'">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>
@@ -916,8 +916,8 @@ const props = defineProps<{
 
 <locale lang="json" locale="ja-JP">
 {
+	"billingCatalogLabel": "課金カタログの変更",
 	"moderationLogTypesLabels": {
-		"billingCatalog": "課金カタログの変更",
 		"clearQueue": "ジョブキューをクリア",
 		"promoteQueue": "キューのジョブを再試行",
 		"createRole": "ロールを作成",

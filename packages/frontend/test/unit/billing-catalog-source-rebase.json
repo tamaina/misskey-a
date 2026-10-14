@@ -1,0 +1,19 @@
+{
+  "file": "packages/features/moderation/frontend/pages/admin/modlog.ModLog.vue",
+  "baselineSha256": "75993c4492a85141edfca95d542b20f2f73fb617704ea7539b64b7a94d831a2b",
+  "currentSha256": "beb8c856f73d7806480493c69b322a3df5b3a13a9710133471c1ce5aae6d7b66",
+  "edits": [
+    {
+      "start": 1071,
+      "end": 1465,
+      "current": "\t\t>{{ log.type === 'billingCatalog' ? $locale.sfc.billingCatalogLabel : copyLocaleDictionary($locale.sfc.moderationLogTypesLabels)[log.type] }}</b>\n\t\t<span v-if=\"log.type === 'billingCatalog'\">: {{ log.info.action }} ({{ log.info.resourceId }})</span>\n\t\t<span v-else-if=\"log.type === 'updateUserNote'\">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>\n",
+      "baseline": "\t\t>{{ copyLocaleDictionary($locale.sfc.moderationLogTypesLabels)[log.type] }}</b>\n\t\t<span v-if=\"log.type === 'updateUserNote'\">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>\n"
+    },
+    {
+      "start": 44218,
+      "end": 44255,
+      "current": "\t\"billingCatalogLabel\": \"課金カタログの変更\",\n",
+      "baseline": ""
+    }
+  ]
+}
