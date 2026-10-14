@@ -4,24 +4,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { createReceiptSnapshot } from './policy-store.js';
-import type { PurchaseContext } from './policy-store.js';
+import { isDeepStrictEqual } from 'node:util';
+import { ORPCError } from '@orpc/server';
+import { MiRole } from '@features/roles/backend/models/Role.js';
 import { recordCatalogAudit } from './catalog-audit.js';
 import { MiBillingWalletChain } from './models/BillingWalletChain.js';
 import { MiBillingCatalogPrice } from './models/BillingCatalogPrice.js';
 import { MiBillingPricingAsset } from './models/BillingPricingAsset.js';
 import { MiBillingAssetDeployment } from './models/BillingAssetDeployment.js';
 import { offerAvailable, catalog, priceId, validPriceCatalog, immutablePriceMatches } from './service-catalog.js';
-import { isDeepStrictEqual } from 'node:util';
 import { lockBillingState, saveBillingState, quoteServiceTerm, applyFundedTerm } from './billing-state.js';
-import type { PaymentQuote } from '../shared/payment-quote.js';
-import { ORPCError } from '@orpc/server';
 import { MiBillingWallet } from './models/BillingWallet.js';
 import { MiBillingServiceOffer } from './models/BillingServiceOffer.js';
 import { MiBillingTransactionClaim } from './models/BillingTransactionClaim.js';
 import { MiBillingServiceOrder } from './models/BillingServiceOrder.js';
-import { MiRole } from '@features/roles/backend/models/Role.js';
+import { createReceiptSnapshot } from './policy-store.js';
 import { matchesOrder } from './service-receipt.js';
+import type { PaymentQuote } from '../shared/payment-quote.js';
+import type { PurchaseContext } from './policy-store.js';
 import type { ServiceOffer } from './api.definition.js';
 import type { ReceiptResult } from './service-receipt.js';
 import type { DataSource, EntityManager } from 'typeorm';
@@ -87,7 +87,7 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 		},
 		async saveOffer(terms: ServiceOffer, actorId: string) {
 			await db.transaction(async manager => {
-				await manager.query("SELECT pg_advisory_xact_lock(hashtextextended('billing-price-catalog', 0))");
+				await manager.query('SELECT pg_advisory_xact_lock(hashtextextended(\'billing-price-catalog\', 0))');
 				terms = await managedOffer(manager, terms, false);
 				const rows = await manager.find(MiBillingServiceOffer);
 				const previous = rows.find(row => row.id === terms.id);
@@ -177,11 +177,11 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				return row;
 			});
 		},
-		async applyReceipt(userId: string, orderId: string, txHash: string, result: ReceiptResult) {
+		async applyReceipt(userId: string, orderId: string, txHash: string, result: ReceiptResult, actorId?: string) {
 			try {
 				return await db.transaction(async manager => {
 					const state = await lockBillingState(manager, userId);
-				const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
+					const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
 					if (!row) throw new ORPCError('BILLING_NOT_FOUND');
 					if (row.txHash !== txHash) conflict();
 					if (row.status !== 'pending' || result.status === 'pending') return row;
@@ -203,6 +203,7 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 					applyFundedTerm(state, row, quote, () => id(now()));
 					await saveBillingState(manager, userId, state);
 					await manager.update(MiBillingServiceOrder, row.id, { status: row.status, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
+					if (actorId) await recordCatalogAudit(manager, actorId, id(now()), 'confirmServiceOrder', row.id, { status: 'pending' }, { status: 'paid', chainId: row.chainId, txHash: row.txHash, userId: row.userId });
 					return row;
 				});
 			} catch (error) { if (duplicateClaim(error)) conflict(); throw error; }

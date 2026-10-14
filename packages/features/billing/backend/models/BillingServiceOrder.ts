@@ -14,6 +14,8 @@ const integer = { type: 'bigint' as const, transformer: { to: (value: number | n
 @Entity('billing_service_order')
 @Index('billing_service_order_request_key', ['userId', 'requestKey'], { unique: true })
 @Index('billing_service_order_transaction_key', ['chainId', 'txHash'], { unique: true, where: '"status" = \'paid\'' })
+@Index('billing_service_order_status_paid_at', ['status', 'paidAt'])
+@Index('billing_service_order_user_id', ['userId', 'id'])
 @Check('billing_service_order_status_check', '"status" IN (\'pending\',\'paid\',\'expired\',\'failed\')')
 @Check('billing_service_order_period_check', '("status" = \'paid\' AND ("txHash" IS NOT NULL OR "cashAmountBaseUnits" = \'0\') AND "paidAt" IS NOT NULL AND "startsAt" IS NOT NULL AND "endsAt" IS NOT NULL AND "endsAt" > "startsAt") OR ("status" <> \'paid\' AND "paidAt" IS NULL AND "startsAt" IS NULL AND "endsAt" IS NULL)')
 export class MiBillingServiceOrder {

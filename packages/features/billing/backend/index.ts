@@ -50,3 +50,7 @@ export { MiBillingResidencyStatement } from './models/BillingResidencyStatement.
 
 export { createPurchaseNotifier, purchaseReceiptLines } from './purchase-notification.js';
 export { MiBillingNotification } from './models/BillingNotification.js';
+
+export { createBillingReportsStore } from './reports-store.js';
+export { createBillingReportsRouter } from './reports.implementation.js';
+export { billingReportsContract } from './reports.contract.js';

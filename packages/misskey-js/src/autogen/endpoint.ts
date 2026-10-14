@@ -73,6 +73,14 @@ import type {
 	AdminBillingPolicyUpsertResponse,
 	BillingPurchaseRequirementsRequest,
 	BillingPurchaseRequirementsResponse,
+	BillingOrdersHistoryRequest,
+	BillingOrdersHistoryResponse,
+	AdminBillingOrdersListRequest,
+	AdminBillingOrdersListResponse,
+	AdminBillingOrdersCheckRequest,
+	AdminBillingOrdersCheckResponse,
+	AdminBillingSalesSummaryRequest,
+	AdminBillingSalesSummaryResponse,
 	AdminWalletsChainsListRequest,
 	AdminWalletsChainsListResponse,
 	AdminWalletsChainsUpsertRequest,
@@ -874,6 +882,10 @@ export type Endpoints = {
 	'admin/billing/policy/get': { req: AdminBillingPolicyGetRequest; res: AdminBillingPolicyGetResponse };
 	'admin/billing/policy/upsert': { req: AdminBillingPolicyUpsertRequest; res: AdminBillingPolicyUpsertResponse };
 	'billing/purchase-requirements': { req: BillingPurchaseRequirementsRequest; res: BillingPurchaseRequirementsResponse };
+	'billing/orders/history': { req: BillingOrdersHistoryRequest; res: BillingOrdersHistoryResponse };
+	'admin/billing/orders/list': { req: AdminBillingOrdersListRequest; res: AdminBillingOrdersListResponse };
+	'admin/billing/orders/check': { req: AdminBillingOrdersCheckRequest; res: AdminBillingOrdersCheckResponse };
+	'admin/billing/sales/summary': { req: AdminBillingSalesSummaryRequest; res: AdminBillingSalesSummaryResponse };
 	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
 	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };

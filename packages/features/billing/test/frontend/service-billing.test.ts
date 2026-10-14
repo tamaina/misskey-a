@@ -137,3 +137,39 @@ test('consent is required, original consent is retained on retry, and reload fai
 		submit(form); await flush(); expect(client.createOrder.mock.calls).toHaveLength(2);
 	} finally { view.dispose(); }
 });
+
+test('owner history pages remain available when new-purchase region preflight fails', async () => {
+	const getHistory = vi.fn(async (_input: unknown) => ({ items: [], nextCursor: 'older-orders' as string | null }));
+	getHistory.mockResolvedValueOnce({ items: [], nextCursor: 'older-orders' }).mockResolvedValueOnce({ items: [], nextCursor: null });
+	const client = { listCatalog: vi.fn(async () => []), listOrders: vi.fn(async () => []) };
+	const view = await mount(ServiceSubscriptions, { client, getHistory, listWallets: async () => [], getRequirements: async () => { throw new Error('Region unavailable'); } });
+	try {
+		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush(); expect(client.listOrders).not.toHaveBeenCalled();
+		expect(view.element.textContent).toContain('地域条件を確認できません');
+		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === '支払い履歴の次のページ')!.click(); await flush();
+		expect(getHistory).toHaveBeenLastCalledWith({ cursor: 'older-orders', limit: 20 });
+	} finally { view.dispose(); }
+});
+
+test('native purchase reviews prorated quote before creating and submits the exact reviewed quote', async () => {
+	const selected = { ...offer, amountBaseUnits: '14', durationUnit: 'days' as const, planGroup: 'source-group', sortOrder: 2 };
+	const result = { revision: 4, quote: { quoteCreatedAt: 1000, quoteExpiresAt: 901000, baseAmountBaseUnits: '14', discountBaseUnits: '7', payableAmountBaseUnits: '7', discountAssignmentIds: ['old'], effectiveStartsAt: 1000, effectiveExpiresAt: 86401000, currentPlan: { id: 'old-plan', name: 'Old tier', sortOrder: 1, expiresAt: 43201000, priceAmountBaseUnits: '14', priceDurationDays: 1, priceDurationUnit: 'days' } } };
+	const client = { listCatalog: vi.fn(async () => [{ offer: selected, priceHistory: [], priceDisplayWindow: { previousPeriod: null, currentPeriod: null, nextPeriod: null }, dealDisplay: { canShowDeal: false } }]), listOrders: vi.fn(async () => []), quoteOrder: vi.fn(async () => result), createOrder: vi.fn(async (_input: unknown) => ({})) };
+	client.createOrder.mockRejectedValueOnce({ code: 'BILLING_CONFLICT', message: 'Expired quote' });
+	const view = await mount(ServiceSubscriptions, { client, requireQuotePreview: true, listWallets: async () => [{ id: 'wallet', chainId: offer.chainId, address: 'synthetic', label: null, createdAt: 0, updatedAt: 0 }] });
+	try {
+		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
+		for (const select of view.element.querySelectorAll('div[tabindex="0"]')) {
+			select.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true })); const call = vi.mocked(os.popupMenu).mock.calls.at(-1)!; const option = call[0][0];
+			if (!option || !('action' in option) || typeof option.action !== 'function') throw new Error('Expected option');
+			option.action(new PointerEvent('click')); call[2]?.onClosing?.(); await flush();
+		}
+		const form = view.element.querySelector('form')!; submit(form); await flush(); expect(client.createOrder).not.toHaveBeenCalled();
+		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === '日割りと利用期間の見積を確認')!.click(); await flush();
+		expect(view.element.textContent).toContain('今回の支払額: 0.000007 TEST'); expect(view.element.textContent).toContain('Old tier'); expect(view.element.textContent).toContain('元の価格で按分');
+		submit(form); await flush(); expect(client.quoteOrder).toHaveBeenCalledTimes(1); expect(client.createOrder.mock.calls[0][0]).toMatchObject({ quotedQuote: result });
+		expect(view.element.textContent).not.toContain('今回の支払額:');
+		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === '日割りと利用期間の見積を確認')!.click(); await flush(); expect(client.quoteOrder).toHaveBeenCalledTimes(2);
+		submit(form); await flush(); expect(client.createOrder.mock.calls[1][0]).toMatchObject({ quotedQuote: result }); expect(client.createOrder.mock.calls[1][0]).not.toMatchObject({ requestKey: (client.createOrder.mock.calls[0][0] as { requestKey: string }).requestKey });
+	} finally { view.dispose(); }
+});

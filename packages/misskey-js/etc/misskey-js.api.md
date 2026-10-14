@@ -296,6 +296,18 @@ type AdminBillingOffersUpsertRequest = ContractRequest<'admin/billing/offers/ups
 type AdminBillingOffersUpsertResponse = ContractResponse<'admin/billing/offers/upsert'>;
 
 // @public (undocumented)
+type AdminBillingOrdersCheckRequest = ContractRequest<'admin/billing/orders/check'>;
+
+// @public (undocumented)
+type AdminBillingOrdersCheckResponse = ContractResponse<'admin/billing/orders/check'>;
+
+// @public (undocumented)
+type AdminBillingOrdersListRequest = ContractRequest<'admin/billing/orders/list'>;
+
+// @public (undocumented)
+type AdminBillingOrdersListResponse = ContractResponse<'admin/billing/orders/list'>;
+
+// @public (undocumented)
 type AdminBillingPolicyGetRequest = ContractRequest<'admin/billing/policy/get'>;
 
 // @public (undocumented)
@@ -360,6 +372,12 @@ type AdminBillingRefundsSubmitRequest = ContractRequest<'admin/billing/refunds/s
 
 // @public (undocumented)
 type AdminBillingRefundsSubmitResponse = ContractResponse<'admin/billing/refunds/submit'>;
+
+// @public (undocumented)
+type AdminBillingSalesSummaryRequest = ContractRequest<'admin/billing/sales/summary'>;
+
+// @public (undocumented)
+type AdminBillingSalesSummaryResponse = ContractResponse<'admin/billing/sales/summary'>;
 
 // @public (undocumented)
 type AdminCaptchaCurrentRequest = ContractRequest<'admin/captcha/current'>;
@@ -908,6 +926,12 @@ type BillingOrdersCreateRequest = ContractRequest<'billing/orders/create'>;
 
 // @public (undocumented)
 type BillingOrdersCreateResponse = ContractResponse<'billing/orders/create'>;
+
+// @public (undocumented)
+type BillingOrdersHistoryRequest = ContractRequest<'billing/orders/history'>;
+
+// @public (undocumented)
+type BillingOrdersHistoryResponse = ContractResponse<'billing/orders/history'>;
 
 // @public (undocumented)
 type BillingOrdersListRequest = ContractRequest<'billing/orders/list'>;
@@ -2016,6 +2040,14 @@ declare namespace entities {
         AdminBillingPolicyUpsertResponse,
         BillingPurchaseRequirementsRequest,
         BillingPurchaseRequirementsResponse,
+        BillingOrdersHistoryRequest,
+        BillingOrdersHistoryResponse,
+        AdminBillingOrdersListRequest,
+        AdminBillingOrdersListResponse,
+        AdminBillingOrdersCheckRequest,
+        AdminBillingOrdersCheckResponse,
+        AdminBillingSalesSummaryRequest,
+        AdminBillingSalesSummaryResponse,
         AdminWalletsChainsListRequest,
         AdminWalletsChainsListResponse,
         AdminWalletsChainsUpsertRequest,

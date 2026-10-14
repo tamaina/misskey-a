@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { billingReportsContract } from '../../billing/backend/reports.contract.js';
 import { billingPolicyContract } from '../../billing/backend/policy.contract.js';
 import { catalogAdminContract } from '../../billing/backend/catalog.contract.js';
 import { refundContract } from '../../billing/backend/refund.contract.js';
@@ -39,7 +40,7 @@ import { rolesContract } from '../../roles/backend/api.definition.js';
 import { clearBrowserCacheContract, clearBrowserCacheGetContract } from '../../api/backend/endpoints/clear-browser-cache.contract.js';
 
 export const pilotContract: {
-	serviceBilling: typeof serviceBillingContract & typeof refundContract & typeof catalogAdminContract & typeof billingPolicyContract;
+	serviceBilling: typeof serviceBillingContract & typeof refundContract & typeof catalogAdminContract & typeof billingPolicyContract & typeof billingReportsContract;
 	wallets: typeof walletContract;
 	clearBrowserCache: typeof clearBrowserCacheContract;
 	clearBrowserCacheGet: typeof clearBrowserCacheGetContract;
@@ -73,7 +74,7 @@ export const pilotContract: {
 	collections: typeof collectionsContract;
 	drive: typeof drivePilotContract;
 } = {
-	serviceBilling: { ...serviceBillingContract, ...refundContract, ...catalogAdminContract, ...billingPolicyContract },
+	serviceBilling: { ...serviceBillingContract, ...refundContract, ...catalogAdminContract, ...billingPolicyContract, ...billingReportsContract },
 	wallets: walletContract,
 	clearBrowserCache: clearBrowserCacheContract,
 	clearBrowserCacheGet: clearBrowserCacheGetContract,

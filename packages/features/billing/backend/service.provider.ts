@@ -12,6 +12,8 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
+import { createBillingReportsStore } from './reports-store.js';
+import { createBillingReportsRouter } from './reports.implementation.js';
 import { createBillingPolicyStore } from './policy-store.js';
 import { createBillingPolicyRouter } from './policy.implementation.js';
 import { createCatalogAdminStore } from './catalog-store.js';
@@ -39,7 +41,8 @@ export class ServiceBillingApiProvider {
 		const chains = createPostgresWalletChainStore(db);
 		const readReceipt = createServiceReceiptReader(this.moduleRef.get(HttpRequestService, { strict: false }), chains.rpcUrl);
 		const catalogRpc = createCatalogRpcReader(chains.rpcUrl, createWalletRpcFetch(this.moduleRef.get(HttpRequestService, { strict: false })));
-		return { ...createBillingPolicyRouter<MiLocalUser>(createBillingPolicyStore(db, () => id.gen())), ...createCatalogAdminRouter<MiLocalUser>(createCatalogAdminStore(db, Date.now, () => id.gen()), catalogRpc, chains.rpcUrl), ...createServiceBillingRouter<MiLocalUser>({ store: createServiceBillingStore(db, now => id.gen(now)), notifyPurchase, rpcUrl: chains.rpcUrl, readReceipt }),
+		const billingDeps = { store: createServiceBillingStore(db, now => id.gen(now)), notifyPurchase, rpcUrl: chains.rpcUrl, readReceipt };
+		return { ...createBillingReportsRouter<MiLocalUser>(createBillingReportsStore(db), billingDeps), ...createBillingPolicyRouter<MiLocalUser>(createBillingPolicyStore(db, () => id.gen())), ...createCatalogAdminRouter<MiLocalUser>(createCatalogAdminStore(db, Date.now, () => id.gen()), catalogRpc, chains.rpcUrl), ...createServiceBillingRouter<MiLocalUser>(billingDeps),
 											...createRefundRouter<MiLocalUser>(createRefundStore(db, () => id.gen(), readReceipt)) };
 	}
 }
