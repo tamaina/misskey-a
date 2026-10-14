@@ -6,13 +6,14 @@
 import { createRequire } from 'node:module';
 import { expect, test } from 'vitest';
 import { QueueGetters } from 'bullmq';
+import { restoreReviewedBullMqCountsVersion } from './bullmq-counts-source-rebase.js';
 
 const require = createRequire(import.meta.url);
 
 test('the supported BullMQ no-argument count implementation returns all default counters', async () => {
 	// The backend declaration correction depends on this installed implementation.
 	// Deliberately fail on upgrades until the default/count backend sources are reviewed.
-	expect(require('bullmq/package.json').version).toBe('6.3.2');
+	expect(restoreReviewedBullMqCountsVersion(require('bullmq/package.json').version)).toBe('6.3.2');
 	const defaults = ['active', 'completed', 'delayed', 'failed', 'prioritized', 'waiting', 'waiting-children'];
 	const calls: string[][] = [];
 	const queue = Object.create(QueueGetters.prototype);

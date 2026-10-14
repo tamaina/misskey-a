@@ -183,6 +183,48 @@ describe('native conditional request ownership', () => {
 		expect(result).toEqual({ id: 'synthetic', rawId: 'AAEC', type: 'public-key', authenticatorAttachment: 'platform',
 			response: { clientDataJSON: 'AAEC', authenticatorData: 'AAEC', signature: 'AAEC', userHandle: 'AAEC' }, clientExtensionResults: {} });
 	});
+	test.each(['ArrayBuffer', 'SharedArrayBuffer'] as const)('copies offset PRF views backed by %s into independent DOM buffers', async backing => {
+		const storage = backing === 'SharedArrayBuffer' ? new SharedArrayBuffer(12) : new ArrayBuffer(12);
+		const bytes = new Uint8Array(storage);
+		bytes.set([90, 91, 1, 2, 3, 92, 4, 5, 93, 6, 7, 94]);
+		const first = new Uint8Array(storage, 2, 3);
+		const second = new DataView(storage, 6, 2);
+		const perCredential = new Uint8Array(storage, 9, 2);
+		const raw = Uint8Array.of(0, 1, 2).buffer;
+		const get = vi.fn(async (_options: CredentialRequestOptions) => ({ id: 'synthetic', rawId: raw, type: 'public-key',
+			response: { clientDataJSON: raw, authenticatorData: raw, signature: raw, userHandle: null }, getClientExtensionResults: () => ({}) }));
+		vi.stubGlobal('navigator', { credentials: { get } });
+		const own = new AbortController();
+		const request: PublicKeyCredentialRequestOptionsJSON = {
+			...option,
+			timeout: 60000,
+			allowCredentials: [{ id: 'ignored', type: 'public-key' }],
+			extensions: { appid: 'https://synthetic.example/app-id', credProps: true,
+				prf: { eval: { first, second }, evalByCredential: { synthetic: { first: perCredential } } } },
+		};
+		await getConditionalCredential(request, own.signal);
+		const passed = get.mock.calls[0][0];
+		expect(passed.signal).toBe(own.signal);
+		expect(passed.mediation).toBe('conditional');
+		expect(passed.publicKey).toMatchObject({ rpId: option.rpId, userVerification: option.userVerification, timeout: 60000, allowCredentials: [] });
+		expect(passed.publicKey!.extensions).toMatchObject({ appid: request.extensions!.appid, credProps: true });
+		const evalValues = passed.publicKey!.extensions!.prf!.eval!;
+		const credentialValues = passed.publicKey!.extensions!.prf!.evalByCredential!.synthetic;
+		expect(evalValues.first).toBeInstanceOf(ArrayBuffer);
+		expect(evalValues.second).toBeInstanceOf(ArrayBuffer);
+		expect(credentialValues.first).toBeInstanceOf(ArrayBuffer);
+		expect(evalValues.first).not.toBe(storage);
+		expect(evalValues.first).toEqual(Uint8Array.of(1, 2, 3).buffer);
+		expect(evalValues.second!).toEqual(Uint8Array.of(4, 5).buffer);
+		expect(credentialValues.first).toEqual(Uint8Array.of(6, 7).buffer);
+		expect(credentialValues).not.toHaveProperty('second');
+		bytes.fill(0);
+		expect(evalValues.first).toEqual(Uint8Array.of(1, 2, 3).buffer);
+		expect(evalValues.second!).toEqual(Uint8Array.of(4, 5).buffer);
+		expect(credentialValues.first).toEqual(Uint8Array.of(6, 7).buffer);
+		expect(request.extensions!.prf!.eval!.first).toBe(first);
+		expect(request.allowCredentials).toEqual([{ id: 'ignored', type: 'public-key' }]);
+	});
 	test('dismissed credential chooser returns to fallback', async () => {
 		vi.stubGlobal('navigator', { credentials: { get: async () => null } });
 		await expect(getConditionalCredential(option, new AbortController().signal)).rejects.toThrow('No public-key credential');
