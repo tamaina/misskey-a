@@ -624,7 +624,7 @@ const isDeleted = ref(false);
 	"cwShow": "عرض المزيد",
 	"private": "خاص",
 	"showMore": "عرض المزيد",
-	"showLess": "اغلق",
+	"showLess": "عرض اقل",
 	"more": "المزيد!"
 }
 </locale>

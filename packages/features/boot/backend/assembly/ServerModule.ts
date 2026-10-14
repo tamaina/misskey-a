@@ -32,6 +32,7 @@ import { MainChannel } from '@features/api/backend/transport/stream/channels/mai
 import { AdminChannel } from '@features/operations/backend/stream/admin.js';
 import { AntennaChannel } from '@features/timelines/backend/stream/antenna.js';
 import { ChannelChannel } from '@features/channels/backend/stream/channel.js';
+import { ClipChannel } from '@features/collections/backend/stream/clip.js';
 import { DriveChannel } from '@features/drive/backend/stream/drive.js';
 import { GlobalTimelineChannel } from '@features/timelines/backend/stream/global-timeline.js';
 import { HashtagChannel } from '@features/discovery/backend/stream/hashtag.js';
@@ -85,6 +86,7 @@ import { CoreModule } from './CoreModule.js';
 		AdminChannel,
 		AntennaChannel,
 		ChannelChannel,
+		ClipChannel,
 		DriveChannel,
 		GlobalTimelineChannel,
 		HashtagChannel,

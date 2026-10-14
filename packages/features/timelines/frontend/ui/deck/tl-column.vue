@@ -409,7 +409,7 @@ const menu = computed<MenuItem[]>(() => {
 	"showRenotes": "Includi le Rinota",
 	"showRepliesToOthersInTimeline": "Risposte altrui nella TL",
 	"fileAttachedOnly": "Solo con allegati",
-	"withSensitive": "Mostra le Note con allegati espliciti"
+	"withSensitive": "Includi con allegati espliciti"
 }
 </locale>
 
