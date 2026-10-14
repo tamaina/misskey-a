@@ -70,9 +70,10 @@ This does not enable independent passkey MFA or change recovery-code storage.
 `user_profile.passkeyMfaEnabled` is an internal policy with default `false`.
 Registered keys, passwordless convenience settings and recovery-code availability
 never activate it. This slice has no true writer, activation API or UI. Rollback
-refuses to discard an enabled policy. Login and sensitive-operation enforcement,
-fresh session/purpose-bound password + strict-UV reauthentication, and policy
-stamps in authentication progress must be connected before activation is exposed.
+refuses to discard an enabled policy. Both login entry points now enforce it as
+described below. Sensitive-operation enforcement, the remaining fresh
+session/purpose-bound flows and authentication-progress policy binding must still
+be completed before activation is exposed.
 
 Key removal, legacy TOTP removal and admin recovery serialize on the owner profile
 row. Existing password/TOTP proofs run before locking so recovery consumption does
@@ -112,9 +113,10 @@ The verifier is registered in DI and connected to the dedicated password-change
 start/complete API and security-settings button. Activation and recovery-code
 display purposes still have no runtime caller, and this flow never changes MFA
 policy. It is independent of the unmerged login-progress connection in #143.
-Activation remains blocked until both sign-in paths, password/email/token/account
-deletion, factor management/key display and every factor writer share the final
-enforcement and locking protocol.
+Both existing sign-in paths now use the current-policy issuance protocol below.
+Activation remains blocked until email/token/account deletion, recovery and
+credential issuance, factor management/key display and every remaining writer
+share the final enforcement and locking protocol.
 
 Legacy uncompressed P-256 keys are normalized to COSE, as in the existing named
 WebAuthn flow. Their representation update shares the counter compare-and-update;
@@ -125,7 +127,6 @@ Remaining runtime connections before activation:
 
 | Surface | Required connection |
 | --- | --- |
-| `signinFlow.ts`, `signinWithPasskey.ts` | Read the same explicit policy, require its factors, bind progress to current policy and issue a session only after final verification. |
 | `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Apply current independent MFA policy and operation-specific fresh verification before the sensitive mutation; password change is now connected separately. |
 | `i/2fa/*`, admin `unset-mfa` | Join all enrolment/policy writers to the profile lock; require exact operation/target bindings and recheck live session/policy inside the mutation transaction. |
 | User self serializer `securityKeysList` and factor display | Represent independent policy consistently and gate sensitive key/recovery display through its dedicated fresh purpose. |
@@ -141,17 +142,17 @@ acceptance. There is still no true writer or user-facing activation state.
 
 | Existing path | Current coverage | Still required before activation |
 | --- | --- | --- |
-| Password-first `signinFlow`, passkey `signinWithPasskey`, `SigninService` | Existing password/TOTP and strict-UV authentication, individual browser-session issuance | Explicit independent policy at both entry points and final issuance; fresh current-policy checks and recovery fallback; #143 remains a separate unmerged login-progress Draft. |
-| `TotpService` recovery codes | Atomic one-use consume bound to password/TOTP/independent policy | Expose recovery for independent MFA only through the completed policy flow; never infer remaining factors from backup stock. |
+| Password-first `signinFlow`, passkey `signinWithPasskey`, `SigninService` | Explicit policy at both entry points; password plus an enabled factor for independent MFA; atomic recovery; server-owned proof and current user/policy/key/deadline checks under user/profile locks with transactional session issuance | Real-device acceptance; #143 remains a separate unmerged login-progress Draft and is not incorporated into this flow. |
+| `TotpService` recovery codes | Atomic one-use consume bound to password/TOTP/independent policy; the named login flow uses it only when policy requires MFA | Finish fresh-gated presentation and recovery management; never infer remaining factors from backup stock. |
 | `request-reset-password`, `reset-password`, admin `reset-password`, `verify-email` | Existing email/admin authorization and reset behavior | Serialize relevant credential changes and preserve independent MFA on reset; define recovery policy and invalidate stale reauthentication/session state. |
 | `i/2fa/register`, `done`, `register-key`, `key-done` | Legacy independent-policy refusal; profile-locked DB setup/completion with proof snapshot checks; TOTP pending setup is consumed | Exact session/purpose/target-bound fresh flows and independent enrolment/activation, recovery-code presentation acknowledgement. |
 | `i/2fa/remove-key`, `unregister`, `password-less`, `update-key`, admin `unset-mfa` | Common profile lock and owned mutation; active independent policy is refused on legacy user routes; reset clears pending setup | Fresh per-operation flows, preserve last-factor invariant and recovery semantics for the final independent policy. |
-| Both existing WebAuthn verifiers and fresh verifier | Strict UV; fresh verifier has challenge ownership, deadline, counter CAS and legacy key normalization | Align counter updates and policy/session binding in all runtime callers. |
+| WebAuthn login proof methods and fresh verifier | Strict UV, atomically consumed challenge, bounded deadline, owned key material, counter CAS and legacy key normalization | Keep future callers on the proof-bearing path; compatibility boolean/user-ID methods do not authorize session issuance. |
 | `i/change-password` and its passkey start/complete routes | Dedicated UI → fresh password/strict UV → profile/session-locked password write; legacy route refuses active independent policy and rechecks its snapshot | Real-device acceptance and independent-policy display before activation. |
 | `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Existing password/TOTP authorization; token regeneration revokes individual sessions | Independent policy enforcement and transaction-bound current proof/session checks before mutation. |
 | `auth/accept`, OAuth consent, MiAuth token issuance, `auth/session/userkey` | Existing scope/session/owner checks | Audit credential issuance against active policy and fresh assurance; never elevate delegated/shared tokens into fresh auth. |
 | User self/moderator security fields and `securityKeysList` | Existing TOTP-based serialization | Consistent independent policy display; dedicated fresh-gated sensitive key/recovery display. |
-| Browser-session verify/revoke/signout, HTTP/stream/native MCP | Existing durable session revocation checks | Bind final proof/mutation to a live individual session without expanding old token privileges. |
+| Browser-session verify/revoke/signout, HTTP/stream/native MCP | Durable revocation checks; login proof rechecked under account/profile locks; same-transaction session insert; separate guarded new-account issuer | Complete sensitive-operation binding to live individual sessions without expanding old token privileges. |
 
 Automated tests use synthetic users, external-proof mocks and signed synthetic
 WebAuthn assertions. Physical authenticators, browsers on real devices,
@@ -183,3 +184,34 @@ active independent policy and checking its authenticated snapshot under the lock
 cancellation, failure, expiry and revocation. Automated coverage includes the real
 settings component plus HTTP with real disposable PostgreSQL/Redis and synthetic
 signed WebAuthn assertions. Physical authenticator/browser results remain pending.
+
+
+### Login sessions: current-policy issuance
+
+Both existing login entry points read the explicit policy. The named flow checks
+password first and offers only enabled TOTP/passkey factors and actual recovery
+stock. Independent passkey MFA never permits the convenience passwordless setting
+to omit password. TOTP remains an alternative when it is enabled; recovery codes
+are consumed atomically and are never treated as remaining factors.
+
+A passkey-only login for independent MFA returns `passwordFlowRequired` after
+strict UV, then returns both manual and conditional UI to the named password flow.
+It carries no proof into that flow. Existing false-policy passwordless behavior
+remains available only with its explicit convenience flag and an owned strict-UV
+key. Both UI surfaces discard native/API results from an earlier activation.
+
+Login WebAuthn proof methods atomically claim challenge plus remaining TTL before
+verification, require a deadline within 90 seconds, and compare the exact stored
+key row when advancing its counter. The server-only, one-use issuance proof binds
+the policy and native-token snapshot from before password/factor verification.
+`SigninService` locks user then profile, rechecks current local active state,
+password/policy/key material and deadline, inserts through the transaction's
+session repository, and checks deadline again. Login notifications, history and
+email are scheduled only after commit. Signup uses a separate guarded creation
+result path; the test-only remote actor factory returns no login credential.
+
+Run real HTTP, signed synthetic WebAuthn, race/rollback and recovery tests with
+`MISSKEY_AUTH_SIGNIN_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs`.
+The runner owns and stops disposable Unix-socket PostgreSQL and network-none Redis.
+This connection does not expose activation, sudo, SSO or relaxed UV. Physical
+browser/authenticator and cross-device acceptance remains pending.
