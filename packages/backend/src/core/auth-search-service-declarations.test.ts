@@ -172,7 +172,15 @@ describe('auth and search declaration boundaries', () => {
 	test('WebAuthn registration options preserve relying party, policy and ninety-second challenge TTL', async () => {
 		const inputs = securityInputs();
 		inputs.userSecurityKeysRepository.findBy.mockResolvedValue([storedKey()]);
-		const options = mockDeep<PublicKeyCredentialCreationOptionsJSON>({ challenge: 'registration-challenge' });
+		const options: PublicKeyCredentialCreationOptionsJSON = {
+			challenge: 'registration-challenge',
+			rp: { name: 'Example', id: 'example.test' },
+			user: { id: 'dXNlcg', name: 'name', displayName: 'Display' },
+			pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+			timeout: 60000, attestation: 'none',
+			excludeCredentials: [{ id: 'credential-id', type: 'public-key', transports: ['internal'] }],
+			authenticatorSelection: { residentKey: 'required', requireResidentKey: true, userVerification: 'required' },
+		};
 		vi.mocked(generateRegistrationOptions).mockResolvedValue(options);
 		const service = authSecurityServices.create(inputs).WebAuthnService;
 		expect(await service.initiateRegistration('user', 'name', 'Display')).toBe(options);
@@ -195,7 +203,10 @@ describe('auth and search declaration boundaries', () => {
 	test('WebAuthn authentication and passkey challenges retain TTL and scoped credential options', async () => {
 		const inputs = securityInputs();
 		inputs.userSecurityKeysRepository.findBy.mockResolvedValue([storedKey()]);
-		const options = mockDeep<PublicKeyCredentialRequestOptionsJSON>({ challenge: 'authentication-challenge' });
+		const options: PublicKeyCredentialRequestOptionsJSON = {
+			challenge: 'authentication-challenge', rpId: 'example.test', timeout: 60000,
+			userVerification: 'required', allowCredentials: [],
+		};
 		vi.mocked(generateAuthenticationOptions).mockResolvedValue(options);
 		const service = authSecurityServices.create(inputs).WebAuthnService;
 		await service.initiateAuthentication('user');

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { Brackets } from 'typeorm';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
 import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
@@ -21,8 +22,15 @@ export function createAnnouncementAdminListProcedure<Actor extends ApiActor>(dep
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input }) => {
 			const query = deps.queryService.makePaginationQuery(deps.announcementsRepository.createQueryBuilder('announcement'), input.sinceId, input.untilId, input.sinceDate, input.untilDate);
-			if (input.status === 'archived') query.andWhere('announcement.isActive = false');
-			else if (input.status === 'active') query.andWhere('announcement.isActive = true');
+			const now = new Date();
+			if (input.status === 'archived') query.andWhere(new Brackets(qb => {
+				qb.where('announcement.isActive = false');
+				qb.orWhere('announcement.autoArchiveAt <= :now', { now });
+			}));
+			else if (input.status === 'active') {
+				query.andWhere('announcement.isActive = true');
+				query.andWhere(new Brackets(qb => { qb.where('announcement.autoArchiveAt IS NULL'); qb.orWhere('announcement.autoArchiveAt > :now', { now }); }));
+			}
 			if (input.userId) query.andWhere('announcement.userId = :userId', { userId: input.userId });
 			else query.andWhere('announcement.userId IS NULL');
 			const rows = await query.limit(input.limit).getMany();
@@ -30,7 +38,7 @@ export function createAnnouncementAdminListProcedure<Actor extends ApiActor>(dep
 			for (const row of rows) result.push({
 				id: row.id, createdAt: deps.idService.parse(row.id).date.toISOString(), updatedAt: row.updatedAt?.toISOString() ?? null,
 				title: row.title, text: row.text, imageUrl: row.imageUrl, icon: row.icon, display: row.display,
-				isActive: row.isActive, forExistingUsers: row.forExistingUsers, silence: row.silence,
+				isActive: row.isActive && (row.autoArchiveAt == null || row.autoArchiveAt > now), autoArchiveAt: row.autoArchiveAt?.toISOString() ?? null, forExistingUsers: row.forExistingUsers, silence: row.silence,
 				needConfirmationToRead: row.needConfirmationToRead, userId: row.userId,
 				reads: await deps.announcementReadsRepository.countBy({ announcementId: row.id }),
 			});
