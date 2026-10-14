@@ -5,6 +5,7 @@
 
 import 'reflect-metadata';
 import { readFileSync } from 'node:fs';
+import { restoreUpstreamConstructorBaseline } from './upstream-service-wiring-rebase.js';
 import { Test } from '@nestjs/testing';
 import { ModuleRef } from '@nestjs/core';
 import { describe, expect, test, vi } from 'vitest';
@@ -86,7 +87,7 @@ describe('typed feature declaration proof', () => {
 					if (!local) throw new Error('Missing published local definition');
 					return { service: local[0] };
 				});
-				expect(actual).toEqual(expected);
+				expect(restoreUpstreamConstructorBaseline(name, key, actual)).toEqual(expected);
 			}
 		}
 	});

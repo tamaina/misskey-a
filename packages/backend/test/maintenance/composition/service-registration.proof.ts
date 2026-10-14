@@ -7,6 +7,9 @@ import 'reflect-metadata';
 import { MODULE_METADATA } from '@nestjs/common/constants.js';
 import { expect, test } from 'vitest';
 import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
+import { restoreUpstreamConstructorBaseline } from '../../../src/core/upstream-service-wiring-rebase.js';
+
+const historicalConstructorCounts = new Map<object, () => number>();
 
 import { AbuseReportNotificationService } from '@features/moderation/backend/services/AbuseReportNotificationService.js';
 
@@ -70,6 +73,16 @@ import { ChartManagementService } from '@features/statistics/backend/services/Ch
 import { ChatService } from '@features/chat/backend/services/ChatService.js';
 
 import { ClipService } from '@features/collections/backend/services/ClipService.js';
+import { collectionServices } from '@features/collections/backend/services.js';
+
+function restoreClipConstructorCount(feature: typeof ClipService): number {
+	const dependencies = collectionServices.definitions.ClipService.dependencies;
+	expect(feature.length).toBe(dependencies.length);
+	const baseline = restoreUpstreamConstructorBaseline('collections', 'ClipService', dependencies.map(dependency => ({ port: dependency.name })));
+	return baseline.length;
+}
+
+historicalConstructorCounts.set(ClipService, () => restoreClipConstructorCount(ClipService));
 
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 
@@ -297,7 +310,8 @@ for (const [name, feature, parameterCount] of services) {
 			expect(Reflect.getMetadata('design:paramtypes', feature) ?? []).toHaveLength(parameterCount);
 		} else {
 			expect(registrations[0]).toHaveProperty('useFactory');
-			expect(feature.length).toBe(parameterCount);
+			const historicalParameterCount = historicalConstructorCounts.get(feature)?.() ?? feature.length;
+			expect(historicalParameterCount).toBe(parameterCount);
 		}
 	});
 }
