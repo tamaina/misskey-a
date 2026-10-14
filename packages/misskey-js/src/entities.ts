@@ -162,12 +162,12 @@ export type SigninFlowResponse = {
 } | {
 	finished: false;
 	next: 'totp';
-	availableFactors?: ('totp' | 'passkey')[];
+	availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 } | {
 	finished: false;
 	next: 'passkey';
 	authRequest: PublicKeyCredentialRequestOptionsJSON;
-	availableFactors?: ('totp' | 'passkey')[];
+	availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 };
 
 export type SigninWithPasskeyRequest = {
@@ -182,6 +182,10 @@ export type SigninWithPasskeyInitResponse = {
 
 export type SigninWithPasskeyResponse = {
 	signinResponse: SigninFlowResponse & { finished: true };
+	passwordFlowRequired?: never;
+} | {
+	passwordFlowRequired: true;
+	signinResponse?: never;
 };
 
 export type I2faKeyDoneRequest = {

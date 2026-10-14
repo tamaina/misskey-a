@@ -143166,7 +143166,7 @@ export interface operations {
                         finished: false;
                         /** @constant */
                         next: 'totp';
-                        availableFactors?: ('totp' | 'passkey')[];
+                        availableFactors?: ('totp' | 'passkey' | 'recovery')[];
                     } | {
                         /** @constant */
                         finished: false;
@@ -143192,7 +143192,7 @@ export interface operations {
                                 minPinLength?: boolean;
                             };
                         };
-                        availableFactors?: ('totp' | 'passkey')[];
+                        availableFactors?: ('totp' | 'passkey' | 'recovery')[];
                     }) | {
                         error: {
                             id?: string;
@@ -143284,6 +143284,9 @@ export interface operations {
                             code?: 'TOO_MANY_AUTHENTICATION_FAILURES';
                             message?: string;
                         };
+                    } | {
+                        /** @constant */
+                        passwordFlowRequired: true;
                     };
                 };
             };

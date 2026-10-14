@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import bcrypt from 'bcryptjs';
+import { performance } from 'node:perf_hooks';
 import { IsNull } from 'typeorm';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
@@ -24,6 +25,10 @@ import { implement } from '@orpc/server';
 import type { AuthSessionOutputs } from '../api.definition.js';
 import { authSessionsContract } from '../api.definition.js';
 import { sessionErrors } from '../session.middleware.js';
+import { readMfaPolicy } from '../mfa-policy.js';
+import { createSigninAssurance, signinPolicyStamp, SigninPolicyError } from '../signin-assurance.js';
+import type { VerifiedSigninKey } from '../signin-assurance.js';
+import { normalizedPasskeyPublicKey } from '../passkey-public-key.js';
 export interface SigninFlowDependencies {
 	config: Config;
 	meta: MiMeta;
@@ -36,7 +41,7 @@ export interface SigninFlowDependencies {
 	rateLimiterService: Pick<RateLimiterService, 'limit'>;
 	signinService: Pick<SigninService, 'signin'>;
 	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
-	webAuthnService: Pick<WebAuthnService, 'initiateAuthentication' | 'verifyAuthentication'>;
+	webAuthnService: Pick<WebAuthnService, 'initiateAuthentication' | 'verifyAuthenticationWithProof'>;
 	captchaService: Pick<CaptchaService, 'verifyHcaptcha' | 'verifyMcaptcha' | 'verifyRecaptcha' | 'verifyTestcaptcha' | 'verifyTurnstile'>;
 }
 export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
@@ -45,6 +50,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 		const body = input;
 		const request = context.request;
 		const reply = context.effects;
+		const deadline = performance.now() + 90_000;
 		const result = await (async (): Promise<AuthSessionOutputs['signinFlow']> => {
 			reply.header('Access-Control-Allow-Origin', deps.config.url);
 			reply.header('Access-Control-Allow-Credentials', 'true');
@@ -98,10 +104,17 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				});
 			}
 			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: user.id });
-			const securityKeysAvailable = await deps.userSecurityKeysRepository.countBy({ userId: user.id }).then(result => result >= 1);
+			const keys = await deps.userSecurityKeysRepository.findBy({ userId: user.id });
+			const policy = readMfaPolicy(profile, keys.length);
+			const expected = signinPolicyStamp(user, profile, keys);
+			const recoveryAvailable = Array.isArray(profile.twoFactorBackupSecret) && profile.twoFactorBackupSecret.length > 0;
+			const availableFactors: ('totp' | 'passkey' | 'recovery')[] = [];
+			if (policy.totp) availableFactors.push('totp');
+			if (policy.passkey) availableFactors.push('passkey');
+			if (policy.required && recoveryAvailable) availableFactors.push('recovery');
 			if (password == null) {
 				reply.code(200);
-				if (profile.twoFactorEnabled) {
+				if (policy.required) {
 					return {
 						finished: false,
 						next: 'password',
@@ -118,7 +131,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				return;
 			}
 			// Compare password
-			const same = await bcrypt.compare(password, profile.password!);
+			const same = typeof profile.password === 'string' && profile.password.length > 0 && await bcrypt.compare(password, profile.password);
 			const fail = async (status?: number, failure?: { id: string; }) => {
 				// Append signin history
 				await deps.signinsRepository.insert({
@@ -130,7 +143,16 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				});
 				return error(status ?? 500, failure ?? { id: '4e30e80c-e338-45a0-8c8f-44455efa3b76' });
 			};
-			if (!profile.twoFactorEnabled) {
+			const finish = async (factor: 'none' | 'totp' | 'recovery' | 'passkey', key?: VerifiedSigninKey) => {
+				try {
+					const proof = createSigninAssurance({ userId: user.id, policyStamp: expected, mode: same ? 'password' : 'passwordless', passwordVerified: same, factor, ...(key ? { key } : {}), deadline });
+					return toFinishedSignin(await deps.signinService.signin(request, reply, user, proof));
+				} catch (err) {
+					if (err instanceof SigninPolicyError) return fail(403, { id: 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f' });
+					throw err;
+				}
+			};
+			if (!policy.required) {
 				if (process.env.NODE_ENV !== 'test') {
 					if (deps.meta.enableHcaptcha && deps.meta.hcaptchaSecretKey) {
 						await deps.captchaService.verifyHcaptcha(deps.meta.hcaptchaSecretKey, sessionField(body, 'hcaptcha-response')).catch(err => {
@@ -159,7 +181,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					}
 				}
 				if (same) {
-					return toFinishedSignin(await deps.signinService.signin(request, reply, user));
+					return finish('none');
 				} else {
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
@@ -172,6 +194,8 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
 				}
+				const recovery = Array.isArray(profile.twoFactorBackupSecret) && profile.twoFactorBackupSecret.includes(token);
+				if (!recovery && !policy.totp) return fail(403, { id: 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f' });
 				try {
 					await deps.userAuthService.twoFactorAuthenticate(profile, token);
 				} catch (_) {
@@ -179,23 +203,27 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 						id: 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f',
 					});
 				}
-				return toFinishedSignin(await deps.signinService.signin(request, reply, user));
+				return finish(recovery ? 'recovery' : 'totp');
 			} else if (sessionField(body, 'credential')) {
-				if (!same && !profile.usePasswordLessLogin) {
+				if (!policy.passkey || (!same && (policy.independentPasskeyEnabled || !profile.usePasswordLessLogin))) {
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
 				}
-				const authorized = await deps.webAuthnService.verifyAuthentication(user.id, sessionField(body, 'credential'));
-				if (authorized) {
-					return toFinishedSignin(await deps.signinService.signin(request, reply, user));
-				} else {
+				try {
+					const verified = await deps.webAuthnService.verifyAuthenticationWithProof(user.id, sessionField(body, 'credential'), async key => {
+						if (key.userId !== user.id || !keys.some(stored => stored.id === key.id && normalizedPasskeyPublicKey(stored.publicKey) === key.publicKey)) throw new SigninPolicyError();
+						return expected;
+					});
+					if (verified?.expected === expected) return finish('passkey', verified.key);
+				} catch (_) {
 					return await fail(403, {
 						id: '93b86c4b-72f9-40eb-9815-798928603d1e',
 					});
 				}
-			} else if (securityKeysAvailable) {
-				if (!same && !profile.usePasswordLessLogin) {
+				return fail(403, { id: '93b86c4b-72f9-40eb-9815-798928603d1e' });
+			} else if (policy.passkey) {
+				if (!same && (policy.independentPasskeyEnabled || !profile.usePasswordLessLogin)) {
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
@@ -206,10 +234,10 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					finished: false,
 					next: 'passkey',
 					authRequest,
-					...(same ? { availableFactors: ['totp', 'passkey'] as ('totp' | 'passkey')[] } : {}),
+					...(same ? { availableFactors } : {}),
 				};
 			} else {
-				if (!same || !profile.twoFactorEnabled) {
+				if (!same || availableFactors.length === 0) {
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
@@ -218,7 +246,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					return {
 						finished: false,
 						next: 'totp',
-						availableFactors: ['totp'],
+						availableFactors,
 					};
 				}
 			}

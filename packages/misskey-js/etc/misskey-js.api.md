@@ -7968,12 +7968,12 @@ type SigninFlowResponse = {
 } | {
     finished: false;
     next: 'totp';
-    availableFactors?: ('totp' | 'passkey')[];
+    availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 } | {
     finished: false;
     next: 'passkey';
     authRequest: PublicKeyCredentialRequestOptionsJSON_2;
-    availableFactors?: ('totp' | 'passkey')[];
+    availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 };
 
 // @public (undocumented)
@@ -7993,6 +7993,10 @@ type SigninWithPasskeyResponse = {
     signinResponse: SigninFlowResponse & {
         finished: true;
     };
+    passwordFlowRequired?: never;
+} | {
+    passwordFlowRequired: true;
+    signinResponse?: never;
 };
 
 // @public (undocumented)

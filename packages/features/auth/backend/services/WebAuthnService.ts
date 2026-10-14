@@ -4,6 +4,7 @@
  */
 
 import * as v from 'valibot';
+import { performance } from 'node:perf_hooks';
 
 import {
 	generateAuthenticationOptions,
@@ -24,6 +25,25 @@ import type { Config } from '@/config.js';
 import { webAuthnRegistrationResponseSchema, webAuthnAuthenticationResponseSchema, webAuthnTransportSchema, nativeRegistrationOptionsSchema, nativeAuthenticationOptionsSchema } from '../webauthn.schema.js';
 import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import type * as Redis from 'ioredis';
+import { normalizedPasskeyPublicKey } from '../passkey-public-key.js';
+import { SigninPolicyError } from '../signin-assurance.js';
+import type { VerifiedSigninKey } from '../signin-assurance.js';
+import type { MiUserSecurityKey } from '../models/UserSecurityKey.js';
+
+const claimSigninChallenge = `
+local challenge = redis.call('GET', KEYS[1])
+if not challenge then return false end
+local remaining = redis.call('PTTL', KEYS[1])
+redis.call('DEL', KEYS[1])
+if remaining <= 0 or remaining > 90000 then return false end
+return { challenge, remaining }
+`;
+
+export interface SigninKeyProof<Expected> {
+	key: VerifiedSigninKey;
+	expected: Expected;
+}
+type SigninKeyIdentity = Readonly<Pick<MiUserSecurityKey, 'id' | 'userId' | 'publicKey'>>;
 
 export class WebAuthnService {
 	constructor(
@@ -48,6 +68,55 @@ export class WebAuthnService {
 			rpName: this.meta.name ?? this.config.host,
 			rpIcon: this.meta.iconUrl ?? undefined,
 		};
+	}
+
+	/** The callback captures credential policy before verification, never after it. */
+	@bindThis
+	public async verifyAuthenticationWithProof<Expected>(userId: string, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>): Promise<SigninKeyProof<Expected> | null> {
+		return this.verifySigninKey(`webauthn:authenticationChallenge:${userId}`, userId, response, beforeProof);
+	}
+
+	@bindThis
+	public async verifySignInWithPasskeyWithProof<Expected>(context: string, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>): Promise<SigninKeyProof<Expected> | null> {
+		return this.verifySigninKey(`webauthn:passkeyChallenge:${context}`, undefined, response, beforeProof);
+	}
+
+	private async verifySigninKey<Expected>(challengeKey: string, userId: string | undefined, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>): Promise<SigninKeyProof<Expected> | null> {
+		const started = performance.now();
+		const claimed: unknown = await this.redisClient.eval(claimSigninChallenge, 1, challengeKey);
+		if (!Array.isArray(claimed) || typeof claimed[0] !== 'string' || typeof claimed[1] !== 'number'
+			|| !Number.isSafeInteger(claimed[1]) || claimed[1] <= 0 || claimed[1] > 90_000) throw new SigninPolicyError();
+		const deadline = started + claimed[1];
+		const checkDeadline = () => { if (performance.now() >= deadline) throw new SigninPolicyError(); };
+		checkDeadline();
+		const credential = v.parse(webAuthnAuthenticationResponseSchema, response);
+		const key = await this.userSecurityKeysRepository.findOneBy({ id: credential.id, ...(userId === undefined ? {} : { userId }) });
+		if (!key || (userId !== undefined && key.userId !== userId)) throw new SigninPolicyError();
+		// Keep the exact row read for verification/CAS, even while the callback awaits other repositories.
+		const original = { id: key.id, userId: key.userId, publicKey: key.publicKey, counter: key.counter };
+		// PostgreSQL bigint may be returned as a decimal string despite the entity's number annotation.
+		const counter = Number(original.counter);
+		if (!Number.isSafeInteger(counter) || counter < 0 || counter > 0xffffffff) throw new SigninPolicyError();
+		const publicKey = normalizedPasskeyPublicKey(original.publicKey);
+		const transports = key.transports == null ? undefined : v.parse(v.array(webAuthnTransportSchema), key.transports);
+		const expected = await beforeProof(Object.freeze({ id: original.id, userId: original.userId, publicKey }));
+		checkDeadline();
+		const relyingParty = this.getRelyingParty();
+		const verification = await verifyAuthenticationResponse({
+			response: credential, expectedChallenge: claimed[0], expectedOrigin: relyingParty.origin, expectedRPID: relyingParty.rpId,
+			credential: { id: original.id, publicKey: new Uint8Array(Buffer.from(publicKey, 'base64url')), counter, transports },
+			requireUserVerification: true,
+		});
+		checkDeadline();
+		if (!verification.verified || verification.authenticationInfo.userVerified !== true) return null;
+		const info = verification.authenticationInfo;
+		if (!Number.isSafeInteger(info.newCounter) || info.newCounter < 0) throw new SigninPolicyError();
+		const updated = await this.userSecurityKeysRepository.update(original, {
+			publicKey, counter: info.newCounter, lastUsed: new Date(), credentialDeviceType: info.credentialDeviceType, credentialBackedUp: info.credentialBackedUp,
+		});
+		if (!updated || typeof updated !== 'object' || !('affected' in updated) || updated.affected !== 1) throw new SigninPolicyError();
+		checkDeadline();
+		return { key: Object.freeze({ id: original.id, userId: original.userId, publicKey, deadline }), expected };
 	}
 
 	@bindThis

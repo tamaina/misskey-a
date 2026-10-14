@@ -5,8 +5,8 @@
 
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { load } from 'js-yaml';
 import { resolve } from 'node:path';
+import { load } from 'js-yaml';
 import { createApp } from 'vue';
 import { compileScript, parse } from 'vue/compiler-sfc';
 import { expect, test } from 'vitest';
@@ -194,5 +194,16 @@ test('fresh password label keeps its exact primary-only inventory and rejects ev
 	expect(() => restoreFinalOwnerHistoricalSource(file, moved)).toThrow('Invalid final-owner key inventory');
 	const otherLanguage = source.replace('<locale locale="ar-SA" lang="json">\n{\n', '<locale locale="ar-SA" lang="json">\n{\n' + addition);
 	expect(() => restoreFinalOwnerHistoricalSource(file, otherLanguage)).toThrow('Invalid final-owner key inventory');
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace(addition, addition + addition))).toThrow('Final owner changed original component body');
+});
+
+test('login fallback label projects only its exact primary inventory before the frozen owner checks', () => {
+	const file = 'packages/features/auth/frontend/components/MkSignin.vue';
+	const source = readFileSync(resolve(root, file), 'utf8');
+	const addition = '\t"passwordFlowRequired": "このアカウントはパスワードと追加の本人確認が必要です。ユーザー名を入力してログインしてください。",\n';
+	expect(source.split(addition)).toHaveLength(2);
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace(addition, ''))).toThrow('Invalid final-owner key inventory');
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace('このアカウントはパスワードと追加の本人確認が必要です。ユーザー名を入力してログインしてください。', 'unreviewed'))).toThrow('Final-owner dictionary differs from reviewed text');
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace('<locale locale="ar-SA" lang="json">\n{\n', '<locale locale="ar-SA" lang="json">\n{\n' + addition))).toThrow('Invalid final-owner key inventory');
 	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace(addition, addition + addition))).toThrow('Final owner changed original component body');
 });

@@ -569,6 +569,7 @@ export const authSessionsContract = {
 	} as const).route({ method: 'POST', path: '/signin-with-passkey', tags: ['auth'], }).errors(httpErrors).input(packedOptionalJsonValueSchema).output(v.union([
 	v.strictObject({ option: webAuthnAuthenticationOptionsSchema, context: v.string() }),
 	v.strictObject({ signinResponse: finishedSigninSchema }), sessionFailureSchema,
+		v.strictObject({ passwordFlowRequired: v.literal(true) }),
 ])),
 };
 

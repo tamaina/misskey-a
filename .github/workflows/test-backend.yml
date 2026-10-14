@@ -102,6 +102,8 @@ jobs:
       run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/auth/test/vitest.fresh-reauthentication.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
     - name: Test fresh password change HTTP with isolated PostgreSQL and Redis
       run: node packages/features/auth/test/run-fresh-password-change-fixture.mjs
+    - name: Test login policy HTTP with isolated PostgreSQL and Redis
+      run: MISSKEY_AUTH_SIGNIN_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs
     - name: Test MCP with disposable PostgreSQL
       run: node packages/features/mcp/test/run-postgres-fixture.mjs
     - name: Upload to Codecov

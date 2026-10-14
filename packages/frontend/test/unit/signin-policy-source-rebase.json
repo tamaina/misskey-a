@@ -1,0 +1,336 @@
+[
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.vue",
+    "currentSha256": "73e705383ac03d1e3f063c385bb888db8ecebe088486c1baee2b021808a66e7d",
+    "baselineSha256": "b31ccdecb4d8b5f75445cdf338b38723eb0f0da1c8661961b4d3e73f15e6c94a",
+    "edits": [
+      {
+        "start": 956,
+        "end": 1030,
+        "current": "\t\t\t:allowTotp=\"totpFactorAvailable\"\n\t\t\t:allowRecovery=\"recoveryAvailable\"\n",
+        "baseline": ""
+      },
+      {
+        "start": 1292,
+        "end": 1353,
+        "current": "\t\t\t:recoveryOnly=\"!totpFactorAvailable && recoveryAvailable\"\n",
+        "baseline": ""
+      },
+      {
+        "start": 1651,
+        "end": 1761,
+        "current": "import { nextTick, onActivated, onBeforeUnmount, onDeactivated, ref, shallowRef, useTemplateRef } from 'vue';\n",
+        "baseline": "import { nextTick, onBeforeUnmount, ref, shallowRef, useTemplateRef } from 'vue';\n"
+      },
+      {
+        "start": 1867,
+        "end": 1867,
+        "current": "",
+        "baseline": "import type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';\nimport type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';\nimport type { PwResponse } from '@features/auth/frontend/components/MkSignin.password.vue';\n"
+      },
+      {
+        "start": 2573,
+        "end": 2871,
+        "current": "import type { PwResponse } from '@features/auth/frontend/components/MkSignin.password.vue';\nimport type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';\nimport type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';\n",
+        "baseline": ""
+      },
+      {
+        "start": 3330,
+        "end": 3429,
+        "current": "let active = true;\nlet generation = 0;\nconst owns = (run: number) => active && run === generation;\n",
+        "baseline": ""
+      },
+      {
+        "start": 3882,
+        "end": 3958,
+        "current": "const totpFactorAvailable = ref(true);\nconst recoveryAvailable = ref(true);\n",
+        "baseline": ""
+      },
+      {
+        "start": 3993,
+        "end": 4059,
+        "current": "\tif (!active || waiting.value) return;\n\tconst run = ++generation;\n",
+        "baseline": ""
+      },
+      {
+        "start": 4219,
+        "end": 4247,
+        "current": "\t\t\t\tif (!owns(run)) return;\n",
+        "baseline": ""
+      },
+      {
+        "start": 4397,
+        "end": 4458,
+        "current": "\t\t\t.catch(err => { if (owns(run)) onSigninApiError(err); });\n",
+        "baseline": "\t\t\t.catch(onSigninApiError);\n"
+      },
+      {
+        "start": 4535,
+        "end": 4584,
+        "current": "\tif (!active) return;\n\tconst run = ++generation;\n",
+        "baseline": ""
+      },
+      {
+        "start": 4747,
+        "end": 4886,
+        "current": "\t\t}).then(async (res) => {\n\t\t\tif (!owns(run)) return;\n\t\t\tif (res.passwordFlowRequired) {\n\t\t\t\tawait requirePasswordFlow();\n\t\t\t\treturn;\n\t\t\t}\n",
+        "baseline": "\t\t}).then((res) => {\n"
+      },
+      {
+        "start": 5043,
+        "end": 5105,
+        "current": "\t\t}).catch(err => { if (owns(run)) onSigninApiError(err); });\n",
+        "baseline": "\t\t}).catch(onSigninApiError);\n"
+      },
+      {
+        "start": 5772,
+        "end": 5821,
+        "current": "\tif (!active) return;\n\tconst run = ++generation;\n",
+        "baseline": ""
+      },
+      {
+        "start": 5845,
+        "end": 5892,
+        "current": "\tconst user = await misskeyApi('users/show', {\n",
+        "baseline": "\tuserInfo.value = await misskeyApi('users/show', {\n"
+      },
+      {
+        "start": 5927,
+        "end": 5976,
+        "current": "\tif (!owns(run)) return;\n\tuserInfo.value = user;\n",
+        "baseline": ""
+      },
+      {
+        "start": 7221,
+        "end": 7248,
+        "current": "\tconst run = ++generation;\n",
+        "baseline": ""
+      },
+      {
+        "start": 7644,
+        "end": 7674,
+        "current": "\t\tif (!owns(run)) return res;\n",
+        "baseline": ""
+      },
+      {
+        "start": 8008,
+        "end": 8311,
+        "current": "\t\t\t\t\ttotpFactorAvailable.value = res.availableFactors === undefined || res.availableFactors.includes('totp');\n\t\t\t\t\trecoveryAvailable.value = res.availableFactors === undefined || res.availableFactors.includes('recovery');\n\t\t\t\t\ttotpAvailable.value = totpFactorAvailable.value || recoveryAvailable.value;\n",
+        "baseline": "\t\t\t\t\ttotpAvailable.value = true;\n"
+      },
+      {
+        "start": 8613,
+        "end": 8830,
+        "current": "\t\t\t\t\ttotpFactorAvailable.value = useTotp;\n\t\t\t\t\trecoveryAvailable.value = res.availableFactors === undefined || res.availableFactors.includes('recovery');\n\t\t\t\t\ttotpAvailable.value = useTotp || recoveryAvailable.value;\n",
+        "baseline": "\t\t\t\t\ttotpAvailable.value = useTotp;\n"
+      },
+      {
+        "start": 9082,
+        "end": 9142,
+        "current": "\t\t\t\t\tif (!totpAvailable.value && !passkeyAvailable.value) {\n",
+        "baseline": "\t\t\t\t\tif (!useTotp && !passkeyAvailable.value) {\n"
+      },
+      {
+        "start": 9721,
+        "end": 9761,
+        "current": "\t\tif (owns(run)) onSigninApiError(err);\n",
+        "baseline": "\t\tonSigninApiError(err);\n"
+      },
+      {
+        "start": 12095,
+        "end": 12135,
+        "current": "function clearSignin() {\n\tgeneration++;\n",
+        "baseline": "onBeforeUnmount(() => {\n"
+      },
+      {
+        "start": 12209,
+        "end": 12847,
+        "current": "\tcredentialRequest.value = null;\n\tpasskeyContext.value = '';\n\tdoingPasskeyFromInputPage.value = false;\n\tpasskeyAvailable.value = false;\n\ttotpAvailable.value = true;\n\ttotpFactorAvailable.value = true;\n\trecoveryAvailable.value = true;\n\twaiting.value = false;\n\tpage.value = 'input';\n}\n\nasync function requirePasswordFlow() {\n\tif (!active) return;\n\tclearSignin();\n\tawait os.alert({ type: 'info', text: $locale.value.sfc.passwordFlowRequired });\n}\n\ndefineExpose({ requirePasswordFlow });\nonActivated(() => { active = true; });\nonDeactivated(() => { active = false; clearSignin(); });\nonBeforeUnmount(() => { active = false; clearSignin(); });\n",
+        "baseline": "});\n"
+      },
+      {
+        "start": 20313,
+        "end": 20390,
+        "current": "\t\"passwordFlowRequired\": \"このアカウントはパスワードと追加の本人確認が必要です。ユーザー名を入力してログインしてください。\",\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.passkey.vue",
+    "currentSha256": "4034ba95816d28c7bb831c4af82d88633b10d22ab658771f25c53f07bc3bf09b",
+    "baselineSha256": "f0ac9281aabe608396969de32b234c1fa1d5f57ff4f016a019782c3749ccca37",
+    "edits": [
+      {
+        "start": 520,
+        "end": 777,
+        "current": "\t\t<MkButton v-if=\"isPerformingPasswordlessLogin !== true && canUseTotp !== false\" transparent rounded :disabled=\"queryingKey\" style=\"margin: 0 auto;\" @click=\"emit('useTotp')\">{{ recoveryOnly ? $locale.sfc.useRecoveryCode : $locale.sfc.useTotp }}</MkButton>\n",
+        "baseline": "\t\t<MkButton v-if=\"isPerformingPasswordlessLogin !== true && canUseTotp !== false\" transparent rounded :disabled=\"queryingKey\" style=\"margin: 0 auto;\" @click=\"emit('useTotp')\">{{ $locale.sfc.useTotp }}</MkButton>\n"
+      },
+      {
+        "start": 830,
+        "end": 913,
+        "current": "import { ref, onActivated, onBeforeUnmount, onDeactivated, onMounted } from 'vue';\n",
+        "baseline": "import { ref, onMounted } from 'vue';\n"
+      },
+      {
+        "start": 1328,
+        "end": 1403,
+        "current": "\trecoveryOnly?: boolean;\n}>(), { canUseTotp: true, recoveryOnly: false });\n",
+        "baseline": "}>(), { canUseTotp: true });\n"
+      },
+      {
+        "start": 1555,
+        "end": 1595,
+        "current": "let active = true;\nlet generation = 0;\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 1623,
+        "end": 1672,
+        "current": "\tif (!active) return;\n\tconst run = ++generation;\n",
+        "baseline": ""
+      },
+      {
+        "start": 1699,
+        "end": 2021,
+        "current": "\ttry {\n\t\tconst credential = await startAuthentication({ optionsJSON: props.credentialRequest });\n\t\tif (active && run === generation) emit('done', credential);\n\t} catch {\n\t\t// Cancellation keeps the owned retry and code alternatives available.\n\t} finally {\n\t\tif (active && run === generation) queryingKey.value = false;\n\t}\n",
+        "baseline": "\tawait startAuthentication({ optionsJSON: props.credentialRequest })\n\t\t.catch(() => {\n\t\t\treturn Promise.reject(null);\n\t\t})\n\t\t.then((credential) => {\n\t\t\temit('done', credential);\n\t\t})\n\t\t.finally(() => {\n\t\t\tqueryingKey.value = false;\n\t\t});\n"
+      },
+      {
+        "start": 2023,
+        "end": 2204,
+        "current": "\nonActivated(() => { active = true; });\nonDeactivated(() => { active = false; generation++; queryingKey.value = false; });\nonBeforeUnmount(() => { active = false; generation++; });\n",
+        "baseline": ""
+      },
+      {
+        "start": 5126,
+        "end": 5163,
+        "current": "  \"useRecoveryCode\": \"バックアップコードを使う\",\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.totp.vue",
+    "currentSha256": "2ce20d151067f2239d907d91ba1648de6adac6ab992a60212b82008110342585",
+    "baselineSha256": "6b19cabca936e5980d2807f1f4a6a36df058dfed62803c05f3989aab2f6d86b2",
+    "edits": [
+      {
+        "start": 281,
+        "end": 395,
+        "current": "\t\t\t<div :class=\"$style.totpDescription\">{{ isBackupCode ? $locale.sfc.useBackupCode : $locale.sfc['2fa'] }}</div>\n",
+        "baseline": "\t\t\t<div :class=\"$style.totpDescription\">{{ $locale.sfc['2fa'] }}</div>\n"
+      },
+      {
+        "start": 905,
+        "end": 1131,
+        "current": "\t\t\t\t<template v-if=\"allowTotp && allowRecovery\" #caption><button class=\"_textButton\" type=\"button\" @click=\"isBackupCode = !isBackupCode\">{{ isBackupCode ? $locale.sfc.useTotp : $locale.sfc.useBackupCode }}</button></template>\n",
+        "baseline": "\t\t\t\t<template #caption><button class=\"_textButton\" type=\"button\" @click=\"isBackupCode = !isBackupCode\">{{ isBackupCode ? $locale.sfc.useTotp : $locale.sfc.useBackupCode }}</button></template>\n"
+      },
+      {
+        "start": 1146,
+        "end": 1332,
+        "current": "\t\t\t<MkButton type=\"submit\" :disabled=\"!allowTotp && !allowRecovery\" large primary rounded style=\"margin: 0 auto;\">{{ $locale.sfc.continue }} <i class=\"ti ti-arrow-right\"></i></MkButton>\n",
+        "baseline": "\t\t\t<MkButton type=\"submit\" large primary rounded style=\"margin: 0 auto;\">{{ $locale.sfc.continue }} <i class=\"ti ti-arrow-right\"></i></MkButton>\n"
+      },
+      {
+        "start": 1395,
+        "end": 1565,
+        "current": "import { ref, watch } from 'vue';\n\nconst props = withDefaults(defineProps<{ allowTotp?: boolean; allowRecovery?: boolean }>(), { allowTotp: true, allowRecovery: true });\n",
+        "baseline": "import { ref } from 'vue';\n"
+      },
+      {
+        "start": 1840,
+        "end": 2035,
+        "current": "watch(() => [props.allowTotp, props.allowRecovery], () => {\n\tif (!props.allowTotp) isBackupCode.value = true;\n\telse if (!props.allowRecovery) isBackupCode.value = false;\n}, { immediate: true });\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.conditional.vue",
+    "currentSha256": "10265dbeaebced8409689060c716d5deec0482299005a9dc1510c24c85712f49",
+    "baselineSha256": "b88b08fff89e5f7d5d59a4e11a4925067773a74e1c946cd0556f19c3299c368d",
+    "edits": [
+      {
+        "start": 205,
+        "end": 362,
+        "current": "\t<MkSignin ref=\"manualSignin\" :autoSet=\"autoSet\" :message=\"message\" :openOnRemote=\"openOnRemote\" :initialUsername=\"initialUsername\" @login=\"onManualLogin\"/>\n",
+        "baseline": "\t<MkSignin :autoSet=\"autoSet\" :message=\"message\" :openOnRemote=\"openOnRemote\" :initialUsername=\"initialUsername\" @login=\"onManualLogin\"/>\n"
+      },
+      {
+        "start": 438,
+        "end": 533,
+        "current": "import { onActivated, onBeforeUnmount, onDeactivated, ref, useTemplateRef, watch } from 'vue';\n",
+        "baseline": "import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';\n"
+      },
+      {
+        "start": 608,
+        "end": 608,
+        "current": "",
+        "baseline": "import type * as Misskey from 'misskey-js';\nimport type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';\n"
+      },
+      {
+        "start": 947,
+        "end": 1083,
+        "current": "import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';\nimport type * as Misskey from 'misskey-js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 1598,
+        "end": 1682,
+        "current": "const manualSignin = useTemplateRef<InstanceType<typeof MkSignin>>('manualSignin');\n",
+        "baseline": ""
+      },
+      {
+        "start": 1732,
+        "end": 1775,
+        "current": "let suspended = false;\nlet generation = 0;\n",
+        "baseline": ""
+      },
+      {
+        "start": 2310,
+        "end": 2336,
+        "current": "\t\tconst run = generation;\n",
+        "baseline": ""
+      },
+      {
+        "start": 2419,
+        "end": 2713,
+        "current": "\t\tif (run !== generation || suspended || manual || !props.enabled) throw new Error('Stale passkey result');\n\t\tif (result.passwordFlowRequired) {\n\t\t\tmanual = true;\n\t\t\tcancelAutofill();\n\t\t\tawait manualSignin.value?.requirePasswordFlow?.();\n\t\t\tthrow new Error('Named password flow required');\n\t\t}\n",
+        "baseline": ""
+      },
+      {
+        "start": 2971,
+        "end": 3035,
+        "current": "function cancelAutofill() { generation++; autofill.cancel(); }\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 3190,
+        "end": 3209,
+        "current": "\tcancelAutofill();\n",
+        "baseline": "\tautofill.cancel();\n"
+      },
+      {
+        "start": 3458,
+        "end": 3477,
+        "current": "\tcancelAutofill();\n",
+        "baseline": "\tautofill.cancel();\n"
+      },
+      {
+        "start": 3544,
+        "end": 3630,
+        "current": "\tif (enabled && !manual && !suspended) void autofill.start();\n\telse cancelAutofill();\n",
+        "baseline": "\tif (enabled && !manual) void autofill.start();\n\telse autofill.cancel();\n"
+      },
+      {
+        "start": 3670,
+        "end": 3919,
+        "current": "onBeforeUnmount(() => { suspended = true; cancelAutofill(); });\nonDeactivated(() => { suspended = true; cancelAutofill(); });\nonActivated(() => {\n\tif (!suspended) return;\n\tsuspended = false;\n\tif (props.enabled && !manual) void autofill.start();\n});\n",
+        "baseline": "onBeforeUnmount(() => autofill.cancel());\n"
+      }
+    ]
+  }
+]

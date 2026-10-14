@@ -6,8 +6,12 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { IsNull, LessThanOrEqual } from 'typeorm';
 import type { FindOptionsSelect } from 'typeorm';
-import type { BrowserSessionsRepository, MiBrowserSession } from '@features/persistence/backend/repositories/models.js';
+import type { BrowserSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import { MiBrowserSession } from '../models/BrowserSession.js';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { SigninPolicyError } from '../signin-assurance.js';
 
 export type BrowserSessionMetadata = Pick<MiBrowserSession, 'id' | 'userId' | 'createdAt' | 'lastUsedAt' | 'revokedAt' | 'sudoUntil'>;
 
@@ -21,17 +25,28 @@ export class BrowserSessionService {
 		private idService: Pick<IdService, 'gen'>,
 	) {}
 
-	public async issue(userId: string): Promise<{ token: string; session: BrowserSessionMetadata }> {
+	public async issue(userId: string, repository: Pick<BrowserSessionsRepository, 'insert'> = this.browserSessionsRepository): Promise<{ token: string; session: BrowserSessionMetadata }> {
 		const token = `bs_${randomBytes(32).toString('base64url')}`;
 		const now = new Date();
 		const session: BrowserSessionMetadata = {
 			id: this.idService.gen(), userId, createdAt: now, lastUsedAt: now,
 			revokedAt: null, sudoUntil: null,
 		};
-		await this.browserSessionsRepository.insert({
+		await repository.insert({
 			...session, tokenHash: createHash('sha256').update(token).digest('hex'),
 		});
 		return { token, session };
+	}
+
+	/** Only creation results from SignupService reach this path; it is not a login proof bypass. */
+	public async issueForNewAccount(account: Pick<MiUser, 'id' | 'token'>): Promise<{ token: string; session: BrowserSessionMetadata }> {
+		return this.browserSessionsRepository.manager.transaction(async manager => {
+			const user = await manager.getRepository(MiUser).findOne({ where: { id: account.id }, lock: { mode: 'pessimistic_write' } });
+			if (!user || user.host !== null || user.isSuspended || user.isDeleted || !account.token || user.token !== account.token) throw new SigninPolicyError();
+			const profile = await manager.getRepository(MiUserProfile).findOne({ where: { userId: user.id }, lock: { mode: 'pessimistic_write' } });
+			if (!profile || profile.twoFactorEnabled || profile.passkeyMfaEnabled) throw new SigninPolicyError();
+			return this.issue(user.id, manager.getRepository(MiBrowserSession));
+		});
 	}
 
 	public async verify(token: string): Promise<BrowserSessionMetadata | null> {

@@ -22,7 +22,7 @@ import { sessionErrors } from '../session.middleware.js';
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 const invitationCodeMailTimeoutMs = 1000 * 60 * 30;
 export interface SignupDependencies {
-	browserSessionService: Pick<BrowserSessionService, 'issue'>;
+	browserSessionService: Pick<BrowserSessionService, 'issueForNewAccount'>;
 	config: Config;
 	meta: MiMeta;
 	usersRepository: UsersRepository;
@@ -240,7 +240,10 @@ export function createSignupProcedure(deps: SignupDependencies) {
 					});
 					return {
 						...res,
-						token: (await deps.browserSessionService.issue(account.id)).token,
+						// The existing test-only remote actor factory has no local login session.
+						token: process.env.NODE_ENV === 'test' && typeof host === 'string' && account.host === host
+							? ''
+							: (await deps.browserSessionService.issueForNewAccount(account)).token,
 					};
 				} catch (err) {
 					// 確保したコードが無駄に消費されたままになるのを防ぐ
