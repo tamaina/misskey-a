@@ -14,7 +14,7 @@ import type { MiUserSecurityKey } from './models/UserSecurityKey.js';
 import type { BrowserSessionService } from './services/BrowserSessionService.js';
 import { FreshReauthenticationStore, freshReauthenticationPurposeSchema } from './fresh-reauthentication-store.js';
 import type { FreshReauthenticationBinding, FreshReauthenticationPurpose } from './fresh-reauthentication-store.js';
-import { webAuthnAuthenticationResponseSchema, webAuthnTransportSchema } from './webauthn.schema.js';
+import { webAuthnAuthenticationResponseSchema, webAuthnTransportSchema, nativeAuthenticationOptionsSchema } from './webauthn.schema.js';
 import { normalizedPasskeyPublicKey } from './passkey-public-key.js';
 
 /** Server-owned API context only. No token or wire object is an identity proof. */
@@ -73,6 +73,7 @@ export class FreshPasskeyReauthentication {
 			rpID: this.relyingParty.rpId, userVerification: 'required',
 			allowCredentials: before.keys.map(key => ({ id: key.id, transports: key.transports == null ? undefined : v.parse(v.array(webAuthnTransportSchema), key.transports) })),
 		});
+		v.assert(nativeAuthenticationOptionsSchema, options);
 		const after = await this.snapshot(binding.userId);
 		if (before.stamp !== after.stamp) throw new Error('Fresh reauthentication failed');
 		await this.binding(identity, purpose);
