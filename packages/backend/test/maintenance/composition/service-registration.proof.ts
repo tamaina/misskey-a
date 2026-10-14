@@ -89,6 +89,16 @@ import { ChartManagementService } from '@features/statistics/backend/services/Ch
 import { ChatService } from '@features/chat/backend/services/ChatService.js';
 
 import { ClipService } from '@features/collections/backend/services/ClipService.js';
+import { collectionServices } from '@features/collections/backend/services.js';
+
+function restoreClipConstructorCount(feature: typeof ClipService): number {
+	const dependencies = collectionServices.definitions.ClipService.dependencies;
+	expect(feature.length).toBe(dependencies.length);
+	const baseline = restoreUpstreamConstructorBaseline('collections', 'ClipService', dependencies.map(dependency => ({ port: dependency.name })));
+	return baseline.length;
+}
+
+historicalConstructorCounts.set(ClipService, () => restoreClipConstructorCount(ClipService));
 
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 

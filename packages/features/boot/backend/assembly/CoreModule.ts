@@ -4,6 +4,7 @@
  */
 
 import { Module } from '@nestjs/common';
+import { clipUpdateLifecycleProvider } from './ClipUpdateLifecycle.js';
 import { FanoutTimelineEndpointService } from '@features/timelines/backend/services/FanoutTimelineEndpointService.js';
 import { AbuseReportService } from '@features/moderation/backend/services/AbuseReportService.js';
 import { AbuseReportNotificationService } from '@features/moderation/backend/services/AbuseReportNotificationService.js';
@@ -233,7 +234,7 @@ const aliasExports = serviceAliases.filter(alias => alias.useExisting !== ChartL
 
 @Module({
 	imports: [QueueModule],
-	providers: [...featureServiceProviders, ...announcementArchiveLifecycleProviders, ...serviceProviders, ...serviceAliases],
+	providers: [clipUpdateLifecycleProvider, ...featureServiceProviders, ...announcementArchiveLifecycleProviders, ...serviceProviders, ...serviceAliases],
 	exports: [...featureServiceExports, QueueModule, ...serviceExports, ...aliasExports],
 })
 export class CoreModule {}
