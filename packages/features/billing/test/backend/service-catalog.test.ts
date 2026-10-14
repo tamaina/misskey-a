@@ -36,3 +36,16 @@ test('one logical price may have multiple equivalent settlement deployments with
 	const result = catalog([first, other, current], at);
 	expect(result[0].priceHistory).toHaveLength(2); expect(result[0].dealDisplay.referenceSoldMs).toBe(55 * day);
 });
+
+test('explicit price identity cannot overwrite a distinct fallback offer price history', () => {
+	const next = { ...offer, id: 'new', catalogPriceId: offer.id, amountBaseUnits: '80', priceStartsAt: offer.priceExpiresAt ?? at, priceExpiresAt: null };
+	expect(validPriceCatalog(next, [offer])).toBe(false);
+	expect(validPriceCatalog({ ...offer, id: 'equivalent', catalogPriceId: offer.id }, [offer])).toBe(true);
+});
+
+test('undated offers cannot alias dated logical price identities in either direction', () => {
+	const dated = { ...offer, id: 'rail', catalogPriceId: 'shared' };
+	const { priceStartsAt, priceExpiresAt, ...undated } = { ...offer, id: 'shared' };
+	expect(validPriceCatalog(undated, [dated])).toBe(false);
+	expect(validPriceCatalog(dated, [undated])).toBe(false);
+});

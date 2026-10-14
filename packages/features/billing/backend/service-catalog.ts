@@ -14,7 +14,7 @@ function assetId(offer: ServiceOffer): string {
 	return `${offer.pricingAssetKey ?? `${offer.chainId}:${offer.contractAddress.toLowerCase()}`}:${offer.decimals}`;
 }
 
-function priceId(offer: ServiceOffer): string { return offer.catalogPriceId ?? offer.id; }
+export function priceId(offer: ServiceOffer): string { return offer.catalogPriceId ?? offer.id; }
 
 function samePrice(before: ServiceOffer, after: ServiceOffer): boolean {
 	return before.serviceKey === after.serviceKey && assetId(before) === assetId(after) && before.amountBaseUnits === after.amountBaseUnits
@@ -60,14 +60,15 @@ function durationOrder(offer: ServiceOffer): number {
 
 /** Source price rules: no equal-duration overlap and no reversed duration/price ordering. */
 export function validPriceCatalog(input: ServiceOffer, offers: ServiceOffer[]): boolean {
+	for (const offer of offers) {
+		if (offer.id !== input.id && priceId(input) === priceId(offer)
+			&& (!samePrice(input, offer) || (input.priceExpiresAt ?? null) !== (offer.priceExpiresAt ?? null))) return false;
+	}
 	if (input.priceStartsAt == null) return input.priceExpiresAt == null && input.amountBaseUnits !== '0';
 	if (input.priceExpiresAt != null && input.priceExpiresAt <= input.priceStartsAt) return false;
 	for (const offer of offers) {
 		if (offer.id === input.id) continue;
-		if (input.catalogPriceId && input.catalogPriceId === offer.catalogPriceId) {
-			if (!samePrice(input, offer) || (input.priceExpiresAt ?? null) !== (offer.priceExpiresAt ?? null)) return false;
-			continue;
-		}
+		if (priceId(input) === priceId(offer)) continue;
 		if (offer.priceStartsAt == null || assetId(offer) !== assetId(input) || offer.serviceKey !== input.serviceKey) continue;
 		if (input.priceStartsAt >= (offer.priceExpiresAt ?? Number.MAX_SAFE_INTEGER) || (input.priceExpiresAt ?? Number.MAX_SAFE_INTEGER) <= offer.priceStartsAt) continue;
 		if (offer.duration === input.duration && offer.durationUnit === input.durationUnit) return false;

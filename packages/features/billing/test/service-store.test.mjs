@@ -192,8 +192,14 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 				await store.saveOffer(shared, 'alice');
 				await store.saveOffer({ ...shared, id: 'shared-second', chainId: 123457, contractAddress: address(4) }, 'alice');
 				assert.equal((await store.listCatalog()).find(row => row.offer.id === shared.id).priceHistory.length, 1);
+				await assert.rejects(store.saveOffer({ ...offer, id: 'logical-price' }, 'alice'), error => error.code === 'BILLING_CONFLICT');
 				await store.saveOffer({ ...shared, priceExpiresAt: now + 100 }, 'alice');
 				assert.equal((await store.listOffers()).find(row => row.id === 'shared-second').priceExpiresAt, now + 100);
+				const alias = { ...price, id: 'fallback-alias', catalogPriceId: price.id };
+				await store.saveOffer(alias, 'alice');
+				await assert.rejects(store.saveOffer({ ...alias, id: 'false-alias', amountBaseUnits: '6', priceStartsAt: now + 20, priceExpiresAt: null }, 'alice'), error => error.code === 'BILLING_CONFLICT');
+				await store.saveOffer({ ...alias, priceExpiresAt: now + 5 }, 'alice');
+				assert.equal((await store.listOffers()).find(row => row.id === price.id).priceExpiresAt, now + 5);
 				const free = { ...scheduled, id: 'free-price', serviceKey: 'free-plan', amountBaseUnits: '0', priceExpiresAt: now + 100 };
 				await store.saveOffer(free, 'alice');
 				const zero = await store.createOrder('carol', free.id, 'bob-wallet', 'invalid-owner-free', free).catch(error => error);

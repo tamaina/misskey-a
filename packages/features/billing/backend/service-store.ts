@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { offerAvailable, catalog, validPriceCatalog, immutablePriceMatches } from './service-catalog.js';
+import { offerAvailable, catalog, priceId, validPriceCatalog, immutablePriceMatches } from './service-catalog.js';
 import { isDeepStrictEqual } from 'node:util';
 import { lockBillingState, saveBillingState, quoteServiceTerm, applyFundedTerm } from './billing-state.js';
 import type { PaymentQuote } from '../shared/payment-quote.js';
@@ -65,13 +65,13 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				await manager.query("SELECT pg_advisory_xact_lock(hashtextextended('billing-price-catalog', 0))");
 				const rows = await manager.find(MiBillingServiceOffer);
 				const previous = rows.find(row => row.id === terms.id);
-				const catalogRows = rows.map(row => terms.catalogPriceId && terms.catalogPriceId === row.terms.catalogPriceId ? { ...row.terms, priceExpiresAt: terms.priceExpiresAt ?? null } : row.terms);
+				const catalogRows = rows.map(row => terms.priceStartsAt != null && priceId(terms) === priceId(row.terms) ? { ...row.terms, priceExpiresAt: terms.priceExpiresAt ?? null } : row.terms);
 				if (!validPriceCatalog(terms, catalogRows) || (previous && !immutablePriceMatches(previous.terms, terms))) conflict();
 				await manager.query('LOCK TABLE billing_service_offer IN SHARE ROW EXCLUSIVE MODE');
 				if (!await manager.existsBy(MiBillingServiceOffer, { id: terms.id }) && await manager.count(MiBillingServiceOffer) >= 1000) unavailable();
 				await requirePurchasableRole(manager, terms.roleId);
 				await manager.upsert(MiBillingServiceOffer, { id: terms.id, terms, updatedAt: new Date(now()), updatedByUserId: actorId }, ['id']);
-				if (terms.catalogPriceId) for (const row of rows) if (row.id !== terms.id && row.terms.catalogPriceId === terms.catalogPriceId) {
+				if (terms.priceStartsAt != null) for (const row of rows) if (row.id !== terms.id && priceId(row.terms) === priceId(terms)) {
 					await manager.update(MiBillingServiceOffer, row.id, { terms: { ...row.terms, priceExpiresAt: terms.priceExpiresAt ?? null }, updatedAt: new Date(now()), updatedByUserId: actorId });
 				}
 			});
