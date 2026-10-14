@@ -17,7 +17,7 @@ import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import metadata from './final-owner-locale-baseline.json';
 import retired from './retired-ui-next-locale-baseline.json';
-import { historicalFinalOwnerValue, originalFinalOwnerDictionaries, reviewedFinalOwnerDictionaries, restoreFinalOwnerHistoricalSource } from './final-owner-locale-baseline.js';
+import { historicalFinalOwnerDictionary, historicalFinalOwnerValue, originalFinalOwnerDictionaries, reviewedFinalOwnerDictionaries, restoreFinalOwnerHistoricalSource } from './final-owner-locale-baseline.js';
 
 const root = resolve(import.meta.dirname, '../../../..');
 const sourceHash = (value: string) => createHash('sha256').update(value).digest('hex');
@@ -45,7 +45,7 @@ test('four owners retain 754 prior values and apply only 226 independently revie
 		expect(blocks.map(block => block.attrs.locale)).toEqual(languages);
 		for (const block of blocks) {
 			const language = String(block.attrs.locale);
-			const actual = JSON.parse(block.content) as Record<string, string>;
+			const actual = historicalFinalOwnerDictionary(owner.file, language, JSON.parse(block.content) as Record<string, string>);
 			expect(actual).toEqual(reviewed[language]);
 			for (const [key, value] of Object.entries(actual)) {
 				expect(value).not.toMatch(/\{[^{}]+\}/);
@@ -167,6 +167,7 @@ test('actual VVI resolves all 980 reviewed labels and returns to English and Jap
 		await runtime.loadLocale(language);
 		runtime.install(createApp({}));
 		expect(runtime.locale).toBe(language);
+		expect((createComponentLocale('/features/auth/frontend/pages/settings/security.vue') as Record<string, string>).changePasswordWithPasskey).toBe('パスキーでパスワードを変更');
 		for (const owner of metadata.owners) {
 			const actual = createComponentLocale(owner.file.replace('packages/', '/')) as Record<string, string>;
 			const expected = reviewedFinalOwnerDictionaries.get(owner.file)![language];
@@ -180,3 +181,18 @@ test('actual VVI resolves all 980 reviewed labels and returns to English and Jap
 	}
 	expect(checked).toBe(1050);
 }, 30000);
+
+test('fresh password label keeps its exact primary-only inventory and rejects every extra edit', () => {
+	const file = 'packages/features/auth/frontend/pages/settings/security.vue';
+	const source = readFileSync(resolve(root, file), 'utf8');
+	const addition = '\t"changePasswordWithPasskey": "パスキーでパスワードを変更",\n';
+	expect(source.split(addition)).toHaveLength(2);
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace(addition, ''))).toThrow('Invalid final-owner key inventory');
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace('"changePasswordWithPasskey":', '"unexpectedFreshKey":'))).toThrow('Invalid final-owner key inventory');
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace('パスキーでパスワードを変更', 'unreviewed label'))).toThrow('Final-owner dictionary differs from reviewed text');
+	const moved = source.replace(addition, '').replace('<locale locale="ja-JP" lang="json">\n{\n', '<locale locale="ja-JP" lang="json">\n{\n' + addition);
+	expect(() => restoreFinalOwnerHistoricalSource(file, moved)).toThrow('Invalid final-owner key inventory');
+	const otherLanguage = source.replace('<locale locale="ar-SA" lang="json">\n{\n', '<locale locale="ar-SA" lang="json">\n{\n' + addition);
+	expect(() => restoreFinalOwnerHistoricalSource(file, otherLanguage)).toThrow('Invalid final-owner key inventory');
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace(addition, addition + addition))).toThrow('Final owner changed original component body');
+});

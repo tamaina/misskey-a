@@ -43,6 +43,18 @@ export function reviewedFinalOwnerMessage(file: string, language: string, path: 
 	return expected;
 }
 
+/** Project only the exact new primary label out of the immutable migration oracle. */
+export function historicalFinalOwnerDictionary(file: string, language: string, dictionary: Dictionary): Dictionary {
+	if (file !== 'packages/features/auth/frontend/pages/settings/security.vue' || language !== 'ja-JP') return dictionary;
+	const keys = [...owners.get(file)!.keys];
+	keys.splice(keys.indexOf('changePassword') + 1, 0, 'changePasswordWithPasskey');
+	if (JSON.stringify(Object.keys(dictionary)) !== JSON.stringify(keys)) throw new Error(`Invalid final-owner key inventory: ${file}`);
+	if (dictionary.changePasswordWithPasskey !== 'パスキーでパスワードを変更') throw new Error(`Final-owner dictionary differs from reviewed text: ${file}:${language}`);
+	const historical = { ...dictionary };
+	delete historical.changePasswordWithPasskey;
+	return historical;
+}
+
 /** Verify the actual reviewed dictionaries and every non-locale byte before
  * exposing immutable Git source to the unchanged historical migration oracle.
  */
@@ -57,7 +69,7 @@ export function restoreFinalOwnerHistoricalSource(file: string, source: string):
 	const keys = owner.keys;
 	for (const block of blocks) {
 		if (block.attrs.lang !== 'json') throw new Error(`Invalid final-owner locale format: ${file}`);
-		const dictionary = JSON.parse(block.content) as Dictionary;
+		const dictionary = historicalFinalOwnerDictionary(file, String(block.attrs.locale), JSON.parse(block.content) as Dictionary);
 		if (JSON.stringify(Object.keys(dictionary)) !== JSON.stringify(keys)) throw new Error(`Invalid final-owner key inventory: ${file}`);
 		const expected = reviewedFinalOwnerDictionaries.get(file)?.[String(block.attrs.locale)];
 		if (JSON.stringify(dictionary) !== JSON.stringify(expected)) throw new Error(`Final-owner dictionary differs from reviewed text: ${file}:${block.attrs.locale}`);
