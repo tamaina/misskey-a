@@ -29,7 +29,7 @@ const entity = new EntitySchema<Pick<MiUserProfile, 'userId' | 'password' | 'two
 });
 
 describe.skipIf(!socket)('real PostgreSQL recovery-code consumption', () => {
-	let db: DataSource;
+	let db: DataSource | undefined;
 	let profiles: UserProfilesRepository;
 	let service: TotpService;
 	beforeAll(async () => {
@@ -87,7 +87,7 @@ describe.skipIf(!socket)('real PostgreSQL recovery-code consumption', () => {
 	});
 
 	test('code text is a parameter even when it contains SQL syntax', async () => {
-		const literal = "synthetic'); DROP TABLE user_profile; --";
+		const literal = 'synthetic\'); DROP TABLE user_profile; --';
 		await profiles.update({ userId: 'synthetic' }, { twoFactorBackupSecret: [literal, second] });
 		await service.twoFactorAuthenticate(await snapshot(), literal);
 		expect((await snapshot()).twoFactorBackupSecret).toEqual([second]);

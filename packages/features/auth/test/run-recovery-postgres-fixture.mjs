@@ -23,6 +23,8 @@ function run(binary, args, env = process.env) {
 }
 
 let started = false;
+let failure;
+let cleanupFailure;
 try {
 	run(join(binaries, 'initdb'), ['-D', data, '--encoding=UTF8', '--locale=C', '--auth-local=trust', '--auth-host=reject', '--wal-segsize=1', '--no-sync']);
 	const config = join(directory, 'settings.conf');
@@ -33,11 +35,20 @@ try {
 	const testConfig = join(directory, 'vitest.mjs');
 	writeFileSync(testConfig, `import { baseConfig } from ${JSON.stringify(join(root, 'packages/backend/vitest.config.ts'))};\nexport default { ...baseConfig, test: { ...baseConfig.test, dir: ${JSON.stringify(join(root, 'packages/features/auth/test/backend'))}, include: ['recovery-code-postgres.test.ts'], environment: 'node', maxWorkers: 1, maxConcurrency: 1 } };\n`);
 	run(process.execPath, ['--max-old-space-size=1024', 'packages/backend/node_modules/vitest/vitest.mjs', 'run', '--config', testConfig], { ...process.env, MISSKEY_AUTH_RECOVERY_TEST_SOCKET: socket });
+} catch (error) {
+	failure = { error };
 } finally {
 	if (started) {
 		const status = spawnSync(join(binaries, 'pg_ctl'), ['-D', data, 'status'], { stdio: 'ignore' });
-		if (status.status === 0) run(join(binaries, 'pg_ctl'), ['-D', data, '-m', 'fast', '-w', '-t', '10', 'stop']);
-		else if (status.status !== 3) throw new Error('Cannot verify recovery fixture shutdown');
+		if (status.status === 0) {
+			const stopped = spawnSync(join(binaries, 'pg_ctl'), ['-D', data, '-m', 'fast', '-w', '-t', '10', 'stop'], { stdio: 'inherit' });
+			if (stopped.error || stopped.status !== 0) cleanupFailure = new Error('Recovery fixture shutdown failed');
+		} else if (status.status !== 3) {
+			cleanupFailure = new Error('Cannot verify recovery fixture shutdown');
+		}
 	}
 	process.stdout.write(`Task-owned recovery fixture retained at ${directory}; TCP disabled.\n`);
 }
+
+if (cleanupFailure) throw new AggregateError([...(failure ? [failure.error] : []), cleanupFailure], 'Recovery fixture shutdown was not verified');
+if (failure) throw failure.error;

@@ -27,9 +27,9 @@ export class TotpService {
 			// different code or accept the same snapshot after it was consumed.
 			const consumed = await this.userProfilesRepository.update({
 				userId: profile.userId,
-				password: profile.password == null ? IsNull() : profile.password,
+				password: profile.password ?? IsNull(),
 				twoFactorEnabled: profile.twoFactorEnabled === true,
-				twoFactorSecret: profile.twoFactorSecret == null ? IsNull() : profile.twoFactorSecret,
+				twoFactorSecret: profile.twoFactorSecret ?? IsNull(),
 				twoFactorBackupSecret: Raw(column => `:backupCode = ANY(${column})`, { backupCode: token }),
 			}, {
 				twoFactorBackupSecret: () => 'array_remove("twoFactorBackupSecret", :backupCode)',

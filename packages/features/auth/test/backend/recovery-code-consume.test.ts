@@ -8,6 +8,7 @@ import { TotpService } from '../../backend/services/TotpService.js';
 import type { MiUserProfile } from '@features/persistence/backend/repositories/models.js';
 
 const code = 'SYNTHETIC'.padEnd(32, 'A');
+
 function fixture() {
 	const redis = mockDeep<ConstructorParameters<typeof TotpService>[0]>();
 	const users = mockDeep<ConstructorParameters<typeof TotpService>[1]>();
