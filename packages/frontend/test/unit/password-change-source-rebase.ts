@@ -4,12 +4,14 @@
  */
 
 import { createHash } from 'node:crypto';
+import { restoreSigninProgressBaseline } from './signin-progress-source-rebase.js';
 import rebases from './password-change-source-rebase.json';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 /** Reverse only this password/MFA flow fix before checking the frozen locale proofs. */
 export function restorePasswordChangeBaseline(file: string, source: string): string {
+	source = restoreSigninProgressBaseline(file, source);
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from the password/MFA change: ${file}`);

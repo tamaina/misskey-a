@@ -142596,12 +142596,24 @@ export interface operations {
                         finished: false;
                         /** @constant */
                         next: 'totp';
+                        authenticationProgress?: {
+                            ticket: string;
+                            browserSecret: string;
+                            nonce: string;
+                            version: number;
+                        };
                         availableFactors?: ('totp' | 'passkey')[];
                     } | {
                         /** @constant */
                         finished: false;
                         /** @constant */
                         next: 'passkey';
+                        authenticationProgress?: {
+                            ticket: string;
+                            browserSecret: string;
+                            nonce: string;
+                            version: number;
+                        };
                         authRequest: {
                             challenge: string;
                             timeout?: number;

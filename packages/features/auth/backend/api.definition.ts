@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { signinProgressChallengeSchema } from './signin-progress.schema.js';
 import { aliasTwoFactorContract } from './2fa-api-aliases.contract.js';
 import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
@@ -548,8 +549,8 @@ export const authSessionsContract = {
 	} as const).route({ method: 'POST', path: '/signin-flow', tags: ['auth'], }).errors(httpErrors).input(packedOptionalJsonValueSchema).output(v.union([v.union([
 	finishedSigninSchema,
 	v.strictObject({ finished: v.literal(false), next: v.picklist(['captcha', 'password']) }),
-	v.strictObject({ finished: v.literal(false), next: v.literal('totp'), availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
-	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authRequest: webAuthnAuthenticationOptionsSchema, availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('totp'), authenticationProgress: v.exactOptional(signinProgressChallengeSchema), availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authenticationProgress: v.exactOptional(signinProgressChallengeSchema), authRequest: webAuthnAuthenticationOptionsSchema, availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
 ]), sessionFailureSchema, v.void()])),
 	signinWithPasskey: oc.$meta({
 		requestName: 'signin-with-passkey',

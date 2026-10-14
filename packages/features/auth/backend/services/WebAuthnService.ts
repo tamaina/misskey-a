@@ -4,6 +4,7 @@
  */
 
 import * as v from 'valibot';
+import { canonicalWebAuthnPublicKey } from '../webauthn-public-key.js';
 
 import {
 	generateAuthenticationOptions,
@@ -18,7 +19,7 @@ import type {
 	PublicKeyCredentialRequestOptionsJSON,
 	RegistrationResponseJSON,
 } from '@simplewebauthn/server';
-import { AttestationFormat, isoCBOR, isoUint8Array } from '@simplewebauthn/server/helpers';
+import { AttestationFormat, isoUint8Array } from '@simplewebauthn/server/helpers';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiUser } from '@features/persistence/backend/repositories/models.js';
 import type { MiMeta, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
@@ -260,28 +261,11 @@ export class WebAuthnService {
 			throw new IdentifiableError('36b96a7d-b547-412d-aeed-2d611cdc8cdc', 'unknown key');
 		}
 
-		// マイグレーション
-		if (key.counter === 0 && key.publicKey.length === 87) {
-			const cert = new Uint8Array(Buffer.from(key.publicKey, 'base64url'));
-			if (cert[0] === 0x04) { // 前の実装ではいつも 0x04 で始まっていた
-				const halfLength = (cert.length - 1) / 2;
-
-				const cborMap = new Map<number, number | Uint8Array>();
-				cborMap.set(1, 2); // kty, EC2
-				cborMap.set(3, -7); // alg, ES256
-				cborMap.set(-1, 1); // crv, P256
-				cborMap.set(-2, cert.slice(1, halfLength + 1)); // x
-				cborMap.set(-3, cert.slice(halfLength + 1)); // y
-
-				const cborPubKey = Buffer.from(isoCBOR.encode(cborMap)).toString('base64url');
-				await this.userSecurityKeysRepository.update({
-					id: this.authenticationCredentialId(response),
-					userId: userId,
-				}, {
-					publicKey: cborPubKey,
-				});
-				key.publicKey = cborPubKey;
-			}
+		// Preserve the existing legacy EC→COSE conversion and its update timing.
+		const cborPubKey = canonicalWebAuthnPublicKey(key.publicKey, key.counter);
+		if (cborPubKey !== key.publicKey) {
+			await this.userSecurityKeysRepository.update({ id: this.authenticationCredentialId(response), userId }, { publicKey: cborPubKey });
+			key.publicKey = cborPubKey;
 		}
 
 		const relyingParty = this.getRelyingParty();
