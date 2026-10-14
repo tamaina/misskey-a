@@ -1,0 +1,574 @@
+[
+  {
+    "file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
+    "currentSha256": "3f756404fc149ea664b71a7ba7e7fd13c7769dce0d4a1ca7875a5cd923ca4fe9",
+    "baselineSha256": "ff777757a0db707321f10f911888b02957fb3a9f1bc6f4892412191761e439fe",
+    "edits": [
+      {
+        "start": 1365,
+        "end": 1786,
+        "current": "\t\t\t\t\t<template #caption>\n\t\t\t\t\t\t<span :class=\"$style.announcementText\">{{ announcement.text }}</span>\n\t\t\t\t\t</template>\n\t\t\t\t\t<template #suffix>\n\t\t\t\t\t\t<span v-if=\"announcement.autoArchiveAt\" :class=\"$style.autoArchiveAt\">\n\t\t\t\t\t\t\t<i class=\"ti ti-calendar-time\"></i> {{ $locale.sfc.autoArchiveAt }}: <MkTime :key=\"announcement.autoArchiveAt\" :time=\"announcement.autoArchiveAt\" mode=\"absolute\"/>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</template>\n",
+        "baseline": "\t\t\t\t\t<template #caption>{{ announcement.text }}</template>\n"
+      },
+      {
+        "start": 2979,
+        "end": 3218,
+        "current": "\t\t\t\t\t\t</MkInput>\n\t\t\t\t\t\t<MkInput v-model=\"announcement.autoArchiveAt\" type=\"datetime-local\">\n\t\t\t\t\t\t\t<template #label>{{ $locale.sfc.autoArchiveAt }}</template>\n\t\t\t\t\t\t\t<template #caption>{{ $locale.sfc.autoArchiveAtDescription }}</template>\n",
+        "baseline": ""
+      },
+      {
+        "start": 5243,
+        "end": 5321,
+        "current": "import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 5786,
+        "end": 5893,
+        "current": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 5969,
+        "end": 5969,
+        "current": "",
+        "baseline": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';\n"
+      },
+      {
+        "start": 6328,
+        "end": 6540,
+        "current": "import { buildAnnouncementUpdate } from '@features/announcements/frontend/update-input.js';\nimport { formatAutoArchiveInput, parseAutoArchiveInput } from '@features/announcements/frontend/auto-archive-input.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 6846,
+        "end": 7225,
+        "current": "const createAnnouncementErrors: ApiWithDialogCustomErrors = {\n\t'2a892bd5-487d-46a2-a5fe-3d85ad51defe': {\n\t\ttitle: $locale.value.sfc.autoArchiveAt,\n\t\ttext: $locale.value.sfc.autoArchiveAtMustBeInFuture,\n\t},\n};\n\ntype EditableAnnouncement = Omit<Misskey.entities.AdminAnnouncementsListResponse[number], 'id' | 'createdAt' | 'updatedAt' | 'reads' | 'isActive' | 'autoArchiveAt'> & {\n",
+        "baseline": "const announcements = ref<(Omit<Misskey.entities.AdminAnnouncementsListResponse[number], 'id' | 'createdAt' | 'updatedAt' | 'reads' | 'isActive'> & {\n"
+      },
+      {
+        "start": 7416,
+        "end": 7882,
+        "current": "\tautoArchiveAt: string;\n\toriginalAutoArchiveAt: Misskey.entities.AdminAnnouncementsListResponse[number]['autoArchiveAt'];\n};\n\nconst announcements = ref<EditableAnnouncement[]>([]);\n\nfunction toEditableAnnouncement(announcement: Misskey.entities.AdminAnnouncementsListResponse[number]): EditableAnnouncement {\n\treturn {\n\t\t...announcement,\n\t\tautoArchiveAt: formatAutoArchiveInput(announcement.autoArchiveAt),\n\t\toriginalAutoArchiveAt: announcement.autoArchiveAt,\n\t};\n}\n",
+        "baseline": "})[]>([]);\n"
+      },
+      {
+        "start": 8034,
+        "end": 8108,
+        "current": "\t\tannouncements.value = announcementResponse.map(toEditableAnnouncement);\n",
+        "baseline": "\t\tannouncements.value = announcementResponse;\n"
+      },
+      {
+        "start": 8414,
+        "end": 8466,
+        "current": "\t\tautoArchiveAt: '',\n\t\toriginalAutoArchiveAt: null,\n",
+        "baseline": ""
+      },
+      {
+        "start": 9061,
+        "end": 9239,
+        "current": "\tconst { _id, id, autoArchiveAt, originalAutoArchiveAt, ...data } = announcement; // APIに不要な項目を消す\n\tawait os.apiWithDialog('admin/announcements/update', buildAnnouncementUpdate({\n",
+        "baseline": "\tconst { _id, ...data } = announcement; // _idを消す\n\tawait os.apiWithDialog('admin/announcements/update', {\n"
+      },
+      {
+        "start": 9250,
+        "end": 9256,
+        "current": "\t\tid,\n",
+        "baseline": "\t\tid: announcement.id, // TSを黙らすため\n"
+      },
+      {
+        "start": 9275,
+        "end": 9359,
+        "current": "\t\tautoArchiveAt: parseAutoArchiveInput(autoArchiveAt, originalAutoArchiveAt),\n\t}));\n",
+        "baseline": "\t});\n"
+      },
+      {
+        "start": 9494,
+        "end": 9758,
+        "current": "\tconst { _id, id, autoArchiveAt, originalAutoArchiveAt, ...data } = announcement; // APIに不要な項目を消す\n\tconst autoArchiveAtMs = parseAutoArchiveInput(autoArchiveAt, originalAutoArchiveAt);\n\tawait os.apiWithDialog('admin/announcements/update', buildAnnouncementUpdate({\n",
+        "baseline": "\tconst { _id, ...data } = announcement; // _idを消す\n\tawait os.apiWithDialog('admin/announcements/update', {\n"
+      },
+      {
+        "start": 9769,
+        "end": 9775,
+        "current": "\t\tid,\n",
+        "baseline": "\t\tid: announcement.id, // TSを黙らすため\n"
+      },
+      {
+        "start": 9793,
+        "end": 9899,
+        "current": "\t\tautoArchiveAt: autoArchiveAtMs != null && autoArchiveAtMs <= Date.now() ? null : autoArchiveAtMs,\n\t}));\n",
+        "baseline": "\t});\n"
+      },
+      {
+        "start": 9991,
+        "end": 10622,
+        "current": "\tconst { _id, id, isActive, reads, autoArchiveAt, originalAutoArchiveAt, ...data } = announcement; // APIに不要な項目を消す\n\tconst autoArchiveAtMs = parseAutoArchiveInput(autoArchiveAt, originalAutoArchiveAt);\n\tif (id == null) {\n\t\tif (autoArchiveAtMs != null && (Number.isNaN(autoArchiveAtMs) || autoArchiveAtMs <= Date.now())) {\n\t\t\tawait os.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.autoArchiveAt,\n\t\t\t\ttext: $locale.value.sfc.autoArchiveAtMustBeInFuture,\n\t\t\t});\n\t\t\treturn;\n\t\t}\n\n\t\tawait os.apiWithDialog('admin/announcements/create', {\n\t\t\t...data,\n\t\t\tautoArchiveAt: autoArchiveAtMs,\n\t\t}, undefined, createAnnouncementErrors);\n",
+        "baseline": "\tconst { _id, ...data } = announcement; // _idを消す\n\tif (announcement.id == null) {\n\t\tawait os.apiWithDialog('admin/announcements/create', data);\n"
+      },
+      {
+        "start": 10645,
+        "end": 10726,
+        "current": "\t\tawait os.apiWithDialog('admin/announcements/update', buildAnnouncementUpdate({\n",
+        "baseline": "\t\tos.apiWithDialog('admin/announcements/update', {\n"
+      },
+      {
+        "start": 10738,
+        "end": 10800,
+        "current": "\t\t\tid,\n\t\t\tisActive,\n\t\t\tautoArchiveAt: autoArchiveAtMs,\n\t\t}));\n",
+        "baseline": "\t\t\tid: announcement.id, // TSを黙らすため\n\t\t});\n"
+      },
+      {
+        "start": 11077,
+        "end": 11179,
+        "current": "\t\tannouncements.value = announcements.value.concat(announcementResponse.map(toEditableAnnouncement));\n",
+        "baseline": "\t\tannouncements.value = announcements.value.concat(announcementResponse);\n"
+      },
+      {
+        "start": 11374,
+        "end": 11448,
+        "current": "\t\tannouncements.value = announcementResponse.map(toEditableAnnouncement);\n",
+        "baseline": "\t\tannouncements.value = announcementResponse;\n"
+      },
+      {
+        "start": 11812,
+        "end": 11997,
+        "current": "\n<style lang=\"scss\" module>\n.announcementText {\n\tdisplay: block;\n\toverflow: hidden;\n\ttext-overflow: ellipsis;\n\twhite-space: nowrap;\n}\n\n.autoArchiveAt {\n\twhite-space: nowrap;\n}\n</style>\n",
+        "baseline": ""
+      },
+      {
+        "start": 13857,
+        "end": 14070,
+        "current": "\t\"announcements\": \"الإعلانات\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"الإعلانات\"\n"
+      },
+      {
+        "start": 16014,
+        "end": 16416,
+        "current": "\t\"announcements\": \"Avisos\",\n\t\"autoArchiveAt\": \"Data i hora d'arxivament automàtic\",\n\t\"autoArchiveAtDescription\": \"Un cop hagin passat la data i l'hora especificades, aquest avís s'arxivarà automàticament. Si aquest camp es deixa en blanc, no s'arxivarà automàticament.\",\n\t\"autoArchiveAtMustBeInFuture\": \"Indiqueu una data i una hora per a l'arxivament automàtic posteriors a la data i l'hora actuals.\"\n",
+        "baseline": "\t\"announcements\": \"Avisos\"\n"
+      },
+      {
+        "start": 18314,
+        "end": 18526,
+        "current": "\t\"announcements\": \"Oznámení\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Oznámení\"\n"
+      },
+      {
+        "start": 20406,
+        "end": 20623,
+        "current": "\t\"announcements\": \"Announcements\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Announcements\"\n"
+      },
+      {
+        "start": 22662,
+        "end": 22879,
+        "current": "\t\"announcements\": \"Ankündigungen\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Ankündigungen\"\n"
+      },
+      {
+        "start": 24759,
+        "end": 24976,
+        "current": "\t\"announcements\": \"Announcements\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Announcements\"\n"
+      },
+      {
+        "start": 26978,
+        "end": 27188,
+        "current": "\t\"announcements\": \"Avisos\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Avisos\"\n"
+      },
+      {
+        "start": 29221,
+        "end": 29433,
+        "current": "\t\"announcements\": \"Annonces\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Annonces\"\n"
+      },
+      {
+        "start": 31471,
+        "end": 31685,
+        "current": "\t\"announcements\": \"Pengumuman\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Pengumuman\"\n"
+      },
+      {
+        "start": 33839,
+        "end": 34050,
+        "current": "\t\"announcements\": \"Annunci\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Annunci\"\n"
+      },
+      {
+        "start": 35326,
+        "end": 35534,
+        "current": "\t\"announcements\": \"お知らせ\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"お知らせ\"\n"
+      },
+      {
+        "start": 36766,
+        "end": 36974,
+        "current": "\t\"announcements\": \"お知らせ\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"お知らせ\"\n"
+      },
+      {
+        "start": 38856,
+        "end": 39073,
+        "current": "\t\"announcements\": \"Announcements\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Announcements\"\n"
+      },
+      {
+        "start": 40953,
+        "end": 41170,
+        "current": "\t\"announcements\": \"Announcements\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Announcements\"\n"
+      },
+      {
+        "start": 42478,
+        "end": 42719,
+        "current": "\t\"announcements\": \"공지사항\",\n\t\"autoArchiveAt\": \"자동 아카이브 날짜 및 시각\",\n\t\"autoArchiveAtDescription\": \"지정한 날짜 및 시각이 지나면 이 알림은 자동적으로 아카이브됩니다. 빈칸일 경우에는 자동적으로 아카이브되지 않습니다.\",\n\t\"autoArchiveAtMustBeInFuture\": \"자동 아카이브 날짜 및 시각에는 현재보다 후의 날짜 및 시각으로 지정해 주십시오.\"\n",
+        "baseline": "\t\"announcements\": \"공지사항\"\n"
+      },
+      {
+        "start": 44635,
+        "end": 44853,
+        "current": "\t\"announcements\": \"Aankondigingen\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Aankondigingen\"\n"
+      },
+      {
+        "start": 46737,
+        "end": 46954,
+        "current": "\t\"announcements\": \"Kunngjøringer\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Kunngjøringer\"\n"
+      },
+      {
+        "start": 48853,
+        "end": 49067,
+        "current": "\t\"announcements\": \"Ogłoszenia\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Ogłoszenia\"\n"
+      },
+      {
+        "start": 50882,
+        "end": 51092,
+        "current": "\t\"announcements\": \"Avisos\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Avisos\"\n"
+      },
+      {
+        "start": 52981,
+        "end": 53195,
+        "current": "\t\"announcements\": \"Оповещения\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Оповещения\"\n"
+      },
+      {
+        "start": 55094,
+        "end": 55304,
+        "current": "\t\"announcements\": \"Oznamy\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Oznamy\"\n"
+      },
+      {
+        "start": 57153,
+        "end": 57363,
+        "current": "\t\"announcements\": \"ประกาศ\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"ประกาศ\"\n"
+      },
+      {
+        "start": 59295,
+        "end": 59508,
+        "current": "\t\"announcements\": \"Duyurular\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Duyurular\"\n"
+      },
+      {
+        "start": 61389,
+        "end": 61606,
+        "current": "\t\"announcements\": \"Announcements\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Announcements\"\n"
+      },
+      {
+        "start": 63489,
+        "end": 63703,
+        "current": "\t\"announcements\": \"Оголошення\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Оголошення\"\n"
+      },
+      {
+        "start": 65598,
+        "end": 65819,
+        "current": "\t\"announcements\": \"Thông báo máy chủ\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"Thông báo máy chủ\"\n"
+      },
+      {
+        "start": 66921,
+        "end": 67081,
+        "current": "\t\"announcements\": \"公告\",\n\t\"autoArchiveAt\": \"自动存档时间\",\n\t\"autoArchiveAtDescription\": \"当超过指定的时间时，此通知将自动存档。留空则不自动存档。\",\n\t\"autoArchiveAtMustBeInFuture\": \"请指定晚于当前时间的值。\"\n",
+        "baseline": "\t\"announcements\": \"公告\"\n"
+      },
+      {
+        "start": 68185,
+        "end": 68391,
+        "current": "\t\"announcements\": \"公告\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"announcements\": \"公告\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/users/frontend/components/MkUserAnnouncementEditDialog.vue",
+    "currentSha256": "2dedaa3f5a137c76afe1bfb1524735a7232d1282b1d9078b4631bb27cd503478",
+    "baselineSha256": "a534b0d3fc8c59151b8d4e26aa50ca5584fc3574f9c96a79065b6b002bbd6243",
+    "edits": [
+      {
+        "start": 1442,
+        "end": 1660,
+        "current": "\t\t\t\t<MkInput v-model=\"autoArchiveAt\" type=\"datetime-local\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.autoArchiveAt }}</template>\n\t\t\t\t\t<template #caption>{{ $locale.sfc.autoArchiveAtDescription }}</template>\n\t\t\t\t</MkInput>\n",
+        "baseline": ""
+      },
+      {
+        "start": 2354,
+        "end": 2432,
+        "current": "import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 2701,
+        "end": 2808,
+        "current": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 2884,
+        "end": 2884,
+        "current": "",
+        "baseline": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';\n"
+      },
+      {
+        "start": 3098,
+        "end": 3310,
+        "current": "import { buildAnnouncementUpdate } from '@features/announcements/frontend/update-input.js';\nimport { formatAutoArchiveInput, parseAutoArchiveInput } from '@features/announcements/frontend/auto-archive-input.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 3311,
+        "end": 3478,
+        "current": "type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsListResponse[number];\ntype AdminAnnouncementUpdate = Misskey.entities.AdminAnnouncementsUpdateRequest;\n",
+        "baseline": "type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsCreateRequest & { id: string; };\n"
+      },
+      {
+        "start": 3537,
+        "end": 3576,
+        "current": "\tannouncement?: AdminAnnouncementType,\n",
+        "baseline": "\tannouncement?: Required<AdminAnnouncementType>,\n"
+      },
+      {
+        "start": 3610,
+        "end": 3754,
+        "current": "\t(ev: 'done', v: { deleted?: boolean; updated?: AdminAnnouncementUpdate; created?: Misskey.entities.AdminAnnouncementsCreateResponse; }): void,\n",
+        "baseline": "\t(ev: 'done', v: { deleted?: boolean; updated?: AdminAnnouncementType; created?: AdminAnnouncementType; }): void,\n"
+      },
+      {
+        "start": 4226,
+        "end": 4573,
+        "current": "const initialAutoArchiveAt = formatAutoArchiveInput(props.announcement?.autoArchiveAt);\nconst autoArchiveAt = ref(initialAutoArchiveAt);\n\nconst createAnnouncementErrors: ApiWithDialogCustomErrors = {\n\t'2a892bd5-487d-46a2-a5fe-3d85ad51defe': {\n\t\ttitle: $locale.value.sfc.autoArchiveAt,\n\t\ttext: $locale.value.sfc.autoArchiveAtMustBeInFuture,\n\t},\n};\n",
+        "baseline": ""
+      },
+      {
+        "start": 4598,
+        "end": 4981,
+        "current": "\tconst autoArchiveAtMs = parseAutoArchiveInput(autoArchiveAt.value, props.announcement?.autoArchiveAt);\n\tif (!props.announcement && autoArchiveAtMs != null && (Number.isNaN(autoArchiveAtMs) || autoArchiveAtMs <= Date.now())) {\n\t\tawait os.alert({\n\t\t\ttype: 'error',\n\t\t\ttitle: $locale.value.sfc.autoArchiveAt,\n\t\t\ttext: $locale.value.sfc.autoArchiveAtMustBeInFuture,\n\t\t});\n\t\treturn;\n\t}\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 5186,
+        "end": 5220,
+        "current": "\t\tautoArchiveAt: autoArchiveAtMs,\n",
+        "baseline": ""
+      },
+      {
+        "start": 5311,
+        "end": 5459,
+        "current": "\t\tconst update = buildAnnouncementUpdate({ ...params, id: props.announcement.id });\n\t\tawait os.apiWithDialog('admin/announcements/update', update);\n",
+        "baseline": "\t\tawait os.apiWithDialog('admin/announcements/update', {\n\t\t\t...params,\n\t\t\tid: props.announcement.id,\n\t\t});\n"
+      },
+      {
+        "start": 5477,
+        "end": 5497,
+        "current": "\t\t\tupdated: update,\n",
+        "baseline": "\t\t\tupdated: {\n\t\t\t\t...params,\n\t\t\t\tid: props.announcement.id,\n\t\t\t},\n"
+      },
+      {
+        "start": 5539,
+        "end": 5656,
+        "current": "\t\tconst created = await os.apiWithDialog('admin/announcements/create', params, undefined, createAnnouncementErrors);\n",
+        "baseline": "\t\tconst created = await os.apiWithDialog('admin/announcements/create', params);\n"
+      },
+      {
+        "start": 5674,
+        "end": 5686,
+        "current": "\t\t\tcreated,\n",
+        "baseline": "\t\t\tcreated: created,\n"
+      },
+      {
+        "start": 6945,
+        "end": 7146,
+        "current": "\t\"create\": \"أنشئ\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"أنشئ\"\n"
+      },
+      {
+        "start": 7745,
+        "end": 8139,
+        "current": "\t\"create\": \"Crear\",\n\t\"autoArchiveAt\": \"Data i hora d'arxivament automàtic\",\n\t\"autoArchiveAtDescription\": \"Un cop hagin passat la data i l'hora especificades, aquest avís s'arxivarà automàticament. Si aquest camp es deixa en blanc, no s'arxivarà automàticament.\",\n\t\"autoArchiveAtMustBeInFuture\": \"Indiqueu una data i una hora per a l'arxivament automàtic posteriors a la data i l'hora actuals.\"\n",
+        "baseline": "\t\"create\": \"Crear\"\n"
+      },
+      {
+        "start": 8731,
+        "end": 8936,
+        "current": "\t\"create\": \"Vytvořit\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Vytvořit\"\n"
+      },
+      {
+        "start": 9522,
+        "end": 9725,
+        "current": "\t\"create\": \"Create\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Create\"\n"
+      },
+      {
+        "start": 10336,
+        "end": 10542,
+        "current": "\t\"create\": \"Erstellen\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Erstellen\"\n"
+      },
+      {
+        "start": 11128,
+        "end": 11331,
+        "current": "\t\"create\": \"Create\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Create\"\n"
+      },
+      {
+        "start": 11902,
+        "end": 12104,
+        "current": "\t\"create\": \"Crear\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Crear\"\n"
+      },
+      {
+        "start": 12681,
+        "end": 12883,
+        "current": "\t\"create\": \"Créer\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Créer\"\n"
+      },
+      {
+        "start": 13514,
+        "end": 13715,
+        "current": "\t\"create\": \"Buat\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Buat\"\n"
+      },
+      {
+        "start": 14280,
+        "end": 14481,
+        "current": "\t\"create\": \"Crea\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Crea\"\n"
+      },
+      {
+        "start": 14869,
+        "end": 15068,
+        "current": "\t\"create\": \"作成\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"作成\"\n"
+      },
+      {
+        "start": 15458,
+        "end": 15657,
+        "current": "\t\"create\": \"作成\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"作成\"\n"
+      },
+      {
+        "start": 16243,
+        "end": 16446,
+        "current": "\t\"create\": \"Create\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Create\"\n"
+      },
+      {
+        "start": 17031,
+        "end": 17234,
+        "current": "\t\"create\": \"Create\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Create\"\n"
+      },
+      {
+        "start": 17640,
+        "end": 17872,
+        "current": "\t\"create\": \"생성\",\n\t\"autoArchiveAt\": \"자동 아카이브 날짜 및 시각\",\n\t\"autoArchiveAtDescription\": \"지정한 날짜 및 시각이 지나면 이 알림은 자동적으로 아카이브됩니다. 빈칸일 경우에는 자동적으로 아카이브되지 않습니다.\",\n\t\"autoArchiveAtMustBeInFuture\": \"자동 아카이브 날짜 및 시각에는 현재보다 후의 날짜 및 시각으로 지정해 주십시오.\"\n",
+        "baseline": "\t\"create\": \"생성\"\n"
+      },
+      {
+        "start": 18468,
+        "end": 18671,
+        "current": "\t\"create\": \"Creëer\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Creëer\"\n"
+      },
+      {
+        "start": 19256,
+        "end": 19460,
+        "current": "\t\"create\": \"Opprett\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Opprett\"\n"
+      },
+      {
+        "start": 20041,
+        "end": 20244,
+        "current": "\t\"create\": \"Utwórz\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Utwórz\"\n"
+      },
+      {
+        "start": 20789,
+        "end": 20991,
+        "current": "\t\"create\": \"Criar\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Criar\"\n"
+      },
+      {
+        "start": 21569,
+        "end": 21773,
+        "current": "\t\"create\": \"Создать\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Создать\"\n"
+      },
+      {
+        "start": 22355,
+        "end": 22560,
+        "current": "\t\"create\": \"Vytvoriť\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Vytvoriť\"\n"
+      },
+      {
+        "start": 23097,
+        "end": 23299,
+        "current": "\t\"create\": \"สร้าง\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"สร้าง\"\n"
+      },
+      {
+        "start": 23879,
+        "end": 24083,
+        "current": "\t\"create\": \"Oluştur\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Oluştur\"\n"
+      },
+      {
+        "start": 24670,
+        "end": 24873,
+        "current": "\t\"create\": \"Create\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Create\"\n"
+      },
+      {
+        "start": 25491,
+        "end": 25696,
+        "current": "\t\"create\": \"Створити\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Створити\"\n"
+      },
+      {
+        "start": 26287,
+        "end": 26487,
+        "current": "\t\"create\": \"Tạo\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"Tạo\"\n"
+      },
+      {
+        "start": 26846,
+        "end": 26999,
+        "current": "\t\"create\": \"创建\",\n\t\"autoArchiveAt\": \"自动存档时间\",\n\t\"autoArchiveAtDescription\": \"当超过指定的时间时，此通知将自动存档。留空则不自动存档。\",\n\t\"autoArchiveAtMustBeInFuture\": \"请指定晚于当前时间的值。\"\n",
+        "baseline": "\t\"create\": \"创建\"\n"
+      },
+      {
+        "start": 27368,
+        "end": 27567,
+        "current": "\t\"create\": \"新增\",\n\t\"autoArchiveAt\": \"自動アーカイブ日時\",\n\t\"autoArchiveAtDescription\": \"指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。\",\n\t\"autoArchiveAtMustBeInFuture\": \"自動アーカイブ日時には現在より後の日時を指定してください。\"\n",
+        "baseline": "\t\"create\": \"新增\"\n"
+      }
+    ]
+  }
+]

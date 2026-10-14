@@ -52,6 +52,22 @@ import { ApPersonService } from '@features/federation/backend/services/ApPersonS
 import { ApQuestionService } from '@features/federation/backend/services/ApQuestionService.js';
 
 import { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
+import { announcementServices } from '@features/announcements/backend/services.js';
+
+function restoreAnnouncementConstructorCount(feature: typeof AnnouncementService): number {
+	const entries = Object.entries(announcementServices.definitions);
+	const dependencies = announcementServices.definitions.AnnouncementService.dependencies;
+	expect(feature.length).toBe(dependencies.length);
+	const current = dependencies.map(dependency => {
+		if (dependency.kind === 'port') return { port: dependency.name };
+		const local = entries.find(([, candidate]) => candidate === dependency);
+		if (!local) throw new Error('Missing published local announcement definition');
+		return { service: local[0] };
+	});
+	return restoreUpstreamConstructorBaseline('announcements', 'AnnouncementService', current).length;
+}
+
+historicalConstructorCounts.set(AnnouncementService, () => restoreAnnouncementConstructorCount(AnnouncementService));
 
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';

@@ -47,6 +47,7 @@ import { SystemWebhookEntityService } from '@features/integrations/backend/seria
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { toNestProviders } from '@features/index/backend/feature-service-provider-types.js';
 import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
@@ -93,7 +94,7 @@ describe('typed feature declaration proof', () => {
 	});
 
 	test('Nest translates all typed external service ports to the original class targets', () => {
-		const targets = { httpRequestService: HttpRequestService, loggerService: LoggerService, idService: IdService, globalEventService: GlobalEventService, moderationLogService: ModerationLogService, userEntityService: UserEntityService, noteEntityService: NoteEntityService, roleService: RoleService, driveFileEntityService: DriveFileEntityService, queryService: QueryService, utilityService: UtilityService, systemAccountService: SystemAccountService, systemWebhookEntityService: SystemWebhookEntityService };
+		const targets = { queueService: QueueService, httpRequestService: HttpRequestService, loggerService: LoggerService, idService: IdService, globalEventService: GlobalEventService, moderationLogService: ModerationLogService, userEntityService: UserEntityService, noteEntityService: NoteEntityService, roleService: RoleService, driveFileEntityService: DriveFileEntityService, queryService: QueryService, utilityService: UtilityService, systemAccountService: SystemAccountService, systemWebhookEntityService: SystemWebhookEntityService };
 		for (const [name, feature] of [['auth', authServices], ['authSecurity', authSecurityServices], ['integrations', integrationServices], ['channels', channelServices], ['timelines', timelineServices], ['games', gameServices], ['drive', driveServices], ['relationships', relationshipServices], ['discovery', discoveryServices], ['userSearch', userSearchServices], ['ranking', rankingServices], ['announcements', announcementServices], ['instance', instanceServices], ['chat', chatServices], ['play', playServices], ['moderation', moderationServices], ['moderationLogging', moderationLoggingServices], ['collections', collectionServices], ['roles', roleServices], ['emojis', emojiServices], ['collectionGallery', galleryServices], ['driveMedia', mediaServices], ['markup', markupServices], ['preferences', preferencesServices]] as const) {
 			const factory = featureServiceGroups[name].providers.find((provider): provider is FactoryProvider => typeof provider === 'object' && 'useFactory' in provider && typeof provider.provide === 'symbol');
 			expect(factory?.inject).toEqual(feature.ports.map(port => port.name in targets ? targets[port.name as keyof typeof targets] : port.name === 'redisClient' ? DI.redis : DI[port.name as keyof typeof DI]));

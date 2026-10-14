@@ -36,6 +36,7 @@ export interface AnnouncementUpdateValues {
 	silence: boolean | undefined;
 	needConfirmationToRead: boolean | undefined;
 	isActive: boolean | undefined;
+	autoArchiveAt?: Date | null;
 }
 
 type Outputs = InferContractRouterOutputs<typeof announcementsContract>;
