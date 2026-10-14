@@ -81,6 +81,8 @@ import { MiFlash } from '@features/play/backend/models/Flash.js';
 import { MiFlashLike } from '@features/play/backend/models/FlashLike.js';
 import { MiBillingRefund } from '@features/billing/backend/models/BillingRefund.js';
 import { MiBillingTransactionClaim } from '@features/billing/backend/models/BillingTransactionClaim.js';
+import { MiBillingPolicy } from '../../billing/backend/models/BillingPolicy.js';
+import { MiBillingResidencyStatement } from '../../billing/backend/models/BillingResidencyStatement.js';
 import { MiBillingCatalogPrice } from '../../billing/backend/models/BillingCatalogPrice.js';
 import { MiBillingPricingAsset } from '../../billing/backend/models/BillingPricingAsset.js';
 import { MiBillingAssetDeployment } from '../../billing/backend/models/BillingAssetDeployment.js';
@@ -263,6 +265,8 @@ export const entities = [
 	MiUserMemo,
 	MiBillingRefund,
 	MiBillingTransactionClaim,
+	MiBillingPolicy,
+	MiBillingResidencyStatement,
 	MiBillingCatalogPrice,
 	MiBillingPricingAsset,
 	MiBillingAssetDeployment,

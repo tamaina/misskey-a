@@ -5,6 +5,7 @@
 
 import { oc } from '@orpc/contract';
 import * as v from 'valibot';
+import { receiptSnapshot, residencyConsent } from './policy.schema.js';
 import { rawObjectInputGuard } from '../../api/backend/transport/input.schema.js';
 import { apiErrorData, commonErrors } from '../../api/backend/transport/errors.schema.js';
 import { webAuthnAuthenticationOptionsSchema, webAuthnAuthenticationResponseSchema } from '../../auth/backend/webauthn.schema.js';
@@ -155,13 +156,14 @@ const adminRead = { requireCredential: true, requireAdmin: true, kind: 'read:adm
 const adminWrite = { ...adminRead, kind: 'write:admin:meta', limit: write.limit } as const;
 const empty = v.intersect([v.strictObject({}), rawObjectInputGuard]);
 export const serviceBillingContract = {
+	getReceipt: serviceProcedure.$meta({ ...read, requestName: 'billing/orders/receipt' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/receipt' }).input(v.strictObject({ orderId: id })).output(v.strictObject({ order: serviceOrder, snapshot: v.nullable(receiptSnapshot) })),
 	listCatalog: serviceProcedure.$meta({ ...read, requestName: 'billing/catalog/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/catalog/list' }).input(empty).output(v.array(catalogOffer)),
 	cancelOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/cancel' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/cancel' }).input(v.strictObject({ orderId: id })).output(v.strictObject({ ok: v.literal(true) })),
 	quoteOrder: serviceProcedure.$meta({ ...read, requestName: 'billing/orders/quote' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/quote' }).input(v.strictObject({ offerId: id })).output(serviceQuote),
 	listOfferSettings: serviceProcedure.$meta({ ...adminRead, requestName: 'admin/billing/offers/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/admin/billing/offers/list' }).input(empty).output(v.array(serviceOffer)),
 	upsertOffer: serviceProcedure.$meta({ ...adminWrite, requestName: 'admin/billing/offers/upsert' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/admin/billing/offers/upsert' }).input(serviceOffer).output(serviceOffer),
 	listOffers: serviceProcedure.$meta({ ...read, requestName: 'billing/offers/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/offers/list' }).input(empty).output(v.array(serviceOffer)),
-	createOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/create' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/create' }).input(v.strictObject({ offerId: id, walletId: id, requestKey: text, quotedOffer: serviceOffer, quotedQuote: v.exactOptional(serviceQuote) })).output(serviceOrder),
+	createOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/create' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/create' }).input(v.strictObject({ offerId: id, walletId: id, requestKey: text, quotedOffer: serviceOffer, quotedQuote: v.exactOptional(serviceQuote), residencyConsent: v.exactOptional(residencyConsent) })).output(serviceOrder),
 	checkOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/check' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/check' }).input(v.strictObject({ orderId: id, txHash: v.exactOptional(transactionHash) })).output(serviceOrder),
 	listOrders: serviceProcedure.$meta({ ...read, requestName: 'billing/orders/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/list' }).input(empty).output(v.array(serviceOrder)),
 };

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createReceiptSnapshot } from './policy-store.js';
+import type { PurchaseContext } from './policy-store.js';
 import { recordCatalogAudit } from './catalog-audit.js';
 import { MiBillingWalletChain } from './models/BillingWalletChain.js';
 import { MiBillingCatalogPrice } from './models/BillingCatalogPrice.js';
@@ -109,13 +111,15 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 			});
 			return terms;
 		},
+		async getReceipt(userId: string, orderId: string) { const row = await orders.findOneBy({ id: orderId, userId, status: 'paid' }); if (!row) throw new ORPCError('BILLING_NOT_FOUND'); return row; },
 		async listOrders(userId: string) { return orders.find({ where: { userId }, order: { id: 'DESC' }, take: 100 }); },
-		async createOrder(userId: string, offerId: string, walletId: string, requestKey: string, quotedOffer: ServiceOffer, quotedQuote?: { revision: number; quote: PaymentQuote }) {
+		async createOrder(userId: string, offerId: string, walletId: string, requestKey: string, quotedOffer: ServiceOffer, quotedQuote?: { revision: number; quote: PaymentQuote }, purchase?: PurchaseContext) {
 			return db.transaction(async manager => {
 				const state = await lockBillingState(manager, userId);
 				const existing = await manager.findOneBy(MiBillingServiceOrder, { userId, requestKey });
 				if (existing) {
 					if (existing.offer.id !== offerId || existing.walletId !== walletId || !sameOffer(existing.offer, quotedOffer) || (quotedQuote && (!isDeepStrictEqual(existing.quote, quotedQuote.quote) || existing.billingRevision !== quotedQuote.revision))) conflict();
+					if (existing.receiptSnapshot && purchase?.consent?.statementId !== existing.receiptSnapshot.statement.id) conflict();
 					return existing;
 				}
 				const offer = await manager.getRepository(MiBillingServiceOffer).findOne({ where: { id: offerId }, lock: { mode: 'pessimistic_read' } });
@@ -136,7 +140,8 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 					const pending = await manager.findBy(MiBillingServiceOrder, { userId, status: 'pending' });
 					if (pending.some(row => row.txHash || row.expiresAt > createdAt)) conflict();
 				}
-				const row = manager.create(MiBillingServiceOrder, { id: id(createdAt), userId, walletId, requestKey,
+				const snapshot = await createReceiptSnapshot(manager, purchase, quote?.payableAmountBaseUnits ?? offer.terms.amountBaseUnits, offer.terms.currencyCode, createdAt, () => id(createdAt));
+				const row = manager.create(MiBillingServiceOrder, { id: id(createdAt), userId, walletId, requestKey, receiptSnapshot: snapshot,
 																																																								quote, billingRevision: quotedQuote?.revision ?? null, cashAmountBaseUnits: quote?.payableAmountBaseUnits ?? offer.terms.amountBaseUnits, offer: offer.terms, chainId: wallet.chainId, payerAddress: wallet.address,
 																																																								status: 'pending', createdAt, expiresAt: createdAt + 30 * 60 * 1000,
 																																																								txHash: null, paidAt: null, startsAt: null, endsAt: null });

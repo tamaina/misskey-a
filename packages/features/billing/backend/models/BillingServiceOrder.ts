@@ -7,6 +7,7 @@
 import { Check, Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { id } from '@features/persistence/backend/models/util/id.js';
+import type { ReceiptSnapshot } from '../policy.schema.js';
 import type { PaymentQuote } from '../../shared/payment-quote.js';
 import type { ServiceOffer } from '../api.definition.js';
 const integer = { type: 'bigint' as const, transformer: { to: (value: number | null) => value, from: (value: string | null) => value === null ? null : Number(value) } };
@@ -23,6 +24,7 @@ export class MiBillingServiceOrder {
 	@Column('varchar', { length: 128 }) public requestKey: string;
 	@Column({ ...id() }) public walletId: string;
 	@Column('jsonb') public offer: ServiceOffer;
+	@Column('jsonb', { nullable: true }) public receiptSnapshot: ReceiptSnapshot | null;
 	@Column('jsonb', { nullable: true }) public quote: PaymentQuote | null;
 	@Column({ ...integer, nullable: true }) public billingRevision: number | null;
 	@Column('varchar', { length: 78, nullable: true }) public cashAmountBaseUnits: string | null;

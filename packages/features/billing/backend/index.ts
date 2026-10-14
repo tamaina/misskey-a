@@ -42,3 +42,8 @@ export { MiBillingPricingAsset } from './models/BillingPricingAsset.js';
 export { MiBillingAssetDeployment } from './models/BillingAssetDeployment.js';
 
 export { MiBillingCatalogPrice } from './models/BillingCatalogPrice.js';
+
+export { createBillingPolicyStore } from './policy-store.js';
+export { createBillingPolicyRouter } from './policy.implementation.js';
+export { MiBillingPolicy } from './models/BillingPolicy.js';
+export { MiBillingResidencyStatement } from './models/BillingResidencyStatement.js';

@@ -1,6 +1,8 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	BillingOrdersReceiptRequest,
+	BillingOrdersReceiptResponse,
 	BillingCatalogListRequest,
 	BillingCatalogListResponse,
 	BillingOrdersCancelRequest,
@@ -65,6 +67,12 @@ import type {
 	AdminBillingPricesAttachDeploymentResponse,
 	AdminBillingPricesDeleteRequest,
 	AdminBillingPricesDeleteResponse,
+	AdminBillingPolicyGetRequest,
+	AdminBillingPolicyGetResponse,
+	AdminBillingPolicyUpsertRequest,
+	AdminBillingPolicyUpsertResponse,
+	BillingPurchaseRequirementsRequest,
+	BillingPurchaseRequirementsResponse,
 	AdminWalletsChainsListRequest,
 	AdminWalletsChainsListResponse,
 	AdminWalletsChainsUpsertRequest,
@@ -830,6 +838,7 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'billing/orders/receipt': { req: BillingOrdersReceiptRequest; res: BillingOrdersReceiptResponse };
 	'billing/catalog/list': { req: BillingCatalogListRequest; res: BillingCatalogListResponse };
 	'billing/orders/cancel': { req: BillingOrdersCancelRequest; res: BillingOrdersCancelResponse };
 	'billing/orders/quote': { req: BillingOrdersQuoteRequest; res: BillingOrdersQuoteResponse };
@@ -862,6 +871,9 @@ export type Endpoints = {
 	'admin/billing/chains/test-rpc': { req: AdminBillingChainsTestRpcRequest; res: AdminBillingChainsTestRpcResponse };
 	'admin/billing/prices/attach-deployment': { req: AdminBillingPricesAttachDeploymentRequest; res: AdminBillingPricesAttachDeploymentResponse };
 	'admin/billing/prices/delete': { req: AdminBillingPricesDeleteRequest; res: AdminBillingPricesDeleteResponse };
+	'admin/billing/policy/get': { req: AdminBillingPolicyGetRequest; res: AdminBillingPolicyGetResponse };
+	'admin/billing/policy/upsert': { req: AdminBillingPolicyUpsertRequest; res: AdminBillingPolicyUpsertResponse };
+	'billing/purchase-requirements': { req: BillingPurchaseRequirementsRequest; res: BillingPurchaseRequirementsResponse };
 	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
 	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };

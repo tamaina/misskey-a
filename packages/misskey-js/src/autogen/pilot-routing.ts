@@ -3,6 +3,63 @@ import type { AnyContractRouter } from '@orpc/contract';
 
 export default {
 	"serviceBilling": {
+		"getReceipt": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_NOT_FOUND": {
+						"status": 404
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					},
+					"BILLING_TRANSACTION_INVALID": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "billing/orders/receipt"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/orders/receipt"
+				}
+			}
+		},
 		"listCatalog": {
 			"~orpc": {
 				"errorMap": {
@@ -1843,6 +1900,165 @@ export default {
 				"route": {
 					"method": "POST",
 					"path": "/admin/billing/prices/delete"
+				}
+			}
+		},
+		"getBillingPolicy": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/policy/get",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/policy/get"
+				}
+			}
+		},
+		"upsertBillingPolicy": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requestName": "admin/billing/policy/upsert",
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/billing/policy/upsert"
+				}
+			}
+		},
+		"getPurchaseRequirements": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BILLING_UNAVAILABLE": {
+						"status": 400
+					},
+					"BILLING_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requestName": "billing/purchase-requirements",
+					"requireCredential": true,
+					"kind": "read:account"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/billing/purchase-requirements"
 				}
 			}
 		}
@@ -27079,6 +27295,10 @@ export default {
 } satisfies AnyContractRouter;
 
 export const nullableResponses: readonly (readonly string[])[] = [
+	[
+		"serviceBilling",
+		"getBillingPolicy"
+	],
 	[
 		"federation",
 		"federationShowInstance"

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createBillingPolicyStore } from './policy-store.js';
+import { createBillingPolicyRouter } from './policy.implementation.js';
 import { createCatalogAdminStore } from './catalog-store.js';
 import { createCatalogAdminRouter } from './catalog.implementation.js';
 import { createCatalogRpcReader } from './catalog-rpc.js';
@@ -31,7 +33,7 @@ export class ServiceBillingApiProvider {
 		const chains = createPostgresWalletChainStore(db);
 		const readReceipt = createServiceReceiptReader(this.moduleRef.get(HttpRequestService, { strict: false }), chains.rpcUrl);
 		const catalogRpc = createCatalogRpcReader(chains.rpcUrl, createWalletRpcFetch(this.moduleRef.get(HttpRequestService, { strict: false })));
-		return { ...createCatalogAdminRouter<MiLocalUser>(createCatalogAdminStore(db, Date.now, () => id.gen()), catalogRpc, chains.rpcUrl), ...createServiceBillingRouter<MiLocalUser>({ store: createServiceBillingStore(db, now => id.gen(now)), rpcUrl: chains.rpcUrl, readReceipt }),
+		return { ...createBillingPolicyRouter<MiLocalUser>(createBillingPolicyStore(db, () => id.gen())), ...createCatalogAdminRouter<MiLocalUser>(createCatalogAdminStore(db, Date.now, () => id.gen()), catalogRpc, chains.rpcUrl), ...createServiceBillingRouter<MiLocalUser>({ store: createServiceBillingStore(db, now => id.gen(now)), rpcUrl: chains.rpcUrl, readReceipt }),
 			...createRefundRouter<MiLocalUser>(createRefundStore(db, () => id.gen(), readReceipt)) };
 	}
 }

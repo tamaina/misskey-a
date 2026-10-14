@@ -28,6 +28,7 @@ export function createServiceBillingRouter<Actor extends ApiActor>(deps: Service
 	const procedure = createApiProcedure<Actor>();
 	const account = requirePrincipal<Actor>();
 	return implement(serviceBillingContract).$context<ApiContext<Actor>>().router({
+		getReceipt: procedure(serviceBillingContract.getReceipt).use(account).handler(async ({ input, context }) => { const row = await deps.store.getReceipt(context.principal.id, input.orderId); return { order: publicOrder(row), snapshot: row.receiptSnapshot ?? null }; }),
 		listCatalog: procedure(serviceBillingContract.listCatalog).handler(async () => {
 			const items = [];
 			for (const item of await deps.store.listCatalog()) if (await deps.rpcUrl(item.offer.chainId)) items.push(item);
@@ -49,7 +50,7 @@ export function createServiceBillingRouter<Actor extends ApiActor>(deps: Service
 		createOrder: procedure(serviceBillingContract.createOrder).use(account).handler(async ({ input, context }) => {
 			const offer = (await deps.store.listOffers()).find(row => row.id === input.offerId);
 			if (!offer || !await deps.rpcUrl(offer.chainId)) throw new ORPCError('BILLING_UNAVAILABLE');
-			return publicOrder(await deps.store.createOrder(context.principal.id, input.offerId, input.walletId, input.requestKey, input.quotedOffer, input.quotedQuote));
+			return publicOrder(await deps.store.createOrder(context.principal.id, input.offerId, input.walletId, input.requestKey, input.quotedOffer, input.quotedQuote, { headers: context.headers, transportPeerIp: context.transportPeerIp, consent: input.residencyConsent }));
 		}),
 		checkOrder: procedure(serviceBillingContract.checkOrder).use(account).handler(async ({ input, context }) => {
 			const row = await deps.store.submitTransaction(context.principal.id, input.orderId, input.txHash?.toLowerCase());

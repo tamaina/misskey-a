@@ -110,3 +110,30 @@ test('registered deployment selection supplies exact pricing unit and settlement
 		expect(client.upsertOffer).toHaveBeenCalledExactlyOnceWith({ ...offer, deploymentId: deployment.id, pricingAssetKey: asset.pricingAssetKey, currencyCode: asset.currencyCode, chainId: deployment.chainId, contractAddress: deployment.contractAddress, recipientAddress: deployment.recipientAddress, tokenSymbol: deployment.tokenSymbol, decimals: deployment.decimals });
 	} finally { view.dispose(); }
 });
+
+test('consent is required, original consent is retained on retry, and reload failure clears consent', async () => {
+	const item = { offer, priceHistory: [], priceDisplayWindow: { previousPeriod: null, currentPeriod: null, nextPeriod: null }, dealDisplay: { canShowDeal: false } };
+	const client = { listCatalog: vi.fn(async () => [item]), listOrders: vi.fn(async () => []), quoteOrder: vi.fn(async () => ({ revision: 0, quote: {} })), createOrder: vi.fn(async (_input: unknown) => { throw new Error('Unknown outcome'); }) };
+	const getRequirements = vi.fn(async () => ({ isRequired: true, country: 'JP', statement: { id: 'original', country: 'JP', statement: 'Original statement' } }));
+	const view = await mount(ServiceSubscriptions, { client, getRequirements, listWallets: async () => [{ id: 'wallet', chainId: offer.chainId, address: 'synthetic', label: null, createdAt: 0, updatedAt: 0 }] });
+	try {
+		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
+		for (const select of view.element.querySelectorAll('div[tabindex="0"]')) {
+			select.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+			const call = vi.mocked(os.popupMenu).mock.calls.at(-1)!; const option = call[0][0];
+			if (!option || !('action' in option) || typeof option.action !== 'function') throw new Error('Expected option');
+			option.action(new PointerEvent('click')); call[2]?.onClosing?.(); await flush();
+		}
+		const form = view.element.querySelector('form')!;
+		submit(form); await flush(); expect(client.createOrder).not.toHaveBeenCalled();
+		view.element.querySelector<HTMLInputElement>('input[type="checkbox"]')!.click(); await flush();
+		submit(form); await flush(); submit(form); await flush();
+		expect(client.createOrder.mock.calls).toHaveLength(2);
+		expect(client.createOrder.mock.calls[0]).toEqual(client.createOrder.mock.calls[1]);
+		expect(client.createOrder.mock.calls[0][0]).toMatchObject({ residencyConsent: { statementId: 'original', agreed: true } });
+		client.listCatalog.mockRejectedValueOnce(new Error('Catalog unavailable'));
+		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
+		expect(view.element.textContent).not.toContain('Original statement');
+		submit(form); await flush(); expect(client.createOrder.mock.calls).toHaveLength(2);
+	} finally { view.dispose(); }
+});

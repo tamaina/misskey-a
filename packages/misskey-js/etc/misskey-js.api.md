@@ -296,6 +296,18 @@ type AdminBillingOffersUpsertRequest = ContractRequest<'admin/billing/offers/ups
 type AdminBillingOffersUpsertResponse = ContractResponse<'admin/billing/offers/upsert'>;
 
 // @public (undocumented)
+type AdminBillingPolicyGetRequest = ContractRequest<'admin/billing/policy/get'>;
+
+// @public (undocumented)
+type AdminBillingPolicyGetResponse = ContractResponse<'admin/billing/policy/get'>;
+
+// @public (undocumented)
+type AdminBillingPolicyUpsertRequest = ContractRequest<'admin/billing/policy/upsert'>;
+
+// @public (undocumented)
+type AdminBillingPolicyUpsertResponse = ContractResponse<'admin/billing/policy/upsert'>;
+
+// @public (undocumented)
 type AdminBillingPricesAttachDeploymentRequest = ContractRequest<'admin/billing/prices/attach-deployment'>;
 
 // @public (undocumented)
@@ -908,6 +920,18 @@ type BillingOrdersQuoteRequest = ContractRequest<'billing/orders/quote'>;
 
 // @public (undocumented)
 type BillingOrdersQuoteResponse = ContractResponse<'billing/orders/quote'>;
+
+// @public (undocumented)
+type BillingOrdersReceiptRequest = ContractRequest<'billing/orders/receipt'>;
+
+// @public (undocumented)
+type BillingOrdersReceiptResponse = ContractResponse<'billing/orders/receipt'>;
+
+// @public (undocumented)
+type BillingPurchaseRequirementsRequest = ContractRequest<'billing/purchase-requirements'>;
+
+// @public (undocumented)
+type BillingPurchaseRequirementsResponse = ContractResponse<'billing/purchase-requirements'>;
 
 // @public (undocumented)
 type BillingRefundsCancelRequest = ContractRequest<'billing/refunds/cancel'>;
@@ -1920,6 +1944,8 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        BillingOrdersReceiptRequest,
+        BillingOrdersReceiptResponse,
         BillingCatalogListRequest,
         BillingCatalogListResponse,
         BillingOrdersCancelRequest,
@@ -1984,6 +2010,12 @@ declare namespace entities {
         AdminBillingPricesAttachDeploymentResponse,
         AdminBillingPricesDeleteRequest,
         AdminBillingPricesDeleteResponse,
+        AdminBillingPolicyGetRequest,
+        AdminBillingPolicyGetResponse,
+        AdminBillingPolicyUpsertRequest,
+        AdminBillingPolicyUpsertResponse,
+        BillingPurchaseRequirementsRequest,
+        BillingPurchaseRequirementsResponse,
         AdminWalletsChainsListRequest,
         AdminWalletsChainsListResponse,
         AdminWalletsChainsUpsertRequest,

@@ -5,11 +5,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <SearchMarker path="/settings/subscriptions" :label="$locale.sfc.title" :keywords="['billing', 'subscription', 'ERC20']" icon="ti ti-receipt">
-	<ServiceSubscriptions :client="client" :listWallets="listWallets"/>
+	<ServiceSubscriptions :client="client" :listWallets="listWallets" :getRequirements="nativeBillingPolicyClient.getPurchaseRequirements" :getReceipt="getReceipt"/>
 <RefundRequests :client="nativeRefundClient"/>
 </SearchMarker>
 </template>
 <script setup lang="ts">
+import { nativeBillingPolicyClient } from '../../policy-client.js';
 import RefundRequests from '../../RefundRequests.vue';
 import { nativeRefundClient } from '../../native-refund-client.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
@@ -25,6 +26,7 @@ const client: ServiceAccountClient = {
 	checkOrder: input => misskeyApi('billing/orders/check', input),
 	listOrders: input => misskeyApi('billing/orders/list', input),
 };
+const getReceipt = (input: { orderId: string }) => misskeyApi('billing/orders/receipt', input);
 const listWallets = () => misskeyApi('account/wallets/list', {});
 definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-receipt' }));
 </script>
