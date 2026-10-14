@@ -14,7 +14,7 @@ import { objectInput, rawObjectInputGuard } from '../../api/backend/transport/in
 import { packedJsonValueSchema, packedOptionalJsonValueSchema } from '../../users/backend/json-value.schema.js';
 import { packedMeDetailedSchema, packedUserDetailedNotMeSchema } from '../../users/backend/user.schema.js';
 import { localUsernameSchema, passwordSchema } from '../../users/backend/user-validation.schema.js';
-import { webAuthnRegistrationOptionsSchema, webAuthnAuthenticationOptionsSchema } from './webauthn.schema.js';
+import { webAuthnRegistrationOptionsSchema, webAuthnAuthenticationOptionsSchema, webAuthnAuthenticationResponseSchema } from './webauthn.schema.js';
 import { packedAppSchema, packedInviteCodeSchema, packedSigninSchema, supportedCaptchaProviders } from './auth.schema.js';
 import { sessionFailureSchema, fastifyFailureSchema } from './session-errors.schema.js';
 import { availableSigninFactorsSchema, finishedSigninSchema } from './session.schema.js';
@@ -303,6 +303,16 @@ export const IChangePasswordContract = oc.$meta({
 	"token": v.exactOptional(v.nullable(v.string())),
 })).output(v.void());
 
+const freshPasswordMetadata = { requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-password-change' } } as const;
+const freshPasswordErrors = { ...commonErrors, FRESH_REAUTHENTICATION_FAILED: { status: 403, data: apiErrorData } } as const;
+export const IChangePasswordPasskeyStartContract = oc.$meta({ ...freshPasswordMetadata, requestName: 'i/change-password/passkey/start' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/change-password/passkey/start', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ currentPassword: v.pipe(v.string(), v.minLength(1), v.maxLength(1024)) }))
+	.output(v.strictObject({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), options: webAuthnAuthenticationOptionsSchema }));
+export const IChangePasswordPasskeyCompleteContract = oc.$meta({ ...freshPasswordMetadata, requestName: 'i/change-password/passkey/complete' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/change-password/passkey/complete', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), credential: webAuthnAuthenticationResponseSchema, newPassword: v.pipe(v.string(), v.minCodePoints(1), v.maxLength(1024)) })).output(v.void());
+
 export const IRegenerateTokenContract = oc.$meta({
 	requestName: 'i/regenerate-token',
 	requireCredential: true,
@@ -506,6 +516,8 @@ export const authContract = {
 	'i/apps': IAppsContract,
 	'i/authorized-apps': IAuthorizedAppsContract,
 	'i/change-password': IChangePasswordContract,
+	'i/change-password/passkey/start': IChangePasswordPasskeyStartContract,
+	'i/change-password/passkey/complete': IChangePasswordPasskeyCompleteContract,
 	'i/regenerate-token': IRegenerateTokenContract,
 	'i/revoke-token': IRevokeTokenContract,
 	'i/signin-history': ISigninHistoryContract,

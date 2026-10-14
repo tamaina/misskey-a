@@ -38,7 +38,7 @@ function fixture() {
 	let row: FreshReauthenticationRecord | undefined;
 	deps.store.create.mockImplementation(async value => { row = value; return 'x'.repeat(43); });
 	deps.store.consume.mockImplementation(async () => { const value = row; row = undefined; return value ? { record: value, remainingMs: 90_000 } : null; });
-	const service = new FreshPasskeyReauthentication(deps.store, deps.sessions, deps.profiles, deps.keys, { origin: 'https://synthetic.example', rpId: 'synthetic.example' });
+	const service = new FreshPasskeyReauthentication(deps.store, deps.sessions, deps.profiles, deps.keys, { url: 'https://synthetic.example', hostname: 'synthetic.example' });
 	return { ...deps, profile, key, service };
 }
 
@@ -53,7 +53,7 @@ test('password-first real generator binds a dedicated required-UV challenge; res
 	expect(started.options).toMatchObject({ rpId: 'synthetic.example', userVerification: 'required', allowCredentials: [{ id: 'AQID', type: 'public-key', transports: ['usb'] }] });
 	expect(f.store.create).toHaveBeenCalledWith({ userId: identity.userId, sessionId: identity.browserSession.id, purpose, policyStamp: expect.stringMatching(/^[a-f0-9]{64}$/), challenge: started.options.challenge }, expect.any(Number));
 	expect(f.store.create.mock.calls[0][1]).toBe(1_800_000_000_000);
-	expect(await f.service.complete(identity, purpose, started.ticket, assertion)).toEqual({ userId: identity.userId, sessionId: identity.browserSession.id, purpose, policyStamp: expect.any(String) });
+	expect(await f.service.complete(identity, purpose, started.ticket, assertion)).toEqual({ userId: identity.userId, sessionId: identity.browserSession.id, purpose, policyStamp: expect.any(String), expiresAtMonotonic: expect.any(Number) });
 	expect(webauthn.verifyAuthenticationResponse).toHaveBeenCalledWith(expect.objectContaining({ requireUserVerification: true, expectedChallenge: started.options.challenge, expectedOrigin: 'https://synthetic.example', expectedRPID: 'synthetic.example', credential: expect.objectContaining({ id: 'AQID', counter: 1 }) }));
 	expect(f.keys.update).toHaveBeenCalledWith({ id: 'AQID', userId: identity.userId, publicKey: 'AQID', counter: 1 }, expect.objectContaining({ counter: 2 }));
 	await expect(f.service.complete(identity, purpose, started.ticket, assertion)).rejects.toThrow();

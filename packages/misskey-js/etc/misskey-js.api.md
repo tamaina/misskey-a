@@ -1963,6 +1963,9 @@ declare namespace entities {
         IAuthorizedAppsRequest,
         IAuthorizedAppsResponse,
         IChangePasswordRequest,
+        IChangePasswordPasskeyStartRequest,
+        IChangePasswordPasskeyStartResponse,
+        IChangePasswordPasskeyCompleteRequest,
         IRegenerateTokenRequest,
         IRevokeTokenRequest,
         ISigninHistoryRequest,
@@ -3899,6 +3902,15 @@ type IAuthorizedAppsRequest = ContractRequest<'i/authorized-apps'>;
 
 // @public (undocumented)
 type IAuthorizedAppsResponse = ContractResponse<'i/authorized-apps'>;
+
+// @public (undocumented)
+type IChangePasswordPasskeyCompleteRequest = ContractRequest<'i/change-password/passkey/complete'>;
+
+// @public (undocumented)
+type IChangePasswordPasskeyStartRequest = ContractRequest<'i/change-password/passkey/start'>;
+
+// @public (undocumented)
+type IChangePasswordPasskeyStartResponse = ContractResponse<'i/change-password/passkey/start'>;
 
 // @public (undocumented)
 type IChangePasswordRequest = ContractRequest<'i/change-password'>;

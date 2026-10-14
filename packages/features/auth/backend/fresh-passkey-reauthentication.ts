@@ -16,6 +16,7 @@ import { FreshReauthenticationStore, freshReauthenticationPurposeSchema } from '
 import type { FreshReauthenticationBinding, FreshReauthenticationPurpose } from './fresh-reauthentication-store.js';
 import { webAuthnAuthenticationResponseSchema, webAuthnTransportSchema } from './webauthn.schema.js';
 import { normalizedPasskeyPublicKey } from './passkey-public-key.js';
+import type { Config } from '@/config.js';
 
 /** Server-owned API context only. No token or wire object is an identity proof. */
 export interface FreshReauthenticationIdentity {
@@ -34,8 +35,8 @@ export function freshReauthenticationPolicyStamp(profile: MfaPolicySnapshot, key
 	])).digest('hex');
 }
 
-/** Unconnected verifier: no DI registration, endpoint, activation writer or grant.
- * A future mutation must recheck this session and policy under its own DB locks.
+/** Purpose-bound verifier; password change is its first runtime caller.
+ * Every mutation must recheck this session, policy and deadline under its DB locks.
  * The returned metadata is never a reusable sudo or activation credential.
  */
 export class FreshPasskeyReauthentication {
@@ -44,7 +45,7 @@ export class FreshPasskeyReauthentication {
 		private sessions: Pick<BrowserSessionService, 'isActive'>,
 		private profiles: Pick<UserProfilesRepository, 'findOneByOrFail'>,
 		private keys: Pick<UserSecurityKeysRepository, 'findBy' | 'update'>,
-		private relyingParty: { origin: string; rpId: string },
+		private config: Pick<Config, 'url' | 'hostname'>,
 	) {}
 
 	private async binding(identity: FreshReauthenticationIdentity, purpose: FreshReauthenticationPurpose): Promise<FreshReauthenticationBinding> {
@@ -70,7 +71,7 @@ export class FreshPasskeyReauthentication {
 		const before = await this.snapshot(binding.userId);
 		if (!await bcrypt.compare(password, before.profile.password!)) throw new Error('Fresh reauthentication failed');
 		const options = await generateAuthenticationOptions({
-			rpID: this.relyingParty.rpId, userVerification: 'required',
+			rpID: this.config.hostname, userVerification: 'required',
 			allowCredentials: before.keys.map(key => ({ id: key.id, transports: key.transports == null ? undefined : v.parse(v.array(webAuthnTransportSchema), key.transports) })),
 		});
 		const after = await this.snapshot(binding.userId);
@@ -98,7 +99,7 @@ export class FreshPasskeyReauthentication {
 		const publicKey = normalizedPasskeyPublicKey(key.publicKey);
 		const result = await verifyAuthenticationResponse({
 			response: credential, expectedChallenge: claimed.record.challenge,
-			expectedOrigin: this.relyingParty.origin, expectedRPID: this.relyingParty.rpId,
+			expectedOrigin: this.config.url, expectedRPID: this.config.hostname,
 			requireUserVerification: true,
 			credential: { id: key.id, publicKey: Buffer.from(publicKey, 'base64url'), counter: Number(key.counter), transports: key.transports == null ? undefined : v.parse(v.array(webAuthnTransportSchema), key.transports) },
 		});
@@ -112,6 +113,6 @@ export class FreshPasskeyReauthentication {
 		const after = await this.snapshot(binding.userId);
 		await this.binding(identity, purpose);
 		if (after.stamp !== claimed.record.policyStamp || performance.now() >= deadline) throw new Error('Fresh reauthentication failed');
-		return { ...binding, policyStamp: after.stamp };
+		return { ...binding, policyStamp: after.stamp, expiresAtMonotonic: deadline };
 	}
 }

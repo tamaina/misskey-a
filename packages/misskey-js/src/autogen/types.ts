@@ -564,6 +564,12 @@ export type paths = {
     '/i/change-password': {
         post: operations['i___change-password'];
     };
+    '/i/change-password/passkey/start': {
+        post: operations['i___change-password___passkey___start'];
+    };
+    '/i/change-password/passkey/complete': {
+        post: operations['i___change-password___passkey___complete'];
+    };
     '/i/regenerate-token': {
         post: operations['i___regenerate-token'];
     };
@@ -77558,6 +77564,543 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    'i___change-password___passkey___start': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    currentPassword: string;
+                } & ({
+                    currentPassword: string;
+                } & unknown);
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        ticket: string;
+                        options: {
+                            challenge: string;
+                            timeout?: number;
+                            rpId?: string;
+                            allowCredentials?: {
+                                id: string;
+                                /** @constant */
+                                type: 'public-key';
+                                transports?: ('ble' | 'cable' | 'hybrid' | 'internal' | 'nfc' | 'smart-card' | 'usb')[];
+                            }[];
+                            /** @enum {string} */
+                            userVerification?: 'discouraged' | 'preferred' | 'required';
+                            hints?: ('security-key' | 'client-device' | 'hybrid')[];
+                            extensions?: {
+                                appid?: string;
+                                credProps?: boolean;
+                                hmacCreateSecret?: boolean;
+                                minPinLength?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'FRESH_REAUTHENTICATION_FAILED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    'i___change-password___passkey___complete': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    ticket: string;
+                    credential: {
+                        id: string;
+                        rawId: string;
+                        /** @constant */
+                        type: 'public-key';
+                        /** @enum {string} */
+                        authenticatorAttachment?: 'platform' | 'cross-platform';
+                        response: {
+                            clientDataJSON: string;
+                            authenticatorData: string;
+                            signature: string;
+                            userHandle?: string;
+                        } & ({
+                            clientDataJSON: string;
+                            authenticatorData: string;
+                            signature: string;
+                            userHandle?: string;
+                        } & unknown);
+                        clientExtensionResults: {
+                            appid?: boolean;
+                            hmacCreateSecret?: boolean;
+                            credProps?: {
+                                rk?: boolean;
+                            } & ({
+                                rk?: boolean;
+                            } & unknown);
+                        } & ({
+                            appid?: boolean;
+                            hmacCreateSecret?: boolean;
+                            credProps?: {
+                                rk?: boolean;
+                            } & ({
+                                rk?: boolean;
+                            } & unknown);
+                        } & unknown);
+                    } & ({
+                        id: string;
+                        rawId: string;
+                        /** @constant */
+                        type: 'public-key';
+                        /** @enum {string} */
+                        authenticatorAttachment?: 'platform' | 'cross-platform';
+                        response: {
+                            clientDataJSON: string;
+                            authenticatorData: string;
+                            signature: string;
+                            userHandle?: string;
+                        } & ({
+                            clientDataJSON: string;
+                            authenticatorData: string;
+                            signature: string;
+                            userHandle?: string;
+                        } & unknown);
+                        clientExtensionResults: {
+                            appid?: boolean;
+                            hmacCreateSecret?: boolean;
+                            credProps?: {
+                                rk?: boolean;
+                            } & ({
+                                rk?: boolean;
+                            } & unknown);
+                        } & ({
+                            appid?: boolean;
+                            hmacCreateSecret?: boolean;
+                            credProps?: {
+                                rk?: boolean;
+                            } & ({
+                                rk?: boolean;
+                            } & unknown);
+                        } & unknown);
+                    } & unknown);
+                    newPassword: string;
+                } & ({
+                    ticket: string;
+                    credential: {
+                        id: string;
+                        rawId: string;
+                        /** @constant */
+                        type: 'public-key';
+                        /** @enum {string} */
+                        authenticatorAttachment?: 'platform' | 'cross-platform';
+                        response: {
+                            clientDataJSON: string;
+                            authenticatorData: string;
+                            signature: string;
+                            userHandle?: string;
+                        } & ({
+                            clientDataJSON: string;
+                            authenticatorData: string;
+                            signature: string;
+                            userHandle?: string;
+                        } & unknown);
+                        clientExtensionResults: {
+                            appid?: boolean;
+                            hmacCreateSecret?: boolean;
+                            credProps?: {
+                                rk?: boolean;
+                            } & ({
+                                rk?: boolean;
+                            } & unknown);
+                        } & ({
+                            appid?: boolean;
+                            hmacCreateSecret?: boolean;
+                            credProps?: {
+                                rk?: boolean;
+                            } & ({
+                                rk?: boolean;
+                            } & unknown);
+                        } & unknown);
+                    } & ({
+                        id: string;
+                        rawId: string;
+                        /** @constant */
+                        type: 'public-key';
+                        /** @enum {string} */
+                        authenticatorAttachment?: 'platform' | 'cross-platform';
+                        response: {
+                            clientDataJSON: string;
+                            authenticatorData: string;
+                            signature: string;
+                            userHandle?: string;
+                        } & ({
+                            clientDataJSON: string;
+                            authenticatorData: string;
+                            signature: string;
+                            userHandle?: string;
+                        } & unknown);
+                        clientExtensionResults: {
+                            appid?: boolean;
+                            hmacCreateSecret?: boolean;
+                            credProps?: {
+                                rk?: boolean;
+                            } & ({
+                                rk?: boolean;
+                            } & unknown);
+                        } & ({
+                            appid?: boolean;
+                            hmacCreateSecret?: boolean;
+                            credProps?: {
+                                rk?: boolean;
+                            } & ({
+                                rk?: boolean;
+                            } & unknown);
+                        } & unknown);
+                    } & unknown);
+                    newPassword: string;
+                } & unknown);
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'FRESH_REAUTHENTICATION_FAILED';
                             message: string;
                         };
                     };

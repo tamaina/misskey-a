@@ -33,7 +33,8 @@ try {
 	run(join(binaries, 'pg_ctl'), ['-D', data, '-l', join(directory, 'server.log'), '-o', `-c config_file=${config}`, '-w', '-t', '10', 'start']);
 	run(join(binaries, 'createdb'), ['-h', socket, '-p', '55439', '-U', userInfo().username, 'auth_policy_synthetic']);
 	const testConfig = join(directory, 'vitest.mjs');
-	writeFileSync(testConfig, `import { baseConfig } from ${JSON.stringify(join(root, 'packages/backend/vitest.config.ts'))};\nexport default { ...baseConfig, cacheDir: '/tmp/misskey-auth-policy-vite', test: { ...baseConfig.test, dir: ${JSON.stringify(join(root, 'packages/features/auth/test/backend'))}, include: ['mfa-policy-postgres.test.ts'], environment: 'node', maxWorkers: 1, maxConcurrency: 1 } };\n`);
+	const include = process.env.MISSKEY_AUTH_PASSWORD_CHANGE_FIXTURE === '1' ? ['fresh-password-change-postgres.test.ts'] : ['mfa-policy-postgres.test.ts'];
+	writeFileSync(testConfig, `import { baseConfig } from ${JSON.stringify(join(root, 'packages/backend/vitest.config.ts'))};\nexport default { ...baseConfig, cacheDir: '/tmp/misskey-auth-policy-vite', test: { ...baseConfig.test, dir: ${JSON.stringify(join(root, 'packages/features/auth/test/backend'))}, include: ${JSON.stringify(include)}, environment: 'node', maxWorkers: 1, maxConcurrency: 1 } };\n`);
 	// Production entity registration excludes NODE_ENV=test chart-only models.
 	run(process.execPath, ['--max-old-space-size=1024', 'packages/backend/node_modules/vitest/vitest.mjs', 'run', '--config', testConfig], { ...process.env, NODE_ENV: 'production', MISSKEY_AUTH_POLICY_TEST_SOCKET: socket });
 } catch (error) {

@@ -295,6 +295,9 @@ import type {
 	IAuthorizedAppsRequest,
 	IAuthorizedAppsResponse,
 	IChangePasswordRequest,
+	IChangePasswordPasskeyStartRequest,
+	IChangePasswordPasskeyStartResponse,
+	IChangePasswordPasskeyCompleteRequest,
 	IRegenerateTokenRequest,
 	IRevokeTokenRequest,
 	ISigninHistoryRequest,
@@ -934,6 +937,8 @@ export type Endpoints = {
 	'i/apps': { req: IAppsRequest; res: IAppsResponse };
 	'i/authorized-apps': { req: IAuthorizedAppsRequest; res: IAuthorizedAppsResponse };
 	'i/change-password': { req: IChangePasswordRequest; res: EmptyResponse };
+	'i/change-password/passkey/start': { req: IChangePasswordPasskeyStartRequest; res: IChangePasswordPasskeyStartResponse };
+	'i/change-password/passkey/complete': { req: IChangePasswordPasskeyCompleteRequest; res: EmptyResponse };
 	'i/regenerate-token': { req: IRegenerateTokenRequest; res: EmptyResponse };
 	'i/revoke-token': { req: IRevokeTokenRequest; res: EmptyResponse };
 	'i/signin-history': { req: ISigninHistoryRequest; res: ISigninHistoryResponse };

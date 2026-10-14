@@ -90,7 +90,7 @@ Future activation and sensitive-operation writers must adopt the same protocol
 before the activation writer is connected. The old TOTP-disabled orphan-key behavior is preserved. This groundwork
 does not complete the independent-MFA acceptance criteria in #94 / #144 / #157.
 
-### Fresh passkey reauthentication (unconnected verifier)
+### Fresh passkey reauthentication
 
 `FreshPasskeyReauthentication` accepts a server-owned, live individual browser
 session only. Shared native tokens and delegated tokens cannot establish its
@@ -108,7 +108,9 @@ rechecks policy/session and the original deadline. The result is internal
 metadata, not a reusable grant, sudo state or activation credential. A future
 mutation must recheck session and policy within its own locked transaction.
 
-This verifier has no DI registration, endpoint or UI and never changes an MFA
+The verifier is registered in DI and connected to the dedicated password-change
+start/complete API and security-settings button. Activation and recovery-code
+display purposes still have no runtime caller, and this flow never changes MFA
 policy. It is independent of the unmerged login-progress connection in #143.
 Activation remains blocked until both sign-in paths, password/email/token/account
 deletion, factor management/key display and every factor writer share the final
@@ -124,12 +126,12 @@ Remaining runtime connections before activation:
 | Surface | Required connection |
 | --- | --- |
 | `signinFlow.ts`, `signinWithPasskey.ts` | Read the same explicit policy, require its factors, bind progress to current policy and issue a session only after final verification. |
-| `i/change-password`, `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Apply current independent MFA policy and operation-specific fresh verification before the sensitive mutation. |
+| `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Apply current independent MFA policy and operation-specific fresh verification before the sensitive mutation; password change is now connected separately. |
 | `i/2fa/*`, admin `unset-mfa` | Join all enrolment/policy writers to the profile lock; require exact operation/target bindings and recheck live session/policy inside the mutation transaction. |
 | User self serializer `securityKeysList` and factor display | Represent independent policy consistently and gate sensitive key/recovery display through its dedicated fresh purpose. |
 
-The current verifier supports only `activate-passkey-mfa` and
-`show-recovery-codes`. Other actions need their own concrete purpose/target
+The verifier supports `change-password`, `activate-passkey-mfa` and
+`show-recovery-codes`; only password change has a runtime caller. Other actions need their own concrete purpose/target
 bindings; neither a generic sudo purpose nor this metadata authorizes them.
 
 ### Activation readiness inventory
@@ -145,7 +147,8 @@ acceptance. There is still no true writer or user-facing activation state.
 | `i/2fa/register`, `done`, `register-key`, `key-done` | Legacy independent-policy refusal; profile-locked DB setup/completion with proof snapshot checks; TOTP pending setup is consumed | Exact session/purpose/target-bound fresh flows and independent enrolment/activation, recovery-code presentation acknowledgement. |
 | `i/2fa/remove-key`, `unregister`, `password-less`, `update-key`, admin `unset-mfa` | Common profile lock and owned mutation; active independent policy is refused on legacy user routes; reset clears pending setup | Fresh per-operation flows, preserve last-factor invariant and recovery semantics for the final independent policy. |
 | Both existing WebAuthn verifiers and fresh verifier | Strict UV; fresh verifier has challenge ownership, deadline, counter CAS and legacy key normalization | Align counter updates and policy/session binding in all runtime callers. |
-| `i/change-password`, `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Existing password/TOTP authorization; token regeneration revokes individual sessions | Independent policy enforcement and transaction-bound current proof/session checks before mutation. |
+| `i/change-password` and its passkey start/complete routes | Dedicated UI → fresh password/strict UV → profile/session-locked password write; legacy route refuses active independent policy and rechecks its snapshot | Real-device acceptance and independent-policy display before activation. |
+| `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Existing password/TOTP authorization; token regeneration revokes individual sessions | Independent policy enforcement and transaction-bound current proof/session checks before mutation. |
 | `auth/accept`, OAuth consent, MiAuth token issuance, `auth/session/userkey` | Existing scope/session/owner checks | Audit credential issuance against active policy and fresh assurance; never elevate delegated/shared tokens into fresh auth. |
 | User self/moderator security fields and `securityKeysList` | Existing TOTP-based serialization | Consistent independent policy display; dedicated fresh-gated sensitive key/recovery display. |
 | Browser-session verify/revoke/signout, HTTP/stream/native MCP | Existing durable session revocation checks | Bind final proof/mutation to a live individual session without expanding old token privileges. |
@@ -157,3 +160,26 @@ foundation slices. They remain explicit acceptance work before user exposure.
 
 Run its real atomic Redis regression with
 `MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/auth/test/vitest.fresh-reauthentication.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs`.
+
+### Password change: first connected fresh-authentication path
+
+Security settings keeps the original password-change action and adds a passkey
+variant for individual browser sessions with an existing listed passkey and a
+WebAuthn-capable browser. Both collect the current password and confirm the new
+password first. The passkey action then calls `i/change-password/passkey/start`,
+performs required-UV WebAuthn, and calls `i/change-password/passkey/complete`.
+It never automatically retries through the legacy action after cancellation or
+failure, and leaving settings prevents a later native result from completing.
+
+Completion consumes its exact `change-password` challenge and returns no grant.
+The protected write locks the profile and live browser session, checks current
+account state, normalized key material/policy and the original monotonic expiry,
+and checks expiry again after the update so failure rolls back. It changes only
+the password hash. No activation, sudo state or credential issuance is added.
+The legacy action preserves existing password/TOTP behavior while refusing an
+active independent policy and checking its authenticated snapshot under the lock.
+
+[Real-device acceptance steps](test/manual/fresh-password-change.md) cover success,
+cancellation, failure, expiry and revocation. Automated coverage includes the real
+settings component plus HTTP with real disposable PostgreSQL/Redis and synthetic
+signed WebAuthn assertions. Physical authenticator/browser results remain pending.

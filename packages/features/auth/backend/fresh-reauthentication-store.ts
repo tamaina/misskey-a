@@ -7,7 +7,7 @@ import * as v from 'valibot';
 import type { Redis } from 'ioredis';
 
 const id = v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{1,128}$/));
-export const freshReauthenticationPurposeSchema = v.picklist(['activate-passkey-mfa', 'show-recovery-codes']);
+export const freshReauthenticationPurposeSchema = v.picklist(['activate-passkey-mfa', 'show-recovery-codes', 'change-password']);
 const bindingSchema = v.strictObject({ userId: id, sessionId: id, purpose: freshReauthenticationPurposeSchema });
 const rowSchema = v.strictObject({
 	v: v.literal(1), ...bindingSchema.entries,

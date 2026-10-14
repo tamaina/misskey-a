@@ -55,6 +55,9 @@ import { createIAppsProcedure } from './endpoints/i/apps.js';
 import type { IAppsDependencies } from './endpoints/i/apps.js';
 import { createIAuthorizedAppsProcedure } from './endpoints/i/authorized-apps.js';
 import type { IAuthorizedAppsDependencies } from './endpoints/i/authorized-apps.js';
+import { createChangePasswordPasskeyStartProcedure, createChangePasswordPasskeyCompleteProcedure } from './endpoints/i/change-password-passkey.js';
+import type { ChangePasswordPasskeyDependencies } from './endpoints/i/change-password-passkey.js';
+import { FreshPasskeyReauthentication } from './fresh-passkey-reauthentication.js';
 import { createIChangePasswordProcedure } from './endpoints/i/change-password.js';
 import type { IChangePasswordDependencies } from './endpoints/i/change-password.js';
 import { createIRegenerateTokenProcedure } from './endpoints/i/regenerate-token.js';
@@ -163,6 +166,8 @@ export interface AuthRouterDependencies {
 	'i/apps': IAppsDependencies;
 	'i/authorized-apps': IAuthorizedAppsDependencies;
 	'i/change-password': IChangePasswordDependencies;
+	'i/change-password/passkey/start': ChangePasswordPasskeyDependencies;
+	'i/change-password/passkey/complete': ChangePasswordPasskeyDependencies;
 	'i/regenerate-token': IRegenerateTokenDependencies;
 	'i/revoke-token': IRevokeTokenDependencies;
 	'i/signin-history': ISigninHistoryDependencies;
@@ -225,6 +230,8 @@ export function createAuthRouter(deps: AuthRouterDependencies) {
 		'i/apps': createIAppsProcedure(deps['i/apps']),
 		'i/authorized-apps': createIAuthorizedAppsProcedure(deps['i/authorized-apps']),
 		'i/change-password': createIChangePasswordProcedure(deps['i/change-password']),
+		'i/change-password/passkey/start': createChangePasswordPasskeyStartProcedure(deps['i/change-password/passkey/start']),
+		'i/change-password/passkey/complete': createChangePasswordPasskeyCompleteProcedure(deps['i/change-password/passkey/complete']),
 		'i/regenerate-token': createIRegenerateTokenProcedure(deps['i/regenerate-token']),
 		'i/revoke-token': createIRevokeTokenProcedure(deps['i/revoke-token']),
 		'i/signin-history': createISigninHistoryProcedure(deps['i/signin-history']),
@@ -276,7 +283,9 @@ export class AuthApiProvider {
 			'i/2fa/update-key': { db: this.moduleRef.get<I2faUpdateKeyDependencies['db']>(DI.db, { strict: false }), userSecurityKeysRepository: this.moduleRef.get<I2faUpdateKeyDependencies['userSecurityKeysRepository']>(DI.userSecurityKeysRepository, { strict: false }), userEntityService: this.moduleRef.get<I2faUpdateKeyDependencies['userEntityService']>(UserEntityService, { strict: false }), globalEventService: this.moduleRef.get<I2faUpdateKeyDependencies['globalEventService']>(GlobalEventService, { strict: false }) },
 			'i/apps': { accessTokensRepository: this.moduleRef.get<IAppsDependencies['accessTokensRepository']>(DI.accessTokensRepository, { strict: false }), idService: this.moduleRef.get<IAppsDependencies['idService']>(IdService, { strict: false }) },
 			'i/authorized-apps': { accessTokensRepository: this.moduleRef.get<IAuthorizedAppsDependencies['accessTokensRepository']>(DI.accessTokensRepository, { strict: false }), appEntityService: this.moduleRef.get<IAuthorizedAppsDependencies['appEntityService']>(AppEntityService, { strict: false }) },
-			'i/change-password': { userProfilesRepository: this.moduleRef.get<IChangePasswordDependencies['userProfilesRepository']>(DI.userProfilesRepository, { strict: false }), userAuthService: this.moduleRef.get<IChangePasswordDependencies['userAuthService']>(UserAuthService, { strict: false }) },
+			'i/change-password': { db: this.moduleRef.get<IChangePasswordDependencies['db']>(DI.db, { strict: false }), userProfilesRepository: this.moduleRef.get<IChangePasswordDependencies['userProfilesRepository']>(DI.userProfilesRepository, { strict: false }), userAuthService: this.moduleRef.get<IChangePasswordDependencies['userAuthService']>(UserAuthService, { strict: false }) },
+			'i/change-password/passkey/start': { db: this.moduleRef.get<ChangePasswordPasskeyDependencies['db']>(DI.db, { strict: false }), freshReauthentication: this.moduleRef.get(FreshPasskeyReauthentication, { strict: false }) },
+			'i/change-password/passkey/complete': { db: this.moduleRef.get<ChangePasswordPasskeyDependencies['db']>(DI.db, { strict: false }), freshReauthentication: this.moduleRef.get(FreshPasskeyReauthentication, { strict: false }) },
 			'i/regenerate-token': { db: this.moduleRef.get<IRegenerateTokenDependencies['db']>(DI.db, { strict: false }), userAuthService: this.moduleRef.get<IRegenerateTokenDependencies['userAuthService']>(UserAuthService, { strict: false }), browserSessionService: this.moduleRef.get<IRegenerateTokenDependencies['browserSessionService']>(BrowserSessionService, { strict: false }), usersRepository: this.moduleRef.get<IRegenerateTokenDependencies['usersRepository']>(DI.usersRepository, { strict: false }), userProfilesRepository: this.moduleRef.get<IRegenerateTokenDependencies['userProfilesRepository']>(DI.userProfilesRepository, { strict: false }), globalEventService: this.moduleRef.get<IRegenerateTokenDependencies['globalEventService']>(GlobalEventService, { strict: false }) },
 			'i/revoke-token': { accessTokensRepository: this.moduleRef.get<IRevokeTokenDependencies['accessTokensRepository']>(DI.accessTokensRepository, { strict: false }) },
 			'i/sessions': { browserSessionService: this.moduleRef.get<BrowserSessionDependencies['browserSessionService']>(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get<BrowserSessionDependencies['globalEventService']>(GlobalEventService, { strict: false }) },
