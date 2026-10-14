@@ -212,18 +212,21 @@ it('binds antenna arguments to ownership, read:account scope and subscription id
 });
 
 it('advertises strict antenna arguments separately from empty mention/reply arguments', async () => {
+	permission.push('read:account');
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
 	expect(result.events.find(event => event.name === 'antenna.note')?.inputSchema).toEqual({ type: 'object', properties: { antennaId: { type: 'string' } }, required: ['antennaId'], additionalProperties: false });
 	expect(result.events.find(event => event.name === 'note.mentioned')?.inputSchema).toEqual({ type: 'object', properties: {}, additionalProperties: false });
 });
 
 it('advertises object input schemas for all six event definitions', async () => {
+	permission.push('read:account');
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
 	expect(result.events).toHaveLength(6);
 	for (const event of result.events) expect(ToolSchema.shape.inputSchema.safeParse(event.inputSchema).success, event.name).toBe(true);
 });
 
 it('keeps the stream catalog outside JSON Schema and preserves it through the native output contract', async () => {
+	permission.push('read:account');
 	// Use the existing SDK's pinned AJV dependency; add no test/package dependency.
 	const backendRequire = createRequire(`${process.cwd()}/package.json`);
 	const sdkRequire = createRequire(backendRequire.resolve('@modelcontextprotocol/sdk/validation/ajv-provider.js'));
@@ -243,4 +246,57 @@ it('keeps the stream catalog outside JSON Schema and preserves it through the na
 	}
 	expect(result.events.find(event => event.name === 'stream.channel')?.inputSchema).toEqual(streamChannelInputSchema);
 	expect(result.events.find(event => event.name === 'stream.note')?.inputSchema).toEqual(streamNoteInputSchema);
+});
+
+it.each([
+	{ scopes: ['read:notifications'], names: ['note.mentioned', 'note.replied'] },
+	{ scopes: ['read:account'], names: ['stream.channel', 'stream.broadcast', 'stream.note'] },
+	{ scopes: ['read:notifications', 'read:account'], names: ['note.mentioned', 'note.replied', 'antenna.note', 'stream.channel', 'stream.broadcast', 'stream.note'] },
+])('lists only events admitted by current native scopes: $scopes', async ({ scopes, names }) => {
+	permission = ['access:mcp', ...scopes];
+	const result = await service.invoke('events/list', {}, context()) as { events: { name: string }[] };
+	expect(result.events.map(event => event.name)).toEqual(names);
+});
+
+it.each([
+	{ scopes: ['access:mcp'], code: -32602 },
+	{ scopes: ['read:notifications'], code: 'PERMISSION_DENIED' },
+	{ scopes: ['read:account'], code: 'PERMISSION_DENIED' },
+])('rejects discovery without the existing MCP/event grant boundary: $scopes', async ({ scopes, code }) => {
+	permission = scopes;
+	await expect(service.invoke('events/list', {}, context())).rejects.toMatchObject({ code });
+});
+
+it('rechecks native scope changes between event discoveries', async () => {
+	const list = async () => (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.map(event => event.name);
+	permission = ['access:mcp', 'read:notifications', 'read:account'];
+	expect(await list()).toHaveLength(6);
+	permission = ['access:mcp', 'read:account'];
+	expect(await list()).toEqual(['stream.channel', 'stream.broadcast', 'stream.note']);
+	permission = ['access:mcp', 'read:notifications'];
+	expect(await list()).toEqual(['note.mentioned', 'note.replied']);
+	permission = ['access:mcp'];
+	await expect(list()).rejects.toThrow('Event access denied');
+});
+
+it('filters using current app permissions rather than the token/context scope snapshot', async () => {
+	permission = ['access:mcp', 'read:notifications', 'read:account'];
+	deps.tokens.findOneBy.mockResolvedValue({ id: 'grant', userId: actor.id, appId: 'app', permission } as never);
+	deps.apps.findOneBy.mockResolvedValue({ id: 'app', permission: ['access:mcp', 'read:account'] } as never);
+	const list = async () => (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.map(event => event.name);
+	expect(await list()).toEqual(['stream.channel', 'stream.broadcast', 'stream.note']);
+	deps.apps.findOneBy.mockResolvedValue({ id: 'app', permission: ['access:mcp', 'read:notifications'] } as never);
+	expect(await list()).toEqual(['note.mentioned', 'note.replied']);
+	deps.apps.findOneBy.mockResolvedValue(null);
+	await expect(list()).rejects.toThrow('Event access denied');
+});
+
+it('retains current grant and account-state checks when listing events', async () => {
+	permission = ['access:mcp', 'read:account'];
+	actor.isSuspended = true;
+	await expect(service.invoke('events/list', {}, context())).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_SUSPENDED' });
+	actor.isSuspended = false; actor.movedToUri = 'https://moved.example';
+	await expect(service.invoke('events/list', {}, context())).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_MOVED' });
+	actor.movedToUri = null; deps.tokens.findOneBy.mockResolvedValue(null);
+	await expect(service.invoke('events/list', {}, context())).rejects.toThrow('Event access denied');
 });

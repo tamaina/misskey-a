@@ -120,7 +120,7 @@ const collapsed = ref(isLong);
 	"withNFiles": "{n} ملف (ملفات)",
 	"poll": "استطلاع رأي",
 	"showMore": "عرض المزيد",
-	"showLess": "اغلق"
+	"showLess": "عرض اقل"
 }
 </locale>
 
