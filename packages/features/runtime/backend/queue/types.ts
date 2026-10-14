@@ -116,6 +116,8 @@ export type PostScheduledNoteJobData = {
 	noteDraftId: string;
 };
 
+export type ArchiveAnnouncementJobData = { announcementId: string; autoArchiveAt: number };
+
 export type SystemWebhookDeliverJobData<T extends SystemWebhookEventType = SystemWebhookEventType> = {
 	type: T;
 	content: SystemWebhookPayload<T>;

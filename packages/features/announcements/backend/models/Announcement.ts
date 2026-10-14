@@ -85,6 +85,9 @@ export class MiAnnouncement {
 	@JoinColumn()
 	public user: MiUser | null;
 
+	@Column('timestamp with time zone', { nullable: true })
+	public autoArchiveAt: Date | null;
+
 	constructor(data: Partial<MiAnnouncement>) {
 		if (data == null) return;
 

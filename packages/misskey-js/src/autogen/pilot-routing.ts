@@ -15363,6 +15363,9 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"INVALID_AUTO_ARCHIVE_AT": {
+						"status": 400
 					}
 				},
 				"meta": {
@@ -15516,6 +15519,9 @@ export default {
 						"status": 500
 					},
 					"NO_SUCH_ANNOUNCEMENT": {
+						"status": 400
+					},
+					"INVALID_AUTO_ARCHIVE_AT": {
 						"status": 400
 					}
 				},

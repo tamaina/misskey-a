@@ -16,6 +16,7 @@ import type { MiAntenna } from '@features/timelines/backend/models/Antenna.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiDriveFolder } from '@features/drive/backend/models/DriveFolder.js';
 import type { MiUserList } from '@features/relationships/backend/models/UserList.js';
+import type { MiClip } from '@features/collections/backend/models/Clip.js';
 import type { MiAbuseUserReport } from '@features/moderation/backend/models/AbuseUserReport.js';
 import type { MiSignin } from '@features/auth/backend/models/Signin.js';
 import type { MiPage } from '@features/pages/backend/models/Page.js';
@@ -142,6 +143,11 @@ type NoteStreamEventTypes = {
 export interface UserListEventTypes {
 	userAdded: Packed<'UserLite'>;
 	userRemoved: Packed<'UserLite'>;
+}
+
+export interface ClipEventTypes {
+	updated: undefined;
+	deleted: undefined;
 }
 
 export interface AntennaEventTypes {
@@ -300,6 +306,10 @@ export type GlobalEvents = {
 		name: `userListStream:${MiUserList['id']}`;
 		payload: EventTypesToEventPayload<UserListEventTypes>;
 	};
+	clip: {
+		name: `clipStream:${MiClip['id']}`;
+		payload: EventTypesToEventPayload<ClipEventTypes>;
+	};
 	roleTimeline: {
 		name: `roleTimelineStream:${MiRole['id']}`;
 		payload: EventTypesToEventPayload<RoleTimelineEventTypes>;
@@ -411,6 +421,11 @@ export class GlobalEventService {
 	@bindThis
 	public publishUserListStream<K extends keyof UserListEventTypes>(listId: MiUserList['id'], type: K, value?: UserListEventTypes[K]): void {
 		this.publish(`userListStream:${listId}`, type, typeof value === 'undefined' ? null : value);
+	}
+
+	@bindThis
+	public publishClipStream<K extends keyof ClipEventTypes>(clipId: MiClip['id'], type: K, value?: ClipEventTypes[K]): void {
+		this.publish(`clipStream:${clipId}`, type, typeof value === 'undefined' ? null : value);
 	}
 
 	@bindThis

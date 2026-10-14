@@ -18,6 +18,7 @@ import type { SystemAccountService } from '@features/users/backend/services/Syst
 import type { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import type { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import type { Config } from '@/config.js';
 import type * as Redis from 'ioredis';
 import type { DataSource } from 'typeorm';
@@ -36,6 +37,7 @@ function legacyPort<Name extends string, Value>(name: Name, token = Symbol(name)
 }
 
 export const ports = {
+	queueService: legacyPort<'queueService', QueueService>('queueService'),
 	...repositoryPorts(DI),
 	userEntityService: legacyPort<'userEntityService', UserEntityService>('userEntityService'),
 	noteEntityService: legacyPort<'noteEntityService', NoteEntityService>('noteEntityService'),

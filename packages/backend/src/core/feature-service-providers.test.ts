@@ -195,7 +195,7 @@ describe('annotation-free feature services preserve behavior', () => {
 		deps.idService.parse.mockReturnValue({ date });
 		const announcement = mockDeep<MiAnnouncement>({
 			id: 'announcement', updatedAt: null, title: 'Title', text: 'Text', imageUrl: null,
-			icon: 'info', display: 'normal', userId: null, needConfirmationToRead: false, silence: false,
+			icon: 'info', display: 'normal', userId: null, needConfirmationToRead: false, silence: false, isActive: true, autoArchiveAt: null,
 		});
 		deps.announcementsRepository.insertOne.mockResolvedValue(announcement);
 		const services = announcementServices.create(deps);
