@@ -112,3 +112,14 @@ test('other followers retain visibility and followed-message boundaries without 
 		for (const key of ['email', 'securityKeysList', 'unreadAnnouncements', 'policies']) expect(output).not.toHaveProperty(key);
 	}
 });
+
+test.each([null, new Date('2099-01-01T00:00:00.000Z')])('self announcement projection omits admin-only autoArchiveAt=%s in native and wire DTOs', async autoArchiveAt => {
+	const f = fixture();
+	f.announcements.getUnreadAnnouncements.mockResolvedValue([{ ...announcement, autoArchiveAt }]);
+	const native = await f.service.packSelf(f.user.id, { ...f.hints, includeSecrets: true });
+	expect(native.unreadAnnouncements[0]).not.toHaveProperty('autoArchiveAt');
+	expect(v.parse(nativeMeDetailedSchema, native)).toEqual(native);
+	const wire = JSON.parse(JSON.stringify(native));
+	expect(wire.unreadAnnouncements[0]).not.toHaveProperty('autoArchiveAt');
+	expect(v.parse(packedMeDetailedSchema, wire)).toEqual(wire);
+});

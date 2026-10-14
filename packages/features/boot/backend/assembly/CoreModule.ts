@@ -91,6 +91,7 @@ import { ApNoteService } from '@features/federation/backend/services/ApNoteServi
 import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
 import { ApQuestionService } from '@features/federation/backend/services/ApQuestionService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { announcementArchiveLifecycleProviders } from './AnnouncementArchiveLifecycle.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { TelemetryService } from '@features/statistics/backend/services/TelemetryService.js';
 import { QueueModule } from './QueueModule.js';
@@ -232,7 +233,7 @@ const aliasExports = serviceAliases.filter(alias => alias.useExisting !== ChartL
 
 @Module({
 	imports: [QueueModule],
-	providers: [...featureServiceProviders, ...serviceProviders, ...serviceAliases],
+	providers: [...featureServiceProviders, ...announcementArchiveLifecycleProviders, ...serviceProviders, ...serviceAliases],
 	exports: [...featureServiceExports, QueueModule, ...serviceExports, ...aliasExports],
 })
 export class CoreModule {}
