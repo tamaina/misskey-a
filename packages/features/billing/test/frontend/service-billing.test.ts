@@ -40,7 +40,7 @@ test('real native admin form preserves large base units and explicit offer confi
 });
 test('account retry reuses its idempotency key, checks order hash ', async () => {
 	const order = { id: 'order', offer, payerAddress: `0x${'1'.padStart(40, '0')}`, status: 'pending' as const, txHash: null, createdAt: 1000, expiresAt: 1801000, paidAt: null, startsAt: null, endsAt: null };
-	const client = { listOffers: vi.fn(async () => [offer]), listOrders: vi.fn(async () => [order]), listTransfers: vi.fn(async () => []), createOrder: vi.fn(async () => order), checkOrder: vi.fn(async () => order), detectTransfer: vi.fn(async () => ({ status: 'pending' as const, transfer: null })) };
+	const client = { quoteOrder: vi.fn(async () => ({ revision: 0, quote: { quoteCreatedAt: 1000, quoteExpiresAt: 901000, baseAmountBaseUnits: offer.amountBaseUnits, discountBaseUnits: '0', payableAmountBaseUnits: offer.amountBaseUnits, discountAssignmentIds: [], effectiveStartsAt: 1000, effectiveExpiresAt: 100000, currentPlan: null } })), cancelOrder: vi.fn(async () => ({ ok: true })), listOffers: vi.fn(async () => [offer]), listOrders: vi.fn(async () => [order]), listTransfers: vi.fn(async () => []), createOrder: vi.fn(async () => order), checkOrder: vi.fn(async () => order), detectTransfer: vi.fn(async () => ({ status: 'pending' as const, transfer: null })) };
 	client.createOrder.mockRejectedValueOnce(new Error('synthetic private failure'));
 	const view = await mount(ServiceSubscriptions, { client, listWallets: async () => [{ id: 'wallet', chainId: offer.chainId, address: order.payerAddress, label: null, createdAt: 1, updatedAt: 1 }] });
 	try {

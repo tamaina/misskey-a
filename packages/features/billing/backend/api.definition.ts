@@ -110,6 +110,7 @@ const units = v.pipe(v.string(), v.regex(/^[1-9][0-9]{0,77}$/), v.check(value =>
 const transactionHash = v.pipe(v.string(), v.regex(/^0x[0-9a-fA-F]{64}$/));
 export const serviceOffer = v.strictObject({
 	id: v.pipe(id, v.maxLength(32)), serviceKey: text, name: text, chainId,
+	pricingAssetKey: v.exactOptional(text), planGroup: v.exactOptional(text), sortOrder: v.exactOptional(v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(100000))),
 	roleId: v.exactOptional(v.nullable(v.pipe(id, v.maxLength(32)))),
 	contractAddress: address, recipientAddress: address, tokenSymbol: text,
 	decimals: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(255)),
@@ -120,8 +121,17 @@ export const serviceOffer = v.strictObject({
 	isEnabled: v.boolean(),
 });
 export type ServiceOffer = v.InferOutput<typeof serviceOffer>;
+const nonnegativeUnits = v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]{0,77})$/));
+export const paymentQuoteSchema = v.strictObject({
+	quoteCreatedAt: timestamp, quoteExpiresAt: timestamp, baseAmountBaseUnits: nonnegativeUnits, discountBaseUnits: nonnegativeUnits, payableAmountBaseUnits: nonnegativeUnits,
+	discountAssignmentIds: v.array(id), effectiveStartsAt: timestamp, effectiveExpiresAt: timestamp,
+	currentPlan: v.nullable(v.strictObject({ id, name: text, sortOrder: v.number(), expiresAt: timestamp, priceAmountBaseUnits: nonnegativeUnits, priceDurationDays: v.number(), priceDurationUnit: v.picklist(['days', 'months', 'years']) })),
+});
+export const serviceQuote = v.strictObject({ revision: timestamp, quote: paymentQuoteSchema });
+
 export const serviceOrder = v.strictObject({
 	id, offer: serviceOffer, payerAddress: address,
+	amountBaseUnits: nonnegativeUnits, quote: v.nullable(paymentQuoteSchema),
 	status: v.picklist(['pending', 'paid', 'expired', 'failed']),
 	txHash: v.nullable(transactionHash), createdAt: timestamp, expiresAt: timestamp,
 	paidAt: v.nullable(timestamp), startsAt: v.nullable(timestamp), endsAt: v.nullable(timestamp),
@@ -137,10 +147,12 @@ const adminRead = { requireCredential: true, requireAdmin: true, kind: 'read:adm
 const adminWrite = { ...adminRead, kind: 'write:admin:meta', limit: write.limit } as const;
 const empty = v.intersect([v.strictObject({}), rawObjectInputGuard]);
 export const serviceBillingContract = {
+	cancelOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/cancel' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/cancel' }).input(v.strictObject({ orderId: id })).output(v.strictObject({ ok: v.literal(true) })),
+	quoteOrder: serviceProcedure.$meta({ ...read, requestName: 'billing/orders/quote' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/quote' }).input(v.strictObject({ offerId: id })).output(serviceQuote),
 	listOfferSettings: serviceProcedure.$meta({ ...adminRead, requestName: 'admin/billing/offers/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/admin/billing/offers/list' }).input(empty).output(v.array(serviceOffer)),
 	upsertOffer: serviceProcedure.$meta({ ...adminWrite, requestName: 'admin/billing/offers/upsert' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/admin/billing/offers/upsert' }).input(serviceOffer).output(serviceOffer),
 	listOffers: serviceProcedure.$meta({ ...read, requestName: 'billing/offers/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/offers/list' }).input(empty).output(v.array(serviceOffer)),
-	createOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/create' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/create' }).input(v.strictObject({ offerId: id, walletId: id, requestKey: text, quotedOffer: serviceOffer })).output(serviceOrder),
+	createOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/create' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/create' }).input(v.strictObject({ offerId: id, walletId: id, requestKey: text, quotedOffer: serviceOffer, quotedQuote: v.exactOptional(serviceQuote) })).output(serviceOrder),
 	checkOrder: serviceProcedure.$meta({ ...write, requestName: 'billing/orders/check' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/check' }).input(v.strictObject({ orderId: id, txHash: v.exactOptional(transactionHash) })).output(serviceOrder),
 	listOrders: serviceProcedure.$meta({ ...read, requestName: 'billing/orders/list' } as const satisfies ApiProcedureMetadata).route({ method: 'POST', path: '/billing/orders/list' }).input(empty).output(v.array(serviceOrder)),
 };

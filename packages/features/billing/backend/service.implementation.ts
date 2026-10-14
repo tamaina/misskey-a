@@ -21,13 +21,15 @@ export interface ServiceBillingDependencies {
 
 function publicOrder(row: Awaited<ReturnType<ServiceBillingStore['createOrder']>>) {
 	return v.parse(serviceOrder, { id: row.id, offer: row.offer, payerAddress: row.payerAddress, status: row.status, txHash: row.txHash,
-																																createdAt: row.createdAt, expiresAt: row.expiresAt, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
+																																amountBaseUnits: row.cashAmountBaseUnits ?? row.offer.amountBaseUnits, quote: row.quote, createdAt: row.createdAt, expiresAt: row.expiresAt, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
 }
 
 export function createServiceBillingRouter<Actor extends ApiActor>(deps: ServiceBillingDependencies) {
 	const procedure = createApiProcedure<Actor>();
 	const account = requirePrincipal<Actor>();
 	return implement(serviceBillingContract).$context<ApiContext<Actor>>().router({
+		cancelOrder: procedure(serviceBillingContract.cancelOrder).use(account).handler(({ input, context }) => deps.store.cancelOrder(context.principal.id, input.orderId)),
+		quoteOrder: procedure(serviceBillingContract.quoteOrder).use(account).handler(({ input, context }) => deps.store.quoteOrder(context.principal.id, input.offerId)),
 		listOfferSettings: procedure(serviceBillingContract.listOfferSettings).handler(async () => v.parse(v.array(serviceOffer), await deps.store.listOffers())),
 		upsertOffer: procedure(serviceBillingContract.upsertOffer).use(account).handler(async ({ input, context }) => {
 			const normalized = { ...input, contractAddress: input.contractAddress.toLowerCase(), recipientAddress: input.recipientAddress.toLowerCase() };
@@ -42,7 +44,7 @@ export function createServiceBillingRouter<Actor extends ApiActor>(deps: Service
 		createOrder: procedure(serviceBillingContract.createOrder).use(account).handler(async ({ input, context }) => {
 			const offer = (await deps.store.listOffers()).find(row => row.id === input.offerId);
 			if (!offer || !await deps.rpcUrl(offer.chainId)) throw new ORPCError('BILLING_UNAVAILABLE');
-			return publicOrder(await deps.store.createOrder(context.principal.id, input.offerId, input.walletId, input.requestKey, input.quotedOffer));
+			return publicOrder(await deps.store.createOrder(context.principal.id, input.offerId, input.walletId, input.requestKey, input.quotedOffer, input.quotedQuote));
 		}),
 		checkOrder: procedure(serviceBillingContract.checkOrder).use(account).handler(async ({ input, context }) => {
 			const row = await deps.store.submitTransaction(context.principal.id, input.orderId, input.txHash?.toLowerCase());

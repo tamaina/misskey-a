@@ -14,10 +14,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkButton type="submit" :disabled="busy || !offerId || !walletId">{{ $locale.sfc.create }}</MkButton>
 	</form>
 	<div v-for="order in orders" :key="order.id" class="_gaps_s">
-		<MkInfo>{{ order.offer.name }} / {{ order.status }} / {{ order.id }}<br>{{ $locale.sfc.token }}: {{ order.offer.chainId }} / {{ order.offer.contractAddress }}<br>{{ $locale.sfc.recipient }}: {{ order.offer.recipientAddress }}<br>{{ $locale.sfc.amount }}: {{ formatServiceAmount(order.offer.amountBaseUnits, order.offer.decimals) }} {{ order.offer.tokenSymbol }} / {{ order.offer.amountBaseUnits }} ({{ order.offer.decimals }} {{ $locale.sfc.decimals }})<br>{{ $locale.sfc.deadline }}: {{ new Date(order.expiresAt).toISOString() }}<br v-if="order.endsAt">{{ order.startsAt ? new Date(order.startsAt).toISOString() : '' }} — {{ order.endsAt ? new Date(order.endsAt).toISOString() : '' }}</MkInfo>
+		<MkInfo>{{ order.offer.name }} / {{ order.status }} / {{ order.id }}<br>{{ $locale.sfc.token }}: {{ order.offer.chainId }} / {{ order.offer.contractAddress }}<br>{{ $locale.sfc.recipient }}: {{ order.offer.recipientAddress }}<br>{{ $locale.sfc.amount }}: {{ formatServiceAmount((order.amountBaseUnits ?? order.offer.amountBaseUnits), order.offer.decimals) }} {{ order.offer.tokenSymbol }} / {{ (order.amountBaseUnits ?? order.offer.amountBaseUnits) }} ({{ order.offer.decimals }} {{ $locale.sfc.decimals }})<br>{{ $locale.sfc.deadline }}: {{ new Date(order.expiresAt).toISOString() }}<br v-if="order.endsAt">{{ order.startsAt ? new Date(order.startsAt).toISOString() : '' }} — {{ order.endsAt ? new Date(order.endsAt).toISOString() : '' }}</MkInfo>
 		<form v-if="order.status === 'pending'" class="_gaps_s" @submit.prevent="check(order)">
 			<MkInput v-model="hashes[order.id]" :disabled="busy || !!order.txHash"><template #label>{{ $locale.sfc.hash }}</template><template #caption>{{ order.txHash ?? $locale.sfc.hashCaption }}</template></MkInput>
 			<MkButton type="submit" :disabled="busy">{{ $locale.sfc.check }}</MkButton>
+		<MkButton v-if="!order.txHash" :disabled="busy" @click="cancel(order)">{{ $locale.sfc.cancel }}</MkButton>
 		</form>
 	</div>
 </div>
@@ -37,7 +38,7 @@ const offerId = ref(''), walletId = ref(''), hashes = ref<Record<string, string>
 const offerItems = computed(() => offers.value.map(offer => ({ value: offer.id, label: `${offer.name}: ${formatServiceAmount(offer.amountBaseUnits, offer.decimals)} ${offer.tokenSymbol} / ${offer.duration} ${offer.durationUnit}` })));
 const walletItems = computed(() => wallets.value.map(wallet => ({ value: wallet.id, label: `${wallet.chainId} / ${wallet.address}` })));
 const busy = ref(false), error = ref(false);
-let retry: { offerId: string; walletId: string; requestKey: string; quotedOffer: ServiceOffer } | undefined;
+let retry: { offerId: string; walletId: string; requestKey: string; quotedOffer: ServiceOffer; quotedQuote?: Awaited<ReturnType<ServiceAccountClient['quoteOrder']>> } | undefined;
 
 async function run(action: () => Promise<void>) {
 	if (busy.value) return;
@@ -53,10 +54,12 @@ async function create() {
 	await run(async () => {
 		const quotedOffer = offers.value.find(offer => offer.id === offerId.value);
 		if (!quotedOffer) throw new Error('Offer unavailable');
-		if (!retry || retry.offerId !== offerId.value || retry.walletId !== walletId.value || JSON.stringify(retry.quotedOffer) !== JSON.stringify(quotedOffer)) retry = { offerId: offerId.value, walletId: walletId.value, requestKey: crypto.randomUUID(), quotedOffer };
+		if (!retry || retry.offerId !== offerId.value || retry.walletId !== walletId.value || JSON.stringify(retry.quotedOffer) !== JSON.stringify(quotedOffer)) { const quotedQuote = await props.client.quoteOrder({ offerId: quotedOffer.id }); retry = { offerId: offerId.value, walletId: walletId.value, requestKey: crypto.randomUUID(), quotedOffer, quotedQuote }; }
 		await props.client.createOrder(retry); retry = undefined; await refreshHistory();
 	});
 }
+
+async function cancel(order: ServiceOrder) { await run(async () => { await props.client.cancelOrder({ orderId: order.id }); await refreshHistory(); }); }
 
 async function check(order: ServiceOrder) {
 	await run(async () => { await props.client.checkOrder({ orderId: order.id, ...(!order.txHash && hashes.value[order.id] ? { txHash: hashes.value[order.id] } : {}) }); await refreshHistory(); });
@@ -64,5 +67,5 @@ async function check(order: ServiceOrder) {
 
 </script>
 <locale lang="json" locale="ja-JP">
-{"scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、管理者が紐付けた通常ロールは確認済み期間内だけ有効です。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"読み込む","offer":"サービス","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","deadline":"ハッシュ提出期限"}
+{"scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、管理者が紐付けた通常ロールは確認済み期間内だけ有効です。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"読み込む","offer":"サービス","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","cancel":"送信前の注文を取り消す","deadline":"ハッシュ提出期限"}
 </locale>

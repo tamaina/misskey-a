@@ -11,6 +11,7 @@ import { createRequire } from 'node:module';
 import { createRouterClient } from '@orpc/server';
 import { createServiceBillingStore, createServiceBillingRouter, activePaidRoleIds } from '../../../backend/built/features/billing/backend.js';
 import { BillingServiceSubscriptions1791838800000 as Migration } from '../../../backend/migration/1791838800000-BillingServiceSubscriptions.js';
+import { BillingFundedTerms1792010000000 } from '../../../backend/migration/1792010000000-BillingFundedTerms.js';
 import { BillingWalletRegistration1791760200000 as WalletMigration } from '../../../backend/migration/1791760200000-BillingWalletRegistration.js';
 const require = createRequire(new URL('../../../backend/package.json', import.meta.url));
 const { DataSource } = require('typeorm');
@@ -33,6 +34,7 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 		await qr.query('INSERT INTO "user" ("id") VALUES (\'alice\'), (\'bob\'), (\'carol\')');
 		const migration = new Migration(); await migration.up(qr); await migration.down(qr); await migration.up(qr);
 		await new WalletMigration().up(qr);
+		await new BillingFundedTerms1792010000000().up(qr);
 		const pending = (await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_service_(offer|order)"/.test(row.query));
 		assert.deepEqual(pending, [], 'Migration and entity DDL agree');
 		await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES (\'alice-wallet\',\'alice\',123456,$1,NULL,$3,$3),(\'bob-wallet\',\'bob\',123456,$2,NULL,$3,$3)', [address(1), address(2), now]);

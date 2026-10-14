@@ -13,7 +13,11 @@ import type { DataSource } from 'typeorm';
 export async function activePaidRoleIds(db: Pick<DataSource, 'query'>, userId: string, now: number): Promise<string[]> {
 	const rows: { roleId: string }[] = await db.query(`SELECT DISTINCT term.offer->>'roleId' AS "roleId"
 		FROM billing_service_order term JOIN role ON role.id = term.offer->>'roleId'
-		WHERE term."userId" = $1 AND term.status = 'paid' AND term."startsAt" <= $2 AND term."endsAt" > $2
+		WHERE NOT EXISTS (SELECT 1 FROM billing_account_state WHERE "userId" = $1) AND term."userId" = $1 AND term.status = 'paid' AND term."startsAt" <= $2 AND term."endsAt" > $2
+		AND role.target = 'manual' AND role."isAdministrator" = false AND role."isModerator" = false
+		UNION SELECT DISTINCT item->'offer'->>'roleId' AS "roleId" FROM billing_account_state state,
+		LATERAL jsonb_array_elements(state.data->'terms') item JOIN role ON role.id = item->'offer'->>'roleId'
+		WHERE state."userId" = $1 AND (item->>'startsAt')::bigint <= $2 AND (item->>'expiresAt')::bigint > $2
 		AND role.target = 'manual' AND role."isAdministrator" = false AND role."isModerator" = false`, [userId, now]);
 	return rows.map(row => row.roleId);
 }

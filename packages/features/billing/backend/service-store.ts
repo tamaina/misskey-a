@@ -4,14 +4,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { isDeepStrictEqual } from 'node:util';
+import { lockBillingState, saveBillingState, quoteServiceTerm, applyFundedTerm } from './billing-state.js';
+import type { PaymentQuote } from '../shared/payment-quote.js';
 import { ORPCError } from '@orpc/server';
-import { MiUser } from '@features/users/backend/models/User.js';
 import { MiBillingWallet } from './models/BillingWallet.js';
 import { MiBillingServiceOffer } from './models/BillingServiceOffer.js';
+import { MiBillingTransactionClaim } from './models/BillingTransactionClaim.js';
 import { MiBillingServiceOrder } from './models/BillingServiceOrder.js';
 import { MiRole } from '@features/roles/backend/models/Role.js';
 import { matchesOrder } from './service-receipt.js';
-import { calculatePaymentQuote } from '../shared/payment-quote.js';
 import type { ServiceOffer } from './api.definition.js';
 import type { ReceiptResult } from './service-receipt.js';
 import type { DataSource, EntityManager } from 'typeorm';
@@ -36,6 +38,25 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 	const offers = db.getRepository(MiBillingServiceOffer);
 	const orders = db.getRepository(MiBillingServiceOrder);
 	return {
+		async quoteOrder(userId: string, offerId: string) {
+			return db.transaction(async manager => {
+				const state = await lockBillingState(manager, userId);
+				if (state.lockRequestId) conflict();
+				const offer = await manager.findOneBy(MiBillingServiceOffer, { id: offerId });
+				if (!offer?.terms.isEnabled) unavailable();
+				return { revision: state.revision, quote: quoteServiceTerm(state, offer.terms, now()) };
+			});
+		},
+		async cancelOrder(userId: string, orderId: string) {
+			return db.transaction(async manager => {
+				const state = await lockBillingState(manager, userId);
+				const row = await manager.findOneBy(MiBillingServiceOrder, { id: orderId, userId });
+				if (!row) throw new ORPCError('BILLING_NOT_FOUND');
+				if (state.lockRequestId || row.status !== 'pending' || row.txHash) conflict();
+				await manager.update(MiBillingServiceOrder, row.id, { status: 'expired' });
+				return { ok: true as const };
+			});
+		},
 		async listOffers() { return (await offers.find({ order: { id: 'ASC' }, take: 100 })).map(row => row.terms); },
 		async saveOffer(terms: ServiceOffer, actorId: string) {
 			await db.transaction(async manager => {
@@ -47,13 +68,12 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 			return terms;
 		},
 		async listOrders(userId: string) { return orders.find({ where: { userId }, order: { id: 'DESC' }, take: 100 }); },
-		async createOrder(userId: string, offerId: string, walletId: string, requestKey: string, quotedOffer: ServiceOffer) {
+		async createOrder(userId: string, offerId: string, walletId: string, requestKey: string, quotedOffer: ServiceOffer, quotedQuote?: { revision: number; quote: PaymentQuote }) {
 			return db.transaction(async manager => {
-				// Also serializes idempotent create and same-service renewal for this account.
-				await manager.getRepository(MiUser).createQueryBuilder('user').select('user.id').where('user.id = :userId', { userId }).setLock('for_no_key_update').getOneOrFail();
+				const state = await lockBillingState(manager, userId);
 				const existing = await manager.findOneBy(MiBillingServiceOrder, { userId, requestKey });
 				if (existing) {
-					if (existing.offer.id !== offerId || existing.walletId !== walletId || !sameOffer(existing.offer, quotedOffer)) conflict();
+					if (existing.offer.id !== offerId || existing.walletId !== walletId || !sameOffer(existing.offer, quotedOffer) || (quotedQuote && (!isDeepStrictEqual(existing.quote, quotedQuote.quote) || existing.billingRevision !== quotedQuote.revision))) conflict();
 					return existing;
 				}
 				const offer = await manager.getRepository(MiBillingServiceOffer).findOne({ where: { id: offerId }, lock: { mode: 'pessimistic_read' } });
@@ -61,24 +81,49 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				if (!offer?.terms.isEnabled || !wallet || wallet.chainId !== offer.terms.chainId) unavailable();
 				if (!sameOffer(offer.terms, quotedOffer)) conflict();
 				const createdAt = now();
+				if (state.lockRequestId) conflict();
+				if (offer.terms.planGroup && !quotedQuote) conflict();
+				const pendingOrders = await manager.findBy(MiBillingServiceOrder, { userId, status: 'pending' });
+				if (pendingOrders.some(row => row.quote && (row.txHash || row.expiresAt > createdAt))) conflict();
+				let quote: PaymentQuote | null = null;
+				if (quotedQuote) {
+					if (quotedQuote.revision !== state.revision || quotedQuote.quote.quoteCreatedAt > createdAt + 60000 || quotedQuote.quote.quoteExpiresAt <= createdAt) conflict();
+					quote = quoteServiceTerm(state, offer.terms, quotedQuote.quote.quoteCreatedAt);
+					if (!isDeepStrictEqual(quote, quotedQuote.quote)) conflict();
+					const pending = await manager.findBy(MiBillingServiceOrder, { userId, status: 'pending' });
+					if (pending.some(row => row.txHash || row.expiresAt > createdAt)) conflict();
+				}
 				const row = manager.create(MiBillingServiceOrder, { id: id(createdAt), userId, walletId, requestKey,
-																																																								offer: offer.terms, chainId: wallet.chainId, payerAddress: wallet.address,
+																																																								quote, billingRevision: quotedQuote?.revision ?? null, cashAmountBaseUnits: quote?.payableAmountBaseUnits ?? offer.terms.amountBaseUnits, offer: offer.terms, chainId: wallet.chainId, payerAddress: wallet.address,
 																																																								status: 'pending', createdAt, expiresAt: createdAt + 30 * 60 * 1000,
 																																																								txHash: null, paidAt: null, startsAt: null, endsAt: null });
 				await manager.insert(MiBillingServiceOrder, row);
+				if (quote?.payableAmountBaseUnits === '0') {
+					await requirePurchasableRole(manager, row.offer.roleId);
+					row.status = 'paid'; row.paidAt = createdAt; row.startsAt = quote.effectiveStartsAt; row.endsAt = quote.effectiveExpiresAt;
+					applyFundedTerm(state, row, quote, () => id(now()));
+					await manager.update(MiBillingServiceOrder, row.id, { status: row.status, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
+					await saveBillingState(manager, userId, state);
+				}
 				return row;
 			});
 		},
 		/** Stores a per-order retry hint; it is not a global claim until proof matches. */
 		async submitTransaction(userId: string, orderId: string, txHash?: string) {
 			return db.transaction(async manager => {
+				const state = await lockBillingState(manager, userId);
 				const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
 				if (!row) throw new ORPCError('BILLING_NOT_FOUND');
 				if (txHash && row.txHash && txHash !== row.txHash) conflict();
 				if (row.status !== 'pending') return row;
+				if (state.lockRequestId) conflict();
 				if (row.txHash === null) {
 					if (row.expiresAt <= now()) row.status = 'expired';
-					else if (txHash) row.txHash = txHash;
+					else if (txHash) {
+						await manager.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [`${row.chainId}:${txHash}`]);
+						if (await manager.existsBy(MiBillingTransactionClaim, { chainId: String(row.chainId), txHash })) conflict();
+						row.txHash = txHash;
+					}
 					await manager.update(MiBillingServiceOrder, row.id, { status: row.status, txHash: row.txHash });
 				}
 				return row;
@@ -87,7 +132,8 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 		async applyReceipt(userId: string, orderId: string, txHash: string, result: ReceiptResult) {
 			try {
 				return await db.transaction(async manager => {
-					const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
+					const state = await lockBillingState(manager, userId);
+				const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
 					if (!row) throw new ORPCError('BILLING_NOT_FOUND');
 					if (row.txHash !== txHash) conflict();
 					if (row.status !== 'pending' || result.status === 'pending') return row;
@@ -96,23 +142,18 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 						await manager.update(MiBillingServiceOrder, row.id, { status: row.status });
 						return row;
 					}
-					await manager.getRepository(MiUser).createQueryBuilder('user').select('user.id').where('user.id = :userId', { userId }).setLock('for_no_key_update').getOneOrFail();
-					const latest = await manager.getRepository(MiBillingServiceOrder).createQueryBuilder('term')
-						.where('term."userId" = :userId AND term.status = :status AND term.offer->>\'serviceKey\' = :key', { userId, status: 'paid', key: row.offer.serviceKey })
-						.orderBy('term.endsAt', 'DESC').getOne();
+					if (state.lockRequestId || (row.billingRevision !== null && row.billingRevision !== state.revision)) conflict();
 					await requirePurchasableRole(manager, row.offer.roleId);
+					await manager.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [`${row.chainId}:${txHash}`]);
+					if (await manager.existsBy(MiBillingTransactionClaim, { chainId: String(row.chainId), txHash })) conflict();
+					await manager.insert(MiBillingTransactionClaim, { chainId: String(row.chainId), txHash, ownerId: row.id });
 					row.paidAt = now();
-					// The representative slice uses the source kernel's initial/same-plan branches.
-					// Different plan ranks, discounts and assignment trimming remain unimplemented.
-					const quote = calculatePaymentQuote({ quoteCreatedAt: row.paidAt, quoteTtlMs: 30 * 60 * 1000,
-						targetPlanId: row.offer.serviceKey, targetPlanSortOrder: 0,
-						targetPlanPrice: { amountBaseUnits: row.offer.amountBaseUnits, durationDays: row.offer.duration, durationUnit: row.offer.durationUnit },
-						currentPlan: latest?.endsAt && latest.endsAt > row.paidAt ? { id: row.offer.serviceKey, name: latest.offer.name, sortOrder: 0,
-							startsAt: latest.startsAt ?? undefined, expiresAt: latest.endsAt,
-							price: { amountBaseUnits: latest.offer.amountBaseUnits, durationDays: latest.offer.duration, durationUnit: latest.offer.durationUnit } } : null });
+					const quote = row.quote ?? quoteServiceTerm(state, row.offer, row.paidAt);
 					row.startsAt = quote.effectiveStartsAt; row.endsAt = quote.effectiveExpiresAt;
 					if (!Number.isSafeInteger(row.endsAt) || row.endsAt <= row.startsAt) unavailable();
 					row.status = 'paid';
+					applyFundedTerm(state, row, quote, () => id(now()));
+					await saveBillingState(manager, userId, state);
 					await manager.update(MiBillingServiceOrder, row.id, { status: row.status, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
 					return row;
 				});
