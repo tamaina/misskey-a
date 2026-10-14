@@ -69,6 +69,7 @@ export function createI2faUnregisterProcedure(deps: I2faUnregisterDependencies) 
 				assertLegacyMfaManagement(current);
 				await manager.getRepository(MiUserProfile).update({ userId: me.id }, {
 					twoFactorSecret: null,
+					twoFactorTempSecret: null,
 					twoFactorBackupSecret: null,
 					twoFactorEnabled: false,
 					usePasswordLessLogin: false,

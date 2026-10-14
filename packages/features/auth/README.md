@@ -82,9 +82,12 @@ existing password and atomically clears keys, policies and recovery codes.
 The legacy management routes reject an enabled independent policy, preserving its
 recovery codes until the future fresh-authenticated management flow is available.
 
-This lock protocol currently covers removal/reset. Future activation, key
-enrolment and other factor writers must adopt it before the activation writer is
-connected. The old TOTP-disabled orphan-key behavior is preserved. This groundwork
+This lock protocol covers removal/reset, TOTP setup, key enrolment completion,
+key naming and passwordless convenience settings. Pending TOTP secrets are
+compared under the lock and consumed on completion; removal/reset also clears
+them. Legacy registration/setup routes refuse an active independent policy.
+Future activation and sensitive-operation writers must adopt the same protocol
+before the activation writer is connected. The old TOTP-disabled orphan-key behavior is preserved. This groundwork
 does not complete the independent-MFA acceptance criteria in #94 / #144 / #157.
 
 ### Fresh passkey reauthentication (unconnected verifier)
@@ -128,6 +131,29 @@ Remaining runtime connections before activation:
 The current verifier supports only `activate-passkey-mfa` and
 `show-recovery-codes`. Other actions need their own concrete purpose/target
 bindings; neither a generic sudo purpose nor this metadata authorizes them.
+
+### Activation readiness inventory
+
+The following inventory records implementation boundaries, not activation
+acceptance. There is still no true writer or user-facing activation state.
+
+| Existing path | Current coverage | Still required before activation |
+| --- | --- | --- |
+| Password-first `signinFlow`, passkey `signinWithPasskey`, `SigninService` | Existing password/TOTP and strict-UV authentication, individual browser-session issuance | Explicit independent policy at both entry points and final issuance; fresh current-policy checks and recovery fallback; #143 remains a separate unmerged login-progress Draft. |
+| `TotpService` recovery codes | Atomic one-use consume bound to password/TOTP/independent policy | Expose recovery for independent MFA only through the completed policy flow; never infer remaining factors from backup stock. |
+| `request-reset-password`, `reset-password`, admin `reset-password`, `verify-email` | Existing email/admin authorization and reset behavior | Serialize relevant credential changes and preserve independent MFA on reset; define recovery policy and invalidate stale reauthentication/session state. |
+| `i/2fa/register`, `done`, `register-key`, `key-done` | Legacy independent-policy refusal; profile-locked DB setup/completion with proof snapshot checks; TOTP pending setup is consumed | Exact session/purpose/target-bound fresh flows and independent enrolment/activation, recovery-code presentation acknowledgement. |
+| `i/2fa/remove-key`, `unregister`, `password-less`, `update-key`, admin `unset-mfa` | Common profile lock and owned mutation; active independent policy is refused on legacy user routes; reset clears pending setup | Fresh per-operation flows, preserve last-factor invariant and recovery semantics for the final independent policy. |
+| Both existing WebAuthn verifiers and fresh verifier | Strict UV; fresh verifier has challenge ownership, deadline, counter CAS and legacy key normalization | Align counter updates and policy/session binding in all runtime callers. |
+| `i/change-password`, `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Existing password/TOTP authorization; token regeneration revokes individual sessions | Independent policy enforcement and transaction-bound current proof/session checks before mutation. |
+| `auth/accept`, OAuth consent, MiAuth token issuance, `auth/session/userkey` | Existing scope/session/owner checks | Audit credential issuance against active policy and fresh assurance; never elevate delegated/shared tokens into fresh auth. |
+| User self/moderator security fields and `securityKeysList` | Existing TOTP-based serialization | Consistent independent policy display; dedicated fresh-gated sensitive key/recovery display. |
+| Browser-session verify/revoke/signout, HTTP/stream/native MCP | Existing durable session revocation checks | Bind final proof/mutation to a live individual session without expanding old token privileges. |
+
+Automated tests use synthetic users, external-proof mocks and signed synthetic
+WebAuthn assertions. Physical authenticators, browsers on real devices,
+cross-device passkeys and device-specific UI have not been tested in these
+foundation slices. They remain explicit acceptance work before user exposure.
 
 Run its real atomic Redis regression with
 `MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/auth/test/vitest.fresh-reauthentication.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs`.

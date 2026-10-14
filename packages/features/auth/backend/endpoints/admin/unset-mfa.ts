@@ -64,6 +64,7 @@ export function createAdminUnsetMfaProcedure(deps: AdminUnsetMfaDependencies) {
 				// TOTP・パスワードレスログインを無効化
 				await transactionalEntityManager.update(MiUserProfile, { userId: user.id }, {
 					twoFactorSecret: null,
+					twoFactorTempSecret: null,
 					twoFactorBackupSecret: null,
 					twoFactorEnabled: false,
 					passkeyMfaEnabled: false,

@@ -92,7 +92,7 @@ test('malformed registration credentials retain password and stored challenge or
 	const auth = mockDeep<Parameters<typeof createI2faKeyDoneProcedure>[0]['userAuthService']>();
 	const redis = mockDeep<ConstructorParameters<typeof WebAuthnService>[2]>();
 	const domain = new WebAuthnService(mockDeep<ConstructorParameters<typeof WebAuthnService>[0]>({ url: 'https://example.com', hostname: 'example.com', host: 'example.com' }), mockDeep<ConstructorParameters<typeof WebAuthnService>[1]>({ name: 'Fixture' }), redis, mockDeep());
-	const operation = createI2faKeyDoneProcedure({ userProfilesRepository: profiles, userSecurityKeysRepository: mockDeep(), webAuthnService: domain, userAuthService: auth, userEntityService: mockDeep(), globalEventService: mockDeep() });
+	const operation = createI2faKeyDoneProcedure({ db: mockDeep(), userProfilesRepository: profiles, userSecurityKeysRepository: mockDeep(), webAuthnService: domain, userAuthService: auth, userEntityService: mockDeep(), globalEventService: mockDeep() });
 	const me = mockDeep<MiLocalUser>({ id: actor.id, isSuspended: false, movedToUri: null });
 	profiles.findOneByOrFail.mockResolvedValue(mockDeep<NonNullable<Awaited<ReturnType<Parameters<typeof createI2faKeyDoneProcedure>[0]['userProfilesRepository']['findOneByOrFail']>>>>({ userId: me.id, password: bcrypt.hashSync('password', 4), twoFactorEnabled: true }));
 	const input = v.parse(requiredSchema(I2faKeyDoneContract['~orpc'].inputSchema), { password: 'wrong', token: 'totp', name: 'Key', credential: {} });

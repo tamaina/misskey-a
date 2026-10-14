@@ -131,12 +131,6 @@ test('real key update/remove handlers return guarded finite empty objects and pr
 	const keys = mockDeep<UserSecurityKeysRepository>();
 	const profiles = mockDeep<UserProfilesRepository>();
 	keys.findOneBy.mockResolvedValue(mockDeep<MiUserSecurityKey>({ id: 'key123', userId: me.id }));
-	const update = UpdateKeyEndpoint({ userSecurityKeysRepository: keys, userEntityService: mockDeep(), globalEventService: mockDeep() });
-	const updated = await call(update, { name: 'Fixture', credentialId: 'key123' }, { context: testContext(me, null) });
-	expect(v.parse(requiredSchema(I2faUpdateKeyContract['~orpc'].outputSchema), updated)).toEqual({});
-	expect(keys.update).toHaveBeenCalledWith('key123', { name: 'Fixture' });
-	keys.findOneBy.mockResolvedValue(null);
-	await expect(call(update, { name: 'Fixture', credentialId: 'key123' }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'NO_SUCH_KEY' });
 	profiles.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: me.id, password: bcrypt.hashSync('password', 4), twoFactorEnabled: false }));
 	keys.count.mockResolvedValue(0);
 	profiles.findOneOrFail.mockResolvedValue(await profiles.findOneByOrFail({ userId: me.id }));
@@ -152,6 +146,12 @@ test('real key update/remove handlers return guarded finite empty objects and pr
 		if (typeof callback !== 'function') throw new Error('missing synthetic transaction callback');
 		return await callback(manager);
 	});
+	const update = UpdateKeyEndpoint({ db, userSecurityKeysRepository: keys, userEntityService: mockDeep(), globalEventService: mockDeep() });
+	const updated = await call(update, { name: 'Fixture', credentialId: 'key123' }, { context: testContext(me, null) });
+	expect(v.parse(requiredSchema(I2faUpdateKeyContract['~orpc'].outputSchema), updated)).toEqual({});
+	expect(keys.update).toHaveBeenCalledWith({ id: 'key123', userId: me.id }, { name: 'Fixture' });
+	keys.findOneBy.mockResolvedValue(null);
+	await expect(call(update, { name: 'Fixture', credentialId: 'key123' }, { context: testContext(me, null) })).rejects.toMatchObject({ code: 'NO_SUCH_KEY' });
 	const remove = RemoveKeyEndpoint({ db, userSecurityKeysRepository: keys, userProfilesRepository: profiles, userEntityService: mockDeep(), userAuthService: mockDeep(), globalEventService: mockDeep() });
 	const removed = await call(remove, { password: 'password', credentialId: 'key123' }, { context: testContext(me, null) });
 	expect(v.parse(requiredSchema(I2faRemoveKeyContract['~orpc'].outputSchema), removed)).toEqual({});

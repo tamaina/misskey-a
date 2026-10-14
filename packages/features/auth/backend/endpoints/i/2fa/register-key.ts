@@ -5,6 +5,7 @@
 
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import { assertLegacyMfaManagement } from '../../../mfa-policy.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -59,6 +60,7 @@ export function createI2faRegisterKeyProcedure(deps: I2faRegisterKeyDependencies
 			if (profile == null) {
 				throw apiError(meta.errors.userNotFound);
 			}
+			assertLegacyMfaManagement(profile);
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {

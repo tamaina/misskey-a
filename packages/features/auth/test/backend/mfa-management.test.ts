@@ -74,7 +74,7 @@ test.each(['key', 'totp'] as const)('valid legacy %s management preserves proof-
 	expect(h.auth.twoFactorAuthenticate.mock.invocationCallOrder[0]).toBeLessThan(h.db.transaction.mock.invocationCallOrder[0]);
 	expect(h.profiles.findOneOrFail.mock.invocationCallOrder[0]).toBeLessThan(h.profiles.update.mock.invocationCallOrder[0]);
 	expect(h.profiles.update.mock.invocationCallOrder[0]).toBeLessThan(h.events.publishMainStream.mock.invocationCallOrder[0]);
-	if (action === 'totp') expect(h.profiles.update).toHaveBeenCalledWith({ userId: h.me.id }, { twoFactorSecret: null, twoFactorBackupSecret: null, twoFactorEnabled: false, usePasswordLessLogin: false, passkeyMfaEnabled: false });
+	if (action === 'totp') expect(h.profiles.update).toHaveBeenCalledWith({ userId: h.me.id }, { twoFactorSecret: null, twoFactorTempSecret: null, twoFactorBackupSecret: null, twoFactorEnabled: false, usePasswordLessLogin: false, passkeyMfaEnabled: false });
 	else expect(h.keys.delete).toHaveBeenCalledWith({ userId: h.me.id, id: 'synthetic-key' });
 });
 
