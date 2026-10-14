@@ -31,7 +31,7 @@ export const webAuthnRegistrationOptionsSchema = v.strictObject({
 });
 export type WebAuthnRegistrationOptions = v.InferOutput<typeof webAuthnRegistrationOptionsSchema>;
 
-const nativeRegistrationOptionsSchema = v.strictObject({
+export const nativeRegistrationOptionsSchema = v.strictObject({
 	challenge: v.string(),
 	rp: v.strictObject({ name: v.string(), id: v.optional(v.string()) }),
 	user: v.strictObject({ id: v.string(), name: v.string(), displayName: v.string() }),
@@ -115,7 +115,7 @@ export const webAuthnAuthenticationResponseSchema = objectInput({
 	clientExtensionResults: objectInput({ appid: v.optional(v.boolean()), hmacCreateSecret: v.optional(v.boolean()), credProps: v.optional(objectInput({ rk: v.optional(v.boolean()) })) }),
 });
 
-const nativeAuthenticationOptionsSchema = v.strictObject({
+export const nativeAuthenticationOptionsSchema = v.strictObject({
 	challenge: v.string(), timeout: v.optional(v.pipe(v.number(), v.finite())), rpId: v.optional(v.string()),
 	allowCredentials: v.optional(v.array(v.strictObject({ id: v.string(), type: v.literal('public-key'), transports: v.optional(v.array(webAuthnTransportSchema)) }))),
 	userVerification: v.optional(v.picklist(['discouraged', 'preferred', 'required'])),
