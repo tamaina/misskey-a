@@ -11,5 +11,5 @@ import { AnnouncementService } from './services/AnnouncementService.js';
 const announcementEntityService = service(AnnouncementEntityService, [ports.announcementsRepository, ports.announcementReadsRepository, ports.idService]);
 export const announcementServices = defineServices({
 	AnnouncementEntityService: announcementEntityService,
-	AnnouncementService: service(AnnouncementService, [ports.announcementsRepository, ports.announcementReadsRepository, ports.usersRepository, ports.idService, ports.globalEventService, ports.moderationLogService, announcementEntityService]),
+	AnnouncementService: service(AnnouncementService, [ports.announcementsRepository, ports.announcementReadsRepository, ports.usersRepository, ports.idService, ports.globalEventService, ports.moderationLogService, announcementEntityService, ports.queueService]),
 });

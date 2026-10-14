@@ -100229,6 +100229,8 @@ export interface operations {
         requestBody: {
             content: {
                 'application/json': {
+                    /** @default null */
+                    autoArchiveAt?: number | null;
                     title: string;
                     text: string;
                     imageUrl: string | null;
@@ -100251,6 +100253,8 @@ export interface operations {
                     /** @default null */
                     userId?: string | null;
                 } & ({
+                    /** @default null */
+                    autoArchiveAt?: number | null;
                     title: string;
                     text: string;
                     imageUrl: string | null;
@@ -100327,6 +100331,16 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_AUTO_ARCHIVE_AT';
                             message: string;
                         };
                     };
@@ -100699,6 +100713,7 @@ export interface operations {
                         needConfirmationToRead: boolean;
                         userId: string | null;
                         reads: number;
+                        autoArchiveAt: string | null;
                     }[];
                 };
             };
@@ -100863,6 +100878,7 @@ export interface operations {
         requestBody: {
             content: {
                 'application/json': {
+                    autoArchiveAt?: number | null;
                     id: string;
                     title?: string;
                     text?: string;
@@ -100876,6 +100892,7 @@ export interface operations {
                     needConfirmationToRead?: boolean;
                     isActive?: boolean;
                 } & ({
+                    autoArchiveAt?: number | null;
                     id: string;
                     title?: string;
                     text?: string;
@@ -100934,6 +100951,16 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'NO_SUCH_ANNOUNCEMENT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_AUTO_ARCHIVE_AT';
                             message: string;
                         };
                     };

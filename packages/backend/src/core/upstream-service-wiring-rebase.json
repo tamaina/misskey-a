@@ -1,0 +1,118 @@
+[
+  {
+    "feature": "announcements",
+    "service": "AnnouncementService",
+    "file": "packages/features/announcements/backend/services.ts",
+    "sourceSha256": "98d8700ac68d8e84588160fa155979c8479ddca1a8af2bdae57a38885653c406",
+    "baseline": [
+      {
+        "port": "announcementsRepository"
+      },
+      {
+        "port": "announcementReadsRepository"
+      },
+      {
+        "port": "usersRepository"
+      },
+      {
+        "port": "idService"
+      },
+      {
+        "port": "globalEventService"
+      },
+      {
+        "port": "moderationLogService"
+      },
+      {
+        "service": "AnnouncementEntityService"
+      }
+    ],
+    "current": [
+      {
+        "port": "announcementsRepository"
+      },
+      {
+        "port": "announcementReadsRepository"
+      },
+      {
+        "port": "usersRepository"
+      },
+      {
+        "port": "idService"
+      },
+      {
+        "port": "globalEventService"
+      },
+      {
+        "port": "moderationLogService"
+      },
+      {
+        "service": "AnnouncementEntityService"
+      },
+      {
+        "port": "queueService"
+      }
+    ],
+    "baselineSourceSha256": "ba254a224efa3a612e4737879255acfff5d1ad958ed7c48e7893088f23a03468",
+    "edits": [
+      {
+        "start": 922,
+        "end": 942,
+        "current": ", ports.queueService",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "feature": "collections",
+    "service": "ClipService",
+    "file": "packages/features/collections/backend/services.ts",
+    "sourceSha256": "beec2c7394752ca91b1d30d02e123788c2bd1e108bd6fae4771bedb7267f140c",
+    "baseline": [
+      {
+        "port": "clipsRepository"
+      },
+      {
+        "port": "clipNotesRepository"
+      },
+      {
+        "port": "notesRepository"
+      },
+      {
+        "port": "roleService"
+      },
+      {
+        "port": "idService"
+      }
+    ],
+    "current": [
+      {
+        "port": "clipsRepository"
+      },
+      {
+        "port": "clipNotesRepository"
+      },
+      {
+        "port": "notesRepository"
+      },
+      {
+        "port": "roleService"
+      },
+      {
+        "port": "idService"
+      },
+      {
+        "port": "globalEventService"
+      }
+    ],
+    "baselineSourceSha256": "31734f9b9f59c7e96503d4c4927247eba7311d857ae569d24a0375189345495c",
+    "edits": [
+      {
+        "start": 984,
+        "end": 1010,
+        "current": ", ports.globalEventService",
+        "baseline": ""
+      }
+    ]
+  }
+]

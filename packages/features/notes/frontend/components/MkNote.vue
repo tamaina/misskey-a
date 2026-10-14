@@ -863,7 +863,7 @@ const keymap = {
 	"private": "خاص",
 	"translatedFrom": "تُرجم من {x}",
 	"showMore": "عرض المزيد",
-	"showLess": "اغلق",
+	"showLess": "عرض اقل",
 	"more": "المزيد!",
 	"userSaysSomethingSensitive": "Post by {name} contains sensitive content",
 	"userSaysSomething": "كتب {name} شيءً",

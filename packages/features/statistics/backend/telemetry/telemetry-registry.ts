@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { Config } from '@/config.js';
 import { setLogTraceContextProvider } from '@features/runtime/backend/logging/logging-runtime.js';
 import { SentryTelemetryAdapter } from './adapters/SentryTelemetryAdapter.js';
@@ -13,11 +14,12 @@ import type { TelemetryAdapter, TelemetryCaptureMessageOptions } from './adapter
  * DIを介さないモジュールレベルの状態として有効なアダプタを保持する。
  * TelemetryServiceはこの状態への薄いラッパーとして振る舞う。
  */
+const logger = new Logger('telemetry');
 const adapters: TelemetryAdapter[] = [];
 
 export async function initTelemetry(config: Config): Promise<void> {
 	if (config.sentryForBackend) {
-		const adapter = await SentryTelemetryAdapter.create(config.sentryForBackend);
+		const adapter = await SentryTelemetryAdapter.create(config.sentryForBackend, message => logger.warn(message));
 		adapters.push(adapter);
 		// Telemetryの初期化後に登録し、初期化前のBootstrapログは従来どおり出力する。
 		setLogTraceContextProvider(() => adapter.getActiveTraceContext?.());

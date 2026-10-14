@@ -21,11 +21,17 @@ export function createAnnouncementsListProcedure<Actor extends ApiActor>(deps: A
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;
 			const query = deps.queryService.makePaginationQuery(deps.announcementsRepository.createQueryBuilder('announcement'), input.sinceId, input.untilId, input.sinceDate, input.untilDate)
-				.andWhere('announcement.isActive = :isActive', { isActive: input.isActive })
 				.andWhere(new Brackets(qb => {
 					if (actor) qb.orWhere('announcement.userId = :meId', { meId: actor.id });
 					qb.orWhere('announcement.userId IS NULL');
 				}));
+			const now = new Date();
+			if (input.isActive) {
+				query.andWhere('announcement.isActive = true');
+				query.andWhere(new Brackets(qb => { qb.where('announcement.autoArchiveAt IS NULL'); qb.orWhere('announcement.autoArchiveAt > :now', { now }); }));
+			} else {
+				query.andWhere(new Brackets(qb => { qb.where('announcement.isActive = false'); qb.orWhere('announcement.autoArchiveAt <= :now', { now }); }));
+			}
 			return (await deps.announcementEntityService.packMany(await query.limit(input.limit).getMany(), actor)).map(toPackedAnnouncement);
 		});
 }

@@ -32,6 +32,7 @@ import { HashtagChannel } from '@features/discovery/backend/stream/hashtag.js';
 import { RoleTimelineChannel } from '@features/timelines/backend/stream/role-timeline.js';
 import { AntennaChannel } from '@features/timelines/backend/stream/antenna.js';
 import { ChannelChannel } from '@features/channels/backend/stream/channel.js';
+import { ClipChannel } from '@features/collections/backend/stream/clip.js';
 import { DriveChannel } from '@features/drive/backend/stream/drive.js';
 import { ServerStatsChannel } from '@features/statistics/backend/stream/server-stats.js';
 import { QueueStatsChannel } from '@features/operations/backend/stream/queue-stats.js';
@@ -567,6 +568,7 @@ export default class Connection {
 			case 'roleTimeline': return RoleTimelineChannel;
 			case 'antenna': return AntennaChannel;
 			case 'channel': return ChannelChannel;
+			case 'clip': return ClipChannel;
 			case 'drive': return DriveChannel;
 			case 'serverStats': return ServerStatsChannel;
 			case 'queueStats': return QueueStatsChannel;

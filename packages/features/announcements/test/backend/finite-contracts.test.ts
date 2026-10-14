@@ -3,19 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { announcementsContract } from '../../backend/api.definition.js';
-
 import { expect, expectTypeOf, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 
-import { AnnouncementEntityService } from '../../backend/serializers/AnnouncementEntityService.js';
 import { createRouterClient } from '@orpc/server';
 import { Brackets, EntityNotFoundError } from 'typeorm';
-import type { SelectQueryBuilder } from 'typeorm';
+import { AnnouncementEntityService } from '../../backend/serializers/AnnouncementEntityService.js';
+import { announcementsContract } from '../../backend/api.definition.js';
 import { createAnnouncementsRouter } from '../../backend/api.implementation.js';
-import type { AnnouncementsDependencies } from '../../backend/api.implementation.js';
-import type { ApiActor, ApiAuthorization, ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
 import { MiAnnouncement } from '../../backend/models/Announcement.js';
 
 import { packedSchemas } from '../../../index/backend/packed.schema.js';
@@ -27,6 +23,9 @@ import { announcementsContract as nativeContract6 } from '../../backend/api.defi
 import { announcementsContract as nativeContract7 } from '../../backend/api.definition.js';
 import { announcementsContract as nativeContract8 } from '../../backend/api.definition.js';
 import { announcementsContract as nativeContract9 } from '../../backend/api.definition.js';
+import type { ApiActor, ApiAuthorization, ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
+import type { SelectQueryBuilder } from 'typeorm';
+import type { AnnouncementsDependencies } from '../../backend/api.implementation.js';
 import type { QueryService } from '@features/notes/backend/services/QueryService.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { AnnouncementsRepository, AnnouncementReadsRepository } from '@features/persistence/backend/repositories/models.js';
@@ -50,7 +49,7 @@ const packedAnnouncementSchema = packedSchemas.Announcement;
 const date = new Date('2026-01-01T00:00:00.000Z');
 
 function announcement() {
-	return new MiAnnouncement({ id: 'announcement123', updatedAt: null, title: 'Title', text: 'Text', imageUrl: null, icon: 'info', display: 'normal', needConfirmationToRead: false, silence: false, forExistingUsers: false, isActive: true, userId: null });
+	return new MiAnnouncement({ id: 'announcement123', updatedAt: null, title: 'Title', text: 'Text', imageUrl: null, icon: 'info', display: 'normal', needConfirmationToRead: false, silence: false, forExistingUsers: false, isActive: true, userId: null, autoArchiveAt: null });
 }
 
 function fixture() {
@@ -66,7 +65,7 @@ function fixture() {
 test('all announcement native inputs are finite while retaining defaults, nullability and validation', () => {
 	expectTypeOf<string extends keyof v.InferOutput<typeof createInput> ? true : false>().toEqualTypeOf<false>();
 	expectTypeOf<string extends keyof v.InferOutput<typeof createOutput> ? true : false>().toEqualTypeOf<false>();
-	expect(v.parse(createInput, { title: 'T', text: 'T', imageUrl: null, future: true })).toEqual({ title: 'T', text: 'T', imageUrl: null, icon: 'info', display: 'normal', forExistingUsers: false, silence: false, needConfirmationToRead: false, userId: null });
+	expect(v.parse(createInput, { title: 'T', text: 'T', imageUrl: null, future: true })).toEqual({ title: 'T', text: 'T', imageUrl: null, icon: 'info', display: 'normal', forExistingUsers: false, silence: false, needConfirmationToRead: false, userId: null, autoArchiveAt: null });
 	expect(v.safeParse(createInput, { title: 'T', text: 'T' }).success).toBe(false);
 	expect(v.safeParse(createInput, { title: '', text: 'T', imageUrl: null }).success).toBe(false);
 	expect(v.parse(listInput, { future: true })).toEqual({ limit: 10, status: 'active' });
@@ -120,7 +119,7 @@ test('native create injects construction dependencies and materializes defaults 
 	expect(dependencies.announcementService.create).toHaveBeenCalledExactlyOnceWith({
 		title: 'Title', text: 'Text', imageUrl: null, updatedAt: null,
 		icon: 'info', display: 'normal', forExistingUsers: false, silence: false,
-		needConfirmationToRead: false, userId: null,
+		needConfirmationToRead: false, userId: null, autoArchiveAt: null,
 	}, actor);
 });
 test('native admin list retains status/user filters and awaits read counts with ISO dates', async () => {
@@ -130,14 +129,18 @@ test('native admin list retains status/user filters and awaits read counts with 
 	query.getMany.mockResolvedValue([row]);
 	dependencies.announcementReadsRepository.countBy.mockResolvedValue(3);
 	const output = await client.adminList({ status: 'archived', userId: 'target123' });
-	expect(query.andWhere).toHaveBeenCalledWith('announcement.isActive = false');
+	const archived = query.andWhere.mock.calls.map(([where]) => where).find(where => where instanceof Brackets);
+	if (!(archived instanceof Brackets)) throw new Error('Missing archived predicate');
+	archived.whereFactory(query);
+	expect(query.where).toHaveBeenCalledWith('announcement.isActive = false');
+	expect(query.orWhere).toHaveBeenCalledWith('announcement.autoArchiveAt <= :now', { now: expect.any(Date) });
 	expect(query.andWhere).toHaveBeenCalledWith('announcement.userId = :userId', { userId: 'target123' });
 	expect(query.limit).toHaveBeenCalledExactlyOnceWith(10);
 	expect(dependencies.announcementReadsRepository.countBy).toHaveBeenCalledExactlyOnceWith({ announcementId: row.id });
 	expect(output).toEqual([{
 		id: row.id, createdAt: date.toISOString(), updatedAt: date.toISOString(), title: row.title,
 		text: row.text, imageUrl: null, icon: 'info', display: 'normal', isActive: true,
-		forExistingUsers: false, silence: false, needConfirmationToRead: false, userId: null, reads: 3,
+		forExistingUsers: false, silence: false, needConfirmationToRead: false, userId: null, reads: 3, autoArchiveAt: null,
 	}]);
 	expect(v.parse(listOutput, output)).toEqual(output);
 });
@@ -149,7 +152,7 @@ test.each([false, true])('native public list retains actor targeting and anonymo
 	query.getMany.mockResolvedValue(rows);
 	dependencies.announcementEntityService.packMany.mockResolvedValue(packed);
 	expect(await client.list({})).toEqual(packed);
-	expect(query.andWhere).toHaveBeenCalledWith('announcement.isActive = :isActive', { isActive: true });
+	expect(query.andWhere).toHaveBeenCalledWith('announcement.isActive = true');
 	const bracket = query.andWhere.mock.calls.map(([where]) => where).find(where => where instanceof Brackets);
 	expect(bracket).toBeInstanceOf(Brackets);
 	if (!(bracket instanceof Brackets)) throw new Error('Missing targeting predicate');
@@ -190,4 +193,40 @@ test('native public announcement selects wire fields without invoking output val
 		expect(response).not.toHaveProperty('privateTargetingData');
 		expect(validate).not.toHaveBeenCalled();
 	} finally { validate.mockRestore(); }
+});
+
+test('archive creation validates future dates with its domain UUID before calling the service', async () => {
+	const { dependencies, client } = nativeFixture();
+	for (const autoArchiveAt of [0, -1, 8.64e15 + 1]) {
+		await expect(client.create({ title: 'Title', text: 'Text', imageUrl: null, autoArchiveAt })).rejects.toMatchObject({ code: 'INVALID_AUTO_ARCHIVE_AT', data: { id: '2a892bd5-487d-46a2-a5fe-3d85ad51defe' } });
+	}
+	expect(dependencies.announcementService.create).not.toHaveBeenCalled();
+});
+
+test('archive update validates dates, preserves omission and supports clearing', async () => {
+	const { dependencies, client, actor } = nativeFixture();
+	const row = announcement();
+	dependencies.announcementsRepository.findOneBy.mockResolvedValue(row);
+	for (const autoArchiveAt of [-1, 8.64e15 + 1]) await expect(client.update({ id: row.id, autoArchiveAt })).rejects.toMatchObject({ code: 'INVALID_AUTO_ARCHIVE_AT', data: { id: '01b83d7b-2fd5-4d7c-86c4-d03144d16355' } });
+	expect(dependencies.announcementService.update).not.toHaveBeenCalled();
+	await client.update({ id: row.id });
+	expect(dependencies.announcementService.update).toHaveBeenLastCalledWith(row, expect.objectContaining({ autoArchiveAt: undefined }), actor);
+	await client.update({ id: row.id, autoArchiveAt: null });
+	expect(dependencies.announcementService.update).toHaveBeenLastCalledWith(row, expect.objectContaining({ autoArchiveAt: null }), actor);
+});
+
+test('archive input rejects fractional and non-finite dates', () => {
+	expect(v.safeParse(createInput, { title: 'T', text: 'T', imageUrl: null, autoArchiveAt: 0.5 }).success).toBe(false);
+	expect(v.safeParse(announcementCommandInputs['admin/announcements/update'], { id: 'announcement123', autoArchiveAt: Infinity }).success).toBe(false);
+});
+
+test('admin deadline projection reports expired rows as archived and retains the ISO deadline', async () => {
+	const { dependencies, query, client } = nativeFixture();
+	const row = announcement();
+	row.autoArchiveAt = new Date('2026-01-01T00:00:00.000Z');
+	query.getMany.mockResolvedValue([row]);
+	dependencies.announcementReadsRepository.countBy.mockResolvedValue(0);
+	const output = await client.adminList({ status: 'archived' });
+	expect(output[0]).toMatchObject({ isActive: false, autoArchiveAt: row.autoArchiveAt.toISOString() });
+	expect(v.safeParse(listOutput, output).success).toBe(true);
 });

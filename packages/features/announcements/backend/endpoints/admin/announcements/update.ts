@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toAnnouncementAutoArchiveAt } from '../../../api.dto.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
 import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
@@ -19,12 +20,16 @@ export function createAnnouncementUpdateProcedure<Actor extends ApiActor>(deps: 
 		.use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;
+			const autoArchiveAt = toAnnouncementAutoArchiveAt(input.autoArchiveAt);
+			if (autoArchiveAt != null && (Number.isNaN(autoArchiveAt.getTime()) || autoArchiveAt.getTime() < 0)) {
+				throw apiError({ code: 'INVALID_AUTO_ARCHIVE_AT', message: 'Invalid auto archive date.', id: '01b83d7b-2fd5-4d7c-86c4-d03144d16355' });
+			}
 			const row = await deps.announcementsRepository.findOneBy({ id: input.id });
 			if (row === null) throw apiError({ code: 'NO_SUCH_ANNOUNCEMENT', message: 'No such announcement.', id: 'd3aae5a7-6372-4cb4-b61c-f511ffc2d7cc' });
 			await deps.announcementService.update(row, {
 				updatedAt: new Date(), title: input.title, text: input.text, imageUrl: input.imageUrl || null,
 				display: input.display, icon: input.icon, forExistingUsers: input.forExistingUsers,
-				silence: input.silence, needConfirmationToRead: input.needConfirmationToRead, isActive: input.isActive,
+				silence: input.silence, needConfirmationToRead: input.needConfirmationToRead, isActive: input.isActive, autoArchiveAt,
 			}, actor);
 		});
 }
