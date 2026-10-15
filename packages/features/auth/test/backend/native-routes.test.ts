@@ -34,8 +34,11 @@ function harness() {
 	return { services, operations, context, router: createAuthRouter(operations) };
 }
 
-test('all 52 native auth routes retain secure policy enforcement', async () => {
-	expect(Object.keys(authContract)).toHaveLength(52);
+test('all 54 native auth routes retain secure policy enforcement', async () => {
+	expect(Object.keys(authContract)).toHaveLength(54);
+	for (const path of ['i/regenerate-token/passkey/start', 'i/regenerate-token/passkey/complete'] as const) {
+		expect(authContract[path]['~orpc'].meta).toMatchObject({ requestName: path, requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-token-regeneration' } });
+	}
 	const h = harness();
 	h.services.authenticate.mockResolvedValue([actor, { permission: ['write:account'] }]);
 	await expect(call(h.router['i/change-password'], { currentPassword: 'old', newPassword: 'new' }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED', data: { id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
@@ -57,6 +60,11 @@ test('malformed HTTP inputs fail authentication and secure-token policy before i
 		const secure = await app.inject({ method: 'POST', url: '/api/i/change-password', payload: { currentPassword: 42, newPassword: null } });
 		expect(secure.statusCode).toBe(400);
 		expect(secure.json()).toMatchObject({ error: { code: 'ACCESS_DENIED', id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
+		for (const path of ['start', 'complete']) {
+			const fresh = await app.inject({ method: 'POST', url: `/api/i/regenerate-token/passkey/${path}`, payload: { currentPassword: 42, credential: null } });
+			expect(fresh.statusCode).toBe(400);
+			expect(fresh.json()).toMatchObject({ error: { code: 'ACCESS_DENIED', id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
+		}
 		h.services.authenticate.mockResolvedValue([null, null]);
 		const anonymous = await app.inject({ method: 'POST', url: '/api/i/2fa/key-done', payload: { password: 42, name: false, credential: [] } });
 		expect(anonymous.statusCode).toBe(400);
@@ -65,7 +73,7 @@ test('malformed HTTP inputs fail authentication and secure-token policy before i
 		const authenticated = await app.inject({ method: 'POST', url: '/api/i/change-password', payload: { currentPassword: 42, newPassword: null } });
 		expect(authenticated.statusCode).toBe(400);
 		expect(authenticated.json()).toMatchObject({ error: { code: 'INVALID_PARAM' } });
-		expect(h.services.authenticate).toHaveBeenCalledTimes(3);
+		expect(h.services.authenticate).toHaveBeenCalledTimes(5);
 		expect(h.operations['i/change-password'].userProfilesRepository.findOneByOrFail).not.toHaveBeenCalled();
 		expect(h.operations['i/2fa/key-done'].userProfilesRepository.findOneByOrFail).not.toHaveBeenCalled();
 	} finally { await app.close(); }
