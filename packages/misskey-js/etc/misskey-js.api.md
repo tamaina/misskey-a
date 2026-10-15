@@ -1977,6 +1977,9 @@ declare namespace entities {
         IChangePasswordPasskeyStartResponse,
         IChangePasswordPasskeyCompleteRequest,
         IRegenerateTokenRequest,
+        IRegenerateTokenPasskeyStartRequest,
+        IRegenerateTokenPasskeyStartResponse,
+        IRegenerateTokenPasskeyCompleteRequest,
         IRevokeTokenRequest,
         ISigninHistoryRequest,
         ISigninHistoryResponse,
@@ -4071,6 +4074,15 @@ type IPinResponse = ContractResponse<'i/pin'>;
 
 // @public (undocumented)
 type IReadAnnouncementRequest = ContractRequest<'i/read-announcement'>;
+
+// @public (undocumented)
+type IRegenerateTokenPasskeyCompleteRequest = ContractRequest<'i/regenerate-token/passkey/complete'>;
+
+// @public (undocumented)
+type IRegenerateTokenPasskeyStartRequest = ContractRequest<'i/regenerate-token/passkey/start'>;
+
+// @public (undocumented)
+type IRegenerateTokenPasskeyStartResponse = ContractResponse<'i/regenerate-token/passkey/start'>;
 
 // @public (undocumented)
 type IRegenerateTokenRequest = ContractRequest<'i/regenerate-token'>;

@@ -55,9 +55,12 @@ export function historicalFinalOwnerDictionary(file: string, language: string, d
 	if (file !== 'packages/features/auth/frontend/pages/settings/security.vue' || language !== 'ja-JP') return dictionary;
 	const keys = [...owners.get(file)!.keys];
 	keys.splice(keys.indexOf('changePassword') + 1, 0, 'changePasswordWithPasskey');
+	keys.splice(keys.indexOf('regenerateLoginToken'), 0, 'regenerateLoginTokenWithPasskey');
 	if (JSON.stringify(Object.keys(dictionary)) !== JSON.stringify(keys)) throw new Error(`Invalid final-owner key inventory: ${file}`);
 	if (dictionary.changePasswordWithPasskey !== 'パスキーでパスワードを変更') throw new Error(`Final-owner dictionary differs from reviewed text: ${file}:${language}`);
+	if (dictionary.regenerateLoginTokenWithPasskey !== 'パスキーでログイントークンを再生成') throw new Error(`Final-owner dictionary differs from reviewed text: ${file}:${language}`);
 	const historical = { ...dictionary };
+	delete historical.regenerateLoginTokenWithPasskey;
 	delete historical.changePasswordWithPasskey;
 	return historical;
 }

@@ -257,3 +257,56 @@ test('KeepAlive departure and return cannot revive an old native ceremony', asyn
 	await startFreshChange();
 	await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledTimes(3));
 });
+
+async function startTokenRegeneration(fresh = true) {
+	await nextTick();
+	const label = fresh ? 'パスキーでログイントークンを再生成' : 'Regenerate login token';
+	const button = [...element.querySelectorAll('button')].find(item => item.textContent?.trim() === label);
+	expect(button).toBeDefined(); button!.click();
+}
+
+test('token regeneration uses its exact purpose endpoints and never returns a replacement credential', async () => {
+	enableFreshPath(); await startTokenRegeneration();
+	await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledTimes(2));
+	expect(os.inputText).toHaveBeenCalledExactlyOnceWith({ title: 'Password', type: 'password', autocomplete: 'current-password', minLength: 1 });
+	expect(os.apiWithDialog).toHaveBeenNthCalledWith(1, 'i/regenerate-token/passkey/start', { currentPassword: 'current-password' });
+	expect(os.apiWithDialog).toHaveBeenNthCalledWith(2, 'i/regenerate-token/passkey/complete', { ticket: 't'.repeat(43), credential: freshCredential });
+	expect(os.authenticateDialog).not.toHaveBeenCalled();
+});
+
+test.each(['NotAllowedError', 'AbortError'])('token native %s cancellation never submits protected completion or legacy fallback', async name => {
+	enableFreshPath(); vi.mocked(startAuthentication).mockRejectedValue(new DOMException('Synthetic cancellation', name));
+	await startTokenRegeneration(); await vi.waitFor(() => expect(startAuthentication).toHaveBeenCalledOnce());
+	for (let i = 0; i < 10; i++) await Promise.resolve();
+	expect(os.apiWithDialog).toHaveBeenCalledTimes(1); expect(os.authenticateDialog).not.toHaveBeenCalled(); expect(os.alert).not.toHaveBeenCalled();
+});
+
+test.each(['password', 'start', 'native', 'complete'] as const)('token %s failure never falls back to the legacy endpoint', async phase => {
+	enableFreshPath();
+	if (phase === 'password') vi.mocked(os.inputText).mockReset().mockResolvedValue({ canceled: true, result: undefined });
+	if (phase === 'start') { const error = new Error('Synthetic denied'); expectedErrors = [error]; vi.mocked(os.apiWithDialog).mockReset().mockRejectedValue(error); }
+	if (phase === 'native') vi.mocked(startAuthentication).mockRejectedValue(new Error('Synthetic native failure'));
+	if (phase === 'complete') { const error = new Error('Synthetic expired'); expectedErrors = [error]; vi.mocked(os.apiWithDialog).mockReset().mockResolvedValueOnce({ ticket: 't'.repeat(43), options: freshOptions } as never).mockRejectedValue(error); }
+	await startTokenRegeneration();
+	await vi.waitFor(() => phase === 'password' ? expect(os.inputText).toHaveBeenCalledOnce() : phase === 'complete' ? expect(os.apiWithDialog).toHaveBeenCalledTimes(2) : phase === 'native' ? expect(os.alert).toHaveBeenCalledOnce() : expect(errors).toEqual(expectedErrors));
+	expect(vi.mocked(os.apiWithDialog).mock.calls.some(([path]) => path === 'i/regenerate-token')).toBe(false); expect(os.authenticateDialog).not.toHaveBeenCalled();
+});
+
+test('password and token mutations share one busy owner and old KeepAlive results cannot finish', async () => {
+	enableFreshPath(); let release!: (value: typeof freshCredential) => void;
+	vi.mocked(startAuthentication).mockReturnValue(new Promise(resolve => { release = resolve; }));
+	await startTokenRegeneration(); await vi.waitFor(() => expect(startAuthentication).toHaveBeenCalledOnce());
+	startChange(true); await startTokenRegeneration();
+	expect(os.inputText).toHaveBeenCalledOnce(); expect(os.apiWithDialog).toHaveBeenCalledTimes(1);
+	showSecurity.value = false; await nextTick(); showSecurity.value = true; await nextTick();
+	release(freshCredential); for (let i = 0; i < 10; i++) await Promise.resolve();
+	expect(os.apiWithDialog).toHaveBeenCalledTimes(1);
+});
+
+test('legacy token regeneration preserves password/TOTP and ignores dialog results after unmount', async () => {
+	let release!: (value: Awaited<ReturnType<typeof os.authenticateDialog>>) => void;
+	vi.mocked(os.authenticateDialog).mockReturnValue(new Promise(resolve => { release = resolve; }));
+	await startTokenRegeneration(false); expect(os.authenticateDialog).toHaveBeenCalledOnce();
+	app.unmount(); mounted = false; release({ canceled: false, result: { password: 'current-password', token: '123456' } });
+	for (let i = 0; i < 10; i++) await Promise.resolve(); expect(os.apiWithDialog).not.toHaveBeenCalled();
+});

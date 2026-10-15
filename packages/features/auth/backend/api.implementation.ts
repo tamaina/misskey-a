@@ -61,6 +61,8 @@ import { FreshPasskeyReauthentication } from './fresh-passkey-reauthentication.j
 import { createIChangePasswordProcedure } from './endpoints/i/change-password.js';
 import type { IChangePasswordDependencies } from './endpoints/i/change-password.js';
 import { createIRegenerateTokenProcedure } from './endpoints/i/regenerate-token.js';
+import { createRegenerateTokenPasskeyStartProcedure, createRegenerateTokenPasskeyCompleteProcedure } from './endpoints/i/regenerate-token-passkey.js';
+import type { RegenerateTokenPasskeyDependencies } from './endpoints/i/regenerate-token-passkey.js';
 import type { IRegenerateTokenDependencies } from './endpoints/i/regenerate-token.js';
 import { createIRevokeTokenProcedure } from './endpoints/i/revoke-token.js';
 import type { IRevokeTokenDependencies } from './endpoints/i/revoke-token.js';
@@ -169,6 +171,8 @@ export interface AuthRouterDependencies {
 	'i/change-password/passkey/start': ChangePasswordPasskeyDependencies;
 	'i/change-password/passkey/complete': ChangePasswordPasskeyDependencies;
 	'i/regenerate-token': IRegenerateTokenDependencies;
+	'i/regenerate-token/passkey/start': RegenerateTokenPasskeyDependencies;
+	'i/regenerate-token/passkey/complete': RegenerateTokenPasskeyDependencies;
 	'i/revoke-token': IRevokeTokenDependencies;
 	'i/signin-history': ISigninHistoryDependencies;
 	'i/sessions': BrowserSessionDependencies;
@@ -233,6 +237,8 @@ export function createAuthRouter(deps: AuthRouterDependencies) {
 		'i/change-password/passkey/start': createChangePasswordPasskeyStartProcedure(deps['i/change-password/passkey/start']),
 		'i/change-password/passkey/complete': createChangePasswordPasskeyCompleteProcedure(deps['i/change-password/passkey/complete']),
 		'i/regenerate-token': createIRegenerateTokenProcedure(deps['i/regenerate-token']),
+		'i/regenerate-token/passkey/start': createRegenerateTokenPasskeyStartProcedure(deps['i/regenerate-token/passkey/start']),
+		'i/regenerate-token/passkey/complete': createRegenerateTokenPasskeyCompleteProcedure(deps['i/regenerate-token/passkey/complete']),
 		'i/revoke-token': createIRevokeTokenProcedure(deps['i/revoke-token']),
 		'i/signin-history': createISigninHistoryProcedure(deps['i/signin-history']),
 		'i/sessions': createISessionsProcedure(deps['i/sessions']),
@@ -287,6 +293,8 @@ export class AuthApiProvider {
 			'i/change-password/passkey/start': { db: this.moduleRef.get<ChangePasswordPasskeyDependencies['db']>(DI.db, { strict: false }), freshReauthentication: this.moduleRef.get(FreshPasskeyReauthentication, { strict: false }) },
 			'i/change-password/passkey/complete': { db: this.moduleRef.get<ChangePasswordPasskeyDependencies['db']>(DI.db, { strict: false }), freshReauthentication: this.moduleRef.get(FreshPasskeyReauthentication, { strict: false }) },
 			'i/regenerate-token': { db: this.moduleRef.get<IRegenerateTokenDependencies['db']>(DI.db, { strict: false }), userAuthService: this.moduleRef.get<IRegenerateTokenDependencies['userAuthService']>(UserAuthService, { strict: false }), browserSessionService: this.moduleRef.get<IRegenerateTokenDependencies['browserSessionService']>(BrowserSessionService, { strict: false }), usersRepository: this.moduleRef.get<IRegenerateTokenDependencies['usersRepository']>(DI.usersRepository, { strict: false }), userProfilesRepository: this.moduleRef.get<IRegenerateTokenDependencies['userProfilesRepository']>(DI.userProfilesRepository, { strict: false }), globalEventService: this.moduleRef.get<IRegenerateTokenDependencies['globalEventService']>(GlobalEventService, { strict: false }) },
+			'i/regenerate-token/passkey/start': { db: this.moduleRef.get<RegenerateTokenPasskeyDependencies['db']>(DI.db, { strict: false }), browserSessionService: this.moduleRef.get(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get(GlobalEventService, { strict: false }), freshReauthentication: this.moduleRef.get(FreshPasskeyReauthentication, { strict: false }) },
+			'i/regenerate-token/passkey/complete': { db: this.moduleRef.get<RegenerateTokenPasskeyDependencies['db']>(DI.db, { strict: false }), browserSessionService: this.moduleRef.get(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get(GlobalEventService, { strict: false }), freshReauthentication: this.moduleRef.get(FreshPasskeyReauthentication, { strict: false }) },
 			'i/revoke-token': { accessTokensRepository: this.moduleRef.get<IRevokeTokenDependencies['accessTokensRepository']>(DI.accessTokensRepository, { strict: false }) },
 			'i/sessions': { browserSessionService: this.moduleRef.get<BrowserSessionDependencies['browserSessionService']>(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get<BrowserSessionDependencies['globalEventService']>(GlobalEventService, { strict: false }) },
 			'i/sessions/revoke': { browserSessionService: this.moduleRef.get<BrowserSessionDependencies['browserSessionService']>(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get<BrowserSessionDependencies['globalEventService']>(GlobalEventService, { strict: false }) },

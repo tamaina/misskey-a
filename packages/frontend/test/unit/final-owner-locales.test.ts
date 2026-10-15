@@ -207,3 +207,14 @@ test('login fallback label projects only its exact primary inventory before the 
 	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace('<locale locale="ar-SA" lang="json">\n{\n', '<locale locale="ar-SA" lang="json">\n{\n' + addition))).toThrow('Invalid final-owner key inventory');
 	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace(addition, addition + addition))).toThrow('Final owner changed original component body');
 });
+
+test('token-regeneration label projects only its exact new primary entry', () => {
+	const file = 'packages/features/auth/frontend/pages/settings/security.vue';
+	const source = readFileSync(resolve(root, file), 'utf8');
+	const addition = '\t"regenerateLoginTokenWithPasskey": "パスキーでログイントークンを再生成",\n';
+	expect(source.split(addition)).toHaveLength(2);
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace(addition, ''))).toThrow('Invalid final-owner key inventory');
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace('パスキーでログイントークンを再生成', 'unreviewed'))).toThrow('Final-owner dictionary differs from reviewed text');
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace('<locale locale="ar-SA" lang="json">\n{\n', '<locale locale="ar-SA" lang="json">\n{\n' + addition))).toThrow('Invalid final-owner key inventory');
+	expect(() => restoreFinalOwnerHistoricalSource(file, source.replace(addition, addition + addition))).toThrow('Final owner changed original component body');
+});

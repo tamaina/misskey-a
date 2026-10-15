@@ -109,12 +109,12 @@ rechecks policy/session and the original deadline. The result is internal
 metadata, not a reusable grant, sudo state or activation credential. A future
 mutation must recheck session and policy within its own locked transaction.
 
-The verifier is registered in DI and connected to the dedicated password-change
-start/complete API and security-settings button. Activation and recovery-code
-display purposes still have no runtime caller, and this flow never changes MFA
+The verifier is registered in DI and connected to dedicated
+start/complete APIs and security-settings buttons for password change and token
+regeneration. Activation and recovery-code display purposes still have no runtime caller, and this flow never changes MFA
 policy. It is independent of the unmerged login-progress connection in #143.
 Both existing sign-in paths now use the current-policy issuance protocol below.
-Activation remains blocked until email/token/account deletion, recovery and
+Activation remains blocked until email/account deletion, recovery and
 credential issuance, factor management/key display and every remaining writer
 share the final enforcement and locking protocol.
 
@@ -127,12 +127,13 @@ Remaining runtime connections before activation:
 
 | Surface | Required connection |
 | --- | --- |
-| `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Apply current independent MFA policy and operation-specific fresh verification before the sensitive mutation; password change is now connected separately. |
+| `i/update-email`, users `i/delete-account` | Apply current independent MFA policy and operation-specific fresh verification before the sensitive mutation; password change is now connected separately. |
 | `i/2fa/*`, admin `unset-mfa` | Join all enrolment/policy writers to the profile lock; require exact operation/target bindings and recheck live session/policy inside the mutation transaction. |
 | User self serializer `securityKeysList` and factor display | Represent independent policy consistently and gate sensitive key/recovery display through its dedicated fresh purpose. |
 
-The verifier supports `change-password`, `activate-passkey-mfa` and
-`show-recovery-codes`; only password change has a runtime caller. Other actions need their own concrete purpose/target
+The verifier supports `change-password`, `activate-passkey-mfa`,
+`show-recovery-codes` and `regenerate-token`; password change and token regeneration
+have runtime callers. Other actions need their own concrete purpose/target
 bindings; neither a generic sudo purpose nor this metadata authorizes them.
 
 ### Activation readiness inventory
@@ -149,7 +150,8 @@ acceptance. There is still no true writer or user-facing activation state.
 | `i/2fa/remove-key`, `unregister`, `password-less`, `update-key`, admin `unset-mfa` | Common profile lock and owned mutation; active independent policy is refused on legacy user routes; reset clears pending setup | Fresh per-operation flows, preserve last-factor invariant and recovery semantics for the final independent policy. |
 | WebAuthn login proof methods and fresh verifier | Strict UV, atomically consumed challenge, bounded deadline, owned key material, counter CAS and legacy key normalization | Keep future callers on the proof-bearing path; compatibility boolean/user-ID methods do not authorize session issuance. |
 | `i/change-password` and its passkey start/complete routes | Dedicated UI → fresh password/strict UV → profile/session-locked password write; legacy route refuses active independent policy and rechecks its snapshot | Real-device acceptance and independent-policy display before activation. |
-| `i/update-email`, `i/regenerate-token`, users `i/delete-account` | Existing password/TOTP authorization; token regeneration revokes individual sessions | Independent policy enforcement and transaction-bound current proof/session checks before mutation. |
+| `i/regenerate-token` and its passkey start/complete routes | Dedicated purpose-bound fresh password/strict UV; user/profile/current-session locks; native rotation and all owned session revocations commit together; legacy independent-policy refusal and snapshot/live-session checks | Real-device acceptance; this is not general sudo. |
+| `i/update-email`, users `i/delete-account` | Existing password/TOTP authorization | Independent policy enforcement and transaction-bound current proof/session checks before mutation. |
 | `auth/accept`, OAuth consent, MiAuth token issuance, `auth/session/userkey` | Existing scope/session/owner checks | Audit credential issuance against active policy and fresh assurance; never elevate delegated/shared tokens into fresh auth. |
 | User self/moderator security fields and `securityKeysList` | Existing TOTP-based serialization | Consistent independent policy display; dedicated fresh-gated sensitive key/recovery display. |
 | Browser-session verify/revoke/signout, HTTP/stream/native MCP | Durable revocation checks; login proof rechecked under account/profile locks; same-transaction session insert; separate guarded new-account issuer | Complete sensitive-operation binding to live individual sessions without expanding old token privileges. |
@@ -215,3 +217,27 @@ Run real HTTP, signed synthetic WebAuthn, race/rollback and recovery tests with
 The runner owns and stops disposable Unix-socket PostgreSQL and network-none Redis.
 This connection does not expose activation, sudo, SSO or relaxed UV. Physical
 browser/authenticator and cross-device acceptance remains pending.
+
+### Token regeneration: operation-bound fresh authentication
+
+Security settings offers a passkey variant for an individual browser session with
+an existing listed key and a WebAuthn-capable browser. It verifies the current
+password before required-UV WebAuthn, using the dedicated `regenerate-token`
+purpose. Its ticket cannot authorize password change or any other mutation.
+Both password change and token regeneration share the UI ceremony owner; leaving
+settings, cancellation and native/API failure never trigger a legacy fallback.
+
+Completion locks user, profile and the current live browser session, rechecks the
+active local account, normalized keys/policy and the original deadline, rotates
+the native token and revokes every owned browser session within one transaction.
+Expiry after either write rolls back both. Revocation/cache/stream events are
+published only after commit. The response returns neither the new token nor a
+grant. The legacy password/TOTP route rejects active independent policy and
+rechecks the authenticated policy, presented native token or live browser session
+under the same locks. Other users' credentials and delegated grants are unchanged.
+
+Run its real HTTP/SQL/Redis/signed-WebAuthn regression with
+`MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs`.
+Physical browser/authenticator and cross-device acceptance remains pending; see
+[manual acceptance](test/manual/fresh-token-regeneration.md). This slice does not
+add activation or authorize real-user credential changes during development.

@@ -299,6 +299,9 @@ import type {
 	IChangePasswordPasskeyStartResponse,
 	IChangePasswordPasskeyCompleteRequest,
 	IRegenerateTokenRequest,
+	IRegenerateTokenPasskeyStartRequest,
+	IRegenerateTokenPasskeyStartResponse,
+	IRegenerateTokenPasskeyCompleteRequest,
 	IRevokeTokenRequest,
 	ISigninHistoryRequest,
 	ISigninHistoryResponse,
@@ -940,6 +943,8 @@ export type Endpoints = {
 	'i/change-password/passkey/start': { req: IChangePasswordPasskeyStartRequest; res: IChangePasswordPasskeyStartResponse };
 	'i/change-password/passkey/complete': { req: IChangePasswordPasskeyCompleteRequest; res: EmptyResponse };
 	'i/regenerate-token': { req: IRegenerateTokenRequest; res: EmptyResponse };
+	'i/regenerate-token/passkey/start': { req: IRegenerateTokenPasskeyStartRequest; res: IRegenerateTokenPasskeyStartResponse };
+	'i/regenerate-token/passkey/complete': { req: IRegenerateTokenPasskeyCompleteRequest; res: EmptyResponse };
 	'i/revoke-token': { req: IRevokeTokenRequest; res: EmptyResponse };
 	'i/signin-history': { req: ISigninHistoryRequest; res: ISigninHistoryResponse };
 	'i/sessions': { req: ISessionsRequest; res: ISessionsResponse };

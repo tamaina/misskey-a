@@ -52,7 +52,9 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/i/signout']?.post?.operationId).toBe('post___i___signout');
 	expect(spec.paths?.['/i/change-password/passkey/start']?.post?.operationId).toBe('post___i___change-password___passkey___start');
 	expect(spec.paths?.['/i/change-password/passkey/complete']?.post?.operationId).toBe('post___i___change-password___passkey___complete');
-	expect(identifiers).toHaveLength(479);
+	expect(spec.paths?.['/i/regenerate-token/passkey/start']?.post?.operationId).toBe('post___i___regenerate-token___passkey___start');
+	expect(spec.paths?.['/i/regenerate-token/passkey/complete']?.post?.operationId).toBe('post___i___regenerate-token___passkey___complete');
+	expect(identifiers).toHaveLength(481);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

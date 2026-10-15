@@ -104,6 +104,8 @@ jobs:
       run: node packages/features/auth/test/run-fresh-password-change-fixture.mjs
     - name: Test login policy HTTP with isolated PostgreSQL and Redis
       run: MISSKEY_AUTH_SIGNIN_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs
+    - name: Test token regeneration HTTP with isolated PostgreSQL and Redis
+      run: MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs
     - name: Test MCP with disposable PostgreSQL
       run: node packages/features/mcp/test/run-postgres-fixture.mjs
     - name: Upload to Codecov

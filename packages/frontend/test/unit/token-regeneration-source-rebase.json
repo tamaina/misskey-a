@@ -1,0 +1,123 @@
+[
+	{
+		"file": "packages/features/auth/frontend/pages/settings/security.vue",
+		"currentSha256": "2e165c8aca00f3adf5c8222dd9c6ac90dc031dd34f6783ed764a639d54933423",
+		"baselineSha256": "f69ee543f32242478866d1c24d8b14f93891ba2a389e900114e7476a21897752",
+		"edits": [
+			{
+				"start": 1843,
+				"end": 1872,
+				"baseline": "",
+				"current": ":disabled=\"changingPassword\" "
+			},
+			{
+				"start": 1895,
+				"end": 1902,
+				"baseline": "",
+				"current": "(false)"
+			},
+			{
+				"start": 1999,
+				"end": 2163,
+				"baseline": "",
+				"current": "</MkButton>\n\t\t\t\t\t<MkButton v-if=\"canUsePasskey\" danger :disabled=\"changingPassword\" @click=\"regenerateToken(true)\">{{ $locale.sfc.regenerateLoginTokenWithPasskey }}"
+			},
+			{
+				"start": 2957,
+				"end": 2957,
+				"baseline": ".js';\nimport { misskeyApi } from '@features/api/frontend/utility/misskey-api",
+				"current": ""
+			},
+			{
+				"start": 6271,
+				"end": 6290,
+				"baseline": "",
+				"current": "usePasskey: boolean"
+			},
+			{
+				"start": 6294,
+				"end": 7569,
+				"baseline": "",
+				"current": "\tif (changingPassword.value || disposed) return;\n\tchangingPassword.value = true;\n\tconst generation = ++ceremonyGeneration;\n\tconst isCurrent = () => !disposed && generation === ceremonyGeneration;\n\ttry {\n\t\tif (usePasskey) {\n\t\t\tif (!canUsePasskey.value) return;\n\t\t\tconst password = await os.inputText({ title: $locale.value.sfc.password, type: 'password', autocomplete: 'current-password', minLength: 1 });\n\t\t\tif (!isCurrent() || password.canceled || !password.result) return;\n\t\t\tconst started = await os.apiWithDialog('i/regenerate-token/passkey/start', { currentPassword: password.result });\n\t\t\tif (!isCurrent()) return;\n\t\t\tlet credential;\n\t\t\ttry {\n\t\t\t\tcredential = await os.promiseDialog(startAuthentication({ optionsJSON: started.options }), null, () => {});\n\t\t\t} catch (error) {\n\t\t\t\tconst failure = error instanceof Error && error.cause instanceof Error ? error.cause : error;\n\t\t\t\tif (isCurrent() && (!(failure instanceof Error) || !['NotAllowedError', 'AbortError'].includes(failure.name))) await os.alert({ type: 'error', text: error instanceof Error ? error.message : String(error) });\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tif (!isCurrent() || !credential) return;\n\t\t\tawait os.apiWithDialog('i/regenerate-token/passkey/complete', { ticket: started.ticket, credential });\n\t\t\treturn;\n\t\t}\n\t"
+			},
+			{
+				"start": 7615,
+				"end": 7616,
+				"baseline": "",
+				"current": "\t"
+			},
+			{
+				"start": 7620,
+				"end": 7636,
+				"baseline": "",
+				"current": "!isCurrent() || "
+			},
+			{
+				"start": 7659,
+				"end": 7659,
+				"baseline": "\n",
+				"current": ""
+			},
+			{
+				"start": 7660,
+				"end": 7664,
+				"baseline": "m",
+				"current": "\tawa"
+			},
+			{
+				"start": 7665,
+				"end": 7668,
+				"baseline": "",
+				"current": "t o"
+			},
+			{
+				"start": 7669,
+				"end": 7671,
+				"baseline": "skeyA",
+				"current": ".a"
+			},
+			{
+				"start": 7673,
+				"end": 7683,
+				"baseline": "",
+				"current": "WithDialog"
+			},
+			{
+				"start": 7707,
+				"end": 7708,
+				"baseline": "\n\t\t",
+				"current": " "
+			},
+			{
+				"start": 7739,
+				"end": 7740,
+				"baseline": "\n\t\t",
+				"current": " "
+			},
+			{
+				"start": 7764,
+				"end": 7768,
+				"baseline": ",",
+				"current": " });"
+			},
+			{
+				"start": 7771,
+				"end": 7812,
+				"baseline": ")",
+				"current": " finally { changingPassword.value = false"
+			},
+			{
+				"start": 7813,
+				"end": 7815,
+				"baseline": "",
+				"current": " }"
+			},
+			{
+				"start": 16382,
+				"end": 16439,
+				"baseline": "",
+				"current": "\",\n\t\"regenerateLoginTokenWithPasskey\": \"パスキーでログイントークンを再生成"
+			}
+		]
+	}
+]

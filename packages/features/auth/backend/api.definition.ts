@@ -313,6 +313,15 @@ export const IChangePasswordPasskeyCompleteContract = oc.$meta({ ...freshPasswor
 	.route({ method: 'POST', path: '/i/change-password/passkey/complete', tags: ['account'] }).errors(freshPasswordErrors)
 	.input(objectInput({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), credential: webAuthnAuthenticationResponseSchema, newPassword: v.pipe(v.string(), v.minCodePoints(1), v.maxLength(1024)) })).output(v.void());
 
+const freshTokenMetadata = { requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-token-regeneration' } } as const;
+export const IRegenerateTokenPasskeyStartContract = oc.$meta({ ...freshTokenMetadata, requestName: 'i/regenerate-token/passkey/start' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/regenerate-token/passkey/start', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ currentPassword: v.pipe(v.string(), v.minLength(1), v.maxLength(1024)) }))
+	.output(v.strictObject({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), options: webAuthnAuthenticationOptionsSchema }));
+export const IRegenerateTokenPasskeyCompleteContract = oc.$meta({ ...freshTokenMetadata, requestName: 'i/regenerate-token/passkey/complete' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/regenerate-token/passkey/complete', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), credential: webAuthnAuthenticationResponseSchema })).output(v.void());
+
 export const IRegenerateTokenContract = oc.$meta({
 	requestName: 'i/regenerate-token',
 	requireCredential: true,
@@ -519,6 +528,8 @@ export const authContract = {
 	'i/change-password/passkey/start': IChangePasswordPasskeyStartContract,
 	'i/change-password/passkey/complete': IChangePasswordPasskeyCompleteContract,
 	'i/regenerate-token': IRegenerateTokenContract,
+	'i/regenerate-token/passkey/start': IRegenerateTokenPasskeyStartContract,
+	'i/regenerate-token/passkey/complete': IRegenerateTokenPasskeyCompleteContract,
 	'i/revoke-token': IRevokeTokenContract,
 	'i/signin-history': ISigninHistoryContract,
 	'i/sessions': ISessionsContract,
