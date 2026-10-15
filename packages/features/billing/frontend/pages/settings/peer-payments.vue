@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: syuilo and misskey-project
 SPDX-License-Identifier: AGPL-3.0-only
 -->
-<template><SearchMarker path="/settings/peer-payments" :label="$locale.sfc.title" :keywords="['ERC20', 'payment']" icon="ti ti-arrows-exchange"><PeerPayments v-if="$i" :client="client" :residenceClient="nativeResidenceClient" :currentUserId="$i.id" :resolveUser="resolveUser"/></SearchMarker></template>
+<template><SearchMarker path="/settings/peer-payments" :label="$locale.sfc.title" :keywords="['ERC20', 'payment']" icon="ti ti-arrows-exchange"><PeerPayments v-if="$i" :client="client" :residenceClient="nativeResidenceClient" :currentUserId="$i.id"/></SearchMarker></template>
 <script setup lang="ts">
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
@@ -17,8 +17,6 @@ const client: PeerPaymentClient = {
 	start: input => misskeyApi('peer-payments/send/start', input),
 	prepare: input => misskeyApi('peer-payments/prepare', input), check: input => misskeyApi('peer-payments/check', input), list: input => misskeyApi('peer-payments/list', input),
 };
-
-async function resolveUser(username: string) { return (await misskeyApi('users/show', { username, host: null })).id; }
 
 definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-arrows-exchange' }));
 </script>

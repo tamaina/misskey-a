@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ $locale.sfc.regions }}</template>
 			<MkSelect v-model="policy.regionRules.mode" :items="[{ value: 'allow', label: $locale.sfc.allow }, { value: 'deny', label: $locale.sfc.deny }]" :disabled="busy"><template #label>{{ $locale.sfc.mode }}</template></MkSelect>
 			<div v-for="(rule, index) in rules" :key="index" class="_gaps_s">
-				<MkInput v-model="rule.country" :disabled="busy"><template #label>{{ $locale.sfc.country }}</template></MkInput>
+				<MkInput v-model="rule.country" :disabled="busy"><template #label>{{ $locale.sfc.country }}</template><template #caption>{{ countryLabel(rule.country, internationalization.locale) }}</template></MkInput>
 				<MkInput v-model="rule.regionCode" :disabled="busy"><template #label>{{ $locale.sfc.regionCode }}</template></MkInput>
 				<MkInput v-model="rule.continent" :disabled="busy"><template #label>{{ $locale.sfc.continent }}</template></MkInput>
 				<MkSelect v-model="rule.eu" :items="[{ value: 'any', label: $locale.sfc.any }, { value: 'yes', label: $locale.sfc.yes }, { value: 'no', label: $locale.sfc.no }]" :disabled="busy"><template #label>{{ $locale.sfc.eu }}</template></MkSelect>
@@ -23,7 +23,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<MkButton :disabled="busy" @click="rules.push({ country: '', regionCode: '', continent: '', eu: 'any' })">{{ $locale.sfc.add }}</MkButton>
 		</FormSection>
-		<FormSection><template #label>{{ $locale.sfc.residenceRegistration }}</template><MkTextarea v-model="residenceRequired" :disabled="busy"><template #label>{{ $locale.sfc.requiredSubdivisions }}</template></MkTextarea></FormSection>
+		<FormSection><template #label>{{ $locale.sfc.residenceRegistration }}</template><MkTextarea v-model="residenceRequired" :disabled="busy"><template #label>{{ $locale.sfc.requiredSubdivisions }}</template><template #caption>{{ requiredCountryLabels }}</template></MkTextarea></FormSection>
 		<FormSection>
 			<template #label>{{ $locale.sfc.tax }}</template>
 			<MkInput v-model="policy.taxName" :disabled="busy"><template #label>{{ $locale.sfc.taxName }}</template></MkInput>
@@ -42,7 +42,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useInternationalization } from 'virtual:vite-vue-internationalization';
 import * as v from 'valibot';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
@@ -53,10 +54,13 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import { billingPolicy } from '../backend/policy.schema.js';
 import type { BillingPolicy } from '../backend/policy.schema.js';
+import { countryLabel } from './country-label.js';
 import type { BillingPolicyClient } from './policy-client.js';
 const props = defineProps<{ client: Pick<BillingPolicyClient, 'getBillingPolicy' | 'upsertBillingPolicy'> }>();
 const policy = ref<BillingPolicy>({ isEnabled: false, trustedProxyCidrs: [], regionRules: { mode: 'allow', rules: [{ country: 'JP' }] }, taxName: '消費税', taxRate: '0.1', seller: { name: '', address: '', invoiceRegistrationNumber: '' }, statementText: '私は日本国内に住所または居所を有しており、日本在住者としてこの有料プランを購入します。' });
+const internationalization = useInternationalization();
 const residenceRequired = ref('');
+const requiredCountryLabels = computed(() => residenceRequired.value.split(/\r?\n/).filter(value => value.trim()).map(value => countryLabel(value, internationalization.locale)).join(', '));
 const cidrs = ref(''), revision = ref(0), busy = ref(false), error = ref(false), saved = ref(false);
 const rules = ref<Array<{ country: string; regionCode: string; continent: string; eu: 'any' | 'yes' | 'no' }>>([{ country: 'JP', regionCode: '', continent: '', eu: 'any' }]);
 

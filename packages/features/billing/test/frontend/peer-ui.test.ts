@@ -18,7 +18,7 @@ async function mount(component: typeof PeerPayments | typeof PeerTokenSettings, 
 	return { element, dispose: () => { app.unmount(); element.remove(); } };
 }
 
-async function flush() { for (let n = 0; n < 8; n++) { await Promise.resolve(); await nextTick(); } }
+async function flush() { await vi.dynamicImportSettled(); for (let n = 0; n < 8; n++) { await Promise.resolve(); await nextTick(); } }
 
 test('native opt-in control never publishes or contacts a wallet automatically', async () => {
 	const request = vi.fn(async () => { throw new Error('Disconnected synthetic wallet'); });
@@ -27,7 +27,7 @@ test('native opt-in control never publishes or contacts a wallet automatically',
 	const wallet = { walletId: 'wallet', chainId: 123456, address: `0x${'1'.padStart(40, '0')}`, isPublic: false };
 	const client = { ownPublication: vi.fn(async () => [wallet]), listTokens: vi.fn(async () => []), list: vi.fn(async () => []),
 																		publish: vi.fn(async (input: { isPublic: boolean }) => { wallet.isPublic = input.isPublic; return { isPublic: input.isPublic }; }) };
-	const view = await mount(PeerPayments, { client, residenceClient: { getResidence: async () => ({ residence: null, isReady: false, requiredSubdivisions: [] }) }, currentUserId: 'alice', resolveUser: async () => 'bob' });
+	const view = await mount(PeerPayments, { client, residenceClient: { getResidence: async () => ({ residence: null, isReady: false, requiredSubdivisions: [] }) }, currentUserId: 'alice' });
 	try {
 		expect(client.publish).not.toHaveBeenCalled(); expect(request).not.toHaveBeenCalled();
 		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
@@ -53,25 +53,27 @@ test('peer prepare requires residence, preserves unknown-key recovery, and keeps
 	let ready = false;
 	const residenceClient = { getResidence: vi.fn(async () => ({ residence: ready ? { country: 'JP', subdivision: null, revision: 1, declaredAt: 1, kind: 'self_declared' } : null, isReady: ready, requiredSubdivisions: [] })) };
 	const client = { ownPublication: vi.fn(async () => [{ walletId: 'wallet', chainId: token.chainId, address: address(1), isPublic: false }]), listTokens: vi.fn(async () => [token]), list: vi.fn(async () => [intent]), publicWallets: vi.fn(async () => [{ chainId: token.chainId, address: address(2) }]), prepare: vi.fn(async (_input: unknown) => { throw new Error('Unknown outcome'); }), check: vi.fn(async (_input: unknown) => intent) };
-	const view = await mount(PeerPayments, { client, residenceClient, currentUserId: 'alice', resolveUser: async () => 'bob' });
+	const view = await mount(PeerPayments, { client, residenceClient, currentUserId: 'alice' });
 	const submit = (form: Element) => form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 	try {
 		const load = () => view.element.querySelector<HTMLButtonElement>('button')!.click(); load(); await flush();
-		const forms = view.element.querySelectorAll('form'); submit(forms[0]); await flush();
-		for (const select of forms[1].querySelectorAll('div[tabindex="0"]')) {
+		vi.mocked(os.selectUser).mockResolvedValueOnce({ id: 'bob', username: 'bob', host: null } as Awaited<ReturnType<typeof os.selectUser>>);
+		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === '受取人を選択')!.click(); await flush();
+		const forms = view.element.querySelectorAll('form');
+		for (const select of forms[0].querySelectorAll('div[tabindex="0"]')) {
 			select.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true })); const call = vi.mocked(os.popupMenu).mock.calls.at(-1)!; const option = call[0][0];
 			if (!option || !('action' in option) || typeof option.action !== 'function') throw new Error('Expected peer selection');
 			option.action(new PointerEvent('click')); call[2]?.onClosing?.(); await flush();
 		}
-		const amount = forms[1].querySelector<HTMLInputElement>('input')!; amount.value = '0.000007'; amount.dispatchEvent(new Event('input', { bubbles: true })); await flush();
-		submit(forms[1]); await flush(); expect(client.prepare).not.toHaveBeenCalled();
-		ready = true; load(); await flush(); submit(forms[1]); await flush(); expect(client.prepare).toHaveBeenCalledTimes(1);
-		ready = false; load(); await flush(); expect(forms[1].querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
-		submit(forms[1]); await flush(); expect(client.prepare.mock.calls[1]).toEqual(client.prepare.mock.calls[0]);
-		amount.value = '0.000008'; amount.dispatchEvent(new Event('input', { bubbles: true })); await flush(); expect(forms[1].querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
-		submit(forms[1]); await flush(); expect(client.prepare).toHaveBeenCalledTimes(2);
-		const hash = `0x${'a'.repeat(64)}`; const hashInput = forms[2].querySelector<HTMLInputElement>('input')!; hashInput.value = hash; hashInput.dispatchEvent(new Event('input', { bubbles: true })); await flush();
-		submit(forms[2]); await flush(); expect(client.check).toHaveBeenCalledWith({ intentId: 'intent', txHash: hash });
+		const amount = forms[0].querySelector<HTMLInputElement>('input')!; amount.value = '0.000007'; amount.dispatchEvent(new Event('input', { bubbles: true })); await flush();
+		submit(forms[0]); await flush(); expect(client.prepare).not.toHaveBeenCalled();
+		ready = true; load(); await flush(); submit(forms[0]); await flush(); expect(client.prepare).toHaveBeenCalledTimes(1);
+		ready = false; load(); await flush(); expect(forms[0].querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
+		submit(forms[0]); await flush(); expect(client.prepare.mock.calls[1]).toEqual(client.prepare.mock.calls[0]);
+		amount.value = '0.000008'; amount.dispatchEvent(new Event('input', { bubbles: true })); await flush(); expect(forms[0].querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
+		submit(forms[0]); await flush(); expect(client.prepare).toHaveBeenCalledTimes(2);
+		const hash = `0x${'a'.repeat(64)}`; const hashInput = forms[1].querySelector<HTMLInputElement>('input')!; hashInput.value = hash; hashInput.dispatchEvent(new Event('input', { bubbles: true })); await flush();
+		submit(forms[1]); await flush(); expect(client.check).toHaveBeenCalledWith({ intentId: 'intent', txHash: hash });
 	} finally { view.dispose(); }
 });
 
@@ -83,7 +85,7 @@ test('unknown wallet send remains blocked after reload while hash recovery stays
 	const request = vi.fn(async (input: { method: string }) => { if (input.method === 'eth_chainId') return '0x1e240'; if (input.method === 'eth_requestAccounts') return [address(1)]; throw new Error('Unknown wallet outcome'); });
 	Object.defineProperty(window, 'ethereum', { configurable: true, value: { request } });
 	const client = { ownPublication: vi.fn(async () => []), listTokens: vi.fn(async () => []), list: vi.fn(async () => [intent]), start: vi.fn(async () => { intent = { ...intent, broadcastStartedAt: 1000 }; return intent; }), check: vi.fn(async (_input: unknown) => intent) };
-	const props = { client, residenceClient: { getResidence: async () => ({ residence: { country: 'JP', subdivision: null, revision: 1, declaredAt: 1, kind: 'self_declared' }, isReady: true, requiredSubdivisions: [] }) }, currentUserId: 'alice', resolveUser: async () => 'bob' };
+	const props = { client, residenceClient: { getResidence: async () => ({ residence: { country: 'JP', subdivision: null, revision: 1, declaredAt: 1, kind: 'self_declared' }, isReady: true, requiredSubdivisions: [] }) }, currentUserId: 'alice' };
 	let view = await mount(PeerPayments, props);
 	try {
 		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
@@ -95,8 +97,77 @@ test('unknown wallet send remains blocked after reload while hash recovery stays
 		send()!.click(); await flush(); expect(client.start).toHaveBeenCalledExactlyOnceWith({ intentId: 'intent' }); expect(request.mock.calls.filter(([input]) => input.method === 'eth_sendTransaction')).toHaveLength(1); expect(send()).toBeUndefined();
 		view.dispose(); view = await mount(PeerPayments, props); view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
 		expect(send()).toBeUndefined(); expect(view.element.textContent).toContain('送信開始済み');
-		const form = view.element.querySelectorAll('form')[2], input = form.querySelector<HTMLInputElement>('input')!, hash = `0x${'a'.repeat(64)}`;
+		const form = view.element.querySelectorAll('form')[1], input = form.querySelector<HTMLInputElement>('input')!, hash = `0x${'a'.repeat(64)}`;
 		input.value = hash; input.dispatchEvent(new Event('input', { bubbles: true })); await flush(); form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); await flush();
 		expect(client.check).toHaveBeenCalledWith({ intentId: 'intent', txHash: hash }); expect(request.mock.calls.filter(([item]) => item.method === 'eth_sendTransaction')).toHaveLength(1);
 	} finally { view.dispose(); if (original) Object.defineProperty(window, 'ethereum', original); else Reflect.deleteProperty(window, 'ethereum'); }
+});
+
+test('recipient picker automatically loads public wallets and discards stale results, failures and cleared selections', async () => {
+	let resolveOld!: (value: { chainId: number; address: string }[]) => void;
+	const pending = new Promise<{ chainId: number; address: string }[]>(resolve => { resolveOld = resolve; });
+	const client = { ownPublication: vi.fn(async () => []), listTokens: vi.fn(async () => []), list: vi.fn(async () => []), publicWallets: vi.fn().mockReturnValueOnce(pending).mockResolvedValueOnce([]).mockRejectedValueOnce(new Error('Unavailable')).mockResolvedValueOnce([{ chainId: 123456, address: `0x${'1'.repeat(40)}` }]), prepare: vi.fn(), start: vi.fn(), check: vi.fn(), publish: vi.fn() };
+	const view = await mount(PeerPayments, { client, residenceClient: { getResidence: async () => ({ isReady: false }) }, currentUserId: 'alice' });
+	const button = (name: string) => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === name)!;
+	const pick = async (id: string, host: string | null = null) => {
+		vi.mocked(os.selectUser).mockResolvedValueOnce({ id, username: id, host } as Awaited<ReturnType<typeof os.selectUser>>);
+		button('受取人を選択').click(); await flush();
+	};
+	try {
+		await flush(); expect(client.ownPublication).toHaveBeenCalledTimes(1); expect(client.listTokens).toHaveBeenCalledTimes(1); expect(client.list).toHaveBeenCalledTimes(1);
+		await pick('bob'); expect(view.element.textContent).toContain('取得しています');
+		expect(os.selectUser).toHaveBeenLastCalledWith({ localOnly: true, includeSelf: false });
+		await pick('carol'); expect(view.element.textContent).toContain('@carol'); expect(view.element.textContent).toContain('公開された受取ウォレットがありません');
+		resolveOld([{ chainId: 123456, address: `0x${'2'.repeat(40)}` }]); await flush();
+		expect(view.element.textContent).toContain('@carol'); expect(view.element.textContent).toContain('公開された受取ウォレットがありません');
+		await pick('dave'); expect(view.element.textContent).toContain('取得できませんでした');
+		button('公開ウォレットを再取得').click(); await flush(); expect(view.element.textContent).not.toContain('取得できませんでした');
+		button('受取人の選択を解除').click(); await flush(); expect(view.element.textContent).not.toContain('@dave');
+		expect(button('送金内容を準備する').disabled).toBe(true);
+		await pick('remote', 'example.invalid'); await pick('alice'); expect(client.publicWallets).toHaveBeenCalledTimes(4);
+		for (const method of [client.prepare, client.start, client.check, client.publish]) expect(method).not.toHaveBeenCalled();
+	} finally { view.dispose(); }
+});
+
+test('clearing a recipient invalidates an in-flight wallet failure', async () => {
+	let rejectLookup!: (reason: Error) => void;
+	const client = { ownPublication: async () => [], listTokens: async () => [], list: async () => [], publicWallets: vi.fn(() => new Promise((_resolve, reject) => { rejectLookup = reject; })) };
+	const view = await mount(PeerPayments, { client, residenceClient: { getResidence: async () => ({ isReady: false }) }, currentUserId: 'alice' });
+	const button = (name: string) => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === name)!;
+	try {
+		await flush(); vi.mocked(os.selectUser).mockResolvedValueOnce({ id: 'bob', username: 'bob', host: null } as Awaited<ReturnType<typeof os.selectUser>>);
+		button('受取人を選択').click(); await flush(); button('受取人の選択を解除').click(); await flush();
+		rejectLookup(new Error('Old failure')); await flush(); expect(view.element.textContent).not.toContain('取得できませんでした'); expect(view.element.textContent).not.toContain('@bob');
+	} finally { view.dispose(); }
+});
+
+test('an older user dialog cannot replace a newer recipient selection', async () => {
+	let resolveFirst!: (user: Awaited<ReturnType<typeof os.selectUser>>) => void;
+	vi.mocked(os.selectUser).mockImplementationOnce(() => new Promise(resolve => { resolveFirst = resolve; }));
+	vi.mocked(os.selectUser).mockResolvedValueOnce({ id: 'carol', username: 'carol', host: null } as Awaited<ReturnType<typeof os.selectUser>>);
+	const client = { ownPublication: async () => [], listTokens: async () => [], list: async () => [], publicWallets: vi.fn(async () => []) };
+	const view = await mount(PeerPayments, { client, residenceClient: { getResidence: async () => ({ isReady: false }) }, currentUserId: 'alice' });
+	try {
+		await flush(); const choose = () => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '受取人を選択')!.click();
+		choose(); await flush(); choose(); await flush();
+		resolveFirst({ id: 'bob', username: 'bob', host: null } as Awaited<ReturnType<typeof os.selectUser>>); await flush();
+		expect(client.publicWallets).toHaveBeenCalledExactlyOnceWith({ userId: 'carol' }); expect(view.element.textContent).toContain('@carol'); expect(view.element.textContent).not.toContain('@bob');
+	} finally { view.dispose(); }
+});
+
+test('opening another picker keeps the current recipient lookup valid until a new selection is confirmed', async () => {
+	let resolveLookup!: (value: { chainId: number; address: string }[]) => void;
+	const address = `0x${'3'.repeat(40)}`;
+	const client = { ownPublication: async () => [], listTokens: async () => [], list: async () => [], publicWallets: vi.fn(() => new Promise(resolve => { resolveLookup = resolve; })) };
+	const view = await mount(PeerPayments, { client, residenceClient: { getResidence: async () => ({ isReady: false }) }, currentUserId: 'alice' });
+	try {
+		await flush(); const choose = () => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '受取人を選択')!.click();
+		vi.mocked(os.selectUser).mockResolvedValueOnce({ id: 'bob', username: 'bob', host: null } as Awaited<ReturnType<typeof os.selectUser>>);
+		choose(); await flush(); vi.mocked(os.selectUser).mockImplementationOnce(() => new Promise(() => {})); choose(); await flush();
+		resolveLookup([{ chainId: 123456, address }]); await flush();
+		expect(view.element.textContent).toContain('@bob'); expect(view.element.textContent).not.toContain('取得しています'); expect(view.element.textContent).not.toContain('公開された受取ウォレットがありません');
+		view.element.querySelectorAll('div[tabindex="0"]')[2].dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+		const options = vi.mocked(os.popupMenu).mock.calls.at(-1)![0];
+		expect(options).toEqual(expect.arrayContaining([expect.objectContaining({ text: `123456 / ${address}` })]));
+	} finally { view.dispose(); }
 });

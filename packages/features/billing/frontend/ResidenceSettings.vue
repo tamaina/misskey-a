@@ -17,14 +17,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
+import { useInternationalization } from 'virtual:vite-vue-internationalization';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import { residenceCountries, residenceSubdivisions } from '../shared/residence-codes.schema.js';
+import { countryLabel } from './country-label.js';
 import type { ResidenceClient } from './residence-client.js';
 const props = defineProps<{ client: ResidenceClient }>();
 const country = ref(''), subdivision = ref(''), required = ref<string[]>([]), revision = ref(0), busy = ref(false), failed = ref(false), saved = ref(false);
-const countryItems: { value: string; label: string }[] = residenceCountries.map(value => ({ value, label: value }));
+const internationalization = useInternationalization();
+const countryItems = computed<{ value: string; label: string }[]>(() => residenceCountries.map(value => ({ value, label: countryLabel(value, internationalization.locale) })));
 const requiresSubdivision = computed(() => required.value.includes(country.value));
 const subdivisionItems = computed(() => (residenceSubdivisions[country.value] ?? []).map(value => ({ value, label: value })));
 watch(country, () => { subdivision.value = ''; }, { flush: 'sync' });

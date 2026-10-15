@@ -20,6 +20,7 @@ const states = [
 	['servicesubscriptions--residence-required', 'purchase-residence-required', '居住地未登録の購入開始制限', '注文を作成', true],
 	['peerpayments--residence-required', 'peer-residence-required', '居住地未登録の送金開始制限', '送金内容を準備する', true],
 ];
+states.push(['peerpayments--recipient-without-wallet', 'peer-recipient-without-wallet', '受取人選択後・公開ウォレットなし', '送金内容を準備する', true]);
 const captures = [];
 try {
 	for (const [viewport, size] of Object.entries({ desktop: { width: 1280, height: 900 }, mobile: { width: 390, height: 844 } })) {
@@ -41,13 +42,18 @@ try {
 				await writeFile(resolve(output, `${name}-${viewport}-failure.json`), JSON.stringify({ errors, externalRequests, url: page.url(), text: await page.locator('body').innerText() }, null, 2));
 				throw error;
 			});
-			if (story.includes('registered')) await expect(page.getByText('JP', { exact: true })).toBeVisible();
+			if (story.includes('registered')) await expect(page.getByText('JP / 日本', { exact: true })).toBeVisible();
+			if (story.includes('subdivision')) await expect(page.getByText('US / アメリカ合衆国', { exact: true })).toBeVisible();
 			if (story.includes('subdivision')) await expect(page.getByText('州・地域（ISO行政区分コード）', { exact: true })).toBeVisible();
 			if (story.startsWith('wallet')) await expect(page.getByText('Synthetic chain (123456)', { exact: true })).toBeVisible();
 			if (story.startsWith('service') || story.startsWith('peer')) {
-				const load = page.getByRole('button', { name: '読み込む', exact: true });
+				const load = page.getByRole('button', { name: story.startsWith('peer') ? 'ウォレット・トークン・履歴を再読み込み' : '読み込む', exact: true });
 				await expect(load).toBeEnabled();
 			}
+			if (story.includes('recipient-without-wallet')) await expect(page.getByText('この受取人には公開された受取ウォレットがありません。', { exact: true })).toBeVisible({ timeout: 60000 }).catch(async error => {
+				await writeFile(resolve(output, `${name}-${viewport}-failure.json`), JSON.stringify({ errors, externalRequests, text: await page.locator('body').innerText() }, null, 2));
+				throw error;
+			});
 			if (disabled) await expect(button).toBeDisabled(); else await expect(button).toBeEnabled();
 			await page.evaluate(() => document.fonts.ready);
 			await page.addStyleTag({ content: '*, *::before, *::after { animation: none !important; transition: none !important; caret-color: transparent !important; }' });
