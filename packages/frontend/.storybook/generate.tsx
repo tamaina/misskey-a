@@ -474,6 +474,10 @@ function toStories(component: string): Promise<string> {
 		globSync('../features/users/frontend/pages/user/home.vue'),
 		globSync('../features/discovery/frontend/pages/search.vue'),
 		// Keep the curated story set when selected components move into feature packages.
+		globSync('../features/billing/frontend/ResidenceSettings.vue'),
+		globSync('../features/billing/frontend/WalletSettings.vue'),
+		globSync('../features/billing/frontend/ServiceSubscriptions.vue'),
+		globSync('../features/billing/frontend/PeerPayments.vue'),
 		globSync('../features/ui/frontend/components/MkButton.vue'),
 		globSync('../features/auth/frontend/components/MkCaptcha.vue'),
 		globSync('../features/channels/frontend/components/MkChannelFollowButton.vue'),
