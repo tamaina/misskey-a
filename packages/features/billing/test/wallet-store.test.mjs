@@ -11,6 +11,7 @@ import { createRouterClient } from '@orpc/server';
 import { createPostgresWalletStore, createWalletAuthentication, createPostgresWalletChainStore, createResidenceStore } from '../../../backend/built/features/billing/backend.js';
 import { BillingWalletRegistration1791760200000 as Migration } from '../../../backend/migration/1791760200000-BillingWalletRegistration.js';
 import { BillingWalletChainSettings1791763800000 as ChainMigration } from '../../../backend/migration/1791763800000-BillingWalletChainSettings.js';
+import { PeerPayments1791950000000 as PeerMigration } from '../../../backend/migration/1791950000000-PeerPayments.js';
 import { composeNativeTestRouter, nativeTestDependencies } from '../../api/test/native-router-fixture.mjs';
 
 const require = createRequire(new URL('../../../backend/package.json', import.meta.url));
@@ -34,7 +35,7 @@ test('real PostgreSQL wallet ownership, atomic consumption, rollback and native 
 		await qr.query('CREATE TABLE user_profile ("userId" varchar(32) PRIMARY KEY, "billingResidence" jsonb)');
 		await qr.query('CREATE TABLE billing_policy (id varchar(32) PRIMARY KEY, revision integer, policy jsonb, "updatedAt" timestamptz, "updatedByUserId" varchar(32))');
 		await qr.query('INSERT INTO user_profile SELECT id, $1::jsonb FROM "user"', [JSON.stringify({ country: 'JP', subdivision: 'JP-13', revision: 1, declaredAt: 1, kind: 'self_declared' })]);
-		await migration.up(qr); await migration.down(qr); await migration.up(qr);
+		await migration.up(qr); await migration.down(qr); await migration.up(qr); await new PeerMigration().up(qr);
 		const chainMigration = new ChainMigration();
 		await chainMigration.up(qr); await chainMigration.down(qr); await chainMigration.up(qr);
 		const diff = await db.driver.createSchemaBuilder().log();

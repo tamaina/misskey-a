@@ -120,3 +120,23 @@ available. The residence migration refuses rollback while declarations or order
 evidence remain. The sibling P2P pilot needs a separate integration of this guard
 at prepare and immediately before browser-wallet sending; this slice does not
 claim that connection.
+## Independent peer payments
+
+[Draft #126](https://github.com/tamaina/misskey-a/pull/126) adds `/admin/peer-payment-tokens`
+and `/settings/peer-payments`, using [receipt core #103](https://github.com/tamaina/misskey-a/pull/103).
+An administrator explicitly configures supported assets. An account may publish
+its linked wallet for payments; publication defaults to off. A sender prepares an
+immutable recipient/asset/amount snapshot, then explicitly selects a browser wallet
+to send an ordinary ERC20 transfer and submits its hash for confirmation.
+Only participants can inspect a payment. Confirmed evidence reserves a unique
+chain/transaction/log claim; retry keys preserve the prepared request. Deletion
+retains evidence with nullable participant references. Server service terms are
+absent from this slice, and their claim boundary is independent. No fee, balance
+ledger, note/reaction memo association or background settlement is added.
+
+Source provenance, authorization boundaries and behavioral differences are in
+[Issue #106](https://github.com/tamaina/misskey-a/issues/106) and the PR body.
+The migration is local and unapplied to production. Browser providers and receipts
+in development tests are synthetic; no real transaction or signature was requested.
+After building, run `node --test --test-concurrency=1 packages/features/billing/test/peer-store.test.mjs`
+with the disposable loopback database variable described above.
