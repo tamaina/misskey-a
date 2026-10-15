@@ -33,6 +33,7 @@ export function createPeerPaymentRouter<Actor extends ApiActor>(deps: { store: P
 			if (!token || !await deps.rpcUrl(token.chainId)) throw new ORPCError('PEER_UNAVAILABLE');
 			return publicPeerTransfer(await deps.store.prepare(context.principal.id, { ...input, recipientAddress: input.recipientAddress.toLowerCase() }));
 		}),
+		start: procedure(peerPaymentContract.start).use(account).handler(async ({ context, input }) => publicPeerTransfer(await deps.store.start(context.principal.id, input.intentId))),
 		check: procedure(peerPaymentContract.check).use(account).handler(async ({ context, input }) => {
 			const row = await deps.store.submit(context.principal.id, input.intentId, input.txHash?.toLowerCase());
 			if (row.status !== 'pending' || !row.txHash) return publicPeerTransfer(row);

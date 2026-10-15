@@ -10,6 +10,7 @@ import * as v from 'valibot';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiBillingWallet } from './models/BillingWallet.js';
 import { MiPeerPaymentToken, MiPeerPaymentIntent } from './models/PeerPayment.js';
+import { requireDeclaredResidence } from './residence-store.js';
 import { peerTransfer } from './peer.contract.js';
 import type { PeerToken, PreparePeerTransfer } from './peer.contract.js';
 import type { ReceiptResult } from './transfer-confirmation.js';
@@ -27,8 +28,8 @@ const party = (row: MiPeerPaymentIntent, userId: string) => row.senderUserId ===
 export function publicPeerTransfer(row: MiPeerPaymentIntent) {
 	const { token, fromAddress, toAddress, amountBaseUnits } = row.terms;
 	return v.parse(peerTransfer, { id: row.id, token, fromAddress, toAddress, amountBaseUnits, senderUserId: row.senderUserId, recipientUserId: row.recipientUserId,
-		createdAt: row.createdAt, expiresAt: row.expiresAt, status: row.status, txHash: row.txHash, logIndex: row.logIndex, confirmedAt: row.confirmedAt,
-		data: encodeFunctionData({ abi, functionName: 'transfer', args: [toAddress as `0x${string}`, BigInt(amountBaseUnits)] }) });
+																																createdAt: row.createdAt, expiresAt: row.expiresAt, status: row.status, txHash: row.txHash, logIndex: row.logIndex, confirmedAt: row.confirmedAt, broadcastStartedAt: row.broadcastStartedAt,
+																																data: encodeFunctionData({ abi, functionName: 'transfer', args: [toAddress as `0x${string}`, BigInt(amountBaseUnits)] }) });
 }
 
 async function localRecipient(manager: EntityManager, userId: string) {
@@ -64,6 +65,7 @@ export function createPeerPaymentStore(db: DataSource, id: (now: number) => stri
 					if (existing.terms.senderWalletId !== input.walletId || existing.recipientUserId !== input.recipientUserId || existing.terms.toAddress !== input.recipientAddress || existing.terms.token.id !== input.tokenId || existing.terms.amountBaseUnits !== input.amountBaseUnits) conflict();
 					return existing;
 				}
+				await requireDeclaredResidence(manager, userId);
 				if (userId === input.recipientUserId) unavailable();
 				await localRecipient(manager, input.recipientUserId);
 				const token = await manager.getRepository(MiPeerPaymentToken).findOne({ where: { id: input.tokenId }, lock: { mode: 'pessimistic_read' } });
@@ -74,9 +76,21 @@ export function createPeerPaymentStore(db: DataSource, id: (now: number) => stri
 				const createdAt = now();
 				if (Math.max(sender.createdAt, recipient.createdAt) > createdAt) unavailable();
 				const row = manager.create(MiPeerPaymentIntent, { id: id(createdAt), senderUserId: userId, recipientUserId: input.recipientUserId, requestKey: input.requestKey,
-					terms: { token: token.terms, senderWalletId: sender.id, recipientWalletId: recipient.id, fromAddress: sender.address, toAddress: recipient.address, amountBaseUnits: input.amountBaseUnits },
-					chainId: token.terms.chainId, createdAt, expiresAt: createdAt + 30 * 60 * 1000, status: 'pending', txHash: null, logIndex: null, confirmedAt: null });
+																																																						terms: { token: token.terms, senderWalletId: sender.id, recipientWalletId: recipient.id, fromAddress: sender.address, toAddress: recipient.address, amountBaseUnits: input.amountBaseUnits },
+																																																						chainId: token.terms.chainId, createdAt, expiresAt: createdAt + 30 * 60 * 1000, status: 'pending', txHash: null, logIndex: null, confirmedAt: null, broadcastStartedAt: null });
 				await manager.insert(MiPeerPaymentIntent, row); return row;
+			});
+		},
+		async start(userId: string, intentId: string) {
+			return db.transaction(async manager => {
+				await requireDeclaredResidence(manager, userId);
+				const row = await manager.getRepository(MiPeerPaymentIntent).findOne({ where: { id: intentId, senderUserId: userId }, lock: { mode: 'pessimistic_write' } });
+				if (!row) missing();
+				if (row.broadcastStartedAt !== null) conflict();
+				const startedAt = now();
+				if (row.status !== 'pending' || row.txHash || row.expiresAt <= startedAt) unavailable();
+				await manager.update(MiPeerPaymentIntent, row.id, { broadcastStartedAt: startedAt });
+				return { ...row, broadcastStartedAt: startedAt };
 			});
 		},
 		async submit(userId: string, intentId: string, txHash?: string) {
@@ -95,20 +109,20 @@ export function createPeerPaymentStore(db: DataSource, id: (now: number) => stri
 		},
 		async apply(userId: string, intentId: string, txHash: string, result: ReceiptResult, logIndex?: number) {
 			try {
- return await db.transaction(async manager => {
-				const row = await manager.getRepository(MiPeerPaymentIntent).findOne({ where: { id: intentId }, lock: { mode: 'pessimistic_write' } });
-				if (!row || !party(row, userId)) missing();
-				if (row.txHash !== txHash) conflict();
-				if (row.status !== 'pending' || result.status === 'pending') return row;
-				if (result.status === 'invalid') { row.status = 'failed'; await manager.update(MiPeerPaymentIntent, row.id, { status: row.status }); return row; }
-				const proof = result.evidence, terms = row.terms;
-				if (proof.chainId !== row.chainId || proof.txHash !== txHash || proof.timestamp + 2000 < row.createdAt || proof.timestamp > now() + 2000) unavailable();
-				const logs = proof.transfers.filter(log => log.contractAddress === terms.token.contractAddress && log.fromAddress === terms.fromAddress && log.toAddress === terms.toAddress && log.amountBaseUnits === terms.amountBaseUnits && (logIndex === undefined || log.logIndex === logIndex));
-				if (logs.length !== 1) unavailable();
-				row.status = 'confirmed'; row.logIndex = logs[0].logIndex; row.confirmedAt = now();
-				await manager.update(MiPeerPaymentIntent, row.id, { status: row.status, logIndex: row.logIndex, confirmedAt: row.confirmedAt }); return row;
-			}); 
-} catch (error) {
+				return await db.transaction(async manager => {
+					const row = await manager.getRepository(MiPeerPaymentIntent).findOne({ where: { id: intentId }, lock: { mode: 'pessimistic_write' } });
+					if (!row || !party(row, userId)) missing();
+					if (row.txHash !== txHash) conflict();
+					if (row.status !== 'pending' || result.status === 'pending') return row;
+					if (result.status === 'invalid') { row.status = 'failed'; await manager.update(MiPeerPaymentIntent, row.id, { status: row.status }); return row; }
+					const proof = result.evidence, terms = row.terms;
+					if (proof.chainId !== row.chainId || proof.txHash !== txHash || proof.timestamp + 2000 < row.createdAt || proof.timestamp > now() + 2000) unavailable();
+					const logs = proof.transfers.filter(log => log.contractAddress === terms.token.contractAddress && log.fromAddress === terms.fromAddress && log.toAddress === terms.toAddress && log.amountBaseUnits === terms.amountBaseUnits && (logIndex === undefined || log.logIndex === logIndex));
+					if (logs.length !== 1) unavailable();
+					row.status = 'confirmed'; row.logIndex = logs[0].logIndex; row.confirmedAt = now();
+					await manager.update(MiPeerPaymentIntent, row.id, { status: row.status, logIndex: row.logIndex, confirmedAt: row.confirmedAt }); return row;
+				});
+			} catch (error) {
 				if (typeof error === 'object' && error !== null && 'code' in error && error.code === '23505' && 'constraint' in error && error.constraint === 'billing_peer_intent_event_key') conflict();
 				throw error;
 			}

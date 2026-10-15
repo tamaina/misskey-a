@@ -90,11 +90,12 @@ serializes same-service renewals; request keys preserve retry idempotency.
 An optional eligible ordinary manual role takes effect during the paid interval
 through the native role service. Existing manual assignments remain intact;
 paid roles cannot grant staff privileges through conditional roles. Role reads
-query active paid intervals directly. No quota mapping, ranked plan changes,
-automatic renewal, balance ledger, usage settlement, refund or notification is wired.
+query active paid intervals directly. The billing stack adds ranked/prorated plan
+changes, catalog/policy administration, refunds and purchase notifications. There
+is no automatic renewal, balance ledger or usage-priced settlement.
 
-P2P routes, models and UI belong to [Draft #126](https://github.com/tamaina/misskey-a/pull/126);
-they are absent from this server slice. Accounting claims are scoped to this slice.
+This integration includes the independent P2P pilot from [#126](https://github.com/tamaina/misskey-a/pull/126).
+Its accounting claim boundary remains independent from service orders.
 Account deletion removes the participant reference while retaining paid evidence.
 The new local migration has reversible schema tests and is unapplied to production.
 Reverting it removes its records.
@@ -117,9 +118,9 @@ Declarations are private, self-declared account data, not verified tax location.
 New orders retain their original declaration. Existing request-key recovery,
 transaction hash submission, reconciliation, history and refund obligations stay
 available. The residence migration refuses rollback while declarations or order
-evidence remain. The sibling P2P pilot needs a separate integration of this guard
-at prepare and immediately before browser-wallet sending; this slice does not
-claim that connection.
+evidence remain. P2P prepares use the same server guard after existing-key recovery. Browser
+sending requires fresh residence checks before wallet connection and immediately
+before eth_sendTransaction; declaration/policy changes and proof expiry fail closed.
 ## Independent peer payments
 
 [Draft #126](https://github.com/tamaina/misskey-a/pull/126) adds `/admin/peer-payment-tokens`
@@ -130,8 +131,7 @@ immutable recipient/asset/amount snapshot, then explicitly selects a browser wal
 to send an ordinary ERC20 transfer and submits its hash for confirmation.
 Only participants can inspect a payment. Confirmed evidence reserves a unique
 chain/transaction/log claim; retry keys preserve the prepared request. Deletion
-retains evidence with nullable participant references. Server service terms are
-absent from this slice, and their claim boundary is independent. No fee, balance
+retains evidence with nullable participant references. Service terms coexist here through the residence integration; their claim boundary is independent. No fee, balance
 ledger, note/reaction memo association or background settlement is added.
 
 Source provenance, authorization boundaries and behavioral differences are in
@@ -140,3 +140,11 @@ The migration is local and unapplied to production. Browser providers and receip
 in development tests are synthetic; no real transaction or signature was requested.
 After building, run `node --test --test-concurrency=1 packages/features/billing/test/peer-store.test.mjs`
 with the disposable loopback database variable described above.
+
+A sender reserves one browser broadcast attempt at `/peer-payments/send/start`.
+The server checks the current declaration and intent deadline under locks, then
+retains `broadcastStartedAt`. A failed or unknown wallet response must be recovered
+by transaction hash; the same intent cannot be broadcast again, including after
+reload or from another client. The send-start migration refuses rollback while
+attempt evidence remains. An attempt does not assert that an on-chain transfer
+occurred, and hash confirmation remains available without a residence gate.

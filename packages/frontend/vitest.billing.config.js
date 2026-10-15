@@ -13,7 +13,7 @@ import { pluginVvi } from './lib/vite-plugin-vvi.ts';
 export default defineConfig({
 	plugins: [pluginFeatureDependencies(fileURLToPath(new URL('.', import.meta.url)), fileURLToPath(new URL('../features', import.meta.url))), pluginVvi(), vue()],
 	resolve: { alias: { '@features': fileURLToPath(new URL('../features', import.meta.url)), '@': fileURLToPath(new URL('./src', import.meta.url)), '@@': fileURLToPath(new URL('../frontend-shared', import.meta.url)) }, dedupe: ['vue', 'vite-vue-internationalization'] },
-	cacheDir: '../backend/built/peer-vitest-cache',
+	cacheDir: '../backend/built/billing-vitest-cache',
 	test: {
 		setupFiles: ['../features/billing/test/frontend/setup.ts'],
 		include: ['../features/billing/test/frontend/*.test.ts'],

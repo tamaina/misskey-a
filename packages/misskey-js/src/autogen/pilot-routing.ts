@@ -2452,6 +2452,631 @@ export default {
 			}
 		}
 	},
+	"peerPayments": {
+		"listSettings": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "read:admin:meta",
+					"requestName": "admin/peer-payments/tokens/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/peer-payments/tokens/list"
+				}
+			}
+		},
+		"saveSettings": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"requireAdmin": true,
+					"kind": "write:admin:meta",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "admin/peer-payments/tokens/upsert"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/admin/peer-payments/tokens/upsert"
+				}
+			}
+		},
+		"listTokens": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "peer-payments/tokens/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/peer-payments/tokens/list"
+				}
+			}
+		},
+		"ownPublication": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "account/wallets/publication/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/wallets/publication/list"
+				}
+			}
+		},
+		"publish": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"secure": true,
+					"requestName": "account/wallets/publication/set"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/wallets/publication/set"
+				}
+			}
+		},
+		"publicWallets": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "users/payment-wallets"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/users/payment-wallets"
+				}
+			}
+		},
+		"prepare": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "peer-payments/prepare"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/peer-payments/prepare"
+				}
+			}
+		},
+		"start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "peer-payments/send/start"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/peer-payments/send/start"
+				}
+			}
+		},
+		"check": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					},
+					"requestName": "peer-payments/check"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/peer-payments/check"
+				}
+			}
+		},
+		"list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
+					"PEER_NOT_FOUND": {
+						"status": 404
+					},
+					"PEER_UNAVAILABLE": {
+						"status": 400
+					},
+					"PEER_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "peer-payments/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/peer-payments/list"
+				}
+			}
+		}
+	},
 	"wallets": {
 		"listChainSettings": {
 			"~orpc": {

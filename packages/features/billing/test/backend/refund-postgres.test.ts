@@ -8,6 +8,8 @@ import { DataSource } from 'typeorm';
 import { expect, test } from 'vitest';
 import { createRouterClient } from '@orpc/server';
 import { entities } from '@features/persistence/backend/postgres.js';
+import { PeerPayments1791950000000 as PeerMigration } from '../../../../backend/migration/1791950000000-PeerPayments.js';
+import { PeerBroadcastStart1792101000000 as BroadcastMigration } from '../../../../backend/migration/1792101000000-PeerBroadcastStart.js';
 import { createServiceBillingStore } from '../../backend/service-store.js';
 import { createBillingPolicyStore } from '../../backend/policy-store.js';
 import { createRefundStore } from '../../backend/refund-store.js';
@@ -66,7 +68,7 @@ test.skipIf(!url)('native PostgreSQL refund API, claims, all-group atomic expiry
 		await qr.query('INSERT INTO "user" VALUES (\'alice\'),(\'bob\'),(\'admin\'),(\'carol\'),(\'dave\')');
 		await qr.query('CREATE TABLE role (id varchar(32) PRIMARY KEY, target varchar(16), "isAdministrator" boolean, "isModerator" boolean)');
 		await qr.query('INSERT INTO role VALUES (\'normal\',\'manual\',false,false)');
-		await new BillingWalletRegistration1791760200000().up(qr);
+		await new BillingWalletRegistration1791760200000().up(qr); await new PeerMigration().up(qr); await new BroadcastMigration().up(qr);
 		await new BillingServiceSubscriptions1791838800000().up(qr);
 		const funded = new BillingFundedTerms1792010000000(), migration = new BillingRefunds1792011000000();
 		await funded.up(qr); await migration.up(qr); await migration.down(qr); await funded.down(qr); await funded.up(qr); await migration.up(qr);

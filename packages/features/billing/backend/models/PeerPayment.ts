@@ -35,4 +35,6 @@ export class MiPeerPaymentIntent {
 	@Column('varchar', { length: 66, nullable: true }) public txHash: string | null;
 	@Column({ ...integer, nullable: true }) public logIndex: number | null;
 	@Column({ ...integer, nullable: true }) public confirmedAt: number | null;
+	/** One browser broadcast attempt; unknown outcomes must recover by hash, never resend. */
+	@Column({ ...integer, nullable: true }) public broadcastStartedAt: number | null;
 }

@@ -9,6 +9,8 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { createRouterClient } from '@orpc/server';
+import { PeerPayments1791950000000 as PeerMigration } from '../../../backend/migration/1791950000000-PeerPayments.js';
+import { PeerBroadcastStart1792101000000 as BroadcastMigration } from '../../../backend/migration/1792101000000-PeerBroadcastStart.js';
 import { createServiceBillingStore, createCatalogAdminStore, createCatalogAdminRouter, createServiceBillingRouter, createBillingPolicyStore, createPurchaseNotifier, createBillingReportsStore, createBillingReportsRouter, activePaidRoleIds, createResidenceStore } from '../../../backend/built/features/billing/backend.js';
 import { BillingServiceSubscriptions1791838800000 as Migration } from '../../../backend/migration/1791838800000-BillingServiceSubscriptions.js';
 import { BillingFundedTerms1792010000000 } from '../../../backend/migration/1792010000000-BillingFundedTerms.js';
@@ -40,7 +42,7 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 		await qr.query('INSERT INTO "user" ("id") VALUES (\'alice\'), (\'bob\'), (\'carol\')');
 		await qr.query('CREATE TABLE moderation_log (id varchar(32) PRIMARY KEY, "userId" varchar(32) NOT NULL, type varchar(128) NOT NULL, info jsonb NOT NULL)');
 		const migration = new Migration(); await migration.up(qr); await migration.down(qr); await migration.up(qr);
-		await new WalletMigration().up(qr);
+		await new WalletMigration().up(qr); await new PeerMigration().up(qr); await new BroadcastMigration().up(qr);
 		await new BillingFundedTerms1792010000000().up(qr);
 		await new BillingWalletChainSettings1791763800000().up(qr);
 		const seed = { ...offer, id: 'migration-price', priceStartsAt: now - 10, priceExpiresAt: now + 10 };

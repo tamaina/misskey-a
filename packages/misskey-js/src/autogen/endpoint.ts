@@ -85,6 +85,26 @@ import type {
 	AdminBillingOrdersCheckResponse,
 	AdminBillingSalesSummaryRequest,
 	AdminBillingSalesSummaryResponse,
+	AdminPeerPaymentsTokensListRequest,
+	AdminPeerPaymentsTokensListResponse,
+	AdminPeerPaymentsTokensUpsertRequest,
+	AdminPeerPaymentsTokensUpsertResponse,
+	PeerPaymentsTokensListRequest,
+	PeerPaymentsTokensListResponse,
+	AccountWalletsPublicationListRequest,
+	AccountWalletsPublicationListResponse,
+	AccountWalletsPublicationSetRequest,
+	AccountWalletsPublicationSetResponse,
+	UsersPaymentWalletsRequest,
+	UsersPaymentWalletsResponse,
+	PeerPaymentsPrepareRequest,
+	PeerPaymentsPrepareResponse,
+	PeerPaymentsSendStartRequest,
+	PeerPaymentsSendStartResponse,
+	PeerPaymentsCheckRequest,
+	PeerPaymentsCheckResponse,
+	PeerPaymentsListRequest,
+	PeerPaymentsListResponse,
 	AdminWalletsChainsListRequest,
 	AdminWalletsChainsListResponse,
 	AdminWalletsChainsUpsertRequest,
@@ -892,6 +912,16 @@ export type Endpoints = {
 	'admin/billing/orders/list': { req: AdminBillingOrdersListRequest; res: AdminBillingOrdersListResponse };
 	'admin/billing/orders/check': { req: AdminBillingOrdersCheckRequest; res: AdminBillingOrdersCheckResponse };
 	'admin/billing/sales/summary': { req: AdminBillingSalesSummaryRequest; res: AdminBillingSalesSummaryResponse };
+	'admin/peer-payments/tokens/list': { req: AdminPeerPaymentsTokensListRequest; res: AdminPeerPaymentsTokensListResponse };
+	'admin/peer-payments/tokens/upsert': { req: AdminPeerPaymentsTokensUpsertRequest; res: AdminPeerPaymentsTokensUpsertResponse };
+	'peer-payments/tokens/list': { req: PeerPaymentsTokensListRequest; res: PeerPaymentsTokensListResponse };
+	'account/wallets/publication/list': { req: AccountWalletsPublicationListRequest; res: AccountWalletsPublicationListResponse };
+	'account/wallets/publication/set': { req: AccountWalletsPublicationSetRequest; res: AccountWalletsPublicationSetResponse };
+	'users/payment-wallets': { req: UsersPaymentWalletsRequest; res: UsersPaymentWalletsResponse };
+	'peer-payments/prepare': { req: PeerPaymentsPrepareRequest; res: PeerPaymentsPrepareResponse };
+	'peer-payments/send/start': { req: PeerPaymentsSendStartRequest; res: PeerPaymentsSendStartResponse };
+	'peer-payments/check': { req: PeerPaymentsCheckRequest; res: PeerPaymentsCheckResponse };
+	'peer-payments/list': { req: PeerPaymentsListRequest; res: PeerPaymentsListResponse };
 	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
 	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };
