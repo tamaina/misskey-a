@@ -12,6 +12,8 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
+import { createResidenceStore } from './residence-store.js';
+import { createResidenceRouter } from './residence.implementation.js';
 import { createBillingReportsStore } from './reports-store.js';
 import { createBillingReportsRouter } from './reports.implementation.js';
 import { createBillingPolicyStore } from './policy-store.js';
@@ -42,7 +44,7 @@ export class ServiceBillingApiProvider {
 		const readReceipt = createServiceReceiptReader(this.moduleRef.get(HttpRequestService, { strict: false }), chains.rpcUrl);
 		const catalogRpc = createCatalogRpcReader(chains.rpcUrl, createWalletRpcFetch(this.moduleRef.get(HttpRequestService, { strict: false })));
 		const billingDeps = { store: createServiceBillingStore(db, now => id.gen(now)), notifyPurchase, rpcUrl: chains.rpcUrl, readReceipt };
-		return { ...createBillingReportsRouter<MiLocalUser>(createBillingReportsStore(db), billingDeps), ...createBillingPolicyRouter<MiLocalUser>(createBillingPolicyStore(db, () => id.gen())), ...createCatalogAdminRouter<MiLocalUser>(createCatalogAdminStore(db, Date.now, () => id.gen()), catalogRpc, chains.rpcUrl), ...createServiceBillingRouter<MiLocalUser>(billingDeps),
+		return { ...createResidenceRouter<MiLocalUser>(createResidenceStore(db)), ...createBillingReportsRouter<MiLocalUser>(createBillingReportsStore(db), billingDeps), ...createBillingPolicyRouter<MiLocalUser>(createBillingPolicyStore(db, () => id.gen())), ...createCatalogAdminRouter<MiLocalUser>(createCatalogAdminStore(db, Date.now, () => id.gen()), catalogRpc, chains.rpcUrl), ...createServiceBillingRouter<MiLocalUser>(billingDeps),
 											...createRefundRouter<MiLocalUser>(createRefundStore(db, () => id.gen(), readReceipt)) };
 	}
 }

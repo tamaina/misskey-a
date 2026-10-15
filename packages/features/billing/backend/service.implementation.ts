@@ -22,6 +22,7 @@ export interface ServiceBillingDependencies {
 
 export function publicOrder(row: Awaited<ReturnType<ServiceBillingStore['createOrder']>>) {
 	return v.parse(serviceOrder, { id: row.id, offer: row.offer, payerAddress: row.payerAddress, status: row.status, txHash: row.txHash,
+																																...(row.declaredResidence ? { declaredResidence: row.declaredResidence } : {}),
 																																amountBaseUnits: row.cashAmountBaseUnits ?? row.offer.amountBaseUnits, quote: row.quote, createdAt: row.createdAt, expiresAt: row.expiresAt, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
 }
 

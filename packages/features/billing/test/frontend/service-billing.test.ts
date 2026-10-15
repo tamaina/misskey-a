@@ -111,11 +111,12 @@ test('registered deployment selection supplies exact pricing unit and settlement
 	} finally { view.dispose(); }
 });
 
-test('consent is required, original consent is retained on retry, and reload failure clears consent', async () => {
+test('original retry recovers after preflight failure, while a changed offer remains gated', async () => {
 	const item = { offer, priceHistory: [], priceDisplayWindow: { previousPeriod: null, currentPeriod: null, nextPeriod: null }, dealDisplay: { canShowDeal: false } };
 	const client = { listCatalog: vi.fn(async () => [item]), listOrders: vi.fn(async () => []), quoteOrder: vi.fn(async () => ({ revision: 0, quote: {} })), createOrder: vi.fn(async (_input: unknown) => { throw new Error('Unknown outcome'); }) };
 	const getRequirements = vi.fn(async () => ({ isRequired: true, country: 'JP', statement: { id: 'original', country: 'JP', statement: 'Original statement' } }));
-	const view = await mount(ServiceSubscriptions, { client, getRequirements, listWallets: async () => [{ id: 'wallet', chainId: offer.chainId, address: 'synthetic', label: null, createdAt: 0, updatedAt: 0 }] });
+	const residenceClient = { getResidence: vi.fn(async () => ({ residence: { country: 'JP', subdivision: null, revision: 1, declaredAt: 1, kind: 'self_declared' }, isReady: true, requiredSubdivisions: [] })) };
+	const view = await mount(ServiceSubscriptions, { client, getRequirements, residenceClient, listWallets: async () => [{ id: 'wallet', chainId: offer.chainId, address: 'synthetic', label: null, createdAt: 0, updatedAt: 0 }] });
 	try {
 		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
 		for (const select of view.element.querySelectorAll('div[tabindex="0"]')) {
@@ -131,10 +132,18 @@ test('consent is required, original consent is retained on retry, and reload fai
 		expect(client.createOrder.mock.calls).toHaveLength(2);
 		expect(client.createOrder.mock.calls[0]).toEqual(client.createOrder.mock.calls[1]);
 		expect(client.createOrder.mock.calls[0][0]).toMatchObject({ residencyConsent: { statementId: 'original', agreed: true } });
-		client.listCatalog.mockRejectedValueOnce(new Error('Catalog unavailable'));
+		getRequirements.mockRejectedValueOnce(new Error('Region unavailable'));
+		residenceClient.getResidence.mockResolvedValueOnce({ residence: null, isReady: false, requiredSubdivisions: [] } as never);
 		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
 		expect(view.element.textContent).not.toContain('Original statement');
-		submit(form); await flush(); expect(client.createOrder.mock.calls).toHaveLength(2);
+		expect(form.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
+		submit(form); await flush(); expect(client.createOrder.mock.calls).toHaveLength(3);
+		expect(client.createOrder.mock.calls[2]).toEqual(client.createOrder.mock.calls[0]);
+		expect(residenceClient.getResidence).toHaveBeenCalledTimes(4);
+		client.listCatalog.mockResolvedValueOnce([{ ...item, offer: { ...offer, amountBaseUnits: '12' } }]);
+		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
+		expect(form.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
+		submit(form); await flush(); expect(client.createOrder.mock.calls).toHaveLength(3);
 	} finally { view.dispose(); }
 });
 

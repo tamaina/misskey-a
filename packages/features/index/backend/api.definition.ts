@@ -35,12 +35,13 @@ import { testContract } from '../../api/backend/endpoints/test.contract.js';
 import { driveManagementContract } from '../../drive/backend/api.definition.js';
 import { portabilityApiContract } from '../../portability/backend/api.definition.js';
 import { authContract } from '../../auth/backend/api.definition.js';
+import { residenceContract } from '../../billing/backend/residence.contract.js';
 import { moderationContract } from '../../moderation/backend/api.definition.js';
 import { rolesContract } from '../../roles/backend/api.definition.js';
 import { clearBrowserCacheContract, clearBrowserCacheGetContract } from '../../api/backend/endpoints/clear-browser-cache.contract.js';
 
 export const pilotContract: {
-	serviceBilling: typeof serviceBillingContract & typeof refundContract & typeof catalogAdminContract & typeof billingPolicyContract & typeof billingReportsContract;
+	serviceBilling: typeof serviceBillingContract & typeof refundContract & typeof catalogAdminContract & typeof billingPolicyContract & typeof billingReportsContract & typeof residenceContract;
 	wallets: typeof walletContract;
 	clearBrowserCache: typeof clearBrowserCacheContract;
 	clearBrowserCacheGet: typeof clearBrowserCacheGetContract;
@@ -74,7 +75,7 @@ export const pilotContract: {
 	collections: typeof collectionsContract;
 	drive: typeof drivePilotContract;
 } = {
-	serviceBilling: { ...serviceBillingContract, ...refundContract, ...catalogAdminContract, ...billingPolicyContract, ...billingReportsContract },
+	serviceBilling: { ...residenceContract, ...serviceBillingContract, ...refundContract, ...catalogAdminContract, ...billingPolicyContract, ...billingReportsContract },
 	wallets: walletContract,
 	clearBrowserCache: clearBrowserCacheContract,
 	clearBrowserCacheGet: clearBrowserCacheGetContract,

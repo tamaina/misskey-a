@@ -103,3 +103,20 @@ Source provenance and behavioral differences are recorded in Issue #8 and the
 PR body. Synthetic tests do not prove live payment interoperability. After building,
 run `node --test --test-concurrency=1 packages/features/billing/test/service-store.test.mjs`
 with the disposable loopback database variable described above.
+
+## Registered account residence
+
+Before registering a wallet or creating a new service order, the account must
+explicitly register its country at `/settings/residence`. In the purchase-policy
+admin page, operators select the countries that also require an administrative
+subdivision. These settings apply independently of purchase IP-region rules and
+whether tax policy is enabled. ISO identifiers are vendored as portable schema
+constants; no runtime dataset dependency is installed.
+
+Declarations are private, self-declared account data, not verified tax location.
+New orders retain their original declaration. Existing request-key recovery,
+transaction hash submission, reconciliation, history and refund obligations stay
+available. The residence migration refuses rollback while declarations or order
+evidence remain. The sibling P2P pilot needs a separate integration of this guard
+at prepare and immediately before browser-wallet sending; this slice does not
+claim that connection.

@@ -8,6 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkInfo>{{ $locale.sfc.scope }}</MkInfo>
 	<MkInfo v-if="error" warn role="alert">{{ $locale.sfc.failed }}</MkInfo>
 	<MkButton :disabled="busy" @click="load">{{ $locale.sfc.load }}</MkButton>
+	<MkInfo v-if="props.residenceClient && !residenceReady" warn><MkA to="/settings/residence">{{ $locale.sfc.residenceRequired }}</MkA></MkInfo>
 	<form class="_gaps_m" @submit.prevent="create">
 		<MkSelect v-model="offerId" :items="offerItems" :disabled="busy"><template #label>{{ $locale.sfc.offer }}</template></MkSelect>
 		<MkInfo v-for="item in catalogItems.filter(row => row.offer.id === offerId)" :key="item.offer.id">
@@ -29,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkInfo v-if="requirements?.isRequired && requirements.statement">{{ requirements.statement.statement }}</MkInfo>
 		<MkSwitch v-if="requirements?.isRequired" v-model="agreed" :disabled="busy">{{ $locale.sfc.agree }}</MkSwitch>
 		<MkSelect v-model="walletId" :items="walletItems" :disabled="busy"><template #label>{{ $locale.sfc.wallet }}</template></MkSelect>
-		<MkButton type="submit" :disabled="busy || !offerId || !walletId || (props.requireQuotePreview && !selectedQuote) || requirementsError || (props.getRequirements && !requirements) || (requirements?.isRequired && !agreed)">{{ $locale.sfc.create }}</MkButton>
+		<MkButton type="submit" :disabled="busy || !offerId || !walletId || (!matchingRetry && (!residenceReady || (props.requireQuotePreview && !selectedQuote) || requirementsError || (props.getRequirements && !requirements) || (requirements?.isRequired && !agreed)))">{{ $locale.sfc.create }}</MkButton>
 	</form>
 	<div v-for="order in orders" :key="order.id" class="_gaps_s">
 		<MkInfo>{{ order.offer.name }} / {{ order.status }} / {{ order.id }}<br>{{ $locale.sfc.token }}: {{ order.offer.chainId }} / {{ order.offer.contractAddress }}<br>{{ $locale.sfc.recipient }}: {{ order.offer.recipientAddress }}<br>{{ $locale.sfc.amount }}: {{ formatServiceAmount((order.amountBaseUnits ?? order.offer.amountBaseUnits), order.offer.decimals) }} {{ order.offer.tokenSymbol }} / {{ (order.amountBaseUnits ?? order.offer.amountBaseUnits) }} ({{ order.offer.decimals }} {{ $locale.sfc.decimals }})<br>{{ $locale.sfc.deadline }}: {{ new Date(order.expiresAt).toISOString() }}<br v-if="order.endsAt">{{ order.startsAt ? new Date(order.startsAt).toISOString() : '' }} — {{ order.endsAt ? new Date(order.endsAt).toISOString() : '' }}</MkInfo>
@@ -52,15 +53,18 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import { requireResidenceForStart } from './residence-client.js';
 import PurchaseReceipt from './PurchaseReceipt.vue';
 import { formatServiceAmount } from './service-client.js';
+import type { ResidenceClient } from './residence-client.js';
 import type { BillingReportsClient } from './reports-client.js';
 import type { ServiceBillingClient } from './service-client.js';
 import type { ResidencyConsent } from '../backend/policy.schema.js';
 import type { BillingPolicyClient } from './policy-client.js';
 import type { ServiceAccountClient } from './service-client.js';
 import type { LinkedWallet, ServiceOffer, ServiceOrder, CatalogOffer } from '../backend/api.definition.js';
-const props = defineProps<{ client: ServiceAccountClient; listWallets: () => Promise<LinkedWallet[]>; getRequirements?: BillingPolicyClient['getPurchaseRequirements']; getReceipt?: ServiceBillingClient['getReceipt']; getHistory?: BillingReportsClient['listBillingOrderHistory']; requireQuotePreview?: boolean }>();
+const props = defineProps<{ client: ServiceAccountClient; listWallets: () => Promise<LinkedWallet[]>; getRequirements?: BillingPolicyClient['getPurchaseRequirements']; getReceipt?: ServiceBillingClient['getReceipt']; getHistory?: BillingReportsClient['listBillingOrderHistory']; requireQuotePreview?: boolean; residenceClient?: Pick<ResidenceClient, 'getResidence'> }>();
+const residenceReady = ref(!props.residenceClient);
 const offers = ref<ServiceOffer[]>([]), wallets = ref<LinkedWallet[]>([]), orders = ref<ServiceOrder[]>([]);
 const nextHistoryCursor = ref<string | null>(null);
 const receipt = ref<Awaited<ReturnType<ServiceBillingClient['getReceipt']>> | null>(null);
@@ -73,7 +77,8 @@ const walletItems = computed(() => wallets.value.map(wallet => ({ value: wallet.
 const selectedOffer = computed(() => offers.value.find(offer => offer.id === offerId.value));
 const selectedQuote = computed(() => preparedQuote.value && selectedOffer.value && JSON.stringify(preparedQuote.value.offer) === JSON.stringify(selectedOffer.value) ? preparedQuote.value.result : null);
 const busy = ref(false), error = ref(false);
-let retry: { offerId: string; walletId: string; requestKey: string; quotedOffer: ServiceOffer; quotedQuote?: Awaited<ReturnType<ServiceAccountClient['quoteOrder']>>; residencyConsent?: ResidencyConsent } | undefined;
+const retry = ref<{ offerId: string; walletId: string; requestKey: string; quotedOffer: ServiceOffer; quotedQuote?: Awaited<ReturnType<ServiceAccountClient['quoteOrder']>>; residencyConsent?: ResidencyConsent }>();
+const matchingRetry = computed(() => !!retry.value && retry.value.offerId === offerId.value && retry.value.walletId === walletId.value && JSON.stringify(retry.value.quotedOffer) === JSON.stringify(selectedOffer.value));
 
 async function run(action: () => Promise<void>) {
 	if (busy.value) return;
@@ -87,19 +92,21 @@ async function refreshHistory(cursor?: string) { if (props.getHistory) { const p
 
 async function nextHistory() { await run(async () => { if (nextHistoryCursor.value) await refreshHistory(nextHistoryCursor.value); }); }
 
-async function load() { await run(async () => { requirements.value = null; agreed.value = false; catalogItems.value = await props.client.listCatalog({}); offers.value = catalogItems.value.map(item => item.offer); wallets.value = await props.listWallets(); await refreshHistory(); if (props.getRequirements) { requirements.value = null; agreed.value = false; try { requirements.value = await props.getRequirements({}); requirementsError.value = false; agreed.value = false; } catch { requirementsError.value = true; } } }); }
+async function load() { await run(async () => { requirements.value = null; agreed.value = false; catalogItems.value = await props.client.listCatalog({}); offers.value = catalogItems.value.map(item => item.offer); wallets.value = await props.listWallets(); await refreshHistory(); if (props.residenceClient) { residenceReady.value = false; residenceReady.value = (await props.residenceClient.getResidence({})).isReady; } if (props.getRequirements) { requirements.value = null; agreed.value = false; try { requirements.value = await props.getRequirements({}); requirementsError.value = false; agreed.value = false; } catch { requirementsError.value = true; } } }); }
 
-async function prepareQuote() { await run(async () => { const offer = selectedOffer.value; if (!offer) throw new Error('Offer unavailable'); if (retry && retry.offerId === offerId.value && retry.walletId === walletId.value && JSON.stringify(retry.quotedOffer) === JSON.stringify(offer) && retry.quotedQuote) preparedQuote.value = { offer: retry.quotedOffer, result: retry.quotedQuote }; else { preparedQuote.value = null; preparedQuote.value = { offer: { ...offer }, result: await props.client.quoteOrder({ offerId: offer.id }) }; } }); }
+async function prepareQuote() { await run(async () => { const offer = selectedOffer.value; if (!offer) throw new Error('Offer unavailable'); if (retry.value && retry.value.offerId === offerId.value && retry.value.walletId === walletId.value && JSON.stringify(retry.value.quotedOffer) === JSON.stringify(offer) && retry.value.quotedQuote) preparedQuote.value = { offer: retry.value.quotedOffer, result: retry.value.quotedQuote }; else { preparedQuote.value = null; preparedQuote.value = { offer: { ...offer }, result: await props.client.quoteOrder({ offerId: offer.id }) }; } }); }
 
 async function create() {
 	await run(async () => {
 		const quotedOffer = offers.value.find(offer => offer.id === offerId.value);
 		if (!quotedOffer) throw new Error('Offer unavailable');
-		if (props.requireQuotePreview && !selectedQuote.value) throw new Error('Review quote before creating order');
-		if (requirementsError.value || (props.getRequirements && !requirements.value) || (requirements.value?.isRequired && !agreed.value)) throw new Error('Residency consent required');
-		if (!retry || retry.offerId !== offerId.value || retry.walletId !== walletId.value || JSON.stringify(retry.quotedOffer) !== JSON.stringify(quotedOffer)) { const quotedQuote = props.requireQuotePreview ? selectedQuote.value! : await props.client.quoteOrder({ offerId: quotedOffer.id }); retry = { offerId: offerId.value, walletId: walletId.value, requestKey: crypto.randomUUID(), quotedOffer, quotedQuote, ...(requirements.value?.isRequired && requirements.value.statement ? { residencyConsent: { statementId: requirements.value.statement.id, agreed: true } as const } : {}) }; }
-		try { await props.client.createOrder(retry); } catch (cause) { if (cause !== null && typeof cause === 'object' && 'code' in cause && cause.code === 'BILLING_CONFLICT') { retry = undefined; preparedQuote.value = null; } throw cause; }
-		retry = undefined; preparedQuote.value = null; await refreshHistory();
+		if (!matchingRetry.value && props.residenceClient) { residenceReady.value = false; await requireResidenceForStart(props.residenceClient); residenceReady.value = true; }
+		if (!matchingRetry.value && props.requireQuotePreview && !selectedQuote.value) throw new Error('Review quote before creating order');
+		if (!matchingRetry.value && (requirementsError.value || (props.getRequirements && !requirements.value) || (requirements.value?.isRequired && !agreed.value))) throw new Error('Residency consent required');
+		if (!matchingRetry.value) { const quotedQuote = props.requireQuotePreview ? selectedQuote.value! : await props.client.quoteOrder({ offerId: quotedOffer.id }); retry.value = { offerId: offerId.value, walletId: walletId.value, requestKey: crypto.randomUUID(), quotedOffer, quotedQuote, ...(requirements.value?.isRequired && requirements.value.statement ? { residencyConsent: { statementId: requirements.value.statement.id, agreed: true } as const } : {}) }; }
+		if (!retry.value) throw new Error('Order preparation unavailable');
+		try { await props.client.createOrder(retry.value); } catch (cause) { if (cause !== null && typeof cause === 'object' && 'code' in cause && cause.code === 'BILLING_CONFLICT') { retry.value = undefined; preparedQuote.value = null; } throw cause; }
+		retry.value = undefined; preparedQuote.value = null; await refreshHistory();
 	});
 }
 
@@ -111,5 +118,6 @@ async function check(order: ServiceOrder) {
 
 </script>
 <locale lang="json" locale="ja-JP">
-{"durationUnits":{"days":"日","months":"ヶ月","years":"年"},"previewQuote":"日割りと利用期間の見積を確認","base":"通常価格","discount":"残り期間の日割り割引","payable":"今回の支払額","period":"利用期間","prorated":"残り期間を元の価格で按分","afterTail":"現在の上位プランの期限後に開始（または同プラン更新）","quoteDeadline":"見積の有効期限","nextHistory":"支払い履歴の次のページ","receipt":"領収書を表示","requirementsFailed":"新規購入の地域条件を確認できませんでした。履歴は引き続き閲覧できます。","agree":"表示された居住地声明に同意して購入します。","reference":"基準価格（元の販売期間条件を満たす価格）","previous":"前の価格","current":"現在価格","next":"次の価格","scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、管理者が紐付けた通常ロールは確認済み期間内だけ有効です。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"読み込む","offer":"サービス","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","cancel":"送信前の注文を取り消す","deadline":"ハッシュ提出期限"}
+{
+	"residenceRequired": "新しい支払いの前に居住地を設定してください。履歴や送信済み取引は引き続き確認できます。","durationUnits":{"days":"日","months":"ヶ月","years":"年"},"previewQuote":"日割りと利用期間の見積を確認","base":"通常価格","discount":"残り期間の日割り割引","payable":"今回の支払額","period":"利用期間","prorated":"残り期間を元の価格で按分","afterTail":"現在の上位プランの期限後に開始（または同プラン更新）","quoteDeadline":"見積の有効期限","nextHistory":"支払い履歴の次のページ","receipt":"領収書を表示","requirementsFailed":"新規購入の地域条件を確認できませんでした。履歴は引き続き閲覧できます。","agree":"表示された居住地声明に同意して購入します。","reference":"基準価格（元の販売期間条件を満たす価格）","previous":"前の価格","current":"現在価格","next":"次の価格","scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、管理者が紐付けた通常ロールは確認済み期間内だけ有効です。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"読み込む","offer":"サービス","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","cancel":"送信前の注文を取り消す","deadline":"ハッシュ提出期限"}
 </locale>

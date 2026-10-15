@@ -18,6 +18,7 @@ import { BillingWalletRegistration1791760200000 } from '../../../../backend/migr
 import { BillingFundedTerms1792010000000 } from '../../../../backend/migration/1792010000000-BillingFundedTerms.js';
 import { BillingWalletChainSettings1791763800000 } from '../../../../backend/migration/1791763800000-BillingWalletChainSettings.js';
 import { BillingCatalogAdministration1792020000000 } from '../../../../backend/migration/1792020000000-BillingCatalogAdministration.js';
+import { AccountDeclaredResidence1792100000000 } from '../../../../backend/migration/1792100000000-AccountDeclaredResidence.js';
 import { BillingOrderReports1792023000000 } from '../../../../backend/migration/1792023000000-BillingOrderReports.js';
 import { BillingNotifications1792022000000 } from '../../../../backend/migration/1792022000000-BillingNotifications.js';
 import { BillingTaxResidency1792021000000 } from '../../../../backend/migration/1792021000000-BillingTaxResidency.js';
@@ -75,6 +76,9 @@ test.skipIf(!url)('native PostgreSQL refund API, claims, all-group atomic expiry
 		await new BillingTaxResidency1792021000000().up(qr);
 		await new BillingNotifications1792022000000().up(qr);
 		await new BillingOrderReports1792023000000().up(qr);
+		await qr.query('CREATE TABLE user_profile ("userId" varchar(32) PRIMARY KEY)');
+		await new AccountDeclaredResidence1792100000000().up(qr);
+		await qr.query('INSERT INTO user_profile ("userId", "billingResidence") SELECT id, $1::jsonb FROM "user"', [JSON.stringify({ country: 'JP', subdivision: 'JP-13', revision: 1, declaredAt: now, kind: 'self_declared' })]);
 		await qr.query('CREATE TABLE moderation_log (id varchar(32) PRIMARY KEY, "userId" varchar(32) NOT NULL, type varchar(128) NOT NULL, info jsonb NOT NULL)');
 		await purchase.saveOffer(offer, 'admin');
 		const first = await buy('first', 'wallet-a', 1); now += day; const second = await buy('second', 'wallet-b', 2);

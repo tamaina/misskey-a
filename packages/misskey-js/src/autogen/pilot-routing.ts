@@ -3,6 +3,112 @@ import type { AnyContractRouter } from '@orpc/contract';
 
 export default {
 	"serviceBilling": {
+		"getResidence": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requestName": "account/residence/get",
+					"requireCredential": true,
+					"kind": "read:account"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/residence/get"
+				}
+			}
+		},
+		"setResidence": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requestName": "account/residence/set",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/account/residence/set"
+				}
+			}
+		},
 		"getReceipt": {
 			"~orpc": {
 				"errorMap": {
@@ -35,6 +141,12 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
@@ -93,6 +205,12 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
 					},
@@ -149,6 +267,12 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
@@ -211,6 +335,12 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
 					},
@@ -267,6 +397,12 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
@@ -325,6 +461,12 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
@@ -388,6 +530,12 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
 					},
@@ -444,6 +592,12 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
@@ -506,6 +660,12 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
+					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
 					},
@@ -566,6 +726,12 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					},
 					"BILLING_NOT_FOUND": {
 						"status": 404
@@ -2340,6 +2506,12 @@ export default {
 					},
 					"PAYMENT_TRANSACTION_INVALID": {
 						"status": 400
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					}
 				},
 				"meta": {
@@ -2407,6 +2579,12 @@ export default {
 					},
 					"PAYMENT_TRANSACTION_INVALID": {
 						"status": 400
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					}
 				},
 				"meta": {
@@ -2478,6 +2656,12 @@ export default {
 					},
 					"PAYMENT_TRANSACTION_INVALID": {
 						"status": 400
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					}
 				},
 				"meta": {
@@ -2548,6 +2732,12 @@ export default {
 					},
 					"PAYMENT_TRANSACTION_INVALID": {
 						"status": 400
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					}
 				},
 				"meta": {
@@ -2614,6 +2804,12 @@ export default {
 					},
 					"PAYMENT_TRANSACTION_INVALID": {
 						"status": 400
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					}
 				},
 				"meta": {
@@ -2680,6 +2876,12 @@ export default {
 					},
 					"PAYMENT_TRANSACTION_INVALID": {
 						"status": 400
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					}
 				},
 				"meta": {
@@ -2750,6 +2952,12 @@ export default {
 					},
 					"PAYMENT_TRANSACTION_INVALID": {
 						"status": 400
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					}
 				},
 				"meta": {
@@ -2820,6 +3028,12 @@ export default {
 					},
 					"PAYMENT_TRANSACTION_INVALID": {
 						"status": 400
+					},
+					"RESIDENCE_REQUIRED": {
+						"status": 400
+					},
+					"RESIDENCE_CONFLICT": {
+						"status": 409
 					}
 				},
 				"meta": {

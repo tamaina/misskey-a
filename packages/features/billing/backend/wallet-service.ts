@@ -34,6 +34,7 @@ export interface WalletStore {
 }
 export type WalletAuthentication = { currentPassword?: string; twoFactorToken?: string; passkey?: v.InferOutput<typeof webAuthnAuthenticationResponseSchema> };
 export interface WalletDependencies {
+	requireResidence(userId: string): Promise<unknown>;
 	chainSettings?: import('./wallet-chain-store.js').WalletChainSettingsStore;
 	passkeyOptions?(userId: string): Promise<v.InferOutput<typeof webAuthnAuthenticationOptionsSchema>>;
 	store: WalletStore;
@@ -63,7 +64,7 @@ export function createWalletProof(native: Pick<HttpRequestService, 'send'>) {
 			try {
 				const client = createPublicClient({ transport: http(rpcUrl, { retryCount: 0, timeout: WALLET_RPC_TIMEOUT, fetchFn }) });
 				return await verifySiweMessage(client, { address: getAddress(challenge.address), domain: challenge.domain,
-																																							message: challenge.message, nonce: challenge.nonce, signature, time: new Date(now) });
+																																													message: challenge.message, nonce: challenge.nonce, signature, time: new Date(now) });
 			} catch { return false; } // Never propagate viem errors containing private RPC URLs.
 		},
 	};
@@ -81,6 +82,7 @@ export function createWalletService(deps: WalletDependencies) {
 	return {
 		async begin(userId: string, input: { chainId: number; address: string } & WalletAuthentication, credential?: string | null) {
 			requireSecureOrigin();
+			await deps.requireResidence(userId);
 			await deps.reauthenticate(userId, input, credential);
 			if (!await deps.rpcUrl(input.chainId)) throw walletError('WALLET_CHAIN_UNSUPPORTED');
 			if (!isAddress(input.address)) throw walletError('PAYMENT_TRANSACTION_INVALID');
@@ -108,6 +110,7 @@ export function createWalletService(deps: WalletDependencies) {
 		},
 		async verify(userId: string, input: { nonce: string; message: string; signature: string }) {
 			requireSecureOrigin();
+			await deps.requireResidence(userId);
 			const challenge = await deps.store.getChallenge(input.nonce, userId);
 			const now = deps.now();
 			if (!challenge || challenge.nonce !== input.nonce || challenge.userId !== userId || challenge.usedAt !== null || challenge.expiresAt <= now
@@ -128,6 +131,7 @@ export function createWalletService(deps: WalletDependencies) {
 				chainId: challenge.chainId, address: challenge.address, label: null,
 				createdAt: completedAt, updatedAt: completedAt,
 			};
+			await deps.requireResidence(userId);
 			const wallet = await deps.store.complete(challenge, record, completedAt);
 			if (!wallet) throw walletError('WALLET_CHALLENGE_NOT_FOUND');
 			if (wallet.userId !== userId || wallet.chainId !== challenge.chainId || wallet.address !== challenge.address) {

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import * as v from 'valibot';
+import { residenceRegionRequirements } from './residence.schema.js';
 const label = v.pipe(v.string(), v.maxLength(128));
 const text = v.pipe(v.string(), v.maxLength(4096));
 const country = v.pipe(v.string(), v.regex(/^[A-Z]{2}$/));
@@ -14,6 +15,7 @@ export type RegionSnapshot = v.InferOutput<typeof regionSnapshot>;
 const taxRate = v.pipe(v.string(), v.regex(/^(0|[1-9]\d*)(\.\d+)?$/), v.maxLength(64));
 export const receiptSeller = v.strictObject({ name: label, address: text, invoiceRegistrationNumber: label });
 export const billingPolicy = v.pipe(v.strictObject({
+	residenceRequiredSubdivisions: v.exactOptional(residenceRegionRequirements),
 	isEnabled: v.boolean(), trustedProxyCidrs: v.pipe(v.array(v.pipe(v.string(), v.maxLength(100))), v.maxLength(64)),
 	regionRules: v.strictObject({ mode: v.picklist(['allow', 'deny']), rules: v.pipe(v.array(regionRule), v.minLength(1), v.maxLength(100)) }),
 	taxName: label, taxRate,

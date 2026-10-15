@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { createRouterClient } from '@orpc/server';
-import { createServiceBillingStore, createCatalogAdminStore, createCatalogAdminRouter, createServiceBillingRouter, createBillingPolicyStore, createPurchaseNotifier, createBillingReportsStore, createBillingReportsRouter, activePaidRoleIds } from '../../../backend/built/features/billing/backend.js';
+import { createServiceBillingStore, createCatalogAdminStore, createCatalogAdminRouter, createServiceBillingRouter, createBillingPolicyStore, createPurchaseNotifier, createBillingReportsStore, createBillingReportsRouter, activePaidRoleIds, createResidenceStore } from '../../../backend/built/features/billing/backend.js';
 import { BillingServiceSubscriptions1791838800000 as Migration } from '../../../backend/migration/1791838800000-BillingServiceSubscriptions.js';
 import { BillingFundedTerms1792010000000 } from '../../../backend/migration/1792010000000-BillingFundedTerms.js';
 import { BillingWalletRegistration1791760200000 as WalletMigration } from '../../../backend/migration/1791760200000-BillingWalletRegistration.js';
@@ -18,6 +18,7 @@ import { BillingCatalogAdministration1792020000000 as CatalogMigration } from '.
 import { BillingTaxResidency1792021000000 as PolicyMigration } from '../../../backend/migration/1792021000000-BillingTaxResidency.js';
 import { BillingNotifications1792022000000 as NotificationMigration } from '../../../backend/migration/1792022000000-BillingNotifications.js';
 import { BillingOrderReports1792023000000 as ReportsMigration } from '../../../backend/migration/1792023000000-BillingOrderReports.js';
+import { AccountDeclaredResidence1792100000000 as ResidenceMigration } from '../../../backend/migration/1792100000000-AccountDeclaredResidence.js';
 const require = createRequire(new URL('../../../backend/package.json', import.meta.url));
 const { DataSource } = require('typeorm');
 const url = process.env.MISSKEY_BILLING_TEST_DATABASE_URL;
@@ -53,6 +54,10 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 		await new PolicyMigration().up(qr); await new PolicyMigration().down(qr); await new PolicyMigration().up(qr);
 		await new NotificationMigration().up(qr); await new NotificationMigration().down(qr); await new NotificationMigration().up(qr);
 		await new ReportsMigration().up(qr); await new ReportsMigration().down(qr); await new ReportsMigration().up(qr);
+		await qr.query('CREATE TABLE user_profile ("userId" varchar(32) PRIMARY KEY, email varchar(128), "emailVerified" boolean)');
+		await new ResidenceMigration().up(qr); await new ResidenceMigration().down(qr); await new ResidenceMigration().up(qr);
+		const residence = { country: 'JP', subdivision: 'JP-13', revision: 1, declaredAt: now, kind: 'self_declared' };
+		await qr.query('INSERT INTO user_profile ("userId", "billingResidence") SELECT id, $1::jsonb FROM "user"', [JSON.stringify(residence)]);
 		const pending = (await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_service_(offer|order)"/.test(row.query));
 		assert.deepEqual(pending, [], 'Migration and entity DDL agree');
 		await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES (\'alice-wallet\',\'alice\',123456,$1,NULL,$3,$3),(\'bob-wallet\',\'bob\',123456,$2,NULL,$3,$3)', [address(1), address(2), now]);
@@ -223,6 +228,7 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 				const zero = await store.createOrder('carol', free.id, 'bob-wallet', 'invalid-owner-free', free).catch(error => error);
 				assert.equal(zero.code, 'BILLING_UNAVAILABLE');
 				await qr.query('INSERT INTO "user" (id) VALUES ($1)', ['catalog-buyer']);
+				await qr.query('INSERT INTO user_profile ("userId", "billingResidence") VALUES ($1, $2::jsonb)', ['catalog-buyer', JSON.stringify(residence)]);
 				await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES ($1,$2,123456,$3,NULL,$4,$4)', ['catalog-wallet', 'catalog-buyer', address(5), now]);
 				const zeroQuote = await store.quoteOrder('catalog-buyer', free.id);
 				const zeroPaid = await store.createOrder('catalog-buyer', free.id, 'catalog-wallet', 'free-order', free, zeroQuote);
@@ -309,8 +315,7 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 			await policyStore.upsert({ revision: 2, policy: { ...policy, isEnabled: false } }, 'alice');
 		});
 		await t.test('purchase email reserves one attempt across concurrency and never resends unknown outcomes', async () => {
-			await qr.query('CREATE TABLE user_profile ("userId" varchar(32) PRIMARY KEY, email varchar(128), "emailVerified" boolean)');
-			await qr.query('INSERT INTO user_profile VALUES (\'bob\',\'synthetic@example.invalid\',true),(\'alice\',NULL,false),(\'catalog-buyer\',\'zero@example.invalid\',true)');
+			await qr.query('UPDATE user_profile SET email = CASE WHEN "userId"=\'bob\' THEN \'synthetic@example.invalid\' WHEN "userId"=\'catalog-buyer\' THEN \'zero@example.invalid\' ELSE NULL END, "emailVerified" = "userId" <> \'alice\'');
 			const paid = (await store.listOrders('bob')).find(row => row.offer.id === 'taxable');
 			let calls = 0;
 			const notify = createPurchaseNotifier(db, 'https://synthetic.example.invalid', async (to, subject, lines) => {
@@ -393,6 +398,40 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 				assert.deepEqual((await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_service_order"/.test(row.query)), []);
 				await policyStore.upsert({ revision: saved.revision + 1, policy: { ...saved.policy, isEnabled: false } }, 'alice');
 			} finally { now = originalTime; }
+		});
+		await t.test('registered residence gates only new purchases and freezes original self declaration', async () => {
+			const residences = createResidenceStore(db, () => now);
+			const existing = (await store.listOrders('alice'))[0];
+			await qr.query('UPDATE user_profile SET "billingResidence" = NULL WHERE "userId" = $1', ['alice']);
+			assert.equal((await residences.get('alice')).isReady, false);
+			await assert.rejects(store.createOrder('alice', offer.id, 'alice-wallet', 'residence-missing', offer), error => error.code === 'RESIDENCE_REQUIRED');
+			const replay = await store.createOrder('alice', existing.offer.id, existing.walletId, existing.requestKey, existing.offer, existing.quote ? { revision: existing.billingRevision, quote: existing.quote } : undefined, existing.receiptSnapshot ? { headers: {}, consent: { statementId: existing.receiptSnapshot.statement.id, agreed: true } } : undefined);
+			assert.equal(replay.id, existing.id); assert.deepEqual(replay.declaredResidence, existing.declaredResidence);
+			await store.listOrders('alice'); await store.submitTransaction('alice', existing.id);
+			const saved = await residences.save('alice', { revision: 0, residence: { country: 'US', subdivision: 'US-CA' } });
+			assert.equal(saved.kind, 'self_declared');
+			await assert.rejects(residences.save('alice', { revision: 0, residence: { country: 'JP', subdivision: null } }), error => error.code === 'RESIDENCE_CONFLICT');
+			const nextOffer = { ...offer, id: 'residence-offer', serviceKey: 'residence-service' }; await store.saveOffer(nextOffer, 'alice');
+			const next = await store.createOrder('alice', nextOffer.id, 'alice-wallet', 'residence-valid', nextOffer);
+			assert.deepEqual(next.declaredResidence, saved);
+			await residences.save('alice', { revision: saved.revision, residence: { country: 'JP', subdivision: 'JP-13' } });
+			assert.deepEqual((await store.listOrders('alice')).find(row => row.id === next.id).declaredResidence, saved);
+			const policyLock = db.createQueryRunner(); await policyLock.startTransaction();
+			await policyLock.query('SELECT pg_advisory_xact_lock(hashtextextended(\'billing-policy\', 0))');
+			const saving = residences.save('alice', { revision: saved.revision + 1, residence: { country: 'US', subdivision: null } });
+			// Observe the wait, then publish a stricter rule while holding the same lock.
+			let blocked = false;
+			try {
+				for (let attempt = 0; attempt < 100 && !blocked; attempt++) {
+					blocked = (await qr.query('SELECT 1 FROM pg_locks l JOIN pg_stat_activity a ON a.pid=l.pid WHERE a.application_name=\'misskey-billing-service-synthetic\' AND l.locktype=\'advisory\' AND NOT l.granted')).length > 0;
+					if (!blocked) await new Promise(resolve => setTimeout(resolve, 10));
+				}
+				assert.equal(blocked, true, 'residence save waits for current policy');
+				await policyLock.query('UPDATE billing_policy SET policy=jsonb_set(policy, \'{residenceRequiredSubdivisions}\', \'["US"]\'::jsonb) WHERE id=\'server\'');
+			} finally { await policyLock.commitTransaction(); await policyLock.release(); }
+			await assert.rejects(saving, error => error.code === 'RESIDENCE_REQUIRED');
+			assert.equal((await residences.get('alice')).residence.country, 'JP');
+			await assert.rejects(new ResidenceMigration().down(qr), /Retain/);
 		});
 		await t.test('paid evidence remains claimed after account deletion', async () => {
 			await qr.query('DELETE FROM "user" WHERE id = \'alice\'');

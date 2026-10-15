@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { requireDeclaredResidence } from './residence-store.js';
 import { MiBillingWallet } from './models/BillingWallet.js';
 import { MiBillingWalletChallenge } from './models/BillingWalletChallenge.js';
 import type { DataSource } from 'typeorm';
@@ -24,7 +25,9 @@ export function createPostgresWalletStore(db: DataSource, clock: () => number = 
 					const challenge = await tx.getRepository(MiBillingWalletChallenge).findOne({
 						where: { nonce: expected.nonce, userId: wallet.userId }, lock: { mode: 'pessimistic_write' },
 					});
-					// Read time after acquiring the lock: waiting cannot extend a proof's lifetime.
+					if (!challenge) return null;
+					await requireDeclaredResidence(tx, wallet.userId);
+					// Sample after all guards and locks: waiting cannot extend a proof's lifetime.
 					const completedAt = Math.max(now, clock());
 					if (expected.usedAt !== null || !challenge || challenge.usedAt !== null || challenge.expiresAt <= completedAt
 						|| challenge.userId !== expected.userId || challenge.chainId !== expected.chainId

@@ -5,13 +5,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <SearchMarker path="/settings/subscriptions" :label="$locale.sfc.title" :keywords="['billing', 'subscription', 'ERC20']" icon="ti ti-receipt">
-	<ServiceSubscriptions :client="client" :listWallets="listWallets" :getRequirements="nativeBillingPolicyClient.getPurchaseRequirements" :getReceipt="getReceipt" :getHistory="nativeBillingReportsClient.listBillingOrderHistory" requireQuotePreview/>
+	<ServiceSubscriptions :residenceClient="nativeResidenceClient" :client="client" :listWallets="listWallets" :getRequirements="nativeBillingPolicyClient.getPurchaseRequirements" :getReceipt="getReceipt" :getHistory="nativeBillingReportsClient.listBillingOrderHistory" requireQuotePreview/>
 	<RefundRequests :client="nativeRefundClient"/>
 </SearchMarker>
 </template>
 <script setup lang="ts">
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
+import { nativeResidenceClient } from '../../native-residence-client.js';
 import { nativeBillingReportsClient } from '../../reports-client.js';
 import { nativeBillingPolicyClient } from '../../policy-client.js';
 import RefundRequests from '../../RefundRequests.vue';

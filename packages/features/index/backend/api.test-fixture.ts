@@ -36,13 +36,14 @@ import { createNoteSearchRouter } from '@features/note-search/backend/api.implem
 import { createRelationshipsRouter } from '@features/relationships/backend/endpoints/relationships.js';
 import { createCollectionsRouter } from '@features/collections/backend/api.implementation.js';
 import { createDriveRouter } from '@features/drive/backend/api.implementation.js';
+import { createResidenceRouter } from '../../billing/backend/residence.implementation.js';
 import { createBillingReportsRouter } from '../../billing/backend/reports.implementation.js';
 import { createApiRouter, type ApiRouterFeatures } from './api.implementation.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 export function createApiTestFeatures(): ApiRouterFeatures {
 	return {
-		serviceBilling: { ...createBillingReportsRouter<MiLocalUser>(mockDeep<Parameters<typeof createBillingReportsRouter<MiLocalUser>>[0]>(), mockDeep<Parameters<typeof createBillingReportsRouter<MiLocalUser>>[1]>()), ...createBillingPolicyRouter<MiLocalUser>(mockDeep<Parameters<typeof createBillingPolicyRouter<MiLocalUser>>[0]>()), ...createCatalogAdminRouter<MiLocalUser>(mockDeep<Parameters<typeof createCatalogAdminRouter<MiLocalUser>>[0]>(), mockDeep<Parameters<typeof createCatalogAdminRouter<MiLocalUser>>[1]>(), async () => null), ...createServiceBillingRouter<MiLocalUser>(mockDeep<Parameters<typeof createServiceBillingRouter<MiLocalUser>>[0]>()), ...createRefundRouter<MiLocalUser>(mockDeep<Parameters<typeof createRefundRouter<MiLocalUser>>[0]>()) },
+		serviceBilling: { ...createResidenceRouter<MiLocalUser>(mockDeep<Parameters<typeof createResidenceRouter<MiLocalUser>>[0]>()), ...createBillingReportsRouter<MiLocalUser>(mockDeep<Parameters<typeof createBillingReportsRouter<MiLocalUser>>[0]>(), mockDeep<Parameters<typeof createBillingReportsRouter<MiLocalUser>>[1]>()), ...createBillingPolicyRouter<MiLocalUser>(mockDeep<Parameters<typeof createBillingPolicyRouter<MiLocalUser>>[0]>()), ...createCatalogAdminRouter<MiLocalUser>(mockDeep<Parameters<typeof createCatalogAdminRouter<MiLocalUser>>[0]>(), mockDeep<Parameters<typeof createCatalogAdminRouter<MiLocalUser>>[1]>(), async () => null), ...createServiceBillingRouter<MiLocalUser>(mockDeep<Parameters<typeof createServiceBillingRouter<MiLocalUser>>[0]>()), ...createRefundRouter<MiLocalUser>(mockDeep<Parameters<typeof createRefundRouter<MiLocalUser>>[0]>()) },
 		wallets: createWalletRouter<MiLocalUser>({ ...mockDeep<Parameters<typeof createWalletRouter<MiLocalUser>>[0]>(), origin: 'https://misskey.example.test' }),
 		roles: createRolesRouter<MiLocalUser>(mockDeep<Parameters<typeof createRolesRouter<MiLocalUser>>[0]>()),
 		moderation: createModerationRouter<MiLocalUser>(mockDeep<Parameters<typeof createModerationRouter<MiLocalUser>>[0]>()),

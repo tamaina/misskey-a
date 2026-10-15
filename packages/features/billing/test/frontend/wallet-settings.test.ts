@@ -8,12 +8,13 @@ import './setup.js';
 import { test, expect, vi } from 'vitest';
 import { createApp, nextTick } from 'vue';
 import WalletSettings from '../../frontend/WalletSettings.vue';
+import type { ResidenceClient } from '../../frontend/residence-client.js';
 import type { WalletClient } from '../../frontend/wallet-client.js';
 
 const wallet = { id: 'wallet1', address: '0x0000000000000000000000000000000000000001', chainId: 123456, label: null, createdAt: 1, updatedAt: 1 };
 const chain = { chainId: 123456, name: 'Synthetic chain', nativeCurrencyName: 'Test', nativeCurrencySymbol: 'TEST', nativeCurrencyDecimals: 18, blockExplorerUrl: null };
 
-async function fixture(confirm = true, authenticateWithPasskey?: () => Promise<NonNullable<Parameters<WalletClient['begin']>[0]['passkey']>>) {
+async function fixture(confirm = true, authenticateWithPasskey?: () => Promise<NonNullable<Parameters<WalletClient['begin']>[0]['passkey']>>, residenceClient?: Pick<ResidenceClient, 'getResidence'>) {
 	const client: WalletClient = { passkeyOptions: vi.fn(), list: vi.fn(async () => [wallet]), chains: vi.fn(async () => [chain]),
 																																begin: vi.fn(async () => ({ nonce: 'nonce0001', message: 'Synthetic ownership proof' })),
 																																verify: vi.fn(async () => wallet), unlink: vi.fn(async () => ({ ok: true as const })),
@@ -28,7 +29,7 @@ async function fixture(confirm = true, authenticateWithPasskey?: () => Promise<N
 	const on = vi.fn((event: string, callback: () => void) => { listeners.set(event, callback); });
 	const removeListener = vi.fn((event: string) => { listeners.delete(event); });
 	const confirmUnlink = vi.fn(async () => confirm);
-	const app = createApp(WalletSettings, { client, connectors: [{ id: 'synthetic', name: 'Synthetic wallet', provider: { request, on, removeListener } }], confirmUnlink, authenticateWithPasskey });
+	const app = createApp(WalletSettings, { client, residenceClient, connectors: [{ id: 'synthetic', name: 'Synthetic wallet', provider: { request, on, removeListener } }], confirmUnlink, authenticateWithPasskey });
 	const i18n = createInternationalization({ initialLocale: 'ja-JP' }); await i18n.ready; app.use(i18n);
 	const element = window.document.createElement('div'); window.document.body.append(element); app.mount(element);
 	return { client, request, confirmUnlink, listeners, removeListener, element, dispose: () => { app.unmount(); element.remove(); } };
@@ -82,7 +83,7 @@ test('account/chain/disconnect changes clear the page connection and dispose pro
 
 test('native passkey is requested after wallet selection, forwarded once and not retained', async () => {
 	const passkey = { id: 'synthetic-key', rawId: 'synthetic', type: 'public-key' as const, clientExtensionResults: {},
-		response: { clientDataJSON: 'synthetic', authenticatorData: 'synthetic', signature: 'synthetic' } };
+																			response: { clientDataJSON: 'synthetic', authenticatorData: 'synthetic', signature: 'synthetic' } };
 	const authenticate = vi.fn(async () => passkey);
 	const f = await fixture(true, authenticate);
 	try {
@@ -132,4 +133,15 @@ test('password/TOTP entry appears only after slow unlock and chain switch; cance
 		expect(f.client.begin).toHaveBeenCalledExactlyOnceWith({ chainId: chain.chainId, address: wallet.address, currentPassword: 'synthetic password', twoFactorToken: 'synthetic-window-9' });
 		expect(f.client.verify).toHaveBeenCalledOnce();
 	} finally { f.dispose(); vi.useRealTimers(); }
+});
+
+test('existing wallet holder without residence can list/unlink but cannot start wallet interaction', async () => {
+	const residenceClient = { getResidence: vi.fn(async () => ({ residence: null, requiredSubdivisions: [], isReady: false })) };
+	const f = await fixture(true, undefined, residenceClient);
+	try {
+		await flush(); expect(f.element.textContent).toContain(wallet.address); expect(f.element.textContent).toContain('居住地を設定');
+		expect(button(f.element, 'Synthetic wallet').disabled).toBe(true); button(f.element, 'Synthetic wallet').click(); await flush();
+		expect(f.request).not.toHaveBeenCalled(); expect(f.client.begin).not.toHaveBeenCalled();
+		button(f.element, '登録を解除').click(); await flush(); expect(f.client.unlink).toHaveBeenCalledWith({ walletId: wallet.id });
+	} finally { f.dispose(); }
 });

@@ -54,3 +54,7 @@ export { MiBillingNotification } from './models/BillingNotification.js';
 export { createBillingReportsStore } from './reports-store.js';
 export { createBillingReportsRouter } from './reports.implementation.js';
 export { billingReportsContract } from './reports.contract.js';
+export { createResidenceRouter } from './residence.implementation.js';
+export { createResidenceStore, requireDeclaredResidence, readyResidence } from './residence-store.js';
+export { residenceContract } from './residence.contract.js';
+export { declaredResidence, declaredResidenceInput } from './residence.schema.js';

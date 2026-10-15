@@ -66,10 +66,22 @@ type AbuseReportNotificationRecipient = ContractModel<'AbuseReportNotificationRe
 // Warning: (ae-forgotten-export) The symbol "ContractRequest" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type AccountWalletsLinkBeginRequest = ContractRequest<'account/wallets/link/begin'>;
+type AccountResidenceGetRequest = ContractRequest<'account/residence/get'>;
 
 // Warning: (ae-forgotten-export) The symbol "ContractResponse" needs to be exported by the entry point index.d.ts
 //
+// @public (undocumented)
+type AccountResidenceGetResponse = ContractResponse<'account/residence/get'>;
+
+// @public (undocumented)
+type AccountResidenceSetRequest = ContractRequest<'account/residence/set'>;
+
+// @public (undocumented)
+type AccountResidenceSetResponse = ContractResponse<'account/residence/set'>;
+
+// @public (undocumented)
+type AccountWalletsLinkBeginRequest = ContractRequest<'account/wallets/link/begin'>;
+
 // @public (undocumented)
 type AccountWalletsLinkBeginResponse = ContractResponse<'account/wallets/link/begin'>;
 
@@ -1968,6 +1980,10 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        AccountResidenceGetRequest,
+        AccountResidenceGetResponse,
+        AccountResidenceSetRequest,
+        AccountResidenceSetResponse,
         BillingOrdersReceiptRequest,
         BillingOrdersReceiptResponse,
         BillingCatalogListRequest,

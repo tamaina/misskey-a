@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <SearchMarker path="/settings/wallets" :label="$locale.sfc.title" :keywords="['wallet', 'SIWE']" icon="ti ti-wallet">
 	<MkA to="/settings/subscriptions">{{ $locale.sfc.billing }}</MkA>
-	<WalletSettings :client="client" :connectors="connectors" :confirmUnlink="confirmUnlink" :authenticateWithPasskey="authenticateWithPasskey"/>
+	<WalletSettings :residenceClient="nativeResidenceClient" :client="client" :connectors="connectors" :confirmUnlink="confirmUnlink" :authenticateWithPasskey="authenticateWithPasskey"/>
 </SearchMarker>
 </template>
 
@@ -17,6 +17,7 @@ import { startAuthentication } from '@simplewebauthn/browser';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import * as os from '@features/ui/frontend/os.js';
+import { nativeResidenceClient } from '../../native-residence-client.js';
 import WalletSettings from '../../WalletSettings.vue';
 import { discoverWallets } from '../../wallet-discovery.js';
 import type { WalletClient, WalletConnector } from '../../wallet-client.js';
