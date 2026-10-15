@@ -8,6 +8,7 @@ import { createRouterClient } from '@orpc/server';
 import { readyResidence, requireDeclaredResidence } from '../../backend/residence-store.js';
 import { declaredResidenceInput, residenceRegionRequirements } from '../../backend/residence.schema.js';
 import { createResidenceRouter } from '../../backend/residence.implementation.js';
+import type { ApiContext } from '../../../api/backend/transport/context.js';
 import type { EntityManager } from 'typeorm';
 import type { createResidenceStore } from '../../backend/residence-store.js';
 const residence = { country: 'JP' as const, subdivision: 'JP-13', revision: 1, declaredAt: 1000, kind: 'self_declared' as const };
@@ -29,7 +30,7 @@ test('shared guard rejects missing or newly incomplete residence without inferri
 });
 test('residence owner API rejects direct invalid codes/foreign user fields before save and fixes authenticated owner', async () => {
 	const store = { get: vi.fn(async () => ({ residence, requiredSubdivisions: [], isReady: true })), save: vi.fn(async () => residence), require: vi.fn(async () => residence) } satisfies ReturnType<typeof createResidenceStore>;
-	const context = { credential: 'synthetic', ip: '127.0.0.1', headers: {}, services: { authenticate: async () => [{ id: 'alice', isSuspended: false, movedToUri: null }, null] as const, limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } };
+	const context: ApiContext = { credential: 'synthetic', ip: '127.0.0.1', headers: {}, services: { authenticate: async () => [{ id: 'alice', isSuspended: false, movedToUri: null }, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } };
 	const client = createRouterClient(createResidenceRouter(store), { context });
 	for (const value of [{ revision: 0, residence: { country: '', subdivision: null } }, { revision: 0, residence: { country: 'ZZ', subdivision: null } }, { revision: 0, residence: { country: 'JP', subdivision: 'US-CA' } }, { revision: 0, residence: { country: 'JP', subdivision: null }, userId: 'bob' }]) await expect(client.setResidence(value as never)).rejects.toBeDefined();
 	expect(store.save).not.toHaveBeenCalled();
