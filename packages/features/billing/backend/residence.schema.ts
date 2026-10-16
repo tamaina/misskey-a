@@ -10,5 +10,7 @@ const residenceFields = { country: residenceCountry, subdivision: v.nullable(res
 const belongsToCountry = (value: { country: string; subdivision: string | null }) => value.subdivision === null || (residenceSubdivisions[value.country]?.includes(value.subdivision) ?? false);
 export const declaredResidenceInput = v.pipe(v.strictObject(residenceFields), v.check(value => belongsToCountry(value), 'Subdivision must belong to the selected country'));
 export const declaredResidence = v.pipe(v.strictObject({ ...residenceFields, revision: v.pipe(v.number(), v.integer(), v.minValue(1)), declaredAt: v.pipe(v.number(), v.integer(), v.minValue(0)), kind: v.literal('self_declared') }), v.check(value => belongsToCountry(value), 'Subdivision must belong to the selected country'));
+export const peerReceiptSettings = v.strictObject({ revision: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(2147483647)), acceptForeignPayments: v.boolean() });
+export type PeerReceiptSettings = v.InferOutput<typeof peerReceiptSettings>;
 export type DeclaredResidence = v.InferOutput<typeof declaredResidence>;
 export const residenceRegionRequirements = v.pipe(v.array(residenceCountry), v.maxLength(249), v.check(countries => new Set(countries).size === countries.length && countries.every(country => residenceSubdivisions[country]?.length), 'Configure unique countries with supported administrative subdivisions'));

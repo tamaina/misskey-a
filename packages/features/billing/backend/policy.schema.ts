@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import * as v from 'valibot';
-import { residenceRegionRequirements } from './residence.schema.js';
+import { residenceCountry, residenceRegionRequirements } from './residence.schema.js';
 const label = v.pipe(v.string(), v.maxLength(128));
 const text = v.pipe(v.string(), v.maxLength(4096));
 const country = v.pipe(v.string(), v.regex(/^[A-Z]{2}$/));
@@ -14,7 +14,14 @@ export const regionSnapshot = v.strictObject({ country: v.nullable(country), isE
 export type RegionSnapshot = v.InferOutput<typeof regionSnapshot>;
 const taxRate = v.pipe(v.string(), v.regex(/^(0|[1-9]\d*)(\.\d+)?$/), v.maxLength(64));
 export const receiptSeller = v.strictObject({ name: label, address: text, invoiceRegistrationNumber: label });
+export const countryEligibilityPolicy = v.pipe(v.strictObject({
+	operatorCountry: residenceCountry,
+	mode: v.picklist(['domestic', 'allow']),
+	allowedCountries: v.pipe(v.array(residenceCountry), v.maxLength(249), v.check(countries => new Set(countries).size === countries.length)),
+}), v.check(policy => policy.mode === 'domestic' ? policy.allowedCountries.length === 0 : policy.allowedCountries.length > 0));
+export type CountryEligibilityPolicy = v.InferOutput<typeof countryEligibilityPolicy>;
 export const billingPolicy = v.pipe(v.strictObject({
+	countryEligibility: v.exactOptional(countryEligibilityPolicy),
 	residenceRequiredSubdivisions: v.exactOptional(residenceRegionRequirements),
 	isEnabled: v.boolean(), trustedProxyCidrs: v.pipe(v.array(v.pipe(v.string(), v.maxLength(100))), v.maxLength(64)),
 	regionRules: v.strictObject({ mode: v.picklist(['allow', 'deny']), rules: v.pipe(v.array(regionRule), v.minLength(1), v.maxLength(100)) }),

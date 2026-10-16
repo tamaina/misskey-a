@@ -19,12 +19,13 @@ async function mount(component: Component, props: Record<string, unknown>) {
 async function flush() { for (let n = 0; n < 8; n++) { await Promise.resolve(); await nextTick(); } }
 
 test('native policy form preserves CAS revision, source global statement and integer rate', async () => {
-	const policy = { isEnabled: true, trustedProxyCidrs: ['127.0.0.1/32'], regionRules: { mode: 'allow', rules: [{ country: 'JP' }] }, taxName: 'Tax', taxRate: '0.100000000000000001', seller: { name: 'Synthetic seller', address: 'Address', invoiceRegistrationNumber: 'Registration' }, statementText: 'Synthetic statement' };
+	const policy = { countryEligibility: { operatorCountry: 'CA', mode: 'allow', allowedCountries: ['CA', 'US'] }, residenceRequiredSubdivisions: ['US'], isEnabled: true, trustedProxyCidrs: ['127.0.0.1/32'], regionRules: { mode: 'allow', rules: [{ country: 'JP' }] }, taxName: 'Tax', taxRate: '0.100000000000000001', seller: { name: 'Synthetic seller', address: 'Address', invoiceRegistrationNumber: 'Registration' }, statementText: 'Synthetic statement' };
 	const input = { revision: 5, policy };
 	const client = { getBillingPolicy: vi.fn(async () => input), upsertBillingPolicy: vi.fn(async (_input: unknown) => input) };
 	const view = await mount(BillingPurchasePolicy, { client });
 	try {
 		view.element.querySelector<HTMLButtonElement>('button')!.click(); await flush();
+		expect(view.element.textContent).toContain('JP / 日本'); expect(view.element.textContent).toContain('US / アメリカ合衆国');
 		view.element.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); await flush();
 		expect(client.upsertBillingPolicy).toHaveBeenCalledExactlyOnceWith(input);
 	} finally { view.dispose(); }

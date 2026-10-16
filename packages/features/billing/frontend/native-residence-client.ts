@@ -5,6 +5,8 @@
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import type { ResidenceClient } from './residence-client.js';
 export const nativeResidenceClient: ResidenceClient = {
+	getPeerReceiptSettings: input => misskeyApi('account/peer-receipt/get', input),
+	setPeerReceiptSettings: input => misskeyApi('account/peer-receipt/set', input),
 	getResidence: input => misskeyApi('account/residence/get', input),
 	setResidence: input => misskeyApi('account/residence/set', input),
 };

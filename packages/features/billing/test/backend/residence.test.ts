@@ -29,12 +29,15 @@ test('shared guard rejects missing or newly incomplete residence without inferri
 	stored = residence; await expect(requireDeclaredResidence(manager, 'alice')).resolves.toEqual(residence);
 });
 test('residence owner API rejects direct invalid codes/foreign user fields before save and fixes authenticated owner', async () => {
-	const store = { get: vi.fn(async () => ({ residence, requiredSubdivisions: [], isReady: true })), save: vi.fn(async () => residence), require: vi.fn(async () => residence) } satisfies ReturnType<typeof createResidenceStore>;
+	const store = { getPeerReceiptSettings: vi.fn(async () => ({ revision: 0, acceptForeignPayments: false })), setPeerReceiptSettings: vi.fn(async (_userId: string, input: { revision: number; acceptForeignPayments: boolean }) => input), get: vi.fn(async () => ({ residence, requiredSubdivisions: [], isReady: true })), save: vi.fn(async () => residence), require: vi.fn(async () => residence) } satisfies ReturnType<typeof createResidenceStore>;
 	const context: ApiContext = { credential: 'synthetic', ip: '127.0.0.1', headers: {}, services: { authenticate: async () => [{ id: 'alice', isSuspended: false, movedToUri: null }, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } };
 	const client = createRouterClient(createResidenceRouter(store), { context });
 	for (const value of [{ revision: 0, residence: { country: '', subdivision: null } }, { revision: 0, residence: { country: 'ZZ', subdivision: null } }, { revision: 0, residence: { country: 'JP', subdivision: 'US-CA' } }, { revision: 0, residence: { country: 'JP', subdivision: null }, userId: 'bob' }]) await expect(client.setResidence(value as never)).rejects.toBeDefined();
 	expect(store.save).not.toHaveBeenCalled();
 	await client.setResidence({ revision: 0, residence: { country: 'JP', subdivision: 'JP-13' } });
 	expect(store.save).toHaveBeenCalledExactlyOnceWith('alice', { revision: 0, residence: { country: 'JP', subdivision: 'JP-13' } });
+	await expect(client.setPeerReceiptSettings({ revision: 0, acceptForeignPayments: true, userId: 'bob' } as never)).rejects.toBeDefined();
+	await client.getPeerReceiptSettings({}); expect(store.getPeerReceiptSettings).toHaveBeenCalledExactlyOnceWith('alice');
+	await client.setPeerReceiptSettings({ revision: 0, acceptForeignPayments: true }); expect(store.setPeerReceiptSettings).toHaveBeenCalledExactlyOnceWith('alice', { revision: 0, acceptForeignPayments: true });
 	await client.getResidence({}); expect(store.get).toHaveBeenCalledExactlyOnceWith('alice');
 });

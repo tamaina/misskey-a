@@ -9,7 +9,7 @@ import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiPage } from '@features/pages/backend/models/Page.js';
 import { MiUserList } from '@features/relationships/backend/models/UserList.js';
 import { MiUser } from './User.js';
-import type { DeclaredResidence } from '../../../billing/backend/residence.schema.js';
+import type { DeclaredResidence, PeerReceiptSettings } from '../../../billing/backend/residence.schema.js';
 
 // TODO: このテーブルで管理している情報すべてレジストリで管理するようにしても良いかも
 //       ただ、「emailVerified が true なユーザーを find する」のようなクエリは書けなくなるからウーン
@@ -33,6 +33,10 @@ export class MiUserProfile {
 	/** Private self-declaration for new financial starts; not verified tax location. */
 	@Column('jsonb', { nullable: true })
 	public billingResidence: DeclaredResidence | null;
+
+	/** Private recipient preference. Missing rows remain opted out. */
+	@Column('jsonb', { nullable: true })
+	public billingPeerReceiptSettings: PeerReceiptSettings | null;
 
 	// Note: There's index named IDX_de22cd2b445eee31ae51cdbe99 for SUBSTR("birthday", 6, 5)
 	@Column('char', {

@@ -11,6 +11,8 @@ import type { ApiActor, ApiContext } from '../../api/backend/transport/context.j
 export function createResidenceRouter<Actor extends ApiActor>(store: ReturnType<typeof createResidenceStore>) {
 	const procedure = createApiProcedure<Actor>(), account = requirePrincipal<Actor>();
 	return implement(residenceContract).$context<ApiContext<Actor>>().router({
+		getPeerReceiptSettings: procedure(residenceContract.getPeerReceiptSettings).use(account).handler(({ context }) => store.getPeerReceiptSettings(context.principal.id)),
+		setPeerReceiptSettings: procedure(residenceContract.setPeerReceiptSettings).use(account).handler(({ input, context }) => store.setPeerReceiptSettings(context.principal.id, input)),
 		getResidence: procedure(residenceContract.getResidence).use(account).handler(({ context }) => store.get(context.principal.id)),
 		setResidence: procedure(residenceContract.setResidence).use(account).handler(({ input, context }) => store.save(context.principal.id, input)),
 	});

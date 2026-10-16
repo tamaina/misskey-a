@@ -6,6 +6,10 @@ type ContractResponse<Route extends keyof ContractEndpoints> = ContractEndpoints
 export type EmptyRequest = Record<string, unknown> | undefined;
 export type EmptyResponse = Record<string, unknown> | undefined;
 
+export type AccountPeerReceiptGetRequest = ContractRequest<'account/peer-receipt/get'>;
+export type AccountPeerReceiptGetResponse = ContractResponse<'account/peer-receipt/get'>;
+export type AccountPeerReceiptSetRequest = ContractRequest<'account/peer-receipt/set'>;
+export type AccountPeerReceiptSetResponse = ContractResponse<'account/peer-receipt/set'>;
 export type AccountResidenceGetRequest = ContractRequest<'account/residence/get'>;
 export type AccountResidenceGetResponse = ContractResponse<'account/residence/get'>;
 export type AccountResidenceSetRequest = ContractRequest<'account/residence/set'>;
