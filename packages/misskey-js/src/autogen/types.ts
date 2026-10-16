@@ -60616,7 +60616,7 @@ export interface operations {
                 content: {
                     'application/json': [
                         string,
-                        number,
+                        number
                     ][];
                 };
             };
@@ -60792,7 +60792,7 @@ export interface operations {
                 content: {
                     'application/json': [
                         string,
-                        number,
+                        number
                     ][];
                 };
             };
