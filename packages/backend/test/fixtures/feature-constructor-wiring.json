@@ -580,6 +580,28 @@
         {
           "port": "idService"
         }
+      ],
+      "FreshReauthenticationStore": [
+        {
+          "port": "redisClient"
+        }
+      ],
+      "FreshPasskeyReauthentication": [
+        {
+          "service": "FreshReauthenticationStore"
+        },
+        {
+          "service": "BrowserSessionService"
+        },
+        {
+          "port": "userProfilesRepository"
+        },
+        {
+          "port": "userSecurityKeysRepository"
+        },
+        {
+          "port": "config"
+        }
       ]
     },
     "userSearch": {

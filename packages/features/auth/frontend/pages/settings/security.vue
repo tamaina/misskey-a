@@ -15,10 +15,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label><SearchLabel>{{ $locale.sfc.password }}</SearchLabel></template>
 
 				<SearchMarker>
-					<MkButton primary @click="change()">
+					<MkButton primary :disabled="changingPassword" @click="change(false)">
 						<SearchLabel>{{ $locale.sfc.changePassword }}</SearchLabel>
 					</MkButton>
 				</SearchMarker>
+				<MkButton v-if="canUsePasskey" :disabled="changingPassword" @click="change(true)">{{ $locale.sfc.changePasswordWithPasskey }}</MkButton>
 			</FormSection>
 		</SearchMarker>
 
@@ -47,7 +48,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<SearchMarker :keywords="['regenerate', 'refresh', 'reset', 'token']">
 			<FormSection>
 				<FormSlot>
-					<MkButton danger @click="regenerateToken"><i class="ti ti-refresh"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>
+					<MkButton danger :disabled="changingPassword" @click="regenerateToken(false)"><i class="ti ti-refresh"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>
+					<MkButton v-if="canUsePasskey" danger :disabled="changingPassword" @click="regenerateToken(true)">{{ $locale.sfc.regenerateLoginTokenWithPasskey }}</MkButton>
 					<template #caption>{{ $locale.sfc.regenerateLoginTokenDescription }}</template>
 				</FormSlot>
 			</FormSection>
@@ -57,14 +59,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw } from 'vue';
+import { computed, markRaw, onActivated, onDeactivated, onUnmounted, ref } from 'vue';
+import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import X2fa from '@features/auth/frontend/pages/settings/2fa.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import * as os from '@features/ui/frontend/os.js';
-import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
@@ -74,28 +76,47 @@ const paginator = markRaw(new Paginator('i/signin-history', {
 	limit: 5,
 }));
 
-async function change() {
+const canUsePasskey = computed(() => {
+	const account = ensureSignin();
+	return account.token?.startsWith('bs_') && (account.securityKeysList?.length ?? 0) > 0 && browserSupportsWebAuthn();
+});
+const changingPassword = ref(false);
+let disposed = false;
+let ceremonyGeneration = 0;
+const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; };
+onDeactivated(invalidateCeremony);
+onUnmounted(invalidateCeremony);
+onActivated(() => { disposed = false; });
+
+async function change(usePasskey: boolean) {
+	if (changingPassword.value || disposed) return;
+	changingPassword.value = true;
+	const generation = ++ceremonyGeneration;
+	try { await collectAndChangePassword(usePasskey, () => !disposed && generation === ceremonyGeneration); } finally { changingPassword.value = false; }
+}
+
+async function collectAndChangePassword(usePasskey: boolean, isCurrent: () => boolean) {
 	const { canceled, result: currentPassword } = await os.inputText({
 		title: $locale.value.sfc.password,
 		type: 'password',
 		autocomplete: 'current-password',
 		minLength: 1,
 	});
-	if (canceled || currentPassword == null || currentPassword === '') return;
+	if (!isCurrent() || canceled || currentPassword == null || currentPassword === '') return;
 
 	const { canceled: canceled2, result: newPassword } = await os.inputText({
 		title: $locale.value.sfc.newPassword,
 		type: 'password',
 		autocomplete: 'new-password',
 	});
-	if (canceled2 || newPassword == null) return;
+	if (!isCurrent() || canceled2 || newPassword == null) return;
 
 	const { canceled: canceled3, result: newPassword2 } = await os.inputText({
 		title: $locale.value.sfc.newPasswordRetype,
 		type: 'password',
 		autocomplete: 'new-password',
 	});
-	if (canceled3 || newPassword2 == null) return;
+	if (!isCurrent() || canceled3 || newPassword2 == null) return;
 
 	if (newPassword !== newPassword2) {
 		os.alert({
@@ -105,28 +126,67 @@ async function change() {
 		return;
 	}
 
+	if (usePasskey) {
+		if (!canUsePasskey.value) return;
+		const started = await os.apiWithDialog('i/change-password/passkey/start', { currentPassword });
+		if (!isCurrent()) return;
+		let credential;
+		try {
+			credential = await os.promiseDialog(startAuthentication({ optionsJSON: started.options }), null, () => {});
+		} catch (error) {
+			const failure = error instanceof Error && error.cause instanceof Error ? error.cause : error;
+			if (!(failure instanceof Error) || !['NotAllowedError', 'AbortError'].includes(failure.name)) {
+				await os.alert({ type: 'error', text: error instanceof Error ? error.message : String(error) });
+			}
+			return;
+		}
+		if (!isCurrent() || !credential) return;
+		await os.apiWithDialog('i/change-password/passkey/complete', { ticket: started.ticket, credential, newPassword });
+		return;
+	}
+
 	let token: string | null = null;
 	if (ensureSignin().twoFactorEnabled) {
 		const auth = await os.authenticateDialog({ currentPassword });
-		if (auth.canceled) return;
+		if (!isCurrent() || auth.canceled) return;
 		token = auth.result.token;
 	}
 
-	os.apiWithDialog('i/change-password', {
+	await os.apiWithDialog('i/change-password', {
 		currentPassword,
 		token,
 		newPassword,
 	});
 }
 
-async function regenerateToken() {
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
-
-	misskeyApi('i/regenerate-token', {
-		password: auth.result.password,
-		token: auth.result.token,
-	});
+async function regenerateToken(usePasskey: boolean) {
+	if (changingPassword.value || disposed) return;
+	changingPassword.value = true;
+	const generation = ++ceremonyGeneration;
+	const isCurrent = () => !disposed && generation === ceremonyGeneration;
+	try {
+		if (usePasskey) {
+			if (!canUsePasskey.value) return;
+			const password = await os.inputText({ title: $locale.value.sfc.password, type: 'password', autocomplete: 'current-password', minLength: 1 });
+			if (!isCurrent() || password.canceled || !password.result) return;
+			const started = await os.apiWithDialog('i/regenerate-token/passkey/start', { currentPassword: password.result });
+			if (!isCurrent()) return;
+			let credential;
+			try {
+				credential = await os.promiseDialog(startAuthentication({ optionsJSON: started.options }), null, () => {});
+			} catch (error) {
+				const failure = error instanceof Error && error.cause instanceof Error ? error.cause : error;
+				if (isCurrent() && (!(failure instanceof Error) || !['NotAllowedError', 'AbortError'].includes(failure.name))) await os.alert({ type: 'error', text: error instanceof Error ? error.message : String(error) });
+				return;
+			}
+			if (!isCurrent() || !credential) return;
+			await os.apiWithDialog('i/regenerate-token/passkey/complete', { ticket: started.ticket, credential });
+			return;
+		}
+		const auth = await os.authenticateDialog();
+		if (!isCurrent() || auth.canceled) return;
+		await os.apiWithDialog('i/regenerate-token', { password: auth.result.password, token: auth.result.token });
+	} finally { changingPassword.value = false; }
 }
 
 const headerActions = computed(() => []);
@@ -350,7 +410,9 @@ definePage(() => ({
 	"securityBanner": "パスワード、ログイン方法、認証アプリ、パスキーなどアカウントのセキュリティに関する設定を行えます。",
 	"password": "パスワード",
 	"changePassword": "パスワードを変更",
+	"changePasswordWithPasskey": "パスキーでパスワードを変更",
 	"signinHistory": "ログイン履歴",
+	"regenerateLoginTokenWithPasskey": "パスキーでログイントークンを再生成",
 	"regenerateLoginToken": "ログイントークンを再生成",
 	"regenerateLoginTokenDescription": "ログインに使用される内部トークンを再生成します。通常この操作を行う必要はありません。再生成すると、全てのデバイスでログアウトされます。"
 }

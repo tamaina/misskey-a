@@ -133,6 +133,13 @@ export class MiUserProfile {
 	})
 	public twoFactorEnabled: boolean;
 
+	// Server-only groundwork. No activation writer is exposed until all callers
+	// enforce independent MFA and fresh, session/purpose-bound reauthentication.
+	@Column('boolean', {
+		default: false,
+	})
+	public passkeyMfaEnabled: boolean;
+
 	@Column('boolean', {
 		default: false,
 	})

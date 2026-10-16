@@ -42,6 +42,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<XTotp
 			v-else-if="page === 'totp'"
 			key="totp"
+			:allowTotp="totpFactorAvailable"
+			:allowRecovery="recoveryAvailable"
 
 			@totpSubmitted="onTotpSubmitted"
 		/>
@@ -54,6 +56,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:credentialRequest="credentialRequest!"
 			:isPerformingPasswordlessLogin="doingPasskeyFromInputPage"
 			:canUseTotp="totpAvailable"
+			:recoveryOnly="!totpFactorAvailable && recoveryAvailable"
 
 			@done="onPasskeyDone"
 			@useTotp="onUseTotp"
@@ -67,12 +70,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, shallowRef, useTemplateRef } from 'vue';
+import { nextTick, onActivated, onBeforeUnmount, onDeactivated, ref, shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
-import type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';
-import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
-import type { PwResponse } from '@features/auth/frontend/components/MkSignin.password.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { showSuspendedDialog } from '@features/moderation/frontend/utility/show-suspended-dialog.js';
 import * as os from '@features/ui/frontend/os.js';
@@ -83,6 +83,9 @@ import XTotp from '@features/auth/frontend/components/MkSignin.totp.vue';
 import XPasskey from '@features/auth/frontend/components/MkSignin.passkey.vue';
 import XPasskeyAlternative from '@features/auth/frontend/components/MkSignin.passkey-alternative.vue';
 import { login } from '@features/auth/frontend/accounts.js';
+import type { PwResponse } from '@features/auth/frontend/components/MkSignin.password.vue';
+import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
+import type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';
 
 const emit = defineEmits<{
 	(ev: 'login', v: Misskey.entities.SigninFlowResponse & { finished: true }): void;
@@ -102,6 +105,9 @@ const props = withDefaults(defineProps<{
 
 const page = ref<'input' | 'password' | 'totp' | 'passkey'>('input');
 const waiting = ref(false);
+let active = true;
+let generation = 0;
+const owns = (run: number) => active && run === generation;
 
 const passwordPageEl = useTemplateRef('passwordPageEl');
 const needCaptcha = ref(false);
@@ -115,38 +121,50 @@ const passkeyContext = ref('');
 const doingPasskeyFromInputPage = ref(false);
 const passkeyAvailable = ref(false);
 const totpAvailable = ref(true);
+const totpFactorAvailable = ref(true);
+const recoveryAvailable = ref(true);
 
 function onPasskeyLogin(): void {
+	if (!active || waiting.value) return;
+	const run = ++generation;
 	if (browserSupportsWebAuthn()) {
 		doingPasskeyFromInputPage.value = true;
 		waiting.value = true;
 		misskeyApi('signin-with-passkey', {})
 			.then((res) => {
+				if (!owns(run)) return;
 				passkeyContext.value = res.context ?? '';
 				credentialRequest.value = res.option;
 
 				page.value = 'passkey';
 				waiting.value = false;
 			})
-			.catch(onSigninApiError);
+			.catch(err => { if (owns(run)) onSigninApiError(err); });
 	}
 }
 
 function onPasskeyDone(credential: AuthenticationResponseJSON): void {
+	if (!active) return;
+	const run = ++generation;
 	waiting.value = true;
 
 	if (doingPasskeyFromInputPage.value) {
 		misskeyApi('signin-with-passkey', {
 			credential: credential,
 			context: passkeyContext.value,
-		}).then((res) => {
+		}).then(async (res) => {
+			if (!owns(run)) return;
+			if (res.passwordFlowRequired) {
+				await requirePasswordFlow();
+				return;
+			}
 			if (res.signinResponse == null) {
 				onSigninApiError();
 				return;
 			}
 			emit('login', res.signinResponse);
 			onLoginSucceeded(res.signinResponse);
-		}).catch(onSigninApiError);
+		}).catch(err => { if (owns(run)) onSigninApiError(err); });
 	} else if (userInfo.value != null) {
 		tryLogin({
 			username: userInfo.value.username,
@@ -171,11 +189,15 @@ async function onUsePasskey(): Promise<void> {
 //#endregion
 
 async function onUsernameSubmitted(username: string) {
+	if (!active) return;
+	const run = ++generation;
 	waiting.value = true;
 
-	userInfo.value = await misskeyApi('users/show', {
+	const user = await misskeyApi('users/show', {
 		username,
 	}).catch(() => null);
+	if (!owns(run)) return;
+	userInfo.value = user;
 
 	await tryLogin({
 		username,
@@ -228,6 +250,7 @@ async function onTotpSubmitted(token: string) {
 }
 
 async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, preferPasskey = false): Promise<Misskey.entities.SigninFlowResponse> {
+	const run = ++generation;
 	const _req = {
 		username: req.username ?? userInfo.value?.username,
 		...req,
@@ -242,6 +265,7 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 	}
 
 	return await misskeyApi('signin-flow', _req).then(async (res) => {
+		if (!owns(run)) return res;
 		if (res.finished) {
 			emit('login', res);
 			await onLoginSucceeded(res);
@@ -258,7 +282,9 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 					break;
 				}
 				case 'totp': {
-					totpAvailable.value = true;
+					totpFactorAvailable.value = res.availableFactors === undefined || res.availableFactors.includes('totp');
+					recoveryAvailable.value = res.availableFactors === undefined || res.availableFactors.includes('recovery');
+					totpAvailable.value = totpFactorAvailable.value || recoveryAvailable.value;
 					passkeyAvailable.value = false;
 					credentialRequest.value = null;
 					page.value = 'totp';
@@ -267,10 +293,12 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 				case 'passkey': {
 					// Older servers send this step only when TOTP is enabled.
 					const useTotp = res.availableFactors === undefined || res.availableFactors.includes('totp');
-					totpAvailable.value = useTotp;
+					totpFactorAvailable.value = useTotp;
+					recoveryAvailable.value = res.availableFactors === undefined || res.availableFactors.includes('recovery');
+					totpAvailable.value = useTotp || recoveryAvailable.value;
 					passkeyAvailable.value = browserSupportsWebAuthn() && (res.availableFactors === undefined || res.availableFactors.includes('passkey'));
 					credentialRequest.value = passkeyAvailable.value && (preferPasskey || !useTotp) ? res.authRequest : null;
-					if (!useTotp && !passkeyAvailable.value) {
+					if (!totpAvailable.value && !passkeyAvailable.value) {
 						page.value = 'input';
 						password.value = '';
 						await os.alert({ type: 'error', title: $locale.value.sfc.loginFailed, text: $locale.value.sfc.passkeyVerificationFailed });
@@ -293,7 +321,7 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 		}
 		return res;
 	}).catch((err) => {
-		onSigninApiError(err);
+		if (owns(run)) onSigninApiError(err);
 		return Promise.reject(err);
 	});
 }
@@ -397,11 +425,32 @@ function onSigninApiError(err?: any): void {
 	});
 }
 
-onBeforeUnmount(() => {
+function clearSignin() {
+	generation++;
 	password.value = '';
 	needCaptcha.value = false;
 	userInfo.value = null;
-});
+	credentialRequest.value = null;
+	passkeyContext.value = '';
+	doingPasskeyFromInputPage.value = false;
+	passkeyAvailable.value = false;
+	totpAvailable.value = true;
+	totpFactorAvailable.value = true;
+	recoveryAvailable.value = true;
+	waiting.value = false;
+	page.value = 'input';
+}
+
+async function requirePasswordFlow() {
+	if (!active) return;
+	clearSignin();
+	await os.alert({ type: 'info', text: $locale.value.sfc.passwordFlowRequired });
+}
+
+defineExpose({ requirePasswordFlow });
+onActivated(() => { active = true; });
+onDeactivated(() => { active = false; clearSignin(); });
+onBeforeUnmount(() => { active = false; clearSignin(); });
 </script>
 
 <style lang="scss" module>
@@ -581,6 +630,7 @@ onBeforeUnmount(() => {
 
 <locale locale="ja-JP" lang="json">
 {
+	"passwordFlowRequired": "このアカウントはパスワードと追加の本人確認が必要です。ユーザー名を入力してログインしてください。",
 	"noSuchUser": "ユーザーが見つかりません",
 	"signinFailed": "ログインできませんでした。ユーザー名とパスワードを確認してください。",
 	"loginFailed": "ログインに失敗しました",

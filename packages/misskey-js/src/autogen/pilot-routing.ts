@@ -9929,6 +9929,118 @@ export default {
 				}
 			}
 		},
+		"i/change-password/passkey/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "fresh-password-change"
+					},
+					"requestName": "i/change-password/passkey/start"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/change-password/passkey/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/change-password/passkey/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "fresh-password-change"
+					},
+					"requestName": "i/change-password/passkey/complete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/change-password/passkey/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
 		"i/regenerate-token": {
 			"~orpc": {
 				"errorMap": {
@@ -9972,6 +10084,118 @@ export default {
 					"method": "POST",
 					"path": "/i/regenerate-token",
 					"tags": []
+				}
+			}
+		},
+		"i/regenerate-token/passkey/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "fresh-token-regeneration"
+					},
+					"requestName": "i/regenerate-token/passkey/start"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/regenerate-token/passkey/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/regenerate-token/passkey/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "fresh-token-regeneration"
+					},
+					"requestName": "i/regenerate-token/passkey/complete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/regenerate-token/passkey/complete",
+					"tags": [
+						"account"
+					]
 				}
 			}
 		},
@@ -10269,6 +10493,118 @@ export default {
 					"method": "POST",
 					"path": "/i/update-email",
 					"tags": []
+				}
+			}
+		},
+		"i/update-email/passkey/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "fresh-email-change"
+					},
+					"requestName": "i/update-email/passkey/start"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/update-email/passkey/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/update-email/passkey/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 3,
+						"key": "i/update-email"
+					},
+					"requestName": "i/update-email/passkey/complete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/update-email/passkey/complete",
+					"tags": [
+						"account"
+					]
 				}
 			}
 		},

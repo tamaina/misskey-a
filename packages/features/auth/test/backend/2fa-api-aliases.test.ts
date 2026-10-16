@@ -112,6 +112,39 @@ function signinBranches(operation: unknown): unknown[] {
 	return success.anyOf;
 }
 
+// Issue #180 changes only these two response boundaries. Restore them before
+// applying the unchanged availability and historical alias oracles.
+const signinPolicyOperationHashes = {
+	'/signin-flow': '1cfb7d68266d3cc3a3be88acb287eac09d5a3a1a3febc3c6ee50313c764da040',
+	'/signin-with-passkey': '57ce9cdbbf224ee25817ea295d31b185d24fe58f92a0a75de021aa5aaff2127e',
+};
+const recoveryFactorsShape = { type: 'array', items: { enum: ['totp', 'passkey', 'recovery'], type: 'string' }, minItems: 1, maxItems: 3 };
+
+function restorePreSigninPolicyOperation(path: string, operation: unknown): unknown {
+	if (path !== '/signin-flow' && path !== '/signin-with-passkey') return operation;
+	expect(schemaHash(operation)).toBe(signinPolicyOperationHashes[path]);
+	const restored: unknown = structuredClone(operation);
+	if (path === '/signin-flow') {
+		const branches = signinBranches(restored);
+		for (const index of [2, 3]) {
+			const properties = object(object(branches[index]).properties);
+			expect(properties.availableFactors).toEqual(recoveryFactorsShape);
+			properties.availableFactors = structuredClone(availableFactorsShape);
+		}
+		expect(schemaHash(restored)).toBe(availableSigninOperationHash);
+	} else {
+		const output = signinOutput(restored);
+		expect(Object.keys(output).sort()).toEqual(['$schema', 'anyOf']);
+		expect(output.$schema).toBe('https://json-schema.org/draft/2020-12/schema');
+		if (!Array.isArray(output.anyOf)) throw new Error('Invalid login policy union');
+		expect(output.anyOf).toHaveLength(4);
+		expect(output.anyOf[3]).toEqual({ type: 'object', properties: { passwordFlowRequired: { const: true } }, required: ['passwordFlowRequired'], additionalProperties: false });
+		output.anyOf.pop();
+		expect(schemaHash(restored)).toBe(baseline.operationHashes[path]);
+	}
+	return restored;
+}
+
 function restorePreAvailabilitySigninOperation(operation: unknown): unknown {
 	// This full new-operation hash also guards request/error/security metadata,
 	// WebAuthn constraints, and all fields outside the narrowly reversed response.
@@ -143,7 +176,7 @@ test('actual portable generator preserves every legacy operation and public sche
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
-		const operation = spec.paths?.[path];
+		const operation = restorePreSigninPolicyOperation(path, spec.paths?.[path]);
 		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreAnnouncementOperationBaseline(path, operation)), path).toBe(hash);
 	}
 	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(spec.components?.schemas?.[name]), name).toBe(hash);
@@ -164,7 +197,7 @@ test('actual portable generator preserves every legacy operation and public sche
 
 test('availability inverse rejects tampering at every allowed boundary and outside the response', async () => {
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
-	const original = spec.paths?.['/signin-flow'];
+	const original = restorePreSigninPolicyOperation('/signin-flow', spec.paths?.['/signin-flow']);
 	const originalHash = schemaHash(original);
 	expect(schemaHash(restorePreAvailabilitySigninOperation(original))).toBe(baseline.operationHashes['/signin-flow']);
 	expect(schemaHash(original)).toBe(originalHash);
@@ -188,6 +221,41 @@ test('availability inverse rejects tampering at every allowed boundary and outsi
 		const changed: unknown = structuredClone(original);
 		change(changed);
 		expect(() => restorePreAvailabilitySigninOperation(changed)).toThrow();
+	}
+});
+
+test('login policy inverse is exact, immutable and rejects added outcomes or changed factor boundaries', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	for (const path of ['/signin-flow', '/signin-with-passkey'] as const) {
+		const original = spec.paths?.[path]; const originalHash = schemaHash(original);
+		const restored = restorePreSigninPolicyOperation(path, original);
+		expect(schemaHash(original)).toBe(originalHash);
+		expect(schemaHash(restored)).toBe(path === '/signin-flow' ? availableSigninOperationHash : baseline.operationHashes[path]);
+		const changes: Array<(operation: unknown) => void> = [
+			operation => { object(object(operation).post).operationId = 'wrong'; },
+			operation => { object(object(operation).post).security = []; },
+			operation => { object(object(operation).post).requestBody = {}; },
+			operation => { object(object(object(operation).post).responses)['403'] = {}; },
+		];
+		if (path === '/signin-flow') {
+			for (const index of [2, 3]) {
+				changes.push(operation => { object(object(object(signinBranches(operation)[index]).properties).availableFactors).maxItems = 4; });
+				changes.push(operation => { object(object(object(signinBranches(operation)[index]).properties).availableFactors).minItems = 0; });
+				changes.push(operation => { object(object(object(signinBranches(operation)[index]).properties).availableFactors).items = { type: 'string', enum: ['totp', 'passkey'] }; });
+				changes.push(operation => { object(signinBranches(operation)[index]).required = ['finished', 'next', 'availableFactors']; });
+			}
+		} else {
+			const fallback = (operation: unknown) => { const branches = signinOutput(operation).anyOf; if (!Array.isArray(branches)) throw new Error('Invalid union'); return object(branches[3]); };
+			changes.push(operation => { fallback(operation).additionalProperties = true; });
+			changes.push(operation => { fallback(operation).required = []; });
+			changes.push(operation => { object(fallback(operation).properties).passwordFlowRequired = { type: 'boolean' }; });
+			changes.push(operation => { object(fallback(operation).properties).signinResponse = { type: 'string' }; });
+			changes.push(operation => { const branches = signinOutput(operation).anyOf; if (!Array.isArray(branches)) throw new Error('Invalid union'); branches.push({}); });
+		}
+		for (const change of changes) {
+			const changed: unknown = structuredClone(original); change(changed);
+			expect(() => restorePreSigninPolicyOperation(path, changed)).toThrow();
+		}
 	}
 });
 

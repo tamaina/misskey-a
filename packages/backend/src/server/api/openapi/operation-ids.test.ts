@@ -50,7 +50,13 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/i/sessions']?.post?.operationId).toBe('post___i___sessions');
 	expect(spec.paths?.['/i/sessions/revoke']?.post?.operationId).toBe('post___i___sessions___revoke');
 	expect(spec.paths?.['/i/signout']?.post?.operationId).toBe('post___i___signout');
-	expect(identifiers).toHaveLength(477);
+	expect(spec.paths?.['/i/change-password/passkey/start']?.post?.operationId).toBe('post___i___change-password___passkey___start');
+	expect(spec.paths?.['/i/change-password/passkey/complete']?.post?.operationId).toBe('post___i___change-password___passkey___complete');
+	expect(spec.paths?.['/i/regenerate-token/passkey/start']?.post?.operationId).toBe('post___i___regenerate-token___passkey___start');
+	expect(spec.paths?.['/i/regenerate-token/passkey/complete']?.post?.operationId).toBe('post___i___regenerate-token___passkey___complete');
+	expect(spec.paths?.['/i/update-email/passkey/start']?.post?.operationId).toBe('post___i___update-email___passkey___start');
+	expect(spec.paths?.['/i/update-email/passkey/complete']?.post?.operationId).toBe('post___i___update-email___passkey___complete');
+	expect(identifiers).toHaveLength(483);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

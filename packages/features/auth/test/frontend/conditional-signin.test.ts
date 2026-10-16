@@ -4,19 +4,20 @@
  */
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { createApp, defineComponent, h, nextTick, ref } from 'vue';
-import ConditionalSignin from '../../frontend/components/MkSignin.conditional.vue';
+import { createApp, defineComponent, h, KeepAlive, nextTick, ref } from 'vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { login } from '@features/auth/frontend/accounts.js';
 import { browserSupportsWebAuthnAutofill } from '@simplewebauthn/browser';
+import ConditionalSignin from '../../frontend/components/MkSignin.conditional.vue';
 
-const state = vi.hoisted(() => ({ manual: vi.fn(), props: {} as Record<string, unknown> }));
+const state = vi.hoisted(() => ({ manual: vi.fn(), props: {} as Record<string, unknown>, passwordFlow: vi.fn() }));
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
 vi.mock('@features/auth/frontend/accounts.js', () => ({ login: vi.fn() }));
 vi.mock('@simplewebauthn/browser', async original => ({ ...await original<typeof import('@simplewebauthn/browser')>(), browserSupportsWebAuthnAutofill: vi.fn() }));
 vi.mock('@features/auth/frontend/components/MkSignin.vue', () => ({ default: defineComponent({
 	props: ['autoSet', 'message', 'openOnRemote', 'initialUsername'], emits: ['login'],
-	setup(props, { emit }) {
+	setup(props, { emit, expose }) {
+		expose({ requirePasswordFlow: state.passwordFlow });
 		state.props = props;
 		return () => h('div', [
 			h('form', { onSubmit: (event: Event) => { event.preventDefault(); state.manual('username'); } }, [
@@ -168,4 +169,30 @@ describe('opt-in conditional signin surface', () => {
 		element.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 		expect(state.manual).toHaveBeenCalledWith('username');
 	});
+});
+
+test('conditional independent policy returns explicitly to password flow without login or autoSet', async () => {
+	vi.mocked(misskeyApi).mockReset().mockResolvedValueOnce({ context: 'synthetic-context', option } as never).mockResolvedValueOnce({ passwordFlowRequired: true } as never);
+	mount({ enabled: true, autoSet: true }); await settle(); chooseCredential(); await settle();
+	expect(state.passwordFlow).toHaveBeenCalledOnce(); expect(emitted).not.toHaveBeenCalled(); expect(login).not.toHaveBeenCalled();
+	expect(element.firstElementChild!.hasAttribute('inert')).toBe(false);
+});
+
+test('a late conditional fallback after unmount cannot reset a new manual form', async () => {
+	let finish!: (value: never) => void;
+	vi.mocked(misskeyApi).mockReset().mockResolvedValueOnce({ context: 'synthetic-context', option } as never).mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+	mount({ enabled: true }); await settle(); chooseCredential(); await settle(); app!.unmount(); app = undefined;
+	finish({ passwordFlowRequired: true } as never); await settle(); expect(state.passwordFlow).not.toHaveBeenCalled(); expect(emitted).not.toHaveBeenCalled(); expect(login).not.toHaveBeenCalled();
+});
+
+test('cached conditional form ignores a late fallback from its previous activation', async () => {
+	let finish!: (value: never) => void;
+	vi.mocked(misskeyApi).mockReset().mockResolvedValueOnce({ context: 'synthetic-context', option } as never)
+		.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }))
+		.mockResolvedValue({ context: 'new-context', option } as never);
+	const visible = ref(true);
+	app = createApp(defineComponent({ setup: () => () => h(KeepAlive, () => visible.value ? h(ConditionalSignin, { enabled: true, autoSet: true, onLogin: emitted }) : null) }));
+	app.component('MkLoading', defineComponent({ render: () => h('span', 'Verifying') })); app.mount(element);
+	await settle(); chooseCredential(); await settle(); visible.value = false; await settle(); visible.value = true; await settle();
+	finish({ passwordFlowRequired: true } as never); await settle(); expect(state.passwordFlow).not.toHaveBeenCalled(); expect(emitted).not.toHaveBeenCalled(); expect(login).not.toHaveBeenCalled();
 });

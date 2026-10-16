@@ -15,6 +15,9 @@ import { DI } from '@/di-symbols.js';
 import type { MiUser, MiUserProfile } from '@features/persistence/backend/repositories/models.js';
 import { authSecurityServices, authServices } from '@features/auth/backend/services.js';
 import { discoveryServices, userSearchServices } from '@features/discovery/backend/services.js';
+import { FreshPasskeyReauthentication } from '@features/auth/backend/fresh-passkey-reauthentication.js';
+import { FreshReauthenticationStore } from '@features/auth/backend/fresh-reauthentication-store.js';
+import { BrowserSessionService } from '@features/auth/backend/services/BrowserSessionService.js';
 import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { UserSearchService } from '@features/discovery/backend/services/UserSearchService.js';
@@ -83,6 +86,14 @@ describe('auth and search declaration boundaries', () => {
 		const directAuth = new UserAuthService(inputs.redisClient, inputs.usersRepository, inputs.userProfilesRepository);
 		const directWebAuthn = new WebAuthnService(inputs.config, inputs.meta, inputs.redisClient, inputs.userSecurityKeysRepository);
 		for (const service of [first.UserAuthService, first.WebAuthnService, second.UserAuthService, second.WebAuthnService, directAuth, directWebAuthn]) expect(Reflect.get(service, 'redisClient')).toBe(inputs.redisClient);
+		expect(Reflect.get(first.FreshReauthenticationStore, 'redis')).toBe(inputs.redisClient);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'store')).toBe(first.FreshReauthenticationStore);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'sessions')).toBe(first.BrowserSessionService);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'profiles')).toBe(inputs.userProfilesRepository);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'keys')).toBe(inputs.userSecurityKeysRepository);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'config')).toBe(inputs.config);
+		expect(first.FreshReauthenticationStore).not.toBe(second.FreshReauthenticationStore);
+		expect(first.FreshPasskeyReauthentication).not.toBe(second.FreshPasskeyReauthentication);
 		expect(first.UserAuthService).not.toBe(second.UserAuthService);
 		expect(first.WebAuthnService).not.toBe(second.WebAuthnService);
 		expect(first.WebAuthnService.getRelyingParty()).toEqual(directWebAuthn.getRelyingParty());
@@ -106,7 +117,7 @@ describe('auth and search declaration boundaries', () => {
 		try {
 			await module.init();
 			const resolver = module.get(ModuleRef);
-			for (const ctor of [UserAuthService, WebAuthnService, UserSearchService]) {
+			for (const ctor of [UserAuthService, WebAuthnService, BrowserSessionService, FreshReauthenticationStore, FreshPasskeyReauthentication, UserSearchService]) {
 				const service = module.get<object>(ctor);
 				expect(service).toBeInstanceOf(ctor);
 				const alias = ctor === UserAuthService ? 'UserAuthService' : ctor.name;

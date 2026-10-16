@@ -295,7 +295,13 @@ import type {
 	IAuthorizedAppsRequest,
 	IAuthorizedAppsResponse,
 	IChangePasswordRequest,
+	IChangePasswordPasskeyStartRequest,
+	IChangePasswordPasskeyStartResponse,
+	IChangePasswordPasskeyCompleteRequest,
 	IRegenerateTokenRequest,
+	IRegenerateTokenPasskeyStartRequest,
+	IRegenerateTokenPasskeyStartResponse,
+	IRegenerateTokenPasskeyCompleteRequest,
 	IRevokeTokenRequest,
 	ISigninHistoryRequest,
 	ISigninHistoryResponse,
@@ -305,6 +311,9 @@ import type {
 	ISignoutRequest,
 	IUpdateEmailRequest,
 	IUpdateEmailResponse,
+	IUpdateEmailPasskeyStartRequest,
+	IUpdateEmailPasskeyStartResponse,
+	IUpdateEmailPasskeyCompleteRequest,
 	InviteCreateRequest,
 	InviteCreateResponse,
 	InviteDeleteRequest,
@@ -934,13 +943,19 @@ export type Endpoints = {
 	'i/apps': { req: IAppsRequest; res: IAppsResponse };
 	'i/authorized-apps': { req: IAuthorizedAppsRequest; res: IAuthorizedAppsResponse };
 	'i/change-password': { req: IChangePasswordRequest; res: EmptyResponse };
+	'i/change-password/passkey/start': { req: IChangePasswordPasskeyStartRequest; res: IChangePasswordPasskeyStartResponse };
+	'i/change-password/passkey/complete': { req: IChangePasswordPasskeyCompleteRequest; res: EmptyResponse };
 	'i/regenerate-token': { req: IRegenerateTokenRequest; res: EmptyResponse };
+	'i/regenerate-token/passkey/start': { req: IRegenerateTokenPasskeyStartRequest; res: IRegenerateTokenPasskeyStartResponse };
+	'i/regenerate-token/passkey/complete': { req: IRegenerateTokenPasskeyCompleteRequest; res: EmptyResponse };
 	'i/revoke-token': { req: IRevokeTokenRequest; res: EmptyResponse };
 	'i/signin-history': { req: ISigninHistoryRequest; res: ISigninHistoryResponse };
 	'i/sessions': { req: ISessionsRequest; res: ISessionsResponse };
 	'i/sessions/revoke': { req: ISessionsRevokeRequest; res: EmptyResponse };
 	'i/signout': { req: ISignoutRequest; res: EmptyResponse };
 	'i/update-email': { req: IUpdateEmailRequest; res: IUpdateEmailResponse };
+	'i/update-email/passkey/start': { req: IUpdateEmailPasskeyStartRequest; res: IUpdateEmailPasskeyStartResponse };
+	'i/update-email/passkey/complete': { req: IUpdateEmailPasskeyCompleteRequest; res: EmptyResponse };
 	'invite/create': { req: InviteCreateRequest; res: InviteCreateResponse };
 	'invite/delete': { req: InviteDeleteRequest; res: EmptyResponse };
 	'invite/limit': { req: InviteLimitRequest; res: InviteLimitResponse };

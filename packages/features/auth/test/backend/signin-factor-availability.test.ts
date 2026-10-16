@@ -10,16 +10,17 @@ import { mockDeep } from 'vitest-mock-extended';
 import * as v from 'valibot';
 import { createSigninFlowProcedure, type SigninFlowDependencies } from '../../backend/endpoints/signinFlow.js';
 import { authSessionsContract } from '../../backend/api.definition.js';
+import type { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
 import type { AuthSessionContext } from '../../backend/session.effects.js';
 
 const option = { challenge: 'c3ludGhldGlj', rpId: 'synthetic.example', userVerification: 'required' as const };
 
-function harness(totp = true, keys = true, passwordless = false) {
+function harness(totp = true, keys = true, passwordless = false, independent = false) {
 	const deps = mockDeep<SigninFlowDependencies>();
 	deps.config.enableIpRateLimit = false;
-	deps.usersRepository.findOneBy.mockResolvedValue(mockDeep<NonNullable<Awaited<ReturnType<typeof deps.usersRepository.findOneBy>>>>({ id: 'synthetic', isSuspended: false, isDeleted: false }));
-	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<Awaited<ReturnType<typeof deps.userProfilesRepository.findOneByOrFail>>>({ userId: 'synthetic', twoFactorEnabled: totp, usePasswordLessLogin: passwordless, password: bcrypt.hashSync('synthetic-password', 4) }));
-	deps.userSecurityKeysRepository.countBy.mockResolvedValue(keys ? 1 : 0);
+	deps.usersRepository.findOneBy.mockResolvedValue(mockDeep<NonNullable<Awaited<ReturnType<typeof deps.usersRepository.findOneBy>>>>({ id: 'synthetic', host: null, isSuspended: false, isDeleted: false }));
+	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<Awaited<ReturnType<typeof deps.userProfilesRepository.findOneByOrFail>>>({ userId: 'synthetic', twoFactorEnabled: totp, twoFactorSecret: totp ? 'synthetic-secret' : null, passkeyMfaEnabled: independent, twoFactorBackupSecret: [], usePasswordLessLogin: passwordless, password: bcrypt.hashSync('synthetic-password', 4) }));
+	deps.userSecurityKeysRepository.findBy.mockResolvedValue(keys ? [mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: 'synthetic', publicKey: 'AQID' })] : []);
 	deps.webAuthnService.initiateAuthentication.mockResolvedValue(option);
 	deps.signinService.signin.mockResolvedValue({ finished: true, id: 'synthetic', i: 'synthetic-session' });
 	const context: AuthSessionContext = { request: { ip: '127.0.0.1', headers: {} }, effects: { code: vi.fn(), header: vi.fn() }, response: {} };
@@ -76,4 +77,24 @@ test('finite output accepts old responses and optional factor choices but reject
 	}
 	expect(v.safeParse(schema, { finished: false, next: 'password', availableFactors: ['totp'] }).success).toBe(false);
 	expect(v.safeParse(schema, { finished: true, id: 'synthetic', i: 'synthetic-session', availableFactors: ['totp'] }).success).toBe(false);
+});
+
+test('independent passkey MFA advertises the enabled key without inventing a TOTP factor', async () => {
+	const h = harness(false, true, true, true);
+	expect(await h.invoke({ username: 'synthetic', password: 'synthetic-password' })).toMatchObject({ finished: false, next: 'passkey', availableFactors: ['passkey'] });
+	expect(h.deps.signinService.signin).not.toHaveBeenCalled();
+});
+
+test('independent policy disables the convenience wrong-password bypass', async () => {
+	const h = harness(false, true, true, true);
+	expect(await h.invoke({ username: 'synthetic', password: 'wrong' })).toHaveProperty('error');
+	expect(h.deps.webAuthnService.initiateAuthentication).not.toHaveBeenCalled();
+	expect(h.deps.signinService.signin).not.toHaveBeenCalled();
+});
+
+test('disabled TOTP cannot use the test-environment OTP shortcut under independent policy', async () => {
+	const h = harness(false, true, true, true);
+	expect(await h.invoke({ username: 'synthetic', password: 'synthetic-password', token: '123456' })).toHaveProperty('error');
+	expect(h.deps.userAuthService.twoFactorAuthenticate).not.toHaveBeenCalled();
+	expect(h.deps.signinService.signin).not.toHaveBeenCalled();
 });

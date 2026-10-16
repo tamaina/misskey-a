@@ -1973,7 +1973,13 @@ declare namespace entities {
         IAuthorizedAppsRequest,
         IAuthorizedAppsResponse,
         IChangePasswordRequest,
+        IChangePasswordPasskeyStartRequest,
+        IChangePasswordPasskeyStartResponse,
+        IChangePasswordPasskeyCompleteRequest,
         IRegenerateTokenRequest,
+        IRegenerateTokenPasskeyStartRequest,
+        IRegenerateTokenPasskeyStartResponse,
+        IRegenerateTokenPasskeyCompleteRequest,
         IRevokeTokenRequest,
         ISigninHistoryRequest,
         ISigninHistoryResponse,
@@ -1983,6 +1989,9 @@ declare namespace entities {
         ISignoutRequest,
         IUpdateEmailRequest,
         IUpdateEmailResponse,
+        IUpdateEmailPasskeyStartRequest,
+        IUpdateEmailPasskeyStartResponse,
+        IUpdateEmailPasskeyCompleteRequest,
         InviteCreateRequest,
         InviteCreateResponse,
         InviteDeleteRequest,
@@ -3911,6 +3920,15 @@ type IAuthorizedAppsRequest = ContractRequest<'i/authorized-apps'>;
 type IAuthorizedAppsResponse = ContractResponse<'i/authorized-apps'>;
 
 // @public (undocumented)
+type IChangePasswordPasskeyCompleteRequest = ContractRequest<'i/change-password/passkey/complete'>;
+
+// @public (undocumented)
+type IChangePasswordPasskeyStartRequest = ContractRequest<'i/change-password/passkey/start'>;
+
+// @public (undocumented)
+type IChangePasswordPasskeyStartResponse = ContractResponse<'i/change-password/passkey/start'>;
+
+// @public (undocumented)
 type IChangePasswordRequest = ContractRequest<'i/change-password'>;
 
 // @public (undocumented)
@@ -4061,6 +4079,15 @@ type IPinResponse = ContractResponse<'i/pin'>;
 type IReadAnnouncementRequest = ContractRequest<'i/read-announcement'>;
 
 // @public (undocumented)
+type IRegenerateTokenPasskeyCompleteRequest = ContractRequest<'i/regenerate-token/passkey/complete'>;
+
+// @public (undocumented)
+type IRegenerateTokenPasskeyStartRequest = ContractRequest<'i/regenerate-token/passkey/start'>;
+
+// @public (undocumented)
+type IRegenerateTokenPasskeyStartResponse = ContractResponse<'i/regenerate-token/passkey/start'>;
+
+// @public (undocumented)
 type IRegenerateTokenRequest = ContractRequest<'i/regenerate-token'>;
 
 // @public (undocumented)
@@ -4177,6 +4204,15 @@ type IUnpinRequest = ContractRequest<'i/unpin'>;
 
 // @public (undocumented)
 type IUnpinResponse = ContractResponse<'i/unpin'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyCompleteRequest = ContractRequest<'i/update-email/passkey/complete'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyStartRequest = ContractRequest<'i/update-email/passkey/start'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyStartResponse = ContractResponse<'i/update-email/passkey/start'>;
 
 // @public (undocumented)
 type IUpdateEmailRequest = ContractRequest<'i/update-email'>;
@@ -7956,12 +7992,12 @@ type SigninFlowResponse = {
 } | {
     finished: false;
     next: 'totp';
-    availableFactors?: ('totp' | 'passkey')[];
+    availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 } | {
     finished: false;
     next: 'passkey';
     authRequest: PublicKeyCredentialRequestOptionsJSON_2;
-    availableFactors?: ('totp' | 'passkey')[];
+    availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 };
 
 // @public (undocumented)
@@ -7981,6 +8017,10 @@ type SigninWithPasskeyResponse = {
     signinResponse: SigninFlowResponse & {
         finished: true;
     };
+    passwordFlowRequired?: never;
+} | {
+    passwordFlowRequired: true;
+    signinResponse?: never;
 };
 
 // @public (undocumented)

@@ -15,13 +15,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<MkButton large primary rounded :disabled="queryingKey" style="margin: 0 auto;" @click="queryKey">{{ $locale.sfc.retry }}</MkButton>
 
-		<MkButton v-if="isPerformingPasswordlessLogin !== true && canUseTotp !== false" transparent rounded :disabled="queryingKey" style="margin: 0 auto;" @click="emit('useTotp')">{{ $locale.sfc.useTotp }}</MkButton>
+		<MkButton v-if="isPerformingPasswordlessLogin !== true && canUseTotp !== false" transparent rounded :disabled="queryingKey" style="margin: 0 auto;" @click="emit('useTotp')">{{ recoveryOnly ? $locale.sfc.useRecoveryCode : $locale.sfc.useTotp }}</MkButton>
 	</div>
 </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onActivated, onBeforeUnmount, onDeactivated, onMounted } from 'vue';
 import { startAuthentication } from '@simplewebauthn/browser';
 
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -32,7 +32,8 @@ const props = withDefaults(defineProps<{
 	credentialRequest: PublicKeyCredentialRequestOptionsJSON;
 	isPerformingPasswordlessLogin?: boolean;
 	canUseTotp?: boolean;
-}>(), { canUseTotp: true });
+	recoveryOnly?: boolean;
+}>(), { canUseTotp: true, recoveryOnly: false });
 
 const emit = defineEmits<{
 	(ev: 'done', credential: AuthenticationResponseJSON): void;
@@ -41,19 +42,26 @@ const emit = defineEmits<{
 
 const queryingKey = ref(true);
 
+let active = true;
+let generation = 0;
+
 async function queryKey() {
+	if (!active) return;
+	const run = ++generation;
 	queryingKey.value = true;
-	await startAuthentication({ optionsJSON: props.credentialRequest })
-		.catch(() => {
-			return Promise.reject(null);
-		})
-		.then((credential) => {
-			emit('done', credential);
-		})
-		.finally(() => {
-			queryingKey.value = false;
-		});
+	try {
+		const credential = await startAuthentication({ optionsJSON: props.credentialRequest });
+		if (active && run === generation) emit('done', credential);
+	} catch {
+		// Cancellation keeps the owned retry and code alternatives available.
+	} finally {
+		if (active && run === generation) queryingKey.value = false;
+	}
 }
+
+onActivated(() => { active = true; });
+onDeactivated(() => { active = false; generation++; queryingKey.value = false; });
+onBeforeUnmount(() => { active = false; generation++; });
 
 onMounted(() => {
 	queryKey();
@@ -172,6 +180,7 @@ onMounted(() => {
 
 <locale locale="ja-JP" lang="json">
 {
+  "useRecoveryCode": "バックアップコードを使う",
   "useSecurityKey": "ブラウザまたはデバイスの指示に従って、セキュリティキーまたはパスキーを使用してください。",
   "retry": "再試行",
   "useTotp": "ワンタイムパスワードを使う"
