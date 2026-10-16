@@ -142,13 +142,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<template v-if="log.type === 'updateServerSettings'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateUserNote'">
 			<div>{{ $locale.sfc.user }}: {{ log.info.userId }}</div>
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="log.info.before ?? ''" :newString="log.info.after ?? ''" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="log.info.before ?? ''" :code="log.info.after ?? ''" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'suspend'">
@@ -159,7 +159,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 		<template v-else-if="log.type === 'updateRole'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'assignRole'">
@@ -173,52 +173,52 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template v-else-if="log.type === 'updateCustomEmoji'">
 			<div>{{ $locale.sfc.emoji }}: {{ log.info.emojiId }}</div>
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateAd'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateGlobalAnnouncement'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateUserAnnouncement'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateAvatarDecoration'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateRemoteInstanceNote'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="log.info.before ?? ''" :newString="log.info.after ?? ''" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="log.info.before ?? ''" :code="log.info.after ?? ''" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateSystemWebhook'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateAbuseReportNotificationRecipient'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateAbuseReportNote'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="log.info.before ?? ''" :newString="log.info.after ?? ''" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="log.info.before ?? ''" :code="log.info.after ?? ''" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateProxyAccountDescription'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="log.info.before ?? ''" :newString="log.info.after ?? ''" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="log.info.before ?? ''" :code="log.info.after ?? ''" :maxHeight="300"/>
 			</div>
 		</template>
 
@@ -232,7 +232,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import * as Misskey from 'misskey-js';
-import { CodeDiff } from 'v-code-diff';
+import MkCodeDiff from '@features/markup/frontend/components/MkCodeDiff.vue';
 import JSON5 from 'json5';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
@@ -244,8 +244,8 @@ const props = defineProps<{
 
 <style lang="scss" module>
 .diff {
-	background: #fff;
-	color: #000;
+	background: var(--MI_THEME-panel);
+	color: var(--MI_THEME-fg);
 	border-radius: 6px;
 	overflow: clip;
 }

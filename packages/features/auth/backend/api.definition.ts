@@ -458,6 +458,20 @@ export const I2faPasskeyRemoveContract = aliasTwoFactorContract(I2faRemoveKeyCon
 export const I2faPasskeyUpdateContract = aliasTwoFactorContract(I2faUpdateKeyContract, 'i/2fa/passkey/update');
 export const I2faPasskeyPasswordLessContract = aliasTwoFactorContract(I2faPasswordLessContract, 'i/2fa/passkey/password-less');
 
+const browserSessionResult = v.strictObject({
+	id: v.string(), createdAt: v.string(), lastUsedAt: v.string(), revokedAt: v.nullable(v.string()), current: v.boolean(),
+});
+export const ISessionsContract = oc.$meta({ requestName: 'i/sessions', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/sessions', tags: ['account'] }).errors(commonErrors)
+	.input(objectInput({ limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100), offset: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0) }))
+	.output(v.array(browserSessionResult));
+export const ISessionsRevokeContract = oc.$meta({ requestName: 'i/sessions/revoke', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/sessions/revoke', tags: ['account'] }).errors(commonErrors)
+	.input(objectInput({ sessionId: misskeyId })).output(v.void());
+export const ISignoutContract = oc.$meta({ requestName: 'i/signout', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/signout', tags: ['account'] }).errors({ ...commonErrors, SESSION_NOT_REVOCABLE: { status: 400, data: apiErrorData } })
+	.input(objectInput({})).output(v.void());
+
 export const authContract = {
 	'admin/accounts/create': AdminAccountsCreateContract,
 	'admin/captcha/current': AdminCaptchaCurrentContract,
@@ -495,6 +509,9 @@ export const authContract = {
 	'i/regenerate-token': IRegenerateTokenContract,
 	'i/revoke-token': IRevokeTokenContract,
 	'i/signin-history': ISigninHistoryContract,
+	'i/sessions': ISessionsContract,
+	'i/sessions/revoke': ISessionsRevokeContract,
+	'i/signout': ISignoutContract,
 	'i/update-email': IUpdateEmailContract,
 	'invite/create': InviteCreateContract,
 	'invite/delete': InviteDeleteContract,

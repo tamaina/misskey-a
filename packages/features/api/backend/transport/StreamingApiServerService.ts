@@ -57,6 +57,7 @@ export class StreamingApiServerService {
 
 			let user: MiLocalUser | null = null;
 			let app: MiAccessToken | null = null;
+			let browserSession: ConnectionRequest['browserSession'];
 
 			// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1
 			// Note that the standard WHATWG WebSocket API does not support setting any headers,
@@ -66,7 +67,7 @@ export class StreamingApiServerService {
 				: q.get('i');
 
 			try {
-				[user, app] = await this.authenticateService.authenticate(token);
+				[user, app, browserSession] = await this.authenticateService.authenticate(token);
 
 				if (app !== null && !app.permission.some(p => p === 'read:account')) {
 					throw new AuthenticationError('Your app does not have necessary permissions to use websocket API.');
@@ -96,11 +97,12 @@ export class StreamingApiServerService {
 			this.moduleRef.registerRequestByContextId<ConnectionRequest>({
 				user,
 				token: app,
+				browserSession,
 			}, contextId);
 			const stream = await this.moduleRef.create(MainStreamConnection, contextId);
 
 			await stream.init();
-			if (this.#stopping) { stream.dispose(); socket.destroy(); return; }
+			if (this.#stopping || !await stream.checkBrowserSession()) { stream.dispose(); socket.destroy(); return; }
 
 			wss.handleUpgrade(request, socket, head, (ws) => {
 				wss.emit('connection', ws, request, {
@@ -144,8 +146,6 @@ export class StreamingApiServerService {
 
 			globalEv.on('message', onRedisMessage);
 
-			await stream.listen(ev, connection);
-
 			this.#connections.set(connection, Date.now());
 
 			const userUpdateIntervalId = user ? setInterval(() => {
@@ -162,6 +162,8 @@ export class StreamingApiServerService {
 				this.#connections.delete(connection);
 				if (userUpdateIntervalId) clearInterval(userUpdateIntervalId);
 			});
+
+			await stream.listen(ev, connection);
 
 			connection.on('pong', () => {
 				this.#connections.set(connection, Date.now());

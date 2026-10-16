@@ -17,11 +17,11 @@ const option = { challenge: 'c3ludGhldGlj', rpId: 'synthetic.example', userVerif
 function harness(totp = true, keys = true, passwordless = false) {
 	const deps = mockDeep<SigninFlowDependencies>();
 	deps.config.enableIpRateLimit = false;
-	deps.usersRepository.findOneBy.mockResolvedValue(mockDeep<NonNullable<Awaited<ReturnType<typeof deps.usersRepository.findOneBy>>>>({ id: 'synthetic', isSuspended: false }));
+	deps.usersRepository.findOneBy.mockResolvedValue(mockDeep<NonNullable<Awaited<ReturnType<typeof deps.usersRepository.findOneBy>>>>({ id: 'synthetic', isSuspended: false, isDeleted: false }));
 	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<Awaited<ReturnType<typeof deps.userProfilesRepository.findOneByOrFail>>>({ userId: 'synthetic', twoFactorEnabled: totp, usePasswordLessLogin: passwordless, password: bcrypt.hashSync('synthetic-password', 4) }));
 	deps.userSecurityKeysRepository.countBy.mockResolvedValue(keys ? 1 : 0);
 	deps.webAuthnService.initiateAuthentication.mockResolvedValue(option);
-	deps.signinService.signin.mockReturnValue({ finished: true, id: 'synthetic', i: 'synthetic-session' });
+	deps.signinService.signin.mockResolvedValue({ finished: true, id: 'synthetic', i: 'synthetic-session' });
 	const context: AuthSessionContext = { request: { ip: '127.0.0.1', headers: {} }, effects: { code: vi.fn(), header: vi.fn() }, response: {} };
 	const procedure = createSigninFlowProcedure(deps);
 	return { deps, invoke: (body: { username: string; password?: string; token?: string; availableFactors?: string[] }) => call(procedure, body, { context }) };

@@ -18,12 +18,14 @@ export interface ApiAuthorization<Actor extends ApiActor> {
 	policyAllowed(actor: Actor, key: string): Promise<boolean>;
 }
 
+export interface BrowserSessionIdentity { id: string; userId: string }
+
 export interface ApiToken { id?: string; name?: string | null; iconUrl?: string | null; permission: readonly string[] }
 export interface UploadResource { path: string; name: string | null; file: File }
 
 /** The host binds existing services to these narrow ports once per server role. */
 export interface ApiServices<Actor extends ApiActor> {
-	authenticate(credential: string | null | undefined): Promise<[Actor | null, ApiToken | null]>;
+	authenticate(credential: string | null | undefined): Promise<[Actor | null, ApiToken | null, BrowserSessionIdentity?]>;
 	limitActor(actor: Actor | null, ip: string): string | null;
 	rateLimitFactor(actor: Actor): Promise<number>;
 	limit(limit: RateLimit, actor: string, factor: number): Promise<{ info: Record<string, unknown> } | null>;

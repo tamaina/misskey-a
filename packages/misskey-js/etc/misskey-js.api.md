@@ -882,6 +882,16 @@ export type Channels = {
         };
         receives: null;
     };
+    clip: {
+        params: {
+            clipId: string;
+        };
+        events: {
+            updated: () => void;
+            deleted: () => void;
+        };
+        receives: null;
+    };
     drive: {
         params: null;
         events: {
@@ -1967,6 +1977,10 @@ declare namespace entities {
         IRevokeTokenRequest,
         ISigninHistoryRequest,
         ISigninHistoryResponse,
+        ISessionsRequest,
+        ISessionsResponse,
+        ISessionsRevokeRequest,
+        ISignoutRequest,
         IUpdateEmailRequest,
         IUpdateEmailResponse,
         InviteCreateRequest,
@@ -4104,10 +4118,22 @@ type IRevokeTokenRequest = ContractRequest<'i/revoke-token'>;
 function isAPIError(reason: Record<PropertyKey, unknown>): reason is APIError;
 
 // @public (undocumented)
+type ISessionsRequest = ContractRequest<'i/sessions'>;
+
+// @public (undocumented)
+type ISessionsResponse = ContractResponse<'i/sessions'>;
+
+// @public (undocumented)
+type ISessionsRevokeRequest = ContractRequest<'i/sessions/revoke'>;
+
+// @public (undocumented)
 type ISigninHistoryRequest = ContractRequest<'i/signin-history'>;
 
 // @public (undocumented)
 type ISigninHistoryResponse = ContractResponse<'i/signin-history'>;
+
+// @public (undocumented)
+type ISignoutRequest = ContractRequest<'i/signout'>;
 
 // @public (undocumented)
 function isPureRenote(note: Note): note is PureRenote;
@@ -8281,8 +8307,8 @@ type VerifyEmailRequest = ContractRequest<'verify-email'>;
 // Warnings were encountered during analysis:
 //
 // src/streaming.ts:57:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
-// src/streaming.types.ts:226:4 - (ae-forgotten-export) The symbol "ReversiUpdateKey" needs to be exported by the entry point index.d.ts
-// src/streaming.types.ts:241:4 - (ae-forgotten-export) The symbol "ReversiUpdateSettings" needs to be exported by the entry point index.d.ts
+// src/streaming.types.ts:236:4 - (ae-forgotten-export) The symbol "ReversiUpdateKey" needs to be exported by the entry point index.d.ts
+// src/streaming.types.ts:251:4 - (ae-forgotten-export) The symbol "ReversiUpdateSettings" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

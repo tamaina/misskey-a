@@ -17,11 +17,11 @@ export async function openAntennaNotePilot(
 	onNote: (note: Packed<'Note'>) => void | Promise<void>,
 ) {
 	params.signal?.throwIfAborted();
-	const [user, token] = await deps.authenticateService.authenticate(params.credential);
+	const [user, token, browserSession] = await deps.authenticateService.authenticate(params.credential);
 	params.signal?.throwIfAborted();
 	if (!user || user.isSuspended || user.host !== null || !params.antennaId) throw new Error('Antenna access denied');
 	const context = ContextIdFactory.create();
-	deps.moduleRef.registerRequestByContextId<ConnectionRequest>({ user, token }, context);
+	deps.moduleRef.registerRequestByContextId<ConnectionRequest>({ user, token, browserSession }, context);
 	const connection = await deps.moduleRef.create(Connection, context);
 	let open = true;
 	let resolveClosed!: (result: AntennaPilotClosed) => void;

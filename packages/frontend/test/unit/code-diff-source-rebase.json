@@ -1,0 +1,167 @@
+[
+	{
+		"file": "packages/features/markup/frontend/components/MkCode.vue",
+		"currentSha256": "183b881609941f61c383824ce2ef6e5808947bd54fa23af7b9f915e84163c4d7",
+		"baselineSha256": "3dfd66037332dc71ca2a5b5019d1ac9c3335bbd3a4fa56047c6f8b6c8bca7435",
+		"edits": [
+			{
+				"start": 585,
+				"end": 630,
+				"current": "\t\t\tv-if=\"show && (lang || diffBase != null)\"\n",
+				"baseline": "\t\t\tv-if=\"show && lang\"\n"
+			},
+			{
+				"start": 669,
+				"end": 719,
+				"current": "\t\t\t:diffBase=\"diffBase\"\n\t\t\t:maxHeight=\"maxHeight\"\n",
+				"baseline": ""
+			},
+			{
+				"start": 1568,
+				"end": 1616,
+				"current": "\tdiffBase?: string;\n\tmaxHeight?: number | null;\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/markup/frontend/components/MkCode.core.vue",
+		"currentSha256": "9146cabe2b8bbf7ff8bc39cf06d38daf0de5c4adad20dcdf36ee3c33df9cb37d",
+		"baselineSha256": "f90d896d7978c2c443d3f83ac7c2585a696f241aac482cb5fb4c4df5657b8622",
+		"edits": [
+			{
+				"start": 333,
+				"end": 450,
+				"current": "\t}]\" :style=\"maxHeight != null ? { maxHeight: `${maxHeight}px`, overflow: 'auto' } : undefined\" v-html=\"html\"></div>\n",
+				"baseline": "\t}]\" v-html=\"html\"></div>\n"
+			},
+			{
+				"start": 734,
+				"end": 810,
+				"current": "import { getCodeDiff, codeDiffTransformer } from '../utility/code-diff.js';\n",
+				"baseline": ""
+			},
+			{
+				"start": 932,
+				"end": 980,
+				"current": "\tdiffBase?: string;\n\tmaxHeight?: number | null;\n",
+				"baseline": ""
+			},
+			{
+				"start": 1356,
+				"end": 1733,
+				"current": "const diffRows = computed(() => props.diffBase != null ? getCodeDiff(props.diffBase, props.code) : null);\nconst html = computed(() => highlighter.codeToHtml(diffRows.value ? diffRows.value.map(row => row.text).join('\\n') : props.code, {\n\ttransformers: diffRows.value ? [codeDiffTransformer(diffRows.value)] : [],\n\tlang: diffRows.value && !props.lang ? 'text' : codeLang.value,\n",
+				"baseline": "const html = computed(() => highlighter.codeToHtml(props.code, {\n\tlang: codeLang.value,\n"
+			},
+			{
+				"start": 2746,
+				"end": 2773,
+				"current": "\treturn fetchLanguage(to);\n",
+				"baseline": "\treturn new Promise((resolve) => {\n\t\tfetchLanguage(to).then(() => resolve);\n\t});\n"
+			},
+			{
+				"start": 4295,
+				"end": 4711,
+				"current": "\n.codeBlockRoot :global(.diff) {\n\tdisplay: inline-block;\n\twidth: 100%;\n\t&:global(.add) { background: color-mix(in srgb, var(--MI_THEME-success) 18%, transparent); }\n\t&:global(.remove) { background: color-mix(in srgb, var(--MI_THEME-error) 18%, transparent); }\n}\n\n.codeBlockRoot :global(.diff-sign) {\n\tdisplay: inline-block;\n\twidth: 1.5em;\n\tuser-select: none;\n}\n\n.codeBlockRoot :global(.diff-omit) {\n\topacity: 0.6;\n}\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/moderation/frontend/pages/admin/modlog.ModLog.vue",
+		"currentSha256": "75993c4492a85141edfca95d542b20f2f73fb617704ea7539b64b7a94d831a2b",
+		"baselineSha256": "6b67788058ff6b6dd1eea2761da13810d006e4f751276145a46f813797db78cb",
+		"edits": [
+			{
+				"start": 9505,
+				"end": 9677,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"JSON5.stringify(log.info.before, null, '\\t')\" :code=\"JSON5.stringify(log.info.after, null, '\\t')\" lang=\"javascript\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"JSON5.stringify(log.info.before, null, '\\t')\" :newString=\"JSON5.stringify(log.info.after, null, '\\t')\" language=\"javascript\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 9846,
+				"end": 9954,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"log.info.before ?? ''\" :code=\"log.info.after ?? ''\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"log.info.before ?? ''\" :newString=\"log.info.after ?? ''\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 10555,
+				"end": 10727,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"JSON5.stringify(log.info.before, null, '\\t')\" :code=\"JSON5.stringify(log.info.after, null, '\\t')\" lang=\"javascript\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"JSON5.stringify(log.info.before, null, '\\t')\" :newString=\"JSON5.stringify(log.info.after, null, '\\t')\" language=\"javascript\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 11325,
+				"end": 11497,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"JSON5.stringify(log.info.before, null, '\\t')\" :code=\"JSON5.stringify(log.info.after, null, '\\t')\" lang=\"javascript\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"JSON5.stringify(log.info.before, null, '\\t')\" :newString=\"JSON5.stringify(log.info.after, null, '\\t')\" language=\"javascript\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 11600,
+				"end": 11772,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"JSON5.stringify(log.info.before, null, '\\t')\" :code=\"JSON5.stringify(log.info.after, null, '\\t')\" lang=\"javascript\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"JSON5.stringify(log.info.before, null, '\\t')\" :newString=\"JSON5.stringify(log.info.after, null, '\\t')\" language=\"javascript\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 11891,
+				"end": 12063,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"JSON5.stringify(log.info.before, null, '\\t')\" :code=\"JSON5.stringify(log.info.after, null, '\\t')\" lang=\"javascript\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"JSON5.stringify(log.info.before, null, '\\t')\" :newString=\"JSON5.stringify(log.info.after, null, '\\t')\" language=\"javascript\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 12180,
+				"end": 12352,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"JSON5.stringify(log.info.before, null, '\\t')\" :code=\"JSON5.stringify(log.info.after, null, '\\t')\" lang=\"javascript\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"JSON5.stringify(log.info.before, null, '\\t')\" :newString=\"JSON5.stringify(log.info.after, null, '\\t')\" language=\"javascript\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 12469,
+				"end": 12641,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"JSON5.stringify(log.info.before, null, '\\t')\" :code=\"JSON5.stringify(log.info.after, null, '\\t')\" lang=\"javascript\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"JSON5.stringify(log.info.before, null, '\\t')\" :newString=\"JSON5.stringify(log.info.after, null, '\\t')\" language=\"javascript\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 12760,
+				"end": 12868,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"log.info.before ?? ''\" :code=\"log.info.after ?? ''\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"log.info.before ?? ''\" :newString=\"log.info.after ?? ''\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 12982,
+				"end": 13154,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"JSON5.stringify(log.info.before, null, '\\t')\" :code=\"JSON5.stringify(log.info.after, null, '\\t')\" lang=\"javascript\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"JSON5.stringify(log.info.before, null, '\\t')\" :newString=\"JSON5.stringify(log.info.after, null, '\\t')\" language=\"javascript\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 13287,
+				"end": 13459,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"JSON5.stringify(log.info.before, null, '\\t')\" :code=\"JSON5.stringify(log.info.after, null, '\\t')\" lang=\"javascript\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"JSON5.stringify(log.info.before, null, '\\t')\" :newString=\"JSON5.stringify(log.info.after, null, '\\t')\" language=\"javascript\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 13575,
+				"end": 13683,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"log.info.before ?? ''\" :code=\"log.info.after ?? ''\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"log.info.before ?? ''\" :newString=\"log.info.after ?? ''\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 13807,
+				"end": 13915,
+				"current": "\t\t\t\t<MkCodeDiff forceShow :diffBase=\"log.info.before ?? ''\" :code=\"log.info.after ?? ''\" :maxHeight=\"300\"/>\n",
+				"baseline": "\t\t\t\t<CodeDiff :context=\"5\" :hideHeader=\"true\" :oldString=\"log.info.before ?? ''\" :newString=\"log.info.after ?? ''\" maxHeight=\"300px\"/>\n"
+			},
+			{
+				"start": 14141,
+				"end": 14219,
+				"current": "import MkCodeDiff from '@features/markup/frontend/components/MkCodeDiff.vue';\n",
+				"baseline": "import { CodeDiff } from 'v-code-diff';\n"
+			},
+			{
+				"start": 14528,
+				"end": 14592,
+				"current": "\tbackground: var(--MI_THEME-panel);\n\tcolor: var(--MI_THEME-fg);\n",
+				"baseline": "\tbackground: #fff;\n\tcolor: #000;\n"
+			}
+		]
+	}
+]

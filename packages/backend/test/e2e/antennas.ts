@@ -530,8 +530,18 @@ describe('アンテナ', () => {
 				label: '削除ユーザーのノートも含まれる',
 				parameters: () => ({}),
 				posts: [
-					{ note: (): Promise<Note> => post(userDeletedBySelf, { text: `${keyword}` }), included: true },
-					{ note: (): Promise<Note> => post(userDeletedByAdmin, { text: `${keyword}` }), included: true },
+					{ note: async (): Promise<Note> => {
+						const user = await signup({ password: 'synthetic-delete-fixture' });
+						const note = await post(user, { text: `${keyword}` });
+						await successfulApiCall({ endpoint: 'i/delete-account', parameters: { password: 'synthetic-delete-fixture' }, user });
+						return note;
+					}, included: true },
+					{ note: async (): Promise<Note> => {
+						const user = await signup();
+						const note = await post(user, { text: `${keyword}` });
+						await successfulApiCall({ endpoint: 'admin/delete-account', parameters: { userId: user.id }, user: root });
+						return note;
+					}, included: true },
 				],
 			},
 			{

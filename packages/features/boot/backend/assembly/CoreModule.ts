@@ -4,6 +4,7 @@
  */
 
 import { Module } from '@nestjs/common';
+import { clipUpdateLifecycleProvider } from './ClipUpdateLifecycle.js';
 import { FanoutTimelineEndpointService } from '@features/timelines/backend/services/FanoutTimelineEndpointService.js';
 import { AbuseReportService } from '@features/moderation/backend/services/AbuseReportService.js';
 import { AbuseReportNotificationService } from '@features/moderation/backend/services/AbuseReportNotificationService.js';
@@ -92,6 +93,7 @@ import { ApNoteService } from '@features/federation/backend/services/ApNoteServi
 import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
 import { ApQuestionService } from '@features/federation/backend/services/ApQuestionService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { announcementArchiveLifecycleProviders } from './AnnouncementArchiveLifecycle.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { TelemetryService } from '@features/statistics/backend/services/TelemetryService.js';
 import { QueueModule } from './QueueModule.js';
@@ -234,7 +236,7 @@ const aliasExports = serviceAliases.filter(alias => alias.useExisting !== ChartL
 
 @Module({
 	imports: [QueueModule],
-	providers: [...featureServiceProviders, ...serviceProviders, ...serviceAliases],
+	providers: [clipUpdateLifecycleProvider, ...featureServiceProviders, ...announcementArchiveLifecycleProviders, ...serviceProviders, ...serviceAliases],
 	exports: [...featureServiceExports, QueueModule, ...serviceExports, ...aliasExports],
 })
 export class CoreModule {}

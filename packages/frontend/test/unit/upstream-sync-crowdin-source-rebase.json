@@ -1,0 +1,155 @@
+[
+  {
+    "file": "packages/features/notes/frontend/components/MkNote.vue",
+    "currentSha256": "3980b73322a2c875eef990f9829f516f38ed9d6958ae4fbcc6ca9e9fadf81f62",
+    "baselineSha256": "37b872de587ebee8b674d81288229c123332097b361b76851f29c1e404e49562",
+    "edits": [
+      {
+        "start": 22264,
+        "end": 22288,
+        "current": "\t\"showLess\": \"عرض اقل\",\n",
+        "baseline": "\t\"showLess\": \"اغلق\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
+    "currentSha256": "f1cd2226286118852ac5aa0636bee47f03b654ea2a27e79cf7bcac51ff1686e3",
+    "baselineSha256": "1bdfb89ac91f395de7b6bf29c28d3b5c80cbaa3eb92d9f232366d6d3befb7801",
+    "edits": [
+      {
+        "start": 3576,
+        "end": 3599,
+        "current": "\t\"showLess\": \"عرض اقل\"\n",
+        "baseline": "\t\"showLess\": \"اغلق\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+    "currentSha256": "32e6abb203fb351465a5ad5fa664ea970fd99488e05fec5a46b4d2be045f9f95",
+    "baselineSha256": "f35495024a74e9f56f200d071adc1df7a01cdf31271f5e75268f95207c0cf7d2",
+    "edits": [
+      {
+        "start": 15411,
+        "end": 15435,
+        "current": "\t\"showLess\": \"عرض اقل\",\n",
+        "baseline": "\t\"showLess\": \"اغلق\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+    "currentSha256": "c3bfe34d9e8e77975562aa35705d44d1dd47bcacb84eb021c6546bf299058cca",
+    "baselineSha256": "3e29554585bf9d03e9f14e0bdf273a814eb2f9057ebe4bdd05ce965fe39144b8",
+    "edits": [
+      {
+        "start": 14220,
+        "end": 14244,
+        "current": "\t\"showLess\": \"عرض اقل\",\n",
+        "baseline": "\t\"showLess\": \"اغلق\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/notes/frontend/embed/components/EmSubNoteContent.vue",
+    "currentSha256": "a760537050f1bb244dac7ba5a8e2e51e3797d3d1909773731fde589a4482d95a",
+    "baselineSha256": "02b0942c62e7083619b3631671e439c34ed4071ff5d09426ae1f65df55788748",
+    "edits": [
+      {
+        "start": 3585,
+        "end": 3608,
+        "current": "\t\"showLess\": \"عرض اقل\"\n",
+        "baseline": "\t\"showLess\": \"اغلق\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+    "currentSha256": "16f40adf763c74c8d4fbf84877fc1785d6ea854303f9bf51ea2ae12e3824f474",
+    "baselineSha256": "3dfec1e11bf9d8e8134791893337446d55c4a2d6a353ddf4eb8e7411d18c5a2b",
+    "edits": [
+      {
+        "start": 144360,
+        "end": 144417,
+        "current": "\t\"showFixedPostForm\": \"Modulo di pubblicazione in cima\",\n",
+        "baseline": "\t\"showFixedPostForm\": \"Visualizzare la finestra di pubblicazione in cima alla timeline\",\n"
+      },
+      {
+        "start": 150519,
+        "end": 150583,
+        "current": "\t\"reloadRequiredToApplySettings\": \"Ricarica le impostazioni. \",\n",
+        "baseline": "\t\"reloadRequiredToApplySettings\": \"Per applicare le impostazioni, occorre ricaricare.\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/timelines/frontend/pages/timeline.vue",
+    "currentSha256": "f19c304505f10b523e86420b229ae8dc4a02a3f22fd53726f0cb126e7a68bc46",
+    "baselineSha256": "c6cfb4364f14fc74538199467267b77dd092ff0beed75b06c905ca892764e6fb",
+    "edits": [
+      {
+        "start": 20188,
+        "end": 20240,
+        "current": "\t\"withSensitive\": \"Includi con allegati espliciti\",\n",
+        "baseline": "\t\"withSensitive\": \"Mostra le Note con allegati espliciti\",\n"
+      },
+      {
+        "start": 20282,
+        "end": 20339,
+        "current": "\t\"showFixedPostForm\": \"Modulo di pubblicazione in cima\",\n",
+        "baseline": "\t\"showFixedPostForm\": \"Visualizzare la finestra di pubblicazione in cima alla timeline\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/timelines/frontend/ui/deck/tl-column.vue",
+    "currentSha256": "e22dfcc08ecd16dccfc33e7fae0a3b9209ddcb2e03f70ba8e95db2179636f1e2",
+    "baselineSha256": "d171fcc71765f01e0e8de3586155103ed3a42fc1838b8d532ca3b9c4f6907154",
+    "edits": [
+      {
+        "start": 12471,
+        "end": 12522,
+        "current": "\t\"withSensitive\": \"Includi con allegati espliciti\"\n",
+        "baseline": "\t\"withSensitive\": \"Mostra le Note con allegati espliciti\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/users/frontend/pages/settings/privacy.vue",
+    "currentSha256": "233790e33eda940a137c00df5bfbc9dc558c71fde02c0d2eba92c015b7ff67f4",
+    "baselineSha256": "b3d6adf5cec421df2975efe19ab1ae8d2c94040b23c44fe1bba120c5728d719d",
+    "edits": [
+      {
+        "start": 31611,
+        "end": 33424,
+        "current": "\t\"followApprovalGroupTitle\": \"Segueix la sol·licitud aprovada\",\n\t\"followApprovalInactiveDescription\": \"Com que tots els seguiments estaran subjectes a aprovació, no s'aplicaran els paràmetres basats en el temps. Si desactiveu el sistema d'aprovació de seguiments, s'aplicaran de nou els paràmetres següents.\",\n\t\"followApprovalTitle\": \"Establiu que els seguiments de comptes nous requereixin aprovació.\",\n\t\"followApprovalAutoAcceptDescription\": \"Fins i tot si has configurat el teu compte perquè requereixi aprovació per als nous seguidors, o si estàs pendent de sol·licituds de seguiment de nous comptes, les persones que segueixes seran aprovades automàticament.\",\n\t\"followApprovalDescription\": \"Les sol·licituds de seguiment d'usuaris que no t'han seguit durant el període especificat es consideraran sol·licituds de seguiment. Això no afectarà els teus seguidors actuals. Si tens habilitada l'aprovació automàtica per als usuaris que segueixes, aquests usuaris seran aprovats automàticament.\",\n\t\"followApprovalLocal\": \"Segueix usuaris locals\",\n\t\"followApprovalLocalDescription\": \"Això es determina pel temps transcorregut des que es va crear el compte en aquest servidor.\",\n\t\"followApprovalRemote\": \"Seguidors d'usuaris remots\",\n\t\"followApprovalRemoteDescription\": \"Això es determina pel temps transcorregut des que aquest servidor va reconèixer per primera vegada aquest compte, en lloc de la data i l'hora de creació a l'altre servidor.\",\n\t\"followApprovalUseDefault\": \"Utilitzar valors per defecte (actualment desactivat)\",\n\t\"followApprovalCustom\": \"Especifiqueu un període\",\n\t\"followApprovalPeriod\": \"Període que requereix aprovació\",\n\t\"followApprovalUnit\": \"Unitat\",\n\t\"followApprovalInvalidPeriod\": \"La durada és incorrecta. Si us plau, introduïu una durada d'almenys 1 segon, dins de l'interval permès.\",\n",
+        "baseline": "\t\"followApprovalGroupTitle\": \"フォロー承認\",\n\t\"followApprovalInactiveDescription\": \"すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。\",\n\t\"followApprovalTitle\": \"新しいアカウントからのフォローを承認制にする\",\n\t\"followApprovalAutoAcceptDescription\": \"フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。\",\n\t\"followApprovalDescription\": \"指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。\",\n\t\"followApprovalLocal\": \"ローカルユーザーからのフォロー\",\n\t\"followApprovalLocalDescription\": \"このサーバーでのアカウント作成からの期間で判定します。\",\n\t\"followApprovalRemote\": \"リモートユーザーからのフォロー\",\n\t\"followApprovalRemoteDescription\": \"相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。\",\n\t\"followApprovalUseDefault\": \"既定値を使う（現在は無効）\",\n\t\"followApprovalCustom\": \"期間を指定する\",\n\t\"followApprovalPeriod\": \"承認が必要な期間\",\n\t\"followApprovalUnit\": \"単位\",\n\t\"followApprovalInvalidPeriod\": \"期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。\",\n"
+      },
+      {
+        "start": 60525,
+        "end": 62343,
+        "current": "\t\"followApprovalGroupTitle\": \"Aceptar seguimiento\",\n\t\"followApprovalInactiveDescription\": \"Dado que todas las solicitudes de seguimiento pasarán a requerir aprobación, no se aplicarán los ajustes relacionados con el periodo. Si desactivas el sistema de aprobación de solicitudes de seguimiento, se volverán a aplicar los siguientes ajustes.\",\n\t\"followApprovalTitle\": \"Habilitar la aprobación de seguidores de cuentas nuevas\",\n\t\"followApprovalAutoAcceptDescription\": \"Aunque tengas configurada la opción de aprobación de seguidores o hayas puesto en espera las solicitudes de seguimiento de cuentas nuevas, se aprobarán automáticamente las personas a las que tú sigues.\",\n\t\"followApprovalDescription\": \"Las solicitudes de seguimiento de usuarios que no hayan transcurrido el periodo especificado se pondrán en espera. Esto no afecta a los seguidores actuales. Si tienes activada la aceptación automática de los usuarios a los que sigues, se aceptarán automáticamente.\",\n\t\"followApprovalLocal\": \"Sigue a usuarios locales\",\n\t\"followApprovalLocalDescription\": \"Se determinará en función del tiempo transcurrido desde la creación de la cuenta en este servidor.\",\n\t\"followApprovalRemote\": \"Seguimiento por parte de usuarios remotos\",\n\t\"followApprovalRemoteDescription\": \"No se tiene en cuenta la fecha y hora de creación en el servidor del destinatario, sino el tiempo transcurrido desde que este servidor reconoció por primera vez dicha cuenta.\",\n\t\"followApprovalUseDefault\": \"Utilizar valores predeterminados (actualmente desactivado)\",\n\t\"followApprovalCustom\": \"Específica un periodo\",\n\t\"followApprovalPeriod\": \"Plazo para la aprobación\",\n\t\"followApprovalUnit\": \"Unidad\",\n\t\"followApprovalInvalidPeriod\": \"El intervalo de tiempo no es correcto. Introduzca un intervalo de al menos 1 segundo, dentro del rango permitido.\",\n",
+        "baseline": "\t\"followApprovalGroupTitle\": \"フォロー承認\",\n\t\"followApprovalInactiveDescription\": \"すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。\",\n\t\"followApprovalTitle\": \"新しいアカウントからのフォローを承認制にする\",\n\t\"followApprovalAutoAcceptDescription\": \"フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。\",\n\t\"followApprovalDescription\": \"指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。\",\n\t\"followApprovalLocal\": \"ローカルユーザーからのフォロー\",\n\t\"followApprovalLocalDescription\": \"このサーバーでのアカウント作成からの期間で判定します。\",\n\t\"followApprovalRemote\": \"リモートユーザーからのフォロー\",\n\t\"followApprovalRemoteDescription\": \"相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。\",\n\t\"followApprovalUseDefault\": \"既定値を使う（現在は無効）\",\n\t\"followApprovalCustom\": \"期間を指定する\",\n\t\"followApprovalPeriod\": \"承認が必要な期間\",\n\t\"followApprovalUnit\": \"単位\",\n\t\"followApprovalInvalidPeriod\": \"期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。\",\n"
+      },
+      {
+        "start": 78314,
+        "end": 80114,
+        "current": "\t\"followApprovalGroupTitle\": \"Approvazione dei Follow\",\n\t\"followApprovalInactiveDescription\": \"Poiché i Follow sono soggetti ad approvazione, non si applicano le impostazioni basate sul periodo. Disattivando il sistema di approvazione, verranno nuovamente applicate le seguenti impostazioni.\",\n\t\"followApprovalTitle\": \"Le richieste di follow da parte di nuovi account richiedono l'approvazione.\",\n\t\"followApprovalAutoAcceptDescription\": \"Anche se attivi \\\"Richiedi approvazione per le richieste di follow\\\" o \\\"Richiedi approvazione per le richieste di follow da nuovi account\\\", le richieste di follow provenienti da account che già segui verranno approvate automaticamente.\",\n\t\"followApprovalDescription\": \"Le richieste di follow da profili registrati prima del tempo specificato verranno non verranno approvate. Questo non influisce sui Follower esistenti; se è attiva l'opzione “Accetta automaticamente le richieste di follow da chi mi segue”, le richieste di follow da quei profili verranno approvate automaticamente.\",\n\t\"followApprovalLocal\": \"Richieste da profili locali\",\n\t\"followApprovalLocalDescription\": \"Si calcola la durata relativamente alla data di iscrizione del profilo in questo server.\",\n\t\"followApprovalRemote\": \"Richieste da profili remoti\",\n\t\"followApprovalRemoteDescription\": \"Si calcola la durata in base a quando il profilo remoto è stato federato su questo server la prima volta; non si calcola la data di iscrizione sul server remoto.\",\n\t\"followApprovalUseDefault\": \"Utilizzare il valore predefinito (attualmente disabilitato)\",\n\t\"followApprovalCustom\": \"Periodo specifico\",\n\t\"followApprovalPeriod\": \"Periodo richiesto per l'iscrizione\",\n\t\"followApprovalUnit\": \"Unità\",\n\t\"followApprovalInvalidPeriod\": \"Periodo sbagliato. Indicare da 1 secondo fino al limite consentito.\",\n",
+        "baseline": "\t\"followApprovalGroupTitle\": \"フォロー承認\",\n\t\"followApprovalInactiveDescription\": \"すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。\",\n\t\"followApprovalTitle\": \"新しいアカウントからのフォローを承認制にする\",\n\t\"followApprovalAutoAcceptDescription\": \"フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。\",\n\t\"followApprovalDescription\": \"指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。\",\n\t\"followApprovalLocal\": \"ローカルユーザーからのフォロー\",\n\t\"followApprovalLocalDescription\": \"このサーバーでのアカウント作成からの期間で判定します。\",\n\t\"followApprovalRemote\": \"リモートユーザーからのフォロー\",\n\t\"followApprovalRemoteDescription\": \"相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。\",\n\t\"followApprovalUseDefault\": \"既定値を使う（現在は無効）\",\n\t\"followApprovalCustom\": \"期間を指定する\",\n\t\"followApprovalPeriod\": \"承認が必要な期間\",\n\t\"followApprovalUnit\": \"単位\",\n\t\"followApprovalInvalidPeriod\": \"期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。\",\n"
+      },
+      {
+        "start": 101837,
+        "end": 102793,
+        "current": "\t\"followApprovalGroupTitle\": \"팔로우 승인\",\n\t\"followApprovalInactiveDescription\": \"모든 팔로우가 승인제로 되어 기간에 따른 설정은 적용되지 않습니다. 팔로우의 승인제를 해제하면 아래의 설정이 다시 적용됩니다.\",\n\t\"followApprovalTitle\": \"새로운 계정으로부터의 팔로우를 승인제로 변경\",\n\t\"followApprovalAutoAcceptDescription\": \"팔로우를 승인제로 한 경우나 새로운 계정으로부터의 팔로우를 보류하는 경우에도 사용자님께서 팔로우하고 있는 상대는 자동 승인됩니다.\",\n\t\"followApprovalDescription\": \"지정한 기간이 경과하지 않은 상대로부터의 팔로우를 팔로우 요청으로 보류합니다. 기존 팔로워에는 영향을 끼치지 않습니다. 팔로우하고 있는 상대의 자동 승인이 활성화된 경우, 그 상대는 자동 승인됩니다.\",\n\t\"followApprovalLocal\": \"로컬 유저로부터의 팔로우\",\n\t\"followApprovalLocalDescription\": \"이 서버에서의 계정 생성으로부터의 기간으로 판정됩니다.\",\n\t\"followApprovalRemote\": \"리모트 유저로부터의 팔로우\",\n\t\"followApprovalRemoteDescription\": \"상대 서버에서의 생성 시각이 아닌 이 서버가 처음 그 계정을 인식한 뒤부터의 기간으로 판정됩니다.\",\n\t\"followApprovalUseDefault\": \"미리 정해둔 값을 사용 (현재는 유효하지 않음)\",\n\t\"followApprovalCustom\": \"기간 지정\",\n\t\"followApprovalPeriod\": \"승인이 필요한 기간\",\n\t\"followApprovalUnit\": \"단위\",\n\t\"followApprovalInvalidPeriod\": \"기간이 올바르지 않습니다. 1초 이상의 기간을 지정 가능한 범위 내에 입력해 주십시오.\",\n",
+        "baseline": "\t\"followApprovalGroupTitle\": \"フォロー承認\",\n\t\"followApprovalInactiveDescription\": \"すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。\",\n\t\"followApprovalTitle\": \"新しいアカウントからのフォローを承認制にする\",\n\t\"followApprovalAutoAcceptDescription\": \"フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。\",\n\t\"followApprovalDescription\": \"指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。\",\n\t\"followApprovalLocal\": \"ローカルユーザーからのフォロー\",\n\t\"followApprovalLocalDescription\": \"このサーバーでのアカウント作成からの期間で判定します。\",\n\t\"followApprovalRemote\": \"リモートユーザーからのフォロー\",\n\t\"followApprovalRemoteDescription\": \"相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。\",\n\t\"followApprovalUseDefault\": \"既定値を使う（現在は無効）\",\n\t\"followApprovalCustom\": \"期間を指定する\",\n\t\"followApprovalPeriod\": \"承認が必要な期間\",\n\t\"followApprovalUnit\": \"単位\",\n\t\"followApprovalInvalidPeriod\": \"期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。\",\n"
+      },
+      {
+        "start": 165053,
+        "end": 165856,
+        "current": "\t\"followApprovalGroupTitle\": \"批准关注请求\",\n\t\"followApprovalInactiveDescription\": \"因为所有的关注请求都需要批准，因此按时间段设置的规则将不再生效。关闭「关注请求需要批准」后下面的设置将重新生效。\",\n\t\"followApprovalTitle\": \"新账户的关注请求需要批准\",\n\t\"followApprovalAutoAcceptDescription\": \"就算开启了「关注请求需要批准」或「新账户的关注请求需要批准」，您已关注的账户的关注请求将被自动批准。\",\n\t\"followApprovalDescription\": \"注册未达指定时长的账户的关注将作为关注请求予以保留。这不影响现有的关注者。已开启「自动允许我关注的人的关注请求」的话，对方的关注请求将被自动批准。\",\n\t\"followApprovalLocal\": \"从本地用户发来的关注\",\n\t\"followApprovalLocalDescription\": \"以本服务器的账户注册时间来计算时长。\",\n\t\"followApprovalRemote\": \"从远程用户发来的关注\",\n\t\"followApprovalRemoteDescription\": \"不是以远程服务器上的注册时间，而是以本服务器最初认知到这个账户的时间来计算时长。\",\n\t\"followApprovalUseDefault\": \"使用默认值（当前为无效）\",\n\t\"followApprovalCustom\": \"指定时间段\",\n\t\"followApprovalPeriod\": \"批准所需注册时长\",\n\t\"followApprovalUnit\": \"单位\",\n\t\"followApprovalInvalidPeriod\": \"输入的时间不正确。请在可输入的范围内输入 1 秒以上的时间。\",\n",
+        "baseline": "\t\"followApprovalGroupTitle\": \"フォロー承認\",\n\t\"followApprovalInactiveDescription\": \"すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。\",\n\t\"followApprovalTitle\": \"新しいアカウントからのフォローを承認制にする\",\n\t\"followApprovalAutoAcceptDescription\": \"フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。\",\n\t\"followApprovalDescription\": \"指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。\",\n\t\"followApprovalLocal\": \"ローカルユーザーからのフォロー\",\n\t\"followApprovalLocalDescription\": \"このサーバーでのアカウント作成からの期間で判定します。\",\n\t\"followApprovalRemote\": \"リモートユーザーからのフォロー\",\n\t\"followApprovalRemoteDescription\": \"相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。\",\n\t\"followApprovalUseDefault\": \"既定値を使う（現在は無効）\",\n\t\"followApprovalCustom\": \"期間を指定する\",\n\t\"followApprovalPeriod\": \"承認が必要な期間\",\n\t\"followApprovalUnit\": \"単位\",\n\t\"followApprovalInvalidPeriod\": \"期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。\",\n"
+      }
+    ]
+  }
+]

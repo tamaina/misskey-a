@@ -1,0 +1,54 @@
+[
+  {
+    "feature": "collections",
+    "service": "ClipService",
+    "file": "packages/features/collections/backend/services.ts",
+    "sourceSha256": "beec2c7394752ca91b1d30d02e123788c2bd1e108bd6fae4771bedb7267f140c",
+    "baseline": [
+      {
+        "port": "clipsRepository"
+      },
+      {
+        "port": "clipNotesRepository"
+      },
+      {
+        "port": "notesRepository"
+      },
+      {
+        "port": "roleService"
+      },
+      {
+        "port": "idService"
+      }
+    ],
+    "current": [
+      {
+        "port": "clipsRepository"
+      },
+      {
+        "port": "clipNotesRepository"
+      },
+      {
+        "port": "notesRepository"
+      },
+      {
+        "port": "roleService"
+      },
+      {
+        "port": "idService"
+      },
+      {
+        "port": "globalEventService"
+      }
+    ],
+    "baselineSourceSha256": "31734f9b9f59c7e96503d4c4927247eba7311d857ae569d24a0375189345495c",
+    "edits": [
+      {
+        "start": 984,
+        "end": 1010,
+        "current": ", ports.globalEventService",
+        "baseline": ""
+      }
+    ]
+  }
+]

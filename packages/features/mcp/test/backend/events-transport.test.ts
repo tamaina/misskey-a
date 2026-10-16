@@ -25,7 +25,8 @@ async function pilot() {
 it('serves modern discovery, events and tools on the same authenticated endpoint', async () => {
 	const { request, events, invoke } = await pilot();
 	const discovery = await request('server/discover'); expect(discovery.statusCode).toBe(200);
-	expect(discovery.json().result).toMatchObject({ resultType: 'complete', supportedVersions: ['2026-07-28'], capabilities: { events: {}, tools: {} } });
+	// MCP 2026-07-28 DiscoverResult requires both cache fields on the wire.
+	expect(discovery.json().result).toMatchObject({ resultType: 'complete', supportedVersions: ['2026-07-28'], capabilities: { events: {}, tools: {} }, cacheScope: 'private', ttlMs: 0 });
 	for (const method of ['events/list', 'events/subscribe', 'events/unsubscribe']) {
 		const response = await request(method, { synthetic: true }); expect(response.statusCode).toBe(200); expect(response.json().result.resultType).toBe('complete');
 		expect(events).toHaveBeenCalledWith(method, { synthetic: true }, expect.any(AbortSignal));

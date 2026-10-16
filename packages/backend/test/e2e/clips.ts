@@ -560,9 +560,10 @@ describe('クリップ', () => {
 		test('は11を超えて設定できる。', async () => {
 			const clips = [
 				aliceClip,
-				...await createMany({}, 10, alice),
+				...await createMany({}, 9, alice),
 				...await createMany({ isPublic: true }, 10, bob),
 			];
+			assert.ok(clips.length > 11);
 			for (const clip of clips) {
 				await favorite({ clipId: clip.id });
 			}
