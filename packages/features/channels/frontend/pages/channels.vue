@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					@update:modelValue="search()"
 				>
 				</MkRadios>
-				<MkButton large primary gradate rounded @click="search">{{ $locale.sfc.search }}</MkButton>
+				<MkButton large primary gradate rounded @click="search">{{ globalLocale.env.search }}</MkButton>
 			</div>
 
 			<MkFoldableSection v-if="channelPaginator">
@@ -62,6 +62,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';
 import MkChannelPreview from '@features/channels/frontend/components/MkChannelPreview.vue';
 import MkChannelList from '@features/channels/frontend/components/MkChannelList.vue';
@@ -74,6 +76,8 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import { $i } from '@features/auth/frontend/i.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const router = useRouter();
 
@@ -137,7 +141,7 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => [{
 	key: 'search',
-	title: $locale.value.sfc.search,
+	title: globalLocale.value.env.search,
 	icon: 'ti ti-search',
 }, {
 	key: 'featured',
@@ -179,7 +183,6 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"search": "البحث",
 	"featured": "المتداوَلة",
 	"favorites": "المفضلات",
 	"following": "متابَع",
@@ -194,7 +197,6 @@ definePage(() => ({
 
 <locale locale="ca-ES" lang="json">
 {
-	"search": "Cercar",
 	"featured": "Popular",
 	"favorites": "Favorits",
 	"following": "Seguin",
@@ -209,7 +211,6 @@ definePage(() => ({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"search": "Vyhledávání",
 	"featured": "Trendy",
 	"favorites": "Oblíbené",
 	"following": "Sledovaný",
@@ -224,7 +225,6 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
-	"search": "Search",
 	"featured": "Trending",
 	"favorites": "Favorites",
 	"following": "Followed",
@@ -239,7 +239,6 @@ definePage(() => ({
 
 <locale locale="de-DE" lang="json">
 {
-	"search": "Suchen",
 	"featured": "Trends",
 	"favorites": "Favoriten",
 	"following": "Gefolgt",
@@ -254,7 +253,6 @@ definePage(() => ({
 
 <locale locale="en-US" lang="json">
 {
-	"search": "Search",
 	"featured": "Trending",
 	"favorites": "Favorites",
 	"following": "Followed",
@@ -269,7 +267,6 @@ definePage(() => ({
 
 <locale locale="es-ES" lang="json">
 {
-	"search": "Buscar",
 	"featured": "Tendencias",
 	"favorites": "Favoritos",
 	"following": "Siguiendo",
@@ -284,7 +281,6 @@ definePage(() => ({
 
 <locale locale="fr-FR" lang="json">
 {
-	"search": "Rechercher",
 	"featured": "Tendances",
 	"favorites": "Favoris",
 	"following": "Abonné·e",
@@ -299,7 +295,6 @@ definePage(() => ({
 
 <locale locale="id-ID" lang="json">
 {
-	"search": "Cari",
 	"featured": "Tren",
 	"favorites": "Favorit",
 	"following": "Mengikuti",
@@ -314,7 +309,6 @@ definePage(() => ({
 
 <locale locale="it-IT" lang="json">
 {
-	"search": "Cerca",
 	"featured": "Popolari nel canale",
 	"favorites": "Preferiti",
 	"following": "Following",
@@ -329,7 +323,6 @@ definePage(() => ({
 
 <locale locale="ja-JP" lang="json">
 {
-	"search": "検索",
 	"featured": "トレンド",
 	"favorites": "お気に入り",
 	"following": "フォロー中",
@@ -344,7 +337,6 @@ definePage(() => ({
 
 <locale locale="ja-KS" lang="json">
 {
-	"search": "探す",
 	"featured": "トレンド",
 	"favorites": "お気に入り",
 	"following": "フォロー中やで",
@@ -359,7 +351,6 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"search": "Nadi",
 	"featured": "Trending",
 	"favorites": "Favorites",
 	"following": "Followed",
@@ -374,7 +365,6 @@ definePage(() => ({
 
 <locale locale="kn-IN" lang="json">
 {
-	"search": "ಹುಡುಕು",
 	"featured": "Trending",
 	"favorites": "ಮೆಚ್ಚಿನವುಗಳು",
 	"following": "Followed",
@@ -389,7 +379,6 @@ definePage(() => ({
 
 <locale locale="ko-KR" lang="json">
 {
-	"search": "검색",
 	"featured": "트렌드",
 	"favorites": "즐겨찾기",
 	"following": "팔로잉",
@@ -404,7 +393,6 @@ definePage(() => ({
 
 <locale locale="nl-NL" lang="json">
 {
-	"search": "Zoeken",
 	"featured": "Trending",
 	"favorites": "Toevoegen aan favorieten",
 	"following": "Followed",
@@ -419,7 +407,6 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
-	"search": "Søk",
 	"featured": "Populært",
 	"favorites": "Favoritter",
 	"following": "Følger",
@@ -434,7 +421,6 @@ definePage(() => ({
 
 <locale locale="pl-PL" lang="json">
 {
-	"search": "Szukaj",
 	"featured": "Na czasie",
 	"favorites": "Ulubione",
 	"following": "Śledzeni",
@@ -449,7 +435,6 @@ definePage(() => ({
 
 <locale locale="pt-PT" lang="json">
 {
-	"search": "Pesquisar",
 	"featured": "Destaques",
 	"favorites": "Favoritos",
 	"following": "Seguindo",
@@ -464,7 +449,6 @@ definePage(() => ({
 
 <locale locale="ru-RU" lang="json">
 {
-	"search": "Поиск",
 	"featured": "Актуальные",
 	"favorites": "Избранное",
 	"following": "Подписки",
@@ -479,7 +463,6 @@ definePage(() => ({
 
 <locale locale="sk-SK" lang="json">
 {
-	"search": "Hľadať",
 	"featured": "Trendy",
 	"favorites": "Obľúbené",
 	"following": "Sledované",
@@ -494,7 +477,6 @@ definePage(() => ({
 
 <locale locale="th-TH" lang="json">
 {
-	"search": "ค้นหา",
 	"featured": "เทรนด์",
 	"favorites": "รายการโปรด",
 	"following": "ติดตามแล้ว",
@@ -509,7 +491,6 @@ definePage(() => ({
 
 <locale locale="tr-TR" lang="json">
 {
-	"search": "Ara",
 	"featured": "Trend olan",
 	"favorites": "Favoriler",
 	"following": "Takip edildi",
@@ -524,7 +505,6 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
-	"search": "ئىزدەش",
 	"featured": "Trending",
 	"favorites": "Favorites",
 	"following": "Followed",
@@ -539,7 +519,6 @@ definePage(() => ({
 
 <locale locale="uk-UA" lang="json">
 {
-	"search": "Пошук",
 	"featured": "Тренди",
 	"favorites": "Обране",
 	"following": "Підписки",
@@ -554,7 +533,6 @@ definePage(() => ({
 
 <locale locale="vi-VN" lang="json">
 {
-	"search": "Tìm kiếm",
 	"featured": "Xu hướng",
 	"favorites": "Lượt thích",
 	"following": "Đang theo dõi",
@@ -569,7 +547,6 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
-	"search": "搜索",
 	"featured": "热门",
 	"favorites": "收藏",
 	"following": "正在关注",
@@ -584,7 +561,6 @@ definePage(() => ({
 
 <locale locale="zh-TW" lang="json">
 {
-	"search": "搜尋",
 	"featured": "熱門貼文",
 	"favorites": "我的最愛",
 	"following": "追隨中",

@@ -83,15 +83,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div :class="$style.footer" class="_buttonsCenter">
 			<MkButton primary rounded :disabled="disableSubmitButton" @click="onSubmitClicked">
 				<i class="ti ti-check"></i>
-				{{ $locale.sfc.ok }}
+				{{ globalLocale.env.ok }}
 			</MkButton>
-			<MkButton rounded @click="onCancelClicked"><i class="ti ti-x"></i> {{ $locale.sfc.cancel }}</MkButton>
+			<MkButton rounded @click="onCancelClicked"><i class="ti ti-x"></i> {{ globalLocale.env.cancel }}</MkButton>
 		</div>
 	</div>
 </MkModalWindow>
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { computed, onMounted, ref, useTemplateRef, toRefs } from 'vue';
 import * as Misskey from 'misskey-js';
 import type {
@@ -106,6 +108,8 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import * as os from '@features/ui/frontend/os.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 type EventType = {
 	abuseReport: boolean;
@@ -325,9 +329,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "تشغيل",
-	"ok": " حسناً",
-	"cancel": " إلغاء"
+	"enable": "تشغيل"
 }
 </locale>
 
@@ -346,9 +348,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "Quan el compte d'un moderador no té activitat durant un temps",
 	"inactiveModeratorsInvitationOnlyChanged": "Quan el compte d'un moderador no té activitat durant un temps, i el servidor es canvia a registre per invitacions",
 	"testRemarks": "Si feu clic al botó a la dreta de l'interruptor, podeu enviar un webhook de prova amb dades dummy.",
-	"enable": "Habilita",
-	"ok": "OK",
-	"cancel": "Cancel·lar"
+	"enable": "Habilita"
 }
 </locale>
 
@@ -367,9 +367,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Povolit",
-	"ok": "Potvrdit",
-	"cancel": "Zrušit"
+	"enable": "Povolit"
 }
 </locale>
 
@@ -388,9 +386,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Enable",
-	"ok": "OK",
-	"cancel": "Cancel"
+	"enable": "Enable"
 }
 </locale>
 
@@ -409,9 +405,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "Wenn Moderatoren für eine gewisse Zeit inaktiv sind",
 	"inactiveModeratorsInvitationOnlyChanged": "Wenn ein Moderator über einen gewissen Zeitraum inaktiv war und der Server auf Einladungsbasis umgestellt wird",
 	"testRemarks": "Klicke auf die Schaltfläche rechts neben dem Schalter, um einen Test-Webhook mit Dummy-Daten zu senden.",
-	"enable": "Aktivieren",
-	"ok": "OK",
-	"cancel": "Abbrechen"
+	"enable": "Aktivieren"
 }
 </locale>
 
@@ -430,9 +424,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Enable",
-	"ok": "OK",
-	"cancel": "Cancel"
+	"enable": "Enable"
 }
 </locale>
 
@@ -451,9 +443,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "Cuando un moderador ha estado inactivo por un tiempo",
 	"inactiveModeratorsInvitationOnlyChanged": "Cuando un moderador ha estado inactivo durante un tiempo, y el servidor se cambia a sólo por invitación",
 	"testRemarks": "Haz clic en el botón de la derecha del switch para mandar una prueba Webhook con datos ficticios",
-	"enable": "Activar",
-	"ok": "OK",
-	"cancel": "Cancelar"
+	"enable": "Activar"
 }
 </locale>
 
@@ -472,9 +462,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Activer",
-	"ok": "OK",
-	"cancel": "Annuler"
+	"enable": "Activer"
 }
 </locale>
 
@@ -493,9 +481,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Aktifkan",
-	"ok": "Oke",
-	"cancel": "Batalkan"
+	"enable": "Aktifkan"
 }
 </locale>
 
@@ -514,9 +500,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "Quando un profilo moderatore rimane inattivo per un determinato periodo",
 	"inactiveModeratorsInvitationOnlyChanged": "Quando la moderazione è rimasta inattiva per un determinato periodo e il sistema è cambiato in modalità \"solo inviti\"",
 	"testRemarks": "Clicca il bottone a destra dell'interruttore, per provare l'invio di un webhook con dati fittizi.",
-	"enable": "Abilita",
-	"ok": "OK",
-	"cancel": "Annulla"
+	"enable": "Abilita"
 }
 </locale>
 
@@ -535,9 +519,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "モデレーターが一定期間非アクティブになったとき",
 	"inactiveModeratorsInvitationOnlyChanged": "モデレーターが一定期間非アクティブだったため、システムにより招待制へと変更されたとき",
 	"testRemarks": "スイッチの右にあるボタンをクリックするとダミーのデータを使用したテスト用Webhookを送信できます。",
-	"enable": "有効にする",
-	"ok": "OK",
-	"cancel": "キャンセル"
+	"enable": "有効にする"
 }
 </locale>
 
@@ -556,9 +538,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "モデレーターがしばらくおらんかったとき",
 	"inactiveModeratorsInvitationOnlyChanged": "モデレーターがしばらくおらんかったから、システムが招待制に変えたとき",
 	"testRemarks": "スイッチ右のボタンを押すとダミーデータを使ったテスト用Webhookを送れるで。",
-	"enable": "有効にするで",
-	"ok": "ええで",
-	"cancel": "やめる"
+	"enable": "有効にするで"
 }
 </locale>
 
@@ -577,9 +557,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Enable",
-	"ok": "IH",
-	"cancel": "Cancel"
+	"enable": "Enable"
 }
 </locale>
 
@@ -598,9 +576,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Enable",
-	"ok": "ಸರಿ",
-	"cancel": "ರದ್ದು"
+	"enable": "Enable"
 }
 </locale>
 
@@ -619,9 +595,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "모더레이터가 일정 기간동안 활동하지 않은 경우",
 	"inactiveModeratorsInvitationOnlyChanged": "모더레이터가 일정 기간 활동하지 않아 시스템에 의해 초대제로 바뀐 경우",
 	"testRemarks": "스위치 오른쪽에 있는 버튼을 클릭하여 더미 데이터를 사용한 테스트용 웹 훅을 보낼 수 있습니다.",
-	"enable": "사용",
-	"ok": "확인",
-	"cancel": "취소"
+	"enable": "사용"
 }
 </locale>
 
@@ -640,9 +614,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Inschakelen",
-	"ok": "Ok",
-	"cancel": "Annuleren"
+	"enable": "Inschakelen"
 }
 </locale>
 
@@ -661,9 +633,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Enable",
-	"ok": "OK",
-	"cancel": "Avbryt"
+	"enable": "Enable"
 }
 </locale>
 
@@ -682,9 +652,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Włącz",
-	"ok": "OK",
-	"cancel": "Anuluj"
+	"enable": "Włącz"
 }
 </locale>
 
@@ -703,9 +671,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "Quando moderadores estiverem inativos por um tempo",
 	"inactiveModeratorsInvitationOnlyChanged": "Quando um moderador está inativo por um tempo e os cadastros passam a exigir convites",
 	"testRemarks": "Clique no botão à direita do interruptor para enviar um Webhook de teste com dados fictícios.",
-	"enable": "Habilitar",
-	"ok": "OK",
-	"cancel": "Cancelar"
+	"enable": "Habilitar"
 }
 </locale>
 
@@ -724,9 +690,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Включить",
-	"ok": "Подтвердить",
-	"cancel": "Отмена"
+	"enable": "Включить"
 }
 </locale>
 
@@ -745,9 +709,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Povoliť",
-	"ok": "OK",
-	"cancel": "Zrušiť"
+	"enable": "Povoliť"
 }
 </locale>
 
@@ -766,9 +728,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "เมื่อผู้ควบคุมไม่มีความเคลื่อนไหวในช่วงระยะเวลาหนึ่ง",
 	"inactiveModeratorsInvitationOnlyChanged": "เมื่อผู้ควบคุมไม่มีความเคลื่อนไหวในช่วงระยะเวลาหนึ่ง ระบบจะเปลี่ยนเป็นแบบใช้คำเชิญโดยอัตโนมัติ",
 	"testRemarks": "คลิกปุ่มทางด้านขวาของสวิตช์เพื่อส่ง Webhook ทดสอบที่มีข้อมูลจำลอง",
-	"enable": "เปิดใช้งาน",
-	"ok": "ตกลง",
-	"cancel": "ยกเลิก"
+	"enable": "เปิดใช้งาน"
 }
 </locale>
 
@@ -787,9 +747,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "Moderatörler bir süredir aktif olmadıklarında",
 	"inactiveModeratorsInvitationOnlyChanged": "Bir moderatör bir süre aktif olmadığında ve sunucu davetle erişilebilir hale getirildiğinde",
 	"testRemarks": "Anahtarın sağındaki düğmeyi tıklayarak sahte verilerle bir test Webhook gönderin.",
-	"enable": "Etkin",
-	"ok": "Tamam",
-	"cancel": "Vazgeç"
+	"enable": "Etkin"
 }
 </locale>
 
@@ -808,9 +766,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Enable",
-	"ok": "ماقۇل",
-	"cancel": "Cancel"
+	"enable": "Enable"
 }
 </locale>
 
@@ -829,9 +785,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Увімкнути",
-	"ok": "OK",
-	"cancel": "Скасувати"
+	"enable": "Увімкнути"
 }
 </locale>
 
@@ -850,9 +804,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "When moderators have been inactive for a while",
 	"inactiveModeratorsInvitationOnlyChanged": "When a moderator has been inactive for a while, and the server is changed to invitation-only",
 	"testRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"enable": "Bật",
-	"ok": "Đồng ý",
-	"cancel": "Hủy"
+	"enable": "Bật"
 }
 </locale>
 
@@ -871,9 +823,7 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "当管理员在一段时间内不活跃时",
 	"inactiveModeratorsInvitationOnlyChanged": "当因为管理员在一段时间内不活跃，导致服务器变为邀请制时",
 	"testRemarks": "点击开关右侧的按钮，可以发送使用假数据的测试 Webhook。",
-	"enable": "启用",
-	"ok": "OK",
-	"cancel": "取消"
+	"enable": "启用"
 }
 </locale>
 
@@ -892,8 +842,6 @@ onMounted(async () => {
 	"inactiveModeratorsWarning": "當審查員在一段時間內沒有活動時",
 	"inactiveModeratorsInvitationOnlyChanged": "當審查員在一段時間內不活動時，系統會將模式變更為邀請制",
 	"testRemarks": "按下切換開關右側的按鈕，就會將假資料發送至 Webhook。",
-	"enable": "啟用",
-	"ok": "OK",
-	"cancel": "取消"
+	"enable": "啟用"
 }
 </locale>

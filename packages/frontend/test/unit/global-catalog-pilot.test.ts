@@ -12,6 +12,7 @@ import { expect, test } from 'vitest';
 import { languages, locales } from 'i18n';
 import { createInternationalization, setActiveInternationalization, useLocale } from 'vite-vue-internationalization/runtime';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
+import { globalLocaleKeys } from '../../../features/runtime/frontend/shared/global-locale.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import { globalCatalogPilotOwners, restoreGlobalCatalogPilotSource, restoreGlobalCatalogPilotDictionary } from './global-catalog-pilot-baseline.js';
 import embedMessages from '../../../features/boot/frontend/embed/boot-messages.json';
@@ -51,7 +52,7 @@ test('all 112 original pilot labels retain their bytes through the shared runtim
 	for (const [file, keys] of owners) {
 		for (const language of languages) {
 			const bundle = payload(plugin, language);
-			expect(bundle.global).toEqual({ save: locales[language].save, delete: locales[language].delete, close: locales[language].close });
+			expect(bundle.global).toEqual(Object.fromEntries(globalLocaleKeys.map(key => [key, locales[language][key]])));
 			const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => bundle } });
 			await runtime.ready;
 			setActiveInternationalization(runtime);
@@ -99,7 +100,7 @@ test.each(globalCatalogPilotOwners)('$file rejects source, owner and global chan
 	expect(createHash('sha256').update(baseline).digest('hex')).toBe(owner.baselineSha256);
 	expect(restoreGlobalCatalogPilotSource(owner.file, baseline)).toBe(baseline);
 	expect(() => restoreGlobalCatalogPilotSource(owner.file, source + '\n')).toThrow('Global catalog pilot source differs');
-	expect(() => restoreGlobalCatalogPilotSource(owner.file, source.replace(`globalLocale.env.${owner.keys[0]}`, 'globalLocale.env.unreviewed'))).toThrow('Global catalog pilot source differs');
+	expect(() => restoreGlobalCatalogPilotSource(owner.file, source.replace(`env.${owner.keys[0]}`, 'env.unreviewed'))).toThrow('Global catalog pilot source differs');
 	const bundle = payload(plugin, 'ja-JP');
 	const dictionary = bundle.modules![owner.file.replace('packages/', '/')]!;
 	const restored = restoreGlobalCatalogPilotDictionary(owner.file, 'ja-JP', dictionary, bundle.global!);

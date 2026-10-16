@@ -88,6 +88,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { ref, useTemplateRef, computed, onMounted, onBeforeUnmount, onDeactivated, onActivated } from 'vue';
 import * as Misskey from 'misskey-js';
 import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
@@ -110,6 +112,8 @@ import { useRouter } from '@features/navigation/frontend/router.js';
 import { useMutationObserver } from '@features/ui/frontend/composables/use-mutation-observer.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { makeDateSeparatedTimelineComputedRef } from '@features/timelines/frontend/utility/timeline-date-separate.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const $i = ensureSignin();
 const router = useRouter();
@@ -205,7 +209,7 @@ async function initialize() {
 		if (rResult.status === 'rejected') {
 			os.alert({
 				type: 'error',
-				text: $locale.value.sfc.somethingHappened,
+				text: globalLocale.value.env.somethingHappened,
 			});
 			initializing.value = false;
 			return;
@@ -428,7 +432,7 @@ const headerTabs = computed(() => room.value ? [{
 	icon: 'ti ti-users',
 }, {
 	key: 'search',
-	title: $locale.value.sfc.search,
+	title: globalLocale.value.env.search,
 	icon: 'ti ti-search',
 }, {
 	key: 'info',
@@ -440,7 +444,7 @@ const headerTabs = computed(() => room.value ? [{
 	icon: 'ti ti-messages',
 }, {
 	key: 'search',
-	title: $locale.value.sfc.search,
+	title: globalLocale.value.env.search,
 	icon: 'ti ti-search',
 }]);
 
@@ -558,7 +562,6 @@ definePage(computed(() => {
 
 <locale locale="ar-SA" lang="json">
 {
-	"somethingHappened": "حدث خطأ",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Are you sure?",
@@ -566,7 +569,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "الأعضاء",
-	"search": "البحث",
 	"info": "عن",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -585,7 +587,6 @@ definePage(computed(() => {
 
 <locale locale="ca-ES" lang="json">
 {
-	"somethingHappened": "S'ha produït un error",
 	"youAreNotAMemberOfThisRoomButInvited": "No participes en aquesta sala, però has rebut una invitació. Per participar accepta la invitació.",
 	"doYouAcceptInvitation": "Acceptes la invitació?",
 	"areYouSure": "Estàs segur?",
@@ -593,7 +594,6 @@ definePage(computed(() => {
 	"leave": "Marxar",
 	"messages": "Missatge",
 	"members": "Membres",
-	"search": "Cercar",
 	"info": "Informació",
 	"directMessage": "Xateja amb aquest usuari",
 	"noMessagesYet": "Encara no tens missatges ",
@@ -612,7 +612,6 @@ definePage(computed(() => {
 
 <locale locale="cs-CZ" lang="json">
 {
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Jste si jistí?",
@@ -620,7 +619,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Členové",
-	"search": "Vyhledávání",
 	"info": "Informace",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -639,7 +637,6 @@ definePage(computed(() => {
 
 <locale locale="da-DK" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Are you sure?",
@@ -647,7 +644,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"search": "Search",
 	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -666,7 +662,6 @@ definePage(computed(() => {
 
 <locale locale="de-DE" lang="json">
 {
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"youAreNotAMemberOfThisRoomButInvited": "Du bist kein Teilnehmer in diesem Raum, aber du hast eine Einladung erhalten. Bitte nimm die Einladung an, um beizutreten.",
 	"doYouAcceptInvitation": "Nimmst du die Einladung an?",
 	"areYouSure": "Bist du sicher?",
@@ -674,7 +669,6 @@ definePage(computed(() => {
 	"leave": "Raum verlassen",
 	"messages": "Nachrichten",
 	"members": "Mitglieder",
-	"search": "Suchen",
 	"info": "Über",
 	"directMessage": "Mit dem Benutzer chatten",
 	"noMessagesYet": "Noch keine Nachrichten",
@@ -693,7 +687,6 @@ definePage(computed(() => {
 
 <locale locale="en-US" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Are you sure?",
@@ -701,7 +694,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"search": "Search",
 	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -720,7 +712,6 @@ definePage(computed(() => {
 
 <locale locale="es-ES" lang="json">
 {
-	"somethingHappened": "Ocurrió un error",
 	"youAreNotAMemberOfThisRoomButInvited": "No eres participante en esta sala, pero has recibido una invitación. Por favor, acepta la invitación para unirte.",
 	"doYouAcceptInvitation": "¿Aceptas la invitación?",
 	"areYouSure": "¿Estás conforme?",
@@ -728,7 +719,6 @@ definePage(computed(() => {
 	"leave": "Dejar sala",
 	"messages": "Mensajes",
 	"members": "Miembros",
-	"search": "Buscar",
 	"info": "Información",
 	"directMessage": "Chatear",
 	"noMessagesYet": "Aún no hay mensajes",
@@ -747,7 +737,6 @@ definePage(computed(() => {
 
 <locale locale="fr-FR" lang="json">
 {
-	"somethingHappened": "Une erreur est survenue",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Êtes-vous sûr·e ?",
@@ -755,7 +744,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Membres",
-	"search": "Rechercher",
 	"info": "Informations",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -774,7 +762,6 @@ definePage(computed(() => {
 
 <locale locale="id-ID" lang="json">
 {
-	"somethingHappened": "Terjadi kesalahan",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Apakah kamu yakin?",
@@ -782,7 +769,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Anggota",
-	"search": "Cari",
 	"info": "Informasi",
 	"directMessage": "Obrolan pengguna",
 	"noMessagesYet": "No messages yet",
@@ -801,7 +787,6 @@ definePage(computed(() => {
 
 <locale locale="it-IT" lang="json">
 {
-	"somethingHappened": "Si è verificato un problema",
 	"youAreNotAMemberOfThisRoomButInvited": "Non partecipi a questa stanza di chat, ma hai ricevuto un invito. Per partecipare, accetta l'invito.",
 	"doYouAcceptInvitation": "Intendi accettare l'invito?",
 	"areYouSure": "Confermi?",
@@ -809,7 +794,6 @@ definePage(computed(() => {
 	"leave": "Esci",
 	"messages": "Messaggi",
 	"members": "Membri",
-	"search": "Cerca",
 	"info": "Informazioni",
 	"directMessage": "Chattare insieme",
 	"noMessagesYet": "Ancora nessun messaggio",
@@ -828,7 +812,6 @@ definePage(computed(() => {
 
 <locale locale="ja-JP" lang="json">
 {
-	"somethingHappened": "問題が発生しました",
 	"youAreNotAMemberOfThisRoomButInvited": "あなたはこのグループの参加者ではありませんが、招待が届いています。参加するには、招待を承認してください。",
 	"doYouAcceptInvitation": "招待を承認しますか？",
 	"areYouSure": "よろしいですか？",
@@ -836,7 +819,6 @@ definePage(computed(() => {
 	"leave": "グループから退出",
 	"messages": "メッセージ",
 	"members": "メンバー",
-	"search": "検索",
 	"info": "情報",
 	"directMessage": "ダイレクトメッセージ",
 	"noMessagesYet": "まだメッセージはありません",
@@ -855,7 +837,6 @@ definePage(computed(() => {
 
 <locale locale="ja-KS" lang="json">
 {
-	"somethingHappened": "なんかあかんわ",
 	"youAreNotAMemberOfThisRoomButInvited": "あんたはこのルームの参加者ちゃうけど、招待が届いとるで。参加するんやったら、招待を承認してな。",
 	"doYouAcceptInvitation": "招待を承認してもええんか？",
 	"areYouSure": "いいん？",
@@ -863,7 +844,6 @@ definePage(computed(() => {
 	"leave": "グループから抜ける",
 	"messages": "メッセージ",
 	"members": "メンバーはん",
-	"search": "探す",
 	"info": "情報",
 	"directMessage": "チャットしよか",
 	"noMessagesYet": "まだメッセージはあらへんで",
@@ -882,7 +862,6 @@ definePage(computed(() => {
 
 <locale locale="kab-KAB" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Are you sure?",
@@ -890,7 +869,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"search": "Nadi",
 	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -909,7 +887,6 @@ definePage(computed(() => {
 
 <locale locale="kn-IN" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Are you sure?",
@@ -917,7 +894,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"search": "ಹುಡುಕು",
 	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -936,7 +912,6 @@ definePage(computed(() => {
 
 <locale locale="ko-KR" lang="json">
 {
-	"somethingHappened": "오류가 발생했습니다",
 	"youAreNotAMemberOfThisRoomButInvited": "이 방의 참가자가 아니지만 초대를 받았습니다. 참가하려면 초대를 수락하세요.",
 	"doYouAcceptInvitation": "초대를 수락하시겠습니까?",
 	"areYouSure": "계속 진행하시겠습니까?",
@@ -944,7 +919,6 @@ definePage(computed(() => {
 	"leave": "룸을 떠나기",
 	"messages": "메시지",
 	"members": "멤버",
-	"search": "검색",
 	"info": "정보",
 	"directMessage": "채팅하기",
 	"noMessagesYet": "아직 메시지가 없습니다",
@@ -963,7 +937,6 @@ definePage(computed(() => {
 
 <locale locale="nl-NL" lang="json">
 {
-	"somethingHappened": "Er is iets misgegaan.",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Weet je het zeker?",
@@ -971,7 +944,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Leden",
-	"search": "Zoeken",
 	"info": "Over",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -990,7 +962,6 @@ definePage(computed(() => {
 
 <locale locale="no-NO" lang="json">
 {
-	"somethingHappened": "En feil har oppstått",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Are you sure?",
@@ -998,7 +969,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Medlemmer",
-	"search": "Søk",
 	"info": "Infomasjon",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -1017,7 +987,6 @@ definePage(computed(() => {
 
 <locale locale="pl-PL" lang="json">
 {
-	"somethingHappened": "Coś poszło nie tak",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Na pewno?",
@@ -1025,7 +994,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Członkowie",
-	"search": "Szukaj",
 	"info": "Informacje",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -1044,7 +1012,6 @@ definePage(computed(() => {
 
 <locale locale="pt-PT" lang="json">
 {
-	"somethingHappened": "Ocorreu um erro",
 	"youAreNotAMemberOfThisRoomButInvited": "Você não é um participante da sala, mas recebeu um convite. Por favor, aceite o convite para entrar.",
 	"doYouAcceptInvitation": "Aceita o convite?",
 	"areYouSure": "Tem certeza?",
@@ -1052,7 +1019,6 @@ definePage(computed(() => {
 	"leave": "Deixar sala",
 	"messages": "Mensagem",
 	"members": "Membros",
-	"search": "Pesquisar",
 	"info": "Informações",
 	"directMessage": "Conversar com usuário",
 	"noMessagesYet": "Ainda não há mensagens",
@@ -1071,7 +1037,6 @@ definePage(computed(() => {
 
 <locale locale="ru-RU" lang="json">
 {
-	"somethingHappened": "Что-то пошло не так",
 	"youAreNotAMemberOfThisRoomButInvited": "Вы не являетесь участником этого чата, но вас в него пригласили. Пожалуйста, примите приглашение.",
 	"doYouAcceptInvitation": "Принять приглашение?",
 	"areYouSure": "Вы уверены?",
@@ -1079,7 +1044,6 @@ definePage(computed(() => {
 	"leave": "Выйти из комнаты",
 	"messages": "Сообщения",
 	"members": "Участники",
-	"search": "Поиск",
 	"info": "Описание",
 	"directMessage": "Личные сообщения",
 	"noMessagesYet": "Сообщений пока нет",
@@ -1098,7 +1062,6 @@ definePage(computed(() => {
 
 <locale locale="sk-SK" lang="json">
 {
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Are you sure?",
@@ -1106,7 +1069,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Členovia",
-	"search": "Hľadať",
 	"info": "Informácie",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -1125,7 +1087,6 @@ definePage(computed(() => {
 
 <locale locale="th-TH" lang="json">
 {
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"youAreNotAMemberOfThisRoomButInvited": "คุณไม่ได้เป็นผู้เข้าร่วมห้องนี้ แต่มีคำเชิญส่งมา หากต้องการเข้าร่วม กรุณายืนยันคำเชิญ",
 	"doYouAcceptInvitation": "ต้องการยอมรับคำเชิญหรือไม่?",
 	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?",
@@ -1133,7 +1094,6 @@ definePage(computed(() => {
 	"leave": "ออกจากห้อง",
 	"messages": "ข้อความ",
 	"members": "สมาชิก",
-	"search": "ค้นหา",
 	"info": "เกี่ยวกับ",
 	"directMessage": "แชตเลย",
 	"noMessagesYet": "ยังไม่มีข้อความ",
@@ -1152,7 +1112,6 @@ definePage(computed(() => {
 
 <locale locale="tr-TR" lang="json">
 {
-	"somethingHappened": "Bir hata oluştu",
 	"youAreNotAMemberOfThisRoomButInvited": "Bu odanın katılımcısı değilsin, ancak bir davet aldın. Lütfen daveti kabul ederek katıl.",
 	"doYouAcceptInvitation": "Daveti kabul ediyor musunuz?",
 	"areYouSure": "Emin misin?",
@@ -1160,7 +1119,6 @@ definePage(computed(() => {
 	"leave": "Odadan çık",
 	"messages": "Mesaj",
 	"members": "Üyeler",
-	"search": "Ara",
 	"info": "Hakkında",
 	"directMessage": "Kullanıcıyla sohbet et",
 	"noMessagesYet": "Henüz mesaj yok",
@@ -1179,7 +1137,6 @@ definePage(computed(() => {
 
 <locale locale="ug-CN" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Are you sure?",
@@ -1187,7 +1144,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"search": "ئىزدەش",
 	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -1206,7 +1162,6 @@ definePage(computed(() => {
 
 <locale locale="uk-UA" lang="json">
 {
-	"somethingHappened": "Щось пішло не так",
 	"youAreNotAMemberOfThisRoomButInvited": "Ви не учасник цієї групи, але ви маєте запрошення до неї. Будь ласка, прийміть запрошення, щоб доєднатися.",
 	"doYouAcceptInvitation": "Чи приймаєте ви запрошення?",
 	"areYouSure": "Ви впевнені?",
@@ -1214,7 +1169,6 @@ definePage(computed(() => {
 	"leave": "Залишити групу",
 	"messages": "Повідомлення",
 	"members": "Учасники",
-	"search": "Пошук",
 	"info": "Інформація",
 	"directMessage": "Чат із користувачем",
 	"noMessagesYet": "Повідомлень поки немає",
@@ -1233,7 +1187,6 @@ definePage(computed(() => {
 
 <locale locale="vi-VN" lang="json">
 {
-	"somethingHappened": "Xảy ra lỗi",
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
 	"areYouSure": "Bạn chắc chứ?",
@@ -1241,7 +1194,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Thành viên",
-	"search": "Tìm kiếm",
 	"info": "Giới thiệu",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
@@ -1260,7 +1212,6 @@ definePage(computed(() => {
 
 <locale locale="zh-CN" lang="json">
 {
-	"somethingHappened": "出错了",
 	"youAreNotAMemberOfThisRoomButInvited": "您尚未加入此群组，但已收到加入邀请。请接受邀请加入。",
 	"doYouAcceptInvitation": "要接受邀请吗？",
 	"areYouSure": "你确定吗？",
@@ -1268,7 +1219,6 @@ definePage(computed(() => {
 	"leave": "退出群聊",
 	"messages": "消息",
 	"members": "成员",
-	"search": "搜索",
 	"info": "关于",
 	"directMessage": "私信",
 	"noMessagesYet": "还没有消息",
@@ -1287,7 +1237,6 @@ definePage(computed(() => {
 
 <locale locale="zh-TW" lang="json">
 {
-	"somethingHappened": "發生錯誤",
 	"youAreNotAMemberOfThisRoomButInvited": "您不是此聊天室的參與者，但已收到邀請。若要加入，請先接受邀請。\n",
 	"doYouAcceptInvitation": "您要接受這個邀請嗎？\n",
 	"areYouSure": "是否確定？",
@@ -1295,7 +1244,6 @@ definePage(computed(() => {
 	"leave": "退出聊天室",
 	"messages": "訊息",
 	"members": "成員",
-	"search": "搜尋",
 	"info": "資訊",
 	"directMessage": "直接訊息",
 	"noMessagesYet": "尚無訊息",

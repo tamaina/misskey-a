@@ -74,9 +74,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 					<div class="_gaps_s">
 						<MkCode :code="result" lang="html" :forceShow="true" :copyButton="false" :class="$style.embedCodeGenResultCode"/>
-						<MkButton :class="$style.embedCodeGenResultButtons" rounded primary @click="doCopy"><i class="ti ti-copy"></i> {{ $locale.sfc.copy }}</MkButton>
+						<MkButton :class="$style.embedCodeGenResultButtons" rounded primary @click="doCopy"><i class="ti ti-copy"></i> {{ globalLocale.env.copy }}</MkButton>
 					</div>
-					<MkButton :class="$style.embedCodeGenResultButtons" rounded transparent @click="close">{{ $locale.sfc.close }}</MkButton>
+					<MkButton :class="$style.embedCodeGenResultButtons" rounded transparent @click="close">{{ globalLocale.env.close }}</MkButton>
 				</div>
 			</div>
 		</Transition>
@@ -85,6 +85,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { useTemplateRef, ref, computed, nextTick, onMounted, onDeactivated, onUnmounted } from 'vue';
 import { url } from '@features/boot/frontend/shared/config.js';
 import { embedRouteWithScrollbar } from '@features/web/frontend/shared/embed-page.js';
@@ -100,6 +102,8 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { normalizeEmbedParams, getEmbedCode } from '@features/web/frontend/utility/get-embed-code.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const emit = defineEmits<{
 	(ev: 'ok'): void;
@@ -408,9 +412,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "نسخ",
-	"close": "اغلق"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -432,9 +434,7 @@ onUnmounted(() => {
 	"applyToPreview": "Aplica a la vista prèvia",
 	"generateCode": "Crea el codi per incrustar",
 	"codeGenerated": "Codi generat",
-	"codeGeneratedDescription": "Si us plau, enganxeu el codi generat al lloc web.",
-	"copy": "Copiar",
-	"close": "Tanca"
+	"codeGeneratedDescription": "Si us plau, enganxeu el codi generat al lloc web."
 }
 </locale>
 
@@ -456,9 +456,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopírovat",
-	"close": "Zavřít"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -480,9 +478,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -504,9 +500,7 @@ onUnmounted(() => {
 	"applyToPreview": "Auf die Vorschau anwenden",
 	"generateCode": "Einbettungscode generieren",
 	"codeGenerated": "Der Code wurde generiert",
-	"codeGeneratedDescription": "Füge den generierten Code in deine Website ein, um den Inhalt einzubetten.",
-	"copy": "Kopieren",
-	"close": "Schließen"
+	"codeGeneratedDescription": "Füge den generierten Code in deine Website ein, um den Inhalt einzubetten."
 }
 </locale>
 
@@ -528,9 +522,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -552,9 +544,7 @@ onUnmounted(() => {
 	"applyToPreview": "Aplicar a la vista previa",
 	"generateCode": "Crear el código para incrustar",
 	"codeGenerated": "El código ha sido generado",
-	"codeGeneratedDescription": "Pegue el código generado en su sitio web para incrustar el contenido.",
-	"copy": "Copiar",
-	"close": "Cerrar"
+	"codeGeneratedDescription": "Pegue el código generado en su sitio web para incrustar el contenido."
 }
 </locale>
 
@@ -576,9 +566,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Générer le code d'intégration",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copier",
-	"close": "Fermer"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -600,9 +588,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Salin",
-	"close": "Tutup"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -624,9 +610,7 @@ onUnmounted(() => {
 	"applyToPreview": "Aggiorna l'anteprima",
 	"generateCode": "Crea il codice per incorporare",
 	"codeGenerated": "Codice generato",
-	"codeGeneratedDescription": "Incolla il codice appena generato sul tuo sito web.",
-	"copy": "Copia",
-	"close": "Chiudi"
+	"codeGeneratedDescription": "Incolla il codice appena generato sul tuo sito web."
 }
 </locale>
 
@@ -648,9 +632,7 @@ onUnmounted(() => {
 	"applyToPreview": "プレビューに反映",
 	"generateCode": "埋め込みコードを作成",
 	"codeGenerated": "コードが生成されました",
-	"codeGeneratedDescription": "生成されたコードをウェブサイトに貼り付けてご利用ください。",
-	"copy": "コピー",
-	"close": "閉じる"
+	"codeGeneratedDescription": "生成されたコードをウェブサイトに貼り付けてご利用ください。"
 }
 </locale>
 
@@ -672,9 +654,7 @@ onUnmounted(() => {
 	"applyToPreview": "プレビューに反映",
 	"generateCode": "埋め込みコード作る",
 	"codeGenerated": "コード作ったで",
-	"codeGeneratedDescription": "作ったコードはウェブサイトに貼っつけて使ってや。",
-	"copy": "コピー",
-	"close": "さいなら"
+	"codeGeneratedDescription": "作ったコードはウェブサイトに貼っつけて使ってや。"
 }
 </locale>
 
@@ -696,9 +676,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -720,9 +698,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -744,9 +720,7 @@ onUnmounted(() => {
 	"applyToPreview": "미리보기에 반영",
 	"generateCode": "임베디드 코드를 만들기",
 	"codeGenerated": "코드를 만들었습니다.",
-	"codeGeneratedDescription": "만들어진 코드를 웹 사이트에 붙여서 사용하세요.",
-	"copy": "복사",
-	"close": "닫기"
+	"codeGeneratedDescription": "만들어진 코드를 웹 사이트에 붙여서 사용하세요."
 }
 </locale>
 
@@ -768,9 +742,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopiëren",
-	"close": "Sluiten"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -792,9 +764,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopier",
-	"close": "Lukk"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -816,9 +786,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopiuj",
-	"close": "Zamknij"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -840,9 +808,7 @@ onUnmounted(() => {
 	"applyToPreview": "Aplicar para a prévia",
 	"generateCode": "Gerar código de embed",
 	"codeGenerated": "O código foi gerado",
-	"codeGeneratedDescription": "Coloque o código no seu website para incorporar o conteúdo.",
-	"copy": "Copiar",
-	"close": "Fechar"
+	"codeGeneratedDescription": "Coloque o código no seu website para incorporar o conteúdo."
 }
 </locale>
 
@@ -864,9 +830,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Копировать",
-	"close": "Закрыть"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -888,9 +852,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopírovať",
-	"close": "Zavrieť"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -912,9 +874,7 @@ onUnmounted(() => {
 	"applyToPreview": "นำไปใช้กับการแสดงตัวอย่าง",
 	"generateCode": "สร้างโค้ดสำหรับการฝัง",
 	"codeGenerated": "รหัสถูกสร้างขึ้นแล้ว",
-	"codeGeneratedDescription": "นำโค้ดที่สร้างแล้วไปวางในเว็บไซต์ของคุณเพื่อฝังเนื้อหา",
-	"copy": "คัดลอก",
-	"close": "ปิด"
+	"codeGeneratedDescription": "นำโค้ดที่สร้างแล้วไปวางในเว็บไซต์ของคุณเพื่อฝังเนื้อหา"
 }
 </locale>
 
@@ -936,9 +896,7 @@ onUnmounted(() => {
 	"applyToPreview": "Önizlemeye başvur",
 	"generateCode": "Gömme kodu oluştur",
 	"codeGenerated": "Kod oluşturuldu",
-	"codeGeneratedDescription": "Oluşturulan kodu web sitene yapıştırarak içeriği göm.",
-	"copy": "Kopyala",
-	"close": "Kapat"
+	"codeGeneratedDescription": "Oluşturulan kodu web sitene yapıştırarak içeriği göm."
 }
 </locale>
 
@@ -960,9 +918,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -984,9 +940,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Скопіювати",
-	"close": "Закрити"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -1008,9 +962,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Sao chép",
-	"close": "Đóng"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -1032,9 +984,7 @@ onUnmounted(() => {
 	"applyToPreview": "应用预览",
 	"generateCode": "生成嵌入代码",
 	"codeGenerated": "已生成代码",
-	"codeGeneratedDescription": "将生成的代码贴到网站上来使用。",
-	"copy": "复制",
-	"close": "关闭"
+	"codeGeneratedDescription": "将生成的代码贴到网站上来使用。"
 }
 </locale>
 
@@ -1056,8 +1006,6 @@ onUnmounted(() => {
 	"applyToPreview": "反映在預覽中",
 	"generateCode": "建立嵌入程式碼",
 	"codeGenerated": "已產生程式碼",
-	"codeGeneratedDescription": "請將產生的程式碼貼到您的網站上。",
-	"copy": "複製",
-	"close": "關閉"
+	"codeGeneratedDescription": "請將產生的程式碼貼到您的網站上。"
 }
 </locale>

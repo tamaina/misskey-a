@@ -45,7 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkTextarea v-model="preservedUsernames">
 								<template #caption>{{ $locale.sfc.preservedUsernamesDescription }}</template>
 							</MkTextarea>
-							<MkButton primary @click="save_preservedUsernames">{{ $locale.sfc.save }}</MkButton>
+							<MkButton primary @click="save_preservedUsernames">{{ globalLocale.env.save }}</MkButton>
 						</div>
 					</MkFolder>
 				</SearchMarker>
@@ -59,7 +59,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkTextarea v-model="sensitiveWords">
 								<template #caption>{{ $locale.sfc.sensitiveWordsDescription }}<br>{{ $locale.sfc.sensitiveWordsDescription2 }}</template>
 							</MkTextarea>
-							<MkButton primary @click="save_sensitiveWords">{{ $locale.sfc.save }}</MkButton>
+							<MkButton primary @click="save_sensitiveWords">{{ globalLocale.env.save }}</MkButton>
 						</div>
 					</MkFolder>
 				</SearchMarker>
@@ -73,7 +73,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkTextarea v-model="prohibitedWords">
 								<template #caption>{{ $locale.sfc.prohibitedWordsDescription }}<br>{{ $locale.sfc.prohibitedWordsDescription2 }}</template>
 							</MkTextarea>
-							<MkButton primary @click="save_prohibitedWords">{{ $locale.sfc.save }}</MkButton>
+							<MkButton primary @click="save_prohibitedWords">{{ globalLocale.env.save }}</MkButton>
 						</div>
 					</MkFolder>
 				</SearchMarker>
@@ -87,7 +87,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkTextarea v-model="prohibitedWordsForNameOfUser">
 								<template #caption>{{ $locale.sfc.prohibitedWordsForNameOfUserDescription }}<br>{{ $locale.sfc.prohibitedWordsDescription2 }}</template>
 							</MkTextarea>
-							<MkButton primary @click="save_prohibitedWordsForNameOfUser">{{ $locale.sfc.save }}</MkButton>
+							<MkButton primary @click="save_prohibitedWordsForNameOfUser">{{ globalLocale.env.save }}</MkButton>
 						</div>
 					</MkFolder>
 				</SearchMarker>
@@ -101,7 +101,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkTextarea v-model="hiddenTags">
 								<template #caption>{{ $locale.sfc.hiddenTagsDescription }}</template>
 							</MkTextarea>
-							<MkButton primary @click="save_hiddenTags">{{ $locale.sfc.save }}</MkButton>
+							<MkButton primary @click="save_hiddenTags">{{ globalLocale.env.save }}</MkButton>
 						</div>
 					</MkFolder>
 				</SearchMarker>
@@ -115,7 +115,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkTextarea v-model="silencedHosts">
 								<template #caption>{{ $locale.sfc.silencedInstancesDescription }}</template>
 							</MkTextarea>
-							<MkButton primary @click="save_silencedHosts">{{ $locale.sfc.save }}</MkButton>
+							<MkButton primary @click="save_silencedHosts">{{ globalLocale.env.save }}</MkButton>
 						</div>
 					</MkFolder>
 				</SearchMarker>
@@ -129,7 +129,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkTextarea v-model="mediaSilencedHosts">
 								<template #caption>{{ $locale.sfc.mediaSilencedInstancesDescription }}</template>
 							</MkTextarea>
-							<MkButton primary @click="save_mediaSilencedHosts">{{ $locale.sfc.save }}</MkButton>
+							<MkButton primary @click="save_mediaSilencedHosts">{{ globalLocale.env.save }}</MkButton>
 						</div>
 					</MkFolder>
 				</SearchMarker>
@@ -143,7 +143,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkTextarea v-model="blockedHosts">
 								<template #caption>{{ $locale.sfc.blockedInstancesDescription }}</template>
 							</MkTextarea>
-							<MkButton primary @click="save_blockedHosts">{{ $locale.sfc.save }}</MkButton>
+							<MkButton primary @click="save_blockedHosts">{{ globalLocale.env.save }}</MkButton>
 						</div>
 					</MkFolder>
 				</SearchMarker>
@@ -154,6 +154,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import XServerRules from '@features/instance/frontend/pages/admin/server-rules.vue';
@@ -169,6 +171,8 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const meta = await misskeyApi('admin/meta');
 
@@ -317,7 +321,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "أسماء المستخدمين المحجوزة",
 	"preservedUsernamesDescription": "قائمة بأسماء المستخدمين المحجوزة كلٌ في سطر. لن يُقبل التسجيل بهذه الأسماء وستبقى محصورة على التسجيل اليدوي بواسطة المديرين. لن يتأثر المستخدمون الذين يملكون هذه الأسماء سلفًا.",
-	"save": "حفظ",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -354,7 +357,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "La publicació incondicional de tots els continguts del servidor a internet, incloent-hi els continguts remots rebuts pel servidor, comporta riscos. Això és extremadament important per els espectadors que desconeixen el caràcter descentralitzat dels continguts, ja que poden percebre erroneament els continguts remots com contingut generat per el propi servidor.",
 	"preservedUsernames": "Noms d'usuaris reservats",
 	"preservedUsernamesDescription": "Llistat de noms d'usuaris que no es poden fer servir separats per salts de linia. Aquests noms d'usuaris no estaran disponibles quan es creï un compte d'usuari normal, però els administradors els poden fer servir per crear comptes manualment. Per altre banda els comptes ja creats amb aquests noms d'usuari no es veure'n afectats.",
-	"save": "Desa",
 	"sensitiveWords": "Paraules sensibles",
 	"sensitiveWordsDescription": "La visibilitat de totes les notes que continguin qualsevol de les paraules configurades seran, automàticament, afegides a \"Inici\". Pots llistar diferents paraules separant les per línies noves.",
 	"sensitiveWordsDescription2": "Fent servir espais crearà expressions AND si l'expressió s'envolta amb barres inclinades es converteix en una expressió regular.",
@@ -391,7 +393,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Rezervované uživatelské jména",
 	"preservedUsernamesDescription": "Seznam uživatelských jmén na rezervaci oddělené mezerama. Tyhle jména se potom nebudou moc použít při normálním procesu vytvoření účtu ale můžou být použiti manuálně administratorém. Existujících účtů se to nedotkne.",
-	"save": "Uložit",
 	"sensitiveWords": "Citlivá slova",
 	"sensitiveWordsDescription": "Viditelnost všech poznámek obsahujících některé z nakonfigurovaných slov bude automaticky nastavena na \"Domů\". Můžete jich uvést více tak, že je oddělíte pomocí řádků.",
 	"sensitiveWordsDescription2": "Použití mezer vytvoří výrazy AND a obklopení klíčových slov lomítky je změní na regulární výraz.",
@@ -428,7 +429,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "Save",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -465,7 +465,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Die uneingeschränkte Veröffentlichung aller Inhalte des Servers im Internet, einschließlich der vom Server empfangenen Fremdinhalte, birgt Risiken. Dies ist besonders wichtig für Betrachter, die sich des dezentralen Charakters der Inhalte nicht bewusst sind, da sie selbst fremde Inhalte fälschlicherweise als auf dem Server erstellte Inhalte wahrnehmen könnten.",
 	"preservedUsernames": "Reservierte Benutzernamen",
 	"preservedUsernamesDescription": "Gib zu reservierende Benutzernamen durch Zeilenumbrüche getrennt an. Diese werden für die Registrierung gesperrt, können aber von Administratoren zur manuellen Erstellung von Konten verwendet werden. Existierende Konten, die diese Namen bereits verwenden, werden nicht beeinträchtigt.",
-	"save": "Speichern",
 	"sensitiveWords": "Sensible Wörter",
 	"sensitiveWordsDescription": "Die Notizsichtbarkeit aller Notizen, die diese Wörter enthalten, wird automatisch auf \"Startseite\" gesetzt. Durch Zeilenumbrüche können mehrere konfiguriert werden.",
 	"sensitiveWordsDescription2": "Durch die Verwendung von Leerzeichen können AND-Verknüpfungen angegeben werden und durch das Umgeben von Schrägstrichen können reguläre Ausdrücke verwendet werden.",
@@ -502,7 +501,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "Save",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -539,7 +537,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Publicar incondicionalmente todo el contenido del servidor en Internet, incluido el contenido remoto recibido por el servidor, es arriesgado. Esto es especialmente importante para los invitados que desconocen la naturaleza distribuida del contenido, ya que pueden creer erróneamente que incluso el contenido remoto es contenido creado por usuarios en el servidor.",
 	"preservedUsernames": "Nombre de usuario reservado",
 	"preservedUsernamesDescription": "La lista de nombres de usuario para reservar tienen que separarse con saltos de línea.\nEstos estarán indisponibles durante la creación de cuentas, pero pueden ser usados para que los administradores puedan crear esas cuentas manualmente. Las cuentas existentes con esos nombres de usuario no se verán afectadas.",
-	"save": "Guardar",
 	"sensitiveWords": "Palabras sensibles",
 	"sensitiveWordsDescription": "La visibilidad de todas las notas que contienen cualquiera de las palabras configuradas serán puestas en \"Inicio\" automáticamente. Puedes enumerás varias separándolas con saltos de línea",
 	"sensitiveWordsDescription2": "Si se usan espacios se crearán expresiones AND y las palabras subsecuentes con barras inclinadas se convertirán en expresiones regulares.",
@@ -576,7 +573,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Noms d'utilisateur·rice réservés",
 	"preservedUsernamesDescription": "Énumérez les noms d'utilisateur à réserver, séparés par des nouvelles lignes. Les noms d'utilisateur spécifiés ici ne seront plus utilisables lors de la création d'un compte, sauf la création manuelle par un administrateur. De plus, les comptes existants ne seront pas affectés.",
-	"save": "Enregistrer",
 	"sensitiveWords": "Mots sensibles",
 	"sensitiveWordsDescription": "Définir la visibilité des notes contenant un mot défini ici au fil principal automatiquement. Vous pouvez définir plusieurs valeurs en les séparant par des sauts de ligne.",
 	"sensitiveWordsDescription2": "Séparer par une espace pour créer une expression AND ; entourer de barres obliques pour créer une expression régulière.",
@@ -613,7 +609,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Nama pengguna tercadangkan",
 	"preservedUsernamesDescription": "Daftar nama pengguna yang dicadangkan dipisah dengan baris baru. Nama pengguna berikut akan tidak dapat dipakai pada pembuatan akun normal, namun dapat digunakan oleh admin untuk membuat akun baru. Akun yang sudah ada dengan menggunakan nama pengguna ini tidak akan terpengaruh.",
-	"save": "Simpan",
 	"sensitiveWords": "Kata sensitif",
 	"sensitiveWordsDescription": "Visibilitas dari semua catatan mengandung kata yang telah diatur akan dijadikan \"Beranda\" secara otomatis. Kamu dapat mendaftarkan kata tersebut lebih dari satu dengan menuliskannya di baris baru.",
 	"sensitiveWordsDescription2": "Menggunakan spasi akan membuat ekspresi AND dan kata kunci disekitarnya dengan garis miring akan mengubahnya menjadi ekspresi reguler.",
@@ -650,7 +645,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Esistono dei rischi nell'esporre incondizionatamente su internet tutto il contenuto del tuo server, incluso il contenuto remoto ricevuto da altri server. In particolare, occorre prestare attenzione, perché le persone non consapevoli della federazione potrebbero erroneamente credere che il contenuto remoto sia stato invece creato all'interno del proprio server.",
 	"preservedUsernames": "Nomi utente riservati",
 	"preservedUsernamesDescription": "Elenca, uno per linea, i nomi utente che non possono essere registrati durante la creazione del profilo. La restrizione non si applica agli amministratori. Inoltre, i profili già registrati sono esenti.",
-	"save": "Salva",
 	"sensitiveWords": "Parole esplicite",
 	"sensitiveWordsDescription": "Imposta automaticamente \"Home\" alla visibilità delle Note che contengono una qualsiasi parola tra queste configurate. Puoi separarle per riga.",
 	"sensitiveWordsDescription2": "Gli spazi creano la relazione \"E\" tra parole (questo E quello). Racchiudere una parola nelle slash \"/\" la trasforma in Espressione Regolare.",
@@ -687,7 +681,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "サーバーで受信したリモートのコンテンツを含め、サーバー内の全てのコンテンツを無条件でインターネットに公開することはリスクが伴います。特に、分散型の特性を知らない閲覧者にとっては、リモートのコンテンツであってもサーバー内で作成されたコンテンツであると誤って認識してしまう可能性があるため、注意が必要です。",
 	"preservedUsernames": "予約ユーザー名",
 	"preservedUsernamesDescription": "予約するユーザー名を改行で列挙します。ここで指定されたユーザー名はアカウント作成時に使えなくなりますが、管理者によるアカウント作成時はこの制限を受けません。また、既に存在するアカウントも影響を受けません。",
-	"save": "保存",
 	"sensitiveWords": "センシティブワード",
 	"sensitiveWordsDescription": "設定したワードが含まれるノートの公開範囲をホームにします。改行で区切って複数設定できます。",
 	"sensitiveWordsDescription2": "スペースで区切るとAND指定になり、キーワードをスラッシュで囲むと正規表現になります。",
@@ -724,7 +717,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "サーバーで受け取ったリモートのコンテンツを含め、サーバー内の全部のコンテンツを何でもかんでもインターネットに公開するのはリスクを伴うねん。特に、分散型の特性を知らん閲覧者にとっては、リモートのコンテンツやったとしてもサーバー内で作られたコンテンツやと誤認してまうかもしれへんから、注意が必要やな。",
 	"preservedUsernames": "予約ユーザー名",
 	"preservedUsernamesDescription": "予約しとくユーザー名を行ごとに挙げるで。ここで指定されたユーザー名はアカウント作るときに使えへんくなるけど、管理者は例外や。あと、もうあるアカウントも例外やな。",
-	"save": "とっとく",
 	"sensitiveWords": "けったいな単語",
 	"sensitiveWordsDescription": "設定した単語が入っとるノートの公開範囲をホームにしたるわ。改行で区切ったら複数設定できるで。",
 	"sensitiveWordsDescription2": "スペースで区切るとAND指定、キーワードをスラッシュで囲んだら正規表現や。",
@@ -761,7 +753,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "Sekles",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -798,7 +789,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "ಉಳಿಸಿ",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -835,7 +825,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "서버에서 받은 리모트 콘텐츠를 포함해 서버 내의 모든 콘텐츠를 무조건 인터넷에 공개하는 것에는 위험이 따릅니다. 특히, 분산형 특성에 대해 모르는 열람자에게는 리모트 콘텐츠여도 서버 내에서 작성된 콘텐츠라고 잘못 인식할 수 있기에 주의가 필요합니다.",
 	"preservedUsernames": "예약한 유저명",
 	"preservedUsernamesDescription": "예약할 유저명을 한 줄에 하나씩 입력합니다. 여기에서 지정한 유저명으로는 계정을 생성할 수 없게 됩니다. 단, 관리자 권한으로 계정을 생성할 때에는 해당되지 않으며, 이미 존재하는 계정도 영향을 받지 않습니다.",
-	"save": "저장",
 	"sensitiveWords": "민감한 단어",
 	"sensitiveWordsDescription": "설정한 단어가 포함된 노트의 공개 범위를 '홈'으로 강제합니다. 개행으로 구분하여 여러 개를 지정할 수 있습니다.",
 	"sensitiveWordsDescription2": "공백으로 구분하면 AND 지정이 되며, 키워드를 슬래시로 둘러싸면 정규 표현식이 됩니다.",
@@ -872,7 +861,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "Opslaan",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -909,7 +897,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "Lagre",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -946,7 +933,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "Zapisz",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -983,7 +969,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Publicar todo o conteúdo do servidor para a internet pode ser arriscado. Isso é especialmente importante para visitantes que desconhecem a natureza distribuída do conteúdo na internet, pois eles podem acreditar que o conteúdo remoto é criado por usuários desse servidor.",
 	"preservedUsernames": "Nomes de usuário reservados",
 	"preservedUsernamesDescription": "Liste os nomes de usuário que deseja reservar, separando-os por quebras de linha. Os nomes de usuário especificados aqui não poderão ser utilizados durante a criação de contas. No entanto, esta restrição não se aplica quando a conta é criada por um administrador. Além disso, as contas que já existem não serão afetadas.",
-	"save": "Salvar",
 	"sensitiveWords": "Palavras sensíveis",
 	"sensitiveWordsDescription": "A visibilidade de todas as notas contendo as palavras configuradas será colocadas como \"Início\" automaticamente. Você pode listar várias delas separando-as por linha.",
 	"sensitiveWordsDescription2": "Utilizar espaços irá criar expressões aditivas (AND) e cercar palavras-chave com barras irá transformá-las em expressões regulares (RegEx)",
@@ -1020,7 +1005,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Зарезервированные имена пользователей",
 	"preservedUsernamesDescription": "Перечислите зарезервированные имена пользователей, отделяя их строками. Они станут недоступны при создании учётной записи. Это ограничение не применяется при создании учётной записи администраторами. Также, уже существующие учётные записи останутся без изменений.",
-	"save": "Сохранить",
 	"sensitiveWords": "Чувствительные слова",
 	"sensitiveWordsDescription": "Установите общедоступный диапазон заметки, содержащей заданное слово, на домашний. Можно сделать несколько настроек, разделив их переносами строк.",
 	"sensitiveWordsDescription2": "Разделение пробелом создаёт спецификацию AND, а разделение косой чертой создаёт регулярное выражение.",
@@ -1057,7 +1041,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "Uložiť",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -1094,7 +1077,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "การเปิดเผยเนื้อหาทั้งหมดในเซิร์ฟเวอร์รวมทั้งเนื้อหาที่รับมาจากระยะไกลสู่สาธารณะบนอินเทอร์เน็ตโดยไม่มีข้อจำกัดใดๆ มีความเสี่ยงโดยเฉพาะอย่างยิ่งสำหรับผู้ชมที่ไม่เข้าใจลักษณะของระบบแบบกระจาย อาจทำให้เกิดความเข้าใจผิดคิดว่าเนื้อหาที่มาจากระยะไกลนั้นเป็นเนื้อหาที่สร้างขึ้นภายในเซิร์ฟเวอร์นี้ จึงควรใช้ความระมัดระวังอย่างมาก",
 	"preservedUsernames": "ชื่อผู้ใช้ที่สงวนไว้",
 	"preservedUsernamesDescription": "ระบุชื่อผู้ใช้ที่จะสงวนชื่อไว้ คั่นด้วยการขึ้นบรรทัดใหม่ ชื่อผู้ใช้ที่ระบุที่นี่จะไม่สามารถใช้งานได้อีกต่อไปเมื่อสร้างบัญชีใหม่ ยกเว้นเมื่อผู้ดูแลระบบสร้างบัญชี นอกจากนี้ บัญชีที่มีอยู่แล้วจะไม่ได้รับผลกระทบ",
-	"save": "บันทึก",
 	"sensitiveWords": "คำที่มีเนื้อหาละเอียดอ่อน",
 	"sensitiveWordsDescription": "โน้ตที่มีคำที่ระบุไว้จะถูกตั้งค่าการมองเห็นของให้แสดงเฉพาะในหน้าหลักเท่านั้น คั่นคำด้วยการขึ้นบรรทัดใหม่",
 	"sensitiveWordsDescription2": "ถ้าแยกด้วยเว้นวรรคจะเป็นการระบุ AND และถ้าล้อมคำด้วยสแลช (/) จะเป็นการใช้ regular expression",
@@ -1131,7 +1113,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Sunucu tarafından alınan uzak içerik dahil olmak üzere sunucudaki tüm içeriği koşulsuz olarak İnternet'e yayınlamak risklidir. Bu, içeriğin dağıtılmış yapısından haberdar olmayan misafirler için özellikle önemlidir, çünkü onlar yanlışlıkla uzak içeriğin bile sunucudaki kullanıcılar tarafından oluşturulan içerik olduğunu düşünebilirler.",
 	"preservedUsernames": "Rezerve edilmiş kullanıcı adları",
 	"preservedUsernamesDescription": "Rezervasyon yapmak için kullanıcı adlarını satır sonlarıyla ayırarak listele. Bu kullanıcı adları normal hesap oluşturma sırasında kullanılamaz hale gelir, ancak yöneticiler tarafından manuel olarak hesap oluşturmak için kullanılabilir. Bu kullanıcı adlarını kullanan mevcut hesaplar etkilenmez.",
-	"save": "Kaydet",
 	"sensitiveWords": "Hassas kelimeler",
 	"sensitiveWordsDescription": "Yapılandırılan kelimelerden herhangi birini içeren tüm notların görünürlüğü otomatik olarak “Ana Sayfa” olarak ayarlanacaktır. Satır sonları ile ayırarak birden fazla not listeleyebilirsin.",
 	"sensitiveWordsDescription2": "Boşluk kullanmak AND ifadeleri oluşturur ve anahtar kelimeleri eğik çizgi ile çevrelemek bunları düzenli ifadeye dönüştürür.",
@@ -1168,7 +1149,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "Save",
 	"sensitiveWords": "Sensitive words",
 	"sensitiveWordsDescription": "The visibility of all notes containing any of the configured words will be set to \"Home\" automatically. You can list multiple by separating them via line breaks.",
 	"sensitiveWordsDescription2": "Using spaces will create AND expressions and surrounding keywords with slashes will turn them into a regular expression.",
@@ -1205,7 +1185,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Зарезервовані імена користувачів",
 	"preservedUsernamesDescription": "Укажіть імена користувачів, які потрібно зарезервувати, розділяючи їх переносами рядка. Вони стануть недоступними під час звичайного створення облікового запису, але адміністратори зможуть використовувати їх для ручного створення облікових записів. Уже наявні облікові записи з такими іменами користувачів не будуть зачеплені.",
-	"save": "Зберегти",
 	"sensitiveWords": "Чутливі слова",
 	"sensitiveWordsDescription": "Видимість усіх нотаток, що містять будь-яке з налаштованих слів, автоматично буде встановлено на «Домашня». Можна вказати кілька слів, розділяючи їх переносами рядка.",
 	"sensitiveWordsDescription2": "Використання пробілів створює AND-вирази, а ключові слова, взяті в скісні риски, перетворюються на регулярний вираз.",
@@ -1242,7 +1221,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "Unconditionally publishing all content on the server to the Internet, including remote content received by the server is risky. This is especially important for guests who are unaware of the distributed nature of the content, as they may mistakenly believe that even remote content is content created by users on the server.",
 	"preservedUsernames": "Reserved usernames",
 	"preservedUsernamesDescription": "List usernames to reserve separated by linebreaks. These will become unable during normal account creation, but can be used by administrators to manually create accounts. Already existing accounts using these usernames will not be affected.",
-	"save": "Lưu",
 	"sensitiveWords": "Các từ nhạy cảm",
 	"sensitiveWordsDescription": "Phạm vi của tất cả bài đăng chứa các từ được cấu hình sẽ tự động được đặt về \"Home\". Ban có thể thêm nhiều từ trên mỗi dòng.",
 	"sensitiveWordsDescription2": "Sử dụng dấu cách sẽ tạo cấu trúc AND và thêm dấu gạch xuôi để sử dụng như một regex.",
@@ -1279,7 +1257,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "包含服务器接收到的远程内容在内，无条件将服务器上的所有内容公开在互联网上存在风险。特别是对去中心化的特性不是很了解的访问者有可能将远程服务器上的内容误认为是在此服务器内生成的，需要特别留意。",
 	"preservedUsernames": "保留的用户名",
 	"preservedUsernamesDescription": "列出需要保留的用户名，使用换行来作为分割。被指定的用户名在建立账户时无法使用，但由管理员所创建的账户不受该限制。此外，现有的账户也不会受到影响。",
-	"save": "保存",
 	"sensitiveWords": "敏感词",
 	"sensitiveWordsDescription": "包含这些词的帖子将只在首页可见。可用换行来设定多个词。",
 	"sensitiveWordsDescription2": "AND 条件用空格分隔，正则表达式用斜线包裹。",
@@ -1316,7 +1293,6 @@ definePage(() => ({
 	"userGeneratedContentsVisibilityForVisitor_description2": "包括伺服器接收到的遠端內容在內，無條件地將伺服器內所有內容公開到網際網路上是具有風險的。特別是對於不了解分散式架構特性的瀏覽者來說，他們可能會誤以為這些遠端內容是由該伺服器所創建的，因此需要特別留意。",
 	"preservedUsernames": "保留的使用者名稱",
 	"preservedUsernamesDescription": "換行列舉要保留的使用者名稱。此處出現的名稱將在註冊時禁用，但由管理者建立帳戶則不受此限。此外，既有的帳戶也不受影響。",
-	"save": "儲存",
 	"sensitiveWords": "敏感詞",
 	"sensitiveWordsDescription": "將含有設定詞彙的貼文可見性設為發送至首頁。可以用換行來進行複數的設定。",
 	"sensitiveWordsDescription2": "空格代表「以及」（AND），斜線包圍關鍵字代表使用正規表達式。",

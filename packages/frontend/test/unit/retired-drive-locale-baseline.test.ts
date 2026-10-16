@@ -6,6 +6,7 @@
 import { createHash } from 'node:crypto';
 import { languages, locales as currentLocales } from 'i18n';
 import { expect, test } from 'vitest';
+import { locales as historicalCurrentLocales } from './pruned-global-locale-baseline.js';
 import { locales, verifyRetiredDriveBaseline, verifyRetiredDriveLanguages } from './retired-drive-locale-baseline.js';
 import baseline from './retired-drive-locale-baseline.json';
 
@@ -29,7 +30,7 @@ test('retired drive text remains independently frozen without restoring producti
 		}
 		for (const key of ['scale', 'size', 'color', 'opacity', 'lightness', 'offset']) {
 			const path = `_imageEffector._fxProps.${key}`;
-			expect(at(locales[language], path)).toBe(at(currentLocales[language], path));
+			expect(at(locales[language], path)).toBe(at(historicalCurrentLocales[language], path));
 		}
 	}
 });

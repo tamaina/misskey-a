@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #footer>
 		<div :class="$style.footer">
 			<div class="_spacer" style="--MI_SPACER-w: 600px; --MI_SPACER-min: 16px; --MI_SPACER-max: 16px;">
-				<MkButton primary rounded @click="save"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
+				<MkButton primary rounded @click="save"><i class="ti ti-check"></i> {{ globalLocale.env.save }}</MkButton>
 			</div>
 		</div>
 	</template>
@@ -19,6 +19,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XEditor from '@features/roles/frontend/pages/admin/roles.editor.vue';
@@ -29,6 +31,8 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { rolesCache } from '@features/runtime/frontend/cache.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const router = useRouter();
 
@@ -113,223 +117,195 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"edit": "حرر الأدوار",
-	"new": "دور جديد",
-	"save": "حفظ"
+	"new": "دور جديد"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
 	"edit": "Editar el rol",
-	"new": "Nou rol",
-	"save": "Desa"
+	"new": "Nou rol"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
 	"edit": "Upravit roli",
-	"new": "Nová role",
-	"save": "Uložit"
+	"new": "Nová role"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "Save"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
 	"edit": "Rolle bearbeiten",
-	"new": "Rolle erstellen",
-	"save": "Speichern"
+	"new": "Rolle erstellen"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "Save"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
 	"edit": "Editar rol",
-	"new": "Crear rol",
-	"save": "Guardar"
+	"new": "Crear rol"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
 	"edit": "Modifier le rôle",
-	"new": "Nouveau rôle",
-	"save": "Enregistrer"
+	"new": "Nouveau rôle"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
 	"edit": "Sunting peran",
-	"new": "Buat peran",
-	"save": "Simpan"
+	"new": "Buat peran"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
 	"edit": "Modifica ruolo",
-	"new": "Nuovo ruolo",
-	"save": "Salva"
+	"new": "Nuovo ruolo"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
 	"edit": "ロールの編集",
-	"new": "ロールの作成",
-	"save": "保存"
+	"new": "ロールの作成"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
 	"edit": "ロールの編集",
-	"new": "ロールの作成",
-	"save": "とっとく"
+	"new": "ロールの作成"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "Sekles"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "ಉಳಿಸಿ"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
 	"edit": "역할 수정",
-	"new": "새 역할 생성",
-	"save": "저장"
+	"new": "새 역할 생성"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "Opslaan"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "Lagre"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "Zapisz"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
 	"edit": "Editar cargo",
-	"new": "Novo cargo",
-	"save": "Salvar"
+	"new": "Novo cargo"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
 	"edit": "Изменить роль",
-	"new": "Новая роль",
-	"save": "Сохранить"
+	"new": "Новая роль"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "Uložiť"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
 	"edit": "แก้ไขบทบาท",
-	"new": "บทบาทใหม่",
-	"save": "บันทึก"
+	"new": "บทบาทใหม่"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
 	"edit": "Rolü düzenle",
-	"new": "Yeni rol",
-	"save": "Kaydet"
+	"new": "Yeni rol"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "Save"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
 	"edit": "Змінити роль",
-	"new": "Нова роль",
-	"save": "Зберегти"
+	"new": "Нова роль"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
 	"edit": "Edit role",
-	"new": "New role",
-	"save": "Lưu"
+	"new": "New role"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
 	"edit": "编辑角色",
-	"new": "创建角色",
-	"save": "保存"
+	"new": "创建角色"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
 	"edit": "編輯角色",
-	"new": "建立角色",
-	"save": "儲存"
+	"new": "建立角色"
 }
 </locale>

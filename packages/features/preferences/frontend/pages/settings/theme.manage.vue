@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkTextarea>
 		<MkTextarea readonly tall :modelValue="selectedThemeCode">
 			<template #label>{{ $locale.sfc.code }}</template>
-			<template #caption><button class="_textButton" @click="copyThemeCode()">{{ $locale.sfc.copy }}</button></template>
+			<template #caption><button class="_textButton" @click="copyThemeCode()">{{ globalLocale.env.copy }}</button></template>
 		</MkTextarea>
 		<MkButton v-if="!builtinThemes.some(t => t.id == selectedTheme!.id)" danger @click="uninstall()"><i class="ti ti-trash"></i> {{ $locale.sfc.uninstall }}</MkButton>
 	</template>
@@ -25,6 +25,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { computed, ref } from 'vue';
 import JSON5 from 'json5';
 import type { Theme } from '@features/preferences/frontend/shared/theme.js';
@@ -40,6 +42,8 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import { prefer } from '@features/preferences/frontend/preferences';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const installedThemes = prefer.r.themes;
 const builtinThemes = ref<Theme[]>([]);
@@ -105,7 +109,6 @@ definePage(() => ({
 	"author": "الكاتب",
 	"description": "الوصف",
 	"code": "شيفرة القالب",
-	"copy": "نسخ",
 	"uninstall": "إلغاء التثبيت"
 }
 </locale>
@@ -119,7 +122,6 @@ definePage(() => ({
 	"author": "Autor",
 	"description": "Descripció",
 	"code": "Codi del tema",
-	"copy": "Copiar",
 	"uninstall": "Desinstal·la"
 }
 </locale>
@@ -133,7 +135,6 @@ definePage(() => ({
 	"author": "Autor",
 	"description": "Popis",
 	"code": "Kód vzhledu",
-	"copy": "Kopírovat",
 	"uninstall": "Odinstalovat"
 }
 </locale>
@@ -147,7 +148,6 @@ definePage(() => ({
 	"author": "Author",
 	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -161,7 +161,6 @@ definePage(() => ({
 	"author": "Autor",
 	"description": "Beschreibung",
 	"code": "Farbschemencode",
-	"copy": "Kopieren",
 	"uninstall": "Deinstallieren"
 }
 </locale>
@@ -175,7 +174,6 @@ definePage(() => ({
 	"author": "Author",
 	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -189,7 +187,6 @@ definePage(() => ({
 	"author": "Autor",
 	"description": "Descripción",
 	"code": "Código del tema",
-	"copy": "Copiar",
 	"uninstall": "Desinstalar"
 }
 </locale>
@@ -203,7 +200,6 @@ definePage(() => ({
 	"author": "Auteur·rice",
 	"description": "Description",
 	"code": "Code du thème",
-	"copy": "Copier",
 	"uninstall": "Désinstaller"
 }
 </locale>
@@ -217,7 +213,6 @@ definePage(() => ({
 	"author": "Pembuat",
 	"description": "Deskripsi",
 	"code": "Kode tema",
-	"copy": "Salin",
 	"uninstall": "Copot pemasangan"
 }
 </locale>
@@ -231,7 +226,6 @@ definePage(() => ({
 	"author": "Autore",
 	"description": "Descrizione",
 	"code": "Codice tema",
-	"copy": "Copia",
 	"uninstall": "Disinstalla"
 }
 </locale>
@@ -245,7 +239,6 @@ definePage(() => ({
 	"author": "作者",
 	"description": "説明",
 	"code": "テーマコード",
-	"copy": "コピー",
 	"uninstall": "アンインストール"
 }
 </locale>
@@ -259,7 +252,6 @@ definePage(() => ({
 	"author": "作者",
 	"description": "説明",
 	"code": "テーマコード",
-	"copy": "コピー",
 	"uninstall": "アンインストール"
 }
 </locale>
@@ -273,7 +265,6 @@ definePage(() => ({
 	"author": "Author",
 	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -287,7 +278,6 @@ definePage(() => ({
 	"author": "Author",
 	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -301,7 +291,6 @@ definePage(() => ({
 	"author": "작성자",
 	"description": "설명",
 	"code": "테마 코드",
-	"copy": "복사",
 	"uninstall": "삭제"
 }
 </locale>
@@ -315,7 +304,6 @@ definePage(() => ({
 	"author": "Auteur",
 	"description": "Beschrijving",
 	"code": "Theme code",
-	"copy": "Kopiëren",
 	"uninstall": "Deinstalleren"
 }
 </locale>
@@ -329,7 +317,6 @@ definePage(() => ({
 	"author": "Forfatter",
 	"description": "Beskrivelse",
 	"code": "Theme code",
-	"copy": "Kopier",
 	"uninstall": "Avinstaller"
 }
 </locale>
@@ -343,7 +330,6 @@ definePage(() => ({
 	"author": "Autor",
 	"description": "Opis",
 	"code": "Kod motywu",
-	"copy": "Kopiuj",
 	"uninstall": "Odinstaluj"
 }
 </locale>
@@ -357,7 +343,6 @@ definePage(() => ({
 	"author": "Autor",
 	"description": "Descrição",
 	"code": "Código do tema",
-	"copy": "Copiar",
 	"uninstall": "Desinstalar"
 }
 </locale>
@@ -371,7 +356,6 @@ definePage(() => ({
 	"author": "Автор",
 	"description": "Описание",
 	"code": "Код темы",
-	"copy": "Копировать",
 	"uninstall": "Удалить"
 }
 </locale>
@@ -385,7 +369,6 @@ definePage(() => ({
 	"author": "Autor",
 	"description": "Popis",
 	"code": "Kód témy",
-	"copy": "Kopírovať",
 	"uninstall": "Odinštalovať"
 }
 </locale>
@@ -399,7 +382,6 @@ definePage(() => ({
 	"author": "ผู้เขียน",
 	"description": "คำอธิบาย",
 	"code": "โค้ดธีม",
-	"copy": "คัดลอก",
 	"uninstall": "ถอนการติดตั้ง"
 }
 </locale>
@@ -413,7 +395,6 @@ definePage(() => ({
 	"author": "Yazar",
 	"description": "Açıklama",
 	"code": "Tema kodu",
-	"copy": "Kopyala",
 	"uninstall": "Kaldır"
 }
 </locale>
@@ -427,7 +408,6 @@ definePage(() => ({
 	"author": "Author",
 	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -441,7 +421,6 @@ definePage(() => ({
 	"author": "Автор",
 	"description": "Опис",
 	"code": "Код теми",
-	"copy": "Скопіювати",
 	"uninstall": "Видалити"
 }
 </locale>
@@ -455,7 +434,6 @@ definePage(() => ({
 	"author": "Tác giả",
 	"description": "Mô tả",
 	"code": "Mã theme",
-	"copy": "Sao chép",
 	"uninstall": "Gỡ bỏ"
 }
 </locale>
@@ -469,7 +447,6 @@ definePage(() => ({
 	"author": "作者",
 	"description": "描述",
 	"code": "主题代码",
-	"copy": "复制",
 	"uninstall": "卸载"
 }
 </locale>
@@ -483,7 +460,6 @@ definePage(() => ({
 	"author": "作者",
 	"description": "描述",
 	"code": "佈景主題代碼",
-	"copy": "複製",
 	"uninstall": "解除安裝"
 }
 </locale>

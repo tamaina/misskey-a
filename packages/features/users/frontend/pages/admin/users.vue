@@ -45,6 +45,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { computed, markRaw, ref, watchEffect } from 'vue';
 import * as Misskey from 'misskey-js';
 import { defaultMemoryStorage } from '@features/preferences/frontend/memory-storage';
@@ -59,6 +61,8 @@ import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import { dateString } from '@features/ui/frontend/filters/date.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 type SearchQuery = {
 	sort?: '-createdAt' | '+createdAt' | '-updatedAt' | '+updatedAt';
@@ -160,7 +164,7 @@ function resetQuery() {
 
 const headerActions = computed(() => [{
 	icon: 'ti ti-search',
-	text: $locale.value.sfc.search,
+	text: globalLocale.value.env.search,
 	handler: searchUser,
 }, {
 	asFullButton: true,
@@ -225,7 +229,6 @@ definePage(() => ({
 	"remote": "بُعدي",
 	"username": "اسم المستخدم",
 	"password": "الكلمة السرية",
-	"search": "البحث",
 	"addUser": "اضافة مستخدم",
 	"lookup": "البحث",
 	"users": "المستخدمون",
@@ -252,7 +255,6 @@ definePage(() => ({
 	"remote": "Remot",
 	"username": "Nom d'usuari",
 	"password": "Contrasenya",
-	"search": "Cercar",
 	"addUser": "Afegir un usuari",
 	"lookup": "Cerca",
 	"users": "Usuaris",
@@ -279,7 +281,6 @@ definePage(() => ({
 	"remote": "Vzdálené",
 	"username": "Uživatelské jméno",
 	"password": "Heslo",
-	"search": "Vyhledávání",
 	"addUser": "Přidat uživatele",
 	"lookup": "Vyhledat",
 	"users": "Uživatelé",
@@ -306,7 +307,6 @@ definePage(() => ({
 	"remote": "Remote",
 	"username": "Username",
 	"password": "Password",
-	"search": "Search",
 	"addUser": "Add a user",
 	"lookup": "Lookup",
 	"users": "Users",
@@ -333,7 +333,6 @@ definePage(() => ({
 	"remote": "Fremd",
 	"username": "Benutzername",
 	"password": "Passwort",
-	"search": "Suchen",
 	"addUser": "Benutzer hinzufügen",
 	"lookup": "Anfragen",
 	"users": "Benutzer",
@@ -360,7 +359,6 @@ definePage(() => ({
 	"remote": "Remote",
 	"username": "Username",
 	"password": "Password",
-	"search": "Search",
 	"addUser": "Add a user",
 	"lookup": "Lookup",
 	"users": "Users",
@@ -387,7 +385,6 @@ definePage(() => ({
 	"remote": "Remoto",
 	"username": "Nombre de usuario",
 	"password": "Contraseña",
-	"search": "Buscar",
 	"addUser": "Agregar usuario",
 	"lookup": "Búsqueda",
 	"users": "Usuarios",
@@ -414,7 +411,6 @@ definePage(() => ({
 	"remote": "Distant",
 	"username": "Nom d’utilisateur·rice",
 	"password": "Mot de passe",
-	"search": "Rechercher",
 	"addUser": "Ajouter un·e utilisateur·rice",
 	"lookup": "Recherche",
 	"users": "Utilisateur·rice·s",
@@ -441,7 +437,6 @@ definePage(() => ({
 	"remote": "Remote",
 	"username": "Nama Pengguna",
 	"password": "Kata sandi",
-	"search": "Cari",
 	"addUser": "Tambah pengguna",
 	"lookup": "Cari",
 	"users": "Pengguna",
@@ -468,7 +463,6 @@ definePage(() => ({
 	"remote": "Remota",
 	"username": "Nome utente",
 	"password": "Password",
-	"search": "Cerca",
 	"addUser": "Aggiungi profilo",
 	"lookup": "Ricerca remota",
 	"users": "Profili",
@@ -495,7 +489,6 @@ definePage(() => ({
 	"remote": "リモート",
 	"username": "ユーザー名",
 	"password": "パスワード",
-	"search": "検索",
 	"addUser": "ユーザーを追加",
 	"lookup": "照会",
 	"users": "ユーザー",
@@ -522,7 +515,6 @@ definePage(() => ({
 	"remote": "リモート",
 	"username": "ユーザー名",
 	"password": "パスワード",
-	"search": "探す",
 	"addUser": "ユーザーを追加や",
 	"lookup": "見てきて",
 	"users": "ユーザー",
@@ -549,7 +541,6 @@ definePage(() => ({
 	"remote": "Remote",
 	"username": "Isem n umseqdac",
 	"password": "Awal uffir",
-	"search": "Nadi",
 	"addUser": "Add a user",
 	"lookup": "Lookup",
 	"users": "Users",
@@ -576,7 +567,6 @@ definePage(() => ({
 	"remote": "Remote",
 	"username": "ಬಳಕೆಹೆಸರು",
 	"password": "ಗುಪ್ತಪದ",
-	"search": "ಹುಡುಕು",
 	"addUser": "ಬಳಕೆದಾರರನ್ನು ಸೇರಿಸಿ",
 	"lookup": "Lookup",
 	"users": "ಬಳಕೆದಾರ",
@@ -603,7 +593,6 @@ definePage(() => ({
 	"remote": "리모트",
 	"username": "유저명",
 	"password": "비밀번호",
-	"search": "검색",
 	"addUser": "유저 추가",
 	"lookup": "찾아보기",
 	"users": "유저",
@@ -630,7 +619,6 @@ definePage(() => ({
 	"remote": "Remote",
 	"username": "Gebruikersnaam",
 	"password": "Wachtwoord",
-	"search": "Zoeken",
 	"addUser": "Toevoegen gebruiker",
 	"lookup": "Opzoeken",
 	"users": "Gebruikers",
@@ -657,7 +645,6 @@ definePage(() => ({
 	"remote": "Remote",
 	"username": "Brukernavn",
 	"password": "Passord",
-	"search": "Søk",
 	"addUser": "Legg til bruker",
 	"lookup": "Lookup",
 	"users": "Brukere",
@@ -684,7 +671,6 @@ definePage(() => ({
 	"remote": "Zdalny",
 	"username": "Nazwa użytkownika",
 	"password": "Hasło",
-	"search": "Szukaj",
 	"addUser": "Dodaj użytkownika",
 	"lookup": "Zapytania",
 	"users": "Użytkownicy",
@@ -711,7 +697,6 @@ definePage(() => ({
 	"remote": "Remoto",
 	"username": "Nome de usuário",
 	"password": "Senha",
-	"search": "Pesquisar",
 	"addUser": "Adicionar usuário",
 	"lookup": "Consultar",
 	"users": "Usuários",
@@ -738,7 +723,6 @@ definePage(() => ({
 	"remote": "С других сайтов",
 	"username": "Имя пользователя",
 	"password": "Пароль",
-	"search": "Поиск",
 	"addUser": "Добавить пользователя",
 	"lookup": "Запрос",
 	"users": "Пользователи",
@@ -765,7 +749,6 @@ definePage(() => ({
 	"remote": "Vzdialené",
 	"username": "Meno používateľa",
 	"password": "Heslo",
-	"search": "Hľadať",
 	"addUser": "Pridať používateľa",
 	"lookup": "Vyhľadať",
 	"users": "Používatelia",
@@ -792,7 +775,6 @@ definePage(() => ({
 	"remote": "ระยะไกล",
 	"username": "ชื่อผู้ใช้",
 	"password": "รหัสผ่าน",
-	"search": "ค้นหา",
 	"addUser": "เพิ่มผู้ใช้",
 	"lookup": "การค้นหา",
 	"users": "ผู้ใช้",
@@ -819,7 +801,6 @@ definePage(() => ({
 	"remote": "Uzak",
 	"username": "Kullanıcı Adı",
 	"password": "Şifre",
-	"search": "Ara",
 	"addUser": "Kullanıcı ekle",
 	"lookup": "Sorgu",
 	"users": "Kullanıcılar",
@@ -846,7 +827,6 @@ definePage(() => ({
 	"remote": "Remote",
 	"username": "Username",
 	"password": "Password",
-	"search": "ئىزدەش",
 	"addUser": "Add a user",
 	"lookup": "Lookup",
 	"users": "Users",
@@ -873,7 +853,6 @@ definePage(() => ({
 	"remote": "Віддалені",
 	"username": "Ім'я користувача",
 	"password": "Пароль",
-	"search": "Пошук",
 	"addUser": "Додати користувача",
 	"lookup": "Пошук",
 	"users": "Користувачі",
@@ -900,7 +879,6 @@ definePage(() => ({
 	"remote": "Máy chủ khác",
 	"username": "Tên người dùng",
 	"password": "Mật khẩu",
-	"search": "Tìm kiếm",
 	"addUser": "Thêm người dùng",
 	"lookup": "Tra cứu",
 	"users": "Người dùng",
@@ -927,7 +905,6 @@ definePage(() => ({
 	"remote": "远程",
 	"username": "用户名",
 	"password": "密码",
-	"search": "搜索",
 	"addUser": "添加用户",
 	"lookup": "查找用户",
 	"users": "用户",
@@ -954,7 +931,6 @@ definePage(() => ({
 	"remote": "遠端",
 	"username": "使用者名稱",
 	"password": "密碼",
-	"search": "搜尋",
 	"addUser": "新增使用者",
 	"lookup": "查詢",
 	"users": "使用者",

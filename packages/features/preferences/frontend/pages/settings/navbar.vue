@@ -30,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_buttons">
 			<MkButton @click="addItem"><i class="ti ti-plus"></i> {{ $locale.sfc.addItem }}</MkButton>
 			<MkButton danger @click="reset"><i class="ti ti-reload"></i> {{ $locale.sfc.default }}</MkButton>
-			<MkButton primary class="save" @click="save"><i class="ti ti-device-floppy"></i> {{ $locale.sfc.save }}</MkButton>
+			<MkButton primary class="save" @click="save"><i class="ti ti-device-floppy"></i> {{ globalLocale.env.save }}</MkButton>
 		</div>
 
 		<MkRadios
@@ -55,6 +55,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { computed, ref } from 'vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -70,6 +72,8 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { getInitialPrefValue } from '@features/preferences/frontend/state/manager.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const items = ref(prefer.s.menu.map(x => ({
 	id: genId(),
@@ -170,7 +174,6 @@ definePage(() => ({
 	"divider": "فاصل",
 	"navbar": "شريط التنقل",
 	"default": "افتراضي",
-	"save": "حفظ",
 	"sideFull": "جانبي",
 	"sideIcon": "Side (Icons)",
 	"display": "المظهر",
@@ -184,7 +187,6 @@ definePage(() => ({
 	"divider": "Divisor",
 	"navbar": "Barra de navegació ",
 	"default": "Per defecte",
-	"save": "Desa",
 	"sideFull": "Horitzontal ",
 	"sideIcon": "Horitzontal (icones)",
 	"display": "Veure",
@@ -198,7 +200,6 @@ definePage(() => ({
 	"divider": "Dělící čára",
 	"navbar": "Navigační panel",
 	"default": "Výchozí",
-	"save": "Uložit",
 	"sideFull": "Postranně",
 	"sideIcon": "Postranně (Ikony)",
 	"display": "Zobrazit",
@@ -212,7 +213,6 @@ definePage(() => ({
 	"divider": "Divider",
 	"navbar": "Navigation bar",
 	"default": "Default",
-	"save": "Save",
 	"sideFull": "Side",
 	"sideIcon": "Side (Icons)",
 	"display": "Display",
@@ -226,7 +226,6 @@ definePage(() => ({
 	"divider": "Trenner",
 	"navbar": "Navigationsleiste",
 	"default": "Standard",
-	"save": "Speichern",
 	"sideFull": "Seitlich",
 	"sideIcon": "Seitlich (Icons)",
 	"display": "Anzeigeart",
@@ -240,7 +239,6 @@ definePage(() => ({
 	"divider": "Divider",
 	"navbar": "Navigation bar",
 	"default": "Default",
-	"save": "Save",
 	"sideFull": "Side",
 	"sideIcon": "Side (Icons)",
 	"display": "Display",
@@ -254,7 +252,6 @@ definePage(() => ({
 	"divider": "Divisor",
 	"navbar": "Barra de navegación",
 	"default": "Predeterminado",
-	"save": "Guardar",
 	"sideFull": "Horizontal",
 	"sideIcon": "Horizontal (ícono)",
 	"display": "Apariencia",
@@ -268,7 +265,6 @@ definePage(() => ({
 	"divider": "Séparateur",
 	"navbar": "Barre de navigation",
 	"default": "Par défaut",
-	"save": "Enregistrer",
 	"sideFull": "Latéral",
 	"sideIcon": "Latéral (icônes)",
 	"display": "Affichage",
@@ -282,7 +278,6 @@ definePage(() => ({
 	"divider": "Pembagi",
 	"navbar": "Bilah navigasi",
 	"default": "Bawaan",
-	"save": "Simpan",
 	"sideFull": "Horisontal",
 	"sideIcon": "Horisontal (Ikon)",
 	"display": "Tampilkan",
@@ -296,7 +291,6 @@ definePage(() => ({
 	"divider": "Linea di separazione",
 	"navbar": "Barra di navigazione",
 	"default": "Predefinito",
-	"save": "Salva",
 	"sideFull": "Laterale",
 	"sideIcon": "Laterale (solo icone)",
 	"display": "Visualizza",
@@ -310,7 +304,6 @@ definePage(() => ({
 	"divider": "分割線",
 	"navbar": "ナビゲーションバー",
 	"default": "デフォルト",
-	"save": "保存",
 	"sideFull": "横",
 	"sideIcon": "横(アイコン)",
 	"display": "表示",
@@ -324,7 +317,6 @@ definePage(() => ({
 	"divider": "分割線",
 	"navbar": "ナビゲーションバー",
 	"default": "デフォルト",
-	"save": "とっとく",
 	"sideFull": "横",
 	"sideIcon": "横(アイコン)",
 	"display": "表示",
@@ -338,7 +330,6 @@ definePage(() => ({
 	"divider": "Divider",
 	"navbar": "Navigation bar",
 	"default": "Default",
-	"save": "Sekles",
 	"sideFull": "Side",
 	"sideIcon": "Side (Icons)",
 	"display": "Display",
@@ -352,7 +343,6 @@ definePage(() => ({
 	"divider": "Divider",
 	"navbar": "Navigation bar",
 	"default": "Default",
-	"save": "ಉಳಿಸಿ",
 	"sideFull": "Side",
 	"sideIcon": "Side (Icons)",
 	"display": "Display",
@@ -366,7 +356,6 @@ definePage(() => ({
 	"divider": "구분선",
 	"navbar": "내비게이션 바",
 	"default": "기본값",
-	"save": "저장",
 	"sideFull": "가로",
 	"sideIcon": "가로(아이콘)",
 	"display": "보기",
@@ -380,7 +369,6 @@ definePage(() => ({
 	"divider": "Scheider",
 	"navbar": "Navigation bar",
 	"default": "Standaard",
-	"save": "Opslaan",
 	"sideFull": "Side",
 	"sideIcon": "Side (Icons)",
 	"display": "Weergave",
@@ -394,7 +382,6 @@ definePage(() => ({
 	"divider": "Divider",
 	"navbar": "Navigation bar",
 	"default": "Standard",
-	"save": "Lagre",
 	"sideFull": "Side",
 	"sideIcon": "Side (Icons)",
 	"display": "Display",
@@ -408,7 +395,6 @@ definePage(() => ({
 	"divider": "Rozdzielacz",
 	"navbar": "Pasek nawigacyjny",
 	"default": "Domyślne",
-	"save": "Zapisz",
 	"sideFull": "Side",
 	"sideIcon": "Side (Icons)",
 	"display": "Wyświetlanie",
@@ -422,7 +408,6 @@ definePage(() => ({
 	"divider": "Separador",
 	"navbar": "Barra de navegação",
 	"default": "Predefinição",
-	"save": "Salvar",
 	"sideFull": "Exibir painel lateral inteiro",
 	"sideIcon": "Lateral (Ícones)",
 	"display": "Visualizar",
@@ -436,7 +421,6 @@ definePage(() => ({
 	"divider": "Линия-разделитель",
 	"navbar": "Панель навигации",
 	"default": "По умолчанию",
-	"save": "Сохранить",
 	"sideFull": "Сбоку",
 	"sideIcon": "Сбоку (только значки)",
 	"display": "Отображение",
@@ -450,7 +434,6 @@ definePage(() => ({
 	"divider": "Oddeľovač",
 	"navbar": "Navigačný panel",
 	"default": "Predvolené",
-	"save": "Uložiť",
 	"sideFull": "Strana",
 	"sideIcon": "Strana (Ikony)",
 	"display": "Zobraziť",
@@ -464,7 +447,6 @@ definePage(() => ({
 	"divider": "ตัวแบ่ง",
 	"navbar": "แถบนำทาง",
 	"default": "ค่าเริ่มต้น",
-	"save": "บันทึก",
 	"sideFull": "ด้านข้าง",
 	"sideIcon": "ด้านข้าง (ไอคอน)",
 	"display": "แสดงผล",
@@ -478,7 +460,6 @@ definePage(() => ({
 	"divider": "Bölücü",
 	"navbar": "Gezinti çubuğu",
 	"default": "Varsayılan",
-	"save": "Kaydet",
 	"sideFull": "Yan",
 	"sideIcon": "Yan (Simgeler)",
 	"display": "Ekran",
@@ -492,7 +473,6 @@ definePage(() => ({
 	"divider": "Divider",
 	"navbar": "Navigation bar",
 	"default": "Default",
-	"save": "Save",
 	"sideFull": "Side",
 	"sideIcon": "Side (Icons)",
 	"display": "Display",
@@ -506,7 +486,6 @@ definePage(() => ({
 	"divider": "Розділювач",
 	"navbar": "Рядок навігації",
 	"default": "За умовчанням",
-	"save": "Зберегти",
 	"sideFull": "Збоку",
 	"sideIcon": "Збоку (значки)",
 	"display": "Відображення",
@@ -520,7 +499,6 @@ definePage(() => ({
 	"divider": "Phân chia",
 	"navbar": "Thanh điều hướng",
 	"default": "Mặc định",
-	"save": "Lưu",
 	"sideFull": "Thanh bên",
 	"sideIcon": "Thanh bên (Biểu tượng)",
 	"display": "Hiển thị",
@@ -534,7 +512,6 @@ definePage(() => ({
 	"divider": "分割线",
 	"navbar": "导航栏",
 	"default": "默认",
-	"save": "保存",
 	"sideFull": "横向",
 	"sideIcon": "横向（图标）",
 	"display": "显示",
@@ -548,7 +525,6 @@ definePage(() => ({
 	"divider": "分隔線",
 	"navbar": "導覽列",
 	"default": "預設",
-	"save": "儲存",
 	"sideFull": "橫向",
 	"sideIcon": "橫向（圖示）",
 	"display": "檢視",

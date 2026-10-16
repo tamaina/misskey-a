@@ -13,12 +13,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</MkSelect>
 
 	<div class="_buttons">
-		<MkButton inline primary :disabled="type === 'list' && userListId === null" @click="save"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
+		<MkButton inline primary :disabled="type === 'list' && userListId === null" @click="save"><i class="ti ti-check"></i> {{ globalLocale.env.save }}</MkButton>
 	</div>
 </div>
 </template>
 
 <script lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 const notificationConfigTypes = [
 	'all',
 	'following',
@@ -43,6 +45,8 @@ import { ref, computed } from 'vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const props = defineProps<{
 	value: NotificationConfig;
@@ -98,8 +102,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "القوائم",
-	"none": "لا شيء",
-	"save": "حفظ"
+	"none": "لا شيء"
 }
 </locale>
 
@@ -111,8 +114,7 @@ function save() {
 	"mutualFollow": "Seguidor mutu",
 	"followingOrFollower": "Seguint o seguidor",
 	"userList": "Llistes",
-	"none": "Res",
-	"save": "Desa"
+	"none": "Res"
 }
 </locale>
 
@@ -124,8 +126,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Seznamy",
-	"none": "Žádný",
-	"save": "Uložit"
+	"none": "Žádný"
 }
 </locale>
 
@@ -137,8 +138,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lists",
-	"none": "None",
-	"save": "Save"
+	"none": "None"
 }
 </locale>
 
@@ -150,8 +150,7 @@ function save() {
 	"mutualFollow": "Gegenseitig gefolgt",
 	"followingOrFollower": "Follow oder Follower",
 	"userList": "Liste",
-	"none": "Nichts",
-	"save": "Speichern"
+	"none": "Nichts"
 }
 </locale>
 
@@ -163,8 +162,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lists",
-	"none": "None",
-	"save": "Save"
+	"none": "None"
 }
 </locale>
 
@@ -176,8 +174,7 @@ function save() {
 	"mutualFollow": "Os seguís mutuamente",
 	"followingOrFollower": "Siguiendo o seguidor",
 	"userList": "Lista",
-	"none": "Ninguna",
-	"save": "Guardar"
+	"none": "Ninguna"
 }
 </locale>
 
@@ -189,8 +186,7 @@ function save() {
 	"mutualFollow": "Abonnement mutuel",
 	"followingOrFollower": "Abonnement ou abonné",
 	"userList": "Listes",
-	"none": "Rien",
-	"save": "Enregistrer"
+	"none": "Rien"
 }
 </locale>
 
@@ -202,8 +198,7 @@ function save() {
 	"mutualFollow": "Saling mengikuti",
 	"followingOrFollower": "Mengikuti atau pengikut",
 	"userList": "Daftar",
-	"none": "Tidak ada",
-	"save": "Simpan"
+	"none": "Tidak ada"
 }
 </locale>
 
@@ -215,8 +210,7 @@ function save() {
 	"mutualFollow": "Follow reciproco",
 	"followingOrFollower": "Following o Follower",
 	"userList": "Liste",
-	"none": "Nessuna",
-	"save": "Salva"
+	"none": "Nessuna"
 }
 </locale>
 
@@ -228,8 +222,7 @@ function save() {
 	"mutualFollow": "相互フォロー",
 	"followingOrFollower": "フォロー中またはフォロワー",
 	"userList": "リスト",
-	"none": "なし",
-	"save": "保存"
+	"none": "なし"
 }
 </locale>
 
@@ -241,8 +234,7 @@ function save() {
 	"mutualFollow": "お互いフォローしてんで",
 	"followingOrFollower": "フォロー中またはフォロワー",
 	"userList": "リスト",
-	"none": "なし",
-	"save": "とっとく"
+	"none": "なし"
 }
 </locale>
 
@@ -254,8 +246,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Tibdarin",
-	"none": "None",
-	"save": "Sekles"
+	"none": "None"
 }
 </locale>
 
@@ -267,8 +258,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lists",
-	"none": "None",
-	"save": "ಉಳಿಸಿ"
+	"none": "None"
 }
 </locale>
 
@@ -280,8 +270,7 @@ function save() {
 	"mutualFollow": "맞팔로우",
 	"followingOrFollower": "팔로 중이거나 팔로워",
 	"userList": "리스트",
-	"none": "없음",
-	"save": "저장"
+	"none": "없음"
 }
 </locale>
 
@@ -293,8 +282,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Gevolgd of volger",
 	"userList": "Lijsten",
-	"none": "Niets",
-	"save": "Opslaan"
+	"none": "Niets"
 }
 </locale>
 
@@ -306,8 +294,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lister",
-	"none": "Ingen",
-	"save": "Lagre"
+	"none": "Ingen"
 }
 </locale>
 
@@ -319,8 +306,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Listy",
-	"none": "Brak",
-	"save": "Zapisz"
+	"none": "Brak"
 }
 </locale>
 
@@ -332,8 +318,7 @@ function save() {
 	"mutualFollow": "Seguidor mútuo",
 	"followingOrFollower": "Seguidor ou usuário seguido",
 	"userList": "Listas",
-	"none": "Nenhum",
-	"save": "Salvar"
+	"none": "Nenhum"
 }
 </locale>
 
@@ -345,8 +330,7 @@ function save() {
 	"mutualFollow": "Взаимные подписки",
 	"followingOrFollower": "Подписки или подписчики",
 	"userList": "Списки",
-	"none": "Ничего",
-	"save": "Сохранить"
+	"none": "Ничего"
 }
 </locale>
 
@@ -358,8 +342,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Zoznamy",
-	"none": "Žiadne",
-	"save": "Uložiť"
+	"none": "Žiadne"
 }
 </locale>
 
@@ -371,8 +354,7 @@ function save() {
 	"mutualFollow": "ติดตามซึ่งกันและกัน",
 	"followingOrFollower": "กำลังติดตามหรือผู้ติดตาม",
 	"userList": "ลิสต์",
-	"none": "ไม่มี",
-	"save": "บันทึก"
+	"none": "ไม่มี"
 }
 </locale>
 
@@ -384,8 +366,7 @@ function save() {
 	"mutualFollow": "Karşılıklı takip",
 	"followingOrFollower": "Takip eden veya takipçi",
 	"userList": "Listeler",
-	"none": "Hiçbiri",
-	"save": "Kaydet"
+	"none": "Hiçbiri"
 }
 </locale>
 
@@ -397,8 +378,7 @@ function save() {
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lists",
-	"none": "None",
-	"save": "Save"
+	"none": "None"
 }
 </locale>
 
@@ -410,8 +390,7 @@ function save() {
 	"mutualFollow": "Взаємна підписка",
 	"followingOrFollower": "Підписки або підписники",
 	"userList": "Списки",
-	"none": "Відсутній",
-	"save": "Зберегти"
+	"none": "Відсутній"
 }
 </locale>
 
@@ -423,8 +402,7 @@ function save() {
 	"mutualFollow": "Theo dõi lẫn nhau",
 	"followingOrFollower": "Đang theo dõi hoặc người theo dõi",
 	"userList": "Danh sách",
-	"none": "Không",
-	"save": "Lưu"
+	"none": "Không"
 }
 </locale>
 
@@ -436,8 +414,7 @@ function save() {
 	"mutualFollow": "互相关注",
 	"followingOrFollower": "关注中或关注者",
 	"userList": "列表",
-	"none": "无",
-	"save": "保存"
+	"none": "无"
 }
 </locale>
 
@@ -449,7 +426,6 @@ function save() {
 	"mutualFollow": "互相追隨",
 	"followingOrFollower": "追隨中或追隨者",
 	"userList": "使用者清單",
-	"none": "無",
-	"save": "儲存"
+	"none": "無"
 }
 </locale>

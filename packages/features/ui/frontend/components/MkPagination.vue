@@ -45,6 +45,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 export type MkPaginationOptions = {
 	autoLoad?: boolean;
 	/**
@@ -73,6 +75,8 @@ import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vu
 import MkPaginationControl from '@features/ui/frontend/components/MkPaginationControl.vue';
 import * as os from '@features/ui/frontend/os.js';
 
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+
 const props = withDefaults(defineProps<MkPaginationOptions & {
 	paginator: T;
 }>(), {
@@ -94,7 +98,7 @@ function onContextmenu(ev: PointerEvent) {
 	// TODO: 並び順設定
 	os.contextMenu([{
 		icon: 'ti ti-refresh',
-		text: $locale.value.sfc.reload,
+		text: globalLocale.value.env.reload,
 		action: () => {
 			props.paginator.reload();
 		},
@@ -171,196 +175,168 @@ defineSlots<{
 
 <locale locale="ar-SA" lang="json">
 {
-	"reload": "انعش",
 	"loadMore": "عرض المزيد"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"reload": "Actualitzar",
 	"loadMore": "Carregar més"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"reload": "Aktualizovat",
 	"loadMore": "Zobrazit více"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"reload": "Refresh",
 	"loadMore": "Load more"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"reload": "Aktualisieren",
 	"loadMore": "Mehr laden"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"reload": "Refresh",
 	"loadMore": "Load more"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"reload": "Recargar",
 	"loadMore": "Ver más"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"reload": "Rafraîchir",
 	"loadMore": "Afficher plus …"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"reload": "Muat ulang",
 	"loadMore": "Selebihnya"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"reload": "Ricarica",
 	"loadMore": "Mostra di più"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"reload": "リロード",
 	"loadMore": "もっと見る"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"reload": "リロード",
 	"loadMore": "まだまだあるで！"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"reload": "Refresh",
 	"loadMore": "Wali ugar"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"reload": "Refresh",
 	"loadMore": "ಇನ್ನಷ್ಟು ನೋಡು"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"reload": "새로고침",
 	"loadMore": "더 보기"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"reload": "Verversen",
 	"loadMore": "Laad meer"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"reload": "Refresh",
 	"loadMore": "Vis mer"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"reload": "Odśwież",
 	"loadMore": "Załaduj więcej"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"reload": "Recarregar",
 	"loadMore": "Carregar mais"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"reload": "Перезагрузить",
 	"loadMore": "Загрузить ещё"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"reload": "Obnoviť",
 	"loadMore": "Zobraziť viac"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"reload": "รีโหลด",
 	"loadMore": "แสดงเพิ่มเติม"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"reload": "Yenile",
 	"loadMore": "Daha fazla yükle"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"reload": "Refresh",
 	"loadMore": "Load more"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"reload": "Оновити",
 	"loadMore": "Показати більше"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"reload": "Tải lại",
 	"loadMore": "Tải thêm"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"reload": "刷新",
 	"loadMore": "查看更多"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"reload": "重新整理",
 	"loadMore": "載入更多"
 }
 </locale>

@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template v-else>
 				<div>{{ $locale.sfc.newVersionOfClientAvailable }}</div>
 				<div>{{ $locale.sfc.youShouldUpgradeClient }}</div>
-				<MkButton style="margin: 8px auto;" @click="reload">{{ $locale.sfc.reload }}</MkButton>
+				<MkButton style="margin: 8px auto;" @click="reload">{{ globalLocale.env.reload }}</MkButton>
 			</template>
 			<div><MkLink url="https://misskey-hub.net/docs/for-users/resources/troubleshooting/" target="_blank">{{ $locale.sfc.troubleshooting }}</MkLink></div>
 			<div v-if="error" style="opacity: 0.7;">ERROR: {{ error }}</div>
@@ -25,6 +25,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { version } from '@features/boot/frontend/shared/config.js';
@@ -36,6 +38,8 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { instance } from '@features/instance/frontend/instance.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	error?: Error;
@@ -94,7 +98,6 @@ definePage(() => ({
 	"serverIsDead": "الخادم لا يستجيب، حاول بعد قليل",
 	"newVersionOfClientAvailable": "تتوفر نسخة أحدث للعميل",
 	"youShouldUpgradeClient": "حدّث الصفحة لعرضها.",
-	"reload": "انعش",
 	"troubleshooting": "استكشاف الأخطاء وإصلاحها"
 }
 </locale>
@@ -107,7 +110,6 @@ definePage(() => ({
 	"serverIsDead": "Aquest servidor no respon. Espera una estona i torna-ho a provar.",
 	"newVersionOfClientAvailable": "Tens disponible una versió del client més recent.",
 	"youShouldUpgradeClient": "Per veure aquesta pàgina, actualitzeu-la per actualitzar el vostre client.",
-	"reload": "Actualitzar",
 	"troubleshooting": "Solucionar problemes"
 }
 </locale>
@@ -120,7 +122,6 @@ definePage(() => ({
 	"serverIsDead": "Server neodpovídá. Počkejte chvíli a zkuste to znovu.",
 	"newVersionOfClientAvailable": "Nová verze klienta je k dispozici.",
 	"youShouldUpgradeClient": "Pro zobrazení této stránky obnovte stránku pro aktualizaci klienta.",
-	"reload": "Aktualizovat",
 	"troubleshooting": "Poradce při potížích"
 }
 </locale>
@@ -133,7 +134,6 @@ definePage(() => ({
 	"serverIsDead": "This server is not responding. Please wait for a while and try again.",
 	"newVersionOfClientAvailable": "There is a newer version of your client available.",
 	"youShouldUpgradeClient": "To view this page, please refresh to update your client.",
-	"reload": "Refresh",
 	"troubleshooting": "Troubleshooting"
 }
 </locale>
@@ -146,7 +146,6 @@ definePage(() => ({
 	"serverIsDead": "Dieser Server antwortet nicht. Bitte warte einen Moment und versuche es dann erneut.",
 	"newVersionOfClientAvailable": "Eine neuere Version deines Clients ist verfügbar.",
 	"youShouldUpgradeClient": "Bitte aktualisiere diese Seite, um eine neuere Version deines Clients zu verwenden.",
-	"reload": "Aktualisieren",
 	"troubleshooting": "Problembehandlung"
 }
 </locale>
@@ -159,7 +158,6 @@ definePage(() => ({
 	"serverIsDead": "This server is not responding. Please wait for a while and try again.",
 	"newVersionOfClientAvailable": "There is a newer version of your client available.",
 	"youShouldUpgradeClient": "To view this page, please refresh to update your client.",
-	"reload": "Refresh",
 	"troubleshooting": "Troubleshooting"
 }
 </locale>
@@ -172,7 +170,6 @@ definePage(() => ({
 	"serverIsDead": "No hay respuesta del servidor. Espera un momento y vuelve a intentarlo.",
 	"newVersionOfClientAvailable": "Hay una versión más nueva de su cliente disponible.",
 	"youShouldUpgradeClient": "Para ver esta página, recarga el navegador para actualizar el cliente.",
-	"reload": "Recargar",
 	"troubleshooting": "Solución de problemas"
 }
 </locale>
@@ -185,7 +182,6 @@ definePage(() => ({
 	"serverIsDead": "Le serveur ne répond pas. Patientez quelques instants puis essayez à nouveau.",
 	"newVersionOfClientAvailable": "Une nouvelle version de votre client est disponible.",
 	"youShouldUpgradeClient": "Si la page ne s'affiche pas correctement, rechargez-la pour mettre votre client à jour.",
-	"reload": "Rafraîchir",
 	"troubleshooting": "Résolution de problèmes"
 }
 </locale>
@@ -198,7 +194,6 @@ definePage(() => ({
 	"serverIsDead": "Tidak ada respon dari peladen. Mohon tunggu dan coba beberapa saat lagi.",
 	"newVersionOfClientAvailable": "Versi terbaru dari klien kamu telah tersedia.",
 	"youShouldUpgradeClient": "Untuk melihat halaman ini, mohon muat ulang untuk memutakhirkan klienmu.",
-	"reload": "Muat ulang",
 	"troubleshooting": "Penyelesaian Masalah"
 }
 </locale>
@@ -211,7 +206,6 @@ definePage(() => ({
 	"serverIsDead": "Il server non risponde. Si prega di attendere e riprovare più tardi.",
 	"newVersionOfClientAvailable": "Una nuova versione del tuo client è disponibile.",
 	"youShouldUpgradeClient": "Per visualizzare la pagina è necessario aggiornare il client alla nuova versione e ricaricare.",
-	"reload": "Ricarica",
 	"troubleshooting": "Risoluzione problemi"
 }
 </locale>
@@ -224,7 +218,6 @@ definePage(() => ({
 	"serverIsDead": "サーバーの応答がありません。しばらく待ってから再度試してください。",
 	"newVersionOfClientAvailable": "新しいバージョンのクライアントが利用可能です。",
 	"youShouldUpgradeClient": "このページを表示するためには、リロードして新しいバージョンのクライアントをご利用ください。",
-	"reload": "リロード",
 	"troubleshooting": "トラブルシューティング"
 }
 </locale>
@@ -237,7 +230,6 @@ definePage(() => ({
 	"serverIsDead": "サーバーからの応答がないで。もうちょい待ってから試してみてな。",
 	"newVersionOfClientAvailable": "新しいバージョンのクライアントが使えるで。",
 	"youShouldUpgradeClient": "このページを表示するには、リロードして新しいバージョンのクライアントを使ってなー。",
-	"reload": "リロード",
 	"troubleshooting": "トラブルシューティング"
 }
 </locale>
@@ -250,7 +242,6 @@ definePage(() => ({
 	"serverIsDead": "This server is not responding. Please wait for a while and try again.",
 	"newVersionOfClientAvailable": "There is a newer version of your client available.",
 	"youShouldUpgradeClient": "To view this page, please refresh to update your client.",
-	"reload": "Refresh",
 	"troubleshooting": "Troubleshooting"
 }
 </locale>
@@ -263,7 +254,6 @@ definePage(() => ({
 	"serverIsDead": "This server is not responding. Please wait for a while and try again.",
 	"newVersionOfClientAvailable": "There is a newer version of your client available.",
 	"youShouldUpgradeClient": "To view this page, please refresh to update your client.",
-	"reload": "Refresh",
 	"troubleshooting": "Troubleshooting"
 }
 </locale>
@@ -276,7 +266,6 @@ definePage(() => ({
 	"serverIsDead": "서버가 응답하지 않습니다. 잠시 후 다시 시도해 주세요.",
 	"newVersionOfClientAvailable": "새로운 버전의 클라이언트를 이용할 수 있습니다.",
 	"youShouldUpgradeClient": "이 페이지를 표시하려면 새로고침하여 새로운 버전의 클라이언트를 이용해 주십시오.",
-	"reload": "새로고침",
 	"troubleshooting": "문제 해결"
 }
 </locale>
@@ -289,7 +278,6 @@ definePage(() => ({
 	"serverIsDead": "De server reageert niet. Wacht even en probeer het opnieuw.",
 	"newVersionOfClientAvailable": "Er is een nieuwere versie van je client beschikbaar.",
 	"youShouldUpgradeClient": "Werk je client bij om deze pagina te zien.",
-	"reload": "Verversen",
 	"troubleshooting": "Probleemoplossing"
 }
 </locale>
@@ -302,7 +290,6 @@ definePage(() => ({
 	"serverIsDead": "Denne serveren svarer ikke. Vennligst vent en stund og prøv igjen.",
 	"newVersionOfClientAvailable": "There is a newer version of your client available.",
 	"youShouldUpgradeClient": "To view this page, please refresh to update your client.",
-	"reload": "Refresh",
 	"troubleshooting": "Troubleshooting"
 }
 </locale>
@@ -315,7 +302,6 @@ definePage(() => ({
 	"serverIsDead": "Serwer nie odpowiada. Zaczekaj chwilę i spróbuj ponownie.",
 	"newVersionOfClientAvailable": "Nowsza wersja klienta jest dostępna.",
 	"youShouldUpgradeClient": "Odśwież stronę, by zaaktualizować klienta.",
-	"reload": "Odśwież",
 	"troubleshooting": "Rozwiązywanie problemów"
 }
 </locale>
@@ -328,7 +314,6 @@ definePage(() => ({
 	"serverIsDead": "Não há resposta do servidor. Aguarde um momento e tente novamente.",
 	"newVersionOfClientAvailable": "Nova versão do cliente disponível",
 	"youShouldUpgradeClient": "Para visualizar esta página, recarregue-a e utilize a nova versão do cliente.",
-	"reload": "Recarregar",
 	"troubleshooting": "Resolução de problemas"
 }
 </locale>
@@ -341,7 +326,6 @@ definePage(() => ({
 	"serverIsDead": "Ответа от сервера нет. Пожалуйста, подождите немного и повторите попытку.",
 	"newVersionOfClientAvailable": "Доступна более свежая версия клиента.",
 	"youShouldUpgradeClient": "Чтобы просмотреть эту страницу, пожалуйста, обновите ее.",
-	"reload": "Перезагрузить",
 	"troubleshooting": "Разрешение проблем"
 }
 </locale>
@@ -354,7 +338,6 @@ definePage(() => ({
 	"serverIsDead": "Tento server nereaguje. Prosím chvíľu počkajte a skúste znova.",
 	"newVersionOfClientAvailable": "Je dostupná novšia verzia vášho klienta.",
 	"youShouldUpgradeClient": "Na pozretie tejto stránky prosím obnovte svojho klienta.",
-	"reload": "Obnoviť",
 	"troubleshooting": "Riešenie problémov"
 }
 </locale>
@@ -367,7 +350,6 @@ definePage(() => ({
 	"serverIsDead": "เซิร์ฟเวอร์นี้ไม่มีการตอบสนอง โปรดกรุณารอสักครู่แล้วลองใหม่อีกครั้ง",
 	"newVersionOfClientAvailable": "มีไคลเอ็นต์เวอร์ชันใหม่กว่าของคุณพร้อมใช้งานนะ",
 	"youShouldUpgradeClient": "หากต้องการดูหน้านี้ กรุณาโหลดหน้าใหม่เพื่ออัปเดตไคลเอ็นต์ของคุณ",
-	"reload": "รีโหลด",
 	"troubleshooting": "แก้ปัญหา"
 }
 </locale>
@@ -380,7 +362,6 @@ definePage(() => ({
 	"serverIsDead": "Bu sunucu yanıt vermiyor. Lütfen bir süre bekleyin ve tekrar dene.",
 	"newVersionOfClientAvailable": "İstemcinin daha yeni bir sürümü var.",
 	"youShouldUpgradeClient": "Bu sayfayı görüntülemek için lütfen yenileyerek istemcini güncelle.",
-	"reload": "Yenile",
 	"troubleshooting": "Sorun Giderme"
 }
 </locale>
@@ -393,7 +374,6 @@ definePage(() => ({
 	"serverIsDead": "This server is not responding. Please wait for a while and try again.",
 	"newVersionOfClientAvailable": "There is a newer version of your client available.",
 	"youShouldUpgradeClient": "To view this page, please refresh to update your client.",
-	"reload": "Refresh",
 	"troubleshooting": "Troubleshooting"
 }
 </locale>
@@ -406,7 +386,6 @@ definePage(() => ({
 	"serverIsDead": "Відповіді від сервера немає. Зачекайте деякий час і повторіть спробу.",
 	"newVersionOfClientAvailable": "Доступніша свіжа версія клієнта.",
 	"youShouldUpgradeClient": "Перезавантажте та використовуйте нову версію клієнта, щоб переглянути цю сторінку.",
-	"reload": "Оновити",
 	"troubleshooting": "Усунення проблем"
 }
 </locale>
@@ -419,7 +398,6 @@ definePage(() => ({
 	"serverIsDead": "Máy chủ không phản hồi. Vui lòng thử lại sau giây lát.",
 	"newVersionOfClientAvailable": "Có phiên bản mới cho bạn cập nhật.",
 	"youShouldUpgradeClient": "Để xem trang này, hãy làm tươi để cập nhật ứng dụng.",
-	"reload": "Tải lại",
 	"troubleshooting": "Khắc phục sự cố"
 }
 </locale>
@@ -432,7 +410,6 @@ definePage(() => ({
 	"serverIsDead": "服务器未响应。 请稍后再试。",
 	"newVersionOfClientAvailable": "新版本的客户端可用。",
 	"youShouldUpgradeClient": "请刷新并使用新版本客户端查看此页面。",
-	"reload": "刷新",
 	"troubleshooting": "故障排除"
 }
 </locale>
@@ -445,7 +422,6 @@ definePage(() => ({
 	"serverIsDead": "伺服器沒有回應。請稍等片刻再試。",
 	"newVersionOfClientAvailable": "新版本的客戶端可用。",
 	"youShouldUpgradeClient": "請重新載入以使用新版客戶端顯示此頁面。",
-	"reload": "重新整理",
 	"troubleshooting": "故障排除"
 }
 </locale>

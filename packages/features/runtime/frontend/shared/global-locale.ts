@@ -6,5 +6,5 @@
 import type { Locale } from 'i18n';
 
 /** Select shared actions from the existing catalog; never duplicate their translations. */
-export const globalLocaleKeys = ['save', 'delete', 'close'] as const;
+export const globalLocaleKeys = ['save', 'delete', 'close', 'somethingHappened', 'search', 'edit', 'cancel', 'ok', 'reload', 'copy'] as const;
 export type GlobalLocale = Pick<Locale, typeof globalLocaleKeys[number]>;

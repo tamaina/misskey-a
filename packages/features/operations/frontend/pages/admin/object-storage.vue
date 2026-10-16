@@ -98,7 +98,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #footer>
 		<div :class="$style.footer">
 			<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 16px;">
-				<MkButton primary rounded @click="save"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
+				<MkButton primary rounded @click="save"><i class="ti ti-check"></i> {{ globalLocale.env.save }}</MkButton>
 			</div>
 		</div>
 	</template>
@@ -106,6 +106,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { ref, computed } from 'vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -115,6 +117,8 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { fetchInstance } from '@features/instance/frontend/instance.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const meta = await misskeyApi('admin/meta');
 
@@ -186,8 +190,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "اتصل عبر وكيل",
 	"objectStorageUseProxyDesc": "عطل هذا الخيار إذا لم ترد استخدام API عبر وكيل",
 	"objectStorageSetPublicRead": "عينها ك\"علنية\" عند الرفع",
-	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance.",
-	"save": "حفظ"
+	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance."
 }
 </locale>
 
@@ -210,8 +213,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Connectar-se  mitjançant un Proxy",
 	"objectStorageUseProxyDesc": "Desactiva'l si no faràs servir un Proxy per les connexions de l'API",
 	"objectStorageSetPublicRead": "Configurar les pujades com públiques ",
-	"s3ForcePathStyleDesc": "Si s3ForcePathStyle es troba activat el nom del cubell s'haurà d'especificar com a part de l'adreça URL en comptes del nom del servidor. Podria ser que necessitis activar aquesta opció quan facis servir serveis com ara l'allotjament a un servidor propi.",
-	"save": "Desa"
+	"s3ForcePathStyleDesc": "Si s3ForcePathStyle es troba activat el nom del cubell s'haurà d'especificar com a part de l'adreça URL en comptes del nom del servidor. Podria ser que necessitis activar aquesta opció quan facis servir serveis com ara l'allotjament a un servidor propi."
 }
 </locale>
 
@@ -234,8 +236,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Připojení skrze Proxy",
 	"objectStorageUseProxyDesc": "Vypněte to pokud nebudete používat Proxy pro API připojení.",
 	"objectStorageSetPublicRead": "Při nahrátí nastavit na \"public-read\"",
-	"s3ForcePathStyleDesc": "Pokud je povolena funkce s3ForcePathStyle, musí být název Bucketu zahrnut do cesty k adrese URL, nikoli do názvu hostitele adresy URL. Toto nastavení může být nutné povolit při používání služeb, jako je například samostatně hostovaná instance Minio.",
-	"save": "Uložit"
+	"s3ForcePathStyleDesc": "Pokud je povolena funkce s3ForcePathStyle, musí být název Bucketu zahrnut do cesty k adrese URL, nikoli do názvu hostitele adresy URL. Toto nastavení může být nutné povolit při používání služeb, jako je například samostatně hostovaná instance Minio."
 }
 </locale>
 
@@ -258,8 +259,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Connect over Proxy",
 	"objectStorageUseProxyDesc": "Turn this off if you are not going to use a Proxy for API connections",
 	"objectStorageSetPublicRead": "Set \"public-read\" on upload",
-	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance.",
-	"save": "Save"
+	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance."
 }
 </locale>
 
@@ -282,8 +282,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Über Proxy verbinden",
 	"objectStorageUseProxyDesc": "Deaktiviere dies, falls du für Verbindungen zur API keinen Proxy verwenden wirst",
 	"objectStorageSetPublicRead": "Bei Upload auf \"public-read\" stellen",
-	"s3ForcePathStyleDesc": "Ist s3ForcePathStyle aktiviert, so muss der Bucketname nicht im Hostnamen der URL, sondern im Pfad der URL angeben werden. Diese Option muss eventuell aktiviert werden, wenn Dienste wie z.B. eine selbstbetriebene Minio-Instanz verwendet werden.",
-	"save": "Speichern"
+	"s3ForcePathStyleDesc": "Ist s3ForcePathStyle aktiviert, so muss der Bucketname nicht im Hostnamen der URL, sondern im Pfad der URL angeben werden. Diese Option muss eventuell aktiviert werden, wenn Dienste wie z.B. eine selbstbetriebene Minio-Instanz verwendet werden."
 }
 </locale>
 
@@ -306,8 +305,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Connect over Proxy",
 	"objectStorageUseProxyDesc": "Turn this off if you are not going to use a Proxy for API connections",
 	"objectStorageSetPublicRead": "Set \"public-read\" on upload",
-	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance.",
-	"save": "Save"
+	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance."
 }
 </locale>
 
@@ -330,8 +328,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Conectarse a través de Proxy",
 	"objectStorageUseProxyDesc": "Desactive esto si no va a usar Proxy para la conexión de Almacenamiento de objetos",
 	"objectStorageSetPublicRead": "Seleccionar \"public-read\" al subir ",
-	"s3ForcePathStyleDesc": "Si s3ForcePathStyle esta habilitado el nombre del bucket debe ser especificado como parte de la URL en lugar del nombre de host en la URL. Puede ser necesario activar esta opción cuando se utilice, por ejemplo, Minio en un servidor propio.",
-	"save": "Guardar"
+	"s3ForcePathStyleDesc": "Si s3ForcePathStyle esta habilitado el nombre del bucket debe ser especificado como parte de la URL en lugar del nombre de host en la URL. Puede ser necesario activar esta opción cuando se utilice, por ejemplo, Minio en un servidor propio."
 }
 </locale>
 
@@ -354,8 +351,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Se connecter via proxy",
 	"objectStorageUseProxyDesc": "Désactivez cette option si vous n'utilisez pas de proxy pour la connexion API",
 	"objectStorageSetPublicRead": "Régler sur « public » lors de l'envoi",
-	"s3ForcePathStyleDesc": "Si s3ForcePathStyle est activé, le nom du compartiment doit être spécifié comme une partie du chemin de l'URL plutôt que le nom d'hôte. Il faudra peut-être l'activer lors de l'utilisation d'une instance de Minio autohébergée, etc.",
-	"save": "Enregistrer"
+	"s3ForcePathStyleDesc": "Si s3ForcePathStyle est activé, le nom du compartiment doit être spécifié comme une partie du chemin de l'URL plutôt que le nom d'hôte. Il faudra peut-être l'activer lors de l'utilisation d'une instance de Minio autohébergée, etc."
 }
 </locale>
 
@@ -378,8 +374,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Hubungkan melalui Proxy",
 	"objectStorageUseProxyDesc": "Matikan ini jika kamu tidak akan menggunakan Proxy untuk koneksi ObjectStorage",
 	"objectStorageSetPublicRead": "Setel \"public-read\" disaat mengunggah",
-	"s3ForcePathStyleDesc": "Jika s3ForcePathStyle dinyalakan, nama bucket harus dimasukkan dalam path URL dan bukan URL nama host tersebut. Kamu perlu menyalakan pengaturan ini jika menggunakan layanan seperti instansi Minio yang self-hosted.",
-	"save": "Simpan"
+	"s3ForcePathStyleDesc": "Jika s3ForcePathStyle dinyalakan, nama bucket harus dimasukkan dalam path URL dan bukan URL nama host tersebut. Kamu perlu menyalakan pengaturan ini jika menggunakan layanan seperti instansi Minio yang self-hosted."
 }
 </locale>
 
@@ -402,8 +397,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Usa proxy",
 	"objectStorageUseProxyDesc": "Disabilita quest'opzione se non usi proxy per la connessione API.",
 	"objectStorageSetPublicRead": "Imposta \"visibilità pubblica\" al momento di caricare",
-	"s3ForcePathStyleDesc": "L'attivazione di s3ForcePathStyle impone di specificare il nome del bucket come parte del percorso nell'URL anziché del nome host. Potrebbe tornare utile quando si utilizzano applicazioni come Minio.",
-	"save": "Salva"
+	"s3ForcePathStyleDesc": "L'attivazione di s3ForcePathStyle impone di specificare il nome del bucket come parte del percorso nell'URL anziché del nome host. Potrebbe tornare utile quando si utilizzano applicazioni come Minio."
 }
 </locale>
 
@@ -426,8 +420,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Proxyを利用する",
 	"objectStorageUseProxyDesc": "API接続にproxyを利用しない場合はオフにしてください",
 	"objectStorageSetPublicRead": "アップロード時に'public-read'を設定する",
-	"s3ForcePathStyleDesc": "s3ForcePathStyleを有効にすると、バケット名をURLのホスト名ではなくパスの一部として指定することを強制します。セルフホストされたMinioなどの使用時に有効にする必要がある場合があります。",
-	"save": "保存"
+	"s3ForcePathStyleDesc": "s3ForcePathStyleを有効にすると、バケット名をURLのホスト名ではなくパスの一部として指定することを強制します。セルフホストされたMinioなどの使用時に有効にする必要がある場合があります。"
 }
 </locale>
 
@@ -450,8 +443,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Proxyを使う",
 	"objectStorageUseProxyDesc": "API接続にproxy使わんのやったら切ってくれへん？",
 	"objectStorageSetPublicRead": "アップロードした時に'public-read'を設定してや",
-	"s3ForcePathStyleDesc": "s3ForcePathStyleを使たらバケット名をURLのホスト名やなくてパスの一部として必ず指定させるようになるで。セルフホストされたMinioとかを使うてるんやったら有効にせなあかん場合があるで。",
-	"save": "とっとく"
+	"s3ForcePathStyleDesc": "s3ForcePathStyleを使たらバケット名をURLのホスト名やなくてパスの一部として必ず指定させるようになるで。セルフホストされたMinioとかを使うてるんやったら有効にせなあかん場合があるで。"
 }
 </locale>
 
@@ -474,8 +466,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Connect over Proxy",
 	"objectStorageUseProxyDesc": "Turn this off if you are not going to use a Proxy for API connections",
 	"objectStorageSetPublicRead": "Set \"public-read\" on upload",
-	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance.",
-	"save": "Sekles"
+	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance."
 }
 </locale>
 
@@ -498,8 +489,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Connect over Proxy",
 	"objectStorageUseProxyDesc": "Turn this off if you are not going to use a Proxy for API connections",
 	"objectStorageSetPublicRead": "Set \"public-read\" on upload",
-	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance.",
-	"save": "ಉಳಿಸಿ"
+	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance."
 }
 </locale>
 
@@ -522,8 +512,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "연결에 프록시를 사용",
 	"objectStorageUseProxyDesc": "오브젝트 스토리지 API 호출시 프록시를 사용하지 않는 경우 OFF 로 설정해 주세요",
 	"objectStorageSetPublicRead": "업로드할 때 'public-read'를 설정하기",
-	"s3ForcePathStyleDesc": "s3ForcePathStyle을 활성화하면, 버킷 이름을 URL의 호스트명이 아닌 경로의 일부로써 취급합니다. 셀프 호스트 Minio와 같은 서비스를 사용할 경우 활성화해야 할 수 있습니다.",
-	"save": "저장"
+	"s3ForcePathStyleDesc": "s3ForcePathStyle을 활성화하면, 버킷 이름을 URL의 호스트명이 아닌 경로의 일부로써 취급합니다. 셀프 호스트 Minio와 같은 서비스를 사용할 경우 활성화해야 할 수 있습니다."
 }
 </locale>
 
@@ -546,8 +535,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Verbinden via proxy",
 	"objectStorageUseProxyDesc": "Deactiveer dit als u geen proxy wilt gebruiken voor verbindingen met de API",
 	"objectStorageSetPublicRead": "Instellen op “public-read” op upload",
-	"s3ForcePathStyleDesc": "Als s3ForcePathStyle is geactiveerd, moet de bucketnaam niet worden opgegeven in de hostnaam van de URL, maar in het pad van de URL. Deze optie moet mogelijk worden geactiveerd als services zoals een zelfbediende Minio-instantie worden gebruikt.",
-	"save": "Opslaan"
+	"s3ForcePathStyleDesc": "Als s3ForcePathStyle is geactiveerd, moet de bucketnaam niet worden opgegeven in de hostnaam van de URL, maar in het pad van de URL. Deze optie moet mogelijk worden geactiveerd als services zoals een zelfbediende Minio-instantie worden gebruikt."
 }
 </locale>
 
@@ -570,8 +558,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Bruk Proxy",
 	"objectStorageUseProxyDesc": "Turn this off if you are not going to use a Proxy for API connections",
 	"objectStorageSetPublicRead": "Set \"public-read\" on upload",
-	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance.",
-	"save": "Lagre"
+	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance."
 }
 </locale>
 
@@ -594,8 +581,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Połącz przez proxy",
 	"objectStorageUseProxyDesc": "Wyłącz, jeżeli nie zamierzasz używać proxy dla połączenia z pamięcią blokową",
 	"objectStorageSetPublicRead": "Ustaw opcję \"public-read\" przy przesyłaniu",
-	"s3ForcePathStyleDesc": "Jeśli opcja s3ForcePathStyle jest włączona, nazwa Bucket'u musi być zawarta w ścieżce adresu URL, a nie w nazwie hosta adresu URL. Włączenie tego ustawienia może być konieczne w przypadku użycia usług takich jak self-hosted instancja Minio.",
-	"save": "Zapisz"
+	"s3ForcePathStyleDesc": "Jeśli opcja s3ForcePathStyle jest włączona, nazwa Bucket'u musi być zawarta w ścieżce adresu URL, a nie w nazwie hosta adresu URL. Włączenie tego ustawienia może być konieczne w przypadku użycia usług takich jak self-hosted instancja Minio."
 }
 </locale>
 
@@ -618,8 +604,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Usar proxy",
 	"objectStorageUseProxyDesc": "Se você não usa proxy para conexão de API, desative-o.",
 	"objectStorageSetPublicRead": "Definir 'public-read' ao fazer o upload",
-	"s3ForcePathStyleDesc": "Ao habilitar s3ForcePathStyle, o nome do bucket é especificado como parte do caminho em vez de ser o nome do host na URL. Isso pode ser necessário ao usar serviços auto-hospedados como o Minio.",
-	"save": "Salvar"
+	"s3ForcePathStyleDesc": "Ao habilitar s3ForcePathStyle, o nome do bucket é especificado como parte do caminho em vez de ser o nome do host na URL. Isso pode ser necessário ao usar serviços auto-hospedados como o Minio."
 }
 </locale>
 
@@ -642,8 +627,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Использовать прокси",
 	"objectStorageUseProxyDesc": "Отключите, если не будете испоьзовать прокси для соединений по протоколу ObjectStorage.",
 	"objectStorageSetPublicRead": "Устанавливать public-read при загрузке на сервер",
-	"s3ForcePathStyleDesc": "Включение s3ForcePathStyle приводит к тому, что имя корзины указывается как часть пути в URL, а не в имени хоста. Может потребоваться включить при использовании локального Minio или чего-то подобного.",
-	"save": "Сохранить"
+	"s3ForcePathStyleDesc": "Включение s3ForcePathStyle приводит к тому, что имя корзины указывается как часть пути в URL, а не в имени хоста. Может потребоваться включить при использовании локального Minio или чего-то подобного."
 }
 </locale>
 
@@ -666,8 +650,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Pripájať cez Proxy",
 	"objectStorageUseProxyDesc": "Vypnite ak nechcete, aby spojenia na API išli cez Proxy",
 	"objectStorageSetPublicRead": "Pri nahratí nastaviť \"public-read\"",
-	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance.",
-	"save": "Uložiť"
+	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance."
 }
 </locale>
 
@@ -690,8 +673,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "เชื่อมต่อผ่านพร็อกซี",
 	"objectStorageUseProxyDesc": "ปิดสิ่งนี้ไว้ถ้าหากคุณจะไม่ใช้ Proxy สำหรับการเชื่อมต่อ API",
 	"objectStorageSetPublicRead": "ตั้งค่าเป็น “public-read” เมื่ออัปโหลด",
-	"s3ForcePathStyleDesc": "เมื่อเปิดใช้งาน s3ForcePathStyle จะบังคับให้ ระบุชื่อบัคเก็ตเป็นส่วนหนึ่งของพาธ แทนที่จะเป็นชื่อโฮสต์ใน URL, อาจจำเป็นต้องเปิดใช้งานตัวเลือกนี้เมื่อใช้กับ Minio ที่โฮสต์เองหรือบริการที่คล้ายกัน",
-	"save": "บันทึก"
+	"s3ForcePathStyleDesc": "เมื่อเปิดใช้งาน s3ForcePathStyle จะบังคับให้ ระบุชื่อบัคเก็ตเป็นส่วนหนึ่งของพาธ แทนที่จะเป็นชื่อโฮสต์ใน URL, อาจจำเป็นต้องเปิดใช้งานตัวเลือกนี้เมื่อใช้กับ Minio ที่โฮสต์เองหรือบริการที่คล้ายกัน"
 }
 </locale>
 
@@ -714,8 +696,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Proxy üzerinden bağlan",
 	"objectStorageUseProxyDesc": "API bağlantıları için Proxy kullanmayacaksanız bunu kapatın.",
 	"objectStorageSetPublicRead": "Yükleme sırasında \"genel-okuma\" ayarını yapın",
-	"s3ForcePathStyleDesc": "s3ForcePathStyle etkinleştirilirse, kova adı URL'nin ana bilgisayar adı yerine URL yoluna eklenmelidir. Kendi kendine barındırılan bir Minio örneği gibi hizmetleri kullanırken bu ayarı etkinleştirmen gerekebilir.",
-	"save": "Kaydet"
+	"s3ForcePathStyleDesc": "s3ForcePathStyle etkinleştirilirse, kova adı URL'nin ana bilgisayar adı yerine URL yoluna eklenmelidir. Kendi kendine barındırılan bir Minio örneği gibi hizmetleri kullanırken bu ayarı etkinleştirmen gerekebilir."
 }
 </locale>
 
@@ -738,8 +719,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Connect over Proxy",
 	"objectStorageUseProxyDesc": "Turn this off if you are not going to use a Proxy for API connections",
 	"objectStorageSetPublicRead": "Set \"public-read\" on upload",
-	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance.",
-	"save": "Save"
+	"s3ForcePathStyleDesc": "If s3ForcePathStyle is enabled, the bucket name has to included in the path of the URL as opposed to the hostname of the URL. You may need to enable this setting when using services such as a self-hosted Minio instance."
 }
 </locale>
 
@@ -762,8 +742,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Використовувати Proxy",
 	"objectStorageUseProxyDesc": "Вимкніть коли проксі не використовується для з'єднання ObjectStorage",
 	"objectStorageSetPublicRead": "Встановіть 'публічне читання' при завантаженні",
-	"s3ForcePathStyleDesc": "Якщо увімкнено s3ForcePathStyle, назва бакету має бути включена до шляху URL, а не до імені хосту URL. Можливо, вам потрібно ввімкнути це налаштування під час використання таких сервісів, як власний екземпляр Minio.",
-	"save": "Зберегти"
+	"s3ForcePathStyleDesc": "Якщо увімкнено s3ForcePathStyle, назва бакету має бути включена до шляху URL, а не до імені хосту URL. Можливо, вам потрібно ввімкнути це налаштування під час використання таких сервісів, як власний екземпляр Minio."
 }
 </locale>
 
@@ -786,8 +765,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "Kết nối thông qua Proxy",
 	"objectStorageUseProxyDesc": "Tắt nếu bạn không dùng Proxy để kết nối API",
 	"objectStorageSetPublicRead": "Đặt \"public-read\" khi tải lên",
-	"s3ForcePathStyleDesc": "Nếu s3ForcePathStyle được bật, tên bucket phải được thêm vào địa chỉ URL thay vì chỉ có tên miền. Bạn có thể phải sử dụng thiết lập này nếu bạn sử dụng các dịch vụ như Minio mà bạn tự cung cấp.",
-	"save": "Lưu"
+	"s3ForcePathStyleDesc": "Nếu s3ForcePathStyle được bật, tên bucket phải được thêm vào địa chỉ URL thay vì chỉ có tên miền. Bạn có thể phải sử dụng thiết lập này nếu bạn sử dụng các dịch vụ như Minio mà bạn tự cung cấp."
 }
 </locale>
 
@@ -810,8 +788,7 @@ definePage(() => ({
 	"objectStorageUseProxy": "使用代理",
 	"objectStorageUseProxyDesc": "如果不使用代理进行 API 连接，请关闭。",
 	"objectStorageSetPublicRead": "上传时设置为 public-read",
-	"s3ForcePathStyleDesc": "启用 s3ForcePathStyle 会强制将存储桶名称指定为 URL 中路径的一部分，而不是主机名。使用自托管 Minio 等时可能需要启用。",
-	"save": "保存"
+	"s3ForcePathStyleDesc": "启用 s3ForcePathStyle 会强制将存储桶名称指定为 URL 中路径的一部分，而不是主机名。使用自托管 Minio 等时可能需要启用。"
 }
 </locale>
 
@@ -834,7 +811,6 @@ definePage(() => ({
 	"objectStorageUseProxy": "使用網路代理",
 	"objectStorageUseProxyDesc": "請在不使用網路代理連接 API 時關閉",
 	"objectStorageSetPublicRead": "上傳時設定為「public-read」",
-	"s3ForcePathStyleDesc": "啟用 s3ForcePathStyle 將強制填寫儲存空間（Bucket）名稱至 URL 路徑內，而非寫入主機名。 使用如 Minio 等自行託管服務時可能需要啟用。",
-	"save": "儲存"
+	"s3ForcePathStyleDesc": "啟用 s3ForcePathStyle 將強制填寫儲存空間（Bucket）名稱至 URL 路徑內，而非寫入主機名。 使用如 Minio 等自行託管服務時可能需要啟用。"
 }
 </locale>

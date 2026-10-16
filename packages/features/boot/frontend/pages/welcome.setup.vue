@@ -126,6 +126,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { ref } from 'vue';
 import { host, version, productName } from '@features/boot/frontend/shared/config.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -135,6 +137,8 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { login } from '@features/auth/frontend/accounts.js';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import MkServerSetupWizard from '@features/boot/frontend/components/MkServerSetupWizard.vue';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const username = ref('');
 const password = ref('');
@@ -161,7 +165,7 @@ function createAccount() {
 	}).catch((err) => {
 		accountCreating.value = false;
 
-		let title: string = $locale.value.sfc.somethingHappened;
+		let title: string = globalLocale.value.env.somethingHappened;
 		let text = err.message + '\n' + err.id;
 
 		if (err.code === 'ACCESS_DENIED') {
@@ -251,7 +255,6 @@ function finish() {
 
 <locale locale="ar-SA" lang="json">
 {
-	"somethingHappened": "حدث خطأ",
 	"permissionDeniedError": "رُفضة العملية",
 	"operationForbidden": "عملية ممنوعة",
 	"incorrectPassword": "كلمة السر خاطئة.",
@@ -283,7 +286,6 @@ function finish() {
 
 <locale locale="ca-ES" lang="json">
 {
-	"somethingHappened": "S'ha produït un error",
 	"permissionDeniedError": "Operació no permesa ",
 	"operationForbidden": "Operació no permesa ",
 	"incorrectPassword": "Contrasenya incorrecta.",
@@ -315,7 +317,6 @@ function finish() {
 
 <locale locale="cs-CZ" lang="json">
 {
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"permissionDeniedError": "Operace zamítnuta",
 	"operationForbidden": "Zakázaná operace",
 	"incorrectPassword": "Nesprávné heslo.",
@@ -347,7 +348,6 @@ function finish() {
 
 <locale locale="da-DK" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -379,7 +379,6 @@ function finish() {
 
 <locale locale="de-DE" lang="json">
 {
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"permissionDeniedError": "Aktion verweigert",
 	"operationForbidden": "Aktion nicht möglich",
 	"incorrectPassword": "Falsches Passwort.",
@@ -411,7 +410,6 @@ function finish() {
 
 <locale locale="en-US" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -443,7 +441,6 @@ function finish() {
 
 <locale locale="es-ES" lang="json">
 {
-	"somethingHappened": "Ocurrió un error",
 	"permissionDeniedError": "Operación denegada",
 	"operationForbidden": "Operación prohibida",
 	"incorrectPassword": "La contraseña es incorrecta",
@@ -475,7 +472,6 @@ function finish() {
 
 <locale locale="fr-FR" lang="json">
 {
-	"somethingHappened": "Une erreur est survenue",
 	"permissionDeniedError": "Opération refusée",
 	"operationForbidden": "Opération non autorisée",
 	"incorrectPassword": "Le mot de passe est incorrect.",
@@ -507,7 +503,6 @@ function finish() {
 
 <locale locale="id-ID" lang="json">
 {
-	"somethingHappened": "Terjadi kesalahan",
 	"permissionDeniedError": "Operasi ditolak",
 	"operationForbidden": "Operasi dilarang",
 	"incorrectPassword": "Kata sandi salah.",
@@ -539,7 +534,6 @@ function finish() {
 
 <locale locale="it-IT" lang="json">
 {
-	"somethingHappened": "Si è verificato un problema",
 	"permissionDeniedError": "Errore, attività non autorizzata",
 	"operationForbidden": "Operazione non consentita",
 	"incorrectPassword": "La password è errata.",
@@ -571,7 +565,6 @@ function finish() {
 
 <locale locale="ja-JP" lang="json">
 {
-	"somethingHappened": "問題が発生しました",
 	"permissionDeniedError": "操作が拒否されました",
 	"operationForbidden": "この操作はできません",
 	"incorrectPassword": "パスワードが間違っています。",
@@ -603,7 +596,6 @@ function finish() {
 
 <locale locale="ja-KS" lang="json">
 {
-	"somethingHappened": "なんかあかんわ",
 	"permissionDeniedError": "操作が拒否されてもうた。",
 	"operationForbidden": "この操作はできまへん",
 	"incorrectPassword": "パスワードがちゃうわ。",
@@ -635,7 +627,6 @@ function finish() {
 
 <locale locale="kab-KAB" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -667,7 +658,6 @@ function finish() {
 
 <locale locale="kn-IN" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -699,7 +689,6 @@ function finish() {
 
 <locale locale="ko-KR" lang="json">
 {
-	"somethingHappened": "오류가 발생했습니다",
 	"permissionDeniedError": "작업이 거부되었습니다",
 	"operationForbidden": "사용할 수 없습니다",
 	"incorrectPassword": "비밀번호가 올바르지 않습니다.",
@@ -731,7 +720,6 @@ function finish() {
 
 <locale locale="nl-NL" lang="json">
 {
-	"somethingHappened": "Er is iets misgegaan.",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Onjuist wachtwoord.",
@@ -763,7 +751,6 @@ function finish() {
 
 <locale locale="no-NO" lang="json">
 {
-	"somethingHappened": "En feil har oppstått",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -795,7 +782,6 @@ function finish() {
 
 <locale locale="pl-PL" lang="json">
 {
-	"somethingHappened": "Coś poszło nie tak",
 	"permissionDeniedError": "Odrzucono operacje",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Nieprawidłowe hasło.",
@@ -827,7 +813,6 @@ function finish() {
 
 <locale locale="pt-PT" lang="json">
 {
-	"somethingHappened": "Ocorreu um erro",
 	"permissionDeniedError": "Operação recusada",
 	"operationForbidden": "Operação proibída",
 	"incorrectPassword": "Senha inválida.",
@@ -859,7 +844,6 @@ function finish() {
 
 <locale locale="ru-RU" lang="json">
 {
-	"somethingHappened": "Что-то пошло не так",
 	"permissionDeniedError": "Операция запрещена",
 	"operationForbidden": "Это действие запрещено",
 	"incorrectPassword": "Пароль неверен.",
@@ -891,7 +875,6 @@ function finish() {
 
 <locale locale="sk-SK" lang="json">
 {
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Nesprávne heslo.",
@@ -923,7 +906,6 @@ function finish() {
 
 <locale locale="th-TH" lang="json">
 {
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"permissionDeniedError": "การดำเนินถูกปฏิเสธ",
 	"operationForbidden": "การดำเนินการถูกห้าม",
 	"incorrectPassword": "รหัสผ่านไม่ถูกต้อง",
@@ -955,7 +937,6 @@ function finish() {
 
 <locale locale="tr-TR" lang="json">
 {
-	"somethingHappened": "Bir hata oluştu",
 	"permissionDeniedError": "İşlem reddedildi",
 	"operationForbidden": "İşlem yasak",
 	"incorrectPassword": "Yanlış şifre.",
@@ -987,7 +968,6 @@ function finish() {
 
 <locale locale="ug-CN" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -1019,7 +999,6 @@ function finish() {
 
 <locale locale="uk-UA" lang="json">
 {
-	"somethingHappened": "Щось пішло не так",
 	"permissionDeniedError": "Операцію заборонено",
 	"operationForbidden": "Операцію заборонено",
 	"incorrectPassword": "Неправильний пароль.",
@@ -1051,7 +1030,6 @@ function finish() {
 
 <locale locale="vi-VN" lang="json">
 {
-	"somethingHappened": "Xảy ra lỗi",
 	"permissionDeniedError": "Thao tác bị từ chối",
 	"operationForbidden": "Thao tác này không thể thực hiện",
 	"incorrectPassword": "Sai mật khẩu.",
@@ -1083,7 +1061,6 @@ function finish() {
 
 <locale locale="zh-CN" lang="json">
 {
-	"somethingHappened": "出错了",
 	"permissionDeniedError": "操作被拒绝",
 	"operationForbidden": "不允许此操作",
 	"incorrectPassword": "密码错误",
@@ -1115,7 +1092,6 @@ function finish() {
 
 <locale locale="zh-TW" lang="json">
 {
-	"somethingHappened": "發生錯誤",
 	"permissionDeniedError": "操作被拒絕",
 	"operationForbidden": "不允許此操作",
 	"incorrectPassword": "密碼錯誤。",
