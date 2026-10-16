@@ -25,6 +25,7 @@ export const receiptEvidenceSchema = v.strictObject({
 	chainId,
 	txHash: hash,
 	timestamp: safeInteger,
+	blockHash: v.exactOptional(hash), blockNumber: v.exactOptional(v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]*)$/))),
 	transfers: v.array(transferEvidenceSchema),
 });
 export const receiptRequestSchema = v.strictObject({

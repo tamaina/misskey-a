@@ -37,7 +37,7 @@ function fixture(options: { chain?: number; status?: string; tip?: number; canon
 test('actual viem receipt decoding and confirmation through bounded native transport', async () => {
 	const { read, send } = fixture();
 	const result = await read(123456, hash, 3);
-	expect(result).toEqual({ status: 'confirmed', evidence: { chainId: 123456, txHash: hash, timestamp: 1000000,
+	expect(result).toEqual({ status: 'confirmed', evidence: { chainId: 123456, txHash: hash, timestamp: 1000000, blockHash, blockNumber: '10',
 																																																											transfers: [{ logIndex: 2, contractAddress: address(3), fromAddress: address(1), toAddress: address(2), amountBaseUnits: '7' }] } });
 	expect(send).toHaveBeenCalledTimes(4);
 	expect(send.mock.calls[0][1]).toMatchObject({ timeout: 10000, size: 262144, follow: 0, redirect: 'error' });

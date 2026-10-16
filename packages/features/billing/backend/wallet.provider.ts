@@ -13,6 +13,7 @@ import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { createPostgresWalletChainStore } from './wallet-chain-store.js';
+import { createResidenceStore } from './residence-store.js';
 import { createWalletRouter } from './wallet.implementation.js';
 import { createPostgresWalletStore } from './wallet-store.js';
 import { createWalletAuthentication } from './wallet-authentication.js';
@@ -35,6 +36,7 @@ export class WalletApiProvider {
 		});
 		const chainSettings = createPostgresWalletChainStore(get<DataSource>(DI.db));
 		return createWalletRouter<MiLocalUser>({
+			requireResidence: createResidenceStore(get<DataSource>(DI.db)).require,
 			...authentication, ...createWalletProof(this.moduleRef.get(HttpRequestService, { strict: false })),
 			store: createPostgresWalletStore(get<DataSource>(DI.db)),
 			origin: new URL(config.url).origin,

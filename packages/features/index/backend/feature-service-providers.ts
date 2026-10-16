@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ServiceBillingRoleProvider } from '@features/billing/backend/service-role.provider.js';
 import { authSecurityServices, authServices } from '@features/auth/backend/services.js';
 import { integrationServices } from '@features/integrations/backend/services.js';
 import { channelServices } from '@features/channels/backend/services.js';
@@ -80,6 +81,7 @@ export const featureServiceGroups = {
 	moderation: toNestProviders('moderation', moderationServices, legacyServiceBindings),
 	moderationLogging: toNestProviders('moderationLogging', moderationLoggingServices, legacyServiceBindings),
 	collections: toNestProviders('collections', collectionServices, legacyServiceBindings),
+	billing: { providers: [ServiceBillingRoleProvider], exports: [ServiceBillingRoleProvider] },
 	roles: toNestProviders('roles', roleServices, legacyServiceBindings),
 	emojis: toNestProviders('emojis', emojiServices, legacyServiceBindings),
 	collectionGallery: toNestProviders('collectionGallery', galleryServices, legacyServiceBindings),

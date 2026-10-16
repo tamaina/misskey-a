@@ -8,13 +8,14 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from 'vitest';
 import { parse } from 'vue/compiler-sfc';
+import { restoreBillingCatalogBaseline } from './billing-catalog-source-rebase.js';
 import { restoreCodeDiffBaseline } from './code-diff-source-rebase.js';
 import rebases from './code-diff-source-rebase.json';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 for (const entry of rebases) {
 	test(`restores exact boundaries and preserves dictionaries: ${entry.file}`, () => {
-		const source = readFileSync(resolve(root, entry.file), 'utf8');
+		const source = restoreBillingCatalogBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
 		const restored = restoreCodeDiffBaseline(entry.file, source);
 		expect(createHash('sha256').update(restored).digest('hex')).toBe(entry.baselineSha256);
 		const locales = (text: string) => parse(text).descriptor.customBlocks.filter(block => block.type === 'locale').map(block => block.content);

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ServiceBillingApiProvider } from '@features/billing/backend/service.provider.js';
 import { WalletApiProvider } from '@features/billing/backend/wallet.provider.js';
 import { implement } from '@orpc/server';
 import { normalizeError } from '@features/api/backend/transport/orpc-error.js';
@@ -43,6 +44,7 @@ import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 
 export interface ApiRouterFeatures {
+	serviceBilling: ReturnType<ServiceBillingApiProvider['compose']>;
 	wallets: ReturnType<WalletApiProvider['compose']>;
 	roles: ReturnType<RolesApiProvider['compose']>;
 	moderation: ReturnType<ModerationApiProvider['compose']>;
@@ -96,6 +98,7 @@ export class ApiRouterProvider {
 	compose(): ApiRouter {
 		if (this.router !== undefined) return this.router;
 		this.router = createApiRouter({
+			serviceBilling: this.moduleRef.get(ServiceBillingApiProvider, { strict: false }).compose(),
 			wallets: this.moduleRef.get(WalletApiProvider, { strict: false }).compose(),
 			roles: this.moduleRef.get(RolesApiProvider, { strict: false }).compose(),
 			moderation: this.moduleRef.get(ModerationApiProvider, { strict: false }).compose(),

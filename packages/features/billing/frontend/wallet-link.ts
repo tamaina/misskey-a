@@ -13,6 +13,7 @@ export class WalletLinkCancelled extends Error { }
 /** cfw-fileup's connect -> switch -> begin -> personal_sign -> verify flow.
  * Cancellation stops the next step; it cannot undo an already submitted verify request. */
 export async function linkWallet(input: {
+	requireResidence?(): Promise<unknown>;
 	client: WalletClient; connector: WalletConnector; chain: WalletChain;
 	/** Collect fresh native credentials only after wallet selection/switching. */
 	authenticate(): Promise<WalletAuthInput>;
@@ -22,6 +23,7 @@ export async function linkWallet(input: {
 
 	const provider = input.connector.provider;
 	check();
+	await input.requireResidence?.(); check();
 	input.progress('connect');
 	const accounts = await provider.request({ method: 'eth_requestAccounts' });
 	check();
@@ -46,6 +48,7 @@ export async function linkWallet(input: {
 	check();
 	const challenge = await input.client.begin({ chainId: input.chain.chainId, address, ...auth });
 	check();
+	await input.requireResidence?.(); check();
 	input.progress('sign');
 	const signature = await provider.request({ method: 'personal_sign', params: [challenge.message, address] });
 	check();

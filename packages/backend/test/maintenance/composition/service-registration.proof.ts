@@ -174,6 +174,7 @@ import { RemoteUserResolveService } from '@features/federation/backend/services/
 
 import { ReversiService } from '@features/games/backend/services/ReversiService.js';
 
+import { ServiceBillingRoleProvider } from '@features/billing/backend/service-role.provider.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 
 import { S3Service } from '@features/runtime/backend/services/S3Service.js';
@@ -293,7 +294,8 @@ const services = [
 	['RemoteLoggerService', RemoteLoggerService, 1],
 	['RemoteUserResolveService', RemoteUserResolveService, 7],
 	['ReversiService', ReversiService, 8],
-	['RoleService', RoleService, 14],
+	['RoleService', RoleService, 15],
+	['ServiceBillingRoleProvider', ServiceBillingRoleProvider, 1],
 	['S3Service', S3Service, 1],
 	['SearchService', SearchService, 8],
 	['SensitiveMediaDetectionService', SensitiveMediaDetectionService, 3],

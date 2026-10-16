@@ -18,6 +18,43 @@ export { MiBillingWalletChallenge } from './models/BillingWalletChallenge.js';
 export { createPostgresWalletChainStore } from './wallet-chain-store.js';
 export { MiBillingWalletChain } from './models/BillingWalletChain.js';
 export { createWalletRpcFetch, WALLET_RPC_MAX_BYTES, WALLET_RPC_TIMEOUT } from './wallet-rpc.js';
+export { serviceBillingContract } from './api.definition.js';
+export { createServiceBillingRouter } from './service.implementation.js';
+export { ServiceBillingApiProvider } from './service.provider.js';
+export { createServiceBillingStore } from './service-store.js';
+export { MiBillingServiceOffer } from './models/BillingServiceOffer.js';
+export { MiBillingServiceOrder } from './models/BillingServiceOrder.js';
 export { createTransferReceiptReader } from './transfer-confirmation.js';
 export { receiptEvidenceSchema, transferEvidenceSchema } from './transfer.schema.js';
 export type { ReceiptReader, ReceiptResult, ReceiptEvidence, TransferEvidence } from './transfer-confirmation.js';
+export { ServiceBillingRoleProvider, activePaidRoleIds } from './service-role.provider.js';
+
+export { createRefundStore, matchesRefund } from './refund-store.js';
+export { createRefundRouter } from './refund.implementation.js';
+export { MiBillingAccountState } from './models/BillingAccountState.js';
+export { MiBillingRefund } from './models/BillingRefund.js';
+export { MiBillingTransactionClaim } from './models/BillingTransactionClaim.js';
+
+export { catalogAdminContract } from './catalog.contract.js';
+export { createCatalogAdminStore } from './catalog-store.js';
+export { createCatalogAdminRouter } from './catalog.implementation.js';
+export { MiBillingPricingAsset } from './models/BillingPricingAsset.js';
+export { MiBillingAssetDeployment } from './models/BillingAssetDeployment.js';
+
+export { MiBillingCatalogPrice } from './models/BillingCatalogPrice.js';
+
+export { createBillingPolicyStore } from './policy-store.js';
+export { createBillingPolicyRouter } from './policy.implementation.js';
+export { MiBillingPolicy } from './models/BillingPolicy.js';
+export { MiBillingResidencyStatement } from './models/BillingResidencyStatement.js';
+
+export { createPurchaseNotifier, purchaseReceiptLines } from './purchase-notification.js';
+export { MiBillingNotification } from './models/BillingNotification.js';
+
+export { createBillingReportsStore } from './reports-store.js';
+export { createBillingReportsRouter } from './reports.implementation.js';
+export { billingReportsContract } from './reports.contract.js';
+export { createResidenceRouter } from './residence.implementation.js';
+export { createResidenceStore, requireDeclaredResidence, readyResidence } from './residence-store.js';
+export { residenceContract } from './residence.contract.js';
+export { declaredResidence, declaredResidenceInput } from './residence.schema.js';
