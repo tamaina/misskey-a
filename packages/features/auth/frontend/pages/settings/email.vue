@@ -13,11 +13,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<SearchMarker :keywords="['email', 'address']">
 					<FormSection first>
 						<template #label><SearchLabel>{{ $locale.sfc.emailAddress }}</SearchLabel></template>
-						<MkInput v-model="emailAddress" type="email" manualSave>
+						<MkInput v-model="emailAddress" type="email" :disabled="savingEmail">
 							<template #prefix><i class="ti ti-mail"></i></template>
 							<template v-if="$i.email && !$i.emailVerified" #caption>{{ $locale.sfc.verificationEmailSent }}</template>
 							<template v-else-if="emailAddress === $i.email && $i.emailVerified" #caption><i class="ti ti-check" style="color: var(--MI_THEME-success);"></i> {{ $locale.sfc.emailVerified }}</template>
 						</MkInput>
+						<MkButton primary :disabled="savingEmail" @click="saveEmailAddress(false)">{{ $locale.sfc.saveEmail }}</MkButton>
+						<MkButton v-if="canUsePasskey" :disabled="savingEmail" @click="saveEmailAddress(true)">{{ $locale.sfc.saveEmailWithPasskey }}</MkButton>
 					</FormSection>
 				</SearchMarker>
 
@@ -59,7 +61,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, computed } from 'vue';
+import { onActivated, onDeactivated, onUnmounted, ref, watch, computed } from 'vue';
+import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -81,15 +85,39 @@ function onChangeReceiveAnnouncementEmail(v: boolean) {
 	});
 }
 
-async function saveEmailAddress() {
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
+const canUsePasskey = computed(() => $i.token?.startsWith('bs_') && ($i.securityKeysList?.length ?? 0) > 0 && browserSupportsWebAuthn());
+const savingEmail = ref(false);
+let disposed = false;
+let ceremonyGeneration = 0;
+const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; };
+onDeactivated(invalidateCeremony);
+onUnmounted(invalidateCeremony);
+onActivated(() => { disposed = false; });
 
-	os.apiWithDialog('i/update-email', {
-		password: auth.result.password,
-		token: auth.result.token,
-		email: emailAddress.value,
-	});
+async function saveEmailAddress(usePasskey: boolean) {
+	if (savingEmail.value || disposed) return;
+	savingEmail.value = true;
+	const generation = ++ceremonyGeneration;
+	const isCurrent = () => !disposed && generation === ceremonyGeneration;
+	// Bind the visible input once. Neither later edits nor native UI can replace it.
+	const email = emailAddress.value === '' ? null : emailAddress.value;
+	try {
+		if (usePasskey) {
+			if (!canUsePasskey.value) return;
+			const password = await os.inputText({ title: $locale.value.sfc.currentPasswordPrompt, type: 'password', autocomplete: 'current-password', minLength: 1 });
+			if (!isCurrent() || password.canceled || !password.result) return;
+			const started = await os.apiWithDialog('i/update-email/passkey/start', { currentPassword: password.result, email });
+			if (!isCurrent()) return;
+			let credential;
+			try { credential = await startAuthentication({ optionsJSON: started.options }); } catch { return; }
+			if (!isCurrent()) return;
+			await os.apiWithDialog('i/update-email/passkey/complete', { ticket: started.ticket, credential, email });
+		} else {
+			const auth = await os.authenticateDialog();
+			if (!isCurrent() || auth.canceled) return;
+			await os.apiWithDialog('i/update-email', { password: auth.result.password, token: auth.result.token, email });
+		}
+	} finally { savingEmail.value = false; }
 }
 
 const emailNotification_mention = ref($i.emailNotificationTypes.includes('mention'));
@@ -112,12 +140,6 @@ const saveNotificationSettings = () => {
 
 watch([emailNotification_mention, emailNotification_reply, emailNotification_quote, emailNotification_follow, emailNotification_receiveFollowRequest], () => {
 	saveNotificationSettings();
-});
-
-onMounted(() => {
-	watch(emailAddress, () => {
-		saveEmailAddress();
-	});
 });
 
 const headerActions = computed(() => []);
@@ -313,7 +335,10 @@ definePage(() => ({
 	"reply": "リプライ",
 	"quote": "引用",
 	"follow": "フォロー",
-	"receiveFollowRequest": "フォロー申請を受け取った"
+	"receiveFollowRequest": "フォロー申請を受け取った",
+	"saveEmail": "メールアドレスを保存",
+	"saveEmailWithPasskey": "パスキーでメールアドレスを保存",
+	"currentPasswordPrompt": "現在のパスワード"
 }
 </locale>
 

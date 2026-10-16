@@ -110,11 +110,11 @@ metadata, not a reusable grant, sudo state or activation credential. A future
 mutation must recheck session and policy within its own locked transaction.
 
 The verifier is registered in DI and connected to dedicated
-start/complete APIs and security-settings buttons for password change and token
-regeneration. Activation and recovery-code display purposes still have no runtime caller, and this flow never changes MFA
+start/complete APIs and security-settings buttons for password change, token
+regeneration and email change. Activation and recovery-code display purposes still have no runtime caller, and this flow never changes MFA
 policy. It is independent of the unmerged login-progress connection in #143.
 Both existing sign-in paths now use the current-policy issuance protocol below.
-Activation remains blocked until email/account deletion, recovery and
+Activation remains blocked until account deletion, recovery and
 credential issuance, factor management/key display and every remaining writer
 share the final enforcement and locking protocol.
 
@@ -127,13 +127,13 @@ Remaining runtime connections before activation:
 
 | Surface | Required connection |
 | --- | --- |
-| `i/update-email`, users `i/delete-account` | Apply current independent MFA policy and operation-specific fresh verification before the sensitive mutation; password change is now connected separately. |
+| users `i/delete-account` | Apply current independent MFA policy and operation-specific fresh verification before the sensitive mutation; password change is now connected separately. |
 | `i/2fa/*`, admin `unset-mfa` | Join all enrolment/policy writers to the profile lock; require exact operation/target bindings and recheck live session/policy inside the mutation transaction. |
 | User self serializer `securityKeysList` and factor display | Represent independent policy consistently and gate sensitive key/recovery display through its dedicated fresh purpose. |
 
 The verifier supports `change-password`, `activate-passkey-mfa`,
-`show-recovery-codes` and `regenerate-token`; password change and token regeneration
-have runtime callers. Other actions need their own concrete purpose/target
+`show-recovery-codes`, `regenerate-token` and `update-email`; password change, token regeneration
+and email change have runtime callers. Other actions need their own concrete purpose/target
 bindings; neither a generic sudo purpose nor this metadata authorizes them.
 
 ### Activation readiness inventory
@@ -145,13 +145,14 @@ acceptance. There is still no true writer or user-facing activation state.
 | --- | --- | --- |
 | Password-first `signinFlow`, passkey `signinWithPasskey`, `SigninService` | Explicit policy at both entry points; password plus an enabled factor for independent MFA; atomic recovery; server-owned proof and current user/policy/key/deadline checks under user/profile locks with transactional session issuance | Real-device acceptance; #143 remains a separate unmerged login-progress Draft and is not incorporated into this flow. |
 | `TotpService` recovery codes | Atomic one-use consume bound to password/TOTP/independent policy; the named login flow uses it only when policy requires MFA | Finish fresh-gated presentation and recovery management; never infer remaining factors from backup stock. |
-| `request-reset-password`, `reset-password`, admin `reset-password`, `verify-email` | Existing email/admin authorization and reset behavior | Serialize relevant credential changes and preserve independent MFA on reset; define recovery policy and invalidate stale reauthentication/session state. |
+| `request-reset-password`, `reset-password`, admin `reset-password` | Existing email/admin authorization and reset behavior | Serialize relevant credential changes and preserve independent MFA on reset; define recovery policy and invalidate stale reauthentication/session state. |
+| `i/update-email`, dedicated passkey start/complete, `verify-email` | Exact previous/target email binding; locked current policy/session mutation; legacy proof compatibility; atomic owner/code/address verification | Physical-device acceptance; existing reset-request invalidation and recovery policy remain separate. |
 | `i/2fa/register`, `done`, `register-key`, `key-done` | Legacy independent-policy refusal; profile-locked DB setup/completion with proof snapshot checks; TOTP pending setup is consumed | Exact session/purpose/target-bound fresh flows and independent enrolment/activation, recovery-code presentation acknowledgement. |
 | `i/2fa/remove-key`, `unregister`, `password-less`, `update-key`, admin `unset-mfa` | Common profile lock and owned mutation; active independent policy is refused on legacy user routes; reset clears pending setup | Fresh per-operation flows, preserve last-factor invariant and recovery semantics for the final independent policy. |
 | WebAuthn login proof methods and fresh verifier | Strict UV, atomically consumed challenge, bounded deadline, owned key material, counter CAS and legacy key normalization | Keep future callers on the proof-bearing path; compatibility boolean/user-ID methods do not authorize session issuance. |
 | `i/change-password` and its passkey start/complete routes | Dedicated UI → fresh password/strict UV → profile/session-locked password write; legacy route refuses active independent policy and rechecks its snapshot | Real-device acceptance and independent-policy display before activation. |
 | `i/regenerate-token` and its passkey start/complete routes | Dedicated purpose-bound fresh password/strict UV; user/profile/current-session locks; native rotation and all owned session revocations commit together; legacy independent-policy refusal and snapshot/live-session checks | Real-device acceptance; this is not general sudo. |
-| `i/update-email`, users `i/delete-account` | Existing password/TOTP authorization | Independent policy enforcement and transaction-bound current proof/session checks before mutation. |
+| users `i/delete-account` | Existing password/TOTP authorization | Independent policy enforcement and transaction-bound current proof/session checks before mutation. |
 | `auth/accept`, OAuth consent, MiAuth token issuance, `auth/session/userkey` | Existing scope/session/owner checks | Audit credential issuance against active policy and fresh assurance; never elevate delegated/shared tokens into fresh auth. |
 | User self/moderator security fields and `securityKeysList` | Existing TOTP-based serialization | Consistent independent policy display; dedicated fresh-gated sensitive key/recovery display. |
 | Browser-session verify/revoke/signout, HTTP/stream/native MCP | Durable revocation checks; login proof rechecked under account/profile locks; same-transaction session insert; separate guarded new-account issuer | Complete sensitive-operation binding to live individual sessions without expanding old token privileges. |
@@ -241,3 +242,30 @@ Run its real HTTP/SQL/Redis/signed-WebAuthn regression with
 Physical browser/authenticator and cross-device acceptance remains pending; see
 [manual acceptance](test/manual/fresh-token-regeneration.md). This slice does not
 add activation or authorize real-user credential changes during development.
+
+### Fresh email changes
+
+The complete route shares the existing three-per-hour email-change bucket; start
+has a separate bounded challenge rate. The dedicated start/complete routes bind the exact nullable target and the
+previous email, verification state and code to the one-use strict-UV ceremony.
+The target digest is required only for `update-email`; the unchanged v1 records
+for all previous purposes carry no target. A different target/session cannot
+consume the correct ticket. Under user/profile/session locks, completion rechecks
+that digest, policy, keys, live account/session and the original deadline. The
+address, unverified flag and new code are written together. Competing ceremonies
+based on the same email state have one winner. The old route keeps its contract
+and existing TOTP/recovery behavior, refuses independent MFA and checks the
+credential/session/policy and previous email snapshot under the same locks.
+
+Verification uses an exact owner/code/address conditional update and publishes
+only for one affected row. A stale code cannot verify a later replacement
+address. Delivery and notifications occur after commit. SMTP failure does not
+roll back a committed address/code or restore a used ticket; a retry needs a new
+explicit ceremony. External email validation and delivery are stubbed in the
+owned PostgreSQL/Redis/signed-WebAuthn tests; physical browser/authenticator and
+cross-device acceptance remain pending.
+
+This does not invalidate existing password-reset requests when email changes.
+Reset/recovery policy, account deletion, factor enrolment/removal/activation,
+recovery/key display, credential issuance and general five-minute sudo remain
+unfinished. No activation writer or real-user configuration change is added.

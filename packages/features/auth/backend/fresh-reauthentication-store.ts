@@ -7,13 +7,16 @@ import * as v from 'valibot';
 import type { Redis } from 'ioredis';
 
 const id = v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{1,128}$/));
-export const freshReauthenticationPurposeSchema = v.picklist(['activate-passkey-mfa', 'show-recovery-codes', 'change-password', 'regenerate-token']);
-const bindingSchema = v.strictObject({ userId: id, sessionId: id, purpose: freshReauthenticationPurposeSchema });
-const rowSchema = v.strictObject({
-	v: v.literal(1), ...bindingSchema.entries,
+export const freshReauthenticationPurposeSchema = v.picklist(['activate-passkey-mfa', 'show-recovery-codes', 'change-password', 'regenerate-token', 'update-email']);
+const bindingEntries = { userId: id, sessionId: id, purpose: freshReauthenticationPurposeSchema, targetStamp: v.exactOptional(v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/))) };
+const hasExactTarget = (value: { purpose: string; targetStamp?: string }) => (value.purpose === 'update-email') === (value.targetStamp !== undefined);
+export const freshReauthenticationBindingSchema = v.pipe(v.strictObject(bindingEntries), v.check(value => hasExactTarget(value)));
+const bindingSchema = freshReauthenticationBindingSchema;
+const rowSchema = v.pipe(v.strictObject({
+	v: v.literal(1), ...bindingEntries,
 	policyStamp: v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/)),
 	challenge: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{1,1024}$/)),
-});
+}), v.check(value => hasExactTarget(value)));
 export type FreshReauthenticationBinding = v.InferOutput<typeof bindingSchema>;
 export type FreshReauthenticationPurpose = v.InferOutput<typeof freshReauthenticationPurposeSchema>;
 export type FreshReauthenticationRecord = Omit<v.InferOutput<typeof rowSchema>, 'v'>;
@@ -53,8 +56,9 @@ if not raw or ttl <= 0 or ttl > 90000 then return nil end
 local ok, row = pcall(cjson.decode, raw)
 if not ok or type(row) ~= 'table' or row.v ~= 1 then return nil end
 if row.userId ~= ARGV[1] or row.sessionId ~= ARGV[2] or row.purpose ~= ARGV[3] then return nil end
+local target = row.targetStamp or ''; if target ~= ARGV[4] then return nil end
 redis.call('DEL', KEYS[1]); return {raw, ttl}
-`, 1, key(ticket), binding.userId, binding.sessionId, binding.purpose);
+`, 1, key(ticket), binding.userId, binding.sessionId, binding.purpose, binding.targetStamp ?? '');
 		if (!Array.isArray(result) || typeof result[0] !== 'string' || !Number.isSafeInteger(result[1]) || result[1] <= 0 || result[1] > 90_000) return null;
 		const { v: _v, ...record } = v.parse(rowSchema, JSON.parse(result[0]));
 		return { record, remainingMs: result[1] };

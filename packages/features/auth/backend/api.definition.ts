@@ -357,6 +357,16 @@ export const ISigninHistoryContract = oc.$meta({
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 })).output(v.array(packedSigninSchema));
 
+const freshEmailMetadata = { requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-email-change' } } as const;
+const freshEmailTarget = v.nullable(v.pipe(v.string(), v.maxLength(320)));
+export const IUpdateEmailPasskeyStartContract = oc.$meta({ ...freshEmailMetadata, requestName: 'i/update-email/passkey/start' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/update-email/passkey/start', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ currentPassword: v.pipe(v.string(), v.minLength(1), v.maxLength(1024)), email: freshEmailTarget }))
+	.output(v.strictObject({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), options: webAuthnAuthenticationOptionsSchema }));
+export const IUpdateEmailPasskeyCompleteContract = oc.$meta({ ...freshEmailMetadata, limit: { duration: 3_600_000, max: 3, key: 'i/update-email' }, requestName: 'i/update-email/passkey/complete' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/update-email/passkey/complete', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), credential: webAuthnAuthenticationResponseSchema, email: freshEmailTarget })).output(v.void());
+
 export const IUpdateEmailContract = oc.$meta({
 	requestName: 'i/update-email',
 	requireCredential: true,
@@ -536,6 +546,8 @@ export const authContract = {
 	'i/sessions/revoke': ISessionsRevokeContract,
 	'i/signout': ISignoutContract,
 	'i/update-email': IUpdateEmailContract,
+	'i/update-email/passkey/start': IUpdateEmailPasskeyStartContract,
+	'i/update-email/passkey/complete': IUpdateEmailPasskeyCompleteContract,
 	'invite/create': InviteCreateContract,
 	'invite/delete': InviteDeleteContract,
 	'invite/limit': InviteLimitContract,

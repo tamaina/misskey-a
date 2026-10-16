@@ -1,0 +1,141 @@
+[
+  {
+    "file": "packages/features/auth/frontend/pages/settings/email.vue",
+    "baselineSha256": "62fc30bba0bc3ebf2c48d041b36d7264a42a2ea0ff267d3b85ad4b3b7b0042bd",
+    "currentSha256": "b7fa43e841ff85e6c754fe4b84bcdc527fb26895d05cbe82d3ef27ee82200aa9",
+    "edits": [
+      {
+        "start": 624,
+        "end": 642,
+        "baseline": "",
+        "current": ":disabled=\"savingE"
+      },
+      {
+        "start": 644,
+        "end": 645,
+        "baseline": "nua",
+        "current": "i"
+      },
+      {
+        "start": 646,
+        "end": 647,
+        "baseline": "Save",
+        "current": "\""
+      },
+      {
+        "start": 1036,
+        "end": 1299,
+        "baseline": "",
+        "current": ">\n\t\t\t\t\t\t<MkButton primary :disabled=\"savingEmail\" @click=\"saveEmailAddress(false)\">{{ $locale.sfc.saveEmail }}</MkButton>\n\t\t\t\t\t\t<MkButton v-if=\"canUsePasskey\" :disabled=\"savingEmail\" @click=\"saveEmailAddress(true)\">{{ $locale.sfc.saveEmailWithPasskey }}</MkButton"
+      },
+      {
+        "start": 2613,
+        "end": 2644,
+        "baseline": "M",
+        "current": "Activated, onDeactivated, onUnm"
+      },
+      {
+        "start": 2681,
+        "end": 2839,
+        "baseline": "",
+        "current": "vue';\nimport { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';\nimport MkButton from '@features/ui/frontend/components/MkButton."
+      },
+      {
+        "start": 3729,
+        "end": 4137,
+        "baseline": "",
+        "current": "const canUsePasskey = computed(() => $i.token?.startsWith('bs_') && ($i.securityKeysList?.length ?? 0) > 0 && browserSupportsWebAuthn());\nconst savingEmail = ref(false);\nlet disposed = false;\nlet ceremonyGeneration = 0;\nconst invalidateCeremony = () => { disposed = true; ceremonyGeneration++; };\nonDeactivated(invalidateCeremony);\nonUnmounted(invalidateCeremony);\nonActivated(() => { disposed = false; });\n\n"
+      },
+      {
+        "start": 4169,
+        "end": 4188,
+        "baseline": "",
+        "current": "usePasskey: boolean"
+      },
+      {
+        "start": 4192,
+        "end": 5245,
+        "baseline": "",
+        "current": "\tif (savingEmail.value || disposed) return;\n\tsavingEmail.value = true;\n\tconst generation = ++ceremonyGeneration;\n\tconst isCurrent = () => !disposed && generation === ceremonyGeneration;\n\t// Bind the visible input once. Neither later edits nor native UI can replace it.\n\tconst email = emailAddress.value === '' ? null : emailAddress.value;\n\ttry {\n\t\tif (usePasskey) {\n\t\t\tif (!canUsePasskey.value) return;\n\t\t\tconst password = await os.inputText({ title: $locale.value.sfc.currentPasswordPrompt, type: 'password', autocomplete: 'current-password', minLength: 1 });\n\t\t\tif (!isCurrent() || password.canceled || !password.result) return;\n\t\t\tconst started = await os.apiWithDialog('i/update-email/passkey/start', { currentPassword: password.result, email });\n\t\t\tif (!isCurrent()) return;\n\t\t\tlet credential;\n\t\t\ttry { credential = await startAuthentication({ optionsJSON: started.options }); } catch { return; }\n\t\t\tif (!isCurrent()) return;\n\t\t\tawait os.apiWithDialog('i/update-email/passkey/complete', { ticket: started.ticket, credential, email });\n\t\t} else {\n\t\t"
+      },
+      {
+        "start": 5291,
+        "end": 5293,
+        "baseline": "",
+        "current": "\t\t"
+      },
+      {
+        "start": 5297,
+        "end": 5313,
+        "baseline": "",
+        "current": "!isCurrent() || "
+      },
+      {
+        "start": 5336,
+        "end": 5336,
+        "baseline": "\n",
+        "current": ""
+      },
+      {
+        "start": 5337,
+        "end": 5345,
+        "baseline": "",
+        "current": "\t\tawait "
+      },
+      {
+        "start": 5381,
+        "end": 5382,
+        "baseline": "\n\t\t",
+        "current": " "
+      },
+      {
+        "start": 5413,
+        "end": 5414,
+        "baseline": "\n\t\t",
+        "current": " "
+      },
+      {
+        "start": 5439,
+        "end": 5439,
+        "baseline": "\n\t\temail:",
+        "current": ""
+      },
+      {
+        "start": 5445,
+        "end": 5467,
+        "baseline": "Addre",
+        "current": " });\n\t\t}\n\t} finally { "
+      },
+      {
+        "start": 5468,
+        "end": 5478,
+        "baseline": "s",
+        "current": "avingEmail"
+      },
+      {
+        "start": 5484,
+        "end": 5494,
+        "baseline": ",\n\t",
+        "current": " = false; "
+      },
+      {
+        "start": 5495,
+        "end": 5495,
+        "baseline": ");",
+        "current": ""
+      },
+      {
+        "start": 6579,
+        "end": 6579,
+        "baseline": ");\n});\n\nonMounted(() => {\n\twatch(emailAddress, () => {\n\t\tsaveEmailAddress();\n\t}",
+        "current": ""
+      },
+      {
+        "start": 13671,
+        "end": 13781,
+        "baseline": "",
+        "current": "\",\n\t\"saveEmail\": \"メールアドレスを保存\",\n\t\"saveEmailWithPasskey\": \"パスキーでメールアドレスを保存\",\n\t\"currentPasswordPrompt\": \"現在のパスワード"
+      }
+    ]
+  }
+]

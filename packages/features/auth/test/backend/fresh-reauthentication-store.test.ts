@@ -23,6 +23,12 @@ test('finite bindings reject unknown purpose/fields and malformed ticket before 
 	expect(redis.set).not.toHaveBeenCalled(); expect(redis.eval).not.toHaveBeenCalled();
 });
 
+test('only email purpose requires a finite target stamp, without changing old records', async () => {
+	const redis = { eval: vi.fn() }; const store = new FreshReauthenticationStore(redis);
+	for (const value of [{ ...record, purpose: 'update-email' }, { ...record, targetStamp: 'a'.repeat(64) }, { ...record, purpose: 'update-email', targetStamp: 'bad' }]) await expect(store.create(value as typeof record, 1)).rejects.toThrow();
+	expect(redis.eval).not.toHaveBeenCalled();
+});
+
 const socket = process.env.MISSKEY_OAUTH_REDIS_SOCKET;
 if (socket) {
 	if (!/^\/tmp\/misskey-oauth-[^/]+\/redis\.sock$/.test(socket)) throw new Error('Fresh reauthentication requires task-owned Unix socket');
@@ -47,6 +53,15 @@ describe.skipIf(!redis)('atomic fresh reauthentication on isolated Redis', () =>
 		const store = new FreshReauthenticationStore(redis!); const ticket = await store.create(record, await store.startDeadline());
 		expect(await store.consume(wrong, ticket)).toBeNull();
 		expect((await store.consume(binding, ticket))?.record).toEqual(record);
+	});
+	test('wrong target digest does not burn the exact email ceremony', async () => {
+		const store = new FreshReauthenticationStore(redis!);
+		const emailBinding = { ...binding, purpose: 'update-email' as const, targetStamp: 'a'.repeat(64) };
+		const emailRecord = { ...record, ...emailBinding };
+		const ticket = await store.create(emailRecord, await store.startDeadline());
+		expect(await store.consume({ ...emailBinding, targetStamp: 'b'.repeat(64) }, ticket)).toBeNull();
+		expect((await store.consume(emailBinding, ticket))?.record).toEqual(emailRecord);
+		expect(await store.consume(emailBinding, ticket)).toBeNull();
 	});
 	test('begin elapsed time shortens Redis TTL instead of granting a new 90 seconds', async () => {
 		const store = new FreshReauthenticationStore(redis!); const ticket = await store.create(record, (await store.startDeadline()) - 86_000);

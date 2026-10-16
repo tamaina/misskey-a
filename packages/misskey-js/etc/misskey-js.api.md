@@ -1989,6 +1989,9 @@ declare namespace entities {
         ISignoutRequest,
         IUpdateEmailRequest,
         IUpdateEmailResponse,
+        IUpdateEmailPasskeyStartRequest,
+        IUpdateEmailPasskeyStartResponse,
+        IUpdateEmailPasskeyCompleteRequest,
         InviteCreateRequest,
         InviteCreateResponse,
         InviteDeleteRequest,
@@ -4201,6 +4204,15 @@ type IUnpinRequest = ContractRequest<'i/unpin'>;
 
 // @public (undocumented)
 type IUnpinResponse = ContractResponse<'i/unpin'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyCompleteRequest = ContractRequest<'i/update-email/passkey/complete'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyStartRequest = ContractRequest<'i/update-email/passkey/start'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyStartResponse = ContractResponse<'i/update-email/passkey/start'>;
 
 // @public (undocumented)
 type IUpdateEmailRequest = ContractRequest<'i/update-email'>;

@@ -12,7 +12,7 @@ import type { BrowserSessionIdentity } from '@features/api/backend/transport/con
 import type { MfaPolicySnapshot } from './mfa-policy.js';
 import type { MiUserSecurityKey } from './models/UserSecurityKey.js';
 import type { BrowserSessionService } from './services/BrowserSessionService.js';
-import { FreshReauthenticationStore, freshReauthenticationPurposeSchema } from './fresh-reauthentication-store.js';
+import { FreshReauthenticationStore, freshReauthenticationPurposeSchema, freshReauthenticationBindingSchema } from './fresh-reauthentication-store.js';
 import type { FreshReauthenticationBinding, FreshReauthenticationPurpose } from './fresh-reauthentication-store.js';
 import { webAuthnAuthenticationResponseSchema, webAuthnTransportSchema, nativeAuthenticationOptionsSchema } from './webauthn.schema.js';
 import { normalizedPasskeyPublicKey } from './passkey-public-key.js';
@@ -48,12 +48,12 @@ export class FreshPasskeyReauthentication {
 		private config: Pick<Config, 'url' | 'hostname'>,
 	) {}
 
-	private async binding(identity: FreshReauthenticationIdentity, purpose: FreshReauthenticationPurpose): Promise<FreshReauthenticationBinding> {
+	private async binding(identity: FreshReauthenticationIdentity, purpose: FreshReauthenticationPurpose, targetStamp?: string): Promise<FreshReauthenticationBinding> {
 		v.parse(freshReauthenticationPurposeSchema, purpose);
 		const session = identity.browserSession;
 		if (identity.accessToken != null || !session || session.userId !== identity.userId
 			|| !await this.sessions.isActive(session.id, identity.userId)) throw new Error('Fresh reauthentication failed');
-		return { userId: identity.userId, sessionId: session.id, purpose };
+		return v.parse(freshReauthenticationBindingSchema, { userId: identity.userId, sessionId: session.id, purpose, ...(targetStamp === undefined ? {} : { targetStamp }) });
 	}
 
 	private async snapshot(userId: string) {
@@ -63,9 +63,9 @@ export class FreshPasskeyReauthentication {
 		return { profile, keys, stamp: freshReauthenticationPolicyStamp(profile, keys) };
 	}
 
-	async begin(identity: FreshReauthenticationIdentity, purpose: FreshReauthenticationPurpose, password: string) {
+	async begin(identity: FreshReauthenticationIdentity, purpose: FreshReauthenticationPurpose, password: string, targetStamp?: string) {
 		const deadline = performance.now() + 90_000;
-		const binding = await this.binding(identity, purpose);
+		const binding = await this.binding(identity, purpose, targetStamp);
 		// Anchor to Redis time BEFORE the password proof; queued create cannot renew it.
 		const expiresAt = await this.store.startDeadline();
 		const before = await this.snapshot(binding.userId);
@@ -77,7 +77,7 @@ export class FreshPasskeyReauthentication {
 		v.assert(nativeAuthenticationOptionsSchema, options);
 		const after = await this.snapshot(binding.userId);
 		if (before.stamp !== after.stamp) throw new Error('Fresh reauthentication failed');
-		await this.binding(identity, purpose);
+		await this.binding(identity, purpose, targetStamp);
 		const remainingMs = Math.floor(deadline - performance.now());
 		if (remainingMs <= 0) throw new Error('Fresh reauthentication failed');
 		const ticket = await this.store.create({ ...binding, policyStamp: before.stamp, challenge: options.challenge }, expiresAt);
@@ -85,8 +85,8 @@ export class FreshPasskeyReauthentication {
 		return { ticket, options };
 	}
 
-	async complete(identity: FreshReauthenticationIdentity, purpose: FreshReauthenticationPurpose, ticket: string, response: unknown) {
-		const binding = await this.binding(identity, purpose);
+	async complete(identity: FreshReauthenticationIdentity, purpose: FreshReauthenticationPurpose, ticket: string, response: unknown, targetStamp?: string) {
+		const binding = await this.binding(identity, purpose, targetStamp);
 		// Include Redis round-trip time in the conservative monotonic deadline.
 		const started = performance.now();
 		const claimed = await this.store.consume(binding, ticket);
@@ -112,7 +112,7 @@ export class FreshPasskeyReauthentication {
 		});
 		if (updated.affected !== 1) throw new Error('Fresh reauthentication failed');
 		const after = await this.snapshot(binding.userId);
-		await this.binding(identity, purpose);
+		await this.binding(identity, purpose, targetStamp);
 		if (after.stamp !== claimed.record.policyStamp || performance.now() >= deadline) throw new Error('Fresh reauthentication failed');
 		return { ...binding, policyStamp: after.stamp, expiresAtMonotonic: deadline };
 	}

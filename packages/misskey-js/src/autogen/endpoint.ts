@@ -311,6 +311,9 @@ import type {
 	ISignoutRequest,
 	IUpdateEmailRequest,
 	IUpdateEmailResponse,
+	IUpdateEmailPasskeyStartRequest,
+	IUpdateEmailPasskeyStartResponse,
+	IUpdateEmailPasskeyCompleteRequest,
 	InviteCreateRequest,
 	InviteCreateResponse,
 	InviteDeleteRequest,
@@ -951,6 +954,8 @@ export type Endpoints = {
 	'i/sessions/revoke': { req: ISessionsRevokeRequest; res: EmptyResponse };
 	'i/signout': { req: ISignoutRequest; res: EmptyResponse };
 	'i/update-email': { req: IUpdateEmailRequest; res: IUpdateEmailResponse };
+	'i/update-email/passkey/start': { req: IUpdateEmailPasskeyStartRequest; res: IUpdateEmailPasskeyStartResponse };
+	'i/update-email/passkey/complete': { req: IUpdateEmailPasskeyCompleteRequest; res: EmptyResponse };
 	'invite/create': { req: InviteCreateRequest; res: InviteCreateResponse };
 	'invite/delete': { req: InviteDeleteRequest; res: EmptyResponse };
 	'invite/limit': { req: InviteLimitRequest; res: InviteLimitResponse };

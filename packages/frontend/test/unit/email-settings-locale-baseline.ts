@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreEmailChangeBaseline } from './email-change-source-rebase.js';
 import { parse } from 'vue/compiler-sfc';
 import metadata from './email-settings-locale-baseline.json';
 
@@ -22,6 +23,7 @@ export function reviewedEmailMessage(file: string, language: string, path: strin
  * dictionaries and every non-locale source byte against immutable Git input.
  */
 export function restoreEmailHistoricalSource(file: string, source: string): string {
+	source = restoreEmailChangeBaseline(file, source);
 	if (file !== metadata.file) return source;
 	const parsed = parse(source, { filename: file });
 	if (parsed.errors.length) throw new Error('Invalid email settings SFC');
