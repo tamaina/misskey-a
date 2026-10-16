@@ -4,6 +4,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, test } from 'vitest';
@@ -1214,7 +1215,7 @@ const additionalStaticMigrations = [
 
 describe('Additional static SFC-local locale migrations', () => {
 	test.each(additionalStaticMigrations)('$file preserves every static label in all active locales', ({ file, keyPaths }) => {
-		const source = restoreFinalOwnerHistoricalSource(file, readFileSync(resolve(repoRoot, file), 'utf8'));
+		const source = restoreFinalOwnerHistoricalSource(file, restoreGlobalCatalogPilotSource(file, readFileSync(resolve(repoRoot, file), 'utf8')));
 		const localKeys = keyPaths.map(({ keyPath }) => keyPath.split('.').at(-1)!);
 		const localeBlocks = new Map<string, Record<string, unknown>>();
 

@@ -13,6 +13,7 @@ import { languages, locales } from 'i18n';
 import { createInternationalization, setActiveInternationalization, useLocale } from 'vite-vue-internationalization/runtime';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
+import { globalCatalogPilotOwners, restoreGlobalCatalogPilotSource, restoreGlobalCatalogPilotDictionary } from './global-catalog-pilot-baseline.js';
 import embedMessages from '../../../features/boot/frontend/embed/boot-messages.json';
 
 const root = resolve(import.meta.dirname, '../../../..');
@@ -89,4 +90,20 @@ test('embed retains only its existing boot globals and its language inventory', 
 		expect(payload(embed, language).global).toEqual(embedMessages[language]);
 		expect(payload(embed, language).global).not.toHaveProperty('save');
 	}
+});
+
+test.each(globalCatalogPilotOwners)('$file rejects source, owner and global changes before replaying historical proofs', owner => {
+	const source = readFileSync(resolve(root, owner.file), 'utf8');
+	const baseline = restoreGlobalCatalogPilotSource(owner.file, source);
+	expect(createHash('sha256').update(source).digest('hex')).toBe(owner.currentSha256);
+	expect(createHash('sha256').update(baseline).digest('hex')).toBe(owner.baselineSha256);
+	expect(restoreGlobalCatalogPilotSource(owner.file, baseline)).toBe(baseline);
+	expect(() => restoreGlobalCatalogPilotSource(owner.file, source + '\n')).toThrow('Global catalog pilot source differs');
+	expect(() => restoreGlobalCatalogPilotSource(owner.file, source.replace(`globalLocale.env.${owner.keys[0]}`, 'globalLocale.env.unreviewed'))).toThrow('Global catalog pilot source differs');
+	const bundle = payload(plugin, 'ja-JP');
+	const dictionary = bundle.modules![owner.file.replace('packages/', '/')]!;
+	const restored = restoreGlobalCatalogPilotDictionary(owner.file, 'ja-JP', dictionary, bundle.global!);
+	for (const key of owner.keys) expect(restored[key]).toBe(locales['ja-JP'][key]);
+	expect(() => restoreGlobalCatalogPilotDictionary(owner.file, 'ja-JP', { ...dictionary, extra: 'unreviewed' }, bundle.global!)).toThrow('Global catalog pilot loader differs');
+	expect(() => restoreGlobalCatalogPilotDictionary(owner.file, 'ja-JP', dictionary, { ...bundle.global, [owner.keys[0]]: 'unreviewed' })).toThrow('Global catalog pilot shared label differs');
 });

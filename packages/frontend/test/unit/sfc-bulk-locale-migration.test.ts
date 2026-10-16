@@ -4,6 +4,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -1588,7 +1589,7 @@ describe('expanded literal SFC-local locale migration', () => {
 
 	test.each(migrations)('$file preserves every translation, placeholder, occurrence and source boundary', migration => {
 		const { file, sha256, importOffset, keyPaths, references } = migration;
-		const source = restorePwaShareSourceBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8'));
+		const source = restorePwaShareSourceBaseline(file, restoreGlobalCatalogPilotSource(file, readFileSync(resolve(repoRoot, file), 'utf8')));
 		const blocks = getBlocks(file, source);
 		expect([...blocks.keys()]).toEqual(languages);
 		expect(source).not.toMatch(/\bi18n\s*\./);
