@@ -58,7 +58,7 @@ test('peer prepare requires residence, preserves unknown-key recovery, and keeps
 	try {
 		const load = () => view.element.querySelector<HTMLButtonElement>('button')!.click(); load(); await flush();
 		vi.mocked(os.selectUser).mockResolvedValueOnce({ id: 'bob', username: 'bob', host: null } as Awaited<ReturnType<typeof os.selectUser>>);
-		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === '受取人を選択')!.click(); await flush();
+		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === '選択')!.click(); await flush();
 		const forms = view.element.querySelectorAll('form');
 		for (const select of forms[0].querySelectorAll('div[tabindex="0"]')) {
 			select.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true })); const call = vi.mocked(os.popupMenu).mock.calls.at(-1)!; const option = call[0][0];
@@ -111,18 +111,18 @@ test('recipient picker automatically loads public wallets and discards stale res
 	const button = (name: string) => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === name)!;
 	const pick = async (id: string, host: string | null = null) => {
 		vi.mocked(os.selectUser).mockResolvedValueOnce({ id, username: id, host } as Awaited<ReturnType<typeof os.selectUser>>);
-		button('受取人を選択').click(); await flush();
+		button('選択').click(); await flush();
 	};
 	try {
 		await flush(); expect(client.ownPublication).toHaveBeenCalledTimes(1); expect(client.listTokens).toHaveBeenCalledTimes(1); expect(client.list).toHaveBeenCalledTimes(1);
 		await pick('bob'); expect(view.element.textContent).toContain('取得しています');
 		expect(os.selectUser).toHaveBeenLastCalledWith({ localOnly: true, includeSelf: false });
-		await pick('carol'); expect(view.element.textContent).toContain('@carol'); expect(view.element.textContent).toContain('公開された受取ウォレットがありません');
+		button('解除').click(); await flush(); await pick('carol'); expect(view.element.textContent).toContain('@carol'); expect(view.element.textContent).toContain('公開された受取ウォレットがありません');
 		resolveOld([{ chainId: 123456, address: `0x${'2'.repeat(40)}` }]); await flush();
 		expect(view.element.textContent).toContain('@carol'); expect(view.element.textContent).toContain('公開された受取ウォレットがありません');
-		await pick('dave'); expect(view.element.textContent).toContain('取得できませんでした');
+		button('解除').click(); await flush(); await pick('dave'); expect(view.element.textContent).toContain('取得できませんでした');
 		button('公開ウォレットを再取得').click(); await flush(); expect(view.element.textContent).not.toContain('取得できませんでした');
-		button('受取人の選択を解除').click(); await flush(); expect(view.element.textContent).not.toContain('@dave');
+		button('解除').click(); await flush(); expect(view.element.textContent).not.toContain('@dave');
 		expect(button('送金内容を準備する').disabled).toBe(true);
 		await pick('remote', 'example.invalid'); await pick('alice'); expect(client.publicWallets).toHaveBeenCalledTimes(4);
 		for (const method of [client.prepare, client.start, client.check, client.publish]) expect(method).not.toHaveBeenCalled();
@@ -136,7 +136,7 @@ test('clearing a recipient invalidates an in-flight wallet failure', async () =>
 	const button = (name: string) => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === name)!;
 	try {
 		await flush(); vi.mocked(os.selectUser).mockResolvedValueOnce({ id: 'bob', username: 'bob', host: null } as Awaited<ReturnType<typeof os.selectUser>>);
-		button('受取人を選択').click(); await flush(); button('受取人の選択を解除').click(); await flush();
+		button('選択').click(); await flush(); button('解除').click(); await flush();
 		rejectLookup(new Error('Old failure')); await flush(); expect(view.element.textContent).not.toContain('取得できませんでした'); expect(view.element.textContent).not.toContain('@bob');
 	} finally { view.dispose(); }
 });
@@ -148,26 +148,31 @@ test('an older user dialog cannot replace a newer recipient selection', async ()
 	const client = { ownPublication: async () => [], listTokens: async () => [], list: async () => [], publicWallets: vi.fn(async () => []) };
 	const view = await mount(PeerPayments, { client, residenceClient: { getResidence: async () => ({ isReady: false }) }, currentUserId: 'alice' });
 	try {
-		await flush(); const choose = () => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '受取人を選択')!.click();
+		await flush(); const choose = () => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '選択')!.click();
 		choose(); await flush(); choose(); await flush();
 		resolveFirst({ id: 'bob', username: 'bob', host: null } as Awaited<ReturnType<typeof os.selectUser>>); await flush();
 		expect(client.publicWallets).toHaveBeenCalledExactlyOnceWith({ userId: 'carol' }); expect(view.element.textContent).toContain('@carol'); expect(view.element.textContent).not.toContain('@bob');
 	} finally { view.dispose(); }
 });
 
-test('opening another picker keeps the current recipient lookup valid until a new selection is confirmed', async () => {
+test('selected recipient hides picker while its lookup stays valid; clearing restores primary selection', async () => {
 	let resolveLookup!: (value: { chainId: number; address: string }[]) => void;
 	const address = `0x${'3'.repeat(40)}`;
 	const client = { ownPublication: async () => [], listTokens: async () => [], list: async () => [], publicWallets: vi.fn(() => new Promise(resolve => { resolveLookup = resolve; })) };
 	const view = await mount(PeerPayments, { client, residenceClient: { getResidence: async () => ({ isReady: false }) }, currentUserId: 'alice' });
 	try {
-		await flush(); const choose = () => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '受取人を選択')!.click();
+		await flush(); const choose = () => [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '選択')!.click();
 		vi.mocked(os.selectUser).mockResolvedValueOnce({ id: 'bob', username: 'bob', host: null } as Awaited<ReturnType<typeof os.selectUser>>);
-		choose(); await flush(); vi.mocked(os.selectUser).mockImplementationOnce(() => new Promise(() => {})); choose(); await flush();
+		expect([...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '選択')?.className).toContain('primary');
+		choose(); await flush(); expect([...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '選択')).toBeUndefined();
 		resolveLookup([{ chainId: 123456, address }]); await flush();
 		expect(view.element.textContent).toContain('@bob'); expect(view.element.textContent).not.toContain('取得しています'); expect(view.element.textContent).not.toContain('公開された受取ウォレットがありません');
 		view.element.querySelectorAll('div[tabindex="0"]')[2].dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
 		const options = vi.mocked(os.popupMenu).mock.calls.at(-1)![0];
 		expect(options).toEqual(expect.arrayContaining([expect.objectContaining({ text: `123456 / ${address}` })]));
+		[...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '解除')!.click(); await flush();
+		expect(view.element.textContent).not.toContain('@bob');
+		expect([...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '選択')?.className).toContain('primary');
+		expect([...view.element.querySelectorAll<HTMLButtonElement>('button')].find(el => el.textContent === '解除')).toBeUndefined();
 	} finally { view.dispose(); }
 });

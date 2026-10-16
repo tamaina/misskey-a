@@ -182,3 +182,20 @@ test.each(['7', '0'])('native purchase reviews prorated quote (credit %s) and su
 		submit(form); await flush(); expect(client.createOrder.mock.calls[1][0]).toMatchObject({ quotedQuote: result }); expect(client.createOrder.mock.calls[1][0]).not.toMatchObject({ requestKey: (client.createOrder.mock.calls[0][0] as { requestKey: string }).requestKey });
 	} finally { view.dispose(); }
 });
+
+test('purchase loads residence and history on mount without writing, retries a failed residence read explicitly', async () => {
+	const client = { listCatalog: vi.fn(async () => []), listOrders: vi.fn(async () => []), createOrder: vi.fn(), quoteOrder: vi.fn(), checkOrder: vi.fn(), cancelOrder: vi.fn() };
+	const residenceClient = { getResidence: vi.fn().mockRejectedValueOnce(new Error('Unavailable')).mockResolvedValue({ residence: { country: 'CA', subdivision: null, revision: 1, declaredAt: 1, kind: 'self_declared' }, isReady: true, requiredSubdivisions: [] }) };
+	const listWallets = vi.fn(async () => []), getRequirements = vi.fn(async () => ({ isRequired: false, country: null, statement: null }));
+	const view = await mount(ServiceSubscriptions, { client, residenceClient, listWallets, getRequirements });
+	try {
+		await flush();
+		expect(residenceClient.getResidence).toHaveBeenCalledExactlyOnceWith({});
+		expect(client.listCatalog).toHaveBeenCalledExactlyOnceWith({}); expect(client.listOrders).toHaveBeenCalledExactlyOnceWith({}); expect(listWallets).toHaveBeenCalledTimes(1);
+		expect(view.element.querySelector('[role="alert"]')).not.toBeNull();
+		expect(view.element.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(true);
+		const reload = [...view.element.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent === 'サービス・居住地・履歴を再読み込み')!;
+		reload.click(); await flush(); expect(residenceClient.getResidence).toHaveBeenCalledTimes(2); expect(view.element.querySelector('[role="alert"]')).toBeNull();
+		for (const write of [client.createOrder, client.quoteOrder, client.checkOrder, client.cancelOrder]) expect(write).not.toHaveBeenCalled();
+	} finally { view.dispose(); }
+});

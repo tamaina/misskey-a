@@ -40,5 +40,5 @@ async function load() { await run(async () => { const data = await props.client.
 async function save() { await run(async () => { const data = await props.client.setResidence({ revision: revision.value, residence: { country: country.value as typeof residenceCountries[number], subdivision: requiresSubdivision.value ? subdivision.value : null } }); revision.value = data.revision; saved.value = true; }); }
 </script>
 <locale lang="json" locale="ja-JP">
-{"scope":"居住している国を登録してください。運営者の設定で必要な場合は州・地域も選択します。登録は自己申告であり、税務上の所在地が確認済みであることを示すものではありません。ウォレット登録や新しい支払い・送金の開始前に必要です。","country":"居住国（ISO国コード）","subdivision":"州・地域（ISO行政区分コード）","load":"登録内容を読み込む","save":"居住地を登録する","saved":"居住地を登録しました。ウォレットや支払いの画面で再読込してください。","failed":"登録できませんでした。国・地域と最新の設定を確認してください。"}
+{"scope":"居住している国を登録してください。運営者の設定で必要な場合は州・地域も選択します。登録は自己申告であり、税務上の所在地が確認済みであることを示すものではありません。ウォレット登録や新しい支払い・送金の開始前に必要です。","country":"居住国（ISO国コード）","subdivision":"州・地域（ISO行政区分コード）","load":"登録内容を再読み込み","save":"居住地を登録する","saved":"居住地を登録しました。ウォレットや支払いの画面で再読込してください。","failed":"登録できませんでした。国・地域と最新の設定を確認してください。"}
 </locale>

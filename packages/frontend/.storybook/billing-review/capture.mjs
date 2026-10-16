@@ -47,9 +47,11 @@ try {
 			if (story.includes('subdivision')) await expect(page.getByText('州・地域（ISO行政区分コード）', { exact: true })).toBeVisible();
 			if (story.startsWith('wallet')) await expect(page.getByText('Synthetic chain (123456)', { exact: true })).toBeVisible();
 			if (story.startsWith('service') || story.startsWith('peer')) {
-				const load = page.getByRole('button', { name: story.startsWith('peer') ? 'ウォレット・トークン・履歴を再読み込み' : '読み込む', exact: true });
+				const load = page.getByRole('button', { name: story.startsWith('peer') ? 'ウォレット・トークン・履歴を再読み込み' : 'サービス・居住地・履歴を再読み込み', exact: true });
 				await expect(load).toBeEnabled();
 			}
+			if (story.startsWith('peer') && !story.includes('recipient-without-wallet')) await expect(page.getByRole('button', { name: '選択', exact: true })).toBeVisible();
+			if (story.includes('recipient-without-wallet')) { await expect(page.getByRole('button', { name: '選択', exact: true })).toHaveCount(0); await expect(page.getByRole('button', { name: '解除', exact: true })).toBeVisible(); }
 			if (story.includes('recipient-without-wallet')) await expect(page.getByText('この受取人には公開された受取ウォレットがありません。', { exact: true })).toBeVisible({ timeout: 60000 }).catch(async error => {
 				await writeFile(resolve(output, `${name}-${viewport}-failure.json`), JSON.stringify({ errors, externalRequests, text: await page.locator('body').innerText() }, null, 2));
 				throw error;

@@ -36,11 +36,13 @@ export const RecipientWithoutWallet = {
 	},
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement), screen = within(canvasElement.ownerDocument.body);
-		await userEvent.click(await canvas.findByRole('button', { name: '受取人を選択' }));
+		await userEvent.click(await canvas.findByRole('button', { name: '選択' }));
 		const usernameLabel = await screen.findByText('ユーザー名', { exact: true });
 		await userEvent.type(within(usernameLabel.parentElement!).getByRole('combobox'), 'synthetic_recipient');
 		await userEvent.click(await screen.findByText('Synthetic recipient', { exact: true }));
 		await userEvent.click(await screen.findByRole('button', { name: /^完了/ }));
 		await expect(await canvas.findByText('この受取人には公開された受取ウォレットがありません。')).toBeVisible();
+		await expect(canvas.queryByRole('button', { name: /^選択$/ })).toBeNull();
+		await expect(canvas.getByRole('button', { name: /^解除$/ })).toBeVisible();
 	},
 } satisfies StoryObj<typeof PeerPayments>;

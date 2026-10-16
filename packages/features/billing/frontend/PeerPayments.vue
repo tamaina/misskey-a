@@ -14,10 +14,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkButton :disabled="busy" @click="publish(wallet.walletId, !wallet.isPublic)">{{ wallet.isPublic ? $locale.sfc.hide : $locale.sfc.publish }}</MkButton>
 	</div>
 	<div class="_gaps_s">
-		<MkButton :disabled="busy" @click="selectRecipient">{{ $locale.sfc.selectRecipient }}</MkButton>
+		<span>{{ $locale.sfc.recipientLabel }}</span>
+		<div class="_buttons">
+			<MkButton v-if="!recipient" primary :disabled="busy" @click="selectRecipient">{{ $locale.sfc.selectRecipient }}</MkButton>
+			<template v-else>
+				<span>@{{ recipient.username }}</span>
+				<MkButton :disabled="busy" @click="clearRecipient">{{ $locale.sfc.clearRecipient }}</MkButton>
+			</template>
+		</div>
 		<template v-if="recipient">
-			<span>@{{ recipient.username }}</span>
-			<MkButton :disabled="busy" @click="clearRecipient">{{ $locale.sfc.clearRecipient }}</MkButton>
 			<MkInfo v-if="recipientLoading" role="status">{{ $locale.sfc.recipientLoading }}</MkInfo>
 			<MkInfo v-else-if="recipientFailed" warn role="alert">{{ $locale.sfc.recipientFailed }}</MkInfo>
 			<MkInfo v-else-if="!addresses.length">{{ $locale.sfc.noRecipientWallet }}</MkInfo>
@@ -155,5 +160,5 @@ async function send(intent: PeerTransfer) {
 async function check(intent: PeerTransfer) { await run(async () => { await props.client.check({ intentId: intent.id, ...(logIndices.value[intent.id] != null ? { logIndex: logIndices.value[intent.id]! } : {}), ...(!intent.txHash && hashes.value[intent.id] ? { txHash: hashes.value[intent.id] } : {}) }); await refresh(); }); }
 </script>
 <locale lang="json" locale="ja-JP">
-{"broadcastUnknown":"この送金は送信開始済みです。結果が不明な場合も再送せず、ウォレットで取引ハッシュを確認して登録してください。","residenceRequired":"新しい送金の準備・送信前に居住地を設定してください。送信済みハッシュの確認と履歴は引き続き利用できます。","scope":"ユーザー間のERC20送金の試作です。内容を確認してウォレットで送信し、サーバーで確認します。残高やノートのリアクションは変更しません。","failed":"処理できませんでした。送信済みの場合は再送せず、ウォレットの取引ハッシュで確認してください。","load":"読み込む","reload":"ウォレット・トークン・履歴を再読み込み","publication":"受取用アドレスは初期状態では非公開です。公開すると他のアカウントが取得でき、チェーン上の履歴とあなたのアカウントを関連付けられます。非公開に戻すと新しい送金準備の対象から外れます。","publish":"受取アドレスを公開する","hide":"非公開に戻す","recipient":"受取人のローカルユーザー名","lookup":"公開アドレスを確認","selectRecipient":"受取人を選択","clearRecipient":"受取人の選択を解除","recipientLoading":"受取人の公開ウォレットを取得しています。","recipientFailed":"公開ウォレットを取得できませんでした。再取得するか受取人を選び直してください。","noRecipientWallet":"この受取人には公開された受取ウォレットがありません。","retryRecipient":"公開ウォレットを再取得","token":"トークン","payer":"登録済みの送信元","address":"公開された受取アドレス","amount":"送金額（トークン単位）","prepare":"送金内容を準備する","browserWallet":"送信に使うブラウザーウォレット","send":"内容を確認してウォレットで送信","log":"ログインデックス（任意）","logCaption":"同じ内容のTransferログが複数ある場合だけ指定します。","hash":"取引ハッシュ","check":"送金を確認","baseUnits":"最小単位"}
+{"broadcastUnknown":"この送金は送信開始済みです。結果が不明な場合も再送せず、ウォレットで取引ハッシュを確認して登録してください。","residenceRequired":"新しい送金の準備・送信前に居住地を設定してください。送信済みハッシュの確認と履歴は引き続き利用できます。","scope":"ユーザー間のERC20送金の試作です。内容を確認してウォレットで送信し、サーバーで確認します。残高やノートのリアクションは変更しません。","failed":"処理できませんでした。送信済みの場合は再送せず、ウォレットの取引ハッシュで確認してください。","load":"読み込む","reload":"ウォレット・トークン・履歴を再読み込み","publication":"受取用アドレスは初期状態では非公開です。公開すると他のアカウントが取得でき、チェーン上の履歴とあなたのアカウントを関連付けられます。非公開に戻すと新しい送金準備の対象から外れます。","publish":"受取アドレスを公開する","hide":"非公開に戻す","recipient":"受取人のローカルユーザー名","lookup":"公開アドレスを確認","recipientLabel":"受取人","selectRecipient":"選択","clearRecipient":"解除","recipientLoading":"受取人の公開ウォレットを取得しています。","recipientFailed":"公開ウォレットを取得できませんでした。再取得するか受取人を選び直してください。","noRecipientWallet":"この受取人には公開された受取ウォレットがありません。","retryRecipient":"公開ウォレットを再取得","token":"トークン","payer":"登録済みの送信元","address":"公開された受取アドレス","amount":"送金額（トークン単位）","prepare":"送金内容を準備する","browserWallet":"送信に使うブラウザーウォレット","send":"内容を確認してウォレットで送信","log":"ログインデックス（任意）","logCaption":"同じ内容のTransferログが複数ある場合だけ指定します。","hash":"取引ハッシュ","check":"送金を確認","baseUnits":"最小単位"}
 </locale>
