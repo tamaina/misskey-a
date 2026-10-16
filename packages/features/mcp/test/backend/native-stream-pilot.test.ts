@@ -171,3 +171,10 @@ it('handles abort during connection creation before attaching output or fetching
 		expect(f.subscriber.eventNames()).toEqual([]); expect(vi.getTimerCount()).toBe(0); expect(f.cache.userProfileCache.fetch).not.toHaveBeenCalled();
 	} finally { release(); f.connections.forEach(connection => { connection.dispose(); }); vi.useRealTimers(); }
 });
+
+it('denies a first-party browser session before creating an MCP connection', async () => {
+	const f = fixture();
+	f.authenticate.authenticate.mockResolvedValue([f.actor, null, { id: 'session-a', userId: f.actor.id }]);
+	await expect(f.open()).rejects.toThrow('Stream access denied');
+	expect(f.moduleRef.create).not.toHaveBeenCalled(); expect(f.subscriber.eventNames()).toEqual([]);
+});

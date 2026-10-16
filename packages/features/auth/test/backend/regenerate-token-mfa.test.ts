@@ -5,11 +5,14 @@
 import { call } from '@orpc/server';
 import bcrypt from 'bcryptjs';
 import * as OTPAuth from 'otpauth';
+import type { EntityManager } from 'typeorm';
+import { MiUser, MiBrowserSession } from '@features/persistence/backend/repositories/models.js';
 import { afterEach, expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { createIRegenerateTokenProcedure } from '../../backend/endpoints/i/regenerate-token.js';
+import type { IRegenerateTokenDependencies } from '../../backend/endpoints/i/regenerate-token.js';
 import { IRegenerateTokenContract } from '../../backend/api.definition.js';
 import { UserAuthService } from '../../backend/services/UserAuthService.js';
 import { testContext } from './native-context.js';
@@ -39,14 +42,30 @@ function fixture(twoFactorEnabled = true) {
 	redis.set.mockResolvedValue('OK');
 	const auth = new UserAuthService(redis, users, profiles);
 	const authenticate = vi.spyOn(auth, 'twoFactorAuthenticate');
-	const endpoint = createIRegenerateTokenProcedure({ usersRepository: users, userProfilesRepository: profiles, userAuthService: auth, globalEventService: events });
+	const db = mockDeep<IRegenerateTokenDependencies['db']>();
+	const browserSessionService = mockDeep<IRegenerateTokenDependencies['browserSessionService']>();
+	const browserRows = mockDeep<NonNullable<Parameters<IRegenerateTokenDependencies['browserSessionService']['revokeAllOwned']>[1]>>();
+	const manager = mockDeep<EntityManager>();
+	manager.getRepository.mockImplementation(entity => {
+		if (entity === MiUser) return users as unknown as ReturnType<EntityManager['getRepository']>;
+		if (entity === MiBrowserSession) return browserRows as unknown as ReturnType<EntityManager['getRepository']>;
+		throw new Error('unsupported synthetic repository');
+	});
+	db.transaction.mockImplementation(async (...args) => {
+		const callback = args.at(-1);
+		if (typeof callback !== 'function') throw new Error('missing synthetic transaction callback');
+		return await callback(manager);
+	});
+	const endpoint = createIRegenerateTokenProcedure({ db, browserSessionService, usersRepository: users, userProfilesRepository: profiles, userAuthService: auth, globalEventService: events });
 	const invoke = (proof?: string | null, suppliedPassword = password) => call(endpoint, { password: suppliedPassword, ...(proof === undefined ? {} : { token: proof }) }, { context: testContext(me) });
 	const noRotation = () => {
 		expect(users.update).not.toHaveBeenCalled();
+		expect(db.transaction).not.toHaveBeenCalled();
+		expect(browserSessionService.revokeAllOwned).not.toHaveBeenCalled();
 		expect(events.publishInternalEvent).not.toHaveBeenCalled();
 		expect(events.publishMainStream).not.toHaveBeenCalled();
 	};
-	return { users, profiles, redis, events, me, profile, authenticate, invoke, noRotation };
+	return { users, profiles, redis, events, db, browserSessionService, browserRows, me, profile, authenticate, invoke, noRotation };
 }
 
 test.each([undefined, null])('MFA rejects missing proof (%s) before any rotation', async proof => {
@@ -76,6 +95,8 @@ test('real TOTP verification precedes rotation and publishes its new token', asy
 	expect(h.events.publishInternalEvent).toHaveBeenCalledWith('userTokenRegenerated', { id: h.me.id, oldToken: h.me.token, newToken: token });
 	expect(h.events.publishMainStream).toHaveBeenCalledWith(h.me.id, 'myTokenRegenerated');
 	expect(h.authenticate.mock.invocationCallOrder[0]).toBeLessThan(h.users.update.mock.invocationCallOrder[0]);
+	expect(h.authenticate.mock.invocationCallOrder[0]).toBeLessThan(h.db.transaction.mock.invocationCallOrder[0]);
+	expect(h.browserSessionService.revokeAllOwned).toHaveBeenCalledWith(h.me.id, h.browserRows);
 });
 
 test('already-used TOTP cannot rotate the token', async () => {

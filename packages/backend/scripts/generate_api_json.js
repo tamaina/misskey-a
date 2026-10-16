@@ -18,6 +18,8 @@ async function main() {
 		throw new Error('`built` directory does not exist.');
 	}
 
+	await import('reflect-metadata');
+
 	/** @type {import('../src/config.js')} */
 	const { loadConfig } = await import('../built/config.js');
 

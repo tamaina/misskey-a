@@ -52,8 +52,9 @@ export const announcementsContract = {
 		kind: 'write:admin:announcements',
 	} as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/admin/announcements/create', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-		.errors({ ...commonErrors })
+		.errors({ ...commonErrors, INVALID_AUTO_ARCHIVE_AT: { status: 400, data: apiErrorData } })
 		.input(objectInput({
+			autoArchiveAt: v.optional(v.nullable(v.pipe(v.number(), v.integer())), null),
 			title: nonempty, text: nonempty, imageUrl: v.nullable(v.string()),
 			icon: v.optional(apiContractIcon, 'info'), display: v.optional(apiContractDisplay, 'normal'),
 			forExistingUsers: v.optional(v.boolean(), false), silence: v.optional(v.boolean(), false),
@@ -82,6 +83,7 @@ export const announcementsContract = {
 	id: v.string(), createdAt: apiContractDate, updatedAt: v.nullable(apiContractDate), title: v.string(), text: v.string(),
 	imageUrl: v.nullable(v.string()), icon: apiContractIcon, display: apiContractDisplay, isActive: v.boolean(), forExistingUsers: v.boolean(),
 	silence: v.boolean(), needConfirmationToRead: v.boolean(), userId: v.nullable(v.string()), reads: v.number(),
+	autoArchiveAt: v.nullable(apiContractDate),
 }))),
 	update: oc.$meta({
 		requestName: 'admin/announcements/update',
@@ -90,8 +92,9 @@ export const announcementsContract = {
 		kind: 'write:admin:announcements',
 	} as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/admin/announcements/update', tags: ['admin'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }), successStatus: 204 })
-		.errors({ ...commonErrors, NO_SUCH_ANNOUNCEMENT: { status: 400, data: apiErrorData } })
+		.errors({ ...commonErrors, NO_SUCH_ANNOUNCEMENT: { status: 400, data: apiErrorData }, INVALID_AUTO_ARCHIVE_AT: { status: 400, data: apiErrorData } })
 		.input(objectInput({
+			autoArchiveAt: v.exactOptional(v.nullable(v.pipe(v.number(), v.integer()))),
 			id, title: v.exactOptional(nonempty), text: v.exactOptional(nonempty),
 			imageUrl: v.exactOptional(v.nullable(v.string())), icon: v.exactOptional(apiContractIcon), display: v.exactOptional(apiContractDisplay),
 			forExistingUsers: v.exactOptional(v.boolean()), silence: v.exactOptional(v.boolean()),

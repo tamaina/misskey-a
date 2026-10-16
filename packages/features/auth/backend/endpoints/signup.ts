@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import type { BrowserSessionService } from '../services/BrowserSessionService.js';
 import bcrypt from 'bcryptjs';
 import { IsNull, LessThanOrEqual, type FindOptionsWhere } from 'typeorm';
 import { CaptchaService } from '@features/auth/backend/services/CaptchaService.js';
@@ -21,6 +22,7 @@ import { sessionErrors } from '../session.middleware.js';
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 const invitationCodeMailTimeoutMs = 1000 * 60 * 30;
 export interface SignupDependencies {
+	browserSessionService: Pick<BrowserSessionService, 'issue'>;
 	config: Config;
 	meta: MiMeta;
 	usersRepository: UsersRepository;
@@ -224,7 +226,7 @@ export function createSignupProcedure(deps: SignupDependencies) {
 					return;
 				}
 				try {
-					const { account, secret } = await deps.signupService.signup({
+					const { account } = await deps.signupService.signup({
 						username, password, host,
 					});
 					if (ticket) {
@@ -238,7 +240,7 @@ export function createSignupProcedure(deps: SignupDependencies) {
 					});
 					return {
 						...res,
-						token: secret,
+						token: (await deps.browserSessionService.issue(account.id)).token,
 					};
 				} catch (err) {
 					// 確保したコードが無駄に消費されたままになるのを防ぐ

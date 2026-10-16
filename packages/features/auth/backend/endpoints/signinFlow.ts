@@ -92,7 +92,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					id: '6cc579cc-885d-43d8-95c2-b8c7fc963280',
 				});
 			}
-			if (user.isSuspended) {
+			if (user.isSuspended || user.isDeleted) {
 				return error(403, {
 					id: 'e03a5f46-d309-4865-9b69-56282d94e1eb',
 				});
@@ -159,7 +159,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					}
 				}
 				if (same) {
-					return toFinishedSignin(deps.signinService.signin(request, reply, user));
+					return toFinishedSignin(await deps.signinService.signin(request, reply, user));
 				} else {
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
@@ -179,7 +179,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 						id: 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f',
 					});
 				}
-				return toFinishedSignin(deps.signinService.signin(request, reply, user));
+				return toFinishedSignin(await deps.signinService.signin(request, reply, user));
 			} else if (sessionField(body, 'credential')) {
 				if (!same && !profile.usePasswordLessLogin) {
 					return await fail(403, {
@@ -188,7 +188,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				}
 				const authorized = await deps.webAuthnService.verifyAuthentication(user.id, sessionField(body, 'credential'));
 				if (authorized) {
-					return toFinishedSignin(deps.signinService.signin(request, reply, user));
+					return toFinishedSignin(await deps.signinService.signin(request, reply, user));
 				} else {
 					return await fail(403, {
 						id: '93b86c4b-72f9-40eb-9815-798928603d1e',
@@ -206,6 +206,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					finished: false,
 					next: 'passkey',
 					authRequest,
+					...(same ? { availableFactors: ['totp', 'passkey'] as ('totp' | 'passkey')[] } : {}),
 				};
 			} else {
 				if (!same || !profile.twoFactorEnabled) {
@@ -217,6 +218,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					return {
 						finished: false,
 						next: 'totp',
+						availableFactors: ['totp'],
 					};
 				}
 			}

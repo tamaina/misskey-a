@@ -5,9 +5,12 @@
 
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import type { DataSource } from 'typeorm';
+import { MiBrowserSession, MiUser } from '@features/persistence/backend/repositories/models.js';
 import type { UsersRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
-import { generateNativeUserToken } from '../../utility/token.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
+import { generateNativeUserToken } from '../../utility/token.js';
+import type { BrowserSessionService } from '../../services/BrowserSessionService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 
 import { IRegenerateTokenContract } from '../../api.definition.js';
@@ -19,6 +22,8 @@ export const meta = {
 
 } as const;
 export interface IRegenerateTokenDependencies {
+	db: Pick<DataSource, 'transaction'>;
+	browserSessionService: Pick<BrowserSessionService, 'revokeAllOwned'>;
 	usersRepository: UsersRepository;
 	userProfilesRepository: UserProfilesRepository;
 	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
@@ -55,9 +60,11 @@ export function createIRegenerateTokenProcedure(deps: IRegenerateTokenDependenci
 
 			const newToken = generateNativeUserToken();
 
-			await deps.usersRepository.update(me.id, {
-				token: newToken,
+			await deps.db.transaction(async manager => {
+				await manager.getRepository(MiUser).update(me.id, { token: newToken });
+				await deps.browserSessionService.revokeAllOwned(me.id, manager.getRepository(MiBrowserSession));
 			});
+			deps.globalEventService.publishInternalEvent('browserSessionRevoked', { id: null, userId: me.id });
 
 			// Publish event
 			deps.globalEventService.publishInternalEvent('userTokenRegenerated', { id: me.id, oldToken, newToken });

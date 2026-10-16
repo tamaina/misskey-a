@@ -4,7 +4,7 @@
  */
 
 import { createHash, randomBytes } from 'node:crypto';
-import { IsNull } from 'typeorm';
+import { IsNull, LessThanOrEqual } from 'typeorm';
 import type { FindOptionsSelect } from 'typeorm';
 import type { BrowserSessionsRepository, MiBrowserSession } from '@features/persistence/backend/repositories/models.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
@@ -42,17 +42,31 @@ export class BrowserSessionService {
 		});
 		if (!session) return null;
 		const lastUsedAt = new Date();
-		// Revocation may occur between the read and write. Only an active row can
-		// authorize this check; a concurrent revocation must never be overwritten.
-		const result = await this.browserSessionsRepository.update({
-			id: session.id, tokenHash, revokedAt: IsNull(),
-		}, { lastUsedAt });
-		return result.affected === 1 ? { ...session, lastUsedAt } : null;
+		const cutoff = new Date(lastUsedAt.getTime() - 60_000);
+		if (session.lastUsedAt <= cutoff) {
+			await this.browserSessionsRepository.update({
+				id: session.id, tokenHash, revokedAt: IsNull(), lastUsedAt: LessThanOrEqual(cutoff),
+			}, { lastUsedAt });
+		}
+		// Always re-read after the optional touch: concurrent revocation wins,
+		// and authorization never relies on a cached validity or sudo snapshot.
+		return this.browserSessionsRepository.findOne({
+			where: { id: session.id, userId: session.userId, revokedAt: IsNull(), user: { id: session.userId, host: IsNull(), isSuspended: false, isDeleted: false } }, select: metadataSelect,
+		});
 	}
 
-	public async listOwned(userId: string): Promise<BrowserSessionMetadata[]> {
+	/** Stream gates check durable validity without producing per-frame writes. */
+	public async isActive(sessionId: string, userId: string): Promise<boolean> {
+		return await this.browserSessionsRepository.existsBy({ id: sessionId, userId, revokedAt: IsNull(), user: { id: userId, host: IsNull(), isSuspended: false, isDeleted: false } });
+	}
+
+	public async revokeAllOwned(userId: string, repository: Pick<BrowserSessionsRepository, 'update'> = this.browserSessionsRepository): Promise<void> {
+		await repository.update({ userId, revokedAt: IsNull() }, { revokedAt: new Date(), sudoUntil: null });
+	}
+
+	public async listOwned(userId: string, limit = 100, offset = 0): Promise<BrowserSessionMetadata[]> {
 		return this.browserSessionsRepository.find({
-			where: { userId }, select: metadataSelect, order: { createdAt: 'DESC', id: 'DESC' },
+			where: { userId }, select: metadataSelect, take: limit, skip: offset, order: { createdAt: 'DESC', id: 'DESC' },
 		});
 	}
 

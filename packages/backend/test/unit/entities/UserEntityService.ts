@@ -35,6 +35,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { FetchInstanceMetadataService } from '@features/federation/backend/services/FetchInstanceMetadataService.js';
@@ -154,6 +155,7 @@ describe('UserEntityService', () => {
 				UtilityService,
 				ModerationLogService,
 				GlobalEventService,
+				HttpRequestService,
 				DriveFileEntityService,
 				MetaService,
 				FetchInstanceMetadataService,

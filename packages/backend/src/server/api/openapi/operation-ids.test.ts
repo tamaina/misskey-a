@@ -53,7 +53,10 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		const operation = item?.[method];
 		return operation ? [operation.operationId] : [];
 	}));
-	expect(identifiers).toHaveLength(474 + walletPaths.length);
+	expect(spec.paths?.['/i/sessions']?.post?.operationId).toBe('post___i___sessions');
+	expect(spec.paths?.['/i/sessions/revoke']?.post?.operationId).toBe('post___i___sessions___revoke');
+	expect(spec.paths?.['/i/signout']?.post?.operationId).toBe('post___i___signout');
+	expect(identifiers).toHaveLength(477 + walletPaths.length);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

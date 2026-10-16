@@ -8,7 +8,7 @@ process.env.NODE_ENV = 'test';
 import * as assert from 'assert';
 import { beforeAll, beforeEach, describe, test } from 'vitest';
 import { inspect } from 'node:util';
-import { api, post, role, signup, successfulApiCall, uploadFile } from '../utils.js';
+import { api, failedApiCall, post, role, signup, successfulApiCall, uploadFile } from '../utils.js';
 import type * as misskey from 'misskey-js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 
@@ -250,9 +250,11 @@ describe('ユーザー', () => {
 		await api('admin/suspend-user', { userId: userSuspended.id }, root);
 		userDeletedBySelf = await signup({ username: 'userDeletedBySelf', password: 'userDeletedBySelf' });
 		await post(userDeletedBySelf, { text: 'test' });
+		await successfulApiCall({ endpoint: 'i/update', parameters: { description: '#user_testuserDeletedBySelf' }, user: userDeletedBySelf });
 		await api('i/delete-account', { password: 'userDeletedBySelf' }, userDeletedBySelf);
 		userDeletedByAdmin = await signup({ username: 'userDeletedByAdmin' });
 		await post(userDeletedByAdmin, { text: 'test' });
+		await successfulApiCall({ endpoint: 'i/update', parameters: { description: '#user_testuserDeletedByAdmin' }, user: userDeletedByAdmin });
 		await api('admin/delete-account', { userId: userDeletedByAdmin.id }, root);
 		userFollowingAlice = await signup({ username: 'userFollowingAlice' });
 		await post(userFollowingAlice, { text: 'test' });
@@ -303,7 +305,7 @@ describe('ユーザー', () => {
 		}) as unknown as misskey.entities.SignupResponse; // BUG MeDetailedに足りないキーがある
 
 		// signupの時はtokenが含まれる特別なMeDetailedが返ってくる
-		assert.match(response.token, /[a-zA-Z0-9]{16}/);
+		assert.match(response.token, /^bs_[A-Za-z0-9_-]{43}$/);
 
 		// UserLite
 		assert.match(response.id, /[0-9a-z]{10}/);
@@ -631,10 +633,8 @@ describe('ユーザー', () => {
 		{ label: 'サイレンスになっている', user: () => userSilenced, selector: (user: misskey.entities.UserDetailed) => user.isSilenced },
 		// FIXME: 落ちる
 		//{ label: 'サスペンドになっている', user: () => userSuspended, selector: (user: misskey.entities.UserDetailed) => user.isSuspended },
-		{ label: '削除済みになっている', user: () => userDeletedBySelf, me: () => userDeletedBySelf, selector: (user: misskey.entities.MeDetailed) => user.isDeleted },
 		// @ts-expect-error UserDetailedNotMe doesn't include isDeleted
 		{ label: '自分以外から見たときは削除済みか判定できない', user: () => userDeletedBySelf, selector: (user: misskey.entities.UserDetailedNotMe) => user.isDeleted, expected: () => undefined },
-		{ label: '削除済み(byAdmin)になっている', user: () => userDeletedByAdmin, me: () => userDeletedByAdmin, selector: (user: misskey.entities.MeDetailed) => user.isDeleted },
 		// @ts-expect-error UserDetailedNotMe doesn't include isDeleted
 		{ label: '自分以外から見たときは削除済み(byAdmin)か判定できない', user: () => userDeletedByAdmin, selector: (user: misskey.entities.UserDetailedNotMe) => user.isDeleted, expected: () => undefined },
 		{ label: 'フォロー中になっている', user: () => userFollowedByAlice, selector: (user: misskey.entities.UserDetailed) => user.isFollowing },
@@ -648,6 +648,14 @@ describe('ユーザー', () => {
 	] as const)('を取得することができ、$labelこと', async ({ user, me, selector, expected }) => {
 		const response = await successfulApiCall({ endpoint: 'users/show', parameters: { userId: user().id }, user: me?.() ?? alice });
 		assert.strictEqual(selector(response as any), (expected ?? ((): true => true))());
+	});
+	test.each([
+		{ label: '本人による削除', user: () => userDeletedBySelf },
+		{ label: '管理者による削除', user: () => userDeletedByAdmin },
+	])('削除済みユーザーのブラウザー認証を拒否する（$label）', async ({ user }) => {
+		await failedApiCall({ endpoint: 'users/show', parameters: { userId: user().id }, user: user() }, {
+			status: 401, code: 'AUTHENTICATION_FAILED', id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14',
+		});
 	});
 	test('を取得することができ、Publicなロールがセットされていること', async () => {
 		const response = await successfulApiCall({ endpoint: 'users/show', parameters: { userId: userRolePublic.id }, user: alice });
@@ -853,8 +861,8 @@ describe('ユーザー', () => {
 		{ label: '削除済(byAdmin)ユーザーが含まれる', user: () => userDeletedByAdmin },
 	] as const)('をハッシュタグ指定で取得することができ、結果に$label', async ({ user, excluded }) => {
 		const hashtag = `user_test${user().username}`;
-		if (user() !== userSuspended) {
-			// サスペンドユーザーはupdateできない。
+		if (![userSuspended, userDeletedBySelf, userDeletedByAdmin].includes(user())) {
+			// 無効化済みユーザーのハッシュタグはbeforeAllで設定する。
 			await successfulApiCall({ endpoint: 'i/update', parameters: { description: `#${hashtag}` }, user: user() });
 		}
 		const parameters = { tag: hashtag, limit: 100, sort: '-follower' } as const;
