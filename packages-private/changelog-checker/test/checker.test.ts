@@ -5,7 +5,7 @@
 
 import { expect, describe, test } from 'vitest';
 import { Release, ReleaseCategory } from '../src/parser.js';
-import { checkNewRelease, checkNewTopic } from '../src/checker.js';
+import { checkNewRelease, checkNewTopic, checkReleasePromotion } from '../src/checker.js';
 
 describe('checkNewRelease', () => {
 	test('headに新しいリリースがある1', () => {
@@ -501,5 +501,49 @@ describe('checkNewTopic', () => {
 		const result = checkNewTopic(base, head);
 
 		expect(result.success).toBe(true);
+	});
+});
+
+describe('checkReleasePromotion', () => {
+	const history = () => new Release('2026.9.0', [new ReleaseCategory('General', ['old entry'])]);
+	const base = () => [new Release('Unreleased', [new ReleaseCategory('General', ['new entry'])]), history()];
+	const head = () => [new Release('9000.0.0', [new ReleaseCategory('General', ['new entry', 'release entry'])]), history()];
+
+	test('公式 action の prerelease バージョンに一致する見出しを認める', () => {
+		expect(checkReleasePromotion(base(), head(), '9000.0.0-beta.0').success).toBe(true);
+		expect(checkReleasePromotion(base(), head(), '9000.0.0').success).toBe(true);
+	});
+
+	test('通常の追記としては見出し変更を認めない', () => {
+		expect(checkNewTopic(base(), head()).success).toBe(false);
+	});
+
+	test.each(['9000.0.1-beta.0', 'invalid', '9000.0.0junk'])('不一致または無効な manifest バージョン %s を拒否する', (version) => {
+		expect(checkReleasePromotion(base(), head(), version).success).toBe(false);
+	});
+
+	test('Unreleased 以外の見出し変更を拒否する', () => {
+		const changed = base();
+		changed[0] = new Release('2026.10.0');
+		expect(checkReleasePromotion(changed, head(), '9000.0.0-beta.0').success).toBe(false);
+	});
+
+	test('リリース数の変更を拒否する', () => {
+		expect(checkReleasePromotion(base(), head().slice(0, 1), '9000.0.0-beta.0').success).toBe(false);
+	});
+
+	test.each([
+		new Release('2026.8.0'),
+		new Release('2026.9.0', []),
+		new Release('2026.9.0', [new ReleaseCategory('Client', ['old entry'])]),
+		new Release('2026.9.0', [new ReleaseCategory('General', ['edited old entry'])]),
+	])('過去のバージョン・カテゴリ・項目の改変を拒否する (%j)', (oldRelease) => {
+		const changed = head();
+		changed[1] = oldRelease;
+		expect(checkReleasePromotion(base(), changed, '9000.0.0-beta.0').success).toBe(false);
+	});
+
+	test('空の履歴を拒否する', () => {
+		expect(checkReleasePromotion([], [], '9000.0.0-beta.0').success).toBe(false);
 	});
 });

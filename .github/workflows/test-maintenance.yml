@@ -67,6 +67,8 @@ jobs:
       - run: pnpm --filter 'backend^...' -r build
       - run: pnpm --filter backend typecheck
       - run: pnpm --filter backend lint:features
+      - name: Verify avatar decoration federation and public HTTPS side channel
+        run: pnpm --filter backend exec vitest --config vitest.config.unit.ts --run --maxWorkers=1 ../features/avatar-decorations/test/backend/remote-avatar-decorations.test.ts ../features/federation/test/backend/avatar-decoration-federation.test.ts ../features/runtime/test/backend/public-json.test.ts ../features/users/test/backend/native-user-projection.test.ts
       - run: pnpm --filter backend test:features
       - name: Verify synthetic wallet PostgreSQL transactions
         working-directory: packages/backend
