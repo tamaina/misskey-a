@@ -3,20 +3,42 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { toPackedReversiGameDetailed } from '../../backend/reversi.schema.js';
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { packedReversiGameDetailedSchema, packedReversiGameLiteSchema } from '../../contract/packed.js';
-import { packedReversiMatchInput, packedReversiMatchOutput, packedReversiMatchDefinition, packedReversiVerifyOutput, packedBubbleGameRankingOutput } from '../../contract/packed-endpoint-definitions.js';
-import { voidBubbleGameRegisterInput } from '../../contract/void-endpoint-definitions.js';
-import { emptyReversiInvitationsInput } from '../../contract/empty-input-endpoint-definitions.js';
+import { packedReversiGameDetailedSchema } from '../../backend/reversi.schema.js';
+import { packedReversiGameLiteSchema } from '../../backend/reversi.schema.js';
+import { reversiMatchContract } from '../../backend/endpoints/reversi/match.contract.js';
+
+import { reversiMatchContract as packedReversiMatchDefinition } from '../../backend/endpoints/reversi/match.contract.js';
+import { reversiVerifyContract } from '../../backend/endpoints/reversi/verify.contract.js';
+import { bubbleGameRankingContract } from '../../backend/endpoints/bubble-game/ranking.contract.js';
+import { bubbleGameRegisterContract } from '../../backend/endpoints/bubble-game/register.contract.js';
+import { reversiInvitationsContract } from '../../backend/endpoints/reversi/invitations.contract.js';
 import { ReversiGameEntityService } from '../../backend/serializers/ReversiGameEntityService.js';
-import { EndpointImplementation as RankingEndpoint } from '../../backend/endpoints/bubble-game/ranking.js';
-import { EndpointImplementation as VerifyEndpoint } from '../../backend/endpoints/reversi/verify.js';
-import type { MiReversiGame } from '../../backend/models/ReversiGame.js';
+import { createRouterClient } from '@orpc/server';
+import { createBubbleGameRankingProcedure } from '../../backend/endpoints/bubble-game/ranking.js';
+import type { BubbleGameRankingDependencies } from '../../backend/endpoints/bubble-game/ranking.js';
+import type { ApiContext, ApiServices } from '../../../api/backend/transport/context.js';
+import type { MiLocalUser } from '../../../users/backend/models/User.js';
+import { createReversiVerifyProcedure } from '../../backend/endpoints/reversi/verify.js';
+import type { ReversiVerifyDependencies } from '../../backend/endpoints/reversi/verify.js';
+import { MiReversiGame } from '../../backend/models/ReversiGame.js';
 import type { MiBubbleGameRecord } from '../../backend/models/BubbleGameRecord.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+const packedBubbleGameRankingOutput = requiredSchema(bubbleGameRankingContract['~orpc'].outputSchema);
+
+function requiredSchema<T>(schema: T | undefined): T {
+	if (schema === undefined) throw new Error('Expected contract schema');
+	return schema;
+}
+
+const packedReversiMatchInput = requiredSchema(reversiMatchContract['~orpc'].inputSchema);
+const packedReversiMatchOutput = requiredSchema(reversiMatchContract['~orpc'].outputSchema);
+const packedReversiVerifyOutput = requiredSchema(reversiVerifyContract['~orpc'].outputSchema);
+const voidBubbleGameRegisterInput = requiredSchema(bubbleGameRegisterContract['~orpc'].inputSchema);
+const emptyReversiInvitationsInput = requiredSchema(reversiInvitationsContract['~orpc'].inputSchema);
 
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
@@ -36,7 +58,7 @@ function fixture() {
 	const ids = mockDeep<ConstructorParameters<typeof ReversiGameEntityService>[2]>();
 	ids.parse.mockReturnValue({ date });
 	const service = new ReversiGameEntityService(mockDeep(), users, ids);
-	const game: MiReversiGame = mockDeep<MiReversiGame>({ id: 'game123', startedAt: null, endedAt: null, isStarted: false, isEnded: false, form1: null, form2: null, user1Ready: false, user2Ready: false, user1Id: user.id, user2Id: 'other123', user1: null, user2: null, winnerId: null, surrenderedUserId: null, timeoutUserId: null, black: null, bw: 'invalid', noIrregularRules: false, isLlotheo: false, canPutEverywhere: false, loopedBoard: false, timeLimitForEachTurn: 90, logs: [], map: ['--------'] });
+	const game: MiReversiGame = Object.assign(new MiReversiGame(), { id: 'game123', startedAt: null, endedAt: null, isStarted: false, isEnded: false, form1: null, form2: null, user1Ready: false, user2Ready: false, user1Id: user.id, user2Id: 'other123', user1: null, user2: null, winnerId: null, surrenderedUserId: null, timeoutUserId: null, black: null, bw: 'invalid', noIrregularRules: false, isLlotheo: false, canPutEverywhere: false, loopedBoard: false, timeLimitForEachTurn: 90, logs: [], map: ['--------'], crc32: null });
 	return { service, game };
 }
 
@@ -63,13 +85,12 @@ test('actual Reversi serializers retain nullable state, winner, surrender, timeo
 });
 
 // Establish each saved-form boundary independently; the other form stays null.
-// The retained loose object accepts arrays, while scalar forms fail native parsing.
-// The serializer continues to emit either saved value through the legacy HTTP path.
+// Saved forms are genuine JSON, including historical arrays and scalar values.
 test.each([
 	{ field: 'form1' as const, saved: [1, 'saved'], accepted: true },
 	{ field: 'form2' as const, saved: [1, 'saved'], accepted: true },
-	{ field: 'form1' as const, saved: 'saved scalar', accepted: false },
-	{ field: 'form2' as const, saved: 'saved scalar', accepted: false },
+	{ field: 'form1' as const, saved: 'saved scalar', accepted: true },
+	{ field: 'form2' as const, saved: 'saved scalar', accepted: true },
 ])('retained saved-form boundary for $field=$saved', async ({ field, saved, accepted }) => {
 	const { service, game } = fixture();
 	game[field] = saved;
@@ -82,27 +103,29 @@ test.each([
 
 test.each([false, true])('actual verify handler preserves desynced=%s variants', async desynced => {
 	const { service, game } = fixture();
-	const reversi = mockDeep<ConstructorParameters<typeof VerifyEndpoint>[0]>();
+	const reversi = mockDeep<ReversiVerifyDependencies['reversiService']>();
 	reversi.checkCrc.mockResolvedValue(desynced ? game : null);
-	const result = await new VerifyEndpoint(reversi, service).exec({ gameId: game.id, crc32: 'crc' }, null, null);
+	const client = createRouterClient({ verify: createReversiVerifyProcedure({ reversiService: reversi, reversiGameEntityService: service }) }, { context: anonymousContext() });
+	const result = await client.verify({ gameId: game.id, crc32: 'crc' });
 	expect(v.safeParse(packedReversiVerifyOutput, result).success).toBe(true);
 	expect(result.desynced).toBe(desynced);
 	checkClosed(packedReversiVerifyOutput, result, 'desynced', { desynced: 7 });
 });
 
 test.each([false, true])('actual ranking handler retains missing packed user=%s and closes wrapper', async missingUser => {
-	const records = mockDeep<ConstructorParameters<typeof RankingEndpoint>[0]>();
+	const records = mockDeep<BubbleGameRankingDependencies['bubbleGameRecordsRepository']>();
 	records.find.mockResolvedValue([mockDeep<MiBubbleGameRecord>({ id: 'record123', score: 9, user: mockDeep<MiUser>({ id: user.id }) })]);
-	const users = mockDeep<ConstructorParameters<typeof RankingEndpoint>[1]>();
+	const users = mockDeep<BubbleGameRankingDependencies['userEntityService']>();
 	users.packMany.mockResolvedValue(missingUser ? [] : [user]);
-	const result = await new RankingEndpoint(records, users).exec({ gameMode: 'normal' }, null, null);
+	const client = createRouterClient({ ranking: createBubbleGameRankingProcedure({ bubbleGameRecordsRepository: records, userEntityService: users }) }, { context: anonymousContext() });
+	const result = await client.ranking({ gameMode: 'normal' });
 	expect(v.safeParse(packedBubbleGameRankingOutput, result).success).toBe(true);
 	expect(result[0].user).toEqual(missingUser ? undefined : user);
 	expect(Object.hasOwn(result[0], 'user')).toBe(true);
 	for (const value of [{ ...result[0], future: true }, { score: 9 }, { ...result[0], score: '9' }]) expect(v.safeParse(packedBubbleGameRankingOutput, [value]).success).toBe(false);
 });
 
-test('native game defaults and constraints stay separate from open HTTP inputs and unparsed results', async () => {
+test('native game defaults, empty invitation JSON and finite responses retain wire semantics', async () => {
 	expect(v.parse(packedReversiMatchInput, { future: true })).toEqual({ noIrregularRules: false, multiple: false });
 	for (const value of [{ userId: 7 }, { multiple: null }]) expect(v.safeParse(packedReversiMatchInput, value).success).toBe(false);
 	const register = { score: 0, seed: 'seed', logs: [[1, 2]], gameMode: 'normal', gameVersion: 1 };
@@ -112,11 +135,27 @@ test('native game defaults and constraints stay separate from open HTTP inputs a
 	const { service, game } = fixture();
 	const response = { ...await service.packDetail(game), future: true };
 	const params = { future: true };
-	const projection = projectEndpointContract(packedReversiMatchDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(params).toEqual({ future: true, noIrregularRules: false, multiple: false });
 	expect(v.safeParse(packedReversiMatchOutput, response).success).toBe(false);
-	await expect(endpoint.exec({ multiple: 7 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/multiple/type' } });
+	expect(v.safeParse(packedReversiMatchInput, { multiple: 7 }).success).toBe(false);
+});
+
+function anonymousContext(): ApiContext<MiLocalUser> {
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([null, null]);
+	return { services, credential: null, headers: {}, ip: '127.0.0.1' };
+}
+
+test('Reversi DTO selection strips outer and nested producer secrets while retaining saved JSON', async () => {
+	const { service, game } = fixture();
+	game.form1 = { extension: ['retained', { constructor: 'business-value' }] };
+	const packed = await service.packDetail(game);
+	const producer = {
+		...packed, privateToken: 'outer-secret',
+		user1: { ...packed.user1, privateToken: 'nested-secret', email: 'private@example.test' },
+	};
+	const selected = toPackedReversiGameDetailed(producer);
+	expect(selected).not.toHaveProperty('privateToken');
+	expect(selected.user1).not.toHaveProperty('privateToken');
+	expect(selected.user1).not.toHaveProperty('email');
+	expect(selected.form1).toEqual(game.form1);
 });

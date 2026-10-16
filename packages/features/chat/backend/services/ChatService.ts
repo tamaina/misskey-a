@@ -22,7 +22,7 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { MiChatRoomInvitation } from '../models/ChatRoomInvitation.js';
-import { Packed } from '@features/index/contract/packed.js';
+import { Packed } from '@features/index/backend/packed.schema.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { emojiRegex } from '@features/emojis/backend/utility/emoji-regex.js';
@@ -354,11 +354,11 @@ export class ChatService {
 	}
 
 	@bindThis
-	public async hasPermissionToViewRoomTimeline(meId: MiUser['id'], room: MiChatRoom) {
+	public async hasPermissionToViewRoomTimeline(meId: MiUser['id'], room: MiChatRoom, fresh = false) {
 		if (await this.isRoomMember(room, meId)) {
 			return true;
 		} else {
-			const iAmModerator = await this.roleService.isModerator({ id: meId });
+			const iAmModerator = await this.roleService.isModerator({ id: meId }, fresh);
 			if (iAmModerator) {
 				return true;
 			}

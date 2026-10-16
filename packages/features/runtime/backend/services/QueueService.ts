@@ -3,23 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { reduceOccurrence } from '@features/mcp/backend/stream-catalog.js';
+import type { StreamOccurrence } from '@features/mcp/backend/stream-types.js';
+import { StreamQueueFullError, StreamQueueExpiredError } from '@features/mcp/backend/stream-queue-backend.js';
+import { STREAM_QUEUE_RETENTION_SECONDS, STREAM_QUEUE_MAX_AGE_MS } from '@features/mcp/backend/stream-queue-admission.js';
+import { toPackedJsonValue, type PackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { MetricsTime, type JobType } from 'bullmq';
 import type { IActivity } from '@features/federation/backend/protocol/type.js';
+import type { MiAnnouncement } from '@features/announcements/backend/models/Announcement.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiWebhook, WebhookEventTypes } from '@features/integrations/backend/models/Webhook.js';
 import type { MiSystemWebhook, SystemWebhookEventType } from '@features/integrations/backend/models/SystemWebhook.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '../decorators.js';
-import type { Antenna } from '@features/portability/backend/endpoints/i/import-antennas.js';
+import type { AntennaArtifact } from '@features/portability/backend/antenna-artifact.schema.js';
 import { ApRequestCreator } from '@features/federation/backend/services/ApRequestService.js';
 import { type SystemWebhookPayload } from '@features/integrations/backend/services/SystemWebhookService.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { type UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
 import type {
 	DbJobData,
+	ArchiveAnnouncementJobData,
 	DeliverJobData,
 	RelationshipJobData,
 	SystemWebhookDeliverJobData,
@@ -37,8 +44,10 @@ import type {
 	SystemQueue,
 	SystemWebhookDeliverQueue,
 	UserWebhookDeliverQueue,
+	McpAntennaDeliverQueue,
+	McpStreamDeliverQueue,
 } from '@features/boot/backend/assembly/QueueModule.js';
-import type httpSignature from '@peertube/http-signature';
+import type { ParsedSignature } from '@misskey-dev/node-http-message-signatures';
 import type * as Bull from 'bullmq';
 
 import { QUEUE_TYPES } from '../../shared/queue-types.js';
@@ -104,6 +113,8 @@ export class QueueService {
 		@Inject('queue:relationship') public relationshipQueue: RelationshipQueue,
 		@Inject('queue:objectStorage') public objectStorageQueue: ObjectStorageQueue,
 		@Inject('queue:userWebhookDeliver') public userWebhookDeliverQueue: UserWebhookDeliverQueue,
+		@Inject('queue:mcpStreamDeliver') public mcpStreamDeliverQueue: McpStreamDeliverQueue,
+		@Inject('queue:mcpAntennaDeliver') public mcpAntennaDeliverQueue: McpAntennaDeliverQueue,
 		@Inject('queue:systemWebhookDeliver') public systemWebhookDeliverQueue: SystemWebhookDeliverQueue,
 	) {
 		for (const def of REPEATABLE_SYSTEM_JOB_DEF) {
@@ -135,7 +146,7 @@ export class QueueService {
 	}
 
 	@bindThis
-	public deliver(user: ThinUser, content: IActivity | null, to: string | null, isSharedInbox: boolean) {
+	public deliver(user: ThinUser, content: IActivity | null, to: string | null, isSharedInbox: boolean, forceMainKey = false) {
 		if (content == null) return null;
 		if (to == null) return null;
 
@@ -150,6 +161,7 @@ export class QueueService {
 			digest,
 			to,
 			isSharedInbox,
+			forceMainKey,
 		};
 
 		const label = to.replace('https://', '').replace('/inbox', '');
@@ -178,8 +190,18 @@ export class QueueService {
 	 * @returns void
 	 */
 	@bindThis
-	public async deliverMany(user: ThinUser, content: IActivity | null, inboxes: Map<string, boolean>) {
+	public async deliverMany(user: ThinUser, content: IActivity | null, inboxes: Map<string, boolean>, forceMainKey = false) {
 		if (content == null) return null;
+		// Defend against nullable inboxes at runtime without mutating the caller's map.
+		const destinations = new Map<string, boolean>();
+		for (const [inbox, isSharedInbox] of inboxes) {
+			// Nullable legacy destinations can still reach this typed boundary at runtime.
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+			if (inbox === null) continue;
+			destinations.set(inbox, isSharedInbox);
+		}
+		if (destinations.size === 0) return null;
+
 		const contentBody = JSON.stringify(content);
 		const digest = ApRequestCreator.createDigest(contentBody);
 
@@ -198,7 +220,7 @@ export class QueueService {
 			},
 		};
 
-		await this.deliverQueue.addBulk(Array.from(inboxes.entries(), d => ({
+		await this.deliverQueue.addBulk(Array.from(destinations.entries(), d => ({
 			name: d[0].replace('https://', '').replace('/inbox', ''),
 			data: {
 				user,
@@ -206,6 +228,7 @@ export class QueueService {
 				digest,
 				to: d[0],
 				isSharedInbox: d[1],
+				forceMainKey,
 			} as DeliverJobData,
 			opts,
 		})));
@@ -214,7 +237,7 @@ export class QueueService {
 	}
 
 	@bindThis
-	public inbox(activity: IActivity, signature: httpSignature.IParsedSignature) {
+	public inbox(activity: IActivity, signature: ParsedSignature | null) {
 		const data = {
 			activity: activity,
 			signature,
@@ -236,6 +259,44 @@ export class QueueService {
 				count: 100,
 			},
 		});
+	}
+
+	private announcementArchiveJobId(announcementId: MiAnnouncement['id'], autoArchiveAt: Date): string {
+		return `archiveAnnouncement-${announcementId}-${autoArchiveAt.getTime()}`;
+	}
+
+	@bindThis
+	public async scheduleAnnouncementArchive(announcementId: MiAnnouncement['id'], autoArchiveAt: Date): Promise<void> {
+		const jobId = this.announcementArchiveJobId(announcementId, autoArchiveAt);
+		const existingJob = await this.systemQueue.getJob(jobId);
+		if (existingJob != null) {
+			const state = await existingJob.getState();
+			if (state !== 'completed' && state !== 'failed') return;
+			await this.systemQueue.remove(jobId);
+		}
+
+		const data: ArchiveAnnouncementJobData = {
+			announcementId,
+			autoArchiveAt: autoArchiveAt.getTime(),
+		};
+
+		await this.systemQueue.add('archiveAnnouncement', data, {
+			jobId,
+			delay: Math.max(0, autoArchiveAt.getTime() - Date.now()),
+			removeOnComplete: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 30,
+			},
+			removeOnFail: {
+				age: 3600 * 24 * 7, // keep up to 7 days
+				count: 100,
+			},
+		});
+	}
+
+	@bindThis
+	public async clearAnnouncementArchive(announcementId: MiAnnouncement['id'], autoArchiveAt: Date): Promise<void> {
+		await this.systemQueue.remove(this.announcementArchiveJobId(announcementId, autoArchiveAt));
 	}
 
 	@bindThis
@@ -521,7 +582,7 @@ export class QueueService {
 	}
 
 	@bindThis
-	public createImportAntennasJob(user: ThinUser, antenna: Antenna) {
+	public createImportAntennasJob(user: ThinUser, antenna: AntennaArtifact) {
 		return this.dbQueue.add('importAntennas', {
 			user: { id: user.id },
 			antenna,
@@ -654,6 +715,16 @@ export class QueueService {
 		content: UserWebhookPayload<T>,
 		opts?: { attempts?: number },
 	) {
+		if (webhook.mode === 'mcp') {
+			if ((type !== 'mention' && type !== 'reply') || !('note' in content) || !webhook.mcpGeneration
+				|| !webhook.mcpExpiresAt || new Date(webhook.mcpExpiresAt).getTime() <= Date.now()) return;
+			const eventId = createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, type, content.note.id])).digest('hex');
+			const data: UserWebhookDeliverJobData = { mode: 'mcp', type, webhookId: webhook.id, userId: webhook.userId,
+				generation: webhook.mcpGeneration, noteId: content.note.id, createdAt: new Date(content.note.createdAt).getTime(), eventId };
+			return this.userWebhookDeliverQueue.add(webhook.id, data, { jobId: eventId, attempts: 4,
+				backoff: { type: 'custom' }, removeOnComplete: { age: 86400, count: 1000 }, removeOnFail: { age: 86400, count: 1000 } });
+		}
+
 		const data: UserWebhookDeliverJobData = {
 			type,
 			content,
@@ -679,6 +750,34 @@ export class QueueService {
 				count: 100,
 			},
 		});
+	}
+
+	public async streamWebhookDeliver(webhook: MiWebhook, source: StreamOccurrence): Promise<'queued' | 'duplicate' | 'full' | 'inactive'> {
+		if (webhook.mode !== 'mcp' || !webhook.active || !webhook.mcpStream || !webhook.mcpGeneration
+			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now()) return 'inactive';
+		const reduced = reduceOccurrence(source);
+		const maxAge = /^statisticsStream:(serverStats|queueStats)$/.test(source.channel) ? 30000 : STREAM_QUEUE_MAX_AGE_MS;
+		if (!reduced || reduced.createdAt > Date.now() + 5000 || reduced.createdAt < Date.now() - maxAge) return 'inactive';
+		const eventId = 'stream-' + createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, reduced.id])).digest('hex');
+		if (await this.mcpStreamDeliverQueue.getJob(eventId)) return 'duplicate';
+		try {
+ await this.mcpStreamDeliverQueue.add(webhook.id, { webhookId: webhook.id, userId: webhook.userId,
+			generation: webhook.mcpGeneration, eventId, source: { id: reduced.id, createdAt: reduced.createdAt, channel: reduced.channel, message: reduced.message } }, { jobId: eventId, attempts: 4,
+			backoff: { type: 'custom' }, removeOnComplete: { age: STREAM_QUEUE_RETENTION_SECONDS },
+			removeOnFail: { age: STREAM_QUEUE_RETENTION_SECONDS } });
+		} catch (error) { if (error instanceof StreamQueueFullError) return 'full'; if (error instanceof StreamQueueExpiredError) return 'inactive'; throw error; }
+		return 'queued';
+	}
+
+	/** Isolated retention prevents legacy queue count cleanup evicting antenna IDs. */
+	public antennaWebhookDeliver(webhook: MiWebhook, antennaId: string, noteId: string, createdAt: number) {
+		if (webhook.mode !== 'mcp' || !webhook.active || webhook.mcpAntennaId !== antennaId || !webhook.mcpGeneration
+			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now()) return;
+		const eventId = createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, 'antenna', antennaId, noteId])).digest('hex');
+		const data: UserWebhookDeliverJobData = { mode: 'mcp', type: 'antenna', webhookId: webhook.id, userId: webhook.userId,
+			generation: webhook.mcpGeneration, antennaId, noteId, createdAt, eventId };
+		return this.mcpAntennaDeliverQueue.add(webhook.id, data, { jobId: eventId, attempts: 4,
+			backoff: { type: 'custom' }, removeOnComplete: { age: 86400 }, removeOnFail: { age: 86400 } });
 	}
 
 	/**
@@ -795,14 +894,14 @@ export class QueueService {
 	}
 
 	@bindThis
-	private redactJobData<T>(queueType: typeof QUEUE_TYPES[number], data: T): T {
-		// Webhookのsecret
-		if (queueType === 'userWebhookDeliver' || queueType === 'systemWebhookDeliver') {
-			if (typeof data === 'object' && data != null && 'secret' in data) {
-				return { ...data, secret: '(redacted)' } as T;
-			}
+	private redactJobData(queueType: typeof QUEUE_TYPES[number], data: unknown): PackedJsonValue {
+		// BullMQ has already decoded persisted JSON; validate every original business key.
+		const json = toPackedJsonValue(data);
+		if ((queueType === 'userWebhookDeliver' || queueType === 'systemWebhookDeliver')
+			&& json !== null && typeof json === 'object' && !Array.isArray(json) && Object.hasOwn(json, 'secret')) {
+			return { ...json, secret: '(redacted)' };
 		}
-		return data;
+		return json;
 	}
 
 	@bindThis
@@ -820,12 +919,12 @@ export class QueueService {
 			processedOn: job.processedOn,
 			processedBy: job.processedBy,
 			finishedOn: job.finishedOn,
-			progress: job.progress,
+			progress: toPackedJsonValue(job.progress),
 			attempts: job.attemptsMade,
 			delay: job.delay,
 			failedReason: job.failedReason,
 			stacktrace: stacktrace,
-			returnValue: job.returnvalue,
+			returnValue: job.returnvalue === undefined ? undefined : toPackedJsonValue(job.returnvalue),
 			isFailed: !!job.failedReason || (Array.isArray(stacktrace) && stacktrace.length > 0),
 		};
 	}

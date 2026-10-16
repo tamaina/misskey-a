@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		[$style.outerStyle]: !codeEditor && withOuterStyle,
 		[$style.dark]: darkMode,
 		[$style.light]: !darkMode,
-	}]" v-html="html"></div>
+	}]" :style="maxHeight != null ? { maxHeight: `${maxHeight}px`, overflow: 'auto' } : undefined" v-html="html"></div>
 </template>
 
 <script lang="ts" setup>
@@ -19,10 +19,13 @@ import { computed, ref, watch } from 'vue';
 import { bundledLanguagesInfo } from 'shiki/langs';
 import type { BundledLanguage } from 'shiki/langs';
 import { getHighlighter, getTheme } from '@features/markup/frontend/utility/code-highlighter.js';
+import { getCodeDiff, codeDiffTransformer } from '../utility/code-diff.js';
 import { store } from '@features/preferences/frontend/store.js';
 
 const props = withDefaults(defineProps<{
 	code: string;
+	diffBase?: string;
+	maxHeight?: number | null;
 	lang?: string;
 	codeEditor?: boolean;
 	withOuterStyle?: boolean;
@@ -40,8 +43,10 @@ const [lightThemeName, darkThemeName] = await Promise.all([
 	getTheme('dark', true),
 ]);
 
-const html = computed(() => highlighter.codeToHtml(props.code, {
-	lang: codeLang.value,
+const diffRows = computed(() => props.diffBase != null ? getCodeDiff(props.diffBase, props.code) : null);
+const html = computed(() => highlighter.codeToHtml(diffRows.value ? diffRows.value.map(row => row.text).join('\n') : props.code, {
+	transformers: diffRows.value ? [codeDiffTransformer(diffRows.value)] : [],
+	lang: diffRows.value && !props.lang ? 'text' : codeLang.value,
 	themes: {
 		fallback: 'dark-plus',
 		light: lightThemeName,
@@ -75,9 +80,7 @@ async function fetchLanguage(to: string): Promise<void> {
 
 watch(() => props.lang, (to) => {
 	if (codeLang.value === to || !to) return;
-	return new Promise((resolve) => {
-		fetchLanguage(to).then(() => resolve);
-	});
+	return fetchLanguage(to);
 }, { immediate: true });
 </script>
 
@@ -158,5 +161,22 @@ watch(() => props.lang, (to) => {
 			min-height: 1em;
 		}
 	}
+}
+
+.codeBlockRoot :global(.diff) {
+	display: inline-block;
+	width: 100%;
+	&:global(.add) { background: color-mix(in srgb, var(--MI_THEME-success) 18%, transparent); }
+	&:global(.remove) { background: color-mix(in srgb, var(--MI_THEME-error) 18%, transparent); }
+}
+
+.codeBlockRoot :global(.diff-sign) {
+	display: inline-block;
+	width: 1.5em;
+	user-select: none;
+}
+
+.codeBlockRoot :global(.diff-omit) {
+	opacity: 0.6;
 }
 </style>

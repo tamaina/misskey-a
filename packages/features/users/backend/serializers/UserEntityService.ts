@@ -5,12 +5,12 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
-import { Ajv } from 'ajv';
+import * as v from 'valibot';
 import { ModuleRef } from '@nestjs/core';
 import { In } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { NativeUserLite, NativeUserDetailedNotMe, NativeMeDetailed, NativeUserDetailed, NativePackedUser, UserPackSchema } from './native-user.js';
 import type { MiAnnouncement } from '@features/announcements/backend/models/Announcement.js';
 import type { MiUserSecurityKey } from '@features/auth/backend/models/UserSecurityKey.js';
@@ -25,7 +25,7 @@ import {
 	locationSchema,
 	nameSchema,
 	passwordSchema,
-} from '../models/User.js';
+} from '../user-validation.schema.js';
 import type {
 	BlockingsRepository,
 	FollowingsRepository,
@@ -50,13 +50,12 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
 import type { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
+import { packRemoteAvatarDecorations } from '@features/avatar-decorations/backend/remote-avatar-decorations.js';
 import { ChatService } from '@features/chat/backend/services/ChatService.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { PageEntityService } from '@features/pages/backend/serializers/PageEntityService.js';
 import { toArray } from '@features/runtime/backend/data/array.js';
-
-const ajv = new Ajv();
 
 function isLocalUser(user: MiUser): user is MiLocalUser;
 function isLocalUser<T extends { host: MiUser['host'] }>(user: T): user is (T & { host: null; });
@@ -70,6 +69,10 @@ function isRemoteUser<T extends { host: MiUser['host'] }>(user: T): user is (T &
 
 function isRemoteUser(user: MiUser | { host: MiUser['host'] }): boolean {
 	return !isLocalUser(user);
+}
+
+function isSuspendedEither(user: Pick<MiUser, 'isSuspended' | 'isRemoteSuspended'>): boolean {
+	return user.isSuspended || user.isRemoteSuspended;
 }
 
 export type UserRelation = {
@@ -164,16 +167,17 @@ export class UserEntityService implements OnModuleInit {
 	}
 
 	//#region Validators
-	public validateLocalUsername = ajv.compile(localUsernameSchema);
-	public validatePassword = ajv.compile(passwordSchema);
-	public validateName = ajv.compile(nameSchema);
-	public validateDescription = ajv.compile(descriptionSchema);
-	public validateLocation = ajv.compile(locationSchema);
-	public validateBirthday = ajv.compile(birthdaySchema);
+	public validateLocalUsername = (value: unknown): boolean => v.safeParse(localUsernameSchema, value).success;
+	public validatePassword = (value: unknown): boolean => v.safeParse(passwordSchema, value).success;
+	public validateName = (value: unknown): boolean => v.safeParse(nameSchema, value).success;
+	public validateDescription = (value: unknown): boolean => v.safeParse(descriptionSchema, value).success;
+	public validateLocation = (value: unknown): boolean => v.safeParse(locationSchema, value).success;
+	public validateBirthday = (value: unknown): boolean => v.safeParse(birthdaySchema, value).success;
 	//#endregion
 
 	public isLocalUser = isLocalUser;
 	public isRemoteUser = isRemoteUser;
+	public isSuspendedEither = isSuspendedEither;
 
 	@bindThis
 	public async getRelation(me: MiUser['id'], target: MiUser['id']): Promise<UserRelation> {
@@ -496,7 +500,11 @@ export class UserEntityService implements OnModuleInit {
 		const unreadAnnouncements = isMe && isDetailed ?
 			(await this.announcementService.getUnreadAnnouncements(user)).map((announcement: Omit<MiAnnouncement, 'user'>) => ({
 				createdAt: this.idService.parse(announcement.id).date.toISOString(),
-				...announcement,
+				id: announcement.id, updatedAt: announcement.updatedAt,
+				title: announcement.title, text: announcement.text, imageUrl: announcement.imageUrl,
+				icon: announcement.icon, display: announcement.display,
+				needConfirmationToRead: announcement.needConfirmationToRead, silence: announcement.silence,
+				isActive: announcement.isActive, forExistingUsers: announcement.forExistingUsers, userId: announcement.userId,
 			})) : null;
 
 		const notificationsInfo = isMe && isDetailed ? await this.getNotificationsInfo(user.id) : null;
@@ -508,7 +516,7 @@ export class UserEntityService implements OnModuleInit {
 			host: user.host,
 			avatarUrl: (user.avatarId == null ? null : user.avatarUrl) ?? this.getIdenticonUrl(user),
 			avatarBlurhash: (user.avatarId == null ? null : user.avatarBlurhash),
-			avatarDecorations: user.avatarDecorations.length > 0 ? this.avatarDecorationService.getAll().then(decorations => user.avatarDecorations.filter(ud => decorations.some(d => d.id === ud.id)).map(ud => ({
+			avatarDecorations: user.host != null ? packRemoteAvatarDecorations(user.avatarDecorations, this.config.mediaProxy) : user.avatarDecorations.length > 0 ? this.avatarDecorationService.getAll().then(decorations => user.avatarDecorations.filter(ud => decorations.some(d => d.id === ud.id)).map(ud => ({
 				id: ud.id,
 				angle: ud.angle || undefined,
 				flipH: ud.flipH || undefined,
@@ -561,7 +569,7 @@ export class UserEntityService implements OnModuleInit {
 			bannerBlurhash: user.bannerId == null ? null : user.bannerBlurhash,
 			isLocked: user.isLocked,
 			isSilenced: this.roleService.getUserPolicies(user.id).then(r => !r.canPublicNote),
-			isSuspended: user.isSuspended,
+			isSuspended: this.isSuspendedEither(user),
 			description: profile!.description,
 			location: profile!.location,
 			birthday: profile!.birthday,
@@ -637,6 +645,8 @@ export class UserEntityService implements OnModuleInit {
 			autoSensitive: profile!.autoSensitive,
 			carefulBot: profile!.carefulBot,
 			autoAcceptFollowed: profile!.autoAcceptFollowed,
+			followApprovalLocalSeconds: profile!.followApprovalLocalSeconds,
+			followApprovalRemoteSeconds: profile!.followApprovalRemoteSeconds,
 			noCrawle: profile!.noCrawle,
 			preventAiLearning: profile!.preventAiLearning,
 			isExplorable: user.isExplorable,

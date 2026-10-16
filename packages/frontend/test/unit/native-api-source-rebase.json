@@ -1,0 +1,650 @@
+[
+  {
+    "file": "packages/features/auth/frontend/accounts.ts",
+    "baselineBodySha256": "4610675c7d9e18afc56bc2ed4f2411cfeda46c29c475787b63e32767b9f4d1e1",
+    "currentBodySha256": "73914465c9a4e48be220736702fb56ce6f21e7d22c848a532e571796f0920488",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 4597,
+        "end": 5415,
+        "current": "/** Retain the trusted live account proxy behind the native DTO type. */\nfunction getCurrentAccountInfo(): Misskey.entities.MeDetailed | null {\n\tif (!$i) return null;\n\tconst accounts: Record<string, Misskey.entities.MeDetailed> = {};\n\t// Keep the trusted live proxy while avoiding a recursive Vue UnwrapRef\n\t// comparison with the portable DTO's persisted JSON fields.\n\tconst account: unknown = $i;\n\tReflect.set(accounts, $i.id, account);\n\treturn accounts[$i.id];\n}\n\nfunction persistCurrentAccountInfo() {\n\tif (!$i) return;\n\tconst accountInfos: Record<string, Misskey.entities.MeDetailed> = {};\n\tfor (const [key, value] of Object.entries(store.s.accountInfos)) Reflect.set(accountInfos, key, value);\n\tReflect.set(accountInfos, host + '/' + $i.id, getCurrentAccountInfo());\n\tstore.set('accountInfos', accountInfos);\n}\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 5579,
+        "end": 5587,
+        "current": "Reflect.",
+        "baseline": ""
+      },
+      {
+        "start": 5593,
+        "end": 5602,
+        "current": "Property(",
+        "baseline": " "
+      },
+      {
+        "start": 5604,
+        "end": 5605,
+        "current": ",",
+        "baseline": "[key as"
+      },
+      {
+        "start": 5609,
+        "end": 5610,
+        "current": ")",
+        "baseline": "of typeof $i]"
+      },
+      {
+        "start": 5676,
+        "end": 5687,
+        "current": "Reflect.set",
+        "baseline": ""
+      },
+      {
+        "start": 5690,
+        "end": 5691,
+        "current": ",",
+        "baseline": "[key as"
+      },
+      {
+        "start": 5695,
+        "end": 5696,
+        "current": ",",
+        "baseline": "of typeof accountData] as any) ="
+      },
+      {
+        "start": 5702,
+        "end": 5703,
+        "current": ")",
+        "baseline": ""
+      },
+      {
+        "start": 5709,
+        "end": 5714,
+        "current": "persi",
+        "baseline": ""
+      },
+      {
+        "start": 5716,
+        "end": 5719,
+        "current": "Cur",
+        "baseline": "o"
+      },
+      {
+        "start": 5721,
+        "end": 5722,
+        "current": "n",
+        "baseline": ".se"
+      },
+      {
+        "start": 5723,
+        "end": 5724,
+        "current": "A",
+        "baseline": "('a"
+      },
+      {
+        "start": 5734,
+        "end": 5735,
+        "current": "(",
+        "baseline": "s', { ...store.s.accountInfos, [host + '/' + $i.id]: $i }"
+      },
+      {
+        "start": 5992,
+        "end": 6003,
+        "current": "Reflect.set",
+        "baseline": ""
+      },
+      {
+        "start": 6006,
+        "end": 6007,
+        "current": ",",
+        "baseline": "[key as"
+      },
+      {
+        "start": 6011,
+        "end": 6012,
+        "current": ",",
+        "baseline": "of typeof accountData] as any) ="
+      },
+      {
+        "start": 6018,
+        "end": 6019,
+        "current": ")",
+        "baseline": ""
+      },
+      {
+        "start": 6026,
+        "end": 6031,
+        "current": "persi",
+        "baseline": ""
+      },
+      {
+        "start": 6033,
+        "end": 6036,
+        "current": "Cur",
+        "baseline": "o"
+      },
+      {
+        "start": 6038,
+        "end": 6039,
+        "current": "n",
+        "baseline": ".se"
+      },
+      {
+        "start": 6040,
+        "end": 6041,
+        "current": "A",
+        "baseline": "('a"
+      },
+      {
+        "start": 6051,
+        "end": 6052,
+        "current": "(",
+        "baseline": "s', { ...store.s.accountInfos, [host + '/' + $i.id]: $i }"
+      },
+      {
+        "start": 8211,
+        "end": 8213,
+        "current": "Us",
+        "baseline": "M"
+      },
+      {
+        "start": 8214,
+        "end": 8218,
+        "current": "rLit",
+        "baseline": "D"
+      },
+      {
+        "start": 8219,
+        "end": 8219,
+        "current": "",
+        "baseline": "tailed"
+      },
+      {
+        "start": 8260,
+        "end": 8290,
+        "current": ", onChooseAccount?: () => void",
+        "baseline": ""
+      },
+      {
+        "start": 8494,
+        "end": 8503,
+        "current": "onChooseA",
+        "baseline": "callback(a"
+      },
+      {
+        "start": 8509,
+        "end": 8512,
+        "current": "?.(",
+        "baseline": ""
+      },
+      {
+        "start": 9928,
+        "end": 9965,
+        "current": "{\n\t\tconst account = a.user;\n\t\treturn ",
+        "baseline": ""
+      },
+      {
+        "start": 10003,
+        "end": 10006,
+        "current": "cco",
+        "baseline": "."
+      },
+      {
+        "start": 10007,
+        "end": 10009,
+        "current": "nt",
+        "baseline": "ser"
+      },
+      {
+        "start": 10018,
+        "end": 10043,
+        "current": ", account && callback ? (",
+        "baseline": ""
+      },
+      {
+        "start": 10044,
+        "end": 10064,
+        "current": " => callback(account",
+        "baseline": ""
+      },
+      {
+        "start": 10065,
+        "end": 10253,
+        "current": " : undefined);\n\t});\n\tconst currentAccount = callback ? getCurrentAccountInfo() : null;\n\tconst chooseCurrentAccount = currentAccount && callback ? () => callback(currentAccount) : undefined",
+        "baseline": ""
+      },
+      {
+        "start": 10551,
+        "end": 10573,
+        "current": ", chooseCurrentAccount",
+        "baseline": ""
+      },
+      {
+        "start": 11412,
+        "end": 11434,
+        "current": ", chooseCurrentAccount",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/instance/frontend/pages/admin/branding.vue",
+    "baselineBodySha256": "6ebb62db1ce1fda4d7969637ec04dddac3f3302d6423003e768b07e50328395b",
+    "currentBodySha256": "39cf2eda08fc350be7a38d7711cbec1e98ccf77f1baf82ad276a8fbbb0f8b622",
+    "localeBlocksSha256": "19fe2256c4fa250277ed8eab4075fd9b7be7d2a0f4002a6a95e6ceab53b19740",
+    "edits": [
+      {
+        "start": 7647,
+        "end": 7647,
+        "current": "",
+        "baseline": "// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\n"
+      },
+      {
+        "start": 7676,
+        "end": 7688,
+        "current": "<NonNullable",
+        "baseline": ""
+      },
+      {
+        "start": 7745,
+        "end": 7746,
+        "current": ">",
+        "baseline": ""
+      },
+      {
+        "start": 7799,
+        "end": 7799,
+        "current": "",
+        "baseline": "// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\n"
+      },
+      {
+        "start": 7834,
+        "end": 7838,
+        "current": "bool",
+        "baseline": "Missk"
+      },
+      {
+        "start": 7839,
+        "end": 7840,
+        "current": "a",
+        "baseline": "y.e"
+      },
+      {
+        "start": 7841,
+        "end": 7841,
+        "current": "",
+        "baseline": "tities.MetaClientOptions['showTimelineForVisitor']"
+      },
+      {
+        "start": 7895,
+        "end": 7895,
+        "current": "",
+        "baseline": "// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition\n"
+      },
+      {
+        "start": 7932,
+        "end": 7936,
+        "current": "bool",
+        "baseline": "Missk"
+      },
+      {
+        "start": 7937,
+        "end": 7938,
+        "current": "a",
+        "baseline": "y.e"
+      },
+      {
+        "start": 7939,
+        "end": 7939,
+        "current": "",
+        "baseline": "tities.MetaClientOptions['showActivitiesForVisitor']"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/pages/registry.vue",
+    "baselineBodySha256": "886c1d0a7539b6c22ad4571be2999565692c1390899913dfed2829ccdcad00de",
+    "currentBodySha256": "c3fc8e89615ede121de40dd4c13942f20c333ab634bb9737222471eb627f145c",
+    "localeBlocksSha256": "338c1c8b0c0ba98229c06656a3655866bc0b9982b37c0ba56e61963f15bf90a2",
+    "edits": [
+      {
+        "start": 987,
+        "end": 1102,
+        "current": "';\nimport * as v from 'valibot';\nimport { packedJsonValueSchema } from '../../../users/backend/json-value.schema.js",
+        "baseline": ""
+      },
+      {
+        "start": 2199,
+        "end": 2230,
+        "current": "v.parse(packedJsonValueSchema, ",
+        "baseline": ""
+      },
+      {
+        "start": 2254,
+        "end": 2255,
+        "current": ")",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/pages/registry.keys.vue",
+    "baselineBodySha256": "f92918863c4d9d419cddd8e8c48ecc282828f636478ae946c50d7aecbcb0bd83",
+    "currentBodySha256": "e7b390ff0be094bec5539b57b6290cb13a375e187bfa3c6eb1fb8a7bbd1d04f8",
+    "localeBlocksSha256": "e0551e6a8f5525b2e6bf9576218cc8603fc795fe9f9ba4c5e70a1b9e083b4022",
+    "edits": [
+      {
+        "start": 1212,
+        "end": 1327,
+        "current": "';\nimport * as v from 'valibot';\nimport { packedJsonValueSchema } from '../../../users/backend/json-value.schema.js",
+        "baseline": ""
+      },
+      {
+        "start": 2813,
+        "end": 2844,
+        "current": "v.parse(packedJsonValueSchema, ",
+        "baseline": ""
+      },
+      {
+        "start": 2868,
+        "end": 2869,
+        "current": ")",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/pages/registry.value.vue",
+    "baselineBodySha256": "d3e79572e32d23f85d1843bf7385e590e7af20842f237acff77c297df74c353c",
+    "currentBodySha256": "d7a39a2dd2045883539742b876280ffc0a76164aa6a147a95382032d3c01c804",
+    "localeBlocksSha256": "7c040c692128612d21bf720110b5020cb918c71b3f2a72023f4a94fe44dbae64",
+    "edits": [
+      {
+        "start": 1597,
+        "end": 1712,
+        "current": "v from 'valibot';\nimport { packedJsonValueSchema } from '../../../users/backend/json-value.schema.js';\nimport * as ",
+        "baseline": ""
+      },
+      {
+        "start": 2829,
+        "end": 2860,
+        "current": "v.parse(packedJsonValueSchema, ",
+        "baseline": ""
+      },
+      {
+        "start": 2892,
+        "end": 2893,
+        "current": ")",
+        "baseline": ""
+      },
+      {
+        "start": 3220,
+        "end": 3251,
+        "current": "v.parse(packedJsonValueSchema, ",
+        "baseline": ""
+      },
+      {
+        "start": 3283,
+        "end": 3284,
+        "current": ")",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/roles/frontend/pages/admin/RolesEditorFormula.vue",
+    "baselineBodySha256": "70a311893b2bf55c8b411122b47fbcbd8a73071b402a8ff5ec62b10f1a561f1e",
+    "currentBodySha256": "7bcb4553ee0d0f59c61c4397e95f078d4f38fb082ad1f1dc02b15bedfd8da9af",
+    "localeBlocksSha256": "9f8d0e20005dc90f0474fb51e505ecf95b8fbd83abd23d59b9f4e0baa37a7514",
+    "edits": [
+      {
+        "start": 2528,
+        "end": 2537,
+        "current": "initializ",
+        "baseline": "d"
+      },
+      {
+        "start": 2538,
+        "end": 2541,
+        "current": "Rol",
+        "baseline": ""
+      },
+      {
+        "start": 2542,
+        "end": 2547,
+        "current": "Formu",
+        "baseline": "pC"
+      },
+      {
+        "start": 2548,
+        "end": 2549,
+        "current": "a",
+        "baseline": "one"
+      },
+      {
+        "start": 2558,
+        "end": 2559,
+        "current": ".",
+        "baseline": "@features"
+      },
+      {
+        "start": 2561,
+        "end": 2569,
+        "current": "ole-form",
+        "baseline": ""
+      },
+      {
+        "start": 2570,
+        "end": 2576,
+        "current": "la-edi",
+        "baseline": "n"
+      },
+      {
+        "start": 2577,
+        "end": 2585,
+        "current": "or.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 2587,
+        "end": 2595,
+        "current": "port typ",
+        "baseline": ""
+      },
+      {
+        "start": 2596,
+        "end": 2621,
+        "current": " { EditableRoleFormula } ",
+        "baseline": "/"
+      },
+      {
+        "start": 2624,
+        "end": 2632,
+        "current": "m './rol",
+        "baseline": "nt"
+      },
+      {
+        "start": 2633,
+        "end": 2643,
+        "current": "-formula-e",
+        "baseline": "n"
+      },
+      {
+        "start": 2644,
+        "end": 2644,
+        "current": "",
+        "baseline": "/util"
+      },
+      {
+        "start": 2646,
+        "end": 2646,
+        "current": "",
+        "baseline": "y/cl"
+      },
+      {
+        "start": 2647,
+        "end": 2648,
+        "current": "r",
+        "baseline": "ne"
+      },
+      {
+        "start": 2782,
+        "end": 2784,
+        "current": "Ed",
+        "baseline": "Misskey.ent"
+      },
+      {
+        "start": 2786,
+        "end": 2789,
+        "current": "abl",
+        "baseline": "i"
+      },
+      {
+        "start": 2790,
+        "end": 2790,
+        "current": "",
+        "baseline": "s."
+      },
+      {
+        "start": 2794,
+        "end": 2794,
+        "current": "",
+        "baseline": "['cond"
+      },
+      {
+        "start": 2801,
+        "end": 2801,
+        "current": "",
+        "baseline": "']"
+      },
+      {
+        "start": 3007,
+        "end": 3028,
+        "current": "<EditableRoleFormula>",
+        "baseline": ""
+      },
+      {
+        "start": 3029,
+        "end": 3038,
+        "current": "initializ",
+        "baseline": "d"
+      },
+      {
+        "start": 3039,
+        "end": 3042,
+        "current": "Rol",
+        "baseline": ""
+      },
+      {
+        "start": 3043,
+        "end": 3048,
+        "current": "Formu",
+        "baseline": "pC"
+      },
+      {
+        "start": 3049,
+        "end": 3050,
+        "current": "a",
+        "baseline": "one"
+      },
+      {
+        "start": 3067,
+        "end": 3074,
+        "current": ", genId",
+        "baseline": ""
+      },
+      {
+        "start": 3244,
+        "end": 3253,
+        "current": "initializ",
+        "baseline": "d"
+      },
+      {
+        "start": 3254,
+        "end": 3257,
+        "current": "Rol",
+        "baseline": ""
+      },
+      {
+        "start": 3258,
+        "end": 3263,
+        "current": "Formu",
+        "baseline": "pC"
+      },
+      {
+        "start": 3264,
+        "end": 3265,
+        "current": "a",
+        "baseline": "one"
+      },
+      {
+        "start": 3282,
+        "end": 3289,
+        "current": ", genId",
+        "baseline": ""
+      },
+      {
+        "start": 5015,
+        "end": 5017,
+        "current": "Ed",
+        "baseline": "Misskey.ent"
+      },
+      {
+        "start": 5019,
+        "end": 5022,
+        "current": "abl",
+        "baseline": "i"
+      },
+      {
+        "start": 5023,
+        "end": 5023,
+        "current": "",
+        "baseline": "s."
+      },
+      {
+        "start": 5027,
+        "end": 5027,
+        "current": "",
+        "baseline": "['cond"
+      },
+      {
+        "start": 5034,
+        "end": 5034,
+        "current": "",
+        "baseline": "']"
+      },
+      {
+        "start": 6531,
+        "end": 6533,
+        "current": "Ed",
+        "baseline": "Misskey.ent"
+      },
+      {
+        "start": 6535,
+        "end": 6538,
+        "current": "abl",
+        "baseline": "i"
+      },
+      {
+        "start": 6539,
+        "end": 6539,
+        "current": "",
+        "baseline": "s."
+      },
+      {
+        "start": 6543,
+        "end": 6543,
+        "current": "",
+        "baseline": "['cond"
+      },
+      {
+        "start": 6550,
+        "end": 6550,
+        "current": "",
+        "baseline": "']"
+      }
+    ]
+  }
+]

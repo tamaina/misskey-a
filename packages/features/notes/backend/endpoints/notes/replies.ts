@@ -2,52 +2,41 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesRepliesDefinition, packedNotesRepliesInput, packedNotesRepliesOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
 
 import { QueryService } from '../../services/QueryService.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { notesRepliesContract } from './replies.contract.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 
-const contractProjection = projectEndpointContract(packedNotesRepliesDefinition);
+export interface NotesRepliesDependencies {
+	notesRepository: NotesRepository;
+	noteEntityService: Pick<NoteEntityService, 'packMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery' | 'generateVisibilityQuery' | 'generateBaseNoteFilteringQuery'>;
+}
+export function createNotesRepliesProcedure(deps: NotesRepliesDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesRepliesContract).handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
 
-export const meta = {
-	tags: ['notes'],
+					const query = deps.queryService.makePaginationQuery(deps.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+						.andWhere('note.replyId = :replyId', { replyId: ps.noteId })
+						.innerJoinAndSelect('note.user', 'user')
+						.leftJoinAndSelect('note.reply', 'reply')
+						.leftJoinAndSelect('note.renote', 'renote')
+						.leftJoinAndSelect('reply.user', 'replyUser')
+						.leftJoinAndSelect('renote.user', 'renoteUser');
 
-	requireCredential: false,
+					deps.queryService.generateVisibilityQuery(query, me);
+					deps.queryService.generateBaseNoteFilteringQuery(query, me);
 
-	res: contractProjection.response,
-} as const;
+					const timeline = await query.limit(ps.limit).getMany();
 
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesRepliesInput, typeof packedNotesRepliesOutput> {
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		private noteEntityService: NoteEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('note.replyId = :replyId', { replyId: ps.noteId })
-				.innerJoinAndSelect('note.user', 'user')
-				.leftJoinAndSelect('note.reply', 'reply')
-				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser')
-				.leftJoinAndSelect('renote.user', 'renoteUser');
-
-			this.queryService.generateVisibilityQuery(query, me);
-			this.queryService.generateBaseNoteFilteringQuery(query, me);
-
-			const timeline = await query.limit(ps.limit).getMany();
-
-			return await this.noteEntityService.packMany(timeline, me);
+					return await deps.noteEntityService.packMany(timeline, me);
+			})();
+			return result.map(toPackedNote);
 		});
-	}
 }

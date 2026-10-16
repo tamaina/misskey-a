@@ -5,18 +5,12 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createPortabilityImportCommands, legacyPortabilityImportSchemas } from '../../../backend/built/features/portability/backend.js';
+import * as v from 'valibot';
+import { createRouterClient } from '@orpc/server';
+import { createPortabilityRouter, portabilityApiContract } from '../../../backend/built/features/portability/backend.js';
 
-const actor = { id: 'trusted123', data: 'kept' };
+const actor = { id: 'trusted123', data: 'kept', isSuspended: false, movedToUri: null };
 const file = { id: 'file123', size: 12, url: 'https://example.test/file' };
-
-function makeError(definition) {
-	const error = new Error(definition.message);
-	error.definition = definition;
-	error.code = definition.code;
-	error.id = definition.id;
-	return error;
-}
 
 function createFixture(overrides = {}) {
 	const calls = [];
@@ -32,26 +26,20 @@ function createFixture(overrides = {}) {
 		createImportFollowingJob: (...args) => { calls.push(['createImportFollowingJob', ...args]); },
 		createImportMutingJob: (...args) => { calls.push(['createImportMutingJob', ...args]); },
 		createImportUserListsJob: (...args) => { calls.push(['createImportUserListsJob', ...args]); },
-		createError: makeError,
 		...overrides,
 	};
-	return { calls, feature: createPortabilityImportCommands(deps) };
+	return { calls, feature: createPortabilityRouter(deps) };
 }
 
-function invoke(feature, route, input = { fileId: file.id }, trustedActor = actor) {
-	return feature[route](input, { context: trustedActor === undefined ? undefined : { actor: trustedActor } });
+async function invoke(feature, route, input = { fileId: file.id }, trustedActor = actor) {
+	const client = createRouterClient(feature, { context: nativeContext(trustedActor) });
+	return client[route](input);
 }
 
-test('legacy import schemas retain misskey IDs, optional withReplies and loose extra properties', () => {
-	const id = { type: 'string', format: 'misskey:id' };
-	for (const route of ['i/import-antennas', 'i/import-blocking', 'i/import-muting', 'i/import-user-lists']) {
-		assert.deepEqual(legacyPortabilityImportSchemas[route].input, {
-			type: 'object', properties: { fileId: id }, required: ['fileId'],
-		});
-	}
-	assert.deepEqual(legacyPortabilityImportSchemas['i/import-following'].input, {
-		type: 'object', properties: { fileId: id, withReplies: { type: 'boolean' } }, required: ['fileId'],
-	});
+test('native import schemas retain misskey IDs and optional withReplies', () => {
+	const following = portabilityApiContract['i/import-following']['~orpc'].inputSchema;
+	assert.deepEqual(v.parse(following, { fileId: file.id, future: true }), { fileId: file.id });
+	assert.equal(v.safeParse(following, { fileId: file.id, withReplies: 'bad' }).success, false);
 });
 
 test('portability contract validates file IDs and optional booleans before any import side effects', async () => {
@@ -125,3 +113,10 @@ test('empty/missing files stop before move validation or queueing; antenna cap i
 	await assert.rejects(invoke(atLimit.feature, 'i/import-antennas'), error => error.code === 'TOO_MANY_ANTENNAS');
 	assert.equal(atLimit.calls.some(([method]) => method === 'createImportAntennasJob'), false);
 });
+
+function nativeContext(actor) {
+	return { credential: 'credential', ip: '192.0.2.1', headers: {},
+		services: { authenticate: async () => [actor, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
+		authorization: { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => true },
+	};
+}

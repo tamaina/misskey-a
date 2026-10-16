@@ -1,0 +1,1278 @@
+{
+	"baseline": "1c0eb2a60698fa76fe5cb3b37ca45ca6e560d88d",
+	"file": "packages/features/instance/frontend/pages/admin/email-settings.vue",
+	"sourceSha256": "5dcb7bb266fb43d3997b9f62dfe7386479da127d599d12926f1dacb611b87304",
+	"originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<PageWithHeader :tabs=\"headerTabs\">\n\t<div class=\"_spacer\" style=\"--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;\">\n\t\t<SearchMarker path=\"/admin/email-settings\" :label=\"$locale.sfc.emailServer\" :keywords=\"['email']\" icon=\"ti ti-mail\">\n\t\t\t<div class=\"_gaps_m\">\n\t\t\t\t<SearchMarker>\n\t\t\t\t\t<MkSwitch v-model=\"enableEmail\">\n\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.enableEmail }}</SearchLabel> ({{ $locale.sfc.recommended }})</template>\n\t\t\t\t\t\t<template #caption><SearchText>{{ $locale.sfc.emailConfigInfo }}</SearchText></template>\n\t\t\t\t\t</MkSwitch>\n\t\t\t\t</SearchMarker>\n\n\t\t\t\t<template v-if=\"enableEmail\">\n\t\t\t\t\t<SearchMarker>\n\t\t\t\t\t\t<MkInput v-model=\"email\" type=\"email\">\n\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.emailAddress }}</SearchLabel></template>\n\t\t\t\t\t\t</MkInput>\n\t\t\t\t\t</SearchMarker>\n\n\t\t\t\t\t<SearchMarker>\n\t\t\t\t\t\t<FormSection>\n\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.smtpConfig }}</SearchLabel></template>\n\n\t\t\t\t\t\t\t<div class=\"_gaps_m\">\n\t\t\t\t\t\t\t\t<FormSplit :minWidth=\"280\">\n\t\t\t\t\t\t\t\t\t<SearchMarker>\n\t\t\t\t\t\t\t\t\t\t<MkInput v-model=\"smtpHost\">\n\t\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.smtpHost }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t\t</MkInput>\n\t\t\t\t\t\t\t\t\t</SearchMarker>\n\t\t\t\t\t\t\t\t\t<SearchMarker>\n\t\t\t\t\t\t\t\t\t\t<MkInput v-model=\"smtpPort\" type=\"number\">\n\t\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.smtpPort }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t\t</MkInput>\n\t\t\t\t\t\t\t\t\t</SearchMarker>\n\t\t\t\t\t\t\t\t</FormSplit>\n\n\t\t\t\t\t\t\t\t<FormSplit :minWidth=\"280\">\n\t\t\t\t\t\t\t\t\t<SearchMarker>\n\t\t\t\t\t\t\t\t\t\t<MkInput v-model=\"smtpUser\">\n\t\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.smtpUser }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t\t</MkInput>\n\t\t\t\t\t\t\t\t\t</SearchMarker>\n\t\t\t\t\t\t\t\t\t<SearchMarker>\n\t\t\t\t\t\t\t\t\t\t<MkInput v-model=\"smtpPass\" type=\"password\" autocomplete=\"new-password\">\n\t\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.smtpPass }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t\t</MkInput>\n\t\t\t\t\t\t\t\t\t</SearchMarker>\n\t\t\t\t\t\t\t\t</FormSplit>\n\n\t\t\t\t\t\t\t\t<FormInfo>{{ $locale.sfc.emptyToDisableSmtpAuth }}</FormInfo>\n\n\t\t\t\t\t\t\t\t<SearchMarker>\n\t\t\t\t\t\t\t\t\t<MkSwitch v-model=\"smtpSecure\">\n\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.smtpSecure }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t\t<template #caption><SearchText>{{ $locale.sfc.smtpSecureInfo }}</SearchText></template>\n\t\t\t\t\t\t\t\t\t</MkSwitch>\n\t\t\t\t\t\t\t\t</SearchMarker>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</FormSection>\n\t\t\t\t\t</SearchMarker>\n\t\t\t\t</template>\n\t\t\t</div>\n\t\t</SearchMarker>\n\t</div>\n\t<template #footer>\n\t\t<div :class=\"$style.footer\">\n\t\t\t<div class=\"_spacer\" style=\"--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 16px;\">\n\t\t\t\t<div class=\"_buttons\">\n\t\t\t\t\t<MkButton primary rounded @click=\"save\"><i class=\"ti ti-check\"></i> {{ $locale.sfc.save }}</MkButton>\n\t\t\t\t\t<MkButton rounded @click=\"testEmail\"><i class=\"ti ti-send\"></i> {{ $locale.sfc.testEmail }}</MkButton>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</template>\n</PageWithHeader>\n</template>\n\n<script lang=\"ts\" setup>\nimport { ref, computed } from 'vue';\nimport MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';\nimport MkInput from '@features/ui/frontend/components/MkInput.vue';\nimport FormInfo from '@features/ui/frontend/components/MkInfo.vue';\nimport FormSplit from '@features/ui/frontend/components/form/split.vue';\nimport FormSection from '@features/ui/frontend/components/form/section.vue';\nimport * as os from '@features/ui/frontend/os.js';\nimport { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';\nimport { fetchInstance, instance } from '@features/instance/frontend/instance.js';\nimport { definePage } from '@features/navigation/frontend/page.js';\nimport MkButton from '@features/ui/frontend/components/MkButton.vue';\n\nconst meta = await misskeyApi('admin/meta');\n\nconst enableEmail = ref(meta.enableEmail);\nconst email = ref(meta.email);\nconst smtpSecure = ref(meta.smtpSecure);\nconst smtpHost = ref(meta.smtpHost);\nconst smtpPort = ref(meta.smtpPort);\nconst smtpUser = ref(meta.smtpUser);\nconst smtpPass = ref(meta.smtpPass);\n\nasync function testEmail() {\n\tconst { canceled, result: destination } = await os.inputText({\n\t\ttitle: 'To',\n\t\ttype: 'email',\n\t\tdefault: instance.maintainerEmail ?? '',\n\t\tplaceholder: 'test@example.com',\n\t\tminLength: 1,\n\t});\n\tif (canceled) return;\n\tos.apiWithDialog('admin/send-email', {\n\t\tto: destination,\n\t\tsubject: 'Test email',\n\t\ttext: 'Yo',\n\t});\n}\n\nfunction save() {\n\tos.apiWithDialog('admin/update-meta', {\n\t\tenableEmail: enableEmail.value,\n\t\temail: email.value,\n\t\tsmtpSecure: smtpSecure.value,\n\t\tsmtpHost: smtpHost.value,\n\t\tsmtpPort: smtpPort.value,\n\t\tsmtpUser: smtpUser.value,\n\t\tsmtpPass: smtpPass.value,\n\t}).then(() => {\n\t\tfetchInstance(true);\n\t});\n}\n\nconst headerTabs = computed(() => []);\n\ndefinePage(() => ({\n\ttitle: $locale.value.sfc.emailServer,\n\ticon: 'ti ti-mail',\n}));\n</script>\n\n<style lang=\"scss\" module>\n.footer {\n\t-webkit-backdrop-filter: var(--MI-blur, blur(15px));\n\tbackdrop-filter: var(--MI-blur, blur(15px));\n}\n</style>\n\n<locale locale=\"ar-SA\" lang=\"json\">\n{\n\t\"emailServer\": \"خادم البريد الإلكتروني\",\n\t\"enableEmail\": \"Enable email distribution\",\n\t\"recommended\": \"مقترح\",\n\t\"emailConfigInfo\": \"يستخدم لتأكيد عنوان بريدك الإلكتروني ولإعادة تعيين كلمة المرور إن نسيتها.\",\n\t\"emailAddress\": \"عنوان البريد الالكتروني\",\n\t\"smtpConfig\": \"إعدادات خادم SMTP\",\n\t\"smtpHost\": \"المضيف\",\n\t\"smtpPort\": \"المنفذ\",\n\t\"smtpUser\": \"اسم المستخدم\",\n\t\"smtpPass\": \"الكلمة السرية\",\n\t\"emptyToDisableSmtpAuth\": \"اترك اسم المستخدم وكلمة المرور فارغين لتعطيل التحقق من SMTP\",\n\t\"smtpSecure\": \"Use implicit SSL/TLS for SMTP connections\",\n\t\"smtpSecureInfo\": \"عطل هذا الخيار عند استخدام STARTTLS\",\n\t\"save\": \"حفظ\",\n\t\"testEmail\": \"Test email delivery\"\n}\n</locale>\n\n<locale locale=\"ca-ES\" lang=\"json\">\n{\n\t\"emailServer\": \"Servidor de correu electrònic \",\n\t\"enableEmail\": \"Activar l'enviament de correus electrònics \",\n\t\"recommended\": \"Recomanat\",\n\t\"emailConfigInfo\": \"Es fa servir per confirmar el teu correu quan et registres o oblides la contrasenya \",\n\t\"emailAddress\": \"Adreça de correu electrònic\",\n\t\"smtpConfig\": \"Configuració del servidor SMTP\",\n\t\"smtpHost\": \"Amfitrió\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Nom d'usuari\",\n\t\"smtpPass\": \"Contrasenya\",\n\t\"emptyToDisableSmtpAuth\": \"No omplis el nom d'usuari i la contrasenya si vols deshabilitar l'autenticació SMTP\",\n\t\"smtpSecure\": \"Fes servir SSL/TLS per connexions SMTP\",\n\t\"smtpSecureInfo\": \"Desactiva això quan facis servir connexions STARTTLS\",\n\t\"save\": \"Desa\",\n\t\"testEmail\": \"Prova l'enviament de correu \"\n}\n</locale>\n\n<locale locale=\"cs-CZ\" lang=\"json\">\n{\n\t\"emailServer\": \"Mailový server\",\n\t\"enableEmail\": \"Zapnout email dystribuci\",\n\t\"recommended\": \"Doporučeno\",\n\t\"emailConfigInfo\": \"Používá se na ověření emailové adresy během registrace nebo při zapomenutí hesla.\",\n\t\"emailAddress\": \"Emailová adresa\",\n\t\"smtpConfig\": \"Konfigurace SMTP serveru\",\n\t\"smtpHost\": \"Hostitel\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Uživatelské jméno\",\n\t\"smtpPass\": \"Heslo\",\n\t\"emptyToDisableSmtpAuth\": \"Zanechte uživatelské jméno a heslo prázdné pro vypnutí SMTP verifikace.\",\n\t\"smtpSecure\": \"Použít implicitní SSL/TLS pro SMTP připojení\",\n\t\"smtpSecureInfo\": \"Toto vypněte pokud používáte STARTTLS\",\n\t\"save\": \"Uložit\",\n\t\"testEmail\": \"Otestovat doručení emailů\"\n}\n</locale>\n\n<locale locale=\"da-DK\" lang=\"json\">\n{\n\t\"emailServer\": \"Email server\",\n\t\"enableEmail\": \"Enable email distribution\",\n\t\"recommended\": \"Recommended\",\n\t\"emailConfigInfo\": \"Used to confirm your email during sign-up or if you forget your password\",\n\t\"emailAddress\": \"Email address\",\n\t\"smtpConfig\": \"SMTP Server Configuration\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Username\",\n\t\"smtpPass\": \"Password\",\n\t\"emptyToDisableSmtpAuth\": \"Leave username and password empty to disable SMTP authentication\",\n\t\"smtpSecure\": \"Use implicit SSL/TLS for SMTP connections\",\n\t\"smtpSecureInfo\": \"Turn this off when using STARTTLS\",\n\t\"save\": \"Save\",\n\t\"testEmail\": \"Test email delivery\"\n}\n</locale>\n\n<locale locale=\"de-DE\" lang=\"json\">\n{\n\t\"emailServer\": \"Email-Server\",\n\t\"enableEmail\": \"Email-Versand aktivieren\",\n\t\"recommended\": \"Empfehlung\",\n\t\"emailConfigInfo\": \"Zur Email-Bestätigung bei Registrierung oder zum Zurücksetzen des Passworts verwendet\",\n\t\"emailAddress\": \"Email-Adresse\",\n\t\"smtpConfig\": \"SMTP-Server Konfiguration\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Benutzername\",\n\t\"smtpPass\": \"Passwort\",\n\t\"emptyToDisableSmtpAuth\": \"Benutzername und Passwort leer lassen, um SMTP-Verifizierung zu deaktivieren\",\n\t\"smtpSecure\": \"Für SMTP-Verbindungen implizit SSL/TLS verwenden\",\n\t\"smtpSecureInfo\": \"Schalte dies aus, falls du STARTTLS verwendest.\",\n\t\"save\": \"Speichern\",\n\t\"testEmail\": \"Emailversand testen\"\n}\n</locale>\n\n<locale locale=\"en-US\" lang=\"json\">\n{\n\t\"emailServer\": \"Email server\",\n\t\"enableEmail\": \"Enable email distribution\",\n\t\"recommended\": \"Recommended\",\n\t\"emailConfigInfo\": \"Used to confirm your email during sign-up or if you forget your password\",\n\t\"emailAddress\": \"Email address\",\n\t\"smtpConfig\": \"SMTP Server Configuration\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Username\",\n\t\"smtpPass\": \"Password\",\n\t\"emptyToDisableSmtpAuth\": \"Leave username and password empty to disable SMTP authentication\",\n\t\"smtpSecure\": \"Use implicit SSL/TLS for SMTP connections\",\n\t\"smtpSecureInfo\": \"Turn this off when using STARTTLS\",\n\t\"save\": \"Save\",\n\t\"testEmail\": \"Test email delivery\"\n}\n</locale>\n\n<locale locale=\"es-ES\" lang=\"json\">\n{\n\t\"emailServer\": \"Servidor de correo\",\n\t\"enableEmail\": \"Activar el envío de correos electrónicos\",\n\t\"recommended\": \"Recomendado\",\n\t\"emailConfigInfo\": \"Usar en caso de validación de correo electrónico y pedido de contraseña\",\n\t\"emailAddress\": \"Correo electrónico\",\n\t\"smtpConfig\": \"Configuración del servidor SMTP\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Puerto\",\n\t\"smtpUser\": \"Nombre de usuario\",\n\t\"smtpPass\": \"Contraseña\",\n\t\"emptyToDisableSmtpAuth\": \"Deje el nombre del usuario y la contraseña en blanco para deshabilitar la autenticación SMTP\",\n\t\"smtpSecure\": \"Usar SSL/TLS implícito en la conexión SMTP\",\n\t\"smtpSecureInfo\": \"Apagar cuando se use STARTTLS\",\n\t\"save\": \"Guardar\",\n\t\"testEmail\": \"Prueba de envío\"\n}\n</locale>\n\n<locale locale=\"fr-FR\" lang=\"json\">\n{\n\t\"emailServer\": \"Serveur de messagerie\",\n\t\"enableEmail\": \"Activer la distribution de courriel\",\n\t\"recommended\": \"Recommandé\",\n\t\"emailConfigInfo\": \"Utilisé pour confirmer votre adresse e-mail et réinitialiser votre mot de passe en cas d’oubli\",\n\t\"emailAddress\": \"Adresse e-mail\",\n\t\"smtpConfig\": \"Paramètres du serveur SMTP\",\n\t\"smtpHost\": \"Serveur distant\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Nom d’utilisateur·rice\",\n\t\"smtpPass\": \"Mot de passe\",\n\t\"emptyToDisableSmtpAuth\": \"Laisser le nom d’utilisateur et le mot de passe vides pour désactiver la vérification SMTP\",\n\t\"smtpSecure\": \"Utiliser SSL/TLS implicitement dans les connexions SMTP\",\n\t\"smtpSecureInfo\": \"Désactiver cette option lorsque STARTTLS est utilisé\",\n\t\"save\": \"Enregistrer\",\n\t\"testEmail\": \"Tester la distribution de courriel\"\n}\n</locale>\n\n<locale locale=\"id-ID\" lang=\"json\">\n{\n\t\"emailServer\": \"Peladen surel\",\n\t\"enableEmail\": \"Nyalakan distribusi surel\",\n\t\"recommended\": \"Disarankan\",\n\t\"emailConfigInfo\": \"Digunakan untuk mengonfirmasi surel kamu disaat mendaftar dan lupa kata sandi\",\n\t\"emailAddress\": \"Alamat surel\",\n\t\"smtpConfig\": \"Konfigurasi peladen SMTP\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Nama Pengguna\",\n\t\"smtpPass\": \"Kata sandi\",\n\t\"emptyToDisableSmtpAuth\": \"Kosongkan nama pengguna dan kata sandi untuk menonaktifkan verifikasi SMTP\",\n\t\"smtpSecure\": \"Gunakan SSL/TLS implisit untuk koneksi SMTP\",\n\t\"smtpSecureInfo\": \"Matikan ini ketika menggunakan STARTTLS\",\n\t\"save\": \"Simpan\",\n\t\"testEmail\": \"Tes pengiriman surel\"\n}\n</locale>\n\n<locale locale=\"it-IT\" lang=\"json\">\n{\n\t\"emailServer\": \"Server email\",\n\t\"enableEmail\": \"Abilita consegna email\",\n\t\"recommended\": \"Consigliato\",\n\t\"emailConfigInfo\": \"Utilizzato per verificare il tuo indirizzo di posta elettronica e per ripristinare la password\",\n\t\"emailAddress\": \"Indirizzo di posta elettronica\",\n\t\"smtpConfig\": \"Impostazioni del server SMTP\",\n\t\"smtpHost\": \"Host SMTP\",\n\t\"smtpPort\": \"Porta\",\n\t\"smtpUser\": \"Nome utente\",\n\t\"smtpPass\": \"Password\",\n\t\"emptyToDisableSmtpAuth\": \"Lasciare i campi vuoti se non c'è autenticazione SMTP\",\n\t\"smtpSecure\": \"Usare SSL/TLS implicito per le connessioni SMTP\",\n\t\"smtpSecureInfo\": \"Disabilitare quando è attivo STARTTLS.\",\n\t\"save\": \"Salva\",\n\t\"testEmail\": \"Verifica il funzionamento\"\n}\n</locale>\n\n<locale locale=\"ja-JP\" lang=\"json\">\n{\n\t\"emailServer\": \"メールサーバー\",\n\t\"enableEmail\": \"メール配信機能を有効化する\",\n\t\"recommended\": \"推奨\",\n\t\"emailConfigInfo\": \"メールアドレスの確認やパスワードリセットの際に使います\",\n\t\"emailAddress\": \"メールアドレス\",\n\t\"smtpConfig\": \"SMTP サーバーの設定\",\n\t\"smtpHost\": \"ホスト\",\n\t\"smtpPort\": \"ポート\",\n\t\"smtpUser\": \"ユーザー名\",\n\t\"smtpPass\": \"パスワード\",\n\t\"emptyToDisableSmtpAuth\": \"ユーザー名とパスワードを空欄にすることで、SMTP認証を無効化出来ます\",\n\t\"smtpSecure\": \"SMTP 接続に暗黙的なSSL/TLSを使用する\",\n\t\"smtpSecureInfo\": \"STARTTLS使用時はオフにします。\",\n\t\"save\": \"保存\",\n\t\"testEmail\": \"配信テスト\"\n}\n</locale>\n\n<locale locale=\"ja-KS\" lang=\"json\">\n{\n\t\"emailServer\": \"メールサーバー\",\n\t\"enableEmail\": \"メール配信を受け取る\",\n\t\"recommended\": \"推奨\",\n\t\"emailConfigInfo\": \"メールアドレスの確認とかパスワードリセットの時に使うで\",\n\t\"emailAddress\": \"メールアドレス\",\n\t\"smtpConfig\": \"SMTP サーバーの設定\",\n\t\"smtpHost\": \"ホスト\",\n\t\"smtpPort\": \"ポート\",\n\t\"smtpUser\": \"ユーザー名\",\n\t\"smtpPass\": \"パスワード\",\n\t\"emptyToDisableSmtpAuth\": \"ユーザー名とパスワードになんも入れんかったら、SMTP認証を無効化するで\",\n\t\"smtpSecure\": \"SMTP 接続に暗黙的なSSL/TLSを使用する\",\n\t\"smtpSecureInfo\": \"STARTTLS使っとる時はオフにしてや。\",\n\t\"save\": \"とっとく\",\n\t\"testEmail\": \"配信テスト\"\n}\n</locale>\n\n<locale locale=\"kab-KAB\" lang=\"json\">\n{\n\t\"emailServer\": \"Email server\",\n\t\"enableEmail\": \"Enable email distribution\",\n\t\"recommended\": \"Recommended\",\n\t\"emailConfigInfo\": \"Used to confirm your email during sign-up or if you forget your password\",\n\t\"emailAddress\": \"Tansa imayl\",\n\t\"smtpConfig\": \"SMTP Server Configuration\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Isem n umseqdac\",\n\t\"smtpPass\": \"Awal uffir\",\n\t\"emptyToDisableSmtpAuth\": \"Leave username and password empty to disable SMTP authentication\",\n\t\"smtpSecure\": \"Use implicit SSL/TLS for SMTP connections\",\n\t\"smtpSecureInfo\": \"Turn this off when using STARTTLS\",\n\t\"save\": \"Sekles\",\n\t\"testEmail\": \"Test email delivery\"\n}\n</locale>\n\n<locale locale=\"kn-IN\" lang=\"json\">\n{\n\t\"emailServer\": \"Email server\",\n\t\"enableEmail\": \"Enable email distribution\",\n\t\"recommended\": \"Recommended\",\n\t\"emailConfigInfo\": \"Used to confirm your email during sign-up or if you forget your password\",\n\t\"emailAddress\": \"Email address\",\n\t\"smtpConfig\": \"SMTP Server Configuration\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"ಬಳಕೆಹೆಸರು\",\n\t\"smtpPass\": \"ಗುಪ್ತಪದ\",\n\t\"emptyToDisableSmtpAuth\": \"Leave username and password empty to disable SMTP authentication\",\n\t\"smtpSecure\": \"Use implicit SSL/TLS for SMTP connections\",\n\t\"smtpSecureInfo\": \"Turn this off when using STARTTLS\",\n\t\"save\": \"ಉಳಿಸಿ\",\n\t\"testEmail\": \"Test email delivery\"\n}\n</locale>\n\n<locale locale=\"ko-KR\" lang=\"json\">\n{\n\t\"emailServer\": \"메일 서버\",\n\t\"enableEmail\": \"이메일 송신 기능 활성화\",\n\t\"recommended\": \"추천\",\n\t\"emailConfigInfo\": \"가입 시 메일 주소 확인이나 비밀번호 초기화 시에 사용합니다.\",\n\t\"emailAddress\": \"메일 주소\",\n\t\"smtpConfig\": \"SMTP 서버 설정\",\n\t\"smtpHost\": \"호스트\",\n\t\"smtpPort\": \"포트\",\n\t\"smtpUser\": \"유저 이름\",\n\t\"smtpPass\": \"비밀번호\",\n\t\"emptyToDisableSmtpAuth\": \"SMTP 인증을 사용하지 않으려면 공란으로 비워둡니다.\",\n\t\"smtpSecure\": \"SMTP 연결에 Implicit SSL/TTS 사용\",\n\t\"smtpSecureInfo\": \"STARTTLS 사용 시에는 해제합니다.\",\n\t\"save\": \"저장\",\n\t\"testEmail\": \"이메일 전송 테스트\"\n}\n</locale>\n\n<locale locale=\"nl-NL\" lang=\"json\">\n{\n\t\"emailServer\": \"Email-Server\",\n\t\"enableEmail\": \"Email distributie inschakelen\",\n\t\"recommended\": \"Recommended\",\n\t\"emailConfigInfo\": \"Wordt gebruikt om je email te bevestigen tijdens het aanmelden of als je je wachtwoord bent vergeten\",\n\t\"emailAddress\": \"Email adres\",\n\t\"smtpConfig\": \"SMTP-server configuratie\",\n\t\"smtpHost\": \"Server\",\n\t\"smtpPort\": \"Poort\",\n\t\"smtpUser\": \"Gebruikersnaam\",\n\t\"smtpPass\": \"Wachtwoord\",\n\t\"emptyToDisableSmtpAuth\": \"Laat gebruikersnaam en wachtwoord leeg om SMTP-authenticatie uit te schakelen.\",\n\t\"smtpSecure\": \"Impliciet SSL/TLS gebruiken voor SMTP-verbindingen\",\n\t\"smtpSecureInfo\": \"Schakel dit uit bij gebruik van STARTTLS\",\n\t\"save\": \"Opslaan\",\n\t\"testEmail\": \"Emailversand testen\"\n}\n</locale>\n\n<locale locale=\"no-NO\" lang=\"json\">\n{\n\t\"emailServer\": \"Email server\",\n\t\"enableEmail\": \"Enable email distribution\",\n\t\"recommended\": \"Anbefalt\",\n\t\"emailConfigInfo\": \"Used to confirm your email during sign-up or if you forget your password\",\n\t\"emailAddress\": \"Email address\",\n\t\"smtpConfig\": \"SMTP Server Configuration\",\n\t\"smtpHost\": \"Vert\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Brukernavn\",\n\t\"smtpPass\": \"Passord\",\n\t\"emptyToDisableSmtpAuth\": \"Leave username and password empty to disable SMTP authentication\",\n\t\"smtpSecure\": \"Use implicit SSL/TLS for SMTP connections\",\n\t\"smtpSecureInfo\": \"Turn this off when using STARTTLS\",\n\t\"save\": \"Lagre\",\n\t\"testEmail\": \"Test email delivery\"\n}\n</locale>\n\n<locale locale=\"pl-PL\" lang=\"json\">\n{\n\t\"emailServer\": \"Serwer poczty e-mail\",\n\t\"enableEmail\": \"Włącz dostarczanie wiadomości e-mail\",\n\t\"recommended\": \"Zalecane\",\n\t\"emailConfigInfo\": \"Wykorzystywany do potwierdzenia adresu e-mail w trakcie rejestracji, lub gdy zapomnisz hasła\",\n\t\"emailAddress\": \"Adres e-mail\",\n\t\"smtpConfig\": \"Konfiguracja serwera SMTP\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Nazwa użytkownika\",\n\t\"smtpPass\": \"Hasło\",\n\t\"emptyToDisableSmtpAuth\": \"Pozostaw adres e-mail i hasło puste, aby wyłączyć weryfikację SMTP\",\n\t\"smtpSecure\": \"Użyj niejawnego SSL/TLS dla połączeń SMTP\",\n\t\"smtpSecureInfo\": \"Wyłącz, jeżeli używasz STARTTLS\",\n\t\"save\": \"Zapisz\",\n\t\"testEmail\": \"Przetestuj dostarczanie wiadomości e-mail\"\n}\n</locale>\n\n<locale locale=\"pt-PT\" lang=\"json\">\n{\n\t\"emailServer\": \"Servidor de e-mail\",\n\t\"enableEmail\": \"Habilitar envio de e-mails\",\n\t\"recommended\": \"Recomendado\",\n\t\"emailConfigInfo\": \"Usado para confirmar o seu endereço de e-mail e redefinir sua senha\",\n\t\"emailAddress\": \"Endereço de e-mail\",\n\t\"smtpConfig\": \"Configuração do servidor SMTP\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Porta\",\n\t\"smtpUser\": \"Nome de usuário\",\n\t\"smtpPass\": \"Senha\",\n\t\"emptyToDisableSmtpAuth\": \"Desative a autenticação SMTP deixando o nome de usuário e a senha em branco.\",\n\t\"smtpSecure\": \"Use SSL/TLS implícito para conexões SMTP\",\n\t\"smtpSecureInfo\": \"Desative esta opção ao utilizar STARTTLS.\",\n\t\"save\": \"Salvar\",\n\t\"testEmail\": \"Testar envio de e-mail\"\n}\n</locale>\n\n<locale locale=\"ru-RU\" lang=\"json\">\n{\n\t\"emailServer\": \"Сервер электронной почты\",\n\t\"enableEmail\": \"Включить обмен электронной почтой\",\n\t\"recommended\": \"Рекомендуем\",\n\t\"emailConfigInfo\": \"Используется для подтверждения адреса электронной почты и сброса пароля.\",\n\t\"emailAddress\": \"Адрес электронной почты\",\n\t\"smtpConfig\": \"Конфигурация SMTP-сервера\",\n\t\"smtpHost\": \"Хост\",\n\t\"smtpPort\": \"Порт\",\n\t\"smtpUser\": \"Имя пользователя\",\n\t\"smtpPass\": \"Пароль\",\n\t\"emptyToDisableSmtpAuth\": \"Не заполняйте имя пользователя и пароль, чтобы отключить аутентификацию в SMTP.\",\n\t\"smtpSecure\": \"Использовать SSL/TLS\",\n\t\"smtpSecureInfo\": \"Выключите при использовании STARTTLS.\",\n\t\"save\": \"Сохранить\",\n\t\"testEmail\": \"Отправить тестовое письмо\"\n}\n</locale>\n\n<locale locale=\"sk-SK\" lang=\"json\">\n{\n\t\"emailServer\": \"Email server\",\n\t\"enableEmail\": \"Zapnúť email\",\n\t\"recommended\": \"Odporúčané\",\n\t\"emailConfigInfo\": \"Používa sa na overenie emaily pri registrácii alebo pri zabudnutí hesla\",\n\t\"emailAddress\": \"Emailová adresa\",\n\t\"smtpConfig\": \"Nastavenia SMTP servera\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Meno používateľa\",\n\t\"smtpPass\": \"Heslo\",\n\t\"emptyToDisableSmtpAuth\": \"Vynechaním mena hesla vypnete SMTP verifikáciu\",\n\t\"smtpSecure\": \"Použiť implicitné SSL/TLS pre SMTP spojenia\",\n\t\"smtpSecureInfo\": \"Toto vypnite keď používate STARTTLS\",\n\t\"save\": \"Uložiť\",\n\t\"testEmail\": \"Doručenie testovacieho emailu\"\n}\n</locale>\n\n<locale locale=\"th-TH\" lang=\"json\">\n{\n\t\"emailServer\": \"เซิร์ฟเวอร์ของอีเมล\",\n\t\"enableEmail\": \"เปิดใช้งานการกระจายอีเมล\",\n\t\"recommended\": \"แนะนำ\",\n\t\"emailConfigInfo\": \"ใช้สำหรับการยืนยันอีเมลหรือการรีเซ็ตรหัสผ่าน\",\n\t\"emailAddress\": \"ที่อยู่อีเมล\",\n\t\"smtpConfig\": \"ตั้งค่าเซิร์ฟเวอร์ SMTP\",\n\t\"smtpHost\": \"โฮสต์\",\n\t\"smtpPort\": \"พอร์ต\",\n\t\"smtpUser\": \"ชื่อผู้ใช้\",\n\t\"smtpPass\": \"รหัสผ่าน\",\n\t\"emptyToDisableSmtpAuth\": \"ปล่อยชื่อผู้ใช้และรหัสผ่านว่างไว้เพื่อปิดใช้งานการยืนยัน SMTP\",\n\t\"smtpSecure\": \"ใช้โดยนัย SSL/TLS สำหรับการเชื่อมต่อ SMTP\",\n\t\"smtpSecureInfo\": \"ปิดสิ่งนี้เมื่อใช้ STARTTLS\",\n\t\"save\": \"บันทึก\",\n\t\"testEmail\": \"ทดสอบการส่งอีเมล\"\n}\n</locale>\n\n<locale locale=\"tr-TR\" lang=\"json\">\n{\n\t\"emailServer\": \"E-posta sunucusu\",\n\t\"enableEmail\": \"E-posta dağıtımını etkinleştir\",\n\t\"recommended\": \"Önerilen\",\n\t\"emailConfigInfo\": \"Kayıt sırasında veya şifreni unuttuğunda E-postanı doğrulamak için kullanılır.\",\n\t\"emailAddress\": \"E-Posta adresi\",\n\t\"smtpConfig\": \"SMTP Sunucu yapılandırması\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Kullanıcı adı\",\n\t\"smtpPass\": \"Şifre\",\n\t\"emptyToDisableSmtpAuth\": \"SMTP kimlik doğrulamasını devre dışı bırakmak için kullanıcı adı ve şifre alanlarını boş bırakın.\",\n\t\"smtpSecure\": \"SMTP bağlantıları için örtük SSL/TLS kullanın\",\n\t\"smtpSecureInfo\": \"STARTTLS kullanırken bunu kapatın.\",\n\t\"save\": \"Kaydet\",\n\t\"testEmail\": \"Test E-postası gönderimi\"\n}\n</locale>\n\n<locale locale=\"ug-CN\" lang=\"json\">\n{\n\t\"emailServer\": \"Email server\",\n\t\"enableEmail\": \"Enable email distribution\",\n\t\"recommended\": \"Recommended\",\n\t\"emailConfigInfo\": \"Used to confirm your email during sign-up or if you forget your password\",\n\t\"emailAddress\": \"Email address\",\n\t\"smtpConfig\": \"SMTP Server Configuration\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Port\",\n\t\"smtpUser\": \"Username\",\n\t\"smtpPass\": \"Password\",\n\t\"emptyToDisableSmtpAuth\": \"Leave username and password empty to disable SMTP authentication\",\n\t\"smtpSecure\": \"Use implicit SSL/TLS for SMTP connections\",\n\t\"smtpSecureInfo\": \"Turn this off when using STARTTLS\",\n\t\"save\": \"Save\",\n\t\"testEmail\": \"Test email delivery\"\n}\n</locale>\n\n<locale locale=\"uk-UA\" lang=\"json\">\n{\n\t\"emailServer\": \"Email сервер\",\n\t\"enableEmail\": \"Увімкнути функцію доставки пошти\",\n\t\"recommended\": \"Рекомендоване\",\n\t\"emailConfigInfo\": \"Використовується для підтвердження електронної пошти підчас реєстрації, а також для відновлення паролю.\",\n\t\"emailAddress\": \"E-mail адреса\",\n\t\"smtpConfig\": \"Налаштування сервера SMTP\",\n\t\"smtpHost\": \"Хост\",\n\t\"smtpPort\": \"Порт\",\n\t\"smtpUser\": \"Ім'я користувача\",\n\t\"smtpPass\": \"Пароль\",\n\t\"emptyToDisableSmtpAuth\": \"Залиште назву користувача і пароль пустими для вимкнення підтвердження SMTP\",\n\t\"smtpSecure\": \"Використовувати безумовне шифрування SSL/TLS для з'єднань SMTP\",\n\t\"smtpSecureInfo\": \"Вимкніть при використанні STARTTLS  \",\n\t\"save\": \"Зберегти\",\n\t\"testEmail\": \"Тестовий email\"\n}\n</locale>\n\n<locale locale=\"vi-VN\" lang=\"json\">\n{\n\t\"emailServer\": \"Email máy chủ\",\n\t\"enableEmail\": \"Bật phân phối email\",\n\t\"recommended\": \"Được đề xuất\",\n\t\"emailConfigInfo\": \"Được dùng để xác minh email của bạn lúc đăng ký hoặc nếu bạn quên mật khẩu của mình\",\n\t\"emailAddress\": \"Địa chỉ email\",\n\t\"smtpConfig\": \"Cấu hình máy chủ SMTP\",\n\t\"smtpHost\": \"Host\",\n\t\"smtpPort\": \"Cổng\",\n\t\"smtpUser\": \"Tên người dùng\",\n\t\"smtpPass\": \"Mật khẩu\",\n\t\"emptyToDisableSmtpAuth\": \"Để trống tên người dùng và mật khẩu để tắt xác thực SMTP\",\n\t\"smtpSecure\": \"Dùng SSL/TLS ngầm định cho các kết nối SMTP\",\n\t\"smtpSecureInfo\": \"Tắt cái này nếu dùng STARTTLS\",\n\t\"save\": \"Lưu\",\n\t\"testEmail\": \"Kiểm tra vận chuyển email\"\n}\n</locale>\n\n<locale locale=\"zh-CN\" lang=\"json\">\n{\n\t\"emailServer\": \"邮件服务器\",\n\t\"enableEmail\": \"启用发送邮件功能\",\n\t\"recommended\": \"推荐\",\n\t\"emailConfigInfo\": \"用于确认电子邮件和密码重置\",\n\t\"emailAddress\": \"电子邮件地址\",\n\t\"smtpConfig\": \"SMTP 服务器设置\",\n\t\"smtpHost\": \"主机名\",\n\t\"smtpPort\": \"端口\",\n\t\"smtpUser\": \"用户名\",\n\t\"smtpPass\": \"密码\",\n\t\"emptyToDisableSmtpAuth\": \"用户名和密码留空可以禁用 SMTP 验证\",\n\t\"smtpSecure\": \"在 SMTP 连接中使用隐式 SSL / TLS\",\n\t\"smtpSecureInfo\": \"使用 STARTTLS 时关闭。\",\n\t\"save\": \"保存\",\n\t\"testEmail\": \"邮件发送测试\"\n}\n</locale>\n\n<locale locale=\"zh-TW\" lang=\"json\">\n{\n\t\"emailServer\": \"電子郵件伺服器\",\n\t\"enableEmail\": \"啟用發送電子郵件功能\",\n\t\"recommended\": \"推薦\",\n\t\"emailConfigInfo\": \"用於確認電子郵件地址及密碼重置\",\n\t\"emailAddress\": \"電子郵件位址\",\n\t\"smtpConfig\": \"SMTP 伺服器設定\",\n\t\"smtpHost\": \"主機\",\n\t\"smtpPort\": \"埠\",\n\t\"smtpUser\": \"使用者名稱\",\n\t\"smtpPass\": \"密碼\",\n\t\"emptyToDisableSmtpAuth\": \"將使用者名稱和密碼留空以關閉 SMTP 驗證。\",\n\t\"smtpSecure\": \"在 SMTP 連接中使用隱式 SSL/TLS\",\n\t\"smtpSecureInfo\": \"使用 STARTTLS 時關閉。\",\n\t\"save\": \"儲存\",\n\t\"testEmail\": \"測試郵件發送\"\n}\n</locale>\n",
+	"languages": [
+		"ar-SA",
+		"ca-ES",
+		"cs-CZ",
+		"da-DK",
+		"de-DE",
+		"en-US",
+		"es-ES",
+		"fr-FR",
+		"id-ID",
+		"it-IT",
+		"ja-JP",
+		"ja-KS",
+		"kab-KAB",
+		"kn-IN",
+		"ko-KR",
+		"nl-NL",
+		"no-NO",
+		"pl-PL",
+		"pt-PT",
+		"ru-RU",
+		"sk-SK",
+		"th-TH",
+		"tr-TR",
+		"ug-CN",
+		"uk-UA",
+		"vi-VN",
+		"zh-CN",
+		"zh-TW"
+	],
+	"mappings": [
+		[
+			"emailServer",
+			"emailServer"
+		],
+		[
+			"enableEmail",
+			"enableEmail"
+		],
+		[
+			"recommended",
+			"recommended"
+		],
+		[
+			"emailConfigInfo",
+			"emailConfigInfo"
+		],
+		[
+			"emailAddress",
+			"emailAddress"
+		],
+		[
+			"smtpConfig",
+			"smtpConfig"
+		],
+		[
+			"smtpHost",
+			"smtpHost"
+		],
+		[
+			"smtpPort",
+			"smtpPort"
+		],
+		[
+			"smtpUser",
+			"smtpUser"
+		],
+		[
+			"smtpPass",
+			"smtpPass"
+		],
+		[
+			"emptyToDisableSmtpAuth",
+			"emptyToDisableSmtpAuth"
+		],
+		[
+			"smtpSecure",
+			"smtpSecure"
+		],
+		[
+			"smtpSecureInfo",
+			"smtpSecureInfo"
+		],
+		[
+			"save",
+			"save"
+		],
+		[
+			"testEmail",
+			"testEmail"
+		]
+	],
+	"reviewed": {
+		"ar-SA": {
+			"emailServer": "خادم البريد الإلكتروني",
+			"enableEmail": "تفعيل إرسال البريد الإلكتروني",
+			"recommended": "مقترح",
+			"emailConfigInfo": "يستخدم لتأكيد عنوان بريدك الإلكتروني ولإعادة تعيين كلمة المرور إن نسيتها.",
+			"emailAddress": "عنوان البريد الالكتروني",
+			"smtpConfig": "إعدادات خادم SMTP",
+			"smtpHost": "المضيف",
+			"smtpPort": "المنفذ",
+			"smtpUser": "اسم المستخدم",
+			"smtpPass": "الكلمة السرية",
+			"emptyToDisableSmtpAuth": "اترك اسم المستخدم وكلمة المرور فارغين لتعطيل التحقق من SMTP",
+			"smtpSecure": "استخدام SSL/TLS منذ بدء اتصالات SMTP",
+			"smtpSecureInfo": "عطل هذا الخيار عند استخدام STARTTLS",
+			"save": "حفظ",
+			"testEmail": "اختبار إرسال البريد الإلكتروني"
+		},
+		"ca-ES": {
+			"emailServer": "Servidor de correu electrònic ",
+			"enableEmail": "Activar l'enviament de correus electrònics ",
+			"recommended": "Recomanat",
+			"emailConfigInfo": "Es fa servir per confirmar el teu correu quan et registres o oblides la contrasenya ",
+			"emailAddress": "Adreça de correu electrònic",
+			"smtpConfig": "Configuració del servidor SMTP",
+			"smtpHost": "Amfitrió",
+			"smtpPort": "Port",
+			"smtpUser": "Nom d'usuari",
+			"smtpPass": "Contrasenya",
+			"emptyToDisableSmtpAuth": "No omplis el nom d'usuari i la contrasenya si vols deshabilitar l'autenticació SMTP",
+			"smtpSecure": "Fes servir SSL/TLS per connexions SMTP",
+			"smtpSecureInfo": "Desactiva això quan facis servir connexions STARTTLS",
+			"save": "Desa",
+			"testEmail": "Prova l'enviament de correu "
+		},
+		"cs-CZ": {
+			"emailServer": "Mailový server",
+			"enableEmail": "Zapnout email dystribuci",
+			"recommended": "Doporučeno",
+			"emailConfigInfo": "Používá se na ověření emailové adresy během registrace nebo při zapomenutí hesla.",
+			"emailAddress": "Emailová adresa",
+			"smtpConfig": "Konfigurace SMTP serveru",
+			"smtpHost": "Hostitel",
+			"smtpPort": "Port",
+			"smtpUser": "Uživatelské jméno",
+			"smtpPass": "Heslo",
+			"emptyToDisableSmtpAuth": "Zanechte uživatelské jméno a heslo prázdné pro vypnutí SMTP verifikace.",
+			"smtpSecure": "Použít implicitní SSL/TLS pro SMTP připojení",
+			"smtpSecureInfo": "Toto vypněte pokud používáte STARTTLS",
+			"save": "Uložit",
+			"testEmail": "Otestovat doručení emailů"
+		},
+		"da-DK": {
+			"emailServer": "E-mailserver",
+			"enableEmail": "Aktivér afsendelse af e-mails",
+			"recommended": "Anbefalet",
+			"emailConfigInfo": "Bruges til at bekræfte din e-mailadresse ved tilmelding eller til at nulstille din adgangskode, hvis du glemmer den",
+			"emailAddress": "E-mailadresse",
+			"smtpConfig": "Indstillinger for SMTP-serveren",
+			"smtpHost": "Vært",
+			"smtpPort": "Port",
+			"smtpUser": "Brugernavn",
+			"smtpPass": "Adgangskode",
+			"emptyToDisableSmtpAuth": "Lad brugernavn og adgangskode være tomme for at deaktivere SMTP-godkendelse",
+			"smtpSecure": "Brug implicit SSL/TLS til SMTP-forbindelser",
+			"smtpSecureInfo": "Slå dette fra, når du bruger STARTTLS",
+			"save": "Gem",
+			"testEmail": "Test levering af e-mails"
+		},
+		"de-DE": {
+			"emailServer": "Email-Server",
+			"enableEmail": "Email-Versand aktivieren",
+			"recommended": "Empfehlung",
+			"emailConfigInfo": "Zur Email-Bestätigung bei Registrierung oder zum Zurücksetzen des Passworts verwendet",
+			"emailAddress": "Email-Adresse",
+			"smtpConfig": "SMTP-Server Konfiguration",
+			"smtpHost": "Host",
+			"smtpPort": "Port",
+			"smtpUser": "Benutzername",
+			"smtpPass": "Passwort",
+			"emptyToDisableSmtpAuth": "Benutzername und Passwort leer lassen, um SMTP-Verifizierung zu deaktivieren",
+			"smtpSecure": "Für SMTP-Verbindungen implizit SSL/TLS verwenden",
+			"smtpSecureInfo": "Schalte dies aus, falls du STARTTLS verwendest.",
+			"save": "Speichern",
+			"testEmail": "Emailversand testen"
+		},
+		"en-US": {
+			"emailServer": "Email server",
+			"enableEmail": "Enable email distribution",
+			"recommended": "Recommended",
+			"emailConfigInfo": "Used to confirm your email during sign-up or if you forget your password",
+			"emailAddress": "Email address",
+			"smtpConfig": "SMTP Server Configuration",
+			"smtpHost": "Host",
+			"smtpPort": "Port",
+			"smtpUser": "Username",
+			"smtpPass": "Password",
+			"emptyToDisableSmtpAuth": "Leave username and password empty to disable SMTP authentication",
+			"smtpSecure": "Use implicit SSL/TLS for SMTP connections",
+			"smtpSecureInfo": "Turn this off when using STARTTLS",
+			"save": "Save",
+			"testEmail": "Test email delivery"
+		},
+		"es-ES": {
+			"emailServer": "Servidor de correo",
+			"enableEmail": "Activar el envío de correos electrónicos",
+			"recommended": "Recomendado",
+			"emailConfigInfo": "Usar en caso de validación de correo electrónico y pedido de contraseña",
+			"emailAddress": "Correo electrónico",
+			"smtpConfig": "Configuración del servidor SMTP",
+			"smtpHost": "Host",
+			"smtpPort": "Puerto",
+			"smtpUser": "Nombre de usuario",
+			"smtpPass": "Contraseña",
+			"emptyToDisableSmtpAuth": "Deje el nombre del usuario y la contraseña en blanco para deshabilitar la autenticación SMTP",
+			"smtpSecure": "Usar SSL/TLS implícito en la conexión SMTP",
+			"smtpSecureInfo": "Apagar cuando se use STARTTLS",
+			"save": "Guardar",
+			"testEmail": "Prueba de envío"
+		},
+		"fr-FR": {
+			"emailServer": "Serveur de messagerie",
+			"enableEmail": "Activer la distribution de courriel",
+			"recommended": "Recommandé",
+			"emailConfigInfo": "Utilisé pour confirmer votre adresse e-mail et réinitialiser votre mot de passe en cas d’oubli",
+			"emailAddress": "Adresse e-mail",
+			"smtpConfig": "Paramètres du serveur SMTP",
+			"smtpHost": "Serveur distant",
+			"smtpPort": "Port",
+			"smtpUser": "Nom d’utilisateur·rice",
+			"smtpPass": "Mot de passe",
+			"emptyToDisableSmtpAuth": "Laisser le nom d’utilisateur et le mot de passe vides pour désactiver la vérification SMTP",
+			"smtpSecure": "Utiliser SSL/TLS implicitement dans les connexions SMTP",
+			"smtpSecureInfo": "Désactiver cette option lorsque STARTTLS est utilisé",
+			"save": "Enregistrer",
+			"testEmail": "Tester la distribution de courriel"
+		},
+		"id-ID": {
+			"emailServer": "Peladen surel",
+			"enableEmail": "Nyalakan distribusi surel",
+			"recommended": "Disarankan",
+			"emailConfigInfo": "Digunakan untuk mengonfirmasi surel kamu disaat mendaftar dan lupa kata sandi",
+			"emailAddress": "Alamat surel",
+			"smtpConfig": "Konfigurasi peladen SMTP",
+			"smtpHost": "Host",
+			"smtpPort": "Port",
+			"smtpUser": "Nama Pengguna",
+			"smtpPass": "Kata sandi",
+			"emptyToDisableSmtpAuth": "Kosongkan nama pengguna dan kata sandi untuk menonaktifkan verifikasi SMTP",
+			"smtpSecure": "Gunakan SSL/TLS implisit untuk koneksi SMTP",
+			"smtpSecureInfo": "Matikan ini ketika menggunakan STARTTLS",
+			"save": "Simpan",
+			"testEmail": "Tes pengiriman surel"
+		},
+		"it-IT": {
+			"emailServer": "Server email",
+			"enableEmail": "Abilita consegna email",
+			"recommended": "Consigliato",
+			"emailConfigInfo": "Utilizzato per verificare il tuo indirizzo di posta elettronica e per ripristinare la password",
+			"emailAddress": "Indirizzo di posta elettronica",
+			"smtpConfig": "Impostazioni del server SMTP",
+			"smtpHost": "Host SMTP",
+			"smtpPort": "Porta",
+			"smtpUser": "Nome utente",
+			"smtpPass": "Password",
+			"emptyToDisableSmtpAuth": "Lasciare i campi vuoti se non c'è autenticazione SMTP",
+			"smtpSecure": "Usare SSL/TLS implicito per le connessioni SMTP",
+			"smtpSecureInfo": "Disabilitare quando è attivo STARTTLS.",
+			"save": "Salva",
+			"testEmail": "Verifica il funzionamento"
+		},
+		"ja-JP": {
+			"emailServer": "メールサーバー",
+			"enableEmail": "メール配信機能を有効化する",
+			"recommended": "推奨",
+			"emailConfigInfo": "メールアドレスの確認やパスワードリセットの際に使います",
+			"emailAddress": "メールアドレス",
+			"smtpConfig": "SMTP サーバーの設定",
+			"smtpHost": "ホスト",
+			"smtpPort": "ポート",
+			"smtpUser": "ユーザー名",
+			"smtpPass": "パスワード",
+			"emptyToDisableSmtpAuth": "ユーザー名とパスワードを空欄にすることで、SMTP認証を無効化出来ます",
+			"smtpSecure": "SMTP 接続に暗黙的なSSL/TLSを使用する",
+			"smtpSecureInfo": "STARTTLS使用時はオフにします。",
+			"save": "保存",
+			"testEmail": "配信テスト"
+		},
+		"ja-KS": {
+			"emailServer": "メールサーバー",
+			"enableEmail": "メール配信を受け取る",
+			"recommended": "推奨",
+			"emailConfigInfo": "メールアドレスの確認とかパスワードリセットの時に使うで",
+			"emailAddress": "メールアドレス",
+			"smtpConfig": "SMTP サーバーの設定",
+			"smtpHost": "ホスト",
+			"smtpPort": "ポート",
+			"smtpUser": "ユーザー名",
+			"smtpPass": "パスワード",
+			"emptyToDisableSmtpAuth": "ユーザー名とパスワードになんも入れんかったら、SMTP認証を無効化するで",
+			"smtpSecure": "SMTP 接続に暗黙的なSSL/TLSを使用する",
+			"smtpSecureInfo": "STARTTLS使っとる時はオフにしてや。",
+			"save": "とっとく",
+			"testEmail": "配信テスト"
+		},
+		"kab-KAB": {
+			"emailServer": "Aqeddac n yimayl",
+			"enableEmail": "Rmed tuzna n yimaylen",
+			"recommended": "Yettusemter",
+			"emailConfigInfo": "Yettuseqdec i usentem n tansa-k n yimayl deg ujerred neɣ i uwennez n wawal uffir ma tettuḍ-t.",
+			"emailAddress": "Tansa imayl",
+			"smtpConfig": "Iɣewwaṛen n uqeddac SMTP",
+			"smtpHost": "Asenneftaɣ",
+			"smtpPort": "Tawwurt",
+			"smtpUser": "Isem n umseqdac",
+			"smtpPass": "Awal uffir",
+			"emptyToDisableSmtpAuth": "Eǧǧ isem n umseqdac d wawal uffir d ilmawen i usensi n usesteb SMTP.",
+			"smtpSecure": "Seqdec SSL/TLS seg tazwara n tuqqniwin SMTP",
+			"smtpSecureInfo": "Sens asefran-a mi ara tesqedceḍ STARTTLS.",
+			"save": "Sekles",
+			"testEmail": "Sekyed tuzna n yimayl"
+		},
+		"kn-IN": {
+			"emailServer": "ಇಮೇಲ್ ಸರ್ವರ್",
+			"enableEmail": "ಇಮೇಲ್ ಕಳುಹಿಸುವುದನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ",
+			"recommended": "ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ",
+			"emailConfigInfo": "ನೋಂದಣಿ ಸಮಯದಲ್ಲಿ ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ದೃಢೀಕರಿಸಲು ಅಥವಾ ಗುಪ್ತಪದವನ್ನು ಮರೆತಾಗ ಅದನ್ನು ಮರುಹೊಂದಿಸಲು ಬಳಸಲಾಗುತ್ತದೆ.",
+			"emailAddress": "ಇಮೇಲ್ ವಿಳಾಸ",
+			"smtpConfig": "SMTP ಸರ್ವರ್ ಸಂರಚನೆ",
+			"smtpHost": "ಹೋಸ್ಟ್",
+			"smtpPort": "ಪೋರ್ಟ್",
+			"smtpUser": "ಬಳಕೆಹೆಸರು",
+			"smtpPass": "ಗುಪ್ತಪದ",
+			"emptyToDisableSmtpAuth": "SMTP ದೃಢೀಕರಣವನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲು ಬಳಕೆಹೆಸರು ಮತ್ತು ಗುಪ್ತಪದವನ್ನು ಖಾಲಿ ಬಿಡಿ.",
+			"smtpSecure": "SMTP ಸಂಪರ್ಕಗಳ ಆರಂಭದಿಂದಲೇ SSL/TLS ಬಳಸಿ",
+			"smtpSecureInfo": "STARTTLS ಬಳಸುವಾಗ ಈ ಆಯ್ಕೆಯನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಿ.",
+			"save": "ಉಳಿಸಿ",
+			"testEmail": "ಇಮೇಲ್ ಕಳುಹಿಸುವಿಕೆಯನ್ನು ಪರೀಕ್ಷಿಸಿ"
+		},
+		"ko-KR": {
+			"emailServer": "메일 서버",
+			"enableEmail": "이메일 송신 기능 활성화",
+			"recommended": "추천",
+			"emailConfigInfo": "가입 시 메일 주소 확인이나 비밀번호 초기화 시에 사용합니다.",
+			"emailAddress": "메일 주소",
+			"smtpConfig": "SMTP 서버 설정",
+			"smtpHost": "호스트",
+			"smtpPort": "포트",
+			"smtpUser": "유저 이름",
+			"smtpPass": "비밀번호",
+			"emptyToDisableSmtpAuth": "SMTP 인증을 사용하지 않으려면 공란으로 비워둡니다.",
+			"smtpSecure": "SMTP 연결에 Implicit SSL/TTS 사용",
+			"smtpSecureInfo": "STARTTLS 사용 시에는 해제합니다.",
+			"save": "저장",
+			"testEmail": "이메일 전송 테스트"
+		},
+		"nl-NL": {
+			"emailServer": "Email-Server",
+			"enableEmail": "Email distributie inschakelen",
+			"recommended": "Aanbevolen",
+			"emailConfigInfo": "Wordt gebruikt om je email te bevestigen tijdens het aanmelden of als je je wachtwoord bent vergeten",
+			"emailAddress": "Email adres",
+			"smtpConfig": "SMTP-server configuratie",
+			"smtpHost": "Server",
+			"smtpPort": "Poort",
+			"smtpUser": "Gebruikersnaam",
+			"smtpPass": "Wachtwoord",
+			"emptyToDisableSmtpAuth": "Laat gebruikersnaam en wachtwoord leeg om SMTP-authenticatie uit te schakelen.",
+			"smtpSecure": "Impliciet SSL/TLS gebruiken voor SMTP-verbindingen",
+			"smtpSecureInfo": "Schakel dit uit bij gebruik van STARTTLS",
+			"save": "Opslaan",
+			"testEmail": "Emailversand testen"
+		},
+		"no-NO": {
+			"emailServer": "E-postserver",
+			"enableEmail": "Aktiver sending av e-post",
+			"recommended": "Anbefalt",
+			"emailConfigInfo": "Brukes til å bekrefte e-postadressen din ved registrering eller til å tilbakestille passordet hvis du glemmer det",
+			"emailAddress": "E-postadresse",
+			"smtpConfig": "Innstillinger for SMTP-serveren",
+			"smtpHost": "Vert",
+			"smtpPort": "Port",
+			"smtpUser": "Brukernavn",
+			"smtpPass": "Passord",
+			"emptyToDisableSmtpAuth": "La brukernavn og passord stå tomme for å deaktivere SMTP-autentisering",
+			"smtpSecure": "Bruk implisitt SSL/TLS for SMTP-tilkoblinger",
+			"smtpSecureInfo": "Slå av dette når du bruker STARTTLS",
+			"save": "Lagre",
+			"testEmail": "Test levering av e-post"
+		},
+		"pl-PL": {
+			"emailServer": "Serwer poczty e-mail",
+			"enableEmail": "Włącz dostarczanie wiadomości e-mail",
+			"recommended": "Zalecane",
+			"emailConfigInfo": "Wykorzystywany do potwierdzenia adresu e-mail w trakcie rejestracji, lub gdy zapomnisz hasła",
+			"emailAddress": "Adres e-mail",
+			"smtpConfig": "Konfiguracja serwera SMTP",
+			"smtpHost": "Host",
+			"smtpPort": "Port",
+			"smtpUser": "Nazwa użytkownika",
+			"smtpPass": "Hasło",
+			"emptyToDisableSmtpAuth": "Pozostaw adres e-mail i hasło puste, aby wyłączyć weryfikację SMTP",
+			"smtpSecure": "Użyj niejawnego SSL/TLS dla połączeń SMTP",
+			"smtpSecureInfo": "Wyłącz, jeżeli używasz STARTTLS",
+			"save": "Zapisz",
+			"testEmail": "Przetestuj dostarczanie wiadomości e-mail"
+		},
+		"pt-PT": {
+			"emailServer": "Servidor de e-mail",
+			"enableEmail": "Habilitar envio de e-mails",
+			"recommended": "Recomendado",
+			"emailConfigInfo": "Usado para confirmar o seu endereço de e-mail e redefinir sua senha",
+			"emailAddress": "Endereço de e-mail",
+			"smtpConfig": "Configuração do servidor SMTP",
+			"smtpHost": "Host",
+			"smtpPort": "Porta",
+			"smtpUser": "Nome de usuário",
+			"smtpPass": "Senha",
+			"emptyToDisableSmtpAuth": "Desative a autenticação SMTP deixando o nome de usuário e a senha em branco.",
+			"smtpSecure": "Use SSL/TLS implícito para conexões SMTP",
+			"smtpSecureInfo": "Desative esta opção ao utilizar STARTTLS.",
+			"save": "Salvar",
+			"testEmail": "Testar envio de e-mail"
+		},
+		"ru-RU": {
+			"emailServer": "Сервер электронной почты",
+			"enableEmail": "Включить обмен электронной почтой",
+			"recommended": "Рекомендуем",
+			"emailConfigInfo": "Используется для подтверждения адреса электронной почты и сброса пароля.",
+			"emailAddress": "Адрес электронной почты",
+			"smtpConfig": "Конфигурация SMTP-сервера",
+			"smtpHost": "Хост",
+			"smtpPort": "Порт",
+			"smtpUser": "Имя пользователя",
+			"smtpPass": "Пароль",
+			"emptyToDisableSmtpAuth": "Не заполняйте имя пользователя и пароль, чтобы отключить аутентификацию в SMTP.",
+			"smtpSecure": "Использовать SSL/TLS",
+			"smtpSecureInfo": "Выключите при использовании STARTTLS.",
+			"save": "Сохранить",
+			"testEmail": "Отправить тестовое письмо"
+		},
+		"sk-SK": {
+			"emailServer": "Email server",
+			"enableEmail": "Zapnúť email",
+			"recommended": "Odporúčané",
+			"emailConfigInfo": "Používa sa na overenie emaily pri registrácii alebo pri zabudnutí hesla",
+			"emailAddress": "Emailová adresa",
+			"smtpConfig": "Nastavenia SMTP servera",
+			"smtpHost": "Host",
+			"smtpPort": "Port",
+			"smtpUser": "Meno používateľa",
+			"smtpPass": "Heslo",
+			"emptyToDisableSmtpAuth": "Vynechaním mena hesla vypnete SMTP verifikáciu",
+			"smtpSecure": "Použiť implicitné SSL/TLS pre SMTP spojenia",
+			"smtpSecureInfo": "Toto vypnite keď používate STARTTLS",
+			"save": "Uložiť",
+			"testEmail": "Doručenie testovacieho emailu"
+		},
+		"th-TH": {
+			"emailServer": "เซิร์ฟเวอร์ของอีเมล",
+			"enableEmail": "เปิดใช้งานการกระจายอีเมล",
+			"recommended": "แนะนำ",
+			"emailConfigInfo": "ใช้สำหรับการยืนยันอีเมลหรือการรีเซ็ตรหัสผ่าน",
+			"emailAddress": "ที่อยู่อีเมล",
+			"smtpConfig": "ตั้งค่าเซิร์ฟเวอร์ SMTP",
+			"smtpHost": "โฮสต์",
+			"smtpPort": "พอร์ต",
+			"smtpUser": "ชื่อผู้ใช้",
+			"smtpPass": "รหัสผ่าน",
+			"emptyToDisableSmtpAuth": "ปล่อยชื่อผู้ใช้และรหัสผ่านว่างไว้เพื่อปิดใช้งานการยืนยัน SMTP",
+			"smtpSecure": "ใช้โดยนัย SSL/TLS สำหรับการเชื่อมต่อ SMTP",
+			"smtpSecureInfo": "ปิดสิ่งนี้เมื่อใช้ STARTTLS",
+			"save": "บันทึก",
+			"testEmail": "ทดสอบการส่งอีเมล"
+		},
+		"tr-TR": {
+			"emailServer": "E-posta sunucusu",
+			"enableEmail": "E-posta dağıtımını etkinleştir",
+			"recommended": "Önerilen",
+			"emailConfigInfo": "Kayıt sırasında veya şifreni unuttuğunda E-postanı doğrulamak için kullanılır.",
+			"emailAddress": "E-Posta adresi",
+			"smtpConfig": "SMTP Sunucu yapılandırması",
+			"smtpHost": "Host",
+			"smtpPort": "Port",
+			"smtpUser": "Kullanıcı adı",
+			"smtpPass": "Şifre",
+			"emptyToDisableSmtpAuth": "SMTP kimlik doğrulamasını devre dışı bırakmak için kullanıcı adı ve şifre alanlarını boş bırakın.",
+			"smtpSecure": "SMTP bağlantıları için örtük SSL/TLS kullanın",
+			"smtpSecureInfo": "STARTTLS kullanırken bunu kapatın.",
+			"save": "Kaydet",
+			"testEmail": "Test E-postası gönderimi"
+		},
+		"ug-CN": {
+			"emailServer": "ئېلېكترونلۇق خەت مۇلازىمېتىرى",
+			"enableEmail": "ئېلېكترونلۇق خەت يوللاشنى قوزغىتىش",
+			"recommended": "تەۋسىيە قىلىنىدۇ",
+			"emailConfigInfo": "تىزىملىتىش ۋاقتىدا ئېلېكترونلۇق خەت ئادرېسىڭىزنى دەلىللەش ياكى پارولنى ئۇنتۇپ قالغاندا قايتا تەڭشەش ئۈچۈن ئىشلىتىلىدۇ.",
+			"emailAddress": "ئېلېكترونلۇق خەت ئادرېسى",
+			"smtpConfig": "SMTP مۇلازىمېتىرىنىڭ تەڭشىكى",
+			"smtpHost": "باش ئاپپارات",
+			"smtpPort": "ئېغىز",
+			"smtpUser": "ئىشلەتكۈچى نامى",
+			"smtpPass": "پارول",
+			"emptyToDisableSmtpAuth": "SMTP دەلىللەشنى تاقاش ئۈچۈن ئىشلەتكۈچى نامى ۋە پارولنى بوش قالدۇرۇڭ.",
+			"smtpSecure": "SMTP ئۇلىنىشى باشلانغاندىن تارتىپ SSL/TLS ئىشلىتىش",
+			"smtpSecureInfo": "STARTTLS ئىشلەتكەندە بۇ تاللاشنى تاقاڭ.",
+			"save": "ساقلاش",
+			"testEmail": "ئېلېكترونلۇق خەت يوللاشنى سىناش"
+		},
+		"uk-UA": {
+			"emailServer": "Email сервер",
+			"enableEmail": "Увімкнути функцію доставки пошти",
+			"recommended": "Рекомендоване",
+			"emailConfigInfo": "Використовується для підтвердження електронної пошти підчас реєстрації, а також для відновлення паролю.",
+			"emailAddress": "E-mail адреса",
+			"smtpConfig": "Налаштування сервера SMTP",
+			"smtpHost": "Хост",
+			"smtpPort": "Порт",
+			"smtpUser": "Ім'я користувача",
+			"smtpPass": "Пароль",
+			"emptyToDisableSmtpAuth": "Залиште назву користувача і пароль пустими для вимкнення підтвердження SMTP",
+			"smtpSecure": "Використовувати безумовне шифрування SSL/TLS для з'єднань SMTP",
+			"smtpSecureInfo": "Вимкніть при використанні STARTTLS  ",
+			"save": "Зберегти",
+			"testEmail": "Тестовий email"
+		},
+		"vi-VN": {
+			"emailServer": "Email máy chủ",
+			"enableEmail": "Bật phân phối email",
+			"recommended": "Được đề xuất",
+			"emailConfigInfo": "Được dùng để xác minh email của bạn lúc đăng ký hoặc nếu bạn quên mật khẩu của mình",
+			"emailAddress": "Địa chỉ email",
+			"smtpConfig": "Cấu hình máy chủ SMTP",
+			"smtpHost": "Host",
+			"smtpPort": "Cổng",
+			"smtpUser": "Tên người dùng",
+			"smtpPass": "Mật khẩu",
+			"emptyToDisableSmtpAuth": "Để trống tên người dùng và mật khẩu để tắt xác thực SMTP",
+			"smtpSecure": "Dùng SSL/TLS ngầm định cho các kết nối SMTP",
+			"smtpSecureInfo": "Tắt cái này nếu dùng STARTTLS",
+			"save": "Lưu",
+			"testEmail": "Kiểm tra vận chuyển email"
+		},
+		"zh-CN": {
+			"emailServer": "邮件服务器",
+			"enableEmail": "启用发送邮件功能",
+			"recommended": "推荐",
+			"emailConfigInfo": "用于确认电子邮件和密码重置",
+			"emailAddress": "电子邮件地址",
+			"smtpConfig": "SMTP 服务器设置",
+			"smtpHost": "主机名",
+			"smtpPort": "端口",
+			"smtpUser": "用户名",
+			"smtpPass": "密码",
+			"emptyToDisableSmtpAuth": "用户名和密码留空可以禁用 SMTP 验证",
+			"smtpSecure": "在 SMTP 连接中使用隐式 SSL / TLS",
+			"smtpSecureInfo": "使用 STARTTLS 时关闭。",
+			"save": "保存",
+			"testEmail": "邮件发送测试"
+		},
+		"zh-TW": {
+			"emailServer": "電子郵件伺服器",
+			"enableEmail": "啟用發送電子郵件功能",
+			"recommended": "推薦",
+			"emailConfigInfo": "用於確認電子郵件地址及密碼重置",
+			"emailAddress": "電子郵件位址",
+			"smtpConfig": "SMTP 伺服器設定",
+			"smtpHost": "主機",
+			"smtpPort": "埠",
+			"smtpUser": "使用者名稱",
+			"smtpPass": "密碼",
+			"emptyToDisableSmtpAuth": "將使用者名稱和密碼留空以關閉 SMTP 驗證。",
+			"smtpSecure": "在 SMTP 連接中使用隱式 SSL/TLS",
+			"smtpSecureInfo": "使用 STARTTLS 時關閉。",
+			"save": "儲存",
+			"testEmail": "測試郵件發送"
+		}
+	},
+	"changes": [
+		{
+			"language": "da-DK",
+			"path": "emailServer",
+			"original": "Email server",
+			"reviewed": "E-mailserver"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "emailServer",
+			"original": "Email server",
+			"reviewed": "Aqeddac n yimayl"
+		},
+		{
+			"language": "kn-IN",
+			"path": "emailServer",
+			"original": "Email server",
+			"reviewed": "ಇಮೇಲ್ ಸರ್ವರ್"
+		},
+		{
+			"language": "no-NO",
+			"path": "emailServer",
+			"original": "Email server",
+			"reviewed": "E-postserver"
+		},
+		{
+			"language": "ug-CN",
+			"path": "emailServer",
+			"original": "Email server",
+			"reviewed": "ئېلېكترونلۇق خەت مۇلازىمېتىرى"
+		},
+		{
+			"language": "ar-SA",
+			"path": "enableEmail",
+			"original": "Enable email distribution",
+			"reviewed": "تفعيل إرسال البريد الإلكتروني"
+		},
+		{
+			"language": "da-DK",
+			"path": "enableEmail",
+			"original": "Enable email distribution",
+			"reviewed": "Aktivér afsendelse af e-mails"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "enableEmail",
+			"original": "Enable email distribution",
+			"reviewed": "Rmed tuzna n yimaylen"
+		},
+		{
+			"language": "kn-IN",
+			"path": "enableEmail",
+			"original": "Enable email distribution",
+			"reviewed": "ಇಮೇಲ್ ಕಳುಹಿಸುವುದನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
+		},
+		{
+			"language": "no-NO",
+			"path": "enableEmail",
+			"original": "Enable email distribution",
+			"reviewed": "Aktiver sending av e-post"
+		},
+		{
+			"language": "ug-CN",
+			"path": "enableEmail",
+			"original": "Enable email distribution",
+			"reviewed": "ئېلېكترونلۇق خەت يوللاشنى قوزغىتىش"
+		},
+		{
+			"language": "da-DK",
+			"path": "recommended",
+			"original": "Recommended",
+			"reviewed": "Anbefalet"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "recommended",
+			"original": "Recommended",
+			"reviewed": "Yettusemter"
+		},
+		{
+			"language": "kn-IN",
+			"path": "recommended",
+			"original": "Recommended",
+			"reviewed": "ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ"
+		},
+		{
+			"language": "nl-NL",
+			"path": "recommended",
+			"original": "Recommended",
+			"reviewed": "Aanbevolen"
+		},
+		{
+			"language": "ug-CN",
+			"path": "recommended",
+			"original": "Recommended",
+			"reviewed": "تەۋسىيە قىلىنىدۇ"
+		},
+		{
+			"language": "da-DK",
+			"path": "emailConfigInfo",
+			"original": "Used to confirm your email during sign-up or if you forget your password",
+			"reviewed": "Bruges til at bekræfte din e-mailadresse ved tilmelding eller til at nulstille din adgangskode, hvis du glemmer den"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "emailConfigInfo",
+			"original": "Used to confirm your email during sign-up or if you forget your password",
+			"reviewed": "Yettuseqdec i usentem n tansa-k n yimayl deg ujerred neɣ i uwennez n wawal uffir ma tettuḍ-t."
+		},
+		{
+			"language": "kn-IN",
+			"path": "emailConfigInfo",
+			"original": "Used to confirm your email during sign-up or if you forget your password",
+			"reviewed": "ನೋಂದಣಿ ಸಮಯದಲ್ಲಿ ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ದೃಢೀಕರಿಸಲು ಅಥವಾ ಗುಪ್ತಪದವನ್ನು ಮರೆತಾಗ ಅದನ್ನು ಮರುಹೊಂದಿಸಲು ಬಳಸಲಾಗುತ್ತದೆ."
+		},
+		{
+			"language": "no-NO",
+			"path": "emailConfigInfo",
+			"original": "Used to confirm your email during sign-up or if you forget your password",
+			"reviewed": "Brukes til å bekrefte e-postadressen din ved registrering eller til å tilbakestille passordet hvis du glemmer det"
+		},
+		{
+			"language": "ug-CN",
+			"path": "emailConfigInfo",
+			"original": "Used to confirm your email during sign-up or if you forget your password",
+			"reviewed": "تىزىملىتىش ۋاقتىدا ئېلېكترونلۇق خەت ئادرېسىڭىزنى دەلىللەش ياكى پارولنى ئۇنتۇپ قالغاندا قايتا تەڭشەش ئۈچۈن ئىشلىتىلىدۇ."
+		},
+		{
+			"language": "da-DK",
+			"path": "emailAddress",
+			"original": "Email address",
+			"reviewed": "E-mailadresse"
+		},
+		{
+			"language": "kn-IN",
+			"path": "emailAddress",
+			"original": "Email address",
+			"reviewed": "ಇಮೇಲ್ ವಿಳಾಸ"
+		},
+		{
+			"language": "no-NO",
+			"path": "emailAddress",
+			"original": "Email address",
+			"reviewed": "E-postadresse"
+		},
+		{
+			"language": "ug-CN",
+			"path": "emailAddress",
+			"original": "Email address",
+			"reviewed": "ئېلېكترونلۇق خەت ئادرېسى"
+		},
+		{
+			"language": "da-DK",
+			"path": "smtpConfig",
+			"original": "SMTP Server Configuration",
+			"reviewed": "Indstillinger for SMTP-serveren"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "smtpConfig",
+			"original": "SMTP Server Configuration",
+			"reviewed": "Iɣewwaṛen n uqeddac SMTP"
+		},
+		{
+			"language": "kn-IN",
+			"path": "smtpConfig",
+			"original": "SMTP Server Configuration",
+			"reviewed": "SMTP ಸರ್ವರ್ ಸಂರಚನೆ"
+		},
+		{
+			"language": "no-NO",
+			"path": "smtpConfig",
+			"original": "SMTP Server Configuration",
+			"reviewed": "Innstillinger for SMTP-serveren"
+		},
+		{
+			"language": "ug-CN",
+			"path": "smtpConfig",
+			"original": "SMTP Server Configuration",
+			"reviewed": "SMTP مۇلازىمېتىرىنىڭ تەڭشىكى"
+		},
+		{
+			"language": "da-DK",
+			"path": "smtpHost",
+			"original": "Host",
+			"reviewed": "Vært"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "smtpHost",
+			"original": "Host",
+			"reviewed": "Asenneftaɣ"
+		},
+		{
+			"language": "kn-IN",
+			"path": "smtpHost",
+			"original": "Host",
+			"reviewed": "ಹೋಸ್ಟ್"
+		},
+		{
+			"language": "ug-CN",
+			"path": "smtpHost",
+			"original": "Host",
+			"reviewed": "باش ئاپپارات"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "smtpPort",
+			"original": "Port",
+			"reviewed": "Tawwurt"
+		},
+		{
+			"language": "kn-IN",
+			"path": "smtpPort",
+			"original": "Port",
+			"reviewed": "ಪೋರ್ಟ್"
+		},
+		{
+			"language": "ug-CN",
+			"path": "smtpPort",
+			"original": "Port",
+			"reviewed": "ئېغىز"
+		},
+		{
+			"language": "da-DK",
+			"path": "smtpUser",
+			"original": "Username",
+			"reviewed": "Brugernavn"
+		},
+		{
+			"language": "ug-CN",
+			"path": "smtpUser",
+			"original": "Username",
+			"reviewed": "ئىشلەتكۈچى نامى"
+		},
+		{
+			"language": "da-DK",
+			"path": "smtpPass",
+			"original": "Password",
+			"reviewed": "Adgangskode"
+		},
+		{
+			"language": "ug-CN",
+			"path": "smtpPass",
+			"original": "Password",
+			"reviewed": "پارول"
+		},
+		{
+			"language": "da-DK",
+			"path": "emptyToDisableSmtpAuth",
+			"original": "Leave username and password empty to disable SMTP authentication",
+			"reviewed": "Lad brugernavn og adgangskode være tomme for at deaktivere SMTP-godkendelse"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "emptyToDisableSmtpAuth",
+			"original": "Leave username and password empty to disable SMTP authentication",
+			"reviewed": "Eǧǧ isem n umseqdac d wawal uffir d ilmawen i usensi n usesteb SMTP."
+		},
+		{
+			"language": "kn-IN",
+			"path": "emptyToDisableSmtpAuth",
+			"original": "Leave username and password empty to disable SMTP authentication",
+			"reviewed": "SMTP ದೃಢೀಕರಣವನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲು ಬಳಕೆಹೆಸರು ಮತ್ತು ಗುಪ್ತಪದವನ್ನು ಖಾಲಿ ಬಿಡಿ."
+		},
+		{
+			"language": "no-NO",
+			"path": "emptyToDisableSmtpAuth",
+			"original": "Leave username and password empty to disable SMTP authentication",
+			"reviewed": "La brukernavn og passord stå tomme for å deaktivere SMTP-autentisering"
+		},
+		{
+			"language": "ug-CN",
+			"path": "emptyToDisableSmtpAuth",
+			"original": "Leave username and password empty to disable SMTP authentication",
+			"reviewed": "SMTP دەلىللەشنى تاقاش ئۈچۈن ئىشلەتكۈچى نامى ۋە پارولنى بوش قالدۇرۇڭ."
+		},
+		{
+			"language": "ar-SA",
+			"path": "smtpSecure",
+			"original": "Use implicit SSL/TLS for SMTP connections",
+			"reviewed": "استخدام SSL/TLS منذ بدء اتصالات SMTP"
+		},
+		{
+			"language": "da-DK",
+			"path": "smtpSecure",
+			"original": "Use implicit SSL/TLS for SMTP connections",
+			"reviewed": "Brug implicit SSL/TLS til SMTP-forbindelser"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "smtpSecure",
+			"original": "Use implicit SSL/TLS for SMTP connections",
+			"reviewed": "Seqdec SSL/TLS seg tazwara n tuqqniwin SMTP"
+		},
+		{
+			"language": "kn-IN",
+			"path": "smtpSecure",
+			"original": "Use implicit SSL/TLS for SMTP connections",
+			"reviewed": "SMTP ಸಂಪರ್ಕಗಳ ಆರಂಭದಿಂದಲೇ SSL/TLS ಬಳಸಿ"
+		},
+		{
+			"language": "no-NO",
+			"path": "smtpSecure",
+			"original": "Use implicit SSL/TLS for SMTP connections",
+			"reviewed": "Bruk implisitt SSL/TLS for SMTP-tilkoblinger"
+		},
+		{
+			"language": "ug-CN",
+			"path": "smtpSecure",
+			"original": "Use implicit SSL/TLS for SMTP connections",
+			"reviewed": "SMTP ئۇلىنىشى باشلانغاندىن تارتىپ SSL/TLS ئىشلىتىش"
+		},
+		{
+			"language": "da-DK",
+			"path": "smtpSecureInfo",
+			"original": "Turn this off when using STARTTLS",
+			"reviewed": "Slå dette fra, når du bruger STARTTLS"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "smtpSecureInfo",
+			"original": "Turn this off when using STARTTLS",
+			"reviewed": "Sens asefran-a mi ara tesqedceḍ STARTTLS."
+		},
+		{
+			"language": "kn-IN",
+			"path": "smtpSecureInfo",
+			"original": "Turn this off when using STARTTLS",
+			"reviewed": "STARTTLS ಬಳಸುವಾಗ ಈ ಆಯ್ಕೆಯನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಿ."
+		},
+		{
+			"language": "no-NO",
+			"path": "smtpSecureInfo",
+			"original": "Turn this off when using STARTTLS",
+			"reviewed": "Slå av dette når du bruker STARTTLS"
+		},
+		{
+			"language": "ug-CN",
+			"path": "smtpSecureInfo",
+			"original": "Turn this off when using STARTTLS",
+			"reviewed": "STARTTLS ئىشلەتكەندە بۇ تاللاشنى تاقاڭ."
+		},
+		{
+			"language": "da-DK",
+			"path": "save",
+			"original": "Save",
+			"reviewed": "Gem"
+		},
+		{
+			"language": "ug-CN",
+			"path": "save",
+			"original": "Save",
+			"reviewed": "ساقلاش"
+		},
+		{
+			"language": "ar-SA",
+			"path": "testEmail",
+			"original": "Test email delivery",
+			"reviewed": "اختبار إرسال البريد الإلكتروني"
+		},
+		{
+			"language": "da-DK",
+			"path": "testEmail",
+			"original": "Test email delivery",
+			"reviewed": "Test levering af e-mails"
+		},
+		{
+			"language": "kab-KAB",
+			"path": "testEmail",
+			"original": "Test email delivery",
+			"reviewed": "Sekyed tuzna n yimayl"
+		},
+		{
+			"language": "kn-IN",
+			"path": "testEmail",
+			"original": "Test email delivery",
+			"reviewed": "ಇಮೇಲ್ ಕಳುಹಿಸುವಿಕೆಯನ್ನು ಪರೀಕ್ಷಿಸಿ"
+		},
+		{
+			"language": "no-NO",
+			"path": "testEmail",
+			"original": "Test email delivery",
+			"reviewed": "Test levering av e-post"
+		},
+		{
+			"language": "ug-CN",
+			"path": "testEmail",
+			"original": "Test email delivery",
+			"reviewed": "ئېلېكترونلۇق خەت يوللاشنى سىناش"
+		}
+	],
+	"preservedEnglishEqualRawSlots": [
+		{
+			"language": "sk-SK",
+			"local": "emailServer",
+			"value": "Email server"
+		},
+		{
+			"language": "de-DE",
+			"local": "smtpHost",
+			"value": "Host"
+		},
+		{
+			"language": "es-ES",
+			"local": "smtpHost",
+			"value": "Host"
+		},
+		{
+			"language": "id-ID",
+			"local": "smtpHost",
+			"value": "Host"
+		},
+		{
+			"language": "pl-PL",
+			"local": "smtpHost",
+			"value": "Host"
+		},
+		{
+			"language": "pt-PT",
+			"local": "smtpHost",
+			"value": "Host"
+		},
+		{
+			"language": "sk-SK",
+			"local": "smtpHost",
+			"value": "Host"
+		},
+		{
+			"language": "tr-TR",
+			"local": "smtpHost",
+			"value": "Host"
+		},
+		{
+			"language": "vi-VN",
+			"local": "smtpHost",
+			"value": "Host"
+		},
+		{
+			"language": "ca-ES",
+			"local": "smtpPort",
+			"value": "Port"
+		},
+		{
+			"language": "cs-CZ",
+			"local": "smtpPort",
+			"value": "Port"
+		},
+		{
+			"language": "de-DE",
+			"local": "smtpPort",
+			"value": "Port"
+		},
+		{
+			"language": "fr-FR",
+			"local": "smtpPort",
+			"value": "Port"
+		},
+		{
+			"language": "id-ID",
+			"local": "smtpPort",
+			"value": "Port"
+		},
+		{
+			"language": "pl-PL",
+			"local": "smtpPort",
+			"value": "Port"
+		},
+		{
+			"language": "sk-SK",
+			"local": "smtpPort",
+			"value": "Port"
+		},
+		{
+			"language": "tr-TR",
+			"local": "smtpPort",
+			"value": "Port"
+		},
+		{
+			"language": "it-IT",
+			"local": "smtpPass",
+			"value": "Password"
+		}
+	],
+	"preservedAbsentRawLoanwords": [
+		{
+			"language": "da-DK",
+			"local": "smtpPort",
+			"value": "Port",
+			"englishSource": "Port",
+			"rawAbsent": true,
+			"reason": "Port is already the ordinary Danish/Norwegian technical label; changing it would be stylistic."
+		},
+		{
+			"language": "no-NO",
+			"local": "smtpPort",
+			"value": "Port",
+			"englishSource": "Port",
+			"rawAbsent": true,
+			"reason": "Port is already the ordinary Danish/Norwegian technical label; changing it would be stylistic."
+		}
+	],
+	"raw": {
+		"ar-SA": {
+			"count": 12,
+			"sha256": "5b0583f37fc3db477f03ce9eb21b2a1f489170026a29a99bd075751062b9262f"
+		},
+		"bn-BD": {
+			"count": 14,
+			"sha256": "1f200f29254f7054e6ca3115eb849a8ad730d10b93829d8f213d6ff0e4b54a51"
+		},
+		"ca-ES": {
+			"count": 15,
+			"sha256": "39589b341dc74e0ae9afb642a167520c2b4115e380ec665eed1d166f1ed87270"
+		},
+		"cs-CZ": {
+			"count": 15,
+			"sha256": "576e0cdc61fd1c9991ad4fcc1fa0b9db51b2e4312cf702be534c4e0311d3d8ba"
+		},
+		"da-DK": {
+			"count": 0,
+			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+		},
+		"de-DE": {
+			"count": 15,
+			"sha256": "3012f8545b3bfab45a25ddb41475fa261480595fdee9da51377f57323aa429a2"
+		},
+		"el-GR": {
+			"count": 5,
+			"sha256": "6e737ae1944d861f34504ba53721b64303c594fda0789d19d5be673e3d258c78"
+		},
+		"en-US": {
+			"count": 15,
+			"sha256": "8dab7d8c224e0383318147df5343a8f66fbecff35705334f868f1fa4e9de3947"
+		},
+		"es-ES": {
+			"count": 15,
+			"sha256": "5926b36883cc7b6995a348c4e48a3931a69e7f1b551ec5ca62f76215e61d38a9"
+		},
+		"fa-IR": {
+			"count": 4,
+			"sha256": "82d97d02f080f2297d70aea66271bd3cd0d92d69d7714be9daa8d2180a2ef112"
+		},
+		"fr-FR": {
+			"count": 15,
+			"sha256": "845eafa1b7003da4e4c606d3ca93f0ddea8685bc14fec846e944d5e9554b99e6"
+		},
+		"hr-HR": {
+			"count": 0,
+			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+		},
+		"ht-HT": {
+			"count": 2,
+			"sha256": "3cf3d64aec4aec16001c0d0ac57fafe30dd351d7f7fbed5a5e84d90012113b91"
+		},
+		"hu-HU": {
+			"count": 3,
+			"sha256": "b52504133dc84eea9d2cfa95858dc869404d5b8d1a68c48e03c88c3e814e11cb"
+		},
+		"id-ID": {
+			"count": 15,
+			"sha256": "b8bfa746aa53a58c993c28eb5a5e311c64c115ff921f6d026ba647d5e113b606"
+		},
+		"it-IT": {
+			"count": 15,
+			"sha256": "4d1ab6d831416ea4c8d25c61f38866d4871ea53ad54967c620bdadf8187737d2"
+		},
+		"ja-JP": {
+			"count": 15,
+			"sha256": "b3fb437075522baa9c0d21fdc1ec4f5e3a69bda4b437c7000fb87e034fe6e4cd"
+		},
+		"ja-KS": {
+			"count": 15,
+			"sha256": "9de5e7d634a80666b6a06f26d0eb8469d17e9344dc563747f3851dccff680e67"
+		},
+		"jbo-EN": {
+			"count": 0,
+			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+		},
+		"kab-KAB": {
+			"count": 4,
+			"sha256": "1e86f62b00932c055a89a4b093ae84909df01256a8932c639f24d03c71a5f377"
+		},
+		"kn-IN": {
+			"count": 3,
+			"sha256": "e92175d806988d8cec76bb4d7d9e6e4f93732d660d8283bdf16a49ecc676559a"
+		},
+		"ko-GS": {
+			"count": 7,
+			"sha256": "c435d2b55f98c6ae5124abe07cb5c9e49a23daab91b1784dd43cd0c96643d541"
+		},
+		"ko-KR": {
+			"count": 15,
+			"sha256": "25de0c7cac6d05694eeff18a36d9eb5ecc5ed2a23c29916b547035dbdb26838a"
+		},
+		"lo-LA": {
+			"count": 4,
+			"sha256": "d2584bdc7c5acc7d1a7ef183840a80cdfabe30ccdcc9f847315f753c08043666"
+		},
+		"nl-NL": {
+			"count": 14,
+			"sha256": "e13eae9364e1a0d0c253771736783524acd6521e05eb0b4beaf678afba0900de"
+		},
+		"no-NO": {
+			"count": 5,
+			"sha256": "a844c4df40db0188128c6ad137fbfce2f08f5022f359794dfb6e7f9c01beaaf0"
+		},
+		"pl-PL": {
+			"count": 15,
+			"sha256": "f63c8c8abecfe0ad36e498040e900dc6156ca106e01e1ca79f2b162995981dd7"
+		},
+		"pt-PT": {
+			"count": 15,
+			"sha256": "d6061e66d4f79362b139d1df6d1ad91d26d5c865c231396f9fb08e717c9a142e"
+		},
+		"ro-RO": {
+			"count": 15,
+			"sha256": "f5557435fdc5ac89cc86abbf593d2c47f51cc8f6e91023df2acfc279b7635ee3"
+		},
+		"ru-RU": {
+			"count": 15,
+			"sha256": "829de9572e087a4ce8c1e2073447f1dc162f18e57958751d36c443f5e4eeca2c"
+		},
+		"si-LK": {
+			"count": 2,
+			"sha256": "a9ff42a7f824479c0f161651ff53d0eb226523414cfbee3382ddbc38a87523d0"
+		},
+		"sk-SK": {
+			"count": 15,
+			"sha256": "cbcb7712f89fb70e4b8ce9051bc59b46c4deaa4d21b1decf22ed15f0cbf9654c"
+		},
+		"sv-SE": {
+			"count": 7,
+			"sha256": "dbb1f3607fbd7addaee27506d8bbeb2081ac6d7086f5c9a6bbec0b4a2d8cb481"
+		},
+		"th-TH": {
+			"count": 15,
+			"sha256": "e54c9b5709c925429075dc91398a0773e14255fb94d0d88153008c1c03e39835"
+		},
+		"tl-PH": {
+			"count": 0,
+			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+		},
+		"tr-TR": {
+			"count": 15,
+			"sha256": "bbc72e4bc2eee4cbde89db8201124ef3f3a10f54d411e2d9e95b9534d038e963"
+		},
+		"ug-CN": {
+			"count": 0,
+			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+		},
+		"uk-UA": {
+			"count": 15,
+			"sha256": "7fecda4674d4f8cadf3400e073494d95fb33b7c161912824598c7cca0852fc71"
+		},
+		"uz-UZ": {
+			"count": 10,
+			"sha256": "d75afb327ab9c9f0a1d5201d5f04c9f5f80bacc9a9980e397d6d52a0987abf34"
+		},
+		"vi-VN": {
+			"count": 15,
+			"sha256": "534fec520de3c5ab0d188674ade15bf2c40cb8ba4e508d4b0a02f6775c6060c0"
+		},
+		"zh-CN": {
+			"count": 15,
+			"sha256": "1275e6476f6994a6af4f26cba24316edb9a9128ed8b5728e804f59db1808506e"
+		},
+		"zh-TW": {
+			"count": 15,
+			"sha256": "58d4469c404385c945e9e2f47ede012d44b9feba1684731c7a5a032f62b9dd60"
+		}
+	},
+	"effective": {
+		"ar-SA": "889fb21e0bd0c8e6f2a92db6654dee07ad729204806f0aaddd9d86b08f0a545e",
+		"ca-ES": "39589b341dc74e0ae9afb642a167520c2b4115e380ec665eed1d166f1ed87270",
+		"cs-CZ": "576e0cdc61fd1c9991ad4fcc1fa0b9db51b2e4312cf702be534c4e0311d3d8ba",
+		"da-DK": "8dab7d8c224e0383318147df5343a8f66fbecff35705334f868f1fa4e9de3947",
+		"de-DE": "3012f8545b3bfab45a25ddb41475fa261480595fdee9da51377f57323aa429a2",
+		"en-US": "8dab7d8c224e0383318147df5343a8f66fbecff35705334f868f1fa4e9de3947",
+		"es-ES": "5926b36883cc7b6995a348c4e48a3931a69e7f1b551ec5ca62f76215e61d38a9",
+		"fr-FR": "845eafa1b7003da4e4c606d3ca93f0ddea8685bc14fec846e944d5e9554b99e6",
+		"id-ID": "b8bfa746aa53a58c993c28eb5a5e311c64c115ff921f6d026ba647d5e113b606",
+		"it-IT": "4d1ab6d831416ea4c8d25c61f38866d4871ea53ad54967c620bdadf8187737d2",
+		"ja-JP": "b3fb437075522baa9c0d21fdc1ec4f5e3a69bda4b437c7000fb87e034fe6e4cd",
+		"ja-KS": "9de5e7d634a80666b6a06f26d0eb8469d17e9344dc563747f3851dccff680e67",
+		"kab-KAB": "25e3e741b1d71c65a73d69c9cced353d65683bb21dfebef0845baf7f13f244cd",
+		"kn-IN": "929d157bc7321fe74ca36cde298a1521cea353756d1fa52ee1d049ca4a1cf7c5",
+		"ko-KR": "25de0c7cac6d05694eeff18a36d9eb5ecc5ed2a23c29916b547035dbdb26838a",
+		"nl-NL": "0d7b569a487151f6159f4dc9c45d00019a0788228ea773e37c97585709d2cf1c",
+		"no-NO": "e1696f98aa4c0e4547a269094ebc388d28fce716ca2b06b9cde07a2f5d89b4ff",
+		"pl-PL": "f63c8c8abecfe0ad36e498040e900dc6156ca106e01e1ca79f2b162995981dd7",
+		"pt-PT": "d6061e66d4f79362b139d1df6d1ad91d26d5c865c231396f9fb08e717c9a142e",
+		"ru-RU": "829de9572e087a4ce8c1e2073447f1dc162f18e57958751d36c443f5e4eeca2c",
+		"sk-SK": "cbcb7712f89fb70e4b8ce9051bc59b46c4deaa4d21b1decf22ed15f0cbf9654c",
+		"th-TH": "e54c9b5709c925429075dc91398a0773e14255fb94d0d88153008c1c03e39835",
+		"tr-TR": "bbc72e4bc2eee4cbde89db8201124ef3f3a10f54d411e2d9e95b9534d038e963",
+		"ug-CN": "8dab7d8c224e0383318147df5343a8f66fbecff35705334f868f1fa4e9de3947",
+		"uk-UA": "7fecda4674d4f8cadf3400e073494d95fb33b7c161912824598c7cca0852fc71",
+		"vi-VN": "534fec520de3c5ab0d188674ade15bf2c40cb8ba4e508d4b0a02f6775c6060c0",
+		"zh-CN": "1275e6476f6994a6af4f26cba24316edb9a9128ed8b5728e804f59db1808506e",
+		"zh-TW": "58d4469c404385c945e9e2f47ede012d44b9feba1684731c7a5a032f62b9dd60"
+	}
+}

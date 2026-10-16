@@ -52,11 +52,15 @@ export default [
 		},
 	},
 	{
-		files: ['**/contract/**/*.ts', '**/shared/**/*.ts'],
+		files: ['**/contract/**/*.ts', '**/shared/**/*.ts', '**/*.contract.ts', '**/api.definition.ts', '**/*.schema.ts', '**/api/backend/transport/policy.types.ts'],
 		rules: {
 			'no-restricted-imports': ['error', {
 				paths: [{ name: 'punycode' }],
-				patterns: [{ group: ['node:*', '**/backend/**'], message: 'Contracts/shared code cannot import server implementation.' }],
+				// Colocated contracts are portable; the SDK AST check validates their transitive imports.
+				patterns: [
+					{ group: ['node:*'], message: 'Portable contracts/shared code cannot import Node APIs.' },
+					{ regex: '(?:^|/)backend/(?!.*\\.(?:contract|schema|definition)\\.js$|transport/policy\\.types\\.js$)', message: 'Portable modules can import only colocated contracts/schemas/types, not server implementation.' },
+				],
 			}],
 		},
 	},

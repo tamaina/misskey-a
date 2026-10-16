@@ -25,7 +25,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<i v-else-if="announcement.icon === 'error'" class="ti ti-circle-x" style="color: var(--MI_THEME-error);"></i>
 						<i v-else-if="announcement.icon === 'success'" class="ti ti-check" style="color: var(--MI_THEME-success);"></i>
 					</template>
-					<template #caption>{{ announcement.text }}</template>
+					<template #caption>
+						<span :class="$style.announcementText">{{ announcement.text }}</span>
+					</template>
+					<template #suffix>
+						<span v-if="announcement.autoArchiveAt" :class="$style.autoArchiveAt">
+							<i class="ti ti-calendar-time"></i> {{ $locale.sfc.autoArchiveAt }}: <MkTime :key="announcement.autoArchiveAt" :time="announcement.autoArchiveAt" mode="absolute"/>
+						</span>
+					</template>
 					<template #footer>
 						<div class="_buttons">
 							<MkButton rounded primary @click="save(announcement)"><i class="ti ti-device-floppy"></i> {{ $locale.sfc.save }}</MkButton>
@@ -44,6 +51,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkTextarea>
 						<MkInput v-model="announcement.imageUrl" type="url">
 							<template #label>{{ $locale.sfc.imageUrl }}</template>
+						</MkInput>
+						<MkInput v-model="announcement.autoArchiveAt" type="datetime-local">
+							<template #label>{{ $locale.sfc.autoArchiveAt }}</template>
+							<template #caption>{{ $locale.sfc.autoArchiveAtDescription }}</template>
 						</MkInput>
 						<MkRadios
 							v-model="announcement.icon"
@@ -92,6 +103,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
 import * as Misskey from 'misskey-js';
+import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -99,13 +111,15 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import * as os from '@features/ui/frontend/os.js';
-import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import { buildAnnouncementUpdate } from '@features/announcements/frontend/update-input.js';
+import { formatAutoArchiveInput, parseAutoArchiveInput } from '@features/announcements/frontend/auto-archive-input.js';
 
 const {
 	model: announcementsStatus,
@@ -121,19 +135,38 @@ const {
 const loading = ref(true);
 const loadingMore = ref(false);
 
-const announcements = ref<(Omit<Misskey.entities.AdminAnnouncementsListResponse[number], 'id' | 'createdAt' | 'updatedAt' | 'reads' | 'isActive'> & {
+const createAnnouncementErrors: ApiWithDialogCustomErrors = {
+	'2a892bd5-487d-46a2-a5fe-3d85ad51defe': {
+		title: $locale.value.sfc.autoArchiveAt,
+		text: $locale.value.sfc.autoArchiveAtMustBeInFuture,
+	},
+};
+
+type EditableAnnouncement = Omit<Misskey.entities.AdminAnnouncementsListResponse[number], 'id' | 'createdAt' | 'updatedAt' | 'reads' | 'isActive' | 'autoArchiveAt'> & {
 	id: string | null;
 	_id?: string;
 	isActive?: Misskey.entities.AdminAnnouncementsListResponse[number]['isActive'];
 	reads?: Misskey.entities.AdminAnnouncementsListResponse[number]['reads'];
-})[]>([]);
+	autoArchiveAt: string;
+	originalAutoArchiveAt: Misskey.entities.AdminAnnouncementsListResponse[number]['autoArchiveAt'];
+};
+
+const announcements = ref<EditableAnnouncement[]>([]);
+
+function toEditableAnnouncement(announcement: Misskey.entities.AdminAnnouncementsListResponse[number]): EditableAnnouncement {
+	return {
+		...announcement,
+		autoArchiveAt: formatAutoArchiveInput(announcement.autoArchiveAt),
+		originalAutoArchiveAt: announcement.autoArchiveAt,
+	};
+}
 
 watch(announcementsStatus, (to) => {
 	loading.value = true;
 	misskeyApi('admin/announcements/list', {
 		status: to,
 	}).then(announcementResponse => {
-		announcements.value = announcementResponse;
+		announcements.value = announcementResponse.map(toEditableAnnouncement);
 		loading.value = false;
 	});
 }, { immediate: true });
@@ -150,6 +183,8 @@ function add() {
 		forExistingUsers: false,
 		silence: false,
 		needConfirmationToRead: false,
+		autoArchiveAt: '',
+		originalAutoArchiveAt: null,
 		userId: null,
 	});
 }
@@ -169,36 +204,54 @@ async function del(announcement: (typeof announcements)['value'][number]) {
 
 async function archive(announcement: (typeof announcements)['value'][number]) {
 	if (announcement.id == null) return;
-	const { _id, ...data } = announcement; // _idを消す
-	await os.apiWithDialog('admin/announcements/update', {
+	const { _id, id, autoArchiveAt, originalAutoArchiveAt, ...data } = announcement; // APIに不要な項目を消す
+	await os.apiWithDialog('admin/announcements/update', buildAnnouncementUpdate({
 		...data,
-		id: announcement.id, // TSを黙らすため
+		id,
 		isActive: false,
-	});
+		autoArchiveAt: parseAutoArchiveInput(autoArchiveAt, originalAutoArchiveAt),
+	}));
 	refresh();
 }
 
 async function unarchive(announcement: (typeof announcements)['value'][number]) {
 	if (announcement.id == null) return;
-	const { _id, ...data } = announcement; // _idを消す
-	await os.apiWithDialog('admin/announcements/update', {
+	const { _id, id, autoArchiveAt, originalAutoArchiveAt, ...data } = announcement; // APIに不要な項目を消す
+	const autoArchiveAtMs = parseAutoArchiveInput(autoArchiveAt, originalAutoArchiveAt);
+	await os.apiWithDialog('admin/announcements/update', buildAnnouncementUpdate({
 		...data,
-		id: announcement.id, // TSを黙らすため
+		id,
 		isActive: true,
-	});
+		autoArchiveAt: autoArchiveAtMs != null && autoArchiveAtMs <= Date.now() ? null : autoArchiveAtMs,
+	}));
 	refresh();
 }
 
 async function save(announcement: (typeof announcements)['value'][number]) {
-	const { _id, ...data } = announcement; // _idを消す
-	if (announcement.id == null) {
-		await os.apiWithDialog('admin/announcements/create', data);
+	const { _id, id, isActive, reads, autoArchiveAt, originalAutoArchiveAt, ...data } = announcement; // APIに不要な項目を消す
+	const autoArchiveAtMs = parseAutoArchiveInput(autoArchiveAt, originalAutoArchiveAt);
+	if (id == null) {
+		if (autoArchiveAtMs != null && (Number.isNaN(autoArchiveAtMs) || autoArchiveAtMs <= Date.now())) {
+			await os.alert({
+				type: 'error',
+				title: $locale.value.sfc.autoArchiveAt,
+				text: $locale.value.sfc.autoArchiveAtMustBeInFuture,
+			});
+			return;
+		}
+
+		await os.apiWithDialog('admin/announcements/create', {
+			...data,
+			autoArchiveAt: autoArchiveAtMs,
+		}, undefined, createAnnouncementErrors);
 		refresh();
 	} else {
-		os.apiWithDialog('admin/announcements/update', {
+		await os.apiWithDialog('admin/announcements/update', buildAnnouncementUpdate({
 			...data,
-			id: announcement.id, // TSを黙らすため
-		});
+			id,
+			isActive,
+			autoArchiveAt: autoArchiveAtMs,
+		}));
 	}
 }
 
@@ -208,7 +261,7 @@ function more() {
 		status: announcementsStatus.value,
 		untilId: announcements.value.reduce((acc, announcement) => announcement.id != null ? announcement : acc).id!,
 	}).then(announcementResponse => {
-		announcements.value = announcements.value.concat(announcementResponse);
+		announcements.value = announcements.value.concat(announcementResponse.map(toEditableAnnouncement));
 		loadingMore.value = false;
 	});
 }
@@ -218,7 +271,7 @@ function refresh() {
 	misskeyApi('admin/announcements/list', {
 		status: announcementsStatus.value,
 	}).then(announcementResponse => {
-		announcements.value = announcementResponse;
+		announcements.value = announcementResponse.map(toEditableAnnouncement);
 		loading.value = false;
 	});
 }
@@ -238,6 +291,19 @@ definePage(() => ({
 	icon: 'ti ti-speakerphone',
 }));
 </script>
+
+<style lang="scss" module>
+.announcementText {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.autoArchiveAt {
+	white-space: nowrap;
+}
+</style>
 
 <locale lang="json" locale="ar-SA">
 {
@@ -270,7 +336,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "متأكد من أنك تريد حذف {x}؟",
 	"add": "إضافة",
-	"announcements": "الإعلانات"
+	"announcements": "الإعلانات",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -305,7 +374,10 @@ definePage(() => ({
 	"archived": "Arxivat",
 	"deleteAreYouSure": "Segur que vols esborrar «{x}»?",
 	"add": "Afegir",
-	"announcements": "Avisos"
+	"announcements": "Avisos",
+	"autoArchiveAt": "Data i hora d'arxivament automàtic",
+	"autoArchiveAtDescription": "Un cop hagin passat la data i l'hora especificades, aquest avís s'arxivarà automàticament. Si aquest camp es deixa en blanc, no s'arxivarà automàticament.",
+	"autoArchiveAtMustBeInFuture": "Indiqueu una data i una hora per a l'arxivament automàtic posteriors a la data i l'hora actuals."
 }
 </locale>
 
@@ -340,7 +412,10 @@ definePage(() => ({
 	"archived": "Archivované",
 	"deleteAreYouSure": "Jste si jistí že chcete smazat \"{x}\"?",
 	"add": "Přidat",
-	"announcements": "Oznámení"
+	"announcements": "Oznámení",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -375,7 +450,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"add": "Add",
-	"announcements": "Announcements"
+	"announcements": "Announcements",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -410,7 +488,10 @@ definePage(() => ({
 	"archived": "Archiviert",
 	"deleteAreYouSure": "Möchtest du „{x}“ wirklich löschen?",
 	"add": "Hinzufügen",
-	"announcements": "Ankündigungen"
+	"announcements": "Ankündigungen",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -445,7 +526,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"add": "Add",
-	"announcements": "Announcements"
+	"announcements": "Announcements",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -480,7 +564,10 @@ definePage(() => ({
 	"archived": "Archivado",
 	"deleteAreYouSure": "¿Desea borrar \"{x}\"?",
 	"add": "Agregar",
-	"announcements": "Avisos"
+	"announcements": "Avisos",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -515,7 +602,10 @@ definePage(() => ({
 	"archived": "Archivé",
 	"deleteAreYouSure": "Êtes-vous sûr·e de vouloir supprimer « {x} » ?",
 	"add": "Ajouter",
-	"announcements": "Annonces"
+	"announcements": "Annonces",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -550,7 +640,10 @@ definePage(() => ({
 	"archived": "Diarsipkan",
 	"deleteAreYouSure": "Apakah kamu yakin ingin menghapus \"{x}\"?",
 	"add": "Tambahkan",
-	"announcements": "Pengumuman"
+	"announcements": "Pengumuman",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -585,7 +678,10 @@ definePage(() => ({
 	"archived": "Archiviato",
 	"deleteAreYouSure": "Vuoi davvero eliminare \"{x}\"?",
 	"add": "Aggiungi",
-	"announcements": "Annunci"
+	"announcements": "Annunci",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -620,7 +716,10 @@ definePage(() => ({
 	"archived": "アーカイブ済み",
 	"deleteAreYouSure": "「{x}」を削除しますか？",
 	"add": "追加",
-	"announcements": "お知らせ"
+	"announcements": "お知らせ",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -655,7 +754,10 @@ definePage(() => ({
 	"archived": "アーカイブ済み",
 	"deleteAreYouSure": "「{x}」はほかしてええか？",
 	"add": "増やす",
-	"announcements": "お知らせ"
+	"announcements": "お知らせ",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -690,7 +792,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"add": "Add",
-	"announcements": "Announcements"
+	"announcements": "Announcements",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -725,7 +830,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"add": "Add",
-	"announcements": "Announcements"
+	"announcements": "Announcements",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -760,7 +868,10 @@ definePage(() => ({
 	"archived": "아카이브 됨",
 	"deleteAreYouSure": "\"{x}\" 을(를) 삭제하시겠습니까?",
 	"add": "추가",
-	"announcements": "공지사항"
+	"announcements": "공지사항",
+	"autoArchiveAt": "자동 아카이브 날짜 및 시각",
+	"autoArchiveAtDescription": "지정한 날짜 및 시각이 지나면 이 알림은 자동적으로 아카이브됩니다. 빈칸일 경우에는 자동적으로 아카이브되지 않습니다.",
+	"autoArchiveAtMustBeInFuture": "자동 아카이브 날짜 및 시각에는 현재보다 후의 날짜 및 시각으로 지정해 주십시오."
 }
 </locale>
 
@@ -795,7 +906,10 @@ definePage(() => ({
 	"archived": "Gearchiveerd",
 	"deleteAreYouSure": "Weet je zeker dat je \"{x}\" wil verwijderen?",
 	"add": "Toevoegen",
-	"announcements": "Aankondigingen"
+	"announcements": "Aankondigingen",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -830,7 +944,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "Er du sikker på at du vil slette \"{x}\"?",
 	"add": "Legg til",
-	"announcements": "Kunngjøringer"
+	"announcements": "Kunngjøringer",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -865,7 +982,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "Czy na pewno chcesz usunąć „{x}”?",
 	"add": "Dodaj",
-	"announcements": "Ogłoszenia"
+	"announcements": "Ogłoszenia",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -900,7 +1020,10 @@ definePage(() => ({
 	"archived": "Arquivado",
 	"deleteAreYouSure": "Deseja excluir \"{x}\"?",
 	"add": "Adicionar",
-	"announcements": "Avisos"
+	"announcements": "Avisos",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -935,7 +1058,10 @@ definePage(() => ({
 	"archived": "Архивировано",
 	"deleteAreYouSure": "Хотите удалить «{x}»?",
 	"add": "Добавить",
-	"announcements": "Оповещения"
+	"announcements": "Оповещения",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -970,7 +1096,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "Naozaj chcete odstrániť \"{x}\"?",
 	"add": "Pridať",
-	"announcements": "Oznamy"
+	"announcements": "Oznamy",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -1005,7 +1134,10 @@ definePage(() => ({
 	"archived": "เก็บถาวรแล้ว",
 	"deleteAreYouSure": "ต้องการลบ “{x}” ใช่ไหม?",
 	"add": "เพิ่ม",
-	"announcements": "ประกาศ"
+	"announcements": "ประกาศ",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -1040,7 +1172,10 @@ definePage(() => ({
 	"archived": "Arşivle",
 	"deleteAreYouSure": "“{x}” öğesini silmek istediğinizden emin misin?",
 	"add": "Ekle",
-	"announcements": "Duyurular"
+	"announcements": "Duyurular",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -1075,7 +1210,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
 	"add": "Add",
-	"announcements": "Announcements"
+	"announcements": "Announcements",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -1110,7 +1248,10 @@ definePage(() => ({
 	"archived": "Заархівовано",
 	"deleteAreYouSure": "Ви впевнені, що хочете видалити \"{x}\"?",
 	"add": "Додати",
-	"announcements": "Оголошення"
+	"announcements": "Оголошення",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -1145,7 +1286,10 @@ definePage(() => ({
 	"archived": "Archived",
 	"deleteAreYouSure": "Bạn có chắc muốn xóa \"{x}\"?",
 	"add": "Thêm",
-	"announcements": "Thông báo máy chủ"
+	"announcements": "Thông báo máy chủ",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
@@ -1180,7 +1324,10 @@ definePage(() => ({
 	"archived": "已归档",
 	"deleteAreYouSure": "要删掉「{x}」吗？",
 	"add": "添加",
-	"announcements": "公告"
+	"announcements": "公告",
+	"autoArchiveAt": "自动存档时间",
+	"autoArchiveAtDescription": "当超过指定的时间时，此通知将自动存档。留空则不自动存档。",
+	"autoArchiveAtMustBeInFuture": "请指定晚于当前时间的值。"
 }
 </locale>
 
@@ -1215,6 +1362,9 @@ definePage(() => ({
 	"archived": "已封存",
 	"deleteAreYouSure": "確定要刪掉「{x}」嗎？",
 	"add": "新增",
-	"announcements": "公告"
+	"announcements": "公告",
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>

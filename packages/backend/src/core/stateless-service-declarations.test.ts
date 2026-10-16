@@ -140,15 +140,23 @@ describe('seven stateless feature declarations', () => {
 		const query = mockDeep<SelectQueryBuilder<MiRegistryItem>>();
 		query.where.mockReturnValue(query);
 		query.andWhere.mockReturnValue(query);
-		inputs.registryItemsRepository.createQueryBuilder.mockReturnValue(query);
+		const createQueryBuilder = (): SelectQueryBuilder<MiRegistryItem> => query;
+		inputs.registryItemsRepository.createQueryBuilder.mockImplementation(createQueryBuilder);
 		inputs.idService.gen.mockReturnValue('item-id');
-		query.getOne.mockResolvedValueOnce(null).mockResolvedValueOnce(mockDeep<MiRegistryItem>({ id: 'existing-id' }));
+		const existing: MiRegistryItem = { id: 'existing-id', updatedAt: new Date(), userId: 'user', user: null, key: 'key', value: null, scope: ['settings'], domain: null };
+		const getOne = vi.fn<SelectQueryBuilder<MiRegistryItem>['getOne']>();
+		getOne.mockImplementationOnce(async () => null).mockImplementationOnce(async () => existing);
+		query.getOne.mockImplementation(getOne);
 		const registry = preferencesServices.create(inputs).RegistryApiService;
 		await registry.set('user', null, ['settings'], 'key', { enabled: true });
-		expect(inputs.registryItemsRepository.insert).toHaveBeenCalledWith(expect.objectContaining({ id: 'item-id', userId: 'user', domain: null, scope: ['settings'], key: 'key', value: { enabled: true } }));
+		expect(inputs.registryItemsRepository.query).toHaveBeenNthCalledWith(1,
+			'INSERT INTO "registry_item" ("id", "updatedAt", "userId", "domain", "scope", "key", "value") VALUES ($1, $2, $3, $4, $5, $6, $7)',
+			['item-id', expect.any(Date), 'user', null, ['settings'], 'key', '{"enabled":true}']);
 		expect(inputs.globalEventService.publishMainStream).toHaveBeenCalledWith('user', 'registryUpdated', { scope: ['settings'], key: 'key', value: { enabled: true } });
 		await registry.set('user', 'example.com', ['settings'], 'key', false);
-		expect(inputs.registryItemsRepository.update).toHaveBeenCalledWith('existing-id', expect.objectContaining({ value: false }));
+		expect(inputs.registryItemsRepository.query).toHaveBeenNthCalledWith(2,
+			'UPDATE "registry_item" SET "updatedAt" = $1, "value" = $2 WHERE "id" = $3',
+			[expect.any(Date), 'false', 'existing-id']);
 		expect(inputs.globalEventService.publishMainStream).toHaveBeenCalledTimes(1);
 	});
 });

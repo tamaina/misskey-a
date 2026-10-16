@@ -61,7 +61,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkFollowButton from '@features/relationships/frontend/components/MkFollowButton.vue';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { getUserMenu } from '@features/users/frontend/utility/get-user-menu.js';
@@ -100,12 +100,11 @@ async function fetchUser() {
 		user.value = props.q;
 		error.value = false;
 	} else {
-		const query: Misskey.entities.UsersShowRequest = props.q.startsWith('@') ?
+		const query: { userId: string } | { username: string; host?: string | null } = props.q.startsWith('@') ?
 			Misskey.acct.parse(props.q.substring(1)) :
 			{ userId: props.q };
 
-		// @ts-expect-error payloadの引数側の型が正常に解決されない
-		misskeyApi('users/show', query).then(res => {
+		misskeyApi<void, 'users/show', typeof query>('users/show', query).then(res => {
 			if (!props.showing) return;
 			user.value = res;
 			error.value = false;

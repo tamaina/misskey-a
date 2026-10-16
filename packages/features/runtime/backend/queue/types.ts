@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Antenna } from '@features/portability/backend/endpoints/i/import-antennas.js';
+import type { AntennaArtifact } from '@features/portability/backend/antenna-artifact.schema.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { SystemWebhookEventType } from '@features/integrations/backend/models/SystemWebhook.js';
@@ -12,7 +12,7 @@ import type { MiWebhook, WebhookEventTypes } from '@features/integrations/backen
 import type { IActivity } from '@features/federation/backend/protocol/type.js';
 import type { SystemWebhookPayload } from '@features/integrations/backend/services/SystemWebhookService.js';
 import type { UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
-import type httpSignature from '@peertube/http-signature';
+import type { ParsedDraftSignature, ParsedSignature } from '@misskey-dev/node-http-message-signatures';
 
 export type DeliverJobData = {
 	/** Actor */
@@ -25,11 +25,14 @@ export type DeliverJobData = {
 	to: string;
 	/** whether it is sharedInbox */
 	isSharedInbox: boolean;
+	/** Force the stable main RSA key for compatibility publication. */
+	forceMainKey?: boolean;
 };
 
 export type InboxJobData = {
 	activity: IActivity;
-	signature: httpSignature.IParsedSignature;
+	/** Canonical ParsedSignature wrapper/null, plus flat signatures from older writers. */
+	signature: ParsedDraftSignature['value'] | ParsedSignature | null;
 };
 
 export type RelationshipJobData = {
@@ -90,7 +93,7 @@ export type DbUserImportJobData = {
 
 export type DBAntennaImportJobData = {
 	user: ThinUser,
-	antenna: Antenna
+	antenna: AntennaArtifact
 };
 
 export type DbUserImportToDbJobData = {
@@ -113,6 +116,8 @@ export type PostScheduledNoteJobData = {
 	noteDraftId: string;
 };
 
+export type ArchiveAnnouncementJobData = { announcementId: string; autoArchiveAt: number };
+
 export type SystemWebhookDeliverJobData<T extends SystemWebhookEventType = SystemWebhookEventType> = {
 	type: T;
 	content: SystemWebhookPayload<T>;
@@ -123,7 +128,8 @@ export type SystemWebhookDeliverJobData<T extends SystemWebhookEventType = Syste
 	eventId: string;
 };
 
-export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEventTypes> = {
+export type LegacyUserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEventTypes> = {
+	mode?: 'legacy';
 	type: T;
 	content: UserWebhookPayload<T>;
 	webhookId: MiWebhook['id'];
@@ -134,6 +140,18 @@ export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEvent
 	eventId: string;
 };
 
+/** MCP jobs contain references only; current destination and keys are read at delivery time. */
+export type McpWebhookDeliverJobData = {
+	mode: 'mcp'; type: 'mention' | 'reply' | 'antenna'; antennaId?: string; webhookId: string; userId: string;
+	generation: string; noteId: string; createdAt: number; eventId: string;
+};
+export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEventTypes> = LegacyUserWebhookDeliverJobData<T> | McpWebhookDeliverJobData;
+
 export type ThinUser = {
 	id: MiUser['id'];
+};
+
+export type McpStreamDeliverJobData = {
+	webhookId: string; userId: string; generation: string; eventId: string;
+	source: import('@features/mcp/backend/stream-types.js').StreamOccurrence;
 };

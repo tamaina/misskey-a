@@ -33,7 +33,9 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { FetchInstanceMetadataService } from '@features/federation/backend/services/FetchInstanceMetadataService.js';
@@ -67,7 +69,7 @@ describe('UserEntityService', () => {
 		let mutingRepository: MutingsRepository;
 		let renoteMutingsRepository: RenoteMutingsRepository;
 
-		async function createUser(userData: Partial<MiUser> = {}, profileData: Partial<MiUserProfile> = {}) {
+		async function createUser(userData: Partial<MiUser> = {}, profileData: Partial<Pick<MiUserProfile, 'birthday' | 'achievements'>> = {}) {
 			const un = secureRndstr(16);
 			const user = await usersRepository
 				.insert({
@@ -143,6 +145,7 @@ describe('UserEntityService', () => {
 			const services = [
 				UserEntityService,
 				ApPersonService,
+				UserSuspendService,
 				NoteEntityService,
 				CustomEmojiService,
 				RoleService,
@@ -152,6 +155,7 @@ describe('UserEntityService', () => {
 				UtilityService,
 				ModerationLogService,
 				GlobalEventService,
+				HttpRequestService,
 				DriveFileEntityService,
 				MetaService,
 				FetchInstanceMetadataService,

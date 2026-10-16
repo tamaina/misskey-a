@@ -1,0 +1,1873 @@
+{
+  "baseline": "c73a4c8f78d3e769b2eb1f5c837d4178961b5f11",
+  "languages": [
+    "ar-SA",
+    "ca-ES",
+    "cs-CZ",
+    "da-DK",
+    "de-DE",
+    "en-US",
+    "es-ES",
+    "fr-FR",
+    "id-ID",
+    "it-IT",
+    "ja-JP",
+    "ja-KS",
+    "kab-KAB",
+    "kn-IN",
+    "ko-KR",
+    "nl-NL",
+    "no-NO",
+    "pl-PL",
+    "pt-PT",
+    "ru-RU",
+    "sk-SK",
+    "th-TH",
+    "tr-TR",
+    "ug-CN",
+    "uk-UA",
+    "vi-VN",
+    "zh-CN",
+    "zh-TW"
+  ],
+  "owners": [
+    {
+      "file": "packages/features/auth/frontend/components/MkSignin.vue",
+      "sourceSha256": "dd951696d77ff92b352e6a76335125c5dd83954be517686844ef8ed898dfbf81",
+      "originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<div :class=\"$style.signinRoot\">\n\t<Transition\n\t\tmode=\"out-in\"\n\t\t:enterActiveClass=\"$style.transition_enterActive\"\n\t\t:leaveActiveClass=\"$style.transition_leaveActive\"\n\t\t:enterFromClass=\"$style.transition_enterFrom\"\n\t\t:leaveToClass=\"$style.transition_leaveTo\"\n\n\t\t:inert=\"waiting\"\n\t>\n\t\t<!-- 1. 外部サーバーへの転送・username入力・パスキー -->\n\t\t<XInput\n\t\t\tv-if=\"page === 'input'\"\n\t\t\tkey=\"input\"\n\t\t\t:message=\"message\"\n\t\t\t:openOnRemote=\"openOnRemote\"\n\t\t\t:initialUsername=\"initialUsername\"\n\n\t\t\t@usernameSubmitted=\"onUsernameSubmitted\"\n\t\t\t@passkeyClick=\"onPasskeyLogin\"\n\t\t/>\n\n\t\t<!-- 2. パスワード入力 -->\n\t\t<XPassword\n\t\t\tv-else-if=\"page === 'password'\"\n\t\t\tkey=\"password\"\n\t\t\tref=\"passwordPageEl\"\n\n\t\t\t:user=\"userInfo!\"\n\t\t\t:needCaptcha=\"needCaptcha\"\n\n\t\t\t@passwordSubmitted=\"onPasswordSubmitted\"\n\t\t/>\n\n\t\t<!-- 3. ワンタイムパスワード -->\n\t\t<XTotp\n\t\t\tv-else-if=\"page === 'totp'\"\n\t\t\tkey=\"totp\"\n\n\t\t\t@totpSubmitted=\"onTotpSubmitted\"\n\t\t/>\n\n\t\t<!-- 4. パスキー -->\n\t\t<XPasskey\n\t\t\tv-else-if=\"page === 'passkey'\"\n\t\t\tkey=\"passkey\"\n\n\t\t\t:credentialRequest=\"credentialRequest!\"\n\t\t\t:isPerformingPasswordlessLogin=\"doingPasskeyFromInputPage\"\n\n\t\t\t@done=\"onPasskeyDone\"\n\t\t\t@useTotp=\"onUseTotp\"\n\t\t/>\n\t</Transition>\n\t<div v-if=\"waiting\" :class=\"$style.waitingRoot\">\n\t\t<MkLoading/>\n\t</div>\n</div>\n</template>\n\n<script setup lang=\"ts\">\nimport { nextTick, onBeforeUnmount, ref, shallowRef, useTemplateRef } from 'vue';\nimport * as Misskey from 'misskey-js';\nimport { browserSupportsWebAuthn } from '@simplewebauthn/browser';\nimport type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';\nimport type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';\nimport type { PwResponse } from '@features/auth/frontend/components/MkSignin.password.vue';\nimport { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';\nimport { showSuspendedDialog } from '@features/moderation/frontend/utility/show-suspended-dialog.js';\nimport * as os from '@features/ui/frontend/os.js';\n\nimport XInput from '@features/auth/frontend/components/MkSignin.input.vue';\nimport XPassword from '@features/auth/frontend/components/MkSignin.password.vue';\nimport XTotp from '@features/auth/frontend/components/MkSignin.totp.vue';\nimport XPasskey from '@features/auth/frontend/components/MkSignin.passkey.vue';\nimport { login } from '@features/auth/frontend/accounts.js';\n\nconst emit = defineEmits<{\n\t(ev: 'login', v: Misskey.entities.SigninFlowResponse & { finished: true }): void;\n}>();\n\nconst props = withDefaults(defineProps<{\n\tautoSet?: boolean;\n\tmessage?: string,\n\topenOnRemote?: OpenOnRemoteOptions,\n\tinitialUsername?: string;\n}>(), {\n\tautoSet: false,\n\tmessage: '',\n\topenOnRemote: undefined,\n\tinitialUsername: undefined,\n});\n\nconst page = ref<'input' | 'password' | 'totp' | 'passkey'>('input');\nconst waiting = ref(false);\n\nconst passwordPageEl = useTemplateRef('passwordPageEl');\nconst needCaptcha = ref(false);\n\nconst userInfo = ref<null | Misskey.entities.UserDetailed>(null);\nconst password = ref('');\n\n//#region Passkey Passwordless\nconst credentialRequest = shallowRef<PublicKeyCredentialRequestOptionsJSON | null>(null);\nconst passkeyContext = ref('');\nconst doingPasskeyFromInputPage = ref(false);\n\nfunction onPasskeyLogin(): void {\n\tif (browserSupportsWebAuthn()) {\n\t\tdoingPasskeyFromInputPage.value = true;\n\t\twaiting.value = true;\n\t\tmisskeyApi('signin-with-passkey', {})\n\t\t\t.then((res) => {\n\t\t\t\tpasskeyContext.value = res.context ?? '';\n\t\t\t\tcredentialRequest.value = res.option;\n\n\t\t\t\tpage.value = 'passkey';\n\t\t\t\twaiting.value = false;\n\t\t\t})\n\t\t\t.catch(onSigninApiError);\n\t}\n}\n\nfunction onPasskeyDone(credential: AuthenticationResponseJSON): void {\n\twaiting.value = true;\n\n\tif (doingPasskeyFromInputPage.value) {\n\t\tmisskeyApi('signin-with-passkey', {\n\t\t\tcredential: credential,\n\t\t\tcontext: passkeyContext.value,\n\t\t}).then((res) => {\n\t\t\tif (res.signinResponse == null) {\n\t\t\t\tonSigninApiError();\n\t\t\t\treturn;\n\t\t\t}\n\t\t\temit('login', res.signinResponse);\n\t\t\tonLoginSucceeded(res.signinResponse);\n\t\t}).catch(onSigninApiError);\n\t} else if (userInfo.value != null) {\n\t\ttryLogin({\n\t\t\tusername: userInfo.value.username,\n\t\t\tpassword: password.value,\n\t\t\tcredential: credential,\n\t\t});\n\t}\n}\n\nfunction onUseTotp(): void {\n\tpage.value = 'totp';\n}\n//#endregion\n\nasync function onUsernameSubmitted(username: string) {\n\twaiting.value = true;\n\n\tuserInfo.value = await misskeyApi('users/show', {\n\t\tusername,\n\t}).catch(() => null);\n\n\tawait tryLogin({\n\t\tusername,\n\t});\n}\n\nasync function onPasswordSubmitted(pw: PwResponse) {\n\twaiting.value = true;\n\tpassword.value = pw.password;\n\n\tif (userInfo.value == null) {\n\t\tawait os.alert({\n\t\t\ttype: 'error',\n\t\t\ttitle: $locale.value.sfc.noSuchUser,\n\t\t\ttext: $locale.value.sfc.signinFailed,\n\t\t});\n\t\twaiting.value = false;\n\t\treturn;\n\t} else {\n\t\tawait tryLogin({\n\t\t\tusername: userInfo.value.username,\n\t\t\tpassword: pw.password,\n\t\t\t'hcaptcha-response': pw.captcha.hCaptchaResponse,\n\t\t\t'm-captcha-response': pw.captcha.mCaptchaResponse,\n\t\t\t'g-recaptcha-response': pw.captcha.reCaptchaResponse,\n\t\t\t'turnstile-response': pw.captcha.turnstileResponse,\n\t\t\t'testcaptcha-response': pw.captcha.testcaptchaResponse,\n\t\t});\n\t}\n}\n\nasync function onTotpSubmitted(token: string) {\n\twaiting.value = true;\n\n\tif (userInfo.value == null) {\n\t\tawait os.alert({\n\t\t\ttype: 'error',\n\t\t\ttitle: $locale.value.sfc.noSuchUser,\n\t\t\ttext: $locale.value.sfc.signinFailed,\n\t\t});\n\t\twaiting.value = false;\n\t\treturn;\n\t} else {\n\t\tawait tryLogin({\n\t\t\tusername: userInfo.value.username,\n\t\t\tpassword: password.value,\n\t\t\ttoken,\n\t\t});\n\t}\n}\n\nasync function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>): Promise<Misskey.entities.SigninFlowResponse> {\n\tconst _req = {\n\t\tusername: req.username ?? userInfo.value?.username,\n\t\t...req,\n\t};\n\n\tfunction assertIsSigninFlowRequest(x: Partial<Misskey.entities.SigninFlowRequest>): x is Misskey.entities.SigninFlowRequest {\n\t\treturn x.username != null;\n\t}\n\n\tif (!assertIsSigninFlowRequest(_req)) {\n\t\tthrow new Error('Invalid request');\n\t}\n\n\treturn await misskeyApi('signin-flow', _req).then(async (res) => {\n\t\tif (res.finished) {\n\t\t\temit('login', res);\n\t\t\tawait onLoginSucceeded(res);\n\t\t} else {\n\t\t\tswitch (res.next) {\n\t\t\t\tcase 'captcha': {\n\t\t\t\t\tneedCaptcha.value = true;\n\t\t\t\t\tpage.value = 'password';\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t\tcase 'password': {\n\t\t\t\t\tneedCaptcha.value = false;\n\t\t\t\t\tpage.value = 'password';\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t\tcase 'totp': {\n\t\t\t\t\tpage.value = 'totp';\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t\tcase 'passkey': {\n\t\t\t\t\tif (browserSupportsWebAuthn()) {\n\t\t\t\t\t\tcredentialRequest.value = res.authRequest;\n\t\t\t\t\t\tpage.value = 'passkey';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tpage.value = 'totp';\n\t\t\t\t\t}\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tif (doingPasskeyFromInputPage.value === true) {\n\t\t\t\tdoingPasskeyFromInputPage.value = false;\n\t\t\t\tpage.value = 'input';\n\t\t\t\tpassword.value = '';\n\t\t\t}\n\t\t\tpasswordPageEl.value?.resetCaptcha();\n\t\t\tnextTick(() => {\n\t\t\t\twaiting.value = false;\n\t\t\t});\n\t\t}\n\t\treturn res;\n\t}).catch((err) => {\n\t\tonSigninApiError(err);\n\t\treturn Promise.reject(err);\n\t});\n}\n\nasync function onLoginSucceeded(res: Misskey.entities.SigninFlowResponse & { finished: true }) {\n\tif (props.autoSet) {\n\t\tawait login(res.i);\n\t}\n}\n\nfunction onSigninApiError(err?: any): void {\n\tconst id = err?.id ?? null;\n\n\tswitch (id) {\n\t\tcase '6cc579cc-885d-43d8-95c2-b8c7fc963280': {\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.loginFailed,\n\t\t\t\ttext: $locale.value.sfc.noSuchUser,\n\t\t\t});\n\t\t\tbreak;\n\t\t}\n\t\tcase '932c904e-9460-45b7-9ce6-7ed33be7eb2c': {\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.loginFailed,\n\t\t\t\ttext: $locale.value.sfc.incorrectPassword,\n\t\t\t});\n\t\t\tbreak;\n\t\t}\n\t\tcase 'e03a5f46-d309-4865-9b69-56282d94e1eb': {\n\t\t\tshowSuspendedDialog();\n\t\t\tbreak;\n\t\t}\n\t\tcase '22d05606-fbcf-421a-a2db-b32610dcfd1b': {\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.loginFailed,\n\t\t\t\ttext: $locale.value.sfc.rateLimitExceeded,\n\t\t\t});\n\t\t\tbreak;\n\t\t}\n\t\tcase 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f': {\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.loginFailed,\n\t\t\t\ttext: $locale.value.sfc.incorrectTotp,\n\t\t\t});\n\t\t\tbreak;\n\t\t}\n\t\tcase '36b96a7d-b547-412d-aeed-2d611cdc8cdc': {\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.loginFailed,\n\t\t\t\ttext: $locale.value.sfc.unknownWebAuthnKey,\n\t\t\t});\n\t\t\tbreak;\n\t\t}\n\t\tcase '93b86c4b-72f9-40eb-9815-798928603d1e': {\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.loginFailed,\n\t\t\t\ttext: $locale.value.sfc.passkeyVerificationFailed,\n\t\t\t});\n\t\t\tbreak;\n\t\t}\n\t\tcase 'b18c89a7-5b5e-4cec-bb5b-0419f332d430': {\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.loginFailed,\n\t\t\t\ttext: $locale.value.sfc.passkeyVerificationFailed,\n\t\t\t});\n\t\t\tbreak;\n\t\t}\n\t\tcase '2d84773e-f7b7-4d0b-8f72-bb69b584c912': {\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.loginFailed,\n\t\t\t\ttext: $locale.value.sfc.passkeyVerificationSucceededButPasswordlessLoginDisabled,\n\t\t\t});\n\t\t\tbreak;\n\t\t}\n\t\tdefault: {\n\t\t\tconsole.error(err);\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttitle: $locale.value.sfc.loginFailed,\n\t\t\t\ttext: JSON.stringify(err),\n\t\t\t});\n\t\t}\n\t}\n\n\tif (doingPasskeyFromInputPage.value === true) {\n\t\tdoingPasskeyFromInputPage.value = false;\n\t\tpage.value = 'input';\n\t\tpassword.value = '';\n\t}\n\tpasswordPageEl.value?.resetCaptcha();\n\tnextTick(() => {\n\t\twaiting.value = false;\n\t});\n}\n\nonBeforeUnmount(() => {\n\tpassword.value = '';\n\tneedCaptcha.value = false;\n\tuserInfo.value = null;\n});\n</script>\n\n<style lang=\"scss\" module>\n.transition_enterActive,\n.transition_leaveActive {\n\ttransition: opacity 0.3s cubic-bezier(0,0,.35,1), transform 0.3s cubic-bezier(0,0,.35,1);\n}\n.transition_enterFrom {\n\topacity: 0;\n\ttransform: translateX(50px);\n}\n.transition_leaveTo {\n\topacity: 0;\n\ttransform: translateX(-50px);\n}\n\n.signinRoot {\n\toverflow-x: hidden;\n\toverflow-x: clip;\n\n\tposition: relative;\n}\n\n.waitingRoot {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tbackground-color: color-mix(in srgb, var(--MI_THEME-panel), transparent 50%);\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\tz-index: 1;\n}\n</style>\n\n<locale locale=\"ar-SA\" lang=\"json\">\n{\n\t\"noSuchUser\": \"لم يُعثَر على المستخدم\",\n\t\"signinFailed\": \"فشل الولوج، خطأ في اسم المستخدم أو كلمة المرور.\",\n\t\"loginFailed\": \"فشل الولوج\",\n\t\"incorrectPassword\": \"كلمة السر خاطئة.\",\n\t\"rateLimitExceeded\": \"Rate limit exceeded\",\n\t\"incorrectTotp\": \"The one-time password is incorrect or has expired.\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"ca-ES\" lang=\"json\">\n{\n\t\"noSuchUser\": \"No s'ha trobat l'usuari\",\n\t\"signinFailed\": \"Autenticació sense èxit. Intenta-ho un altre cop utilitzant la contrasenya i el nom correctes.\",\n\t\"loginFailed\": \"S'ha produït un error al accedir.\",\n\t\"incorrectPassword\": \"Contrasenya incorrecta.\",\n\t\"rateLimitExceeded\": \"S'ha arribat al màxim de peticions\",\n\t\"incorrectTotp\": \"La contrasenya no és correcta, o ha caducat.\",\n\t\"unknownWebAuthnKey\": \"Passkey desconeguda\",\n\t\"passkeyVerificationFailed\": \"La verificació a fallat\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"La verificació de la passkey a estat correcta, però s'ha deshabilitat l'inici de sessió sense contrasenya.\"\n}\n</locale>\n\n<locale locale=\"cs-CZ\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Uživatel nebyl nalezen\",\n\t\"signinFailed\": \"Nelze se přihlásit. Zkontrolujte prosím své uživatelské jméno a heslo.\",\n\t\"loginFailed\": \"Přihlášení se nezdařilo.\",\n\t\"incorrectPassword\": \"Nesprávné heslo.\",\n\t\"rateLimitExceeded\": \"Překročení rychlostního limitu\",\n\t\"incorrectTotp\": \"The one-time password is incorrect or has expired.\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"da-DK\" lang=\"json\">\n{\n\t\"noSuchUser\": \"User not found\",\n\t\"signinFailed\": \"Unable to sign in. The entered username or password is incorrect.\",\n\t\"loginFailed\": \"Failed to sign in\",\n\t\"incorrectPassword\": \"Incorrect password.\",\n\t\"rateLimitExceeded\": \"Rate limit exceeded\",\n\t\"incorrectTotp\": \"The one-time password is incorrect or has expired.\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"de-DE\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Benutzer nicht gefunden\",\n\t\"signinFailed\": \"Anmeldung fehlgeschlagen. Überprüfe Benutzername und Passswort.\",\n\t\"loginFailed\": \"Anmeldung fehlgeschlagen\",\n\t\"incorrectPassword\": \"Falsches Passwort.\",\n\t\"rateLimitExceeded\": \"Versuchsanzahl überschritten\",\n\t\"incorrectTotp\": \"Das Einmalpasswort ist falsch oder abgelaufen.\",\n\t\"unknownWebAuthnKey\": \"Unbekannter Passkey\",\n\t\"passkeyVerificationFailed\": \"Die Passkey-Verifizierung ist fehlgeschlagen.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Die Verifizierung des Passkeys war erfolgreich, aber die passwortlose Anmeldung ist deaktiviert.\"\n}\n</locale>\n\n<locale locale=\"en-US\" lang=\"json\">\n{\n\t\"noSuchUser\": \"User not found\",\n\t\"signinFailed\": \"Unable to sign in. The entered username or password is incorrect.\",\n\t\"loginFailed\": \"Failed to sign in\",\n\t\"incorrectPassword\": \"Incorrect password.\",\n\t\"rateLimitExceeded\": \"Rate limit exceeded\",\n\t\"incorrectTotp\": \"The one-time password is incorrect or has expired.\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"es-ES\" lang=\"json\">\n{\n\t\"noSuchUser\": \"No se encuentra el usuario\",\n\t\"signinFailed\": \"Autenticación fallida. Asegúrate de haber usado el nombre de usuario y contraseña correctos.\",\n\t\"loginFailed\": \"Error al iniciar sesión.\",\n\t\"incorrectPassword\": \"La contraseña es incorrecta\",\n\t\"rateLimitExceeded\": \"Se excedió el límite de peticiones\",\n\t\"incorrectTotp\": \"La contraseña de un solo uso es incorrecta o ha caducado.\",\n\t\"unknownWebAuthnKey\": \"Esto no se ha registrado llave maestra.\",\n\t\"passkeyVerificationFailed\": \"La verificación de la clave de acceso ha fallado.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"La verificación de la clave de acceso ha sido satisfactoria pero se ha deshabilitado el inicio de sesión sin contraseña.\"\n}\n</locale>\n\n<locale locale=\"fr-FR\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Utilisateur·rice non trouvé·e\",\n\t\"signinFailed\": \"Échec d’authentification. Veuillez vérifier que votre nom d’utilisateur et mot de passe sont corrects.\",\n\t\"loginFailed\": \"Échec de la connexion\",\n\t\"incorrectPassword\": \"Le mot de passe est incorrect.\",\n\t\"rateLimitExceeded\": \"Limite de taux dépassée\",\n\t\"incorrectTotp\": \"Le mot de passe à usage unique est incorrect ou a expiré.\",\n\t\"unknownWebAuthnKey\": \"Clé d'accès inconnue.\",\n\t\"passkeyVerificationFailed\": \"La vérification de la clé d'accès a échoué.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"La vérification de la clé d'accès a réussi, mais la connexion sans mot de passe est désactivée.\"\n}\n</locale>\n\n<locale locale=\"id-ID\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Pengguna tidak ditemukan\",\n\t\"signinFailed\": \"Tidak dapat masuk. Nama pengguna atau kata sandi yang kamu masukkan salah.\",\n\t\"loginFailed\": \"Gagal untuk masuk\",\n\t\"incorrectPassword\": \"Kata sandi salah.\",\n\t\"rateLimitExceeded\": \"Batas sudah terlampaui\",\n\t\"incorrectTotp\": \"Password sekali pakai salah dimasukkan atau sudah kadaluarsa.\",\n\t\"unknownWebAuthnKey\": \"Kunci sandi tidak terdaftar.\",\n\t\"passkeyVerificationFailed\": \"Verifikasi kunci sandi gagal.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Verifikasi kunci sandi berhasil, namun pemasukan tanpa sandi dinonaktifkan.\"\n}\n</locale>\n\n<locale locale=\"it-IT\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Profilo non trovato\",\n\t\"signinFailed\": \"Autenticazione non riuscita. Controlla la tua password e nome utente.\",\n\t\"loginFailed\": \"Accesso non riuscito\",\n\t\"incorrectPassword\": \"La password è errata.\",\n\t\"rateLimitExceeded\": \"Superato il limite di richieste.\",\n\t\"incorrectTotp\": \"Il codice OTP è sbagliato, oppure scaduto.\",\n\t\"unknownWebAuthnKey\": \"Questa è una passkey sconosciuta.\",\n\t\"passkeyVerificationFailed\": \"La verifica della passkey non è riuscita.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"La verifica della passkey è riuscita, ma l'accesso senza password è disabilitato.\"\n}\n</locale>\n\n<locale locale=\"ja-JP\" lang=\"json\">\n{\n\t\"noSuchUser\": \"ユーザーが見つかりません\",\n\t\"signinFailed\": \"ログインできませんでした。ユーザー名とパスワードを確認してください。\",\n\t\"loginFailed\": \"ログインに失敗しました\",\n\t\"incorrectPassword\": \"パスワードが間違っています。\",\n\t\"rateLimitExceeded\": \"レート制限を超えました\",\n\t\"incorrectTotp\": \"ワンタイムパスワードが間違っているか、期限切れになっています。\",\n\t\"unknownWebAuthnKey\": \"登録されていないパスキーです。\",\n\t\"passkeyVerificationFailed\": \"パスキーの検証に失敗しました。\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"パスキーの検証に成功しましたが、パスワードレスログインが無効になっています。\"\n}\n</locale>\n\n<locale locale=\"ja-KS\" lang=\"json\">\n{\n\t\"noSuchUser\": \"ユーザーが見つからへんで\",\n\t\"signinFailed\": \"ログインできんかったで。もっかいユーザー名とパスワードを確認してみてや。\",\n\t\"loginFailed\": \"ログインに失敗してもうた…\",\n\t\"incorrectPassword\": \"パスワードがちゃうわ。\",\n\t\"rateLimitExceeded\": \"レート制限が超えたみたいやで\",\n\t\"incorrectTotp\": \"ワンタイムパスワードが間違っとるか、期限が切れとるみたいやな。\",\n\t\"unknownWebAuthnKey\": \"登録されてへんパスキーやな。\",\n\t\"passkeyVerificationFailed\": \"パスキーの検証に失敗したで。\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"パスキーの検証は成功したんやけど、パスワードレスログインが無効になっとるわ。\"\n}\n</locale>\n\n<locale locale=\"kab-KAB\" lang=\"json\">\n{\n\t\"noSuchUser\": \"User not found\",\n\t\"signinFailed\": \"Unable to sign in. The entered username or password is incorrect.\",\n\t\"loginFailed\": \"Failed to sign in\",\n\t\"incorrectPassword\": \"Incorrect password.\",\n\t\"rateLimitExceeded\": \"Rate limit exceeded\",\n\t\"incorrectTotp\": \"The one-time password is incorrect or has expired.\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"kn-IN\" lang=\"json\">\n{\n\t\"noSuchUser\": \"User not found\",\n\t\"signinFailed\": \"Unable to sign in. The entered username or password is incorrect.\",\n\t\"loginFailed\": \"Failed to sign in\",\n\t\"incorrectPassword\": \"Incorrect password.\",\n\t\"rateLimitExceeded\": \"Rate limit exceeded\",\n\t\"incorrectTotp\": \"The one-time password is incorrect or has expired.\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"ko-KR\" lang=\"json\">\n{\n\t\"noSuchUser\": \"유저를 찾을 수 없습니다\",\n\t\"signinFailed\": \"로그인할 수 없습니다. 유저 이름과 비밀번호를 확인해 주십시오.\",\n\t\"loginFailed\": \"로그인에 실패했습니다\",\n\t\"incorrectPassword\": \"비밀번호가 올바르지 않습니다.\",\n\t\"rateLimitExceeded\": \"요청 제한 횟수를 초과하였습니다\",\n\t\"incorrectTotp\": \"OTP 번호가 틀렸거나 유효기간이 만료되어 있을 수 있습니다.\",\n\t\"unknownWebAuthnKey\": \"등록되지 않은 패스키입니다.\",\n\t\"passkeyVerificationFailed\": \"패스키 검증을 실패했습니다.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"입력된 패스키는 정상적이나, 비밀번호 없이 로그인 하는 기능이 비활성화 되어있습니다.\"\n}\n</locale>\n\n<locale locale=\"nl-NL\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Gebruiker niet gevonden\",\n\t\"signinFailed\": \"Inloggen mislukt. Controleer gebruikersnaam en wachtwoord.\",\n\t\"loginFailed\": \"Aanmelding mislukt.\",\n\t\"incorrectPassword\": \"Onjuist wachtwoord.\",\n\t\"rateLimitExceeded\": \"Rate limit exceeded\",\n\t\"incorrectTotp\": \"Het eenmalige wachtwoord is incorrect of verlopen\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"no-NO\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Bruker ikke funnet\",\n\t\"signinFailed\": \"Kunne ikke logge inn. Det oppgitte brukernavnet eller passordet er feil.\",\n\t\"loginFailed\": \"Kunne ikke logge inn\",\n\t\"incorrectPassword\": \"Incorrect password.\",\n\t\"rateLimitExceeded\": \"Rate limit exceeded\",\n\t\"incorrectTotp\": \"The one-time password is incorrect or has expired.\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"pl-PL\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Nie znaleziono użytkownika\",\n\t\"signinFailed\": \"Nie udało się zalogować. Wprowadzona nazwa użytkownika lub hasło są nieprawidłowe.\",\n\t\"loginFailed\": \"Nie udało się zalogować\",\n\t\"incorrectPassword\": \"Nieprawidłowe hasło.\",\n\t\"rateLimitExceeded\": \"Limit szybkości przekroczony\",\n\t\"incorrectTotp\": \"Hasło pojedynczego użytku jest nie poprawne, lub straciło ważność\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"pt-PT\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Usuário não encontrado\",\n\t\"signinFailed\": \"Não foi possível fazer login. Por favor, verifique o nome de usuário e a senha.\",\n\t\"loginFailed\": \"Falha ao logar\",\n\t\"incorrectPassword\": \"Senha inválida.\",\n\t\"rateLimitExceeded\": \"Taxa limite excedido\",\n\t\"incorrectTotp\": \"A senha de uso único está incorreta ou expirou.\",\n\t\"unknownWebAuthnKey\": \"Passkey desconhecida\",\n\t\"passkeyVerificationFailed\": \"A verificação com Passkey falhou.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"A verificação com Passkey teve êxito, mas a entrada sem senha está desabilitada.\"\n}\n</locale>\n\n<locale locale=\"ru-RU\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Таких пользователей не найдено\",\n\t\"signinFailed\": \"Невозможно войти в систему. Введенное вами имя пользователя или пароль неверны.\",\n\t\"loginFailed\": \"Неудачная попытка входа\",\n\t\"incorrectPassword\": \"Пароль неверен.\",\n\t\"rateLimitExceeded\": \"Ограничение скорости превышено\",\n\t\"incorrectTotp\": \"Введен неверный одноразовый пароль или срок его действия истек.\",\n\t\"unknownWebAuthnKey\": \"Неизвестный ключ\",\n\t\"passkeyVerificationFailed\": \"Ошибка проверка ключа доступа \",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Проверка Passkey выполнена, но вход без пароля отключен\"\n}\n</locale>\n\n<locale locale=\"sk-SK\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Používateľ sa nenašiel\",\n\t\"signinFailed\": \"Nedá sa prihlásiť. Skontrolujte prosím meno používateľa a heslo.\",\n\t\"loginFailed\": \"Prihlásenie sa nepodarilo.\",\n\t\"incorrectPassword\": \"Nesprávne heslo.\",\n\t\"rateLimitExceeded\": \"Prekročený limit rýchlosti\",\n\t\"incorrectTotp\": \"The one-time password is incorrect or has expired.\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"th-TH\" lang=\"json\">\n{\n\t\"noSuchUser\": \"ไม่พบผู้ใช้\",\n\t\"signinFailed\": \"ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบชื่อผู้ใช้และรหัสผ่าน\",\n\t\"loginFailed\": \"การเข้าสู่ระบบไม่สำเร็จ\",\n\t\"incorrectPassword\": \"รหัสผ่านไม่ถูกต้อง\",\n\t\"rateLimitExceeded\": \"เกินขีดจำกัดอัตรา\",\n\t\"incorrectTotp\": \"รหัสยืนยันตัวตนแบบใช้ครั้งเดียวที่ท่านได้ระบุมานั้น ไม่ถูกต้องหรือหมดอายุลงแล้วค่ะ\",\n\t\"unknownWebAuthnKey\": \"เป็น Passkey ที่ยังไม่ได้ลงทะเบียน\",\n\t\"passkeyVerificationFailed\": \"การยืนยัน Passkey ล้มเหลว\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"การยืนยัน Passkey สำเร็จ แต่การเข้าสู่ระบบแบบไม่ใช้รหัสผ่านถูกปิดใช้งานอยู่\"\n}\n</locale>\n\n<locale locale=\"tr-TR\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Kullanıcı bulunamadı\",\n\t\"signinFailed\": \"Giriş yapılamıyor. Girilen kullanıcı adı veya şifre yanlış.\",\n\t\"loginFailed\": \"Giriş başarısız oldu\",\n\t\"incorrectPassword\": \"Yanlış şifre.\",\n\t\"rateLimitExceeded\": \"Hız sınırı aşıldı\",\n\t\"incorrectTotp\": \"Tek kullanımlık şifre yanlış veya süresi dolmuş.\",\n\t\"unknownWebAuthnKey\": \"Bilinmeyen Geçiş Anahtarı\",\n\t\"passkeyVerificationFailed\": \"Geçiş Anahtarı doğrulama başarısız oldu.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Geçiş anahtarı doğrulaması başarılı oldu ancak şifresiz oturum açma devre dışıdır.\"\n}\n</locale>\n\n<locale locale=\"ug-CN\" lang=\"json\">\n{\n\t\"noSuchUser\": \"User not found\",\n\t\"signinFailed\": \"Unable to sign in. The entered username or password is incorrect.\",\n\t\"loginFailed\": \"Failed to sign in\",\n\t\"incorrectPassword\": \"Incorrect password.\",\n\t\"rateLimitExceeded\": \"Rate limit exceeded\",\n\t\"incorrectTotp\": \"The one-time password is incorrect or has expired.\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Passkey verification has failed.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"uk-UA\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Користувача не знайдено\",\n\t\"signinFailed\": \"Не вдалося увійти. Введені ім’я користувача або пароль неправильнi.\",\n\t\"loginFailed\": \"Не вдалося увійти\",\n\t\"incorrectPassword\": \"Неправильний пароль.\",\n\t\"rateLimitExceeded\": \"Ліміт швидкості перевищено\",\n\t\"incorrectTotp\": \"Одноразовий пароль неправильний або його термін дії минув.\",\n\t\"unknownWebAuthnKey\": \"Невідомий Passkey\",\n\t\"passkeyVerificationFailed\": \"Помилка під час верифікації Passkey\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Верифікація Passkey пройшла успішно, але вхід без пароля вимкнено.\"\n}\n</locale>\n\n<locale locale=\"vi-VN\" lang=\"json\">\n{\n\t\"noSuchUser\": \"Không tìm thấy người dùng\",\n\t\"signinFailed\": \"Không thể đăng nhập. Vui lòng kiểm tra tên người dùng và mật khẩu của bạn.\",\n\t\"loginFailed\": \"Đăng nhập không thành công\",\n\t\"incorrectPassword\": \"Sai mật khẩu.\",\n\t\"rateLimitExceeded\": \"Giới hạn quá mức\",\n\t\"incorrectTotp\": \"Mã OTP không đúng hoặc đã quá hạn\",\n\t\"unknownWebAuthnKey\": \"Unknown Passkey\",\n\t\"passkeyVerificationFailed\": \"Xác minh mật khẩu không thành công.\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"Passkey verification has succeeded but password-less login is disabled.\"\n}\n</locale>\n\n<locale locale=\"zh-CN\" lang=\"json\">\n{\n\t\"noSuchUser\": \"未找到该用户\",\n\t\"signinFailed\": \"无法登录，请检查您的用户名和密码是否正确。\",\n\t\"loginFailed\": \"登录失败\",\n\t\"incorrectPassword\": \"密码错误\",\n\t\"rateLimitExceeded\": \"已超过速率限制\",\n\t\"incorrectTotp\": \"一次性密码不正确或已过期\",\n\t\"unknownWebAuthnKey\": \"此通行密钥未注册。\",\n\t\"passkeyVerificationFailed\": \"验证通行密钥失败。\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"通行密钥验证成功，但账户未开启无密码登录。\"\n}\n</locale>\n\n<locale locale=\"zh-TW\" lang=\"json\">\n{\n\t\"noSuchUser\": \"使用者不存在\",\n\t\"signinFailed\": \"登入失敗。 請檢查使用者名稱和密碼。\",\n\t\"loginFailed\": \"登入失敗\",\n\t\"incorrectPassword\": \"密碼錯誤。\",\n\t\"rateLimitExceeded\": \"已超過速率限制\",\n\t\"incorrectTotp\": \"一次性密碼錯誤，或者已過期。\",\n\t\"unknownWebAuthnKey\": \"未註冊的通行金鑰。\",\n\t\"passkeyVerificationFailed\": \"驗證通行金鑰失敗。\",\n\t\"passkeyVerificationSucceededButPasswordlessLoginDisabled\": \"雖然驗證通行金鑰成功，但是無密碼登入的方式是停用的。\"\n}\n</locale>\n",
+      "mappings": [
+        [
+          "signinFailed",
+          "signinFailed"
+        ],
+        [
+          "loginFailed",
+          "loginFailed"
+        ],
+        [
+          "rateLimitExceeded",
+          "rateLimitExceeded"
+        ],
+        [
+          "incorrectTotp",
+          "incorrectTotp"
+        ],
+        [
+          "unknownWebAuthnKey",
+          "unknownWebAuthnKey"
+        ],
+        [
+          "passkeyVerificationFailed",
+          "passkeyVerificationFailed"
+        ],
+        [
+          "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "passkeyVerificationSucceededButPasswordlessLoginDisabled"
+        ]
+      ],
+      "changes": [
+        {
+          "language": "da-DK",
+          "path": "signinFailed",
+          "original": "Unable to sign in. The entered username or password is incorrect.",
+          "reviewed": "Kunne ikke logge ind. Det indtastede brugernavn eller den indtastede adgangskode er forkert."
+        },
+        {
+          "language": "kab-KAB",
+          "path": "signinFailed",
+          "original": "Unable to sign in. The entered username or password is incorrect.",
+          "reviewed": "Ur tezmireḍ ara ad tkecmeḍ. Isem n umseqdac neɣ awal uffir i teskecmeḍ d arameɣtu."
+        },
+        {
+          "language": "kn-IN",
+          "path": "signinFailed",
+          "original": "Unable to sign in. The entered username or password is incorrect.",
+          "reviewed": "ಪ್ರವೇಶಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ನಮೂದಿಸಿದ ಬಳಕೆದಾರಹೆಸರು ಅಥವಾ ಗುಪ್ತಪದ ತಪ್ಪಾಗಿದೆ."
+        },
+        {
+          "language": "ug-CN",
+          "path": "signinFailed",
+          "original": "Unable to sign in. The entered username or password is incorrect.",
+          "reviewed": "كىرەلمىدىڭىز. كىرگۈزگەن ئىشلەتكۈچى نامى ياكى پارول خاتا."
+        },
+        {
+          "language": "da-DK",
+          "path": "loginFailed",
+          "original": "Failed to sign in",
+          "reviewed": "Login mislykkedes"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "loginFailed",
+          "original": "Failed to sign in",
+          "reviewed": "Anekcum ur yeddi ara"
+        },
+        {
+          "language": "kn-IN",
+          "path": "loginFailed",
+          "original": "Failed to sign in",
+          "reviewed": "ಪ್ರವೇಶ ವಿಫಲವಾಗಿದೆ"
+        },
+        {
+          "language": "ug-CN",
+          "path": "loginFailed",
+          "original": "Failed to sign in",
+          "reviewed": "كىرىش مەغلۇپ بولدى"
+        },
+        {
+          "language": "ar-SA",
+          "path": "rateLimitExceeded",
+          "original": "Rate limit exceeded",
+          "reviewed": "تم تجاوز الحد المسموح لعدد الطلبات"
+        },
+        {
+          "language": "da-DK",
+          "path": "rateLimitExceeded",
+          "original": "Rate limit exceeded",
+          "reviewed": "Grænsen for antal forespørgsler er overskredet"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "rateLimitExceeded",
+          "original": "Rate limit exceeded",
+          "reviewed": "Tezriḍ talast n usuter"
+        },
+        {
+          "language": "kn-IN",
+          "path": "rateLimitExceeded",
+          "original": "Rate limit exceeded",
+          "reviewed": "ವಿನಂತಿಗಳ ಮಿತಿಯನ್ನು ಮೀರಲಾಗಿದೆ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "rateLimitExceeded",
+          "original": "Rate limit exceeded",
+          "reviewed": "Limiet voor het aantal verzoeken overschreden"
+        },
+        {
+          "language": "no-NO",
+          "path": "rateLimitExceeded",
+          "original": "Rate limit exceeded",
+          "reviewed": "Grensen for antall forespørsler er overskredet"
+        },
+        {
+          "language": "ug-CN",
+          "path": "rateLimitExceeded",
+          "original": "Rate limit exceeded",
+          "reviewed": "تەلەپ سانى چەكتىن ئېشىپ كەتتى"
+        },
+        {
+          "language": "ar-SA",
+          "path": "incorrectTotp",
+          "original": "The one-time password is incorrect or has expired.",
+          "reviewed": "كلمة المرور لمرة واحدة غير صحيحة أو انتهت صلاحيتها."
+        },
+        {
+          "language": "cs-CZ",
+          "path": "incorrectTotp",
+          "original": "The one-time password is incorrect or has expired.",
+          "reviewed": "Jednorázové heslo je nesprávné nebo vypršela jeho platnost."
+        },
+        {
+          "language": "da-DK",
+          "path": "incorrectTotp",
+          "original": "The one-time password is incorrect or has expired.",
+          "reviewed": "Engangsadgangskoden er forkert eller udløbet."
+        },
+        {
+          "language": "kab-KAB",
+          "path": "incorrectTotp",
+          "original": "The one-time password is incorrect or has expired.",
+          "reviewed": "Awal uffir n yiwet n tikkelt d arameɣtu neɣ yezri wakud-is."
+        },
+        {
+          "language": "kn-IN",
+          "path": "incorrectTotp",
+          "original": "The one-time password is incorrect or has expired.",
+          "reviewed": "ಒಮ್ಮೆ ಬಳಸುವ ಗುಪ್ತಪದ ತಪ್ಪಾಗಿದೆ ಅಥವಾ ಅದರ ಅವಧಿ ಮುಗಿದಿದೆ."
+        },
+        {
+          "language": "no-NO",
+          "path": "incorrectTotp",
+          "original": "The one-time password is incorrect or has expired.",
+          "reviewed": "Engangspassordet er feil eller har utløpt."
+        },
+        {
+          "language": "sk-SK",
+          "path": "incorrectTotp",
+          "original": "The one-time password is incorrect or has expired.",
+          "reviewed": "Jednorazové heslo je nesprávne alebo jeho platnosť vypršala."
+        },
+        {
+          "language": "ug-CN",
+          "path": "incorrectTotp",
+          "original": "The one-time password is incorrect or has expired.",
+          "reviewed": "بىر قېتىملىق پارول خاتا ياكى ۋاقتى ئۆتكەن."
+        },
+        {
+          "language": "ar-SA",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "مفتاح مرور غير معروف"
+        },
+        {
+          "language": "cs-CZ",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "Neznámý přístupový klíč"
+        },
+        {
+          "language": "da-DK",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "Ukendt adgangsnøgle"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "Tasarut n unekcum tarussint"
+        },
+        {
+          "language": "kn-IN",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "ಅಪರಿಚಿತ ಪಾಸ್‌ಕೀ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "Onbekende passkey"
+        },
+        {
+          "language": "no-NO",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "Ukjent tilgangsnøkkel"
+        },
+        {
+          "language": "pl-PL",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "Nieznany klucz dostępu"
+        },
+        {
+          "language": "sk-SK",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "Neznámy prístupový kľúč"
+        },
+        {
+          "language": "ug-CN",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "نامەلۇم كىرىش ئاچقۇچى"
+        },
+        {
+          "language": "vi-VN",
+          "path": "unknownWebAuthnKey",
+          "original": "Unknown Passkey",
+          "reviewed": "Khóa truy cập không xác định"
+        },
+        {
+          "language": "ar-SA",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "فشل التحقق من مفتاح المرور."
+        },
+        {
+          "language": "cs-CZ",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "Ověření přístupového klíče selhalo."
+        },
+        {
+          "language": "da-DK",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "Bekræftelse af adgangsnøglen mislykkedes."
+        },
+        {
+          "language": "kab-KAB",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "Asesteb n tsarut n unekcum ur yeddi ara."
+        },
+        {
+          "language": "kn-IN",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "ಪಾಸ್‌ಕೀ ಪರಿಶೀಲನೆ ವಿಫಲವಾಗಿದೆ."
+        },
+        {
+          "language": "nl-NL",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "Verificatie van de passkey is mislukt."
+        },
+        {
+          "language": "no-NO",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "Bekreftelse av tilgangsnøkkelen mislyktes."
+        },
+        {
+          "language": "pl-PL",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "Weryfikacja klucza dostępu nie powiodła się."
+        },
+        {
+          "language": "sk-SK",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "Overenie prístupového kľúča zlyhalo."
+        },
+        {
+          "language": "ug-CN",
+          "path": "passkeyVerificationFailed",
+          "original": "Passkey verification has failed.",
+          "reviewed": "كىرىش ئاچقۇچىنى دەلىللەش مەغلۇپ بولدى."
+        },
+        {
+          "language": "ar-SA",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "نجح التحقق من مفتاح المرور، لكن تسجيل الدخول دون كلمة مرور معطّل."
+        },
+        {
+          "language": "cs-CZ",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "Ověření přístupového klíče proběhlo úspěšně, ale přihlašování bez hesla je zakázáno."
+        },
+        {
+          "language": "da-DK",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "Adgangsnøglen blev bekræftet, men login uden adgangskode er deaktiveret."
+        },
+        {
+          "language": "kab-KAB",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "Asesteb n tsarut n unekcum yedda, maca anekcum war awal uffir yensa."
+        },
+        {
+          "language": "kn-IN",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "ಪಾಸ್‌ಕೀ ಪರಿಶೀಲನೆ ಯಶಸ್ವಿಯಾಗಿದೆ, ಆದರೆ ಗುಪ್ತಪದವಿಲ್ಲದ ಪ್ರವೇಶವನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ."
+        },
+        {
+          "language": "nl-NL",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "De passkey is geverifieerd, maar aanmelden zonder wachtwoord is uitgeschakeld."
+        },
+        {
+          "language": "no-NO",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "Tilgangsnøkkelen ble bekreftet, men innlogging uten passord er deaktivert."
+        },
+        {
+          "language": "pl-PL",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "Weryfikacja klucza dostępu powiodła się, ale logowanie bez hasła jest wyłączone."
+        },
+        {
+          "language": "sk-SK",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "Overenie prístupového kľúča bolo úspešné, ale prihlasovanie bez hesla je zakázané."
+        },
+        {
+          "language": "ug-CN",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "كىرىش ئاچقۇچى مۇۋەپپەقىيەتلىك دەلىللەندى، ئەمما پارولسىز كىرىش چەكلەنگەن."
+        },
+        {
+          "language": "vi-VN",
+          "path": "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+          "original": "Passkey verification has succeeded but password-less login is disabled.",
+          "reviewed": "Xác minh khóa truy cập đã thành công, nhưng đăng nhập không cần mật khẩu đang bị tắt."
+        }
+      ],
+      "keys": [
+        "noSuchUser",
+        "signinFailed",
+        "loginFailed",
+        "incorrectPassword",
+        "rateLimitExceeded",
+        "incorrectTotp",
+        "unknownWebAuthnKey",
+        "passkeyVerificationFailed",
+        "passkeyVerificationSucceededButPasswordlessLoginDisabled"
+      ]
+    },
+    {
+      "file": "packages/features/auth/frontend/pages/settings/security.vue",
+      "sourceSha256": "3893e2becb4aad868e3509f67954c081c9573e19e1e0e3866fa60b73b8cc863a",
+      "originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<SearchMarker path=\"/settings/security\" :label=\"$locale.sfc.security\" :keywords=\"['security']\" icon=\"ti ti-lock\" :inlining=\"['2fa']\">\n\t<div class=\"_gaps_m\">\n\t\t<MkFeatureBanner icon=\"/fluent-emoji/1f510.png\" color=\"#ffbf00\">\n\t\t\t<SearchText>{{ $locale.sfc.securityBanner }}</SearchText>\n\t\t</MkFeatureBanner>\n\n\t\t<SearchMarker :keywords=\"['password']\">\n\t\t\t<FormSection first>\n\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.password }}</SearchLabel></template>\n\n\t\t\t\t<SearchMarker>\n\t\t\t\t\t<MkButton primary @click=\"change()\">\n\t\t\t\t\t\t<SearchLabel>{{ $locale.sfc.changePassword }}</SearchLabel>\n\t\t\t\t\t</MkButton>\n\t\t\t\t</SearchMarker>\n\t\t\t</FormSection>\n\t\t</SearchMarker>\n\n\t\t<X2fa/>\n\n\t\t<SearchMarker :keywords=\"['signin', 'login', 'history', 'log']\">\n\t\t\t<FormSection>\n\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.signinHistory }}</SearchLabel></template>\n\t\t\t\t<MkPagination :paginator=\"paginator\" withControl :forceDisableInfiniteScroll=\"true\">\n\t\t\t\t\t<template #default=\"{items}\">\n\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t<div v-for=\"item in items\" :key=\"item.id\" v-panel class=\"timnmucd\">\n\t\t\t\t\t\t\t\t<header>\n\t\t\t\t\t\t\t\t\t<i v-if=\"item.success\" class=\"ti ti-check icon succ\"></i>\n\t\t\t\t\t\t\t\t\t<i v-else class=\"ti ti-circle-x icon fail\"></i>\n\t\t\t\t\t\t\t\t\t<code class=\"ip _monospace\">{{ item.ip }}</code>\n\t\t\t\t\t\t\t\t\t<MkTime :time=\"item.createdAt\" class=\"time\"/>\n\t\t\t\t\t\t\t\t</header>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</template>\n\t\t\t\t</MkPagination>\n\t\t\t</FormSection>\n\t\t</SearchMarker>\n\n\t\t<SearchMarker :keywords=\"['regenerate', 'refresh', 'reset', 'token']\">\n\t\t\t<FormSection>\n\t\t\t\t<FormSlot>\n\t\t\t\t\t<MkButton danger @click=\"regenerateToken\"><i class=\"ti ti-refresh\"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>\n\t\t\t\t\t<template #caption>{{ $locale.sfc.regenerateLoginTokenDescription }}</template>\n\t\t\t\t</FormSlot>\n\t\t\t</FormSection>\n\t\t</SearchMarker>\n\t</div>\n</SearchMarker>\n</template>\n\n<script lang=\"ts\" setup>\nimport { computed, markRaw } from 'vue';\nimport X2fa from '@features/auth/frontend/pages/settings/2fa.vue';\nimport FormSection from '@features/ui/frontend/components/form/section.vue';\nimport FormSlot from '@features/ui/frontend/components/form/slot.vue';\nimport MkButton from '@features/ui/frontend/components/MkButton.vue';\nimport MkPagination from '@features/ui/frontend/components/MkPagination.vue';\nimport * as os from '@features/ui/frontend/os.js';\nimport { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';\nimport { definePage } from '@features/navigation/frontend/page.js';\nimport MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';\nimport { Paginator } from '@features/ui/frontend/utility/paginator.js';\n\nconst paginator = markRaw(new Paginator('i/signin-history', {\n\tlimit: 5,\n}));\n\nasync function change() {\n\tconst { canceled: canceled2, result: newPassword } = await os.inputText({\n\t\ttitle: $locale.value.sfc.newPassword,\n\t\ttype: 'password',\n\t\tautocomplete: 'new-password',\n\t});\n\tif (canceled2 || newPassword == null) return;\n\n\tconst { canceled: canceled3, result: newPassword2 } = await os.inputText({\n\t\ttitle: $locale.value.sfc.newPasswordRetype,\n\t\ttype: 'password',\n\t\tautocomplete: 'new-password',\n\t});\n\tif (canceled3 || newPassword2 == null) return;\n\n\tif (newPassword !== newPassword2) {\n\t\tos.alert({\n\t\t\ttype: 'error',\n\t\t\ttext: $locale.value.sfc.retypedNotMatch,\n\t\t});\n\t\treturn;\n\t}\n\n\tconst auth = await os.authenticateDialog();\n\tif (auth.canceled) return;\n\n\tos.apiWithDialog('i/change-password', {\n\t\tcurrentPassword: auth.result.password,\n\t\ttoken: auth.result.token,\n\t\tnewPassword,\n\t});\n}\n\nasync function regenerateToken() {\n\tconst auth = await os.authenticateDialog();\n\tif (auth.canceled) return;\n\n\tmisskeyApi('i/regenerate-token', {\n\t\tpassword: auth.result.password,\n\t\ttoken: auth.result.token,\n\t});\n}\n\nconst headerActions = computed(() => []);\n\nconst headerTabs = computed(() => []);\n\ndefinePage(() => ({\n\ttitle: $locale.value.sfc.security,\n\ticon: 'ti ti-lock',\n}));\n</script>\n\n<style lang=\"scss\" scoped>\n.timnmucd {\n\tpadding: 12px;\n\n\t&:first-child {\n\t\tborder-top-left-radius: 6px;\n\t\tborder-top-right-radius: 6px;\n\t}\n\n\t&:last-child {\n\t\tborder-bottom-left-radius: 6px;\n\t\tborder-bottom-right-radius: 6px;\n\t}\n\n\t&:not(:last-child) {\n\t\tborder-bottom: solid 0.5px var(--MI_THEME-divider);\n\t}\n\n\t> header {\n\t\tdisplay: flex;\n\t\talign-items: center;\n\n\t\t> .icon {\n\t\t\twidth: 1em;\n\t\t\tmargin-right: 0.75em;\n\n\t\t\t&.succ {\n\t\t\t\tcolor: var(--MI_THEME-success);\n\t\t\t}\n\n\t\t\t&.fail {\n\t\t\t\tcolor: var(--MI_THEME-error);\n\t\t\t}\n\t\t}\n\n\t\t> .ip {\n\t\t\tflex: 1;\n\t\t\tmin-width: 0;\n\t\t\twhite-space: nowrap;\n\t\t\toverflow: hidden;\n\t\t\ttext-overflow: ellipsis;\n\t\t\tmargin-right: 12px;\n\t\t}\n\n\t\t> .time {\n\t\t\tmargin-left: auto;\n\t\t\topacity: 0.7;\n\t\t}\n\t}\n}\n</style>\n\n<locale locale=\"ar-SA\" lang=\"json\">\n{\n\t\"newPassword\": \"كلمة المرور الجديدة\",\n\t\"newPasswordRetype\": \"كرّر كلمة المرور الجديدة:\",\n\t\"retypedNotMatch\": \"المدخلات لا تتطابق\",\n\t\"security\": \"الأمان\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"الكلمة السرية\",\n\t\"changePassword\": \"تغيير الكلمة السرية\",\n\t\"signinHistory\": \"تاريخ تسجيل الدخول\",\n\t\"regenerateLoginToken\": \"أعد توليد الرمز\",\n\t\"regenerateLoginTokenDescription\": \"ينشئ رمز استيثاق جديد في العادة هذا ليس ضروريًا ؛ عند إنشاء رمز جديد ستُخرج جميع الأجهزة.\"\n}\n</locale>\n\n<locale locale=\"ca-ES\" lang=\"json\">\n{\n\t\"newPassword\": \"Contrasenya nova\",\n\t\"newPasswordRetype\": \"Contrasenya nova (repeteix-la)\",\n\t\"retypedNotMatch\": \"Les entrades no coincideix\",\n\t\"security\": \"Seguretat\",\n\t\"securityBanner\": \"Configura les opcions relacionades amb la seguretat del teu compte com ara contrasenyes, mètodes per iniciar sessió, aplicacions d'autentificació i claus d'accés.\",\n\t\"password\": \"Contrasenya\",\n\t\"changePassword\": \"Canvia la contrasenya\",\n\t\"signinHistory\": \"Historial d'autenticacions\",\n\t\"regenerateLoginToken\": \"Regenerar clau de seguretat d'inici de sessió\",\n\t\"regenerateLoginTokenDescription\": \"Regenera la clau de seguretat que es fa servir internament durant l'inici de sessió. Normalment aquesta acció no és necessària. Si es regenera es tancarà la sessió a tots els dispositius amb una sessió activa.\"\n}\n</locale>\n\n<locale locale=\"cs-CZ\" lang=\"json\">\n{\n\t\"newPassword\": \"Nové heslo\",\n\t\"newPasswordRetype\": \"Nové heslo (znovu)\",\n\t\"retypedNotMatch\": \"Zadané údaje se neshodují.\",\n\t\"security\": \"Zabezpečení\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Heslo\",\n\t\"changePassword\": \"Změnit heslo\",\n\t\"signinHistory\": \"Historie přihlášení\",\n\t\"regenerateLoginToken\": \"Přegenerovat přihlašovací token\",\n\t\"regenerateLoginTokenDescription\": \"Přegeneruje token interně používaný během přihlášení. Běžně tahle akce není nutná. Pokud bude token přegenerovaný, tak se všechna přihlášená zařízení odhlásí.\"\n}\n</locale>\n\n<locale locale=\"da-DK\" lang=\"json\">\n{\n\t\"newPassword\": \"New password\",\n\t\"newPasswordRetype\": \"Retype new password\",\n\t\"retypedNotMatch\": \"The inputs do not match.\",\n\t\"security\": \"Security\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Password\",\n\t\"changePassword\": \"Change password\",\n\t\"signinHistory\": \"Login history\",\n\t\"regenerateLoginToken\": \"Regenerate login token\",\n\t\"regenerateLoginTokenDescription\": \"Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.\"\n}\n</locale>\n\n<locale locale=\"de-DE\" lang=\"json\">\n{\n\t\"newPassword\": \"Neues Passwort\",\n\t\"newPasswordRetype\": \"Neues Passwort bestätigen\",\n\t\"retypedNotMatch\": \"Die Eingaben stimmen nicht überein.\",\n\t\"security\": \"Sicherheit\",\n\t\"securityBanner\": \"Du kannst Einstellungen für die Kontosicherheit konfigurieren, z. B. Passwörter, Anmeldemethoden, Authentifizierungs-Apps und Passkeys.\",\n\t\"password\": \"Passwort\",\n\t\"changePassword\": \"Passwort ändern\",\n\t\"signinHistory\": \"Anmeldungsverlauf\",\n\t\"regenerateLoginToken\": \"Anmeldetoken regenerieren\",\n\t\"regenerateLoginTokenDescription\": \"Den zur Anmeldung intern verwendeten Token regenerieren. Normalerweise wird dies nicht benötigt. Bei Regeneration werden alle Geräte ausgeloggt.\"\n}\n</locale>\n\n<locale locale=\"en-US\" lang=\"json\">\n{\n\t\"newPassword\": \"New password\",\n\t\"newPasswordRetype\": \"Retype new password\",\n\t\"retypedNotMatch\": \"The inputs do not match.\",\n\t\"security\": \"Security\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Password\",\n\t\"changePassword\": \"Change password\",\n\t\"signinHistory\": \"Login history\",\n\t\"regenerateLoginToken\": \"Regenerate login token\",\n\t\"regenerateLoginTokenDescription\": \"Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.\"\n}\n</locale>\n\n<locale locale=\"es-ES\" lang=\"json\">\n{\n\t\"newPassword\": \"Contraseña nueva\",\n\t\"newPasswordRetype\": \"Reescribe contraseña nueva\",\n\t\"retypedNotMatch\": \"La información no coincide.\",\n\t\"security\": \"Seguridad\",\n\t\"securityBanner\": \"Puedes configurar opciones relacionadas con la seguridad de la cuenta, como la contraseña, los métodos de inicio de sesión, las aplicaciones de autenticación y Passkeys.\",\n\t\"password\": \"Contraseña\",\n\t\"changePassword\": \"Cambiar contraseña\",\n\t\"signinHistory\": \"Historial de ingresos\",\n\t\"regenerateLoginToken\": \"Regenerar token de login\",\n\t\"regenerateLoginTokenDescription\": \"Regenerar el token usado internamente durante el login. No siempre es necesario hacerlo. Al hacerlo de nuevo, se deslogueará en todos los dispositivos.\"\n}\n</locale>\n\n<locale locale=\"fr-FR\" lang=\"json\">\n{\n\t\"newPassword\": \"Nouveau mot de passe\",\n\t\"newPasswordRetype\": \"Répéter le nouveau mot de passe\",\n\t\"retypedNotMatch\": \"Les saisies ne correspondent pas.\",\n\t\"security\": \"Sécurité\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Mot de passe\",\n\t\"changePassword\": \"Modifier votre mot de passe\",\n\t\"signinHistory\": \"Historique de connexion\",\n\t\"regenerateLoginToken\": \"Régénérer le jeton de connexion\",\n\t\"regenerateLoginTokenDescription\": \"Générer un nouveau jeton d'authentification. Cette opération ne devrait pas être nécessaire ; lors de la génération d'un nouveau jeton, tous les appareils seront déconnectés. \"\n}\n</locale>\n\n<locale locale=\"id-ID\" lang=\"json\">\n{\n\t\"newPassword\": \"Kata sandi baru\",\n\t\"newPasswordRetype\": \"Ulangi kata sandi baru\",\n\t\"retypedNotMatch\": \"Input tidak sama\",\n\t\"security\": \"Keamanan\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Kata sandi\",\n\t\"changePassword\": \"Ubah kata sandi\",\n\t\"signinHistory\": \"Riwayat masuk\",\n\t\"regenerateLoginToken\": \"Perbarui token login\",\n\t\"regenerateLoginTokenDescription\": \"Perbarui token yang digunakan secara internal saat login. Normalnya aksi ini tidak diperlukan. Jika diperbarui, semua perangkat akan dilogout.\"\n}\n</locale>\n\n<locale locale=\"it-IT\" lang=\"json\">\n{\n\t\"newPassword\": \"Nuova Password\",\n\t\"newPasswordRetype\": \"Conferma password\",\n\t\"retypedNotMatch\": \"Le password non corrispondono.\",\n\t\"security\": \"Sicurezza\",\n\t\"securityBanner\": \"Puoi gestire la sicurezza del tuo account, la password, i modi di accesso, la generazione di codici OTP per accesso multi fattore (MFA/2FA) e la passkey.\",\n\t\"password\": \"Password\",\n\t\"changePassword\": \"Aggiorna Password\",\n\t\"signinHistory\": \"Storico degli accessi al profilo\",\n\t\"regenerateLoginToken\": \"Genera di nuovo un token di connessione\",\n\t\"regenerateLoginTokenDescription\": \"Genera un nuovo token di autenticazione. Solitamente questa operazione non è necessaria: quando si genera un nuovo token, tutti i dispositivi vanno disconnessi.\"\n}\n</locale>\n\n<locale locale=\"ja-JP\" lang=\"json\">\n{\n\t\"newPassword\": \"新しいパスワード\",\n\t\"newPasswordRetype\": \"新しいパスワード(再入力)\",\n\t\"retypedNotMatch\": \"入力が一致しません。\",\n\t\"security\": \"セキュリティ\",\n\t\"securityBanner\": \"パスワード、ログイン方法、認証アプリ、パスキーなどアカウントのセキュリティに関する設定を行えます。\",\n\t\"password\": \"パスワード\",\n\t\"changePassword\": \"パスワードを変更\",\n\t\"signinHistory\": \"ログイン履歴\",\n\t\"regenerateLoginToken\": \"ログイントークンを再生成\",\n\t\"regenerateLoginTokenDescription\": \"ログインに使用される内部トークンを再生成します。通常この操作を行う必要はありません。再生成すると、全てのデバイスでログアウトされます。\"\n}\n</locale>\n\n<locale locale=\"ja-KS\" lang=\"json\">\n{\n\t\"newPassword\": \"今度のパスワード\",\n\t\"newPasswordRetype\": \"今度のパスワード(もっぺん入れて)\",\n\t\"retypedNotMatch\": \"入れたやつ合うてへんわ。\",\n\t\"security\": \"セキュリティ\",\n\t\"securityBanner\": \"パスワード、ログイン方法、認証アプリ、パスキーとかアカウントのセキュリティに関わる設定ができるで。\",\n\t\"password\": \"パスワード\",\n\t\"changePassword\": \"パスワードをいじる\",\n\t\"signinHistory\": \"ログイン履歴\",\n\t\"regenerateLoginToken\": \"ログイントークンを再生成\",\n\t\"regenerateLoginTokenDescription\": \"ログインに使われる内部トークンをもっかい作るで。いつもならこれをやる必要はないで。もっかい作ると、全部のデバイスでログアウトされるで気ぃつけてなー。\"\n}\n</locale>\n\n<locale locale=\"kab-KAB\" lang=\"json\">\n{\n\t\"newPassword\": \"New password\",\n\t\"newPasswordRetype\": \"Retype new password\",\n\t\"retypedNotMatch\": \"The inputs do not match.\",\n\t\"security\": \"Taɣellist\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Awal uffir\",\n\t\"changePassword\": \"Change password\",\n\t\"signinHistory\": \"Login history\",\n\t\"regenerateLoginToken\": \"Regenerate login token\",\n\t\"regenerateLoginTokenDescription\": \"Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.\"\n}\n</locale>\n\n<locale locale=\"kn-IN\" lang=\"json\">\n{\n\t\"newPassword\": \"New password\",\n\t\"newPasswordRetype\": \"Retype new password\",\n\t\"retypedNotMatch\": \"The inputs do not match.\",\n\t\"security\": \"Security\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"ಗುಪ್ತಪದ\",\n\t\"changePassword\": \"Change password\",\n\t\"signinHistory\": \"Login history\",\n\t\"regenerateLoginToken\": \"Regenerate login token\",\n\t\"regenerateLoginTokenDescription\": \"Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.\"\n}\n</locale>\n\n<locale locale=\"ko-KR\" lang=\"json\">\n{\n\t\"newPassword\": \"새 비밀번호\",\n\t\"newPasswordRetype\": \"새 비밀번호(재입력)\",\n\t\"retypedNotMatch\": \"입력이 일치하지 않습니다.\",\n\t\"security\": \"보안\",\n\t\"securityBanner\": \"비밀번호, 로그인 방법, OTP, 패스 키 등의 계정의 보안에 관련된 설정을 합니다.\",\n\t\"password\": \"비밀번호\",\n\t\"changePassword\": \"비밀번호 변경\",\n\t\"signinHistory\": \"로그인 기록\",\n\t\"regenerateLoginToken\": \"로그인 토큰을 재생성\",\n\t\"regenerateLoginTokenDescription\": \"로그인할 때 사용되는 내부 토큰을 재생성합니다. 일반적으로 이 작업을 실행할 필요는 없습니다. 이 기능을 사용하면 이 계정으로 로그인한 모든 기기에서 로그아웃됩니다.\"\n}\n</locale>\n\n<locale locale=\"nl-NL\" lang=\"json\">\n{\n\t\"newPassword\": \"Nieuwe wachtwoord\",\n\t\"newPasswordRetype\": \"Nieuw wachtwoord (herhalen)\",\n\t\"retypedNotMatch\": \"Invoer komt niet overeen\",\n\t\"security\": \"Beveiliging\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Wachtwoord\",\n\t\"changePassword\": \"Wachtwoord wijzigen\",\n\t\"signinHistory\": \"Inloggeschiedenis\",\n\t\"regenerateLoginToken\": \"Login token opnieuw genereren\",\n\t\"regenerateLoginTokenDescription\": \"Regenereren van het token dat intern wordt gebruikt om in te loggen. Dit is normaal gezien niet nodig. Alle apparaten worden afgemeld tijdens het regenereren.\"\n}\n</locale>\n\n<locale locale=\"no-NO\" lang=\"json\">\n{\n\t\"newPassword\": \"Nytt passord\",\n\t\"newPasswordRetype\": \"Nytt passord (gjenta)\",\n\t\"retypedNotMatch\": \"Inngangene stemmer ikke overens.\",\n\t\"security\": \"Sikkerhet\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Passord\",\n\t\"changePassword\": \"Endre passord\",\n\t\"signinHistory\": \"Login history\",\n\t\"regenerateLoginToken\": \"Regenerate login token\",\n\t\"regenerateLoginTokenDescription\": \"Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.\"\n}\n</locale>\n\n<locale locale=\"pl-PL\" lang=\"json\">\n{\n\t\"newPassword\": \"Nowe hasło\",\n\t\"newPasswordRetype\": \"Powtórz nowe hasło\",\n\t\"retypedNotMatch\": \"Wejście nie zgadza się.\",\n\t\"security\": \"Bezpieczeństwo\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Hasło\",\n\t\"changePassword\": \"Zmień hasło\",\n\t\"signinHistory\": \"Historia logowania\",\n\t\"regenerateLoginToken\": \"Generuj token logowania ponownie\",\n\t\"regenerateLoginTokenDescription\": \"Regeneruje token używany wewnętrznie podczas logowania. Zazwyczaj nie jest to konieczne. Po regeneracji wszystkie urządzenia zostaną wylogowane.\"\n}\n</locale>\n\n<locale locale=\"pt-PT\" lang=\"json\">\n{\n\t\"newPassword\": \"Nova senha\",\n\t\"newPasswordRetype\": \"Nova senha (digite novamente)\",\n\t\"retypedNotMatch\": \"As informações inseridas não coincidem.\",\n\t\"security\": \"Segurança\",\n\t\"securityBanner\": \"Você pode configurar a segurança da conta em ajustes como senha, meios de entrada, aplicativos de autenticação e chaves de acesso.\",\n\t\"password\": \"Senha\",\n\t\"changePassword\": \"Mudar senha\",\n\t\"signinHistory\": \"Histórico de acesso\",\n\t\"regenerateLoginToken\": \"Gerar novo token de login\",\n\t\"regenerateLoginTokenDescription\": \"Gera novamente o token interno usado para o login. Normalmente, isso não é necessário. Ao regenerar, você será desconectado de todos os dispositivos.\"\n}\n</locale>\n\n<locale locale=\"ru-RU\" lang=\"json\">\n{\n\t\"newPassword\": \"Новый пароль\",\n\t\"newPasswordRetype\": \"Новый пароль (ещё раз)\",\n\t\"retypedNotMatch\": \"Не совпадают\",\n\t\"security\": \"Безопасность\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Пароль\",\n\t\"changePassword\": \"Изменить пароль\",\n\t\"signinHistory\": \"Журнал посещений\",\n\t\"regenerateLoginToken\": \"Создать новый токен для входа\",\n\t\"regenerateLoginTokenDescription\": \"Создаёт новый токен, используемый внутри программы во время входа. Обычно в этом нет необходимости. При создании все устройства будут отключены.\"\n}\n</locale>\n\n<locale locale=\"sk-SK\" lang=\"json\">\n{\n\t\"newPassword\": \"Nové heslo\",\n\t\"newPasswordRetype\": \"Nové heslo (znovu)\",\n\t\"retypedNotMatch\": \"Zadané vstupy nesúhlasia\",\n\t\"security\": \"Zabezpečenie\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Heslo\",\n\t\"changePassword\": \"Zmeniť heslo\",\n\t\"signinHistory\": \"História prihlásení\",\n\t\"regenerateLoginToken\": \"Pregenerovať prihlasovací token\",\n\t\"regenerateLoginTokenDescription\": \"Pregeneruje token interne používaný počas prihlásenia. Normálne toto netreba robiť. Ak sa pregeneruje, všetky zariadenia sa odhlásia.\"\n}\n</locale>\n\n<locale locale=\"th-TH\" lang=\"json\">\n{\n\t\"newPassword\": \"รหัสผ่านใหม่\",\n\t\"newPasswordRetype\": \"ใส่รหัสผ่านใหม่อีกครั้ง\",\n\t\"retypedNotMatch\": \"ทั้งสองป้อนข้อมูลไม่สอดคล้องกัน\",\n\t\"security\": \"ความปลอดภัย\",\n\t\"securityBanner\": \"สามารถตั้งค่าความปลอดภัยของบัญชี เช่น รหัสผ่าน วิธีการเข้าสู่ระบบ แอปยืนยันตัวตน Passkey เป็นต้น\",\n\t\"password\": \"รหัสผ่าน\",\n\t\"changePassword\": \"เปลี่ยนรหัสผ่าน\",\n\t\"signinHistory\": \"ประวัติการเข้าสู่ระบบ\",\n\t\"regenerateLoginToken\": \"สร้างโทเค็นการเข้าสู่ระบบอีกครั้ง\",\n\t\"regenerateLoginTokenDescription\": \"สร้างโทเค็นใหม่ที่ใช้ภายในระหว่างการเข้าสู่ระบบ โดยตามหลักปกติแล้วการดำเนินการนี้ไม่จำเป็น หากสร้างใหม่ อุปกรณ์ทั้งหมดจะถูกออกจากระบบนะ\"\n}\n</locale>\n\n<locale locale=\"tr-TR\" lang=\"json\">\n{\n\t\"newPassword\": \"Yeni şifre\",\n\t\"newPasswordRetype\": \"Yeni şifreyi tekrar girin\",\n\t\"retypedNotMatch\": \"Girişler eşleşmiyor.\",\n\t\"security\": \"Güvenlik\",\n\t\"securityBanner\": \"Şifre, oturum açma yöntemleri, kimlik doğrulama uygulamaları ve Passkeys gibi hesap güvenliği ile ilgili ayarları yapılandırabilirsin.\",\n\t\"password\": \"Şifre\",\n\t\"changePassword\": \"Şifreyi değiştir\",\n\t\"signinHistory\": \"Giriş geçmişi\",\n\t\"regenerateLoginToken\": \"Giriş jetonunu yeniden oluştur\",\n\t\"regenerateLoginTokenDescription\": \"Giriş sırasında dahili olarak kullanılan jetonu yeniden oluşturur. Normalde bu işlem gerekli değildir. Yeniden oluşturulursa, tüm cihazlar oturumu kapatılır.\"\n}\n</locale>\n\n<locale locale=\"ug-CN\" lang=\"json\">\n{\n\t\"newPassword\": \"New password\",\n\t\"newPasswordRetype\": \"Retype new password\",\n\t\"retypedNotMatch\": \"The inputs do not match.\",\n\t\"security\": \"Security\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Password\",\n\t\"changePassword\": \"Change password\",\n\t\"signinHistory\": \"Login history\",\n\t\"regenerateLoginToken\": \"Regenerate login token\",\n\t\"regenerateLoginTokenDescription\": \"Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.\"\n}\n</locale>\n\n<locale locale=\"uk-UA\" lang=\"json\">\n{\n\t\"newPassword\": \"Новий пароль\",\n\t\"newPasswordRetype\": \"Новий пароль (повторно)\",\n\t\"retypedNotMatch\": \"Введені дані не збігаються.\",\n\t\"security\": \"Безпека\",\n\t\"securityBanner\": \"Ви можете змінювати налаштування, пов'язані з безпекою облікового запису, такі як пароль, методи входження, засоби аутентифікації, й Passkeys.\",\n\t\"password\": \"Пароль\",\n\t\"changePassword\": \"Змінити пароль\",\n\t\"signinHistory\": \"Історія входів\",\n\t\"regenerateLoginToken\": \"Оновити Login Token\",\n\t\"regenerateLoginTokenDescription\": \"Регенерувати внутрішній ключ використовуваний під час входу. Зазвичай цього не потрібно робити. При регенерації всі пристрої вийдуть з системи.\"\n}\n</locale>\n\n<locale locale=\"vi-VN\" lang=\"json\">\n{\n\t\"newPassword\": \"Mật khẩu mới\",\n\t\"newPasswordRetype\": \"Nhập lại mật khẩu mới\",\n\t\"retypedNotMatch\": \"Mật khẩu không trùng khớp.\",\n\t\"security\": \"Bảo mật\",\n\t\"securityBanner\": \"You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.\",\n\t\"password\": \"Mật khẩu\",\n\t\"changePassword\": \"Đổi mật khẩu\",\n\t\"signinHistory\": \"Lịch sử đăng nhập\",\n\t\"regenerateLoginToken\": \"Tạo lại mã đăng nhập\",\n\t\"regenerateLoginTokenDescription\": \"Tạo lại mã nội bộ có thể dùng để đăng nhập. Thông thường hành động này là không cần thiết. Nếu được tạo lại, tất cả các thiết bị sẽ bị đăng xuất.\"\n}\n</locale>\n\n<locale locale=\"zh-CN\" lang=\"json\">\n{\n\t\"newPassword\": \"新密码\",\n\t\"newPasswordRetype\": \"重新输入密码：\",\n\t\"retypedNotMatch\": \"两次输入不一致！\",\n\t\"security\": \"安全\",\n\t\"securityBanner\": \"可在此设置如密码、登入方式、验证器、Passkey 等账户安全性设置。\",\n\t\"password\": \"密码\",\n\t\"changePassword\": \"修改密码\",\n\t\"signinHistory\": \"登录历史\",\n\t\"regenerateLoginToken\": \"重新生成登录令牌\",\n\t\"regenerateLoginTokenDescription\": \"重新生成用于登录的内部令牌。通常您不需要这样做。重新生成后，您将在所有设备上登出。\"\n}\n</locale>\n\n<locale locale=\"zh-TW\" lang=\"json\">\n{\n\t\"newPassword\": \"新密碼\",\n\t\"newPasswordRetype\": \"確認密碼\",\n\t\"retypedNotMatch\": \"兩次輸入不一致。\",\n\t\"security\": \"安全性\",\n\t\"securityBanner\": \"您可以設定與帳戶安全性相關的設定，例如密碼、登入方式、驗證應用程式和通行金鑰。\",\n\t\"password\": \"密碼\",\n\t\"changePassword\": \"修改密碼\",\n\t\"signinHistory\": \"登入歷史\",\n\t\"regenerateLoginToken\": \"重新產生登入權杖\",\n\t\"regenerateLoginTokenDescription\": \"重新產生用於登入的內部權杖。通常不需要使用此功能。重新產生後，所有裝置都將被登出。\"\n}\n</locale>\n",
+      "mappings": [
+        [
+          "newPasswordRetype",
+          "newPasswordRetype"
+        ],
+        [
+          "retypedNotMatch",
+          "retypedNotMatch"
+        ],
+        [
+          "_settings.securityBanner",
+          "securityBanner"
+        ],
+        [
+          "changePassword",
+          "changePassword"
+        ],
+        [
+          "signinHistory",
+          "signinHistory"
+        ],
+        [
+          "regenerateLoginToken",
+          "regenerateLoginToken"
+        ],
+        [
+          "regenerateLoginTokenDescription",
+          "regenerateLoginTokenDescription"
+        ]
+      ],
+      "changes": [
+        {
+          "language": "da-DK",
+          "path": "newPasswordRetype",
+          "original": "Retype new password",
+          "reviewed": "Indtast den nye adgangskode igen"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "newPasswordRetype",
+          "original": "Retype new password",
+          "reviewed": "Ales asekcem n wawal uffir amaynut"
+        },
+        {
+          "language": "kn-IN",
+          "path": "newPasswordRetype",
+          "original": "Retype new password",
+          "reviewed": "ಹೊಸ ಗುಪ್ತಪದವನ್ನು ಮತ್ತೊಮ್ಮೆ ನಮೂದಿಸಿ"
+        },
+        {
+          "language": "ug-CN",
+          "path": "newPasswordRetype",
+          "original": "Retype new password",
+          "reviewed": "يېڭى پارولنى قايتا كىرگۈزۈڭ"
+        },
+        {
+          "language": "da-DK",
+          "path": "retypedNotMatch",
+          "original": "The inputs do not match.",
+          "reviewed": "De indtastede værdier stemmer ikke overens."
+        },
+        {
+          "language": "kab-KAB",
+          "path": "retypedNotMatch",
+          "original": "The inputs do not match.",
+          "reviewed": "Isekcam ur mṣadan ara."
+        },
+        {
+          "language": "kn-IN",
+          "path": "retypedNotMatch",
+          "original": "The inputs do not match.",
+          "reviewed": "ನಮೂದಿಸಿದ ಮೌಲ್ಯಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ."
+        },
+        {
+          "language": "ug-CN",
+          "path": "retypedNotMatch",
+          "original": "The inputs do not match.",
+          "reviewed": "كىرگۈزگەن مەزمۇنلار ماس كەلمەيدۇ."
+        },
+        {
+          "language": "ar-SA",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "يمكنك ضبط الإعدادات المتعلقة بأمان الحساب، مثل كلمة المرور وطرق تسجيل الدخول وتطبيقات المصادقة ومفاتيح المرور."
+        },
+        {
+          "language": "cs-CZ",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Zde můžete nastavit zabezpečení účtu, například heslo, způsoby přihlašování, ověřovací aplikace a přístupové klíče."
+        },
+        {
+          "language": "da-DK",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Her kan du konfigurere indstillinger for kontosikkerhed, såsom adgangskode, loginmetoder, godkendelsesapps og adgangsnøgler."
+        },
+        {
+          "language": "fr-FR",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Vous pouvez configurer les paramètres de sécurité du compte, comme le mot de passe, les méthodes de connexion, les applications d’authentification et les clés d’accès."
+        },
+        {
+          "language": "id-ID",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Kamu dapat mengatur keamanan akun, seperti kata sandi, metode masuk, aplikasi autentikasi, dan kunci akses."
+        },
+        {
+          "language": "kab-KAB",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Tzemreḍ ad tesbaduḍ iɣewwaren n tɣellist n umiḍan, am wawal uffir, tarrayin n unekcum, isnasen n usesteb akked tsura n unekcum."
+        },
+        {
+          "language": "kn-IN",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "ಗುಪ್ತಪದ, ಪ್ರವೇಶ ವಿಧಾನಗಳು, ದೃಢೀಕರಣ ಅಪ್ಲಿಕೇಶನ್‌ಗಳು ಮತ್ತು ಪಾಸ್‌ಕೀಗಳಂತಹ ಖಾತೆಯ ಸುರಕ್ಷತೆಗೆ ಸಂಬಂಧಿಸಿದ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಇಲ್ಲಿ ಹೊಂದಿಸಬಹುದು."
+        },
+        {
+          "language": "nl-NL",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Je kunt instellingen voor accountbeveiliging configureren, zoals je wachtwoord, aanmeldmethoden, authenticatie-apps en passkeys."
+        },
+        {
+          "language": "no-NO",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Du kan konfigurere innstillinger for kontosikkerhet, som passord, innloggingsmetoder, autentiseringsapper og tilgangsnøkler."
+        },
+        {
+          "language": "pl-PL",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Możesz skonfigurować ustawienia zabezpieczeń konta, takie jak hasło, metody logowania, aplikacje uwierzytelniające i klucze dostępu."
+        },
+        {
+          "language": "ru-RU",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Здесь можно настроить безопасность аккаунта: пароль, способы входа, приложения для аутентификации и ключи доступа."
+        },
+        {
+          "language": "sk-SK",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Tu môžete nastaviť zabezpečenie účtu, napríklad heslo, spôsoby prihlasovania, overovacie aplikácie a prístupové kľúče."
+        },
+        {
+          "language": "ug-CN",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "بۇ يەردە پارول، كىرىش ئۇسۇللىرى، دەلىللەش ئەپلىرى ۋە كىرىش ئاچقۇچلىرى قاتارلىق ھېسابات بىخەتەرلىكىگە مۇناسىۋەتلىك تەڭشەكلەرنى تەڭشىيەلەيسىز."
+        },
+        {
+          "language": "vi-VN",
+          "path": "securityBanner",
+          "original": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+          "reviewed": "Bạn có thể cấu hình các thiết lập bảo mật tài khoản, như mật khẩu, phương thức đăng nhập, ứng dụng xác thực và khóa truy cập."
+        },
+        {
+          "language": "da-DK",
+          "path": "changePassword",
+          "original": "Change password",
+          "reviewed": "Skift adgangskode"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "changePassword",
+          "original": "Change password",
+          "reviewed": "Beddel awal uffir"
+        },
+        {
+          "language": "kn-IN",
+          "path": "changePassword",
+          "original": "Change password",
+          "reviewed": "ಗುಪ್ತಪದ ಬದಲಾಯಿಸಿ"
+        },
+        {
+          "language": "ug-CN",
+          "path": "changePassword",
+          "original": "Change password",
+          "reviewed": "پارولنى ئۆزگەرتىش"
+        },
+        {
+          "language": "da-DK",
+          "path": "signinHistory",
+          "original": "Login history",
+          "reviewed": "Loginhistorik"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "signinHistory",
+          "original": "Login history",
+          "reviewed": "Amazray n unekcum"
+        },
+        {
+          "language": "kn-IN",
+          "path": "signinHistory",
+          "original": "Login history",
+          "reviewed": "ಪ್ರವೇಶದ ಇತಿಹಾಸ"
+        },
+        {
+          "language": "no-NO",
+          "path": "signinHistory",
+          "original": "Login history",
+          "reviewed": "Innloggingshistorikk"
+        },
+        {
+          "language": "ug-CN",
+          "path": "signinHistory",
+          "original": "Login history",
+          "reviewed": "كىرىش تارىخى"
+        },
+        {
+          "language": "da-DK",
+          "path": "regenerateLoginToken",
+          "original": "Regenerate login token",
+          "reviewed": "Generér et nyt login-token"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "regenerateLoginToken",
+          "original": "Regenerate login token",
+          "reviewed": "Sirew tikelt-nniḍen ajuṭun n unekcum"
+        },
+        {
+          "language": "kn-IN",
+          "path": "regenerateLoginToken",
+          "original": "Regenerate login token",
+          "reviewed": "ಪ್ರವೇಶ ಟೋಕನ್ ಅನ್ನು ಮರುಸೃಷ್ಟಿಸಿ"
+        },
+        {
+          "language": "no-NO",
+          "path": "regenerateLoginToken",
+          "original": "Regenerate login token",
+          "reviewed": "Generer innloggingstoken på nytt"
+        },
+        {
+          "language": "ug-CN",
+          "path": "regenerateLoginToken",
+          "original": "Regenerate login token",
+          "reviewed": "كىرىش توكىنىنى قايتا ھاسىل قىلىش"
+        },
+        {
+          "language": "da-DK",
+          "path": "regenerateLoginTokenDescription",
+          "original": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.",
+          "reviewed": "Genererer et nyt token, som bruges internt ved login. Dette er normalt ikke nødvendigt. Hvis tokenet genereres igen, bliver du logget ud på alle enheder."
+        },
+        {
+          "language": "kab-KAB",
+          "path": "regenerateLoginTokenDescription",
+          "original": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.",
+          "reviewed": "Yessiraw tikelt-nniḍen ajuṭun yettwasqedcen daxel deg unekcum. Tigawt-a ur tlaq ara s umata. Ma yella yettwasirew tikelt-nniḍen, ad teffɣeḍ seg meṛṛa ibenkan."
+        },
+        {
+          "language": "kn-IN",
+          "path": "regenerateLoginTokenDescription",
+          "original": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.",
+          "reviewed": "ಪ್ರವೇಶದ ವೇಳೆ ಆಂತರಿಕವಾಗಿ ಬಳಸುವ ಟೋಕನ್ ಅನ್ನು ಮರುಸೃಷ್ಟಿಸುತ್ತದೆ. ಸಾಮಾನ್ಯವಾಗಿ ಈ ಕ್ರಿಯೆ ಅಗತ್ಯವಿರುವುದಿಲ್ಲ. ಮರುಸೃಷ್ಟಿಸಿದರೆ, ಎಲ್ಲ ಸಾಧನಗಳಿಂದ ನಿರ್ಗಮಿಸಲಾಗುತ್ತದೆ."
+        },
+        {
+          "language": "no-NO",
+          "path": "regenerateLoginTokenDescription",
+          "original": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.",
+          "reviewed": "Genererer tokenet som brukes internt ved innlogging, på nytt. Dette er vanligvis ikke nødvendig. Hvis tokenet genereres på nytt, blir du logget ut på alle enheter."
+        },
+        {
+          "language": "ug-CN",
+          "path": "regenerateLoginTokenDescription",
+          "original": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out.",
+          "reviewed": "كىرىش جەريانىدا ئىچكى قىسىمدا ئىشلىتىلىدىغان توكىننى قايتا ھاسىل قىلىدۇ. ئادەتتە بۇ مەشغۇلاتنىڭ ھاجىتى يوق. قايتا ھاسىل قىلىنسا، بارلىق ئۈسكۈنىلەردىن چىقىرىلىسىز."
+        }
+      ],
+      "keys": [
+        "newPassword",
+        "newPasswordRetype",
+        "retypedNotMatch",
+        "security",
+        "securityBanner",
+        "password",
+        "changePassword",
+        "signinHistory",
+        "regenerateLoginToken",
+        "regenerateLoginTokenDescription"
+      ]
+    },
+    {
+      "file": "packages/features/share/frontend/pages/qr.read.vue",
+      "sourceSha256": "dd8ea8a59142ca5867c0e2941ba8576ce74991b2dbbea76a1341c9af9e8d22c6",
+      "originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<div\n\tref=\"rootEl\"\n\t:class=\"$style.root\"\n\t:style=\"{\n\t\t'--MI-QrReadViewHeight': 'calc(100cqh - var(--MI-stickyTop, 0px) - var(--MI-stickyBottom, 0px))',\n\t\t'--MI-QrReadVideoHeight': 'min(calc(var(--MI-QrReadViewHeight) * 0.3), 512px)',\n\t}\"\n>\n\t<MkStickyContainer>\n\t\t<template #header>\n\t\t\t<div :class=\"$style.view\">\n\t\t\t\t<video ref=\"videoEl\" :class=\"$style.video\" autoplay muted playsinline></video>\n\t\t\t\t<div ref=\"overlayEl\"></div>\n\t\t\t\t<div :class=\"$style.controls\">\n\t\t\t\t\t<MkButton v-tooltip=\"$locale.sfc.scanFile\" iconOnly @click=\"upload\"><i class=\"ti ti-photo-plus\"></i></MkButton>\n\n\t\t\t\t\t<MkButton v-if=\"qrStarted\" v-tooltip=\"$locale.sfc.stopQr\" iconOnly @click=\"stopQr\"><i class=\"ti ti-player-play\"></i></MkButton>\n\t\t\t\t\t<MkButton v-else v-tooltip=\"$locale.sfc.startQr\" iconOnly danger @click=\"startQr\"><i class=\"ti ti-player-pause\"></i></MkButton>\n\n\t\t\t\t\t<MkButton v-tooltip=\"$locale.sfc.chooseCamera\" iconOnly @click=\"chooseCamera\"><i class=\"ti ti-camera-rotate\"></i></MkButton>\n\n\t\t\t\t\t<MkButton v-if=\"!flashCanToggle\" v-tooltip=\"$locale.sfc.cannotToggleFlash\" iconOnly disabled><i class=\"ti ti-bolt\"></i></MkButton>\n\t\t\t\t\t<MkButton v-else-if=\"!flash\" v-tooltip=\"$locale.sfc.turnOnFlash\" iconOnly @click=\"toggleFlash(true)\"><i class=\"ti ti-bolt-off\"></i></MkButton>\n\t\t\t\t\t<MkButton v-else v-tooltip=\"$locale.sfc.turnOffFlash\" iconOnly @click=\"toggleFlash(false)\"><i class=\"ti ti-bolt-filled\"></i></MkButton>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</template>\n\t\t<div\n\t\t\t:class=\"['_spacer', $style.contents]\"\n\t\t\t:style=\"{\n\t\t\t\t'--MI_SPACER-w': '800px'\n\t\t\t}\"\n\t\t>\n\t\t\t<MkStickyContainer>\n\t\t\t\t<template #header>\n\t\t\t\t\t<MkTab\n\t\t\t\t\t\tv-model=\"tab\"\n\t\t\t\t\t\t:tabs=\"[\n\t\t\t\t\t\t\t{ key: 'users', label: $locale.sfc.users },\n\t\t\t\t\t\t\t{ key: 'notes', label: $locale.sfc.notes },\n\t\t\t\t\t\t\t{ key: 'all', label: $locale.sfc.all },\n\t\t\t\t\t\t]\"\n\t\t\t\t\t\t:class=\"$style.tab\"\n\t\t\t\t\t>\n\t\t\t\t\t</MkTab>\n\t\t\t\t</template>\n\t\t\t\t<div v-if=\"tab === 'users'\" :class=\"[$style.users, '_margin']\" style=\"padding-bottom: var(--MI-margin);\">\n\t\t\t\t\t<MkUserInfo v-for=\"user in users\" :key=\"user.id\" :user=\"user\"/>\n\t\t\t\t</div>\n\t\t\t\t<div v-else-if=\"tab === 'notes'\" class=\"_margin _gaps\" style=\"padding-bottom: var(--MI-margin);\">\n\t\t\t\t\t<MkNote v-for=\"note in notes\" :key=\"note.id\" :note=\"note\" :class=\"$style.note\"/>\n\t\t\t\t</div>\n\t\t\t\t<div v-else-if=\"tab === 'all'\" class=\"_margin _gaps\" style=\"padding-bottom: var(--MI-margin);\">\n\t\t\t\t\t<MkQrReadRawViewer v-for=\"result in Array.from(results).reverse()\" :key=\"result\" :data=\"result\"/>\n\t\t\t\t</div>\n\t\t\t</MkStickyContainer>\n\t\t</div>\n\t</MkStickyContainer>\n</div>\n</template>\n\n<script lang=\"ts\" setup>\nimport QrScanner from 'qr-scanner';\nimport { onActivated, onDeactivated, onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue';\nimport * as misskey from 'misskey-js';\nimport { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';\nimport type { ApShowResponse } from 'misskey-js/entities.js';\nimport * as os from '@features/ui/frontend/os.js';\nimport MkUserInfo from '@features/users/frontend/components/MkUserInfo.vue';\nimport { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';\nimport MkNote from '@features/notes/frontend/components/MkNote.vue';\nimport MkTab from '@features/ui/frontend/components/MkTab.vue';\nimport MkButton from '@features/ui/frontend/components/MkButton.vue';\nimport MkQrReadRawViewer from '@features/share/frontend/pages/qr.read.raw-viewer.vue';\n\nconst LIST_RERENDER_INTERVAL = 1500;\n\nconst rootEl = useTemplateRef('rootEl');\nconst videoEl = useTemplateRef('videoEl');\nconst overlayEl = useTemplateRef('overlayEl');\n\nconst scannerInstance = shallowRef<QrScanner | null>(null);\n\nconst tab = ref<'users' | 'notes' | 'all'>('users');\n\n// higher is recent\nconst results = ref(new Set<string>());\n// lower is recent\nconst uris = ref<string[]>([]);\nconst sources = new Map<string, ApShowResponse | null>();\nconst users = ref<(misskey.entities.UserDetailed)[]>([]);\nconst usersCount = ref(0);\nconst notes = ref<misskey.entities.Note[]>([]);\nconst notesCount = ref(0);\n\nconst timer = ref<number | null>(null);\n\nfunction updateLists() {\n\tconst responses = uris.value.map(uri => sources.get(uri)).filter((r): r is ApShowResponse => !!r);\n\tusers.value = responses.filter(r => r.type === 'User').map(r => r.object).filter((u) => !!u);\n\tusersCount.value = users.value.length;\n\tnotes.value = responses.filter(r => r.type === 'Note').map(r => r.object).filter((n) => !!n);\n\tnotesCount.value = notes.value.length;\n\tupdateRequired.value = false;\n}\n\nconst updateRequired = ref(false);\n\nwatch(uris, () => {\n\tif (timer.value) {\n\t\tupdateRequired.value = true;\n\t\treturn;\n\t}\n\n\tupdateLists();\n\n\ttimer.value = window.setTimeout(() => {\n\t\ttimer.value = null;\n\t\tif (updateRequired.value) {\n\t\t\tupdateLists();\n\t\t}\n\t}, LIST_RERENDER_INTERVAL) as number;\n});\n\nwatch(tab, () => {\n\tif (timer.value) {\n\t\twindow.clearTimeout(timer.value);\n\t\ttimer.value = null;\n\t}\n\tupdateLists();\n});\n\nasync function processResult(result: QrScanner.ScanResult) {\n\tif (!result) return;\n\tconst trimmed = result.data.trim();\n\n\tif (!trimmed) return;\n\n\tconst haveExisted = results.value.has(trimmed);\n\tresults.value.add(trimmed);\n\n\ttry {\n\t\tnew URL(trimmed);\n\t} catch {\n\t\tif (!haveExisted) {\n\t\t\ttab.value = 'all';\n\t\t}\n\t\treturn;\n\t}\n\n\tif (uris.value[0] !== trimmed) {\n\t\t// 並べ替え\n\t\turis.value = [trimmed, ...uris.value.slice(0, 29).filter(u => u !== trimmed)];\n\t}\n\n\tif (sources.has(trimmed)) return;\n\t// Start fetching user info\n\tsources.set(trimmed, null);\n\n\tawait misskeyApi('ap/show', { uri: trimmed })\n\t\t.then(data => {\n\t\t\tif (data.type === 'User') {\n\t\t\t\tsources.set(trimmed, data);\n\t\t\t\ttab.value = 'users';\n\t\t\t} else if (data.type === 'Note') {\n\t\t\t\tsources.set(trimmed, data);\n\t\t\t\ttab.value = 'notes';\n\t\t\t}\n\t\t\tupdateLists();\n\t\t})\n\t\t.catch(err => {\n\t\t\ttab.value = 'all';\n\t\t\tthrow err;\n\t\t});\n}\n\nconst qrStarted = ref(true);\nconst flashCanToggle = ref(false);\nconst flash = ref(false);\n\nasync function upload() {\n\tos.chooseFileFromPc({ multiple: true }).then(files => {\n\t\tif (files.length === 0) return;\n\t\tfor (const file of files) {\n\t\t\tQrScanner.scanImage(file, { returnDetailedScanResult: true })\n\t\t\t\t.then(result => {\n\t\t\t\t\tprocessResult(result);\n\t\t\t\t})\n\t\t\t\t.catch(err => {\n\t\t\t\t\tif (err.toString().includes('No QR code found')) {\n\t\t\t\t\t\tos.alert({\n\t\t\t\t\t\t\ttype: 'info',\n\t\t\t\t\t\t\ttext: $locale.value.sfc.noQrCodeFound,\n\t\t\t\t\t\t});\n\t\t\t\t\t} else {\n\t\t\t\t\t\tos.alert({\n\t\t\t\t\t\t\ttype: 'error',\n\t\t\t\t\t\t\ttext: err.toString(),\n\t\t\t\t\t\t});\n\t\t\t\t\t\tconsole.error(err);\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t}\n\t});\n}\n\nasync function chooseCamera() {\n\tif (!scannerInstance.value) return;\n\tconst cameras = await QrScanner.listCameras(true);\n\tif (cameras.length === 0) {\n\t\tos.alert({\n\t\t\ttype: 'error',\n\t\t});\n\t\treturn;\n\t}\n\n\tconst select = await os.select({\n\t\ttitle: $locale.value.sfc.chooseCamera,\n\t\titems: cameras.map(camera => ({\n\t\t\tlabel: camera.label,\n\t\t\tvalue: camera.id,\n\t\t})),\n\t});\n\tif (select.canceled) return;\n\tif (select.result == null) return;\n\n\tawait scannerInstance.value.setCamera(select.result);\n\tflashCanToggle.value = await scannerInstance.value.hasFlash();\n\tflash.value = scannerInstance.value.isFlashOn();\n}\n\nasync function toggleFlash(to = false) {\n\tif (!scannerInstance.value) return;\n\n\tflash.value = to;\n\tif (flash.value) {\n\t\tawait scannerInstance.value.turnFlashOn();\n\t} else {\n\t\tawait scannerInstance.value.turnFlashOff();\n\t}\n}\n\n// hasFlashなどの後続の処理がカメラを再起動する可能性があるため、\n// start() が完了するまでの間に停止された場合は結果を破棄する必要がある\nlet initializeId = 0;\n\nfunction startQr() {\n\tif (!scannerInstance.value) return;\n\tconst currentInitializeId = ++initializeId;\n\tqrStarted.value = false;\n\tscannerInstance.value.start()\n\t\t.then(async () => {\n\t\t\tif (currentInitializeId !== initializeId) return;\n\t\t\tqrStarted.value = true;\n\t\t\tif (!scannerInstance.value) return;\n\t\t\tconst hasFlash = await scannerInstance.value.hasFlash();\n\t\t\tif (currentInitializeId !== initializeId) return;\n\t\t\tflashCanToggle.value = hasFlash;\n\t\t\tflash.value = scannerInstance.value.isFlashOn();\n\t\t})\n\t\t.catch(err => {\n\t\t\tif (currentInitializeId !== initializeId) return;\n\t\t\tqrStarted.value = false;\n\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttext: err.toString(),\n\t\t\t});\n\t\t\tconsole.error(err);\n\t\t});\n}\n\nfunction stopQr() {\n\tinitializeId++;\n\tif (!scannerInstance.value) return;\n\tscannerInstance.value.stop();\n\tqrStarted.value = false;\n}\n\nonActivated(() => {\n\tstartQr();\n});\n\nonDeactivated(() => {\n\tstopQr();\n});\n\nconst alertLock = ref(false);\n\nonMounted(() => {\n\tif (!videoEl.value || !overlayEl.value) {\n\t\tos.alert({\n\t\t\ttype: 'error',\n\t\t\ttext: $locale.value.sfc.somethingHappened,\n\t\t});\n\t\treturn;\n\t}\n\n\tscannerInstance.value = new QrScanner(\n\t\tvideoEl.value,\n\t\tprocessResult,\n\t\t{\n\t\t\thighlightScanRegion: true,\n\t\t\thighlightCodeOutline: true,\n\t\t\toverlay: overlayEl.value,\n\t\t\tcalculateScanRegion(video: HTMLVideoElement): QrScanner.ScanRegion {\n\t\t\t\tconst aspectRatio = video.videoWidth / video.videoHeight;\n\t\t\t\tconst SHORT_SIDE_SIZE_DOWNSCALED = 360;\n\t\t\t\treturn {\n\t\t\t\t\tx: 0,\n\t\t\t\t\ty: 0,\n\t\t\t\t\twidth: video.videoWidth,\n\t\t\t\t\theight: video.videoHeight,\n\t\t\t\t\tdownScaledWidth: aspectRatio > 1 ? Math.round(SHORT_SIDE_SIZE_DOWNSCALED * aspectRatio) : SHORT_SIDE_SIZE_DOWNSCALED,\n\t\t\t\t\tdownScaledHeight: aspectRatio > 1 ? SHORT_SIDE_SIZE_DOWNSCALED : Math.round(SHORT_SIDE_SIZE_DOWNSCALED / aspectRatio),\n\t\t\t\t};\n\t\t\t},\n\t\t\tonDecodeError(err) {\n\t\t\t\tif (err.toString().includes('No QR code found')) return;\n\t\t\t\tif (alertLock.value) return;\n\t\t\t\talertLock.value = true;\n\t\t\t\tos.alert({\n\t\t\t\t\ttype: 'error',\n\t\t\t\t\ttext: err.toString(),\n\t\t\t\t}).finally(() => {\n\t\t\t\t\talertLock.value = false;\n\t\t\t\t});\n\t\t\t},\n\t\t},\n\t);\n\n\tstartQr();\n});\n\nonUnmounted(() => {\n\tif (timer.value) {\n\t\twindow.clearTimeout(timer.value);\n\t\ttimer.value = null;\n\t}\n\n\tinitializeId++;\n\tscannerInstance.value?.destroy();\n});\n</script>\n\n<style lang=\"scss\" module>\n.root {\n\tposition: relative;\n}\n\n.view {\n\tposition: sticky;\n\ttop: var(--MI-stickyTop, 0);\n\tz-index: 1;\n\tbackground: var(--MI_THEME-bg);\n\tbackground-size: 16px 16px;\n\twidth: 100%;\n\theight: var(--MI-QrReadVideoHeight);\n}\n\n.video {\n\twidth: 100%;\n\theight: 100%;\n\tobject-fit: contain;\n}\n\n.controls {\n\twidth: 100%;\n\tposition: absolute;\n\tright: 10px;\n\tbottom: 10px;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n\tgap: 10px;\n}\n\nhtml[data-color-scheme=dark] .view {\n\t--c: rgb(255 255 255 / 2%);\n\tbackground-image: linear-gradient(45deg, var(--c) 16.67%, var(--MI_THEME-bg) 16.67%, var(--MI_THEME-bg) 50%, var(--c) 50%, var(--c) 66.67%, var(--MI_THEME-bg) 66.67%, var(--MI_THEME-bg) 100%);\n}\n\nhtml[data-color-scheme=light] .view {\n\t--c: rgb(0 0 0 / 2%);\n\tbackground-image: linear-gradient(45deg, var(--c) 16.67%, var(--MI_THEME-bg) 16.67%, var(--MI_THEME-bg) 50%, var(--c) 50%, var(--c) 66.67%, var(--MI_THEME-bg) 66.67%, var(--MI_THEME-bg) 100%);\n}\n\n.contents {\n\tpadding-top: calc(var(--MI-margin) / 2);\n}\n\n.tab {\n\tpadding: calc(var(--MI-margin) / 2) 0;\n\tbackground: var(--MI_THEME-bg);\n}\n\n.users {\n\tdisplay: grid;\n\tgrid-template-columns: repeat(auto-fill, minmax(260px, 1fr));\n\tgrid-gap: var(--MI-margin);\n}\n\n.note {\n\tbackground: var(--MI_THEME-panel);\n\tborder-radius: var(--MI-radius);\n}\n</style>\n\n<locale locale=\"ar-SA\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"حدث خطأ\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"المستخدمون\",\n\t\"notes\": \"الملاحظات\",\n\t\"all\": \"الكل\"\n}\n</locale>\n\n<locale locale=\"ca-ES\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No s'ha trobat cap codi QR\",\n\t\"chooseCamera\": \"Seleccionar càmera \",\n\t\"somethingHappened\": \"S'ha produït un error\",\n\t\"scanFile\": \"Escanejar la imatge des del dispositiu\",\n\t\"stopQr\": \"Parar el lector de codis QR\",\n\t\"startQr\": \"Reiniciar el lector de codis QR\",\n\t\"cannotToggleFlash\": \"No es pot activar el flaix\",\n\t\"turnOnFlash\": \"Activar el flaix\",\n\t\"turnOffFlash\": \"Apagar el flaix\",\n\t\"users\": \"Usuaris\",\n\t\"notes\": \"Notes\",\n\t\"all\": \"Tot\"\n}\n</locale>\n\n<locale locale=\"cs-CZ\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"Jejda. Něco se nepovedlo.\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Uživatelé\",\n\t\"notes\": \"Poznámky\",\n\t\"all\": \"Vše\"\n}\n</locale>\n\n<locale locale=\"da-DK\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"An error has occurred\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Users\",\n\t\"notes\": \"Notes\",\n\t\"all\": \"All\"\n}\n</locale>\n\n<locale locale=\"de-DE\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"QR-Code wurde nicht gefunden\",\n\t\"chooseCamera\": \"Kamera auswählen\",\n\t\"somethingHappened\": \"Ein Fehler ist aufgetreten\",\n\t\"scanFile\": \"Gerätebilder scannen\",\n\t\"stopQr\": \"QR-Code-Leser stoppen\",\n\t\"startQr\": \"QR-Code-Leser starten\",\n\t\"cannotToggleFlash\": \"Blitzauswahl nicht möglich\",\n\t\"turnOnFlash\": \"Blitz einschalten\",\n\t\"turnOffFlash\": \"Blitz ausschalten\",\n\t\"users\": \"Benutzer\",\n\t\"notes\": \"Notizen\",\n\t\"all\": \"Alle\"\n}\n</locale>\n\n<locale locale=\"en-US\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"An error has occurred\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Users\",\n\t\"notes\": \"Notes\",\n\t\"all\": \"All\"\n}\n</locale>\n\n<locale locale=\"es-ES\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No se encontró el código QR\",\n\t\"chooseCamera\": \"Seleccione cámara\",\n\t\"somethingHappened\": \"Ocurrió un error\",\n\t\"scanFile\": \"Escanear imagen desde un dispositivo\",\n\t\"stopQr\": \"Detener el lector de códigos QR\",\n\t\"startQr\": \"Reiniciar el lector de códigos QR\",\n\t\"cannotToggleFlash\": \"No se puede activar el flash\",\n\t\"turnOnFlash\": \"Encender el flash\",\n\t\"turnOffFlash\": \"Apagar el flash\",\n\t\"users\": \"Usuarios\",\n\t\"notes\": \"Notas\",\n\t\"all\": \"Todo\"\n}\n</locale>\n\n<locale locale=\"fr-FR\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"Une erreur est survenue\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Utilisateur·rice·s\",\n\t\"notes\": \"Notes\",\n\t\"all\": \"Tous\"\n}\n</locale>\n\n<locale locale=\"id-ID\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"Terjadi kesalahan\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Pengguna\",\n\t\"notes\": \"Catatan\",\n\t\"all\": \"Semua\"\n}\n</locale>\n\n<locale locale=\"it-IT\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"Non trovo alcun QR Code\",\n\t\"chooseCamera\": \"Seleziona fotocamera\",\n\t\"somethingHappened\": \"Si è verificato un problema\",\n\t\"scanFile\": \"Scansiona immagine nel dispositivo\",\n\t\"stopQr\": \"Interrompi lettura QR Code\",\n\t\"startQr\": \"Inizia lettura QR Code\",\n\t\"cannotToggleFlash\": \"Flash non controllabile\",\n\t\"turnOnFlash\": \"Accendi il flash\",\n\t\"turnOffFlash\": \"Spegni il flash\",\n\t\"users\": \"Profili\",\n\t\"notes\": \"Note\",\n\t\"all\": \"Tutte\"\n}\n</locale>\n\n<locale locale=\"ja-JP\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"QRコードが見つかりません\",\n\t\"chooseCamera\": \"カメラを選択\",\n\t\"somethingHappened\": \"問題が発生しました\",\n\t\"scanFile\": \"端末の画像をスキャン\",\n\t\"stopQr\": \"コードリーダーを停止\",\n\t\"startQr\": \"コードリーダーを再開\",\n\t\"cannotToggleFlash\": \"ライト選択不可\",\n\t\"turnOnFlash\": \"ライトをオンにする\",\n\t\"turnOffFlash\": \"ライトをオフにする\",\n\t\"users\": \"ユーザー\",\n\t\"notes\": \"ノート\",\n\t\"all\": \"全て\"\n}\n</locale>\n\n<locale locale=\"ja-KS\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"QRコードが見つかりません\",\n\t\"chooseCamera\": \"カメラを選択\",\n\t\"somethingHappened\": \"なんかあかんわ\",\n\t\"scanFile\": \"端末の画像をスキャン\",\n\t\"stopQr\": \"コードリーダーを停止\",\n\t\"startQr\": \"コードリーダーを再開\",\n\t\"cannotToggleFlash\": \"ライト選択不可\",\n\t\"turnOnFlash\": \"ライトをオンにする\",\n\t\"turnOffFlash\": \"ライトをオフにする\",\n\t\"users\": \"ユーザー\",\n\t\"notes\": \"ノート\",\n\t\"all\": \"みんな\"\n}\n</locale>\n\n<locale locale=\"kab-KAB\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"An error has occurred\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Users\",\n\t\"notes\": \"Notes\",\n\t\"all\": \"All\"\n}\n</locale>\n\n<locale locale=\"kn-IN\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"An error has occurred\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"ಬಳಕೆದಾರ\",\n\t\"notes\": \"Notes\",\n\t\"all\": \"All\"\n}\n</locale>\n\n<locale locale=\"ko-KR\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"QR 코드를 찾을 수 없습니다.\",\n\t\"chooseCamera\": \"카메라 선택\",\n\t\"somethingHappened\": \"오류가 발생했습니다\",\n\t\"scanFile\": \"단말기의 이미지 스캔\",\n\t\"stopQr\": \"코드 리더 정지\",\n\t\"startQr\": \"코드 리더 재개\",\n\t\"cannotToggleFlash\": \"플래시 선택 불가\",\n\t\"turnOnFlash\": \"플래시 켜기\",\n\t\"turnOffFlash\": \"플래시 끄기\",\n\t\"users\": \"유저\",\n\t\"notes\": \"노트\",\n\t\"all\": \"전체\"\n}\n</locale>\n\n<locale locale=\"nl-NL\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"Er is iets misgegaan.\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Gebruikers\",\n\t\"notes\": \"Notities\",\n\t\"all\": \"Alle\"\n}\n</locale>\n\n<locale locale=\"no-NO\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"En feil har oppstått\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Brukere\",\n\t\"notes\": \"Notes\",\n\t\"all\": \"Alle\"\n}\n</locale>\n\n<locale locale=\"pl-PL\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"Coś poszło nie tak\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Użytkownicy\",\n\t\"notes\": \"Wpisy\",\n\t\"all\": \"Wszystkie\"\n}\n</locale>\n\n<locale locale=\"pt-PT\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"Nenhum código QR encontrado\",\n\t\"chooseCamera\": \"Escolher câmera\",\n\t\"somethingHappened\": \"Ocorreu um erro\",\n\t\"scanFile\": \"Escanear imagem de dispositivo\",\n\t\"stopQr\": \"Deixar o leitor de códigos QR\",\n\t\"startQr\": \"Retornar ao leitor de códigos QR\",\n\t\"cannotToggleFlash\": \"Não foi possível ligar a lanterna\",\n\t\"turnOnFlash\": \"Ligar a lanterna\",\n\t\"turnOffFlash\": \"Desligar a lanterna\",\n\t\"users\": \"Usuários\",\n\t\"notes\": \"Posts\",\n\t\"all\": \"Todos\"\n}\n</locale>\n\n<locale locale=\"ru-RU\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"Что-то пошло не так\",\n\t\"scanFile\": \"Отсканировать изображение с устройства\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Пользователи\",\n\t\"notes\": \"Заметки\",\n\t\"all\": \"Все\"\n}\n</locale>\n\n<locale locale=\"sk-SK\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"Ups. Niečo sa nepodarilo.\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Používatelia\",\n\t\"notes\": \"Poznámky\",\n\t\"all\": \"Všetko\"\n}\n</locale>\n\n<locale locale=\"th-TH\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"ไม่พบ QR โค้ด\",\n\t\"chooseCamera\": \"เลือกกล้อง\",\n\t\"somethingHappened\": \"อุ๊ย ! มีอะไรบางอย่างผิดพลาด\",\n\t\"scanFile\": \"สแกนภาพจากอุปกรณ์\",\n\t\"stopQr\": \"หยุดตัวอ่าน QR โค้ด\",\n\t\"startQr\": \"เริ่มตัวอ่าน QR โค้ด\",\n\t\"cannotToggleFlash\": \"ไม่สามารถเลือกแสงแฟลชได้\",\n\t\"turnOnFlash\": \"ปิดแสงแฟลช\",\n\t\"turnOffFlash\": \"เปิดแสงแฟลช\",\n\t\"users\": \"ผู้ใช้\",\n\t\"notes\": \" โน้ต\",\n\t\"all\": \"ทั้งหมด\"\n}\n</locale>\n\n<locale locale=\"tr-TR\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"QR kodu bulunamadı\",\n\t\"chooseCamera\": \"Kamera Seç\",\n\t\"somethingHappened\": \"Bir hata oluştu\",\n\t\"scanFile\": \"Cihazdaki görüntüyü tarayın\",\n\t\"stopQr\": \"Kod okuyucuyu durdurun\",\n\t\"startQr\": \"Özgeçmiş Kodu Okuyucu\",\n\t\"cannotToggleFlash\": \"Işık seçeneği mevcut değil.\",\n\t\"turnOnFlash\": \"Işığı açın\",\n\t\"turnOffFlash\": \"Işığı kapatın\",\n\t\"users\": \"Kullanıcılar\",\n\t\"notes\": \"Notlar\",\n\t\"all\": \"Tümü\"\n}\n</locale>\n\n<locale locale=\"ug-CN\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"An error has occurred\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Users\",\n\t\"notes\": \"Notes\",\n\t\"all\": \"All\"\n}\n</locale>\n\n<locale locale=\"uk-UA\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"Щось пішло не так\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Користувачі\",\n\t\"notes\": \"Записи\",\n\t\"all\": \"Всі\"\n}\n</locale>\n\n<locale locale=\"vi-VN\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"No QR code found\",\n\t\"chooseCamera\": \"Choose camera\",\n\t\"somethingHappened\": \"Xảy ra lỗi\",\n\t\"scanFile\": \"Scan image from device\",\n\t\"stopQr\": \"Stop QR code reader\",\n\t\"startQr\": \"Resume QR code reader\",\n\t\"cannotToggleFlash\": \"Unable to toggle flashlight\",\n\t\"turnOnFlash\": \"Turn on flashlight\",\n\t\"turnOffFlash\": \"Turn off flashlight\",\n\t\"users\": \"Người dùng\",\n\t\"notes\": \"Bài Viết\",\n\t\"all\": \"Tất cả\"\n}\n</locale>\n\n<locale locale=\"zh-CN\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"未找到二维码\",\n\t\"chooseCamera\": \"切换镜头\",\n\t\"somethingHappened\": \"出错了\",\n\t\"scanFile\": \"从设备扫描图像\",\n\t\"stopQr\": \"关闭扫码器\",\n\t\"startQr\": \"重新打开二维码扫描器\",\n\t\"cannotToggleFlash\": \"无法开关闪光灯\",\n\t\"turnOnFlash\": \"开启闪光灯\",\n\t\"turnOffFlash\": \"关闭闪光灯\",\n\t\"users\": \"用户\",\n\t\"notes\": \"帖子\",\n\t\"all\": \"全部\"\n}\n</locale>\n\n<locale locale=\"zh-TW\" lang=\"json\">\n{\n\t\"noQrCodeFound\": \"找不到 QR code\",\n\t\"chooseCamera\": \"選擇相機\",\n\t\"somethingHappened\": \"發生錯誤\",\n\t\"scanFile\": \"掃描在裝置上的影像\",\n\t\"stopQr\": \"停止條碼掃描器\",\n\t\"startQr\": \"啟動條碼掃描器\",\n\t\"cannotToggleFlash\": \"無法切換閃光燈\",\n\t\"turnOnFlash\": \"開啟閃光燈\",\n\t\"turnOffFlash\": \"關閉閃光燈\",\n\t\"users\": \"使用者\",\n\t\"notes\": \"貼文\",\n\t\"all\": \"全部\"\n}\n</locale>\n",
+      "mappings": [
+        [
+          "_qr.noQrCodeFound",
+          "noQrCodeFound"
+        ],
+        [
+          "_qr.chooseCamera",
+          "chooseCamera"
+        ],
+        [
+          "_qr.scanFile",
+          "scanFile"
+        ],
+        [
+          "_qr.stopQr",
+          "stopQr"
+        ],
+        [
+          "_qr.startQr",
+          "startQr"
+        ],
+        [
+          "_qr.cannotToggleFlash",
+          "cannotToggleFlash"
+        ],
+        [
+          "_qr.turnOnFlash",
+          "turnOnFlash"
+        ],
+        [
+          "_qr.turnOffFlash",
+          "turnOffFlash"
+        ]
+      ],
+      "changes": [
+        {
+          "language": "ar-SA",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "لم يُعثر على رمز QR"
+        },
+        {
+          "language": "cs-CZ",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Nebyl nalezen žádný QR kód"
+        },
+        {
+          "language": "da-DK",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Ingen QR-kode fundet"
+        },
+        {
+          "language": "fr-FR",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Aucun code QR trouvé"
+        },
+        {
+          "language": "id-ID",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Tidak ditemukan kode QR"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Ulac tangalt QR yettwafen"
+        },
+        {
+          "language": "kn-IN",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "QR ಕೋಡ್ ಕಂಡುಬಂದಿಲ್ಲ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Geen QR-code gevonden"
+        },
+        {
+          "language": "no-NO",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Ingen QR-kode funnet"
+        },
+        {
+          "language": "pl-PL",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Nie znaleziono kodu QR"
+        },
+        {
+          "language": "ru-RU",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "QR-код не найден"
+        },
+        {
+          "language": "sk-SK",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Nenašiel sa žiadny QR kód"
+        },
+        {
+          "language": "ug-CN",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "QR كود تېپىلمىدى"
+        },
+        {
+          "language": "uk-UA",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "QR-код не знайдено"
+        },
+        {
+          "language": "vi-VN",
+          "path": "noQrCodeFound",
+          "original": "No QR code found",
+          "reviewed": "Không tìm thấy mã QR"
+        },
+        {
+          "language": "ar-SA",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "اختيار الكاميرا"
+        },
+        {
+          "language": "cs-CZ",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Vybrat kameru"
+        },
+        {
+          "language": "da-DK",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Vælg kamera"
+        },
+        {
+          "language": "fr-FR",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Choisir une caméra"
+        },
+        {
+          "language": "id-ID",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Pilih kamera"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Fren takamiṛat"
+        },
+        {
+          "language": "kn-IN",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "ಕ್ಯಾಮೆರಾ ಆಯ್ಕೆಮಾಡಿ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Camera kiezen"
+        },
+        {
+          "language": "no-NO",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Velg kamera"
+        },
+        {
+          "language": "pl-PL",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Wybierz kamerę"
+        },
+        {
+          "language": "ru-RU",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Выбрать камеру"
+        },
+        {
+          "language": "sk-SK",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Vybrať kameru"
+        },
+        {
+          "language": "ug-CN",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "كامېرا تاللاش"
+        },
+        {
+          "language": "uk-UA",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Вибрати камеру"
+        },
+        {
+          "language": "vi-VN",
+          "path": "chooseCamera",
+          "original": "Choose camera",
+          "reviewed": "Chọn camera"
+        },
+        {
+          "language": "ar-SA",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "مسح صورة من الجهاز"
+        },
+        {
+          "language": "cs-CZ",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Skenovat obrázek ze zařízení"
+        },
+        {
+          "language": "da-DK",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Scan et billede fra enheden"
+        },
+        {
+          "language": "fr-FR",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Scanner une image depuis l’appareil"
+        },
+        {
+          "language": "id-ID",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Pindai gambar dari perangkat"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Sken tugna seg yibenk"
+        },
+        {
+          "language": "kn-IN",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "ಸಾಧನದಿಂದ ಚಿತ್ರವನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Een afbeelding van het apparaat scannen"
+        },
+        {
+          "language": "no-NO",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Skann et bilde fra enheten"
+        },
+        {
+          "language": "pl-PL",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Skanuj obraz z urządzenia"
+        },
+        {
+          "language": "sk-SK",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Skenovať obrázok zo zariadenia"
+        },
+        {
+          "language": "ug-CN",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "ئۈسكۈنىدىكى رەسىمنى سىكاننېرلاش"
+        },
+        {
+          "language": "uk-UA",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Сканувати зображення з пристрою"
+        },
+        {
+          "language": "vi-VN",
+          "path": "scanFile",
+          "original": "Scan image from device",
+          "reviewed": "Quét ảnh từ thiết bị"
+        },
+        {
+          "language": "ar-SA",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "إيقاف قارئ رموز QR"
+        },
+        {
+          "language": "cs-CZ",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Zastavit čtečku QR kódů"
+        },
+        {
+          "language": "da-DK",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Stop QR-kodelæseren"
+        },
+        {
+          "language": "fr-FR",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Arrêter le lecteur de codes QR"
+        },
+        {
+          "language": "id-ID",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Hentikan pembaca kode QR"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Seḥbes imeɣri n tengalin QR"
+        },
+        {
+          "language": "kn-IN",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "QR ಕೋಡ್ ಓದುವಿಕೆಯನ್ನು ನಿಲ್ಲಿಸಿ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "QR-codelezer stoppen"
+        },
+        {
+          "language": "no-NO",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Stopp QR-kodeleseren"
+        },
+        {
+          "language": "pl-PL",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Zatrzymaj czytnik kodów QR"
+        },
+        {
+          "language": "ru-RU",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Остановить сканер QR-кодов"
+        },
+        {
+          "language": "sk-SK",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Zastaviť čítačku QR kódov"
+        },
+        {
+          "language": "ug-CN",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "QR كود ئوقۇغۇچنى توختىتىش"
+        },
+        {
+          "language": "uk-UA",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Зупинити сканер QR-кодів"
+        },
+        {
+          "language": "vi-VN",
+          "path": "stopQr",
+          "original": "Stop QR code reader",
+          "reviewed": "Dừng trình đọc mã QR"
+        },
+        {
+          "language": "ar-SA",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "استئناف قارئ رموز QR"
+        },
+        {
+          "language": "cs-CZ",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Obnovit čtečku QR kódů"
+        },
+        {
+          "language": "da-DK",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Genoptag QR-kodelæseren"
+        },
+        {
+          "language": "fr-FR",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Reprendre la lecture des codes QR"
+        },
+        {
+          "language": "id-ID",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Lanjutkan pembaca kode QR"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Kemmel taɣuri n tengalin QR"
+        },
+        {
+          "language": "kn-IN",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "QR ಕೋಡ್ ಓದುವಿಕೆಯನ್ನು ಮುಂದುವರಿಸಿ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "QR-codelezer hervatten"
+        },
+        {
+          "language": "no-NO",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Gjenoppta QR-kodeleseren"
+        },
+        {
+          "language": "pl-PL",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Wznów działanie czytnika kodów QR"
+        },
+        {
+          "language": "ru-RU",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Возобновить работу сканера QR-кодов"
+        },
+        {
+          "language": "sk-SK",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Obnoviť čítačku QR kódov"
+        },
+        {
+          "language": "ug-CN",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "QR كود ئوقۇغۇچنى قايتا داۋاملاشتۇرۇش"
+        },
+        {
+          "language": "uk-UA",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Відновити роботу сканера QR-кодів"
+        },
+        {
+          "language": "vi-VN",
+          "path": "startQr",
+          "original": "Resume QR code reader",
+          "reviewed": "Tiếp tục trình đọc mã QR"
+        },
+        {
+          "language": "ar-SA",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "تعذّر تشغيل ضوء الكاميرا أو إطفاؤه"
+        },
+        {
+          "language": "cs-CZ",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Nelze zapnout nebo vypnout přisvícení"
+        },
+        {
+          "language": "da-DK",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Kan ikke slå kameralyset til eller fra"
+        },
+        {
+          "language": "fr-FR",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Impossible d’activer ou de désactiver la lampe"
+        },
+        {
+          "language": "id-ID",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Tidak dapat menyalakan atau mematikan lampu kamera"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Ur nezmir ara ad nermed neɣ ad nessens tafat n tkamiṛat"
+        },
+        {
+          "language": "kn-IN",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "ಕ್ಯಾಮೆರಾ ಬೆಳಕನ್ನು ಆನ್ ಅಥವಾ ಆಫ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Kan de cameralamp niet in- of uitschakelen"
+        },
+        {
+          "language": "no-NO",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Kan ikke slå kameralyset på eller av"
+        },
+        {
+          "language": "pl-PL",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Nie można włączyć ani wyłączyć lampy"
+        },
+        {
+          "language": "ru-RU",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Не удалось включить или выключить фонарик"
+        },
+        {
+          "language": "sk-SK",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Nedá sa zapnúť alebo vypnúť svetlo kamery"
+        },
+        {
+          "language": "ug-CN",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "كامېرا چىرىغىنى ياندۇرغىلى ياكى ئۆچۈرگىلى بولمىدى"
+        },
+        {
+          "language": "uk-UA",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Не вдалося ввімкнути або вимкнути ліхтарик"
+        },
+        {
+          "language": "vi-VN",
+          "path": "cannotToggleFlash",
+          "original": "Unable to toggle flashlight",
+          "reviewed": "Không thể bật hoặc tắt đèn pin"
+        },
+        {
+          "language": "ar-SA",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "تشغيل ضوء الكاميرا"
+        },
+        {
+          "language": "cs-CZ",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Zapnout přisvícení"
+        },
+        {
+          "language": "da-DK",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Tænd kameralyset"
+        },
+        {
+          "language": "fr-FR",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Allumer la lampe"
+        },
+        {
+          "language": "id-ID",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Nyalakan lampu kamera"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Rmed tafat n tkamiṛat"
+        },
+        {
+          "language": "kn-IN",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "ಕ್ಯಾಮೆರಾ ಬೆಳಕನ್ನು ಆನ್ ಮಾಡಿ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Cameralamp inschakelen"
+        },
+        {
+          "language": "no-NO",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Slå på kameralyset"
+        },
+        {
+          "language": "pl-PL",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Włącz lampę"
+        },
+        {
+          "language": "ru-RU",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Включить фонарик"
+        },
+        {
+          "language": "sk-SK",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Zapnúť svetlo kamery"
+        },
+        {
+          "language": "ug-CN",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "كامېرا چىرىغىنى ياندۇرۇش"
+        },
+        {
+          "language": "uk-UA",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Увімкнути ліхтарик"
+        },
+        {
+          "language": "vi-VN",
+          "path": "turnOnFlash",
+          "original": "Turn on flashlight",
+          "reviewed": "Bật đèn pin"
+        },
+        {
+          "language": "ar-SA",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "إطفاء ضوء الكاميرا"
+        },
+        {
+          "language": "cs-CZ",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Vypnout přisvícení"
+        },
+        {
+          "language": "da-DK",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Sluk kameralyset"
+        },
+        {
+          "language": "fr-FR",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Éteindre la lampe"
+        },
+        {
+          "language": "id-ID",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Matikan lampu kamera"
+        },
+        {
+          "language": "kab-KAB",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Sens tafat n tkamiṛat"
+        },
+        {
+          "language": "kn-IN",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "ಕ್ಯಾಮೆರಾ ಬೆಳಕನ್ನು ಆಫ್ ಮಾಡಿ"
+        },
+        {
+          "language": "nl-NL",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Cameralamp uitschakelen"
+        },
+        {
+          "language": "no-NO",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Slå av kameralyset"
+        },
+        {
+          "language": "pl-PL",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Wyłącz lampę"
+        },
+        {
+          "language": "ru-RU",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Выключить фонарик"
+        },
+        {
+          "language": "sk-SK",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Vypnúť svetlo kamery"
+        },
+        {
+          "language": "ug-CN",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "كامېرا چىرىغىنى ئۆچۈرۈش"
+        },
+        {
+          "language": "uk-UA",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Вимкнути ліхтарик"
+        },
+        {
+          "language": "vi-VN",
+          "path": "turnOffFlash",
+          "original": "Turn off flashlight",
+          "reviewed": "Tắt đèn pin"
+        }
+      ],
+      "keys": [
+        "noQrCodeFound",
+        "chooseCamera",
+        "somethingHappened",
+        "scanFile",
+        "stopQr",
+        "startQr",
+        "cannotToggleFlash",
+        "turnOnFlash",
+        "turnOffFlash",
+        "users",
+        "notes",
+        "all"
+      ]
+    },
+    {
+      "file": "packages/features/instance/frontend/pages/admin/server-rules.vue",
+      "sourceSha256": "c6bbc89309a31d5a6f33c1ae62e76b4756ecf1846c001e6e89b76b55b8d45404",
+      "originalSource": "<!--\nSPDX-FileCopyrightText: syuilo and misskey-project\nSPDX-License-Identifier: AGPL-3.0-only\n-->\n\n<template>\n<SearchMarker markerId=\"serverRules\" :keywords=\"['rules']\">\n\t<MkFolder>\n\t\t<template #icon><SearchIcon><i class=\"ti ti-checkbox\"></i></SearchIcon></template>\n\t\t<template #label><SearchLabel>{{ $locale.sfc.serverRules }}</SearchLabel></template>\n\n\t\t<div class=\"_gaps_m\">\n\t\t\t<div><SearchText>{{ $locale.sfc.description }}</SearchText></div>\n\n\t\t\t<MkDraggable\n\t\t\t\tv-model=\"serverRules\"\n\t\t\t\tdirection=\"vertical\"\n\t\t\t\twithGaps\n\t\t\t\tmanualDragStart\n\t\t\t>\n\t\t\t\t<template #default=\"{ item, index, dragStart }\">\n\t\t\t\t\t<div :class=\"$style.item\">\n\t\t\t\t\t\t<div :class=\"$style.itemHeader\">\n\t\t\t\t\t\t\t<div :class=\"$style.itemNumber\">{{ index + 1 }}</div>\n\t\t\t\t\t\t\t<span :class=\"$style.itemHandle\" :draggable=\"true\" @dragstart.stop=\"dragStart\"><i class=\"ti ti-menu\"></i></span>\n\t\t\t\t\t\t\t<button class=\"_button\" :class=\"$style.itemRemove\" @click=\"remove(item.id)\"><i class=\"ti ti-x\"></i></button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<MkInput :modelValue=\"item.text\" @update:modelValue=\"serverRules[index].text = $event\"/>\n\t\t\t\t\t</div>\n\t\t\t\t</template>\n\t\t\t</MkDraggable>\n\t\t\t<div :class=\"$style.commands\">\n\t\t\t\t<MkButton rounded @click=\"add\"><i class=\"ti ti-plus\"></i> {{ $locale.sfc.add }}</MkButton>\n\t\t\t\t<MkButton primary rounded @click=\"save\"><i class=\"ti ti-check\"></i> {{ $locale.sfc.save }}</MkButton>\n\t\t\t</div>\n\t\t</div>\n\t</MkFolder>\n</SearchMarker>\n</template>\n\n<script lang=\"ts\" setup>\nimport { ref } from 'vue';\nimport * as os from '@features/ui/frontend/os.js';\nimport { fetchInstance, instance } from '@features/instance/frontend/instance.js';\nimport MkButton from '@features/ui/frontend/components/MkButton.vue';\nimport MkInput from '@features/ui/frontend/components/MkInput.vue';\nimport MkFolder from '@features/ui/frontend/components/MkFolder.vue';\nimport MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';\n\nconst serverRules = ref<{ text: string; id: string; }[]>(instance.serverRules.map(text => ({ text, id: Math.random().toString() })));\n\nasync function save() {\n\tawait os.apiWithDialog('admin/update-meta', {\n\t\tserverRules: serverRules.value.map(r => r.text),\n\t});\n\tfetchInstance(true);\n}\n\nfunction add(): void {\n\tserverRules.value.push({ text: '', id: Math.random().toString() });\n}\n\nfunction remove(id: string): void {\n\tserverRules.value = serverRules.value.filter(r => r.id !== id);\n}\n</script>\n\n<style lang=\"scss\" module>\n.item {\n\tdisplay: block;\n\tcolor: var(--MI_THEME-navFg);\n}\n\n.itemHeader {\n\tdisplay: flex;\n\tmargin-bottom: 8px;\n\talign-items: center;\n}\n\n.itemHandle {\n\tdisplay: flex;\n\twidth: 40px;\n\theight: 40px;\n\talign-items: center;\n\tjustify-content: center;\n\tcursor: move;\n}\n\n.itemNumber {\n\tdisplay: flex;\n\tbackground-color: var(--MI_THEME-accentedBg);\n\tcolor: var(--MI_THEME-accent);\n\tfont-size: 14px;\n\tfont-weight: bold;\n\twidth: 28px;\n\theight: 28px;\n\talign-items: center;\n\tjustify-content: center;\n\tborder-radius: 999px;\n\tmargin-right: 8px;\n}\n\n.itemEdit {\n\twidth: 100%;\n\tmax-width: 100%;\n\tmin-width: 100%;\n}\n\n.itemRemove {\n\twidth: 40px;\n\theight: 40px;\n\tcolor: var(--MI_THEME-error);\n\tmargin-left: auto;\n\tborder-radius: 6px;\n\n\t&:hover {\n\t\tbackground: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.05));\n\t}\n}\n\n.commands {\n\tdisplay: flex;\n\tgap: 16px;\n}\n</style>\n\n<locale locale=\"ar-SA\" lang=\"json\">\n{\n  \"serverRules\": \"قوانين الخادم\",\n  \"description\": \"مجموعة من القواعد لعرضها عند التسجيل، من المستحسن كتابة ملخصٍ للشروط الخدمة.\",\n  \"add\": \"إضافة\",\n  \"save\": \"حفظ\"\n}\n</locale>\n\n<locale locale=\"ca-ES\" lang=\"json\">\n{\n  \"serverRules\": \"Regles del servidor\",\n  \"description\": \"Un conjunt de regles que seran mostrades abans de registrar-se. Es recomanable configurar un resum dels termes d'ús.\",\n  \"add\": \"Afegir\",\n  \"save\": \"Desa\"\n}\n</locale>\n\n<locale locale=\"cs-CZ\" lang=\"json\">\n{\n  \"serverRules\": \"Pravidla serveru\",\n  \"description\": \"Soubor pravidel, která se zobrazí před registrací. Doporučuje se nastavit shrnutí podmínek služby.\",\n  \"add\": \"Přidat\",\n  \"save\": \"Uložit\"\n}\n</locale>\n\n<locale locale=\"da-DK\" lang=\"json\">\n{\n  \"serverRules\": \"Server rules\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Add\",\n  \"save\": \"Save\"\n}\n</locale>\n\n<locale locale=\"de-DE\" lang=\"json\">\n{\n  \"serverRules\": \"Serverregeln\",\n  \"description\": \"Eine Reihe von Regeln, die vor der Registrierung angezeigt werden. Eine Zusammenfassung der Nutzungsbedingungen anzuzeigen ist empfohlen.\",\n  \"add\": \"Hinzufügen\",\n  \"save\": \"Speichern\"\n}\n</locale>\n\n<locale locale=\"en-US\" lang=\"json\">\n{\n  \"serverRules\": \"Server rules\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Add\",\n  \"save\": \"Save\"\n}\n</locale>\n\n<locale locale=\"es-ES\" lang=\"json\">\n{\n  \"serverRules\": \"Reglas del servidor\",\n  \"description\": \"Un conjunto de reglas que serán mostradas antes del registro. Configurar un sumario de términos de servicio es recomendado.\",\n  \"add\": \"Agregar\",\n  \"save\": \"Guardar\"\n}\n</locale>\n\n<locale locale=\"fr-FR\" lang=\"json\">\n{\n  \"serverRules\": \"Règles du serveur\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Ajouter\",\n  \"save\": \"Enregistrer\"\n}\n</locale>\n\n<locale locale=\"id-ID\" lang=\"json\">\n{\n  \"serverRules\": \"Aturan peladen\",\n  \"description\": \"Daftar peraturan akan ditampilkan sebelum pendaftaran. Mengatur ringkasan dari Syarat dan Ketentuan sangat direkomendasikan.\",\n  \"add\": \"Tambahkan\",\n  \"save\": \"Simpan\"\n}\n</locale>\n\n<locale locale=\"it-IT\" lang=\"json\">\n{\n  \"serverRules\": \"Regolamento\",\n  \"description\": \"In Europa è necessario mostrare l'informativa sul trattamento dei dati personali, prima della registrazione al servizio.\",\n  \"add\": \"Aggiungi\",\n  \"save\": \"Salva\"\n}\n</locale>\n\n<locale locale=\"ja-JP\" lang=\"json\">\n{\n  \"serverRules\": \"サーバールール\",\n  \"description\": \"新規登録前に表示する、サーバーの簡潔なルールを設定します。内容は利用規約の要約とすることを推奨します。\",\n  \"add\": \"追加\",\n  \"save\": \"保存\"\n}\n</locale>\n\n<locale locale=\"ja-KS\" lang=\"json\">\n{\n  \"serverRules\": \"サーバールール\",\n  \"description\": \"新規登録前に見せる、サーバーのカンタンなルールを決めるで。内容は使うための決め事の要約がええと思うわ。\",\n  \"add\": \"増やす\",\n  \"save\": \"とっとく\"\n}\n</locale>\n\n<locale locale=\"kab-KAB\" lang=\"json\">\n{\n  \"serverRules\": \"Server rules\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Add\",\n  \"save\": \"Sekles\"\n}\n</locale>\n\n<locale locale=\"kn-IN\" lang=\"json\">\n{\n  \"serverRules\": \"Server rules\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Add\",\n  \"save\": \"ಉಳಿಸಿ\"\n}\n</locale>\n\n<locale locale=\"ko-KR\" lang=\"json\">\n{\n  \"serverRules\": \"서버 규칙\",\n  \"description\": \"회원 가입 이전에 간단하게 표시할 서버 규칙입니다. 이용 약관의 요약으로 구성하는 것을 추천합니다.\",\n  \"add\": \"추가\",\n  \"save\": \"저장\"\n}\n</locale>\n\n<locale locale=\"nl-NL\" lang=\"json\">\n{\n  \"serverRules\": \"Server rules\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Toevoegen\",\n  \"save\": \"Opslaan\"\n}\n</locale>\n\n<locale locale=\"no-NO\" lang=\"json\">\n{\n  \"serverRules\": \"Server rules\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Legg til\",\n  \"save\": \"Lagre\"\n}\n</locale>\n\n<locale locale=\"pl-PL\" lang=\"json\">\n{\n  \"serverRules\": \"Server rules\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Dodaj\",\n  \"save\": \"Zapisz\"\n}\n</locale>\n\n<locale locale=\"pt-PT\" lang=\"json\">\n{\n  \"serverRules\": \"Regras do servidor\",\n  \"description\": \"Um grupo de regras a ser exibido antes de um cadastro. É recomendado que se faça um resumo dos Termos de Serviço.\",\n  \"add\": \"Adicionar\",\n  \"save\": \"Salvar\"\n}\n</locale>\n\n<locale locale=\"ru-RU\" lang=\"json\">\n{\n  \"serverRules\": \"Правила сервера\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Добавить\",\n  \"save\": \"Сохранить\"\n}\n</locale>\n\n<locale locale=\"sk-SK\" lang=\"json\">\n{\n  \"serverRules\": \"Server rules\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Pridať\",\n  \"save\": \"Uložiť\"\n}\n</locale>\n\n<locale locale=\"th-TH\" lang=\"json\">\n{\n  \"serverRules\": \"กฎของเซิร์ฟเวอร์\",\n  \"description\": \"ชุดของกฎที่จะแสดงก่อนการลงทะเบียนเราขอแนะนำให้ตั้งค่าสรุปข้อกำหนดในการให้บริการ\",\n  \"add\": \"เพิ่ม\",\n  \"save\": \"บันทึก\"\n}\n</locale>\n\n<locale locale=\"tr-TR\" lang=\"json\">\n{\n  \"serverRules\": \"Sunucu kuralları\",\n  \"description\": \"Kayıt öncesinde gösterilecek bir dizi kural. Hizmet Şartlarının özetini belirlemen önerilir.\",\n  \"add\": \"Ekle\",\n  \"save\": \"Kaydet\"\n}\n</locale>\n\n<locale locale=\"ug-CN\" lang=\"json\">\n{\n  \"serverRules\": \"Server rules\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Add\",\n  \"save\": \"Save\"\n}\n</locale>\n\n<locale locale=\"uk-UA\" lang=\"json\">\n{\n  \"serverRules\": \"Правила сервера\",\n  \"description\": \"Набір правил які будуть показані перед реєстрацією. Налаштування короткого огляду Умов Сервісу рекомендовано.\",\n  \"add\": \"Додати\",\n  \"save\": \"Зберегти\"\n}\n</locale>\n\n<locale locale=\"vi-VN\" lang=\"json\">\n{\n  \"serverRules\": \"Luật của máy chủ\",\n  \"description\": \"A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.\",\n  \"add\": \"Thêm\",\n  \"save\": \"Lưu\"\n}\n</locale>\n\n<locale locale=\"zh-CN\" lang=\"json\">\n{\n  \"serverRules\": \"服务器规则\",\n  \"description\": \"在新用户注册前显示服务器的简单规则。推荐显示服务条款的主要内容。\",\n  \"add\": \"添加\",\n  \"save\": \"保存\"\n}\n</locale>\n\n<locale locale=\"zh-TW\" lang=\"json\">\n{\n  \"serverRules\": \"伺服器規則\",\n  \"description\": \"設定在註冊頁面顯示的伺服器簡要規則。建議是服務條款的摘要。\",\n  \"add\": \"新增\",\n  \"save\": \"儲存\"\n}\n</locale>\n",
+      "mappings": [
+        [
+          "_serverRules.description",
+          "description"
+        ]
+      ],
+      "changes": [
+        {
+          "language": "da-DK",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "Angiv et kort sæt serverregler, der vises før tilmelding. Det anbefales at bruge et sammendrag af brugsvilkårene."
+        },
+        {
+          "language": "fr-FR",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "Définissez un ensemble concis de règles du serveur à afficher avant l’inscription. Il est recommandé d’utiliser un résumé des conditions d’utilisation."
+        },
+        {
+          "language": "kab-KAB",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "Sbadu ilugan iwezlan n uqeddac ara d-yettwaseknen send ajerred. Yettusemter ad ilin d agzul n tewtilin n useqdec."
+        },
+        {
+          "language": "kn-IN",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "ನೋಂದಣಿಗೂ ಮೊದಲು ತೋರಿಸಲು ಸರ್ವರ್‌ನ ಸಂಕ್ಷಿಪ್ತ ನಿಯಮಗಳನ್ನು ಹೊಂದಿಸಿ. ಸೇವಾ ನಿಯಮಗಳ ಸಾರಾಂಶವನ್ನು ಬಳಸಲು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ."
+        },
+        {
+          "language": "nl-NL",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "Stel beknopte serverregels in die vóór registratie worden weergegeven. Een samenvatting van de gebruiksvoorwaarden wordt aanbevolen."
+        },
+        {
+          "language": "no-NO",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "Angi et kort sett med serverregler som vises før registrering. Det anbefales å bruke et sammendrag av bruksvilkårene."
+        },
+        {
+          "language": "pl-PL",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "Ustaw zwięzłe zasady serwera wyświetlane przed rejestracją. Zaleca się użycie podsumowania warunków korzystania z usługi."
+        },
+        {
+          "language": "ru-RU",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "Задайте краткие правила сервера, которые будут показаны перед регистрацией. Рекомендуется использовать краткое изложение условий предоставления услуг."
+        },
+        {
+          "language": "sk-SK",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "Nastavte stručné pravidlá servera, ktoré sa zobrazia pred registráciou. Odporúča sa použiť zhrnutie podmienok používania služby."
+        },
+        {
+          "language": "ug-CN",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "تىزىملىتىشتىن بۇرۇن كۆرسىتىلىدىغان مۇلازىمېتىرنىڭ قىسقا قائىدىلىرىنى بەلگىلەڭ. مۇلازىمەت شەرتلىرىنىڭ قىسقىچە مەزمۇنىنى ئىشلىتىش تەۋسىيە قىلىنىدۇ."
+        },
+        {
+          "language": "vi-VN",
+          "path": "description",
+          "original": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+          "reviewed": "Thiết lập các quy tắc ngắn gọn của máy chủ để hiển thị trước khi đăng ký. Bạn nên sử dụng bản tóm tắt điều khoản dịch vụ."
+        }
+      ],
+      "keys": [
+        "serverRules",
+        "description",
+        "add",
+        "save"
+      ]
+    }
+  ],
+  "catalogs": {
+    "globals": [
+      "_qr.cannotToggleFlash",
+      "_qr.chooseCamera",
+      "_qr.noQrCodeFound",
+      "_qr.scanFile",
+      "_qr.startQr",
+      "_qr.stopQr",
+      "_qr.turnOffFlash",
+      "_qr.turnOnFlash",
+      "_serverRules.description",
+      "_settings.securityBanner",
+      "changePassword",
+      "incorrectTotp",
+      "loginFailed",
+      "newPasswordRetype",
+      "passkeyVerificationFailed",
+      "passkeyVerificationSucceededButPasswordlessLoginDisabled",
+      "rateLimitExceeded",
+      "regenerateLoginToken",
+      "regenerateLoginTokenDescription",
+      "retypedNotMatch",
+      "signinFailed",
+      "signinHistory",
+      "unknownWebAuthnKey"
+    ],
+    "raw": {
+      "ar-SA": {
+        "count": 8,
+        "sha256": "1f271a9513e6a8b3f63216bf93db2c08024b25e831c5f9d1938330cefec1eba2"
+      },
+      "bn-BD": {
+        "count": 9,
+        "sha256": "83839c767a1abebea6f87223ecfa5ac45e6327f2ccc0e3acf4d8e91b3fce050c"
+      },
+      "ca-ES": {
+        "count": 11,
+        "sha256": "46219bdedf5ae681ea999975a97ce12ed5e445aaef42bfd3ac2f2be83f6faeb3"
+      },
+      "cs-CZ": {
+        "count": 9,
+        "sha256": "3f7bef69ab1c4d1742f21ea226c64e2c61160fd482f69271f2722556cf3ae9e3"
+      },
+      "da-DK": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "de-DE": {
+        "count": 11,
+        "sha256": "f3a971f67dbe5f8b7715d05f6d700109f60d726af832859dead8665f0e9ffb64"
+      },
+      "el-GR": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "en-US": {
+        "count": 11,
+        "sha256": "cb68f5b9c6c029edb26a6dcfb68fff0f7dc42defa93b2e6be718e493bdb2ee6e"
+      },
+      "es-ES": {
+        "count": 11,
+        "sha256": "f5b2730855465b2327db6d955237040d5b804ac942b1ca3ba97e55269bd568dd"
+      },
+      "fa-IR": {
+        "count": 1,
+        "sha256": "af2a261c9fe91b3b07c96cbc518d03371a8b9e72da106357fbce51a56ccf3e75"
+      },
+      "fr-FR": {
+        "count": 11,
+        "sha256": "9d8fe25ceb6d91735471b4ca64c7e9684f8f94564cd7780a7a2376b4013de2ae"
+      },
+      "hr-HR": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "ht-HT": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "hu-HU": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "id-ID": {
+        "count": 11,
+        "sha256": "cbd6a64ce6b2b029635275435f91ff5bf4f003e2a236f9d419b75c6b3ad2e268"
+      },
+      "it-IT": {
+        "count": 11,
+        "sha256": "554c80a912c0db2ef222e9ab904b101c586c1bdf09ddf4ef3444d8905d249b08"
+      },
+      "ja-JP": {
+        "count": 11,
+        "sha256": "2d72c1cca1b16b2c0d3f68634a65d7fd50677124cefa293fc2eb209115f54a02"
+      },
+      "ja-KS": {
+        "count": 11,
+        "sha256": "59e55d94a35a2254b7e57e52e4aec06fbbae5ade1f8e041444d1d6d0b2c2c464"
+      },
+      "jbo-EN": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "kab-KAB": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "kn-IN": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "ko-GS": {
+        "count": 6,
+        "sha256": "3fb7448f31ba1be72f6d78f520339728066d479f860c5079468d63e146594b0f"
+      },
+      "ko-KR": {
+        "count": 11,
+        "sha256": "fdfec135427721ff5d91281b8988e60e0cdef5fdc171fd6e1d65e1d1e3355b1d"
+      },
+      "lo-LA": {
+        "count": 4,
+        "sha256": "28237ee3f00554d974864cb7391088cd02d74e18fd8ed3ba6a3238dc3349f374"
+      },
+      "nl-NL": {
+        "count": 9,
+        "sha256": "e3a13a2f06199443f5f79bd699dc2170b1676f83ce494ac8b62ffa1eed39b8ff"
+      },
+      "no-NO": {
+        "count": 5,
+        "sha256": "bf5501abe32a4921608038d5161816af0cd6803c4633640b78a958a4805d1cc0"
+      },
+      "pl-PL": {
+        "count": 10,
+        "sha256": "db131ca0c65fd405a2fc0bbcd7da95776e334144ba5ebf9161f5f0ae3e707576"
+      },
+      "pt-PT": {
+        "count": 11,
+        "sha256": "9605bb5290c9c4047a57ac985f0eab970142bac0d5d1a45f713c059b669fd5bf"
+      },
+      "ro-RO": {
+        "count": 10,
+        "sha256": "9e952685f4b897332fb68fe97359953e0e9543dbfad9f300e9c2e473e57b9622"
+      },
+      "ru-RU": {
+        "count": 11,
+        "sha256": "05d738ae483eb55ef084af97197321423b9cd90e42567cbdcef58be9d21e58e0"
+      },
+      "si-LK": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "sk-SK": {
+        "count": 9,
+        "sha256": "998323b95a70f8a377a18b4b1a2be1d50018ca18215c02bf164dbe1badf864bc"
+      },
+      "sv-SE": {
+        "count": 6,
+        "sha256": "9322de500c94c15b87c98ed8a90506f1a257e7eafaea7d2adef3c4c95fd7c8bf"
+      },
+      "th-TH": {
+        "count": 11,
+        "sha256": "d160d37a41730ca1a5962c8aee64b7e50f0abd6134607ba1c8f5a5279e54ae7f"
+      },
+      "tl-PH": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "tr-TR": {
+        "count": 11,
+        "sha256": "8f92b7a1f0cda5d29309df90a3f2775d00b5de676efd40ae2d9e995b08e8533f"
+      },
+      "ug-CN": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "uk-UA": {
+        "count": 11,
+        "sha256": "37d6d6d589868cb0d17537de9ce304fba2e6c4cde9e9eeab55e518b82b2f6f1d"
+      },
+      "uz-UZ": {
+        "count": 7,
+        "sha256": "6c0b3d554c3427057a0e1cf7250a37addf96d2211e31f3b023f0025a4736a40f"
+      },
+      "vi-VN": {
+        "count": 10,
+        "sha256": "af919f5985eb1bce906fe326124c99461c4a94af425fbade6a2ef2794e18d4a8"
+      },
+      "zh-CN": {
+        "count": 11,
+        "sha256": "85061bf1a6597e215f35d4aa7d9d643e426504f54d033b522c08f17e2e559cc9"
+      },
+      "zh-TW": {
+        "count": 11,
+        "sha256": "28f3c89390e2a50b90bb5766e88707e4a1f8a25588bce7a43187af4aabe1f3ed"
+      }
+    },
+    "effective": {
+      "ar-SA": {
+        "count": 11,
+        "sha256": "04219a58746e41d75bf1d31ed0ae4e855ce3edd0f8f1ac66c27dc6c801ec7f1f"
+      },
+      "ca-ES": {
+        "count": 11,
+        "sha256": "46219bdedf5ae681ea999975a97ce12ed5e445aaef42bfd3ac2f2be83f6faeb3"
+      },
+      "cs-CZ": {
+        "count": 11,
+        "sha256": "bd22c2de8df18b3173424e7f2d9855b042ea574484b332a7d6d2a29bfc1ef987"
+      },
+      "da-DK": {
+        "count": 11,
+        "sha256": "cb68f5b9c6c029edb26a6dcfb68fff0f7dc42defa93b2e6be718e493bdb2ee6e"
+      },
+      "de-DE": {
+        "count": 11,
+        "sha256": "f3a971f67dbe5f8b7715d05f6d700109f60d726af832859dead8665f0e9ffb64"
+      },
+      "en-US": {
+        "count": 11,
+        "sha256": "cb68f5b9c6c029edb26a6dcfb68fff0f7dc42defa93b2e6be718e493bdb2ee6e"
+      },
+      "es-ES": {
+        "count": 11,
+        "sha256": "f5b2730855465b2327db6d955237040d5b804ac942b1ca3ba97e55269bd568dd"
+      },
+      "fr-FR": {
+        "count": 11,
+        "sha256": "9d8fe25ceb6d91735471b4ca64c7e9684f8f94564cd7780a7a2376b4013de2ae"
+      },
+      "id-ID": {
+        "count": 11,
+        "sha256": "cbd6a64ce6b2b029635275435f91ff5bf4f003e2a236f9d419b75c6b3ad2e268"
+      },
+      "it-IT": {
+        "count": 11,
+        "sha256": "554c80a912c0db2ef222e9ab904b101c586c1bdf09ddf4ef3444d8905d249b08"
+      },
+      "ja-JP": {
+        "count": 11,
+        "sha256": "2d72c1cca1b16b2c0d3f68634a65d7fd50677124cefa293fc2eb209115f54a02"
+      },
+      "ja-KS": {
+        "count": 11,
+        "sha256": "59e55d94a35a2254b7e57e52e4aec06fbbae5ade1f8e041444d1d6d0b2c2c464"
+      },
+      "kab-KAB": {
+        "count": 11,
+        "sha256": "cb68f5b9c6c029edb26a6dcfb68fff0f7dc42defa93b2e6be718e493bdb2ee6e"
+      },
+      "kn-IN": {
+        "count": 11,
+        "sha256": "cb68f5b9c6c029edb26a6dcfb68fff0f7dc42defa93b2e6be718e493bdb2ee6e"
+      },
+      "ko-KR": {
+        "count": 11,
+        "sha256": "fdfec135427721ff5d91281b8988e60e0cdef5fdc171fd6e1d65e1d1e3355b1d"
+      },
+      "nl-NL": {
+        "count": 11,
+        "sha256": "f7af6b438e43fbec99f25451c5c87694623a9e28ebfd82b287efcabd0dee8b68"
+      },
+      "no-NO": {
+        "count": 11,
+        "sha256": "115f1d321ea006cad923602a3c90bedcf6a9efd0bd273e382973e0d6fe268f00"
+      },
+      "pl-PL": {
+        "count": 11,
+        "sha256": "bc2c45f5c9442dbda8957cb2a25aa6534722df828491867badb6f578b8f3ebf8"
+      },
+      "pt-PT": {
+        "count": 11,
+        "sha256": "9605bb5290c9c4047a57ac985f0eab970142bac0d5d1a45f713c059b669fd5bf"
+      },
+      "ru-RU": {
+        "count": 11,
+        "sha256": "05d738ae483eb55ef084af97197321423b9cd90e42567cbdcef58be9d21e58e0"
+      },
+      "sk-SK": {
+        "count": 11,
+        "sha256": "f52dff65587c7f78d632b47dc19f871fb2e2b2bdca4a5af3fb7bbe82a71faf03"
+      },
+      "th-TH": {
+        "count": 11,
+        "sha256": "d160d37a41730ca1a5962c8aee64b7e50f0abd6134607ba1c8f5a5279e54ae7f"
+      },
+      "tr-TR": {
+        "count": 11,
+        "sha256": "8f92b7a1f0cda5d29309df90a3f2775d00b5de676efd40ae2d9e995b08e8533f"
+      },
+      "ug-CN": {
+        "count": 11,
+        "sha256": "cb68f5b9c6c029edb26a6dcfb68fff0f7dc42defa93b2e6be718e493bdb2ee6e"
+      },
+      "uk-UA": {
+        "count": 11,
+        "sha256": "37d6d6d589868cb0d17537de9ce304fba2e6c4cde9e9eeab55e518b82b2f6f1d"
+      },
+      "vi-VN": {
+        "count": 11,
+        "sha256": "d073c77e2ffc22a86f6e19438cdb751937cc5fea95fcb39f8167e59fc46e0b80"
+      },
+      "zh-CN": {
+        "count": 11,
+        "sha256": "85061bf1a6597e215f35d4aa7d9d643e426504f54d033b522c08f17e2e559cc9"
+      },
+      "zh-TW": {
+        "count": 11,
+        "sha256": "28f3c89390e2a50b90bb5766e88707e4a1f8a25588bce7a43187af4aabe1f3ed"
+      }
+    }
+  }
+}

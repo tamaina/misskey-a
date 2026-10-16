@@ -114,11 +114,11 @@ test('public emoji response types remain compatible with generated entities', as
 
 test('queue operations and exports use the feature contract types', async () => {
 	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
-	expectType<void>(await cli.request('admin/queue/pause', { queue: 'db' }));
-	expectType<void>(await cli.request('admin/queue/clear', { queue: 'inbox', state: 'failed' }));
-	expectType<void>(await cli.request('admin/queue/retry-job', { queue: 'deliver', jobId: 'job' }));
-	expectType<void>(await cli.request('i/export-notes'));
-	expectType<void>(await cli.request('i/export-following', { excludeMuting: true }));
+	expectType<null>(await cli.request('admin/queue/pause', { queue: 'db' }));
+	expectType<null>(await cli.request('admin/queue/clear', { queue: 'inbox', state: 'failed' }));
+	expectType<null>(await cli.request('admin/queue/retry-job', { queue: 'deliver', jobId: 'job' }));
+	expectType<null>(await cli.request('i/export-notes'));
+	expectType<null>(await cli.request('i/export-following', { excludeMuting: true }));
 	// @ts-expect-error queue names are constrained by the contract
 	cli.request('admin/queue/pause', { queue: 'unknown' });
 	// @ts-expect-error clear requires a state
@@ -131,13 +131,13 @@ test('queue operations and exports use the feature contract types', async () => 
 
 test('chat, collection, emoji administration and notification commands derive from contracts', async () => {
 	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
-	expectType<void>(await cli.request('chat/read-all'));
-	expectType<void>(await cli.request('chat/rooms/mute', { roomId: 'room1', mute: true }));
-	expectType<void>(await cli.request('chat/messages/react', { messageId: 'message1', reaction: '👍' }));
-	expectType<void>(await cli.request('clips/add-note', { clipId: 'clip1', noteId: 'note1' }));
-	expectType<void>(await cli.request('admin/emoji/set-category-bulk', { ids: [], category: null }));
-	expectType<void>(await cli.request('admin/emoji/add-aliases-bulk', { ids: ['emoji1'], aliases: [] }));
-	expectType<void>(await cli.request('notifications/create', { body: 'hello', header: null }));
+	expectType<null>(await cli.request('chat/read-all'));
+	expectType<null>(await cli.request('chat/rooms/mute', { roomId: 'room1', mute: true }));
+	expectType<null>(await cli.request('chat/messages/react', { messageId: 'message1', reaction: '👍' }));
+	expectType<null>(await cli.request('clips/add-note', { clipId: 'clip1', noteId: 'note1' }));
+	expectType<null>(await cli.request('admin/emoji/set-category-bulk', { ids: [], category: null }));
+	expectType<null>(await cli.request('admin/emoji/add-aliases-bulk', { ids: ['emoji1'], aliases: [] }));
+	expectType<null>(await cli.request('notifications/create', { body: 'hello', header: null }));
 	// @ts-expect-error room identifiers remain strings
 	cli.request('chat/rooms/join', { roomId: 1 });
 	// @ts-expect-error mute is a required boolean
@@ -152,12 +152,12 @@ test('chat, collection, emoji administration and notification commands derive fr
 
 test('list, announcement, decoration and webhook commands derive from contracts', async () => {
 	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
-	expectType<void>(await cli.request('users/lists/update-membership', { listId: 'list1', userId: 'user1', withReplies: false }));
-	expectType<void>(await cli.request('users/lists/favorite', { listId: 'list1' }));
-	expectType<void>(await cli.request('admin/avatar-decorations/update', { id: 'decoration1', category: null }));
-	expectType<void>(await cli.request('admin/announcements/update', { id: 'announcement1', imageUrl: null, icon: 'info' }));
-	expectType<void>(await cli.request('i/read-announcement', { announcementId: 'announcement1' }));
-	expectType<void>(await cli.request('i/webhooks/update', { webhookId: 'hook1', secret: null, on: ['note'] }));
+	expectType<null>(await cli.request('users/lists/update-membership', { listId: 'list1', userId: 'user1', withReplies: false }));
+	expectType<null>(await cli.request('users/lists/favorite', { listId: 'list1' }));
+	expectType<null>(await cli.request('admin/avatar-decorations/update', { id: 'decoration1', category: null }));
+	expectType<null>(await cli.request('admin/announcements/update', { id: 'announcement1', imageUrl: null, icon: 'info' }));
+	expectType<null>(await cli.request('i/read-announcement', { announcementId: 'announcement1' }));
+	expectType<null>(await cli.request('i/webhooks/update', { webhookId: 'hook1', secret: null, on: ['note'] }));
 	// @ts-expect-error membership user is required
 	cli.request('users/lists/update-membership', { listId: 'list1' });
 	// @ts-expect-error decoration roles must be strings
@@ -170,12 +170,12 @@ test('list, announcement, decoration and webhook commands derive from contracts'
 
 test('channel interactions and clip favorites derive from contracts', async () => {
 	const cli = new Misskey.api.APIClient({ origin: 'https://misskey.test' });
-	expectType<void>(await cli.request('channels/follow', { channelId: 'channel1' }));
-	expectType<void>(await cli.request('channels/unfavorite', { channelId: 'channel1' }));
-	expectType<void>(await cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: null }));
-	expectType<void>(await cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: 1234 }));
-	expectType<void>(await cli.request('clips/favorite', { clipId: 'clip1' }));
-	expectType<void>(await cli.request('clips/unfavorite', { clipId: 'clip1' }));
+	expectType<null>(await cli.request('channels/follow', { channelId: 'channel1' }));
+	expectType<null>(await cli.request('channels/unfavorite', { channelId: 'channel1' }));
+	expectType<null>(await cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: null }));
+	expectType<null>(await cli.request('channels/mute/create', { channelId: 'channel1', expiresAt: 1234 }));
+	expectType<null>(await cli.request('clips/favorite', { clipId: 'clip1' }));
+	expectType<null>(await cli.request('clips/unfavorite', { clipId: 'clip1' }));
 	// @ts-expect-error channel id is required
 	cli.request('channels/follow', {});
 	// @ts-expect-error expiry remains a number or null

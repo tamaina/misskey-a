@@ -94,13 +94,14 @@ export default defineConfig((args) => {
 	// 通常のビルド時にexternalとするモジュール
 	const externalModules: ExternalOption = [
 		/^slacc-.*/,
+		// Nest's ESM decorators need the native polyfill initialized before bundled feature imports.
+		'reflect-metadata',
 		'class-transformer',
 		'class-validator',
 		/^@sentry\/.*/,
 		/^@sentry-internal\/.*/,
-		'@nestjs/websockets/socket-module',
-		'@nestjs/microservices/microservices-module',
-		'@nestjs/microservices',
+		// Misskey uses application contexts and its own Fastify server, not Nest's optional HTTP adapter.
+		/^@nestjs\/(?:microservices|websockets|platform-express)(?:\/.*)?$/,
 		/^@napi-rs\/.*/,
 		'mock-aws-s3',
 		'aws-sdk',
@@ -162,6 +163,7 @@ export default defineConfig((args) => {
 				config: './src/config.ts',
 				postgres: '../features/persistence/backend/postgres.ts',
 				'gen-spec': '../features/api/backend/transport/openapi/gen-spec.ts',
+				'features/api/pilot': '../features/api/backend/pilot.ts',
 				...Object.fromEntries([...globSync('../features/*/{backend,shared}/index.ts')].map(file => [
 					file.replace('../', '').replace('/index.ts', ''), file,
 				])),

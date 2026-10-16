@@ -3,19 +3,23 @@ name: Test (backend)
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/backend/**
+      - packages/features/auth/**
+      - packages/features/mcp/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
       - .github/misskey/test.yml
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/backend/**
+      - packages/features/auth/**
+      - packages/features/mcp/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
@@ -62,10 +66,10 @@ jobs:
         submodules: true
     - name: Setup pnpm
       uses: pnpm/action-setup@v6.0.10
-    - name: Install FFmpeg
+    - name: Install FFmpeg and PostgreSQL fixture binaries
       run: |
         sudo apt update
-        sudo apt install -y ffmpeg
+        sudo apt install -y ffmpeg postgresql
     - name: Use Node.js
       uses: actions/setup-node@v7.0.0
       with:
@@ -80,6 +84,18 @@ jobs:
       run: pnpm build
     - name: Test
       run: pnpm --filter backend ${{ matrix.coverage && 'test-and-coverage' || 'test' }}
+    - name: Test OAuth with disposable Redis
+      run: node packages/features/auth/test/run-oauth-fixture.mjs
+    - name: Test OIDC boundaries with isolated Unix-socket Redis
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: node packages/features/auth/test/run-oidc-fixture.mjs
+    - name: Test authentication progress with isolated Unix-socket Redis
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: node packages/features/auth/test/run-authentication-progress-fixture.mjs
+    - name: Test antenna delivery identity with disposable Redis
+      run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/mcp/test/vitest.antenna-redis.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
+    - name: Test MCP with disposable PostgreSQL
+      run: node packages/features/mcp/test/run-postgres-fixture.mjs
     - name: Upload to Codecov
       if: ${{ matrix.coverage }}
       uses: codecov/codecov-action@v7
@@ -184,3 +200,5 @@ jobs:
         run: MISSKEY_CONFIG_YML=test.yml pnpm --filter backend migrate
       - name: Check no migrations are remaining
         run: MISSKEY_CONFIG_YML=test.yml pnpm --filter backend check-migrations
+      - name: Check browser-session migration round trip on empty CI fixture
+        run: MISSKEY_CONFIG_YML=test.yml node packages/features/auth/test/backend/browser-session-migration.mjs

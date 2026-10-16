@@ -6,7 +6,7 @@
 import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import * as v from 'valibot';
-import { packedFollowingSchema } from '../../contract/packed.js';
+import { packedFollowingSchema } from '../endpoints/relationships.schema.js';
 import { nativeUserDetailedSchema, type NativeUserDetailed } from '@features/users/backend/serializers/native-user.js';
 import type { } from '../models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';

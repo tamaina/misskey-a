@@ -572,6 +572,14 @@
         {
           "port": "userSecurityKeysRepository"
         }
+      ],
+      "BrowserSessionService": [
+        {
+          "port": "browserSessionsRepository"
+        },
+        {
+          "port": "idService"
+        }
       ]
     },
     "userSearch": {

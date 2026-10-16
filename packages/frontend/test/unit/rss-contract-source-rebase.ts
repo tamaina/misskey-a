@@ -4,12 +4,14 @@
  */
 
 import { createHash } from 'node:crypto';
+import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
 import rebases from './rss-contract-source-rebase.json';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 /** Reverse only the reviewed RSS contract edits before checking frozen locale migration proofs. */
 export function restoreRssContractBaseline(file: string, source: string): string {
+	source = restoreNativeApiSourceBaseline(file, source);
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	const localeStart = source.indexOf('<locale locale=');

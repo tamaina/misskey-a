@@ -2,81 +2,29 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAdminRolesUnassignDefinition, voidAdminRolesUnassignInput, voidAdminRolesUnassignOutput } from '../../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import type { RolesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-import { RoleService } from '../../../services/RoleService.js';
-
-const contractProjection = projectEndpointContract(voidAdminRolesUnassignDefinition);
-
-export const meta = {
-	tags: ['admin', 'role'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:roles',
-
-	errors: {
-		noSuchRole: {
-			message: 'No such role.',
-			code: 'NO_SUCH_ROLE',
-			id: '6e519036-a70d-4c76-b679-bc8fb18194e2',
-		},
-
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '2b730f78-1179-461b-88ad-d24c9af1a5ce',
-		},
-
-		notAssigned: {
-			message: 'Not assigned.',
-			code: 'NOT_ASSIGNED',
-			id: 'b9060ac7-5c94-4da4-9f55-2047c953df44',
-		},
-
-		accessDenied: {
-			message: 'Only administrators can edit members of the role.',
-			code: 'ACCESS_DENIED',
-			id: '24636eee-e8c1-493e-94b2-e16ad401e262',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAdminRolesUnassignInput, typeof voidAdminRolesUnassignOutput> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		@Inject(DI.rolesRepository)
-		private rolesRepository: RolesRepository,
-
-		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const role = await this.rolesRepository.findOneBy({ id: ps.roleId });
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { rolesContract } from '../../../api.definition.js';
+import type { RolesDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { rolesErrors } from '../../../api.errors.js';
+export function createAdminRolesUnassignProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'rolesRepository' | 'roleService' | 'usersRepository'>) {
+	return createApiProcedure<Actor>()(rolesContract.adminRolesUnassign).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const role = await deps.rolesRepository.findOneBy({ id: ps.roleId });
 			if (role == null) {
-				throw new ApiError(meta.errors.noSuchRole);
+				throw apiError(rolesErrors.adminRolesUnassign.noSuchRole);
 			}
-
-			if (!role.canEditMembersByModerator && !(await this.roleService.isAdministrator(me))) {
-				throw new ApiError(meta.errors.accessDenied);
+			if (!role.canEditMembersByModerator && !(await deps.roleService.isAdministrator(me))) {
+				throw apiError(rolesErrors.adminRolesUnassign.accessDenied);
 			}
-
-			const user = await this.usersRepository.findOneBy({ id: ps.userId });
+			const user = await deps.usersRepository.findOneBy({ id: ps.userId });
 			if (user == null) {
-				throw new ApiError(meta.errors.noSuchUser);
+				throw apiError(rolesErrors.adminRolesUnassign.noSuchUser);
 			}
-
-			await this.roleService.unassign(user.id, role.id, me);
+			await deps.roleService.unassign(user.id, role.id, me);
 		});
-	}
 }

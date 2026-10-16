@@ -3,63 +3,34 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedReversiMatchDefinition, packedReversiMatchInput, packedReversiMatchOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-
-import { ReversiService } from '../../services/ReversiService.js';
-import { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-import { GetterService } from '@features/api/backend/transport/GetterService.js';
-
-const contractProjection = projectEndpointContract(packedReversiMatchDefinition);
-
-export const meta = {
-	requireCredential: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '0b4f0559-b484-4e31-9581-3f73cee89b28',
-		},
-
-		isYourself: {
-			message: 'Target user is yourself.',
-			code: 'TARGET_IS_YOURSELF',
-			id: '96fd7bd6-d2bc-426c-a865-d055dcd2828e',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedReversiMatchInput, typeof packedReversiMatchOutput> {
-	constructor(
-		private getterService: GetterService,
-		private reversiService: ReversiService,
-		private reversiGameEntityService: ReversiGameEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			if (ps.userId === me.id) throw new ApiError(meta.errors.isYourself);
-
-			const target = ps.userId ? await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
+import { toPackedReversiGameDetailed } from '../../reversi.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+import { reversiMatchContract, reversiMatchErrors } from './match.contract.js';
+import type { ReversiService } from '../../services/ReversiService.js';
+import type { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { GetterService } from '@features/api/backend/transport/GetterService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface ReversiMatchDependencies {
+	getterService: Pick<GetterService, 'getUser'>;
+	reversiService: Pick<ReversiService, 'matchAnyUser' | 'matchSpecificUser'>;
+	reversiGameEntityService: Pick<ReversiGameEntityService, 'packDetail'>;
+}
+export function createReversiMatchProcedure(deps: ReversiMatchDependencies) {
+	return createApiProcedure<MiLocalUser>()(reversiMatchContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			if (ps.userId === me.id) throw apiError(reversiMatchErrors.isYourself);
+			const target = ps.userId ? await deps.getterService.getUser(ps.userId).catch((err: unknown) => {
+				if (err !== null && typeof err === 'object' && 'id' in err && err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(reversiMatchErrors.noSuchUser);
 				throw err;
 			}) : null;
-
 			const game = target
-				? await this.reversiService.matchSpecificUser(me, target, ps.multiple)
-				: await this.reversiService.matchAnyUser(me, { noIrregularRules: ps.noIrregularRules }, ps.multiple);
-
+				? await deps.reversiService.matchSpecificUser(me, target, ps.multiple)
+				: await deps.reversiService.matchAnyUser(me, { noIrregularRules: ps.noIrregularRules }, ps.multiple);
 			if (game == null) return;
-
-			return await this.reversiGameEntityService.packDetail(game);
+			return toPackedReversiGameDetailed(await deps.reversiGameEntityService.packDetail(game));
 		});
-	}
 }

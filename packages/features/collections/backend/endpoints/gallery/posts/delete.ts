@@ -3,70 +3,34 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidGalleryPostsDeleteDefinition, voidGalleryPostsDeleteInput, voidGalleryPostsDeleteOutput } from '../../../../contract/gallery/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import type { GalleryPostsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidGalleryPostsDeleteDefinition);
-
-export const meta = {
-	tags: ['gallery'],
-
-	requireCredential: true,
-
-	kind: 'write:gallery',
-
-	errors: {
-		noSuchPost: {
-			message: 'No such post.',
-			code: 'NO_SUCH_POST',
-			id: 'ae52f367-4bd7-4ecd-afc6-5672fff427f5',
-		},
-
-		accessDenied: {
-			message: 'Access denied.',
-			code: 'ACCESS_DENIED',
-			id: 'c86e09de-1c48-43ac-a435-1c7e42ed4496',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidGalleryPostsDeleteInput, typeof voidGalleryPostsDeleteOutput> {
-	constructor(
-		@Inject(DI.galleryPostsRepository)
-		private galleryPostsRepository: GalleryPostsRepository,
-
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
-
-		private moderationLogService: ModerationLogService,
-		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const post = await this.galleryPostsRepository.findOneBy({ id: ps.postId });
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.definition.js';
+import type { CollectionsDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { collectionsErrors } from '../../../api.errors.js';
+export interface GalleryPostsDeleteDependencies<Actor extends ApiActor> {
+	galleryPostsRepository: Pick<CollectionsDependencies<Actor>['galleryPostsRepository'], 'delete' | 'findOneBy'>;
+	roleService: Pick<CollectionsDependencies<Actor>['roleService'], 'isModerator'>;
+	usersRepository: Pick<CollectionsDependencies<Actor>['usersRepository'], 'findOneByOrFail'>;
+	moderationLogService: Pick<CollectionsDependencies<Actor>['moderationLogService'], 'log'>;
+}
+export function createGalleryPostsDeleteProcedure<Actor extends ApiActor>(deps: GalleryPostsDeleteDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.galleryPostsDelete).use(requirePrincipal<Actor>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const post = await deps.galleryPostsRepository.findOneBy({ id: ps.postId });
 			if (post == null) {
-				throw new ApiError(meta.errors.noSuchPost);
+				throw apiError(collectionsErrors.galleryPostsDelete.noSuchPost);
 			}
-
-			if (!await this.roleService.isModerator(me) && post.userId !== me.id) {
-				throw new ApiError(meta.errors.accessDenied);
+			if (!await deps.roleService.isModerator(me) && post.userId !== me.id) {
+				throw apiError(collectionsErrors.galleryPostsDelete.accessDenied);
 			}
-
-			await this.galleryPostsRepository.delete(post.id);
-
+			await deps.galleryPostsRepository.delete(post.id);
 			if (post.userId !== me.id) {
-				const user = await this.usersRepository.findOneByOrFail({ id: post.userId });
-				this.moderationLogService.log(me, 'deleteGalleryPost', {
+				const user = await deps.usersRepository.findOneByOrFail({ id: post.userId });
+				deps.moderationLogService.log(me, 'deleteGalleryPost', {
 					postId: post.id,
 					postUserId: post.userId,
 					postUserUsername: user.username,
@@ -74,5 +38,4 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				});
 			}
 		});
-	}
 }

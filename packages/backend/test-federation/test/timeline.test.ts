@@ -267,8 +267,8 @@ describe('Timeline', () => {
 				name: 'Remote Users',
 				description: 'Remote users are assigned to this role.',
 				condFormula: {
-					/** TODO: @see https://github.com/misskey-dev/misskey/issues/14169 */
-					type: 'isRemote' as never,
+					id: crypto.randomUUID(),
+					type: 'isRemote',
 				},
 			});
 			await sleep();

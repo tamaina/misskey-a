@@ -4,15 +4,15 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import type { OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { MiUser, type WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
 import { MiWebhook, WebhookEventTypes } from '../models/Webhook.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-import type { OnApplicationShutdown } from '@nestjs/common';
 
 export type UserWebhookPayload<T extends WebhookEventTypes> =
 	T extends 'note' | 'reply' | 'renote' | 'mention' ? {
@@ -45,6 +45,7 @@ export class UserWebhookService implements OnApplicationShutdown {
 		if (!this.activeWebhooksFetched) {
 			this.activeWebhooks = await this.webhooksRepository.findBy({
 				active: true,
+				mode: 'legacy',
 			});
 			this.activeWebhooksFetched = true;
 		}
@@ -61,7 +62,7 @@ export class UserWebhookService implements OnApplicationShutdown {
 		isActive?: MiWebhook['active'];
 		on?: MiWebhook['on'];
 	}): Promise<MiWebhook[]> {
-		const query = this.webhooksRepository.createQueryBuilder('webhook');
+		const query = this.webhooksRepository.createQueryBuilder('webhook').where('webhook.mode = :mode', { mode: 'legacy' });
 		if (params) {
 			if (params.ids && params.ids.length > 0) {
 				query.andWhere('webhook.id IN (:...ids)', { ids: params.ids });
@@ -89,8 +90,12 @@ export class UserWebhookService implements OnApplicationShutdown {
 	) {
 		const webhooks = await this.getActiveWebhooks()
 			.then(webhooks => webhooks.filter(webhook => webhook.userId === userId && webhook.on.includes(type)));
+		// Reuse event selection while keeping MCP lifecycle out of the legacy cache.
+		if (type === 'mention' || type === 'reply') {
+			webhooks.push(...await this.webhooksRepository.findBy({ userId, mode: 'mcp', active: true }));
+		}
 		return Promise.all(
-			webhooks.map(webhook => {
+			webhooks.filter(webhook => webhook.on.includes(type)).map(webhook => {
 				return this.queueService.userWebhookDeliver(webhook, type, content);
 			}),
 		);
@@ -106,28 +111,34 @@ export class UserWebhookService implements OnApplicationShutdown {
 		const { type, body } = obj.message as GlobalEvents['internal']['payload'];
 		switch (type) {
 			case 'webhookCreated': {
-				if (body.active) {
+				if (body.active && body.mode !== 'mcp') {
 					this.activeWebhooks.push({ // TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
 						...body,
 						latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
+						mcpExpiresAt: null, mcpPreviousSecretUntil: null, mcpStream: null, mcpStreamSince: null,
+						mcpToken: null, mcpAntenna: null, // not joined
 						user: null, // joinなカラムは通常取ってこないので
 					});
 				}
 				break;
 			}
 			case 'webhookUpdated': {
-				if (body.active) {
+				if (body.active && body.mode !== 'mcp') {
 					const i = this.activeWebhooks.findIndex(a => a.id === body.id);
 					if (i > -1) {
 						this.activeWebhooks[i] = { // TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
 							...body,
 							latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
+							mcpExpiresAt: null, mcpPreviousSecretUntil: null, mcpStream: null, mcpStreamSince: null,
+							mcpToken: null, mcpAntenna: null, // not joined
 							user: null, // joinなカラムは通常取ってこないので
 						};
 					} else {
 						this.activeWebhooks.push({ // TODO: このあたりのデシリアライズ処理は各modelファイル内に関数としてexportしたい
 							...body,
 							latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
+							mcpExpiresAt: null, mcpPreviousSecretUntil: null, mcpStream: null, mcpStreamSince: null,
+							mcpToken: null, mcpAntenna: null, // not joined
 							user: null, // joinなカラムは通常取ってこないので
 						});
 					}

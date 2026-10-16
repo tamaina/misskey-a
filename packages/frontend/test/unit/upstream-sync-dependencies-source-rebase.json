@@ -1,0 +1,52 @@
+[
+  {
+    "file": "packages/features/auth/frontend/utility/conditional-passkey.ts",
+    "currentSha256": "a779cb79842bef676e3875203441752d7d6bfe3ad23db3a56c3f896d35816184",
+    "baselineSha256": "571c2b5703903f3a970e76e5c5bdf3a5e28a54dc3554e25be12018c650b1ff7f",
+    "edits": [
+      {
+        "start": 311,
+        "end": 1441,
+        "current": "type LibraryExtensions = NonNullable<PublicKeyCredentialRequestOptionsJSON['extensions']>;\ntype LibraryPrfValues = NonNullable<NonNullable<LibraryExtensions['prf']>['eval']>;\n\n/** Copy extension buffers into DOM-compatible, request-owned ArrayBuffers. */\nfunction normalizeExtensions(extensions: LibraryExtensions | undefined): AuthenticationExtensionsClientInputs | undefined {\n\tif (!extensions) return undefined;\n\tconst { prf, ...rest } = extensions;\n\tconst copy = (value: LibraryPrfValues['first']): ArrayBuffer => {\n\t\tconst bytes = ArrayBuffer.isView(value) ? new Uint8Array(value.buffer, value.byteOffset, value.byteLength) : new Uint8Array(value);\n\t\treturn bytes.slice().buffer;\n\t};\n\tconst values = (value: LibraryPrfValues): AuthenticationExtensionsPRFValues => ({ first: copy(value.first), ...(value.second ? { second: copy(value.second) } : {}) });\n\treturn {\n\t\t...rest,\n\t\t...(prf ? { prf: {\n\t\t\t...(prf.eval ? { eval: values(prf.eval) } : {}),\n\t\t\t...(prf.evalByCredential ? { evalByCredential: Object.fromEntries(Object.entries(prf.evalByCredential).map(([id, value]) => [id, values(value)])) } : {}),\n\t\t} } : {}),\n\t};\n}\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 1813,
+        "end": 1858,
+        "current": "\tconst { extensions, ...request } = options;\n",
+        "baseline": ""
+      },
+      {
+        "start": 1948,
+        "end": 2126,
+        "current": "\t\tpublicKey: { ...request, challenge: base64URLStringToBuffer(options.challenge), allowCredentials: [], ...(extensions ? { extensions: normalizeExtensions(extensions) } : {}) },\n",
+        "baseline": "\t\tpublicKey: { ...options, challenge: base64URLStringToBuffer(options.challenge), allowCredentials: [] },\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/statistics/frontend/telemetry.ts",
+    "currentSha256": "4a24beabc66f42a330d1e5e49688b53d095770ef243a7276a364374fd804bef0",
+    "baselineSha256": "47b8bc6004014a3b45f810723161ed7dcb36ee1cc6744a433cd2ea756b63e223",
+    "edits": [
+      {
+        "start": 248,
+        "end": 377,
+        "current": "/** 中継元のアドレスや利用者を特定できるHTTPヘッダー名の断片 */\nconst PEER_IDENTIFYING_HEADER_SNIPPETS = ['forwarded', '-ip', 'remote-', 'via', '-user'];\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 569,
+        "end": 570,
+        "current": "\n",
+        "baseline": ""
+      },
+      {
+        "start": 1684,
+        "end": 2151,
+        "current": "\t\t// Sentry v11は`dataCollection`未指定だと全て収集するため、既定を絞る\n\t\t// 緩める場合はサーバー側の設定で`dataCollection`を明示する\n\t\tdataCollection: {\n\t\t\tuserInfo: false,\n\t\t\tcookies: false,\n\t\t\t// GETのAPI呼び出しはアクセストークンを`i`クエリパラメータでも受け取るため落とす\n\t\t\turlQueryParams: false,\n\t\t\thttpHeaders: {\n\t\t\t\trequest: { deny: PEER_IDENTIFYING_HEADER_SNIPPETS },\n\t\t\t\tresponse: { deny: PEER_IDENTIFYING_HEADER_SNIPPETS },\n\t\t\t},\n\t\t\thttpBodies: [],\n\t\t\tdatabaseQueryData: false,\n\t\t\tgenAI: { inputs: false, outputs: false },\n\t\t},\n\n",
+        "baseline": ""
+      }
+    ]
+  }
+]

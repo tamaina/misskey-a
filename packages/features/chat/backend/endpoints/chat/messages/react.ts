@@ -3,22 +3,33 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { chatContract } from '../../../../contract/index.js';
-import { chatErrors } from '@features/chat/contract';
-import { legacyChatSchemas } from '@features/chat/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['chat'],
-	requireCredential: true,
-	kind: 'write:chat',
-	errors: chatErrors['chat/messages/react'],
-} as const;
+import { chatMessagesReactContract } from './react.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const paramDef = legacyChatSchemas['chat/messages/react'].input as Schema;
+import type { InferSchemaOutput } from '@orpc/contract';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { ChatMessageAccessError, type ChatService } from '@features/chat/backend/services/ChatService.js';
+import { chatMessagesReactErrors } from './react.contract.js';
+export interface ChatMessagesReactDependencies {
+	chatService: Pick<ChatService, 'checkChatAvailability' | 'react'>;
+}
+export function createChatMessagesReactProcedure(deps: ChatMessagesReactDependencies) {
+	async function execute(input: InferSchemaOutput<NonNullable<typeof chatMessagesReactContract['~orpc']['inputSchema']>>, actor: MiLocalUser): Promise<void> {
+		await deps.chatService.checkChatAvailability(actor.id, 'write');
+		try {
+			await deps.chatService.react(input.messageId, actor.id, input.reaction);
+		} catch (error) {
+			if (error instanceof ChatMessageAccessError) {
+				throw apiError(chatMessagesReactErrors.noSuchMessage);
+			}
+			throw error;
+		}
+	}
 
-export const { feature, createEndpoint } = defineFeatureEndpoint('chatCommands', commands => createContractTransportEndpoint(meta, paramDef, chatContract['chat/messages/react'], async (params, user) => commands['chat/messages/react'](params, {
-	context: { actor: user },
-})));
+	return createApiProcedure<MiLocalUser>()(chatMessagesReactContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
+}

@@ -62,28 +62,35 @@ export class AntennaChannel extends Channel {
 	@bindThis
 	private async onEvent(data: GlobalEvents['antenna']['payload']) {
 		if (data.type === 'note') {
-			let note = await this.noteEntityService.pack(data.body.id, this.user, { detail: true });
-
-			if (!this.isNoteVisibleForMe(note)) return;
-			if (this.isNoteMutedOrBlocked(note)) return;
-
-			const filtered = await this.noteStreamingHidingService.filter(note, this.user?.id ?? null);
-			if (!filtered) return;
-			note = filtered;
-
-			if (this.user) {
-				if (isRenotePacked(note) && !isQuotePacked(note)) {
-					if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-						const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-						note.renote.myReaction = myRenoteReaction;
-					}
-				}
-			}
-
+			const note = await this.packNote(data.body.id);
+			if (!note) return;
 			this.send('note', note);
 		} else {
 			this.send(data.type, data.body);
 		}
+	}
+
+	/** Shared native packing/filtering for reference-only queued antenna events. */
+	public async packNote(noteId: string) {
+		let note = await this.noteEntityService.pack(noteId, this.user, { detail: true });
+
+		if (!this.isNoteVisibleForMe(note)) return null;
+		if (this.isNoteMutedOrBlocked(note)) return null;
+
+		const filtered = await this.noteStreamingHidingService.filter(note, this.user?.id ?? null);
+		if (!filtered) return null;
+		note = filtered;
+
+		if (this.user) {
+			if (isRenotePacked(note) && !isQuotePacked(note)) {
+				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
+					note.renote.myReaction = myRenoteReaction;
+				}
+			}
+		}
+
+		return note;
 	}
 
 	@bindThis

@@ -3,32 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { referenceAdminQueueQueueStatsDefinition, referenceAdminQueueQueueStatsInput, referenceAdminQueueQueueStatsOutput } from '../../../../contract/reference-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-
-const contractProjection = projectEndpointContract(referenceAdminQueueQueueStatsDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'read:admin:queue',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof referenceAdminQueueQueueStatsInput, typeof referenceAdminQueueQueueStatsOutput> {
-	constructor(
-		private queueService: QueueService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return this.queueService.queueGetQueue(ps.queue);
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { adminQueueQueueStatsContract } from './queue-stats.contract.js';
+import type { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+import { toQueueDetails } from '../../../queue-wire.js';
+export interface AdminQueueQueueStatsDependencies {
+	queueService: Pick<QueueService, 'queueGetQueue'>;
+}
+export function createAdminQueueQueueStatsProcedure<Actor extends ApiActor>(deps: AdminQueueQueueStatsDependencies) {
+	return createApiProcedure<Actor>()(adminQueueQueueStatsContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input }) => {
+			const ps = input;
+			const result = await (async () => {
+				return deps.queueService.queueGetQueue(ps.queue);
+			})();
+			return toQueueDetails(result);
 		});
-	}
 }

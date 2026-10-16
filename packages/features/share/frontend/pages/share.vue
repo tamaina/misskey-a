@@ -13,6 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:initialText="initialText"
 			:initialVisibility="visibility"
 			:initialFiles="files"
+			:initialLocalFiles="tempFiles"
 			:initialLocalOnly="localOnly"
 			:reply="reply"
 			:renote="renote"
@@ -31,8 +32,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 // SPECIFICATION: https://misskey-hub.net/docs/for-users/features/share-form/
 
-import { ref, computed } from 'vue';
+import { ref, computed, onBeforeUnmount, onDeactivated } from 'vue';
 import * as Misskey from 'misskey-js';
+import { readSharedFiles, discardSharedFiles } from '@@/js/shared-files.js';
+import { $i } from '@features/auth/frontend/i.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkPostForm from '@features/notes/frontend/components/MkPostForm.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -40,7 +43,19 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { postMessageToParentWindow } from '@features/web/frontend/utility/post-message.js';
 
+//#region parameters
 const urlParams = new URLSearchParams(window.location.search);
+// merge hash parameters
+try {
+	const hashParams = new URLSearchParams(window.location.hash.slice(1));
+	for (const [key, value] of hashParams.entries()) {
+		urlParams.set(key, value);
+	}
+} catch (e) {
+	console.error('Failed to parse hash parameters:', e);
+}
+//#endregion
+
 const localOnlyQuery = urlParams.get('localOnly');
 const visibilityQuery = urlParams.get('visibility') as typeof Misskey.noteVisibilities[number];
 
@@ -55,6 +70,25 @@ const visibility = ref(Misskey.noteVisibilities.includes(visibilityQuery) ? visi
 const localOnly = ref(localOnlyQuery === '0' ? false : localOnlyQuery === '1' ? true : undefined);
 const files = ref([] as Misskey.entities.DriveFile[]);
 const visibleUsers = ref([] as Misskey.entities.UserDetailed[]);
+const tempFiles = ref([] as File[]);
+const shareId = urlParams.get('shareId');
+const shareAccountId = $i?.id ?? null;
+
+function discardShare() {
+	return discardSharedFiles(shareId, shareAccountId).catch(err => console.error('Failed to clear shared files:', err));
+}
+
+let disposed = false;
+
+function isCurrentShare() {
+	return !disposed && ($i?.id ?? null) === shareAccountId;
+}
+
+onBeforeUnmount(() => {
+	disposed = true;
+	tempFiles.value = [];
+	void discardShare();
+});
 
 async function init() {
 	let noteText = '';
@@ -180,12 +214,55 @@ async function init() {
 		});
 	}
 
+	//#region Local files
+	// If the browser supports IndexedDB, try to get the temporary files from temp.
+	if (shareId && window.indexedDB) {
+		try {
+			const filesFromIdb = await readSharedFiles(shareId, shareAccountId);
+			if (isCurrentShare() && Array.isArray(filesFromIdb) && filesFromIdb.length > 0 && filesFromIdb.every(file => file instanceof Blob)) {
+				tempFiles.value = filesFromIdb;
+			}
+		} catch (err) {
+			console.error('Failed to read shared files:', err);
+			if (isCurrentShare()) os.alert({ type: 'error', title: $locale.value.sfc.error, text: err instanceof Error ? err.message : String(err) });
+		}
+	}
+
+	const fileData = urlParams.get('file');
+	if (fileData && fileData.startsWith('data:')) {
+		try {
+			const file = await window.fetch(fileData).then(res => res.blob());
+			if (isCurrentShare() && file instanceof Blob) {
+				tempFiles.value.push(new File([file], 'shared-file', { type: file.type }));
+			} else {
+				console.error('Fetched file is not a Blob:', file);
+			}
+		} catch (e) {
+			console.error('Failed to fetch file:', e);
+		}
+	}
+	//#endregion
+
+	if (!isCurrentShare()) return;
 	state.value = 'writing';
 }
 
 init();
 
-function close(): void {
+onDeactivated(() => {
+	cancelShare();
+	void discardShare();
+});
+
+function cancelShare() {
+	disposed = true;
+	tempFiles.value = [];
+	state.value = 'fetching';
+}
+
+async function close(): Promise<void> {
+	cancelShare();
+	await discardShare();
 	window.close();
 
 	// 閉じなければ100ms後タイムラインに
@@ -194,16 +271,39 @@ function close(): void {
 	}, 100);
 }
 
-function goToMisskey(): void {
+async function goToMisskey(): Promise<void> {
+	cancelShare();
+	await discardShare();
 	window.location.href = '/';
 }
 
 function onPosted(): void {
 	state.value = 'posted';
+	// SWが保存したファイルは投稿が完了するまでIndexedDBに保持
+	void discardShare();
 	postMessageToParentWindow('misskey:shareForm:shareCompleted');
 }
 
-const headerActions = computed(() => []);
+const headerActions = computed(() => [
+	{
+		icon: 'ti ti-dots',
+		text: $locale.value.sfc.menu,
+		handler: (ev: MouseEvent) => {
+			os.popupMenu([
+				{
+					icon: 'ti ti-home',
+					text: $locale.value.sfc.goToMisskey,
+					action: () => goToMisskey(),
+				},
+				{
+					icon: 'ti ti-x',
+					text: $locale.value.sfc.close,
+					action: () => close(),
+				},
+			], ev.currentTarget ?? ev.target);
+		},
+	},
+]);
 
 const headerTabs = computed(() => []);
 
@@ -296,6 +396,8 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"close": "閉じる",
+	"menu": "メニュー",
+	"error": "エラー",
 	"goToMisskey": "Misskeyへ",
 	"share": "共有"
 }

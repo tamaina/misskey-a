@@ -33,7 +33,7 @@ import { url, host } from '@features/boot/frontend/shared/config.js';
 import type { Directive } from 'vue';
 import { instance } from '@features/instance/frontend/instance.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
-import { userPage, userName } from '@features/users/frontend/filters/user.js';
+import { userPage, userName } from '@features/users/frontend/shared/user.js';
 import misskeysvg from '/client-assets/misskey.svg';
 import { getStaticImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 

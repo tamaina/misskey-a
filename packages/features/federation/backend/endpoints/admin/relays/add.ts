@@ -3,49 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminRelaysAddDefinition, inlineAdminRelaysAddInput, inlineAdminRelaysAddOutput } from '../../../../contract/endpoint-definitions.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+import type { ApiActor } from '../../../../../api/backend/transport/context.js';
+import { adminRelaysAddContract, adminRelaysAddErrors } from './add.contract.js';
 import { URL } from 'node:url';
-import { Injectable } from '@nestjs/common';
-
-import { RelayService } from '../../../services/RelayService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(inlineAdminRelaysAddDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:relays',
-
-	errors: {
-		invalidUrl: {
-			message: 'Invalid URL',
-			code: 'INVALID_URL',
-			id: 'fb8c92d3-d4e5-44e7-b3d4-800d5cef8b2c',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminRelaysAddInput, typeof inlineAdminRelaysAddOutput> {
-	constructor(
-		private relayService: RelayService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			try {
-				if (new URL(ps.inbox).protocol !== 'https:') throw new Error('https only');
-			} catch {
-				throw new ApiError(meta.errors.invalidUrl);
-			}
-
-			return await this.relayService.addRelay(ps.inbox);
+import type { RelayService } from '../../../services/RelayService.js';
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+export interface AdminRelaysAddDependencies {
+	relayService: Pick<RelayService, 'addRelay'>;
+}
+export function createAdminRelaysAddProcedure<Actor extends ApiActor>(deps: AdminRelaysAddDependencies) {
+	return createApiProcedure<Actor>()(adminRelaysAddContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input }) => {
+			const ps = input;
+			const result = await (async () => {
+				try {
+					if (new URL(ps.inbox).protocol !== 'https:') throw new Error('https only');
+				} catch {
+					throw apiError(adminRelaysAddErrors.invalidUrl);
+				}
+				const relay = await deps.relayService.addRelay(ps.inbox);
+				return { id: relay.id, inbox: relay.inbox, status: relay.status };
+			})();
+			return result;
 		});
-	}
 }

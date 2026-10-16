@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { restoreProductNameBaseline } from './product-name-source-rebase.js';
 import { resolve } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { getConfig } from '../../vite.config.js';
@@ -18,7 +20,7 @@ const rewrite = (source: string) => source.replaceAll('features/media/', 'featur
 describe('drive ownership preserves frozen source identities', () => {
 	test.each(proofs)('$file changes only verified module paths', proof => {
 		expect(sha256(proof.originalSource)).toBe(proof.originalSha256);
-		expect(readFileSync(resolve(root, proof.file), 'utf8')).toBe(rewrite(proof.migratedSource));
+		expect(restoreCommonUtilitiesBaseline(proof.file, restoreProductNameBaseline(proof.file, readFileSync(resolve(root, proof.file), 'utf8')))).toBe(rewrite(proof.migratedSource));
 		expect(readFileSync(resolve(root, proof.fixture), 'utf8')).toContain(sha256(rewrite(proof.originalSource)));
 		const localeStart = proof.migratedSource.indexOf('<locale ');
 		expect(rewrite(proof.migratedSource).slice(localeStart)).toBe(proof.migratedSource.slice(localeStart));

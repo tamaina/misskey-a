@@ -38,7 +38,7 @@ import * as Misskey from 'misskey-js';
 import { computed, markRaw, ref, watch } from 'vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { userPage, acct } from '@features/users/frontend/filters/user.js';
+import { userPage, acct } from '@features/users/frontend/shared/user.js';
 import * as os from '@features/ui/frontend/os.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { definePage } from '@features/navigation/frontend/page.js';

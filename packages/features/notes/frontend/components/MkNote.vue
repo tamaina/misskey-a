@@ -203,7 +203,7 @@ import { useNote } from '@features/notes/frontend/composables/use-note.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import { getNoteSummary } from '@features/notes/frontend/utility/get-note-summary.js';
 import { isEnabledUrlPreview } from '@features/markup/frontend/utility/url-preview.js';
 import { focusPrev, focusNext } from '@features/ui/frontend/utility/focus.js';
@@ -863,7 +863,7 @@ const keymap = {
 	"private": "خاص",
 	"translatedFrom": "تُرجم من {x}",
 	"showMore": "عرض المزيد",
-	"showLess": "اغلق",
+	"showLess": "عرض اقل",
 	"more": "المزيد!",
 	"userSaysSomethingSensitive": "Post by {name} contains sensitive content",
 	"userSaysSomething": "كتب {name} شيءً",

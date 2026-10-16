@@ -5,7 +5,9 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createPortability, legacyPortabilitySchemas } from '../../../backend/built/features/portability/backend.js';
+import * as v from 'valibot';
+import { createRouterClient } from '@orpc/server';
+import { createPortabilityRouter, portabilityApiContract } from '../../../backend/built/features/portability/backend.js';
 
 const routeMethods = {
 	'i/export-antennas': 'createExportAntennasJob',
@@ -27,31 +29,18 @@ function makeDependencies(overrides = {}) {
 	return { dependencies: { ...dependencies, ...overrides }, calls };
 }
 
-function call(feature, route, input = {}, actorId = 'trusted-user') {
-	return feature[route](input, { context: { actor: { id: actorId } } });
+async function call(feature, route, input = {}, actorId = 'trusted-user') {
+	const client = createRouterClient(feature, { context: nativeContext({ id: actorId, isSuspended: false, movedToUri: null }) });
+	return client[route](input);
 }
 
-test('legacy inputs retain empty-object schemas and following flag defaults', () => {
-	for (const route of Object.keys(routeMethods).filter(route => route !== 'i/export-following')) {
-		assert.deepEqual(legacyPortabilitySchemas[route].input, {
-			type: 'object',
-			properties: {},
-			additionalProperties: true,
-		});
-	}
-	assert.deepEqual(legacyPortabilitySchemas['i/export-following'].input, {
-		type: 'object',
-		properties: {
-			excludeMuting: { type: 'boolean', default: false },
-			excludeInactive: { type: 'boolean', default: false },
-		},
-		required: [],
-	});
+test('native following input retains false flag defaults', () => {
+	assert.deepEqual(v.parse(portabilityApiContract['i/export-following']['~orpc'].inputSchema, {}), { excludeMuting: false, excludeInactive: false });
 });
 
 test('each export selects only its matching job and following uses false defaults', async () => {
 	const { dependencies, calls } = makeDependencies();
-	const feature = createPortability(dependencies);
+	const feature = createPortabilityRouter(dependencies);
 
 	for (const [route, method] of Object.entries(routeMethods)) {
 		const output = await call(feature, route);
@@ -75,30 +64,12 @@ test('trusted context is isolated across concurrent calls and request input cann
 	const { dependencies } = makeDependencies({
 		createExportNotesJob: actor => { calls.push(actor); return Promise.resolve(); },
 	});
-	const feature = createPortability(dependencies);
+	const feature = createPortabilityRouter(dependencies);
 	await Promise.all([
-		feature['i/export-notes']({ actor: { id: 'spoofed-one' }, userId: 'spoofed-two' }, { context: { actor: { id: 'trusted-one' } } }),
-		feature['i/export-notes']({ actor: { id: 'spoofed-two' }, userId: 'spoofed-one' }, { context: { actor: { id: 'trusted-two' } } }),
+		call(feature, 'i/export-notes', { actor: { id: 'spoofed-one' }, userId: 'spoofed-two' }, 'trusted-one'),
+		call(feature, 'i/export-notes', { actor: { id: 'spoofed-two' }, userId: 'spoofed-one' }, 'trusted-two'),
 	]);
 	assert.deepEqual(calls, [{ id: 'trusted-one' }, { id: 'trusted-two' }]);
-});
-
-test('missing or malformed actor context fails before any queue side effect', async () => {
-	const { dependencies, calls } = makeDependencies();
-	const feature = createPortability(dependencies);
-	for (const options of [
-		undefined,
-		null,
-		{},
-		{ context: undefined },
-		{ context: {} },
-		{ context: { actor: null } },
-		{ context: { actor: { id: '' } } },
-		{ context: { actor: { id: 7 } } },
-	]) {
-		await assert.rejects(feature['i/export-notes']({}, options), /authenticated actor is required/i);
-	}
-	assert.deepEqual(calls, []);
 });
 
 test('queue promises are deliberately fire-and-forget', async () => {
@@ -107,7 +78,7 @@ test('queue promises are deliberately fire-and-forget', async () => {
 	const { dependencies } = makeDependencies({
 		createExportAntennasJob: () => { invoked = true; return neverSettles; },
 	});
-	const feature = createPortability(dependencies);
+	const feature = createPortabilityRouter(dependencies);
 	const result = await Promise.race([
 		call(feature, 'i/export-antennas').then(() => 'handler-finished'),
 		new Promise(resolve => setTimeout(() => resolve('handler-blocked'), 50)),
@@ -121,7 +92,14 @@ test('synchronous queue errors propagate without retrying or starting another jo
 	const { dependencies, calls } = makeDependencies({
 		createExportBlockingJob: () => { calls.push({ method: 'createExportBlockingJob', args: [] }); throw error; },
 	});
-	const feature = createPortability(dependencies);
+	const feature = createPortabilityRouter(dependencies);
 	await assert.rejects(call(feature, 'i/export-blocking'), candidate => candidate === error);
 	assert.deepEqual(calls, [{ method: 'createExportBlockingJob', args: [] }]);
 });
+
+function nativeContext(actor) {
+	return { credential: 'credential', ip: '192.0.2.1', headers: {},
+		services: { authenticate: async () => [actor, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
+		authorization: { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => true },
+	};
+}

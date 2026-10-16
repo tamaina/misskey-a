@@ -4,6 +4,7 @@
  */
 
 import type { Config } from '@/config.js';
+import type { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import type { ApDbResolverService } from '@features/federation/backend/services/ApDbResolverService.js';
 import type { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import type { ApRequestService } from '@features/federation/backend/services/ApRequestService.js';
@@ -47,6 +48,7 @@ export class MockResolver extends Resolver {
 			{} as HttpRequestService,
 			{} as ApRendererService,
 			{} as ApDbResolverService,
+			{} as FederatedInstanceService,
 			loggerService,
 		);
 	}

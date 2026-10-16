@@ -226,8 +226,8 @@ function reduceFrequency(): void {
 
 <locale locale="da-DK" lang="json">
 {
-	"reduceFrequencyOfThisAd": "Show this ad less",
-	"back": "Back"
+	"reduceFrequencyOfThisAd": "Vis denne annonce sjældnere",
+	"back": "Tilbage"
 }
 </locale>
 
@@ -289,15 +289,15 @@ function reduceFrequency(): void {
 
 <locale locale="kab-KAB" lang="json">
 {
-	"reduceFrequencyOfThisAd": "Show this ad less",
-	"back": "Back"
+	"reduceFrequencyOfThisAd": "Senqes askan n udellel-a",
+	"back": "Uɣal"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"reduceFrequencyOfThisAd": "Show this ad less",
-	"back": "Back"
+	"reduceFrequencyOfThisAd": "ಈ ಜಾಹೀರಾತನ್ನು ಕಡಿಮೆ ಬಾರಿ ತೋರಿಸಿ",
+	"back": "ಹಿಂದೆ"
 }
 </locale>
 
@@ -310,15 +310,15 @@ function reduceFrequency(): void {
 
 <locale locale="nl-NL" lang="json">
 {
-	"reduceFrequencyOfThisAd": "Show this ad less",
+	"reduceFrequencyOfThisAd": "Toon deze advertentie minder vaak",
 	"back": "Terug"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"reduceFrequencyOfThisAd": "Show this ad less",
-	"back": "Back"
+	"reduceFrequencyOfThisAd": "Vis denne annonsen sjeldnere",
+	"back": "Tilbake"
 }
 </locale>
 
@@ -366,8 +366,8 @@ function reduceFrequency(): void {
 
 <locale locale="ug-CN" lang="json">
 {
-	"reduceFrequencyOfThisAd": "Show this ad less",
-	"back": "Back"
+	"reduceFrequencyOfThisAd": "بۇ ئېلاننى ئازراق كۆرسەت",
+	"back": "قايتىش"
 }
 </locale>
 
@@ -396,5 +396,103 @@ function reduceFrequency(): void {
 {
 	"reduceFrequencyOfThisAd": "降低此廣告的頻率 ",
 	"back": "返回"
+}
+</locale>
+
+<locale lang="json" locale="bn-BD">
+{
+	"reduceFrequencyOfThisAd": "এই বিজ্ঞাপনটি কম দেখান",
+	"back": "পিছনে"
+}
+</locale>
+
+<locale lang="json" locale="el-GR">
+{
+	"reduceFrequencyOfThisAd": "Εμφάνιση αυτής της διαφήμισης λιγότερο συχνά",
+	"back": "Πίσω"
+}
+</locale>
+
+<locale lang="json" locale="fa-IR">
+{
+	"reduceFrequencyOfThisAd": "این تبلیغ را کمتر نشان بده",
+	"back": "بازگشت"
+}
+</locale>
+
+<locale lang="json" locale="hr-HR">
+{
+	"reduceFrequencyOfThisAd": "Rjeđe prikazuj ovaj oglas",
+	"back": "Natrag"
+}
+</locale>
+
+<locale lang="json" locale="ht-HT">
+{
+	"reduceFrequencyOfThisAd": "Montre piblisite sa a mwens souvan",
+	"back": "Retounen"
+}
+</locale>
+
+<locale lang="json" locale="hu-HU">
+{
+	"reduceFrequencyOfThisAd": "Ez a hirdetés ritkábban jelenjen meg",
+	"back": "Vissza"
+}
+</locale>
+
+<locale lang="json" locale="jbo-EN">
+{
+	"reduceFrequencyOfThisAd": "ko na cafne jarco ti poi ve skicu lo se vecnu",
+	"back": "ko xruti"
+}
+</locale>
+
+<locale lang="json" locale="ko-GS">
+{
+	"reduceFrequencyOfThisAd": "요 광고 쪼매 덜 비이기",
+	"back": "뒤로"
+}
+</locale>
+
+<locale lang="json" locale="lo-LA">
+{
+	"reduceFrequencyOfThisAd": "ສະແດງໂຄສະນານີ້ໃຫ້ໜ້ອຍລົງ",
+	"back": "ກັບຄືນ"
+}
+</locale>
+
+<locale lang="json" locale="ro-RO">
+{
+	"reduceFrequencyOfThisAd": "Afișează acest anunț mai rar",
+	"back": "Înapoi"
+}
+</locale>
+
+<locale lang="json" locale="si-LK">
+{
+	"reduceFrequencyOfThisAd": "මෙම දැන්වීම අඩුවෙන් පෙන්වන්න",
+	"back": "ආපසු"
+}
+</locale>
+
+<locale lang="json" locale="sv-SE">
+{
+	"reduceFrequencyOfThisAd": "Visa den här annonsen mer sällan",
+	"back": "Tillbaka"
+}
+</locale>
+
+<locale lang="json" locale="tl-PH">
+{
+	"reduceFrequencyOfThisAd": "Ipakita nang mas madalang ang ad na ito",
+	"back": "Bumalik"
+}
+</locale>
+
+<locale lang="json" locale="uz-UZ">
+{
+	"reduceFrequencyOfThisAd": "Bu reklamani kamroq ko‘rsatish",
+	"back": "qaytish"
 }
 </locale>

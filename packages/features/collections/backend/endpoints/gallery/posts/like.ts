@@ -3,97 +3,51 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidGalleryPostsLikeDefinition, voidGalleryPostsLikeInput, voidGalleryPostsLikeOutput } from '../../../../contract/gallery/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import type { GalleryLikesRepository, GalleryPostsRepository } from '@features/persistence/backend/repositories/models.js';
-import { FeaturedService, GALLERY_POSTS_RANKING_WINDOW } from '@features/discovery/backend/services/FeaturedService.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidGalleryPostsLikeDefinition);
-
-export const meta = {
-	tags: ['gallery'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:gallery-likes',
-
-	errors: {
-		noSuchPost: {
-			message: 'No such post.',
-			code: 'NO_SUCH_POST',
-			id: '56c06af3-1287-442f-9701-c93f7c4a62ff',
-		},
-
-		yourPost: {
-			message: 'You cannot like your post.',
-			code: 'YOUR_POST',
-			id: 'f78f1511-5ebc-4478-a888-1198d752da68',
-		},
-
-		alreadyLiked: {
-			message: 'The post has already been liked.',
-			code: 'ALREADY_LIKED',
-			id: '40e9ed56-a59c-473a-bf3f-f289c54fb5a7',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidGalleryPostsLikeInput, typeof voidGalleryPostsLikeOutput> {
-	constructor(
-		@Inject(DI.galleryPostsRepository)
-		private galleryPostsRepository: GalleryPostsRepository,
-
-		@Inject(DI.galleryLikesRepository)
-		private galleryLikesRepository: GalleryLikesRepository,
-
-		private featuredService: FeaturedService,
-		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const post = await this.galleryPostsRepository.findOneBy({ id: ps.postId });
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.definition.js';
+import type { CollectionsDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { GALLERY_POSTS_RANKING_WINDOW } from '@features/discovery/backend/services/FeaturedService.js';
+import { collectionsErrors } from '../../../api.errors.js';
+export interface GalleryPostsLikeDependencies<Actor extends ApiActor> {
+	galleryPostsRepository: Pick<CollectionsDependencies<Actor>['galleryPostsRepository'], 'findOneBy' | 'increment'>;
+	galleryLikesRepository: Pick<CollectionsDependencies<Actor>['galleryLikesRepository'], 'exists' | 'insert'>;
+	idService: Pick<CollectionsDependencies<Actor>['idService'], 'gen' | 'parse'>;
+	featuredService: Pick<CollectionsDependencies<Actor>['featuredService'], 'updateGalleryPostsRanking'>;
+}
+export function createGalleryPostsLikeProcedure<Actor extends ApiActor>(deps: GalleryPostsLikeDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.galleryPostsLike).use(requirePrincipal<Actor>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const post = await deps.galleryPostsRepository.findOneBy({ id: ps.postId });
 			if (post == null) {
-				throw new ApiError(meta.errors.noSuchPost);
+				throw apiError(collectionsErrors.galleryPostsLike.noSuchPost);
 			}
-
 			if (post.userId === me.id) {
-				throw new ApiError(meta.errors.yourPost);
+				throw apiError(collectionsErrors.galleryPostsLike.yourPost);
 			}
-
 			// if already liked
-			const exist = await this.galleryLikesRepository.exists({
+			const exist = await deps.galleryLikesRepository.exists({
 				where: {
 					postId: post.id,
 					userId: me.id,
 				},
 			});
-
 			if (exist) {
-				throw new ApiError(meta.errors.alreadyLiked);
+				throw apiError(collectionsErrors.galleryPostsLike.alreadyLiked);
 			}
-
 			// Create like
-			await this.galleryLikesRepository.insert({
-				id: this.idService.gen(),
+			await deps.galleryLikesRepository.insert({
+				id: deps.idService.gen(),
 				postId: post.id,
 				userId: me.id,
 			});
-
 			// ランキング更新
-			if (Date.now() - this.idService.parse(post.id).date.getTime() < GALLERY_POSTS_RANKING_WINDOW) {
-				await this.featuredService.updateGalleryPostsRanking(post.id, 1);
+			if (Date.now() - deps.idService.parse(post.id).date.getTime() < GALLERY_POSTS_RANKING_WINDOW) {
+				await deps.featuredService.updateGalleryPostsRanking(post.id, 1);
 			}
-
-			this.galleryPostsRepository.increment({ id: post.id }, 'likedCount', 1);
+			deps.galleryPostsRepository.increment({ id: post.id }, 'likedCount', 1);
 		});
-	}
 }
