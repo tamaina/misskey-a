@@ -1,6 +1,10 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	AccountPeerReceiptGetRequest,
+	AccountPeerReceiptGetResponse,
+	AccountPeerReceiptSetRequest,
+	AccountPeerReceiptSetResponse,
 	AccountResidenceGetRequest,
 	AccountResidenceGetResponse,
 	AccountResidenceSetRequest,
@@ -870,6 +874,8 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'account/peer-receipt/get': { req: AccountPeerReceiptGetRequest; res: AccountPeerReceiptGetResponse };
+	'account/peer-receipt/set': { req: AccountPeerReceiptSetRequest; res: AccountPeerReceiptSetResponse };
 	'account/residence/get': { req: AccountResidenceGetRequest; res: AccountResidenceGetResponse };
 	'account/residence/set': { req: AccountResidenceSetRequest; res: AccountResidenceSetResponse };
 	'billing/orders/receipt': { req: BillingOrdersReceiptRequest; res: BillingOrdersReceiptResponse };
