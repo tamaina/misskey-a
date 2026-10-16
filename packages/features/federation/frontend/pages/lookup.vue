@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
 		<div v-if="state === 'done'" class="_buttonsCenter">
-			<MkButton @click="close">{{ $locale.sfc.close }}</MkButton>
+			<MkButton @click="close">{{ globalLocale.env.close }}</MkButton>
 			<MkButton @click="goToMisskey">{{ $locale.sfc.goToMisskey }}</MkButton>
 		</div>
 		<div v-else class="_fullInfo">
@@ -18,6 +18,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@features/ui/frontend/os.js';
@@ -25,6 +27,8 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { mainRouter } from '@features/navigation/frontend/router.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const state = ref<'fetching' | 'done'>('fetching');
 
@@ -106,7 +110,6 @@ definePage({
 
 <locale locale="ar-SA" lang="json">
 {
-	"close": "اغلق",
 	"goToMisskey": "لميسكي",
 	"fetchingAsApObject": "جارٍ جلبه مِن الفديفرس…",
 	"lookup": "البحث"
@@ -115,7 +118,6 @@ definePage({
 
 <locale locale="ca-ES" lang="json">
 {
-	"close": "Tanca",
 	"goToMisskey": "Ves a Misskey",
 	"fetchingAsApObject": "Cercant al Fediverse...",
 	"lookup": "Cerca"
@@ -124,7 +126,6 @@ definePage({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"close": "Zavřít",
 	"goToMisskey": "Jít na Misskey",
 	"fetchingAsApObject": "Načítám data z Fediversu...",
 	"lookup": "Vyhledat"
@@ -133,7 +134,6 @@ definePage({
 
 <locale locale="da-DK" lang="json">
 {
-	"close": "Close",
 	"goToMisskey": "To Misskey",
 	"fetchingAsApObject": "Fetching from the Fediverse...",
 	"lookup": "Lookup"
@@ -142,7 +142,6 @@ definePage({
 
 <locale locale="de-DE" lang="json">
 {
-	"close": "Schließen",
 	"goToMisskey": "Zu Misskey",
 	"fetchingAsApObject": "Wird aus dem Fediverse angefragt …",
 	"lookup": "Anfragen"
@@ -151,7 +150,6 @@ definePage({
 
 <locale locale="en-US" lang="json">
 {
-	"close": "Close",
 	"goToMisskey": "To Misskey",
 	"fetchingAsApObject": "Fetching from the Fediverse...",
 	"lookup": "Lookup"
@@ -160,7 +158,6 @@ definePage({
 
 <locale locale="es-ES" lang="json">
 {
-	"close": "Cerrar",
 	"goToMisskey": "ir a Misskey",
 	"fetchingAsApObject": "Buscando en el fediverso",
 	"lookup": "Búsqueda"
@@ -169,7 +166,6 @@ definePage({
 
 <locale locale="fr-FR" lang="json">
 {
-	"close": "Fermer",
 	"goToMisskey": "Retour vers Misskey",
 	"fetchingAsApObject": "Récupération depuis le fédiverse …",
 	"lookup": "Recherche"
@@ -178,7 +174,6 @@ definePage({
 
 <locale locale="id-ID" lang="json">
 {
-	"close": "Tutup",
 	"goToMisskey": "Ke Misskey",
 	"fetchingAsApObject": "Mengambil data dari Fediverse...",
 	"lookup": "Cari"
@@ -187,7 +182,6 @@ definePage({
 
 <locale locale="it-IT" lang="json">
 {
-	"close": "Chiudi",
 	"goToMisskey": "Vai a Misskey",
 	"fetchingAsApObject": "Recuperando dal Fediverso...",
 	"lookup": "Ricerca remota"
@@ -196,7 +190,6 @@ definePage({
 
 <locale locale="ja-JP" lang="json">
 {
-	"close": "閉じる",
 	"goToMisskey": "Misskeyへ",
 	"fetchingAsApObject": "連合に照会中",
 	"lookup": "照会"
@@ -205,7 +198,6 @@ definePage({
 
 <locale locale="ja-KS" lang="json">
 {
-	"close": "さいなら",
 	"goToMisskey": "Misskeyへ",
 	"fetchingAsApObject": "今ちと連合に照会しとるで",
 	"lookup": "見てきて"
@@ -214,7 +206,6 @@ definePage({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"close": "Close",
 	"goToMisskey": "To Misskey",
 	"fetchingAsApObject": "Fetching from the Fediverse...",
 	"lookup": "Lookup"
@@ -223,7 +214,6 @@ definePage({
 
 <locale locale="kn-IN" lang="json">
 {
-	"close": "Close",
 	"goToMisskey": "To Misskey",
 	"fetchingAsApObject": "ಒಕ್ಕೂಟದಿಂದ ಪಡೆಯಲಾಗುತ್ತಿದೆ...",
 	"lookup": "Lookup"
@@ -232,7 +222,6 @@ definePage({
 
 <locale locale="ko-KR" lang="json">
 {
-	"close": "닫기",
 	"goToMisskey": "Misskey로",
 	"fetchingAsApObject": "연합에서 찾아보는 중",
 	"lookup": "찾아보기"
@@ -241,7 +230,6 @@ definePage({
 
 <locale locale="nl-NL" lang="json">
 {
-	"close": "Sluiten",
 	"goToMisskey": "To Misskey",
 	"fetchingAsApObject": "Ophalen vanuit de Fediverse",
 	"lookup": "Opzoeken"
@@ -250,7 +238,6 @@ definePage({
 
 <locale locale="no-NO" lang="json">
 {
-	"close": "Lukk",
 	"goToMisskey": "To Misskey",
 	"fetchingAsApObject": "Henter fra Fediverse...",
 	"lookup": "Lookup"
@@ -259,7 +246,6 @@ definePage({
 
 <locale locale="pl-PL" lang="json">
 {
-	"close": "Zamknij",
 	"goToMisskey": "To Misskey",
 	"fetchingAsApObject": "Pobieranie z Fediwersum…",
 	"lookup": "Zapytania"
@@ -268,7 +254,6 @@ definePage({
 
 <locale locale="pt-PT" lang="json">
 {
-	"close": "Fechar",
 	"goToMisskey": "Ao Misskey",
 	"fetchingAsApObject": "Buscando no Fediverso...",
 	"lookup": "Consultar"
@@ -277,7 +262,6 @@ definePage({
 
 <locale locale="ru-RU" lang="json">
 {
-	"close": "Закрыть",
 	"goToMisskey": "К Misskey",
 	"fetchingAsApObject": "Приём с других сайтов",
 	"lookup": "Запрос"
@@ -286,7 +270,6 @@ definePage({
 
 <locale locale="sk-SK" lang="json">
 {
-	"close": "Zavrieť",
 	"goToMisskey": "To Misskey",
 	"fetchingAsApObject": "Načítam údaje z Fediverzu",
 	"lookup": "Vyhľadať"
@@ -295,7 +278,6 @@ definePage({
 
 <locale locale="th-TH" lang="json">
 {
-	"close": "ปิด",
 	"goToMisskey": "ถึง Misskey",
 	"fetchingAsApObject": "กำลังดึงข้อมูลจากสหพันธ์...",
 	"lookup": "การค้นหา"
@@ -304,7 +286,6 @@ definePage({
 
 <locale locale="tr-TR" lang="json">
 {
-	"close": "Kapat",
 	"goToMisskey": "Misskey'e",
 	"fetchingAsApObject": "Fediverse'den talep ediliyor...",
 	"lookup": "Sorgu"
@@ -313,7 +294,6 @@ definePage({
 
 <locale locale="ug-CN" lang="json">
 {
-	"close": "Close",
 	"goToMisskey": "To Misskey",
 	"fetchingAsApObject": "Fetching from the Fediverse...",
 	"lookup": "Lookup"
@@ -322,7 +302,6 @@ definePage({
 
 <locale locale="uk-UA" lang="json">
 {
-	"close": "Закрити",
 	"goToMisskey": "До Misskey",
 	"fetchingAsApObject": "Отримуємо з федіверсу...",
 	"lookup": "Пошук"
@@ -331,7 +310,6 @@ definePage({
 
 <locale locale="vi-VN" lang="json">
 {
-	"close": "Đóng",
 	"goToMisskey": "Tới Misskey",
 	"fetchingAsApObject": "Đang nạp dữ liệu từ Fediverse...",
 	"lookup": "Tra cứu"
@@ -340,7 +318,6 @@ definePage({
 
 <locale locale="zh-CN" lang="json">
 {
-	"close": "关闭",
 	"goToMisskey": "去往 Misskey",
 	"fetchingAsApObject": "在联邦中查找中…",
 	"lookup": "查找用户"
@@ -349,7 +326,6 @@ definePage({
 
 <locale locale="zh-TW" lang="json">
 {
-	"close": "關閉",
 	"goToMisskey": "往 Misskey",
 	"fetchingAsApObject": "從聯邦宇宙取得中...",
 	"lookup": "查詢"

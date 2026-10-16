@@ -25,16 +25,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkSwitch v-model="isSensitive">{{ $locale.sfc.markAsSensitive }}</MkSwitch>
 
 		<div class="_buttons">
-			<MkButton v-if="props.post != null" primary @click="save"><i class="ti ti-device-floppy"></i> {{ $locale.sfc.save }}</MkButton>
+			<MkButton v-if="props.post != null" primary @click="save"><i class="ti ti-device-floppy"></i> {{ globalLocale.env.save }}</MkButton>
 			<MkButton v-else primary @click="save"><i class="ti ti-device-floppy"></i> {{ $locale.sfc.publish }}</MkButton>
 
-			<MkButton v-if="props.post != null" danger @click="del"><i class="ti ti-trash"></i> {{ $locale.sfc.delete }}</MkButton>
+			<MkButton v-if="props.post != null" danger @click="del"><i class="ti ti-trash"></i> {{ globalLocale.env.delete }}</MkButton>
 		</div>
 	</div>
 </PageWithHeader>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
 import { computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -45,6 +47,8 @@ import { selectFile } from '@features/drive/frontend/utility/drive.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
+
+const globalLocale = useLocale<GlobalLocale>(import.meta.url);
 
 const router = useRouter();
 
@@ -151,9 +155,7 @@ const headerTabs = computed(() => []);
 	"remove": "حذف",
 	"attachFile": "أرفق ملفات",
 	"markAsSensitive": "علّمه كمحتوى حساس",
-	"save": "حفظ",
-	"publish": "علني",
-	"delete": "حذف"
+	"publish": "علني"
 }
 </locale>
 
@@ -165,9 +167,7 @@ const headerTabs = computed(() => []);
 	"remove": "Eliminar",
 	"attachFile": "Afegeix un arxiu",
 	"markAsSensitive": "Marcar com a sensible",
-	"save": "Desa",
-	"publish": "Publicar",
-	"delete": "Elimina"
+	"publish": "Publicar"
 }
 </locale>
 
@@ -179,9 +179,7 @@ const headerTabs = computed(() => []);
 	"remove": "Smazat",
 	"attachFile": "Přiložit soubor",
 	"markAsSensitive": "Označit jako NSFW",
-	"save": "Uložit",
-	"publish": "Zveřejnit",
-	"delete": "Smazat"
+	"publish": "Zveřejnit"
 }
 </locale>
 
@@ -193,9 +191,7 @@ const headerTabs = computed(() => []);
 	"remove": "Delete",
 	"attachFile": "Attach files",
 	"markAsSensitive": "Mark as sensitive",
-	"save": "Save",
-	"publish": "Publish",
-	"delete": "Delete"
+	"publish": "Publish"
 }
 </locale>
 
@@ -207,9 +203,7 @@ const headerTabs = computed(() => []);
 	"remove": "Löschen",
 	"attachFile": "Datei anhängen",
 	"markAsSensitive": "Als sensibel markieren",
-	"save": "Speichern",
-	"publish": "Veröffentlichen",
-	"delete": "Löschen"
+	"publish": "Veröffentlichen"
 }
 </locale>
 
@@ -221,9 +215,7 @@ const headerTabs = computed(() => []);
 	"remove": "Delete",
 	"attachFile": "Attach files",
 	"markAsSensitive": "Mark as sensitive",
-	"save": "Save",
-	"publish": "Publish",
-	"delete": "Delete"
+	"publish": "Publish"
 }
 </locale>
 
@@ -235,9 +227,7 @@ const headerTabs = computed(() => []);
 	"remove": "Borrar",
 	"attachFile": "Añadir archivo",
 	"markAsSensitive": "Marcar como sensible",
-	"save": "Guardar",
-	"publish": "Publicar",
-	"delete": "Borrar"
+	"publish": "Publicar"
 }
 </locale>
 
@@ -249,9 +239,7 @@ const headerTabs = computed(() => []);
 	"remove": "Supprimer",
 	"attachFile": "Joindre un fichier",
 	"markAsSensitive": "Marquer comme sensible",
-	"save": "Enregistrer",
-	"publish": "Public",
-	"delete": "Supprimer"
+	"publish": "Public"
 }
 </locale>
 
@@ -263,9 +251,7 @@ const headerTabs = computed(() => []);
 	"remove": "Hapus",
 	"attachFile": "Lampirkan berkas",
 	"markAsSensitive": "Tandai sebagai konten sensitif",
-	"save": "Simpan",
-	"publish": "Terbitkan",
-	"delete": "Hapus"
+	"publish": "Terbitkan"
 }
 </locale>
 
@@ -277,9 +263,7 @@ const headerTabs = computed(() => []);
 	"remove": "Elimina",
 	"attachFile": "Allega file",
 	"markAsSensitive": "Segna come esplicito",
-	"save": "Salva",
-	"publish": "Pubblicare",
-	"delete": "Elimina"
+	"publish": "Pubblicare"
 }
 </locale>
 
@@ -291,9 +275,7 @@ const headerTabs = computed(() => []);
 	"remove": "削除",
 	"attachFile": "ファイルを添付",
 	"markAsSensitive": "センシティブとして設定",
-	"save": "保存",
-	"publish": "公開",
-	"delete": "削除"
+	"publish": "公開"
 }
 </locale>
 
@@ -305,9 +287,7 @@ const headerTabs = computed(() => []);
 	"remove": "ほかす",
 	"attachFile": "ファイルのっける",
 	"markAsSensitive": "ちょっと見せられへんわ",
-	"save": "とっとく",
-	"publish": "公開",
-	"delete": "ほかす"
+	"publish": "公開"
 }
 </locale>
 
@@ -319,9 +299,7 @@ const headerTabs = computed(() => []);
 	"remove": "Kkes",
 	"attachFile": "Attach files",
 	"markAsSensitive": "Mark as sensitive",
-	"save": "Sekles",
-	"publish": "Publish",
-	"delete": "Kkes"
+	"publish": "Publish"
 }
 </locale>
 
@@ -333,9 +311,7 @@ const headerTabs = computed(() => []);
 	"remove": "ಅಳಿಸು",
 	"attachFile": "Attach files",
 	"markAsSensitive": "Mark as sensitive",
-	"save": "ಉಳಿಸಿ",
-	"publish": "Publish",
-	"delete": "ಅಳಿಸು"
+	"publish": "Publish"
 }
 </locale>
 
@@ -347,9 +323,7 @@ const headerTabs = computed(() => []);
 	"remove": "삭제",
 	"attachFile": "파일 첨부",
 	"markAsSensitive": "열람주의로 설정",
-	"save": "저장",
-	"publish": "공개",
-	"delete": "삭제"
+	"publish": "공개"
 }
 </locale>
 
@@ -361,9 +335,7 @@ const headerTabs = computed(() => []);
 	"remove": "Verwijderen",
 	"attachFile": "Bestanden toevoegen",
 	"markAsSensitive": "Markeren als NSFW",
-	"save": "Opslaan",
-	"publish": "Publiceren",
-	"delete": "Verwijderen"
+	"publish": "Publiceren"
 }
 </locale>
 
@@ -375,9 +347,7 @@ const headerTabs = computed(() => []);
 	"remove": "Slett",
 	"attachFile": "Legg ved filer",
 	"markAsSensitive": "Mark as sensitive",
-	"save": "Lagre",
-	"publish": "Publish",
-	"delete": "Slett"
+	"publish": "Publish"
 }
 </locale>
 
@@ -389,9 +359,7 @@ const headerTabs = computed(() => []);
 	"remove": "Usuń",
 	"attachFile": "Załącz pliki",
 	"markAsSensitive": "Oznacz jako NSFW",
-	"save": "Zapisz",
-	"publish": "Publikuj",
-	"delete": "Usuń"
+	"publish": "Publikuj"
 }
 </locale>
 
@@ -403,9 +371,7 @@ const headerTabs = computed(() => []);
 	"remove": "Remover",
 	"attachFile": "Anexar arquivo",
 	"markAsSensitive": "Marcar como sensível",
-	"save": "Salvar",
-	"publish": "Publicar",
-	"delete": "Excluir"
+	"publish": "Publicar"
 }
 </locale>
 
@@ -417,9 +383,7 @@ const headerTabs = computed(() => []);
 	"remove": "Удалить",
 	"attachFile": "Прикрепить файлы",
 	"markAsSensitive": "Отметить как «не для всех»",
-	"save": "Сохранить",
-	"publish": "Опубликовать",
-	"delete": "Удалить"
+	"publish": "Опубликовать"
 }
 </locale>
 
@@ -431,9 +395,7 @@ const headerTabs = computed(() => []);
 	"remove": "Odstrániť",
 	"attachFile": "Priložiť súbor",
 	"markAsSensitive": "Označiť ako NSFW",
-	"save": "Uložiť",
-	"publish": "Zverejniť",
-	"delete": "Odstrániť"
+	"publish": "Zverejniť"
 }
 </locale>
 
@@ -445,9 +407,7 @@ const headerTabs = computed(() => []);
 	"remove": "ลบ",
 	"attachFile": "แนบไฟล์",
 	"markAsSensitive": "ทำเครื่องหมายว่ามีเนื้อหาละเอียดอ่อน",
-	"save": "บันทึก",
-	"publish": "เผยแพร่",
-	"delete": "ลบ"
+	"publish": "เผยแพร่"
 }
 </locale>
 
@@ -459,9 +419,7 @@ const headerTabs = computed(() => []);
 	"remove": "Sil",
 	"attachFile": "Dosyaları ekle",
 	"markAsSensitive": "Hassas içerik olarak işaretle",
-	"save": "Kaydet",
-	"publish": "Yayınla",
-	"delete": "Sil"
+	"publish": "Yayınla"
 }
 </locale>
 
@@ -473,9 +431,7 @@ const headerTabs = computed(() => []);
 	"remove": "ئۆچۈرۈش",
 	"attachFile": "Attach files",
 	"markAsSensitive": "Mark as sensitive",
-	"save": "Save",
-	"publish": "Publish",
-	"delete": "ئۆچۈرۈش"
+	"publish": "Publish"
 }
 </locale>
 
@@ -487,9 +443,7 @@ const headerTabs = computed(() => []);
 	"remove": "Видалити",
 	"attachFile": "Прикріпити файл",
 	"markAsSensitive": "Позначити як NSFW",
-	"save": "Зберегти",
-	"publish": "Опублікувати",
-	"delete": "Видалити"
+	"publish": "Опублікувати"
 }
 </locale>
 
@@ -501,9 +455,7 @@ const headerTabs = computed(() => []);
 	"remove": "Xóa",
 	"attachFile": "Đính kèm tập tin",
 	"markAsSensitive": "Đánh dấu là nhạy cảm",
-	"save": "Lưu",
-	"publish": "Đăng",
-	"delete": "Xóa"
+	"publish": "Đăng"
 }
 </locale>
 
@@ -515,9 +467,7 @@ const headerTabs = computed(() => []);
 	"remove": "删除",
 	"attachFile": "添加附件",
 	"markAsSensitive": "标记为敏感内容",
-	"save": "保存",
-	"publish": "发布",
-	"delete": "删除"
+	"publish": "发布"
 }
 </locale>
 
@@ -529,8 +479,6 @@ const headerTabs = computed(() => []);
 	"remove": "刪除",
 	"attachFile": "上傳附件",
 	"markAsSensitive": "標記為敏感內容",
-	"save": "儲存",
-	"publish": "發布",
-	"delete": "刪除"
+	"publish": "發布"
 }
 </locale>
