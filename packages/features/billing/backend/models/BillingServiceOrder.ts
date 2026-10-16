@@ -7,6 +7,7 @@
 import { Check, Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { id } from '@features/persistence/backend/models/util/id.js';
+import type { CountryEligibilityEvidence } from '../country-eligibility.js';
 import type { DeclaredResidence } from '../residence.schema.js';
 import type { ReceiptSnapshot } from '../policy.schema.js';
 import type { PaymentQuote } from '../../shared/payment-quote.js';
@@ -21,6 +22,7 @@ const integer = { type: 'bigint' as const, transformer: { to: (value: number | n
 @Check('billing_service_order_period_check', '("status" = \'paid\' AND ("txHash" IS NOT NULL OR "cashAmountBaseUnits" = \'0\') AND "paidAt" IS NOT NULL AND "startsAt" IS NOT NULL AND "endsAt" IS NOT NULL AND "endsAt" > "startsAt") OR ("status" <> \'paid\' AND "paidAt" IS NULL AND "startsAt" IS NULL AND "endsAt" IS NULL)')
 export class MiBillingServiceOrder {
 	@PrimaryColumn({ ...id(), primaryKeyConstraintName: 'billing_service_order_pk' }) public id: string;
+	@Column('jsonb', { nullable: true }) public countryEligibility: CountryEligibilityEvidence | null;
 	@Column('jsonb', { nullable: true }) public declaredResidence: DeclaredResidence | null;
 
 	@Column({ ...id(), nullable: true }) public userId: string | null;

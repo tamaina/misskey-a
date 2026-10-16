@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import 'reflect-metadata';
+import { BillingCountryEligibility1792138000000 as CountryMigration } from '../../../../backend/migration/1792138000000-BillingCountryEligibility.js';
+
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { expect, test } from 'vitest';
 import { createRouterClient } from '@orpc/server';
 import { entities } from '@features/persistence/backend/postgres.js';
-import { PeerPayments1791950000000 as PeerMigration } from '../../../../backend/migration/1791950000000-PeerPayments.js';
-import { PeerBroadcastStart1792101000000 as BroadcastMigration } from '../../../../backend/migration/1792101000000-PeerBroadcastStart.js';
 import { createServiceBillingStore } from '../../backend/service-store.js';
 import { createBillingPolicyStore } from '../../backend/policy-store.js';
 import { createRefundStore } from '../../backend/refund-store.js';
@@ -68,7 +68,7 @@ test.skipIf(!url)('native PostgreSQL refund API, claims, all-group atomic expiry
 		await qr.query('INSERT INTO "user" VALUES (\'alice\'),(\'bob\'),(\'admin\'),(\'carol\'),(\'dave\')');
 		await qr.query('CREATE TABLE role (id varchar(32) PRIMARY KEY, target varchar(16), "isAdministrator" boolean, "isModerator" boolean)');
 		await qr.query('INSERT INTO role VALUES (\'normal\',\'manual\',false,false)');
-		await new BillingWalletRegistration1791760200000().up(qr); await new PeerMigration().up(qr); await new BroadcastMigration().up(qr);
+		await new BillingWalletRegistration1791760200000().up(qr);
 		await new BillingServiceSubscriptions1791838800000().up(qr);
 		const funded = new BillingFundedTerms1792010000000(), migration = new BillingRefunds1792011000000();
 		await funded.up(qr); await migration.up(qr); await migration.down(qr); await funded.down(qr); await funded.up(qr); await migration.up(qr);
@@ -80,13 +80,15 @@ test.skipIf(!url)('native PostgreSQL refund API, claims, all-group atomic expiry
 		await new BillingOrderReports1792023000000().up(qr);
 		await qr.query('CREATE TABLE user_profile ("userId" varchar(32) PRIMARY KEY)');
 		await new AccountDeclaredResidence1792100000000().up(qr);
+		await new CountryMigration().up(qr); await new CountryMigration().down(qr); await new CountryMigration().up(qr);
+		await qr.query('INSERT INTO billing_policy (id, revision, policy, \"updatedAt\") VALUES ($1,0,$2::jsonb,$3)', ['server', JSON.stringify({ isEnabled: false, countryEligibility: { operatorCountry: 'JP', mode: 'allow', allowedCountries: ['JP', 'US'] } }), new Date(now)]);
 		await qr.query('INSERT INTO user_profile ("userId", "billingResidence") SELECT id, $1::jsonb FROM "user"', [JSON.stringify({ country: 'JP', subdivision: 'JP-13', revision: 1, declaredAt: now, kind: 'self_declared' })]);
 		await qr.query('CREATE TABLE moderation_log (id varchar(32) PRIMARY KEY, "userId" varchar(32) NOT NULL, type varchar(128) NOT NULL, info jsonb NOT NULL)');
 		await purchase.saveOffer(offer, 'admin');
 		const first = await buy('first', 'wallet-a', 1); now += day; const second = await buy('second', 'wallet-b', 2);
 		const policyStore = createBillingPolicyStore(db, () => `policy-${++sequence}`, () => now);
 		const seller = { name: 'Refund seller', address: 'Synthetic address', invoiceRegistrationNumber: 'Synthetic number' };
-		const policy = { isEnabled: false, trustedProxyCidrs: [], regionRules: { mode: 'allow' as const, rules: [{ country: 'JP' }] }, taxName: 'Tax', taxRate: '0.2', seller, statementText: 'Synthetic statement' };
+		const policy = { countryEligibility: { operatorCountry: 'JP' as const, mode: 'allow' as const, allowedCountries: ['JP', 'US'] as Array<'JP' | 'US'> }, isEnabled: false, trustedProxyCidrs: [], regionRules: { mode: 'allow' as const, rules: [{ country: 'JP' }] }, taxName: 'Tax', taxRate: '0.2', seller, statementText: 'Synthetic statement' };
 		await policyStore.upsert({ revision: 0, policy }, 'admin');
 		const region: Record<string, unknown> = Object.fromEntries(['country', 'isEUCountry', 'city', 'continent', 'latitude', 'longitude', 'postalCode', 'metroCode', 'region', 'regionCode', 'timezone'].map(key => [key, null])); region.country = 'JP';
 		await qr.query('UPDATE billing_service_order SET "receiptSnapshot"=$1::jsonb WHERE id=$2', [JSON.stringify({ version: 1, consentedAt: started, region, statement: { id: 'synthetic-statement', country: 'JP', statement: 'Original statement' }, seller: { ...seller, name: 'Purchase seller' }, tax: { name: 'Original tax', rate: '0.1', currencyCode: 'JPY', includedBaseUnits: '100', excludedBaseUnits: '90', taxBaseUnits: '10' } }), first.id]);

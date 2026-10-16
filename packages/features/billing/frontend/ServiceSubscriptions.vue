@@ -47,7 +47,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -86,13 +86,15 @@ async function run(action: () => Promise<void>) {
 	try { await action(); } catch { error.value = true; } finally { busy.value = false; }
 }
 
+onMounted(load);
+
 async function loadReceipt(orderId: string) { await run(async () => { if (props.getReceipt) receipt.value = await props.getReceipt({ orderId }); }); }
 
 async function refreshHistory(cursor?: string) { if (props.getHistory) { const page = await props.getHistory({ ...(cursor ? { cursor } : {}), limit: 20 }); orders.value = page.items; nextHistoryCursor.value = page.nextCursor; } else { orders.value = await props.client.listOrders({}); nextHistoryCursor.value = null; } }
 
 async function nextHistory() { await run(async () => { if (nextHistoryCursor.value) await refreshHistory(nextHistoryCursor.value); }); }
 
-async function load() { await run(async () => { requirements.value = null; agreed.value = false; catalogItems.value = await props.client.listCatalog({}); offers.value = catalogItems.value.map(item => item.offer); wallets.value = await props.listWallets(); await refreshHistory(); if (props.residenceClient) { residenceReady.value = false; residenceReady.value = (await props.residenceClient.getResidence({})).isReady; } if (props.getRequirements) { requirements.value = null; agreed.value = false; try { requirements.value = await props.getRequirements({}); requirementsError.value = false; agreed.value = false; } catch { requirementsError.value = true; } } }); }
+async function load() { await run(async () => { requirements.value = null; agreed.value = false; if (props.residenceClient) { residenceReady.value = false; try { residenceReady.value = (await props.residenceClient.getResidence({})).isReady; } catch { error.value = true; } } catalogItems.value = await props.client.listCatalog({}); offers.value = catalogItems.value.map(item => item.offer); wallets.value = await props.listWallets(); await refreshHistory(); if (props.getRequirements) { requirements.value = null; agreed.value = false; try { requirements.value = await props.getRequirements({}); requirementsError.value = false; agreed.value = false; } catch { requirementsError.value = true; } } }); }
 
 async function prepareQuote() { await run(async () => { const offer = selectedOffer.value; if (!offer) throw new Error('Offer unavailable'); if (retry.value && retry.value.offerId === offerId.value && retry.value.walletId === walletId.value && JSON.stringify(retry.value.quotedOffer) === JSON.stringify(offer) && retry.value.quotedQuote) preparedQuote.value = { offer: retry.value.quotedOffer, result: retry.value.quotedQuote }; else { preparedQuote.value = null; preparedQuote.value = { offer: { ...offer }, result: await props.client.quoteOrder({ offerId: offer.id }) }; } }); }
 
@@ -119,5 +121,5 @@ async function check(order: ServiceOrder) {
 </script>
 <locale lang="json" locale="ja-JP">
 {
-	"residenceRequired": "新しい支払いの前に居住地を設定してください。履歴や送信済み取引は引き続き確認できます。","durationUnits":{"days":"日","months":"ヶ月","years":"年"},"previewQuote":"日割りと利用期間の見積を確認","base":"通常価格","discount":"残り期間の日割り割引","payable":"今回の支払額","period":"利用期間","prorated":"残り期間を元の価格で按分","afterTail":"現在の上位プランの期限後に開始（または同プラン更新）","quoteDeadline":"見積の有効期限","nextHistory":"支払い履歴の次のページ","receipt":"領収書を表示","requirementsFailed":"新規購入の地域条件を確認できませんでした。履歴は引き続き閲覧できます。","agree":"表示された居住地声明に同意して購入します。","reference":"基準価格（元の販売期間条件を満たす価格）","previous":"前の価格","current":"現在価格","next":"次の価格","scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、管理者が紐付けた通常ロールは確認済み期間内だけ有効です。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"読み込む","offer":"サービス","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","cancel":"送信前の注文を取り消す","deadline":"ハッシュ提出期限"}
+	"residenceRequired": "新しい支払いの前に居住地を設定してください。履歴や送信済み取引は引き続き確認できます。","durationUnits":{"days":"日","months":"ヶ月","years":"年"},"previewQuote":"日割りと利用期間の見積を確認","base":"通常価格","discount":"残り期間の日割り割引","payable":"今回の支払額","period":"利用期間","prorated":"残り期間を元の価格で按分","afterTail":"現在の上位プランの期限後に開始（または同プラン更新）","quoteDeadline":"見積の有効期限","nextHistory":"支払い履歴の次のページ","receipt":"領収書を表示","requirementsFailed":"新規購入の地域条件を確認できませんでした。履歴は引き続き閲覧できます。","agree":"表示された居住地声明に同意して購入します。","reference":"基準価格（元の販売期間条件を満たす価格）","previous":"前の価格","current":"現在価格","next":"次の価格","scope":"固定期間のサービス契約の試作です。注文と確認済み期間を記録しますが、管理者が紐付けた通常ロールは確認済み期間内だけ有効です。この画面は署名・送金・自動更新を実行しません。","failed":"処理できませんでした。設定と入力を確認してください。","load":"サービス・居住地・履歴を再読み込み","offer":"サービス","wallet":"登録済みの支払ウォレット","create":"注文を作成","hash":"トランザクションハッシュ","hashCaption":"注文期限内に提出します。別のハッシュへの変更はできません。","check":"確認する","detectScope":"選択したトークンについて、登録済みの別アカウント間の送金を検出します。自分が送信者または受信者であるイベントのみ記録できます。","log":"ログインデックス","detect":"送金を検出","pending":"未確認です。後で再確認してください。","decimals":"小数桁","token":"チェーン / コントラクト","recipient":"受取先","amount":"金額（最小単位）","cancel":"送信前の注文を取り消す","deadline":"ハッシュ提出期限"}
 </locale>

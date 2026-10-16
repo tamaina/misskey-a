@@ -18,7 +18,7 @@ import { MiBillingWallet } from './models/BillingWallet.js';
 import { MiBillingServiceOffer } from './models/BillingServiceOffer.js';
 import { MiBillingTransactionClaim } from './models/BillingTransactionClaim.js';
 import { MiBillingServiceOrder } from './models/BillingServiceOrder.js';
-import { requireDeclaredResidence } from './residence-store.js';
+import { requireCountryEligibility } from './country-eligibility.js';
 import { createReceiptSnapshot } from './policy-store.js';
 import { matchesOrder } from './service-receipt.js';
 import type { PaymentQuote } from '../shared/payment-quote.js';
@@ -123,7 +123,8 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 					if (existing.receiptSnapshot && purchase?.consent?.statementId !== existing.receiptSnapshot.statement.id) conflict();
 					return existing;
 				}
-				const declaredResidence = await requireDeclaredResidence(manager, userId);
+				const countryEligibility = await requireCountryEligibility(manager, userId);
+				const declaredResidence = countryEligibility.sender;
 				const offer = await manager.getRepository(MiBillingServiceOffer).findOne({ where: { id: offerId }, lock: { mode: 'pessimistic_read' } });
 				if (offer) offer.terms = await managedOffer(manager, offer.terms, true);
 				const wallet = await manager.findOneBy(MiBillingWallet, { id: walletId, userId });
@@ -143,7 +144,7 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 					if (pending.some(row => row.txHash || row.expiresAt > createdAt)) conflict();
 				}
 				const snapshot = await createReceiptSnapshot(manager, purchase, quote?.payableAmountBaseUnits ?? offer.terms.amountBaseUnits, offer.terms.currencyCode, createdAt, () => id(createdAt));
-				const row = manager.create(MiBillingServiceOrder, { id: id(createdAt), userId, walletId, requestKey, declaredResidence, receiptSnapshot: snapshot,
+				const row = manager.create(MiBillingServiceOrder, { id: id(createdAt), userId, walletId, requestKey, declaredResidence, countryEligibility, receiptSnapshot: snapshot,
 																																																								quote, billingRevision: quotedQuote?.revision ?? null, cashAmountBaseUnits: quote?.payableAmountBaseUnits ?? offer.terms.amountBaseUnits, offer: offer.terms, chainId: wallet.chainId, payerAddress: wallet.address,
 																																																								status: 'pending', createdAt, expiresAt: createdAt + 30 * 60 * 1000,
 																																																								txHash: null, paidAt: null, startsAt: null, endsAt: null });

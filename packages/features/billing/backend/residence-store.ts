@@ -6,7 +6,7 @@ import { ORPCError } from '@orpc/server';
 import * as v from 'valibot';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiBillingPolicy } from './models/BillingPolicy.js';
-import { declaredResidence, declaredResidenceInput } from './residence.schema.js';
+import { declaredResidence, declaredResidenceInput, peerReceiptSettings } from './residence.schema.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import type { DeclaredResidence } from './residence.schema.js';
 export const RESIDENCE_REQUIRED = 'RESIDENCE_REQUIRED';
@@ -25,6 +25,23 @@ export async function requireDeclaredResidence(manager: EntityManager, userId: s
 }
 export function createResidenceStore(db: DataSource, now = Date.now) {
 	return {
+		async getPeerReceiptSettings(userId: string) {
+			const row = await db.manager.getRepository(MiUserProfile).findOne({ where: { userId }, select: { userId: true, billingPeerReceiptSettings: true } });
+			const parsed = v.safeParse(peerReceiptSettings, row?.billingPeerReceiptSettings);
+			return parsed.success ? parsed.output : { revision: 0, acceptForeignPayments: false };
+		},
+		async setPeerReceiptSettings(userId: string, input: v.InferOutput<typeof peerReceiptSettings>) {
+			return db.transaction(async manager => {
+				await manager.query('SELECT pg_advisory_xact_lock(hashtextextended(\'billing-policy\', 0))');
+				const row = await manager.getRepository(MiUserProfile).findOne({ where: { userId }, select: { userId: true, billingPeerReceiptSettings: true }, lock: { mode: 'pessimistic_write' } });
+				if (!row) throw new ORPCError(RESIDENCE_REQUIRED);
+				const parsed = v.safeParse(peerReceiptSettings, row.billingPeerReceiptSettings);
+				if ((parsed.success ? parsed.output.revision : 0) !== input.revision || input.revision >= 2147483647) throw new ORPCError('RESIDENCE_CONFLICT');
+				const settings = { revision: input.revision + 1, acceptForeignPayments: input.acceptForeignPayments };
+				await manager.update(MiUserProfile, { userId }, { billingPeerReceiptSettings: settings });
+				return settings;
+			});
+		},
 		async get(userId: string) {
 			const row = await db.manager.getRepository(MiUserProfile).findOne({ where: { userId }, select: { userId: true, billingResidence: true } }), requiredSubdivisions = await residenceRequirements(db.manager);
 			const stored = v.safeParse(declaredResidence, row?.billingResidence);

@@ -10,7 +10,7 @@ import * as v from 'valibot';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiBillingWallet } from './models/BillingWallet.js';
 import { MiPeerPaymentToken, MiPeerPaymentIntent } from './models/PeerPayment.js';
-import { requireDeclaredResidence } from './residence-store.js';
+import { requireCountryEligibility } from './country-eligibility.js';
 import { peerTransfer } from './peer.contract.js';
 import type { PeerToken, PreparePeerTransfer } from './peer.contract.js';
 import type { ReceiptResult } from './transfer-confirmation.js';
@@ -65,7 +65,7 @@ export function createPeerPaymentStore(db: DataSource, id: (now: number) => stri
 					if (existing.terms.senderWalletId !== input.walletId || existing.recipientUserId !== input.recipientUserId || existing.terms.toAddress !== input.recipientAddress || existing.terms.token.id !== input.tokenId || existing.terms.amountBaseUnits !== input.amountBaseUnits) conflict();
 					return existing;
 				}
-				await requireDeclaredResidence(manager, userId);
+				const countryEligibility = await requireCountryEligibility(manager, userId, input.recipientUserId);
 				if (userId === input.recipientUserId) unavailable();
 				await localRecipient(manager, input.recipientUserId);
 				const token = await manager.getRepository(MiPeerPaymentToken).findOne({ where: { id: input.tokenId }, lock: { mode: 'pessimistic_read' } });
@@ -75,7 +75,7 @@ export function createPeerPaymentStore(db: DataSource, id: (now: number) => stri
 				if (!sender || !recipient) unavailable();
 				const createdAt = now();
 				if (Math.max(sender.createdAt, recipient.createdAt) > createdAt) unavailable();
-				const row = manager.create(MiPeerPaymentIntent, { id: id(createdAt), senderUserId: userId, recipientUserId: input.recipientUserId, requestKey: input.requestKey,
+				const row = manager.create(MiPeerPaymentIntent, { id: id(createdAt), senderUserId: userId, recipientUserId: input.recipientUserId, requestKey: input.requestKey, countryEligibility, broadcastCountryEligibility: null,
 																																																						terms: { token: token.terms, senderWalletId: sender.id, recipientWalletId: recipient.id, fromAddress: sender.address, toAddress: recipient.address, amountBaseUnits: input.amountBaseUnits },
 																																																						chainId: token.terms.chainId, createdAt, expiresAt: createdAt + 30 * 60 * 1000, status: 'pending', txHash: null, logIndex: null, confirmedAt: null, broadcastStartedAt: null });
 				await manager.insert(MiPeerPaymentIntent, row); return row;
@@ -83,14 +83,17 @@ export function createPeerPaymentStore(db: DataSource, id: (now: number) => stri
 		},
 		async start(userId: string, intentId: string) {
 			return db.transaction(async manager => {
-				await requireDeclaredResidence(manager, userId);
+				await manager.query('SELECT pg_advisory_xact_lock(hashtextextended(\'billing-policy\', 0))');
 				const row = await manager.getRepository(MiPeerPaymentIntent).findOne({ where: { id: intentId, senderUserId: userId }, lock: { mode: 'pessimistic_write' } });
 				if (!row) missing();
 				if (row.broadcastStartedAt !== null) conflict();
+				if (!row.recipientUserId) unavailable();
+				await localRecipient(manager, row.recipientUserId);
+				const broadcastCountryEligibility = await requireCountryEligibility(manager, userId, row.recipientUserId);
 				const startedAt = now();
 				if (row.status !== 'pending' || row.txHash || row.expiresAt <= startedAt) unavailable();
-				await manager.update(MiPeerPaymentIntent, row.id, { broadcastStartedAt: startedAt });
-				return { ...row, broadcastStartedAt: startedAt };
+				await manager.update(MiPeerPaymentIntent, row.id, { broadcastStartedAt: startedAt, broadcastCountryEligibility });
+				return { ...row, broadcastStartedAt: startedAt, broadcastCountryEligibility };
 			});
 		},
 		async submit(userId: string, intentId: string, txHash?: string) {

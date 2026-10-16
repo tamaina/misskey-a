@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { BillingCountryEligibility1792138000000 as CountryMigration } from '../../../backend/migration/1792138000000-BillingCountryEligibility.js';
+import { PeerCountryEligibility1792138000001 as PeerCountryMigration } from '../../../backend/migration/1792138000001-PeerCountryEligibility.js';
+import { createResidenceStore } from '../../../backend/built/features/billing/backend.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
@@ -33,13 +36,21 @@ test('synthetic opt-in addresses and atomic peer intent evidence', { skip: !url 
 		await qr.query(`CREATE SCHEMA "${schema}"`);
 		await qr.query('CREATE TABLE "user" (id varchar(32) PRIMARY KEY, host varchar(128), "isSuspended" boolean NOT NULL DEFAULT false, "movedToUri" varchar(512))');
 		await qr.query('INSERT INTO "user" (id) VALUES (\'alice\'),(\'bob\'),(\'carol\')');
-		await qr.query('CREATE TABLE user_profile ("userId" varchar(32) PRIMARY KEY, "billingResidence" jsonb)');
+		await qr.query('CREATE TABLE user_profile ("userId" varchar(32) PRIMARY KEY, "billingResidence" jsonb, "billingPeerReceiptSettings" jsonb)');
 		await qr.query('CREATE TABLE billing_policy (id varchar(32) PRIMARY KEY, revision integer, policy jsonb, "updatedAt" timestamptz, "updatedByUserId" varchar(32))');
-		await qr.query('INSERT INTO user_profile SELECT id, $1::jsonb FROM "user"', [JSON.stringify({ country: 'JP', subdivision: 'JP-13', revision: 1, declaredAt: now, kind: 'self_declared' })]);
+		await qr.query('INSERT INTO user_profile (\"userId\",\"billingResidence\") SELECT id, $1::jsonb FROM "user"', [JSON.stringify({ country: 'JP', subdivision: 'JP-13', revision: 1, declaredAt: now, kind: 'self_declared' })]);
 		await new WalletMigration().up(qr);
 		await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES (\'alice-wallet\',\'alice\',123456,$1,NULL,$3,$3),(\'bob-wallet\',\'bob\',123456,$2,\'private label\',$3,$3)', [address(1), address(2), now]);
 		const migration = new Migration(); await migration.up(qr); await migration.down(qr); await migration.up(qr);
 		await new BroadcastMigration().up(qr); await new BroadcastMigration().down(qr); await new BroadcastMigration().up(qr);
+		await qr.query('ALTER TABLE user_profile DROP COLUMN \"billingPeerReceiptSettings\"');
+		await qr.query('CREATE TABLE billing_service_order (id varchar(32) PRIMARY KEY)');
+		await new CountryMigration().up(qr); await new CountryMigration().down(qr); await new CountryMigration().up(qr);
+		await new PeerCountryMigration().up(qr); await new PeerCountryMigration().down(qr); await new PeerCountryMigration().up(qr);
+		await qr.query('INSERT INTO billing_policy (id, revision, policy) VALUES ($1,1,$2::jsonb)', ['server', JSON.stringify({ countryEligibility: { operatorCountry: 'JP', mode: 'allow', allowedCountries: ['JP', 'US'] } })]);
+		const receiptSettings = createResidenceStore(db, () => now);
+		assert.deepEqual(await receiptSettings.getPeerReceiptSettings('bob'), { revision: 0, acceptForeignPayments: false });
+		await receiptSettings.setPeerReceiptSettings('bob', { revision: 0, acceptForeignPayments: true });
 		const pending = (await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_peer_(token|intent)"|"billing_wallet"/.test(row.query) && !/billing_wallet_challenge/.test(row.query));
 		assert.deepEqual(pending, [], 'Unapplied draft migration agrees with entity metadata');
 		await store.saveToken(token);
@@ -53,6 +64,7 @@ test('synthetic opt-in addresses and atomic peer intent evidence', { skip: !url 
 		});
 		await t.test('prepare is idempotent, snapshots participants and rejects alien wallets/self recipients', async () => {
 			const rows = await Promise.all([store.prepare('alice', input), store.prepare('alice', input)]); assert.equal(rows[0].id, rows[1].id);
+			await assert.rejects(new PeerCountryMigration().down(qr), /Retain country eligibility evidence/);
 			await assert.rejects(store.prepare('alice', { ...input, amountBaseUnits: '8' }), error => error.code === 'PEER_CONFLICT');
 			await assert.rejects(store.prepare('carol', { ...input, requestKey: 'other' }), error => error.code === 'PEER_UNAVAILABLE');
 			await assert.rejects(store.prepare('alice', { ...input, recipientUserId: 'alice', requestKey: 'self' }), error => error.code === 'PEER_UNAVAILABLE');
@@ -66,7 +78,7 @@ test('synthetic opt-in addresses and atomic peer intent evidence', { skip: !url 
 			await store.submit('alice', existing.id); await store.list('alice');
 			const incomplete = { country: 'US', subdivision: null, revision: 2, declaredAt: now, kind: 'self_declared' };
 			await qr.query('UPDATE user_profile SET "billingResidence"=$1::jsonb WHERE "userId"=$2', [JSON.stringify(incomplete), 'alice']);
-			await qr.query('INSERT INTO billing_policy (id, policy) VALUES (\'server\', \'{"residenceRequiredSubdivisions":["US"]}\')');
+			await qr.query('UPDATE billing_policy SET policy=jsonb_set(policy, \'{residenceRequiredSubdivisions}\', \'["US"]\'::jsonb) WHERE id=\'server\'');
 			await assert.rejects(store.prepare('alice', { ...input, requestKey: 'incomplete-residence' }), error => error.code === 'RESIDENCE_REQUIRED');
 			assert.equal((await store.prepare('alice', input)).id, existing.id);
 			await qr.query('UPDATE user_profile SET "billingResidence"=$1::jsonb WHERE "userId"=$2', [JSON.stringify({ ...incomplete, subdivision: 'US-CA', revision: 3 }), 'alice']);
@@ -130,6 +142,55 @@ test('synthetic opt-in addresses and atomic peer intent evidence', { skip: !url 
 			await qr.query('DELETE FROM billing_wallet WHERE id = \'bob-wallet\'');
 			await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES (\'carol-wallet\',\'carol\',123456,$1,NULL,$2,$2)', [address(2), now]);
 			assert.deepEqual(await store.list('carol'), []); await assert.rejects(store.apply('carol', winner.id, hash(1), proof(winner)), error => error.code === 'PEER_NOT_FOUND');
+		});
+		await t.test('country limits and overseas opt-out recheck at broadcast without exposing recipient evidence or breaking recovery', async () => {
+			const settings = () => receiptSettings.getPeerReceiptSettings('bob');
+			const set = async acceptForeignPayments => receiptSettings.setPeerReceiptSettings('bob', { ...(await settings()), acceptForeignPayments });
+			// Prior tests leave Alice in US and Bob in JP.
+			await qr.query('DELETE FROM billing_wallet WHERE id=\'carol-wallet\'');
+			await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt","isPublicForPayments") VALUES (\'bob-again\',\'bob\',123456,$1,NULL,$2,$2,true)', [address(2), now]);
+			await set(false);
+			await assert.rejects(store.prepare('alice', { ...input, requestKey: 'foreign-off' }), error => error.code === 'BILLING_COUNTRY_UNAVAILABLE');
+			await set(true);
+			const row = await store.prepare('alice', { ...input, requestKey: 'country-recheck' });
+			assert.equal(row.countryEligibility.recipient.country, 'JP');
+			const dto = publicPeerTransfer(row); assert.equal('countryEligibility' in dto, false); assert.equal('broadcastCountryEligibility' in dto, false);
+			await set(false);
+			await assert.rejects(store.start('alice', row.id), error => error.code === 'BILLING_COUNTRY_UNAVAILABLE');
+			assert.equal((await store.list('alice')).find(item => item.id === row.id).broadcastStartedAt, null);
+			assert.equal((await store.prepare('alice', { ...input, requestKey: 'country-recheck' })).id, row.id);
+			await set(true);
+			const current = await settings();
+			const started = await store.start('alice', row.id);
+			assert.equal(started.broadcastCountryEligibility.recipientReceiptSettings.revision, current.revision);
+			await set(false);
+			await assert.rejects(store.start('alice', row.id), error => error.code === 'PEER_CONFLICT');
+			assert.equal((await store.submit('alice', row.id, hash(77))).txHash, hash(77));
+			await store.apply('bob', row.id, hash(77), { status: 'pending' });
+			await set(true);
+			const policy = (await qr.query('SELECT policy FROM billing_policy WHERE id=\'server\''))[0].policy;
+			try {
+				for (const country of ['JP', 'US']) {
+					await qr.query('UPDATE billing_policy SET policy=jsonb_set(policy, \'{countryEligibility}\', $1::jsonb) WHERE id=\'server\'', [JSON.stringify({ operatorCountry: country, mode: 'domestic', allowedCountries: [] })]);
+					await assert.rejects(store.prepare('alice', { ...input, requestKey: `server-${country}` }), error => error.code === 'BILLING_COUNTRY_UNAVAILABLE');
+				}
+			} finally { await qr.query('UPDATE billing_policy SET policy=$1::jsonb WHERE id=\'server\'', [JSON.stringify(policy)]); }
+			const race = await store.prepare('alice', { ...input, requestKey: 'country-race' });
+			const lock = db.createQueryRunner(); await lock.startTransaction();
+			await lock.query('SELECT pg_advisory_xact_lock(hashtextextended(\'billing-policy\', 0))');
+			const waiting = store.start('alice', race.id);
+			const rejected = assert.rejects(waiting, error => error.code === 'BILLING_COUNTRY_UNAVAILABLE');
+			try {
+				let blocked = false;
+				for (let n = 0; n < 100 && !blocked; n++) {
+					blocked = (await qr.query('SELECT 1 FROM pg_locks l JOIN pg_stat_activity a ON a.pid=l.pid WHERE a.application_name=\'misskey-peer-synthetic\' AND l.locktype=\'advisory\' AND NOT l.granted')).length > 0;
+					if (!blocked) await new Promise(resolve => setTimeout(resolve, 10));
+				}
+				assert.equal(blocked, true);
+				await lock.query('UPDATE user_profile SET "billingPeerReceiptSettings"=jsonb_set("billingPeerReceiptSettings", \'{acceptForeignPayments}\', \'false\'::jsonb) WHERE "userId"=\'bob\'');
+			} finally { await lock.commitTransaction(); await lock.release(); }
+			await rejected;
+			assert.equal((await store.list('alice')).find(item => item.id === race.id).broadcastStartedAt, null);
 		});
 		await t.test('native principal/scope boundary, safe expired submission and account deletion retention', async () => {
 			const client = createRouterClient(createPeerPaymentRouter({ store, readReceipt: async() => ({ status: 'pending' }), rpcUrl: async() => 'https://rpc.example.test' }), { context: { credential: 'synthetic', headers: {}, ip: '127.0.0.1', services: { authenticate: async() => [{ id: 'alice', isSuspended: false, movedToUri: null }, { permission: ['read:account', 'write:account'] }], limitActor: () => null, rateLimitFactor: async() => 1, limit: async() => null } } });

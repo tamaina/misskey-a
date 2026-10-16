@@ -7,6 +7,7 @@
 import { Check, Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { id } from '@features/persistence/backend/models/util/id.js';
+import type { CountryEligibilityEvidence } from '../country-eligibility.js';
 import type { PeerToken } from '../peer.contract.js';
 const integer = { type: 'bigint' as const, transformer: { to: (value: number | null) => value, from: (value: string | null) => value === null ? null : Number(value) } };
 @Entity('billing_peer_token')
@@ -26,6 +27,8 @@ export class MiPeerPaymentIntent {
 	@Column({ ...id(), nullable: true }) public recipientUserId: string | null;
 	@ManyToOne(() => MiUser, { onDelete: 'SET NULL' })
 	@JoinColumn({ name: 'recipientUserId', foreignKeyConstraintName: 'billing_peer_intent_recipient_fk' }) public recipient: MiUser | null;
+	@Column('jsonb', { nullable: true }) public countryEligibility: CountryEligibilityEvidence | null;
+	@Column('jsonb', { nullable: true }) public broadcastCountryEligibility: CountryEligibilityEvidence | null;
 	@Column('varchar', { length: 128 }) public requestKey: string;
 	@Column('jsonb') public terms: { token: PeerToken; senderWalletId: string; recipientWalletId: string; fromAddress: string; toAddress: string; amountBaseUnits: string };
 	@Column(integer) public chainId: number;
