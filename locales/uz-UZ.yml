@@ -1,214 +1,49 @@
----
-_lang_: "O'zbek tili"
-monthAndDay: "{day}/{month}"
-search: "Izlash"
-ok: "Ho'p"
-cancel: "Bekor qilish"
-notificationSettings: "Xabarnoma sozlamalari"
-uploading: "Yuklanmoqda..."
-save: "Saqlash"
-favorites: "Sevimlilar"
-favorited: "sevimli"
-alreadyFavorited: "allaqachon sevimlilar orasida"
-delete: "O'chirib tashlash"
-searchUser: "Foydalanuvchini izlash"
-showLess: "Yopish"
-lists: "Ro'yxatlar"
-notes: "Qaydlar"
-following: "Obuna bo‘lish"
-somethingHappened: "Xatolik yuz berdi"
-pinned: "Profilga qadab qo'yish"
-unsuspend: "Blokdan chiqarish"
-customEmojis: "Maxsus emoji"
-emojis: "Emoji"
-emojiName: "Emoji nomi"
-loginFailed: "Tizimga kirishda xatolik yuz berdi"
-wallpaper: "Fon rasmi"
-instances: "Serverlar"
-latestStatus: "So'nggi holat"
-operations: "Amallar"
-monitor: "Kuzatish"
-network: "Tarmoq"
-disk: "Disk"
-mutedUsers: "Ovozsiz foydalanuvchilar"
-blockedUsers: "Bloklangan foydalanuvchilar"
-changePassword: "Parolni o‘zgartirish"
-retypedNotMatch: "Maydonlar mos kelmayapti"
-currentPassword: "Joriy parol"
-newPasswordRetype: "Yangi parolni boshqatdan tering"
-removed: "Muvaffaqiyatli o'chirildi"
-home: "Bosh sahifa"
-reload: "Yangilash"
-watch: "Kuzatmoq"
-unwatch: "Kuzatishni to'xtatish"
-accept: "Ruxsat"
-reject: "Rad etish"
-integration: "Integratsiya"
-pinnedPages: "Qadalgan Sahifalar"
-pinnedClipId: "Qadalgan xabar IDsi"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "hCaptchani yoqish"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "reCAPTCHA ni yoqish"
-turnstile: "Turniket"
-enableTurnstile: "Turniketni yoqish"
-antennas: "Antennalar"
-close: "Yopish"
-invites: "Taklif qilish"
-transfer: "topshiriq"
-signinFailed: "Tizimga kirishda xatolik yuz berdi. Iltimos, foydalanuvchi nomingiz va parolingizni tekshiring."
-noHistory: "Tarix yo'q"
-signinHistory: "kirish tarixi"
-regenerate: "regeneratsiya"
-appearance: "Tasgqi ko'rinish"
-promotion: "rag'batlantirish"
-promote: "targ'ib qilish"
-hideThisNote: "bu eslatmani yashiring"
-showFeaturedNotesInTimeline: "Tanlangan qaydlarni Timelineda ko'rsatish"
-deleteAll: "Hammasini o'chirib tashlash"
-showFixedPostForm: "Taqdim etish shaklini vaqt jadvalining yuqori qismida ko'rsating"
-deleteAllFiles: "barcha fayllarni o'chirish"
-leaveConfirm: "Sizda saqlanmagan oʻzgarishlar bor. Bekor qilinsinmi?"
-notificationType: "Bildirishnoma turi"
-edit: "Tahrirlash"
-emailServer: "Email server"
-emailAddress: "E-pochtangiz:"
-smtpConfig: "SMTP server sozlamalari"
-smtpHost: "Host"
-smtpPort: "Port"
-smtpUser: "Foydalanuvchi nomi"
-smtpPass: "Parol"
-testEmail: "Email jo'natmani testlash"
-copy: "Nusxa olish"
-metrics: "Metrikalar"
-delayed: "Kechiktirildi"
-regenerateLoginToken: "Kirish tokenini qayta yaratish"
-sample: "Namuna"
-repliesCount: "Yuborilgan javoblar soni"
-repliedCount: "Qabul qilingan javoblar soni"
-followingCount: "Obuna bo'lingan akkountlar soni"
-followersCount: "Obunachilar soni"
-pollVotesCount: "Berilgan ovozlar soni"
-driveUsage: "Ishlatilgan disk joyi"
-clips: "Klip"
-experimental: "eksperimental"
-wide: "Keng"
-narrow: "Tor"
-advanced: "Murakkab"
-markAllAsRead: "hammasini o'qilgan deb belgilang"
-onlineStatus: "onlayn holat"
-global: "Global"
-sent: "Yuborish"
-received: "Qabul qilingan"
-unread: "Oʻqilmagan xabarlar"
-classic: "Klassik"
-recommended: "Tavsiya qilingan"
-_chat:
-  invitations: "Taklif qilish"
-  noHistory: "Tarix yo'q"
-  members: "A'zolar"
-  home: "Bosh sahifa"
-  send: "Yuborish"
+_lang_: 'O''zbek tili'
+search: 'Izlash'
+ok: 'Ho''p'
+cancel: 'Bekor qilish'
+notificationSettings: 'Xabarnoma sozlamalari'
+save: 'Saqlash'
+favorites: 'Sevimlilar'
+delete: 'O''chirib tashlash'
+lists: 'Ro''yxatlar'
+notes: 'Qaydlar'
+following: 'Obuna bo‘lish'
+somethingHappened: 'Xatolik yuz berdi'
+customEmojis: 'Maxsus emoji'
+mutedUsers: 'Ovozsiz foydalanuvchilar'
+blockedUsers: 'Bloklangan foydalanuvchilar'
+reload: 'Yangilash'
+accept: 'Ruxsat'
+reject: 'Rad etish'
+antennas: 'Antennalar'
+close: 'Yopish'
+edit: 'Tahrirlash'
+copy: 'Nusxa olish'
+clips: 'Klip'
+markAllAsRead: 'hammasini o''qilgan deb belgilang'
 _achievements:
   _types:
     _viewInstanceChart:
-      title: "Tahlilchi"
-_role:
-  priority: "Ustuvorlik"
-  _priority:
-    low: "Quyi"
-    middle: "O'rta"
-    high: "Yuqori"
-_ffVisibility:
-  public: "Chiqarish"
-_ad:
-  hide: "Boshqa ko'rsatilmasin"
-_email:
-  _follow:
-    title: "sizga obuna bo'ldi"
-_theme:
-  base: "Asos"
-  addConstant: "O'zgarmas qo'shish"
-  constant: "O'zgarmas"
-  key: "Kalit"
-  func: "Funksiyalar"
-  funcKind: "Funksiya turi"
-  argument: "Argument"
-  darken: "Qoraytirish"
-  inputConstantName: "Ushbu o'zgarmas uchun nom kiriting"
-  deleteConstantConfirm: "Siz rostdan ham {const} o'zgarmasni o'chirmoqchimisiz?"
-  keys:
-    accent: "Urg'u"
-    bg: "Fon"
-    fg: "Matn"
-    focus: "Fokus"
-    panel: "Panel"
-    shadow: "Soya"
-    navBg: "Yon panel foni"
-    navFg: "Yon panel matni"
-    mention: "Eslatib o'tish"
-    renote: "Qayta qayd etish"
-    divider: "Ajratrmoq"
-    fgHighlighted: "Belgilangan matn"
-_permissions:
-  "read:blocks": "Bloklangan foydalanuvchilar roʻyxatini koʻring"
-  "write:blocks": "Bloklangan foydalanuvchilar roʻyxatini tahrirlang"
-_profile:
-  username: "Foydalanuvchi nomi"
-  metadata: "Qo'shimcha ma'lumot"
-_charts:
-  filesTotal: "Fayllarning umumiy soni"
-_pages:
-  newPage: "Yangi Sahifa yaratish"
-  editPage: "Ushbu Sahifani tahrirlash"
-  pageSetting: "Sahifa sozlamalari"
-  nameAlreadyExists: "Ko'rsatilgan Sahifa URL'i allaqachon mavjud"
-  invalidNameTitle: "Ko'rsatilgan Sahifa URL'i yaroqsiz"
-  editThisPage: "Ushbu Sahifani tahrirlash"
-  viewPage: "Sizning Sahifalaringizni ko'rish"
-  my: "Mening Sahifalarim"
-  featured: "Mashhur"
-  contents: "Tarkib"
-  title: "Sarlavha"
-  url: "Sahifa URL'i"
-  summary: "Sahifa bayoni"
-  font: "Shrift"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  selectType: "Turni tanlang"
-  contentBlocks: "Tarkib"
-  blocks:
-    text: "Matn"
-    textarea: "Matn maydoni"
-    section: "Bo'lim"
-    image: "Rasmlar"
-    button: "Tugma"
-    note: "Biriktirilgan qayd"
-    _note:
-      id: "Qayd ID"
-      detailed: "Batafsil ko'rinishi"
+      title: 'Tahlilchi'
 _notification:
-  fileUploaded: "Fayl muvaffaqiyatli yuklandi"
-  youGotMention: "{name} sizni eslab o'tdi"
-  youGotReply: "{name} sizga javob berdi"
-  youGotQuote: "{name} sizdan iqtibos keltirdi"
-  youRenoted: "{name} dan qayta qayd qilish"
-  youWereFollowed: "sizga obuna bo'ldi"
-  unreadAntennaNote: "Antenna {name}"
-  _types:
-    all: "Barchasi"
-    follow: "Obuna bo‘lish"
-    mention: "Eslatib o'tish"
-    renote: "Qayta qayd etish"
-    quote: "Iqtibos keltirish"
-    reaction: "Reaktsiyalar"
-    receiveFollowRequest: "Qabul qilingan kuzatuv so'rovlari"
-    login: "Kirish"
+  youGotMention: '{name} sizni eslab o''tdi'
+  youGotReply: '{name} sizga javob berdi'
+  youGotQuote: '{name} sizdan iqtibos keltirdi'
+  youRenoted: '{name} dan qayta qayd qilish'
+  youWereFollowed: 'sizga obuna bo''ldi'
+  unreadAntennaNote: 'Antenna {name}'
   _actions:
-    reply: "Javob berish"
-    renote: "Qayta qayd qilish"
-_moderationLogTypes:
-  suspend: "To'xtatish"
-  resetPassword: "Parolni tiklash"
-_watermarkEditor:
-  advanced: "Murakkab"
+    reply: 'Javob berish'
+    renote: 'Qayta qayd qilish'
+next: 'Keyingisi'
+upload: 'Yuklash'
+preview: 'Ko''rish'
+name: 'Ism'
+title: 'Sarlavha'
+description: 'tavsif'
+none: 'Hechnima'
+all: 'Barcha'
+default: 'Odatiy'
+error: 'Xato'
+users: 'Foydalanuvchilar'

@@ -1,704 +1,218 @@
----
-_lang_: "Deutsch"
-monthAndDay: "{day}.{month}."
-search: "Suchen"
-ok: "OK"
-cancel: "Abbrechen"
-notificationSettings: "Benachrichtigungseinstellungen"
-uploading: "Wird hochgeladen …"
-save: "Speichern"
-favorites: "Favoriten"
-favorited: "Zu Favoriten hinzugefügt."
-alreadyFavorited: "Bereits zu den Favoriten hinzugefügt."
-delete: "Löschen"
-searchUser: "Nach einem Benutzer suchen"
-showLess: "Schließen"
-lists: "Listen"
-notes: "Notizen"
-following: "Folgt"
-somethingHappened: "Ein Fehler ist aufgetreten"
-pinned: "Angeheftet"
-emojiPicker: "Emoji auswählen"
-unsuspend: "Sperrung aufheben"
-customEmojis: "Benutzerdefinierte Emojis"
-emojis: "Emojis"
-emojiName: "Emoji-Name"
-loginFailed: "Anmeldung fehlgeschlagen"
-wallpaper: "Hintergrund"
-instances: "Instanzen"
-latestStatus: "Neuster Status"
-operations: "Aktionen"
-monitor: "Beobachten"
-network: "Netzwerk"
-disk: "Festplatte"
-mutedUsers: "Stummgeschaltete Benutzer"
-blockedUsers: "Blockierte Benutzer"
-changePassword: "Passwort ändern"
-retypedNotMatch: "Die Eingaben stimmen nicht überein."
-currentPassword: "Aktuelles Passwort"
-newPasswordRetype: "Neues Passwort bestätigen"
-removed: "Erfolgreich gelöscht"
-home: "Startseite"
-reload: "Aktualisieren"
-watch: "Beobachten"
-unwatch: "Nicht mehr beobachten"
-accept: "Akzeptieren"
-reject: "Ablehnen"
-integration: "Integration"
-pinnedPages: "Angeheftete Seiten"
-pinnedClipId: "ID des anzuheftenden Clips"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "hCaptcha aktivieren"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "mCaptcha aktivieren"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "reCAPTCHA aktivieren"
-turnstile: "Turnstile"
-enableTurnstile: "Turnstile aktivieren"
-antennas: "Antennen"
-close: "Schließen"
-invites: "Einladungen"
-transfer: "Übertragen"
-signinFailed: "Anmeldung fehlgeschlagen. Überprüfe Benutzername und Passswort."
-noHistory: "Kein Verlauf gefunden"
-signinHistory: "Anmeldungsverlauf"
-regenerate: "Regenerieren"
-appearance: "Aussehen"
-promotion: "Werbung"
-promote: "Werbung schalten"
-hideThisNote: "Diese Notiz verstecken"
-showFeaturedNotesInTimeline: "Beliebte Notizen in der Chronik anzeigen"
-deleteAll: "Alle löschen"
-showFixedPostForm: "Bereich zum Schreiben neuer Notizen am Anfang der Chronik anzeigen"
-deleteAllFiles: "Alle Dateien löschen"
-leaveConfirm: "Es gibt unspeicherte Änderungen. Möchtest du diese verwerfen?"
-notificationType: "Art der Benachrichtigung"
-edit: "Bearbeiten"
-emailServer: "Email-Server"
-enableEmail: "Email-Versand aktivieren"
-emailConfigInfo: "Zur Email-Bestätigung bei Registrierung oder zum Zurücksetzen des Passworts verwendet"
-emailAddress: "Email-Adresse"
-smtpConfig: "SMTP-Server Konfiguration"
-smtpHost: "Host"
-smtpPort: "Port"
-smtpUser: "Benutzername"
-smtpPass: "Passwort"
-emptyToDisableSmtpAuth: "Benutzername und Passwort leer lassen, um SMTP-Verifizierung zu deaktivieren"
-smtpSecure: "Für SMTP-Verbindungen implizit SSL/TLS verwenden"
-smtpSecureInfo: "Schalte dies aus, falls du STARTTLS verwendest."
-testEmail: "Emailversand testen"
-copy: "Kopieren"
-metrics: "Metriken"
-delayed: "Verzögert"
-regenerateLoginToken: "Anmeldetoken regenerieren"
-regenerateLoginTokenDescription: "Den zur Anmeldung intern verwendeten Token regenerieren. Normalerweise wird dies nicht benötigt. Bei Regeneration werden alle Geräte ausgeloggt."
-sample: "Beispiel"
-repliesCount: "Anzahl gesendeter Antworten"
-repliedCount: "Anzahl erhaltener Antworten"
-followingCount: "Anzahl gefolgter Benutzer"
-followersCount: "Anzahl an Followern"
-pollVotesCount: "Anzahl gesendeter Antworten auf Umfragen"
-driveUsage: "Drive-Auslastung"
-clips: "Clips"
-experimental: "Experimentell"
-wide: "Breit"
-narrow: "Schmal"
-sendErrorReports: "Fehlerberichte senden"
-sendErrorReportsDescription: "Ist diese Option aktiviert, so werden beim Auftreten von Fehlern detaillierte Fehlerinformationen an Misskey weitergegeben, was zur Verbesserung der Qualität von Misskey beiträgt.\nEnthalten in diesen Informationen sind u.a. die Version deines Betriebssystems, welchen Browser du verwendest und ein Verlauf deiner Aktivitäten innerhalb Misskey."
-advanced: "Fortgeschritten"
-markAllAsRead: "Alle als gelesen markieren"
-onlineStatus: "Onlinestatus"
-global: "Global"
-sent: "Gesendet"
-received: "Erhalten"
-aiChanMode: "Ai-Modus"
-unread: "Ungelesen"
-classic: "Classic"
-incorrectTotp: "Das Einmalpasswort ist falsch oder abgelaufen."
-rateLimitExceeded: "Versuchsanzahl überschritten"
-recommended: "Empfehlung"
-undefined: "Undefiniert"
-videos: "Videos"
-reactionsList: "Reaktionen"
-createWithOptions: "Einladung mit Optionen erstellen"
-edited: "Bearbeitet"
-replay: "Aufzeichnen"
-genEmbedCode: "Einbettungscode generieren"
-unknownWebAuthnKey: "Unbekannter Passkey"
-draft: "Entwurf"
-untitled: "Unbenannt"
-chat: "Chat"
-defaultImageCompressionLevel: "Standard-Bildkomprimierungsstufe"
-_chat:
-  invitations: "Einladen"
-  noHistory: "Kein Verlauf gefunden"
-  members: "Mitglieder"
-  home: "Startseite"
-  send: "Senden"
-  cannotChatWithTheUser: "Starten eines Chats mit diesem Benutzer nicht möglich"
-  cannotChatWithTheUser_description: "Der Chat ist entweder nicht verfügbar oder die andere Seite hat den Chat nicht aktiviert."
-_settings:
-  showUrlPreview: "URL-Vorschau anzeigen"
-_initialTutorial:
-  launchTutorial: "Tutorial ansehen"
-  title: "Tutorial"
-  skipAreYouSure: "Möchtest du das Tutorial verlassen?"
-  _landing:
-    title: "Willkommen zum Tutorial"
-  _note:
-    reply: "Klicke auf diesen Button, um auf eine Nachricht zu antworten. Es ist auch möglich, auf Antworten zu antworten und die Unterhaltung wie einen Thread fortzusetzen."
-    menu: "Du kannst Details zu Notizen anzeigen, Links kopieren und verschiedene andere Aktionen durchführen."
-  _reaction:
-    title: "Was sind Reaktionen?"
-  _timeline:
-    social: "Notizen von der Startseite und der lokalen Chronik werden angezeigt."
-  _postNote:
-    _visibility:
-      localOnly: "Wenn du eine Notiz mit dieser Einstellung veröffentlichst, wird sie nicht an andere Server weitergeleitet. Benutzer auf anderen Servern können diese Notizen nicht direkt sehen, unabhängig von den obigen Anzeigeeinstellungen."
-    _cw:
-      description: "Anstelle des Textes wird das angezeigt, was du im Abschnitt „Anmerkungen“ angibst. Drücke auf „Inhalt anzeigen“, um den vollständigen Text zu sehen."
-      useCases: "Dient zur Kennzeichnung von Notizen, wie sie in den Serverrichtlinien vorgeschrieben sind, oder zur eigenen Festlegung von Spoiler-Beiträgen oder sensiblem Text."
-  _done:
-    title: "Du hast das Tutorial abgeschlossen! 🎉"
+_lang_: 'Deutsch'
+search: 'Suchen'
+ok: 'OK'
+cancel: 'Abbrechen'
+notificationSettings: 'Benachrichtigungseinstellungen'
+save: 'Speichern'
+favorites: 'Favoriten'
+delete: 'Löschen'
+lists: 'Listen'
+notes: 'Notizen'
+following: 'Folgt'
+somethingHappened: 'Ein Fehler ist aufgetreten'
+customEmojis: 'Benutzerdefinierte Emojis'
+mutedUsers: 'Stummgeschaltete Benutzer'
+blockedUsers: 'Blockierte Benutzer'
+reload: 'Aktualisieren'
+accept: 'Akzeptieren'
+reject: 'Ablehnen'
+antennas: 'Antennen'
+close: 'Schließen'
+edit: 'Bearbeiten'
+copy: 'Kopieren'
+clips: 'Clips'
+markAllAsRead: 'Alle als gelesen markieren'
 _achievements:
   _types:
     _notes1:
-      title: "Hallo Misskey!"
-      description: "Sende deine erste Notiz"
-      flavor: "Hab eine schöne Zeit mit Misskey!"
+      title: 'Hallo Misskey!'
     _notes10:
-      title: "Ein paar Notizen"
-      description: "10 Notizen gesendet"
+      title: 'Ein paar Notizen'
     _notes100:
-      title: "Viele Notizen"
-      description: "100 Notizen gesendet"
+      title: 'Viele Notizen'
     _notes500:
-      title: "Überschüttet mit Notizen"
-      description: "500 Notizen gesendet"
+      title: 'Überschüttet mit Notizen'
     _notes1000:
-      title: "Berg an Notizen"
-      description: "1.000 Notizen gesendet"
+      title: 'Berg an Notizen'
     _notes5000:
-      title: "Überquellende Notizen"
-      description: "5.000 Notizen gesendet"
+      title: 'Überquellende Notizen'
     _notes10000:
-      title: "Supernotiz"
-      description: "10.000 Notizen gesendet"
+      title: 'Supernotiz'
     _notes20000:
-      title: "Brauche... mehr... Notizen..."
-      description: "20.000 Notizen gesendet"
+      title: 'Brauche... mehr... Notizen...'
     _notes30000:
-      title: "Notizen, Notizen, Notizen"
-      description: "30.000 Notizen gesendet"
+      title: 'Notizen, Notizen, Notizen'
     _notes40000:
-      title: "Notizfabrik"
-      description: "40.000 Notizen gesendet"
+      title: 'Notizfabrik'
     _notes50000:
-      title: "Planet der Notizen"
-      description: "50.000 Notizen gesendet"
+      title: 'Planet der Notizen'
     _notes60000:
-      title: "Notizquasar"
-      description: "60.000 Notizen gesendet"
+      title: 'Notizquasar'
     _notes70000:
-      title: "Schwarzes Notizloch"
-      description: "70.000 Notizen gesendet"
+      title: 'Schwarzes Notizloch'
     _notes80000:
-      title: "Notizgalaxie"
-      description: "80.000 Notizen gesendet"
+      title: 'Notizgalaxie'
     _notes90000:
-      title: "Notizversum"
-      description: "90.000 Notizen gesendet"
+      title: 'Notizversum'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "100.000 Notizen gesendet"
-      flavor: "Du hast wirklich viel zu sagen."
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "Anfänger Ⅰ"
-      description: "An 3 Tagen eingeloggt"
-      flavor: "Nenn' mich ab heute Misskist"
+      title: 'Anfänger Ⅰ'
     _login7:
-      title: "Anfänger Ⅱ"
-      description: "An 7 Tagen eingeloggt"
-      flavor: "Na, eingewöht?"
+      title: 'Anfänger Ⅱ'
     _login15:
-      title: "Anfänger Ⅲ"
-      description: "An 15 Tagen eingeloggt"
+      title: 'Anfänger Ⅲ'
     _login30:
-      title: "Misskist Ⅰ"
-      description: "An 30 Tagen eingeloggt"
+      title: 'Misskist Ⅰ'
     _login60:
-      title: "Misskist Ⅱ"
-      description: "An 60 Tagen eingeloggt"
+      title: 'Misskist Ⅱ'
     _login100:
-      title: "Misskist Ⅲ"
-      description: "An 100 Tagen eingeloggt"
-      flavor: "Violent Misskist"
+      title: 'Misskist Ⅲ'
     _login200:
-      title: "Stammbesucher Ⅰ"
-      description: "An 200 Tagen eingeloggt"
+      title: 'Stammbesucher Ⅰ'
     _login300:
-      title: "Stammbesucher Ⅱ"
-      description: "An 300 Tagen eingeloggt"
+      title: 'Stammbesucher Ⅱ'
     _login400:
-      title: "Stammbesucher Ⅲ"
-      description: "An 400 Tagen eingeloggt"
+      title: 'Stammbesucher Ⅲ'
     _login500:
-      title: "Veteran Ⅰ"
-      description: "An 500 Tagen eingeloggt"
-      flavor: "Meine Kameraden, ich liebe sie, die Notizen."
+      title: 'Veteran Ⅰ'
     _login600:
-      title: "Veteran Ⅱ"
-      description: "An 600 Tagen eingeloggt"
+      title: 'Veteran Ⅱ'
     _login700:
-      title: "Veteran Ⅲ"
-      description: "An 700 Tagen eingeloggt"
+      title: 'Veteran Ⅲ'
     _login800:
-      title: "Meister der Notizen Ⅰ"
-      description: "An 800 Tagen eingeloggt"
+      title: 'Meister der Notizen Ⅰ'
     _login900:
-      title: "Meister der Notizen Ⅱ"
-      description: "An 900 Tagen eingeloggt"
+      title: 'Meister der Notizen Ⅱ'
     _login1000:
-      title: "Meister der Notizen Ⅲ"
-      description: "An 1000 Tagen eingeloggt"
-      flavor: "Danke, dass du Misskey nutzt!"
+      title: 'Meister der Notizen Ⅲ'
     _noteClipped1:
-      title: "Muss... clippen..."
-      description: "Die erste Notiz geclippt"
+      title: 'Muss... clippen...'
     _noteFavorited1:
-      title: "Sternengucker"
-      description: "Eine Notiz als Favorit markiert"
+      title: 'Sternengucker'
     _myNoteFavorited1:
-      title: "Sternensucher"
-      description: "Ein anderer Benutzer hat eine deiner Notizen als Favoriten markiert"
+      title: 'Sternensucher'
     _profileFilled:
-      title: "Perfekte Vorbereitung"
-      description: "Fülle dein Profil aus"
+      title: 'Perfekte Vorbereitung'
     _markedAsCat:
-      title: "Ich der Kater"
-      description: "Markiere dein Konto als Katze"
-      flavor: "Einen Namen bekommst du später. "
+      title: 'Ich der Kater'
     _following1:
-      title: "Das Folgen beginnt"
-      description: "Du folgst deiner ersten Person"
+      title: 'Das Folgen beginnt'
     _following10:
-      title: "Folge ihnen... folge ihnen..."
-      description: "Du folgst über 10 Leuten"
+      title: 'Folge ihnen... folge ihnen...'
     _following50:
-      title: "Viele Freunde"
-      description: "Du folgst über 50 Leuten"
+      title: 'Viele Freunde'
     _following100:
-      title: "100 Freunde"
-      description: "Du folgst über 100 Leuten"
+      title: '100 Freunde'
     _following300:
-      title: "Freundeüberschuss"
-      description: "Du folgst über 300 Leuten"
+      title: 'Freundeüberschuss'
     _followers1:
-      title: "Der erste Follower"
-      description: "Du hast deinen ersten Follower erhalten"
+      title: 'Der erste Follower'
     _followers10:
-      title: "Mir nach!"
-      description: "Die Anzahl deiner Follower hat 10 überschritten"
+      title: 'Mir nach!'
     _followers50:
-      title: "Wirrwarr"
-      description: "Die Anzahl deiner Follower hat 50 überschritten"
+      title: 'Wirrwarr'
     _followers100:
-      title: "Beliebt"
-      description: "Die Anzahl deiner Follower hat 100 überschritten"
+      title: 'Beliebt'
     _followers300:
-      title: "Eine geordnete Reihe, bitte!"
-      description: "Die Anzahl deiner Follower hat 300 überschritten"
+      title: 'Eine geordnete Reihe, bitte!'
     _followers500:
-      title: "Funkmast"
-      description: "Die Anzahl deiner Follower hat 500 überschritten"
+      title: 'Funkmast'
     _followers1000:
-      title: "Influencer"
-      description: "Die Anzahl deiner Follower hat 1000 überschritten"
+      title: 'Influencer'
     _collectAchievements30:
-      title: "Sammler der Errungenschaften"
-      description: "Schalte 30 Errungenschaften frei"
+      title: 'Sammler der Errungenschaften'
     _viewAchievements3min:
-      title: "Fan von Errungenschaften"
-      description: "Schau dir die Liste deiner Errungenschaften für mindestens 3 Minuten an"
+      title: 'Fan von Errungenschaften'
     _iLoveMisskey:
-      title: "I Love Misskey"
-      description: "Sende \"I ❤ #Misskey\""
-      flavor: "Danke, dass du Misskey verwendest! - vom Entwicklerteam"
+      title: 'I Love Misskey'
     _foundTreasure:
-      title: "Schatzsuche"
-      description: "Du hast einen verborgenen Schatz gefunden"
+      title: 'Schatzsuche'
     _client30min:
-      title: "Kurze Pause"
-      description: "Habe Misskey für mindestens 30 Minuten geöffnet"
+      title: 'Kurze Pause'
     _client60min:
-      title: "Munter mit Misskey"
-      description: "Habe Misskey für mindestens 60 Minuten geöffnet"
+      title: 'Munter mit Misskey'
     _noteDeletedWithin1min:
-      title: "Ups"
-      description: "Lösche eine Notiz innerhalb von 1 Minute nachdem sie gesendet wurde"
+      title: 'Ups'
     _postedAtLateNight:
-      title: "Nachtaktiv"
-      description: "Sende mitten in der Nacht eine Notiz"
-      flavor: "Geh bald schlafen."
+      title: 'Nachtaktiv'
     _postedAt0min0sec:
-      title: "Zeitansage"
-      description: "Sende um 00:00 eine Notiz"
-      flavor: "Klick Klick Klick Dooong"
+      title: 'Zeitansage'
     _selfQuote:
-      title: "Selbstzitat"
-      description: "Zitiere eine eigene Notiz"
+      title: 'Selbstzitat'
     _htl20npm:
-      title: "Fließende Chronik"
-      description: "Deine Startseitenchronik erreicht eine Geschwindigkeit von 20 npm (Notizen pro Minute)"
+      title: 'Fließende Chronik'
     _viewInstanceChart:
-      title: "Analyst"
-      description: "Schau dir die Messwerte der Instanz an"
+      title: 'Analyst'
     _outputHelloWorldOnScratchpad:
-      title: "Hallo Welt!"
-      description: "Gib \"hello world\" in der Testumgebung aus"
+      title: 'Hallo Welt!'
     _open3windows:
-      title: "Splitscreen"
-      description: "Habe zur gleichen Zeit mindestens 3 Fenster offen"
+      title: 'Splitscreen'
     _driveFolderCircularReference:
-      title: "Zyklischer Verweis"
-      description: "Versuche, in Drive einen Zirkelbezug von Ordnern herzustellen"
+      title: 'Zyklischer Verweis'
     _reactWithoutRead:
-      title: "Hast du das wirklich gelesen?"
-      description: "Reagiere auf eine Notiz mit mindestens 100 Zeichen innerhalb von 3 Sekunden der Erstellung der Notiz"
+      title: 'Hast du das wirklich gelesen?'
     _clickedClickHere:
-      title: "Klicke hier"
-      description: "Du hast hier geklickt"
+      title: 'Klicke hier'
     _justPlainLucky:
-      title: "Pures Glück"
-      description: "Kann alle 10 Sekunden mit einer Warscheinlichkeit von 0.005% erhalten werden"
+      title: 'Pures Glück'
     _setNameToSyuilo:
-      title: "Gottkomplex"
-      description: "Setze deinen Namen auf \"syuilo\""
+      title: 'Gottkomplex'
     _passedSinceAccountCreated1:
-      title: "Einjahresjubiläum"
-      description: "Seit der Erstellung deines Kontos ist 1 Jahr vergangen"
+      title: 'Einjahresjubiläum'
     _passedSinceAccountCreated2:
-      title: "Zweijahresjubiläum"
-      description: "Seit der Erstellung deines Kontos sind 2 Jahre vergangen"
+      title: 'Zweijahresjubiläum'
     _passedSinceAccountCreated3:
-      title: "Dreijahresjubiläum"
-      description: "Seit der Erstellung deines Kontos sind 3 Jahre vergangen"
+      title: 'Dreijahresjubiläum'
     _loggedInOnBirthday:
-      title: "Alles Gute Zum Geburtstag"
-      description: "Logge dich an deinem Geburtstag ein"
+      title: 'Alles Gute Zum Geburtstag'
     _loggedInOnNewYearsDay:
-      title: "Frohes Neujahr"
-      description: "Logge dich am Neujahrstag ein"
-      flavor: "Auf ein weiteres tolles Jahr in dieser Instanz"
+      title: 'Frohes Neujahr'
     _cookieClicked:
-      title: "Ein Spiel, in dem du auf einen Keks klickst"
-      description: "Den Keks geklickt"
-      flavor: "Bist du hier richtig?"
+      title: 'Ein Spiel, in dem du auf einen Keks klickst'
     _brainDiver:
-      title: "Brain Diver"
-      description: "Sende den Link zu Brain Diver"
-      flavor: "Misskey-Misskey La-Tu-Ma"
+      title: 'Brain Diver'
     _smashTestNotificationButton:
-      title: "Testüberfluss"
-      description: "Betätige den Benachrichtigungstest mehrfach innerhalb einer extrem kurzen Zeitspanne"
+      title: 'Testüberfluss'
     _tutorialCompleted:
-      title: "Misskey Grundkurs-Diplom"
-      description: "Tutorial abgeschlossen"
+      title: 'Misskey Grundkurs-Diplom'
     _bubbleGameExplodingHead:
-      title: "🤯"
-      description: "Das größte Objekt im Bubble Game"
+      title: '🤯'
     _bubbleGameDoubleExplodingHead:
-      title: "Doppel🤯"
-      description: "Zwei der größten Objekte im Bubble Game zur gleichen Zeit"
-      flavor: "Eine Lunchbox kann man auch mit etwas mehr 🤯 🤯 füllen"
-_role:
-  edit: "Rolle bearbeiten"
-  assignTarget: "Zuweisungsart"
-  options: "Optionen"
-  displayOrder: "Position"
-  priority: "Priorität"
-  _priority:
-    low: "Niedrig"
-    middle: "Mittel"
-    high: "Hoch"
-  _options:
-    canManageCustomEmojis: "Benutzerdefinierte Emojis verwalten"
-    canManageAvatarDecorations: "Profilbilddekorationen verwalten"
-    canHideAds: "Kann Werbung ausblenden"
-  _condition:
-    isRemote: "Benutzer fremder Instanz"
-    isCat: "Katzen-Benutzer"
-    isBot: "Bot-Benutzer"
-_ffVisibility:
-  public: "Öffentlich"
-  followers: "Nur für Follower sichtbar"
-  private: "Privat"
-_ad:
-  hide: "Ausblenden"
-_email:
-  _follow:
-    title: "Du hast einen neuen Follower"
-  _receiveFollowRequest:
-    title: "Du hast eine Follow-Anfrage erhalten"
-_plugin:
-  manage: "Plugins verwalten"
-_preferencesBackups:
-  list: "Erstellte Backups"
-  apply: "Auf dieses Gerät anwenden"
-  save: "Speichern"
-  nameAlreadyExists: "Es existiert bereits ein Backup unter dem Namen \"{name}\". Bitte gib einen anderen Namen ein."
-  saveConfirm: "Als {name} speichern?"
-  deleteConfirm: "Das Backup {name} löschen?"
-  createdAt: "Erstellt am: {date} {time}"
-  updatedAt: "Aktualisiert am: {date} {time}"
-  cannotLoad: "Laden fehlgeschlagen"
-_aboutMisskey:
-  contributors: "Hauptmitwirkende"
-_menuDisplay:
-  top: "Oben"
-  hide: "Ausblenden"
-_theme:
-  base: "Vorlage"
-  addConstant: "Konstante hinzufügen"
-  constant: "Konstante"
-  defaultValue: "Standardwert"
-  refProp: "Eigenschaft referenzieren"
-  refConst: "Konstante referenzieren"
-  key: "Schlüssel"
-  func: "Funktionen"
-  funcKind: "Funktionsart"
-  argument: "Parameter"
-  basedProp: "Referenzierte Eigenschaft"
-  darken: "Verdunkeln"
-  inputConstantName: "Name der Konstanten eingeben"
-  importInfo: "Hier kannst du Farbschemencode einfügen, um ihn in den Editor zu importieren"
-  deleteConstantConfirm: "Die Konstante {const} wirklich löschen?"
-  keys:
-    accent: "Akzentfarbe"
-    bg: "Hintergrund"
-    fg: "Text"
-    focus: "Fokus"
-    indicator: "Indikator"
-    panel: "Panel"
-    shadow: "Schatten"
-    navBg: "Hintergrund der Seitenleiste"
-    navFg: "Text der Seitenleiste"
-    navActive: "Text der Seitenleiste (Aktiv)"
-    navIndicator: "Indikator der Seitenleiste"
-    link: "Link"
-    hashtag: "Hashtag"
-    mention: "Erwähnung"
-    mentionMe: "Erwähnung (Ich)"
-    renote: "Renote"
-    modalBg: "Modalhintergrund"
-    divider: "Trenner"
-    scrollbarHandle: "Griff des Scrollbalkens"
-    scrollbarHandleHover: "Griff des Scrollbalkens (Mouseover)"
-    dateLabelFg: "Text von Datumsbeschriftungen"
-    infoBg: "Hintergrund von Informationen"
-    infoFg: "Text von Informationen"
-    infoWarnBg: "Hintergrund von Warnungen"
-    infoWarnFg: "Text von Warnungen"
-    toastBg: "Hintergrund von Benachrichtigungen"
-    toastFg: "Text von Benachrichtigungen"
-    buttonBg: "Hintergrund von Schaltflächen"
-    buttonHoverBg: "Hintergrund von Schaltflächen (Mouseover)"
-    inputBorder: "Rahmen von Eingabefeldern"
-    badge: "Wappen"
-    messageBg: "Hintergrund von Chats"
-    fgHighlighted: "Hervorgehobener Text"
-_ago:
-  future: "Zukunft"
-_permissions:
-  "read:account": "Deine Benutzerkontoinformationen lesen"
-  "write:account": "Deine Benutzerkontoinformationen bearbeiten"
-  "read:blocks": "Die Liste deiner blockierten Benutzer lesen"
-  "write:blocks": "Die Liste deiner blockierten Benutzer bearbeiten"
-  "read:drive": "Deine Drive-Dateien und Ordner lesen"
-  "write:drive": "Deine Drive-Dateien und Ordner bearbeiten oder löschen"
-  "read:favorites": "Deine Favoriten-Liste lesen"
-  "write:favorites": "Deine Favoriten-Liste bearbeiten"
-  "read:following": "Die Liste der Benutzer, denen du folgst, lesen"
-  "write:following": "Anderen Benutzern folgen oder entfolgen"
-  "read:messaging": "Chats lesen"
-  "write:messaging": "Chats bedienen"
-  "read:mutes": "Stummschaltungen lesen"
-  "write:mutes": "Stummschaltungen bearbeiten"
-  "write:notes": "Notizen schreiben oder löschen"
-  "read:notifications": "Benachrichtigungen lesen"
-  "write:notifications": "Benachrichtigungen bedienen"
-  "read:reactions": "Reaktionen lesen"
-  "write:reactions": "Reaktionen bedienen"
-  "write:votes": "Umfragen bedienen"
-  "read:pages": "Deine Seiten lesen"
-  "write:pages": "Deine Seiten bearbeiten oder löschen"
-  "read:page-likes": "Liste der Seiten, die mir gefallen, lesen"
-  "write:page-likes": "Liste der Seiten, die mir gefallen, bearbeiten"
-  "read:user-groups": "Benutzergruppen lesen"
-  "write:user-groups": "Benutzergruppen bearbeiten oder löschen"
-  "read:channels": "Kanäle lesen"
-  "write:channels": "Kanäle bedienen"
-  "read:gallery": "Beiträge deiner Galerie lesen"
-  "write:gallery": "Deine Galerie bearbeiten"
-  "read:gallery-likes": "Liste deiner mit \"Gefällt mir\" markierten Galerie-Beiträge lesen"
-  "write:gallery-likes": "Liste deiner mit \"Gefällt mir\" markierten Galerie-Beiträge bearbeiten"
-  "write:admin:delete-account": "Benutzerkonto löschen"
-  "write:admin:roles": "Rollen verwalten"
-  "read:admin:roles": "Rollen anzeigen"
-  "write:chat": "Chats bedienen"
-_profile:
-  username: "Benutzername"
-  metadata: "Zusätzliche Informationen"
-_charts:
-  filesTotal: "Anzahl aller Dateien"
-_play:
-  created: "Play erfolgreich erstellt"
-  updated: "Play erfolgreich aktualisiert"
-  deleted: "Play erfolgreich gelöscht"
-  pageSetting: "Play-Einstellungen"
-_pages:
-  newPage: "Seite erstellen"
-  editPage: "Seite bearbeiten"
-  readPage: "Quelltextansicht"
-  pageSetting: "Seiteneinstellungen"
-  nameAlreadyExists: "Die angegebene Seiten-URL existiert bereits"
-  invalidNameTitle: "Die angegebene Seiten-URL ist ungültig"
-  invalidNameText: "Überprüfe, ob der Seitentitel nicht leer ist"
-  editThisPage: "Diese Seite bearbeiten"
-  viewSource: "Quelltext anzeigen"
-  viewPage: "Seite anschauen"
-  like: "Gefällt mir"
-  unlike: "\"Gefällt mir\" entfernen"
-  my: "Meine Seiten"
-  liked: "Seiten, die mir gefallen"
-  featured: "Beliebt"
-  inspector: "Inspektor"
-  contents: "Inhalte"
-  content: "Seitenblock"
-  variables: "Variablen"
-  title: "Titel"
-  url: "Seiten-URL"
-  summary: "Zusammenfassung"
-  alignCenter: "Zentrieren"
-  hideTitleWhenPinned: "Seitentitel wenn angeheftet ausblenden"
-  font: "Schriftart"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  eyeCatchingImageSet: "Vorschaubild festlegen"
-  eyeCatchingImageRemove: "Vorschaubild entfernen"
-  chooseBlock: "Block hinzufügen"
-  selectType: "Typ auswählen"
-  contentBlocks: "Inhalt"
-  inputBlocks: "Eingabe"
-  specialBlocks: "Spezial"
-  blocks:
-    text: "Text"
-    textarea: "Textfeld"
-    section: "Abschnitt"
-    image: "Bild"
-    button: "Knopf"
-    note: "Eingebettete Notiz"
-    _note:
-      id: "Notiz-ID"
-      idDescription: "Du kannst alternativ auch die Notiz-URL angeben."
-      detailed: "Detailierte Ansicht"
+      title: 'Doppel🤯'
 _notification:
-  fileUploaded: "Datei erfolgreich hochgeladen"
-  youGotMention: "{name} hat dich erwähnt"
-  youGotReply: "{name} hat dir geantwortet"
-  youGotQuote: "{name} hat dich zitiert"
-  youRenoted: "Renote deiner Notiz von {name}"
-  youWereFollowed: "ist dir gefolgt"
-  youReceivedFollowRequest: "Du hast eine Follow-Anfrage erhalten"
-  yourFollowRequestAccepted: "Deine Follow-Anfrage wurde akzeptiert"
-  pollEnded: "Umfrageergebnisse sind verfügbar"
-  newNote: "Neue Notiz"
-  unreadAntennaNote: "Antenne {name}"
-  emptyPushNotificationMessage: "Push-Benachrichtigungen wurden aktualisiert"
-  achievementEarned: "Errungenschaft freigeschaltet"
-  testNotification: "Testbenachrichtigung"
-  notificationWillBeDisplayedLikeThis: "Benachrichtigungen sehen so aus"
-  exportOfXCompleted: "Der Export von {x} ist abgeschlossen"
-  login: "Neue Anmeldung erfolgt"
-  _types:
-    all: "Alle"
-    note: "Neue Notizen"
-    follow: "Neue Follower"
-    mention: "Erwähnungen"
-    reply: "Antworten"
-    renote: "Renotes"
-    quote: "Zitationen"
-    reaction: "Reaktionen"
-    pollEnded: "Ende von Umfragen"
-    scheduledNotePosted: "Der geplante Beitrag wurde erfolgreich veröffentlicht."
-    scheduledNotePostFailed: "Der geplante Beitrag ist fehlgeschlagen."
-    receiveFollowRequest: "Erhaltene Follow-Anfragen"
-    followRequestAccepted: "Akzeptierte Follow-Anfragen"
-    roleAssigned: "Rolle zugewiesen"
-    chatRoomInvitationReceived: "Einladungen zum Chatraum"
-    achievementEarned: "Errungenschaft freigeschaltet"
-    exportCompleted: "Der Export ist abgeschlossen"
-    login: "Anmeldung"
-    createToken: "Erstellung von Zugriffstokens"
-    test: "Test-Benachrichtigungen"
-    app: "Benachrichtigungen von Apps"
+  youGotMention: '{name} hat dich erwähnt'
+  youGotReply: '{name} hat dir geantwortet'
+  youGotQuote: '{name} hat dich zitiert'
+  youRenoted: 'Renote deiner Notiz von {name}'
+  youWereFollowed: 'ist dir gefolgt'
+  youReceivedFollowRequest: 'Du hast eine Follow-Anfrage erhalten'
+  yourFollowRequestAccepted: 'Deine Follow-Anfrage wurde akzeptiert'
+  pollEnded: 'Umfrageergebnisse sind verfügbar'
+  newNote: 'Neue Notiz'
+  unreadAntennaNote: 'Antenne {name}'
+  achievementEarned: 'Errungenschaft freigeschaltet'
+  testNotification: 'Testbenachrichtigung'
+  notificationWillBeDisplayedLikeThis: 'Benachrichtigungen sehen so aus'
+  exportOfXCompleted: 'Der Export von {x} ist abgeschlossen'
+  login: 'Neue Anmeldung erfolgt'
   _actions:
-    followBack: "folgt dir nun auch"
-    reply: "Antworten"
-    renote: "Renote"
-_moderationLogTypes:
-  suspend: "Gesperrt"
-  deleteNote: "Notiz gelöscht"
-  deleteUserAnnouncement: "Benutzerspezifische Ankündigung gelöscht"
-  resetPassword: "Passwort zurückgesetzt"
-  resolveAbuseReport: "Meldung bearbeitet"
-  createInvitation: "Einladung erstellt"
-  deleteGalleryPost: "Galeriebeitrag gelöscht"
-_fileViewer:
-  url: "URL"
-_externalResourceInstaller:
-  _vendorInfo:
-    title: "Vertreiber"
-  _errors:
-    _themeInstallFailed:
-      title: "Das Farbschema konnte nicht installiert werden"
-      description: "Während der Installation des Farbschemas ist ein Problem aufgetreten. Bitte versuche es erneut. Detaillierte Fehlerinformationen können über die Javascript-Konsole abgerufen werden."
-_reversi:
-  reversi: "Reversi"
+    followBack: 'folgt dir nun auch'
+    reply: 'Antworten'
+    renote: 'Renote'
 _offlineScreen:
-  title: "Offline - keine Verbindung zum Server möglich"
-  header: "Verbindung zum Server nicht möglich"
-_gridComponent:
-  _error:
-    columnTypeNotSupport: "Die Validierung regulärer Ausdrücke wird nur für Spalten vom Typ \"Text\" unterstützt."
-_embedCodeGen:
-  autoload: "Automatisch mehr laden (veraltet)"
-_selfXssPrevention:
-  warning: "WARNUNG"
-  title: "„Füge in diesen Bereich etwas ein“ ist eine Betrugsmasche."
-  description1: "Wenn du hier etwas einfügst, könnte ein böswilliger Benutzer dein Konto übernehmen oder deine persönlichen Daten stehlen."
-  description2: "Wenn du das nicht genau verstehst, was du einfügst, %csolltest du die Eingabe abbrechen und das Fenster schließen."
-  description3: "Weitere Informationen findest du hier. {link}"
-_bootErrors:
-  title: "Laden fehlgeschlagen"
-  serverError: "Wenn das Problem nach kurzem Warten und erneutem Laden immer noch nicht behoben ist, wende dich bitte an den Serveradministrator und gib die folgende Fehler-ID an."
-  solution: "Folgendes könnte das Problem lösen."
-  solution1: "Aktualisiere deinen Browser und dein Betriebssystem auf die neueste Version"
-  solution2: "Deaktiviere den Werbeblocker"
-  solution3: "Leere den Browser-Cache"
-  solution4: "(Tor Browser) Setze dom.webaudio.enabled auf true"
-  otherOption: "Weitere Optionen"
-  otherOption1: "Client-Einstellungen und Cache löschen"
-  otherOption2: "Einfachen Client starten"
-  otherOption3: "Starte das Reparaturwerkzeug"
-  otherOption4: "Misskey im abgesicherten Modus starten"
-_watermarkEditor:
-  advanced: "Fortgeschritten"
-_imageEffector:
-  _fxProps:
-    radius: "Radius"
-    samples: "Stichprobengröße"
-    threshold: "Schwellenwert"
-_drafts:
-  select: "Entwurf auswählen"
-  schedule: "Beitragsplanung"
+  title: 'Offline - keine Verbindung zum Server möglich'
+  header: 'Verbindung zum Server nicht möglich'
+next: 'Weiter'
+upload: 'Hochladen'
+preview: 'Vorschau'
+reset: 'Zurücksetzen'
+name: 'Name'
+title: 'Titel'
+description: 'Beschreibung'
+none: 'Nichts'
+all: 'Alle'
+default: 'Standard'
+error: 'Fehler'
+users: 'Benutzer'
+areYouSure: 'Bist du sicher?'

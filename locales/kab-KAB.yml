@@ -1,39 +1,11 @@
----
-_lang_: "Taqbaylit"
-monthAndDay: "{day}/{month}"
-search: "Nadi"
-ok: "IH"
-save: "Sekles"
-delete: "Kkes"
-lists: "Tibdarin"
-following: "Ig ṭṭafaṛ"
-emailAddress: "Tansa imayl"
-smtpUser: "Isem n umseqdac"
-smtpPass: "Awal uffir"
-_email:
-  _follow:
-    title: "Yeṭṭafaṛ-ik·em-id"
-_theme:
-  keys:
-    mention: "Bder"
-_permissions:
-  "write:account": "Ẓreg talɣut n umiḍan-ik·im"
-_profile:
-  username: "Isem n umseqdac"
-_pages:
-  contents: "Agbur"
-  font: "Tasefsit"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  eyeCatchingImageRemove: "Kkes tugna i d-ijebden"
-  selectType: "Fren anaw"
-  contentBlocks: "Agbur"
-  inputBlocks: "Anekcum"
-  specialBlocks: "Uzzig"
+_lang_: 'Taqbaylit'
+search: 'Nadi'
+ok: 'IH'
+save: 'Sekles'
+delete: 'Kkes'
+lists: 'Tibdarin'
+following: 'Ig ṭṭafaṛ'
 _notification:
-  youWereFollowed: "Yeṭṭafaṛ-ik·em-id"
-  _types:
-    follow: "Ig ṭṭafaṛ"
-    mention: "Bder"
+  youWereFollowed: 'Yeṭṭafaṛ-ik·em-id'
   _actions:
-    reply: "Err"
+    reply: 'Err'

@@ -1,704 +1,218 @@
----
-_lang_: "中文(简体)"
-monthAndDay: "{month}月 {day}日"
-search: "搜索"
-ok: "OK"
-cancel: "取消"
-notificationSettings: "通知设置"
-uploading: "正在上传"
-save: "保存"
-favorites: "收藏"
-favorited: "已加入收藏夹。"
-alreadyFavorited: "收藏夹中已存在。"
-delete: "删除"
-searchUser: "搜索用户"
-showLess: "关闭"
-lists: "列表"
-notes: "帖子"
-following: "关注中"
-somethingHappened: "出错了"
-pinned: "置顶"
-emojiPicker: "表情符号选择器"
-unsuspend: "解除冻结"
-customEmojis: "自定义表情符号"
-emojis: "表情符号"
-emojiName: "表情符号名称"
-loginFailed: "登录失败"
-wallpaper: "壁纸"
-instances: "服务器"
-latestStatus: "最后状态"
-operations: "操作"
-monitor: "服务器状态"
-network: "网络"
-disk: "存储"
-mutedUsers: "已隐藏的用户"
-blockedUsers: "已屏蔽的用户"
-changePassword: "修改密码"
-retypedNotMatch: "两次输入不一致！"
-currentPassword: "现在的密码"
-newPasswordRetype: "重新输入密码："
-removed: "已删除"
-home: "首页"
-reload: "刷新"
-watch: "关注"
-unwatch: "取消关注"
-accept: "允许"
-reject: "拒绝"
-integration: "关联"
-pinnedPages: "固定页面"
-pinnedClipId: "置顶的便签 ID"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "启用 hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "启用 mCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "启用 reCAPTCHA\n(请注意, 此功能在中国大陆不可用. 如果启用, 可能导致无法正常使用登录或注册等功能)"
-turnstile: "Turnstile"
-enableTurnstile: "启用 Turnstile"
-antennas: "天线"
-close: "关闭"
-invites: "邀请"
-transfer: "转让"
-signinFailed: "无法登录，请检查您的用户名和密码是否正确。"
-noHistory: "没有历史记录"
-signinHistory: "登录历史"
-regenerate: "重新生成"
-appearance: "外观"
-promotion: "推广"
-promote: "推广"
-hideThisNote: "隐藏这条帖子"
-showFeaturedNotesInTimeline: "在时间线上显示热门推荐"
-deleteAll: "全部删除"
-showFixedPostForm: "在时间线顶部显示发帖框"
-deleteAllFiles: "删除所有文件"
-leaveConfirm: "存在未保存的更改。要放弃更改吗？"
-notificationType: "通知类型"
-edit: "编辑"
-emailServer: "邮件服务器"
-enableEmail: "启用发送邮件功能"
-emailConfigInfo: "用于确认电子邮件和密码重置"
-emailAddress: "电子邮件地址"
-smtpConfig: "SMTP 服务器设置"
-smtpHost: "主机名"
-smtpPort: "端口"
-smtpUser: "用户名"
-smtpPass: "密码"
-emptyToDisableSmtpAuth: "用户名和密码留空可以禁用 SMTP 验证"
-smtpSecure: "在 SMTP 连接中使用隐式 SSL / TLS"
-smtpSecureInfo: "使用 STARTTLS 时关闭。"
-testEmail: "邮件发送测试"
-copy: "复制"
-metrics: "指标"
-delayed: "滞后"
-regenerateLoginToken: "重新生成登录令牌"
-regenerateLoginTokenDescription: "重新生成用于登录的内部令牌。通常您不需要这样做。重新生成后，您将在所有设备上登出。"
-sample: "示例"
-repliesCount: "回复数量"
-repliedCount: "回复数"
-followingCount: "正在关注数量"
-followersCount: "关注者数量"
-pollVotesCount: "问卷调查的投票数"
-driveUsage: "网盘的空间用量"
-clips: "便签"
-experimental: "实验性的"
-wide: "宽"
-narrow: "窄"
-sendErrorReports: "发送错误报告"
-sendErrorReportsDescription: "启用后，如果出现问题，可以与 Misskey 共享详细的错误信息，从而帮助提高软件的质量。错误信息包括操作系统版本、浏览器类型、行为历史记录等。"
-advanced: "高级"
-markAllAsRead: "全部标记为已读"
-onlineStatus: "在线状态"
-global: "全局"
-sent: "发送"
-received: "收取"
-aiChanMode: "小蓝模式"
-unread: "未读"
-classic: "经典"
-incorrectTotp: "一次性密码不正确或已过期"
-rateLimitExceeded: "已超过速率限制"
-recommended: "推荐"
-undefined: "未定义"
-videos: "视频"
-reactionsList: "回应列表"
-createWithOptions: "使用选项来创建"
-edited: "已编辑"
-replay: "重播"
-genEmbedCode: "生成嵌入代码"
-unknownWebAuthnKey: "此通行密钥未注册。"
-draft: "草稿"
-untitled: "未命名"
-chat: "聊天"
-defaultImageCompressionLevel: "默认图像压缩等级"
-_chat:
-  invitations: "邀请"
-  noHistory: "没有历史记录"
-  members: "成员"
-  home: "首页"
-  send: "发送"
-  cannotChatWithTheUser: "无法私信该用户"
-  cannotChatWithTheUser_description: "可能现在无法使用聊天，或者对方未开启聊天。"
-_settings:
-  showUrlPreview: "显示 URL 预览"
-_initialTutorial:
-  launchTutorial: "观看教学"
-  title: "教学"
-  skipAreYouSure: "是否退出教学？"
-  _landing:
-    title: "欢迎来到教学"
-  _note:
-    reply: "用来回复帖子。可以对回复进行回复，从而形成一串对话。"
-    menu: "用来进行例如显示帖子详情、复制链接等各种各样的操作。"
-  _reaction:
-    title: "什么是回应？"
-  _timeline:
-    social: "将同时显示首页时间线和本地时间线的内容。"
-  _postNote:
-    _visibility:
-      localOnly: "不将帖子通过联邦推送到其它服务器。 无论上述公开范围如何，其它服务器的用户将无法看到附加了此设定的帖子。\n"
-    _cw:
-      description: "显示 “注释” 中的内容，而非正文。点击 “查看更多” 以显示正文。"
-      useCases: "用于服务器条款所规定的帖子，或对剧透内容和敏感内容进行自主规制。"
-  _done:
-    title: "恭喜您，已经完成了教程🎉\n"
+_lang_: '中文(简体)'
+search: '搜索'
+ok: 'OK'
+cancel: '取消'
+notificationSettings: '通知设置'
+save: '保存'
+favorites: '收藏'
+delete: '删除'
+lists: '列表'
+notes: '帖子'
+following: '关注中'
+somethingHappened: '出错了'
+customEmojis: '自定义表情符号'
+mutedUsers: '已隐藏的用户'
+blockedUsers: '已屏蔽的用户'
+reload: '刷新'
+accept: '允许'
+reject: '拒绝'
+antennas: '天线'
+close: '关闭'
+edit: '编辑'
+copy: '复制'
+clips: '便签'
+markAllAsRead: '全部标记为已读'
 _achievements:
   _types:
     _notes1:
-      title: "初来乍到"
-      description: "第一次发帖"
-      flavor: "祝您在 Misskey 玩的愉快～"
+      title: '初来乍到'
     _notes10:
-      title: "一些帖子"
-      description: "发布了 10 篇帖子"
+      title: '一些帖子'
     _notes100:
-      title: "很多帖子"
-      description: "发布了 100 篇帖子"
+      title: '很多帖子'
     _notes500:
-      title: "满是帖子"
-      description: "发布了 500 篇帖子"
+      title: '满是帖子'
     _notes1000:
-      title: "积帖成山"
-      description: "发布了 1,000 篇帖子"
+      title: '积帖成山'
     _notes5000:
-      title: "帖如泉涌"
-      description: "发布了 5,000 篇帖子"
+      title: '帖如泉涌'
     _notes10000:
-      title: "超级帖"
-      description: "发布了 10,000 篇帖子"
+      title: '超级帖'
     _notes20000:
-      title: "还想要更多帖子"
-      description: "发布了 20,000 篇帖子"
+      title: '还想要更多帖子'
     _notes30000:
-      title: "帖子帖子帖子"
-      description: "发布了 30,000 篇帖子"
+      title: '帖子帖子帖子'
     _notes40000:
-      title: "帖子工厂"
-      description: "发布了 40,000 篇帖子"
+      title: '帖子工厂'
     _notes50000:
-      title: "帖子星球"
-      description: "发布了 50,000 篇帖子"
+      title: '帖子星球'
     _notes60000:
-      title: "帖子类星体"
-      description: "发布了 60,000 篇帖子"
+      title: '帖子类星体'
     _notes70000:
-      title: "帖子黑洞"
-      description: "发布了 70,000 篇帖子"
+      title: '帖子黑洞'
     _notes80000:
-      title: "帖子星系"
-      description: "发布了 80,000 篇帖子"
+      title: '帖子星系'
     _notes90000:
-      title: "帖子起源"
-      description: "发布了 90,000 篇帖子"
+      title: '帖子起源'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "发布了 100,000 篇帖子"
-      flavor: "真的有那么多可以写的东西吗？"
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "初学者 I"
-      description: "累计登录 3 天"
-      flavor: "今天开始我就是 Misskist！"
+      title: '初学者 I'
     _login7:
-      title: "初学者 II"
-      description: "累计登录 7 天"
-      flavor: "您开始习惯了吗？"
+      title: '初学者 II'
     _login15:
-      title: "初学者 III"
-      description: "累计登录 15 天"
+      title: '初学者 III'
     _login30:
-      title: "Misskist Ⅰ"
-      description: "累计登录 30 天"
+      title: 'Misskist Ⅰ'
     _login60:
-      title: "Misskist Ⅱ"
-      description: "累计登录 60 天"
+      title: 'Misskist Ⅱ'
     _login100:
-      title: "Misskist Ⅲ"
-      description: "累计登入 100 天"
-      flavor: "那个用户，是 Misskist 喔"
+      title: 'Misskist Ⅲ'
     _login200:
-      title: "定期联系Ⅰ"
-      description: "累计登录 200 天"
+      title: '定期联系Ⅰ'
     _login300:
-      title: "定期联系Ⅱ"
-      description: "累计登录 300 天"
+      title: '定期联系Ⅱ'
     _login400:
-      title: "定期联系Ⅲ"
-      description: "累计登录 400 天"
+      title: '定期联系Ⅲ'
     _login500:
-      title: "老熟人Ⅰ"
-      description: "累计登录 500 天"
-      flavor: "诸君，我喜欢帖文"
+      title: '老熟人Ⅰ'
     _login600:
-      title: "老熟人Ⅱ"
-      description: "累计登录 600 天"
+      title: '老熟人Ⅱ'
     _login700:
-      title: "老熟人Ⅲ"
-      description: "累计登录 700 天"
+      title: '老熟人Ⅲ'
     _login800:
-      title: "帖子大师 Ⅰ"
-      description: "累计登录 800 天"
+      title: '帖子大师 Ⅰ'
     _login900:
-      title: "帖子大师 Ⅱ"
-      description: "累计登录 900 天"
+      title: '帖子大师 Ⅱ'
     _login1000:
-      title: "帖子大师 Ⅲ"
-      description: "累计登录 1000 天"
-      flavor: "感谢您使用 Misskey！"
+      title: '帖子大师 Ⅲ'
     _noteClipped1:
-      title: "忍不住想加入便签"
-      description: "第一次将帖子加入便签"
+      title: '忍不住想加入便签'
     _noteFavorited1:
-      title: "观星者"
-      description: "第一次将帖子加入收藏"
+      title: '观星者'
     _myNoteFavorited1:
-      title: "想要星星"
-      description: "自己的帖子被其他人收藏了"
+      title: '想要星星'
     _profileFilled:
-      title: "整装待发"
-      description: "设置了个人资料"
+      title: '整装待发'
     _markedAsCat:
-      title: "我是猫"
-      description: "将账户设定为一只猫"
-      flavor: "还没有名字"
+      title: '我是猫'
     _following1:
-      title: "首次关注"
-      description: "第一次关注别人"
+      title: '首次关注'
     _following10:
-      title: "关注，跟随"
-      description: "关注超过 10 人"
+      title: '关注，跟随'
     _following50:
-      title: "我的朋友很多"
-      description: "关注超过 50 人"
+      title: '我的朋友很多'
     _following100:
-      title: "胜友如云"
-      description: "关注超过 100 人"
+      title: '胜友如云'
     _following300:
-      title: "朋友成群"
-      description: "关注数超过 300"
+      title: '朋友成群'
     _followers1:
-      title: "最初的关注者"
-      description: "第一次被关注"
+      title: '最初的关注者'
     _followers10:
-      title: "关注我吧！"
-      description: "拥有超过 10 名关注者"
+      title: '关注我吧！'
     _followers50:
-      title: "三五成群"
-      description: "拥有超过 50 名关注者"
+      title: '三五成群'
     _followers100:
-      title: "胜友如云"
-      description: "拥有超过 100 名关注者"
+      title: '胜友如云'
     _followers300:
-      title: "排列成行"
-      description: "拥有超过 300 名关注者"
+      title: '排列成行'
     _followers500:
-      title: "信号塔"
-      description: "拥有超过 500 名关注者"
+      title: '信号塔'
     _followers1000:
-      title: "大影响家"
-      description: "拥有超过 1000 名关注者"
+      title: '大影响家'
     _collectAchievements30:
-      title: "成就收藏家"
-      description: "获得超过 30 个成就"
+      title: '成就收藏家'
     _viewAchievements3min:
-      title: "成就爱好者"
-      description: "盯着成就看三分钟"
+      title: '成就爱好者'
     _iLoveMisskey:
-      title: "I Love Misskey"
-      description: "发布 \"I ❤ #Misskey\" 帖子"
-      flavor: "感谢您使用 Misskey ！ by 开发团队"
+      title: 'I Love Misskey'
     _foundTreasure:
-      title: "寻宝"
-      description: "发现了隐藏的宝藏"
+      title: '寻宝'
     _client30min:
-      title: "休息一下！"
-      description: "启动客户端超过 30 分钟"
+      title: '休息一下！'
     _client60min:
-      title: "Misskey 重度依赖"
-      description: "启动客户端超过 60 分钟"
+      title: 'Misskey 重度依赖'
     _noteDeletedWithin1min:
-      title: "欲言又止"
-      description: "发帖后一分钟内就将其删除"
+      title: '欲言又止'
     _postedAtLateNight:
-      title: "夜猫子"
-      description: "深夜发布帖子"
-      flavor: "差不多该去睡了喔。"
+      title: '夜猫子'
     _postedAt0min0sec:
-      title: "报时"
-      description: "在 0 点发布一篇帖子"
-      flavor: "嘟 · 嘟 · 嘟 · 哔——"
+      title: '报时'
     _selfQuote:
-      title: "自我引用"
-      description: "引用了自己的帖子"
+      title: '自我引用'
     _htl20npm:
-      title: "流动的时间线"
-      description: "首页时间线中，帖子加载速度超过每分钟20篇"
+      title: '流动的时间线'
     _viewInstanceChart:
-      title: "分析师"
-      description: "查看了服务器信息中的图表"
+      title: '分析师'
     _outputHelloWorldOnScratchpad:
-      title: "Hello, world!"
-      description: "在 AiScript 控制台中输出 hello world"
+      title: 'Hello, world!'
     _open3windows:
-      title: "多窗口"
-      description: "打开了三个或更多的窗口"
+      title: '多窗口'
     _driveFolderCircularReference:
-      title: "循环引用"
-      description: "试图对网盘中的文件夹进行循环嵌套"
+      title: '循环引用'
     _reactWithoutRead:
-      title: "有好好读过吗？"
-      description: "在含有100字以上的帖子被发出三秒内做出回应"
+      title: '有好好读过吗？'
     _clickedClickHere:
-      title: "点这里"
-      description: "点了这里"
+      title: '点这里'
     _justPlainLucky:
-      title: "超高校级的幸运"
-      description: "每 10 秒有 0.005% 的概率自动获得"
+      title: '超高校级的幸运'
     _setNameToSyuilo:
-      title: "上帝情结"
-      description: "将名称设定为 syuilo"
+      title: '上帝情结'
     _passedSinceAccountCreated1:
-      title: "一周年"
-      description: "账户创建时间超过 1 年"
+      title: '一周年'
     _passedSinceAccountCreated2:
-      title: "二周年"
-      description: "账户创建时间超过 2 年"
+      title: '二周年'
     _passedSinceAccountCreated3:
-      title: "三周年"
-      description: "账户创建时间超过 3 年"
+      title: '三周年'
     _loggedInOnBirthday:
-      title: "生日快乐"
-      description: "在生日当天登录"
+      title: '生日快乐'
     _loggedInOnNewYearsDay:
-      title: "恭贺新禧"
-      description: "在元旦登入"
-      flavor: "今年也请对本服务器多多指教！"
+      title: '恭贺新禧'
     _cookieClicked:
-      title: "饼干点点乐"
-      description: "点击了饼干"
-      flavor: "穿越了？"
+      title: '饼干点点乐'
     _brainDiver:
-      title: "Brain Diver"
-      description: "发布了包含 Brain Diver 链接的帖子"
-      flavor: "Misskey-Misskey La-Tu-Ma"
+      title: 'Brain Diver'
     _smashTestNotificationButton:
-      title: "过度测试"
-      description: "短时间内连续测试通知"
+      title: '过度测试'
     _tutorialCompleted:
-      title: "Misskey 初学者课程 结业证书"
-      description: "完成了教学"
+      title: 'Misskey 初学者课程 结业证书'
     _bubbleGameExplodingHead:
-      title: "🤯"
-      description: "你合成出了游戏里最大的Emoji"
+      title: '🤯'
     _bubbleGameDoubleExplodingHead:
-      title: "两个🤯"
-      description: "你合成出了2个游戏里最大的Emoji"
-      flavor: "大约能　装满　这些便当盒　🤯　🤯　（比划）"
-_role:
-  edit: "编辑角色"
-  assignTarget: "授权对象"
-  options: "选项"
-  displayOrder: "显示顺序"
-  priority: "优先级"
-  _priority:
-    low: "低"
-    middle: "中"
-    high: "高"
-  _options:
-    canManageCustomEmojis: "管理自定义表情符号"
-    canManageAvatarDecorations: "管理头像挂件"
-    canHideAds: "可以隐藏广告"
-  _condition:
-    isRemote: "是远程用户"
-    isCat: "猫猫用户"
-    isBot: "机器人用户"
-_ffVisibility:
-  public: "公开"
-  followers: "仅关注者可见"
-  private: "私密"
-_ad:
-  hide: "不显示"
-_email:
-  _follow:
-    title: "你有新的关注者"
-  _receiveFollowRequest:
-    title: "收到了关注请求"
-_plugin:
-  manage: "管理插件..."
-_preferencesBackups:
-  list: "已创建的备份"
-  apply: "应用于本设备"
-  save: "覆盖存档"
-  nameAlreadyExists: "备份名称 “{name}” 已经存在，请指定其他名称。"
-  saveConfirm: "您确定要覆盖保存 {name} 吗？"
-  deleteConfirm: "您确定要删除 {name} 吗？"
-  createdAt: "创建日期：{date} {time}"
-  updatedAt: "更新日期：{date} {time}"
-  cannotLoad: "无法加载"
-_aboutMisskey:
-  contributors: "主要贡献者"
-_menuDisplay:
-  top: "顶部"
-  hide: "隐藏"
-_theme:
-  base: "基于"
-  addConstant: "添加常量"
-  constant: "常量"
-  defaultValue: "默认值"
-  refProp: "查看属性"
-  refConst: "查看常量"
-  key: "主要"
-  func: "函数"
-  funcKind: "功能类型"
-  argument: "参数"
-  basedProp: "基于的属性名称"
-  darken: "深色"
-  inputConstantName: "请输入常量名称"
-  importInfo: "您可以在此处粘贴主题代码，将其导入到编辑器中"
-  deleteConstantConfirm: "确定要删除常量 {const} 吗?"
-  keys:
-    accent: "强调色"
-    bg: "背景"
-    fg: "文本"
-    focus: "聚焦"
-    indicator: "标记"
-    panel: "面板"
-    shadow: "阴影"
-    navBg: "侧边栏背景"
-    navFg: "侧栏文本"
-    navActive: "侧栏文本（活动）"
-    navIndicator: "侧栏标记"
-    link: "链接"
-    hashtag: "话题标签"
-    mention: "提及"
-    mentionMe: "提及"
-    renote: "转发"
-    modalBg: "发帖背景"
-    divider: "分割线"
-    scrollbarHandle: "滚动条"
-    scrollbarHandleHover: "滚动条（悬停）"
-    dateLabelFg: "日期标签文字"
-    infoBg: "信息背景"
-    infoFg: "信息文本"
-    infoWarnBg: "警告背景"
-    infoWarnFg: "警告文本"
-    toastBg: "Toast 通知背景"
-    toastFg: "Toast 通知文本"
-    buttonBg: "按钮背景"
-    buttonHoverBg: "按钮背景（悬停）"
-    inputBorder: "输入框边框"
-    badge: "徽章"
-    messageBg: "聊天背景"
-    fgHighlighted: "高亮显示文本"
-_ago:
-  future: "未来"
-_permissions:
-  "read:account": "查看账户信息"
-  "write:account": "更改帐户信息"
-  "read:blocks": "查看屏蔽列表"
-  "write:blocks": "编辑屏蔽列表"
-  "read:drive": "查看网盘"
-  "write:drive": "管理网盘文件"
-  "read:favorites": "查看收藏夹"
-  "write:favorites": "编辑收藏夹"
-  "read:following": "查看关注信息"
-  "write:following": "关注/取消关注"
-  "read:messaging": "查看私信"
-  "write:messaging": "撰写或删除消息"
-  "read:mutes": "查看已隐藏用户列表"
-  "write:mutes": "编辑已隐藏用户列表"
-  "write:notes": "撰写或删除帖子"
-  "read:notifications": "查看通知"
-  "write:notifications": "管理通知"
-  "read:reactions": "查看回应"
-  "write:reactions": "编辑回应"
-  "write:votes": "投票"
-  "read:pages": "查看页面"
-  "write:pages": "编辑页面"
-  "read:page-likes": "查看喜欢的页面"
-  "write:page-likes": "管理喜欢的页面"
-  "read:user-groups": "查看用户组"
-  "write:user-groups": "编辑用户组"
-  "read:channels": "查看频道"
-  "write:channels": "管理频道"
-  "read:gallery": "浏览相册"
-  "write:gallery": "管理相册"
-  "read:gallery-likes": "浏览喜欢的相册"
-  "write:gallery-likes": "管理喜欢的相册"
-  "write:admin:delete-account": "删除用户账户"
-  "write:admin:roles": "管理角色"
-  "read:admin:roles": "查看角色"
-  "write:chat": "撰写或删除消息"
-_profile:
-  username: "用户名"
-  metadata: "附加信息"
-_charts:
-  filesTotal: "合计文件总数"
-_play:
-  created: "创建了一个 Play"
-  updated: "更新了 Play"
-  deleted: "删除了 Play"
-  pageSetting: "Play 设置"
-_pages:
-  newPage: "创建页面"
-  editPage: "编辑页面"
-  readPage: "查看页面"
-  pageSetting: "页面设置"
-  nameAlreadyExists: "该页面 URL 已存在"
-  invalidNameTitle: "无效的页面 URL"
-  invalidNameText: "请确认该项不为空"
-  editThisPage: "编辑此页面"
-  viewSource: "查看源代码"
-  viewPage: "查看页面"
-  like: "喜欢"
-  unlike: "取消喜欢"
-  my: "我的页面"
-  liked: "喜欢的页面"
-  featured: "热门"
-  inspector: "检查器"
-  contents: "内容"
-  content: "页面内容"
-  variables: "变量"
-  title: "标题"
-  url: "页面 URL"
-  summary: "页面摘要"
-  alignCenter: "居中"
-  hideTitleWhenPinned: "置顶时隐藏标题"
-  font: "字体"
-  fontSerif: "衬线字体"
-  fontSansSerif: "无衬线字体"
-  eyeCatchingImageSet: "设置封面图片"
-  eyeCatchingImageRemove: "删除封面图片"
-  chooseBlock: "添加内容块"
-  selectType: "选择类型"
-  contentBlocks: "内容"
-  inputBlocks: "输入"
-  specialBlocks: "特殊"
-  blocks:
-    text: "文本"
-    textarea: "文本区域"
-    section: "章节"
-    image: "图片"
-    button: "按钮"
-    note: "嵌入的帖子"
-    _note:
-      id: "帖子 ID"
-      idDescription: "您也可以通过粘贴帖子的URL来进行设置。"
-      detailed: "显示详细信息"
+      title: '两个🤯'
 _notification:
-  fileUploaded: "文件已上传"
-  youGotMention: "来自{name}的提及"
-  youGotReply: "来自{name}的回复"
-  youGotQuote: "{name} 引用了您"
-  youRenoted: "{name} 转发你的帖子"
-  youWereFollowed: "关注了你"
-  youReceivedFollowRequest: "您有新的关注请求"
-  yourFollowRequestAccepted: "您的关注请求已通过"
-  pollEnded: "问卷调查结果已生成。"
-  newNote: "新的帖子"
-  unreadAntennaNote: "天线 {name}"
-  emptyPushNotificationMessage: "推送通知已更新"
-  achievementEarned: "获得成就"
-  testNotification: "测试通知"
-  notificationWillBeDisplayedLikeThis: "通知将会这样表示"
-  exportOfXCompleted: "已完成 {x} 的导出"
-  login: "有新的登录"
-  _types:
-    all: "全部"
-    note: "用户的新帖子"
-    follow: "关注中"
-    mention: "提及"
-    reply: "回复"
-    renote: "转贴"
-    quote: "引用"
-    reaction: "回应"
-    pollEnded: "问卷调查结束"
-    scheduledNotePosted: "定时发送成功"
-    scheduledNotePostFailed: "定时发送失败"
-    receiveFollowRequest: "收到关注请求"
-    followRequestAccepted: "关注请求已通过"
-    roleAssigned: "授予的角色"
-    chatRoomInvitationReceived: "您已被邀请加入群聊"
-    achievementEarned: "取得的成就"
-    exportCompleted: "已完成导出"
-    login: "登录"
-    createToken: "创建访问令牌"
-    test: "测试通知"
-    app: "关联应用的通知"
+  youGotMention: '来自{name}的提及'
+  youGotReply: '来自{name}的回复'
+  youGotQuote: '{name} 引用了您'
+  youRenoted: '{name} 转发你的帖子'
+  youWereFollowed: '关注了你'
+  youReceivedFollowRequest: '您有新的关注请求'
+  yourFollowRequestAccepted: '您的关注请求已通过'
+  pollEnded: '问卷调查结果已生成。'
+  newNote: '新的帖子'
+  unreadAntennaNote: '天线 {name}'
+  achievementEarned: '获得成就'
+  testNotification: '测试通知'
+  notificationWillBeDisplayedLikeThis: '通知将会这样表示'
+  exportOfXCompleted: '已完成 {x} 的导出'
+  login: '有新的登录'
   _actions:
-    followBack: "回关"
-    reply: "回复"
-    renote: "转发"
-_moderationLogTypes:
-  suspend: "冻结"
-  deleteNote: "删除帖子"
-  deleteUserAnnouncement: "删除用户通知"
-  resetPassword: "重置密码"
-  resolveAbuseReport: "处理举报"
-  createInvitation: "生成邀请码"
-  deleteGalleryPost: "删除相册内容"
-_fileViewer:
-  url: "URL"
-_externalResourceInstaller:
-  _vendorInfo:
-    title: "来源信息"
-  _errors:
-    _themeInstallFailed:
-      title: "安装主题失败"
-      description: "安装主题时出错。请再试一次。可在 Javascript 控制台查看错误详情。"
-_reversi:
-  reversi: "黑白棋"
+    followBack: '回关'
+    reply: '回复'
+    renote: '转发'
 _offlineScreen:
-  title: "离线——无法连接到服务器"
-  header: "无法连接到服务器"
-_gridComponent:
-  _error:
-    columnTypeNotSupport: "正则表达式验证仅支持 type:text 列。"
-_embedCodeGen:
-  autoload: "连续加载（不推荐）"
-_selfXssPrevention:
-  warning: "警告"
-  title: "任何要求 “在屏幕上贴些什么吧” 的都是诈骗。"
-  description1: "如果在此处粘贴了什么，恶意用户可能会接管账户或者盗取个人资料。"
-  description2: "如果不能完全理解将要粘贴的内容，%c 请立即停止操作并关闭这个窗口。"
-  description3: "详情请看这里。{link}"
-_bootErrors:
-  title: "加载失败"
-  serverError: "请稍等片刻再重试。若问题仍无法解决，请将以下 Error ID 一起发送给管理员。"
-  solution: "以下方法或许可以解决问题："
-  solution1: "将浏览器及操作系统更新到最新版本"
-  solution2: "禁用广告拦截插件"
-  solution3: "清除浏览器缓存"
-  solution4: "（Tor Browser）将 dom.webaudio.enabled 设定为 true"
-  otherOption: "其它选项"
-  otherOption1: "清除客户端设定与缓存"
-  otherOption2: "使用简易客户端"
-  otherOption3: "启动修复工具"
-  otherOption4: "以安全模式启动 Misskey"
-_watermarkEditor:
-  advanced: "高级"
-_imageEffector:
-  _fxProps:
-    radius: "半径"
-    samples: "采样数"
-    threshold: "阈值"
-_drafts:
-  select: "选择草稿"
-  schedule: "定时发布"
+  title: '离线——无法连接到服务器'
+  header: '无法连接到服务器'
+next: '下一个'
+upload: '本地上传'
+preview: '预览'
+reset: '重置'
+name: '名称'
+title: '标题'
+description: '描述'
+none: '无'
+all: '全部'
+default: '默认'
+error: '错误'
+users: '用户'
+areYouSure: '你确定吗？'

@@ -196,7 +196,7 @@ async function onSubmitClicked() {
 			// eslint-disable-next-line
 		} catch (ex: any) {
 			const msg = ex.message ?? $locale.value.sfc.internalServerErrorDescription;
-			await os.alert({ type: 'error', title: $locale.value.sfc.error, text: msg });
+			await os.alert({ type: 'error', title: globalLocale.value.env.error, text: msg });
 			dialogEl.value?.close();
 			emit('canceled');
 		}
@@ -253,7 +253,7 @@ onMounted(async () => {
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				} catch (ex: any) {
 					const msg = ex.message ?? $locale.value.sfc.internalServerErrorDescription;
-					await os.alert({ type: 'error', title: $locale.value.sfc.error, text: msg });
+					await os.alert({ type: 'error', title: globalLocale.value.env.error, text: msg });
 					dialogEl.value?.close();
 					emit('canceled');
 				}
@@ -317,7 +317,6 @@ onMounted(async () => {
 <locale locale="ar-SA" lang="json">
 {
 	"internalServerErrorDescription": "واجه الخادم خطأ غي متوقع.",
-	"error": "خطأ",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "الاسم",
@@ -336,7 +335,6 @@ onMounted(async () => {
 <locale locale="ca-ES" lang="json">
 {
 	"internalServerErrorDescription": "El servidor ha fallat de manera inexplicable.",
-	"error": "Error",
 	"createWebhook": "Crear un Webhook",
 	"modifyWebhook": "Modificar un Webhook",
 	"name": "Nom",
@@ -355,7 +353,6 @@ onMounted(async () => {
 <locale locale="cs-CZ" lang="json">
 {
 	"internalServerErrorDescription": "Server narazil na neočekávanou chybu.",
-	"error": "Chyba",
 	"createWebhook": "Vytvořit Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Jméno",
@@ -374,7 +371,6 @@ onMounted(async () => {
 <locale locale="da-DK" lang="json">
 {
 	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Name",
@@ -393,7 +389,6 @@ onMounted(async () => {
 <locale locale="de-DE" lang="json">
 {
 	"internalServerErrorDescription": "Im Server ist ein unerwarteter Fehler aufgetreten.",
-	"error": "Fehler",
 	"createWebhook": "Webhook erstellen",
 	"modifyWebhook": "Webhook bearbeiten",
 	"name": "Name",
@@ -412,7 +407,6 @@ onMounted(async () => {
 <locale locale="en-US" lang="json">
 {
 	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Name",
@@ -431,7 +425,6 @@ onMounted(async () => {
 <locale locale="es-ES" lang="json">
 {
 	"internalServerErrorDescription": "El servidor tuvo un error inesperado.",
-	"error": "Error",
 	"createWebhook": "Crear Webhook",
 	"modifyWebhook": "Editar webhook",
 	"name": "Nombre",
@@ -450,7 +443,6 @@ onMounted(async () => {
 <locale locale="fr-FR" lang="json">
 {
 	"internalServerErrorDescription": "Une erreur inattendue s'est produite sur le serveur.",
-	"error": "Erreur",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Nom",
@@ -469,7 +461,6 @@ onMounted(async () => {
 <locale locale="id-ID" lang="json">
 {
 	"internalServerErrorDescription": "Peladen sedang mengalami galat tak terduga",
-	"error": "Galat",
 	"createWebhook": "Buat Webhook",
 	"modifyWebhook": "Sunting Webhook",
 	"name": "Nama",
@@ -488,7 +479,6 @@ onMounted(async () => {
 <locale locale="it-IT" lang="json">
 {
 	"internalServerErrorDescription": "Si è verificato un errore imprevisto all'interno del server",
-	"error": "Errore",
 	"createWebhook": "Creazione Webhook",
 	"modifyWebhook": "Modifica Webhook",
 	"name": "Nome",
@@ -507,7 +497,6 @@ onMounted(async () => {
 <locale locale="ja-JP" lang="json">
 {
 	"internalServerErrorDescription": "サーバー内部で予期しないエラーが発生しました。",
-	"error": "エラー",
 	"createWebhook": "Webhookを作成",
 	"modifyWebhook": "Webhookを編集",
 	"name": "名前",
@@ -526,7 +515,6 @@ onMounted(async () => {
 <locale locale="ja-KS" lang="json">
 {
 	"internalServerErrorDescription": "サーバーでなんか変なこと起こっとるわ。",
-	"error": "おかしなったで",
 	"createWebhook": "Webhookをつくる",
 	"modifyWebhook": "Webhookを編集",
 	"name": "名前",
@@ -545,7 +533,6 @@ onMounted(async () => {
 <locale locale="kab-KAB" lang="json">
 {
 	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Name",
@@ -564,7 +551,6 @@ onMounted(async () => {
 <locale locale="kn-IN" lang="json">
 {
 	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Name",
@@ -583,7 +569,6 @@ onMounted(async () => {
 <locale locale="ko-KR" lang="json">
 {
 	"internalServerErrorDescription": "내부 서버에서 예기치 않은 오류가 발생했습니다.",
-	"error": "오류",
 	"createWebhook": "Webhook 생성",
 	"modifyWebhook": "Webhook 수정",
 	"name": "이름",
@@ -602,7 +587,6 @@ onMounted(async () => {
 <locale locale="nl-NL" lang="json">
 {
 	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Fout",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Naam",
@@ -621,7 +605,6 @@ onMounted(async () => {
 <locale locale="no-NO" lang="json">
 {
 	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Feil",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Navn",
@@ -640,7 +623,6 @@ onMounted(async () => {
 <locale locale="pl-PL" lang="json">
 {
 	"internalServerErrorDescription": "Niespodziewany błąd po stronie serwera",
-	"error": "Błąd",
 	"createWebhook": "Stwórz Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Nazwa",
@@ -659,7 +641,6 @@ onMounted(async () => {
 <locale locale="pt-PT" lang="json">
 {
 	"internalServerErrorDescription": "Houve um erro inesperado no servidor.",
-	"error": "Erro",
 	"createWebhook": "Criar Webhook",
 	"modifyWebhook": "Modificar Webhook",
 	"name": "Nome",
@@ -678,7 +659,6 @@ onMounted(async () => {
 <locale locale="ru-RU" lang="json">
 {
 	"internalServerErrorDescription": "Внутри сервера произошла непредвиденная ошибка.",
-	"error": "Ошибка",
 	"createWebhook": "Создать вебхук",
 	"modifyWebhook": "Изменить Вебхук",
 	"name": "Название",
@@ -697,7 +677,6 @@ onMounted(async () => {
 <locale locale="sk-SK" lang="json">
 {
 	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Chyba",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Názov",
@@ -716,7 +695,6 @@ onMounted(async () => {
 <locale locale="th-TH" lang="json">
 {
 	"internalServerErrorDescription": "เกิดข้อผิดพลาดที่ไม่คาดคิดภายในเซิร์ฟเวอร์",
-	"error": "ผิดพลาด!",
 	"createWebhook": "สร้าง Webhook",
 	"modifyWebhook": "แก้ไข Webhook",
 	"name": "ชื่อ",
@@ -735,7 +713,6 @@ onMounted(async () => {
 <locale locale="tr-TR" lang="json">
 {
 	"internalServerErrorDescription": "Sunucu beklenmedik bir hatayla karşılaştı.",
-	"error": "Hata",
 	"createWebhook": "Webhook oluştur",
 	"modifyWebhook": "Webhook'u değiştir",
 	"name": "Webhook'u değiştir",
@@ -754,7 +731,6 @@ onMounted(async () => {
 <locale locale="ug-CN" lang="json">
 {
 	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Name",
@@ -773,7 +749,6 @@ onMounted(async () => {
 <locale locale="uk-UA" lang="json">
 {
 	"internalServerErrorDescription": "На сервері сталася неочікувана помилка.",
-	"error": "Помилка",
 	"createWebhook": "Create Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Ім'я",
@@ -792,7 +767,6 @@ onMounted(async () => {
 <locale locale="vi-VN" lang="json">
 {
 	"internalServerErrorDescription": "Trong chủ máy lỗi bất ngờ xảy ra",
-	"error": "Lỗi",
 	"createWebhook": "Tạo Webhook",
 	"modifyWebhook": "Modify Webhook",
 	"name": "Tên",
@@ -811,7 +785,6 @@ onMounted(async () => {
 <locale locale="zh-CN" lang="json">
 {
 	"internalServerErrorDescription": "内部服务器发生了预期外的错误",
-	"error": "错误",
 	"createWebhook": "创建 Webhook",
 	"modifyWebhook": "编辑 webhook",
 	"name": "名称",
@@ -830,7 +803,6 @@ onMounted(async () => {
 <locale locale="zh-TW" lang="json">
 {
 	"internalServerErrorDescription": "內部伺服器出現意外錯誤。",
-	"error": "錯誤",
 	"createWebhook": "建立 Webhook",
 	"modifyWebhook": "編輯 Webhook",
 	"name": "名字",

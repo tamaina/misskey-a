@@ -1,704 +1,218 @@
----
-_lang_: "English"
-monthAndDay: "{month}/{day}"
-search: "Search"
-ok: "OK"
-cancel: "Cancel"
-notificationSettings: "Notification Settings"
-uploading: "Uploading..."
-save: "Save"
-favorites: "Favorites"
-favorited: "Added to favorites."
-alreadyFavorited: "Already added to favorites."
-delete: "Delete"
-searchUser: "Search for a user"
-showLess: "Close"
-lists: "Lists"
-notes: "Notes"
-following: "Following"
-somethingHappened: "An error has occurred"
-pinned: "Pin to profile"
-emojiPicker: "Emoji picker"
-unsuspend: "Unsuspend"
-customEmojis: "Custom Emoji"
-emojis: "Emoji"
-emojiName: "Emoji name"
-loginFailed: "Failed to sign in"
-wallpaper: "Wallpaper"
-instances: "Instances"
-latestStatus: "Latest status"
-operations: "Operations"
-monitor: "Monitor"
-network: "Network"
-disk: "Disk"
-mutedUsers: "Muted users"
-blockedUsers: "Blocked users"
-changePassword: "Change password"
-retypedNotMatch: "The inputs do not match."
-currentPassword: "Current password"
-newPasswordRetype: "Retype new password"
-removed: "Successfully deleted"
-home: "Home"
-reload: "Refresh"
-watch: "Watch"
-unwatch: "Stop watching"
-accept: "Accept"
-reject: "Reject"
-integration: "Integration"
-pinnedPages: "Pinned Pages"
-pinnedClipId: "ID of the clip to pin"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Enable hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "Enable mCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Enable reCAPTCHA"
-turnstile: "Turnstile"
-enableTurnstile: "Enable Turnstile"
-antennas: "Antennas"
-close: "Close"
-invites: "Invites"
-transfer: "Transfer"
-signinFailed: "Unable to sign in. The entered username or password is incorrect."
-noHistory: "No history available"
-signinHistory: "Login history"
-regenerate: "Regenerate"
-appearance: "Appearance"
-promotion: "Promoted"
-promote: "Promote"
-hideThisNote: "Hide this note"
-showFeaturedNotesInTimeline: "Show featured notes in timelines"
-deleteAll: "Delete all"
-showFixedPostForm: "Display the posting form at the top of the timeline"
-deleteAllFiles: "Delete all files"
-leaveConfirm: "There are unsaved changes. Do you want to discard them?"
-notificationType: "Notification type"
-edit: "Edit"
-emailServer: "Email server"
-enableEmail: "Enable email distribution"
-emailConfigInfo: "Used to confirm your email during sign-up or if you forget your password"
-emailAddress: "Email address"
-smtpConfig: "SMTP Server Configuration"
-smtpHost: "Host"
-smtpPort: "Port"
-smtpUser: "Username"
-smtpPass: "Password"
-emptyToDisableSmtpAuth: "Leave username and password empty to disable SMTP authentication"
-smtpSecure: "Use implicit SSL/TLS for SMTP connections"
-smtpSecureInfo: "Turn this off when using STARTTLS"
-testEmail: "Test email delivery"
-copy: "Copy"
-metrics: "Metrics"
-delayed: "Delayed"
-regenerateLoginToken: "Regenerate login token"
-regenerateLoginTokenDescription: "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
-sample: "Sample"
-repliesCount: "Number of replies sent"
-repliedCount: "Number of replies received"
-followingCount: "Number of followed accounts"
-followersCount: "Number of followers"
-pollVotesCount: "Number of sent poll votes"
-driveUsage: "Drive space usage"
-clips: "Clips"
-experimental: "Experimental"
-wide: "Wide"
-narrow: "Narrow"
-sendErrorReports: "Send error reports"
-sendErrorReportsDescription: "When turned on, detailed error information will be shared with Misskey when a problem occurs, helping to improve the quality of Misskey.\nThis will include information such the version of your OS, what browser you're using, your activity in Misskey, etc."
-advanced: "Advanced"
-markAllAsRead: "Mark all as read"
-onlineStatus: "Online status"
-global: "Global"
-sent: "Sent"
-received: "Received"
-aiChanMode: "Ai Mode"
-unread: "Unread"
-classic: "Classic"
-incorrectTotp: "The one-time password is incorrect or has expired."
-rateLimitExceeded: "Rate limit exceeded"
-recommended: "Recommended"
-undefined: "Undefined"
-videos: "Videos"
-reactionsList: "Reactions"
-createWithOptions: "Generate with options"
-edited: "Edited"
-replay: "Replay"
-genEmbedCode: "Generate embed code"
-unknownWebAuthnKey: "Unknown Passkey"
-draft: "Drafts"
-untitled: "Untitled"
-chat: "Chat"
-defaultImageCompressionLevel: "Default image compression level"
-_chat:
-  invitations: "Invite"
-  noHistory: "No history available"
-  members: "Members"
-  home: "Home"
-  send: "Send"
-  cannotChatWithTheUser: "Cannot start a chat with this user"
-  cannotChatWithTheUser_description: "Chat is either unavailable or the other party has not enabled chat."
-_settings:
-  showUrlPreview: "Show URL preview"
-_initialTutorial:
-  launchTutorial: "Start Tutorial"
-  title: "Tutorial"
-  skipAreYouSure: "Quit Tutorial?"
-  _landing:
-    title: "Welcome to the Tutorial"
-  _note:
-    reply: "Click on this button to reply to a message. It's also possible to reply to replies, continuing the conversation like a thread."
-    menu: "You can view Note details, copy links, and perform various other actions."
-  _reaction:
-    title: "What are Reactions?"
-  _timeline:
-    social: "Notes from the Home and Local timelines will be displayed."
-  _postNote:
-    _visibility:
-      localOnly: "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above."
-    _cw:
-      description: "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body."
-      useCases: "This is used when following the server guidelines, for necessary notes, or for self-restriction of spoiler or sensitive text."
-  _done:
-    title: "You've completed the tutorial! 🎉"
+_lang_: 'English'
+search: 'Search'
+ok: 'OK'
+cancel: 'Cancel'
+notificationSettings: 'Notification Settings'
+save: 'Save'
+favorites: 'Favorites'
+delete: 'Delete'
+lists: 'Lists'
+notes: 'Notes'
+following: 'Following'
+somethingHappened: 'An error has occurred'
+customEmojis: 'Custom Emoji'
+mutedUsers: 'Muted users'
+blockedUsers: 'Blocked users'
+reload: 'Refresh'
+accept: 'Accept'
+reject: 'Reject'
+antennas: 'Antennas'
+close: 'Close'
+edit: 'Edit'
+copy: 'Copy'
+clips: 'Clips'
+markAllAsRead: 'Mark all as read'
 _achievements:
   _types:
     _notes1:
-      title: "just setting up my msky"
-      description: "Post your first note"
-      flavor: "Have a good time with Misskey!"
+      title: 'just setting up my msky'
     _notes10:
-      title: "Some notes"
-      description: "Post 10 notes"
+      title: 'Some notes'
     _notes100:
-      title: "A lot of notes"
-      description: "Post 100 notes"
+      title: 'A lot of notes'
     _notes500:
-      title: "Covered in notes"
-      description: "Post 500 notes"
+      title: 'Covered in notes'
     _notes1000:
-      title: "A mountain of notes"
-      description: "Post 1,000 notes"
+      title: 'A mountain of notes'
     _notes5000:
-      title: "Overflowing notes"
-      description: "Post 5,000 notes"
+      title: 'Overflowing notes'
     _notes10000:
-      title: "Supernote"
-      description: "Post 10,000 notes"
+      title: 'Supernote'
     _notes20000:
-      title: "Need... more... notes..."
-      description: "Post 20,000 notes"
+      title: 'Need... more... notes...'
     _notes30000:
-      title: "Notes notes notes!"
-      description: "Post 30,000 notes"
+      title: 'Notes notes notes!'
     _notes40000:
-      title: "Note factory"
-      description: "Post 40,000 notes"
+      title: 'Note factory'
     _notes50000:
-      title: "Planet of notes"
-      description: "Post 50,000 notes"
+      title: 'Planet of notes'
     _notes60000:
-      title: "Note quasar"
-      description: "Post 60,000 notes"
+      title: 'Note quasar'
     _notes70000:
-      title: "Note black hole"
-      description: "Post 70,000 notes"
+      title: 'Note black hole'
     _notes80000:
-      title: "Note galaxy"
-      description: "Post 80,000 notes"
+      title: 'Note galaxy'
     _notes90000:
-      title: "Note universe"
-      description: "Post 90,000 notes"
+      title: 'Note universe'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "Post 100,000 notes"
-      flavor: "You sure have a lot to say."
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "Beginner I"
-      description: "Log in for a total of 3 days"
-      flavor: "Starting today, just call me Misskist"
+      title: 'Beginner I'
     _login7:
-      title: "Beginner II"
-      description: "Log in for a total of 7 days"
-      flavor: "Feel like you've gotten the hang of things yet?"
+      title: 'Beginner II'
     _login15:
-      title: "Beginner III"
-      description: "Log in for a total of 15 days"
+      title: 'Beginner III'
     _login30:
-      title: "Misskist I"
-      description: "Log in for a total of 30 days"
+      title: 'Misskist I'
     _login60:
-      title: "Misskist II"
-      description: "Log in for a total of 60 days"
+      title: 'Misskist II'
     _login100:
-      title: "Misskist III"
-      description: "Log in for a total of 100 days"
-      flavor: "Violent Misskist"
+      title: 'Misskist III'
     _login200:
-      title: "Regular I"
-      description: "Log in for a total of 200 days"
+      title: 'Regular I'
     _login300:
-      title: "Regular II"
-      description: "Log in for a total of 300 days"
+      title: 'Regular II'
     _login400:
-      title: "Regular III"
-      description: "Log in for a total of 400 days"
+      title: 'Regular III'
     _login500:
-      title: "Expert I"
-      description: "Log in for a total of 500 days"
-      flavor: "My friends, it has often been said that I like notes"
+      title: 'Expert I'
     _login600:
-      title: "Expert II"
-      description: "Log in for a total of 600 days"
+      title: 'Expert II'
     _login700:
-      title: "Expert III"
-      description: "Log in for a total of 700 days"
+      title: 'Expert III'
     _login800:
-      title: "Master of Notes I"
-      description: "Log in for a total of 800 days"
+      title: 'Master of Notes I'
     _login900:
-      title: "Master of Notes II"
-      description: "Log in for a total of 900 days"
+      title: 'Master of Notes II'
     _login1000:
-      title: "Master of Notes III"
-      description: "Log in for a total of 1,000 days"
-      flavor: "Thank you for using Misskey!"
+      title: 'Master of Notes III'
     _noteClipped1:
-      title: "Must... clip..."
-      description: "Clip your first note"
+      title: 'Must... clip...'
     _noteFavorited1:
-      title: "Stargazer"
-      description: "Favorite your first note"
+      title: 'Stargazer'
     _myNoteFavorited1:
-      title: "Seeking Stars"
-      description: "Have somebody else favorite one of your notes"
+      title: 'Seeking Stars'
     _profileFilled:
-      title: "Well-prepared"
-      description: "Set up your profile"
+      title: 'Well-prepared'
     _markedAsCat:
-      title: "I Am a Cat"
-      description: "Mark your account as a cat"
-      flavor: "I'll give you a name later."
+      title: 'I Am a Cat'
     _following1:
-      title: "Following your first user"
-      description: "Follow a user"
+      title: 'Following your first user'
     _following10:
-      title: "Keep up... keep up..."
-      description: "Follow 10 users"
+      title: 'Keep up... keep up...'
     _following50:
-      title: "Lots of friends"
-      description: "Follow 50 accounts"
+      title: 'Lots of friends'
     _following100:
-      title: "100 Friends"
-      description: "Follow 100 accounts"
+      title: '100 Friends'
     _following300:
-      title: "Friend overload"
-      description: "Follow 300 accounts"
+      title: 'Friend overload'
     _followers1:
-      title: "First follower"
-      description: "Gain 1 follower"
+      title: 'First follower'
     _followers10:
-      title: "Follow me!"
-      description: "Gain 10 followers"
+      title: 'Follow me!'
     _followers50:
-      title: "Coming in crowds"
-      description: "Gain 50 followers"
+      title: 'Coming in crowds'
     _followers100:
-      title: "Popular"
-      description: "Gain 100 followers"
+      title: 'Popular'
     _followers300:
-      title: "Please form a single line"
-      description: "Gain 300 followers"
+      title: 'Please form a single line'
     _followers500:
-      title: "Radio Tower"
-      description: "Gain 500 followers"
+      title: 'Radio Tower'
     _followers1000:
-      title: "Influencer"
-      description: "Gain 1,000 followers"
+      title: 'Influencer'
     _collectAchievements30:
-      title: "Achievement Collector"
-      description: "Earn 30 achievements"
+      title: 'Achievement Collector'
     _viewAchievements3min:
-      title: "Likes Achievements"
-      description: "Look at your list of achievements for at least 3 minutes"
+      title: 'Likes Achievements'
     _iLoveMisskey:
-      title: "I Love Misskey"
-      description: "Post \"I ❤ #Misskey\""
-      flavor: "Misskey's development team greatly appreciates your support!"
+      title: 'I Love Misskey'
     _foundTreasure:
-      title: "Treasure Hunt"
-      description: "You've found the hidden treasure"
+      title: 'Treasure Hunt'
     _client30min:
-      title: "Short break"
-      description: "Keep Misskey opened for at least 30 minutes"
+      title: 'Short break'
     _client60min:
-      title: "No \"Miss\" in Misskey"
-      description: "Keep Misskey opened for at least 60 minutes"
+      title: 'No "Miss" in Misskey'
     _noteDeletedWithin1min:
-      title: "Nevermind"
-      description: "Delete a note within a minute of posting it"
+      title: 'Nevermind'
     _postedAtLateNight:
-      title: "Nocturnal"
-      description: "Post a note late at night"
-      flavor: "It's about time to go to bed."
+      title: 'Nocturnal'
     _postedAt0min0sec:
-      title: "Speaking Clock"
-      description: "Post a note at 00:00"
-      flavor: "Click Click Click Claaang"
+      title: 'Speaking Clock'
     _selfQuote:
-      title: "Self-Reference"
-      description: "Quote your own note"
+      title: 'Self-Reference'
     _htl20npm:
-      title: "Flowing Timeline"
-      description: "Have the speed of your home timeline exceed 20 npm (notes per minute)"
+      title: 'Flowing Timeline'
     _viewInstanceChart:
-      title: "Analyst"
-      description: "View your instance's charts"
+      title: 'Analyst'
     _outputHelloWorldOnScratchpad:
-      title: "Hello, world!"
-      description: "Output \"hello world\" in the Scratchpad"
+      title: 'Hello, world!'
     _open3windows:
-      title: "Multi-Window"
-      description: "Have at least 3 windows open at the same time"
+      title: 'Multi-Window'
     _driveFolderCircularReference:
-      title: "Circular Reference"
-      description: "Attempt to create a recursively nested folder in Drive"
+      title: 'Circular Reference'
     _reactWithoutRead:
-      title: "Did you really read that?"
-      description: "React on a note that's over 100 characters long within 3 seconds of it being posted"
+      title: 'Did you really read that?'
     _clickedClickHere:
-      title: "Click here"
-      description: "You've clicked here"
+      title: 'Click here'
     _justPlainLucky:
-      title: "Just Plain Lucky"
-      description: "Has a chance to be obtained with a probability of 0.005% every 10 seconds"
+      title: 'Just Plain Lucky'
     _setNameToSyuilo:
-      title: "God Complex"
-      description: "Set your name to \"syuilo\""
+      title: 'God Complex'
     _passedSinceAccountCreated1:
-      title: "One Year Anniversary"
-      description: "One year has passed since your account was created"
+      title: 'One Year Anniversary'
     _passedSinceAccountCreated2:
-      title: "Two Year Anniversary"
-      description: "Two years have passed since your account was created"
+      title: 'Two Year Anniversary'
     _passedSinceAccountCreated3:
-      title: "Three Year Anniversary"
-      description: "Three years have passed since your account was created"
+      title: 'Three Year Anniversary'
     _loggedInOnBirthday:
-      title: "Happy Birthday"
-      description: "Log in on your birthday"
+      title: 'Happy Birthday'
     _loggedInOnNewYearsDay:
-      title: "Happy New Year!"
-      description: "Logged in on the first day of the year"
-      flavor: "To another great year on this instance"
+      title: 'Happy New Year!'
     _cookieClicked:
-      title: "A game in which you click cookies"
-      description: "Clicked the cookie"
-      flavor: "Wait, are you on the correct website?"
+      title: 'A game in which you click cookies'
     _brainDiver:
-      title: "Brain Diver"
-      description: "Post the link to Brain Diver"
-      flavor: "Misskey-Misskey La-Tu-Ma"
+      title: 'Brain Diver'
     _smashTestNotificationButton:
-      title: "Test overflow"
-      description: "Trigger the notification test repeatedly within an extremely short time"
+      title: 'Test overflow'
     _tutorialCompleted:
-      title: "Misskey Elementary Course Diploma"
-      description: "Tutorial completed"
+      title: 'Misskey Elementary Course Diploma'
     _bubbleGameExplodingHead:
-      title: "🤯"
-      description: "The biggest object in the bubble game"
+      title: '🤯'
     _bubbleGameDoubleExplodingHead:
-      title: "Double🤯"
-      description: "Two of the biggest objects in the bubble game at the same time"
-      flavor: "You can fill a lunch box like this 🤯 🤯 a bit."
-_role:
-  edit: "Edit role"
-  assignTarget: "Assignment type"
-  options: "Options"
-  displayOrder: "Position"
-  priority: "Priority"
-  _priority:
-    low: "Low"
-    middle: "Medium"
-    high: "High"
-  _options:
-    canManageCustomEmojis: "Can manage custom emojis"
-    canManageAvatarDecorations: "Manage avatar decorations"
-    canHideAds: "Can hide ads"
-  _condition:
-    isRemote: "Remote user"
-    isCat: "Cat Users"
-    isBot: "Bot Users"
-_ffVisibility:
-  public: "Public"
-  followers: "Visible to followers only"
-  private: "Private"
-_ad:
-  hide: "Hide"
-_email:
-  _follow:
-    title: "You've got a new follower"
-  _receiveFollowRequest:
-    title: "You've received a follow request"
-_plugin:
-  manage: "Manage plugins"
-_preferencesBackups:
-  list: "Created backups"
-  apply: "Apply to this device"
-  save: "Save changes"
-  nameAlreadyExists: "A backup called \"{name}\" already exists. Please enter a different name."
-  saveConfirm: "Save backup as {name}?"
-  deleteConfirm: "Delete the {name} backup?"
-  createdAt: "Created at: {date} {time}"
-  updatedAt: "Updated at: {date} {time}"
-  cannotLoad: "Loading failed"
-_aboutMisskey:
-  contributors: "Main contributors"
-_menuDisplay:
-  top: "Top"
-  hide: "Hide"
-_theme:
-  base: "Base"
-  addConstant: "Add constant"
-  constant: "Constant"
-  defaultValue: "Default value"
-  refProp: "Reference a property"
-  refConst: "Reference a constant"
-  key: "Key"
-  func: "Functions"
-  funcKind: "Function type"
-  argument: "Argument"
-  basedProp: "Referenced property"
-  darken: "Darken"
-  inputConstantName: "Enter a name for this constant"
-  importInfo: "If you enter theme code here, you can import it to the theme editor"
-  deleteConstantConfirm: "Do you really want to delete the constant {const}?"
-  keys:
-    accent: "Accent"
-    bg: "Background"
-    fg: "Text"
-    focus: "Focus"
-    indicator: "Indicator"
-    panel: "Panel"
-    shadow: "Shadow"
-    navBg: "Sidebar background"
-    navFg: "Sidebar text"
-    navActive: "Sidebar text (Active)"
-    navIndicator: "Sidebar indicator"
-    link: "Link"
-    hashtag: "Hashtag"
-    mention: "Mention"
-    mentionMe: "Mentions (Me)"
-    renote: "Renote"
-    modalBg: "Modal background"
-    divider: "Divider"
-    scrollbarHandle: "Scrollbar handle"
-    scrollbarHandleHover: "Scrollbar handle (Hover)"
-    dateLabelFg: "Date label text"
-    infoBg: "Information background"
-    infoFg: "Information text"
-    infoWarnBg: "Warning background"
-    infoWarnFg: "Warning text"
-    toastBg: "Notification background"
-    toastFg: "Notification text"
-    buttonBg: "Button background"
-    buttonHoverBg: "Button background (Hover)"
-    inputBorder: "Input field border"
-    badge: "Badge"
-    messageBg: "Chat background"
-    fgHighlighted: "Highlighted Text"
-_ago:
-  future: "Future"
-_permissions:
-  "read:account": "View your account information"
-  "write:account": "Edit your account information"
-  "read:blocks": "View your list of blocked users"
-  "write:blocks": "Edit your list of blocked users"
-  "read:drive": "Access your Drive files and folders"
-  "write:drive": "Edit or delete your Drive files and folders"
-  "read:favorites": "View your list of favorites"
-  "write:favorites": "Edit your list of favorites"
-  "read:following": "View information on who you follow"
-  "write:following": "Follow or unfollow other accounts"
-  "read:messaging": "View your chats"
-  "write:messaging": "Compose or delete chat messages"
-  "read:mutes": "View your list of muted users"
-  "write:mutes": "Edit your list of muted users"
-  "write:notes": "Compose or delete notes"
-  "read:notifications": "View your notifications"
-  "write:notifications": "Manage your notifications"
-  "read:reactions": "View your reactions"
-  "write:reactions": "Edit your reactions"
-  "write:votes": "Vote on a poll"
-  "read:pages": "View your Pages"
-  "write:pages": "Edit or delete your Pages"
-  "read:page-likes": "View list of liked Pages"
-  "write:page-likes": "Edit list of liked Pages"
-  "read:user-groups": "View your user groups"
-  "write:user-groups": "Edit or delete your user groups"
-  "read:channels": "View your channels"
-  "write:channels": "Edit your channels"
-  "read:gallery": "View your gallery"
-  "write:gallery": "Edit your gallery"
-  "read:gallery-likes": "View your list of liked gallery posts"
-  "write:gallery-likes": "Edit your list of liked gallery posts"
-  "write:admin:delete-account": "Delete user account"
-  "write:admin:roles": "Manage roles"
-  "read:admin:roles": "View roles"
-  "write:chat": "Compose or delete chat messages"
-_profile:
-  username: "Username"
-  metadata: "Additional Information"
-_charts:
-  filesTotal: "Total number of files"
-_play:
-  created: "Play created"
-  updated: "Play edited"
-  deleted: "Play deleted"
-  pageSetting: "Play settings"
-_pages:
-  newPage: "Create a new Page"
-  editPage: "Edit this Page"
-  readPage: "Viewing this Page's source"
-  pageSetting: "Page settings"
-  nameAlreadyExists: "The specified Page URL already exists"
-  invalidNameTitle: "The specified Page URL is invalid"
-  invalidNameText: "Make sure the Page title is not empty"
-  editThisPage: "Edit this Page"
-  viewSource: "View source"
-  viewPage: "View your Pages"
-  like: "Like"
-  unlike: "Remove like"
-  my: "My Pages"
-  liked: "Liked Pages"
-  featured: "Popular"
-  inspector: "Inspector"
-  contents: "Contents"
-  content: "Page block"
-  variables: "Variables"
-  title: "Title"
-  url: "Page URL"
-  summary: "Page summary"
-  alignCenter: "Center elements"
-  hideTitleWhenPinned: "Hide Page title when pinned to profile"
-  font: "Font"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  eyeCatchingImageSet: "Set thumbnail"
-  eyeCatchingImageRemove: "Delete thumbnail"
-  chooseBlock: "Add a block"
-  selectType: "Select a type"
-  contentBlocks: "Content"
-  inputBlocks: "Input"
-  specialBlocks: "Special"
-  blocks:
-    text: "Text"
-    textarea: "Text area"
-    section: "Section"
-    image: "Images"
-    button: "Button"
-    note: "Embedded note"
-    _note:
-      id: "Note ID"
-      idDescription: "You can alternatively paste the note URL here."
-      detailed: "Detailed view"
+      title: 'Double🤯'
 _notification:
-  fileUploaded: "File successfully uploaded"
-  youGotMention: "{name} mentioned you"
-  youGotReply: "{name} replied to you"
-  youGotQuote: "{name} quoted you"
-  youRenoted: "Renote from {name}"
-  youWereFollowed: "followed you"
-  youReceivedFollowRequest: "You've received a follow request"
-  yourFollowRequestAccepted: "Your follow request was accepted"
-  pollEnded: "Poll results have become available"
-  newNote: "New note"
-  unreadAntennaNote: "Antenna {name}"
-  emptyPushNotificationMessage: "Push notifications have been updated"
-  achievementEarned: "Achievement unlocked"
-  testNotification: "Test notification"
-  notificationWillBeDisplayedLikeThis: "Notifications look like this"
-  exportOfXCompleted: "Export of {x} has been completed"
-  login: "Someone logged in"
-  _types:
-    all: "All"
-    note: "New notes"
-    follow: "New followers"
-    mention: "Mentions"
-    reply: "Replies"
-    renote: "Renotes"
-    quote: "Quotes"
-    reaction: "Reactions"
-    pollEnded: "Polls ending"
-    scheduledNotePosted: "Scheduled note was successful"
-    scheduledNotePostFailed: "Scheduled note failed"
-    receiveFollowRequest: "Received follow requests"
-    followRequestAccepted: "Accepted follow requests"
-    roleAssigned: "Role given"
-    chatRoomInvitationReceived: "Invited to chat room"
-    achievementEarned: "Achievement unlocked"
-    exportCompleted: "The export has been completed"
-    login: "Sign In"
-    createToken: "Create access token"
-    test: "Notification test"
-    app: "Notifications from linked apps"
+  youGotMention: '{name} mentioned you'
+  youGotReply: '{name} replied to you'
+  youGotQuote: '{name} quoted you'
+  youRenoted: 'Renote from {name}'
+  youWereFollowed: 'followed you'
+  youReceivedFollowRequest: 'You''ve received a follow request'
+  yourFollowRequestAccepted: 'Your follow request was accepted'
+  pollEnded: 'Poll results have become available'
+  newNote: 'New note'
+  unreadAntennaNote: 'Antenna {name}'
+  achievementEarned: 'Achievement unlocked'
+  testNotification: 'Test notification'
+  notificationWillBeDisplayedLikeThis: 'Notifications look like this'
+  exportOfXCompleted: 'Export of {x} has been completed'
+  login: 'Someone logged in'
   _actions:
-    followBack: "followed you back"
-    reply: "Reply"
-    renote: "Renote"
-_moderationLogTypes:
-  suspend: "Suspended"
-  deleteNote: "Note deleted"
-  deleteUserAnnouncement: "User announcement deleted"
-  resetPassword: "Password reset"
-  resolveAbuseReport: "Report resolved"
-  createInvitation: "Invite generated"
-  deleteGalleryPost: "Gallery post deleted"
-_fileViewer:
-  url: "URL"
-_externalResourceInstaller:
-  _vendorInfo:
-    title: "Distributor information"
-  _errors:
-    _themeInstallFailed:
-      title: "Failed to install theme"
-      description: "A problem occurred during theme installation. Please try again. Error details can be viewed in the Javascript console."
-_reversi:
-  reversi: "Reversi"
+    followBack: 'followed you back'
+    reply: 'Reply'
+    renote: 'Renote'
 _offlineScreen:
-  title: "Offline - cannot connect to the server"
-  header: "Unable to connect to the server"
-_gridComponent:
-  _error:
-    columnTypeNotSupport: "Validation with regular expression is supported only for type:text columns."
-_embedCodeGen:
-  autoload: "Automatically load more (deprecated)"
-_selfXssPrevention:
-  warning: "WARNING"
-  title: "\"Paste something on this screen\" is all a scam."
-  description1: "If you paste something here, a malicious user could hijack your account or steal your personal information."
-  description2: "If you do not understand exactly what you are trying to paste, %cstop working right now and close this window."
-  description3: "For more information, please refer to this. {link}"
-_bootErrors:
-  title: "Failed to load"
-  serverError: "If the problem persists after waiting a moment and reloading, please contact the server administrator with the following Error ID."
-  solution: "The following may solve the problem."
-  solution1: "Update your browser and OS to the latest version"
-  solution2: "Disable ad blocker"
-  solution3: "Clear the browser cache"
-  solution4: "Set the dom.webaudio.enabled to true for Tor Browser"
-  otherOption: "Other options"
-  otherOption1: "Delete client settings and cache"
-  otherOption2: "Start the simple client"
-  otherOption3: "Launch the repair tool"
-  otherOption4: "Launch Misskey in safe mode"
-_watermarkEditor:
-  advanced: "Advanced"
-_imageEffector:
-  _fxProps:
-    radius: "Radius"
-    samples: "Sample count"
-    threshold: "Threshold"
-_drafts:
-  select: "Select Draft"
-  schedule: "Schedule note"
+  title: 'Offline - cannot connect to the server'
+  header: 'Unable to connect to the server'
+next: 'Next'
+upload: 'Upload'
+preview: 'Preview'
+reset: 'Reset'
+name: 'Name'
+title: 'Title'
+description: 'Description'
+none: 'None'
+all: 'All'
+default: 'Default'
+error: 'Error'
+users: 'Users'
+areYouSure: 'Are you sure?'

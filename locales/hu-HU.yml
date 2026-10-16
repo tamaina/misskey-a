@@ -1,30 +1,12 @@
----
-_lang_: "Magyar"
-monthAndDay: "{month}.{day}."
-search: "Keresés"
-ok: "OK"
-cancel: "Mégse"
-notificationSettings: "Értesítés beállításai"
-uploading: "Feltöltés"
-save: "Mentés"
-favorites: "Kedvencek"
-favorited: "Kedvencek közé rakva."
-alreadyFavorited: "Már a kedvencek között van."
-delete: "Törlés"
-pinned: "Rögzítés"
-instances: "Szerver"
-smtpUser: "Felhasználónév"
-smtpPass: "Jelszó"
-_theme:
-  keys:
-    renote: "Renote"
-_profile:
-  username: "Felhasználónév"
+_lang_: 'Magyar'
+search: 'Keresés'
+ok: 'OK'
+cancel: 'Mégse'
+notificationSettings: 'Értesítés beállításai'
+save: 'Mentés'
+favorites: 'Kedvencek'
+delete: 'Törlés'
 _notification:
-  _types:
-    renote: "Renote"
-    quote: "Idézet"
-    reaction: "Reakciók"
-    login: "Bejelentkezés"
   _actions:
-    renote: "Renote"
+    renote: 'Renote'
+users: 'Felhasználók'

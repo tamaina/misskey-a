@@ -1,15 +1,7 @@
----
-_lang_: "සිංහල"
-monthAndDay: "{month}-{day}"
-search: "සොයන්න"
-ok: "හරි"
-cancel: "අවලංගු කරන්න"
-notes: "නෝට්"
-instances: "සර්වර්"
-smtpUser: "පරිශීලක නාමය"
-smtpPass: "මුරපදය"
-_profile:
-  username: "පරිශීලක නාමය"
-_notification:
-  _types:
-    login: "පිවිසෙන්න"
+_lang_: 'සිංහල'
+search: 'සොයන්න'
+ok: 'හරි'
+cancel: 'අවලංගු කරන්න'
+notes: 'නෝට්'
+reset: 'යළි සකසන්න'
+users: 'පරිශීලක'

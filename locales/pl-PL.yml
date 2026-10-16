@@ -1,334 +1,50 @@
----
-_lang_: "Polski"
-monthAndDay: "{month}-{day}"
-search: "Szukaj"
-ok: "OK"
-cancel: "Anuluj"
-notificationSettings: "Powiadomienia"
-uploading: "Wysyłanie"
-save: "Zapisz"
-favorites: "Ulubione"
-favorited: "Dodano do ulubionych."
-alreadyFavorited: "Już jest w ulubionych."
-delete: "Usuń"
-searchUser: "Wyszukiwanie użytkowników"
-showLess: "Zamknij"
-lists: "Listy"
-notes: "Wpisy"
-following: "Obserwowani"
-somethingHappened: "Coś poszło nie tak"
-pinned: "Przypnij do profilu"
-emojiPicker: "Selektor Emoji"
-unsuspend: "Cofnij zawieszenie"
-customEmojis: "Niestandardowe emoji"
-emojis: "Emoji"
-emojiName: "Nazwa emoji"
-loginFailed: "Nie udało się zalogować"
-wallpaper: "Tapeta"
-instances: "Instancja"
-latestStatus: "Najnowszy status"
-operations: "Działania"
-monitor: "Monitor"
-network: "Sieć"
-disk: "Dysk"
-mutedUsers: "Wyciszeni użytkownicy"
-blockedUsers: "Zablokowani użytkownicy"
-changePassword: "Zmień hasło"
-retypedNotMatch: "Wejście nie zgadza się."
-currentPassword: "Obecne hasło"
-newPasswordRetype: "Powtórz nowe hasło"
-removed: "Pomyślnie usunięto"
-home: "Strona główna"
-reload: "Odśwież"
-watch: "Śledź"
-unwatch: "Przestań śledzić"
-accept: "Akceptuj"
-reject: "Odrzuć"
-integration: "Integracja"
-pinnedPages: "Przypięte strony"
-pinnedClipId: "ID przypiętego klipu"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Włącz hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "Włącz mCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Włącz reCAPTCHA"
-turnstile: "Turnstile"
-enableTurnstile: "Włącz Turnstile"
-antennas: "Anteny"
-close: "Zamknij"
-invites: "Zaproś"
-transfer: "Transfer"
-signinFailed: "Nie udało się zalogować. Wprowadzona nazwa użytkownika lub hasło są nieprawidłowe."
-noHistory: "Brak historii"
-signinHistory: "Historia logowania"
-regenerate: "Wygeneruj ponownie"
-appearance: "Wygląd"
-promotion: "Promowane"
-promote: "Promuj"
-hideThisNote: "Ukryj ten wpis"
-showFeaturedNotesInTimeline: "Pokazuj wyróżnione wpisy w osi czasu"
-deleteAll: "Usuń wszystkie"
-showFixedPostForm: "Wyświetlaj formularz tworzenia wpisu w górnej części osi czasu"
-deleteAllFiles: "Usuń wszystkie pliki"
-leaveConfirm: "Są niezapisane zmiany. Czy chcesz je odrzucić?"
-notificationType: "Rodzaj powiadomień"
-edit: "Edytuj"
-emailServer: "Serwer poczty e-mail"
-enableEmail: "Włącz dostarczanie wiadomości e-mail"
-emailConfigInfo: "Wykorzystywany do potwierdzenia adresu e-mail w trakcie rejestracji, lub gdy zapomnisz hasła"
-emailAddress: "Adres e-mail"
-smtpConfig: "Konfiguracja serwera SMTP"
-smtpHost: "Host"
-smtpPort: "Port"
-smtpUser: "Nazwa użytkownika"
-smtpPass: "Hasło"
-emptyToDisableSmtpAuth: "Pozostaw adres e-mail i hasło puste, aby wyłączyć weryfikację SMTP"
-smtpSecure: "Użyj niejawnego SSL/TLS dla połączeń SMTP"
-smtpSecureInfo: "Wyłącz, jeżeli używasz STARTTLS"
-testEmail: "Przetestuj dostarczanie wiadomości e-mail"
-copy: "Kopiuj"
-metrics: "Pomiary"
-delayed: "Opóźnione"
-regenerateLoginToken: "Generuj token logowania ponownie"
-regenerateLoginTokenDescription: "Regeneruje token używany wewnętrznie podczas logowania. Zazwyczaj nie jest to konieczne. Po regeneracji wszystkie urządzenia zostaną wylogowane."
-sample: "Przykład"
-repliesCount: "Liczba wysłanych odpowiedzi"
-repliedCount: "Liczba otrzymanych odpowiedzi"
-followingCount: "Liczba obserwowanych kont"
-followersCount: "Liczba obserwujących"
-pollVotesCount: "Liczba wysłanych głosów w ankietach"
-driveUsage: "Użycie przestrzeni dyskowej"
-clips: "Klipy"
-experimental: "Eksperymentalne"
-wide: "Szerokie"
-narrow: "Wąskie"
-sendErrorReports: "Wyślij raporty o błędach"
-sendErrorReportsDescription: "Gdy włączone, jeśli wystąpi problem, szczegółowe informacje o błędach będą udostępniane Misskey, pomagając ulepszyć jakość Misskey.\nBędzie to zawierało informacje takie jak wersja twojego systemu operacyjnego, jakiej przeglądarki używasz, twoja aktywność w Misskey, itd."
-advanced: "Zaawansowane"
-markAllAsRead: "Oznacz wszystkie jako przeczytane"
-onlineStatus: "Status online"
-global: "Globalna"
-sent: "Wyślij"
-received: "Otrzymane"
-aiChanMode: "Tryb Ai"
-unread: "Nieodczytane"
-classic: "Klasyczny"
-incorrectTotp: "Hasło pojedynczego użytku jest nie poprawne, lub straciło ważność"
-rateLimitExceeded: "Limit szybkości przekroczony"
-recommended: "Zalecane"
-undefined: "Niezdefiniowane"
-_chat:
-  invitations: "Zaproś"
-  noHistory: "Brak historii"
-  members: "Członkowie"
-  home: "Strona główna"
-  send: "Wyślij"
-_role:
-  assignTarget: "Przydziel"
-  priority: "Priorytet"
-  _priority:
-    low: "Niski"
-    middle: "Średnie"
-    high: "Wysoki"
-  _options:
-    canManageCustomEmojis: "Zarządzaj niestandardowymi Emoji"
-    canManageAvatarDecorations: "Zarządzaj dekoracjami awatara"
-_ffVisibility:
-  public: "Publiczne"
-  followers: "Widoczne tylko dla obserwujących"
-  private: "Prywatne"
-_ad:
-  hide: "Nigdy nie pokazuj"
-_email:
-  _follow:
-    title: "Zaobserwował(a) Cię"
-  _receiveFollowRequest:
-    title: "Otrzymano prośbę o możliwość obserwacji"
-_plugin:
-  manage: "Zarządzanie wtyczkami"
-_preferencesBackups:
-  list: "Utworzone kopie zapasowe"
-  apply: "Zastosuj do tego urządzenia"
-  save: "Zapisz zmiany"
-  nameAlreadyExists: "Kopia zapasowa o nazwie \"{name}\" już istnieje. Proszę podać inną nazwę."
-  saveConfirm: "Zapisać kopię zapasową jako {name}?"
-  deleteConfirm: "Usunąć kopię zapasową {name}?"
-  createdAt: "Utworzony w: {date} {time}"
-  updatedAt: "Zaktualizowano w: {date} {time}"
-  cannotLoad: "Ładowanie nie powiodło się"
-_aboutMisskey:
-  contributors: "Główni twórcy"
-_menuDisplay:
-  top: "Góra"
-  hide: "Ukryj"
-_theme:
-  base: "Podstawowy"
-  addConstant: "Dodaj stałą"
-  constant: "Stała"
-  defaultValue: "Domyślna wartość"
-  refProp: "Nawiąż do właściwości"
-  refConst: "Nawiąż do stałej"
-  key: "Klucz"
-  func: "Funkcje"
-  funcKind: "Rodzaj funkcji"
-  argument: "Argument"
-  basedProp: "Nawiązana właściwość"
-  darken: "Ściemnij"
-  inputConstantName: "Wprowadź nazwę stałej"
-  importInfo: "Jeżeli wprowadzisz tu kod motywu, możesz zaimportować go w edytorze motywu"
-  deleteConstantConfirm: "Czy na pewno chcesz usunąć stała {const}?"
-  keys:
-    accent: "Akcent"
-    bg: "Tło"
-    fg: "Tekst"
-    focus: "Skupienie"
-    indicator: "Wskaźnik"
-    panel: "Panel"
-    shadow: "Cień"
-    navBg: "Tło paska bocznego"
-    navFg: "Tekst paska bocznego"
-    navActive: "Tekst paska bocznego (aktywny)"
-    navIndicator: "Wskaźnik paska bocznego"
-    link: "Odnośnik"
-    hashtag: "Hashtag"
-    mention: "Wspomnij"
-    mentionMe: "Wspomnienia (ja)"
-    renote: "Udostępnij"
-    modalBg: "Tło modalu"
-    divider: "Rozdzielacz"
-    scrollbarHandle: "Uchwyt paska przewijania"
-    scrollbarHandleHover: "Uchwyt paska przewijania (po najechaniu)"
-    dateLabelFg: "Tekst z datą"
-    infoBg: "Tło informacji"
-    infoFg: "Tekst informacji"
-    infoWarnBg: "Tło ostrzeżenia"
-    infoWarnFg: "Tekst ostrzeżenia"
-    toastBg: "Tło powiadomień"
-    toastFg: "Tekst powiadomień"
-    buttonBg: "Tło przycisku"
-    buttonHoverBg: "Tło przycisku (po najechaniu)"
-    inputBorder: "Obramowanie pola wejścia"
-    badge: "Odznaka"
-    messageBg: "Tło czatu"
-    fgHighlighted: "Wyróżniony tekst"
-_ago:
-  future: "W przyszłości"
-_permissions:
-  "read:account": "Wyświetl informacje o swoim koncie"
-  "write:account": "Edytuj swoje informacje o koncie"
-  "read:blocks": "Zobacz listę osób, które zablokowałeś(-aś)"
-  "write:blocks": "Edytuj listę osób, które zablokowałeś(-aś)"
-  "read:drive": "Dostęp do plików i katalogów ze Twojego dysku"
-  "write:drive": "Edycja i usuwanie plików i katalogów z Twojego dysku."
-  "read:favorites": "Wyświetlanie Twojej listy ulubionych."
-  "write:favorites": "Edycja Twojej listy ulubionych."
-  "read:following": "Wyświetlanie informacji o obserwowanych"
-  "write:following": "Obserwowanie lub cofanie obserwacji innych kont"
-  "read:messaging": "Zobacz swoje czaty"
-  "write:messaging": "Tworzenie lub usuwanie wiadomości czatu"
-  "read:mutes": "Wyświetlanie listy osób, które wyciszyłeś(-aś)"
-  "write:mutes": "Edycja listy osób, które wyciszyłeś(-aś)"
-  "write:notes": "Tworzenie lub usuwanie wpisów"
-  "read:notifications": "Wyświetlanie powiadomień"
-  "write:notifications": "Działanie na powiadomieniach"
-  "read:reactions": "Wyświetlanie reakcji"
-  "write:reactions": "Edycja reakcji"
-  "write:votes": "Głosowanie w ankiecie"
-  "read:pages": "Wyświetlanie Twoich stron"
-  "write:pages": "Edycja lub usuwanie Twoich stron"
-  "read:page-likes": "Wyświetlanie polubień na stronach"
-  "write:page-likes": "Edycja polubień na stronach"
-  "read:user-groups": "Wyświetlanie grup użytkownika"
-  "write:user-groups": "Edycja lub usuwanie grup użytkownika"
-  "read:channels": "Zobacz swoje kanały"
-  "write:channels": "Edytuj swoje kanały"
-  "read:gallery": "Zobacz swoją galerię"
-  "write:gallery": "Edytuj swoją galerię"
-  "read:gallery-likes": "Wyświetlanie listy polubionych postów w galerii"
-  "write:gallery-likes": "Edytowanie listy polubionych postów w galerii"
-  "write:chat": "Tworzenie lub usuwanie wiadomości czatu"
-_profile:
-  username: "Nazwa użytkownika"
-  metadata: "Dodatkowe informacje"
-_charts:
-  filesTotal: "Całkowita liczba plików"
-_pages:
-  newPage: "Utwórz stronę"
-  editPage: "Edytuj tę stronę"
-  readPage: "Aktywowano widok źródła"
-  pageSetting: "Ustawienia strony"
-  nameAlreadyExists: "Określony adres URL strony już istnieje"
-  invalidNameTitle: "Podany adres URL strony jest nieprawidłowy"
-  invalidNameText: "Sprawdź, czy nie jest puste"
-  editThisPage: "Edytuj tę stronę"
-  viewSource: "Zobacz źródło"
-  viewPage: "Wyświetlanie Twoich stron"
-  like: "Lubię"
-  unlike: "Cofnij polubienie"
-  my: "Moje strony"
-  liked: "Polubione strony"
-  featured: "Wyróżnione"
-  inspector: "Inspektor"
-  contents: "Zawartość"
-  content: "Blokada strony"
-  variables: "Zmienne"
-  title: "Tytuł"
-  url: "URL strony"
-  summary: "Podsumowanie strony"
-  alignCenter: "Wyśrodkuj elementy"
-  hideTitleWhenPinned: "Ukryj tytuł strony, gdy przypięta do profilu"
-  font: "Czcionka"
-  fontSerif: "Szeryfowa"
-  fontSansSerif: "Bezszeryfowa"
-  eyeCatchingImageSet: "Ustaw przyciągające wzrok zdjęcie"
-  eyeCatchingImageRemove: "Usuń przyciągające wzrok zdjęcie"
-  chooseBlock: "Dodaj blok"
-  selectType: "Wybierz typ"
-  contentBlocks: "Zawartość"
-  inputBlocks: "Wejście"
-  specialBlocks: "Specjalne"
-  blocks:
-    text: "Tekst"
-    textarea: "Pole tekstowe"
-    section: "Sekcja"
-    image: "Zdjęcia"
-    button: "Przycisk"
-    note: "Osadzony wpis"
-    _note:
-      id: "ID wpisu"
-      idDescription: "Możesz też wkleić adres URL wpisu, aby go ustawić."
-      detailed: "Szczegółowy widok"
+_lang_: 'Polski'
+search: 'Szukaj'
+ok: 'OK'
+cancel: 'Anuluj'
+notificationSettings: 'Powiadomienia'
+save: 'Zapisz'
+favorites: 'Ulubione'
+delete: 'Usuń'
+lists: 'Listy'
+notes: 'Wpisy'
+following: 'Obserwowani'
+somethingHappened: 'Coś poszło nie tak'
+customEmojis: 'Niestandardowe emoji'
+mutedUsers: 'Wyciszeni użytkownicy'
+blockedUsers: 'Zablokowani użytkownicy'
+reload: 'Odśwież'
+accept: 'Akceptuj'
+reject: 'Odrzuć'
+antennas: 'Anteny'
+close: 'Zamknij'
+edit: 'Edytuj'
+copy: 'Kopiuj'
+clips: 'Klipy'
+markAllAsRead: 'Oznacz wszystkie jako przeczytane'
 _notification:
-  fileUploaded: "Pomyślnie wysłano plik"
-  youGotMention: "{name} wspomniał(a) o Tobie"
-  youGotReply: "{name} odpowiedział(a) Tobie"
-  youGotQuote: "{name} zacytował(a) Ciebie"
-  youRenoted: "{name} udostępnił(a) Twój wpis"
-  youWereFollowed: "Zaobserwował(a) Cię"
-  youReceivedFollowRequest: "Otrzymałeś(-aś) prośbę o możliwość obserwacji"
-  yourFollowRequestAccepted: "Twoja prośba o możliwość obserwacji została przyjęta"
-  pollEnded: "Wyniki ankiety stały się dostępne"
-  unreadAntennaNote: "Antena {name}"
-  emptyPushNotificationMessage: "Powiadomienia push zostały zaktualizowane"
-  _types:
-    all: "Wszystkie"
-    follow: "Nowi obserwujący"
-    mention: "Wspomnij"
-    reply: "Odpowiedzi"
-    renote: "Udostępnij"
-    quote: "Cytuj"
-    reaction: "Reakcja"
-    receiveFollowRequest: "Otrzymano prośbę o możliwość obserwacji"
-    followRequestAccepted: "Przyjęto prośbę o możliwość obserwacji"
-    login: "Zaloguj się"
-    app: "Powiadomienia z aplikacji"
+  youGotMention: '{name} wspomniał(a) o Tobie'
+  youGotReply: '{name} odpowiedział(a) Tobie'
+  youGotQuote: '{name} zacytował(a) Ciebie'
+  youRenoted: '{name} udostępnił(a) Twój wpis'
+  youWereFollowed: 'Zaobserwował(a) Cię'
+  youReceivedFollowRequest: 'Otrzymałeś(-aś) prośbę o możliwość obserwacji'
+  yourFollowRequestAccepted: 'Twoja prośba o możliwość obserwacji została przyjęta'
+  pollEnded: 'Wyniki ankiety stały się dostępne'
+  unreadAntennaNote: 'Antena {name}'
   _actions:
-    followBack: "zaobserwował cię z powrotem"
-    reply: "Odpowiedz"
-    renote: "Udostępnij"
-_moderationLogTypes:
-  suspend: "Zawieś"
-  resetPassword: "Zresetuj hasło"
-_watermarkEditor:
-  advanced: "Zaawansowane"
+    followBack: 'zaobserwował cię z powrotem'
+    reply: 'Odpowiedz'
+    renote: 'Udostępnij'
+next: 'Dalej'
+upload: 'Wyślij'
+preview: 'Podgląd'
+name: 'Nazwa'
+title: 'Tytuł'
+description: 'Opis'
+none: 'Brak'
+all: 'Wszystkie'
+default: 'Domyślne'
+error: 'Błąd'
+users: 'Użytkownicy'
+areYouSure: 'Na pewno?'

@@ -1,312 +1,48 @@
----
-_lang_: "বাংলা"
-monthAndDay: "{day}/{month}"
-search: "খুঁজুন"
-ok: "ঠিক"
-cancel: "বাতিল"
-notificationSettings: "বিজ্ঞপ্তির সেটিংস"
-uploading: "আপলোড হচ্ছ …"
-save: "সংরক্ষণ"
-favorites: "পছন্দগুলি"
-favorited: "পছন্দ করা হয়েছে"
-alreadyFavorited: "ইতিমধ্যে পছন্দ করা হয়েছে"
-delete: "মুছুন"
-searchUser: "ব্যবহারকারী খুঁজুন..."
-showLess: "বন্ধ"
-lists: "লিস্ট"
-notes: "নোটগুলি"
-following: "অনুসরণ করা হচ্ছে"
-somethingHappened: "একটি ত্রুটি হয়েছে"
-pinned: "পিন করা"
-emojiPicker: "ইমোজি পিকার"
-unsuspend: "অস্থগিত করা"
-customEmojis: "স্বনির্ধারিত ইমোজিগুলি"
-emojis: "ইমোজিগুলি"
-emojiName: "ইমোজির নাম"
-loginFailed: "প্রবেশ করা যায়নি"
-wallpaper: "ওয়ালপেপার"
-instances: "ইন্সট্যান্স"
-latestStatus: "সর্বশেষ অবস্থা"
-operations: "ক্রিয়াকলাপ"
-monitor: "মনিটর"
-network: "নেটওয়ার্ক"
-disk: "ডিস্ক"
-mutedUsers: "নিঃশব্দকৃত ব্যবহারকারী"
-blockedUsers: "যাদের ব্লক করা হয়েছে"
-changePassword: "পাসওয়ার্ড পরিবর্তন করুন"
-retypedNotMatch: "ইনপুট মেলে না।"
-currentPassword: "বর্তমান পাসওয়ার্ড"
-newPasswordRetype: "নতুন পাসওয়ার্ড (পুনরায় লিখুন)"
-removed: "সরানো হয়েছে"
-home: "মূল পাতা"
-reload: "আবার লোড করুন"
-watch: "বিজ্ঞপ্তি পান"
-unwatch: "বিজ্ঞপ্তি পাওয়া বন্ধ করুন "
-accept: "অনুমোদন"
-reject: "প্রত্যাখ্যান"
-integration: "ইন্টিগ্রেশন"
-pinnedPages: "পিন করা পৃষ্ঠাসুমহ"
-pinnedClipId: "পিনকৃত ক্লিপের ID"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "hCaptcha চালু করুন"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "reCAPTCHA চালু করুন"
-antennas: "অ্যান্টেনা"
-close: "বন্ধ"
-invites: "আমন্ত্রণ"
-transfer: "হস্তান্তর"
-signinFailed: "লগ ইন করা যায়নি। আপনার ব্যবহারকারীর নাম এবং পাসওয়ার্ড চেক করুন."
-noHistory: "কোনো ইতিহাস নেই"
-signinHistory: "প্রবেশ করার ইতিহাস"
-regenerate: "আবারও তৈরি করুন"
-appearance: "অবয়ব"
-promotion: "প্রমোশন"
-promote: "প্রচার করুন"
-hideThisNote: "নোটটি লুকান"
-showFeaturedNotesInTimeline: "টাইমলাইনে সুপারিশকৃত নোটগুলি দেখান"
-deleteAll: "সব মুছুন"
-showFixedPostForm: "টাইমলাইনের শীর্ষে পোস্ট করার ফর্মটি দেখান"
-deleteAllFiles: "সকল ফাইল ডিলিট করুন"
-leaveConfirm: "কিছু পরিবর্তন সেভ করা হয়নি। আপনি কি চলে যেতে চান?"
-notificationType: "বিজ্ঞপ্তির ধরন"
-edit: "সম্পাদনা"
-emailServer: "ইমেইল সার্ভার"
-enableEmail: "ইমেইল বিতরণ চালু করুন"
-emailConfigInfo: "আপনার ইমেল ঠিকানা নিশ্চিত করতে এবং আপনার পাসওয়ার্ড পুনরায় সেট করতে ব্যবহৃত হয়"
-emailAddress: "ইমেইল ঠিকানা"
-smtpConfig: "SMTP সার্ভার কনফিগারেশন"
-smtpHost: "হোস্ট"
-smtpPort: "পোর্ট"
-smtpUser: "ব্যবহারকারীর নাম"
-smtpPass: "পাসওয়ার্ড"
-emptyToDisableSmtpAuth: "আপনি ব্যবহারকারীর নাম এবং পাসওয়ার্ড ফাঁকা রেখে SMTP প্রমাণীকরণ নিষ্ক্রিয় করতে পারেন।"
-smtpSecure: "SMTP সংযোগের জন্য SSL/TLS ব্যবহার করুন"
-smtpSecureInfo: "STARTTLS ব্যবহার করার সময় এটি বন্ধ করুন।"
-testEmail: "ইমেল বিতরণ পরীক্ষা করুন"
-copy: "অনুলিপি"
-metrics: "মেট্রিক্স"
-delayed: "দেরি করুন"
-regenerateLoginToken: "লগইন টোকেন আবার বানান"
-regenerateLoginTokenDescription: "লগ ইন করার জন্য ব্যবহৃত অভ্যন্তরীণ টোকেন পুনরায় তৈরি করে। সাধারণত আপনার এটি করার দরকার নেই। এটি করলে, আপনি সমস্ত ডিভাইসে লগ আউট হয়ে যাবেন৷"
-sample: "উদাহরণ"
-repliesCount: "জবাবের সংখ্যা"
-repliedCount: "জবাব গ্রহন করা হয়েছে"
-followingCount: "যাদেরকে অনুসরণ করেন, তাদের সংখ্যা"
-followersCount: "অনুসরণকারীদের সংখ্যা"
-pollVotesCount: "পোল ভোট দিয়েছেন"
-driveUsage: "ড্রাইভ এর ব্যাবহার"
-clips: "ক্লিপগুলি "
-wide: "চওড়া"
-narrow: "সংকীর্ণ"
-sendErrorReports: "ক্রুটি প্রতিবেদন পাঠান"
-sendErrorReportsDescription: "চালু থাকলে, বিস্তারিত ত্রুটির তথ্য Misskey-এর সাথে শেয়ার করা হয়। যা সফ্টওয়্যারটির গুণমান উন্নত করতে সাহায্য করে। ত্রুটির তথ্যের মধ্যে রয়েছে OS সংস্করণ, ব্রাউজারের ধরন, কর্মের ইতিহাস ইত্যাদি।"
-advanced: "উন্নত"
-markAllAsRead: "সব পঠিত হিসেবে চিহ্নিত করুন"
-onlineStatus: "অনলাইন স্ট্যাটাস"
-global: "গ্লোবাল"
-sent: "পাঠান"
-received: "প্রাপ্ত"
-aiChanMode: "Ai মোড"
-unread: "অপঠিত"
-classic: "ক্লাসিক"
-rateLimitExceeded: "রেট লিমিট ছাড়িয়ে গেছে "
-_chat:
-  invitations: "আমন্ত্রণ"
-  noHistory: "কোনো ইতিহাস নেই"
-  members: "সদস্যবৃন্দ"
-  home: "মূল পাতা"
-  send: "পাঠান"
-_role:
-  priority: "অগ্রাধিকার"
-  _priority:
-    low: "নিম্ন"
-    middle: "মাঝারি"
-    high: "উচ্চ"
-_ffVisibility:
-  public: "প্রকাশ"
-  followers: "শুধুমাত্র অনুসরণকারীদের কাছে দৃশ্যমান"
-  private: "ব্যাক্তিগত"
-_ad:
-  hide: "দেখাবেন না"
-_email:
-  _follow:
-    title: "আপনাকে অনুসরণ করছে"
-  _receiveFollowRequest:
-    title: "অনুসরণ করার অনুরোধ পেয়েছেন"
-_plugin:
-  manage: "প্লাগইন ম্যানেজ করুন"
-_aboutMisskey:
-  contributors: "প্রধান কন্ট্রিবিউটারগণ"
-_menuDisplay:
-  top: "শীর্ষে"
-  hide: "লুকান"
-_theme:
-  base: "বেস"
-  addConstant: "ধ্রুবক যোগ করুন"
-  constant: "ধ্রুবক"
-  defaultValue: "ডিফল্ট মান"
-  refProp: "প্রোপার্টি রেফারেন্স করুন"
-  refConst: "ধ্রুবক রেফারেন্স করুন"
-  key: "কী"
-  func: "ফাংশন"
-  funcKind: "ফাংশনের ধরন"
-  argument: "আর্গুমেন্ট"
-  basedProp: "রেফারেন্স করা প্রোপার্টি"
-  darken: "অন্ধকার করুন"
-  inputConstantName: "ধ্রুবকটির নাম লিখুন"
-  importInfo: "আপনি এখানে থিম কোড পেস্ট করতে পারেন এবং সেটিকে এডিটরে ইম্পোর্ট করতে পারেন"
-  deleteConstantConfirm: "আপনি কি ধ্রুবক {const} মুছে ফেলতে চান？"
-  keys:
-    accent: "অ্যাকসেন্ট"
-    bg: "পটভূমি"
-    fg: "লেখা"
-    focus: "ফোকাস"
-    indicator: "ইনডিকেটর"
-    panel: "প্যানেল"
-    shadow: "ছায়া"
-    navBg: "সাইডবারের পটভূমি"
-    navFg: "সাইডবারের পাঠ্য"
-    navActive: "সাইডবারের পাঠ্য (অ্যাকটিভ)"
-    navIndicator: "সাইডবারের ইনডিকেটর"
-    link: "লিংক"
-    hashtag: "হ্যাশট্যাগ"
-    mention: "উল্লেখ"
-    mentionMe: "আপনাকে উল্লেখ্য করা"
-    renote: "রিনোট"
-    modalBg: "মোডালের পটভূমি"
-    divider: "খন্ডক"
-    scrollbarHandle: "স্ক্রলবার হ্যান্ডেল"
-    scrollbarHandleHover: "স্ক্রলবার হ্যান্ডেল (হভার)"
-    dateLabelFg: "তারিখ লেবেলের পাঠ্য"
-    infoBg: "তথ্যের পটভূমি"
-    infoFg: "তথ্যের পাঠ্য"
-    infoWarnBg: "ওয়ার্নিং এর পটভূমি"
-    infoWarnFg: "ওয়ার্নিং এর পাঠ্য"
-    toastBg: "বিজ্ঞপ্তির পটভূমি"
-    toastFg: "বিজ্ঞপ্তির পাঠ্য"
-    buttonBg: "বাটনের পটভূমি"
-    buttonHoverBg: "বাটনের পটভূমি (হভার)"
-    inputBorder: "ইনপুট ফিল্ডের বর্ডার"
-    badge: "ব্যাজ"
-    messageBg: "চ্যাটের পটভূমি"
-    fgHighlighted: "হাইলাইট করা পাঠ্য"
-_ago:
-  future: "ভবিষ্যৎ"
-_permissions:
-  "read:account": "অ্যাকাউন্টের তথ্য দেখুন"
-  "write:account": "অ্যাকাউন্টের তথ্য সম্পাদন করুন"
-  "read:blocks": "ব্লক করা ব্যাবহারকারীদের তালিকা দেখুন"
-  "write:blocks": "ব্লক করা ব্যাবহারকারীদের তালিকা সম্পাদনা করুন"
-  "read:drive": "ড্রাইভের ফাইল এবং ফোল্ডারসমূহ পড়া"
-  "write:drive": "ড্রাইভের ফাইল এবং ফোল্ডারসমূহ সম্পাদনা করা"
-  "read:favorites": "পছন্দের তালিকা পড়া"
-  "write:favorites": "পছন্দের তালিকা সম্পাদনা করা"
-  "read:following": "অনুসরণ তথ্য দেখুন"
-  "write:following": "অনুসরণ তথ্য সম্পাদনা করা"
-  "read:messaging": "চ্যাটগুলি দেখুন"
-  "write:messaging": "চ্যাটগুলি সম্পাদনা করুন"
-  "read:mutes": "মিউটের লিস্ট দেখুন"
-  "write:mutes": "মিউটের লিস্ট সম্পাদনা করুন"
-  "write:notes": "নোট লিখা"
-  "read:notifications": "বিজ্ঞপ্তিগুলি দেখুন"
-  "write:notifications": "বিজ্ঞপ্তি নিয়ে কাজ করে"
-  "read:reactions": "রিঅ্যাকশনগুলি দেখুন"
-  "write:reactions": "রিঅ্যাকশনগুলি সম্পাদনা করুন"
-  "write:votes": "ভোট দিন"
-  "read:pages": "আপনার পেজগুলি দেখুন"
-  "write:pages": "পেজগুলি সম্পাদনা বা ডিলিট করুন"
-  "read:page-likes": "পৃষ্ঠায় দেয়া পছন্দগুলি দেখুন"
-  "write:page-likes": "পৃষ্ঠায় দেয়া পছন্দগুলি সম্পাদনা করুন"
-  "read:user-groups": "ব্যাবহারকারী গ্রুপগুলি দেখুন"
-  "write:user-groups": "ব্যাবহারকারী গ্রুপগুলি সম্পাদনা করুন"
-  "read:channels": "চ্যানেলগুলি দেখুন"
-  "write:channels": "চ্যানেলগুলি সম্পাদনা করুন"
-  "read:gallery": "গ্যালারী দেখুন"
-  "write:gallery": "গ্যালারী সম্পাদনা করুন"
-  "read:gallery-likes": "গ্যালারীর পছন্দগুলি দেখুন"
-  "write:gallery-likes": "গ্যালারীর পছন্দগুলি সম্পাদনা করুন"
-  "write:chat": "চ্যাটগুলি সম্পাদনা করুন"
-_profile:
-  username: "ব্যবহারকারীর নাম"
-  metadata: "অতিরিক্ত তথ্য"
-_charts:
-  filesTotal: "ফাইলের সংখ্যা"
-_pages:
-  newPage: "নতুন পৃষ্ঠা বানান"
-  editPage: "পৃষ্ঠাটি সম্পাদনা করুন"
-  readPage: "উৎস দেখছেন"
-  pageSetting: "পৃষ্ঠার সেটিংস"
-  nameAlreadyExists: "পৃষ্ঠার URLটি ইতিমধ্যেই ব্যাবহার করা হয়েছে"
-  invalidNameTitle: "পৃষ্ঠার URL অবৈধ"
-  invalidNameText: "নিশ্চিত করুন যে এটি ফাঁকা নয়"
-  editThisPage: "পৃষ্ঠাটি সম্পাদনা করুন"
-  viewSource: "উৎস দেখুন"
-  viewPage: "আপনার পেজগুলি দেখুন"
-  like: "পছন্দ"
-  unlike: "পছন্দ সরান"
-  my: "আমার পৃষ্ঠাগুলি"
-  liked: "পছন্দ করা পৃষ্ঠাগুলি"
-  featured: "জনপ্রিয়"
-  inspector: "ইনিস্পেক্টর"
-  contents: "বিষয়বস্তু"
-  content: "পৃষ্ঠার ব্লক"
-  variables: "চলকগুলি"
-  title: "শিরোনাম"
-  url: "পৃষ্ঠার URL"
-  summary: "পৃষ্ঠার বর্ণনা"
-  alignCenter: "সেন্টার"
-  hideTitleWhenPinned: "পিন করা হলে টাইটেল লুকান"
-  font: "ফন্ট"
-  fontSerif: "সেরিফ"
-  fontSansSerif: "স্যান্স সেরিফ"
-  eyeCatchingImageSet: "থাম্বনেইল সেট করুন"
-  eyeCatchingImageRemove: "থাম্বনেইল সরান"
-  chooseBlock: "ব্লক যোগ করুন"
-  selectType: "ধরন নির্বাচন করুন"
-  contentBlocks: "বিষয়বস্তু"
-  inputBlocks: "ইনপুট"
-  specialBlocks: "বিশেষ"
-  blocks:
-    text: "লেখা"
-    textarea: "টেক্সট এরিয়া"
-    section: "বিভাগ"
-    image: "ছবি"
-    button: "বাটন"
-    note: "এম্বেড নোট"
-    _note:
-      id: "নোট ID"
-      idDescription: "আপনি এর বদলে নোটের URL পেস্ট করতে পারেন."
-      detailed: "বিস্তারিত দেখুন"
+_lang_: 'বাংলা'
+search: 'খুঁজুন'
+ok: 'ঠিক'
+cancel: 'বাতিল'
+notificationSettings: 'বিজ্ঞপ্তির সেটিংস'
+save: 'সংরক্ষণ'
+favorites: 'পছন্দগুলি'
+delete: 'মুছুন'
+lists: 'লিস্ট'
+notes: 'নোটগুলি'
+following: 'অনুসরণ করা হচ্ছে'
+somethingHappened: 'একটি ত্রুটি হয়েছে'
+customEmojis: 'স্বনির্ধারিত ইমোজিগুলি'
+mutedUsers: 'নিঃশব্দকৃত ব্যবহারকারী'
+blockedUsers: 'যাদের ব্লক করা হয়েছে'
+reload: 'আবার লোড করুন'
+accept: 'অনুমোদন'
+reject: 'প্রত্যাখ্যান'
+antennas: 'অ্যান্টেনা'
+close: 'বন্ধ'
+edit: 'সম্পাদনা'
+copy: 'অনুলিপি'
+clips: 'ক্লিপগুলি '
+markAllAsRead: 'সব পঠিত হিসেবে চিহ্নিত করুন'
 _notification:
-  fileUploaded: "ফাইল সফলভাবে আপলোড করা হয়েছে"
-  youGotMention: "{name} আপনাকে উল্লেখ্য করেছে"
-  youGotReply: "{name} আপনাকে জবাব দিয়েছে"
-  youGotQuote: "{name} আপনাকে উদ্ধৃত করেছে"
-  youRenoted: "{name} এর Renote"
-  youWereFollowed: "আপনাকে অনুসরণ করছে"
-  youReceivedFollowRequest: "অনুসরণ করার জন্য অনুরোধ পাওয়া গেছে"
-  yourFollowRequestAccepted: "আপনার অনুসরণ করার অনুরোধ গৃহীত হয়েছে"
-  pollEnded: "পোলের ফলাফল দেখা যাবে"
-  emptyPushNotificationMessage: "আপডেট করা পুশ বিজ্ঞপ্তি"
-  _types:
-    all: "সকল"
-    follow: "অনুসরণ করা হচ্ছে"
-    mention: "উল্লেখ"
-    reply: "উত্তর দিন"
-    renote: "রিনোট"
-    quote: "উদ্ধৃতি"
-    reaction: "প্রতিক্রিয়া"
-    pollEnded: "পোল শেষ"
-    receiveFollowRequest: "প্রাপ্ত অনুসরণের অনুরোধসমূহ"
-    followRequestAccepted: "গৃহীত অনুসরণের অনুরোধসমূহ"
-    login: "প্রবেশ করুন"
-    app: "লিঙ্ক করা অ্যাপ থেকে বিজ্ঞপ্তি"
+  youGotMention: '{name} আপনাকে উল্লেখ্য করেছে'
+  youGotReply: '{name} আপনাকে জবাব দিয়েছে'
+  youGotQuote: '{name} আপনাকে উদ্ধৃত করেছে'
+  youRenoted: '{name} এর Renote'
+  youWereFollowed: 'আপনাকে অনুসরণ করছে'
+  youReceivedFollowRequest: 'অনুসরণ করার জন্য অনুরোধ পাওয়া গেছে'
+  yourFollowRequestAccepted: 'আপনার অনুসরণ করার অনুরোধ গৃহীত হয়েছে'
+  pollEnded: 'পোলের ফলাফল দেখা যাবে'
   _actions:
-    followBack: "ফলো ব্যাক করেছে"
-    reply: "জবাব"
-    renote: "রিনোট"
-_moderationLogTypes:
-  suspend: "স্থগিত করা"
-  resetPassword: "পাসওয়ার্ড রিসেট করুন"
-_watermarkEditor:
-  advanced: "উন্নত"
+    followBack: 'ফলো ব্যাক করেছে'
+    reply: 'জবাব'
+    renote: 'রিনোট'
+next: 'পরবর্তী'
+upload: 'আপলোড'
+preview: 'পূর্বরূপ দেখুন'
+name: 'নাম'
+title: 'শিরোনাম'
+description: 'বর্ণনা'
+none: 'কিছুই না'
+all: 'সবগুলো'
+default: 'পূর্বনির্ধারিত'
+error: 'সমস্যা'
+users: 'ব্যবহারকারীগণ'

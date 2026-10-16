@@ -1,704 +1,218 @@
----
-_lang_: "Türkçe"
-monthAndDay: "{day}.{month}."
-search: "Ara"
-ok: "Tamam"
-cancel: "Vazgeç"
-notificationSettings: "Bildirim Ayarları"
-uploading: "Yükleniyor..."
-save: "Kaydet"
-favorites: "Favoriler"
-favorited: "Favoriye eklendi."
-alreadyFavorited: "Zaten favoride"
-delete: "Sil"
-searchUser: "Kullanıcı ara"
-showLess: "Kapat"
-lists: "Listeler"
-notes: "Notlar"
-following: "Takip"
-somethingHappened: "Bir hata oluştu"
-pinned: "Profiline sabitle"
-emojiPicker: "Emoji seçici"
-unsuspend: "askıya almayı kaldır"
-customEmojis: "Özel Emoji"
-emojis: "Emoji"
-emojiName: "Emoji adı"
-loginFailed: "Giriş başarısız oldu"
-wallpaper: "Duvar kağıdı"
-instances: "Sunucular"
-latestStatus: "Son durum"
-operations: "Operasyonlar"
-monitor: "Monitör"
-network: "Ağ"
-disk: "Disk"
-mutedUsers: "Sessize alınan kullanıcılar"
-blockedUsers: "Engellenen kullanıcılar"
-changePassword: "Şifreyi değiştir"
-retypedNotMatch: "Girişler eşleşmiyor."
-currentPassword: "Mevcut şifre"
-newPasswordRetype: "Yeni şifreyi tekrar girin"
-removed: "Silindi"
-home: "Pano"
-reload: "Yenile"
-watch: "İzle"
-unwatch: "İzlemeyi bırak"
-accept: "Kabul et"
-reject: "Reddet"
-integration: "Entegrasyon"
-pinnedPages: "Sabitlenmiş Sayfalar"
-pinnedClipId: "Sabitlenecek klibin ID"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "hCaptcha etkinleştir"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "mCaptcha etkinleştir"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "reCAPTCHA etkinleştir"
-turnstile: "Turnstile"
-enableTurnstile: "Turnstile etkinleştir"
-antennas: "Antenler"
-close: "Kapat"
-invites: "Davetler"
-transfer: "Transfer"
-signinFailed: "Giriş yapılamıyor. Girilen kullanıcı adı veya şifre yanlış."
-noHistory: "Geçmiş mevcut değil"
-signinHistory: "Giriş geçmişi"
-regenerate: "Yeniden oluştur"
-appearance: "Görünüm"
-promotion: "Tanıtım"
-promote: "Tanıtıldı"
-hideThisNote: "Bu notu gizle"
-showFeaturedNotesInTimeline: "Pano'da öne çıkan notları göster"
-deleteAll: "Tümünü sil"
-showFixedPostForm: "Gönderi formunu pano üstünde görüntüle"
-deleteAllFiles: "Tüm dosyaları sil"
-leaveConfirm: "Kaydedilmemiş değişiklikler var. Bunları silmek istiyor musunuz?"
-notificationType: "Bildirim türü"
-edit: "Düzenle"
-emailServer: "E-posta sunucusu"
-enableEmail: "E-posta dağıtımını etkinleştir"
-emailConfigInfo: "Kayıt sırasında veya şifreni unuttuğunda E-postanı doğrulamak için kullanılır."
-emailAddress: "E-Posta adresi"
-smtpConfig: "SMTP Sunucu yapılandırması"
-smtpHost: "Host"
-smtpPort: "Port"
-smtpUser: "Kullanıcı adı"
-smtpPass: "Şifre"
-emptyToDisableSmtpAuth: "SMTP kimlik doğrulamasını devre dışı bırakmak için kullanıcı adı ve şifre alanlarını boş bırakın."
-smtpSecure: "SMTP bağlantıları için örtük SSL/TLS kullanın"
-smtpSecureInfo: "STARTTLS kullanırken bunu kapatın."
-testEmail: "Test E-postası gönderimi"
-copy: "Kopyala"
-metrics: "Metrikler"
-delayed: "Gecikmeli"
-regenerateLoginToken: "Giriş jetonunu yeniden oluştur"
-regenerateLoginTokenDescription: "Giriş sırasında dahili olarak kullanılan jetonu yeniden oluşturur. Normalde bu işlem gerekli değildir. Yeniden oluşturulursa, tüm cihazlar oturumu kapatılır."
-sample: "Örnek"
-repliesCount: "Yanıt sayısı"
-repliedCount: "Alınan yanıt sayısı"
-followingCount: "Takip sayısı"
-followersCount: "Takipçi sayısı"
-pollVotesCount: "Anket oy sayısı"
-driveUsage: "Drive alanı kullanımı"
-clips: "Klipler"
-experimental: "Deneysel"
-wide: "Geniş"
-narrow: "Dar"
-sendErrorReports: "Hata raporları gönder"
-sendErrorReportsDescription: "Etkinleştirildiğinde, bir sorun oluştuğunda ayrıntılı hata bilgileri Misskey ile paylaşılacak ve bu da Misskey'in kalitesinin iyileştirilmesine yardımcı olacak.\nBu bilgiler arasında işletim sisteminizin sürümü, kullandığınız tarayıcı, Misskey'deki faaliyetlerin vb. yer alacaktır."
-advanced: "Gelişmiş"
-markAllAsRead: "Tümünü okundu olarak işaretle"
-onlineStatus: "Çevrimiçi durumu"
-global: "Global"
-sent: "Gönderilen"
-received: "Alınan"
-aiChanMode: "Ai Modu"
-unread: "Okunmamış"
-classic: "Klasik"
-incorrectTotp: "Tek kullanımlık şifre yanlış veya süresi dolmuş."
-rateLimitExceeded: "Hız sınırı aşıldı"
-recommended: "Önerilen"
-undefined: "Tanımlanmamış"
-videos: "Videolar"
-reactionsList: "Tepkiler"
-createWithOptions: "Seçeneklerle oluştur"
-edited: "Düzenlendi"
-replay: "Tekrar oynat"
-genEmbedCode: "Gömme kodu oluştur"
-unknownWebAuthnKey: "Bilinmeyen Geçiş Anahtarı"
-draft: "Taslaklar"
-untitled: "İsimsiz"
-chat: "Sohbet"
-defaultImageCompressionLevel: "Varsayılan görüntü sıkıştırma düzeyi"
-_chat:
-  invitations: "Davet"
-  noHistory: "Geçmiş bilgisi mevcut değil"
-  members: "Üyeler"
-  home: "Ana Sayfa"
-  send: "Gönder"
-  cannotChatWithTheUser: "Bu kullanıcıyla sohbet başlatılamıyor."
-  cannotChatWithTheUser_description: "Sohbet kullanılamıyor veya karşı taraf sohbeti etkinleştirmedi."
-_settings:
-  showUrlPreview: "URL önizlemesi"
-_initialTutorial:
-  launchTutorial: "Öğreticiyi izle"
-  title: "Öğretici"
-  skipAreYouSure: "Öğreticiyi kapatmak mı istiyorsunuz?"
-  _landing:
-    title: "Öğreticiye hoş geldin"
-  _note:
-    reply: "Bir mesaja yanıt vermek için bu düğmeye tıklayın. Yanıtlara yanıt vermek de mümkündür, böylece konuşma bir konu başlığı gibi devam eder."
-    menu: "Not ayrıntılarını görüntüleyebilir, bağlantıları kopyalayabilir ve çeşitli diğer işlemleri gerçekleştirebilirsin."
-  _reaction:
-    title: "Reaksiyonlar nedir?"
-  _timeline:
-    social: "Ev ve Yerel Pano'dan notlar görüntülenecek."
-  _postNote:
-    _visibility:
-      localOnly: "Bu bayrakla yayınlamak, notu diğer sunuculara aktarmaz. Diğer sunuculardaki kullanıcılar, yukarıdaki görüntüleme ayarlarından bağımsız olarak bu notları doğrudan görüntüleyemezler."
-    _cw:
-      description: "Gövde yerine, “Yorumlar” alanına yazılan içerik görüntülenecek. “Devamını oku” düğmesine basıldığında gövde görüntülenecek."
-      useCases: "Bu, sunucu kurallarına uyulurken, gerekli notlar için veya spoiler veya hassas metinlerin kendi kendine kısıtlanması için kullanılır."
-  _done:
-    title: "Eğitimi tamamladınız! 🎉"
+_lang_: 'Türkçe'
+search: 'Ara'
+ok: 'Tamam'
+cancel: 'Vazgeç'
+notificationSettings: 'Bildirim Ayarları'
+save: 'Kaydet'
+favorites: 'Favoriler'
+delete: 'Sil'
+lists: 'Listeler'
+notes: 'Notlar'
+following: 'Takip'
+somethingHappened: 'Bir hata oluştu'
+customEmojis: 'Özel Emoji'
+mutedUsers: 'Sessize alınan kullanıcılar'
+blockedUsers: 'Engellenen kullanıcılar'
+reload: 'Yenile'
+accept: 'Kabul et'
+reject: 'Reddet'
+antennas: 'Antenler'
+close: 'Kapat'
+edit: 'Düzenle'
+copy: 'Kopyala'
+clips: 'Klipler'
+markAllAsRead: 'Tümünü okundu olarak işaretle'
 _achievements:
   _types:
     _notes1:
-      title: "msky'ımı kuruyorum"
-      description: "İlk notunuzu yayınlayın"
-      flavor: "Misskey ile iyi vakit geçirin!"
+      title: 'msky''ımı kuruyorum'
     _notes10:
-      title: "Bazı notlar"
-      description: "10 not gönder"
+      title: 'Bazı notlar'
     _notes100:
-      title: "Çok sayıda not"
-      description: "100 notu yayınla"
+      title: 'Çok sayıda not'
     _notes500:
-      title: "Notlarla kaplı"
-      description: "500 notu yayınla"
+      title: 'Notlarla kaplı'
     _notes1000:
-      title: "Notlardan oluşan bir dağ"
-      description: "1.000 not yayınla"
+      title: 'Notlardan oluşan bir dağ'
     _notes5000:
-      title: "Taşan notlar"
-      description: "5.000 not yayınla"
+      title: 'Taşan notlar'
     _notes10000:
-      title: "Süper not"
-      description: "10.000 not yayınla"
+      title: 'Süper not'
     _notes20000:
-      title: "Daha... fazla... not... lazım..."
-      description: "20.000 not yayınla"
+      title: 'Daha... fazla... not... lazım...'
     _notes30000:
-      title: "Notlar notlar notlar!"
-      description: "30.000 not yayınla"
+      title: 'Notlar notlar notlar!'
     _notes40000:
-      title: "Not fabrikası"
-      description: "40.000 not yayınla"
+      title: 'Not fabrikası'
     _notes50000:
-      title: "Notların gezegeni"
-      description: "50.000 not yayınla"
+      title: 'Notların gezegeni'
     _notes60000:
-      title: "Not kuasar"
-      description: "60.000 not yayınla"
+      title: 'Not kuasar'
     _notes70000:
-      title: "Not kara deliği"
-      description: "70.000 not yayınla"
+      title: 'Not kara deliği'
     _notes80000:
-      title: "Not galaksisi"
-      description: "80.000 not yayınla"
+      title: 'Not galaksisi'
     _notes90000:
-      title: "Not evreni"
-      description: "90.000 not yayınla"
+      title: 'Not evreni'
     _notes100000:
-      title: "TÜM NOTLARINIZ BİZE AİTTİR"
-      description: "100.000 yayınlanmış not"
-      flavor: "Gerçekten söyleyecek çok şeyin var."
+      title: 'TÜM NOTLARINIZ BİZE AİTTİR'
     _login3:
-      title: "Başlangıç I"
-      description: "Log in for a total of 3 days"
-      flavor: "Toplam 3 gün boyunca oturum açın"
+      title: 'Başlangıç I'
     _login7:
-      title: "Başlangıç II"
-      description: "Toplam 7 gün boyunca oturum açın"
-      flavor: "Henüz işlerin nasıl yürüdüğünü anladığını hissediyor musun?"
+      title: 'Başlangıç II'
     _login15:
-      title: "Başlangıç III"
-      description: "Toplam 15 gün boyunca oturum açın"
+      title: 'Başlangıç III'
     _login30:
-      title: "Misskist I"
-      description: "Toplam 30 gün boyunca oturum açın"
+      title: 'Misskist I'
     _login60:
-      title: "Misskist II"
-      description: "Toplam 60 gün boyunca oturum açın"
+      title: 'Misskist II'
     _login100:
-      title: "Misskist III"
-      description: "Toplam 100 gün boyunca oturum açın"
-      flavor: "Şiddetli Misskist"
+      title: 'Misskist III'
     _login200:
-      title: "Düzenli I"
-      description: "Toplam 200 gün boyunca oturum açın."
+      title: 'Düzenli I'
     _login300:
-      title: "Düzenli II"
-      description: "Toplam 300 gün boyunca oturum açın"
+      title: 'Düzenli II'
     _login400:
-      title: "Düzenli III"
-      description: "Toplam 400 gün boyunca oturum açın"
+      title: 'Düzenli III'
     _login500:
-      title: "Uzman I"
-      description: "Toplam 500 gün boyunca oturum açın"
-      flavor: "Arkadaşlar, sık sık not almayı sevdiğim söylenir."
+      title: 'Uzman I'
     _login600:
-      title: "Uzman II"
-      description: "Toplam 600 gün boyunca oturum açın"
+      title: 'Uzman II'
     _login700:
-      title: "Uzman III"
-      description: "Toplam 700 gün boyunca oturum açın"
+      title: 'Uzman III'
     _login800:
-      title: "Notların Ustası I"
-      description: "Toplam 800 gün boyunca oturum açın"
+      title: 'Notların Ustası I'
     _login900:
-      title: "Notların Ustası II"
-      description: "Toplam 900 gün boyunca oturum açın"
+      title: 'Notların Ustası II'
     _login1000:
-      title: "Notların Ustası III"
-      description: "Toplam 1.000 gün boyunca oturum açın."
-      flavor: "Misskey'i kullandığınız için teşekkür ederiz!"
+      title: 'Notların Ustası III'
     _noteClipped1:
-      title: "Kesinlikle... kesmeliyim..."
-      description: "İlk notunu ekle"
+      title: 'Kesinlikle... kesmeliyim...'
     _noteFavorited1:
-      title: "Yıldız gözlemcisi"
-      description: "İlk notunu favorilerine ekle"
+      title: 'Yıldız gözlemcisi'
     _myNoteFavorited1:
-      title: "Yıldızları Arayış"
-      description: "Başka birinin notlarınızdan birini favorilerine eklemesini sağlayın"
+      title: 'Yıldızları Arayış'
     _profileFilled:
-      title: "İyi hazırlanmış"
-      description: "Profilini oluştur"
+      title: 'İyi hazırlanmış'
     _markedAsCat:
-      title: "Ben bir kediyim."
-      description: "Hesabını kedi olarak işaretle"
-      flavor: "Sana daha sonra bir isim vereceğim."
+      title: 'Ben bir kediyim.'
     _following1:
-      title: "İlk kullanıcınızı takip edin"
-      description: "Bir kullanıcıyı takip et"
+      title: 'İlk kullanıcınızı takip edin'
     _following10:
-      title: "Devam et... devam et..."
-      description: "10 kullanıcıyı takip et"
+      title: 'Devam et... devam et...'
     _following50:
-      title: "Bir sürü arkadaş"
-      description: "50 hesabı takip et"
+      title: 'Bir sürü arkadaş'
     _following100:
-      title: "100 Arkadaş"
-      description: "100 hesabı takip et"
+      title: '100 Arkadaş'
     _following300:
-      title: "Arkadaş yüklemesi"
-      description: "300 hesabı takip et"
+      title: 'Arkadaş yüklemesi'
     _followers1:
-      title: "İlk takipçi"
-      description: "1 takipçi kazanın"
+      title: 'İlk takipçi'
     _followers10:
-      title: "Beni takip edin!"
-      description: "10 takipçi kazanın"
+      title: 'Beni takip edin!'
     _followers50:
-      title: "Kalabalıklar halinde gelmek"
-      description: "50 takipçi kazanın"
+      title: 'Kalabalıklar halinde gelmek'
     _followers100:
-      title: "Popüler"
-      description: "100 takipçi kazanın"
+      title: 'Popüler'
     _followers300:
-      title: "Lütfen tek sıra halinde dizilin."
-      description: "300 takipçi kazanın"
+      title: 'Lütfen tek sıra halinde dizilin.'
     _followers500:
-      title: "Radyo Kulesi"
-      description: "500 takipçi kazanın"
+      title: 'Radyo Kulesi'
     _followers1000:
-      title: "Etkileyici"
-      description: "1.000 takipçi kazanın"
+      title: 'Etkileyici'
     _collectAchievements30:
-      title: "Başarı Koleksiyoncusu"
-      description: "30 başarı kazan"
+      title: 'Başarı Koleksiyoncusu'
     _viewAchievements3min:
-      title: "Beğeniler Başarılar"
-      description: "Likes Achievements"
+      title: 'Beğeniler Başarılar'
     _iLoveMisskey:
-      title: "Misskey'i seviyorum"
-      description: "“I ❤ #Misskey” yazısını paylaş"
-      flavor: "Misskey geliştirme ekibi desteğin için çok teşekkür eder!"
+      title: 'Misskey''i seviyorum'
     _foundTreasure:
-      title: "Hazine Avı"
-      description: "Gizli hazineyi buldunuz."
+      title: 'Hazine Avı'
     _client30min:
-      title: "Kısa mola"
-      description: "Misskey'i en az 30 dakika açık tutun."
+      title: 'Kısa mola'
     _client60min:
-      title: "Misskey'de “Miss” yok"
-      description: "Misskey'i en az 60 dakika açık tutun."
+      title: 'Misskey''de “Miss” yok'
     _noteDeletedWithin1min:
-      title: "Nevermind"
-      description: "Boş ver"
+      title: 'Nevermind'
     _postedAtLateNight:
-      title: "Gececi"
-      description: "Gece geç saatlerde bir not yayınlayın"
-      flavor: "Yatma vakti geldi."
+      title: 'Gececi'
     _postedAt0min0sec:
-      title: "Konuşan Saat"
-      description: "00:00'da bir not yayınlayın."
-      flavor: "Tık tık tık, güm!"
+      title: 'Konuşan Saat'
     _selfQuote:
-      title: "Öz Referans"
-      description: "Kendi notunuzu alıntı yapın"
+      title: 'Öz Referans'
     _htl20npm:
-      title: "Akış Panosu"
-      description: "Ev zaman çizelgenizin hızı 20 npm'yi (dakika başına not sayısı) aşıyor mu?"
+      title: 'Akış Panosu'
     _viewInstanceChart:
-      title: "Analist"
-      description: "Sunucunun grafiklerini görüntüle"
+      title: 'Analist'
     _outputHelloWorldOnScratchpad:
-      title: "Merhaba, dünya!"
-      description: "Scratchpad'de “hello world” yazdırın."
+      title: 'Merhaba, dünya!'
     _open3windows:
-      title: "Çoklu Pencere"
-      description: "Aynı anda en az 3 pencere açık olsun."
+      title: 'Çoklu Pencere'
     _driveFolderCircularReference:
-      title: "Döngüsel Referans"
-      description: "Drive'da yinelemeli olarak iç içe geçmiş bir klasör oluşturmaya çalış."
+      title: 'Döngüsel Referans'
     _reactWithoutRead:
-      title: "Cidden okudun mu?"
-      description: "100 karakterden uzun bir notun yayınlanmasından itibaren 3 saniye içinde yanıt verin."
+      title: 'Cidden okudun mu?'
     _clickedClickHere:
-      title: "Buraya tıklayın"
-      description: "Buraya tıkladınız"
+      title: 'Buraya tıklayın'
     _justPlainLucky:
-      title: "Sadece Şanslı"
-      description: "Her 10 saniyede bir %0,005 olasılıkla elde edilme şansı vardır."
+      title: 'Sadece Şanslı'
     _setNameToSyuilo:
-      title: "Tanrı Kompleksi"
-      description: "Adınızı “syuilo” olarak ayarlayın."
+      title: 'Tanrı Kompleksi'
     _passedSinceAccountCreated1:
-      title: "Birinci Yıl Dönümü"
-      description: "Hesabınızın oluşturulmasından bu yana bir yıl geçti."
+      title: 'Birinci Yıl Dönümü'
     _passedSinceAccountCreated2:
-      title: "İki Yıllık Yıldönümü"
-      description: "Hesabınızın oluşturulmasından bu yana iki yıl geçti."
+      title: 'İki Yıllık Yıldönümü'
     _passedSinceAccountCreated3:
-      title: "Üçüncü Yıl Dönümü"
-      description: "Hesabınızın oluşturulmasından bu yana üç yıl geçti."
+      title: 'Üçüncü Yıl Dönümü'
     _loggedInOnBirthday:
-      title: "Doğum günün kutlu olsun"
-      description: "Doğum gününüzde giriş yapın"
+      title: 'Doğum günün kutlu olsun'
     _loggedInOnNewYearsDay:
-      title: "Yeni yılınız kutlu olsun!"
-      description: "Yılın ilk gününde oturum açıldı"
-      flavor: "Bu sunucuda bir başka harika yıla"
+      title: 'Yeni yılınız kutlu olsun!'
     _cookieClicked:
-      title: "Çerezleri tıklayarak oynanan bir oyun"
-      description: "Çerezi tıkladı"
-      flavor: "Wait, are you on the correct website?"
+      title: 'Çerezleri tıklayarak oynanan bir oyun'
     _brainDiver:
-      title: "Brain Diver"
-      description: "Brain Diver bağlantısını paylaşın"
-      flavor: "Misskey-Misskey La-Tu-Ma"
+      title: 'Brain Diver'
     _smashTestNotificationButton:
-      title: "Test taşması"
-      description: "Bildirim testini çok kısa bir süre içinde tekrar tekrar tetikle."
+      title: 'Test taşması'
     _tutorialCompleted:
-      title: "Misskey Temel Kurs Diploması"
-      description: "Eğitim tamamlandı"
+      title: 'Misskey Temel Kurs Diploması'
     _bubbleGameExplodingHead:
-      title: "🤯"
-      description: "Kabarcık oyunundaki en büyük nesne"
+      title: '🤯'
     _bubbleGameDoubleExplodingHead:
-      title: "Çift🤯"
-      description: "Aynı anda balon oyunundaki en büyük iki nesne"
-      flavor: "Öğle yemeği kutunu şöyle doldurabilirsin 🤯 🤯 biraz."
-_role:
-  edit: "Rolü düzenle"
-  assignTarget: "Görev türü"
-  options: "Seçenekler"
-  displayOrder: "Pozisyon"
-  priority: "Öncelik"
-  _priority:
-    low: "Düşük"
-    middle: "Orta"
-    high: "Yüksek"
-  _options:
-    canManageCustomEmojis: "Özel emojileri yönetebilir"
-    canManageAvatarDecorations: "Avatar süslerini yönet"
-    canHideAds: "Reklamları gizleyebilir"
-  _condition:
-    isRemote: "Uzak kullanıcı"
-    isCat: "Kedi Kullanıcıları"
-    isBot: "Bot Kullanıcıları"
-_ffVisibility:
-  public: "Bu e-posta adresiyle kayıt olamazsınız."
-  followers: "Sadece takipçiler tarafından görülebilir"
-  private: "Özel"
-_ad:
-  hide: "Gizle"
-_email:
-  _follow:
-    title: "Yeni bir takipçin var."
-  _receiveFollowRequest:
-    title: "Bir takip isteği aldınız."
-_plugin:
-  manage: "Eklentileri yönet"
-_preferencesBackups:
-  list: "Created backups"
-  apply: "Bu cihaza başvur"
-  save: "Değişiklikleri kaydet"
-  nameAlreadyExists: "“{name}” adlı bir yedekleme zaten mevcut. Lütfen farklı bir ad girin."
-  saveConfirm: "Yedeklemeyi {name} olarak kaydedin?"
-  deleteConfirm: "{name} yedeklemesini silmek ister misin?"
-  createdAt: "Oluşturulma tarihi: {date} {time}"
-  updatedAt: "Güncelleme tarihi: {date} {time}"
-  cannotLoad: "Yükleme başarısız"
-_aboutMisskey:
-  contributors: "Başlıca katkıda bulunanlar"
-_menuDisplay:
-  top: "En üst"
-  hide: "Gizle"
-_theme:
-  base: "Base"
-  addConstant: "Sabit ekle"
-  constant: "Sabit"
-  defaultValue: "Varsayılan değer"
-  refProp: "Bir özelliği referans al"
-  refConst: "Sabiti referans al"
-  key: "Anahtar"
-  func: "İşlevler"
-  funcKind: "İşlev türü"
-  argument: "Tartışma"
-  basedProp: "Referans verilen mülk"
-  darken: "Koyulaştır"
-  inputConstantName: "Bu sabit için bir ad girin"
-  importInfo: "Buraya tema kodunu girersen, onu tema düzenleyicisine aktarabilirsin."
-  deleteConstantConfirm: "{const} sabitini cidden silmek istiyor musun?"
-  keys:
-    accent: "Aksan"
-    bg: "Arka plan"
-    fg: "Metin"
-    focus: "Odak"
-    indicator: "Gösterge"
-    panel: "Panel"
-    shadow: "Gölge"
-    navBg: "Kenar çubuğu arka planı"
-    navFg: "Kenar çubuğu metni"
-    navActive: "Kenar çubuğu metni (Etkin)"
-    navIndicator: "Kenar çubuğu göstergesi"
-    link: "Link"
-    hashtag: "Hashtag"
-    mention: "Bahsetmeler"
-    mentionMe: "Bahsetmeler (Ben)"
-    renote: "Renote"
-    modalBg: "Modal arka plan"
-    divider: "Bölücü"
-    scrollbarHandle: "Kaydırma çubuğu"
-    scrollbarHandleHover: "Kaydırma çubuğu (Fareyi üzerine getir)"
-    dateLabelFg: "Tarih etiketi metni"
-    infoBg: "Bilgi arka planı"
-    infoFg: "Bilgi metni"
-    infoWarnBg: "Uyarı arka planı"
-    infoWarnFg: "Uyarı metni"
-    toastBg: "Bildirim arka planı"
-    toastFg: "Bildirim metni"
-    buttonBg: "Düğme arka planı"
-    buttonHoverBg: "Button background (Hover)"
-    inputBorder: "Giriş alanı kenarlığı"
-    badge: "Rozet"
-    messageBg: "Sohbet arka planı"
-    fgHighlighted: "Vurgulanan Metin"
-_ago:
-  future: "Gelecek"
-_permissions:
-  "read:account": "Hesap bilgilerini gör"
-  "write:account": "Hesap bilgilerini düzenle"
-  "read:blocks": "Engellenen kullanıcıların listesini görüntüle"
-  "write:blocks": "Engellenen kullanıcılar listeni düzenle"
-  "read:drive": "Drive dosyalarına ve klasörlerine eriş"
-  "write:drive": "Drive dosyalarını ve klasörlerini düzenle veya sil"
-  "read:favorites": "Favoriler listeni görüntüle"
-  "write:favorites": "Favoriler listeni düzenle"
-  "read:following": "Takip ettiğin kişilerle ilgili bilgileri görüntüle"
-  "write:following": "Diğer hesapları takip et veya takipten çıkar"
-  "read:messaging": "Sohbetlerini görüntüle"
-  "write:messaging": "Sohbet mesajlarını oluşturun veya silin"
-  "read:mutes": "Sessize alınan kullanıcıların listesini görüntüle"
-  "write:mutes": "Sessize alınan kullanıcıların listesini düzenle"
-  "write:notes": "Notlar oluşturun veya silin"
-  "read:notifications": "Bildirimlerini görüntüle"
-  "write:notifications": "Bildirimlerini yönet"
-  "read:reactions": "Tepkilerini görüntüle"
-  "write:reactions": "Tepkilerini düzenle"
-  "write:votes": "Ankete oy verin"
-  "read:pages": "Sayfalarını görüntüle"
-  "write:pages": "Sayfalarını düzenle veya sil"
-  "read:page-likes": "Beğenilen sayfaların listesini görüntüle"
-  "write:page-likes": "Beğenilen sayfaların listesini düzenle"
-  "read:user-groups": "Kullanıcı gruplarını görüntüle"
-  "write:user-groups": "Kullanıcı gruplarını düzenle veya sil"
-  "read:channels": "Kanallarını görüntüle"
-  "write:channels": "Kanallarını düzenle"
-  "read:gallery": "Galeriyi görüntüle"
-  "write:gallery": "Galeri düzenle"
-  "read:gallery-likes": "Beğendiğin galeri gönderilerinin listesini görüntüle"
-  "write:gallery-likes": "Beğendiğin galeri gönderilerinin listesini düzenle"
-  "write:admin:delete-account": "Kullanıcı hesabını sil"
-  "write:admin:roles": "Rolleri yönet"
-  "read:admin:roles": "Rolü görüntüle"
-  "write:chat": "Sohbet mesajlarını oluşturun veya silin"
-_profile:
-  username: "Kullanıcı adı"
-  metadata: "Ek Bilgiler"
-_charts:
-  filesTotal: "Toplam dosya sayısı"
-_play:
-  created: "Oyun oluşturuldu"
-  updated: "Düzenlenmiş oynat"
-  deleted: "Oyun silindi"
-  pageSetting: "Oyun ayarları"
-_pages:
-  newPage: "Yeni bir Sayfa oluşturun"
-  editPage: "Bu sayfayı düzenle"
-  readPage: "Bu Sayfanın Kaynağını Görüntüleme"
-  pageSetting: "Sayfa ayarları"
-  nameAlreadyExists: "Belirtilen Sayfa URL'si zaten mevcut."
-  invalidNameTitle: "Belirtilen Sayfa URL geçersiz"
-  invalidNameText: "Sayfa başlığının boş olmadığından emin olun."
-  editThisPage: "Bu sayfayı düzenle"
-  viewSource: "Kaynak görüntüle"
-  viewPage: "Sayfalarını görüntüle"
-  like: "Beğen"
-  unlike: "Benzerlerini kaldır"
-  my: "Benzerlerini kaldır"
-  liked: "Beğenilen Sayfalar"
-  featured: "Popüler"
-  inspector: "Müfettiş"
-  contents: "İçindekiler"
-  content: "Sayfa bloğu"
-  variables: "Değişkenler"
-  title: "Başlık"
-  url: "Sayfa URL'si"
-  summary: "Sayfa özeti"
-  alignCenter: "Merkez öğeleri"
-  hideTitleWhenPinned: "Profiline sabitlendiğinde sayfa başlığını gizle"
-  font: "Yazı tipi"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  eyeCatchingImageSet: "Küçük resmi ayarla"
-  eyeCatchingImageRemove: "Küçük resmi sil"
-  chooseBlock: "Blok ekle"
-  selectType: "Bir tür seçin"
-  contentBlocks: "İçerik"
-  inputBlocks: "Giriş"
-  specialBlocks: "Özel"
-  blocks:
-    text: "Metin"
-    textarea: "Metin alanı"
-    section: "Bölüm"
-    image: "Görseller"
-    button: "Düğme"
-    note: "Gömülü not"
-    _note:
-      id: "Not Kimliği"
-      idDescription: "Alternatif olarak notun URL buraya yapıştırabilirsin."
-      detailed: "Ayrıntılı görünüm"
+      title: 'Çift🤯'
 _notification:
-  fileUploaded: "Dosya başarıyla yüklendi"
-  youGotMention: "{name} sizden bahsetti."
-  youGotReply: "{name} size yanıt verdi"
-  youGotQuote: "{name} sizden alıntı yaptı"
-  youRenoted: "{name}'den Renote"
-  youWereFollowed: "seni takip etti"
-  youReceivedFollowRequest: "Bir takip isteği aldınız."
-  yourFollowRequestAccepted: "Takip isteğin kabul edildi."
-  pollEnded: "Anket sonuçları açıklandı."
-  newNote: "Yeni not"
-  unreadAntennaNote: "{name} anteni"
-  emptyPushNotificationMessage: "Push bildirimleri güncellendi"
-  achievementEarned: "Achievement unlocked"
-  testNotification: "Test bildirimi"
-  notificationWillBeDisplayedLikeThis: "Bildirimler şöyle görünür"
-  exportOfXCompleted: "{x} ihracatı tamamlandı."
-  login: "Biri oturum açtı"
-  _types:
-    all: "Tümü"
-    note: "Yeni notlar"
-    follow: "Yeni takipçiler"
-    mention: "Bahsetmeler"
-    reply: "Yanıtlar"
-    renote: "Renote"
-    quote: "Alıntılar"
-    reaction: "Tepki"
-    pollEnded: "Anketler sona eriyor"
-    scheduledNotePosted: "Planlanan gönderi başarılı"
-    scheduledNotePostFailed: "Planlanan gönderi başarısız oldu"
-    receiveFollowRequest: "Takip istekleri alındı"
-    followRequestAccepted: "Kabul edilen takip istekleri"
-    roleAssigned: "Verilen rol"
-    chatRoomInvitationReceived: "Sohbet odasına davet edildi"
-    achievementEarned: "Başarı kilidi açıldı"
-    exportCompleted: "İhracat işlemi tamamlandı."
-    login: "Oturum Aç"
-    createToken: "Erişim jetonu oluştur"
-    test: "Bildirim testi"
-    app: "Bağlı uygulamalardan gelen bildirimler"
+  youGotMention: '{name} sizden bahsetti.'
+  youGotReply: '{name} size yanıt verdi'
+  youGotQuote: '{name} sizden alıntı yaptı'
+  youRenoted: '{name}''den Renote'
+  youWereFollowed: 'seni takip etti'
+  youReceivedFollowRequest: 'Bir takip isteği aldınız.'
+  yourFollowRequestAccepted: 'Takip isteğin kabul edildi.'
+  pollEnded: 'Anket sonuçları açıklandı.'
+  newNote: 'Yeni not'
+  unreadAntennaNote: '{name} anteni'
+  achievementEarned: 'Achievement unlocked'
+  testNotification: 'Test bildirimi'
+  notificationWillBeDisplayedLikeThis: 'Bildirimler şöyle görünür'
+  exportOfXCompleted: '{x} ihracatı tamamlandı.'
+  login: 'Biri oturum açtı'
   _actions:
-    followBack: "seni takip ettim"
-    reply: "Yanıtla"
-    renote: "Renote"
-_moderationLogTypes:
-  suspend: "Askıya alınmış"
-  deleteNote: "Not silindi"
-  deleteUserAnnouncement: "Kullanıcı duyurusu silindi"
-  resetPassword: "Şifreyi sıfırla"
-  resolveAbuseReport: "Rapor çözüldü"
-  createInvitation: "Davet oluşturuldu"
-  deleteGalleryPost: "Galeri gönderisi silindi"
-_fileViewer:
-  url: "URL"
-_externalResourceInstaller:
-  _vendorInfo:
-    title: "Dağıtıcı bilgileri"
-  _errors:
-    _themeInstallFailed:
-      title: "Tema yüklenemedi"
-      description: "Tema yükleme sırasında bir sorun oluştu. Lütfen tekrar dene. Hata ayrıntıları Javascript konsolunda görüntülenebilir."
-_reversi:
-  reversi: "Tersine çevirme"
+    followBack: 'seni takip ettim'
+    reply: 'Yanıtla'
+    renote: 'Renote'
 _offlineScreen:
-  title: "Çevrimdışı - sunucuya bağlanılamıyor"
-  header: "Sunucuya bağlanılamıyor"
-_gridComponent:
-  _error:
-    columnTypeNotSupport: "Düzenli ifade ile doğrulama yalnızca type:text sütunları için desteklenir."
-_embedCodeGen:
-  autoload: "Otomatik olarak daha fazlasını yükle (kullanımdan kaldırıldı)"
-_selfXssPrevention:
-  warning: "UYARI"
-  title: "“Bu ekrana bir şey yapıştırın” tamamen bir aldatmaca."
-  description1: "Buraya bir şey yapıştırırsan, kötü niyetli bir kullanıcı hesabını ele geçirebilir veya kişisel bilgilerini çalabilir."
-  description2: "Yapıştırmaya çalıştığınız şeyi tam olarak anlamıyorsanız, %c hemen çalışmayı bırakın ve bu pencereyi kapatın."
-  description3: "Daha fazla bilgi için lütfen buraya bakın. {link}"
-_bootErrors:
-  title: "Yükleme başarısız"
-  serverError: "Bir süre bekledikten ve yeniden yükledikten sonra sorun devam ederse, lütfen aşağıdaki Hata ID ile sunucu yöneticisine başvurun."
-  solution: "Aşağıdakiler sorunu çözebilir."
-  solution1: "Tarayıcını ve işletim sistemini en son sürüme güncelle."
-  solution2: "Reklam engelleyiciyi devre dışı bırak"
-  solution3: "Tarayıcı önbelleğini temizle"
-  solution4: "Tor Tarayıcı için dom.webaudio.enabled değerini true olarak ayarlayın."
-  otherOption: "Diğer seçenekler"
-  otherOption1: "İstemci ayarlarını ve önbelleği sil"
-  otherOption2: "Basit istemciyi başlatın"
-  otherOption3: "Onarım aracını başlatın"
-  otherOption4: "Misskey'i güvenli modda başlatın"
-_watermarkEditor:
-  advanced: "Gelişmiş"
-_imageEffector:
-  _fxProps:
-    radius: "Yarıçap"
-    samples: "Örnek sayısı"
-    threshold: "Eşik"
-_drafts:
-  select: "Taslak Seç"
-  schedule: "Planlanmış Gönderi"
+  title: 'Çevrimdışı - sunucuya bağlanılamıyor'
+  header: 'Sunucuya bağlanılamıyor'
+next: 'Sonraki'
+upload: 'Yükle'
+preview: 'Önizleme'
+reset: 'Sıfırla'
+name: 'İsim'
+title: 'Başlık'
+description: 'Açıklama'
+none: 'Hiçbiri'
+all: 'Tümü'
+default: 'Varsayılan'
+error: 'Hata'
+users: 'Kullanıcılar'
+areYouSure: 'Emin misin?'

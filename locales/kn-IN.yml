@@ -1,29 +1,12 @@
----
-_lang_: "ಕನ್ನಡ"
-monthAndDay: "{month}ನೇ ತಿಂಗಳ {day}ನೇ ದಿನ"
-search: "ಹುಡುಕು"
-ok: "ಸರಿ"
-cancel: "ರದ್ದು"
-uploading: "ಅಪ್‌ಲೋಡಾಗುತ್ತಿದೆ"
-save: "ಉಳಿಸಿ"
-favorites: "ಮೆಚ್ಚಿನವುಗಳು"
-delete: "ಅಳಿಸು"
-pinned: "ಪ್ರೊಫ಼ೈಲಿಗೆ ಅಂಟಿಸು"
-instances: "ನಿದರ್ಶನ"
-smtpUser: "ಬಳಕೆಹೆಸರು"
-smtpPass: "ಗುಪ್ತಪದ"
-_email:
-  _follow:
-    title: "ಹಿಂಬಾಲಿಸಿದರು"
-_theme:
-  keys:
-    mention: "ಹೆಸರಿಸಿದ"
-_profile:
-  username: "ಬಳಕೆಹೆಸರು"
+_lang_: 'ಕನ್ನಡ'
+search: 'ಹುಡುಕು'
+ok: 'ಸರಿ'
+cancel: 'ರದ್ದು'
+save: 'ಉಳಿಸಿ'
+favorites: 'ಮೆಚ್ಚಿನವುಗಳು'
+delete: 'ಅಳಿಸು'
 _notification:
-  youWereFollowed: "ಹಿಂಬಾಲಿಸಿದರು"
-  _types:
-    mention: "ಹೆಸರಿಸಿದ"
-    login: "ಪ್ರವೇಶ"
+  youWereFollowed: 'ಹಿಂಬಾಲಿಸಿದರು'
   _actions:
-    reply: "ಉತ್ತರಿಸು"
+    reply: 'ಉತ್ತರಿಸು'
+users: 'ಬಳಕೆದಾರ'

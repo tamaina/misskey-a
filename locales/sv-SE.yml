@@ -1,130 +1,43 @@
----
-_lang_: "Svenska"
-monthAndDay: "{day}/{month}"
-search: "Sök"
-ok: "OK"
-cancel: "Avbryt"
-notificationSettings: "Notifieringsinställningar"
-uploading: "Laddar upp..."
-save: "Spara"
-favorites: "Favoriter"
-favorited: "Tillagd i favoriter."
-alreadyFavorited: "Redan tillagd i favoriter."
-delete: "Radera"
-searchUser: "Sök användare"
-showLess: "Stäng"
-lists: "Listor"
-notes: "Noter"
-following: "Följer"
-somethingHappened: "Ett fel har uppstått"
-pinned: "Fäst till profil"
-unsuspend: "Ta bort suspenderingen"
-customEmojis: "Anpassa emoji"
-emojis: "Emoji"
-emojiName: "Emoji namn"
-loginFailed: "Inloggningen misslyckades"
-wallpaper: "Bakgrundsbild"
-instances: "Instanser"
-latestStatus: "Senaste status"
-operations: "Operationer"
-monitor: "Övervakning"
-network: "Nätverk"
-disk: "Disk"
-mutedUsers: "Tystade användare"
-blockedUsers: "Blockerade användare"
-changePassword: "Ändra lösenord"
-retypedNotMatch: "Inmatningen matchar inte"
-currentPassword: "Nuvarande lösenord"
-newPasswordRetype: "Bekräfta lösenord"
-removed: "Borttaget"
-home: "Hem"
-reload: "Ladda om"
-watch: "Titta"
-accept: "Tillåt"
-reject: "Neka"
-integration: "Integrationer"
-pinnedPages: "Fästa sidor"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Aktivera hCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Aktivera reCAPTCHA"
-turnstile: "Turnstile"
-enableTurnstile: "Aktivera Turnstile"
-antennas: "Antenner"
-close: "Stäng"
-invites: "Inbjudan"
-transfer: "Överför"
-signinFailed: "Kan inte logga in. Det angivna användarnamnet eller lösenordet är felaktigt."
-regenerate: "Regenerera"
-appearance: "Utseende"
-deleteAll: "Radera alla"
-deleteAllFiles: "Radera alla filer"
-edit: "Ändra"
-enableEmail: "Aktivera epost-utskick"
-emailAddress: "E-postadress"
-smtpHost: "Värd"
-smtpUser: "Användarnamn"
-smtpPass: "Lösenord"
-emptyToDisableSmtpAuth: "Lämna användarnamn och lösenord tomt för att avaktivera SMTP verifiering"
-copy: "Kopiera"
-followersCount: "Antal följare"
-clips: "Klipp"
-global: "Global"
-sent: "Skicka"
-unknownWebAuthnKey: "Okänd nyckel"
-_chat:
-  invitations: "Inbjudan"
-  members: "Medlemmar"
-  home: "Hem"
-  send: "Skicka"
-_initialTutorial:
-  _reaction:
-    title: "Vad är reaktioner?"
+_lang_: 'Svenska'
+search: 'Sök'
+ok: 'OK'
+cancel: 'Avbryt'
+notificationSettings: 'Notifieringsinställningar'
+save: 'Spara'
+favorites: 'Favoriter'
+delete: 'Radera'
+lists: 'Listor'
+notes: 'Noter'
+following: 'Följer'
+somethingHappened: 'Ett fel har uppstått'
+customEmojis: 'Anpassa emoji'
+mutedUsers: 'Tystade användare'
+blockedUsers: 'Blockerade användare'
+reload: 'Ladda om'
+accept: 'Tillåt'
+reject: 'Neka'
+antennas: 'Antenner'
+close: 'Stäng'
+edit: 'Ändra'
+copy: 'Kopiera'
+clips: 'Klipp'
 _achievements:
   _types:
     _open3windows:
-      title: "Flera Fönster"
-      description: "Ha minst 3 fönster öppna samtidigt"
-_role:
-  edit: "Redigera roll"
-_ffVisibility:
-  public: "Publicera"
-  private: "Privat"
-_email:
-  _follow:
-    title: "följde dig"
-_menuDisplay:
-  hide: "Dölj"
-_theme:
-  keys:
-    mention: "Nämn"
-    renote: "Omnotera"
-_permissions:
-  "read:reactions": "Visa dina reaktioner"
-  "write:reactions": "Redigera dina reaktioner"
-  "write:admin:delete-account": "Radera användarkonto"
-  "write:admin:roles": "Hantera roller"
-  "read:admin:roles": "Visa roller"
-_profile:
-  username: "Användarnamn"
-_pages:
-  blocks:
-    image: "Bilder"
+      title: 'Flera Fönster'
 _notification:
-  youWereFollowed: "följde dig"
-  unreadAntennaNote: "Antenn {name}"
-  _types:
-    follow: "Följer"
-    mention: "Nämn"
-    renote: "Omnotera"
-    quote: "Citat"
-    reaction: "Reaktioner"
-    login: "Logga in"
+  youWereFollowed: 'följde dig'
+  unreadAntennaNote: 'Antenn {name}'
   _actions:
-    reply: "Svara"
-    renote: "Omnotera"
-_moderationLogTypes:
-  suspend: "Suspendera"
-  resetPassword: "Återställ Lösenord"
-_selfXssPrevention:
-  warning: "VARNING"
+    reply: 'Svara'
+    renote: 'Omnotera'
+next: 'Nästa'
+upload: 'Ladda upp'
+preview: 'Förhandsvisning'
+name: 'Namn'
+description: 'Beskrivning'
+none: 'Ingen'
+all: 'Allt'
+default: 'Standard'
+error: 'Fel!'
+users: 'Användare'

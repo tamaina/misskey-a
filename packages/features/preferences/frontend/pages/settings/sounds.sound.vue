@@ -84,7 +84,7 @@ if (type.value === '_driveFile_' && fileId.value) {
 function getSoundTypeName(f: SoundType): string {
 	switch (f) {
 		case null:
-			return $locale.value.sfc.none;
+			return globalLocale.value.env.none;
 		case '_driveFile_':
 			return $locale.value.sfc.driveFile;
 		default:
@@ -223,7 +223,6 @@ function save() {
 
 <locale locale="ar-SA" lang="json">
 {
-	"none": "لا شيء",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -241,7 +240,6 @@ function save() {
 
 <locale locale="ca-ES" lang="json">
 {
-	"none": "Res",
 	"driveFile": "Fer servir un fitxer d'àudio del disc",
 	"driveFileWarn": "Seleccionar un fitxer d'àudio del disc",
 	"driveFileTypeWarn": "Fitxer no suportat ",
@@ -259,7 +257,6 @@ function save() {
 
 <locale locale="cs-CZ" lang="json">
 {
-	"none": "Žádný",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -277,7 +274,6 @@ function save() {
 
 <locale locale="da-DK" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -295,7 +291,6 @@ function save() {
 
 <locale locale="de-DE" lang="json">
 {
-	"none": "Nichts",
 	"driveFile": "Audiodatei aus dem Drive verwenden",
 	"driveFileWarn": "Wähle eine Audiodatei aus dem Drive",
 	"driveFileTypeWarn": "Diese Datei wird nicht unterstützt",
@@ -313,7 +308,6 @@ function save() {
 
 <locale locale="en-US" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -331,7 +325,6 @@ function save() {
 
 <locale locale="es-ES" lang="json">
 {
-	"none": "Ninguna",
 	"driveFile": "Usar un archivo de audio en Drive",
 	"driveFileWarn": "Selecciona un archivo de audio en Drive.",
 	"driveFileTypeWarn": "Este archivo es incompatible",
@@ -349,7 +342,6 @@ function save() {
 
 <locale locale="fr-FR" lang="json">
 {
-	"none": "Rien",
 	"driveFile": "Utiliser un effet sonore sur le Disque",
 	"driveFileWarn": "Veuillez sélectionner le fichier sur le Disque",
 	"driveFileTypeWarn": "Ce fichier n'est pas pris en charge",
@@ -367,7 +359,6 @@ function save() {
 
 <locale locale="id-ID" lang="json">
 {
-	"none": "Tidak ada",
 	"driveFile": "Menggunakan berkas audio dalam Drive",
 	"driveFileWarn": "Pilih berkas audio dari Drive",
 	"driveFileTypeWarn": "Berkas ini tidak didukung",
@@ -385,7 +376,6 @@ function save() {
 
 <locale locale="it-IT" lang="json">
 {
-	"none": "Nessuna",
 	"driveFile": "Suoni del Drive",
 	"driveFileWarn": "Seleziona file dal dispositivo",
 	"driveFileTypeWarn": "Formato file non supportato",
@@ -403,7 +393,6 @@ function save() {
 
 <locale locale="ja-JP" lang="json">
 {
-	"none": "なし",
 	"driveFile": "ドライブの音声を使用",
 	"driveFileWarn": "ドライブのファイルを選択してください",
 	"driveFileTypeWarn": "このファイルは対応していません",
@@ -421,7 +410,6 @@ function save() {
 
 <locale locale="ja-KS" lang="json">
 {
-	"none": "なし",
 	"driveFile": "ドライブん中の音使う",
 	"driveFileWarn": "ドライブん中のファイル選びや",
 	"driveFileTypeWarn": "このファイルは対応しとらへん",
@@ -439,7 +427,6 @@ function save() {
 
 <locale locale="kab-KAB" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -457,7 +444,6 @@ function save() {
 
 <locale locale="kn-IN" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -475,7 +461,6 @@ function save() {
 
 <locale locale="ko-KR" lang="json">
 {
-	"none": "없음",
 	"driveFile": "드라이브에 있는 오디오를 사용",
 	"driveFileWarn": "드라이브에 있는 파일을 선택하세요.",
 	"driveFileTypeWarn": "이 파이",
@@ -493,7 +478,6 @@ function save() {
 
 <locale locale="nl-NL" lang="json">
 {
-	"none": "Niets",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -511,7 +495,6 @@ function save() {
 
 <locale locale="no-NO" lang="json">
 {
-	"none": "Ingen",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -529,7 +512,6 @@ function save() {
 
 <locale locale="pl-PL" lang="json">
 {
-	"none": "Brak",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -547,7 +529,6 @@ function save() {
 
 <locale locale="pt-PT" lang="json">
 {
-	"none": "Nenhum",
 	"driveFile": "Usar um arquivo de áudio do Drive.",
 	"driveFileWarn": "Selecione um arquivo de áudio do Drive.",
 	"driveFileTypeWarn": "Esse arquivo não é compatível",
@@ -565,7 +546,6 @@ function save() {
 
 <locale locale="ru-RU" lang="json">
 {
-	"none": "Ничего",
 	"driveFile": "Использовать аудиофайл с Диска.",
 	"driveFileWarn": "Выбрать аудиофайл с Диска.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -583,7 +563,6 @@ function save() {
 
 <locale locale="sk-SK" lang="json">
 {
-	"none": "Žiadne",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -601,7 +580,6 @@ function save() {
 
 <locale locale="th-TH" lang="json">
 {
-	"none": "ไม่มี",
 	"driveFile": "ใช้เสียงจากไดรฟ์",
 	"driveFileWarn": "เลือกไฟล์ในไดรฟ์ของคุณ",
 	"driveFileTypeWarn": "ไม่รองรับไฟล์นี้",
@@ -619,7 +597,6 @@ function save() {
 
 <locale locale="tr-TR" lang="json">
 {
-	"none": "Hiçbiri",
 	"driveFile": "Drive'da bir ses dosyası kullanın.",
 	"driveFileWarn": "Drive'dan bir ses dosyası seçin.",
 	"driveFileTypeWarn": "Bu dosya desteklenmiyor",
@@ -637,7 +614,6 @@ function save() {
 
 <locale locale="ug-CN" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -655,7 +631,6 @@ function save() {
 
 <locale locale="uk-UA" lang="json">
 {
-	"none": "Відсутній",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -673,7 +648,6 @@ function save() {
 
 <locale locale="vi-VN" lang="json">
 {
-	"none": "Không",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
@@ -691,7 +665,6 @@ function save() {
 
 <locale locale="zh-CN" lang="json">
 {
-	"none": "无",
 	"driveFile": "使用网盘内的音频",
 	"driveFileWarn": "选择网盘上的文件",
 	"driveFileTypeWarn": "不支持此文件",
@@ -709,7 +682,6 @@ function save() {
 
 <locale locale="zh-TW" lang="json">
 {
-	"none": "無",
 	"driveFile": "使用雲端硬碟的音效檔案",
 	"driveFileWarn": "請選擇雲端硬碟中的檔案",
 	"driveFileTypeWarn": "不支援此檔案",

@@ -384,7 +384,7 @@ async function leaveRoom() {
 
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: $locale.value.sfc.areYouSure,
+		text: globalLocale.value.env.areYouSure,
 	});
 	if (canceled) return;
 
@@ -564,7 +564,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Are you sure?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -589,7 +588,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "No participes en aquesta sala, però has rebut una invitació. Per participar accepta la invitació.",
 	"doYouAcceptInvitation": "Acceptes la invitació?",
-	"areYouSure": "Estàs segur?",
 	"inviteUser": "Invitar usuaris",
 	"leave": "Marxar",
 	"messages": "Missatge",
@@ -614,7 +612,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Jste si jistí?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -639,7 +636,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Are you sure?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -664,7 +660,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "Du bist kein Teilnehmer in diesem Raum, aber du hast eine Einladung erhalten. Bitte nimm die Einladung an, um beizutreten.",
 	"doYouAcceptInvitation": "Nimmst du die Einladung an?",
-	"areYouSure": "Bist du sicher?",
 	"inviteUser": "Benutzer einladen",
 	"leave": "Raum verlassen",
 	"messages": "Nachrichten",
@@ -689,7 +684,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Are you sure?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -714,7 +708,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "No eres participante en esta sala, pero has recibido una invitación. Por favor, acepta la invitación para unirte.",
 	"doYouAcceptInvitation": "¿Aceptas la invitación?",
-	"areYouSure": "¿Estás conforme?",
 	"inviteUser": "Invitar  usuarios",
 	"leave": "Dejar sala",
 	"messages": "Mensajes",
@@ -739,7 +732,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Êtes-vous sûr·e ?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -764,7 +756,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Apakah kamu yakin?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -789,7 +780,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "Non partecipi a questa stanza di chat, ma hai ricevuto un invito. Per partecipare, accetta l'invito.",
 	"doYouAcceptInvitation": "Intendi accettare l'invito?",
-	"areYouSure": "Confermi?",
 	"inviteUser": "Invita persona",
 	"leave": "Esci",
 	"messages": "Messaggi",
@@ -814,7 +804,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "あなたはこのグループの参加者ではありませんが、招待が届いています。参加するには、招待を承認してください。",
 	"doYouAcceptInvitation": "招待を承認しますか？",
-	"areYouSure": "よろしいですか？",
 	"inviteUser": "ユーザーを招待",
 	"leave": "グループから退出",
 	"messages": "メッセージ",
@@ -839,7 +828,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "あんたはこのルームの参加者ちゃうけど、招待が届いとるで。参加するんやったら、招待を承認してな。",
 	"doYouAcceptInvitation": "招待を承認してもええんか？",
-	"areYouSure": "いいん？",
 	"inviteUser": "ユーザーを招待",
 	"leave": "グループから抜ける",
 	"messages": "メッセージ",
@@ -864,7 +852,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Are you sure?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -889,7 +876,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Are you sure?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -914,7 +900,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "이 방의 참가자가 아니지만 초대를 받았습니다. 참가하려면 초대를 수락하세요.",
 	"doYouAcceptInvitation": "초대를 수락하시겠습니까?",
-	"areYouSure": "계속 진행하시겠습니까?",
 	"inviteUser": "유저를 초대",
 	"leave": "룸을 떠나기",
 	"messages": "메시지",
@@ -939,7 +924,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Weet je het zeker?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -964,7 +948,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Are you sure?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -989,7 +972,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Na pewno?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -1014,7 +996,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "Você não é um participante da sala, mas recebeu um convite. Por favor, aceite o convite para entrar.",
 	"doYouAcceptInvitation": "Aceita o convite?",
-	"areYouSure": "Tem certeza?",
 	"inviteUser": "Convidar Usuários",
 	"leave": "Deixar sala",
 	"messages": "Mensagem",
@@ -1039,7 +1020,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "Вы не являетесь участником этого чата, но вас в него пригласили. Пожалуйста, примите приглашение.",
 	"doYouAcceptInvitation": "Принять приглашение?",
-	"areYouSure": "Вы уверены?",
 	"inviteUser": "Пригласить пользователей",
 	"leave": "Выйти из комнаты",
 	"messages": "Сообщения",
@@ -1064,7 +1044,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Are you sure?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -1089,7 +1068,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "คุณไม่ได้เป็นผู้เข้าร่วมห้องนี้ แต่มีคำเชิญส่งมา หากต้องการเข้าร่วม กรุณายืนยันคำเชิญ",
 	"doYouAcceptInvitation": "ต้องการยอมรับคำเชิญหรือไม่?",
-	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?",
 	"inviteUser": "เชิญผู้ใช้",
 	"leave": "ออกจากห้อง",
 	"messages": "ข้อความ",
@@ -1114,7 +1092,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "Bu odanın katılımcısı değilsin, ancak bir davet aldın. Lütfen daveti kabul ederek katıl.",
 	"doYouAcceptInvitation": "Daveti kabul ediyor musunuz?",
-	"areYouSure": "Emin misin?",
 	"inviteUser": "Kullanıcıları Davet Et",
 	"leave": "Odadan çık",
 	"messages": "Mesaj",
@@ -1139,7 +1116,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Are you sure?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -1164,7 +1140,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "Ви не учасник цієї групи, але ви маєте запрошення до неї. Будь ласка, прийміть запрошення, щоб доєднатися.",
 	"doYouAcceptInvitation": "Чи приймаєте ви запрошення?",
-	"areYouSure": "Ви впевнені?",
 	"inviteUser": "Запросити користувачів",
 	"leave": "Залишити групу",
 	"messages": "Повідомлення",
@@ -1189,7 +1164,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "You are not a participant in this room, but you have received an invitation. Please accept the invitation to join.",
 	"doYouAcceptInvitation": "Do you accept the invitation?",
-	"areYouSure": "Bạn chắc chứ?",
 	"inviteUser": "Invite Users",
 	"leave": "Leave room",
 	"messages": "Messages",
@@ -1214,7 +1188,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "您尚未加入此群组，但已收到加入邀请。请接受邀请加入。",
 	"doYouAcceptInvitation": "要接受邀请吗？",
-	"areYouSure": "你确定吗？",
 	"inviteUser": "邀请用户",
 	"leave": "退出群聊",
 	"messages": "消息",
@@ -1239,7 +1212,6 @@ definePage(computed(() => {
 {
 	"youAreNotAMemberOfThisRoomButInvited": "您不是此聊天室的參與者，但已收到邀請。若要加入，請先接受邀請。\n",
 	"doYouAcceptInvitation": "您要接受這個邀請嗎？\n",
-	"areYouSure": "是否確定？",
 	"inviteUser": "邀請使用者",
 	"leave": "退出聊天室",
 	"messages": "訊息",

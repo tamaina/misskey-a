@@ -18,6 +18,10 @@ import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import expansion from './shared-global-locale-expansion.json';
 import pruning from './pruned-global-locale-baseline.json';
 import retained from './pruned-global-locale-retained.json';
+import { historicalRawLocale, flattenCatalog, verifyCatalogHistory } from './catalog-history.js';
+import history from './catalog-history.json';
+import retention from '../../../i18n/catalog-retention.json';
+import { globalLocaleKeys } from '../../../features/runtime/frontend/shared/global-locale.js';
 import { locales, valueAt, verifyPrunedGlobalLocale } from './pruned-global-locale-baseline.js';
 
 const root = resolve(import.meta.dirname, '../../../..');
@@ -63,7 +67,7 @@ test.each(expansion.owners)('$file compiles its real shared template and script 
 	const filename = resolve(root, owner.file);
 	const source = readFileSync(filename, 'utf8');
 	for (const key of owner.keys) expect(source).not.toMatch(new RegExp(`\\$locale(?:\\.value)?\\.sfc\\.${key}\\b`));
-	for (const reference of source.matchAll(/globalLocale(?:\.value)?\.env\.(\w+)/g)) expect(owner.keys).toContain(reference[1]);
+	for (const reference of source.matchAll(/globalLocale(?:\.value)?\.env\.(\w+)/g)) expect(globalLocaleKeys).toContain(reference[1]);
 	const transformed = await hook(plugin.transform, source, filename) as { code: string };
 	const parsed = parse(transformed.code, { filename });
 	expect(parsed.errors).toEqual([]);
@@ -73,11 +77,14 @@ test.each(expansion.owners)('$file compiles its real shared template and script 
 test('deleted keys are absent from every source catalog and the effective production catalogs', () => {
 	expect(pruning.mappings).toHaveLength(1391);
 	for (const language of languages) {
-		for (const [path] of pruning.mappings) expect(valueAt(productionLocales[language], String(path))).toBeUndefined();
+		for (const [path] of pruning.mappings) {
+			if ((history.promoted as string[]).includes(String(path))) expect(typeof valueAt(productionLocales[language], String(path))).toBe('string');
+			else expect(valueAt(productionLocales[language], String(path))).toBeUndefined();
+		}
 	}
 	for (const file of readdirSync(resolve(root, 'locales')).filter(file => file.endsWith('.yml'))) {
 		const raw = load(readFileSync(resolve(root, 'locales', file), 'utf8').replaceAll('\b', ''));
-		for (const [path] of pruning.mappings) expect(valueAt(raw, String(path))).toBeUndefined();
+		for (const [path] of pruning.mappings) if (!(history.promoted as string[]).includes(String(path))) expect(valueAt(raw, String(path))).toBeUndefined();
 	}
 });
 
@@ -97,42 +104,79 @@ test('all 42 catalogs retain the independently frozen values outside the deleted
 		return Object.entries(dictionary).flatMap(([key, value]) => flatten(value, prefix ? `${prefix}.${key}` : key));
 	};
 	for (const [file, original] of Object.entries(retained)) {
-		const raw = load(readFileSync(resolve(root, 'locales', file), 'utf8').replaceAll('\b', ''));
+		const raw = historicalRawLocale(file.slice(0, -4));
 		const pairs = flatten(raw ?? {}).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
 		expect(pairs).toHaveLength(original.after);
 		expect(createHash('sha256').update(JSON.stringify(pairs)).digest('hex')).toBe(original.sha256);
 	}
 });
 
-test('SW dynamic achievements, notification actions, email and boot catalogs remain available', () => {
-	const scopes = ['_achievements', '_notification', '_email', '_bootErrors', '_offlineScreen', '_selfXssPrevention'];
-	const actions = ['_lang_', 'reload', 'accept', 'reject', 'antennas', 'blockedUsers', 'clips', 'customEmojis', 'favorites', 'following', 'mutedUsers', 'notes', 'lists', 'markAllAsRead', 'notificationSettings'];
-	for (const language of languages) {
-		for (const scope of scopes) expect(productionLocales[language][scope]).toEqual(locales[language][scope]);
-		for (const action of actions) expect(typeof productionLocales[language][action]).toBe('string');
+test('production catalogs contain only documented runtime paths and preserve their historical values', () => {
+	for (const file of Object.keys(retained)) {
+		const language = file.slice(0, -4);
+		const current = (load(readFileSync(resolve(root, 'locales', file), 'utf8').replaceAll('\b', '')) ?? {}) as Parameters<typeof flattenCatalog>[0];
+		for (const [path] of flattenCatalog(current)) expect(retention.retainedPaths).toContain(path);
+		const promoted = flattenCatalog(current).filter(([path]) => (history.promoted as string[]).includes(path)).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+		const expected = Reflect.get(history.promotedRawHashes, language) as { count: number; sha256: string };
+		expect(promoted).toHaveLength(expected.count);
+		expect(createHash('sha256').update(JSON.stringify(promoted)).digest('hex')).toBe(expected.sha256);
+		verifyCatalogHistory(language, flattenCatalog(historicalRawLocale(language)));
 	}
+	for (const language of languages) {
+		for (const path of retention.retainedPaths) expect(valueAt(productionLocales[language], path)).toBe(valueAt(locales[language], path));
+	}
+	expect(retention.unconfirmedKeys).toEqual([]);
+	expect(Object.keys(history.deletedRaw)).toHaveLength(42);
 });
 
-test('all static paths and dynamic prefixes used by SW and email survive catalog pruning', () => {
-	const paths = new Set<string>();
+test('historical raw fixtures cannot approve changed values or language inventories', () => {
+	const pairs = flattenCatalog(historicalRawLocale('ja-JP'));
+	const changed = pairs.map((pair): [string, string] => [...pair]);
+	changed[0][1] += '!';
+	expect(() => verifyCatalogHistory('ja-JP', changed)).toThrow('Historical catalog differs');
+	expect(() => verifyCatalogHistory('ja-JP', pairs.slice(1))).toThrow('Historical catalog differs');
+	expect(() => verifyCatalogHistory('unknown', pairs)).toThrow('Historical catalog differs');
+});
+
+test('runtime AST paths including dynamic tails match the documented complete callsite inventory', () => {
+	const uses: { file: string; line: number; path: string }[] = [];
 	for (const file of ['packages/sw/src/sw.ts', 'packages/sw/src/scripts/create-notification.ts', 'packages/features/notifications/backend/services/NotificationService.ts']) {
 		const source = ts.createSourceFile(file, readFileSync(resolve(root, file), 'utf8'), ts.ScriptTarget.Latest, true);
-		const visit = (node: ts.Node): void => {
+		const chain = (node: ts.Node): string[] | null => {
+			if (ts.isIdentifier(node)) return node.text === 'i18n' ? [] : null;
 			if (ts.isPropertyAccessExpression(node) || ts.isElementAccessExpression(node)) {
-				const match = node.getText(source).match(/^i18n\.tsx?\??\.([\w$]+(?:\.[\w$]+)*)/);
-				if (match) paths.add(match[1]);
+				const prefix = chain(node.expression);
+				if (!prefix) return null;
+				return [...prefix, ts.isPropertyAccessExpression(node) ? node.name.text : ts.isStringLiteral(node.argumentExpression) ? node.argumentExpression.text : '*'];
+			}
+			return null;
+		};
+		const visit = (node: ts.Node): void => {
+			if (ts.isIdentifier(node) && node.text === 'i18n') {
+				let outer: ts.Node = node;
+				while ((ts.isPropertyAccessExpression(outer.parent) || ts.isElementAccessExpression(outer.parent)) && outer.parent.expression === outer) outer = outer.parent;
+				const parts = chain(outer);
+				if (parts && ['ts', 'tsx'].includes(parts[0]) && parts.length > 1) uses.push({ file, line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1, path: parts.slice(1).join('.') });
 			}
 			if (ts.isCallExpression(node) && node.expression.getText(source) === 'i18n.t') {
 				const argument = node.arguments[0];
-				if (!ts.isStringLiteral(argument)) throw new Error(`Unreviewed dynamic email locale path: ${file}`);
-				paths.add(argument.text);
+				if (!ts.isStringLiteral(argument)) throw new Error(`Unreviewed dynamic locale path: ${file}`);
+				uses.push({ file, line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1, path: argument.text });
 			}
 			ts.forEachChild(node, visit);
 		};
 		visit(source);
 	}
-	expect(paths.has('_achievements._types')).toBe(true);
-	// Backend email helpers are currently commented out; their catalog is retained conservatively.
-	expect(paths.has('_notification.youWereFollowed')).toBe(true);
-	for (const language of languages) for (const path of paths) expect(valueAt(productionLocales[language], path), `${language}:${path}`).toBeDefined();
+	expect(uses).toEqual(retention.runtimeUses);
+	expect(uses.some(use => use.path === '_achievements._types.*.title')).toBe(true);
+	for (const use of uses) {
+		const matches = retention.retainedPaths.filter(path => {
+			const actual = path.split('.');
+			const expected = use.path.split('.');
+			return actual.length === expected.length && actual.every((part, index) => expected[index] === '*' || expected[index] === part);
+		});
+		expect(matches.length, use.path).toBeGreaterThan(0);
+		for (const language of languages) for (const path of matches) expect(valueAt(productionLocales[language], path)).toBe(valueAt(locales[language], path));
+	}
+	for (const use of retention.sharedUses) expect(readFileSync(resolve(root, use.file), 'utf8').split('\n')[use.line - 1]).toContain(`.env.${use.path}`);
 });

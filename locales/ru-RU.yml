@@ -1,634 +1,210 @@
----
-_lang_: "Русский"
-monthAndDay: "{day}.{month}"
-search: "Поиск"
-ok: "Подтвердить"
-cancel: "Отмена"
-notificationSettings: "Настройки уведомлений"
-uploading: "Загрузка..."
-save: "Сохранить"
-favorites: "Избранное"
-favorited: "Добавлено в избранное."
-alreadyFavorited: "Уже есть в избранном."
-delete: "Удалить"
-searchUser: "Поиск людей"
-showLess: "Закрыть"
-lists: "Списки"
-notes: "Заметки"
-following: "Подписки"
-somethingHappened: "Что-то пошло не так"
-pinned: "Закрепить в профиле"
-emojiPicker: "Выбор эмодзи"
-unsuspend: "Разморозить"
-customEmojis: "Собственные эмодзи"
-emojis: "Эмодзи"
-emojiName: "Название эмодзи"
-loginFailed: "Неудачная попытка входа"
-wallpaper: "Обои"
-instances: "Инстанс"
-latestStatus: "Последний статус"
-operations: "Операции"
-monitor: "Монитор"
-network: "Сеть"
-disk: "Диск"
-mutedUsers: "Скрытые пользователи"
-blockedUsers: "Заблокированные пользователи"
-changePassword: "Изменить пароль"
-retypedNotMatch: "Не совпадают"
-currentPassword: "Текущий пароль"
-newPasswordRetype: "Новый пароль (ещё раз)"
-removed: "﻿Удалено"
-home: "Главная"
-reload: "Перезагрузить"
-watch: "Следить"
-unwatch: "Отписаться"
-accept: "Принять"
-reject: "Отклонить"
-integration: "Интеграция"
-pinnedPages: "Закрепленные страницы"
-pinnedClipId: "Идентификатор закреплённой подборки"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Включить hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "Включить mCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Включить reCAPTCHA"
-turnstile: "Сервис Turnstile"
-enableTurnstile: "Включить Turnstile"
-antennas: "Антенны"
-close: "Закрыть"
-invites: "Приглашения"
-transfer: "Отдать"
-signinFailed: "Невозможно войти в систему. Введенное вами имя пользователя или пароль неверны."
-noHistory: "История пока пуста"
-signinHistory: "Журнал посещений"
-regenerate: "Создать повторно"
-appearance: "Внешний вид"
-promotion: "Продвинуто"
-promote: "Продвинуть"
-hideThisNote: "Спрятать эту запись"
-showFeaturedNotesInTimeline: "Показывать в ленте заметки из «Горячего»"
-deleteAll: "Удалить всё"
-showFixedPostForm: "Показывать поле для ввода новой заметки наверху ленты"
-deleteAllFiles: "Удалить все файлы"
-leaveConfirm: "Вы не сохранили изменения. Хотите выйти и потерять их?"
-notificationType: "Тип уведомления"
-edit: "Изменить"
-emailServer: "Сервер электронной почты"
-enableEmail: "Включить обмен электронной почтой"
-emailConfigInfo: "Используется для подтверждения адреса электронной почты и сброса пароля."
-emailAddress: "Адрес электронной почты"
-smtpConfig: "Конфигурация SMTP-сервера"
-smtpHost: "Хост"
-smtpPort: "Порт"
-smtpUser: "Имя пользователя"
-smtpPass: "Пароль"
-emptyToDisableSmtpAuth: "Не заполняйте имя пользователя и пароль, чтобы отключить аутентификацию в SMTP."
-smtpSecure: "Использовать SSL/TLS"
-smtpSecureInfo: "Выключите при использовании STARTTLS."
-testEmail: "Отправить тестовое письмо"
-copy: "Копировать"
-metrics: "Метрики"
-delayed: "Задержка"
-regenerateLoginToken: "Создать новый токен для входа"
-regenerateLoginTokenDescription: "Создаёт новый токен, используемый внутри программы во время входа. Обычно в этом нет необходимости. При создании все устройства будут отключены."
-sample: "Пример"
-repliesCount: "Сколько раз пользователь кому-то ответил"
-repliedCount: "Сколько раз ответили пользователю"
-followingCount: "Количество подписок"
-followersCount: "Количество подписавшихся"
-pollVotesCount: "Сколько раз пользователь участвовал в опросах"
-driveUsage: "Занято места на диске"
-clips: "Подборки"
-experimental: "Экспериментальные"
-wide: "Толстый"
-narrow: "Тонкий"
-sendErrorReports: "Посылать отчёты о сбоях"
-sendErrorReportsDescription: "Если включено, когда возникнет какая-нибудь техническая проблема, подробные сведения об этом будут отправлены разработчикам Misskey. Это очень помогает делать программу лучше. В отчёты попадают тип и версия ОС, браузера, журнал действий (что привело к сбою) и тому подобное."
-advanced: "Для продвинутых"
-markAllAsRead: "Отметить всё как прочитанное"
-onlineStatus: "Присутствие в сети"
-global: "Всеобщая"
-sent: "Отправить"
-received: "Получено"
-aiChanMode: "Режим Ай"
-unread: "Непрочитанное"
-classic: "Классика"
-incorrectTotp: "Введен неверный одноразовый пароль или срок его действия истек."
-rateLimitExceeded: "Ограничение скорости превышено"
-recommended: "Рекомендуем"
-undefined: "неопределённо"
-videos: "Видео"
-reactionsList: "Список реакций"
-createWithOptions: "Используйте параметры для создания"
-edited: "Изменено"
-replay: "Повтор"
-genEmbedCode: "Сгенерировать код для "
-unknownWebAuthnKey: "Неизвестный ключ"
-draft: "Черновик"
-untitled: "Без названия"
-chat: "Чат"
-defaultImageCompressionLevel: "Уровень сжатия изображений по умолчанию"
-_chat:
-  invitations: "Пригласить"
-  noHistory: "История пока пуста"
-  members: "Участники"
-  home: "Главная"
-  send: "Отправить"
-  cannotChatWithTheUser: "Невозможно начать чат с данным пользователем"
-  cannotChatWithTheUser_description: "Чат недоступен либо пользователь не включил функцию чата."
-_settings:
-  showUrlPreview: "Показывать предпросмотр ссылок"
-_initialTutorial:
-  launchTutorial: "Пройти обучение"
-  title: "Туториал"
-  skipAreYouSure: "Покинуть Туториал?"
-  _landing:
-    title: "Добро пожаловать в Туториал"
-  _note:
-    reply: "Нажмите на кнопку для того что бы ответить на сообщение. Так же можно ответить на ответ, продолжая дискуссию."
-    menu: "Вы можете посмотреть данные о заметке, копировать ссылки и выполнять прочие действия."
-  _reaction:
-    title: "Что такое реакции?"
-  _timeline:
-    social: "Посты из домашней и локальной ленты будут показаны тут."
-  _postNote:
-    _visibility:
-      localOnly: "Заметки с этим флагом не будут передаваться присоединённым серверам. Пользователи на других серверах не смогут увидеть её вне зависимости от настроек выше."
-  _done:
-    title: "Вы прошли туториал! 🎉"
+_lang_: 'Русский'
+search: 'Поиск'
+ok: 'Подтвердить'
+cancel: 'Отмена'
+notificationSettings: 'Настройки уведомлений'
+save: 'Сохранить'
+favorites: 'Избранное'
+delete: 'Удалить'
+lists: 'Списки'
+notes: 'Заметки'
+following: 'Подписки'
+somethingHappened: 'Что-то пошло не так'
+customEmojis: 'Собственные эмодзи'
+mutedUsers: 'Скрытые пользователи'
+blockedUsers: 'Заблокированные пользователи'
+reload: 'Перезагрузить'
+accept: 'Принять'
+reject: 'Отклонить'
+antennas: 'Антенны'
+close: 'Закрыть'
+edit: 'Изменить'
+copy: 'Копировать'
+clips: 'Подборки'
+markAllAsRead: 'Отметить всё как прочитанное'
 _achievements:
   _types:
     _notes1:
-      title: "Первые шаги в Misskey"
-      description: "Опубликована первая заметка"
-      flavor: "Приятных дней с Misskey!"
+      title: 'Первые шаги в Misskey'
     _notes10:
-      title: "Несколько заметок"
-      description: "Опубликовано 10 заметок"
+      title: 'Несколько заметок'
     _notes100:
-      title: "Много заметок"
-      description: "Опубликовано 100 заметок"
+      title: 'Много заметок'
     _notes500:
-      title: "Всё в заметках"
-      description: "Опубликовано 500 заметок"
+      title: 'Всё в заметках'
     _notes1000:
-      title: "Гора заметок"
-      description: "Опубликовано 1000 заметок"
+      title: 'Гора заметок'
     _notes5000:
-      title: "Заметки льются рекой"
-      description: "Опубликовано 5000 заметок"
+      title: 'Заметки льются рекой'
     _notes10000:
-      title: "Превосходство в заметках"
-      description: "Опубликовано 10 000 заметок"
+      title: 'Превосходство в заметках'
     _notes20000:
-      title: "Нужно больше заметок!"
-      description: "Опубликовано 20 000 заметок"
+      title: 'Нужно больше заметок!'
     _notes30000:
-      title: "Заметки, заметки, заметки"
-      description: "Опубликовано 30 000 заметок"
+      title: 'Заметки, заметки, заметки'
     _notes40000:
-      title: "Фабрика заметок"
-      description: "Опубликовано 40 000 заметок"
+      title: 'Фабрика заметок'
     _notes50000:
-      title: "Планета заметок"
-      description: "Опубликовано 50 000 заметок"
+      title: 'Планета заметок'
     _notes60000:
-      title: "Замет-квазар"
-      description: "Опубликовано 60 000 заметок"
+      title: 'Замет-квазар'
     _notes70000:
-      title: "Чёрная дыра из заметок"
-      description: "Опубликовано 70 000 заметок"
+      title: 'Чёрная дыра из заметок'
     _notes80000:
-      title: "Галактика заметок"
-      description: "Опубликовано 80 000 заметок"
+      title: 'Галактика заметок'
     _notes90000:
-      title: "Вселенная заметок"
-      description: "Опубликовано 90 000 заметок"
+      title: 'Вселенная заметок'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "Опубликовано 100 000 заметок"
-      flavor: "Вам правда нужно столько писать?"
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "Новичок Ⅰ"
-      description: "3 дня на сайте"
-      flavor: "С сегодняшнего дня зовите меня просто мискиец"
+      title: 'Новичок Ⅰ'
     _login7:
-      title: "Новичок Ⅱ"
-      description: "Неделя на сайте"
-      flavor: "Кажется, вы начали свыкаться с этим, нет?"
+      title: 'Новичок Ⅱ'
     _login15:
-      title: "Новичок Ⅲ"
-      description: "15 дней на сайте"
+      title: 'Новичок Ⅲ'
     _login30:
-      title: "Мискиец Ⅰ"
-      description: "30 дней на сайте"
+      title: 'Мискиец Ⅰ'
     _login60:
-      title: "Мискиец Ⅱ"
-      description: "60 дней на сайте"
+      title: 'Мискиец Ⅱ'
     _login100:
-      title: "Мискиец Ⅲ"
-      description: "100 дней на сайте"
-      flavor: "Жестокий мискиец"
+      title: 'Мискиец Ⅲ'
     _login200:
-      title: "Завсегдатай Ⅰ"
-      description: "200 дней на сайте"
+      title: 'Завсегдатай Ⅰ'
     _login300:
-      title: "Завсегдатай Ⅱ"
-      description: "300 дней на сайте"
+      title: 'Завсегдатай Ⅱ'
     _login400:
-      title: "Завсегдатай Ⅲ"
-      description: "400 дней на сайте"
+      title: 'Завсегдатай Ⅲ'
     _login500:
-      title: "Ветеран Ⅰ"
-      description: "500 дней на сайте"
-      flavor: "Господа, я люблю заметки"
+      title: 'Ветеран Ⅰ'
     _login600:
-      title: "Ветеран Ⅱ"
-      description: "600 дней на сайте"
+      title: 'Ветеран Ⅱ'
     _login700:
-      title: "Ветеран Ⅲ"
-      description: "700 дней на сайте"
+      title: 'Ветеран Ⅲ'
     _login800:
-      title: "Повелитель заметок Ⅰ"
-      description: "800 дней на сайте"
+      title: 'Повелитель заметок Ⅰ'
     _login900:
-      title: "Повелитель заметок Ⅱ"
-      description: "900 дней на сайте"
+      title: 'Повелитель заметок Ⅱ'
     _login1000:
-      title: "Повелитель заметок Ⅲ"
-      description: "1000 дней на сайте"
-      flavor: "Спасибо, что пользуетесь Misskey!"
+      title: 'Повелитель заметок Ⅲ'
     _noteClipped1:
-      title: "Нельзя не сохранить"
-      description: "Первая заметка в подборке"
+      title: 'Нельзя не сохранить'
     _noteFavorited1:
-      title: "Смотрящий на звёзды"
-      description: "Первое добавление в избранное"
+      title: 'Смотрящий на звёзды'
     _myNoteFavorited1:
-      title: "В поиске звёзд"
-      description: "Кому-то понравилась ваша заметка"
+      title: 'В поиске звёзд'
     _profileFilled:
-      title: "Приготовления закончены"
-      description: "Заполнен профиль"
+      title: 'Приготовления закончены'
     _markedAsCat:
-      title: "Ваш покорный слуга кот"
-      description: "Включена опция «Аккаунт кота»"
-      flavor: "Позвольте представиться: я — кот, просто кот, у меня еще нет имени."
+      title: 'Ваш покорный слуга кот'
     _following1:
-      title: "Я не один"
-      description: "Сделана первая подписка"
+      title: 'Я не один'
     _following10:
-      title: "Не останавливайся… Не останавливайся…"
-      description: "Количество подписок достигло 10"
+      title: 'Не останавливайся… Не останавливайся…'
     _following50:
-      title: "Много друзей"
-      description: "Количество подписок достигло 50"
+      title: 'Много друзей'
     _following100:
-      title: "Сотня друзей"
-      description: "Количество подписок достигло 100"
+      title: 'Сотня друзей'
     _following300:
-      title: "Друзья в избытке"
-      description: "Количество подписок достигло 300"
+      title: 'Друзья в избытке'
     _followers1:
-      title: "Первый подписчик"
-      description: "Появился 1 подписчик"
+      title: 'Первый подписчик'
     _followers10:
-      title: "Следуй за мной!"
-      description: "Количество подписчиков достигло 10"
+      title: 'Следуй за мной!'
     _followers50:
-      title: "Один за другим"
-      description: "Количество подписчиков достигло 50"
+      title: 'Один за другим'
     _followers100:
-      title: "Всеобщий любимец"
-      description: "Количество подписчиков достигло 100"
+      title: 'Всеобщий любимец'
     _followers300:
-      title: "В очередь!"
-      description: "Количество подписчиков достигло 300"
+      title: 'В очередь!'
     _followers500:
-      title: "Радиостанция"
-      description: "Количество подписчиков достигло 500"
+      title: 'Радиостанция'
     _followers1000:
-      title: "Авторитет"
-      description: "Количество подписчиков достигло 1000"
+      title: 'Авторитет'
     _collectAchievements30:
-      title: "Достигатор"
-      description: "Получено 30 достижений"
+      title: 'Достигатор'
     _viewAchievements3min:
-      title: "Любовь к успехам"
-      description: "Более 3 минут любования достижениями"
+      title: 'Любовь к успехам'
     _iLoveMisskey:
-      title: "Я люблю Misskey"
-      description: "Написана заметка «I ❤ #Misskey»"
-      flavor: "Спасибо за поддержку Misskey! Ваша команда разработчиков"
+      title: 'Я люблю Misskey'
     _foundTreasure:
-      title: "Охота за сокровищами"
-      description: "Найдено спрятанное сокровище"
+      title: 'Охота за сокровищами'
     _client30min:
-      title: "Перерыв на обед"
-      description: "Прошло 30 минут с момента запуска клиента"
+      title: 'Перерыв на обед'
     _client60min:
-      title: "Не наглядеться на Misskey"
-      description: "Misskey был открыт 60 минут подряд"
+      title: 'Не наглядеться на Misskey'
     _noteDeletedWithin1min:
-      title: "Ой, нет!"
-      description: "Заметка удалена через минуту после публикации"
+      title: 'Ой, нет!'
     _postedAtLateNight:
-      title: "Житель ночи"
-      description: "Заметка опубликована в глухую ночь"
-      flavor: "Вроде бы пора спать"
+      title: 'Житель ночи'
     _postedAt0min0sec:
-      title: "Говорящие часы"
-      description: "Заметка опубликована ровно в 0 минут 0 секунд"
-      flavor: "Дин-дон дин-дон"
+      title: 'Говорящие часы'
     _selfQuote:
-      title: "Самовоспроизведение"
-      description: "Процитирована собственная заметка"
+      title: 'Самовоспроизведение'
     _htl20npm:
-      title: "В потоке"
-      description: "Достигнута скорость домашней ленты в 20 з/мин (заметок минуту)"
+      title: 'В потоке'
     _viewInstanceChart:
-      title: "Аналитик"
-      description: "Просмотрены статистические диаграммы инстанса"
+      title: 'Аналитик'
     _outputHelloWorldOnScratchpad:
-      title: "Привет, мир!"
-      description: "Выведен текст «hello world» в Когтеточке"
+      title: 'Привет, мир!'
     _open3windows:
-      title: "Многооконный"
-      description: "Открыто одновременно 3 окна"
+      title: 'Многооконный'
     _driveFolderCircularReference:
-      title: "Циклическая ссылка"
-      description: "Попытка создать на «диске» рекурсивно вложенную папку"
+      title: 'Циклическая ссылка'
     _reactWithoutRead:
-      title: "Не читай @ отвечай!"
-      description: "На заметку более чем 100 знаков написан ответ в первые же 3 секунды с её появления."
+      title: 'Не читай @ отвечай!'
     _clickedClickHere:
-      title: "Нажмите здесь"
-      description: "Нажато здесь"
+      title: 'Нажмите здесь'
     _justPlainLucky:
-      title: "Чистая удача"
-      description: "Может достаться с вероятностью 0,005% каждые 10 секунд."
+      title: 'Чистая удача'
     _setNameToSyuilo:
-      title: "Комплекс бога"
-      description: "Установлено «syuilo» в качестве имени"
+      title: 'Комплекс бога'
     _passedSinceAccountCreated1:
-      title: "Первая годовщина"
-      description: "Прошёл 1 год с момента регистрации"
+      title: 'Первая годовщина'
     _passedSinceAccountCreated2:
-      title: "Вторая годовщина"
-      description: "Прошло 2 года с момента регистрации"
+      title: 'Вторая годовщина'
     _passedSinceAccountCreated3:
-      title: "Третья годовщина"
-      description: "Прошло 3 года с момента регистрации"
+      title: 'Третья годовщина'
     _loggedInOnBirthday:
-      title: "С днём рождения!"
-      description: "Вход на сайт в свой день рождения"
+      title: 'С днём рождения!'
     _loggedInOnNewYearsDay:
-      title: "С Новым годом!"
-      description: "Вход на сайт в первый день года"
-      flavor: "Желаем отличного года на нашем сайте!"
+      title: 'С Новым годом!'
     _cookieClicked:
-      title: "Игра, в которой вы щёлкаете по печенькам"
-      description: "Нажато печенье"
-      flavor: "Стоп, вы вообще на том сайте-то?"
+      title: 'Игра, в которой вы щёлкаете по печенькам'
     _brainDiver:
-      title: "Brain Diver"
-      description: "Опубликована ссылка на песню «Brain Diver»"
-      flavor: "Мисски-Мисски Ла-Ту-Ма"
+      title: 'Brain Diver'
     _smashTestNotificationButton:
-      title: "Избыточное тестирование"
-      description: "Вызовите тестовое уведомление много раз за очень короткий период времени"
+      title: 'Избыточное тестирование'
     _tutorialCompleted:
-      title: "Диплом начального курса Misskey"
-      description: "Закончите туториал"
+      title: 'Диплом начального курса Misskey'
     _bubbleGameExplodingHead:
-      title: "🤯"
-      description: "Самый большой объект в Bubble game"
+      title: '🤯'
     _bubbleGameDoubleExplodingHead:
-      title: "Двойной🤯"
-      description: "Два самых больших объекта в Bubble game одновременно!"
-_role:
-  edit: "Изменить роль"
-  assignTarget: "Метод присвоения"
-  options: "Настройки ролей"
-  priority: "Приоритет"
-  _priority:
-    low: "Низкий"
-    middle: "Средне"
-    high: "Высокий"
-  _options:
-    canManageCustomEmojis: "Управлять пользовательскими эмодзи"
-    canManageAvatarDecorations: "Управление украшениями аватара"
-    canHideAds: "Может скрыть рекламу"
-  _condition:
-    isRemote: "Неместный"
-_ffVisibility:
-  public: "Общедоступны"
-  followers: "Показываются только подписчикам"
-  private: "Показываются только вам"
-_ad:
-  hide: "Не показывать"
-_email:
-  _follow:
-    title: "Новый подписчик"
-  _receiveFollowRequest:
-    title: "Новый запрос на подписку."
-_plugin:
-  manage: "Управление расширениями"
-_preferencesBackups:
-  list: "Существующие резервные копии"
-  apply: "Восстановить на это устройство"
-  save: "Обновить из текущих настроек"
-  nameAlreadyExists: "Резервная копия под названием «{name}» уже существует. Придумайте другое."
-  saveConfirm: "Сохранить резервную копию под названием «{name}»?"
-  deleteConfirm: "Удалить резервную копию «{name}»?"
-  createdAt: "Создана {date} в {time}"
-  updatedAt: "Обновлена {date} в {time}"
-  cannotLoad: "Загрузить не удалось"
-_aboutMisskey:
-  contributors: "Основные соавторы"
-_menuDisplay:
-  top: "Сверху"
-  hide: "Спрятать"
-_theme:
-  base: "Основа"
-  addConstant: "Добавить константу"
-  constant: "Константа"
-  defaultValue: "По умолчанию"
-  refProp: "Ссылка на свойство"
-  refConst: "Ссылка на константу"
-  key: "Ключ"
-  func: "Функции"
-  funcKind: "Тип функции"
-  argument: "Аргумент"
-  basedProp: "Исходное свойство"
-  darken: "Затемнение"
-  inputConstantName: "Введите имя для константы."
-  importInfo: "Если вы введете код темы здесь, вы можете импортировать его в редактор тем."
-  deleteConstantConfirm: "Вы действительно хотите удалить константу {const}?"
-  keys:
-    accent: "Акцент"
-    bg: "Фон"
-    fg: "Текст"
-    focus: "Фокус"
-    indicator: "Индикатор"
-    panel: "Панель"
-    shadow: "Тень"
-    navBg: "Фон боковой панели"
-    navFg: "Текст на боковой панели"
-    navActive: "Текст на боковой панели (активирован)"
-    navIndicator: "Индикатор на боковой панели"
-    link: "Ссылка"
-    hashtag: "Хештег"
-    mention: "Упоминание"
-    mentionMe: "Упоминания вас"
-    renote: "Репост"
-    modalBg: "Фон формы поверх страницы"
-    divider: "Разделитель"
-    scrollbarHandle: "Ползунок прокрутки"
-    scrollbarHandleHover: "Ползунок прокрутки (под указателем)"
-    dateLabelFg: "Текст отметки даты"
-    infoBg: "Фон сообщения"
-    infoFg: "Текст сообщения"
-    infoWarnBg: "Фон предупреждения"
-    infoWarnFg: "Текст предупреждения"
-    toastBg: "Фон оповещения"
-    toastFg: "Текст оповещения"
-    buttonBg: "Фон кнопки"
-    buttonHoverBg: "Текст кнопки"
-    inputBorder: "Рамка поля ввода"
-    badge: "Значок"
-    messageBg: "Фон беседы"
-    fgHighlighted: "Подсвеченный текст"
-_ago:
-  future: "Из будущего"
-_permissions:
-  "read:account": "Просматривать данные учётной записи"
-  "write:account": "Изменять данные учётной записи"
-  "read:blocks": "Смотреть список блокировок"
-  "write:blocks": "Изменять список блокировок"
-  "read:drive": "Смотреть содержимое «диска»"
-  "write:drive": "Изменять содержимое «диска»"
-  "read:favorites": "Смотреть список избранного"
-  "write:favorites": "Изменять список избранного"
-  "read:following": "Смотреть спискок подписок"
-  "write:following": "Изменять спискок подписок"
-  "read:messaging": "Смотреть сообщения"
-  "write:messaging": "Писать и удалять сообщения"
-  "read:mutes": "Смотреть список скрытых пользователей"
-  "write:mutes": "Изменять список скрытых пользователей"
-  "write:notes": "Писать и удалять заметки"
-  "read:notifications": "Смотреть уведомления"
-  "write:notifications": "Изменять уведомления"
-  "read:reactions": "Смотреть реакции"
-  "write:reactions": "Изменять реакции"
-  "write:votes": "Голосовать"
-  "read:pages": "Смотреть страницы"
-  "write:pages": "Изменять и удалять страницы"
-  "read:page-likes": "Смотреть добавления страниц в избранное"
-  "write:page-likes": "Изменять добавления страниц в избранное"
-  "read:user-groups": "Смотреть группы пользователей"
-  "write:user-groups": "Изменять и удалять группы пользователей"
-  "read:channels": "Смотреть каналы"
-  "write:channels": "Изменять каналы"
-  "read:gallery": "Просмотр галереи"
-  "write:gallery": "Редактирование галереи"
-  "read:gallery-likes": "Просмотр списка понравившегося в галерее"
-  "write:gallery-likes": "Изменение списка понравившегося в галерее"
-  "write:chat": "Писать и удалять сообщения"
-_profile:
-  username: "Имя пользователя"
-  metadata: "Дополнительные сведения"
-_charts:
-  filesTotal: "Суммарное количество файлов"
-_play:
-  created: "Приложение создано"
-  updated: "Приложение обновлено"
-  deleted: "Приложение удалено"
-  pageSetting: "Настройки приложения"
-_pages:
-  newPage: "Создать страницу"
-  editPage: "Править страницу"
-  readPage: "Читать страницу"
-  pageSetting: "Настройки страницы"
-  nameAlreadyExists: "Указанный адрес страницы уже существует."
-  invalidNameTitle: "Указанный адрес страницы недопустим."
-  invalidNameText: "Проверьте, что не оставили поле пустым."
-  editThisPage: "Правка этой страницы"
-  viewSource: "Просмотр исходника"
-  viewPage: "Смотреть страницы"
-  like: "Нравится"
-  unlike: "Отменить «нравится»"
-  my: "Свои страницы"
-  liked: "Понравившиеся страницы"
-  featured: "Популярные"
-  inspector: "Инспектор"
-  contents: "Содержимое"
-  content: "Содержимое"
-  variables: "Переменные"
-  title: "Заголовок"
-  url: "Адрес страницы"
-  summary: "Краткое содержание"
-  alignCenter: "Выровнять элементы по центру"
-  hideTitleWhenPinned: "Скрыть заголовок страницы при привязке к профилю"
-  font: "Шрифт"
-  fontSerif: "Антиква (с засечками)"
-  fontSansSerif: "Гротеск (без засечек)"
-  eyeCatchingImageSet: "Добавить картинку для привлечения внимания"
-  eyeCatchingImageRemove: "Убрать картинку для привлечения внимания"
-  chooseBlock: "Добавить блок"
-  selectType: "Выберите вид"
-  contentBlocks: "Содержательные"
-  inputBlocks: "Для ввода"
-  specialBlocks: "Особые"
-  blocks:
-    text: "Текст"
-    textarea: "Текст в рамке"
-    section: "Раздел"
-    image: "Изображения"
-    button: "Кнопка"
-    note: "Встроенная заметка"
-    _note:
-      id: "Идентификатор заметки"
-      idDescription: "Можно также вставить ссылку на заметку."
-      detailed: "Подробный вид"
+      title: 'Двойной🤯'
 _notification:
-  fileUploaded: "Файл успешно загружен."
-  youGotMention: "{name} упоминает вас."
-  youGotReply: "{name} отвечает вам."
-  youGotQuote: "{name} цитирует вас."
-  youRenoted: "{name} передаёт вашу заметку."
-  youWereFollowed: "У вас новый подписчик."
-  youReceivedFollowRequest: "У вас новый запрос на подписку."
-  yourFollowRequestAccepted: "Ваш запрос на подписку одобрен."
-  pollEnded: "Подведены окончательные итоги опроса"
-  unreadAntennaNote: "Антенна {name}"
-  emptyPushNotificationMessage: "Обновлены push-уведомления"
-  achievementEarned: "Получено достижение"
-  _types:
-    all: "Все"
-    follow: "Подписки"
-    mention: "Упоминания"
-    reply: "Ответы"
-    renote: "Репосты"
-    quote: "Цитаты"
-    reaction: "Реакции"
-    pollEnded: "Окончания опросов"
-    receiveFollowRequest: "Получен запрос на подписку"
-    followRequestAccepted: "Запрос на подписку одобрен"
-    chatRoomInvitationReceived: "Пригласили в чат"
-    achievementEarned: "Получение достижений"
-    login: "Войти"
-    app: "Уведомления из приложений"
+  youGotMention: '{name} упоминает вас.'
+  youGotReply: '{name} отвечает вам.'
+  youGotQuote: '{name} цитирует вас.'
+  youRenoted: '{name} передаёт вашу заметку.'
+  youWereFollowed: 'У вас новый подписчик.'
+  youReceivedFollowRequest: 'У вас новый запрос на подписку.'
+  yourFollowRequestAccepted: 'Ваш запрос на подписку одобрен.'
+  pollEnded: 'Подведены окончательные итоги опроса'
+  unreadAntennaNote: 'Антенна {name}'
+  achievementEarned: 'Получено достижение'
   _actions:
-    followBack: "отвечает взаимной подпиской"
-    reply: "Ответ"
-    renote: "Репост"
-_moderationLogTypes:
-  suspend: "Заморозить"
-  resetPassword: "Сброс пароля:"
-  createInvitation: "Создать код приглашения"
-_fileViewer:
-  url: "Ссылка"
-_watermarkEditor:
-  advanced: "Для продвинутых"
+    followBack: 'отвечает взаимной подпиской'
+    reply: 'Ответ'
+    renote: 'Репост'
+next: 'Дальше'
+upload: 'Загрузить'
+preview: 'Предпросмотр'
+reset: 'Сброс'
+name: 'Название'
+title: 'Заголовок'
+description: 'Описание'
+none: 'Ничего'
+all: 'Все'
+default: 'По умолчанию'
+error: 'Ошибка'
+users: 'Пользователи'
+areYouSure: 'Вы уверены?'

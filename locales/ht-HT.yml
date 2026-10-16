@@ -1,8 +1,5 @@
----
-_lang_: "Japonè"
-ok: "OK"
-cancel: "anile"
-save: "kenbe"
-delete: "efase"
-instances: "sèvè"
-smtpPass: "modpas"
+_lang_: 'Japonè'
+ok: 'OK'
+cancel: 'anile'
+save: 'kenbe'
+delete: 'efase'

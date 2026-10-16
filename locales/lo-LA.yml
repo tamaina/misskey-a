@@ -1,88 +1,34 @@
----
-_lang_: "ພາສາລາວ"
-monthAndDay: "ເດືອນ{month} / ວັນ{day}"
-search: "ຄົ້ນຫາ"
-ok: "ຕົກ​ລົງ"
-cancel: "ຍົກເລີກ"
-notificationSettings: "ຕັ້ງຄ່າການແຈ້ງເຕືອນ"
-uploading: "ກຳລັງອັບໂຫຼດ..."
-save: "ບັນທຶກ"
-favorites: "ລາຍການທີ່ມັກ"
-favorited: "ເພີ່ມໃສ່ລາຍການທີ່ມັກແລ້ວ"
-alreadyFavorited: "ເພີ່ມເຂົ້າໃນລາຍການທີ່ມັກແລ້ວ."
-delete: "ລຶບ"
-searchUser: "ຄົ້ນຫາຜູ້ໃຊ້"
-showLess: "ປິດ"
-lists: "ລາຍການ"
-notes: "Note"
-following: "ກຳລັງຕິດຕາມ"
-somethingHappened: "​ອຸຍ, ມີ​ບາງ​ຢ່າງ​ຜິ​ດ​ພາດ"
-pinned: "ປັກໝຸດ"
-unsuspend: "ເຊົາ​ລະ​ງັບ"
-customEmojis: "ອີໂມຈິແບບກຳນົດເອງ"
-emojis: "ອີໂມຈິ"
-emojiName: "ຊື່ Emoji"
-loginFailed: "ການເຂົ້າສູ່ລະບົບບໍ່ສຳເລັດ"
-wallpaper: "ພາບພື້ນຫລັງ"
-instances: "ເຊີຟເວີຣ໌"
-operations: "ການດຳເນີນງານ"
-monitor: "ຈໍພາບ"
-network: "ເຄືອຂ່າຍ"
-disk: "ດິສກ໌"
-changePassword: "ປ່ຽນ​ລະ​ຫັດ​ຜ່ານ"
-retypedNotMatch: "ປ້ອນຂໍ້ມູນບໍ່ກົງກັນ"
-currentPassword: "ລະຫັດຜ່ານປະຈຸບັນ"
-newPasswordRetype: "ໃສ່ລະຫັດຜ່ານໃໝ່ອີກເທື່ອໜຶ່ງ"
-removed: "ລຶບແລ້ວ"
-home: "ໜ້າຫຼັກ"
-watch: "ເພັ່ງເລັງ"
-unwatch: "ຢຸດເພັ່ງເລັງ"
-accept: "ອະນຸຍາດ"
-reject: "ປະຕິເສດ"
-integration: "ເຊື່ອມໂຍງ"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "ເປີດໃຊ້ງານ reCAPTCHA"
-close: "ປິດ"
-invites: "ເຊີນ"
-transfer: "ໂອນຍ້າຍ"
-noHistory: "​ບໍ່​ມີປະຫວັດ"
-deleteAll: "ລຶບທັງໝົດ"
-notificationType: "​ປະເພດການ​ແຈ້ງ​ເຕືອນ"
-edit: "ແກ້ໄຂ"
-smtpHost: "ໂຮສຕ໌"
-smtpUser: "ຊື່ຜູ້ໃຊ້"
-smtpPass: "ລະຫັດຜ່ານ"
-_chat:
-  invitations: "ເຊີນ"
-  noHistory: "​ບໍ່​ມີປະຫວັດ"
-  members: "ສະມາຊິກ"
-  home: "ໜ້າຫຼັກ"
-_role:
-  _priority:
-    middle: "ປານກາງ"
-_email:
-  _follow:
-    title: "ໄດ້ຕິດຕາມທ່ານ"
-_theme:
-  keys:
-    mention: "ໄດ້ກ່າວມາ"
-    renote: "Renote"
-_profile:
-  username: "ຊື່ຜູ້ໃຊ້"
-_pages:
-  blocks:
-    image: "ຮູບພາບ"
+_lang_: 'ພາສາລາວ'
+search: 'ຄົ້ນຫາ'
+ok: 'ຕົກ​ລົງ'
+cancel: 'ຍົກເລີກ'
+notificationSettings: 'ຕັ້ງຄ່າການແຈ້ງເຕືອນ'
+save: 'ບັນທຶກ'
+favorites: 'ລາຍການທີ່ມັກ'
+delete: 'ລຶບ'
+lists: 'ລາຍການ'
+notes: 'Note'
+following: 'ກຳລັງຕິດຕາມ'
+somethingHappened: '​ອຸຍ, ມີ​ບາງ​ຢ່າງ​ຜິ​ດ​ພາດ'
+customEmojis: 'ອີໂມຈິແບບກຳນົດເອງ'
+accept: 'ອະນຸຍາດ'
+reject: 'ປະຕິເສດ'
+close: 'ປິດ'
+edit: 'ແກ້ໄຂ'
 _notification:
-  youWereFollowed: "ໄດ້ຕິດຕາມເຈົ້າ"
-  _types:
-    follow: "ກຳລັງຕິດຕາມ"
-    mention: "ໄດ້ກ່າວເຖິງ"
-    renote: "Renote"
-    quote: "ອ້າງອີງ"
-    reaction: "Reaction"
-    login: "ເຂົ້າ​ສູ່​ລະ​ບົບ"
+  youWereFollowed: 'ໄດ້ຕິດຕາມເຈົ້າ'
   _actions:
-    reply: "ຕອບ​ກັບ"
-    renote: "Renote"
-_moderationLogTypes:
-  suspend: "ລະງັບ"
+    reply: 'ຕອບ​ກັບ'
+    renote: 'Renote'
+next: 'ຕໍ່ໄປ'
+upload: 'ອັບໂຫຼດ'
+preview: 'ສະແດງເປັນຕົວຢ່າງ'
+reset: 'ຣີເຊັດ'
+name: 'ຊື່'
+title: 'ຫົວຂໍ້'
+description: 'ລາຍລະອຽດ'
+none: 'ບໍ່ມີ'
+all: 'ທັງໝົດ'
+default: 'ຄ່າເລີ່ມຕົ້ນ'
+error: 'ຂໍ້ຜິດພາດ'
+users: 'ຜູ້ໃຊ້'

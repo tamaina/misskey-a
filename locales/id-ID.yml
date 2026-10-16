@@ -1,668 +1,218 @@
----
-_lang_: "Bahasa Indonesia"
-monthAndDay: "{day} {month}"
-search: "Cari"
-ok: "Oke"
-cancel: "Batalkan"
-notificationSettings: "Atur Notifikasi"
-uploading: "Mengunggah"
-save: "Simpan"
-favorites: "Favorit"
-favorited: "Ditambahkan ke favorit"
-alreadyFavorited: "Sudah ada di favorit"
-delete: "Hapus"
-searchUser: "Cari pengguna"
-showLess: "Tutup"
-lists: "Daftar"
-notes: "Catatan"
-following: "Ikuti"
-somethingHappened: "Terjadi kesalahan"
-pinned: "Sematkan ke profil"
-emojiPicker: "Palet emoji"
-unsuspend: "Batalkan penangguhan"
-customEmojis: "Emoji kustom"
-emojis: "Emoji"
-emojiName: "Nama emoji"
-loginFailed: "Gagal untuk masuk"
-wallpaper: "Wallpaper"
-instances: "Instansi"
-latestStatus: "Status terakhir"
-operations: "Tindakan"
-monitor: "Pantau"
-network: "Jaringan"
-disk: "Diska"
-mutedUsers: "Pengguna yang dibisukan"
-blockedUsers: "Pengguna yang diblokir"
-changePassword: "Ubah kata sandi"
-retypedNotMatch: "Input tidak sama"
-currentPassword: "Kata sandi saat ini"
-newPasswordRetype: "Ulangi kata sandi baru"
-removed: "Telah dihapus"
-home: "Beranda"
-reload: "Muat ulang"
-watch: "Tonton"
-unwatch: "Batal tonton"
-accept: "Terima"
-reject: "Tolak"
-integration: "Integrasi"
-pinnedPages: "Halaman yang disematkan"
-pinnedClipId: "ID dari klip yang disematkan"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Nyalakan hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "Aktifkan mCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Nyalakan reCAPTCHA"
-turnstile: "Turnstile"
-enableTurnstile: "Nyalakan Turnstile"
-antennas: "Antena"
-close: "Tutup"
-invites: "Undangan"
-transfer: "Transfer"
-signinFailed: "Tidak dapat masuk. Nama pengguna atau kata sandi yang kamu masukkan salah."
-noHistory: "Tidak ada riwayat"
-signinHistory: "Riwayat masuk"
-regenerate: "Buat ulang"
-appearance: "Tampilan"
-promotion: "Promosi"
-promote: "Promosikan"
-hideThisNote: "Sembunyikan catatan ini"
-showFeaturedNotesInTimeline: "Tampilkan catatan yang diunggulkan di lini masa"
-deleteAll: "Hapus semua"
-showFixedPostForm: "Tampilkan form posting di atas lini masa"
-deleteAllFiles: "Hapus semua berkas"
-leaveConfirm: "Ada perubahan yang belum disimpan. Apakah kamu ingin membuangnya?"
-notificationType: "Jenis notifikasi"
-edit: "Sunting"
-emailServer: "Peladen surel"
-enableEmail: "Nyalakan distribusi surel"
-emailConfigInfo: "Digunakan untuk mengonfirmasi surel kamu disaat mendaftar dan lupa kata sandi"
-emailAddress: "Alamat surel"
-smtpConfig: "Konfigurasi peladen SMTP"
-smtpHost: "Host"
-smtpPort: "Port"
-smtpUser: "Nama Pengguna"
-smtpPass: "Kata sandi"
-emptyToDisableSmtpAuth: "Kosongkan nama pengguna dan kata sandi untuk menonaktifkan verifikasi SMTP"
-smtpSecure: "Gunakan SSL/TLS implisit untuk koneksi SMTP"
-smtpSecureInfo: "Matikan ini ketika menggunakan STARTTLS"
-testEmail: "Tes pengiriman surel"
-copy: "Salin"
-metrics: "Metrik"
-delayed: "Terlambat"
-regenerateLoginToken: "Perbarui token login"
-regenerateLoginTokenDescription: "Perbarui token yang digunakan secara internal saat login. Normalnya aksi ini tidak diperlukan. Jika diperbarui, semua perangkat akan dilogout."
-sample: "Contoh"
-repliesCount: "Jumlah balasan terkirim"
-repliedCount: "Jumlah balasan diterima"
-followingCount: "Jumlah akun yang diikuti"
-followersCount: "Jumlah pengikut"
-pollVotesCount: "Jumlah suara yang terkirim"
-driveUsage: "Penggunaan ruang penyimpanan drive"
-clips: "Klip"
-experimental: "Eksperimental"
-wide: "Lebar"
-narrow: "Sempit"
-sendErrorReports: "Kirim laporan kesalahan"
-sendErrorReportsDescription: "Ketika dinyalakan, informasi kesalahan rinci akan dibagikan dengan Misskey ketika masalah terjadi, hal ini untuk membantu kualitas Misskey. Fitur ini memungkinkan memuat informasi seperti sistem operasi yang kamu gunakan dan versinya, aplikasi peramban yang kamu gunakan, riwayat aktivitas kamu, dll."
-advanced: "Tingkat lanjut"
-markAllAsRead: "Tandai semua telah dibaca"
-onlineStatus: "Status daring"
-global: "Global"
-sent: "Kirim"
-received: "Diterima"
-aiChanMode: "Mode Ai"
-unread: "Belum dibaca"
-classic: "Klasik"
-incorrectTotp: "Password sekali pakai salah dimasukkan atau sudah kadaluarsa."
-rateLimitExceeded: "Batas sudah terlampaui"
-recommended: "Disarankan"
-undefined: "Tak terdefinisi"
-videos: "Video"
-reactionsList: "Reaksi"
-createWithOptions: "Buat dengan opsi"
-edited: "Telah disunting"
-replay: "Tayangan ulang"
-genEmbedCode: "Buat kode sematan"
-unknownWebAuthnKey: "Kunci sandi tidak terdaftar."
-draft: "Draf"
-chat: "Obrolan"
-_chat:
-  invitations: "Undang"
-  noHistory: "Tidak ada riwayat"
-  members: "Anggota"
-  home: "Beranda"
-  send: "Kirim"
-_initialTutorial:
-  launchTutorial: "Lihat Tutorial"
-  title: "Tutorial"
-  skipAreYouSure: "Berhenti dari Tutorial?"
-  _landing:
-    title: "Selamat datang di Tutorial"
-  _note:
-    reply: "Klik pada tombol ini untuk membalas ke sebuah pesan. Bisa juga untuk membalas ke sebuah balasan dan melanjutkannya seperti percakapan selayaknya utas."
-    menu: "Kamu dapat melihat detil catatan, menyalin tautan, dan melakukan aksi lainnya."
-  _reaction:
-    title: "Apa itu Reaksi?"
-  _timeline:
-    social: "Catatan dari linimasa Beranda dan Lokal akan ditampilkan."
-  _postNote:
-    _visibility:
-      localOnly: "Memposting dengan opsi ini tidak akan memfederasi catatan ke peladen lain. Pengguna pada peladen lain tidak akan dapat melihat catatan ini secara langsung, meskipun dengan pengaturan visibilitas yang sudah diatur di atas."
-    _cw:
-      description: "Alih-alih isinya, konten yang ditulis dalam kolom 'komentar' akan ditampilkan. Menekan 'Selebihnya' akan menampilkan isi konten."
-      useCases: "Fungsi ini digunakan ketika mengikutik panduan peladen untuk catatan yang dibutuhkan atau untuk membatasi diri dari teks sensitif atau spoiler."
-  _done:
-    title: "Kamu telah menyelesaikan tutorial! 🎉"
+_lang_: 'Bahasa Indonesia'
+search: 'Cari'
+ok: 'Oke'
+cancel: 'Batalkan'
+notificationSettings: 'Atur Notifikasi'
+save: 'Simpan'
+favorites: 'Favorit'
+delete: 'Hapus'
+lists: 'Daftar'
+notes: 'Catatan'
+following: 'Ikuti'
+somethingHappened: 'Terjadi kesalahan'
+customEmojis: 'Emoji kustom'
+mutedUsers: 'Pengguna yang dibisukan'
+blockedUsers: 'Pengguna yang diblokir'
+reload: 'Muat ulang'
+accept: 'Terima'
+reject: 'Tolak'
+antennas: 'Antena'
+close: 'Tutup'
+edit: 'Sunting'
+copy: 'Salin'
+clips: 'Klip'
+markAllAsRead: 'Tandai semua telah dibaca'
 _achievements:
   _types:
     _notes1:
-      title: "Cus, baru gabung Misskey nih!"
-      description: "Catat catatan pertama kamu"
-      flavor: "Selamat bersenang-senang dengan Misskey!"
+      title: 'Cus, baru gabung Misskey nih!'
     _notes10:
-      title: "Beberapa catatan"
-      description: "Catat 10 catatan"
+      title: 'Beberapa catatan'
     _notes100:
-      title: "Banyak catatan"
-      description: "Catat 100 catatan"
+      title: 'Banyak catatan'
     _notes500:
-      title: "Tertumpuk catatan"
-      description: "Catat 500 catatan"
+      title: 'Tertumpuk catatan'
     _notes1000:
-      title: "Gunung catatan"
-      description: "Catat 1000 catatan"
+      title: 'Gunung catatan'
     _notes5000:
-      title: "Luapan catatan"
-      description: "Catat 5000 catatan"
+      title: 'Luapan catatan'
     _notes10000:
-      title: "Catatan super"
-      description: "Catat 10 ribu catatan"
+      title: 'Catatan super'
     _notes20000:
-      title: "Butuh... banyak... catatan..."
-      description: "Catat 20 ribu catatan"
+      title: 'Butuh... banyak... catatan...'
     _notes30000:
-      title: "Catat, catat, catat !"
-      description: "Catat 30 ribu catatan"
+      title: 'Catat, catat, catat !'
     _notes40000:
-      title: "Pabrik catatan"
-      description: "Catat 40 ribu catatan"
+      title: 'Pabrik catatan'
     _notes50000:
-      title: "Planet catatan"
-      description: "Catat 50 ribu catatan"
+      title: 'Planet catatan'
     _notes60000:
-      title: "Kuasar catatan"
-      description: "Catat 60 ribu catatan"
+      title: 'Kuasar catatan'
     _notes70000:
-      title: "Lubang hitam catatan"
-      description: "Catat 70 ribu catatan"
+      title: 'Lubang hitam catatan'
     _notes80000:
-      title: "Galaksi catatan"
-      description: "Catat 80 ribu catatan"
+      title: 'Galaksi catatan'
     _notes90000:
-      title: "Semesta catatan"
-      description: "Catat 90 ribu catatan"
+      title: 'Semesta catatan'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "Catat 100 ribu catatan"
-      flavor: "Banyak bacot ya kamu."
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "Pemula I"
-      description: "Login selama 3 hari"
-      flavor: "Mulai hari ini, panggil gue Misskist"
+      title: 'Pemula I'
     _login7:
-      title: "Pemula II"
-      description: "Login selama 7 hari"
-      flavor: "Sudah mulai terbiasa?"
+      title: 'Pemula II'
     _login15:
-      title: "Pemula III"
-      description: "Login selama 15 hari"
+      title: 'Pemula III'
     _login30:
-      title: "Misskist I"
-      description: "Login selama 30 hari"
+      title: 'Misskist I'
     _login60:
-      title: "Misskist II"
-      description: "Login selama 60 hari"
+      title: 'Misskist II'
     _login100:
-      title: "Misskist III"
-      description: "Login selama 100 hari"
-      flavor: "Violent Misskist"
+      title: 'Misskist III'
     _login200:
-      title: "Reguler I"
-      description: "Login selama 200 hari"
+      title: 'Reguler I'
     _login300:
-      title: "Reguler II"
-      description: "Login selama 300 hari"
+      title: 'Reguler II'
     _login400:
-      title: "Reguler III"
-      description: "Login selama 400 hari"
+      title: 'Reguler III'
     _login500:
-      title: "Veteran I"
-      description: "Login selama 500 hari"
-      flavor: "Kawanku, aku suka catatan."
+      title: 'Veteran I'
     _login600:
-      title: "Veteran II"
-      description: "Login selama 600 hari"
+      title: 'Veteran II'
     _login700:
-      title: "Veteran III"
-      description: "Login selama 700 hari"
+      title: 'Veteran III'
     _login800:
-      title: "Sepuh Catatan I"
-      description: "Login selama 800 hari"
+      title: 'Sepuh Catatan I'
     _login900:
-      title: "Sepuh Catatan II"
-      description: "Login selama 900 hari"
+      title: 'Sepuh Catatan II'
     _login1000:
-      title: "Sepuh Catatan III"
-      description: "Login selama 1000 hari"
-      flavor: "Terima kasih telah menggunakan Misskey!"
+      title: 'Sepuh Catatan III'
     _noteClipped1:
-      title: "Harus... Ngeklip..."
-      description: "Klip catatan pertamamu"
+      title: 'Harus... Ngeklip...'
     _noteFavorited1:
-      title: "Pengamat Bintang"
-      description: "Favoritkan catatan pertamamu"
+      title: 'Pengamat Bintang'
     _myNoteFavorited1:
-      title: "Pencari Bintang"
-      description: "Minta orang lain memfavoritkan salah satu catatanmu"
+      title: 'Pencari Bintang'
     _profileFilled:
-      title: "Siap Sedia"
-      description: "Atur profil kamu"
+      title: 'Siap Sedia'
     _markedAsCat:
-      title: "Aku Seekor Kucing"
-      description: "Tandai akunmu sebagai kucing"
-      flavor: "Aku beri kamu nama nanti"
+      title: 'Aku Seekor Kucing'
     _following1:
-      title: "Ikuti pengguna lain pertamamu"
-      description: "Ikuti pengguna"
+      title: 'Ikuti pengguna lain pertamamu'
     _following10:
-      title: "Terusin... terusin..."
-      description: "Ikuti 10 pengguna lain"
+      title: 'Terusin... terusin...'
     _following50:
-      title: "Banyak teman"
-      description: "Ikuti 50 pengguna lain"
+      title: 'Banyak teman'
     _following100:
-      title: "100 Teman"
-      description: "Ikuti 100 pengguna lain"
+      title: '100 Teman'
     _following300:
-      title: "Kelebihan teman"
-      description: "Mengikuti 300 pengguna lain"
+      title: 'Kelebihan teman'
     _followers1:
-      title: "Pengikut pertama"
-      description: "Dapatkan 1 pengikut"
+      title: 'Pengikut pertama'
     _followers10:
-      title: "Ikuti aku!"
-      description: "Dapatkan 10 pengikut"
+      title: 'Ikuti aku!'
     _followers50:
-      title: "Rame-rame"
-      description: "Dapatkan 50 pengikut"
+      title: 'Rame-rame'
     _followers100:
-      title: "Terkenal"
-      description: "Dapatkan 100 pengikut"
+      title: 'Terkenal'
     _followers300:
-      title: "Mohon antri satu baris"
-      description: "Dapatkan 300 pengikut"
+      title: 'Mohon antri satu baris'
     _followers500:
-      title: "Stasiun Informasi"
-      description: "Dapatkan 500 pengikut"
+      title: 'Stasiun Informasi'
     _followers1000:
-      title: "Influencer"
-      description: "Dapatkan 1000 pengikut"
+      title: 'Influencer'
     _collectAchievements30:
-      title: "Kolektor pencapaian"
-      description: "Dapatkan 30 pencapaian"
+      title: 'Kolektor pencapaian'
     _viewAchievements3min:
-      title: "Suka Pencapaian"
-      description: "Lugat daftar pencapaianmu setidaknya 3 menit"
+      title: 'Suka Pencapaian'
     _iLoveMisskey:
-      title: "I Love Misskey"
-      description: "Catat \"I ❤ #Misskey\""
-      flavor: "Tim pengembang misskey sangat mengapresiasi dukungan kamu!"
+      title: 'I Love Misskey'
     _foundTreasure:
-      title: "Berburu Harta Karun"
-      description: "Kamu telah menemukan harta karun tersembunyi"
+      title: 'Berburu Harta Karun'
     _client30min:
-      title: "Istirahat pendek"
-      description: "Habiskan waktu 30 menit di Misskey"
+      title: 'Istirahat pendek'
     _client60min:
-      title: "Tidak ada \"Miss\" dalam Misskey"
-      description: "Biarkan Misskey tetap terbuka setidaknya selama 60 menit"
+      title: 'Tidak ada "Miss" dalam Misskey'
     _noteDeletedWithin1min:
-      title: "Eh, salah coy!"
-      description: "Hapus catatan kurang dari semenit kamu catat"
+      title: 'Eh, salah coy!'
     _postedAtLateNight:
-      title: "Nokturnal"
-      description: "Catat catatan di tengah malam hari"
-      flavor: "Udah waktunya boboq."
+      title: 'Nokturnal'
     _postedAt0min0sec:
-      title: "Jam ngomong"
-      description: "Catat catatan di jam 00.00"
-      flavor: "Tik Tok Tik Toeeeng"
+      title: 'Jam ngomong'
     _selfQuote:
-      title: "Rujukan mandiri"
-      description: "Kutip catatanmu sendiri"
+      title: 'Rujukan mandiri'
     _htl20npm:
-      title: "Lini masa mengalir"
-      description: "Memiliki lini masa beranda dengan kecepatan melebihi 20 cpm (catatan per menit)"
+      title: 'Lini masa mengalir'
     _viewInstanceChart:
-      title: "Analis"
-      description: "Lihat bagan instansimu"
+      title: 'Analis'
     _outputHelloWorldOnScratchpad:
-      title: "Halo, dunia!"
-      description: "Munculkan \"hello world\" di Scratchpad"
+      title: 'Halo, dunia!'
     _open3windows:
-      title: "Jendela ganda"
-      description: "Memiliki setidaknya 3 jendela yang terbuka secara bersamaan"
+      title: 'Jendela ganda'
     _driveFolderCircularReference:
-      title: "Referensi Siklus"
-      description: "Mencoba membuat folder bersarang rekursif di Drive"
+      title: 'Referensi Siklus'
     _reactWithoutRead:
-      title: "Beneran udah dibaca?"
-      description: "Mereaksi catatan dengan 100 karakter panjangnya dalam 3 detik setelah dicatat"
+      title: 'Beneran udah dibaca?'
     _clickedClickHere:
-      title: "Klik di sini"
-      description: "Kamu telah mengeklik disini"
+      title: 'Klik di sini'
     _justPlainLucky:
-      title: "Lagi Beruntung"
-      description: "Mendapatkan kesempatan dengan kemungkinan 0.01% setiap 10 detik"
+      title: 'Lagi Beruntung'
     _setNameToSyuilo:
-      title: "God Complex"
-      description: "Atur namamu jadi \"syuilo\""
+      title: 'God Complex'
     _passedSinceAccountCreated1:
-      title: "Perayaan Satu Tahun"
-      description: "Satu tahun telah lewat sejak akunmu dibuat"
+      title: 'Perayaan Satu Tahun'
     _passedSinceAccountCreated2:
-      title: "Perayaan Dua Tahun"
-      description: "Dua tahun telah lewat sejak akunmu dibuat"
+      title: 'Perayaan Dua Tahun'
     _passedSinceAccountCreated3:
-      title: "Perayaan Tiga Tahun"
-      description: "Tiga tahun telah lewat sejak akunmu dibuat"
+      title: 'Perayaan Tiga Tahun'
     _loggedInOnBirthday:
-      title: "Selamat Ulang Tahun"
-      description: "Login di hari ulang tahunmu"
+      title: 'Selamat Ulang Tahun'
     _loggedInOnNewYearsDay:
-      title: "Selamat Tahun Baru!"
-      description: "Login di hari pertama tahun baru"
-      flavor: "Untuk tahun baru yang berkah bagi instansi ini"
+      title: 'Selamat Tahun Baru!'
     _cookieClicked:
-      title: "Permainan dimana kamu mengeklik kue"
-      description: "Mengeklik kue"
-      flavor: "Tunggu, apakah kamu sedang berada di website yang benar?"
+      title: 'Permainan dimana kamu mengeklik kue'
     _brainDiver:
-      title: "Brain Diver"
-      description: "Posting tautan mengenai Brain Diver"
-      flavor: "Misskey-Misskey La-Tu-Ma"
+      title: 'Brain Diver'
     _smashTestNotificationButton:
-      title: "Tes overflow"
-      description: "Picu tes notifikasi secara berulang dalam waktu yang sangat pendek"
+      title: 'Tes overflow'
     _tutorialCompleted:
-      title: "Ijazah Sekolah Dasar Misskey"
-      description: "Tutorial selesai"
+      title: 'Ijazah Sekolah Dasar Misskey'
     _bubbleGameExplodingHead:
-      title: "🤯"
-      description: "Obyek paling terbesar di permainan gelembung"
+      title: '🤯'
     _bubbleGameDoubleExplodingHead:
-      title: "Ganda 🤯"
-      description: "Dua dari obyek paling terbesar pada permainan gelembung di waktu yang sama"
-      flavor: "Kamu dapat mengisi kotak makan siang seperti ini 🤯 🤯."
-_role:
-  edit: "Sunting peran"
-  assignTarget: "Tipe tugas"
-  options: "Opsi peran"
-  displayOrder: "Urutan"
-  priority: "Prioritas"
-  _priority:
-    low: "Rendah"
-    middle: "Sedang"
-    high: "Tinggi"
-  _options:
-    canManageCustomEmojis: "Dapat mengelola Emoji kustom"
-    canManageAvatarDecorations: "Kelola dekorasi avatar"
-    canHideAds: "Dapat menyembunyikan iklan"
-  _condition:
-    isRemote: "Pengguna remote"
-    isCat: "Pengguna Kucing"
-    isBot: "Pengguna Bot"
-_ffVisibility:
-  public: "Publik"
-  followers: "Tampil untuk pengikut saja"
-  private: "Tersembunyi"
-_ad:
-  hide: "Jangan tampilkan"
-_email:
-  _follow:
-    title: "Mengikuti kamu"
-  _receiveFollowRequest:
-    title: "Kamu menerima permintaan mengikuti"
-_plugin:
-  manage: "Manajemen plugin"
-_preferencesBackups:
-  list: "Cadangan yang dibuat"
-  apply: "Terapkan pada perangkat ini"
-  save: "Simpan perubahan"
-  nameAlreadyExists: "Cadangan bernama \"{name}\" sudah ada. Mohon gunakan nama lain."
-  saveConfirm: "Simpan cadangan sebagai {name}?"
-  deleteConfirm: "Hapus cadangan {name}?"
-  createdAt: "Dibuat pada: {date} {time}"
-  updatedAt: "Diperbarui pada: {date} {time}"
-  cannotLoad: "Gagal memuat"
-_aboutMisskey:
-  contributors: "Kontributor utama"
-_menuDisplay:
-  top: "Atas"
-  hide: "Sembunyikan"
-_theme:
-  base: "Dasar"
-  addConstant: "Tambah konstanta"
-  constant: "Konstanta"
-  defaultValue: "Nilai bawaan"
-  refProp: "Referensikan properti"
-  refConst: "Referensikan konstanta"
-  key: "Kunci"
-  func: "Fungsi"
-  funcKind: "Tipe fungsi"
-  argument: "Argumen"
-  basedProp: "Mereferensikan properti"
-  darken: "Mengelamkan"
-  inputConstantName: "Masukkan nama untuk konstanta"
-  importInfo: "Jika kamu memasukkan kode tema disini, kamu dapat mengimpornya ke penyunting tema"
-  deleteConstantConfirm: "apakah kamu ingin menghapus konstanta {const}?"
-  keys:
-    accent: "Aksen"
-    bg: "Latar belakang"
-    fg: "Teks"
-    focus: "Fokus"
-    indicator: "Indikator"
-    panel: "Panel"
-    shadow: "Bayangan"
-    navBg: "Latar belakang bilah samping"
-    navFg: "Teks bilah samping"
-    navActive: "Teks bilah samping (Aktif)"
-    navIndicator: "Indikator bilah samping"
-    link: "Tautan"
-    hashtag: "Tagar"
-    mention: "Sebut"
-    mentionMe: "Sebutan (saya)"
-    renote: "Renote"
-    modalBg: "Latar belakang modal"
-    divider: "Pembagi"
-    scrollbarHandle: "Pegangan bilah gulir"
-    scrollbarHandleHover: "Pegangan bilah gulir (Mengambang)"
-    dateLabelFg: "Teks label tanggal"
-    infoBg: "Latar belakang informasi"
-    infoFg: "Teks informasi"
-    infoWarnBg: "Latar belakang peringatan"
-    infoWarnFg: "Teks peringatan"
-    toastBg: "Latar belakang notifikasi"
-    toastFg: "Teks notifikasi"
-    buttonBg: "Latar belakang tombol"
-    buttonHoverBg: "Latar belakang tombol (Mengambang)"
-    inputBorder: "Batas bidang masukan"
-    badge: "Lencana"
-    messageBg: "Latar belakang obrolan"
-    fgHighlighted: "Teks yang disorot"
-_ago:
-  future: "Masa depan"
-_permissions:
-  "read:account": "Lihat informasi akun"
-  "write:account": "Sunting informasi akun"
-  "read:blocks": "Lihat daftar orang yang diblokir"
-  "write:blocks": "Sunting daftar orang yang diblokir"
-  "read:drive": "Akses berkas dan folder drive"
-  "write:drive": "Sunting atau hapus berkas dan folder drive"
-  "read:favorites": "Lihat daftar favorit"
-  "write:favorites": "Sunting daftar favorit"
-  "read:following": "Lihat informasi mengikuti"
-  "write:following": "Ikuti atau Stop Ikuti akun lain"
-  "read:messaging": "Lihat obrolan"
-  "write:messaging": "Buat atau hapus obrolan"
-  "read:mutes": "Lihat daftar orang yang dibisukan"
-  "write:mutes": "Sunting daftar orang yang dibisukan"
-  "write:notes": "Buat atau hapus catatan"
-  "read:notifications": "Lihat notifikasi"
-  "write:notifications": "Sunting notifikasi"
-  "read:reactions": "Lihat reaksi"
-  "write:reactions": "Sunting reaksi"
-  "write:votes": "Beri suara"
-  "read:pages": "Lihat halaman"
-  "write:pages": "Sunting atau hapus halaman"
-  "read:page-likes": "Lihat suka pada halaman"
-  "write:page-likes": "Sunting suka pada Halaman"
-  "read:user-groups": "Lihat grup pengguna"
-  "write:user-groups": "Sunting atau hapus grup pengguna"
-  "read:channels": "Lihat Kanal"
-  "write:channels": "Sunting Kanal"
-  "read:gallery": "Lihat galeri"
-  "write:gallery": "Sunting galeri"
-  "read:gallery-likes": "Lihat daftar postingan galeri yang disukai"
-  "write:gallery-likes": "Sunting daftar postingan galeri yang disukai"
-  "write:admin:delete-account": "Hapus akun pengguna"
-  "write:admin:roles": "Kelola peran"
-  "read:admin:roles": "Lihat peran"
-  "write:chat": "Buat atau hapus obrolan"
-_profile:
-  username: "Nama Pengguna"
-  metadata: "Informasi tambahan"
-_charts:
-  filesTotal: "Jumlah # berkas"
-_play:
-  created: "Permainan sudah dibuat"
-  updated: "Permainan sudah diperbaharui"
-  deleted: "Hapus permainan"
-  pageSetting: "Pengaturan permainan"
-_pages:
-  newPage: "Buat halaman baru"
-  editPage: "Sunting halaman"
-  readPage: "Lihat sumber kode aktif"
-  pageSetting: "Pengaturan Halaman"
-  nameAlreadyExists: "URL Halaman yang ditentukan sudah ada"
-  invalidNameTitle: "URL Halaman yang ditentukan tidak valid"
-  invalidNameText: "Cek apabila Halaman tidak kosong"
-  editThisPage: "Sunting Halaman ini"
-  viewSource: "Lihat sumber"
-  viewPage: "Lihat Halaman"
-  like: "Suka"
-  unlike: "Hapus suka"
-  my: "Halaman saya"
-  liked: "Halaman yang disukai"
-  featured: "Populer"
-  inspector: "Inspektor"
-  contents: "Konten"
-  content: "Blokir Halaman"
-  variables: "Variabel"
-  title: "Judul"
-  url: "URL Halaman"
-  summary: "Ringkasan Halaman"
-  alignCenter: "Tengah"
-  hideTitleWhenPinned: "Sembunyikan judul halaman saat disematkan ke profil"
-  font: "Font"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans-serif"
-  eyeCatchingImageSet: "Setel gambar yang menarik"
-  eyeCatchingImageRemove: "Hapus gambar yang menarik"
-  chooseBlock: "Tambahkan blokir"
-  selectType: "Pilih jenis"
-  contentBlocks: "Konten"
-  inputBlocks: "Masukan"
-  specialBlocks: "Khusus"
-  blocks:
-    text: "Teks"
-    textarea: "Area teks"
-    section: "Bagian"
-    image: "Gambar"
-    button: "Tombol"
-    note: "Catatan yang ditanam"
-    _note:
-      id: "ID Catatan"
-      idDescription: "Kamu dapat menyetel ini dengan menempelkan tautan URL Catatan."
-      detailed: "Tampilan rincian"
+      title: 'Ganda 🤯'
 _notification:
-  fileUploaded: "Berkas telah berhasil diunggah"
-  youGotMention: "{name} meyebut kamu"
-  youGotReply: "{name} membalas kamu"
-  youGotQuote: "{name} mengutip kamu"
-  youRenoted: "{name} me-renote kamu"
-  youWereFollowed: "Mengikuti kamu"
-  youReceivedFollowRequest: "Kamu menerima permintaan mengikuti"
-  yourFollowRequestAccepted: "Permintaan mengikuti kamu telah diterima"
-  pollEnded: "Hasil Kuesioner telah keluar"
-  newNote: "Catatan baru"
-  unreadAntennaNote: "Antena {name}"
-  emptyPushNotificationMessage: "Pembaruan notifikasi dorong"
-  achievementEarned: "Pencapaian didapatkan"
-  testNotification: "Tes notifikasi"
-  notificationWillBeDisplayedLikeThis: "Notifikasi akan terlihat seperti ini"
-  exportOfXCompleted: "Berhasil mengekspor {x}"
-  login: "Seseorang telah masuk"
-  _types:
-    all: "Semua"
-    note: "Catatan baru"
-    follow: "Ikuti"
-    mention: "Sebut"
-    reply: "Balasan"
-    renote: "Renote"
-    quote: "Kutip"
-    reaction: "Reaksi"
-    pollEnded: "Jajak pendapat berakhir"
-    scheduledNotePosted: "Note terjadwal berhasil"
-    scheduledNotePostFailed: "Note terjadwal gagal"
-    receiveFollowRequest: "Permintaan mengikuti diterima"
-    followRequestAccepted: "Permintaan mengikuti disetujui"
-    roleAssigned: "Peran Diberikan"
-    chatRoomInvitationReceived: "Diundang ke dalam ruang chat"
-    achievementEarned: "Pencapaian didapatkan"
-    exportCompleted: "Ekspor telah selesai"
-    login: "Masuk"
-    createToken: "Buat token akses"
-    test: "Tes notifikasi"
-    app: "Notifikasi dari aplikasi tertaut"
+  youGotMention: '{name} meyebut kamu'
+  youGotReply: '{name} membalas kamu'
+  youGotQuote: '{name} mengutip kamu'
+  youRenoted: '{name} me-renote kamu'
+  youWereFollowed: 'Mengikuti kamu'
+  youReceivedFollowRequest: 'Kamu menerima permintaan mengikuti'
+  yourFollowRequestAccepted: 'Permintaan mengikuti kamu telah diterima'
+  pollEnded: 'Hasil Kuesioner telah keluar'
+  newNote: 'Catatan baru'
+  unreadAntennaNote: 'Antena {name}'
+  achievementEarned: 'Pencapaian didapatkan'
+  testNotification: 'Tes notifikasi'
+  notificationWillBeDisplayedLikeThis: 'Notifikasi akan terlihat seperti ini'
+  exportOfXCompleted: 'Berhasil mengekspor {x}'
+  login: 'Seseorang telah masuk'
   _actions:
-    followBack: "Ikuti Kembali"
-    reply: "Balas"
-    renote: "Renote"
-_moderationLogTypes:
-  suspend: "Tangguhkan"
-  deleteNote: "Catatan dihapus"
-  deleteUserAnnouncement: "Pengumuman pengguna telah dihapus."
-  resetPassword: "Atur ulang kata sandi"
-  resolveAbuseReport: "Laporan terselesaikan"
-  createInvitation: "Buat kode undangan"
-_fileViewer:
-  url: "URL"
-_externalResourceInstaller:
-  _vendorInfo:
-    title: "Informasi sumber"
-  _errors:
-    _themeInstallFailed:
-      title: "Pemasangan tema gagal"
-      description: "Kesalahan terjadi ketika pemasangan tema. Mohon coba lagi. Detil kesalahan dapat dilihat pada konsol Javascript."
-_reversi:
-  reversi: "Reversi"
+    followBack: 'Ikuti Kembali'
+    reply: 'Balas'
+    renote: 'Renote'
 _offlineScreen:
-  title: "Luring - tidak dapat terhubung ke peladen"
-  header: "Tidak dapat tersambung ke server"
-_watermarkEditor:
-  advanced: "Tingkat lanjut"
-_drafts:
-  select: "Pilih Draf"
-  schedule: "Jadwalkan note"
+  title: 'Luring - tidak dapat terhubung ke peladen'
+  header: 'Tidak dapat tersambung ke server'
+next: 'Selanjutnya'
+upload: 'Unggah'
+preview: 'Pratinjau'
+reset: 'Reset'
+name: 'Nama'
+title: 'Judul'
+description: 'Deskripsi'
+none: 'Tidak ada'
+all: 'Semua'
+default: 'Bawaan'
+error: 'Galat'
+users: 'Pengguna'
+areYouSure: 'Apakah kamu yakin?'

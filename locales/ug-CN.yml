@@ -1,10 +1,4 @@
----
-_lang_: "ياپونچە"
-monthAndDay: "{day}-{month}"
-search: "ئىزدەش"
-ok: "ماقۇل"
-delete: "ئۆچۈرۈش"
-pinned: "pinned"
-_notification:
-  _types:
-    login: "كىرىش"
+_lang_: 'ياپونچە'
+search: 'ئىزدەش'
+ok: 'ماقۇل'
+delete: 'ئۆچۈرۈش'

@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ $locale.sfc.author }}</template>
 		</MkInput>
 		<MkTextarea v-if="selectedTheme.desc" readonly :modelValue="selectedTheme.desc">
-			<template #label>{{ $locale.sfc.description }}</template>
+			<template #label>{{ globalLocale.env.description }}</template>
 		</MkTextarea>
 		<MkTextarea readonly tall :modelValue="selectedThemeCode">
 			<template #label>{{ $locale.sfc.code }}</template>
@@ -107,7 +107,6 @@ definePage(() => ({
 	"manage": "إدارة القوالب",
 	"theme": "المظهر",
 	"author": "الكاتب",
-	"description": "الوصف",
 	"code": "شيفرة القالب",
 	"uninstall": "إلغاء التثبيت"
 }
@@ -120,7 +119,6 @@ definePage(() => ({
 	"manage": "Gestionar els temes ",
 	"theme": "Tema",
 	"author": "Autor",
-	"description": "Descripció",
 	"code": "Codi del tema",
 	"uninstall": "Desinstal·la"
 }
@@ -133,7 +131,6 @@ definePage(() => ({
 	"manage": "Správa vzhledů",
 	"theme": "Vzhled",
 	"author": "Autor",
-	"description": "Popis",
 	"code": "Kód vzhledu",
 	"uninstall": "Odinstalovat"
 }
@@ -146,7 +143,6 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
 	"uninstall": "Uninstall"
 }
@@ -159,7 +155,6 @@ definePage(() => ({
 	"manage": "Farbschemaverwaltung",
 	"theme": "Farbschema",
 	"author": "Autor",
-	"description": "Beschreibung",
 	"code": "Farbschemencode",
 	"uninstall": "Deinstallieren"
 }
@@ -172,7 +167,6 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
 	"uninstall": "Uninstall"
 }
@@ -185,7 +179,6 @@ definePage(() => ({
 	"manage": "Gestor de temas",
 	"theme": "Tema",
 	"author": "Autor",
-	"description": "Descripción",
 	"code": "Código del tema",
 	"uninstall": "Desinstalar"
 }
@@ -198,7 +191,6 @@ definePage(() => ({
 	"manage": "Gestion des thèmes",
 	"theme": "Thème",
 	"author": "Auteur·rice",
-	"description": "Description",
 	"code": "Code du thème",
 	"uninstall": "Désinstaller"
 }
@@ -211,7 +203,6 @@ definePage(() => ({
 	"manage": "Manajer tema",
 	"theme": "Tema",
 	"author": "Pembuat",
-	"description": "Deskripsi",
 	"code": "Kode tema",
 	"uninstall": "Copot pemasangan"
 }
@@ -224,7 +215,6 @@ definePage(() => ({
 	"manage": "Gestione dei temi",
 	"theme": "Tema",
 	"author": "Autore",
-	"description": "Descrizione",
 	"code": "Codice tema",
 	"uninstall": "Disinstalla"
 }
@@ -237,7 +227,6 @@ definePage(() => ({
 	"manage": "テーマの管理",
 	"theme": "テーマ",
 	"author": "作者",
-	"description": "説明",
 	"code": "テーマコード",
 	"uninstall": "アンインストール"
 }
@@ -250,7 +239,6 @@ definePage(() => ({
 	"manage": "テーマの管理",
 	"theme": "テーマ",
 	"author": "作者",
-	"description": "説明",
 	"code": "テーマコード",
 	"uninstall": "アンインストール"
 }
@@ -263,7 +251,6 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
 	"uninstall": "Uninstall"
 }
@@ -276,7 +263,6 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
 	"uninstall": "Uninstall"
 }
@@ -289,7 +275,6 @@ definePage(() => ({
 	"manage": "테마 관리",
 	"theme": "테마",
 	"author": "작성자",
-	"description": "설명",
 	"code": "테마 코드",
 	"uninstall": "삭제"
 }
@@ -302,7 +287,6 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Thema's",
 	"author": "Auteur",
-	"description": "Beschrijving",
 	"code": "Theme code",
 	"uninstall": "Deinstalleren"
 }
@@ -315,7 +299,6 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Temaer",
 	"author": "Forfatter",
-	"description": "Beskrivelse",
 	"code": "Theme code",
 	"uninstall": "Avinstaller"
 }
@@ -328,7 +311,6 @@ definePage(() => ({
 	"manage": "Zarządzanie motywami",
 	"theme": "Motywy",
 	"author": "Autor",
-	"description": "Opis",
 	"code": "Kod motywu",
 	"uninstall": "Odinstaluj"
 }
@@ -341,7 +323,6 @@ definePage(() => ({
 	"manage": "Gerenciar temas",
 	"theme": "Tema",
 	"author": "Autor",
-	"description": "Descrição",
 	"code": "Código do tema",
 	"uninstall": "Desinstalar"
 }
@@ -354,7 +335,6 @@ definePage(() => ({
 	"manage": "Менеджер тем",
 	"theme": "Тема",
 	"author": "Автор",
-	"description": "Описание",
 	"code": "Код темы",
 	"uninstall": "Удалить"
 }
@@ -367,7 +347,6 @@ definePage(() => ({
 	"manage": "Spravovať témy",
 	"theme": "Téma",
 	"author": "Autor",
-	"description": "Popis",
 	"code": "Kód témy",
 	"uninstall": "Odinštalovať"
 }
@@ -380,7 +359,6 @@ definePage(() => ({
 	"manage": "จัดการธีม",
 	"theme": "ธีม",
 	"author": "ผู้เขียน",
-	"description": "คำอธิบาย",
 	"code": "โค้ดธีม",
 	"uninstall": "ถอนการติดตั้ง"
 }
@@ -393,7 +371,6 @@ definePage(() => ({
 	"manage": "Temaları yönet",
 	"theme": "Tema",
 	"author": "Yazar",
-	"description": "Açıklama",
 	"code": "Tema kodu",
 	"uninstall": "Kaldır"
 }
@@ -406,7 +383,6 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
 	"uninstall": "Uninstall"
 }
@@ -419,7 +395,6 @@ definePage(() => ({
 	"manage": "Керування темами",
 	"theme": "Тема",
 	"author": "Автор",
-	"description": "Опис",
 	"code": "Код теми",
 	"uninstall": "Видалити"
 }
@@ -432,7 +407,6 @@ definePage(() => ({
 	"manage": "Quản lý theme",
 	"theme": "Chủ đề",
 	"author": "Tác giả",
-	"description": "Mô tả",
 	"code": "Mã theme",
 	"uninstall": "Gỡ bỏ"
 }
@@ -445,7 +419,6 @@ definePage(() => ({
 	"manage": "主题管理",
 	"theme": "主题",
 	"author": "作者",
-	"description": "描述",
 	"code": "主题代码",
 	"uninstall": "卸载"
 }
@@ -458,7 +431,6 @@ definePage(() => ({
 	"manage": "管理佈景主題",
 	"theme": "佈景主題",
 	"author": "作者",
-	"description": "描述",
 	"code": "佈景主題代碼",
 	"uninstall": "解除安裝"
 }

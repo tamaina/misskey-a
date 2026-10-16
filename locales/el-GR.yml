@@ -1,87 +1,28 @@
----
-_lang_: "Ελληνικά"
-monthAndDay: "{day}/{month}"
-search: "Αναζήτηση"
-ok: "Εντάξει"
-cancel: "Ακύρωση"
-uploading: "Ανέβασμα..."
-save: "Αποθήκευση"
-favorites: "Αγαπημένα"
-favorited: "Προστέθηκε στα αγαπημένα."
-alreadyFavorited: "Έχει ήδη προστεθεί στα αγαπημένα."
-delete: "Διαγραφή"
-searchUser: "Αναζήτηση μέλους"
-showLess: "Κλείσιμο"
-lists: "Λίστες"
-notes: "Σημειώματα"
-following: "Ακολουθεί"
-somethingHappened: "Προέκυψε ένα σφάλμα"
-pinned: "Καρφίτσωμα στο προφίλ"
-unsuspend: "Άρση αποβολής"
-customEmojis: "Επιπλέον emoji"
-emojiName: "Όνομα emoji"
-wallpaper: "Ταπετσαρία"
-network: "Δίκτυο"
-disk: "Δίσκος"
-removed: "Η διαγραφή ολοκληρώθηκε επιτυχώς"
-home: "Κεντρικό"
-reload: "Ανανέωση"
-watch: "Παρακολούθηση"
-unwatch: "Τέλος παρακολούθησης"
-accept: "Αποδοχή"
-reject: "Απόρριψη"
-pinnedPages: "Καρφιτσωμένες Σελίδες"
-antennas: "Αντένες"
-transfer: "Μεταφορά"
-appearance: "Εμφάνιση"
-smtpHost: "Φιλοξενεί"
-smtpUser: "Όνομα μέλους"
-smtpPass: "Κωδικός πρόσβασης"
-driveUsage: "Χρήση Αποθηκευτικού Χώρου"
-clips: "Κλιπ"
-global: "Παγκόσμιο"
-recommended: "Προτεινόμενα"
-_chat:
-  members: "Μέλη"
-  home: "Κεντρικό"
-_email:
-  _follow:
-    title: "Έχετε ένα νέο ακόλουθο"
-_theme:
-  keys:
-    panel: "Πίνακας"
-    mention: "Επισήμανση"
-    renote: "Κοινοποίηση σημειώματος"
-_ago:
-  future: "Μελλοντικό"
-_permissions:
-  "write:drive": "Επεξεργαστείτε ή διαγράψτε τα αρχεία και τους φακέλους του Αποθηκευτικού Χώρου σας"
-  "read:favorites": "Δείτε τη λίστα των αγαπημένων σας"
-  "write:favorites": "Επεξεργαστείτε τη λίστα των αγαπημένων σας"
-  "read:messaging": "Δείτε τις συνομιλίες σας"
-  "write:messaging": "Γράψτε ή διαγράψτε μηνύματα συνομιλίας"
-  "read:notifications": "Δείτε τις ειδοποιήσεις σας"
-  "write:notifications": "Διαχειριστείτε τις ειδοποιήσεις σας"
-  "read:pages": "Δείτε τις Σελίδες σας"
-  "write:pages": "Επεξεργαστείτε ή διαγράψτε τις σελίδες σας"
-  "write:chat": "Γράψτε ή διαγράψτε μηνύματα συνομιλίας"
-_profile:
-  username: "Όνομα μέλους"
-_pages:
-  viewPage: "Δείτε τις Σελίδες σας"
-  blocks:
-    image: "Εικόνες"
+_lang_: 'Ελληνικά'
+search: 'Αναζήτηση'
+ok: 'Εντάξει'
+cancel: 'Ακύρωση'
+save: 'Αποθήκευση'
+favorites: 'Αγαπημένα'
+delete: 'Διαγραφή'
+lists: 'Λίστες'
+notes: 'Σημειώματα'
+following: 'Ακολουθεί'
+somethingHappened: 'Προέκυψε ένα σφάλμα'
+customEmojis: 'Επιπλέον emoji'
+reload: 'Ανανέωση'
+accept: 'Αποδοχή'
+reject: 'Απόρριψη'
+antennas: 'Αντένες'
+clips: 'Κλιπ'
 _notification:
-  youWereFollowed: "σε ακολούθησε"
-  _types:
-    follow: "Νέοι ακόλουθοι"
-    mention: "Επισήμανση"
-    renote: "Κοινοποίηση σημειώματος"
-    quote: "Παράθεση"
-    reaction: "Αντιδράσεις"
-    login: "Σύνδεση"
+  youWereFollowed: 'σε ακολούθησε'
   _actions:
-    reply: "Απάντηση"
-    renote: "Κοινοποίηση σημειώματος"
-_moderationLogTypes:
-  suspend: "Αποβολή"
+    reply: 'Απάντηση'
+    renote: 'Κοινοποίηση σημειώματος'
+next: 'Επόμενο'
+upload: 'Ανεβάστε'
+name: 'Όνομα'
+title: 'Τίτλος'
+error: 'Σφάλμα'
+users: 'Μέλη'

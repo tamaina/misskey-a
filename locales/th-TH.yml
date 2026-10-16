@@ -1,704 +1,218 @@
----
-_lang_: "ภาษาไทย"
-monthAndDay: "{month}/{day}"
-search: "ค้นหา"
-ok: "ตกลง"
-cancel: "ยกเลิก"
-notificationSettings: "ตั้งค่าการแจ้งเตือน"
-uploading: "กำลังอัปโหลด"
-save: "บันทึก"
-favorites: "รายการโปรด"
-favorited: "เพิ่มลงรายการโปรดแล้ว"
-alreadyFavorited: "เพิ่มลงรายการโปรดอยู่แล้ว"
-delete: "ลบ"
-searchUser: "ค้นหาผู้ใช้"
-showLess: "ปิด"
-lists: "รายชื่อ"
-notes: " โน้ต"
-following: "กำลังติดตาม"
-somethingHappened: "อุ๊ย ! มีอะไรบางอย่างผิดพลาด"
-pinned: "ปักหมุด"
-emojiPicker: "ตัวจิ้มเอโมจิ"
-unsuspend: "เลิกระงับ"
-customEmojis: "เอโมจิที่กำหนดเอง"
-emojis: "อีโมจิ"
-emojiName: "ชื่อเอโมจิ"
-loginFailed: "การเข้าสู่ระบบไม่สำเร็จ"
-wallpaper: "ภาพพื้นหลัง"
-instances: "เซิร์ฟเวอร์"
-latestStatus: "สถานะล่าสุด"
-operations: "ดำเนินการ"
-monitor: "มอนิเตอร์"
-network: "เครือข่าย"
-disk: "ดิสก์"
-mutedUsers: "ผู้ใช้ที่ถูกปิดเสียง"
-blockedUsers: "ผู้ใช้ที่ถูกบล็อก"
-changePassword: "เปลี่ยนรหัสผ่าน"
-retypedNotMatch: "ทั้งสองป้อนข้อมูลไม่สอดคล้องกัน"
-currentPassword: "รหัสผ่านปัจจุบัน"
-newPasswordRetype: "ใส่รหัสผ่านใหม่อีกครั้ง"
-removed: "ถูกลบไปแล้ว"
-home: "หน้าหลัก"
-reload: "รีโหลด"
-watch: "เพ่งเล็ง"
-unwatch: "เลิกเพ่งเล็ง"
-accept: "ยอมรับ"
-reject: "ปฏิเสธ"
-integration: "เชื่อมโยง"
-pinnedPages: "หน้าเพจที่ปักหมุด"
-pinnedClipId: "ID ของคลิปที่จะปักหมุด"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "เปิดใช้ hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "เปิดใช้ mCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "เปิดใช้ reCAPTCHA"
-turnstile: "Turnstile"
-enableTurnstile: "เปิดใช้งาน Turnstile"
-antennas: "เสาอากาศ"
-close: "ปิด"
-invites: "คำเชิญ"
-transfer: "ถ่ายโอน"
-signinFailed: "ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบชื่อผู้ใช้และรหัสผ่าน"
-noHistory: "ไม่มีประวัติ"
-signinHistory: "ประวัติการเข้าสู่ระบบ"
-regenerate: "สร้างอีกครั้ง"
-appearance: "ภาพลักษณ์"
-promotion: "โฆษณา"
-promote: "โปรโมท"
-hideThisNote: "ซ่อนโน้ตนี้"
-showFeaturedNotesInTimeline: "แสดงโน้ตเด่นในไทม์ไลน์"
-deleteAll: "ลบทั้งหมด"
-showFixedPostForm: "แสดงแบบฟอร์มการโพสต์ที่ด้านบนสุดของไทม์ไลน์"
-deleteAllFiles: "ลบไฟล์ทั้งหมด"
-leaveConfirm: "มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก ต้องการละทิ้งมันใช่ไหม?"
-notificationType: "ประเภทการแจ้งเตือน"
-edit: "แก้ไข"
-emailServer: "เซิร์ฟเวอร์ของอีเมล"
-enableEmail: "เปิดใช้งานการกระจายอีเมล"
-emailConfigInfo: "ใช้สำหรับการยืนยันอีเมลหรือการรีเซ็ตรหัสผ่าน"
-emailAddress: "ที่อยู่อีเมล"
-smtpConfig: "ตั้งค่าเซิร์ฟเวอร์ SMTP"
-smtpHost: "โฮสต์"
-smtpPort: "พอร์ต"
-smtpUser: "ชื่อผู้ใช้"
-smtpPass: "รหัสผ่าน"
-emptyToDisableSmtpAuth: "ปล่อยชื่อผู้ใช้และรหัสผ่านว่างไว้เพื่อปิดใช้งานการยืนยัน SMTP"
-smtpSecure: "ใช้โดยนัย SSL/TLS สำหรับการเชื่อมต่อ SMTP"
-smtpSecureInfo: "ปิดสิ่งนี้เมื่อใช้ STARTTLS"
-testEmail: "ทดสอบการส่งอีเมล"
-copy: "คัดลอก"
-metrics: "เมตริก"
-delayed: "ดีเลย์"
-regenerateLoginToken: "สร้างโทเค็นการเข้าสู่ระบบอีกครั้ง"
-regenerateLoginTokenDescription: "สร้างโทเค็นใหม่ที่ใช้ภายในระหว่างการเข้าสู่ระบบ โดยตามหลักปกติแล้วการดำเนินการนี้ไม่จำเป็น หากสร้างใหม่ อุปกรณ์ทั้งหมดจะถูกออกจากระบบนะ"
-sample: "ตัวอย่าง"
-repliesCount: "จำนวนการตอบกลับที่ส่ง"
-repliedCount: "จำนวนของการตอบกลับที่ได้รับ"
-followingCount: "จำนวนบัญชีที่ติดตาม"
-followersCount: "จำนวนผู้ติดตาม"
-pollVotesCount: "จำนวนโหวตที่ส่งไป"
-driveUsage: "การใช้พื้นที่ไดรฟ์"
-clips: "คลิป"
-experimental: "ทดลอง"
-wide: "กว้าง"
-narrow: "ชิด"
-sendErrorReports: "ส่งรายงานข้อผิดพลาด"
-sendErrorReportsDescription: "เมื่อเปิดใช้งาน การแจ้งข้อผิดพลาดจะถูกแชร์กับ Misskey เมื่อเกิดปัญหา ซึ่งช่วยในการปรับปรุงคุณภาพของซอฟต์แวร์ ข้อมูลข้อผิดพลาดอาจรวมถึงเวอร์ชันของระบบปฏิบัติการ ประเภทของเบราว์เซอร์ และประวัติการใช้งาน ฯลฯ"
-advanced: "ขั้นสูง"
-markAllAsRead: "ทำเครื่องหมายทั้งหมดว่าอ่านแล้ว"
-onlineStatus: "สถานะออนไลน์"
-global: "ทั่วโลก"
-sent: "ส่ง"
-received: "ได้รับแล้ว"
-aiChanMode: "โหมด Ai "
-unread: "ยังไม่ได้อ่าน"
-classic: "คลาสสิค"
-incorrectTotp: "รหัสยืนยันตัวตนแบบใช้ครั้งเดียวที่ท่านได้ระบุมานั้น ไม่ถูกต้องหรือหมดอายุลงแล้วค่ะ"
-rateLimitExceeded: "เกินขีดจำกัดอัตรา"
-recommended: "แนะนำ"
-undefined: "ไม่ได้กำหนด"
-videos: "วีดีโอ"
-reactionsList: "รายการรีแอคชั่น"
-createWithOptions: "สร้างด้วยตัวเลือก"
-edited: "แก้ไขแล้ว"
-replay: "รีเพลย์"
-genEmbedCode: "สร้างรหัสฝัง"
-unknownWebAuthnKey: "เป็น Passkey ที่ยังไม่ได้ลงทะเบียน"
-draft: "ร่าง"
-untitled: "ไม่มีชื่อ"
-chat: "แชต"
-defaultImageCompressionLevel: "ค่าการบีบอัดภาพเริ่มต้น"
-_chat:
-  invitations: "คำเชิญ"
-  noHistory: "ไม่มีประวัติ"
-  members: "สมาชิก"
-  home: "หน้าหลัก"
-  send: "ส่ง"
-  cannotChatWithTheUser: "ไม่สามารถเริ่มแชตกับผู้ใช้นี้ได้"
-  cannotChatWithTheUser_description: "แชตใช้งานไม่ได้ หรือคู่สนทนายังไม่ได้เปิดแชต"
-_settings:
-  showUrlPreview: "แสดงตัวอย่าง URL"
-_initialTutorial:
-  launchTutorial: "เริ่มบทช่วยสอน"
-  title: "บทช่วยสอน"
-  skipAreYouSure: "ต้องการออกจากบทช่วยสอนใช่ไหม?"
-  _landing:
-    title: "ยินดีต้อนรับสู่บทช่วยสอน"
-  _note:
-    reply: "คุณสามารถตอบกลับได้ และคุณยังสามารถตอบกลับใส่การตอบกลับเพื่อสนทนาต่อได้เสมือนดั่งเธรด"
-    menu: "คุณสามารถดูรายละเอียดโน้ต คัดลอกลิงก์ และดำเนินการอื่นๆ ได้"
-  _reaction:
-    title: "รีแอคชั่นคืออะไร?"
-  _timeline:
-    social: "จะแสดงโพสต์ทั้งจากไทม์ไลน์หลักและไทม์ไลน์ท้องถิ่น"
-  _postNote:
-    _visibility:
-      localOnly: "การโพสต์ด้วย flag นี้จะไม่รวมโน้ตไปยังเซิร์ฟเวอร์อื่น ผู้ใช้บนเซิร์ฟเวอร์อื่นจะไม่สามารถดูโน้ตเหล่านี้ได้โดยตรง โดยไม่คำนึงถึงการตั้งค่าการแสดงผลข้างต้น"
-    _cw:
-      description: "เนื้อหาที่เขียนใน “ข้อความเกริ่น” จะแสดงแทนเนื้อหาหลัก ต้องกด “ดูเพิ่มเติม” เพื่อให้เนื้อหาหลักแสดง"
-      useCases: "ใช้สิ่งนี้เพื่อระบุโน้ตที่ต้องตามแนวทางปฏิบัติของเซิร์ฟเวอร์ หรือเพื่อควบคุมการสปอยล์และข้อความที่ละเอียดอ่อนด้วยตนเอง"
-  _done:
-    title: "บทเรียนจบลงแล้วจ้า เย่เย่เย่  🎉"
+_lang_: 'ภาษาไทย'
+search: 'ค้นหา'
+ok: 'ตกลง'
+cancel: 'ยกเลิก'
+notificationSettings: 'ตั้งค่าการแจ้งเตือน'
+save: 'บันทึก'
+favorites: 'รายการโปรด'
+delete: 'ลบ'
+lists: 'รายชื่อ'
+notes: ' โน้ต'
+following: 'กำลังติดตาม'
+somethingHappened: 'อุ๊ย ! มีอะไรบางอย่างผิดพลาด'
+customEmojis: 'เอโมจิที่กำหนดเอง'
+mutedUsers: 'ผู้ใช้ที่ถูกปิดเสียง'
+blockedUsers: 'ผู้ใช้ที่ถูกบล็อก'
+reload: 'รีโหลด'
+accept: 'ยอมรับ'
+reject: 'ปฏิเสธ'
+antennas: 'เสาอากาศ'
+close: 'ปิด'
+edit: 'แก้ไข'
+copy: 'คัดลอก'
+clips: 'คลิป'
+markAllAsRead: 'ทำเครื่องหมายทั้งหมดว่าอ่านแล้ว'
 _achievements:
   _types:
     _notes1:
-      title: "just setting up my msky"
-      description: "โพสต์โน้ตเป็นครั้งแรก"
-      flavor: "ขอให้มีช่วงเวลาที่ดีกับ Misskey นะคะ!"
+      title: 'just setting up my msky'
     _notes10:
-      title: "โน้ตไม่กี่ชิ้น"
-      description: "โพสต์ 10 โน้ต"
+      title: 'โน้ตไม่กี่ชิ้น'
     _notes100:
-      title: "โน้ตเยอะอยู่"
-      description: "โพสต์ 100 โน้ต"
+      title: 'โน้ตเยอะอยู่'
     _notes500:
-      title: "จมคากองโน้ต"
-      description: "โพสต์ 500 โน้ต"
+      title: 'จมคากองโน้ต'
     _notes1000:
-      title: "ภูเขาแห่งโน้ต"
-      description: "โพสต์ 1,000 โน้ต"
+      title: 'ภูเขาแห่งโน้ต'
     _notes5000:
-      title: "โน้ตล้นไปแล้ว"
-      description: "โพสต์ 5,000 โน้ต"
+      title: 'โน้ตล้นไปแล้ว'
     _notes10000:
-      title: "ซุปเปอร์โน้ต"
-      description: "โพสต์ 10,000 โน้ต"
+      title: 'ซุปเปอร์โน้ต'
     _notes20000:
-      title: "ต้ อ ง ก า ร โ น้ ต เ พิ่ ม อี ก !"
-      description: "โพสต์ 20,000 โน้ต"
+      title: 'ต้ อ ง ก า ร โ น้ ต เ พิ่ ม อี ก !'
     _notes30000:
-      title: "โน้ต โน้ต โน้ต!"
-      description: "โพสต์ 30,000 โน้ต"
+      title: 'โน้ต โน้ต โน้ต!'
     _notes40000:
-      title: "โรงงานผลิตโน้ต"
-      description: "โพสต์ 40,000 โน้ต"
+      title: 'โรงงานผลิตโน้ต'
     _notes50000:
-      title: "ดาวเคราะห์แห่งโน้ต"
-      description: "โพสต์ 50,000 โน้ต"
+      title: 'ดาวเคราะห์แห่งโน้ต'
     _notes60000:
-      title: "โน้ตควอซาร์"
-      description: "โพสต์ 60,000 โน้ต"
+      title: 'โน้ตควอซาร์'
     _notes70000:
-      title: "หลุม-โน้ต-ดำ"
-      description: "โพสต์ 70,000 โน้ต"
+      title: 'หลุม-โน้ต-ดำ'
     _notes80000:
-      title: "ดาราจักรโน้ต"
-      description: "โพสต์ 80,000 โน้ต"
+      title: 'ดาราจักรโน้ต'
     _notes90000:
-      title: "จักรวาลโน้ต"
-      description: "โพสต์ 90,000 โน้ต"
+      title: 'จักรวาลโน้ต'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "โพสต์ 100,000 โน้ต"
-      flavor: "มีเรื่องจะเขียนมากขนาดนั้นเลยเหรอนั่น?"
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "มือใหม่ I"
-      description: "เข้าสู่ระบบเป็นเวลารวม 3 วัน"
-      flavor: "ตั้งแต่วันนี้เป็นต้นไป ฉันคือมิสคิสต์"
+      title: 'มือใหม่ I'
     _login7:
-      title: "มือใหม่ II"
-      description: "เข้าสู่ระบบเป็นเวลารวม 7 วัน"
-      flavor: "ชินกับมันแล้วหรือยัง?"
+      title: 'มือใหม่ II'
     _login15:
-      title: "มือใหม่ III"
-      description: "เข้าสู่ระบบเป็นเวลารวม 15 วัน"
+      title: 'มือใหม่ III'
     _login30:
-      title: "มิสคิสต์ I"
-      description: "เข้าสู่ระบบเป็นเวลารวม 30 วัน"
+      title: 'มิสคิสต์ I'
     _login60:
-      title: "มิสคิสต์ II"
-      description: "เข้าสู่ระบบเป็นเวลารวม 60 วัน"
+      title: 'มิสคิสต์ II'
     _login100:
-      title: "มิสคิสต์ III"
-      description: "เข้าสู่ระบบเป็นเวลารวม 100 วัน"
-      flavor: "Violent Misskist (ทำไมเหมือนชื่อหนังสักเรื่องจังเลยนะ)"
+      title: 'มิสคิสต์ III'
     _login200:
-      title: "ลูกค้าประจำ I"
-      description: "เข้าสู่ระบบเป็นเวลารวม 200 วัน"
+      title: 'ลูกค้าประจำ I'
     _login300:
-      title: "ลูกค้าประจำ II"
-      description: "เข้าสู่ระบบเป็นเวลารวม 300 วัน"
+      title: 'ลูกค้าประจำ II'
     _login400:
-      title: "ลูกค้าประจำ III"
-      description: "เข้าสู่ระบบเป็นเวลารวม 400 วัน"
+      title: 'ลูกค้าประจำ III'
     _login500:
-      title: "ผู้เชี่ยวชาญ I"
-      description: "เข้าสู่ระบบเป็นเวลารวม 500 วัน"
-      flavor: "ทุกท่าน ผมชอบโน้ต (กล่าวโดย เดอะ เ_เ_อร์)"
+      title: 'ผู้เชี่ยวชาญ I'
     _login600:
-      title: "ผู้เชี่ยวชาญ II"
-      description: "เข้าสู่ระบบเป็นเวลารวม 600 วัน"
+      title: 'ผู้เชี่ยวชาญ II'
     _login700:
-      title: "ผู้เชี่ยวชาญ III"
-      description: "เข้าสู่ระบบเป็นเวลารวม 700 วัน"
+      title: 'ผู้เชี่ยวชาญ III'
     _login800:
-      title: "ปรมาจารย์ด้านโน้ต I"
-      description: "เข้าสู่ระบบเป็นเวลารวม 800 วัน"
+      title: 'ปรมาจารย์ด้านโน้ต I'
     _login900:
-      title: "ปรมาจารย์ด้านโน้ต II"
-      description: "เข้าสู่ระบบเป็นเวลารวม 900 วัน"
+      title: 'ปรมาจารย์ด้านโน้ต II'
     _login1000:
-      title: "ปรมาจารย์ด้านโน้ต III"
-      description: "เข้าสู่ระบบเป็นเวลารวม 1,000 วัน"
-      flavor: "ขอบคุณที่ใช้ Misskey นะ !"
+      title: 'ปรมาจารย์ด้านโน้ต III'
     _noteClipped1:
-      title: "อดไม่ได้ที่จะต้องคลิปมันเอาไว้"
-      description: "คลิปโน้ตเป็นครั้งแรก"
+      title: 'อดไม่ได้ที่จะต้องคลิปมันเอาไว้'
     _noteFavorited1:
-      title: "สตาร์เกเซอร์"
-      description: "ใส่โน้ตเป็นรายการโปรดเป็นครั้งแรก"
+      title: 'สตาร์เกเซอร์'
     _myNoteFavorited1:
-      title: "แสวงหาดวงดาว"
-      description: "โน้ตตัวเองถูกคนอื่นเพิ่มลงรายการโปรดของเขา"
+      title: 'แสวงหาดวงดาว'
     _profileFilled:
-      title: "เตรียมตัวอย่างดี"
-      description: "ตั้งค่าโปรไฟล์"
+      title: 'เตรียมตัวอย่างดี'
     _markedAsCat:
-      title: "ฉันเป็นแมว"
-      description: "ตั้งค่าบัญชีเป็นแมวเมี้ยวเมี้ยว"
-      flavor: "แมวน้อยไร้ชื่อ"
+      title: 'ฉันเป็นแมว'
     _following1:
-      title: "ก้าวแรกสู่...กดติดตาม"
-      description: "กดติดตามชาวบ้านครั้งแรก"
+      title: 'ก้าวแรกสู่...กดติดตาม'
     _following10:
-      title: "ทำต่อไป... ทำต่อไป..."
-      description: "ติดตาม 10 บัญชีผู้ใช้"
+      title: 'ทำต่อไป... ทำต่อไป...'
     _following50:
-      title: "มีเพื่อนมากมาย"
-      description: "ติดตาม 50 บัญชี"
+      title: 'มีเพื่อนมากมาย'
     _following100:
-      title: "เพื่อน 100 คน"
-      description: "ติดตาม 100 บัญชี"
+      title: 'เพื่อน 100 คน'
     _following300:
-      title: "มีเพื่อนมากเกินไปละ"
-      description: "ติดตาม 300 บัญชี"
+      title: 'มีเพื่อนมากเกินไปละ'
     _followers1:
-      title: "ผู้ติดตามคนแรก"
-      description: "ได้รับ 1 ผู้ติดตาม"
+      title: 'ผู้ติดตามคนแรก'
     _followers10:
-      title: "ติดตามฉัน!"
-      description: "ได้รับ 10 คนผู้ติดตาม"
+      title: 'ติดตามฉัน!'
     _followers50:
-      title: "มากันเป็นฝูง"
-      description: "ได้รับ 50 ผู้ติดตาม"
+      title: 'มากันเป็นฝูง'
     _followers100:
-      title: "บุคคลที่เป็นที่นิยม"
-      description: "ได้รับ 100 ผู้ติดตาม"
+      title: 'บุคคลที่เป็นที่นิยม'
     _followers300:
-      title: "กรุณาสร้างบรรทัดเดียวนะคะ"
-      description: "ได้รับ 300 คนผู้ติดตาม"
+      title: 'กรุณาสร้างบรรทัดเดียวนะคะ'
     _followers500:
-      title: "เสาสัญญาณ"
-      description: "ได้รับ 500 คนผู้ติดตาม"
+      title: 'เสาสัญญาณ'
     _followers1000:
-      title: "ผู้ทรงอิทธิพล"
-      description: "ได้รับ 1,000 ผู้ติดตาม"
+      title: 'ผู้ทรงอิทธิพล'
     _collectAchievements30:
-      title: "นักสะสมความสำเร็จ"
-      description: "ได้รับความสำเร็จ 30 ครั้ง"
+      title: 'นักสะสมความสำเร็จ'
     _viewAchievements3min:
-      title: "ชอบบรรลุความสําเร็จ"
-      description: "มองดูรายการความสำเร็จเป็นเวลานานกว่า 3 นาที"
+      title: 'ชอบบรรลุความสําเร็จ'
     _iLoveMisskey:
-      title: "ฉันรัก Misskey"
-      description: "โพสต์ “I ❤ #Misskey”"
-      flavor: "ขอบคุณพระคุณเป็นอย่างสูงที่ท่านใช้ Misskey นะคะ ! by ทีมผู้พัฒนา"
+      title: 'ฉันรัก Misskey'
     _foundTreasure:
-      title: "ล่าสมบัติ"
-      description: "คุณพบสมบัติที่ซ่อนอยู่"
+      title: 'ล่าสมบัติ'
     _client30min:
-      title: "พักผ่อนสักหน่อย"
-      description: "ใช้เวลา 30 นาทีบน Misskey"
+      title: 'พักผ่อนสักหน่อย'
     _client60min:
-      title: "Misskey ต้องไม่มีสิ่งใด “Miss”"
-      description: "เปิด Misskey ค้างไว้แล้วอย่างน้อย 60 นาที"
+      title: 'Misskey ต้องไม่มีสิ่งใด “Miss”'
     _noteDeletedWithin1min:
-      title: "ไม่เป็นไร"
-      description: "ลบโน้ตภายในหนึ่งนาทีหลังจากที่โพสต์"
+      title: 'ไม่เป็นไร'
     _postedAtLateNight:
-      title: "ออกหากินยามดึกดื่น"
-      description: "โพสต์โน้ตตอนดึกๆ"
-      flavor: "ได้เวลาเข้านอนแล้วนะ"
+      title: 'ออกหากินยามดึกดื่น'
     _postedAt0min0sec:
-      title: "นาฬิกาเทียบเวลา"
-      description: "โพสต์โน้ตเมื่อเวลา 00:00 น."
-      flavor: "โป๊ะ โป๊ะ โป๊ะ ปิ้งงงงง"
+      title: 'นาฬิกาเทียบเวลา'
     _selfQuote:
-      title: "อ้างอิงตนเอง"
-      description: "อ้างอิงโน้ตตัวเอง"
+      title: 'อ้างอิงตนเอง'
     _htl20npm:
-      title: "ไทม์ไลน์ไหล"
-      description: "มีการทำความเร็วของไทม์ไลน์หลักเกิน 20 npm (โน้ตต่อนาที)"
+      title: 'ไทม์ไลน์ไหล'
     _viewInstanceChart:
-      title: "วิเคราะห์"
-      description: "ดูแผนภูมิของเซิร์ฟเวอร์"
+      title: 'วิเคราะห์'
     _outputHelloWorldOnScratchpad:
-      title: "หวัดดีชาวโลก!"
-      description: "เอาพุต \"hello world\" ใน Scratchpad"
+      title: 'หวัดดีชาวโลก!'
     _open3windows:
-      title: "มัลติวินโดว์"
-      description: "มีการเปิดหน้าต่างอย่างน้อย 3 หน้าต่างพร้อมกัน"
+      title: 'มัลติวินโดว์'
     _driveFolderCircularReference:
-      title: "อ้างอิงวงจร"
-      description: "พยายามสร้างโฟลเดอร์ที่ซ้อนกันแบบวนซ้ำในไดรฟ์"
+      title: 'อ้างอิงวงจร'
     _reactWithoutRead:
-      title: "คุณอ่านมันจริงๆหรือเปล่า?"
-      description: "มีการโต้ตอบกับโน้ตที่มีความยาวมากกว่า 100 ตัวอักษรภายใน 3 วินาทีหลังจากที่โพสต์"
+      title: 'คุณอ่านมันจริงๆหรือเปล่า?'
     _clickedClickHere:
-      title: "คลิกที่นี่"
-      description: "คุณได้คลิกที่นี่"
+      title: 'คลิกที่นี่'
     _justPlainLucky:
-      title: "แค่ลัคกี้ธรรมดา"
-      description: "มีโอกาสที่จะได้รับด้วยความน่าจะเป็นไปได้ 0.005% ทุก ๆ 10 วินาที"
+      title: 'แค่ลัคกี้ธรรมดา'
     _setNameToSyuilo:
-      title: "คอมเพล็กซ์ของพระเจ้า"
-      description: "ตั้งชื่อเป็น “syuilo”"
+      title: 'คอมเพล็กซ์ของพระเจ้า'
     _passedSinceAccountCreated1:
-      title: "ครบรอบหนึ่งปี"
-      description: "ผ่านไป 1 ปีนับตั้งแต่สร้างบัญชี"
+      title: 'ครบรอบหนึ่งปี'
     _passedSinceAccountCreated2:
-      title: "ครบรอบสองปี"
-      description: "ผ่านไป 2 ปีนับตั้งแต่สร้างบัญชี"
+      title: 'ครบรอบสองปี'
     _passedSinceAccountCreated3:
-      title: "ครบรอบสามปี"
-      description: "ผ่านไป 3 ปีนับตั้งแต่สร้างบัญชี"
+      title: 'ครบรอบสามปี'
     _loggedInOnBirthday:
-      title: "สุขสันต์วันเกิด"
-      description: "เข้าสู่ระบบในวันเกิดของคุณ"
+      title: 'สุขสันต์วันเกิด'
     _loggedInOnNewYearsDay:
-      title: "สวัสดีปีใหม่!"
-      description: "เข้าสู่ระบบในวันแรกของปี"
-      flavor: "อีกปีที่ยอดเยี่ยมในโอกาสนี้เลย"
+      title: 'สวัสดีปีใหม่!'
     _cookieClicked:
-      title: "เกมที่คุณคลิกที่คุกกี้"
-      description: "คลิกคุกกี้"
-      flavor: "ใช่หรอ? แน่ใจว่าซอฟต์แวร์ทำงานถูกต้องนะ?"
+      title: 'เกมที่คุณคลิกที่คุกกี้'
     _brainDiver:
-      title: "Brain Diver"
-      description: "โพสต์ลิงก์ไปยัง Brain Diver"
-      flavor: "Misskey-Misskey La-Tu-Ma"
+      title: 'Brain Diver'
     _smashTestNotificationButton:
-      title: "ทดสอบโอเวอร์โฟลว์"
-      description: "ทดสอบการแจ้งเตือนทริกเกอร์ซ้ำๆ ภายในระยะเวลาอันสั้นๆ"
+      title: 'ทดสอบโอเวอร์โฟลว์'
     _tutorialCompleted:
-      title: "ใบรับรองการสำเร็จหลักสูตร Misskey มือใหม่"
-      description: "เสร็จสิ้นการสอนแล้ว"
+      title: 'ใบรับรองการสำเร็จหลักสูตร Misskey มือใหม่'
     _bubbleGameExplodingHead:
-      title: "🤯"
-      description: "สร้างวัตถุที่ใหญ่ที่สุดในเกมบับเบิ้ล"
+      title: '🤯'
     _bubbleGameDoubleExplodingHead:
-      title: "ดับเบิ้ล"
-      description: "สร้างวัตถุที่ใหญ่ที่สุดในเกมบับเบิ้ลสองชิ้นในเวลาเดียวกัน"
-      flavor: "ปิ่นโตขนาดนี้ น่าจะเพิ่ม　🤯　🤯　เข้าไปนิดหน่อย"
-_role:
-  edit: "แก้ไขบทบาท"
-  assignTarget: "มอบหมาย"
-  options: "ตัวเลือก"
-  displayOrder: "ลำดับการแสดงผล"
-  priority: "ลำดับความสำคัญ"
-  _priority:
-    low: "ต่ำ"
-    middle: "ปานกลาง"
-    high: "สูง"
-  _options:
-    canManageCustomEmojis: "จัดการเอโมจิที่กำหนดเอง"
-    canManageAvatarDecorations: "จัดการตกแต่งอวตาร"
-    canHideAds: "ซ่อนโฆษณา"
-  _condition:
-    isRemote: "ผู้ใช้ระยะไกล"
-    isCat: "ผู้ใช้ที่เป็นแมว"
-    isBot: "ผู้ใช้ที่เป็นบอต"
-_ffVisibility:
-  public: "สาธารณะ"
-  followers: "ปรากฏให้แก่ผู้ติดตามเท่านั้น"
-  private: "ส่วนตัว"
-_ad:
-  hide: "ไม่ต้องแสดง"
-_email:
-  _follow:
-    title: "ได้ติดตามคุณ"
-  _receiveFollowRequest:
-    title: "คุณได้รับคำขอติดตาม"
-_plugin:
-  manage: "จัดการปลั๊กอิน"
-_preferencesBackups:
-  list: "การตั้งค่าที่สำรองไว้"
-  apply: "นำไปใช้กับอุปกรณ์นี้"
-  save: "บันทึก"
-  nameAlreadyExists: "มีการตั้งค่าสำรองชื่อ “{name}” อยู่แล้ว กรุณาป้อนชื่ออื่น"
-  saveConfirm: "บันทึกการตั้งค่าสำรองเป็น {name} ใช่ไหม?"
-  deleteConfirm: "ต้องการลบ {name} ใช่ไหม?"
-  createdAt: "สร้างเมื่อ: {date} {time}"
-  updatedAt: "อัปเดตเมื่อ: {date} {time}"
-  cannotLoad: "การโหลดล้มเหลว"
-_aboutMisskey:
-  contributors: "ผู้สนับสนุนหลัก"
-_menuDisplay:
-  top: "ท็อป"
-  hide: "ซ่อน"
-_theme:
-  base: "ฐาน"
-  addConstant: "เพิ่มค่าคงที่"
-  constant: "ตัวแปร"
-  defaultValue: "ค่าเริ่มต้น"
-  refProp: "อ้างอิงคุณสมบัติ"
-  refConst: "อ้างอิงค่าคงที่"
-  key: "คีย์"
-  func: "ฟังก์ชัน"
-  funcKind: "ประเภทฟังก์ชัน"
-  argument: "อากิวเม้นต์"
-  basedProp: "ทรัพย์สินอ้างอิง"
-  darken: "มืดลง"
-  inputConstantName: "ป้อนชื่อสำหรับค่าคงที่นี้"
-  importInfo: "ถ้าหากต้องการป้อนโค้ดที่นี่ คุณยังสามารถนำเข้าไปยังโปรแกรมแก้ไขธีมได้"
-  deleteConstantConfirm: "คุณต้องการลบค่าคงที่ {const} หรือป่าว?"
-  keys:
-    accent: "สีหลัก"
-    bg: "พื้นหลัง"
-    fg: "ข้อความ"
-    focus: "โฟกัส"
-    indicator: "ตัวบ่งชี้"
-    panel: "แผง"
-    shadow: "เงา"
-    navBg: "พื้นหลังแถบด้านข้าง"
-    navFg: "ข้อความแถบด้านข้าง"
-    navActive: "ข้อความแถบด้านข้าง (ใช้งานอยู่)"
-    navIndicator: "ตัวระบุแถบด้านข้าง"
-    link: "ลิงก์"
-    hashtag: "แฮชแท็ก"
-    mention: "กล่าวถึง"
-    mentionMe: "ได้กล่าวถึงคุณ"
-    renote: "รีโน้ต"
-    modalBg: "พื้นหลังโมดอล"
-    divider: "ตัวแบ่ง"
-    scrollbarHandle: "ที่จับแถบเลื่อน"
-    scrollbarHandleHover: "ที่จับแถบเลื่อน (โฮเวอร์)"
-    dateLabelFg: "ข้อความกำกับป้ายวันที่"
-    infoBg: "ข้อมูลพื้นหลัง"
-    infoFg: "ข้อความข้อมูล"
-    infoWarnBg: "คำเตือนพื้นหลัง"
-    infoWarnFg: "คำเตือนข้อความ"
-    toastBg: "ประวัติการแจ้งเตือน"
-    toastFg: "ข้อความแจ้งเตือน"
-    buttonBg: "ปุ่มพื้นหลัง"
-    buttonHoverBg: "ปุ่มพื้นหลัง (โฮเวอร์)"
-    inputBorder: "เส้นขอบของช่องป้อนข้อมูล"
-    badge: "ตรา"
-    messageBg: "พื้นหลังแชท"
-    fgHighlighted: "ข้อความที่ไฮไลต์"
-_ago:
-  future: "อนาคต"
-_permissions:
-  "read:account": "ดูข้อมูลบัญชี"
-  "write:account": "แก้ไขข้อมูลบัญชี"
-  "read:blocks": "ดูรายชื่อผู้ใช้ที่ถูกบล็อก"
-  "write:blocks": "แก้ไขรายชื่อผู้ใช้ที่ถูกบล็อก"
-  "read:drive": "เข้าถึงไดรฟ์"
-  "write:drive": "จัดการไดรฟ์"
-  "read:favorites": "ดูรายการโปรด"
-  "write:favorites": "แก้ไขรายการโปรด"
-  "read:following": "ดูข้อมูลว่าใครที่คุณติดตาม"
-  "write:following": "ติดตามหรือเลิกติดตามบัญชีอื่น"
-  "read:messaging": "ดูแชท"
-  "write:messaging": "เขียนหรือลบข้อความแชท"
-  "read:mutes": "ดูรายชื่อผู้ใช้ที่ถูกปิดเสียง"
-  "write:mutes": "แก้ไขรายชื่อผู้ใช้ที่ถูกปิดเสียง"
-  "write:notes": "เขียนหรือลบโน้ต"
-  "read:notifications": "ดูการแจ้งเตือน"
-  "write:notifications": "จัดการแจ้งเตือน"
-  "read:reactions": "ดูรีแอคชั่น"
-  "write:reactions": "แก้ไขรีแอคชั่น"
-  "write:votes": "โหวตบนสำรวจความคิดเห็น"
-  "read:pages": "ดูหน้าเพจ"
-  "write:pages": "แก้ไขหรือลบเพจ"
-  "read:page-likes": "ดูรายการเพจที่ถูกใจไว้"
-  "write:page-likes": "แก้ไขรายการเพจที่ถูกใจ"
-  "read:user-groups": "ดูกลุ่มผู้ใช้"
-  "write:user-groups": "แก้ไขหรือลบกลุ่มผู้ใช้"
-  "read:channels": "ดูช่อง"
-  "write:channels": "แก้ไขช่อง"
-  "read:gallery": "ดูแกลเลอรี่"
-  "write:gallery": "แก้ไขแกลเลอรี"
-  "read:gallery-likes": "ดูแกลเลอรีที่ถูกใจไว้"
-  "write:gallery-likes": "จัดการแกลเลอรีที่ถูกใจไว้"
-  "write:admin:delete-account": "ลบบัญชีผู้ใช้"
-  "write:admin:roles": "จัดการบทบาท"
-  "read:admin:roles": "ดูบทบาท"
-  "write:chat": "เขียนหรือลบข้อความแชท"
-_profile:
-  username: "ชื่อผู้ใช้"
-  metadata: "ข้อมูลเพิ่มเติม"
-_charts:
-  filesTotal: "จำนวนไฟล์ทั้งหมด"
-_play:
-  created: "สร้าง Play แล้ว"
-  updated: "แก้ไข Play แล้ว"
-  deleted: "ลบ Play แล้ว"
-  pageSetting: "ตั้งค่า Play"
-_pages:
-  newPage: "สร้างหน้าเพจใหม่"
-  editPage: "แก้ไขหน้าเพจ"
-  readPage: "กำลังดูแหล่งที่มาของเพจนี้"
-  pageSetting: "การตั้งค่าหน้าเพจ"
-  nameAlreadyExists: "URL ของหน้าที่ระบุนั้นมีอยู่แล้ว"
-  invalidNameTitle: "URL ของหน้าที่ระบุนั้นไม่ถูกต้อง"
-  invalidNameText: "ตรวจสอบให้แน่ใจนะว่าชื่อหน้าไม่ว่างเปล่า"
-  editThisPage: "แก้ไขเพจนี้"
-  viewSource: "ดูต้นฉบับ"
-  viewPage: "ดูหน้าเพจ"
-  like: "ถูกใจ"
-  unlike: "เลิกถูกใจ"
-  my: "หน้าเพจของฉัน"
-  liked: "หน้าเพจที่ถูกใจ"
-  featured: "เป็นที่นิยม"
-  inspector: "ตัวตรวจสอบ"
-  contents: "เนื้อหา"
-  content: "บล็อกหน้าเพจ"
-  variables: "ตัวแปร"
-  title: "หัวข้อ"
-  url: "URL ของหน้า"
-  summary: "สรุปเพจ"
-  alignCenter: "เซ็นเตอร์"
-  hideTitleWhenPinned: "ซ่อนชื่อหน้าเพจเมื่อปักหมุดไว้ที่โปรไฟล์"
-  font: "แบบอักษร"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  eyeCatchingImageSet: "ตั้งค่าภาพขนาดย่อ"
-  eyeCatchingImageRemove: "ลบภาพขนาดย่อ"
-  chooseBlock: "เพิ่มบล็อก"
-  selectType: "เลือกชนิด"
-  contentBlocks: "เนื้อหา"
-  inputBlocks: "ป้อนข้อมูล"
-  specialBlocks: "พิเศษ"
-  blocks:
-    text: "ข้อความ"
-    textarea: "พื้นที่ข้อความ"
-    section: "ประเภท"
-    image: "รูปภาพ"
-    button: "ปุ่ม"
-    note: "โน้ตที่ฝังตัว"
-    _note:
-      id: "โน้ต ID"
-      idDescription: "คุณสามารถจะวาง URL ของโน้ตที่นี่ก็ได้นะ"
-      detailed: "มุมมองโดยละเอียด"
+      title: 'ดับเบิ้ล'
 _notification:
-  fileUploaded: "ไฟล์ถูกอัปโหลดแล้ว"
-  youGotMention: "{name} กล่าวถึงคุณ"
-  youGotReply: "{name} ตอบกลับถึงคุณ"
-  youGotQuote: "{name} อ้างอิงคุณ"
-  youRenoted: "รีโน้ตจาก {name}"
-  youWereFollowed: "ได้ติดตามคุณ"
-  youReceivedFollowRequest: "ได้รับคำขอติดตาม"
-  yourFollowRequestAccepted: "คำขอติดตามได้รับการอนุมัติแล้ว"
-  pollEnded: "ผลโพลออกมาแล้ว"
-  newNote: "โพสต์ใหม่"
-  unreadAntennaNote: "เสาอากาศ {name}"
-  emptyPushNotificationMessage: "อัปเดตการแจ้งเตือนแบบพุชแล้ว"
-  achievementEarned: "รับความสำเร็จ"
-  testNotification: "ทดสอบการแจ้งเตือน"
-  notificationWillBeDisplayedLikeThis: "การแจ้งเตือนมีลักษณะแบบนี้"
-  exportOfXCompleted: "การดำเนินการส่งออก {x} ได้เสร็จสิ้นลงแล้ว"
-  login: "มีการเข้าสู่ระบบ"
-  _types:
-    all: "ทั้งหมด"
-    note: "โน้ตใหม่"
-    follow: "กำลังติดตาม"
-    mention: "กล่าวถึง"
-    reply: "ตอบกลับ"
-    renote: "รีโน้ต"
-    quote: "อ้างอิง"
-    reaction: "รีแอคชั่น"
-    pollEnded: "โพลสิ้นสุดแล้ว"
-    scheduledNotePosted: "โพสต์กำหนดเวลาสำเร็จ"
-    scheduledNotePostFailed: "โพสต์กำหนดเวลาล้มเหลว"
-    receiveFollowRequest: "ได้รับคำร้องขอติดตาม"
-    followRequestAccepted: "อนุมัติให้ติดตามแล้ว"
-    roleAssigned: "ให้บทบาท"
-    chatRoomInvitationReceived: "เชิญเข้าห้องแชต"
-    achievementEarned: "ปลดล็อกความสำเร็จแล้ว"
-    exportCompleted: "กระบวนการส่งออกข้อมูลได้เสร็จสิ้นสมบูรณ์แล้ว"
-    login: "เข้าสู่ระบบ"
-    createToken: "สร้างโทเค็นการเข้าถึง"
-    test: "ทดสอบระบบแจ้งเตือน"
-    app: "การแจ้งเตือนจากแอปที่มีลิงก์"
+  youGotMention: '{name} กล่าวถึงคุณ'
+  youGotReply: '{name} ตอบกลับถึงคุณ'
+  youGotQuote: '{name} อ้างอิงคุณ'
+  youRenoted: 'รีโน้ตจาก {name}'
+  youWereFollowed: 'ได้ติดตามคุณ'
+  youReceivedFollowRequest: 'ได้รับคำขอติดตาม'
+  yourFollowRequestAccepted: 'คำขอติดตามได้รับการอนุมัติแล้ว'
+  pollEnded: 'ผลโพลออกมาแล้ว'
+  newNote: 'โพสต์ใหม่'
+  unreadAntennaNote: 'เสาอากาศ {name}'
+  achievementEarned: 'รับความสำเร็จ'
+  testNotification: 'ทดสอบการแจ้งเตือน'
+  notificationWillBeDisplayedLikeThis: 'การแจ้งเตือนมีลักษณะแบบนี้'
+  exportOfXCompleted: 'การดำเนินการส่งออก {x} ได้เสร็จสิ้นลงแล้ว'
+  login: 'มีการเข้าสู่ระบบ'
   _actions:
-    followBack: "ติดตามกลับด้วย"
-    reply: "ตอบกลับ"
-    renote: "รีโน้ต"
-_moderationLogTypes:
-  suspend: "ระงับ"
-  deleteNote: "ลบโน้ตออกแล้ว"
-  deleteUserAnnouncement: "ลบประกาศผู้ใช้ออกแล้ว"
-  resetPassword: "รีเซ็ตรหัสผ่าน"
-  resolveAbuseReport: "รายงานได้รับการแก้ไขแล้ว"
-  createInvitation: "สร้างรหัสเชิญ"
-  deleteGalleryPost: "โพสต์แกลเลอรี่ถูกลบออกแล้ว"
-_fileViewer:
-  url: "URL"
-_externalResourceInstaller:
-  _vendorInfo:
-    title: "ข้อมูลผู้จัดจำหน่าย"
-  _errors:
-    _themeInstallFailed:
-      title: "ติดตั้งธีมล้มเหลว"
-      description: "เกิดปัญหาระหว่างการติดตั้งธีม กรุณาลองอีกครั้ง. รายละเอียดข้อผิดพลาดสามารถดูได้ในคอนโซล Javascript"
-_reversi:
-  reversi: "รีเวอร์ซี"
+    followBack: 'ติดตามกลับด้วย'
+    reply: 'ตอบกลับ'
+    renote: 'รีโน้ต'
 _offlineScreen:
-  title: "ออฟไลน์ - ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้"
-  header: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้"
-_gridComponent:
-  _error:
-    columnTypeNotSupport: "การตรวจสอบค่าด้วย regex รองรับเฉพาะคอลัมน์ที่เป็น type:text"
-_embedCodeGen:
-  autoload: "โหลดเพิ่มโดยอัตโนมัติ (เลิกใช้แล้ว)"
-_selfXssPrevention:
-  warning: "คำเตือน"
-  title: "“ข้อความที่บอกให้วางบางอย่างในหน้าจอนี้” ทั้งหมดเป็นการหลอกลวง"
-  description1: "ถ้าวางบางอย่างที่นี่ อาจทำให้ผู้ไม่หวังดีเข้าควบคุมบัญชี หรือขโมยข้อมูลส่วนตัวได้"
-  description2: "ถ้าไม่เข้าใจอย่างชัดเจนว่าสิ่งที่กำลังจะวางคืออะไร %cให้หยุดการทำงานทันทีแล้วปิดหน้าต่างนี้"
-  description3: "ดูรายละเอียดเพิ่มเติมได้ที่นี่: {link}"
-_bootErrors:
-  title: "การโหลดล้มเหลว"
-  serverError: "หากปัญหายังคงอยู่แม้ว่าจะรอสักครู่แล้วโหลดหน้าใหม่อีกครั้ง โปรดติดต่อผู้ดูแลระบบเซิร์ฟเวอร์พร้อมรหัสข้อผิดพลาดต่อไปนี้"
-  solution: "สิ่งต่อไปนี้อาจช่วยแก้ไขปัญหาได้"
-  solution1: "อัปเดตเบราว์เซอร์และระบบปฏิบัติการเป็นรุ่นล่าสุด"
-  solution2: "ปิดใช้งานตัวบล็อกโฆษณา"
-  solution3: "ล้างแคชเบราว์เซอร์"
-  solution4: "(Tor Browser) ตั้งค่า dom.webaudio.enabled เป็น true"
-  otherOption: "ตัวเลือกเพิ่มเติม"
-  otherOption1: "ลบการตั้งค่าและแคชของไคลเอนต์"
-  otherOption2: "เริ่มใช้งานไคลเอนต์แบบง่าย"
-  otherOption3: "เปิดเครื่องมือซ่อมแซม"
-  otherOption4: "เริ่มทำงาน Misskey ในโหมดปลอดภัย"
-_watermarkEditor:
-  advanced: "ขั้นสูง"
-_imageEffector:
-  _fxProps:
-    radius: "รัศสี"
-    samples: "จำนวนตัวอย่าง"
-    threshold: "เทรชโฮลด์"
-_drafts:
-  select: "เลือกฉบับร่าง"
-  schedule: "โพสต์กำหนดเวลา"
+  title: 'ออฟไลน์ - ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'
+  header: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'
+next: 'ถัด​ไป'
+upload: 'อัปโหลด'
+preview: 'แสดงตัวอย่าง'
+reset: 'รีเซ็ต'
+name: 'ชื่อ'
+title: 'หัวข้อ'
+description: 'คำอธิบาย'
+none: 'ไม่มี'
+all: 'ทั้งหมด'
+default: 'ค่าเริ่มต้น'
+error: 'ผิดพลาด!'
+users: 'ผู้ใช้'
+areYouSure: 'แน่ใจแล้วใช่ไหมคะ?'

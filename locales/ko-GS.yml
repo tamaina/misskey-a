@@ -1,191 +1,39 @@
----
-_lang_: "한국어(경상)"
-monthAndDay: "{month}월 {day}일"
-search: "찾기"
-ok: "예"
-cancel: "아이예"
-notificationSettings: "알림 설정"
-uploading: "올리고 잇어예"
-save: "저장하기"
-favorites: "질겨찾기"
-favorited: "질겨찾기에 담앗십니다."
-alreadyFavorited: "벌시로 질겨찾기에 담기 잇십니다."
-delete: "내삐리기"
-searchUser: "사용자 찾기"
-showLess: "꺼기"
-lists: "리스트"
-notes: "노트"
-following: "팔로잉"
-somethingHappened: "먼가 일낫십니다"
-pinned: "프로필에 붙이기"
-unsuspend: "얼우기 풀기"
-customEmojis: "사용자 지정 이모지"
-emojis: "이모지"
-emojiName: "이모지 이럼"
-loginFailed: "로그인이 아이뎁니다."
-wallpaper: "벡지"
-instances: "서버"
-latestStatus: "막죽 상태"
-operations: "동작"
-monitor: "모니터"
-network: "네트워크"
-disk: "디스크"
-mutedUsers: "수ᇚ훈 사용자"
-blockedUsers: "차단한 사용자"
-changePassword: "비밀번호 바꾸기"
-retypedNotMatch: "선 거가 안 맞십니다."
-currentPassword: "지검 비밀번호"
-newPasswordRetype: "새 비밀번호 다시 서기"
-removed: "뭉캣십니다"
-home: "덜머리"
-reload: "새로곤침"
-watch: "간심 갖기"
-unwatch: "간심 고마 갖기"
-accept: "받기"
-reject: "아이 받기"
-integration: "옌겔"
-pinnedPages: "붙인 바닥"
-pinnedClipId: "붙일 클립으 아이디"
-hcaptcha: "에이치캡차"
-enableHcaptcha: "에이치캡차 키기"
-recaptcha: "리캡차"
-enableRecaptcha: "리캡차 키기"
-turnstile: "턴스타일"
-enableTurnstile: "턴스타일 키기"
-antennas: "안테나"
-close: "꺼기"
-invites: "초대하기"
-transfer: "넘구기"
-signinFailed: "로그인 몬 했십니다. 고 이름이랑 비밀번호 제대로 썼는가 확인해 주이소."
-noHistory: "기록이 없십니다"
-signinHistory: "로그인 기록"
-regenerate: "엎고 다시 맨걸기"
-appearance: "모냥"
-promotion: "선전"
-promote: "선전하기"
-hideThisNote: "요 노트를 수ᇚ후기"
-showFeaturedNotesInTimeline: "타임라인에다 추천 노트 보이기"
-deleteAll: "말캉 뭉캐기"
-showFixedPostForm: "타임라인 우에 글 작성 칸 박기"
-deleteAllFiles: "파일 말캉 뭉캐기"
-emailServer: "전자우펜 서버"
-emailAddress: "전자우펜 주소"
-smtpHost: "호스트 이럼"
-smtpPort: "포트"
-smtpUser: "사용자 이럼"
-smtpPass: "비밀번호"
-followingCount: "팔로우 수"
-followersCount: "팔로워 수"
-clips: "클립 맨걸기"
-_chat:
-  invitations: "초대하기"
-  noHistory: "기록이 없십니다"
-  members: "구성원"
-  home: "덜머리"
-_initialTutorial:
-  launchTutorial: "길라잡이 보기"
-  title: "길라잡이"
-  skipAreYouSure: "길라잡이럴 껕냅니까?"
-  _landing:
-    title: "길라잡이에 어서 오이소"
-  _done:
-    title: "길라잡이가 껕낫십니다!🎉"
-_achievements:
-  _types:
-    _notes1:
-      description: "첫 노트럴 섯어예"
-    _notes10:
-      description: "노트럴 10번 섰어예"
-    _notes100:
-      description: "노트럴 100번 섰어예"
-    _notes500:
-      description: "노트럴 500번 섰어예"
-    _notes1000:
-      description: "노트럴 1,000번 섰어예"
-    _notes5000:
-      description: "노트럴 5,000번 섰어예"
-    _notes10000:
-      description: "노트럴 10,000번 섰어예"
-    _notes20000:
-      description: "노트럴 20,000번 섰어예"
-    _notes30000:
-      description: "노트럴 30,000번 섰어예"
-    _notes40000:
-      description: "노트럴 40,000번 섰어예"
-    _notes50000:
-      description: "노트럴 50,000번 섰어예"
-    _notes60000:
-      description: "노트럴 60,000번 섰어예"
-    _notes70000:
-      description: "노트럴 70,000번 섰어예"
-    _notes80000:
-      description: "노트럴 80,000번 섰어예"
-    _notes90000:
-      description: "노트럴 90,000번 섰어예"
-    _notes100000:
-      description: "노트럴 100,000번 섰어예"
-    _noteClipped1:
-      description: "첫 노트럴 클립햇어예"
-    _noteFavorited1:
-      description: "첫 노트럴 질겨찾기에 담앗어예"
-    _myNoteFavorited1:
-      description: "다런 사람이 내 노트럴 질겨찾기에 담앗십니다"
-    _iLoveMisskey:
-      description: "“I ❤ #Misskey”럴 섰어예"
-    _postedAt0min0sec:
-      description: "0분 0초에 노트를 섰어예"
-    _tutorialCompleted:
-      description: "길라잡이럴 껕냇십니다"
-_role:
-  displayOrder: "보기 순서"
-  _priority:
-    middle: "엔갆게"
-  _options:
-    canHideAds: "강고 수ᇚ후기"
-  _condition:
-    isRemote: "웬겍 사용자"
-    isCat: "갱이 사용자"
-    isBot: "자동 사용자"
-_email:
-  _follow:
-    title: "새 팔로워가 잇십니다"
-_menuDisplay:
-  hide: "수ᇚ후기"
-_theme:
-  keys:
-    mention: "받언 멘션"
-    renote: "리노트"
-_permissions:
-  "read:favorites": "질겨찾기 보기"
-  "write:favorites": "질겨찾기 곤치기"
-_profile:
-  username: "사용자 이럼"
-_pages:
-  like: "좋네예"
-  unlike: "좋네예 무루기"
-  my: "내 페이지"
-  blocks:
-    image: "이미지"
-    _note:
-      id: "노트 아이디"
+_lang_: '한국어(경상)'
+search: '찾기'
+ok: '예'
+cancel: '아이예'
+notificationSettings: '알림 설정'
+save: '저장하기'
+favorites: '질겨찾기'
+delete: '내삐리기'
+lists: '리스트'
+notes: '노트'
+following: '팔로잉'
+somethingHappened: '먼가 일낫십니다'
+customEmojis: '사용자 지정 이모지'
+mutedUsers: '수ᇚ훈 사용자'
+blockedUsers: '차단한 사용자'
+reload: '새로곤침'
+accept: '받기'
+reject: '아이 받기'
+antennas: '안테나'
+close: '꺼기'
+clips: '클립 맨걸기'
 _notification:
-  youWereFollowed: "새 팔로워가 잇십니다"
-  newNote: "새 걸"
-  _types:
-    follow: "팔로잉"
-    mention: "받언 멘션"
-    renote: "리노트"
-    quote: "따오기"
-    reaction: "반엉"
-    login: "로그인"
+  youWereFollowed: '새 팔로워가 잇십니다'
+  newNote: '새 걸'
   _actions:
-    reply: "답하기"
-    renote: "리노트"
-_moderationLogTypes:
-  suspend: "얼우기"
-  deleteNote: "노트 뭉캐기"
-  deleteUserAnnouncement: "사용자 공지 걸 뭉캐기"
-  resetPassword: "비밀번호 재설정"
-  resolveAbuseReport: "신고 해겔하기"
-_reversi:
-  reversi: "리버시"
+    reply: '답하기'
+    renote: '리노트'
+next: '다엄'
+upload: '올리기'
+preview: '미리보기'
+name: '이럼'
+title: '제목'
+description: '설멩'
+none: '어ᇝ엄'
+all: '말캉'
+default: '기본값'
+error: '우짭니꺼'
+users: '사용자'
+areYouSure: '갠찮십니꺼?'

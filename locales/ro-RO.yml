@@ -1,195 +1,42 @@
----
-_lang_: "Română"
-monthAndDay: "{day}/{month}"
-search: "Caută"
-ok: "OK"
-cancel: "Anulează"
-notificationSettings: "Setări notificări"
-uploading: "Se încarcă"
-save: "Salvează"
-favorites: "Favorite"
-favorited: "Adăugat la favorite."
-alreadyFavorited: "Deja adăugat la favorite."
-delete: "Şterge"
-searchUser: "Caută un utilizator"
-showLess: "Închide"
-lists: "Liste"
-notes: "Note"
-following: "Îl urmărești"
-somethingHappened: "A apărut o eroare"
-pinned: "Fixat pe profil"
-emojiPicker: "Selectator de emoji"
-unsuspend: "Anulează suspendare"
-customEmojis: "Emoji personalizate"
-emojis: "Emoji-uri"
-emojiName: "Numele emoji-ului"
-loginFailed: "Autentificare eșuată"
-wallpaper: "Imagine de fundal"
-instances: "Instanțe"
-latestStatus: "Ultimul status"
-operations: "Operațiuni"
-monitor: "Monitor"
-network: "Rețea"
-disk: "Disk"
-mutedUsers: "Utilizatori amuțiți"
-blockedUsers: "Utilizatori blocați"
-changePassword: "Schimbă parolă"
-retypedNotMatch: "Intrările nu corespund"
-currentPassword: "Parola curentă"
-newPasswordRetype: "Rescrie parola nouă"
-removed: "Șterș cu succes"
-home: "Acasă"
-reload: "Reîncarcă"
-watch: "Vezi"
-unwatch: "Oprește-te din văzut"
-accept: "Acceptă"
-reject: "Respinge"
-integration: "Integrare"
-pinnedPages: "Pagini fixate"
-pinnedClipId: "ID-ul clip-ului pe care să îl fixezi"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Activează hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "Permite mCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Activează reCAPTCHA"
-turnstile: "\nTurnstile"
-enableTurnstile: "Permite Turnstile"
-antennas: "Antene"
-close: "Închide"
-invites: "Invită"
-transfer: "Transferă"
-signinFailed: "Nu se poate autentifica. Numele de utilizator sau parola introdusă e incorectă."
-noHistory: "Nu există istoric"
-signinHistory: "Istoric autentificări"
-regenerate: "Regenerează"
-appearance: "Aspect"
-promotion: "Promovat"
-promote: "Promovează"
-hideThisNote: "Ascunde această notă"
-showFeaturedNotesInTimeline: "Arată notele recomandate în cronologii"
-deleteAll: "Șterge tot"
-showFixedPostForm: "Arată caseta de postare în vârful cronologie"
-deleteAllFiles: "Șterge toate fișierele"
-leaveConfirm: "Ai schimbări nesalvate. Vrei să renunți la ele?"
-notificationType: "Tipul notificării"
-edit: "Editează"
-emailServer: "Server email"
-enableEmail: "Activează distribuția de emailuri"
-emailConfigInfo: "Folosit pentru a confirma emailul tău în timpul logări dacă îți uiți parola"
-emailAddress: "Adresă de email"
-smtpConfig: "Configurare Server SMTP"
-smtpHost: "Gazdă"
-smtpPort: "Port"
-smtpUser: "Nume de utilizator"
-smtpPass: "Parolă"
-emptyToDisableSmtpAuth: "Lasă username-ul și parola necompletate pentru a dezactiva verificarea SMTP"
-smtpSecure: "Folosește SSL/TLS implicit pentru conecțiunile SMTP"
-smtpSecureInfo: "Oprește opțiunea asta dacă STARTTLS este folosit"
-testEmail: "Testează livrarea emailurilor"
-copy: "Copiază"
-metrics: "Metrici"
-delayed: "Întârziate"
-regenerateLoginToken: "Regenerează token de login"
-regenerateLoginTokenDescription: "Regenerează token-ul folosit intern în timpul logări. În mod normal asta nu este necesar. Odată regenerat, toate dispozitivele vor fi delogate."
-sample: "exemplu"
-repliesCount: "Numărul de răspunsuri trimise"
-repliedCount: "Numărul de răspunsuri primite"
-followingCount: "Numărul de conturi urmărite"
-followersCount: "Numărul de urmăritori"
-pollVotesCount: "Numărul de voturi trimise la sondaj"
-driveUsage: "Gestionati spatiul de utilizare a drive-ului"
-clips: "Clip"
-experimental: "Experimental"
-wide: "Lat"
-narrow: "Îngust"
-sendErrorReports: "Trimite rapoartele de eroare"
-sendErrorReportsDescription: "Când este pornit, informațiile detaliate despre erori vor fi partajate cu Misskey atunci când apare o problemă, ajutând la îmbunătățirea calității Misskey.\nAceasta va include informații precum versiunea sistemului de operare, ce browser utilizați, activitatea dvs. în Misskey etc."
-advanced: "Avansat"
-markAllAsRead: "Marchează ca ,,citit”"
-onlineStatus: "Stare online"
-global: "Global"
-sent: "Trimite"
-received: "Primite"
-aiChanMode: "Modul Ai"
-unread: "Necitit/e"
-classic: "Clasic"
-incorrectTotp: "Parola unică este incorectă sau a expirat."
-rateLimitExceeded: "Limita ratei a fost depășită"
-recommended: "Recomandat"
-undefined: "Nedefinit"
-videos: "Video-uri"
-reactionsList: "Reacții"
-createWithOptions: "Generează cu opțiuni"
-edited: "Editat"
-_chat:
-  invitations: "Invită"
-  noHistory: "Nu există istoric"
-  members: "Membri"
-  home: "Acasă"
-  send: "Trimite"
-_initialTutorial:
-  _note:
-    reply: "Face clic pe acest buton pentru a răspunde la un mesaj. De asemenea, este posibil să răspunzi la răspunsuri, continuând conversația ca pe un șir de replici(thread)."
-    menu: "Poți vedea detaliile ce țin de Note, să copiezi linkuri și să efectuezi alte acțiuni."
-  _timeline:
-    social: "Vor fi afișate notele din cronologia „Acasă'' și „Locală''."
-  _postNote:
-    _visibility:
-      localOnly: "Postarea cu acest flag nu va federa nota pe alte servere. Utilizatorii de pe alte servere nu vor putea vizualiza aceste note direct, indiferent de setările de afișare de mai sus."
-    _cw:
-      description: "În locul corpului, va fi afișat conținutul scris în câmpul „comentarii”. Apăsând „citește mai mult” va dezvălui corpul."
-      useCases: "Acesta este folosit atunci când respectați instrucțiunile serverului, pentru notele necesare sau pentru auto-restrângerea spoilerului sau a textului sensibil."
-_role:
-  assignTarget: "Asignează"
-  priority: "Prioritate"
-  _priority:
-    low: "Scăzuta"
-    middle: "Mediu"
-    high: "Ridicată"
-  _options:
-    canManageCustomEmojis: "Gestionează emoji-uri personalizate"
-    canManageAvatarDecorations: "Gestionați decorațiunile avatarului"
-_ffVisibility:
-  public: "Publică"
-_email:
-  _follow:
-    title: "Ai un nou urmăritor"
-_theme:
-  keys:
-    fg: "Text"
-    mention: "Mențiune"
-    renote: "Re-Notează"
-    divider: "Separator"
-    toastFg: "Textul din notificare"
-    fgHighlighted: "Textul evidențiat"
-_permissions:
-  "read:gallery": "Vizualizează-ți galeria"
-  "write:gallery": "Editează-ți galeria"
-  "read:gallery-likes": "Vizualizează-ți lista de postări apreciate din galerie"
-  "write:gallery-likes": "Editează-ți lista de postări apreciate din galerie"
-_profile:
-  username: "Nume de utilizator"
-_pages:
-  blocks:
-    text: "Text"
-    image: "Imagini"
+_lang_: 'Română'
+search: 'Caută'
+ok: 'OK'
+cancel: 'Anulează'
+notificationSettings: 'Setări notificări'
+save: 'Salvează'
+favorites: 'Favorite'
+delete: 'Şterge'
+lists: 'Liste'
+notes: 'Note'
+following: 'Îl urmărești'
+somethingHappened: 'A apărut o eroare'
+customEmojis: 'Emoji personalizate'
+mutedUsers: 'Utilizatori amuțiți'
+blockedUsers: 'Utilizatori blocați'
+reload: 'Reîncarcă'
+accept: 'Acceptă'
+reject: 'Respinge'
+antennas: 'Antene'
+close: 'Închide'
+edit: 'Editează'
+copy: 'Copiază'
+clips: 'Clip'
+markAllAsRead: 'Marchează ca ,,citit”'
 _notification:
-  youWereFollowed: "te-a urmărit"
-  _types:
-    follow: "Urmărești"
-    mention: "Mențiune"
-    renote: "Re-Note"
-    quote: "Citează"
-    reaction: "Reacție"
-    login: "Autentifică-te"
+  youWereFollowed: 'te-a urmărit'
   _actions:
-    reply: "Răspunde"
-    renote: "Re-Notează"
-_moderationLogTypes:
-  suspend: "Suspendă"
-  resetPassword: "Resetează parola"
-  createInvitation: "Generează invitația"
-  deleteGalleryPost: "Postarea din galerie a fost ștearsă"
-_watermarkEditor:
-  advanced: "Avansat"
+    reply: 'Răspunde'
+    renote: 'Re-Notează'
+next: 'Următorul'
+upload: 'Încarcă'
+preview: 'Previzualizare'
+reset: 'Resetează.'
+name: 'Nume'
+title: 'Titlu'
+description: 'Descriere'
+none: 'Nimic'
+all: 'Tot'
+default: 'Prestabilit'
+error: 'Eroare'
+users: 'Utilizatori'
+areYouSure: 'Ești sigur(ă)?'

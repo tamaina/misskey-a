@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			v-if="instance.federation !== 'none'"
 			v-model="searchOrigin"
 			:options="[
-				{ value: 'combined', label: $locale.sfc.all },
+				{ value: 'combined', label: globalLocale.env.all },
 				{ value: 'local', label: $locale.sfc.local },
 				{ value: 'remote', label: $locale.sfc.remote },
 			]"
@@ -151,7 +151,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "جارٍ جلبه مِن الفديفرس…",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "الكل",
 	"local": "المحلي",
 	"remote": "بُعدي",
 	"searchResult": "نتائج البحث"
@@ -163,7 +162,6 @@ async function search() {
 	"lookupConfirm": "Vols fer una cerca?",
 	"fetchingAsApObject": "Cercant al Fediverse...",
 	"openTagPageConfirm": "Vols obrir una pàgina d'etiquetes?",
-	"all": "Tot",
 	"local": "Local",
 	"remote": "Remot",
 	"searchResult": "Resultats de la cerca"
@@ -175,7 +173,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Načítám data z Fediversu...",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "Vše",
 	"local": "Lokální",
 	"remote": "Vzdálené",
 	"searchResult": "Výsledky hledání"
@@ -187,7 +184,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Fetching from the Fediverse...",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"searchResult": "Search results"
@@ -199,7 +195,6 @@ async function search() {
 	"lookupConfirm": "Bist du sicher, dass du das nachschlagen möchtest?",
 	"fetchingAsApObject": "Wird aus dem Fediverse angefragt …",
 	"openTagPageConfirm": "Hashtag Seite wirklich öffnen?",
-	"all": "Alle",
 	"local": "Lokal",
 	"remote": "Fremd",
 	"searchResult": "Suchergebnisse"
@@ -211,7 +206,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Fetching from the Fediverse...",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"searchResult": "Search results"
@@ -223,7 +217,6 @@ async function search() {
 	"lookupConfirm": "¿Quiere informarse?",
 	"fetchingAsApObject": "Buscando en el fediverso",
 	"openTagPageConfirm": "¿Quieres abrir la página de etiquetas?",
-	"all": "Todo",
 	"local": "Local",
 	"remote": "Remoto",
 	"searchResult": "Resultados de búsqueda"
@@ -235,7 +228,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Récupération depuis le fédiverse …",
 	"openTagPageConfirm": "Ouvrir une page d'hashtags ?",
-	"all": "Tous",
 	"local": "Local",
 	"remote": "Distant",
 	"searchResult": "Résultats de la recherche"
@@ -247,7 +239,6 @@ async function search() {
 	"lookupConfirm": "Cari?",
 	"fetchingAsApObject": "Mengambil data dari Fediverse...",
 	"openTagPageConfirm": "Apakah ingin membuka laman tagar?",
-	"all": "Semua",
 	"local": "Lokal",
 	"remote": "Remote",
 	"searchResult": "Hasil Penelusuran"
@@ -259,7 +250,6 @@ async function search() {
 	"lookupConfirm": "Vuoi davvero richiedere informazioni?",
 	"fetchingAsApObject": "Recuperando dal Fediverso...",
 	"openTagPageConfirm": "Vuoi davvero aprire la pagina dell'hashtag?",
-	"all": "Tutte",
 	"local": "Locale",
 	"remote": "Remota",
 	"searchResult": "Risultati della Ricerca"
@@ -271,7 +261,6 @@ async function search() {
 	"lookupConfirm": "照会しますか？",
 	"fetchingAsApObject": "連合に照会中",
 	"openTagPageConfirm": "ハッシュタグのページを開きますか？",
-	"all": "全て",
 	"local": "ローカル",
 	"remote": "リモート",
 	"searchResult": "検索結果"
@@ -283,7 +272,6 @@ async function search() {
 	"lookupConfirm": "照会するけどええか？",
 	"fetchingAsApObject": "今ちと連合に照会しとるで",
 	"openTagPageConfirm": "ハッシュタグのページを開くんか？",
-	"all": "みんな",
 	"local": "ローカル",
 	"remote": "リモート",
 	"searchResult": "検索結果やで"
@@ -295,7 +283,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Fetching from the Fediverse...",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"searchResult": "Search results"
@@ -307,7 +294,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "ಒಕ್ಕೂಟದಿಂದ ಪಡೆಯಲಾಗುತ್ತಿದೆ...",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"searchResult": "Search results"
@@ -319,7 +305,6 @@ async function search() {
 	"lookupConfirm": "조회 할까요?",
 	"fetchingAsApObject": "연합에서 찾아보는 중",
 	"openTagPageConfirm": "해시태그의 페이지를 열까요?",
-	"all": "전체",
 	"local": "로컬",
 	"remote": "리모트",
 	"searchResult": "검색 결과"
@@ -331,7 +316,6 @@ async function search() {
 	"lookupConfirm": "Weet je zeker dat je dit wil opzoeken?",
 	"fetchingAsApObject": "Ophalen vanuit de Fediverse",
 	"openTagPageConfirm": "Wil je deze hashtagpagina openen?",
-	"all": "Alle",
 	"local": "Lokaal",
 	"remote": "Remote",
 	"searchResult": "Zoekresultaten"
@@ -343,7 +327,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Henter fra Fediverse...",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "Alle",
 	"local": "Local",
 	"remote": "Remote",
 	"searchResult": "Search results"
@@ -355,7 +338,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Pobieranie z Fediwersum…",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "Wszystkie",
 	"local": "Lokalne",
 	"remote": "Zdalny",
 	"searchResult": "Wyniki wyszukiwania"
@@ -367,7 +349,6 @@ async function search() {
 	"lookupConfirm": "Deseja buscar?",
 	"fetchingAsApObject": "Buscando no Fediverso...",
 	"openTagPageConfirm": "Deseja abrir a uma página de hashtag?",
-	"all": "Todos",
 	"local": "Local",
 	"remote": "Remoto",
 	"searchResult": "Pesquisar"
@@ -379,7 +360,6 @@ async function search() {
 	"lookupConfirm": "Хотите узнать?",
 	"fetchingAsApObject": "Приём с других сайтов",
 	"openTagPageConfirm": "Открыть страницу этого хештега?",
-	"all": "Все",
 	"local": "С этого сайта",
 	"remote": "С других сайтов",
 	"searchResult": "Результаты поиска"
@@ -391,7 +371,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Načítam údaje z Fediverzu",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "Všetko",
 	"local": "Lokálne",
 	"remote": "Vzdialené",
 	"searchResult": "Výsledky hľadania"
@@ -403,7 +382,6 @@ async function search() {
 	"lookupConfirm": "ต้องการเรียกดูข้อมูลใช่ไหม?",
 	"fetchingAsApObject": "กำลังดึงข้อมูลจากสหพันธ์...",
 	"openTagPageConfirm": "ต้องการเปิดหน้าแฮชแท็กใช่ไหม?",
-	"all": "ทั้งหมด",
 	"local": "ท้องถิ่น",
 	"remote": "ระยะไกล",
 	"searchResult": "ผลการค้นหา"
@@ -415,7 +393,6 @@ async function search() {
 	"lookupConfirm": "Yukarı bakmak ister misin?",
 	"fetchingAsApObject": "Fediverse'den talep ediliyor...",
 	"openTagPageConfirm": "Bir hashtag sayfası açmak ister misin?",
-	"all": "Tümü",
 	"local": "Yerel",
 	"remote": "Uzak",
 	"searchResult": "Arama sonuçları"
@@ -427,7 +404,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Fetching from the Fediverse...",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"searchResult": "Search results"
@@ -439,7 +415,6 @@ async function search() {
 	"lookupConfirm": "Хочете дізнатись?",
 	"fetchingAsApObject": "Отримуємо з федіверсу...",
 	"openTagPageConfirm": "Хочете відкрити сторінку хештега?",
-	"all": "Всі",
 	"local": "Локальні",
 	"remote": "Віддалені",
 	"searchResult": "Результати пошуку"
@@ -451,7 +426,6 @@ async function search() {
 	"lookupConfirm": "Do you want to look up?",
 	"fetchingAsApObject": "Đang nạp dữ liệu từ Fediverse...",
 	"openTagPageConfirm": "Do you want to open a hashtag page?",
-	"all": "Tất cả",
 	"local": "Máy chủ này",
 	"remote": "Máy chủ khác",
 	"searchResult": "Kết quả tìm kiếm"
@@ -463,7 +437,6 @@ async function search() {
 	"lookupConfirm": "确定查找吗？",
 	"fetchingAsApObject": "在联邦中查找中…",
 	"openTagPageConfirm": "确定打开话题标签页面？",
-	"all": "全部",
 	"local": "本地",
 	"remote": "远程",
 	"searchResult": "搜索结果"
@@ -475,7 +448,6 @@ async function search() {
 	"lookupConfirm": "要查詢嗎？",
 	"fetchingAsApObject": "從聯邦宇宙取得中...",
 	"openTagPageConfirm": "要開啟標籤的頁面嗎？",
-	"all": "全部",
 	"local": "本地",
 	"remote": "遠端",
 	"searchResult": "搜尋結果"

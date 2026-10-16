@@ -1,685 +1,218 @@
----
-_lang_: "日本語 (関西弁)"
-monthAndDay: "{month}月 {day}日"
-search: "探す"
-ok: "ええで"
-cancel: "やめる"
-notificationSettings: "通知の設定"
-uploading: "アップロードしとるで"
-save: "とっとく"
-favorites: "お気に入り"
-favorited: "お気に入りに入れたで。"
-alreadyFavorited: "もうお気に入りに入れとるがな。"
-delete: "ほかす"
-searchUser: "ユーザーを探す"
-showLess: "さいなら"
-lists: "リスト"
-notes: "ノート"
-following: "フォロー"
-somethingHappened: "なんかあかんわ"
-pinned: "ピン留めしとく"
-emojiPicker: "絵文字ピッカー"
-unsuspend: "溶かす"
-customEmojis: "カスタム絵文字"
-emojis: "絵文字"
-emojiName: "絵文字はんの名前"
-loginFailed: "ログインに失敗してもうた…"
-wallpaper: "壁紙"
-instances: "サーバー"
-latestStatus: "ちょっと前のステータス"
-operations: "操作"
-monitor: "モニター"
-network: "ネットワーク"
-disk: "ディスク"
-mutedUsers: "ミュートしとるユーザー"
-blockedUsers: "ブロックしとるユーザー"
-changePassword: "パスワードをいじる"
-retypedNotMatch: "入れたやつ合うてへんわ。"
-currentPassword: "今のパスワード"
-newPasswordRetype: "今度のパスワード(もっぺん入れて)"
-removed: "ほかしたで！"
-home: "ホーム"
-reload: "リロード"
-watch: "ウォッチ"
-unwatch: "ウォッチやめる"
-accept: "ええで"
-reject: "あかん"
-integration: "連携"
-pinnedPages: "ピン留めページ"
-pinnedClipId: "ピン留めするクリップのID"
-hcaptcha: "hCaptcha（キャプチャ）"
-enableHcaptcha: "hCaptcha（キャプチャ）をつけとく"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "hCaptcha（キャプチャ）をつけとく"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "reCAPTCHA（リキャプチャ）を有効にする"
-turnstile: "Turnstile"
-enableTurnstile: "Turnstileを有効にするで"
-antennas: "アンテナ"
-close: "さいなら"
-invites: "来てや"
-transfer: "譲渡"
-signinFailed: "ログインできんかったで。もっかいユーザー名とパスワードを確認してみてや。"
-noHistory: "履歴はないわ。"
-signinHistory: "ログイン履歴"
-regenerate: "もっぺん生成するで"
-appearance: "見た目"
-promotion: "宣伝"
-promote: "宣伝"
-hideThisNote: "このノートは表示せんでいい"
-showFeaturedNotesInTimeline: "タイムラインにおすすめのノートを表示してや"
-deleteAll: "全部ほかす"
-showFixedPostForm: "タイムラインの上の方で投稿できるようにするわ"
-deleteAllFiles: "ファイルを全部ほかす"
-leaveConfirm: "あんた、いじったのにまだ保存してないで！ほかしてええか？"
-notificationType: "通知の種類"
-edit: "編集"
-emailServer: "メールサーバー"
-enableEmail: "メール配信を受け取る"
-emailConfigInfo: "メールアドレスの確認とかパスワードリセットの時に使うで"
-emailAddress: "メールアドレス"
-smtpConfig: "SMTP サーバーの設定"
-smtpHost: "ホスト"
-smtpPort: "ポート"
-smtpUser: "ユーザー名"
-smtpPass: "パスワード"
-emptyToDisableSmtpAuth: "ユーザー名とパスワードになんも入れんかったら、SMTP認証を無効化するで"
-smtpSecure: "SMTP 接続に暗黙的なSSL/TLSを使用する"
-smtpSecureInfo: "STARTTLS使っとる時はオフにしてや。"
-testEmail: "配信テスト"
-copy: "コピー"
-metrics: "メトリクス"
-delayed: "遅延"
-regenerateLoginToken: "ログイントークンを再生成"
-regenerateLoginTokenDescription: "ログインに使われる内部トークンをもっかい作るで。いつもならこれをやる必要はないで。もっかい作ると、全部のデバイスでログアウトされるで気ぃつけてなー。"
-sample: "サンプル"
-repliesCount: "返信した数やで"
-repliedCount: "返信された数やで"
-followingCount: "フォロー数やで"
-followersCount: "フォロワー数やで"
-pollVotesCount: "アンケートに投票した数"
-driveUsage: "ドライブ使用量やで"
-clips: "クリップ"
-experimental: "実験的"
-wide: "広い"
-narrow: "狭い"
-sendErrorReports: "エラーリポートを送る"
-sendErrorReportsDescription: "オンにしたら、なんか変なことが起きたとき、詳しいのが全部Misskeyに送られて、ソフトウェアをもっと良うするで。エラー情報には、OSのバージョン、ブラウザの種類、行動履歴なんかが含まれるな。"
-advanced: "高度"
-markAllAsRead: "もうみな読んでもうたわ"
-onlineStatus: "オンライン状態"
-global: "グローバル"
-sent: "送信"
-received: "受信"
-aiChanMode: "藍モードやで"
-unread: "未読"
-classic: "クラシック"
-incorrectTotp: "ワンタイムパスワードが間違っとるか、期限が切れとるみたいやな。"
-rateLimitExceeded: "レート制限が超えたみたいやで"
-recommended: "推奨"
-undefined: "未定義"
-videos: "動画"
-reactionsList: "ツッコミ一覧"
-createWithOptions: "オプション決めて作る"
-edited: "いじったやつ"
-replay: "リプレイ"
-genEmbedCode: "埋め込みコードを作る"
-unknownWebAuthnKey: "登録されてへんパスキーやな。"
-_chat:
-  invitations: "来てや"
-  noHistory: "履歴はないわ。"
-  members: "メンバーはん"
-  home: "ホーム"
-  send: "送信"
-  cannotChatWithTheUser: "このユーザーとのチャットを開始できへんみたいやわ"
-  cannotChatWithTheUser_description: "チャットが使えん状態になっとるか、相手がチャットを開放してへんみたいやわ。"
-_initialTutorial:
-  launchTutorial: "チュートリアル見るで"
-  title: "チュートリアルやで"
-  skipAreYouSure: "チュートリアルやめるか？"
-  _landing:
-    title: "チュートリアルによう来たな"
-  _note:
-    reply: "返信もできるで。返信の返信もできるから、スレッドっぽく会話をそのまま続けれもするで。"
-    menu: "ノートの詳細を出したり、リンクをコピーしたり、いろいろできんねん。"
-  _reaction:
-    title: "ツッコミってなんや？"
-  _timeline:
-    social: "ホームタイムラインの投稿もローカルタイムラインのも一緒に見れるで。"
-  _postNote:
-    _visibility:
-      localOnly: "他のサーバーに投稿せえへんくなるで。他の公開範囲とか一切無視して、他のサーバーの人らはこの設定がされたノートは絶対に見れへん。"
-    _cw:
-      description: "本文のかわりに「注釈」に書いた内容だけ見せるで。「続き見して！」を押すと本文も見れんねん。"
-      useCases: "サーバーのガイドラインに決められとるノートに使うたり、ネタバレとかきわどい内容を自分で隠したりするとき用やな。"
-  _done:
-    title: "チュートリアル終わり！おつかれさん🎉"
+_lang_: '日本語 (関西弁)'
+search: '探す'
+ok: 'ええで'
+cancel: 'やめる'
+notificationSettings: '通知の設定'
+save: 'とっとく'
+favorites: 'お気に入り'
+delete: 'ほかす'
+lists: 'リスト'
+notes: 'ノート'
+following: 'フォロー'
+somethingHappened: 'なんかあかんわ'
+customEmojis: 'カスタム絵文字'
+mutedUsers: 'ミュートしとるユーザー'
+blockedUsers: 'ブロックしとるユーザー'
+reload: 'リロード'
+accept: 'ええで'
+reject: 'あかん'
+antennas: 'アンテナ'
+close: 'さいなら'
+edit: '編集'
+copy: 'コピー'
+clips: 'クリップ'
+markAllAsRead: 'もうみな読んでもうたわ'
 _achievements:
   _types:
     _notes1:
-      title: "まいど！"
-      description: "初めてノート投稿したった"
-      flavor: "Misskeyを楽しんでな～"
+      title: 'まいど！'
     _notes10:
-      title: "ノートの天保山"
-      description: "ノートを10回投稿した"
+      title: 'ノートの天保山'
     _notes100:
-      title: "ノートの真田山"
-      description: "ノートを100回投稿した"
+      title: 'ノートの真田山'
     _notes500:
-      title: "ノートの生駒山"
-      description: "ノートを500回投稿した"
+      title: 'ノートの生駒山'
     _notes1000:
-      title: "ノートの六甲山"
-      description: "ノートを1,000回投稿した"
+      title: 'ノートの六甲山'
     _notes5000:
-      title: "箕面の滝からノート"
-      description: "ノートを5,000回投稿した"
+      title: '箕面の滝からノート'
     _notes10000:
-      title: "えげつないノート"
-      description: "ノートを10,000回投稿した"
+      title: 'えげつないノート'
     _notes20000:
-      title: "もっとノートよこせ！"
-      description: "ノートを20,000回投稿した"
+      title: 'もっとノートよこせ！'
     _notes30000:
-      title: "ノートノートノート"
-      description: "ノートを30,000回投稿した"
+      title: 'ノートノートノート'
     _notes40000:
-      title: "ノート工場"
-      description: "ノートを40,000回投稿した"
+      title: 'ノート工場'
     _notes50000:
-      title: "ノートの惑星"
-      description: "ノートを50,000回投稿した"
+      title: 'ノートの惑星'
     _notes60000:
-      title: "ノートクエーサー"
-      description: "ノートを60,000回投稿した"
+      title: 'ノートクエーサー'
     _notes70000:
-      title: "ブラックノートホール"
-      description: "ノートを70,000回投稿した"
+      title: 'ブラックノートホール'
     _notes80000:
-      title: "ノートギャラクシー"
-      description: "ノートを80,000回投稿した"
+      title: 'ノートギャラクシー'
     _notes90000:
-      title: "ノートバース"
-      description: "ノートを90,000回投稿した"
+      title: 'ノートバース'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "ノートを100,000回投稿した"
-      flavor: "そんなに書くことあるんか？"
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "ビギナーⅠ"
-      description: "通算3日ログインした"
-      flavor: "今日からワシはミスキストやで"
+      title: 'ビギナーⅠ'
     _login7:
-      title: "ビギナーⅡ"
-      description: "通算7日ログインした"
-      flavor: "慣れてきたんとちゃう？"
+      title: 'ビギナーⅡ'
     _login15:
-      title: "ビギナーⅢ"
-      description: "通算15日ログインした"
+      title: 'ビギナーⅢ'
     _login30:
-      title: "ミスキストⅠ"
-      description: "通算30日ログインした"
+      title: 'ミスキストⅠ'
     _login60:
-      title: "ミスキストⅡ"
-      description: "通算60日ログインした"
+      title: 'ミスキストⅡ'
     _login100:
-      title: "ミスキストⅢ"
-      description: "通算100日ログインした"
-      flavor: "そのユーザー、ミスキストにつき"
+      title: 'ミスキストⅢ'
     _login200:
-      title: "常連さんⅠ"
-      description: "通算200日ログインした"
+      title: '常連さんⅠ'
     _login300:
-      title: "常連さんⅡ"
-      description: "通算300日ログインした"
+      title: '常連さんⅡ'
     _login400:
-      title: "常連さんⅢ"
-      description: "通算400日ログインした"
+      title: '常連さんⅢ'
     _login500:
-      title: "ベテランさんⅠ"
-      description: "通算500日ログインした"
-      flavor: "あんたら、うちはノートが好きや"
+      title: 'ベテランさんⅠ'
     _login600:
-      title: "ベテランさんⅡ"
-      description: "通算600日ログインした"
+      title: 'ベテランさんⅡ'
     _login700:
-      title: "ベテランさんⅢ"
-      description: "通算700日ログインした"
+      title: 'ベテランさんⅢ'
     _login800:
-      title: "ノートマイスターⅠ"
-      description: "通算800日ログインした"
+      title: 'ノートマイスターⅠ'
     _login900:
-      title: "ノートマイスターⅡ"
-      description: "通算900日ログインした"
+      title: 'ノートマイスターⅡ'
     _login1000:
-      title: "ノートマイスターⅢ"
-      description: "通算1,000日ログインした"
-      flavor: "Misskeyようさん使てもろておおきにな！"
+      title: 'ノートマイスターⅢ'
     _noteClipped1:
-      title: "アカンどれもクリップしたいわ"
-      description: "初めてノートをクリップした"
+      title: 'アカンどれもクリップしたいわ'
     _noteFavorited1:
-      title: "星ぃみるひと"
-      description: "初めてノートをお気に入りに登録した"
+      title: '星ぃみるひと'
     _myNoteFavorited1:
-      title: "星ぃ欲しい"
-      description: "ワレのノートが他のひとにお気に入り登録されたで"
+      title: '星ぃ欲しい'
     _profileFilled:
-      title: "準備万端や"
-      description: "プロフィールを設定した"
+      title: '準備万端や'
     _markedAsCat:
-      title: "吾輩は猫やねん"
-      description: "アカウントをCatにしたった"
-      flavor: "名前はまだないねん。"
+      title: '吾輩は猫やねん'
     _following1:
-      title: "はじめてのフォロー"
-      description: "初めてフォローした"
+      title: 'はじめてのフォロー'
     _following10:
-      title: "すたこらさっさ"
-      description: "フォローが10人超えた"
+      title: 'すたこらさっさ'
     _following50:
-      title: "友達ぎょうさん"
-      description: "フォローが50人超えた"
+      title: '友達ぎょうさん'
     _following100:
-      title: "友達100人"
-      description: "フォローが100人超えた"
+      title: '友達100人'
     _following300:
-      title: "いや友達多すぎやろ"
-      description: "フォローが300人超えた"
+      title: 'いや友達多すぎやろ'
     _followers1:
-      title: "はじめてのフォロワー"
-      description: "初めてフォローされた"
+      title: 'はじめてのフォロワー'
     _followers10:
-      title: "フォローみぃ！"
-      description: "フォロワーが10人超えた"
+      title: 'フォローみぃ！'
     _followers50:
-      title: "ぞろぞろ"
-      description: "フォロワーが50人超えた"
+      title: 'ぞろぞろ'
     _followers100:
-      title: "人気もん"
-      description: "フォロワーが100人超えた"
+      title: '人気もん'
     _followers300:
-      title: "ほらそこ一列に並んで！"
-      description: "フォロワーが300人超えた"
+      title: 'ほらそこ一列に並んで！'
     _followers500:
-      title: "基地局"
-      description: "フォロワーが500人超えた"
+      title: '基地局'
     _followers1000:
-      title: "インフルエンサー"
-      description: "フォロワーが1,000人超えた"
+      title: 'インフルエンサー'
     _collectAchievements30:
-      title: "実績コレクター"
-      description: "実績を30個以上獲得した"
+      title: '実績コレクター'
     _viewAchievements3min:
-      title: "実績好き"
-      description: "実績一覧を3分以上眺め続けた"
+      title: '実績好き'
     _iLoveMisskey:
-      title: "Misskey好きやねん"
-      description: "\"I ❤ #Misskey\"を投稿した"
-      flavor: "Misskeyを使ってくれておおきにな～　by 開発チーム"
+      title: 'Misskey好きやねん'
     _foundTreasure:
-      title: "なんでも鑑定団"
-      description: "隠されたお宝を発見した"
+      title: 'なんでも鑑定団'
     _client30min:
-      title: "ねんね"
-      description: "クライアントを起動してから30分以上経過した"
+      title: 'ねんね'
     _client60min:
-      title: "Misskeyの見過ぎや！"
-      description: "クライアント付けてから１時間経ってもうたで。"
+      title: 'Misskeyの見過ぎや！'
     _noteDeletedWithin1min:
-      title: "＊おおっと＊"
-      description: "投稿してから1分以内にその投稿をほかした"
+      title: '＊おおっと＊'
     _postedAtLateNight:
-      title: "夜行性"
-      description: "真夜中にノートを投稿した"
-      flavor: "そろそろ寝よか"
+      title: '夜行性'
     _postedAt0min0sec:
-      title: "時報"
-      description: "0分0秒にノートを投稿した"
-      flavor: "ポッ ポッ ポッ ピーン"
+      title: '時報'
     _selfQuote:
-      title: "自己言及"
-      description: "自分のノートを引用した"
+      title: '自己言及'
     _htl20npm:
-      title: "流れるTL"
-      description: "ホームタイムラインの流速が20npmを超す"
+      title: '流れるTL'
     _viewInstanceChart:
-      title: "アナリスト"
-      description: "サーバーのチャートを表示した"
+      title: 'アナリスト'
     _outputHelloWorldOnScratchpad:
-      title: "Hello, world!"
-      description: "スクラッチパッドで hello world を出力した"
+      title: 'Hello, world!'
     _open3windows:
-      title: "マド開けすぎ"
-      description: "ウィンドウを3つ以上開いた状態にした"
+      title: 'マド開けすぎ'
     _driveFolderCircularReference:
-      title: "環状線"
-      description: "ドライブのフォルダを再帰的な入れ子にしようとした"
+      title: '環状線'
     _reactWithoutRead:
-      title: "ちゃんと読んだんか？"
-      description: "100文字以上のノートに投稿3秒以内にツッコんだ"
+      title: 'ちゃんと読んだんか？'
     _clickedClickHere:
-      title: "ここをクリック"
-      description: "ここをクリックした"
+      title: 'ここをクリック'
     _justPlainLucky:
-      title: "単なるラッキー"
-      description: "10秒ごとに0.005％の確率で獲得"
+      title: '単なるラッキー'
     _setNameToSyuilo:
-      title: "神様コンプレックス"
-      description: "名前を syuilo にした"
+      title: '神様コンプレックス'
     _passedSinceAccountCreated1:
-      title: "一周年"
-      description: "アカウント作成から1年経過した"
+      title: '一周年'
     _passedSinceAccountCreated2:
-      title: "二周年"
-      description: "アカウント作成から2年経過した"
+      title: '二周年'
     _passedSinceAccountCreated3:
-      title: "三周年"
-      description: "アカウント作成から3年経過した"
+      title: '三周年'
     _loggedInOnBirthday:
-      title: "ハッピーバースデー！"
-      description: "誕生日にログインした"
+      title: 'ハッピーバースデー！'
     _loggedInOnNewYearsDay:
-      title: "あけましておめでとうございます！"
-      description: "元旦にログインした"
-      flavor: "今年も弊サーバーをよろしゅう頼みますわ"
+      title: 'あけましておめでとうございます！'
     _cookieClicked:
-      title: "クッキー叩くやつ"
-      description: "クッキー叩いてもうた"
-      flavor: "兄ちゃんソフト間違っとんで"
+      title: 'クッキー叩くやつ'
     _brainDiver:
-      title: "Brain Diver"
-      description: "Brain Diverへのリンクを投稿したった"
-      flavor: "Misskey-Misskey La-Tu-Ma"
+      title: 'Brain Diver'
     _smashTestNotificationButton:
-      title: "心配性"
-      description: "通知のテストしすぎやって"
+      title: '心配性'
     _tutorialCompleted:
-      title: "Misskeyひよっこ講座 修了証"
-      description: "チュートリアル全部やった"
+      title: 'Misskeyひよっこ講座 修了証'
     _bubbleGameExplodingHead:
-      title: "🤯"
-      description: "バブルゲームで最も大きいモノを出した"
+      title: '🤯'
     _bubbleGameDoubleExplodingHead:
-      title: "ダブル🤯"
-      description: "バブルゲームで最も大きいモノを2つ同時に出した"
-      flavor: "これくらいの　おべんとばこに　🤯　🤯　ちょっとつめて"
-_role:
-  edit: "ロールの編集"
-  assignTarget: "アサイン"
-  options: "オプション"
-  displayOrder: "表示順"
-  priority: "優先度"
-  _priority:
-    low: "低い"
-    middle: "中くらい"
-    high: "高い"
-  _options:
-    canManageCustomEmojis: "カスタム絵文字の管理"
-    canManageAvatarDecorations: "アバターを飾るモンの管理"
-    canHideAds: "広告映さへん"
-  _condition:
-    isRemote: "リモートユーザー"
-    isCat: "猫ユーザー"
-    isBot: "botユーザー"
-_ffVisibility:
-  public: "公開"
-  followers: "フォロワーだけに公開"
-  private: "非公開"
-_ad:
-  hide: "表示せん"
-_email:
-  _follow:
-    title: "フォローされたで"
-  _receiveFollowRequest:
-    title: "フォローリクエストを受け取ったで"
-_plugin:
-  manage: "プラグインの管理"
-_preferencesBackups:
-  list: "作ったバックアップ"
-  apply: "このデバイスに使う"
-  save: "上書き保存"
-  nameAlreadyExists: "「{name}」って名前のバックアップはもうあんねん。やから違う名前を入れてや。"
-  saveConfirm: "{name}に上書き保存するん？"
-  deleteConfirm: "{name}を消すん？"
-  createdAt: "作った日時: {date} {time}"
-  updatedAt: "更新日時: {date} {time}"
-  cannotLoad: "読み込みできへん..."
-_aboutMisskey:
-  contributors: "主な貢献者"
-_menuDisplay:
-  top: "上"
-  hide: "隠す"
-_theme:
-  base: "ベース"
-  addConstant: "定数を追加"
-  constant: "定数"
-  defaultValue: "デフォルト値"
-  refProp: "プロパティを参照"
-  refConst: "定数を参照"
-  key: "キー"
-  func: "関数"
-  funcKind: "関数の種類"
-  argument: "引数"
-  basedProp: "元にするプロパティの名前"
-  darken: "暗さ"
-  inputConstantName: "定数名を入力してな"
-  importInfo: "ここにテーマコードを張り付けて、エディターにインポートすることができるで"
-  deleteConstantConfirm: "定数 {const} を削除してもええか？"
-  keys:
-    accent: "アクセント"
-    bg: "背景"
-    fg: "文字"
-    focus: "フォーカス"
-    indicator: "インジケーター"
-    panel: "パネル"
-    shadow: "影"
-    navBg: "サイドバーの背景"
-    navFg: "サイドバーの文字"
-    navActive: "サイドバー文字(アクティブ)"
-    navIndicator: "サイドバーのインジケーター"
-    link: "リンク"
-    hashtag: "ハッシュタグ"
-    mention: "あんた宛て"
-    mentionMe: "うち宛てのメンション"
-    renote: "Renote"
-    modalBg: "モーダルの背景"
-    divider: "分割線"
-    scrollbarHandle: "スクロールバーの取っ手"
-    scrollbarHandleHover: "スクロールバーの取っ手（ホバー)"
-    dateLabelFg: "日付ラベルの文字"
-    infoBg: "情報の背景"
-    infoFg: "情報の文字"
-    infoWarnBg: "警告の背景"
-    infoWarnFg: "警告の文字"
-    toastBg: "通知トーストの背景"
-    toastFg: "通知トーストの文字"
-    buttonBg: "ボタンの背景"
-    buttonHoverBg: "ボタンの背景 (ホバー)"
-    inputBorder: "入力ボックスの縁取り"
-    badge: "バッジ"
-    messageBg: "チャットの背景"
-    fgHighlighted: "強調されとる文字"
-_ago:
-  future: "未来"
-_permissions:
-  "read:account": "アカウントの情報を見るで"
-  "write:account": "アカウントの情報を変更するで"
-  "read:blocks": "ブロックを見るで"
-  "write:blocks": "ブロックを操作するで"
-  "read:drive": "ドライブを見るで"
-  "write:drive": "ドライブを操作するで"
-  "read:favorites": "お気に入りを見るで"
-  "write:favorites": "お気に入りを操作するで"
-  "read:following": "フォローの情報を見るで"
-  "write:following": "フォロー・フォロー解除するで"
-  "read:messaging": "チャットを見るで"
-  "write:messaging": "チャットを操作するで"
-  "read:mutes": "ミュートを見るで"
-  "write:mutes": "ミュートを操作するで"
-  "write:notes": "ノートを作成・削除するで"
-  "read:notifications": "通知を見るで"
-  "write:notifications": "通知を操作するで"
-  "read:reactions": "ツッコミを見る"
-  "write:reactions": "ツッコミを操作するで"
-  "write:votes": "投票する"
-  "read:pages": "ページを見る"
-  "write:pages": "ページを操作するで"
-  "read:page-likes": "ページのええやんを見る"
-  "write:page-likes": "ページのええやんを操作する"
-  "read:user-groups": "ユーザーグループを見る"
-  "write:user-groups": "ユーザーグループで操作するで"
-  "read:channels": "チャンネルを見る"
-  "write:channels": "チャンネルを操作するで"
-  "read:gallery": "ギャラリーを見るで"
-  "write:gallery": "ギャラリーを操作するで"
-  "read:gallery-likes": "ギャラリーのいいねを見るで"
-  "write:gallery-likes": "ギャラリーのいいねを操作するで"
-  "write:admin:delete-account": "ユーザーアカウント消す"
-  "write:admin:roles": "ロールをいじる"
-  "read:admin:roles": "ロール見る"
-  "write:chat": "チャットを操作するで"
-_profile:
-  username: "ユーザー名"
-  metadata: "追加情報"
-_charts:
-  filesTotal: "ファイルの合計"
-_play:
-  created: "Playを作ったで"
-  updated: "Playを更新したで"
-  deleted: "Playを消したで"
-  pageSetting: "Play設定"
-_pages:
-  newPage: "ページを作る"
-  editPage: "ページの編集"
-  readPage: "ソースを表示中"
-  pageSetting: "ページ設定"
-  nameAlreadyExists: "指定されたページURLはもうあるみたいや"
-  invalidNameTitle: "正しくないページURLみたいやで"
-  invalidNameText: "空白になってないか確認してや～"
-  editThisPage: "このページを編集"
-  viewSource: "ソースを表示"
-  viewPage: "ページを見る"
-  like: "ええやん"
-  unlike: "良くないわ"
-  my: "自分のページ"
-  liked: "ええと思ったページ"
-  featured: "人気"
-  inspector: "インスペクター"
-  contents: "コンテンツ"
-  content: "ページブロック"
-  variables: "変数"
-  title: "タイトル"
-  url: "ページURL"
-  summary: "ページの要約"
-  alignCenter: "中央寄せ"
-  hideTitleWhenPinned: "ピン止めされてるときにタイトルを表示"
-  font: "フォント"
-  fontSerif: "セリフ"
-  fontSansSerif: "サンセリフ"
-  eyeCatchingImageSet: "アイキャッチ画像を設定"
-  eyeCatchingImageRemove: "アイキャッチ画像を削除"
-  chooseBlock: "ブロックを追加"
-  selectType: "種類を選択"
-  contentBlocks: "コンテンツ"
-  inputBlocks: "入力"
-  specialBlocks: "特殊"
-  blocks:
-    text: "テキスト"
-    textarea: "テキストエリア"
-    section: "セクション"
-    image: "画像"
-    button: "ボタン"
-    note: "ノート埋め込み"
-    _note:
-      id: "ノートID"
-      idDescription: "ノートURLをペーストして設定することもできるで。"
-      detailed: "詳細な表示"
+      title: 'ダブル🤯'
 _notification:
-  fileUploaded: "ファイルが無事アップロードされたで。"
-  youGotMention: "{name}からのメンション"
-  youGotReply: "{name}からのリプライ"
-  youGotQuote: "{name}による引用"
-  youRenoted: "{name}がリノートしたみたいやで"
-  youWereFollowed: "フォローされたで"
-  youReceivedFollowRequest: "フォロー許可してほしいみたいやな"
-  yourFollowRequestAccepted: "フォローさせてもろたで"
-  pollEnded: "アンケートの結果が出たみたいや"
-  newNote: "さらの投稿"
-  unreadAntennaNote: "アンテナ {name}"
-  emptyPushNotificationMessage: "プッシュ通知の更新をしといたで"
-  achievementEarned: "実績を獲得しとるで"
-  testNotification: "通知テスト"
-  notificationWillBeDisplayedLikeThis: "通知はこのように表示されるで"
-  exportOfXCompleted: "{x}のエクスポートが終わったわ"
-  login: "ログインしとったで"
-  _types:
-    all: "すべて"
-    note: "あんたらの新規投稿"
-    follow: "フォロー"
-    mention: "あんた宛て"
-    reply: "リプライ"
-    renote: "リノート"
-    quote: "引用"
-    reaction: "ツッコミ"
-    pollEnded: "アンケートが終了したで"
-    receiveFollowRequest: "フォロー許可してほしいみたいやで"
-    followRequestAccepted: "フォローが受理されたで"
-    roleAssigned: "ロールが付与された"
-    achievementEarned: "実績の獲得"
-    exportCompleted: "エクスポート終わった"
-    login: "ログイン"
-    test: "通知テスト"
-    app: "連携アプリからの通知や"
+  youGotMention: '{name}からのメンション'
+  youGotReply: '{name}からのリプライ'
+  youGotQuote: '{name}による引用'
+  youRenoted: '{name}がリノートしたみたいやで'
+  youWereFollowed: 'フォローされたで'
+  youReceivedFollowRequest: 'フォロー許可してほしいみたいやな'
+  yourFollowRequestAccepted: 'フォローさせてもろたで'
+  pollEnded: 'アンケートの結果が出たみたいや'
+  newNote: 'さらの投稿'
+  unreadAntennaNote: 'アンテナ {name}'
+  achievementEarned: '実績を獲得しとるで'
+  testNotification: '通知テスト'
+  notificationWillBeDisplayedLikeThis: '通知はこのように表示されるで'
+  exportOfXCompleted: '{x}のエクスポートが終わったわ'
+  login: 'ログインしとったで'
   _actions:
-    followBack: "フォローバック"
-    reply: "返事"
-    renote: "リノート"
-_moderationLogTypes:
-  suspend: "凍結"
-  deleteNote: "ノートを削除"
-  deleteUserAnnouncement: "あんたらへのお知らせを削除"
-  resetPassword: "パスワードをリセット"
-  resolveAbuseReport: "苦情を解決"
-  createInvitation: "招待コード作る"
-  deleteGalleryPost: "ギャラリーの投稿をほかす"
-_fileViewer:
-  url: "URL"
-_externalResourceInstaller:
-  _vendorInfo:
-    title: ""
-  _errors:
-    _themeInstallFailed:
-      title: "テーマインストールに失敗してもた"
-      description: "なんかテーマインストールできんかったわ。もう一回試してな。細かいのはJavaScriptのコンソール見てや。"
-_reversi:
-  reversi: "リバーシ"
+    followBack: 'フォローバック'
+    reply: '返事'
+    renote: 'リノート'
 _offlineScreen:
-  title: "オフライン - サーバーに接続できひんで"
-  header: "サーバーに接続できへんわ"
-_gridComponent:
-  _error:
-    columnTypeNotSupport: "正規表現によるバリデーションはtype:textのカラムだけサポートしてるで"
-_embedCodeGen:
-  autoload: "勝手に続きを読み込む（非推奨）"
-_selfXssPrevention:
-  warning: "警告"
-  title: "「この画面になんか貼り付けろ」は全部詐欺やで。"
-  description1: "ここになんかはつっつけると、悪いユーザーにアカウント乗っ取られたり、個人情報盗まれたりするかもやで"
-  description2: "はっつけようとしてるものがなんなんかわからんのやったら、%c今すぐ作業やめてウィンドウを閉じて。"
-  description3: "詳しくはこれを見て。{link}"
-_bootErrors:
-  title: "読み込みに失敗したで"
-  serverError: "少し待ってからリロードしてもまだ問題が解決されんのやったら、以下のError IDを添えてサーバー管理者に連絡して。"
-  solution: "以下のことやったら解決するかもやで。"
-  solution1: "ブラウザとかOSを最新バージョンに更新する"
-  solution2: "アドブロッカーを無効にする"
-  solution3: "ブラウザのキャッシュをクリアする"
-  solution4: "(Tor Browser) dom.webaudio.enabledをtrueに設定する"
-  otherOption: "ほかのオプション"
-  otherOption1: "クライアント設定とキャッシュをほかす"
-  otherOption2: "簡易クライアントを起動"
-  otherOption3: "修復ツールを起動"
-_watermarkEditor:
-  advanced: "高度"
+  title: 'オフライン - サーバーに接続できひんで'
+  header: 'サーバーに接続できへんわ'
+next: '次'
+upload: 'アップロード'
+preview: 'プレビュー'
+reset: 'リセット'
+name: '名前'
+title: 'タイトル'
+description: '説明'
+none: 'なし'
+all: 'みんな'
+default: 'デフォルト'
+error: 'おかしなったで'
+users: 'ユーザー'
+areYouSure: 'いいん？'

@@ -1,540 +1,168 @@
----
-_lang_: "Tiếng Việt"
-monthAndDay: "{day} tháng {month}"
-search: "Tìm kiếm"
-ok: "Đồng ý"
-cancel: "Hủy"
-notificationSettings: "Cài đặt thông báo"
-uploading: "Đang tải lên…"
-save: "Lưu"
-favorites: "Lượt thích"
-favorited: "Đã thêm vào yêu thích."
-alreadyFavorited: "Đã thêm vào yêu thích rồi."
-delete: "Xóa"
-searchUser: "Tìm kiếm người dùng"
-showLess: "Đóng"
-lists: "Danh sách"
-notes: "Bài Viết"
-following: "Đang theo dõi"
-somethingHappened: "Xảy ra lỗi"
-pinned: "Ghim"
-emojiPicker: "Bộ chọn biểu tượng cảm xúc"
-unsuspend: "Bỏ vô hiệu hóa"
-customEmojis: "Tùy chỉnh emoji"
-emojis: "Emoji"
-emojiName: "Tên emoji"
-loginFailed: "Đăng nhập không thành công"
-wallpaper: "Ảnh bìa"
-instances: "Máy chủ"
-latestStatus: "Trạng thái cuối cùng"
-operations: "Vận hành"
-monitor: "Giám sát"
-network: "Mạng"
-disk: "Ổ đĩa"
-mutedUsers: "Người đã ẩn"
-blockedUsers: "Người đã chặn"
-changePassword: "Đổi mật khẩu"
-retypedNotMatch: "Mật khẩu không trùng khớp."
-currentPassword: "Mật khẩu hiện tại"
-newPasswordRetype: "Nhập lại mật khẩu mới"
-removed: "Đã xóa"
-home: "Trang chính"
-reload: "Tải lại"
-watch: "Xem"
-unwatch: "Ngừng xem"
-accept: "Đồng ý"
-reject: "Từ chối"
-integration: "Tương tác"
-pinnedPages: "Trang đã ghim"
-pinnedClipId: "ID của clip muốn ghim"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Bật hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "Bật mCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Bật reCAPTCHA"
-turnstile: "Turnstile"
-enableTurnstile: "Áp dụng Turnstile"
-antennas: "Trạm phát sóng"
-close: "Đóng"
-invites: "Mời"
-transfer: "Chuyển giao"
-signinFailed: "Không thể đăng nhập. Vui lòng kiểm tra tên người dùng và mật khẩu của bạn."
-noHistory: "Không có dữ liệu"
-signinHistory: "Lịch sử đăng nhập"
-regenerate: "Tạo lại"
-appearance: "Giao diện"
-promotion: "Quảng cáo"
-promote: "Quảng cáo"
-hideThisNote: "Ẩn tút này"
-showFeaturedNotesInTimeline: "Hiện tút nổi bật trong bảng tin"
-deleteAll: "Xóa tất cả"
-showFixedPostForm: "Hiện khung soạn tút ở phía trên bảng tin"
-deleteAllFiles: "Xóa toàn bộ tập tin"
-leaveConfirm: "Có những thay đổi chưa được lưu. Bạn có muốn bỏ chúng không?"
-notificationType: "Loại thông báo"
-edit: "Sửa"
-emailServer: "Email máy chủ"
-enableEmail: "Bật phân phối email"
-emailConfigInfo: "Được dùng để xác minh email của bạn lúc đăng ký hoặc nếu bạn quên mật khẩu của mình"
-emailAddress: "Địa chỉ email"
-smtpConfig: "Cấu hình máy chủ SMTP"
-smtpHost: "Host"
-smtpPort: "Cổng"
-smtpUser: "Tên người dùng"
-smtpPass: "Mật khẩu"
-emptyToDisableSmtpAuth: "Để trống tên người dùng và mật khẩu để tắt xác thực SMTP"
-smtpSecure: "Dùng SSL/TLS ngầm định cho các kết nối SMTP"
-smtpSecureInfo: "Tắt cái này nếu dùng STARTTLS"
-testEmail: "Kiểm tra vận chuyển email"
-copy: "Sao chép"
-metrics: "Số liệu"
-delayed: "Độ trễ"
-regenerateLoginToken: "Tạo lại mã đăng nhập"
-regenerateLoginTokenDescription: "Tạo lại mã nội bộ có thể dùng để đăng nhập. Thông thường hành động này là không cần thiết. Nếu được tạo lại, tất cả các thiết bị sẽ bị đăng xuất."
-sample: "Ví dụ"
-repliesCount: "Số lượt trả lời đã gửi"
-repliedCount: "Số lượt trả lời đã nhận"
-followingCount: "Số lượng người tôi theo dõi"
-followersCount: "Số lượng người theo dõi tôi"
-pollVotesCount: "Số lượng bình chọn đã gửi"
-driveUsage: "Dung lượng ổ đĩa"
-clips: "Lưu bài viết"
-experimental: "Thử nghiệm"
-wide: "Rộng"
-narrow: "Thu hẹp"
-sendErrorReports: "Báo lỗi"
-sendErrorReportsDescription: "Khi được bật, thông tin chi tiết về lỗi sẽ được chia sẻ với Misskey khi xảy ra sự cố, giúp nâng cao chất lượng của Misskey.\nBao gồm thông tin như phiên bản hệ điều hành của bạn, trình duyệt bạn đang sử dụng, hoạt động của bạn trong Misskey, v.v."
-advanced: "Nâng cao"
-markAllAsRead: "Đánh dấu tất cả đã đọc"
-onlineStatus: "Trạng thái"
-global: "Toàn cầu"
-sent: "Gửi"
-received: "Đã nhận"
-aiChanMode: "Chế độ Ai"
-unread: "Chưa đọc"
-classic: "Cổ điển"
-incorrectTotp: "Mã OTP không đúng hoặc đã quá hạn"
-rateLimitExceeded: "Giới hạn quá mức"
-recommended: "Được đề xuất"
-undefined: "Chưa xác định"
-videos: "Các video"
-createWithOptions: "Tạo cùng tùy chọn"
-edited: "Đã chỉnh sửa"
-chat: "Trò chuyện"
-_chat:
-  invitations: "Mời"
-  noHistory: "Không có dữ liệu"
-  members: "Thành viên"
-  home: "Trang chính"
-  send: "Gửi"
-_initialTutorial:
-  launchTutorial: "Bắt đầu hướng dẫn"
-  title: "Hướng dẫn"
-  skipAreYouSure: "Thoát khỏi hướng dẫn?"
-  _landing:
-    title: "Chào mừng đến với Hướng dẫn"
-  _timeline:
-    social: "Ghi chú từ dòng thời gian Trang chủ và Địa phương sẽ được hiển thị."
+_lang_: 'Tiếng Việt'
+search: 'Tìm kiếm'
+ok: 'Đồng ý'
+cancel: 'Hủy'
+notificationSettings: 'Cài đặt thông báo'
+save: 'Lưu'
+favorites: 'Lượt thích'
+delete: 'Xóa'
+lists: 'Danh sách'
+notes: 'Bài Viết'
+following: 'Đang theo dõi'
+somethingHappened: 'Xảy ra lỗi'
+customEmojis: 'Tùy chỉnh emoji'
+mutedUsers: 'Người đã ẩn'
+blockedUsers: 'Người đã chặn'
+reload: 'Tải lại'
+accept: 'Đồng ý'
+reject: 'Từ chối'
+antennas: 'Trạm phát sóng'
+close: 'Đóng'
+edit: 'Sửa'
+copy: 'Sao chép'
+clips: 'Lưu bài viết'
+markAllAsRead: 'Đánh dấu tất cả đã đọc'
 _achievements:
   _types:
     _notes1:
-      title: "just setting up my msky"
-      description: "Lần đầu tiên đăng bài"
-      flavor: "Chúc bạn trên Miskey vui vẻ nha!!"
+      title: 'just setting up my msky'
     _notes10:
-      title: "Một số bài viết"
-      description: "Đăng bài 10 lần"
+      title: 'Một số bài viết'
     _notes100:
-      title: "Rất nhiều bài biết"
-      description: "Đăng bài 100 lần"
+      title: 'Rất nhiều bài biết'
     _notes500:
-      title: "Như đầy bài viết"
-      description: "Đăng bài 500 lần"
+      title: 'Như đầy bài viết'
     _notes1000:
-      title: "Ngọn núi bài viết"
-      description: "Đăng bài 1000 lần"
+      title: 'Ngọn núi bài viết'
     _notes5000:
-      title: "Bài viết chảy như suối"
-      description: "Đăng bài 5000 lần"
+      title: 'Bài viết chảy như suối'
     _notes10000:
-      title: "Bài Viết siu nhìu"
-      description: "Đăng bài 10000 lần"
+      title: 'Bài Viết siu nhìu'
     _notes20000:
-      title: "Need more note"
-      description: "Đã đăng bài 20,000 lần rồi"
+      title: 'Need more note'
     _notes30000:
-      title: "ĐĂNG VỚI BÀI"
-      description: "Đã đăng bài 30,000 lần rồi"
+      title: 'ĐĂNG VỚI BÀI'
     _notes40000:
-      title: "Nhà xưởng dăng bài"
-      description: "Đã đăng bài 40,000 lần rồi"
+      title: 'Nhà xưởng dăng bài'
     _notes50000:
-      title: "Hàng tinh đăng bài"
-      description: "Đã đăng bài 50,000 lần rồi"
+      title: 'Hàng tinh đăng bài'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "Đăng 100,000 tút"
-      flavor: "Liệu viết bài gì tầm này vậy? "
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "Sơ cấp I"
-      description: "Tổng số ngày đăng nhập đạt 3 ngày"
-      flavor: "Từ nay các bạn cứ xem như mình là một Misskist đó"
+      title: 'Sơ cấp I'
     _login7:
-      title: "Sơ cấp II"
-      description: "Tổng số ngày đăng nhập đạt 7 ngày"
-      flavor: "Bạn dần quen chưa? "
+      title: 'Sơ cấp II'
     _login15:
-      title: "Sơ cấp III"
-      description: "Tổng số ngày đăng nhập đạt 7 ngày"
+      title: 'Sơ cấp III'
     _login30:
-      title: "Misskist cấp I"
-      description: "Tổng số ngày đăng nhập đạt 30 ngày"
+      title: 'Misskist cấp I'
     _login60:
-      title: "Misskist cấp II"
-      description: "Tổng số ngày đăng nhập đạt 60 ngày"
+      title: 'Misskist cấp II'
     _login100:
-      title: "Misskist cấp III"
-      description: "Tổng số ngày đăng nhập đạt 100 ngày"
-      flavor: "Người dùng này, chính vì đó là một Misskist"
+      title: 'Misskist cấp III'
     _login200:
-      title: "Khách hàng thường xuyên cấp I"
-      description: "Tổng số ngày đăng nhập đạt 200 ngày"
+      title: 'Khách hàng thường xuyên cấp I'
     _login300:
-      title: "Khách hàng thường xuyên cấp II"
-      description: "Tổng số ngày đăng nhập đạt 300 ngày"
+      title: 'Khách hàng thường xuyên cấp II'
     _login400:
-      title: "Khách hàng thường xuyên cấp III"
-      description: "Tổng số ngày đăng nhập đạt 400 ngày"
-    _login1000:
-      flavor: "Cảm ơn bạn đã sử dụng Misskey!"
+      title: 'Khách hàng thường xuyên cấp III'
     _noteFavorited1:
-      title: "Nhà thiên văn học"
+      title: 'Nhà thiên văn học'
     _myNoteFavorited1:
-      title: "Đi tìm những ngôi sao"
+      title: 'Đi tìm những ngôi sao'
     _profileFilled:
-      title: "Luôn sẵn sàng"
-      description: "Thiết lập tài khoản của bạn"
+      title: 'Luôn sẵn sàng'
     _markedAsCat:
-      title: "Tôi là một con mèo"
-      description: "Bật chế độ mèo"
-      flavor: "Mà tên chưa có"
+      title: 'Tôi là một con mèo'
     _following1:
-      title: "Theo dõi đầu tiên"
-      description: "Lần đầu tiên theo dõi "
+      title: 'Theo dõi đầu tiên'
     _following10:
-      title: "Cứ theo dõi và theo dõi"
-      description: "Vừa theo dõi hơn 10 người"
+      title: 'Cứ theo dõi và theo dõi'
     _following50:
-      title: "Bạn bè nhiều quá"
-      description: "Vừa theo dõi hơn 50 người"
+      title: 'Bạn bè nhiều quá'
     _following100:
-      title: "Trăm bạn bè"
-      description: "Vừa theo dõi vượt lên 100 người"
+      title: 'Trăm bạn bè'
     _following300:
-      title: "Quá nhiều bạn bè"
-      description: "Vừa theo dõi vượt lên 300 người"
+      title: 'Quá nhiều bạn bè'
     _followers1:
-      title: "Ai đầu tiên theo dõi bạn"
-      description: "Lần đầu tiên được theo dõi"
+      title: 'Ai đầu tiên theo dõi bạn'
     _followers10:
-      title: "FOLLOW ME!!"
-      description: "Người theo dõi bạn vượt lên 10 người"
+      title: 'FOLLOW ME!!'
     _followers50:
-      title: "Từng chút một"
-      description: "Đạt được 50 lượt theo dõi"
+      title: 'Từng chút một'
     _followers100:
-      title: "Người nổi tiếng"
-      description: "Đạt được 100 lượt theo dõi"
+      title: 'Người nổi tiếng'
     _followers300:
-      title: "Vui lòng xếp thành hàng nào"
-      description: "Đạt được 300 lượt theo dõi"
+      title: 'Vui lòng xếp thành hàng nào'
     _followers500:
-      title: "Trạm phát sóng"
-      description: "Đạt được 500 lượt theo dõi"
+      title: 'Trạm phát sóng'
     _followers1000:
-      title: "Người có tầm ảnh hưởng"
-      description: "Người theo dõi bạn vượt lên 1000 người"
+      title: 'Người có tầm ảnh hưởng'
     _collectAchievements30:
-      title: "Người sưu tập thành tích"
-      description: "Vừa lấy thành tích hơn 30 cái"
+      title: 'Người sưu tập thành tích'
     _viewAchievements3min:
-      title: "Yêu Thành tích"
-      description: "Ngắm danh sách thành tích đến tận hơn 3 phút"
+      title: 'Yêu Thành tích'
     _iLoveMisskey:
-      title: "Tôi Yêu Misskey"
-      description: "Đăng lời nói \"I ❤ #Misskey\""
-      flavor: "Xin chân thành cảm ơn bạn đã sử dụng Misskey!!  by Đội ngũ phát triển"
+      title: 'Tôi Yêu Misskey'
     _foundTreasure:
-      title: "Tìm kiếm kho báu"
-      description: "Tìm thấy được những kho báu cất giấu"
+      title: 'Tìm kiếm kho báu'
     _client30min:
-      title: "Giải lao xỉu"
-      description: "Giữ Misskey mở trong ít nhất 30 phút"
-    _client60min:
-      description: "Giữ Misskey mở trong ít nhất 60 phút"
+      title: 'Giải lao xỉu'
     _noteDeletedWithin1min:
-      title: "Xem như không có gì đâu nha"
+      title: 'Xem như không có gì đâu nha'
     _postedAtLateNight:
-      title: "Loài ăn đêm"
-      description: "Đăng bài trong đêm khuya "
-      flavor: "Đến giờ đi ngủ rồi."
+      title: 'Loài ăn đêm'
     _postedAt0min0sec:
-      title: "Tín hiệu báo giờ"
-      description: "Đăng bài vào 0 phút 0 giây"
-      flavor: "Pin pop pop pop"
+      title: 'Tín hiệu báo giờ'
     _selfQuote:
-      title: "Nói đến bản thân"
-      description: "Trích dẫn bài viết của mình"
+      title: 'Nói đến bản thân'
     _htl20npm:
-      title: "Timeline trôi như con sông"
-      description: "Timeline trang chính tốc độ vượt lên 20npm"
+      title: 'Timeline trôi như con sông'
     _viewInstanceChart:
-      title: "Nhà phân tích"
-      description: "Xem biểu đồ của chủ máy"
+      title: 'Nhà phân tích'
     _outputHelloWorldOnScratchpad:
-      title: "Chào thế giới!"
+      title: 'Chào thế giới!'
     _open3windows:
-      title: "Nhiều cửa sổ"
-      description: "Mở cửa sổ hơn 3 cửa sổ"
+      title: 'Nhiều cửa sổ'
     _reactWithoutRead:
-      title: "Bài này bạn đọc kỹ chứ? "
-      description: "Phản hồi trong vọng 3 giây sau bài viết có hơn 100 ký tự mới được đăng lên"
+      title: 'Bài này bạn đọc kỹ chứ? '
     _clickedClickHere:
-      title: "Bấm đây"
-      description: "Bấm chỗ này"
+      title: 'Bấm đây'
     _justPlainLucky:
-      title: "Chỉ là một cuộc máy mắn"
-      description: "Mỗi 10 giây thu nhận được với tỷ lệ  0.005%"
+      title: 'Chỉ là một cuộc máy mắn'
     _setNameToSyuilo:
-      title: "Ngưỡng mộ với vị thần"
-      description: "Đạt tên là syuilo"
+      title: 'Ngưỡng mộ với vị thần'
     _passedSinceAccountCreated1:
-      title: "Kỷ niệm một năm"
+      title: 'Kỷ niệm một năm'
     _loggedInOnBirthday:
-      title: "Sinh nhật vủi vẻ"
-      description: "Đăng nhập vào ngày sinh"
+      title: 'Sinh nhật vủi vẻ'
     _loggedInOnNewYearsDay:
-      title: "Chức mừng năm mới"
-      description: "Đăng nhập vào Tết Nguyên đàn dương lịch"
-      flavor: "Chúc bạn năm mới AN KHANG THỊNH VƯỢNG, VẠN SỰ NHƯ Ý!!"
-    _cookieClicked:
-      flavor: "Bạn nhầm phầm mềm chứ?"
-_role:
-  assignTarget: "Phân công"
-  priority: "Ưu tiên"
-  _priority:
-    low: "Thấp"
-    middle: "Vừa"
-    high: "Cao"
-  _options:
-    canManageCustomEmojis: "Quản lý CustomEmoji"
-    canManageAvatarDecorations: "Quản lý trang trí ảnh đại diện"
-    canHideAds: "Tắt quảng cáo"
-_ffVisibility:
-  public: "Đăng"
-  followers: "Chỉ người theo dõi mới xem được"
-  private: "Riêng tư"
-_ad:
-  hide: "Không hiển thị"
-_email:
-  _follow:
-    title: "đã theo dõi bạn"
-  _receiveFollowRequest:
-    title: "Chấp nhận yêu cầu theo dõi"
-_plugin:
-  manage: "Quản lý plugin"
-_preferencesBackups:
-  list: "Tạo sao lưu"
-  apply: "Áp dụng lên thiết bị này"
-  save: "Lưu thay đổi"
-  nameAlreadyExists: "Bản sao lưu \"{name}\" đã tồn tại. Xin nhập tên khác."
-  saveConfirm: "Lưu bản sao lưu {name}?"
-  deleteConfirm: "Xóa bản sao lưu {name}?"
-  createdAt: "Tạo vào: {time} {date}"
-  updatedAt: "Cập nhật: {time} {date}"
-  cannotLoad: "Tải thất bại"
-_aboutMisskey:
-  contributors: "Những người đóng góp nổi bật"
-_menuDisplay:
-  top: "Trên cùng"
-  hide: "Ẩn"
-_theme:
-  base: "Dựa trên có sẵn"
-  addConstant: "Thêm hằng số"
-  constant: "Hằng số"
-  defaultValue: "Giá trị mặc định"
-  refProp: "Tham chiếu một thuộc tính"
-  refConst: "Tham chiếu một hằng số"
-  key: "Khóa"
-  func: "Hàm"
-  funcKind: "Loại hàm"
-  argument: "Tham số"
-  basedProp: "Thuộc tính tham chiếu"
-  darken: "Độ tối"
-  inputConstantName: "Nhập tên cho hằng số này"
-  importInfo: "Nếu bạn nhập mã theme ở đây, bạn có thể nhập mã đó vào trình chỉnh sửa theme"
-  deleteConstantConfirm: "Bạn có chắc muốn xóa hằng số {const} không?"
-  keys:
-    accent: "Màu phụ"
-    bg: "Màu nền"
-    fg: "Màu chữ"
-    focus: "Trọng tâm"
-    indicator: "Chỉ báo"
-    panel: "Thanh bên"
-    shadow: "Bóng mờ"
-    navBg: "Nền thanh bên"
-    navFg: "Chữ thanh bên"
-    navActive: "Chữ thanh bên (Khi chọn)"
-    navIndicator: "Chỉ báo thanh bên"
-    link: "Đường dẫn"
-    hashtag: "Hashtag"
-    mention: "Nhắc đến"
-    mentionMe: "Lượt nhắc (Tôi)"
-    renote: "Đăng lại"
-    modalBg: "Nền phương thức"
-    divider: "Phân chia"
-    scrollbarHandle: "Thanh cuộn khi giữ"
-    scrollbarHandleHover: "Thanh cuộn khi chạm"
-    dateLabelFg: "Màu ngày tháng năm"
-    infoBg: "Nền thông tin"
-    infoFg: "Chữ thông tin"
-    infoWarnBg: "Nền cảnh báo"
-    infoWarnFg: "Chữ cảnh báo"
-    toastBg: "Nền thông báo"
-    toastFg: "Chữ thông báo"
-    buttonBg: "Nền nút"
-    buttonHoverBg: "Nền nút (Chạm)"
-    inputBorder: "Đường viền khung soạn thảo"
-    badge: "Huy hiệu"
-    messageBg: "Nền chat"
-    fgHighlighted: "Chữ nổi bật"
-_ago:
-  future: "Tương lai"
-_permissions:
-  "read:account": "Xem thông tin tài khoản của bạn"
-  "write:account": "Sửa thông tin tài khoản của bạn"
-  "read:blocks": "Xem danh sách người bạn chặn"
-  "write:blocks": "Sửa danh sách người bạn chặn"
-  "read:drive": "Truy cập tập tin, thư mục trong Ổ đĩa"
-  "write:drive": "Sửa và xóa tập tin, thư mục trong Ổ đĩa"
-  "read:favorites": "Xem lượt thích của tôi"
-  "write:favorites": "Sửa lượt thích của tôi"
-  "read:following": "Xem những người bạn theo dõi"
-  "write:following": "Theo dõi hoặc ngưng theo dõi ai đó"
-  "read:messaging": "Xem lịch sử chat"
-  "write:messaging": "Soạn hoặc xóa tin nhắn"
-  "read:mutes": "Xem những người bạn ẩn"
-  "write:mutes": "Sửa những người bạn ẩn"
-  "write:notes": "Soạn hoặc xóa tút"
-  "read:notifications": "Xem thông báo của tôi"
-  "write:notifications": "Quản lý thông báo của tôi"
-  "read:reactions": "Xem lượt biểu cảm của tôi"
-  "write:reactions": "Sửa lượt biểu cảm của tôi"
-  "write:votes": "Bình chọn"
-  "read:pages": "Xem trang của tôi"
-  "write:pages": "Sửa hoặc xóa trang của tôi"
-  "read:page-likes": "Xem lượt thích trên trang của tôi"
-  "write:page-likes": "Sửa lượt thích của tôi trên trang"
-  "read:user-groups": "Xem nhóm của tôi"
-  "write:user-groups": "Sửa hoặc xóa nhóm của tôi"
-  "read:channels": "Xem kênh của tôi"
-  "write:channels": "Sửa kênh của tôi"
-  "read:gallery": "Xem kho ảnh của tôi"
-  "write:gallery": "Sửa kho ảnh của tôi"
-  "read:gallery-likes": "Xem danh sách các tút đã thích trong thư viện của tôi"
-  "write:gallery-likes": "Sửa danh sách các tút đã thích trong thư viện của tôi"
-  "write:chat": "Soạn hoặc xóa tin nhắn"
-_profile:
-  username: "Tên người dùng"
-  metadata: "Thông tin bổ sung"
-_charts:
-  filesTotal: "Tổng số tập tin"
-_play:
-  created: "Bạn vừa tạo play rồi"
-  updated: "Bạn vừa cập nhật play rồi"
-  deleted: "Bạn vừa xóa play rồi"
-  pageSetting: "Cài đặt play"
-_pages:
-  newPage: "Tạo Trang mới"
-  editPage: "Sửa Trang này"
-  readPage: "Xem mã nguồn Trang này"
-  pageSetting: "Cài đặt trang"
-  nameAlreadyExists: "URL Trang đã tồn tại"
-  invalidNameTitle: "URL Trang không hợp lệ"
-  invalidNameText: "Không được để trống tựa đề Trang"
-  editThisPage: "Sửa Trang này"
-  viewSource: "Xem mã nguồn"
-  viewPage: "Xem trang của tôi"
-  like: "Thích"
-  unlike: "Bỏ thích"
-  my: "Trang của tôi"
-  liked: "Trang đã thích"
-  featured: "Nổi tiếng"
-  inspector: "Thanh tra"
-  contents: "Nội dung"
-  content: "Chặn Trang"
-  variables: "Biến thể"
-  title: "Tựa đề"
-  url: "URL Trang"
-  summary: "Mô tả Trang"
-  alignCenter: "Căn giữa"
-  hideTitleWhenPinned: "Ẩn tựa đề Trang khi ghim lên hồ sơ"
-  font: "Phông chữ"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  eyeCatchingImageSet: "Đặt ảnh thu nhỏ"
-  eyeCatchingImageRemove: "Xóa ảnh thu nhỏ"
-  chooseBlock: "Thêm khối"
-  selectType: "Chọn kiểu"
-  contentBlocks: "Nội dung"
-  inputBlocks: "Nhập"
-  specialBlocks: "Đặc biệt"
-  blocks:
-    text: "Văn bản"
-    textarea: "Khu vực văn bản"
-    section: "Mục "
-    image: "Hình ảnh"
-    button: "Nút"
-    note: "Tút đã nhúng"
-    _note:
-      id: "ID tút"
-      idDescription: "Ngoài ra, bạn có thể dán URL tút vào đây."
-      detailed: "Xem chi tiết"
+      title: 'Chức mừng năm mới'
 _notification:
-  fileUploaded: "Đã tải lên tập tin"
-  youGotMention: "{name} nhắc đến bạn"
-  youGotReply: "{name} trả lời bạn"
-  youGotQuote: "{name} trích dẫn tút của bạn"
-  youRenoted: "{name} đăng lại tút của bạn"
-  youWereFollowed: "đã theo dõi bạn"
-  youReceivedFollowRequest: "Bạn vừa có một yêu cầu theo dõi"
-  yourFollowRequestAccepted: "Yêu cầu theo dõi của bạn đã được chấp nhận"
-  pollEnded: "Cuộc bình chọn đã kết thúc"
-  unreadAntennaNote: "Ăng ten {name}"
-  emptyPushNotificationMessage: "Đã cập nhật thông báo đẩy"
-  achievementEarned: "Hoàn thành Achievement"
-  _types:
-    all: "Toàn bộ"
-    follow: "Đang theo dõi"
-    mention: "Nhắc đến"
-    reply: "Lượt trả lời"
-    renote: "Đăng lại"
-    quote: "Trích dẫn"
-    reaction: "Biểu cảm"
-    pollEnded: "Bình chọn kết thúc"
-    receiveFollowRequest: "Yêu cầu theo dõi"
-    followRequestAccepted: "Yêu cầu theo dõi được chấp nhận"
-    achievementEarned: "Hoàn thành Achievement"
-    login: "Đăng nhập"
-    app: "Từ app liên kết"
+  youGotMention: '{name} nhắc đến bạn'
+  youGotReply: '{name} trả lời bạn'
+  youGotQuote: '{name} trích dẫn tút của bạn'
+  youRenoted: '{name} đăng lại tút của bạn'
+  youWereFollowed: 'đã theo dõi bạn'
+  youReceivedFollowRequest: 'Bạn vừa có một yêu cầu theo dõi'
+  yourFollowRequestAccepted: 'Yêu cầu theo dõi của bạn đã được chấp nhận'
+  pollEnded: 'Cuộc bình chọn đã kết thúc'
+  unreadAntennaNote: 'Ăng ten {name}'
+  achievementEarned: 'Hoàn thành Achievement'
   _actions:
-    followBack: "đã theo dõi lại bạn"
-    reply: "Trả lời"
-    renote: "Đăng lại"
-_moderationLogTypes:
-  suspend: "Vô hiệu hóa"
-  resetPassword: "Đặt lại mật khẩu"
-  createInvitation: "Tạo lời mời"
-_watermarkEditor:
-  advanced: "Nâng cao"
+    followBack: 'đã theo dõi lại bạn'
+    reply: 'Trả lời'
+    renote: 'Đăng lại'
+next: 'Kế tiếp'
+upload: 'Tải lên'
+preview: 'Xem trước'
+reset: 'cài lại'
+name: 'Tên'
+title: 'Tựa đề'
+description: 'Mô tả'
+none: 'Không'
+all: 'Tất cả'
+default: 'Mặc định'
+error: 'Lỗi'
+users: 'Người dùng'
+areYouSure: 'Bạn chắc chứ?'

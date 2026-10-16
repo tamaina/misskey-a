@@ -1,587 +1,202 @@
----
-_lang_: "Čeština"
-monthAndDay: "{day}. {month}."
-search: "Vyhledávání"
-ok: "Potvrdit"
-cancel: "Zrušit"
-notificationSettings: "Nastavení oznámení"
-uploading: "Nahrávám"
-save: "Uložit"
-favorites: "Oblíbené"
-favorited: "Přidáno do oblíbených"
-alreadyFavorited: "Už je mezi oblíbenými"
-delete: "Smazat"
-searchUser: "Vyhledat uživatele"
-showLess: "Zavřít"
-lists: "Seznamy"
-notes: "Poznámky"
-following: "Sledovaní"
-somethingHappened: "Jejda. Něco se nepovedlo."
-pinned: "Připnout"
-unsuspend: "Odmrazit"
-customEmojis: "Vlastní emoji"
-emojis: "Emoji"
-emojiName: "Jméno emoji"
-loginFailed: "Přihlášení se nezdařilo."
-wallpaper: "Obrázek na pozadí"
-instances: "Instance"
-latestStatus: "Poslední status"
-operations: "Operace"
-monitor: "Monitorovat"
-network: "Síť"
-disk: "Disk"
-mutedUsers: "Zltumení uživatelé"
-blockedUsers: "Blokovaní uživatelé"
-changePassword: "Změnit heslo"
-retypedNotMatch: "Zadané údaje se neshodují."
-currentPassword: "Současné heslo"
-newPasswordRetype: "Nové heslo (znovu)"
-removed: "Smazáno"
-home: "Domů"
-reload: "Aktualizovat"
-watch: "Sledovat"
-unwatch: "Přestat sledovat"
-accept: "Souhlasím"
-reject: "Odmítnout"
-integration: "Integrace"
-pinnedPages: "Připnutý stránky"
-pinnedClipId: "ID připnutého klipu"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Aktivovat hCaptchu"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "Aktivovat mCaptchu"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Zapnout ReCAPTCHu"
-turnstile: "Turnstile"
-enableTurnstile: "Povolit Turnstile"
-antennas: "Antény"
-close: "Zavřít"
-invites: "Pozvat"
-transfer: "Převod"
-signinFailed: "Nelze se přihlásit. Zkontrolujte prosím své uživatelské jméno a heslo."
-noHistory: "Žádná historie"
-signinHistory: "Historie přihlášení"
-regenerate: "Obnovit"
-appearance: "Vzhled"
-promotion: "Propagace"
-promote: "Propagovat"
-hideThisNote: "Skrýt tuto poznámku"
-showFeaturedNotesInTimeline: "Zobrazit významné poznámky v časové ose"
-deleteAll: "Smazat vše"
-showFixedPostForm: "Zobrazit formulář pro nové příspěvky nad časovou osou"
-deleteAllFiles: "Smazat všechny soubory"
-leaveConfirm: "Máte neuložené změny. Opravdu je chcete zahodit?"
-notificationType: "Typy oznámení"
-edit: "Upravit"
-emailServer: "Mailový server"
-enableEmail: "Zapnout email dystribuci"
-emailConfigInfo: "Používá se na ověření emailové adresy během registrace nebo při zapomenutí hesla."
-emailAddress: "Emailová adresa"
-smtpConfig: "Konfigurace SMTP serveru"
-smtpHost: "Hostitel"
-smtpPort: "Port"
-smtpUser: "Uživatelské jméno"
-smtpPass: "Heslo"
-emptyToDisableSmtpAuth: "Zanechte uživatelské jméno a heslo prázdné pro vypnutí SMTP verifikace."
-smtpSecure: "Použít implicitní SSL/TLS pro SMTP připojení"
-smtpSecureInfo: "Toto vypněte pokud používáte STARTTLS"
-testEmail: "Otestovat doručení emailů"
-copy: "Kopírovat"
-metrics: "Metriky"
-delayed: "Prodleva"
-regenerateLoginToken: "Přegenerovat přihlašovací token"
-regenerateLoginTokenDescription: "Přegeneruje token interně používaný během přihlášení. Běžně tahle akce není nutná. Pokud bude token přegenerovaný, tak se všechna přihlášená zařízení odhlásí."
-sample: "Ukázka"
-repliesCount: "Počet odeslaných odpovědí"
-repliedCount: "Počet přijatých odpovědí"
-followingCount: "Počet sledovaných účtů"
-followersCount: "Počet sledujících"
-pollVotesCount: "Počet odeslaných anketových hlasů"
-driveUsage: "Využití disku"
-clips: "Oříznout"
-experimental: "Experimentální"
-wide: "Široké"
-narrow: "Úzké"
-sendErrorReports: "Odesílat chybové záznamy"
-sendErrorReportsDescription: "Pokud je tato funkce zapnutá, budou se při výskytu problému sdílet podrobné informace o chybách se službou Misskey, což pomůže zlepšit kvalitu služby Misskey. Tyto informace budou zahrnovat například verzi operačního systému, jaký prohlížeč používáte, vaši aktivitu v Misskey atd."
-advanced: "Pokročilé"
-markAllAsRead: "Označit všechno jako přečtené"
-onlineStatus: "Online status"
-global: "Globální"
-sent: "Odeslat"
-received: "Přijaté"
-aiChanMode: "Režim Ai"
-unread: "Nepřečtený"
-classic: "Klasický"
-rateLimitExceeded: "Překročení rychlostního limitu"
-recommended: "Doporučeno"
-undefined: "Neurčeno"
-videos: "Videa"
-reactionsList: "Reakce"
-createWithOptions: "Vygenerovat s nastavením"
-_chat:
-  invitations: "Pozvat"
-  noHistory: "Žádná historie"
-  members: "Členové"
-  home: "Domů"
-  send: "Odeslat"
+_lang_: 'Čeština'
+search: 'Vyhledávání'
+ok: 'Potvrdit'
+cancel: 'Zrušit'
+notificationSettings: 'Nastavení oznámení'
+save: 'Uložit'
+favorites: 'Oblíbené'
+delete: 'Smazat'
+lists: 'Seznamy'
+notes: 'Poznámky'
+following: 'Sledovaní'
+somethingHappened: 'Jejda. Něco se nepovedlo.'
+customEmojis: 'Vlastní emoji'
+mutedUsers: 'Zltumení uživatelé'
+blockedUsers: 'Blokovaní uživatelé'
+reload: 'Aktualizovat'
+accept: 'Souhlasím'
+reject: 'Odmítnout'
+antennas: 'Antény'
+close: 'Zavřít'
+edit: 'Upravit'
+copy: 'Kopírovat'
+clips: 'Oříznout'
+markAllAsRead: 'Označit všechno jako přečtené'
 _achievements:
   _types:
     _notes1:
-      title: "Dobrý den Misskey!"
-      description: "Zveřejněte vaší první poznámku"
-      flavor: "Užijte si to s Misskey!"
+      title: 'Dobrý den Misskey!'
     _notes10:
-      title: "Pár poznámek"
-      description: "Zveřejněte 10 poznámek"
+      title: 'Pár poznámek'
     _notes100:
-      title: "Hodně poznámek"
-      description: "Zveřejněte 100 poznámek"
+      title: 'Hodně poznámek'
     _notes500:
-      title: "Zahlcen poznámkama"
-      description: "Zveřejněte 500 poznámek"
+      title: 'Zahlcen poznámkama'
     _notes1000:
-      title: "Hora poznámek"
-      description: "Zveřejněte 1000 poznámek"
+      title: 'Hora poznámek'
     _notes5000:
-      title: "Přetékající poznámky"
-      description: "Zveřejněte 5000 poznámek"
+      title: 'Přetékající poznámky'
     _notes10000:
-      title: "Super poznámka"
-      description: "Zveřejněte 10 000 poznámek"
+      title: 'Super poznámka'
     _notes20000:
-      title: "Potřebuju... více... poznámek..."
-      description: "Zveřejněte 20 000 poznámek"
+      title: 'Potřebuju... více... poznámek...'
     _notes30000:
-      title: "Poznámky, poznámky, POZNÁMKY!"
-      description: "Zveřejněte 30 000 poznámek"
+      title: 'Poznámky, poznámky, POZNÁMKY!'
     _notes40000:
-      title: "Továrna na poznámky"
-      description: "Zveřejněte 40 000 poznámek"
+      title: 'Továrna na poznámky'
     _notes50000:
-      title: "Planeta poznámek"
-      description: "Zveřejněte 50 000 poznámek"
+      title: 'Planeta poznámek'
     _notes60000:
-      title: "Poznámkový kvasar"
-      description: "Zveřejněte 60 000 poznámek"
+      title: 'Poznámkový kvasar'
     _notes70000:
-      title: "Černá díra poznámek"
-      description: "Zveřejněte 70 000 poznámek"
+      title: 'Černá díra poznámek'
     _notes80000:
-      title: "Galaxie poznámek"
-      description: "Zveřejněte 80 000 poznámek"
+      title: 'Galaxie poznámek'
     _notes90000:
-      title: "Vesmír poznámek"
-      description: "Zveřejněte 90 000 poznámek"
+      title: 'Vesmír poznámek'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "Zveřejněte 100 000 poznámek"
-      flavor: "Máte toho hodně co říct."
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "Začátečník I"
-      description: "Přihlaste se celkově za 3 dny"
-      flavor: "Ode dneška mi říkejte Misskista."
+      title: 'Začátečník I'
     _login7:
-      title: "Začátečník II"
-      description: "Přihlaste se celkově za 7 dní"
-      flavor: "Máte pocit, že už jste se v tom vyznali?"
+      title: 'Začátečník II'
     _login15:
-      title: "Začátečník III"
-      description: "Přihlaste se celkově za 15 dní"
+      title: 'Začátečník III'
     _login30:
-      title: "Misskista I"
-      description: "Přihlaste se celkově za 30 dní"
+      title: 'Misskista I'
     _login60:
-      title: "Misskista II"
-      description: "Přihlaste se celkově za 60 dní"
+      title: 'Misskista II'
     _login100:
-      title: "Misskista III"
-      description: "Přihlaste se celkově za 100 dní"
-      flavor: "Violent Misskista"
+      title: 'Misskista III'
     _login200:
-      title: "Stálý zákazník I"
-      description: "Přihlaste se celkově za 200 dní"
+      title: 'Stálý zákazník I'
     _login300:
-      title: "Stálý zákazník II"
-      description: "Přihlaste se celkově za 300 dní"
+      title: 'Stálý zákazník II'
     _login400:
-      title: "Stálý zákazník III"
-      description: "Přihlaste se celkově za 400 dní"
+      title: 'Stálý zákazník III'
     _login500:
-      title: "Expert I"
-      description: "Přihlaste se celkově za 500 dní"
-      flavor: "Moji přátelé, často se říká, že mám rád poznámky."
+      title: 'Expert I'
     _login600:
-      title: "Expert II"
-      description: "Přihlaste se celkově za 600 dní"
+      title: 'Expert II'
     _login700:
-      title: "Expert III"
-      description: "Přihlaste se celkově za 700 dní"
+      title: 'Expert III'
     _login800:
-      title: "Mistr poznámek I"
-      description: "Přihlaste se celkově za 800 dní"
+      title: 'Mistr poznámek I'
     _login900:
-      title: "Mistr poznámek II"
-      description: "Přihlaste se celkově za 900 dní"
+      title: 'Mistr poznámek II'
     _login1000:
-      title: "Mistr poznámek III"
-      description: "Přihlaste se celkově za 1000 dní"
-      flavor: "Děkujeme, že používáte Misskey!"
+      title: 'Mistr poznámek III'
     _noteClipped1:
-      title: "Musím... připnout..."
-      description: "Připněte si první poznámku"
+      title: 'Musím... připnout...'
     _noteFavorited1:
-      title: "Hvězdář"
-      description: "Oblíbena první poznámka"
+      title: 'Hvězdář'
     _myNoteFavorited1:
-      title: "Hledání hvězd"
-      description: "Někdo si oblíbil jednu z vašich poznámek"
+      title: 'Hledání hvězd'
     _profileFilled:
-      title: "Dobře připravený"
-      description: "Nastavte si profil"
+      title: 'Dobře připravený'
     _markedAsCat:
-      title: "Já jsem kočka"
-      description: "Označte váš účet \"jako kočka\""
-      flavor: "Jméno ti dám později."
+      title: 'Já jsem kočka'
     _following1:
-      title: "Sledujte prvního uživatele"
-      description: "Sledujte uživatele"
+      title: 'Sledujte prvního uživatele'
     _following10:
-      title: "Drž se... drž se..."
-      description: "Sledujte 10 uživatelů"
+      title: 'Drž se... drž se...'
     _following50:
-      title: "Hodně přátel"
-      description: "Sledujte 50 uživatelů"
+      title: 'Hodně přátel'
     _following100:
-      title: "100 přátel"
-      description: "Sledujte 100 uživatelů"
+      title: '100 přátel'
     _following300:
-      title: "Přetížení přátel"
-      description: "Sledujte 300 účtů"
+      title: 'Přetížení přátel'
     _followers1:
-      title: "První sledující"
-      description: "Získejte 1 sledujícího"
+      title: 'První sledující'
     _followers10:
-      title: "Sledujte mě!"
-      description: "Získejte 10 sledujících"
+      title: 'Sledujte mě!'
     _followers50:
-      title: "Přicházejí davy"
-      description: "Získejte 50 sledujících"
+      title: 'Přicházejí davy'
     _followers100:
-      title: "Populární"
-      description: "Získejte 100 sledujících"
+      title: 'Populární'
     _followers300:
-      title: "Prosíme srovnejte se do jedné řady!"
-      description: "Získejte 300 sledujících"
+      title: 'Prosíme srovnejte se do jedné řady!'
     _followers500:
-      title: "Rádiová věž"
-      description: "Získejte 500 sledujících"
+      title: 'Rádiová věž'
     _followers1000:
-      title: "Influencer"
-      description: "Získejte 1000 sledujících"
+      title: 'Influencer'
     _collectAchievements30:
-      title: "Sběratel úspěchů"
-      description: "Získejte 30 úspěchů"
+      title: 'Sběratel úspěchů'
     _viewAchievements3min:
-      title: "Máš rád úspěchy"
-      description: "Koukejte na váš seznam úspěchů alespoň po dobu 3 minut"
+      title: 'Máš rád úspěchy'
     _iLoveMisskey:
-      title: "Miluju Misskey"
-      description: "Zveřejněte \" I ❤ #Misskey\""
-      flavor: "Vývojový tým Misskey si velmi váží vaší podpory!"
+      title: 'Miluju Misskey'
     _foundTreasure:
-      title: "Hon za pokladem"
-      description: "Našli jste schovaný poklad!"
+      title: 'Hon za pokladem'
     _client30min:
-      title: "Krátká pauza"
-      description: "Mějte otevřený Misskey alespoň po dobu 30 minut"
+      title: 'Krátká pauza'
     _client60min:
-      title: "Žádný \"Miss\" v Misskey"
-      description: "Mějte otevřený Misskey alespoň po dobu 60 minut"
+      title: 'Žádný "Miss" v Misskey'
     _noteDeletedWithin1min:
-      title: "Ups, nevadí"
-      description: "Vymažte poznámku během minuty co ji zveřejníte"
+      title: 'Ups, nevadí'
     _postedAtLateNight:
-      title: "Noční typ"
-      description: "Zveřejněte poznámku pozdě v noci"
-      flavor: "Je nejvyšší čas jít spát."
+      title: 'Noční typ'
     _postedAt0min0sec:
-      title: "Mluvící hodiny"
-      description: "Zveřejněte poznámku přesně v 00:00"
-      flavor: "Klik Klik Klik Bum"
+      title: 'Mluvící hodiny'
     _selfQuote:
-      title: "Sebereference"
-      description: "Citujte vlastní poznámku"
+      title: 'Sebereference'
     _htl20npm:
-      title: "Plynoucí časová osa"
-      description: "Mějte rychlost vaší domovské časové osy vyšší než 20 pzm (poznámek za minutu)."
+      title: 'Plynoucí časová osa'
     _viewInstanceChart:
-      title: "Analytik"
-      description: "Zobrazte graf instance"
+      title: 'Analytik'
     _outputHelloWorldOnScratchpad:
-      title: "Hello, world!"
-      description: "Dostaňte výpis \"hello world\" do Scratchpadu"
+      title: 'Hello, world!'
     _open3windows:
-      title: "Splitscreen"
-      description: "Mějte otevřená alespoň 3 okna zároveň"
+      title: 'Splitscreen'
     _driveFolderCircularReference:
-      title: "Okružní reference"
-      description: "Pokuste se o vytvoření rekurzivně vnořené složky v disku"
+      title: 'Okružní reference'
     _reactWithoutRead:
-      title: "Opravdu jste to četl/a?"
-      description: "Reagujte na poznámku, která má více než 100 znaků, do 3 sekund od jejího zveřejnění."
+      title: 'Opravdu jste to četl/a?'
     _clickedClickHere:
-      title: "Klikněte sem"
-      description: "Kliknul si tam"
+      title: 'Klikněte sem'
     _justPlainLucky:
-      title: "Čisté štěstí"
-      description: "Mějte šanci na získání s pravděpodobností 0,005 % každých 10 sekund."
+      title: 'Čisté štěstí'
     _setNameToSyuilo:
-      title: "Boží komplex"
-      description: "Nastavte si jméno na \"syuilo\""
+      title: 'Boží komplex'
     _passedSinceAccountCreated1:
-      title: "Roční výročí"
-      description: "Od vytvoření vašeho účtu uplynul jeden rok"
+      title: 'Roční výročí'
     _passedSinceAccountCreated2:
-      title: "Dvouleté výročí"
-      description: "Od vytvoření vašeho účtu uplynuly dva roky"
+      title: 'Dvouleté výročí'
     _passedSinceAccountCreated3:
-      title: "Tříleté výročí"
-      description: "Od vytvoření vašeho účtu uplynuly tři roky"
+      title: 'Tříleté výročí'
     _loggedInOnBirthday:
-      title: "Všechno nejlepší!"
-      description: "Přihlašte se v den vašich narozenin"
+      title: 'Všechno nejlepší!'
     _loggedInOnNewYearsDay:
-      title: "Štastný nový rok!"
-      description: "Přihlašte se v den nového roku"
-      flavor: "Na další skvělý rok v této instanci"
+      title: 'Štastný nový rok!'
     _cookieClicked:
-      title: "Hra, ve které klikáte na sušenky"
-      description: "Klikněte na soubor cookie"
-      flavor: "Počkejte, jste na správné webové stránce?"
+      title: 'Hra, ve které klikáte na sušenky'
     _brainDiver:
-      title: "Brain Diver"
-      description: "Zveřejněte odkaz na Brain Diver"
-      flavor: "Misskey-Misskey La-Tu-Ma"
-_role:
-  edit: "Upravit roli"
-  assignTarget: "Přiřadit"
-  options: "Nastavení"
-  displayOrder: "Pozice"
-  priority: "Priorita"
-  _priority:
-    low: "Nízká"
-    middle: "Střední"
-    high: "Vysoká"
-  _options:
-    canManageCustomEmojis: "Spravovat vlastní emoji"
-    canHideAds: "Může schovat reklamy"
-  _condition:
-    isRemote: "Vzdálený uživatel"
-_ffVisibility:
-  public: "Zveřejnit"
-  followers: "Viditelné pouze pro sledující"
-  private: "Soukromý"
-_ad:
-  hide: "Schovat"
-_email:
-  _follow:
-    title: "Máte nového následovníka"
-  _receiveFollowRequest:
-    title: "Obdrželi jste žádost o sledování"
-_plugin:
-  manage: "Správce pluginů"
-_preferencesBackups:
-  list: "Vytvořit backup"
-  apply: "Použít pro toto zařízení"
-  save: "Uložit změny"
-  nameAlreadyExists: "Záloha s názvem \"{name}\" již existuje. Zadejte prosím jiný název."
-  saveConfirm: "Uložit zálohu jako {name}?"
-  deleteConfirm: "Odstranit zálohu {name}?"
-  createdAt: "Vytvořeno v: {date} {time}"
-  updatedAt: "Aktualizováno: {date} {time}"
-  cannotLoad: "Načítání selhalo"
-_aboutMisskey:
-  contributors: "Hlavní přispěvatelé"
-_menuDisplay:
-  top: "Nahoru"
-  hide: "Skrýt"
-_theme:
-  base: "Základ"
-  addConstant: "Přidat konstantu"
-  constant: "Konstanta"
-  defaultValue: "Výchozí hodnota"
-  refProp: "Odkázat na vlastnost"
-  refConst: "Odkázat na konstantu"
-  key: "Klíč"
-  func: "Funkce "
-  funcKind: "Typ funkce"
-  argument: "Argument"
-  basedProp: "Odkazovaná vlastnost"
-  darken: "Ztmavit"
-  inputConstantName: "Zadejte název pro tuto konstantu"
-  importInfo: "Pokud zde zadáte kód motivu, můžete jej importovat do editoru motivu."
-  deleteConstantConfirm: "Opravdu chcete odstranit konstantu {const}?"
-  keys:
-    accent: "Akcent"
-    bg: "Pozadí"
-    fg: "Text"
-    focus: "Fokus"
-    indicator: "Indikátor"
-    panel: "Panely"
-    shadow: "Stín"
-    navBg: "Pozadí postranního panelu"
-    navFg: "Text na postranním panelu"
-    navActive: "Text na postranním panelu (Aktivní)"
-    navIndicator: "Indikátor na postranním panelu"
-    link: "Odkaz"
-    hashtag: "Hashtag"
-    mention: "Zmínění"
-    mentionMe: "Zmínky (mě)"
-    renote: "Přeposlat"
-    modalBg: "Pozadí Modalu"
-    divider: "Dělící čára"
-    scrollbarHandle: "Rukojeť posuvníku"
-    scrollbarHandleHover: "Rukojeť posuvníku (Hover)"
-    dateLabelFg: "Text štítku s datem"
-    infoBg: "Pozadí informací"
-    infoFg: "Text informací"
-    infoWarnBg: "Pozadí varování"
-    infoWarnFg: "Text varování"
-    toastBg: "Pozadí oznámení"
-    toastFg: "Text oznámení"
-    buttonBg: "Pozadí tlačítka"
-    buttonHoverBg: "Pozadí tlačítka (Hover)"
-    inputBorder: "Ohraničení vstupního pole"
-    badge: "Odznak"
-    messageBg: "Pozadí chatu"
-    fgHighlighted: "Zvýrazněný text"
-_ago:
-  future: "Budoucí"
-_permissions:
-  "read:account": "Zobrazit informace o účtu"
-  "write:account": "Upravit informace o účtu"
-  "read:blocks": "Zobrazit seznam blokovaných uživatelů"
-  "write:blocks": "Upravit seznam blokovaných uživatelů"
-  "read:drive": "Přístup k souborům a složkám na disku"
-  "write:drive": "Úprava nebo odstranění souborů a složek na disku"
-  "read:favorites": "Zobrazit seznam oblíbených"
-  "write:favorites": "Upravit seznam oblíbených"
-  "read:following": "Zobrazit informace o tom, koho sledujete"
-  "write:following": "Sledování nebo zrušení sledování jiných účtů"
-  "read:messaging": "Zobrazit chat"
-  "write:messaging": "Sestavit nebo mazat zprávy chatu"
-  "read:mutes": "Zobrazit seznam ztlumených uživatelů"
-  "write:mutes": "Upravit seznam ztlumených uživatelů"
-  "write:notes": "Sestavit nebo odstranit poznámky"
-  "read:notifications": "Zobrazit oznámení"
-  "write:notifications": "Spravit oznámení"
-  "read:reactions": "Zobrazit vaše reakce"
-  "write:reactions": "Upravit své reakce"
-  "write:votes": "Hlasovat v anketě"
-  "read:pages": "Zobrazit své stránky"
-  "write:pages": "Upravit nebo odstranit stránky"
-  "read:page-likes": "Zobrazit to se mi líbí na stránkách"
-  "write:page-likes": "Upravit to se mi líbí na stránkách"
-  "read:user-groups": "Zobrazit skupiny uživatelů"
-  "write:user-groups": "Upravit nebo odstranit skupiny uživatelů"
-  "read:channels": "Zobrazit své kanály"
-  "write:channels": "Upravit kanály"
-  "read:gallery": "Zobrazit galerii"
-  "write:gallery": "Upravit galerii"
-  "read:gallery-likes": "Zobrazit seznam to se mi líbí příspěvků v galerii"
-  "write:gallery-likes": "Upravit seznam to se mi líbí příspěvků v galerii"
-  "write:chat": "Sestavit nebo mazat zprávy chatu"
-_profile:
-  username: "Uživatelské jméno"
-  metadata: "Doplňující informace"
-_charts:
-  filesTotal: "Celkový počet souborů"
-_play:
-  created: "Play vytvořen"
-  updated: "Play upraven"
-  deleted: "Play smazán"
-  pageSetting: "Nastavení Play"
-_pages:
-  newPage: "Vytvořit novou stránku"
-  editPage: "Upravit stránku"
-  readPage: "Prohlížení zdroje této stránky"
-  pageSetting: "Nastavení stránky"
-  nameAlreadyExists: "Zadaná adresa URL stránky již existuje"
-  invalidNameTitle: "Zadaná adresa URL stránky je neplatná"
-  invalidNameText: "Ujistěte se že jméno stránky je vyplněno"
-  editThisPage: "Upravit tuto stránku"
-  viewSource: "Zobrazit zdroj"
-  viewPage: "Zobrazit své stránky"
-  like: "To se mi líbí"
-  unlike: "Už se mi to nelíbí"
-  my: "Moje stránky"
-  liked: "To se mi líbí stránky"
-  featured: "Populární"
-  inspector: "Inspektor"
-  contents: "Obsah"
-  content: "Blok stránky"
-  variables: "Proměnné"
-  title: "Titulek"
-  url: "URL stránky"
-  summary: "Přehled stránky"
-  alignCenter: "Vycentrovat prvky"
-  hideTitleWhenPinned: "Skrytí názvu stránky při připnutí k profilu"
-  font: "Písmo"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  eyeCatchingImageSet: "Nastavení miniatury"
-  eyeCatchingImageRemove: "Smazání miniatury"
-  chooseBlock: "Přidat blok"
-  selectType: "Vyberte typ"
-  contentBlocks: "Obsah"
-  inputBlocks: "Vstup"
-  specialBlocks: "Speciální"
-  blocks:
-    text: "Text"
-    textarea: "Textové pole"
-    section: "Sekce"
-    image: "Obrázky"
-    button: "Tlačítko"
-    note: "Vestavěná poznámka"
-    _note:
-      id: "ID poznámky"
-      idDescription: "Adresu URL poznámky můžete vložit také sem."
-      detailed: "Podrobné zobrazení"
+      title: 'Brain Diver'
 _notification:
-  fileUploaded: "Soubor úspěšně nahrán"
-  youGotMention: "{name} vás zmínil"
-  youGotReply: "{name} vám odpověděl"
-  youGotQuote: "{name} vás citoval"
-  youRenoted: "Poznámka od {name}"
-  youWereFollowed: "Máte nového následovníka"
-  youReceivedFollowRequest: "Obdrželi jste žádost o sledování"
-  yourFollowRequestAccepted: "Vaše žádost o sledování byla přijata"
-  pollEnded: "Výsledky ankety jsou k dispozici"
-  unreadAntennaNote: "Anténa {name}"
-  emptyPushNotificationMessage: "Push oznámení byla aktualizována"
-  achievementEarned: "Úspěch odemčen"
-  _types:
-    all: "Vše"
-    follow: "Sledovaní"
-    mention: "Zmínění"
-    reply: "Odpovědi"
-    renote: "Přeposlat"
-    quote: "Citovat"
-    reaction: "Reakce"
-    pollEnded: "Anketa končí"
-    receiveFollowRequest: "Obdržené žádosti o sledování"
-    followRequestAccepted: "Přijaté žádosti o sledování"
-    achievementEarned: "Úspěch odemčen"
-    login: "Přihlásit se"
-    app: "Oznámení z propojených aplikací"
+  youGotMention: '{name} vás zmínil'
+  youGotReply: '{name} vám odpověděl'
+  youGotQuote: '{name} vás citoval'
+  youRenoted: 'Poznámka od {name}'
+  youWereFollowed: 'Máte nového následovníka'
+  youReceivedFollowRequest: 'Obdrželi jste žádost o sledování'
+  yourFollowRequestAccepted: 'Vaše žádost o sledování byla přijata'
+  pollEnded: 'Výsledky ankety jsou k dispozici'
+  unreadAntennaNote: 'Anténa {name}'
+  achievementEarned: 'Úspěch odemčen'
   _actions:
-    followBack: "vás začal sledovat zpět"
-    reply: "Odpovědět"
-    renote: "Přeposlat"
-_moderationLogTypes:
-  suspend: "Zmrazit"
-  resetPassword: "Resetovat heslo"
-  createInvitation: "Vygenerovat pozvánku"
-_watermarkEditor:
-  advanced: "Pokročilé"
+    followBack: 'vás začal sledovat zpět'
+    reply: 'Odpovědět'
+    renote: 'Přeposlat'
+next: 'Další'
+upload: 'Nahrát soubory'
+preview: 'Náhled'
+reset: 'Obnovit'
+name: 'Jméno'
+title: 'Titulek'
+description: 'Popis'
+none: 'Žádný'
+all: 'Vše'
+default: 'Výchozí'
+error: 'Chyba'
+users: 'Uživatelé'
+areYouSure: 'Jste si jistí?'

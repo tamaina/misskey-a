@@ -2,9 +2,17 @@
 	"baseline": "59fca8674e479be5e9ca8934d56c993a468bc3d1",
 	"owners": [
 		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"keys": [
+				"title",
+				"description"
+			]
+		},
+		{
 			"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
 			"keys": [
-				"somethingHappened"
+				"somethingHappened",
+				"next"
 			]
 		},
 		{
@@ -22,14 +30,16 @@
 		{
 			"file": "packages/features/chat/frontend/pages/chat/home.home.vue",
 			"keys": [
-				"search"
+				"search",
+				"name"
 			]
 		},
 		{
 			"file": "packages/features/chat/frontend/pages/chat/room.vue",
 			"keys": [
 				"search",
-				"somethingHappened"
+				"somethingHappened",
+				"areYouSure"
 			]
 		},
 		{
@@ -42,7 +52,8 @@
 		{
 			"file": "packages/features/discovery/frontend/pages/search.user.vue",
 			"keys": [
-				"search"
+				"search",
+				"all"
 			]
 		},
 		{
@@ -56,7 +67,9 @@
 			"file": "packages/features/drive/frontend/components/MkDrive.vue",
 			"keys": [
 				"somethingHappened",
-				"edit"
+				"edit",
+				"upload",
+				"name"
 			]
 		},
 		{
@@ -69,7 +82,8 @@
 			"file": "packages/features/integrations/frontend/components/MkSystemWebhookEditor.vue",
 			"keys": [
 				"cancel",
-				"ok"
+				"ok",
+				"error"
 			]
 		},
 		{
@@ -87,7 +101,9 @@
 		{
 			"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
 			"keys": [
-				"save"
+				"save",
+				"none",
+				"all"
 			]
 		},
 		{
@@ -120,20 +136,23 @@
 		{
 			"file": "packages/features/preferences/frontend/pages/settings/navbar.vue",
 			"keys": [
-				"save"
+				"save",
+				"default"
 			]
 		},
 		{
 			"file": "packages/features/preferences/frontend/pages/settings/sounds.sound.vue",
 			"keys": [
 				"save",
-				"cancel"
+				"cancel",
+				"none"
 			]
 		},
 		{
 			"file": "packages/features/preferences/frontend/pages/settings/theme.manage.vue",
 			"keys": [
-				"copy"
+				"copy",
+				"description"
 			]
 		},
 		{
@@ -151,23 +170,28 @@
 		{
 			"file": "packages/features/users/frontend/pages/admin/users.vue",
 			"keys": [
-				"search"
+				"search",
+				"reset",
+				"all",
+				"users"
 			]
 		},
 		{
 			"file": "packages/features/web/frontend/components/MkEmbedCodeGenDialog.vue",
 			"keys": [
 				"close",
-				"copy"
+				"copy",
+				"preview"
 			]
 		},
 		{
 			"file": "packages/features/web/frontend/pages/_error_.vue",
 			"keys": [
-				"reload"
+				"reload",
+				"error"
 			]
 		}
 	],
-	"count": 1008,
-	"sha256": "14d3beae9acf141ace0243edcbbc59fb8e3f1adfebebee9ad3d1467cb29c8c7d"
+	"count": 1540,
+	"sha256": "8c21bf5f9dc02a1d30e3e8569ea74e6e4163f254aaa83447a56dc79b7e856e1a"
 }

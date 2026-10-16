@@ -1,365 +1,86 @@
----
-_lang_: "العربية"
-monthAndDay: "{day}/{month}"
-search: "البحث"
-ok: " حسناً"
-cancel: " إلغاء"
-notificationSettings: "إعدادات الإشعارات"
-uploading: "يرفع..."
-save: "حفظ"
-favorites: "المفضلات"
-favorited: "أُضيف إلى المفضلة."
-alreadyFavorited: "تمت إضافته بالفعل إلى المفضلة."
-delete: "حذف"
-searchUser: "ابحث عن مستخدمين"
-showLess: "اغلق"
-lists: "القوائم"
-notes: "الملاحظات"
-following: "المتابَعون"
-somethingHappened: "حدث خطأ"
-pinned: "ثبتها على الصفحة الشخصية"
-unsuspend: "ألغ التعليق"
-customEmojis: "إيموجي مخصص"
-emojis: "إيموجي"
-emojiName: "اسم الإيموجي"
-loginFailed: "فشل الولوج"
-wallpaper: "الخلفية"
-instances: "مثيل الخادم"
-latestStatus: "الحالات الأخيرة"
-operations: "الإجراءات"
-monitor: "شاشة التحكم"
-network: "الشبكة"
-disk: "قرص التخزين"
-mutedUsers: "الحسابات المكتومة"
-blockedUsers: "الحسابات المحجوبة"
-changePassword: "تغيير الكلمة السرية"
-retypedNotMatch: "المدخلات لا تتطابق"
-currentPassword: "كلمة المرور الحالية"
-newPasswordRetype: "كرّر كلمة المرور الجديدة:"
-removed: "حُذف بنجاح"
-home: "الرئيسي"
-reload: "انعش"
-watch: "راقب"
-unwatch: "إلغاء المراقبة"
-accept: "السماح"
-reject: "رفض"
-integration: "التكامل"
-pinnedPages: "الصفحات المثبتة"
-pinnedClipId: "معرّف المشبك المثبت"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "فعّل hCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "تمكين reCAPTCHA"
-antennas: "الهوائيات"
-close: "اغلق"
-invites: "دعوة"
-transfer: "نقل"
-signinFailed: "فشل الولوج، خطأ في اسم المستخدم أو كلمة المرور."
-noHistory: "السجل فارغ"
-signinHistory: "تاريخ تسجيل الدخول"
-regenerate: "أعِد التوليد"
-appearance: "المظهر"
-promotion: "ترقية"
-promote: "روِّج"
-hideThisNote: "إخفاء هذه الملاحظة"
-showFeaturedNotesInTimeline: "أظهر الملاحظات الشائعة في الخيط الزمني"
-deleteAll: "حذف الكل"
-showFixedPostForm: "أظهر نموذج الكتابة في أعلى الصفحة"
-deleteAllFiles: "حذف كافة الملفات"
-leaveConfirm: "لديك تغييرات غير محفوظة. أتريد المتابعة دون حفظها؟"
-notificationType: "أنواع الإشعارات"
-edit: "التعديل"
-emailServer: "خادم البريد الإلكتروني"
-emailConfigInfo: "يستخدم لتأكيد عنوان بريدك الإلكتروني ولإعادة تعيين كلمة المرور إن نسيتها."
-emailAddress: "عنوان البريد الالكتروني"
-smtpConfig: "إعدادات خادم SMTP"
-smtpHost: "المضيف"
-smtpPort: "المنفذ"
-smtpUser: "اسم المستخدم"
-smtpPass: "الكلمة السرية"
-emptyToDisableSmtpAuth: "اترك اسم المستخدم وكلمة المرور فارغين لتعطيل التحقق من SMTP"
-smtpSecureInfo: "عطل هذا الخيار عند استخدام STARTTLS"
-copy: "نسخ"
-metrics: "المقاييس"
-delayed: "متأخر"
-regenerateLoginToken: "أعد توليد الرمز"
-regenerateLoginTokenDescription: "ينشئ رمز استيثاق جديد في العادة هذا ليس ضروريًا ؛ عند إنشاء رمز جديد ستُخرج جميع الأجهزة."
-sample: "مثال"
-repliesCount: "عدد الردود المرسلة"
-repliedCount: "عدد الردود المتلقاة"
-followingCount: "عدد الحسابات المتابَعة"
-followersCount: "عدد المتابِعين"
-pollVotesCount: "عدد الاستطلاعات المرسلة"
-driveUsage: "المستغل من قرص التخزين"
-clips: "مشابك"
-experimental: "اختباري"
-wide: "عريض"
-narrow: "رفيع"
-sendErrorReports: "أرسل تقارير الأخطاء"
-sendErrorReportsDescription: "إذا فعّلته ستساعد في تحسين ميسكي وذلك عبر مشاركة معلومات تفصيلية عن الخطأ.\nومما تحتويه التقارير: نسخة نظام التشغيل ونوع المتصفح وسجل نشاطك إلخ."
-advanced: "متقدم"
-markAllAsRead: "علّم الكل كمقروء"
-onlineStatus: "الحالة"
-global: "الشامل"
-sent: "أرسل"
-received: "اُستلم"
-unread: "غير مقروءة"
-classic: "تقليدي"
-recommended: "مقترح"
-undefined: "غير معرّف"
-videos: "فيديوهات"
-reactionsList: "التفاعلات"
-_chat:
-  invitations: "دعوة"
-  noHistory: "السجل فارغ"
-  members: "الأعضاء"
-  home: "الرئيسي"
-  send: "أرسل"
+_lang_: 'العربية'
+search: 'البحث'
+ok: ' حسناً'
+cancel: ' إلغاء'
+notificationSettings: 'إعدادات الإشعارات'
+save: 'حفظ'
+favorites: 'المفضلات'
+delete: 'حذف'
+lists: 'القوائم'
+notes: 'الملاحظات'
+following: 'المتابَعون'
+somethingHappened: 'حدث خطأ'
+customEmojis: 'إيموجي مخصص'
+mutedUsers: 'الحسابات المكتومة'
+blockedUsers: 'الحسابات المحجوبة'
+reload: 'انعش'
+accept: 'السماح'
+reject: 'رفض'
+antennas: 'الهوائيات'
+close: 'اغلق'
+edit: 'التعديل'
+copy: 'نسخ'
+clips: 'مشابك'
+markAllAsRead: 'علّم الكل كمقروء'
 _achievements:
   _types:
-    _notes1:
-      description: "انشر ملاحظتك الأولى"
-      flavor: "تمتع باستخدام ميسكي!"
     _notes10:
-      title: "بعض الملاحظات"
-      description: "انشر 10 ملاحظات"
+      title: 'بعض الملاحظات'
     _notes100:
-      title: "كثير من الملاحظات"
-      description: "انشر 100 ملاحظة"
-    _notes500:
-      description: "انشر 500 ملاحظة"
+      title: 'كثير من الملاحظات'
     _notes1000:
-      title: "جبل ملاحظات"
-      description: "انشر 1000 ملاحظة"
-    _notes5000:
-      description: "انشر 5000 ملاحظة"
-    _notes10000:
-      description: "انشر 10000 ملاحظة"
+      title: 'جبل ملاحظات'
     _notes20000:
-      title: "أريد...ملاحظات...أكثر"
-      description: "انشر 20000 ملاحظة"
+      title: 'أريد...ملاحظات...أكثر'
     _notes30000:
-      title: "ملاحظات وملاحظات وملاحظات"
-      description: "انشر 30000 ملاحظة"
+      title: 'ملاحظات وملاحظات وملاحظات'
     _notes40000:
-      title: "مصنع ملاحظات"
-      description: "انشر 40000 ملاحظة"
+      title: 'مصنع ملاحظات'
     _notes50000:
-      title: "كوكب ملاحظات"
-      description: "انشر 50000 ملاحظة"
+      title: 'كوكب ملاحظات'
     _notes60000:
-      title: "نجم ملاحظات"
-      description: "انشر 60000 ملاحظة"
+      title: 'نجم ملاحظات'
     _notes70000:
-      title: "ثقب أسود للملاحظات"
-      description: "انشر 70000 ملاحظة"
+      title: 'ثقب أسود للملاحظات'
     _notes80000:
-      title: "مجرة ملاحظات"
-      description: "انشر 80000 ملاحظة"
+      title: 'مجرة ملاحظات'
     _notes90000:
-      title: "كوْن ملاحظات"
-      description: "انشر 90000 ملاحظة"
+      title: 'كوْن ملاحظات'
     _notes100000:
-      title: "كل ملاحظاتك لنا"
-      description: "انشر 100000 ملاحظة"
-      flavor: "حقًا لديك الكثير من القصص"
+      title: 'كل ملاحظاتك لنا'
     _login3:
-      title: "مبتدأ I"
-    _noteFavorited1:
-      description: "فضًِل ملاحظتك الأولى"
+      title: 'مبتدأ I'
     _myNoteFavorited1:
-      title: "ساعٍ للنجوم"
-      description: "أعجب شخص آخر بإحدى ملاحظاتك"
+      title: 'ساعٍ للنجوم'
     _profileFilled:
-      title: "مستعد"
-      description: "أعدّ حسابك"
+      title: 'مستعد'
     _markedAsCat:
-      title: "أنا قط"
-_role:
-  edit: "حرر الأدوار"
-  assignTarget: "نوع الإسناد"
-  options: "خيارات"
-  priority: "الأولوية"
-  _priority:
-    low: "منخفضة"
-    middle: "متوسط"
-    high: "عالية"
-  _options:
-    canManageCustomEmojis: "إدارة الإيموجي المخصصة"
-  _condition:
-    isRemote: "مستخدم بعيد"
-_ffVisibility:
-  public: "علني"
-  followers: "مرئية لمتابِعيك فقط"
-  private: "خاص"
-_ad:
-  hide: "لا تظهره بتاتًا"
-_email:
-  _follow:
-    title: "يتابعك"
-  _receiveFollowRequest:
-    title: "استلمت طلب متابعة"
-_plugin:
-  manage: "إدارة الإضافات"
-_preferencesBackups:
-  createdAt: "تم إنشاؤه: {date} {time}"
-  updatedAt: "آخر تحديث: {date} {time}"
-_aboutMisskey:
-  contributors: "المساهمون الرئيسيون"
-_menuDisplay:
-  top: "الأعلى"
-  hide: "إخفاء"
-_theme:
-  addConstant: "أضف ثابتًا"
-  constant: "ثابت"
-  defaultValue: "القيمة الافتراضية"
-  key: "مفتاح"
-  func: "دوال"
-  funcKind: "نوع الدالة"
-  argument: "معامل"
-  inputConstantName: "أدخل اسمًا للثابت"
-  deleteConstantConfirm: "أمتأكد من حذف الثابت {const}؟"
-  keys:
-    accent: "طابع لوني"
-    bg: "الخلفية"
-    fg: "النص"
-    indicator: "المؤشر"
-    panel: "اللوحة"
-    shadow: "الظل"
-    navBg: "خلفية الشريط الجانبي"
-    navFg: "نص الشريط الجانبي"
-    link: "رابط"
-    hashtag: "وسم"
-    mention: "أشر الى"
-    renote: "أعد النشر"
-    divider: "فاصل"
-    scrollbarHandle: "مقبض شريط التمرير"
-    scrollbarHandleHover: "مقبض شريط التمرير (عند التمرير فوقه)"
-    infoWarnBg: "خلفية التحذير"
-    infoWarnFg: "نص التحذير"
-    toastBg: "خلفية الإشعارات"
-    toastFg: "نص الإشعارات"
-    buttonBg: "خلفية الأزرار"
-    buttonHoverBg: "خلفية الأزرار (عند التمرير فوقها)"
-    inputBorder: "حواف حقل الإدخال"
-    messageBg: "خلفية المحادثة"
-_ago:
-  future: "المستقبَل"
-_permissions:
-  "read:account": "اعرض معلومات حسابك"
-  "write:account": "تعديل معلومات حسابك"
-  "read:blocks": "اعرض قائمة المستخدمين المحجوبين"
-  "write:blocks": "عدّل قائمة المستخدمين المحجوبين"
-  "read:drive": "تصفح قرص التخزين"
-  "write:drive": "احذف أو عدّل محتويات قرص التخزين"
-  "read:favorites": "اعرض المفضلة"
-  "write:favorites": "عدّل المفضلة"
-  "read:following": "اعرض معلومات متابَعيك"
-  "write:following": "تابع أو ألغ متابعة حسابات"
-  "read:messaging": "اعرض المحادثات"
-  "write:messaging": "اكتب أو احذف رسائل محادثة"
-  "read:mutes": "اعرض قائمة المستخدمين المكتومين"
-  "write:mutes": "عدّل قائمة المستخدمين المكتومين"
-  "write:notes": "أنشئ أو احذف ملاحظات"
-  "read:notifications": "اظهر الإشعارات"
-  "write:notifications": "إدارة الإشعارات"
-  "read:reactions": "اعرض تفاعلاتك"
-  "write:reactions": "عدّل تفاعلاتك"
-  "write:votes": "صوّت"
-  "read:pages": "اعرض صفحاتك"
-  "write:pages": "عدّل أو احذف صفحاتك"
-  "read:page-likes": "يعرض ما أعجبك من ملاحظات في صفحات"
-  "read:user-groups": "اعرض فِرق المستخدمين"
-  "write:user-groups": "عدّل أو احذف فِرق المستخدمين"
-  "read:channels": "طالع قنواتك"
-  "write:channels": "عدّل القنوات"
-  "read:gallery": "اعرض المعرض"
-  "write:gallery": "عدّل المعرض"
-  "read:gallery-likes": "يعرض ما أعجبك من مشاركات المعرض"
-  "write:chat": "اكتب أو احذف رسائل محادثة"
-_profile:
-  username: "اسم المستخدم"
-  metadata: "معلومات إضافية"
-_charts:
-  filesTotal: "العدد الإجمالي للملفات"
-_pages:
-  newPage: "أنشئ صفحة جديدة"
-  editPage: "عدّل الصفحة"
-  readPage: "نُشّط عرض المصدر"
-  pageSetting: "إعدادات الصفحة"
-  nameAlreadyExists: "رابط الصفحة موجود مسبقًا"
-  invalidNameTitle: "رابط الصفحة ليس صالحًا"
-  invalidNameText: "تأكد أن عنوان الصفحة ليس فارغًا"
-  editThisPage: "عدّل هذه الصفحة"
-  viewSource: "اظهر المصدر"
-  viewPage: "اعرض صفحاتك"
-  like: "أعجبني"
-  unlike: "أزل الإعجاب"
-  my: "صفحاتي"
-  liked: "الصفحات المُعجب بها"
-  featured: "الأكثر شعبية"
-  contents: "المحتوى"
-  variables: "متغيّرات"
-  title: "العنوان"
-  url: "رابط الصفحة"
-  summary: "ملخص الصفحة"
-  alignCenter: "توسيط العناصر"
-  hideTitleWhenPinned: "اخف عنوان الصفحة عند تثبيتها في ملف الشخصي"
-  font: "الخط"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  eyeCatchingImageSet: "عيّن صورة مصغّرة"
-  eyeCatchingImageRemove: "احذف صورة مصغّرة"
-  chooseBlock: "إضافة كتلة"
-  selectType: "اختر النوع"
-  contentBlocks: "المحتوى"
-  inputBlocks: "مُدخل"
-  specialBlocks: "خاص"
-  blocks:
-    text: "نص"
-    textarea: "حقل نصي"
-    section: "قسم"
-    image: "صور"
-    button: "زرّ"
-    note: "ملاحظة مضمّنة"
-    _note:
-      id: "معرّف الملاحظة"
-      idDescription: "كبديل يمكنك إدخال رابك الملاحظة هنا"
-      detailed: "عرض مفصّل"
+      title: 'أنا قط'
 _notification:
-  fileUploaded: "نجح رفع الملف"
-  youGotMention: "{name} أشار إليك"
-  youGotReply: "ردّ عليك {name}"
-  youGotQuote: "اقتبس {name} منشورك"
-  youRenoted: "أعاد {name} نشر منشورك"
-  youWereFollowed: "يتابعك"
-  youReceivedFollowRequest: "تلقيتَ طلب متابعة"
-  yourFollowRequestAccepted: "قُبل طلب المتابعة"
-  pollEnded: "انتهى الاستطلاع"
-  unreadAntennaNote: "هوائي {name}"
-  _types:
-    all: "الكل"
-    follow: "متابِعون جدد"
-    mention: "الإشارات"
-    reply: "الردود"
-    renote: "أعاد النشر"
-    quote: "الاقتباسات"
-    reaction: "التفاعل"
-    receiveFollowRequest: "طلبات المتابعة"
-    followRequestAccepted: "طلبات المتابعة المقبولة"
-    login: "لِج"
-    app: "إشعارات التطبيقات المرتبطة"
+  youGotMention: '{name} أشار إليك'
+  youGotReply: 'ردّ عليك {name}'
+  youGotQuote: 'اقتبس {name} منشورك'
+  youRenoted: 'أعاد {name} نشر منشورك'
+  youWereFollowed: 'يتابعك'
+  youReceivedFollowRequest: 'تلقيتَ طلب متابعة'
+  yourFollowRequestAccepted: 'قُبل طلب المتابعة'
+  pollEnded: 'انتهى الاستطلاع'
+  unreadAntennaNote: 'هوائي {name}'
   _actions:
-    followBack: "تابعك بالمثل"
-    reply: "رد"
-    renote: "أعد النشر"
-_moderationLogTypes:
-  suspend: "علِق"
-  deleteNote: "حُذفت الملاحظة"
-  resetPassword: "أعد تعيين كلمتك السرية"
-  createInvitation: "ولِّد دعوة"
+    followBack: 'تابعك بالمثل'
+    reply: 'رد'
+    renote: 'أعد النشر'
 _offlineScreen:
-  title: "غير متصل - يتعذر الاتصال بالخادم"
-  header: "يتعذر الاتصال بالخادم"
-_watermarkEditor:
-  advanced: "متقدم"
+  title: 'غير متصل - يتعذر الاتصال بالخادم'
+  header: 'يتعذر الاتصال بالخادم'
+next: 'التالية'
+upload: 'ارفع'
+preview: 'معاينة'
+name: 'الإسم'
+title: 'العنوان'
+description: 'الوصف'
+none: 'لا شيء'
+all: 'الكل'
+default: 'افتراضي'
+error: 'خطأ'
+users: 'المستخدمون'

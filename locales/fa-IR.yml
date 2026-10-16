@@ -1,62 +1,21 @@
----
-_lang_: "فارسی"
-monthAndDay: "{day}/{month}"
-search: "جستجو"
-ok: "باشه"
-cancel: "لغو"
-notificationSettings: "تنظیمات اعلان"
-uploading: "بارگذاری..."
-save: "ذخیره"
-favorites: "برگزیده ها"
-favorited: "به برگزیده ها اضافه شد."
-alreadyFavorited: "قبلا به برگزیده ها اضافه شده."
-delete: "حذف"
-searchUser: "جستجوی کاربران"
-showLess: "بستن"
-lists: "فهرست ها"
-notes: "یادداشت ها"
-following: "دنبال می‌کنید"
-somethingHappened: "یک مشکلی پیش آمده"
-pinned: "سنجاق کردن"
-emojiPicker: "انتخابگر شکلک"
-unsuspend: "ذوب شدن"
-customEmojis: "شکلک سفارشی"
-emojis: "شکلک"
-emojiName: "اسم شکلک"
-loginFailed: "مشکل در وارد شدن"
-wallpaper: "تصویر پس‌زمینه"
-instances: "سرور"
-latestStatus: "جدیدترین وضعیت"
-operations: "عملیات ها"
-monitor: "رصدگر"
-network: "شبکه"
-disk: "حافظه ذخیره"
-smtpHost: "میزبان"
-smtpUser: "نام کاربری"
-smtpPass: "گذرواژه"
-_role:
-  _options:
-    canManageCustomEmojis: "مدیریت شکلک های سفارشی"
-_email:
-  _follow:
-    title: "شما دنبال شده اید"
-_theme:
-  keys:
-    mention: "اشاره کردن"
-    renote: "بازنشر"
-_profile:
-  username: "نام کاربری"
+_lang_: 'فارسی'
+search: 'جستجو'
+ok: 'باشه'
+cancel: 'لغو'
+notificationSettings: 'تنظیمات اعلان'
+save: 'ذخیره'
+favorites: 'برگزیده ها'
+delete: 'حذف'
+lists: 'فهرست ها'
+notes: 'یادداشت ها'
+following: 'دنبال می‌کنید'
+somethingHappened: 'یک مشکلی پیش آمده'
+customEmojis: 'شکلک سفارشی'
 _notification:
-  youWereFollowed: "شما دنبال شده اید"
-  _types:
-    follow: "دنبال می‌کنید"
-    mention: "اشاره کردن"
-    renote: "بازنشر"
-    quote: "نقل‌قول"
-    reaction: "واکنش‌ها"
-    login: "ورود"
+  youWereFollowed: 'شما دنبال شده اید'
   _actions:
-    reply: "پاسخ"
-    renote: "بازنشر"
-_moderationLogTypes:
-  suspend: "انجماد"
+    reply: 'پاسخ'
+    renote: 'بازنشر'
+reset: 'بازنشانی'
+error: 'خطا'
+users: 'کاربران'

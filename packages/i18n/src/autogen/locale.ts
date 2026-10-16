@@ -8,10 +8,6 @@ export interface Locale extends ILocale {
      */
     "_lang_": string;
     /**
-     * {month}月 {day}日
-     */
-    "monthAndDay": ParameterizedString<"month" | "day">;
-    /**
      * 検索
      */
     "search": string;
@@ -28,10 +24,6 @@ export interface Locale extends ILocale {
      */
     "notificationSettings": string;
     /**
-     * アップロード中
-     */
-    "uploading": string;
-    /**
      * 保存
      */
     "save": string;
@@ -40,25 +32,9 @@ export interface Locale extends ILocale {
      */
     "favorites": string;
     /**
-     * お気に入りに登録しました。
-     */
-    "favorited": string;
-    /**
-     * 既にお気に入りに登録されています。
-     */
-    "alreadyFavorited": string;
-    /**
      * 削除
      */
     "delete": string;
-    /**
-     * ユーザーを検索
-     */
-    "searchUser": string;
-    /**
-     * 閉じる
-     */
-    "showLess": string;
     /**
      * リスト
      */
@@ -76,61 +52,9 @@ export interface Locale extends ILocale {
      */
     "somethingHappened": string;
     /**
-     * ピン留め
-     */
-    "pinned": string;
-    /**
-     * 絵文字ピッカー
-     */
-    "emojiPicker": string;
-    /**
-     * 解凍
-     */
-    "unsuspend": string;
-    /**
      * カスタム絵文字
      */
     "customEmojis": string;
-    /**
-     * 絵文字
-     */
-    "emojis": string;
-    /**
-     * 絵文字名
-     */
-    "emojiName": string;
-    /**
-     * ログインに失敗しました
-     */
-    "loginFailed": string;
-    /**
-     * 壁紙
-     */
-    "wallpaper": string;
-    /**
-     * サーバー
-     */
-    "instances": string;
-    /**
-     * 直近のステータス
-     */
-    "latestStatus": string;
-    /**
-     * 操作
-     */
-    "operations": string;
-    /**
-     * モニター
-     */
-    "monitor": string;
-    /**
-     * ネットワーク
-     */
-    "network": string;
-    /**
-     * ディスク
-     */
-    "disk": string;
     /**
      * ミュートしたユーザー
      */
@@ -140,41 +64,9 @@ export interface Locale extends ILocale {
      */
     "blockedUsers": string;
     /**
-     * パスワードを変更
-     */
-    "changePassword": string;
-    /**
-     * 入力が一致しません。
-     */
-    "retypedNotMatch": string;
-    /**
-     * 現在のパスワード
-     */
-    "currentPassword": string;
-    /**
-     * 新しいパスワード(再入力)
-     */
-    "newPasswordRetype": string;
-    /**
-     * 削除しました
-     */
-    "removed": string;
-    /**
-     * ホーム
-     */
-    "home": string;
-    /**
      * リロード
      */
     "reload": string;
-    /**
-     * ウォッチ
-     */
-    "watch": string;
-    /**
-     * ウォッチ解除
-     */
-    "unwatch": string;
     /**
      * 許可
      */
@@ -184,50 +76,6 @@ export interface Locale extends ILocale {
      */
     "reject": string;
     /**
-     * 連携
-     */
-    "integration": string;
-    /**
-     * ピン留めページ
-     */
-    "pinnedPages": string;
-    /**
-     * ピン留めするクリップのID
-     */
-    "pinnedClipId": string;
-    /**
-     * hCaptcha
-     */
-    "hcaptcha": string;
-    /**
-     * hCaptchaを有効にする
-     */
-    "enableHcaptcha": string;
-    /**
-     * mCaptcha
-     */
-    "mcaptcha": string;
-    /**
-     * mCaptchaを有効にする
-     */
-    "enableMcaptcha": string;
-    /**
-     * reCAPTCHA
-     */
-    "recaptcha": string;
-    /**
-     * reCAPTCHAを有効にする
-     */
-    "enableRecaptcha": string;
-    /**
-     * Turnstile
-     */
-    "turnstile": string;
-    /**
-     * Turnstileを有効にする
-     */
-    "enableTurnstile": string;
-    /**
      * アンテナ
      */
     "antennas": string;
@@ -236,395 +84,21 @@ export interface Locale extends ILocale {
      */
     "close": string;
     /**
-     * 招待
-     */
-    "invites": string;
-    /**
-     * 譲渡
-     */
-    "transfer": string;
-    /**
-     * ログインできませんでした。ユーザー名とパスワードを確認してください。
-     */
-    "signinFailed": string;
-    /**
-     * 履歴はありません
-     */
-    "noHistory": string;
-    /**
-     * ログイン履歴
-     */
-    "signinHistory": string;
-    /**
-     * 再生成
-     */
-    "regenerate": string;
-    /**
-     * アピアランス
-     */
-    "appearance": string;
-    /**
-     * プロモーション
-     */
-    "promotion": string;
-    /**
-     * プロモート
-     */
-    "promote": string;
-    /**
-     * このノートを非表示
-     */
-    "hideThisNote": string;
-    /**
-     * タイムラインにおすすめのノートを表示する
-     */
-    "showFeaturedNotesInTimeline": string;
-    /**
-     * 全て削除
-     */
-    "deleteAll": string;
-    /**
-     * タイムライン上部に投稿フォームを表示する
-     */
-    "showFixedPostForm": string;
-    /**
-     * すべてのファイルを削除
-     */
-    "deleteAllFiles": string;
-    /**
-     * 未保存の変更があります。破棄しますか？
-     */
-    "leaveConfirm": string;
-    /**
-     * 通知の種類
-     */
-    "notificationType": string;
-    /**
      * 編集
      */
     "edit": string;
-    /**
-     * メールサーバー
-     */
-    "emailServer": string;
-    /**
-     * メール配信機能を有効化する
-     */
-    "enableEmail": string;
-    /**
-     * メールアドレスの確認やパスワードリセットの際に使います
-     */
-    "emailConfigInfo": string;
-    /**
-     * メールアドレス
-     */
-    "emailAddress": string;
-    /**
-     * SMTP サーバーの設定
-     */
-    "smtpConfig": string;
-    /**
-     * ホスト
-     */
-    "smtpHost": string;
-    /**
-     * ポート
-     */
-    "smtpPort": string;
-    /**
-     * ユーザー名
-     */
-    "smtpUser": string;
-    /**
-     * パスワード
-     */
-    "smtpPass": string;
-    /**
-     * ユーザー名とパスワードを空欄にすることで、SMTP認証を無効化出来ます
-     */
-    "emptyToDisableSmtpAuth": string;
-    /**
-     * SMTP 接続に暗黙的なSSL/TLSを使用する
-     */
-    "smtpSecure": string;
-    /**
-     * STARTTLS使用時はオフにします。
-     */
-    "smtpSecureInfo": string;
-    /**
-     * 配信テスト
-     */
-    "testEmail": string;
     /**
      * コピー
      */
     "copy": string;
     /**
-     * メトリクス
-     */
-    "metrics": string;
-    /**
-     * 遅延
-     */
-    "delayed": string;
-    /**
-     * ログイントークンを再生成
-     */
-    "regenerateLoginToken": string;
-    /**
-     * ログインに使用される内部トークンを再生成します。通常この操作を行う必要はありません。再生成すると、全てのデバイスでログアウトされます。
-     */
-    "regenerateLoginTokenDescription": string;
-    /**
-     * サンプル
-     */
-    "sample": string;
-    /**
-     * 返信した数
-     */
-    "repliesCount": string;
-    /**
-     * 返信された数
-     */
-    "repliedCount": string;
-    /**
-     * フォロー数
-     */
-    "followingCount": string;
-    /**
-     * フォロワー数
-     */
-    "followersCount": string;
-    /**
-     * アンケートに投票した数
-     */
-    "pollVotesCount": string;
-    /**
-     * ドライブ使用量
-     */
-    "driveUsage": string;
-    /**
      * クリップ
      */
     "clips": string;
     /**
-     * 実験的
-     */
-    "experimental": string;
-    /**
-     * 広い
-     */
-    "wide": string;
-    /**
-     * 狭い
-     */
-    "narrow": string;
-    /**
-     * エラーリポートを送信
-     */
-    "sendErrorReports": string;
-    /**
-     * オンにすると、問題が発生したときにエラーの詳細情報がMisskeyに共有され、ソフトウェアの品質向上に役立てることができます。エラー情報には、OSのバージョン、ブラウザの種類、行動履歴などが含まれます。
-     */
-    "sendErrorReportsDescription": string;
-    /**
-     * 高度
-     */
-    "advanced": string;
-    /**
      * 全て既読にする
      */
     "markAllAsRead": string;
-    /**
-     * オンライン状態
-     */
-    "onlineStatus": string;
-    /**
-     * グローバル
-     */
-    "global": string;
-    /**
-     * 送信
-     */
-    "sent": string;
-    /**
-     * 受信
-     */
-    "received": string;
-    /**
-     * 藍モード
-     */
-    "aiChanMode": string;
-    /**
-     * 未読
-     */
-    "unread": string;
-    /**
-     * クラシック
-     */
-    "classic": string;
-    /**
-     * ワンタイムパスワードが間違っているか、期限切れになっています。
-     */
-    "incorrectTotp": string;
-    /**
-     * レート制限を超えました
-     */
-    "rateLimitExceeded": string;
-    /**
-     * 推奨
-     */
-    "recommended": string;
-    /**
-     * 未定義
-     */
-    "undefined": string;
-    /**
-     * 動画
-     */
-    "videos": string;
-    /**
-     * リアクション一覧
-     */
-    "reactionsList": string;
-    /**
-     * オプションを指定して作成
-     */
-    "createWithOptions": string;
-    /**
-     * 編集済み
-     */
-    "edited": string;
-    /**
-     * リプレイ
-     */
-    "replay": string;
-    /**
-     * 埋め込みコードを生成
-     */
-    "genEmbedCode": string;
-    /**
-     * 登録されていないパスキーです。
-     */
-    "unknownWebAuthnKey": string;
-    /**
-     * 下書き
-     */
-    "draft": string;
-    /**
-     * 無題
-     */
-    "untitled": string;
-    /**
-     * チャット
-     */
-    "chat": string;
-    /**
-     * デフォルトの画像圧縮度
-     */
-    "defaultImageCompressionLevel": string;
-    "_chat": {
-        /**
-         * 招待
-         */
-        "invitations": string;
-        /**
-         * 履歴はありません
-         */
-        "noHistory": string;
-        /**
-         * メンバー
-         */
-        "members": string;
-        /**
-         * ホーム
-         */
-        "home": string;
-        /**
-         * 送信
-         */
-        "send": string;
-        /**
-         * このユーザーとのダイレクトメッセージを開始できません
-         */
-        "cannotChatWithTheUser": string;
-        /**
-         * ダイレクトメッセージが使えない状態になっているか、相手がダイレクトメッセージを開放していません。
-         */
-        "cannotChatWithTheUser_description": string;
-    };
-    "_settings": {
-        /**
-         * URLプレビューを表示する
-         */
-        "showUrlPreview": string;
-    };
-    "_initialTutorial": {
-        /**
-         * チュートリアルを見る
-         */
-        "launchTutorial": string;
-        /**
-         * チュートリアル
-         */
-        "title": string;
-        /**
-         * チュートリアルを終了しますか？
-         */
-        "skipAreYouSure": string;
-        "_landing": {
-            /**
-             * チュートリアルへようこそ
-             */
-            "title": string;
-        };
-        "_note": {
-            /**
-             * 返信することができます。返信に対しての返信も可能で、スレッドのように会話を続けることもできます。
-             */
-            "reply": string;
-            /**
-             * ノートの詳細を表示したり、リンクをコピーしたりなどの様々な操作が行えます。
-             */
-            "menu": string;
-        };
-        "_reaction": {
-            /**
-             * リアクションって何？
-             */
-            "title": string;
-        };
-        "_timeline": {
-            /**
-             * ホームタイムラインとローカルタイムラインの投稿が両方表示されます。
-             */
-            "social": string;
-        };
-        "_postNote": {
-            "_visibility": {
-                /**
-                 * 他のサーバーに投稿を連合しません。上記の公開範囲に関わらず、他のサーバーのユーザーは、この設定がついたノートを直接閲覧することができなくなります。
-                 */
-                "localOnly": string;
-            };
-            "_cw": {
-                /**
-                 * 本文のかわりに「注釈」に書いた内容が表示されます。「もっと見る」を押すと本文が表示されます。
-                 */
-                "description": string;
-                /**
-                 * サーバーのガイドラインにより必要とされるノートに指定したり、ネタバレ投稿やセンシティブな文章を自主規制したりするときに使います。
-                 */
-                "useCases": string;
-            };
-        };
-        "_done": {
-            /**
-             * チュートリアルは終了です🎉
-             */
-            "title": string;
-        };
-    };
     "_achievements": {
         "_types": {
             "_notes1": {
@@ -632,1570 +106,472 @@ export interface Locale extends ILocale {
                  * just setting up my msky
                  */
                 "title": string;
-                /**
-                 * 初めてノートを投稿した
-                 */
-                "description": string;
-                /**
-                 * 良いMisskeyライフを！
-                 */
-                "flavor": string;
             };
             "_notes10": {
                 /**
                  * いくつかのノート
                  */
                 "title": string;
-                /**
-                 * ノートを10回投稿した
-                 */
-                "description": string;
             };
             "_notes100": {
                 /**
                  * たくさんのノート
                  */
                 "title": string;
-                /**
-                 * ノートを100回投稿した
-                 */
-                "description": string;
             };
             "_notes500": {
                 /**
                  * ノートまみれ
                  */
                 "title": string;
-                /**
-                 * ノートを500回投稿した
-                 */
-                "description": string;
             };
             "_notes1000": {
                 /**
                  * ノートの山
                  */
                 "title": string;
-                /**
-                 * ノートを1,000回投稿した
-                 */
-                "description": string;
             };
             "_notes5000": {
                 /**
                  * 湧き出るノート
                  */
                 "title": string;
-                /**
-                 * ノートを5,000回投稿した
-                 */
-                "description": string;
             };
             "_notes10000": {
                 /**
                  * スーパーノート
                  */
                 "title": string;
-                /**
-                 * ノートを10,000回投稿した
-                 */
-                "description": string;
             };
             "_notes20000": {
                 /**
                  * ニードモアノート
                  */
                 "title": string;
-                /**
-                 * ノートを20,000回投稿した
-                 */
-                "description": string;
             };
             "_notes30000": {
                 /**
                  * ノートノートノート
                  */
                 "title": string;
-                /**
-                 * ノートを30,000回投稿した
-                 */
-                "description": string;
             };
             "_notes40000": {
                 /**
                  * ノート工場
                  */
                 "title": string;
-                /**
-                 * ノートを40,000回投稿した
-                 */
-                "description": string;
             };
             "_notes50000": {
                 /**
                  * ノートの惑星
                  */
                 "title": string;
-                /**
-                 * ノートを50,000回投稿した
-                 */
-                "description": string;
             };
             "_notes60000": {
                 /**
                  * ノートクエーサー
                  */
                 "title": string;
-                /**
-                 * ノートを60,000回投稿した
-                 */
-                "description": string;
             };
             "_notes70000": {
                 /**
                  * ブラックノートホール
                  */
                 "title": string;
-                /**
-                 * ノートを70,000回投稿した
-                 */
-                "description": string;
             };
             "_notes80000": {
                 /**
                  * ノートギャラクシー
                  */
                 "title": string;
-                /**
-                 * ノートを80,000回投稿した
-                 */
-                "description": string;
             };
             "_notes90000": {
                 /**
                  * ノートバース
                  */
                 "title": string;
-                /**
-                 * ノートを90,000回投稿した
-                 */
-                "description": string;
             };
             "_notes100000": {
                 /**
                  * ALL YOUR NOTE ARE BELONG TO US
                  */
                 "title": string;
-                /**
-                 * ノートを100,000回投稿した
-                 */
-                "description": string;
-                /**
-                 * そんなに書くことある？
-                 */
-                "flavor": string;
             };
             "_login3": {
                 /**
                  * ビギナーⅠ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が3日
-                 */
-                "description": string;
-                /**
-                 * 今日からね僕は ミスキストってことで
-                 */
-                "flavor": string;
             };
             "_login7": {
                 /**
                  * ビギナーⅡ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が7日
-                 */
-                "description": string;
-                /**
-                 * 慣れてきましたか？
-                 */
-                "flavor": string;
             };
             "_login15": {
                 /**
                  * ビギナーⅢ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が15日
-                 */
-                "description": string;
             };
             "_login30": {
                 /**
                  * ミスキストⅠ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が30日
-                 */
-                "description": string;
             };
             "_login60": {
                 /**
                  * ミスキストⅡ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が60日
-                 */
-                "description": string;
             };
             "_login100": {
                 /**
                  * ミスキストⅢ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が100日
-                 */
-                "description": string;
-                /**
-                 * そのユーザー、ミスキストにつき
-                 */
-                "flavor": string;
             };
             "_login200": {
                 /**
                  * 常連Ⅰ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が200日
-                 */
-                "description": string;
             };
             "_login300": {
                 /**
                  * 常連Ⅱ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が300日
-                 */
-                "description": string;
             };
             "_login400": {
                 /**
                  * 常連Ⅲ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が400日
-                 */
-                "description": string;
             };
             "_login500": {
                 /**
                  * ベテランⅠ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が500日
-                 */
-                "description": string;
-                /**
-                 * 諸君、私はノートが好きだ
-                 */
-                "flavor": string;
             };
             "_login600": {
                 /**
                  * ベテランⅡ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が600日
-                 */
-                "description": string;
             };
             "_login700": {
                 /**
                  * ベテランⅢ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が700日
-                 */
-                "description": string;
             };
             "_login800": {
                 /**
                  * ノートマスターⅠ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が800日
-                 */
-                "description": string;
             };
             "_login900": {
                 /**
                  * ノートマスターⅡ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が900日
-                 */
-                "description": string;
             };
             "_login1000": {
                 /**
                  * ノートマスターⅢ
                  */
                 "title": string;
-                /**
-                 * 通算ログイン日数が1,000日
-                 */
-                "description": string;
-                /**
-                 * Misskeyを使ってくれてありがとう！
-                 */
-                "flavor": string;
             };
             "_noteClipped1": {
                 /**
                  * クリップせずにはいられないな
                  */
                 "title": string;
-                /**
-                 * 初めてノートをクリップした
-                 */
-                "description": string;
             };
             "_noteFavorited1": {
                 /**
                  * 星をみるひと
                  */
                 "title": string;
-                /**
-                 * 初めてノートをお気に入りに登録した
-                 */
-                "description": string;
             };
             "_myNoteFavorited1": {
                 /**
                  * 星が欲しい
                  */
                 "title": string;
-                /**
-                 * 自分のノートが他の人からお気に入りに登録された
-                 */
-                "description": string;
             };
             "_profileFilled": {
                 /**
                  * 準備万端
                  */
                 "title": string;
-                /**
-                 * プロフィール設定を行った
-                 */
-                "description": string;
             };
             "_markedAsCat": {
                 /**
                  * 吾輩は猫である
                  */
                 "title": string;
-                /**
-                 * アカウントをCatとして設定した
-                 */
-                "description": string;
-                /**
-                 * 名前はまだない。
-                 */
-                "flavor": string;
             };
             "_following1": {
                 /**
                  * はじめてのフォロー
                  */
                 "title": string;
-                /**
-                 * 初めてフォローした
-                 */
-                "description": string;
             };
             "_following10": {
                 /**
                  * ついてく、ついてく
                  */
                 "title": string;
-                /**
-                 * フォローが10人を超した
-                 */
-                "description": string;
             };
             "_following50": {
                 /**
                  * 友達たくさん
                  */
                 "title": string;
-                /**
-                 * フォローが50人を超した
-                 */
-                "description": string;
             };
             "_following100": {
                 /**
                  * 友達100人
                  */
                 "title": string;
-                /**
-                 * フォローが100人を超した
-                 */
-                "description": string;
             };
             "_following300": {
                 /**
                  * 友達過多
                  */
                 "title": string;
-                /**
-                 * フォローが300人を超した
-                 */
-                "description": string;
             };
             "_followers1": {
                 /**
                  * はじめてのフォロワー
                  */
                 "title": string;
-                /**
-                 * 初めてフォローされた
-                 */
-                "description": string;
             };
             "_followers10": {
                 /**
                  * フォローミー！
                  */
                 "title": string;
-                /**
-                 * フォロワーが10人を超した
-                 */
-                "description": string;
             };
             "_followers50": {
                 /**
                  * ぞろぞろ
                  */
                 "title": string;
-                /**
-                 * フォロワーが50人を超した
-                 */
-                "description": string;
             };
             "_followers100": {
                 /**
                  * 人気者
                  */
                 "title": string;
-                /**
-                 * フォロワーが100人を超した
-                 */
-                "description": string;
             };
             "_followers300": {
                 /**
                  * 一列でお並びください
                  */
                 "title": string;
-                /**
-                 * フォロワーが300人を超した
-                 */
-                "description": string;
             };
             "_followers500": {
                 /**
                  * 基地局
                  */
                 "title": string;
-                /**
-                 * フォロワーが500人を超した
-                 */
-                "description": string;
             };
             "_followers1000": {
                 /**
                  * インフルエンサー
                  */
                 "title": string;
-                /**
-                 * フォロワーが1,000人を超した
-                 */
-                "description": string;
             };
             "_collectAchievements30": {
                 /**
                  * 実績コレクター
                  */
                 "title": string;
-                /**
-                 * 実績を30個以上獲得した
-                 */
-                "description": string;
             };
             "_viewAchievements3min": {
                 /**
                  * 実績好き
                  */
                 "title": string;
-                /**
-                 * 実績一覧を3分以上眺め続けた
-                 */
-                "description": string;
             };
             "_iLoveMisskey": {
                 /**
                  * I Love Misskey
                  */
                 "title": string;
-                /**
-                 * "I ❤ #Misskey"を投稿した
-                 */
-                "description": string;
-                /**
-                 * Misskeyを使ってくださりありがとうございます！ by 開発チーム
-                 */
-                "flavor": string;
             };
             "_foundTreasure": {
                 /**
                  * 宝探し
                  */
                 "title": string;
-                /**
-                 * 隠されたお宝を発見した
-                 */
-                "description": string;
             };
             "_client30min": {
                 /**
                  * ひとやすみ
                  */
                 "title": string;
-                /**
-                 * クライアントを起動してから30分以上経過した
-                 */
-                "description": string;
             };
             "_client60min": {
                 /**
                  * Misskeyの見すぎ
                  */
                 "title": string;
-                /**
-                 * クライアントを起動してから60分以上経過した
-                 */
-                "description": string;
             };
             "_noteDeletedWithin1min": {
                 /**
                  * いまのなし
                  */
                 "title": string;
-                /**
-                 * 投稿してから1分以内にその投稿を削除した
-                 */
-                "description": string;
             };
             "_postedAtLateNight": {
                 /**
                  * 夜行性
                  */
                 "title": string;
-                /**
-                 * 深夜にノートを投稿した
-                 */
-                "description": string;
-                /**
-                 * そろそろ寝よう。
-                 */
-                "flavor": string;
             };
             "_postedAt0min0sec": {
                 /**
                  * 時報
                  */
                 "title": string;
-                /**
-                 * 0分0秒にノートを投稿した
-                 */
-                "description": string;
-                /**
-                 * ポッ ポッ ポッ ピーン
-                 */
-                "flavor": string;
             };
             "_selfQuote": {
                 /**
                  * 自己言及
                  */
                 "title": string;
-                /**
-                 * 自分のノートを引用した
-                 */
-                "description": string;
             };
             "_htl20npm": {
                 /**
                  * 流れるTL
                  */
                 "title": string;
-                /**
-                 * ホームタイムラインの流速が20npmを越す
-                 */
-                "description": string;
             };
             "_viewInstanceChart": {
                 /**
                  * アナリスト
                  */
                 "title": string;
-                /**
-                 * サーバーのチャートを表示した
-                 */
-                "description": string;
             };
             "_outputHelloWorldOnScratchpad": {
                 /**
                  * Hello, world!
                  */
                 "title": string;
-                /**
-                 * スクラッチパッドで hello world を出力した
-                 */
-                "description": string;
             };
             "_open3windows": {
                 /**
                  * マルチウィンドウ
                  */
                 "title": string;
-                /**
-                 * ウィンドウを3つ以上開いた状態にした
-                 */
-                "description": string;
             };
             "_driveFolderCircularReference": {
                 /**
                  * 循環参照
                  */
                 "title": string;
-                /**
-                 * ドライブのフォルダを再帰的な入れ子にしようとした
-                 */
-                "description": string;
             };
             "_reactWithoutRead": {
                 /**
                  * ちゃんと読んだ？
                  */
                 "title": string;
-                /**
-                 * 100文字以上のテキストを含むノートに投稿されてから3秒以内にリアクションした
-                 */
-                "description": string;
             };
             "_clickedClickHere": {
                 /**
                  * ここをクリック
                  */
                 "title": string;
-                /**
-                 * ここをクリックした
-                 */
-                "description": string;
             };
             "_justPlainLucky": {
                 /**
                  * 単なるラッキー
                  */
                 "title": string;
-                /**
-                 * 10秒ごとに0.005%の確率で獲得
-                 */
-                "description": string;
             };
             "_setNameToSyuilo": {
                 /**
                  * 神様コンプレックス
                  */
                 "title": string;
-                /**
-                 * 名前を syuilo に設定した
-                 */
-                "description": string;
             };
             "_passedSinceAccountCreated1": {
                 /**
                  * 一周年
                  */
                 "title": string;
-                /**
-                 * アカウント作成から1年経過した
-                 */
-                "description": string;
             };
             "_passedSinceAccountCreated2": {
                 /**
                  * 二周年
                  */
                 "title": string;
-                /**
-                 * アカウント作成から2年経過した
-                 */
-                "description": string;
             };
             "_passedSinceAccountCreated3": {
                 /**
                  * 三周年
                  */
                 "title": string;
-                /**
-                 * アカウント作成から3年経過した
-                 */
-                "description": string;
             };
             "_loggedInOnBirthday": {
                 /**
                  * ハッピーバースデー
                  */
                 "title": string;
-                /**
-                 * 誕生日にログインした
-                 */
-                "description": string;
             };
             "_loggedInOnNewYearsDay": {
                 /**
                  * あけましておめでとうございます
                  */
                 "title": string;
-                /**
-                 * 元日にログインした
-                 */
-                "description": string;
-                /**
-                 * 今年も弊サーバーをよろしくお願いします
-                 */
-                "flavor": string;
             };
             "_cookieClicked": {
                 /**
                  * クッキーをクリックするゲーム
                  */
                 "title": string;
-                /**
-                 * クッキーをクリックした
-                 */
-                "description": string;
-                /**
-                 * ソフト間違ってない？
-                 */
-                "flavor": string;
             };
             "_brainDiver": {
                 /**
                  * Brain Diver
                  */
                 "title": string;
-                /**
-                 * Brain Diverへのリンクを投稿した
-                 */
-                "description": string;
-                /**
-                 * Misskey-Misskey La-Tu-Ma
-                 */
-                "flavor": string;
             };
             "_smashTestNotificationButton": {
                 /**
                  * テスト過剰
                  */
                 "title": string;
-                /**
-                 * 通知のテストをごく短時間のうちに連続して行った
-                 */
-                "description": string;
             };
             "_tutorialCompleted": {
                 /**
                  * Misskey初心者講座 修了証
                  */
                 "title": string;
-                /**
-                 * チュートリアルを完了した
-                 */
-                "description": string;
             };
             "_bubbleGameExplodingHead": {
                 /**
                  * 🤯
                  */
                 "title": string;
-                /**
-                 * バブルゲームで最も大きいモノを出した
-                 */
-                "description": string;
             };
             "_bubbleGameDoubleExplodingHead": {
                 /**
                  * ダブル🤯
                  */
                 "title": string;
-                /**
-                 * バブルゲームで最も大きいモノを2つ同時に出した
-                 */
-                "description": string;
-                /**
-                 * これくらいの　おべんとばこに　🤯　🤯　ちょっとつめて
-                 */
-                "flavor": string;
-            };
-        };
-    };
-    "_role": {
-        /**
-         * ロールの編集
-         */
-        "edit": string;
-        /**
-         * アサイン
-         */
-        "assignTarget": string;
-        /**
-         * オプション
-         */
-        "options": string;
-        /**
-         * 表示順
-         */
-        "displayOrder": string;
-        /**
-         * 優先度
-         */
-        "priority": string;
-        "_priority": {
-            /**
-             * 低
-             */
-            "low": string;
-            /**
-             * 中
-             */
-            "middle": string;
-            /**
-             * 高
-             */
-            "high": string;
-        };
-        "_options": {
-            /**
-             * カスタム絵文字の管理
-             */
-            "canManageCustomEmojis": string;
-            /**
-             * アバターデコレーションの管理
-             */
-            "canManageAvatarDecorations": string;
-            /**
-             * 広告の非表示
-             */
-            "canHideAds": string;
-        };
-        "_condition": {
-            /**
-             * リモートユーザー
-             */
-            "isRemote": string;
-            /**
-             * 猫ユーザー
-             */
-            "isCat": string;
-            /**
-             * botユーザー
-             */
-            "isBot": string;
-        };
-    };
-    "_ffVisibility": {
-        /**
-         * 公開
-         */
-        "public": string;
-        /**
-         * フォロワーだけに公開
-         */
-        "followers": string;
-        /**
-         * 非公開
-         */
-        "private": string;
-    };
-    "_ad": {
-        /**
-         * 表示しない
-         */
-        "hide": string;
-    };
-    "_email": {
-        "_follow": {
-            /**
-             * フォローされました
-             */
-            "title": string;
-        };
-        "_receiveFollowRequest": {
-            /**
-             * フォローリクエストを受け取りました
-             */
-            "title": string;
-        };
-    };
-    "_plugin": {
-        /**
-         * プラグインの管理
-         */
-        "manage": string;
-    };
-    "_preferencesBackups": {
-        /**
-         * 作成したバックアップ
-         */
-        "list": string;
-        /**
-         * このデバイスに適用
-         */
-        "apply": string;
-        /**
-         * 上書き保存
-         */
-        "save": string;
-        /**
-         * バックアップ名「{name}」は既に存在します。違う名前を指定してください。
-         */
-        "nameAlreadyExists": ParameterizedString<"name">;
-        /**
-         * {name}に上書き保存しますか？
-         */
-        "saveConfirm": ParameterizedString<"name">;
-        /**
-         * {name}を削除しますか？
-         */
-        "deleteConfirm": ParameterizedString<"name">;
-        /**
-         * 作成日時: {date} {time}
-         */
-        "createdAt": ParameterizedString<"date" | "time">;
-        /**
-         * 更新日時: {date} {time}
-         */
-        "updatedAt": ParameterizedString<"date" | "time">;
-        /**
-         * 読み込みできません
-         */
-        "cannotLoad": string;
-    };
-    "_aboutMisskey": {
-        /**
-         * コントリビューター
-         */
-        "contributors": string;
-    };
-    "_menuDisplay": {
-        /**
-         * 上部
-         */
-        "top": string;
-        /**
-         * 隠す
-         */
-        "hide": string;
-    };
-    "_theme": {
-        /**
-         * ベース
-         */
-        "base": string;
-        /**
-         * 定数を追加
-         */
-        "addConstant": string;
-        /**
-         * 定数
-         */
-        "constant": string;
-        /**
-         * デフォルト値
-         */
-        "defaultValue": string;
-        /**
-         * プロパティを参照
-         */
-        "refProp": string;
-        /**
-         * 定数を参照
-         */
-        "refConst": string;
-        /**
-         * キー
-         */
-        "key": string;
-        /**
-         * 関数
-         */
-        "func": string;
-        /**
-         * 関数の種類
-         */
-        "funcKind": string;
-        /**
-         * 引数
-         */
-        "argument": string;
-        /**
-         * 元にするプロパティの名前
-         */
-        "basedProp": string;
-        /**
-         * 暗さ
-         */
-        "darken": string;
-        /**
-         * 定数名を入力してください
-         */
-        "inputConstantName": string;
-        /**
-         * ここにテーマコードを貼り付けて、エディターにインポートできます
-         */
-        "importInfo": string;
-        /**
-         * 定数 {const} を削除しても良いですか？
-         */
-        "deleteConstantConfirm": ParameterizedString<"const">;
-        "keys": {
-            /**
-             * アクセント
-             */
-            "accent": string;
-            /**
-             * 背景
-             */
-            "bg": string;
-            /**
-             * 文字
-             */
-            "fg": string;
-            /**
-             * フォーカス
-             */
-            "focus": string;
-            /**
-             * インジケーター
-             */
-            "indicator": string;
-            /**
-             * パネル
-             */
-            "panel": string;
-            /**
-             * 影
-             */
-            "shadow": string;
-            /**
-             * ナビゲーションバーの背景
-             */
-            "navBg": string;
-            /**
-             * ナビゲーションバーの文字
-             */
-            "navFg": string;
-            /**
-             * ナビゲーションバー文字(アクティブ)
-             */
-            "navActive": string;
-            /**
-             * ナビゲーションバーのインジケーター
-             */
-            "navIndicator": string;
-            /**
-             * リンク
-             */
-            "link": string;
-            /**
-             * ハッシュタグ
-             */
-            "hashtag": string;
-            /**
-             * メンション
-             */
-            "mention": string;
-            /**
-             * あなた宛てメンション
-             */
-            "mentionMe": string;
-            /**
-             * リノート
-             */
-            "renote": string;
-            /**
-             * モーダルの背景
-             */
-            "modalBg": string;
-            /**
-             * 分割線
-             */
-            "divider": string;
-            /**
-             * スクロールバーの取っ手
-             */
-            "scrollbarHandle": string;
-            /**
-             * スクロールバーの取っ手（ホバー)
-             */
-            "scrollbarHandleHover": string;
-            /**
-             * 日付ラベルの文字
-             */
-            "dateLabelFg": string;
-            /**
-             * 情報の背景
-             */
-            "infoBg": string;
-            /**
-             * 情報の文字
-             */
-            "infoFg": string;
-            /**
-             * 警告の背景
-             */
-            "infoWarnBg": string;
-            /**
-             * 警告の文字
-             */
-            "infoWarnFg": string;
-            /**
-             * 通知トーストの背景
-             */
-            "toastBg": string;
-            /**
-             * 通知トーストの文字
-             */
-            "toastFg": string;
-            /**
-             * ボタンの背景
-             */
-            "buttonBg": string;
-            /**
-             * ボタンの背景 (ホバー)
-             */
-            "buttonHoverBg": string;
-            /**
-             * 入力ボックスの縁取り
-             */
-            "inputBorder": string;
-            /**
-             * バッジ
-             */
-            "badge": string;
-            /**
-             * メッセージの背景
-             */
-            "messageBg": string;
-            /**
-             * 強調された文字
-             */
-            "fgHighlighted": string;
-        };
-    };
-    "_ago": {
-        /**
-         * 未来
-         */
-        "future": string;
-    };
-    "_permissions": {
-        /**
-         * MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）
-         */
-        "access:mcp": string;
-        /**
-         * アカウントの情報を見る
-         */
-        "read:account": string;
-        /**
-         * アカウントの情報を変更する
-         */
-        "write:account": string;
-        /**
-         * ブロックを見る
-         */
-        "read:blocks": string;
-        /**
-         * ブロックを操作する
-         */
-        "write:blocks": string;
-        /**
-         * ドライブを見る
-         */
-        "read:drive": string;
-        /**
-         * ドライブを操作する
-         */
-        "write:drive": string;
-        /**
-         * お気に入りを見る
-         */
-        "read:favorites": string;
-        /**
-         * お気に入りを操作する
-         */
-        "write:favorites": string;
-        /**
-         * フォローの情報を見る
-         */
-        "read:following": string;
-        /**
-         * フォロー・フォロー解除する
-         */
-        "write:following": string;
-        /**
-         * ダイレクトメッセージを見る
-         */
-        "read:messaging": string;
-        /**
-         * ダイレクトメッセージを操作する
-         */
-        "write:messaging": string;
-        /**
-         * ミュートを見る
-         */
-        "read:mutes": string;
-        /**
-         * ミュートを操作する
-         */
-        "write:mutes": string;
-        /**
-         * ノートを作成・削除する
-         */
-        "write:notes": string;
-        /**
-         * 通知を見る
-         */
-        "read:notifications": string;
-        /**
-         * 通知を操作する
-         */
-        "write:notifications": string;
-        /**
-         * リアクションを見る
-         */
-        "read:reactions": string;
-        /**
-         * リアクションを操作する
-         */
-        "write:reactions": string;
-        /**
-         * 投票する
-         */
-        "write:votes": string;
-        /**
-         * ページを見る
-         */
-        "read:pages": string;
-        /**
-         * ページを操作する
-         */
-        "write:pages": string;
-        /**
-         * ページのいいねを見る
-         */
-        "read:page-likes": string;
-        /**
-         * ページのいいねを操作する
-         */
-        "write:page-likes": string;
-        /**
-         * ユーザーグループを見る
-         */
-        "read:user-groups": string;
-        /**
-         * ユーザーグループを操作する
-         */
-        "write:user-groups": string;
-        /**
-         * チャンネルを見る
-         */
-        "read:channels": string;
-        /**
-         * チャンネルを操作する
-         */
-        "write:channels": string;
-        /**
-         * ギャラリーを見る
-         */
-        "read:gallery": string;
-        /**
-         * ギャラリーを操作する
-         */
-        "write:gallery": string;
-        /**
-         * ギャラリーのいいねを見る
-         */
-        "read:gallery-likes": string;
-        /**
-         * ギャラリーのいいねを操作する
-         */
-        "write:gallery-likes": string;
-        /**
-         * ユーザーアカウントを削除する
-         */
-        "write:admin:delete-account": string;
-        /**
-         * ロールを操作する
-         */
-        "write:admin:roles": string;
-        /**
-         * ロールを見る
-         */
-        "read:admin:roles": string;
-        /**
-         * ダイレクトメッセージを操作する
-         */
-        "write:chat": string;
-    };
-    "_profile": {
-        /**
-         * ユーザー名
-         */
-        "username": string;
-        /**
-         * 追加情報
-         */
-        "metadata": string;
-    };
-    "_charts": {
-        /**
-         * ファイルの合計
-         */
-        "filesTotal": string;
-    };
-    "_play": {
-        /**
-         * Playを作成しました
-         */
-        "created": string;
-        /**
-         * Playを更新しました
-         */
-        "updated": string;
-        /**
-         * Playを削除しました
-         */
-        "deleted": string;
-        /**
-         * Play設定
-         */
-        "pageSetting": string;
-    };
-    "_pages": {
-        /**
-         * ページの作成
-         */
-        "newPage": string;
-        /**
-         * ページの編集
-         */
-        "editPage": string;
-        /**
-         * ソースを表示中
-         */
-        "readPage": string;
-        /**
-         * ページ設定
-         */
-        "pageSetting": string;
-        /**
-         * 指定されたページURLは既に存在しています
-         */
-        "nameAlreadyExists": string;
-        /**
-         * 不正なページURLです
-         */
-        "invalidNameTitle": string;
-        /**
-         * 空白でないか確認してください
-         */
-        "invalidNameText": string;
-        /**
-         * このページを編集
-         */
-        "editThisPage": string;
-        /**
-         * ソースを表示
-         */
-        "viewSource": string;
-        /**
-         * ページを見る
-         */
-        "viewPage": string;
-        /**
-         * いいね
-         */
-        "like": string;
-        /**
-         * いいね解除
-         */
-        "unlike": string;
-        /**
-         * 自分のページ
-         */
-        "my": string;
-        /**
-         * いいねしたページ
-         */
-        "liked": string;
-        /**
-         * 人気
-         */
-        "featured": string;
-        /**
-         * インスペクター
-         */
-        "inspector": string;
-        /**
-         * コンテンツ
-         */
-        "contents": string;
-        /**
-         * ページブロック
-         */
-        "content": string;
-        /**
-         * 変数
-         */
-        "variables": string;
-        /**
-         * タイトル
-         */
-        "title": string;
-        /**
-         * ページURL
-         */
-        "url": string;
-        /**
-         * ページの要約
-         */
-        "summary": string;
-        /**
-         * 中央寄せ
-         */
-        "alignCenter": string;
-        /**
-         * ピン留めされているときにタイトルを非表示
-         */
-        "hideTitleWhenPinned": string;
-        /**
-         * フォント
-         */
-        "font": string;
-        /**
-         * セリフ
-         */
-        "fontSerif": string;
-        /**
-         * サンセリフ
-         */
-        "fontSansSerif": string;
-        /**
-         * アイキャッチ画像を設定
-         */
-        "eyeCatchingImageSet": string;
-        /**
-         * アイキャッチ画像を削除
-         */
-        "eyeCatchingImageRemove": string;
-        /**
-         * ブロックを追加
-         */
-        "chooseBlock": string;
-        /**
-         * 種類を選択
-         */
-        "selectType": string;
-        /**
-         * コンテンツ
-         */
-        "contentBlocks": string;
-        /**
-         * 入力
-         */
-        "inputBlocks": string;
-        /**
-         * 特殊
-         */
-        "specialBlocks": string;
-        "blocks": {
-            /**
-             * テキスト
-             */
-            "text": string;
-            /**
-             * テキストエリア
-             */
-            "textarea": string;
-            /**
-             * セクション
-             */
-            "section": string;
-            /**
-             * 画像
-             */
-            "image": string;
-            /**
-             * ボタン
-             */
-            "button": string;
-            /**
-             * ノート埋め込み
-             */
-            "note": string;
-            "_note": {
-                /**
-                 * ノートID
-                 */
-                "id": string;
-                /**
-                 * ノートURLをペーストして設定することもできます。
-                 */
-                "idDescription": string;
-                /**
-                 * 詳細な表示
-                 */
-                "detailed": string;
             };
         };
     };
     "_notification": {
-        /**
-         * ファイルがアップロードされました
-         */
-        "fileUploaded": string;
         /**
          * {name}からのメンション
          */
@@ -2237,10 +613,6 @@ export interface Locale extends ILocale {
          */
         "unreadAntennaNote": ParameterizedString<"name">;
         /**
-         * プッシュ通知の更新をしました
-         */
-        "emptyPushNotificationMessage": string;
-        /**
          * 実績を獲得
          */
         "achievementEarned": string;
@@ -2260,92 +632,6 @@ export interface Locale extends ILocale {
          * ログインがありました
          */
         "login": string;
-        "_types": {
-            /**
-             * すべて
-             */
-            "all": string;
-            /**
-             * ユーザーの新規投稿
-             */
-            "note": string;
-            /**
-             * フォロー
-             */
-            "follow": string;
-            /**
-             * メンション
-             */
-            "mention": string;
-            /**
-             * リプライ
-             */
-            "reply": string;
-            /**
-             * リノート
-             */
-            "renote": string;
-            /**
-             * 引用
-             */
-            "quote": string;
-            /**
-             * リアクション
-             */
-            "reaction": string;
-            /**
-             * アンケートが終了
-             */
-            "pollEnded": string;
-            /**
-             * 予約投稿が成功した
-             */
-            "scheduledNotePosted": string;
-            /**
-             * 予約投稿が失敗した
-             */
-            "scheduledNotePostFailed": string;
-            /**
-             * フォロー申請を受け取った
-             */
-            "receiveFollowRequest": string;
-            /**
-             * フォローが受理された
-             */
-            "followRequestAccepted": string;
-            /**
-             * ロールが付与された
-             */
-            "roleAssigned": string;
-            /**
-             * ダイレクトメッセージのグループへ招待された
-             */
-            "chatRoomInvitationReceived": string;
-            /**
-             * 実績の獲得
-             */
-            "achievementEarned": string;
-            /**
-             * エクスポートが完了した
-             */
-            "exportCompleted": string;
-            /**
-             * ログイン
-             */
-            "login": string;
-            /**
-             * アクセストークンの作成
-             */
-            "createToken": string;
-            /**
-             * 通知のテスト
-             */
-            "test": string;
-            /**
-             * 連携アプリからの通知
-             */
-            "app": string;
-        };
         "_actions": {
             /**
              * フォローバック
@@ -2361,68 +647,6 @@ export interface Locale extends ILocale {
             "renote": string;
         };
     };
-    "_moderationLogTypes": {
-        /**
-         * 凍結
-         */
-        "suspend": string;
-        /**
-         * ノートを削除
-         */
-        "deleteNote": string;
-        /**
-         * ユーザーのお知らせを削除
-         */
-        "deleteUserAnnouncement": string;
-        /**
-         * パスワードをリセット
-         */
-        "resetPassword": string;
-        /**
-         * 通報を解決
-         */
-        "resolveAbuseReport": string;
-        /**
-         * 招待コードを作成
-         */
-        "createInvitation": string;
-        /**
-         * ギャラリーの投稿を削除
-         */
-        "deleteGalleryPost": string;
-    };
-    "_fileViewer": {
-        /**
-         * URL
-         */
-        "url": string;
-    };
-    "_externalResourceInstaller": {
-        "_vendorInfo": {
-            /**
-             * 配布元情報
-             */
-            "title": string;
-        };
-        "_errors": {
-            "_themeInstallFailed": {
-                /**
-                 * テーマのインストールに失敗しました
-                 */
-                "title": string;
-                /**
-                 * テーマのインストール中に問題が発生しました。もう一度お試しください。エラーの詳細はJavascriptコンソールをご覧ください。
-                 */
-                "description": string;
-            };
-        };
-    };
-    "_reversi": {
-        /**
-         * リバーシ
-         */
-        "reversi": string;
-    };
     "_offlineScreen": {
         /**
          * オフライン - サーバーに接続できません
@@ -2433,122 +657,56 @@ export interface Locale extends ILocale {
          */
         "header": string;
     };
-    "_gridComponent": {
-        "_error": {
-            /**
-             * 正規表現によるバリデーションはtype:textのカラムのみサポートします。
-             */
-            "columnTypeNotSupport": string;
-        };
-    };
-    "_embedCodeGen": {
-        /**
-         * 自動で続きを読み込む（非推奨）
-         */
-        "autoload": string;
-    };
-    "_selfXssPrevention": {
-        /**
-         * 警告
-         */
-        "warning": string;
-        /**
-         * 「この画面に何か貼り付けろ」はすべて詐欺です。
-         */
-        "title": string;
-        /**
-         * ここに何かを貼り付けると、悪意のあるユーザーにアカウントを乗っ取られたり、個人情報を盗まれたりする可能性があります。
-         */
-        "description1": string;
-        /**
-         * 貼り付けようとしているものが何なのかを正確に理解していない場合は、%c今すぐ作業を中止してこのウィンドウを閉じてください。
-         */
-        "description2": string;
-        /**
-         * 詳しくはこちらをご確認ください。 {link}
-         */
-        "description3": ParameterizedString<"link">;
-    };
-    "_bootErrors": {
-        /**
-         * 読み込みに失敗しました
-         */
-        "title": string;
-        /**
-         * 少し待ってからリロードしてもまだ問題が解決されない場合、以下のError IDを添えてサーバー管理者に連絡してください。
-         */
-        "serverError": string;
-        /**
-         * 以下を行うと解決する可能性があります。
-         */
-        "solution": string;
-        /**
-         * ブラウザおよびOSを最新バージョンに更新する
-         */
-        "solution1": string;
-        /**
-         * アドブロッカーを無効にする
-         */
-        "solution2": string;
-        /**
-         * ブラウザのキャッシュをクリアする
-         */
-        "solution3": string;
-        /**
-         * (Tor Browser) dom.webaudio.enabledをtrueに設定する
-         */
-        "solution4": string;
-        /**
-         * その他のオプション
-         */
-        "otherOption": string;
-        /**
-         * クライアント設定とキャッシュを削除
-         */
-        "otherOption1": string;
-        /**
-         * 簡易クライアントを起動
-         */
-        "otherOption2": string;
-        /**
-         * 修復ツールを起動
-         */
-        "otherOption3": string;
-        /**
-         * Misskeyをセーフモードで起動
-         */
-        "otherOption4": string;
-    };
-    "_watermarkEditor": {
-        /**
-         * 高度
-         */
-        "advanced": string;
-    };
-    "_imageEffector": {
-        "_fxProps": {
-            /**
-             * 半径
-             */
-            "radius": string;
-            /**
-             * サンプル数
-             */
-            "samples": string;
-            /**
-             * しきい値
-             */
-            "threshold": string;
-        };
-    };
-    "_drafts": {
-        /**
-         * 下書きを選択
-         */
-        "select": string;
-        /**
-         * 投稿予約
-         */
-        "schedule": string;
-    };
+    /**
+     * 次
+     */
+    "next": string;
+    /**
+     * アップロード
+     */
+    "upload": string;
+    /**
+     * プレビュー
+     */
+    "preview": string;
+    /**
+     * リセット
+     */
+    "reset": string;
+    /**
+     * 名前
+     */
+    "name": string;
+    /**
+     * タイトル
+     */
+    "title": string;
+    /**
+     * 説明
+     */
+    "description": string;
+    /**
+     * なし
+     */
+    "none": string;
+    /**
+     * 全て
+     */
+    "all": string;
+    /**
+     * デフォルト
+     */
+    "default": string;
+    /**
+     * エラー
+     */
+    "error": string;
+    /**
+     * ユーザー
+     */
+    "users": string;
+    /**
+     * よろしいですか？
+     */
+    "areYouSure": string;
 }

@@ -1,162 +1,43 @@
----
-_lang_: "Nederlands"
-monthAndDay: "{day} {month}"
-search: "Zoeken"
-ok: "Ok"
-cancel: "Annuleren"
-notificationSettings: "Notificatie instellingen"
-uploading: "Bezig met uploaden"
-save: "Opslaan"
-favorites: "Toevoegen aan favorieten"
-favorited: "Toegevoegd aan favorieten."
-alreadyFavorited: "Al toegevoegd aan favorieten"
-delete: "Verwijderen"
-searchUser: "Zoeken een gebruiker"
-showLess: "Sluiten"
-lists: "Lijsten"
-notes: "Notities"
-following: "Volgend"
-somethingHappened: "Er is iets misgegaan."
-pinned: "Vastmaken aan profielpagina"
-emojiPicker: "Emoji kiezer"
-unsuspend: "Heractiveren"
-customEmojis: "Eigen emoji"
-emojis: "Emoji"
-emojiName: "Naam emoji"
-loginFailed: "Aanmelding mislukt."
-wallpaper: "Achtergrond"
-instances: "Server"
-latestStatus: "Laatste status"
-operations: "Verwerkingen"
-monitor: "Monitor"
-network: "Netwerk"
-disk: "Schijfruimte"
-mutedUsers: "Gedempte gebruikers"
-blockedUsers: "Geblokkeerde gebruikers"
-changePassword: "Wachtwoord wijzigen"
-retypedNotMatch: "Invoer komt niet overeen"
-currentPassword: "Huidig wachtwoord"
-newPasswordRetype: "Nieuw wachtwoord (herhalen)"
-removed: "Succesvol verwijderd"
-home: "Startpagina"
-reload: "Verversen"
-watch: "Volgen"
-unwatch: "Niet meer volgen"
-accept: "Accepteren"
-reject: "Weigeren"
-integration: "Integraties"
-pinnedPages: "Vastgeprikte pagina's"
-pinnedClipId: "ID van de clip die moet worden vastgepind"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Inschakelen hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "mCaptcha activeren"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Inschakelen reCAPTCHA"
-turnstile: "Tourniquet"
-enableTurnstile: "Inschakelen tourniquet"
-antennas: "Antennes"
-close: "Sluiten"
-invites: "Uitnodigen"
-transfer: "Overdracht"
-signinFailed: "Inloggen mislukt. Controleer gebruikersnaam en wachtwoord."
-noHistory: "Geen geschiedenis gevonden"
-signinHistory: "Inloggeschiedenis"
-regenerate: "Regenereer"
-appearance: "Weergave"
-promotion: "Promotie"
-promote: "Promoot"
-hideThisNote: "Verberg deze notitie"
-showFeaturedNotesInTimeline: "Laat featured notities in tijdlijn zien"
-deleteAll: "Alles verwijderen"
-showFixedPostForm: "Het postingformulier bovenaan de tijdbalk weergeven"
-deleteAllFiles: "Alle bestanden verwijderen"
-leaveConfirm: "Er zijn niet-opgeslagen wijzigingen. Wil je ze verwijderen?"
-notificationType: "Type melding"
-edit: "Bewerken"
-emailServer: "Email-Server"
-enableEmail: "Email distributie inschakelen"
-emailConfigInfo: "Wordt gebruikt om je email te bevestigen tijdens het aanmelden of als je je wachtwoord bent vergeten"
-emailAddress: "Email adres"
-smtpConfig: "SMTP-server configuratie"
-smtpHost: "Server"
-smtpPort: "Poort"
-smtpUser: "Gebruikersnaam"
-smtpPass: "Wachtwoord"
-emptyToDisableSmtpAuth: "Laat gebruikersnaam en wachtwoord leeg om SMTP-authenticatie uit te schakelen."
-smtpSecure: "Impliciet SSL/TLS gebruiken voor SMTP-verbindingen"
-smtpSecureInfo: "Schakel dit uit bij gebruik van STARTTLS"
-testEmail: "Emailversand testen"
-copy: "Kopiëren"
-metrics: "Metrieken"
-delayed: "Vertraagd"
-regenerateLoginToken: "Login token opnieuw genereren"
-regenerateLoginTokenDescription: "Regenereren van het token dat intern wordt gebruikt om in te loggen. Dit is normaal gezien niet nodig. Alle apparaten worden afgemeld tijdens het regenereren."
-sample: "Voorbeeld"
-repliesCount: "Aantal verzonden replies"
-repliedCount: "Aantal ontvangen replies"
-followingCount: "Aantal gevolgde accounts"
-followersCount: "Aantal volgers"
-pollVotesCount: "Aantal verzonden peiling stemmen"
-driveUsage: "Schijfruimtegebruik"
-clips: "Clips"
-experimental: "Experimentele"
-wide: "Breed"
-narrow: "Smal"
-sendErrorReports: "Foutrapporten sturen"
-sendErrorReportsDescription: "Als u deze optie inschakelt, wordt gedetailleerde foutinformatie met Misskey gedeeld wanneer zich een probleem voordoet. Dit helpt de kwaliteit van Misskey te verbeteren.\nDit omvat informatie zoals de versie van uw OS, welke browser u gebruikt, uw activiteit in Misskey, enz."
-advanced: "Geavanceerd"
-markAllAsRead: "Alles als gelezen markeren"
-onlineStatus: "Online status"
-global: "Globaal"
-sent: "Verzonden"
-received: "Ontvangen"
-aiChanMode: "Ai Mode"
-unread: "Ongelezen"
-classic: "Classic"
-incorrectTotp: "Het eenmalige wachtwoord is incorrect of verlopen"
-_chat:
-  invitations: "Uitnodigen"
-  noHistory: "Geen geschiedenis gevonden"
-  members: "Leden"
-  home: "Startpagina"
-  send: "Stuur"
-_role:
-  priority: "Prioriteit"
-  _priority:
-    low: "Lage"
-    middle: "Medium"
-    high: "Hoge"
-_ffVisibility:
-  public: "Publiceren"
-_email:
-  _follow:
-    title: "volgde jou"
-_theme:
-  keys:
-    mention: "Vermelding"
-    renote: "Herdelen"
-    divider: "Scheider"
-_profile:
-  username: "Gebruikersnaam"
-_pages:
-  blocks:
-    image: "Afbeeldingen"
+_lang_: 'Nederlands'
+search: 'Zoeken'
+ok: 'Ok'
+cancel: 'Annuleren'
+notificationSettings: 'Notificatie instellingen'
+save: 'Opslaan'
+favorites: 'Toevoegen aan favorieten'
+delete: 'Verwijderen'
+lists: 'Lijsten'
+notes: 'Notities'
+following: 'Volgend'
+somethingHappened: 'Er is iets misgegaan.'
+customEmojis: 'Eigen emoji'
+mutedUsers: 'Gedempte gebruikers'
+blockedUsers: 'Geblokkeerde gebruikers'
+reload: 'Verversen'
+accept: 'Accepteren'
+reject: 'Weigeren'
+antennas: 'Antennes'
+close: 'Sluiten'
+edit: 'Bewerken'
+copy: 'Kopiëren'
+clips: 'Clips'
+markAllAsRead: 'Alles als gelezen markeren'
 _notification:
-  youWereFollowed: "volgde jou"
-  unreadAntennaNote: "Antenne {name}"
-  _types:
-    follow: "Volgend"
-    mention: "Vermelding"
-    renote: "Herdelen"
-    quote: "Quote"
-    reaction: "Reacties"
-    login: "Inloggen"
+  youWereFollowed: 'volgde jou'
+  unreadAntennaNote: 'Antenne {name}'
   _actions:
-    reply: "Antwoord"
-    renote: "Herdelen"
-_moderationLogTypes:
-  suspend: "Opschorten"
-  resetPassword: "Wachtwoord terugzetten"
-_watermarkEditor:
-  advanced: "Geavanceerd"
+    reply: 'Antwoord'
+    renote: 'Herdelen'
+next: 'Volgende'
+upload: 'Uploaden'
+preview: 'Voorbeeld'
+reset: 'Herstellen'
+name: 'Naam'
+title: 'Titel'
+description: 'Beschrijving'
+none: 'Niets'
+all: 'Alle'
+default: 'Standaard'
+error: 'Fout'
+users: 'Gebruikers'
+areYouSure: 'Weet je het zeker?'

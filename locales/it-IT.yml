@@ -1,704 +1,218 @@
----
-_lang_: "Italiano"
-monthAndDay: "{day}/{month}"
-search: "Cerca"
-ok: "OK"
-cancel: "Annulla"
-notificationSettings: "Preferenze di notifica"
-uploading: "Caricamento..."
-save: "Salva"
-favorites: "Preferiti"
-favorited: "Aggiunta ai tuoi preferiti."
-alreadyFavorited: "Già tra i tuoi preferiti."
-delete: "Elimina"
-searchUser: "Cerca profilo"
-showLess: "Comprimi"
-lists: "Liste"
-notes: "Note"
-following: "Following"
-somethingHappened: "Si è verificato un problema"
-pinned: "Fissa sul profilo"
-emojiPicker: "Selettore emoji"
-unsuspend: "Revoca la sospensione"
-customEmojis: "Emoji personalizzate"
-emojis: "Emoji"
-emojiName: "Nome dell'emoji"
-loginFailed: "Accesso non riuscito"
-wallpaper: "Sfondo"
-instances: "Istanza"
-latestStatus: "Ultimo stato"
-operations: "Operazioni"
-monitor: "Monitorare"
-network: "Rete"
-disk: "Disco"
-mutedUsers: "Profili silenziati"
-blockedUsers: "Profili bloccati"
-changePassword: "Aggiorna Password"
-retypedNotMatch: "Le password non corrispondono."
-currentPassword: "Password attuale"
-newPasswordRetype: "Conferma password"
-removed: "Eliminato con successo"
-home: "Home"
-reload: "Ricarica"
-watch: "Osserva"
-unwatch: "Smetti di Osserva"
-accept: "Accetta"
-reject: "Rifiuta"
-integration: "App collegate"
-pinnedPages: "Pagine in evidenza"
-pinnedClipId: "ID della Clip in evidenza"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Abilita hCaptcha"
-mcaptcha: "mCaptcha"
-enableMcaptcha: "Abilita hCaptcha"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Abilita reCAPTCHA"
-turnstile: "Accesso"
-enableTurnstile: "Abilita l'accesso"
-antennas: "Antenne"
-close: "Chiudi"
-invites: "Inviti"
-transfer: "Trasferisci"
-signinFailed: "Autenticazione non riuscita. Controlla la tua password e nome utente."
-noHistory: "Nessuna cronologia"
-signinHistory: "Storico degli accessi al profilo"
-regenerate: "Generare di nuovo"
-appearance: "Aspetto"
-promotion: "Promossa"
-promote: "Pubblicizza"
-hideThisNote: "Nasconda la nota"
-showFeaturedNotesInTimeline: "Mostrare le note di tendenza nella tua timeline"
-deleteAll: "Cancella cronologia"
-showFixedPostForm: "Visualizzare la finestra di pubblicazione in cima alla timeline"
-deleteAllFiles: "Elimina tutti i file"
-leaveConfirm: "Ci sono delle modifiche ancora non salvate. Vuoi cancellarle?"
-notificationType: "Tipo di notifiche"
-edit: "Modifica"
-emailServer: "Server email"
-enableEmail: "Abilita consegna email"
-emailConfigInfo: "Utilizzato per verificare il tuo indirizzo di posta elettronica e per ripristinare la password"
-emailAddress: "Indirizzo di posta elettronica"
-smtpConfig: "Impostazioni del server SMTP"
-smtpHost: "Host SMTP"
-smtpPort: "Porta"
-smtpUser: "Nome utente"
-smtpPass: "Password"
-emptyToDisableSmtpAuth: "Lasciare i campi vuoti se non c'è autenticazione SMTP"
-smtpSecure: "Usare SSL/TLS implicito per le connessioni SMTP"
-smtpSecureInfo: "Disabilitare quando è attivo STARTTLS."
-testEmail: "Verifica il funzionamento"
-copy: "Copia"
-metrics: "Statistiche"
-delayed: "Ritardo"
-regenerateLoginToken: "Genera di nuovo un token di connessione"
-regenerateLoginTokenDescription: "Genera un nuovo token di autenticazione. Solitamente questa operazione non è necessaria: quando si genera un nuovo token, tutti i dispositivi vanno disconnessi."
-sample: "Esempio"
-repliesCount: "Quantità di risposte"
-repliedCount: "Quantità di risposte"
-followingCount: "Quantità di Following"
-followersCount: "Quantità di Follower"
-pollVotesCount: "Quantità di voti"
-driveUsage: "Utilizzazione del Drive"
-clips: "Clip"
-experimental: "Sperimentale"
-wide: "Largo"
-narrow: "Stretto"
-sendErrorReports: "Invia segnalazioni di errori"
-sendErrorReportsDescription: "Quando abilitato, se si verifica un problema, informazioni dettagliate sugli errori verranno condivise con Misskey in modo da aiutare a migliorare la qualità del software.\nCiò include informazioni come la versione del sistema operativo, il tipo di navigatore web che usi, la cronologia delle attività, ecc."
-advanced: "Avanzato"
-markAllAsRead: "Segna tutti come già letti"
-onlineStatus: "Stato di connessione"
-global: "Federata"
-sent: "Inviato"
-received: "Ricevuto"
-aiChanMode: "Modalità Ai"
-unread: "Non lette"
-classic: "Classico"
-incorrectTotp: "Il codice OTP è sbagliato, oppure scaduto."
-rateLimitExceeded: "Superato il limite di richieste."
-recommended: "Consigliato"
-undefined: "Indefinito"
-videos: "Video"
-reactionsList: "Chi ha reagito?"
-createWithOptions: "Genera con opzioni"
-edited: "Modificato"
-replay: "Replay"
-genEmbedCode: "Ottieni il codice per incorporare"
-unknownWebAuthnKey: "Questa è una passkey sconosciuta."
-draft: "Bozza"
-untitled: "Senza titolo"
-chat: "Chat"
-defaultImageCompressionLevel: "Livello predefinito di compressione immagini"
-_chat:
-  invitations: "Inviti"
-  noHistory: "Nessuna cronologia"
-  members: "Membri"
-  home: "Home"
-  send: "Inviare"
-  cannotChatWithTheUser: "Impossibile chattare con questa persona"
-  cannotChatWithTheUser_description: "La chat potrebbe non essere disponibile, oppure l'altra persona potrebbe non esserlo."
-_settings:
-  showUrlPreview: "Mostra anteprima dell'URL"
-_initialTutorial:
-  launchTutorial: "Inizia il tutorial"
-  title: "Tutorial"
-  skipAreYouSure: "Vuoi davvero interrompere il tutorial?"
-  _landing:
-    title: "Eccoci nel tutorial"
-  _note:
-    reply: "Puoi rispondere alle Note, alle altre risposte e dialogare in conversazioni."
-    menu: "Per altre attività, ad esempio, vedere i dettagli delle Note o copiare i collegamenti."
-  _reaction:
-    title: "Cosa sono le Reazioni?"
-  _timeline:
-    social: "sia le Note della Timeline Home che quelle della Timeline Locale, insieme!"
-  _postNote:
-    _visibility:
-      localOnly: "Indipendentemente dalla visualizzazione sopra indicata, i profili su altri server non saranno in grado di visualizzare la Nota, se questa impostazione è attivata. Non non verrà comunicata ad altri server."
-    _cw:
-      description: "Verrà visualizzato il testo scritto nel campo \"Annotazione preventiva\" al posto del testo principale della Nota. Premere il bottone \"Continua la lettura\" se si intende davvero leggere il testo."
-      useCases: "Utilizzalo per chiarire il contenuto della Nota, prima che sia letta. Come richiesto dal regolamento del server o per autoregolamentare spoiler e testi troppo espliciti."
-  _done:
-    title: "Il tutorial è finito! 🎉"
+_lang_: 'Italiano'
+search: 'Cerca'
+ok: 'OK'
+cancel: 'Annulla'
+notificationSettings: 'Preferenze di notifica'
+save: 'Salva'
+favorites: 'Preferiti'
+delete: 'Elimina'
+lists: 'Liste'
+notes: 'Note'
+following: 'Following'
+somethingHappened: 'Si è verificato un problema'
+customEmojis: 'Emoji personalizzate'
+mutedUsers: 'Profili silenziati'
+blockedUsers: 'Profili bloccati'
+reload: 'Ricarica'
+accept: 'Accetta'
+reject: 'Rifiuta'
+antennas: 'Antenne'
+close: 'Chiudi'
+edit: 'Modifica'
+copy: 'Copia'
+clips: 'Clip'
+markAllAsRead: 'Segna tutti come già letti'
 _achievements:
   _types:
     _notes1:
-      title: "Hai iniziato a usare Misskey"
-      description: "Hai pubblicato la prima Nota"
-      flavor: "Goditi la vita su Misskey!"
+      title: 'Hai iniziato a usare Misskey'
     _notes10:
-      title: "Alcune Note"
-      description: "Hai inserito 10 Note"
+      title: 'Alcune Note'
     _notes100:
-      title: "Un po' di Note"
-      description: "Hai inserito 100 Note"
+      title: 'Un po'' di Note'
     _notes500:
-      title: "Un bel po' di Note"
-      description: "Hai inserito 500 Note"
+      title: 'Un bel po'' di Note'
     _notes1000:
-      title: "Una montagna di Note"
-      description: "Hai inserito 1.000 Note"
+      title: 'Una montagna di Note'
     _notes5000:
-      title: "Un sovraccarico di Note!"
-      description: "Hai inserito 5.000 Note"
+      title: 'Un sovraccarico di Note!'
     _notes10000:
-      title: "SuperNote!"
-      description: "Hai inserito 10.000 Note"
+      title: 'SuperNote!'
     _notes20000:
-      title: "Voglio più... Note!"
-      description: "Hai inserito 20.000 Note"
+      title: 'Voglio più... Note!'
     _notes30000:
-      title: "Note, Note, Note!"
-      description: "Hai inserito 30.000 Note"
+      title: 'Note, Note, Note!'
     _notes40000:
-      title: "Una fabbrica di Note"
-      description: "Hai inserito 40.000 Note"
+      title: 'Una fabbrica di Note'
     _notes50000:
-      title: "Un pianeta di Note"
-      description: "Hai inserito 50.000 Note"
+      title: 'Un pianeta di Note'
     _notes60000:
-      title: "Un quasar di Note"
-      description: "Hai inserito 60.000 Note"
+      title: 'Un quasar di Note'
     _notes70000:
-      title: "Un buco nero supermassiccio di Note"
-      description: "Hai inserito 70.000 Note"
+      title: 'Un buco nero supermassiccio di Note'
     _notes80000:
-      title: "Una galassia di Note"
-      description: "Hai inserito 80.000 Note"
+      title: 'Una galassia di Note'
     _notes90000:
-      title: "Un universo di Note!"
-      description: "Hai inserito 90.000 Note"
+      title: 'Un universo di Note!'
     _notes100000:
-      title: "ALL YOUR NOTE ARE BELONG TO US"
-      description: "Hai inserito 100.000 Note"
-      flavor: "Hai molto da scrivere?"
+      title: 'ALL YOUR NOTE ARE BELONG TO US'
     _login3:
-      title: "Principiante I"
-      description: "Hai totalizzato 3 accessi!"
-      flavor: "Da oggi, chiamatemi Misskist"
+      title: 'Principiante I'
     _login7:
-      title: "Principiante II"
-      description: "Hai totalizzato 7 accessi!"
-      flavor: "Ti sembra di avere la situazione sotto controllo?"
+      title: 'Principiante II'
     _login15:
-      title: "Principiante III"
-      description: "Hai totalizzato 15 accessi!"
+      title: 'Principiante III'
     _login30:
-      title: "Missalcolista I"
-      description: "Hai totalizzato 30 accessi!"
+      title: 'Missalcolista I'
     _login60:
-      title: "Missalcolista II"
-      description: "Hai totalizzato 60 accessi!"
+      title: 'Missalcolista II'
     _login100:
-      title: "Missalcolista III"
-      description: "Hai totalizzato 100 accessi!"
-      flavor: "Violent Misskeist"
+      title: 'Missalcolista III'
     _login200:
-      title: "Regolare I livello"
-      description: "Hai totalizzato 200 accessi!"
+      title: 'Regolare I livello'
     _login300:
-      title: "Regolare II livello"
-      description: "Hai totalizzato 300 accessi!"
+      title: 'Regolare II livello'
     _login400:
-      title: "Regolare III livello"
-      description: "Hai totalizzato 400 accessi!"
+      title: 'Regolare III livello'
     _login500:
-      title: "Professionista I livello"
-      description: "Hai totalizzato 500 accessi!"
-      flavor: "Amici cari, mi piacciono le Note"
+      title: 'Professionista I livello'
     _login600:
-      title: "Professionista II livello"
-      description: "Hai totalizzato 600 accessi!"
+      title: 'Professionista II livello'
     _login700:
-      title: "Professionista III livello"
-      description: "Hai totalizzato 700 accessi!"
+      title: 'Professionista III livello'
     _login800:
-      title: "Maestro di Note I livello"
-      description: "Hai totalizzato 800 accessi!"
+      title: 'Maestro di Note I livello'
     _login900:
-      title: "Maestro di Note II livello"
-      description: "Hai totalizzato 900 accessi!"
+      title: 'Maestro di Note II livello'
     _login1000:
-      title: "Maestro di Note III livello"
-      description: "Hai totalizzato 1000 accessi!"
-      flavor: "Grazie per aver usato Misskey!"
+      title: 'Maestro di Note III livello'
     _noteClipped1:
-      title: "Devo clippare!"
-      description: "Hai raccolto la tua prima Nota in una Clip"
+      title: 'Devo clippare!'
     _noteFavorited1:
-      title: "Guarda le stelle"
-      description: "Aggiungi una Nota ai preferiti per la prima volta"
+      title: 'Guarda le stelle'
     _myNoteFavorited1:
-      title: "Fornitura stelline"
-      description: "Qualcuno ha preferito una delle tue Note"
+      title: 'Fornitura stelline'
     _profileFilled:
-      title: "Preparazione perfetta!"
-      description: "Imposta il tuo profilo"
+      title: 'Preparazione perfetta!'
     _markedAsCat:
-      title: "Io sono un gatto"
-      description: "Aggiungi le orecchie da gatto al tuo profilo"
-      flavor: "Ti chiamerò..."
+      title: 'Io sono un gatto'
     _following1:
-      title: "Il mio primo Follow"
-      description: "Hai seguito il tuo primo profilo"
+      title: 'Il mio primo Follow'
     _following10:
-      title: "Segui, segui!"
-      description: "Hai seguito 10 profili"
+      title: 'Segui, segui!'
     _following50:
-      title: "Tanti amici"
-      description: "Hai seguito 50 profili"
+      title: 'Tanti amici'
     _following100:
-      title: "Cento amici"
-      description: "Hai seguito 100 profili"
+      title: 'Cento amici'
     _following300:
-      title: "Sovraccarico di amici"
-      description: "Hai seguito 300 profili"
+      title: 'Sovraccarico di amici'
     _followers1:
-      title: "Il primo profilo tuo Follower"
-      description: "Hai ottenuto il tuo primo profilo Follower"
+      title: 'Il primo profilo tuo Follower'
     _followers10:
-      title: "Follow me!"
-      description: "Hai ottenuto 10 profili Follower"
+      title: 'Follow me!'
     _followers50:
-      title: "Un gregge di Follower"
-      description: "Hai ottenuto 50 Follower"
+      title: 'Un gregge di Follower'
     _followers100:
-      title: "Popolare"
-      description: "Hai ottenuto 100 profili Follower"
+      title: 'Popolare'
     _followers300:
-      title: "Mettetevi in fila"
-      description: "Hai ottenuto 300 Follower"
+      title: 'Mettetevi in fila'
     _followers500:
-      title: "Trasmettitore"
-      description: "Hai ottenuto 500 Follower"
+      title: 'Trasmettitore'
     _followers1000:
-      title: "Influenzer"
-      description: "Hai superato i 1.000 profili Follower"
+      title: 'Influenzer'
     _collectAchievements30:
-      title: "Collezionista di successi"
-      description: "Hai raggiunto 30 conquiste"
+      title: 'Collezionista di successi'
     _viewAchievements3min:
-      title: "Mi piacciono i risultati"
-      description: "Ammira la tua collezione di conquiste per almeno 3 minuti"
+      title: 'Mi piacciono i risultati'
     _iLoveMisskey:
-      title: "I LOVE Misskey"
-      description: "Pubblica «I ♥ #Misskey»"
-      flavor: "Grazie per aver utilizzato Misskey! Dal team di sviluppo"
+      title: 'I LOVE Misskey'
     _foundTreasure:
-      title: "Caccia al tesoro"
-      description: "Hai trovato un tesoro nascosto"
+      title: 'Caccia al tesoro'
     _client30min:
-      title: "Piccola grande pausa"
-      description: "Hai passato più di 30 minuti su Misskey"
+      title: 'Piccola grande pausa'
     _client60min:
-      title: "Misskey negli occhi"
-      description: "Hai letto Misskey almeno per un'ora"
+      title: 'Misskey negli occhi'
     _noteDeletedWithin1min:
-      title: "Ooops!"
-      description: "Hai eliminato una nota entro un minuto dalla sua pubblicazione"
+      title: 'Ooops!'
     _postedAtLateNight:
-      title: "Biassanot!"
-      description: "Hai pubblicato una nota in tarda notte"
-      flavor: "Andiamo a dormire presto"
+      title: 'Biassanot!'
     _postedAt0min0sec:
-      title: "Mezzanotte"
-      description: "Hai pubblicato una Nota a mezzanotte in punto"
-      flavor: "tic, tac, tic, tac! Gong!"
+      title: 'Mezzanotte'
     _selfQuote:
-      title: "Autoreferenziale"
-      description: "Hai citato una delle tue Note"
+      title: 'Autoreferenziale'
     _htl20npm:
-      title: "Timeline scorrevole"
-      description: "La tua Timeline personale ha superato la velocità di 20 Note orarie (Note al minuto)"
+      title: 'Timeline scorrevole'
     _viewInstanceChart:
-      title: "Analista"
-      description: "Visualizza i grafici dell'istanza"
+      title: 'Analista'
     _outputHelloWorldOnScratchpad:
-      title: "Hello, world!"
-      description: "Hai scritto «Hello world» nel blocco appunti"
+      title: 'Hello, world!'
     _open3windows:
-      title: "Apri le finestre!"
-      description: "Hai aperto almeno 3 finestre contemporaneamente"
+      title: 'Apri le finestre!'
     _driveFolderCircularReference:
-      title: "Riferimento circolare"
-      description: "Hai provato a nidificare in modo ricorsivo le cartelle del Drive"
+      title: 'Riferimento circolare'
     _reactWithoutRead:
-      title: "Hai letto bene?"
-      description: "Hai reagito ad una Nota più lunga di 100 caratteri entro 3 secondi dalla sua pubblicazione"
+      title: 'Hai letto bene?'
     _clickedClickHere:
-      title: "Clicca qui"
-      description: "Hai cliccato qui"
+      title: 'Clicca qui'
     _justPlainLucky:
-      title: "Proprio fortunato"
-      description: "Ottenuto con una probabilità dello 0,01% ogni 10 secondi"
+      title: 'Proprio fortunato'
     _setNameToSyuilo:
-      title: "Complesso divino"
-      description: "Hai impostati il tuo nome in «syuilo»"
+      title: 'Complesso divino'
     _passedSinceAccountCreated1:
-      title: "Primo Anniversario"
-      description: "È passato un anno da quando hai creato il profilo"
+      title: 'Primo Anniversario'
     _passedSinceAccountCreated2:
-      title: "Secondo Anniversario"
-      description: "Sono passati due anni da quando hai creato il profilo"
+      title: 'Secondo Anniversario'
     _passedSinceAccountCreated3:
-      title: "Terzo Anniversario"
-      description: "Sono passati tre anni da quando hai creato il profilo"
+      title: 'Terzo Anniversario'
     _loggedInOnBirthday:
-      title: "Buon compleanno!"
-      description: "Hai effettuato l'accesso il giorno del tuo compleanno"
+      title: 'Buon compleanno!'
     _loggedInOnNewYearsDay:
-      title: "Buon anno nuovo!"
-      description: "Hai usato effettuato l'accesso il giorno di capodanno"
-      flavor: "Anche quest'anno, grazie per il tuo continuo supporto a questa istanza"
+      title: 'Buon anno nuovo!'
     _cookieClicked:
-      title: "Clicca il biscotto"
-      description: "Hai giocato a cliccare il cookie"
-      flavor: "È il sito giusto?"
+      title: 'Clicca il biscotto'
     _brainDiver:
-      title: "Brain Diver"
-      description: "Pubblica un link a Brain Diver"
-      flavor: "Sulle note di Brain Diver"
+      title: 'Brain Diver'
     _smashTestNotificationButton:
-      title: "Prove eccessive"
-      description: "Hai provato le notifiche consecutivamente in un periodo di tempo molto breve"
+      title: 'Prove eccessive'
     _tutorialCompleted:
-      title: "Attestato di partecipazione al corso per principianti di Misskey"
-      description: "Ha completato il tutorial"
+      title: 'Attestato di partecipazione al corso per principianti di Misskey'
     _bubbleGameExplodingHead:
-      title: "🤯"
-      description: "Estrai l'oggetto più grande dal Bubble Game"
+      title: '🤯'
     _bubbleGameDoubleExplodingHead:
-      title: "Doppio 🤯"
-      description: "Due oggetti più grossi contemporaneamente nel Bubble Game"
-      flavor: "Ha le dimensioni di una bento-box 🤯 🤯"
-_role:
-  edit: "Modifica ruolo"
-  assignTarget: "Modalità di assegnazione del ruolo"
-  options: "Opzioni del ruolo"
-  displayOrder: "Ordine di visualizzazione"
-  priority: "Priorità"
-  _priority:
-    low: "Bassa"
-    middle: "Medio"
-    high: "Alta"
-  _options:
-    canManageCustomEmojis: "Gestire le emoji personalizzate"
-    canManageAvatarDecorations: "Gestisce le decorazioni di immagini del profilo"
-    canHideAds: "Nascondere i banner"
-  _condition:
-    isRemote: "Profilo remoto"
-    isCat: "È un gattino"
-    isBot: "È un bot"
-_ffVisibility:
-  public: "Pubblica"
-  followers: "Mostra solo ai follower"
-  private: "Invisibile"
-_ad:
-  hide: "Nascondi"
-_email:
-  _follow:
-    title: "Follower aggiuntivo"
-  _receiveFollowRequest:
-    title: "Hai ricevuto una richiesta di follow"
-_plugin:
-  manage: "Gestisci estensioni"
-_preferencesBackups:
-  list: "Elenco di impostazioni salvate in precedenza"
-  apply: "Applica a questo dispositivo"
-  save: "Sovrascrivi il backup"
-  nameAlreadyExists: "Il nome del backup \"{name}\" esiste già. Si prega di specificare un nome diverso."
-  saveConfirm: "Si vuole sovrascrivere {name}?"
-  deleteConfirm: "Vuoi davvero eliminare \"{name}\"?"
-  createdAt: "Data di creazione: {date} {time}"
-  updatedAt: "Data di aggiornamento: {date} {time}"
-  cannotLoad: "Impossibile da caricare."
-_aboutMisskey:
-  contributors: "Principali sostenitori"
-_menuDisplay:
-  top: "In alto"
-  hide: "Nascondere"
-_theme:
-  base: "Base"
-  addConstant: "Aggiungi costante"
-  constant: "Costante"
-  defaultValue: "Valore predefinito"
-  refProp: "Vedi proprietà"
-  refConst: "Chiama costante"
-  key: "Chiave"
-  func: "Funzione"
-  funcKind: "Tipo di funzione"
-  argument: "Argomento"
-  basedProp: "Nome della proprietà da cui si origina"
-  darken: "Scuro"
-  inputConstantName: "Inserisci un nome per la costante"
-  importInfo: "È possibile incollare il codice del tema qui e importarlo nel proprio editor"
-  deleteConstantConfirm: "Vuoi davvero eliminare la costante {const}?"
-  keys:
-    accent: "accento"
-    bg: "Sfondo"
-    fg: "Testo"
-    focus: "Focalizzazione"
-    indicator: "Indicatore"
-    panel: "Pannello"
-    shadow: "Ombra"
-    navBg: "Sfondo della barra laterale"
-    navFg: "Testo della barra laterale"
-    navActive: "Testo della barra laterale (attivo)"
-    navIndicator: "Indicatore di barra laterale"
-    link: "Link"
-    hashtag: "Hashtag"
-    mention: "Menzioni"
-    mentionMe: "Menzioni (di me)"
-    renote: "Rinota"
-    modalBg: "Sfondo modale."
-    divider: "Interruzione di linea"
-    scrollbarHandle: "Maniglie della barra di scorrimento"
-    scrollbarHandleHover: "Maniglia della barra di scorrimento (hover)"
-    dateLabelFg: "Testo dell'etichetta della data"
-    infoBg: "Sfondo informazioni"
-    infoFg: "Testo di informazioni"
-    infoWarnBg: "Sfondo degli avvisi"
-    infoWarnFg: "Testo di avviso"
-    toastBg: "Sfondo di notifica a comparsa"
-    toastFg: "Testo di notifica a comparsa"
-    buttonBg: "Sfondo del pulsante"
-    buttonHoverBg: "Sfondo del pulsante (sorvolato)"
-    inputBorder: "Inquadra casella di testo"
-    badge: "Distintivo"
-    messageBg: "Sfondo della chat"
-    fgHighlighted: "Testo in evidenza."
-_ago:
-  future: "Futuro"
-_permissions:
-  "read:account": "Vedere le informazioni sul profilo"
-  "write:account": "Modificare le informazioni sul profilo"
-  "read:blocks": "Vedere i profili bloccati"
-  "write:blocks": "Gestire il blocco profili"
-  "read:drive": "Leggere file nel Drive"
-  "write:drive": "Gestire file nel Drive"
-  "read:favorites": "Vedere le Note Preferite"
-  "write:favorites": "Gestire Note Preferite"
-  "read:following": "Vedere i Following"
-  "write:following": "Gestire i Following"
-  "read:messaging": "Vedere Messaggi Privati"
-  "write:messaging": "Modificare Messaggi Privati"
-  "read:mutes": "Vedere profili silenziati"
-  "write:mutes": "Gestire profili silenziati"
-  "write:notes": "Gestire le Note"
-  "read:notifications": "Vedere le notifiche"
-  "write:notifications": "Gestire le notifiche"
-  "read:reactions": "Vedere le reazioni"
-  "write:reactions": "Gestire le reazioni"
-  "write:votes": "Votare"
-  "read:pages": "Vedere le pagine"
-  "write:pages": "Gestire le pagine"
-  "read:page-likes": "Vedere le Pagine piaciute"
-  "write:page-likes": "Modificare le Pagine piaciute"
-  "read:user-groups": "Vedere i gruppi di utenti"
-  "write:user-groups": "Gestire i gruppi di utenti"
-  "read:channels": "Vedere i canali"
-  "write:channels": "Gestire i canali"
-  "read:gallery": "Vedere le gallerie"
-  "write:gallery": "Gestire le gallerie"
-  "read:gallery-likes": "Vedere le Gallerie piaciute"
-  "write:gallery-likes": "Gestire le Gallerie piaciute"
-  "write:admin:delete-account": "Eliminare profili"
-  "write:admin:roles": "Gestire i ruoli"
-  "read:admin:roles": "Vedere i ruoli"
-  "write:chat": "Modificare Messaggi Privati"
-_profile:
-  username: "Nome utente"
-  metadata: "Informazioni aggiuntive"
-_charts:
-  filesTotal: "Numero di file in totale"
-_play:
-  created: "Il Play è stato creato"
-  updated: "Il Play è stato aggiornato"
-  deleted: "Il Play è stato eliminato"
-  pageSetting: "Impostazioni di Play"
-_pages:
-  newPage: "Crea pagina"
-  editPage: "Modifica pagina"
-  readPage: "Visualizzando fonte "
-  pageSetting: "Impostazioni pagina"
-  nameAlreadyExists: "Esiste già una pagina con lo stesso URL."
-  invalidNameTitle: "L'URL di pagina definito non è valido"
-  invalidNameText: "Verifica che il campo non è vuoto"
-  editThisPage: "Modifica questa pagina"
-  viewSource: "Visualizza sorgente"
-  viewPage: "Visualizza pagina"
-  like: "Mi piace"
-  unlike: "Togli Mi piace"
-  my: "Le mie pagine"
-  liked: "Pagine che mi piacciono"
-  featured: "Popolari"
-  inspector: "Analisi pagina"
-  contents: "Contenuto"
-  content: "Blocco di pagina"
-  variables: "Variabili"
-  title: "Titolo"
-  url: "URL della pagina"
-  summary: "Riassunto di pagina"
-  alignCenter: "centrato"
-  hideTitleWhenPinned: "Nascondere il titolo pagina quando è fissata in cima al profilo."
-  font: "Tipo di carattere"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans serif"
-  eyeCatchingImageSet: "Imposta un'immagine attraente"
-  eyeCatchingImageRemove: "Elimina immagine attraente"
-  chooseBlock: "Aggiungi blocco"
-  selectType: "Seleziona tipo"
-  contentBlocks: "Contenuto"
-  inputBlocks: "Blocchi di input"
-  specialBlocks: "Speciale"
-  blocks:
-    text: "Testo"
-    textarea: "Area di testo"
-    section: "Sezione"
-    image: "Immagini"
-    button: "Pulsante"
-    note: "Nota integrata"
-    _note:
-      id: "ID nota"
-      idDescription: "Qui puoi anche incollare l'URL della nota che vuoi impostare."
-      detailed: "Visualizzazione dettagliata"
+      title: 'Doppio 🤯'
 _notification:
-  fileUploaded: "File caricato correttamente"
-  youGotMention: "{name} ti ha menzionato"
-  youGotReply: "{name} ti ha risposto"
-  youGotQuote: "{name} ha scritto citando la tua Nota"
-  youRenoted: "{name} ha rinotato"
-  youWereFollowed: "Follower aggiuntivo"
-  youReceivedFollowRequest: "Hai ricevuto una richiesta di follow"
-  yourFollowRequestAccepted: "La tua richiesta di follow è stata accettata"
-  pollEnded: "Risultati del sondaggio."
-  newNote: "Nuove Note"
-  unreadAntennaNote: "Antenna {name}"
-  emptyPushNotificationMessage: "Le notifiche push sono state aggiornate."
-  achievementEarned: "Obiettivo raggiunto"
-  testNotification: "Provare la notifica"
-  notificationWillBeDisplayedLikeThis: "La notifica apparirà così"
-  exportOfXCompleted: "Abbiamo completato l'esportazione di {x}"
-  login: "Autenticazione avvenuta"
-  _types:
-    all: "Tutte"
-    note: "Nuove Note"
-    follow: "Follower"
-    mention: "Menzioni"
-    reply: "Risposte"
-    renote: "Rinota"
-    quote: "Cita"
-    reaction: "Reazioni"
-    pollEnded: "Sondaggio terminato"
-    scheduledNotePosted: "Nota pianificata correttamente"
-    scheduledNotePostFailed: "La pianificazione della Nota è fallita"
-    receiveFollowRequest: "Richieste di follow in arrivo"
-    followRequestAccepted: "Richieste di follow accettate"
-    roleAssigned: "Ruolo concesso"
-    chatRoomInvitationReceived: "Invito in una stanza di chat"
-    achievementEarned: "Risultato raggiunto"
-    exportCompleted: "Esportazione completata"
-    login: "Accessi"
-    createToken: "Aggiunto un token di accesso"
-    test: "Notifiche di test"
-    app: "Notifiche da applicazioni"
+  youGotMention: '{name} ti ha menzionato'
+  youGotReply: '{name} ti ha risposto'
+  youGotQuote: '{name} ha scritto citando la tua Nota'
+  youRenoted: '{name} ha rinotato'
+  youWereFollowed: 'Follower aggiuntivo'
+  youReceivedFollowRequest: 'Hai ricevuto una richiesta di follow'
+  yourFollowRequestAccepted: 'La tua richiesta di follow è stata accettata'
+  pollEnded: 'Risultati del sondaggio.'
+  newNote: 'Nuove Note'
+  unreadAntennaNote: 'Antenna {name}'
+  achievementEarned: 'Obiettivo raggiunto'
+  testNotification: 'Provare la notifica'
+  notificationWillBeDisplayedLikeThis: 'La notifica apparirà così'
+  exportOfXCompleted: 'Abbiamo completato l''esportazione di {x}'
+  login: 'Autenticazione avvenuta'
   _actions:
-    followBack: "Following ricambiato"
-    reply: "Rispondi"
-    renote: "Rinota"
-_moderationLogTypes:
-  suspend: "Sospende"
-  deleteNote: "Elimina una Nota"
-  deleteUserAnnouncement: "Elimina un annuncio ai profili già iscritti"
-  resetPassword: "Azzera la password"
-  resolveAbuseReport: "Risolve una segnalazione"
-  createInvitation: "Genera un codice di invito"
-  deleteGalleryPost: "Elimina pubblicazione nella Galleria"
-_fileViewer:
-  url: "URL"
-_externalResourceInstaller:
-  _vendorInfo:
-    title: "Informazioni sulla fonte"
-  _errors:
-    _themeInstallFailed:
-      title: "Impossibile installare la variazione grafica"
-      description: "Si è verificato un impedimento durante l'installazione della variazione grafica. Per favore riprova e consulta la console di Javascript per ottenere dettagli aggiuntivi."
-_reversi:
-  reversi: "Reversi"
+    followBack: 'Following ricambiato'
+    reply: 'Rispondi'
+    renote: 'Rinota'
 _offlineScreen:
-  title: "Scollegato. Impossibile connettersi al server"
-  header: "Impossibile connettersi al server"
-_gridComponent:
-  _error:
-    columnTypeNotSupport: "Solo le colonne type:text permettono la convalida delle Espresioni Regolari"
-_embedCodeGen:
-  autoload: "Carica automaticamente di più (sconsigliato)"
-_selfXssPrevention:
-  warning: "Avviso"
-  title: "\"Incolla qualcosa su questa schermata\" è tutta una truffa."
-  description1: "Incollando qualcosa qui, malintenzionati potrebbero prendere il controllo del tuo profilo o rubare i tuoi dati personali."
-  description2: "Se non sai esattamente cosa stai facendo, %c smetti subito e chiudi questa finestra."
-  description3: "Per favore, controlla questo collegamento per avere maggiori dettagli. {link}"
-_bootErrors:
-  title: "Caricamento non riuscito"
-  serverError: "Dopo una breve attesa, e dopo aver ricaricato la pagina, se il problema persiste, contatta l'amministrazione comunicando il seguente ID di errore."
-  solution: "Di seguito, alcune probabili soluzioni al problema."
-  solution1: "Aggiornare browser e il sistema operativo all'ultima versione"
-  solution2: "Disattivare gli adblocker"
-  solution3: "Cancellare la cache del browser"
-  solution4: "(Per chi utilizza il Browser Tor) Impostare dom.webaudio.enabled = vero"
-  otherOption: "Altre opzioni"
-  otherOption1: "Nelle impostazioni, cancellare le impostazioni del client e svuotare la cache"
-  otherOption2: "Avviare il client predefinito"
-  otherOption3: "Avviare lo strumento di riparazione"
-  otherOption4: "Avvia Misskey in modalità sicura"
-_watermarkEditor:
-  advanced: "Avanzato"
-_imageEffector:
-  _fxProps:
-    radius: "Raggio"
-    samples: "Quantità di campioni"
-    threshold: "Soglia"
-_drafts:
-  select: "Selezionare bozza"
-  schedule: "Pianifica pubblicazione"
+  title: 'Scollegato. Impossibile connettersi al server'
+  header: 'Impossibile connettersi al server'
+next: 'Avanti'
+upload: 'Carica'
+preview: 'Anteprima'
+reset: 'Ripristina'
+name: 'Nome'
+title: 'Titolo'
+description: 'Descrizione'
+none: 'Nessuna'
+all: 'Tutte'
+default: 'Predefinito'
+error: 'Errore'
+users: 'Profili'
+areYouSure: 'Confermi?'
