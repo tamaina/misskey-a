@@ -25,16 +25,22 @@ test('actual Storybook preview setup readies real component locales and installs
 	const create = vi.fn(createInternationalization);
 	const activate = vi.fn(setActiveInternationalization);
 	const initialized: string[] = [];
+	const interception = Promise.withResolvers<void>();
+	const worker = { start: vi.fn(() => interception.promise) };
+	const setupWorker = vi.fn(() => worker);
+	const mswLoader = vi.fn(() => vi.fn());
+	const onUnhandledRequest = vi.fn();
 	const collaborators: Record<string, unknown> = {
-		'@storybook/core-events': { FORCE_RE_RENDER: 'render', FORCE_REMOUNT: 'remount' },
-		'@storybook/preview-api': { addons: { getChannel: () => ({ emit: vi.fn() }) } },
+		'storybook/internal/core-events': { FORCE_RE_RENDER: 'render', FORCE_REMOUNT: 'remount' },
+		'storybook/preview-api': { addons: { getChannel: () => ({ emit: vi.fn() }) } },
 		'@storybook/vue3': { setup },
 		'virtual:vite-vue-internationalization': { createInternationalization: create, setActiveInternationalization: activate },
 		'@features/boot/frontend/index.js': { startComponentLocales },
 		'chromatic/isChromatic': { default: () => false },
-		'msw-storybook-addon': { initialize: vi.fn(), mswLoader: vi.fn() },
+		'msw-storybook-addon/csf3': { mswLoader },
+		'msw/browser': { setupWorker },
 		'./fakes.js': { userDetailed: () => ({ id: 'storybook-fixture' }) },
-		'./mocks.js': { commonHandlers: [], onUnhandledRequest: vi.fn() },
+		'./mocks.js': { commonHandlers: [], onUnhandledRequest },
 		'./themes.js': { default: { 'l-light': {} } },
 		'../src/style.scss': {},
 		'../../features/index/frontend/components.js': { default: registerComponents },
@@ -53,7 +59,7 @@ test('actual Storybook preview setup readies real component locales and installs
 		reportDiagnostics: true,
 	});
 	expect(compiled.diagnostics).toEqual([]);
-	await runInNewContext('(async () => {\n' + compiled.outputText + '\n})()', {
+	const execution = runInNewContext('(async () => {\n' + compiled.outputText + '\n})()', {
 		exports: {},
 		require(specifier: string) {
 			if (specifier.startsWith('../../features/')) {
@@ -65,10 +71,18 @@ test('actual Storybook preview setup readies real component locales and installs
 			return { __esModule: true, ...(collaborators[specifier] as Record<string, unknown>) };
 		},
 		window, localStorage, queueMicrotask, MutationObserver,
-	});
+	}) as Promise<void>;
+	await vi.waitFor(() => expect(worker.start).toHaveBeenCalledExactlyOnceWith({ onUnhandledRequest, quiet: true }));
+	expect(create).not.toHaveBeenCalled();
+	expect(initialized).toEqual([]);
+	interception.resolve();
+	await execution;
+	expect(setupWorker).toHaveBeenCalledOnce();
+	expect(mswLoader).toHaveBeenCalledExactlyOnceWith(expect.any(Function));
 	await vi.waitFor(() => expect(setup).toHaveBeenCalledOnce());
 	expect(create).toHaveBeenCalledExactlyOnceWith({ initialLocale: lang });
 	expect(initialized).toHaveLength(6);
+	expect(initialized[0]).toBe('../../features/ui/frontend/os.js');
 	expect(activate).toHaveBeenCalledOnce();
 	const configure = setup.mock.calls[0][0];
 	preferState.emojiStyle = 'native';
