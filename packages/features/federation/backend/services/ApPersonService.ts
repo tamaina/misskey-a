@@ -13,6 +13,8 @@ import type { FollowingsRepository, InstancesRepository, MiMeta, UserProfilesRep
 import type { Config } from '@/config.js';
 import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import { MiUser } from '@features/users/backend/models/User.js';
+import { fetchRemoteAvatarDecorations } from '@features/avatar-decorations/backend/remote-avatar-decorations.js';
+import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { truncate } from '@features/runtime/backend/formatting/truncate.js';
 import type { CacheService } from '@features/users/backend/services/CacheService.js';
 import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
@@ -81,6 +83,7 @@ export class ApPersonService implements OnModuleInit {
 	private accountMoveService: AccountMoveService;
 	private userSuspendService: UserSuspendService;
 	private logger: Logger;
+	private httpRequestService: HttpRequestService;
 
 	constructor(
 		private moduleRef: ModuleRef,
@@ -134,6 +137,7 @@ export class ApPersonService implements OnModuleInit {
 		this.accountMoveService = this.moduleRef.get('AccountMoveService');
 		this.userSuspendService = this.moduleRef.get('UserSuspendService');
 		this.logger = this.apLoggerService.logger;
+		this.httpRequestService = this.moduleRef.get('HttpRequestService');
 	}
 
 	/**
@@ -294,7 +298,7 @@ export class ApPersonService implements OnModuleInit {
 		return exist;
 	}
 
-	private async resolveAvatarAndBanner(user: MiRemoteUser, icon: any, image: any): Promise<Partial<Pick<MiRemoteUser, 'avatarId' | 'bannerId' | 'avatarUrl' | 'bannerUrl' | 'avatarBlurhash' | 'bannerBlurhash'>>> {
+	private async resolveAvatarAndBanner(user: MiRemoteUser, icon: any, image: any): Promise<Partial<Pick<MiRemoteUser, 'avatarId' | 'bannerId' | 'avatarUrl' | 'bannerUrl' | 'avatarBlurhash' | 'bannerBlurhash' | 'avatarDecorations'>>> {
 		if (user == null) throw new Error('failed to create user: user is null');
 
 		const [avatar, banner] = await Promise.all([icon, image].map(img => {
@@ -313,10 +317,12 @@ export class ApPersonService implements OnModuleInit {
 			return this.apImageService.resolveImage(user, img).catch(() => null);
 		}));
 
-		if (((avatar != null && avatar.id != null) || (banner != null && banner.id != null))
-				&& !(await this.roleService.getUserPolicies(user.id)).canUpdateBioMedia) {
+		const canUpdateBioMedia = (await this.roleService.getUserPolicies(user.id)).canUpdateBioMedia;
+		if (((avatar != null && avatar.id != null) || (banner != null && banner.id != null)) && !canUpdateBioMedia) {
 			return {};
 		}
+
+		const avatarDecorations = canUpdateBioMedia ? await this.resolveAvatarDecorations(user) : undefined;
 
 		/*
 			we don't want to return nulls on errors! if the database fields
@@ -326,6 +332,7 @@ export class ApPersonService implements OnModuleInit {
 			returns the special {id:null}&c value, and we return those
 		*/
 		return {
+			...(avatarDecorations === undefined ? {} : { avatarDecorations }),
 			...( avatar ? {
 				avatarId: avatar.id,
 				avatarUrl: avatar.url ? this.driveFileEntityService.getPublicUrl(avatar, 'avatar') : null,
@@ -337,6 +344,17 @@ export class ApPersonService implements OnModuleInit {
 				bannerBlurhash: banner.blurhash,
 			} : {}),
 		};
+	}
+
+	private async resolveAvatarDecorations(user: MiRemoteUser): Promise<MiUser['avatarDecorations'] | undefined> {
+		try {
+			const instance = await this.federatedInstanceService.fetch(user.host);
+			// A first contact may not have NodeInfo yet. Other software simply has no side channel.
+			if (instance?.softwareName != null && !['misskey', 'cherrypick', 'sharkey', 'misskey-tempura'].includes(instance.softwareName.toLowerCase())) return;
+			return await fetchRemoteAvatarDecorations(user, this.httpRequestService, host => this.utilityService.isFederationAllowedHost(host));
+		} catch {
+			return;
+		}
 	}
 
 	/**
