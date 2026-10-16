@@ -52420,6 +52420,16 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                             /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
                             code: 'RESIDENCE_REQUIRED';
                             message: string;
                         } | {
@@ -52683,6 +52693,16 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                             /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
                             code: 'RESIDENCE_REQUIRED';
                             message: string;
                         } | {
@@ -52928,6 +52948,16 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
                             message: string;
                         } | {
                             id: string;
@@ -53187,6 +53217,16 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                             /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
                             code: 'RESIDENCE_REQUIRED';
                             message: string;
                         } | {
@@ -53437,6 +53477,16 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                             /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
                             code: 'RESIDENCE_REQUIRED';
                             message: string;
                         } | {
@@ -53678,6 +53728,16 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
                             message: string;
                         } | {
                             id: string;
@@ -53965,6 +54025,16 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                             /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
                             code: 'RESIDENCE_REQUIRED';
                             message: string;
                         } | {
@@ -54229,6 +54299,16 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
                             message: string;
                         } | {
                             id: string;
@@ -54513,6 +54593,16 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                             /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
                             code: 'RESIDENCE_REQUIRED';
                             message: string;
                         } | {
@@ -54775,6 +54865,16 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
                             message: string;
                         } | {
                             id: string;

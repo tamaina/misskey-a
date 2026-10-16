@@ -2635,6 +2635,9 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
+					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
 					},
@@ -2695,6 +2698,9 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
 					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
@@ -2761,6 +2767,9 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
+					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
 					},
@@ -2821,6 +2830,9 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
+					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
 					},
@@ -2880,6 +2892,9 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
 					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
@@ -2946,6 +2961,9 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
+					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
 					},
@@ -3005,6 +3023,9 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
 					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
@@ -3070,6 +3091,9 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
+					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
 					},
@@ -3134,6 +3158,9 @@ export default {
 					"INTERNAL_ERROR": {
 						"status": 500
 					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
+					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
 					},
@@ -3197,6 +3224,9 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"BILLING_COUNTRY_UNAVAILABLE": {
+						"status": 400
 					},
 					"RESIDENCE_REQUIRED": {
 						"status": 400
