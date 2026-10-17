@@ -98,7 +98,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { computed, watch, ref, defineAsyncComponent, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@features/boot/frontend/shared/config.js';
@@ -125,7 +125,7 @@ import { prefer } from '@features/preferences/frontend/preferences.js';
 import { getPluginHandlers } from '@features/integrations/frontend/plugin.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 

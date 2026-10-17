@@ -18,7 +18,8 @@
 		{
 			"file": "packages/features/channels/frontend/pages/channels.vue",
 			"keys": [
-				"search"
+				"search",
+				"favorites"
 			]
 		},
 		{
@@ -75,7 +76,8 @@
 		{
 			"file": "packages/features/emojis/frontend/pages/custom-emojis-manager.vue",
 			"keys": [
-				"search"
+				"search",
+				"customEmojis"
 			]
 		},
 		{
@@ -103,7 +105,8 @@
 			"keys": [
 				"save",
 				"none",
-				"all"
+				"all",
+				"following"
 			]
 		},
 		{
@@ -192,6 +195,6 @@
 			]
 		}
 	],
-	"count": 1540,
-	"sha256": "8c21bf5f9dc02a1d30e3e8569ea74e6e4163f254aaa83447a56dc79b7e856e1a"
+	"count": 1624,
+	"sha256": "bd08d328c7ff9c63bddbe9f2bad067efff87973b9984bb9f1902e117f552bd6d"
 }

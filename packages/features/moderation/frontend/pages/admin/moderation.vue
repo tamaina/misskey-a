@@ -155,7 +155,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import XServerRules from '@features/instance/frontend/pages/admin/server-rules.vue';
@@ -172,7 +172,7 @@ import FormLink from '@features/ui/frontend/components/form/link.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const meta = await misskeyApi('admin/meta');
 

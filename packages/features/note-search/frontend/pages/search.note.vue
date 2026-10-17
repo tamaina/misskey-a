@@ -119,7 +119,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { computed, markRaw, ref, shallowRef, toRef } from 'vue';
 import { host as localHost } from '@features/boot/frontend/shared/config.js';
 import type * as Misskey from 'misskey-js';
@@ -138,7 +138,7 @@ import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.v
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	query?: string;

@@ -127,7 +127,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { ref } from 'vue';
 import { host, version, productName } from '@features/boot/frontend/shared/config.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -138,7 +138,7 @@ import { login } from '@features/auth/frontend/accounts.js';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import MkServerSetupWizard from '@features/boot/frontend/components/MkServerSetupWizard.vue';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const username = ref('');
 const password = ref('');

@@ -15,7 +15,7 @@ import type { RuntimeLocaleDictionary } from 'vite-vue-internationalization/runt
 export const globalCatalogPilotOwners = [
 	{
 		"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
-		"currentSha256": "275dcb57c731a4124ef85fecc2505559e3f681b2c900b7e24da47e517fc6b805",
+		"currentSha256": "604972bddeb811f2e5c8302d4eeb84004cdc231d22765619f4b56ab47cbc6f21",
 		"baselineSha256": "53fe5b78ff387ba19e7de58d01e6c3bab36a237b5c7efc260857547b89ddf845",
 		"keys": [
 			"save",
@@ -37,7 +37,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/federation/frontend/pages/lookup.vue",
-		"currentSha256": "c71dea676bc473147833c8ce042bac2566c95c19afbf0d40ae88ad7d5b6945f9",
+		"currentSha256": "06bc1932d7942c37183bff8ed82f2469da2bc41cb8210e944905ccedaa4a1a3c",
 		"baselineSha256": "481b50b4cb1e6f31df52a235cd0472500427b192be62cd2db2205ccc9ef775b0",
 		"keys": [
 			"close"
@@ -51,7 +51,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkWindow.vue",
-		"currentSha256": "736c644594a8205d3bf361e7c4764b43294c15f751887f55606dd24eb5a6403c",
+		"currentSha256": "8b79ea75214325a89ddbb2db5cc4d054cfb56a41a4e21760f9ef702b5a85cf63",
 		"baselineSha256": "8751a56c744171748ecf6e98432db7383e20ed5d500de7401aa406a2c67ef172",
 		"keys": [
 			"close"
@@ -69,7 +69,7 @@ export const globalCatalogPilotOwners = [
 			"somethingHappened",
 			"next"
 		],
-		"currentSha256": "d61ae625ac14210e53c101bfa2431a0a331c22288d2e365a28e9bcb73cc899a3",
+		"currentSha256": "b8687e01986c67fea2bacabfd60380adcdcae260913c9d4cf3d565d18db1e136",
 		"baselineSha256": "fe0288a83b7d0eb29ee74dbe96b0116a60042bb2601cd154c0dae45932a440d6",
 		"order": [
 			"somethingHappened",
@@ -105,9 +105,10 @@ export const globalCatalogPilotOwners = [
 	{
 		"file": "packages/features/channels/frontend/pages/channels.vue",
 		"keys": [
-			"search"
+			"search",
+			"favorites"
 		],
-		"currentSha256": "48dc8cd25b654fcc57486e35a72a33e838887c033fb737418fbb7af9a1d475dd",
+		"currentSha256": "631263469940d924c6eea86aef7773ecf7080c23c51eb42f9558e4cf44cda52b",
 		"baselineSha256": "52c58c290e4b67682b4c3e06ec86b41ec5fc93e9a0aca9a82213cb040791c52a",
 		"order": [
 			"search",
@@ -128,7 +129,7 @@ export const globalCatalogPilotOwners = [
 		"keys": [
 			"delete"
 		],
-		"currentSha256": "98ef09d5622a68d03211e4e507adab37983b5c476ecef8063906b4d3eb388feb",
+		"currentSha256": "110f539bb610b55d846352ba6589c5c260c8c433690f30407779e7161cc640ee",
 		"baselineSha256": "af8c9fbafba7db1791edf98d12aab6998d8971d72be19deed67ae2cc8a034125",
 		"order": [
 			"reaction",
@@ -144,7 +145,7 @@ export const globalCatalogPilotOwners = [
 			"search",
 			"name"
 		],
-		"currentSha256": "0256fe4c5d7e4c2f317a62154e01f6a50e2330c298514b952494b5791299793c",
+		"currentSha256": "033c6f694127c3b6001ee033e0b50be8142f60a2a6dd59579209ae7fe7613515",
 		"baselineSha256": "47d17c6d2dfe97c0d7e28ce471ec851c64c52ea307f572900b4c2f92b1aae658",
 		"order": [
 			"individualChat",
@@ -170,7 +171,7 @@ export const globalCatalogPilotOwners = [
 			"somethingHappened",
 			"areYouSure"
 		],
-		"currentSha256": "e161337ae6557afaeaa42fa57fdaf11859fccdca42f07d54be1659a5f6530dc2",
+		"currentSha256": "a522380fcbe7a70cc3bf6078a6d8c3809543c953e49f0bda991b7926cd7b7e90",
 		"baselineSha256": "9693b25b97a6fff6ee8cabfc53e38e312fbfcd0be5e33418e98b6552bbdda003",
 		"order": [
 			"somethingHappened",
@@ -204,7 +205,7 @@ export const globalCatalogPilotOwners = [
 			"delete",
 			"edit"
 		],
-		"currentSha256": "c0092ae38edd7bb3d10ed69da319cf54f076c59690f8490b959d6a6e24e313b5",
+		"currentSha256": "53de05e6df0fdc92ef5a50942bc75d0c19edd8c0aef132225b2d18d20870c945",
 		"baselineSha256": "d103fab6b961758083b7d2977ce5b9884b3111bff0724f8177e20c4bae2d586f",
 		"order": [
 			"unlikeConfirm",
@@ -228,7 +229,7 @@ export const globalCatalogPilotOwners = [
 			"search",
 			"all"
 		],
-		"currentSha256": "8bc85a88337af253da0a4088510f77b2d58b3c9cf305cd4db6f780cce2ce7128",
+		"currentSha256": "bca7cfa17bc272931d4c43eab86d032f7c5663815470c08d96c40bc22637ef65",
 		"baselineSha256": "74355a979c1054c4b433b274248684aed59adc0e64be309f3f756efbcc20ee79",
 		"order": [
 			"lookupConfirm",
@@ -248,7 +249,7 @@ export const globalCatalogPilotOwners = [
 			"delete",
 			"somethingHappened"
 		],
-		"currentSha256": "6e4d437048ca6fcb35267b30bee04da79516eed9eadbb9e36d05cb2a0abca57c",
+		"currentSha256": "59ae6db550b776f41ae536bf5b2f7f759d8615e9a97c24270b6220ae16cd3339",
 		"baselineSha256": "499cf397197d0a3bb34639bbf565c53547b59e10674789246f5e8bff5eb0676b",
 		"order": [
 			"unableToProcess",
@@ -275,7 +276,7 @@ export const globalCatalogPilotOwners = [
 			"upload",
 			"name"
 		],
-		"currentSha256": "ca54c39e71438ae7ff3049af8dd2878e81fa5a4ada6bb8ca2c19893ac2120a90",
+		"currentSha256": "23c3edd14b54c45a0fde0edeb592c14fcbb997fb8e9d74da05a59c725906ab47",
 		"baselineSha256": "768f5a8ad56451dc23e3cae9630c3de472f345f2d3f1841bb9a500cfb78c8934",
 		"order": [
 			"unableToProcess",
@@ -317,9 +318,10 @@ export const globalCatalogPilotOwners = [
 	{
 		"file": "packages/features/emojis/frontend/pages/custom-emojis-manager.vue",
 		"keys": [
-			"search"
+			"search",
+			"customEmojis"
 		],
-		"currentSha256": "187e587f7c78dba4464b85b19d5ee8cf370a306f5b033d1a9188659079667168",
+		"currentSha256": "539d6d120be2cc18c424904135f3c44fe411ea336d37517d0fa71c2c155499d1",
 		"baselineSha256": "938869ff161f2a9cdc5343d92b2066a9ede499b862dbbd8ff6e25f62ffa4f246",
 		"order": [
 			"details",
@@ -346,7 +348,7 @@ export const globalCatalogPilotOwners = [
 			"ok",
 			"error"
 		],
-		"currentSha256": "49b74e353211e0ce38ade35c20c31d843f2ae96c7c8b895d2191b1899637dcc1",
+		"currentSha256": "2e6f9560480ca52a665f94e080cfd4c8b31122929b83c68f35f15a5a9cac4aec",
 		"baselineSha256": "cb666e648f680d96f51dec09d90ab84f08f26d904728e8c5b9d4dfc09f21d014",
 		"order": [
 			"internalServerErrorDescription",
@@ -373,7 +375,7 @@ export const globalCatalogPilotOwners = [
 		"keys": [
 			"save"
 		],
-		"currentSha256": "8423791fd8dbcc8650fda960423a103167c2443511759034961d8b1f96165f26",
+		"currentSha256": "975f8d3f144659224224518bd4508992ee27bbd76482bd93f9bace4e66806bfc",
 		"baselineSha256": "7c95232a27f9ff2423a0e61c5a063a7afd30cc8df201a4d1cd4367870c5bd58b",
 		"order": [
 			"all",
@@ -416,7 +418,7 @@ export const globalCatalogPilotOwners = [
 		"keys": [
 			"search"
 		],
-		"currentSha256": "337f875a4c683300f9a57156ce7fcb5c210a66cb52cdf63ef5b75546f2fc32c4",
+		"currentSha256": "66952e6c16d38bbf4e53cdc89870ae1f66efbacd7774ac4036f9e00e9327669b",
 		"baselineSha256": "bd432936dd611d7a5d20e7c212b0fcd61b431dd6b7902c8ea7721f843a10fb62",
 		"order": [
 			"searchScopeAll",
@@ -443,9 +445,10 @@ export const globalCatalogPilotOwners = [
 		"keys": [
 			"save",
 			"none",
-			"all"
+			"all",
+			"following"
 		],
-		"currentSha256": "cdb11176e26f0cf79f6ee6054050db22a6bfb13d7748d8dec27cb62c46a57912",
+		"currentSha256": "a11780019bb1a762818d28ad8964588205dcbc6e52247c4c3c9579135a69acb3",
 		"baselineSha256": "17e3110fbd3866c59c8cfa03a24d7d14d1c6cea4cc2e6b29b8311834cfb5bf25",
 		"order": [
 			"all",
@@ -464,7 +467,7 @@ export const globalCatalogPilotOwners = [
 		"keys": [
 			"save"
 		],
-		"currentSha256": "7f991cee9a8840eb6ecec3cf202fe74f4ac84baece5c33165660dc4c99e2f28b",
+		"currentSha256": "f9ca9d232631e20c0ee23cab1039d68c8d0199ac71f7906807ba1d269c5377e2",
 		"baselineSha256": "4222b25b3dcd055fc97eaa7fc3aeee0b698935813d1cb6909b49217f2e54a3e2",
 		"order": [
 			"objectStorage",
@@ -495,7 +498,7 @@ export const globalCatalogPilotOwners = [
 			"delete",
 			"edit"
 		],
-		"currentSha256": "9fcf07cf38b91470295b7865d2a1250a48cc96a7b6c9206b4b0ea5747c62a3ad",
+		"currentSha256": "c08a17e936d9830d989738c53eee08cfde582fc7bbf8264866aa1d4f96b7f210",
 		"baselineSha256": "921cfa9a66c7404f4e0d148b913fc17fb885a1cffb038411c3b4bad21d772ca0",
 		"order": [
 			"shareWithNote",
@@ -524,7 +527,7 @@ export const globalCatalogPilotOwners = [
 			"delete",
 			"reload"
 		],
-		"currentSha256": "ee389d0014593e13871ac0a669a86b5d71ee0b3d181ddb79e808d78f499e9079",
+		"currentSha256": "737bad2c31571e398a0d415903278d0797b99c152329098ea8388cbe0a26d9ae",
 		"baselineSha256": "e31fd49ae514819d19409e18ac88de62e91a93b8e5e2866235a158736d3953a6",
 		"order": [
 			"shareWithNote",
@@ -551,7 +554,7 @@ export const globalCatalogPilotOwners = [
 			"save",
 			"delete"
 		],
-		"currentSha256": "fe1f98c8a59e7cebc6e54e4550efb96ee6ed7a51f2e94b610120522068d78a11",
+		"currentSha256": "158691df2da647c3be47a65076df7b697baee072a6f7c803b5ef4d89b12ee678",
 		"baselineSha256": "f55eb9544c1a7871ed41c73bee6c2c6309f53fdeb2ff30004d93dfc8e52edacb",
 		"order": [
 			"invalidValue",
@@ -576,7 +579,7 @@ export const globalCatalogPilotOwners = [
 			"save",
 			"default"
 		],
-		"currentSha256": "167ca888e48239e3269727c9119bac305b4c7bdfbd840d339bc4040086a8885b",
+		"currentSha256": "cd06f4f487a02dc9a8704283c79f337ceddc67184349dd5190f6be8a558ef556",
 		"baselineSha256": "723ca0afdea1eadf070f9599e7ed0a64a00775e0022d6f3b6912b45646a9036d",
 		"order": [
 			"addItem",
@@ -598,7 +601,7 @@ export const globalCatalogPilotOwners = [
 			"cancel",
 			"none"
 		],
-		"currentSha256": "583e6030d1cdbd185bbf7b72c476489c027143f61f46c6326abfc27a3fa8e051",
+		"currentSha256": "025afe316e5f46dfc8f0b073f98177836e288a855466138a8097258fc78a131f",
 		"baselineSha256": "12fe9cf0b438c3e59346640c32d2f5ca3bf94d52435630d4ab6970a3e31d18f1",
 		"order": [
 			"none",
@@ -625,7 +628,7 @@ export const globalCatalogPilotOwners = [
 			"copy",
 			"description"
 		],
-		"currentSha256": "de86c220a4e95a529578692fd7007f8aa5c1c8d0b1fd6840078ad64dba456b2e",
+		"currentSha256": "614e85f595d3876aa2c3bcc89411bcae788a957a3b1fad9d81e9f1df552c3e6b",
 		"baselineSha256": "0d9cda002930465caaf37ab5f793fa3fce2c85a2a9c72a8847f98b9e807657b8",
 		"order": [
 			"installedThemes",
@@ -645,7 +648,7 @@ export const globalCatalogPilotOwners = [
 		"keys": [
 			"save"
 		],
-		"currentSha256": "dbc7163673fe80a070bd8349f8ac8dc08a3d408b056e6af7d42b60bb69aa856d",
+		"currentSha256": "5db4455ca96904230d849d39acf6fda25f34dfb60b401240946a323d6361a382",
 		"baselineSha256": "27b5f652876b1721cfb8385e86b13fb306b9413b6088f2eb3125480f751e97c7",
 		"order": [
 			"edit",
@@ -659,7 +662,7 @@ export const globalCatalogPilotOwners = [
 		"keys": [
 			"reload"
 		],
-		"currentSha256": "a0fa680ff03fc6ed700a718fd83ecb8f6fb21d28e7239d9e246225de18845843",
+		"currentSha256": "ee2766ab106e0cd120ea5fabace836fbb62860fc6e1c3d02ff96b82ee98a9129",
 		"baselineSha256": "962781234f622f91d3e811be111c2a93006d1e6e367ece0281cd5de17b28870f",
 		"order": [
 			"reload",
@@ -675,7 +678,7 @@ export const globalCatalogPilotOwners = [
 			"all",
 			"users"
 		],
-		"currentSha256": "7b8dc75e925270232bbd138a8230babe30c6737b1392c03e2f8562577e09cbf5",
+		"currentSha256": "7d699f6da878a0c74a09ecafb5c5516dbee102e126f8f084a38c882e26837f02",
 		"baselineSha256": "52c0ad7178105965a2d7d6270fffd075551c38c3b3ed99a67a024f2ea177cd7a",
 		"order": [
 			"registeredDate",
@@ -710,7 +713,7 @@ export const globalCatalogPilotOwners = [
 			"copy",
 			"preview"
 		],
-		"currentSha256": "cf4960e5bdd9311b374d36243bdbdcaa08b8a3929e5c0ef53109f7f12a2ea568",
+		"currentSha256": "0242fc6bb9e1d7bad3075d91961ba656bcd78f35c036327c1dc33478738e5880",
 		"baselineSha256": "afa4e4abfbcb45d211457f93ad62e326a7b1926196d6b808588e2c43b8e401b4",
 		"order": [
 			"syncDeviceDarkMode",
@@ -741,7 +744,7 @@ export const globalCatalogPilotOwners = [
 			"reload",
 			"error"
 		],
-		"currentSha256": "2734a9b9a52885f04ffef51e2abdc84ef3fd69b5d53c2139191ae14d2f0264ec",
+		"currentSha256": "cea807950601a45580119a52c60e998d6034d166a2abb6d0e5e84d4af18d8f21",
 		"baselineSha256": "0268cfb79c93aa4eda6b857807f1dc06f5b87757bec08c7383e7990db58848c3",
 		"order": [
 			"error",
@@ -767,9 +770,9 @@ export function restoreGlobalCatalogPilotSource(file: string, source: string): s
 	if (sha256(source) !== owner.currentSha256) throw new Error(`Global catalog pilot source differs: ${file}`);
 	source = source
 		.replace("import { useLocale } from 'virtual:vite-vue-internationalization';\n", '')
-		.replace("import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';\n", '')
-		.replace('const globalLocale = useLocale<GlobalLocale>(import.meta.url);\n\n', '')
-		.replace('\nconst globalLocale = useLocale<GlobalLocale>(import.meta.url);\n', '');
+		.replace("import type { Locale } from 'i18n';\n", '')
+		.replace('const globalLocale = useLocale<Locale>(import.meta.url);\n\n', '')
+		.replace('\nconst globalLocale = useLocale<Locale>(import.meta.url);\n', '');
 	for (const key of owner.keys) source = source.replaceAll(`globalLocale.value.env.${key}`, `$locale.value.sfc.${key}`).replaceAll(`globalLocale.env.${key}`, `$locale.sfc.${key}`);
 	source = source.replace(/(<locale[^>]*locale="([^"]+)"[^>]*>)([\s\S]*?)<\/locale>/g, (_block, start: string, language: string, content: string) => {
 		const current = JSON.parse(content) as Record<string, string>;

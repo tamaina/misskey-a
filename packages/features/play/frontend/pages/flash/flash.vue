@@ -62,7 +62,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { computed, onDeactivated, onUnmounted, ref, watch, shallowRef, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import { utils } from '@syuilo/aiscript';
@@ -87,7 +87,7 @@ import { isSupportShare } from '@features/navigation/frontend/utility/navigator.
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	id: string;

@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@features/ui/frontend/os.js';
@@ -28,7 +28,7 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { mainRouter } from '@features/navigation/frontend/router.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const state = ref<'fetching' | 'done'>('fetching');
 

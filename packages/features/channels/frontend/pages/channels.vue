@@ -63,7 +63,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';
 import MkChannelPreview from '@features/channels/frontend/components/MkChannelPreview.vue';
 import MkChannelList from '@features/channels/frontend/components/MkChannelList.vue';
@@ -77,7 +77,7 @@ import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import { $i } from '@features/auth/frontend/i.js';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -149,7 +149,7 @@ const headerTabs = computed(() => [{
 	icon: 'ti ti-comet',
 }, {
 	key: 'favorites',
-	title: $locale.value.sfc.favorites,
+	title: globalLocale.value.env.favorites,
 	icon: 'ti ti-star',
 }, {
 	key: 'following',
@@ -184,7 +184,6 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"featured": "المتداوَلة",
-	"favorites": "المفضلات",
 	"following": "متابَع",
 	"owned": "قنواتي",
 	"channel": "القنوات",
@@ -198,7 +197,6 @@ definePage(() => ({
 <locale locale="ca-ES" lang="json">
 {
 	"featured": "Popular",
-	"favorites": "Favorits",
 	"following": "Seguin",
 	"owned": "Propietat",
 	"channel": "Canals",
@@ -212,7 +210,6 @@ definePage(() => ({
 <locale locale="cs-CZ" lang="json">
 {
 	"featured": "Trendy",
-	"favorites": "Oblíbené",
 	"following": "Sledovaný",
 	"owned": "Vlastněný",
 	"channel": "Kanály",
@@ -226,7 +223,6 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -240,7 +236,6 @@ definePage(() => ({
 <locale locale="de-DE" lang="json">
 {
 	"featured": "Trends",
-	"favorites": "Favoriten",
 	"following": "Gefolgt",
 	"owned": "In Besitz",
 	"channel": "Kanäle",
@@ -254,7 +249,6 @@ definePage(() => ({
 <locale locale="en-US" lang="json">
 {
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -268,7 +262,6 @@ definePage(() => ({
 <locale locale="es-ES" lang="json">
 {
 	"featured": "Tendencias",
-	"favorites": "Favoritos",
 	"following": "Siguiendo",
 	"owned": "Dueño",
 	"channel": "Canal",
@@ -282,7 +275,6 @@ definePage(() => ({
 <locale locale="fr-FR" lang="json">
 {
 	"featured": "Tendances",
-	"favorites": "Favoris",
 	"following": "Abonné·e",
 	"owned": "Mes canaux",
 	"channel": "Canaux",
@@ -296,7 +288,6 @@ definePage(() => ({
 <locale locale="id-ID" lang="json">
 {
 	"featured": "Tren",
-	"favorites": "Favorit",
 	"following": "Mengikuti",
 	"owned": "Dimiliki",
 	"channel": "Kanal",
@@ -310,7 +301,6 @@ definePage(() => ({
 <locale locale="it-IT" lang="json">
 {
 	"featured": "Popolari nel canale",
-	"favorites": "Preferiti",
 	"following": "Following",
 	"owned": "I miei canali",
 	"channel": "Canale",
@@ -324,7 +314,6 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"featured": "トレンド",
-	"favorites": "お気に入り",
 	"following": "フォロー中",
 	"owned": "管理中",
 	"channel": "チャンネル",
@@ -338,7 +327,6 @@ definePage(() => ({
 <locale locale="ja-KS" lang="json">
 {
 	"featured": "トレンド",
-	"favorites": "お気に入り",
 	"following": "フォロー中やで",
 	"owned": "管理しとる",
 	"channel": "チャンネル",
@@ -352,7 +340,6 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -366,7 +353,6 @@ definePage(() => ({
 <locale locale="kn-IN" lang="json">
 {
 	"featured": "Trending",
-	"favorites": "ಮೆಚ್ಚಿನವುಗಳು",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -380,7 +366,6 @@ definePage(() => ({
 <locale locale="ko-KR" lang="json">
 {
 	"featured": "트렌드",
-	"favorites": "즐겨찾기",
 	"following": "팔로잉",
 	"owned": "관리중",
 	"channel": "채널",
@@ -394,7 +379,6 @@ definePage(() => ({
 <locale locale="nl-NL" lang="json">
 {
 	"featured": "Trending",
-	"favorites": "Toevoegen aan favorieten",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Kanalen",
@@ -408,7 +392,6 @@ definePage(() => ({
 <locale locale="no-NO" lang="json">
 {
 	"featured": "Populært",
-	"favorites": "Favoritter",
 	"following": "Følger",
 	"owned": "Owned",
 	"channel": "Kanaler",
@@ -422,7 +405,6 @@ definePage(() => ({
 <locale locale="pl-PL" lang="json">
 {
 	"featured": "Na czasie",
-	"favorites": "Ulubione",
 	"following": "Śledzeni",
 	"owned": "Własny",
 	"channel": "Kanały",
@@ -436,7 +418,6 @@ definePage(() => ({
 <locale locale="pt-PT" lang="json">
 {
 	"featured": "Destaques",
-	"favorites": "Favoritos",
 	"following": "Seguindo",
 	"owned": "Autoral",
 	"channel": "Canais",
@@ -450,7 +431,6 @@ definePage(() => ({
 <locale locale="ru-RU" lang="json">
 {
 	"featured": "Актуальные",
-	"favorites": "Избранное",
 	"following": "Подписки",
 	"owned": "Собственные",
 	"channel": "Каналы",
@@ -464,7 +444,6 @@ definePage(() => ({
 <locale locale="sk-SK" lang="json">
 {
 	"featured": "Trendy",
-	"favorites": "Obľúbené",
 	"following": "Sledované",
 	"owned": "Vlastnené",
 	"channel": "Kanály",
@@ -478,7 +457,6 @@ definePage(() => ({
 <locale locale="th-TH" lang="json">
 {
 	"featured": "เทรนด์",
-	"favorites": "รายการโปรด",
 	"following": "ติดตามแล้ว",
 	"owned": "เจ้าของ",
 	"channel": "ช่อง",
@@ -492,7 +470,6 @@ definePage(() => ({
 <locale locale="tr-TR" lang="json">
 {
 	"featured": "Trend olan",
-	"favorites": "Favoriler",
 	"following": "Takip edildi",
 	"owned": "Sahip olunan",
 	"channel": "Kanallar",
@@ -506,7 +483,6 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -520,7 +496,6 @@ definePage(() => ({
 <locale locale="uk-UA" lang="json">
 {
 	"featured": "Тренди",
-	"favorites": "Обране",
 	"following": "Підписки",
 	"owned": "Owned",
 	"channel": "Канали",
@@ -534,7 +509,6 @@ definePage(() => ({
 <locale locale="vi-VN" lang="json">
 {
 	"featured": "Xu hướng",
-	"favorites": "Lượt thích",
 	"following": "Đang theo dõi",
 	"owned": "Do tôi quản lý",
 	"channel": "Kênh",
@@ -548,7 +522,6 @@ definePage(() => ({
 <locale locale="zh-CN" lang="json">
 {
 	"featured": "热门",
-	"favorites": "收藏",
 	"following": "正在关注",
 	"owned": "我的频道",
 	"channel": "频道",
@@ -562,7 +535,6 @@ definePage(() => ({
 <locale locale="zh-TW" lang="json">
 {
 	"featured": "熱門貼文",
-	"favorites": "我的最愛",
 	"following": "追隨中",
 	"owned": "管理中",
 	"channel": "頻道",

@@ -41,7 +41,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { onActivated, onDeactivated, onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
@@ -57,7 +57,7 @@ import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSectio
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkChatHistories from '@features/chat/frontend/components/MkChatHistories.vue';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 

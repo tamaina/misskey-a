@@ -93,7 +93,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { computed, onMounted, ref, useTemplateRef, toRefs } from 'vue';
 import * as Misskey from 'misskey-js';
 import type {
@@ -109,7 +109,7 @@ import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import * as os from '@features/ui/frontend/os.js';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 type EventType = {
 	abuseReport: boolean;

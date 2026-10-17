@@ -12,7 +12,6 @@ import { expect, test } from 'vitest';
 import { languages, locales } from 'i18n';
 import { createInternationalization, setActiveInternationalization, useLocale } from 'vite-vue-internationalization/runtime';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
-import { globalLocaleKeys } from '../../../features/runtime/frontend/shared/global-locale.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import { globalCatalogPilotOwners, restoreGlobalCatalogPilotSource, restoreGlobalCatalogPilotDictionary } from './global-catalog-pilot-baseline.js';
 import embedMessages from '../../../features/boot/frontend/embed/boot-messages.json';
@@ -52,7 +51,7 @@ test('all 112 original pilot labels retain their bytes through the shared runtim
 	for (const [file, keys] of owners) {
 		for (const language of languages) {
 			const bundle = payload(plugin, language);
-			expect(bundle.global).toEqual(Object.fromEntries(globalLocaleKeys.map(key => [key, locales[language][key]])));
+			expect(bundle.global).toEqual(locales[language]);
 			const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => bundle } });
 			await runtime.ready;
 			setActiveInternationalization(runtime);

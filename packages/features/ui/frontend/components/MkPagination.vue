@@ -46,7 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts">
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 export type MkPaginationOptions = {
 	autoLoad?: boolean;
 	/**
@@ -75,7 +75,7 @@ import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vu
 import MkPaginationControl from '@features/ui/frontend/components/MkPaginationControl.vue';
 import * as os from '@features/ui/frontend/os.js';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<MkPaginationOptions & {
 	paginator: T;

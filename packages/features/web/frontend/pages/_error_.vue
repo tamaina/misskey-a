@@ -26,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { version } from '@features/boot/frontend/shared/config.js';
@@ -39,7 +39,7 @@ import { miLocalStorage } from '@features/preferences/frontend/local-storage.js'
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { instance } from '@features/instance/frontend/instance.js';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	error?: Error;

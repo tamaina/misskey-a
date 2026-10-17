@@ -21,7 +21,6 @@ import retained from './pruned-global-locale-retained.json';
 import { historicalRawLocale, flattenCatalog, verifyCatalogHistory } from './catalog-history.js';
 import history from './catalog-history.json';
 import retention from '../../../i18n/catalog-retention.json';
-import { globalLocaleKeys } from '../../../features/runtime/frontend/shared/global-locale.js';
 import { locales, valueAt, verifyPrunedGlobalLocale } from './pruned-global-locale-baseline.js';
 
 const root = resolve(import.meta.dirname, '../../../..');
@@ -67,7 +66,7 @@ test.each(expansion.owners)('$file compiles its real shared template and script 
 	const filename = resolve(root, owner.file);
 	const source = readFileSync(filename, 'utf8');
 	for (const key of owner.keys) expect(source).not.toMatch(new RegExp(`\\$locale(?:\\.value)?\\.sfc\\.${key}\\b`));
-	for (const reference of source.matchAll(/globalLocale(?:\.value)?\.env\.(\w+)/g)) expect(globalLocaleKeys).toContain(reference[1]);
+	for (const reference of source.matchAll(/globalLocale(?:\.value)?\.env\.(\w+)/g)) expect(Object.hasOwn(productionLocales['ja-JP'], reference[1])).toBe(true);
 	const transformed = await hook(plugin.transform, source, filename) as { code: string };
 	const parsed = parse(transformed.code, { filename });
 	expect(parsed.errors).toEqual([]);

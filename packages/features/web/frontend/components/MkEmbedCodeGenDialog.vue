@@ -86,7 +86,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { useTemplateRef, ref, computed, nextTick, onMounted, onDeactivated, onUnmounted } from 'vue';
 import { url } from '@features/boot/frontend/shared/config.js';
 import { embedRouteWithScrollbar } from '@features/web/frontend/shared/embed-page.js';
@@ -103,7 +103,7 @@ import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { normalizeEmbedParams, getEmbedCode } from '@features/web/frontend/utility/get-embed-code.js';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const emit = defineEmits<{
 	(ev: 'ok'): void;

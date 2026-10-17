@@ -56,7 +56,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { computed, ref } from 'vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -73,7 +73,7 @@ import { prefer } from '@features/preferences/frontend/preferences.js';
 import { getInitialPrefValue } from '@features/preferences/frontend/state/manager.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const items = ref(prefer.s.menu.map(x => ({
 	id: genId(),

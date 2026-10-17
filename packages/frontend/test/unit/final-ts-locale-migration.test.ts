@@ -21,7 +21,6 @@ import { locales } from './instance-pilot-locale-catalog.js';
 import type { ParameterizedString } from 'i18n';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
-import { globalLocaleKeys } from '../../../features/runtime/frontend/shared/global-locale.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import proof from './final-ts-locale-migration.json';
 
@@ -138,7 +137,7 @@ test('all39 TS consumers reverse byte for byte and all17 owners retain exactly91
 
 test.each(languages)('actual default owner exports preserve every access and formatter in %s', async language => {
 	const payload = generated(language);
-	expect(payload.global).toEqual(Object.fromEntries(globalLocaleKeys.map(key => [key, globalLocales[language][key]])));
+	expect(payload.global).toEqual(globalLocales[language]);
 	const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
 	await runtime.ready;
 	await runtime.loadLocale(language);

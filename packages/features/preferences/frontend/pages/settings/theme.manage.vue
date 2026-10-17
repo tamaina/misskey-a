@@ -26,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { computed, ref } from 'vue';
 import JSON5 from 'json5';
 import type { Theme } from '@features/preferences/frontend/shared/theme.js';
@@ -43,7 +43,7 @@ import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import { prefer } from '@features/preferences/frontend/preferences';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const installedThemes = prefer.r.themes;
 const builtinThemes = ref<Theme[]>([]);

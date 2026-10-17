@@ -89,7 +89,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { ref, useTemplateRef, computed, onMounted, onBeforeUnmount, onDeactivated, onActivated } from 'vue';
 import * as Misskey from 'misskey-js';
 import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
@@ -113,7 +113,7 @@ import { useMutationObserver } from '@features/ui/frontend/composables/use-mutat
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { makeDateSeparatedTimelineComputedRef } from '@features/timelines/frontend/utility/timeline-date-separate.js';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 const router = useRouter();

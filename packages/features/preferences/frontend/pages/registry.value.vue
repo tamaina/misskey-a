@@ -45,7 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { watch, computed, ref } from 'vue';
 import JSON5 from 'json5';
 import * as v from 'valibot';
@@ -59,7 +59,7 @@ import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue'
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import FormInfo from '@features/ui/frontend/components/MkInfo.vue';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	path: string;

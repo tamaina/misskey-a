@@ -107,7 +107,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { GlobalLocale } from '@features/runtime/frontend/shared/global-locale.js';
+import type { Locale } from 'i18n';
 import { ref, computed } from 'vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -118,7 +118,7 @@ import { fetchInstance } from '@features/instance/frontend/instance.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 
-const globalLocale = useLocale<GlobalLocale>(import.meta.url);
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const meta = await misskeyApi('admin/meta');
 

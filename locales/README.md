@@ -5,15 +5,17 @@ Translations added in ja-JP file should contain the original Japanese strings.
 
 Please see [Contribution guide](../CONTRIBUTING.md) for more information.
 
-The VVI shared vocabulary is selected from these existing catalogs by
-`packages/features/runtime/frontend/shared/global-locale.ts`. Screen-specific
+The main VVI global dictionary is the existing `locales` export from `i18n`.
+Consumers use its generated `Locale` type directly with `useLocale<Locale>()`;
+the runtime dictionary and type cover the same complete 135-key catalog.
+There is no separate key selection or custom shared-locale type. Screen-specific
 messages stay in their owning Vue `<locale>` blocks. Match meaning and all
-28 effective translations before moving an owner label into the shared scope.
+28 effective translations before replacing an owner label with a global label.
 
 The catalog pruning in PR #204 was explicitly authorized across languages.
-The Japanese catalog now has 135 leaves: 23 shared labels, one language-name
+The Japanese catalog now has 135 leaves: 26 frontend-shared labels, one language-name
 field, 78 dynamically selected achievement titles, 18 notification labels,
-two offline messages and 13 other SW labels. Every retained path has a concrete
+two offline messages and 10 other SW labels. Every retained path has a concrete
 caller in `packages/i18n/catalog-retention.json`; no unconfirmed category remains.
 Achievement descriptions/flavors stay with the Vue owner, while SW only needs
 `_achievements._types[achievement].title`.

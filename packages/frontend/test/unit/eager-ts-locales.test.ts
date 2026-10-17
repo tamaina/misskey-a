@@ -18,7 +18,6 @@ import { locales } from './instance-pilot-locale-catalog.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { startComponentLocales } from '@features/boot/frontend/index.js';
 import proof from './eager-ts-locales.json';
-import { globalLocaleKeys } from '../../../features/runtime/frontend/shared/global-locale.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
@@ -142,7 +141,7 @@ test('owner dictionaries and reversible source proof contain only the existing e
 
 test.each(languages)('actual generated owner modules and all 19 eager consumers preserve raw bytes in %s', async language => {
 	const payload = generated(language);
-	expect(payload.global).toEqual(Object.fromEntries(globalLocaleKeys.map(key => [key, globalLocales[language][key]])));
+	expect(payload.global).toEqual(globalLocales[language]);
 	expect(payload.modules?.[proof.owners.drive.host]).toEqual(driveMessages[language]);
 	expect(payload.modules?.[proof.owners.navigation.host]).toEqual(navbarMessages[language]);
 	const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
