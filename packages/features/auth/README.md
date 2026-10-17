@@ -54,3 +54,21 @@ JWKS has at most 32 keys with bounded public RSA fields. Only configured-origin
 JWKS is used; token/key URLs never trigger additional fetches. Errors retain no
 provider body or credential cause. Access/refresh tokens are discarded, email
 claims are not trusted, and the result cannot create a local session or grant.
+
+## Password-first signin progress
+
+The standard signin UI opts into a ten-minute, in-memory progress challenge after
+password verification. Password and the existing TOTP/backup-code or strict-UV
+WebAuthn proof remain required; progress metadata is never a credential. Redis
+stores only hashed opaque secrets and policy fingerprints. A private claim nonce
+reserves one consumable verifier owner, and a completed factor is consumed before
+issuing the browser session. Failure or a policy/account change fails closed.
+There is no Redis/database exactly-once grant guarantee: a crash can burn a ticket.
+
+Legacy clients and the existing explicitly enabled passwordless route keep their
+previous verifier requirements. This connects only password-first signin, without
+activating passkey MFA independently of TOTP. Dedicated passwordless signin,
+sudo and factor-change controllers remain separate follow-up work. No refresh
+cookie protocol or UV relaxation is introduced. The UI keeps no progress ticket
+in localStorage/IndexedDB and restarts password entry after an attempted verifier
+fails. Abandoned initial tickets expire rather than extending their deadline.

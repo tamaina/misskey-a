@@ -70,17 +70,15 @@ if row.version ~= tonumber(ARGV[6]) or row.nonceHash ~= ARGV[7] or row.version >
 `;
 const SAVE = `redis.call('SET', KEYS[1], cjson.encode(row), 'KEEPTTL'); return cjson.encode(row)`;
 
-/** Unconnected metadata storage, never an authentication verifier or grant issuer.
- * Callers must supply server-owned bindings and already verified proof metadata.
- * Before production use, a controller must reserve ONE verifier owner before
- * consuming backup codes/WebAuthn proofs; a CAS after verification alone can burn
- * multiple external proofs. That reservation protocol is not implemented here.
- * Redis fact timestamps record metadata arrival for audit; they are not
- * independent evidence of when a proof was verified or of its freshness.
- * The future controller must enforce current policy, proof freshness and active
- * BrowserSession ownership before claim. Consume deletes BEFORE any future grant;
- * a crash can burn the ticket. There is no Redis/DB exactly-once guarantee.
- * Read never recovers a plaintext nonce; losing a nonce requires a fresh start.
+/** Metadata storage, never an authentication verifier or grant issuer.
+ * Callers supply server-owned bindings and already verified proof metadata.
+ * A controller must claim BEFORE a consumable verifier; the claimed nonce is a
+ * private verifier-owner receipt, never returned to the browser. finishClaim
+ * records that owner's verified factor. Current policy/fresh proofs and active
+ * session ownership for non-signin purposes remain controller responsibilities.
+ * Redis timestamps audit metadata arrival rather than proof freshness. Consume
+ * deletes BEFORE the grant: a crash burns a ticket, without Redis/DB exactly-once.
+ * Losing a nonce requires a fresh start; expiry is never extended.
  */
 export class AuthenticationProgressStore {
 	constructor(private redis: Pick<Redis, 'eval'>) {}
@@ -142,6 +140,21 @@ row.version = row.version + 1; row.nonceHash = ARGV[11]
 if row.state ~= 'active' or row.userId == cjson.null then return nil end
 row.state = 'claimed'; row.version = row.version + 1; row.nonceHash = ARGV[8]
 ` + SAVE, 1, key(access.ticket), ...args, hash(nonce));
+		if (typeof raw !== 'string') return null;
+		const result = metadata(raw); return { nonce, version: result.version, metadata: result };
+	}
+
+	/** Only the private owner of a claimed step may finish a consumable verifier. */
+	async finishClaim(context: AuthenticationProgressBinding, access: AuthenticationProgressAccess, owner: AuthenticationProgressStep, verified: AuthenticationProgressProof): Promise<(AuthenticationProgressStep & { metadata: AuthenticationProgressMetadata }) | null> {
+		const proof = v.parse(proofSchema, verified);
+		const args = this.casArgs(context, access, owner); if (!args) return null;
+		const nonce = opaque();
+		const raw = await this.redis.eval(CHECK + CAS + `
+if row.state ~= 'claimed' or row.userId ~= ARGV[8] or row.userPolicyStamp ~= ARGV[9] then return nil end
+local time = redis.call('TIME')
+row.facts[ARGV[10]] = tonumber(time[1]) * 1000 + math.floor(tonumber(time[2]) / 1000)
+row.version = row.version + 1; row.nonceHash = ARGV[11]
+` + SAVE, 1, key(access.ticket), ...args, proof.verifiedForUserId, proof.userPolicyStamp, proof.factor, hash(nonce));
 		if (typeof raw !== 'string') return null;
 		const result = metadata(raw); return { nonce, version: result.version, metadata: result };
 	}
