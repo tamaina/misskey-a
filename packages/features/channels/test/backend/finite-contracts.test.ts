@@ -59,7 +59,7 @@ const channelInputs = {
 };
 
 const date = new Date('2026-01-01T00:00:00.000Z');
-const channel = Object.assign(new MiChannel(), { id: 'channel123', lastNotedAt: null, name: 'Channel', description: null, userId: null, bannerId: null, pinnedNoteIds: [], color: '#86b300', isArchived: false, usersCount: 0, notesCount: 0, isSensitive: false, allowRenoteToExternal: true });
+const channel = Object.assign(new MiChannel(), { id: 'channel123', lastNotedAt: null, name: 'Channel', isFederated: false, uri: null, host: null, description: null, userId: null, bannerId: null, pinnedNoteIds: [], color: '#86b300', isArchived: false, usersCount: 0, notesCount: 0, isSensitive: false, allowRenoteToExternal: true });
 
 function fixture() {
 	const channels = mockDeep<ChannelsRepository>();
@@ -94,7 +94,7 @@ test('all channel input objects discard unknown native fields and retain default
 	}
 	expect(v.parse(channelInputs['channels/mute/create'], { channelId: 'channel123', expiresAt: null })).toEqual({ channelId: 'channel123', expiresAt: null });
 	expect(v.safeParse(channelInputs['channels/mute/create'], { channelId: 'channel123', expiresAt: 1.5 }).success).toBe(false);
-	expect(v.parse(createInput, { name: 'Channel', description: null, bannerId: null, isSensitive: null, allowRenoteToExternal: null })).toMatchObject({ description: null, bannerId: null, isSensitive: null, allowRenoteToExternal: null });
+	expect(v.parse(createInput, { name: 'Channel', isFederated: false, uri: null, host: null, description: null, bannerId: null, isSensitive: null, allowRenoteToExternal: null })).toMatchObject({ description: null, bannerId: null, isSensitive: null, allowRenoteToExternal: null });
 	expect(v.parse(updateInput, { channelId: 'channel123', isArchived: null })).toEqual({ channelId: 'channel123', isArchived: null });
 	expect(v.parse(timelineInput, { channelId: 'channel123' })).toEqual({ channelId: 'channel123', limit: 10, allowPartial: false });
 	expect(v.parse(packedEndpointDefinitions['channels/search'].input, { query: '' })).toEqual({ query: '', type: 'nameAndDescription', limit: 5 });

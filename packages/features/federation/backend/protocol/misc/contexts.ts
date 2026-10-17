@@ -673,6 +673,7 @@ const extension_context_definition = {
 	'_misskey_reaction': 'misskey:_misskey_reaction',
 	'_misskey_votes': 'misskey:_misskey_votes',
 	'_misskey_summary': 'misskey:_misskey_summary',
+	'_misskey_channel': 'misskey:_misskey_channel',
 	'_misskey_followedMessage': 'misskey:_misskey_followedMessage',
 	'_misskey_requireSigninToViewContents': 'misskey:_misskey_requireSigninToViewContents',
 	'_misskey_makeNotesFollowersOnlyBefore': 'misskey:_misskey_makeNotesFollowersOnlyBefore',

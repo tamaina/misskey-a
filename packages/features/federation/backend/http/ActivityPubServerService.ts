@@ -19,6 +19,7 @@ import type { Config } from '@/config.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
+import { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import { UserKeypairService } from '@features/federation/backend/services/UserKeypairService.js';
 import type { MiFollowing } from '@features/relationships/backend/models/Following.js';
 import { countIf } from '@features/runtime/backend/data/array.js';
@@ -75,6 +76,7 @@ export class ActivityPubServerService {
 		private apRendererService: ApRendererService,
 		private queueService: QueueService,
 		private userKeypairService: UserKeypairService,
+		private channelFederationService: ChannelFederationService,
 		private queryService: QueryService,
 		private fanoutTimelineEndpointService: FanoutTimelineEndpointService,
 	) {
@@ -668,6 +670,40 @@ export class ActivityPubServerService {
 		// inbox (limit: 64kb)
 		fastify.post('/inbox', { config: { rawBody: true }, bodyLimit: 1024 * 64 }, async (request, reply) => await this.inbox(request, reply));
 		fastify.post('/users/:user/inbox', { config: { rawBody: true }, bodyLimit: 1024 * 64 }, async (request, reply) => await this.inbox(request, reply));
+		fastify.post('/channels/:channel/inbox', { config: { rawBody: true }, bodyLimit: 1024 * 64 }, async (request, reply) => await this.inbox(request, reply));
+		fastify.get<{ Params: { channel: string } }>('/channels/:channel', { constraints: { apOrHtml: 'ap' } }, async (request, reply) => {
+			if (this.meta.federation === 'none') return reply.code(403).send();
+			const channel = await this.channelFederationService.localChannel(`${this.config.url}/channels/${request.params.channel}`);
+			if (!channel || (!channel.isFederated && !channel.federationPublicKey)) return reply.code(404).send();
+			this.setResponseType(request, reply);
+			vary(reply.raw, 'Accept');
+			return await this.channelFederationService.renderActor(channel);
+		});
+		fastify.get<{ Params: { channel: string; collection: string } }>('/channels/:channel/:collection', async (request, reply) => {
+			if (this.meta.federation === 'none') return reply.code(403).send();
+			const channel = await this.channelFederationService.localChannel(`${this.config.url}/channels/${request.params.channel}`);
+			if (!channel || (!channel.isFederated && !channel.federationPublicKey)) return reply.code(404).send();
+			if (!['followers', 'following', 'outbox'].includes(request.params.collection)) return reply.code(404).send();
+			this.setResponseType(request, reply);
+			const uri = this.channelFederationService.actorUri(channel);
+			// The pilot exposes an empty following collection and the latest approved publications.
+			const notes = request.params.collection === 'outbox' ? await this.notesRepository.find({
+				where: { channelId: channel.id, localOnly: false, visibility: 'public', userHost: IsNull() },
+				order: { id: 'DESC' }, take: 20,
+			}) : [];
+			const items = request.params.collection === 'followers'
+				? await this.channelFederationService.followerUris(channel)
+				: await Promise.all(notes.map(note => this.channelFederationService.renderNoteAnnounce(channel, note)));
+			return this.apRendererService.addContext(this.apRendererService.renderOrderedCollection(`${uri}/${request.params.collection}`, items.length, undefined, undefined, items as IActivity[]));
+		});
+		fastify.get<{ Params: { channel: string; note: string } }>('/channels/:channel/activities/:note', async (request, reply) => {
+			if (this.meta.federation === 'none') return reply.code(403).send();
+			const channel = await this.channelFederationService.localChannel(`${this.config.url}/channels/${request.params.channel}`);
+			const note = channel ? await this.notesRepository.findOneBy({ id: request.params.note, channelId: channel.id, localOnly: false, visibility: 'public', userHost: IsNull() }) : null;
+			if (!channel || !note) return reply.code(404).send();
+			this.setResponseType(request, reply);
+			return await this.channelFederationService.renderNoteAnnounce(channel, note);
+		});
 
 		// note
 		fastify.get<{ Params: { note: string; } }>('/notes/:note', { constraints: { apOrHtml: 'ap' } }, async (request, reply) => {
