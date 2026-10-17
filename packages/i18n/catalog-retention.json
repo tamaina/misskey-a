@@ -1,0 +1,1066 @@
+{
+	"baseline": "23de9f6a1e23d1b14b75a81b2821d52c3420f2ae",
+	"metadata": [
+		{
+			"path": "_lang_",
+			"callers": [
+				"packages/frontend/vite.config.ts:168",
+				"packages/frontend-embed/vite.config.ts:137",
+				"packages/sw/build.js:26"
+			]
+		}
+	],
+	"runtimeUses": [
+		{
+			"file": "packages/sw/src/sw.ts",
+			"line": 55,
+			"path": "_offlineScreen.title"
+		},
+		{
+			"file": "packages/sw/src/sw.ts",
+			"line": 56,
+			"path": "_offlineScreen.header"
+		},
+		{
+			"file": "packages/sw/src/sw.ts",
+			"line": 57,
+			"path": "reload"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 60,
+			"path": "_notification.youWereFollowed"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 68,
+			"path": "_notification._actions.followBack"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 75,
+			"path": "_notification.youGotMention"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 83,
+			"path": "_notification._actions.reply"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 89,
+			"path": "_notification.youGotReply"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 97,
+			"path": "_notification._actions.reply"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 103,
+			"path": "_notification.youRenoted"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 117,
+			"path": "_notification.youGotQuote"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 125,
+			"path": "_notification._actions.reply"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 130,
+			"path": "_notification._actions.renote"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 137,
+			"path": "_notification.newNote"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 180,
+			"path": "_notification.youReceivedFollowRequest"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 188,
+			"path": "accept"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 192,
+			"path": "reject"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 198,
+			"path": "_notification.yourFollowRequestAccepted"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 206,
+			"path": "_notification.achievementEarned"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 207,
+			"path": "_achievements._types.*.title"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 214,
+			"path": "_notification.login"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 221,
+			"path": "antennas"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 222,
+			"path": "blockedUsers"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 223,
+			"path": "clips"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 224,
+			"path": "customEmojis"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 225,
+			"path": "favorites"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 226,
+			"path": "following"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 227,
+			"path": "mutedUsers"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 228,
+			"path": "notes"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 229,
+			"path": "lists"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 232,
+			"path": "_notification.exportOfXCompleted"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 239,
+			"path": "_notification.pollEnded"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 253,
+			"path": "_notification.testNotification"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 254,
+			"path": "_notification.notificationWillBeDisplayedLikeThis"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 263,
+			"path": "_notification.unreadAntennaNote"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 306,
+			"path": "markAllAsRead"
+		},
+		{
+			"file": "packages/sw/src/scripts/create-notification.ts",
+			"line": 310,
+			"path": "notificationSettings"
+		}
+	],
+	"retainedPaths": [
+		"_achievements._types._brainDiver.title",
+		"_achievements._types._bubbleGameDoubleExplodingHead.title",
+		"_achievements._types._bubbleGameExplodingHead.title",
+		"_achievements._types._clickedClickHere.title",
+		"_achievements._types._client30min.title",
+		"_achievements._types._client60min.title",
+		"_achievements._types._collectAchievements30.title",
+		"_achievements._types._cookieClicked.title",
+		"_achievements._types._driveFolderCircularReference.title",
+		"_achievements._types._followers1.title",
+		"_achievements._types._followers10.title",
+		"_achievements._types._followers100.title",
+		"_achievements._types._followers1000.title",
+		"_achievements._types._followers300.title",
+		"_achievements._types._followers50.title",
+		"_achievements._types._followers500.title",
+		"_achievements._types._following1.title",
+		"_achievements._types._following10.title",
+		"_achievements._types._following100.title",
+		"_achievements._types._following300.title",
+		"_achievements._types._following50.title",
+		"_achievements._types._foundTreasure.title",
+		"_achievements._types._htl20npm.title",
+		"_achievements._types._iLoveMisskey.title",
+		"_achievements._types._justPlainLucky.title",
+		"_achievements._types._loggedInOnBirthday.title",
+		"_achievements._types._loggedInOnNewYearsDay.title",
+		"_achievements._types._login100.title",
+		"_achievements._types._login1000.title",
+		"_achievements._types._login15.title",
+		"_achievements._types._login200.title",
+		"_achievements._types._login3.title",
+		"_achievements._types._login30.title",
+		"_achievements._types._login300.title",
+		"_achievements._types._login400.title",
+		"_achievements._types._login500.title",
+		"_achievements._types._login60.title",
+		"_achievements._types._login600.title",
+		"_achievements._types._login7.title",
+		"_achievements._types._login700.title",
+		"_achievements._types._login800.title",
+		"_achievements._types._login900.title",
+		"_achievements._types._markedAsCat.title",
+		"_achievements._types._myNoteFavorited1.title",
+		"_achievements._types._noteClipped1.title",
+		"_achievements._types._noteDeletedWithin1min.title",
+		"_achievements._types._noteFavorited1.title",
+		"_achievements._types._notes1.title",
+		"_achievements._types._notes10.title",
+		"_achievements._types._notes100.title",
+		"_achievements._types._notes1000.title",
+		"_achievements._types._notes10000.title",
+		"_achievements._types._notes100000.title",
+		"_achievements._types._notes20000.title",
+		"_achievements._types._notes30000.title",
+		"_achievements._types._notes40000.title",
+		"_achievements._types._notes500.title",
+		"_achievements._types._notes5000.title",
+		"_achievements._types._notes50000.title",
+		"_achievements._types._notes60000.title",
+		"_achievements._types._notes70000.title",
+		"_achievements._types._notes80000.title",
+		"_achievements._types._notes90000.title",
+		"_achievements._types._open3windows.title",
+		"_achievements._types._outputHelloWorldOnScratchpad.title",
+		"_achievements._types._passedSinceAccountCreated1.title",
+		"_achievements._types._passedSinceAccountCreated2.title",
+		"_achievements._types._passedSinceAccountCreated3.title",
+		"_achievements._types._postedAt0min0sec.title",
+		"_achievements._types._postedAtLateNight.title",
+		"_achievements._types._profileFilled.title",
+		"_achievements._types._reactWithoutRead.title",
+		"_achievements._types._selfQuote.title",
+		"_achievements._types._setNameToSyuilo.title",
+		"_achievements._types._smashTestNotificationButton.title",
+		"_achievements._types._tutorialCompleted.title",
+		"_achievements._types._viewAchievements3min.title",
+		"_achievements._types._viewInstanceChart.title",
+		"_lang_",
+		"_notification._actions.followBack",
+		"_notification._actions.renote",
+		"_notification._actions.reply",
+		"_notification.achievementEarned",
+		"_notification.exportOfXCompleted",
+		"_notification.login",
+		"_notification.newNote",
+		"_notification.notificationWillBeDisplayedLikeThis",
+		"_notification.pollEnded",
+		"_notification.testNotification",
+		"_notification.unreadAntennaNote",
+		"_notification.youGotMention",
+		"_notification.youGotQuote",
+		"_notification.youGotReply",
+		"_notification.youReceivedFollowRequest",
+		"_notification.youRenoted",
+		"_notification.youWereFollowed",
+		"_notification.yourFollowRequestAccepted",
+		"_offlineScreen.header",
+		"_offlineScreen.title",
+		"accept",
+		"all",
+		"antennas",
+		"areYouSure",
+		"blockedUsers",
+		"cancel",
+		"clips",
+		"close",
+		"copy",
+		"customEmojis",
+		"default",
+		"delete",
+		"description",
+		"edit",
+		"error",
+		"favorites",
+		"following",
+		"lists",
+		"markAllAsRead",
+		"mutedUsers",
+		"name",
+		"next",
+		"none",
+		"notes",
+		"notificationSettings",
+		"ok",
+		"preview",
+		"reject",
+		"reload",
+		"reset",
+		"save",
+		"search",
+		"somethingHappened",
+		"title",
+		"upload",
+		"users"
+	],
+	"removedClassifications": {
+		"unconfirmedKeys": 168,
+		"rawOracleKeys": 145
+	},
+	"excludedConsumers": [
+		{
+			"file": "packages/features/notifications/backend/services/NotificationService.ts:210-233",
+			"reason": "Both email helpers are commented out; their titles move to the test-only historical fixture."
+		},
+		{
+			"file": "packages/features/boot/frontend/shared/store-boot-errors.ts",
+			"reason": "Boot messages are owned by Vue/embed JSON; its type now derives from that existing JSON."
+		}
+	],
+	"unconfirmedKeys": [],
+	"sharedUses": [
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 10,
+			"path": "title"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 14,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 28,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 31,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/lookup.vue",
+			"line": 10,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkWindow.vue",
+			"line": 34,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
+			"line": 73,
+			"path": "next"
+		},
+		{
+			"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
+			"line": 82,
+			"path": "next"
+		},
+		{
+			"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
+			"line": 168,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channels.vue",
+			"line": 23,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channels.vue",
+			"line": 144,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channels.vue",
+			"line": 152,
+			"path": "favorites"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/XMessage.vue",
+			"line": 172,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/home.home.vue",
+			"line": 22,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/home.home.vue",
+			"line": 102,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/room.vue",
+			"line": 212,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/room.vue",
+			"line": 387,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/room.vue",
+			"line": 435,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/room.vue",
+			"line": 447,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/post.vue",
+			"line": 29,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/post.vue",
+			"line": 199,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/search.user.vue",
+			"line": 16,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/search.user.vue",
+			"line": 23,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.folder.vue",
+			"line": 191,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.folder.vue",
+			"line": 304,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.vue",
+			"line": 412,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.vue",
+			"line": 620,
+			"path": "upload"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.vue",
+			"line": 662,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.vue",
+			"line": 667,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.vue",
+			"line": 692,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/custom-emojis-manager.vue",
+			"line": 13,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/custom-emojis-manager.vue",
+			"line": 47,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/custom-emojis-manager.vue",
+			"line": 351,
+			"path": "customEmojis"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkSystemWebhookEditor.vue",
+			"line": 86,
+			"path": "ok"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkSystemWebhookEditor.vue",
+			"line": 88,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkSystemWebhookEditor.vue",
+			"line": 199,
+			"path": "error"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkSystemWebhookEditor.vue",
+			"line": 256,
+			"path": "error"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
+			"line": 48,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
+			"line": 62,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
+			"line": 76,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
+			"line": 90,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
+			"line": 104,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
+			"line": 118,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
+			"line": 132,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
+			"line": 146,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/note-search/frontend/pages/search.note.vue",
+			"line": 108,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
+			"line": 16,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
+			"line": 62,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
+			"line": 63,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
+			"line": 68,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/operations/frontend/pages/admin/object-storage.vue",
+			"line": 101,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page.vue",
+			"line": 272,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page.vue",
+			"line": 305,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash.vue",
+			"line": 18,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash.vue",
+			"line": 303,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/registry.value.vue",
+			"line": 32,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/registry.value.vue",
+			"line": 39,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/navbar.vue",
+			"line": 32,
+			"path": "default"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/navbar.vue",
+			"line": 33,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/sounds.sound.vue",
+			"line": 27,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/sounds.sound.vue",
+			"line": 87,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/sounds.sound.vue",
+			"line": 127,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/theme.manage.vue",
+			"line": 16,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/theme.manage.vue",
+			"line": 20,
+			"path": "copy"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.edit.vue",
+			"line": 14,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkPagination.vue",
+			"line": 101,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/admin/users.vue",
+			"line": 11,
+			"path": "reset"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/admin/users.vue",
+			"line": 94,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/admin/users.vue",
+			"line": 107,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/admin/users.vue",
+			"line": 167,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/admin/users.vue",
+			"line": 194,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/web/frontend/components/MkEmbedCodeGenDialog.vue",
+			"line": 29,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/web/frontend/components/MkEmbedCodeGenDialog.vue",
+			"line": 77,
+			"path": "copy"
+		},
+		{
+			"file": "packages/features/web/frontend/components/MkEmbedCodeGenDialog.vue",
+			"line": 79,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/web/frontend/pages/_error_.vue",
+			"line": 18,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/web/frontend/pages/_error_.vue",
+			"line": 74,
+			"path": "error"
+		}
+	],
+	"resolvedRemovals": [
+		{
+			"previousClassification": "unconfirmed",
+			"paths": [
+				"monthAndDay",
+				"uploading",
+				"favorited",
+				"alreadyFavorited",
+				"searchUser",
+				"showLess",
+				"pinned",
+				"emojiPicker",
+				"unsuspend",
+				"emojis",
+				"emojiName",
+				"wallpaper",
+				"instances",
+				"latestStatus",
+				"operations",
+				"monitor",
+				"network",
+				"disk",
+				"currentPassword",
+				"removed",
+				"home",
+				"watch",
+				"unwatch",
+				"integration",
+				"pinnedPages",
+				"pinnedClipId",
+				"hcaptcha",
+				"enableHcaptcha",
+				"mcaptcha",
+				"enableMcaptcha",
+				"recaptcha",
+				"enableRecaptcha",
+				"turnstile",
+				"enableTurnstile",
+				"invites",
+				"transfer",
+				"noHistory",
+				"regenerate",
+				"appearance",
+				"promotion",
+				"promote",
+				"hideThisNote",
+				"showFeaturedNotesInTimeline",
+				"deleteAll",
+				"showFixedPostForm",
+				"deleteAllFiles",
+				"leaveConfirm",
+				"notificationType",
+				"metrics",
+				"delayed",
+				"sample",
+				"repliesCount",
+				"repliedCount",
+				"followingCount",
+				"followersCount",
+				"pollVotesCount",
+				"driveUsage",
+				"experimental",
+				"wide",
+				"narrow",
+				"sendErrorReports",
+				"sendErrorReportsDescription",
+				"advanced",
+				"onlineStatus",
+				"global",
+				"sent",
+				"received",
+				"aiChanMode",
+				"unread",
+				"classic",
+				"undefined",
+				"videos",
+				"reactionsList",
+				"createWithOptions",
+				"edited",
+				"replay",
+				"genEmbedCode",
+				"draft",
+				"untitled",
+				"chat",
+				"defaultImageCompressionLevel",
+				"_settings.showUrlPreview",
+				"_ffVisibility.public",
+				"_ffVisibility.followers",
+				"_ffVisibility.private",
+				"_ad.hide",
+				"_plugin.manage",
+				"_preferencesBackups.list",
+				"_preferencesBackups.apply",
+				"_preferencesBackups.save",
+				"_preferencesBackups.nameAlreadyExists",
+				"_preferencesBackups.saveConfirm",
+				"_preferencesBackups.deleteConfirm",
+				"_preferencesBackups.createdAt",
+				"_preferencesBackups.updatedAt",
+				"_preferencesBackups.cannotLoad",
+				"_aboutMisskey.contributors",
+				"_menuDisplay.top",
+				"_menuDisplay.hide",
+				"_theme.base",
+				"_theme.addConstant",
+				"_theme.constant",
+				"_theme.defaultValue",
+				"_theme.refProp",
+				"_theme.refConst",
+				"_theme.key",
+				"_theme.func",
+				"_theme.funcKind",
+				"_theme.argument",
+				"_theme.basedProp",
+				"_theme.darken",
+				"_theme.inputConstantName",
+				"_theme.importInfo",
+				"_theme.deleteConstantConfirm",
+				"_theme.keys.accent",
+				"_theme.keys.bg",
+				"_theme.keys.fg",
+				"_theme.keys.focus",
+				"_theme.keys.indicator",
+				"_theme.keys.panel",
+				"_theme.keys.shadow",
+				"_theme.keys.navBg",
+				"_theme.keys.navFg",
+				"_theme.keys.navActive",
+				"_theme.keys.navIndicator",
+				"_theme.keys.link",
+				"_theme.keys.hashtag",
+				"_theme.keys.mention",
+				"_theme.keys.mentionMe",
+				"_theme.keys.renote",
+				"_theme.keys.modalBg",
+				"_theme.keys.divider",
+				"_theme.keys.scrollbarHandle",
+				"_theme.keys.scrollbarHandleHover",
+				"_theme.keys.dateLabelFg",
+				"_theme.keys.infoBg",
+				"_theme.keys.infoFg",
+				"_theme.keys.infoWarnBg",
+				"_theme.keys.infoWarnFg",
+				"_theme.keys.toastBg",
+				"_theme.keys.toastFg",
+				"_theme.keys.buttonBg",
+				"_theme.keys.buttonHoverBg",
+				"_theme.keys.inputBorder",
+				"_theme.keys.badge",
+				"_theme.keys.messageBg",
+				"_theme.keys.fgHighlighted",
+				"_ago.future",
+				"_profile.username",
+				"_profile.metadata",
+				"_charts.filesTotal",
+				"_play.created",
+				"_play.updated",
+				"_play.deleted",
+				"_play.pageSetting",
+				"_fileViewer.url",
+				"_externalResourceInstaller._vendorInfo.title",
+				"_externalResourceInstaller._errors._themeInstallFailed.title",
+				"_externalResourceInstaller._errors._themeInstallFailed.description",
+				"_reversi.reversi",
+				"_gridComponent._error.columnTypeNotSupport",
+				"_embedCodeGen.autoload",
+				"_watermarkEditor.advanced",
+				"_imageEffector._fxProps.radius",
+				"_imageEffector._fxProps.samples",
+				"_imageEffector._fxProps.threshold",
+				"_drafts.select",
+				"_drafts.schedule"
+			],
+			"reason": "No live legacy frontend labels (source AST and production bundle guard); no SW path or metadata consumer. Original raw/effective values remain in test-only catalog history."
+		},
+		{
+			"previousClassification": "raw-oracle",
+			"paths": [
+				"loginFailed",
+				"changePassword",
+				"retypedNotMatch",
+				"newPasswordRetype",
+				"signinFailed",
+				"signinHistory",
+				"emailServer",
+				"enableEmail",
+				"emailConfigInfo",
+				"emailAddress",
+				"smtpConfig",
+				"smtpHost",
+				"smtpPort",
+				"smtpUser",
+				"smtpPass",
+				"emptyToDisableSmtpAuth",
+				"smtpSecure",
+				"smtpSecureInfo",
+				"testEmail",
+				"regenerateLoginToken",
+				"regenerateLoginTokenDescription",
+				"incorrectTotp",
+				"rateLimitExceeded",
+				"recommended",
+				"unknownWebAuthnKey",
+				"_chat.invitations",
+				"_chat.noHistory",
+				"_chat.members",
+				"_chat.home",
+				"_chat.send",
+				"_chat.cannotChatWithTheUser",
+				"_chat.cannotChatWithTheUser_description",
+				"_initialTutorial.launchTutorial",
+				"_initialTutorial.title",
+				"_initialTutorial.skipAreYouSure",
+				"_initialTutorial._landing.title",
+				"_initialTutorial._note.reply",
+				"_initialTutorial._note.menu",
+				"_initialTutorial._reaction.title",
+				"_initialTutorial._timeline.social",
+				"_initialTutorial._postNote._visibility.localOnly",
+				"_initialTutorial._postNote._cw.description",
+				"_initialTutorial._postNote._cw.useCases",
+				"_initialTutorial._done.title",
+				"_role.edit",
+				"_role.assignTarget",
+				"_role.options",
+				"_role.displayOrder",
+				"_role.priority",
+				"_role._priority.low",
+				"_role._priority.middle",
+				"_role._priority.high",
+				"_role._options.canManageCustomEmojis",
+				"_role._options.canManageAvatarDecorations",
+				"_role._options.canHideAds",
+				"_role._condition.isRemote",
+				"_role._condition.isCat",
+				"_role._condition.isBot",
+				"_permissions.access:mcp",
+				"_permissions.read:account",
+				"_permissions.write:account",
+				"_permissions.read:blocks",
+				"_permissions.write:blocks",
+				"_permissions.read:drive",
+				"_permissions.write:drive",
+				"_permissions.read:favorites",
+				"_permissions.write:favorites",
+				"_permissions.read:following",
+				"_permissions.write:following",
+				"_permissions.read:messaging",
+				"_permissions.write:messaging",
+				"_permissions.read:mutes",
+				"_permissions.write:mutes",
+				"_permissions.write:notes",
+				"_permissions.read:notifications",
+				"_permissions.write:notifications",
+				"_permissions.read:reactions",
+				"_permissions.write:reactions",
+				"_permissions.write:votes",
+				"_permissions.read:pages",
+				"_permissions.write:pages",
+				"_permissions.read:page-likes",
+				"_permissions.write:page-likes",
+				"_permissions.read:user-groups",
+				"_permissions.write:user-groups",
+				"_permissions.read:channels",
+				"_permissions.write:channels",
+				"_permissions.read:gallery",
+				"_permissions.write:gallery",
+				"_permissions.read:gallery-likes",
+				"_permissions.write:gallery-likes",
+				"_permissions.write:admin:delete-account",
+				"_permissions.write:admin:roles",
+				"_permissions.read:admin:roles",
+				"_permissions.write:chat",
+				"_pages.newPage",
+				"_pages.editPage",
+				"_pages.readPage",
+				"_pages.pageSetting",
+				"_pages.nameAlreadyExists",
+				"_pages.invalidNameTitle",
+				"_pages.invalidNameText",
+				"_pages.editThisPage",
+				"_pages.viewSource",
+				"_pages.viewPage",
+				"_pages.like",
+				"_pages.unlike",
+				"_pages.my",
+				"_pages.liked",
+				"_pages.featured",
+				"_pages.inspector",
+				"_pages.contents",
+				"_pages.content",
+				"_pages.variables",
+				"_pages.title",
+				"_pages.url",
+				"_pages.summary",
+				"_pages.alignCenter",
+				"_pages.hideTitleWhenPinned",
+				"_pages.font",
+				"_pages.fontSerif",
+				"_pages.fontSansSerif",
+				"_pages.eyeCatchingImageSet",
+				"_pages.eyeCatchingImageRemove",
+				"_pages.chooseBlock",
+				"_pages.selectType",
+				"_pages.contentBlocks",
+				"_pages.inputBlocks",
+				"_pages.specialBlocks",
+				"_pages.blocks.text",
+				"_pages.blocks.textarea",
+				"_pages.blocks.section",
+				"_pages.blocks.image",
+				"_pages.blocks.button",
+				"_pages.blocks.note",
+				"_pages.blocks._note.id",
+				"_pages.blocks._note.idDescription",
+				"_pages.blocks._note.detailed",
+				"_moderationLogTypes.suspend",
+				"_moderationLogTypes.deleteNote",
+				"_moderationLogTypes.deleteUserAnnouncement",
+				"_moderationLogTypes.resetPassword",
+				"_moderationLogTypes.resolveAbuseReport",
+				"_moderationLogTypes.createInvitation",
+				"_moderationLogTypes.deleteGalleryPost"
+			],
+			"reason": "Only historical regression tests consume these values; all prior raw/effective hashes and inactive-language expectations are maintained by test-only reconstruction.",
+			"proofs": [
+				"packages/frontend/test/unit/email-settings-locales.test.ts",
+				"packages/frontend/test/unit/final-owner-locales.test.ts",
+				"packages/frontend/test/unit/retired-ui-locale-baseline.test.ts"
+			]
+		}
+	]
+}

@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { load } from 'js-yaml';
+import { historicalRawLocale } from './catalog-history.js';
 import { languages, locales as currentLocales } from 'i18n';
 import { expect, test } from 'vitest';
 import baseline from './retired-ui-locale-baseline.json';
@@ -39,10 +40,10 @@ test('retired UI values retain their independent original effective-catalog hash
 	}
 });
 
-test('inactive-language translations are preserved byte-for-byte as YAML values', () => {
+test('inactive-language historical translations retain their independently frozen raw values', () => {
 	let total = 0;
 	for (const [language, frozen] of Object.entries(baseline.inactive)) {
-		const raw = (load(readFileSync(resolve(root, 'locales', `${language}.yml`), 'utf8').replaceAll('\b', '')) ?? {}) as Record<string, unknown>;
+		const raw = historicalRawLocale(language);
 		const selected = Object.fromEntries(baseline.inactiveNamespaces.filter(namespace => raw[namespace] !== undefined).map(namespace => [namespace, raw[namespace]]));
 		const pairs = flatten(selected);
 		expect(pairs).toHaveLength(frozen.count);

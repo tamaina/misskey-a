@@ -4,6 +4,7 @@
  */
 
 import { resolve } from 'node:path';
+import { locales } from 'i18n';
 import { vueInternationalization } from 'vite-vue-internationalization';
 import type { VueInternationalizationOptions } from 'vite-vue-internationalization';
 import embedBootMessages from '../../features/boot/frontend/embed/boot-messages.json' with { type: 'json' };
@@ -13,8 +14,9 @@ export function pluginVvi(options: { embed?: boolean; buildStrategy?: VueInterna
 	const plugin = vueInternationalization({
 		primaryLocale: 'ja-JP',
 		buildStrategy: options.buildStrategy,
-		// Embed boot messages also retain all supported loader languages.
-		global: options.embed ? embedBootMessages : undefined,
+		// Reuse the existing catalog and its fallback policy; do not copy shared translations.
+		global: options.embed ? embedBootMessages : locales,
+
 		scan: options.embed
 			? { include: ['features/*/frontend/embed/**/*.vue'] }
 			: { include: ['features/*/frontend/**/*.vue'], exclude: ['features/*/frontend/embed/**'] },

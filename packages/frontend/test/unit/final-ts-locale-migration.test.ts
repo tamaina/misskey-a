@@ -16,7 +16,7 @@ import { parse, compileScript } from 'vue/compiler-sfc';
 import { expect, test } from 'vitest';
 import { createInternationalization, setActiveInternationalization, createComponentLocale, createComponentLocalizer, useLocale } from 'vite-vue-internationalization/runtime';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
-import { languages } from 'i18n';
+import { languages, locales as globalLocales } from 'i18n';
 import { locales } from './instance-pilot-locale-catalog.js';
 import type { ParameterizedString } from 'i18n';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
@@ -137,7 +137,7 @@ test('all39 TS consumers reverse byte for byte and all17 owners retain exactly91
 
 test.each(languages)('actual default owner exports preserve every access and formatter in %s', async language => {
 	const payload = generated(language);
-	expect(payload.global).toEqual({});
+	expect(payload.global).toEqual(globalLocales[language]);
 	const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
 	await runtime.ready;
 	await runtime.loadLocale(language);

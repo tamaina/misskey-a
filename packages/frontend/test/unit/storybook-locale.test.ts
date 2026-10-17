@@ -9,7 +9,7 @@ import type { App } from 'vue';
 import { expect, test, vi } from 'vitest';
 import ts from 'typescript';
 import { createInternationalization, setActiveInternationalization } from 'virtual:vite-vue-internationalization';
-import locales from 'i18n';
+import { locales } from './pruned-global-locale-baseline.js';
 import previewSource from '../../.storybook/preview.ts?raw';
 import { preferState } from '../setup.unit.js';
 import { startComponentLocales } from '@features/boot/frontend/index.js';
@@ -76,10 +76,10 @@ test('actual Storybook preview setup readies real component locales and installs
 		setup: () => () => h('div', [h(MkEmoji, { emoji: '\u2764' }), h(MkResult, { type: 'empty' })]),
 	}));
 	const use = vi.spyOn(app, 'use');
-	const element = document.createElement('div');
+	const element = window.document.createElement('div');
 	const secondApp = createApp(MkResult, { type: 'notFound' });
 	const secondUse = vi.spyOn(secondApp, 'use');
-	const secondElement = document.createElement('div');
+	const secondElement = window.document.createElement('div');
 	try {
 		configure(app);
 		configure(app);

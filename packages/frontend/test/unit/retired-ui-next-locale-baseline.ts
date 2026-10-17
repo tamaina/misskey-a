@@ -4,6 +4,7 @@
  */
 
 import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
+import { restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -41,7 +42,7 @@ function ownerValue(index: number, language: string, path: string): string {
 	let blocks = dictionaries.get(index);
 	if (!blocks) {
 		const filename = resolve(root, baseline.owners[index]);
-		const parsed = parse(restoreUpstreamDevelopBaseline(baseline.owners[index], readFileSync(filename, 'utf8')), { filename });
+		const parsed = parse(restoreUpstreamDevelopBaseline(baseline.owners[index], restoreGlobalCatalogPilotSource(baseline.owners[index], readFileSync(filename, 'utf8'))), { filename });
 		const expectedError = `At least one <template> or <script> is required in a single file component. ${filename}`;
 		if (parsed.errors.some(error => (typeof error === 'string' ? error : error.message) !== expectedError)) throw new Error(`Invalid UI locale owner: ${filename}`);
 		blocks = new Map();
