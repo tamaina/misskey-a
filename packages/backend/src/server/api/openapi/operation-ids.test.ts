@@ -43,6 +43,12 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	for (const path of ['signup-pending', 'signin-flow', 'signin-with-passkey']) {
 		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('-', '_')}`);
 	}
+	const walletPaths = ['account/wallets/link/passkey-options', 'account/wallets/list', 'account/wallets/link/chains',
+		'account/wallets/link/begin', 'account/wallets/link/verify', 'account/wallets/unlink',
+		'admin/wallets/chains/list', 'admin/wallets/chains/upsert'];
+	for (const path of walletPaths) {
+		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('/', '___')}`);
+	}
 	const identifiers = Object.values(spec.paths ?? {}).flatMap(item => (['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'] as const).flatMap(method => {
 		const operation = item?.[method];
 		return operation ? [operation.operationId] : [];
@@ -50,7 +56,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/i/sessions']?.post?.operationId).toBe('post___i___sessions');
 	expect(spec.paths?.['/i/sessions/revoke']?.post?.operationId).toBe('post___i___sessions___revoke');
 	expect(spec.paths?.['/i/signout']?.post?.operationId).toBe('post___i___signout');
-	expect(identifiers).toHaveLength(477);
+	expect(identifiers).toHaveLength(477 + walletPaths.length);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

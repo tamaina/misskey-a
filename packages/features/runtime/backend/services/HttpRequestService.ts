@@ -331,6 +331,9 @@ export class HttpRequestService {
 			timeout?: number,
 			size?: number,
 			isLocalAddressAllowed?: boolean,
+			/** Optional bounded redirect behavior; defaults preserve the native fetch policy. */
+			redirect?: 'follow' | 'error' | 'manual',
+			follow?: number,
 		} = {},
 		extra: HttpRequestSendOptions = {
 			throwErrorWhenResponseNotOk: true,
@@ -354,6 +357,8 @@ export class HttpRequestService {
 			},
 			body: args.body,
 			size: args.size ?? 10 * 1024 * 1024,
+			...(args.redirect !== undefined ? { redirect: args.redirect } : {}),
+			...(args.follow !== undefined ? { follow: args.follow } : {}),
 			agent: (url) => this.getAgentByUrl(url, false, isLocalAddressAllowed),
 			signal: controller.signal,
 		});

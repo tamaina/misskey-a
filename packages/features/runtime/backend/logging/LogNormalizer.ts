@@ -59,6 +59,7 @@ const sensitiveKeyParts = [
 	'cookie',
 	'apikey',
 	'privatekey',
+	'rpcurl',
 	'credential',
 	'captcha',
 	'hcaptcharesponse',

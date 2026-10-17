@@ -12,6 +12,12 @@ import {
 } from '@features/runtime/backend/logging/LogNormalizer.js';
 
 describe('LogNormalizer', () => {
+	test('redacts private wallet RPC URLs in optional request-body and nested attribute logging', () => {
+		const body = { rpcUrl: 'https://synthetic:fake@rpc.example.test/token', chainId: 123456 };
+		expect(normalizeLogValue(body)).toEqual({ rpcUrl: '[REDACTED]', chainId: 123456 });
+		expect(normalizeLogAttributes({ request: body })).toEqual({ request: { rpcUrl: '[REDACTED]', chainId: 123456 } });
+	});
+
 	test('normalizes common non-JSON values', () => {
 		expect(normalizeLogAttributes({
 			date: new Date('2025-01-02T03:04:05.678Z'),

@@ -110,6 +110,10 @@ export const ROUTE_DEF = [{
 		name: 'email',
 		component: page(() => import('@features/auth/frontend/pages/settings/email.vue')),
 	}, {
+		path: '/wallets',
+		name: 'wallets',
+		component: page(() => import('@features/billing/frontend/pages/settings/wallets.vue')),
+	}, {
 		path: '/security',
 		name: 'security',
 		component: page(() => import('@features/auth/frontend/pages/settings/security.vue')),
@@ -459,6 +463,10 @@ export const ROUTE_DEF = [{
 		path: '/modlog',
 		name: 'modlog',
 		component: page(() => import('@features/moderation/frontend/pages/admin/modlog.vue')),
+	}, {
+		path: '/wallet-chains',
+		name: 'walletChains',
+		component: page(() => import('@features/billing/frontend/pages/admin/wallet-chains.vue')),
 	}, {
 		path: '/settings',
 		name: 'settings',

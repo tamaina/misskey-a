@@ -121,7 +121,9 @@
 			"archiver": ["./node_modules/@types/archiver/index.d.ts"],
 			"mime-types": ["./node_modules/@types/mime-types/index.d.ts"],
 			"jsonld": ["./node_modules/@types/jsonld/index.d.ts"],
-			"systeminformation": ["./node_modules/systeminformation/lib/index.d.ts"]
+			"systeminformation": ["./node_modules/systeminformation/lib/index.d.ts"],
+			"viem": ["./node_modules/viem/_types/index.d.ts"],
+			"viem/siwe": ["./node_modules/viem/_types/siwe/index.d.ts"]
 		}
 	}
 }
