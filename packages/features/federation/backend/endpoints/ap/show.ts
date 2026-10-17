@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { IsNull } from 'typeorm';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import * as Acct from '../../utility/acct.js';
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
 import { toPackedNote } from '@features/notes/backend/note.schema.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
@@ -24,7 +27,8 @@ import { FetchAllowSoftFailMask } from '../../protocol/misc/check-against-url.js
 import { apiError } from '../../../../api/backend/transport/orpc-error.js';
 import type { ApShowOutput } from './show.contract.js';
 export interface ApShowDependencies {
-	utilityService: Pick<UtilityService, 'isFederationAllowedUri' | 'extractDbHost' | 'isSelfHost'>;
+	utilityService: Pick<UtilityService, 'isFederationAllowedUri' | 'extractDbHost' | 'isSelfHost' | 'isUriLocal'>;
+	usersRepository: Pick<UsersRepository, 'findOneBy'>;
 	userEntityService: Pick<UserEntityService, 'pack'>;
 	noteEntityService: Pick<NoteEntityService, 'pack'>;
 	apResolverService: Pick<ApResolverService, 'createResolver'>;
@@ -38,7 +42,7 @@ export function createApShowProcedure<Actor extends ApiActor>(deps: ApShowDepend
 			throw apiError(apShowErrors.federationNotAllowed);
 		}
 		let local = await mergePack(me, ...await Promise.all([
-			deps.apDbResolverService.getUserFromApId(uri),
+			deps.apDbResolverService.getUserFromApId(uri).then(async user => user ?? await getUserFromProfileUrl(uri)),
 			deps.apDbResolverService.getNoteFromApId(uri),
 		]));
 		if (local != null) return local;
@@ -91,6 +95,26 @@ export function createApShowProcedure<Actor extends ApiActor>(deps: ApShowDepend
 			isActor(object) ? await deps.apPersonService.createPerson(getApId(object)) : null,
 			isPost(object) ? await deps.apNoteService.createNote(getApId(object), undefined, undefined, true) : null,
 		);
+	}
+
+	async function getUserFromProfileUrl(url: string): Promise<MiUser | null> {
+		if (!deps.utilityService.isUriLocal(url)) return null;
+
+		const uri = new URL(url);
+		const pathComponents = uri.pathname.split('/').filter(Boolean);
+		if (pathComponents.length !== 1 || !pathComponents[0].startsWith('@')) return null;
+
+		const acct = Acct.parse(pathComponents[0]);
+		if (deps.utilityService.isSelfHost(acct.host)) acct.host = null;
+
+		// Stored identities are resolved directly, independently of allowExternalApRedirect.
+		// Do not fetch missing remote users or expose deleted/suspended identities.
+		return await deps.usersRepository.findOneBy({
+			usernameLower: acct.username.toLowerCase(),
+			host: acct.host ?? IsNull(),
+			isDeleted: false,
+			isSuspended: false,
+		});
 	}
 
 	async function mergePack(me: { id: MiUser['id'] } | null | undefined, user: MiUser | null | undefined, note: MiNote | null | undefined): Promise<ApShowOutput | null> {
