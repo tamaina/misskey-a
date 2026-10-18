@@ -4,12 +4,14 @@
  */
 
 import { createHash } from 'node:crypto';
+import { restoreSudoSettingsBaseline } from './sudo-settings-source-rebase.js';
 import rebases from './email-change-source-rebase.json';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 /** Reverse only this email-change flow fix before checking the frozen locale proofs. */
 export function restoreEmailChangeBaseline(file: string, source: string): string {
+	if (file === 'packages/features/auth/frontend/pages/settings/email.vue') source = restoreSudoSettingsBaseline(file, source);
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from the email-change change: ${file}`);

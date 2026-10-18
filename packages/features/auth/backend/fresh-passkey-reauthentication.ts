@@ -9,6 +9,7 @@ import * as v from 'valibot';
 import { generateAuthenticationOptions, verifyAuthenticationResponse } from '@simplewebauthn/server';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import type { BrowserSessionIdentity } from '@features/api/backend/transport/context.js';
+import type { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import type { MfaPolicySnapshot } from './mfa-policy.js';
 import type { MiUserSecurityKey } from './models/UserSecurityKey.js';
 import type { BrowserSessionService } from './services/BrowserSessionService.js';
@@ -26,11 +27,11 @@ export interface FreshReauthenticationIdentity {
 }
 
 /** Counters, last-used dates and recovery consumption do not change credential policy. */
-export function freshReauthenticationPolicyStamp(profile: MfaPolicySnapshot, keys: Pick<MiUserSecurityKey, 'id' | 'userId' | 'publicKey'>[]): string {
+export function freshReauthenticationPolicyStamp(profile: MfaPolicySnapshot & Partial<Pick<MiUserProfile, 'usePasswordLessLogin' | 'passwordLoginDisabled'>>, keys: Pick<MiUserSecurityKey, 'id' | 'userId' | 'publicKey'>[]): string {
 	if (keys.some(key => key.userId !== profile.userId)) throw new Error('Fresh reauthentication failed');
 	return createHash('sha256').update(JSON.stringify([
 		profile.userId, profile.password ?? null, profile.twoFactorEnabled === true,
-		profile.twoFactorSecret ?? null, profile.passkeyMfaEnabled === true,
+		profile.twoFactorSecret ?? null, profile.passkeyMfaEnabled === true, profile.usePasswordLessLogin === true, profile.passwordLoginDisabled === true,
 		keys.map(key => [key.id, normalizedPasskeyPublicKey(key.publicKey)]).sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0),
 	])).digest('hex');
 }
@@ -63,15 +64,17 @@ export class FreshPasskeyReauthentication {
 		return { profile, keys, stamp: freshReauthenticationPolicyStamp(profile, keys) };
 	}
 
-	async begin(identity: FreshReauthenticationIdentity, purpose: FreshReauthenticationPurpose, password: string, targetStamp?: string) {
+	async begin(identity: FreshReauthenticationIdentity, purpose: FreshReauthenticationPurpose, password: string | undefined, targetStamp?: string) {
 		const deadline = performance.now() + 90_000;
 		const binding = await this.binding(identity, purpose, targetStamp);
 		// Anchor to Redis time BEFORE the password proof; queued create cannot renew it.
 		const expiresAt = await this.store.startDeadline();
 		const before = await this.snapshot(binding.userId);
-		if (!await bcrypt.compare(password, before.profile.password!)) throw new Error('Fresh reauthentication failed');
+		if (before.profile.passwordLoginDisabled === true && purpose !== 'sudo') throw new Error('Fresh reauthentication failed');
+		const strictPrimary = purpose === 'sudo' && before.profile.passwordLoginDisabled === true && before.profile.usePasswordLessLogin === true && !before.profile.passkeyMfaEnabled;
+		if (!strictPrimary && (password === undefined || !await bcrypt.compare(password, before.profile.password!))) throw new Error('Fresh reauthentication failed');
 		const options = await generateAuthenticationOptions({
-			rpID: this.config.hostname, userVerification: 'required',
+			rpID: this.config.hostname, userVerification: purpose === 'sudo' && !before.profile.usePasswordLessLogin ? 'preferred' : 'required',
 			allowCredentials: before.keys.map(key => ({ id: key.id, transports: key.transports == null ? undefined : v.parse(v.array(webAuthnTransportSchema), key.transports) })),
 		});
 		v.assert(nativeAuthenticationOptionsSchema, options);
@@ -93,6 +96,7 @@ export class FreshPasskeyReauthentication {
 		if (!claimed) throw new Error('Fresh reauthentication failed');
 		const deadline = started + claimed.remainingMs;
 		const before = await this.snapshot(binding.userId);
+		if (before.profile.passwordLoginDisabled === true && purpose !== 'sudo') throw new Error('Fresh reauthentication failed');
 		if (before.stamp !== claimed.record.policyStamp || performance.now() >= deadline) throw new Error('Fresh reauthentication failed');
 		const credential = v.parse(webAuthnAuthenticationResponseSchema, response);
 		const key = before.keys.find(key => key.id === credential.id);
@@ -101,10 +105,10 @@ export class FreshPasskeyReauthentication {
 		const result = await verifyAuthenticationResponse({
 			response: credential, expectedChallenge: claimed.record.challenge,
 			expectedOrigin: this.config.url, expectedRPID: this.config.hostname,
-			requireUserVerification: true,
+			requireUserVerification: purpose !== 'sudo' || before.profile.usePasswordLessLogin === true,
 			credential: { id: key.id, publicKey: Buffer.from(publicKey, 'base64url'), counter: Number(key.counter), transports: key.transports == null ? undefined : v.parse(v.array(webAuthnTransportSchema), key.transports) },
 		});
-		if (!result.verified || !result.authenticationInfo.userVerified) throw new Error('Fresh reauthentication failed');
+		if (!result.verified || ((purpose !== 'sudo' || before.profile.usePasswordLessLogin === true) && !result.authenticationInfo.userVerified)) throw new Error('Fresh reauthentication failed');
 		// Compare-and-update prevents a concurrent assertion from rewinding counters.
 		const updated = await this.keys.update({ id: key.id, userId: binding.userId, publicKey: key.publicKey, counter: key.counter }, {
 			publicKey, counter: result.authenticationInfo.newCounter, lastUsed: new Date(),

@@ -133,8 +133,7 @@ export class MiUserProfile {
 	})
 	public twoFactorEnabled: boolean;
 
-	// Server-only groundwork. No activation writer is exposed until all callers
-	// enforce independent MFA and fresh, session/purpose-bound reauthentication.
+	// Independent passkey MFA is activated only by the session-bound enrollment flow.
 	@Column('boolean', {
 		default: false,
 	})
@@ -149,6 +148,14 @@ export class MiUserProfile {
 		default: false,
 	})
 	public usePasswordLessLogin: boolean;
+
+	/** Only a strict passkey proof can turn off password-based sign-in. */
+	@Column('boolean', { default: false })
+	public passwordLoginDisabled: boolean;
+
+	/** Exact server-owned intent required by a commit-gated account deletion job. */
+	@Column('varchar', { length: 43, nullable: true, select: false })
+	public deletionIntentId: string | null;
 
 	@Column('varchar', {
 		length: 128, nullable: true,

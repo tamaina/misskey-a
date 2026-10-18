@@ -50,6 +50,7 @@ import { GetterService } from '@features/api/backend/transport/GetterService.js'
 import { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
 import type { Config } from '@/config.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { AccountUpdateService } from './services/AccountUpdateService.js';
@@ -132,6 +133,10 @@ export class UsersApiProvider {
 				achievementService: this.moduleRef.get(AchievementService, { strict: false }),
 			},
 			'i/delete-account': {
+				db: this.moduleRef.get(DI.db),
+				meta: this.moduleRef.get(DI.meta),
+				queue: this.moduleRef.get(QueueService, { strict: false }),
+				globalEventService: this.moduleRef.get(GlobalEventService, { strict: false }),
 				usersRepository: this.moduleRef.get<UsersRepository>(DI.usersRepository, { strict: false }),
 				userProfilesRepository: this.moduleRef.get<UserProfilesRepository>(DI.userProfilesRepository, { strict: false }),
 				userAuthService: this.moduleRef.get(UserAuthService, { strict: false }),

@@ -7,7 +7,7 @@ import * as v from 'valibot';
 import type { Redis } from 'ioredis';
 
 const id = v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{1,128}$/));
-export const freshReauthenticationPurposeSchema = v.picklist(['activate-passkey-mfa', 'show-recovery-codes', 'change-password', 'regenerate-token', 'update-email']);
+export const freshReauthenticationPurposeSchema = v.picklist(['activate-passkey-mfa', 'show-recovery-codes', 'change-password', 'regenerate-token', 'update-email', 'sudo']);
 const bindingEntries = { userId: id, sessionId: id, purpose: freshReauthenticationPurposeSchema, targetStamp: v.exactOptional(v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/))) };
 const hasExactTarget = (value: { purpose: string; targetStamp?: string }) => (value.purpose === 'update-email') === (value.targetStamp !== undefined);
 export const freshReauthenticationBindingSchema = v.pipe(v.strictObject(bindingEntries), v.check(value => hasExactTarget(value)));

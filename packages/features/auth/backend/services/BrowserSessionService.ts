@@ -76,7 +76,7 @@ export class BrowserSessionService {
 	}
 
 	public async revokeAllOwned(userId: string, repository: Pick<BrowserSessionsRepository, 'update'> = this.browserSessionsRepository): Promise<void> {
-		await repository.update({ userId, revokedAt: IsNull() }, { revokedAt: new Date(), sudoUntil: null });
+		await repository.update({ userId, revokedAt: IsNull() }, { revokedAt: new Date(), sudoUntil: null, sudoPolicyStamp: null });
 	}
 
 	public async listOwned(userId: string, limit = 100, offset = 0): Promise<BrowserSessionMetadata[]> {
@@ -88,7 +88,7 @@ export class BrowserSessionService {
 	public async revokeOwned(userId: string, sessionId: string): Promise<boolean> {
 		const result = await this.browserSessionsRepository.update({
 			id: sessionId, userId, revokedAt: IsNull(),
-		}, { revokedAt: new Date(), sudoUntil: null });
+		}, { revokedAt: new Date(), sudoUntil: null, sudoPolicyStamp: null });
 		return result.affected === 1;
 	}
 }

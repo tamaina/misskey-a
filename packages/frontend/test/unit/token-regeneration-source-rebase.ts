@@ -4,12 +4,14 @@
  */
 
 import { createHash } from 'node:crypto';
+import { restoreSudoSettingsBaseline } from './sudo-settings-source-rebase.js';
 import rebases from './token-regeneration-source-rebase.json';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 /** Reverse only this token-regeneration flow fix before checking the frozen locale proofs. */
 export function restoreTokenRegenerationBaseline(file: string, source: string): string {
+	if (file === 'packages/features/auth/frontend/pages/settings/security.vue') source = restoreSudoSettingsBaseline(file, source);
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from the token-regeneration change: ${file}`);

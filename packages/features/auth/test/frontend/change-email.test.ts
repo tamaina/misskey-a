@@ -9,7 +9,10 @@ import * as os from '@features/ui/frontend/os.js';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import Email from '../../frontend/pages/settings/email.vue';
 vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: vi.fn(() => true), startAuthentication: vi.fn() }));
-const account = vi.hoisted(() => ({ email: 'old@example.test', emailVerified: true, token: 'bs_synthetic', securityKeysList: [{ id: 'AQID' }], emailNotificationTypes: [], receiveAnnouncementEmail: false }));
+import { ensureSudo } from '../../frontend/utility/ensure-sudo.js';
+vi.mock('@features/auth/frontend/utility/ensure-sudo.js', () => ({ ensureSudo: vi.fn() }));
+vi.mock('@features/auth/frontend/utility/owned-dialog.js', () => ({ ownedInputText: (props: Parameters<typeof os.inputText>[0]) => os.inputText(props), ownedAuthenticateDialog: (props: Parameters<typeof os.authenticateDialog>[0]) => os.authenticateDialog(props) }));
+const account = vi.hoisted(() => ({ id: 'synthetic-owner', email: 'old@example.test', emailVerified: true, token: 'bs_synthetic', securityKeysList: [{ id: 'AQID' }], emailNotificationTypes: [], receiveAnnouncementEmail: false }));
 vi.mock('@features/auth/frontend/i.js', () => ({ ensureSignin: () => reactive(account) }));
 vi.mock('@features/instance/frontend/instance.js', () => ({ instance: { enableEmail: true } }));
 vi.mock('@features/ui/frontend/os.js', () => ({ authenticateDialog: vi.fn(), inputText: vi.fn(), apiWithDialog: vi.fn() }));
@@ -27,6 +30,7 @@ const show = ref(true); const errors: unknown[] = []; let expectedErrors: unknow
 beforeAll(async () => { await internationalization.ready; await internationalization.loadLocale('en-US'); });
 beforeEach(() => {
 	vi.resetAllMocks(); errors.length = 0; expectedErrors = []; show.value = true;
+	account.id = 'synthetic-owner'; vi.mocked(ensureSudo).mockResolvedValue(true);
 	account.token = 'bs_synthetic'; account.securityKeysList = [{ id: 'AQID' }]; vi.mocked(browserSupportsWebAuthn).mockReturnValue(true);
 	vi.mocked(os.inputText).mockResolvedValue({ canceled: false, result: 'current-password' });
 	vi.mocked(os.authenticateDialog).mockResolvedValue({ canceled: false, result: { password: 'current-password', token: 'totp' } });
@@ -48,52 +52,55 @@ afterEach(() => { expect(errors).toEqual(expectedErrors); if (mounted) app.unmou
 
 function edit(value: string) { const input = element.querySelector('input')!; input.value = value; input.dispatchEvent(new Event('input')); }
 
-function save(fresh = true) { const button = [...element.querySelectorAll('button')].find(item => item.textContent === (fresh ? 'パスキーでメールアドレスを保存' : 'メールアドレスを保存')); expect(button).toBeDefined(); button!.click(); }
 
-test('editing is inert until explicit save; target is frozen before password/native ceremony', async () => {
-	edit('new@example.test'); expect(os.authenticateDialog).not.toHaveBeenCalled(); expect(os.apiWithDialog).not.toHaveBeenCalled();
-	let finish!: (value: Awaited<ReturnType<typeof os.inputText>>) => void;
-	vi.mocked(os.inputText).mockReturnValueOnce(new Promise(resolve => { finish = resolve; })); save(); edit('later@example.test');
-	finish({ canceled: false, result: 'current-password' });
-	await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledTimes(2));
-	expect(os.apiWithDialog).toHaveBeenNthCalledWith(1, 'i/update-email/passkey/start', { currentPassword: 'current-password', email: 'new@example.test' });
-	expect(os.apiWithDialog).toHaveBeenNthCalledWith(2, 'i/update-email/passkey/complete', { ticket: 'ticket', credential: { id: 'credential' }, email: 'new@example.test' });
-	expect(os.authenticateDialog).not.toHaveBeenCalled();
+function save() { const button = [...element.querySelectorAll('button')].find(item => item.textContent === 'メールアドレスを保存'); expect(button).toBeDefined(); button!.click(); }
+function legacy() { app.unmount(); element.remove(); account.token = 'legacy-native'; mountEmail(); }
+
+test('editing is inert; common sudo authorizes the exact target captured before confirmation', async () => {
+	edit('new@example.test'); expect(ensureSudo).not.toHaveBeenCalled(); expect(os.apiWithDialog).not.toHaveBeenCalled();
+	let finish!: (value: boolean) => void; vi.mocked(ensureSudo).mockReturnValue(new Promise(resolve => { finish = resolve; }));
+	save(); edit('later@example.test'); finish(true);
+	await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledExactlyOnceWith('i/security/email', { email: 'new@example.test' }));
+	expect(os.authenticateDialog).not.toHaveBeenCalled(); expect(startAuthentication).not.toHaveBeenCalled();
 });
-test('empty target means explicit null, without confusing an omitted field', async () => { edit(''); save(); await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledTimes(2)); expect(os.apiWithDialog).toHaveBeenCalledWith('i/update-email/passkey/start', { currentPassword: 'current-password', email: null }); });
-test.each(['password-cancel', 'native-cancel', 'start-failed', 'complete-failed'] as const)('%s never falls back to legacy', async mode => {
-	const failure = new Error('Synthetic request failure');
-	if (mode === 'password-cancel') vi.mocked(os.inputText).mockResolvedValue({ canceled: true, result: undefined });
-	if (mode === 'native-cancel') vi.mocked(startAuthentication).mockRejectedValue(new Error('Canceled'));
-	if (mode === 'start-failed') { expectedErrors = [failure]; vi.mocked(os.apiWithDialog).mockRejectedValueOnce(failure); }
-	if (mode === 'complete-failed') { expectedErrors = [failure]; vi.mocked(os.apiWithDialog).mockResolvedValueOnce({ ticket: 'ticket', options: {} } as never).mockRejectedValueOnce(failure); }
-	save(); await nextTick(); await vi.waitFor(() => expect(element.querySelector('button')!.disabled).toBe(false));
-	expect(os.authenticateDialog).not.toHaveBeenCalled(); expect(os.apiWithDialog).toHaveBeenCalledTimes(mode === 'password-cancel' ? 0 : mode === 'complete-failed' ? 2 : 1);
+test('empty target is explicit null', async () => { edit(''); save(); await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledExactlyOnceWith('i/security/email', { email: null })); });
+test('cancelled sudo never submits or falls back', async () => {
+	vi.mocked(ensureSudo).mockResolvedValue(false); save(); await nextTick();
+	expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(os.authenticateDialog).not.toHaveBeenCalled();
 });
-test('busy excludes a competing legacy save', async () => {
-	let finish!: (value: Awaited<ReturnType<typeof startAuthentication>>) => void;
-	vi.mocked(startAuthentication).mockReturnValueOnce(new Promise(resolve => { finish = resolve; })); save(); await vi.waitFor(() => expect(startAuthentication).toHaveBeenCalledOnce()); save(false); expect(os.authenticateDialog).not.toHaveBeenCalled();
-	finish({ id: 'credential' } as never); await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledTimes(2));
+test.each(['authorization', 'mutation'] as const)('%s failure does not fall back', async stage => {
+	const failure = new Error('Synthetic request failure'); expectedErrors = [failure];
+	if (stage === 'authorization') vi.mocked(ensureSudo).mockRejectedValue(failure); else vi.mocked(os.apiWithDialog).mockRejectedValue(failure);
+	save(); await vi.waitFor(() => expect(errors).toEqual([failure]));
+	expect(os.apiWithDialog).toHaveBeenCalledTimes(stage === 'authorization' ? 0 : 1); expect(os.authenticateDialog).not.toHaveBeenCalled();
 });
-test.each(['deactivate', 'unmount'] as const)('%s discards delayed native results, including reactivation', async mode => {
-	let finish!: (value: Awaited<ReturnType<typeof startAuthentication>>) => void;
-	vi.mocked(startAuthentication).mockReturnValueOnce(new Promise(resolve => { finish = resolve; })); save(); await vi.waitFor(() => expect(startAuthentication).toHaveBeenCalledOnce());
-	if (mode === 'unmount') { app.unmount(); mounted = false; } else { show.value = false; await vi.waitFor(() => expect(element.textContent).toBe('Other')); show.value = true; await vi.waitFor(() => expect(element.querySelector('input')).not.toBeNull()); }
-	finish({ id: 'credential' } as never); await new Promise(resolve => window.setTimeout(resolve, 10)); expect(os.apiWithDialog).toHaveBeenCalledOnce();
+test('busy excludes competing save during confirmation', async () => {
+	let finish!: (value: boolean) => void; vi.mocked(ensureSudo).mockReturnValue(new Promise(resolve => { finish = resolve; }));
+	save(); save(); expect(ensureSudo).toHaveBeenCalledOnce(); finish(true); await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledOnce());
 });
-test('legacy remains explicit with password/TOTP and the captured target', async () => { edit('legacy@example.test'); save(false); await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledOnce()); expect(os.apiWithDialog).toHaveBeenCalledWith('i/update-email', { password: 'current-password', token: 'totp', email: 'legacy@example.test' }); expect(startAuthentication).not.toHaveBeenCalled(); });
+test.each(['deactivate', 'unmount', 'actor'] as const)('%s discards delayed authorization, including reactivation', async mode => {
+	let finish!: (value: boolean) => void; vi.mocked(ensureSudo).mockReturnValue(new Promise(resolve => { finish = resolve; }));
+	save(); const [current, signal] = vi.mocked(ensureSudo).mock.calls[0];
+	if (mode === 'unmount') { app.unmount(); mounted = false; }
+	else if (mode === 'actor') account.id = 'replacement-owner';
+	else { show.value = false; await nextTick(); show.value = true; await nextTick(); }
+	expect(current!()).toBe(false); if (mode !== 'actor') expect(signal?.aborted).toBe(true);
+	finish(true); await new Promise(resolve => window.setTimeout(resolve, 10)); expect(os.apiWithDialog).not.toHaveBeenCalled();
+});
+test('legacy retains password/TOTP and captured target', async () => {
+	legacy(); edit('legacy@example.test'); save(); await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledOnce());
+	expect(os.apiWithDialog).toHaveBeenCalledWith('i/update-email', { password: 'current-password', token: 'totp', email: 'legacy@example.test' }); expect(ensureSudo).not.toHaveBeenCalled();
+});
 test('legacy cancellation never calls either endpoint', async () => {
-	vi.mocked(os.authenticateDialog).mockResolvedValueOnce({ canceled: true, result: undefined }); save(false); await nextTick(); await vi.waitFor(() => expect(element.querySelector('button')!.disabled).toBe(false)); expect(os.apiWithDialog).not.toHaveBeenCalled();
+	legacy(); vi.mocked(os.authenticateDialog).mockResolvedValue({ canceled: true, result: undefined }); save(); await nextTick(); expect(os.apiWithDialog).not.toHaveBeenCalled();
 });
-test('unmount while the legacy dialog waits discards its result', async () => {
-	let finish!: (value: Awaited<ReturnType<typeof os.authenticateDialog>>) => void;
-	vi.mocked(os.authenticateDialog).mockReturnValueOnce(new Promise(resolve => { finish = resolve; })); save(false); expect(os.authenticateDialog).toHaveBeenCalledOnce(); app.unmount(); mounted = false;
+test('unmount while legacy dialog waits discards its result', async () => {
+	legacy(); let finish!: (value: Awaited<ReturnType<typeof os.authenticateDialog>>) => void;
+	vi.mocked(os.authenticateDialog).mockReturnValue(new Promise(resolve => { finish = resolve; })); save(); app.unmount(); mounted = false;
 	finish({ canceled: false, result: { password: 'current-password', token: 'totp' } }); await new Promise(resolve => window.setTimeout(resolve, 10)); expect(os.apiWithDialog).not.toHaveBeenCalled();
 });
-test.each(['legacy-token', 'no-key', 'unsupported'] as const)('%s keeps only the explicit legacy choice', async kind => {
+test.each(['legacy-token', 'no-key', 'unsupported'] as const)('%s renders one explicit save choice', async kind => {
 	app.unmount(); element.remove(); mounted = false;
-	if (kind === 'legacy-token') account.token = 'old-native';
-	if (kind === 'no-key') account.securityKeysList = [];
-	if (kind === 'unsupported') vi.mocked(browserSupportsWebAuthn).mockReturnValue(false);
+	if (kind === 'legacy-token') account.token = 'old-native'; if (kind === 'no-key') account.securityKeysList = []; if (kind === 'unsupported') vi.mocked(browserSupportsWebAuthn).mockReturnValue(false);
 	mountEmail(); await nextTick(); expect([...element.querySelectorAll('button')].some(button => button.textContent === 'パスキーでメールアドレスを保存')).toBe(false); expect(os.apiWithDialog).not.toHaveBeenCalled();
 });

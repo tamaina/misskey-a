@@ -15,15 +15,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label><SearchLabel>{{ $locale.sfc.password }}</SearchLabel></template>
 
 				<SearchMarker>
-					<MkButton primary :disabled="changingPassword" @click="change(false)">
+					<MkButton primary :disabled="changingPassword" @click="change()">
 						<SearchLabel>{{ $locale.sfc.changePassword }}</SearchLabel>
 					</MkButton>
 				</SearchMarker>
-				<MkButton v-if="canUsePasskey" :disabled="changingPassword" @click="change(true)">{{ $locale.sfc.changePasswordWithPasskey }}</MkButton>
 			</FormSection>
 		</SearchMarker>
 
-		<X2fa/>
+		<MkSecuritySettings v-if="individualSession"/>
+		<X2fa v-else/>
+		<MkBrowserSessions/>
 
 		<SearchMarker :keywords="['signin', 'login', 'history', 'log']">
 			<FormSection>
@@ -48,8 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<SearchMarker :keywords="['regenerate', 'refresh', 'reset', 'token']">
 			<FormSection>
 				<FormSlot>
-					<MkButton danger :disabled="changingPassword" @click="regenerateToken(false)"><i class="ti ti-refresh"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>
-					<MkButton v-if="canUsePasskey" danger :disabled="changingPassword" @click="regenerateToken(true)">{{ $locale.sfc.regenerateLoginTokenWithPasskey }}</MkButton>
+					<MkButton danger :disabled="changingPassword" @click="regenerateToken()"><i class="ti ti-refresh"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>
 					<template #caption>{{ $locale.sfc.regenerateLoginTokenDescription }}</template>
 				</FormSlot>
 			</FormSection>
@@ -59,8 +59,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw, onActivated, onDeactivated, onUnmounted, ref } from 'vue';
-import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
+import { computed, markRaw, onActivated, onDeactivated, onUnmounted, ref, watch } from 'vue';
+import MkBrowserSessions from '@features/auth/frontend/components/MkBrowserSessions.vue';
+import MkSecuritySettings from '@features/auth/frontend/components/MkSecuritySettings.vue';
 import X2fa from '@features/auth/frontend/pages/settings/2fa.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
@@ -70,52 +71,70 @@ import * as os from '@features/ui/frontend/os.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import { signout } from '@features/auth/frontend/signout.js';
+import { ownedInputText, ownedAuthenticateDialog } from '@features/auth/frontend/utility/owned-dialog.js';
+import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
+
+const individualSession = computed(() => ensureSignin().token.startsWith('bs_'));
 
 const paginator = markRaw(new Paginator('i/signin-history', {
 	limit: 5,
 }));
 
-const canUsePasskey = computed(() => {
-	const account = ensureSignin();
-	return account.token?.startsWith('bs_') && (account.securityKeysList?.length ?? 0) > 0 && browserSupportsWebAuthn();
-});
+const ownerId = ensureSignin().id;
+const ownerToken = ensureSignin().token;
+const sameActor = () => ensureSignin().id === ownerId && ensureSignin().token === ownerToken;
 const changingPassword = ref(false);
 let disposed = false;
 let ceremonyGeneration = 0;
-const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; };
+let sudoAbort: AbortController | null = null;
+const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; sudoAbort?.abort(); sudoAbort = null; };
 onDeactivated(invalidateCeremony);
 onUnmounted(invalidateCeremony);
 onActivated(() => { disposed = false; });
+watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!sameActor()) invalidateCeremony(); }, { flush: 'sync' });
 
-async function change(usePasskey: boolean) {
+async function change() {
 	if (changingPassword.value || disposed) return;
 	changingPassword.value = true;
 	const generation = ++ceremonyGeneration;
-	try { await collectAndChangePassword(usePasskey, () => !disposed && generation === ceremonyGeneration); } finally { changingPassword.value = false; }
+	sudoAbort = new AbortController();
+	try { await collectAndChangePassword(() => !disposed && generation === ceremonyGeneration && sameActor()); } finally { changingPassword.value = false; }
 }
 
-async function collectAndChangePassword(usePasskey: boolean, isCurrent: () => boolean) {
-	const { canceled, result: currentPassword } = await os.inputText({
+async function collectAndChangePassword(isCurrent: () => boolean) {
+	if (individualSession.value) {
+		if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+		const password = await ownedInputText({ title: $locale.value.sfc.newPassword, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
+		if (!isCurrent() || password.canceled || !password.result) return;
+		const repeated = await ownedInputText({ title: $locale.value.sfc.newPasswordRetype, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
+		if (!isCurrent() || repeated.canceled || !repeated.result) return;
+		if (password.result !== repeated.result) { await os.alert({ type: 'error', text: $locale.value.sfc.retypedNotMatch }); return; }
+		await os.apiWithDialog('i/security/password', { newPassword: password.result });
+		if (isCurrent()) await signout('credentials-changed');
+		return;
+	}
+	const { canceled, result: currentPassword } = await ownedInputText({
 		title: $locale.value.sfc.password,
 		type: 'password',
 		autocomplete: 'current-password',
 		minLength: 1,
-	});
+	}, sudoAbort?.signal);
 	if (!isCurrent() || canceled || currentPassword == null || currentPassword === '') return;
 
-	const { canceled: canceled2, result: newPassword } = await os.inputText({
+	const { canceled: canceled2, result: newPassword } = await ownedInputText({
 		title: $locale.value.sfc.newPassword,
 		type: 'password',
 		autocomplete: 'new-password',
-	});
+	}, sudoAbort?.signal);
 	if (!isCurrent() || canceled2 || newPassword == null) return;
 
-	const { canceled: canceled3, result: newPassword2 } = await os.inputText({
+	const { canceled: canceled3, result: newPassword2 } = await ownedInputText({
 		title: $locale.value.sfc.newPasswordRetype,
 		type: 'password',
 		autocomplete: 'new-password',
-	});
+	}, sudoAbort?.signal);
 	if (!isCurrent() || canceled3 || newPassword2 == null) return;
 
 	if (newPassword !== newPassword2) {
@@ -126,28 +145,11 @@ async function collectAndChangePassword(usePasskey: boolean, isCurrent: () => bo
 		return;
 	}
 
-	if (usePasskey) {
-		if (!canUsePasskey.value) return;
-		const started = await os.apiWithDialog('i/change-password/passkey/start', { currentPassword });
-		if (!isCurrent()) return;
-		let credential;
-		try {
-			credential = await os.promiseDialog(startAuthentication({ optionsJSON: started.options }), null, () => {});
-		} catch (error) {
-			const failure = error instanceof Error && error.cause instanceof Error ? error.cause : error;
-			if (!(failure instanceof Error) || !['NotAllowedError', 'AbortError'].includes(failure.name)) {
-				await os.alert({ type: 'error', text: error instanceof Error ? error.message : String(error) });
-			}
-			return;
-		}
-		if (!isCurrent() || !credential) return;
-		await os.apiWithDialog('i/change-password/passkey/complete', { ticket: started.ticket, credential, newPassword });
-		return;
-	}
+
 
 	let token: string | null = null;
 	if (ensureSignin().twoFactorEnabled) {
-		const auth = await os.authenticateDialog({ currentPassword });
+		const auth = await ownedAuthenticateDialog({ currentPassword }, sudoAbort?.signal);
 		if (!isCurrent() || auth.canceled) return;
 		token = auth.result.token;
 	}
@@ -159,31 +161,23 @@ async function collectAndChangePassword(usePasskey: boolean, isCurrent: () => bo
 	});
 }
 
-async function regenerateToken(usePasskey: boolean) {
+async function regenerateToken() {
 	if (changingPassword.value || disposed) return;
 	changingPassword.value = true;
 	const generation = ++ceremonyGeneration;
-	const isCurrent = () => !disposed && generation === ceremonyGeneration;
+	sudoAbort = new AbortController();
+	const isCurrent = () => !disposed && generation === ceremonyGeneration && sameActor();
 	try {
-		if (usePasskey) {
-			if (!canUsePasskey.value) return;
-			const password = await os.inputText({ title: $locale.value.sfc.password, type: 'password', autocomplete: 'current-password', minLength: 1 });
-			if (!isCurrent() || password.canceled || !password.result) return;
-			const started = await os.apiWithDialog('i/regenerate-token/passkey/start', { currentPassword: password.result });
-			if (!isCurrent()) return;
-			let credential;
-			try {
-				credential = await os.promiseDialog(startAuthentication({ optionsJSON: started.options }), null, () => {});
-			} catch (error) {
-				const failure = error instanceof Error && error.cause instanceof Error ? error.cause : error;
-				if (isCurrent() && (!(failure instanceof Error) || !['NotAllowedError', 'AbortError'].includes(failure.name))) await os.alert({ type: 'error', text: error instanceof Error ? error.message : String(error) });
-				return;
-			}
-			if (!isCurrent() || !credential) return;
-			await os.apiWithDialog('i/regenerate-token/passkey/complete', { ticket: started.ticket, credential });
+		if (individualSession.value) {
+			if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+			const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.regenerateLoginTokenDescription });
+			if (!isCurrent() || confirmation.canceled) return;
+			await os.apiWithDialog('i/security/regenerate-token', {});
+			if (isCurrent()) await signout('credentials-changed');
 			return;
 		}
-		const auth = await os.authenticateDialog();
+
+		const auth = await ownedAuthenticateDialog({}, sudoAbort?.signal);
 		if (!isCurrent() || auth.canceled) return;
 		await os.apiWithDialog('i/regenerate-token', { password: auth.result.password, token: auth.result.token });
 	} finally { changingPassword.value = false; }

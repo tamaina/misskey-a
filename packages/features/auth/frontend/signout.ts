@@ -16,10 +16,10 @@ import { $i } from '@features/auth/frontend/i.js';
 import { encodePushSubscriptionKey } from '@features/notifications/frontend/utility/encode-push-subscription-key.js';
 
 // Internal cleanup reasons follow a confirmed server rejection or accepted account deletion.
-export async function signout(reason?: 'server-rejected-credential' | 'account-deletion-accepted') {
+export async function signout(reason?: 'server-rejected-credential' | 'account-deletion-accepted' | 'credentials-changed') {
 	if (!$i) return;
 
-	const cleanupOnly = reason === 'server-rejected-credential' || reason === 'account-deletion-accepted';
+	const cleanupOnly = reason === 'server-rejected-credential' || reason === 'account-deletion-accepted' || reason === 'credentials-changed';
 	let finishWaiting = waiting();
 
 	try {

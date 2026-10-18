@@ -8263,6 +8263,1860 @@ export default {
 		}
 	},
 	"auth": {
+		"i/sudo/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "sudo"
+					},
+					"requestName": "i/sudo/start"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sudo/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/sudo/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "sudo"
+					},
+					"requestName": "i/sudo/complete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sudo/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/sudo/status": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"requestName": "i/sudo/status"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sudo/status",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/sudo/exit": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"requestName": "i/sudo/exit"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sudo/exit",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/account/delete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/account/delete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/account/delete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/passwordless/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/passwordless/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/passwordless/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/passwordless/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/passwordless/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/passwordless/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/password-login/disable/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/password-login/disable/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/password-login/disable/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/password-login/disable/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/password-login/disable/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/password-login/disable/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/password": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/password",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/password",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/email": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/email",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/email",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/regenerate-token": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/regenerate-token",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/regenerate-token",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/state": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/state",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/state",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/keys/list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/keys/list",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/keys/list",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/register/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/register/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/register/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/register/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/register/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/register/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/mfa/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/mfa/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/mfa/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/mfa/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/mfa/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/mfa/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/mfa/disable": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/mfa/disable",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/mfa/disable",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/remove": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/remove",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/remove",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/rename": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/rename",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/rename",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/passwordless": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/passwordless",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/passwordless",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/totp/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/totp/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/totp/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/totp/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/totp/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/totp/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/totp/remove": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/totp/remove",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/totp/remove",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/recovery-codes": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/recovery-codes",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/recovery-codes",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
 		"admin/accounts/create": {
 			"~orpc": {
 				"errorMap": {

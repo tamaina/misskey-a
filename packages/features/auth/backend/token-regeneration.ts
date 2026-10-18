@@ -16,6 +16,7 @@ import type { FreshPasskeyReauthentication } from './fresh-passkey-reauthenticat
 import { freshReauthenticationPolicyStamp } from './fresh-passkey-reauthentication.js';
 import { assertLegacyMfaManagement, assertSameMfaPolicy } from './mfa-policy.js';
 import type { MfaPolicySnapshot } from './mfa-policy.js';
+import type { SudoService, SudoIdentity } from './sudo.js';
 import { generateNativeUserToken } from './utility/token.js';
 
 export interface TokenRegenerationDependencies {
@@ -28,7 +29,7 @@ type Authority = {
 	kind: 'legacy'; nativeToken: string; profile: MfaPolicySnapshot; session?: BrowserSessionIdentity;
 } | {
 	kind: 'fresh'; proof: Awaited<ReturnType<FreshPasskeyReauthentication['complete']>>;
-};
+} | { kind: 'sudo'; service: SudoService; identity: SudoIdentity };
 
 /** No grant or replacement credential escapes this operation. All issuers take
  * the user lock first, so rotation and browser-session issuance serialize.
@@ -39,13 +40,14 @@ export async function regenerateToken(deps: TokenRegenerationDependencies, userI
 		if (!user || user.host !== null || user.isDeleted || user.isSuspended || !user.token) throw new Error('authentication failed');
 		const profile = await manager.getRepository(MiUserProfile).findOneOrFail({ where: { userId }, lock: { mode: 'pessimistic_write' } });
 		if (profile.userId !== userId) throw new Error('authentication failed');
-		const session = authority.kind === 'fresh' ? { id: authority.proof.sessionId, userId: authority.proof.userId } : authority.session;
+		const sudoDeadline = authority.kind === 'sudo' ? authority.service.assert(await authority.service.lock(authority.identity, manager, user, profile)) : null;
+		const session = authority.kind === 'sudo' ? undefined : authority.kind === 'fresh' ? { id: authority.proof.sessionId, userId: authority.proof.userId } : authority.session;
 		if (session && (session.userId !== userId || !await manager.getRepository(MiBrowserSession).findOne({ where: { id: session.id, userId, revokedAt: IsNull() }, lock: { mode: 'pessimistic_write' } }))) throw new Error('authentication failed');
 		if (authority.kind === 'legacy') {
 			assertLegacyMfaManagement(profile);
 			assertSameMfaPolicy(authority.profile, profile);
 			if (user.token !== authority.nativeToken) throw new Error('authentication failed');
-		} else {
+		} else if (authority.kind === 'fresh') {
 			const proof = authority.proof;
 			const keys = await manager.getRepository(MiUserSecurityKey).findBy({ userId });
 			if (proof.userId !== userId || proof.purpose !== 'regenerate-token' || freshReauthenticationPolicyStamp(profile, keys) !== proof.policyStamp || performance.now() >= proof.expiresAtMonotonic) throw new Error('authentication failed');
@@ -56,6 +58,7 @@ export async function regenerateToken(deps: TokenRegenerationDependencies, userI
 		await deps.browserSessionService.revokeAllOwned(userId, manager.getRepository(MiBrowserSession));
 		// Expiry after either write rolls back the token and every revocation.
 		if (authority.kind === 'fresh' && performance.now() >= authority.proof.expiresAtMonotonic) throw new Error('authentication failed');
+		if (sudoDeadline !== null && Date.now() >= sudoDeadline) throw new Error('authentication failed');
 		return { oldToken, newToken };
 	});
 	deps.globalEventService.publishInternalEvent('browserSessionRevoked', { id: null, userId });

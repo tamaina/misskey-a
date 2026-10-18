@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { securitySettingsContract } from './security-settings.contract.js';
+import { sudoContract } from './sudo.contract.js';
 import { aliasTwoFactorContract } from './2fa-api-aliases.contract.js';
 import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
@@ -502,6 +504,8 @@ export const ISignoutContract = oc.$meta({ requestName: 'i/signout', requireCred
 	.input(objectInput({})).output(v.void());
 
 export const authContract = {
+	...sudoContract,
+	...securitySettingsContract,
 	'admin/accounts/create': AdminAccountsCreateContract,
 	'admin/captcha/current': AdminCaptchaCurrentContract,
 	'admin/captcha/save': AdminCaptchaSaveContract,

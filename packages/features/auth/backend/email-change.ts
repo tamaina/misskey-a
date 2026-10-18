@@ -21,6 +21,8 @@ import type { FreshPasskeyReauthentication } from './fresh-passkey-reauthenticat
 import { freshReauthenticationPolicyStamp } from './fresh-passkey-reauthentication.js';
 import { assertLegacyMfaManagement, assertSameMfaPolicy } from './mfa-policy.js';
 import type { MfaPolicySnapshot } from './mfa-policy.js';
+import type { SudoService, SudoIdentity } from './sudo.js';
+import { MiPasswordResetRequest } from './models/PasswordResetRequest.js';
 import { L_CHARS, secureRndstr } from './utility/secure-rndstr.js';
 
 export const emailChangeErrors = {
@@ -47,7 +49,8 @@ export async function validateEmailChange(deps: Pick<EmailChangeDependencies, 's
 }
 
 type Authority = { kind: 'fresh'; proof: Awaited<ReturnType<FreshPasskeyReauthentication['complete']>> }
-	| { kind: 'legacy'; nativeToken: string; profile: MfaPolicySnapshot & EmailState; session?: BrowserSessionIdentity; omitEmail?: boolean };
+	| { kind: 'legacy'; nativeToken: string; profile: MfaPolicySnapshot & EmailState; session?: BrowserSessionIdentity; omitEmail?: boolean }
+	| { kind: 'sudo'; service: SudoService; identity: SudoIdentity };
 
 /** One row update; notifications and external delivery happen only after commit. */
 export async function changeEmail(deps: EmailChangeDependencies, userId: string, email: string | null, authority: Authority) {
@@ -57,14 +60,15 @@ export async function changeEmail(deps: EmailChangeDependencies, userId: string,
 		const user = await manager.getRepository(MiUser).findOne({ where: { id: userId }, lock: { mode: 'pessimistic_write' } });
 		if (!user || user.host !== null || user.isDeleted || user.isSuspended || !user.token) throw new Error('authentication failed');
 		const profile = await manager.getRepository(MiUserProfile).findOneOrFail({ where: { userId }, lock: { mode: 'pessimistic_write' } });
-		if (profile.userId !== userId) throw new Error('authentication failed');
-		const session = authority.kind === 'fresh' ? { id: authority.proof.sessionId, userId: authority.proof.userId } : authority.session;
+		if (profile.userId !== userId || profile.passwordLoginDisabled === true) throw new Error('authentication failed');
+		const sudoDeadline = authority.kind === 'sudo' ? authority.service.assert(await authority.service.lock(authority.identity, manager, user, profile)) : null;
+		const session = authority.kind === 'sudo' ? undefined : authority.kind === 'fresh' ? { id: authority.proof.sessionId, userId: authority.proof.userId } : authority.session;
 		if (session && (session.userId !== userId || !await manager.getRepository(MiBrowserSession).findOne({ where: { id: session.id, userId, revokedAt: IsNull() }, lock: { mode: 'pessimistic_write' } }))) throw new Error('authentication failed');
 		if (authority.kind === 'fresh') {
 			const proof = authority.proof;
 			const keys = await manager.getRepository(MiUserSecurityKey).findBy({ userId });
 			if (proof.userId !== userId || proof.purpose !== 'update-email' || proof.targetStamp !== emailChangeTargetStamp(email, profile) || proof.policyStamp !== freshReauthenticationPolicyStamp(profile, keys) || performance.now() >= proof.expiresAtMonotonic) throw new Error('authentication failed');
-		} else {
+		} else if (authority.kind === 'legacy') {
 			assertLegacyMfaManagement(profile); assertSameMfaPolicy(authority.profile, profile);
 			if (user.token !== authority.nativeToken || emailChangeTargetStamp(email, authority.profile) !== emailChangeTargetStamp(email, profile)) throw new Error('authentication failed');
 		}
@@ -72,7 +76,10 @@ export async function changeEmail(deps: EmailChangeDependencies, userId: string,
 		// The legacy optional field historically omitted this SET column entirely.
 		const omitEmail = authority.kind === 'legacy' && authority.omitEmail === true;
 		await manager.getRepository(MiUserProfile).update({ userId }, { ...(omitEmail ? {} : { email }), emailVerified: false, emailVerifyCode: code });
+		// A reset mailed to the previous address must not survive this change.
+		await manager.getRepository(MiPasswordResetRequest).delete({ userId });
 		if (authority.kind === 'fresh' && performance.now() >= authority.proof.expiresAtMonotonic) throw new Error('authentication failed');
+		if (sudoDeadline !== null && Date.now() >= sudoDeadline) throw new Error('authentication failed');
 	});
 	const packed = await deps.userEntityService.packSelf(userId, { includeSecrets: true });
 	deps.globalEventService.publishMainStream(userId, 'meUpdated', packed);

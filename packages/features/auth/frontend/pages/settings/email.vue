@@ -18,8 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template v-if="$i.email && !$i.emailVerified" #caption>{{ $locale.sfc.verificationEmailSent }}</template>
 							<template v-else-if="emailAddress === $i.email && $i.emailVerified" #caption><i class="ti ti-check" style="color: var(--MI_THEME-success);"></i> {{ $locale.sfc.emailVerified }}</template>
 						</MkInput>
-						<MkButton primary :disabled="savingEmail" @click="saveEmailAddress(false)">{{ $locale.sfc.saveEmail }}</MkButton>
-						<MkButton v-if="canUsePasskey" :disabled="savingEmail" @click="saveEmailAddress(true)">{{ $locale.sfc.saveEmailWithPasskey }}</MkButton>
+						<MkButton primary :disabled="savingEmail" @click="saveEmailAddress()">{{ $locale.sfc.saveEmail }}</MkButton>
 					</FormSection>
 				</SearchMarker>
 
@@ -62,7 +61,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { onActivated, onDeactivated, onUnmounted, ref, watch, computed } from 'vue';
-import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
@@ -71,6 +69,8 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkDisableSection from '@features/ui/frontend/components/MkDisableSection.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { ownedAuthenticateDialog } from '@features/auth/frontend/utility/owned-dialog.js';
+import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { instance } from '@features/instance/frontend/instance.js';
@@ -85,38 +85,38 @@ function onChangeReceiveAnnouncementEmail(v: boolean) {
 	});
 }
 
-const canUsePasskey = computed(() => $i.token?.startsWith('bs_') && ($i.securityKeysList?.length ?? 0) > 0 && browserSupportsWebAuthn());
+const individualSession = computed(() => $i.token.startsWith('bs_'));
+const ownerId = $i.id;
+const ownerToken = $i.token;
 const savingEmail = ref(false);
 let disposed = false;
 let ceremonyGeneration = 0;
-const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; };
+let sudoAbort: AbortController | null = null;
+const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; sudoAbort?.abort(); sudoAbort = null; };
 onDeactivated(invalidateCeremony);
 onUnmounted(invalidateCeremony);
 onActivated(() => { disposed = false; });
+watch(() => [ensureSignin().id, ensureSignin().token], () => { if (ensureSignin().id !== ownerId || ensureSignin().token !== ownerToken) invalidateCeremony(); }, { flush: 'sync' });
 
-async function saveEmailAddress(usePasskey: boolean) {
+async function saveEmailAddress() {
 	if (savingEmail.value || disposed) return;
 	savingEmail.value = true;
 	const generation = ++ceremonyGeneration;
-	const isCurrent = () => !disposed && generation === ceremonyGeneration;
+	sudoAbort = new AbortController();
+	const isCurrent = () => !disposed && generation === ceremonyGeneration && ensureSignin().id === ownerId && ensureSignin().token === ownerToken;
 	// Bind the visible input once. Neither later edits nor native UI can replace it.
 	const email = emailAddress.value === '' ? null : emailAddress.value;
 	try {
-		if (usePasskey) {
-			if (!canUsePasskey.value) return;
-			const password = await os.inputText({ title: $locale.value.sfc.currentPasswordPrompt, type: 'password', autocomplete: 'current-password', minLength: 1 });
-			if (!isCurrent() || password.canceled || !password.result) return;
-			const started = await os.apiWithDialog('i/update-email/passkey/start', { currentPassword: password.result, email });
-			if (!isCurrent()) return;
-			let credential;
-			try { credential = await startAuthentication({ optionsJSON: started.options }); } catch { return; }
-			if (!isCurrent()) return;
-			await os.apiWithDialog('i/update-email/passkey/complete', { ticket: started.ticket, credential, email });
-		} else {
-			const auth = await os.authenticateDialog();
-			if (!isCurrent() || auth.canceled) return;
-			await os.apiWithDialog('i/update-email', { password: auth.result.password, token: auth.result.token, email });
+		if (individualSession.value) {
+			if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+			await os.apiWithDialog('i/security/email', { email });
+			return;
 		}
+
+		const auth = await ownedAuthenticateDialog({}, sudoAbort?.signal);
+		if (!isCurrent() || auth.canceled) return;
+		await os.apiWithDialog('i/update-email', { password: auth.result.password, token: auth.result.token, email });
+
 	} finally { savingEmail.value = false; }
 }
 

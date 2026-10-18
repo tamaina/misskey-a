@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { legacyManagementOnly } from '../../../legacy-management.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { DataSource } from 'typeorm';
 import { MiUserSecurityKey } from '../../../models/UserSecurityKey.js';
@@ -40,7 +41,7 @@ export interface I2faUpdateKeyDependencies {
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createI2faUpdateKeyProcedure(deps: I2faUpdateKeyDependencies) {
-	return createApiProcedure<MiLocalUser>()(I2faUpdateKeyContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faUpdateKeyContract).use(requirePrincipal<MiLocalUser>()).use(legacyManagementOnly()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {

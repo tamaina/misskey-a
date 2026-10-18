@@ -5,6 +5,8 @@
 
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import { recoverPassword } from '../password-recovery.js';
+import type { PasswordRecoveryDependencies } from '../password-recovery.js';
 import type { UserProfilesRepository, PasswordResetRequestsRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 
@@ -20,7 +22,7 @@ export const meta = {
 
 	},
 } as const;
-export interface ResetPasswordDependencies {
+export interface ResetPasswordDependencies extends PasswordRecoveryDependencies {
 	passwordResetRequestsRepository: PasswordResetRequestsRepository;
 	userProfilesRepository: UserProfilesRepository;
 	idService: Pick<IdService, 'parse'>;
@@ -42,11 +44,7 @@ export function createResetPasswordProcedure(deps: ResetPasswordDependencies) {
 			const salt = await bcrypt.genSalt(8);
 			const hash = await bcrypt.hash(ps.password, salt);
 
-			await deps.userProfilesRepository.update(req.userId, {
-				password: hash,
-			});
-
-			deps.passwordResetRequestsRepository.delete(req.id);
+			await recoverPassword(deps, req.userId, hash, { id: req.id, token: req.token, issuedAt: deps.idService.parse(req.id).date.getTime() });
 		})();
 		return result;
 	});

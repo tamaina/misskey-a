@@ -47,7 +47,7 @@ describe('feature service composition adapter', () => {
 			entries.splice(entries.indexOf('class:SystemWebhookService'), 0, 'class:McpEventsService');
 			entries.splice(entries.indexOf('alias:SystemWebhookService'), 0, 'alias:McpEventsService');
 			for (const prefix of ['class:', 'alias:']) {
-				entries.push(`${prefix}BrowserSessionService`, `${prefix}FreshReauthenticationStore`, `${prefix}FreshPasskeyReauthentication`);
+				entries.push(`${prefix}BrowserSessionService`, `${prefix}FreshReauthenticationStore`, `${prefix}FreshPasskeyReauthentication`, `${prefix}SudoService`);
 				entries.splice(entries.indexOf(`${prefix}AntennaService`) + 1, 0, `${prefix}AntennaNoteAccessService`, `${prefix}AntennaEventSubscriptionService`);
 				entries.splice(entries.indexOf(`${prefix}McpEventsService`) + 1, 0, `${prefix}McpStreamAccessService`, `${prefix}McpStreamSubscriptionService`, `${prefix}NoteStreamingHidingService`);
 			}
@@ -55,7 +55,7 @@ describe('feature service composition adapter', () => {
 		expect(baseline.aliases.filter(alias => alias.name === 'UserAuthService')).toEqual([{ name: 'UserAuthService', target: 'UserAuthService' }]);
 		baseline.aliases.find(alias => alias.name === 'UserAuthService')!.target = 'TotpService';
 		baseline.aliases.push({ name: 'McpEventsService', target: 'McpEventsService' });
-		for (const name of ['BrowserSessionService', 'FreshReauthenticationStore', 'FreshPasskeyReauthentication', 'AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService', 'McpStreamAccessService', 'McpStreamSubscriptionService']) baseline.aliases.push({ name, target: name });
+		for (const name of ['BrowserSessionService', 'FreshReauthenticationStore', 'FreshPasskeyReauthentication', 'SudoService', 'AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService', 'McpStreamAccessService', 'McpStreamSubscriptionService']) baseline.aliases.push({ name, target: name });
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
 		const describeToken = (entry: Provider | InjectionToken): string => {
@@ -77,8 +77,8 @@ describe('feature service composition adapter', () => {
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
 		expect(factoryProviders).toHaveLength(24);
-		expect(classProviders).toHaveLength(52);
-		expect(featureServiceExports).toHaveLength(103);
+		expect(classProviders).toHaveLength(53);
+		expect(featureServiceExports).toHaveLength(105);
 		for (const provider of featureServiceProviders) {
 			expect(providers.filter(candidate => providerToken(candidate) === providerToken(provider))).toEqual([provider]);
 		}

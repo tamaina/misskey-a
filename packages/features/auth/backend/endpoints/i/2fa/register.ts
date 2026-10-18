@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { legacyManagementOnly } from '../../../legacy-management.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
 import type { DataSource } from 'typeorm';
@@ -38,7 +39,7 @@ export interface I2faRegisterDependencies {
 	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
 }
 export function createI2faRegisterProcedure(deps: I2faRegisterDependencies) {
-	return createApiProcedure<MiLocalUser>()(I2faRegisterContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faRegisterContract).use(requirePrincipal<MiLocalUser>()).use(legacyManagementOnly()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
