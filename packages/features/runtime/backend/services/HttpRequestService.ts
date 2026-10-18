@@ -15,6 +15,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { sendPublicWebhook } from '../http/mcp-webhook.js';
+import { postPublicJson } from '../http/public-json.js';
 import { StatusError } from '../http/status-error.js';
 import { bindThis } from '../decorators.js';
 import { validateContentTypeSetAsActivityPub } from '@features/federation/backend/protocol/misc/validator.js';
@@ -207,6 +208,12 @@ export class HttpRequestService {
 		// A proxy would resolve/connect elsewhere and defeat local address pinning.
 		if (this.config.proxy) throw new Error('MCP callback egress requires direct HTTPS');
 		return sendPublicWebhook(url, body, headers, { localAddress: this.config.outgoingAddress, signal, beforeSend });
+	}
+
+	/** Remote API side channels cannot inherit private-network exceptions or proxy DNS. */
+	public postPublicJson(url: string, body: string): Promise<unknown> {
+		if (this.config.proxy) return Promise.reject(new Error('Public JSON egress requires direct HTTPS'));
+		return postPublicJson(url, body, { userAgent: this.config.userAgent, localAddress: this.config.outgoingAddress });
 	}
 
 	/**

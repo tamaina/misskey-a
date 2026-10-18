@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -50,7 +51,7 @@ function ownerValue(file: string, language: string, path: string): string {
 	let blocks = dictionaries.get(file);
 	if (!blocks) {
 		const filename = resolve(root, 'packages/features/drive/frontend', file);
-		const parsed = parse(readFileSync(filename, 'utf8'), { filename });
+		const parsed = parse(restoreGlobalCatalogPilotSource('packages/features/drive/frontend/' + file, readFileSync(filename, 'utf8')), { filename });
 		const localeOnly = ['ts-messages.vue', 'utility/image-compositor-functions/messages.vue'].includes(file);
 		const expectedError = `At least one <template> or <script> is required in a single file component. ${filename}`;
 		if (parsed.errors.some(error => !localeOnly || (typeof error === 'string' ? error : error.message) !== expectedError)) throw new Error(`Invalid drive locale owner: ${file}`);

@@ -5,7 +5,7 @@
 import { createApp, defineComponent, h } from 'vue';
 import { describe, expect, test, vi } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import locales from 'i18n';
+import { locales } from './pruned-global-locale-baseline.js';
 import MkError from '@features/ui/frontend/components/global/MkError.vue';
 import MkResult from '@features/ui/frontend/components/global/MkResult.vue';
 
@@ -29,7 +29,7 @@ describe('result component-owned translations', () => {
 		app.use(internationalization);
 		app.component('MkResult', MkResult);
 		app.component('MkSystemIcon', defineComponent({ setup: () => () => null }));
-		const element = document.createElement('div');
+		const element = window.document.createElement('div');
 		app.mount(element);
 		try {
 			const resultText = Array.from(element.querySelectorAll('[style="opacity: 0.7;"]'), el => el.textContent);
@@ -55,7 +55,7 @@ describe('result component-owned translations', () => {
 		const app = createApp(MkResult, { type: 'empty', text });
 		app.use(internationalization);
 		app.component('MkSystemIcon', defineComponent({ setup: () => () => null }));
-		const element = document.createElement('div');
+		const element = window.document.createElement('div');
 		app.mount(element);
 		try {
 			expect(element.querySelector('[style="opacity: 0.7;"]')?.textContent).toBe(text);

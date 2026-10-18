@@ -150,6 +150,8 @@ export class MiUser {
 	})
 	public avatarDecorations: {
 		id: string;
+		/** Remote users only; local users resolve their decoration ID through our catalog. */
+		url?: string;
 		angle?: number;
 		flipH?: boolean;
 		offsetX?: number;
