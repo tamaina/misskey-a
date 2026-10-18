@@ -7,6 +7,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { ZipArchive, ZipFile } from '@features/runtime/backend/io/zip.js';
 import { ExportCustomEmojisProcessorService } from '@features/emojis/backend/jobs/ExportCustomEmojisProcessorService.js';
 
@@ -19,8 +20,8 @@ import { createTemp, createTempDir } from '@features/runtime/backend/io/create-t
 
 describe('custom emoji ZIP export', () => {
 	let dir: string;
-	let cleanup: ReturnType<typeof vi.fn>;
-	let archiveCleanup: ReturnType<typeof vi.fn>;
+	let cleanup: Mock<() => void>;
+	let archiveCleanup: Mock<() => void>;
 
 	beforeEach(async () => {
 		dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'emoji-export-'));
