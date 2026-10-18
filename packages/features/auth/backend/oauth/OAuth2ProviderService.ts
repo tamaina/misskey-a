@@ -9,6 +9,7 @@ import { selectedTokenExpiry, accessTokenExpired } from '../access-token-expiry.
 import { signinPolicyStamp } from '../signin-assurance.js';
 import { MiOAuthApproval } from '../models/OAuthApproval.js';
 import { MiAccessToken } from '../models/AccessToken.js';
+import { SudoService } from '../sudo.js';
 import type { CredentialIssuanceAuthorization } from '../credential-issuance.js';
 import type { OidcLocalIdentity } from '../oidc-runtime.js';
 import dns from 'node:dns/promises';
@@ -478,7 +479,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		private roleService: RoleService,
 		@Inject(DI.redis) redis: Redis.Redis,
 		private readonly authenticateService: AuthenticateService,
-		@Inject('auth:SudoService') private readonly local: CredentialIssuanceAuthorization,
+		@Inject(SudoService) private readonly local: CredentialIssuanceAuthorization,
 	) {
 		this.#state = new OAuthStateStore(redis);
 		this.#logger = loggerService.getLogger('oauth');

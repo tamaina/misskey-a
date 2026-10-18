@@ -71,7 +71,42 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/admin/oidc/providers']?.post?.operationId).toBe('post___admin___oidc___providers');
 	expect(spec.paths?.['/admin/oidc/create']?.post?.operationId).toBe('post___admin___oidc___create');
 	expect(spec.paths?.['/admin/oidc/update']?.post?.operationId).toBe('post___admin___oidc___update');
-	expect(identifiers).toHaveLength(498);
+	const addedSecurityPaths = [
+		'/i/security/account/delete',
+		'/i/security/passkey/passwordless/start',
+		'/i/security/passkey/passwordless/complete',
+		'/i/security/password-login/disable/start',
+		'/i/security/password-login/disable/complete',
+		'/i/security/password',
+		'/i/security/email',
+		'/i/security/regenerate-token',
+		'/i/security/state',
+		'/i/security/keys/list',
+		'/i/security/passkey/register/start',
+		'/i/security/passkey/register/complete',
+		'/i/security/passkey/mfa/start',
+		'/i/security/passkey/mfa/complete',
+		'/i/security/passkey/mfa/disable',
+		'/i/security/passkey/remove',
+		'/i/security/passkey/rename',
+		'/i/security/passkey/passwordless',
+		'/i/security/totp/start',
+		'/i/security/totp/complete',
+		'/i/security/totp/remove',
+		'/i/security/recovery-codes',
+		'/i/sudo/start',
+		'/i/sudo/complete',
+		'/i/sudo/status',
+		'/i/sudo/exit',
+	];
+	const addedSecurityIds = new Set(addedSecurityPaths.map(path => `post___${path.slice(1).replaceAll('/', '___')}`));
+	expect(addedSecurityIds.size).toBe(26);
+	for (const path of addedSecurityPaths) {
+		expect(spec.paths?.[path]?.post?.operationId).toBe(`post___${path.slice(1).replaceAll('/', '___')}`);
+	}
+	// Preserve the preceding API count while independently enumerating each new route.
+	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(498);
+	expect(identifiers).toHaveLength(498 + 26);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

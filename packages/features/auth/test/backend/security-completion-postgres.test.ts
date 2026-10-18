@@ -21,6 +21,9 @@ import { recoverPassword } from '../../backend/password-recovery.js';
 import { queueCommittedAccountDeletion } from '../../backend/account-deletion.js';
 import { PasswordLoginPolicy1792300000002 } from '../../../../backend/migration/1792300000002-PasswordLoginPolicy.js';
 import { DeletionIntent1792300000003 } from '../../../../backend/migration/1792300000003-DeletionIntent.js';
+import { BrowserSession1791849600000 } from '../../../../backend/migration/1791849600000-BrowserSession.js';
+import { SudoPolicy1792300000001 } from '../../../../backend/migration/1792300000001-SudoPolicy.js';
+import { AccessTokenExpiry1792300000004 } from '../../../../backend/migration/1792300000004-AccessTokenExpiry.js';
 
 const socket = process.env.MISSKEY_AUTH_POLICY_TEST_SOCKET;
 const owner = 'syntheticcompletion';
@@ -119,5 +122,24 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		const applied = await db.runMigrations();
 		expect(applied.map(migration => migration.name)).toEqual(['OidcIdentities1792300000000', 'SudoPolicy1792300000001', 'PasswordLoginPolicy1792300000002', 'DeletionIntent1792300000003', 'AccessTokenExpiry1792300000004']);
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
+	});
+	test('empty browser-session round trip restores its newer sudo columns and approval foreign key', async () => {
+		await db.getRepository(MiUser).delete({ id: owner });
+		expect(await db.getRepository(MiBrowserSession).count()).toBe(0);
+		await db.transaction(async manager => {
+			const runner = manager.queryRunner!;
+			await runner.query('LOCK TABLE "browser_session" IN ACCESS EXCLUSIVE MODE');
+			expect(await runner.query('SELECT 1 FROM "browser_session" LIMIT 1')).toEqual([]);
+			const session = new BrowserSession1791849600000();
+			const policy = new SudoPolicy1792300000001();
+			const expiry = new AccessTokenExpiry1792300000004();
+			await expiry.down(runner); await policy.down(runner); await session.down(runner);
+			expect(await runner.hasTable('browser_session')).toBe(false);
+			await session.up(runner); await policy.up(runner); await expiry.up(runner);
+			expect(await runner.hasTable('browser_session')).toBe(true);
+		});
+		const pending = await db.driver.createSchemaBuilder().log();
+		expect(pending.upQueries.map(query => query.query)).toEqual([]);
+		expect(pending.downQueries.map(query => query.query)).toEqual([]);
 	});
 });

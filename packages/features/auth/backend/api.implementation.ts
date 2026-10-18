@@ -290,7 +290,7 @@ export class AuthApiProvider {
 	compose() {
 		if (this.router !== undefined) return this.router;
 		const config = this.moduleRef.get<OidcRuntimeDependencies['config']>(DI.config, { strict: false });
-		const credentialAuthorization = this.moduleRef.get<OidcLocalAuthorization>('auth:SudoService', { strict: false });
+		const credentialAuthorization = this.moduleRef.get<OidcLocalAuthorization>(SudoService, { strict: false });
 		const oidc = new OidcRuntime({
 			db: this.moduleRef.get(DI.db, { strict: false }), redis: this.moduleRef.get<Redis>(DI.redis, { strict: false }), config,
 			meta: this.moduleRef.get(DI.meta, { strict: false }), idService: this.moduleRef.get(IdService, { strict: false }),

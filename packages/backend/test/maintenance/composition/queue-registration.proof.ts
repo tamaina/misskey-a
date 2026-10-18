@@ -19,6 +19,7 @@ import { CleanChartsProcessorService } from '@features/statistics/backend/jobs/C
 import { CleanRemoteFilesProcessorService } from '@features/drive/backend/jobs/CleanRemoteFilesProcessorService.js';
 
 import { DeleteAccountProcessorService } from '@features/users/backend/jobs/DeleteAccountProcessorService.js';
+import { DeleteAccountService } from '@features/users/backend/services/DeleteAccountService.js';
 
 import { DeleteDriveFilesProcessorService } from '@features/drive/backend/jobs/DeleteDriveFilesProcessorService.js';
 
@@ -112,6 +113,14 @@ const processors = [
 for (const [name, feature, parameterCount] of processors) {
 	test(`${name} is registered once with its canonical constructor metadata`, () => {
 		expect(processorProviders.filter(provider => provider === feature)).toHaveLength(1);
-		expect(Reflect.getMetadata('design:paramtypes', feature)).toHaveLength(parameterCount);
+		const parameters = Reflect.getMetadata('design:paramtypes', feature) as unknown[];
+		if (feature === DeleteAccountProcessorService) {
+			// Committed deletion delivery appends exactly this canonical dependency.
+			expect(parameters).toHaveLength(parameterCount + 1);
+			expect(parameters.at(-1)).toBe(DeleteAccountService);
+			expect(parameters.slice(0, -1)).toHaveLength(parameterCount);
+		} else {
+			expect(parameters).toHaveLength(parameterCount);
+		}
 	});
 }

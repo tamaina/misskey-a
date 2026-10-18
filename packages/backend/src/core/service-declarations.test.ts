@@ -76,7 +76,10 @@ describe('typed feature declaration proof', () => {
 		for (const [name, feature] of [['auth', authServices], ['authSecurity', authSecurityServices], ['integrations', integrationServices], ['channels', channelServices], ['timelines', timelineServices], ['games', gameServices], ['drive', driveServices], ['relationships', relationshipServices], ['discovery', discoveryServices], ['userSearch', userSearchServices], ['ranking', rankingServices], ['announcements', announcementServices], ['instance', instanceServices], ['chat', chatServices], ['play', playServices], ['moderation', moderationServices], ['moderationLogging', moderationLoggingServices], ['collections', collectionServices], ['roles', roleServices], ['emojis', emojiServices], ['collectionGallery', galleryServices], ['driveMedia', mediaServices], ['markup', markupServices], ['preferences', preferencesServices]] as const) {
 			const entries: [string, ServiceDefinition][] = Object.entries(feature.definitions);
 			for (const [key, definition] of entries) {
-				const expected = baseline.features[name][key];
+				// Keep the published fixture unchanged; sudo is an explicit new local graph.
+				const expected = baseline.features[name][key] ?? (name === 'authSecurity' && key === 'SudoService' ? [
+					{ port: 'db' }, { service: 'FreshPasskeyReauthentication' }, { service: 'UserAuthService' },
+				] : undefined);
 				expect(expected).toBeDefined();
 				const actual = definition.dependencies.map(dependency => {
 					if (dependency.kind === 'port') {
