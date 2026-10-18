@@ -6,7 +6,7 @@ import 'reflect-metadata';
 import { call } from '@orpc/server';
 import { Module } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import type { ModuleRef } from '@nestjs/core';
+import { ModuleRef } from '@nestjs/core';
 import type { FactoryProvider, InjectionToken } from '@nestjs/common';
 import { expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
@@ -20,6 +20,7 @@ import { featureServiceExports, featureServiceGroups } from '../../../index/back
 import type { Inputs } from '../../../index/backend/service-definitions.js';
 import type { OidcLocalAuthorization } from '../../backend/oidc-runtime.js';
 import { testContext } from './native-context.js';
+import { UsersApiProvider } from '../../../users/backend/api.implementation.js';
 
 test('actual native provider delegates OIDC administration to the canonical shared sudo and authenticated session', async () => {
 	const moduleRef = mockDeep<ModuleRef>(); const sudo = mockDeep<OidcLocalAuthorization>();
@@ -70,4 +71,27 @@ test('OAuth resolves the actual shared security graph across a Nest module expor
 		expect(module.get('SudoService')).toBe(sudo);
 		expect(Reflect.get(module.get(OAuth2ProviderService), 'local')).toBe(sudo);
 	} finally { await module.close(); }
+});
+
+test('account deletion composes with database and meta exported by a different Nest module', async () => {
+	const db = { fixture: 'database' }; const meta = { fixture: 'meta' };
+	class GlobalDependenciesFixture {}
+	Module({ providers: [{ provide: DI.db, useValue: db }, { provide: DI.meta, useValue: meta }], exports: [DI.db, DI.meta] })(GlobalDependenciesFixture);
+	class UsersApiFixture {}
+	Module({ imports: [GlobalDependenciesFixture], providers: [UsersApiProvider] })(UsersApiFixture);
+	const module = await Test.createTestingModule({ imports: [UsersApiFixture] }).compile();
+	const ref = module.select(UsersApiFixture).get(ModuleRef, { strict: true });
+	const get = ref.get.bind(ref);
+	// Imported providers require non-strict lookup even when they are exported.
+	expect(() => get(DI.db)).toThrow(); expect(() => get(DI.meta)).toThrow();
+	expect(get(DI.db, { strict: false })).toBe(db); expect(get(DI.meta, { strict: false })).toBe(meta);
+	const lookup = vi.spyOn(ref, 'get').mockImplementation((token, options) => token === DI.db || token === DI.meta ? get(token, options) : mockDeep());
+	try {
+		const provider = module.get(UsersApiProvider);
+		const router = provider.compose();
+		expect(router['i/delete-account']).toBeDefined();
+		expect(provider.compose()).toBe(router);
+		expect(lookup).toHaveBeenCalledWith(DI.db, expect.objectContaining({ strict: false }));
+		expect(lookup).toHaveBeenCalledWith(DI.meta, expect.objectContaining({ strict: false }));
+	} finally { lookup.mockRestore(); await module.close(); }
 });

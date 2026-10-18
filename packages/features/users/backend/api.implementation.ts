@@ -133,8 +133,8 @@ export class UsersApiProvider {
 				achievementService: this.moduleRef.get(AchievementService, { strict: false }),
 			},
 			'i/delete-account': {
-				db: this.moduleRef.get(DI.db),
-				meta: this.moduleRef.get(DI.meta),
+				db: this.moduleRef.get(DI.db, { strict: false }),
+				meta: this.moduleRef.get(DI.meta, { strict: false }),
 				queue: this.moduleRef.get(QueueService, { strict: false }),
 				globalEventService: this.moduleRef.get(GlobalEventService, { strict: false }),
 				usersRepository: this.moduleRef.get<UsersRepository>(DI.usersRepository, { strict: false }),

@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runInNewContext } from 'node:vm';
+import { createContext, runInContext, runInNewContext } from 'node:vm';
 import { createApp } from 'vue';
 import { compileScript, parse } from 'vue/compiler-sfc';
 import { describe, expect, test } from 'vitest';
@@ -36,10 +36,14 @@ function originalValue(language: string, key: string): string {
 	return value;
 }
 
+// The production inliner emits a JSON string literal, with no mutable VM state.
+// Reuse its sandbox while still compiling and evaluating every generated value.
+const productionContext = createContext();
+
 function production(message: string): unknown {
 	const code = new MagicString('raw');
 	applyWithLocale(code, [{ type: 'localized', begin: 0, end: 3, localizationKey: ['message'], localizedOnly: true }], 'en-US', { message } as unknown as Locale, blankLogger);
-	return runInNewContext(code.toString());
+	return runInContext(code.toString(), productionContext);
 }
 
 let historicalLocalePlugin: ReturnType<typeof pluginVvi> | undefined;

@@ -78,7 +78,7 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh email change with real SQL,
 		const cache = mockDeep<ConstructorParameters<typeof AuthenticateService>[3]>();
 		cache.localUserByNativeTokenCache.fetch.mockImplementation(async () => user);
 		cache.localUserByIdCache.fetch.mockImplementation(async () => user);
-		const tokens = mockDeep<ConstructorParameters<typeof AuthenticateService>[1]>(); tokens.findOne.mockImplementation(async () => mockDeep<MiAccessToken>({ userId: owner, appId: null, permission: ['write:account'] }));
+		const tokens = mockDeep<ConstructorParameters<typeof AuthenticateService>[1]>(); tokens.findOne.mockImplementation(async () => mockDeep<MiAccessToken>({ userId: owner, appId: null, permission: ['write:account'], expiresAt: null }));
 		authenticate = new AuthenticateService(db.getRepository(MiUser) as ConstructorParameters<typeof AuthenticateService>[0], tokens, mockDeep(), cache, sessions);
 		const fresh = new FreshPasskeyReauthentication(new FreshReauthenticationStore(redis), sessions, db.getRepository(MiUserProfile) as unknown as UserProfilesRepository, db.getRepository(MiUserSecurityKey) as unknown as UserSecurityKeysRepository, relyingParty);
 		const deps: AuthRouterDependencies = mockDeep<AuthRouterDependencies>();
