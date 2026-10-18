@@ -1,0 +1,70 @@
+[
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.vue",
+    "baselineSha256": "73e705383ac03d1e3f063c385bb888db8ecebe088486c1baee2b021808a66e7d",
+    "currentSha256": "11d0409527086d3027d1534bebf1f61bdd93b39eef64f5df54ff613e17336896",
+    "edits": [
+      {
+        "start": 3612,
+        "end": 3786,
+        "baseline": "",
+        "current": "// Short-lived challenge stays in this component, never in browser storage.\nconst authenticationProgress = shallowRef<Misskey.entities.SigninProgressChallenge | null>(null);\n"
+      },
+      {
+        "start": 4822,
+        "end": 4861,
+        "baseline": "",
+        "current": "\t\tauthenticationProgress.value = null;\n"
+      },
+      {
+        "start": 6034,
+        "end": 6072,
+        "baseline": "",
+        "current": "\tauthenticationProgress.value = null;\n"
+      },
+      {
+        "start": 7515,
+        "end": 7647,
+        "baseline": "",
+        "current": "\t\tprogressMode: 'v1' as const,\n\t\t...(authenticationProgress.value ? { authenticationProgress: authenticationProgress.value } : {}),\n"
+      },
+      {
+        "start": 7715,
+        "end": 7772,
+        "baseline": "",
+        "current": "\tif (authenticationProgress.value) delete _req.password;\n"
+      },
+      {
+        "start": 8136,
+        "end": 8176,
+        "baseline": "",
+        "current": "\t\t\tauthenticationProgress.value = null;\n"
+      },
+      {
+        "start": 8488,
+        "end": 8620,
+        "baseline": "",
+        "current": "\t\t\t\t\tauthenticationProgress.value = res.authenticationProgress ?? null;\n\t\t\t\t\tif (authenticationProgress.value) password.value = '';\n"
+      },
+      {
+        "start": 9063,
+        "end": 9195,
+        "baseline": "",
+        "current": "\t\t\t\t\tauthenticationProgress.value = res.authenticationProgress ?? null;\n\t\t\t\t\tif (authenticationProgress.value) password.value = '';\n"
+      },
+      {
+        "start": 10735,
+        "end": 11004,
+        "baseline": "",
+        "current": "\tif (!active) return;\n\tconst restartPassword = authenticationProgress.value !== null;\n\tauthenticationProgress.value = null;\n\tif (restartPassword) {\n\t\tpage.value = 'password';\n\t\tpassword.value = '';\n\t\tcredentialRequest.value = null;\n\t\tpasskeyAvailable.value = false;\n\t}\n"
+      },
+      {
+        "start": 13148,
+        "end": 13186,
+        "baseline": "",
+        "current": "\tauthenticationProgress.value = null;\n"
+      }
+    ],
+    "localeBlocksSha256": "18e493a346f53eb13b41d6b8852d444255bc545833655226a8c85c519b23e1e1"
+  }
+]

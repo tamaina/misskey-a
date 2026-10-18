@@ -112,6 +112,27 @@ function signinBranches(operation: unknown): unknown[] {
 	return success.anyOf;
 }
 
+const progressOpaqueShape = { type: 'string', pattern: '^[A-Za-z0-9_-]{43}$' };
+const progressShape = { type: 'object', properties: {
+	ticket: progressOpaqueShape, browserSecret: progressOpaqueShape, nonce: progressOpaqueShape,
+	version: { type: 'integer', minimum: 0, maximum: Number.MAX_SAFE_INTEGER },
+}, required: ['ticket', 'browserSecret', 'nonce', 'version'], additionalProperties: false };
+
+function restorePreProgressSigninOperation(operation: unknown): unknown {
+	const restored: unknown = structuredClone(operation);
+	const branches = signinBranches(restored);
+	for (const index of [2, 3]) {
+		const branch = object(branches[index]);
+		const properties = object(branch.properties);
+		expect(properties.authenticationProgress).toEqual(progressShape);
+		expect(branch.required).toEqual(index === 2 ? ['finished', 'next'] : ['finished', 'next', 'authRequest']);
+		delete properties.authenticationProgress;
+	}
+	expect(schemaHash(restored)).toBe(signinPolicyOperationHashes['/signin-flow']);
+	return restored;
+}
+
+
 // Issue #180 changes only these two response boundaries. Restore them before
 // applying the unchanged availability and historical alias oracles.
 const signinPolicyOperationHashes = {
@@ -122,6 +143,7 @@ const recoveryFactorsShape = { type: 'array', items: { enum: ['totp', 'passkey',
 
 function restorePreSigninPolicyOperation(path: string, operation: unknown): unknown {
 	if (path !== '/signin-flow' && path !== '/signin-with-passkey') return operation;
+	if (path === '/signin-flow') operation = restorePreProgressSigninOperation(operation);
 	expect(schemaHash(operation)).toBe(signinPolicyOperationHashes[path]);
 	const restored: unknown = structuredClone(operation);
 	if (path === '/signin-flow') {

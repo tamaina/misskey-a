@@ -1,0 +1,111 @@
+[
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.vue",
+    "baselineSha256": "db67e3d3bc2829e59930919c494f257408656e0485772ecc6c4140a36682866a",
+    "currentSha256": "635641e6bc5c2bfce54e0717fd917b892cd3e1aaa6d64384e062e3ee8866904b",
+    "edits": [
+      {
+        "start": 3068,
+        "end": 3091,
+        "baseline": "",
+        "current": "\t(ev: 'manual'): void;\n"
+      },
+      {
+        "start": 4276,
+        "end": 4293,
+        "baseline": "",
+        "current": "\temit('manual');\n"
+      },
+      {
+        "start": 6111,
+        "end": 6128,
+        "baseline": "",
+        "current": "\temit('manual');\n"
+      },
+      {
+        "start": 6462,
+        "end": 6479,
+        "baseline": "",
+        "current": "\temit('manual');\n"
+      },
+      {
+        "start": 7155,
+        "end": 7172,
+        "baseline": "",
+        "current": "\temit('manual');\n"
+      }
+    ],
+    "historicalSha256": [
+      "73e705383ac03d1e3f063c385bb888db8ecebe088486c1baee2b021808a66e7d",
+      "dd951696d77ff92b352e6a76335125c5dd83954be517686844ef8ed898dfbf81"
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/components/MkSigninDialog.vue",
+    "baselineSha256": "e7fdab22fc81427d00f31ca002f2a2e9860cb05f240293ef13d4b59a118d1d55",
+    "currentSha256": "ec57d05eda488200aadada838a4908993a993deecde740acb60ba2a5bada87a6",
+    "edits": [
+      {
+        "start": 503,
+        "end": 681,
+        "baseline": "\t\t\t<MkSignin :autoSet=\"autoSet\" :message=\"message\" :openOnRemote=\"openOnRemote\" :initialUsername=\"initialUsername\" @login=\"onLogin\"/>\n",
+        "current": "\t\t\t<MkSignin ref=\"conditionalSignin\" :enabled=\"!closing\" :autoSet=\"autoSet\" :message=\"message\" :openOnRemote=\"openOnRemote\" :initialUsername=\"initialUsername\" @login=\"onLogin\"/>\n"
+      },
+      {
+        "start": 786,
+        "end": 829,
+        "baseline": "import { useTemplateRef } from 'vue';\n",
+        "current": "import { useTemplateRef, ref } from 'vue';\n"
+      },
+      {
+        "start": 921,
+        "end": 1005,
+        "baseline": "import MkSignin from '@features/auth/frontend/components/MkSignin.vue';\n",
+        "current": "import MkSignin from '@features/auth/frontend/components/MkSignin.conditional.vue';\n"
+      },
+      {
+        "start": 1507,
+        "end": 1629,
+        "baseline": "",
+        "current": "const conditionalSignin = useTemplateRef<InstanceType<typeof MkSignin>>('conditionalSignin');\nconst closing = ref(false);\n"
+      },
+      {
+        "start": 1651,
+        "end": 1709,
+        "baseline": "",
+        "current": "\tclosing.value = true; conditionalSignin.value?.cancel();\n"
+      },
+      {
+        "start": 1853,
+        "end": 1911,
+        "baseline": "",
+        "current": "\tclosing.value = true; conditionalSignin.value?.cancel();\n"
+      }
+    ],
+    "historicalSha256": [
+      "e7fdab22fc81427d00f31ca002f2a2e9860cb05f240293ef13d4b59a118d1d55"
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/pages/auth.vue",
+    "baselineSha256": "3b29a4f8d0b3cc36a873528d9d05939e53fcbb93fc14e47971de7004ad91d4d0",
+    "currentSha256": "e6ddad865b6da17b68560d911782df52ebba9980a82eb9f5b697e49e25fec16d",
+    "edits": [
+      {
+        "start": 1066,
+        "end": 1106,
+        "baseline": "\t\t\t<MkSignin @login=\"onLogin\"/>\n",
+        "current": "\t\t\t<MkSignin enabled @login=\"onLogin\"/>\n"
+      },
+      {
+        "start": 1331,
+        "end": 1415,
+        "baseline": "import MkSignin from '@features/auth/frontend/components/MkSignin.vue';\n",
+        "current": "import MkSignin from '@features/auth/frontend/components/MkSignin.conditional.vue';\n"
+      }
+    ],
+    "historicalSha256": [
+      "beb2072811e658ccade5c93cafa794aab61b1f564d6766443988d3e70b8b63c4"
+    ]
+  }
+]

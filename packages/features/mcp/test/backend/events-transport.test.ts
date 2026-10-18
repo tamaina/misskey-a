@@ -8,12 +8,12 @@ import { createLocalMcpPilot } from '../../backend/local-transport.js';
 import type { McpApiService } from '../../backend/McpApiService.js';
 const close: (() => Promise<unknown>)[] = [];
 
-afterEach(async () => { for (const callback of close.splice(0)) await callback(); });
+afterEach(async () => { vi.restoreAllMocks(); for (const callback of close.splice(0)) await callback(); });
 
-async function pilot() {
+async function pilot(expiresAt?: Date) {
 	const invoke = vi.fn(async () => []);
 	const events = vi.fn(async (method: string) => method === 'events/subscribe' ? { id: 'synthetic-sub', refreshBefore: '2026-10-12T00:00:00Z', cursor: null, truncated: false } : method === 'events/list' ? { events: [] } : {});
-	const service = { prepare: vi.fn(async () => ({ invoke, events })), requiredScopes: () => ['access:mcp'] } as unknown as McpApiService;
+	const service = { prepare: vi.fn(async () => ({ invoke, events, expiresAt })), requiredScopes: () => ['access:mcp'] } as unknown as McpApiService;
 	const p = createLocalMcpPilot(service, { enabled: true, resource: 'http://127.0.0.1:61836/mcp' }); await p.app.ready(); close.push(() => p.app.close());
 	const request = (method: string, params: object = {}, extra: Record<string, string> = {}) => p.app.inject({ method: 'POST', url: '/mcp', headers: {
 		host: '127.0.0.1:61836', authorization: 'Bearer synthetic', 'content-type': 'application/json', accept: 'application/json, text/event-stream',
@@ -49,4 +49,12 @@ it('preserves native authorization challenge metadata in modern tool results', a
 	const response = await request('tools/call', { name: 'list_my_notes', arguments: {} }, { 'mcp-name': 'list_my_notes' });
 	expect(response.json().result._meta['mcp/www_authenticate']).toBeDefined();
 	expect(response.json().result._meta['io.modelcontextprotocol/serverInfo']).toBeDefined();
+});
+
+it('modern output checks wall-clock expiry even before its idle timer has a turn', async () => {
+	const now = vi.spyOn(Date, 'now').mockReturnValue(1000); const h = await pilot(new Date(2000));
+	h.events.mockImplementationOnce(async () => { now.mockReturnValue(2000); return { secret: 'SYNTHETIC_PRIVATE_OUTPUT' }; });
+	const result = await h.request('events/list').catch(error => error);
+	expect(result).toBeInstanceOf(Error);
+	expect(h.events).toHaveBeenCalledOnce(); expect(h.p.activeRequests()).toBe(0);
 });

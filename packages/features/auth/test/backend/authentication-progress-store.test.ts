@@ -154,4 +154,42 @@ describe.skipIf(!redis)('real atomic authentication progress on isolated Redis',
 		expect(Number(consumed !== null) + Number(cancelled)).toBe(1);
 		expect(await a.read(identified, start)).toBeNull();
 	});
+	it('only the private claimed owner may finish a verifier and then consume it', async () => {
+		const store = new AuthenticationProgressStore(redis!);
+		const start = await store.create(identified);
+		const password = (await store.advance(identified, start, start, proof))!;
+		const factor = { ...proof, factor: 'passkey' as const };
+		expect(await store.finishClaim(identified, start, password, factor)).toBeNull();
+		const owner = (await store.claim(identified, start, password))!;
+		expect(await store.finishClaim(identified, start, password, factor)).toBeNull();
+		expect(await store.finishClaim(identified, start, owner, { ...factor, verifiedForUserId: 'other' })).toBeNull();
+		expect(await store.finishClaim(identified, start, owner, { ...factor, userPolicyStamp: 'c'.repeat(64) })).toBeNull();
+		const finished = (await store.finishClaim(identified, start, owner, factor))!;
+		expect(finished.metadata).toMatchObject({ state: 'claimed', facts: { password: expect.any(Number), passkey: expect.any(Number) } });
+		expect(await store.consume(identified, start, owner)).toBeNull();
+		expect(await store.finishClaim(identified, start, owner, factor)).toBeNull();
+		expect(await store.consume(identified, start, finished)).not.toBeNull();
+		expect(await store.consume(identified, start, finished)).toBeNull();
+	});
+
+	it('finishClaim keeps the original deadline and has one concurrent owner', async () => {
+		const a = new AuthenticationProgressStore(redis!); const b = new AuthenticationProgressStore(redis!);
+		const start = await a.create(identified); const first = (await a.advance(identified, start, start, proof))!;
+		const owner = (await a.claim(identified, start, first))!; const before = await redis!.pttl(key(start.ticket));
+		const results = await Promise.all([a.finishClaim(identified, start, owner, { ...proof, factor: 'totp' }), b.finishClaim(identified, start, owner, { ...proof, factor: 'passkey' })]);
+		expect(results.filter(Boolean)).toHaveLength(1); const winner = results.find(Boolean)!;
+		expect(await redis!.pttl(key(start.ticket))).toBeLessThanOrEqual(before);
+		const raw = await redis!.get(key(start.ticket)); expect(raw).not.toContain(owner.nonce); expect(raw).not.toContain(winner.nonce);
+		await redis!.pexpire(key(start.ticket), 1); await new Promise(resolve => setTimeout(resolve, 10));
+		expect(await a.consume(identified, start, winner)).toBeNull();
+	});
+	it('password proof creation uses an absolute short deadline and step reads reject stale nonces', async () => {
+		const store = new AuthenticationProgressStore(redis!); const deadline = await store.startDeadline(1000); const start = await store.create(identified, deadline);
+		expect(await store.remaining(identified, start)).toBeLessThanOrEqual(1000);
+		const password = (await store.advance(identified, start, start, proof))!;
+		expect(await store.read(identified, start, start)).toBeNull(); expect(await store.read(identified, start, password)).not.toBeNull();
+		await expect(store.create(identified, deadline - 90_000)).rejects.toThrow();
+		await redis!.persist(key(start.ticket)); expect(await store.remaining(identified, start)).toBeNull();
+	});
+
 });

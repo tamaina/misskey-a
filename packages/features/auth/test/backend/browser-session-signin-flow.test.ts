@@ -56,7 +56,7 @@ test('passkey completion also awaits the shared issuer, while rejected credentia
 	const h = fixture();
 	h.deps.userSecurityKeysRepository.findBy.mockResolvedValue([mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: 'alice', publicKey: 'AQID' })]);
 	h.deps.webAuthnService.verifyAuthenticationWithProof.mockImplementation(async (_id, _response, before) => {
-		const key = { id: 'AQID', userId: 'alice', publicKey: 'AQID', deadline: performance.now() + 90_000 };
+		const key = { id: 'AQID', userId: 'alice', publicKey: 'AQID', userVerified: true, deadline: performance.now() + 90_000 };
 		return { key, expected: await before(key) };
 	});
 	expect(await h.invoke({ password: 'synthetic-password', credential: {} })).toEqual({ finished: true, id: 'alice', i: 'bs_synthetic' });

@@ -11,7 +11,7 @@ import { localUsernameSchema, passwordSchema } from '@features/users/backend/use
 
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
-import { DataSource, IsNull } from 'typeorm';
+import { DataSource, IsNull, type EntityManager } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { MiMeta, UsedUsernamesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { MiUser } from '@features/users/backend/models/User.js';
@@ -61,7 +61,7 @@ export class SignupService {
 		passwordHash?: MiUserProfile['password'] | null;
 		host?: PackedJsonValue;
 		ignorePreservedUsernames?: boolean;
-	}) {
+	}, manager?: EntityManager) {
 		const { password, passwordHash, host } = opts;
 		let hash = passwordHash;
 
@@ -130,7 +130,7 @@ export class SignupService {
 		let account!: MiUser;
 
 		// Start transaction
-		await this.db.transaction(async transactionalEntityManager => {
+		const createAccount = async (transactionalEntityManager: EntityManager) => {
 			const exist = await transactionalEntityManager.findOneBy(MiUser, {
 				usernameLower: username.toLowerCase(),
 				host: IsNull(),
@@ -164,8 +164,15 @@ export class SignupService {
 				createdAt: new Date(),
 				username: username.toLowerCase(),
 			}));
-		});
+		};
+		if (manager) await createAccount(manager);
+		else await this.db.transaction(createAccount);
+		if (!manager) await this.completeSignup(account);
+		return { account, secret };
+	}
 
+	/** Call only after the outer signup transaction commits. */
+	public async completeSignup(account: MiUser) {
 		this.usersChart.update(account, true);
 		this.userService.notifySystemWebhook(account, 'userCreated');
 
@@ -173,6 +180,5 @@ export class SignupService {
 			await this.metaService.update({ rootUserId: account.id });
 		}
 
-		return { account, secret };
 	}
 }

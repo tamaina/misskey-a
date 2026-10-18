@@ -119,7 +119,7 @@ test.each(['123456', 'A'.repeat(32)])('TOTP/backup token is sent unchanged and l
 	mount(true); await passwordPath();
 	vi.mocked(misskeyApi).mockResolvedValueOnce(finished as never);
 	state.handlers.totp(token); await settle();
-	expect(misskeyApi).toHaveBeenNthCalledWith(4, 'signin-flow', { username: 'synthetic', password: pw.password, token });
+	expect(misskeyApi).toHaveBeenNthCalledWith(4, 'signin-flow', { progressMode: 'v1', username: 'synthetic', password: pw.password, token });
 	expect(emitted).toHaveBeenCalledWith(finished); expect(login).toHaveBeenCalledWith('synthetic-session');
 });
 
@@ -130,7 +130,7 @@ test('explicit passkey fallback obtains fresh challenge and verifies through pas
 	expect(state.requests).toEqual([option('fresh')]); expect(page()).toBe('passkey');
 	vi.mocked(misskeyApi).mockResolvedValueOnce(finished as never);
 	state.handlers.credential(credential); await settle();
-	expect(misskeyApi).toHaveBeenLastCalledWith('signin-flow', { username: 'synthetic', password: pw.password, credential });
+	expect(misskeyApi).toHaveBeenLastCalledWith('signin-flow', { progressMode: 'v1', username: 'synthetic', password: pw.password, credential });
 	expect(emitted).toHaveBeenCalledWith(finished); expect(login).not.toHaveBeenCalled();
 });
 

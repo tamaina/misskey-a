@@ -19,41 +19,75 @@ requested scopeを任意追加欄に重ねず、`access:mcp`は通常OAuthでは
 この拡張を利用しない明示scope付き通常OAuthは従来の固定scope同意のまま。
 MCP clientsが独自フラグを送る必要はなく、discovery metadataにも変更を加えない。
 
-## OIDC SP foundation (unconnected pilot)
+## OIDC Service Provider integration
 
-The ID token verifier, discovery adapter, and transaction store do not register
-HTTP endpoints or issue sessions. Providers must be explicitly enabled by a
-future server-owned configuration. Discovery accepts public HTTPS only, with
-pinned DNS/TLS, no redirects, JSON, and same-origin authorization/token/JWKS
-endpoints. Internal IdPs and cross-origin provider endpoints are unsupported in
-this finite pilot. Identity is issuer + subject, never email matching.
+The protocol adapters are connected through `oidc-runtime.ts` and the finite
+`oidc-contract.ts`/`oidc-api.ts` routes. Provider administration first creates a
+disabled draft and exposes its exact server-owned redirect URL. Administrators
+then save issuer/client details and explicitly enable it. Changes require local
+sudo, recheck current administrator rights and provider version, and rotate that
+version. Client secrets are write-only in responses. Provider lists are explicit
+DTOs; secrets never become public metadata or UI defaults. An empty secret input
+preserves the saved value. Preparing migration rollback requires disabling the
+provider, unlinking all identities, then explicitly confirming secret erasure
+under sudo/current-version checks; erasure rotates the version and cannot be
+combined with enabling or replacement-secret input.
 
-Link transaction context must come from fresh local authentication and a live
-individually revocable session. A stored context alone is not authentication;
-future completion must recheck session/account state and require local MFA.
+`oidc/start` and `oidc/callback` bind state, nonce, S256 PKCE, exact redirect,
+provider/version and a Secure/HttpOnly host cookie. A dedicated frontend transport
+uses same-origin credentials only for these endpoints; ordinary API token
+requests retain `credentials: omit`. Continuations are opaque, cookie-bound,
+short-lived Redis records, never browser sessions or reusable elevation grants.
+Callback cancellation/replay cannot issue a session. External access/refresh
+tokens and email claims are discarded.
 
-Run synthetic network and real atomic Redis tests with
-`node packages/features/auth/test/run-oidc-fixture.mjs` from the repository root.
-It requires the existing `redis:8` image and task-local installed dependencies,
-uses a temporary Unix socket with no network/published ports/persistence, and
-removes only its own container and temporary directory. Ordinary unit runs skip
-the Redis cases unless this task-owned fixture socket is explicitly supplied.
-The current-Node backend unit CI job runs the explicit fixture so actual Lua
-atomicity is checked independently of those ordinary unit runs.
+Linked login records the verified issuer/subject and exact local identity row.
+Required local TOTP, recovery code or passkey must still succeed. Only the
+second-factor passkey assertion can omit UV; passwordless primary remains strict.
+The consumed external continuation yields a server-owned external assurance.
+`SigninService` locks the current user/profile, checks current credential policy,
+provider version and exact still-linked identity, and inserts an individual
+browser session in the same transaction. Unlink/relink cannot revive an old
+pending proof. External identity is never marked as a verified local password.
 
-The unconnected token exchange adapter accepts a server-owned provider snapshot
-and a transaction additionally bound to the exact redirect URI and S256 challenge.
-The current transaction store does not produce these extra bindings; there is no
-runtime bridge. Callback integration must add them before using the adapter.
-It supports client_secret_basic only, form-encodes each credential before Basic
-encoding, and shares one five-second monotonic deadline from before DNS through
-token POST, JWKS GET, and verification. HTTP is created only after authenticated
-TLS and the pinned public peer are checked. Redirects, proxies, compression, and
-connection reuse are unsupported. Each JSON response is limited to 64 KiB, and
-JWKS has at most 32 keys with bounded public RSA fields. Only configured-origin
-JWKS is used; token/key URLs never trigger additional fetches. Errors retain no
-provider body or credential cause. Access/refresh tokens are discarded, email
-claims are not trusted, and the result cannot create a local session or grant.
+An unlinked identity enters onboarding, regardless of email equality. Onboarding
+requires an explicit username, local password, rules/terms consent and local
+email verification, preserving CAPTCHA and invitation requirements. The original
+Redis deadline is not extended by email preparation or retries. Account/profile,
+external identity, invitation consumption and browser session commit together;
+write failure rolls them back together. Mail delivery and post-signup effects are
+outside that transaction. Failed delivery does not create an account.
+
+Existing users link from settings: external authentication first, explicit
+agreement to the displayed issuer/subject, then fresh local sudo for the exact
+pending identity and individual session. Unlink also uses local sudo and keeps a
+remaining usable local or enabled external login method. Email alone never links
+accounts. A disabled provider stops new pending flows; it does not silently
+remove local accounts or existing sessions.
+
+Discovery/token/JWKS retain pinned DNS/TLS, no redirects, bounded responses and
+same-origin provider endpoints. Public HTTPS is the default. Only a server
+operator's existing `allowedPrivateNetworks` CIDRs can authorize private peers;
+provider administrators cannot broaden network policy, disable TLS verification,
+or choose a proxy. The finite adapter supports RS256, S256 and
+`client_secret_basic`. Generic OAuth2, arbitrary cross-origin provider endpoints,
+provider-enforced username and provider-wide local-auth disabling are not claimed
+complete. This intentionally differs from upstream #13865's email auto-link idea
+and resolves its open onboarding password choice by requiring a local password.
+
+Validation sources (run only in the coordinated validation slot):
+- `test/run-oidc-fixture.mjs`: actual Redis transaction/continuation atomicity.
+- `test/run-oidc-runtime-fixture.mjs`: task-owned HTTPS synthetic IdP, PostgreSQL,
+  Redis, actual HTTP routes, signatures, PKCE, local MFA, session issuance,
+  onboarding, cancellation, replay and owner/identity races.
+- `test/frontend/oidc-*.test.ts`: same-origin cookie boundary and UI late results.
+
+The HTTP fixture stubs mail/CAPTCHA/rate services and the shared local-sudo
+transaction port. Common sudo has separate tests; the final combined-stack test
+must connect its real implementation. Synthetic IdP credentials are generated
+inside the disposable fixture. No real external provider or real-user settings
+are touched. Physical/cross-device acceptance remains separate. These sources
+are not a claim that the current uncommitted implementation has passed tests.
 
 ### Recovery-code consumption
 
@@ -112,7 +146,7 @@ mutation must recheck session and policy within its own locked transaction.
 The verifier is registered in DI and connected to dedicated
 start/complete APIs and security-settings buttons for password change, token
 regeneration and email change. Activation and recovery-code display purposes still have no runtime caller, and this flow never changes MFA
-policy. It is independent of the unmerged login-progress connection in #143.
+policy. The #143 password-first progress source is integrated below; its historical Draft remains independently recorded.
 Both existing sign-in paths now use the current-policy issuance protocol below.
 Activation remains blocked until account deletion, recovery and
 credential issuance, factor management/key display and every remaining writer
@@ -143,7 +177,7 @@ acceptance. There is still no true writer or user-facing activation state.
 
 | Existing path | Current coverage | Still required before activation |
 | --- | --- | --- |
-| Password-first `signinFlow`, passkey `signinWithPasskey`, `SigninService` | Explicit policy at both entry points; password plus an enabled factor for independent MFA; atomic recovery; server-owned proof and current user/policy/key/deadline checks under user/profile locks with transactional session issuance | Real-device acceptance; #143 remains a separate unmerged login-progress Draft and is not incorporated into this flow. |
+| Password-first `signinFlow`, passkey `signinWithPasskey`, `SigninService` | Explicit policy at both entry points; password plus an enabled factor for independent MFA; atomic recovery; server-owned proof and current user/policy/key/deadline checks under user/profile locks with transactional session issuance | Real-device acceptance; #143 source is integrated with the assurance protocol; the historical Draft remains unmerged. |
 | `TotpService` recovery codes | Atomic one-use consume bound to password/TOTP/independent policy; the named login flow uses it only when policy requires MFA | Finish fresh-gated presentation and recovery management; never infer remaining factors from backup stock. |
 | `request-reset-password`, `reset-password`, admin `reset-password` | Existing email/admin authorization and reset behavior | Serialize relevant credential changes and preserve independent MFA on reset; define recovery policy and invalidate stale reauthentication/session state. |
 | `i/update-email`, dedicated passkey start/complete, `verify-email` | Exact previous/target email binding; locked current policy/session mutation; legacy proof compatibility; atomic owner/code/address verification | Physical-device acceptance; existing reset-request invalidation and recovery policy remain separate. |
@@ -269,3 +303,58 @@ This does not invalidate existing password-reset requests when email changes.
 Reset/recovery policy, account deletion, factor enrolment/removal/activation,
 recovery/key display, credential issuance and general five-minute sudo remain
 unfinished. No activation writer or real-user configuration change is added.
+
+### Authentication progress integration
+
+The password-first progress flow from Draft #143 is composed with the explicit
+MFA policy and server-owned login assurance. Its binding includes the independent
+policy, native-token generation and registered key material. A single verifier
+claims the ticket before consumable factor verification; current policy is checked
+before the transaction-owned session issuance. Redis anchors a maximum 90-second
+absolute deadline before password verification. The server records the verified
+password fact and current credential/native-policy stamp; a continuation sends
+only the bound one-use ticket and factor, without repeating the password or
+bcrypt. The browser clears its password after receiving progress. Factor choice
+changes preserve the ticket and original deadline; final issuance uses its
+remaining TTL. Legacy callers retain their existing authentication requirements.
+
+
+### OIDC, Conditional login and credential issuance checkpoint
+
+OIDC sign-in, explicit local-sudo link/unlink and provider administration are now
+connected in source, including local second-factor checks before individual
+browser-session issuance. Email equality never links accounts. New-account
+onboarding requires a local password and local email verification. Provider-fixed
+usernames and provider-wide disabling of local authentication remain separate
+specification decisions; this does not claim every request in #13346 is solved.
+Private IdPs still require the server's explicit network allowlist and HTTPS/DNS
+pinning policy. The normal password path rejects `passwordLoginDisabled`; strict
+passkey primary authentication and external primary authentication retain their
+own assurance checks. The login dialog and authorization login page explicitly
+enable Conditional mediation. Manual/named/TOTP-first interaction, account
+switching and closing the dialog cancel its owned pending ceremony.
+
+MiAuth, legacy application approval and OAuth code consent now require the
+current individual browser session and shared local sudo. Selecting a different
+saved account requires an explicit account switch or login first. Native master
+credentials cannot silently substitute for that browser-session proof. Existing
+unbounded tokens and omitted expiry stay unbounded; new expiry is an explicit
+user choice. HTTP, streaming and MCP output enforce expiry, with owned timers
+also closing idle connections. Application approval preserves an existing live
+token's expiry; changing it requires revocation first.
+
+OAuth publishes a code only after committing an approval receipt. Exchange
+rechecks the exact immutable grant, current account/policy/native-token stamp,
+original browser session, sudo grant identifier and original deadline under the
+shared transaction locks, then consumes the receipt with token insertion. The
+receipt stores no bearer credential or plaintext native token. A committed issued
+token remains independent of the authorizing browser session's later logout.
+
+These additions are a source checkpoint: no build, type check, test, synthetic
+IdP, PostgreSQL, Redis, browser acceptance or SDK generation has yet run for this
+worktree. Fixture sources cover the intended cases but are not passing evidence.
+The common SudoService/model changes still need the owner's normal merge, then
+formal SDK generation, exact operation-inventory projections, focused unit/UI,
+real database races/rollback, full types and shipping checks in allocated serial
+stages. Real IdP credentials, grants, email delivery and production changes have
+not been used.

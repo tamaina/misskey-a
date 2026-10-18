@@ -34,8 +34,8 @@ function harness() {
 	return { services, operations, context, router: createAuthRouter(operations) };
 }
 
-test('all 56 native auth routes retain secure policy enforcement', async () => {
-	expect(Object.keys(authContract)).toHaveLength(56);
+test('all 71 native auth routes retain secure policy enforcement', async () => {
+	expect(Object.keys(authContract)).toHaveLength(71);
 	for (const path of ['i/regenerate-token/passkey/start', 'i/regenerate-token/passkey/complete'] as const) {
 		expect(authContract[path]['~orpc'].meta).toMatchObject({ requestName: path, requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-token-regeneration' } });
 	}

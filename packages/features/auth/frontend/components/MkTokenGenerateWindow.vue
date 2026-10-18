@@ -27,6 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #label>{{ $locale.sfc.name }}</template>
 				</MkInput>
 			</div>
+			<MkTokenExpiry v-model="expiry"/>
 			<div><b>{{ $locale.sfc.permission }}</b></div>
 			<MkPermissionSelect v-model="selectedPermissions" :permissions="Misskey.permissions" :administrator="!!iAmAdmin"
 				:labels="copyLocaleDictionary($locale.sfc.permissionsLabels)" :disableAllText="$locale.sfc.disableAll" :enableAllText="$locale.sfc.enableAll" :adminPermissionText="$locale.sfc.adminPermission"/>
@@ -36,6 +37,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { selectedCredentialExpiry } from '../utility/use-credential-operation.js';
+import MkTokenExpiry from './MkTokenExpiry.vue';
+import * as os from '@features/ui/frontend/os.js';
 import { useTemplateRef, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -59,17 +63,21 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
 	(ev: 'closed'): void;
-	(ev: 'done', result: { name: string | null, permissions: string[] }): void;
+	(ev: 'done', result: { name: string | null, permissions: string[], expiresAt?: string }): void;
 }>();
 
 const dialog = useTemplateRef('dialog');
 const name = ref(props.initialName);
+const expiry = ref<string | null>(null);
 const selectedPermissions = ref<string[]>(props.initialPermissions ? [...props.initialPermissions] : []);
 
-function ok(): void {
+async function ok(): Promise<void> {
+	let expiresAt: string | undefined;
+	try { expiresAt = selectedCredentialExpiry(expiry.value); } catch { await os.alert({ type: 'error', text: $locale.value.sfc.invalidExpiry }); return; }
 	emit('done', {
 		name: name.value,
 		permissions: selectedPermissions.value,
+		...(expiresAt ? { expiresAt } : {}),
 	});
 	dialog.value?.close();
 }
@@ -1183,7 +1191,8 @@ function ok(): void {
 		"write:chat": "ダイレクトメッセージを操作する",
 		"read:chat": "ダイレクトメッセージを閲覧する"
 	},
-	"adminPermission": "管理者権限"
+	"adminPermission": "管理者権限",
+	"invalidExpiry": "有効期限には未来の日時を指定してください。"
 }
 </locale>
 

@@ -64,8 +64,8 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh password change with real S
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
 		await db.initialize();
 		const migrations = await db.runMigrations();
-		expect(migrations).toHaveLength(360);
-		expect(migrations.map(migration => migration.name)).toEqual(expect.arrayContaining(['AutoArchiveAnnouncements1791943550568', 'PasskeyMfaPolicy1791969900000']));
+		expect(migrations).toHaveLength(363);
+		expect(migrations.map(migration => migration.name)).toEqual(expect.arrayContaining(['AutoArchiveAnnouncements1791943550568', 'PasskeyMfaPolicy1791969900000', 'OidcIdentities1792300000000', 'AccessTokenExpiry1792300000004']));
 		redis = new Redis({ path: redisSocket });
 		sessions = new BrowserSessionService(db.getRepository(MiBrowserSession) as ConstructorParameters<typeof BrowserSessionService>[0], { gen: () => `freshsession${++nextSession}` });
 		const cache = mockDeep<ConstructorParameters<typeof AuthenticateService>[3]>();

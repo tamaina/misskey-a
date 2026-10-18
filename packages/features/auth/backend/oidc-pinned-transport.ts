@@ -7,7 +7,7 @@ import dns from 'node:dns/promises';
 import https from 'node:https';
 import tls from 'node:tls';
 import { isIP } from 'node:net';
-import { publicAddress } from './oauth/ClientMetadataFetcher.js';
+import { oidcAddress } from './oidc-network-policy.js';
 import type { ClientMetadataNetwork } from './oauth/ClientMetadataFetcher.js';
 import type { ClientRequest } from 'node:http';
 
@@ -30,7 +30,7 @@ type RequestData = { method: 'GET' } | { method: 'POST'; form: string; authoriza
 
 /** The caller supplies ONE monotonic operation deadline shared across token/JWKS.
  * Only after public DNS and authenticated pinned TLS may HTTP see credentials. */
-export function createOidcPinnedJsonRequester(dependencies: ClientMetadataNetwork = network) {
+export function createOidcPinnedJsonRequester(dependencies: ClientMetadataNetwork = network, allowedPrivateNetworks: readonly string[] = []) {
 	return async (endpoint: string, data: RequestData, deadlineAt: number): Promise<unknown> => {
 		let socket: tls.TLSSocket | undefined;
 		let request: ClientRequest | undefined;
@@ -61,7 +61,7 @@ export function createOidcPinnedJsonRequester(dependencies: ClientMetadataNetwor
 				const addresses = isIP(hostname) ? [{ address: hostname, family: isIP(hostname) }]
 					: await dependencies.lookup(hostname);
 				if (expired || !addresses.length) throw new Error('Invalid DNS');
-				const normalized = addresses.map(answer => publicAddress(answer.address));
+				const normalized = addresses.map(answer => oidcAddress(answer.address, allowedPrivateNetworks));
 				const target = addresses[0];
 				if (target.family !== 4 && target.family !== 6) throw new Error('Invalid DNS family');
 				await new Promise<void>((resolve, reject) => {
@@ -75,7 +75,7 @@ export function createOidcPinnedJsonRequester(dependencies: ClientMetadataNetwor
 					ownedSocket.once('secureConnect', () => {
 						try {
 							if (expired || ownedSocket.destroyed || !ownedSocket.authorized || !ownedSocket.remoteAddress ||
-								publicAddress(ownedSocket.remoteAddress) !== normalized[0]) throw new Error('Invalid TLS peer');
+								oidcAddress(ownedSocket.remoteAddress, allowedPrivateNetworks) !== normalized[0]) throw new Error('Invalid TLS peer');
 							resolve();
 						} catch { reject(new Error('TLS failed')); }
 					});

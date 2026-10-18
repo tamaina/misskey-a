@@ -24,6 +24,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</SearchMarker>
 
 		<X2fa/>
+		<XOidcSettingsLinks/>
 
 		<SearchMarker :keywords="['signin', 'login', 'history', 'log']">
 			<FormSection>
@@ -59,6 +60,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import XOidcSettingsLinks from '../../components/MkOidcSettingsLinks.vue';
 import { computed, markRaw, onActivated, onDeactivated, onUnmounted, ref } from 'vue';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import X2fa from '@features/auth/frontend/pages/settings/2fa.vue';

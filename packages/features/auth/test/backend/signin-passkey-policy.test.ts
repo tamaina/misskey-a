@@ -20,7 +20,7 @@ function harness(independent = true, passwordless = true) {
 	const profile = mockDeep<Awaited<ReturnType<typeof deps.userProfilesRepository.findOneByOrFail>>>({ userId: user.id, password: 'synthetic-hash', twoFactorEnabled: false, twoFactorSecret: null, passkeyMfaEnabled: independent, usePasswordLessLogin: passwordless });
 	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(profile);
 	deps.userSecurityKeysRepository.findBy.mockResolvedValue([mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: user.id, publicKey: 'AQID' })]);
-	deps.webAuthnService.verifySignInWithPasskeyWithProof.mockImplementation(async (_context, _response, before) => ({ key: { id: 'AQID', userId: user.id, publicKey: 'AQID', deadline: performance.now() + 90_000 }, expected: await before({ id: 'AQID', userId: user.id, publicKey: 'AQID' }) }));
+	deps.webAuthnService.verifySignInWithPasskeyWithProof.mockImplementation(async (_context, _response, before) => ({ key: { id: 'AQID', userId: user.id, publicKey: 'AQID', userVerified: true, deadline: performance.now() + 90_000 }, expected: await before({ id: 'AQID', userId: user.id, publicKey: 'AQID' }) }));
 	deps.signinService.signin.mockResolvedValue({ finished: true, id: user.id, i: 'bs_synthetic' });
 	const context: AuthSessionContext = { request: { ip: '127.0.0.1', headers: {} }, effects: mockDeep(), response: {} };
 	return { deps, user, profile, invoke: () => call(createSigninWithPasskeyProcedure(deps), { context: '00000000-0000-4000-8000-000000000000', credential: {} }, { context }) };

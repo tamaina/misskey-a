@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { accessTokenExpired, scheduleTokenExpiry } from '@features/auth/backend/access-token-expiry.js';
 import { Buffer } from 'node:buffer';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
@@ -72,6 +73,8 @@ export function registerMcpTransport(app: FastifyInstance, service: McpApiServic
 			return operation.finally(() => { nativePending--; releasePermit(); });
 		};
 		const cancel = () => { abort.abort(); };
+		let tokenExpiresAt: Date | null | undefined;
+		const expired = () => { if (accessTokenExpired({ expiresAt: tokenExpiresAt })) cancel(); return abort.signal.aborted; };
 		request.raw.once('aborted', cancel);
 		const disconnected = () => { if (!reply.raw.writableFinished) cancel(); };
 		reply.raw.once('close', disconnected);
@@ -80,6 +83,7 @@ export function registerMcpTransport(app: FastifyInstance, service: McpApiServic
 		if (request.raw.aborted || reply.raw.destroyed) cancel();
 		let server: Server | undefined;
 		let transport: WebStandardStreamableHTTPServerTransport | undefined;
+		let cancelTokenExpiry: (() => void) | undefined;
 		try {
 			let prepared: Awaited<ReturnType<McpApiService['prepare']>>;
 			try { prepared = await Promise.race([track(service.prepare({ credential: credential.slice(7), ip: request.ip, headers: request.headers }, abort.signal)), cancelled]); } catch (original) {
@@ -89,6 +93,9 @@ export function registerMcpTransport(app: FastifyInstance, service: McpApiServic
 				if (status === 403) reply.header('WWW-Authenticate', mcpChallenge(resource.href, 'insufficient_scope'));
 				return reply.code(status).send();
 			}
+			tokenExpiresAt = prepared.expiresAt;
+			cancelTokenExpiry = scheduleTokenExpiry({ expiresAt: tokenExpiresAt }, cancel);
+			abort.signal.throwIfAborted();
 			// Each POST has a separate stateless SDK server. Cross-request protocol cancellation is unsupported.
 			if (request.body && typeof request.body === 'object' && !Array.isArray(request.body)
 				&& 'method' in request.body && request.body.method === 'notifications/cancelled') return reply.code(501).send();
@@ -102,7 +109,7 @@ export function registerMcpTransport(app: FastifyInstance, service: McpApiServic
 				const signal = AbortSignal.any([abort.signal, extra.signal]);
 				try {
 					const output = await track(prepared.invoke(message.params.name, message.params.arguments ?? {}, signal));
-					signal.throwIfAborted(); // Response suppression only; native DB work may have completed.
+					expired(); signal.throwIfAborted(); // Response suppression only; native DB work may have completed.
 					const data = message.params.name === 'list_my_notes' ? { notes: output } : { result: output };
 					const result = { structuredContent: data, content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
 					if (Buffer.byteLength(JSON.stringify(result)) > bodyLimit) return { isError: true, content: [{ type: 'text', text: 'MCP response exceeds the 1 MiB output limit; request a smaller result or a specific endpoint definition.' }] };
@@ -142,10 +149,11 @@ export function registerMcpTransport(app: FastifyInstance, service: McpApiServic
 						if (!parsed.success) throw new McpEventError(-32602, 'Invalid tool arguments');
 						result = await Promise.race([callTool(parsed.data, { signal: abort.signal }), cancelled]);
 					} else throw new McpEventError(-32601, 'Method unavailable');
-					abort.signal.throwIfAborted();
-					return reply.send({ jsonrpc: '2.0', id, result: { resultType: 'complete', ...(result as object), _meta: { ...(result as { _meta?: Record<string, unknown> })._meta, 'io.modelcontextprotocol/serverInfo': { name: 'misskey', version: '0' } } } });
+					const body = { jsonrpc: '2.0', id, result: { resultType: 'complete', ...(result as object), _meta: { ...(result as { _meta?: Record<string, unknown> })._meta, 'io.modelcontextprotocol/serverInfo': { name: 'misskey', version: '0' } } } };
+					expired(); abort.signal.throwIfAborted();
+					return reply.send(body);
 				} catch (error) {
-					if (abort.signal.aborted) { reply.raw.destroy(); return reply; }
+					if (expired()) { reply.raw.destroy(); return reply; }
 					if (id === undefined && rpcBody && typeof rpcBody === 'object' && 'id' in rpcBody && (typeof rpcBody.id === 'string' || typeof rpcBody.id === 'number')) id = rpcBody.id;
 					const normalized = normalizeError(error);
 					const code = error instanceof McpEventError || error instanceof McpError ? error.code : normalized.status === 400 || normalized.status === 403 ? -32602 : -32603;
@@ -165,15 +173,16 @@ export function registerMcpTransport(app: FastifyInstance, service: McpApiServic
 			const response = await Promise.race([transport.handleRequest(new Request(resource, { method: 'POST', headers }), { parsedBody: request.body }), cancelled]);
 			const body = await response.text();
 			if (Buffer.byteLength(body) > bodyLimit) return reply.code(413).send();
-			if (!abort.signal.aborted && !reply.raw.destroyed) {
+			if (!expired() && !reply.raw.destroyed) {
 				reply.code(response.status);
 				response.headers.forEach((value, name) => { reply.header(name, value); });
+				if (expired()) { reply.raw.destroy(); return reply; }
 				return reply.send(body);
 			}
 		} catch { reply.raw.destroy(); } finally {
 			if (rejectAbort) abort.signal.removeEventListener('abort', rejectAbort);
 			request.raw.off('aborted', cancel); reply.raw.off('close', disconnected);
-			active.delete(abort); clearTimeout(deadline);
+			active.delete(abort); clearTimeout(deadline); cancelTokenExpiry?.();
 			transportFinished = true; releasePermit();
 			await server?.close(); await transport?.close();
 		}

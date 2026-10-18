@@ -1,0 +1,40 @@
+[
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.vue",
+    "baselineSha256": "11d0409527086d3027d1534bebf1f61bdd93b39eef64f5df54ff613e17336896",
+    "currentSha256": "db67e3d3bc2829e59930919c494f257408656e0485772ecc6c4140a36682866a",
+    "edits": [
+      {
+        "start": 144,
+        "end": 184,
+        "baseline": "",
+        "current": "\t<XOidcSignin v-if=\"page === 'input'\"/>\n"
+      },
+      {
+        "start": 1691,
+        "end": 1737,
+        "baseline": "",
+        "current": "import XOidcSignin from './MkOidcSignin.vue';\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/pages/settings/security.vue",
+    "baselineSha256": "2e165c8aca00f3adf5c8222dd9c6ac90dc031dd34f6783ed764a639d54933423",
+    "currentSha256": "9b0168c9408226084abd38a95dd12e8e286a4b15aef2555cd8b002229456b3a0",
+    "edits": [
+      {
+        "start": 956,
+        "end": 980,
+        "baseline": "",
+        "current": "\t\t<XOidcSettingsLinks/>\n"
+      },
+      {
+        "start": 2398,
+        "end": 2473,
+        "baseline": "",
+        "current": "import XOidcSettingsLinks from '../../components/MkOidcSettingsLinks.vue';\n"
+      }
+    ]
+  }
+]

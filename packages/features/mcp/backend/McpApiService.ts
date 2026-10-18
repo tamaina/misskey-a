@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { accessTokenExpired } from '@features/auth/backend/access-token-expiry.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import * as v from 'valibot';
@@ -42,8 +43,8 @@ export class McpApiService {
 		// Native master/session credentials have no scoped grant and cannot opt into MCP.
 		if (!token?.id) throw mcpPermissionDenied();
 		const tokenId = token.id;
-		await this.checkAccess(principal.id, tokenId);
-		return { events: async (method: string, input: unknown, invocationSignal?: AbortSignal) => {
+		const initial = await this.checkAccess(principal.id, tokenId);
+		return { expiresAt: initial.grant.expiresAt ?? null, events: async (method: string, input: unknown, invocationSignal?: AbortSignal) => {
 			const { actor, permission } = await this.checkAccess(principal.id, tokenId);
 			const operationContext = this.contexts.create({ ...request, safeDiagnostics: true, freshAuthorization: true }, `mcp/${method}`);
 			const bound: ApiContext<MiLocalUser> = { ...operationContext, services: { ...operationContext.services, authenticate: async () => [actor, { ...token, permission }] } };
@@ -84,10 +85,10 @@ export class McpApiService {
 		// Use shared repositories; do not trust the native app cache for this connection gate.
 		const grant = await this.tokens.findOneBy({ id: tokenId, userId });
 		const actor = await this.users.findOneBy({ id: userId }) as MiLocalUser | null;
-		if (!grant || !actor || actor.host !== null) throw apiError({ code: 'AUTHENTICATION_FAILED', status: 401, message: 'Authentication failed.', id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14' });
+		if (!grant || accessTokenExpired(grant) || !actor || actor.host !== null) throw apiError({ code: 'AUTHENTICATION_FAILED', status: 401, message: 'Authentication failed.', id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14' });
 		const permission = grant.appId ? (await this.apps.findOneBy({ id: grant.appId }))?.permission : grant.permission;
 		if (!permission?.includes('access:mcp')) throw mcpPermissionDenied();
-		return { actor, permission };
+		return { actor, permission, grant };
 	}
 
 	async invoke(tool: string, input: unknown, request: ApiRequestContext, signal?: AbortSignal): Promise<unknown> {
