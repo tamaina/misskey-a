@@ -10,7 +10,7 @@ import * as crypto from 'node:crypto';
 import { encode as encodeToCbor } from 'cbor2';
 import * as OTPAuth from 'otpauth';
 import { loadConfig } from '@/config.js';
-import { api, signup, sendEnvUpdateRequest } from '../utils.js';
+import { api, legacySignup, sendEnvUpdateRequest } from '../utils.js';
 import type {
 	AuthenticationResponseJSON,
 	AuthenticatorAssertionResponseJSON,
@@ -22,7 +22,7 @@ import type {
 import type * as misskey from 'misskey-js';
 import { describe, beforeAll, beforeEach, test } from 'vitest';
 
-describe('2要素認証', () => {
+describe('2要素認証（旧native credential互換）', () => {
 	let alice: misskey.entities.SignupResponse;
 
 	const config = loadConfig();
@@ -180,7 +180,7 @@ describe('2要素認証', () => {
 	};
 
 	beforeAll(async () => {
-		alice = await signup({ username, password });
+		alice = await legacySignup({ username, password });
 	}, 1000 * 60 * 2);
 
 	beforeEach(async () => {
