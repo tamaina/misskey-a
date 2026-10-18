@@ -7,16 +7,16 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import type { Mock } from 'vitest';
 import { ZipArchive, ZipFile } from '@features/runtime/backend/io/zip.js';
 import { ExportCustomEmojisProcessorService } from '@features/emojis/backend/jobs/ExportCustomEmojisProcessorService.js';
+import { createTemp, createTempDir } from '@features/runtime/backend/io/create-temp.js';
+import type { Mock } from 'vitest';
 
 vi.mock('@features/drive/backend/services/DriveService.js', () => ({ DriveService: class {} }));
 vi.mock('@features/runtime/backend/services/DownloadService.js', () => ({ DownloadService: class {} }));
 vi.mock('@features/notifications/backend/services/NotificationService.js', () => ({ NotificationService: class {} }));
 vi.mock('@features/runtime/backend/queue/QueueLoggerService.js', () => ({ QueueLoggerService: class {} }));
 vi.mock('@features/runtime/backend/io/create-temp.js', () => ({ createTemp: vi.fn(), createTempDir: vi.fn() }));
-import { createTemp, createTempDir } from '@features/runtime/backend/io/create-temp.js';
 
 describe('custom emoji ZIP export', () => {
 	let dir: string;
