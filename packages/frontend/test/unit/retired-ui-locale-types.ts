@@ -4,7 +4,8 @@
  */
 
 // Legacy formatter shapes retained only for original-source regression tests.
-import type { Locale as CurrentLocale, ParameterizedString } from 'i18n';
+import type { ParameterizedString } from 'i18n';
+import type { Locale as CurrentLocale } from './pruned-global-locale-types.js';
 
 export type Locale = CurrentLocale & {
 	'_role': {

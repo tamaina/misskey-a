@@ -1,0 +1,200 @@
+{
+	"baseline": "59fca8674e479be5e9ca8934d56c993a468bc3d1",
+	"owners": [
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"keys": [
+				"title",
+				"description"
+			]
+		},
+		{
+			"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
+			"keys": [
+				"somethingHappened",
+				"next"
+			]
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channels.vue",
+			"keys": [
+				"search",
+				"favorites"
+			]
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/XMessage.vue",
+			"keys": [
+				"delete"
+			]
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/home.home.vue",
+			"keys": [
+				"search",
+				"name"
+			]
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/room.vue",
+			"keys": [
+				"search",
+				"somethingHappened",
+				"areYouSure"
+			]
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/post.vue",
+			"keys": [
+				"delete",
+				"edit"
+			]
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/search.user.vue",
+			"keys": [
+				"search",
+				"all"
+			]
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.folder.vue",
+			"keys": [
+				"delete",
+				"somethingHappened"
+			]
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.vue",
+			"keys": [
+				"somethingHappened",
+				"edit",
+				"upload",
+				"name"
+			]
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/custom-emojis-manager.vue",
+			"keys": [
+				"search",
+				"customEmojis"
+			]
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkSystemWebhookEditor.vue",
+			"keys": [
+				"cancel",
+				"ok",
+				"error"
+			]
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
+			"keys": [
+				"save"
+			]
+		},
+		{
+			"file": "packages/features/note-search/frontend/pages/search.note.vue",
+			"keys": [
+				"search"
+			]
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
+			"keys": [
+				"save",
+				"none",
+				"all",
+				"following"
+			]
+		},
+		{
+			"file": "packages/features/operations/frontend/pages/admin/object-storage.vue",
+			"keys": [
+				"save"
+			]
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page.vue",
+			"keys": [
+				"delete",
+				"edit"
+			]
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash.vue",
+			"keys": [
+				"delete",
+				"reload"
+			]
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/registry.value.vue",
+			"keys": [
+				"save",
+				"delete"
+			]
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/navbar.vue",
+			"keys": [
+				"save",
+				"default"
+			]
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/sounds.sound.vue",
+			"keys": [
+				"save",
+				"cancel",
+				"none"
+			]
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/theme.manage.vue",
+			"keys": [
+				"copy",
+				"description"
+			]
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.edit.vue",
+			"keys": [
+				"save"
+			]
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkPagination.vue",
+			"keys": [
+				"reload"
+			]
+		},
+		{
+			"file": "packages/features/users/frontend/pages/admin/users.vue",
+			"keys": [
+				"search",
+				"reset",
+				"all",
+				"users"
+			]
+		},
+		{
+			"file": "packages/features/web/frontend/components/MkEmbedCodeGenDialog.vue",
+			"keys": [
+				"close",
+				"copy",
+				"preview"
+			]
+		},
+		{
+			"file": "packages/features/web/frontend/pages/_error_.vue",
+			"keys": [
+				"reload",
+				"error"
+			]
+		}
+	],
+	"count": 1624,
+	"sha256": "bd08d328c7ff9c63bddbe9f2bad067efff87973b9984bb9f1902e117f552bd6d"
+}
