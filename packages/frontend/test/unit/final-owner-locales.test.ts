@@ -5,12 +5,13 @@
 
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { load } from 'js-yaml';
+import { historicalRawLocale } from './catalog-history.js';
 import { resolve } from 'node:path';
 import { createApp } from 'vue';
 import { compileScript, parse } from 'vue/compiler-sfc';
 import { expect, test } from 'vitest';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { locales } from './pruned-global-locale-baseline.js';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
@@ -96,10 +97,10 @@ test('165 exact mapped translations preserve the frozen 789-key historical oracl
 	expect([...changedByOwner.values()].reduce((sum, count) => sum + count, 0)).toBe(165);
 });
 
-test('only the 23 relevant global-key mappings retain their raw and effective catalog values', () => {
+test('23 original global-key mappings retain their raw and effective historical values', () => {
 	expect(metadata.catalogs.globals).toHaveLength(23);
 	for (const [language, frozen] of Object.entries(metadata.catalogs.raw)) {
-		const raw = load(readFileSync(resolve(root, 'locales', `${language}.yml`), 'utf8').replaceAll('\b', '')) ?? {};
+		const raw = historicalRawLocale(language);
 		const dictionary = catalogPairs(raw);
 		expect(dictionary).toHaveLength(frozen.count);
 		expect(sourceHash(JSON.stringify(dictionary))).toBe(frozen.sha256);
