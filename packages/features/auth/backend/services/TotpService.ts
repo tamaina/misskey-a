@@ -10,6 +10,9 @@ import type { MiUserProfile, UserProfilesRepository, UsersRepository } from '@fe
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type * as Redis from 'ioredis';
 
+/** Invalid authentication input; infrastructure failures keep their original error. */
+export class TotpAuthenticationFailed extends Error {}
+
 export class TotpService {
 	constructor(
 		private redisClient: Redis.Redis,
@@ -35,10 +38,10 @@ export class TotpService {
 			}, {
 				twoFactorBackupSecret: () => 'array_remove("twoFactorBackupSecret", :backupCode)',
 			});
-			if (consumed.affected !== 1) throw new Error('authentication failed');
+			if (consumed.affected !== 1) throw new TotpAuthenticationFailed('authentication failed');
 		} else {
 			if (!await this.validateOtp(profile.userId, profile.twoFactorSecret!, token)) {
-				throw new Error('authentication failed');
+				throw new TotpAuthenticationFailed('authentication failed');
 			}
 		}
 	}
@@ -73,7 +76,7 @@ export class TotpService {
 		});
 
 		if (delta === null) {
-			throw new Error('authentication failed');
+			throw new TotpAuthenticationFailed('authentication failed');
 		}
 
 		// 4. totp.counter() を用い、同じタイムスタンプから基準ステップを取得

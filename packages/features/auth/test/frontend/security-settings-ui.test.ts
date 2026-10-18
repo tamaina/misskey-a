@@ -39,15 +39,19 @@ beforeEach(async () => {
 		if (route === 'i/security/passkey/register/start') return { ticket: 'synthetic-ticket', options } as never;
 		return undefined as never;
 	});
-	element = document.createElement('div');
+	element = window.document.createElement('div');
 	app = createApp(defineComponent({ setup: () => () => h(KeepAlive, null, { default: () => show.value ? h(Settings) : h('div', 'Other page') }) }));
 	app.use(internationalization); app.component('MkTime', defineComponent({ render: () => null })); app.mount(element); mounted = true;
 	await vi.waitFor(() => expect(element.textContent).toContain('パスキーによる多要素認証は無効です。'));
 });
 afterEach(() => { if (mounted) app.unmount(); element.remove(); vi.unstubAllGlobals(); });
+
 function button(text: string) { const value = [...element.querySelectorAll('button')].find(value => value.textContent === text); expect(value).toBeDefined(); return value!; }
+
 function click(text: string) { button(text).click(); }
+
 const calls = (route: string) => vi.mocked(misskeyApi).mock.calls.filter(([name]) => name === route);
+
 async function activation() { click('パスキーによる多要素認証を有効にする'); await vi.waitFor(() => expect(element.textContent).toContain(codes[0])); }
 
 test('registration needs no TOTP setup and never silently activates MFA', async () => {
@@ -81,5 +85,5 @@ test('authenticator Signal API runs only after owned removal has been accepted',
 	click('登録済みのパスキーを表示'); await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
 	let accept!: () => void; vi.mocked(misskeyApi).mockImplementationOnce(() => new Promise<void>(resolve => { accept = resolve; }) as never);
 	click('削除'); await vi.waitFor(() => expect(calls('i/security/passkey/remove')).toHaveLength(1)); expect(signal).not.toHaveBeenCalled();
-	accept(); await vi.waitFor(() => expect(signal).toHaveBeenCalledOnce()); expect(signal).toHaveBeenCalledWith({ rpId: location.hostname, credentialId: 'synthetic-key' });
+	accept(); await vi.waitFor(() => expect(signal).toHaveBeenCalledOnce()); expect(signal).toHaveBeenCalledWith({ rpId: window.location.hostname, credentialId: 'synthetic-key' });
 });

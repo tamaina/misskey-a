@@ -16,6 +16,8 @@ export interface PendingOidcTransaction {
 	purpose: OidcTransactionPurpose;
 	nonce: string;
 	codeVerifier: string;
+	redirectUri?: string;
+	codeChallenge?: string;
 }
 
 const TTL_SECONDS = 300;
@@ -43,7 +45,7 @@ function validateBinding(provider: ConfiguredOidcProvider, purpose: OidcTransact
 export class OidcTransactionStore {
 	constructor(private redis: Pick<Redis, 'set' | 'eval'>) {}
 
-	async create(provider: ConfiguredOidcProvider, purpose: OidcTransactionPurpose) {
+	async create(provider: ConfiguredOidcProvider, purpose: OidcTransactionPurpose, redirectUri?: string) {
 		if (provider.enabled !== true) throw new Error('OIDC provider disabled');
 		validateBinding(provider, purpose);
 		const state = opaque();
@@ -54,10 +56,23 @@ export class OidcTransactionStore {
 			purpose: purpose.mode === 'login' ? { mode: 'login' } : { mode: 'link', localUserId: purpose.localUserId, localSessionId: purpose.localSessionId },
 			nonce: opaque(), codeVerifier: opaque(),
 		};
+		if (redirectUri !== undefined) { transaction.redirectUri = redirectUri; transaction.codeChallenge = hash(transaction.codeVerifier); }
 		const stored = { transaction, browserHash: hash(browserSecret), purposeKey: purposeKey(purpose) };
 		if (await this.redis.set(stateKey(state), JSON.stringify(stored), 'EX', TTL_SECONDS, 'NX') !== 'OK') throw new Error('OIDC transaction collision');
 		return { state, browserSecret, nonce: transaction.nonce,
 			codeChallenge: hash(transaction.codeVerifier), codeChallengeMethod: 'S256' as const };
+	}
+
+	/** Lookup reveals no context unless the browser secret matches; consume still owns verification. */
+	async lookup(state: string, browserSecret: string): Promise<PendingOidcTransaction | null> {
+		if (!validOpaque(state) || !validOpaque(browserSecret)) return null;
+		const raw = await this.redis.eval(`
+local raw = redis.call('GET', KEYS[1]); if not raw or redis.call('PTTL', KEYS[1]) <= 0 then return nil end
+local ok, row = pcall(cjson.decode, raw)
+if not ok or type(row) ~= 'table' or row.browserHash ~= ARGV[1] then return nil end
+return cjson.encode(row.transaction)
+`, 1, stateKey(state), hash(browserSecret));
+		return typeof raw === 'string' ? JSON.parse(raw) : null;
 	}
 
 	async consume(provider: ConfiguredOidcProvider, purpose: OidcTransactionPurpose, state: string, browserSecret: string): Promise<PendingOidcTransaction | null> {

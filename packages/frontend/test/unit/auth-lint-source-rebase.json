@@ -1,0 +1,47 @@
+[
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.conditional.vue",
+    "currentSha256": "32a27d11399d58c0112227c697273655865155f8c0db3f7456d134f10bc99a16",
+    "baselineSha256": "337e8e80ed127cfb2447dc6260c457346ee801b17a773a6c91ce51571e8d8d0c",
+    "edits": [
+      {
+        "start": 3091,
+        "end": 3092,
+        "current": "\n",
+        "baseline": ""
+      },
+      {
+        "start": 3156,
+        "end": 3157,
+        "current": "\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/pages/settings/email.vue",
+    "currentSha256": "6ba96a0456558271799ad4667d1584c50f0fe3720938920e430db7eaf18404cf",
+    "baselineSha256": "25dc932b19ed3d7e8ab0bddc5c58966a1a39779da1ec4884bb15176417d67a9a",
+    "edits": [
+      {
+        "start": 5223,
+        "end": 5223,
+        "current": "",
+        "baseline": "\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/pages/settings/security.vue",
+    "currentSha256": "f26bbb5d3d5500b9bc75ed27b8405f0a75d82aadf1a7ecf73f98a623ba31e938",
+    "baselineSha256": "3e28f754e2f2c12b7e695d1f426cc82a6383284c9628ac10c01be9b7161b6b90",
+    "edits": [
+      {
+        "start": 6503,
+        "end": 6503,
+        "current": "",
+        "baseline": "\n\n"
+      }
+    ]
+  }
+]

@@ -16,11 +16,13 @@ import { SecuritySettings } from '../../backend/security-settings.js';
 import type { SecuritySettingsDependencies } from '../../backend/security-settings.js';
 import type { LockedSudoContext } from '../../backend/sudo.js';
 import type { SecurityOperation } from '../../backend/security-operation-store.js';
+import { SecurityConfirmationRejected } from '../../backend/security-operation-store.js';
 
 vi.mock('@simplewebauthn/server', async original => ({ ...await original<typeof import('@simplewebauthn/server')>(), verifyAuthenticationResponse: vi.fn() }));
 const identity = { userId: 'synthetic-user', browserSession: { id: 'synthetic-session', userId: 'synthetic-user' } };
-const credential = { id: 'AQID', rawId: 'AQID', type: 'public-key', response: { clientDataJSON: 'AQID', authenticatorData: 'AQID', signature: 'AQID' }, clientExtensionResults: {} };
+const credential = { id: 'AQID', rawId: 'AQID', type: 'public-key', response: { clientDataJSON: 'AQID', authenticatorData: 'AQID', signature: 'AQID', userHandle: Buffer.from(identity.userId).toString('base64url') }, clientExtensionResults: {} };
 const ticket = 'x'.repeat(43);
+
 function fixture() {
 	const deps = mockDeep<SecuritySettingsDependencies>();
 	deps.config = { url: 'https://synthetic.example', host: 'synthetic.example', hostname: 'synthetic.example' }; deps.meta = { name: 'Synthetic', rootUserId: null };
@@ -38,7 +40,7 @@ function fixture() {
 	const profile = mockDeep<MiUserProfile>({ userId: identity.userId, password: 'synthetic-hash', twoFactorEnabled: false, twoFactorSecret: null, twoFactorTempSecret: null,
 		twoFactorBackupSecret: null, passkeyMfaEnabled: false, usePasswordLessLogin: false, passwordLoginDisabled: false, email: 'synthetic@example.test', emailVerified: true });
 	const key = mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: identity.userId, publicKey: 'AQID', counter: 1, transports: ['usb'], name: 'Synthetic', lastUsed: new Date() });
-	const context: LockedSudoContext = { manager, user, profile, keys: [key], session: mockDeep<MiBrowserSession>({ id: identity.browserSession.id, userId: identity.userId, sudoUntil: new Date(Date.now() + 300_000) }) };
+	const context: LockedSudoContext = { manager, user, profile, keys: [key], session: mockDeep<MiBrowserSession>({ id: identity.browserSession.id, userId: identity.userId, sudoGrantId: 'g'.repeat(43), sudoUntil: new Date(Date.now() + 300_000) }) };
 	const committed = vi.fn();
 	deps.sudo.transaction.mockImplementation(async (_owner, run) => { const result = await run(context); committed(); return result; });
 	deps.sudo.status.mockResolvedValue({ active: true, expiresAt: context.session.sudoUntil!.toISOString() });
@@ -52,6 +54,7 @@ function fixture() {
 	keys.update.mockResolvedValue({ affected: 1, generatedMaps: [], raw: [] });
 	return { service: new SecuritySettings(deps), deps, context, user, profile, key, users, profiles, keys, sessions, committed, pending: () => pending };
 }
+
 beforeEach(() => {
 	vi.clearAllMocks();
 	vi.mocked(webauthn.verifyAuthenticationResponse).mockResolvedValue({ verified: true, authenticationInfo: { credentialID: 'AQID', newCounter: 2,
@@ -91,15 +94,15 @@ test.each(['no-key', 'already-active', 'passwordless'] as const)('activation rej
 	await expect(f.service.activateStart(identity)).rejects.toThrow(); expect(f.deps.operations.create).not.toHaveBeenCalled();
 });
 
-test.each(['policy', 'codes', 'deadline', 'foreign-key', 'counter'] as const)('activation rejects %s drift after claiming its own pending operation', async kind => {
+test.each(['policy', 'codes', 'deadline', 'foreign-key', 'counter', 'grant'] as const)('activation rejects %s drift after claiming its own pending operation', async kind => {
 	const f = fixture(); await f.service.activateStart(identity);
+	if (kind === 'grant') f.context.session.sudoGrantId = 'h'.repeat(43);
 	if (kind === 'policy') f.profile.password = 'changed';
 	if (kind === 'codes') f.profile.twoFactorBackupSecret = ['changed'];
 	if (kind === 'deadline') f.context.session.sudoUntil = new Date(Date.now() + 5000);
 	if (kind === 'foreign-key') credential.id = 'BAUG';
 	if (kind === 'counter') f.keys.update.mockResolvedValue({ affected: 0, generatedMaps: [], raw: [] });
-	try { await expect(f.service.activateComplete(identity, ticket, credential, true)).rejects.toThrow(); }
-	finally { credential.id = 'AQID'; }
+	try { await expect(f.service.activateComplete(identity, ticket, credential, true)).rejects.toThrow(); } finally { credential.id = 'AQID'; }
 	expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.deps.events.publishMainStream).not.toHaveBeenCalled();
 });
 
@@ -143,4 +146,22 @@ test('password-login disable rotates legacy credentials and keeps only this sess
 	expect(f.users.update).toHaveBeenCalledWith(identity.userId, { token: expect.any(String) });
 	expect(f.context.session.sudoUntil).toBe(until);
 	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('userTokenRegenerated', expect.objectContaining({ oldToken: 'synthetic-native', newToken: expect.any(String) }));
+});
+
+test('a consumed or foreign confirmation returns the declared client error while Redis failures remain server failures', async () => {
+	const f = fixture();
+	f.deps.operations.consume.mockRejectedValueOnce(new SecurityConfirmationRejected('Used'));
+	await expect(f.service.activateComplete(identity, ticket, credential, true)).rejects.toMatchObject({ code: 'CONFIRMATION_FAILED' });
+	const unavailable = new Error('Synthetic Redis unavailable');
+	f.deps.operations.consume.mockRejectedValueOnce(unavailable);
+	await expect(f.service.activateComplete(identity, ticket, credential, true)).rejects.toBe(unavailable);
+});
+
+test.each(['missing', 'foreign'] as const)('primary activation rejects a %s userHandle before verification', async mode => {
+	const f = fixture(); const started = await f.service.passwordlessStart(identity);
+	const response = structuredClone(credential);
+	if (mode === 'missing') Reflect.deleteProperty(response.response, 'userHandle');
+	else response.response.userHandle = Buffer.from('another-owner').toString('base64url');
+	await expect(f.service.passwordlessComplete(identity, started.ticket, response)).rejects.toMatchObject({ code: 'CONFIRMATION_FAILED' });
+	expect(webauthn.verifyAuthenticationResponse).not.toHaveBeenCalled();
 });

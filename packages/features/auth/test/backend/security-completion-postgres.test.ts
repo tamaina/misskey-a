@@ -35,7 +35,8 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
 		await db.initialize();
 		const applied = await db.runMigrations();
-		expect(applied.at(-1)?.name).toBe('DeletionIntent1792300000003');
+		expect(applied).toHaveLength(366);
+		expect(applied.at(-1)?.name).toBe('AccessTokenExpiry1792300000004');
 		const schema = await db.driver.createSchemaBuilder().log();
 		expect(schema.upQueries.map(query => query.query)).toEqual([]);
 		console.log('Production migrations / zero pending DDL:', applied.length);
@@ -111,6 +112,12 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 			const deletion = new DeletionIntent1792300000003(); const password = new PasswordLoginPolicy1792300000002();
 			await deletion.down(manager.queryRunner!); await password.down(manager.queryRunner!); await password.up(manager.queryRunner!); await deletion.up(manager.queryRunner!);
 		});
+		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
+	});
+	test('the five new migrations down/up against production metadata leave no pending DDL', async () => {
+		for (let index = 0; index < 5; index++) await db.undoLastMigration();
+		const applied = await db.runMigrations();
+		expect(applied.map(migration => migration.name)).toEqual(['OidcIdentities1792300000000', 'SudoPolicy1792300000001', 'PasswordLoginPolicy1792300000002', 'DeletionIntent1792300000003', 'AccessTokenExpiry1792300000004']);
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
 });

@@ -5,6 +5,8 @@
 
 import { securitySettingsContract } from './security-settings.contract.js';
 import { sudoContract } from './sudo.contract.js';
+import { oidcContract } from './oidc.contract.js';
+import { signinProgressChallengeSchema } from './signin-progress.schema.js';
 import { aliasTwoFactorContract } from './2fa-api-aliases.contract.js';
 import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
@@ -20,6 +22,8 @@ import { webAuthnRegistrationOptionsSchema, webAuthnAuthenticationOptionsSchema,
 import { packedAppSchema, packedInviteCodeSchema, packedSigninSchema, supportedCaptchaProviders } from './auth.schema.js';
 import { sessionFailureSchema, fastifyFailureSchema } from './session-errors.schema.js';
 import { availableSigninFactorsSchema, finishedSigninSchema } from './session.schema.js';
+
+const tokenExpiryInput = v.exactOptional(v.nullable(v.pipe(v.string(), v.isoTimestamp())));
 
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
@@ -138,6 +142,7 @@ export const AuthAcceptContract = oc.$meta({
 	secure: true,
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/auth/accept', tags: ['auth'] }).errors({ ...commonErrors, 'NO_SUCH_SESSION': { status: 400, data: apiErrorData } }).input(objectInput({
 	"token": v.string(),
+	expiresAt: tokenExpiryInput,
 })).output(v.void());
 
 export const AuthSessionGenerateContract = oc.$meta({
@@ -273,6 +278,7 @@ export const IAppsContract = oc.$meta({
 		"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 		"name": v.optional(v.string()),
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
+		expiresAt: v.nullable(v.pipe(v.string(), v.isoTimestamp())),
 		"lastUsedAt": v.optional(v.pipe(v.string(), v.metadata({ "format": "date-time" }))),
 		"permission": v.pipe(v.array(v.string()), v.metadata({ "uniqueItems": true })),
 		"iconUrl": v.exactOptional(v.nullable(v.string())),
@@ -427,6 +433,7 @@ export const MiauthGenTokenContract = oc.$meta({
 	secure: true,
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/miauth/gen-token', tags: ['auth'] }).errors({ ...commonErrors }).input(objectInput({
 	"session": v.nullable(v.string()),
+	expiresAt: tokenExpiryInput,
 	"name": v.exactOptional(v.nullable(v.string())),
 	"description": v.exactOptional(v.nullable(v.string())),
 	"iconUrl": v.exactOptional(v.nullable(v.string())),
@@ -562,6 +569,7 @@ export const authContract = {
 	'reset-password': ResetPasswordContract,
 	'username/available': UsernameAvailableContract,
 	'verify-email': VerifyEmailContract,
+	...oidcContract,
 };
 
 export type AuthInputs = InferContractRouterInputs<typeof authContract>;
@@ -587,8 +595,8 @@ export const authSessionsContract = {
 	} as const).route({ method: 'POST', path: '/signin-flow', tags: ['auth'], }).errors(httpErrors).input(packedOptionalJsonValueSchema).output(v.union([v.union([
 	finishedSigninSchema,
 	v.strictObject({ finished: v.literal(false), next: v.picklist(['captcha', 'password']) }),
-	v.strictObject({ finished: v.literal(false), next: v.literal('totp'), availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
-	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authRequest: webAuthnAuthenticationOptionsSchema, availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('totp'), authenticationProgress: v.exactOptional(signinProgressChallengeSchema), availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authenticationProgress: v.exactOptional(signinProgressChallengeSchema), authRequest: webAuthnAuthenticationOptionsSchema, availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
 ]), sessionFailureSchema, v.void()])),
 	signinWithPasskey: oc.$meta({
 		requestName: 'signin-with-passkey',

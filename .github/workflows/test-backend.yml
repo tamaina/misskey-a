@@ -98,6 +98,18 @@ jobs:
       run: node packages/features/auth/test/run-recovery-postgres-fixture.mjs
     - name: Test MFA policy with isolated PostgreSQL
       run: node packages/features/auth/test/run-mfa-policy-postgres-fixture.mjs
+    - name: Test security completion and migration round trips with isolated PostgreSQL
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: MISSKEY_AUTH_COMPLETION_FIXTURE=1 node packages/features/auth/test/run-mfa-policy-postgres-fixture.mjs
+    - name: Test security settings HTTP and signed WebAuthn with isolated PostgreSQL and Redis
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: node packages/features/auth/test/run-security-settings-fixture.mjs
+    - name: Test signed OIDC runtime with isolated PostgreSQL and Redis
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: node packages/features/auth/test/run-oidc-runtime-fixture.mjs
+    - name: Test credential issuance with isolated PostgreSQL and Redis
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: MISSKEY_AUTH_CREDENTIAL_ISSUANCE_FIXTURE=1 node packages/features/auth/test/run-oidc-runtime-fixture.mjs
     - name: Test fresh reauthentication with isolated Redis
       run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/auth/test/vitest.fresh-reauthentication.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
     - name: Test fresh password change HTTP with isolated PostgreSQL and Redis

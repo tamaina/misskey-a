@@ -14,11 +14,13 @@ import { assertLegacyMfaManagement, assertSameMfaPolicy } from '../../backend/mf
 import { testContext } from './native-context.js';
 
 const me = mockDeep<MiLocalUser>({ id: 'synthetic-user', isSuspended: false, isDeleted: false, host: null });
+
 function browserContext() {
 	const context = testContext(me);
 	context.services.authenticate = async () => [me, null, { id: 'synthetic-session', userId: me.id }];
 	return context;
 }
+
 test('browser sessions cannot bypass sudo through the old passwordless toggle or key rename', async () => {
 	const passwordless = mockDeep<Parameters<typeof createI2faPasswordLessProcedure>[0]>();
 	const rename = mockDeep<Parameters<typeof createI2faUpdateKeyProcedure>[0]>();

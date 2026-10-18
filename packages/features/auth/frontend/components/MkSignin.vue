@@ -5,6 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div :class="$style.signinRoot">
+	<XOidcSignin v-if="page === 'input'"/>
 	<Transition
 		mode="out-in"
 		:enterActiveClass="$style.transition_enterActive"
@@ -70,6 +71,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import XOidcSignin from './MkOidcSignin.vue';
 import { nextTick, onActivated, onBeforeUnmount, onDeactivated, ref, shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
@@ -89,6 +91,7 @@ import type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON 
 
 const emit = defineEmits<{
 	(ev: 'login', v: Misskey.entities.SigninFlowResponse & { finished: true }): void;
+	(ev: 'manual'): void;
 }>();
 
 const props = withDefaults(defineProps<{
@@ -114,6 +117,8 @@ const needCaptcha = ref(false);
 
 const userInfo = ref<null | Misskey.entities.UserDetailed>(null);
 const password = ref('');
+// Short-lived challenge stays in this component, never in browser storage.
+const authenticationProgress = shallowRef<Misskey.entities.SigninProgressChallenge | null>(null);
 
 //#region Passkey Passwordless
 const credentialRequest = shallowRef<PublicKeyCredentialRequestOptionsJSON | null>(null);
@@ -125,6 +130,7 @@ const totpFactorAvailable = ref(true);
 const recoveryAvailable = ref(true);
 
 function onPasskeyLogin(): void {
+	emit('manual');
 	if (!active || waiting.value) return;
 	const run = ++generation;
 	if (browserSupportsWebAuthn()) {
@@ -149,6 +155,7 @@ function onPasskeyDone(credential: AuthenticationResponseJSON): void {
 	waiting.value = true;
 
 	if (doingPasskeyFromInputPage.value) {
+		authenticationProgress.value = null;
 		misskeyApi('signin-with-passkey', {
 			credential: credential,
 			context: passkeyContext.value,
@@ -189,8 +196,10 @@ async function onUsePasskey(): Promise<void> {
 //#endregion
 
 async function onUsernameSubmitted(username: string) {
+	emit('manual');
 	if (!active) return;
 	const run = ++generation;
+	authenticationProgress.value = null;
 	waiting.value = true;
 
 	const user = await misskeyApi('users/show', {
@@ -205,6 +214,7 @@ async function onUsernameSubmitted(username: string) {
 }
 
 async function onPasswordSubmitted(pw: PwResponse) {
+	emit('manual');
 	waiting.value = true;
 	password.value = pw.password;
 
@@ -230,6 +240,7 @@ async function onPasswordSubmitted(pw: PwResponse) {
 }
 
 async function onTotpSubmitted(token: string) {
+	emit('manual');
 	waiting.value = true;
 
 	if (userInfo.value == null) {
@@ -252,9 +263,12 @@ async function onTotpSubmitted(token: string) {
 async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, preferPasskey = false): Promise<Misskey.entities.SigninFlowResponse> {
 	const run = ++generation;
 	const _req = {
+		progressMode: 'v1' as const,
+		...(authenticationProgress.value ? { authenticationProgress: authenticationProgress.value } : {}),
 		username: req.username ?? userInfo.value?.username,
 		...req,
 	};
+	if (authenticationProgress.value) delete _req.password;
 
 	function assertIsSigninFlowRequest(x: Partial<Misskey.entities.SigninFlowRequest>): x is Misskey.entities.SigninFlowRequest {
 		return x.username != null;
@@ -267,6 +281,7 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 	return await misskeyApi('signin-flow', _req).then(async (res) => {
 		if (!owns(run)) return res;
 		if (res.finished) {
+			authenticationProgress.value = null;
 			emit('login', res);
 			await onLoginSucceeded(res);
 		} else {
@@ -282,6 +297,8 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 					break;
 				}
 				case 'totp': {
+					authenticationProgress.value = res.authenticationProgress ?? null;
+					if (authenticationProgress.value) password.value = '';
 					totpFactorAvailable.value = res.availableFactors === undefined || res.availableFactors.includes('totp');
 					recoveryAvailable.value = res.availableFactors === undefined || res.availableFactors.includes('recovery');
 					totpAvailable.value = totpFactorAvailable.value || recoveryAvailable.value;
@@ -291,6 +308,8 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 					break;
 				}
 				case 'passkey': {
+					authenticationProgress.value = res.authenticationProgress ?? null;
+					if (authenticationProgress.value) password.value = '';
 					// Older servers send this step only when TOTP is enabled.
 					const useTotp = res.availableFactors === undefined || res.availableFactors.includes('totp');
 					totpFactorAvailable.value = useTotp;
@@ -333,6 +352,15 @@ async function onLoginSucceeded(res: Misskey.entities.SigninFlowResponse & { fin
 }
 
 function onSigninApiError(err?: any): void {
+	if (!active) return;
+	const restartPassword = authenticationProgress.value !== null;
+	authenticationProgress.value = null;
+	if (restartPassword) {
+		page.value = 'password';
+		password.value = '';
+		credentialRequest.value = null;
+		passkeyAvailable.value = false;
+	}
 	const id = err?.id ?? null;
 
 	switch (id) {
@@ -427,6 +455,7 @@ function onSigninApiError(err?: any): void {
 
 function clearSignin() {
 	generation++;
+	authenticationProgress.value = null;
 	password.value = '';
 	needCaptcha.value = false;
 	userInfo.value = null;

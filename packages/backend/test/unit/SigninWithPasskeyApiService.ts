@@ -109,7 +109,7 @@ describe('SigninWithPasskeyApiService', () => {
 			return uid;
 		};
 		vi.spyOn(webAuthnService, 'verifySignInWithPasskeyWithProof').mockImplementation(async (_context, _response, before) => {
-			const key = { id: `AQID${uid}`, userId: uid, publicKey: 'AQID', deadline: performance.now() + 90_000 };
+			const key = { id: `AQID${uid}`, userId: uid, publicKey: 'AQID', userVerified: true, deadline: performance.now() + 90_000 };
 			return { key, expected: await before(key) };
 		});
 		vi.spyOn(webAuthnService, 'initiateSignInWithPasskeyAuthentication');

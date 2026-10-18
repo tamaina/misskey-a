@@ -15,6 +15,7 @@ import type { DbUserDeleteJobData } from '@features/runtime/backend/queue/types.
 
 type Dependencies = ConstructorParameters<typeof DeleteAccountProcessorService>;
 const intent = 'x'.repeat(43);
+
 function fixture() {
 	const deps = {
 		users: mockDeep<Dependencies[0]>(), profiles: mockDeep<Dependencies[1]>(), notes: mockDeep<Dependencies[2]>(),

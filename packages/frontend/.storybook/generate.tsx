@@ -465,6 +465,8 @@ function toStories(component: string): Promise<string> {
 
 		globSync('../features/federation/frontend/components/MkInstanceCardMini.vue'),
 		globSync('../features/auth/frontend/components/MkInviteCode.vue'),
+		globSync('../features/auth/frontend/components/MkSudoDialog.vue'),
+		globSync('../features/auth/frontend/components/MkSecuritySettings.vue'),
 		globSync('../features/discovery/frontend/components/MkTagItem.vue'),
 		globSync('../features/roles/frontend/components/MkRoleSelectDialog.vue'),
 

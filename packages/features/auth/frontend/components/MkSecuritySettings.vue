@@ -113,14 +113,17 @@ function clearPending() {
 	activation.value = null; recoveryAcknowledged.value = false;
 	totp.value = null; totpCode.value = ''; codes.value = null;
 }
+
 function leave() {
 	active = false; generation++; sudoAbort?.abort(); sudoAbort = null; clearPending(); keys.value = [];
 	if (nativePending) { WebAuthnAbortService.cancelCeremony(); nativePending = false; }
 }
+
 async function refresh(isCurrent: () => boolean) {
 	const value = await readState();
 	if (isCurrent()) state.value = value;
 }
+
 async function run(action: (isCurrent: () => boolean) => Promise<void>, elevate = true) {
 	if (!currentActor() || busy.value) return;
 	busy.value = true; error.value = false;
@@ -130,12 +133,13 @@ async function run(action: (isCurrent: () => boolean) => Promise<void>, elevate 
 	try {
 		if (elevate && !await ensureSudo(isCurrent, controller.signal)) return;
 		if (isCurrent()) await action(isCurrent);
-	} catch { if (isCurrent()) error.value = true; }
-	finally { controller.abort(); if (sudoAbort === controller) sudoAbort = null; busy.value = false; nativePending = false; }
+	} catch { if (isCurrent()) error.value = true; } finally { controller.abort(); if (sudoAbort === controller) sudoAbort = null; busy.value = false; nativePending = false; }
 }
+
 function loadKeys() {
 	return run(async isCurrent => { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; });
 }
+
 function registerKey() {
 	return run(async isCurrent => {
 		const name = await os.inputText({ title: $locale.value.sfc.keyName, minLength: 1, maxLength: 30 });
@@ -150,6 +154,7 @@ function registerKey() {
 		if (isCurrent()) { keys.value = []; clearPending(); await refresh(isCurrent); }
 	});
 }
+
 function renameKey(key: { id: string; name: string }) {
 	return run(async isCurrent => {
 		const name = await os.inputText({ title: $locale.value.sfc.keyName, default: key.name, minLength: 1, maxLength: 30 });
@@ -158,6 +163,7 @@ function renameKey(key: { id: string; name: string }) {
 		if (isCurrent()) keys.value = keys.value.map(value => value.id === key.id ? { ...value, name: name.result! } : value);
 	});
 }
+
 function removeKey(key: { id: string; name: string }) {
 	return run(async isCurrent => {
 		const confirmation = await os.confirm({ type: 'warning', title: key.name, text: $locale.value.sfc.removeKeyWarning });
@@ -166,13 +172,15 @@ function removeKey(key: { id: string; name: string }) {
 		if (!isCurrent()) return;
 		// Inform a supporting authenticator only after committed removal of this owned key.
 		const signal = (globalThis.PublicKeyCredential as unknown as { signalUnknownCredential?: (options: { rpId: string; credentialId: string }) => Promise<void> })?.signalUnknownCredential;
-		if (signal) await signal.call(globalThis.PublicKeyCredential, { rpId: location.hostname, credentialId: key.id }).catch(() => {});
+		if (signal) await signal.call(globalThis.PublicKeyCredential, { rpId: window.location.hostname, credentialId: key.id }).catch(() => {});
 		if (isCurrent()) { keys.value = keys.value.filter(value => value.id !== key.id); clearPending(); await refresh(isCurrent); }
 	});
 }
+
 function prepareActivation() {
 	return run(async isCurrent => { clearPending(); const value = await beginActivation(); if (isCurrent()) activation.value = value; });
 }
+
 function completeActivation() {
 	return run(async isCurrent => {
 		const pending = activation.value;
@@ -185,6 +193,7 @@ function completeActivation() {
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
 	});
 }
+
 function disableMfa() {
 	return run(async isCurrent => {
 		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning });
@@ -193,6 +202,7 @@ function disableMfa() {
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
 	});
 }
+
 function setPasswordless(enabled: boolean) {
 	return run(async isCurrent => {
 		if (enabled) {
@@ -207,6 +217,7 @@ function setPasswordless(enabled: boolean) {
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
 	});
 }
+
 function disablePassword() {
 	return run(async isCurrent => {
 		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disablePasswordWarning });
@@ -225,6 +236,7 @@ function disablePassword() {
 function prepareTotp() {
 	return run(async isCurrent => { clearPending(); const value = await misskeyApi('i/security/totp/start', {}); if (isCurrent()) totp.value = value; });
 }
+
 function completeTotp() {
 	return run(async isCurrent => {
 		if (!totp.value || !totpCode.value) return;
@@ -232,6 +244,7 @@ function completeTotp() {
 		if (isCurrent()) { clearPending(); codes.value = value.backupCodes; await refresh(isCurrent); }
 	});
 }
+
 function removeTotp() {
 	return run(async isCurrent => {
 		const confirmation = await os.confirm({ type: 'warning', text: state.value?.passkeyMfaEnabled ? $locale.value.sfc.removeTotpWarning : $locale.value.sfc.disableWarning });
@@ -240,6 +253,7 @@ function removeTotp() {
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
 	});
 }
+
 function showCodes(regenerate: boolean) {
 	return run(async isCurrent => {
 		clearPending();
@@ -251,6 +265,7 @@ function showCodes(regenerate: boolean) {
 		if (isCurrent()) { codes.value = value.backupCodes; await refresh(isCurrent); }
 	});
 }
+
 watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!currentActor()) leave(); }, { flush: 'sync' });
 onMounted(() => run(refresh, false));
 onActivated(() => { if (!active) { active = true; void run(refresh, false); } });

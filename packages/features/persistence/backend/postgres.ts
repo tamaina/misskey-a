@@ -13,6 +13,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 
 import { MiAbuseUserReport } from '@features/moderation/backend/models/AbuseUserReport.js';
 import { MiAbuseReportNotificationRecipient } from '@features/moderation/backend/models/AbuseReportNotificationRecipient.js';
+import { MiOAuthApproval } from '@features/auth/backend/models/OAuthApproval.js';
 import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { MiAd } from '@features/instance/backend/models/Ad.js';
 import { MiAnnouncement } from '@features/announcements/backend/models/Announcement.js';
@@ -20,6 +21,8 @@ import { MiAnnouncementRead } from '@features/announcements/backend/models/Annou
 import { MiAntenna } from '@features/timelines/backend/models/Antenna.js';
 import { MiApp } from '@features/auth/backend/models/App.js';
 import { MiAvatarDecoration } from '@features/avatar-decorations/backend/models/AvatarDecoration.js';
+import { MiOidcProvider } from '@features/auth/backend/models/OidcProvider.js';
+import { MiOidcIdentity } from '@features/auth/backend/models/OidcIdentity.js';
 import { MiBrowserSession } from '@features/auth/backend/models/BrowserSession.js';
 import { MiAuthSession } from '@features/auth/backend/models/AuthSession.js';
 import { MiBlocking } from '@features/relationships/backend/models/Blocking.js';
@@ -186,7 +189,10 @@ export const entities = [
 	MiApp,
 	MiAvatarDecoration,
 	MiAuthSession,
+	MiOidcProvider,
+	MiOidcIdentity,
 	MiBrowserSession,
+	MiOAuthApproval,
 	MiAccessToken,
 	MiUser,
 	MiUserProfile,

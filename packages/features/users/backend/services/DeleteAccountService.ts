@@ -105,8 +105,6 @@ export class DeleteAccountService {
 			for (const inbox of queue) {
 				await this.queueService.deliver(user, content, inbox, true);
 			}
-
 		}
 	}
-
 }

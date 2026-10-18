@@ -18,6 +18,7 @@ import { mockDeep } from 'vitest-mock-extended';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { AuthenticationProgressStore } from '../../backend/authentication-progress-store.js';
 import { createAuthSessionRouter } from '../../backend/api.implementation.js';
 import { registerAuthSessionHttp } from '../../backend/session.http.js';
 import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
@@ -62,7 +63,8 @@ describe.skipIf(!socket || !redisSocket)('HTTP login with real SQL, Redis and si
 		if (!socket || !dirname(socket).startsWith('/tmp/misskey-auth-policy-') || readFileSync(join(dirname(socket), '.misskey-auth-policy-fixture'), 'utf8') !== 'auth_policy_synthetic') throw new Error('Owned PG required');
 		if (!redisSocket || !/^\/tmp\/misskey-oauth-[^/]+\/redis\.sock$/.test(redisSocket) || lstatSync(dirname(redisSocket)).uid !== process.getuid?.() || (lstatSync(dirname(redisSocket)).mode & 0o077) !== 0 || !lstatSync(redisSocket).isSocket()) throw new Error('Owned Redis required');
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
-		await db.initialize(); expect(await db.runMigrations()).toHaveLength(360);
+		await db.initialize(); const applied = await db.runMigrations(); expect(applied).toHaveLength(366);
+		expect(applied.map(migration => migration.name)).toEqual(expect.arrayContaining(['AutoArchiveAnnouncements1791943550568', 'PasskeyMfaPolicy1791969900000', 'OidcIdentities1792300000000', 'AccessTokenExpiry1792300000004']));
 		redis = new Redis({ path: redisSocket });
 		const sessionIds = { gen: () => `signinpolicy${++nextSession}` };
 		sessions = new BrowserSessionService(db.getRepository(MiBrowserSession) as ConstructorParameters<typeof BrowserSessionService>[0], sessionIds);
@@ -80,7 +82,7 @@ describe.skipIf(!socket || !redisSocket)('HTTP login with real SQL, Redis and si
 			entry.loggerService = logger;
 		}
 		deps.signinFlow.meta = mockDeep<AuthSessionDependencies['signinFlow']['meta']>({ enableHcaptcha: false, enableMcaptcha: false, enableRecaptcha: false, enableTurnstile: false, enableTestcaptcha: false });
-		deps.signinFlow.userAuthService = totp;
+		deps.signinFlow.userAuthService = totp; deps.signinFlow.progressStore = new AuthenticationProgressStore(redis);
 		app = Fastify(); await app.register(async api => registerAuthSessionHttp(api, createAuthSessionRouter(deps)), { prefix: '/api' });
 	});
 	afterAll(async () => { await app?.close(); await redis?.quit(); if (db?.isInitialized) await db.destroy(); });
@@ -98,6 +100,17 @@ describe.skipIf(!socket || !redisSocket)('HTTP login with real SQL, Redis and si
 		const challenge = await beginNamed(); const body = { credential: assertion(challenge) };
 		const response = await named(body); expect(response.statusCode).toBe(200); expect(response.json()).toMatchObject({ finished: true, id: owner, i: expect.stringMatching(/^bs_/) });
 		expect(await count()).toBe(1); expect((await named(body)).statusCode).toBe(403); expect(await count()).toBe(1);
+	});
+	test('server progress completes signed second-factor proof without retransmitting password and rejects replay', async () => {
+		const begin = await named({ progressMode: 'v1' }); expect(begin.statusCode).toBe(200); const { authenticationProgress, authRequest } = begin.json(); expect(authenticationProgress).toBeDefined();
+		const compare = vi.spyOn(bcrypt, 'compare'); compare.mockClear();
+		const body = { username: 'synthetic', progressMode: 'v1', authenticationProgress, credential: assertion(authRequest.challenge, false) };
+		expect((await request('signin-flow', body)).statusCode).toBe(200); expect(compare).not.toHaveBeenCalled(); expect(await count()).toBe(1);
+		expect((await request('signin-flow', body)).statusCode).toBe(403); expect(await count()).toBe(1);
+	});
+	test('one real server password ticket owns only one competing recovery verifier', async () => {
+		const begin = await named({ progressMode: 'v1' }); const body = { username: 'synthetic', progressMode: 'v1', authenticationProgress: begin.json().authenticationProgress, token: 'synthetic-recovery' };
+		const replies = await Promise.all([request('signin-flow', body), request('signin-flow', body)]); expect(replies.map(reply => reply.statusCode).sort()).toEqual([200, 403]); expect(await count()).toBe(1);
 	});
 	test('independent passkey-only returns explicit password flow and does not carry UV into it', async () => {
 		const started = await beginAnonymous();
@@ -121,12 +134,19 @@ describe.skipIf(!socket || !redisSocket)('HTTP login with real SQL, Redis and si
 		expect((await request('signin-with-passkey', { context: started.context, credential: assertion(started.option.challenge) })).json()).toHaveProperty('signinResponse.finished', true);
 		expect(await count()).toBe(2);
 	});
-	test.each(['noUV', 'missing', 'noTTL', 'oversizedTTL'] as const)('%s rejects before issuance', async mode => {
+	test('password-verified second-factor UP-only succeeds while passwordless primary still requires UV', async () => {
+		const challenge = await beginNamed(); expect((await named({ credential: assertion(challenge, false) })).statusCode).toBe(200);
+		await profiles().update({ userId: owner }, { passkeyMfaEnabled: false });
+		const started = await beginAnonymous();
+		expect((await request('signin-with-passkey', { context: started.context, credential: assertion(started.option.challenge, false) })).statusCode).toBe(403);
+		expect(await count()).toBe(1);
+	});
+	test.each(['missing', 'noTTL', 'oversizedTTL'] as const)('%s rejects before issuance', async mode => {
 		const challenge = await beginNamed(); const name = `webauthn:authenticationChallenge:${owner}`;
 		if (mode === 'missing') await redis.del(name);
 		if (mode === 'noTTL') await redis.persist(name);
 		if (mode === 'oversizedTTL') await redis.pexpire(name, 100_000);
-		expect((await named({ credential: assertion(challenge, mode !== 'noUV') })).statusCode).toBe(403); expect(await count()).toBe(0);
+		expect((await named({ credential: assertion(challenge) })).statusCode).toBe(403); expect(await count()).toBe(0);
 	});
 	test.each(['password', 'policy', 'key', 'token', 'suspended', 'deleted', 'deadline'] as const)('%s changing after real proof while waiting for locks prevents issuance', async mode => {
 		const challenge = await beginNamed(); const blocker = db.createQueryRunner(); await blocker.connect(); await blocker.startTransaction();

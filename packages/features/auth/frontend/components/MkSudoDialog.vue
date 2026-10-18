@@ -101,8 +101,7 @@ async function confirm() {
 		settled = true;
 		emit('done', true);
 		dialog.value?.close();
-	} catch { if (current()) error.value = true; }
-	finally { password.value = ''; token.value = ''; busy.value = false; nativePending = false; }
+	} catch { if (current()) error.value = true; } finally { password.value = ''; token.value = ''; busy.value = false; nativePending = false; }
 }
 
 watch(() => props.isCurrent(), value => { if (!value) cancel(); }, { flush: 'sync' });

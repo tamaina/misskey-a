@@ -218,5 +218,79 @@
         "current": "\n\t\tconst auth = await ownedAuthenticateDialog({}, sudoAbort?.signal);\n\t\tif (!isCurrent() || auth.canceled) return;\n\t\tawait os.apiWithDialog('i/update-email', { password: auth.result.password, token: auth.result.token, email });\n\n"
       }
     ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/pages/settings/other.vue",
+    "currentSha256": "d82b3bd5ae4bd536b2be70c4f9d5ae30703e8f4d3c156d09db7e5ab70917e6b5",
+    "baselineSha256": "0179773c6f0b93ea9088624bd3cfeebaef9106cb9e15049288ca6d079e272541",
+    "edits": [
+      {
+        "start": 2894,
+        "end": 3064,
+        "current": "\t\t\t\t\t\t<MkButton v-if=\"!$i.isDeleted\" danger :disabled=\"deletingAccount\" @click=\"deleteAccount\"><SearchText>{{ $locale.sfc.requestAccountDelete }}</SearchText></MkButton>\n",
+        "baseline": "\t\t\t\t\t\t<MkButton v-if=\"!$i.isDeleted\" danger @click=\"deleteAccount\"><SearchText>{{ $locale.sfc.requestAccountDelete }}</SearchText></MkButton>\n"
+      },
+      {
+        "start": 5766,
+        "end": 5843,
+        "current": "import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 5891,
+        "end": 5976,
+        "current": "import { computed, watch, ref, onActivated, onDeactivated, onUnmounted } from 'vue';\n",
+        "baseline": "import { computed, watch } from 'vue';\n"
+      },
+      {
+        "start": 8060,
+        "end": 8410,
+        "current": "const deletingAccount = ref(false);\nlet deletionActive = true;\nlet deletionGeneration = 0;\nlet deletionAbort: AbortController | null = null;\nconst leaveDeletion = () => { deletionActive = false; deletionGeneration++; deletionAbort?.abort(); };\nonDeactivated(leaveDeletion); onUnmounted(leaveDeletion);\nonActivated(() => { deletionActive = true; });\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 8443,
+        "end": 9416,
+        "current": "\tif (deletingAccount.value || !deletionActive) return;\n\tdeletingAccount.value = true;\n\tconst ownerId = $i.id; const ownerToken = $i.token;\n\tconst generation = ++deletionGeneration;\n\tconst controller = new AbortController(); deletionAbort = controller;\n\tconst isCurrent = () => deletionActive && generation === deletionGeneration && $i.id === ownerId && $i.token === ownerToken;\n\ttry {\n\t\tconst confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.deleteAccountConfirm });\n\t\tif (!isCurrent() || confirmation.canceled) return;\n\t\tif (!await ensureSudo(isCurrent, controller.signal) || !isCurrent()) return;\n\t\tawait os.apiWithDialog('i/security/account/delete', { acknowledged: true });\n\t\tif (!isCurrent()) return;\n\t\tawait os.alert({ title: $locale.value.sfc.started });\n\t\tif (isCurrent()) await signout('account-deletion-accepted');\n\t} finally { controller.abort(); deletingAccount.value = false; if (deletionAbort === controller) deletionAbort = null; }\n",
+        "baseline": "\t{\n\t\tconst { canceled } = await os.confirm({\n\t\t\ttype: 'warning',\n\t\t\ttext: $locale.value.sfc.deleteAccountConfirm,\n\t\t});\n\t\tif (canceled) return;\n\t}\n\n\tconst auth = await os.authenticateDialog();\n\tif (auth.canceled) return;\n\n\tawait os.apiWithDialog('i/delete-account', {\n\t\tpassword: auth.result.password,\n\t\ttoken: auth.result.token,\n\t});\n\n\tawait os.alert({\n\t\ttitle: $locale.value.sfc.started,\n\t});\n\n\tawait signout('account-deletion-accepted');\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.conditional.vue",
+    "currentSha256": "337e8e80ed127cfb2447dc6260c457346ee801b17a773a6c91ce51571e8d8d0c",
+    "baselineSha256": "10265dbeaebced8409689060c716d5deec0482299005a9dc1510c24c85712f49",
+    "edits": [
+      {
+        "start": 205,
+        "end": 388,
+        "current": "\t<MkSignin ref=\"manualSignin\" :autoSet=\"autoSet\" :message=\"message\" :openOnRemote=\"openOnRemote\" :initialUsername=\"initialUsername\" @login=\"onManualLogin\" @manual=\"cancelForManual\"/>\n",
+        "baseline": "\t<MkSignin ref=\"manualSignin\" :autoSet=\"autoSet\" :message=\"message\" :openOnRemote=\"openOnRemote\" :initialUsername=\"initialUsername\" @login=\"onManualLogin\"/>\n"
+      },
+      {
+        "start": 464,
+        "end": 494,
+        "current": "import { $i } from '../i.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 1140,
+        "end": 1224,
+        "current": "// The login dialog and named authorization entry explicitly opt into this surface.\n",
+        "baseline": "// Separate opt-in surface: existing callers continue using the ordinary MkSignin.\n"
+      },
+      {
+        "start": 3091,
+        "end": 3321,
+        "current": "function cancelForManual() { manual = true; cancelAutofill(); }\nconst actor = () => JSON.stringify([$i?.id ?? null, $i?.token ?? null]);\nwatch(actor, cancelForManual, { flush: 'sync' });\ndefineExpose({ cancel: cancelForManual });\n",
+        "baseline": ""
+      },
+      {
+        "start": 3461,
+        "end": 3481,
+        "current": "\tcancelForManual();\n",
+        "baseline": "\tmanual = true;\n\tcancelAutofill();\n"
+      }
+    ]
   }
 ]

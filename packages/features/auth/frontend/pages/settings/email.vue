@@ -116,7 +116,6 @@ async function saveEmailAddress() {
 		const auth = await ownedAuthenticateDialog({}, sudoAbort?.signal);
 		if (!isCurrent() || auth.canceled) return;
 		await os.apiWithDialog('i/update-email', { password: auth.result.password, token: auth.result.token, email });
-
 	} finally { savingEmail.value = false; }
 }
 

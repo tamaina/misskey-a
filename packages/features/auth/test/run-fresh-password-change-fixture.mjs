@@ -9,6 +9,9 @@ import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
 const root = resolve(import.meta.dirname, '../../../..');
+const selected = ['MISSKEY_AUTH_PASSWORD_CHANGE_FIXTURE', 'MISSKEY_AUTH_SIGNIN_FIXTURE', 'MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE', 'MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE'].filter(name => process.env[name] === '1');
+if (selected.length > 1) throw new Error('Select only one fresh authentication fixture suite');
+const suiteFlag = selected[0] ?? 'MISSKEY_AUTH_PASSWORD_CHANGE_FIXTURE';
 const directory = mkdtempSync('/tmp/misskey-oauth-'); chmodSync(directory, 0o700);
 const socket = join(directory, 'redis.sock');
 const container = `misskey-fresh-password-${randomUUID()}`;
@@ -28,7 +31,7 @@ try {
 	const deadline = Date.now() + 10000;
 	while (!existsSync(socket) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 50));
 	if (!existsSync(socket)) throw new Error('Fresh password fixture Redis unavailable');
-	run(process.execPath, ['packages/features/auth/test/run-mfa-policy-postgres-fixture.mjs'], { ...process.env, MISSKEY_AUTH_PASSWORD_CHANGE_FIXTURE: '1', MISSKEY_OAUTH_REDIS_SOCKET: socket });
+	run(process.execPath, ['packages/features/auth/test/run-mfa-policy-postgres-fixture.mjs'], { ...process.env, [suiteFlag]: '1', MISSKEY_OAUTH_REDIS_SOCKET: socket });
 } finally {
 	if (started) run('docker', ['rm', '--force', container]);
 	process.stdout.write(`Task-owned fresh password fixture retained at ${directory}; Redis removed.\n`);

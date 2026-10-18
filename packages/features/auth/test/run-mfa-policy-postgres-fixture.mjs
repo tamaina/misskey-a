@@ -8,6 +8,8 @@ import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const root = resolve(import.meta.dirname, '../../../..');
+if (process.env.MISSKEY_AUTH_SECURITY_RUNTIME_FIXTURE === '1' && !process.env.MISSKEY_OAUTH_REDIS_SOCKET) throw new Error('The security runtime fixture requires its owned Redis socket');
+if ((process.env.MISSKEY_AUTH_OIDC_FIXTURE === '1' || process.env.MISSKEY_AUTH_CREDENTIAL_ISSUANCE_FIXTURE === '1') && !process.env.MISSKEY_OIDC_REDIS_SOCKET) throw new Error('The selected fixture requires its owned Redis socket');
 const versions = existsSync('/usr/lib/postgresql') ? readdirSync('/usr/lib/postgresql').sort((a, b) => Number(b) - Number(a)) : [];
 const binaries = process.env.MISSKEY_PG_BINDIR ?? versions.map(version => `/usr/lib/postgresql/${version}/bin`).find(path => existsSync(join(path, 'initdb')));
 if (!binaries) throw new Error('PostgreSQL fixture binaries unavailable; set MISSKEY_PG_BINDIR');
@@ -33,7 +35,18 @@ try {
 	run(join(binaries, 'pg_ctl'), ['-D', data, '-l', join(directory, 'server.log'), '-o', `-c config_file=${config}`, '-w', '-t', '10', 'start']);
 	run(join(binaries, 'createdb'), ['-h', socket, '-p', '55439', '-U', userInfo().username, 'auth_policy_synthetic']);
 	const testConfig = join(directory, 'vitest.mjs');
-	const include = process.env.MISSKEY_AUTH_COMPLETION_FIXTURE === '1' ? ['security-completion-postgres.test.ts'] : process.env.MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE === '1' ? ['fresh-email-change-postgres.test.ts'] : process.env.MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE === '1' ? ['fresh-token-regeneration-postgres.test.ts'] : process.env.MISSKEY_AUTH_SIGNIN_FIXTURE === '1' ? ['signin-policy-postgres.test.ts'] : process.env.MISSKEY_AUTH_PASSWORD_CHANGE_FIXTURE === '1' ? ['fresh-password-change-postgres.test.ts'] : ['mfa-policy-postgres.test.ts'];
+	const suites = [
+		['MISSKEY_AUTH_SECURITY_RUNTIME_FIXTURE', 'security-settings-runtime-postgres.test.ts'],
+		['MISSKEY_AUTH_COMPLETION_FIXTURE', 'security-completion-postgres.test.ts'],
+		['MISSKEY_AUTH_CREDENTIAL_ISSUANCE_FIXTURE', 'credential-issuance-postgres.test.ts'],
+		['MISSKEY_AUTH_OIDC_FIXTURE', 'oidc-runtime-postgres.test.ts'],
+		['MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE', 'fresh-email-change-postgres.test.ts'],
+		['MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE', 'fresh-token-regeneration-postgres.test.ts'],
+		['MISSKEY_AUTH_SIGNIN_FIXTURE', 'signin-policy-postgres.test.ts'],
+		['MISSKEY_AUTH_PASSWORD_CHANGE_FIXTURE', 'fresh-password-change-postgres.test.ts'],
+	].filter(([name]) => process.env[name] === '1');
+	if (suites.length > 1) throw new Error('Select only one owned PostgreSQL fixture suite');
+	const include = [suites[0]?.[1] ?? 'mfa-policy-postgres.test.ts'];
 	writeFileSync(testConfig, `import { baseConfig } from ${JSON.stringify(join(root, 'packages/backend/vitest.config.ts'))};\nexport default { ...baseConfig, cacheDir: '/tmp/misskey-auth-policy-vite', test: { ...baseConfig.test, dir: ${JSON.stringify(join(root, 'packages/features/auth/test/backend'))}, include: ${JSON.stringify(include)}, environment: 'node', maxWorkers: 1, maxConcurrency: 1 } };\n`);
 	// Production entity registration excludes NODE_ENV=test chart-only models.
 	run(process.execPath, ['--max-old-space-size=1024', 'packages/backend/node_modules/vitest/vitest.mjs', 'run', '--config', testConfig], { ...process.env, NODE_ENV: 'production', MISSKEY_AUTH_POLICY_TEST_SOCKET: socket });

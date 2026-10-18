@@ -13,6 +13,7 @@ import { expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiUser } from '@features/users/backend/models/User.js';
+import { MiPasswordResetRequest } from '../../backend/models/PasswordResetRequest.js';
 import { MiBrowserSession } from '../../backend/models/BrowserSession.js';
 import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
 import { freshReauthenticationPolicyStamp } from '../../backend/fresh-passkey-reauthentication.js';
@@ -35,12 +36,14 @@ function fixture() {
 	const keys = mockDeep<ReturnType<EntityManager['getRepository']>>(); keys.findBy.mockResolvedValue([key]);
 	const sessions = mockDeep<ReturnType<EntityManager['getRepository']>>(); sessions.findOne.mockResolvedValue(mockDeep<MiBrowserSession>(session));
 	const users = mockDeep<ReturnType<EntityManager['getRepository']>>(); users.findOne.mockResolvedValue(me); users.findOneByOrFail.mockResolvedValue(me);
+	const resets = mockDeep<ReturnType<EntityManager['getRepository']>>();
 	const manager = mockDeep<EntityManager>();
 	manager.getRepository.mockImplementation(entity => {
 		if (entity === MiUserProfile) return profiles as unknown as ReturnType<EntityManager['getRepository']>;
 		if (entity === MiUserSecurityKey) return keys;
 		if (entity === MiBrowserSession) return sessions;
 		if (entity === MiUser) return users;
+		if (entity === MiPasswordResetRequest) return resets;
 		throw new Error('Unsupported synthetic entity');
 	});
 	const db = mockDeep<DataSource>(); db.transaction.mockImplementation(async (...args) => { const run = args.at(-1); if (typeof run !== 'function') throw new Error('Missing transaction'); return await run(manager); });
@@ -53,7 +56,7 @@ function fixture() {
 	const globalEventService = mockDeep<UpdateEmailPasskeyDependencies['globalEventService']>();
 	const serverSettings = { emailRequiredForSignup: false };
 	const deps = { db, config: { url: 'https://synthetic.example' }, serverSettings, userProfilesRepository: profiles, freshReauthentication: fresh, emailService, userEntityService, globalEventService };
-	return { me, session, context, profile, profiles, keys, key, sessions, users, fresh, proof, db, manager, emailService, userEntityService, globalEventService, deps, serverSettings,
+	return { me, session, context, profile, profiles, keys, key, sessions, users, resets, fresh, proof, db, manager, emailService, userEntityService, globalEventService, deps, serverSettings,
 		start: (email: string | null = 'new@example.test') => call(createUpdateEmailPasskeyStartProcedure(deps), { currentPassword: 'synthetic-old', email }, { context }),
 		complete: (email: string | null = 'new@example.test') => call(createUpdateEmailPasskeyCompleteProcedure(deps), { ticket: 't'.repeat(43), credential: assertion, email }, { context }),
 	};
@@ -73,6 +76,9 @@ test('one transaction saves email, pending verification and code before effects'
 	expect(f.users.findOne).toHaveBeenCalledWith({ where: { id: f.me.id }, lock: { mode: 'pessimistic_write' } });
 	expect(f.profiles.findOneOrFail).toHaveBeenCalledWith({ where: { userId: f.me.id }, lock: { mode: 'pessimistic_write' } });
 	expect(f.profiles.update).toHaveBeenCalledExactlyOnceWith({ userId: f.me.id }, { email: 'new@example.test', emailVerified: false, emailVerifyCode: expect.any(String) });
+	expect(f.resets.delete).toHaveBeenCalledExactlyOnceWith({ userId: f.me.id });
+	expect(f.profiles.update.mock.invocationCallOrder[0]).toBeLessThan(f.resets.delete.mock.invocationCallOrder[0]);
+	expect(f.resets.delete.mock.invocationCallOrder[0]).toBeLessThan(f.emailService.sendEmail.mock.invocationCallOrder[0]);
 	expect(f.emailService.sendEmail).toHaveBeenCalledExactlyOnceWith('new@example.test', 'Email verification', expect.stringContaining('/verify-email/'), expect.stringContaining('/verify-email/'));
 });
 test.each(['legacy', 'oauth', 'wrong-owner'] as const)('%s cannot start or complete', async kind => {
@@ -93,7 +99,7 @@ test.each(['session', 'user', 'policy', 'key', 'expired', 'purpose', 'target', '
 	if (kind === 'target') f.fresh.complete.mockResolvedValue({ ...f.proof, targetStamp: 'a'.repeat(64) });
 	if (kind === 'previous-email') f.profile.email = 'other@example.test';
 	if (kind === 'verification') f.profile.emailVerified = false;
-	await expect(f.complete()).rejects.toMatchObject({ code: 'FRESH_REAUTHENTICATION_FAILED' }); expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.emailService.sendEmail).not.toHaveBeenCalled(); expect(f.globalEventService.publishMainStream).not.toHaveBeenCalled();
+	await expect(f.complete()).rejects.toMatchObject({ code: 'FRESH_REAUTHENTICATION_FAILED' }); expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.resets.delete).not.toHaveBeenCalled(); expect(f.emailService.sendEmail).not.toHaveBeenCalled(); expect(f.globalEventService.publishMainStream).not.toHaveBeenCalled();
 });
 test.each(['unavailable', 'required', 'write', 'expired-after-write'] as const)('%s refuses before effects', async kind => {
 	const f = fixture();
@@ -106,17 +112,17 @@ test.each(['unavailable', 'required', 'write', 'expired-after-write'] as const)(
 });
 test('null target clears email and code without delivery', async () => {
 	const f = fixture(); f.fresh.complete.mockResolvedValue({ ...f.proof, targetStamp: emailChangeTargetStamp(null, f.profile) });
-	await f.complete(null); expect(f.profiles.update).toHaveBeenCalledWith({ userId: f.me.id }, { email: null, emailVerified: false, emailVerifyCode: null }); expect(f.emailService.sendEmail).not.toHaveBeenCalled();
+	await f.complete(null); expect(f.resets.delete).toHaveBeenCalledExactlyOnceWith({ userId: f.me.id }); expect(f.profiles.update).toHaveBeenCalledWith({ userId: f.me.id }, { email: null, emailVerified: false, emailVerifyCode: null }); expect(f.emailService.sendEmail).not.toHaveBeenCalled();
 });
 test('SMTP failure occurs after commit and never triggers a second DB mutation', async () => {
-	const f = fixture(); f.emailService.sendEmail.mockRejectedValue(new Error('Synthetic SMTP failure')); await expect(f.complete()).rejects.toThrow(); expect(f.profiles.update).toHaveBeenCalledOnce(); expect(f.globalEventService.publishMainStream).toHaveBeenCalledOnce();
+	const f = fixture(); f.emailService.sendEmail.mockRejectedValue(new Error('Synthetic SMTP failure')); await expect(f.complete()).rejects.toThrow(); expect(f.profiles.update).toHaveBeenCalledOnce(); expect(f.resets.delete).toHaveBeenCalledExactlyOnceWith({ userId: f.me.id }); expect(f.globalEventService.publishMainStream).toHaveBeenCalledOnce();
 });
 test.each(['policy', 'native', 'session'] as const)('legacy %s mismatch refuses the locked mutation', async kind => {
 	const f = fixture(); const authority = { kind: 'legacy' as const, nativeToken: f.me.token!, profile: { ...f.profile }, session: f.session };
 	if (kind === 'policy') f.profile.passkeyMfaEnabled = true;
 	if (kind === 'native') authority.nativeToken = 'old-native';
 	if (kind === 'session') f.sessions.findOne.mockResolvedValue(null);
-	await expect(changeEmail(f.deps, f.me.id, 'new@example.test', authority)).rejects.toThrow(); expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.emailService.sendEmail).not.toHaveBeenCalled();
+	await expect(changeEmail(f.deps, f.me.id, 'new@example.test', authority)).rejects.toThrow(); expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.resets.delete).not.toHaveBeenCalled(); expect(f.emailService.sendEmail).not.toHaveBeenCalled();
 });
 test('legacy active independent policy refuses before consuming a backup code', async () => {
 	const f = fixture(); f.profile.passkeyMfaEnabled = true; const auth = mockDeep<Parameters<typeof createIUpdateEmailProcedure>[0]['userAuthService']>();
@@ -134,6 +140,7 @@ test('legacy omission and explicit null retain different SET columns', async () 
 	for (const omitEmail of [false, true]) {
 		const f = fixture(); const authority = { kind: 'legacy' as const, nativeToken: f.me.token!, profile: { ...f.profile }, omitEmail };
 		await changeEmail(f.deps, f.me.id, null, authority);
+		expect(f.resets.delete).toHaveBeenCalledExactlyOnceWith({ userId: f.me.id });
 		expect(f.profiles.update).toHaveBeenCalledWith({ userId: f.me.id }, { ...(omitEmail ? {} : { email: null }), emailVerified: false, emailVerifyCode: null }); expect(f.emailService.sendEmail).not.toHaveBeenCalled();
 	}
 });

@@ -1,3 +1,5 @@
+> この個別 slice の履歴手順は、現在の共通本人確認 UI では [認証改修の実機受入確認](auth-completion.md) に置き換わります。旧 API の互換検証と現在の UI 受入確認を区別してください。
+
 # Fresh passkey token regeneration acceptance
 
 Use only an explicitly authorized disposable test account and instance. These

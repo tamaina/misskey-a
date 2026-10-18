@@ -25,6 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkSecuritySettings v-if="individualSession"/>
 		<X2fa v-else/>
 		<MkBrowserSessions/>
+		<XOidcSettingsLinks/>
 
 		<SearchMarker :keywords="['signin', 'login', 'history', 'log']">
 			<FormSection>
@@ -62,6 +63,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { computed, markRaw, onActivated, onDeactivated, onUnmounted, ref, watch } from 'vue';
 import MkBrowserSessions from '@features/auth/frontend/components/MkBrowserSessions.vue';
 import MkSecuritySettings from '@features/auth/frontend/components/MkSecuritySettings.vue';
+import XOidcSettingsLinks from '../../components/MkOidcSettingsLinks.vue';
 import X2fa from '@features/auth/frontend/pages/settings/2fa.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
@@ -144,8 +146,6 @@ async function collectAndChangePassword(isCurrent: () => boolean) {
 		});
 		return;
 	}
-
-
 
 	let token: string | null = null;
 	if (ensureSignin().twoFactorEnabled) {

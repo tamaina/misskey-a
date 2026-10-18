@@ -40,6 +40,7 @@ const sessions = ref<Session[]>([]);
 const busy = ref(false); const error = ref(false); const hasMore = ref(true);
 let active = true; let generation = 0; let offset = 0;
 const current = () => active && ensureSignin().id === ownerId && ensureSignin().token === ownerToken;
+
 async function load() {
 	if (busy.value || !current()) return;
 	busy.value = true; error.value = false;
@@ -50,10 +51,11 @@ async function load() {
 		offset += values.length; hasMore.value = values.length === 20;
 		const existing = new Set(sessions.value.map(value => value.id));
 		sessions.value.push(...values.filter(value => !existing.has(value.id)));
-	} catch { if (current() && turn === generation) error.value = true; }
-	finally { busy.value = false; }
+	} catch { if (current() && turn === generation) error.value = true; } finally { busy.value = false; }
 }
+
 function reload() { offset = 0; sessions.value = []; hasMore.value = true; return load(); }
+
 async function revoke(session: Session) {
 	if (busy.value || !current() || session.revokedAt) return;
 	busy.value = true; error.value = false;
@@ -65,9 +67,9 @@ async function revoke(session: Session) {
 		await misskeyApi('i/sessions/revoke', { sessionId: session.id });
 		if (!current() || turn !== generation) return;
 		session.revokedAt = new Date().toISOString();
-	} catch { if (current() && turn === generation) error.value = true; }
-	finally { busy.value = false; }
+	} catch { if (current() && turn === generation) error.value = true; } finally { busy.value = false; }
 }
+
 const leave = () => { active = false; generation++; sessions.value = []; offset = 0; };
 watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!current()) leave(); }, { flush: 'sync' });
 onMounted(load);

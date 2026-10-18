@@ -6,6 +6,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { createApp, defineComponent, h, KeepAlive, nextTick, reactive, ref } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
+import type { Endpoints } from 'misskey-js';
 import Security from '../../frontend/pages/settings/security.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
@@ -16,6 +17,8 @@ import { signout } from '../../frontend/signout.js';
 vi.mock('@features/auth/frontend/utility/ensure-sudo.js', () => ({ ensureSudo: vi.fn() }));
 vi.mock('@features/auth/frontend/utility/owned-dialog.js', () => ({ ownedInputText: (props: Parameters<typeof os.inputText>[0]) => os.inputText(props), ownedAuthenticateDialog: (props: Parameters<typeof os.authenticateDialog>[0]) => os.authenticateDialog(props) }));
 vi.mock('@features/auth/frontend/signout.js', () => ({ signout: vi.fn() }));
+// OIDC child behavior is covered by oidc-flow/api tests, independently of these password dialogs.
+vi.mock('@features/auth/frontend/components/MkOidcSettingsLinks.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/auth/frontend/components/MkSecuritySettings.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/auth/frontend/components/MkBrowserSessions.vue', () => ({ default: defineComponent({ render: () => null }) }));
 const account = vi.hoisted(() => ({ id: 'synthetic-owner', twoFactorEnabled: true, token: 'legacy-token', securityKeysList: [] as { id: string }[] }));
@@ -207,17 +210,18 @@ describe('password-change dialogs', () => {
 	});
 });
 
-
 function enableSession() {
 	Object.assign(reactive(account), { token: 'bs_' + 'x'.repeat(43), securityKeysList: [{ id: 'AQID' }] });
 	vi.mocked(os.inputText).mockReset().mockResolvedValue({ canceled: false, result: 'new-password' });
 	app.unmount(); element.remove(); mountSecurity();
 }
+
 async function startTokenRegeneration() {
 	await nextTick();
 	const button = [...element.querySelectorAll('button')].find(item => item.textContent?.trim() === 'Regenerate login token');
 	expect(button).toBeDefined(); button!.click();
 }
+
 test('session password change authorizes once before two new-password entries and awaits accepted cleanup', async () => {
 	enableSession(); await nextTick(); startChange();
 	await vi.waitFor(() => expect(signout).toHaveBeenCalledWith('credentials-changed'));
@@ -256,9 +260,7 @@ test.each(['unmount', 'deactivate', 'actor'] as const)('%s invalidates delayed c
 	vi.mocked(ensureSudo).mockReturnValue(new Promise(resolve => { release = resolve; })); await nextTick(); startChange();
 	await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledOnce());
 	const [current, signal] = vi.mocked(ensureSudo).mock.calls[0];
-	if (phase === 'unmount') { app.unmount(); mounted = false; }
-	else if (phase === 'deactivate') { showSecurity.value = false; await nextTick(); showSecurity.value = true; await nextTick(); }
-	else account.id = 'replacement-owner';
+	if (phase === 'unmount') { app.unmount(); mounted = false; } else if (phase === 'deactivate') { showSecurity.value = false; await nextTick(); showSecurity.value = true; await nextTick(); } else account.id = 'replacement-owner';
 	expect(current!()).toBe(false); if (phase !== 'actor') expect(signal?.aborted).toBe(true);
 	release(true); for (let index = 0; index < 10; index++) await Promise.resolve();
 	expect(os.inputText).not.toHaveBeenCalled(); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
@@ -280,7 +282,7 @@ test('cancelled token regeneration warning submits nothing', async () => {
 	await vi.waitFor(() => expect(os.confirm).toHaveBeenCalledOnce()); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
 });
 test('actor switch while password mutation waits cannot clean the replacement account', async () => {
-	enableSession(); let release!: () => void; vi.mocked(os.apiWithDialog).mockReturnValue(new Promise<undefined>(resolve => { release = () => resolve(undefined); }));
+	enableSession(); let release!: () => void; vi.mocked(os.apiWithDialog).mockReturnValue(new Promise<Endpoints['i/security/password']['res']>(resolve => { release = () => resolve(null); }));
 	await nextTick(); startChange(); await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledOnce());
 	account.id = 'replacement-owner'; release(); for (let index = 0; index < 10; index++) await Promise.resolve(); expect(signout).not.toHaveBeenCalled();
 });

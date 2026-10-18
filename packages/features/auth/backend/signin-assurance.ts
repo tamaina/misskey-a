@@ -19,13 +19,14 @@ export interface VerifiedSigninKey {
 	readonly id: string;
 	readonly publicKey: string;
 	readonly deadline: number;
+	readonly userVerified: boolean;
 }
 
 /** Capture BEFORE the password/factor proof; counters and recovery consumption are not policy changes. */
 export function signinPolicyStamp(user: Pick<MiUser, 'id' | 'token'>, profile: MiUserProfile, keys: Pick<MiUserSecurityKey, 'id' | 'userId' | 'publicKey'>[]): string {
 	if (profile.userId !== user.id || keys.some(key => key.userId !== user.id)) throw new SigninPolicyError();
 	return createHash('sha256').update(JSON.stringify([
-		user.id, user.token, profile.password ?? null, profile.twoFactorEnabled === true,
+		user.id, user.token, profile.password ?? null, 'passwordLoginDisabled' in profile && profile.passwordLoginDisabled === true, profile.twoFactorEnabled === true,
 		profile.twoFactorSecret ?? null, profile.passkeyMfaEnabled === true, profile.usePasswordLessLogin === true,
 		keys.map(key => [key.id, normalizedPasskeyPublicKey(key.publicKey)]).sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0),
 	])).digest('hex');
@@ -36,7 +37,8 @@ const pending = new WeakSet<object>();
 interface SigninAssuranceFacts {
 	readonly userId: string;
 	readonly policyStamp: string;
-	readonly mode: 'password' | 'passwordless';
+	readonly mode: 'password' | 'passwordless' | 'oidc';
+	readonly external?: { readonly identityId: string; readonly providerId: string; readonly providerVersion: string; readonly issuer: string; readonly subject: string };
 	readonly passwordVerified: boolean;
 	readonly factor: 'none' | 'totp' | 'passkey' | 'recovery';
 	readonly key?: VerifiedSigninKey;
@@ -48,7 +50,7 @@ export interface SigninAssurance extends SigninAssuranceFacts { readonly [brand]
 export function createSigninAssurance(facts: SigninAssuranceFacts): SigninAssurance {
 	const deadline = Math.min(facts.deadline, facts.key?.deadline ?? Number.POSITIVE_INFINITY);
 	if (!Number.isFinite(deadline) || performance.now() >= deadline) throw new SigninPolicyError();
-	const proof: SigninAssurance = Object.freeze({ ...facts, key: facts.key ? Object.freeze({ ...facts.key }) : undefined, deadline, [brand]: true as const });
+	const proof: SigninAssurance = Object.freeze({ ...facts, key: facts.key ? Object.freeze({ ...facts.key }) : undefined, external: facts.external ? Object.freeze({ ...facts.external }) : undefined, deadline, [brand]: true as const });
 	pending.add(proof);
 	return proof;
 }
@@ -70,10 +72,12 @@ export function assertCurrentSigninAssurance(proof: SigninAssurance, user: MiUse
 	const policy = readMfaPolicy(profile, keys.length);
 	if (proof.key && (proof.key.userId !== user.id || !keys.some(key => key.id === proof.key?.id && normalizedPasskeyPublicKey(key.publicKey) === proof.key.publicKey))) throw new SigninPolicyError();
 	if (proof.mode === 'passwordless') {
-		if (policy.independentPasskeyEnabled || !profile.usePasswordLessLogin || proof.factor !== 'passkey' || !proof.key) throw new SigninPolicyError();
+		if (policy.independentPasskeyEnabled || !profile.usePasswordLessLogin || proof.factor !== 'passkey' || !proof.key || proof.key.userVerified !== true) throw new SigninPolicyError();
 		return;
 	}
-	if (!proof.passwordVerified || !profile.password) throw new SigninPolicyError();
+	if (proof.mode === 'oidc') {
+		if (!proof.external || proof.passwordVerified) throw new SigninPolicyError();
+	} else if (!proof.passwordVerified || !profile.password || ('passwordLoginDisabled' in profile && profile.passwordLoginDisabled === true)) throw new SigninPolicyError();
 	if (!policy.required && proof.factor === 'none') return;
 	if (proof.factor === 'totp' && policy.totp) return;
 	if (proof.factor === 'recovery' && policy.required) return;

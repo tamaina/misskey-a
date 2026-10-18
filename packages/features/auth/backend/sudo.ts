@@ -85,8 +85,7 @@ export class SudoService {
 
 	async status(identity: SudoIdentity): Promise<{ active: boolean; expiresAt: string | null }> {
 		return this.transaction(identity, async locked => {
-			try { return { active: true, expiresAt: new Date(this.assert(locked)).toISOString() }; }
-			catch { return { active: false, expiresAt: null }; }
+			try { return { active: true, expiresAt: new Date(this.assert(locked)).toISOString() }; } catch { return { active: false, expiresAt: null }; }
 		}, false);
 	}
 

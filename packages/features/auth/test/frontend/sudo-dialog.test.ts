@@ -29,12 +29,15 @@ beforeEach(async () => {
 	vi.clearAllMocks(); current.value = true; fixture.actor.token = 'bs_synthetic';
 	vi.mocked(startAuthentication).mockReset().mockResolvedValue(credential as never);
 	vi.mocked(misskeyApi).mockReset().mockImplementation(async route => route === 'i/security/state' ? { ...state } as never : { status: 'elevated', expiresAt, grantId } as never);
-	element = document.createElement('div'); app = createApp({ render: () => h(Dialog, { isCurrent: () => current.value, onDone: done }) }); app.use(internationalization); app.mount(element);
+	element = window.document.createElement('div'); app = createApp({ render: () => h(Dialog, { isCurrent: () => current.value, onDone: done }) }); app.use(internationalization); app.mount(element);
 	await vi.waitFor(() => expect(element.querySelector('form')).not.toBeNull());
 });
 afterEach(() => { app.unmount(); element.remove(); state.totpEnabled = true; state.passkeyMfaEnabled = false; state.passwordLoginDisabled = false; });
+
 function input(type: string, value: string) { const field = element.querySelector<HTMLInputElement>(`input[type=${type}]`)!; field.value = value; field.dispatchEvent(new Event('input')); }
+
 function submit() { element.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true })); }
+
 function cancel() { [...element.querySelectorAll('button')].find(button => button.textContent === 'キャンセル')!.click(); }
 
 test('TOTP is the initial choice and the common endpoint receives password plus current code', async () => {

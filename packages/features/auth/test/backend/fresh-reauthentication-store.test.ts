@@ -15,12 +15,23 @@ const key = (ticket: string) => `fresh-reauth:v1:${createHash('sha256').update(t
 
 test('finite bindings reject unknown purpose/fields and malformed ticket before Redis', async () => {
 	const redis = { set: vi.fn(), eval: vi.fn() }; const store = new FreshReauthenticationStore(redis);
-	for (const value of [{ ...record, purpose: 'sudo' }, { ...record, password: 'secret' }, { ...record, policyStamp: 'invalid' }]) {
+	for (const value of [{ ...record, purpose: 'unknown-purpose' }, { ...record, password: 'secret' }, { ...record, policyStamp: 'invalid' }]) {
 		await expect(store.create(value as typeof record, 1)).rejects.toThrow();
 	}
 	expect(await store.consume(binding, 'invalid')).toBeNull();
 	for (const ttl of [-1, 0, NaN, 0.5]) await expect(store.create(record, ttl)).rejects.toThrow();
 	expect(redis.set).not.toHaveBeenCalled(); expect(redis.eval).not.toHaveBeenCalled();
+});
+
+test('sudo is an explicit supported purpose with the same one-use binding', async () => {
+	const redis = { eval: vi.fn().mockResolvedValueOnce('OK') }; const store = new FreshReauthenticationStore(redis);
+	const value = { ...record, purpose: 'sudo' as const }; const deadline = Date.now() + 90_000;
+	const ticket = await store.create(value, deadline);
+	expect(ticket).toMatch(/^[A-Za-z0-9_-]{43}$/);
+	expect(redis.eval.mock.calls[0].slice(1)).toEqual([1, key(ticket), JSON.stringify({ v: 1, ...value }), String(deadline)]);
+	redis.eval.mockResolvedValueOnce([JSON.stringify({ v: 1, ...value }), 1000]);
+	expect(await store.consume({ ...binding, purpose: 'sudo' }, ticket)).toEqual({ record: value, remainingMs: 1000 });
+	expect(redis.eval.mock.calls[1].slice(1)).toEqual([1, key(ticket), binding.userId, binding.sessionId, 'sudo', '']);
 });
 
 test('only email purpose requires a finite target stamp, without changing old records', async () => {

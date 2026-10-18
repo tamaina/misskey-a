@@ -26,6 +26,8 @@ vi.mock('@features/auth/frontend/accounts.js', () => ({ login: vi.fn() }));
 vi.mock('@features/moderation/frontend/utility/show-suspended-dialog.js', () => ({ showSuspendedDialog: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({ alert: vi.fn() }));
 vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: vi.fn(), startAuthentication: vi.fn() }));
+// Provider discovery belongs to the dedicated OIDC child tests.
+vi.mock('@features/auth/frontend/components/MkOidcSignin.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/auth/frontend/components/MkSignin.input.vue', () => ({ default: defineComponent({
 	emits: ['usernameSubmitted', 'passkeyClick'], setup(_, { emit }) {
 		state.handlers.username = value => emit('usernameSubmitted', value);
@@ -94,7 +96,7 @@ async function passwordPath() {
 
 function page() { return element.querySelector('[data-page]')?.getAttribute('data-page'); }
 
-function fallback() { return element.querySelector('button') as HTMLButtonElement | null; }
+function fallback() { return Array.from(element.querySelectorAll('button')).find(button => button.textContent?.trim() === 'Sign in with Passkey') ?? null; }
 
 beforeEach(() => {
 	vi.resetAllMocks(); state.handlers = {}; state.requests = []; errors.length = 0; expectedError = undefined;
@@ -112,14 +114,14 @@ afterEach(() => {
 test('password path shows TOTP without mounting passkey or relying on public MFA flags', async () => {
 	mount(); await passwordPath();
 	expect(page()).toBe('totp'); expect(state.requests).toEqual([]); expect(fallback()?.disabled).toBe(false); expect(fallback()?.textContent).toBe('Sign in with Passkey');
-	expect(misskeyApi).toHaveBeenNthCalledWith(3, 'signin-flow', { username: 'synthetic', password: pw.password, 'hcaptcha-response': 'h', 'm-captcha-response': 'm', 'g-recaptcha-response': 'r', 'turnstile-response': 't', 'testcaptcha-response': 'test' });
+	expect(misskeyApi).toHaveBeenNthCalledWith(3, 'signin-flow', { username: 'synthetic', progressMode: 'v1', password: pw.password, 'hcaptcha-response': 'h', 'm-captcha-response': 'm', 'g-recaptcha-response': 'r', 'turnstile-response': 't', 'testcaptcha-response': 'test' });
 });
 
 test.each(['123456', 'A'.repeat(32)])('TOTP/backup token is sent unchanged and login emits only server success: %s', async token => {
 	mount(true); await passwordPath();
 	vi.mocked(misskeyApi).mockResolvedValueOnce(finished as never);
 	state.handlers.totp(token); await settle();
-	expect(misskeyApi).toHaveBeenNthCalledWith(4, 'signin-flow', { username: 'synthetic', password: pw.password, token });
+	expect(misskeyApi).toHaveBeenNthCalledWith(4, 'signin-flow', { progressMode: 'v1', username: 'synthetic', password: pw.password, token });
 	expect(emitted).toHaveBeenCalledWith(finished); expect(login).toHaveBeenCalledWith('synthetic-session');
 });
 
@@ -130,7 +132,7 @@ test('explicit passkey fallback obtains fresh challenge and verifies through pas
 	expect(state.requests).toEqual([option('fresh')]); expect(page()).toBe('passkey');
 	vi.mocked(misskeyApi).mockResolvedValueOnce(finished as never);
 	state.handlers.credential(credential); await settle();
-	expect(misskeyApi).toHaveBeenLastCalledWith('signin-flow', { username: 'synthetic', password: pw.password, credential });
+	expect(misskeyApi).toHaveBeenLastCalledWith('signin-flow', { progressMode: 'v1', username: 'synthetic', password: pw.password, credential });
 	expect(emitted).toHaveBeenCalledWith(finished); expect(login).not.toHaveBeenCalled();
 });
 
@@ -263,7 +265,7 @@ test('ordinary passkey-only fallback clears the credential context and requests 
 	expect(showAlert).toHaveBeenCalledWith({ type: 'info', text: 'このアカウントはパスワードと追加の本人確認が必要です。ユーザー名を入力してログインしてください。' });
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ username: 'synthetic' } as never).mockResolvedValueOnce({ finished: false, next: 'password' } as never);
 	state.handlers.username('synthetic'); await settle(); expect(page()).toBe('password');
-	expect(misskeyApi).toHaveBeenLastCalledWith('signin-flow', { username: 'synthetic' });
+	expect(misskeyApi).toHaveBeenLastCalledWith('signin-flow', { username: 'synthetic', progressMode: 'v1' });
 });
 
 test('unmounted ordinary login ignores a late successful server response', async () => {

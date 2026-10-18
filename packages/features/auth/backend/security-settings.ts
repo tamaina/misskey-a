@@ -22,9 +22,10 @@ import { MiBrowserSession } from './models/BrowserSession.js';
 import { MiUserSecurityKey } from './models/UserSecurityKey.js';
 import { SudoService, sudoPolicyStamp, sudoRequired } from './sudo.js';
 import type { SudoIdentity, LockedSudoContext } from './sudo.js';
-import { SecurityOperationStore } from './security-operation-store.js';
+import { SecurityOperationStore, SecurityConfirmationRejected } from './security-operation-store.js';
 import type { SecurityOperation } from './security-operation-store.js';
 import type { TotpService } from './services/TotpService.js';
+import { TotpAuthenticationFailed } from './services/TotpService.js';
 import { queueCommittedAccountDeletion } from './account-deletion.js';
 import { changeEmail } from './email-change.js';
 import type { EmailChangeDependencies } from './email-change.js';
@@ -77,10 +78,13 @@ export class SecuritySettings {
 	private async claim(identity: SudoIdentity, kind: SecurityOperation['kind'], ticket: string) {
 		if (identity.accessToken != null || !identity.browserSession || identity.browserSession.userId !== identity.userId) throw failure();
 		if (!(await this.deps.sudo.status(identity)).active) throw sudoRequired();
-		return this.deps.operations.consume(kind, identity.userId, identity.browserSession.id, ticket);
+		return this.deps.operations.consume(kind, identity.userId, identity.browserSession.id, ticket).catch(error => {
+			if (error instanceof SecurityConfirmationRejected) throw failure();
+			throw error;
+		});
 	}
 	private check(context: LockedSudoContext, row: SecurityOperation & { expiresAtMonotonic: number }) {
-		if (context.session.sudoUntil?.getTime() !== row.sudoUntil || operationStamp(context) !== row.policyStamp || performance.now() >= row.expiresAtMonotonic) throw failure();
+		if (context.session.sudoUntil?.getTime() !== row.sudoUntil || context.session.sudoGrantId !== row.sudoGrantId || operationStamp(context) !== row.policyStamp || performance.now() >= row.expiresAtMonotonic) throw failure();
 	}
 
 	async deleteAccount(identity: SudoIdentity, acknowledged: boolean) {
@@ -117,7 +121,7 @@ export class SecuritySettings {
 			const options = await generateAuthenticationOptions({ rpID: this.deps.config.hostname, userVerification: 'required' });
 			v.assert(nativeAuthenticationOptionsSchema, options);
 			const ticket = await this.deps.operations.create({ kind: 'enable-passwordless-login', userId: context.user.id,
-				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), policyStamp: operationStamp(context),
+				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), sudoGrantId: context.session.sudoGrantId!, policyStamp: operationStamp(context),
 				challenge: options.challenge, requireUV: true, name: null, backupCodes: null });
 			return { ticket, options };
 		});
@@ -139,11 +143,11 @@ export class SecuritySettings {
 		return this.deps.sudo.transaction(identity, async context => {
 			if (context.profile.passwordLoginDisabled || !context.profile.usePasswordLessLogin || context.profile.passkeyMfaEnabled
 				|| !context.profile.email || !context.profile.emailVerified || !context.keys.length) throw failure();
-			// Omitting allowCredentials proves that the owned key can actually be discovered for primary sign-in.
+			// Request a discoverable ceremony; require an owned userHandle and strict UV on completion.
 			const options = await generateAuthenticationOptions({ rpID: this.deps.config.hostname, userVerification: 'required' });
 			v.assert(nativeAuthenticationOptionsSchema, options);
 			const ticket = await this.deps.operations.create({ kind: 'disable-password-login', userId: context.user.id,
-				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), policyStamp: operationStamp(context),
+				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), sudoGrantId: context.session.sudoGrantId!, policyStamp: operationStamp(context),
 				challenge: options.challenge, requireUV: true, name: null, backupCodes: null });
 			return { ticket, options };
 		});
@@ -169,6 +173,11 @@ export class SecuritySettings {
 	}
 	private async verifyKey(context: LockedSudoContext, row: SecurityOperation, response: unknown) {
 		const credential = v.parse(webAuthnAuthenticationResponseSchema, response);
+		const handle = credential.response.userHandle;
+		const expectedHandle = Buffer.from(context.user.id).toString('base64url');
+		const primary = row.kind === 'enable-passwordless-login' || row.kind === 'disable-password-login';
+		// This checks ceremony/owner consistency, not cryptographic discoverability.
+		if ((primary && handle !== expectedHandle) || (typeof handle === 'string' && handle !== expectedHandle)) throw failure();
 		const key = context.keys.find(key => key.id === credential.id);
 		if (!key) throw failure();
 		const publicKey = normalizedPasskeyPublicKey(key.publicKey);
@@ -206,7 +215,7 @@ export class SecuritySettings {
 			});
 			v.assert(nativeRegistrationOptionsSchema, options);
 			const ticket = await this.deps.operations.create({ kind: 'register-passkey', userId: context.user.id,
-				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), policyStamp: operationStamp(context),
+				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), sudoGrantId: context.session.sudoGrantId!, policyStamp: operationStamp(context),
 				challenge: options.challenge, requireUV, name, backupCodes: null });
 			return { ticket, options };
 		});
@@ -216,7 +225,7 @@ export class SecuritySettings {
 		const row = await this.claim(identity, 'register-passkey', ticket);
 		const credential = v.parse(webAuthnRegistrationResponseSchema, response);
 		const result = await verifyRegistrationResponse({ response: credential, expectedChallenge: row.challenge,
-			expectedOrigin: this.deps.config.url, expectedRPID: this.deps.config.hostname, requireUserVerification: row.requireUV });
+			expectedOrigin: this.deps.config.url, expectedRPID: this.deps.config.hostname, requireUserVerification: row.requireUV }).catch(() => { throw failure(); });
 		if (!result.verified || !result.registrationInfo) throw failure();
 		const info = result.registrationInfo;
 		await this.deps.sudo.transaction(identity, async context => {
@@ -241,7 +250,7 @@ export class SecuritySettings {
 			v.assert(nativeAuthenticationOptionsSchema, options);
 			const backupCodes = context.profile.twoFactorBackupSecret?.length ? context.profile.twoFactorBackupSecret : newCodes();
 			const ticket = await this.deps.operations.create({ kind: 'activate-passkey-mfa', userId: context.user.id,
-				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), policyStamp: operationStamp(context),
+				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), sudoGrantId: context.session.sudoGrantId!, policyStamp: operationStamp(context),
 				challenge: options.challenge, requireUV, name: null, backupCodes });
 			return { ticket, options, backupCodes };
 		});
@@ -308,7 +317,10 @@ export class SecuritySettings {
 		let revokedIds: string[] = [];
 		const backupCodes = await this.deps.sudo.transaction(identity, async context => {
 			const secret = context.profile.twoFactorTempSecret;
-			if (!secret || !await this.deps.totp.validateOtp(context.user.id, secret, token)) throw failure();
+			if (!secret || !await this.deps.totp.validateOtp(context.user.id, secret, token).catch(error => {
+				if (error instanceof TotpAuthenticationFailed) throw failure();
+				throw error;
+			})) throw failure();
 			const backupCodes = context.profile.twoFactorBackupSecret?.length ? context.profile.twoFactorBackupSecret : newCodes();
 			revokedIds = await this.updated(context, { twoFactorEnabled: true, twoFactorTempSecret: null, twoFactorSecret: secret, twoFactorBackupSecret: backupCodes });
 			return backupCodes;

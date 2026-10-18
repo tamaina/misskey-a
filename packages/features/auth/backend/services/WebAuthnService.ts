@@ -5,6 +5,7 @@
 
 import * as v from 'valibot';
 import { performance } from 'node:perf_hooks';
+import { canonicalWebAuthnPublicKey } from '../webauthn-public-key.js';
 
 import {
 	generateAuthenticationOptions,
@@ -16,7 +17,7 @@ import type {
 	CredentialDeviceType,
 	RegistrationResponseJSON,
 } from '@simplewebauthn/server';
-import { AttestationFormat, isoCBOR, isoUint8Array } from '@simplewebauthn/server/helpers';
+import { AttestationFormat, isoUint8Array } from '@simplewebauthn/server/helpers';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiUser } from '@features/persistence/backend/repositories/models.js';
 import type { MiMeta, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
@@ -72,8 +73,14 @@ export class WebAuthnService {
 
 	/** The callback captures credential policy before verification, never after it. */
 	@bindThis
-	public async verifyAuthenticationWithProof<Expected>(userId: string, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>): Promise<SigninKeyProof<Expected> | null> {
-		return this.verifySigninKey(`webauthn:authenticationChallenge:${userId}`, userId, response, beforeProof);
+	public async verifyAuthenticationWithProof<Expected>(userId: string, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>, requireUserVerification = true): Promise<SigninKeyProof<Expected> | null> {
+		return this.verifySigninKey(`webauthn:authenticationChallenge:${userId}`, userId, response, beforeProof, requireUserVerification);
+	}
+
+	@bindThis
+	public async verifyOidcAuthenticationWithProof<Expected>(userId: string, ticket: string, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>): Promise<SigninKeyProof<Expected> | null> {
+		if (!/^[A-Za-z0-9_-]{43}$/.test(ticket)) return null;
+		return this.verifySigninKey(`webauthn:oidcChallenge:${ticket}`, userId, response, beforeProof, false);
 	}
 
 	@bindThis
@@ -81,7 +88,7 @@ export class WebAuthnService {
 		return this.verifySigninKey(`webauthn:passkeyChallenge:${context}`, undefined, response, beforeProof);
 	}
 
-	private async verifySigninKey<Expected>(challengeKey: string, userId: string | undefined, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>): Promise<SigninKeyProof<Expected> | null> {
+	private async verifySigninKey<Expected>(challengeKey: string, userId: string | undefined, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>, requireUserVerification = true): Promise<SigninKeyProof<Expected> | null> {
 		const started = performance.now();
 		const claimed: unknown = await this.redisClient.eval(claimSigninChallenge, 1, challengeKey);
 		if (!Array.isArray(claimed) || typeof claimed[0] !== 'string' || typeof claimed[1] !== 'number'
@@ -105,10 +112,10 @@ export class WebAuthnService {
 		const verification = await verifyAuthenticationResponse({
 			response: credential, expectedChallenge: claimed[0], expectedOrigin: relyingParty.origin, expectedRPID: relyingParty.rpId,
 			credential: { id: original.id, publicKey: new Uint8Array(Buffer.from(publicKey, 'base64url')), counter, transports },
-			requireUserVerification: true,
+			requireUserVerification,
 		});
 		checkDeadline();
-		if (!verification.verified || verification.authenticationInfo.userVerified !== true) return null;
+		if (!verification.verified || (requireUserVerification && verification.authenticationInfo.userVerified !== true)) return null;
 		const info = verification.authenticationInfo;
 		if (!Number.isSafeInteger(info.newCounter) || info.newCounter < 0) throw new SigninPolicyError();
 		const updated = await this.userSecurityKeysRepository.update(original, {
@@ -116,7 +123,7 @@ export class WebAuthnService {
 		});
 		if (!updated || typeof updated !== 'object' || !('affected' in updated) || updated.affected !== 1) throw new SigninPolicyError();
 		checkDeadline();
-		return { key: Object.freeze({ id: original.id, userId: original.userId, publicKey, deadline }), expected };
+		return { key: Object.freeze({ id: original.id, userId: original.userId, publicKey, deadline, userVerified: verification.authenticationInfo.userVerified === true }), expected };
 	}
 
 	@bindThis
@@ -207,7 +214,7 @@ export class WebAuthnService {
 	}
 
 	@bindThis
-	public async initiateAuthentication(userId: MiUser['id']): Promise<v.InferOutput<typeof nativeAuthenticationOptionsSchema>> {
+	public async initiateAuthentication(userId: MiUser['id'], oidcContext?: string, requireUserVerification = true): Promise<v.InferOutput<typeof nativeAuthenticationOptionsSchema>> {
 		const relyingParty = this.getRelyingParty();
 		const keys = await this.userSecurityKeysRepository.findBy({
 			userId: userId,
@@ -223,11 +230,12 @@ export class WebAuthnService {
 				id: key.id,
 				transports: key.transports == null ? undefined : v.parse(v.array(webAuthnTransportSchema), key.transports),
 			})),
-			userVerification: 'required',
+			userVerification: requireUserVerification ? 'required' : 'preferred',
 		});
 		v.assert(nativeAuthenticationOptionsSchema, authenticationOptions);
 
-		await this.redisClient.setex(`webauthn:authenticationChallenge:${userId}`, 90, authenticationOptions.challenge);
+		if (oidcContext !== undefined && !/^[A-Za-z0-9_-]{43}$/.test(oidcContext)) throw new Error('Invalid OIDC context');
+		await this.redisClient.setex(oidcContext ? `webauthn:oidcChallenge:${oidcContext}` : `webauthn:authenticationChallenge:${userId}`, 90, authenticationOptions.challenge);
 
 		return authenticationOptions;
 	}
@@ -329,28 +337,11 @@ export class WebAuthnService {
 			throw new IdentifiableError('36b96a7d-b547-412d-aeed-2d611cdc8cdc', 'unknown key');
 		}
 
-		// マイグレーション
-		if (key.counter === 0 && key.publicKey.length === 87) {
-			const cert = new Uint8Array(Buffer.from(key.publicKey, 'base64url'));
-			if (cert[0] === 0x04) { // 前の実装ではいつも 0x04 で始まっていた
-				const halfLength = (cert.length - 1) / 2;
-
-				const cborMap = new Map<number, number | Uint8Array>();
-				cborMap.set(1, 2); // kty, EC2
-				cborMap.set(3, -7); // alg, ES256
-				cborMap.set(-1, 1); // crv, P256
-				cborMap.set(-2, cert.slice(1, halfLength + 1)); // x
-				cborMap.set(-3, cert.slice(halfLength + 1)); // y
-
-				const cborPubKey = Buffer.from(isoCBOR.encode(cborMap)).toString('base64url');
-				await this.userSecurityKeysRepository.update({
-					id: this.authenticationCredentialId(response),
-					userId: userId,
-				}, {
-					publicKey: cborPubKey,
-				});
-				key.publicKey = cborPubKey;
-			}
+		// Preserve the existing legacy EC→COSE conversion and its update timing.
+		const cborPubKey = canonicalWebAuthnPublicKey(key.publicKey, key.counter);
+		if (cborPubKey !== key.publicKey) {
+			await this.userSecurityKeysRepository.update({ id: this.authenticationCredentialId(response), userId }, { publicKey: cborPubKey });
+			key.publicKey = cborPubKey;
 		}
 
 		const relyingParty = this.getRelyingParty();

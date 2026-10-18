@@ -16,6 +16,7 @@ import type { FreshPasskeyReauthentication } from '../../backend/fresh-passkey-r
 import type { TotpService } from '../../backend/services/TotpService.js';
 
 const identity = { userId: 'synthetic-user', browserSession: { id: 'synthetic-session', userId: 'synthetic-user' } };
+
 function fixture() {
 	const db = mockDeep<DataSource>();
 	const manager = mockDeep<EntityManager>();
@@ -51,6 +52,7 @@ function fixture() {
 	const service = new SudoService(db, fresh, totp);
 	return { service, db, manager, user, profile, session, users, profiles, sessions, keys, totp, fresh };
 }
+
 afterEach(() => vi.restoreAllMocks());
 
 test('one server-owned session can repeat operations during five minutes without renewal', async () => {

@@ -83,7 +83,7 @@ test('real app handlers retain explicit undefined names/dates and authorized vie
 	query.where.mockReturnValue(query);
 	query.leftJoinAndSelect.mockReturnValue(query);
 	query.orderBy.mockReturnValue(query);
-	const token = { id: 'token123', lastUsedAt: null, token: 'token', session: null, hash: '', userId: me.id, user: null, appId: null, app: null, name: null, description: null, iconUrl: null, permission: [], fetched: false };
+	const token = { id: 'token123', expiresAt: null, lastUsedAt: null, token: 'token', session: null, hash: '', userId: me.id, user: null, appId: null, app: null, name: null, description: null, iconUrl: null, permission: [], fetched: false };
 	query.getMany.mockResolvedValue([token, { ...token, appId: app.id, app, lastUsedAt: date }]);
 	const packed = await call(AppsEndpoint({ accessTokensRepository: tokens, idService: ids }), {}, { context: testContext(me, null) });
 	expect(v.parse(requiredSchema(inline.IAppsContract['~orpc'].outputSchema), packed)).toEqual(packed);

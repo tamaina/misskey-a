@@ -15,7 +15,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label><i class="ti ti-api"></i> <SearchLabel>{{ $locale.sfc.api }}</SearchLabel></template>
 
 				<div class="_gaps_m">
-					<MkButton primary @click="generateToken">{{ $locale.sfc.generateAccessToken }}</MkButton>
+					<p v-if="!individualCredential">{{ $locale.sfc.individualCredentialRequired }}</p>
+					<MkButton primary :disabled="credentialBusy || !individualCredential" @click="generateToken">{{ $locale.sfc.generateAccessToken }}</MkButton>
 					<FormLink to="/settings/apps">{{ $locale.sfc.manageAccessTokens }}</FormLink>
 					<FormLink to="/api-console" :behavior="isDesktop ? 'window' : null">API console</FormLink>
 				</div>
@@ -61,6 +62,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { ensureSudo } from '../../utility/ensure-sudo.js';
+import { useCredentialOperation } from '../../utility/use-credential-operation.js';
+import { $i } from '../../i.js';
 import { computed, ref, defineAsyncComponent, markRaw } from 'vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -69,6 +73,7 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import MkDialog from '@features/ui/frontend/components/MkDialog.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
@@ -80,23 +85,30 @@ const paginator = markRaw(new Paginator('i/webhooks/list', {
 	noPaging: true,
 }));
 
-async function generateToken() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@features/auth/frontend/components/MkTokenGenerateWindow.vue').then(x => x.default), {}, {
-		done: async result => {
-			const { name, permissions } = result;
-			const { token } = await misskeyApi('miauth/gen-token', {
-				session: null,
-				name: name,
-				permission: permissions,
-			});
+const individualCredential = computed(() => $i?.token.startsWith('bs_'));
+const { run: runCredential, busy: credentialBusy } = useCredentialOperation();
 
-			os.alert({
-				type: 'success',
-				title: $locale.value.sfc.accessToken,
-				text: token,
-			});
-		},
-		closed: () => dispose(),
+async function generateToken() {
+	if (!individualCredential.value) return;
+	await runCredential(async (current, signal) => {
+		let dispose: (() => void) | undefined; let onAbort: () => void = () => {};
+		type Selection = { name: string | null; permissions: string[]; expiresAt?: string };
+		const result = await new Promise<Selection | undefined>((resolve, reject) => {
+			onAbort = () => { dispose?.(); resolve(undefined); }; signal.addEventListener('abort', onAbort, { once: true });
+			void os.popupAsyncWithDialog(import('@features/auth/frontend/components/MkTokenGenerateWindow.vue').then(x => x.default), {}, {
+				done: selection => resolve(selection), closed: () => { dispose?.(); resolve(undefined); },
+			}).then(popup => { dispose = popup.dispose; if (!current()) onAbort(); }).catch(reject);
+		}).finally(() => { signal.removeEventListener('abort', onAbort); dispose?.(); });
+		if (!result || !current() || !await ensureSudo(current, signal) || !current()) return;
+		let issued: { token: string };
+		try { issued = await misskeyApi('miauth/gen-token', { session: null, name: result.name, permission: result.permissions, ...(result.expiresAt ? { expiresAt: result.expiresAt } : {}) }); } catch { if (current()) await os.alert({ type: 'error', text: $locale.value.sfc.issuanceFailed }); return; }
+		const { token } = issued;
+		if (!current()) return;
+		await new Promise<void>(resolve => {
+			const dialog = os.popup(MkDialog, { type: 'success', title: $locale.value.sfc.accessToken, text: token }, { done: () => { dialog.dispose(); resolve(); }, closed: () => { dialog.dispose(); resolve(); } });
+			const close = () => { dialog.dispose(); resolve(); }; signal.addEventListener('abort', close, { once: true });
+			if (!current()) close();
+		});
 	});
 }
 
@@ -260,7 +272,9 @@ definePage(() => ({
 	"manageAccessTokens": "アクセストークンの管理",
 	"webhook": "Webhook",
 	"createWebhook": "Webhookを作成",
-	"manage": "管理"
+	"manage": "管理",
+	"individualCredentialRequired": "トークンを発行するには通常のログインで個別セッションを作成し、発行時に再認証してください。",
+	"issuanceFailed": "発行できませんでした。現在のアカウント・再認証・有効期限を確認してやり直してください。"
 }
 </locale>
 

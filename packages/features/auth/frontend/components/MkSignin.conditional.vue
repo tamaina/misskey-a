@@ -5,12 +5,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div ref="root" :inert="verifying" @click.capture="onClick" @submit.capture="onManualAction">
-	<MkSignin ref="manualSignin" :autoSet="autoSet" :message="message" :openOnRemote="openOnRemote" :initialUsername="initialUsername" @login="onManualLogin"/>
+	<MkSignin ref="manualSignin" :autoSet="autoSet" :message="message" :openOnRemote="openOnRemote" :initialUsername="initialUsername" @login="onManualLogin" @manual="cancelForManual"/>
 	<MkLoading v-if="verifying"/>
 </div>
 </template>
 
 <script setup lang="ts">
+import { $i } from '../i.js';
 import { onActivated, onBeforeUnmount, onDeactivated, ref, useTemplateRef, watch } from 'vue';
 import { browserSupportsWebAuthnAutofill } from '@simplewebauthn/browser';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
@@ -20,7 +21,7 @@ import { createConditionalPasskeyLogin, getConditionalCredential } from '@featur
 import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
 import type * as Misskey from 'misskey-js';
 
-// Separate opt-in surface: existing callers continue using the ordinary MkSignin.
+// The login dialog and named authorization entry explicitly opt into this surface.
 const props = withDefaults(defineProps<{
 	enabled?: boolean;
 	autoSet?: boolean;
@@ -68,14 +69,19 @@ const autofill = createConditionalPasskeyLogin({
 
 function cancelAutofill() { generation++; autofill.cancel(); }
 
+function cancelForManual() { manual = true; cancelAutofill(); }
+
+const actor = () => JSON.stringify([$i?.id ?? null, $i?.token ?? null]);
+watch(actor, cancelForManual, { flush: 'sync' });
+defineExpose({ cancel: cancelForManual });
+
 function onManualAction(event: Event) {
 	if (verifying.value) {
 		event.preventDefault();
 		event.stopImmediatePropagation();
 		return;
 	}
-	manual = true;
-	cancelAutofill();
+	cancelForManual();
 }
 
 function onClick(event: MouseEvent) {

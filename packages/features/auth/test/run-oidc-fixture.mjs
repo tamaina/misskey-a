@@ -42,7 +42,7 @@ try {
 	const config = `${directory}/vitest.mjs`;
 	writeFileSync(config, `import { baseConfig } from ${JSON.stringify(resolve(root, 'packages/backend/vitest.config.ts'))};
 export default { ...baseConfig, test: { ...baseConfig.test,
-include: ['../features/auth/test/backend/oidc-discovery.test.ts', '../features/auth/test/backend/oidc-transaction-store.test.ts', '../features/auth/test/backend/client-metadata-fetcher.test.ts'], environment: 'node', maxWorkers: 1 } };`);
+include: ['../features/auth/test/backend/oidc-flow-store.test.ts', '../features/auth/test/backend/oidc-discovery.test.ts', '../features/auth/test/backend/oidc-transaction-store.test.ts', '../features/auth/test/backend/client-metadata-fetcher.test.ts'], environment: 'node', maxWorkers: 1 } };`);
 	command(process.execPath, ['packages/backend/node_modules/vitest/vitest.mjs', 'run', '--config', config], {
 		env: { ...process.env, MISSKEY_OIDC_REDIS_SOCKET: socket },
 	});

@@ -25,6 +25,7 @@ import { aliasTwoFactorContract } from '../../backend/2fa-api-aliases.contract.j
 import { aliasTwoFactorProcedure, createAuthRouter } from '../../backend/api.implementation.js';
 import { authContract } from '../../backend/api.definition.js';
 import baseline from './fixtures/2fa-api-alias-baseline.json';
+import expiryRebases from './fixtures/credential-expiry-operation-rebase.json';
 import { restoreAnnouncementOperationBaseline } from '../../../announcements/test/backend/operation-rebase.js';
 import { testContext } from './native-context.js';
 import type { AuthRouterDependencies } from '../../backend/api.implementation.js';
@@ -112,6 +113,26 @@ function signinBranches(operation: unknown): unknown[] {
 	return success.anyOf;
 }
 
+const progressOpaqueShape = { type: 'string', pattern: '^[A-Za-z0-9_-]{43}$' };
+const progressShape = { type: 'object', properties: {
+	ticket: progressOpaqueShape, browserSecret: progressOpaqueShape, nonce: progressOpaqueShape,
+	version: { type: 'integer', minimum: 0, maximum: Number.MAX_SAFE_INTEGER },
+}, required: ['ticket', 'browserSecret', 'nonce', 'version'], additionalProperties: false };
+
+function restorePreProgressSigninOperation(operation: unknown): unknown {
+	const restored: unknown = structuredClone(operation);
+	const branches = signinBranches(restored);
+	for (const index of [2, 3]) {
+		const branch = object(branches[index]);
+		const properties = object(branch.properties);
+		expect(properties.authenticationProgress).toEqual(progressShape);
+		expect(branch.required).toEqual(index === 2 ? ['finished', 'next'] : ['finished', 'next', 'authRequest']);
+		delete properties.authenticationProgress;
+	}
+	expect(schemaHash(restored)).toBe(signinPolicyOperationHashes['/signin-flow']);
+	return restored;
+}
+
 // Issue #180 changes only these two response boundaries. Restore them before
 // applying the unchanged availability and historical alias oracles.
 const signinPolicyOperationHashes = {
@@ -120,8 +141,34 @@ const signinPolicyOperationHashes = {
 };
 const recoveryFactorsShape = { type: 'array', items: { enum: ['totp', 'passkey', 'recovery'], type: 'string' }, minItems: 1, maxItems: 3 };
 
+/** Accept only the pinned optional expiry additions, then apply the frozen legacy oracle. */
+function restorePreExpiryOperation(path: string, operation: unknown): unknown {
+	const rebase = expiryRebases.find(entry => entry.path === path);
+	if (!rebase) return operation;
+	expect(schemaHash(operation), path).toBe(rebase.currentSha256);
+	const restored: unknown = structuredClone(operation);
+	for (const removal of rebase.removals) {
+		let parent: unknown = restored;
+		for (const part of removal.parent) {
+			if (parent === null || typeof parent !== 'object' || !(part in parent)) throw new Error('Expiry inverse parent differs');
+			parent = Reflect.get(parent, part);
+		}
+		if (typeof removal.key === 'number') {
+			if (!Array.isArray(parent)) throw new Error('Expiry inverse array differs');
+			expect(parent[removal.key]).toEqual(removal.current);
+			parent.splice(removal.key, 1);
+		} else {
+			expect(object(parent)[removal.key]).toEqual(removal.current);
+			delete object(parent)[removal.key];
+		}
+	}
+	expect(schemaHash(restored), path).toBe(rebase.baselineSha256);
+	return restored;
+}
+
 function restorePreSigninPolicyOperation(path: string, operation: unknown): unknown {
 	if (path !== '/signin-flow' && path !== '/signin-with-passkey') return operation;
+	if (path === '/signin-flow') operation = restorePreProgressSigninOperation(operation);
 	expect(schemaHash(operation)).toBe(signinPolicyOperationHashes[path]);
 	const restored: unknown = structuredClone(operation);
 	if (path === '/signin-flow') {
@@ -174,9 +221,10 @@ function restorePreAvailabilitySigninOperation(operation: unknown): unknown {
 
 test('actual portable generator preserves every legacy operation and public schema, with eight unique canonical IDs', async () => {
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
-		const operation = restorePreSigninPolicyOperation(path, spec.paths?.[path]);
+		const operation = restorePreSigninPolicyOperation(path, restorePreExpiryOperation(path, spec.paths?.[path]));
 		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreAnnouncementOperationBaseline(path, operation)), path).toBe(hash);
 	}
 	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(spec.components?.schemas?.[name]), name).toBe(hash);
@@ -192,7 +240,24 @@ test('actual portable generator preserves every legacy operation and public sche
 		expect(routes.filter(route => route.name === canonical)).toHaveLength(1);
 		expect(spec.paths?.[`/${canonical}`]?.post?.operationId).toBe(`post___${canonical.replaceAll('/', '___')}`);
 	}
-	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
+});
+
+test('expiry inverse rejects changed constraints and unrelated operation metadata', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	for (const rebase of expiryRebases) {
+		const original = spec.paths?.[rebase.path];
+		expect(schemaHash(restorePreExpiryOperation(rebase.path, original))).toBe(baseline.operationHashes[rebase.path as keyof typeof baseline.operationHashes]);
+		for (const removal of rebase.removals) {
+			const changed: unknown = structuredClone(original);
+			let parent: unknown = changed;
+			for (const part of removal.parent) parent = Reflect.get(parent as object, part);
+			Reflect.set(parent as object, removal.key, null);
+			expect(() => restorePreExpiryOperation(rebase.path, changed)).toThrow();
+		}
+		const changed: unknown = structuredClone(original);
+		object(object(changed).post).operationId = 'unexpected';
+		expect(() => restorePreExpiryOperation(rebase.path, changed)).toThrow();
+	}
 });
 
 test('availability inverse rejects tampering at every allowed boundary and outside the response', async () => {

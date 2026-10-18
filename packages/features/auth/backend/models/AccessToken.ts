@@ -18,6 +18,9 @@ export class MiAccessToken {
 	})
 	public lastUsedAt: Date | null;
 
+	@Column('timestamp with time zone', { nullable: true })
+	public expiresAt: Date | null;
+
 	@Index()
 	@Column('varchar', {
 		length: 128,

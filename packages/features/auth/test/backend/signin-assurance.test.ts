@@ -16,7 +16,7 @@ function fixture(profileChanges: Partial<MiUserProfile> = {}) {
 	const profile = Object.assign(new MiUserProfile({}), { userId: user.id, password: 'synthetic-hash', twoFactorEnabled: true, twoFactorSecret: 'synthetic-secret', passkeyMfaEnabled: false, usePasswordLessLogin: false, twoFactorBackupSecret: ['synthetic-recovery'], ...profileChanges });
 	const keys = [mock<MiUserSecurityKey>({ id: 'AQID', userId: user.id, publicKey: 'AQID', counter: 1 })];
 	const deadline = performance.now() + 90_000;
-	const proof = (changes: Partial<Parameters<typeof createSigninAssurance>[0]> = {}) => createSigninAssurance({ userId: user.id, policyStamp: signinPolicyStamp(user, profile, keys), mode: 'password', passwordVerified: true, factor: 'passkey', key: { userId: user.id, id: keys[0].id, publicKey: keys[0].publicKey, deadline }, deadline, ...changes });
+	const proof = (changes: Partial<Parameters<typeof createSigninAssurance>[0]> = {}) => createSigninAssurance({ userId: user.id, policyStamp: signinPolicyStamp(user, profile, keys), mode: 'password', passwordVerified: true, factor: 'passkey', key: { userId: user.id, id: keys[0].id, publicKey: keys[0].publicKey, userVerified: true, deadline }, deadline, ...changes });
 	return { user, profile, keys, deadline, proof };
 }
 
@@ -81,8 +81,15 @@ test('legacy enabled passwordless remains available only with an owned UV key', 
 	expect(() => assertCurrentSigninAssurance(f.proof({ mode: 'passwordless', factor: 'totp', key: undefined }), f.user, f.profile, f.keys)).toThrow();
 });
 
+test('a second-factor UP-only proof cannot become a passwordless primary proof', () => {
+	const f = fixture({ usePasswordLessLogin: true });
+	const key = { userId: f.user.id, id: 'AQID', publicKey: 'AQID', deadline: f.deadline, userVerified: false };
+	expect(() => assertCurrentSigninAssurance(f.proof({ key }), f.user, f.profile, f.keys)).not.toThrow();
+	expect(() => assertCurrentSigninAssurance(f.proof({ mode: 'passwordless', passwordVerified: false, key }), f.user, f.profile, f.keys)).toThrow('authentication failed');
+});
+
 test('the earlier key deadline wins, expired proof is burned and cannot be restored', () => {
-	const f = fixture(); const proof = f.proof({ key: { userId: f.user.id, id: 'AQID', publicKey: 'AQID', deadline: f.deadline - 10_000 } });
+	const f = fixture(); const proof = f.proof({ key: { userId: f.user.id, id: 'AQID', publicKey: 'AQID', userVerified: true, deadline: f.deadline - 10_000 } });
 	expect(proof.deadline).toBe(f.deadline - 10_000);
 	const clock = vi.spyOn(performance, 'now').mockReturnValue(proof.deadline);
 	expect(() => assertSigninDeadline(proof)).toThrow(); expect(() => consumeSigninAssurance(proof, f.user.id)).toThrow();
@@ -92,4 +99,12 @@ test('the earlier key deadline wins, expired proof is burned and cannot be resto
 test('enabled TOTP remains an alternative when independent passkey policy is enabled', () => {
 	const f = fixture({ passkeyMfaEnabled: true });
 	expect(() => assertCurrentSigninAssurance(f.proof({ factor: 'totp', key: undefined }), f.user, f.profile, f.keys)).not.toThrow();
+});
+
+test('password login disablement is stamped and cannot issue a password proof', () => {
+	const f = fixture({ usePasswordLessLogin: true }); const before = f.proof();
+	Object.assign(f.profile, { passwordLoginDisabled: true });
+	expect(() => assertCurrentSigninAssurance(before, f.user, f.profile, f.keys)).toThrow();
+	expect(() => assertCurrentSigninAssurance(f.proof(), f.user, f.profile, f.keys)).toThrow();
+	expect(() => assertCurrentSigninAssurance(f.proof({ mode: 'passwordless', passwordVerified: false }), f.user, f.profile, f.keys)).not.toThrow();
 });

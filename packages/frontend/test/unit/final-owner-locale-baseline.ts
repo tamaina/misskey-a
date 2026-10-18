@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreConditionalEntryBaseline } from './conditional-entry-source-rebase.js';
+import { restoreCredentialIssuanceBaseline } from './credential-issuance-source-rebase.js';
 import { parse } from 'vue/compiler-sfc';
 import { restoreSigninPolicyBaseline } from './signin-policy-source-rebase.js';
 import { restoreCodeDiffBaseline } from './code-diff-source-rebase.js';
@@ -71,7 +73,7 @@ export function historicalFinalOwnerDictionary(file: string, language: string, d
 export function restoreFinalOwnerHistoricalSource(file: string, source: string): string {
 	source = restoreCodeDiffBaseline(file, source);
 	const owner = owners.get(file);
-	if (!owner) return restoreSigninPolicyBaseline(file, source);
+	if (!owner) return restoreSigninPolicyBaseline(file, restoreCredentialIssuanceBaseline(file, restoreConditionalEntryBaseline(file, source)));
 	const parsed = parse(source, { filename: file });
 	if (parsed.errors.length) throw new Error(`Invalid final-owner SFC: ${file}`);
 	const blocks = parsed.descriptor.customBlocks.filter(block => block.type === 'locale');

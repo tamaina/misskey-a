@@ -52,8 +52,8 @@ afterEach(() => { expect(errors).toEqual(expectedErrors); if (mounted) app.unmou
 
 function edit(value: string) { const input = element.querySelector('input')!; input.value = value; input.dispatchEvent(new Event('input')); }
 
-
 function save() { const button = [...element.querySelectorAll('button')].find(item => item.textContent === 'メールアドレスを保存'); expect(button).toBeDefined(); button!.click(); }
+
 function legacy() { app.unmount(); element.remove(); account.token = 'legacy-native'; mountEmail(); }
 
 test('editing is inert; common sudo authorizes the exact target captured before confirmation', async () => {
@@ -81,8 +81,7 @@ test('busy excludes competing save during confirmation', async () => {
 test.each(['deactivate', 'unmount', 'actor'] as const)('%s discards delayed authorization, including reactivation', async mode => {
 	let finish!: (value: boolean) => void; vi.mocked(ensureSudo).mockReturnValue(new Promise(resolve => { finish = resolve; }));
 	save(); const [current, signal] = vi.mocked(ensureSudo).mock.calls[0];
-	if (mode === 'unmount') { app.unmount(); mounted = false; }
-	else if (mode === 'actor') account.id = 'replacement-owner';
+	if (mode === 'unmount') { app.unmount(); mounted = false; } else if (mode === 'actor') account.id = 'replacement-owner';
 	else { show.value = false; await nextTick(); show.value = true; await nextTick(); }
 	expect(current!()).toBe(false); if (mode !== 'actor') expect(signal?.aborted).toBe(true);
 	finish(true); await new Promise(resolve => window.setTimeout(resolve, 10)); expect(os.apiWithDialog).not.toHaveBeenCalled();

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreConditionalEntryBaseline } from './conditional-entry-source-rebase.js';
+import { restoreCredentialIssuanceBaseline } from './credential-issuance-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
 import rebases from './rss-contract-source-rebase.json';
@@ -11,7 +13,7 @@ const sha256 = (source: string) => createHash('sha256').update(source).digest('h
 
 /** Reverse only the reviewed RSS contract edits before checking frozen locale migration proofs. */
 export function restoreRssContractBaseline(file: string, source: string): string {
-	source = restoreNativeApiSourceBaseline(file, source);
+	source = restoreNativeApiSourceBaseline(file, restoreCredentialIssuanceBaseline(file, restoreConditionalEntryBaseline(file, source)));
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	const localeStart = source.indexOf('<locale locale=');

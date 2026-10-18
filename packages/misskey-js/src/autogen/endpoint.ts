@@ -251,6 +251,45 @@ import type {
 	IImportFollowingRequest,
 	IImportMutingRequest,
 	IImportUserListsRequest,
+	ISudoStartRequest,
+	ISudoStartResponse,
+	ISudoCompleteRequest,
+	ISudoCompleteResponse,
+	ISudoStatusRequest,
+	ISudoStatusResponse,
+	ISudoExitRequest,
+	ISecurityAccountDeleteRequest,
+	ISecurityPasskeyPasswordlessStartRequest,
+	ISecurityPasskeyPasswordlessStartResponse,
+	ISecurityPasskeyPasswordlessCompleteRequest,
+	ISecurityPasswordLoginDisableStartRequest,
+	ISecurityPasswordLoginDisableStartResponse,
+	ISecurityPasswordLoginDisableCompleteRequest,
+	ISecurityPasswordRequest,
+	ISecurityEmailRequest,
+	ISecurityRegenerateTokenRequest,
+	ISecurityStateRequest,
+	ISecurityStateResponse,
+	ISecurityKeysListRequest,
+	ISecurityKeysListResponse,
+	ISecurityPasskeyRegisterStartRequest,
+	ISecurityPasskeyRegisterStartResponse,
+	ISecurityPasskeyRegisterCompleteRequest,
+	ISecurityPasskeyRegisterCompleteResponse,
+	ISecurityPasskeyMfaStartRequest,
+	ISecurityPasskeyMfaStartResponse,
+	ISecurityPasskeyMfaCompleteRequest,
+	ISecurityPasskeyMfaDisableRequest,
+	ISecurityPasskeyRemoveRequest,
+	ISecurityPasskeyRenameRequest,
+	ISecurityPasskeyPasswordlessRequest,
+	ISecurityTotpStartRequest,
+	ISecurityTotpStartResponse,
+	ISecurityTotpCompleteRequest,
+	ISecurityTotpCompleteResponse,
+	ISecurityTotpRemoveRequest,
+	ISecurityRecoveryCodesRequest,
+	ISecurityRecoveryCodesResponse,
 	AdminAccountsCreateRequest,
 	AdminAccountsCreateResponse,
 	AdminCaptchaCurrentRequest,
@@ -330,6 +369,32 @@ import type {
 	UsernameAvailableRequest,
 	UsernameAvailableResponse,
 	VerifyEmailRequest,
+	OidcProvidersRequest,
+	OidcProvidersResponse,
+	OidcStartRequest,
+	OidcStartResponse,
+	OidcCallbackRequest,
+	OidcCallbackResponse,
+	OidcStatusRequest,
+	OidcStatusResponse,
+	OidcCancelRequest,
+	OidcLoginRequest,
+	OidcLoginResponse,
+	OidcOnboardingRequest,
+	OidcOnboardingVerifyRequest,
+	OidcOnboardingVerifyResponse,
+	IOidcLinksRequest,
+	IOidcLinksResponse,
+	IOidcLinkStartRequest,
+	IOidcLinkStartResponse,
+	IOidcLinkCompleteRequest,
+	IOidcUnlinkRequest,
+	AdminOidcProvidersRequest,
+	AdminOidcProvidersResponse,
+	AdminOidcCreateRequest,
+	AdminOidcCreateResponse,
+	AdminOidcUpdateRequest,
+	AdminOidcUpdateResponse,
 	AdminAbuseReportNotificationRecipientCreateRequest,
 	AdminAbuseReportNotificationRecipientCreateResponse,
 	AdminAbuseReportNotificationRecipientDeleteRequest,
@@ -918,6 +983,32 @@ export type Endpoints = {
 	'i/import-following': { req: IImportFollowingRequest; res: EmptyResponse };
 	'i/import-muting': { req: IImportMutingRequest; res: EmptyResponse };
 	'i/import-user-lists': { req: IImportUserListsRequest; res: EmptyResponse };
+	'i/sudo/start': { req: ISudoStartRequest; res: ISudoStartResponse };
+	'i/sudo/complete': { req: ISudoCompleteRequest; res: ISudoCompleteResponse };
+	'i/sudo/status': { req: ISudoStatusRequest; res: ISudoStatusResponse };
+	'i/sudo/exit': { req: ISudoExitRequest; res: EmptyResponse };
+	'i/security/account/delete': { req: ISecurityAccountDeleteRequest; res: EmptyResponse };
+	'i/security/passkey/passwordless/start': { req: ISecurityPasskeyPasswordlessStartRequest; res: ISecurityPasskeyPasswordlessStartResponse };
+	'i/security/passkey/passwordless/complete': { req: ISecurityPasskeyPasswordlessCompleteRequest; res: EmptyResponse };
+	'i/security/password-login/disable/start': { req: ISecurityPasswordLoginDisableStartRequest; res: ISecurityPasswordLoginDisableStartResponse };
+	'i/security/password-login/disable/complete': { req: ISecurityPasswordLoginDisableCompleteRequest; res: EmptyResponse };
+	'i/security/password': { req: ISecurityPasswordRequest; res: EmptyResponse };
+	'i/security/email': { req: ISecurityEmailRequest; res: EmptyResponse };
+	'i/security/regenerate-token': { req: ISecurityRegenerateTokenRequest; res: EmptyResponse };
+	'i/security/state': { req: ISecurityStateRequest; res: ISecurityStateResponse };
+	'i/security/keys/list': { req: ISecurityKeysListRequest; res: ISecurityKeysListResponse };
+	'i/security/passkey/register/start': { req: ISecurityPasskeyRegisterStartRequest; res: ISecurityPasskeyRegisterStartResponse };
+	'i/security/passkey/register/complete': { req: ISecurityPasskeyRegisterCompleteRequest; res: ISecurityPasskeyRegisterCompleteResponse };
+	'i/security/passkey/mfa/start': { req: ISecurityPasskeyMfaStartRequest; res: ISecurityPasskeyMfaStartResponse };
+	'i/security/passkey/mfa/complete': { req: ISecurityPasskeyMfaCompleteRequest; res: EmptyResponse };
+	'i/security/passkey/mfa/disable': { req: ISecurityPasskeyMfaDisableRequest; res: EmptyResponse };
+	'i/security/passkey/remove': { req: ISecurityPasskeyRemoveRequest; res: EmptyResponse };
+	'i/security/passkey/rename': { req: ISecurityPasskeyRenameRequest; res: EmptyResponse };
+	'i/security/passkey/passwordless': { req: ISecurityPasskeyPasswordlessRequest; res: EmptyResponse };
+	'i/security/totp/start': { req: ISecurityTotpStartRequest; res: ISecurityTotpStartResponse };
+	'i/security/totp/complete': { req: ISecurityTotpCompleteRequest; res: ISecurityTotpCompleteResponse };
+	'i/security/totp/remove': { req: ISecurityTotpRemoveRequest; res: EmptyResponse };
+	'i/security/recovery-codes': { req: ISecurityRecoveryCodesRequest; res: ISecurityRecoveryCodesResponse };
 	'admin/accounts/create': { req: AdminAccountsCreateRequest; res: AdminAccountsCreateResponse };
 	'admin/captcha/current': { req: AdminCaptchaCurrentRequest; res: AdminCaptchaCurrentResponse };
 	'admin/captcha/save': { req: AdminCaptchaSaveRequest; res: EmptyResponse };
@@ -966,6 +1057,21 @@ export type Endpoints = {
 	'reset-password': { req: ResetPasswordRequest; res: EmptyResponse };
 	'username/available': { req: UsernameAvailableRequest; res: UsernameAvailableResponse };
 	'verify-email': { req: VerifyEmailRequest; res: EmptyResponse };
+	'oidc/providers': { req: OidcProvidersRequest; res: OidcProvidersResponse };
+	'oidc/start': { req: OidcStartRequest; res: OidcStartResponse };
+	'oidc/callback': { req: OidcCallbackRequest; res: OidcCallbackResponse };
+	'oidc/status': { req: OidcStatusRequest; res: OidcStatusResponse };
+	'oidc/cancel': { req: OidcCancelRequest; res: EmptyResponse };
+	'oidc/login': { req: OidcLoginRequest; res: OidcLoginResponse };
+	'oidc/onboarding': { req: OidcOnboardingRequest; res: EmptyResponse };
+	'oidc/onboarding/verify': { req: OidcOnboardingVerifyRequest; res: OidcOnboardingVerifyResponse };
+	'i/oidc/links': { req: IOidcLinksRequest; res: IOidcLinksResponse };
+	'i/oidc/link/start': { req: IOidcLinkStartRequest; res: IOidcLinkStartResponse };
+	'i/oidc/link/complete': { req: IOidcLinkCompleteRequest; res: EmptyResponse };
+	'i/oidc/unlink': { req: IOidcUnlinkRequest; res: EmptyResponse };
+	'admin/oidc/providers': { req: AdminOidcProvidersRequest; res: AdminOidcProvidersResponse };
+	'admin/oidc/create': { req: AdminOidcCreateRequest; res: AdminOidcCreateResponse };
+	'admin/oidc/update': { req: AdminOidcUpdateRequest; res: AdminOidcUpdateResponse };
 	'admin/abuse-report/notification-recipient/create': { req: AdminAbuseReportNotificationRecipientCreateRequest; res: AdminAbuseReportNotificationRecipientCreateResponse };
 	'admin/abuse-report/notification-recipient/delete': { req: AdminAbuseReportNotificationRecipientDeleteRequest; res: EmptyResponse };
 	'admin/abuse-report/notification-recipient/list': { req: AdminAbuseReportNotificationRecipientListRequest; res: AdminAbuseReportNotificationRecipientListResponse };
