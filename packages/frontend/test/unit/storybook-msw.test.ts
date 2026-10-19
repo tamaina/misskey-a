@@ -40,7 +40,6 @@ describe('Storybook MSW 3 warning policy', () => {
 	});
 });
 
-
 describe('Storybook bootstrap registry responses', () => {
 	test.each([
 		['keys', []],
