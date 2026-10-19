@@ -67,14 +67,14 @@ export const RejectedProof = {
 	...TotpFirst,
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement.ownerDocument.body);
-		await canvas.findByRole('button', { name: '確認して続ける', exact: true });
+		await canvas.findByRole('button', { name: /^確認して続ける$/ });
 		const password = canvasElement.ownerDocument.querySelector<HTMLInputElement>('input[type="password"]');
 		if (!password) throw new Error('Synthetic password input missing');
 		await userEvent.type(password, 'synthetic-password');
 		const token = canvasElement.ownerDocument.querySelector<HTMLInputElement>('input[autocomplete="one-time-code"]');
 		if (!token) throw new Error('Synthetic factor input missing');
 		await userEvent.type(token, '000000');
-		await userEvent.click(canvas.getByRole('button', { name: '確認して続ける', exact: true }));
+		await userEvent.click(canvas.getByRole('button', { name: /^確認して続ける$/ }));
 		await expect(canvas.findByRole('alert')).resolves.toHaveTextContent('本人確認できませんでした');
 	},
 } satisfies StoryObj<typeof MkSudoDialog>;
@@ -95,7 +95,7 @@ export const Cancelled = {
 	},
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement.ownerDocument.body);
-		await userEvent.click(await canvas.findByRole('button', { name: 'キャンセル', exact: true }));
+		await userEvent.click(await canvas.findByRole('button', { name: /^キャンセル$/ }));
 		await expect(canvas.findByRole('status')).resolves.toHaveTextContent('操作は実行していません');
 	},
 } satisfies StoryObj<typeof MkSudoDialog>;

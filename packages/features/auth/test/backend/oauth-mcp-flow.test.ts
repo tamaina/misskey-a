@@ -74,7 +74,7 @@ async function setup() {
 	const repository = (entity: unknown) => { if (entity === MiOAuthApproval) return receipts; if (entity === MiAccessToken) return f.tokens; throw new Error('Unexpected synthetic consent repository'); };
 	manager.getRepository.mockImplementation(repository); f.tokens.manager.getRepository.mockImplementation(repository);
 	const local = mockDeep<CredentialIssuanceAuthorization>(); local.transaction.mockImplementation(async (identity, run) => {
-		if (identity.userId !== f.own.id || identity.browserSession.id !== consentSession.id || identity.browserSession.userId !== f.own.id || consentUntil.getTime() <= Date.now()) throw new Error('Synthetic local sudo denied');
+		if (!identity.browserSession || identity.userId !== f.own.id || identity.browserSession.id !== consentSession.id || identity.browserSession.userId !== f.own.id || consentUntil.getTime() <= Date.now()) throw new Error('Synthetic local sudo denied');
 		return run({ manager, user: f.own, profile, keys: [], session: consentSession as never });
 	});
 	const logger = mockDeep<Logger>();

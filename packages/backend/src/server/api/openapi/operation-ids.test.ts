@@ -56,21 +56,26 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/i/regenerate-token/passkey/complete']?.post?.operationId).toBe('post___i___regenerate-token___passkey___complete');
 	expect(spec.paths?.['/i/update-email/passkey/start']?.post?.operationId).toBe('post___i___update-email___passkey___start');
 	expect(spec.paths?.['/i/update-email/passkey/complete']?.post?.operationId).toBe('post___i___update-email___passkey___complete');
-	expect(spec.paths?.['/oidc/providers']?.post?.operationId).toBe('post___oidc___providers');
-	expect(spec.paths?.['/oidc/start']?.post?.operationId).toBe('post___oidc___start');
-	expect(spec.paths?.['/oidc/callback']?.post?.operationId).toBe('post___oidc___callback');
-	expect(spec.paths?.['/oidc/status']?.post?.operationId).toBe('post___oidc___status');
-	expect(spec.paths?.['/oidc/cancel']?.post?.operationId).toBe('post___oidc___cancel');
-	expect(spec.paths?.['/oidc/login']?.post?.operationId).toBe('post___oidc___login');
-	expect(spec.paths?.['/oidc/onboarding']?.post?.operationId).toBe('post___oidc___onboarding');
-	expect(spec.paths?.['/oidc/onboarding/verify']?.post?.operationId).toBe('post___oidc___onboarding___verify');
-	expect(spec.paths?.['/i/oidc/links']?.post?.operationId).toBe('post___i___oidc___links');
-	expect(spec.paths?.['/i/oidc/link/start']?.post?.operationId).toBe('post___i___oidc___link___start');
-	expect(spec.paths?.['/i/oidc/link/complete']?.post?.operationId).toBe('post___i___oidc___link___complete');
-	expect(spec.paths?.['/i/oidc/unlink']?.post?.operationId).toBe('post___i___oidc___unlink');
-	expect(spec.paths?.['/admin/oidc/providers']?.post?.operationId).toBe('post___admin___oidc___providers');
-	expect(spec.paths?.['/admin/oidc/create']?.post?.operationId).toBe('post___admin___oidc___create');
-	expect(spec.paths?.['/admin/oidc/update']?.post?.operationId).toBe('post___admin___oidc___update');
+	// SSO is deferred; none of its fifteen routes may appear in the public contract.
+	for (const path of [
+		'/oidc/providers',
+		'/oidc/start',
+		'/oidc/callback',
+		'/oidc/status',
+		'/oidc/cancel',
+		'/oidc/login',
+		'/oidc/onboarding',
+		'/oidc/onboarding/verify',
+		'/i/oidc/links',
+		'/i/oidc/link/start',
+		'/i/oidc/link/complete',
+		'/i/oidc/unlink',
+		'/admin/oidc/providers',
+		'/admin/oidc/create',
+		'/admin/oidc/update',
+	]) {
+		expect(spec.paths).not.toHaveProperty(path);
+	}
 	const addedSecurityPaths = [
 		'/i/security/account/delete',
 		'/i/security/passkey/passwordless/start',
@@ -104,9 +109,9 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	for (const path of addedSecurityPaths) {
 		expect(spec.paths?.[path]?.post?.operationId).toBe(`post___${path.slice(1).replaceAll('/', '___')}`);
 	}
-	// Preserve the preceding API count while independently enumerating each new route.
-	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(498);
-	expect(identifiers).toHaveLength(498 + 26);
+	// Exclude the fifteen deferred SSO routes from the preceding API count.
+	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(483);
+	expect(identifiers).toHaveLength(483 + 26);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 
