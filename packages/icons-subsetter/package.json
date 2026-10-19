@@ -18,7 +18,7 @@
 	},
 	"dependencies": {
 		"@tabler/icons-webfont": "3.35.0",
-		"harfbuzzjs": "1.6.2",
+		"harfbuzzjs": "1.6.3",
 		"tsx": "4.23.15",
 		"wawoff2": "2.0.1"
 	},
