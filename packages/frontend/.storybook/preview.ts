@@ -90,16 +90,20 @@ setup((app) => {
 });
 
 const preview = {
-	initialGlobals: { misskeyTheme: 'l-light' },
+	initialGlobals: { misskeyTheme: false },
 	globalTypes: {
 		misskeyTheme: {
 			description: 'Misskey theme',
-			toolbar: { icon: 'mirror', dynamicTitle: true, items: Object.keys(themes) },
+			toolbar: { icon: 'mirror', dynamicTitle: true, items: [{ value: '', title: '(clear)' }, ...Object.keys(themes)] },
 		},
 	},
 	decorators: [
 		(Story, context) => {
-			window.document.documentElement.dataset.misskeyTheme = context.globals.misskeyTheme;
+			if (context.globals.misskeyTheme) {
+				window.document.documentElement.dataset.misskeyTheme = context.globals.misskeyTheme;
+			} else {
+				delete window.document.documentElement.dataset.misskeyTheme;
+			}
 			if (lastStory === context.id) {
 				lastStory = null;
 			} else {
