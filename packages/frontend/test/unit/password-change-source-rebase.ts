@@ -3,13 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreConditionalEntryBaseline } from './conditional-entry-source-rebase.js';
+import { restoreCredentialIssuanceBaseline } from './credential-issuance-source-rebase.js';
+import { restoreOidcSourceBaseline } from './oidc-source-rebase.js';
+import { restoreSigninProgressBaseline } from './signin-progress-source-rebase.js';
 import { createHash } from 'node:crypto';
+import { restoreTokenRegenerationBaseline } from './token-regeneration-source-rebase.js';
+import { restoreSigninPolicyBaseline } from './signin-policy-source-rebase.js';
 import rebases from './password-change-source-rebase.json';
+import { restoreAuthLintBaseline } from './auth-lint-source-rebase.js';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 /** Reverse only this password/MFA flow fix before checking the frozen locale proofs. */
 export function restorePasswordChangeBaseline(file: string, source: string): string {
+	if (rebases.some(entry => entry.file === file)) source = restoreAuthLintBaseline(file, source);
+	source = restoreSigninPolicyBaseline(file, restoreTokenRegenerationBaseline(file, restoreSigninProgressBaseline(file, restoreOidcSourceBaseline(file, restoreCredentialIssuanceBaseline(file, restoreConditionalEntryBaseline(file, source))))));
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from the password/MFA change: ${file}`);

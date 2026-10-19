@@ -1,0 +1,59 @@
+[
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.conditional.vue",
+    "currentSha256": "32a27d11399d58c0112227c697273655865155f8c0db3f7456d134f10bc99a16",
+    "baselineSha256": "337e8e80ed127cfb2447dc6260c457346ee801b17a773a6c91ce51571e8d8d0c",
+    "edits": [
+      {
+        "start": 3091,
+        "end": 3092,
+        "current": "\n",
+        "baseline": ""
+      },
+      {
+        "start": 3156,
+        "end": 3157,
+        "current": "\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/pages/settings/email.vue",
+    "currentSha256": "6ba96a0456558271799ad4667d1584c50f0fe3720938920e430db7eaf18404cf",
+    "baselineSha256": "25dc932b19ed3d7e8ab0bddc5c58966a1a39779da1ec4884bb15176417d67a9a",
+    "edits": [
+      {
+        "start": 5223,
+        "end": 5223,
+        "current": "",
+        "baseline": "\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/pages/settings/security.vue",
+    "currentSha256": "ce7b4c85fe57270c73945dc06f39ba78314ad11d8823e5d20d2abb4c98a37f72",
+    "baselineSha256": "3e28f754e2f2c12b7e695d1f426cc82a6383284c9628ac10c01be9b7161b6b90",
+    "edits": [
+      {
+        "start": 889,
+        "end": 889,
+        "current": "",
+        "baseline": "\t\t<XOidcSettingsLinks/>\n"
+      },
+      {
+        "start": 2414,
+        "end": 2414,
+        "current": "",
+        "baseline": "import XOidcSettingsLinks from '../../components/MkOidcSettingsLinks.vue';\n"
+      },
+      {
+        "start": 6404,
+        "end": 6404,
+        "current": "",
+        "baseline": "\n\n"
+      }
+    ]
+  }
+]

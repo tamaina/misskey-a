@@ -96,6 +96,27 @@ jobs:
       run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/mcp/test/vitest.antenna-redis.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
     - name: Test recovery codes with isolated PostgreSQL
       run: node packages/features/auth/test/run-recovery-postgres-fixture.mjs
+    - name: Test MFA policy with isolated PostgreSQL
+      run: node packages/features/auth/test/run-mfa-policy-postgres-fixture.mjs
+    - name: Test security completion and migration round trips with isolated PostgreSQL
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: MISSKEY_AUTH_COMPLETION_FIXTURE=1 node packages/features/auth/test/run-mfa-policy-postgres-fixture.mjs
+    - name: Test security settings HTTP and signed WebAuthn with isolated PostgreSQL and Redis
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: node packages/features/auth/test/run-security-settings-fixture.mjs
+    - name: Test credential issuance with isolated PostgreSQL and Redis
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: node packages/features/auth/test/run-credential-issuance-fixture.mjs
+    - name: Test fresh reauthentication with isolated Redis
+      run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/auth/test/vitest.fresh-reauthentication.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
+    - name: Test fresh password change HTTP with isolated PostgreSQL and Redis
+      run: node packages/features/auth/test/run-fresh-password-change-fixture.mjs
+    - name: Test login policy HTTP with isolated PostgreSQL and Redis
+      run: MISSKEY_AUTH_SIGNIN_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs
+    - name: Test token regeneration HTTP with isolated PostgreSQL and Redis
+      run: MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs
+    - name: Test email change HTTP with isolated PostgreSQL and Redis
+      run: MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs
     - name: Test MCP with disposable PostgreSQL
       run: node packages/features/mcp/test/run-postgres-fixture.mjs
     - name: Upload to Codecov

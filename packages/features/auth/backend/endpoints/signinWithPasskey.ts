@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { randomUUID } from 'crypto';
+import { performance } from 'node:perf_hooks';
 import { IsNull } from 'typeorm';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
@@ -15,7 +16,7 @@ import { toWebAuthnAuthenticationOptions } from '../webauthn.schema.js';
 import { toSessionHeaders, toFinishedSignin } from '../session.schema.js';
 import { sessionField, type AuthSessionContext } from '../session.effects.js';
 import { SigninService } from '../transport/SigninService.js';
-import type { UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { UserProfilesRepository, UserSecurityKeysRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { SigninHistoryRepository } from '../session-signin-repository.js';
 import { implement } from '@orpc/server';
@@ -23,15 +24,19 @@ import { implement } from '@orpc/server';
 import type { AuthSessionOutputs } from '../api.definition.js';
 import { authSessionsContract } from '../api.definition.js';
 import { sessionErrors } from '../session.middleware.js';
+import { readMfaPolicy } from '../mfa-policy.js';
+import { createSigninAssurance, signinPolicyStamp, SigninPolicyError } from '../signin-assurance.js';
+import { normalizedPasskeyPublicKey } from '../passkey-public-key.js';
 export interface SigninWithPasskeyDependencies {
 	config: Config;
 	usersRepository: UsersRepository;
 	userProfilesRepository: UserProfilesRepository;
+	userSecurityKeysRepository: UserSecurityKeysRepository;
 	signinsRepository: SigninHistoryRepository;
 	idService: Pick<IdService, 'gen'>;
 	rateLimiterService: Pick<RateLimiterService, 'limit'>;
 	signinService: Pick<SigninService, 'signin'>;
-	webAuthnService: Pick<WebAuthnService, 'initiateSignInWithPasskeyAuthentication' | 'verifySignInWithPasskeyAuthentication'>;
+	webAuthnService: Pick<WebAuthnService, 'initiateSignInWithPasskeyAuthentication' | 'verifySignInWithPasskeyWithProof'>;
 	loggerService: Pick<LoggerService, 'getLogger'>;
 }
 export function createSigninWithPasskeyProcedure(deps: SigninWithPasskeyDependencies) {
@@ -40,6 +45,7 @@ export function createSigninWithPasskeyProcedure(deps: SigninWithPasskeyDependen
 		const body = input;
 		const request = context.request;
 		const reply = context.effects;
+		const deadline = performance.now() + 90_000;
 		const result = await (async (): Promise<AuthSessionOutputs['signinWithPasskey']> => {
 			reply.header('Access-Control-Allow-Origin', deps.config.url);
 			reply.header('Access-Control-Allow-Credentials', 'true');
@@ -99,47 +105,38 @@ export function createSigninWithPasskeyProcedure(deps: SigninWithPasskeyDependen
 				});
 			}
 			logger.debug(`Try Sign-in with Passkey: context: ${context}`);
-			let authorizedUserId: MiUser['id'] | null;
+			const authenticate = () => deps.webAuthnService.verifySignInWithPasskeyWithProof(context, credential, async key => {
+				const user = await deps.usersRepository.findOneBy({ id: key.userId, host: IsNull() });
+				if (!user) throw new SigninPolicyError();
+				const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: user.id });
+				const keys = await deps.userSecurityKeysRepository.findBy({ userId: user.id });
+				if (!keys.some(stored => stored.id === key.id && normalizedPasskeyPublicKey(stored.publicKey) === key.publicKey)) throw new SigninPolicyError();
+				// Keep this expectation from before cryptographic verification.
+				return { user, policy: readMfaPolicy(profile, keys.length), passwordless: profile.usePasswordLessLogin === true, policyStamp: signinPolicyStamp(user, profile, keys) };
+			});
+			let verified: Awaited<ReturnType<typeof authenticate>>;
 			try {
-				authorizedUserId = await deps.webAuthnService.verifySignInWithPasskeyAuthentication(context, credential);
+				verified = await authenticate();
 			} catch (err) {
 				logger.warn(`Passkey challenge Verify error! : ${err}`);
-				const errorId = err instanceof IdentifiableError ? err.id : undefined;
-				return error(403, {
-					id: errorId,
-				});
+				return error(403, { id: err instanceof IdentifiableError ? err.id : undefined });
 			}
-			if (!authorizedUserId) {
-				return error(403, {
-					id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
-				});
+			if (!verified) return error(403, { id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c' });
+			const { user, policy, passwordless, policyStamp } = verified.expected;
+			if (user.isSuspended || user.isDeleted) return error(403, { id: 'e03a5f46-d309-4865-9b69-56282d94e1eb' });
+			if (policy.independentPasskeyEnabled) {
+				// This UV identifies the account only. No proof/session is carried into the named password flow.
+				reply.code(200);
+				return { passwordFlowRequired: true };
 			}
-			// Fetch user
-			const user = await deps.usersRepository.findOneBy({
-				id: authorizedUserId,
-				host: IsNull(),
-			});
-			if (user == null) {
-				return error(403, {
-					id: '652f899f-66d4-490e-993e-6606c8ec04c3',
-				});
+			if (!passwordless) return fail(user.id, 403, { id: '2d84773e-f7b7-4d0b-8f72-bb69b584c912' });
+			try {
+				const proof = createSigninAssurance({ userId: user.id, policyStamp, mode: 'passwordless', passwordVerified: false, factor: 'passkey', key: verified.key, deadline });
+				return { signinResponse: toFinishedSignin(await deps.signinService.signin(request, reply, user, proof)) };
+			} catch (err) {
+				if (err instanceof SigninPolicyError) return fail(user.id, 403, { id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c' });
+				throw err;
 			}
-			if (user.isSuspended || user.isDeleted) {
-				return error(403, {
-					id: 'e03a5f46-d309-4865-9b69-56282d94e1eb',
-				});
-			}
-			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: user.id });
-			// Authentication was successful, but passwordless login is not enabled
-			if (!profile.usePasswordLessLogin) {
-				return await fail(user.id, 403, {
-					id: '2d84773e-f7b7-4d0b-8f72-bb69b584c912',
-				});
-			}
-			const signinResponse = await deps.signinService.signin(request, reply, user);
-			return {
-				signinResponse: toFinishedSignin(signinResponse),
-			};
 		})();
 		return result;
 	});

@@ -4,6 +4,9 @@
  */
 
 import { Inject, Injectable } from '@nestjs/common';
+import { MiUserProfile } from '../models/UserProfile.js';
+import { MiUser } from '../models/User.js';
+import { DeleteAccountService } from '../services/DeleteAccountService.js';
 import { MoreThan } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { DriveFilesRepository, NotesRepository, PagesRepository, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -44,6 +47,7 @@ export class DeleteAccountProcessorService {
 		private emailService: EmailService,
 		private queueLoggerService: QueueLoggerService,
 		private searchService: SearchService,
+		private deleteAccountService: DeleteAccountService,
 	) {
 		this.logger = this.queueLoggerService.logger.createSubLogger('delete-account');
 	}
@@ -52,10 +56,21 @@ export class DeleteAccountProcessorService {
 	public async process(job: Bull.Job<DbUserDeleteJobData>): Promise<string | void> {
 		this.logger.info(`Deleting account of ${job.data.user.id} ...`);
 
-		const user = await this.usersRepository.findOneBy({ id: job.data.user.id });
+		const user = job.data.requiresCommittedDeletion
+			? await this.usersRepository.manager.transaction(async manager => {
+				// The producer holds this row through the authorization/intent commit.
+				const user = await manager.getRepository(MiUser).findOne({ where: { id: job.data.user.id }, lock: { mode: 'pessimistic_write' } });
+				const deletionIntentId = job.data.deletionIntentId;
+				if (!user?.isDeleted || typeof deletionIntentId !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(deletionIntentId)) return null;
+				const intent = await manager.getRepository(MiUserProfile).findOne({ where: { userId: user.id, deletionIntentId }, lock: { mode: 'pessimistic_write' } });
+				return intent ? user : null;
+			})
+			: await this.usersRepository.findOneBy({ id: job.data.user.id });
 		if (user == null) {
 			return;
 		}
+
+		if (job.data.requiresCommittedDeletion) await this.deleteAccountService.deliverDeletion(user);
 
 		{ // Delete notes
 			let cursor: MiNote['id'] | null = null;

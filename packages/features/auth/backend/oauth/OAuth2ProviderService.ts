@@ -3,6 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createHash } from 'node:crypto';
+import { LessThan } from 'typeorm';
+import { selectedTokenExpiry, accessTokenExpired } from '../access-token-expiry.js';
+import { signinPolicyStamp } from '../signin-assurance.js';
+import { MiOAuthApproval } from '../models/OAuthApproval.js';
+import { MiAccessToken } from '../models/AccessToken.js';
+import { SudoService } from '../sudo.js';
+import type { CredentialIssuanceAuthorization } from '../credential-issuance.js';
+import type { SudoIdentity } from '../sudo.js';
 import dns from 'node:dns/promises';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as htmlParser from 'node-html-parser';
@@ -141,6 +150,8 @@ interface AuthorizationTransaction {
 }
 
 interface AuthorizationCodeGrant {
+	approvalId: string;
+	expiresAt: string | null;
 	clientId: string;
 	cimd: boolean;
 	userId: string;
@@ -148,6 +159,10 @@ interface AuthorizationCodeGrant {
 	codeChallenge: string;
 	scopes: string[];
 	resource?: string;
+}
+
+function grantStamp(grant: Omit<AuthorizationCodeGrant, 'approvalId'>): string {
+	return createHash('sha256').update(JSON.stringify([grant.clientId, grant.cimd, grant.userId, grant.redirectUri, grant.codeChallenge, grant.scopes, grant.resource ?? null, grant.expiresAt])).digest('hex');
 }
 
 function parseMicroformats(doc: htmlParser.HTMLElement, baseUrl: string, id: string): { name: string | null; logo: string | null; } {
@@ -464,6 +479,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		private roleService: RoleService,
 		@Inject(DI.redis) redis: Redis.Redis,
 		private readonly authenticateService: AuthenticateService,
+		@Inject(SudoService) private readonly local: CredentialIssuanceAuthorization,
 	) {
 		this.#state = new OAuthStateStore(redis);
 		this.#logger = loggerService.getLogger('oauth');
@@ -564,21 +580,14 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		};
 	}
 
-	async #findUserByLoginToken(loginToken: string): Promise<MiLocalUser> {
+	async #findUserByLoginToken(loginToken: string): Promise<{ user: MiLocalUser; identity: SudoIdentity }> {
 		if (loginToken.startsWith('bs_')) {
 			try {
-				const [user, app] = await this.authenticateService.authenticate(loginToken);
-				if (user && app === null) return user;
-			} catch { /* Authentication failure remains an invalid consent request. */ }
-			throw new InvalidRequestError('No such user');
+				const [user, app, session] = await this.authenticateService.authenticate(loginToken);
+				if (user && app === null && session?.userId === user.id) return { user, identity: { userId: user.id, browserSession: session } };
+			} catch { /* Failed consent never falls back to the master-token cache. */ }
 		}
-		const user = await this.cacheService.localUserByNativeTokenCache.fetch(loginToken,
-			() => this.usersRepository.findOneBy({ token: loginToken }) as Promise<MiLocalUser | null>);
-		if (!user) {
-			throw new InvalidRequestError('No such user');
-		}
-
-		return user;
+		throw new InvalidRequestError('Sign in with an individual browser session and confirm local authentication');
 	}
 
 	#validateResource(resource: string | undefined, scopes: string[]): void {
@@ -663,6 +672,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 
 		fastify.post('/decision', { config: { sensitiveAccessLogBody: true } }, async (request, reply) => {
 			try {
+				if (request.headers.origin !== new URL(this.config.url).origin) throw new InvalidRequestError('Same-origin consent required');
 				const body = toRequestParameters(request.body);
 				const transactionId = firstValue(body.transaction_id);
 				if (!transactionId) {
@@ -690,7 +700,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				}
 
 				this.#logger.info('Checking user consent');
-				const user = await this.#findUserByLoginToken(loginToken);
+				const { user, identity } = await this.#findUserByLoginToken(loginToken);
 				const decisionParameters = request.body !== null && typeof request.body === 'object' ? request.body : body;
 				if ('misskey_customize_permissions' in decisionParameters || 'customizePermissions' in decisionParameters) throw new InvalidRequestError('Customization mode is fixed by the authorization request');
 				const allowAdditions = transaction.request.resource === new URL('/mcp', this.config.url).href
@@ -704,7 +714,8 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				this.#logger.info('Issuing authorization code after consent');
 
 				const code = secureRndstr(128);
-				await this.#state.putCode(code, {
+				const grant = {
+					expiresAt: (() => { try { return selectedTokenExpiry(firstValue(body.expires_at))?.toISOString() ?? null; } catch { throw new InvalidRequestError('Select a future token expiry'); } })(),
 					clientId: transaction.client.id,
 					cimd: transaction.client.cimd,
 					userId: user.id,
@@ -712,7 +723,18 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					codeChallenge: transaction.request.codeChallenge,
 					scopes,
 					resource: transaction.request.resource,
-				});
+				};
+				// Commit the exact approval before publishing any remotely exchangeable code.
+				const approvalId = await this.local.transaction(identity, async ({ manager, user: lockedUser, profile, keys, session }) => {
+					const sudoGrantId = session.sudoGrantId;
+					const deadline = Math.min(session.sudoUntil?.getTime() ?? 0, Date.now() + 300_000);
+					if (!sudoGrantId || deadline <= Date.now() || lockedUser.id !== user.id) throw new AccessDeniedError('Local authentication expired');
+					const repository = manager.getRepository(MiOAuthApproval); const id = this.idService.gen();
+					await repository.delete({ userId: user.id, deadline: LessThan(new Date()) });
+					await repository.insert({ id, userId: user.id, sessionId: session.id, sudoGrantId, policyStamp: signinPolicyStamp(lockedUser, profile, keys), grantStamp: grantStamp(grant), deadline: new Date(deadline) });
+					return id;
+				}).catch(() => { throw createForbiddenAccessDenied('Local authentication required'); });
+				await this.#state.putCode(code, { ...grant, approvalId });
 
 				redirectWithQuery(reply, transaction.request.redirectUri, appendIssuer({
 					code,
@@ -775,6 +797,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					throw new InvalidGrantError('grant request is invalid');
 				}
 				const granted = claim.grant;
+				if (typeof granted.approvalId !== 'string' || !/^[a-zA-Z0-9]{1,32}$/.test(granted.approvalId) || (granted.expiresAt !== null && typeof granted.expiresAt !== 'string')) throw new InvalidGrantError('grant request is invalid');
 				if (granted.cimd && body.client_secret !== undefined) throw new InvalidRequestError('Only public-client authentication is supported');
 				if (resource !== granted.resource) throw new InvalidGrantError('grant request is invalid');
 				this.#validateResource(resource, granted.scopes);
@@ -802,16 +825,16 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				// Retain the row identifier before insertion so a worker crash does not hide it from replay cleanup.
 				if (!await this.#state.publishToken(code, tokenId)) throw new InvalidGrantError('grant request is invalid');
 
-				// NOTE: we don't have a setup for automatic token expiration
-				await this.accessTokensRepository.insert({
-					id: tokenId,
-					lastUsedAt: now,
-					userId: granted.userId,
-					token: accessToken,
-					hash: accessToken,
-					name: granted.clientId,
-					permission: granted.scopes,
-				});
+				const approval = await this.accessTokensRepository.manager.getRepository(MiOAuthApproval).findOneBy({ id: granted.approvalId, userId: granted.userId });
+				if (!approval) throw new InvalidGrantError('grant request is invalid');
+				await this.local.transaction({ userId: granted.userId, browserSession: { id: approval.sessionId, userId: granted.userId } }, async ({ manager, user, profile, keys, session }) => {
+					const receipt = await manager.getRepository(MiOAuthApproval).findOne({ where: { id: granted.approvalId, userId: granted.userId, sessionId: session.id }, lock: { mode: 'pessimistic_write' } });
+					if (!receipt || receipt.sudoGrantId !== session.sudoGrantId || receipt.deadline.getTime() <= Date.now() || receipt.grantStamp !== grantStamp(granted) || receipt.policyStamp !== signinPolicyStamp(user, profile, keys)) throw new InvalidGrantError('grant request is invalid');
+					const expiry = selectedTokenExpiry(granted.expiresAt);
+					await manager.getRepository(MiOAuthApproval).delete({ id: receipt.id });
+					await manager.getRepository(MiAccessToken).insert({ id: tokenId, lastUsedAt: now, userId: granted.userId, token: accessToken, hash: accessToken, name: granted.clientId, permission: granted.scopes, expiresAt: expiry });
+					if (receipt.deadline.getTime() <= Date.now() || accessTokenExpired({ expiresAt: expiry })) throw new InvalidGrantError('grant request is invalid');
+				}).catch(() => { throw new InvalidGrantError('grant request is invalid'); });
 
 				try {
 					if (!await this.#state.publishToken(code, tokenId)) throw new InvalidGrantError('grant request is invalid');
@@ -825,6 +848,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					access_token: accessToken,
 					token_type: 'Bearer',
 					scope: granted.scopes.join(' '),
+					...(granted.expiresAt ? { expires_in: Math.max(0, Math.floor((Date.parse(granted.expiresAt) - Date.now()) / 1000)) } : {}),
 				});
 			} catch (error) {
 				sendOAuthProviderError(reply, normalizeOAuthProviderError(error));

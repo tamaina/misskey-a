@@ -3,9 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreConditionalEntryBaseline } from './conditional-entry-source-rebase.js';
+import { restoreCredentialIssuanceBaseline } from './credential-issuance-source-rebase.js';
+import { parse } from 'vue/compiler-sfc';
+import { restoreSigninPolicyBaseline } from './signin-policy-source-rebase.js';
 import { restoreCodeDiffBaseline } from './code-diff-source-rebase.js';
 import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
-import { parse } from 'vue/compiler-sfc';
 import metadata from './final-owner-locale-baseline.json';
 import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
 
@@ -43,13 +46,34 @@ export function reviewedFinalOwnerMessage(file: string, language: string, path: 
 	return expected;
 }
 
+/** Project only the exact new primary label out of the immutable migration oracle. */
+export function historicalFinalOwnerDictionary(file: string, language: string, dictionary: Dictionary): Dictionary {
+	if (file === 'packages/features/auth/frontend/components/MkSignin.vue' && language === 'ja-JP') {
+		const keys = ['passwordFlowRequired', ...owners.get(file)!.keys];
+		if (JSON.stringify(Object.keys(dictionary)) !== JSON.stringify(keys)) throw new Error(`Invalid final-owner key inventory: ${file}`);
+		if (dictionary.passwordFlowRequired !== 'このアカウントはパスワードと追加の本人確認が必要です。ユーザー名を入力してログインしてください。') throw new Error(`Final-owner dictionary differs from reviewed text: ${file}:${language}`);
+		const historical = { ...dictionary }; delete historical.passwordFlowRequired; return historical;
+	}
+	if (file !== 'packages/features/auth/frontend/pages/settings/security.vue' || language !== 'ja-JP') return dictionary;
+	const keys = [...owners.get(file)!.keys];
+	keys.splice(keys.indexOf('changePassword') + 1, 0, 'changePasswordWithPasskey');
+	keys.splice(keys.indexOf('regenerateLoginToken'), 0, 'regenerateLoginTokenWithPasskey');
+	if (JSON.stringify(Object.keys(dictionary)) !== JSON.stringify(keys)) throw new Error(`Invalid final-owner key inventory: ${file}`);
+	if (dictionary.changePasswordWithPasskey !== 'パスキーでパスワードを変更') throw new Error(`Final-owner dictionary differs from reviewed text: ${file}:${language}`);
+	if (dictionary.regenerateLoginTokenWithPasskey !== 'パスキーでログイントークンを再生成') throw new Error(`Final-owner dictionary differs from reviewed text: ${file}:${language}`);
+	const historical = { ...dictionary };
+	delete historical.regenerateLoginTokenWithPasskey;
+	delete historical.changePasswordWithPasskey;
+	return historical;
+}
+
 /** Verify the actual reviewed dictionaries and every non-locale byte before
  * exposing immutable Git source to the unchanged historical migration oracle.
  */
 export function restoreFinalOwnerHistoricalSource(file: string, source: string): string {
 	source = restoreCodeDiffBaseline(file, source);
 	const owner = owners.get(file);
-	if (!owner) return source;
+	if (!owner) return restoreSigninPolicyBaseline(file, restoreCredentialIssuanceBaseline(file, restoreConditionalEntryBaseline(file, source)));
 	const parsed = parse(source, { filename: file });
 	if (parsed.errors.length) throw new Error(`Invalid final-owner SFC: ${file}`);
 	const blocks = parsed.descriptor.customBlocks.filter(block => block.type === 'locale');
@@ -57,7 +81,7 @@ export function restoreFinalOwnerHistoricalSource(file: string, source: string):
 	const keys = owner.keys;
 	for (const block of blocks) {
 		if (block.attrs.lang !== 'json') throw new Error(`Invalid final-owner locale format: ${file}`);
-		const dictionary = JSON.parse(block.content) as Dictionary;
+		const dictionary = historicalFinalOwnerDictionary(file, String(block.attrs.locale), JSON.parse(block.content) as Dictionary);
 		if (JSON.stringify(Object.keys(dictionary)) !== JSON.stringify(keys)) throw new Error(`Invalid final-owner key inventory: ${file}`);
 		const expected = reviewedFinalOwnerDictionaries.get(file)?.[String(block.attrs.locale)];
 		if (JSON.stringify(dictionary) !== JSON.stringify(expected)) throw new Error(`Final-owner dictionary differs from reviewed text: ${file}:${block.attrs.locale}`);

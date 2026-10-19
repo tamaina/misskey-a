@@ -34,7 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<div v-else>
 			<p :class="$style.loginMessage">{{ $locale.sfc.pleaseLogin }}</p>
-			<MkSignin @login="onLogin"/>
+			<MkSignin enabled @login="onLogin"/>
 		</div>
 	</div>
 </PageWithHeader>
@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { onMounted, ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import XForm from '@features/auth/frontend/pages/auth.form.vue';
-import MkSignin from '@features/auth/frontend/components/MkSignin.vue';
+import MkSignin from '@features/auth/frontend/components/MkSignin.conditional.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { definePage } from '@features/navigation/frontend/page.js';
@@ -79,15 +79,8 @@ onMounted(async () => {
 		});
 		session.value = result;
 
-		// 既に連携していた場合
-		if (result.app.isAuthorized) {
-			await misskeyApi('auth/accept', {
-				token: result.token,
-			});
-			accepted();
-		} else {
-			state.value = 'waiting';
-		}
+		// Reused app grants still require explicit consent and current local authentication.
+		state.value = 'waiting';
 	} catch (err) {
 		state.value = 'fetch-session-error';
 	}

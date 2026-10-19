@@ -77,7 +77,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div class="_gaps_m">
 						<FormInfo warn>{{ $locale.sfc.mayTakeTime }}</FormInfo>
 						<FormInfo>{{ $locale.sfc.sendEmail }}</FormInfo>
-						<MkButton v-if="!$i.isDeleted" danger @click="deleteAccount"><SearchText>{{ $locale.sfc.requestAccountDelete }}</SearchText></MkButton>
+						<MkButton v-if="!$i.isDeleted" danger :disabled="deletingAccount" @click="deleteAccount"><SearchText>{{ $locale.sfc.requestAccountDelete }}</SearchText></MkButton>
 						<MkButton v-else disabled>{{ $locale.sfc.inProgress }}</MkButton>
 					</div>
 				</MkFolder>
@@ -155,8 +155,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
 import MkClientErrorLog from './error-log.vue';
-import { computed, watch } from 'vue';
+import { computed, watch, ref, onActivated, onDeactivated, onUnmounted } from 'vue';
 import XMigration from '@features/users/frontend/pages/settings/migration.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
@@ -193,28 +194,30 @@ watch(skipNoteRender, () => {
 	suggestReload();
 });
 
+const deletingAccount = ref(false);
+let deletionActive = true;
+let deletionGeneration = 0;
+let deletionAbort: AbortController | null = null;
+const leaveDeletion = () => { deletionActive = false; deletionGeneration++; deletionAbort?.abort(); };
+onDeactivated(leaveDeletion); onUnmounted(leaveDeletion);
+onActivated(() => { deletionActive = true; });
+
 async function deleteAccount() {
-	{
-		const { canceled } = await os.confirm({
-			type: 'warning',
-			text: $locale.value.sfc.deleteAccountConfirm,
-		});
-		if (canceled) return;
-	}
-
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
-
-	await os.apiWithDialog('i/delete-account', {
-		password: auth.result.password,
-		token: auth.result.token,
-	});
-
-	await os.alert({
-		title: $locale.value.sfc.started,
-	});
-
-	await signout('account-deletion-accepted');
+	if (deletingAccount.value || !deletionActive) return;
+	deletingAccount.value = true;
+	const ownerId = $i.id; const ownerToken = $i.token;
+	const generation = ++deletionGeneration;
+	const controller = new AbortController(); deletionAbort = controller;
+	const isCurrent = () => deletionActive && generation === deletionGeneration && $i.id === ownerId && $i.token === ownerToken;
+	try {
+		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.deleteAccountConfirm });
+		if (!isCurrent() || confirmation.canceled) return;
+		if (!await ensureSudo(isCurrent, controller.signal) || !isCurrent()) return;
+		await os.apiWithDialog('i/security/account/delete', { acknowledged: true });
+		if (!isCurrent()) return;
+		await os.alert({ title: $locale.value.sfc.started });
+		if (isCurrent()) await signout('account-deletion-accepted');
+	} finally { controller.abort(); deletingAccount.value = false; if (deletionAbort === controller) deletionAbort = null; }
 }
 
 function resetAllTips() {

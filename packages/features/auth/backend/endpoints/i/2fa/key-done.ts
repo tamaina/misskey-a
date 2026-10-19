@@ -3,8 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { legacyManagementOnly } from '../../../legacy-management.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import type { DataSource } from 'typeorm';
+import { MiUserSecurityKey } from '../../../models/UserSecurityKey.js';
+import { assertLegacyMfaManagement } from '../../../mfa-policy.js';
+import { withLockedMfaProfile } from '../../../locked-mfa-profile.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
@@ -34,6 +39,7 @@ export const meta = {
 	},
 } as const;
 export interface I2faKeyDoneDependencies {
+	db: DataSource;
 	userProfilesRepository: UserProfilesRepository;
 	userSecurityKeysRepository: UserSecurityKeysRepository;
 	webAuthnService: Pick<WebAuthnService, 'verifyRegistration'>;
@@ -42,12 +48,13 @@ export interface I2faKeyDoneDependencies {
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createI2faKeyDoneProcedure(deps: I2faKeyDoneDependencies) {
-	return createApiProcedure<MiLocalUser>()(I2faKeyDoneContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faKeyDoneContract).use(requirePrincipal<MiLocalUser>()).use(legacyManagementOnly()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
 			const token = ps.token;
 			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			assertLegacyMfaManagement(profile);
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -73,15 +80,18 @@ export function createI2faKeyDoneProcedure(deps: I2faKeyDoneDependencies) {
 			const keyInfo = await deps.webAuthnService.verifyRegistration(me.id, ps.credential);
 			const keyId = keyInfo.credentialID;
 
-			await deps.userSecurityKeysRepository.insert({
-				id: keyId,
-				userId: me.id,
-				name: ps.name,
-				publicKey: Buffer.from(keyInfo.credentialPublicKey).toString('base64url'),
-				counter: keyInfo.counter,
-				credentialDeviceType: keyInfo.credentialDeviceType,
-				credentialBackedUp: keyInfo.credentialBackedUp,
-				transports: keyInfo.transports,
+			await withLockedMfaProfile(deps.db, me.id, profile, async (locked, manager) => {
+				assertLegacyMfaManagement(locked);
+				await manager.getRepository(MiUserSecurityKey).insert({
+					id: keyId,
+					userId: me.id,
+					name: ps.name,
+					publicKey: Buffer.from(keyInfo.credentialPublicKey).toString('base64url'),
+					counter: keyInfo.counter,
+					credentialDeviceType: keyInfo.credentialDeviceType,
+					credentialBackedUp: keyInfo.credentialBackedUp,
+					transports: keyInfo.transports,
+				});
 			});
 
 			// Publish meUpdated event

@@ -9,6 +9,7 @@ import * as assert from 'assert';
 import { describe, beforeAll, beforeEach, test } from 'vitest';
 import {
 	api,
+	deleteOwnAccount,
 	failedApiCall,
 	post,
 	role,
@@ -102,7 +103,7 @@ describe('アンテナ', () => {
 		await api('admin/suspend-user', { userId: userSuspended.id }, root);
 		userDeletedBySelf = await signup({ username: 'userDeletedBySelf', password: 'userDeletedBySelf' });
 		await post(userDeletedBySelf, { text: 'test' });
-		await api('i/delete-account', { password: 'userDeletedBySelf' }, userDeletedBySelf);
+		await deleteOwnAccount(userDeletedBySelf, 'userDeletedBySelf');
 		userDeletedByAdmin = await signup({ username: 'userDeletedByAdmin' });
 		await post(userDeletedByAdmin, { text: 'test' });
 		await api('admin/delete-account', { userId: userDeletedByAdmin.id }, root);
@@ -533,7 +534,7 @@ describe('アンテナ', () => {
 					{ note: async (): Promise<Note> => {
 						const user = await signup({ password: 'synthetic-delete-fixture' });
 						const note = await post(user, { text: `${keyword}` });
-						await successfulApiCall({ endpoint: 'i/delete-account', parameters: { password: 'synthetic-delete-fixture' }, user });
+						await deleteOwnAccount(user, 'synthetic-delete-fixture');
 						return note;
 					}, included: true },
 					{ note: async (): Promise<Note> => {

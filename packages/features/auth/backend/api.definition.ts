@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { securitySettingsContract } from './security-settings.contract.js';
+import { sudoContract } from './sudo.contract.js';
+import { signinProgressChallengeSchema } from './signin-progress.schema.js';
 import { aliasTwoFactorContract } from './2fa-api-aliases.contract.js';
 import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
@@ -14,10 +17,12 @@ import { objectInput, rawObjectInputGuard } from '../../api/backend/transport/in
 import { packedJsonValueSchema, packedOptionalJsonValueSchema } from '../../users/backend/json-value.schema.js';
 import { packedMeDetailedSchema, packedUserDetailedNotMeSchema } from '../../users/backend/user.schema.js';
 import { localUsernameSchema, passwordSchema } from '../../users/backend/user-validation.schema.js';
-import { webAuthnRegistrationOptionsSchema, webAuthnAuthenticationOptionsSchema } from './webauthn.schema.js';
+import { webAuthnRegistrationOptionsSchema, webAuthnAuthenticationOptionsSchema, webAuthnAuthenticationResponseSchema } from './webauthn.schema.js';
 import { packedAppSchema, packedInviteCodeSchema, packedSigninSchema, supportedCaptchaProviders } from './auth.schema.js';
 import { sessionFailureSchema, fastifyFailureSchema } from './session-errors.schema.js';
 import { availableSigninFactorsSchema, finishedSigninSchema } from './session.schema.js';
+
+const tokenExpiryInput = v.exactOptional(v.nullable(v.pipe(v.string(), v.isoTimestamp())));
 
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
@@ -136,6 +141,7 @@ export const AuthAcceptContract = oc.$meta({
 	secure: true,
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/auth/accept', tags: ['auth'] }).errors({ ...commonErrors, 'NO_SUCH_SESSION': { status: 400, data: apiErrorData } }).input(objectInput({
 	"token": v.string(),
+	expiresAt: tokenExpiryInput,
 })).output(v.void());
 
 export const AuthSessionGenerateContract = oc.$meta({
@@ -271,6 +277,7 @@ export const IAppsContract = oc.$meta({
 		"id": v.pipe(v.string(), v.metadata({ "format": "misskey:id" })),
 		"name": v.optional(v.string()),
 		"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
+		expiresAt: v.nullable(v.pipe(v.string(), v.isoTimestamp())),
 		"lastUsedAt": v.optional(v.pipe(v.string(), v.metadata({ "format": "date-time" }))),
 		"permission": v.pipe(v.array(v.string()), v.metadata({ "uniqueItems": true })),
 		"iconUrl": v.exactOptional(v.nullable(v.string())),
@@ -302,6 +309,25 @@ export const IChangePasswordContract = oc.$meta({
 	"newPassword": v.pipe(v.string(), v.minCodePoints(1)),
 	"token": v.exactOptional(v.nullable(v.string())),
 })).output(v.void());
+
+const freshPasswordMetadata = { requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-password-change' } } as const;
+const freshPasswordErrors = { ...commonErrors, FRESH_REAUTHENTICATION_FAILED: { status: 403, data: apiErrorData } } as const;
+export const IChangePasswordPasskeyStartContract = oc.$meta({ ...freshPasswordMetadata, requestName: 'i/change-password/passkey/start' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/change-password/passkey/start', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ currentPassword: v.pipe(v.string(), v.minLength(1), v.maxLength(1024)) }))
+	.output(v.strictObject({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), options: webAuthnAuthenticationOptionsSchema }));
+export const IChangePasswordPasskeyCompleteContract = oc.$meta({ ...freshPasswordMetadata, requestName: 'i/change-password/passkey/complete' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/change-password/passkey/complete', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), credential: webAuthnAuthenticationResponseSchema, newPassword: v.pipe(v.string(), v.minCodePoints(1), v.maxLength(1024)) })).output(v.void());
+
+const freshTokenMetadata = { requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-token-regeneration' } } as const;
+export const IRegenerateTokenPasskeyStartContract = oc.$meta({ ...freshTokenMetadata, requestName: 'i/regenerate-token/passkey/start' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/regenerate-token/passkey/start', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ currentPassword: v.pipe(v.string(), v.minLength(1), v.maxLength(1024)) }))
+	.output(v.strictObject({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), options: webAuthnAuthenticationOptionsSchema }));
+export const IRegenerateTokenPasskeyCompleteContract = oc.$meta({ ...freshTokenMetadata, requestName: 'i/regenerate-token/passkey/complete' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/regenerate-token/passkey/complete', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), credential: webAuthnAuthenticationResponseSchema })).output(v.void());
 
 export const IRegenerateTokenContract = oc.$meta({
 	requestName: 'i/regenerate-token',
@@ -337,6 +363,16 @@ export const ISigninHistoryContract = oc.$meta({
 	"sinceDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 	"untilDate": v.exactOptional(v.pipe(v.number(), v.integer())),
 })).output(v.array(packedSigninSchema));
+
+const freshEmailMetadata = { requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-email-change' } } as const;
+const freshEmailTarget = v.nullable(v.pipe(v.string(), v.maxLength(320)));
+export const IUpdateEmailPasskeyStartContract = oc.$meta({ ...freshEmailMetadata, requestName: 'i/update-email/passkey/start' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/update-email/passkey/start', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ currentPassword: v.pipe(v.string(), v.minLength(1), v.maxLength(1024)), email: freshEmailTarget }))
+	.output(v.strictObject({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), options: webAuthnAuthenticationOptionsSchema }));
+export const IUpdateEmailPasskeyCompleteContract = oc.$meta({ ...freshEmailMetadata, limit: { duration: 3_600_000, max: 3, key: 'i/update-email' }, requestName: 'i/update-email/passkey/complete' } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/update-email/passkey/complete', tags: ['account'] }).errors(freshPasswordErrors)
+	.input(objectInput({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), credential: webAuthnAuthenticationResponseSchema, email: freshEmailTarget })).output(v.void());
 
 export const IUpdateEmailContract = oc.$meta({
 	requestName: 'i/update-email',
@@ -396,6 +432,7 @@ export const MiauthGenTokenContract = oc.$meta({
 	secure: true,
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/miauth/gen-token', tags: ['auth'] }).errors({ ...commonErrors }).input(objectInput({
 	"session": v.nullable(v.string()),
+	expiresAt: tokenExpiryInput,
 	"name": v.exactOptional(v.nullable(v.string())),
 	"description": v.exactOptional(v.nullable(v.string())),
 	"iconUrl": v.exactOptional(v.nullable(v.string())),
@@ -473,6 +510,8 @@ export const ISignoutContract = oc.$meta({ requestName: 'i/signout', requireCred
 	.input(objectInput({})).output(v.void());
 
 export const authContract = {
+	...sudoContract,
+	...securitySettingsContract,
 	'admin/accounts/create': AdminAccountsCreateContract,
 	'admin/captcha/current': AdminCaptchaCurrentContract,
 	'admin/captcha/save': AdminCaptchaSaveContract,
@@ -506,13 +545,19 @@ export const authContract = {
 	'i/apps': IAppsContract,
 	'i/authorized-apps': IAuthorizedAppsContract,
 	'i/change-password': IChangePasswordContract,
+	'i/change-password/passkey/start': IChangePasswordPasskeyStartContract,
+	'i/change-password/passkey/complete': IChangePasswordPasskeyCompleteContract,
 	'i/regenerate-token': IRegenerateTokenContract,
+	'i/regenerate-token/passkey/start': IRegenerateTokenPasskeyStartContract,
+	'i/regenerate-token/passkey/complete': IRegenerateTokenPasskeyCompleteContract,
 	'i/revoke-token': IRevokeTokenContract,
 	'i/signin-history': ISigninHistoryContract,
 	'i/sessions': ISessionsContract,
 	'i/sessions/revoke': ISessionsRevokeContract,
 	'i/signout': ISignoutContract,
 	'i/update-email': IUpdateEmailContract,
+	'i/update-email/passkey/start': IUpdateEmailPasskeyStartContract,
+	'i/update-email/passkey/complete': IUpdateEmailPasskeyCompleteContract,
 	'invite/create': InviteCreateContract,
 	'invite/delete': InviteDeleteContract,
 	'invite/limit': InviteLimitContract,
@@ -548,8 +593,8 @@ export const authSessionsContract = {
 	} as const).route({ method: 'POST', path: '/signin-flow', tags: ['auth'], }).errors(httpErrors).input(packedOptionalJsonValueSchema).output(v.union([v.union([
 	finishedSigninSchema,
 	v.strictObject({ finished: v.literal(false), next: v.picklist(['captcha', 'password']) }),
-	v.strictObject({ finished: v.literal(false), next: v.literal('totp'), availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
-	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authRequest: webAuthnAuthenticationOptionsSchema, availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('totp'), authenticationProgress: v.exactOptional(signinProgressChallengeSchema), availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authenticationProgress: v.exactOptional(signinProgressChallengeSchema), authRequest: webAuthnAuthenticationOptionsSchema, availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
 ]), sessionFailureSchema, v.void()])),
 	signinWithPasskey: oc.$meta({
 		requestName: 'signin-with-passkey',
@@ -557,6 +602,7 @@ export const authSessionsContract = {
 	} as const).route({ method: 'POST', path: '/signin-with-passkey', tags: ['auth'], }).errors(httpErrors).input(packedOptionalJsonValueSchema).output(v.union([
 	v.strictObject({ option: webAuthnAuthenticationOptionsSchema, context: v.string() }),
 	v.strictObject({ signinResponse: finishedSigninSchema }), sessionFailureSchema,
+		v.strictObject({ passwordFlowRequired: v.literal(true) }),
 ])),
 };
 

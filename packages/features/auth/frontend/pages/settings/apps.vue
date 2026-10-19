@@ -28,6 +28,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<template #key>{{ $locale.sfc.installedDate }}</template>
 								<template #value><MkTime :time="token.createdAt" :mode="'detail'"/></template>
 							</MkKeyValue>
+							<MkKeyValue oneline>
+								<template #key>{{ $locale.sfc.tokenExpiry }}</template>
+								<template #value><MkTime v-if="token.expiresAt" :time="token.expiresAt" :mode="'detail'"/><span v-else>{{ $locale.sfc.unbounded }}</span></template>
+							</MkKeyValue>
 							<MkKeyValue v-if="token.lastUsedAt != null" oneline>
 								<template #key>{{ $locale.sfc.lastUsedDate }}</template>
 								<template #value><MkTime :time="token.lastUsedAt" :mode="'detail'"/></template>
@@ -1200,7 +1204,9 @@ definePage(() => ({
 		"write:chat": "ダイレクトメッセージを操作する",
 		"read:chat": "ダイレクトメッセージを閲覧する"
 	},
-	"installedApps": "インストールされたアプリ"
+	"installedApps": "インストールされたアプリ",
+	"tokenExpiry": "アクセストークンの有効期限",
+	"unbounded": "無期限"
 }
 </locale>
 

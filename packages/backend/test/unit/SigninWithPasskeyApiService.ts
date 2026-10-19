@@ -89,6 +89,7 @@ describe('SigninWithPasskeyApiService', () => {
 			config: app.get<SigninWithPasskeyDependencies['config']>(DI.config),
 			usersRepository: app.get<SigninWithPasskeyDependencies['usersRepository']>(DI.usersRepository),
 			userProfilesRepository: app.get<SigninWithPasskeyDependencies['userProfilesRepository']>(DI.userProfilesRepository),
+			userSecurityKeysRepository: app.get<SigninWithPasskeyDependencies['userSecurityKeysRepository']>(DI.userSecurityKeysRepository),
 			signinsRepository: app.get<SigninWithPasskeyDependencies['signinsRepository']>(DI.signinsRepository),
 			idService: app.get<SigninWithPasskeyDependencies['idService']>(IdService),
 			rateLimiterService: app.get<SigninWithPasskeyDependencies['rateLimiterService']>(RateLimiterService),
@@ -107,7 +108,10 @@ describe('SigninWithPasskeyApiService', () => {
 		FakeWebauthnVerify = async () => {
 			return uid;
 		};
-		vi.spyOn(webAuthnService, 'verifySignInWithPasskeyAuthentication').mockImplementation(FakeWebauthnVerify);
+		vi.spyOn(webAuthnService, 'verifySignInWithPasskeyWithProof').mockImplementation(async (_context, _response, before) => {
+			const key = { id: `AQID${uid}`, userId: uid, publicKey: 'AQID', userVerified: true, deadline: performance.now() + 90_000 };
+			return { key, expected: await before(key) };
+		});
 		vi.spyOn(webAuthnService, 'initiateSignInWithPasskeyAuthentication');
 
 		const dummyUser = {
@@ -120,6 +124,7 @@ describe('SigninWithPasskeyApiService', () => {
 		};
 		await createUser(dummyUser);
 		await createUserProfile(dummyProfile);
+		await app.get<SigninWithPasskeyDependencies['userSecurityKeysRepository']>(DI.userSecurityKeysRepository).insert({ id: `AQID${uid}`, userId: uid, publicKey: 'AQID', name: 'Synthetic' });
 	});
 
 	afterAll(async () => {
@@ -150,8 +155,8 @@ describe('SigninWithPasskeyApiService', () => {
 			const res_body = await call(passkeyProcedure, req.body, { context: { request: req, effects: res, response: {} } });
 			if (!('signinResponse' in res_body)) throw new Error('Expected successful sign-in');
 			expect(res_body.signinResponse).toBeDefined();
-			expect(webAuthnService.verifySignInWithPasskeyAuthentication).toHaveBeenCalledWith(dummyContext, { dummy: [] });
-			expect(signin).toHaveBeenCalledWith(req, res, expect.objectContaining({ id: await FakeWebauthnVerify() }));
+			expect(webAuthnService.verifySignInWithPasskeyWithProof).toHaveBeenCalledWith(dummyContext, { dummy: [] }, expect.any(Function));
+			expect(signin).toHaveBeenCalledWith(req, res, expect.objectContaining({ id: await FakeWebauthnVerify() }), expect.objectContaining({ mode: 'passwordless', factor: 'passkey' }));
 		});
 
 		it('Should return 400 Without Auth Context', async () => {
@@ -175,7 +180,7 @@ describe('SigninWithPasskeyApiService', () => {
 		it('Should return 403 When Challenge Verify fail', async () => {
 			const req = new DummyRequest({ context: dummyContext, credential: { dummy: [] } });
 			const res = new DummyReply();
-			vi.spyOn(webAuthnService, 'verifySignInWithPasskeyAuthentication')
+			vi.spyOn(webAuthnService, 'verifySignInWithPasskeyWithProof')
 				.mockImplementation(async () => {
 					throw new IdentifiableError('THIS_ERROR_CODE_SHOULD_BE_FORWARDED');
 				});

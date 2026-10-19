@@ -1,0 +1,296 @@
+[
+  {
+    "file": "packages/features/auth/frontend/pages/settings/security.vue",
+    "baselineRef": "1b2fb81c2d",
+    "baselineSha256": "2e165c8aca00f3adf5c8222dd9c6ac90dc031dd34f6783ed764a639d54933423",
+    "currentSha256": "334d8a07e40775dbd9b93beb3728f12238b83a86b1fe3e8a9e2f594601f9f7f9",
+    "edits": [
+      {
+        "start": 589,
+        "end": 660,
+        "baseline": "\t\t\t\t\t<MkButton primary :disabled=\"changingPassword\" @click=\"change(false)\">\n",
+        "current": "\t\t\t\t\t<MkButton primary :disabled=\"changingPassword\" @click=\"change()\">\n"
+      },
+      {
+        "start": 763,
+        "end": 763,
+        "baseline": "\t\t\t\t<MkButton v-if=\"canUsePasskey\" :disabled=\"changingPassword\" @click=\"change(true)\">{{ $locale.sfc.changePasswordWithPasskey }}</MkButton>\n",
+        "current": ""
+      },
+      {
+        "start": 800,
+        "end": 889,
+        "baseline": "\t\t<X2fa/>\n",
+        "current": "\t\t<MkSecuritySettings v-if=\"individualSession\"/>\n\t\t<X2fa v-else/>\n\t\t<MkBrowserSessions/>\n"
+      },
+      {
+        "start": 1754,
+        "end": 1939,
+        "baseline": "\t\t\t\t\t<MkButton danger :disabled=\"changingPassword\" @click=\"regenerateToken(false)\"><i class=\"ti ti-refresh\"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>\n\t\t\t\t\t<MkButton v-if=\"canUsePasskey\" danger :disabled=\"changingPassword\" @click=\"regenerateToken(true)\">{{ $locale.sfc.regenerateLoginTokenWithPasskey }}</MkButton>\n",
+        "current": "\t\t\t\t\t<MkButton danger :disabled=\"changingPassword\" @click=\"regenerateToken()\"><i class=\"ti ti-refresh\"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>\n"
+      },
+      {
+        "start": 2138,
+        "end": 2414,
+        "baseline": "import { computed, markRaw, onActivated, onDeactivated, onUnmounted, ref } from 'vue';\nimport { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';\n",
+        "current": "import { computed, markRaw, onActivated, onDeactivated, onUnmounted, ref, watch } from 'vue';\nimport MkBrowserSessions from '@features/auth/frontend/components/MkBrowserSessions.vue';\nimport MkSecuritySettings from '@features/auth/frontend/components/MkSecuritySettings.vue';\n"
+      },
+      {
+        "start": 3053,
+        "end": 3299,
+        "baseline": "",
+        "current": "import { signout } from '@features/auth/frontend/signout.js';\nimport { ownedInputText, ownedAuthenticateDialog } from '@features/auth/frontend/utility/owned-dialog.js';\nimport { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';\n"
+      },
+      {
+        "start": 3360,
+        "end": 3443,
+        "baseline": "",
+        "current": "\nconst individualSession = computed(() => ensureSignin().token.startsWith('bs_'));\n"
+      },
+      {
+        "start": 3523,
+        "end": 3693,
+        "baseline": "const canUsePasskey = computed(() => {\n\tconst account = ensureSignin();\n\treturn account.token?.startsWith('bs_') && (account.securityKeysList?.length ?? 0) > 0 && browserSupportsWebAuthn();\n});\n",
+        "current": "const ownerId = ensureSignin().id;\nconst ownerToken = ensureSignin().token;\nconst sameActor = () => ensureSignin().id === ownerId && ensureSignin().token === ownerToken;\n"
+      },
+      {
+        "start": 3780,
+        "end": 3941,
+        "baseline": "const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; };\n",
+        "current": "let sudoAbort: AbortController | null = null;\nconst invalidateCeremony = () => { disposed = true; ceremonyGeneration++; sudoAbort?.abort(); sudoAbort = null; };\n"
+      },
+      {
+        "start": 4051,
+        "end": 4177,
+        "baseline": "",
+        "current": "watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!sameActor()) invalidateCeremony(); }, { flush: 'sync' });\n"
+      },
+      {
+        "start": 4178,
+        "end": 4204,
+        "baseline": "async function change(usePasskey: boolean) {\n",
+        "current": "async function change() {\n"
+      },
+      {
+        "start": 4327,
+        "end": 4517,
+        "baseline": "\ttry { await collectAndChangePassword(usePasskey, () => !disposed && generation === ceremonyGeneration); } finally { changingPassword.value = false; }\n",
+        "current": "\tsudoAbort = new AbortController();\n\ttry { await collectAndChangePassword(() => !disposed && generation === ceremonyGeneration && sameActor()); } finally { changingPassword.value = false; }\n"
+      },
+      {
+        "start": 4520,
+        "end": 5525,
+        "baseline": "async function collectAndChangePassword(usePasskey: boolean, isCurrent: () => boolean) {\n\tconst { canceled, result: currentPassword } = await os.inputText({\n",
+        "current": "async function collectAndChangePassword(isCurrent: () => boolean) {\n\tif (individualSession.value) {\n\t\tif (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;\n\t\tconst password = await ownedInputText({ title: $locale.value.sfc.newPassword, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);\n\t\tif (!isCurrent() || password.canceled || !password.result) return;\n\t\tconst repeated = await ownedInputText({ title: $locale.value.sfc.newPasswordRetype, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);\n\t\tif (!isCurrent() || repeated.canceled || !repeated.result) return;\n\t\tif (password.result !== repeated.result) { await os.alert({ type: 'error', text: $locale.value.sfc.retypedNotMatch }); return; }\n\t\tawait os.apiWithDialog('i/security/password', { newPassword: password.result });\n\t\tif (isCurrent()) await signout('credentials-changed');\n\t\treturn;\n\t}\n\tconst { canceled, result: currentPassword } = await ownedInputText({\n"
+      },
+      {
+        "start": 5634,
+        "end": 5658,
+        "baseline": "\t});\n",
+        "current": "\t}, sudoAbort?.signal);\n"
+      },
+      {
+        "start": 5751,
+        "end": 5828,
+        "baseline": "\tconst { canceled: canceled2, result: newPassword } = await os.inputText({\n",
+        "current": "\tconst { canceled: canceled2, result: newPassword } = await ownedInputText({\n"
+      },
+      {
+        "start": 5920,
+        "end": 5944,
+        "baseline": "\t});\n",
+        "current": "\t}, sudoAbort?.signal);\n"
+      },
+      {
+        "start": 6008,
+        "end": 6086,
+        "baseline": "\tconst { canceled: canceled3, result: newPassword2 } = await os.inputText({\n",
+        "current": "\tconst { canceled: canceled3, result: newPassword2 } = await ownedInputText({\n"
+      },
+      {
+        "start": 6184,
+        "end": 6208,
+        "baseline": "\t});\n",
+        "current": "\t}, sudoAbort?.signal);\n"
+      },
+      {
+        "start": 6405,
+        "end": 6406,
+        "baseline": "\tif (usePasskey) {\n\t\tif (!canUsePasskey.value) return;\n\t\tconst started = await os.apiWithDialog('i/change-password/passkey/start', { currentPassword });\n\t\tif (!isCurrent()) return;\n\t\tlet credential;\n\t\ttry {\n\t\t\tcredential = await os.promiseDialog(startAuthentication({ optionsJSON: started.options }), null, () => {});\n\t\t} catch (error) {\n\t\t\tconst failure = error instanceof Error && error.cause instanceof Error ? error.cause : error;\n\t\t\tif (!(failure instanceof Error) || !['NotAllowedError', 'AbortError'].includes(failure.name)) {\n\t\t\t\tawait os.alert({ type: 'error', text: error instanceof Error ? error.message : String(error) });\n\t\t\t}\n\t\t\treturn;\n\t\t}\n\t\tif (!isCurrent() || !credential) return;\n\t\tawait os.apiWithDialog('i/change-password/passkey/complete', { ticket: started.ticket, credential, newPassword });\n\t\treturn;\n\t}\n",
+        "current": "\n"
+      },
+      {
+        "start": 6481,
+        "end": 6567,
+        "baseline": "\t\tconst auth = await os.authenticateDialog({ currentPassword });\n",
+        "current": "\t\tconst auth = await ownedAuthenticateDialog({ currentPassword }, sudoAbort?.signal);\n"
+      },
+      {
+        "start": 6743,
+        "end": 6778,
+        "baseline": "async function regenerateToken(usePasskey: boolean) {\n",
+        "current": "async function regenerateToken() {\n"
+      },
+      {
+        "start": 6901,
+        "end": 7025,
+        "baseline": "\tconst isCurrent = () => !disposed && generation === ceremonyGeneration;\n",
+        "current": "\tsudoAbort = new AbortController();\n\tconst isCurrent = () => !disposed && generation === ceremonyGeneration && sameActor();\n"
+      },
+      {
+        "start": 7032,
+        "end": 7439,
+        "baseline": "\t\tif (usePasskey) {\n\t\t\tif (!canUsePasskey.value) return;\n\t\t\tconst password = await os.inputText({ title: $locale.value.sfc.password, type: 'password', autocomplete: 'current-password', minLength: 1 });\n\t\t\tif (!isCurrent() || password.canceled || !password.result) return;\n\t\t\tconst started = await os.apiWithDialog('i/regenerate-token/passkey/start', { currentPassword: password.result });\n\t\t\tif (!isCurrent()) return;\n\t\t\tlet credential;\n\t\t\ttry {\n\t\t\t\tcredential = await os.promiseDialog(startAuthentication({ optionsJSON: started.options }), null, () => {});\n\t\t\t} catch (error) {\n\t\t\t\tconst failure = error instanceof Error && error.cause instanceof Error ? error.cause : error;\n\t\t\t\tif (isCurrent() && (!(failure instanceof Error) || !['NotAllowedError', 'AbortError'].includes(failure.name))) await os.alert({ type: 'error', text: error instanceof Error ? error.message : String(error) });\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tif (!isCurrent() || !credential) return;\n\t\t\tawait os.apiWithDialog('i/regenerate-token/passkey/complete', { ticket: started.ticket, credential });\n",
+        "current": "\t\tif (individualSession.value) {\n\t\t\tif (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;\n\t\t\tconst confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.regenerateLoginTokenDescription });\n\t\t\tif (!isCurrent() || confirmation.canceled) return;\n\t\t\tawait os.apiWithDialog('i/security/regenerate-token', {});\n\t\t\tif (isCurrent()) await signout('credentials-changed');\n"
+      },
+      {
+        "start": 7454,
+        "end": 7524,
+        "baseline": "\t\tconst auth = await os.authenticateDialog();\n",
+        "current": "\n\t\tconst auth = await ownedAuthenticateDialog({}, sudoAbort?.signal);\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/pages/settings/email.vue",
+    "baselineRef": "1b2fb81c2d",
+    "baselineSha256": "b7fa43e841ff85e6c754fe4b84bcdc527fb26895d05cbe82d3ef27ee82200aa9",
+    "currentSha256": "25dc932b19ed3d7e8ab0bddc5c58966a1a39779da1ec4884bb15176417d67a9a",
+    "edits": [
+      {
+        "start": 1038,
+        "end": 1153,
+        "baseline": "\t\t\t\t\t\t<MkButton primary :disabled=\"savingEmail\" @click=\"saveEmailAddress(false)\">{{ $locale.sfc.saveEmail }}</MkButton>\n\t\t\t\t\t\t<MkButton v-if=\"canUsePasskey\" :disabled=\"savingEmail\" @click=\"saveEmailAddress(true)\">{{ $locale.sfc.saveEmailWithPasskey }}</MkButton>\n",
+        "current": "\t\t\t\t\t\t<MkButton primary :disabled=\"savingEmail\" @click=\"saveEmailAddress()\">{{ $locale.sfc.saveEmail }}</MkButton>\n"
+      },
+      {
+        "start": 2539,
+        "end": 2539,
+        "baseline": "import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';\n",
+        "current": ""
+      },
+      {
+        "start": 3103,
+        "end": 3271,
+        "baseline": "",
+        "current": "import { ownedAuthenticateDialog } from '@features/auth/frontend/utility/owned-dialog.js';\nimport { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';\n"
+      },
+      {
+        "start": 3661,
+        "end": 3783,
+        "baseline": "const canUsePasskey = computed(() => $i.token?.startsWith('bs_') && ($i.securityKeysList?.length ?? 0) > 0 && browserSupportsWebAuthn());\n",
+        "current": "const individualSession = computed(() => $i.token.startsWith('bs_'));\nconst ownerId = $i.id;\nconst ownerToken = $i.token;\n"
+      },
+      {
+        "start": 3865,
+        "end": 4026,
+        "baseline": "const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; };\n",
+        "current": "let sudoAbort: AbortController | null = null;\nconst invalidateCeremony = () => { disposed = true; ceremonyGeneration++; sudoAbort?.abort(); sudoAbort = null; };\n"
+      },
+      {
+        "start": 4136,
+        "end": 4318,
+        "baseline": "",
+        "current": "watch(() => [ensureSignin().id, ensureSignin().token], () => { if (ensureSignin().id !== ownerId || ensureSignin().token !== ownerToken) invalidateCeremony(); }, { flush: 'sync' });\n"
+      },
+      {
+        "start": 4319,
+        "end": 4355,
+        "baseline": "async function saveEmailAddress(usePasskey: boolean) {\n",
+        "current": "async function saveEmailAddress() {\n"
+      },
+      {
+        "start": 4468,
+        "end": 4649,
+        "baseline": "\tconst isCurrent = () => !disposed && generation === ceremonyGeneration;\n",
+        "current": "\tsudoAbort = new AbortController();\n\tconst isCurrent = () => !disposed && generation === ceremonyGeneration && ensureSignin().id === ownerId && ensureSignin().token === ownerToken;\n"
+      },
+      {
+        "start": 4809,
+        "end": 4991,
+        "baseline": "\t\tif (usePasskey) {\n\t\t\tif (!canUsePasskey.value) return;\n\t\t\tconst password = await os.inputText({ title: $locale.value.sfc.currentPasswordPrompt, type: 'password', autocomplete: 'current-password', minLength: 1 });\n\t\t\tif (!isCurrent() || password.canceled || !password.result) return;\n\t\t\tconst started = await os.apiWithDialog('i/update-email/passkey/start', { currentPassword: password.result, email });\n\t\t\tif (!isCurrent()) return;\n\t\t\tlet credential;\n\t\t\ttry { credential = await startAuthentication({ optionsJSON: started.options }); } catch { return; }\n\t\t\tif (!isCurrent()) return;\n\t\t\tawait os.apiWithDialog('i/update-email/passkey/complete', { ticket: started.ticket, credential, email });\n\t\t} else {\n\t\t\tconst auth = await os.authenticateDialog();\n\t\t\tif (!isCurrent() || auth.canceled) return;\n\t\t\tawait os.apiWithDialog('i/update-email', { password: auth.result.password, token: auth.result.token, email });\n",
+        "current": "\t\tif (individualSession.value) {\n\t\t\tif (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;\n\t\t\tawait os.apiWithDialog('i/security/email', { email });\n\t\t\treturn;\n"
+      },
+      {
+        "start": 4995,
+        "end": 5224,
+        "baseline": "",
+        "current": "\n\t\tconst auth = await ownedAuthenticateDialog({}, sudoAbort?.signal);\n\t\tif (!isCurrent() || auth.canceled) return;\n\t\tawait os.apiWithDialog('i/update-email', { password: auth.result.password, token: auth.result.token, email });\n\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/pages/settings/other.vue",
+    "currentSha256": "d82b3bd5ae4bd536b2be70c4f9d5ae30703e8f4d3c156d09db7e5ab70917e6b5",
+    "baselineSha256": "0179773c6f0b93ea9088624bd3cfeebaef9106cb9e15049288ca6d079e272541",
+    "edits": [
+      {
+        "start": 2894,
+        "end": 3064,
+        "current": "\t\t\t\t\t\t<MkButton v-if=\"!$i.isDeleted\" danger :disabled=\"deletingAccount\" @click=\"deleteAccount\"><SearchText>{{ $locale.sfc.requestAccountDelete }}</SearchText></MkButton>\n",
+        "baseline": "\t\t\t\t\t\t<MkButton v-if=\"!$i.isDeleted\" danger @click=\"deleteAccount\"><SearchText>{{ $locale.sfc.requestAccountDelete }}</SearchText></MkButton>\n"
+      },
+      {
+        "start": 5766,
+        "end": 5843,
+        "current": "import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 5891,
+        "end": 5976,
+        "current": "import { computed, watch, ref, onActivated, onDeactivated, onUnmounted } from 'vue';\n",
+        "baseline": "import { computed, watch } from 'vue';\n"
+      },
+      {
+        "start": 8060,
+        "end": 8410,
+        "current": "const deletingAccount = ref(false);\nlet deletionActive = true;\nlet deletionGeneration = 0;\nlet deletionAbort: AbortController | null = null;\nconst leaveDeletion = () => { deletionActive = false; deletionGeneration++; deletionAbort?.abort(); };\nonDeactivated(leaveDeletion); onUnmounted(leaveDeletion);\nonActivated(() => { deletionActive = true; });\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 8443,
+        "end": 9416,
+        "current": "\tif (deletingAccount.value || !deletionActive) return;\n\tdeletingAccount.value = true;\n\tconst ownerId = $i.id; const ownerToken = $i.token;\n\tconst generation = ++deletionGeneration;\n\tconst controller = new AbortController(); deletionAbort = controller;\n\tconst isCurrent = () => deletionActive && generation === deletionGeneration && $i.id === ownerId && $i.token === ownerToken;\n\ttry {\n\t\tconst confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.deleteAccountConfirm });\n\t\tif (!isCurrent() || confirmation.canceled) return;\n\t\tif (!await ensureSudo(isCurrent, controller.signal) || !isCurrent()) return;\n\t\tawait os.apiWithDialog('i/security/account/delete', { acknowledged: true });\n\t\tif (!isCurrent()) return;\n\t\tawait os.alert({ title: $locale.value.sfc.started });\n\t\tif (isCurrent()) await signout('account-deletion-accepted');\n\t} finally { controller.abort(); deletingAccount.value = false; if (deletionAbort === controller) deletionAbort = null; }\n",
+        "baseline": "\t{\n\t\tconst { canceled } = await os.confirm({\n\t\t\ttype: 'warning',\n\t\t\ttext: $locale.value.sfc.deleteAccountConfirm,\n\t\t});\n\t\tif (canceled) return;\n\t}\n\n\tconst auth = await os.authenticateDialog();\n\tif (auth.canceled) return;\n\n\tawait os.apiWithDialog('i/delete-account', {\n\t\tpassword: auth.result.password,\n\t\ttoken: auth.result.token,\n\t});\n\n\tawait os.alert({\n\t\ttitle: $locale.value.sfc.started,\n\t});\n\n\tawait signout('account-deletion-accepted');\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.conditional.vue",
+    "currentSha256": "337e8e80ed127cfb2447dc6260c457346ee801b17a773a6c91ce51571e8d8d0c",
+    "baselineSha256": "10265dbeaebced8409689060c716d5deec0482299005a9dc1510c24c85712f49",
+    "edits": [
+      {
+        "start": 205,
+        "end": 388,
+        "current": "\t<MkSignin ref=\"manualSignin\" :autoSet=\"autoSet\" :message=\"message\" :openOnRemote=\"openOnRemote\" :initialUsername=\"initialUsername\" @login=\"onManualLogin\" @manual=\"cancelForManual\"/>\n",
+        "baseline": "\t<MkSignin ref=\"manualSignin\" :autoSet=\"autoSet\" :message=\"message\" :openOnRemote=\"openOnRemote\" :initialUsername=\"initialUsername\" @login=\"onManualLogin\"/>\n"
+      },
+      {
+        "start": 464,
+        "end": 494,
+        "current": "import { $i } from '../i.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 1140,
+        "end": 1224,
+        "current": "// The login dialog and named authorization entry explicitly opt into this surface.\n",
+        "baseline": "// Separate opt-in surface: existing callers continue using the ordinary MkSignin.\n"
+      },
+      {
+        "start": 3091,
+        "end": 3321,
+        "current": "function cancelForManual() { manual = true; cancelAutofill(); }\nconst actor = () => JSON.stringify([$i?.id ?? null, $i?.token ?? null]);\nwatch(actor, cancelForManual, { flush: 'sync' });\ndefineExpose({ cancel: cancelForManual });\n",
+        "baseline": ""
+      },
+      {
+        "start": 3461,
+        "end": 3481,
+        "current": "\tcancelForManual();\n",
+        "baseline": "\tmanual = true;\n\tcancelAutofill();\n"
+      }
+    ]
+  }
+]

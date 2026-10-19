@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { legacyManagementOnly } from '../../../legacy-management.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import { assertLegacyMfaManagement } from '../../../mfa-policy.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { WebAuthnService } from '../../../services/WebAuthnService.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -44,7 +46,7 @@ export interface I2faRegisterKeyDependencies {
 	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
 }
 export function createI2faRegisterKeyProcedure(deps: I2faRegisterKeyDependencies) {
-	return createApiProcedure<MiLocalUser>()(I2faRegisterKeyContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faRegisterKeyContract).use(requirePrincipal<MiLocalUser>()).use(legacyManagementOnly()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
@@ -59,6 +61,7 @@ export function createI2faRegisterKeyProcedure(deps: I2faRegisterKeyDependencies
 			if (profile == null) {
 				throw apiError(meta.errors.userNotFound);
 			}
+			assertLegacyMfaManagement(profile);
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {

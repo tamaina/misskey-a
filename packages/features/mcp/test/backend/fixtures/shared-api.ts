@@ -132,5 +132,5 @@ export async function fixture() {
 	const request = (credential: string | undefined = grant.token) => ({ credential, ip: '127.0.0.1', headers: {} });
 	const invoke = (input: unknown = {}, credential: string | undefined = grant.token) => module.get(McpApiService).invoke('list_my_notes', input, request(credential));
 	const ordinary = (input: object, credential = grant.token, name = 'users/notes') => http.inject({ method: 'POST', url: `/api/${name}`, payload: { ...input, i: credential } });
-	return { cache, users, apps, appDeps, http, own, otherId, grant, appGrant, app, rows, tokens, deps, blocked, module, invoke, ordinary, request, router, logger, telemetry, reactions, notes, roles, ads, moderation };
+	return { browserSessions, cache, users, apps, appDeps, http, own, otherId, grant, appGrant, app, rows, tokens, deps, blocked, module, invoke, ordinary, request, router, logger, telemetry, reactions, notes, roles, ads, moderation };
 }

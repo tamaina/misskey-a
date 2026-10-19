@@ -10,6 +10,7 @@ import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { MiBrowserSession } from '../../backend/models/BrowserSession.js';
+import { SudoPolicy1792300000001 } from '../../../../backend/migration/1792300000001-SudoPolicy.js';
 import { BrowserSession1791849600000 } from '../../../../backend/migration/1791849600000-BrowserSession.js';
 
 class MetadataSource extends DataSource {
@@ -18,12 +19,12 @@ class MetadataSource extends DataSource {
 	}
 }
 
-test('browser session entity metadata matches the additive migration without connecting to a database', async () => {
+test('browser session entity metadata matches the additive migrations without connecting to a database', async () => {
 	const source = new MetadataSource({ type: 'postgres', entities, synchronize: false, dropSchema: false });
 	await source.prepare();
 	const metadata = source.getMetadata(MiBrowserSession);
 	expect(metadata.tableName).toBe('browser_session');
-	expect(metadata.columns.map(column => column.databaseName)).toEqual(['id', 'userId', 'tokenHash', 'createdAt', 'lastUsedAt', 'revokedAt', 'sudoUntil']);
+	expect(metadata.columns.map(column => column.databaseName)).toEqual(['id', 'userId', 'tokenHash', 'createdAt', 'lastUsedAt', 'revokedAt', 'sudoUntil', 'sudoGrantId', 'sudoPolicyStamp']);
 	expect(metadata.primaryColumns[0].primaryKeyConstraintName).toBe('PK_browser_session');
 	expect(metadata.foreignKeys[0]).toMatchObject({ name: 'FK_browser_session_userId', onDelete: 'CASCADE', referencedTablePath: 'user' });
 	expect(metadata.indices.map(index => ({ name: index.name, unique: index.isUnique }))).toEqual([
@@ -38,8 +39,17 @@ test('browser session entity metadata matches the additive migration without con
 	expect(statements).toHaveLength(3);
 	expect(statements[0]).toContain('CREATE TABLE "browser_session"');
 	expect(statements[0]).toContain('FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE');
-	for (const column of metadata.columns) expect(statements[0]).toContain(`"${column.databaseName}"`);
+	for (const column of metadata.columns.filter(value => !['sudoGrantId', 'sudoPolicyStamp'].includes(value.databaseName))) expect(statements[0]).toContain(`"${column.databaseName}"`);
 	for (const index of metadata.indices) expect(statements.slice(1).join('\n')).toContain(`"${index.name}"`);
+	expect(metadata.findColumnWithPropertyName('sudoGrantId')).toMatchObject({ isSelect: false, length: '43', isNullable: true });
+	expect(metadata.findColumnWithPropertyName('sudoPolicyStamp')).toMatchObject({ isSelect: false, length: '64', isNullable: true });
+	runner.query.mockClear();
+	await new SudoPolicy1792300000001().up(runner);
+	expect(runner.query.mock.calls).toEqual([
+		['ALTER TABLE "browser_session" ADD "sudoGrantId" character varying(43)'],
+		['ALTER TABLE "browser_session" ADD "sudoPolicyStamp" character varying(64)'],
+		['UPDATE "browser_session" SET "sudoUntil" = NULL'],
+	]);
 	runner.query.mockClear();
 	await migration.down(runner);
 	expect(runner.query.mock.calls).toEqual([['DROP TABLE "browser_session"']]);

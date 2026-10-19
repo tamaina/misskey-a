@@ -13,6 +13,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 
 import { MiAbuseUserReport } from '@features/moderation/backend/models/AbuseUserReport.js';
 import { MiAbuseReportNotificationRecipient } from '@features/moderation/backend/models/AbuseReportNotificationRecipient.js';
+import { MiOAuthApproval } from '@features/auth/backend/models/OAuthApproval.js';
 import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { MiAd } from '@features/instance/backend/models/Ad.js';
 import { MiAnnouncement } from '@features/announcements/backend/models/Announcement.js';
@@ -187,6 +188,7 @@ export const entities = [
 	MiAvatarDecoration,
 	MiAuthSession,
 	MiBrowserSession,
+	MiOAuthApproval,
 	MiAccessToken,
 	MiUser,
 	MiUserProfile,

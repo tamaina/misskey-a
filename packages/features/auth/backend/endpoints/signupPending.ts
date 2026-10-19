@@ -20,7 +20,7 @@ export interface SignupPendingDependencies {
 	registrationTicketsRepository: RegistrationTicketsRepository;
 	idService: Pick<IdService, 'parse'>;
 	signupService: Pick<SignupService, 'signup'>;
-	signinService: Pick<SigninService, 'signin'>;
+	signinService: Pick<SigninService, 'signinSignup'>;
 }
 export function createSignupPendingProcedure(deps: SignupPendingDependencies) {
 	return implement(authSessionsContract.signupPending, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
@@ -55,7 +55,7 @@ export function createSignupPendingProcedure(deps: SignupPendingDependencies) {
 						pendingUserId: null,
 					});
 				}
-				return deps.signinService.signin(request, reply, account);
+				return deps.signinService.signinSignup(request, reply, account);
 			} catch (err) {
 				throw new FastifyReplyError(400, typeof err === 'string' ? err : sessionErrorMessage(err));
 			}

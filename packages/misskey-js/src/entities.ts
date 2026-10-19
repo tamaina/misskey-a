@@ -140,7 +140,11 @@ export type SignupPendingResponse = {
 	i: string,
 };
 
+export type SigninProgressChallenge = { ticket: string; browserSecret: string; nonce: string; version: number };
+
 export type SigninFlowRequest = {
+	progressMode?: 'v1';
+	authenticationProgress?: SigninProgressChallenge;
 	username: string;
 	password?: string;
 	token?: string;
@@ -162,12 +166,14 @@ export type SigninFlowResponse = {
 } | {
 	finished: false;
 	next: 'totp';
-	availableFactors?: ('totp' | 'passkey')[];
+	authenticationProgress?: SigninProgressChallenge;
+	availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 } | {
 	finished: false;
 	next: 'passkey';
+	authenticationProgress?: SigninProgressChallenge;
 	authRequest: PublicKeyCredentialRequestOptionsJSON;
-	availableFactors?: ('totp' | 'passkey')[];
+	availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 };
 
 export type SigninWithPasskeyRequest = {
@@ -182,6 +188,10 @@ export type SigninWithPasskeyInitResponse = {
 
 export type SigninWithPasskeyResponse = {
 	signinResponse: SigninFlowResponse & { finished: true };
+	passwordFlowRequired?: never;
+} | {
+	passwordFlowRequired: true;
+	signinResponse?: never;
 };
 
 export type I2faKeyDoneRequest = {
