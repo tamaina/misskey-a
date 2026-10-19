@@ -25,16 +25,22 @@ test('actual Storybook preview setup readies real component locales and installs
 	const create = vi.fn(createInternationalization);
 	const activate = vi.fn(setActiveInternationalization);
 	const initialized: string[] = [];
+	const onUnhandledFrame = vi.fn();
+	const start = vi.fn<(options: { onUnhandledFrame: typeof onUnhandledFrame }) => Promise<void>>().mockResolvedValue();
+	const worker = { start };
+	const setupWorker = vi.fn(() => worker);
+	const mswLoader = vi.fn<(createWorker: () => Promise<unknown>) => () => Promise<unknown>>(createWorker => createWorker);
 	const collaborators: Record<string, unknown> = {
-		'@storybook/core-events': { FORCE_RE_RENDER: 'render', FORCE_REMOUNT: 'remount' },
-		'@storybook/preview-api': { addons: { getChannel: () => ({ emit: vi.fn() }) } },
+		'storybook/internal/core-events': { FORCE_RE_RENDER: 'render', FORCE_REMOUNT: 'remount' },
+		'storybook/preview-api': { addons: { getChannel: () => ({ emit: vi.fn() }) } },
 		'@storybook/vue3': { setup },
 		'virtual:vite-vue-internationalization': { createInternationalization: create, setActiveInternationalization: activate },
 		'@features/boot/frontend/index.js': { startComponentLocales },
 		'chromatic/isChromatic': { default: () => false },
-		'msw-storybook-addon': { initialize: vi.fn(), mswLoader: vi.fn() },
+		'msw/browser': { setupWorker },
+		'msw-storybook-addon/csf3': { mswLoader },
 		'./fakes.js': { userDetailed: () => ({ id: 'storybook-fixture' }) },
-		'./mocks.js': { commonHandlers: [], onUnhandledRequest: vi.fn() },
+		'./mocks.js': { commonHandlers: [], onUnhandledFrame },
 		'./themes.js': { default: { 'l-light': {} } },
 		'../src/style.scss': {},
 		'../../features/index/frontend/components.js': { default: registerComponents },
@@ -67,6 +73,11 @@ test('actual Storybook preview setup readies real component locales and installs
 		window, localStorage, queueMicrotask, MutationObserver,
 	});
 	await vi.waitFor(() => expect(setup).toHaveBeenCalledOnce());
+	expect(mswLoader).toHaveBeenCalledOnce();
+	expect(setupWorker).not.toHaveBeenCalled();
+	expect(await mswLoader.mock.calls[0][0]()).toBe(worker);
+	expect(setupWorker).toHaveBeenCalledOnce();
+	expect(start).toHaveBeenCalledExactlyOnceWith({ onUnhandledFrame });
 	expect(create).toHaveBeenCalledExactlyOnceWith({ initialLocale: lang });
 	expect(initialized).toHaveLength(6);
 	expect(activate).toHaveBeenCalledOnce();
