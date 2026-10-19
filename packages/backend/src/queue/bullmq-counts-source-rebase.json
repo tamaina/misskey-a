@@ -1,6 +1,6 @@
 {
   "baselineVersion": "6.3.2",
-  "currentVersion": "6.3.11",
+  "currentVersion": "6.3.12",
   "sources": [
     {
       "file": "dist/esm/classes/queue-getters.js",
@@ -88,7 +88,7 @@
     },
     {
       "file": "package.json",
-      "currentSha256": "f8eab227da16b431fc12f354f7987c85c8e110dfd15c731f1a74c18cbb5e0e68"
+      "currentSha256": "c41da2849220028ee10459223caeaa12fdee337508970f0b709b87b850755f4f"
     }
   ],
   "entryPoints": {

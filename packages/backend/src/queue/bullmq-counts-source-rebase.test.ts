@@ -9,8 +9,8 @@ import { restoreReviewedBullMqCountsVersion } from './bullmq-counts-source-rebas
 const require = createRequire(import.meta.url);
 
 test('reviewed upgrade keeps exact installed source guards before the historical count oracle', () => {
-	expect(require('bullmq/package.json').version).toBe('6.3.11');
-	expect(restoreReviewedBullMqCountsVersion('6.3.11')).toBe('6.3.2');
-	expect(() => restoreReviewedBullMqCountsVersion('6.3.12')).toThrow('Unreviewed BullMQ counts version');
-	expect(() => restoreReviewedBullMqCountsVersion('6.3.11', () => 'altered')).toThrow('Unreviewed BullMQ counts source');
+	expect(require('bullmq/package.json').version).toBe('6.3.12');
+	expect(restoreReviewedBullMqCountsVersion('6.3.12')).toBe('6.3.2');
+	expect(() => restoreReviewedBullMqCountsVersion('6.3.13')).toThrow('Unreviewed BullMQ counts version');
+	expect(() => restoreReviewedBullMqCountsVersion('6.3.12', () => 'altered')).toThrow('Unreviewed BullMQ counts source');
 });
