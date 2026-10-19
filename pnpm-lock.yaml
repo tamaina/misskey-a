@@ -822,8 +822,8 @@ importers:
         specifier: 17.0.3
         version: 17.0.3
       '@misskey-dev/tagcanvas-es':
-        specifier: 0.1.2
-        version: 0.1.2
+        specifier: 0.1.3
+        version: 0.1.3
       '@sentry/vue':
         specifier: 11.4.0
         version: 11.4.0(vue@3.5.43(typescript@6.0.3))
@@ -873,8 +873,8 @@ importers:
         specifier: 6.1.1
         version: 6.1.1
       cropperjs:
-        specifier: 2.2.0
-        version: 2.2.0
+        specifier: 2.3.0
+        version: 2.3.0
       date-fns:
         specifier: 4.4.0
         version: 4.4.0
@@ -885,8 +885,8 @@ importers:
         specifier: 5.0.4
         version: 5.0.4
       exifreader:
-        specifier: 4.46.0
-        version: 4.46.0
+        specifier: 4.48.0
+        version: 4.48.0
       frontend-shared:
         specifier: workspace:*
         version: link:../frontend-shared
@@ -915,8 +915,8 @@ importers:
         specifier: 0.20.0
         version: 0.20.0
       mediabunny:
-        specifier: 1.61.1
-        version: 1.61.1
+        specifier: 1.61.3
+        version: 1.61.3
       mfm-js:
         specifier: 0.27.0
         version: 0.27.0
@@ -1250,8 +1250,8 @@ importers:
         specifier: 1.6.0
         version: 1.6.0
       uuid:
-        specifier: 14.0.2
-        version: 14.0.2
+        specifier: 14.0.3
+        version: 14.0.3
       vite-vue-internationalization:
         specifier: 1.1.5
         version: 1.1.5(@oxc-project/types@0.152.0)(@vue/language-core@3.3.11)(oxc-parser@0.127.0)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(sass-embedded@1.105.1)(sass@1.105.1)(terser@5.48.0)(tsx@4.23.15)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3))
@@ -1430,8 +1430,8 @@ importers:
         specifier: 3.35.0
         version: 3.35.0
       harfbuzzjs:
-        specifier: 1.6.2
-        version: 1.6.2
+        specifier: 1.6.3
+        version: 1.6.3
       tsx:
         specifier: 4.23.15
         version: 4.23.15
@@ -1787,38 +1787,38 @@ packages:
   '@canvas/image-data@1.1.0':
     resolution: {integrity: sha512-QdObRRjRbcXGmM1tmJ+MrHcaz1MftF2+W7YI+MsphnsCrmtyfS0d5qJbk0MeSbUeyM/jCb0hmnkXPsy026L7dA==}
 
-  '@cropper/element-canvas@2.2.0':
-    resolution: {integrity: sha512-H0Ay2ZSZrxWLP/8fSudH9hghsgIJh9fCgEmpfzD7MnQbE8HdQKljnoRxbrjuFT7Y0rmf405Sp9PmNA6T4twegw==}
+  '@cropper/element-canvas@2.3.0':
+    resolution: {integrity: sha512-nkK2jlwYj3FQkR6FugG1F/WzM/IicPotqx3GCHAaaBRQ4YkaiEYXDDKKZ7ApyCYktAnX7QsShXH1WE5EN1tUzA==}
 
-  '@cropper/element-crosshair@2.2.0':
-    resolution: {integrity: sha512-RXNhlsCd7lPTTjR2rfUEYghaL5bkqiU70qojJCUz1EIKfLriToDztjlsw3TZKJUBHYA+JOnmTBDFTnizoMUN1w==}
+  '@cropper/element-crosshair@2.3.0':
+    resolution: {integrity: sha512-NY56wpxxksDzK0nJZe3PTvUxxrxYZK9/kLc8bSqA1Qbl7mO329IFnE0vVH5MgBtDw6dIqAMNtQbqdx6NHlQxNg==}
 
-  '@cropper/element-grid@2.2.0':
-    resolution: {integrity: sha512-1hxHLi7Jrek/xxeG12a9+TO18Ot4pCG4V9Zh+A0GMLsfFjrd2k/kl0wOq0x1isNNrP3kkIw47FdID2iWR8A48A==}
+  '@cropper/element-grid@2.3.0':
+    resolution: {integrity: sha512-wBvcbnfgYeTvBJMqAlEL146MELvK3zXRe3oLB+LC2FZMz9dUizruEOHqBOXrkenpGlJ+nKHbyPT5FM4g8Fp21A==}
 
-  '@cropper/element-handle@2.2.0':
-    resolution: {integrity: sha512-+WPzHWF96RtLTAtotIcQQ6Sx3zVLQdK+qbaM2yKa841Iz60gQ3qKk7Jl5ndy2OgkEfxZaJI/3lWyf1RMGs/TEw==}
+  '@cropper/element-handle@2.3.0':
+    resolution: {integrity: sha512-IP7gNjlfZ+RC9RDposEAP5r+gGF0i9LXrGRfCmHqQEh7LILr2/mYX4QWZ7pDoBEg5zerEOjVz2NrWuxiKSOPcw==}
 
-  '@cropper/element-image@2.2.0':
-    resolution: {integrity: sha512-J0zBFMEfW6yuAmXoP6S+ZdNJy5J2duVsUS0N2o3D/HxHiVo4Vm3jrSexasu/Vfvwe4Lv0nmZ/10KW3RxhrvDCQ==}
+  '@cropper/element-image@2.3.0':
+    resolution: {integrity: sha512-G15tUyY3JDbn4b3KRBpbGfSkRB3q9/prk7rC6kEFzeEpqKVLGshRVNJjM98aK6Cx4TIk3383XY12OnTyo4wFag==}
 
-  '@cropper/element-selection@2.2.0':
-    resolution: {integrity: sha512-ATtWeEb1J/scQ98ins2jy4YbVOqz13F54jDk4Mm7OCpG0fzDseOujSLoIP8y26gtY7XGQXvn8WiFBbIZbeSgxQ==}
+  '@cropper/element-selection@2.3.0':
+    resolution: {integrity: sha512-uw//GK5cdY9LiqYiY+xW18uFQrzfhN38E0NO0dO5LXfudoK81OB3F55S3410bQzwrPuZVYGOHHd/SblLltdIVA==}
 
-  '@cropper/element-shade@2.2.0':
-    resolution: {integrity: sha512-fiurnjecablA8+17GoOjiNrzKWe85Q6h9JLbPJkxKCQxcxqpjEsOdGu3YlRxaBYcYvr6wH9tghufOlUfYJS9nw==}
+  '@cropper/element-shade@2.3.0':
+    resolution: {integrity: sha512-ghjquOCKqyjyBw31AJcjjtPfB4rTQt8bufWkn63DmGOqSL+JIyEB8PBWnjN5It2qpBynbl2wqO9CG/MTk3YHrg==}
 
-  '@cropper/element-viewer@2.2.0':
-    resolution: {integrity: sha512-w6uO7m7PwBWKynMwj8DYkJHFXrHC6Xxvcp5Y+tSxhfcNtOvw92FDncqRLYv+xHQoCDXEvfCqJyrTx9nIiZgiLQ==}
+  '@cropper/element-viewer@2.3.0':
+    resolution: {integrity: sha512-I93yzz32j7DYPjWSNoU8GC8eX7iFsxV7oZ0inPyrafexInMFx42dSecnrlX4nelcsIvFCYNQgXDYbZG3NS7ukQ==}
 
-  '@cropper/element@2.2.0':
-    resolution: {integrity: sha512-Kckk7TiWt3Cf9MvSfmMx7ZOIuN1rzIUIwIPQSqSj0Sl6gj6opo+CPax+fREvyvVKEzAug7L0sQFZ0TL4H5LsNw==}
+  '@cropper/element@2.3.0':
+    resolution: {integrity: sha512-RPY/Qj+eEvgfEyjZM/SkkQUV9/nQLC5+vktGpcjNUdUxjEAmYw0IlL+Ft5NppYSkgy9G0GgP8OLjqX0ToXuw7w==}
 
-  '@cropper/elements@2.2.0':
-    resolution: {integrity: sha512-OQiVvEjIQUbMAUGpFrI/L95elHNIXjdlSxxzeywbU6C93PdPypXeGQfOSLQ43zUYmFutWNb7jTrHvgb3JaE+VQ==}
+  '@cropper/elements@2.3.0':
+    resolution: {integrity: sha512-WSsokBF3NBMj+RQk85v402/FdMbYVJ4Mi7Oz9rACd2vpzrXkbYuLarp7j2Z74jbe5dNORqOgIpAk1KCDRs8grg==}
 
-  '@cropper/utils@2.2.0':
-    resolution: {integrity: sha512-wTrpZl+F4Kr2hzovqjztSexWUU+EVK1CxPymbYgFYoAS/NZXwCDsrvikJQn+HYZVxjqyo/ClnFxA0fG+tFy6Hw==}
+  '@cropper/utils@2.3.0':
+    resolution: {integrity: sha512-9eMNvPaE/sD8hvATNJ5ElRR7oHQcnhLRRoFEm/j/fxzNJwwdSMnXydpEq/QqkWXD1ttZqBj9IOJjUf5ThQWYvg==}
 
   '@csstools/selector-resolve-nested@4.0.0':
     resolution: {integrity: sha512-9vAPxmp+Dx3wQBIUwc1v7Mdisw1kbbaGqXUM8QLTgWg7SoPGYtXBsMXvsFs/0Bn5yoFhcktzxNZGNaUt0VjgjA==}
@@ -2526,8 +2526,8 @@ packages:
   '@misskey-dev/summaly@5.5.2':
     resolution: {integrity: sha512-dGK0BFrBo+7KXggkzaEI3QYD6DpGQrzmS2U5dP9KcfP2Un4HxDSrjdqtDcqSE+2qiFCo4Ka/AhcrZrYJEmn5gg==}
 
-  '@misskey-dev/tagcanvas-es@0.1.2':
-    resolution: {integrity: sha512-SGqyu30/CCQyIC95Zcmj3k1vYXwfX66/arsxpl1UUulUqvlRpTpuhB7kEAAps1lqXin0rQzXknb31EeveNKsaw==}
+  '@misskey-dev/tagcanvas-es@0.1.3':
+    resolution: {integrity: sha512-6ij5xUrDQvtJMAJZgDw0tCJbosgznvNci5HXlHll5A4yvrArlDbRC2tyyVfF7vWOBOvrfp7ANEeREvfrCvKcmw==}
 
   '@modelcontextprotocol/sdk@1.32.0':
     resolution: {integrity: sha512-8BviX/hK4Gd2eL1KdTwm0gfl4d3wdoErW0Jd00h6nomUAtk6IJk5vwQJc6kfWtJTzN5OEV/lgIiJKI8fiDGAlA==}
@@ -4452,10 +4452,6 @@ packages:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/types@8.71.0':
-    resolution: {integrity: sha512-cJ4OoxPGWvFnBTnSZyaU+qJzGTqPTGJY+gDchj6cRyLRdmIdt4rcsE4twj+zPfrNiWuVi38wijHzShL++Z9atQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
   '@typescript-eslint/types@8.71.1':
     resolution: {integrity: sha512-ybYnPTUwg3VQQOFEiBPLs8Jxl1ry2vXdn1kVKguomBbvxpetdu3MKTNDqFNUrlG8ylP9MpZosmXMFYlGQHk1oQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -4774,10 +4770,9 @@ packages:
   '@webcontainer/env@1.1.1':
     resolution: {integrity: sha512-6aN99yL695Hi9SuIk1oC88l9o0gmxL1nGWWQ/kNy81HigJ0FoaoTXpytCj6ItzgyCEwA9kF1wixsTuv5cjsgng==}
 
-  '@xmldom/xmldom@0.9.10':
-    resolution: {integrity: sha512-A9gOqLdi6cV4ibazAjcQufGj0B1y/vDqYrcuP6d/6x8P27gRS8643Dj9o1dEKtB6O7fwxb2FgBmJS2mX7gpvdw==}
+  '@xmldom/xmldom@0.9.12':
+    resolution: {integrity: sha512-5AXjrcMClTryPe9LgZrygpB1lj7s0S9E0+W+AHaVKAVyHanafK86iPSvG5xHVSp/jC+VH1UXu0TAEmY279xH7A==}
     engines: {node: '>=14.6'}
-    deprecated: this version has critical issues, please update to the latest version
 
   '@zip.js/zip.js@2.23.0':
     resolution: {integrity: sha512-K5obAqfrO7zhycnCupM9aaoZ9kx0SA0kv7+Z2oOUsdpWquv4s/Z4zyD7AdTqxrK3pgPM+ozaUi8kdRQbCWaIrQ==}
@@ -5402,8 +5397,8 @@ packages:
     resolution: {integrity: sha512-pKRrRagItwk9rGIStcUyMxFX34x56zoX3KDf9HJ4ttwkXIK1qxK63EvXvEDmlxI9AdPJ+Y7TEKRftRlW5eSS7A==}
     engines: {node: '>=18'}
 
-  cropperjs@2.2.0:
-    resolution: {integrity: sha512-7egO+tXxt3jGHQcO6x4k1CVoMIlEu+4Klixc6ejspKOAns7onlC/lEi5tRi3qbuHVcATK7rqaZyp8LzynPz6Cg==}
+  cropperjs@2.3.0:
+    resolution: {integrity: sha512-3Npwk6vEY/NoUsDbGqRV7LnkvHnKm5H84NSJQE3dxAyDBdFQOZY0FXLs778E3fSuFfc8KbAqWuyNLJkYp/64sQ==}
 
   cross-env@10.1.0:
     resolution: {integrity: sha512-GsYosgnACZTADcmEyJctkJIoqAhHjttw7RsFrVoJNXbsWWqaq6Ym+7kZjq6mS45O0jij6vtiReppKQEtqWy6Dw==}
@@ -5942,8 +5937,8 @@ packages:
     resolution: {integrity: sha512-9Be3ZoN4LmYR90tUoVu2te2BsbzHfhJyfEiAVfz7N5/zv+jduIfLrV2xdQXOHbaD6KgpGdO9PRPM1Y4Q9QkPkA==}
     engines: {node: ^18.19.0 || >=20.5.0}
 
-  exifreader@4.46.0:
-    resolution: {integrity: sha512-ksHTpjXKWzbckY+bYlGaomG0EobHJkaMWLg5OPbzlTPda04F2dfrDfYSz8iAPp/kXYUSQdINBVI6nCAjQ8PQ/Q==}
+  exifreader@4.48.0:
+    resolution: {integrity: sha512-zDKM9DuTgK9eWYzpROPAVkVf3cMKrQLdBFPfMq489pzQpHWzDhc6ZetDKANZ15GDTjaE/pEuk6iLXJpe+z41Qw==}
     hasBin: true
 
   expect-type@1.4.0:
@@ -6256,8 +6251,8 @@ packages:
     resolution: {integrity: sha512-VIZB+ibDhx7ObhAe7OVtoEbuP4h/MuOTHJ+J8h/eBXotJYl0fBgR72xDFCKgIh22OJZIOVNxBMWuhAr10r8HdA==}
     engines: {node: '>=6'}
 
-  harfbuzzjs@1.6.2:
-    resolution: {integrity: sha512-95c1vWuzoHjM19d5fQgPbz1wcv1pTa0UM9dZrdPgSMUEVuSwuzeVPkq6UhHHw3jLOkE9AYzzTP8XQkRBpPYpEg==}
+  harfbuzzjs@1.6.3:
+    resolution: {integrity: sha512-R5Mfo1UUvQmZJmtScP7fBLKYKnYu82ZdtFT7WbQYeGb3Ut5PR3xfFCJ5/FjbcW5SAfb9cqCSny/KNjp+NJBx0w==}
 
   has-bigints@1.1.0:
     resolution: {integrity: sha512-R3pbpkcIqv2Pm3dUwgjclDRVmWpTJW2DcMzcIhEXEx1oh/CEMObMm3KLmRJOdvhM7o4uQBnwr8pzRK2sJWIqfg==}
@@ -7061,8 +7056,8 @@ packages:
     resolution: {integrity: sha512-aisnrDP4GNe06UcKFnV5bfMNPBUw4jsLGaWwWfnH3v02GnBuXX2MCVn5RbrWo0j3pczUilYblq7fQ7Nw2t5XKw==}
     engines: {node: '>= 0.8'}
 
-  mediabunny@1.61.1:
-    resolution: {integrity: sha512-530o7Q2OkChbfXt8N9WmzcW/wmUN0Vdxgl3RE5zUlzny3aNJUi7huOjdOVVq60aCEjTaMR1Ikby+61+co8gRwA==}
+  mediabunny@1.61.3:
+    resolution: {integrity: sha512-kUqLKVXQVwHR62GkOJxYosAmXERJbqnXBgJDTtRlxHEYviVkMg/Evhl9XN6kedqS5LP1tV4kFKyzY/V4a4ofow==}
 
   meilisearch@0.62.0:
     resolution: {integrity: sha512-/ETDW7mmWI2NcSmtJdTPhbjsIbs3VcuapszX5X6JhdHB0XbszPOhqd3EB2bEylL0HK7dgwh/4Z3MdyuycWVf5A==}
@@ -9231,8 +9226,8 @@ packages:
     resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
     hasBin: true
 
-  uuid@14.0.2:
-    resolution: {integrity: sha512-xZe/16rV4aa+HGSOCiY2YeLT1OybRLrrkL/Rqaq7p7GMVXjFh+6wN4oMYgjFmnSnhY8t6Xpdl2l9qmnHYuMHwQ==}
+  uuid@14.0.3:
+    resolution: {integrity: sha512-Sc5u1VVln93y1Xnz4R+CunOZc7R9LUcTmhj7Rc7Eg3HVcf7rVn2FOoa812fe0W8p3jD7xeoGSYbfqCGGH2B6xw==}
     hasBin: true
 
   uuid@9.0.1:
@@ -9960,71 +9955,71 @@ snapshots:
 
   '@canvas/image-data@1.1.0': {}
 
-  '@cropper/element-canvas@2.2.0':
+  '@cropper/element-canvas@2.3.0':
     dependencies:
-      '@cropper/element': 2.2.0
-      '@cropper/utils': 2.2.0
+      '@cropper/element': 2.3.0
+      '@cropper/utils': 2.3.0
 
-  '@cropper/element-crosshair@2.2.0':
+  '@cropper/element-crosshair@2.3.0':
     dependencies:
-      '@cropper/element': 2.2.0
-      '@cropper/utils': 2.2.0
+      '@cropper/element': 2.3.0
+      '@cropper/utils': 2.3.0
 
-  '@cropper/element-grid@2.2.0':
+  '@cropper/element-grid@2.3.0':
     dependencies:
-      '@cropper/element': 2.2.0
-      '@cropper/utils': 2.2.0
+      '@cropper/element': 2.3.0
+      '@cropper/utils': 2.3.0
 
-  '@cropper/element-handle@2.2.0':
+  '@cropper/element-handle@2.3.0':
     dependencies:
-      '@cropper/element': 2.2.0
-      '@cropper/utils': 2.2.0
+      '@cropper/element': 2.3.0
+      '@cropper/utils': 2.3.0
 
-  '@cropper/element-image@2.2.0':
+  '@cropper/element-image@2.3.0':
     dependencies:
-      '@cropper/element': 2.2.0
-      '@cropper/element-canvas': 2.2.0
-      '@cropper/utils': 2.2.0
+      '@cropper/element': 2.3.0
+      '@cropper/element-canvas': 2.3.0
+      '@cropper/utils': 2.3.0
 
-  '@cropper/element-selection@2.2.0':
+  '@cropper/element-selection@2.3.0':
     dependencies:
-      '@cropper/element': 2.2.0
-      '@cropper/element-canvas': 2.2.0
-      '@cropper/element-image': 2.2.0
-      '@cropper/utils': 2.2.0
+      '@cropper/element': 2.3.0
+      '@cropper/element-canvas': 2.3.0
+      '@cropper/element-image': 2.3.0
+      '@cropper/utils': 2.3.0
 
-  '@cropper/element-shade@2.2.0':
+  '@cropper/element-shade@2.3.0':
     dependencies:
-      '@cropper/element': 2.2.0
-      '@cropper/element-canvas': 2.2.0
-      '@cropper/element-selection': 2.2.0
-      '@cropper/utils': 2.2.0
+      '@cropper/element': 2.3.0
+      '@cropper/element-canvas': 2.3.0
+      '@cropper/element-selection': 2.3.0
+      '@cropper/utils': 2.3.0
 
-  '@cropper/element-viewer@2.2.0':
+  '@cropper/element-viewer@2.3.0':
     dependencies:
-      '@cropper/element': 2.2.0
-      '@cropper/element-canvas': 2.2.0
-      '@cropper/element-image': 2.2.0
-      '@cropper/element-selection': 2.2.0
-      '@cropper/utils': 2.2.0
+      '@cropper/element': 2.3.0
+      '@cropper/element-canvas': 2.3.0
+      '@cropper/element-image': 2.3.0
+      '@cropper/element-selection': 2.3.0
+      '@cropper/utils': 2.3.0
 
-  '@cropper/element@2.2.0':
+  '@cropper/element@2.3.0':
     dependencies:
-      '@cropper/utils': 2.2.0
+      '@cropper/utils': 2.3.0
 
-  '@cropper/elements@2.2.0':
+  '@cropper/elements@2.3.0':
     dependencies:
-      '@cropper/element': 2.2.0
-      '@cropper/element-canvas': 2.2.0
-      '@cropper/element-crosshair': 2.2.0
-      '@cropper/element-grid': 2.2.0
-      '@cropper/element-handle': 2.2.0
-      '@cropper/element-image': 2.2.0
-      '@cropper/element-selection': 2.2.0
-      '@cropper/element-shade': 2.2.0
-      '@cropper/element-viewer': 2.2.0
+      '@cropper/element': 2.3.0
+      '@cropper/element-canvas': 2.3.0
+      '@cropper/element-crosshair': 2.3.0
+      '@cropper/element-grid': 2.3.0
+      '@cropper/element-handle': 2.3.0
+      '@cropper/element-image': 2.3.0
+      '@cropper/element-selection': 2.3.0
+      '@cropper/element-shade': 2.3.0
+      '@cropper/element-viewer': 2.3.0
 
-  '@cropper/utils@2.2.0': {}
+  '@cropper/utils@2.3.0': {}
 
   '@csstools/selector-resolve-nested@4.0.0(postcss-selector-parser@7.1.4)':
     dependencies:
@@ -10688,7 +10683,7 @@ snapshots:
     optionalDependencies:
       fastify: 5.12.3
 
-  '@misskey-dev/tagcanvas-es@0.1.2': {}
+  '@misskey-dev/tagcanvas-es@0.1.3': {}
 
   '@modelcontextprotocol/sdk@1.32.0(supports-color@10.2.2)(zod@4.6.5)':
     dependencies:
@@ -12168,7 +12163,7 @@ snapshots:
   '@stylistic/eslint-plugin@5.10.0(eslint@9.39.5(supports-color@10.2.2))':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.5(supports-color@10.2.2))
-      '@typescript-eslint/types': 8.71.0
+      '@typescript-eslint/types': 8.71.1
       eslint: 9.39.5(supports-color@10.2.2)
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
@@ -12178,7 +12173,7 @@ snapshots:
   '@stylistic/eslint-plugin@5.10.0(eslint@9.39.5(supports-color@5.5.0))':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.5(supports-color@5.5.0))
-      '@typescript-eslint/types': 8.71.0
+      '@typescript-eslint/types': 8.71.1
       eslint: 9.39.5(supports-color@5.5.0)
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
@@ -12625,8 +12620,6 @@ snapshots:
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
-
-  '@typescript-eslint/types@8.71.0': {}
 
   '@typescript-eslint/types@8.71.1': {}
 
@@ -13143,7 +13136,7 @@ snapshots:
 
   '@webcontainer/env@1.1.1': {}
 
-  '@xmldom/xmldom@0.9.10':
+  '@xmldom/xmldom@0.9.12':
     optional: true
 
   '@zip.js/zip.js@2.23.0': {}
@@ -13745,10 +13738,10 @@ snapshots:
     dependencies:
       luxon: 3.7.2
 
-  cropperjs@2.2.0:
+  cropperjs@2.3.0:
     dependencies:
-      '@cropper/elements': 2.2.0
-      '@cropper/utils': 2.2.0
+      '@cropper/elements': 2.3.0
+      '@cropper/utils': 2.3.0
 
   cross-env@10.1.0:
     dependencies:
@@ -14580,9 +14573,9 @@ snapshots:
       strip-final-newline: 4.0.0
       yoctocolors: 2.1.2
 
-  exifreader@4.46.0:
+  exifreader@4.48.0:
     optionalDependencies:
-      '@xmldom/xmldom': 0.9.10
+      '@xmldom/xmldom': 0.9.12
 
   expect-type@1.4.0: {}
 
@@ -14998,7 +14991,7 @@ snapshots:
 
   hard-rejection@2.1.0: {}
 
-  harfbuzzjs@1.6.2: {}
+  harfbuzzjs@1.6.3: {}
 
   has-bigints@1.1.0: {}
 
@@ -15834,7 +15827,7 @@ snapshots:
 
   media-typer@1.1.0: {}
 
-  mediabunny@1.61.1:
+  mediabunny@1.61.3:
     dependencies:
       '@types/dom-mediacapture-transform': 0.1.11
       '@types/dom-webcodecs': 0.1.13
@@ -18332,7 +18325,7 @@ snapshots:
 
   uuid@11.1.0: {}
 
-  uuid@14.0.2: {}
+  uuid@14.0.3: {}
 
   uuid@9.0.1: {}
 
