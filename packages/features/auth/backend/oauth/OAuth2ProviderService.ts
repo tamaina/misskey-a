@@ -11,7 +11,7 @@ import { MiOAuthApproval } from '../models/OAuthApproval.js';
 import { MiAccessToken } from '../models/AccessToken.js';
 import { SudoService } from '../sudo.js';
 import type { CredentialIssuanceAuthorization } from '../credential-issuance.js';
-import type { OidcLocalIdentity } from '../oidc-runtime.js';
+import type { SudoIdentity } from '../sudo.js';
 import dns from 'node:dns/promises';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as htmlParser from 'node-html-parser';
@@ -580,7 +580,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		};
 	}
 
-	async #findUserByLoginToken(loginToken: string): Promise<{ user: MiLocalUser; identity: OidcLocalIdentity }> {
+	async #findUserByLoginToken(loginToken: string): Promise<{ user: MiLocalUser; identity: SudoIdentity }> {
 		if (loginToken.startsWith('bs_')) {
 			try {
 				const [user, app, session] = await this.authenticateService.authenticate(loginToken);

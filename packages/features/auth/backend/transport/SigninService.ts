@@ -22,8 +22,6 @@ import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiUserSecurityKey } from '../models/UserSecurityKey.js';
 import { MiBrowserSession } from '../models/BrowserSession.js';
 import { assertCurrentSigninAssurance, assertSigninDeadline, consumeSigninAssurance, SigninPolicyError } from '../signin-assurance.js';
-import { MiOidcProvider } from '../models/OidcProvider.js';
-import { MiOidcIdentity } from '../models/OidcIdentity.js';
 import type { SigninAssurance } from '../signin-assurance.js';
 
 @Injectable()
@@ -55,13 +53,6 @@ export class SigninService {
 			if (!profile) throw new SigninPolicyError();
 			const keys = await manager.getRepository(MiUserSecurityKey).findBy({ userId: user.id });
 			assertCurrentSigninAssurance(proof, current, profile, keys);
-			if (proof.mode === 'oidc') {
-				const external = proof.external;
-				if (!external) throw new SigninPolicyError();
-				const provider = await manager.getRepository(MiOidcProvider).findOne({ where: { id: external.providerId }, lock: { mode: 'pessimistic_read' } });
-				const identity = await manager.getRepository(MiOidcIdentity).findOne({ where: { id: external.identityId, userId: current.id, providerId: external.providerId, issuer: external.issuer, subject: external.subject }, lock: { mode: 'pessimistic_read' } });
-				if (!provider?.enabled || provider.version !== external.providerVersion || provider.issuer !== external.issuer || !identity) throw new SigninPolicyError();
-			}
 			const issued = await this.browserSessionService.issue(user.id, manager.getRepository(MiBrowserSession));
 			assertSigninDeadline(proof);
 			return issued;

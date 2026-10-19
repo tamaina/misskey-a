@@ -329,24 +329,6 @@ type AdminMetaRequest = ContractRequest<'admin/meta'>;
 type AdminMetaResponse = ContractResponse<'admin/meta'>;
 
 // @public (undocumented)
-type AdminOidcCreateRequest = ContractRequest<'admin/oidc/create'>;
-
-// @public (undocumented)
-type AdminOidcCreateResponse = ContractResponse<'admin/oidc/create'>;
-
-// @public (undocumented)
-type AdminOidcProvidersRequest = ContractRequest<'admin/oidc/providers'>;
-
-// @public (undocumented)
-type AdminOidcProvidersResponse = ContractResponse<'admin/oidc/providers'>;
-
-// @public (undocumented)
-type AdminOidcUpdateRequest = ContractRequest<'admin/oidc/update'>;
-
-// @public (undocumented)
-type AdminOidcUpdateResponse = ContractResponse<'admin/oidc/update'>;
-
-// @public (undocumented)
 type AdminPromoCreateRequest = ContractRequest<'admin/promo/create'>;
 
 // @public (undocumented)
@@ -2066,32 +2048,6 @@ declare namespace entities {
         UsernameAvailableRequest,
         UsernameAvailableResponse,
         VerifyEmailRequest,
-        OidcProvidersRequest,
-        OidcProvidersResponse,
-        OidcStartRequest,
-        OidcStartResponse,
-        OidcCallbackRequest,
-        OidcCallbackResponse,
-        OidcStatusRequest,
-        OidcStatusResponse,
-        OidcCancelRequest,
-        OidcLoginRequest,
-        OidcLoginResponse,
-        OidcOnboardingRequest,
-        OidcOnboardingVerifyRequest,
-        OidcOnboardingVerifyResponse,
-        IOidcLinksRequest,
-        IOidcLinksResponse,
-        IOidcLinkStartRequest,
-        IOidcLinkStartResponse,
-        IOidcLinkCompleteRequest,
-        IOidcUnlinkRequest,
-        AdminOidcProvidersRequest,
-        AdminOidcProvidersResponse,
-        AdminOidcCreateRequest,
-        AdminOidcCreateResponse,
-        AdminOidcUpdateRequest,
-        AdminOidcUpdateResponse,
         AdminAbuseReportNotificationRecipientCreateRequest,
         AdminAbuseReportNotificationRecipientCreateResponse,
         AdminAbuseReportNotificationRecipientDeleteRequest,
@@ -4142,24 +4098,6 @@ type InviteListRequest = ContractRequest<'invite/list'>;
 type InviteListResponse = ContractResponse<'invite/list'>;
 
 // @public (undocumented)
-type IOidcLinkCompleteRequest = ContractRequest<'i/oidc/link/complete'>;
-
-// @public (undocumented)
-type IOidcLinksRequest = ContractRequest<'i/oidc/links'>;
-
-// @public (undocumented)
-type IOidcLinksResponse = ContractResponse<'i/oidc/links'>;
-
-// @public (undocumented)
-type IOidcLinkStartRequest = ContractRequest<'i/oidc/link/start'>;
-
-// @public (undocumented)
-type IOidcLinkStartResponse = ContractResponse<'i/oidc/link/start'>;
-
-// @public (undocumented)
-type IOidcUnlinkRequest = ContractRequest<'i/oidc/unlink'>;
-
-// @public (undocumented)
 type IPageLikesRequest = ContractRequest<'i/page-likes'>;
 
 // @public (undocumented)
@@ -4778,48 +4716,6 @@ export const notificationTypes: readonly ["note", "follow", "mention", "reply", 
 
 // @public (undocumented)
 export function nyaize(text: string): string;
-
-// @public (undocumented)
-type OidcCallbackRequest = ContractRequest<'oidc/callback'>;
-
-// @public (undocumented)
-type OidcCallbackResponse = ContractResponse<'oidc/callback'>;
-
-// @public (undocumented)
-type OidcCancelRequest = ContractRequest<'oidc/cancel'>;
-
-// @public (undocumented)
-type OidcLoginRequest = ContractRequest<'oidc/login'>;
-
-// @public (undocumented)
-type OidcLoginResponse = ContractResponse<'oidc/login'>;
-
-// @public (undocumented)
-type OidcOnboardingRequest = ContractRequest<'oidc/onboarding'>;
-
-// @public (undocumented)
-type OidcOnboardingVerifyRequest = ContractRequest<'oidc/onboarding/verify'>;
-
-// @public (undocumented)
-type OidcOnboardingVerifyResponse = ContractResponse<'oidc/onboarding/verify'>;
-
-// @public (undocumented)
-type OidcProvidersRequest = ContractRequest<'oidc/providers'>;
-
-// @public (undocumented)
-type OidcProvidersResponse = ContractResponse<'oidc/providers'>;
-
-// @public (undocumented)
-type OidcStartRequest = ContractRequest<'oidc/start'>;
-
-// @public (undocumented)
-type OidcStartResponse = ContractResponse<'oidc/start'>;
-
-// @public (undocumented)
-type OidcStatusRequest = ContractRequest<'oidc/status'>;
-
-// @public (undocumented)
-type OidcStatusResponse = ContractResponse<'oidc/status'>;
 
 // @public (undocumented)
 type OrpcDefinition1 = ContractModel<'OrpcDefinition1'>;

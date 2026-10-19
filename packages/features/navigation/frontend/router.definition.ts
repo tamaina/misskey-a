@@ -110,10 +110,6 @@ export const ROUTE_DEF = [{
 		name: 'email',
 		component: page(() => import('@features/auth/frontend/pages/settings/email.vue')),
 	}, {
-		path: '/oidc',
-		name: 'oidc',
-		component: page(() => import('@features/auth/frontend/pages/settings/oidc.vue')),
-	}, {
 		path: '/security',
 		name: 'security',
 		component: page(() => import('@features/auth/frontend/pages/settings/security.vue')),
@@ -287,12 +283,6 @@ export const ROUTE_DEF = [{
 }, {
 	path: '/preview',
 	component: page(() => import('@features/ui/frontend/pages/preview.vue')),
-}, {
-	path: '/auth/oidc/callback/:providerId',
-	component: page(() => import('@features/auth/frontend/pages/oidc.vue')),
-}, {
-	path: '/auth/oidc/resume',
-	component: page(() => import('@features/auth/frontend/pages/oidc.vue')),
 }, {
 	path: '/auth/:token',
 	component: page(() => import('@features/auth/frontend/pages/auth.vue')),
@@ -481,10 +471,6 @@ export const ROUTE_DEF = [{
 		path: '/moderation',
 		name: 'moderation',
 		component: page(() => import('@features/moderation/frontend/pages/admin/moderation.vue')),
-	}, {
-		path: '/oidc',
-		name: 'oidc',
-		component: page(() => import('@features/auth/frontend/pages/admin/oidc.vue')),
 	}, {
 		path: '/email-settings',
 		name: 'email-settings',

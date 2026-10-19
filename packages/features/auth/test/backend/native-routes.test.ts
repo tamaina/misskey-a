@@ -35,8 +35,8 @@ function harness() {
 	return { services, operations, context, router: createAuthRouter(operations) };
 }
 
-test('all 97 native auth routes retain secure policy enforcement', async () => {
-	expect(Object.keys(authContract)).toHaveLength(97);
+test('all 82 native auth routes retain secure policy enforcement', async () => {
+	expect(Object.keys(authContract)).toHaveLength(82);
 	expect(settingsPaths).toHaveLength(26);
 	for (const path of settingsPaths) expect(authContract[path as keyof typeof authContract]['~orpc'].meta).toMatchObject({ requestName: path, requireCredential: true, secure: true });
 	for (const path of ['i/regenerate-token/passkey/start', 'i/regenerate-token/passkey/complete'] as const) {
@@ -52,6 +52,23 @@ test('all 97 native auth routes retain secure policy enforcement', async () => {
 	h.services.authenticate.mockResolvedValue([null, null]);
 	await expect(call(h.router['i/2fa/key-done'], { password: 'password', name: '', credential: null }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
 	for (const value of [undefined, null, 5, true, ['ignored'], { ignored: { future: true } }]) expect(v.safeParse(requiredSchema(AdminCaptchaCurrentContract['~orpc'].inputSchema), value).success).toBe(true);
+});
+
+test('deferred external-provider login has no public, settings or administrator HTTP routes', async () => {
+	const h = harness();
+	const handler = new OpenAPIHandler(h.router, { customErrorResponseBodyEncoder: misskeyErrorBody });
+	const app = Fastify();
+	await app.register(async api => registerPilotHttp(api, handler, {
+		maxFileSize: 1024, context: () => h.context, runSpan: (_name, run) => run(),
+	}), { prefix: '/api' });
+	try {
+		for (const path of ['oidc/providers', 'oidc/start', 'oidc/callback', 'oidc/status', 'oidc/cancel', 'oidc/login', 'oidc/onboarding', 'oidc/onboarding/verify', 'i/oidc/links', 'i/oidc/link/start', 'i/oidc/link/complete', 'i/oidc/unlink', 'admin/oidc/providers', 'admin/oidc/create', 'admin/oidc/update']) {
+			expect(Object.hasOwn(authContract, path)).toBe(false);
+			const response = await app.inject({ method: 'POST', url: `/api/${path}`, payload: {} });
+			expect(response.statusCode, path).toBe(404);
+		}
+		expect(h.services.authenticate).not.toHaveBeenCalled();
+	} finally { await app.close(); }
 });
 
 test('malformed HTTP inputs fail authentication and secure-token policy before input validation', async () => {

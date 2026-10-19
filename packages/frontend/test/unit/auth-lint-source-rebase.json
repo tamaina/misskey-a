@@ -33,12 +33,24 @@
   },
   {
     "file": "packages/features/auth/frontend/pages/settings/security.vue",
-    "currentSha256": "f26bbb5d3d5500b9bc75ed27b8405f0a75d82aadf1a7ecf73f98a623ba31e938",
+    "currentSha256": "ce7b4c85fe57270c73945dc06f39ba78314ad11d8823e5d20d2abb4c98a37f72",
     "baselineSha256": "3e28f754e2f2c12b7e695d1f426cc82a6383284c9628ac10c01be9b7161b6b90",
     "edits": [
       {
-        "start": 6503,
-        "end": 6503,
+        "start": 889,
+        "end": 889,
+        "current": "",
+        "baseline": "\t\t<XOidcSettingsLinks/>\n"
+      },
+      {
+        "start": 2414,
+        "end": 2414,
+        "current": "",
+        "baseline": "import XOidcSettingsLinks from '../../components/MkOidcSettingsLinks.vue';\n"
+      },
+      {
+        "start": 6404,
+        "end": 6404,
         "current": "",
         "baseline": "\n\n"
       }

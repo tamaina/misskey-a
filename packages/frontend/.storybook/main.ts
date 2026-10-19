@@ -11,6 +11,8 @@ import { type PluginOption, mergeConfig } from 'vite';
 import turbosnap from 'vite-plugin-turbosnap';
 
 const require = createRequire(import.meta.url);
+// The authentication preview uses the installed Storybook 10 framework without legacy 8.x addons.
+const authOnly = process.env.MISSKEY_STORYBOOK_AUTH_ONLY === '1';
 const _dirname = fileURLToPath(new URL('.', import.meta.url));
 
 // Retain the project's legacy autodocs option alongside the current config type.
@@ -21,13 +23,15 @@ function hasPluginName(plugin: PluginOption, name: string): boolean {
 }
 
 const config = {
-	stories: [
+	stories: authOnly ? [
+		'../../features/auth/frontend/components/{MkSignin,MkSecuritySettings,MkBrowserSessions,MkTokenExpiry,MkSudoDialog}.stories.ts',
+	] : [
 		'./index.mdx',
 		'../../features/*/frontend/**/*.mdx',
 		'../../features/*/frontend/**/*.stories.@(js|jsx|ts|tsx)',
 	],
-	staticDirs: [{ from: '../assets', to: '/client-assets' }],
-	addons: [
+	staticDirs: [{ from: '../assets', to: '/client-assets' }, '../public'],
+	addons: authOnly ? [getAbsolutePath('@storybook/addon-links')] : [
 		getAbsolutePath('@storybook/addon-essentials'),
 		getAbsolutePath('@storybook/addon-interactions'),
 		getAbsolutePath('@storybook/addon-links'),
@@ -55,6 +59,7 @@ const config = {
 		config.plugins = config.plugins?.filter(plugin => plugin && !hasPluginName(plugin, 'createSearchIndex')) ?? [];
 
 		return mergeConfig(config, {
+			resolve: { alias: { '@storybook/test': 'storybook/test' } },
 			plugins: [
 				{
 					// XXX: https://github.com/IanVS/vite-plugin-turbosnap/issues/8

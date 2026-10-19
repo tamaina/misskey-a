@@ -64,8 +64,8 @@ const formValue = (value: string) => new URLSearchParams({ value }).toString().s
 
 /** Unconnected protocol adapter. Inputs must be server-owned; result is identity,
  * never a local login grant. Future completion must recheck provider and local MFA/session. */
-export function createOidcTokenExchange(network?: ClientMetadataNetwork, allowedPrivateNetworks: readonly string[] = []) {
-	const requestJson = createOidcPinnedJsonRequester(network, allowedPrivateNetworks);
+export function createOidcTokenExchange(network?: ClientMetadataNetwork) {
+	const requestJson = createOidcPinnedJsonRequester(network);
 	return async (providerInput: OidcExchangeProvider, metadataInput: OidcProviderMetadata,
 		transactionInput: BoundOidcExchangeTransaction, codeInput: string, secretInput: string): Promise<OidcIdentity> => {
 		const deadlineAt = performance.now() + 5000;

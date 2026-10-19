@@ -369,32 +369,6 @@ import type {
 	UsernameAvailableRequest,
 	UsernameAvailableResponse,
 	VerifyEmailRequest,
-	OidcProvidersRequest,
-	OidcProvidersResponse,
-	OidcStartRequest,
-	OidcStartResponse,
-	OidcCallbackRequest,
-	OidcCallbackResponse,
-	OidcStatusRequest,
-	OidcStatusResponse,
-	OidcCancelRequest,
-	OidcLoginRequest,
-	OidcLoginResponse,
-	OidcOnboardingRequest,
-	OidcOnboardingVerifyRequest,
-	OidcOnboardingVerifyResponse,
-	IOidcLinksRequest,
-	IOidcLinksResponse,
-	IOidcLinkStartRequest,
-	IOidcLinkStartResponse,
-	IOidcLinkCompleteRequest,
-	IOidcUnlinkRequest,
-	AdminOidcProvidersRequest,
-	AdminOidcProvidersResponse,
-	AdminOidcCreateRequest,
-	AdminOidcCreateResponse,
-	AdminOidcUpdateRequest,
-	AdminOidcUpdateResponse,
 	AdminAbuseReportNotificationRecipientCreateRequest,
 	AdminAbuseReportNotificationRecipientCreateResponse,
 	AdminAbuseReportNotificationRecipientDeleteRequest,
@@ -1057,21 +1031,6 @@ export type Endpoints = {
 	'reset-password': { req: ResetPasswordRequest; res: EmptyResponse };
 	'username/available': { req: UsernameAvailableRequest; res: UsernameAvailableResponse };
 	'verify-email': { req: VerifyEmailRequest; res: EmptyResponse };
-	'oidc/providers': { req: OidcProvidersRequest; res: OidcProvidersResponse };
-	'oidc/start': { req: OidcStartRequest; res: OidcStartResponse };
-	'oidc/callback': { req: OidcCallbackRequest; res: OidcCallbackResponse };
-	'oidc/status': { req: OidcStatusRequest; res: OidcStatusResponse };
-	'oidc/cancel': { req: OidcCancelRequest; res: EmptyResponse };
-	'oidc/login': { req: OidcLoginRequest; res: OidcLoginResponse };
-	'oidc/onboarding': { req: OidcOnboardingRequest; res: EmptyResponse };
-	'oidc/onboarding/verify': { req: OidcOnboardingVerifyRequest; res: OidcOnboardingVerifyResponse };
-	'i/oidc/links': { req: IOidcLinksRequest; res: IOidcLinksResponse };
-	'i/oidc/link/start': { req: IOidcLinkStartRequest; res: IOidcLinkStartResponse };
-	'i/oidc/link/complete': { req: IOidcLinkCompleteRequest; res: EmptyResponse };
-	'i/oidc/unlink': { req: IOidcUnlinkRequest; res: EmptyResponse };
-	'admin/oidc/providers': { req: AdminOidcProvidersRequest; res: AdminOidcProvidersResponse };
-	'admin/oidc/create': { req: AdminOidcCreateRequest; res: AdminOidcCreateResponse };
-	'admin/oidc/update': { req: AdminOidcUpdateRequest; res: AdminOidcUpdateResponse };
 	'admin/abuse-report/notification-recipient/create': { req: AdminAbuseReportNotificationRecipientCreateRequest; res: AdminAbuseReportNotificationRecipientCreateResponse };
 	'admin/abuse-report/notification-recipient/delete': { req: AdminAbuseReportNotificationRecipientDeleteRequest; res: EmptyResponse };
 	'admin/abuse-report/notification-recipient/list': { req: AdminAbuseReportNotificationRecipientListRequest; res: AdminAbuseReportNotificationRecipientListResponse };

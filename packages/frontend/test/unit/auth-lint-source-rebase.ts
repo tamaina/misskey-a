@@ -6,7 +6,8 @@ import { createHash } from 'node:crypto';
 import entries from './auth-lint-source-rebase.json';
 const hash = (source: string) => createHash('sha256').update(source).digest('hex');
 
-/** Undo only an exact reviewed lint cleanup; each owning oracle still rejects unknown source. */
+/** Includes exact SSO-child removal projected back to the frozen historical source.
+ * Undo only an exact reviewed lint cleanup; each owning oracle still rejects unknown source. */
 export function restoreAuthLintBaseline(file: string, source: string): string {
 	const entry = entries.find(value => value.file === file);
 	if (!entry || hash(source) !== entry.currentSha256) return source;

@@ -278,7 +278,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
 				}
-				const authRequest = toWebAuthnAuthenticationOptions(await deps.webAuthnService.initiateAuthentication(user.id, undefined, !same));
+				const authRequest = toWebAuthnAuthenticationOptions(await deps.webAuthnService.initiateAuthentication(user.id, !same));
 				reply.code(200);
 				return {
 					finished: false,

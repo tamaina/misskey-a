@@ -4,6 +4,8 @@
  */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import type { StoryObj } from '@storybook/vue3';
+import { ref } from 'vue';
+import { expect, userEvent, within } from '@storybook/test';
 import { HttpResponse, http } from 'msw';
 import * as account from '../i.js';
 import MkSudoDialog from './MkSudoDialog.vue';
@@ -59,4 +61,41 @@ export const IndependentPasskey = {
 export const PasswordLoginDisabled = {
 	...Password,
 	parameters: { layout: 'centered', msw: { handlers: handlers({ ...initialState, passwordLoginDisabled: true, passwordlessEnabled: true, passkeyCount: 1 }) } },
+} satisfies StoryObj<typeof MkSudoDialog>;
+
+export const RejectedProof = {
+	...TotpFirst,
+	async play({ canvasElement }) {
+		const canvas = within(canvasElement.ownerDocument.body);
+		await canvas.findByRole('button', { name: '確認して続ける', exact: true });
+		const password = canvasElement.ownerDocument.querySelector<HTMLInputElement>('input[type="password"]');
+		if (!password) throw new Error('Synthetic password input missing');
+		await userEvent.type(password, 'synthetic-password');
+		const token = canvasElement.ownerDocument.querySelector<HTMLInputElement>('input[autocomplete="one-time-code"]');
+		if (!token) throw new Error('Synthetic factor input missing');
+		await userEvent.type(token, '000000');
+		await userEvent.click(canvas.getByRole('button', { name: '確認して続ける', exact: true }));
+		await expect(canvas.findByRole('alert')).resolves.toHaveTextContent('本人確認できませんでした');
+	},
+} satisfies StoryObj<typeof MkSudoDialog>;
+export const Cancelled = {
+	...Password,
+	render(args) {
+		return {
+			components: { MkSudoDialog },
+			setup() {
+				if (!account.$i) throw new Error('Storybook synthetic account required');
+				account.$i.token = sessionToken;
+				const open = ref(true);
+				const result = ref('');
+				return { args, open, result, settle: (confirmed: boolean) => { result.value = confirmed ? '合成fixtureの本人確認が完了しました。操作は実行していません。' : '本人確認をキャンセルしました。操作は実行していません。'; open.value = false; } };
+			},
+			template: '<div><MkSudoDialog v-if="open" v-bind="args" @done="settle"/><p v-else role="status">{{ result }}</p></div>',
+		};
+	},
+	async play({ canvasElement }) {
+		const canvas = within(canvasElement.ownerDocument.body);
+		await userEvent.click(await canvas.findByRole('button', { name: 'キャンセル', exact: true }));
+		await expect(canvas.findByRole('status')).resolves.toHaveTextContent('操作は実行していません');
+	},
 } satisfies StoryObj<typeof MkSudoDialog>;

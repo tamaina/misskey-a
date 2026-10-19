@@ -7,7 +7,8 @@ import entries from './oidc-source-rebase.json';
 import { restoreAuthLintBaseline } from './auth-lint-source-rebase.js';
 const hash = (source: string) => createHash('sha256').update(source).digest('hex');
 
-/** Remove only the two reviewed OIDC child integrations before the unchanged historical proofs. */
+/** Historical SSO source exists only in this test projection; production SSO is removed.
+ * Remove only the two reviewed OIDC child integrations before the unchanged historical proofs. */
 export function restoreOidcSourceBaseline(file: string, source: string): string {
 	if (entries.some(entry => entry.file === file)) source = restoreAuthLintBaseline(file, source);
 	const entry = entries.find(value => value.file === file);

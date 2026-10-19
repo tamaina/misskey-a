@@ -5,7 +5,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div :class="$style.signinRoot">
-	<XOidcSignin v-if="page === 'input'"/>
 	<Transition
 		mode="out-in"
 		:enterActiveClass="$style.transition_enterActive"
@@ -71,7 +70,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
-import XOidcSignin from './MkOidcSignin.vue';
 import { nextTick, onActivated, onBeforeUnmount, onDeactivated, ref, shallowRef, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { browserSupportsWebAuthn } from '@simplewebauthn/browser';

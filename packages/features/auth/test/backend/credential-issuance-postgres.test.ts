@@ -36,7 +36,7 @@ import { nullSuccessToNoContent } from '@features/api/backend/transport/no-conte
 import { misskeyErrorBody } from '@features/api/backend/transport/orpc-error.js';
 
 // This suite requires the final common SudoService merge. It never replaces sudo with a permissive port.
-const socket = process.env.MISSKEY_AUTH_POLICY_TEST_SOCKET; const redisSocket = process.env.MISSKEY_OIDC_REDIS_SOCKET;
+const socket = process.env.MISSKEY_AUTH_POLICY_TEST_SOCKET; const redisSocket = process.env.MISSKEY_CREDENTIAL_REDIS_SOCKET;
 const owner = 'credentialowner'; const password = 'synthetic-password'; const origin = 'https://synthetic.example';
 const clientId = 'https://client.invalid/client.json'; const redirect = 'https://client.invalid/callback'; const verifier = 'x'.repeat(43);
 describe.skipIf(!socket || !redisSocket)('actual HTTP, committed OAuth approval, PostgreSQL, Redis and common sudo', () => {
@@ -58,9 +58,9 @@ describe.skipIf(!socket || !redisSocket)('actual HTTP, committed OAuth approval,
 	const codeOf = (response: Awaited<ReturnType<typeof approve>>) => { expect(response.statusCode, response.body).toBe(302); return new URL(String(response.headers.location)).searchParams.get('code')!; };
 	beforeAll(async () => {
 		if (!socket || !dirname(socket).startsWith('/tmp/misskey-auth-policy-') || readFileSync(join(dirname(socket), '.misskey-auth-policy-fixture'), 'utf8') !== 'auth_policy_synthetic') throw new Error('Owned PostgreSQL required');
-		if (!redisSocket || !/^\/tmp\/misskey-oidc-fixture-[^/]+\/redis\.sock$/.test(redisSocket) || lstatSync(dirname(redisSocket)).uid !== process.getuid?.() || (lstatSync(dirname(redisSocket)).mode & 0o077) !== 0 || !lstatSync(redisSocket).isSocket()) throw new Error('Owned Redis required');
+		if (!redisSocket || !/^\/tmp\/misskey-credential-fixture-[^/]+\/redis\.sock$/.test(redisSocket) || lstatSync(dirname(redisSocket)).uid !== process.getuid?.() || (lstatSync(dirname(redisSocket)).mode & 0o077) !== 0 || !lstatSync(redisSocket).isSocket()) throw new Error('Owned Redis required');
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
-		await db.initialize(); const applied = await db.runMigrations(); expect(applied.map(row => row.name)).toEqual(expect.arrayContaining(['AccessTokenExpiry1792300000004', 'OidcIdentities1792300000000']));
+		await db.initialize(); const applied = await db.runMigrations(); expect(applied.map(row => row.name)).toEqual(expect.arrayContaining(['AccessTokenExpiry1792300000004', 'SudoPolicy1792300000001']));
 		redis = new Redis({ path: redisSocket }); sessions = new BrowserSessionService(db.getRepository(MiBrowserSession) as ConstructorParameters<typeof BrowserSessionService>[0], ids);
 		sudo = new SudoService(db, mockDeep(), mockDeep());
 		const cache = mockDeep<ConstructorParameters<typeof AuthenticateService>[3]>(); cache.localUserByIdCache.fetch.mockImplementation(async (_id, load) => { if (!load) throw new Error('Missing synthetic loader'); return load(); }); cache.localUserByNativeTokenCache.fetch.mockImplementation(async (_token, load) => { if (!load) throw new Error('Missing synthetic loader'); return load(); });

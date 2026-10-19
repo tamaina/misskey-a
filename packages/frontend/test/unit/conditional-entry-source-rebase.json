@@ -2,37 +2,49 @@
   {
     "file": "packages/features/auth/frontend/components/MkSignin.vue",
     "baselineSha256": "db67e3d3bc2829e59930919c494f257408656e0485772ecc6c4140a36682866a",
-    "currentSha256": "635641e6bc5c2bfce54e0717fd917b892cd3e1aaa6d64384e062e3ee8866904b",
+    "currentSha256": "3f31bb4773b88bcaf9ccba19f9aa28d4b5a819cd29ae8ba9456bf6c6aa8f1d2b",
     "edits": [
       {
-        "start": 3068,
-        "end": 3091,
-        "baseline": "",
-        "current": "\t(ev: 'manual'): void;\n"
+        "start": 144,
+        "end": 144,
+        "current": "",
+        "baseline": "\t<XOidcSignin v-if=\"page === 'input'\"/>\n"
       },
       {
-        "start": 4276,
-        "end": 4293,
-        "baseline": "",
-        "current": "\temit('manual');\n"
+        "start": 1651,
+        "end": 1651,
+        "current": "",
+        "baseline": "import XOidcSignin from './MkOidcSignin.vue';\n"
       },
       {
-        "start": 6111,
-        "end": 6128,
-        "baseline": "",
-        "current": "\temit('manual');\n"
+        "start": 2982,
+        "end": 3005,
+        "current": "\t(ev: 'manual'): void;\n",
+        "baseline": ""
       },
       {
-        "start": 6462,
-        "end": 6479,
-        "baseline": "",
-        "current": "\temit('manual');\n"
+        "start": 4190,
+        "end": 4207,
+        "current": "\temit('manual');\n",
+        "baseline": ""
       },
       {
-        "start": 7155,
-        "end": 7172,
-        "baseline": "",
-        "current": "\temit('manual');\n"
+        "start": 6025,
+        "end": 6042,
+        "current": "\temit('manual');\n",
+        "baseline": ""
+      },
+      {
+        "start": 6376,
+        "end": 6393,
+        "current": "\temit('manual');\n",
+        "baseline": ""
+      },
+      {
+        "start": 7069,
+        "end": 7086,
+        "current": "\temit('manual');\n",
+        "baseline": ""
       }
     ],
     "historicalSha256": [

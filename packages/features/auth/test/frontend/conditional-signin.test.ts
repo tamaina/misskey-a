@@ -18,7 +18,6 @@ vi.mock('../../frontend/i.js', async () => { const { reactive } = await import('
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
 vi.mock('@features/auth/frontend/accounts.js', () => ({ login: vi.fn() }));
 vi.mock('@simplewebauthn/browser', async original => ({ ...await original<typeof import('@simplewebauthn/browser')>(), browserSupportsWebAuthnAutofill: vi.fn() }));
-vi.mock('@features/auth/frontend/components/MkOidcSignin.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/auth/frontend/components/MkSignin.vue', () => ({ default: defineComponent({
 	props: ['autoSet', 'message', 'openOnRemote', 'initialUsername'], emits: ['login', 'manual'],
 	setup(props, { emit, expose }) {

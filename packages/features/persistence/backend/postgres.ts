@@ -21,8 +21,6 @@ import { MiAnnouncementRead } from '@features/announcements/backend/models/Annou
 import { MiAntenna } from '@features/timelines/backend/models/Antenna.js';
 import { MiApp } from '@features/auth/backend/models/App.js';
 import { MiAvatarDecoration } from '@features/avatar-decorations/backend/models/AvatarDecoration.js';
-import { MiOidcProvider } from '@features/auth/backend/models/OidcProvider.js';
-import { MiOidcIdentity } from '@features/auth/backend/models/OidcIdentity.js';
 import { MiBrowserSession } from '@features/auth/backend/models/BrowserSession.js';
 import { MiAuthSession } from '@features/auth/backend/models/AuthSession.js';
 import { MiBlocking } from '@features/relationships/backend/models/Blocking.js';
@@ -189,8 +187,6 @@ export const entities = [
 	MiApp,
 	MiAvatarDecoration,
 	MiAuthSession,
-	MiOidcProvider,
-	MiOidcIdentity,
 	MiBrowserSession,
 	MiOAuthApproval,
 	MiAccessToken,

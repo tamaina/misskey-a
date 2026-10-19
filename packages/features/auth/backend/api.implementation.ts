@@ -4,10 +4,8 @@
  */
 
 import type { Redis } from 'ioredis';
+import type { CredentialIssuanceAuthorization } from './credential-issuance.js';
 import { DecoratedProcedure, implement } from '@orpc/server';
-import { OidcRuntime } from './oidc-runtime.js';
-import type { OidcRuntimeDependencies, OidcLocalAuthorization } from './oidc-runtime.js';
-import { createOidcRouter } from './oidc-api.js';
 import { authContract, authSessionsContract } from './api.definition.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -159,8 +157,6 @@ export function aliasTwoFactorProcedure<Initial extends Context, Current extends
 export interface AuthRouterDependencies {
 	sudo: SudoApiDependencies;
 	security: SecuritySettingsDependencies;
-	oidc?: OidcRuntime;
-	oidcServerUrl?: string;
 	'admin/accounts/create': AdminAccountsCreateDependencies;
 	'admin/captcha/current': AdminCaptchaCurrentDependencies;
 	'admin/captcha/save': AdminCaptchaSaveDependencies;
@@ -223,7 +219,6 @@ export function createAuthRouter(deps: AuthRouterDependencies) {
 	return implement(authContract).$context<ApiContext<MiLocalUser>>().router({
 		...createSudoRouter(deps.sudo),
 		...createSecuritySettingsRouter(deps.security),
-		...createOidcRouter(deps.oidc, deps.oidcServerUrl),
 		'admin/accounts/create': createAdminAccountsCreateProcedure(deps['admin/accounts/create']),
 		'admin/captcha/current': createAdminCaptchaCurrentProcedure(deps['admin/captcha/current']),
 		'admin/captcha/save': createAdminCaptchaSaveProcedure(deps['admin/captcha/save']),
@@ -289,18 +284,8 @@ export class AuthApiProvider {
 	constructor(private readonly moduleRef: ModuleRef) { }
 	compose() {
 		if (this.router !== undefined) return this.router;
-		const config = this.moduleRef.get<OidcRuntimeDependencies['config']>(DI.config, { strict: false });
-		const credentialAuthorization = this.moduleRef.get<OidcLocalAuthorization>(SudoService, { strict: false });
-		const oidc = new OidcRuntime({
-			db: this.moduleRef.get(DI.db, { strict: false }), redis: this.moduleRef.get<Redis>(DI.redis, { strict: false }), config,
-			meta: this.moduleRef.get(DI.meta, { strict: false }), idService: this.moduleRef.get(IdService, { strict: false }),
-			email: this.moduleRef.get(EmailService, { strict: false }), roles: this.moduleRef.get(RoleService, { strict: false }),
-			signup: this.moduleRef.get(SignupService, { strict: false }), sessions: this.moduleRef.get(BrowserSessionService, { strict: false }),
-			signin: this.moduleRef.get(SigninService, { strict: false }), totp: this.moduleRef.get(UserAuthService, { strict: false }),
-			webauthn: this.moduleRef.get(WebAuthnService, { strict: false }), captcha: this.moduleRef.get(CaptchaService, { strict: false }),
-			local: credentialAuthorization,
-		});
-		this.router = createAuthRouter({ oidc, oidcServerUrl: config.url,
+		const credentialAuthorization = this.moduleRef.get<CredentialIssuanceAuthorization>(SudoService, { strict: false });
+		this.router = createAuthRouter({
 			'admin/accounts/create': { browserSessionService: this.moduleRef.get<AdminAccountsCreateDependencies['browserSessionService']>(BrowserSessionService, { strict: false }), config: this.moduleRef.get<AdminAccountsCreateDependencies['config']>(DI.config, { strict: false }), serverSettings: this.moduleRef.get<AdminAccountsCreateDependencies['serverSettings']>(DI.meta, { strict: false }), usersRepository: this.moduleRef.get<AdminAccountsCreateDependencies['usersRepository']>(DI.usersRepository, { strict: false }), userEntityService: this.moduleRef.get<AdminAccountsCreateDependencies['userEntityService']>(UserEntityService, { strict: false }), signupService: this.moduleRef.get<AdminAccountsCreateDependencies['signupService']>(SignupService, { strict: false }), roleService: this.moduleRef.get<AdminAccountsCreateDependencies['roleService']>(RoleService, { strict: false }) },
 			'admin/captcha/current': { captchaService: this.moduleRef.get<AdminCaptchaCurrentDependencies['captchaService']>(CaptchaService, { strict: false }) },
 			'admin/captcha/save': { captchaService: this.moduleRef.get<AdminCaptchaSaveDependencies['captchaService']>(CaptchaService, { strict: false }) },

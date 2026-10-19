@@ -38,7 +38,7 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
 		await db.initialize();
 		const applied = await db.runMigrations();
-		expect(applied).toHaveLength(366);
+		expect(applied).toHaveLength(365);
 		expect(applied.at(-1)?.name).toBe('AccessTokenExpiry1792300000004');
 		const schema = await db.driver.createSchemaBuilder().log();
 		expect(schema.upQueries.map(query => query.query)).toEqual([]);
@@ -117,10 +117,10 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		});
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
-	test('the five new migrations down/up against production metadata leave no pending DDL', async () => {
-		for (let index = 0; index < 5; index++) await db.undoLastMigration();
+	test('the four new migrations down/up against production metadata leave no pending DDL', async () => {
+		for (let index = 0; index < 4; index++) await db.undoLastMigration();
 		const applied = await db.runMigrations();
-		expect(applied.map(migration => migration.name)).toEqual(['OidcIdentities1792300000000', 'SudoPolicy1792300000001', 'PasswordLoginPolicy1792300000002', 'DeletionIntent1792300000003', 'AccessTokenExpiry1792300000004']);
+		expect(applied.map(migration => migration.name)).toEqual(['SudoPolicy1792300000001', 'PasswordLoginPolicy1792300000002', 'DeletionIntent1792300000003', 'AccessTokenExpiry1792300000004']);
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
 	test('empty browser-session round trip restores its newer sudo columns and approval foreign key', async () => {

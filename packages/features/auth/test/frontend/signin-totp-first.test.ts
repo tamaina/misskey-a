@@ -27,7 +27,6 @@ vi.mock('@features/moderation/frontend/utility/show-suspended-dialog.js', () => 
 vi.mock('@features/ui/frontend/os.js', () => ({ alert: vi.fn() }));
 vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: vi.fn(), startAuthentication: vi.fn() }));
 // Provider discovery belongs to the dedicated OIDC child tests.
-vi.mock('@features/auth/frontend/components/MkOidcSignin.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/auth/frontend/components/MkSignin.input.vue', () => ({ default: defineComponent({
 	emits: ['usernameSubmitted', 'passkeyClick'], setup(_, { emit }) {
 		state.handlers.username = value => emit('usernameSubmitted', value);

@@ -77,11 +77,6 @@ export class WebAuthnService {
 		return this.verifySigninKey(`webauthn:authenticationChallenge:${userId}`, userId, response, beforeProof, requireUserVerification);
 	}
 
-	@bindThis
-	public async verifyOidcAuthenticationWithProof<Expected>(userId: string, ticket: string, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>): Promise<SigninKeyProof<Expected> | null> {
-		if (!/^[A-Za-z0-9_-]{43}$/.test(ticket)) return null;
-		return this.verifySigninKey(`webauthn:oidcChallenge:${ticket}`, userId, response, beforeProof, false);
-	}
 
 	@bindThis
 	public async verifySignInWithPasskeyWithProof<Expected>(context: string, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>): Promise<SigninKeyProof<Expected> | null> {
@@ -214,7 +209,7 @@ export class WebAuthnService {
 	}
 
 	@bindThis
-	public async initiateAuthentication(userId: MiUser['id'], oidcContext?: string, requireUserVerification = true): Promise<v.InferOutput<typeof nativeAuthenticationOptionsSchema>> {
+	public async initiateAuthentication(userId: MiUser['id'], requireUserVerification = true): Promise<v.InferOutput<typeof nativeAuthenticationOptionsSchema>> {
 		const relyingParty = this.getRelyingParty();
 		const keys = await this.userSecurityKeysRepository.findBy({
 			userId: userId,
@@ -234,8 +229,7 @@ export class WebAuthnService {
 		});
 		v.assert(nativeAuthenticationOptionsSchema, authenticationOptions);
 
-		if (oidcContext !== undefined && !/^[A-Za-z0-9_-]{43}$/.test(oidcContext)) throw new Error('Invalid OIDC context');
-		await this.redisClient.setex(oidcContext ? `webauthn:oidcChallenge:${oidcContext}` : `webauthn:authenticationChallenge:${userId}`, 90, authenticationOptions.challenge);
+		await this.redisClient.setex(`webauthn:authenticationChallenge:${userId}`, 90, authenticationOptions.challenge);
 
 		return authenticationOptions;
 	}

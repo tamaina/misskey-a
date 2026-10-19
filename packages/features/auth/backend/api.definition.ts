@@ -5,7 +5,6 @@
 
 import { securitySettingsContract } from './security-settings.contract.js';
 import { sudoContract } from './sudo.contract.js';
-import { oidcContract } from './oidc.contract.js';
 import { signinProgressChallengeSchema } from './signin-progress.schema.js';
 import { aliasTwoFactorContract } from './2fa-api-aliases.contract.js';
 import type { Meta } from '@orpc/contract';
@@ -569,7 +568,6 @@ export const authContract = {
 	'reset-password': ResetPasswordContract,
 	'username/available': UsernameAvailableContract,
 	'verify-email': VerifyEmailContract,
-	...oidcContract,
 };
 
 export type AuthInputs = InferContractRouterInputs<typeof authContract>;

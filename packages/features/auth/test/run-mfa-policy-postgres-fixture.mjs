@@ -9,7 +9,7 @@ import { spawnSync } from 'node:child_process';
 
 const root = resolve(import.meta.dirname, '../../../..');
 if (process.env.MISSKEY_AUTH_SECURITY_RUNTIME_FIXTURE === '1' && !process.env.MISSKEY_OAUTH_REDIS_SOCKET) throw new Error('The security runtime fixture requires its owned Redis socket');
-if ((process.env.MISSKEY_AUTH_OIDC_FIXTURE === '1' || process.env.MISSKEY_AUTH_CREDENTIAL_ISSUANCE_FIXTURE === '1') && !process.env.MISSKEY_OIDC_REDIS_SOCKET) throw new Error('The selected fixture requires its owned Redis socket');
+if (process.env.MISSKEY_AUTH_CREDENTIAL_ISSUANCE_FIXTURE === '1' && !process.env.MISSKEY_CREDENTIAL_REDIS_SOCKET) throw new Error('The selected fixture requires its owned Redis socket');
 const versions = existsSync('/usr/lib/postgresql') ? readdirSync('/usr/lib/postgresql').sort((a, b) => Number(b) - Number(a)) : [];
 const binaries = process.env.MISSKEY_PG_BINDIR ?? versions.map(version => `/usr/lib/postgresql/${version}/bin`).find(path => existsSync(join(path, 'initdb')));
 if (!binaries) throw new Error('PostgreSQL fixture binaries unavailable; set MISSKEY_PG_BINDIR');
@@ -39,7 +39,6 @@ try {
 		['MISSKEY_AUTH_SECURITY_RUNTIME_FIXTURE', 'security-settings-runtime-postgres.test.ts'],
 		['MISSKEY_AUTH_COMPLETION_FIXTURE', 'security-completion-postgres.test.ts'],
 		['MISSKEY_AUTH_CREDENTIAL_ISSUANCE_FIXTURE', 'credential-issuance-postgres.test.ts'],
-		['MISSKEY_AUTH_OIDC_FIXTURE', 'oidc-runtime-postgres.test.ts'],
 		['MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE', 'fresh-email-change-postgres.test.ts'],
 		['MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE', 'fresh-token-regeneration-postgres.test.ts'],
 		['MISSKEY_AUTH_SIGNIN_FIXTURE', 'signin-policy-postgres.test.ts'],

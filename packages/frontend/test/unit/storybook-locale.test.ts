@@ -26,13 +26,14 @@ test('actual Storybook preview setup readies real component locales and installs
 	const activate = vi.fn(setActiveInternationalization);
 	const initialized: string[] = [];
 	const collaborators: Record<string, unknown> = {
-		'@storybook/core-events': { FORCE_RE_RENDER: 'render', FORCE_REMOUNT: 'remount' },
-		'@storybook/preview-api': { addons: { getChannel: () => ({ emit: vi.fn() }) } },
+		'storybook/internal/core-events': { FORCE_RE_RENDER: 'render', FORCE_REMOUNT: 'remount' },
+		'storybook/preview-api': { addons: { getChannel: () => ({ emit: vi.fn() }) } },
 		'@storybook/vue3': { setup },
 		'virtual:vite-vue-internationalization': { createInternationalization: create, setActiveInternationalization: activate },
 		'@features/boot/frontend/index.js': { startComponentLocales },
 		'chromatic/isChromatic': { default: () => false },
-		'msw-storybook-addon': { initialize: vi.fn(), mswLoader: vi.fn() },
+		'msw/browser': { setupWorker: vi.fn() },
+		'msw-storybook-addon/csf3': { mswLoader: vi.fn() },
 		'./fakes.js': { userDetailed: () => ({ id: 'storybook-fixture' }) },
 		'./mocks.js': { commonHandlers: [], onUnhandledRequest: vi.fn() },
 		'./themes.js': { default: { 'l-light': {} } },

@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { FORCE_RE_RENDER, FORCE_REMOUNT } from '@storybook/core-events';
-import { addons } from '@storybook/preview-api';
+import { FORCE_RE_RENDER, FORCE_REMOUNT } from 'storybook/internal/core-events';
+import { addons } from 'storybook/preview-api';
 import { type Preview, setup } from '@storybook/vue3';
 import { createInternationalization, setActiveInternationalization } from 'virtual:vite-vue-internationalization';
 import { startComponentLocales } from '@features/boot/frontend/index.js';
 import isChromatic from 'chromatic/isChromatic';
-import { initialize, mswLoader } from 'msw-storybook-addon';
+import { setupWorker } from 'msw/browser';
+import { mswLoader } from 'msw-storybook-addon/csf3';
 import { userDetailed } from './fakes.js';
 import { commonHandlers, onUnhandledRequest } from './mocks.js';
 import themes from './themes.js';
@@ -58,9 +59,6 @@ function initLocalStorage() {
 	}));
 }
 
-initialize({
-	onUnhandledRequest,
-});
 initLocalStorage();
 // Await locale activation before Storybook can finish evaluating this preview.
 // Story modules and initialization graphs can capture owner messages eagerly.
@@ -138,7 +136,11 @@ const preview = {
 			};
 		},
 	],
-	loaders: [mswLoader],
+	loaders: [mswLoader(async () => {
+		const worker = setupWorker();
+		await worker.start({ onUnhandledRequest });
+		return worker;
+	})],
 	parameters: {
 		controls: {
 			exclude: /^__/,

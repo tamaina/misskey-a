@@ -18,7 +18,6 @@ vi.mock('@features/auth/frontend/utility/ensure-sudo.js', () => ({ ensureSudo: v
 vi.mock('@features/auth/frontend/utility/owned-dialog.js', () => ({ ownedInputText: (props: Parameters<typeof os.inputText>[0]) => os.inputText(props), ownedAuthenticateDialog: (props: Parameters<typeof os.authenticateDialog>[0]) => os.authenticateDialog(props) }));
 vi.mock('@features/auth/frontend/signout.js', () => ({ signout: vi.fn() }));
 // OIDC child behavior is covered by oidc-flow/api tests, independently of these password dialogs.
-vi.mock('@features/auth/frontend/components/MkOidcSettingsLinks.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/auth/frontend/components/MkSecuritySettings.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/auth/frontend/components/MkBrowserSessions.vue', () => ({ default: defineComponent({ render: () => null }) }));
 const account = vi.hoisted(() => ({ id: 'synthetic-owner', twoFactorEnabled: true, token: 'legacy-token', securityKeysList: [] as { id: string }[] }));

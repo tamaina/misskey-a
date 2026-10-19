@@ -5,7 +5,8 @@
 import { createHash } from 'node:crypto';
 import entries from './conditional-entry-source-rebase.json';
 const hash = (source: string) => createHash('sha256').update(source).digest('hex');
-/** Exact Conditional entry wiring only; historical source and every locale remain frozen. */
+/** Includes exact SSO-child removal projected back to the frozen historical source.
+ * Exact Conditional entry wiring only; historical source and every locale remain frozen. */
 export function restoreConditionalEntryBaseline(file: string, source: string): string {
 	const entry = entries.find(value => value.file === file);
 	if (!entry || hash(source) === entry.baselineSha256 || entry.historicalSha256.includes(hash(source))) return source;

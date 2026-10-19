@@ -40,7 +40,7 @@ export const Default = {
 				account.$i.token = 'bs_storybook_synthetic_security';
 				return {};
 			},
-			template: '<div style="width: min(640px, 100vw); padding: 24px"><MkSecuritySettings /></div>',
+			template: '<div style="width: min(640px, 100vw); padding: 24px; box-sizing: border-box"><MkSecuritySettings /></div>',
 		};
 	},
 	parameters: { layout: 'centered', msw: { handlers: handlers(initialState) } },

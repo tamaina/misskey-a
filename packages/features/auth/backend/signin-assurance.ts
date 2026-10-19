@@ -37,8 +37,7 @@ const pending = new WeakSet<object>();
 interface SigninAssuranceFacts {
 	readonly userId: string;
 	readonly policyStamp: string;
-	readonly mode: 'password' | 'passwordless' | 'oidc';
-	readonly external?: { readonly identityId: string; readonly providerId: string; readonly providerVersion: string; readonly issuer: string; readonly subject: string };
+	readonly mode: 'password' | 'passwordless';
 	readonly passwordVerified: boolean;
 	readonly factor: 'none' | 'totp' | 'passkey' | 'recovery';
 	readonly key?: VerifiedSigninKey;
@@ -50,7 +49,7 @@ export interface SigninAssurance extends SigninAssuranceFacts { readonly [brand]
 export function createSigninAssurance(facts: SigninAssuranceFacts): SigninAssurance {
 	const deadline = Math.min(facts.deadline, facts.key?.deadline ?? Number.POSITIVE_INFINITY);
 	if (!Number.isFinite(deadline) || performance.now() >= deadline) throw new SigninPolicyError();
-	const proof: SigninAssurance = Object.freeze({ ...facts, key: facts.key ? Object.freeze({ ...facts.key }) : undefined, external: facts.external ? Object.freeze({ ...facts.external }) : undefined, deadline, [brand]: true as const });
+	const proof: SigninAssurance = Object.freeze({ ...facts, key: facts.key ? Object.freeze({ ...facts.key }) : undefined, deadline, [brand]: true as const });
 	pending.add(proof);
 	return proof;
 }
@@ -75,9 +74,7 @@ export function assertCurrentSigninAssurance(proof: SigninAssurance, user: MiUse
 		if (policy.independentPasskeyEnabled || !profile.usePasswordLessLogin || proof.factor !== 'passkey' || !proof.key || proof.key.userVerified !== true) throw new SigninPolicyError();
 		return;
 	}
-	if (proof.mode === 'oidc') {
-		if (!proof.external || proof.passwordVerified) throw new SigninPolicyError();
-	} else if (!proof.passwordVerified || !profile.password || ('passwordLoginDisabled' in profile && profile.passwordLoginDisabled === true)) throw new SigninPolicyError();
+	if (!proof.passwordVerified || !profile.password || ('passwordLoginDisabled' in profile && profile.passwordLoginDisabled === true)) throw new SigninPolicyError();
 	if (!policy.required && proof.factor === 'none') return;
 	if (proof.factor === 'totp' && policy.totp) return;
 	if (proof.factor === 'recovery' && policy.required) return;
