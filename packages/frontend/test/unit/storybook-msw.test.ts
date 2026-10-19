@@ -4,8 +4,9 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
+import { getResponse } from 'msw';
 import { HttpNetworkFrame } from 'msw/experimental';
-import { onUnhandledFrame } from '../../.storybook/mocks.js';
+import { commonHandlers, onUnhandledFrame } from '../../.storybook/mocks.js';
 
 // Use MSW's public frame constructor; no transport is needed for warning policy.
 class HttpFrame extends HttpNetworkFrame {
@@ -36,5 +37,24 @@ describe('Storybook MSW 3 warning policy', () => {
 		const { warn, error } = check('http://localhost:6006/api/users/show');
 		expect(warn).toHaveBeenCalledOnce();
 		expect(error).not.toHaveBeenCalled();
+	});
+});
+
+
+describe('Storybook bootstrap registry responses', () => {
+	test.each([
+		['keys', []],
+		['get-all', {}],
+	])('serves JSON for the eager registry %s request', async (operation, expected) => {
+		const request = new Request(new URL(`/api/i/registry/${operation}`, window.location.href), { method: 'POST' });
+		const response = await getResponse(commonHandlers, request);
+		expect(response?.status).toBe(200);
+		expect(response?.headers.get('Content-Type')).toContain('application/json');
+		expect(await response?.json()).toEqual(expected);
+	});
+
+	test('leaves other APIs visible to the unhandled-request policy', async () => {
+		const request = new Request(new URL('/api/i/registry/set', window.location.href), { method: 'POST' });
+		expect(await getResponse(commonHandlers, request)).toBeUndefined();
 	});
 });

@@ -17,6 +17,8 @@ export const onUnhandledFrame = (({ frame, defaults }) => {
 }) satisfies SharedOptions['onUnhandledFrame'];
 
 export const commonHandlers = [
+	http.post('/api/i/registry/keys', () => HttpResponse.json([])),
+	http.post('/api/i/registry/get-all', () => HttpResponse.json({})),
 	http.get('/fluent-emoji/:codepoints.png', async ({ params }) => {
 		const { codepoints } = params;
 		const value = await fetch(`https://unpkg.com/@misskey-dev/emoji-assets@17.0.3/built/fluent-emoji/${codepoints}.png`).then((response) => response.blob());

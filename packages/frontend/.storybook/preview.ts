@@ -60,6 +60,10 @@ function initLocalStorage() {
 }
 
 initLocalStorage();
+// Registry consumers run while the runtime graph is imported, before story loaders.
+// Install the worker first so these requests cannot reach the Storybook server.
+const worker = setupWorker(...commonHandlers);
+await worker.start({ onUnhandledFrame });
 // Await locale activation before Storybook can finish evaluating this preview.
 // Story modules and initialization graphs can capture owner messages eagerly.
 const { lang } = await import('@features/boot/frontend/shared/config.js');
@@ -148,11 +152,7 @@ const preview = {
 			};
 		},
 	],
-	loaders: [mswLoader(async () => {
-		const worker = setupWorker();
-		await worker.start({ onUnhandledFrame });
-		return worker;
-	})],
+	loaders: [mswLoader(async () => worker)],
 	parameters: {
 		controls: {
 			exclude: /^__/,

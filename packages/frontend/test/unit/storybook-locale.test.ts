@@ -26,7 +26,9 @@ test('actual Storybook preview setup readies real component locales and installs
 	const activate = vi.fn(setActiveInternationalization);
 	const initialized: string[] = [];
 	const onUnhandledFrame = vi.fn();
-	const start = vi.fn<(options: { onUnhandledFrame: typeof onUnhandledFrame }) => Promise<void>>().mockResolvedValue();
+	let completeWorkerStart!: () => void;
+	const workerReady = new Promise<void>(resolve => { completeWorkerStart = resolve; });
+	const start = vi.fn<(options: { onUnhandledFrame: typeof onUnhandledFrame }) => Promise<void>>().mockReturnValue(workerReady);
 	const worker = { start };
 	const setupWorker = vi.fn(() => worker);
 	const mswLoader = vi.fn<(createWorker: () => Promise<unknown>) => () => Promise<unknown>>(createWorker => createWorker);
@@ -59,7 +61,7 @@ test('actual Storybook preview setup readies real component locales and installs
 		reportDiagnostics: true,
 	});
 	expect(compiled.diagnostics).toEqual([]);
-	await runInNewContext('(async () => {\n' + compiled.outputText + '\n})()', {
+	const previewReady = runInNewContext('(async () => {\n' + compiled.outputText + '\n})()', {
 		exports: {},
 		require(specifier: string) {
 			if (specifier.startsWith('../../features/')) {
@@ -72,9 +74,15 @@ test('actual Storybook preview setup readies real component locales and installs
 		},
 		window, localStorage, queueMicrotask, MutationObserver,
 	});
+	await vi.waitFor(() => expect(start).toHaveBeenCalledOnce());
+	expect(create).not.toHaveBeenCalled();
+	expect(initialized).toEqual([]);
+	expect(setup).not.toHaveBeenCalled();
+	completeWorkerStart();
+	await previewReady;
 	await vi.waitFor(() => expect(setup).toHaveBeenCalledOnce());
 	expect(mswLoader).toHaveBeenCalledOnce();
-	expect(setupWorker).not.toHaveBeenCalled();
+	expect(setupWorker).toHaveBeenCalledOnce();
 	expect(await mswLoader.mock.calls[0][0]()).toBe(worker);
 	expect(setupWorker).toHaveBeenCalledOnce();
 	expect(start).toHaveBeenCalledExactlyOnceWith({ onUnhandledFrame });
