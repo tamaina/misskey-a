@@ -27,7 +27,7 @@ function handlers(state: typeof initialState) {
 		http.post('*/api/i/security/totp/start', () => HttpResponse.json({ secret: 'JBSWY3DPEHPK3PXP', url: 'otpauth://totp/Storybook:synthetic?secret=JBSWY3DPEHPK3PXP&issuer=Storybook' })),
 		http.post('*/api/i/security/recovery-codes', () => HttpResponse.json({ backupCodes })),
 		// Completion and every unlisted API fail locally; no real changes or native ceremonies are exercised.
-		http.all('*/api/*', () => HttpResponse.json({ error: { code: 'STORYBOOK_ONLY', message: 'No real security changes in Storybook' } }, { status: 403 })),
+		http.all(`${window.location.origin}/api/*`, () => HttpResponse.json({ error: { code: 'STORYBOOK_ONLY', message: 'No real security changes in Storybook' } }, { status: 403 })),
 	];
 }
 
@@ -40,7 +40,7 @@ export const Default = {
 				account.$i.token = 'bs_storybook_synthetic_security';
 				return {};
 			},
-			template: '<div style="width: min(640px, 100vw); padding: 24px; box-sizing: border-box"><MkSecuritySettings /></div>',
+			template: '<div style="width: min(640px, 100vw); max-height: 100vh; overflow: auto; padding: 24px; box-sizing: border-box"><MkSecuritySettings /></div>',
 		};
 	},
 	parameters: { layout: 'centered', msw: { handlers: handlers(initialState) } },

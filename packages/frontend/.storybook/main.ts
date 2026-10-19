@@ -59,6 +59,7 @@ const config = {
 		config.plugins = config.plugins?.filter(plugin => plugin && !hasPluginName(plugin, 'createSearchIndex')) ?? [];
 
 		return mergeConfig(config, {
+			define: { 'import.meta.env.MISSKEY_STORYBOOK_AUTH_ONLY': authOnly },
 			resolve: { alias: { '@storybook/test': 'storybook/test' } },
 			plugins: [
 				{

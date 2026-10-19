@@ -12,7 +12,7 @@ const sessions = [
 	{ id: 'synthetic-current', current: true, createdAt: '2026-10-01T09:00:00.000Z', lastUsedAt: '2026-10-19T09:00:00.000Z', revokedAt: null },
 	{ id: 'synthetic-other', current: false, createdAt: '2026-10-02T09:00:00.000Z', lastUsedAt: '2026-10-18T09:00:00.000Z', revokedAt: null },
 ];
-const block = http.all('*/api/*', () => HttpResponse.json({ error: { code: 'STORYBOOK_ONLY', message: 'No real session changes in Storybook' } }, { status: 403 }));
+const block = http.all(`${window.location.origin}/api/*`, () => HttpResponse.json({ error: { code: 'STORYBOOK_ONLY', message: 'No real session changes in Storybook' } }, { status: 403 }));
 export const CurrentAndOther = {
 	render() {
 		return {

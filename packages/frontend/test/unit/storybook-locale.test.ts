@@ -32,6 +32,7 @@ test('actual Storybook preview setup readies real component locales and installs
 		'virtual:vite-vue-internationalization': { createInternationalization: create, setActiveInternationalization: activate },
 		'@features/boot/frontend/index.js': { startComponentLocales },
 		'chromatic/isChromatic': { default: () => false },
+		'msw': {},
 		'msw/browser': { setupWorker: vi.fn() },
 		'msw-storybook-addon/csf3': { mswLoader: vi.fn() },
 		'./fakes.js': { userDetailed: () => ({ id: 'storybook-fixture' }) },
@@ -49,7 +50,10 @@ test('actual Storybook preview setup readies real component locales and installs
 	// Execute the actual preview's setup and guard. Only external Storybook,
 	// theme/widget and network collaborators are substituted; localization and
 	// both representative Vue components use the real generated VVI runtime.
-	const compiled = ts.transpileModule(previewSource, {
+	// Vite replaces this compile-time flag; exercise the unchanged default preview here.
+	const authOnlyFlag = 'import.meta.env.MISSKEY_STORYBOOK_AUTH_ONLY';
+	expect(previewSource.split(authOnlyFlag)).toHaveLength(3);
+	const compiled = ts.transpileModule(previewSource.replaceAll(authOnlyFlag, 'false'), {
 		compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 		reportDiagnostics: true,
 	});

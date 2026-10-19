@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import type { StoryObj } from '@storybook/vue3';
 import { ref } from 'vue';
-import { expect, userEvent, within } from '@storybook/test';
+import { expect, userEvent, waitFor, within } from '@storybook/test';
 import { HttpResponse, http } from 'msw';
 import * as account from '../i.js';
 import MkSudoDialog from './MkSudoDialog.vue';
@@ -30,7 +30,7 @@ function handlers(state: typeof initialState) {
 		}),
 		http.post('*/api/i/sudo/exit', () => new HttpResponse(null, { status: 204 })),
 		// No API request in this story may reach a real server.
-		http.all('*/api/*', () => HttpResponse.json({ error: { code: 'STORYBOOK_ONLY', message: 'No real authentication in Storybook' } }, { status: 403 })),
+		http.all(`${window.location.origin}/api/*`, () => HttpResponse.json({ error: { code: 'STORYBOOK_ONLY', message: 'No real authentication in Storybook' } }, { status: 403 })),
 	];
 }
 
@@ -95,7 +95,9 @@ export const Cancelled = {
 	},
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement.ownerDocument.body);
-		await userEvent.click(await canvas.findByRole('button', { name: /^キャンセル$/ }));
+		const cancel = await canvas.findByRole('button', { name: /^キャンセル$/ });
+		await waitFor(() => { expect(window.getComputedStyle(cancel).pointerEvents).not.toBe('none'); });
+		await userEvent.click(cancel);
 		await expect(canvas.findByRole('status')).resolves.toHaveTextContent('操作は実行していません');
 	},
 } satisfies StoryObj<typeof MkSudoDialog>;

@@ -77,7 +77,6 @@ export class WebAuthnService {
 		return this.verifySigninKey(`webauthn:authenticationChallenge:${userId}`, userId, response, beforeProof, requireUserVerification);
 	}
 
-
 	@bindThis
 	public async verifySignInWithPasskeyWithProof<Expected>(context: string, response: AuthenticationResponseJSON | PackedJsonValue | undefined, beforeProof: (key: SigninKeyIdentity) => Promise<Expected>): Promise<SigninKeyProof<Expected> | null> {
 		return this.verifySigninKey(`webauthn:passkeyChallenge:${context}`, undefined, response, beforeProof);
