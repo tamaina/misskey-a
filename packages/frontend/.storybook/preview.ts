@@ -68,13 +68,15 @@ await worker.start({ onUnhandledFrame });
 // Story modules and initialization graphs can capture owner messages eagerly.
 const { lang } = await import('@features/boot/frontend/shared/config.js');
 const internationalization = await startComponentLocales(lang, createInternationalization, setActiveInternationalization);
-const [{ default: components }, { default: directives }, { default: widgets }, { themeManager }, { prefer }, os] = await Promise.all([
+// The OS entry owns popup imports that depend on preferences. Resolve it first
+// so concurrent entry traversal cannot observe `prefer` before initialization.
+const os = await import('../../features/ui/frontend/os.js');
+const [{ default: components }, { default: directives }, { default: widgets }, { themeManager }, { prefer }] = await Promise.all([
 	import('../../features/index/frontend/components.js'),
 	import('../../features/index/frontend/directives.js'),
 	import('../../features/index/frontend/widgets.js'),
 	import('../../features/preferences/frontend/theme.js'),
 	import('../../features/preferences/frontend/preferences.js'),
-	import('../../features/ui/frontend/os.js'),
 ]);
 setup((app) => {
 	moduleInitialized = true;

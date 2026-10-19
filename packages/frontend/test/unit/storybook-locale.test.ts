@@ -88,6 +88,7 @@ test('actual Storybook preview setup readies real component locales and installs
 	expect(start).toHaveBeenCalledExactlyOnceWith({ onUnhandledFrame });
 	expect(create).toHaveBeenCalledExactlyOnceWith({ initialLocale: lang });
 	expect(initialized).toHaveLength(6);
+	expect(initialized[0]).toBe('../../features/ui/frontend/os.js');
 	expect(activate).toHaveBeenCalledOnce();
 	const configure = setup.mock.calls[0][0];
 	preferState.emojiStyle = 'native';
