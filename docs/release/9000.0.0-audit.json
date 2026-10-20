@@ -7,7 +7,7 @@
   },
   "target": {
     "repository": "tamaina/misskey-a",
-    "head": "e1a614df68f226a8c9ee831994e1727a1ded061f",
+    "head": "af016bb8f56e762d9864bc88710737c88a7b10a5",
     "branch": "develop"
   },
   "initial_target": "3c215bd72640dd882feacd8b97ef92ebf2c4c180",
@@ -32,34 +32,42 @@
   ],
   "groups": {
     "architecture": {
-      "changelog_anchor": "API、モデル、サービス、画面、ジョブを機能単位"
+      "changelog_anchor": "API、モデル、サービス、画面、ジョブを`feature`単位"
     },
     "lifecycle": {
       "changelog_anchor": "サーバー・キュー・CLI の起動終了"
     },
     "contracts": {
-      "changelog_anchor": "oRPC / Valibot の契約から API・SDK"
+      "changelog_anchor": "oRPC/Valibotの契約からAPI"
     },
     "locales": {
-      "changelog_anchor": "VVI 1.1.5"
+      "changelog_anchor": "クライアントのi18nライブラリにVVIを採用"
     },
     "build": {
       "changelog_anchor": "機能別の契約・翻訳・DB・起動停止・連合の回帰検証"
     },
     "ci": {
-      "changelog_anchor": "CI の安定ブランチ対象を main"
+      "changelog_anchor": "CIの安定ブランチ対象をmain"
     },
     "release": {
-      "changelog_anchor": "既存の Release Manager Action"
+      "changelog_anchor": null,
+      "editorial_omission": {
+        "commit": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+        "reason": "ユーザーが公開CHANGELOGから削除した旧説明。以前の文章へ戻さず監査上の分類を保持。"
+      }
     },
     "branding": {
-      "changelog_anchor": "表示名を Misskey 9000"
+      "changelog_anchor": "ソフトウェア名を **Misskey 9000**"
     },
     "dependencies": {
       "changelog_anchor": "依存関係の更新"
     },
     "security_docs": {
-      "changelog_anchor": "脆弱性の報告ガイドライン"
+      "changelog_anchor": null,
+      "editorial_omission": {
+        "commit": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+        "reason": "ユーザーが公開CHANGELOGから削除した旧説明。以前の文章へ戻さず監査上の分類を保持。"
+      }
     },
     "follow_suspend": {
       "changelog_anchor": "ユーザーの凍結時にフォロー関係を削除せず"
@@ -68,7 +76,7 @@
       "changelog_anchor": "新しいアカウントからのフォロー"
     },
     "signature": {
-      "changelog_anchor": "連合の Draft 署名を native"
+      "changelog_anchor": "連合の署名について、複数公開鍵"
     },
     "remote_suspend": {
       "changelog_anchor": "リモートの凍結状態をローカル"
@@ -77,10 +85,10 @@
       "changelog_anchor": "上流由来の migration 名・履歴を復元"
     },
     "pwa": {
-      "changelog_anchor": "PWA で共有されたファイル"
+      "changelog_anchor": "PWAで共有されたファイル"
     },
     "ui": {
-      "changelog_anchor": "Safari でデッキ列"
+      "changelog_anchor": "Safariでデッキ列"
     },
     "upstream_embed": {
       "changelog_anchor": "埋め込み画面の内部リンク判定"
@@ -92,22 +100,22 @@
       "changelog_anchor": "ブラウザーセッションを個別に発行"
     },
     "auth_api": {
-      "changelog_anchor": "TOTP / パスキー API の canonical alias"
+      "changelog_anchor": "TOTP/パスキーAPIのcanonical alias"
     },
     "auth_foundation": {
-      "changelog_anchor": "開発者向けに OIDC"
+      "changelog_anchor": "開発者向けにOIDC"
     },
     "mcp": {
-      "changelog_anchor": "トークンの権限に沿った API 検出"
+      "changelog_anchor": "トークンの権限に沿ったAPI検出"
     },
     "mcp_events": {
-      "changelog_anchor": "MCP のイベント記述・JSON Schema"
+      "changelog_anchor": "MCPのイベント記述・JSON Schema"
     },
     "oauth": {
       "changelog_anchor": "通常の OAuth でも明示的な opt-in"
     },
     "sdk_acct": {
-      "changelog_anchor": "SDK で `acct:`"
+      "changelog_anchor": "misskey-jsで `acct:`"
     },
     "clip": {
       "changelog_anchor": "デッキにクリップ列"
@@ -116,7 +124,7 @@
       "changelog_anchor": "お知らせの自動アーカイブ"
     },
     "quote_emoji": {
-      "changelog_anchor": "リモートへの引用 Renote"
+      "changelog_anchor": "リモートへの引用Renote"
     },
     "pin": {
       "changelog_anchor": "ピン留め解除で削除完了"
@@ -128,25 +136,37 @@
       "changelog_anchor": "モデレーションログの差分表示"
     },
     "sw_follow": {
-      "changelog_anchor": "Service Worker の通知からのフォロー操作"
+      "changelog_anchor": "Service Workerの通知からのフォロー操作"
     },
     "stream_cleanup": {
       "changelog_anchor": "統計ログの応答待ちリスナー"
     },
     "markup": {
-      "changelog_anchor": "通常画面と埋め込み画面の MFM"
+      "changelog_anchor": "通常画面と埋め込み画面のMFM"
     },
     "avatar_federation": {
-      "changelog_anchor": "Tempura 互換のアバターデコレーション連合"
+      "changelog_anchor": "リモートユーザーのアバターデコレーションが反映"
     },
     "profile_comment": {
-      "changelog_anchor": "UserProfile の password 列コメント"
+      "changelog_anchor": "UserProfileのpassword列コメント"
     },
     "setup_ui": {
       "changelog_anchor": "初期設定ダイアログでフッター"
     },
     "delivery_rate": {
       "changelog_anchor": "配送ジョブの `deliverJobPerSec`"
+    },
+    "zip": {
+      "changelog_anchor": "カスタム絵文字ZIPの生成・読み取り"
+    },
+    "vvi_facade": {
+      "changelog_anchor": "翻訳チャンクの直接re-export"
+    },
+    "storybook": {
+      "changelog_anchor": "Storybookの依存関係をMSW 3 / Storybook 10"
+    },
+    "mcp_self_events": {
+      "changelog_anchor": "自分で投稿した返信・メンション"
     }
   },
   "review": {
@@ -155,7 +175,11 @@
       "merged PRの機能変更と未接続の認証基盤を区別",
       "初期契約化のping/server-info/emojisは新APIではないことをdiffで確認",
       "全mergeのcombined diffを確認",
-      "旧リリース節はbyte単位で保持"
+      "旧リリース節はbyte単位で保持",
+      "af016bb8fの機能別見出し・削除済み旧項目と以後の差分を照合",
+      "最新pnpm、beta.3、MCP自己通知除外の実装と未マージ境界を照合",
+      "本文のfork PR94件をGitHub merged状態・target包含・baseline非包含まで照合（upstream #17993は別集計）",
+      "対象268commitの母集合と全changed_paths_sha256を再計算し一致確認"
     ],
     "not_claimed": [
       "本家developの未マージ変更",
@@ -164,12 +188,12 @@
     ]
   },
   "summary": {
-    "commit_count": 257,
+    "commit_count": 268,
     "dispositions": {
-      "excluded": 12,
-      "grouped": 245
+      "excluded": 15,
+      "grouped": 253
     },
-    "referenced_fork_pr_count": 89
+    "referenced_fork_pr_count": 94
   },
   "commits": [
     {
@@ -3854,6 +3878,174 @@
         "delivery_rate"
       ],
       "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f1bedff6085348d80dd5825eeddce1cacde1fe78",
+      "subject": "docs(release): cover changes since upstream 2026.10.0",
+      "parents": [
+        "e1a614df68f226a8c9ee831994e1727a1ded061f"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "dbeecc9f4e7b128f4d224df3dcda0253ff997c8e4c0c212f1c332ac9c65dd266",
+      "disposition": "excluded",
+      "reason": "文書のみの前回CHANGELOG補完。"
+    },
+    {
+      "sha": "64b11074dcf3b47a40b9f37a9a4f3ec8f583806e",
+      "subject": "refactor(i18n): expand shared VVI labels and prune migrated catalogs (#204)",
+      "parents": [
+        "f1bedff6085348d80dd5825eeddce1cacde1fe78"
+      ],
+      "changed_file_count": 113,
+      "changed_paths_sha256": "baee31c2e4ea959249ec3c231fd7f29df1fec7a5332f93c9fbd648f150c85356",
+      "fork_pr": 204,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "60d5ece7ffb1c401ad137ca22ae0ab6b4797b7ec",
+      "subject": "fix(i18n): accept direct re-export facade chunks (#207)",
+      "parents": [
+        "64b11074dcf3b47a40b9f37a9a4f3ec8f583806e"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "5453540bc691bc3d0183538d38b78e02a9cda4bc8f09793c8d4be30427e3ff6b",
+      "fork_pr": 207,
+      "disposition": "grouped",
+      "groups": [
+        "vvi_facade"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "3da6cbe5773215282cfb4fe38694f65e07ffcddf",
+      "subject": "refactor(zip): unify emoji archives with zip.js (#208)",
+      "parents": [
+        "60d5ece7ffb1c401ad137ca22ae0ab6b4797b7ec"
+      ],
+      "changed_file_count": 8,
+      "changed_paths_sha256": "2ef85f2689c512de8aed34e13c23c6165d9d1ce8f7c55485fd242dc2278b4edb",
+      "fork_pr": 208,
+      "disposition": "grouped",
+      "groups": [
+        "zip"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "0ce2b9cd270f21e5d0120f44ff9a6fb2b66012fd",
+      "subject": "chore(deps): align upstream build and test toolchain (#210)",
+      "parents": [
+        "3da6cbe5773215282cfb4fe38694f65e07ffcddf"
+      ],
+      "changed_file_count": 19,
+      "changed_paths_sha256": "0a8fd9933e9630228529d3740b4050463674e06bc4e5b84a5b6875b1793b096f",
+      "fork_pr": 210,
+      "disposition": "grouped",
+      "groups": [
+        "dependencies",
+        "vvi_facade"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "e2bb37384f3b7f2e2f2b0103a04e5c5281952e08",
+      "subject": "chore(deps): follow upstream frontend media dependencies (#213)",
+      "parents": [
+        "0ce2b9cd270f21e5d0120f44ff9a6fb2b66012fd"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "5dd026833fb712152f4972a5a7ca3a3003a2bfc4c3f7d19bf141aa1328f2c15f",
+      "fork_pr": 213,
+      "disposition": "grouped",
+      "groups": [
+        "dependencies"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "9aeadebf7a0b7e0d485b0973024a845770e5c139",
+      "subject": "chore(deps): follow upstream backend and Sentry dependencies (#212)",
+      "parents": [
+        "e2bb37384f3b7f2e2f2b0103a04e5c5281952e08"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "3c074a39083a06fa534b6bf5fe9c5e068c3fe011e3286a91be05847b55cef4ad",
+      "fork_pr": 212,
+      "disposition": "grouped",
+      "groups": [
+        "dependencies"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "e391187600a90dd263da7ff8dc1e3b6efc1a2c8a",
+      "subject": "fix(storybook): migrate MSW 3 and align Storybook 10 addons (#211)",
+      "parents": [
+        "9aeadebf7a0b7e0d485b0973024a845770e5c139"
+      ],
+      "changed_file_count": 13,
+      "changed_paths_sha256": "b53e5372414d523b4d0da4537d3cee85c59b73039963ff1780f63f3208c3a157",
+      "fork_pr": 211,
+      "disposition": "grouped",
+      "groups": [
+        "storybook"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "297fd7f2d1418f50f4135d034c45f4c1589ca7c1",
+      "subject": "Bump version to 9000.0.0-beta.3",
+      "parents": [
+        "e391187600a90dd263da7ff8dc1e3b6efc1a2c8a"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "355df13ce35a258b468406649d072be524c74e25320c2ff4c21023bd989b52bc",
+      "disposition": "excluded",
+      "reason": "公式Release Managerによるbeta.3のversion-only変更。新機能としては数えずNoteの公開タグ情報に反映。"
+    },
+    {
+      "sha": "40191c3301cc47d512b725f14e49f88ab9b13409",
+      "subject": "fix(mcp): exclude self-authored reply and mention events (#215)",
+      "parents": [
+        "297fd7f2d1418f50f4135d034c45f4c1589ca7c1"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "05fa4fa1b38e1b5a47c3b881a52b358ca980624dc24ed2dc4aa25f3cc7f4ef6a",
+      "fork_pr": 215,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_self_events"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+      "subject": "Update CHANGELOG",
+      "parents": [
+        "40191c3301cc47d512b725f14e49f88ab9b13409"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "06572a96a58dc510037d5efa622f9bec8519bc1beab13c9f251e97e657a9d4ed",
+      "disposition": "excluded",
+      "reason": "ユーザーの構成・表現を参照する文書編集。公開機能を増やす変更ではない。"
     }
-  ]
+  ],
+  "editorial_refresh": {
+    "author_edit": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+    "previous_audit_target": "e1a614df68f226a8c9ee831994e1727a1ded061f",
+    "policy": "ユーザーが付けたGeneral内の機能別見出し・説明・Client/Serverの構成と表現を維持。削除済みの旧項目は復活させず、以後の実変更だけ統合。",
+    "not_merged_at_snapshot": [
+      "authentication #188 and related Draft branches",
+      "Unicode user-list name correction #217 (open; Issue #216)"
+    ],
+    "latest_public_beta": {
+      "tag": "9000.0.0-beta.3",
+      "sha": "297fd7f2d1418f50f4135d034c45f4c1589ca7c1"
+    },
+    "publication_boundary": "beta.3後に統合済みのMCP #215も掲載。developで実装済みであることと公開タグ収録を区別。"
+  }
 }
