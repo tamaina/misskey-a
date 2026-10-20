@@ -10,7 +10,7 @@ import { ChannelFederationService } from '../../backend/services/ChannelFederati
 import { ApNoteService } from '@features/federation/backend/services/ApNoteService.js';
 import { ApInboxService } from '@features/federation/backend/services/ApInboxService.js';
 import { createApShowProcedure } from '@features/federation/backend/endpoints/ap/show.js';
-import type { ApiServices } from '@features/api/backend/transport/context.js';
+import type { ApiActor, ApiServices } from '@features/api/backend/transport/context.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { MiChannel } from '../../backend/models/Channel.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
@@ -154,7 +154,7 @@ test('the real ap/show procedure can acquire a public Note before resolving or f
 	const f = fixture();
 	const serializer = mockDeep<NoteEntityService>();
 	serializer.pack.mockResolvedValue({ id: 'saved-0', uri: noteUri, userId: 'author', channelId: 'remote-channel', user: { id: 'author', username: 'author', host: 'a.test', avatarUrl: null, avatarDecorations: [], emojis: {} }, fileIds: [], reactionEmojis: {}, reactions: {} } as never);
-	const services = mockDeep<ApiServices>();
+	const services = mockDeep<ApiServices<ApiActor>>();
 	services.authenticate.mockResolvedValue([{ id: 'viewer', isSuspended: false, movedToUri: null }, null]);
 	services.limitActor.mockReturnValue(null);
 	const client = createProcedureClient(createApShowProcedure({ utilityService: f.utility, userEntityService: mockDeep(), noteEntityService: serializer, apResolverService: f.resolvers, apDbResolverService: { getUserFromApId: async () => null, getNoteFromApId: async () => null }, apPersonService: mockDeep(), apNoteService: f.importer }), { context: { services, credential: 'fixture', ip: '127.0.0.1', headers: {} } });
