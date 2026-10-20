@@ -34,6 +34,12 @@ export async function saveBillingState(manager: EntityManager, userId: string, d
 	await manager.update(MiBillingAccountState, userId, { data });
 }
 
+/** CFW starts an immediate initial term at server confirmation, retaining scheduled/upgrade periods. */
+export function paidServiceQuote(quote: PaymentQuote, offer: ServiceOffer, paidAt: number): PaymentQuote {
+	if (quote.currentPlan !== null || quote.effectiveStartsAt > quote.quoteCreatedAt) return quote;
+	return { ...quote, effectiveStartsAt: paidAt, effectiveExpiresAt: addPaymentDuration(paidAt, offer.duration, offer.durationUnit) };
+}
+
 /** Source selection order: active upgrade, future upgrade, scheduled higher/same tail, active plan. */
 export function quoteServiceTerm(state: BillingState, offer: ServiceOffer, at: number): PaymentQuote {
 	const terms = state.terms.filter(term => planGroup(term.offer) === planGroup(offer) && term.expiresAt > at);

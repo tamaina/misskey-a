@@ -13,7 +13,7 @@ import { MiBillingCatalogPrice } from './models/BillingCatalogPrice.js';
 import { MiBillingPricingAsset } from './models/BillingPricingAsset.js';
 import { MiBillingAssetDeployment } from './models/BillingAssetDeployment.js';
 import { offerAvailable, catalog, priceId, validPriceCatalog, immutablePriceMatches } from './service-catalog.js';
-import { lockBillingState, saveBillingState, quoteServiceTerm, applyFundedTerm } from './billing-state.js';
+import { lockBillingState, saveBillingState, quoteServiceTerm, paidServiceQuote, applyFundedTerm } from './billing-state.js';
 import { MiBillingWallet } from './models/BillingWallet.js';
 import { MiBillingServiceOffer } from './models/BillingServiceOffer.js';
 import { MiBillingTransactionClaim } from './models/BillingTransactionClaim.js';
@@ -151,8 +151,9 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				await manager.insert(MiBillingServiceOrder, row);
 				if (quote?.payableAmountBaseUnits === '0') {
 					await requirePurchasableRole(manager, row.offer.roleId);
-					row.status = 'paid'; row.paidAt = createdAt; row.startsAt = quote.effectiveStartsAt; row.endsAt = quote.effectiveExpiresAt;
-					applyFundedTerm(state, row, quote, () => id(now()));
+					const paidQuote = paidServiceQuote(quote, row.offer, createdAt);
+					row.status = 'paid'; row.paidAt = createdAt; row.startsAt = paidQuote.effectiveStartsAt; row.endsAt = paidQuote.effectiveExpiresAt;
+					applyFundedTerm(state, row, paidQuote, () => id(now()));
 					await manager.update(MiBillingServiceOrder, row.id, { status: row.status, paidAt: row.paidAt, startsAt: row.startsAt, endsAt: row.endsAt });
 					await saveBillingState(manager, userId, state);
 				}
@@ -199,7 +200,7 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 					if (await manager.existsBy(MiBillingTransactionClaim, { chainId: String(row.chainId), txHash })) conflict();
 					await manager.insert(MiBillingTransactionClaim, { chainId: String(row.chainId), txHash, ownerId: row.id });
 					row.paidAt = now();
-					const quote = row.quote ?? quoteServiceTerm(state, row.offer, row.paidAt);
+					const quote = paidServiceQuote(row.quote ?? quoteServiceTerm(state, row.offer, row.paidAt), row.offer, row.paidAt);
 					row.startsAt = quote.effectiveStartsAt; row.endsAt = quote.effectiveExpiresAt;
 					if (!Number.isSafeInteger(row.endsAt) || row.endsAt <= row.startsAt) unavailable();
 					row.status = 'paid';

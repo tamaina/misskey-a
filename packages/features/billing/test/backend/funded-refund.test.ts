@@ -4,7 +4,7 @@
  */
 import 'reflect-metadata';
 import { expect, test } from 'vitest';
-import { applyFundedTerm, quoteServiceTerm } from '../../backend/billing-state.js';
+import { applyFundedTerm, quoteServiceTerm, paidServiceQuote } from '../../backend/billing-state.js';
 import { fundingIntervalAmount } from '../../shared/billing-funding.js';
 import { groupBillingRefundLines } from '../../shared/billing-refund-groups.js';
 import { splitBillingRefundPeriod } from '../../shared/billing-refund-period.js';
@@ -24,6 +24,33 @@ function buy(state: BillingState, price: ServiceOffer, at: number) {
 	const row = { id: `${price.id}-${at}`, offer: price, payerAddress: address(3), cashAmountBaseUnits: quote.payableAmountBaseUnits } as MiBillingServiceOrder;
 	applyFundedTerm(state, row, quote, () => `${row.id}-${++seq}`); return { row, quote };
 }
+
+test.each([
+	{ duration: 10, durationUnit: 'days' as const, at: '2026-10-01T00:00:00Z', paid: '2026-10-02T00:00:00Z', end: '2026-10-12T00:00:00Z' },
+	{ duration: 1, durationUnit: 'months' as const, at: '2026-02-28T12:34:56Z', paid: '2026-03-01T12:34:56Z', end: '2026-04-01T12:34:56Z' },
+	{ duration: 1, durationUnit: 'years' as const, at: '2027-02-28T12:34:56Z', paid: '2028-02-29T12:34:56Z', end: '2029-02-28T12:34:56Z' },
+])('initial $durationUnit term begins at server confirmation and retains its full calendar duration', ({ duration, durationUnit, at, paid, end }) => {
+	const price = { ...offer, duration, durationUnit };
+	const original = quoteServiceTerm(fresh(), price, Date.parse(at));
+	const quoted = structuredClone(original);
+	const confirmed = paidServiceQuote(original, price, Date.parse(paid));
+	expect(confirmed.effectiveStartsAt).toBe(Date.parse(paid)); expect(confirmed.effectiveExpiresAt).toBe(Date.parse(end));
+	expect(original).toEqual(quoted);
+	const state = fresh(); let sequence = 0;
+	applyFundedTerm(state, { id: 'initial', offer: price, cashAmountBaseUnits: original.payableAmountBaseUnits } as MiBillingServiceOrder, confirmed, () => `initial-${++sequence}`);
+	expect(state.terms[0]).toMatchObject({ startsAt: Date.parse(paid), expiresAt: Date.parse(end) });
+	expect(state.lots[0]).toMatchObject({ basisStartsAt: Date.parse(paid), basisExpiresAt: Date.parse(end) });
+});
+test('delayed renewal, upgrade and downgrade keep their quoted periods; initial zero-payable starts when applied', () => {
+	const state = fresh(); buy(state, offer, 0);
+	for (const price of [offer, { ...offer, serviceKey: 'plus', sortOrder: 2 }, { ...offer, serviceKey: 'lower', sortOrder: 0 }]) {
+		const quote = quoteServiceTerm(state, price, day);
+		expect(paidServiceQuote(quote, price, 20 * day)).toEqual(quote);
+	}
+	const free = { ...offer, amountBaseUnits: '0', priceStartsAt: 0 };
+	const quote = quoteServiceTerm(fresh(), free, 0);
+	expect(paidServiceQuote(quote, free, 1000)).toMatchObject({ payableAmountBaseUnits: '0', effectiveStartsAt: 1000, effectiveExpiresAt: 10 * day + 1000 });
+});
 
 test('two upgrades inherit original cash lots and preserve immutable bases', () => {
 	const state = fresh(); const first = buy(state, offer, 0);

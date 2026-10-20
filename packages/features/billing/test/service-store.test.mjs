@@ -93,6 +93,39 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 			assert.equal((await store.listOrders('alice')).find(row => row.id === existing.id).countryEligibility.policy.operatorCountry, 'JP');
 			await assert.rejects(new CountryMigration().down(qr), /Retain/);
 		});
+		await t.test('quoted initial purchase starts at delayed server confirmation once across concurrent checks and retries', async () => {
+			const quoteAt = now, paidAt = quoteAt + 86400000;
+			const terms = { ...offer, id: 'delayed-initial', serviceKey: 'delayed-initial', planGroup: 'delayed-initial', roleId: 'normal', duration: 10, durationUnit: 'days' };
+			await qr.query('INSERT INTO "user" (id) VALUES ($1)', ['delayed-buyer']);
+			await qr.query('INSERT INTO user_profile ("userId", "billingResidence") VALUES ($1, $2::jsonb)', ['delayed-buyer', JSON.stringify(residence)]);
+			await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES ($1,$2,123456,$3,NULL,$4,$4)', ['delayed-wallet', 'delayed-buyer', address(91), now]);
+			await store.saveOffer(terms, 'alice');
+			const quoted = await store.quoteOrder('delayed-buyer', terms.id);
+			const row = await store.createOrder('delayed-buyer', terms.id, 'delayed-wallet', 'delayed-initial', terms, quoted);
+			const hint = await store.submitTransaction('delayed-buyer', row.id, hash(91));
+			const receipt = proof(hint); receipt.evidence.timestamp = quoteAt + 600000;
+			assert.equal((await store.applyReceipt('delayed-buyer', row.id, hash(91), { status: 'pending' })).status, 'pending');
+			now = paidAt;
+			try {
+				assert.equal((await store.submitTransaction('delayed-buyer', row.id)).status, 'pending');
+				const paid = await Promise.all([store.applyReceipt('delayed-buyer', row.id, hash(91), receipt), store.applyReceipt('delayed-buyer', row.id, hash(91), receipt)]);
+				for (const result of paid) {
+					assert.equal(result.paidAt, paidAt); assert.equal(result.startsAt, paidAt); assert.equal(result.endsAt, paidAt + 10 * 86400000);
+					assert.deepEqual(result.quote, quoted.quote, 'Original quote stays immutable for request-key recovery');
+				}
+				assert.deepEqual(await activePaidRoleIds(db, 'delayed-buyer', paidAt - 1), []);
+				assert.deepEqual(await activePaidRoleIds(db, 'delayed-buyer', paidAt), ['normal']);
+				now += 86400000;
+				const replayed = await store.applyReceipt('delayed-buyer', row.id, hash(91), receipt);
+				assert.equal(replayed.startsAt, paidAt); assert.equal(replayed.endsAt, paid[0].endsAt); assert.equal(replayed.paidAt, paidAt);
+				assert.equal((await store.createOrder('delayed-buyer', terms.id, 'delayed-wallet', 'delayed-initial', terms, quoted)).endsAt, paid[0].endsAt);
+				const state = (await qr.query('SELECT data FROM billing_account_state WHERE "userId"=$1', ['delayed-buyer']))[0].data;
+				assert.equal(state.revision, 1); assert.equal(state.terms.length, 1); assert.equal(state.lots.length, 1);
+				assert.equal(state.terms[0].startsAt, paidAt); assert.equal(state.terms[0].expiresAt, paid[0].endsAt);
+				assert.equal(state.lots[0].basisStartsAt, paidAt); assert.equal(state.lots[0].basisExpiresAt, paid[0].endsAt);
+				assert.equal((await qr.query('SELECT count(*)::int AS count FROM billing_transaction_claim WHERE "txHash"=$1', [hash(91)]))[0].count, 1);
+			} finally { now = quoteAt; }
+		});
 		await t.test('confirmed payment claim is globally unique and its term is replay-safe', async () => {
 			const first = (await store.listOrders('alice'))[0];
 			const reserved = await store.submitTransaction('alice', first.id, hash(1));
