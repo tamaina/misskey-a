@@ -186,7 +186,7 @@ export class ApRequestService {
 		} catch (err) {
 			// Inbox capability does not guarantee that authenticated GET can discover
 			// an uncached assertionMethod key. Bootstrap with the legacy RSA publicKey.
-			if (key.algorithm.name === 'Ed25519' && err instanceof StatusError && (err.statusCode === 401 || err.statusCode === 403)) {
+			if (parseHttpSignatureImplementationLevel(level) === '02' && key.algorithm.name === 'Ed25519' && err instanceof StatusError && (err.statusCode === 401 || err.statusCode === 403)) {
 				return await this.signedGet(url, user, allowSoftfail, followAlternate, '00');
 			}
 			throw err;

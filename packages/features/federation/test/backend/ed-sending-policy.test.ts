@@ -61,7 +61,7 @@ function requestFixture(withEd = true) {
 	const service: ApRequestService = Object.assign(Object.create(ApRequestService.prototype), {
 		userKeypairService: keys, httpRequestService: { send }, logger: mock<Logger>(),
 	});
-	return { keys, send, service };
+	return { keys, send, service, entity };
 }
 
 function assertSignature(request: SentRequest, useEd: boolean) {
@@ -159,6 +159,32 @@ describe('Ed sending policy', () => {
 			expect(fixture.send).toHaveBeenCalledTimes(2);
 			assertSignature(fixture.send.mock.calls[0][1], true);
 			assertSignature(fixture.send.mock.calls[1][1], false);
+		} finally { fixture.keys.dispose(); }
+	});
+
+	test.each(['', 'not a PEM'])('propagates missing or corrupt RSA material without sending an unsigned request: %s', async privateKey => {
+		const fixture = requestFixture();
+		fixture.entity.privateKey = privateKey;
+		const failure = new StatusError('forbidden', 403);
+		fixture.send.mockRejectedValue(failure);
+		try {
+			const getKey = vi.spyOn(fixture.keys, 'getLocalUserPrivateKey');
+			await expect(fixture.service.signedGet(target, { id: 'alice' }, FetchAllowSoftFailMask.Strict, false, '02')).rejects.toBeInstanceOf(Error);
+			await expect(getKey.mock.results[1].value).rejects.not.toBe(failure);
+			expect(getKey).toHaveBeenCalledTimes(2);
+			expect(fixture.send).toHaveBeenCalledOnce();
+			assertSignature(fixture.send.mock.calls[0][1], true);
+		} finally { fixture.keys.dispose(); }
+	});
+
+	test('bounds fallback even if corrupt main key storage contains Ed25519 material', async () => {
+		const fixture = requestFixture();
+		fixture.entity.privateKey = privatePem(ed);
+		const failure = new StatusError('forbidden', 403);
+		fixture.send.mockRejectedValue(failure);
+		try {
+			await expect(fixture.service.signedGet(target, { id: 'alice' }, FetchAllowSoftFailMask.Strict, false, '02')).rejects.toBe(failure);
+			expect(fixture.send).toHaveBeenCalledTimes(2);
 		} finally { fixture.keys.dispose(); }
 	});
 
