@@ -13,7 +13,11 @@ test('exploration input proof reverses only the four optional origin fields and 
 	const restored = restoreChannelFederationOpenapiBaseline(spec);
 	expect(JSON.stringify(spec)).toBe(original);
 	for (const path of ['/channels/featured', '/channels/search']) {
-		const input = (value: typeof spec) => value.paths![path].post!.requestBody as { content: { 'application/json': { schema: { properties: Record<string, unknown>; required?: string[]; allOf: { properties: Record<string, unknown>; required?: string[] }[] } } } };
+		const input = (value: typeof spec) => {
+			const body = value.paths?.[path]?.post?.requestBody;
+			if (body == null || !('content' in body)) throw new Error(`Missing request body: ${path}`);
+			return body as { content: { 'application/json': { schema: { properties: Record<string, unknown>; required?: string[]; allOf: { properties: Record<string, unknown>; required?: string[] }[] } } } };
+		};
 		for (const schema of [input(restored).content['application/json'].schema, input(restored).content['application/json'].schema.allOf[0]]) expect(schema.properties).not.toHaveProperty('origin');
 		for (const representation of ['flat', 'intersection']) {
 			for (const mutation of ['enum', 'default', 'required']) {

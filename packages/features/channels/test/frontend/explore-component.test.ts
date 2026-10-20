@@ -8,7 +8,7 @@ import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import Channels from '../../frontend/pages/channels.vue';
 import type { IPaginator } from '@features/ui/frontend/utility/paginator.js';
-import type { PropType } from 'vue';
+import type { Component, PropType } from 'vue';
 
 const mocks = vi.hoisted(() => ({ api: vi.fn() }));
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: mocks.api }));
@@ -21,7 +21,7 @@ vi.mock('@features/channels/frontend/components/MkChannelPreview.vue', async () 
 });
 vi.mock('@features/channels/frontend/components/MkChannelList.vue', async () => {
 	const { defineComponent, h } = await import('vue');
-	const { default: Pagination } = await import('@features/ui/frontend/components/MkPagination.vue');
+	const { default: Pagination } = await vi.importMock<{ default: Component }>('@features/ui/frontend/components/MkPagination.vue');
 	return { default: defineComponent({
 		props: ['paginator'],
 		setup: props => () => h(Pagination, { paginator: props.paginator }, {
