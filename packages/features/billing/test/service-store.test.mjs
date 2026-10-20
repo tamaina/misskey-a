@@ -13,6 +13,8 @@ import { createRouterClient } from '@orpc/server';
 import { createServiceBillingStore, createCatalogAdminStore, createCatalogAdminRouter, createServiceBillingRouter, createBillingPolicyStore, createPurchaseNotifier, createBillingReportsStore, createBillingReportsRouter, activePaidRoleIds, createResidenceStore } from '../../../backend/built/features/billing/backend.js';
 import { BillingServiceSubscriptions1791838800000 as Migration } from '../../../backend/migration/1791838800000-BillingServiceSubscriptions.js';
 import { BillingFundedTerms1792010000000 } from '../../../backend/migration/1792010000000-BillingFundedTerms.js';
+import { BillingRefunds1792011000000 } from '../../../backend/migration/1792011000000-BillingRefunds.js';
+import { BillingLedgerRetention1792464858558 as RetentionMigration } from '../../../backend/migration/1792464858558-BillingLedgerRetention.js';
 import { BillingWalletRegistration1791760200000 as WalletMigration } from '../../../backend/migration/1791760200000-BillingWalletRegistration.js';
 import { BillingWalletChainSettings1791763800000 } from '../../../backend/migration/1791763800000-BillingWalletChainSettings.js';
 import { BillingCatalogAdministration1792020000000 as CatalogMigration } from '../../../backend/migration/1792020000000-BillingCatalogAdministration.js';
@@ -43,6 +45,8 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 		const migration = new Migration(); await migration.up(qr); await migration.down(qr); await migration.up(qr);
 		await new WalletMigration().up(qr);
 		await new BillingFundedTerms1792010000000().up(qr);
+		await new BillingRefunds1792011000000().up(qr);
+		await new RetentionMigration().up(qr);
 		await new BillingWalletChainSettings1791763800000().up(qr);
 		const seed = { ...offer, id: 'migration-price', priceStartsAt: now - 10, priceExpiresAt: now + 10 };
 		await qr.query('INSERT INTO billing_service_offer (id, terms, "updatedAt", "updatedByUserId") VALUES ($1, $2::jsonb, $3, $4)', [seed.id, JSON.stringify(seed), new Date(now), 'alice']);
@@ -484,8 +488,11 @@ test('synthetic PostgreSQL subscriptions and paid role intervals', { skip: !url 
 			await assert.rejects(new ResidenceMigration().down(qr), /Retain/);
 		});
 		await t.test('paid evidence remains claimed after account deletion', async () => {
+			const before = (await qr.query('SELECT data FROM billing_account_state WHERE "userId" = \'alice\''))[0].data;
 			await qr.query('DELETE FROM "user" WHERE id = \'alice\'');
 			assert.equal((await qr.query('SELECT count(*)::int AS count FROM billing_service_order WHERE "txHash" = $1 AND status = \'paid\'', [hash(1)]))[0].count, 1);
+			assert.deepEqual((await qr.query('SELECT data FROM billing_account_state WHERE "userId" = \'alice\''))[0].data, before);
+			assert.deepEqual(await activePaidRoleIds(db, 'alice', now), []);
 		});
 	} finally { await qr.query(`DROP SCHEMA "${schema}" CASCADE`); await qr.release(); await db.destroy(); }
 });

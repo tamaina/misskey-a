@@ -25,6 +25,9 @@ import { BillingOrderReports1792023000000 } from '../../../../backend/migration/
 import { BillingNotifications1792022000000 } from '../../../../backend/migration/1792022000000-BillingNotifications.js';
 import { BillingTaxResidency1792021000000 } from '../../../../backend/migration/1792021000000-BillingTaxResidency.js';
 import { BillingRefunds1792011000000 } from '../../../../backend/migration/1792011000000-BillingRefunds.js';
+import { BillingLedgerRetention1792464858558 as RetentionMigration } from '../../../../backend/migration/1792464858558-BillingLedgerRetention.js';
+import { MiBillingRefund } from '../../backend/models/BillingRefund.js';
+import { createBillingReportsStore } from '../../backend/reports-store.js';
 import type { ServiceOffer } from '../../backend/api.definition.js';
 import type { ReceiptReader, ReceiptResult } from '../../backend/transfer-confirmation.js';
 import type { RefundData } from '../../shared/refund-types.js';
@@ -72,6 +75,7 @@ test.skipIf(!url)('native PostgreSQL refund API, claims, all-group atomic expiry
 		await new BillingServiceSubscriptions1791838800000().up(qr);
 		const funded = new BillingFundedTerms1792010000000(), migration = new BillingRefunds1792011000000();
 		await funded.up(qr); await migration.up(qr); await migration.down(qr); await funded.down(qr); await funded.up(qr); await migration.up(qr);
+		const retention = new RetentionMigration(); await retention.up(qr); await retention.down(qr); await retention.up(qr);
 		await qr.query('INSERT INTO billing_wallet (id,"userId","chainId",address,label,"createdAt","updatedAt") VALUES (\'wallet-a\',\'alice\',1,$1,NULL,$3,$3),(\'wallet-b\',\'alice\',1,$2,NULL,$3,$3)', [address(1), address(2), now]);
 		await new BillingWalletChainSettings1791763800000().up(qr);
 		await new BillingCatalogAdministration1792020000000().up(qr);
@@ -166,5 +170,22 @@ test.skipIf(!url)('native PostgreSQL refund API, claims, all-group atomic expiry
 		expect((await refunds.check(mixedPrepared.id, 'admin')).document!.originalPurchases).toHaveLength(2);
 		const legacy = await refunds.request('bob', 'unknown', undefined, 'legacy'); expect(legacy.status).toBe('review_required');
 		const reviewed = await refunds.decide(legacy.id, legacy.version, 'admin', 'approve', undefined, 'review'); expect(reviewed.status).toBe('review_required');
+		// Normal state transitions keep their original rows; neither ORM DELETE nor TRUNCATE can erase them.
+		for (const table of ['billing_service_order', 'billing_refund', 'billing_transaction_claim', 'billing_account_state']) {
+			await expect(qr.query(`DELETE FROM ${table}`)).rejects.toMatchObject({ code: '23514' });
+			await expect(qr.query(`TRUNCATE ${table} CASCADE`)).rejects.toMatchObject({ code: '23514' });
+		}
+		await expect(db.getRepository(MiBillingRefund).delete({ id: completed.id })).rejects.toMatchObject({ code: '23514' });
+		const beforeDeletion = (await qr.query('SELECT data FROM billing_account_state WHERE "userId" = \'alice\''))[0].data;
+		await qr.query('DELETE FROM "user" WHERE id = \'alice\'');
+		expect((await qr.query('SELECT data FROM billing_account_state WHERE "userId" = \'alice\''))[0].data).toEqual(beforeDeletion);
+		expect((await refunds.show(completed.id)).document).toEqual(completed.document);
+		expect((await refunds.list()).items.some(item => item.id === completed.id)).toBe(true);
+		const retainedOrder = await createBillingReportsStore(db).find(first.id);
+		expect(retainedOrder.userId).toBeNull(); expect(retainedOrder.payerAddress).toBe(first.payerAddress);
+		expect(retainedOrder.offer).toEqual(first.offer); expect(retainedOrder.txHash).toBe(first.txHash); expect(retainedOrder.status).toBe('paid');
+		expect(await activePaidRoleIds(db, 'alice', started + day)).toEqual([]);
+		await expect(retention.down(qr)).rejects.toThrow('Retained billing accounts prevent rollback');
+		expect((await db.driver.createSchemaBuilder().log()).upQueries.filter(row => /"billing_account_state"/.test(row.query))).toEqual([]);
 	} finally { await qr.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`); await qr.release(); await db.destroy(); }
 }, 60000);
