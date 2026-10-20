@@ -102,7 +102,15 @@ export class RemoteUserResolveService {
 			});
 
 			this.logger.info(`try resync: ${acctLower}`);
-			const self = await this.resolveSelf(acctLower);
+			let self: ILink;
+			try {
+				self = await this.resolveSelf(acctLower);
+			} catch (err) {
+				// Discovery failure does not invalidate the already registered Actor.
+				// Retain the retry throttle above and keep the failure observable.
+				this.logger.warn(`return existing remote user after failed WebFinger: ${acctLower}`, { err });
+				return user;
+			}
 
 			if (user.uri !== self.href) {
 				// if uri mismatch, Fix (user@host <=> AP's Person id(RemoteUser.uri)) mapping.
