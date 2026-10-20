@@ -87,6 +87,46 @@ test('creation re-evaluates policies after a scheduled draft was saved', async (
 	await expect(f.service.create(user, f.draft({ createdAt: new Date() }))).rejects.toMatchObject({ id: 'ebd9b2a9-4d95-4b01-8824-e701629b65e7' });
 	expect(f.getUserPolicies.mock.calls).toEqual([[user.id, true], [user.id, true]]);
 });
+
+test.each([
+	['self reply without mentions', user.id, 'hello', undefined, undefined, 0, 0],
+	['other reply without mentions', 'other', 'hello', undefined, undefined, 0, 1],
+	['self reply with explicit self mention', user.id, '@author', undefined, undefined, 0, 1],
+	['self reply with explicit other mention', user.id, '@other', undefined, undefined, 0, 1],
+	['other reply plus duplicate target mentions', 'other', '@other @other', undefined, undefined, 1, 1],
+	['self reply plus duplicate mentions', user.id, '@other @other', undefined, undefined, 1, 1],
+	['other reply plus distinct mention', 'other', '@third', undefined, undefined, 1, 2],
+	['two recipients at boundary', 'other', '@third', undefined, undefined, 2, 2],
+	['CW mention', user.id, 'hello', '@other', undefined, 0, 1],
+	['poll choice mention', user.id, 'hello', undefined, { choices: ['@other', 'hello'], multiple: false, expiresAt: null }, 0, 1],
+	['duplicate across text CW and poll', 'other', '@other', '@other', { choices: ['@other', 'hello'], multiple: false, expiresAt: null }, 1, 1],
+] satisfies [string, string, string, string | undefined, Draft['poll'], number, number][])(
+	'mention recipient count: %s', async (_name, replyUserId, text, cw, poll, limit, count) => {
+		const f = fixture({ mentionLimit: limit });
+		setFixture(f.service, { remoteUserResolveService: { resolveUser: async (username: string) => ({ ...user, id: username === 'author' ? user.id : username, username }) } });
+		const reply = mockDeep<MiNote>({ id: 'reply1', userId: replyUserId, userHost: null, visibility: 'public', localOnly: false, channelId: null });
+		// Parse real MFM and resolve users through the actual deduplication path.
+		const result = f.service.create(user, f.draft({ reply, text, cw, poll, apMentions: undefined }));
+		if (count > limit) {
+			await expect(result).rejects.toMatchObject({ id: '9f466dab-c856-48cd-9e65-ff90ff750580' });
+			expect(f.insertNote).not.toHaveBeenCalled();
+		} else {
+			await expect(result).rejects.toBe(insertBoundary);
+			expect(f.insertNote.mock.calls[0][4]).toHaveLength(count);
+		}
+	});
+
+test.each([0, 1, 2])('specified recipients count once at mention limit %i', async limit => {
+	const f = fixture({ mentionLimit: limit });
+	const recipient = { id: 'other', host: null, username: 'other', uri: null };
+	const data = f.draft({ visibility: 'specified', visibleUsers: [recipient, recipient], apMentions: [recipient] });
+	const result = f.service.create(user, data);
+	if (limit === 0) await expect(result).rejects.toMatchObject({ id: '9f466dab-c856-48cd-9e65-ff90ff750580' });
+	else {
+		await expect(result).rejects.toBe(insertBoundary);
+		expect(f.insertNote.mock.calls[0][4]).toHaveLength(1);
+	}
+});
 test('role priority, assign/remove and attachment clamp use the real aggregator', async () => {
 	const roles: MiRole[] = []; const service = Object.create(RoleService.prototype) as RoleService;
 	setFixture(service, { meta: { policies: {} }, config: { maxFileSize: 32 * 1024 * 1024 }, getUserRoles: vi.fn(async () => roles) });

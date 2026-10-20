@@ -161,7 +161,9 @@ export function useNote(
 	const urls = parsed ? extractUrlFromMfm(parsed).filter((url) => appearNote.renote?.url !== url && appearNote.renote?.uri !== url) : null;
 	const isLong = shouldCollapsed(appearNote, urls ?? []);
 	const collapsed = ref(appearNote.cw == null && isLong);
-	const canReply = computed(() => $i == null || ($i.policies.canNote && $i.policies.mentionLimit > 0));
+	// Only replies to another author add an implicit mention (as in NoteCreateService).
+	// Explicit mentions and specified recipients are still checked at note creation.
+	const canReply = computed(() => $i == null || ($i.policies.canNote && (appearNote.userId === $i.id || $i.policies.mentionLimit >= 1)));
 	const canRenote = computed(() =>
 		(['public', 'home'].includes(appearNote.visibility) || (appearNote.visibility === 'followers' && appearNote.userId === $i?.id)) &&
 		($i == null || ($i.policies.canNote && $i.policies.renotePolicy !== 'disallow')),
