@@ -7,7 +7,7 @@
   },
   "target": {
     "repository": "tamaina/misskey-a",
-    "head": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+    "head": "8b3bbc05b6a1e4686e4f1c793383d3457545c8e0",
     "branch": "develop"
   },
   "initial_target": "3c215bd72640dd882feacd8b97ef92ebf2c4c180",
@@ -167,6 +167,9 @@
     },
     "mcp_self_events": {
       "changelog_anchor": "自分で投稿した返信・メンション"
+    },
+    "list_name_unicode": {
+      "changelog_anchor": "リストの作成・複製・名前変更で、名前の文字数制限をUnicodeコードポイント数"
     }
   },
   "review": {
@@ -188,12 +191,12 @@
     ]
   },
   "summary": {
-    "commit_count": 268,
+    "commit_count": 271,
     "dispositions": {
-      "excluded": 15,
-      "grouped": 253
+      "excluded": 16,
+      "grouped": 255
     },
-    "referenced_fork_pr_count": 94
+    "referenced_fork_pr_count": 95
   },
   "commits": [
     {
@@ -4032,6 +4035,53 @@
       "changed_paths_sha256": "06572a96a58dc510037d5efa622f9bec8519bc1beab13c9f251e97e657a9d4ed",
       "disposition": "excluded",
       "reason": "ユーザーの構成・表現を参照する文書編集。公開機能を増やす変更ではない。"
+    },
+    {
+      "sha": "f7950b3420643dc75d2e77d394ee0b01edb161c3",
+      "subject": "fix: preserve Unicode code-point limits for list names",
+      "parents": [
+        "af016bb8f56e762d9864bc88710737c88a7b10a5"
+      ],
+      "diff_base": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+      "changed_file_count": 5,
+      "changed_paths_sha256": "9a992122ee9026d95db37983a28a9883eb14aba91187bb2d49577d31f246a6ed",
+      "disposition": "grouped",
+      "groups": [
+        "list_name_unicode",
+        "ci"
+      ],
+      "reason": "Unicodeリスト名の既存1〜100コードポイント制限を復元し、関連CIのpathsを補完。同機能の実装・mergeを1項目に統合。"
+    },
+    {
+      "sha": "4085154bda21f0b200179c28e06682728f69bb27",
+      "subject": "docs: refresh changelog while preserving author edits (#218)",
+      "parents": [
+        "af016bb8f56e762d9864bc88710737c88a7b10a5"
+      ],
+      "diff_base": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+      "changed_file_count": 2,
+      "changed_paths_sha256": "dbeecc9f4e7b128f4d224df3dcda0253ff997c8e4c0c212f1c332ac9c65dd266",
+      "fork_pr": 218,
+      "disposition": "excluded",
+      "reason": "ユーザー編集を保持したCHANGELOG/監査JSONの文書更新。機能として重複掲載しない。"
+    },
+    {
+      "sha": "8b3bbc05b6a1e4686e4f1c793383d3457545c8e0",
+      "subject": "Merge pull request #217 from tamaina/fix/list-name-code-points",
+      "parents": [
+        "4085154bda21f0b200179c28e06682728f69bb27",
+        "f7950b3420643dc75d2e77d394ee0b01edb161c3"
+      ],
+      "diff_base": "4085154bda21f0b200179c28e06682728f69bb27",
+      "changed_file_count": 5,
+      "changed_paths_sha256": "9a992122ee9026d95db37983a28a9883eb14aba91187bb2d49577d31f246a6ed",
+      "disposition": "grouped",
+      "groups": [
+        "list_name_unicode",
+        "ci"
+      ],
+      "reason": "Unicodeリスト名の既存1〜100コードポイント制限を復元し、関連CIのpathsを補完。同機能の実装・mergeを1項目に統合。",
+      "fork_pr": 217
     }
   ],
   "editorial_refresh": {
@@ -4039,13 +4089,17 @@
     "previous_audit_target": "e1a614df68f226a8c9ee831994e1727a1ded061f",
     "policy": "ユーザーが付けたGeneral内の機能別見出し・説明・Client/Serverの構成と表現を維持。削除済みの旧項目は復活させず、以後の実変更だけ統合。",
     "not_merged_at_snapshot": [
-      "authentication #188 and related Draft branches",
-      "Unicode user-list name correction #217 (open; Issue #216)"
+      "authentication #188 and related Draft branches"
     ],
     "latest_public_beta": {
       "tag": "9000.0.0-beta.3",
       "sha": "297fd7f2d1418f50f4135d034c45f4c1589ca7c1"
     },
-    "publication_boundary": "beta.3後に統合済みのMCP #215も掲載。developで実装済みであることと公開タグ収録を区別。"
+    "publication_boundary": "beta.3後に統合済みのMCP #215も掲載。developで実装済みであることと公開タグ収録を区別。",
+    "merged_during_validation": {
+      "pr": 217,
+      "sha": "8b3bbc05b6a1e4686e4f1c793383d3457545c8e0",
+      "reason": "最初のdocs PR218のマージ後確認中に別workerの修正が統合されたため、この1件のみ追加。"
+    }
   }
 }
