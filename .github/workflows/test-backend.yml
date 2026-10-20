@@ -9,6 +9,7 @@ on:
       - packages/backend/**
       - packages/features/auth/**
       - packages/features/mcp/**
+      - packages/features/relationships/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
@@ -20,6 +21,7 @@ on:
       - packages/backend/**
       - packages/features/auth/**
       - packages/features/mcp/**
+      - packages/features/relationships/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
