@@ -299,6 +299,10 @@ import type {
 	IRevokeTokenRequest,
 	ISigninHistoryRequest,
 	ISigninHistoryResponse,
+	ISessionsRequest,
+	ISessionsResponse,
+	ISessionsRevokeRequest,
+	ISignoutRequest,
 	IUpdateEmailRequest,
 	IUpdateEmailResponse,
 	InviteCreateRequest,
@@ -729,6 +733,20 @@ import type {
 	SigninFlowResponse,
 	SigninWithPasskeyRequest,
 	SigninWithPasskeyResponse,
+	I2faTotpDoneRequest,
+	I2faTotpDoneResponse,
+	I2faTotpRegisterRequest,
+	I2faTotpRegisterResponse,
+	I2faTotpRemoveRequest,
+	I2faPasskeyDoneRequest,
+	I2faPasskeyDoneResponse,
+	I2faPasskeyRegisterRequest,
+	I2faPasskeyRegisterResponse,
+	I2faPasskeyRemoveRequest,
+	I2faPasskeyRemoveResponse,
+	I2faPasskeyUpdateRequest,
+	I2faPasskeyUpdateResponse,
+	I2faPasskeyPasswordLessRequest,
 } from './entities.js';
 
 export type Endpoints = {
@@ -919,6 +937,9 @@ export type Endpoints = {
 	'i/regenerate-token': { req: IRegenerateTokenRequest; res: EmptyResponse };
 	'i/revoke-token': { req: IRevokeTokenRequest; res: EmptyResponse };
 	'i/signin-history': { req: ISigninHistoryRequest; res: ISigninHistoryResponse };
+	'i/sessions': { req: ISessionsRequest; res: ISessionsResponse };
+	'i/sessions/revoke': { req: ISessionsRevokeRequest; res: EmptyResponse };
+	'i/signout': { req: ISignoutRequest; res: EmptyResponse };
 	'i/update-email': { req: IUpdateEmailRequest; res: IUpdateEmailResponse };
 	'invite/create': { req: InviteCreateRequest; res: InviteCreateResponse };
 	'invite/delete': { req: InviteDeleteRequest; res: EmptyResponse };
@@ -1176,6 +1197,14 @@ export type Endpoints = {
 	'signup-pending': { req: SignupPendingRequest; res: SignupPendingResponse };
 	'signin-flow': { req: SigninFlowRequest; res: SigninFlowResponse };
 	'signin-with-passkey': { req: SigninWithPasskeyRequest; res: SigninWithPasskeyResponse };
+	'i/2fa/totp/done': { req: I2faTotpDoneRequest; res: I2faTotpDoneResponse };
+	'i/2fa/totp/register': { req: I2faTotpRegisterRequest; res: I2faTotpRegisterResponse };
+	'i/2fa/totp/remove': { req: I2faTotpRemoveRequest; res: EmptyResponse };
+	'i/2fa/passkey/done': { req: I2faPasskeyDoneRequest; res: I2faPasskeyDoneResponse };
+	'i/2fa/passkey/register': { req: I2faPasskeyRegisterRequest; res: I2faPasskeyRegisterResponse };
+	'i/2fa/passkey/remove': { req: I2faPasskeyRemoveRequest; res: I2faPasskeyRemoveResponse };
+	'i/2fa/passkey/update': { req: I2faPasskeyUpdateRequest; res: I2faPasskeyUpdateResponse };
+	'i/2fa/passkey/password-less': { req: I2faPasskeyPasswordLessRequest; res: EmptyResponse };
 };
 
 /**

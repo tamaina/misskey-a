@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { aliasTwoFactorContract } from './2fa-api-aliases.contract.js';
 import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
 import * as v from 'valibot';
@@ -16,7 +17,7 @@ import { localUsernameSchema, passwordSchema } from '../../users/backend/user-va
 import { webAuthnRegistrationOptionsSchema, webAuthnAuthenticationOptionsSchema } from './webauthn.schema.js';
 import { packedAppSchema, packedInviteCodeSchema, packedSigninSchema, supportedCaptchaProviders } from './auth.schema.js';
 import { sessionFailureSchema, fastifyFailureSchema } from './session-errors.schema.js';
-import { finishedSigninSchema } from './session.schema.js';
+import { availableSigninFactorsSchema, finishedSigninSchema } from './session.schema.js';
 
 const misskeyId = v.pipe(v.string(), v.regex(/^[a-zA-Z0-9]+$/));
 
@@ -448,6 +449,29 @@ export const VerifyEmailContract = oc.$meta({
 	"code": v.string(),
 })).output(v.void());
 
+export const I2faTotpDoneContract = aliasTwoFactorContract(I2faDoneContract, 'i/2fa/totp/done');
+export const I2faTotpRegisterContract = aliasTwoFactorContract(I2faRegisterContract, 'i/2fa/totp/register');
+export const I2faTotpRemoveContract = aliasTwoFactorContract(I2faUnregisterContract, 'i/2fa/totp/remove');
+export const I2faPasskeyDoneContract = aliasTwoFactorContract(I2faKeyDoneContract, 'i/2fa/passkey/done');
+export const I2faPasskeyRegisterContract = aliasTwoFactorContract(I2faRegisterKeyContract, 'i/2fa/passkey/register');
+export const I2faPasskeyRemoveContract = aliasTwoFactorContract(I2faRemoveKeyContract, 'i/2fa/passkey/remove');
+export const I2faPasskeyUpdateContract = aliasTwoFactorContract(I2faUpdateKeyContract, 'i/2fa/passkey/update');
+export const I2faPasskeyPasswordLessContract = aliasTwoFactorContract(I2faPasswordLessContract, 'i/2fa/passkey/password-less');
+
+const browserSessionResult = v.strictObject({
+	id: v.string(), createdAt: v.string(), lastUsedAt: v.string(), revokedAt: v.nullable(v.string()), current: v.boolean(),
+});
+export const ISessionsContract = oc.$meta({ requestName: 'i/sessions', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/sessions', tags: ['account'] }).errors(commonErrors)
+	.input(objectInput({ limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100), offset: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0) }))
+	.output(v.array(browserSessionResult));
+export const ISessionsRevokeContract = oc.$meta({ requestName: 'i/sessions/revoke', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/sessions/revoke', tags: ['account'] }).errors(commonErrors)
+	.input(objectInput({ sessionId: misskeyId })).output(v.void());
+export const ISignoutContract = oc.$meta({ requestName: 'i/signout', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/signout', tags: ['account'] }).errors({ ...commonErrors, SESSION_NOT_REVOCABLE: { status: 400, data: apiErrorData } })
+	.input(objectInput({})).output(v.void());
+
 export const authContract = {
 	'admin/accounts/create': AdminAccountsCreateContract,
 	'admin/captcha/current': AdminCaptchaCurrentContract,
@@ -471,12 +495,23 @@ export const authContract = {
 	'i/2fa/remove-key': I2faRemoveKeyContract,
 	'i/2fa/unregister': I2faUnregisterContract,
 	'i/2fa/update-key': I2faUpdateKeyContract,
+	'i/2fa/totp/done': I2faTotpDoneContract,
+	'i/2fa/totp/register': I2faTotpRegisterContract,
+	'i/2fa/totp/remove': I2faTotpRemoveContract,
+	'i/2fa/passkey/done': I2faPasskeyDoneContract,
+	'i/2fa/passkey/register': I2faPasskeyRegisterContract,
+	'i/2fa/passkey/remove': I2faPasskeyRemoveContract,
+	'i/2fa/passkey/update': I2faPasskeyUpdateContract,
+	'i/2fa/passkey/password-less': I2faPasskeyPasswordLessContract,
 	'i/apps': IAppsContract,
 	'i/authorized-apps': IAuthorizedAppsContract,
 	'i/change-password': IChangePasswordContract,
 	'i/regenerate-token': IRegenerateTokenContract,
 	'i/revoke-token': IRevokeTokenContract,
 	'i/signin-history': ISigninHistoryContract,
+	'i/sessions': ISessionsContract,
+	'i/sessions/revoke': ISessionsRevokeContract,
+	'i/signout': ISignoutContract,
 	'i/update-email': IUpdateEmailContract,
 	'invite/create': InviteCreateContract,
 	'invite/delete': InviteDeleteContract,
@@ -512,8 +547,9 @@ export const authSessionsContract = {
 		requireCredential: false,
 	} as const).route({ method: 'POST', path: '/signin-flow', tags: ['auth'], }).errors(httpErrors).input(packedOptionalJsonValueSchema).output(v.union([v.union([
 	finishedSigninSchema,
-	v.strictObject({ finished: v.literal(false), next: v.picklist(['captcha', 'password', 'totp']) }),
-	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authRequest: webAuthnAuthenticationOptionsSchema }),
+	v.strictObject({ finished: v.literal(false), next: v.picklist(['captcha', 'password']) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('totp'), availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
+	v.strictObject({ finished: v.literal(false), next: v.literal('passkey'), authRequest: webAuthnAuthenticationOptionsSchema, availableFactors: v.exactOptional(availableSigninFactorsSchema) }),
 ]), sessionFailureSchema, v.void()])),
 	signinWithPasskey: oc.$meta({
 		requestName: 'signin-with-passkey',

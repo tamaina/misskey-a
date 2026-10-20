@@ -6,6 +6,7 @@
 import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
 import { restorePostingRoleBaseline } from './posting-role-source-rebase.js';
 import { readFileSync } from 'node:fs';
+import { restoreGlobalCatalogPilotSource, restoreGlobalCatalogPilotDictionary } from './global-catalog-pilot-baseline.js';
 import { restoreProductNameBaseline } from './product-name-source-rebase.js';
 import { restoreRssContractBaseline } from './rss-contract-source-rebase.js';
 import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
@@ -136,7 +137,7 @@ function getLocaleValue(language: string, keyPath: string): string {
 }
 
 function getBlocks(file: string): Map<string, Record<string, string>> {
-	const { descriptor, errors } = parse(restorePilotHistoricalSource(file, restoreEmailHistoricalSource(file, restoreFinalOwnerHistoricalSource(file, restoreClientErrorLogBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8'))))), { filename: file });
+	const { descriptor, errors } = parse(restorePilotHistoricalSource(file, restoreEmailHistoricalSource(file, restoreFinalOwnerHistoricalSource(file, restoreClientErrorLogBaseline(file, restoreGlobalCatalogPilotSource(file, readFileSync(resolve(repoRoot, file), 'utf8')))))), { filename: file });
 	expect(errors).toEqual([]);
 	const blocks = descriptor.customBlocks.filter(block => block.type === 'locale');
 	const result = new Map<string, Record<string, string>>();
@@ -212,7 +213,7 @@ describe('next74 static raw-label ownership', () => {
 	});
 
 	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', async migration => {
-		const actualSource = restoreClientErrorLogBaseline(migration.file, restorePostingRoleBaseline(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8')));
+		const actualSource = restoreClientErrorLogBaseline(migration.file, restorePostingRoleBaseline(migration.file, restoreGlobalCatalogPilotSource(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8'))));
 		const passwordSource = migration.file === 'packages/features/auth/frontend/components/MkPasswordDialog.vue' ? restorePasswordChangeBaseline(migration.file, actualSource) : actualSource;
 		const source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, restoreEmailHistoricalSource(migration.file, restoreFinalOwnerHistoricalSource(migration.file, restoreProductNameBaseline(migration.file, passwordSource)))));
 		const blocks = getBlocks(migration.file);
@@ -263,7 +264,9 @@ describe('next74 static raw-label ownership', () => {
 		const runtime = await loadActualLocale(language);
 		Vue.createApp({}).use(runtime);
 		for (const migration of migrations) {
-			const dictionary = VviRuntime.createComponentLocale('/' + migration.file.replace(/^packages\//, ''));
+			const moduleId = '/' + migration.file.replace(/^packages\//, '');
+			const scope = VviRuntime.useLocale(moduleId).value;
+			const dictionary = restoreGlobalCatalogPilotDictionary(migration.file, language, scope.sfc, scope.env);
 			for (const keyPath of migration.keyPaths) {
 				const actual = dictionary[keyPath.split('.').at(-1)!];
 				const expected = reviewedFinalOwnerMessage(migration.file, language, keyPath.split('.').at(-1)!, reviewedEmailMessage(migration.file, language, keyPath.split('.').at(-1)!, reviewedPilotMessage(migration.file, language, keyPath.split('.').at(-1)!, getLocaleValue(language, keyPath))));

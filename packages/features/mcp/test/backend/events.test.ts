@@ -4,6 +4,7 @@
  */
 import 'reflect-metadata';
 import { createHmac } from 'node:crypto';
+import { createRequire } from 'node:module';
 import { beforeEach, expect, it, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
@@ -12,9 +13,14 @@ import { ToolSchema } from '@modelcontextprotocol/sdk/types.js';
 import { McpEventsService } from '../../backend/McpEventsService.js';
 import { McpEventError, challengeMatches, signedHeaders, signingKey, subscriptionId } from '../../backend/events-protocol.js';
 import { subscribeInput } from '../../backend/api.definition.js';
+import { streamChannelInputSchema, streamNoteInputSchema } from '../../backend/stream-parameters.js';
+import { streamEventCatalog } from '../../backend/stream-catalog.js';
 import { modernRequest } from '../../backend/modern-request.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
+import { UserWebhookService, type UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
+import type { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import type * as Redis from 'ioredis';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
@@ -26,6 +32,7 @@ import type { AntennaNoteAccessService } from '@features/timelines/backend/servi
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';
 import type { UserWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
+vi.mock('@features/runtime/backend/services/QueueService.js', () => ({ QueueService: class {} }));
 vi.mock('@features/runtime/backend/services/HttpRequestService.js', () => ({ HttpRequestService: class {} }));
 vi.mock('@features/roles/backend/services/RoleService.js', () => ({ RoleService: class {} }));
 vi.mock('@features/notes/backend/serializers/NoteEntityService.js', () => ({ NoteEntityService: class {} }));
@@ -58,7 +65,7 @@ beforeEach(() => {
 	const manager = mockDeep<WebhooksRepository['manager']>(); manager.getRepository.mockImplementation(target => target === deps.antennas.target ? deps.antennas as never : repo as never);
 	deps.webhooks.manager.transaction.mockImplementation(async (...args) => (args.at(-1) as unknown as (manager: unknown) => Promise<unknown>)(manager) as never);
 	deps.http.sendMcpWebhook.mockImplementation(async (_url, body) => ({ status: 200, ok: true, text: JSON.stringify({ challenge: JSON.parse(body).challenge }) }));
-	deps.notes.findOneBy.mockResolvedValue({ id: 'note', mentions: ['account'], replyUserId: 'account' } as never);
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: 'other-author', mentions: ['account'], replyUserId: 'account' } as never);
 	deps.noteEntity.isVisibleForMe.mockResolvedValue(true); deps.noteEntity.pack.mockResolvedValue({ isHidden: false } as never);
 	service = new McpEventsService(deps.webhooks, deps.tokens, deps.apps, deps.users, deps.notes, deps.http, deps.roles, deps.noteEntity, deps.antennas, deps.antennaAccess);
 });
@@ -115,6 +122,45 @@ it('suppresses unsubscribe/expiry/recreation, current note visibility, deletion,
 	await service.invoke('events/unsubscribe', { name: input.name, arguments: {}, delivery: { mode: 'webhook', url: input.delivery.url } }, context());
 	expect(rows.get(id)!.secret).toBe('');
 	await subscribe(); expect(rows.get(id)!.mcpGeneration).not.toBe(currentGeneration);
+});
+it.each(['mention', 'reply'] as const)('filters self %s only from MCP fanout, preserving other recipients and subscriptions', async type => {
+	const redis = mockDeep<Redis.Redis>();
+	const queue = mockDeep<QueueService>();
+	const legacy = Object.assign(new MiWebhook(), { id: 'legacy', userId: 'account', mode: 'legacy', on: [type] });
+	const otherLegacy = Object.assign(new MiWebhook(), { id: 'other-legacy', userId: 'other', mode: 'legacy', on: [type] });
+	const subscriptions = ['account', 'other'].flatMap(userId => [1, 2].map(index =>
+		Object.assign(new MiWebhook(), { id: `${userId}-${index}`, userId, mode: 'mcp', on: [type] })));
+	deps.webhooks.findBy.mockImplementation(async where => {
+		if (Array.isArray(where)) return [];
+		return where.mode === 'legacy' ? [legacy, otherLegacy] : subscriptions.filter(row => row.userId === where.userId);
+	});
+	const producer = new UserWebhookService(redis, deps.webhooks, queue);
+	const content = { note: { id: 'note', userId: 'account', mentions: ['account', 'other'] } } as UserWebhookPayload<'mention'>;
+	await producer.enqueueUserWebhook('account', type, content);
+	await producer.enqueueUserWebhook('other', type, content);
+	expect(queue.userWebhookDeliver.mock.calls.map(([webhook]) => webhook.id)).toEqual(['legacy', 'other-legacy', 'other-1', 'other-2']);
+	expect(queue.userWebhookDeliver.mock.calls.every(([, event, payload]) => event === type && payload === content)).toBe(true);
+	producer.dispose();
+});
+it.each(['mention', 'reply'] as const)('suppresses already queued self %s on every attempt while delivering other authors', async type => {
+	const { id } = await subscribe({ ...input, name: type === 'mention' ? 'note.mentioned' : 'note.replied' });
+	const logger = mockDeep<QueueLoggerService>(); logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, deps.webhooks, deps.http, service, logger);
+	const job = { data: { mode: 'mcp', type, webhookId: id, userId: 'account', generation: rows.get(id)!.mcpGeneration!, noteId: 'note', createdAt: 1000, eventId: 'stable' } } as Bull.Job<UserWebhookDeliverJobData>;
+	deps.http.sendMcpWebhook.mockClear();
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: 'account', mentions: ['account', 'other'], replyUserId: 'account' } as never);
+	expect(await worker.process(job)).toBe('Suppressed');
+	expect(await worker.process(job)).toBe('Suppressed');
+	expect(deps.http.sendMcpWebhook).not.toHaveBeenCalled();
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: 'other-author', mentions: ['account'], replyUserId: 'account' } as never);
+	deps.http.sendMcpWebhook.mockResolvedValue({ ok: false, status: 500, text: '' });
+	await expect(worker.process(job)).rejects.toThrow('500');
+	deps.http.sendMcpWebhook.mockResolvedValue({ ok: true, status: 200, text: '' });
+	expect(await worker.process(job)).toBe('Success');
+	expect(deps.http.sendMcpWebhook.mock.calls.map(([, body, headers]) => [JSON.parse(body).name, headers['webhook-id']])).toEqual([
+		[type === 'mention' ? 'note.mentioned' : 'note.replied', 'stable'],
+		[type === 'mention' ? 'note.mentioned' : 'note.replied', 'stable'],
+	]);
 });
 it('rotates keys without changing live generation or extending expired subscriptions', async () => {
 	const { id } = await subscribe(); const generation = rows.get(id)!.mcpGeneration;
@@ -209,13 +255,91 @@ it('binds antenna arguments to ownership, read:account scope and subscription id
 });
 
 it('advertises strict antenna arguments separately from empty mention/reply arguments', async () => {
+	permission.push('read:account');
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
 	expect(result.events.find(event => event.name === 'antenna.note')?.inputSchema).toEqual({ type: 'object', properties: { antennaId: { type: 'string' } }, required: ['antennaId'], additionalProperties: false });
 	expect(result.events.find(event => event.name === 'note.mentioned')?.inputSchema).toEqual({ type: 'object', properties: {}, additionalProperties: false });
 });
 
 it('advertises object input schemas for all six event definitions', async () => {
+	permission.push('read:account');
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
 	expect(result.events).toHaveLength(6);
 	for (const event of result.events) expect(ToolSchema.shape.inputSchema.safeParse(event.inputSchema).success, event.name).toBe(true);
+});
+
+it('keeps the stream catalog outside JSON Schema and preserves it through the native output contract', async () => {
+	permission.push('read:account');
+	// Use the existing SDK's pinned AJV dependency; add no test/package dependency.
+	const backendRequire = createRequire(`${process.cwd()}/package.json`);
+	const sdkRequire = createRequire(backendRequire.resolve('@modelcontextprotocol/sdk/validation/ajv-provider.js'));
+	const { default: Ajv2020 } = sdkRequire('ajv/dist/2020.js') as { default: new (options: { strict: boolean }) => { compile(schema: object): unknown } };
+	const result = await service.invoke('events/list', {}, context()) as { events: {
+		name: string; inputSchema: Record<string, unknown>; payloadSchema: Record<string, unknown>; _meta?: Record<string, unknown>;
+	}[] };
+	for (const event of result.events) {
+		const validator = new Ajv2020({ strict: true });
+		expect(() => validator.compile(event.inputSchema), event.name).not.toThrow();
+		expect(() => validator.compile(event.payloadSchema), event.name).not.toThrow();
+		if (event.name.startsWith('stream.')) {
+			const catalog = event.name === 'stream.channel' ? streamEventCatalog : event.name === 'stream.note' ? streamEventCatalog.note : streamEventCatalog.broadcast;
+			expect(event._meta).toEqual({ 'dev.a9z.p1/event-catalog': catalog });
+			expect(event.payloadSchema).not.toHaveProperty('x-misskey-event-catalog');
+		} else expect(event._meta).toBeUndefined();
+	}
+	expect(result.events.find(event => event.name === 'stream.channel')?.inputSchema).toEqual(streamChannelInputSchema);
+	expect(result.events.find(event => event.name === 'stream.note')?.inputSchema).toEqual(streamNoteInputSchema);
+});
+
+it.each([
+	{ scopes: ['read:notifications'], names: ['note.mentioned', 'note.replied'] },
+	{ scopes: ['read:account'], names: ['stream.channel', 'stream.broadcast', 'stream.note'] },
+	{ scopes: ['read:notifications', 'read:account'], names: ['note.mentioned', 'note.replied', 'antenna.note', 'stream.channel', 'stream.broadcast', 'stream.note'] },
+])('lists only events admitted by current native scopes: $scopes', async ({ scopes, names }) => {
+	permission = ['access:mcp', ...scopes];
+	const result = await service.invoke('events/list', {}, context()) as { events: { name: string }[] };
+	expect(result.events.map(event => event.name)).toEqual(names);
+});
+
+it.each([
+	{ scopes: ['access:mcp'], code: -32602 },
+	{ scopes: ['read:notifications'], code: 'PERMISSION_DENIED' },
+	{ scopes: ['read:account'], code: 'PERMISSION_DENIED' },
+])('rejects discovery without the existing MCP/event grant boundary: $scopes', async ({ scopes, code }) => {
+	permission = scopes;
+	await expect(service.invoke('events/list', {}, context())).rejects.toMatchObject({ code });
+});
+
+it('rechecks native scope changes between event discoveries', async () => {
+	const list = async () => (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.map(event => event.name);
+	permission = ['access:mcp', 'read:notifications', 'read:account'];
+	expect(await list()).toHaveLength(6);
+	permission = ['access:mcp', 'read:account'];
+	expect(await list()).toEqual(['stream.channel', 'stream.broadcast', 'stream.note']);
+	permission = ['access:mcp', 'read:notifications'];
+	expect(await list()).toEqual(['note.mentioned', 'note.replied']);
+	permission = ['access:mcp'];
+	await expect(list()).rejects.toThrow('Event access denied');
+});
+
+it('filters using current app permissions rather than the token/context scope snapshot', async () => {
+	permission = ['access:mcp', 'read:notifications', 'read:account'];
+	deps.tokens.findOneBy.mockResolvedValue({ id: 'grant', userId: actor.id, appId: 'app', permission } as never);
+	deps.apps.findOneBy.mockResolvedValue({ id: 'app', permission: ['access:mcp', 'read:account'] } as never);
+	const list = async () => (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.map(event => event.name);
+	expect(await list()).toEqual(['stream.channel', 'stream.broadcast', 'stream.note']);
+	deps.apps.findOneBy.mockResolvedValue({ id: 'app', permission: ['access:mcp', 'read:notifications'] } as never);
+	expect(await list()).toEqual(['note.mentioned', 'note.replied']);
+	deps.apps.findOneBy.mockResolvedValue(null);
+	await expect(list()).rejects.toThrow('Event access denied');
+});
+
+it('retains current grant and account-state checks when listing events', async () => {
+	permission = ['access:mcp', 'read:account'];
+	actor.isSuspended = true;
+	await expect(service.invoke('events/list', {}, context())).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_SUSPENDED' });
+	actor.isSuspended = false; actor.movedToUri = 'https://moved.example';
+	await expect(service.invoke('events/list', {}, context())).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_MOVED' });
+	actor.movedToUri = null; deps.tokens.findOneBy.mockResolvedValue(null);
+	await expect(service.invoke('events/list', {}, context())).rejects.toThrow('Event access denied');
 });

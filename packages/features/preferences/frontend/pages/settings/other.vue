@@ -214,7 +214,7 @@ async function deleteAccount() {
 		title: $locale.value.sfc.started,
 	});
 
-	await signout();
+	await signout('account-deletion-accepted');
 }
 
 function resetAllTips() {

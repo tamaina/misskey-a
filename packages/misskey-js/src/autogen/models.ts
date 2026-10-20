@@ -1108,3 +1108,4 @@ export type OrpcDefinition1034 = ContractModel<'OrpcDefinition1034'>;
 export type OrpcDefinition1035 = ContractModel<'OrpcDefinition1035'>;
 export type OrpcDefinition1036 = ContractModel<'OrpcDefinition1036'>;
 export type OrpcDefinition1037 = ContractModel<'OrpcDefinition1037'>;
+export type OrpcDefinition1038 = ContractModel<'OrpcDefinition1038'>;

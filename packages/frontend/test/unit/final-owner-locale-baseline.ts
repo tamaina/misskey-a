@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreCodeDiffBaseline } from './code-diff-source-rebase.js';
 import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
 import { parse } from 'vue/compiler-sfc';
 import metadata from './final-owner-locale-baseline.json';
@@ -46,6 +47,7 @@ export function reviewedFinalOwnerMessage(file: string, language: string, path: 
  * exposing immutable Git source to the unchanged historical migration oracle.
  */
 export function restoreFinalOwnerHistoricalSource(file: string, source: string): string {
+	source = restoreCodeDiffBaseline(file, source);
 	const owner = owners.get(file);
 	if (!owner) return source;
 	const parsed = parse(source, { filename: file });

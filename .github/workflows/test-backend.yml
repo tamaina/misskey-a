@@ -9,6 +9,7 @@ on:
       - packages/backend/**
       - packages/features/auth/**
       - packages/features/mcp/**
+      - packages/features/relationships/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
@@ -20,6 +21,7 @@ on:
       - packages/backend/**
       - packages/features/auth/**
       - packages/features/mcp/**
+      - packages/features/relationships/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
@@ -89,6 +91,9 @@ jobs:
     - name: Test OIDC boundaries with isolated Unix-socket Redis
       if: ${{ matrix.node-version-file == '.node-version' }}
       run: node packages/features/auth/test/run-oidc-fixture.mjs
+    - name: Test authentication progress with isolated Unix-socket Redis
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: node packages/features/auth/test/run-authentication-progress-fixture.mjs
     - name: Test antenna delivery identity with disposable Redis
       run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/mcp/test/vitest.antenna-redis.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
     - name: Test MCP with disposable PostgreSQL
@@ -197,3 +202,5 @@ jobs:
         run: MISSKEY_CONFIG_YML=test.yml pnpm --filter backend migrate
       - name: Check no migrations are remaining
         run: MISSKEY_CONFIG_YML=test.yml pnpm --filter backend check-migrations
+      - name: Check browser-session migration round trip on empty CI fixture
+        run: MISSKEY_CONFIG_YML=test.yml node packages/features/auth/test/backend/browser-session-migration.mjs

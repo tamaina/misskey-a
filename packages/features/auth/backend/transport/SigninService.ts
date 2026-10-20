@@ -15,6 +15,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { AuthSessionRequest, AuthSessionEffects } from '../session.effects.js';
+import { BrowserSessionService } from '../services/BrowserSessionService.js';
 import { toSessionHeaders } from '../session.schema.js';
 
 @Injectable()
@@ -31,11 +32,13 @@ export class SigninService {
 		private notificationService: NotificationService,
 		private idService: IdService,
 		private globalEventService: GlobalEventService,
+		private browserSessionService: BrowserSessionService,
 	) {
 	}
 
 	@bindThis
-	public signin(request: AuthSessionRequest, reply: AuthSessionEffects, user: Pick<MiLocalUser, 'id' | 'token'>): { finished: true; id: string; i: string | null } {
+	public async signin(request: AuthSessionRequest, reply: AuthSessionEffects, user: Pick<MiLocalUser, 'id' | 'token'>): Promise<{ finished: true; id: string; i: string }> {
+		const { token } = await this.browserSessionService.issue(user.id);
 		setImmediate(async () => {
 			this.notificationService.createNotification(user.id, 'login', {});
 
@@ -61,7 +64,7 @@ export class SigninService {
 		return {
 			finished: true,
 			id: user.id,
-			i: user.token,
+			i: token,
 		};
 	}
 }

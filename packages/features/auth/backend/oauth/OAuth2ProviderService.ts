@@ -14,6 +14,7 @@ import { permissions as kinds } from 'misskey-js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { AuthenticateService } from '../transport/AuthenticateService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
@@ -462,6 +463,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		loggerService: LoggerService,
 		private roleService: RoleService,
 		@Inject(DI.redis) redis: Redis.Redis,
+		private readonly authenticateService: AuthenticateService,
 	) {
 		this.#state = new OAuthStateStore(redis);
 		this.#logger = loggerService.getLogger('oauth');
@@ -563,6 +565,13 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 	}
 
 	async #findUserByLoginToken(loginToken: string): Promise<MiLocalUser> {
+		if (loginToken.startsWith('bs_')) {
+			try {
+				const [user, app] = await this.authenticateService.authenticate(loginToken);
+				if (user && app === null) return user;
+			} catch { /* Authentication failure remains an invalid consent request. */ }
+			throw new InvalidRequestError('No such user');
+		}
 		const user = await this.cacheService.localUserByNativeTokenCache.fetch(loginToken,
 			() => this.usersRepository.findOneBy({ token: loginToken }) as Promise<MiLocalUser | null>);
 		if (!user) {

@@ -105,7 +105,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				style="margin: 0 auto;"
 				@click="search"
 			>
-				{{ $locale.sfc.search }}
+				{{ globalLocale.env.search }}
 			</MkButton>
 		</div>
 	</div>
@@ -118,6 +118,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed, markRaw, ref, shallowRef, toRef } from 'vue';
 import { host as localHost } from '@features/boot/frontend/shared/config.js';
 import type * as Misskey from 'misskey-js';
@@ -135,6 +137,8 @@ import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	query?: string;
@@ -424,7 +428,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "حدّد مستخدمًا",
-	"search": "البحث",
 	"searchResult": "نتائج البحث"
 }
 </locale>
@@ -445,7 +448,6 @@ async function search() {
 	"pleaseSelectUser": "Selecciona un usuari",
 	"selectSelf": "Escollir manualment",
 	"selectUser": "Selecciona usuari/a",
-	"search": "Cercar",
 	"searchResult": "Resultats de la cerca"
 }
 </locale>
@@ -466,7 +468,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "Vyberte uživatele",
-	"search": "Vyhledávání",
 	"searchResult": "Výsledky hledání"
 }
 </locale>
@@ -487,7 +488,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "Select a user",
-	"search": "Search",
 	"searchResult": "Search results"
 }
 </locale>
@@ -508,7 +508,6 @@ async function search() {
 	"pleaseSelectUser": "Benutzer auswählen",
 	"selectSelf": "Mich auswählen",
 	"selectUser": "Benutzer auswählen",
-	"search": "Suchen",
 	"searchResult": "Suchergebnisse"
 }
 </locale>
@@ -529,7 +528,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "Select a user",
-	"search": "Search",
 	"searchResult": "Search results"
 }
 </locale>
@@ -550,7 +548,6 @@ async function search() {
 	"pleaseSelectUser": "Selecciona un usuario, por favor",
 	"selectSelf": "Elígete a ti mismo",
 	"selectUser": "Elegir usuario",
-	"search": "Buscar",
 	"searchResult": "Resultados de búsqueda"
 }
 </locale>
@@ -571,7 +568,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Sélectionner manuellement",
 	"selectUser": "Sélectionner un·e utilisateur·rice",
-	"search": "Rechercher",
 	"searchResult": "Résultats de la recherche"
 }
 </locale>
@@ -592,7 +588,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Pilih diri sendiri",
 	"selectUser": "Pilih pengguna",
-	"search": "Cari",
 	"searchResult": "Hasil Penelusuran"
 }
 </locale>
@@ -613,7 +608,6 @@ async function search() {
 	"pleaseSelectUser": "Per favore, seleziona un profilo",
 	"selectSelf": "Segli me",
 	"selectUser": "Seleziona profilo",
-	"search": "Cerca",
 	"searchResult": "Risultati della Ricerca"
 }
 </locale>
@@ -634,7 +628,6 @@ async function search() {
 	"pleaseSelectUser": "ユーザーを選択してください",
 	"selectSelf": "自分を選択",
 	"selectUser": "ユーザーを選択",
-	"search": "検索",
 	"searchResult": "検索結果"
 }
 </locale>
@@ -655,7 +648,6 @@ async function search() {
 	"pleaseSelectUser": "ユーザーを選んでや",
 	"selectSelf": "自分を選択",
 	"selectUser": "ユーザーを選ぶ",
-	"search": "探す",
 	"searchResult": "検索結果やで"
 }
 </locale>
@@ -676,7 +668,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "Select a user",
-	"search": "Nadi",
 	"searchResult": "Search results"
 }
 </locale>
@@ -697,7 +688,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "Select a user",
-	"search": "ಹುಡುಕು",
 	"searchResult": "Search results"
 }
 </locale>
@@ -718,7 +708,6 @@ async function search() {
 	"pleaseSelectUser": "유저를 선택해주세요",
 	"selectSelf": "본인을 선택",
 	"selectUser": "유저 선택",
-	"search": "검색",
 	"searchResult": "검색 결과"
 }
 </locale>
@@ -739,7 +728,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Mezelf kiezen",
 	"selectUser": "Kies een gebruiker",
-	"search": "Zoeken",
 	"searchResult": "Zoekresultaten"
 }
 </locale>
@@ -760,7 +748,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "Velg en bruker",
-	"search": "Søk",
 	"searchResult": "Search results"
 }
 </locale>
@@ -781,7 +768,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "Wybierz użytkownika",
-	"search": "Szukaj",
 	"searchResult": "Wyniki wyszukiwania"
 }
 </locale>
@@ -802,7 +788,6 @@ async function search() {
 	"pleaseSelectUser": "Selecione um usuário",
 	"selectSelf": "Selecionar a mim",
 	"selectUser": "Selecionar usuário",
-	"search": "Pesquisar",
 	"searchResult": "Pesquisar"
 }
 </locale>
@@ -823,7 +808,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Выбрать себя",
 	"selectUser": "Выберите пользователя",
-	"search": "Поиск",
 	"searchResult": "Результаты поиска"
 }
 </locale>
@@ -844,7 +828,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "Vyberte používateľa",
-	"search": "Hľadať",
 	"searchResult": "Výsledky hľadania"
 }
 </locale>
@@ -865,7 +848,6 @@ async function search() {
 	"pleaseSelectUser": "กรุณาเลือกผู้ใช้",
 	"selectSelf": "เลือกตัวเอง",
 	"selectUser": "เลือกผู้ใช้งาน",
-	"search": "ค้นหา",
 	"searchResult": "ผลการค้นหา"
 }
 </locale>
@@ -886,7 +868,6 @@ async function search() {
 	"pleaseSelectUser": "Kullanıcı seç",
 	"selectSelf": "Kendimi seç",
 	"selectUser": "Kullanıcı seç",
-	"search": "Ara",
 	"searchResult": "Arama sonuçları"
 }
 </locale>
@@ -907,7 +888,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Select myself",
 	"selectUser": "Select a user",
-	"search": "ئىزدەش",
 	"searchResult": "Search results"
 }
 </locale>
@@ -928,7 +908,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Вибрати себе",
 	"selectUser": "Виберіть користувача",
-	"search": "Пошук",
 	"searchResult": "Результати пошуку"
 }
 </locale>
@@ -949,7 +928,6 @@ async function search() {
 	"pleaseSelectUser": "Select user",
 	"selectSelf": "Chọn chính bạn",
 	"selectUser": "Chọn người dùng",
-	"search": "Tìm kiếm",
 	"searchResult": "Kết quả tìm kiếm"
 }
 </locale>
@@ -970,7 +948,6 @@ async function search() {
 	"pleaseSelectUser": "请选择用户",
 	"selectSelf": "选择自己",
 	"selectUser": "选择用户",
-	"search": "搜索",
 	"searchResult": "搜索结果"
 }
 </locale>
@@ -991,7 +968,6 @@ async function search() {
 	"pleaseSelectUser": "請選擇使用者",
 	"selectSelf": "選擇自己",
 	"selectUser": "選取使用者",
-	"search": "搜尋",
 	"searchResult": "搜尋結果"
 }
 </locale>

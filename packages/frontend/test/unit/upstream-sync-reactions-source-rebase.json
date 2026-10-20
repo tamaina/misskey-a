@@ -1,0 +1,15 @@
+[
+  {
+    "file": "packages/features/notes/frontend/utility/check-reaction-permissions.ts",
+    "currentSha256": "6c4f6aa4e8a076286a99951ae4dbd82538f1f9b8061b21e3df289570917e023c",
+    "baselineSha256": "54e68dd1edccdf6b4b5eab69d92d21fe5f900f298676ac1da19cec0d5980a4df",
+    "edits": [
+      {
+        "start": 697,
+        "end": 879,
+        "current": "\tconst canUseLocalOnlyEmoji = !emoji.localOnly || (note.user.host === me.host && (note.renote?.user.host == null || note.renote.user.host === me.host));\n\treturn canUseLocalOnlyEmoji\n",
+        "baseline": "\treturn !(emoji.localOnly && note.user.host !== me.host)\n"
+      }
+    ]
+  }
+]

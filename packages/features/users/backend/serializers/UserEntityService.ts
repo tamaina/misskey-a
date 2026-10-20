@@ -50,6 +50,7 @@ import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { AnnouncementService } from '@features/announcements/backend/services/AnnouncementService.js';
 import type { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { AvatarDecorationService } from '@features/avatar-decorations/backend/services/AvatarDecorationService.js';
+import { packRemoteAvatarDecorations } from '@features/avatar-decorations/backend/remote-avatar-decorations.js';
 import { ChatService } from '@features/chat/backend/services/ChatService.js';
 import type { OnModuleInit } from '@nestjs/common';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
@@ -499,7 +500,11 @@ export class UserEntityService implements OnModuleInit {
 		const unreadAnnouncements = isMe && isDetailed ?
 			(await this.announcementService.getUnreadAnnouncements(user)).map((announcement: Omit<MiAnnouncement, 'user'>) => ({
 				createdAt: this.idService.parse(announcement.id).date.toISOString(),
-				...announcement,
+				id: announcement.id, updatedAt: announcement.updatedAt,
+				title: announcement.title, text: announcement.text, imageUrl: announcement.imageUrl,
+				icon: announcement.icon, display: announcement.display,
+				needConfirmationToRead: announcement.needConfirmationToRead, silence: announcement.silence,
+				isActive: announcement.isActive, forExistingUsers: announcement.forExistingUsers, userId: announcement.userId,
 			})) : null;
 
 		const notificationsInfo = isMe && isDetailed ? await this.getNotificationsInfo(user.id) : null;
@@ -511,7 +516,7 @@ export class UserEntityService implements OnModuleInit {
 			host: user.host,
 			avatarUrl: (user.avatarId == null ? null : user.avatarUrl) ?? this.getIdenticonUrl(user),
 			avatarBlurhash: (user.avatarId == null ? null : user.avatarBlurhash),
-			avatarDecorations: user.avatarDecorations.length > 0 ? this.avatarDecorationService.getAll().then(decorations => user.avatarDecorations.filter(ud => decorations.some(d => d.id === ud.id)).map(ud => ({
+			avatarDecorations: user.host != null ? packRemoteAvatarDecorations(user.avatarDecorations, this.config.mediaProxy) : user.avatarDecorations.length > 0 ? this.avatarDecorationService.getAll().then(decorations => user.avatarDecorations.filter(ud => decorations.some(d => d.id === ud.id)).map(ud => ({
 				id: ud.id,
 				angle: ud.angle || undefined,
 				flipH: ud.flipH || undefined,

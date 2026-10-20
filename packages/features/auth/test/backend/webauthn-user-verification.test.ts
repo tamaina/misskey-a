@@ -75,3 +75,30 @@ test.each(['named', 'anonymous'] as const)('%s authentication requires UV and re
 	expect(keys.update).not.toHaveBeenCalled();
 	if (route === 'named') expect(keys.findOneBy).toHaveBeenCalledWith({ id: 'AQID', userId: 'synthetic-user' });
 });
+
+test('registration rejects an unexpected descriptor type before storing its challenge', async () => {
+	const { service, redis } = harness();
+	const valid = await service.initiateRegistration('synthetic-user', 'synthetic');
+	redis.setex.mockClear();
+	const generate = vi.spyOn(webauthn, 'generateRegistrationOptions').mockResolvedValueOnce({
+		...valid, excludeCredentials: [{ id: 'AQID', type: 'synthetic-invalid', transports: ['usb'] }],
+	});
+	try {
+		await expect(service.initiateRegistration('synthetic-user', 'synthetic')).rejects.toThrow();
+		expect(redis.setex).not.toHaveBeenCalled();
+	} finally { generate.mockRestore(); }
+});
+
+test.each(['named', 'anonymous'] as const)('%s authentication rejects an unexpected descriptor type before storing its challenge', async route => {
+	const { service, redis } = harness();
+	const valid = await service.initiateAuthentication('synthetic-user');
+	redis.setex.mockClear();
+	const generate = vi.spyOn(webauthn, 'generateAuthenticationOptions').mockResolvedValueOnce({
+		...valid, allowCredentials: [{ id: 'AQID', type: 'synthetic-invalid', transports: ['usb'] }],
+	});
+	try {
+		const result = route === 'named' ? service.initiateAuthentication('synthetic-user') : service.initiateSignInWithPasskeyAuthentication('synthetic-context');
+		await expect(result).rejects.toThrow();
+		expect(redis.setex).not.toHaveBeenCalled();
+	} finally { generate.mockRestore(); }
+});

@@ -1,0 +1,630 @@
+{
+  "upstream": "4ae9364dfca718f0cc7b596711dcdd594528a39b",
+  "changes": [
+    {
+      "file": "packages/features/users/frontend/pages/settings/privacy.vue",
+      "updates": [
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.groupTitle",
+          "localKey": "followApprovalGroupTitle",
+          "before": "フォロー承認",
+          "after": "批准关注请求"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.inactiveDescription",
+          "localKey": "followApprovalInactiveDescription",
+          "before": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+          "after": "因为所有的关注请求都需要批准，因此按时间段设置的规则将不再生效。关闭「关注请求需要批准」后下面的设置将重新生效。"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.title",
+          "localKey": "followApprovalTitle",
+          "before": "新しいアカウントからのフォローを承認制にする",
+          "after": "新账户的关注请求需要批准"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.autoAcceptDescription",
+          "localKey": "followApprovalAutoAcceptDescription",
+          "before": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+          "after": "就算开启了「关注请求需要批准」或「新账户的关注请求需要批准」，您已关注的账户的关注请求将被自动批准。"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.description",
+          "localKey": "followApprovalDescription",
+          "before": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+          "after": "注册未达指定时长的账户的关注将作为关注请求予以保留。这不影响现有的关注者。已开启「自动允许我关注的人的关注请求」的话，对方的关注请求将被自动批准。"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.local",
+          "localKey": "followApprovalLocal",
+          "before": "ローカルユーザーからのフォロー",
+          "after": "从本地用户发来的关注"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.localDescription",
+          "localKey": "followApprovalLocalDescription",
+          "before": "このサーバーでのアカウント作成からの期間で判定します。",
+          "after": "以本服务器的账户注册时间来计算时长。"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.remote",
+          "localKey": "followApprovalRemote",
+          "before": "リモートユーザーからのフォロー",
+          "after": "从远程用户发来的关注"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.remoteDescription",
+          "localKey": "followApprovalRemoteDescription",
+          "before": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+          "after": "不是以远程服务器上的注册时间，而是以本服务器最初认知到这个账户的时间来计算时长。"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.useDefault",
+          "localKey": "followApprovalUseDefault",
+          "before": "既定値を使う（現在は無効）",
+          "after": "使用默认值（当前为无效）"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.custom",
+          "localKey": "followApprovalCustom",
+          "before": "期間を指定する",
+          "after": "指定时间段"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.period",
+          "localKey": "followApprovalPeriod",
+          "before": "承認が必要な期間",
+          "after": "批准所需注册时长"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.unit",
+          "localKey": "followApprovalUnit",
+          "before": "単位",
+          "after": "单位"
+        },
+        {
+          "language": "zh-CN",
+          "upstreamKey": "_followApproval.invalidPeriod",
+          "localKey": "followApprovalInvalidPeriod",
+          "before": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+          "after": "输入的时间不正确。请在可输入的范围内输入 1 秒以上的时间。"
+        }
+      ]
+    },
+    {
+      "file": "packages/features/users/frontend/pages/settings/privacy.vue",
+      "updates": [
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.groupTitle",
+          "localKey": "followApprovalGroupTitle",
+          "before": "フォロー承認",
+          "after": "Aceptar seguimiento"
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.inactiveDescription",
+          "localKey": "followApprovalInactiveDescription",
+          "before": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+          "after": "Dado que todas las solicitudes de seguimiento pasarán a requerir aprobación, no se aplicarán los ajustes relacionados con el periodo. Si desactivas el sistema de aprobación de solicitudes de seguimiento, se volverán a aplicar los siguientes ajustes."
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.title",
+          "localKey": "followApprovalTitle",
+          "before": "新しいアカウントからのフォローを承認制にする",
+          "after": "Habilitar la aprobación de seguidores de cuentas nuevas"
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.autoAcceptDescription",
+          "localKey": "followApprovalAutoAcceptDescription",
+          "before": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+          "after": "Aunque tengas configurada la opción de aprobación de seguidores o hayas puesto en espera las solicitudes de seguimiento de cuentas nuevas, se aprobarán automáticamente las personas a las que tú sigues."
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.description",
+          "localKey": "followApprovalDescription",
+          "before": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+          "after": "Las solicitudes de seguimiento de usuarios que no hayan transcurrido el periodo especificado se pondrán en espera. Esto no afecta a los seguidores actuales. Si tienes activada la aceptación automática de los usuarios a los que sigues, se aceptarán automáticamente."
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.local",
+          "localKey": "followApprovalLocal",
+          "before": "ローカルユーザーからのフォロー",
+          "after": "Sigue a usuarios locales"
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.localDescription",
+          "localKey": "followApprovalLocalDescription",
+          "before": "このサーバーでのアカウント作成からの期間で判定します。",
+          "after": "Se determinará en función del tiempo transcurrido desde la creación de la cuenta en este servidor."
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.remote",
+          "localKey": "followApprovalRemote",
+          "before": "リモートユーザーからのフォロー",
+          "after": "Seguimiento por parte de usuarios remotos"
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.remoteDescription",
+          "localKey": "followApprovalRemoteDescription",
+          "before": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+          "after": "No se tiene en cuenta la fecha y hora de creación en el servidor del destinatario, sino el tiempo transcurrido desde que este servidor reconoció por primera vez dicha cuenta."
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.useDefault",
+          "localKey": "followApprovalUseDefault",
+          "before": "既定値を使う（現在は無効）",
+          "after": "Utilizar valores predeterminados (actualmente desactivado)"
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.custom",
+          "localKey": "followApprovalCustom",
+          "before": "期間を指定する",
+          "after": "Específica un periodo"
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.period",
+          "localKey": "followApprovalPeriod",
+          "before": "承認が必要な期間",
+          "after": "Plazo para la aprobación"
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.unit",
+          "localKey": "followApprovalUnit",
+          "before": "単位",
+          "after": "Unidad"
+        },
+        {
+          "language": "es-ES",
+          "upstreamKey": "_followApproval.invalidPeriod",
+          "localKey": "followApprovalInvalidPeriod",
+          "before": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+          "after": "El intervalo de tiempo no es correcto. Introduzca un intervalo de al menos 1 segundo, dentro del rango permitido."
+        }
+      ]
+    },
+    {
+      "file": "packages/features/notes/frontend/components/MkNote.vue",
+      "updates": [
+        {
+          "language": "ar-SA",
+          "upstreamKey": "showLess",
+          "localKey": "showLess",
+          "before": "اغلق",
+          "after": "عرض اقل"
+        }
+      ]
+    },
+    {
+      "file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
+      "updates": [
+        {
+          "language": "ar-SA",
+          "upstreamKey": "showLess",
+          "localKey": "showLess",
+          "before": "اغلق",
+          "after": "عرض اقل"
+        }
+      ]
+    },
+    {
+      "file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+      "updates": [
+        {
+          "language": "ar-SA",
+          "upstreamKey": "showLess",
+          "localKey": "showLess",
+          "before": "اغلق",
+          "after": "عرض اقل"
+        }
+      ]
+    },
+    {
+      "file": "packages/features/notes/frontend/embed/components/EmSubNoteContent.vue",
+      "updates": [
+        {
+          "language": "ar-SA",
+          "upstreamKey": "showLess",
+          "localKey": "showLess",
+          "before": "اغلق",
+          "after": "عرض اقل"
+        }
+      ]
+    },
+    {
+      "file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+      "updates": [
+        {
+          "language": "ar-SA",
+          "upstreamKey": "showLess",
+          "localKey": "showLess",
+          "before": "اغلق",
+          "after": "عرض اقل"
+        }
+      ]
+    },
+    {
+      "file": "packages/features/users/frontend/pages/settings/privacy.vue",
+      "updates": [
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.groupTitle",
+          "localKey": "followApprovalGroupTitle",
+          "before": "フォロー承認",
+          "after": "Segueix la sol·licitud aprovada"
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.inactiveDescription",
+          "localKey": "followApprovalInactiveDescription",
+          "before": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+          "after": "Com que tots els seguiments estaran subjectes a aprovació, no s'aplicaran els paràmetres basats en el temps. Si desactiveu el sistema d'aprovació de seguiments, s'aplicaran de nou els paràmetres següents."
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.title",
+          "localKey": "followApprovalTitle",
+          "before": "新しいアカウントからのフォローを承認制にする",
+          "after": "Establiu que els seguiments de comptes nous requereixin aprovació."
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.autoAcceptDescription",
+          "localKey": "followApprovalAutoAcceptDescription",
+          "before": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+          "after": "Fins i tot si has configurat el teu compte perquè requereixi aprovació per als nous seguidors, o si estàs pendent de sol·licituds de seguiment de nous comptes, les persones que segueixes seran aprovades automàticament."
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.description",
+          "localKey": "followApprovalDescription",
+          "before": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+          "after": "Les sol·licituds de seguiment d'usuaris que no t'han seguit durant el període especificat es consideraran sol·licituds de seguiment. Això no afectarà els teus seguidors actuals. Si tens habilitada l'aprovació automàtica per als usuaris que segueixes, aquests usuaris seran aprovats automàticament."
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.local",
+          "localKey": "followApprovalLocal",
+          "before": "ローカルユーザーからのフォロー",
+          "after": "Segueix usuaris locals"
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.localDescription",
+          "localKey": "followApprovalLocalDescription",
+          "before": "このサーバーでのアカウント作成からの期間で判定します。",
+          "after": "Això es determina pel temps transcorregut des que es va crear el compte en aquest servidor."
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.remote",
+          "localKey": "followApprovalRemote",
+          "before": "リモートユーザーからのフォロー",
+          "after": "Seguidors d'usuaris remots"
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.remoteDescription",
+          "localKey": "followApprovalRemoteDescription",
+          "before": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+          "after": "Això es determina pel temps transcorregut des que aquest servidor va reconèixer per primera vegada aquest compte, en lloc de la data i l'hora de creació a l'altre servidor."
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.useDefault",
+          "localKey": "followApprovalUseDefault",
+          "before": "既定値を使う（現在は無効）",
+          "after": "Utilitzar valors per defecte (actualment desactivat)"
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.custom",
+          "localKey": "followApprovalCustom",
+          "before": "期間を指定する",
+          "after": "Especifiqueu un període"
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.period",
+          "localKey": "followApprovalPeriod",
+          "before": "承認が必要な期間",
+          "after": "Període que requereix aprovació"
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.unit",
+          "localKey": "followApprovalUnit",
+          "before": "単位",
+          "after": "Unitat"
+        },
+        {
+          "language": "ca-ES",
+          "upstreamKey": "_followApproval.invalidPeriod",
+          "localKey": "followApprovalInvalidPeriod",
+          "before": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+          "after": "La durada és incorrecta. Si us plau, introduïu una durada d'almenys 1 segon, dins de l'interval permès."
+        }
+      ]
+    },
+    {
+      "file": "packages/features/users/frontend/pages/settings/privacy.vue",
+      "updates": [
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.groupTitle",
+          "localKey": "followApprovalGroupTitle",
+          "before": "フォロー承認",
+          "after": "팔로우 승인"
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.inactiveDescription",
+          "localKey": "followApprovalInactiveDescription",
+          "before": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+          "after": "모든 팔로우가 승인제로 되어 기간에 따른 설정은 적용되지 않습니다. 팔로우의 승인제를 해제하면 아래의 설정이 다시 적용됩니다."
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.title",
+          "localKey": "followApprovalTitle",
+          "before": "新しいアカウントからのフォローを承認制にする",
+          "after": "새로운 계정으로부터의 팔로우를 승인제로 변경"
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.autoAcceptDescription",
+          "localKey": "followApprovalAutoAcceptDescription",
+          "before": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+          "after": "팔로우를 승인제로 한 경우나 새로운 계정으로부터의 팔로우를 보류하는 경우에도 사용자님께서 팔로우하고 있는 상대는 자동 승인됩니다."
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.description",
+          "localKey": "followApprovalDescription",
+          "before": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+          "after": "지정한 기간이 경과하지 않은 상대로부터의 팔로우를 팔로우 요청으로 보류합니다. 기존 팔로워에는 영향을 끼치지 않습니다. 팔로우하고 있는 상대의 자동 승인이 활성화된 경우, 그 상대는 자동 승인됩니다."
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.local",
+          "localKey": "followApprovalLocal",
+          "before": "ローカルユーザーからのフォロー",
+          "after": "로컬 유저로부터의 팔로우"
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.localDescription",
+          "localKey": "followApprovalLocalDescription",
+          "before": "このサーバーでのアカウント作成からの期間で判定します。",
+          "after": "이 서버에서의 계정 생성으로부터의 기간으로 판정됩니다."
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.remote",
+          "localKey": "followApprovalRemote",
+          "before": "リモートユーザーからのフォロー",
+          "after": "리모트 유저로부터의 팔로우"
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.remoteDescription",
+          "localKey": "followApprovalRemoteDescription",
+          "before": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+          "after": "상대 서버에서의 생성 시각이 아닌 이 서버가 처음 그 계정을 인식한 뒤부터의 기간으로 판정됩니다."
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.useDefault",
+          "localKey": "followApprovalUseDefault",
+          "before": "既定値を使う（現在は無効）",
+          "after": "미리 정해둔 값을 사용 (현재는 유효하지 않음)"
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.custom",
+          "localKey": "followApprovalCustom",
+          "before": "期間を指定する",
+          "after": "기간 지정"
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.period",
+          "localKey": "followApprovalPeriod",
+          "before": "承認が必要な期間",
+          "after": "승인이 필요한 기간"
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.unit",
+          "localKey": "followApprovalUnit",
+          "before": "単位",
+          "after": "단위"
+        },
+        {
+          "language": "ko-KR",
+          "upstreamKey": "_followApproval.invalidPeriod",
+          "localKey": "followApprovalInvalidPeriod",
+          "before": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+          "after": "기간이 올바르지 않습니다. 1초 이상의 기간을 지정 가능한 범위 내에 입력해 주십시오."
+        }
+      ]
+    },
+    {
+      "file": "packages/features/timelines/frontend/pages/timeline.vue",
+      "updates": [
+        {
+          "language": "it-IT",
+          "upstreamKey": "showFixedPostForm",
+          "localKey": "showFixedPostForm",
+          "before": "Visualizzare la finestra di pubblicazione in cima alla timeline",
+          "after": "Modulo di pubblicazione in cima"
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "withSensitive",
+          "localKey": "withSensitive",
+          "before": "Mostra le Note con allegati espliciti",
+          "after": "Includi con allegati espliciti"
+        }
+      ]
+    },
+    {
+      "file": "packages/features/timelines/frontend/ui/deck/tl-column.vue",
+      "updates": [
+        {
+          "language": "it-IT",
+          "upstreamKey": "withSensitive",
+          "localKey": "withSensitive",
+          "before": "Mostra le Note con allegati espliciti",
+          "after": "Includi con allegati espliciti"
+        }
+      ]
+    },
+    {
+      "file": "packages/features/users/frontend/pages/settings/privacy.vue",
+      "updates": [
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.groupTitle",
+          "localKey": "followApprovalGroupTitle",
+          "before": "フォロー承認",
+          "after": "Approvazione dei Follow"
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.inactiveDescription",
+          "localKey": "followApprovalInactiveDescription",
+          "before": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+          "after": "Poiché i Follow sono soggetti ad approvazione, non si applicano le impostazioni basate sul periodo. Disattivando il sistema di approvazione, verranno nuovamente applicate le seguenti impostazioni."
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.title",
+          "localKey": "followApprovalTitle",
+          "before": "新しいアカウントからのフォローを承認制にする",
+          "after": "Le richieste di follow da parte di nuovi account richiedono l'approvazione."
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.autoAcceptDescription",
+          "localKey": "followApprovalAutoAcceptDescription",
+          "before": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+          "after": "Anche se attivi \"Richiedi approvazione per le richieste di follow\" o \"Richiedi approvazione per le richieste di follow da nuovi account\", le richieste di follow provenienti da account che già segui verranno approvate automaticamente."
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.description",
+          "localKey": "followApprovalDescription",
+          "before": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+          "after": "Le richieste di follow da profili registrati prima del tempo specificato verranno non verranno approvate. Questo non influisce sui Follower esistenti; se è attiva l'opzione “Accetta automaticamente le richieste di follow da chi mi segue”, le richieste di follow da quei profili verranno approvate automaticamente."
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.local",
+          "localKey": "followApprovalLocal",
+          "before": "ローカルユーザーからのフォロー",
+          "after": "Richieste da profili locali"
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.localDescription",
+          "localKey": "followApprovalLocalDescription",
+          "before": "このサーバーでのアカウント作成からの期間で判定します。",
+          "after": "Si calcola la durata relativamente alla data di iscrizione del profilo in questo server."
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.remote",
+          "localKey": "followApprovalRemote",
+          "before": "リモートユーザーからのフォロー",
+          "after": "Richieste da profili remoti"
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.remoteDescription",
+          "localKey": "followApprovalRemoteDescription",
+          "before": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+          "after": "Si calcola la durata in base a quando il profilo remoto è stato federato su questo server la prima volta; non si calcola la data di iscrizione sul server remoto."
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.useDefault",
+          "localKey": "followApprovalUseDefault",
+          "before": "既定値を使う（現在は無効）",
+          "after": "Utilizzare il valore predefinito (attualmente disabilitato)"
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.custom",
+          "localKey": "followApprovalCustom",
+          "before": "期間を指定する",
+          "after": "Periodo specifico"
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.period",
+          "localKey": "followApprovalPeriod",
+          "before": "承認が必要な期間",
+          "after": "Periodo richiesto per l'iscrizione"
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.unit",
+          "localKey": "followApprovalUnit",
+          "before": "単位",
+          "after": "Unità"
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "_followApproval.invalidPeriod",
+          "localKey": "followApprovalInvalidPeriod",
+          "before": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+          "after": "Periodo sbagliato. Indicare da 1 secondo fino al limite consentito."
+        }
+      ]
+    },
+    {
+      "file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+      "updates": [
+        {
+          "language": "it-IT",
+          "upstreamKey": "showFixedPostForm",
+          "localKey": "showFixedPostForm",
+          "before": "Visualizzare la finestra di pubblicazione in cima alla timeline",
+          "after": "Modulo di pubblicazione in cima"
+        },
+        {
+          "language": "it-IT",
+          "upstreamKey": "reloadRequiredToApplySettings",
+          "localKey": "reloadRequiredToApplySettings",
+          "before": "Per applicare le impostazioni, occorre ricaricare.",
+          "after": "Ricarica le impostazioni. "
+        }
+      ]
+    }
+  ]
+}

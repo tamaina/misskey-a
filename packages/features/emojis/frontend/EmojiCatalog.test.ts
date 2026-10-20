@@ -7,7 +7,7 @@ import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import { createApp, defineComponent, h, nextTick } from 'vue';
 import type { Component } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import locales from 'i18n';
+import { locales } from '../../../frontend/test/unit/pruned-global-locale-baseline.js';
 import { loadEmojiCatalog } from './index.js';
 import EmojiCatalogItem from './EmojiCatalogItem.vue';
 

@@ -58,7 +58,7 @@ export async function removeAccount(host: string, id: AccountWithToken['id']) {
 	prefer.commit('accounts', prefer.s.accounts.filter(x => x[0] !== host || x[1].id !== id));
 }
 
-const isAccountDeleted = Symbol('isAccountDeleted');
+const isCredentialRejected = Symbol('isCredentialRejected');
 
 function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Promise<Misskey.entities.MeDetailed> {
 	return new Promise((done, fail) => {
@@ -77,10 +77,17 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 					// （認証エラーなど4xxはresolve）
 					return fail2(res);
 				}
-				res.json().then(done2, fail2);
+				res.json().then(body => {
+					if (res.status >= 400 && res.status < 500 && (!body || typeof body !== 'object' || !('error' in body))) {
+						fail2(res);
+					} else {
+						done2(body);
+					}
+				}, fail2);
 			}))
 			.then(async res => {
 				if ('error' in res) {
+					let credentialRejected = true;
 					if (res.error.id === 'a8c724b3-6e9c-4b46-b1a8-bc3ed6258370') {
 						// SUSPENDED
 						if (forceShowDialog || $i && (token === $i.token || id === $i.id)) {
@@ -107,6 +114,7 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 							});
 						}
 					} else {
+						credentialRejected = false;
 						await alert({
 							type: 'error',
 							title: FeatureLocaleMessages.$locale.failedToFetchAccountInformation,
@@ -114,7 +122,7 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 						});
 					}
 
-					fail(isAccountDeleted);
+					fail(credentialRejected ? isCredentialRejected : res.error);
 				} else {
 					done(res);
 				}
@@ -170,13 +178,13 @@ export function updateCurrentAccountPartial(accountData: Partial<Misskey.entitie
 export async function refreshCurrentAccount() {
 	if (!$i) return;
 	const me = $i;
-	return fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(reason => {
-		if (reason === isAccountDeleted) {
-			removeAccount(host, me.id);
+	return fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(async reason => {
+		if (reason === isCredentialRejected) {
+			await removeAccount(host, me.id);
 			if (Object.keys(store.s.accountTokens).length > 0) {
-				login(Object.values(store.s.accountTokens)[0]);
+				await login(Object.values(store.s.accountTokens)[0]);
 			} else {
-				signout();
+				await signout('server-rejected-credential');
 			}
 		}
 	});

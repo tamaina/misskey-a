@@ -13,7 +13,7 @@ import { parse, compileScript } from 'vue/compiler-sfc';
 import { expect, test } from 'vitest';
 import { createInternationalization, setActiveInternationalization, useLocale, createComponentLocale, createComponentLocalizer } from 'vite-vue-internationalization/runtime';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
-import { languages } from 'i18n';
+import { languages, locales as globalLocales } from 'i18n';
 import { locales } from './instance-pilot-locale-catalog.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { startComponentLocales } from '@features/boot/frontend/index.js';
@@ -141,7 +141,7 @@ test('owner dictionaries and reversible source proof contain only the existing e
 
 test.each(languages)('actual generated owner modules and all 19 eager consumers preserve raw bytes in %s', async language => {
 	const payload = generated(language);
-	expect(payload.global).toEqual({});
+	expect(payload.global).toEqual(globalLocales[language]);
 	expect(payload.modules?.[proof.owners.drive.host]).toEqual(driveMessages[language]);
 	expect(payload.modules?.[proof.owners.navigation.host]).toEqual(navbarMessages[language]);
 	const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });

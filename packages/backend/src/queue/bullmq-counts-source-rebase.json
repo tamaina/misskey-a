@@ -1,0 +1,98 @@
+{
+  "baselineVersion": "6.3.2",
+  "currentVersion": "6.3.12",
+  "sources": [
+    {
+      "file": "dist/esm/classes/queue-getters.js",
+      "currentSha256": "f156b0c08f5014851250bde92de34cb54c08ec70fe13a720ac22439004874948",
+      "identicalMethods": [
+        {
+          "method": "sanitizeJobTypes",
+          "source": "    sanitizeJobTypes(types) {\n        const currentTypes = typeof types === 'string' ? [types] : types;\n        if (Array.isArray(currentTypes) && currentTypes.length > 0) {\n            const sanitizedTypes = [...currentTypes];\n            return [...new Set(sanitizedTypes)];\n        }\n        return [\n            'active',\n            'completed',\n            'delayed',\n            'failed',\n            'prioritized',\n            'waiting',\n            'waiting-children',\n        ];\n    }",
+          "sha256": "9a1fff8d7e2ba3d2267dbef08cbc0eec5a7d5c65da0d060236e9c94ffa7eaf86"
+        },
+        {
+          "method": "getJobCounts",
+          "source": "    async getJobCounts(...types) {\n        const currentTypes = this.sanitizeJobTypes(types);\n        const responses = await this.backend.getCounts(currentTypes);\n        const counts = {};\n        responses.forEach((res, index) => {\n            counts[currentTypes[index]] = res || 0;\n        });\n        return counts;\n    }",
+          "sha256": "985c8a9b2bfa3dcdfc3bb5bf1f080dc8708d8e95882441358c852dbdcdaeeceb"
+        }
+      ]
+    },
+    {
+      "file": "dist/esm/classes/redis-queue-backend.js",
+      "currentSha256": "28a07401b6468d616fd008e3baa6cb2ad5090c0cff5bdf41fe8431f9bcd8374c",
+      "identicalMethods": [
+        {
+          "method": "getCountsArgs",
+          "source": "    getCountsArgs(types) {\n        const queueKeys = this.queue.keys;\n        const transformedTypes = types.map(type => {\n            return type === 'waiting' ? 'wait' : type;\n        });\n        const keys = [queueKeys['']];\n        const args = [...transformedTypes];\n        return keys.concat(args);\n    }",
+          "sha256": "d3bcdb394213758eb82b30b47da8f79bcfb42ea0408cd78b80457bb23d3000c5"
+        },
+        {
+          "method": "getCounts",
+          "source": "    async getCounts(types) {\n        const client = await this.queue.client;\n        const args = this.getCountsArgs(types);\n        return await this.execCommand(client, 'getCounts', args);\n    }",
+          "sha256": "a6e09e3b8915b01c3c75373aa3e8b967d0eb6c5465f5200cbe3fadbc24aab3dd"
+        }
+      ]
+    },
+    {
+      "file": "dist/esm/commands/getCounts-1.lua",
+      "currentSha256": "bfb163ab2dc8b1690245085c2c120aeb94fb1f6f9305d700b252776b15be5c54",
+      "identicalWholeFile": true
+    },
+    {
+      "file": "dist/cjs/classes/queue-getters.js",
+      "currentSha256": "88e8359150a2b66b15d98abd7c2cc97b4e97ecd89d3c72ad4dfd5363e15e8384",
+      "identicalMethods": [
+        {
+          "method": "sanitizeJobTypes",
+          "source": "    sanitizeJobTypes(types) {\n        const currentTypes = typeof types === 'string' ? [types] : types;\n        if (Array.isArray(currentTypes) && currentTypes.length > 0) {\n            const sanitizedTypes = [...currentTypes];\n            return [...new Set(sanitizedTypes)];\n        }\n        return [\n            'active',\n            'completed',\n            'delayed',\n            'failed',\n            'prioritized',\n            'waiting',\n            'waiting-children',\n        ];\n    }",
+          "sha256": "9a1fff8d7e2ba3d2267dbef08cbc0eec5a7d5c65da0d060236e9c94ffa7eaf86"
+        },
+        {
+          "method": "getJobCounts",
+          "source": "    async getJobCounts(...types) {\n        const currentTypes = this.sanitizeJobTypes(types);\n        const responses = await this.backend.getCounts(currentTypes);\n        const counts = {};\n        responses.forEach((res, index) => {\n            counts[currentTypes[index]] = res || 0;\n        });\n        return counts;\n    }",
+          "sha256": "985c8a9b2bfa3dcdfc3bb5bf1f080dc8708d8e95882441358c852dbdcdaeeceb"
+        }
+      ]
+    },
+    {
+      "file": "dist/cjs/classes/redis-queue-backend.js",
+      "currentSha256": "6467ddd7e035881846c0534c91b4713996a83ad62633067e1a1c3f48166fbc78",
+      "identicalMethods": [
+        {
+          "method": "getCountsArgs",
+          "source": "    getCountsArgs(types) {\n        const queueKeys = this.queue.keys;\n        const transformedTypes = types.map(type => {\n            return type === 'waiting' ? 'wait' : type;\n        });\n        const keys = [queueKeys['']];\n        const args = [...transformedTypes];\n        return keys.concat(args);\n    }",
+          "sha256": "d3bcdb394213758eb82b30b47da8f79bcfb42ea0408cd78b80457bb23d3000c5"
+        },
+        {
+          "method": "getCounts",
+          "source": "    async getCounts(types) {\n        const client = await this.queue.client;\n        const args = this.getCountsArgs(types);\n        return await this.execCommand(client, 'getCounts', args);\n    }",
+          "sha256": "a6e09e3b8915b01c3c75373aa3e8b967d0eb6c5465f5200cbe3fadbc24aab3dd"
+        }
+      ]
+    },
+    {
+      "file": "dist/cjs/commands/getCounts-1.lua",
+      "currentSha256": "bfb163ab2dc8b1690245085c2c120aeb94fb1f6f9305d700b252776b15be5c54",
+      "identicalWholeFile": true
+    },
+    {
+      "file": "dist/cjs/scripts/getCounts-1.js",
+      "currentSha256": "fa3d40832e1db57f1a93f10aff40caba98705ced8c139652ff839e1dc07115fb",
+      "identicalWholeFile": true
+    },
+    {
+      "file": "dist/esm/scripts/getCounts-1.js",
+      "currentSha256": "4e76ad74d5aad727b72c2e8ee91e46d60cce4f96937054727a515ed1db65beb6",
+      "identicalWholeFile": true
+    },
+    {
+      "file": "package.json",
+      "currentSha256": "c41da2849220028ee10459223caeaa12fdee337508970f0b709b87b850755f4f"
+    }
+  ],
+  "entryPoints": {
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js"
+  }
+}

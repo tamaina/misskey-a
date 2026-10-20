@@ -45,8 +45,8 @@
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkNote.vue",
-		"currentSha256": "556ed3cbd3871dc946168529fb7ea3866fc592d00083eaa548da43e74c4f706d",
-		"baselineSha256": "37b872de587ebee8b674d81288229c123332097b361b76851f29c1e404e49562",
+		"currentSha256": "665be3b67d14187b86c161add7c9477385ee9d18bdbfee3019a49910392fbfad",
+		"baselineSha256": "3980b73322a2c875eef990f9829f516f38ed9d6958ae4fbcc6ca9e9fadf81f62",
 		"edits": [
 			{
 				"start": 6669,

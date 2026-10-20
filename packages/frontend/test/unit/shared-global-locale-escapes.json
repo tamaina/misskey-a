@@ -1,0 +1,201 @@
+{
+	"packages/features/boot/frontend/pages/welcome.setup.vue": {
+		"th-TH": [
+			"\\u200b"
+		]
+	},
+	"packages/features/collections/frontend/pages/gallery/post.vue": {
+		"pl-PL": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/drive/frontend/components/MkDrive.vue": {
+		"ar-SA": [
+			"\\u003c"
+		],
+		"ca-ES": [
+			"\\u003c"
+		],
+		"cs-CZ": [
+			"\\u003c"
+		],
+		"da-DK": [
+			"\\u003c"
+		],
+		"de-DE": [
+			"\\u003c"
+		],
+		"en-US": [
+			"\\u003c"
+		],
+		"es-ES": [
+			"\\u003c"
+		],
+		"fr-FR": [
+			"\\u003c"
+		],
+		"id-ID": [
+			"\\u003c"
+		],
+		"ja-JP": [
+			"\\u003c"
+		],
+		"ja-KS": [
+			"\\u003c"
+		],
+		"kab-KAB": [
+			"\\u003c"
+		],
+		"kn-IN": [
+			"\\u003c"
+		],
+		"ko-KR": [
+			"\\u003c"
+		],
+		"nl-NL": [
+			"\\u003c"
+		],
+		"no-NO": [
+			"\\u003c"
+		],
+		"pl-PL": [
+			"\\u003c"
+		],
+		"pt-PT": [
+			"\\u003c"
+		],
+		"ru-RU": [
+			"\\u003c"
+		],
+		"sk-SK": [
+			"\\u003c"
+		],
+		"th-TH": [
+			"\\u003c"
+		],
+		"tr-TR": [
+			"\\u003c"
+		],
+		"ug-CN": [
+			"\\u003c"
+		],
+		"uk-UA": [
+			"\\u003c"
+		],
+		"vi-VN": [
+			"\\u003c"
+		],
+		"zh-CN": [
+			"\\u003c"
+		],
+		"zh-TW": [
+			"\\u003c"
+		]
+	},
+	"packages/features/emojis/frontend/pages/custom-emojis-manager.vue": {
+		"pl-PL": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/moderation/frontend/pages/admin/moderation.vue": {
+		"it-IT": [
+			"\\u200b"
+		]
+	},
+	"packages/features/operations/frontend/pages/admin/object-storage.vue": {
+		"ar-SA": [
+			"\\u003c"
+		],
+		"ca-ES": [
+			"\\u003c"
+		],
+		"cs-CZ": [
+			"\\u003c"
+		],
+		"da-DK": [
+			"\\u003c"
+		],
+		"de-DE": [
+			"\\u003c"
+		],
+		"en-US": [
+			"\\u003c"
+		],
+		"es-ES": [
+			"\\u003c"
+		],
+		"fr-FR": [
+			"\\u003c"
+		],
+		"id-ID": [
+			"\\u003c"
+		],
+		"it-IT": [
+			"\\u003c"
+		],
+		"ja-JP": [
+			"\\u003c"
+		],
+		"ja-KS": [
+			"\\u003c"
+		],
+		"kab-KAB": [
+			"\\u003c"
+		],
+		"kn-IN": [
+			"\\u003c"
+		],
+		"ko-KR": [
+			"\\u003c"
+		],
+		"nl-NL": [
+			"\\u003c"
+		],
+		"no-NO": [
+			"\\u003c"
+		],
+		"pl-PL": [
+			"\\u003c"
+		],
+		"pt-PT": [
+			"\\u003c"
+		],
+		"ru-RU": [
+			"\\u003c"
+		],
+		"sk-SK": [
+			"\\u003c"
+		],
+		"th-TH": [
+			"\\u003c"
+		],
+		"tr-TR": [
+			"\\u003c"
+		],
+		"ug-CN": [
+			"\\u003c"
+		],
+		"uk-UA": [
+			"\\u003c"
+		],
+		"vi-VN": [
+			"\\u003c"
+		],
+		"zh-CN": [
+			"\\u003c"
+		],
+		"zh-TW": [
+			"\\u003c"
+		]
+	},
+	"packages/features/pages/frontend/pages/page.vue": {
+		"pl-PL": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/play/frontend/pages/flash/flash.vue": {
+		"pl-PL": [
+			"\\u00a0"
+		]
+	}
+}

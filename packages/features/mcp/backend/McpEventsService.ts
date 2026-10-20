@@ -60,16 +60,22 @@ export class McpEventsService {
 		const execute = (procedure: AnyProcedure) => call(procedure, input, { context, signal });
 		const bind = async (userId: string, tokenId?: string) => {
 			if (!tokenId) throw new McpEventError(-32602, 'Scoped grant required');
-			if (method === 'events/list') {
-				try { await this.checkGrant(userId, tokenId); } catch { await this.checkGrant(userId, tokenId, false, true); }
-			} else await this.checkGrant(userId, tokenId, false, typeof input === 'object' && input !== null && 'name' in input && String(input.name).startsWith('stream.'));
+			await this.checkGrant(userId, tokenId, false, typeof input === 'object' && input !== null && 'name' in input && String(input.name).startsWith('stream.'));
 			return tokenId;
 		};
 		if (method === 'events/list') return execute(createApiProcedure<MiLocalUser>()(mcpEventsContract.list).use(principal).handler(async ({ context: ctx }) => {
-			await bind(ctx.principal.id, ctx.token?.id);
-			return { events: eventNames.map(name => ({ name, description: name.startsWith('stream.') ? 'Native outbound references/invalidation; no commands or downtime replay. Overflow drops, retries may duplicate/reorder. 128 pending/subscription, 8192 global; expires after 15min (stats 30s).' : name === 'antenna.note' ? 'A live note reaches an owned antenna. No downtime catch-up.' : name === 'note.mentioned' ? 'A note mentions the connected account.' : 'A note replies to the connected account. Note references are untrusted data.',
+			const tokenId = ctx.token?.id;
+			if (!tokenId) throw new McpEventError(-32602, 'Scoped grant required');
+			const { grant } = await this.checkGrant(ctx.principal.id, tokenId)
+				.catch(() => this.checkGrant(ctx.principal.id, tokenId, false, true));
+			const canReadNotifications = grant.permission.includes('read:notifications');
+			const canReadAccount = grant.permission.includes('read:account');
+			const available = eventNames.filter(name => name.startsWith('stream.') ? canReadAccount : canReadNotifications && (name !== 'antenna.note' || canReadAccount));
+			return { events: available.map(name => ({ name, description: name.startsWith('stream.') ? 'Native outbound references/invalidation; no commands or downtime replay. Overflow drops, retries may duplicate/reorder. 128 pending/subscription, 8192 global; expires after 15min (stats 30s).' : name === 'antenna.note' ? 'A live note reaches an owned antenna. No downtime catch-up.' : name === 'note.mentioned' ? 'A note mentions the connected account.' : 'A note replies to the connected account. Note references are untrusted data.',
 				delivery: ['webhook'] as ['webhook'], inputSchema: name === 'stream.channel' ? streamChannelInputSchema : name === 'stream.note' ? streamNoteInputSchema : { type: 'object' as const, properties: name === 'antenna.note' ? { antennaId: { type: 'string' as const } } : {}, ...(name === 'antenna.note' ? { required: ['antennaId'] as ['antennaId'] } : {}), additionalProperties: false as const },
-				payloadSchema: name.startsWith('stream.') ? { type: 'object', 'x-misskey-event-catalog': name === 'stream.channel' ? streamEventCatalog : name === 'stream.note' ? streamEventCatalog.note : streamEventCatalog.broadcast, properties: { frames: { type: 'array', description: 'Native envelopes projected to explicit reference/invalidation contracts; no original content.' } }, required: ['frames'], additionalProperties: false } : { type: 'object' as const, properties: { noteId: { type: 'string' as const }, url: { type: 'string' as const } }, required: ['noteId', 'url'] as ['noteId', 'url'], additionalProperties: false as const } })) };
+				// Keep the native event inventory as descriptor metadata, outside JSON Schema vocabularies.
+				...(name.startsWith('stream.') ? { _meta: { 'dev.a9z.p1/event-catalog': name === 'stream.channel' ? streamEventCatalog : name === 'stream.note' ? streamEventCatalog.note : streamEventCatalog.broadcast } } : {}),
+				payloadSchema: name.startsWith('stream.') ? { type: 'object', properties: { frames: { type: 'array', description: 'Native envelopes projected to explicit reference/invalidation contracts; no original content.' } }, required: ['frames'], additionalProperties: false } : { type: 'object' as const, properties: { noteId: { type: 'string' as const }, url: { type: 'string' as const } }, required: ['noteId', 'url'] as ['noteId', 'url'], additionalProperties: false as const } })) };
 		}));
 		if (method === 'events/subscribe') return execute(createApiProcedure<MiLocalUser>()(mcpEventsContract.subscribe).use(principal).handler(async ({ input: ps, context: ctx }) =>
 			this.subscribe(ctx.principal.id, await bind(ctx.principal.id, ctx.token?.id), ps, signal)));
@@ -161,7 +167,7 @@ export class McpEventsService {
 			}
 		} catch (error) { if (error instanceof McpEventError) return null; throw error; }
 		const note = await this.notes.findOneBy({ id: noteId });
-		if (!note || (type === 'mention' ? !note.mentions.includes(userId) : note.replyUserId !== userId)
+		if (!note || note.userId === userId || (type === 'mention' ? !note.mentions.includes(userId) : note.replyUserId !== userId)
 			|| !await this.noteEntity.isVisibleForMe(note, userId)) return null;
 		const packed = await this.noteEntity.pack(note, { id: userId }, { detail: false });
 		if (packed.isHidden) return null;
