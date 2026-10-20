@@ -57,7 +57,7 @@ function announcement(): IAnnounce {
 	return {
 		type: 'Announce', id: `${groupUri}/activities/note123`, actor: groupUri,
 		audience: groupUri, to: [PUBLIC], object: {
-			type: 'Create', id: `${noteUri}/activity`, actor: authorUri, audience: groupUri,
+			type: 'Create', id: `${noteUri}/activity`, actor: authorUri, audience: groupUri, to: [PUBLIC],
 			object: { type: 'Note', id: noteUri, attributedTo: authorUri, audience: groupUri, to: [PUBLIC], content: 'approved' },
 		} as ICreate,
 	};

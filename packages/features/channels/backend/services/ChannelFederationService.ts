@@ -24,11 +24,15 @@ import type { ApPersonService } from '@features/federation/backend/services/ApPe
 import type { NoteDeleteService } from '@features/notes/backend/services/NoteDeleteService.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { getApId, getApIds, getOneApId, isCreate, isDelete, isPost } from '@features/federation/backend/protocol/type.js';
-import type { IActivity, IAnnounce, IFollow, IObject } from '@features/federation/backend/protocol/type.js';
+import type { IActivity, IAnnounce, IActor, ICreate, IFollow, IObject, IPost } from '@features/federation/backend/protocol/type.js';
 import { acquireApObjectLock, acquireDistributedLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import type * as Redis from 'ioredis';
 
 const PUBLIC = 'https://www.w3.org/ns/activitystreams#Public';
+
+type NoteMembership =
+	| { kind: 'ordinary' | 'rejected' }
+	| { kind: 'approved'; note: IPost; channel: MiChannel; author: MiRemoteUser };
 
 /** Prototype: local authors publish through a dedicated Group; remote submissions are not accepted. */
 @Injectable()
@@ -152,6 +156,60 @@ export class ChannelFederationService {
 		}));
 	}
 
+	/** Verify a public reference without taking the caller's Note lock or subscribing to its Group. */
+	public async resolveNoteMembership(note: IPost): Promise<NoteMembership> {
+		if (note.audience == null) return { kind: 'ordinary' };
+		const audiences = getApIds(note.audience);
+		const candidate = audiences.find(uri => {
+			try { return /^\/channels\/[^/]+$/.test(new URL(uri).pathname); } catch { return false; }
+		}) ?? (await this.channels.findOneBy({ uri: In(audiences) }))?.uri;
+		// Other software may use audience for a Person or a collection unrelated to channels.
+		if (!candidate) return { kind: 'ordinary' };
+		if (note.audience !== candidate || !note.id || !getApIds(note.to).includes(PUBLIC)) return { kind: 'rejected' };
+		const groupUrl = new URL(candidate);
+		const noteUrl = new URL(note.id);
+		if (groupUrl.protocol !== 'https:' || groupUrl.search || groupUrl.hash || noteUrl.search || noteUrl.hash ||
+			groupUrl.origin !== noteUrl.origin || !/^\/channels\/[^/]+$/.test(groupUrl.pathname) || !/^\/notes\/[^/]+$/.test(noteUrl.pathname)) return { kind: 'rejected' };
+
+		const resolver = await this.resolverService.createResolver();
+		const group = await resolver.resolve(candidate);
+		if (group.type !== 'Group' || group._misskey_channel !== true || group.id !== candidate || (group as IActor).suspended === true) return { kind: 'rejected' };
+		const approvalUri = `${candidate}/activities/${noteUrl.pathname.split('/').pop()}`;
+		const approval = await resolver.resolve(approvalUri) as IAnnounce;
+		if (approval.type !== 'Announce' || approval.id !== approvalUri || getApId(approval.actor) !== candidate || approval.audience !== candidate || !getApIds(approval.to).includes(PUBLIC)) return { kind: 'rejected' };
+		if (typeof approval.object !== 'object' || Array.isArray(approval.object) || !isCreate(approval.object) || getApId(approval.object.object) !== note.id) return { kind: 'rejected' };
+		const canonical = await this.verifyCreate(candidate, approval.object, resolver);
+		if (!canonical) return { kind: 'rejected' };
+		// GET Note adds a top-level JSON-LD context; the embedded canonical Note does not.
+		const fetched = { ...note };
+		const approved = { ...canonical };
+		delete fetched['@context'];
+		delete approved['@context'];
+		if (!isDeepStrictEqual(fetched, approved)) return { kind: 'rejected' };
+
+		const people = this.moduleRef.get<ApPersonService>('ApPersonService', { strict: false });
+		// Separate resolvers avoid re-fetching the already resolved Group in the same history.
+		const actor = await people.resolvePerson(candidate);
+		const author = await people.resolvePerson(getOneApId(canonical.attributedTo!));
+		if (actor.host == null || actor.uri !== candidate || actor.isSuspended || actor.isRemoteSuspended ||
+			author.host == null || author.uri !== getOneApId(canonical.attributedTo!) || author.isSuspended || author.isRemoteSuspended) return { kind: 'rejected' };
+		return { kind: 'approved', note: canonical, author, channel: await this.remoteChannel(actor, group) };
+	}
+
+	/** Fetch the author's activity, binding the Group's approval to a public canonical Note. */
+	private async verifyCreate(groupUri: string, inner: ICreate, resolver: Awaited<ReturnType<ApResolverService['createResolver']>>): Promise<IPost | null> {
+		const authorUri = getApId(inner.actor);
+		const noteUri = getApId(inner.object);
+		if (inner.audience !== groupUri || !getApIds(inner.to).includes(PUBLIC) || new URL(authorUri).origin !== new URL(groupUri).origin ||
+			new URL(getApId(inner)).origin !== new URL(authorUri).origin || new URL(noteUri).origin !== new URL(authorUri).origin) return null;
+		const canonical = await resolver.resolve(getApId(inner));
+		if (!isCreate(canonical) || !isDeepStrictEqual(canonical, inner)) return null;
+		const object = canonical.object;
+		if (typeof object !== 'object' || Array.isArray(object) || !isPost(object) || object.id !== noteUri || object.audience !== groupUri ||
+			getApIds(object.attributedTo).length !== 1 || getOneApId(object.attributedTo!) !== authorUri || !getApIds(object.to).includes(PUBLIC)) return null;
+		return object;
+	}
+
 	/** Only an authenticated outer Group may call this approval path. */
 	public async receiveAnnounce(actor: MiRemoteUser, activity: IAnnounce, depth = 0): Promise<string | null> {
 		if (depth > 16) return 'skip: Group reply depth exceeded';
@@ -166,11 +224,12 @@ export class ChannelFederationService {
 		const authorUri = getApId(inner.actor);
 		// The pilot supports authors on the Group's own server only. Remote submissions are deferred.
 		if (new URL(authorUri).origin !== new URL(actor.uri).origin) return 'skip: remote Group submission not supported';
-		const channel = await this.remoteChannel(actor, group);
 		const noteUri = getApId(inner.object);
 		const unlock = await acquireApObjectLock(this.redis, noteUri);
 		try {
 			if (isDelete(inner)) {
+				const channel = await this.channels.findOneBy({ uri: actor.uri });
+				if (!channel) return 'skip: unknown Group channel';
 				const note = await this.notes.findOneBy({ uri: noteUri, channelId: channel.id });
 				if (!note) return 'skip: unknown Group note';
 				const author = await this.users.findOneByOrFail({ id: note.userId }) as MiRemoteUser;
@@ -184,12 +243,8 @@ export class ChannelFederationService {
 				await this.moduleRef.get<NoteDeleteService>('NoteDeleteService', { strict: false }).delete(author, note);
 				return 'ok: Group note deleted';
 			}
-			// Fetch the author's activity by URL, never trust embedded author assertions.
-			if (new URL(getApId(inner)).origin !== new URL(authorUri).origin || new URL(noteUri).origin !== new URL(authorUri).origin) return 'skip: author origin mismatch';
-			const canonical = await resolver.resolve(getApId(inner));
-			if (!isCreate(canonical) || !isDeepStrictEqual(canonical, inner)) return 'skip: forwarded Create differs from author';
-			const object = canonical.object;
-			if (typeof object !== 'object' || Array.isArray(object) || !isPost(object) || object.audience !== actor.uri || getOneApId(object.attributedTo!) !== authorUri || !getApIds(object.to).includes(PUBLIC)) return 'skip: invalid Group Note';
+			const object = await this.verifyCreate(actor.uri, inner as ICreate, resolver);
+			if (!object) return 'skip: invalid Group Create';
 			if (await this.notes.existsBy({ uri: noteUri })) return 'skip: note exists';
 			for (const reference of [object.inReplyTo, object._misskey_quote ?? object.quoteUrl]) {
 				if (reference == null) continue;
@@ -197,7 +252,8 @@ export class ChannelFederationService {
 				if (!(await this.notes.existsBy({ uri: parentUri }))) await this.importReference(actor, parentUri, depth);
 			}
 			const author = await this.moduleRef.get<ApPersonService>('ApPersonService', { strict: false }).resolvePerson(authorUri, resolver);
-			if (author.host == null) return 'skip: local author on remote Group';
+			if (author.host == null || author.isSuspended || author.isRemoteSuspended) return 'skip: invalid Group author';
+			const channel = await this.remoteChannel(actor, group);
 			const note = await this.moduleRef.get<ApNoteService>('ApNoteService', { strict: false }).createNote(object, author, resolver, false, channel);
 			return note ? 'ok: Group note created' : 'skip: Group note rejected';
 		} finally {

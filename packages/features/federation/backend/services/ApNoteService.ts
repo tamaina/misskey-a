@@ -4,12 +4,14 @@
  */
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { In } from 'typeorm';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type { PollsRepository, EmojisRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
+import type { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { acquireApObjectLock } from '@features/runtime/backend/cache/distributed-lock.js';
@@ -76,6 +78,7 @@ export class ApNoteService {
 		private noteCreateService: NoteCreateService,
 		private apDbResolverService: ApDbResolverService,
 		private apLoggerService: ApLoggerService,
+		private moduleRef: ModuleRef,
 	) {
 		this.logger = this.apLoggerService.logger;
 	}
@@ -144,9 +147,7 @@ export class ApNoteService {
 			throw err;
 		}
 
-		const note = object as IPost;
-		// Audience is a claim, not Group approval. Only the verified Announce path supplies a channel.
-		if (note.audience != null && !approvedChannel) return null;
+		let note = object as IPost;
 
 		this.logger.debug(`Note fetched: ${JSON.stringify(note, null, 2)}`);
 
@@ -162,6 +163,18 @@ export class ApNoteService {
 
 		if (url && !checkHttps(url)) {
 			throw new Error('unexpected schema of note url: ' + url);
+		}
+
+		if (!approvedChannel && note.audience != null) {
+			const membership = await this.moduleRef.get<ChannelFederationService>('ChannelFederationService', { strict: false }).resolveNoteMembership(note);
+			if (membership.kind === 'rejected') return null;
+			if (membership.kind === 'approved') {
+				note = membership.note;
+				// eslint-disable-next-line no-param-reassign
+				approvedChannel = membership.channel;
+				// eslint-disable-next-line no-param-reassign
+				actor ??= membership.author;
+			}
 		}
 
 		this.logger.info(`Creating the Note: ${note.id}`);

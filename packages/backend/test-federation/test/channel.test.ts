@@ -70,6 +70,50 @@ describe('Channel Group federation pilot', () => {
 		}, WAIT_FOR_FEDERATION);
 	});
 
+	test('ordinary author Renote imports an unknown channel without subscribing to its Group', async () => {
+		const booster = await createAccount('a.test');
+		const remoteBooster = await bob.client.request('ap/show', { uri: `https://a.test/users/${booster.id}` });
+		if (remoteBooster.type !== 'User') throw new Error('Renote author did not resolve');
+		await bob.client.request('following/create', { userId: remoteBooster.object.id });
+		await vi.waitFor(async () => {
+			const followers = await booster.client.request('users/followers', { userId: booster.id });
+			strictEqual(followers.some(row => row.follower.username === bob.username), true);
+		}, WAIT_FOR_FEDERATION);
+		const unknown = await alice.client.request('channels/create', { name: crypto.randomUUID(), isFederated: true });
+		const original = (await alice.client.request('notes/create', { channelId: unknown.id, text: crypto.randomUUID() })).createdNote;
+		const followersBefore = await fetch(`https://a.test/channels/${unknown.id}/followers`, { headers: { accept: 'application/activity+json' } }).then(r => r.json()) as { totalItems: number };
+		strictEqual(followersBefore.totalItems, 0);
+		const renote = (await booster.client.request('notes/create', { renoteId: original.id })).createdNote;
+		const received = await vi.waitFor(async () => {
+			const timeline = await bob.client.request('notes/hybrid-timeline', {});
+			const result = timeline.find(note => note.uri === `https://a.test/notes/${renote.id}`);
+			strictEqual(result?.renote?.uri, `https://a.test/notes/${original.id}`);
+			return result!;
+		}, WAIT_FOR_FEDERATION);
+		strictEqual(received.channelId == null, true);
+		strictEqual(received.user.username, booster.username);
+		strictEqual(received.renote!.user.username, alice.username);
+		const imported = await bob.client.request('channels/show', { channelId: received.renote!.channelId! });
+		strictEqual(imported.uri, `https://a.test/channels/${unknown.id}`);
+		strictEqual(imported.isFollowing, false);
+		const followersAfter = await fetch(`https://a.test/channels/${unknown.id}/followers`, { headers: { accept: 'application/activity+json' } }).then(r => r.json()) as { totalItems: number };
+		strictEqual(followersAfter.totalItems, 0);
+	});
+
+	test('direct ap/show acquires an unknown public channel Note and concurrent replay stays unique', async () => {
+		const unknown = await alice.client.request('channels/create', { name: crypto.randomUUID(), isFederated: true });
+		const original = (await alice.client.request('notes/create', { channelId: unknown.id, text: crypto.randomUUID() })).createdNote;
+		const uri = `https://a.test/notes/${original.id}`;
+		const results = await Promise.all([bob.client.request('ap/show', { uri }), bob.client.request('ap/show', { uri })]);
+		if (results[0].type !== 'Note' || results[1].type !== 'Note') throw new Error('Channel Note did not resolve');
+		strictEqual(results[0].object.id, results[1].object.id);
+		const imported = await bob.client.request('channels/show', { channelId: results[0].object.channelId! });
+		strictEqual(imported.uri, `https://a.test/channels/${unknown.id}`);
+		strictEqual(imported.isFollowing, false);
+		const timeline = await bob.client.request('channels/timeline', { channelId: imported.id });
+		strictEqual(timeline.filter(note => note.uri === uri).length, 1);
+	});
+
 	test('refuses localOnly and local-only quotes without rewriting the target', async () => {
 		await expect(alice.client.request('notes/create', { channelId: channel.id, localOnly: true, text: 'rejected' })).rejects.toMatchObject({ code: 'CHANNEL_FEDERATION_REQUIRES_PUBLIC' });
 		const local = (await alice.client.request('notes/create', { localOnly: true, text: 'local target' })).createdNote;

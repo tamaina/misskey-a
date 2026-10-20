@@ -241,7 +241,7 @@ const services = [
 	['JsonLdService', JsonLdService, 1],
 	['ApImageService', ApImageService, 5],
 	['ApMentionService', ApMentionService, 1],
-	['ApNoteService', ApNoteService, 18],
+	['ApNoteService', ApNoteService, 19],
 	['ApPersonService', ApPersonService, 10],
 	['ApQuestionService', ApQuestionService, 7],
 	['AnnouncementService', AnnouncementService, 7],
