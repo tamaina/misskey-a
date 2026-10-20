@@ -86,7 +86,7 @@ describe('Channel Group federation pilot', () => {
 		const renote = (await booster.client.request('notes/create', { renoteId: original.id })).createdNote;
 		const received = await vi.waitFor(async () => {
 			const timeline = await bob.client.request('notes/hybrid-timeline', {});
-			const result = timeline.find(note => note.uri === `https://a.test/notes/${renote.id}`);
+			const result = timeline.find(note => note.uri === `https://a.test/notes/${renote.id}/activity`);
 			strictEqual(result?.renote?.uri, `https://a.test/notes/${original.id}`);
 			return result!;
 		}, WAIT_FOR_FEDERATION);

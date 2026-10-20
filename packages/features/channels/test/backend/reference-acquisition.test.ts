@@ -142,7 +142,7 @@ test('a fetched public reference verifies an unknown Group without re-entering i
 test('ordinary B Announce imports A membership on previously unsubscribed C and keeps the wrapper outside the channel', async () => {
 	const f = fixture();
 	const bob = mockDeep<MiRemoteUser>({ id: 'bob', uri: 'https://b.test/users/bob', host: 'b.test', isSuspended: false, isRemoteSuspended: false });
-	const announce: IAnnounce = { type: 'Announce', id: 'https://b.test/notes/renote', actor: bob.uri, object: noteUri, to: [PUBLIC] };
+	const announce: IAnnounce = { type: 'Announce', id: 'https://b.test/notes/renote/activity', actor: bob.uri, object: noteUri, to: [PUBLIC] };
 	await f.inbox.announce(bob, announce);
 	expect(f.savedNotes.get(announce.id!)).toMatchObject({ channelId: null, userId: 'bob', renote: { uri: noteUri, channelId: 'remote-channel', userId: 'author' } });
 	expect(f.noteCreate.mock.calls[0][2]).toBe(true);

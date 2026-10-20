@@ -129,7 +129,7 @@ test('verified Create stores the channel through the author importer', async () 
 	f.channels.findOneBy.mockResolvedValue(channel);
 	f.followings.findBy.mockResolvedValue([]);
 	f.resolver.resolve.mockImplementation(async value => value === groupUri ? { type: 'Group', id: groupUri, _misskey_channel: true } : activity.object as IObject);
-	const author = mockDeep<MiRemoteUser>({ id: 'author123', host: remote.host, uri: authorUri });
+	const author = mockDeep<MiRemoteUser>({ id: 'author123', host: remote.host, uri: authorUri, isSuspended: false, isRemoteSuspended: false });
 	const resolvePerson = vi.fn().mockResolvedValue(author);
 	const createNote = vi.fn().mockResolvedValue({ id: 'note123', channelId: channel.id });
 	f.moduleRef.get.mockImplementation(token => (token === 'ApPersonService' ? { resolvePerson } : { createNote }) as never);
@@ -157,7 +157,7 @@ test('a standalone public quote resolves as an ordinary author Note, without a f
 	((activity.object as IObject & { object: IObject }).object as IObject & { _misskey_quote: string })._misskey_quote = parentUri;
 	f.channels.findOneBy.mockResolvedValue(mockDeep<MiChannel>({ id: 'channel123', uri: groupUri, host: remote.host, isFederated: true }));
 	f.resolver.resolve.mockImplementation(async value => value === groupUri ? { type: 'Group', id: groupUri, _misskey_channel: true } : value === parentUri ? parent : activity.object as IObject);
-	const resolvePerson = vi.fn().mockResolvedValue(mockDeep<MiRemoteUser>({ host: remote.host, uri: authorUri }));
+	const resolvePerson = vi.fn().mockResolvedValue(mockDeep<MiRemoteUser>({ host: remote.host, uri: authorUri, isSuspended: false, isRemoteSuspended: false }));
 	const resolveNote = vi.fn(async (value: IObject, options: { resolver: Resolver; sentFrom: URL }) => {
 		// Exercise the real resolver handoff: an already fetched URI must not be fetched again.
 		const importer = Object.setPrototypeOf({
