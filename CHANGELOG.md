@@ -1,13 +1,13 @@
 ## 9000.0.0
 
 ### Note
-- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `e1a614df68f226a8c9ee831994e1727a1ded061f` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
-- 開発環境の指定は Node.js 26.4.0 / pnpm 12.9.1、Docker のベースイメージは Node.js 26.10.0-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202)
+- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `af016bb8f56e762d9864bc88710737c88a7b10a5` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
+- 開発環境の指定は Node.js 26.4.0 / pnpm 12.11.2、Docker のベースイメージは Node.js 26.10.0-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210)
 - 上流由来の migration 名・履歴を復元しています。過去の実験版で異なる migration 名を適用したデータベースは、更新前に履歴の個別確認が必要です。 (#35)
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
 - OIDC によるログインは未接続の基盤段階です。Conditional Mediation も既存のログイン画面を置き換えない、既定無効の試験部品です。課金やチャンネル連合の未マージ機能は含みません。 (#99, #109, #121, #131, #135)
 - commit ごとの収録先・除外理由は [差分棚卸し記録](https://github.com/tamaina/misskey-a/blob/develop/docs/release/9000.0.0-audit.json) を参照してください。
-- beta.2 の GitHub prerelease は公開済みですが、SDK の npm 公開は `404 Not Found`、Docker 公開は認証情報不足で失敗しています。beta.2 タグ後の変更も本節には含まれるため、利用するソースの commit を確認してください。
+- [beta.3 の GitHub prerelease](https://github.com/tamaina/misskey-a/releases/tag/9000.0.0-beta.3) は公開済みですが、SDK の npm 公開は `404 Not Found`、Docker 公開は認証情報不足で失敗しています。beta.3 タグ後の変更も本節には含まれるため、利用するソースの commit を確認してください。
 
 ### General
 #### Enhance: Misskey 9000
@@ -23,7 +23,8 @@ APIの省略値・nullable・アップロード・エラー・キャンセル処
 
 #### Enhance: クライアントのi18nライブラリにVVIを採用
 - [VVI](https://github.com/tamaina/vite-vue-internationalization)によりコンポーネント・TypeScriptの翻訳をテンプレートや機能ごとに管理
-- 言語別JavaScriptコピーと移行済みの重複翻訳キーを削除 (#12, #27, #34, #37, #38, #39)  
+- 言語別JavaScriptコピーと移行済みの重複翻訳キーを削除 (#12, #27, #34, #37, #38, #39, #204)
+- 共有ラベルを既存の翻訳カタログと生成済み`Locale`型から直接利用するようにし、個別のキー登録表を削除 (#204)
 - 翻訳の更新 (#41, #42, #44, #155)
 
 #### Feat: MCP連携を搭載, 通常のOAuthで権限を追加できるように
@@ -31,6 +32,7 @@ APIの省略値・nullable・アップロード・エラー・キャンセル処
 - MCPのメンション・返信・アンテナ・main/broadcastなどのイベント購読と、永続化された送信キューを追加 (#66, #72, #74, #76)
 - 通常の OAuth でも明示的な opt-in で権限を選択・追加できるようにし、MCP の同意画面では任意権限を初期 OFF で表示 (#56, #59, #63)
 - MCPのイベント記述・JSON Schema 2020-12・フィルター型を整理し、現在の権限・キャッシュに沿った検出結果を返すように (#79, #102, #130, #159, #173)
+- Fix: 自分で投稿した返信・メンションを、そのアカウント自身のMCPイベント購読へ送らないように（通常の通知・Webhookや他の受信者への配送は維持） (#215)
 
 #### Perf: ActivityPubでのやり取りをEd25519に対応させ、配送を軽量に
 - 連合の署名について、複数公開鍵・受信時の鍵再取得・対応相手へのEd25519署名に対応（従来のRSA鍵との互換性を維持。RFC 9421対応を意味しない） (#16, #18, #19)
@@ -43,7 +45,9 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 #### その他
 - Enhance: サーバー・キュー・CLI の起動終了を明示的に管理し、初期化失敗時の巻き戻し、受付停止・処理待機・リソース解放の順序を整理 ([fb671a5c](https://github.com/tamaina/misskey-a/commit/fb671a5cf930c8c567d57d983fa5e8b4906619ea))  
   機能別の契約・翻訳・DB・起動停止・連合の回帰検証をビルドとCIに統合し、テスト終了時の非同期処理待機を改善 (#13, #20, #85, #138, #170)
-- Enhance: 依存関係の更新（NestJS・Sentry などの連携調整、MFM 0.27.0、Docker ビルド環境の更新を含む） (#153, #202)
+- Enhance: 依存関係の更新（NestJS・Sentry などの連携調整、MFM 0.27.0、メディア・フォント処理、Docker・ビルド・テスト環境の更新を含む） (#153, #202, #210, #212, #213)
+- Fix: 翻訳チャンクの直接re-exportを認識できない問題と、ビルド環境更新後のCSS module変換の互換性を修正 (#207, #210)
+- Fix: Storybookの依存関係をMSW 3 / Storybook 10に揃え、モック通信と翻訳・設定の初期化順序を修正 (#211)
 - Enhance: misskey-jsで `acct:` 付きのアカウント表記をパースできるように (#2)
 - Fix: ESM での `ms` 読み込みをアダプターに統一し、機能分割後のbackendの読み込みを修正 ([b94a454b](https://github.com/tamaina/misskey-a/commit/b94a454b2b126ad97489b305c0759bea36687e89))
 - Enhance: CIの安定ブランチ対象をmainに揃え、API差分コメントの上限・全量artifact保存とリリース見出しの検証に対応 (#84, #97, [8e243e7d](https://github.com/tamaina/misskey-a/commit/8e243e7d16f7e62594f2474ee60dd61c719650f8))
@@ -82,6 +86,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: 統計ログの応答待ちリスナーを接続終了時に解除するように (#91)
 - Fix: ログイントークンの再生成時に二要素認証を確認するように (#95)
 - Fix: WebAuthnの本人確認要求をサーバーの検証条件と揃えるように (#96)
+- Enhance: カスタム絵文字ZIPの生成・読み取りをzip.jsに統一し、重複画像と生成失敗時の一時ファイル処理を改善 (#208)
 - Fix: UserProfileのpassword列コメントを修正するmigrationを追加（パスワード処理自体の変更はなし） (#200)
 
 ## 2026.10.0
