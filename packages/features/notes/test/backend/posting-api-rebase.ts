@@ -48,6 +48,7 @@ function responseSchema(operation: unknown, status: string): Record<string, unkn
 const postingErrors = ['CANNOT_CREATE_NOTE', 'CONTAINS_TOO_MANY_FILES', 'RENOTE_FORBIDDEN', 'QUOTE_FORBIDDEN', 'SPECIFIED_NOTE_CREATION_FORBIDDEN', 'REMOTE_SPECIFIED_NOTE_CREATION_FORBIDDEN'];
 
 type Witness = { name: string; currentSha256: string; baselineSha256: string };
+
 function restore(witness: Witness | undefined, value: unknown, inverse: (restored: unknown) => void): unknown {
 	if (!witness) return value;
 	if (postingApiHash(value) !== witness.currentSha256) throw new Error(`Posting API current differs: ${witness.name}`);
