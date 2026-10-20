@@ -91,7 +91,7 @@ export class UserWebhookService implements OnApplicationShutdown {
 		const webhooks = await this.getActiveWebhooks()
 			.then(webhooks => webhooks.filter(webhook => webhook.userId === userId && webhook.on.includes(type)));
 		// Reuse event selection while keeping MCP lifecycle out of the legacy cache.
-		if (type === 'mention' || type === 'reply') {
+		if ((type === 'mention' || type === 'reply') && 'note' in content && content.note.userId !== userId) {
 			webhooks.push(...await this.webhooksRepository.findBy({ userId, mode: 'mcp', active: true }));
 		}
 		return Promise.all(

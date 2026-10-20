@@ -29,7 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					@update:modelValue="search()"
 				>
 				</MkRadios>
-				<MkButton large primary gradate rounded @click="search">{{ $locale.sfc.search }}</MkButton>
+				<MkButton large primary gradate rounded @click="search">{{ globalLocale.env.search }}</MkButton>
 			</div>
 
 			<MkFoldableSection v-if="channelPaginator">
@@ -71,6 +71,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed, markRaw, onMounted, ref, shallowRef, watch } from 'vue';
 import MkChannelPreview from '@features/channels/frontend/components/MkChannelPreview.vue';
 import MkChannelList from '@features/channels/frontend/components/MkChannelList.vue';
@@ -84,6 +86,8 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import { $i } from '@features/auth/frontend/i.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -154,7 +158,7 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => [{
 	key: 'search',
-	title: $locale.value.sfc.search,
+	title: globalLocale.value.env.search,
 	icon: 'ti ti-search',
 }, {
 	key: 'featured',
@@ -162,7 +166,7 @@ const headerTabs = computed(() => [{
 	icon: 'ti ti-comet',
 }, {
 	key: 'favorites',
-	title: $locale.value.sfc.favorites,
+	title: globalLocale.value.env.favorites,
 	icon: 'ti ti-star',
 }, {
 	key: 'following',
@@ -198,9 +202,7 @@ definePage(() => ({
 {
 	"local": "المحلي",
 	"remote": "بُعدي",
-	"search": "البحث",
 	"featured": "المتداوَلة",
-	"favorites": "المفضلات",
 	"following": "متابَع",
 	"owned": "قنواتي",
 	"channel": "القنوات",
@@ -215,9 +217,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Remot",
-	"search": "Cercar",
 	"featured": "Popular",
-	"favorites": "Favorits",
 	"following": "Seguin",
 	"owned": "Propietat",
 	"channel": "Canals",
@@ -232,9 +232,7 @@ definePage(() => ({
 {
 	"local": "Lokální",
 	"remote": "Vzdálené",
-	"search": "Vyhledávání",
 	"featured": "Trendy",
-	"favorites": "Oblíbené",
 	"following": "Sledovaný",
 	"owned": "Vlastněný",
 	"channel": "Kanály",
@@ -249,9 +247,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"search": "Search",
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -266,9 +262,7 @@ definePage(() => ({
 {
 	"local": "Lokal",
 	"remote": "Fremd",
-	"search": "Suchen",
 	"featured": "Trends",
-	"favorites": "Favoriten",
 	"following": "Gefolgt",
 	"owned": "In Besitz",
 	"channel": "Kanäle",
@@ -283,9 +277,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"search": "Search",
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -300,9 +292,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Remoto",
-	"search": "Buscar",
 	"featured": "Tendencias",
-	"favorites": "Favoritos",
 	"following": "Siguiendo",
 	"owned": "Dueño",
 	"channel": "Canal",
@@ -317,9 +307,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Distant",
-	"search": "Rechercher",
 	"featured": "Tendances",
-	"favorites": "Favoris",
 	"following": "Abonné·e",
 	"owned": "Mes canaux",
 	"channel": "Canaux",
@@ -334,9 +322,7 @@ definePage(() => ({
 {
 	"local": "Lokal",
 	"remote": "Remote",
-	"search": "Cari",
 	"featured": "Tren",
-	"favorites": "Favorit",
 	"following": "Mengikuti",
 	"owned": "Dimiliki",
 	"channel": "Kanal",
@@ -351,9 +337,7 @@ definePage(() => ({
 {
 	"local": "Locale",
 	"remote": "Remota",
-	"search": "Cerca",
 	"featured": "Popolari nel canale",
-	"favorites": "Preferiti",
 	"following": "Following",
 	"owned": "I miei canali",
 	"channel": "Canale",
@@ -368,9 +352,7 @@ definePage(() => ({
 {
 	"local": "ローカル",
 	"remote": "リモート",
-	"search": "検索",
 	"featured": "トレンド",
-	"favorites": "お気に入り",
 	"following": "フォロー中",
 	"owned": "管理中",
 	"channel": "チャンネル",
@@ -385,9 +367,7 @@ definePage(() => ({
 {
 	"local": "ローカル",
 	"remote": "リモート",
-	"search": "探す",
 	"featured": "トレンド",
-	"favorites": "お気に入り",
 	"following": "フォロー中やで",
 	"owned": "管理しとる",
 	"channel": "チャンネル",
@@ -402,9 +382,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"search": "Nadi",
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -419,9 +397,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"search": "ಹುಡುಕು",
 	"featured": "Trending",
-	"favorites": "ಮೆಚ್ಚಿನವುಗಳು",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -436,9 +412,7 @@ definePage(() => ({
 {
 	"local": "로컬",
 	"remote": "리모트",
-	"search": "검색",
 	"featured": "트렌드",
-	"favorites": "즐겨찾기",
 	"following": "팔로잉",
 	"owned": "관리중",
 	"channel": "채널",
@@ -453,9 +427,7 @@ definePage(() => ({
 {
 	"local": "Lokaal",
 	"remote": "Remote",
-	"search": "Zoeken",
 	"featured": "Trending",
-	"favorites": "Toevoegen aan favorieten",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Kanalen",
@@ -470,9 +442,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"search": "Søk",
 	"featured": "Populært",
-	"favorites": "Favoritter",
 	"following": "Følger",
 	"owned": "Owned",
 	"channel": "Kanaler",
@@ -487,9 +457,7 @@ definePage(() => ({
 {
 	"local": "Lokalne",
 	"remote": "Zdalny",
-	"search": "Szukaj",
 	"featured": "Na czasie",
-	"favorites": "Ulubione",
 	"following": "Śledzeni",
 	"owned": "Własny",
 	"channel": "Kanały",
@@ -504,9 +472,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Remoto",
-	"search": "Pesquisar",
 	"featured": "Destaques",
-	"favorites": "Favoritos",
 	"following": "Seguindo",
 	"owned": "Autoral",
 	"channel": "Canais",
@@ -521,9 +487,7 @@ definePage(() => ({
 {
 	"local": "С этого сайта",
 	"remote": "С других сайтов",
-	"search": "Поиск",
 	"featured": "Актуальные",
-	"favorites": "Избранное",
 	"following": "Подписки",
 	"owned": "Собственные",
 	"channel": "Каналы",
@@ -538,9 +502,7 @@ definePage(() => ({
 {
 	"local": "Lokálne",
 	"remote": "Vzdialené",
-	"search": "Hľadať",
 	"featured": "Trendy",
-	"favorites": "Obľúbené",
 	"following": "Sledované",
 	"owned": "Vlastnené",
 	"channel": "Kanály",
@@ -555,9 +517,7 @@ definePage(() => ({
 {
 	"local": "ท้องถิ่น",
 	"remote": "ระยะไกล",
-	"search": "ค้นหา",
 	"featured": "เทรนด์",
-	"favorites": "รายการโปรด",
 	"following": "ติดตามแล้ว",
 	"owned": "เจ้าของ",
 	"channel": "ช่อง",
@@ -572,9 +532,7 @@ definePage(() => ({
 {
 	"local": "Yerel",
 	"remote": "Uzak",
-	"search": "Ara",
 	"featured": "Trend olan",
-	"favorites": "Favoriler",
 	"following": "Takip edildi",
 	"owned": "Sahip olunan",
 	"channel": "Kanallar",
@@ -589,9 +547,7 @@ definePage(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"search": "ئىزدەش",
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
 	"channel": "Channels",
@@ -606,9 +562,7 @@ definePage(() => ({
 {
 	"local": "Локальні",
 	"remote": "Віддалені",
-	"search": "Пошук",
 	"featured": "Тренди",
-	"favorites": "Обране",
 	"following": "Підписки",
 	"owned": "Owned",
 	"channel": "Канали",
@@ -623,9 +577,7 @@ definePage(() => ({
 {
 	"local": "Máy chủ này",
 	"remote": "Máy chủ khác",
-	"search": "Tìm kiếm",
 	"featured": "Xu hướng",
-	"favorites": "Lượt thích",
 	"following": "Đang theo dõi",
 	"owned": "Do tôi quản lý",
 	"channel": "Kênh",
@@ -640,9 +592,7 @@ definePage(() => ({
 {
 	"local": "本地",
 	"remote": "远程",
-	"search": "搜索",
 	"featured": "热门",
-	"favorites": "收藏",
 	"following": "正在关注",
 	"owned": "我的频道",
 	"channel": "频道",
@@ -657,9 +607,7 @@ definePage(() => ({
 {
 	"local": "本地",
 	"remote": "遠端",
-	"search": "搜尋",
 	"featured": "熱門貼文",
-	"favorites": "我的最愛",
 	"following": "追隨中",
 	"owned": "管理中",
 	"channel": "頻道",

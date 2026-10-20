@@ -118,7 +118,6 @@
 			"file-type": ["./node_modules/file-type/source/index.d.ts"],
 			"ms": ["./node_modules/ms/dist/index.d.ts"],
 			"sanitize-html": ["./node_modules/@types/sanitize-html/index.d.ts"],
-			"archiver": ["./node_modules/@types/archiver/index.d.ts"],
 			"mime-types": ["./node_modules/@types/mime-types/index.d.ts"],
 			"jsonld": ["./node_modules/@types/jsonld/index.d.ts"],
 			"systeminformation": ["./node_modules/systeminformation/lib/index.d.ts"]

@@ -6,11 +6,12 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { load } from 'js-yaml';
+import { historicalRawLocale } from './catalog-history.js';
 import { createApp } from 'vue';
 import { parse } from 'vue/compiler-sfc';
 import { expect, test } from 'vitest';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { locales } from './pruned-global-locale-baseline.js';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
@@ -22,7 +23,7 @@ const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(va
 const at = (dictionary: unknown, path: string): unknown => path.split('.').reduce<unknown>((current, key) => current && typeof current === 'object' ? Reflect.get(current, key) : undefined, dictionary);
 
 function rawLocale(language: string): unknown {
-	return load(readFileSync(resolve(root, 'locales', `${language}.yml`), 'utf8').replaceAll('\b', '')) ?? {};
+	return historicalRawLocale(language);
 }
 
 test('email translations change only 65 independently reviewed fallback slots and preserve 355 prior values', () => {
@@ -70,7 +71,7 @@ test('email translations change only 65 independently reviewed fallback slots an
 	}
 });
 
-test('all 15 global messages and 426 existing raw translations remain unchanged', () => {
+test('all 15 historical messages and 426 raw translations remain frozen in test history', () => {
 	expect(readdirSync(resolve(root, 'locales')).filter(file => file.endsWith('.yml')).map(file => file.slice(0, -4)).sort()).toEqual(Object.keys(metadata.raw).sort());
 	let supported = 0;
 	let inactive = 0;

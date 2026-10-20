@@ -18,6 +18,9 @@ import { streamEventCatalog } from '../../backend/stream-catalog.js';
 import { modernRequest } from '../../backend/modern-request.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
+import { UserWebhookService, type UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
+import type { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import type * as Redis from 'ioredis';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
@@ -29,6 +32,7 @@ import type { AntennaNoteAccessService } from '@features/timelines/backend/servi
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';
 import type { UserWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
+vi.mock('@features/runtime/backend/services/QueueService.js', () => ({ QueueService: class {} }));
 vi.mock('@features/runtime/backend/services/HttpRequestService.js', () => ({ HttpRequestService: class {} }));
 vi.mock('@features/roles/backend/services/RoleService.js', () => ({ RoleService: class {} }));
 vi.mock('@features/notes/backend/serializers/NoteEntityService.js', () => ({ NoteEntityService: class {} }));
@@ -61,7 +65,7 @@ beforeEach(() => {
 	const manager = mockDeep<WebhooksRepository['manager']>(); manager.getRepository.mockImplementation(target => target === deps.antennas.target ? deps.antennas as never : repo as never);
 	deps.webhooks.manager.transaction.mockImplementation(async (...args) => (args.at(-1) as unknown as (manager: unknown) => Promise<unknown>)(manager) as never);
 	deps.http.sendMcpWebhook.mockImplementation(async (_url, body) => ({ status: 200, ok: true, text: JSON.stringify({ challenge: JSON.parse(body).challenge }) }));
-	deps.notes.findOneBy.mockResolvedValue({ id: 'note', mentions: ['account'], replyUserId: 'account' } as never);
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: 'other-author', mentions: ['account'], replyUserId: 'account' } as never);
 	deps.noteEntity.isVisibleForMe.mockResolvedValue(true); deps.noteEntity.pack.mockResolvedValue({ isHidden: false } as never);
 	service = new McpEventsService(deps.webhooks, deps.tokens, deps.apps, deps.users, deps.notes, deps.http, deps.roles, deps.noteEntity, deps.antennas, deps.antennaAccess);
 });
@@ -118,6 +122,45 @@ it('suppresses unsubscribe/expiry/recreation, current note visibility, deletion,
 	await service.invoke('events/unsubscribe', { name: input.name, arguments: {}, delivery: { mode: 'webhook', url: input.delivery.url } }, context());
 	expect(rows.get(id)!.secret).toBe('');
 	await subscribe(); expect(rows.get(id)!.mcpGeneration).not.toBe(currentGeneration);
+});
+it.each(['mention', 'reply'] as const)('filters self %s only from MCP fanout, preserving other recipients and subscriptions', async type => {
+	const redis = mockDeep<Redis.Redis>();
+	const queue = mockDeep<QueueService>();
+	const legacy = Object.assign(new MiWebhook(), { id: 'legacy', userId: 'account', mode: 'legacy', on: [type] });
+	const otherLegacy = Object.assign(new MiWebhook(), { id: 'other-legacy', userId: 'other', mode: 'legacy', on: [type] });
+	const subscriptions = ['account', 'other'].flatMap(userId => [1, 2].map(index =>
+		Object.assign(new MiWebhook(), { id: `${userId}-${index}`, userId, mode: 'mcp', on: [type] })));
+	deps.webhooks.findBy.mockImplementation(async where => {
+		if (Array.isArray(where)) return [];
+		return where.mode === 'legacy' ? [legacy, otherLegacy] : subscriptions.filter(row => row.userId === where.userId);
+	});
+	const producer = new UserWebhookService(redis, deps.webhooks, queue);
+	const content = { note: { id: 'note', userId: 'account', mentions: ['account', 'other'] } } as UserWebhookPayload<'mention'>;
+	await producer.enqueueUserWebhook('account', type, content);
+	await producer.enqueueUserWebhook('other', type, content);
+	expect(queue.userWebhookDeliver.mock.calls.map(([webhook]) => webhook.id)).toEqual(['legacy', 'other-legacy', 'other-1', 'other-2']);
+	expect(queue.userWebhookDeliver.mock.calls.every(([, event, payload]) => event === type && payload === content)).toBe(true);
+	producer.dispose();
+});
+it.each(['mention', 'reply'] as const)('suppresses already queued self %s on every attempt while delivering other authors', async type => {
+	const { id } = await subscribe({ ...input, name: type === 'mention' ? 'note.mentioned' : 'note.replied' });
+	const logger = mockDeep<QueueLoggerService>(); logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, deps.webhooks, deps.http, service, logger);
+	const job = { data: { mode: 'mcp', type, webhookId: id, userId: 'account', generation: rows.get(id)!.mcpGeneration!, noteId: 'note', createdAt: 1000, eventId: 'stable' } } as Bull.Job<UserWebhookDeliverJobData>;
+	deps.http.sendMcpWebhook.mockClear();
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: 'account', mentions: ['account', 'other'], replyUserId: 'account' } as never);
+	expect(await worker.process(job)).toBe('Suppressed');
+	expect(await worker.process(job)).toBe('Suppressed');
+	expect(deps.http.sendMcpWebhook).not.toHaveBeenCalled();
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: 'other-author', mentions: ['account'], replyUserId: 'account' } as never);
+	deps.http.sendMcpWebhook.mockResolvedValue({ ok: false, status: 500, text: '' });
+	await expect(worker.process(job)).rejects.toThrow('500');
+	deps.http.sendMcpWebhook.mockResolvedValue({ ok: true, status: 200, text: '' });
+	expect(await worker.process(job)).toBe('Success');
+	expect(deps.http.sendMcpWebhook.mock.calls.map(([, body, headers]) => [JSON.parse(body).name, headers['webhook-id']])).toEqual([
+		[type === 'mention' ? 'note.mentioned' : 'note.replied', 'stable'],
+		[type === 'mention' ? 'note.mentioned' : 'note.replied', 'stable'],
+	]);
 });
 it('rotates keys without changing live generation or extending expired subscriptions', async () => {
 	const { id } = await subscribe(); const generation = rows.get(id)!.mcpGeneration;

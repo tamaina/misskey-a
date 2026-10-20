@@ -1,0 +1,212 @@
+{
+	"id-ID.yml": {
+		"before": 1883,
+		"after": 541,
+		"sha256": "5c68210fa912cd1111a0aa7dde4baeac9ce1426756481e8d5754a35c6cf7fb9f"
+	},
+	"ko-GS.yml": {
+		"before": 706,
+		"after": 143,
+		"sha256": "3bd07e23796c9dc19446897d65cb3488b7d3a0889ca5d98f72f333b50723b0b1"
+	},
+	"tl-PH.yml": {
+		"before": 0,
+		"after": 0,
+		"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+	},
+	"fa-IR.yml": {
+		"before": 271,
+		"after": 50,
+		"sha256": "281b4258434bec56492b356b3172ad61085ce4e9d9e3084493efc8ba6e82d56f"
+	},
+	"tr-TR.yml": {
+		"before": 1954,
+		"after": 569,
+		"sha256": "84797025c1d2ace4b2e698b667e582b2ed20a0482129f3744d6df37ac7b80490"
+	},
+	"zh-CN.yml": {
+		"before": 1960,
+		"after": 569,
+		"sha256": "098711fe81229a4a5960bee26eba3f3f45a5aefac2bd8e8bb90d7c455e10d05c"
+	},
+	"nl-NL.yml": {
+		"before": 942,
+		"after": 145,
+		"sha256": "836aa785e5650a3f975c65ef5d9693a097a67288999874256d0a062a25e5cb8b"
+	},
+	"pl-PL.yml": {
+		"before": 1407,
+		"after": 306,
+		"sha256": "16dc22ef3da40bec4c6e11815ba815a6fb3969cd07ddf832b488d588617bcecb"
+	},
+	"ru-RU.yml": {
+		"before": 1853,
+		"after": 514,
+		"sha256": "6853d7f415c91a600a905458269872e0d805d25672855661bf6ba23357ad8040"
+	},
+	"ro-RO.yml": {
+		"before": 1234,
+		"after": 170,
+		"sha256": "dcf21b9410315778996e821b4174eb23adeeab47a202832e081db4b9c8805aac"
+	},
+	"cs-CZ.yml": {
+		"before": 1688,
+		"after": 481,
+		"sha256": "04a9783f68f65153244dad9830df0ccbccdcdf7329aecef58b1096cd9565d9b8"
+	},
+	"es-ES.yml": {
+		"before": 1960,
+		"after": 569,
+		"sha256": "11d968563bf400802655c3d483b663e1b1b2d561b8157f47e0fa2d02ae57fb7e"
+	},
+	"no-NO.yml": {
+		"before": 616,
+		"after": 147,
+		"sha256": "acbdc98809f7c7611108ec385a30f60159f9351c34bcb40457941673df6590a4"
+	},
+	"de-DE.yml": {
+		"before": 1953,
+		"after": 569,
+		"sha256": "7f8f36a19558bb8cc07e8466edbad211e3f3e5ca28380b4ca4203fe22aab34e9"
+	},
+	"pt-PT.yml": {
+		"before": 1939,
+		"after": 567,
+		"sha256": "764919e0138e9c9ed313e493825b6c427fe57e692b1c86c28a1bde56f6134f00"
+	},
+	"da-DK.yml": {
+		"before": 2,
+		"after": 1,
+		"sha256": "612ec71e2fdb3d504dc9646bee052114e22e7abdef95e5fc46cce8b68b0dfe67"
+	},
+	"ar-SA.yml": {
+		"before": 1383,
+		"after": 312,
+		"sha256": "42fa321f77ebfa5f65da6c1fc91b7eca10bd16806742f316389b94037068a9bc"
+	},
+	"ca-ES.yml": {
+		"before": 1960,
+		"after": 569,
+		"sha256": "93cdcd7c08af744b8bd6c29a7aac0abf89b7b4d4dd849d4bf6a3fa311f0a929a"
+	},
+	"ht-HT.yml": {
+		"before": 14,
+		"after": 7,
+		"sha256": "0cd51bab68727bf476dd09e2922d9b4748e8b24c5f4d6a5632be84ace3473784"
+	},
+	"vi-VN.yml": {
+		"before": 1706,
+		"after": 446,
+		"sha256": "a72ddbde245879cd50e1510c33b6f9bf2e18de326bd99e5dc9e6892926d48550"
+	},
+	"ja-KS.yml": {
+		"before": 1914,
+		"after": 554,
+		"sha256": "6809f4b4481931e2c81c32daec69b4dc06ed5f9c71c45b70f947e48b53843df5"
+	},
+	"ko-KR.yml": {
+		"before": 1960,
+		"after": 569,
+		"sha256": "2288c8ef8c598610df9fe1c4db18d9ff0fbf831d0e965daa6430b5bb19c633eb"
+	},
+	"hr-HR.yml": {
+		"before": 4,
+		"after": 3,
+		"sha256": "19e5f5c3bac9d9bda55f5359244fd4128567d8101ee602a6dcb8ffd400c0e5b3"
+	},
+	"it-IT.yml": {
+		"before": 1960,
+		"after": 569,
+		"sha256": "5b0cd61db6014b71dffaa96015f677fdefd723b50e71a5ae741c7d4f95d5272e"
+	},
+	"kn-IN.yml": {
+		"before": 76,
+		"after": 20,
+		"sha256": "141116177ac6eef1c22bd9d71a9fbbfc8bc6b78557a66bfe2a7d7a0fb08c3863"
+	},
+	"si-LK.yml": {
+		"before": 29,
+		"after": 11,
+		"sha256": "f0654994253857601569d54461450a0577576efcc36f4dacbe49083de36b5b9f"
+	},
+	"uk-UA.yml": {
+		"before": 1787,
+		"after": 466,
+		"sha256": "45a13c9bea42188c581c2b5ac8f04b759f49e2fc9fd09241642e6d906bda0bbf"
+	},
+	"bn-BD.yml": {
+		"before": 1210,
+		"after": 286,
+		"sha256": "0a0d6020611dd2a0d51b625addc120b8d1edfceb655dd7934c2b833958d53928"
+	},
+	"fr-FR.yml": {
+		"before": 1770,
+		"after": 482,
+		"sha256": "ed0c05cb54defc16434103acba757b6f5545197b2edf989f253b4413506cd648"
+	},
+	"kab-KAB.yml": {
+		"before": 84,
+		"after": 28,
+		"sha256": "0c768dba4f8c9aaeb6c88eafcea1f0e979885776574025e334b4741ea240d641"
+	},
+	"th-TH.yml": {
+		"before": 1954,
+		"after": 569,
+		"sha256": "eb06842abc01b282e34d2cd14bbeeaf74d5eb4f2d11669be8d1de7d7362f2edf"
+	},
+	"en-US.yml": {
+		"before": 1960,
+		"after": 569,
+		"sha256": "2f706183bf6be9aaff23cd8e7f797dbad467f08fbc7c87dcc4b89eb87502eb61"
+	},
+	"jbo-EN.yml": {
+		"before": 2,
+		"after": 1,
+		"sha256": "39728b8077dbeec876dee6345f9f1775224d64461322add3abe3bdce03f28622"
+	},
+	"sk-SK.yml": {
+		"before": 1286,
+		"after": 297,
+		"sha256": "78ba25f0f15805bd753bcba786e036522cb9f6f25ffae4100f3f2be68268959f"
+	},
+	"ja-JP.yml": {
+		"before": 1961,
+		"after": 570,
+		"sha256": "4f398b9c9d904f70b4b1f9112aa93064601c6769dd6e59c75c58911080229374"
+	},
+	"zh-TW.yml": {
+		"before": 1960,
+		"after": 569,
+		"sha256": "4ce5f5f57e6c18a7ea450063d593232d09cf9ce635781b462c39d11fbb6b4aac"
+	},
+	"el-GR.yml": {
+		"before": 357,
+		"after": 72,
+		"sha256": "d76e3750e9cbf43c3777308e44669e5309b8e1cfe2b3f9f9f143377d3670f97e"
+	},
+	"lo-LA.yml": {
+		"before": 418,
+		"after": 73,
+		"sha256": "63274d86faae0cf484a5acd7245f0e2fa50b97ce96eaf292234a5f03b8852359"
+	},
+	"sv-SE.yml": {
+		"before": 620,
+		"after": 107,
+		"sha256": "71127aa087b0b8c79841e6e2e2f5ce386ef74759b3cc5483a59ed05358221f14"
+	},
+	"hu-HU.yml": {
+		"before": 84,
+		"after": 23,
+		"sha256": "0001ecac1e7d7027f88ff50f15dafec45149533b0205b0b8fea246035dd81465"
+	},
+	"uz-UZ.yml": {
+		"before": 975,
+		"after": 190,
+		"sha256": "6e5dff0dc08c0e83f762343e9f65866533c5157137579b0ac7165c9d61e4f864"
+	},
+	"ug-CN.yml": {
+		"before": 15,
+		"after": 7,
+		"sha256": "d4207f10f39e549d672a7f2c06af444a852b82b8c84457f5f8e6277ff17d6781"
+	}
+}

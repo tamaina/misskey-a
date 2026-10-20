@@ -88,8 +88,8 @@
 	},
 	{
 		"file": "packages/features/channels/frontend/pages/channels.vue",
-		"currentSha256": "a1db97ea0e8f73094136ea1e9428c86c6a4ff87115f9d27abeb7115f57e8907a",
-		"baselineSha256": "52c58c290e4b67682b4c3e06ec86b41ec5fc93e9a0aca9a82213cb040791c52a",
+		"currentSha256": "80c6d1fdf738cd0f2e10a6ddc01fe1f17ce413985b15f9e98e2397a4143c3e49",
+		"baselineSha256": "631263469940d924c6eea86aef7773ecf7080c23c51eb42f9558e4cf44cda52b",
 		"edits": [
 			{
 				"start": 261,
@@ -98,218 +98,218 @@
 				"baseline": ""
 			},
 			{
-				"start": 1367,
-				"end": 1447,
+				"start": 1372,
+				"end": 1452,
 				"current": "\t\t\t<MkPagination :key=\"origin\" v-slot=\"{items}\" :paginator=\"featuredPaginator\">\n",
 				"baseline": "\t\t\t<MkPagination v-slot=\"{items}\" :paginator=\"featuredPaginator\">\n"
 			},
 			{
-				"start": 2635,
-				"end": 2711,
+				"start": 2743,
+				"end": 2819,
 				"current": "import { computed, markRaw, onMounted, ref, shallowRef, watch } from 'vue';\n",
 				"baseline": "import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';\n"
 			},
 			{
-				"start": 2967,
-				"end": 3031,
+				"start": 3075,
+				"end": 3139,
 				"current": "import MkTab from '@features/ui/frontend/components/MkTab.vue';\n",
 				"baseline": ""
 			},
 			{
-				"start": 3792,
-				"end": 3841,
+				"start": 3958,
+				"end": 4007,
 				"current": "const origin = ref<'local' | 'remote'>('local');\n",
 				"baseline": ""
 			},
 			{
-				"start": 4087,
-				"end": 4173,
+				"start": 4253,
+				"end": 4339,
 				"current": "const featuredPaginator = computed(() => markRaw(new Paginator('channels/featured', {\n",
 				"baseline": "const featuredPaginator = markRaw(new Paginator('channels/featured', {\n"
 			},
 			{
-				"start": 4202,
-				"end": 4309,
+				"start": 4368,
+				"end": 4475,
 				"current": "\tparams: { origin: origin.value },\n})));\n\nwatch(origin, () => {\n\tif (channelPaginator.value) search();\n});\n",
 				"baseline": "}));\n"
 			},
 			{
-				"start": 5018,
-				"end": 5043,
+				"start": 5184,
+				"end": 5209,
 				"current": "\t\t\torigin: origin.value,\n",
 				"baseline": ""
 			},
 			{
-				"start": 5055,
-				"end": 5113,
+				"start": 5221,
+				"end": 5279,
 				"current": "\tkey.value = JSON.stringify([origin.value, query, type]);\n",
 				"baseline": "\tkey.value = query + type;\n"
 			},
 			{
-				"start": 5945,
-				"end": 5985,
+				"start": 6121,
+				"end": 6161,
 				"current": "\t\"local\": \"المحلي\",\n\t\"remote\": \"بُعدي\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 6308,
-				"end": 6347,
+				"start": 6438,
+				"end": 6477,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remot\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 6673,
-				"end": 6717,
+				"start": 6756,
+				"end": 6800,
 				"current": "\t\"local\": \"Lokální\",\n\t\"remote\": \"Vzdálené\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 7050,
-				"end": 7090,
+				"start": 7081,
+				"end": 7121,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 7418,
-				"end": 7457,
+				"start": 7401,
+				"end": 7440,
 				"current": "\t\"local\": \"Lokal\",\n\t\"remote\": \"Fremd\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 7787,
-				"end": 7827,
+				"start": 7722,
+				"end": 7762,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 8155,
-				"end": 8195,
+				"start": 8042,
+				"end": 8082,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remoto\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 8534,
-				"end": 8575,
+				"start": 8373,
+				"end": 8414,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Distant\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 8917,
-				"end": 8957,
+				"start": 8706,
+				"end": 8746,
 				"current": "\t\"local\": \"Lokal\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 9279,
-				"end": 9320,
+				"start": 9024,
+				"end": 9065,
 				"current": "\t\"local\": \"Locale\",\n\t\"remote\": \"Remota\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 9669,
-				"end": 9706,
+				"start": 9367,
+				"end": 9404,
 				"current": "\t\"local\": \"ローカル\",\n\t\"remote\": \"リモート\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 9978,
-				"end": 10015,
+				"start": 9636,
+				"end": 9673,
 				"current": "\t\"local\": \"ローカル\",\n\t\"remote\": \"リモート\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 10297,
-				"end": 10337,
+				"start": 9915,
+				"end": 9955,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 10663,
-				"end": 10703,
+				"start": 10235,
+				"end": 10275,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 11034,
-				"end": 11068,
+				"start": 10555,
+				"end": 10589,
 				"current": "\t\"local\": \"로컬\",\n\t\"remote\": \"리모트\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 11336,
-				"end": 11377,
+				"start": 10818,
+				"end": 10859,
 				"current": "\t\"local\": \"Lokaal\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 11724,
-				"end": 11764,
+				"start": 11143,
+				"end": 11183,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 12086,
-				"end": 12128,
+				"start": 11459,
+				"end": 11501,
 				"current": "\t\"local\": \"Lokalne\",\n\t\"remote\": \"Zdalny\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 12461,
-				"end": 12501,
+				"start": 11787,
+				"end": 11827,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remoto\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 12828,
-				"end": 12885,
+				"start": 12103,
+				"end": 12160,
 				"current": "\t\"local\": \"С этого сайта\",\n\t\"remote\": \"С других сайтов\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 13225,
-				"end": 13270,
+				"start": 12453,
+				"end": 12498,
 				"current": "\t\"local\": \"Lokálne\",\n\t\"remote\": \"Vzdialené\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 13604,
-				"end": 13648,
+				"start": 12785,
+				"end": 12829,
 				"current": "\t\"local\": \"ท้องถิ่น\",\n\t\"remote\": \"ระยะไกล\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 13967,
-				"end": 14005,
+				"start": 13100,
+				"end": 13138,
 				"current": "\t\"local\": \"Yerel\",\n\t\"remote\": \"Uzak\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 14345,
-				"end": 14385,
+				"start": 13433,
+				"end": 13473,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 14713,
-				"end": 14759,
+				"start": 13753,
+				"end": 13799,
 				"current": "\t\"local\": \"Локальні\",\n\t\"remote\": \"Віддалені\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 15086,
-				"end": 15138,
+				"start": 14082,
+				"end": 14134,
 				"current": "\t\"local\": \"Máy chủ này\",\n\t\"remote\": \"Máy chủ khác\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 15479,
-				"end": 15512,
+				"start": 14424,
+				"end": 14457,
 				"current": "\t\"local\": \"本地\",\n\t\"remote\": \"远程\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 15773,
-				"end": 15806,
+				"start": 14681,
+				"end": 14714,
 				"current": "\t\"local\": \"本地\",\n\t\"remote\": \"遠端\",\n",
 				"baseline": ""
 			}

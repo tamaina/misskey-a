@@ -6,7 +6,7 @@
 import * as process from 'process';
 import * as fs from 'fs';
 import { parseChangeLog } from './parser.js';
-import { checkNewRelease, checkNewTopic } from './checker.js';
+import { checkNewRelease, checkNewTopic, checkReleasePromotion } from './checker.js';
 
 function abort(message?: string) {
 	if (message) {
@@ -25,9 +25,19 @@ function main() {
 	const base = parseChangeLog('./CHANGELOG-base.md');
 	const head = parseChangeLog('./CHANGELOG-head.md');
 
-	const result = (base.length < head.length)
-		? checkNewRelease(base, head)
-		: checkNewTopic(base, head);
+	// このフラグは同一リポジトリの develop -> stable PR にだけ workflow が設定する。
+	const promotion = process.env.RELEASE_PR === 'true'
+		&& base[0]?.releaseName === 'Unreleased'
+		&& head[0]?.releaseName !== 'Unreleased';
+	const packageVersion: string = promotion
+		? JSON.parse(fs.readFileSync(new URL('../../../package.json', import.meta.url), 'utf8')).version
+		: '';
+
+	const result = promotion
+		? checkReleasePromotion(base, head, packageVersion)
+		: (base.length < head.length)
+			? checkNewRelease(base, head)
+			: checkNewTopic(base, head);
 
 	if (!result.success) {
 		abort(result.message);

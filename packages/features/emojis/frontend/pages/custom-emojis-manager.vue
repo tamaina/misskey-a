@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div v-if="tab === 'local'" class="local">
 				<MkInput v-model="query" :debounce="true" type="search" autocapitalize="off">
 					<template #prefix><i class="ti ti-search"></i></template>
-					<template #label>{{ $locale.sfc.search }}</template>
+					<template #label>{{ globalLocale.env.search }}</template>
 				</MkInput>
 				<MkSwitch v-model="selectMode" style="margin: 8px 0;">
 					<template #label>Select mode</template>
@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<FormSplit>
 					<MkInput v-model="queryRemote" :debounce="true" type="search" autocapitalize="off">
 						<template #prefix><i class="ti ti-search"></i></template>
-						<template #label>{{ $locale.sfc.search }}</template>
+						<template #label>{{ globalLocale.env.search }}</template>
 					</MkInput>
 					<MkInput v-model="host" :debounce="true">
 						<template #label>{{ $locale.sfc.host }}</template>
@@ -71,6 +71,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import * as Misskey from 'misskey-js';
 import { computed, markRaw, ref } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -86,6 +88,8 @@ import { getProxiedImageUrl } from '@features/drive/frontend/utility/media-proxy
 import { iAmAdmin } from '@features/auth/frontend/i.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const tab = ref('local');
 const query = ref<string | null>(null);
@@ -344,7 +348,7 @@ const headerTabs = computed(() => [{
 }]);
 
 definePage(() => ({
-	title: $locale.value.sfc.customEmojis,
+	title: globalLocale.value.env.customEmojis,
 	icon: 'ti ti-icons',
 }));
 </script>
@@ -465,8 +469,6 @@ definePage(() => ({
 	"more": "المزيد!",
 	"local": "المحلي",
 	"remote": "بُعدي",
-	"customEmojis": "إيموجي مخصص",
-	"search": "البحث",
 	"noCustomEmojis": "ليس هناك إيموجي",
 	"host": "المضيف"
 }
@@ -484,8 +486,6 @@ definePage(() => ({
 	"more": "Més",
 	"local": "Local",
 	"remote": "Remot",
-	"customEmojis": "Emojis personalitzats",
-	"search": "Cercar",
 	"noCustomEmojis": "No hi ha emojis personalitzats",
 	"host": "Amfitrió"
 }
@@ -503,8 +503,6 @@ definePage(() => ({
 	"more": "Více!",
 	"local": "Lokální",
 	"remote": "Vzdálené",
-	"customEmojis": "Vlastní emoji",
-	"search": "Vyhledávání",
 	"noCustomEmojis": "Bez Emoji",
 	"host": "Hostitel"
 }
@@ -522,8 +520,6 @@ definePage(() => ({
 	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "Search",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -541,8 +537,6 @@ definePage(() => ({
 	"more": "Mehr!",
 	"local": "Lokal",
 	"remote": "Fremd",
-	"customEmojis": "Benutzerdefinierte Emojis",
-	"search": "Suchen",
 	"noCustomEmojis": "Keine benutzerdefinierten Emojis gefunden",
 	"host": "Hostname"
 }
@@ -560,8 +554,6 @@ definePage(() => ({
 	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "Search",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -579,8 +571,6 @@ definePage(() => ({
 	"more": "¡Más!",
 	"local": "Local",
 	"remote": "Remoto",
-	"customEmojis": "Emojis personalizados",
-	"search": "Buscar",
 	"noCustomEmojis": "No hay emojis personalizados",
 	"host": "Instancia"
 }
@@ -598,8 +588,6 @@ definePage(() => ({
 	"more": "Plus !",
 	"local": "Local",
 	"remote": "Distant",
-	"customEmojis": "Émojis personnalisés",
-	"search": "Rechercher",
 	"noCustomEmojis": "Il n'y a pas d’émoji",
 	"host": "Serveur distant"
 }
@@ -617,8 +605,6 @@ definePage(() => ({
 	"more": "Lainnya",
 	"local": "Lokal",
 	"remote": "Remote",
-	"customEmojis": "Emoji kustom",
-	"search": "Cari",
 	"noCustomEmojis": "Tidak ada emoji kustom",
 	"host": "Host"
 }
@@ -636,8 +622,6 @@ definePage(() => ({
 	"more": "Di più!",
 	"local": "Locale",
 	"remote": "Remota",
-	"customEmojis": "Emoji personalizzate",
-	"search": "Cerca",
 	"noCustomEmojis": "Nessun emoji",
 	"host": "Host"
 }
@@ -655,8 +639,6 @@ definePage(() => ({
 	"more": "もっと！",
 	"local": "ローカル",
 	"remote": "リモート",
-	"customEmojis": "カスタム絵文字",
-	"search": "検索",
 	"noCustomEmojis": "絵文字はありません",
 	"host": "ホスト"
 }
@@ -674,8 +656,6 @@ definePage(() => ({
 	"more": "他のん",
 	"local": "ローカル",
 	"remote": "リモート",
-	"customEmojis": "カスタム絵文字",
-	"search": "探す",
 	"noCustomEmojis": "絵文字はあらへん",
 	"host": "ホスト"
 }
@@ -693,8 +673,6 @@ definePage(() => ({
 	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "Nadi",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -712,8 +690,6 @@ definePage(() => ({
 	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "ಹುಡುಕು",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -731,8 +707,6 @@ definePage(() => ({
 	"more": "더 보기!",
 	"local": "로컬",
 	"remote": "리모트",
-	"customEmojis": "커스텀 이모지",
-	"search": "검색",
 	"noCustomEmojis": "이모지가 없습니다",
 	"host": "호스트"
 }
@@ -750,8 +724,6 @@ definePage(() => ({
 	"more": "Meer!",
 	"local": "Lokaal",
 	"remote": "Remote",
-	"customEmojis": "Eigen emoji",
-	"search": "Zoeken",
 	"noCustomEmojis": "Er zijn geen emojis",
 	"host": "Server"
 }
@@ -769,8 +741,6 @@ definePage(() => ({
 	"more": "Mer!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "Søk",
 	"noCustomEmojis": "Det er ingen emoji",
 	"host": "Vert"
 }
@@ -788,8 +758,6 @@ definePage(() => ({
 	"more": "Więcej!",
 	"local": "Lokalne",
 	"remote": "Zdalny",
-	"customEmojis": "Niestandardowe emoji",
-	"search": "Szukaj",
 	"noCustomEmojis": "Brak emoji",
 	"host": "Host"
 }
@@ -807,8 +775,6 @@ definePage(() => ({
 	"more": "Mais!",
 	"local": "Local",
 	"remote": "Remoto",
-	"customEmojis": "Emoji personalizado",
-	"search": "Pesquisar",
 	"noCustomEmojis": "Não há emojis",
 	"host": "Host"
 }
@@ -826,8 +792,6 @@ definePage(() => ({
 	"more": "Ещё!",
 	"local": "С этого сайта",
 	"remote": "С других сайтов",
-	"customEmojis": "Собственные эмодзи",
-	"search": "Поиск",
 	"noCustomEmojis": "Собственные эмодзи отсутствуют",
 	"host": "Хост"
 }
@@ -845,8 +809,6 @@ definePage(() => ({
 	"more": "Viac!",
 	"local": "Lokálne",
 	"remote": "Vzdialené",
-	"customEmojis": "Vlastné emoji",
-	"search": "Hľadať",
 	"noCustomEmojis": "Žiadne emoji",
 	"host": "Host"
 }
@@ -864,8 +826,6 @@ definePage(() => ({
 	"more": "เพิ่มเติม!",
 	"local": "ท้องถิ่น",
 	"remote": "ระยะไกล",
-	"customEmojis": "เอโมจิที่กำหนดเอง",
-	"search": "ค้นหา",
 	"noCustomEmojis": "ไม่มีเอโมจิ",
 	"host": "โฮสต์"
 }
@@ -883,8 +843,6 @@ definePage(() => ({
 	"more": "Daha fazlası!",
 	"local": "Yerel",
 	"remote": "Uzak",
-	"customEmojis": "Özel Emoji",
-	"search": "Ara",
 	"noCustomEmojis": "Emoji yok",
 	"host": "Host"
 }
@@ -902,8 +860,6 @@ definePage(() => ({
 	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "ئىزدەش",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -921,8 +877,6 @@ definePage(() => ({
 	"more": "Бiльше!",
 	"local": "Локальні",
 	"remote": "Віддалені",
-	"customEmojis": "Кастомні емоджі",
-	"search": "Пошук",
 	"noCustomEmojis": "Немає нетипових емоджі",
 	"host": "Хост"
 }
@@ -940,8 +894,6 @@ definePage(() => ({
 	"more": "Thêm nữa!",
 	"local": "Máy chủ này",
 	"remote": "Máy chủ khác",
-	"customEmojis": "Tùy chỉnh emoji",
-	"search": "Tìm kiếm",
 	"noCustomEmojis": "Không có emoji",
 	"host": "Host"
 }
@@ -959,8 +911,6 @@ definePage(() => ({
 	"more": "更多！",
 	"local": "本地",
 	"remote": "远程",
-	"customEmojis": "自定义表情符号",
-	"search": "搜索",
 	"noCustomEmojis": "没有自定义表情符号",
 	"host": "主机名"
 }
@@ -978,8 +928,6 @@ definePage(() => ({
 	"more": "更多！",
 	"local": "本地",
 	"remote": "遠端",
-	"customEmojis": "自訂表情符號",
-	"search": "搜尋",
 	"noCustomEmojis": "沒有自訂的表情符號",
 	"host": "主機"
 }

@@ -9,6 +9,9 @@ Existing SDK1 tools remain available.
 Events `note.mentioned` and `note.replied` accept exactly `{}` as arguments.
 The native grant needs both `access:mcp` and `read:notifications`. Payload data
 is `{ noteId, url }`; consumers can read the note through existing native tools.
+Self-authored replies and mentions are excluded for that recipient only; other
+mentioned accounts still receive their events. Pending deliveries also recheck the
+note author, including retries. Already sent requests cannot be recalled.
 Delivery is webhook-only without replay; cursors are `null`.
 
 Subscriptions bind to the account, grant, canonical callback URL, event name
