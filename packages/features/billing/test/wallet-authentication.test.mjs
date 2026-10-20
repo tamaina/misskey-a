@@ -17,7 +17,7 @@ function fixture() {
 		passwordMatches: async (value, hash) => value === 'synthetic password' && hash === profile.password,
 		auth: { twoFactorAuthenticate: async (p, token) => { assert.equal(p, profile); if (token !== 'synthetic OTP') throw new Error('Invalid fixture OTP'); calls.push('OTP'); } },
 		passkeys: { initiateAuthentication: async userId => { calls.push(['options', userId]); return { challenge: 'synthetic challenge', rpId: 'misskey.example.test', userVerification: 'required' }; },
-			verifyAuthentication: async (userId, response) => { calls.push(['passkey', userId]); if (userId !== 'alice' || response.id !== 'synthetic key' || used.has(response.id)) return false; used.add(response.id); return true; } },
+														verifyAuthentication: async (userId, response) => { calls.push(['passkey', userId]); if (userId !== 'alice' || response.id !== 'synthetic key' || used.has(response.id)) return false; used.add(response.id); return true; } },
 	};
 	return { auth: createWalletAuthentication(deps), profile, calls };
 }
@@ -48,10 +48,10 @@ test('passwordless accounts require a fresh one-use native passkey on every begi
 test('two browser clients sharing native user.token cannot borrow each other reauthentication', async () => {
 	const f = fixture(); const challenges = [];
 	const actor = { id: 'alice', isSuspended: false, movedToUri: null };
-	const router = createWalletRouter({ ...f.auth, origin: 'https://misskey.example.test', now: () => 1000,
-		id: () => 'synthetic wallet', nonce: () => `nonce000${challenges.length}`, chains: async () => [],
-		rpcUrl: async () => 'https://rpc.example.test', verify: async () => false,
-		store: { find: async () => null, insertChallenge: async value => { challenges.push(value); } },
+	const router = createWalletRouter({ ...f.auth, requireResidence: async () => ({ country: 'JP', subdivision: null, revision: 1, declaredAt: 1, kind: 'self_declared' }), origin: 'https://misskey.example.test', now: () => 1000,
+																																					id: () => 'synthetic wallet', nonce: () => `nonce000${challenges.length}`, chains: async () => [],
+																																					rpcUrl: async () => 'https://rpc.example.test', verify: async () => false,
+																																					store: { find: async () => null, insertChallenge: async value => { challenges.push(value); } },
 	});
 	const context = browser => ({ credential: 'same-stored-user-token', ip: '127.0.0.1', headers: { 'user-agent': browser }, services: {
 		authenticate: async () => [actor, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null,

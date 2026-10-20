@@ -46,9 +46,13 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	const walletPaths = ['account/wallets/link/passkey-options', 'account/wallets/list', 'account/wallets/link/chains',
 		'account/wallets/link/begin', 'account/wallets/link/verify', 'account/wallets/unlink',
 		'admin/wallets/chains/list', 'admin/wallets/chains/upsert'];
-	for (const path of walletPaths) {
+	const servicePaths = ['account/peer-receipt/get', 'account/peer-receipt/set', 'account/residence/get', 'account/residence/set', 'billing/orders/history', 'admin/billing/orders/list', 'admin/billing/orders/check', 'admin/billing/sales/summary', 'billing/orders/receipt', 'billing/purchase-requirements', 'admin/billing/policy/get', 'admin/billing/policy/upsert', 'admin/billing/prices/list', 'admin/billing/chains/delete', 'admin/billing/assets/list', 'admin/billing/assets/upsert', 'admin/billing/assets/delete', 'admin/billing/deployments/list', 'admin/billing/deployments/upsert', 'admin/billing/deployments/delete', 'admin/billing/deployments/resolve', 'admin/billing/chains/test-rpc', 'admin/billing/prices/attach-deployment', 'admin/billing/prices/delete', 'billing/catalog/list', 'admin/billing/offers/list', 'admin/billing/offers/upsert', 'billing/offers/list', 'billing/orders/create', 'billing/orders/check', 'billing/orders/list', 'billing/orders/quote', 'billing/orders/cancel',
+		'billing/refunds/request', 'billing/refunds/list', 'billing/refunds/show', 'billing/refunds/cancel', 'billing/refunds/document',
+		'admin/billing/refunds/list', 'admin/billing/refunds/show', 'admin/billing/refunds/decide', 'admin/billing/refunds/start', 'admin/billing/refunds/submit', 'admin/billing/refunds/check'];
+	for (const path of [...walletPaths, ...servicePaths]) {
 		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('/', '___')}`);
 	}
+	for (const removed of ['billing/transfers/detect', 'billing/transfers/list']) expect(spec.paths?.[`/${removed}`]).toBeUndefined();
 	const identifiers = Object.values(spec.paths ?? {}).flatMap(item => (['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'] as const).flatMap(method => {
 		const operation = item?.[method];
 		return operation ? [operation.operationId] : [];
@@ -56,7 +60,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/i/sessions']?.post?.operationId).toBe('post___i___sessions');
 	expect(spec.paths?.['/i/sessions/revoke']?.post?.operationId).toBe('post___i___sessions___revoke');
 	expect(spec.paths?.['/i/signout']?.post?.operationId).toBe('post___i___signout');
-	expect(identifiers).toHaveLength(477 + walletPaths.length);
+	expect(identifiers).toHaveLength(477 + walletPaths.length + servicePaths.length);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

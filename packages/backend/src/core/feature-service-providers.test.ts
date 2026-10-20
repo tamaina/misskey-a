@@ -18,6 +18,7 @@ import { galleryServices } from '@features/collections/backend/services/gallery.
 import { createPageEntityService, createPageLikeEntityService, createPageService, pageFactoryProviders } from '@features/pages/backend/services.js';
 import { playServices } from '@features/play/backend/services.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { ServiceBillingRoleProvider } from '@features/billing/backend/service-role.provider.js';
 import { TotpService } from '@features/auth/backend/services/TotpService.js';
 import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import { featureServiceExports, featureServiceGroups, featureServiceProviders } from '@features/index/backend/feature-service-providers.js';
@@ -63,8 +64,8 @@ describe('feature service composition adapter', () => {
 			return typeof token === 'function' ? `class:${token.name}` : `alias:${String(token)}`;
 		};
 		const publicProviders = providers.filter(provider => typeof providerToken(provider) !== 'symbol');
-		expect(publicProviders.map(describeToken).sort()).toEqual([...baseline.providers].sort());
-		expect(exports.map(describeToken).sort()).toEqual([...baseline.exports].sort());
+		expect(publicProviders.map(describeToken).sort()).toEqual([...baseline.providers, 'class:ServiceBillingRoleProvider'].sort());
+		expect(exports.map(describeToken).sort()).toEqual([...baseline.exports, 'class:ServiceBillingRoleProvider'].sort());
 		const aliases = publicProviders.filter((provider): provider is import('@nestjs/common').ExistingProvider => typeof provider === 'object' && 'useExisting' in provider)
 			.map(provider => ({ name: String(provider.provide), target: (provider.useExisting as { name: string }).name }));
 		expect(aliases.sort((left, right) => left.name.localeCompare(right.name))).toEqual([...baseline.aliases].sort((left, right) => left.name.localeCompare(right.name)));
@@ -77,8 +78,10 @@ describe('feature service composition adapter', () => {
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
 		expect(factoryProviders).toHaveLength(24);
-		expect(classProviders).toHaveLength(50);
-		expect(featureServiceExports).toHaveLength(99);
+	expect(classProviders).toHaveLength(50);
+	expect(featureServiceExports).toHaveLength(100);
+	expect(featureServiceGroups.billing.providers).toEqual([ServiceBillingRoleProvider]);
+	expect(featureServiceGroups.billing.exports).toEqual([ServiceBillingRoleProvider]);
 		for (const provider of featureServiceProviders) {
 			expect(providers.filter(candidate => providerToken(candidate) === providerToken(provider))).toEqual([provider]);
 		}

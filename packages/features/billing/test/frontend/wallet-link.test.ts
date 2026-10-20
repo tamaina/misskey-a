@@ -69,7 +69,7 @@ test('passkey authentication starts after provider selection/switch delays beyon
 	const f = fixture(); const request = f.request.getMockImplementation()!;
 	let issuedAt = -1;
 	const passkey = { id: 'synthetic-key', rawId: 'synthetic', type: 'public-key' as const, clientExtensionResults: {},
-		response: { clientDataJSON: 'synthetic', authenticatorData: 'synthetic', signature: 'synthetic' } };
+																			response: { clientDataJSON: 'synthetic', authenticatorData: 'synthetic', signature: 'synthetic' } };
 	const authenticate = vi.fn(async () => { issuedAt = Date.now(); return { passkey }; });
 	f.request.mockImplementation(async input => {
 		if (input.method === 'eth_requestAccounts' || input.method === 'wallet_switchEthereumChain') await new Promise(resolve => window.setTimeout(resolve, 91000));
@@ -108,4 +108,11 @@ test('password/TOTP collection occurs after provider waits and immediately befor
 		expect(await result).toEqual(wallet);
 		expect(authenticate).toHaveBeenCalledOnce();
 	} finally { vi.useRealTimers(); }
+});
+
+test('fresh residence checks precede wallet connection and signing, with no inference fallback', async () => {
+	const denied = fixture(); await expect(linkWallet({ ...denied.input, requireResidence: async () => { throw new Error('RESIDENCE_REQUIRED'); } })).rejects.toThrow('RESIDENCE_REQUIRED'); expect(denied.request).not.toHaveBeenCalled(); expect(denied.client.begin).not.toHaveBeenCalled();
+	const changed = fixture(); let checks = 0;
+	await expect(linkWallet({ ...changed.input, requireResidence: async () => { if (++checks === 2) throw new Error('RESIDENCE_REQUIRED'); } })).rejects.toThrow('RESIDENCE_REQUIRED');
+	expect(changed.client.begin).toHaveBeenCalledOnce(); expect(changed.calls).not.toContain('personal_sign'); expect(changed.client.verify).not.toHaveBeenCalled();
 });

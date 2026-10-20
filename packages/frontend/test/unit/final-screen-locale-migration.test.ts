@@ -3,12 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { restoreUpstreamLocaleBundle } from './upstream-develop-source-rebase.js';
-import { restoreCodeDiffBaseline } from './code-diff-source-rebase.js';
-import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
-import { restoreOAuthPermissionBaseline } from './oauth-permission-source-rebase.js';
-import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
-import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -17,16 +11,23 @@ import { runInNewContext } from 'node:vm';
 import { parse, compileScript, compileTemplate } from 'vue/compiler-sfc';
 import { expect, test } from 'vitest';
 import { createInternationalization, setActiveInternationalization, createComponentLocale } from 'vite-vue-internationalization/runtime';
-import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
 import { languages } from 'i18n';
-import { locales } from './instance-pilot-locale-catalog.js';
-import type { ParameterizedString } from 'i18n';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
+import { locales } from './instance-pilot-locale-catalog.js';
+import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
+import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
+import { restoreOAuthPermissionBaseline } from './oauth-permission-source-rebase.js';
+import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
+import { restoreCodeDiffBaseline } from './code-diff-source-rebase.js';
+import { restoreBillingCatalogBaseline } from './billing-catalog-source-rebase.js';
+import { restoreUpstreamLocaleBundle } from './upstream-develop-source-rebase.js';
 import proof from './final-screen-locale-migration.json';
 import mcpPermissionLabels from './mcp-permission-labels.json';
+import type { ParameterizedString } from 'i18n';
+import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const hash = (text: string) => createHash('sha256').update(text).digest('hex');
@@ -61,7 +62,7 @@ function configured(embed: boolean) {
 test('all51 screen sources reverse byte for byte and retain all49336 effective locale strings', () => {
 	let strings = 0;
 	for (const entry of proof) {
-		const currentSource = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, restoreOAuthPermissionBaseline(entry.file, restorePasswordChangeBaseline(entry.file, restoreCodeDiffBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'))))));
+		const currentSource = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, restoreOAuthPermissionBaseline(entry.file, restorePasswordChangeBaseline(entry.file, restoreCodeDiffBaseline(entry.file, restoreBillingCatalogBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8')))))));
 		// Keep the original migration proof frozen; current permission labels are checked below.
 		const source = currentSource.replace(/^\t\t"access:mcp": [^\n]*,\n/gm, '');
 		expect(hash(source)).toBe(entry.migratedSha256);
@@ -143,7 +144,7 @@ test('real main/embed loaders preserve finite selectors, unknown-key fallback an
 					for (const message of messages) {
 						expect(message.replace(/\{[A-Za-z_$][\w$]*\}/g, '')).not.toContain('{');
 						const names = [...message.matchAll(/\{([^}]*)\}/g)].map(match => match[1]);
-						for (const value of [0, 1, -1, 25.5, NaN, Infinity, 'NAME', '$&', "a | b's {x}"]) {
+						for (const value of [0, 1, -1, 25.5, NaN, Infinity, 'NAME', '$&', 'a | b\'s {x}']) {
 							const values = Object.fromEntries(names.map((name, index) => [name, typeof value === 'number' ? value + index : value]));
 							const legacy = new I18n({ message: message as ParameterizedString<string> }).tsx.message(values);
 							expect(interpolateLocaleParameters(message, values)).toBe(legacy);
