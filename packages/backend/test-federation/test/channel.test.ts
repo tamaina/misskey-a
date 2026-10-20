@@ -77,7 +77,7 @@ describe('Channel Group federation pilot', () => {
 		await bob.client.request('following/create', { userId: remoteBooster.object.id });
 		await vi.waitFor(async () => {
 			const followers = await booster.client.request('users/followers', { userId: booster.id });
-			strictEqual(followers.some(row => row.follower.username === bob.username), true);
+			strictEqual(followers.some(row => row.follower?.username === bob.username), true);
 		}, WAIT_FOR_FEDERATION);
 		const unknown = await alice.client.request('channels/create', { name: crypto.randomUUID(), isFederated: true });
 		const original = (await alice.client.request('notes/create', { channelId: unknown.id, text: crypto.randomUUID() })).createdNote;
