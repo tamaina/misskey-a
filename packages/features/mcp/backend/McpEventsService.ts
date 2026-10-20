@@ -167,7 +167,7 @@ export class McpEventsService {
 			}
 		} catch (error) { if (error instanceof McpEventError) return null; throw error; }
 		const note = await this.notes.findOneBy({ id: noteId });
-		if (!note || (type === 'mention' ? !note.mentions.includes(userId) : note.replyUserId !== userId)
+		if (!note || note.userId === userId || (type === 'mention' ? !note.mentions.includes(userId) : note.replyUserId !== userId)
 			|| !await this.noteEntity.isVisibleForMe(note, userId)) return null;
 		const packed = await this.noteEntity.pack(note, { id: userId }, { detail: false });
 		if (packed.isHidden) return null;
