@@ -1,7 +1,7 @@
 ## 9000.0.0
 
 ### Note
-- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `af016bb8f56e762d9864bc88710737c88a7b10a5` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
+- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `8b3bbc05b6a1e4686e4f1c793383d3457545c8e0` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
 - 開発環境の指定は Node.js 26.4.0 / pnpm 12.11.2、Docker のベースイメージは Node.js 26.10.0-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210)
 - 上流由来の migration 名・履歴を復元しています。過去の実験版で異なる migration 名を適用したデータベースは、更新前に履歴の個別確認が必要です。 (#35)
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
@@ -87,6 +87,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: ログイントークンの再生成時に二要素認証を確認するように (#95)
 - Fix: WebAuthnの本人確認要求をサーバーの検証条件と揃えるように (#96)
 - Enhance: カスタム絵文字ZIPの生成・読み取りをzip.jsに統一し、重複画像と生成失敗時の一時ファイル処理を改善 (#208)
+- Fix: リストの作成・複製・名前変更で、名前の文字数制限をUnicodeコードポイント数の1〜100文字として判定するように（絵文字などの非BMP文字を含む名前に対応） (#217)
 - Fix: UserProfileのpassword列コメントを修正するmigrationを追加（パスワード処理自体の変更はなし） (#200)
 
 ## 2026.10.0
