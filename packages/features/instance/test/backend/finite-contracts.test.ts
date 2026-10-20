@@ -21,6 +21,7 @@ import { metaContract } from '../../backend/endpoints/meta.contract.js';
 import { createMetaProcedure } from '../../backend/endpoints/meta.js';
 
 import { MiMeta } from '../../backend/models/Meta.js';
+import { toPublicMetaLite } from '../../backend/serializers/public-meta.js';
 import { MetaEntityService } from '../../backend/serializers/MetaEntityService.js';
 import { createInstanceRouter } from '../../backend/api.implementation.js';
 import type { InstanceApiDependencies } from '../../backend/api.implementation.js';
@@ -280,6 +281,18 @@ test('actual admin metadata and public metadata preserve nullable images, client
 	query.getMany.mockResolvedValue([false, true].map(isSensitive => mockDeep<MiAd>({ id: 'ad1', url: 'https://ad.test', place: 'square', ratio: 1, imageUrl: 'https://ad.test/image', dayOfWeek: 0, isSensitive })));
 	ads.createQueryBuilder.mockReturnValue(query);
 	const serializer = new MetaEntityService(config, meta, ads, system);
+	const postingKeys = ['canNote', 'renotePolicy', 'canCreateSpecifiedNote', 'canFederateNote', 'noteFilesLimit'];
+	const legacyPolicies = Object.fromEntries(Object.entries(meta.policies).filter(([key]) => !postingKeys.includes(key)));
+	const legacyMeta = Object.assign(new MiMeta(), meta, { policies: legacyPolicies });
+	const legacyPublic = toPublicMetaLite(await serializer.pack(legacyMeta));
+	expect(legacyPublic.policies).toMatchObject({ canNote: true, renotePolicy: 'allow', canCreateSpecifiedNote: true, canFederateNote: true, noteFilesLimit: 16 });
+	expect(v.safeParse(packedMetaLiteSchema, legacyPublic).success).toBe(true);
+	for (const [noteFilesLimit, expected] of [[0.5, 0], [-1, 0], [99, 16]]) {
+		const input = Object.assign(new MiMeta(), legacyMeta, { policies: { ...legacyPolicies, noteFilesLimit } });
+		const publicMeta = toPublicMetaLite(await serializer.pack(input));
+		expect(publicMeta.policies.noteFilesLimit).toBe(expected);
+		expect(v.safeParse(packedMetaLiteSchema, publicMeta).success).toBe(true);
+	}
 	const lite = await serializer.pack();
 	expect(v.parse(packedMetaLiteSchema, lite)).toEqual(lite);
 	expect(lite.mascotImageUrl).toBe('/assets/ai.png');

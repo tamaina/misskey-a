@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restorePostingRoleBaseline } from './posting-role-source-rebase.js';
 import { readFileSync } from 'node:fs';
 import { restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
 import { dirname, resolve } from 'node:path';
@@ -477,7 +478,7 @@ function getLocaleValue(locale: string, keyPath: string): unknown {
 
 describe('SFC-local locale migration', () => {
 	test.each(migrations)('$file preserves all effective translations', ({ file, keyPath }) => {
-		const source = restoreFinalOwnerHistoricalSource(file, readFileSync(resolve(repoRoot, file), 'utf8'));
+		const source = restoreFinalOwnerHistoricalSource(file, restorePostingRoleBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8')));
 		const localKey = keyPath.split('.').at(-1)!;
 		const localReference = `$locale.sfc.${localKey}`;
 		const oldReference = `i18n.ts.${keyPath}`;
@@ -515,7 +516,7 @@ function countExactPropertyReference(source: string, reference: string): number 
 
 describe('Feature SFC-local locale migration', () => {
 	test.each(featureMigrations)('$file preserves all simple labels in all active locales', ({ file, keyPaths }) => {
-		const source = restoreFinalOwnerHistoricalSource(file, readFileSync(resolve(repoRoot, file), 'utf8'));
+		const source = restoreFinalOwnerHistoricalSource(file, restorePostingRoleBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8')));
 		const localKeys = keyPaths.map(keyPath => keyPath.split('.').at(-1)!);
 		const localeBlocks = new Map<string, Record<string, unknown>>();
 
@@ -1215,7 +1216,7 @@ const additionalStaticMigrations = [
 
 describe('Additional static SFC-local locale migrations', () => {
 	test.each(additionalStaticMigrations)('$file preserves every static label in all active locales', ({ file, keyPaths }) => {
-		const source = restoreFinalOwnerHistoricalSource(file, restoreGlobalCatalogPilotSource(file, readFileSync(resolve(repoRoot, file), 'utf8')));
+		const source = restoreFinalOwnerHistoricalSource(file, restorePostingRoleBaseline(file, restoreGlobalCatalogPilotSource(file, readFileSync(resolve(repoRoot, file), 'utf8'))));
 		const localKeys = keyPaths.map(({ keyPath }) => keyPath.split('.').at(-1)!);
 		const localeBlocks = new Map<string, Record<string, unknown>>();
 

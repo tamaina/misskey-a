@@ -127,7 +127,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</template>
 			</MkReactionsViewer>
 			<footer :class="$style.footer">
-				<button :class="$style.footerButton" class="_button" @click="reply()">
+				<button
+					:class="$style.footerButton"
+					class="_button"
+					:disabled="!canReply"
+					@click="reply()"
+				>
 					<i class="ti ti-arrow-back-up"></i>
 					<p v-if="appearNote.repliesCount > 0" :class="$style.footerButtonCount">{{ number(appearNote.repliesCount) }}</p>
 				</button>
@@ -273,6 +278,7 @@ const {
 	isLong,
 	showTicker,
 	canRenote,
+	canReply,
 
 	renote,
 	reply,

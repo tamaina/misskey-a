@@ -5,6 +5,7 @@
 
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { restorePostingRoleBaseline } from './posting-role-source-rebase.js';
 import { resolve } from 'node:path';
 import { expect, test } from 'vitest';
 import rebases from './password-change-source-rebase.json';
@@ -13,7 +14,7 @@ import { restorePasswordChangeBaseline } from './password-change-source-rebase.j
 const root = resolve(import.meta.dirname, '../../../..');
 
 test.each(rebases)('$file restores the frozen source and rejects additional source changes', proof => {
-	const source = readFileSync(resolve(root, proof.file), 'utf8');
+	const source = restorePostingRoleBaseline(proof.file, readFileSync(resolve(root, proof.file), 'utf8'));
 	const restored = restorePasswordChangeBaseline(proof.file, source);
 	expect(createHash('sha256').update(restored).digest('hex')).toBe(proof.baselineSha256);
 	expect(() => restorePasswordChangeBaseline(proof.file, source + '\n')).toThrow('Source differs');

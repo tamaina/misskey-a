@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<i class="ti ti-pencil" :class="$style.fileNameEditIcon"></i>
 			</button>
 			<div :class="$style.fileQuickActionsOthers">
-				<button v-tooltip="$locale.sfc.createNoteFromTheFile" class="_button" :class="$style.fileQuickActionsOthersButton" @click="postThis()">
+				<button v-if="$i.policies.canNote && $i.policies.noteFilesLimit > 0" v-tooltip="$locale.sfc.createNoteFromTheFile" class="_button" :class="$style.fileQuickActionsOthersButton" @click="postThis()">
 					<i class="ti ti-pencil"></i>
 				</button>
 				<button v-if="file.isSensitive" v-tooltip="$locale.sfc.unmarkAsSensitive" class="_button" :class="$style.fileQuickActionsOthersButton" @click="toggleSensitive()">
@@ -78,12 +78,14 @@ import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import bytes from '@features/ui/frontend/filters/bytes.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import * as os from '@features/ui/frontend/os.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
 import { globalEvents } from '@features/runtime/frontend/events.js';
 
 const router = useRouter();
+const $i = ensureSignin();
 
 const props = defineProps<{
 	fileId: string;

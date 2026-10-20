@@ -34,7 +34,15 @@ test('notes/create retains the frozen public limit, security policy and every ro
 		requestName: 'notes/create', requireCredential: true, prohibitMoved: true,
 		limit: baseline.routes[0].meta.limit, kind: 'write:notes',
 	});
-	expect(notesCreateErrors).toEqual(baseline.routes[0].meta.errors);
+	expect(notesCreateErrors).toEqual({
+		...baseline.routes[0].meta.errors,
+		cannotCreateNote: { message: 'You are not allowed to create notes.', code: 'CANNOT_CREATE_NOTE', id: 'f35c0bd4-9dca-4998-ae4b-fa0e7c54d16a' },
+		tooManyFilesAttachedToNote: { message: 'Cannot post because too many files are attached.', code: 'CONTAINS_TOO_MANY_FILES', id: '8d28ca32-a244-4cf7-bc29-97895fdc3604' },
+		renoteForbidden: { message: 'You are not allowed to Renote.', code: 'RENOTE_FORBIDDEN', id: 'c5b0bcc1-9db1-4178-b130-920a4e150b58' },
+		quoteForbidden: { message: 'You are not allowed to quote.', code: 'QUOTE_FORBIDDEN', id: 'ae77a039-588a-40c3-8358-cc9c15ec7bbb' },
+		directNoteCreationForbidden: { message: 'You are not allowed to send specified notes.', code: 'SPECIFIED_NOTE_CREATION_FORBIDDEN', id: 'fe35a6b4-f595-4cbc-ab56-f31fa68be1f0' },
+		remoteDirectNoteCreationForbidden: { message: 'You are not allowed to send specified notes to remote users.', code: 'REMOTE_SPECIFIED_NOTE_CREATION_FORBIDDEN', id: 'dd9e27c6-7cba-4587-92c7-672c82d9cc46' },
+	});
 	expect(notesCreateContract['~orpc'].inputSchema).toBe(requiredSchema(notesCreateContract['~orpc'].inputSchema));
 	expect(notesCreateContract['~orpc'].outputSchema).toBe(requiredSchema(notesCreateContract['~orpc'].outputSchema));
 });

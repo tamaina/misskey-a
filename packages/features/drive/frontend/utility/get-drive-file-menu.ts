@@ -4,6 +4,7 @@
  */
 
 import * as Misskey from 'misskey-js';
+import { $i } from '@features/auth/frontend/i.js';
 import { defineAsyncComponent } from 'vue';
 import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
@@ -127,14 +128,15 @@ export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Miss
 		action: () => describe(file),
 	});
 
-	menuItems.push({ type: 'divider' }, {
-		text: FeatureLocaleMessages.$locale.createNoteFromTheFile,
-		icon: 'ti ti-pencil',
-		action: () => os.post({
-			initialFiles: [file],
-			instant: true,
-		}),
-	}, {
+	menuItems.push({ type: 'divider' });
+	if ($i?.policies.canNote && $i.policies.noteFilesLimit > 0) {
+		menuItems.push({
+			text: FeatureLocaleMessages.$locale.createNoteFromTheFile,
+			icon: 'ti ti-pencil',
+			action: () => os.post({ initialFiles: [file], instant: true }),
+		});
+	}
+	menuItems.push({
 		text: FeatureLocaleMessages.$locale.copyUrl,
 		icon: 'ti ti-link',
 		action: () => copyUrl(file),

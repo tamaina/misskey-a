@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { restorePostingRoleBaseline } from './posting-role-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -17,7 +18,7 @@ const dictionaries = (source: string): Map<string, Record<string, unknown>> => n
 
 for (const entry of rebases) {
 	test(`upstream adaptations restore exact frozen source: ${entry.file}`, () => {
-		const current = readFileSync(resolve(root, entry.file), 'utf8');
+		const current = restorePostingRoleBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
 		const baseline = restoreUpstreamDevelopBaseline(entry.file, current);
 		expect(hash(current)).toBe(entry.currentSha256);
 		expect(hash(baseline)).toBe(entry.baselineSha256);

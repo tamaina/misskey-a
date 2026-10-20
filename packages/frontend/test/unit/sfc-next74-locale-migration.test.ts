@@ -4,6 +4,7 @@
  */
 
 import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
+import { restorePostingRoleBaseline } from './posting-role-source-rebase.js';
 import { readFileSync } from 'node:fs';
 import { restoreGlobalCatalogPilotSource, restoreGlobalCatalogPilotDictionary } from './global-catalog-pilot-baseline.js';
 import { restoreProductNameBaseline } from './product-name-source-rebase.js';
@@ -212,7 +213,7 @@ describe('next74 static raw-label ownership', () => {
 	});
 
 	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', async migration => {
-		const actualSource = restoreClientErrorLogBaseline(migration.file, restoreGlobalCatalogPilotSource(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8')));
+		const actualSource = restoreClientErrorLogBaseline(migration.file, restorePostingRoleBaseline(migration.file, restoreGlobalCatalogPilotSource(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8'))));
 		const passwordSource = migration.file === 'packages/features/auth/frontend/components/MkPasswordDialog.vue' ? restorePasswordChangeBaseline(migration.file, actualSource) : actualSource;
 		const source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, restoreEmailHistoricalSource(migration.file, restoreFinalOwnerHistoricalSource(migration.file, restoreProductNameBaseline(migration.file, passwordSource)))));
 		const blocks = getBlocks(migration.file);

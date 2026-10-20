@@ -1,0 +1,445 @@
+[
+	{
+		"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+		"currentSha256": "2bb7dda6e574e7cb9bd4334db7acb1b6da1277de0490a24f4c7b64fed9282640",
+		"baselineSha256": "db9985b735a088f46889e26f6ecf3fd338776ca3d7802efee9c6de67435aed3f",
+		"edits": [
+			{
+				"start": 714,
+				"end": 915,
+				"current": "\t\t\t\t<button v-if=\"$i.policies.canNote && $i.policies.noteFilesLimit > 0\" v-tooltip=\"$locale.sfc.createNoteFromTheFile\" class=\"_button\" :class=\"$style.fileQuickActionsOthersButton\" @click=\"postThis()\">\n",
+				"baseline": "\t\t\t\t<button v-tooltip=\"$locale.sfc.createNoteFromTheFile\" class=\"_button\" :class=\"$style.fileQuickActionsOthersButton\" @click=\"postThis()\">\n"
+			},
+			{
+				"start": 3849,
+				"end": 3910,
+				"current": "import { ensureSignin } from '@features/auth/frontend/i.js';\n",
+				"baseline": ""
+			},
+			{
+				"start": 4232,
+				"end": 4259,
+				"current": "const $i = ensureSignin();\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/drive/frontend/utility/get-drive-file-menu.ts",
+		"currentSha256": "6be6139fd6b8f4a29f8f7da7cfb2f0e4594c18580723719d8925316100193c14",
+		"baselineSha256": "93f9466ca01b29c362cef03475d0c8f75d3f9cd990e19d3adf8460c79afa6a41",
+		"edits": [
+			{
+				"start": 143,
+				"end": 194,
+				"current": "import { $i } from '@features/auth/frontend/i.js';\n",
+				"baseline": ""
+			},
+			{
+				"start": 4100,
+				"end": 4401,
+				"current": "\tmenuItems.push({ type: 'divider' });\n\tif ($i?.policies.canNote && $i.policies.noteFilesLimit > 0) {\n\t\tmenuItems.push({\n\t\t\ttext: FeatureLocaleMessages.$locale.createNoteFromTheFile,\n\t\t\ticon: 'ti ti-pencil',\n\t\t\taction: () => os.post({ initialFiles: [file], instant: true }),\n\t\t});\n\t}\n\tmenuItems.push({\n",
+				"baseline": "\tmenuItems.push({ type: 'divider' }, {\n\t\ttext: FeatureLocaleMessages.$locale.createNoteFromTheFile,\n\t\ticon: 'ti ti-pencil',\n\t\taction: () => os.post({\n\t\t\tinitialFiles: [file],\n\t\t\tinstant: true,\n\t\t}),\n\t}, {\n"
+			}
+		]
+	},
+	{
+		"file": "packages/features/notes/frontend/components/MkNote.vue",
+		"currentSha256": "665be3b67d14187b86c161add7c9477385ee9d18bdbfee3019a49910392fbfad",
+		"baselineSha256": "3980b73322a2c875eef990f9829f516f38ed9d6958ae4fbcc6ca9e9fadf81f62",
+		"edits": [
+			{
+				"start": 6669,
+				"end": 6791,
+				"current": "\t\t\t\t<button\n\t\t\t\t\t:class=\"$style.footerButton\"\n\t\t\t\t\tclass=\"_button\"\n\t\t\t\t\t:disabled=\"!canReply\"\n\t\t\t\t\t@click=\"reply()\"\n\t\t\t\t>\n",
+				"baseline": "\t\t\t\t<button :class=\"$style.footerButton\" class=\"_button\" @click=\"reply()\">\n"
+			},
+			{
+				"start": 12799,
+				"end": 12810,
+				"current": "\tcanReply,\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+		"currentSha256": "b3b5d46679f650975ba1137b63026f2c3fad394fc087a68d62f57fad01d7d4c6",
+		"baselineSha256": "3d8df1af3644c30406bff95d30f51e371f0a5d71f2b0478e462833d4319d7052",
+		"edits": [
+			{
+				"start": 7498,
+				"end": 7624,
+				"current": "\t\t\t\t<button\n\t\t\t\t\tclass=\"_button\"\n\t\t\t\t\t:class=\"$style.noteFooterButton\"\n\t\t\t\t\t:disabled=\"!canReply\"\n\t\t\t\t\t@click=\"reply()\"\n\t\t\t\t>\n",
+				"baseline": "\t\t\t\t<button class=\"_button\" :class=\"$style.noteFooterButton\" @click=\"reply()\">\n"
+			},
+			{
+				"start": 14938,
+				"end": 14949,
+				"current": "\tcanReply,\n",
+				"baseline": ""
+			},
+			{
+				"start": 19827,
+				"end": 19894,
+				"current": "\t&:disabled {\n\t\tcursor: not-allowed;\n\t}\n\n\t&:not(:disabled):hover {\n",
+				"baseline": "\t&:hover {\n"
+			}
+		]
+	},
+	{
+		"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+		"currentSha256": "cc7848ef3ff88711785b2ee0225fc07df2dd39e87611127dde2cef852209e6bc",
+		"baselineSha256": "2dc2f5b18e7cc5f75809749d20da7250c8bfd9438146924b5441d7e638527a94",
+		"edits": [
+			{
+				"start": 1650,
+				"end": 1929,
+				"current": "\t\t\t<button v-if=\"visibility !== 'specified'\" v-tooltip=\"$locale.sfc.visibilityDisableFederation\" class=\"_button\" :class=\"[$style.headerRightItem, { [$style.danger]: localOnly }]\" :disabled=\"targetChannel != null || !postAccountPolicies.canFederateNote\" @click=\"toggleLocalOnly\">\n",
+				"baseline": "\t\t\t<button v-if=\"visibility !== 'specified'\" v-tooltip=\"$locale.sfc.visibilityDisableFederation\" class=\"_button\" :class=\"[$style.headerRightItem, { [$style.danger]: localOnly }]\" :disabled=\"targetChannel != null\" @click=\"toggleLocalOnly\">\n"
+			},
+			{
+				"start": 4202,
+				"end": 4548,
+				"current": "\t<MkInfo v-if=\"!postAccountPolicies.canNote\" warn :class=\"$style.hasNotSpecifiedMentions\">{{ PostingPolicyMessages.$locale.cannotNote }}</MkInfo>\n\t<MkInfo v-if=\"postAccount != null && (serverDraftId != null || scheduledAt != null)\" warn :class=\"$style.hasNotSpecifiedMentions\">{{ PostingPolicyMessages.$locale.crossAccountDraftNotice }}</MkInfo>\n",
+				"baseline": ""
+			},
+			{
+				"start": 6019,
+				"end": 6199,
+				"current": "\t<XPostFormAttaches v-model=\"files\" :noteFilesLimit=\"postAccountPolicies.noteFilesLimit\" @detach=\"detachFile\" @changeSensitive=\"updateFileSensitive\" @changeName=\"updateFileName\"/>\n",
+				"baseline": "\t<XPostFormAttaches v-model=\"files\" @detach=\"detachFile\" @changeSensitive=\"updateFileSensitive\" @changeName=\"updateFileName\"/>\n"
+			},
+			{
+				"start": 6935,
+				"end": 7423,
+				"current": "\t\t\t<button v-if=\"postAccountPolicies.noteFilesLimit > 0\" v-tooltip=\"$locale.sfc.attachFile + ' (' + $locale.sfc.upload + ')'\" class=\"_button\" :class=\"$style.footerButton\" @click=\"chooseFileFromPc\"><i class=\"ti ti-photo-plus\"></i></button>\n\t\t\t<button v-if=\"postAccountPolicies.noteFilesLimit > 0\" v-tooltip=\"$locale.sfc.attachFile + ' (' + $locale.sfc.fromDrive + ')'\" class=\"_button\" :class=\"$style.footerButton\" @click=\"chooseFileFromDrive\"><i class=\"ti ti-cloud-download\"></i></button>\n",
+				"baseline": "\t\t\t<button v-tooltip=\"$locale.sfc.attachFile + ' (' + $locale.sfc.upload + ')'\" class=\"_button\" :class=\"$style.footerButton\" @click=\"chooseFileFromPc\"><i class=\"ti ti-photo-plus\"></i></button>\n\t\t\t<button v-tooltip=\"$locale.sfc.attachFile + ' (' + $locale.sfc.fromDrive + ')'\" class=\"_button\" :class=\"$style.footerButton\" @click=\"chooseFileFromDrive\"><i class=\"ti ti-cloud-download\"></i></button>\n"
+			},
+			{
+				"start": 8905,
+				"end": 8995,
+				"current": "import PostingPolicyMessages from '@features/notes/frontend/posting-policy-messages.vue';\n",
+				"baseline": ""
+			},
+			{
+				"start": 14471,
+				"end": 14946,
+				"current": "const postAccount = ref<Misskey.entities.MeDetailed | null>(null);\n// 投稿は選択中のアカウントで行われるため、ポリシー判定も常にそのアカウントのものを使う\nconst postAccountPolicies = computed(() => (postAccount.value ?? $i).policies);\n\n// 連合が許可されていないなら、ボタンを無効化するだけでなく実際にローカルのみへ倒す。\n// 下書きの復元などで後から localOnly が戻される場合があるため、localOnly 自体も監視して都度補正する\nwatch([postAccountPolicies, localOnly], () => {\n\tif (!postAccountPolicies.value.canFederateNote && !localOnly.value) {\n\t\tlocalOnly.value = true;\n\t}\n}, { immediate: true });\n",
+				"baseline": ""
+			},
+			{
+				"start": 17866,
+				"end": 19821,
+				"current": "\tconst isNotMock = !props.mock;\n\n\tconst canNote = postAccountPolicies.value.canNote;\n\t// Server drafts and schedules belong to the signed-in account. Never submit them as another account.\n\tconst isDraftAccountValid = postAccount.value == null || serverDraftId.value == null;\n\tconst isScheduleValid = scheduledAt.value == null || (postAccount.value == null && postAccountPolicies.value.scheduledNoteLimit > 0);\n\t// 下書きから復元した引用 (quoteId のみ設定される) も引用として扱う\n\tconst isQuoting = renoteTargetNote.value != null || quoteId.value != null;\n\tconst canQuote = isQuoting ? postAccountPolicies.value.renotePolicy === 'allow' : true;\n\tconst isVisibilityValid = visibility.value === 'specified' ? postAccountPolicies.value.canCreateSpecifiedNote : true;\n\tconst isFederationValid = postAccountPolicies.value.canFederateNote || localOnly.value || visibility.value === 'specified';\n\n\tconst isNotPosting = !posting.value && !posted.value;\n\tconst isNotUploading = !uploader.uploading.value;\n\tconst isUploaderReady = uploader.items.value.length === 0 || uploader.readyForUpload.value;\n\n\tconst hasContent = (\n\t\ttextLength.value >= 1 ||\n\t\tfiles.value.length >= 1 ||\n\t\tuploader.items.value.length >= 1 ||\n\t\tpoll.value != null ||\n\t\trenoteTargetNote.value != null ||\n\t\tquoteId.value != null\n\t);\n\n\tconst isTextLengthValid = textLength.value <= maxTextLength.value;\n\tconst isCwValid = useCw.value\n\t\t? cw.value != null && cw.value.trim() !== '' && cwTextLength.value <= maxCwTextLength\n\t\t: true;\n\tconst isFilesCountValid = (files.value.length + uploader.items.value.length) <= postAccountPolicies.value.noteFilesLimit;\n\tconst isPollValid = !poll.value || poll.value.choices.length >= 2;\n\n\treturn (\n\t\tisNotMock &&\n\t\tcanNote &&\n\t\tisDraftAccountValid &&\n\t\tisScheduleValid &&\n\t\tcanQuote &&\n\t\tisVisibilityValid &&\n\t\tisFederationValid &&\n\t\tisNotPosting &&\n\t\tisNotUploading &&\n\t\tisUploaderReady &&\n\t\thasContent &&\n\t\tisTextLengthValid &&\n\t\tisCwValid &&\n\t\tisFilesCountValid &&\n\t\tisPollValid\n\t);\n",
+				"baseline": "\treturn !props.mock && !posting.value && !posted.value && !uploader.uploading.value && (uploader.items.value.length === 0 || uploader.readyForUpload.value) &&\n\t\t(\n\t\t\t1 <= textLength.value ||\n\t\t\t1 <= files.value.length ||\n\t\t\t1 <= uploader.items.value.length ||\n\t\t\tpoll.value != null ||\n\t\t\trenoteTargetNote.value != null ||\n\t\t\tquoteId.value != null\n\t\t) &&\n\t\t(textLength.value <= maxTextLength.value) &&\n\t\t(\n\t\t\tuseCw.value ?\n\t\t\t\t(\n\t\t\t\t\tcw.value != null && cw.value.trim() !== '' &&\n\t\t\t\t\tcwTextLength.value <= maxCwTextLength\n\t\t\t\t) : true\n\t\t) &&\n\t\t(files.value.length <= 16) &&\n\t\t(!poll.value || poll.value.choices.length >= 2);\n"
+			},
+			{
+				"start": 19917,
+				"end": 20043,
+				"current": "\treturn postAccount.value == null && canPost.value && (textLength.value > 0 || files.value.length > 0 || poll.value != null);\n",
+				"baseline": "\treturn canPost.value && (textLength.value > 0 || files.value.length > 0 || poll.value != null);\n"
+			},
+			{
+				"start": 25797,
+				"end": 25873,
+				"current": "\t\tcanCreateSpecifiedNote: postAccountPolicies.value.canCreateSpecifiedNote,\n",
+				"baseline": ""
+			},
+			{
+				"start": 29168,
+				"end": 29255,
+				"current": "\t}, { type: 'divider' }, ...(postAccount.value == null ? [{\n\t\ttype: 'button' as const,\n",
+				"baseline": "\t}, { type: 'divider' }, {\n\t\ttype: 'button',\n"
+			},
+			{
+				"start": 29528,
+				"end": 29626,
+				"current": "\t}] : []), ...(postAccount.value == null && postAccountPolicies.value.scheduledNoteLimit > 0 ? [{\n",
+				"baseline": "\t}, ...($i.policies.scheduledNoteLimit > 0 ? [{\n"
+			},
+			{
+				"start": 32515,
+				"end": 32656,
+				"current": "\tif (!renoteTargetNote.value && !quoteId.value && paste.startsWith(url + '/notes/') && postAccountPolicies.value.renotePolicy === 'allow') {\n",
+				"baseline": "\tif (!renoteTargetNote.value && !quoteId.value && paste.startsWith(url + '/notes/')) {\n"
+			},
+			{
+				"start": 36108,
+				"end": 36148,
+				"current": "\tif (postAccount.value != null) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 36980,
+				"end": 37365,
+				"current": "\t}, undefined, (err) => {\n\t\treturn {\n\t\t\ttitle: options.isActuallyScheduled ? PostingPolicyMessages.$locale.noteDraftErrors.scheduleTitle : PostingPolicyMessages.$locale.noteDraftErrors.draftTitle,\n\t\t\ttext: getErrorDescription(err.id) ?? (PostingPolicyMessages.$locale.noteCreateErrors.genericDescription + (err.message ? `\\n${err.message}` : '') + (err.id ? `\\n${err.id}` : '')),\n\t\t};\n",
+				"baseline": ""
+			},
+			{
+				"start": 37839,
+				"end": 37868,
+				"current": "\tif (!canPost.value) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 38457,
+				"end": 38487,
+				"current": "\t\tif (!canPost.value) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 41618,
+				"end": 41864,
+				"current": "\t// ファイルアップロードにより条件が変わる可能性があるため、再度canPostを確認する\n\tif (!canPost.value) {\n\t\tawait os.alert({\n\t\t\ttype: 'error',\n\t\t\ttitle: PostingPolicyMessages.$locale.cannotPostTitle,\n\t\t\ttext: PostingPolicyMessages.$locale.cannotPostDescription,\n\t\t});\n\t\treturn;\n\t}\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 44078,
+				"end": 44332,
+				"current": "\t\t\ttitle: PostingPolicyMessages.$locale.noteCreateErrors.genericTitle,\n\t\t\ttext: getErrorDescription(err.id) ?? (PostingPolicyMessages.$locale.noteCreateErrors.genericDescription + (err.message ? `\\n${err.message}` : '') + (err.id ? `\\n${err.id}` : '')),\n",
+				"baseline": "\t\t\ttext: err.message + '\\n' + (err as any).id,\n"
+			},
+			{
+				"start": 46978,
+				"end": 46978,
+				"current": "",
+				"baseline": "const postAccount = ref<Misskey.entities.UserDetailed | null>(null);\n\n"
+			},
+			{
+				"start": 47104,
+				"end": 47145,
+				"current": "\t\tif (postAccount.value != null) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 49208,
+				"end": 49285,
+				"current": "\tos.popupMenu([...(postAccount.value == null ? [{\n\t\ttype: 'button' as const,\n",
+				"baseline": "\tos.popupMenu([{\n\t\ttype: 'button',\n"
+			},
+			{
+				"start": 49418,
+				"end": 49445,
+				"current": "\t\ttype: 'button' as const,\n",
+				"baseline": "\t\ttype: 'button',\n"
+			},
+			{
+				"start": 49575,
+				"end": 49701,
+				"current": "\t}, { type: 'divider' as const }] : []), ...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);\n",
+				"baseline": "\t}, { type: 'divider' }, ...items], (ev.currentTarget ?? ev.target ?? undefined) as HTMLElement | undefined);\n"
+			},
+			{
+				"start": 50049,
+				"end": 50142,
+				"current": "\tif (postAccount.value != null || postAccountPolicies.value.scheduledNoteLimit <= 0) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 51702,
+				"end": 54369,
+				"current": "}\n\nfunction getErrorDescription(errId: string): string | null {\n\tswitch (errId) {\n\t\t// Note create errors\n\t\tcase 'f35c0bd4-9dca-4998-ae4b-fa0e7c54d16a':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.rolePolicyDeniedDescription;\n\t\tcase 'b5c90186-4ab0-49c8-9bba-a1f76c282ba4':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.noSuchRenoteTargetDescription;\n\t\tcase '749ee0f6-d3da-459a-bf02-282e2da4292c':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.noSuchReplyTargetDescription;\n\t\tcase 'b98980fa-3780-406c-a935-b6d0eeee10d1':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.cannotReplyToInvisibleNoteDescription;\n\t\tcase 'ed940410-535c-4d5e-bfa3-af798671e93c':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.cannotReplyToSpecifiedVisibilityNoteWithExtendedVisibilityDescription;\n\t\tcase '04da457d-b083-4055-9082-955525eda5a5':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.cannotCreateAlreadyExpiredPollDescription;\n\t\tcase 'b1653923-5453-4edc-b786-7c4f39bb0bbb':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.noSuchChannelDescription;\n\t\tcase 'b390d7e1-8a5e-46ed-b625-06271cafd3d3':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.youHaveBeenBlockedDescription;\n\t\tcase 'b6992544-63e7-67f0-fa7f-32444b1b5306':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.noSuchFileDescription;\n\t\tcase 'aa6e01d3-a85c-669d-758a-76aab43af334':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.containsProhibitedWordsDescription;\n\t\tcase '4de0363a-3046-481b-9b0f-feff3e211025':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.containsTooManyMentionsDescription;\n\t\tcase '8d28ca32-a244-4cf7-bc29-97895fdc3604':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.tooManyFilesDescription;\n\t\tcase 'ae77a039-588a-40c3-8358-cc9c15ec7bbb':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.quoteForbiddenDescription;\n\t\tcase 'fe35a6b4-f595-4cbc-ab56-f31fa68be1f0':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.directNoteCreationForbiddenDescription;\n\t\tcase 'dd9e27c6-7cba-4587-92c7-672c82d9cc46':\n\t\t\treturn PostingPolicyMessages.$locale.noteCreateErrors.remoteDirectNoteCreationForbiddenDescription;\n\n\t\t// Draft errors\n\t\tcase '9ee33bbe-fde3-4c71-9b51-e50492c6b9c8':\n\t\t\treturn PostingPolicyMessages.$locale.noteDraftErrors.tooManyDraftsDescription;\n\t\tcase '22ae69eb-09e3-4541-a850-773cfa45e693':\n\t\t\treturn PostingPolicyMessages.$locale.noteDraftErrors.tooManyScheduledNotesDescription;\n\t\tcase 'e4bed6c9-017e-4934-aed0-01c22cc60ec1':\n\t\t\treturn PostingPolicyMessages.$locale.noteDraftErrors.scheduleMustBeInFutureDescription;\n\n\t\t// Fallback\n\t\tdefault:\n\t\t\treturn null;\n\t}\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/notes/frontend/components/MkPostFormAttaches.vue",
+		"currentSha256": "2cab6d8afbe774a33d3d6b143697cfa5900186c290dba998af1117780402f37a",
+		"baselineSha256": "fc921da54d2363be68f4de16fd2f4773d03210f4c7e24ec0fb9033b5a0da3983",
+		"edits": [
+			{
+				"start": 1038,
+				"end": 1108,
+				"current": "\t\t\t[$style.exceeded]: props.modelValue.length > props.noteFilesLimit,\n",
+				"baseline": "\t\t\t[$style.exceeded]: props.modelValue.length > 16,\n"
+			},
+			{
+				"start": 1117,
+				"end": 1176,
+				"current": "\t\t{{ props.modelValue.length }}/{{ props.noteFilesLimit }}\n",
+				"baseline": "\t\t{{ props.modelValue.length }}/16\n"
+			},
+			{
+				"start": 1985,
+				"end": 2048,
+				"current": "import { MAX_NOTE_ATTACHMENTS } from '@features/notes/shared';\n",
+				"baseline": ""
+			},
+			{
+				"start": 2293,
+				"end": 2334,
+				"current": "const props = withDefaults(defineProps<{\n",
+				"baseline": "const props = defineProps<{\n"
+			},
+			{
+				"start": 2377,
+				"end": 2436,
+				"current": "\t/** 投稿に使用するアカウントのポリシー由来の添付上限 */\n\tnoteFilesLimit?: number;\n",
+				"baseline": ""
+			},
+			{
+				"start": 2475,
+				"end": 2524,
+				"current": "}>(), { noteFilesLimit: MAX_NOTE_ATTACHMENTS });\n",
+				"baseline": "}>();\n"
+			}
+		]
+	},
+	{
+		"file": "packages/features/notes/frontend/components/MkVisibilityPicker.vue",
+		"currentSha256": "205f05d6dc84820e693bf24765d3ffc3d5bc728ed0138731b612bb4fa8dc0171",
+		"baselineSha256": "3751be50ceb65b97456a6b5f921124fd4eed08c566a03c1876795ebc4fba51ee",
+		"edits": [
+			{
+				"start": 1813,
+				"end": 2005,
+				"current": "\t\t<button key=\"specified\" :disabled=\"!props.canCreateSpecifiedNote\" class=\"_button\" :class=\"[$style.item, { [$style.active]: v === 'specified' }]\" data-index=\"4\" @click=\"choose('specified')\">\n",
+				"baseline": "\t\t<button key=\"specified\" class=\"_button\" :class=\"[$style.item, { [$style.active]: v === 'specified' }]\" data-index=\"4\" @click=\"choose('specified')\">\n"
+			},
+			{
+				"start": 2660,
+				"end": 2732,
+				"current": "\t/** 投稿に使用するアカウントのポリシー由来の、指定投稿の可否 */\n\tcanCreateSpecifiedNote?: boolean;\n",
+				"baseline": ""
+			},
+			{
+				"start": 2816,
+				"end": 2847,
+				"current": "\tcanCreateSpecifiedNote: true,\n",
+				"baseline": ""
+			},
+			{
+				"start": 3104,
+				"end": 3178,
+				"current": "\tif (visibility === 'specified' && !props.canCreateSpecifiedNote) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 3947,
+				"end": 4030,
+				"current": "\t&:disabled {\n\t\topacity: 0.8;\n\t\tcursor: not-allowed;\n\t}\n\n\t&:not(:disabled):hover {\n",
+				"baseline": "\t&:hover {\n"
+			},
+			{
+				"start": 4069,
+				"end": 4096,
+				"current": "\t&:not(:disabled):active {\n",
+				"baseline": "\t&:active {\n"
+			}
+		]
+	},
+	{
+		"file": "packages/features/notes/frontend/composables/use-note.ts",
+		"currentSha256": "78fa6cede05165e6dffc04c22be0a96a64214741a29b636a7cbdedf1d8678752",
+		"baselineSha256": "4001033df3294031aa0dd0b3befec79c9108818a0c366ae465fd4402da3b5231",
+		"edits": [
+			{
+				"start": 104,
+				"end": 141,
+				"current": "import { computed, ref } from 'vue';\n",
+				"baseline": "import { ref } from 'vue';\n"
+			},
+			{
+				"start": 6789,
+				"end": 7350,
+				"current": "\t// Only replies to another author add an implicit mention (as in NoteCreateService).\n\t// Explicit mentions and specified recipients are still checked at note creation.\n\tconst canReply = computed(() => $i == null || ($i.policies.canNote && (appearNote.userId === $i.id || $i.policies.mentionLimit >= 1)));\n\tconst canRenote = computed(() =>\n\t\t(['public', 'home'].includes(appearNote.visibility) || (appearNote.visibility === 'followers' && appearNote.userId === $i?.id)) &&\n\t\t($i == null || ($i.policies.canNote && $i.policies.renotePolicy !== 'disallow')),\n\t);\n",
+				"baseline": "\tconst canRenote = ['public', 'home'].includes(appearNote.visibility) || (appearNote.visibility === 'followers' && appearNote.userId === $i?.id);\n"
+			},
+			{
+				"start": 9718,
+				"end": 9749,
+				"current": "\t\tif (!canReply.value) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 15628,
+				"end": 15640,
+				"current": "\t\tcanReply,\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/notes/frontend/utility/get-note-menu.ts",
+		"currentSha256": "ca092a6002535b555f2974c98850a36dea405185d5867516689b90624c11a479",
+		"baselineSha256": "9083977d659098ba8ddaa99d76de6696a2be62629f108c53e2442be2d6dd994e",
+		"edits": [
+			{
+				"start": 18858,
+				"end": 18965,
+				"current": "\tif (!$i?.policies.canNote || $i?.policies.renotePolicy === 'disallow') {\n\t\treturn {\n\t\t\tmenu: [],\n\t\t};\n\t}\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 19200,
+				"end": 19228,
+				"current": "\t\tchannelRenoteItems.push({\n",
+				"baseline": "\t\tchannelRenoteItems.push(...[{\n"
+			},
+			{
+				"start": 19938,
+				"end": 20261,
+				"current": "\t\t});\n\n\t\tif ($i?.policies.renotePolicy === 'allow') {\n\t\t\tchannelRenoteItems.push({\n\t\t\t\ttext: FeatureLocaleMessages.$locale.inChannelQuote,\n\t\t\t\ticon: 'ti ti-quote',\n\t\t\t\taction: () => {\n\t\t\t\t\tif (!props.mock) {\n\t\t\t\t\t\tos.post({\n\t\t\t\t\t\t\trenote: appearNote,\n\t\t\t\t\t\t\tchannel: appearNote.channel!,\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t},\n\t\t\t});\n\t\t}\n",
+				"baseline": "\t\t}, {\n\t\t\ttext: FeatureLocaleMessages.$locale.inChannelQuote,\n\t\t\ticon: 'ti ti-quote',\n\t\t\taction: () => {\n\t\t\t\tif (!props.mock) {\n\t\t\t\t\tos.post({\n\t\t\t\t\t\trenote: appearNote,\n\t\t\t\t\t\tchannel: appearNote.channel,\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t}]);\n"
+			},
+			{
+				"start": 20337,
+				"end": 20364,
+				"current": "\t\tnormalRenoteItems.push({\n",
+				"baseline": "\t\tnormalRenoteItems.push(...[{\n"
+			},
+			{
+				"start": 20902,
+				"end": 21148,
+				"current": "\t\t\t\tconst configuredLocalOnly = prefer.s.rememberNoteVisibility ? store.s.localOnly : prefer.s.defaultNoteLocalOnly;\n\t\t\t\t// 連合が許可されていないなら、設定に関わらずローカルのみにする\n\t\t\t\tconst localOnly = $i?.policies.canFederateNote === false ? true : configuredLocalOnly;\n",
+				"baseline": "\t\t\t\tconst localOnly = prefer.s.rememberNoteVisibility ? store.s.localOnly : prefer.s.defaultNoteLocalOnly;\n"
+			},
+			{
+				"start": 21649,
+				"end": 21906,
+				"current": "\t\t});\n\n\t\tif (!props.mock && $i?.policies.renotePolicy === 'allow') {\n\t\t\tnormalRenoteItems.push({\n\t\t\t\ttext: FeatureLocaleMessages.$locale.quote,\n\t\t\t\ticon: 'ti ti-quote',\n\t\t\t\taction: () => {\n\t\t\t\t\tos.post({\n\t\t\t\t\t\trenote: appearNote,\n\t\t\t\t\t});\n\t\t\t\t},\n\t\t\t});\n\t\t}\n",
+				"baseline": "\t\t}, ...(props.mock ? [] : [{\n\t\t\ttext: FeatureLocaleMessages.$locale.quote,\n\t\t\ticon: 'ti ti-quote',\n\t\t\taction: () => {\n\t\t\t\tos.post({\n\t\t\t\t\trenote: appearNote,\n\t\t\t\t});\n\t\t\t},\n\t\t}])]);\n"
+			}
+		]
+	},
+	{
+		"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+		"currentSha256": "5d7c05838c197a0a43aabd8c9ef6823504672b4f16d1102a64537625bb115dd0",
+		"baselineSha256": "671e99e15eb3258afb4c78a4d3b09aa88d968e751fa5a16b0d036d43041ffd76",
+		"edits": [
+			{
+				"start": 22986,
+				"end": 26378,
+				"current": "\n\t\t<XFolder v-if=\"matchQuery([PostingPolicyMessages.$locale.canNote, 'canNote'])\" v-model:policyMeta=\"policyMetaModel.canNote\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ PostingPolicyMessages.$locale.canNote }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canNote ? $locale.sfc.yes : $locale.sfc.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canNote\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n\n\t\t<XFolder v-if=\"matchQuery([PostingPolicyMessages.$locale.renotePolicy, 'renotePolicy'])\" v-model:policyMeta=\"policyMetaModel.renotePolicy\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ PostingPolicyMessages.$locale.renotePolicy }}</template>\n\t\t\t<template #valueText>{{ valuesModel.renotePolicy === 'allow' ? PostingPolicyMessages.$locale.renotePolicy_allow : valuesModel.renotePolicy === 'renoteOnly' ? PostingPolicyMessages.$locale.renotePolicy_renoteOnly : PostingPolicyMessages.$locale.renotePolicy_disallow }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSelect\n\t\t\t\t\tv-model=\"valuesModel.renotePolicy\"\n\t\t\t\t\t:disabled=\"disabled\"\n\t\t\t\t\t:items=\"[\n\t\t\t\t\t\t{ label: PostingPolicyMessages.$locale.renotePolicy_allow, value: 'allow' },\n\t\t\t\t\t\t{ label: PostingPolicyMessages.$locale.renotePolicy_renoteOnly, value: 'renoteOnly' },\n\t\t\t\t\t\t{ label: PostingPolicyMessages.$locale.renotePolicy_disallow, value: 'disallow' },\n\t\t\t\t\t]\"\n\t\t\t\t>\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSelect>\n\t\t\t</template>\n\t\t</XFolder>\n\n\t\t<XFolder v-if=\"matchQuery([PostingPolicyMessages.$locale.canCreateSpecifiedNote, 'canCreateSpecifiedNote'])\" v-model:policyMeta=\"policyMetaModel.canCreateSpecifiedNote\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ PostingPolicyMessages.$locale.canCreateSpecifiedNote }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canCreateSpecifiedNote ? $locale.sfc.yes : $locale.sfc.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canCreateSpecifiedNote\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n\n\t\t<XFolder v-if=\"matchQuery([PostingPolicyMessages.$locale.canFederateNote, 'canFederateNote'])\" v-model:policyMeta=\"policyMetaModel.canFederateNote\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ PostingPolicyMessages.$locale.canFederateNote }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canFederateNote ? $locale.sfc.yes : $locale.sfc.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canFederateNote\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n\n\t\t<XFolder v-if=\"matchQuery([PostingPolicyMessages.$locale.noteFilesLimit, 'noteFilesLimit'])\" v-model:policyMeta=\"policyMetaModel.noteFilesLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ PostingPolicyMessages.$locale.noteFilesLimit }}</template>\n\t\t\t<template #valueText>{{ valuesModel.noteFilesLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.noteFilesLimit\" type=\"number\" :disabled=\"disabled\" :max=\"MAX_NOTE_ATTACHMENTS\" :min=\"0\"/>\n\t\t\t</template>\n\t\t</XFolder>\n",
+				"baseline": ""
+			},
+			{
+				"start": 26720,
+				"end": 26873,
+				"current": "import { MAX_NOTE_ATTACHMENTS } from '@features/notes/shared';\nimport PostingPolicyMessages from '@features/notes/frontend/posting-policy-messages.vue';\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/ui/frontend/os.ts",
+		"currentSha256": "da5738ab1f7e3cd04291424d1e3a2f494f35f15f110a886f2a2cd09d3e118d2a",
+		"baselineSha256": "2c7c5e6c69b2449a779e6828b43e3e4df9788a411614b4b2b7570844551400ba",
+		"edits": [
+			{
+				"start": 2539,
+				"end": 2706,
+				"current": "export type ApiWithDialogCustomErrors = Record<string, { title?: string; text: string; }> | ((err: Misskey.api.APIError) => { title?: string; text: string; } | null);\n",
+				"baseline": "export type ApiWithDialogCustomErrors = Record<string, { title?: string; text: string; }>;\n"
+			},
+			{
+				"start": 4758,
+				"end": 4972,
+				"current": "\t\t} else if (customErrors != null) {\n\t\t\tconst result = typeof customErrors === 'function' ? customErrors(err) : customErrors[err.id];\n\t\t\tif (result != null) {\n\t\t\t\ttitle = result.title;\n\t\t\t\ttext = result.text;\n\t\t\t}\n",
+				"baseline": "\t\t} else if (customErrors && customErrors[err.id] != null) {\n\t\t\ttitle = customErrors[err.id].title;\n\t\t\ttext = customErrors[err.id].text;\n"
+			}
+		]
+	}
+]

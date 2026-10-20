@@ -5,6 +5,7 @@
 
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { restorePostingRoleBaseline } from './posting-role-source-rebase.js';
 import { resolve } from 'node:path';
 import { expect, test } from 'vitest';
 import rebases from './upstream-common-utilities-source-rebase.json';
@@ -14,7 +15,7 @@ const root = resolve(import.meta.dirname, '../../../..');
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 test.each(rebases)('$file restores the frozen body and rejects any unreviewed body or locale edit', proof => {
-	const source = readFileSync(resolve(root, proof.currentFile), 'utf8');
+	const source = restorePostingRoleBaseline(proof.currentFile, readFileSync(resolve(root, proof.currentFile), 'utf8'));
 	const restored = restoreCommonUtilitiesBaseline(proof.file, source);
 	const localeStart = restored.search(/<locale\s/);
 	const body = localeStart < 0 ? restored : restored.slice(0, localeStart);
