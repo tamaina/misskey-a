@@ -23,6 +23,10 @@ import type { UserKeypairsRepository } from '@features/persistence/backend/repos
 import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
+import { StatusError } from '@features/runtime/backend/http/status-error.js';
+import { RemoteUserResolveService } from '../../backend/services/RemoteUserResolveService.js';
+import { Resolver } from '../../backend/services/ApResolverService.js';
+import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 
 const rsa = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const ed = generateKeyPairSync('ed25519');
@@ -32,6 +36,12 @@ const actorId = 'https://local.example/users/alice';
 const target = 'https://remote.example:8443/inbox?cursor=1';
 const activity = { id: `${actorId}/activities/1`, type: 'Update', actor: actorId, object: { id: actorId, type: 'Person', name: 'Alice あ' } };
 type SentRequest = { method: string; headers: Record<string, string>; body?: string };
+
+function responseAt(body: string, contentType = 'application/activity+json', url = target) {
+	const response = new Response(body, { headers: { 'content-type': contentType } });
+	Object.defineProperty(response, 'url', { value: url });
+	return response;
+}
 
 function requestFixture(withEd = true) {
 	const entity = new MiUserKeypair({
@@ -73,6 +83,124 @@ function assertSignature(request: SentRequest, useEd: boolean) {
 }
 
 describe('Ed sending policy', () => {
+	test.each([401, 403])('cold users/show resolution recovers from an Ed key discovery rejection (%s)', async status => {
+		const fixture = requestFixture();
+		const remoteUser = mock<MiRemoteUser>({ id: 'remote-alice', uri: target, lastFetchedAt: new Date() });
+		let cached: MiRemoteUser | null = null;
+		const order: string[] = [];
+		// Model a peer whose inbox supports Ed, but whose authenticated GET
+		// verifier can bootstrap only the legacy publicKey until it caches assertionMethod.
+		fixture.send.mockImplementation(async (_url, request) => {
+			const parsed = parseRequestSignature({ url: target, ...request, headers: { ...request.headers, host: new URL(target).host } });
+			if (parsed.version !== 'draft') throw new Error('Expected draft signature');
+			const useEd = parsed.value.keyId === `${actorId}#ed25519-key`;
+			order.push(useEd ? 'GET Ed' : 'GET RSA');
+			assertSignature(request, useEd);
+			if (useEd) throw new StatusError('signer key unavailable during Actor discovery', status);
+			const response = responseAt(JSON.stringify({ '@context': 'https://www.w3.org/ns/activitystreams', id: target, type: 'Person' }));
+			return response;
+		});
+		const utility = {
+			toPuny: (host: string) => host, isUriLocal: () => false,
+			extractDbHost: (url: string) => new URL(url).hostname,
+			isSelfHost: () => false, isFederationAllowedHost: () => true,
+		};
+		const resolver: Resolver = Object.assign(Object.create(Resolver.prototype), {
+			history: new Set(), recursionLimit: 256, meta: { signToActivityPubGet: true }, utilityService: utility,
+			systemAccountService: { fetch: async () => ({ id: 'alice' }) }, apRequestService: fixture.service,
+			federatedInstanceService: { fetch: async () => ({ httpMessageSignaturesImplementationLevel: '02' }) },
+		});
+		const resolve: RemoteUserResolveService = Object.assign(Object.create(RemoteUserResolveService.prototype), {
+			config: { host: 'local.example' }, utilityService: utility, logger: mock<Logger>(),
+			usersRepository: { findOneBy: async () => cached },
+			webfingerService: { webfinger: async () => { order.push('WebFinger'); return { links: [{ rel: 'self', href: target }] }; } },
+			apPersonService: { createPerson: async (uri: string) => {
+				await resolver.resolve(uri);
+				order.push('save Actor and keys');
+				cached = remoteUser;
+				return remoteUser;
+			} },
+		});
+		try {
+			// users/show maps a rejection from this exact service to FAILED_TO_RESOLVE_REMOTE_USER.
+			await expect(resolve.resolveUser('alice', 'remote.example')).resolves.toBe(remoteUser);
+			expect(order).toEqual(['WebFinger', 'GET Ed', 'GET RSA', 'save Actor and keys']);
+			await expect(resolve.resolveUser('alice', 'remote.example')).resolves.toBe(remoteUser);
+			expect(fixture.send).toHaveBeenCalledTimes(2);
+		} finally { fixture.keys.dispose(); }
+	});
+
+	test.each([400, 404, 429, 500])('does not retry Ed GET on unrelated HTTP status %s', async status => {
+		const fixture = requestFixture();
+		const failure = new StatusError('failed', status);
+		fixture.send.mockRejectedValue(failure);
+		try {
+			await expect(fixture.service.signedGet(target, { id: 'alice' }, FetchAllowSoftFailMask.Strict, false, '02')).rejects.toBe(failure);
+			expect(fixture.send).toHaveBeenCalledOnce();
+		} finally { fixture.keys.dispose(); }
+	});
+
+	test.each(['00', '02'])('does not retry an RSA authentication failure (level %s)', async level => {
+		const fixture = requestFixture(false);
+		const failure = new StatusError('forbidden', 403);
+		fixture.send.mockRejectedValue(failure);
+		try {
+			await expect(fixture.service.signedGet(target, { id: 'alice' }, FetchAllowSoftFailMask.Strict, false, level)).rejects.toBe(failure);
+			expect(fixture.send).toHaveBeenCalledOnce();
+		} finally { fixture.keys.dispose(); }
+	});
+
+	test('propagates the RSA rejection after a single Ed authentication fallback', async () => {
+		const fixture = requestFixture();
+		const failure = new StatusError('forbidden', 403);
+		fixture.send.mockRejectedValue(failure);
+		try {
+			await expect(fixture.service.signedGet(target, { id: 'alice' }, FetchAllowSoftFailMask.Strict, false, '02')).rejects.toBe(failure);
+			expect(fixture.send).toHaveBeenCalledTimes(2);
+			assertSignature(fixture.send.mock.calls[0][1], true);
+			assertSignature(fixture.send.mock.calls[1][1], false);
+		} finally { fixture.keys.dispose(); }
+	});
+
+	test('does not retry a transport failure or a POST authentication rejection', async () => {
+		const fixture = requestFixture();
+		try {
+			const failure = new Error('connection reset');
+			fixture.send.mockRejectedValueOnce(failure);
+			await expect(fixture.service.signedGet(target, { id: 'alice' }, FetchAllowSoftFailMask.Strict, false, '02')).rejects.toBe(failure);
+			const forbidden = new StatusError('forbidden', 403);
+			fixture.send.mockRejectedValueOnce(forbidden);
+			await expect(fixture.service.signedPost({ id: 'alice' }, target, activity, undefined, { level: '02' })).rejects.toBe(forbidden);
+			expect(fixture.send).toHaveBeenCalledTimes(2);
+		} finally { fixture.keys.dispose(); }
+	});
+
+	test.each(['content-type', 'id'])('validates the RSA fallback response %s', async invalid => {
+		const fixture = requestFixture();
+		fixture.send.mockRejectedValueOnce(new StatusError('forbidden', 403));
+		fixture.send.mockResolvedValueOnce(responseAt(JSON.stringify({ id: invalid === 'id' ? 'https://other.example/actor' : target }), invalid === 'content-type' ? 'text/plain' : 'application/activity+json'));
+		try {
+			await expect(fixture.service.signedGet(target, { id: 'alice' }, FetchAllowSoftFailMask.Strict, false, '02')).rejects.toThrow();
+			expect(fixture.send).toHaveBeenCalledTimes(2);
+		} finally { fixture.keys.dispose(); }
+	});
+
+	test('keeps RSA for an HTML alternate after authentication fallback', async () => {
+		const fixture = requestFixture();
+		const alternate = 'https://remote.example:8443/actor';
+		fixture.send.mockRejectedValueOnce(new StatusError('forbidden', 401));
+		fixture.send.mockResolvedValueOnce(responseAt(`<html><head><link rel="alternate" type="application/activity+json" href="${alternate}"></head></html>`, 'text/html'));
+		fixture.send.mockResolvedValueOnce(responseAt(JSON.stringify({ id: alternate }), 'application/activity+json', alternate));
+		Object.defineProperty(fixture.service, 'utilityService', { value: { punyHost: (url: string) => new URL(url).hostname } });
+		try {
+			await expect(fixture.service.signedGet(target, { id: 'alice' }, FetchAllowSoftFailMask.Strict, true, '02')).resolves.toEqual({ id: alternate });
+			expect(fixture.send).toHaveBeenCalledTimes(3);
+			expect(fixture.send.mock.calls.map(([, request]) => request.headers.signature)).toEqual([
+				expect.stringContaining(`${actorId}#ed25519-key`), expect.stringContaining(`${actorId}#main-key`), expect.stringContaining(`${actorId}#main-key`),
+			]);
+		} finally { fixture.keys.dispose(); }
+	});
+
 	test.each(['00', '01', '02', '10', '11', '12', 'x2', 'ed25519', 2, null, undefined])('GET and POST use Ed only for recognized draft marker 02: %s', async level => {
 		const fixture = requestFixture();
 		try {
@@ -172,7 +300,7 @@ describe('HTTP signature capability metadata', () => {
 	});
 });
 
-test('native RSA and Ed GET/POST signatures survive real loopback HTTP transport', async () => {
+test('native RSA and Ed GET/POST signatures and GET authentication fallback survive real loopback HTTP transport', async () => {
 	const fixture = requestFixture();
 	const http = new HttpRequestService(mock<Config>({ userAgent: 'ed-sending-policy-test', proxy: undefined, outgoingAddress: undefined, deliverJobConcurrency: 1, proxyBypassHosts: [], allowedPrivateNetworks: [] }));
 	Object.defineProperty(fixture.service, 'httpRequestService', { value: http });
@@ -195,6 +323,7 @@ test('native RSA and Ed GET/POST signatures survive real loopback HTTP transport
 		}
 		received.push({ method: request.method, keyId: parsed.value.keyId, body: request.body });
 		if (request.method === 'POST') return reply.code(202).send();
+		if (request.url.includes('bootstrap=1') && isEd) return reply.code(403).send();
 		return reply.type('application/activity+json').send({ id: `http://${request.headers.host}${request.url}`, type: 'Person' });
 	} });
 	try {
@@ -208,7 +337,9 @@ test('native RSA and Ed GET/POST signatures survive real loopback HTTP transport
 		}
 		await fixture.service.signedPost({ id: 'alice' }, url, activity, undefined, { level: '02', forceMainKey: true });
 		expect(received.at(-1)?.keyId).toBe(`${actorId}#main-key`);
-		expect(received).toHaveLength(9);
+		await expect(fixture.service.signedGet(`${origin}/inbox?bootstrap=1`, { id: 'alice' }, FetchAllowSoftFailMask.Strict, false, '02')).resolves.toMatchObject({ type: 'Person' });
+		expect(received.slice(-2).map(value => value.keyId)).toEqual([`${actorId}#ed25519-key`, `${actorId}#main-key`]);
+		expect(received).toHaveLength(11);
 	} finally {
 		http.httpAgent.destroy();
 		http.httpsAgent.destroy();

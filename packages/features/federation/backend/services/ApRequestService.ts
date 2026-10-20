@@ -8,6 +8,7 @@ import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
 import * as htmlParser from 'node-html-parser';
 import type { CustomSigningKey } from '@misskey-dev/node-http-message-signatures';
+import type { Response } from 'node-fetch';
 import { parseHttpSignatureImplementationLevel } from '../protocol/misc/http-signature-capabilities.js';
 import { signAsDraftToRequest } from '@misskey-dev/node-http-message-signatures';
 import { DI } from '@/di-symbols.js';
@@ -16,6 +17,7 @@ import type { MiUser } from '@features/users/backend/models/User.js';
 import { UserKeypairService } from './UserKeypairService.js';
 import { UtilityService } from './UtilityService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
@@ -173,12 +175,22 @@ export class ApRequestService {
 			},
 		});
 
-		const res = await this.httpRequestService.send(url, {
-			method: req.request.method,
-			headers: req.request.headers,
-		}, {
-			throwErrorWhenResponseNotOk: true,
-		});
+		let res: Response;
+		try {
+			res = await this.httpRequestService.send(url, {
+				method: req.request.method,
+				headers: req.request.headers,
+			}, {
+				throwErrorWhenResponseNotOk: true,
+			});
+		} catch (err) {
+			// Inbox capability does not guarantee that authenticated GET can discover
+			// an uncached assertionMethod key. Bootstrap with the legacy RSA publicKey.
+			if (key.algorithm.name === 'Ed25519' && err instanceof StatusError && (err.statusCode === 401 || err.statusCode === 403)) {
+				return await this.signedGet(url, user, allowSoftfail, followAlternate, '00');
+			}
+			throw err;
+		}
 
 		//#region リクエスト先がhtmlかつactivity+jsonへのalternate linkタグがあるとき
 		const contentType = res.headers.get('content-type');
