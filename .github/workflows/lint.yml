@@ -8,6 +8,7 @@ on:
     paths:
       - packages/backend/**
       - packages/features/mcp/**
+      - packages/features/relationships/**
       - packages/frontend/**
       - packages/features/auth/frontend/**
       - packages/features/auth/test/frontend/**
@@ -29,6 +30,7 @@ on:
     paths:
       - packages/backend/**
       - packages/features/mcp/**
+      - packages/features/relationships/**
       - packages/frontend/**
       - packages/features/auth/frontend/**
       - packages/features/auth/test/frontend/**
