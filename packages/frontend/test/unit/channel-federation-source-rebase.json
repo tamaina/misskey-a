@@ -85,5 +85,234 @@
 				"baseline": "\t\tif (($i && $i.id === channel.value.userId) || iAmModerator) {\n"
 			}
 		]
+	},
+	{
+		"file": "packages/features/channels/frontend/pages/channels.vue",
+		"currentSha256": "a1db97ea0e8f73094136ea1e9428c86c6a4ff87115f9d27abeb7115f57e8907a",
+		"baselineSha256": "52c58c290e4b67682b4c3e06ec86b41ec5fc93e9a0aca9a82213cb040791c52a",
+		"edits": [
+			{
+				"start": 261,
+				"end": 504,
+				"current": "\t\t<MkTab\n\t\t\tv-if=\"tab === 'featured' || tab === 'search'\"\n\t\t\tv-model=\"origin\"\n\t\t\t:tabs=\"[\n\t\t\t\t{ key: 'local', label: $locale.sfc.local },\n\t\t\t\t{ key: 'remote', label: $locale.sfc.remote },\n\t\t\t]\"\n\t\t\tstyle=\"margin-bottom: var(--MI-margin);\"\n\t\t/>\n",
+				"baseline": ""
+			},
+			{
+				"start": 1367,
+				"end": 1447,
+				"current": "\t\t\t<MkPagination :key=\"origin\" v-slot=\"{items}\" :paginator=\"featuredPaginator\">\n",
+				"baseline": "\t\t\t<MkPagination v-slot=\"{items}\" :paginator=\"featuredPaginator\">\n"
+			},
+			{
+				"start": 2635,
+				"end": 2711,
+				"current": "import { computed, markRaw, onMounted, ref, shallowRef, watch } from 'vue';\n",
+				"baseline": "import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';\n"
+			},
+			{
+				"start": 2967,
+				"end": 3031,
+				"current": "import MkTab from '@features/ui/frontend/components/MkTab.vue';\n",
+				"baseline": ""
+			},
+			{
+				"start": 3792,
+				"end": 3841,
+				"current": "const origin = ref<'local' | 'remote'>('local');\n",
+				"baseline": ""
+			},
+			{
+				"start": 4087,
+				"end": 4173,
+				"current": "const featuredPaginator = computed(() => markRaw(new Paginator('channels/featured', {\n",
+				"baseline": "const featuredPaginator = markRaw(new Paginator('channels/featured', {\n"
+			},
+			{
+				"start": 4202,
+				"end": 4309,
+				"current": "\tparams: { origin: origin.value },\n})));\n\nwatch(origin, () => {\n\tif (channelPaginator.value) search();\n});\n",
+				"baseline": "}));\n"
+			},
+			{
+				"start": 5018,
+				"end": 5043,
+				"current": "\t\t\torigin: origin.value,\n",
+				"baseline": ""
+			},
+			{
+				"start": 5055,
+				"end": 5113,
+				"current": "\tkey.value = JSON.stringify([origin.value, query, type]);\n",
+				"baseline": "\tkey.value = query + type;\n"
+			},
+			{
+				"start": 5945,
+				"end": 5985,
+				"current": "\t\"local\": \"المحلي\",\n\t\"remote\": \"بُعدي\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 6308,
+				"end": 6347,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remot\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 6673,
+				"end": 6717,
+				"current": "\t\"local\": \"Lokální\",\n\t\"remote\": \"Vzdálené\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 7050,
+				"end": 7090,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 7418,
+				"end": 7457,
+				"current": "\t\"local\": \"Lokal\",\n\t\"remote\": \"Fremd\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 7787,
+				"end": 7827,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 8155,
+				"end": 8195,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remoto\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 8534,
+				"end": 8575,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Distant\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 8917,
+				"end": 8957,
+				"current": "\t\"local\": \"Lokal\",\n\t\"remote\": \"Remote\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 9279,
+				"end": 9320,
+				"current": "\t\"local\": \"Locale\",\n\t\"remote\": \"Remota\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 9669,
+				"end": 9706,
+				"current": "\t\"local\": \"ローカル\",\n\t\"remote\": \"リモート\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 9978,
+				"end": 10015,
+				"current": "\t\"local\": \"ローカル\",\n\t\"remote\": \"リモート\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 10297,
+				"end": 10337,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 10663,
+				"end": 10703,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 11034,
+				"end": 11068,
+				"current": "\t\"local\": \"로컬\",\n\t\"remote\": \"리모트\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 11336,
+				"end": 11377,
+				"current": "\t\"local\": \"Lokaal\",\n\t\"remote\": \"Remote\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 11724,
+				"end": 11764,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 12086,
+				"end": 12128,
+				"current": "\t\"local\": \"Lokalne\",\n\t\"remote\": \"Zdalny\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 12461,
+				"end": 12501,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remoto\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 12828,
+				"end": 12885,
+				"current": "\t\"local\": \"С этого сайта\",\n\t\"remote\": \"С других сайтов\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 13225,
+				"end": 13270,
+				"current": "\t\"local\": \"Lokálne\",\n\t\"remote\": \"Vzdialené\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 13604,
+				"end": 13648,
+				"current": "\t\"local\": \"ท้องถิ่น\",\n\t\"remote\": \"ระยะไกล\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 13967,
+				"end": 14005,
+				"current": "\t\"local\": \"Yerel\",\n\t\"remote\": \"Uzak\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 14345,
+				"end": 14385,
+				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 14713,
+				"end": 14759,
+				"current": "\t\"local\": \"Локальні\",\n\t\"remote\": \"Віддалені\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 15086,
+				"end": 15138,
+				"current": "\t\"local\": \"Máy chủ này\",\n\t\"remote\": \"Máy chủ khác\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 15479,
+				"end": 15512,
+				"current": "\t\"local\": \"本地\",\n\t\"remote\": \"远程\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 15773,
+				"end": 15806,
+				"current": "\t\"local\": \"本地\",\n\t\"remote\": \"遠端\",\n",
+				"baseline": ""
+			}
+		]
 	}
 ]

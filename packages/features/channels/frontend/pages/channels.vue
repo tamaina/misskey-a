@@ -6,6 +6,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs" :swipable="true">
 	<div class="_spacer" style="--MI_SPACER-w: 1200px;">
+		<MkTab
+			v-if="tab === 'featured' || tab === 'search'"
+			v-model="origin"
+			:tabs="[
+				{ key: 'local', label: $locale.sfc.local },
+				{ key: 'remote', label: $locale.sfc.remote },
+			]"
+			style="margin-bottom: var(--MI-margin);"
+		/>
 		<div v-if="tab === 'search'" :class="$style.searchRoot">
 			<div class="_gaps">
 				<MkInput v-model="searchQuery" :large="true" :autofocus="true" type="search" @enter="search">
@@ -29,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFoldableSection>
 		</div>
 		<div v-if="tab === 'featured'">
-			<MkPagination v-slot="{items}" :paginator="featuredPaginator">
+			<MkPagination :key="origin" v-slot="{items}" :paginator="featuredPaginator">
 				<div :class="$style.root">
 					<MkChannelPreview v-for="channel in items" :key="channel.id" :channel="channel"/>
 				</div>
@@ -62,10 +71,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';
+import { computed, markRaw, onMounted, ref, shallowRef, watch } from 'vue';
 import MkChannelPreview from '@features/channels/frontend/components/MkChannelPreview.vue';
 import MkChannelList from '@features/channels/frontend/components/MkChannelList.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkTab from '@features/ui/frontend/components/MkTab.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -86,6 +96,7 @@ const props = defineProps<{
 
 const key = ref('');
 const tab = ref('featured');
+const origin = ref<'local' | 'remote'>('local');
 const searchQuery = ref('');
 const searchType = ref<SearchType>('nameAndDescription');
 const channelPaginator = shallowRef();
@@ -95,10 +106,15 @@ onMounted(() => {
 	searchType.value = props.type ?? 'nameAndDescription';
 });
 
-const featuredPaginator = markRaw(new Paginator('channels/featured', {
+const featuredPaginator = computed(() => markRaw(new Paginator('channels/featured', {
 	limit: 10,
 	noPaging: true,
-}));
+	params: { origin: origin.value },
+})));
+
+watch(origin, () => {
+	if (channelPaginator.value) search();
+});
 const favoritesPaginator = markRaw(new Paginator('channels/my-favorites', {
 	limit: 100,
 	noPaging: true,
@@ -127,10 +143,11 @@ async function search() {
 		params: {
 			query: searchQuery.value,
 			type: type,
+			origin: origin.value,
 		},
 	}));
 
-	key.value = query + type;
+	key.value = JSON.stringify([origin.value, query, type]);
 }
 
 const headerActions = computed(() => []);
@@ -179,6 +196,8 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
+	"local": "المحلي",
+	"remote": "بُعدي",
 	"search": "البحث",
 	"featured": "المتداوَلة",
 	"favorites": "المفضلات",
@@ -194,6 +213,8 @@ definePage(() => ({
 
 <locale locale="ca-ES" lang="json">
 {
+	"local": "Local",
+	"remote": "Remot",
 	"search": "Cercar",
 	"featured": "Popular",
 	"favorites": "Favorits",
@@ -209,6 +230,8 @@ definePage(() => ({
 
 <locale locale="cs-CZ" lang="json">
 {
+	"local": "Lokální",
+	"remote": "Vzdálené",
 	"search": "Vyhledávání",
 	"featured": "Trendy",
 	"favorites": "Oblíbené",
@@ -224,6 +247,8 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"search": "Search",
 	"featured": "Trending",
 	"favorites": "Favorites",
@@ -239,6 +264,8 @@ definePage(() => ({
 
 <locale locale="de-DE" lang="json">
 {
+	"local": "Lokal",
+	"remote": "Fremd",
 	"search": "Suchen",
 	"featured": "Trends",
 	"favorites": "Favoriten",
@@ -254,6 +281,8 @@ definePage(() => ({
 
 <locale locale="en-US" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"search": "Search",
 	"featured": "Trending",
 	"favorites": "Favorites",
@@ -269,6 +298,8 @@ definePage(() => ({
 
 <locale locale="es-ES" lang="json">
 {
+	"local": "Local",
+	"remote": "Remoto",
 	"search": "Buscar",
 	"featured": "Tendencias",
 	"favorites": "Favoritos",
@@ -284,6 +315,8 @@ definePage(() => ({
 
 <locale locale="fr-FR" lang="json">
 {
+	"local": "Local",
+	"remote": "Distant",
 	"search": "Rechercher",
 	"featured": "Tendances",
 	"favorites": "Favoris",
@@ -299,6 +332,8 @@ definePage(() => ({
 
 <locale locale="id-ID" lang="json">
 {
+	"local": "Lokal",
+	"remote": "Remote",
 	"search": "Cari",
 	"featured": "Tren",
 	"favorites": "Favorit",
@@ -314,6 +349,8 @@ definePage(() => ({
 
 <locale locale="it-IT" lang="json">
 {
+	"local": "Locale",
+	"remote": "Remota",
 	"search": "Cerca",
 	"featured": "Popolari nel canale",
 	"favorites": "Preferiti",
@@ -329,6 +366,8 @@ definePage(() => ({
 
 <locale locale="ja-JP" lang="json">
 {
+	"local": "ローカル",
+	"remote": "リモート",
 	"search": "検索",
 	"featured": "トレンド",
 	"favorites": "お気に入り",
@@ -344,6 +383,8 @@ definePage(() => ({
 
 <locale locale="ja-KS" lang="json">
 {
+	"local": "ローカル",
+	"remote": "リモート",
 	"search": "探す",
 	"featured": "トレンド",
 	"favorites": "お気に入り",
@@ -359,6 +400,8 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"search": "Nadi",
 	"featured": "Trending",
 	"favorites": "Favorites",
@@ -374,6 +417,8 @@ definePage(() => ({
 
 <locale locale="kn-IN" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"search": "ಹುಡುಕು",
 	"featured": "Trending",
 	"favorites": "ಮೆಚ್ಚಿನವುಗಳು",
@@ -389,6 +434,8 @@ definePage(() => ({
 
 <locale locale="ko-KR" lang="json">
 {
+	"local": "로컬",
+	"remote": "리모트",
 	"search": "검색",
 	"featured": "트렌드",
 	"favorites": "즐겨찾기",
@@ -404,6 +451,8 @@ definePage(() => ({
 
 <locale locale="nl-NL" lang="json">
 {
+	"local": "Lokaal",
+	"remote": "Remote",
 	"search": "Zoeken",
 	"featured": "Trending",
 	"favorites": "Toevoegen aan favorieten",
@@ -419,6 +468,8 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"search": "Søk",
 	"featured": "Populært",
 	"favorites": "Favoritter",
@@ -434,6 +485,8 @@ definePage(() => ({
 
 <locale locale="pl-PL" lang="json">
 {
+	"local": "Lokalne",
+	"remote": "Zdalny",
 	"search": "Szukaj",
 	"featured": "Na czasie",
 	"favorites": "Ulubione",
@@ -449,6 +502,8 @@ definePage(() => ({
 
 <locale locale="pt-PT" lang="json">
 {
+	"local": "Local",
+	"remote": "Remoto",
 	"search": "Pesquisar",
 	"featured": "Destaques",
 	"favorites": "Favoritos",
@@ -464,6 +519,8 @@ definePage(() => ({
 
 <locale locale="ru-RU" lang="json">
 {
+	"local": "С этого сайта",
+	"remote": "С других сайтов",
 	"search": "Поиск",
 	"featured": "Актуальные",
 	"favorites": "Избранное",
@@ -479,6 +536,8 @@ definePage(() => ({
 
 <locale locale="sk-SK" lang="json">
 {
+	"local": "Lokálne",
+	"remote": "Vzdialené",
 	"search": "Hľadať",
 	"featured": "Trendy",
 	"favorites": "Obľúbené",
@@ -494,6 +553,8 @@ definePage(() => ({
 
 <locale locale="th-TH" lang="json">
 {
+	"local": "ท้องถิ่น",
+	"remote": "ระยะไกล",
 	"search": "ค้นหา",
 	"featured": "เทรนด์",
 	"favorites": "รายการโปรด",
@@ -509,6 +570,8 @@ definePage(() => ({
 
 <locale locale="tr-TR" lang="json">
 {
+	"local": "Yerel",
+	"remote": "Uzak",
 	"search": "Ara",
 	"featured": "Trend olan",
 	"favorites": "Favoriler",
@@ -524,6 +587,8 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"search": "ئىزدەش",
 	"featured": "Trending",
 	"favorites": "Favorites",
@@ -539,6 +604,8 @@ definePage(() => ({
 
 <locale locale="uk-UA" lang="json">
 {
+	"local": "Локальні",
+	"remote": "Віддалені",
 	"search": "Пошук",
 	"featured": "Тренди",
 	"favorites": "Обране",
@@ -554,6 +621,8 @@ definePage(() => ({
 
 <locale locale="vi-VN" lang="json">
 {
+	"local": "Máy chủ này",
+	"remote": "Máy chủ khác",
 	"search": "Tìm kiếm",
 	"featured": "Xu hướng",
 	"favorites": "Lượt thích",
@@ -569,6 +638,8 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
+	"local": "本地",
+	"remote": "远程",
 	"search": "搜索",
 	"featured": "热门",
 	"favorites": "收藏",
@@ -584,6 +655,8 @@ definePage(() => ({
 
 <locale locale="zh-TW" lang="json">
 {
+	"local": "本地",
+	"remote": "遠端",
 	"search": "搜尋",
 	"featured": "熱門貼文",
 	"favorites": "我的最愛",

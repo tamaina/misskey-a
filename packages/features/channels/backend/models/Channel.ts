@@ -8,6 +8,12 @@ import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 
+// Each active origin has an ID cursor index and an activity-order index.
+// PostgreSQL scans the ascending btrees backwards for DESC/DESC trending queries.
+@Index('IDX_channel_active_local_id', ['id'], { where: '"isArchived" = false AND "host" IS NULL' })
+@Index('IDX_channel_active_remote_id', ['id'], { where: '"isArchived" = false AND "host" IS NOT NULL' })
+@Index('IDX_channel_active_local_activity', ['lastNotedAt', 'id'], { where: '"isArchived" = false AND "host" IS NULL AND "lastNotedAt" IS NOT NULL' })
+@Index('IDX_channel_active_remote_activity', ['lastNotedAt', 'id'], { where: '"isArchived" = false AND "host" IS NOT NULL AND "lastNotedAt" IS NOT NULL' })
 @Entity('channel')
 export class MiChannel {
 	@PrimaryColumn(id())

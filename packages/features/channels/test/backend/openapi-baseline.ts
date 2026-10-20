@@ -14,6 +14,18 @@ export function restoreChannelFederationOpenapiBaseline<T extends { paths?: Reco
 	// Normalize exactly as the frozen hash oracle does; preserve the caller's specification.
 	const restored = JSON.parse(JSON.stringify(spec)) as T;
 	const counts = { input: 0, channel: 0, noteChannel: 0, error: 0 };
+	// Exploration adds exactly one optional enum in each input representation.
+	// Keep all existing frozen schemas and hashes after reversing these four fields.
+	for (const name of ['/channels/featured', '/channels/search']) {
+		const operation = restored.paths?.[name] as { post: { requestBody: { content: { 'application/json': { schema: Record<string, unknown> } } } } };
+		const schema = operation.post.requestBody.content['application/json'].schema;
+		for (const input of [schema, (schema.allOf as Record<string, unknown>[])[0]]) {
+			ok(record(input.properties));
+			deepStrictEqual(input.properties.origin, { enum: ['local', 'remote'], type: 'string' }, `${name}: exploration origin differs`);
+			ok(!Array.isArray(input.required) || !input.required.includes('origin'), `${name}: origin must remain optional`);
+			delete input.properties.origin;
+		}
+	}
 
 	function visit(value: unknown, owner: string, path: string[]): void {
 		if (Array.isArray(value)) { value.forEach((child, index) => visit(child, owner, [...path, String(index)])); return; }

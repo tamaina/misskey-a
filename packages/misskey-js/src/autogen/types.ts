@@ -44034,7 +44034,13 @@ export interface operations {
     channels___featured: {
         requestBody: {
             content: {
-                'application/json': Record<string, never> & unknown;
+                'application/json': {
+                    /** @enum {string} */
+                    origin?: 'local' | 'remote';
+                } & ({
+                    /** @enum {string} */
+                    origin?: 'local' | 'remote';
+                } & unknown);
             };
         };
         responses: {
@@ -45082,6 +45088,8 @@ export interface operations {
             content: {
                 'application/json': {
                     query: string;
+                    /** @enum {string} */
+                    origin?: 'local' | 'remote';
                     /**
                      * @default nameAndDescription
                      * @enum {string}
@@ -45095,6 +45103,8 @@ export interface operations {
                     limit?: number;
                 } & ({
                     query: string;
+                    /** @enum {string} */
+                    origin?: 'local' | 'remote';
                     /**
                      * @default nameAndDescription
                      * @enum {string}

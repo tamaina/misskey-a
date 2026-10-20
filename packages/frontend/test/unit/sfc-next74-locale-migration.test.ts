@@ -4,6 +4,7 @@
  */
 
 import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
+import { restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
 import { readFileSync } from 'node:fs';
 import { restoreProductNameBaseline } from './product-name-source-rebase.js';
 import { restoreRssContractBaseline } from './rss-contract-source-rebase.js';
@@ -134,8 +135,12 @@ function getLocaleValue(language: string, keyPath: string): string {
 	return value;
 }
 
+function explorationBaseline(file: string, source: string): string {
+	return file === 'packages/features/channels/frontend/pages/channels.vue' ? restoreChannelFederationSourceBaseline(file, source) : source;
+}
+
 function getBlocks(file: string): Map<string, Record<string, string>> {
-	const { descriptor, errors } = parse(restorePilotHistoricalSource(file, restoreEmailHistoricalSource(file, restoreFinalOwnerHistoricalSource(file, restoreClientErrorLogBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8'))))), { filename: file });
+	const { descriptor, errors } = parse(restorePilotHistoricalSource(file, restoreEmailHistoricalSource(file, restoreFinalOwnerHistoricalSource(file, restoreClientErrorLogBaseline(file, explorationBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8')))))), { filename: file });
 	expect(errors).toEqual([]);
 	const blocks = descriptor.customBlocks.filter(block => block.type === 'locale');
 	const result = new Map<string, Record<string, string>>();
@@ -153,7 +158,7 @@ async function compileSource(file: string): Promise<string> {
 	const cached = compiledSources.get(file);
 	if (cached) return cached;
 	const filename = resolve(repoRoot, file);
-	const source = readFileSync(filename, 'utf8');
+	const source = explorationBaseline(file, readFileSync(filename, 'utf8'));
 	const plugin = pluginVvi();
 	const configure = plugin.configResolved;
 	const transform = plugin.transform;
@@ -211,7 +216,7 @@ describe('next74 static raw-label ownership', () => {
 	});
 
 	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', async migration => {
-		const actualSource = restoreClientErrorLogBaseline(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8'));
+		const actualSource = restoreClientErrorLogBaseline(migration.file, explorationBaseline(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8')));
 		const passwordSource = migration.file === 'packages/features/auth/frontend/components/MkPasswordDialog.vue' ? restorePasswordChangeBaseline(migration.file, actualSource) : actualSource;
 		const source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, restoreEmailHistoricalSource(migration.file, restoreFinalOwnerHistoricalSource(migration.file, restoreProductNameBaseline(migration.file, passwordSource)))));
 		const blocks = getBlocks(migration.file);
