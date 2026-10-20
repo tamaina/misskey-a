@@ -37,7 +37,7 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 			}
 
 			const iAmModerator = await deps.roleService.isModerator(me);
-			if (channel.userId !== me.id && !iAmModerator) {
+			if (channel.host != null || (channel.userId !== me.id && !iAmModerator)) {
 				throw apiError(channelsUpdateErrors.accessDenied);
 			}
 
@@ -56,7 +56,9 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 				banner = null;
 			}
 
+			const isFederated = ps.isFederated ?? channel.isFederated;
 			await deps.channelsRepository.update(channel.id, {
+				...(ps.isFederated !== undefined ? { isFederated } : {}),
 				...(ps.name !== undefined ? { name: ps.name } : {}),
 				...(ps.description !== undefined ? { description: ps.description } : {}),
 				...(ps.pinnedNoteIds !== undefined ? { pinnedNoteIds: ps.pinnedNoteIds } : {}),
@@ -64,7 +66,7 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 				...(typeof ps.isArchived === 'boolean' ? { isArchived: ps.isArchived } : {}),
 				...(banner ? { bannerId: banner.id } : {}),
 				...(typeof ps.isSensitive === 'boolean' ? { isSensitive: ps.isSensitive } : {}),
-				...(typeof ps.allowRenoteToExternal === 'boolean' ? { allowRenoteToExternal: ps.allowRenoteToExternal } : {}),
+				...(isFederated ? { allowRenoteToExternal: true } : typeof ps.allowRenoteToExternal === 'boolean' ? { allowRenoteToExternal: ps.allowRenoteToExternal } : {}),
 			});
 			return toPackedChannel(await deps.channelEntityService.pack(channel.id, me));
 		});

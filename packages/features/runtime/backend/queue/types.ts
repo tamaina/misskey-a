@@ -149,6 +149,8 @@ export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEvent
 
 export type ThinUser = {
 	id: MiUser['id'];
+	/** Present only for a dedicated channel Group signer. */
+	channelId?: string;
 };
 
 export type McpStreamDeliverJobData = {

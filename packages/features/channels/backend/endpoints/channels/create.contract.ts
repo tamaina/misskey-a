@@ -41,5 +41,6 @@ export const channelsCreateContract = oc.$meta({
 		"bannerId": v.exactOptional(v.nullable(misskeyId)),
 		"color": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 16 })),
 		"isSensitive": v.exactOptional(v.nullable(v.boolean())),
+		"isFederated": v.exactOptional(v.boolean()),
 		"allowRenoteToExternal": v.exactOptional(v.nullable(v.boolean())),
 	})).output(packedChannelSchema);

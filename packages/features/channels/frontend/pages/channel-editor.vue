@@ -23,7 +23,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ $locale.sfc.sensitive }}</template>
 			</MkSwitch>
 
-			<MkSwitch v-model="allowRenoteToExternal">
+			<MkSwitch v-model="isFederated">
+				<template #label>{{ $locale.sfc.channelFederation }}</template>
+				<template #caption>{{ $locale.sfc.channelFederationDescription }}</template>
+			</MkSwitch>
+
+			<MkSwitch v-model="allowRenoteToExternal" :disabled="isFederated">
 				<template #label>{{ $locale.sfc.channelAllowRenoteToExternal }}</template>
 			</MkSwitch>
 
@@ -98,6 +103,9 @@ const bannerId = ref<string | null>(null);
 const color = ref('#000');
 const isSensitive = ref(false);
 const allowRenoteToExternal = ref(true);
+const isFederated = ref(false);
+
+watch(isFederated, enabled => { if (enabled) allowRenoteToExternal.value = true; });
 const pinnedNoteIds = ref<Misskey.entities.Note['id'][]>([]);
 
 watch(() => bannerId.value, async () => {
@@ -125,6 +133,7 @@ async function fetchChannel() {
 	pinnedNoteIds.value = result.pinnedNoteIds;
 	color.value = result.color;
 	allowRenoteToExternal.value = result.allowRenoteToExternal;
+	isFederated.value = result.isFederated;
 
 	channel.value = result;
 }
@@ -154,7 +163,8 @@ function save() {
 		bannerId: bannerId.value,
 		color: color.value,
 		isSensitive: isSensitive.value,
-		allowRenoteToExternal: allowRenoteToExternal.value,
+		isFederated: isFederated.value,
+		allowRenoteToExternal: isFederated.value || allowRenoteToExternal.value,
 	} satisfies Misskey.entities.ChannelsCreateRequest;
 
 	if (props.channelId != null) {
@@ -352,6 +362,8 @@ definePage(() => ({
 
 <locale lang="json" locale="en-US">
 {
+	"channelFederation": "Federate this channel",
+	"channelFederationDescription": "New posts are public and federated. Local-only posts are rejected and renotes outside the channel are allowed. Existing posts stay local.",
 	"name": "Name",
 	"description": "Description",
 	"color": "Color",
@@ -457,6 +469,8 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-JP">
 {
+	"channelFederation": "チャンネルを連合する",
+	"channelFederationDescription": "新規投稿は公開・連合されます。ローカル限定の投稿は作成できず、チャンネル外へのリノートを許可します。過去の投稿は公開されません。",
 	"name": "名前",
 	"description": "説明",
 	"color": "色",

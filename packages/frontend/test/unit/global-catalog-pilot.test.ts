@@ -14,6 +14,7 @@ import { createInternationalization, setActiveInternationalization, useLocale } 
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import { globalCatalogPilotOwners, restoreGlobalCatalogPilotSource, restoreGlobalCatalogPilotDictionary } from './global-catalog-pilot-baseline.js';
+import { restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
 import embedMessages from '../../../features/boot/frontend/embed/boot-messages.json';
 
 const root = resolve(import.meta.dirname, '../../../..');
@@ -93,7 +94,8 @@ test('embed retains only its existing boot globals and its language inventory', 
 });
 
 test.each(globalCatalogPilotOwners)('$file rejects source, owner and global changes before replaying historical proofs', owner => {
-	const source = readFileSync(resolve(root, owner.file), 'utf8');
+	const currentSource = readFileSync(resolve(root, owner.file), 'utf8');
+	const source = owner.file === 'packages/features/channels/frontend/pages/channels.vue' ? restoreChannelFederationSourceBaseline(owner.file, currentSource) : currentSource;
 	const baseline = restoreGlobalCatalogPilotSource(owner.file, source);
 	expect(createHash('sha256').update(source).digest('hex')).toBe(owner.currentSha256);
 	expect(createHash('sha256').update(baseline).digest('hex')).toBe(owner.baselineSha256);

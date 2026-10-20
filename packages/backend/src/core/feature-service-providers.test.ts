@@ -36,7 +36,7 @@ function providerToken(provider: Provider): InjectionToken {
 }
 
 describe('feature service composition adapter', () => {
-	test('the pre-migration contract plus explicit MCP Events and antenna additions preserve every alias target', () => {
+	test('the pre-migration contract plus explicit MCP Events, antenna, browser session and channel federation additions preserve every alias target', () => {
 		const baseline = JSON.parse(readFileSync(new URL('../../test/fixtures/core-provider-contract.json', import.meta.url), 'utf8')) as {
 			providers: string[]; exports: string[]; aliases: { name: string; target: string }[];
 		};
@@ -48,6 +48,7 @@ describe('feature service composition adapter', () => {
 			entries.splice(entries.indexOf('alias:SystemWebhookService'), 0, 'alias:McpEventsService');
 			for (const prefix of ['class:', 'alias:']) {
 				entries.push(`${prefix}BrowserSessionService`);
+				entries.splice(entries.indexOf(`${prefix}ChannelFollowingService`), 0, `${prefix}ChannelFederationService`);
 				entries.splice(entries.indexOf(`${prefix}AntennaService`) + 1, 0, `${prefix}AntennaNoteAccessService`, `${prefix}AntennaEventSubscriptionService`);
 				entries.splice(entries.indexOf(`${prefix}McpEventsService`) + 1, 0, `${prefix}McpStreamAccessService`, `${prefix}McpStreamSubscriptionService`, `${prefix}NoteStreamingHidingService`);
 			}
@@ -55,7 +56,7 @@ describe('feature service composition adapter', () => {
 		expect(baseline.aliases.filter(alias => alias.name === 'UserAuthService')).toEqual([{ name: 'UserAuthService', target: 'UserAuthService' }]);
 		baseline.aliases.find(alias => alias.name === 'UserAuthService')!.target = 'TotpService';
 		baseline.aliases.push({ name: 'McpEventsService', target: 'McpEventsService' });
-		for (const name of ['BrowserSessionService', 'AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService', 'McpStreamAccessService', 'McpStreamSubscriptionService']) baseline.aliases.push({ name, target: name });
+		for (const name of ['BrowserSessionService', 'ChannelFederationService', 'AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService', 'McpStreamAccessService', 'McpStreamSubscriptionService']) baseline.aliases.push({ name, target: name });
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
 		const describeToken = (entry: Provider | InjectionToken): string => {

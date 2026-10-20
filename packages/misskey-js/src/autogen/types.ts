@@ -2719,6 +2719,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -2781,6 +2783,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -3965,6 +3969,9 @@ export type components = {
             usersCount: number;
             notesCount: number;
             isSensitive: boolean;
+            isFederated: boolean;
+            uri: string | null;
+            host: string | null;
             allowRenoteToExternal: boolean;
             isFollowing?: boolean;
             isFavorited?: boolean;
@@ -5032,6 +5039,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -5362,6 +5371,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -5612,6 +5623,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -5941,6 +5954,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -6270,6 +6285,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -6718,6 +6735,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -6849,6 +6868,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -7099,6 +7120,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -7245,6 +7268,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -7495,6 +7520,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -7624,6 +7651,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -7888,6 +7917,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -8531,6 +8562,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -9174,6 +9207,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -9817,6 +9852,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -10315,6 +10352,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -13277,6 +13316,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -13475,6 +13516,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -13673,6 +13716,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -13871,6 +13916,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -14069,6 +14116,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -14267,6 +14316,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -14465,6 +14516,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -14782,6 +14835,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -14861,6 +14916,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -15059,6 +15116,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -16585,6 +16644,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -16835,6 +16896,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -17164,6 +17227,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -17493,6 +17558,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -18027,6 +18094,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -18677,6 +18746,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -19007,6 +19078,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -19263,6 +19336,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -19592,6 +19667,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -19846,6 +19923,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -20222,6 +20301,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -20833,6 +20914,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -21371,6 +21454,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -21540,6 +21625,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -21924,6 +22011,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -22253,6 +22342,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -22701,6 +22792,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -22899,6 +22992,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -23097,6 +23192,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -23295,6 +23392,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -23493,6 +23592,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -23572,6 +23673,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -23901,6 +24004,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -24230,6 +24335,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -24559,6 +24666,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -24962,6 +25071,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -25091,6 +25202,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -25331,6 +25444,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -25460,6 +25575,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -25639,6 +25756,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -25968,6 +26087,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -26416,6 +26537,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -26614,6 +26737,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -26812,6 +26937,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -27010,6 +27137,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -27141,6 +27270,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -27339,6 +27470,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -27537,6 +27670,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -27802,6 +27937,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -28052,6 +28189,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -28250,6 +28389,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -28448,6 +28589,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -28579,6 +28722,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -28725,6 +28870,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -28975,6 +29122,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -29304,6 +29453,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -29633,6 +29784,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -30000,6 +30153,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -30329,6 +30484,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -30658,6 +30815,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -31106,6 +31265,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -31304,6 +31465,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -31502,6 +31665,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -31700,6 +31865,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -31898,6 +32065,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -32096,6 +32265,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -32294,6 +32465,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -32492,6 +32665,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -32690,6 +32865,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -32769,6 +32946,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -33098,6 +33277,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -33741,6 +33922,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -34070,6 +34253,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -34713,6 +34898,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -35356,6 +35543,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -35685,6 +35874,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -36014,6 +36205,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -36619,6 +36812,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -37516,6 +37711,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -38176,6 +38373,8 @@ export type components = {
                 name: string;
                 color: string;
                 isSensitive: boolean;
+                isFederated?: boolean;
+                host?: string | null;
                 allowRenoteToExternal: boolean;
                 userId: string | null;
             } | null;
@@ -43425,6 +43624,7 @@ export interface operations {
                     bannerId?: string | null;
                     color?: string;
                     isSensitive?: boolean | null;
+                    isFederated?: boolean;
                     allowRenoteToExternal?: boolean | null;
                 } & ({
                     name: string;
@@ -43432,6 +43632,7 @@ export interface operations {
                     bannerId?: string | null;
                     color?: string;
                     isSensitive?: boolean | null;
+                    isFederated?: boolean;
                     allowRenoteToExternal?: boolean | null;
                 } & unknown);
             };
@@ -43467,6 +43668,9 @@ export interface operations {
                         usersCount: number;
                         notesCount: number;
                         isSensitive: boolean;
+                        isFederated: boolean;
+                        uri: string | null;
+                        host: string | null;
                         allowRenoteToExternal: boolean;
                         isFollowing?: boolean;
                         isFavorited?: boolean;
@@ -43830,7 +44034,13 @@ export interface operations {
     channels___featured: {
         requestBody: {
             content: {
-                'application/json': Record<string, never> & unknown;
+                'application/json': {
+                    /** @enum {string} */
+                    origin?: 'local' | 'remote';
+                } & ({
+                    /** @enum {string} */
+                    origin?: 'local' | 'remote';
+                } & unknown);
             };
         };
         responses: {
@@ -43864,6 +44074,9 @@ export interface operations {
                         usersCount: number;
                         notesCount: number;
                         isSensitive: boolean;
+                        isFederated: boolean;
+                        uri: string | null;
+                        host: string | null;
                         allowRenoteToExternal: boolean;
                         isFollowing?: boolean;
                         isFavorited?: boolean;
@@ -44275,6 +44488,9 @@ export interface operations {
                         usersCount: number;
                         notesCount: number;
                         isSensitive: boolean;
+                        isFederated: boolean;
+                        uri: string | null;
+                        host: string | null;
                         allowRenoteToExternal: boolean;
                         isFollowing?: boolean;
                         isFavorited?: boolean;
@@ -44478,6 +44694,9 @@ export interface operations {
                         usersCount: number;
                         notesCount: number;
                         isSensitive: boolean;
+                        isFederated: boolean;
+                        uri: string | null;
+                        host: string | null;
                         allowRenoteToExternal: boolean;
                         isFollowing?: boolean;
                         isFavorited?: boolean;
@@ -44695,6 +44914,9 @@ export interface operations {
                         usersCount: number;
                         notesCount: number;
                         isSensitive: boolean;
+                        isFederated: boolean;
+                        uri: string | null;
+                        host: string | null;
                         allowRenoteToExternal: boolean;
                         isFollowing?: boolean;
                         isFavorited?: boolean;
@@ -44866,6 +45088,8 @@ export interface operations {
             content: {
                 'application/json': {
                     query: string;
+                    /** @enum {string} */
+                    origin?: 'local' | 'remote';
                     /**
                      * @default nameAndDescription
                      * @enum {string}
@@ -44879,6 +45103,8 @@ export interface operations {
                     limit?: number;
                 } & ({
                     query: string;
+                    /** @enum {string} */
+                    origin?: 'local' | 'remote';
                     /**
                      * @default nameAndDescription
                      * @enum {string}
@@ -44924,6 +45150,9 @@ export interface operations {
                         usersCount: number;
                         notesCount: number;
                         isSensitive: boolean;
+                        isFederated: boolean;
+                        uri: string | null;
+                        host: string | null;
                         allowRenoteToExternal: boolean;
                         isFollowing?: boolean;
                         isFavorited?: boolean;
@@ -45131,6 +45360,9 @@ export interface operations {
                         usersCount: number;
                         notesCount: number;
                         isSensitive: boolean;
+                        isFederated: boolean;
+                        uri: string | null;
+                        host: string | null;
                         allowRenoteToExternal: boolean;
                         isFollowing?: boolean;
                         isFavorited?: boolean;
@@ -45396,6 +45628,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -45968,6 +46202,7 @@ export interface operations {
                     pinnedNoteIds?: string[];
                     color?: string;
                     isSensitive?: boolean | null;
+                    isFederated?: boolean;
                     allowRenoteToExternal?: boolean | null;
                 } & ({
                     channelId: string;
@@ -45978,6 +46213,7 @@ export interface operations {
                     pinnedNoteIds?: string[];
                     color?: string;
                     isSensitive?: boolean | null;
+                    isFederated?: boolean;
                     allowRenoteToExternal?: boolean | null;
                 } & unknown);
             };
@@ -46013,6 +46249,9 @@ export interface operations {
                         usersCount: number;
                         notesCount: number;
                         isSensitive: boolean;
+                        isFederated: boolean;
+                        uri: string | null;
+                        host: string | null;
                         allowRenoteToExternal: boolean;
                         isFollowing?: boolean;
                         isFavorited?: boolean;
@@ -46638,6 +46877,9 @@ export interface operations {
                         usersCount: number;
                         notesCount: number;
                         isSensitive: boolean;
+                        isFederated: boolean;
+                        uri: string | null;
+                        host: string | null;
                         allowRenoteToExternal: boolean;
                         isFollowing?: boolean;
                         isFavorited?: boolean;
@@ -66154,6 +66396,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -88486,6 +88730,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -97350,6 +97596,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -97665,6 +97913,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -97926,6 +98176,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -110960,6 +111212,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -111227,6 +111481,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -111490,6 +111746,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -111828,6 +112086,8 @@ export interface operations {
                                 name: string;
                                 color: string;
                                 isSensitive: boolean;
+                                isFederated?: boolean;
+                                host?: string | null;
                                 allowRenoteToExternal: boolean;
                                 userId: string | null;
                             } | null;
@@ -111880,6 +112140,16 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CHANNEL_FEDERATION_REQUIRES_PUBLIC';
                             message: string;
                         } | {
                             id: string;
@@ -113814,6 +114084,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -114935,6 +115207,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -115212,6 +115486,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -115467,6 +115743,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -122515,6 +122793,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -123462,6 +123742,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -123765,6 +124047,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -124066,6 +124350,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -124357,6 +124643,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -124646,6 +124934,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -124943,6 +125233,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -125240,6 +125532,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -125557,6 +125851,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;
@@ -137579,6 +137875,8 @@ export interface operations {
                             name: string;
                             color: string;
                             isSensitive: boolean;
+                            isFederated?: boolean;
+                            host?: string | null;
                             allowRenoteToExternal: boolean;
                             userId: string | null;
                         } | null;

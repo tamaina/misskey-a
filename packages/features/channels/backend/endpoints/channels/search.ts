@@ -27,8 +27,11 @@ export function createChannelsSearchProcedure<Actor extends MiLocalUser>(deps: C
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
-			const query = deps.queryService.makePaginationQuery(deps.channelsRepository.createQueryBuilder('channel'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('channel.isArchived = FALSE');
+			const query = deps.channelsRepository.createQueryBuilder('channel')
+				.where('channel.isArchived = FALSE');
+			if (ps.origin === 'local') query.andWhere('channel.host IS NULL');
+			else if (ps.origin === 'remote') query.andWhere('channel.host IS NOT NULL');
+			deps.queryService.makePaginationQuery(query, ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
 
 			if (ps.query !== '') {
 				if (ps.type === 'nameAndDescription') {

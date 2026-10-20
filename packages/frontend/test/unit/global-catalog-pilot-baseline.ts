@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
+import { restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
 import { locales } from 'i18n';
 import escapes from './shared-global-locale-escapes.json';
 import type { RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
@@ -767,6 +768,12 @@ const sha256 = (source: string) => createHash('sha256').update(source).digest('h
 export function restoreGlobalCatalogPilotSource(file: string, source: string): string {
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
 	if (!owner || sha256(source) === owner.baselineSha256) return source;
+	if (file === 'packages/features/channels/frontend/pages/channels.vue' && sha256(source) !== owner.currentSha256) {
+		// Reverse the separately pinned exploration delta before the original
+		// shared-label proof; both complete historical hashes stay unchanged.
+		try { source = restoreChannelFederationSourceBaseline(file, source); }
+		catch { throw new Error(`Global catalog pilot source differs: ${file}`); }
+	}
 	if (sha256(source) !== owner.currentSha256) throw new Error(`Global catalog pilot source differs: ${file}`);
 	source = source
 		.replace("import { useLocale } from 'virtual:vite-vue-internationalization';\n", '')

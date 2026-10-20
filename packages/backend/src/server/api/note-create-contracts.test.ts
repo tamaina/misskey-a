@@ -28,13 +28,19 @@ const packedNote = {
 	visibility: 'public', reactionAcceptance: null, reactionEmojis: {}, reactions: {}, reactionCount: 0, renoteCount: 0, repliesCount: 0,
 } satisfies v.InferOutput<typeof packedNoteSchema>;
 
-test('notes/create retains the frozen public limit, security policy and every route error ID', () => {
+test('notes/create retains the frozen public limit, security policy and every route error ID plus the channel federation refusal', () => {
 	expect(MAX_NOTE_TEXT_LENGTH).toBe(3000);
 	expect(notesCreateContract['~orpc'].meta).toMatchObject({
 		requestName: 'notes/create', requireCredential: true, prohibitMoved: true,
 		limit: baseline.routes[0].meta.limit, kind: 'write:notes',
 	});
-	expect(notesCreateErrors).toEqual(baseline.routes[0].meta.errors);
+	expect(notesCreateErrors).toEqual({
+		...baseline.routes[0].meta.errors,
+		channelFederationRequiresPublic: {
+			message: 'Federated channels require a public federated note. Local-only targets, posting restrictions or remote channel posting prevent creation.',
+			code: 'CHANNEL_FEDERATION_REQUIRES_PUBLIC', id: '10920128-46cd-4d5d-8e66-6ae1587fab75',
+		},
+	});
 	expect(notesCreateContract['~orpc'].inputSchema).toBe(requiredSchema(notesCreateContract['~orpc'].inputSchema));
 	expect(notesCreateContract['~orpc'].outputSchema).toBe(requiredSchema(notesCreateContract['~orpc'].outputSchema));
 });
@@ -149,6 +155,15 @@ test('application operation retains file precedence, poll defaults, extraction c
 	expect(entities.pack).toHaveBeenCalledWith(note, actor);
 	create.fetchAndCreate.mockRejectedValue(new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99'));
 	await expect(createProcedureClient(operation, { context: apiTestContext(actor) })(input)).rejects.toMatchObject({ code: notesCreateErrors.containsProhibitedWords.code, data: { id: notesCreateErrors.containsProhibitedWords.id } });
+});
+
+test('native channel refusal preserves the posting restriction reason in the API response', async () => {
+	const { deps, client } = contextFixture();
+	deps.noteCreateService.fetchAndCreate.mockRejectedValue(new IdentifiableError('10920128-46cd-4d5d-8e66-6ae1587fab75', 'Local-only reply prevents federation.'));
+	await expect(client({ text: 'refused' })).rejects.toMatchObject({
+		code: 'CHANNEL_FEDERATION_REQUIRES_PUBLIC',
+		data: { id: '10920128-46cd-4d5d-8e66-6ae1587fab75', info: { reason: 'Local-only reply prevents federation.' } },
+	});
 });
 
 test('native OpenAPI generator documents notes/create auth, route errors and the 200 envelope', async () => {

@@ -109,7 +109,10 @@ export class ChannelEntityService {
 			usersCount: channel.usersCount,
 			notesCount: channel.notesCount,
 			isSensitive: channel.isSensitive,
-			allowRenoteToExternal: channel.allowRenoteToExternal,
+			isFederated: channel.isFederated,
+			uri: channel.uri,
+			host: channel.host,
+			allowRenoteToExternal: channel.isFederated || channel.allowRenoteToExternal,
 
 			...(me ? {
 				isFollowing,

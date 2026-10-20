@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -17,7 +18,7 @@ const root = resolve(import.meta.dirname, '../../../..');
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 test.each(rebases)('$file restores exact reviewed develop bytes and rejects unreviewed body or locale changes', proof => {
-	const source = readFileSync(resolve(root, proof.file), 'utf8');
+	const source = restoreChannelFederationSourceBaseline(proof.file, readFileSync(resolve(root, proof.file), 'utf8'));
 	const restored = restorePwaShareSourceBaseline(proof.file, source);
 	const localeStart = restored.search(/<locale\s/);
 	expect(sha256(localeStart < 0 ? restored : restored.slice(0, localeStart))).toBe(proof.baselineBodySha256);

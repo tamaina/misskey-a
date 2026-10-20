@@ -22,6 +22,7 @@ import { historicalRawLocale, flattenCatalog, verifyCatalogHistory } from './cat
 import history from './catalog-history.json';
 import retention from '../../../i18n/catalog-retention.json';
 import { locales, valueAt, verifyPrunedGlobalLocale } from './pruned-global-locale-baseline.js';
+import { restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
 
 const root = resolve(import.meta.dirname, '../../../..');
 
@@ -177,5 +178,9 @@ test('runtime AST paths including dynamic tails match the documented complete ca
 		expect(matches.length, use.path).toBeGreaterThan(0);
 		for (const language of languages) for (const path of matches) expect(valueAt(productionLocales[language], path)).toBe(valueAt(locales[language], path));
 	}
-	for (const use of retention.sharedUses) expect(readFileSync(resolve(root, use.file), 'utf8').split('\n')[use.line - 1]).toContain(`.env.${use.path}`);
+	for (const use of retention.sharedUses) {
+		const current = readFileSync(resolve(root, use.file), 'utf8');
+		const source = use.file === 'packages/features/channels/frontend/pages/channels.vue' ? restoreChannelFederationSourceBaseline(use.file, current) : current;
+		expect(source.split('\n')[use.line - 1]).toContain(`.env.${use.path}`);
+	}
 });

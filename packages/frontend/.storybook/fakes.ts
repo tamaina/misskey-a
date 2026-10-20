@@ -41,6 +41,9 @@ export function channel(id = 'somechannelid', name = 'Some Channel', bannerUrl: 
 		notesCount: 1,
 		isSensitive: false,
 		allowRenoteToExternal: false,
+		isFederated: false,
+		uri: null,
+		host: null,
 	};
 }
 

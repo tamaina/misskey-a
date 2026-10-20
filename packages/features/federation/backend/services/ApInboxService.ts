@@ -14,6 +14,7 @@ import { RelayService } from './RelayService.js';
 import { NotePiningService } from '@features/notes/backend/services/NotePiningService.js';
 import { UserBlockingService } from '@features/relationships/backend/services/UserBlockingService.js';
 import { NoteDeleteService } from '@features/notes/backend/services/NoteDeleteService.js';
+import { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import { NoteCreateService } from '@features/notes/backend/services/NoteCreateService.js';
 import { acquireApObjectLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import { concat, toArray, toSingle, unique } from '@features/runtime/backend/data/array.js';
@@ -76,6 +77,7 @@ export class ApInboxService {
 		private notePiningService: NotePiningService,
 		private userBlockingService: UserBlockingService,
 		private noteCreateService: NoteCreateService,
+		private channelFederationService: ChannelFederationService,
 		private noteDeleteService: NoteDeleteService,
 		private apResolverService: ApResolverService,
 		private apDbResolverService: ApDbResolverService,
@@ -181,6 +183,8 @@ export class ApInboxService {
 
 	@bindThis
 	private async follow(actor: MiRemoteUser, activity: IFollow): Promise<string> {
+		const groupResult = await this.channelFederationService.follow(actor, activity);
+		if (groupResult != null) return groupResult;
 		const followee = await this.apDbResolverService.getUserFromApId(activity.object);
 
 		if (followee == null) {
@@ -257,6 +261,7 @@ export class ApInboxService {
 		}
 
 		await this.userFollowingService.acceptFollowRequest(actor, follower);
+		await this.channelFederationService.acceptRemoteFollow(actor, follower.id);
 		return 'ok';
 	}
 
@@ -282,6 +287,8 @@ export class ApInboxService {
 
 	@bindThis
 	private async announce(actor: MiRemoteUser, activity: IAnnounce, resolver?: Resolver): Promise<string | void> {
+		const groupResult = await this.channelFederationService.receiveAnnounce(actor, activity);
+		if (groupResult != null) return groupResult;
 		const uri = getApId(activity);
 
 		this.logger.info(`Announce: ${uri}`);
@@ -728,6 +735,8 @@ export class ApInboxService {
 
 	@bindThis
 	private async undoFollow(actor: MiRemoteUser, activity: IFollow): Promise<string> {
+		const groupResult = await this.channelFederationService.follow(actor, activity, true);
+		if (groupResult != null) return groupResult;
 		const followee = await this.apDbResolverService.getUserFromApId(activity.object);
 		if (followee == null) {
 			return 'skip: followee not found';

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreChannelFederationOpenapiBaseline } from '@features/channels/test/backend/openapi-baseline.js';
 import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { call, implement } from '@orpc/server';
@@ -142,11 +143,21 @@ function restorePreAvailabilitySigninOperation(operation: unknown): unknown {
 test('actual portable generator preserves every legacy operation and public schema, with eight unique canonical IDs', async () => {
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
 	const routes = requestRoutes(clientContract);
+	const originalJson = JSON.stringify(spec);
+	const legacySpec = restoreChannelFederationOpenapiBaseline(spec);
+	expect(JSON.stringify(spec)).toBe(originalJson);
+	const invalid = structuredClone(spec);
+	const channel = invalid.components?.schemas?.Channel;
+	if (channel == null || typeof channel !== 'object') throw new Error('Missing documented Channel schema');
+	const properties = Reflect.get(channel, 'properties');
+	if (properties == null) throw new Error('Missing documented Channel properties');
+	properties.isFederated = { type: 'string' };
+	expect(() => restoreChannelFederationOpenapiBaseline(invalid)).toThrow('federation flag differs');
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
-		const operation = spec.paths?.[path];
+		const operation = legacySpec.paths?.[path];
 		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreAnnouncementOperationBaseline(path, operation)), path).toBe(hash);
 	}
-	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(spec.components?.schemas?.[name]), name).toBe(hash);
+	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(legacySpec.components?.schemas?.[name]), name).toBe(hash);
 	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
 	expect(Object.keys(spec.components?.schemas ?? {}).filter(name => !(name in baseline.schemaHashes))).toEqual(['OrpcDefinition1038']);
 	expect(Object.keys(baseline.paths)).toHaveLength(444);

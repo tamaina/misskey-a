@@ -4,6 +4,7 @@
  */
 
 import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
+import { restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
 import { readFileSync } from 'node:fs';
 import { restoreGlobalCatalogPilotSource, restoreGlobalCatalogPilotDictionary } from './global-catalog-pilot-baseline.js';
 import { restoreProductNameBaseline } from './product-name-source-rebase.js';
@@ -135,6 +136,10 @@ function getLocaleValue(language: string, keyPath: string): string {
 	return value;
 }
 
+function explorationBaseline(file: string, source: string): string {
+	return file === 'packages/features/channels/frontend/pages/channels.vue' ? restoreChannelFederationSourceBaseline(file, source) : source;
+}
+
 function getBlocks(file: string): Map<string, Record<string, string>> {
 	const { descriptor, errors } = parse(restorePilotHistoricalSource(file, restoreEmailHistoricalSource(file, restoreFinalOwnerHistoricalSource(file, restoreClientErrorLogBaseline(file, restoreGlobalCatalogPilotSource(file, readFileSync(resolve(repoRoot, file), 'utf8')))))), { filename: file });
 	expect(errors).toEqual([]);
@@ -154,7 +159,7 @@ async function compileSource(file: string): Promise<string> {
 	const cached = compiledSources.get(file);
 	if (cached) return cached;
 	const filename = resolve(repoRoot, file);
-	const source = readFileSync(filename, 'utf8');
+	const source = explorationBaseline(file, readFileSync(filename, 'utf8'));
 	const plugin = pluginVvi();
 	const configure = plugin.configResolved;
 	const transform = plugin.transform;
