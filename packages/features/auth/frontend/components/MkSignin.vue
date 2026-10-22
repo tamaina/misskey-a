@@ -108,6 +108,9 @@ const needCaptcha = ref(false);
 
 const userInfo = ref<null | Misskey.entities.UserDetailed>(null);
 const password = ref('');
+// Short-lived challenge stays in this component, never in browser storage.
+const authenticationProgress = shallowRef<Misskey.entities.SigninProgressChallenge | null>(null);
+let signinDisposed = false;
 
 //#region Passkey Passwordless
 const credentialRequest = shallowRef<PublicKeyCredentialRequestOptionsJSON | null>(null);
@@ -171,6 +174,7 @@ async function onUsePasskey(): Promise<void> {
 //#endregion
 
 async function onUsernameSubmitted(username: string) {
+	authenticationProgress.value = null;
 	waiting.value = true;
 
 	userInfo.value = await misskeyApi('users/show', {
@@ -229,6 +233,8 @@ async function onTotpSubmitted(token: string) {
 
 async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, preferPasskey = false): Promise<Misskey.entities.SigninFlowResponse> {
 	const _req = {
+		progressMode: 'v1' as const,
+		...((req.token || req.credential) && authenticationProgress.value ? { authenticationProgress: authenticationProgress.value } : {}),
 		username: req.username ?? userInfo.value?.username,
 		...req,
 	};
@@ -242,7 +248,9 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 	}
 
 	return await misskeyApi('signin-flow', _req).then(async (res) => {
+		if (signinDisposed) return res;
 		if (res.finished) {
+			authenticationProgress.value = null;
 			emit('login', res);
 			await onLoginSucceeded(res);
 		} else {
@@ -258,6 +266,7 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 					break;
 				}
 				case 'totp': {
+					authenticationProgress.value = res.authenticationProgress ?? null;
 					totpAvailable.value = true;
 					passkeyAvailable.value = false;
 					credentialRequest.value = null;
@@ -265,6 +274,7 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, prefer
 					break;
 				}
 				case 'passkey': {
+					authenticationProgress.value = res.authenticationProgress ?? null;
 					// Older servers send this step only when TOTP is enabled.
 					const useTotp = res.availableFactors === undefined || res.availableFactors.includes('totp');
 					totpAvailable.value = useTotp;
@@ -305,6 +315,15 @@ async function onLoginSucceeded(res: Misskey.entities.SigninFlowResponse & { fin
 }
 
 function onSigninApiError(err?: any): void {
+	if (signinDisposed) return;
+	const restartPassword = authenticationProgress.value !== null;
+	authenticationProgress.value = null;
+	if (restartPassword) {
+		page.value = 'password';
+		password.value = '';
+		credentialRequest.value = null;
+		passkeyAvailable.value = false;
+	}
 	const id = err?.id ?? null;
 
 	switch (id) {
@@ -398,6 +417,8 @@ function onSigninApiError(err?: any): void {
 }
 
 onBeforeUnmount(() => {
+	signinDisposed = true;
+	authenticationProgress.value = null;
 	password.value = '';
 	needCaptcha.value = false;
 	userInfo.value = null;

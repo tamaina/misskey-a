@@ -1669,6 +1669,7 @@ declare namespace entities {
         SignupResponse,
         SignupPendingRequest,
         SignupPendingResponse,
+        SigninProgressChallenge,
         SigninFlowRequest,
         SigninFlowResponse,
         SigninWithPasskeyRequest,
@@ -7934,6 +7935,8 @@ type Signin = ContractModel<'Signin'>;
 
 // @public (undocumented)
 type SigninFlowRequest = {
+    progressMode?: 'v1';
+    authenticationProgress?: SigninProgressChallenge;
     username: string;
     password?: string;
     token?: string;
@@ -7956,12 +7959,22 @@ type SigninFlowResponse = {
 } | {
     finished: false;
     next: 'totp';
+    authenticationProgress?: SigninProgressChallenge;
     availableFactors?: ('totp' | 'passkey')[];
 } | {
     finished: false;
     next: 'passkey';
+    authenticationProgress?: SigninProgressChallenge;
     authRequest: PublicKeyCredentialRequestOptionsJSON_2;
     availableFactors?: ('totp' | 'passkey')[];
+};
+
+// @public (undocumented)
+type SigninProgressChallenge = {
+    ticket: string;
+    browserSecret: string;
+    nonce: string;
+    version: number;
 };
 
 // @public (undocumented)

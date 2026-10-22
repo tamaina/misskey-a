@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import bcrypt from 'bcryptjs';
+import * as v from 'valibot';
+import { SigninProgressController, signinProgressBinding, type SigninProgressStorage } from '../signin-progress.js';
+import { signinProgressChallengeSchema } from '../signin-progress.schema.js';
 import { IsNull } from 'typeorm';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
@@ -26,6 +29,7 @@ import { authSessionsContract } from '../api.definition.js';
 import { sessionErrors } from '../session.middleware.js';
 export interface SigninFlowDependencies {
 	config: Config;
+	progressStore: SigninProgressStorage;
 	meta: MiMeta;
 	usersRepository: UsersRepository;
 	userProfilesRepository: UserProfilesRepository;
@@ -41,6 +45,7 @@ export interface SigninFlowDependencies {
 }
 export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 	const logger = deps.loggerService.getLogger('Signin');
+	const progress = new SigninProgressController(deps.progressStore);
 	return implement(authSessionsContract.signinFlow, { initialInputValidationIndex: Number.POSITIVE_INFINITY, initialOutputValidationIndex: Number.NaN }).$context<AuthSessionContext>().use(sessionErrors()).handler(async ({ input, context }) => {
 		const body = input;
 		const request = context.request;
@@ -82,6 +87,13 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				reply.code(400);
 				return;
 			}
+			const progressMode = sessionField(body, 'progressMode');
+			const rawProgress = sessionField(body, 'authenticationProgress');
+			const stateEnabled = progressMode === 'v1';
+			if ((progressMode !== undefined && !stateEnabled) || (rawProgress !== undefined && !stateEnabled)) return error(400, { id: '4e30e80c-e338-45a0-8c8f-44455efa3b76' });
+			const parsedProgress = rawProgress === undefined ? undefined : v.safeParse(signinProgressChallengeSchema, rawProgress);
+			if (parsedProgress && !parsedProgress.success) return error(400, { id: '4e30e80c-e338-45a0-8c8f-44455efa3b76' });
+			const challenge = parsedProgress?.success ? parsedProgress.output : undefined;
 			// Fetch user
 			const user = await deps.usersRepository.findOneBy({
 				usernameLower: username.toLowerCase(),
@@ -130,6 +142,37 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				});
 				return error(status ?? 500, failure ?? { id: '4e30e80c-e338-45a0-8c8f-44455efa3b76' });
 			};
+
+			const activeUser = user;
+
+			async function bindingFor(currentProfile = profile) {
+				const keys = await deps.userSecurityKeysRepository.findBy({ userId: activeUser.id });
+				return signinProgressBinding({ userId: activeUser.id, origin: deps.config.url, rpId: deps.config.hostname,
+					captcha: [deps.meta.enableHcaptcha, deps.meta.enableMcaptcha, deps.meta.enableRecaptcha, deps.meta.enableTurnstile, deps.meta.enableTestcaptcha],
+					passwordHash: currentProfile.password, totpEnabled: currentProfile.twoFactorEnabled,
+					totpSecret: currentProfile.twoFactorSecret, passwordless: currentProfile.usePasswordLessLogin, keys });
+			}
+
+			const binding = stateEnabled && same && profile.twoFactorEnabled ? await bindingFor() : undefined;
+			if (challenge && !binding) return await fail(403);
+
+			async function verifyFactor(factor: 'totp' | 'passkey', verify: () => Promise<boolean>) {
+				// Legacy clients and the existing explicitly enabled passwordless route
+				// retain their password/MFA requirements. This first vertical flow is password-first.
+				if (!stateEnabled || !same) return await verify();
+				if (!binding || !challenge) return false;
+				return await progress.finish(binding, challenge, factor, verify, async () => {
+					const freshUser = await deps.usersRepository.findOneBy({ id: activeUser.id, host: IsNull(), isSuspended: false, isDeleted: false });
+					if (!freshUser || freshUser.host !== null || freshUser.isSuspended || freshUser.isDeleted) return null;
+					const freshProfile = await deps.userProfilesRepository.findOneBy({ userId: activeUser.id });
+					return freshProfile?.twoFactorEnabled ? await bindingFor(freshProfile) : null;
+				});
+			}
+
+			async function startProgress() {
+				return binding ? { authenticationProgress: await progress.begin(binding) } : {};
+			}
+
 			if (!profile.twoFactorEnabled) {
 				if (process.env.NODE_ENV !== 'test') {
 					if (deps.meta.enableHcaptcha && deps.meta.hcaptchaSecretKey) {
@@ -173,7 +216,11 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					});
 				}
 				try {
-					await deps.userAuthService.twoFactorAuthenticate(profile, token);
+					const authorized = await verifyFactor('totp', async () => {
+						await deps.userAuthService.twoFactorAuthenticate(profile, token);
+						return true;
+					});
+					if (!authorized) return await fail(403, { id: 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f' });
 				} catch (_) {
 					return await fail(403, {
 						id: 'cdf1235b-ac71-46d4-a3a6-84ccce48df6f',
@@ -186,7 +233,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
 				}
-				const authorized = await deps.webAuthnService.verifyAuthentication(user.id, sessionField(body, 'credential'));
+				const authorized = await verifyFactor('passkey', () => deps.webAuthnService.verifyAuthentication(user.id, sessionField(body, 'credential')));
 				if (authorized) {
 					return toFinishedSignin(await deps.signinService.signin(request, reply, user));
 				} else {
@@ -206,6 +253,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					finished: false,
 					next: 'passkey',
 					authRequest,
+					...await startProgress(),
 					...(same ? { availableFactors: ['totp', 'passkey'] as ('totp' | 'passkey')[] } : {}),
 				};
 			} else {
@@ -219,6 +267,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 						finished: false,
 						next: 'totp',
 						availableFactors: ['totp'],
+						...await startProgress(),
 					};
 				}
 			}

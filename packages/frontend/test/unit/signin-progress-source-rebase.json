@@ -1,0 +1,65 @@
+[
+  {
+    "file": "packages/features/auth/frontend/components/MkSignin.vue",
+    "baselineCommit": "45ad40a83d9bf845ec9387e5747801341e9317bd",
+    "currentSha256": "a31a668979abe02ab89d1598f4ab530cd57267dd1b50279070c18c0546b2be91",
+    "baselineSha256": "b31ccdecb4d8b5f75445cdf338b38723eb0f0da1c8661961b4d3e73f15e6c94a",
+    "localeBlocksSha256": "41c65162a1bf43ee996f78bd9c8469049f3c216dbf010b5054dfaa41608c8115",
+    "edits": [
+      {
+        "start": 3350,
+        "end": 3552,
+        "current": "// Short-lived challenge stays in this component, never in browser storage.\nconst authenticationProgress = shallowRef<Misskey.entities.SigninProgressChallenge | null>(null);\nlet signinDisposed = false;\n",
+        "baseline": ""
+      },
+      {
+        "start": 5312,
+        "end": 5350,
+        "current": "authenticationProgress.value = null;\n\t",
+        "baseline": ""
+      },
+      {
+        "start": 6722,
+        "end": 6887,
+        "current": "progressMode: 'v1' as const,\n\t\t...((req.token || req.credential) && authenticationProgress.value ? { authenticationProgress: authenticationProgress.value } : {}),\n\t\t",
+        "baseline": ""
+      },
+      {
+        "start": 7271,
+        "end": 7305,
+        "current": "signinDisposed) return res;\n\t\tif (",
+        "baseline": ""
+      },
+      {
+        "start": 7320,
+        "end": 7360,
+        "current": "\n\t\t\tauthenticationProgress.value = null;",
+        "baseline": ""
+      },
+      {
+        "start": 7678,
+        "end": 7750,
+        "current": "authenticationProgress.value = res.authenticationProgress ?? null;\n\t\t\t\t\t",
+        "baseline": ""
+      },
+      {
+        "start": 7917,
+        "end": 7989,
+        "current": "\n\t\t\t\t\tauthenticationProgress.value = res.authenticationProgress ?? null;",
+        "baseline": ""
+      },
+      {
+        "start": 9321,
+        "end": 9597,
+        "current": "\n\tif (signinDisposed) return;\n\tconst restartPassword = authenticationProgress.value !== null;\n\tauthenticationProgress.value = null;\n\tif (restartPassword) {\n\t\tpage.value = 'password';\n\t\tpassword.value = '';\n\t\tcredentialRequest.value = null;\n\t\tpasskeyAvailable.value = false;\n\t}",
+        "baseline": ""
+      },
+      {
+        "start": 11725,
+        "end": 11787,
+        "current": "\n\tsigninDisposed = true;\n\tauthenticationProgress.value = null;",
+        "baseline": ""
+      }
+    ]
+  }
+]
