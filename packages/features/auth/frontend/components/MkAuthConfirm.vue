@@ -62,6 +62,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</ul>
 				</div>
 			</div>
+			<div v-if="selectablePermissionsLabel && selectablePermissions" :class="$style.accountSelectorLabel">{{ selectablePermissionsLabel }}</div>
+			<MkPermissionSelect v-if="selectablePermissions" v-model="selectedPermissions" :permissions="selectablePermissions"
+				:administrator="selectedAdministrator" :labels="copyLocaleDictionary($locale.sfc.permissionsLabels)"
+				:disableAllText="$locale.sfc.disableAll" :enableAllText="$locale.sfc.enableAll" :adminPermissionText="$locale.sfc.adminPermission"/>
 			<slot name="consentAdditionalInfo"></slot>
 			<div>
 				<div :class="$style.accountSelectorLabel">
@@ -79,7 +83,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div class="_buttonsCenter">
 				<MkButton rounded @click="clickCancel">{{ $locale.sfc.reject }}</MkButton>
-				<MkButton rounded gradate @click="clickAccept">{{ $locale.sfc.accept }}</MkButton>
+				<MkButton rounded gradate :disabled="selectablePermissions !== undefined && !permissions?.length && selectedPermissions.length === 0" @click="clickAccept">{{ $locale.sfc.accept }}</MkButton>
 			</div>
 		</div>
 		<div v-else-if="phase === 'success'" key="success" :class="$style.root" class="_gaps_s">
@@ -117,6 +121,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
+import MkPermissionSelect from './MkPermissionSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@features/auth/frontend/accounts.js';
@@ -130,18 +135,26 @@ const props = defineProps<{
 	name?: string;
 	icon?: string;
 	permissions?: (typeof Misskey.permissions[number])[];
+	selectablePermissions?: string[];
+	selectablePermissionsLabel?: string;
 	manualWaiting?: boolean;
 	waitOnDeny?: boolean;
 }>();
 
 const emit = defineEmits<{
-	(ev: 'accept', token: string): void;
+	(ev: 'accept', token: string, permissions?: string[]): void;
 	(ev: 'deny', token: string): void;
 }>();
 
 const waiting = ref(true);
 const _waiting = computed(() => waiting.value || props.manualWaiting);
 const phase = ref<'accountSelect' | 'consent' | 'success' | 'denied' | 'failed'>('accountSelect');
+
+const selectedPermissions = ref<string[]>([]);
+const selectedAdministrator = computed(() => {
+	const user = selectedUser.value ? users.value.get(selectedUser.value) : undefined;
+	return user !== undefined && 'isAdmin' in user && user.isAdmin === true;
+});
 
 const selectedUser = ref<string | null>(null);
 
@@ -216,9 +229,18 @@ function clickAddAccount(ev: PointerEvent) {
 	}], ev.currentTarget ?? ev.target);
 }
 
-function clickChooseAccount() {
+async function clickChooseAccount() {
 	if (selectedUser.value === null) return;
+	if (props.selectablePermissions !== undefined) {
+		const user = users.value.get(selectedUser.value)!;
+		waiting.value = true;
+		try {
+			const details = await misskeyApi('users/show', { userId: user.id }, user.token);
+			users.value.set(user.id, { ...details, token: user.token });
+		} catch { showUI('failed'); return; } finally { waiting.value = false; }
+	}
 
+	selectedPermissions.value = [];
 	phase.value = 'consent';
 }
 
@@ -248,7 +270,7 @@ async function clickAccept() {
 	const token = user.token;
 
 	waiting.value = true;
-	emit('accept', token);
+	emit('accept', token, props.selectablePermissions === undefined ? undefined : [...selectedPermissions.value]);
 }
 
 function showUI(state: 'success' | 'denied' | 'failed') {
@@ -464,6 +486,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "يطلب التطبيق الأذون التالية",
 	"permissionsLabels": {
+		"access:mcp": "الاتصال بـ MCP (وفقًا لأذونات API ونطاق الرؤية الحاليين، وقد يتيح قراءة الملاحظات غير العامة للحساب نفسه)",
 		"read:account": "اعرض معلومات حسابك",
 		"write:account": "تعديل معلومات حسابك",
 		"read:blocks": "اعرض قائمة المستخدمين المحجوبين",
@@ -561,7 +584,10 @@ defineExpose({
 	"authDenied": "رُفض الوصول",
 	"somethingHappened": "حدث خطأ",
 	"existingAccount": "الحسابات الموجودة",
-	"createAccount": "أنشئ حسابًا"
+	"createAccount": "أنشئ حسابًا",
+	"disableAll": "تعطيل الكل",
+	"enableAll": "تشغيل الكل",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -576,6 +602,7 @@ defineExpose({
 	"authPermission": "{name} demana els següents permisos",
 	"authPermissionAsk": "Aquesta aplicació demana els següents permisos",
 	"permissionsLabels": {
+		"access:mcp": "Connectar-se a MCP (segons els permisos de l’API i la visibilitat existents; pot permetre llegir notes no públiques del mateix compte)",
 		"read:account": "Veure la informació del compte.",
 		"write:account": "Editar la informació del compte.",
 		"read:blocks": "Veure la llista d'usuaris bloquejats",
@@ -673,7 +700,10 @@ defineExpose({
 	"authDenied": "Accés denegat",
 	"somethingHappened": "S'ha produït un error",
 	"existingAccount": "Compte existent",
-	"createAccount": "Crea un compte"
+	"createAccount": "Crea un compte",
+	"disableAll": "Deshabilita tot",
+	"enableAll": "Habilita tot",
+	"adminPermission": "Permisos d'administrador "
 }
 </locale>
 
@@ -688,6 +718,7 @@ defineExpose({
 	"authPermission": "{name} požaduje tato oprávnění",
 	"authPermissionAsk": "Tato aplikace požaduje následující oprávnění",
 	"permissionsLabels": {
+		"access:mcp": "Připojit se k MCP (podle stávajících oprávnění API a viditelnosti; může umožnit čtení neveřejných poznámek tohoto účtu)",
 		"read:account": "Zobrazit informace o účtu",
 		"write:account": "Upravit informace o účtu",
 		"read:blocks": "Zobrazit seznam blokovaných uživatelů",
@@ -785,7 +816,10 @@ defineExpose({
 	"authDenied": "Přístup odepřen",
 	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"existingAccount": "Existující účet",
-	"createAccount": "Vytvořit účet"
+	"createAccount": "Vytvořit účet",
+	"disableAll": "Vypnout vše",
+	"enableAll": "Povolit vše",
+	"adminPermission": "Administrátorská práva"
 }
 </locale>
 
@@ -800,6 +834,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "Opret forbindelse til MCP (med de eksisterende API-tilladelser og synlighedsregler; kan give adgang til kontoens egne ikke-offentlige noter)",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -897,7 +932,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -912,6 +950,7 @@ defineExpose({
 	"authPermission": "{name} fordert folgende Berechtigungen",
 	"authPermissionAsk": "Diese Anwendung fordert folgende Berechtigungen",
 	"permissionsLabels": {
+		"access:mcp": "Mit MCP verbinden (gemäß den bestehenden API-Berechtigungen und Sichtbarkeitsregeln; kann das Lesen eigener nicht öffentlicher Notizen ermöglichen)",
 		"read:account": "Deine Benutzerkontoinformationen lesen",
 		"write:account": "Deine Benutzerkontoinformationen bearbeiten",
 		"read:blocks": "Die Liste deiner blockierten Benutzer lesen",
@@ -1009,7 +1048,10 @@ defineExpose({
 	"authDenied": "Zugriff verweigert",
 	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"existingAccount": "Bestehendes Benutzerkonto",
-	"createAccount": "Benutzerkonto erstellen"
+	"createAccount": "Benutzerkonto erstellen",
+	"disableAll": "Alle deaktivieren",
+	"enableAll": "Alle aktivieren",
+	"adminPermission": "Administratorberechtigung"
 }
 </locale>
 
@@ -1024,6 +1066,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "Connect to MCP (subject to existing API permissions and visibility; may allow reading this account’s own nonpublic notes)",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -1121,7 +1164,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -1136,6 +1182,7 @@ defineExpose({
 	"authPermission": "{name} solicita los siguientes permisos",
 	"authPermissionAsk": "Esta aplicación requiere los siguientes permisos",
 	"permissionsLabels": {
+		"access:mcp": "Conectarse a MCP (según los permisos de la API y la visibilidad existentes; puede permitir leer las notas no públicas de la propia cuenta)",
 		"read:account": "Ver información de la cuenta",
 		"write:account": "Editar información de la cuenta",
 		"read:blocks": "Ver usuarios bloqueados",
@@ -1233,7 +1280,10 @@ defineExpose({
 	"authDenied": "Acceso denegado",
 	"somethingHappened": "Ocurrió un error",
 	"existingAccount": "Cuenta existente",
-	"createAccount": "Crear cuenta"
+	"createAccount": "Crear cuenta",
+	"disableAll": "Desactivar todo",
+	"enableAll": "Activar todo",
+	"adminPermission": "Permiso de administrador"
 }
 </locale>
 
@@ -1248,6 +1298,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "Cette application nécessite les autorisations suivantes :",
 	"permissionsLabels": {
+		"access:mcp": "Se connecter à MCP (selon les autorisations de l’API et la visibilité existantes ; peut permettre de lire les notes non publiques de ce compte)",
 		"read:account": "Afficher les informations du compte",
 		"write:account": "Mettre à jour les informations de votre compte",
 		"read:blocks": "Voir les comptes bloqués",
@@ -1345,7 +1396,10 @@ defineExpose({
 	"authDenied": "Accès refusé",
 	"somethingHappened": "Une erreur est survenue",
 	"existingAccount": "Compte existant",
-	"createAccount": "Créer un compte"
+	"createAccount": "Créer un compte",
+	"disableAll": "Tout désactiver",
+	"enableAll": "Tout activer",
+	"adminPermission": "Droits de l'administrateur"
 }
 </locale>
 
@@ -1360,6 +1414,7 @@ defineExpose({
 	"authPermission": "{name} meminta ijin berikut",
 	"authPermissionAsk": "Aplikasi ini membutuhkan beberapa ijin, yaitu:",
 	"permissionsLabels": {
+		"access:mcp": "Terhubung ke MCP (sesuai izin API dan visibilitas yang berlaku; dapat mengizinkan pembacaan catatan nonpublik milik akun ini)",
 		"read:account": "Lihat informasi akun",
 		"write:account": "Sunting informasi akun",
 		"read:blocks": "Lihat daftar orang yang diblokir",
@@ -1457,7 +1512,10 @@ defineExpose({
 	"authDenied": "Akses ditolak",
 	"somethingHappened": "Terjadi kesalahan",
 	"existingAccount": "Akun yang ada",
-	"createAccount": "Buat akun"
+	"createAccount": "Buat akun",
+	"disableAll": "Nonaktifkan semua",
+	"enableAll": "Aktifkan semua",
+	"adminPermission": "Wewenang Izin Admin"
 }
 </locale>
 
@@ -1472,6 +1530,7 @@ defineExpose({
 	"authPermission": "{name} richiede i permessi seguenti",
 	"authPermissionAsk": "Questa app richiede le seguenti autorizzazioni:",
 	"permissionsLabels": {
+		"access:mcp": "Connettersi a MCP (secondo le autorizzazioni API e la visibilità esistenti; può consentire la lettura delle note non pubbliche del proprio account)",
 		"read:account": "Vedere le informazioni sul profilo",
 		"write:account": "Modificare le informazioni sul profilo",
 		"read:blocks": "Vedere i profili bloccati",
@@ -1569,7 +1628,10 @@ defineExpose({
 	"authDenied": "Accesso negato",
 	"somethingHappened": "Si è verificato un problema",
 	"existingAccount": "Profilo esistente",
-	"createAccount": "Crea il tuo profilo"
+	"createAccount": "Crea il tuo profilo",
+	"disableAll": "Disabilitare tutto",
+	"enableAll": "Abilita tutto",
+	"adminPermission": "Privilegi amministrativi"
 }
 </locale>
 
@@ -1584,6 +1646,7 @@ defineExpose({
 	"authPermission": "{name}は次の権限を要求しています",
 	"authPermissionAsk": "このアプリは次の権限を要求しています",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見る",
 		"write:account": "アカウントの情報を変更する",
 		"read:blocks": "ブロックを見る",
@@ -1681,7 +1744,10 @@ defineExpose({
 	"authDenied": "アクセスを拒否しました",
 	"somethingHappened": "問題が発生しました",
 	"existingAccount": "既存のアカウント",
-	"createAccount": "アカウントを作成"
+	"createAccount": "アカウントを作成",
+	"disableAll": "全て無効にする",
+	"enableAll": "全て有効にする",
+	"adminPermission": "管理者権限"
 }
 </locale>
 
@@ -1696,6 +1762,7 @@ defineExpose({
 	"authPermission": "{name}に次の権限つけたってやって",
 	"authPermissionAsk": "このアプリは次の権限を要求しとるで",
 	"permissionsLabels": {
+		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従って、本人の非公開ノートも読める場合があるで）",
 		"read:account": "アカウントの情報を見るで",
 		"write:account": "アカウントの情報を変更するで",
 		"read:blocks": "ブロックを見るで",
@@ -1793,7 +1860,10 @@ defineExpose({
 	"authDenied": "アクセスを拒否ったで",
 	"somethingHappened": "なんかあかんわ",
 	"existingAccount": "前に作ったアカウント",
-	"createAccount": "アカウントを作るで"
+	"createAccount": "アカウントを作るで",
+	"disableAll": "全部使えへんようにする",
+	"enableAll": "全部使えるようにする",
+	"adminPermission": "管理者権限"
 }
 </locale>
 
@@ -1808,6 +1878,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "Qqen ɣer MCP (ilmend n tsirag n API d tilisa n useknen yellan; yezmer ad isireg taɣuri n tezmilin tudmawin n umiḍan-agi)",
 		"read:account": "View your account information",
 		"write:account": "Ẓreg talɣut n umiḍan-ik·im",
 		"read:blocks": "View your list of blocked users",
@@ -1905,7 +1976,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -1920,6 +1994,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCPಗೆ ಸಂಪರ್ಕಿಸಿ (ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ API ಅನುಮತಿಗಳು ಮತ್ತು ಗೋಚರತೆಯ ನಿಯಮಗಳಿಗೆ ಒಳಪಟ್ಟಿರುತ್ತದೆ; ಈ ಖಾತೆಯ ಸ್ವಂತ ಸಾರ್ವಜನಿಕವಲ್ಲದ ಟಿಪ್ಪಣಿಗಳನ್ನು ಓದಲು ಅವಕಾಶ ನೀಡಬಹುದು)",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2017,7 +2092,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -2032,6 +2110,7 @@ defineExpose({
 	"authPermission": "{name}에서 다음 권한을 요청하였습니다",
 	"authPermissionAsk": "이 앱은 다음의 권한을 요청합니다",
 	"permissionsLabels": {
+		"access:mcp": "MCP에 연결하기 (기존 API 권한과 공개 범위에 따르며, 이 계정의 비공개 노트를 읽을 수 있는 경우가 있습니다)",
 		"read:account": "계정의 정보를 봅니다",
 		"write:account": "계정의 정보를 변경합니다",
 		"read:blocks": "차단 여부를 확인합니다",
@@ -2129,7 +2208,10 @@ defineExpose({
 	"authDenied": "접근이 거부되었습니다",
 	"somethingHappened": "오류가 발생했습니다",
 	"existingAccount": "기존 계정",
-	"createAccount": "계정 만들기"
+	"createAccount": "계정 만들기",
+	"disableAll": "전체 해제",
+	"enableAll": "전체 선택",
+	"adminPermission": "관리자 권한"
 }
 </locale>
 
@@ -2144,6 +2226,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "Verbinding maken met MCP (volgens de bestaande API-rechten en zichtbaarheid; kan het lezen van eigen niet-openbare notities toestaan)",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2241,7 +2324,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "Er is iets misgegaan.",
 	"existingAccount": "Bestaand gebruikersaccount",
-	"createAccount": "Gebruikersaccount maken"
+	"createAccount": "Gebruikersaccount maken",
+	"disableAll": "Alle deactiveren",
+	"enableAll": "Alle activeren",
+	"adminPermission": "Administratorrechten"
 }
 </locale>
 
@@ -2256,6 +2342,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "Koble til MCP (i henhold til eksisterende API-tillatelser og synlighetsregler; kan gi tilgang til kontoens egne ikke-offentlige notater)",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -2353,7 +2440,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "En feil har oppstått",
 	"existingAccount": "Existing account",
-	"createAccount": "Opprett konto"
+	"createAccount": "Opprett konto",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -2368,6 +2458,7 @@ defineExpose({
 	"authPermission": "{name} żąda następujących uprawnień",
 	"authPermissionAsk": "Ta aplikacja wymaga następujących uprawnień:",
 	"permissionsLabels": {
+		"access:mcp": "Połącz z MCP (zgodnie z istniejącymi uprawnieniami API i widocznością; może umożliwić odczyt niepublicznych notatek tego konta)",
 		"read:account": "Wyświetl informacje o swoim koncie",
 		"write:account": "Edytuj swoje informacje o koncie",
 		"read:blocks": "Zobacz listę osób, które zablokowałeś(-aś)",
@@ -2465,7 +2556,10 @@ defineExpose({
 	"authDenied": "Odmowa dostępu",
 	"somethingHappened": "Coś poszło nie tak",
 	"existingAccount": "Istniejące konto",
-	"createAccount": "Utwórz konto"
+	"createAccount": "Utwórz konto",
+	"disableAll": "Wyłącz wszystko",
+	"enableAll": "Włącz wszystko",
+	"adminPermission": "Uprawnienia administracyjne"
 }
 </locale>
 
@@ -2480,6 +2574,7 @@ defineExpose({
 	"authPermission": "{name} solicita as seguintes permissões",
 	"authPermissionAsk": "O aplicativo solicita as seguintes permissões",
 	"permissionsLabels": {
+		"access:mcp": "Ligar ao MCP (de acordo com as permissões da API e a visibilidade existentes; pode permitir ler as notas não públicas da própria conta)",
 		"read:account": "Visualizar informações da conta",
 		"write:account": "Editar informações da conta",
 		"read:blocks": "Visualizar a sua lista de usuários bloqueados",
@@ -2577,7 +2672,10 @@ defineExpose({
 	"authDenied": "Acesso negado",
 	"somethingHappened": "Ocorreu um erro",
 	"existingAccount": "Contas existentes",
-	"createAccount": "Criar conta"
+	"createAccount": "Criar conta",
+	"disableAll": "Desabilitar tudo",
+	"enableAll": "Habilitar tudo",
+	"adminPermission": "Permissões de administrador"
 }
 </locale>
 
@@ -2592,6 +2690,7 @@ defineExpose({
 	"authPermission": "{name} Запрашивает следующие разрешения:",
 	"authPermissionAsk": "Приложение запрашивает следующие разрешения:",
 	"permissionsLabels": {
+		"access:mcp": "Подключение к MCP (с учётом существующих разрешений API и правил видимости; может разрешать чтение собственных непубличных заметок этого аккаунта)",
 		"read:account": "Просматривать данные учётной записи",
 		"write:account": "Изменять данные учётной записи",
 		"read:blocks": "Смотреть список блокировок",
@@ -2689,7 +2788,10 @@ defineExpose({
 	"authDenied": "Доступ закрыт",
 	"somethingHappened": "Что-то пошло не так",
 	"existingAccount": "Существующая учётная запись",
-	"createAccount": "Новая учётная запись"
+	"createAccount": "Новая учётная запись",
+	"disableAll": "Выключить всё",
+	"enableAll": "Включить все",
+	"adminPermission": "Доступ администратора"
 }
 </locale>
 
@@ -2704,6 +2806,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "Táto aplikácia vyžaduje nasledujúce nastavenia",
 	"permissionsLabels": {
+		"access:mcp": "Pripojiť sa k MCP (podľa existujúcich oprávnení API a viditeľnosti; môže umožniť čítanie neverejných poznámok tohto účtu)",
 		"read:account": "Vidieť informácie o vašom účte",
 		"write:account": "Upraviť informácie o vašom účte",
 		"read:blocks": "Vidieť zoznam blokovaných používateľov",
@@ -2801,7 +2904,10 @@ defineExpose({
 	"authDenied": "Prístup zamietnutý",
 	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"existingAccount": "Existujúci účet",
-	"createAccount": "Vytvoriť účet"
+	"createAccount": "Vytvoriť účet",
+	"disableAll": "Vypnúť všetko",
+	"enableAll": "Povoliť všetko",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -2816,6 +2922,7 @@ defineExpose({
 	"authPermission": "{name} ได้ขอสิทธิ์การเข้าถึงดังต่อไปนี้",
 	"authPermissionAsk": "แอปพลิเคชันนี้ขอสิทธิ์ดังต่อไปนี้",
 	"permissionsLabels": {
+		"access:mcp": "เชื่อมต่อกับ MCP (ตามสิทธิ์ API และขอบเขตการมองเห็นที่มีอยู่ ซึ่งอาจอนุญาตให้อ่านโน้ตที่ไม่เป็นสาธารณะของบัญชีนี้เองได้)",
 		"read:account": "ดูข้อมูลบัญชี",
 		"write:account": "แก้ไขข้อมูลบัญชี",
 		"read:blocks": "ดูรายชื่อผู้ใช้ที่ถูกบล็อก",
@@ -2913,7 +3020,10 @@ defineExpose({
 	"authDenied": "ปฏิเสธการเข้าใช้",
 	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"existingAccount": "บัญชีที่มีอยู่แล้ว",
-	"createAccount": "สร้างบัญชี"
+	"createAccount": "สร้างบัญชี",
+	"disableAll": "ปิดการใช้งานทั้งหมด",
+	"enableAll": "เปิดใช้งานทั้งหมด",
+	"adminPermission": "สิทธิ์ของผู้ดูแลระบบ"
 }
 </locale>
 
@@ -2928,6 +3038,7 @@ defineExpose({
 	"authPermission": "{name} aşağıdaki izinleri talep etmektedir.",
 	"authPermissionAsk": "Bu uygulama aşağıdaki izinleri talep etmektedir",
 	"permissionsLabels": {
+		"access:mcp": "MCP’ye bağlan (mevcut API izinleri ve görünürlük kurallarına tabidir; bu hesabın kendi herkese açık olmayan notlarının okunmasına izin verebilir)",
 		"read:account": "Hesap bilgilerini gör",
 		"write:account": "Hesap bilgilerini düzenle",
 		"read:blocks": "Engellenen kullanıcıların listesini görüntüle",
@@ -3025,7 +3136,10 @@ defineExpose({
 	"authDenied": "Erişim reddedildi",
 	"somethingHappened": "Bir hata oluştu",
 	"existingAccount": "Mevcut hesap",
-	"createAccount": "Hesap oluştur"
+	"createAccount": "Hesap oluştur",
+	"disableAll": "Tümünü devre dışı bırak",
+	"enableAll": "Tümünü etkinleştir",
+	"adminPermission": "Yönetici İzinleri"
 }
 </locale>
 
@@ -3040,6 +3154,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "MCP غا ئۇلىنىش (مەۋجۇت API ئىجازەتلىرى ۋە كۆرۈنۈش دائىرىسىگە ئاساسەن، بۇ ھېساباتنىڭ ئۆزىگە تەۋە ئاشكارا بولمىغان خاتىرىلەرنى ئوقۇشقا رۇخسەت بېرىشى مۇمكىن)",
 		"read:account": "View your account information",
 		"write:account": "Edit your account information",
 		"read:blocks": "View your list of blocked users",
@@ -3137,7 +3252,10 @@ defineExpose({
 	"authDenied": "Access denied",
 	"somethingHappened": "An error has occurred",
 	"existingAccount": "Existing account",
-	"createAccount": "Create account"
+	"createAccount": "Create account",
+	"disableAll": "Disable all",
+	"enableAll": "Enable all",
+	"adminPermission": "Admin Permissions"
 }
 </locale>
 
@@ -3152,6 +3270,7 @@ defineExpose({
 	"authPermission": "{name} requests the following permissions",
 	"authPermissionAsk": "This application requests the following permissions",
 	"permissionsLabels": {
+		"access:mcp": "Підключення до MCP (згідно з чинними дозволами API та правилами видимості; може дозволяти читання власних непублічних нотаток цього облікового запису)",
 		"read:account": "Переглядати дані профілю",
 		"write:account": "Змінити дані акаунту",
 		"read:blocks": "Переглянути список заблокованих",
@@ -3249,7 +3368,10 @@ defineExpose({
 	"authDenied": "У доступі відмовлено",
 	"somethingHappened": "Щось пішло не так",
 	"existingAccount": "Існуючий акаунт",
-	"createAccount": "Створити акаунт"
+	"createAccount": "Створити акаунт",
+	"disableAll": "Вимкнути все",
+	"enableAll": "Увімкнути все",
+	"adminPermission": "Права адміністратора"
 }
 </locale>
 
@@ -3264,6 +3386,7 @@ defineExpose({
 	"authPermission": "{name} đang yêu cầu quyền hạn dưới đây",
 	"authPermissionAsk": "Ứng dụng này yêu cầu các quyền sau",
 	"permissionsLabels": {
+		"access:mcp": "Kết nối với MCP (theo quyền API và phạm vi hiển thị hiện có; có thể cho phép đọc ghi chú không công khai của chính tài khoản này)",
 		"read:account": "Xem thông tin tài khoản của bạn",
 		"write:account": "Sửa thông tin tài khoản của bạn",
 		"read:blocks": "Xem danh sách người bạn chặn",
@@ -3361,7 +3484,10 @@ defineExpose({
 	"authDenied": "Truy cập bị từ chối",
 	"somethingHappened": "Xảy ra lỗi",
 	"existingAccount": "Tài khoản hiện có",
-	"createAccount": "Tạo tài khoản"
+	"createAccount": "Tạo tài khoản",
+	"disableAll": "Tắt toàn bộ",
+	"enableAll": "Bật toàn bộ",
+	"adminPermission": "Quyền quản trị viên"
 }
 </locale>
 
@@ -3376,6 +3502,7 @@ defineExpose({
 	"authPermission": "{name} 需要以下权限",
 	"authPermissionAsk": "这个应用程序需要以下权限",
 	"permissionsLabels": {
+		"access:mcp": "连接到 MCP（遵循现有 API 权限和可见范围，可能允许读取此账户自己的非公开笔记）",
 		"read:account": "查看账户信息",
 		"write:account": "更改帐户信息",
 		"read:blocks": "查看屏蔽列表",
@@ -3473,7 +3600,10 @@ defineExpose({
 	"authDenied": "拒绝访问",
 	"somethingHappened": "出错了",
 	"existingAccount": "现有的账户",
-	"createAccount": "注册账户"
+	"createAccount": "注册账户",
+	"disableAll": "禁用全部",
+	"enableAll": "启用全部",
+	"adminPermission": "管理员权限"
 }
 </locale>
 
@@ -3488,6 +3618,7 @@ defineExpose({
 	"authPermission": "{name}要求以下的權限",
 	"authPermissionAsk": "此應用程式需要以下權限",
 	"permissionsLabels": {
+		"access:mcp": "連線至 MCP（遵循現有 API 權限與可見範圍，可能允許讀取此帳號自己的非公開筆記）",
 		"read:account": "查看我的帳戶資訊",
 		"write:account": "更改我的帳戶資訊",
 		"read:blocks": "查看封鎖名單",
@@ -3585,6 +3716,9 @@ defineExpose({
 	"authDenied": "拒絕訪問",
 	"somethingHappened": "發生錯誤",
 	"existingAccount": "現有帳戶",
-	"createAccount": "建立帳戶"
+	"createAccount": "建立帳戶",
+	"disableAll": "停用全部",
+	"enableAll": "啟用全部",
+	"adminPermission": "管理員權限"
 }
 </locale>

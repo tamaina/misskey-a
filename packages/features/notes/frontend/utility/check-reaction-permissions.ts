@@ -11,7 +11,8 @@ export function checkReactionPermissions(me: Misskey.entities.MeDetailed, note: 
 	if ('char' in emoji) return true; // UnicodeEmojiDefなら常にリアクション可能
 
 	const roleIdsThatCanBeUsedThisEmojiAsReaction = emoji.roleIdsThatCanBeUsedThisEmojiAsReaction ?? [];
-	return !(emoji.localOnly && note.user.host !== me.host)
+	const canUseLocalOnlyEmoji = !emoji.localOnly || (note.user.host === me.host && (note.renote?.user.host == null || note.renote.user.host === me.host));
+	return canUseLocalOnlyEmoji
       && !(emoji.isSensitive && (note.reactionAcceptance === 'nonSensitiveOnly' || note.reactionAcceptance === 'nonSensitiveOnlyForLocalLikeOnlyForRemote'))
       && (roleIdsThatCanBeUsedThisEmojiAsReaction.length === 0 || me.roles.some(role => roleIdsThatCanBeUsedThisEmojiAsReaction.includes(role.id)));
 }

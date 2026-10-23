@@ -3,31 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartPerUserPvDefinition, userChartInput, chartPerUserPvOutput } from '../../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { PerUserPvChart } from '../../../charts/per-user-pv.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-const contractProjection = projectEndpointContract(chartPerUserPvDefinition);
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { chartPerUserPvContract, chartPerUserPvGetContract } from './pv.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../../api.implementation.js';
+export function createPerUserPvProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userPv']) {
+	return createApiProcedure<Actor>()(chartPerUserPvContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
+export function createPerUserPvGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['userPv']) {
+	return createApiProcedure<Actor>()(chartPerUserPvGetContract)
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null, input.userId)));
+}
 
-export const meta = {
-	tags: ['charts', 'users'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof userChartInput, typeof chartPerUserPvOutput> {
-	constructor(
-		private perUserPvChart: PerUserPvChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.perUserPvChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null, ps.userId);
-		});
-	}
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['userPv']['getChart']>>) {
+	return { upv: { user: value.upv.user.map(item => item), visitor: value.upv.visitor.map(item => item) }, pv: { user: value.pv.user.map(item => item), visitor: value.pv.visitor.map(item => item) } };
 }

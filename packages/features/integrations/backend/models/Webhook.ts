@@ -5,12 +5,15 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@features/persistence/backend/models/util/id.js';
+import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
+import { MiAntenna } from '@features/timelines/backend/models/Antenna.js';
 import { MiUser } from '@features/users/backend/models/User.js';
-import { webhookEventTypes } from '@features/integrations/contract';
-import type { WebhookEventTypes } from '@features/integrations/contract';
+import { webhookEventTypes } from '../webhook-events.schema.js';
+import type { WebhookEventTypes } from '../webhook-events.schema.js';
+import type { StreamSubscription } from '@features/mcp/backend/stream-types.js';
 
-export { webhookEventTypes } from '@features/integrations/contract';
-export type { WebhookEventTypes } from '@features/integrations/contract';
+export { webhookEventTypes } from '../webhook-events.schema.js';
+export type { WebhookEventTypes } from '../webhook-events.schema.js';
 
 @Entity('webhook')
 export class MiWebhook {
@@ -57,6 +60,44 @@ export class MiWebhook {
 		default: true,
 	})
 	public active: boolean;
+
+	@Column('varchar', { length: 16, default: 'legacy' })
+	public mode: 'legacy' | 'mcp';
+
+	@Index('IDX_webhook_mcpTokenId')
+	@Column({ ...id(), nullable: true })
+	public mcpTokenId: string | null;
+
+	@ManyToOne(() => MiAccessToken, { onDelete: 'CASCADE', nullable: true })
+	@JoinColumn({ name: 'mcpTokenId', foreignKeyConstraintName: 'FK_webhook_mcpTokenId' })
+	public mcpToken: MiAccessToken | null;
+
+	@Index('IDX_webhook_mcpAntennaId')
+	@Column({ ...id(), nullable: true })
+	public mcpAntennaId: string | null;
+
+	@Column('jsonb', { nullable: true })
+	public mcpStream: StreamSubscription | null;
+
+	@Column('timestamp with time zone', { nullable: true })
+	public mcpStreamSince: Date | null;
+
+	@ManyToOne(() => MiAntenna, { onDelete: 'CASCADE', nullable: true })
+	@JoinColumn({ name: 'mcpAntennaId', foreignKeyConstraintName: 'FK_webhook_mcpAntennaId' })
+	public mcpAntenna: MiAntenna | null;
+
+	@Column('timestamp with time zone', { nullable: true })
+	public mcpExpiresAt: Date | null;
+
+	/** Changes after lapse or unsubscribe so old queued events cannot revive. */
+	@Column('uuid', { nullable: true })
+	public mcpGeneration: string | null;
+
+	@Column('varchar', { length: 1024, nullable: true, select: false })
+	public mcpPreviousSecret: string | null;
+
+	@Column('timestamp with time zone', { nullable: true })
+	public mcpPreviousSecretUntil: Date | null;
 
 	/**
 	 * 直近のリクエスト送信日時

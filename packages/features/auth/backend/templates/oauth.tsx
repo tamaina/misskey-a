@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { CommonProps } from '@features/web/backend/templates/_.js';
 import { Layout } from '@features/web/backend/templates/base.js';
+import type { CommonProps } from '@features/web/backend/templates/_.js';
 
 export function OAuthPage(props: CommonProps<{
 	transactionId: string;
 	clientName: string;
 	clientLogo?: string;
 	scope: string[];
+	selectablePermissions?: string[];
 }>) {
 	//- Should be removed by the page when it loads, so that it won't needlessly
 	//- stay when user navigates away via the navigation bar
@@ -22,6 +23,7 @@ export function OAuthPage(props: CommonProps<{
 				<meta name="misskey:oauth:client-name" content={props.clientName} />
 				{props.clientLogo ? <meta name="misskey:oauth:client-logo" content={props.clientLogo} /> : null}
 				<meta name="misskey:oauth:scope" content={props.scope.join(' ')} />
+				{props.selectablePermissions ? <meta name="misskey:oauth:selectable-permissions" content={props.selectablePermissions.join(' ')} /> : null}
 			</>
 		);
 	}

@@ -2,16 +2,22 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { selectorIRevokeTokenDefinition, selectorIRevokeTokenInput, selectorIRevokeTokenOutput } from '../../../contract/selector-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { MiAccessToken } from '../../models/AccessToken.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(selectorIRevokeTokenDefinition);
+import { IRevokeTokenContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
+
+/** Preserve legacy selector precedence and the original repository comparison.
+ * An inactive tokenId may contain JSON when the token alternative is valid.
+ * This narrow port models the actual runtime call without asserting it is a string.
+ */
+export interface TokenRevocationRepository {
+	findOneBy(where: { id: PackedJsonValue | undefined; userId: string } | { token: string; userId: string }): Promise<MiAccessToken | null>;
+	delete(where: { id: string }): Promise<unknown>;
+}
 
 export const meta = {
 	description: 'Revoke an access token of the authenticated user. Requires credential. When called with an access token (third-party app), only the token currently in use can be revoked.',
@@ -25,46 +31,46 @@ export const meta = {
 			message: 'Credential required.',
 			code: 'CREDENTIAL_REQUIRED',
 			id: '6f1f0d3a-3d5b-4b1f-9c3e-2a6d1e5b8c47',
-			httpStatusCode: 401,
+			status: 401,
 		},
 		permissionDenied: {
 			message: 'Permission denied.',
 			code: 'PERMISSION_DENIED',
 			id: 'fc20d118-5705-4462-b6c5-2b5b43092cf3',
-			httpStatusCode: 403,
+			status: 403,
 		},
 	},
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof selectorIRevokeTokenInput, typeof selectorIRevokeTokenOutput, 'legacy-declared'> {
-	constructor(
-		@Inject(DI.accessTokensRepository)
-		private accessTokensRepository: AccessTokensRepository,
-	) {
-		super(meta, contractProjection, async (ps, me, token) => {
+export interface IRevokeTokenDependencies {
+	accessTokensRepository: TokenRevocationRepository;
+}
+export function createIRevokeTokenProcedure(deps: IRevokeTokenDependencies) {
+	return createApiProcedure<MiLocalUser>()(IRevokeTokenContract).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const token = context.token;
+		const result = await (async () => {
 			if (me == null) {
-				throw new ApiError(meta.errors.credentialRequired);
+				throw apiError(meta.errors.credentialRequired);
 			}
 
 			let target: MiAccessToken | null = null;
 			if ('tokenId' in ps) {
-				target = await this.accessTokensRepository.findOneBy({ id: ps.tokenId, userId: me.id });
+				target = await deps.accessTokensRepository.findOneBy({ id: ps.tokenId, userId: me.id });
 			} else {
 				if (ps.token == null || ps.token === '') return;
-				target = await this.accessTokensRepository.findOneBy({ token: ps.token, userId: me.id });
+				target = await deps.accessTokensRepository.findOneBy({ token: ps.token, userId: me.id });
 			}
 
 			if (target == null) return;
 
 			// サードパーティアプリ (アクセストークン) からのリクエストでは、いま使われているトークン自身のみ失効できる
 			if (token != null && token.id !== target.id) {
-				throw new ApiError(meta.errors.permissionDenied);
+				throw apiError(meta.errors.permissionDenied);
 			}
 
-			await this.accessTokensRepository.delete({ id: target.id });
-		});
-	}
+			await deps.accessTokensRepository.delete({ id: target.id });
+		})();
+		return result;
+	});
 }

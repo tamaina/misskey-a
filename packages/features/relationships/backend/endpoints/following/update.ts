@@ -2,100 +2,51 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedUserLite } from '@features/users/backend/user.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFollowingUpdateDefinition, packedFollowingUpdateInput, packedFollowingUpdateOutput } from '../../../contract/packed-endpoint-definitions.js';
-import ms from 'ms';
-import { Inject, Injectable } from '@nestjs/common';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
 
-import type { FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
-import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { UserFollowingService } from '../../services/UserFollowingService.js';
-import { DI } from '@/di-symbols.js';
-import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedFollowingUpdateDefinition);
-
-export const meta = {
-	tags: ['following', 'users'],
-
-	limit: {
-		duration: ms('1hour'),
-		max: 100,
-	},
-
-	requireCredential: true,
-
-	kind: 'write:following',
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '14318698-f67e-492a-99da-5353a5ac52be',
-		},
-
-		followeeIsYourself: {
-			message: 'Followee is yourself.',
-			code: 'FOLLOWEE_IS_YOURSELF',
-			id: '4c4cbaf9-962a-463b-8418-a5e365dbf2eb',
-		},
-
-		notFollowing: {
-			message: 'You are not following that user.',
-			code: 'NOT_FOLLOWING',
-			id: 'b8dc75cf-1cb5-46c9-b14b-5f1ffbd782c9',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFollowingUpdateInput, typeof packedFollowingUpdateOutput> {
-	constructor(
-		@Inject(DI.followingsRepository)
-		private followingsRepository: FollowingsRepository,
-
-		private userEntityService: UserEntityService,
-		private getterService: GetterService,
-		private userFollowingService: UserFollowingService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../relationships.errors.js';
+export function createFollowingUpdateProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'getterService' | 'followingsRepository' | 'userEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["following/update"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
 			const follower = me;
 
 			// Check if the follower is yourself
 			if (me.id === ps.userId) {
-				throw new ApiError(meta.errors.followeeIsYourself);
+				throw apiError(relationshipsErrors['following/update'].followeeIsYourself);
 			}
 
 			// Get followee
-			const followee = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
+			const followee = await deps.getterService.getUser(ps.userId).catch(err => {
+				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(relationshipsErrors['following/update'].noSuchUser);
 				throw err;
 			});
 
 			// Check not following
-			const exist = await this.followingsRepository.findOneBy({
+			const exist = await deps.followingsRepository.findOneBy({
 				followerId: follower.id,
 				followeeId: followee.id,
 			});
 
 			if (exist == null) {
-				throw new ApiError(meta.errors.notFollowing);
+				throw apiError(relationshipsErrors['following/update'].notFollowing);
 			}
 
-			await this.followingsRepository.update({
+			await deps.followingsRepository.update({
 				id: exist.id,
 			}, {
 				notify: ps.notify != null ? (ps.notify === 'none' ? null : ps.notify) : undefined,
 				withReplies: ps.withReplies != null ? ps.withReplies : undefined,
 			});
 
-			return await this.userEntityService.pack(follower.id, me);
+			return toPackedUserLite(await deps.userEntityService.pack(follower.id, me));
 		});
-	}
 }

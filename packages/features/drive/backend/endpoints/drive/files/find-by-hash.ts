@@ -3,45 +3,34 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedDriveFilesFindByHashDefinition, packedDriveFilesFindByHashInput, packedDriveFilesFindByHashOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { toPackedDriveFile } from '@features/notes/backend/drive.schema.js';
 import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { DriveFileEntityService } from '../../../serializers/DriveFileEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-const contractProjection = projectEndpointContract(packedDriveFilesFindByHashDefinition);
+export interface DriveFilesFindByHashDependencies {
+	driveFilesRepository: DriveFilesRepository;
+	driveFileEntityService: Pick<DriveFileEntityService, 'packMany'>;
+}
+export function createDriveFilesFindByHashProcedure(deps: DriveFilesFindByHashDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive/files/find-by-hash']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				const _ip = context.ip;
+				const _headers = context.headers;
+				const files = await deps.driveFilesRepository.findBy({
+					md5: ps.md5,
+					userId: me.id,
+				});
 
-export const meta = {
-	tags: ['drive'],
-
-	requireCredential: true,
-
-	kind: 'read:drive',
-
-	description: 'Search for a drive file by a hash of the contents.',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFilesFindByHashInput, typeof packedDriveFilesFindByHashOutput> {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		private driveFileEntityService: DriveFileEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const files = await this.driveFilesRepository.findBy({
-				md5: ps.md5,
-				userId: me.id,
-			});
-
-			return await this.driveFileEntityService.packMany(files, { self: true });
+				return await deps.driveFileEntityService.packMany(files, { self: true });
+			})();
+			return result.map(toPackedDriveFile);
 		});
-	}
 }

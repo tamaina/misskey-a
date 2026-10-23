@@ -52,7 +52,7 @@ import { char2twemojiFilePath, char2fluentEmojiFilePath } from '@features/emojis
 import { MFM_TAGS, MFM_PARAMS } from '@features/markup/frontend/shared/mfm-constants.js';
 import type { EmojiDef } from '@features/emojis/frontend/utility/search-emoji.js';
 import { elementContains } from '@features/ui/frontend/utility/element-contains.js';
-import { acct } from '@features/users/frontend/filters/user.js';
+import { acct } from '@features/users/frontend/shared/user.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { store } from '@features/preferences/frontend/store.js';

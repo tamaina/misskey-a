@@ -5,7 +5,7 @@
 
 import * as v from 'valibot';
 import * as Misskey from 'misskey-js';
-import { packedPageBlockSchema } from '@features/pages/contract/page-block.js';
+import { packedPageBlockSchema } from '@features/pages/backend/page-block.schema.js';
 
 export function isKnownPageBlock(block: unknown): block is Misskey.entities.PageBlock {
 	return v.is(packedPageBlockSchema, block);

@@ -8,7 +8,7 @@ import { MiAbuseUserReport, MiNote, MiUser, MiWebhook } from '@features/persiste
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiSystemWebhook, type SystemWebhookEventType } from '../models/SystemWebhook.js';
 import { type AbuseReportPayload, SystemWebhookPayload, SystemWebhookService } from './SystemWebhookService.js';
-import { type Packed } from '@features/index/contract/packed.js';
+import { type Packed } from '@features/index/backend/packed.schema.js';
 import { type WebhookEventTypes } from '../models/Webhook.js';
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { type UserWebhookPayload, UserWebhookService } from './UserWebhookService.js';
@@ -44,6 +44,7 @@ function generateDummyUser(override?: Partial<MiUser>): MiUser {
 		avatarDecorations: [],
 		tags: [],
 		isSuspended: false,
+		isRemoteSuspended: false,
 		isLocked: false,
 		isBot: false,
 		isCat: true,
@@ -241,11 +242,11 @@ export class WebhookTestService {
 				send('unfollow', { user: await this.toPackedUserDetailedNotMe(dummyUser3) });
 				break;
 			}
-			// まだ実装されていない (#9485)
 			case 'reaction':
-				return;
+				send('reaction', { note: await this.toPackedNote(dummyNote1), reaction: '👍', user: await this.toPackedUserLite(dummyUser2) });
+				break;
 			default: {
-				const _exhaustiveAssertion: never = params.type;
+				// Notification and chat events are tested through their native creation paths.
 				return;
 			}
 		}

@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import { Entity, Index, JoinColumn, Column, PrimaryColumn, ManyToOne } from 'typeorm';
 import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
-
-export { pageNameSchema } from '../../contract/page-name.js';
 
 @Entity('page')
 @Index(['userId', 'name'], { unique: true })
@@ -79,12 +78,12 @@ export class MiPage {
 	@Column('jsonb', {
 		default: [],
 	})
-	public content: Record<string, any>[];
+	public content: { [key: string]: PackedJsonValue }[];
 
 	@Column('jsonb', {
 		default: [],
 	})
-	public variables: Record<string, any>[];
+	public variables: { [key: string]: PackedJsonValue }[];
 
 	@Column('varchar', {
 		length: 16384,

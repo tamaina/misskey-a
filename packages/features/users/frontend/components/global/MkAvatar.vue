@@ -49,7 +49,7 @@ import { extractAvgColorFromBlurhash } from '@features/drive/frontend/shared/ext
 import MkImgWithBlurhash from '@features/drive/frontend/components/MkImgWithBlurhash.vue';
 import MkA from '@features/navigation/frontend/components/global/MkA.vue';
 import { getStaticImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
-import { acct, userPage } from '@features/users/frontend/filters/user.js';
+import { acct, userPage } from '@features/users/frontend/shared/user.js';
 import MkUserOnlineIndicator from '@features/users/frontend/components/MkUserOnlineIndicator.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 

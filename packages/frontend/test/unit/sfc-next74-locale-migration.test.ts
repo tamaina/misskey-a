@@ -3,8 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
 import { readFileSync } from 'node:fs';
+import { restoreGlobalCatalogPilotSource, restoreGlobalCatalogPilotDictionary } from './global-catalog-pilot-baseline.js';
+import { restoreProductNameBaseline } from './product-name-source-rebase.js';
 import { restoreRssContractBaseline } from './rss-contract-source-rebase.js';
+import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,7 +17,11 @@ import * as Vue from 'vue';
 import { compileScript, parse } from 'vue/compiler-sfc';
 import ts from 'typescript';
 import { describe, expect, test } from 'vitest';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { restorePilotHistoricalSource, reviewedPilotMessage } from './instance-pilot-locale-metadata.js';
+import { restoreEmailHistoricalSource, reviewedEmailMessage } from './email-settings-locale-baseline.js';
+import { restoreFinalOwnerHistoricalSource, reviewedFinalOwnerMessage } from './final-owner-locale-baseline.js';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import * as VviRuntime from 'vite-vue-internationalization/runtime';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
@@ -128,7 +136,7 @@ function getLocaleValue(language: string, keyPath: string): string {
 }
 
 function getBlocks(file: string): Map<string, Record<string, string>> {
-	const { descriptor, errors } = parse(readFileSync(resolve(repoRoot, file), 'utf8'), { filename: file });
+	const { descriptor, errors } = parse(restorePilotHistoricalSource(file, restoreEmailHistoricalSource(file, restoreFinalOwnerHistoricalSource(file, restoreClientErrorLogBaseline(file, restoreGlobalCatalogPilotSource(file, readFileSync(resolve(repoRoot, file), 'utf8')))))), { filename: file });
 	expect(errors).toEqual([]);
 	const blocks = descriptor.customBlocks.filter(block => block.type === 'locale');
 	const result = new Map<string, Record<string, string>>();
@@ -142,7 +150,7 @@ function getBlocks(file: string): Map<string, Record<string, string>> {
 
 const compiledSources = new Map<string, string>();
 
-function compileSource(file: string): string {
+async function compileSource(file: string): Promise<string> {
 	const cached = compiledSources.get(file);
 	if (cached) return cached;
 	const filename = resolve(repoRoot, file);
@@ -151,9 +159,8 @@ function compileSource(file: string): string {
 	const configure = plugin.configResolved;
 	const transform = plugin.transform;
 	if (typeof configure !== 'function' || !transform || typeof transform === 'function') throw new Error('Expected VVI hooks');
-	configure.call({} as never, { root: resolve(repoRoot, 'packages/frontend'), command: 'serve', base: '/' } as never);
-	const transformed = transform.handler.call({} as never, source, filename);
-	if (transformed instanceof Promise) throw new Error('Expected synchronous SFC transform');
+	configure.call({} as never, { root: resolve(repoRoot, 'packages/frontend'), command: 'serve', base: '/', build: { ssr: false } } as never);
+	const transformed = await transform.handler.call({} as never, source, filename);
 	const transformedSource = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? source;
 	expect(transformedSource).not.toContain('<locale locale=');
 	const { descriptor, errors } = parse(transformedSource, { filename });
@@ -168,9 +175,9 @@ function compileSource(file: string): string {
 	return output.outputText;
 }
 
-function compileComponent(file: string, dependencies: Record<string, unknown>): Component {
+async function compileComponent(file: string, dependencies: Record<string, unknown>): Promise<Component> {
 	const exports: { default?: Component } = {};
-	runInNewContext(compileSource(file), {
+	runInNewContext(await compileSource(file), {
 		exports,
 		require(specifier: string) {
 			if (specifier === 'vue') return Vue;
@@ -178,7 +185,7 @@ function compileComponent(file: string, dependencies: Record<string, unknown>): 
 			if (Object.hasOwn(dependencies, specifier)) return { __esModule: true, ...(dependencies[specifier] as Record<string, unknown>) };
 			throw new Error(`Unexpected dependency: ${specifier}`);
 		},
-		window, document, navigator, console,
+		window, document: window.document, navigator, console,
 	}, { filename: file });
 	if (!exports.default) throw new Error(`Missing compiled component: ${file}`);
 	return exports.default;
@@ -204,8 +211,10 @@ describe('next74 static raw-label ownership', () => {
 		expect(languages).toHaveLength(28);
 	});
 
-	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', migration => {
-		const source = restoreRssContractBaseline(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8'));
+	test.each(migrations)('$file preserves all languages and reconstructs the original complete source', async migration => {
+		const actualSource = restoreClientErrorLogBaseline(migration.file, restoreGlobalCatalogPilotSource(migration.file, readFileSync(resolve(repoRoot, migration.file), 'utf8')));
+		const passwordSource = migration.file === 'packages/features/auth/frontend/components/MkPasswordDialog.vue' ? restorePasswordChangeBaseline(migration.file, actualSource) : actualSource;
+		const source = restoreRssContractBaseline(migration.file, restorePilotHistoricalSource(migration.file, restoreEmailHistoricalSource(migration.file, restoreFinalOwnerHistoricalSource(migration.file, restoreProductNameBaseline(migration.file, passwordSource)))));
 		const blocks = getBlocks(migration.file);
 		expect([...blocks.keys()]).toEqual([...languages]);
 		expect(source).not.toContain(legacyImport);
@@ -247,17 +256,19 @@ describe('next74 static raw-label ownership', () => {
 		expect(createHash('sha256').update(reversed).digest('hex')).toBe(migration.sha256);
 		// The real repository wrapper, installed VVI transform and Vue compiler
 		// must accept the unchanged template/script/styles and static numeric key.
-		expect(compileSource(migration.file)).toContain('virtual:vite-vue-internationalization');
+		expect(await compileSource(migration.file)).toContain('virtual:vite-vue-internationalization');
 	});
 
 	test.each(languages)('actual VVI plugin loaders resolve all 74 raw dictionaries in %s', async language => {
 		const runtime = await loadActualLocale(language);
 		Vue.createApp({}).use(runtime);
 		for (const migration of migrations) {
-			const dictionary = VviRuntime.createComponentLocale('/' + migration.file.replace(/^packages\//, ''));
+			const moduleId = '/' + migration.file.replace(/^packages\//, '');
+			const scope = VviRuntime.useLocale(moduleId).value;
+			const dictionary = restoreGlobalCatalogPilotDictionary(migration.file, language, scope.sfc, scope.env);
 			for (const keyPath of migration.keyPaths) {
 				const actual = dictionary[keyPath.split('.').at(-1)!];
-				const expected = getLocaleValue(language, keyPath);
+				const expected = reviewedFinalOwnerMessage(migration.file, language, keyPath.split('.').at(-1)!, reviewedEmailMessage(migration.file, language, keyPath.split('.').at(-1)!, reviewedPilotMessage(migration.file, language, keyPath.split('.').at(-1)!, getLocaleValue(language, keyPath))));
 				expect(actual).toBe(expected);
 				expect(Buffer.from(String(actual), 'utf8')).toEqual(Buffer.from(expected, 'utf8'));
 			}
@@ -276,7 +287,7 @@ describe('next74 static raw-label ownership', () => {
 			]),
 		});
 		const button = Vue.defineComponent({ setup: (_props, { slots }) => () => Vue.h('button', slots.default?.()) });
-		const component = compileComponent(file, {
+		const component = await compileComponent(file, {
 			'@features/ui/frontend/components/MkInput.vue': { default: input },
 			'@features/ui/frontend/components/MkButton.vue': { default: button },
 		});
@@ -284,7 +295,7 @@ describe('next74 static raw-label ownership', () => {
 		const app = Vue.createApp(component, { onTotpSubmitted: (token: string) => submitted.push(token) });
 		app.use(await loadActualLocale(language));
 		app.config.globalProperties.$style = new Proxy({}, { get: (_target, key) => String(key) });
-		const element = document.createElement('div');
+		const element = window.document.createElement('div');
 		app.mount(element);
 		try {
 			expect(element.querySelector('.totpDescription')?.textContent).toBe(locales[language]['2fa']);

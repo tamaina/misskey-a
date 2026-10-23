@@ -1,7 +1,7 @@
 {
 	"type": "module",
 	"name": "misskey-js",
-	"version": "2026.10.0",
+	"version": "9000.0.0-beta.7",
 	"description": "Misskey SDK for JavaScript",
 	"license": "MIT",
 	"main": "./built/index.js",
@@ -29,38 +29,47 @@
 		"lint": "pnpm typecheck && pnpm eslint",
 		"vitest": "vitest run --coverage",
 		"test": "pnpm vitest && pnpm tsd",
+		"test:orpc-fetch": "node --test test-node/orpc-fetch.test.mjs",
+		"test:orpc": "pnpm build && node --test --test-concurrency=1 test-node/*.test.mjs",
 		"update-autogen-code": "pnpm --filter misskey-js-type-generator generate && ncp generator/built/autogen src/autogen"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/misskey-dev/misskey.git",
+		"url": "https://github.com/tamaina/misskey-a.git",
 		"directory": "packages/misskey-js"
 	},
 	"devDependencies": {
-		"@microsoft/api-extractor": "7.59.0",
-		"@types/node": "26.4.0",
-		"@typescript-eslint/eslint-plugin": "8.68.0",
-		"@typescript-eslint/parser": "8.68.0",
-		"@vitest/coverage-v8": "4.1.11",
+		"@microsoft/api-extractor": "7.59.4",
+		"@types/node": "26.6.5",
+		"@typescript-eslint/eslint-plugin": "8.71.1",
+		"@typescript-eslint/parser": "8.71.1",
+		"@vitest/coverage-v8": "5.0.3",
 		"esbuild": "0.28.2",
-		"execa": "10.0.1",
+		"execa": "10.1.0",
 		"ncp": "2.0.0",
 		"nodemon": "3.1.14",
 		"tsd": "0.33.0",
-		"vitest": "4.1.11",
-		"vitest-websocket-mock": "0.7.0"
+		"vitest": "5.0.3",
+		"vitest-websocket-mock": "0.8.0"
 	},
 	"files": [
 		"built"
 	],
 	"dependencies": {
-		"@simplewebauthn/browser": "13.3.0",
+		"@orpc/client": "1.15.4",
+		"@orpc/openapi-client": "1.15.4",
+		"@simplewebauthn/browser": "14.0.0",
 		"eventemitter3": "5.0.4",
 		"reconnecting-websocket": "4.4.0",
 		"@orpc/contract": "1.15.4",
 		"valibot": "1.5.0"
 	},
 	"imports": {
-		"#feature-contracts/*": "./built/contracts/*/contract/index.js"
+		"#api-routing": "./built/contracts/api/shared/api-routing.js",
+		"#pilot-contract": "./built/contracts/index/backend/client.contract.js",
+		"#pilot-error-data": "./built/contracts/api/backend/transport/errors.schema.js",
+		"#native-json-value": "./built/contracts/users/backend/json-value.schema.js",
+		"#packed-models": "./built/contracts/index/backend/packed.schema.js",
+		"#session-errors": "./built/contracts/auth/backend/session-errors.schema.js"
 	}
 }

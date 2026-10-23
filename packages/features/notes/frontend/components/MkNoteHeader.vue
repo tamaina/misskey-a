@@ -38,8 +38,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { inject } from 'vue';
 import * as Misskey from 'misskey-js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
-import { notePage } from '@features/notes/frontend/filters/note.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { notePage } from '@features/notes/frontend/shared/note.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import { DI } from '@features/ui/frontend/di.js';
 
 defineProps<{

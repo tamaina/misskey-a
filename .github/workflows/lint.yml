@@ -3,11 +3,15 @@ name: Lint
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/backend/**
+      - packages/features/mcp/**
+      - packages/features/relationships/**
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       - packages/frontend-shared/**
       - packages/frontend-builder/**
       - packages/frontend-embed/**
@@ -22,10 +26,14 @@ on:
       - package.json
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/backend/**
+      - packages/features/mcp/**
+      - packages/features/relationships/**
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       - packages/frontend-shared/**
       - packages/frontend-builder/**
       - packages/frontend-embed/**

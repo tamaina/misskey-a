@@ -1,0 +1,121 @@
+/*
+	* SPDX-FileCopyrightText: syuilo and misskey-project
+	* SPDX-License-Identifier: AGPL-3.0-only
+	*/
+
+import { toPackedJsonValue, toPackedRecord } from '../../users/backend/json-value.schema.js';
+import * as v from 'valibot';
+import { packedRoleLiteSchema, packedRolePoliciesSchema } from '../../users/backend/user-related.schema.js';
+import { packedOptionalJsonValueSchema, type PackedJsonValue } from '../../users/backend/json-value.schema.js';
+export { packedRoleLiteSchema, packedRolePoliciesSchema };
+export const rolePoliciesSchema = v.strictObject({ ...packedRolePoliciesSchema.entries, rateLimitFactor: v.pipe(v.number(), v.finite()) });
+
+export type RoleFormula = { id: string } & (
+	{ type: 'and'; values: RoleFormula[] } | { type: 'or'; values: RoleFormula[] } | { type: 'not'; value: RoleFormula } |
+{ type: 'isLocal' } | { type: 'isRemote' } | { type: 'isSuspended' } | { type: 'isLocked' } | { type: 'isBot' } | { type: 'isCat' } | { type: 'isExplorable' } |
+	{ type: 'roleAssignedTo'; roleId: string } |
+{ type: 'createdLessThan'; sec: number } | { type: 'createdMoreThan'; sec: number } |
+{ type: 'followersLessThanOrEq'; value: number } | { type: 'followersMoreThanOrEq'; value: number } | { type: 'followingLessThanOrEq'; value: number } | { type: 'followingMoreThanOrEq'; value: number } | { type: 'notesLessThanOrEq'; value: number } | { type: 'notesMoreThanOrEq'; value: number }
+);
+const finite = v.pipe(v.number(), v.finite());
+export const roleCondFormulaSchema: v.GenericSchema<RoleFormula> = v.lazy(() => v.variant('type', [
+	v.strictObject({ id: v.string(), type: v.literal('and'), values: v.array(roleCondFormulaSchema) }),
+	v.strictObject({ id: v.string(), type: v.literal('or'), values: v.array(roleCondFormulaSchema) }),
+	v.strictObject({ id: v.string(), type: v.literal('not'), value: roleCondFormulaSchema }),
+	v.strictObject({ id: v.string(), type: v.literal('isLocal') }),
+	v.strictObject({ id: v.string(), type: v.literal('isRemote') }),
+	v.strictObject({ id: v.string(), type: v.literal('isSuspended') }),
+	v.strictObject({ id: v.string(), type: v.literal('isLocked') }),
+	v.strictObject({ id: v.string(), type: v.literal('isBot') }),
+	v.strictObject({ id: v.string(), type: v.literal('isCat') }),
+	v.strictObject({ id: v.string(), type: v.literal('isExplorable') }),
+	v.strictObject({ id: v.string(), type: v.literal('roleAssignedTo'), roleId: v.string() }),
+	v.strictObject({ id: v.string(), type: v.literal('createdLessThan'), sec: finite }),
+	v.strictObject({ id: v.string(), type: v.literal('createdMoreThan'), sec: finite }),
+	v.strictObject({ id: v.string(), type: v.literal('followersLessThanOrEq'), value: finite }),
+	v.strictObject({ id: v.string(), type: v.literal('followersMoreThanOrEq'), value: finite }),
+	v.strictObject({ id: v.string(), type: v.literal('followingLessThanOrEq'), value: finite }),
+	v.strictObject({ id: v.string(), type: v.literal('followingMoreThanOrEq'), value: finite }),
+	v.strictObject({ id: v.string(), type: v.literal('notesLessThanOrEq'), value: finite }),
+	v.strictObject({ id: v.string(), type: v.literal('notesMoreThanOrEq'), value: finite }),
+]));
+/** Sparse stored settings have an exact finite DTO independent of recursive validator declaration expansion. */
+export type RolePolicySetting = {
+	useDefault?: boolean | undefined;
+	priority?: number | undefined;
+	value?: PackedJsonValue | undefined;
+};
+export const rolePolicySettingsSchema: v.GenericSchema<Record<string, RolePolicySetting>> = v.record(v.string(), v.strictObject({
+	useDefault: v.optional(v.boolean()), priority: v.optional(finite), value: packedOptionalJsonValueSchema,
+}));
+const roleFieldsSchema = v.strictObject({
+	...packedRoleLiteSchema.entries,
+	createdAt: v.string(), updatedAt: v.string(),
+	isPublic: v.boolean(), isExplorable: v.boolean(), asBadge: v.boolean(),
+	preserveAssignmentOnMoveAccount: v.boolean(), canEditMembersByModerator: v.boolean(),
+	policies: rolePolicySettingsSchema, usersCount: v.pipe(finite, v.integer()),
+});
+// The migration initialized formulas with {}; conditional evaluation treats it as false.
+// Preserve that exact stored default while keeping nonempty formulas fully validated.
+export const emptyRoleFormulaSchema: v.GenericSchema<Record<string, never>> = v.strictObject({});
+export type RoleDto = v.InferOutput<typeof roleFieldsSchema> & {
+	target: 'manual' | 'conditional';
+	condFormula: RoleFormula | Record<string, never>;
+};
+export const roleSchema: v.GenericSchema<RoleDto> = v.strictObject({
+	...roleFieldsSchema.entries,
+	target: v.picklist(['manual', 'conditional']),
+	condFormula: v.union([roleCondFormulaSchema, emptyRoleFormulaSchema]),
+});
+export const packedRoleSchema = roleSchema;
+export const packedRoleCondFormulaValueSchema = roleCondFormulaSchema;
+
+export function toRoleFormula(formula: RoleFormula): RoleFormula {
+	switch (formula.type) {
+		case 'and': case 'or': return { id: formula.id, type: formula.type, values: formula.values.map(toRoleFormula) };
+		case 'not': return { id: formula.id, type: formula.type, value: toRoleFormula(formula.value) };
+		case 'roleAssignedTo': return { id: formula.id, type: formula.type, roleId: formula.roleId };
+		case 'createdLessThan': case 'createdMoreThan': return { id: formula.id, type: formula.type, sec: formula.sec };
+		case 'followersLessThanOrEq': case 'followersMoreThanOrEq':
+		case 'followingLessThanOrEq': case 'followingMoreThanOrEq':
+		case 'notesLessThanOrEq': case 'notesMoreThanOrEq': return { id: formula.id, type: formula.type, value: formula.value };
+		default: return { id: formula.id, type: formula.type };
+	}
+}
+
+function isRoleFormula(formula: RoleDto['condFormula']): formula is RoleFormula {
+	if (typeof formula.id !== 'string') return false;
+	switch (formula.type) {
+		case 'and': case 'or': return Array.isArray(formula.values) && formula.values.every(isRoleFormula);
+		case 'not': return formula.value !== null && typeof formula.value === 'object' && isRoleFormula(formula.value);
+		case 'roleAssignedTo': return typeof formula.roleId === 'string';
+		case 'createdLessThan': case 'createdMoreThan': return typeof formula.sec === 'number' && Number.isFinite(formula.sec);
+		case 'followersLessThanOrEq': case 'followersMoreThanOrEq':
+		case 'followingLessThanOrEq': case 'followingMoreThanOrEq':
+		case 'notesLessThanOrEq': case 'notesMoreThanOrEq': return typeof formula.value === 'number' && Number.isFinite(formula.value);
+		case 'isLocal': case 'isRemote': case 'isSuspended': case 'isLocked':
+		case 'isBot': case 'isCat': case 'isExplorable': return true;
+		default: return false;
+	}
+}
+
+export function toRoleDto(role: RoleDto): RoleDto {
+	const formula = role.condFormula;
+	const condFormula = isRoleFormula(formula) ? toRoleFormula(formula) : Object.keys(formula).length === 0 ? {} : null;
+	if (condFormula === null) throw new Error('Cannot serialize invalid persisted role formula');
+	return {
+		id: role.id, name: role.name, color: role.color, iconUrl: role.iconUrl,
+		description: role.description, isModerator: role.isModerator, isAdministrator: role.isAdministrator,
+		displayOrder: role.displayOrder, createdAt: role.createdAt, updatedAt: role.updatedAt,
+		isPublic: role.isPublic, isExplorable: role.isExplorable, asBadge: role.asBadge,
+		preserveAssignmentOnMoveAccount: role.preserveAssignmentOnMoveAccount,
+		canEditMembersByModerator: role.canEditMembersByModerator, target: role.target,
+		condFormula,
+		policies: Object.fromEntries(Object.entries(toPackedRecord(role.policies)).map(([name, policy]) => [name, {
+			...(policy.useDefault === undefined ? {} : { useDefault: policy.useDefault }),
+			...(policy.priority === undefined ? {} : { priority: policy.priority }),
+			...(policy.value === undefined ? {} : { value: toPackedJsonValue(policy.value) }),
+		}])),
+		usersCount: role.usersCount,
+	};
+}

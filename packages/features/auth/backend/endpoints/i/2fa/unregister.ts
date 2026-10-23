@@ -3,24 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidI2faUnregisterDefinition, voidI2faUnregisterInput, voidI2faUnregisterOutput } from '../../../../contract/void-endpoint-definitions.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { UserAuthService } from '../../../services/UserAuthService.js';
 
-const contractProjection = projectEndpointContract(voidI2faUnregisterDefinition);
+import { I2faUnregisterContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
-
-	secure: true,
 
 	errors: {
 		incorrectPassword: {
@@ -30,22 +26,19 @@ export const meta = {
 		},
 	},
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidI2faUnregisterInput, typeof voidI2faUnregisterOutput> {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private userEntityService: UserEntityService,
-		private userAuthService: UserAuthService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface I2faUnregisterDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createI2faUnregisterProcedure(deps: I2faUnregisterDependencies) {
+	return createApiProcedure<MiLocalUser>()(I2faUnregisterContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			const token = ps.token;
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -53,7 +46,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				}
 
 				try {
-					await this.userAuthService.twoFactorAuthenticate(profile, token);
+					await deps.userAuthService.twoFactorAuthenticate(profile, token);
 				} catch (_) {
 					throw new Error('authentication failed');
 				}
@@ -61,10 +54,10 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 			const passwordMatched = await bcrypt.compare(ps.password, profile.password ?? '');
 			if (!passwordMatched) {
-				throw new ApiError(meta.errors.incorrectPassword);
+				throw apiError(meta.errors.incorrectPassword);
 			}
 
-			await this.userProfilesRepository.update(me.id, {
+			await deps.userProfilesRepository.update(me.id, {
 				twoFactorSecret: null,
 				twoFactorBackupSecret: null,
 				twoFactorEnabled: false,
@@ -72,9 +65,10 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 			});
 
 			// Publish meUpdated event
-			this.globalEventService.publishMainStream(me.id, 'meUpdated', await this.userEntityService.packSelf(me.id, {
+			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {
 				includeSecrets: true,
 			}));
-		});
-	}
+		})();
+		return result;
+	});
 }

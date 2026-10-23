@@ -6,25 +6,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
-import { ModuleRef } from '@nestjs/core';
-import type { AuthenticationResponseJSON } from '@simplewebauthn/server';
-import type { Config } from '@/config.js';
-import type { InstancesRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { endpoints } from '@features/index/backend/endpoints.js';
-import { ApiCallService } from './ApiCallService.js';
-import { SignupApiService } from '@features/auth/backend/transport/SignupApiService.js';
-import { SigninApiService } from '@features/auth/backend/transport/SigninApiService.js';
-import { SigninWithPasskeyApiService } from '@features/auth/backend/transport/SigninWithPasskeyApiService.js';
+import { DI } from '@/di-symbols.js';
+import type { Config } from '@/config.js';
+import { OrpcPilotService } from './OrpcPilotService.js';
+import type { InstancesRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
+import { StandaloneAuthService } from '@features/auth/backend/StandaloneAuthService.js';
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
 
 @Injectable()
 export class ApiServerService {
 	constructor(
-		private moduleRef: ModuleRef,
-
 		@Inject(DI.config)
 		private config: Config,
 
@@ -35,10 +28,8 @@ export class ApiServerService {
 		private accessTokensRepository: AccessTokensRepository,
 
 		private userEntityService: UserEntityService,
-		private apiCallService: ApiCallService,
-		private signupApiService: SignupApiService,
-		private signinApiService: SigninApiService,
-		private signinWithPasskeyApiService: SigninWithPasskeyApiService,
+		private orpcPilot: OrpcPilotService,
+		private standaloneAuth: StandaloneAuthService,
 	) {
 		//this.createServer = this.createServer.bind(this);
 	}
@@ -62,86 +53,9 @@ export class ApiServerService {
 			done();
 		});
 
-		for (const endpoint of endpoints) {
-			const ep = {
-				name: endpoint.name,
-				meta: endpoint.meta,
-				params: endpoint.params,
-				exec: this.moduleRef.get('ep:' + endpoint.name, { strict: false }).exec,
-			};
+		this.orpcPilot.register(fastify);
 
-			if (endpoint.meta.requireFile) {
-				fastify.all<{
-					Params: { endpoint: string; },
-					Body: Record<string, unknown>,
-					Querystring: Record<string, unknown>,
-				}>('/' + endpoint.name, async (request, reply) => {
-					if (request.method === 'GET' && !endpoint.meta.allowGet) {
-						reply.code(405);
-						reply.send();
-						return;
-					}
-
-					// Await so that any error can automatically be translated to HTTP 500
-					await this.apiCallService.handleMultipartRequest(ep, request, reply);
-					return reply;
-				});
-			} else {
-				fastify.all<{
-					Params: { endpoint: string; },
-					Body: Record<string, unknown>,
-					Querystring: Record<string, unknown>,
-				}>('/' + endpoint.name, { bodyLimit: 1024 * 1024 }, async (request, reply) => {
-					if (request.method === 'GET' && !endpoint.meta.allowGet) {
-						reply.code(405);
-						reply.send();
-						return;
-					}
-
-					// Await so that any error can automatically be translated to HTTP 500
-					await this.apiCallService.handleRequest(ep, request, reply);
-					return reply;
-				});
-			}
-		}
-
-		fastify.post<{
-			Body: {
-				username: string;
-				password: string;
-				host?: string;
-				invitationCode?: string;
-				emailAddress?: string;
-				'hcaptcha-response'?: string;
-				'g-recaptcha-response'?: string;
-				'turnstile-response'?: string;
-				'm-captcha-response'?: string;
-				'testcaptcha-response'?: string;
-			}
-		}>('/signup', (request, reply) => this.signupApiService.signup(request, reply));
-
-		fastify.post<{
-			Body: {
-				username: string;
-				password?: string;
-				token?: string;
-				credential?: AuthenticationResponseJSON;
-				'hcaptcha-response'?: string;
-				'g-recaptcha-response'?: string;
-				'turnstile-response'?: string;
-				'm-captcha-response'?: string;
-				'testcaptcha-response'?: string;
-			};
-		}>('/signin-flow', (request, reply) => this.signinApiService.signin(request, reply));
-
-		fastify.post<{
-			Body: {
-				credential?: AuthenticationResponseJSON;
-				context?: string;
-			};
-		}>('/signin-with-passkey', (request, reply) => this.signinWithPasskeyApiService.signin(request, reply));
-
-		fastify.post<{ Body: { code: string; } }>('/signup-pending', (request, reply) => this.signupApiService.signupPending(request, reply));
+		this.standaloneAuth.register(fastify);
 
 		fastify.get('/v1/instance/peers', async (request, reply) => {
 			const instances = await this.instancesRepository.find({
@@ -173,17 +87,6 @@ export class ApiServerService {
 				return {
 					ok: false,
 				};
-			}
-		});
-
-		fastify.all('/clear-browser-cache', (request, reply) => {
-			if (['GET', 'POST'].includes(request.method)) {
-				reply.header('Clear-Site-Data', '"cache", "prefetchCache", "prerenderCache", "executionContexts"');
-				reply.code(204);
-				reply.send();
-			} else {
-				reply.code(405);
-				reply.send();
 			}
 		});
 

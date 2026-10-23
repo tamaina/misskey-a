@@ -4,16 +4,15 @@ import { dirname } from 'node:path';
 import * as esbuild from 'esbuild';
 import { build } from 'esbuild';
 import { execa } from 'execa';
+import { generatePilotRouting } from './generate-pilot-routing.mjs';
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
 const _package = JSON.parse(fs.readFileSync(_dirname + '/package.json', 'utf-8'));
 
-const entryPoints = fs.globSync('./src/**/**.{ts,tsx}');
-
 /** @type {import('esbuild').BuildOptions} */
 const options = {
-	entryPoints,
+	entryPoints: [],
 	minify: process.env.NODE_ENV === 'production',
 	outdir: './built',
 	target: 'es2022',
@@ -31,6 +30,9 @@ if (!args.includes('--no-clean')) {
 }
 
 // Contracts remain feature-owned source; the SDK owns their portable build.
+await execa('node', ['check-portable-contracts.mjs'], { cwd: _dirname, stdio: 'inherit' });
+await generatePilotRouting();
+options.entryPoints = fs.globSync('./src/**/**.{ts,tsx}');
 await execa('tsc', ['-p', 'tsconfig.contracts.json'], {
 	cwd: _dirname, stdout: process.stdout, stderr: process.stderr,
 });

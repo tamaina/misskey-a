@@ -3,31 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartActiveUsersDefinition, chartInput, chartActiveUsersOutput } from '../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { ActiveUsersChart } from '../../charts/active-users.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-const contractProjection = projectEndpointContract(chartActiveUsersDefinition);
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { chartActiveUsersContract, chartActiveUsersGetContract } from './active-users.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../api.implementation.js';
+export function createActiveUsersProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['activeUsers']) {
+	return createApiProcedure<Actor>()(chartActiveUsersContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
+}
+export function createActiveUsersGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['activeUsers']) {
+	return createApiProcedure<Actor>()(chartActiveUsersGetContract)
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
+}
 
-export const meta = {
-	tags: ['charts', 'users'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof chartInput, typeof chartActiveUsersOutput> {
-	constructor(
-		private activeUsersChart: ActiveUsersChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.activeUsersChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null);
-		});
-	}
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['activeUsers']['getChart']>>) {
+	return { readWrite: value.readWrite.map(item => item), read: value.read.map(item => item), write: value.write.map(item => item), registeredWithinWeek: value.registeredWithinWeek.map(item => item), registeredWithinMonth: value.registeredWithinMonth.map(item => item), registeredWithinYear: value.registeredWithinYear.map(item => item), registeredOutsideWeek: value.registeredOutsideWeek.map(item => item), registeredOutsideMonth: value.registeredOutsideMonth.map(item => item), registeredOutsideYear: value.registeredOutsideYear.map(item => item) };
 }

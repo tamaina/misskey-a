@@ -5,7 +5,7 @@
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { normalizeForSearch } from '../utility/normalize-for-search.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';

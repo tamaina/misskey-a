@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiHashtag } from '../models/Hashtag.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';

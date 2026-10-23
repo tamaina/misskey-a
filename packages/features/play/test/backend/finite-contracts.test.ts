@@ -2,18 +2,35 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createProcedureClient } from '@orpc/server';
+import { createFlashFeaturedProcedure } from '../../backend/endpoints/flash/featured.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { packedFlashSchema } from '../../contract/packed.js';
-import { packedFlashCreateInput, packedFlashFeaturedInput, packedFlashFeaturedDefinition, packedFlashFeaturedOutput, packedFlashMyLikesOutput } from '../../contract/packed-endpoint-definitions.js';
-import { voidFlashUpdateInput } from '../../contract/void-endpoint-definitions.js';
+import { packedFlashSchema, toPackedFlash } from '../../backend/flash.schema.js';
+import { flashCreateContract } from '../../backend/endpoints/flash/create.contract.js';
+import { flashFeaturedContract } from '../../backend/endpoints/flash/featured.contract.js';
+
+import { flashMyLikesContract } from '../../backend/endpoints/flash/my-likes.contract.js';
+import { flashUpdateContract } from '../../backend/endpoints/flash/update.contract.js';
 import { FlashEntityService } from '../../backend/serializers/FlashEntityService.js';
 import { FlashLikeEntityService } from '../../backend/serializers/FlashLikeEntityService.js';
 import type { MiFlash } from '../../backend/models/Flash.js';
 import type { MiFlashLike } from '../../backend/models/FlashLike.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
+
+function requiredSchema<T>(schema: T | undefined): T {
+	if (schema === undefined) throw new Error('Expected contract schema');
+	return schema;
+}
+
+const packedFlashCreateInput = requiredSchema(flashCreateContract['~orpc'].inputSchema);
+const packedFlashFeaturedInput = requiredSchema(flashFeaturedContract['~orpc'].inputSchema);
+const packedFlashFeaturedOutput = requiredSchema(flashFeaturedContract['~orpc'].outputSchema);
+const packedFlashMyLikesOutput = requiredSchema(flashMyLikesContract['~orpc'].outputSchema);
+const voidFlashUpdateInput = requiredSchema(flashUpdateContract['~orpc'].inputSchema);
 
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
@@ -56,7 +73,7 @@ test.each([false, true])('actual Flash serializer and like wrapper retain viewer
 	}
 });
 
-test('native Flash inputs strip extras and enforce fields while HTTP keeps defaults, errors and raw response identity', async () => {
+test('native Flash inputs preserve defaults and finite outputs reject extra fields', async () => {
 	const create = { title: 'play', summary: '', script: 'print(1)', permissions: [] };
 	expect(v.parse(packedFlashCreateInput, { ...create, future: true })).toEqual({ ...create, visibility: 'public' });
 	for (const value of [{}, { ...create, script: 7 }, { ...create, visibility: 'unknown' }]) expect(v.safeParse(packedFlashCreateInput, value).success).toBe(false);
@@ -65,11 +82,22 @@ test('native Flash inputs strip extras and enforce fields while HTTP keeps defau
 	const { service, flash } = fixture();
 	const response = [{ ...await service.pack(flash), future: true }];
 	const params = { future: true };
-	const projection = projectEndpointContract(packedFlashFeaturedDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(params).toEqual({ future: true, offset: 0, limit: 10 });
 	expect(v.safeParse(packedFlashFeaturedOutput, response).success).toBe(false);
-	await expect(endpoint.exec({ limit: 0 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/limit/minimum' } });
+	expect(v.safeParse(packedFlashFeaturedInput, { limit: 0 }).success).toBe(false);
+});
+
+test('Flash leaf selects outer/nested finite fields without output validation', async () => {
+	const { service, flash } = fixture();
+	const packed = await service.pack(flash);
+	const produced = { ...packed, sentinel: 'private', user: { ...packed.user, sentinel: 'private' } };
+	const deps = mockDeep<Parameters<typeof createFlashFeaturedProcedure>[0]>();
+	deps.flashService.featured.mockResolvedValue([flash]);
+	deps.flashEntityService.packMany.mockResolvedValue([produced]);
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: null, ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([null, null]);
+	const validate = vi.spyOn(packedFlashFeaturedOutput['~standard'], 'validate');
+	try {
+		expect(await createProcedureClient(createFlashFeaturedProcedure(deps), { context })({})).toEqual([toPackedFlash(packed)]);
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
 });

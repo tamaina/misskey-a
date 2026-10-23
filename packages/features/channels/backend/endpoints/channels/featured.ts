@@ -3,43 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsFeaturedDefinition, packedChannelsFeaturedInput, packedChannelsFeaturedOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { channelsFeaturedContract } from './featured.contract.js';
 import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
 
-const contractProjection = projectEndpointContract(packedChannelsFeaturedDefinition);
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const meta = {
-	tags: ['channels'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsFeaturedInput, typeof packedChannelsFeaturedOutput> {
-	constructor(
-		@Inject(DI.channelsRepository)
-		private channelsRepository: ChannelsRepository,
-
-		private channelEntityService: ChannelEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.channelsRepository.createQueryBuilder('channel')
+export interface ChannelsFeaturedDependencies {
+	channelsRepository: ChannelsRepository;
+	channelEntityService: ChannelEntityService;
+}
+export function createChannelsFeaturedProcedure<Actor extends MiLocalUser>(deps: ChannelsFeaturedDependencies) {
+	return createApiProcedure<Actor>()(channelsFeaturedContract)
+		.handler(async ({ input, context }) => {
+			const me = context.principal;
+			const query = deps.channelsRepository.createQueryBuilder('channel')
 				.where('channel.lastNotedAt IS NOT NULL')
 				.andWhere('channel.isArchived = FALSE')
 				.orderBy('channel.lastNotedAt', 'DESC');
 
 			const channels = await query.limit(10).getMany();
-
-			return await Promise.all(channels.map(x => this.channelEntityService.pack(x, me)));
+			return (await Promise.all(channels.map(x => deps.channelEntityService.pack(x, me)))).map(toPackedChannel);
 		});
-	}
 }

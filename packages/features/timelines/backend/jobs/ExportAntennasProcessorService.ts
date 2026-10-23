@@ -15,7 +15,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { createTemp } from '@features/runtime/backend/io/create-temp.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
-import type { ExportedAntenna } from '../../contract/antenna-export.js';
+import type { ExportedAntenna } from '@features/portability/backend/antenna-artifact.schema.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type { DBExportAntennasData } from '@features/runtime/backend/queue/types.js';
 import type * as Bull from 'bullmq';

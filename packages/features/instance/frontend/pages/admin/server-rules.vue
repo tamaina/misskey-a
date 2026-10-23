@@ -154,7 +154,7 @@ function remove(id: string): void {
 <locale locale="da-DK" lang="json">
 {
   "serverRules": "Server rules",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "Angiv et kort sæt serverregler, der vises før tilmelding. Det anbefales at bruge et sammendrag af brugsvilkårene.",
   "add": "Add",
   "save": "Save"
 }
@@ -190,7 +190,7 @@ function remove(id: string): void {
 <locale locale="fr-FR" lang="json">
 {
   "serverRules": "Règles du serveur",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "Définissez un ensemble concis de règles du serveur à afficher avant l’inscription. Il est recommandé d’utiliser un résumé des conditions d’utilisation.",
   "add": "Ajouter",
   "save": "Enregistrer"
 }
@@ -235,7 +235,7 @@ function remove(id: string): void {
 <locale locale="kab-KAB" lang="json">
 {
   "serverRules": "Server rules",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "Sbadu ilugan iwezlan n uqeddac ara d-yettwaseknen send ajerred. Yettusemter ad ilin d agzul n tewtilin n useqdec.",
   "add": "Add",
   "save": "Sekles"
 }
@@ -244,7 +244,7 @@ function remove(id: string): void {
 <locale locale="kn-IN" lang="json">
 {
   "serverRules": "Server rules",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "ನೋಂದಣಿಗೂ ಮೊದಲು ತೋರಿಸಲು ಸರ್ವರ್‌ನ ಸಂಕ್ಷಿಪ್ತ ನಿಯಮಗಳನ್ನು ಹೊಂದಿಸಿ. ಸೇವಾ ನಿಯಮಗಳ ಸಾರಾಂಶವನ್ನು ಬಳಸಲು ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ.",
   "add": "Add",
   "save": "ಉಳಿಸಿ"
 }
@@ -262,7 +262,7 @@ function remove(id: string): void {
 <locale locale="nl-NL" lang="json">
 {
   "serverRules": "Server rules",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "Stel beknopte serverregels in die vóór registratie worden weergegeven. Een samenvatting van de gebruiksvoorwaarden wordt aanbevolen.",
   "add": "Toevoegen",
   "save": "Opslaan"
 }
@@ -271,7 +271,7 @@ function remove(id: string): void {
 <locale locale="no-NO" lang="json">
 {
   "serverRules": "Server rules",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "Angi et kort sett med serverregler som vises før registrering. Det anbefales å bruke et sammendrag av bruksvilkårene.",
   "add": "Legg til",
   "save": "Lagre"
 }
@@ -280,7 +280,7 @@ function remove(id: string): void {
 <locale locale="pl-PL" lang="json">
 {
   "serverRules": "Server rules",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "Ustaw zwięzłe zasady serwera wyświetlane przed rejestracją. Zaleca się użycie podsumowania warunków korzystania z usługi.",
   "add": "Dodaj",
   "save": "Zapisz"
 }
@@ -298,7 +298,7 @@ function remove(id: string): void {
 <locale locale="ru-RU" lang="json">
 {
   "serverRules": "Правила сервера",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "Задайте краткие правила сервера, которые будут показаны перед регистрацией. Рекомендуется использовать краткое изложение условий предоставления услуг.",
   "add": "Добавить",
   "save": "Сохранить"
 }
@@ -307,7 +307,7 @@ function remove(id: string): void {
 <locale locale="sk-SK" lang="json">
 {
   "serverRules": "Server rules",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "Nastavte stručné pravidlá servera, ktoré sa zobrazia pred registráciou. Odporúča sa použiť zhrnutie podmienok používania služby.",
   "add": "Pridať",
   "save": "Uložiť"
 }
@@ -334,7 +334,7 @@ function remove(id: string): void {
 <locale locale="ug-CN" lang="json">
 {
   "serverRules": "Server rules",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "تىزىملىتىشتىن بۇرۇن كۆرسىتىلىدىغان مۇلازىمېتىرنىڭ قىسقا قائىدىلىرىنى بەلگىلەڭ. مۇلازىمەت شەرتلىرىنىڭ قىسقىچە مەزمۇنىنى ئىشلىتىش تەۋسىيە قىلىنىدۇ.",
   "add": "Add",
   "save": "Save"
 }
@@ -352,7 +352,7 @@ function remove(id: string): void {
 <locale locale="vi-VN" lang="json">
 {
   "serverRules": "Luật của máy chủ",
-  "description": "A set of rules to be displayed before registration. Setting a summary of the Terms of Service is recommended.",
+  "description": "Thiết lập các quy tắc ngắn gọn của máy chủ để hiển thị trước khi đăng ký. Bạn nên sử dụng bản tóm tắt điều khoản dịch vụ.",
   "add": "Thêm",
   "save": "Lưu"
 }

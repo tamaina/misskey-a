@@ -19,12 +19,14 @@ import { createApp, nextTick, ref } from 'vue';
 import { parse } from 'vue/compiler-sfc';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/vue';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-with-locale.js';
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
-import type { Locale, ParameterizedString } from 'i18n';
+import type { ParameterizedString } from 'i18n';
+import type { Locale } from './retired-ui-next-locale-types.js';
 
 const actions = vi.hoisted(() => ({
 	confirm: vi.fn(), abortAll: vi.fn(), upload: vi.fn(), addFiles: vi.fn(), close: vi.fn(),

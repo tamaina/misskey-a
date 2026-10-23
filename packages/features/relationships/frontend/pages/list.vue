@@ -31,7 +31,7 @@ import { watch, computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { definePage } from '@features/navigation/frontend/page.js';

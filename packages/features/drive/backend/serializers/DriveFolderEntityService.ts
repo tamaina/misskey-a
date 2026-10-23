@@ -5,7 +5,7 @@
 
 import type { DriveFilesRepository, DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiDriveFolder } from '../models/DriveFolder.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';

@@ -2,57 +2,35 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { constantIWebhooksTestDefinition, constantIWebhooksTestInput, constantIWebhooksTestOutput } from '../../../../contract/source-constant-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import ms from 'ms';
 import { WebhookTestService } from '../../../services/WebhookTestService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(constantIWebhooksTestDefinition);
-
-export const meta = {
-	tags: ['webhooks'],
-
-	requireCredential: true,
-	secure: true,
-	kind: 'read:account',
-
-	limit: {
-		duration: ms('15min'),
-		max: 60,
-	},
-
-	errors: {
-		noSuchWebhook: {
-			message: 'No such webhook.',
-			code: 'NO_SUCH_WEBHOOK',
-			id: '0c52149c-e913-18f8-5dc7-74870bfe0cf9',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof constantIWebhooksTestInput, typeof constantIWebhooksTestOutput> {
-	constructor(
-		private webhookTestService: WebhookTestService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			try {
-				await this.webhookTestService.testUserWebhook({
-					webhookId: ps.webhookId,
-					type: ps.type,
-					override: ps.override,
-				}, me);
-			} catch (e) {
-				if (e instanceof WebhookTestService.NoSuchWebhookError) {
-					throw new ApiError(meta.errors.noSuchWebhook);
+import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '../../../../../users/backend/models/User.js';
+import { iWebhooksTestErrors, iWebhooksTestContract } from './test.contract.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '../../../../../api/backend/transport/middleware.js';
+export interface IWebhooksTestDependencies {
+	webhookTestService: Pick<WebhookTestService, 'testUserWebhook'>;
+}
+export function createIWebhooksTestProcedure(deps: IWebhooksTestDependencies) {
+	return createApiProcedure<MiLocalUser>()(iWebhooksTestContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const result = await (async () => {
+				try {
+					await deps.webhookTestService.testUserWebhook({
+						webhookId: ps.webhookId,
+						type: ps.type,
+						override: ps.override,
+					}, me);
+				} catch (e) {
+					if (e instanceof WebhookTestService.NoSuchWebhookError) {
+						throw apiError(iWebhooksTestErrors.noSuchWebhook);
+					}
+					throw e;
 				}
-				throw e;
-			}
+			})();
+			return result;
 		});
-	}
 }

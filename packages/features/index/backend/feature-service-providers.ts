@@ -20,7 +20,7 @@ import { collectionServices } from '@features/collections/backend/services.js';
 import { roleServices } from '@features/roles/backend/services.js';
 import { emojiServices } from '@features/emojis/backend/services.js';
 import { galleryServices } from '@features/collections/backend/services/gallery.js';
-import { pageServices } from '@features/pages/backend/services.js';
+import { pageProviders, pageExports } from '@features/pages/backend/services.js';
 import { mediaServices } from '@features/drive/backend/services/media.js';
 import { markupServices } from '@features/markup/backend/services.js';
 import { preferencesServices } from '@features/preferences/backend/services.js';
@@ -35,12 +35,14 @@ import { DriveFileEntityService } from '@features/drive/backend/serializers/Driv
 import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import { SystemWebhookEntityService } from '@features/integrations/backend/serializers/SystemWebhookEntityService.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { bindLegacyService, toNestProviders } from './feature-service-provider-types.js';
 
 const legacyServiceBindings = [
+	bindLegacyService(ports.queueService, QueueService),
 	bindLegacyService(ports.httpRequestService, HttpRequestService),
 	bindLegacyService(ports.loggerService, LoggerService),
 	bindLegacyService(ports.idService, IdService),
@@ -81,7 +83,10 @@ export const featureServiceGroups = {
 	roles: toNestProviders('roles', roleServices, legacyServiceBindings),
 	emojis: toNestProviders('emojis', emojiServices, legacyServiceBindings),
 	collectionGallery: toNestProviders('collectionGallery', galleryServices, legacyServiceBindings),
-	pages: toNestProviders('pages', pageServices, legacyServiceBindings),
+	pages: {
+		providers: pageProviders,
+		exports: pageExports,
+	},
 };
 const features = Object.values(featureServiceGroups);
 

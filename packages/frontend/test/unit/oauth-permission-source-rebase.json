@@ -1,0 +1,286 @@
+[
+	{
+		"file": "packages/features/auth/frontend/components/MkAuthConfirm.vue",
+		"currentSha256": "2790d7d63d10741fe271b1656d6e8c419cbaf5f10b9aa217bca1e32784d00bfe",
+		"baselineSha256": "95dec5a80dc3befc023360b8ae6b3c1c4d7e3014de2d68e17a338fc7d7ae4e81",
+		"edits": [
+			{
+				"start": 2984,
+				"end": 3488,
+				"current": "\t\t\t<div v-if=\"selectablePermissionsLabel && selectablePermissions\" :class=\"$style.accountSelectorLabel\">{{ selectablePermissionsLabel }}</div>\n\t\t\t<MkPermissionSelect v-if=\"selectablePermissions\" v-model=\"selectedPermissions\" :permissions=\"selectablePermissions\"\n\t\t\t\t:administrator=\"selectedAdministrator\" :labels=\"copyLocaleDictionary($locale.sfc.permissionsLabels)\"\n\t\t\t\t:disableAllText=\"$locale.sfc.disableAll\" :enableAllText=\"$locale.sfc.enableAll\" :adminPermissionText=\"$locale.sfc.adminPermission\"/>\n",
+				"baseline": ""
+			},
+			{
+				"start": 4324,
+				"end": 4519,
+				"current": "\t\t\t\t<MkButton rounded gradate :disabled=\"selectablePermissions !== undefined && !permissions?.length && selectedPermissions.length === 0\" @click=\"clickAccept\">{{ $locale.sfc.accept }}</MkButton>\n",
+				"baseline": "\t\t\t\t<MkButton rounded gradate @click=\"clickAccept\">{{ $locale.sfc.accept }}</MkButton>\n"
+			},
+			{
+				"start": 5761,
+				"end": 5820,
+				"current": "import MkPermissionSelect from './MkPermissionSelect.vue';\n",
+				"baseline": ""
+			},
+			{
+				"start": 6593,
+				"end": 6666,
+				"current": "\tselectablePermissions?: string[];\n\tselectablePermissionsLabel?: string;\n",
+				"baseline": ""
+			},
+			{
+				"start": 6749,
+				"end": 6811,
+				"current": "\t(ev: 'accept', token: string, permissions?: string[]): void;\n",
+				"baseline": "\t(ev: 'accept', token: string): void;\n"
+			},
+			{
+				"start": 7051,
+				"end": 7308,
+				"current": "\nconst selectedPermissions = ref<string[]>([]);\nconst selectedAdministrator = computed(() => {\n\tconst user = selectedUser.value ? users.value.get(selectedUser.value) : undefined;\n\treturn user !== undefined && 'isAdmin' in user && user.isAdmin === true;\n});\n",
+				"baseline": ""
+			},
+			{
+				"start": 8806,
+				"end": 8844,
+				"current": "async function clickChooseAccount() {\n",
+				"baseline": "function clickChooseAccount() {\n"
+			},
+			{
+				"start": 8886,
+				"end": 9247,
+				"current": "\tif (props.selectablePermissions !== undefined) {\n\t\tconst user = users.value.get(selectedUser.value)!;\n\t\twaiting.value = true;\n\t\ttry {\n\t\t\tconst details = await misskeyApi('users/show', { userId: user.id }, user.token);\n\t\t\tusers.value.set(user.id, { ...details, token: user.token });\n\t\t} catch { showUI('failed'); return; } finally { waiting.value = false; }\n\t}\n",
+				"baseline": ""
+			},
+			{
+				"start": 9248,
+				"end": 9281,
+				"current": "\tselectedPermissions.value = [];\n",
+				"baseline": ""
+			},
+			{
+				"start": 9815,
+				"end": 9927,
+				"current": "\temit('accept', token, props.selectablePermissions === undefined ? undefined : [...selectedPermissions.value]);\n",
+				"baseline": "\temit('accept', token);\n"
+			},
+			{
+				"start": 18097,
+				"end": 18227,
+				"current": "\t\"createAccount\": \"أنشئ حسابًا\",\n\t\"disableAll\": \"تعطيل الكل\",\n\t\"enableAll\": \"تشغيل الكل\",\n\t\"adminPermission\": \"Admin Permissions\"\n",
+				"baseline": "\t\"createAccount\": \"أنشئ حسابًا\"\n"
+			},
+			{
+				"start": 24299,
+				"end": 24447,
+				"current": "\t\"createAccount\": \"Crea un compte\",\n\t\"disableAll\": \"Deshabilita tot\",\n\t\"enableAll\": \"Habilita tot\",\n\t\"adminPermission\": \"Permisos d'administrador \"\n",
+				"baseline": "\t\"createAccount\": \"Crea un compte\"\n"
+			},
+			{
+				"start": 29808,
+				"end": 29947,
+				"current": "\t\"createAccount\": \"Vytvořit účet\",\n\t\"disableAll\": \"Vypnout vše\",\n\t\"enableAll\": \"Povolit vše\",\n\t\"adminPermission\": \"Administrátorská práva\"\n",
+				"baseline": "\t\"createAccount\": \"Vytvořit účet\"\n"
+			},
+			{
+				"start": 35265,
+				"end": 35399,
+				"current": "\t\"createAccount\": \"Create account\",\n\t\"disableAll\": \"Disable all\",\n\t\"enableAll\": \"Enable all\",\n\t\"adminPermission\": \"Admin Permissions\"\n",
+				"baseline": "\t\"createAccount\": \"Create account\"\n"
+			},
+			{
+				"start": 41479,
+				"end": 41641,
+				"current": "\t\"createAccount\": \"Benutzerkonto erstellen\",\n\t\"disableAll\": \"Alle deaktivieren\",\n\t\"enableAll\": \"Alle aktivieren\",\n\t\"adminPermission\": \"Administratorberechtigung\"\n",
+				"baseline": "\t\"createAccount\": \"Benutzerkonto erstellen\"\n"
+			},
+			{
+				"start": 46940,
+				"end": 47074,
+				"current": "\t\"createAccount\": \"Create account\",\n\t\"disableAll\": \"Disable all\",\n\t\"enableAll\": \"Enable all\",\n\t\"adminPermission\": \"Admin Permissions\"\n",
+				"baseline": "\t\"createAccount\": \"Create account\"\n"
+			},
+			{
+				"start": 52604,
+				"end": 52749,
+				"current": "\t\"createAccount\": \"Crear cuenta\",\n\t\"disableAll\": \"Desactivar todo\",\n\t\"enableAll\": \"Activar todo\",\n\t\"adminPermission\": \"Permiso de administrador\"\n",
+				"baseline": "\t\"createAccount\": \"Crear cuenta\"\n"
+			},
+			{
+				"start": 58409,
+				"end": 58559,
+				"current": "\t\"createAccount\": \"Créer un compte\",\n\t\"disableAll\": \"Tout désactiver\",\n\t\"enableAll\": \"Tout activer\",\n\t\"adminPermission\": \"Droits de l'administrateur\"\n",
+				"baseline": "\t\"createAccount\": \"Créer un compte\"\n"
+			},
+			{
+				"start": 63923,
+				"end": 64064,
+				"current": "\t\"createAccount\": \"Buat akun\",\n\t\"disableAll\": \"Nonaktifkan semua\",\n\t\"enableAll\": \"Aktifkan semua\",\n\t\"adminPermission\": \"Wewenang Izin Admin\"\n",
+				"baseline": "\t\"createAccount\": \"Buat akun\"\n"
+			},
+			{
+				"start": 69676,
+				"end": 69832,
+				"current": "\t\"createAccount\": \"Crea il tuo profilo\",\n\t\"disableAll\": \"Disabilitare tutto\",\n\t\"enableAll\": \"Abilita tutto\",\n\t\"adminPermission\": \"Privilegi amministrativi\"\n",
+				"baseline": "\t\"createAccount\": \"Crea il tuo profilo\"\n"
+			},
+			{
+				"start": 73970,
+				"end": 74079,
+				"current": "\t\"createAccount\": \"アカウントを作成\",\n\t\"disableAll\": \"全て無効にする\",\n\t\"enableAll\": \"全て有効にする\",\n\t\"adminPermission\": \"管理者権限\"\n",
+				"baseline": "\t\"createAccount\": \"アカウントを作成\"\n"
+			},
+			{
+				"start": 78116,
+				"end": 78233,
+				"current": "\t\"createAccount\": \"アカウントを作るで\",\n\t\"disableAll\": \"全部使えへんようにする\",\n\t\"enableAll\": \"全部使えるようにする\",\n\t\"adminPermission\": \"管理者権限\"\n",
+				"baseline": "\t\"createAccount\": \"アカウントを作るで\"\n"
+			},
+			{
+				"start": 83527,
+				"end": 83661,
+				"current": "\t\"createAccount\": \"Create account\",\n\t\"disableAll\": \"Disable all\",\n\t\"enableAll\": \"Enable all\",\n\t\"adminPermission\": \"Admin Permissions\"\n",
+				"baseline": "\t\"createAccount\": \"Create account\"\n"
+			},
+			{
+				"start": 88990,
+				"end": 89124,
+				"current": "\t\"createAccount\": \"Create account\",\n\t\"disableAll\": \"Disable all\",\n\t\"enableAll\": \"Enable all\",\n\t\"adminPermission\": \"Admin Permissions\"\n",
+				"baseline": "\t\"createAccount\": \"Create account\"\n"
+			},
+			{
+				"start": 93323,
+				"end": 93427,
+				"current": "\t\"createAccount\": \"계정 만들기\",\n\t\"disableAll\": \"전체 해제\",\n\t\"enableAll\": \"전체 선택\",\n\t\"adminPermission\": \"관리자 권한\"\n",
+				"baseline": "\t\"createAccount\": \"계정 만들기\"\n"
+			},
+			{
+				"start": 98776,
+				"end": 98931,
+				"current": "\t\"createAccount\": \"Gebruikersaccount maken\",\n\t\"disableAll\": \"Alle deactiveren\",\n\t\"enableAll\": \"Alle activeren\",\n\t\"adminPermission\": \"Administratorrechten\"\n",
+				"baseline": "\t\"createAccount\": \"Gebruikersaccount maken\"\n"
+			},
+			{
+				"start": 104243,
+				"end": 104376,
+				"current": "\t\"createAccount\": \"Opprett konto\",\n\t\"disableAll\": \"Disable all\",\n\t\"enableAll\": \"Enable all\",\n\t\"adminPermission\": \"Admin Permissions\"\n",
+				"baseline": "\t\"createAccount\": \"Opprett konto\"\n"
+			},
+			{
+				"start": 109860,
+				"end": 110010,
+				"current": "\t\"createAccount\": \"Utwórz konto\",\n\t\"disableAll\": \"Wyłącz wszystko\",\n\t\"enableAll\": \"Włącz wszystko\",\n\t\"adminPermission\": \"Uprawnienia administracyjne\"\n",
+				"baseline": "\t\"createAccount\": \"Utwórz konto\"\n"
+			},
+			{
+				"start": 115894,
+				"end": 116044,
+				"current": "\t\"createAccount\": \"Criar conta\",\n\t\"disableAll\": \"Desabilitar tudo\",\n\t\"enableAll\": \"Habilitar tudo\",\n\t\"adminPermission\": \"Permissões de administrador\"\n",
+				"baseline": "\t\"createAccount\": \"Criar conta\"\n"
+			},
+			{
+				"start": 121417,
+				"end": 121565,
+				"current": "\t\"createAccount\": \"Новая учётная запись\",\n\t\"disableAll\": \"Выключить всё\",\n\t\"enableAll\": \"Включить все\",\n\t\"adminPermission\": \"Доступ администратора\"\n",
+				"baseline": "\t\"createAccount\": \"Новая учётная запись\"\n"
+			},
+			{
+				"start": 126990,
+				"end": 127129,
+				"current": "\t\"createAccount\": \"Vytvoriť účet\",\n\t\"disableAll\": \"Vypnúť všetko\",\n\t\"enableAll\": \"Povoliť všetko\",\n\t\"adminPermission\": \"Admin Permissions\"\n",
+				"baseline": "\t\"createAccount\": \"Vytvoriť účet\"\n"
+			},
+			{
+				"start": 132081,
+				"end": 132229,
+				"current": "\t\"createAccount\": \"สร้างบัญชี\",\n\t\"disableAll\": \"ปิดการใช้งานทั้งหมด\",\n\t\"enableAll\": \"เปิดใช้งานทั้งหมด\",\n\t\"adminPermission\": \"สิทธิ์ของผู้ดูแลระบบ\"\n",
+				"baseline": "\t\"createAccount\": \"สร้างบัญชี\"\n"
+			},
+			{
+				"start": 138133,
+				"end": 138286,
+				"current": "\t\"createAccount\": \"Hesap oluştur\",\n\t\"disableAll\": \"Tümünü devre dışı bırak\",\n\t\"enableAll\": \"Tümünü etkinleştir\",\n\t\"adminPermission\": \"Yönetici İzinleri\"\n",
+				"baseline": "\t\"createAccount\": \"Hesap oluştur\"\n"
+			},
+			{
+				"start": 143618,
+				"end": 143752,
+				"current": "\t\"createAccount\": \"Create account\",\n\t\"disableAll\": \"Disable all\",\n\t\"enableAll\": \"Enable all\",\n\t\"adminPermission\": \"Admin Permissions\"\n",
+				"baseline": "\t\"createAccount\": \"Create account\"\n"
+			},
+			{
+				"start": 149020,
+				"end": 149162,
+				"current": "\t\"createAccount\": \"Створити акаунт\",\n\t\"disableAll\": \"Вимкнути все\",\n\t\"enableAll\": \"Увімкнути все\",\n\t\"adminPermission\": \"Права адміністратора\"\n",
+				"baseline": "\t\"createAccount\": \"Створити акаунт\"\n"
+			},
+			{
+				"start": 154449,
+				"end": 154585,
+				"current": "\t\"createAccount\": \"Tạo tài khoản\",\n\t\"disableAll\": \"Tắt toàn bộ\",\n\t\"enableAll\": \"Bật toàn bộ\",\n\t\"adminPermission\": \"Quyền quản trị viên\"\n",
+				"baseline": "\t\"createAccount\": \"Tạo tài khoản\"\n"
+			},
+			{
+				"start": 158210,
+				"end": 158309,
+				"current": "\t\"createAccount\": \"注册账户\",\n\t\"disableAll\": \"禁用全部\",\n\t\"enableAll\": \"启用全部\",\n\t\"adminPermission\": \"管理员权限\"\n",
+				"baseline": "\t\"createAccount\": \"注册账户\"\n"
+			},
+			{
+				"start": 161985,
+				"end": 162084,
+				"current": "\t\"createAccount\": \"建立帳戶\",\n\t\"disableAll\": \"停用全部\",\n\t\"enableAll\": \"啟用全部\",\n\t\"adminPermission\": \"管理員權限\"\n",
+				"baseline": "\t\"createAccount\": \"建立帳戶\"\n"
+			}
+		]
+	},
+	{
+		"file": "packages/features/auth/frontend/components/MkTokenGenerateWindow.vue",
+		"currentSha256": "1cd94d3e64fee2b9a02f160bcbe9bcc0bc4146cca9db615754745acd84424049",
+		"baselineSha256": "8d992b7baba15ed0844c461ed1fa29dc40a660d15415539b38973cca39383f5d",
+		"edits": [
+			{
+				"start": 733,
+				"end": 1048,
+				"current": "\t\t\t<MkPermissionSelect v-model=\"selectedPermissions\" :permissions=\"Misskey.permissions\" :administrator=\"!!iAmAdmin\"\n\t\t\t\t:labels=\"copyLocaleDictionary($locale.sfc.permissionsLabels)\" :disableAllText=\"$locale.sfc.disableAll\" :enableAllText=\"$locale.sfc.enableAll\" :adminPermissionText=\"$locale.sfc.adminPermission\"/>\n",
+				"baseline": "\t\t\t<div class=\"_buttons\">\n\t\t\t\t<MkButton inline @click=\"disableAll\">{{ $locale.sfc.disableAll }}</MkButton>\n\t\t\t\t<MkButton inline @click=\"enableAll\">{{ $locale.sfc.enableAll }}</MkButton>\n\t\t\t</div>\n\t\t\t<div class=\"_gaps_s\">\n\t\t\t\t<MkSwitch v-for=\"kind in Object.keys(permissionSwitches)\" :key=\"kind\" v-model=\"permissionSwitches[kind as keyof typeof permissionSwitches]\">{{ copyLocaleDictionary($locale.sfc.permissionsLabels)[kind as keyof typeof permissionSwitches] }}</MkSwitch>\n\t\t\t</div>\n\t\t\t<div v-if=\"iAmAdmin\" :class=\"$style.adminPermissions\">\n\t\t\t\t<div :class=\"$style.adminPermissionsHeader\"><b>{{ $locale.sfc.adminPermission }}</b></div>\n\t\t\t\t<div class=\"_gaps_s\">\n\t\t\t\t\t<MkSwitch v-for=\"kind in Object.keys(permissionSwitchesForAdmin)\" :key=\"kind\" v-model=\"permissionSwitchesForAdmin[kind as keyof typeof permissionSwitchesForAdmin]\">{{ copyLocaleDictionary($locale.sfc.permissionsLabels)[kind as keyof typeof permissionSwitchesForAdmin] }}</MkSwitch>\n\t\t\t\t</div>\n\t\t\t</div>\n"
+			},
+			{
+				"start": 1270,
+				"end": 1329,
+				"current": "import MkPermissionSelect from './MkPermissionSelect.vue';\n",
+				"baseline": "import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';\nimport MkButton from '@features/ui/frontend/components/MkButton.vue';\n"
+			},
+			{
+				"start": 2048,
+				"end": 2048,
+				"current": "",
+				"baseline": "const defaultPermissions = Misskey.permissions.filter(p => !p.startsWith('read:admin') && !p.startsWith('write:admin'));\nconst adminPermissions = Misskey.permissions.filter(p => p.startsWith('read:admin') || p.startsWith('write:admin'));\n\n"
+			},
+			{
+				"start": 2126,
+				"end": 2232,
+				"current": "const selectedPermissions = ref<string[]>(props.initialPermissions ? [...props.initialPermissions] : []);\n",
+				"baseline": "const permissionSwitches = ref({} as Record<(typeof Misskey.permissions)[number], boolean>);\nconst permissionSwitchesForAdmin = ref({} as Record<(typeof Misskey.permissions)[number], boolean>);\n\nif (props.initialPermissions) {\n\tfor (const kind of props.initialPermissions) {\n\t\tpermissionSwitches.value[kind] = true;\n\t}\n} else {\n\tfor (const kind of defaultPermissions) {\n\t\tpermissionSwitches.value[kind] = false;\n\t}\n\n\tif (iAmAdmin) {\n\t\tfor (const kind of adminPermissions) {\n\t\t\tpermissionSwitchesForAdmin.value[kind] = false;\n\t\t}\n\t}\n}\n"
+			},
+			{
+				"start": 2291,
+				"end": 2333,
+				"current": "\t\tpermissions: selectedPermissions.value,\n",
+				"baseline": "\t\tpermissions: [\n\t\t\t...Object.keys(permissionSwitches.value).filter(p => permissionSwitches.value[p as (typeof Misskey.permissions)[number]]),\n\t\t\t...(iAmAdmin ? Object.keys(permissionSwitchesForAdmin.value).filter(p => permissionSwitchesForAdmin.value[p as (typeof Misskey.permissions)[number]]) : []),\n\t\t],\n"
+			},
+			{
+				"start": 2365,
+				"end": 2365,
+				"current": "",
+				"baseline": "function disableAll(): void {\n\tfor (const p in permissionSwitches.value) {\n\t\tpermissionSwitches.value[p as (typeof Misskey.permissions)[number]] = false;\n\t}\n\tif (iAmAdmin) {\n\t\tfor (const p in permissionSwitchesForAdmin.value) {\n\t\t\tpermissionSwitchesForAdmin.value[p as (typeof Misskey.permissions)[number]] = false;\n\t\t}\n\t}\n}\n\nfunction enableAll(): void {\n\tfor (const p in permissionSwitches.value) {\n\t\tpermissionSwitches.value[p as (typeof Misskey.permissions)[number]] = true;\n\t}\n\tif (iAmAdmin) {\n\t\tfor (const p in permissionSwitchesForAdmin.value) {\n\t\t\tpermissionSwitchesForAdmin.value[p as (typeof Misskey.permissions)[number]] = true;\n\t\t}\n\t}\n}\n"
+			},
+			{
+				"start": 2375,
+				"end": 2375,
+				"current": "",
+				"baseline": "\n<style module lang=\"scss\">\n.adminPermissions {\n\tmargin: 8px -6px 0;\n\tpadding: 24px 6px 6px;\n\tborder: 2px solid var(--MI_THEME-error);\n\tborder-radius: calc(var(--MI-radius) / 2);\n}\n\n.adminPermissionsHeader {\n\tmargin: -34px 0 6px 12px;\n\tpadding: 0 4px;\n\twidth: fit-content;\n\tcolor: var(--MI_THEME-error);\n\tbackground: var(--MI_THEME-panel);\n}\n</style>\n"
+			}
+		]
+	}
+]

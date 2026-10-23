@@ -35,11 +35,12 @@ const basicAuthParams: AuthorizationParamsExtended = {
 	redirect_uri,
 	scope: 'write:notes',
 	state: 'state',
-	code_challenge: 'code',
+	code_challenge: 'A'.repeat(43),
 	code_challenge_method: 'S256',
 };
 
 interface AuthorizationParamsExtended {
+	misskey_customize_permissions?: 'true' | 'false';
 	redirect_uri: string;
 	scope: string | string[];
 	state: string;
@@ -83,13 +84,14 @@ function getMeta(html: string): { transactionId: string | undefined, clientName:
 	};
 }
 
-function fetchDecision(transactionId: string, user: misskey.entities.SignupResponse, { cancel }: { cancel?: boolean } = {}): Promise<Response> {
+function fetchDecision(transactionId: string, user: misskey.entities.SignupResponse, { cancel, selectedScope }: { cancel?: boolean; selectedScope?: string } = {}): Promise<Response> {
 	return fetch(new URL('/oauth/decision', host), {
 		method: 'post',
 		body: new URLSearchParams({
 			transaction_id: transactionId,
 			login_token: user.token,
 			cancel: cancel ? 'cancel' : '',
+			...(selectedScope === undefined ? {} : { selected_scope: selectedScope }),
 		}),
 		redirect: 'manual',
 		headers: {
@@ -338,7 +340,7 @@ describe('OAuth', () => {
 				redirect_uri,
 				scope: 'write:notes',
 				state: 'state',
-				code_challenge: 'code',
+				code_challenge: 'A'.repeat(43),
 			} as AuthorizationParamsExtended), { redirect: 'manual' });
 			assertIndirectError(response, 'invalid_request');
 
@@ -356,19 +358,28 @@ describe('OAuth', () => {
 				redirect_uri,
 				scope: 'write:notes',
 				state: 'state',
-				code_challenge: 'code',
+				code_challenge: 'A'.repeat(43),
 				code_challenge_method: 'SSSS',
 			} as AuthorizationParamsExtended), { redirect: 'manual' });
 			assertIndirectError(response, 'invalid_request');
 		});
 
 		// Use precomputed challenge/verifier set here for deterministic test
-		const code_challenge = '4w2GDuvaxXlw2l46k5PFIoIcTGHdzw2i3hrn-C_Q6f7u0-nTYKd-beVEYy9XinYsGtAix.Nnvr.GByD3lAii2ibPRsSDrZgIN0YQb.kfevcfR9aDKoTLyOUm4hW4ABhs';
-		const code_verifier = 'Ew8VSBiH59JirLlg7ocFpLQ6NXuFC1W_rn8gmRzBKc8';
+		test.each(['short', 'A'.repeat(42), 'A'.repeat(44), '='.repeat(43)])('Reject malformed S256 challenge %s', async codeChallenge => {
+			const client = new AuthorizationCode(clientConfig);
+			const response = await fetch(client.authorizeURL({
+				...basicAuthParams,
+				code_challenge: codeChallenge,
+			} as AuthorizationParamsExtended), { redirect: 'manual' });
+			assertIndirectError(response, 'invalid_request');
+		});
+
+		const code_challenge = 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM';
+		const code_verifier = 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
 
 		const tests: Record<string, string | undefined> = {
 			'Code followed by some junk code': code_verifier + 'x',
-			'Clipped code': code_verifier.slice(0, 80),
+			'Clipped code': code_verifier.slice(0, -1),
 			'Some part of code is replaced': code_verifier.slice(0, -10) + 'x'.repeat(10),
 			'No verifier': undefined,
 		};
@@ -475,7 +486,7 @@ describe('OAuth', () => {
 			redirect_uri,
 			scope: 'write:notes',
 			state: 'state',
-			code_challenge: 'code',
+			code_challenge: 'A'.repeat(43),
 			code_challenge_method: 'S256',
 		} as AuthorizationParamsExtended));
 		assert.strictEqual(response.status, 200);
@@ -493,35 +504,70 @@ describe('OAuth', () => {
 
 	// https://datatracker.ietf.org/doc/html/rfc6749.html#section-3.3
 	describe('Scope', () => {
-		// "If the client omits the scope parameter when requesting
-		// authorization, the authorization server MUST either process the
-		// request using a pre-defined default value or fail the request
-		// indicating an invalid scope."
-		// (And Misskey does the latter)
-		test('Missing scope', async () => {
-			const client = new AuthorizationCode(clientConfig);
+		// Ordinary OAuth requires an explicit customization opt-in for scope selection.
+		for (const scope of [undefined, '']) {
+			test(`${scope === undefined ? 'Missing' : 'Empty'} scope without customization fails authorization`, async () => {
+				const client = new AuthorizationCode(clientConfig);
+				const response = await fetch(client.authorizeURL({
+					redirect_uri,
+					...(scope === undefined ? {} : { scope }),
+					state: 'state',
+					code_challenge: 'A'.repeat(43),
+					code_challenge_method: 'S256',
+				} as AuthorizationParamsExtended), { redirect: 'manual' });
+				assertIndirectError(response, 'invalid_scope');
+				assert.ok(!new URL(response.headers.get('location')!).searchParams.has('code'));
+				const html = await response.text();
+				assert.strictEqual(getMeta(html).transactionId, undefined);
+				assert.ok(!html.includes('misskey:oauth:selectable-permissions'));
+			});
 
-			const response = await fetch(client.authorizeURL({
-				redirect_uri,
-				state: 'state',
-				code_challenge: 'code',
-				code_challenge_method: 'S256',
-			} as AuthorizationParamsExtended), { redirect: 'manual' });
-			assertIndirectError(response, 'invalid_scope');
-		});
+			test(`${scope === undefined ? 'Missing' : 'Empty'} scope grants only explicitly selected permissions`, async () => {
+				const client = new AuthorizationCode(clientConfig);
+				const { code_challenge, code_verifier } = await pkceChallenge(128);
+				const response = await fetch(client.authorizeURL({
+					redirect_uri,
+					misskey_customize_permissions: 'true',
+					...(scope === undefined ? {} : { scope }),
+					state: 'state',
+					code_challenge,
+					code_challenge_method: 'S256',
+				} as AuthorizationParamsExtended), { redirect: 'manual' });
+				assert.strictEqual(response.status, 200);
+				const html = await response.text();
+				const doc = htmlParser.parse(html);
+				assert.strictEqual(doc.querySelector('meta[name="misskey:oauth:scope"]')?.attributes.content, '');
+				const selectable = doc.querySelector('meta[name="misskey:oauth:selectable-permissions"]')?.attributes.content.split(' ') ?? [];
+				assert.ok(selectable.includes('read:account'));
+				assert.ok(!selectable.includes('access:mcp'));
+				const { transactionId } = getMeta(html);
+				assert.ok(transactionId);
+				const decision = await fetchDecision(transactionId, alice, { selectedScope: 'read:account' });
+				assert.strictEqual(decision.status, 302);
+				const location = decision.headers.get('location');
+				assert.ok(location);
+				const code = new URL(location).searchParams.get('code');
+				assert.ok(code);
+				const token = await client.getToken({ code, redirect_uri, code_verifier } as AuthorizationTokenConfigExtended);
+				assert.strictEqual(token.token.scope, 'read:account');
+			});
 
-		test('Empty scope', async () => {
-			const client = new AuthorizationCode(clientConfig);
-
-			const response = await fetch(client.authorizeURL({
-				redirect_uri,
-				scope: '',
-				state: 'state',
-				code_challenge: 'code',
-				code_challenge_method: 'S256',
-			} as AuthorizationParamsExtended), { redirect: 'manual' });
-			assertIndirectError(response, 'invalid_scope');
-		});
+			test(`${scope === undefined ? 'Missing' : 'Empty'} scope cannot issue a grant without selection`, async () => {
+				const client = new AuthorizationCode(clientConfig);
+				const response = await fetch(client.authorizeURL({
+					redirect_uri,
+					misskey_customize_permissions: 'true',
+					...(scope === undefined ? {} : { scope }),
+					state: 'state',
+					code_challenge: 'A'.repeat(43),
+					code_challenge_method: 'S256',
+				} as AuthorizationParamsExtended));
+				assert.strictEqual(response.status, 200);
+				const decision = await fetchDecisionFromResponse(response, alice);
+				assert.strictEqual(decision.status, 400);
+				assert.strictEqual((await decision.json() as { error: string }).error, 'invalid_scope');
+			});
+		}
 
 		test('Unknown scopes', async () => {
 			const client = new AuthorizationCode(clientConfig);
@@ -530,7 +576,7 @@ describe('OAuth', () => {
 				redirect_uri,
 				scope: 'test:unknown test:unknown2',
 				state: 'state',
-				code_challenge: 'code',
+				code_challenge: 'A'.repeat(43),
 				code_challenge_method: 'S256',
 			} as AuthorizationParamsExtended), { redirect: 'manual' });
 			assertIndirectError(response, 'invalid_scope');
@@ -567,7 +613,7 @@ describe('OAuth', () => {
 				redirect_uri,
 				scope: 'write:notes read:account',
 				state: 'state',
-				code_challenge: 'code',
+				code_challenge: 'A'.repeat(43),
 				code_challenge_method: 'S256',
 			} as AuthorizationParamsExtended));
 
@@ -625,7 +671,7 @@ describe('OAuth', () => {
 				redirect_uri: 'http://127.0.0.2/',
 				scope: 'write:notes',
 				state: 'state',
-				code_challenge: 'code',
+				code_challenge: 'A'.repeat(43),
 				code_challenge_method: 'S256',
 			} as AuthorizationParamsExtended));
 			await assertDirectError(response, 400, 'invalid_request');
@@ -638,7 +684,7 @@ describe('OAuth', () => {
 				redirect_uri: 'http://127.0.0.1/redirection',
 				scope: 'write:notes',
 				state: 'state',
-				code_challenge: 'code',
+				code_challenge: 'A'.repeat(43),
 				code_challenge_method: 'S256',
 			} as AuthorizationParamsExtended));
 			await assertDirectError(response, 400, 'invalid_request');
@@ -650,7 +696,7 @@ describe('OAuth', () => {
 			const response = await fetch(client.authorizeURL({
 				scope: 'write:notes',
 				state: 'state',
-				code_challenge: 'code',
+				code_challenge: 'A'.repeat(43),
 				code_challenge_method: 'S256',
 			} as AuthorizationParamsExtended));
 			await assertDirectError(response, 400, 'invalid_request');
@@ -890,7 +936,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				assert.strictEqual(response.status, 200);
@@ -917,7 +963,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				assert.strictEqual(ok1.status, 200);
@@ -926,7 +972,7 @@ describe('OAuth', () => {
 					redirect_uri: redirect_uri2,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				assert.strictEqual(ok2.status, 200);
@@ -947,7 +993,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				await assertDirectError(response, 400, 'invalid_request');
@@ -968,7 +1014,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				await assertDirectError(response, 400, 'invalid_request');
@@ -989,7 +1035,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				await assertDirectError(response, 400, 'invalid_request');
@@ -1042,7 +1088,7 @@ describe('OAuth', () => {
 							redirect_uri,
 							scope: 'write:notes',
 							state: 'state',
-							code_challenge: 'code',
+							code_challenge: 'A'.repeat(43),
 							code_challenge_method: 'S256',
 						} as AuthorizationParamsExtended));
 						assert.strictEqual(response.status, 200);
@@ -1063,7 +1109,7 @@ describe('OAuth', () => {
 						redirect_uri,
 						scope: 'write:notes',
 						state: 'state',
-						code_challenge: 'code',
+						code_challenge: 'A'.repeat(43),
 						code_challenge_method: 'S256',
 					} as AuthorizationParamsExtended));
 
@@ -1071,7 +1117,6 @@ describe('OAuth', () => {
 					await assertDirectError(response, 400, 'invalid_request');
 				});
 			});
-
 
 			test('Disallow loopback', async () => {
 				await sendEnvUpdateRequest({ key: 'MISSKEY_TEST_CHECK_IP_RANGE', value: '1' });
@@ -1081,7 +1126,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				await assertDirectError(response, 400, 'invalid_request');
@@ -1099,7 +1144,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				assert.strictEqual(response.status, 200);
@@ -1125,7 +1170,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				assert.strictEqual(response.status, 200);
@@ -1150,7 +1195,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				assert.strictEqual(response.status, 200);
@@ -1175,7 +1220,7 @@ describe('OAuth', () => {
 					redirect_uri,
 					scope: 'write:notes',
 					state: 'state',
-					code_challenge: 'code',
+					code_challenge: 'A'.repeat(43),
 					code_challenge_method: 'S256',
 				} as AuthorizationParamsExtended));
 				assert.strictEqual(response.status, 200);

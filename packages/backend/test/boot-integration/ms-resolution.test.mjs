@@ -16,7 +16,7 @@ import configFactory from '../../rolldown.config.ts';
 const dependencies = [
 	'got', 'fluent-ffmpeg', 'cacheable-lookup', 'tinycolor2', 'web-push',
 	'@simplewebauthn/server/helpers', 'chalk', 'meilisearch', 'qrcode',
-	'file-type', 'ms', 'sanitize-html', 'archiver', 'mime-types',
+	'file-type', 'ms', 'sanitize-html', '@zip.js/zip.js', 'mime-types',
 ];
 for (const mode of ['production', 'e2e']) {
 	test(`${mode} host and feature dependencies retain public export identity`, async () => {

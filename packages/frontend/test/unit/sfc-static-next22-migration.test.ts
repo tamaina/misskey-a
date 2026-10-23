@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreUpstreamLocaleBundle } from './upstream-develop-source-rebase.js';
 import { existsSync } from 'node:fs';
+import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -13,15 +15,17 @@ import { runInNewContext } from 'node:vm';
 import { createApp } from 'vue';
 import { compileScript, parse } from 'vue/compiler-sfc';
 import { describe, expect, test } from 'vitest';
-import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import { createComponentLocale } from 'vite-vue-internationalization/runtime';
-import { languages, locales } from 'i18n';
+import { createInternationalization, createComponentLocale } from 'vite-vue-internationalization/runtime';
+import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
+import { languages } from 'i18n';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-with-locale.js';
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import migrationInputs from './sfc-static-next22-migration.json';
-import type { Locale } from 'i18n';
+import type { Locale } from './instance-pilot-locale-types.js';
+import { restorePilotHistoricalSource, reviewedPilotMessage } from './instance-pilot-locale-metadata.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const MagicString = createRequire(resolve(root, 'packages/frontend-builder/package.json'))('magic-string').default;
@@ -38,8 +42,29 @@ function production(message: string): unknown {
 	return runInNewContext(code.toString());
 }
 
+let historicalLocalePlugin: ReturnType<typeof pluginVvi> | undefined;
+
+function historicalLocaleBundle(language: string): LocaleBundle {
+	const hook = (value: unknown, ...args: unknown[]): unknown => {
+		if (typeof value === 'function') return Reflect.apply(value, {}, args);
+		if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
+		throw new Error('Expected plugin hook');
+	};
+	if (!historicalLocalePlugin) {
+		historicalLocalePlugin = pluginVvi();
+		hook(historicalLocalePlugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
+		hook(historicalLocalePlugin.buildStart);
+	}
+	const source = hook(historicalLocalePlugin.load, `\0virtual:vite-vue-internationalization/locale/${language}`);
+	if (typeof source !== 'string') throw new Error('Expected generated locale loader');
+	const payload: LocaleBundle = {};
+	runInNewContext(source.replaceAll('export const ', 'const ').replace('export default { locale, global, modules };', 'payload.global = global; payload.modules = modules;'), { payload });
+	return restoreUpstreamLocaleBundle(language, payload);
+}
+
 async function activate(language: string) {
-	const runtime = createInternationalization({ initialLocale: language });
+	const payload = historicalLocaleBundle(language);
+	const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
 	await runtime.ready;
 	await runtime.loadLocale(language);
 	runtime.install(createApp({}));
@@ -47,10 +72,10 @@ async function activate(language: string) {
 }
 
 describe('next22 raw locale migration', () => {
-	test('preserves all9324 dictionary values and reverses every source byte', () => {
+	test('preserves all9856 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = readFileSync(resolve(root, entry.file), 'utf8');
+			const source = restoreCommonUtilitiesBaseline(entry.file, restorePilotHistoricalSource(entry.file, readFileSync(resolve(root, entry.file), 'utf8')));
 			expect(createHash('sha256').update(source).digest('hex')).toBe(entry.migratedSha256);
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);
@@ -72,21 +97,21 @@ describe('next22 raw locale migration', () => {
 			}
 			expect(createHash('sha256').update(original).digest('hex')).toBe(entry.originalSha256);
 		}
-		expect(checked).toBe(9324);
+		expect(checked).toBe(9856);
 	});
 
-	test('transforms every real SFC with the installed VVI plugin and Vue compiler', () => {
+	test('transforms every real SFC with the installed VVI plugin and Vue compiler', async () => {
 		const plugin = pluginVvi();
 		const hook = (value: unknown, ...args: unknown[]): unknown => {
 			if (typeof value === 'function') return Reflect.apply(value, {}, args);
 			if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
 			throw new Error('Expected plugin hook');
 		};
-		hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/' });
+		hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
 		hook(plugin.buildStart);
 		for (const entry of migrationInputs) {
 			const file = resolve(root, entry.file);
-			const transformed = hook(plugin.transform, readFileSync(file, 'utf8'), file) as { code: string };
+			const transformed = await hook(plugin.transform, readFileSync(file, 'utf8'), file) as { code: string };
 			expect(transformed.code).toContain('createComponentLocale');
 			const parsed = parse(transformed.code, { filename: file });
 			expect(parsed.errors).toEqual([]);
@@ -102,7 +127,7 @@ describe('next22 raw locale migration', () => {
 				const raw = createComponentLocale(entry.file.replace('packages/', '/'));
 				for (const key of entry.keys) {
 					expect(key.formatter).toBe(false);
-					const message = originalValue(language, key.global);
+					const message = reviewedPilotMessage(entry.file, language, key.local, originalValue(language, key.global));
 					expect(Buffer.from(raw[key.local])).toEqual(Buffer.from(message));
 					expect(raw[key.local]).toBe(new I18n({ message }).t('message'));
 					expect(raw[key.local]).toBe(production(message));
@@ -110,6 +135,6 @@ describe('next22 raw locale migration', () => {
 				}
 			}
 		}
-		expect(checked).toBe(9324);
+		expect(checked).toBe(9856);
 	}, 30000);
 });

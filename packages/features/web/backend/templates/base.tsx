@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { buildLocaleDirections } from '../locale-direction.js';
 import { comment, defaultDescription } from './_.js';
 import { Splash } from './_splash.js';
+import { htmlSafeJsonStringify } from '@features/markup/backend/utility/json-stringify-html-safe.js';
 import type { CommonProps } from './_.js';
 import type { PropsWithChildren, Children } from '@kitajs/html';
 
@@ -81,7 +83,9 @@ export function Layout(props: PropsWithChildren<CommonProps<{
 					<script>
 						const VERSION = '{props.version}';
 						const CLIENT_ENTRY = {JSON.stringify(props.frontendViteFiles?.entryJs ?? null)};
+						const CLIENT_LOCALE_ENTRIES = {htmlSafeJsonStringify(props.frontendViteFiles?.localeEntries ?? null)};
 						const LANGS = {JSON.stringify(props.langs)};
+						const CLIENT_LOCALE_DIRECTIONS = {htmlSafeJsonStringify(buildLocaleDirections(props.langs))};
 					</script>
 
 					{safeMetaJson != null ? <script type="application/json" id="misskey_meta" data-generated-at={now}>{safeMetaJson}</script> : null}

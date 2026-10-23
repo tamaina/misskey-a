@@ -10,7 +10,8 @@ import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
 import { expect, test } from 'vitest';
 import { createInternationalization, setActiveInternationalization, useLocale, useLocalizer } from 'vite-vue-internationalization/runtime';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { locales } from './pruned-global-locale-baseline.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import messages from '../../../features/boot/frontend/embed/boot-messages.json';
 import proof from './embed-boot-messages.json';
@@ -33,7 +34,7 @@ test('embed dictionary keeps exactly the 504 effective strings and preserves boo
 		expect(messages[language]).toEqual({ _bootErrors: locales[language]._bootErrors, reload: locales[language].reload, _selfXssPrevention: locales[language]._selfXssPrevention });
 	}
 	let source = readFileSync(resolve(root, 'packages/features/boot/frontend/embed/boot.ts'), 'utf8');
-	source = source.replace("import { useLocale, useLocalizer } from 'vite-vue-internationalization/runtime';\nimport type bootMessages from './boot-messages.json';", "import { i18n } from '@features/runtime/frontend/embed/i18n.js';");
+	source = source.replace("import { useLocale, useLocalizer } from 'virtual:vite-vue-internationalization';\nimport type bootMessages from './boot-messages.json';", "import { i18n } from '@features/runtime/frontend/embed/i18n.js';");
 	source = source.replace('\n' + proof.newSetup, '');
 	source = source.replace(proof.newStore, proof.oldStore);
 	for (const [before, after] of proof.rewrites) source = source.split(after).join(before);
@@ -43,7 +44,7 @@ test('embed dictionary keeps exactly the 504 effective strings and preserves boo
 
 test.each(languages)('VVI embed boot messages match legacy text and formatter bytes in %s', async language => {
 	const plugin = pluginVvi({ embed: true });
-	hook(plugin.configResolved, { root: resolve(root, 'packages/frontend-embed'), command: 'build', base: '/' });
+	hook(plugin.configResolved, { root: resolve(root, 'packages/frontend-embed'), command: 'build', base: '/', build: { ssr: false } });
 	hook(plugin.buildStart);
 	const source = hook(plugin.load, `\0virtual:vite-vue-internationalization/locale/${language}`);
 	if (typeof source !== 'string') throw new Error('Expected a generated locale loader');

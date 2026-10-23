@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
+import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
+import { restoreDrivePreprocessingBaseline } from './drive-preprocessing-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -13,7 +16,8 @@ import { parse, compileScript } from 'vue/compiler-sfc';
 import { expect, test } from 'vitest';
 import { createInternationalization, setActiveInternationalization, createComponentLocale, createComponentLocalizer, useLocale } from 'vite-vue-internationalization/runtime';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
-import { languages, locales } from 'i18n';
+import { languages, locales as globalLocales } from 'i18n';
+import { locales } from './instance-pilot-locale-catalog.js';
 import type { ParameterizedString } from 'i18n';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
@@ -22,6 +26,7 @@ import proof from './final-ts-locale-migration.json';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const hash = (source: string) => createHash('sha256').update(source).digest('hex');
+
 function at(value: unknown, path: string[]): unknown {
 	for (const key of path) {
 		if (!value || typeof value !== 'object') throw new Error(`Missing path: ${path.join('.')}`);
@@ -29,25 +34,37 @@ function at(value: unknown, path: string[]): unknown {
 	}
 	return value;
 }
+
 function leaves(value: unknown): string[] {
 	if (typeof value === 'string') return [value];
 	if (!value || typeof value !== 'object') throw new Error('Expected dictionary');
 	return Object.values(value).flatMap(leaves);
 }
+
 function hook(value: unknown, ...args: unknown[]): unknown {
 	if (typeof value === 'function') return Reflect.apply(value, {}, args);
 	if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
 	throw new Error('Expected Vite hook');
 }
+
+test('reviewed image lifecycle rebase rejects unreviewed source changes', () => {
+	const file = 'packages/features/drive/frontend/composables/use-uploader.ts';
+	const source = readFileSync(resolve(root, file), 'utf8');
+	expect(() => restoreDrivePreprocessingBaseline(file, source)).not.toThrow();
+	expect(() => restoreDrivePreprocessingBaseline(file, source + '\n')).toThrow('Source differs');
+	expect(() => restoreDrivePreprocessingBaseline(file, source.replace('quality: isWebpSupported() ? 0.85 : 0.8', 'quality: 0.1'))).toThrow('Source differs');
+});
+
 const plugin = pluginVvi();
-hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/' });
+hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
 hook(plugin.buildStart);
 const owners = new Map<string, string>();
-function ownerScript(file: string): string {
+
+async function ownerScript(file: string): Promise<string> {
 	const cached = owners.get(file);
 	if (cached) return cached;
 	const filename = resolve(root, file);
-	const result = hook(plugin.transform, readFileSync(filename, 'utf8'), filename);
+	const result = await hook(plugin.transform, readFileSync(filename, 'utf8'), filename);
 	if (!result || typeof result !== 'object' || !('code' in result) || typeof result.code !== 'string') throw new Error('Expected transformed owner');
 	const parsed = parse(result.code, { filename });
 	expect(parsed.errors).toEqual([]);
@@ -55,6 +72,7 @@ function ownerScript(file: string): string {
 	owners.set(file, script);
 	return script;
 }
+
 function evaluate(source: string, legacy?: I18n<typeof locales['ja-JP']>): Record<string, unknown> {
 	const exports: Record<string, unknown> = {};
 	const requireModule = (specifier: string): unknown => {
@@ -62,13 +80,18 @@ function evaluate(source: string, legacy?: I18n<typeof locales['ja-JP']>): Recor
 		if (specifier === 'virtual:vite-vue-internationalization') return { createComponentLocale, createComponentLocalizer, useLocale };
 		if (specifier.endsWith('/i18n.js')) return { i18n: legacy };
 		if (specifier.endsWith('/interpolate-locale-parameters.js')) return { interpolateLocaleParameters };
-		if (specifier.startsWith('@features/') && specifier.endsWith('/ts-messages.vue')) return evaluate(ownerScript(specifier.replace('@features/', 'packages/features/')));
+		if (specifier.startsWith('@features/') && specifier.endsWith('/ts-messages.vue')) {
+			const script = owners.get(specifier.replace('@features/', 'packages/features/'));
+			if (script === undefined) throw new Error('Owner must be transformed before synchronous module evaluation');
+			return evaluate(script);
+		}
 		return {};
 	};
 	const code = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText;
 	runInNewContext(code, { exports, require: requireModule });
 	return exports;
 }
+
 function invoke(module: Record<string, unknown>, name: string, ...args: unknown[]): unknown {
 	const fn = module[name];
 	if (typeof fn !== 'function') throw new Error(`Expected callable export: ${name}`);
@@ -83,9 +106,9 @@ function generated(language: string): LocaleBundle {
 	return payload;
 }
 
-test('all39 TS consumers reverse byte for byte and all17 owners retain exactly9100 effective strings', () => {
+test('all39 TS consumers reverse byte for byte and all17 owners retain exactly9100 effective strings', async () => {
 	for (const file of proof.files) {
-		let source = readFileSync(resolve(root, file.file), 'utf8');
+		let source = restoreNativeApiSourceBaseline(file.file, restoreDrivePreprocessingBaseline(file.file, restoreClientErrorLogBaseline(file.file, readFileSync(resolve(root, file.file), 'utf8'))));
 		expect(hash(source)).toBe(file.migratedSha256);
 		for (const edit of [...file.edits].reverse()) {
 			expect(source.slice(edit.afterStart, edit.afterStart + edit.replacement.length)).toBe(edit.replacement);
@@ -105,7 +128,7 @@ test('all39 TS consumers reverse byte for byte and all17 owners retain exactly91
 			for (const path of owner.paths) expect(at(dictionary, path)).toEqual(at(locales[String(block.attrs.locale)], path));
 			strings += leaves(dictionary).length;
 		}
-		ownerScript(owner.file);
+		await ownerScript(owner.file);
 	}
 	expect(proof.files).toHaveLength(39);
 	expect(proof.owners).toHaveLength(17);
@@ -114,13 +137,13 @@ test('all39 TS consumers reverse byte for byte and all17 owners retain exactly91
 
 test.each(languages)('actual default owner exports preserve every access and formatter in %s', async language => {
 	const payload = generated(language);
-	expect(payload.global).toEqual({});
+	expect(payload.global).toEqual(globalLocales[language]);
 	const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
 	await runtime.ready;
 	await runtime.loadLocale(language);
 	setActiveInternationalization(runtime);
 	for (const file of proof.files) {
-		const module = evaluate(ownerScript(file.owner));
+		const module = evaluate(await ownerScript(file.owner));
 		const raw = at(module, ['default', '$locale']);
 		for (const edit of file.edits) {
 			if (!edit.path) continue;
@@ -138,6 +161,7 @@ test.each(languages)('actual default owner exports preserve every access and for
 }, 30000);
 
 test.each(languages)('actual utility modules preserve branching, parameters and captured text in %s', async language => {
+	for (const owner of proof.owners) await ownerScript(owner.file);
 	const payload = generated(language);
 	const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
 	await runtime.ready;

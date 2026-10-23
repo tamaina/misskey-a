@@ -5,6 +5,7 @@
 
 import { defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
+import { clearSharedFiles } from '@@/js/shared-files.js';
 import { apiUrl, host } from '@features/boot/frontend/shared/config.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { showSuspendedDialog } from '@features/moderation/frontend/utility/show-suspended-dialog.js';
@@ -57,7 +58,7 @@ export async function removeAccount(host: string, id: AccountWithToken['id']) {
 	prefer.commit('accounts', prefer.s.accounts.filter(x => x[0] !== host || x[1].id !== id));
 }
 
-const isAccountDeleted = Symbol('isAccountDeleted');
+const isCredentialRejected = Symbol('isCredentialRejected');
 
 function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Promise<Misskey.entities.MeDetailed> {
 	return new Promise((done, fail) => {
@@ -76,10 +77,17 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 					// （認証エラーなど4xxはresolve）
 					return fail2(res);
 				}
-				res.json().then(done2, fail2);
+				res.json().then(body => {
+					if (res.status >= 400 && res.status < 500 && (!body || typeof body !== 'object' || !('error' in body))) {
+						fail2(res);
+					} else {
+						done2(body);
+					}
+				}, fail2);
 			}))
 			.then(async res => {
 				if ('error' in res) {
+					let credentialRejected = true;
 					if (res.error.id === 'a8c724b3-6e9c-4b46-b1a8-bc3ed6258370') {
 						// SUSPENDED
 						if (forceShowDialog || $i && (token === $i.token || id === $i.id)) {
@@ -106,6 +114,7 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 							});
 						}
 					} else {
+						credentialRejected = false;
 						await alert({
 							type: 'error',
 							title: FeatureLocaleMessages.$locale.failedToFetchAccountInformation,
@@ -113,7 +122,7 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 						});
 					}
 
-					fail(isAccountDeleted);
+					fail(credentialRejected ? isCredentialRejected : res.error);
 				} else {
 					done(res);
 				}
@@ -122,16 +131,35 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 	});
 }
 
+/** Retain the trusted live account proxy behind the native DTO type. */
+function getCurrentAccountInfo(): Misskey.entities.MeDetailed | null {
+	if (!$i) return null;
+	const accounts: Record<string, Misskey.entities.MeDetailed> = {};
+	// Keep the trusted live proxy while avoiding a recursive Vue UnwrapRef
+	// comparison with the portable DTO's persisted JSON fields.
+	const account: unknown = $i;
+	Reflect.set(accounts, $i.id, account);
+	return accounts[$i.id];
+}
+
+function persistCurrentAccountInfo() {
+	if (!$i) return;
+	const accountInfos: Record<string, Misskey.entities.MeDetailed> = {};
+	for (const [key, value] of Object.entries(store.s.accountInfos)) Reflect.set(accountInfos, key, value);
+	Reflect.set(accountInfos, host + '/' + $i.id, getCurrentAccountInfo());
+	store.set('accountInfos', accountInfos);
+}
+
 export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
 	if (!$i) return;
 	const token = $i.token;
 	for (const key of Object.keys($i)) {
-		delete $i[key as keyof typeof $i];
+		Reflect.deleteProperty($i, key);
 	}
 	for (const [key, value] of Object.entries(accountData)) {
-		($i[key as keyof typeof accountData] as any) = value;
+		Reflect.set($i, key, value);
 	}
-	store.set('accountInfos', { ...store.s.accountInfos, [host + '/' + $i.id]: $i });
+	persistCurrentAccountInfo();
 	$i.token = token;
 	miLocalStorage.setItem('account', JSON.stringify($i));
 }
@@ -139,10 +167,10 @@ export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
 export function updateCurrentAccountPartial(accountData: Partial<Misskey.entities.MeDetailed>) {
 	if (!$i) return;
 	for (const [key, value] of Object.entries(accountData)) {
-		($i[key as keyof typeof accountData] as any) = value;
+		Reflect.set($i, key, value);
 	}
 
-	store.set('accountInfos', { ...store.s.accountInfos, [host + '/' + $i.id]: $i });
+	persistCurrentAccountInfo();
 
 	miLocalStorage.setItem('account', JSON.stringify($i));
 }
@@ -150,13 +178,13 @@ export function updateCurrentAccountPartial(accountData: Partial<Misskey.entitie
 export async function refreshCurrentAccount() {
 	if (!$i) return;
 	const me = $i;
-	return fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(reason => {
-		if (reason === isAccountDeleted) {
-			removeAccount(host, me.id);
+	return fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(async reason => {
+		if (reason === isCredentialRejected) {
+			await removeAccount(host, me.id);
 			if (Object.keys(store.s.accountTokens).length > 0) {
-				login(Object.values(store.s.accountTokens)[0]);
+				await login(Object.values(store.s.accountTokens)[0]);
 			} else {
-				signout();
+				await signout('server-rejected-credential');
 			}
 		}
 	});
@@ -175,6 +203,13 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 		showing.value = false;
 		throw reason;
 	});
+
+	if ($i != null && $i.id !== me.id) {
+		await clearSharedFiles().catch(reason => {
+			showing.value = false;
+			throw reason;
+		});
+	}
 
 	miLocalStorage.setItem('account', JSON.stringify({
 		...me,
@@ -222,7 +257,7 @@ export async function getAccountMenu(opts: {
 
 	const callback = opts.onChoose;
 
-	function createItem(host: string, id: Misskey.entities.User['id'], username: Misskey.entities.User['username'], account: Misskey.entities.MeDetailed | null | undefined, token: string | null): MenuItem {
+	function createItem(host: string, id: Misskey.entities.User['id'], username: Misskey.entities.User['username'], account: Misskey.entities.UserLite | null | undefined, token: string | null, onChooseAccount?: () => void): MenuItem {
 		if (account) {
 			return {
 				type: 'user' as const,
@@ -230,7 +265,7 @@ export async function getAccountMenu(opts: {
 				active: opts.active != null ? opts.active === id : false,
 				action: async () => {
 					if (callback) {
-						callback(account);
+						onChooseAccount?.();
 					} else {
 						switchAccount(host, id);
 					}
@@ -283,7 +318,12 @@ export async function getAccountMenu(opts: {
 	const menuItems: MenuItem[] = [];
 
 	// TODO: $iのホストも比較したいけど通常null
-	const accountItems = (await getAccounts().then(accounts => accounts.filter(x => x.id !== me.id))).map(a => createItem(a.host, a.id, a.username, a.user, a.token));
+	const accountItems = (await getAccounts().then(accounts => accounts.filter(x => x.id !== me.id))).map(a => {
+		const account = a.user;
+		return createItem(a.host, a.id, a.username, account, a.token, account && callback ? () => callback(account) : undefined);
+	});
+	const currentAccount = callback ? getCurrentAccountInfo() : null;
+	const chooseCurrentAccount = currentAccount && callback ? () => callback(currentAccount) : undefined;
 
 	if (opts.withExtraOperation) {
 		menuItems.push({
@@ -296,7 +336,7 @@ export async function getAccountMenu(opts: {
 		});
 
 		if (opts.includeCurrentAccount) {
-			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token));
+			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token, chooseCurrentAccount));
 		}
 
 		menuItems.push(...accountItems);
@@ -332,7 +372,7 @@ export async function getAccountMenu(opts: {
 		});
 	} else {
 		if (opts.includeCurrentAccount) {
-			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token));
+			menuItems.push(createItem(host, $i.id, $i.username, $i, $i.token, chooseCurrentAccount));
 		}
 
 		menuItems.push(...accountItems);
