@@ -35,6 +35,29 @@ const issuer = 'https://instance.invalid';
 const resource = `${issuer}/mcp`;
 const clientId = 'https://chatgpt.com/oauth/client.json';
 const redirectUri = 'https://chatgpt.com/connector_platform_oauth_redirect';
+const cursorClientId = 'https://cursor.com/oauth/mcp-client.json';
+const cursorCallback = 'https://www.cursor.com/bot/mcp/oauth/callback';
+const cursorRedirectUris = [
+	'https://www.cursor.com/agents/mcp/oauth/callback',
+	cursorCallback,
+	'https://grok.com/connectors-oauth-exchange-code/',
+	'http://localhost:8787/callback',
+	'http://127.0.0.1:8787/callback',
+];
+
+function cursorMetadata(redirectUris: readonly string[] = cursorRedirectUris) {
+	return new MetadataResponse(JSON.stringify({
+		client_id: cursorClientId,
+		client_name: 'Cursor',
+		client_uri: 'https://cursor.com',
+		logo_uri: 'https://ptht05hbb1ssoooe.public.blob.vercel-storage.com/assets/uploads/cursorlogomcpv3.svg',
+		redirect_uris: redirectUris,
+		grant_types: ['authorization_code', 'refresh_token'],
+		response_types: ['code'],
+		token_endpoint_auth_method: 'none',
+	}), { url: cursorClientId, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string });
+}
+
 const cleanups: (() => Promise<unknown>)[] = [];
 afterEach(async () => { for (const cleanup of cleanups.splice(0).reverse()) await cleanup(); });
 
@@ -309,14 +332,60 @@ describe.skipIf(!socket)('synthetic OAuth discovery through native MCP (isolated
 		expect(response.statusCode).toBe(200); expect(response.json().scope).toBe('read:account');
 	});
 
-	it.each(['singular', 'plural'])('forces CIMD validation for overlapping %s metadata when resource is supplied', async methods => {
+	it.each(['singular', 'plural'])('accepts a listed loopback redirect when resource forces CIMD for overlapping %s metadata', async methods => {
 		const s = await setup(); const loopback = 'http://127.0.0.1:43123/callback';
 		const authFields = methods === 'singular' ? { token_endpoint_auth_method: 'none' } : { token_endpoint_auth_methods_supported: ['none'] };
 		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(new MetadataResponse(JSON.stringify({ client_id: clientId, client_uri: 'https://chatgpt.com/', client_name: 'Overlapping legacy client', redirect_uris: [loopback], ...authFields }), { url: clientId, headers: { 'content-type': 'application/json' } } as ResponseInit & { url: string }));
-		const flow = await s.begin({ redirect_uri: loopback });
-		expect(flow.page.statusCode).toBeGreaterThanOrEqual(400);
-		expect(flow.page.headers.location).toBeUndefined();
+		const flow = await s.grant({ redirect_uri: loopback });
 		expect(s.providers[0].fetchClientMetadata).toHaveBeenCalledWith(clientId);
+		expect(s.httpServices[0].send).not.toHaveBeenCalled();
+		const response = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: clientId, redirect_uri: loopback, code: flow.code, code_verifier: flow.codeVerifier, resource } });
+		expect(response.statusCode).toBe(200);
+		expect(response.json().scope).toBe('access:mcp');
+	});
+
+	it.each([cursorCallback, 'http://127.0.0.1:8787/callback', 'http://localhost:8787/callback', 'http://[::1]:8787/callback'])('accepts Cursor CIMD redirect %s with resource', async redirect => {
+		const s = await setup();
+		const redirects = redirect === 'http://[::1]:8787/callback' ? [...cursorRedirectUris, redirect] : cursorRedirectUris;
+		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(cursorMetadata(redirects));
+		const flow = await s.grant({ client_id: cursorClientId, redirect_uri: redirect });
+		expect(s.providers[0].fetchClientMetadata).toHaveBeenCalledWith(cursorClientId);
+		expect(s.httpServices[0].send).not.toHaveBeenCalled();
+		const response = await s.app.inject({ method: 'POST', url: '/oauth/token', payload: { grant_type: 'authorization_code', client_id: cursorClientId, redirect_uri: redirect, code: flow.code, code_verifier: flow.codeVerifier, resource } });
+		expect(response.statusCode).toBe(200);
+		expect(response.json().scope).toBe('access:mcp');
+	});
+
+	it.each([
+		'https://www.cursor.com/bot/mcp/oauth/callback/extra',
+		'http://127.0.0.1:8788/callback',
+		'http://127.0.0.1:8787/callback/',
+		'https://evil.example/callback',
+	])('rejects unlisted Cursor CIMD redirect %s', async redirect => {
+		const s = await setup();
+		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(cursorMetadata());
+		const flow = await s.begin({ client_id: cursorClientId, redirect_uri: redirect });
+		expect(flow.page.statusCode).toBe(400);
+		expect(flow.page.json()).toMatchObject({ error: 'invalid_request', error_description: 'Invalid redirect_uri' });
+		expect(flow.page.headers.location).toBeUndefined();
+		expect(s.f.tokens.insert).not.toHaveBeenCalled();
+	});
+
+	it.each([
+		'http://203.0.113.10/callback',
+		'http://127.0.0.2/callback',
+		'http://localhost.example/callback',
+		'http://2130706433/callback',
+		'http://user@127.0.0.1/callback',
+		'http://127.0.0.1\\@evil.example/callback',
+		'cursor://oauth/callback',
+	])('rejects a Cursor-shaped CIMD containing unsafe redirect %s', async unsafe => {
+		const s = await setup();
+		vi.mocked(s.providers[0].fetchClientMetadata).mockResolvedValue(cursorMetadata([...cursorRedirectUris, unsafe]));
+		const flow = await s.begin({ client_id: cursorClientId, redirect_uri: cursorCallback });
+		expect(flow.page.statusCode).toBe(400);
+		expect(flow.page.json()).toMatchObject({ error: 'invalid_request', error_description: 'Invalid client redirect URI' });
+		expect(flow.page.headers.location).toBeUndefined();
 		expect(s.httpServices[0].send).not.toHaveBeenCalled();
 		expect(s.f.tokens.insert).not.toHaveBeenCalled();
 	});

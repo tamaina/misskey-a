@@ -100,6 +100,28 @@ function validateClientId(raw: string): URL {
 	return url;
 }
 
+// https://datatracker.ietf.org/doc/html/rfc8252#section-7.3
+// OAuth 2.1 permits an http redirect only for a canonical loopback literal
+// (localhost, 127.0.0.1, or [::1]). Other spellings, userinfo, fragments, and
+// non-loopback http are rejected so they can never be selected. The authorization
+// request still has to match one of the published strings exactly, including the port.
+const CIMD_LOOPBACK_HTTP_REDIRECT = /^http:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::[1-9][0-9]{0,4})?(?:[/?][^\s#]*)?$/;
+
+function isAllowedCimdRedirectUri(uri: string): boolean {
+	let redirect: URL;
+	try {
+		redirect = new URL(uri);
+	} catch {
+		return false;
+	}
+	if (redirect.username || redirect.password || redirect.hash) return false;
+	if (redirect.protocol === 'https:') return true;
+	const hostname = redirect.hostname === '::1' ? '[::1]' : redirect.hostname;
+	return redirect.protocol === 'http:'
+		&& (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]')
+		&& CIMD_LOOPBACK_HTTP_REDIRECT.test(uri);
+}
+
 interface ClientInformation {
 	id: string;
 	cimd: boolean;
@@ -246,13 +268,7 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 					throw new InvalidRequestError('Client redirect_uris must be a nonempty string array');
 				}
 				for (const uri of json.redirect_uris) {
-					let redirect: URL;
-					try {
-						redirect = new URL(uri);
-					} catch {
-						throw new InvalidRequestError('Invalid client redirect URI');
-					}
-					if (redirect.protocol !== 'https:' || redirect.username || redirect.password || redirect.hash) {
+					if (!isAllowedCimdRedirectUri(uri)) {
 						throw new InvalidRequestError('Invalid client redirect URI');
 					}
 				}
