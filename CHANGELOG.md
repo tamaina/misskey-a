@@ -89,6 +89,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Enhance: カスタム絵文字ZIPの生成・読み取りをzip.jsに統一し、重複画像と生成失敗時の一時ファイル処理を改善 (#208)
 - Fix: リストの作成・複製・名前変更で、名前の文字数制限をUnicodeコードポイント数の1〜100文字として判定するように（絵文字などの非BMP文字を含む名前に対応） (#217)
 - Fix: UserProfileのpassword列コメントを修正するmigrationを追加（パスワード処理自体の変更はなし） (#200)
+- Fix: Client ID Metadata Document に loopback の HTTP リダイレクトが含まれていても、登録済みの redirect_uri なら認可できるよう修正 (#220)
 
 ## 2026.10.0
 
