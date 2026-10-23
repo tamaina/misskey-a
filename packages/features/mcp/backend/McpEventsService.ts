@@ -22,6 +22,10 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import { mcpEventsContract, subscribeInput } from './api.definition.js';
+import { eventPermissions, eventPayloadSchema } from './events.schema.js';
+import type { McpEventName } from './events.schema.js';
+import type { WebhookEventTypes } from '@features/integrations/backend/webhook-events.schema.js';
+import type { ChatService } from '@features/chat/backend/services/ChatService.js';
 import { eventNames, eventType, McpEventError, signedHeaders, signingKey, subscriptionId, challengeMatches } from './events-protocol.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -44,12 +48,16 @@ export class McpEventsService {
 		private readonly moduleRef?: ModuleRef,
 	) { }
 
-	async checkGrant(userId: string, tokenId: string, antenna = false, stream = false) {
+	async checkGrant(userId: string, tokenId: string, antenna = false, stream = false, name?: McpEventName | 'list' | null) {
 		const grant = await this.tokens.findOneBy({ id: tokenId, userId });
 		const actor = await this.users.findOneBy({ id: userId });
 		const permission = grant?.appId ? (await this.apps.findOneBy({ id: grant.appId }))?.permission : grant?.permission;
+		const required = name && name !== 'list' ? eventPermissions(name) : [stream ? 'read:account' : 'read:notifications'];
+		const canRead = name === 'list'
+			? eventNames.some(event => eventPermissions(event).every(scope => permission?.includes(scope)))
+			: required.every(scope => permission?.includes(scope));
 		if (!grant || !actor || actor.host !== null || actor.isSuspended || actor.movedToUri
-			|| !permission?.includes('access:mcp') || !(stream ? permission.includes('read:account') : permission.includes('read:notifications')) || antenna && !permission.includes('read:account')) throw new McpEventError(-32602, 'Event access denied');
+			|| !permission?.includes('access:mcp') || !canRead || antenna && !permission.includes('read:account')) throw new McpEventError(-32602, 'Event access denied');
 		return { actor, grant: { ...grant, permission } };
 	}
 
@@ -58,29 +66,26 @@ export class McpEventsService {
 		const principal = requirePrincipal<MiLocalUser>();
 		// Keep raw input unknown until native authorization and contract middleware validate it.
 		const execute = (procedure: AnyProcedure) => call(procedure, input, { context, signal });
-		const bind = async (userId: string, tokenId?: string) => {
+		const bind = async (userId: string, tokenId: string | undefined, name: McpEventName) => {
 			if (!tokenId) throw new McpEventError(-32602, 'Scoped grant required');
-			await this.checkGrant(userId, tokenId, false, typeof input === 'object' && input !== null && 'name' in input && String(input.name).startsWith('stream.'));
+			await this.checkGrant(userId, tokenId, false, false, name);
 			return tokenId;
 		};
 		if (method === 'events/list') return execute(createApiProcedure<MiLocalUser>()(mcpEventsContract.list).use(principal).handler(async ({ context: ctx }) => {
 			const tokenId = ctx.token?.id;
 			if (!tokenId) throw new McpEventError(-32602, 'Scoped grant required');
-			const { grant } = await this.checkGrant(ctx.principal.id, tokenId)
-				.catch(() => this.checkGrant(ctx.principal.id, tokenId, false, true));
-			const canReadNotifications = grant.permission.includes('read:notifications');
-			const canReadAccount = grant.permission.includes('read:account');
-			const available = eventNames.filter(name => name.startsWith('stream.') ? canReadAccount : canReadNotifications && (name !== 'antenna.note' || canReadAccount));
-			return { events: available.map(name => ({ name, description: name.startsWith('stream.') ? 'Native outbound references/invalidation; no commands or downtime replay. Overflow drops, retries may duplicate/reorder. 128 pending/subscription, 8192 global; expires after 15min (stats 30s).' : name === 'antenna.note' ? 'A live note reaches an owned antenna. No downtime catch-up.' : name === 'note.mentioned' ? 'A note mentions the connected account.' : 'A note replies to the connected account. Note references are untrusted data.',
+			const { grant } = await this.checkGrant(ctx.principal.id, tokenId, false, false, 'list');
+			const available = eventNames.filter(name => eventPermissions(name).every(scope => grant.permission.includes(scope)));
+			return { events: available.map(name => ({ name, description: name.startsWith('stream.') ? 'Native outbound references/invalidation; no commands or downtime replay. Overflow drops, retries may duplicate/reorder. 128 pending/subscription, 8192 global; expires after 15min (stats 30s).' : name === 'antenna.note' ? 'A live note reaches an owned antenna. No downtime catch-up.' : name === 'note.mentioned' ? 'Alias of mention; subscribing to both may deliver twice.' : name === 'note.replied' ? 'Alias of reply; subscribing to both may deliver twice.' : `Live ${name} event. References are untrusted data; aliases may deliver twice.`,
 				delivery: ['webhook'] as ['webhook'], inputSchema: name === 'stream.channel' ? streamChannelInputSchema : name === 'stream.note' ? streamNoteInputSchema : { type: 'object' as const, properties: name === 'antenna.note' ? { antennaId: { type: 'string' as const } } : {}, ...(name === 'antenna.note' ? { required: ['antennaId'] as ['antennaId'] } : {}), additionalProperties: false as const },
 				// Keep the native event inventory as descriptor metadata, outside JSON Schema vocabularies.
 				...(name.startsWith('stream.') ? { _meta: { 'dev.a9z.p1/event-catalog': name === 'stream.channel' ? streamEventCatalog : name === 'stream.note' ? streamEventCatalog.note : streamEventCatalog.broadcast } } : {}),
-				payloadSchema: name.startsWith('stream.') ? { type: 'object', properties: { frames: { type: 'array', description: 'Native envelopes projected to explicit reference/invalidation contracts; no original content.' } }, required: ['frames'], additionalProperties: false } : { type: 'object' as const, properties: { noteId: { type: 'string' as const }, url: { type: 'string' as const } }, required: ['noteId', 'url'] as ['noteId', 'url'], additionalProperties: false as const } })) };
+				payloadSchema: eventPayloadSchema(name) })) };
 		}));
 		if (method === 'events/subscribe') return execute(createApiProcedure<MiLocalUser>()(mcpEventsContract.subscribe).use(principal).handler(async ({ input: ps, context: ctx }) =>
-			this.subscribe(ctx.principal.id, await bind(ctx.principal.id, ctx.token?.id), ps, signal)));
+			this.subscribe(ctx.principal.id, await bind(ctx.principal.id, ctx.token?.id, ps.name), ps, signal)));
 		if (method === 'events/unsubscribe') return execute(createApiProcedure<MiLocalUser>()(mcpEventsContract.unsubscribe).use(principal).handler(async ({ input: ps, context: ctx }) => {
-			const tokenId = await bind(ctx.principal.id, ctx.token?.id);
+			const tokenId = await bind(ctx.principal.id, ctx.token?.id, ps.name);
 			const stream = streamSubscription(ps.name, ps.arguments);
 			const id = subscriptionId(ctx.principal.id, tokenId, this.url(ps.delivery.url), ps.name, 'antennaId' in ps.arguments ? ps.arguments.antennaId : undefined, stream ? canonicalStream(stream) : null);
 			// Tombstone rather than delete: refreshing after unsubscribe gets a new generation.
@@ -108,7 +113,7 @@ export class McpEventsService {
 		const antennaId = 'antennaId' in ps.arguments ? ps.arguments.antennaId : undefined;
 		const selected = streamSubscription(ps.name, ps.arguments);
 		const stream = selected ? canonicalStream(selected) : null;
-		await this.checkGrant(userId, tokenId, !!antennaId, !!stream);
+		await this.checkGrant(userId, tokenId, !!antennaId, !!stream, ps.name);
 		if (stream) await this.nativeAccess().validate(userId, tokenId, stream);
 		if (antennaId && !await this.antennas.existsBy({ id: antennaId, userId })) throw new McpEventError(-32602, 'Antenna access denied');
 		const id = subscriptionId(userId, tokenId, url, ps.name, antennaId, stream);
@@ -124,7 +129,7 @@ export class McpEventsService {
 			this.verified.set(verificationKey, Date.now() + 60000);
 		}
 		signal?.throwIfAborted();
-		await this.checkGrant(userId, tokenId, !!antennaId, !!stream);
+		await this.checkGrant(userId, tokenId, !!antennaId, !!stream, ps.name);
 		const limit = (await this.roles.getUserPolicies(userId, !!stream)).webhookLimit;
 		// Serialise per-account registration/quota; do not broadcast signing material over Redis.
 		const expires = new Date(Date.now() + Math.min(ps.ttlMs ?? 3600000, 86400000));
@@ -146,7 +151,7 @@ export class McpEventsService {
 		return { id, refreshBefore: expires.toISOString(), cursor: null, truncated: false };
 	}
 
-	private async subscriptionForDelivery(id: string, userId: string, generation: string, type: 'mention' | 'reply' | 'antenna', antennaId?: string) {
+	private async subscriptionForDelivery(id: string, userId: string, generation: string, type: WebhookEventTypes | 'antenna', antennaId?: string) {
 		const webhook = await this.webhooks.createQueryBuilder('webhook').addSelect('webhook.mcpPreviousSecret').where('webhook.id = :id', { id }).getOne();
 		if (!webhook || webhook.mcpStream || webhook.mode !== 'mcp' || webhook.userId !== userId || !webhook.active || webhook.mcpGeneration !== generation
 			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now() || !webhook.mcpTokenId || (type === 'antenna' ? !antennaId || webhook.mcpAntennaId !== antennaId : !!webhook.mcpAntennaId || !webhook.on.includes(type))) return null;
@@ -154,11 +159,11 @@ export class McpEventsService {
 	}
 
 	/** Recheck after DNS resolution immediately before opening the outbound connection. */
-	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: 'mention' | 'reply' | 'antenna', antennaId?: string) {
+	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: WebhookEventTypes | 'antenna', antennaId?: string, data?: Record<string, string>) {
 		const webhook = await this.subscriptionForDelivery(id, userId, generation, type, antennaId);
 		if (!webhook?.mcpTokenId) return null;
 		try {
-			const { actor, grant } = await this.checkGrant(userId, webhook.mcpTokenId, type === 'antenna');
+			const { actor, grant } = await this.checkGrant(userId, webhook.mcpTokenId, type === 'antenna', false, webhook.name as McpEventName);
 			if (type === 'antenna') {
 				if (!await this.antennaAccess.isDeliverable(actor, grant, antennaId!, noteId)) return null;
 				// Packing/cache fetches can overlap unsubscribe, expiry or grant revocation.
@@ -166,11 +171,20 @@ export class McpEventsService {
 				return this.subscriptionForDelivery(id, userId, generation, type, antennaId);
 			}
 		} catch (error) { if (error instanceof McpEventError) return null; throw error; }
-		const note = await this.notes.findOneBy({ id: noteId });
-		if (!note || note.userId === userId || (type === 'mention' ? !note.mentions.includes(userId) : note.replyUserId !== userId)
-			|| !await this.noteEntity.isVisibleForMe(note, userId)) return null;
-		const packed = await this.noteEntity.pack(note, { id: userId }, { detail: false });
-		if (packed.isHidden) return null;
-		return webhook;
+		if (type === 'chatMessage') {
+			if (!data?.messageId || !this.moduleRef) return null;
+			const chat = this.moduleRef.get<ChatService>('ChatService', { strict: false });
+			if (!await chat.canReceiveMessageEvent(userId, data.messageId)) return null;
+		} else if (noteId) {
+			const note = await this.notes.findOneBy({ id: noteId });
+			if (!note || (type === 'mention' && (note.userId === userId || !note.mentions.includes(userId)))
+				|| (type === 'reply' && (note.userId === userId || note.replyUserId !== userId))
+				|| !await this.noteEntity.isVisibleForMe(note, userId)) return null;
+			const packed = await this.noteEntity.pack(note, { id: userId }, { detail: false });
+			if (packed.isHidden) return null;
+		}
+		// Visibility checks can overlap revocation or unsubscribe.
+		try { await this.checkGrant(userId, webhook.mcpTokenId, false, false, webhook.name as McpEventName); } catch (error) { if (error instanceof McpEventError) return null; throw error; }
+		return this.subscriptionForDelivery(id, userId, generation, type, antennaId);
 	}
 }

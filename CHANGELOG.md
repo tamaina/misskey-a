@@ -10,6 +10,7 @@
 - [beta.3 の GitHub prerelease](https://github.com/tamaina/misskey-a/releases/tag/9000.0.0-beta.3) は公開済みですが、SDK の npm 公開は `404 Not Found`、Docker 公開は認証情報不足で失敗しています。beta.3 タグ後の変更も本節には含まれるため、利用するソースの commit を確認してください。
 
 ### General
+- User WebhookとMCP Eventsで全通知トリガーおよび受信チャットの購読に対応し、通知の受信設定とミュートを反映するようにしました。
 #### Enhance: Misskey 9000
 ソフトウェア名を **Misskey 9000** に変更し、リポジトリ・問い合わせ先・インスタンスの既定リンクをこのforkに変更 (#32, #50, #54)  
 Misskey 9000の独自SemVer採番を開始しています。NodeInfoの`software`は引き続き`misskey`です。

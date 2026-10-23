@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
+import { notificationEventName } from '@features/integrations/backend/webhook-events.schema.js';
 import { setTimeout } from 'node:timers/promises';
 import * as Redis from 'ioredis';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
@@ -44,6 +46,7 @@ export class NotificationService implements OnApplicationShutdown {
 		private pushNotificationService: PushNotificationService,
 		private cacheService: CacheService,
 		private userListService: UserListService,
+		private webhookService: UserWebhookService,
 	) {
 	}
 
@@ -181,6 +184,26 @@ export class NotificationService implements OnApplicationShutdown {
 		const packed = await this.notificationEntityService.pack(notification, notifieeId, {});
 
 		if (packed == null) return null;
+
+		// Enqueue immediately after successful packing, before the unread delay.
+		switch (packed.type) {
+			case 'mention':
+			case 'reply':
+			case 'renote':
+				await this.webhookService.enqueueUserWebhook(notifieeId, packed.type, { note: packed.note }, packed);
+				break;
+			case 'follow':
+				await this.webhookService.enqueueUserWebhook(notifieeId, 'followed', { user: packed.user }, packed);
+				break;
+			case 'reaction':
+				await this.webhookService.enqueueUserWebhook(notifieeId, 'reaction', { note: packed.note, reaction: packed.reaction, user: packed.user }, packed);
+				break;
+			case 'reaction:grouped':
+			case 'renote:grouped':
+				return null;
+			default:
+				await this.webhookService.enqueueUserWebhook(notifieeId, notificationEventName(packed.type), { notification: packed }, packed);
+		}
 
 		// Publish notification event
 		this.globalEventService.publishMainStream(notifieeId, 'notification', packed);

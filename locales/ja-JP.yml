@@ -216,3 +216,30 @@ default: 'デフォルト'
 error: 'エラー'
 users: 'ユーザー'
 areYouSure: 'よろしいですか？'
+
+_webhookEventsDescription: "通知に由来するイベントには通知の受信設定やミュートが適用されます。MCPで mention / reply と旧名 note.mentioned / note.replied の両方を購読すると、同じイベントが2回届くことがあります。"
+_webhookEvents:
+  note: "ノートを投稿したとき"
+  follow: "フォローしたとき"
+  unfollow: "フォローを解除したとき"
+  followed: "フォローされたとき"
+  mention: "メンションされたとき"
+  reply: "返信されたとき"
+  renote: "Renoteされたとき"
+  reaction: "リアクションされたとき"
+  subscribedNote: "通知をオンにしたユーザーが投稿したとき"
+  quote: "引用Renoteされたとき"
+  pollEnded: "アンケートが終了したとき"
+  scheduledNotePosted: "予約ノートが投稿されたとき"
+  scheduledNotePostFailed: "予約ノートの投稿に失敗したとき"
+  receiveFollowRequest: "フォローリクエストを受け取ったとき"
+  followRequestAccepted: "フォローリクエストが承認されたとき"
+  roleAssigned: "ロールを付与されたとき"
+  chatRoomInvitationReceived: "チャットルームに招待されたとき"
+  achievementEarned: "実績を獲得したとき"
+  exportCompleted: "エクスポートが完了したとき"
+  login: "ログインしたとき"
+  createToken: "トークンが作成されたとき"
+  app: "アプリ通知を受け取ったとき"
+  test: "テスト通知を受け取ったとき"
+  chatMessage: "チャットメッセージを受け取ったとき"

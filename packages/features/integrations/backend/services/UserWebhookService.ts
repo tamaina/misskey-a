@@ -14,6 +14,8 @@ import { GlobalEvents } from '@features/runtime/backend/services/GlobalEventServ
 import type { Packed } from '@features/index/backend/packed.schema.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 
+export type NotificationWebhookOccurrence = Pick<Packed<'Notification'>, 'id' | 'createdAt' | 'type'>;
+
 export type UserWebhookPayload<T extends WebhookEventTypes> =
 	T extends 'note' | 'reply' | 'renote' | 'mention' ? {
 		note: Packed<'Note'>,
@@ -23,7 +25,10 @@ export type UserWebhookPayload<T extends WebhookEventTypes> =
 	} :
 	T extends 'followed' ? {
 		user: Packed<'UserLite'>,
-	} : never;
+	} :
+	T extends 'reaction' ? { note: Packed<'Note'>; reaction: string; user: Packed<'UserLite'> } :
+	T extends 'chatMessage' ? { message: Packed<'ChatMessageLiteFor1on1'> | Packed<'ChatMessageLiteForRoom'> } :
+	{ notification: Packed<'Notification'> };
 
 @Injectable()
 export class UserWebhookService implements OnApplicationShutdown {
@@ -87,16 +92,17 @@ export class UserWebhookService implements OnApplicationShutdown {
 		userId: MiUser['id'],
 		type: T,
 		content: UserWebhookPayload<T>,
+		notification?: NotificationWebhookOccurrence,
 	) {
 		const webhooks = await this.getActiveWebhooks()
 			.then(webhooks => webhooks.filter(webhook => webhook.userId === userId && webhook.on.includes(type)));
 		// Reuse event selection while keeping MCP lifecycle out of the legacy cache.
-		if ((type === 'mention' || type === 'reply') && 'note' in content && content.note.userId !== userId) {
+		if (!((type === 'mention' || type === 'reply') && 'note' in content && content.note.userId === userId)) {
 			webhooks.push(...await this.webhooksRepository.findBy({ userId, mode: 'mcp', active: true }));
 		}
 		return Promise.all(
 			webhooks.filter(webhook => webhook.on.includes(type)).map(webhook => {
-				return this.queueService.userWebhookDeliver(webhook, type, content);
+				return notification ? this.queueService.userWebhookDeliver(webhook, type, content, { notification }) : this.queueService.userWebhookDeliver(webhook, type, content);
 			}),
 		);
 	}

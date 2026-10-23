@@ -361,7 +361,6 @@ export class UserFollowingService implements OnModuleInit {
 		if (this.userEntityService.isLocalUser(followee)) {
 			this.userEntityService.pack(follower.id, followee).then(async packed => {
 				this.globalEventService.publishMainStream(followee.id, 'followed', packed);
-				this.webhookService.enqueueUserWebhook(followee.id, 'followed', { user: packed });
 			});
 
 			// 通知を作成

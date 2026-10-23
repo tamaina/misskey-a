@@ -66,6 +66,7 @@ vi.mock('node:timers/promises', () => ({
 
 // Keep the actual NotificationService implementation; avoid bootstrapping its
 // collaborators' transitive server graph or any database infrastructure.
+vi.mock('@features/integrations/backend/services/UserWebhookService.js', () => ({ UserWebhookService: class {} }));
 vi.mock('@features/runtime/backend/services/GlobalEventService.js', () => ({ GlobalEventService: class {} }));
 vi.mock('../../backend/services/PushNotificationService.js', () => ({ PushNotificationService: class {} }));
 vi.mock('../../backend/serializers/NotificationEntityService.js', () => ({ NotificationEntityService: class {} }));
@@ -92,6 +93,7 @@ function fixture() {
 	const push = mockDeep<Args[6]>();
 	const cache = mockDeep<Args[7]>();
 	const lists = mockDeep<Args[8]>();
+	const webhooks = mockDeep<Args[9]>();
 	cache.userProfileCache.fetch.mockResolvedValue(mockDeep<Awaited<ReturnType<typeof cache.userProfileCache.fetch>>>({ notificationRecieveConfig: {} }));
 	cache.userMutingsCache.fetch.mockResolvedValue(new Set());
 	ids.gen.mockReturnValue('synthetic-notification');
@@ -99,7 +101,7 @@ function fixture() {
 	redis.xadd.mockResolvedValue('1800000000000-0');
 	redis.get.mockResolvedValue(null);
 	serializer.pack.mockResolvedValue(mockDeep<NonNullable<Awaited<ReturnType<typeof serializer.pack>>>>({ id: 'synthetic-notification', type: 'follow' }));
-	return { users, events, service: new NotificationService(config, redis, users, serializer, ids, events, push, cache, lists) };
+	return { users, events, service: new NotificationService(config, redis, users, serializer, ids, events, push, cache, lists, webhooks) };
 }
 
 async function schedule(h: ReturnType<typeof fixture>) {

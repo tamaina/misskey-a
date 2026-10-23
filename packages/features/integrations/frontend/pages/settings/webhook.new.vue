@@ -22,13 +22,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #label>{{ $locale.sfc.trigger }}</template>
 
 		<div class="_gaps_s">
-			<MkSwitch v-model="event_follow">{{ $locale.sfc.follow }}</MkSwitch>
-			<MkSwitch v-model="event_followed">{{ $locale.sfc.followed }}</MkSwitch>
-			<MkSwitch v-model="event_note">{{ $locale.sfc.note }}</MkSwitch>
-			<MkSwitch v-model="event_reply">{{ $locale.sfc.reply }}</MkSwitch>
-			<MkSwitch v-model="event_renote">{{ $locale.sfc.renote }}</MkSwitch>
-			<MkSwitch v-model="event_reaction" :disabled="true">{{ $locale.sfc.reaction }}</MkSwitch>
-			<MkSwitch v-model="event_mention">{{ $locale.sfc.mention }}</MkSwitch>
+			<MkSwitch v-for="event in webhookEventTypes" :key="event" v-model="selectedEvents[event]">{{ i18n.ts._webhookEvents[event] }} ({{ event }})</MkSwitch>
+			<div>{{ i18n.ts._webhookEventsDescription }}</div>
 		</div>
 	</FormSection>
 
@@ -39,8 +34,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import * as Misskey from 'misskey-js';
+import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';
+import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
@@ -52,23 +49,10 @@ const name = ref('');
 const url = ref('');
 const secret = ref('');
 
-const event_follow = ref(true);
-const event_followed = ref(true);
-const event_note = ref(true);
-const event_reply = ref(true);
-const event_renote = ref(true);
-const event_reaction = ref(true);
-const event_mention = ref(true);
+const selectedEvents = reactive(Object.fromEntries(webhookEventTypes.map(event => [event, ['follow', 'followed', 'note', 'reply', 'renote', 'reaction', 'mention'].includes(event)])) as Record<typeof webhookEventTypes[number], boolean>);
 
 async function create(): Promise<void> {
-	const events = [] as Misskey.entities.UserWebhook['on'];
-	if (event_follow.value) events.push('follow');
-	if (event_followed.value) events.push('followed');
-	if (event_note.value) events.push('note');
-	if (event_reply.value) events.push('reply');
-	if (event_renote.value) events.push('renote');
-	if (event_reaction.value) events.push('reaction');
-	if (event_mention.value) events.push('mention');
+	const events: Misskey.entities.UserWebhook['on'] = webhookEventTypes.filter(event => selectedEvents[event]);
 
 	os.apiWithDialog('i/webhooks/create', {
 		name: name.value,
