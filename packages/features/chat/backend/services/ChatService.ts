@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { Brackets } from 'typeorm';
@@ -93,6 +94,7 @@ export class ChatService {
 		private userFollowingService: UserFollowingService,
 		private customEmojiService: CustomEmojiService,
 		private moderationLogService: ModerationLogService,
+		private webhookService: UserWebhookService,
 	) {
 	}
 
@@ -223,6 +225,7 @@ export class ChatService {
 		if (this.userEntityService.isLocalUser(toUser)) {
 			// 相手のストリーム
 			this.globalEventService.publishChatUserStream(toUser.id, fromUser.id, 'message', packedMessage);
+			await this.webhookService.enqueueUserWebhook(toUser.id, 'chatMessage', { message: packedMessage });
 		}
 
 		// 3秒経っても既読にならなかったらイベント発行
@@ -281,6 +284,8 @@ export class ChatService {
 		for (const membership of membershipsOtherThanMe) {
 			if (membership.isMuted) continue;
 
+			await this.webhookService.enqueueUserWebhook(membership.userId, 'chatMessage', { message: packedMessage });
+
 			redisPipeline.set(`newRoomChatMessageExists:${membership.userId}:${toRoom.id}`, message.id);
 			redisPipeline.sadd(`newChatMessagesExists:${membership.userId}`, `room:${toRoom.id}`);
 		}
@@ -309,6 +314,19 @@ export class ChatService {
 		}, 3000);
 
 		return packedMessage;
+	}
+
+	/** Delivery-time access check for MCP references. */
+	public async canReceiveMessageEvent(userId: string, messageId: string): Promise<boolean> {
+		const message = await this.chatMessagesRepository.findOneBy({ id: messageId });
+		if (!message || message.fromUserId === userId || !(await this.getChatAvailability(userId)).read) return false;
+		if (message.toRoomId) {
+			const room = await this.chatRoomsRepository.findOneBy({ id: message.toRoomId });
+			if (!room) return false;
+			const member = await this.chatRoomMembershipsRepository.findOneBy({ roomId: room.id, userId });
+			return member ? !member.isMuted : room.ownerId === userId;
+		}
+		return message.toUserId === userId && !await this.userBlockingService.checkBlocked(userId, message.fromUserId);
 	}
 
 	@bindThis

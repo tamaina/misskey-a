@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { call } from '@orpc/server';
+import { webhookEventTypes } from '../../backend/webhook-events.schema.js';
 import { testContext } from './native-context.js';
 import { createHash } from 'node:crypto';
 import { expect, expectTypeOf, test } from 'vitest';
@@ -103,3 +104,11 @@ function requiredSchema<Schema>(schema: Schema | undefined): Schema {
 	if (schema === undefined) throw new Error('Contract must declare its schema');
 	return schema;
 }
+
+test('all shared event names pass webhook create/update/test and packed response contracts', () => {
+	const on = [...webhookEventTypes];
+	expect(v.parse(requiredSchema(iWebhooksCreateContract['~orpc'].inputSchema), { ...params, on })).toMatchObject({ on });
+	expect(v.parse(requiredSchema(iWebhooksUpdateContract['~orpc'].inputSchema), { webhookId: webhook.id, on })).toMatchObject({ on });
+	checkFinite(packedUserWebhookSchema, { ...webhook, on });
+	for (const type of on) expect(v.parse(requiredSchema(iWebhooksTestContract['~orpc'].inputSchema), { webhookId: webhook.id, type })).toMatchObject({ type });
+});

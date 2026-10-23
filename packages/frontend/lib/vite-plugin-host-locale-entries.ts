@@ -13,13 +13,23 @@ import type { Plugin, ResolvedConfig } from 'vite';
 /** Keep the backend independent of VVI's runtime and manifest representation. */
 export function pluginHostLocaleEntries(options: { embed?: boolean } = {}): Plugin {
 	let config: ResolvedConfig;
+	let bundleWritten = false;
 	return {
 		name: 'misskey-host-locale-entries',
 		apply: 'build',
 		configResolved(resolved) {
 			config = resolved;
 		},
+		buildStart() {
+			bundleWritten = false;
+		},
+		writeBundle() {
+			bundleWritten = true;
+		},
 		async closeBundle() {
+			// closeBundle also runs after build failures. Preserve the original error
+			// instead of trying to read a manifest that was never written.
+			if (!bundleWritten) return;
 			// VVI emits its manifest in writeBundle; closeBundle runs after all writers.
 			const outDir = resolve(config.root, config.build.outDir);
 			const manifest: LocaleAssetManifest = JSON.parse(await readFile(resolve(outDir, '.vite/internationalization-manifest.json'), 'utf8'));

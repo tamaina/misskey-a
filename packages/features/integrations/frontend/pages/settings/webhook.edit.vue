@@ -24,39 +24,41 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_gaps">
 			<div class="_gaps_s">
 				<div :class="$style.switchBox">
-					<MkSwitch v-model="event_follow">{{ $locale.sfc.webhookSettingsEventsFollow }}</MkSwitch>
-					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_follow)" @click="test('follow')"><i class="ti ti-send"></i></MkButton>
+					<MkSwitch v-model="selectedEvents.follow">{{ $locale.sfc.webhookSettingsEventsFollow }}</MkSwitch>
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && selectedEvents.follow)" @click="test('follow')"><i class="ti ti-send"></i></MkButton>
 				</div>
 				<div :class="$style.switchBox">
-					<MkSwitch v-model="event_followed">{{ $locale.sfc.webhookSettingsEventsFollowed }}</MkSwitch>
-					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_followed)" @click="test('followed')"><i class="ti ti-send"></i></MkButton>
+					<MkSwitch v-model="selectedEvents.followed">{{ $locale.sfc.webhookSettingsEventsFollowed }}</MkSwitch>
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && selectedEvents.followed)" @click="test('followed')"><i class="ti ti-send"></i></MkButton>
 				</div>
 				<div :class="$style.switchBox">
-					<MkSwitch v-model="event_note">{{ $locale.sfc.webhookSettingsEventsNote }}</MkSwitch>
-					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_note)" @click="test('note')"><i class="ti ti-send"></i></MkButton>
+					<MkSwitch v-model="selectedEvents.note">{{ $locale.sfc.webhookSettingsEventsNote }}</MkSwitch>
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && selectedEvents.note)" @click="test('note')"><i class="ti ti-send"></i></MkButton>
 				</div>
 				<div :class="$style.switchBox">
-					<MkSwitch v-model="event_reply">{{ $locale.sfc.webhookSettingsEventsReply }}</MkSwitch>
-					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_reply)" @click="test('reply')"><i class="ti ti-send"></i></MkButton>
+					<MkSwitch v-model="selectedEvents.reply">{{ $locale.sfc.webhookSettingsEventsReply }}</MkSwitch>
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && selectedEvents.reply)" @click="test('reply')"><i class="ti ti-send"></i></MkButton>
 				</div>
 				<div :class="$style.switchBox">
-					<MkSwitch v-model="event_renote">{{ $locale.sfc.webhookSettingsEventsRenote }}</MkSwitch>
-					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_renote)" @click="test('renote')"><i class="ti ti-send"></i></MkButton>
+					<MkSwitch v-model="selectedEvents.renote">{{ $locale.sfc.webhookSettingsEventsRenote }}</MkSwitch>
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && selectedEvents.renote)" @click="test('renote')"><i class="ti ti-send"></i></MkButton>
 				</div>
 				<div :class="$style.switchBox">
-					<MkSwitch v-model="event_reaction" :disabled="true">{{ $locale.sfc.webhookSettingsEventsReaction }}</MkSwitch>
-					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_reaction)" @click="test('reaction')"><i class="ti ti-send"></i></MkButton>
+					<MkSwitch v-model="selectedEvents.reaction">{{ $locale.sfc.webhookSettingsEventsReaction }}</MkSwitch>
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && selectedEvents.reaction)" @click="test('reaction')"><i class="ti ti-send"></i></MkButton>
 				</div>
 				<div :class="$style.switchBox">
-					<MkSwitch v-model="event_mention">{{ $locale.sfc.webhookSettingsEventsMention }}</MkSwitch>
-					<MkButton transparent :class="$style.testButton" :disabled="!(active && event_mention)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
+					<MkSwitch v-model="selectedEvents.mention">{{ $locale.sfc.webhookSettingsEventsMention }}</MkSwitch>
+					<MkButton transparent :class="$style.testButton" :disabled="!(active && selectedEvents.mention)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
 				</div>
+				<MkSwitch v-for="event in additionalEvents" :key="event" v-model="selectedEvents[event]">{{ $locale.sfc[event] }} ({{ event }})</MkSwitch>
 			</div>
 
 			<div :class="$style.description">
 				{{ $locale.sfc.webhookSettingsTestRemarks }}
 			</div>
 		</div>
+		<div>{{ $locale.sfc.eventsDescription }}</div>
 	</FormSection>
 
 	<MkSwitch v-model="active">{{ $locale.sfc.webhookSettingsActive }}</MkSwitch>
@@ -69,8 +71,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import * as Misskey from 'misskey-js';
+import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
@@ -96,23 +99,12 @@ const url = ref(webhook.url);
 const secret = ref(webhook.secret);
 const active = ref(webhook.active);
 
-const event_follow = ref(webhook.on.includes('follow'));
-const event_followed = ref(webhook.on.includes('followed'));
-const event_note = ref(webhook.on.includes('note'));
-const event_reply = ref(webhook.on.includes('reply'));
-const event_renote = ref(webhook.on.includes('renote'));
-const event_reaction = ref(webhook.on.includes('reaction'));
-const event_mention = ref(webhook.on.includes('mention'));
+const existingEvents = ['follow', 'followed', 'note', 'reply', 'renote', 'reaction', 'mention'] as const;
+const additionalEvents = webhookEventTypes.filter((event): event is Exclude<typeof event, typeof existingEvents[number]> => !existingEvents.some(existing => existing === event));
+const selectedEvents = reactive(Object.fromEntries(webhookEventTypes.map(event => [event, webhook.on.includes(event)])) as Record<typeof webhookEventTypes[number], boolean>);
 
 function save() {
-	const events: Misskey.entities.UserWebhook['on'] = [];
-	if (event_follow.value) events.push('follow');
-	if (event_followed.value) events.push('followed');
-	if (event_note.value) events.push('note');
-	if (event_reply.value) events.push('reply');
-	if (event_renote.value) events.push('renote');
-	if (event_reaction.value) events.push('reaction');
-	if (event_mention.value) events.push('mention');
+	const events: Misskey.entities.UserWebhook['on'] = webhookEventTypes.filter(event => selectedEvents[event]);
 
 	os.apiWithDialog('i/webhooks/update', {
 		name: name.value,
@@ -402,7 +394,25 @@ definePage(() => ({
 	"webhookSettingsActive": "有効",
 	"save": "保存",
 	"delete": "削除",
-	"deleteAreYouSure": "「{x}」を削除しますか？"
+	"deleteAreYouSure": "「{x}」を削除しますか？",
+	"eventsDescription": "通知に由来するイベントには通知の受信設定やミュートが適用されます。MCPで mention / reply と旧名 note.mentioned / note.replied の両方を購読すると、同じイベントが2回届くことがあります。",
+	"unfollow": "フォローを解除したとき",
+	"subscribedNote": "通知をオンにしたユーザーが投稿したとき",
+	"quote": "引用Renoteされたとき",
+	"pollEnded": "アンケートが終了したとき",
+	"scheduledNotePosted": "予約ノートが投稿されたとき",
+	"scheduledNotePostFailed": "予約ノートの投稿に失敗したとき",
+	"receiveFollowRequest": "フォローリクエストを受け取ったとき",
+	"followRequestAccepted": "フォローリクエストが承認されたとき",
+	"roleAssigned": "ロールを付与されたとき",
+	"chatRoomInvitationReceived": "チャットルームに招待されたとき",
+	"achievementEarned": "実績を獲得したとき",
+	"exportCompleted": "エクスポートが完了したとき",
+	"login": "ログインしたとき",
+	"createToken": "トークンが作成されたとき",
+	"app": "アプリ通知を受け取ったとき",
+	"test": "テスト通知を受け取ったとき",
+	"chatMessage": "チャットメッセージを受け取ったとき"
 }
 </locale>
 

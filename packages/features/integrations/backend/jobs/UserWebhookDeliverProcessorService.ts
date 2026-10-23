@@ -37,11 +37,11 @@ export class UserWebhookDeliverProcessorService {
 	}
 
 	private async processMcp(data: McpWebhookDeliverJobData): Promise<string> {
-		const authorize = () => this.mcpEvents.authorizeDelivery(data.webhookId, data.userId, data.generation, data.noteId, data.type, data.antennaId);
+		const authorize = () => this.mcpEvents.authorizeDelivery(data.webhookId, data.userId, data.generation, data.noteId, data.type, data.antennaId, data.data);
 		const webhook = await authorize();
 		if (!webhook) return 'Suppressed';
-		const body = JSON.stringify({ eventId: data.eventId, name: data.type === 'antenna' ? 'antenna.note' : data.type === 'mention' ? 'note.mentioned' : 'note.replied',
-			timestamp: new Date(data.createdAt).toISOString(), data: { noteId: data.noteId, url: new URL(`/notes/${encodeURIComponent(data.noteId)}`, this.config.url).href }, cursor: null });
+		const body = JSON.stringify({ eventId: data.eventId, name: webhook.name,
+			timestamp: new Date(data.createdAt).toISOString(), data: data.noteId && (webhook.name === 'note.mentioned' || webhook.name === 'note.replied' || data.type === 'antenna') ? { noteId: data.noteId, url: new URL(`/notes/${encodeURIComponent(data.noteId)}`, this.config.url).href } : data.data, cursor: null });
 		const previous = webhook.mcpPreviousSecretUntil && webhook.mcpPreviousSecretUntil.getTime() > Date.now() ? webhook.mcpPreviousSecret ?? undefined : undefined;
 		let response: Awaited<ReturnType<HttpRequestService['sendMcpWebhook']>>;
 		try {

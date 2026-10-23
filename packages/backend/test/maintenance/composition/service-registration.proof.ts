@@ -254,7 +254,8 @@ const services = [
 	['ChannelMutingService', ChannelMutingService, 6],
 	['ChartLoggerService', ChartLoggerService, 1],
 	['ChartManagementService', ChartManagementService, 13],
-	['ChatService', ChatService, 23],
+	// Recipient-scoped chat delivery intentionally adds UserWebhookService (PR #222).
+	['ChatService', ChatService, 24],
 	['ClipService', ClipService, 5],
 	['CustomEmojiService', CustomEmojiService, 7],
 	['DeleteAccountService', DeleteAccountService, 9],
@@ -281,7 +282,8 @@ const services = [
 	['NoteDeleteService', NoteDeleteService, 16],
 	['NoteDraftService', NoteDraftService, 10],
 	['NotePiningService', NotePiningService, 10],
-	['NotificationService', NotificationService, 9],
+	// Delivery runs after notification filtering/packing, before the unread delay (PR #222).
+	['NotificationService', NotificationService, 10],
 	['PageService', PageService, 7],
 	['PollService', PollService, 11],
 	['PushNotificationService', PushNotificationService, 5],
@@ -329,5 +331,12 @@ for (const [name, feature, parameterCount] of services) {
 			const historicalParameterCount = historicalConstructorCounts.get(feature)?.() ?? feature.length;
 			expect(historicalParameterCount).toBe(parameterCount);
 		}
+	});
+}
+
+// Pin the added dependency as well as the counts; stream publication is a separate boundary.
+for (const feature of [ChatService, NotificationService]) {
+	test(`${feature.name} injects user webhook delivery at the recipient boundary`, () => {
+		expect(Reflect.getMetadata('design:paramtypes', feature).at(-1)).toBe(UserWebhookService);
 	});
 }

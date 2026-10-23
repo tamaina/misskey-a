@@ -28,6 +28,7 @@ import { RelayService } from '@features/federation/backend/services/RelayService
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { NotesChart } from '@features/statistics/backend/charts/notes.js';
 import { PerUserNotesChart } from '@features/statistics/backend/charts/per-user-notes.js';
 import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
@@ -856,18 +857,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			if (data.reply) {
 				// 通知
 				if (data.reply.userHost === null) {
-					const isThreadMuted = await this.noteThreadMutingsRepository.exists({
-						where: {
-							userId: data.reply.userId,
-							threadId: data.reply.threadId ?? data.reply.id,
-						},
-					});
-
-					if (!isThreadMuted) {
-						nm.push(data.reply.userId, 'reply');
-						this.globalEventService.publishMainStream(data.reply.userId, 'reply', noteObj);
-						this.webhookService.enqueueUserWebhook(data.reply.userId, 'reply', { note: noteObj });
-					}
+					await this.createReplyEvent(data.reply, noteObj, nm);
 				}
 			}
 
@@ -883,7 +873,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 				// Publish event
 				if ((user.id !== data.renote.userId) && data.renote.userHost === null) {
 					this.globalEventService.publishMainStream(data.renote.userId, 'renote', noteObj);
-					this.webhookService.enqueueUserWebhook(data.renote.userId, 'renote', { note: noteObj });
 				}
 			}
 
@@ -974,6 +963,17 @@ export class NoteCreateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
+	private async createReplyEvent(reply: MiNote, note: Packed<'Note'>, nm: NotificationManager) {
+		const isThreadMuted = await this.noteThreadMutingsRepository.exists({
+			where: { userId: reply.userId, threadId: reply.threadId ?? reply.id },
+		});
+		if (!isThreadMuted) {
+			nm.push(reply.userId, 'reply');
+			this.globalEventService.publishMainStream(reply.userId, 'reply', note);
+		}
+	}
+
+	@bindThis
 	private async createMentionedEvents(mentionedUsers: MinimumUser[], note: MiNote, nm: NotificationManager) {
 		for (const u of mentionedUsers.filter(u => this.userEntityService.isLocalUser(u))) {
 			const isThreadMuted = await this.noteThreadMutingsRepository.exists({
@@ -992,7 +992,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 			});
 
 			this.globalEventService.publishMainStream(u.id, 'mention', detailPackedNote);
-			this.webhookService.enqueueUserWebhook(u.id, 'mention', { note: detailPackedNote });
 
 			// Create notification
 			nm.push(u.id, 'mention');

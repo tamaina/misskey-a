@@ -136,13 +136,13 @@ export const packedNotificationSchema = v.variant('type', [v.strictObject({
 	'id': v.pipe(v.string(), v.metadata({ 'format': 'id' })),
 	'createdAt': v.pipe(v.string(), v.metadata({ 'format': 'date-time' })),
 	'type': v.picklist(['login']),
-	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	// Security events omit userId; no defined notifier value is allowed.
 	'userId': v.optional(v.never()),
 }), v.strictObject({
 	'id': v.pipe(v.string(), v.metadata({ 'format': 'id' })),
 	'createdAt': v.pipe(v.string(), v.metadata({ 'format': 'date-time' })),
 	'type': v.picklist(['createToken']),
-	// packedCommon emits this enumerable key as undefined; JSON must omit it.
+	// Security events omit userId; no defined notifier value is allowed.
 	'userId': v.optional(v.never()),
 }), v.strictObject({
 	'id': v.pipe(v.string(), v.metadata({ 'format': 'id' })),
