@@ -1,7 +1,7 @@
 ## 9000.0.0
 
 ### Note
-- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `8b3bbc05b6a1e4686e4f1c793383d3457545c8e0` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
+- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `a3c8f395bc513cf36dfeaefb73ffb42aed427b7a` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
 - 開発環境の指定は Node.js 26.4.0 / pnpm 12.11.2、Docker のベースイメージは Node.js 26.10.0-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210)
 - 上流由来の migration 名・履歴を復元しています。過去の実験版で異なる migration 名を適用したデータベースは、更新前に履歴の個別確認が必要です。 (#35)
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
@@ -10,7 +10,6 @@
 - [beta.3 の GitHub prerelease](https://github.com/tamaina/misskey-a/releases/tag/9000.0.0-beta.3) は公開済みですが、SDK の npm 公開は `404 Not Found`、Docker 公開は認証情報不足で失敗しています。beta.3 タグ後の変更も本節には含まれるため、利用するソースの commit を確認してください。
 
 ### General
-- User WebhookとMCP Eventsで全通知トリガーおよび受信チャットの購読に対応し、通知の受信設定とミュートを反映するようにしました (#222)
 #### Enhance: Misskey 9000
 ソフトウェア名を **Misskey 9000** に変更し、リポジトリ・問い合わせ先・インスタンスの既定リンクをこのforkに変更 (#32, #50, #54)  
 Misskey 9000の独自SemVer採番を開始しています。NodeInfoの`software`は引き続き`misskey`です。
@@ -34,6 +33,7 @@ APIの省略値・nullable・アップロード・エラー・キャンセル処
 - 通常の OAuth でも明示的な opt-in で権限を選択・追加できるようにし、MCP の同意画面では任意権限を初期 OFF で表示 (#56, #59, #63)
 - MCPのイベント記述・JSON Schema 2020-12・フィルター型を整理し、現在の権限・キャッシュに沿った検出結果を返すように (#79, #102, #130, #159, #173)
 - Fix: 自分で投稿した返信・メンションを、そのアカウント自身のMCPイベント購読へ送らないように（通常の通知・Webhookや他の受信者への配送は維持） (#215)
+- User WebhookとMCP Eventsで全通知トリガーおよび受信チャットの購読に対応し、通知の受信設定とミュートを反映するようにしました (#222)
 
 #### Perf: ActivityPubでのやり取りをEd25519に対応させ、配送を軽量に
 - 連合の署名について、複数公開鍵・受信時の鍵再取得・対応相手へのEd25519署名に対応（従来のRSA鍵との互換性を維持。RFC 9421対応を意味しない） (#16, #18, #19)
