@@ -120,7 +120,12 @@ test.each(fixtures)('real notification serializer has a finite outer shape: $typ
 	}
 	const { id: _id, ...missingId } = result!;
 	expect(v.safeParse(packedNotificationSchema, missingId).success).toBe(false);
-	if (!('notifierId' in fixture) && !fixture.type.endsWith(':grouped')) {
+	if (fixture.type === 'login' || fixture.type === 'createToken') {
+		// Security events carry no actor or credential details, even before JSON encoding.
+		expect(result).toStrictEqual({ ...base, type: fixture.type });
+		expect(Object.keys(result!).sort()).toEqual(['createdAt', 'id', 'type']);
+		for (const value of ['user123', null, 7]) expect(v.safeParse(packedNotificationSchema, { ...result, userId: value }).success).toBe(false);
+	} else if (!('notifierId' in fixture) && !fixture.type.endsWith(':grouped')) {
 		expect(Object.hasOwn(result!, 'userId')).toBe(true);
 		expect(result).toHaveProperty('userId', undefined);
 		for (const value of ['user123', null, 7]) expect(v.safeParse(packedNotificationSchema, { ...result, userId: value }).success).toBe(false);

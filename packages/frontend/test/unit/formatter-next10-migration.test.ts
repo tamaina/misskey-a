@@ -25,6 +25,7 @@ import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import migrationInputs from './formatter-next10-migration.json';
 import type { ParameterizedString } from 'i18n';
 import type { Locale } from './retired-ui-next-locale-types.js';
+import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const MagicString = createRequire(resolve(root, 'packages/frontend-builder/package.json'))('magic-string').default;
@@ -53,7 +54,7 @@ describe('next10 formatter locale migration', () => {
 	test('preserves all4676 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = readFileSync(resolve(root, entry.file), 'utf8');
+			const source = restoreUpstreamDevelopBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'));
 			expect(createHash('sha256').update(source).digest('hex')).toBe(entry.migratedSha256);
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);

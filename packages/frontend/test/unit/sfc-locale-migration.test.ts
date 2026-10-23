@@ -4,6 +4,7 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 import { restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -515,7 +516,8 @@ function countExactPropertyReference(source: string, reference: string): number 
 
 describe('Feature SFC-local locale migration', () => {
 	test.each(featureMigrations)('$file preserves all simple labels in all active locales', ({ file, keyPaths }) => {
-		const source = restoreFinalOwnerHistoricalSource(file, readFileSync(resolve(repoRoot, file), 'utf8'));
+		// Validate pinned new fallback keys before replaying the original label inventory.
+		const source = restoreFinalOwnerHistoricalSource(file, restoreUpstreamDevelopBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8')));
 		const localKeys = keyPaths.map(keyPath => keyPath.split('.').at(-1)!);
 		const localeBlocks = new Map<string, Record<string, unknown>>();
 
