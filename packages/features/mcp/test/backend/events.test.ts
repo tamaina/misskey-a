@@ -404,7 +404,8 @@ it('binds chat delivery to the subscription name and recipient even with a permi
 	const row = rows.get(id)!;
 	const authorize = (data: Record<string, string>, userId = actor.id) => service.authorizeDelivery(id, userId, row.mcpGeneration!, '', 'chatMessage', undefined, data);
 	expect(await authorize({ messageId: 'received', userId: actor.id })).not.toBeNull();
-	for (const data of [{ messageId: 'foreign' }, { messageId: 'received', userId: 'other' }, { messageId: 'received', notificationId: 'foreign' }]) {
+	const invalidReferences: Record<string, string>[] = [{ messageId: 'foreign' }, { messageId: 'received', userId: 'other' }, { messageId: 'received', notificationId: 'foreign' }];
+	for (const data of invalidReferences) {
 		expect(await authorize(data)).toBeNull();
 	}
 	expect(await authorize({ messageId: 'received' }, 'other')).toBeNull();
@@ -452,7 +453,8 @@ it('suppresses a notification removed after DNS without sending the callback', a
 		sent = true;
 		return { ok: true, status: 200, text: '' };
 	});
-	const job = { data: { mode: 'mcp', type: 'login', webhookId: id, userId: actor.id, generation: rows.get(id)!.mcpGeneration!, noteId: '', data: { notificationId: 'notification' }, createdAt: 1000, eventId: 'event' } } as Bull.Job<UserWebhookDeliverJobData>;
+	const job = mockDeep<Bull.Job<UserWebhookDeliverJobData>>();
+	job.data = { mode: 'mcp', type: 'login', webhookId: id, userId: actor.id, generation: rows.get(id)!.mcpGeneration!, noteId: '', data: { notificationId: 'notification' }, createdAt: 1000, eventId: 'event' };
 	expect(await worker.process(job)).toBe('Suppressed');
 	expect(getNotification).toHaveBeenCalledTimes(2);
 	expect(sent).toBe(false);

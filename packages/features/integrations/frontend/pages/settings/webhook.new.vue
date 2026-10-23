@@ -22,8 +22,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #label>{{ $locale.sfc.trigger }}</template>
 
 		<div class="_gaps_s">
-			<MkSwitch v-for="event in webhookEventTypes" :key="event" v-model="selectedEvents[event]">{{ i18n.ts._webhookEvents[event] }} ({{ event }})</MkSwitch>
-			<div>{{ i18n.ts._webhookEventsDescription }}</div>
+			<MkSwitch v-for="event in webhookEventTypes" :key="event" v-model="selectedEvents[event]">{{ $locale.sfc[event] }} ({{ event }})</MkSwitch>
+			<div>{{ $locale.sfc.eventsDescription }}</div>
 		</div>
 	</FormSection>
 
@@ -37,7 +37,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, reactive, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
@@ -244,7 +243,25 @@ definePage(() => ({
   "renote": "Renoteされたとき",
   "reaction": "リアクションがあったとき",
   "mention": "メンションされたとき",
-  "create": "作成"
+  "create": "作成",
+  "eventsDescription": "通知に由来するイベントには通知の受信設定やミュートが適用されます。MCPで mention / reply と旧名 note.mentioned / note.replied の両方を購読すると、同じイベントが2回届くことがあります。",
+  "unfollow": "フォローを解除したとき",
+  "subscribedNote": "通知をオンにしたユーザーが投稿したとき",
+  "quote": "引用Renoteされたとき",
+  "pollEnded": "アンケートが終了したとき",
+  "scheduledNotePosted": "予約ノートが投稿されたとき",
+  "scheduledNotePostFailed": "予約ノートの投稿に失敗したとき",
+  "receiveFollowRequest": "フォローリクエストを受け取ったとき",
+  "followRequestAccepted": "フォローリクエストが承認されたとき",
+  "roleAssigned": "ロールを付与されたとき",
+  "chatRoomInvitationReceived": "チャットルームに招待されたとき",
+  "achievementEarned": "実績を獲得したとき",
+  "exportCompleted": "エクスポートが完了したとき",
+  "login": "ログインしたとき",
+  "createToken": "トークンが作成されたとき",
+  "app": "アプリ通知を受け取ったとき",
+  "test": "テスト通知を受け取ったとき",
+  "chatMessage": "チャットメッセージを受け取ったとき"
 }
 </locale>
 

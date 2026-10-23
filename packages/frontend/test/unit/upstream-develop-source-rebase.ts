@@ -10,6 +10,7 @@ import type { LocaleBundle, RuntimeLocaleDictionary } from 'vite-vue-internation
 
 export interface SourceRebase {
 	file: string;
+	sourceOnly?: boolean;
 	currentSha256: string;
 	baselineSha256: string;
 	edits: { start: number; end: number; current: string; baseline: string }[];
@@ -17,14 +18,14 @@ export interface SourceRebase {
 
 /** Each purpose contributes only its own reviewed sources; identical helpers merge in any order. */
 export const sourceRebases: SourceRebase[] = readdirSync(import.meta.dirname)
-	.filter(name => /^upstream-sync-[a-z]+-source-rebase\.json$/.test(name))
+	.filter(name => /^(?:upstream-sync|feature-update)-[a-z]+-source-rebase\.json$/.test(name))
 	.sort()
 	.flatMap(name => JSON.parse(readFileSync(resolve(import.meta.dirname, name), 'utf8')) as SourceRebase[]);
 const rebases = sourceRebases;
 if (new Set(rebases.map(entry => entry.file)).size !== rebases.length) throw new Error('Duplicate upstream source rebase');
 
 const sha256 = (source: string): string => createHash('sha256').update(source).digest('hex');
-/** Restore only pinned upstream adaptations before replaying the unchanged historical proofs. */
+/** Restore only pinned source adaptations before replaying the unchanged historical proofs. */
 export function restoreUpstreamDevelopBaseline(file: string, source: string): string {
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase || sha256(source) === rebase.baselineSha256) return source;
@@ -43,7 +44,7 @@ const localeCache = new Map<string, { current: Map<string, RuntimeLocaleDictiona
 export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBundle): LocaleBundle {
 	const modules = bundle.modules;
 	if (!modules) return bundle;
-	for (const rebase of rebases.filter(entry => entry.file.endsWith('.vue'))) {
+	for (const rebase of rebases.filter(entry => !entry.sourceOnly && entry.file.endsWith('.vue'))) {
 		const moduleId = rebase.file.replace('packages/', '/');
 		if (!Object.hasOwn(modules, moduleId)) continue;
 		const source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');

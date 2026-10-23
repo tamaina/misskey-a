@@ -51,14 +51,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkSwitch v-model="selectedEvents.mention">{{ $locale.sfc.webhookSettingsEventsMention }}</MkSwitch>
 					<MkButton transparent :class="$style.testButton" :disabled="!(active && selectedEvents.mention)" @click="test('mention')"><i class="ti ti-send"></i></MkButton>
 				</div>
-				<MkSwitch v-for="event in additionalEvents" :key="event" v-model="selectedEvents[event]">{{ i18n.ts._webhookEvents[event] }} ({{ event }})</MkSwitch>
+				<MkSwitch v-for="event in additionalEvents" :key="event" v-model="selectedEvents[event]">{{ $locale.sfc[event] }} ({{ event }})</MkSwitch>
 			</div>
 
 			<div :class="$style.description">
 				{{ $locale.sfc.webhookSettingsTestRemarks }}
 			</div>
 		</div>
-		<div>{{ i18n.ts._webhookEventsDescription }}</div>
+		<div>{{ $locale.sfc.eventsDescription }}</div>
 	</FormSection>
 
 	<MkSwitch v-model="active">{{ $locale.sfc.webhookSettingsActive }}</MkSwitch>
@@ -74,7 +74,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, reactive, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
@@ -100,7 +99,8 @@ const url = ref(webhook.url);
 const secret = ref(webhook.secret);
 const active = ref(webhook.active);
 
-const additionalEvents = webhookEventTypes.filter(event => !['follow', 'followed', 'note', 'reply', 'renote', 'reaction', 'mention'].includes(event));
+const existingEvents = ['follow', 'followed', 'note', 'reply', 'renote', 'reaction', 'mention'] as const;
+const additionalEvents = webhookEventTypes.filter((event): event is Exclude<typeof event, typeof existingEvents[number]> => !existingEvents.some(existing => existing === event));
 const selectedEvents = reactive(Object.fromEntries(webhookEventTypes.map(event => [event, webhook.on.includes(event)])) as Record<typeof webhookEventTypes[number], boolean>);
 
 function save() {
@@ -394,7 +394,25 @@ definePage(() => ({
 	"webhookSettingsActive": "有効",
 	"save": "保存",
 	"delete": "削除",
-	"deleteAreYouSure": "「{x}」を削除しますか？"
+	"deleteAreYouSure": "「{x}」を削除しますか？",
+	"eventsDescription": "通知に由来するイベントには通知の受信設定やミュートが適用されます。MCPで mention / reply と旧名 note.mentioned / note.replied の両方を購読すると、同じイベントが2回届くことがあります。",
+	"unfollow": "フォローを解除したとき",
+	"subscribedNote": "通知をオンにしたユーザーが投稿したとき",
+	"quote": "引用Renoteされたとき",
+	"pollEnded": "アンケートが終了したとき",
+	"scheduledNotePosted": "予約ノートが投稿されたとき",
+	"scheduledNotePostFailed": "予約ノートの投稿に失敗したとき",
+	"receiveFollowRequest": "フォローリクエストを受け取ったとき",
+	"followRequestAccepted": "フォローリクエストが承認されたとき",
+	"roleAssigned": "ロールを付与されたとき",
+	"chatRoomInvitationReceived": "チャットルームに招待されたとき",
+	"achievementEarned": "実績を獲得したとき",
+	"exportCompleted": "エクスポートが完了したとき",
+	"login": "ログインしたとき",
+	"createToken": "トークンが作成されたとき",
+	"app": "アプリ通知を受け取ったとき",
+	"test": "テスト通知を受け取ったとき",
+	"chatMessage": "チャットメッセージを受け取ったとき"
 }
 </locale>
 
