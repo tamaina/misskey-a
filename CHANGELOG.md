@@ -90,6 +90,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: リストの作成・複製・名前変更で、名前の文字数制限をUnicodeコードポイント数の1〜100文字として判定するように（絵文字などの非BMP文字を含む名前に対応） (#217)
 - Fix: UserProfileのpassword列コメントを修正するmigrationを追加（パスワード処理自体の変更はなし） (#200)
 - Fix: Client ID Metadata Document に loopback の HTTP リダイレクトが含まれていても、登録済みの redirect_uri なら認可できるよう修正 (#220)
+- Fix: MCP の API 一覧と呼び出しから、契約の non-productive タグが付いたエンドポイントを除外するように (#221)
 
 ## 2026.10.0
 

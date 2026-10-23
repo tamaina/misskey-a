@@ -4,6 +4,7 @@
  */
 import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { isContractProcedure } from '@orpc/contract';
 import * as v from 'valibot';
 import { availableEndpointsResult } from '@features/instance/backend/endpoints/available-endpoints.contract.js';
 import { mcpScopes } from './discovery.js';
@@ -21,10 +22,30 @@ import type { AccessTokensRepository, AppsRepository, UsersRepository } from '@f
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ApiRequestContext } from '@features/api/backend/transport/ApiExecutionContextFactory.js';
 
+/** Request names whose contract route carries the non-productive tag. HTTP behavior is unchanged. */
+function nonProductiveEndpointNames(contract: unknown): ReadonlySet<string> {
+	const names = new Set<string>();
+	const visit = (node: unknown): void => {
+		if (isContractProcedure(node)) {
+			const { meta, route } = node['~orpc'];
+			const name: unknown = meta.requestName;
+			if (typeof name === 'string' && Array.isArray(route.tags) && route.tags.includes('non-productive')) names.add(name);
+			return;
+		}
+		if (node !== null && typeof node === 'object' && !Array.isArray(node)) {
+			for (const child of Object.values(node)) visit(child);
+		}
+	};
+	visit(contract);
+	return names;
+}
+
+const nonProductiveEndpoints = nonProductiveEndpointNames(pilotContract);
+
 /** Application seam only. No HTTP registration or credential/grant issuance. */
 @Injectable()
 export class McpApiService {
-	private readonly endpoints = endpointPolicies(pilotContract).filter(endpoint => endpoint.mcpSupported);
+	private readonly endpoints = endpointPolicies(pilotContract).filter(endpoint => endpoint.mcpSupported && !nonProductiveEndpoints.has(endpoint.name));
 	private genericCaller: ReturnType<typeof createAllowedApiCaller> | undefined;
 	private caller: ReturnType<typeof createAllowedApiCaller> | undefined;
 	constructor(private readonly contexts: ApiExecutionContextFactory, private readonly moduleRef: ModuleRef,
@@ -59,7 +80,7 @@ export class McpApiService {
 				if (Object.keys(input).some(key => key !== 'endpoint')) throw new ORPCError('BAD_REQUEST', { message: 'Unexpected discovery argument' });
 				const directory = v.parse(availableEndpointsResult, await generic()('available-endpoints', input, bound, invocationSignal));
 				const supported = new Set(this.endpoints.map(endpoint => endpoint.name));
-				return { ...directory, endpoints: directory.endpoints.filter(name => supported.has(name)), definitions: directory.definitions.filter(endpoint => endpoint.mcpSupported) };
+				return { ...directory, endpoints: directory.endpoints.filter(name => supported.has(name)), definitions: directory.definitions.filter(endpoint => supported.has(endpoint.name)) };
 			}
 			if (tool === 'call_api') {
 				if (typeof input.endpoint !== 'string' || !/^[a-z0-9-]+(?:\/[a-z0-9-]+)*$/.test(input.endpoint)) throw new McpSelectionError('TOOL_UNAVAILABLE');

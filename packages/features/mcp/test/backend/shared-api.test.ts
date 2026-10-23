@@ -144,6 +144,23 @@ it('discovers current token API candidates and provides native input definitions
 	expect((await f.ordinary({}, f.grant.token, 'available-endpoints')).json().endpoints).toContain('notes/reactions/create');
 	f.rows.delete(f.grant.id); expect((await f.ordinary({}, f.grant.token, 'available-endpoints')).statusCode).toBe(401);
 });
+it('omits non-productive contract endpoints from MCP discovery and call_api while native listing still includes them', async () => {
+	const f = await fixture(); const service = f.module.get(McpApiService);
+	const listed = await service.invoke('list_api_endpoints', {}, f.request()) as { endpoints: string[] };
+	expect(listed.endpoints).toContain('users/notes');
+	expect(listed.endpoints).not.toContain('reset-db');
+	expect(listed.endpoints).not.toContain('test');
+	for (const endpoint of ['reset-db', 'test']) {
+		const lookup = await service.invoke('list_api_endpoints', { endpoint }, f.request()) as { endpoints: string[]; definitions: { name: string }[] };
+		expect(lookup.endpoints).not.toContain(endpoint);
+		expect(lookup.definitions).toEqual([]);
+		await expect(service.invoke('call_api', { endpoint, arguments: {} }, f.request())).rejects.toMatchObject({ code: 'TOOL_UNAVAILABLE' });
+	}
+	expect(await service.invoke('call_api', { endpoint: 'users/notes', arguments: { userId: f.own.id } }, f.request())).toEqual((await f.ordinary({ userId: f.own.id })).json());
+	const http = await f.ordinary({}, f.grant.token, 'available-endpoints');
+	expect(http.statusCode).toBe(200);
+	expect(http.json().endpoints).toEqual(expect.arrayContaining(['reset-db', 'test', 'users/notes']));
+});
 it('routes generic reads and writes through native validation/permissions, with fresh revocation and no arbitrary URLs', async () => {
 	const f = await fixture(); const prepared = await f.module.get(McpApiService).prepare(f.request());
 	const visiblePrivate = f.notes.find(note => note.userId === f.otherId && note.visibility === 'specified')!;
