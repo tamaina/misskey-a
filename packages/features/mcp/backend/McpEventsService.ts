@@ -25,6 +25,8 @@ import { mcpEventsContract, subscribeInput } from './api.definition.js';
 import { eventPermissions, eventPayloadSchema } from './events.schema.js';
 import type { McpEventName } from './events.schema.js';
 import type { WebhookEventTypes } from '@features/integrations/backend/webhook-events.schema.js';
+import { notificationEventName, notificationEventTypes } from '@features/integrations/backend/webhook-events.schema.js';
+import type { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { ChatService } from '@features/chat/backend/services/ChatService.js';
 import { eventNames, eventType, McpEventError, signedHeaders, signingKey, subscriptionId, challengeMatches } from './events-protocol.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
@@ -154,12 +156,13 @@ export class McpEventsService {
 	private async subscriptionForDelivery(id: string, userId: string, generation: string, type: WebhookEventTypes | 'antenna', antennaId?: string) {
 		const webhook = await this.webhooks.createQueryBuilder('webhook').addSelect('webhook.mcpPreviousSecret').where('webhook.id = :id', { id }).getOne();
 		if (!webhook || webhook.mcpStream || webhook.mode !== 'mcp' || webhook.userId !== userId || !webhook.active || webhook.mcpGeneration !== generation
+			|| (type === 'antenna' ? webhook.name !== 'antenna.note' : eventType(webhook.name as McpEventName) !== type)
 			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now() || !webhook.mcpTokenId || (type === 'antenna' ? !antennaId || webhook.mcpAntennaId !== antennaId : !!webhook.mcpAntennaId || !webhook.on.includes(type))) return null;
 		return webhook;
 	}
 
 	/** Recheck after DNS resolution immediately before opening the outbound connection. */
-	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: WebhookEventTypes | 'antenna', antennaId?: string, data?: Record<string, string>) {
+	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: WebhookEventTypes | 'antenna', antennaId?: string, data?: Partial<Record<string, string>>) {
 		const webhook = await this.subscriptionForDelivery(id, userId, generation, type, antennaId);
 		if (!webhook?.mcpTokenId) return null;
 		try {
@@ -172,10 +175,26 @@ export class McpEventsService {
 			}
 		} catch (error) { if (error instanceof McpEventError) return null; throw error; }
 		if (type === 'chatMessage') {
-			if (!data?.messageId || !this.moduleRef) return null;
+			if (!data?.messageId || !this.moduleRef || (data.userId !== undefined && data.userId !== userId)
+				|| data.notificationId !== undefined || data.notificationType !== undefined) return null;
 			const chat = this.moduleRef.get<ChatService>('ChatService', { strict: false });
 			if (!await chat.canReceiveMessageEvent(userId, data.messageId)) return null;
-		} else if (noteId) {
+		} else {
+			// Only note-bearing event types can use the older note-only reference form.
+			const noteEvent = ['mention', 'reply', 'renote', 'quote', 'subscribedNote', 'reaction', 'pollEnded', 'scheduledNotePosted'].includes(type);
+			if (data?.notificationId !== undefined || data?.notificationType !== undefined
+				|| ((!noteId || !noteEvent) && notificationEventTypes.includes(type as typeof notificationEventTypes[number]))) {
+				if (!data?.notificationId || !this.moduleRef) return null;
+				const notifications = this.moduleRef.get<NotificationService>('NotificationService', { strict: false });
+				const notification = await notifications.getNotification(userId, data.notificationId);
+				if (!notification || notification.id !== data.notificationId || notificationEventName(notification.type) !== type
+					|| (data.notificationType !== undefined && data.notificationType !== notification.type)
+					|| (noteId && (!('noteId' in notification) || notification.noteId !== noteId))
+					|| (data.noteId !== undefined && (!('noteId' in notification) || notification.noteId !== data.noteId))
+					|| (data.userId !== undefined && (!('notifierId' in notification) || notification.notifierId !== data.userId))) return null;
+			}
+		}
+		if (type !== 'chatMessage' && noteId) {
 			const note = await this.notes.findOneBy({ id: noteId });
 			if (!note || (type === 'mention' && (note.userId === userId || !note.mentions.includes(userId)))
 				|| (type === 'reply' && (note.userId === userId || note.replyUserId !== userId))

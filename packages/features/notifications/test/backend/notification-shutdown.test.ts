@@ -165,3 +165,19 @@ test('observer reports the actual callback rejection instead of swallowing it', 
 		h.service.dispose();
 	}
 });
+
+test('reads an exact notification only from the recipient timeline and verifies the full id', async () => {
+	const notification = { id: 'notification', type: 'login' };
+	const xrange = vi.fn(async (key: string) => key === 'notificationTimeline:recipient' ? [['1000-2', ['data', JSON.stringify(notification)]]] : []);
+	const parseFull = vi.fn(() => ({ date: 1000, additional: 2n }));
+	const service = Object.assign(Object.create(NotificationService.prototype), { redisClient: { xrange }, idService: { parseFull } }) as NotificationService;
+	expect(await service.getNotification('recipient', 'notification')).toEqual(notification);
+	expect(xrange).toHaveBeenCalledWith('notificationTimeline:recipient', '1000-2', '1000-2');
+	expect(await service.getNotification('other', 'notification')).toBeNull();
+	// Redis sequence truncation must not authorize a different full notification id.
+	expect(await service.getNotification('recipient', 'different-id')).toBeNull();
+	parseFull.mockImplementation(() => { throw new Error('invalid id'); });
+	xrange.mockClear();
+	expect(await service.getNotification('recipient', 'invalid')).toBeNull();
+	expect(xrange).not.toHaveBeenCalled();
+});

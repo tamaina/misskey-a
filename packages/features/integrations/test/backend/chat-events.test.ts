@@ -85,8 +85,11 @@ it('rechecks deletion, sender exclusion, blocking, room membership and room mute
 	expect(await f.service.canReceiveMessageEvent('recipient', 'message')).toBe(false);
 	f.chatRoomMembershipsRepository.findOneBy.mockResolvedValue({ isMuted: true });
 	expect(await f.service.canReceiveMessageEvent('recipient', 'message')).toBe(false);
+	expect(await f.service.canReceiveMessageEvent('owner', 'message')).toBe(false);
 	f.chatRoomMembershipsRepository.findOneBy.mockResolvedValue({ isMuted: false });
 	expect(await f.service.canReceiveMessageEvent('recipient', 'message')).toBe(true);
+	expect(await f.service.canReceiveMessageEvent('owner', 'message')).toBe(true);
+	f.chatRoomMembershipsRepository.findOneBy.mockResolvedValue(null);
 	expect(await f.service.canReceiveMessageEvent('owner', 'message')).toBe(true);
 	f.roleService.getUserPolicies.mockResolvedValue({ chatAvailability: 'unavailable' });
 	expect(await f.service.canReceiveMessageEvent('owner', 'message')).toBe(false);

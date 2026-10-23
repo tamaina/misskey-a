@@ -276,6 +276,16 @@ export class NotificationService implements OnApplicationShutdown {
 		return date.toString() + '-' + BigInt.asUintN(64, additional).toString();
 	}
 
+	/** Read an exact occurrence from the recipient's notification timeline. */
+	@bindThis
+	public async getNotification(userId: MiUser['id'], id: string): Promise<MiNotification | null> {
+		let streamId: string;
+		try { streamId = this.toXListId(id); } catch { return null; }
+		const entries = await this.redisClient.xrange(`notificationTimeline:${userId}`, streamId, streamId);
+		const notification = entries.length > 0 ? JSON.parse(entries[0][1][1]) as MiNotification : null;
+		return notification?.id === id ? notification : null;
+	}
+
 	@bindThis
 	public async getNotifications(
 		userId: MiUser['id'],

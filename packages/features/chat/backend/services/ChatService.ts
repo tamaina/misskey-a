@@ -323,9 +323,8 @@ export class ChatService {
 		if (message.toRoomId) {
 			const room = await this.chatRoomsRepository.findOneBy({ id: message.toRoomId });
 			if (!room) return false;
-			if (room.ownerId === userId) return true;
 			const member = await this.chatRoomMembershipsRepository.findOneBy({ roomId: room.id, userId });
-			return member != null && !member.isMuted;
+			return member ? !member.isMuted : room.ownerId === userId;
 		}
 		return message.toUserId === userId && !await this.userBlockingService.checkBlocked(userId, message.fromUserId);
 	}
