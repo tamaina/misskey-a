@@ -90,5 +90,19 @@
         "baseline": "\t\"deleteAreYouSure\": \"「{x}」を削除しますか？\"\n"
       }
     ]
+  },
+  {
+    "file": "packages/features/integrations/frontend/pages/settings/webhook.new.vue",
+    "sourceOnly": true,
+    "currentSha256": "ffe8a8c0aac09bc56006796169f105458f52163356875fcb08b66b8a1293f3a2",
+    "baselineSha256": "ef154487b57c5670089c367619aa31c762074feed341d46ca826c4623c5869f6",
+    "edits": [
+      {
+        "start": 7477,
+        "end": 8242,
+        "current": ",\n  \"eventsDescription\": \"通知に由来するイベントには通知の受信設定やミュートが適用されます。MCPで mention / reply と旧名 note.mentioned / note.replied の両方を購読すると、同じイベントが2回届くことがあります。\",\n  \"unfollow\": \"フォローを解除したとき\",\n  \"subscribedNote\": \"通知をオンにしたユーザーが投稿したとき\",\n  \"quote\": \"引用Renoteされたとき\",\n  \"pollEnded\": \"アンケートが終了したとき\",\n  \"scheduledNotePosted\": \"予約ノートが投稿されたとき\",\n  \"scheduledNotePostFailed\": \"予約ノートの投稿に失敗したとき\",\n  \"receiveFollowRequest\": \"フォローリクエストを受け取ったとき\",\n  \"followRequestAccepted\": \"フォローリクエストが承認されたとき\",\n  \"roleAssigned\": \"ロールを付与されたとき\",\n  \"chatRoomInvitationReceived\": \"チャットルームに招待されたとき\",\n  \"achievementEarned\": \"実績を獲得したとき\",\n  \"exportCompleted\": \"エクスポートが完了したとき\",\n  \"login\": \"ログインしたとき\",\n  \"createToken\": \"トークンが作成されたとき\",\n  \"app\": \"アプリ通知を受け取ったとき\",\n  \"test\": \"テスト通知を受け取ったとき\",\n  \"chatMessage\": \"チャットメッセージを受け取ったとき\"",
+        "baseline": ""
+      }
+    ]
   }
 ]

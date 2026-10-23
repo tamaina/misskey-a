@@ -45,8 +45,7 @@ test('webhook event labels resolve through real VVI dictionaries in every suppor
 	}
 });
 
-test('historical webhook source restoration rejects unreviewed edits', () => {
-	const owner = owners.find(owner => owner.kind === 'edit')!;
+test.each(owners)('$kind historical webhook source restoration rejects unreviewed edits', owner => {
 	expect(restoreUpstreamDevelopBaseline(owner.file, owner.source)).not.toBe(owner.source);
 	expect(() => restoreUpstreamDevelopBaseline(owner.file, owner.source + '\n')).toThrow('Source differs from reviewed');
 });

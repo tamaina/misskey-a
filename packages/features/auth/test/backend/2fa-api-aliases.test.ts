@@ -19,6 +19,7 @@ import { genPilotOpenapiSpec } from '@features/api/backend/transport/openapi/pil
 import { registerPilotHttp } from '@features/api/backend/transport/pilot-http.js';
 import { misskeyErrorBody } from '@features/api/backend/transport/orpc-error.js';
 import { requestRoutes } from '@features/api/shared/api-routing.js';
+import { webhookEventTypes } from '@features/integrations/backend/webhook-events.schema.js';
 import { clientContract } from '@features/index/backend/client.contract.js';
 import type { InferContractRouterInputs } from '@orpc/contract';
 import { aliasTwoFactorContract } from '../../backend/2fa-api-aliases.contract.js';
@@ -139,14 +140,66 @@ function restorePreAvailabilitySigninOperation(operation: unknown): unknown {
 	return restored;
 }
 
+// PR #222 intentionally expands only webhook event enums. As with availability
+// and announcements, pin the new generator hashes and reverse that exact delta
+// before replaying the frozen alias baseline. To refresh, export with
+// MISSKEY_TEST_EXPORT_2FA_API_JSON, inspect all five operations and UserWebhook,
+// and verify that restoring the old enum reproduces every frozen hash.
+const notificationWebhookOperationHashes: Record<string, string> = {
+	'/i/webhooks/create': 'a7d4d71fd7494331711527240905b9e7858e5353c6ed7f099addb245d815a32f',
+	'/i/webhooks/test': 'befe1dcbdc3ecf179acc43bc8e270365cd188ec1bef4931cd703fb326cfc7c24',
+	'/i/webhooks/update': 'f237e79bfd4fda636a8fa2d55bf0ac3e9459f36089ec1f58218543860259609e',
+	'/i/webhooks/show': '6d46fa2b3f86bc5af2b3b5a5be5f8cd10f04e2002b2c4ce3e4287fe1d34932ad',
+	'/i/webhooks/list': '9ad0ccee8bfe277447ec538451989fe6931c9cade38a48579dfd3acbaf83d8a3',
+};
+const legacyWebhookEvents = ['mention', 'unfollow', 'follow', 'followed', 'note', 'reply', 'renote', 'reaction'];
+
+function restoreWebhookEventEnum(schema: unknown, field: 'on' | 'type' = 'on'): void {
+	const property = object(object(schema).properties)[field];
+	const items = field === 'on' ? object(property).items : property;
+	expect(items).toEqual({ enum: [...webhookEventTypes], type: 'string' });
+	object(items).enum = legacyWebhookEvents;
+}
+
+function restoreWebhookOperationBaseline(path: string, operation: unknown): unknown {
+	const hash = notificationWebhookOperationHashes[path];
+	if (!hash) return operation;
+	expect(schemaHash(operation), path).toBe(hash);
+	const restored: unknown = structuredClone(operation);
+	if (path === '/i/webhooks/create' || path === '/i/webhooks/update' || path === '/i/webhooks/test') {
+		const post = object(object(restored).post);
+		const schema = object(object(object(object(post.requestBody).content)['application/json']).schema);
+		const field = path === '/i/webhooks/test' ? 'type' : 'on';
+		restoreWebhookEventEnum(schema, field);
+		if (!Array.isArray(schema.allOf)) throw new Error('Invalid webhook input intersection');
+		expect(schema.allOf).toHaveLength(2);
+		restoreWebhookEventEnum(schema.allOf[0], field);
+	}
+	if (path !== '/i/webhooks/update' && path !== '/i/webhooks/test') {
+		const output = signinOutput(restored);
+		restoreWebhookEventEnum(path === '/i/webhooks/list' ? output.items : output);
+	}
+	return restored;
+}
+
+function restoreWebhookSchemaBaseline(name: string, schema: unknown): unknown {
+	if (name !== 'UserWebhook') return schema;
+	expect(schemaHash(schema)).toBe('342c842e548f7dfb9dcbc8024a8ab9d2540f84d3dae5a7fcdd436f3245ea490e');
+	const restored: unknown = structuredClone(schema);
+	restoreWebhookEventEnum(restored);
+	return restored;
+}
+
 test('actual portable generator preserves every legacy operation and public schema, with eight unique canonical IDs', async () => {
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	// Export before assertions so an intentional contract delta can be inspected.
+	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
 		const operation = spec.paths?.[path];
-		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreAnnouncementOperationBaseline(path, operation)), path).toBe(hash);
+		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreWebhookOperationBaseline(path, restoreAnnouncementOperationBaseline(path, operation))), path).toBe(hash);
 	}
-	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(spec.components?.schemas?.[name]), name).toBe(hash);
+	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreWebhookSchemaBaseline(name, spec.components?.schemas?.[name])), name).toBe(hash);
 	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
 	expect(Object.keys(spec.components?.schemas ?? {}).filter(name => !(name in baseline.schemaHashes))).toEqual(['OrpcDefinition1038']);
 	expect(Object.keys(baseline.paths)).toHaveLength(444);
@@ -159,7 +212,6 @@ test('actual portable generator preserves every legacy operation and public sche
 		expect(routes.filter(route => route.name === canonical)).toHaveLength(1);
 		expect(spec.paths?.[`/${canonical}`]?.post?.operationId).toBe(`post___${canonical.replaceAll('/', '___')}`);
 	}
-	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
 });
 
 test('availability inverse rejects tampering at every allowed boundary and outside the response', async () => {

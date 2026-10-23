@@ -22,7 +22,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #label>{{ $locale.sfc.trigger }}</template>
 
 		<div class="_gaps_s">
-			<MkSwitch v-for="event in webhookEventTypes" :key="event" v-model="selectedEvents[event]">{{ $locale.sfc[event] }} ({{ event }})</MkSwitch>
+			<MkSwitch v-model="selectedEvents.follow">{{ $locale.sfc.follow }} (follow)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.followed">{{ $locale.sfc.followed }} (followed)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.note">{{ $locale.sfc.note }} (note)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.reply">{{ $locale.sfc.reply }} (reply)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.renote">{{ $locale.sfc.renote }} (renote)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.reaction">{{ $locale.sfc.reaction }} (reaction)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.mention">{{ $locale.sfc.mention }} (mention)</MkSwitch>
+			<MkSwitch v-for="event in additionalEvents" :key="event" v-model="selectedEvents[event]">{{ $locale.sfc[event] }} ({{ event }})</MkSwitch>
 			<div>{{ $locale.sfc.eventsDescription }}</div>
 		</div>
 	</FormSection>
@@ -48,7 +55,9 @@ const name = ref('');
 const url = ref('');
 const secret = ref('');
 
-const selectedEvents = reactive(Object.fromEntries(webhookEventTypes.map(event => [event, ['follow', 'followed', 'note', 'reply', 'renote', 'reaction', 'mention'].includes(event)])) as Record<typeof webhookEventTypes[number], boolean>);
+const existingEvents = ['follow', 'followed', 'note', 'reply', 'renote', 'reaction', 'mention'] as const;
+const additionalEvents = webhookEventTypes.filter((event): event is Exclude<typeof event, typeof existingEvents[number]> => !existingEvents.some(existing => existing === event));
+const selectedEvents = reactive(Object.fromEntries(webhookEventTypes.map(event => [event, existingEvents.some(existing => existing === event)])) as Record<typeof webhookEventTypes[number], boolean>);
 
 async function create(): Promise<void> {
 	const events: Misskey.entities.UserWebhook['on'] = webhookEventTypes.filter(event => selectedEvents[event]);
