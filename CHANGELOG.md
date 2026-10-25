@@ -2,7 +2,7 @@
 
 ### Note
 - 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `a3c8f395bc513cf36dfeaefb73ffb42aed427b7a` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
-- 開発環境の指定は Node.js 26.4.0 / pnpm 12.11.2、Docker のベースイメージは Node.js 26.10.0-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210)
+- 開発環境の指定は Node.js 26.12.1 / pnpm 12.11.2、Docker のベースイメージは Node.js 26.12.1-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210)
 - 上流由来の migration 名・履歴を復元しています。過去の実験版で異なる migration 名を適用したデータベースは、更新前に履歴の個別確認が必要です。 (#35)
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
 - OIDC によるログインは未接続の基盤段階です。Conditional Mediation も既存のログイン画面を置き換えない、既定無効の試験部品です。課金やチャンネル連合の未マージ機能は含みません。 (#99, #109, #121, #131, #135)
@@ -75,6 +75,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: Service Workerの通知からのフォロー操作で、通知元のユーザーIDが文字列であることを確認するように ([a1b3e952](https://github.com/tamaina/misskey-a/commit/a1b3e952d3e6d30cef7dfa4127f069df8642424b))
 
 ### Server
+- Enhance: Node.js のセキュリティアップデート（Brotli デコーダーの脆弱性 CVE-2026-111497）に伴い、最低動作バージョンを 22.23.4 / 24.22.1 / 26.12.1 に引き上げ、開発環境と Docker Image の Node.js を 26.12.1 に更新
 - Feat: ユーザーの凍結時にフォロー関係を削除せず保持し、凍結解除後に復帰できるように (#1)
 - Feat: 新しいアカウントからのフォローを、ローカルの作成日時・リモートを最初に認識した日時からの期間で承認制にできるように (#14)
 - Feat: ブラウザーセッションを個別に発行・検証・失効し、`i/sessions`・`i/sessions/revoke`・`i/signout`とストリーム接続の失効に対応 (#104, #119)
