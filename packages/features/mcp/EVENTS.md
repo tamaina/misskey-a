@@ -91,3 +91,25 @@ antenna filters and grant checks. A dedicated antenna queue isolates its retaine
 count cleanup and deduplicates across
 processes while retained (at least 24 hours after completion); HTTP retries may
 repeat delivery.
+
+Native antenna streams publish one note packed without a viewer (upstream
+misskey-dev/misskey#18021); the WebSocket antenna channel then applies
+visibility, mutes, blocks, renote mutes, hiding and the viewer's renote reaction
+per connection. MCP never forwards or queues that shared body. `antenna.note`
+reads only the note ID from the publication and queues only references
+(subscription, account, generation, antenna and note IDs, timestamp and event ID); every delivery attempt, including
+retries, re-packs the current note for the subscriber and re-runs the antenna
+channel's checks (visibility, mutes, blocks, renote mutes, hiding and hidden
+notes) against current relationships, so a change before the attempt suppresses
+it. Notes created silently (for example remote notes fetched while resolving
+references) are still added to antennas but emit no live antenna event, so they
+produce no `antenna.note` or `stream.*` antenna delivery.
+
+For `stream.*`, each listener reduces a publication to its native ID references
+(for antenna and timeline notes, `{ id }`) before the 256 KiB per-publication
+ingress limit is applied, so a large packed antenna note is never dropped for
+size; only the reduced reference is size-checked, buffered and queued. Replay
+re-packs that note for the subscriber and applies the same checks as the native
+channel, emitting `{ noteId }`. Each process buffers at most 32 pending
+publications; publications beyond that are dropped (best effort, counted but not
+replayed).

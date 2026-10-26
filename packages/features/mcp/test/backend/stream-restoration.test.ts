@@ -59,3 +59,20 @@ it('drains pending native authorization without enqueueing after shutdown', asyn
 	await reached; const shutdown = service.onApplicationShutdown(); release(); await shutdown;
 	expect(f.queue.streamWebhookDeliver).not.toHaveBeenCalled(); expect(f.redis.listenerCount('message')).toBe(0);
 });
+
+it('reduces antenna publications to ids before the ingress size limit so large packed notes are not dropped', async () => {
+	const f = fixture(); const service = f.create(); f.row.mcpStream = { channel: 'antenna', params: { antennaId: 'antenna' } };
+	const body = { id: 'note', userId: 'author', visibility: 'specified', visibleUserIds: ['PRIVATE_SYNTHETIC'], text: 'PRIVATE_SYNTHETIC'.repeat(20000) };
+	const raw = JSON.stringify({ occurrenceId: 'large', createdAt: Date.now(), channel: 'antennaStream:antenna', message: { type: 'note', body } });
+	expect(Buffer.byteLength(raw)).toBeGreaterThan(256 * 1024);
+	service.onApplicationBootstrap();
+	try {
+		f.redis.emit('message', 'synthetic', raw);
+		await vi.waitFor(() => expect(f.access.authorize).toHaveBeenCalledOnce());
+		const [,,, source] = f.access.authorize.mock.calls[0];
+		expect(source).toMatchObject({ id: 'large', channel: 'antennaStream:antenna', message: { type: 'note', body: { id: 'note' } } });
+		expect(JSON.stringify(source)).not.toContain('PRIVATE_SYNTHETIC'); expect(service.dropped).toBe(0);
+		await vi.waitFor(() => expect(f.queue.streamWebhookDeliver).toHaveBeenCalledOnce());
+		expect(JSON.stringify(f.queue.streamWebhookDeliver.mock.calls)).not.toContain('PRIVATE_SYNTHETIC');
+	} finally { await service.onApplicationShutdown(); }
+});
