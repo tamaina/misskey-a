@@ -7,7 +7,7 @@ import { URL } from 'node:url';
 import * as htmlParser from 'node-html-parser';
 import type { Config } from '@/config.js';
 import { intersperse } from '@features/runtime/backend/data/array.js';
-import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
+import { normalizeTag } from '@features/discovery/backend/utility/normalize-tag.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { escapeHtml } from '../utility/escape-html.js';
 import type { IMentionedRemoteUsers } from '@features/notes/backend/models/Note.js';
@@ -27,7 +27,7 @@ export class MfmService {
 		// some AP servers like Pixelfed use br tags as well as newlines
 		html = html.replace(/<br\s?\/?>\r?\n/gi, '\n');
 
-		const normalizedHashtagNames = hashtagNames == null ? undefined : new Set<string>(hashtagNames.map(x => normalizeForSearch(x)));
+		const normalizedHashtagNames = hashtagNames == null ? undefined : new Set<string>(hashtagNames.map(x => normalizeTag(x)));
 
 		const doc = htmlParser.parse(`<div>${html}</div>`);
 
@@ -82,7 +82,7 @@ export class MfmService {
 					const href = node.attributes.href;
 
 					// ハッシュタグ
-					if (normalizedHashtagNames && href != null && normalizedHashtagNames.has(normalizeForSearch(txt))) {
+					if (normalizedHashtagNames && href != null && normalizedHashtagNames.has(normalizeTag(txt))) {
 						text += txt;
 						// メンション
 					} else if (txt.startsWith('@') && !(rel != null && rel.startsWith('me '))) {

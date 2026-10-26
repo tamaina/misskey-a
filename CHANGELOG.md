@@ -49,6 +49,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Enhance: 依存関係の更新（NestJS・Sentry などの連携調整、MFM 0.27.0、メディア・フォント処理、Docker・ビルド・テスト環境の更新を含む） (#153, #202, #210, #212, #213)
 - Fix: 翻訳チャンクの直接re-exportを認識できない問題と、ビルド環境更新後のCSS module変換の互換性を修正 (#207, #210)
 - Fix: Storybookの依存関係をMSW 3 / Storybook 10に揃え、モック通信と翻訳・設定の初期化順序を修正 (#211)
+- Enhance: 上流 2026.10.1 までの依存関係の更新に追従（MFM 0.28.0、pnpm 12.14.0、sanitize-html・undici のセキュリティ更新を含む） ([upstream #18039](https://github.com/misskey-dev/misskey/pull/18039), [upstream #18042](https://github.com/misskey-dev/misskey/pull/18042), [upstream #18055](https://github.com/misskey-dev/misskey/pull/18055))
 - Enhance: misskey-jsで `acct:` 付きのアカウント表記をパースできるように (#2)
 - Fix: ESM での `ms` 読み込みをアダプターに統一し、機能分割後のbackendの読み込みを修正 ([b94a454b](https://github.com/tamaina/misskey-a/commit/b94a454b2b126ad97489b305c0759bea36687e89))
 - Enhance: CIの安定ブランチ対象をmainに揃え、API差分コメントの上限・全量artifact保存とリリース見出しの検証に対応 (#84, #97, [8e243e7d](https://github.com/tamaina/misskey-a/commit/8e243e7d16f7e62594f2474ee60dd61c719650f8))
@@ -61,6 +62,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Enhance: ブラウザーごとのセッションに対応し、現在のセッションの失効を伴うログアウトとアカウント切替の後処理を整理 (#104, #119)
 - Enhance: モデレーションログの差分表示にShikiを使用 (#140)
 - Enhance: 通常画面と埋め込み画面のMFM描画を共通化 (#154)
+- Enhance: アイコン画像・バナー画像を外せるように ([upstream #13676](https://github.com/misskey-dev/misskey/pull/13676))
 - Enhance: WebAuthn autofillを利用するConditional Mediationのopt-in 試験部品を追加（通常のログイン画面では既定で使用しない） (#99)
 - Fix: 埋め込み画面の内部リンク判定、MFMのクリック要素・リンク・タグ描画、相対時刻更新を本体側と揃えるように ([upstream #17993](https://github.com/misskey-dev/misskey/pull/17993))
 - Fix: 初期設定ダイアログでフッターが内容に重なる問題を修正 (#201)
@@ -93,6 +95,48 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: UserProfileのpassword列コメントを修正するmigrationを追加（パスワード処理自体の変更はなし） (#200)
 - Fix: Client ID Metadata Document に loopback の HTTP リダイレクトが含まれていても、登録済みの redirect_uri なら認可できるよう修正 (#220)
 - Fix: MCP の API 一覧と呼び出しから、契約の non-productive タグが付いたエンドポイントを除外するように (#221)
+- Enhance: ノート中のURLを正規化して禁止ワード・センシティブワードを判定するように ([upstream #18044](https://github.com/misskey-dev/misskey/pull/18044))
+- Perf: ストリーミングでのRenoteへの自分のリアクション取得・ミュートしたサーバーの参照をまとめ、受信メッセージとクライアントへの送信待ちバッファに上限を設定 ([upstream #18021](https://github.com/misskey-dev/misskey/pull/18021))
+- Fix: ルーム招待時にブロック状態を考慮するように ([upstream #18041](https://github.com/misskey-dev/misskey/pull/18041))
+- Fix: アカウント移行時に移行先サーバーのフォロワーを引き継げない問題を修正 ([upstream #18023](https://github.com/misskey-dev/misskey/pull/18023))
+- Fix: サーバーの紹介にHTMLを使うとリンクプレビューの説明文にHTMLタグが表示される問題を修正 ([upstream #18013](https://github.com/misskey-dev/misskey/pull/18013))
+- Fix: センシティブな画像をアイコン・バナーに指定できないように ([upstream #13676](https://github.com/misskey-dev/misskey/pull/13676))
+- Fix: 新規登録の同時実行時の競合、未ログイン時のロール権限判定、お知らせ更新の存在確認などを修正 ([upstream #18035](https://github.com/misskey-dev/misskey/pull/18035), [upstream #18045](https://github.com/misskey-dev/misskey/pull/18045))
+- Fix: セキュリティに関する修正 ([upstream be48948a](https://github.com/misskey-dev/misskey/commit/be48948adf))
+
+## 2026.10.1
+
+### Note
+
+**今回のリリースではMisskeyの動作要件やSentryの設定方法などが変更されます。必ずアップグレード前にお使いの環境をご確認ください。**
+
+- Sentry SDKをv11に更新したため、Sentryを利用しているサーバーでは設定の変更が必要になる場合があります。
+  - Sentry v11で`sendDefaultPii`が削除され、収集する項目を個別に指定する`dataCollection`に置き換えられました。
+  	- **`sentryForBackend.options.sendDefaultPii` / `sentryForFrontend.options.sendDefaultPii`を設定しているサーバーは対応が必要です。** このオプションは無視されるようになり、設定されている場合は起動時に警告を出力します。同じ収集範囲を維持するには`dataCollection: {}`に書き換えてください。
+  	- 設定していない場合、対応は不要です。Sentry v11は`dataCollection`未指定時にすべてを収集しますが、Misskeyは利用者の情報が意図せず送信されないよう、収集範囲を絞った既定を適用します（ユーザー情報・Cookie・URLクエリパラメータ・HTTPボディ・DBクエリの値を送信せず、中継元を特定できるヘッダーを除外）。
+  	- 収集範囲を変更する場合は`dataCollection`を明示してください。Misskeyの既定をすべて置き換えるため、`dataCollection: {}`と書くとSentry本来の既定（すべて収集）に戻ります。
+  - `sentryForBackend.options.profilesSampleRate`を設定している場合、v11で削除されたため無視されます。プロファイリングの有効化は引き続き`sentryForBackend.enableNodeProfiling`で行います。
+  - 詳細は https://docs.sentry.io/platforms/javascript/migration/v10-to-v11/ を参照してください。
+- Node.jsのセキュリティアップデートに伴い、最低動作バージョンを 22.23.4 / 24.22.1 / 26.12.1 に引き上げました。
+  - Docker Image は Node.js 26.12.1-trixie に更新されています。
+
+### General
+- Feat: お知らせに自動アーカイブ日時を設定できるように
+- Feat: アカウント作成から一定期間経っていないアカウントからのフォローを自動的にフォロー申請にできるように
+- Enhance: 依存関係の更新
+- Fix: センシティブな画像をアイコン・バナーに指定できないように
+- Fix: セキュリティに関する修正
+
+### Client
+- Feat: デッキにクリップのカラムを追加できるように
+- Enhance: アイコン画像・バナー画像を外せるように	
+
+### Server
+- Enhance: ノート中のURLを正規化して禁止ワードを判定するように
+- Fix: ローカル限定絵文字でリモートノートのリノートにリアクションできてしまう問題を修正
+- Fix: サーバーの紹介にHTMLを使うとリンクプレビューの説明文にHTMLタグが表示される問題を修正
+- Fix: ルーム招待時にブロック状態を考慮するように
+
 
 ## 2026.10.0
 

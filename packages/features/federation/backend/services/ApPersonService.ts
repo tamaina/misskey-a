@@ -17,7 +17,7 @@ import { fetchRemoteAvatarDecorations } from '@features/avatar-decorations/backe
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { truncate } from '@features/runtime/backend/formatting/truncate.js';
 import type { CacheService } from '@features/users/backend/services/CacheService.js';
-import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
+import { normalizeTag } from '@features/discovery/backend/utility/normalize-tag.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
@@ -382,7 +382,7 @@ export class ApPersonService implements OnModuleInit {
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
 
-		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
+		const tags = extractApHashtags(person.tag).splice(0, 32).map(normalizeTag);
 
 		const isBot = getApType(object) === 'Service' || getApType(object) === 'Application';
 
@@ -580,7 +580,7 @@ export class ApPersonService implements OnModuleInit {
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
 
-		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
+		const tags = extractApHashtags(person.tag).splice(0, 32).map(normalizeTag);
 
 		const [followingVisibility, followersVisibility] = await Promise.all(
 			[
@@ -706,8 +706,11 @@ export class ApPersonService implements OnModuleInit {
 
 		await this.updateFeatured(exist.id, resolver).catch(err => this.logger.error(err));
 
-		const updated = await this.usersRepository.findOneByOrFail({ id: exist.id });
-		if (!this.userEntityService.isRemoteUser(updated)) return 'skip';
+		const current = await this.usersRepository.findOneByOrFail({ id: exist.id });
+		if (!this.userEntityService.isRemoteUser(current)) return 'skip';
+		// Keep the suspension state written above, but decide Move from this job's own Actor snapshot like upstream,
+		// so a concurrent update from a stale Actor fetch cannot drop the movedTo that this job applied.
+		const updated: MiRemoteUser = { ...current, ...updates };
 
 		this.cacheService.uriPersonCache.set(uri, updated);
 
@@ -828,8 +831,8 @@ export class ApPersonService implements OnModuleInit {
 		let dst = await this.fetchPerson(src.movedToUri);
 
 		if (dst && this.userEntityService.isLocalUser(dst)) {
-			// targetがローカルユーザーだった場合データベースから引っ張ってくる
-			dst = await this.usersRepository.findOneByOrFail({ uri: src.movedToUri }) as MiLocalUser;
+			// ローカルユーザーの uri は null なので、ID で最新の移行設定を取得する
+			dst = await this.usersRepository.findOneByOrFail({ id: dst.id }) as MiLocalUser;
 		} else if (dst) {
 			if (movePreventUris.includes(src.movedToUri)) return 'skip: circular move';
 
@@ -847,8 +850,9 @@ export class ApPersonService implements OnModuleInit {
 			dst = await this.resolvePerson(src.movedToUri);
 		}
 
-		if (dst.movedToUri === dst.uri) return 'skip: movedTo itself (dst)'; // ？？？
-		if (src.movedToUri !== dst.uri) return 'skip: missmatch uri'; // ？？？
+		const dstUri = this.userEntityService.getUserUri(dst);
+		if (dst.movedToUri === dstUri) return 'skip: movedTo itself (dst)'; // ？？？
+		if (src.movedToUri !== dstUri) return 'skip: missmatch uri'; // ？？？
 		if (dst.movedToUri === src.uri) return 'skip: dst.movedToUri === src.uri';
 		if (!dst.alsoKnownAs || dst.alsoKnownAs.length === 0) {
 			return 'skip: dst.alsoKnownAs is empty';

@@ -1,7 +1,7 @@
 {
   "file": "packages/features/moderation/frontend/pages/admin-user.vue",
   "baselineSha256": "47bf1ac7a3860e3a95a9f25caefc46224271868536cd9424cba211e6569d502b",
-  "currentSha256": "d4991da7fae414f69996784971907e40d329285ed79a3de7844bfdef97c328db",
+  "currentSha256": "0ad6550df9a130897f4edffec30afde01df2461f829d05c1921226a75c21d9c0",
   "edits": [
     {
       "start": 643,
@@ -28,8 +28,14 @@
       "baseline": "\tsuspended.value = info.value.isSuspended;"
     },
     {
-      "start": 44237,
-      "end": 44270,
+      "start": 19846,
+      "end": 19871,
+      "current": "}, { immediate: true });\n",
+      "baseline": "});\n"
+    },
+    {
+      "start": 44258,
+      "end": 44291,
       "current": "\t\"remoteSuspended\": \"リモートで凍結済み\",\n",
       "baseline": ""
     }

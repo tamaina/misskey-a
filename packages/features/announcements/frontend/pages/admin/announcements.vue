@@ -565,9 +565,9 @@ definePage(() => ({
 	"deleteAreYouSure": "¿Desea borrar \"{x}\"?",
 	"add": "Agregar",
 	"announcements": "Avisos",
-	"autoArchiveAt": "自動アーカイブ日時",
-	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
-	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
+	"autoArchiveAt": "Fecha y hora del archivo automático",
+	"autoArchiveAtDescription": "Una vez pasada la fecha y la hora indicadas, este aviso se archivará automáticamente. Si se deja en blanco, no se archivará automáticamente.",
+	"autoArchiveAtMustBeInFuture": "Especifica una fecha y hora para el archivo automático posteriores a la actual."
 }
 </locale>
 
@@ -679,9 +679,9 @@ definePage(() => ({
 	"deleteAreYouSure": "Vuoi davvero eliminare \"{x}\"?",
 	"add": "Aggiungi",
 	"announcements": "Annunci",
-	"autoArchiveAt": "自動アーカイブ日時",
-	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
-	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
+	"autoArchiveAt": "Data e ora di archiviazione automatica",
+	"autoArchiveAtDescription": "Dal momento specificato, la notifica verrà archiviata automaticamente. Se è vuoto, non verrà archiviata automaticamente.",
+	"autoArchiveAtMustBeInFuture": "Specificare data e ora futura."
 }
 </locale>
 

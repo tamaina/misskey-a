@@ -55,8 +55,10 @@ export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBund
 			dictionaries = { current: collect(source), baseline: collect(restoreUpstreamDevelopBaseline(rebase.file, source)) };
 			localeCache.set(rebase.file, dictionaries);
 		}
-		const current = dictionaries.current.get(language);
-		const baseline = dictionaries.baseline.get(language);
+		// VVI loaders fill keys missing from a language with the primary (ja-JP) messages, in the primary key order.
+		const withPrimary = (dictionary: RuntimeLocaleDictionary | undefined, primary: RuntimeLocaleDictionary | undefined): RuntimeLocaleDictionary | undefined => dictionary && primary ? { ...Object.fromEntries(Object.entries(primary).map(([key, value]) => [key, Object.hasOwn(dictionary, key) ? dictionary[key] : value])), ...dictionary } : dictionary;
+		const current = withPrimary(dictionaries.current.get(language), dictionaries.current.get('ja-JP'));
+		const baseline = withPrimary(dictionaries.baseline.get(language), dictionaries.baseline.get('ja-JP'));
 		if (!current || !baseline || JSON.stringify(modules[moduleId]) !== JSON.stringify(current)) throw new Error(`Locale loader differs from reviewed upstream develop: ${rebase.file}:${language}`);
 		modules[moduleId] = structuredClone(baseline);
 	}

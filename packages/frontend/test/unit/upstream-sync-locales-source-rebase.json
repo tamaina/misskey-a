@@ -1,0 +1,15 @@
+[
+  {
+    "file": "packages/features/users/frontend/ts-messages.vue",
+    "currentSha256": "1633f09d0973c6ac3f1c08548e6614e71553d7b6f6d75fa87a2f7863306d7d21",
+    "baselineSha256": "29f435cf817a2ab5d03588f1165a9d18d866d0bb2baf89303cb6a5614a12e569",
+    "edits": [
+      {
+        "start": 16403,
+        "end": 16452,
+        "current": "\t\"createUserSpecifiedNote\": \"Messaggio diretto\",\n",
+        "baseline": "\t\"createUserSpecifiedNote\": \"Crea Nota privata\",\n"
+      }
+    ]
+  }
+]
