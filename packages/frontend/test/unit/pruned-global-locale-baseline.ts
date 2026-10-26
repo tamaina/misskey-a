@@ -10,11 +10,12 @@ import { parse } from 'vue/compiler-sfc';
 import { languages } from 'i18n';
 import { locales as productionLocales } from './catalog-history.js';
 import { restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
+import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 import metadata from './pruned-global-locale-baseline.json';
 import type { Locale } from './pruned-global-locale-types.js';
 
 const root = resolve(import.meta.dirname, '../../../..');
-const owners = metadata.owners.map(file => new Map(parse(restoreGlobalCatalogPilotSource(file, readFileSync(resolve(root, file), 'utf8'))).descriptor.customBlocks
+const owners = metadata.owners.map(file => new Map(parse(restoreGlobalCatalogPilotSource(file, restoreUpstreamDevelopBaseline(file, readFileSync(resolve(root, file), 'utf8')))).descriptor.customBlocks
 	.filter(block => block.type === 'locale')
 	.map(block => [String(block.attrs.locale), JSON.parse(block.content) as unknown])));
 

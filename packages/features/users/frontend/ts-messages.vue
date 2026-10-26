@@ -483,7 +483,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"showRepliesToOthersInTimeline": "Risposte altrui nella TL",
 	"notifyNotes": "Notifica nuove Note",
 	"unnotifyNotes": "Interrompi le notifiche di nuove Note",
-	"createUserSpecifiedNote": "Crea Nota privata",
+	"createUserSpecifiedNote": "Messaggio diretto",
 	"_chat": {
 		"chatWithThisUser": "Chatta con questa persona"
 	},

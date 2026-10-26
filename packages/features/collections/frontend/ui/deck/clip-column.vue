@@ -262,7 +262,7 @@ const menu: MenuItem[] = [
 <locale lang="json" locale="es-ES">
 {
 	"clip": "Clip",
-	"selectClip": "クリップを選択",
+	"selectClip": "Seleccionar clip",
 	"clips": "Clip",
 	"favorites": "Favoritos",
 	"show": "Apariencia"
@@ -292,7 +292,7 @@ const menu: MenuItem[] = [
 <locale lang="json" locale="it-IT">
 {
 	"clip": "Clip",
-	"selectClip": "クリップを選択",
+	"selectClip": "Seleziona Clip",
 	"clips": "Clip",
 	"favorites": "Preferiti",
 	"show": "Visualizza"
@@ -342,7 +342,7 @@ const menu: MenuItem[] = [
 <locale lang="json" locale="ko-KR">
 {
 	"clip": "클립",
-	"selectClip": "クリップを選択",
+	"selectClip": "클립 선택",
 	"clips": "클립",
 	"favorites": "즐겨찾기",
 	"show": "표시"

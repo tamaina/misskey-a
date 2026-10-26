@@ -82,7 +82,7 @@
   },
   {
     "file": "packages/features/users/frontend/pages/settings/profile.vue",
-    "currentSha256": "463c4140849b82ad1517e9e0ad783ca09e8331d2af252719c80d0d24501f5325",
+    "currentSha256": "322bc325b91ef157eff996bf12152990e90705ec2e37c9de3141ee578baea8ad",
     "baselineSha256": "5e20f8ada79277ff2d9ca1c7479829332c1b304c90d7a9206cb14ed7b442c9a9",
     "edits": [
       {
@@ -152,10 +152,34 @@
         "baseline": "\t}], ev.currentTarget ?? ev.target);\n"
       },
       {
-        "start": 41717,
-        "end": 41967,
+        "start": 20783,
+        "end": 21236,
+        "current": "\t\"qr\": \"Codi QR\",\n\t\"cannotSelectSensitiveMedia\": \"No podeu seleccionar mitjans sensibles\",\n\t\"cannotSelectSensitiveMediaDescription\": \"Si aquest error apareix tot i que no heu marcat el contingut com a sensible vosaltres mateixos, pot ser que s'hagi considerat un mitjà sensible per una detecció automàtica.\\nSi, d'acord amb les normes del servidor, no cal que ho sigui, desactiveu la configuració de contingut sensible del fitxer i torneu-ho a provar.\"\n",
+        "baseline": "\t\"qr\": \"Codi QR\"\n"
+      },
+      {
+        "start": 33128,
+        "end": 33537,
+        "current": "\t\"qr\": \"Código QR\",\n\t\"cannotSelectSensitiveMedia\": \"No se puede seleccionar contenido sensible\",\n\t\"cannotSelectSensitiveMediaDescription\": \"Si te aparece este error sin haber marcado el contenido como sensible, es posible que el archivo se haya clasificado como tal de manera automática.\\nSi no va en contra de las normas del servidor,  quita la marca de contenido sensible del archivo e inténtalo de nuevo.\"\n",
+        "baseline": "\t\"qr\": \"Código QR\"\n"
+      },
+      {
+        "start": 42543,
+        "end": 42793,
         "current": "\t\"qr\": \"二次元コード\",\n\t\"detach\": \"外す\",\n\t\"cannotSelectSensitiveMedia\": \"センシティブなメディアは選択できません\",\n\t\"cannotSelectSensitiveMediaDescription\": \"自分でセンシティブ設定を行っていないのにこのエラーが出ている場合、自動判定によりセンシティブなメディアとされている可能性があります。\\nサーバーの規則に照らして不要な場合は、ファイルのセンシティブ設定を解除してもう一度お試しください。\"\n",
         "baseline": "\t\"qr\": \"二次元コード\"\n"
+      },
+      {
+        "start": 50663,
+        "end": 50905,
+        "current": "\t\"qr\": \"QR 코드\",\n\t\"cannotSelectSensitiveMedia\": \"민감한 미디어는 선택할 수 없습니다.\",\n\t\"cannotSelectSensitiveMediaDescription\": \"자신이 민감함 설정을 하고 있지 않음에도 이 에러가 나온 경우, 자동 판정에 의해 민감한 미디어로 간주됐을 수 있습니다.\\n서버의 규칙과 대조했을 때 불필요한 경우에는 파일의 민감함 설정을 해제하고 한 번 더 시도해 주십시오.\"\n",
+        "baseline": "\t\"qr\": \"QR 코드\"\n"
+      },
+      {
+        "start": 77908,
+        "end": 78074,
+        "current": "\t\"qr\": \"二维码\",\n\t\"cannotSelectSensitiveMedia\": \"无法选择敏感媒体\",\n\t\"cannotSelectSensitiveMediaDescription\": \"若并未自行设为敏感媒体却仍出现此错误，则可能是自动判定将其归类为敏感媒体。如果依服务器规则其并非敏感媒体，则可解除设置再试一次。\"\n",
+        "baseline": "\t\"qr\": \"二维码\"\n"
       }
     ]
   }

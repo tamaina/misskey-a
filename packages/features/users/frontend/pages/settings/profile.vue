@@ -607,7 +607,9 @@ definePage(() => ({
 	"flagAsCatDescription": "Activeu aquesta opció per marcar aquest compte com a gat.",
 	"flagAsBot": "Marca aquest compte com a bot",
 	"flagAsBotDescription": "Activa aquesta opció si el compte el controla un programa. Si s'activa, actuarà com un senyal per altres desenvolupadors per prevenir cadenes d'interacció sense fi i ajustar els paràmetres interns de Misskey pe tractar el compte com un bot.",
-	"qr": "Codi QR"
+	"qr": "Codi QR",
+	"cannotSelectSensitiveMedia": "No podeu seleccionar mitjans sensibles",
+	"cannotSelectSensitiveMediaDescription": "Si aquest error apareix tot i que no heu marcat el contingut com a sensible vosaltres mateixos, pot ser que s'hagi considerat un mitjà sensible per una detecció automàtica.\nSi, d'acord amb les normes del servidor, no cal que ho sigui, desactiveu la configuració de contingut sensible del fitxer i torneu-ho a provar."
 }
 </locale>
 
@@ -847,7 +849,9 @@ definePage(() => ({
 	"flagAsCatDescription": "Activa esta opción para marcar esta cuenta como un gato.",
 	"flagAsBot": "Esta cuenta es un bot",
 	"flagAsBotDescription": "Activa esta opción si la cuenta es utilizada por un programa. Si se activa, actuará como una etiqueta para otros desarrolladores para prevenir cadenas eternas de interacción con otros bots, y ajustará los sistemas internos de Misskey para tratar esta cuenta de manera acorde.",
-	"qr": "Código QR"
+	"qr": "Código QR",
+	"cannotSelectSensitiveMedia": "No se puede seleccionar contenido sensible",
+	"cannotSelectSensitiveMediaDescription": "Si te aparece este error sin haber marcado el contenido como sensible, es posible que el archivo se haya clasificado como tal de manera automática.\nSi no va en contra de las normas del servidor,  quita la marca de contenido sensible del archivo e inténtalo de nuevo."
 }
 </locale>
 
@@ -1234,7 +1238,9 @@ definePage(() => ({
 	"flagAsCatDescription": "야옹?(이 계정이 고양이라면 눌러 주세요.)",
 	"flagAsBot": "나는 봇입니다",
 	"flagAsBotDescription": "이 계정을 자동화된 수단으로 운용할 경우에 활성화해 주세요. 이 플래그를 활성화하면, 다른 봇이 이를 참고하여 봇 끼리의 무한 연쇄 반응을 회피하거나, 이 계정의 시스템 상에서의 취급이 Bot 운영에 최적화되는 등의 변화가 생깁니다.",
-	"qr": "QR 코드"
+	"qr": "QR 코드",
+	"cannotSelectSensitiveMedia": "민감한 미디어는 선택할 수 없습니다.",
+	"cannotSelectSensitiveMediaDescription": "자신이 민감함 설정을 하고 있지 않음에도 이 에러가 나온 경우, 자동 판정에 의해 민감한 미디어로 간주됐을 수 있습니다.\n서버의 규칙과 대조했을 때 불필요한 경우에는 파일의 민감함 설정을 해제하고 한 번 더 시도해 주십시오."
 }
 </locale>
 
@@ -1810,7 +1816,9 @@ definePage(() => ({
 	"flagAsCatDescription": "喵喵喵？？",
 	"flagAsBot": "这是一个机器人账号",
 	"flagAsBotDescription": "如果此账户由程序控制，请启用此项。启用后，此标志可以帮助其他开发人员防止机器人之间产生无限互动的行为，并让 Misskey 的内部系统将此账户识别为机器人。",
-	"qr": "二维码"
+	"qr": "二维码",
+	"cannotSelectSensitiveMedia": "无法选择敏感媒体",
+	"cannotSelectSensitiveMediaDescription": "若并未自行设为敏感媒体却仍出现此错误，则可能是自动判定将其归类为敏感媒体。如果依服务器规则其并非敏感媒体，则可解除设置再试一次。"
 }
 </locale>
 
