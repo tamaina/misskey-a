@@ -1,7 +1,7 @@
 ## 9000.0.0
 
 ### Note
-- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `a3c8f395bc513cf36dfeaefb73ffb42aed427b7a` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
+- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `61ae10f4e5def2c44bcc44c9393083a32eed0227` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
 - 開発環境の指定は Node.js 26.12.1 / pnpm 12.14.0、Docker のベースイメージは Node.js 26.12.1-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210, #225, #226)
 - 上流由来の migration 名・履歴を復元しています。過去の実験版で異なる migration 名を適用したデータベースは、更新前に履歴の個別確認が必要です。 (#35)
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
