@@ -54,3 +54,13 @@ JWKS has at most 32 keys with bounded public RSA fields. Only configured-origin
 JWKS is used; token/key URLs never trigger additional fetches. Errors retain no
 provider body or credential cause. Access/refresh tokens are discarded, email
 claims are not trusted, and the result cannot create a local session or grant.
+
+### Recovery-code consumption
+
+`TotpService.twoFactorAuthenticate` consumes a matching backup code with one
+PostgreSQL compare-and-remove update. It binds the row owner and the loaded
+password/TOTP policy, and authorizes only when exactly one row was changed.
+A persistence rejection does not fall back to OTP validation. Other concurrently
+consumed codes are not written back from the caller's snapshot. Credential or
+session mutation remains a later operation; failures do not restore a used code.
+This does not enable independent passkey MFA or change recovery-code storage.
