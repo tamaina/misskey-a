@@ -11,6 +11,7 @@ import { AdminChannel } from '@features/operations/backend/stream/admin.js';
 import { HomeTimelineChannel } from '@features/timelines/backend/stream/home-timeline.js';
 import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
 import { UserListChannel } from '@features/timelines/backend/stream/user-list.js';
+import { AntennaChannel } from '@features/timelines/backend/stream/antenna.js';
 import { McpEventsService } from '../../backend/McpEventsService.js';
 import { McpStreamAccessService } from '../../backend/McpStreamAccessService.js';
 import { reduceOccurrence } from '../../backend/stream-catalog.js';
@@ -45,6 +46,7 @@ function fixture() {
 	const roles = mockDeep<import('@features/roles/backend/services/RoleService.js').RoleService>(); roles.isModerator.mockResolvedValue(true);
 	const lists = mockDeep<import('@features/persistence/backend/repositories/models.js').UserListsRepository>(); lists.exists.mockResolvedValue(true);
 	const members = mockDeep<import('@features/persistence/backend/repositories/models.js').UserListMembershipsRepository>(); members.find.mockResolvedValue([{ userId: 'author' }] as never);
+	const antennas = mockDeep<import('@features/persistence/backend/repositories/models.js').AntennasRepository>(); antennas.exists.mockResolvedValue(true);
 	const hiding = mockDeep<import('@features/api/backend/transport/stream/NoteStreamingHidingService.js').NoteStreamingHidingService>(); hiding.filter.mockImplementation(async value => value);
 	const moduleRef = mockDeep<ModuleRef>(); const requests = new Map<object, unknown>(); const connections: Connection[] = [];
 	moduleRef.registerRequestByContextId.mockImplementation((request, context) => { requests.set(context, request); });
@@ -60,6 +62,7 @@ function fixture() {
 		if (target === AdminChannel) return new AdminChannel(request) as never;
 		if (target === HomeTimelineChannel) return new HomeTimelineChannel(request, noteEntity, hiding) as never;
 		if (target === ChatRoomChannel) return new ChatRoomChannel(request, rooms, chat) as never;
+		if (target === AntennaChannel) return new AntennaChannel(request, antennas, noteEntity, hiding) as never;
 		if (target === UserListChannel) return new UserListChannel(lists, members, request, noteEntity, hiding) as never;
 		throw new Error('Unexpected test channel');
 	});
@@ -70,7 +73,7 @@ function fixture() {
 	rows.createQueryBuilder.mockReturnValue({ addSelect: () => ({ where: () => ({ getOne: async () => row }) }) } as never);
 	const source = (channel: string, type: string, body: unknown): StreamOccurrence => reduceOccurrence({ id: 'occurrence', createdAt: Date.now(), channel, message: { type, body } as never })!;
 	const authorize = (value: StreamOccurrence) => access.authorize(row.id, actor.id, row.mcpGeneration!, value);
-	return { actor, token, tokens, users, rows, notesRepo, noteEntity, note, cache, rooms, messages, chat, roles, lists, members, access, row, source, authorize, connections };
+	return { actor, token, tokens, users, rows, notesRepo, noteEntity, note, cache, rooms, messages, chat, roles, lists, members, antennas, hiding, access, row, source, authorize, connections };
 }
 
 it('uses real native main filtering and current DB grant/suspension/generation checks', async () => {
@@ -139,4 +142,25 @@ it('validates native parameter shapes and canonical option identities', () => {
 	const explicit = canonicalStream(streamSubscription('stream.channel', { channel: 'homeTimeline', params: { withRenotes: true, withFiles: false } })!);
 	expect(implicit).toEqual(explicit);
 	for (const args of [{ channel: 'invalid' }, { channel: 'antenna' }, { channel: 'main', params: { i: 'CREDENTIAL' } }, { channel: 'hashtag', params: { q: [] } }]) expect(() => streamSubscription('stream.channel', args)).toThrow();
+});
+
+it('reduces pre-packed antenna notes to ids and re-packs/re-checks them for the subscriber on replay', async () => {
+	const f = fixture(); f.row.mcpStream = { channel: 'antenna', params: { antennaId: 'antenna' } };
+	// Upstream #18021 publishes one viewer-less packed note; MCP must never carry or size-check that body.
+	const packed = { id: 'note', userId: 'author', user: { id: 'author', host: null }, visibility: 'public', text: 'PRIVATE_SYNTHETIC'.repeat(20000), fileIds: [] };
+	const source = f.source('antennaStream:antenna', 'note', packed);
+	expect(source.message).toEqual({ type: 'note', body: { id: 'note' } });
+	expect(JSON.stringify(source)).not.toContain('PRIVATE_SYNTHETIC');
+	expect((await f.authorize(source))?.frames[0].body).toMatchObject({ type: 'note', body: { noteId: 'note' } });
+	expect(f.noteEntity.pack).toHaveBeenCalledWith({ id: 'note' }, { id: 'owner' }, { detail: true });
+	expect(f.hiding.filter).toHaveBeenCalledWith(f.note, 'owner');
+	f.cache.userMutingsCache.fetch.mockResolvedValue(new Set(['author'])); expect(await f.authorize(source)).toBeNull();
+	f.cache.userMutingsCache.fetch.mockResolvedValue(new Set()); f.cache.userBlockedCache.fetch.mockResolvedValue(new Set(['author'])); expect(await f.authorize(source)).toBeNull();
+	f.cache.userBlockedCache.fetch.mockResolvedValue(new Set()); f.noteEntity.isVisibleForMe.mockResolvedValue(false); expect(await f.authorize(source)).toBeNull();
+	f.noteEntity.isVisibleForMe.mockResolvedValue(true); f.hiding.filter.mockResolvedValueOnce(null as never); expect(await f.authorize(source)).toBeNull();
+	f.noteEntity.pack.mockResolvedValueOnce({ ...f.note, isHidden: true }); expect(await f.authorize(source)).toBeNull();
+	f.antennas.exists.mockResolvedValue(false); expect(await f.authorize(source)).toBeNull();
+	f.antennas.exists.mockResolvedValue(true); expect(await f.authorize({ ...source, channel: 'antennaStream:other' })).toBeNull();
+	expect((await f.authorize(source))?.frames).toHaveLength(1);
+	expect(f.connections.every(connection => connection.subscriber.eventNames().length === 0)).toBe(true);
 });
