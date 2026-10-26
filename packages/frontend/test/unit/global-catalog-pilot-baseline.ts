@@ -276,8 +276,40 @@ export const globalCatalogPilotOwners = [
 			"upload",
 			"name"
 		],
-		"currentSha256": "23c3edd14b54c45a0fde0edeb592c14fcbb997fb8e9d74da05a59c725906ab47",
+		"currentSha256": "b6c073be48ce077e54becc82794e8e65417408a803c29b9fca9cffb3704d8752",
 		"baselineSha256": "768f5a8ad56451dc23e3cae9630c3de472f345f2d3f1841bb9a500cfb78c8934",
+		"edits": [
+			{
+				"start": 4064,
+				"end": 4122,
+				"current": "\t\t\t\t\t\t\t:isDisabled=\"excludeSensitive && file.isSensitive\"\n",
+				"baseline": ""
+			},
+			{
+				"start": 5016,
+				"end": 5072,
+				"current": "\t\t\t\t\t:isDisabled=\"excludeSensitive && file.isSensitive\"\n",
+				"baseline": ""
+			},
+			{
+				"start": 8113,
+				"end": 8142,
+				"current": "\texcludeSensitive?: boolean;\n",
+				"baseline": ""
+			},
+			{
+				"start": 8265,
+				"end": 8291,
+				"current": "\texcludeSensitive: false,\n",
+				"baseline": ""
+			},
+			{
+				"start": 16606,
+				"end": 16664,
+				"current": "\tif (props.excludeSensitive && file.isSensitive) return;\n\n",
+				"baseline": ""
+			}
+		],
 		"order": [
 			"unableToProcess",
 			"circularReferenceFolder",
@@ -768,6 +800,13 @@ export function restoreGlobalCatalogPilotSource(file: string, source: string): s
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
 	if (!owner || sha256(source) === owner.baselineSha256) return source;
 	if (sha256(source) !== owner.currentSha256) throw new Error(`Global catalog pilot source differs: ${file}`);
+	// Reverse exact reviewed upstream follow-up edits made after the pilot before replaying it.
+	if ('edits' in owner) {
+		for (const edit of [...owner.edits].reverse()) {
+			if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Global catalog pilot follow-up boundary differs: ${file}`);
+			source = source.slice(0, edit.start) + edit.baseline + source.slice(edit.end);
+		}
+	}
 	source = source
 		.replace("import { useLocale } from 'virtual:vite-vue-internationalization';\n", '')
 		.replace("import type { Locale } from 'i18n';\n", '')
