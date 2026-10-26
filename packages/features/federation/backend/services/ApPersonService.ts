@@ -706,8 +706,11 @@ export class ApPersonService implements OnModuleInit {
 
 		await this.updateFeatured(exist.id, resolver).catch(err => this.logger.error(err));
 
-		const updated = await this.usersRepository.findOneByOrFail({ id: exist.id });
-		if (!this.userEntityService.isRemoteUser(updated)) return 'skip';
+		const current = await this.usersRepository.findOneByOrFail({ id: exist.id });
+		if (!this.userEntityService.isRemoteUser(current)) return 'skip';
+		// Keep the suspension state written above, but decide Move from this job's own Actor snapshot like upstream,
+		// so a concurrent update from a stale Actor fetch cannot drop the movedTo that this job applied.
+		const updated: MiRemoteUser = { ...current, ...updates };
 
 		this.cacheService.uriPersonCache.set(uri, updated);
 
