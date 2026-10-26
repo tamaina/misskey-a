@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import { normalizeForSearch } from '../utility/normalize-for-search.js';
+import { normalizeTag } from '../utility/normalize-tag.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
@@ -37,9 +37,9 @@ export class HashtagChannel extends Channel {
 		if (!params.q.every((x): x is string[] => (
 			Array.isArray(x) &&
 			x.length >= 1 &&
-			x.every(y => typeof y === 'string')
+			x.every(y => typeof y === 'string' && Array.from(y).length <= 128)
 		))) return false;
-		this.q = params.q;
+		this.q = params.q.map(tags => tags.map(tag => normalizeTag(tag)));
 
 		// Subscribe stream
 		this.subscriber.on('notesStream', this.onNote);
@@ -50,7 +50,7 @@ export class HashtagChannel extends Channel {
 	@bindThis
 	private async onNote(note: Packed<'Note'>) {
 		const noteTags = note.tags ? note.tags.map((t: string) => t.toLowerCase()) : [];
-		const matched = this.q.some(tags => tags.every(tag => noteTags.includes(normalizeForSearch(tag))));
+		const matched = this.q.some(tags => tags.every(tag => noteTags.includes(tag)));
 		if (!matched) return;
 
 		if (!this.isNoteVisibleForMe(note)) return;

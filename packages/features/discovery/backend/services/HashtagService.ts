@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { normalizeForSearch } from '../utility/normalize-for-search.js';
+import { normalizeTag } from '../utility/normalize-tag.js';
 import type { HashtagsRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { UtilityService } from '@features/federation/backend/services/UtilityService.js';
@@ -65,7 +65,7 @@ export class HashtagService {
 
 	@bindThis
 	public async updateHashtag(user: { id: MiUser['id']; host: MiUser['host']; }, tag: string, isUserAttached = false, inc = true) {
-		tag = normalizeForSearch(tag);
+		tag = normalizeTag(tag);
 
 		// TODO: サンプリング
 		this.updateHashtagsRanking(tag, user.id);
@@ -161,7 +161,7 @@ export class HashtagService {
 
 	@bindThis
 	public async updateHashtagsRanking(hashtag: string, userId: MiUser['id']): Promise<void> {
-		const hiddenTags = this.meta.hiddenTags.map(t => normalizeForSearch(t));
+		const hiddenTags = this.meta.hiddenTags.map(t => normalizeTag(t));
 		if (hiddenTags.includes(hashtag)) return;
 		if (this.utilityService.isKeyWordIncluded(hashtag, this.meta.sensitiveWords)) return;
 

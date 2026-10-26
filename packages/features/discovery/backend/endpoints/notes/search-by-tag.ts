@@ -8,7 +8,7 @@ import { Brackets } from 'typeorm';
 import { safeForSql } from '@features/persistence/backend/utility/safe-for-sql.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import { normalizeForSearch } from '../../utility/normalize-for-search.js';
+import { normalizeTag } from '../../utility/normalize-tag.js';
 import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
@@ -35,15 +35,15 @@ export function createNotesSearchByTagProcedure<Actor extends MiLocalUser>(deps:
 
 		try {
 			if ('tag' in ps) {
-				if (!safeForSql(normalizeForSearch(ps.tag))) throw new Error('Injection');
-				query.andWhere(':tag <@ note.tags', { tag: [normalizeForSearch(ps.tag)] });
+				if (!safeForSql(normalizeTag(ps.tag))) throw new Error('Injection');
+				query.andWhere(':tag <@ note.tags', { tag: [normalizeTag(ps.tag)] });
 			} else {
 				query.andWhere(new Brackets(qb => {
 					for (const tags of ps.query) {
 						qb.orWhere(new Brackets(qb => {
 							for (const tag of tags) {
-								if (!safeForSql(normalizeForSearch(tag))) throw new Error('Injection');
-								qb.andWhere(':tag <@ note.tags', { tag: [normalizeForSearch(tag)] });
+								if (!safeForSql(normalizeTag(tag))) throw new Error('Injection');
+								qb.andWhere(':tag <@ note.tags', { tag: [normalizeTag(tag)] });
 							}
 						}));
 					}

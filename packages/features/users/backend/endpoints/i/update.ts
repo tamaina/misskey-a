@@ -10,7 +10,7 @@ import * as htmlParser from 'node-html-parser';
 import { extractCustomEmojisFromMfm } from '@features/emojis/backend/utility/extract-custom-emojis-from-mfm.js';
 import { extractHashtags } from '@features/discovery/backend/utility/extract-hashtags.js';
 import * as Acct from '@features/federation/backend/utility/acct.js';
-import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
+import { normalizeTag } from '@features/discovery/backend/utility/normalize-tag.js';
 import { type GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { type UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { type UtilityService } from '@features/federation/backend/services/UtilityService.js';
@@ -330,7 +330,7 @@ export function createIUpdateProcedure(deps: IUpdateDependencies) {
 		if (newDescription != null) {
 			const tokens = mfm.parse(newDescription);
 			emojis = emojis.concat(extractCustomEmojisFromMfm(tokens));
-			tags = extractHashtags(tokens).map(tag => normalizeForSearch(tag)).splice(0, 32);
+			tags = extractHashtags(tokens).map(tag => normalizeTag(tag)).splice(0, 32);
 		}
 
 		for (const field of newFields) {

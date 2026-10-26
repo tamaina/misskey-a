@@ -17,7 +17,7 @@ import { fetchRemoteAvatarDecorations } from '@features/avatar-decorations/backe
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { truncate } from '@features/runtime/backend/formatting/truncate.js';
 import type { CacheService } from '@features/users/backend/services/CacheService.js';
-import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
+import { normalizeTag } from '@features/discovery/backend/utility/normalize-tag.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
@@ -382,7 +382,7 @@ export class ApPersonService implements OnModuleInit {
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
 
-		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
+		const tags = extractApHashtags(person.tag).splice(0, 32).map(normalizeTag);
 
 		const isBot = getApType(object) === 'Service' || getApType(object) === 'Application';
 
@@ -580,7 +580,7 @@ export class ApPersonService implements OnModuleInit {
 
 		const fields = this.analyzeAttachments(person.attachment ?? []);
 
-		const tags = extractApHashtags(person.tag).map(normalizeForSearch).splice(0, 32);
+		const tags = extractApHashtags(person.tag).splice(0, 32).map(normalizeTag);
 
 		const [followingVisibility, followersVisibility] = await Promise.all(
 			[

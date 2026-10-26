@@ -23,7 +23,7 @@ import type { IPoll } from '../models/Poll.js';
 import { MiPoll } from '../models/Poll.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
 import type { MiChannel } from '@features/channels/backend/models/Channel.js';
-import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
+import { normalizeTag } from '@features/discovery/backend/utility/normalize-tag.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';
@@ -661,7 +661,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			text: data.text,
 			hasPoll: data.poll != null,
 			cw: data.cw ?? null,
-			tags: tags.map(tag => normalizeForSearch(tag)),
+			tags: tags.map(tag => normalizeTag(tag)),
 			emojis,
 			userId: user.id,
 			localOnly: data.localOnly!,
