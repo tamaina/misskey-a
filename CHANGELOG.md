@@ -3,6 +3,7 @@
 ### Note
 - 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `61ae10f4e5def2c44bcc44c9393083a32eed0227` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
 - 開発環境の指定は Node.js 26.12.1 / pnpm 12.14.0、Docker のベースイメージは Node.js 26.12.1-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210, #225, #226)
+- Sentry SDK を v11 に更新しています。`sentryForBackend.options.sendDefaultPii` / `sentryForFrontend.options.sendDefaultPii` は無視されるため（バックエンドでは起動時に警告）、同じ収集範囲を維持するには `dataCollection: {}` に書き換えてください。`dataCollection` 未指定時は利用者の情報を送らない絞った既定を適用し、`dataCollection` を明示するとこの既定を丸ごと置き換えます。`sentryForBackend.options.profilesSampleRate` も無視され、プロファイリングは引き続き `sentryForBackend.enableNodeProfiling` で有効化します。詳細は [Sentry の移行ガイド](https://docs.sentry.io/platforms/javascript/migration/v10-to-v11/) を参照してください。 (#212)
 - 上流由来の migration 名・履歴を復元しています。過去の実験版で異なる migration 名を適用したデータベースは、更新前に履歴の個別確認が必要です。 (#35)
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
 - OIDC によるログインは未接続の基盤段階です。Conditional Mediation も既存のログイン画面を置き換えない、既定無効の試験部品です。課金やチャンネル連合の未マージ機能は含みません。 (#99, #109, #121, #131, #135)
@@ -104,40 +105,6 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: センシティブな画像をアイコン・バナーに指定できないように ([upstream #13676](https://github.com/misskey-dev/misskey/pull/13676))
 - Fix: 新規登録の同時実行時の競合、未ログイン時のロール権限判定、お知らせ更新の存在確認などを修正 ([upstream #18035](https://github.com/misskey-dev/misskey/pull/18035), [upstream #18045](https://github.com/misskey-dev/misskey/pull/18045))
 - Fix: セキュリティに関する修正 ([upstream be48948a](https://github.com/misskey-dev/misskey/commit/be48948adf))
-
-## 2026.10.1
-
-### Note
-
-**今回のリリースではMisskeyの動作要件やSentryの設定方法などが変更されます。必ずアップグレード前にお使いの環境をご確認ください。**
-
-- Sentry SDKをv11に更新したため、Sentryを利用しているサーバーでは設定の変更が必要になる場合があります。
-  - Sentry v11で`sendDefaultPii`が削除され、収集する項目を個別に指定する`dataCollection`に置き換えられました。
-  	- **`sentryForBackend.options.sendDefaultPii` / `sentryForFrontend.options.sendDefaultPii`を設定しているサーバーは対応が必要です。** このオプションは無視されるようになり、設定されている場合は起動時に警告を出力します。同じ収集範囲を維持するには`dataCollection: {}`に書き換えてください。
-  	- 設定していない場合、対応は不要です。Sentry v11は`dataCollection`未指定時にすべてを収集しますが、Misskeyは利用者の情報が意図せず送信されないよう、収集範囲を絞った既定を適用します（ユーザー情報・Cookie・URLクエリパラメータ・HTTPボディ・DBクエリの値を送信せず、中継元を特定できるヘッダーを除外）。
-  	- 収集範囲を変更する場合は`dataCollection`を明示してください。Misskeyの既定をすべて置き換えるため、`dataCollection: {}`と書くとSentry本来の既定（すべて収集）に戻ります。
-  - `sentryForBackend.options.profilesSampleRate`を設定している場合、v11で削除されたため無視されます。プロファイリングの有効化は引き続き`sentryForBackend.enableNodeProfiling`で行います。
-  - 詳細は https://docs.sentry.io/platforms/javascript/migration/v10-to-v11/ を参照してください。
-- Node.jsのセキュリティアップデートに伴い、最低動作バージョンを 22.23.4 / 24.22.1 / 26.12.1 に引き上げました。
-  - Docker Image は Node.js 26.12.1-trixie に更新されています。
-
-### General
-- Feat: お知らせに自動アーカイブ日時を設定できるように
-- Feat: アカウント作成から一定期間経っていないアカウントからのフォローを自動的にフォロー申請にできるように
-- Enhance: 依存関係の更新
-- Fix: センシティブな画像をアイコン・バナーに指定できないように
-- Fix: セキュリティに関する修正
-
-### Client
-- Feat: デッキにクリップのカラムを追加できるように
-- Enhance: アイコン画像・バナー画像を外せるように	
-
-### Server
-- Enhance: ノート中のURLを正規化して禁止ワードを判定するように
-- Fix: ローカル限定絵文字でリモートノートのリノートにリアクションできてしまう問題を修正
-- Fix: サーバーの紹介にHTMLを使うとリンクプレビューの説明文にHTMLタグが表示される問題を修正
-- Fix: ルーム招待時にブロック状態を考慮するように
-
 
 ## 2026.10.0
 
