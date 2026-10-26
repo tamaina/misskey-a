@@ -206,6 +206,7 @@ export function createIUpdateProcedure(deps: IUpdateDependencies) {
 
 			if (avatar == null || avatar.userId !== user.id) throw apiError(iUpdateErrors.noSuchAvatar);
 			if (!avatar.type.startsWith('image/')) throw apiError(iUpdateErrors.avatarNotAnImage);
+			if (avatar.isSensitive) throw apiError(iUpdateErrors.avatarIsSensitive);
 
 			updates.avatarId = avatar.id;
 			updates.avatarUrl = deps.driveFileEntityService.getPublicUrl(avatar, 'avatar');
@@ -224,6 +225,7 @@ export function createIUpdateProcedure(deps: IUpdateDependencies) {
 
 			if (banner == null || banner.userId !== user.id) throw apiError(iUpdateErrors.noSuchBanner);
 			if (!banner.type.startsWith('image/')) throw apiError(iUpdateErrors.bannerNotAnImage);
+			if (banner.isSensitive) throw apiError(iUpdateErrors.bannerIsSensitive);
 
 			updates.bannerId = banner.id;
 			updates.bannerUrl = deps.driveFileEntityService.getPublicUrl(banner);

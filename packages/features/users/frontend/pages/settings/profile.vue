@@ -183,6 +183,7 @@ import { store } from '@features/preferences/frontend/store.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import { genId } from '@features/runtime/frontend/utility/id.js';
+import { updateCurrentAccount, updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';
 
 const $i = ensureSignin();
 
@@ -256,7 +257,12 @@ function save() {
 			title: $locale.value.sfc.yourNameContainsProhibitedWords,
 			text: $locale.value.sfc.yourNameContainsProhibitedWordsDescription,
 		},
+	}).then((res) => {
+		updateCurrentAccount(res);
+	}).catch(() => {
+		// エラーダイアログは apiWithDialog 側で表示済み
 	});
+
 	claimAchievement('profileFilled');
 	if (profile.name === 'syuilo' || profile.name === 'しゅいろ') {
 		claimAchievement('setNameToSyuilo');
@@ -270,9 +276,19 @@ function changeAvatar(ev: PointerEvent) {
 	async function done(driveFile: Misskey.entities.DriveFile) {
 		const i = await os.apiWithDialog('i/update', {
 			avatarId: driveFile.id,
+		}, undefined, {
+			'71bb5e53-4742-4609-b465-36081e131208': {
+				title: $locale.value.sfc.cannotSelectSensitiveMedia,
+				text: $locale.value.sfc.cannotSelectSensitiveMediaDescription,
+			},
+		}).catch(() => null); // エラーダイアログは apiWithDialog 側で表示済み
+		if (i == null) return;
+
+		updateCurrentAccountPartial({
+			avatarId: i.avatarId,
+			avatarUrl: i.avatarUrl,
+			avatarBlurhash: i.avatarBlurhash,
 		});
-		$i.avatarId = i.avatarId;
-		$i.avatarUrl = i.avatarUrl;
 		claimAchievement('profileFilled');
 	}
 
@@ -308,20 +324,48 @@ function changeAvatar(ev: PointerEvent) {
 		text: $locale.value.sfc.fromDrive,
 		icon: 'ti ti-cloud',
 		action: () => {
-			chooseDriveFile({ multiple: false }).then(files => {
+			chooseDriveFile({ multiple: false, excludeSensitive: true }).then(files => {
 				done(files[0]);
 			});
 		},
-	}], ev.currentTarget ?? ev.target);
+	}, ...($i.avatarId != null ? [
+			{ type: 'divider' as const },
+			{
+				type: 'button' as const,
+				text: $locale.value.sfc.detach,
+				icon: 'ti ti-circle-x',
+				action: () => {
+					os.apiWithDialog('i/update', {
+						avatarId: null,
+					}).then((res) => {
+						updateCurrentAccountPartial({
+							avatarId: res.avatarId,
+							avatarUrl: res.avatarUrl,
+							avatarBlurhash: res.avatarBlurhash,
+						});
+					}).catch(() => {
+						// エラーダイアログは apiWithDialog 側で表示済み
+					});
+				},
+			},
+		] : [])], ev.currentTarget ?? ev.target);
 }
 
 function changeBanner(ev: PointerEvent) {
 	async function done(driveFile: Misskey.entities.DriveFile) {
 		const i = await os.apiWithDialog('i/update', {
 			bannerId: driveFile.id,
+		}, undefined, {
+			'e148b34c-9f33-4300-93e0-7817008fb366': {
+				title: $locale.value.sfc.cannotSelectSensitiveMedia,
+				text: $locale.value.sfc.cannotSelectSensitiveMediaDescription,
+			},
+		}).catch(() => null); // エラーダイアログは apiWithDialog 側で表示済み
+		if (i == null) return;
+		updateCurrentAccountPartial({
+			bannerId: i.bannerId,
+			bannerUrl: i.bannerUrl,
 		});
-		$i.bannerId = i.bannerId;
-		$i.bannerUrl = i.bannerUrl;
 	}
 
 	os.popupMenu([{
@@ -356,11 +400,30 @@ function changeBanner(ev: PointerEvent) {
 		text: $locale.value.sfc.fromDrive,
 		icon: 'ti ti-cloud',
 		action: () => {
-			chooseDriveFile({ multiple: false }).then(files => {
+			chooseDriveFile({ multiple: false, excludeSensitive: true }).then(files => {
 				done(files[0]);
 			});
 		},
-	}], ev.currentTarget ?? ev.target);
+	}, ...($i.bannerId ? [
+			{ type: 'divider' as const },
+			{
+				type: 'button' as const,
+				text: $locale.value.sfc.detach,
+				icon: 'ti ti-circle-x',
+				action: () => {
+					os.apiWithDialog('i/update', {
+						bannerId: null,
+					}).then((res) => {
+						updateCurrentAccountPartial({
+							bannerId: res.bannerId,
+							bannerUrl: res.bannerUrl,
+						});
+					}).catch(() => {
+						// エラーダイアログは apiWithDialog 側で表示済み
+					});
+				},
+			},
+		] : [])], ev.currentTarget ?? ev.target);
 }
 
 const headerActions = computed(() => []);
@@ -976,7 +1039,10 @@ definePage(() => ({
 	"flagAsCatDescription": "にゃにゃにゃ？？",
 	"flagAsBot": "Botとして設定",
 	"flagAsBotDescription": "このアカウントがプログラムによって運用される場合は、このフラグをオンにします。オンにすると、反応の連鎖を防ぐためのフラグとして他の開発者に役立ったり、Misskeyのシステム上での扱いがBotに合ったものになります。",
-	"qr": "二次元コード"
+	"qr": "二次元コード",
+	"detach": "外す",
+	"cannotSelectSensitiveMedia": "センシティブなメディアは選択できません",
+	"cannotSelectSensitiveMediaDescription": "自分でセンシティブ設定を行っていないのにこのエラーが出ている場合、自動判定によりセンシティブなメディアとされている可能性があります。\nサーバーの規則に照らして不要な場合は、ファイルのセンシティブ設定を解除してもう一度お試しください。"
 }
 </locale>
 
