@@ -304,7 +304,7 @@ const services = [
 	['SystemWebhookService', SystemWebhookService, 6],
 	['TelemetryService', TelemetryService, 0],
 	['UserAuthService', UserAuthService, 3],
-	['UserBlockingService', UserBlockingService, 13],
+	['UserBlockingService', UserBlockingService, 15],
 	['UserFollowingService', UserFollowingService, 21],
 	['UserKeypairService', UserKeypairService, 5],
 	['UserListService', UserListService, 9],

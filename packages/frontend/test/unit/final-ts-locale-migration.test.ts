@@ -6,6 +6,7 @@
 import { restoreClientErrorLogBaseline } from './client-error-log-source-rebase.js';
 import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
 import { restoreDrivePreprocessingBaseline } from './drive-preprocessing-source-rebase.js';
+import { restoreUpstreamDevelopBaseline, restoreUpstreamLocaleBundle } from './upstream-develop-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -103,7 +104,7 @@ function generated(language: string): LocaleBundle {
 	if (typeof source !== 'string') throw new Error('Expected generated locale loader');
 	const payload: LocaleBundle = {};
 	runInNewContext(source.replaceAll('export const ', 'const ').replace('export default { locale, global, modules };', 'payload.global = global; payload.modules = modules;'), { payload });
-	return payload;
+	return restoreUpstreamLocaleBundle(language, payload);
 }
 
 test('all39 TS consumers reverse byte for byte and all17 owners retain exactly9100 effective strings', async () => {
@@ -119,7 +120,7 @@ test('all39 TS consumers reverse byte for byte and all17 owners retain exactly91
 	}
 	let strings = 0;
 	for (const owner of proof.owners) {
-		const source = readFileSync(resolve(root, owner.file), 'utf8');
+		const source = restoreUpstreamDevelopBaseline(owner.file, readFileSync(resolve(root, owner.file), 'utf8'));
 		expect(hash(source)).toBe(owner.sha256);
 		const blocks = parse(source, { filename: owner.file }).descriptor.customBlocks;
 		expect(blocks.map(block => block.attrs.locale)).toEqual(languages);

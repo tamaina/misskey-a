@@ -16,6 +16,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DebounceLoader } from '@features/runtime/backend/async/loader.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { shouldHideNoteByTime } from '../utility/should-hide-note-by-time.js';
+import { isQuotePacked, isRenotePacked } from '../utility/is-renote.js';
 import { ReactionsBufferingService } from '../services/ReactionsBufferingService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { OnModuleInit } from '@nestjs/common';
@@ -271,6 +272,23 @@ export class NoteEntityService implements OnModuleInit {
 		}
 
 		return undefined;
+	}
+
+	@bindThis
+	public async withMyRenoteReaction(note: Packed<'Note'>, meId: MiUser['id'] | null): Promise<Packed<'Note'>> {
+		if (meId == null) return note;
+		if (!isRenotePacked(note) || isQuotePacked(note)) return note;
+		if (note.renote == null || Object.keys(note.renote.reactions).length === 0) return note;
+
+		const myReaction = await this.populateMyReaction(note.renote, meId);
+
+		return {
+			...note,
+			renote: {
+				...note.renote,
+				myReaction,
+			},
+		};
 	}
 
 	@bindThis

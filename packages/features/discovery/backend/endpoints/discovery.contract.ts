@@ -8,6 +8,7 @@ import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy
 import { oc, type InferContractRouterOutputs, type InferSchemaOutput } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
+import { jsonString } from '../../../api/backend/transport/string.schema.js';
 import { apiErrorData, commonErrors } from '../../../api/backend/transport/errors.schema.js';
 import { packedUserSchema, packedUserDetailedSchema } from '../../../users/backend/user.schema.js';
 import { packedNoteSchema } from '../../../notes/backend/note.schema.js';
@@ -53,7 +54,7 @@ export const hashtagsShowContract = oc.$meta({
 	requireCredential: false,
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/hashtags/show', tags: ['hashtags'] })
 	.errors({ ...commonErrors, NO_SUCH_HASHTAG: { status: 400, data: apiErrorData } }).input(objectInput({
-		'tag': v.string(),
+		'tag': jsonString({ maxLength: 128 }),
 	})).output(packedHashtagSchema);
 export const hashtagsTrendContract = oc.$meta({
 	requestName: 'hashtags/trend',
@@ -70,7 +71,7 @@ export const hashtagsUsersContract = oc.$meta({
 	requireCredential: false,
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/hashtags/users', tags: ['hashtags', 'users'] })
 	.errors({ ...commonErrors }).input(objectInput({
-		'tag': v.string(),
+		'tag': jsonString({ maxLength: 128 }),
 		'limit': v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 		'offset': v.optional(v.pipe(v.number(), v.integer()), 0),
 		'sort': v.picklist(['+follower', '-follower', '+createdAt', '-createdAt', '+updatedAt', '-updatedAt']),
@@ -96,8 +97,8 @@ export const notesSearchByTagContract = oc.$meta({
 	requireCredential: false,
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/notes/search-by-tag', tags: ['notes', 'hashtags'] })
 	.errors({ ...commonErrors }).input(v.union([
-		objectInput({ tag: v.pipe(v.string(), v.minLength(1)), ...searchTagCommon }),
-		objectInput({ query: v.pipe(v.array(v.pipe(v.array(v.pipe(v.string(), v.minLength(1))), v.minLength(1))), v.minLength(1)), ...searchTagCommon }),
+		objectInput({ tag: jsonString({ minLength: 1, maxLength: 128 }), ...searchTagCommon }),
+		objectInput({ query: v.pipe(v.array(v.pipe(v.array(jsonString({ minLength: 1, maxLength: 128 })), v.minLength(1))), v.minLength(1)), ...searchTagCommon }),
 	])).output(v.array(packedNoteSchema));
 export const usersFeaturedNotesContract = oc.$meta({
 	requestName: 'users/featured-notes',

@@ -49,13 +49,13 @@ export class ApiExecutionContextFactory {
 		const { credential, upload } = request;
 		const fresh = request.freshAuthorization === true;
 		const roleReads = new Map<string, ReturnType<RoleService['getUserRoles']>>();
-		const policyReads = new Map<string, ReturnType<RoleService['getUserPolicies']>>();
+		const policyReads = new Map<string | null, ReturnType<RoleService['getUserPolicies']>>();
 		const readRoles = (id: string) => {
 			if (!fresh) return this.roles.getUserRoles(id);
 			if (!roleReads.has(id)) roleReads.set(id, this.roles.getUserRoles(id, true));
 			return roleReads.get(id)!;
 		};
-		const readPolicies = (id: string) => {
+		const readPolicies = (id: string | null) => {
 			if (!fresh) return this.roles.getUserPolicies(id);
 			if (!policyReads.has(id)) policyReads.set(id, this.roles.getUserPolicies(id, true));
 			return policyReads.get(id)!;
@@ -65,7 +65,8 @@ export class ApiExecutionContextFactory {
 				rootUserId: () => this.settings.rootUserId,
 				roles: actor => readRoles(actor.id),
 				policyAllowed: async (actor, key) => {
-					const policies = await readPolicies(actor.id);
+					// 未ログイン時は既定ポリシーで判定
+					const policies = await readPolicies(actor?.id ?? null);
 					return Boolean(Object.entries(policies).find(([name]) => name === key)?.[1]);
 				},
 			},

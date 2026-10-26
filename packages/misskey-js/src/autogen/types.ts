@@ -119812,6 +119812,26 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                             /** @constant */
+                            code: 'AVATAR_IS_SENSITIVE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BANNER_IS_SENSITIVE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
                             code: 'NO_SUCH_PAGE';
                             message: string;
                         } | {
