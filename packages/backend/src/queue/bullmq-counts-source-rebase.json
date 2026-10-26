@@ -1,10 +1,10 @@
 {
   "baselineVersion": "6.3.2",
-  "currentVersion": "6.3.12",
+  "currentVersion": "6.3.15",
   "sources": [
     {
       "file": "dist/esm/classes/queue-getters.js",
-      "currentSha256": "f156b0c08f5014851250bde92de34cb54c08ec70fe13a720ac22439004874948",
+      "currentSha256": "8e0f10bbe3e9ba62d56369b6195b25920778af0d7d29e567b252da65ea160c4e",
       "identicalMethods": [
         {
           "method": "sanitizeJobTypes",
@@ -20,7 +20,7 @@
     },
     {
       "file": "dist/esm/classes/redis-queue-backend.js",
-      "currentSha256": "28a07401b6468d616fd008e3baa6cb2ad5090c0cff5bdf41fe8431f9bcd8374c",
+      "currentSha256": "1e686d6a60f1fd955debfc992ae37ae090c8d5e38f4f2a37629d60a333941f05",
       "identicalMethods": [
         {
           "method": "getCountsArgs",
@@ -41,7 +41,7 @@
     },
     {
       "file": "dist/cjs/classes/queue-getters.js",
-      "currentSha256": "88e8359150a2b66b15d98abd7c2cc97b4e97ecd89d3c72ad4dfd5363e15e8384",
+      "currentSha256": "d84e911b841c1b58b3e7361bbe0a27b32d92fa48b4cbf62d27856685a6b3ffed",
       "identicalMethods": [
         {
           "method": "sanitizeJobTypes",
@@ -57,7 +57,7 @@
     },
     {
       "file": "dist/cjs/classes/redis-queue-backend.js",
-      "currentSha256": "6467ddd7e035881846c0534c91b4713996a83ad62633067e1a1c3f48166fbc78",
+      "currentSha256": "a3db4a1d9b10c9895a97f89dd225d56a21bd2b3de3a8a3025848c483f4657088",
       "identicalMethods": [
         {
           "method": "getCountsArgs",
@@ -88,7 +88,7 @@
     },
     {
       "file": "package.json",
-      "currentSha256": "c41da2849220028ee10459223caeaa12fdee337508970f0b709b87b850755f4f"
+      "currentSha256": "af606f2a5ce84d37527fee37871fd6229d6d80f965ea8ee176c60c40537b3392"
     }
   ],
   "entryPoints": {
