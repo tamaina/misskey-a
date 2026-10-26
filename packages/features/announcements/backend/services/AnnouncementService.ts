@@ -139,22 +139,30 @@ export class AnnouncementService {
 
 	@bindThis
 	public async update(announcement: MiAnnouncement, values: Partial<MiAnnouncement>, moderator?: MiUser): Promise<void> {
-		await this.announcementsRepository.update(announcement.id, {
-			updatedAt: new Date(),
-			title: values.title,
-			text: values.text,
-			/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空の文字列の場合、nullを渡すようにするため */
-			imageUrl: values.imageUrl || null,
-			display: values.display,
-			icon: values.icon,
-			forExistingUsers: values.forExistingUsers,
-			silence: values.silence,
-			needConfirmationToRead: values.needConfirmationToRead,
-			isActive: values.isActive,
-			autoArchiveAt: values.autoArchiveAt,
-		});
+		// レプリカから古い値を読まないよう、更新後の値はRETURNINGで取得する
+		const after: MiAnnouncement | undefined = await this.announcementsRepository.createQueryBuilder().update()
+			.set({
+				updatedAt: new Date(),
+				title: values.title,
+				text: values.text,
+				/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空の文字列の場合、nullを渡すようにするため */
+				imageUrl: values.imageUrl || null,
+				display: values.display,
+				icon: values.icon,
+				forExistingUsers: values.forExistingUsers,
+				silence: values.silence,
+				needConfirmationToRead: values.needConfirmationToRead,
+				isActive: values.isActive,
+				autoArchiveAt: values.autoArchiveAt,
+			})
+			.where('id = :id', { id: announcement.id })
+			.returning('*')
+			.execute()
+			.then((response) => response.raw[0]);
 
-		const after = await this.announcementsRepository.findOneByOrFail({ id: announcement.id });
+		if (after == null) {
+			throw new EntityNotFoundError(this.announcementsRepository.metadata.target, { id: announcement.id });
+		}
 
 		if (announcement.autoArchiveAt?.getTime() !== after.autoArchiveAt?.getTime() || announcement.isActive !== after.isActive) {
 			if (announcement.autoArchiveAt != null) {
