@@ -47,6 +47,7 @@ import { ClientLoggerService } from './ClientLoggerService.js';
 import { HtmlTemplateService } from './HtmlTemplateService.js';
 
 import { BasePage } from '@features/web/backend/templates/base.js';
+import { htmlToPlainText } from '@features/web/backend/utility/html-to-plain-text.js';
 import { UserPage } from '@features/users/backend/templates/user.js';
 import { NotePage } from '@features/notes/backend/templates/note.js';
 import { PagePage } from '@features/pages/backend/templates/page.js';
@@ -446,7 +447,7 @@ export class ClientServerService {
 			return await HtmlTemplateService.replyHtml(reply, BasePage({
 				img: this.meta.bannerUrl ?? undefined,
 				title: this.meta.name ?? 'Misskey',
-				desc: this.meta.description ?? undefined,
+				desc: this.meta.description == null ? undefined : htmlToPlainText(this.meta.description),
 				...(await this.htmlTemplateService.getCommonData()),
 				...data,
 			}));
