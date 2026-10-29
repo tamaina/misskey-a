@@ -173,7 +173,7 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { getUserMenu } from '@features/users/frontend/utility/get-user-menu.js';
 import number from '@features/ui/frontend/filters/number.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import * as os from '@features/ui/frontend/os.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { $i, iAmModerator } from '@features/auth/frontend/i.js';

@@ -188,7 +188,7 @@ describe('2要素認証', () => {
 	});
 
 	test('が設定でき、OTPでログインできる。', async () => {
-		const registerResponse = await api('i/2fa/register', {
+		const registerResponse = await api('i/2fa/totp/register', {
 			password,
 		}, alice);
 		assert.strictEqual(registerResponse.status, 200);
@@ -198,7 +198,7 @@ describe('2要素認証', () => {
 		assert.strictEqual(registerResponse.body.label, username);
 		assert.strictEqual(registerResponse.body.issuer, config.host);
 
-		const doneResponse = await api('i/2fa/done', {
+		const doneResponse = await api('i/2fa/totp/done', {
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 		assert.strictEqual(doneResponse.status, 200);
@@ -210,6 +210,7 @@ describe('2要素認証', () => {
 		assert.deepStrictEqual(signinWithoutTokenResponse.body, {
 			finished: false,
 			next: 'totp',
+			availableFactors: ['totp'],
 		});
 
 		const signinResponse = await api('signin-flow', {
@@ -221,24 +222,24 @@ describe('2要素認証', () => {
 		assert.notEqual(signinResponse.body.i, undefined);
 
 		// 後片付け
-		await api('i/2fa/unregister', {
+		await api('i/2fa/totp/remove', {
 			password,
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 	});
 
 	test('が設定でき、セキュリティキーでログインできる。', async () => {
-		const registerResponse = await api('i/2fa/register', {
+		const registerResponse = await api('i/2fa/totp/register', {
 			password,
 		}, alice);
 		assert.strictEqual(registerResponse.status, 200);
 
-		const doneResponse = await api('i/2fa/done', {
+		const doneResponse = await api('i/2fa/totp/done', {
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 		assert.strictEqual(doneResponse.status, 200);
 
-		const registerKeyResponse = await api('i/2fa/register-key', {
+		const registerKeyResponse = await api('i/2fa/passkey/register', {
 			password,
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
@@ -248,7 +249,7 @@ describe('2要素認証', () => {
 
 		const keyName = 'example-key';
 		const credentialId = crypto.randomBytes(0x41);
-		const keyDoneResponse = await api('i/2fa/key-done', keyDoneParam({
+		const keyDoneResponse = await api('i/2fa/passkey/done', keyDoneParam({
 			token: otpToken(registerResponse.body.secret),
 			keyName,
 			credentialId,
@@ -278,24 +279,24 @@ describe('2要素認証', () => {
 		assert.notEqual(signinResponse2.body.i, undefined);
 
 		// 後片付け
-		await api('i/2fa/unregister', {
+		await api('i/2fa/totp/remove', {
 			password,
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 	});
 
 	test('が設定でき、セキュリティキーでパスワードレスログインできる。', async () => {
-		const registerResponse = await api('i/2fa/register', {
+		const registerResponse = await api('i/2fa/totp/register', {
 			password,
 		}, alice);
 		assert.strictEqual(registerResponse.status, 200);
 
-		const doneResponse = await api('i/2fa/done', {
+		const doneResponse = await api('i/2fa/totp/done', {
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 		assert.strictEqual(doneResponse.status, 200);
 
-		const registerKeyResponse = await api('i/2fa/register-key', {
+		const registerKeyResponse = await api('i/2fa/passkey/register', {
 			token: otpToken(registerResponse.body.secret),
 			password,
 		}, alice);
@@ -303,7 +304,7 @@ describe('2要素認証', () => {
 
 		const keyName = 'example-key';
 		const credentialId = crypto.randomBytes(0x41);
-		const keyDoneResponse = await api('i/2fa/key-done', keyDoneParam({
+		const keyDoneResponse = await api('i/2fa/passkey/done', keyDoneParam({
 			token: otpToken(registerResponse.body.secret),
 			keyName,
 			credentialId,
@@ -311,7 +312,7 @@ describe('2要素認証', () => {
 		} as any) as any, alice);
 		assert.strictEqual(keyDoneResponse.status, 200);
 
-		const passwordLessResponse = await api('i/2fa/password-less', {
+		const passwordLessResponse = await api('i/2fa/passkey/password-less', {
 			value: true,
 		}, alice);
 		assert.strictEqual(passwordLessResponse.status, 204);
@@ -343,24 +344,24 @@ describe('2要素認証', () => {
 		assert.notEqual(signinResponse2.body.i, undefined);
 
 		// 後片付け
-		await api('i/2fa/unregister', {
+		await api('i/2fa/totp/remove', {
 			password,
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 	});
 
 	test('が設定でき、設定したセキュリティキーの名前を変更できる。', async () => {
-		const registerResponse = await api('i/2fa/register', {
+		const registerResponse = await api('i/2fa/totp/register', {
 			password,
 		}, alice);
 		assert.strictEqual(registerResponse.status, 200);
 
-		const doneResponse = await api('i/2fa/done', {
+		const doneResponse = await api('i/2fa/totp/done', {
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 		assert.strictEqual(doneResponse.status, 200);
 
-		const registerKeyResponse = await api('i/2fa/register-key', {
+		const registerKeyResponse = await api('i/2fa/passkey/register', {
 			token: otpToken(registerResponse.body.secret),
 			password,
 		}, alice);
@@ -368,7 +369,7 @@ describe('2要素認証', () => {
 
 		const keyName = 'example-key';
 		const credentialId = crypto.randomBytes(0x41);
-		const keyDoneResponse = await api('i/2fa/key-done', keyDoneParam({
+		const keyDoneResponse = await api('i/2fa/passkey/done', keyDoneParam({
 			token: otpToken(registerResponse.body.secret),
 			keyName,
 			credentialId,
@@ -377,7 +378,7 @@ describe('2要素認証', () => {
 		assert.strictEqual(keyDoneResponse.status, 200);
 
 		const renamedKey = 'other-key';
-		const updateKeyResponse = await api('i/2fa/update-key', {
+		const updateKeyResponse = await api('i/2fa/passkey/update', {
 			name: renamedKey,
 			credentialId: credentialId.toString('base64url'),
 		}, alice);
@@ -393,24 +394,24 @@ describe('2要素認証', () => {
 		assert.notEqual(securityKeys[0].lastUsed, undefined);
 
 		// 後片付け
-		await api('i/2fa/unregister', {
+		await api('i/2fa/totp/remove', {
 			password,
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 	});
 
 	test('が設定でき、設定したセキュリティキーを削除できる。', async () => {
-		const registerResponse = await api('i/2fa/register', {
+		const registerResponse = await api('i/2fa/totp/register', {
 			password,
 		}, alice);
 		assert.strictEqual(registerResponse.status, 200);
 
-		const doneResponse = await api('i/2fa/done', {
+		const doneResponse = await api('i/2fa/totp/done', {
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 		assert.strictEqual(doneResponse.status, 200);
 
-		const registerKeyResponse = await api('i/2fa/register-key', {
+		const registerKeyResponse = await api('i/2fa/passkey/register', {
 			token: otpToken(registerResponse.body.secret),
 			password,
 		}, alice);
@@ -418,7 +419,7 @@ describe('2要素認証', () => {
 
 		const keyName = 'example-key';
 		const credentialId = crypto.randomBytes(0x41);
-		const keyDoneResponse = await api('i/2fa/key-done', keyDoneParam({
+		const keyDoneResponse = await api('i/2fa/passkey/done', keyDoneParam({
 			token: otpToken(registerResponse.body.secret),
 			keyName,
 			credentialId,
@@ -432,7 +433,7 @@ describe('2要素認証', () => {
 		assert.strictEqual(beforeIResponse.status, 200);
 		assert.ok(beforeIResponse.body.securityKeysList);
 		for (const key of beforeIResponse.body.securityKeysList) {
-			const removeKeyResponse = await api('i/2fa/remove-key', {
+			const removeKeyResponse = await api('i/2fa/passkey/remove', {
 				token: otpToken(registerResponse.body.secret),
 				password,
 				credentialId: key.id,
@@ -453,19 +454,19 @@ describe('2要素認証', () => {
 		assert.notEqual(signinResponse.body.i, undefined);
 
 		// 後片付け
-		await api('i/2fa/unregister', {
+		await api('i/2fa/totp/remove', {
 			password,
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 	});
 
 	test('が設定でき、設定解除できる。（パスワードのみでログインできる。）', async () => {
-		const registerResponse = await api('i/2fa/register', {
+		const registerResponse = await api('i/2fa/totp/register', {
 			password,
 		}, alice);
 		assert.strictEqual(registerResponse.status, 200);
 
-		const doneResponse = await api('i/2fa/done', {
+		const doneResponse = await api('i/2fa/totp/done', {
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 		assert.strictEqual(doneResponse.status, 200);
@@ -474,7 +475,7 @@ describe('2要素認証', () => {
 		assert.strictEqual(iResponse.status, 200);
 		assert.strictEqual(iResponse.body.twoFactorEnabled, true);
 
-		const unregisterResponse = await api('i/2fa/unregister', {
+		const unregisterResponse = await api('i/2fa/totp/remove', {
 			token: otpToken(registerResponse.body.secret),
 			password,
 		}, alice);
@@ -488,7 +489,7 @@ describe('2要素認証', () => {
 		assert.notEqual(signinResponse.body.i, undefined);
 
 		// 後片付け
-		await api('i/2fa/unregister', {
+		await api('i/2fa/totp/remove', {
 			password,
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
@@ -497,13 +498,13 @@ describe('2要素認証', () => {
 	test('のTOTPトークンは一度使うと同じトークンは再利用できない。', async () => {
 		await sendEnvUpdateRequest({ key: 'MISSKEY_TEST_CHECK_DUPLICATED_TOTP', value: '1' });
 
-		const registerResponse = await api('i/2fa/register', {
+		const registerResponse = await api('i/2fa/totp/register', {
 			password,
 		}, alice);
 		assert.strictEqual(registerResponse.status, 200);
 
 		const sharedOtpToken = otpToken(registerResponse.body.secret);
-		const doneResponse = await api('i/2fa/done', {
+		const doneResponse = await api('i/2fa/totp/done', {
 			token: sharedOtpToken,
 		}, alice);
 		assert.strictEqual(doneResponse.status, 200);
@@ -517,7 +518,7 @@ describe('2要素認証', () => {
 		await sendEnvUpdateRequest({ key: 'MISSKEY_TEST_CHECK_DUPLICATED_TOTP', value: '' });
 
 		// 後片付け
-		await api('i/2fa/unregister', {
+		await api('i/2fa/totp/remove', {
 			password,
 			token: otpToken(registerResponse.body.secret),
 		}, alice);

@@ -33,7 +33,9 @@ test('native Blob and File keep direct multipart fields and credential behavior'
 			expect(body!.get('comment')).toBe('caption');
 			expect(body!.get('force')).toBe('true');
 			expect(body!.get('isSensitive')).toBe('false');
-			expect(body!.get('future')).toBe(JSON.stringify({ kept: true }));
+			// No declared upload field is nested. This ignored extra follows oRPC's bracket encoding.
+			expect(body!.get('future')).toBeNull();
+			expect(body!.get('future[kept]')).toBe('true');
 			expect(body!.has('data')).toBe(false);
 			expect(body!.has('0')).toBe(false);
 		}

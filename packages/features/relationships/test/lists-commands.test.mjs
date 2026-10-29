@@ -1,11 +1,12 @@
 /*
- * SPDX-FileCopyrightText: syuilo and misskey-project
- * SPDX-License-Identifier: AGPL-3.0-only
- */
+	* SPDX-FileCopyrightText: syuilo and misskey-project
+	* SPDX-License-Identifier: AGPL-3.0-only
+	*/
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createListCommands, legacyListSchemas } from '../../../backend/built/features/relationships/backend.js';
+import { createRouterClient } from '@orpc/server';
+import { createRelationshipsRouter, UserListService } from '../../../backend/built/features/relationships/backend.js';
 
 const inputs = {
 	'users/lists/delete': { listId: 'list123' },
@@ -16,18 +17,10 @@ const inputs = {
 	'users/lists/update-membership': { listId: 'list123', userId: 'user123' },
 };
 
-const actor = { id: 'trusted-owner', moderator: { audit: 'retained' } };
+const actor = { id: 'trusted-owner', isSuspended: false, movedToUri: null, moderator: { audit: 'retained' } };
 const list = { id: 'list123', ownerId: 'trusted-owner' };
 const user = { id: 'user123', profile: { details: true } };
 const favorite = { id: 'favorite123' };
-
-function makeError(definition) {
-	const error = new Error(definition.message);
-	error.definition = definition;
-	error.code = definition.code;
-	error.id = definition.id;
-	return error;
-}
 
 function createFixture(overrides = {}) {
 	const calls = [];
@@ -41,41 +34,39 @@ function createFixture(overrides = {}) {
 		findFavorite: async (...args) => { calls.push(['findFavorite', ...args]); return favorite; },
 		deleteFavorite: async (...args) => { calls.push(['deleteFavorite', ...args]); },
 		getUser: async (...args) => { calls.push(['getUser', ...args]); return user; },
-		isMissingUserError: error => error?.id === '15348ddd-432d-49c2-8a5a-8069753becff',
 		removeMember: async (...args) => { calls.push(['removeMember', ...args]); },
 		hasReverseBlock: async (...args) => { calls.push(['hasReverseBlock', ...args]); return false; },
 		hasMembership: async (...args) => { calls.push(['hasMembership', ...args]); return false; },
 		addMember: async (...args) => { calls.push(['addMember', ...args]); },
-		isTooManyUsersError: error => error?.code === 'TOO_MANY_USERS_INTERNAL',
 		updateMembership: async (...args) => { calls.push(['updateMembership', ...args]); },
-		createError: makeError,
 		...overrides,
 	};
-	return { deps, calls, feature: createListCommands(deps) };
+	return { deps, calls, feature: createNativeRouter(deps) };
 }
 
-function invoke(feature, route, input = inputs[route], trustedActor = actor) {
-	return feature[route](input, { context: trustedActor === undefined ? undefined : { actor: trustedActor } });
-}
-
-test('legacy user-list schemas preserve field types, required fields, and optional withReplies', () => {
-	const id = { type: 'string', format: 'misskey:id' };
-	const expected = {
-		'users/lists/delete': { type: 'object', properties: { listId: id }, required: ['listId'] },
-		'users/lists/favorite': { type: 'object', properties: { listId: id }, required: ['listId'] },
-		'users/lists/pull': { type: 'object', properties: { listId: id, userId: id }, required: ['listId', 'userId'] },
-		'users/lists/push': { type: 'object', properties: { listId: id, userId: id }, required: ['listId', 'userId'] },
-		'users/lists/unfavorite': { type: 'object', properties: { listId: id }, required: ['listId'] },
-		'users/lists/update-membership': {
-			type: 'object',
-			properties: { listId: id, userId: id, withReplies: { type: 'boolean' } },
-			required: ['listId', 'userId'],
-		},
-	};
-	for (const [route, schema] of Object.entries(expected)) {
-		assert.deepEqual(legacyListSchemas[route].input, schema, route);
-	}
+function createNativeRouter(deps) {
+return createRelationshipsRouter({
+getterService: { getUser: (...args) => deps.getUser(...args) },
+userFollowingService: { acceptFollowRequest: (...args) => deps.acceptFollowRequest(...args), rejectFollowRequest: (...args) => deps.rejectFollowRequest(...args) },
+userMutingService: { unmute: (...args) => deps.unmute(...args) },
+userRenoteMutingService: { mute: (...args) => deps.muteRenotes(...args), unmute: (...args) => deps.unmuteRenotes(...args) },
+userListService: { removeMember: (...args) => deps.removeMember(...args), addMember: (...args) => deps.addMember(...args), updateMembership: (...args) => deps.updateMembership(...args) },
+idService: { gen: () => deps.generateFavoriteId() },
+mutingsRepository: { findOneBy: query => deps.findMuting(query.muterId, query.muteeId) },
+renoteMutingsRepository: { exists: ({ where }) => deps.isRenoteMuting(where.muterId, where.muteeId), findOneBy: query => deps.findRenoteMuting(query.muterId, query.muteeId) },
+userListsRepository: { findOneBy: query => deps.findOwnedList(query.id, query.userId), delete: id => deps.deleteList(id), exists: ({ where }) => deps.findPublicList(where.id) },
+userListFavoritesRepository: { exists: ({ where }) => deps.hasFavorite(where.userId, where.userListId), insert: value => deps.insertFavorite(value), findOneBy: query => deps.findFavorite(query.userListId, query.userId), delete: query => deps.deleteFavorite(query.id) },
+userListMembershipsRepository: { exists: ({ where }) => deps.hasMembership(where.userListId, where.userId) },
+blockingsRepository: { exists: ({ where }) => deps.hasReverseBlock(where.blockerId, where.blockeeId) },
 });
+}
+
+function invoke(feature, route, input = inputs[route], trustedActor = actor, token = null) {
+	const context = { credential: trustedActor ? 'credential' : null, ip: '192.0.2.1', headers: {},
+		services: { authenticate: async () => [trustedActor, token], limitActor: () => actor.id, rateLimitFactor: async () => 1, limit: async () => null },
+	};
+	return createRouterClient(feature, { context })[route](input);
+}
 
 test('all six commands preserve lookup order, trusted identity, full actor context, and void results', async () => {
 	const { feature, calls } = createFixture();
@@ -95,14 +86,13 @@ test('all six commands preserve lookup order, trusted identity, full actor conte
 	]);
 });
 
-test('every command requires a trusted actor before making any dependency call', async () => {
+test('native credential, suspended-account and token policies reject before dependencies', async () => {
 	const { feature, calls } = createFixture();
 	for (const route of Object.keys(inputs)) {
-		await assert.rejects(feature[route]({ ...inputs[route], actor: { id: 'spoofed' } }, { context: undefined }), /trusted actor/i, `${route}: missing context`);
-		for (const invalidActor of [null, {}, { id: '' }]) {
-			await assert.rejects(invoke(feature, route, { ...inputs[route], actor: { id: 'spoofed' } }, invalidActor), /trusted actor/i, `${route}: ${JSON.stringify(invalidActor)}`);
-		}
+		for (const principal of [null, { ...actor, isSuspended: true }]) await assert.rejects(invoke(feature, route, inputs[route], principal));
+		await assert.rejects(invoke(feature, route, inputs[route], actor, { permission: [] }));
 	}
+	await assert.rejects(invoke(feature, 'users/lists/push', inputs['users/lists/push'], { ...actor, movedToUri: 'https://remote.test/@moved' }), error => error.code === 'YOUR_ACCOUNT_MOVED');
 	assert.deepEqual(calls, []);
 });
 
@@ -120,8 +110,8 @@ test('owned-list commands look up ownership first and map only missing lists', a
 				[method]: async (...args) => { events.push([method, ...args]); },
 			});
 			await assert.rejects(invoke(fresh.feature, route), error => {
-				assert.equal(error.definition.code, 'NO_SUCH_LIST');
-				assert.equal(error.definition.id, route === 'users/lists/delete' ? '78436795-db79-42f5-b1e2-55ea2cf19166'
+				assert.equal(error.code, 'NO_SUCH_LIST');
+				assert.equal(error.data.id, route === 'users/lists/delete' ? '78436795-db79-42f5-b1e2-55ea2cf19166'
 					: route === 'users/lists/push' ? '2214501d-ac96-4049-b717-91e42272a711'
 					: '7f44670e-ab16-43b8-b4c1-ccd2ee89cc02');
 				return true;
@@ -140,8 +130,8 @@ test('only the legacy getter missing-user ID is mapped, with route-specific UUID
 	]) {
 		const { feature } = createFixture({ getUser: async () => { throw missingUser; } });
 		await assert.rejects(invoke(feature, route), error => {
-			assert.equal(error.definition.code, 'NO_SUCH_USER');
-			assert.equal(error.definition.id, uuid);
+			assert.equal(error.code, 'NO_SUCH_USER');
+			assert.equal(error.data.id, uuid);
 			return true;
 		});
 	}
@@ -159,8 +149,8 @@ test('push checks reverse blocking before membership, skips self-block lookup, a
 		addMember: async (...args) => { events.push(['addMember', ...args]); },
 	});
 	await assert.rejects(invoke(blocked.feature, 'users/lists/push'), error => {
-		assert.equal(error.definition.code, 'YOU_HAVE_BEEN_BLOCKED');
-		assert.equal(error.definition.id, '990232c5-3f9d-4d83-9f3f-ef27b6332a4b');
+		assert.equal(error.code, 'YOU_HAVE_BEEN_BLOCKED');
+		assert.equal(error.data.id, '990232c5-3f9d-4d83-9f3f-ef27b6332a4b');
 		return true;
 	});
 	assert.deepEqual(events, [['block', user.id, actor.id]]);
@@ -170,10 +160,10 @@ test('push checks reverse blocking before membership, skips self-block lookup, a
 		hasMembership: async (...args) => { duplicateCalls.push(['membership', ...args]); return true; },
 		addMember: async (...args) => { duplicateCalls.push(['addMember', ...args]); },
 	});
-	await assert.rejects(invoke(duplicate.feature, 'users/lists/push'), error => error.definition.code === 'ALREADY_ADDED');
+	await assert.rejects(invoke(duplicate.feature, 'users/lists/push'), error => error.code === 'ALREADY_ADDED');
 	assert.deepEqual(duplicateCalls, [['membership', list.id, user.id]]);
 
-	const self = { id: user.id, full: 'actor context' };
+	const self = { id: user.id, isSuspended: false, movedToUri: null, full: 'actor context' };
 	const selfCalls = [];
 	const selfPush = createFixture({
 		getUser: async () => user,
@@ -183,11 +173,11 @@ test('push checks reverse blocking before membership, skips self-block lookup, a
 	await invoke(selfPush.feature, 'users/lists/push', inputs['users/lists/push'], self);
 	assert.deepEqual(selfCalls, [['addMember', user, list, self]]);
 
-	const tooMany = Object.assign(new Error('full'), { code: 'TOO_MANY_USERS_INTERNAL' });
+	const tooMany = new UserListService.TooManyUsersError();
 	const capped = createFixture({ addMember: async () => { throw tooMany; } });
 	await assert.rejects(invoke(capped.feature, 'users/lists/push'), error => {
-		assert.equal(error.definition.code, 'TOO_MANY_USERS');
-		assert.equal(error.definition.id, '2dd9752e-a338-413d-8eec-41814430989b');
+		assert.equal(error.code, 'TOO_MANY_USERS');
+		assert.equal(error.data.id, '2dd9752e-a338-413d-8eec-41814430989b');
 		return true;
 	});
 
@@ -203,7 +193,7 @@ test('favorite checks public visibility and duplicates before generating an ID',
 		hasFavorite: async (...args) => { hiddenEvents.push(['favorite', ...args]); return false; },
 		generateFavoriteId: () => { hiddenEvents.push(['generate']); return 'never'; },
 	});
-	await assert.rejects(invoke(hidden.feature, 'users/lists/favorite'), error => error.definition.code === 'NO_SUCH_USER_LIST');
+	await assert.rejects(invoke(hidden.feature, 'users/lists/favorite'), error => error.code === 'NO_SUCH_USER_LIST');
 	assert.deepEqual(hiddenEvents, [['public', 'list123']]);
 
 	const duplicateEvents = [];
@@ -212,7 +202,7 @@ test('favorite checks public visibility and duplicates before generating an ID',
 		generateFavoriteId: () => { duplicateEvents.push(['generate']); return 'never'; },
 		insertFavorite: async (...args) => { duplicateEvents.push(['insert', ...args]); },
 	});
-	await assert.rejects(invoke(duplicate.feature, 'users/lists/favorite'), error => error.definition.code === 'ALREADY_FAVORITED');
+	await assert.rejects(invoke(duplicate.feature, 'users/lists/favorite'), error => error.code === 'ALREADY_FAVORITED');
 	assert.deepEqual(duplicateEvents, [['favorite', actor.id, 'list123']]);
 });
 
@@ -224,8 +214,8 @@ test('unfavorite preserves list-first ordering, null-only missing check, and leg
 		deleteFavorite: async (...args) => { events.push(['delete', ...args]); },
 	});
 	await assert.rejects(invoke(noFavorite.feature, 'users/lists/unfavorite'), error => {
-		assert.equal(error.definition.code, 'ALREADY_FAVORITED');
-		assert.equal(error.definition.id, '835c4b27-463d-4cfa-969b-a9058678d465');
+		assert.equal(error.code, 'ALREADY_FAVORITED');
+		assert.equal(error.data.id, '835c4b27-463d-4cfa-969b-a9058678d465');
 		return true;
 	});
 	assert.deepEqual(events, [['public', 'list123'], ['favorite', 'list123', actor.id]]);
@@ -265,7 +255,7 @@ test('each command waits for its final side effect and resolves with undefined',
 				await new Promise(resolve => { release = resolve; });
 			},
 		});
-		const feature = createListCommands(deps);
+		const feature = createNativeRouter(deps);
 		let settled = false;
 		const result = invoke(feature, route).then(value => { settled = true; return value; });
 		await started;

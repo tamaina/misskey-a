@@ -5,7 +5,7 @@
 
 import type { RenoteMutingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { } from '../models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiRenoteMuting } from '../models/RenoteMuting.js';

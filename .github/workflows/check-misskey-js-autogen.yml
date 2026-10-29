@@ -4,11 +4,12 @@ name: Check Misskey JS autogen
 on:
   pull_request:
     branches:
-      - master
+      - main
       - develop
       - improve-misskey-js-autogen-check
     paths:
       - packages/backend/**
+      - packages/features/relationships/backend/**
 
 jobs:
   generate-misskey-js:

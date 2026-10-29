@@ -11,6 +11,23 @@ import ipaddr from 'ipaddr.js';
 import fastifyCors from '@fastify/cors';
 import { verifyChallenge } from 'pkce-challenge';
 import { permissions as kinds } from 'misskey-js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { IdService } from '@features/runtime/backend/services/IdService.js';
+import { AuthenticateService } from '../transport/AuthenticateService.js';
+import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { Logger } from '@features/runtime/backend/logging/logger.js';
+import { StatusError } from '@features/runtime/backend/http/status-error.js';
+import { HtmlTemplateService } from '@features/web/backend/http/HtmlTemplateService.js';
+import { OAuthPage } from '@features/auth/backend/templates/oauth.js';
+import { DI } from '@/di-symbols.js';
+import type { Config } from '@/config.js';
+import { secureRndstr } from '../utility/secure-rndstr.js';
+import { fetchOAuthClientMetadata } from './ClientMetadataFetcher.js';
+import { OAuthStateStore } from './OAuthStateStore.js';
+import { eligibleOAuthPermissions, selectedOAuthScopes, parsePermissionCustomization } from './scope-selection.js';
 import {
 	AccessDeniedError,
 	InvalidGrantError,
@@ -20,21 +37,9 @@ import {
 	UnsupportedGrantTypeError,
 	UnsupportedResponseTypeError,
 } from './errors.js';
-import { secureRndstr } from '../utility/secure-rndstr.js';
-import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
-import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js';
-import { bindThis } from '@features/runtime/backend/decorators.js';
-import type { AccessTokensRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
-import { CacheService } from '@features/users/backend/services/CacheService.js';
+import type * as Redis from 'ioredis';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { MemoryKVCache } from '@features/runtime/backend/cache/cache.js';
-import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-import { Logger } from '@features/runtime/backend/logging/logger.js';
-import { StatusError } from '@features/runtime/backend/http/status-error.js';
-import { HtmlTemplateService } from '@features/web/backend/http/HtmlTemplateService.js';
-import { OAuthPage } from '@features/auth/backend/templates/oauth.js';
+import type { AccessTokensRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { FastifyInstance, FastifyReply } from 'fastify';
 
 // TODO: Consider migrating to @node-oauth/oauth2-server once
@@ -95,8 +100,31 @@ function validateClientId(raw: string): URL {
 	return url;
 }
 
+// https://datatracker.ietf.org/doc/html/rfc8252#section-7.3
+// OAuth 2.1 permits an http redirect only for a canonical loopback literal
+// (localhost, 127.0.0.1, or [::1]). Other spellings, userinfo, fragments, and
+// non-loopback http are rejected so they can never be selected. The authorization
+// request still has to match one of the published strings exactly, including the port.
+const CIMD_LOOPBACK_HTTP_REDIRECT = /^http:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::[1-9][0-9]{0,4})?(?:[/?][^\s#]*)?$/;
+
+function isAllowedCimdRedirectUri(uri: string): boolean {
+	let redirect: URL;
+	try {
+		redirect = new URL(uri);
+	} catch {
+		return false;
+	}
+	if (redirect.username || redirect.password || redirect.hash) return false;
+	if (redirect.protocol === 'https:') return true;
+	const hostname = redirect.hostname === '::1' ? '[::1]' : redirect.hostname;
+	return redirect.protocol === 'http:'
+		&& (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]')
+		&& CIMD_LOOPBACK_HTTP_REDIRECT.test(uri);
+}
+
 interface ClientInformation {
 	id: string;
+	cimd: boolean;
 	redirectUris: string[];
 	name: string;
 	logo: string | null;
@@ -107,20 +135,24 @@ interface OAuthRequestParameters {
 }
 
 interface AuthorizationRequest {
+	customizePermissions: boolean;
 	clientId: string;
 	redirectUri: string;
 	state?: string;
 	scopes: string[];
 	codeChallenge: string;
 	codeChallengeMethod: string;
+	resource?: string;
 }
 
 interface AuthorizationRequestSeed {
+	customizePermissions: boolean;
 	clientInfo: ClientInformation;
 	clientId: string;
 	redirectUri: string;
 	state?: string;
 	requestedScope: string[];
+	resource?: string;
 	codeChallenge?: string;
 	codeChallengeMethod?: string;
 }
@@ -132,13 +164,12 @@ interface AuthorizationTransaction {
 
 interface AuthorizationCodeGrant {
 	clientId: string;
+	cimd: boolean;
 	userId: string;
 	redirectUri: string;
 	codeChallenge: string;
 	scopes: string[];
-	grantedToken?: string;
-	revoked?: boolean;
-	used?: boolean;
+	resource?: string;
 }
 
 function parseMicroformats(doc: htmlParser.HTMLElement, baseUrl: string, id: string): { name: string | null; logo: string | null; } {
@@ -167,13 +198,14 @@ function parseMicroformats(doc: htmlParser.HTMLElement, baseUrl: string, id: str
 	return { name, logo };
 }
 
-async function discoverClientInformation(logger: Logger, httpRequestService: HttpRequestService, id: string): Promise<ClientInformation> {
+async function discoverClientInformation(logger: Logger, httpRequestService: HttpRequestService, id: string, metadataFetcher?: typeof fetchOAuthClientMetadata, requireCimd = false): Promise<ClientInformation> {
 	try {
-		const res = await httpRequestService.send(id);
+		const res = await (metadataFetcher ? metadataFetcher(id) : httpRequestService.send(id));
 
 		const redirectUris: string[] = [];
 		let name = id;
 		let logo: string | null = null;
+		let cimd = false;
 
 		// https://indieauth.spec.indieweb.org/#redirect-url
 		// "The client SHOULD publish one or more <link> tags or Link HTTP headers with a rel attribute
@@ -187,7 +219,7 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 		}
 
 		const contentType = res.headers.get('content-type');
-		const mediaType = contentType ? contentType.split(';')[0].trim() : null;
+		const mediaType = contentType ? contentType.split(';')[0].trim().toLowerCase() : null;
 		if (mediaType === 'application/json') {
 			// Client discovery via JSON document (11 July 2024 spec)
 			// https://indieauth.spec.indieweb.org/#client-metadata
@@ -195,25 +227,58 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 			// client metadata defined in [RFC7591], the minimum properties for an IndieAuth
 			// client defined below."
 
-			const json = await res.json() as {
+			const document: unknown = await res.json();
+			if (document === null || typeof document !== 'object' || Array.isArray(document)) {
+				throw new InvalidRequestError('Invalid client metadata document');
+			}
+			const json = document as {
 				client_id: string;
 				client_name?: string;
 				client_uri: string;
 				logo_uri?: string;
 				redirect_uris?: string[];
+				token_endpoint_auth_methods_supported?: unknown;
+				token_endpoint_auth_method?: unknown;
+				grant_types?: unknown;
+				response_types?: unknown;
 			};
 
 			// https://indieauth.spec.indieweb.org/#client-metadata-li-1
 			// "The authorization server MUST verify that the client_id in the document matches the
 			// client_id of the URL where the document was retrieved."
-			if (json.client_id !== id) {
+			// Recognize overlapping client formats using the document and resource-request context.
+			// Without a resource, a valid IndieAuth client_uri marker takes precedence over optional auth fields.
+			const legacyClientUri = typeof json.client_uri === 'string' && json.client_uri.length > 0 && new URL(id).href.startsWith(json.client_uri);
+			cimd = requireCimd || !legacyClientUri;
+			if (cimd && !metadataFetcher) throw new InvalidRequestError('CIMD requires an HTTPS client ID with a non-root path');
+			if (json.client_id !== (cimd ? id : new URL(id).href)) {
 				throw new InvalidRequestError('client_id in the document does not match the client_id URL');
 			}
 
-			// https://indieauth.spec.indieweb.org/#client-metadata-li-1
-			// "The client_uri MUST be a prefix of the client_id."
-			if (!json.client_uri || !id.startsWith(json.client_uri)) {
-				throw new InvalidRequestError('client_uri is not a prefix of client_id');
+			if (cimd) {
+				if (typeof json.client_name !== 'string' || !json.client_name.trim() || json.client_name.length > 256) {
+					throw new InvalidRequestError('Client metadata requires a client_name');
+				}
+				// The plural capability list takes precedence over the legacy preference.
+				const methods = json.token_endpoint_auth_methods_supported !== undefined ? json.token_endpoint_auth_methods_supported : [json.token_endpoint_auth_method ?? 'client_secret_basic'];
+				if (!Array.isArray(methods) || !methods.every(method => typeof method === 'string') || !methods.includes('none')) {
+					throw new InvalidRequestError('Client does not support public-client authentication');
+				}
+				if (!Array.isArray(json.redirect_uris) || json.redirect_uris.length === 0 || !json.redirect_uris.every(uri => typeof uri === 'string')) {
+					throw new InvalidRequestError('Client redirect_uris must be a nonempty string array');
+				}
+				for (const uri of json.redirect_uris) {
+					if (!isAllowedCimdRedirectUri(uri)) {
+						throw new InvalidRequestError('Invalid client redirect URI');
+					}
+				}
+				if ((json.grant_types !== undefined && (!Array.isArray(json.grant_types) || !json.grant_types.every(value => typeof value === 'string') || !json.grant_types.includes('authorization_code'))) ||
+					(json.response_types !== undefined && (!Array.isArray(json.response_types) || !json.response_types.every(value => typeof value === 'string') || !json.response_types.includes('code')))) {
+					throw new InvalidRequestError('Client does not support authorization code');
+				}
+				// CIMD redirect values are absolute and compared exactly, not URL-normalized.
+				redirectUris.length = 0;
+				redirectUris.push(...json.redirect_uris);
 			}
 
 			if (typeof json.client_name === 'string') {
@@ -225,10 +290,11 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 				logo = new URL(json.logo_uri, res.url).toString();
 			}
 
-			if (Array.isArray(json.redirect_uris)) {
+			if (!cimd && Array.isArray(json.redirect_uris)) {
 				redirectUris.push(...json.redirect_uris.filter((uri): uri is string => typeof uri === 'string'));
 			}
 		} else {
+			if (requireCimd) throw new InvalidRequestError('Resource authorization requires application/json client metadata');
 			// Client discovery via HTML microformats (12 February 2022 spec)
 			// https://indieauth.spec.indieweb.org/20220212/#client-information-discovery
 			// "Authorization servers SHOULD support parsing the [h-app] Microformat from the client_id,
@@ -251,13 +317,14 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 		}
 
 		return {
-			id,
-			redirectUris: redirectUris.map(uri => new URL(uri, res.url).toString()),
+			id: cimd ? id : new URL(id).href,
+			cimd,
+			redirectUris: cimd ? redirectUris : redirectUris.map(uri => new URL(uri, res.url).toString()),
 			name: typeof name === 'string' ? name : id,
 			logo,
 		};
 	} catch (err) {
-		logger.error('Error while fetching client information', { err });
+		logger.error('Error while fetching client information');
 		if (err instanceof StatusError) {
 			throw new InvalidRequestError('Failed to fetch client information');
 		}
@@ -274,8 +341,9 @@ async function discoverClientInformation(logger: Logger, httpRequestService: Htt
 }
 
 function firstValue(value: unknown | unknown[] | undefined): string | undefined {
-	const firstElement = Array.isArray(value) ? value[0] : value;
-	return typeof firstElement === 'string' ? firstElement : undefined;
+	if (Array.isArray(value)) throw new InvalidRequestError('Repeated OAuth parameter');
+	if (typeof value === 'string' && value.length > 4096) throw new InvalidRequestError('OAuth parameter is too long');
+	return typeof value === 'string' ? value : undefined;
 }
 
 function normalizeScope(scope: string | string[] | undefined): string[] {
@@ -343,9 +411,6 @@ function normalizeOAuthProviderError(error: unknown): OAuthProviderError {
 	}
 
 	const wrapped = new InvalidRequestError('request is invalid');
-	if (error instanceof Error) {
-		wrapped.error_description = error.message;
-	}
 	return wrapped;
 }
 
@@ -397,8 +462,7 @@ function registerFormBodyParser(fastify: FastifyInstance): void {
 
 @Injectable()
 export class OAuth2ProviderService implements OnApplicationShutdown {
-	#authorizationTransactionCache: MemoryKVCache<AuthorizationTransaction>;
-	#grantCodeCache: MemoryKVCache<AuthorizationCodeGrant>;
+	#state: OAuthStateStore;
 	#logger: Logger;
 
 	constructor(
@@ -413,10 +477,17 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		private cacheService: CacheService,
 		private htmlTemplateService: HtmlTemplateService,
 		loggerService: LoggerService,
+		private roleService: RoleService,
+		@Inject(DI.redis) redis: Redis.Redis,
+		private readonly authenticateService: AuthenticateService,
 	) {
-		this.#authorizationTransactionCache = new MemoryKVCache<AuthorizationTransaction>(1000 * 60 * 5);
-		this.#grantCodeCache = new MemoryKVCache<AuthorizationCodeGrant>(1000 * 60 * 5);
+		this.#state = new OAuthStateStore(redis);
 		this.#logger = loggerService.getLogger('oauth');
+	}
+
+	/** Production metadata uses a direct, bounded public-network fetcher. */
+	public async fetchClientMetadata(id: string) {
+		return await fetchOAuthClientMetadata(id);
 	}
 
 	async #resolveAuthorizationRequest(params: OAuthRequestParameters): Promise<AuthorizationRequestSeed> {
@@ -427,8 +498,12 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		const codeChallenge = firstValue(params.code_challenge);
 		const codeChallengeMethod = firstValue(params.code_challenge_method);
 		const requestedScope = normalizeScope(params.scope);
+		const resource = firstValue(params.resource);
+		const customizePermissions = parsePermissionCustomization(params.misskey_customize_permissions)
+			|| resource === new URL('/mcp', this.config.url).href;
+		this.#validateResource(resource, requestedScope);
 
-		this.#logger.info(`Validating authorization parameters, with client_id: ${clientId}, redirect_uri: ${redirectUriValue}, scope: ${requestedScope.join(' ')}`);
+		this.#logger.info('Validating authorization parameters');
 
 		if (responseType !== 'code') {
 			throw createUnsupportedResponseTypeError();
@@ -439,12 +514,13 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		}
 
 		const clientUrl = validateClientId(clientId);
+		const strictRetrieval = resource !== undefined || (clientUrl.protocol === 'https:' && clientUrl.pathname !== '/');
 
 		// https://indieauth.spec.indieweb.org/#client-information-discovery
 		// "the server may want to resolve the domain name first and avoid fetching the document
 		// if the IP address is within the loopback range defined by [RFC5735]
 		// or any other implementation-specific internal IP address."
-		if (process.env.NODE_ENV !== 'test' || process.env.MISSKEY_TEST_CHECK_IP_RANGE === '1') {
+		if (!strictRetrieval && (process.env.NODE_ENV !== 'test' || process.env.MISSKEY_TEST_CHECK_IP_RANGE === '1')) {
 			const lookup = await dns.lookup(clientUrl.hostname);
 			if (ipaddr.parse(lookup.address).range() !== 'unicast') {
 				throw new InvalidRequestError('client_id resolves to disallowed IP range.');
@@ -452,7 +528,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		}
 
 		// Find client information from the remote.
-		const clientInfo = await discoverClientInformation(this.#logger, this.httpRequestService, clientUrl.href);
+		const clientInfo = await discoverClientInformation(this.#logger, this.httpRequestService, strictRetrieval ? clientId : clientUrl.href, strictRetrieval ? this.fetchClientMetadata.bind(this) : undefined, resource !== undefined);
 
 		// Require the redirect URI to be included in an explicit list, per
 		// https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.1.3
@@ -461,11 +537,13 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		}
 
 		return {
+			customizePermissions,
 			clientInfo,
 			clientId: clientInfo.id,
 			redirectUri: redirectUriValue,
 			state,
 			requestedScope,
+			resource,
 			codeChallenge,
 			codeChallengeMethod,
 		};
@@ -473,7 +551,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 
 	#finalizeAuthorizationRequest(seed: AuthorizationRequestSeed): AuthorizationRequest {
 		const scopes = [...new Set(seed.requestedScope)].filter(scope => (<readonly string[]>kinds).includes(scope));
-		if (!seed.requestedScope.length || !scopes.length) {
+		if (!scopes.length && (seed.requestedScope.length > 0 || !seed.customizePermissions)) {
 			throw new InvalidScopeError('`scope` parameter has no known scope', seed.requestedScope.join(' '));
 		}
 
@@ -483,21 +561,33 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		if (typeof seed.codeChallenge !== 'string') {
 			throw new InvalidRequestError('`code_challenge` parameter is required');
 		}
+		if (!/^[A-Za-z0-9_-]{43}$/.test(seed.codeChallenge)) {
+			throw new InvalidRequestError('Invalid S256 code_challenge');
+		}
 		if (seed.codeChallengeMethod !== 'S256') {
 			throw new InvalidRequestError('`code_challenge_method` parameter must be set as S256');
 		}
 
 		return {
+			customizePermissions: seed.customizePermissions,
 			clientId: seed.clientId,
 			redirectUri: seed.redirectUri,
 			state: seed.state,
 			scopes,
 			codeChallenge: seed.codeChallenge,
 			codeChallengeMethod: seed.codeChallengeMethod,
+			resource: seed.resource,
 		};
 	}
 
 	async #findUserByLoginToken(loginToken: string): Promise<MiLocalUser> {
+		if (loginToken.startsWith('bs_')) {
+			try {
+				const [user, app] = await this.authenticateService.authenticate(loginToken);
+				if (user && app === null) return user;
+			} catch { /* Authentication failure remains an invalid consent request. */ }
+			throw new InvalidRequestError('No such user');
+		}
 		const user = await this.cacheService.localUserByNativeTokenCache.fetch(loginToken,
 			() => this.usersRepository.findOneBy({ token: loginToken }) as Promise<MiLocalUser | null>);
 		if (!user) {
@@ -507,12 +597,10 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		return user;
 	}
 
-	async #revokeGrantCode(granted: AuthorizationCodeGrant, code: string): Promise<void> {
-		this.#logger.info(`Detected multiple code use from ${granted.clientId} for user ${granted.userId}. Revoking the code.`);
-		this.#grantCodeCache.delete(code);
-		granted.revoked = true;
-		if (granted.grantedToken) {
-			await this.accessTokensRepository.delete({ token: granted.grantedToken });
+	#validateResource(resource: string | undefined, scopes: string[]): void {
+		const canonical = new URL('/mcp', this.config.url).href;
+		if ((resource !== undefined && resource !== canonical) || (scopes.includes('access:mcp') && resource !== canonical)) {
+			throw new InvalidRequestError('Invalid or missing resource');
 		}
 	}
 
@@ -526,6 +614,8 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 			scopes_supported: kinds,
 			response_types_supported: ['code'],
 			grant_types_supported: ['authorization_code'],
+			token_endpoint_auth_methods_supported: ['none'],
+			client_id_metadata_document_supported: true,
 			service_documentation: 'https://misskey-hub.net',
 			code_challenge_methods_supported: ['S256'],
 			authorization_response_iss_parameter_supported: true,
@@ -539,11 +629,11 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		fastify.addHook('onRequest', (request, reply, done) => {
 			// クリックジャッキング防止のためiFrameの中に入れられないようにする
 			reply.header('X-Frame-Options', 'DENY');
-			reply.header('Content-Security-Policy', "frame-ancestors 'none'");
+			reply.header('Content-Security-Policy', 'frame-ancestors \'none\'');
 			done();
 		});
 
-		fastify.get('/authorize', async (request, reply) => {
+		fastify.get('/authorize', { config: { sensitiveAccessLogBody: true } }, async (request, reply) => {
 			let validatedRedirectUri: string | undefined;
 			let state: string | undefined;
 
@@ -555,12 +645,12 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				const authorizationRequest = this.#finalizeAuthorizationRequest(seed);
 
 				const transactionId = secureRndstr(128);
-				this.#authorizationTransactionCache.set(transactionId, {
+				await this.#state.putTransaction(transactionId, {
 					client: clientInfo,
 					request: authorizationRequest,
 				});
 
-				this.#logger.info(`Rendering authorization page for "${clientInfo.name}"`);
+				this.#logger.info('Rendering authorization page');
 
 				applyNoStore(reply);
 				return await HtmlTemplateService.replyHtml(reply, OAuthPage({
@@ -569,6 +659,9 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					clientName: clientInfo.name,
 					clientLogo: clientInfo.logo ?? undefined,
 					scope: authorizationRequest.scopes,
+					selectablePermissions: authorizationRequest.customizePermissions
+						? eligibleOAuthPermissions(authorizationRequest.resource, true).filter(scope => authorizationRequest.scopes.length === 0 || (scope !== 'access:mcp' && !authorizationRequest.scopes.includes(scope)))
+						: undefined,
 				}));
 			} catch (error) {
 				const OAuthProviderError = normalizeOAuthProviderError(error);
@@ -584,7 +677,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 			}
 		});
 
-		fastify.post('/decision', async (request, reply) => {
+		fastify.post('/decision', { config: { sensitiveAccessLogBody: true } }, async (request, reply) => {
 			try {
 				const body = toRequestParameters(request.body);
 				const transactionId = firstValue(body.transaction_id);
@@ -592,11 +685,10 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					throw new InvalidRequestError('Missing transaction ID');
 				}
 
-				const transaction = this.#authorizationTransactionCache.get(transactionId);
+				const transaction = await this.#state.takeTransaction<AuthorizationTransaction>(transactionId);
 				if (!transaction) {
 					throw createForbiddenAccessDenied('Invalid or expired transaction ID');
 				}
-				this.#authorizationTransactionCache.delete(transactionId);
 
 				const cancel = !!firstValue(body.cancel);
 				this.#logger.info(`Received the decision. Cancel: ${cancel}`);
@@ -613,18 +705,29 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					throw new InvalidRequestError('No user');
 				}
 
-				this.#logger.info(`Checking the user before sending authorization code to ${transaction.client.id}`);
+				this.#logger.info('Checking user consent');
 				const user = await this.#findUserByLoginToken(loginToken);
+				const decisionParameters = request.body !== null && typeof request.body === 'object' ? request.body : body;
+				if ('misskey_customize_permissions' in decisionParameters || 'customizePermissions' in decisionParameters) throw new InvalidRequestError('Customization mode is fixed by the authorization request');
+				const allowAdditions = transaction.request.resource === new URL('/mcp', this.config.url).href
+					|| transaction.request.customizePermissions === true;
+				if (!allowAdditions && transaction.request.scopes.length === 0) throw new InvalidScopeError('An explicit scope or permission customization is required');
+				const scopes = selectedOAuthScopes(transaction.request.scopes, body.selected_scope,
+					eligibleOAuthPermissions(transaction.request.resource,
+						allowAdditions && await this.roleService.isAdministrator(user)), allowAdditions);
+				this.#validateResource(transaction.request.resource, scopes);
 
-				this.#logger.info(`Sending authorization code on behalf of user ${user.id} to ${transaction.client.id} through ${transaction.request.redirectUri}, with scope: [${transaction.request.scopes}]`);
+				this.#logger.info('Issuing authorization code after consent');
 
 				const code = secureRndstr(128);
-				this.#grantCodeCache.set(code, {
+				await this.#state.putCode(code, {
 					clientId: transaction.client.id,
+					cimd: transaction.client.cimd,
 					userId: user.id,
 					redirectUri: transaction.request.redirectUri,
 					codeChallenge: transaction.request.codeChallenge,
-					scopes: transaction.request.scopes,
+					scopes,
+					resource: transaction.request.resource,
 				});
 
 				redirectWithQuery(reply, transaction.request.redirectUri, appendIssuer({
@@ -636,7 +739,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 			}
 		});
 
-		fastify.all('/*', async (_request, reply) => {
+		fastify.all('/*', { config: { sensitiveAccessLogBody: true } }, async (_request, reply) => {
 			reply.code(404);
 			reply.send({
 				error: {
@@ -654,7 +757,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 		registerFormBodyParser(fastify);
 		fastify.register(fastifyCors);
 
-		fastify.post('', async (request, reply) => {
+		fastify.post('', { config: { sensitiveAccessLogBody: true } }, async (request, reply) => {
 			applyNoStore(reply);
 
 			try {
@@ -671,26 +774,26 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				const clientId = firstValue(body.client_id);
 				const redirectUriValue = firstValue(body.redirect_uri);
 				const codeVerifier = firstValue(body.code_verifier);
+				const resource = firstValue(body.resource);
+				const clientSecret = firstValue(body.client_secret);
+				if ((clientSecret !== undefined && clientSecret !== '') || body.client_assertion !== undefined || body.client_assertion_type !== undefined || request.headers.authorization !== undefined) {
+					throw new InvalidRequestError('Only public-client authentication is supported');
+				}
 
 				this.#logger.info('Checking the received authorization code for the exchange');
 				if (!code) {
 					throw new InvalidGrantError('grant request is invalid');
 				}
 
-				const granted = this.#grantCodeCache.get(code);
-				if (!granted) {
+				const claim = await this.#state.claimCode<AuthorizationCodeGrant>(code);
+				if (!claim.claimed || !claim.grant) {
+					if (claim.replayTokenId) await this.accessTokensRepository.delete({ id: claim.replayTokenId });
 					throw new InvalidGrantError('grant request is invalid');
 				}
-
-				// https://datatracker.ietf.org/doc/html/rfc6749.html#section-4.1.2
-				// "If an authorization code is used more than once, the authorization server
-				// MUST deny the request and SHOULD revoke (when possible) all tokens
-				// previously issued based on that authorization code."
-				if (granted.used) {
-					await this.#revokeGrantCode(granted, code);
-					throw new InvalidGrantError('grant request is invalid');
-				}
-				granted.used = true;
+				const granted = claim.grant;
+				if (granted.cimd && body.client_secret !== undefined) throw new InvalidRequestError('Only public-client authentication is supported');
+				if (resource !== granted.resource) throw new InvalidGrantError('grant request is invalid');
+				this.#validateResource(resource, granted.scopes);
 
 				// https://datatracker.ietf.org/doc/html/rfc6749.html#section-4.1.3
 				if (clientId !== granted.clientId || redirectUriValue !== granted.redirectUri) {
@@ -698,7 +801,7 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				}
 
 				// https://datatracker.ietf.org/doc/html/rfc7636.html#section-4.6
-				if (!codeVerifier) {
+				if (!codeVerifier || !/^[A-Za-z0-9._~-]{43,128}$/.test(codeVerifier)) {
 					throw new InvalidGrantError('grant request is invalid');
 				}
 
@@ -710,9 +813,14 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				const accessToken = secureRndstr(128);
 				const now = new Date();
 
+				const tokenId = this.idService.gen(now.getTime());
+
+				// Retain the row identifier before insertion so a worker crash does not hide it from replay cleanup.
+				if (!await this.#state.publishToken(code, tokenId)) throw new InvalidGrantError('grant request is invalid');
+
 				// NOTE: we don't have a setup for automatic token expiration
 				await this.accessTokensRepository.insert({
-					id: this.idService.gen(now.getTime()),
+					id: tokenId,
 					lastUsedAt: now,
 					userId: granted.userId,
 					token: accessToken,
@@ -721,14 +829,13 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 					permission: granted.scopes,
 				});
 
-				if (granted.revoked) {
-					this.#logger.info('Canceling the token as the authorization code was revoked in parallel during the process.');
-					await this.accessTokensRepository.delete({ token: accessToken });
-					throw new InvalidGrantError('grant request is invalid');
+				try {
+					if (!await this.#state.publishToken(code, tokenId)) throw new InvalidGrantError('grant request is invalid');
+				} catch (error) {
+					await this.accessTokensRepository.delete({ id: tokenId });
+					throw error;
 				}
-
-				granted.grantedToken = accessToken;
-				this.#logger.info(`Generated access token for ${granted.clientId} for user ${granted.userId}, with scope: [${granted.scopes}]`);
+				this.#logger.info('Generated OAuth access token');
 
 				reply.send({
 					access_token: accessToken,
@@ -739,12 +846,16 @@ export class OAuth2ProviderService implements OnApplicationShutdown {
 				sendOAuthProviderError(reply, normalizeOAuthProviderError(error));
 			}
 		});
+
+		fastify.all('/*', { config: { sensitiveAccessLogBody: true } }, async (_request, reply) => {
+			applyNoStore(reply);
+			reply.code(404).send({ error: 'invalid_request', error_description: 'Unknown OAuth endpoint' });
+		});
 	}
 
 	@bindThis
 	public dispose(): void {
-		this.#authorizationTransactionCache.dispose();
-		this.#grantCodeCache.dispose();
+		// State expires in shared Redis; this service does not own the Redis connection.
 	}
 
 	@bindThis

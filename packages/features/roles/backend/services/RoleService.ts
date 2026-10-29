@@ -27,10 +27,24 @@ import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEven
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
+
+import type { PackedJsonValue } from '../../../users/backend/json-value.schema.js';
+
+/** JSON columns accept the original finite object payload without interpreting its domain shape. */
+export type RoleWriteValues = Omit<Partial<MiRole>, 'condFormula' | 'policies'> & {
+	condFormula?: { [key: string]: PackedJsonValue };
+	policies?: { [key: string]: PackedJsonValue };
+};
+
+/** Type the actual JSON-column write API while keeping the original repository calls. */
+export interface RoleStorage extends Pick<RolesRepository, 'findBy' | 'findOneBy' | 'findOneByOrFail' | 'delete'> {
+	insertOne(values: RoleWriteValues): Promise<MiRole>;
+	update(criteria: Parameters<RolesRepository['update']>[0], values: RoleWriteValues): ReturnType<RolesRepository['update']>;
+}
 
 // misskey-js の rolePolicies と同期すべし
 export type RolePolicies = {
@@ -151,7 +165,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		private usersRepository: UsersRepository,
 
 		@Inject(DI.rolesRepository)
-		private rolesRepository: RolesRepository,
+		private rolesRepository: RoleStorage,
 
 		@Inject(DI.roleAssignmentsRepository)
 		private roleAssignmentsRepository: RoleAssignmentsRepository,
@@ -267,7 +281,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				}
 				// サスペンド済みユーザである
 				case 'isSuspended': {
-					return user.isSuspended;
+					return this.userEntityService.isSuspendedEither(user);
 				}
 				// 鍵アカウントユーザである
 				case 'isLocked': {
@@ -333,20 +347,20 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async getUserAssigns(userId: MiUser['id']) {
+	public async getUserAssigns(userId: MiUser['id'], fresh = false) {
 		const now = Date.now();
-		let assigns = await this.roleAssignmentByUserIdCache.fetch(userId, () => this.roleAssignmentsRepository.findBy({ userId }));
+		let assigns = await (fresh ? this.roleAssignmentsRepository.findBy({ userId }) : this.roleAssignmentByUserIdCache.fetch(userId, () => this.roleAssignmentsRepository.findBy({ userId })));
 		// 期限切れのロールを除外
 		assigns = assigns.filter(a => a.expiresAt == null || (a.expiresAt.getTime() > now));
 		return assigns;
 	}
 
 	@bindThis
-	public async getUserRoles(userId: MiUser['id']) {
-		const roles = await this.rolesCache.fetch(() => this.rolesRepository.findBy({}));
-		const assigns = await this.getUserAssigns(userId);
+	public async getUserRoles(userId: MiUser['id'], fresh = false) {
+		const roles = await (fresh ? this.rolesRepository.findBy({}) : this.rolesCache.fetch(() => this.rolesRepository.findBy({})));
+		const assigns = await this.getUserAssigns(userId, fresh);
 		const assignedRoles = roles.filter(r => assigns.map(x => x.roleId).includes(r.id));
-		const user = roles.some(r => r.target === 'conditional') ? await this.cacheService.findUserById(userId) : null;
+		const user = roles.some(r => r.target === 'conditional') ? await (fresh ? this.usersRepository.findOneByOrFail({ id: userId }) : this.cacheService.findUserById(userId)) : null;
 		const matchedCondRoles = roles.filter(r => r.target === 'conditional' && this.evalCond(user!, assignedRoles, r.condFormula));
 		return [...assignedRoles, ...matchedCondRoles];
 	}
@@ -374,12 +388,12 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async getUserPolicies(userId: MiUser['id'] | null): Promise<RolePolicies> {
+	public async getUserPolicies(userId: MiUser['id'] | null, fresh = false): Promise<RolePolicies> {
 		const basePolicies = { ...DEFAULT_POLICIES, ...this.meta.policies };
 
 		if (userId == null) return basePolicies;
 
-		const roles = await this.getUserRoles(userId);
+		const roles = await this.getUserRoles(userId, fresh);
 
 		function calc<T extends keyof RolePolicies>(name: T, aggregate: (values: RolePolicies[T][]) => RolePolicies[T]) {
 			if (roles.length === 0) return aggregate([basePolicies[name]]);
@@ -456,9 +470,9 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async isModerator(user: { id: MiUser['id'] } | null): Promise<boolean> {
+	public async isModerator(user: { id: MiUser['id'] } | null, fresh = false): Promise<boolean> {
 		if (user == null) return false;
-		return (this.meta.rootUserId === user.id) || (await this.getUserRoles(user.id)).some(r => r.isModerator || r.isAdministrator);
+		return (this.meta.rootUserId === user.id) || (await this.getUserRoles(user.id, fresh)).some(r => r.isModerator || r.isAdministrator);
 	}
 
 	@bindThis
@@ -663,7 +677,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async create(values: Partial<MiRole>, moderator?: MiUser): Promise<MiRole> {
+	public async create(values: RoleWriteValues, moderator?: MiUser): Promise<MiRole> {
 		const date = new Date();
 		const created = await this.rolesRepository.insertOne({
 			id: this.idService.gen(date.getTime()),
@@ -699,7 +713,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	}
 
 	@bindThis
-	public async update(role: MiRole, params: Partial<MiRole>, moderator?: MiUser): Promise<void> {
+	public async update(role: MiRole, params: RoleWriteValues, moderator?: MiUser): Promise<void> {
 		const date = new Date();
 		await this.rolesRepository.update(role.id, {
 			updatedAt: date,

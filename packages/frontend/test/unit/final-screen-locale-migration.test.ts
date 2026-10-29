@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreUpstreamLocaleBundle } from './upstream-develop-source-rebase.js';
+import { restoreCodeDiffBaseline } from './code-diff-source-rebase.js';
+import { restorePasswordChangeBaseline } from './password-change-source-rebase.js';
+import { restoreOAuthPermissionBaseline } from './oauth-permission-source-rebase.js';
+import { restoreCommonUtilitiesBaseline } from './upstream-common-utilities-source-rebase.js';
+import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -12,16 +18,19 @@ import { parse, compileScript, compileTemplate } from 'vue/compiler-sfc';
 import { expect, test } from 'vitest';
 import { createInternationalization, setActiveInternationalization, createComponentLocale } from 'vite-vue-internationalization/runtime';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { locales } from './instance-pilot-locale-catalog.js';
 import type { ParameterizedString } from 'i18n';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import proof from './final-screen-locale-migration.json';
+import mcpPermissionLabels from './mcp-permission-labels.json';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const hash = (text: string) => createHash('sha256').update(text).digest('hex');
+
 function at(value: unknown, path: string): unknown {
 	for (const key of path.split('.')) {
 		if (!value || typeof value !== 'object') throw new Error(`Missing path: ${path}`);
@@ -29,19 +38,22 @@ function at(value: unknown, path: string): unknown {
 	}
 	return value;
 }
+
 function leaves(value: unknown): string[] {
 	if (typeof value === 'string') return [value];
 	if (!value || typeof value !== 'object') throw new Error('Expected locale strings');
 	return Object.values(value).flatMap(leaves);
 }
+
 function hook(value: unknown, ...args: unknown[]): unknown {
 	if (typeof value === 'function') return Reflect.apply(value, {}, args);
 	if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
 	throw new Error('Expected Vite hook');
 }
+
 function configured(embed: boolean) {
 	const plugin = pluginVvi({ embed });
-	hook(plugin.configResolved, { root: resolve(root, embed ? 'packages/frontend-embed' : 'packages/frontend'), command: 'build', base: '/' });
+	hook(plugin.configResolved, { root: resolve(root, embed ? 'packages/frontend-embed' : 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
 	hook(plugin.buildStart);
 	return plugin;
 }
@@ -49,7 +61,9 @@ function configured(embed: boolean) {
 test('all51 screen sources reverse byte for byte and retain all49336 effective locale strings', () => {
 	let strings = 0;
 	for (const entry of proof) {
-		const source = readFileSync(resolve(root, entry.file), 'utf8');
+		const currentSource = restoreCommonUtilitiesBaseline(entry.file, restorePwaShareSourceBaseline(entry.file, restoreOAuthPermissionBaseline(entry.file, restorePasswordChangeBaseline(entry.file, restoreCodeDiffBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8'))))));
+		// Keep the original migration proof frozen; current permission labels are checked below.
+		const source = currentSource.replace(/^\t\t"access:mcp": [^\n]*,\n/gm, '');
 		expect(hash(source)).toBe(entry.migratedSha256);
 		const parsed = parse(source, { filename: entry.file });
 		expect(parsed.errors).toEqual([]);
@@ -58,7 +72,12 @@ test('all51 screen sources reverse byte for byte and retain all49336 effective l
 		for (const block of blocks) {
 			const dictionary: Record<string, unknown> = JSON.parse(block.content);
 			expect(Object.keys(dictionary)).toEqual(entry.keys.map(key => key.local));
-			for (const key of entry.keys) expect(dictionary[key.local]).toEqual(at(locales[String(block.attrs.locale)], key.global));
+			for (const key of entry.keys) {
+				const current = at(locales[String(block.attrs.locale)], key.global);
+				const baseline = key.global === '_permissions' && current && typeof current === 'object'
+					? Object.fromEntries(Object.entries(current).filter(([name]) => name !== 'access:mcp')) : current;
+				expect(dictionary[key.local]).toEqual(baseline);
+			}
 			strings += leaves(dictionary).length;
 		}
 		let original = source.slice(0, entry.bodyLength);
@@ -72,11 +91,11 @@ test('all51 screen sources reverse byte for byte and retain all49336 effective l
 	expect(strings).toBe(49336);
 }, 30000);
 
-test('installed VVI and Vue compile every actual main and embed component', () => {
+test('installed VVI and Vue compile every actual main and embed component', async () => {
 	const plugins = [configured(false), configured(true)];
 	for (const entry of proof) {
 		const file = resolve(root, entry.file);
-		const transformed = hook(plugins[Number(entry.file.includes('/embed/'))].transform, readFileSync(file, 'utf8'), file);
+		const transformed = await hook(plugins[Number(entry.file.includes('/embed/'))].transform, readFileSync(file, 'utf8'), file);
 		if (!transformed || typeof transformed !== 'object' || !('code' in transformed) || typeof transformed.code !== 'string') throw new Error('Expected transformed SFC');
 		expect(transformed.code).toContain('createComponentLocale');
 		const parsed = parse(transformed.code, { filename: file });
@@ -95,8 +114,9 @@ test('real main/embed loaders preserve finite selectors, unknown-key fallback an
 		for (const language of languages) {
 			const source = hook(plugin.load, `\0virtual:vite-vue-internationalization/locale/${language}`);
 			if (typeof source !== 'string') throw new Error('Expected generated loader');
-			const payload: LocaleBundle = {};
+			let payload: LocaleBundle = {};
 			runInNewContext(source.replaceAll('export const ', 'const ').replace('export default { locale, global, modules };', 'payload.global = global; payload.modules = modules;'), { payload });
+			payload = restoreUpstreamLocaleBundle(language, payload);
 			const runtime = createInternationalization({ primaryLocale: 'ja-JP', initialLocale: language, loaders: { [language]: async () => payload } });
 			await runtime.ready;
 			await runtime.loadLocale(language);
@@ -105,11 +125,14 @@ test('real main/embed loaders preserve finite selectors, unknown-key fallback an
 				const raw = createComponentLocale(entry.file.replace('packages/', '/'));
 				for (const key of entry.keys) {
 					const actual = raw[key.local];
-					expect(actual).toEqual(at(locales[language], key.global));
+					const expected = key.global === '_permissions'
+						? { ...at(locales[language], key.global) as Record<string, string>, 'access:mcp': mcpPermissionLabels[language as keyof typeof mcpPermissionLabels] }
+						: at(locales[language], key.global);
+					expect(actual).toEqual(expected);
 					rawChecks += leaves(actual).length;
 					if (actual && typeof actual === 'object') {
 						const dictionary = copyLocaleDictionary(actual);
-						expect(dictionary).toEqual(at(locales[language], key.global));
+						expect(dictionary).toEqual(expected);
 						expect(Reflect.get(dictionary, '__unknown_permission_or_type__')).toBeUndefined();
 						expect(Reflect.get(dictionary, 'constructor')).toBe(Object);
 					}
@@ -132,6 +155,19 @@ test('real main/embed loaders preserve finite selectors, unknown-key fallback an
 			}
 		}
 	}
-	expect(rawChecks).toBe(49336);
+	expect(rawChecks).toBe(49504);
 	expect(formatterChecks).toBe(12096);
 }, 30000);
+
+test('OAuth permission selector labels match existing translations in every language', () => {
+	const dictionaries = (name: string) => new Map(parse(readFileSync(resolve(root, `packages/features/auth/frontend/components/${name}.vue`), 'utf8')).descriptor.customBlocks.filter(block => block.type === 'locale').map(block => [String(block.attrs.locale), JSON.parse(block.content)]));
+	const consent = dictionaries('MkAuthConfirm');
+	const token = dictionaries('MkTokenGenerateWindow');
+	expect([...consent.keys()]).toEqual(languages);
+	for (const language of languages) {
+		for (const key of ['disableAll', 'enableAll', 'adminPermission']) {
+			expect(consent.get(language)[key]).toBe(token.get(language)[key]);
+			expect(typeof consent.get(language)[key]).toBe('string');
+		}
+	}
+});

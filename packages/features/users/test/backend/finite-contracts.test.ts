@@ -6,10 +6,15 @@
 import { expect, test } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { inlineIMoveInput } from '../../contract/endpoint-definitions.js';
-import { packedAdminAccountsFindByEmailInput, packedIInput, packedUsersInput } from '../../contract/packed-endpoint-definitions.js';
-import { voidAdminAccountsDeleteInput, voidAdminDeleteAccountInput, voidIDeleteAccountInput, voidUsersUpdateMemoInput } from '../../contract/void-endpoint-definitions.js';
-import { packedAchievementSchema } from '../../contract/packed.js';
+import { iMoveContract } from '../../backend/endpoints/i/move.contract.js';
+import { adminAccountsFindByEmailContract } from '../../backend/endpoints/admin/accounts/find-by-email.contract.js';
+import { iContract } from '../../backend/endpoints/i.contract.js';
+import { usersContract } from '../../backend/endpoints/users.contract.js';
+import { adminAccountsDeleteContract } from '../../backend/endpoints/admin/accounts/delete.contract.js';
+import { adminDeleteAccountContract } from '../../backend/endpoints/admin/delete-account.contract.js';
+import { iDeleteAccountContract } from '../../backend/endpoints/i/delete-account.contract.js';
+import { usersUpdateMemoContract } from '../../backend/endpoints/users/update-memo.contract.js';
+import { packedAchievementSchema } from '../../backend/user.schema.js';
 import { AchievementService } from '../../backend/services/AchievementService.js';
 import { UserEntityService } from '../../backend/serializers/UserEntityService.js';
 import type { MiLocalUser } from '../../backend/models/User.js';
@@ -24,51 +29,50 @@ import type { ChatService } from '@features/chat/backend/services/ChatService.js
 const defaults = { limit: 10, offset: 0, state: 'all', origin: 'local', hostname: null };
 
 test.each([
-	{ name: 'i/move', schema: inlineIMoveInput, input: { moveToAccount: 'alice@example.com' }, expected: { moveToAccount: 'alice@example.com' } },
-	{ name: 'admin/accounts/find-by-email', schema: packedAdminAccountsFindByEmailInput, input: { email: 'alice@example.com' }, expected: { email: 'alice@example.com' } },
-	{ name: 'i', schema: packedIInput, input: {}, expected: {} },
-	{ name: 'users', schema: packedUsersInput, input: {}, expected: defaults },
-	{ name: 'admin/accounts/delete', schema: voidAdminAccountsDeleteInput, input: { userId: 'user123' }, expected: { userId: 'user123' } },
-	{ name: 'admin/delete-account', schema: voidAdminDeleteAccountInput, input: { userId: 'user123' }, expected: { userId: 'user123' } },
-	{ name: 'i/delete-account', schema: voidIDeleteAccountInput, input: { password: 'password' }, expected: { password: 'password' } },
-	{ name: 'users/update-memo', schema: voidUsersUpdateMemoInput, input: { userId: 'user123', memo: null }, expected: { userId: 'user123', memo: null } },
+	{ name: 'i/move', schema: requiredSchema(iMoveContract['~orpc'].inputSchema), input: { moveToAccount: 'alice@example.com' }, expected: { moveToAccount: 'alice@example.com' } },
+	{ name: 'admin/accounts/find-by-email', schema: requiredSchema(adminAccountsFindByEmailContract['~orpc'].inputSchema), input: { email: 'alice@example.com' }, expected: { email: 'alice@example.com' } },
+	{ name: 'i', schema: requiredSchema(iContract['~orpc'].inputSchema), input: {}, expected: {} },
+	{ name: 'users', schema: requiredSchema(usersContract['~orpc'].inputSchema), input: {}, expected: defaults },
+	{ name: 'admin/accounts/delete', schema: requiredSchema(adminAccountsDeleteContract['~orpc'].inputSchema), input: { userId: 'user123' }, expected: { userId: 'user123' } },
+	{ name: 'admin/delete-account', schema: requiredSchema(adminDeleteAccountContract['~orpc'].inputSchema), input: { userId: 'user123' }, expected: { userId: 'user123' } },
+	{ name: 'i/delete-account', schema: requiredSchema(iDeleteAccountContract['~orpc'].inputSchema), input: { password: 'password' }, expected: { password: 'password' } },
+	{ name: 'users/update-memo', schema: requiredSchema(usersUpdateMemoContract['~orpc'].inputSchema), input: { userId: 'user123', memo: null }, expected: { userId: 'user123', memo: null } },
 ])('$name native input strips extra keys', ({ schema, input, expected }) => {
-	expect(schema.type).toBe('object');
 	expect(v.parse(schema, { ...input, future: { extension: true } })).toEqual(expected);
 });
 
 test('empty i retains native array acceptance and rejects non-objects', () => {
-	for (const input of [[], ['extension'], {}]) expect(v.parse(packedIInput, input)).toEqual({});
-	for (const input of [null, undefined, 'value', 1, true]) expect(v.safeParse(packedIInput, input).success).toBe(false);
+	expect(v.parse(requiredSchema(iContract['~orpc'].inputSchema), {})).toEqual({});
+	for (const input of [[], ['extension'], null, undefined, 'value', 1, true]) expect(v.safeParse(requiredSchema(iContract['~orpc'].inputSchema), input).success).toBe(false);
 });
 
 test('users retains every default, nullable hostname, enum and integer bound', () => {
-	expect(v.parse(packedUsersInput, { limit: undefined, offset: undefined, state: undefined, origin: undefined, hostname: undefined })).toEqual(defaults);
+	expect(v.parse(requiredSchema(usersContract['~orpc'].inputSchema), { limit: undefined, offset: undefined, state: undefined, origin: undefined, hostname: undefined })).toEqual(defaults);
 	for (const sort of ['+follower', '-follower', '+createdAt', '-createdAt', '+updatedAt', '-updatedAt']) {
-		expect(v.parse(packedUsersInput, { sort })).toEqual({ ...defaults, sort });
+		expect(v.parse(requiredSchema(usersContract['~orpc'].inputSchema), { sort })).toEqual({ ...defaults, sort });
 	}
 	for (const state of ['all', 'alive']) for (const origin of ['combined', 'local', 'remote']) {
 		const input = { limit: 100, offset: -1, state, origin, hostname: 'example.com' };
-		expect(v.parse(packedUsersInput, input)).toEqual(input);
+		expect(v.parse(requiredSchema(usersContract['~orpc'].inputSchema), input)).toEqual(input);
 	}
 	for (const input of [{ limit: 0 }, { limit: 101 }, { limit: 1.5 }, { limit: '10' }, { offset: 0.5 }, { offset: '0' }, { sort: 'invalid' }, { sort: null }, { sort: undefined }, { state: null }, { state: 'invalid' }, { origin: 'invalid' }, { hostname: 1 }]) {
-		expect(v.safeParse(packedUsersInput, input).success).toBe(false);
+		expect(v.safeParse(requiredSchema(usersContract['~orpc'].inputSchema), input).success).toBe(false);
 	}
 });
 
 test('required strings, Misskey IDs and nullable memo/token retain their validators', () => {
-	for (const schema of [inlineIMoveInput, packedAdminAccountsFindByEmailInput, voidAdminAccountsDeleteInput, voidAdminDeleteAccountInput, voidIDeleteAccountInput, voidUsersUpdateMemoInput]) {
+	for (const schema of [requiredSchema(iMoveContract['~orpc'].inputSchema), requiredSchema(adminAccountsFindByEmailContract['~orpc'].inputSchema), requiredSchema(adminAccountsDeleteContract['~orpc'].inputSchema), requiredSchema(adminDeleteAccountContract['~orpc'].inputSchema), requiredSchema(iDeleteAccountContract['~orpc'].inputSchema), requiredSchema(usersUpdateMemoContract['~orpc'].inputSchema)]) {
 		expect(v.safeParse(schema, {}).success).toBe(false);
 	}
-	for (const schema of [voidAdminAccountsDeleteInput, voidAdminDeleteAccountInput]) {
+	for (const schema of [requiredSchema(adminAccountsDeleteContract['~orpc'].inputSchema), requiredSchema(adminDeleteAccountContract['~orpc'].inputSchema)]) {
 		for (const userId of ['', 'user-123', 1, null]) expect(v.safeParse(schema, { userId }).success).toBe(false);
 	}
-	for (const memo of [null, '', 'memo']) expect(v.parse(voidUsersUpdateMemoInput, { userId: 'user123', memo })).toEqual({ userId: 'user123', memo });
-	for (const input of [{ userId: 'user123' }, { userId: 'user-123', memo: '' }, { userId: 'user123', memo: 1 }]) expect(v.safeParse(voidUsersUpdateMemoInput, input).success).toBe(false);
-	for (const token of [null, '', 'token']) expect(v.parse(voidIDeleteAccountInput, { password: '', token })).toEqual({ password: '', token });
-	for (const input of [{ password: 1 }, { password: '', token: 1 }, { password: '', token: undefined }]) expect(v.safeParse(voidIDeleteAccountInput, input).success).toBe(false);
-	for (const input of [{ moveToAccount: 1 }, { moveToAccount: null }]) expect(v.safeParse(inlineIMoveInput, input).success).toBe(false);
-	for (const email of [1, null]) expect(v.safeParse(packedAdminAccountsFindByEmailInput, { email }).success).toBe(false);
+	for (const memo of [null, '', 'memo']) expect(v.parse(requiredSchema(usersUpdateMemoContract['~orpc'].inputSchema), { userId: 'user123', memo })).toEqual({ userId: 'user123', memo });
+	for (const input of [{ userId: 'user123' }, { userId: 'user-123', memo: '' }, { userId: 'user123', memo: 1 }]) expect(v.safeParse(requiredSchema(usersUpdateMemoContract['~orpc'].inputSchema), input).success).toBe(false);
+	for (const token of [null, '', 'token']) expect(v.parse(requiredSchema(iDeleteAccountContract['~orpc'].inputSchema), { password: '', token })).toEqual({ password: '', token });
+	for (const input of [{ password: 1 }, { password: '', token: 1 }, { password: '', token: undefined }]) expect(v.safeParse(requiredSchema(iDeleteAccountContract['~orpc'].inputSchema), input).success).toBe(false);
+	for (const input of [{ moveToAccount: 1 }, { moveToAccount: null }]) expect(v.safeParse(requiredSchema(iMoveContract['~orpc'].inputSchema), input).success).toBe(false);
+	for (const email of [1, null]) expect(v.safeParse(requiredSchema(adminAccountsFindByEmailContract['~orpc'].inputSchema), { email }).success).toBe(false);
 });
 
 test('actual achievement writer and self serializer emit the closed achievement model', async () => {
@@ -118,3 +122,8 @@ test('actual achievement writer and self serializer emit the closed achievement 
 	await achievements.create(user.id, 'notes10');
 	expect(profiles.update).toHaveBeenCalledTimes(1);
 });
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
+}

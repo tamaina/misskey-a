@@ -3,39 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { referenceReversiGamesDefinition, referenceReversiGamesInput, referenceReversiGamesOutput } from '../../../contract/reference-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { toPackedReversiGameLite } from '../../reversi.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { reversiGamesContract } from './games.contract.js';
 import { Brackets } from 'typeorm';
-import { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
-import { DI } from '@/di-symbols.js';
+import type { ReversiGameEntityService } from '../../serializers/ReversiGameEntityService.js';
 import type { ReversiGamesRepository } from '@features/persistence/backend/repositories/models.js';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-
-const contractProjection = projectEndpointContract(referenceReversiGamesDefinition);
-
-export const meta = {
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof referenceReversiGamesInput, typeof referenceReversiGamesOutput> {
-	constructor(
-		@Inject(DI.reversiGamesRepository)
-		private reversiGamesRepository: ReversiGamesRepository,
-
-		private reversiGameEntityService: ReversiGameEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.reversiGamesRepository.createQueryBuilder('game'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import type { QueryService } from '@features/notes/backend/services/QueryService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface ReversiGamesDependencies {
+	reversiGamesRepository: Pick<ReversiGamesRepository, 'createQueryBuilder'>;
+	reversiGameEntityService: Pick<ReversiGameEntityService, 'packLiteMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery'>;
+}
+export function createReversiGamesProcedure(deps: ReversiGamesDependencies) {
+	return createApiProcedure<MiLocalUser>()(reversiGamesContract)
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.reversiGamesRepository.createQueryBuilder('game'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.innerJoinAndSelect('game.user1', 'user1')
 				.innerJoinAndSelect('game.user2', 'user2');
-
 			if (ps.my && me) {
 				query.andWhere(new Brackets(qb => {
 					qb
@@ -45,10 +33,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 			} else {
 				query.andWhere('game.isStarted = TRUE');
 			}
-
 			const games = await query.take(ps.limit).getMany();
-
-			return await this.reversiGameEntityService.packLiteMany(games);
+			return (await deps.reversiGameEntityService.packLiteMany(games)).map(toPackedReversiGameLite);
 		});
-	}
 }

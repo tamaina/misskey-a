@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
+import { notificationEventName } from '@features/integrations/backend/webhook-events.schema.js';
 import { setTimeout } from 'node:timers/promises';
 import * as Redis from 'ioredis';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
@@ -44,6 +46,7 @@ export class NotificationService implements OnApplicationShutdown {
 		private pushNotificationService: PushNotificationService,
 		private cacheService: CacheService,
 		private userListService: UserListService,
+		private webhookService: UserWebhookService,
 	) {
 	}
 
@@ -182,13 +185,33 @@ export class NotificationService implements OnApplicationShutdown {
 
 		if (packed == null) return null;
 
+		// Enqueue immediately after successful packing, before the unread delay.
+		switch (packed.type) {
+			case 'mention':
+			case 'reply':
+			case 'renote':
+				await this.webhookService.enqueueUserWebhook(notifieeId, packed.type, { note: packed.note }, packed);
+				break;
+			case 'follow':
+				await this.webhookService.enqueueUserWebhook(notifieeId, 'followed', { user: packed.user }, packed);
+				break;
+			case 'reaction':
+				await this.webhookService.enqueueUserWebhook(notifieeId, 'reaction', { note: packed.note, reaction: packed.reaction, user: packed.user }, packed);
+				break;
+			case 'reaction:grouped':
+			case 'renote:grouped':
+				return null;
+			default:
+				await this.webhookService.enqueueUserWebhook(notifieeId, notificationEventName(packed.type), { notification: packed }, packed);
+		}
+
 		// Publish notification event
 		this.globalEventService.publishMainStream(notifieeId, 'notification', packed);
 
 		// 2秒経っても(今回作成した)通知が既読にならなかったら「未読の通知がありますよ」イベントを発行する
 		// テスト通知の場合は即時発行
 		const interval = notification.type === 'test' ? 0 : 2000;
-		setTimeout(interval, 'unread notification', { signal: this.#shutdownController.signal }).then(async () => {
+		await setTimeout(interval, 'unread notification', { signal: this.#shutdownController.signal }).then(async () => {
 			const latestReadNotificationId = await this.redisClient.get(`latestReadNotification:${notifieeId}`);
 			if (latestReadNotificationId && (latestReadNotificationId >= redisId)) return;
 
@@ -251,6 +274,16 @@ export class NotificationService implements OnApplicationShutdown {
 		const { date, additional } = this.idService.parseFull(id);
 		// Redis Stream sequenceはunit64制約があるため、収まらない場合は下位64bitを取る
 		return date.toString() + '-' + BigInt.asUintN(64, additional).toString();
+	}
+
+	/** Read an exact occurrence from the recipient's notification timeline. */
+	@bindThis
+	public async getNotification(userId: MiUser['id'], id: string): Promise<MiNotification | null> {
+		let streamId: string;
+		try { streamId = this.toXListId(id); } catch { return null; }
+		const entries = await this.redisClient.xrange(`notificationTimeline:${userId}`, streamId, streamId);
+		const notification = entries.length > 0 ? JSON.parse(entries[0][1][1]) as MiNotification : null;
+		return notification?.id === id ? notification : null;
 	}
 
 	@bindThis

@@ -26,6 +26,7 @@
 		"paths": {
 			"vue": ["./node_modules/vue"],
 			"@storybook/vue3": ["./node_modules/@storybook/vue3/dist/index.d.ts"],
+			"@storybook/test": ["./node_modules/storybook/dist/test/index.d.ts"],
 			"storybook/actions": ["./node_modules/storybook/dist/actions/index.d.ts"],
 			"@syuilo/aiscript": ["./node_modules/@syuilo/aiscript/built/dts/index.d.ts"],
 			"@syuilo/aiscript/*": ["./node_modules/@syuilo/aiscript/built/dts/*"],
@@ -66,7 +67,7 @@
 		"jsx": "preserve"
 	},
 	"vueCompilerOptions": {
-		"plugins": [{ "name": "vite-vue-internationalization/volar", "primaryLocale": "ja-JP" }]
+		"plugins": [{ "name": "vite-vue-internationalization/volar", "primaryLocale": "ja-JP", "globalType": "runtime", "global": { "ja-JP": "../../locales/ja-JP.yml" } }]
 	},
 	"compileOnSave": false,
 	"include": [

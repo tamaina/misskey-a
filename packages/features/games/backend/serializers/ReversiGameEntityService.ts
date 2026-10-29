@@ -3,22 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ReversiGamesRepository } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { PackedUserLite } from '@features/users/backend/user.schema.js';
+import type { PackedReversiGameDetailed, PackedReversiGameLite } from '../reversi.schema.js';
 import type { } from '@features/relationships/backend/models/Blocking.js';
 import type { MiReversiGame } from '../models/ReversiGame.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
-function assertBw(bw: string): bw is Packed<'ReversiGameDetailed'>['bw'] {
+function assertBw(bw: string): bw is PackedReversiGameDetailed['bw'] {
 	return ['random', '1', '2'].includes(bw);
+}
+
+/** Exact persistence query used by packing; saved JSON is returned unchanged. */
+export interface ReversiGamePackingRepository {
+	findOneByOrFail(where: { id: MiReversiGame['id'] }): Promise<MiReversiGame>;
 }
 
 export class ReversiGameEntityService {
 	constructor(
-		private reversiGamesRepository: ReversiGamesRepository,
+		private reversiGamesRepository: ReversiGamePackingRepository,
 
 		private userEntityService: Pick<UserEntityService, 'pack' | 'packMany'>,
 		private idService: Pick<IdService, 'parse'>,
@@ -29,10 +34,10 @@ export class ReversiGameEntityService {
 	public async packDetail(
 		src: MiReversiGame['id'] | MiReversiGame,
 		hint?: {
-			packedUser1?: Packed<'UserLite'>,
-			packedUser2?: Packed<'UserLite'>,
+			packedUser1?: PackedUserLite,
+			packedUser2?: PackedUserLite,
 		},
-	): Promise<Packed<'ReversiGameDetailed'>> {
+	): Promise<PackedReversiGameDetailed> {
 		const game = typeof src === 'object' ? src : await this.reversiGamesRepository.findOneByOrFail({ id: src });
 
 		const user1 = hint?.packedUser1 ?? await this.userEntityService.pack(game.user1 ?? game.user1Id);
@@ -91,10 +96,10 @@ export class ReversiGameEntityService {
 	public async packLite(
 		src: MiReversiGame['id'] | MiReversiGame,
 		hint?: {
-			packedUser1?: Packed<'UserLite'>,
-			packedUser2?: Packed<'UserLite'>,
+			packedUser1?: PackedUserLite,
+			packedUser2?: PackedUserLite,
 		},
-	): Promise<Packed<'ReversiGameLite'>> {
+	): Promise<PackedReversiGameLite> {
 		const game = typeof src === 'object' ? src : await this.reversiGamesRepository.findOneByOrFail({ id: src });
 
 		const user1 = hint?.packedUser1 ?? await this.userEntityService.pack(game.user1 ?? game.user1Id);

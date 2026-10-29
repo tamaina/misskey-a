@@ -2,36 +2,20 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { unionUsersRelationDefinition, unionUsersRelationInput, unionUsersRelationOutput } from '../../../contract/union-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-
-const contractProjection = projectEndpointContract(unionUsersRelationDefinition);
-
-export const meta = {
-	tags: ['users'],
-
-	requireCredential: true,
-	kind: 'read:account',
-
-	description: 'Show the different kinds of relations between the authenticated user and the specified user(s).',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof unionUsersRelationInput, typeof unionUsersRelationOutput> {
-	constructor(
-		private userEntityService: UserEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return Array.isArray(ps.userId)
-				? await this.userEntityService.getRelations(me.id, ps.userId).then(it => [...it.values()])
-				: await this.userEntityService.getRelation(me.id, ps.userId).then(it => [it]);
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
+import { toPackedUserRelation } from '../relationships.schema.js';
+export function createUsersRelationProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'userEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["users/relation"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			return (Array.isArray(ps.userId)
+				? await deps.userEntityService.getRelations(me.id, ps.userId).then(it => [...it.values()])
+				: await deps.userEntityService.getRelation(me.id, ps.userId).then(it => [it])).map(toPackedUserRelation);
 		});
-	}
 }

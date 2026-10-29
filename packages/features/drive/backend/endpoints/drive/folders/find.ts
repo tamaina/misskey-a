@@ -3,45 +3,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedDriveFoldersFindDefinition, packedDriveFoldersFindInput, packedDriveFoldersFindOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { toPackedDriveFolder } from '@features/notes/backend/drive.schema.js';
 import { IsNull } from 'typeorm';
 
 import type { DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-const contractProjection = projectEndpointContract(packedDriveFoldersFindDefinition);
+export interface DriveFoldersFindDependencies {
+	driveFoldersRepository: DriveFoldersRepository;
+	driveFolderEntityService: Pick<DriveFolderEntityService, 'pack'>;
+}
+export function createDriveFoldersFindProcedure(deps: DriveFoldersFindDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive/folders/find']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				const _ip = context.ip;
+				const _headers = context.headers;
+				const folders = await deps.driveFoldersRepository.findBy({
+					name: ps.name,
+					userId: me.id,
+					parentId: ps.parentId ?? IsNull(),
+				});
 
-export const meta = {
-	tags: ['drive'],
-
-	requireCredential: true,
-
-	kind: 'read:drive',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFoldersFindInput, typeof packedDriveFoldersFindOutput> {
-	constructor(
-		@Inject(DI.driveFoldersRepository)
-		private driveFoldersRepository: DriveFoldersRepository,
-
-		private driveFolderEntityService: DriveFolderEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const folders = await this.driveFoldersRepository.findBy({
-				name: ps.name,
-				userId: me.id,
-				parentId: ps.parentId ?? IsNull(),
-			});
-
-			return await Promise.all(folders.map(folder => this.driveFolderEntityService.pack(folder)));
+				return await Promise.all(folders.map(folder => deps.driveFolderEntityService.pack(folder)));
+			})();
+			return result.map(toPackedDriveFolder);
 		});
-	}
 }

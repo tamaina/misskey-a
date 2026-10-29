@@ -11,7 +11,7 @@ import * as WebSocket from 'ws';
 import { DI } from '@/di-symbols.js';
 import type { MiAccessToken } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { UserService } from '@features/users/backend/services/UserService.js';
 import { AuthenticateService, AuthenticationError } from '@features/auth/backend/transport/AuthenticateService.js';
 import MainStreamConnection, { ConnectionRequest } from './stream/Connection.js';
@@ -28,6 +28,7 @@ export class StreamingApiServerService {
 	#stopRedis: (() => void) | undefined;
 	#connections = new Map<WebSocket.WebSocket, number>();
 	#cleanConnectionsIntervalId: NodeJS.Timeout | null = null;
+	#activeUsers = new Map<MiLocalUser['id'], { connections: number; intervalId: NodeJS.Timeout; }>();
 
 	constructor(
 		@Inject(DI.redisForSub)
@@ -43,6 +44,8 @@ export class StreamingApiServerService {
 	public attach(server: http.Server): void {
 		const wss = this.#wss = new WebSocket.WebSocketServer({
 			noServer: true,
+			maxPayload: 1024 * 1024, // 1MiB
+			perMessageDeflate: false,
 		});
 
 		const upgrade = async (request: http.IncomingMessage, socket: Duplex, head: Buffer) => {
@@ -57,6 +60,7 @@ export class StreamingApiServerService {
 
 			let user: MiLocalUser | null = null;
 			let app: MiAccessToken | null = null;
+			let browserSession: ConnectionRequest['browserSession'];
 
 			// https://datatracker.ietf.org/doc/html/rfc6750.html#section-2.1
 			// Note that the standard WHATWG WebSocket API does not support setting any headers,
@@ -66,7 +70,7 @@ export class StreamingApiServerService {
 				: q.get('i');
 
 			try {
-				[user, app] = await this.authenticateService.authenticate(token);
+				[user, app, browserSession] = await this.authenticateService.authenticate(token);
 
 				if (app !== null && !app.permission.some(p => p === 'read:account')) {
 					throw new AuthenticationError('Your app does not have necessary permissions to use websocket API.');
@@ -96,11 +100,12 @@ export class StreamingApiServerService {
 			this.moduleRef.registerRequestByContextId<ConnectionRequest>({
 				user,
 				token: app,
+				browserSession,
 			}, contextId);
 			const stream = await this.moduleRef.create(MainStreamConnection, contextId);
 
 			await stream.init();
-			if (this.#stopping) { stream.dispose(); socket.destroy(); return; }
+			if (this.#stopping || !await stream.checkBrowserSession()) { stream.dispose(); socket.destroy(); return; }
 
 			wss.handleUpgrade(request, socket, head, (ws) => {
 				wss.emit('connection', ws, request, {
@@ -144,24 +149,19 @@ export class StreamingApiServerService {
 
 			globalEv.on('message', onRedisMessage);
 
-			await stream.listen(ev, connection);
-
 			this.#connections.set(connection, Date.now());
 
-			const userUpdateIntervalId = user ? setInterval(() => {
-				this.usersService.updateLastActiveDate(user);
-			}, 1000 * 60 * 5) : null;
-			if (user) {
-				this.usersService.updateLastActiveDate(user);
-			}
+			if (user) this.onUserConnected(user);
 
 			connection.once('close', () => {
 				ev.removeAllListeners();
 				stream.dispose();
 				globalEv.off('message', onRedisMessage);
 				this.#connections.delete(connection);
-				if (userUpdateIntervalId) clearInterval(userUpdateIntervalId);
+				if (user) this.onUserDisconnected(user);
 			});
+
+			await stream.listen(ev, connection);
 
 			connection.on('pong', () => {
 				this.#connections.set(connection, Date.now());
@@ -180,6 +180,35 @@ export class StreamingApiServerService {
 				}
 			}
 		}, 1000 * 60);
+	}
+
+	@bindThis
+	private onUserConnected(user: MiLocalUser): void {
+		const activeUser = this.#activeUsers.get(user.id);
+		if (activeUser) {
+			activeUser.connections++;
+			return;
+		}
+
+		this.usersService.updateLastActiveDate(user);
+		this.#activeUsers.set(user.id, {
+			connections: 1,
+			intervalId: setInterval(() => {
+				this.usersService.updateLastActiveDate(user);
+			}, 1000 * 60 * 5),
+		});
+	}
+
+	@bindThis
+	private onUserDisconnected(user: MiLocalUser): void {
+		const activeUser = this.#activeUsers.get(user.id);
+		if (!activeUser) return;
+
+		activeUser.connections--;
+		if (activeUser.connections <= 0) {
+			clearInterval(activeUser.intervalId);
+			this.#activeUsers.delete(user.id);
+		}
 	}
 
 	@bindThis

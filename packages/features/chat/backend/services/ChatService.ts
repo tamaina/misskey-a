@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { Brackets } from 'typeorm';
@@ -22,7 +23,7 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { MiChatRoomInvitation } from '../models/ChatRoomInvitation.js';
-import { Packed } from '@features/index/contract/packed.js';
+import { Packed } from '@features/index/backend/packed.schema.js';
 import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
 import { CustomEmojiService } from '@features/emojis/backend/services/CustomEmojiService.js';
 import { emojiRegex } from '@features/emojis/backend/utility/emoji-regex.js';
@@ -93,6 +94,7 @@ export class ChatService {
 		private userFollowingService: UserFollowingService,
 		private customEmojiService: CustomEmojiService,
 		private moderationLogService: ModerationLogService,
+		private webhookService: UserWebhookService,
 	) {
 	}
 
@@ -223,6 +225,7 @@ export class ChatService {
 		if (this.userEntityService.isLocalUser(toUser)) {
 			// 相手のストリーム
 			this.globalEventService.publishChatUserStream(toUser.id, fromUser.id, 'message', packedMessage);
+			await this.webhookService.enqueueUserWebhook(toUser.id, 'chatMessage', { message: packedMessage });
 		}
 
 		// 3秒経っても既読にならなかったらイベント発行
@@ -281,6 +284,8 @@ export class ChatService {
 		for (const membership of membershipsOtherThanMe) {
 			if (membership.isMuted) continue;
 
+			await this.webhookService.enqueueUserWebhook(membership.userId, 'chatMessage', { message: packedMessage });
+
 			redisPipeline.set(`newRoomChatMessageExists:${membership.userId}:${toRoom.id}`, message.id);
 			redisPipeline.sadd(`newChatMessagesExists:${membership.userId}`, `room:${toRoom.id}`);
 		}
@@ -309,6 +314,19 @@ export class ChatService {
 		}, 3000);
 
 		return packedMessage;
+	}
+
+	/** Delivery-time access check for MCP references. */
+	public async canReceiveMessageEvent(userId: string, messageId: string): Promise<boolean> {
+		const message = await this.chatMessagesRepository.findOneBy({ id: messageId });
+		if (!message || message.fromUserId === userId || !(await this.getChatAvailability(userId)).read) return false;
+		if (message.toRoomId) {
+			const room = await this.chatRoomsRepository.findOneBy({ id: message.toRoomId });
+			if (!room) return false;
+			const member = await this.chatRoomMembershipsRepository.findOneBy({ roomId: room.id, userId });
+			return member ? !member.isMuted : room.ownerId === userId;
+		}
+		return message.toUserId === userId && !await this.userBlockingService.checkBlocked(userId, message.fromUserId);
 	}
 
 	@bindThis
@@ -354,11 +372,11 @@ export class ChatService {
 	}
 
 	@bindThis
-	public async hasPermissionToViewRoomTimeline(meId: MiUser['id'], room: MiChatRoom) {
+	public async hasPermissionToViewRoomTimeline(meId: MiUser['id'], room: MiChatRoom, fresh = false) {
 		if (await this.isRoomMember(room, meId)) {
 			return true;
 		} else {
-			const iAmModerator = await this.roleService.isModerator({ id: meId });
+			const iAmModerator = await this.roleService.isModerator({ id: meId }, fresh);
 			if (iAmModerator) {
 				return true;
 			}
@@ -681,7 +699,16 @@ export class ChatService {
 			throw new Error('room is full');
 		}
 
-		// TODO: cehck block
+		const [blocked, blocking] = await Promise.all([
+			this.userBlockingService.checkBlocked(inviteeId, inviterId),
+			this.userBlockingService.checkBlocked(inviterId, inviteeId),
+		]);
+		if (blocked) {
+			throw new Error('blocked');
+		}
+		if (blocking) {
+			throw new Error('blocking');
+		}
 
 		const invitation = {
 			id: this.idService.gen(),

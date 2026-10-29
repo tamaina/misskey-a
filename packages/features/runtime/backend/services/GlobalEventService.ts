@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { randomUUID } from 'node:crypto';
+import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import * as Reversi from 'misskey-reversi';
@@ -14,6 +16,7 @@ import type { MiAntenna } from '@features/timelines/backend/models/Antenna.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiDriveFolder } from '@features/drive/backend/models/DriveFolder.js';
 import type { MiUserList } from '@features/relationships/backend/models/UserList.js';
+import type { MiClip } from '@features/collections/backend/models/Clip.js';
 import type { MiAbuseUserReport } from '@features/moderation/backend/models/AbuseUserReport.js';
 import type { MiSignin } from '@features/auth/backend/models/Signin.js';
 import type { MiPage } from '@features/pages/backend/models/Page.js';
@@ -22,7 +25,7 @@ import type { MiSystemWebhook } from '@features/integrations/backend/models/Syst
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { MiAvatarDecoration, MiChatMessage, MiChatRoom, MiReversiGame, MiRole, MiRoleAssignment } from '@features/persistence/backend/repositories/models.js';
 import type { NativeMeDetailed } from '@features/users/backend/serializers/native-user.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { bindThis } from '../decorators.js';
@@ -142,8 +145,13 @@ export interface UserListEventTypes {
 	userRemoved: Packed<'UserLite'>;
 }
 
+export interface ClipEventTypes {
+	updated: undefined;
+	deleted: undefined;
+}
+
 export interface AntennaEventTypes {
-	note: MiNote;
+	note: Packed<'Note'>;
 }
 
 export interface RoleTimelineEventTypes {
@@ -225,7 +233,8 @@ type UndefinedAsNullAll<T> = {
 };
 
 export interface InternalEventTypes {
-	userChangeSuspendedState: { id: MiUser['id']; isSuspended: MiUser['isSuspended']; };
+	browserSessionRevoked: { id: string | null; userId: string };
+	userChangeSuspendedState: { id: MiUser['id']; isSuspended: MiUser['isSuspended']; } | { id: MiUser['id']; isRemoteSuspended: MiUser['isRemoteSuspended']; };
 	userChangeDeletedState: { id: MiUser['id']; isDeleted: MiUser['isDeleted']; };
 	userTokenRegenerated: { id: MiUser['id']; oldToken: string; newToken: string; };
 	remoteUserUpdated: { id: MiUser['id']; };
@@ -262,12 +271,17 @@ export interface InternalEventTypes {
 	unmute: { muterId: MiUser['id']; muteeId: MiUser['id']; };
 	userListMemberAdded: { userListId: MiUserList['id']; memberId: MiUser['id']; };
 	userListMemberRemoved: { userListId: MiUserList['id']; memberId: MiUser['id']; };
+	userKeypairUpdated: { userId: MiUser['id']; };
 }
 
 export type EventTypesToEventPayload<T> = EventUnionFromDictionary<UndefinedAsNullAll<SerializedAll<T>>>;
 
 // name/messages(spec) pairs dictionary
 export type GlobalEvents = {
+	statistics: {
+		name: `statisticsStream:${'serverStats' | 'queueStats'}`;
+		payload: { type: 'stats'; body: JsonObject };
+	};
 	internal: {
 		name: 'internal';
 		payload: EventTypesToEventPayload<InternalEventTypes>;
@@ -291,6 +305,10 @@ export type GlobalEvents = {
 	userList: {
 		name: `userListStream:${MiUserList['id']}`;
 		payload: EventTypesToEventPayload<UserListEventTypes>;
+	};
+	clip: {
+		name: `clipStream:${MiClip['id']}`;
+		payload: EventTypesToEventPayload<ClipEventTypes>;
 	};
 	roleTimeline: {
 		name: `roleTimelineStream:${MiRole['id']}`;
@@ -358,7 +376,15 @@ export class GlobalEventService {
 		this.redisForPub.publish(this.config.host, JSON.stringify({
 			channel: channel,
 			message: message,
+			occurrenceId: randomUUID(),
+			createdAt: Date.now(),
 		}));
+	}
+
+	/** One publisher identity per live sample, shared by all native observers. */
+	@bindThis
+	public publishStatisticsStream(channel: 'serverStats' | 'queueStats', stats: JsonObject): void {
+		this.publish(`statisticsStream:${channel}`, 'stats', stats);
 	}
 
 	@bindThis
@@ -395,6 +421,11 @@ export class GlobalEventService {
 	@bindThis
 	public publishUserListStream<K extends keyof UserListEventTypes>(listId: MiUserList['id'], type: K, value?: UserListEventTypes[K]): void {
 		this.publish(`userListStream:${listId}`, type, typeof value === 'undefined' ? null : value);
+	}
+
+	@bindThis
+	public publishClipStream<K extends keyof ClipEventTypes>(clipId: MiClip['id'], type: K, value?: ClipEventTypes[K]): void {
+		this.publish(`clipStream:${clipId}`, type, typeof value === 'undefined' ? null : value);
 	}
 
 	@bindThis

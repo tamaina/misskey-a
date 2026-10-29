@@ -3,37 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Injectable } from '@nestjs/common';
-import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAdminRolesCreateDefinition } from '../../../../contract/packed-endpoint-definitions.js';
-import { LegacyRoleCreateConsumerEndpoint } from '../../../legacy-role-consumer-endpoint.js';
-import { RoleEntityService } from '../../../serializers/RoleEntityService.js';
-import { RoleService } from '../../../services/RoleService.js';
-
-const contractProjection = projectEndpointContract(packedAdminRolesCreateDefinition);
-
-export const meta = {
-	tags: ['admin', 'role'],
-
-	requireCredential: true,
-	requireAdmin: true,
-	kind: 'write:admin:roles',
-
-	res: { ...contractProjection.response, optional: false, nullable: false },
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends LegacyRoleCreateConsumerEndpoint<typeof meta> {
-	constructor(
-		private roleEntityService: RoleEntityService,
-		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const created = await this.roleService.create(ps, me);
-
-			return await this.roleEntityService.pack(created, me);
+import { toRoleDto } from '../../../role.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { rolesContract } from '../../../api.definition.js';
+import type { RolesDependencies } from '../../../api.implementation.js';
+export function createAdminRolesCreateProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'roleService' | 'roleEntityService'>) {
+	return createApiProcedure<Actor>()(rolesContract.adminRolesCreate).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ isPublic: 'boolean', isModerator: 'boolean', isAdministrator: 'boolean', isExplorable: 'boolean', asBadge: 'boolean', preserveAssignmentOnMoveAccount: 'boolean', canEditMembersByModerator: 'boolean' })).use(decodeScalarInput<Actor>({ displayOrder: 'number' }))
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const created = await deps.roleService.create(ps, me);
+			return toRoleDto(await deps.roleEntityService.pack(created, me));
 		});
-	}
 }

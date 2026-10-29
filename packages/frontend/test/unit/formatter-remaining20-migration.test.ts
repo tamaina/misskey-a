@@ -4,8 +4,10 @@
  */
 
 import { existsSync } from 'node:fs';
+import { restoreNativeApiSourceBaseline } from './native-api-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { restoreProductNameBaseline } from './product-name-source-rebase.js';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,14 +17,16 @@ import { compileScript, parse } from 'vue/compiler-sfc';
 import { describe, expect, test } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
-import { languages, locales } from 'i18n';
+import { languages } from 'i18n';
+import { locales } from './instance-pilot-locale-catalog.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { applyWithLocale } from '../../../frontend-builder/locale-inliner/apply-with-locale.js';
 import { blankLogger } from '../../../frontend-builder/logger.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import migrationInputs from './formatter-remaining20-migration.json';
-import type { Locale, ParameterizedString } from 'i18n';
+import type { ParameterizedString } from 'i18n';
+import type { Locale } from './retired-ui-next-locale-types.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const MagicString = createRequire(resolve(root, 'packages/frontend-builder/package.json'))('magic-string').default;
@@ -51,7 +55,7 @@ describe('remaining20 formatter locale migration', () => {
 	test('preserves all12628 dictionary values and reverses every source byte', () => {
 		let checked = 0;
 		for (const entry of migrationInputs) {
-			const source = readFileSync(resolve(root, entry.file), 'utf8');
+			const source = restoreNativeApiSourceBaseline(entry.file, restoreProductNameBaseline(entry.file, readFileSync(resolve(root, entry.file), 'utf8')));
 			expect(createHash('sha256').update(source).digest('hex')).toBe(entry.migratedSha256);
 			const parsed = parse(source, { filename: entry.file });
 			expect(parsed.errors).toEqual([]);
@@ -76,18 +80,18 @@ describe('remaining20 formatter locale migration', () => {
 		expect(checked).toBe(12628);
 	}, 30000);
 
-	test('transforms every real SFC with the installed VVI plugin and Vue compiler', () => {
+	test('transforms every real SFC with the installed VVI plugin and Vue compiler', async () => {
 		const plugin = pluginVvi();
 		const hook = (value: unknown, ...args: unknown[]): unknown => {
 			if (typeof value === 'function') return Reflect.apply(value, {}, args);
 			if (value && typeof value === 'object' && 'handler' in value && typeof value.handler === 'function') return Reflect.apply(value.handler, {}, args);
 			throw new Error('Expected plugin hook');
 		};
-		hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/' });
+		hook(plugin.configResolved, { root: resolve(root, 'packages/frontend'), command: 'build', base: '/', build: { ssr: false } });
 		hook(plugin.buildStart);
 		for (const entry of migrationInputs) {
 			const file = resolve(root, entry.file);
-			const transformed = hook(plugin.transform, readFileSync(file, 'utf8'), file) as { code: string };
+			const transformed = await hook(plugin.transform, readFileSync(file, 'utf8'), file) as { code: string };
 			expect(transformed.code).toContain('createComponentLocale');
 			const parsed = parse(transformed.code, { filename: file });
 			expect(parsed.errors).toEqual([]);
@@ -104,7 +108,12 @@ describe('remaining20 formatter locale migration', () => {
 				const raw = createComponentLocale(entry.file.replace('packages/', '/'));
 				for (const key of entry.keys) {
 					const message = originalValue(language, key.global);
-					expect(raw[key.local]).toBe(message);
+					if (key.local === 'aboutMisskey' && (entry.file.endsWith('/about-misskey.vue') || entry.file.endsWith('/about.overview.vue'))) {
+						expect(raw[key.local]).toBe(message.replace('Misskey', '{productName}'));
+						expect(interpolateLocaleParameters(raw[key.local], { productName: 'Misskey 9000' })).toBe(message.replace('Misskey', 'Misskey 9000'));
+					} else {
+						expect(raw[key.local]).toBe(message);
+					}
 					rawChecks++;
 					if (!key.formatter) continue;
 					expect(message.replace(/\{[A-Za-z_$][\w$]*\}/g, '')).not.toContain('{');

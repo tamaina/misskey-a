@@ -1,3 +1,5 @@
+export type { PilotClient, PilotClientContext } from './pilot-client.js';
+
 import Stream, { Connection } from './streaming.js';
 import * as consts from './consts.js';
 

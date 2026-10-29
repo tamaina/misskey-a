@@ -3,25 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidAuthAcceptDefinition, voidAuthAcceptInput, voidAuthAcceptOutput } from '../../../contract/void-endpoint-definitions.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import * as crypto from 'node:crypto';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { AuthSessionsRepository, AppsRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { secureRndstr } from '../../utility/secure-rndstr.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(voidAuthAcceptDefinition);
+import { AuthAcceptContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
 	tags: ['auth'],
-
-	requireCredential: true,
-
-	secure: true,
 
 	errors: {
 		noSuchSession: {
@@ -31,36 +26,29 @@ export const meta = {
 		},
 	},
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidAuthAcceptInput, typeof voidAuthAcceptOutput> {
-	constructor(
-		@Inject(DI.appsRepository)
-		private appsRepository: AppsRepository,
-
-		@Inject(DI.authSessionsRepository)
-		private authSessionsRepository: AuthSessionsRepository,
-
-		@Inject(DI.accessTokensRepository)
-		private accessTokensRepository: AccessTokensRepository,
-
-		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface AuthAcceptDependencies {
+	appsRepository: AppsRepository;
+	authSessionsRepository: AuthSessionsRepository;
+	accessTokensRepository: AccessTokensRepository;
+	idService: Pick<IdService, 'gen'>;
+}
+export function createAuthAcceptProcedure(deps: AuthAcceptDependencies) {
+	return createApiProcedure<MiLocalUser>()(AuthAcceptContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			// Fetch token
-			const session = await this.authSessionsRepository
+			const session = await deps.authSessionsRepository
 				.findOneBy({ token: ps.token });
 
 			if (session == null) {
-				throw new ApiError(meta.errors.noSuchSession);
+				throw apiError(meta.errors.noSuchSession);
 			}
 
 			const accessToken = secureRndstr(32);
 
 			// Fetch exist access token
-			const exist = await this.accessTokensRepository.exists({
+			const exist = await deps.accessTokensRepository.exists({
 				where: {
 					appId: session.appId,
 					userId: me.id,
@@ -68,7 +56,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 			});
 
 			if (!exist) {
-				const app = await this.appsRepository.findOneByOrFail({ id: session.appId });
+				const app = await deps.appsRepository.findOneByOrFail({ id: session.appId });
 
 				// Generate Hash
 				const sha256 = crypto.createHash('sha256');
@@ -77,8 +65,8 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 				const now = new Date();
 
-				await this.accessTokensRepository.insert({
-					id: this.idService.gen(now.getTime()),
+				await deps.accessTokensRepository.insert({
+					id: deps.idService.gen(now.getTime()),
 					lastUsedAt: now,
 					appId: session.appId,
 					userId: me.id,
@@ -88,9 +76,10 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 			}
 
 			// Update session
-			await this.authSessionsRepository.update(session.id, {
+			await deps.authSessionsRepository.update(session.id, {
 				userId: me.id,
 			});
-		});
-	}
+		})();
+		return result;
+	});
 }

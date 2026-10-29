@@ -3,26 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as v from 'valibot';
+
 import {
 	generateAuthenticationOptions,
 	generateRegistrationOptions, verifyAuthenticationResponse,
 	verifyRegistrationResponse,
 } from '@simplewebauthn/server';
-import { AttestationFormat, isoCBOR, isoUint8Array } from '@simplewebauthn/server/helpers';
-import type { MiMeta, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
-import type { Config } from '@/config.js';
-import { bindThis } from '@features/runtime/backend/decorators.js';
-import { MiUser } from '@features/persistence/backend/repositories/models.js';
-import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
-import type * as Redis from 'ioredis';
 import type {
 	AuthenticationResponseJSON,
-	AuthenticatorTransportFuture,
 	CredentialDeviceType,
-	PublicKeyCredentialCreationOptionsJSON,
-	PublicKeyCredentialRequestOptionsJSON,
 	RegistrationResponseJSON,
 } from '@simplewebauthn/server';
+import { AttestationFormat, isoCBOR, isoUint8Array } from '@simplewebauthn/server/helpers';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import { MiUser } from '@features/persistence/backend/repositories/models.js';
+import type { MiMeta, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
+import type { Config } from '@/config.js';
+import { webAuthnRegistrationResponseSchema, webAuthnAuthenticationResponseSchema, webAuthnTransportSchema, nativeRegistrationOptionsSchema, nativeAuthenticationOptionsSchema } from '../webauthn.schema.js';
+import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
+import type * as Redis from 'ioredis';
 
 export class WebAuthnService {
 	constructor(
@@ -32,7 +33,10 @@ export class WebAuthnService {
 
 		private redisClient: Redis.Redis,
 
-		private userSecurityKeysRepository: UserSecurityKeysRepository,
+		private userSecurityKeysRepository: Omit<UserSecurityKeysRepository, 'findOneBy' | 'update'> & {
+			findOneBy(where: Parameters<UserSecurityKeysRepository['findOneBy']>[0] | { id: PackedJsonValue | undefined; userId?: string }): Promise<import('../models/UserSecurityKey.js').MiUserSecurityKey | null>;
+			update(where: Parameters<UserSecurityKeysRepository['update']>[0] | { id: PackedJsonValue | undefined; userId?: string }, update: import('typeorm').QueryDeepPartialEntity<import('../models/UserSecurityKey.js').MiUserSecurityKey>): Promise<unknown>;
+		},
 	) {
 	}
 
@@ -47,7 +51,7 @@ export class WebAuthnService {
 	}
 
 	@bindThis
-	public async initiateRegistration(userId: MiUser['id'], userName: string, userDisplayName?: string): Promise<PublicKeyCredentialCreationOptionsJSON> {
+	public async initiateRegistration(userId: MiUser['id'], userName: string, userDisplayName?: string): Promise<v.InferOutput<typeof nativeRegistrationOptionsSchema>> {
 		const relyingParty = this.getRelyingParty();
 		const keys = await this.userSecurityKeysRepository.findBy({
 			userId: userId,
@@ -59,15 +63,16 @@ export class WebAuthnService {
 			userID: isoUint8Array.fromUTF8String(userId),
 			userName: userName,
 			userDisplayName: userDisplayName,
-			excludeCredentials: keys.map(key => (<{ id: string; transports?: AuthenticatorTransportFuture[]; }>{
+			excludeCredentials: keys.map(key => ({
 				id: key.id,
-				transports: key.transports ?? undefined,
+				transports: key.transports == null ? undefined : v.parse(v.array(webAuthnTransportSchema), key.transports),
 			})),
 			authenticatorSelection: {
 				residentKey: 'required',
-				userVerification: 'preferred',
+				userVerification: 'required',
 			},
 		});
+		v.assert(nativeRegistrationOptionsSchema, registrationOptions);
 
 		await this.redisClient.setex(`webauthn:registrationChallenge:${userId}`, 90, registrationOptions.challenge);
 
@@ -75,7 +80,7 @@ export class WebAuthnService {
 	}
 
 	@bindThis
-	public async verifyRegistration(userId: MiUser['id'], response: RegistrationResponseJSON): Promise<{
+	public async verifyRegistration(userId: MiUser['id'], response: RegistrationResponseJSON | PackedJsonValue): Promise<{
 		credentialID: string;
 		credentialPublicKey: Uint8Array;
 		attestationObject: Uint8Array;
@@ -84,7 +89,7 @@ export class WebAuthnService {
 		userVerified: boolean;
 		credentialDeviceType: CredentialDeviceType;
 		credentialBackedUp: boolean;
-		transports?: AuthenticatorTransportFuture[];
+		transports?: v.InferOutput<typeof webAuthnTransportSchema>[];
 	}> {
 		const challenge = await this.redisClient.get(`webauthn:registrationChallenge:${userId}`);
 
@@ -98,8 +103,9 @@ export class WebAuthnService {
 
 		let verification;
 		try {
+			const credential = v.parse(webAuthnRegistrationResponseSchema, response);
 			verification = await verifyRegistrationResponse({
-				response: response,
+				response: credential,
 				expectedChallenge: challenge,
 				expectedOrigin: relyingParty.origin,
 				expectedRPID: relyingParty.rpId,
@@ -127,12 +133,12 @@ export class WebAuthnService {
 			userVerified: registrationInfo.userVerified,
 			credentialDeviceType: registrationInfo.credentialDeviceType,
 			credentialBackedUp: registrationInfo.credentialBackedUp,
-			transports: response.response.transports,
+			transports: v.parse(webAuthnRegistrationResponseSchema, response).response.transports,
 		};
 	}
 
 	@bindThis
-	public async initiateAuthentication(userId: MiUser['id']): Promise<PublicKeyCredentialRequestOptionsJSON> {
+	public async initiateAuthentication(userId: MiUser['id']): Promise<v.InferOutput<typeof nativeAuthenticationOptionsSchema>> {
 		const relyingParty = this.getRelyingParty();
 		const keys = await this.userSecurityKeysRepository.findBy({
 			userId: userId,
@@ -144,12 +150,13 @@ export class WebAuthnService {
 
 		const authenticationOptions = await generateAuthenticationOptions({
 			rpID: relyingParty.rpId,
-			allowCredentials: keys.map(key => (<{ id: string; transports?: AuthenticatorTransportFuture[]; }>{
+			allowCredentials: keys.map(key => ({
 				id: key.id,
-				transports: key.transports ?? undefined,
+				transports: key.transports == null ? undefined : v.parse(v.array(webAuthnTransportSchema), key.transports),
 			})),
-			userVerification: 'preferred',
+			userVerification: 'required',
 		});
+		v.assert(nativeAuthenticationOptionsSchema, authenticationOptions);
 
 		await this.redisClient.setex(`webauthn:authenticationChallenge:${userId}`, 90, authenticationOptions.challenge);
 
@@ -161,13 +168,14 @@ export class WebAuthnService {
 	 * @returns authenticationOptions
 	 */
 	@bindThis
-	public async initiateSignInWithPasskeyAuthentication(context: string): Promise<PublicKeyCredentialRequestOptionsJSON> {
+	public async initiateSignInWithPasskeyAuthentication(context: string): Promise<v.InferOutput<typeof nativeAuthenticationOptionsSchema>> {
 		const relyingParty = await this.getRelyingParty();
 
 		const authenticationOptions = await generateAuthenticationOptions({
 			rpID: relyingParty.rpId,
-			userVerification: 'preferred',
+			userVerification: 'required',
 		});
+		v.assert(nativeAuthenticationOptionsSchema, authenticationOptions);
 
 		await this.redisClient.setex(`webauthn:passkeyChallenge:${context}`, 90, authenticationOptions.challenge);
 
@@ -180,7 +188,7 @@ export class WebAuthnService {
 	 * @returns If the challenge is successful, return the user ID. Otherwise, return null.
 	 */
 	@bindThis
-	public async verifySignInWithPasskeyAuthentication(context: string, response: AuthenticationResponseJSON): Promise<MiUser['id'] | null> {
+	public async verifySignInWithPasskeyAuthentication(context: string, response: AuthenticationResponseJSON | PackedJsonValue | undefined): Promise<MiUser['id'] | null> {
 		const challenge = await this.redisClient.getdel(`webauthn:passkeyChallenge:${context}`);
 
 		if (!challenge) {
@@ -188,7 +196,7 @@ export class WebAuthnService {
 		}
 
 		const key = await this.userSecurityKeysRepository.findOneBy({
-			id: response.id,
+			id: this.authenticationCredentialId(response),
 		});
 
 		if (!key) {
@@ -199,8 +207,9 @@ export class WebAuthnService {
 
 		let verification;
 		try {
+			const credential = v.parse(webAuthnAuthenticationResponseSchema, response);
 			verification = await verifyAuthenticationResponse({
-				response: response,
+				response: credential,
 				expectedChallenge: challenge,
 				expectedOrigin: relyingParty.origin,
 				expectedRPID: relyingParty.rpId,
@@ -208,7 +217,7 @@ export class WebAuthnService {
 					id: key.id,
 					publicKey: Buffer.from(key.publicKey, 'base64url'),
 					counter: key.counter,
-					transports: key.transports ? key.transports as AuthenticatorTransportFuture[] : undefined,
+					transports: key.transports ? v.parse(v.array(webAuthnTransportSchema), key.transports) : undefined,
 				},
 				requireUserVerification: true,
 			});
@@ -223,7 +232,7 @@ export class WebAuthnService {
 		}
 
 		await this.userSecurityKeysRepository.update({
-			id: response.id,
+			id: this.authenticationCredentialId(response),
 		}, {
 			lastUsed: new Date(),
 			counter: authenticationInfo.newCounter,
@@ -235,7 +244,7 @@ export class WebAuthnService {
 	}
 
 	@bindThis
-	public async verifyAuthentication(userId: MiUser['id'], response: AuthenticationResponseJSON): Promise<boolean> {
+	public async verifyAuthentication(userId: MiUser['id'], response: AuthenticationResponseJSON | PackedJsonValue | undefined): Promise<boolean> {
 		const challenge = await this.redisClient.getdel(`webauthn:authenticationChallenge:${userId}`);
 
 		if (!challenge) {
@@ -243,7 +252,7 @@ export class WebAuthnService {
 		}
 
 		const key = await this.userSecurityKeysRepository.findOneBy({
-			id: response.id,
+			id: this.authenticationCredentialId(response),
 			userId: userId,
 		});
 
@@ -266,7 +275,7 @@ export class WebAuthnService {
 
 				const cborPubKey = Buffer.from(isoCBOR.encode(cborMap)).toString('base64url');
 				await this.userSecurityKeysRepository.update({
-					id: response.id,
+					id: this.authenticationCredentialId(response),
 					userId: userId,
 				}, {
 					publicKey: cborPubKey,
@@ -279,8 +288,9 @@ export class WebAuthnService {
 
 		let verification;
 		try {
+			const credential = v.parse(webAuthnAuthenticationResponseSchema, response);
 			verification = await verifyAuthenticationResponse({
-				response: response,
+				response: credential,
 				expectedChallenge: challenge,
 				expectedOrigin: relyingParty.origin,
 				expectedRPID: relyingParty.rpId,
@@ -288,7 +298,7 @@ export class WebAuthnService {
 					id: key.id,
 					publicKey: Buffer.from(key.publicKey, 'base64url'),
 					counter: key.counter,
-					transports: key.transports ? key.transports as AuthenticatorTransportFuture[] : undefined,
+					transports: key.transports ? v.parse(v.array(webAuthnTransportSchema), key.transports) : undefined,
 				},
 				requireUserVerification: true,
 			});
@@ -304,7 +314,7 @@ export class WebAuthnService {
 		}
 
 		await this.userSecurityKeysRepository.update({
-			id: response.id,
+			id: this.authenticationCredentialId(response),
 			userId: userId,
 		}, {
 			lastUsed: new Date(),
@@ -314,5 +324,11 @@ export class WebAuthnService {
 		});
 
 		return verified;
+	}
+	/** Access the protocol id before library verification, preserving legacy challenge/lookup order. */
+	private authenticationCredentialId(response: AuthenticationResponseJSON | PackedJsonValue | undefined): PackedJsonValue | undefined {
+		if (response === null || response === undefined) throw new TypeError('Cannot read properties of null or undefined');
+		if (typeof response === 'object' && !Array.isArray(response) && 'id' in response) return response.id;
+		return undefined;
 	}
 }

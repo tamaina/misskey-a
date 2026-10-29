@@ -2,18 +2,20 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { moderationCommandsContract } from '../../../contract/index.js';
-import { moderationCommandMeta, legacyModerationCommandSchemas } from '../../index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = moderationCommandMeta['admin/forward-abuse-user-report'];
-const paramDefFromFeature = legacyModerationCommandSchemas['admin/forward-abuse-user-report'].input;
-
-export const paramDef = paramDefFromFeature as Schema;
-const route = 'admin/forward-abuse-user-report' as const;
-export const { feature, createEndpoint } = defineFeatureEndpoint('moderationCommands', commands => createContractTransportEndpoint(meta, paramDefFromFeature as Schema, moderationCommandsContract['admin/forward-abuse-user-report'], async (params, user) => commands[route](params, {
-	context: { actor: user },
-})));
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { moderationContract } from '../../api.definition.js';
+import type { ModerationApiDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { moderationErrors } from '../../api.errors.js';
+export function createAdminForwardAbuseUserReportProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'abuseUserReportsRepository' | 'abuseReportService'>) {
+	return createApiProcedure<Actor>()(moderationContract.adminForwardAbuseUserReport).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const report = await deps.abuseUserReportsRepository.findOneBy({ id: ps.reportId });
+			if (!report) throw apiError(moderationErrors.adminForwardAbuseUserReport.noSuchAbuseReport);
+			await deps.abuseReportService.forward(report.id, me);
+		});
+}

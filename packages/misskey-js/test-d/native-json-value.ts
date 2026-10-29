@@ -7,7 +7,7 @@ import { expectAssignable, expectNotAssignable } from 'tsd';
 import type * as v from 'valibot';
 import type { entities } from '../built/index.js';
 import type { components } from '../built/autogen/types.js';
-import type { JsonValue, jsonValueSchema } from '../built/contracts/api/contract/json-value.js';
+import type { PackedJsonValue as JsonValue, packedJsonValueSchema as jsonValueSchema } from '../built/contracts/users/backend/json-value.schema.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;

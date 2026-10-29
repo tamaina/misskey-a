@@ -9,9 +9,9 @@ import type { AntennasRepository } from '@features/persistence/backend/repositor
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { isRenotePacked, isQuotePacked } from '@features/notes/backend/utility/is-renote.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { JsonObject } from '@features/runtime/backend/formatting/json-value.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import Channel, { type ChannelRequest } from '@features/api/backend/transport/stream/channel.js';
 import { REQUEST } from '@nestjs/core';
 
@@ -62,28 +62,29 @@ export class AntennaChannel extends Channel {
 	@bindThis
 	private async onEvent(data: GlobalEvents['antenna']['payload']) {
 		if (data.type === 'note') {
-			let note = await this.noteEntityService.pack(data.body.id, this.user, { detail: true });
-
-			if (!this.isNoteVisibleForMe(note)) return;
-			if (this.isNoteMutedOrBlocked(note)) return;
-
-			const filtered = await this.noteStreamingHidingService.filter(note, this.user?.id ?? null);
-			if (!filtered) return;
-			note = filtered;
-
-			if (this.user) {
-				if (isRenotePacked(note) && !isQuotePacked(note)) {
-					if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-						const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-						note.renote.myReaction = myRenoteReaction;
-					}
-				}
-			}
-
+			// The note arrives pre-packed for no viewer (like other timelines); per-subscriber checks follow.
+			const note = await this.filterNote(data.body);
+			if (!note) return;
 			this.send('note', note);
 		} else {
 			this.send(data.type, data.body);
 		}
+	}
+
+	/** Delivery-time path for reference-only queued antenna events: fresh pack for this subscriber, then the same checks. */
+	public async packNote(noteId: string) {
+		return await this.filterNote(await this.noteEntityService.pack(noteId, this.user, { detail: true }));
+	}
+
+	/** Per-subscriber visibility, mute/block and hiding checks shared by the live stream and queued deliveries. */
+	private async filterNote(note: Packed<'Note'>): Promise<Packed<'Note'> | null> {
+		if (!this.isNoteVisibleForMe(note)) return null;
+		if (this.isNoteMutedOrBlocked(note)) return null;
+
+		const filtered = await this.noteStreamingHidingService.filter(note, this.user?.id ?? null);
+		if (!filtered) return null;
+
+		return await this.noteEntityService.withMyRenoteReaction(filtered, this.user?.id ?? null);
 	}
 
 	@bindThis

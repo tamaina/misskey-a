@@ -3,125 +3,96 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedDriveFoldersUpdateDefinition, packedDriveFoldersUpdateInput, packedDriveFoldersUpdateOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { toPackedDriveFolder } from '@features/notes/backend/drive.schema.js';
+import { driveFoldersUpdateErrors } from './update.contract.js';
 import type { DriveFoldersRepository } from '@features/persistence/backend/repositories/models.js';
 import { DriveFolderEntityService } from '../../../serializers/DriveFolderEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-const contractProjection = projectEndpointContract(packedDriveFoldersUpdateDefinition);
+export interface DriveFoldersUpdateDependencies {
+	driveFoldersRepository: DriveFoldersRepository;
+	driveFolderEntityService: Pick<DriveFolderEntityService, 'pack'>;
+	globalEventService: Pick<GlobalEventService, 'publishDriveStream'>;
+}
+export function createDriveFoldersUpdateProcedure(deps: DriveFoldersUpdateDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive/folders/update']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				const _ip = context.ip;
+				const _headers = context.headers;
+				// Fetch folder
+				const folder = await deps.driveFoldersRepository.findOneBy({
+					id: ps.folderId,
+					userId: me.id,
+				});
 
-export const meta = {
-	tags: ['drive'],
+				if (folder == null) {
+					throw apiError(driveFoldersUpdateErrors.noSuchFolder);
+				}
 
-	requireCredential: true,
+				if (ps.name) folder.name = ps.name;
 
-	kind: 'write:drive',
-
-	errors: {
-		noSuchFolder: {
-			message: 'No such folder.',
-			code: 'NO_SUCH_FOLDER',
-			id: 'f7974dac-2c0d-4a27-926e-23583b28e98e',
-		},
-
-		noSuchParentFolder: {
-			message: 'No such parent folder.',
-			code: 'NO_SUCH_PARENT_FOLDER',
-			id: 'ce104e3a-faaf-49d5-b459-10ff0cbbcaa1',
-		},
-
-		recursiveNesting: {
-			message: 'It can not be structured like nesting folders recursively.',
-			code: 'RECURSIVE_NESTING',
-			id: 'dbeb024837894013aed44279f9199740',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFoldersUpdateInput, typeof packedDriveFoldersUpdateOutput> {
-	constructor(
-		@Inject(DI.driveFoldersRepository)
-		private driveFoldersRepository: DriveFoldersRepository,
-
-		private driveFolderEntityService: DriveFolderEntityService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			// Fetch folder
-			const folder = await this.driveFoldersRepository.findOneBy({
-				id: ps.folderId,
-				userId: me.id,
-			});
-
-			if (folder == null) {
-				throw new ApiError(meta.errors.noSuchFolder);
-			}
-
-			if (ps.name) folder.name = ps.name;
-
-			if (ps.parentId !== undefined) {
-				if (ps.parentId === folder.id) {
-					throw new ApiError(meta.errors.recursiveNesting);
-				} else if (ps.parentId === null) {
-					folder.parentId = null;
-				} else {
-					// Get parent folder
-					const parent = await this.driveFoldersRepository.findOneBy({
-						id: ps.parentId,
-						userId: me.id,
-					});
-
-					if (parent == null) {
-						throw new ApiError(meta.errors.noSuchParentFolder);
-					}
-
-					// Check if the circular reference will occur
-					const checkCircle = async (folderId: string): Promise<boolean> => {
-						const folder2 = await this.driveFoldersRepository.findOneByOrFail({
-							id: folderId,
+				if (ps.parentId !== undefined) {
+					if (ps.parentId === folder.id) {
+						throw apiError(driveFoldersUpdateErrors.recursiveNesting);
+					} else if (ps.parentId === null) {
+						folder.parentId = null;
+					} else {
+						// Get parent folder
+						const parent = await deps.driveFoldersRepository.findOneBy({
+							id: ps.parentId,
+							userId: me.id,
 						});
 
-						if (folder2.id === folder.id) {
-							return true;
-						} else if (folder2.parentId) {
-							return await checkCircle(folder2.parentId);
-						} else {
-							return false;
+						if (parent == null) {
+							throw apiError(driveFoldersUpdateErrors.noSuchParentFolder);
 						}
-					};
 
-					if (parent.parentId !== null) {
-						if (await checkCircle(parent.parentId)) {
-							throw new ApiError(meta.errors.recursiveNesting);
+						// Check if the circular reference will occur
+						const checkCircle = async (folderId: string): Promise<boolean> => {
+							const folder2 = await deps.driveFoldersRepository.findOneByOrFail({
+								id: folderId,
+							});
+
+							if (folder2.id === folder.id) {
+								return true;
+							} else if (folder2.parentId) {
+								return await checkCircle(folder2.parentId);
+							} else {
+								return false;
+							}
+						};
+
+						if (parent.parentId !== null) {
+							if (await checkCircle(parent.parentId)) {
+								throw apiError(driveFoldersUpdateErrors.recursiveNesting);
+							}
 						}
+
+						folder.parentId = parent.id;
 					}
-
-					folder.parentId = parent.id;
 				}
-			}
 
-			// Update
-			await this.driveFoldersRepository.update(folder.id, {
-				name: folder.name,
-				parentId: folder.parentId,
-			});
+				// Update
+				await deps.driveFoldersRepository.update(folder.id, {
+					name: folder.name,
+					parentId: folder.parentId,
+				});
 
-			const folderObj = await this.driveFolderEntityService.pack(folder);
+				const folderObj = await deps.driveFolderEntityService.pack(folder);
 
-			// Publish folderUpdated event
-			this.globalEventService.publishDriveStream(me.id, 'folderUpdated', folderObj);
+				// Publish folderUpdated event
+				deps.globalEventService.publishDriveStream(me.id, 'folderUpdated', folderObj);
 
-			return folderObj;
+				return folderObj;
+			})();
+			return toPackedDriveFolder(result);
 		});
-	}
 }

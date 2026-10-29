@@ -37,7 +37,7 @@ import EmA from '@features/navigation/frontend/embed/components/EmA.vue';
 import EmAvatar from '@features/users/frontend/embed/components/EmAvatar.vue';
 import EmNoteHeader from '@features/notes/frontend/embed/components/EmNoteHeader.vue';
 import EmSubNoteContent from '@features/notes/frontend/embed/components/EmSubNoteContent.vue';
-import { notePage } from '@features/web/frontend/embed/utils.js';
+import { notePage } from '@features/notes/frontend/shared/note.js';
 import { misskeyApi } from '@features/api/frontend/embed/misskey-api.js';
 import EmMfm from '@features/markup/frontend/embed/components/EmMfm.js';
 

@@ -375,16 +375,16 @@ export class QueryService {
 			const brakets = (user: string) => new Brackets(qb => qb
 				.where(`${user}.id IS NULL`) // そもそもreplyやrenoteではない、もしくはleftjoinなどでuserが存在しなかった場合を考慮
 				.orWhere(`user.id = ${user}.id`)
-				.orWhere(`${user}.isSuspended = FALSE`));
+				.orWhere(`(${user}.isSuspended = FALSE AND ${user}.isRemoteSuspended = FALSE)`));
 			q
 				.andWhere(brakets('replyUser'))
 				.andWhere(brakets('renoteUser'));
 		} else {
 			const brakets = (user: string) => new Brackets(qb => qb
 				.where(`${user}.id IS NULL`) // そもそもreplyやrenoteではない、もしくはleftjoinなどでuserが存在しなかった場合を考慮
-				.orWhere(`${user}.isSuspended = FALSE`));
+				.orWhere(`(${user}.isSuspended = FALSE AND ${user}.isRemoteSuspended = FALSE)`));
 			q
-				.andWhere('user.isSuspended = FALSE')
+				.andWhere('user.isSuspended = FALSE').andWhere('user.isRemoteSuspended = FALSE')
 				.andWhere(brakets('replyUser'))
 				.andWhere(brakets('renoteUser'));
 		}

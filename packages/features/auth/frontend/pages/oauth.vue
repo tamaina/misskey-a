@@ -12,6 +12,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				:name="name"
 				:icon="logo"
 				:permissions="permissions"
+				:selectablePermissions="selectablePermissions"
+				:selectablePermissionsLabel="permissions.length > 0 ? $locale.sfc.additionalPermissions : undefined"
 				:waitOnDeny="true"
 				@accept="onAccept"
 				@deny="onDeny"
@@ -35,7 +37,10 @@ const name = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:
 const logo = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:oauth:client-logo"]')?.content;
 const permissions = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:oauth:scope"]')?.content.split(' ').filter((p): p is typeof Misskey.permissions[number] => (Misskey.permissions as readonly string[]).includes(p)) ?? [];
 
-function doPost(token: string, decision: 'accept' | 'deny') {
+const selectableMeta = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:oauth:selectable-permissions"]');
+const selectablePermissions = selectableMeta ? selectableMeta.content.split(' ').filter(p => (Misskey.permissions as readonly string[]).includes(p)) : undefined;
+
+function doPost(token: string, decision: 'accept' | 'deny', selected?: string[]) {
 	const form = window.document.createElement('form');
 	form.action = '/oauth/decision';
 	form.method = 'post';
@@ -53,6 +58,14 @@ function doPost(token: string, decision: 'accept' | 'deny') {
 	transactionId.value = transactionIdMeta?.content ?? '';
 	form.appendChild(transactionId);
 
+	if (decision === 'accept' && selected !== undefined) {
+		const scope = window.document.createElement('input');
+		scope.type = 'hidden';
+		scope.name = 'selected_scope';
+		scope.value = selected.join(' ');
+		form.appendChild(scope);
+	}
+
 	if (decision === 'deny') {
 		const cancel = window.document.createElement('input');
 		cancel.type = 'hidden';
@@ -65,8 +78,8 @@ function doPost(token: string, decision: 'accept' | 'deny') {
 	form.submit();
 }
 
-function onAccept(token: string) {
-	doPost(token, 'accept');
+function onAccept(token: string, selected?: string[]) {
+	doPost(token, 'accept', selected);
 }
 
 function onDeny(token: string) {
@@ -101,3 +114,15 @@ definePage(() => ({
 	overflow-y: scroll;
 }
 </style>
+
+<locale locale="ja-JP" lang="json">
+{
+	"additionalPermissions": "追加で許可するAPI権限（任意）"
+}
+</locale>
+
+<locale locale="en-US" lang="json">
+{
+	"additionalPermissions": "Additional API permissions (optional)"
+}
+</locale>

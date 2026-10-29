@@ -3,33 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { collectionsContract } from '../../../contract/index.js';
-import ms from 'ms';
-import { collectionsErrors } from '@features/collections/contract';
-import { legacyCollectionsSchemas } from '@features/collections/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = {
-	tags: ['account', 'notes', 'clips'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:account',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 20,
-	},
-
-	errors: collectionsErrors['clips/add-note'],
-} as const;
-
-export const paramDef = legacyCollectionsSchemas['clips/add-note'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('collectionCommands', commands => createContractTransportEndpoint(meta, paramDef, collectionsContract['clips/add-note'], async (params, user) => commands['clips/add-note'](params, {
-	context: { actor: { id: user.id } },
-})));
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../api.definition.js';
+import type { CollectionsDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { collectionsErrors } from '../../api.errors.js';
+import { ClipService } from '../../services/ClipService.js';
+export interface ClipsAddNoteDependencies<Actor extends ApiActor> {
+	clipService: Pick<CollectionsDependencies<Actor>['clipService'], 'addNote'>;
+}
+export function createClipsAddNoteProcedure<Actor extends ApiActor>(deps: ClipsAddNoteDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.clipsAddNote).use(requirePrincipal<Actor>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			try { await deps.clipService.addNote(me, ps.clipId, ps.noteId); } catch (error) {
+				if (error instanceof ClipService.NoSuchClipError) throw apiError(collectionsErrors.clipsAddNote.noSuchClip);
+				if (error instanceof ClipService.NoSuchNoteError) throw apiError(collectionsErrors.clipsAddNote.noSuchNote);
+				if (error instanceof ClipService.AlreadyAddedError) throw apiError(collectionsErrors.clipsAddNote.alreadyClipped);
+				if (error instanceof ClipService.TooManyClipNotesError) throw apiError(collectionsErrors.clipsAddNote.tooManyClipNotes);
+				throw error;
+			}
+		});
+}

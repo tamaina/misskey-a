@@ -3,20 +3,34 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
+import { createProcedureClient } from '@orpc/server';
+import { packedUserLiteSchema } from '@features/users/backend/user.schema.js';
+import type { ApiContext } from '@features/api/backend/transport/context.js';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
-import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteFor1on1Schema, packedChatMessageLiteForRoomSchema, packedChatRoomSchema, packedChatRoomInvitationSchema, packedChatRoomMembershipSchema } from '../../contract/packed.js';
-import { packedChatHistoryInput, packedChatHistoryOutput, packedChatHistoryDefinition, packedChatMessagesCreateToUserInput } from '../../contract/packed-endpoint-definitions.js';
-import { chatInputs, chatErrors } from '../../contract/index.js';
+import { packedChatMessageSchema, packedChatMessageLiteSchema, packedChatMessageLiteFor1on1Schema, packedChatMessageLiteForRoomSchema, packedChatRoomSchema, packedChatRoomInvitationSchema, packedChatRoomMembershipSchema } from '../../backend/chat.schema.js';
+import { chatHistoryContract } from '../../backend/endpoints/chat/history.contract.js';
+import { chatMessagesCreateToUserContract } from '../../backend/endpoints/chat/messages/create-to-user.contract.js';
+import { chatReadAllContract } from '../../backend/endpoints/chat/read-all.contract.js';
+import { chatRoomsMuteContract } from '../../backend/endpoints/chat/rooms/mute.contract.js';
+import { chatRoomsJoinErrors } from '../../backend/endpoints/chat/rooms/join.contract.js';
 import { ChatEntityService } from '../../backend/serializers/ChatEntityService.js';
-import { EndpointImplementation as HistoryEndpoint } from '../../backend/endpoints/chat/history.js';
+import { createChatRoomsJoiningProcedure } from '../../backend/endpoints/chat/rooms/joining.js';
+import { createChatRoomsInvitationsCreateProcedure } from '../../backend/endpoints/chat/rooms/invitations/create.js';
+import { chatRoomsInvitationsCreateContract } from '../../backend/endpoints/chat/rooms/invitations/create.contract.js';
+import { createChatRoomsMembersProcedure } from '../../backend/endpoints/chat/rooms/members.js';
+import { chatRoomsMembersContract } from '../../backend/endpoints/chat/rooms/members.contract.js';
+import { chatRoomsJoiningContract } from '../../backend/endpoints/chat/rooms/joining.contract.js';
+import { createChatMessagesCreateToUserProcedure } from '../../backend/endpoints/chat/messages/create-to-user.js';
+import { createChatMessagesCreateToRoomProcedure } from '../../backend/endpoints/chat/messages/create-to-room.js';
+import { chatMessagesCreateToRoomContract } from '../../backend/endpoints/chat/messages/create-to-room.contract.js';
+import { createChatHistoryProcedure } from '../../backend/endpoints/chat/history.js';
 import type { MiChatMessage } from '../../backend/models/ChatMessage.js';
 import type { MiChatRoom } from '../../backend/models/ChatRoom.js';
 import type { MiChatRoomInvitation } from '../../backend/models/ChatRoomInvitation.js';
 import type { MiChatRoomMembership } from '../../backend/models/ChatRoomMembership.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
 
 const date = new Date('2026-01-01T00:00:00Z');
 const user = { id: 'user123', name: null, username: 'alice', host: null, avatarUrl: 'https://example/avatar', avatarBlurhash: null, avatarDecorations: [], emojis: {}, onlineStatus: 'unknown' as const };
@@ -101,33 +115,199 @@ test.each([false, true])('actual history handler adds its read state for room=%s
 	const { service, message, room } = fixture();
 	if (roomHistory) { message.toUserId = null; message.toRoomId = room.id; message.toRoom = room; }
 	const packed = await service.packMessageDetailed(message);
-	const entities = mockDeep<ConstructorParameters<typeof HistoryEndpoint>[0]>();
-	entities.packMessagesDetailed.mockResolvedValue([packed]);
-	const chats = mockDeep<ConstructorParameters<typeof HistoryEndpoint>[1]>();
+	const entities = mockDeep<Parameters<typeof createChatHistoryProcedure>[0]['chatEntityService']>();
+	const extended = { ...packed, internalMessageData: 'secret', fromUser: { ...packed.fromUser, privateUserData: 'secret' }, reactions: packed.reactions.map(reaction => ({ ...reaction, internalReactionData: 'secret' })) };
+	entities.packMessagesDetailed.mockResolvedValue([extended]);
+	const chats = mockDeep<Parameters<typeof createChatHistoryProcedure>[0]['chatService']>();
 	chats.userHistory.mockResolvedValue([message]);
 	chats.roomHistory.mockResolvedValue([message]);
 	chats.getRoomReadStateMap.mockResolvedValue({ [room.id]: true });
 	chats.getUserReadStateMap.mockResolvedValue({ other123: true });
-	const endpoint = new HistoryEndpoint(entities, chats);
-	const result = await endpoint.exec({ room: roomHistory }, mockDeep<MiLocalUser>({ id: user.id }), null);
-	expect(v.parse(packedChatHistoryOutput, result)[0].isRead).toBe(true);
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: 'fixture', ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([mockDeep<MiLocalUser>({ id: user.id, isSuspended: false, movedToUri: null }), null]);
+	const endpoint = createProcedureClient(createChatHistoryProcedure({ chatEntityService: entities, chatService: chats }), { context });
+	const validate = vi.spyOn(requiredSchema(chatHistoryContract['~orpc'].outputSchema), '~run');
+	try {
+		const result = await endpoint({ room: roomHistory });
+		expect(result[0].isRead).toBe(true);
+		expect(result[0]).not.toHaveProperty('internalMessageData');
+		expect(result[0].fromUser).not.toHaveProperty('privateUserData');
+		expect(result[0].reactions[0]).not.toHaveProperty('internalReactionData');
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
 });
 
-test('native chat inputs strip extras and keep defaults while HTTP preserves parameters, errors and response identity', async () => {
-	expect(v.parse(packedChatHistoryInput, { future: true })).toEqual({ limit: 10, room: false });
-	expect(v.parse(packedChatMessagesCreateToUserInput, { toUserId: 'user123', text: null, future: true })).toEqual({ toUserId: 'user123', text: null });
-	for (const input of [{}, { toUserId: 7 }, { toUserId: 'user123', text: 7 }]) expect(v.safeParse(packedChatMessagesCreateToUserInput, input).success).toBe(false);
-	for (const input of [[], null, 7]) expect(v.safeParse(chatInputs['chat/read-all'], input).success).toBe(false);
-	expect(v.parse(chatInputs['chat/rooms/mute'], { roomId: 'room123', mute: true, future: true })).toEqual({ roomId: 'room123', mute: true });
-	expect(chatErrors['chat/rooms/join'].noSuchRoom.id).toBe('84416476-5ce8-4a2c-b568-9569f1b10733');
+test('native chat inputs strip transport fields, keep defaults and validate closed producer responses', async () => {
+	expect(v.parse(requiredSchema(chatHistoryContract['~orpc'].inputSchema), { future: true })).toEqual({ limit: 10, room: false });
+	expect(v.parse(requiredSchema(chatMessagesCreateToUserContract['~orpc'].inputSchema), { toUserId: 'user123', text: null, future: true })).toEqual({ toUserId: 'user123', text: null });
+	for (const input of [{}, { toUserId: 7 }, { toUserId: 'user123', text: 7 }]) expect(v.safeParse(requiredSchema(chatMessagesCreateToUserContract['~orpc'].inputSchema), input).success).toBe(false);
+	for (const input of [[], null, 7]) expect(v.safeParse(requiredSchema(chatReadAllContract['~orpc'].inputSchema), input).success).toBe(false);
+	expect(v.parse(requiredSchema(chatRoomsMuteContract['~orpc'].inputSchema), { roomId: 'room123', mute: true, future: true })).toEqual({ roomId: 'room123', mute: true });
+	expect(chatRoomsJoinErrors.noSuchRoom.id).toBe('84416476-5ce8-4a2c-b568-9569f1b10733');
 	const { service, message } = fixture();
 	const response = [{ ...await service.packMessageDetailed(message), future: true }];
-	const params = { future: true };
-	const projection = projectEndpointContract(packedChatHistoryDefinition);
-	expect(projection.input).not.toHaveProperty('additionalProperties');
-	const endpoint = new ContractEndpoint({}, projection, async ps => { expect(ps).toBe(params); return response; });
-	expect(await endpoint.exec(params, null, null)).toBe(response);
-	expect(params).toEqual({ future: true, limit: 10, room: false });
-	expect(v.safeParse(packedChatHistoryOutput, response).success).toBe(false);
-	await expect(endpoint.exec({ limit: 0 }, null, null)).rejects.toMatchObject({ code: 'INVALID_PARAM', info: { param: '#/properties/limit/minimum' } });
+	expect(v.safeParse(requiredSchema(chatHistoryContract['~orpc'].outputSchema), response).success).toBe(false);
+	expect(v.safeParse(requiredSchema(chatHistoryContract['~orpc'].inputSchema), { limit: 0 }).success).toBe(false);
+});
+
+function requiredSchema<Schema>(schema: Schema | undefined): Schema {
+	if (schema === undefined) throw new Error('Missing endpoint contract schema');
+	return schema;
+}
+
+test('native joining preserves membership identifiers and its populated public room', async () => {
+	const { service, room } = fixture();
+	const membership = mockDeep<MiChatRoomMembership>({ id: 'membership123', userId: user.id, roomId: room.id, room, user: null });
+	const chats = mockDeep<Parameters<typeof createChatRoomsJoiningProcedure>[0]['chatService']>();
+	chats.getMyMemberships.mockResolvedValue([membership]);
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: 'fixture', ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([mockDeep<MiLocalUser>({ id: user.id, isSuspended: false, movedToUri: null }), null]);
+	const packed = await service.packRoomMembership(membership, user, { populateRoom: true });
+	if (packed.room === undefined) throw new Error('Expected populated room');
+	const extended = { ...packed, internalMembershipData: 'secret', room: { ...packed.room, internalRoomData: 'secret', owner: { ...packed.room.owner, privateUserData: 'secret' } } };
+	const entities = mockDeep<Parameters<typeof createChatRoomsJoiningProcedure>[0]['chatEntityService']>();
+	entities.packRoomMemberships.mockResolvedValue([extended]);
+	const endpoint = createProcedureClient(createChatRoomsJoiningProcedure({ chatEntityService: entities, chatService: chats, idService: mockDeep() }), { context });
+	const validate = vi.spyOn(requiredSchema(chatRoomsJoiningContract['~orpc'].outputSchema), '~run');
+	const userValidate = vi.spyOn(packedUserLiteSchema, '~run');
+	const roomValidate = vi.spyOn(packedChatRoomSchema, '~run');
+	try {
+		const result = await endpoint({});
+		expect(result).toEqual([packed]);
+		expect(result[0].user).toBeUndefined();
+		expect(result[0]).not.toHaveProperty('internalMembershipData');
+		expect(result[0].room).not.toHaveProperty('internalRoomData');
+		expect(result[0].room?.owner).not.toHaveProperty('privateUserData');
+		expect(entities.packRoomMemberships).toHaveBeenCalledWith([membership], expect.objectContaining({ id: user.id }), { populateUser: false, populateRoom: true });
+		expect(validate).not.toHaveBeenCalled();
+		expect(userValidate).not.toHaveBeenCalled();
+		expect(roomValidate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); userValidate.mockRestore(); roomValidate.mockRestore(); }
+});
+
+function authenticatedContext(): ApiContext<MiLocalUser> {
+	const context = mockDeep<ApiContext<MiLocalUser>>({ credential: 'fixture', ip: '127.0.0.1', headers: {} });
+	context.services.authenticate.mockResolvedValue([mockDeep<MiLocalUser>({ id: user.id, isSuspended: false, movedToUri: null }), null]);
+	context.services.limitActor.mockReturnValue(null);
+	context.services.rateLimitFactor.mockResolvedValue(1);
+	return context;
+}
+
+test('native invitation creation selects its envelope, recipient, room and owner without output validation', async () => {
+	const { service, room } = fixture();
+	const invitation = mockDeep<MiChatRoomInvitation>({ id: 'invitation123', userId: user.id, roomId: room.id, room, user: null });
+	const packed = await service.packRoomInvitation(invitation, user);
+	const extended = {
+		...packed, internalInvitationData: 'secret',
+		user: { ...packed.user, privateRecipientData: 'secret' },
+		room: { ...packed.room, internalRoomData: 'secret', owner: { ...packed.room.owner, privateOwnerData: 'secret' } },
+	};
+	const chats = mockDeep<Parameters<typeof createChatRoomsInvitationsCreateProcedure>[0]['chatService']>();
+	chats.findMyRoomById.mockResolvedValue(room);
+	chats.createRoomInvitation.mockResolvedValue(invitation);
+	const entities = mockDeep<Parameters<typeof createChatRoomsInvitationsCreateProcedure>[0]['chatEntityService']>();
+	entities.packRoomInvitation.mockResolvedValue(extended);
+	const endpoint = createProcedureClient(createChatRoomsInvitationsCreateProcedure({ chatService: chats, chatEntityService: entities }), { context: authenticatedContext() });
+	const validate = vi.spyOn(requiredSchema(chatRoomsInvitationsCreateContract['~orpc'].outputSchema), '~run');
+	const userValidate = vi.spyOn(packedUserLiteSchema, '~run');
+	const roomValidate = vi.spyOn(packedChatRoomSchema, '~run');
+	try {
+		const result = await endpoint({ roomId: room.id, userId: user.id });
+		expect(result).toEqual(packed);
+		expect(result).not.toHaveProperty('internalInvitationData');
+		expect(result.user).not.toHaveProperty('privateRecipientData');
+		expect(result.room).not.toHaveProperty('internalRoomData');
+		expect(result.room.owner).not.toHaveProperty('privateOwnerData');
+		expect(chats.createRoomInvitation).toHaveBeenCalledWith(user.id, room.id, user.id);
+		expect(validate).not.toHaveBeenCalled();
+		expect(userValidate).not.toHaveBeenCalled();
+		expect(roomValidate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); userValidate.mockRestore(); roomValidate.mockRestore(); }
+});
+
+test('native room members select membership and populated user fields without output validation', async () => {
+	const { service, room } = fixture();
+	const membership = mockDeep<MiChatRoomMembership>({ id: 'membership123', userId: user.id, user: null, roomId: room.id, room });
+	const packed = await service.packRoomMembership(membership, user, { populateUser: true });
+	if (packed.user === undefined) throw new Error('Expected populated member');
+	const extended = { ...packed, internalMembershipData: 'secret', user: { ...packed.user, privateMemberData: 'secret' } };
+	const chats = mockDeep<Parameters<typeof createChatRoomsMembersProcedure>[0]['chatService']>();
+	chats.findRoomById.mockResolvedValue(room);
+	chats.isRoomMember.mockResolvedValue(true);
+	chats.getRoomMembershipsWithPagination.mockResolvedValue([membership]);
+	const entities = mockDeep<Parameters<typeof createChatRoomsMembersProcedure>[0]['chatEntityService']>();
+	entities.packRoomMemberships.mockResolvedValue([extended]);
+	const endpoint = createProcedureClient(createChatRoomsMembersProcedure({ chatService: chats, chatEntityService: entities, idService: mockDeep() }), { context: authenticatedContext() });
+	const validate = vi.spyOn(requiredSchema(chatRoomsMembersContract['~orpc'].outputSchema), '~run');
+	const userValidate = vi.spyOn(packedUserLiteSchema, '~run');
+	try {
+		const result = await endpoint({ roomId: room.id });
+		expect(result).toEqual([packed]);
+		expect(result[0].room).toBeUndefined();
+		expect(result[0]).not.toHaveProperty('internalMembershipData');
+		expect(result[0].user).not.toHaveProperty('privateMemberData');
+		expect(entities.packRoomMemberships).toHaveBeenCalledWith([membership], expect.objectContaining({ id: user.id }), { populateUser: true, populateRoom: false });
+		expect(validate).not.toHaveBeenCalled();
+		expect(userValidate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); userValidate.mockRestore(); }
+});
+
+test('native direct-message creation selects lite reaction fields and retains nullable attachment fields without output validation', async () => {
+	const { service, message } = fixture();
+	const recipientId = message.toUserId;
+	if (recipientId === null) throw new Error('Expected a direct-message recipient');
+	const packed = await service.packMessageLiteFor1on1(message);
+	const extended = { ...packed, internalMessageData: 'secret', fromUser: { ...user, privateUserData: 'secret' }, reactions: packed.reactions.map(reaction => ({ ...reaction, internalReactionData: 'secret', user })) };
+	const deps = mockDeep<Parameters<typeof createChatMessagesCreateToUserProcedure>[0]>();
+	deps.getterService.getUser.mockResolvedValue(mockDeep<MiLocalUser>({ id: recipientId, host: null }));
+	deps.chatService.createMessageToUser.mockResolvedValue(extended);
+	const endpoint = createProcedureClient(createChatMessagesCreateToUserProcedure(deps), { context: authenticatedContext() });
+	const validate = vi.spyOn(requiredSchema(chatMessagesCreateToUserContract['~orpc'].outputSchema), '~run');
+	try {
+		const result = await endpoint({ toUserId: recipientId, text: 'hello' });
+		expect(result).toEqual(packed);
+		expect(result.file).toBeNull();
+		expect(result.fileId).toBeNull();
+		expect(result).not.toHaveProperty('internalMessageData');
+		expect(result).not.toHaveProperty('fromUser');
+		expect(result.reactions).toEqual(packed.reactions);
+		for (const reaction of result.reactions) {
+			expect(reaction).not.toHaveProperty('internalReactionData');
+			expect(reaction).not.toHaveProperty('user');
+		}
+		expect(validate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); }
+});
+
+test('native room-message creation selects lite room, author and reaction-user fields without output validation', async () => {
+	const { service, message, room } = fixture();
+	message.toUserId = null;
+	message.toRoomId = room.id;
+	message.toRoom = room;
+	const packed = await service.packMessageLiteForRoom(message);
+	const extended = {
+		...packed, internalMessageData: 'secret',
+		fromUser: { ...packed.fromUser, privateAuthorData: 'secret' },
+		reactions: packed.reactions.map(reaction => ({ ...reaction, internalReactionData: 'secret', user: { ...reaction.user, privateReactionUserData: 'secret' } })),
+	};
+	const deps = mockDeep<Parameters<typeof createChatMessagesCreateToRoomProcedure>[0]>();
+	deps.chatService.findRoomById.mockResolvedValue(room);
+	deps.chatService.createMessageToRoom.mockResolvedValue(extended);
+	const endpoint = createProcedureClient(createChatMessagesCreateToRoomProcedure(deps), { context: authenticatedContext() });
+	const validate = vi.spyOn(requiredSchema(chatMessagesCreateToRoomContract['~orpc'].outputSchema), '~run');
+	const userValidate = vi.spyOn(packedUserLiteSchema, '~run');
+	try {
+		const result = await endpoint({ toRoomId: room.id, text: 'hello' });
+		expect(result).toEqual(packed);
+		expect(result.toRoomId).toBe(room.id);
+		expect(result.file).toBeNull();
+		expect(result).not.toHaveProperty('internalMessageData');
+		expect(result.fromUser).not.toHaveProperty('privateAuthorData');
+		for (const reaction of result.reactions) {
+			expect(reaction).not.toHaveProperty('internalReactionData');
+			expect(reaction.user).not.toHaveProperty('privateReactionUserData');
+		}
+		expect(validate).not.toHaveBeenCalled();
+		expect(userValidate).not.toHaveBeenCalled();
+	} finally { validate.mockRestore(); userValidate.mockRestore(); }
 });

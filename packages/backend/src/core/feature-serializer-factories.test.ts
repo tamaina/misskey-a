@@ -20,7 +20,7 @@ import { relationshipServices } from '@features/relationships/backend/services.j
 import { roleServices } from '@features/roles/backend/services.js';
 import { timelineServices } from '@features/timelines/backend/services.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { Inputs } from '@features/index/backend/service-definitions.js';
 

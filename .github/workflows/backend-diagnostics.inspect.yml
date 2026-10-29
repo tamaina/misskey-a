@@ -4,7 +4,7 @@ name: Backend diagnostics (inspect)
 on:
   pull_request:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/backend/**

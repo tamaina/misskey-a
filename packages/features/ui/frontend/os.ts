@@ -455,17 +455,21 @@ export function inputDatetime(props: {
 	});
 }
 
-export function authenticateDialog(): Promise<{
+export function authenticateDialog(props: { currentPassword?: string; } = {}): Promise<{
 	canceled: true; result: undefined;
 } | {
 	canceled: false; result: { password: string; token: string | null; };
 }> {
 	return new Promise(resolve => {
-		const { dispose } = popup(defineAsyncComponent(() => import('@features/auth/frontend/components/MkPasswordDialog.vue')), {}, {
+		const { dispose } = popup(defineAsyncComponent(() => import('@features/auth/frontend/components/MkPasswordDialog.vue')), props, {
 			done: result => {
 				resolve(result ? { canceled: false, result } : { canceled: true, result: undefined });
 			},
-			closed: () => dispose(),
+			cancelled: () => resolve({ canceled: true, result: undefined }),
+			closed: () => {
+				resolve({ canceled: true, result: undefined });
+				dispose();
+			},
 		});
 	});
 }

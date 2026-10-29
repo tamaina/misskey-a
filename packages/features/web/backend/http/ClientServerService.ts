@@ -47,6 +47,7 @@ import { ClientLoggerService } from './ClientLoggerService.js';
 import { HtmlTemplateService } from './HtmlTemplateService.js';
 
 import { BasePage } from '@features/web/backend/templates/base.js';
+import { htmlToPlainText } from '@features/web/backend/utility/html-to-plain-text.js';
 import { UserPage } from '@features/users/backend/templates/user.js';
 import { NotePage } from '@features/notes/backend/templates/note.js';
 import { PagePage } from '@features/pages/backend/templates/page.js';
@@ -109,7 +110,7 @@ export class ClientServerService {
 		private flashsRepository: FlashsRepository,
 
 		@Inject(DI.reversiGamesRepository)
-		private reversiGamesRepository: ReversiGamesRepository,
+		private reversiGamesRepository: { findOneBy(where: { id: string }): Promise<import('../../../games/backend/models/ReversiGame.js').MiReversiGame | null> },
 
 		@Inject(DI.announcementsRepository)
 		private announcementsRepository: AnnouncementsRepository,
@@ -178,13 +179,19 @@ export class ClientServerService {
 				'purpose': 'any',
 			}],
 			'share_target': {
-				'action': '/share/',
-				'method': 'GET',
-				'enctype': 'application/x-www-form-urlencoded',
+				'action': '/sw/share',
+				'method': 'POST',
+				'enctype': 'multipart/form-data',
 				'params': {
 					'title': 'title',
 					'text': 'text',
 					'url': 'url',
+					'files': [
+						{
+							'name': 'files',
+							'accept': '*/*',
+						},
+					],
 				},
 			},
 			'shortcuts': [{
@@ -440,7 +447,7 @@ export class ClientServerService {
 			return await HtmlTemplateService.replyHtml(reply, BasePage({
 				img: this.meta.bannerUrl ?? undefined,
 				title: this.meta.name ?? 'Misskey',
-				desc: this.meta.description ?? undefined,
+				desc: this.meta.description == null ? undefined : htmlToPlainText(this.meta.description),
 				...(await this.htmlTemplateService.getCommonData()),
 				...data,
 			}));
@@ -455,6 +462,7 @@ export class ClientServerService {
 				usernameLower: username.toLowerCase(),
 				host: host ?? IsNull(),
 				isSuspended: false,
+				isRemoteSuspended: false,
 				requireSigninToViewContents: false,
 			});
 
@@ -520,6 +528,7 @@ export class ClientServerService {
 				usernameLower: username.toLowerCase(),
 				host: host ?? IsNull(),
 				isSuspended: false,
+				isRemoteSuspended: false,
 			});
 
 			vary(reply.raw, 'Accept');
@@ -564,6 +573,7 @@ export class ClientServerService {
 				id: request.params.user,
 				host: IsNull(),
 				isSuspended: false,
+				isRemoteSuspended: false,
 			});
 
 			if (user == null) {

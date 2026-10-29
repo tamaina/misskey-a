@@ -2,48 +2,24 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedBlockingListDefinition, packedBlockingListInput, packedBlockingListOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import type { BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { BlockingEntityService } from '../../serializers/BlockingEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(packedBlockingListDefinition);
-
-export const meta = {
-	tags: ['account'],
-
-	requireCredential: true,
-
-	kind: 'read:blocks',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedBlockingListInput, typeof packedBlockingListOutput> {
-	constructor(
-		@Inject(DI.blockingsRepository)
-		private blockingsRepository: BlockingsRepository,
-
-		private blockingEntityService: BlockingEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.blockingsRepository.createQueryBuilder('blocking'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
+import { toPackedBlocking } from '../relationships.schema.js';
+export function createBlockingListProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'queryService' | 'blockingsRepository' | 'blockingEntityService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["blocking/list"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.blockingsRepository.createQueryBuilder('blocking'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('blocking.blockerId = :meId', { meId: me.id });
 
 			const blockings = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await this.blockingEntityService.packMany(blockings, me);
+			return (await deps.blockingEntityService.packMany(blockings, me)).map(toPackedBlocking);
 		});
-	}
 }

@@ -2,21 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidVerifyEmailDefinition, voidVerifyEmailInput, voidVerifyEmailOutput } from '../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(voidVerifyEmailDefinition);
+import { VerifyEmailContract } from '../api.definition.js';
 
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 export const meta = {
-	requireCredential: false,
 
 	tags: ['account'],
 
@@ -28,35 +23,32 @@ export const meta = {
 		},
 	},
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidVerifyEmailInput, typeof voidVerifyEmailOutput> {
-	constructor(
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private userEntityService: UserEntityService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps) => {
-			const profile = await this.userProfilesRepository.findOneBy({
+export interface VerifyEmailDependencies {
+	userProfilesRepository: UserProfilesRepository;
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
+}
+export function createVerifyEmailProcedure(deps: VerifyEmailDependencies) {
+	return createApiProcedure<MiLocalUser>()(VerifyEmailContract).handler(async ({ input, context }) => {
+		const ps = input;
+		const result = await (async () => {
+			const profile = await deps.userProfilesRepository.findOneBy({
 				emailVerifyCode: ps.code,
 			});
 
 			if (profile == null) {
-				throw new ApiError(meta.errors.noSuchCode);
+				throw apiError(meta.errors.noSuchCode);
 			}
 
-			await this.userProfilesRepository.update({ userId: profile.userId }, {
+			await deps.userProfilesRepository.update({ userId: profile.userId }, {
 				emailVerified: true,
 				emailVerifyCode: null,
 			});
 
-			this.globalEventService.publishMainStream(profile.userId, 'meUpdated', await this.userEntityService.packSelf(profile.userId, {
+			deps.globalEventService.publishMainStream(profile.userId, 'meUpdated', await deps.userEntityService.packSelf(profile.userId, {
 				includeSecrets: true,
 			}));
-		});
-	}
+		})();
+		return result;
+	});
 }
