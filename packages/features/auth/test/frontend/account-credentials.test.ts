@@ -34,7 +34,7 @@ beforeEach(() => {
 	vi.resetAllMocks();
 	m.files.mockResolvedValue(undefined);
 	m.store.s.accountTokens = { 'example.test/current': 'current-token' };
-	m.store.s.accountInfos = { 'example.test/current': { id: 'current' } };
+	m.store.s.accountInfos = { 'example.test/current': { ...m.account } };
 	m.store.r.accountTokens.value = m.store.s.accountTokens;
 	m.store.r.accountInfos.value = m.store.s.accountInfos;
 	m.store.set.mockImplementation(async (key: 'accountTokens' | 'accountInfos', value: never) => {

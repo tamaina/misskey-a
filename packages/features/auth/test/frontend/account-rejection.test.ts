@@ -8,7 +8,7 @@ import { refreshCurrentAccount } from '@features/auth/frontend/accounts.js';
 
 const m = vi.hoisted(() => ({
 	account: { id: 'current', username: 'synthetic', token: 'synthetic-current' },
-	store: { s: { enablePreferencesAutoCloudBackup: true, accountTokens: {} as Record<string, string>, accountInfos: {} as Record<string, unknown> }, set: vi.fn() },
+	store: { r: { accountTokens: { value: {} }, accountInfos: { value: {} } }, s: { enablePreferencesAutoCloudBackup: true, accountTokens: {} as Record<string, string>, accountInfos: {} as Record<string, unknown> }, set: vi.fn() },
 	prefer: { s: { accounts: [] as [string, { id: string; username: string }][] }, commit: vi.fn() },
 	api: vi.fn(), backup: vi.fn(), files: vi.fn(), clear: vi.fn(), reload: vi.fn(), choice: vi.fn(), alert: vi.fn(), suspended: vi.fn(), finish: vi.fn(),
 }));

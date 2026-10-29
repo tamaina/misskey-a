@@ -21,6 +21,9 @@ import { signout } from '@features/auth/frontend/signout.js';
 
 type AccountWithToken = Misskey.entities.MeDetailed & { token: string };
 
+// The live $i remains available until reload, even after its credential is removed.
+const rejectedCredentials = new Map<string, string>();
+
 /** Recover device-only credentials without writing a stale device-state snapshot back. */
 async function loadAccountCredentials(keys: string[]) {
 	await store.ready;
@@ -33,6 +36,15 @@ async function loadAccountCredentials(keys: string[]) {
 			store.r.accountInfos.value = store.s.accountInfos = { ...saved.accountInfos, ...store.s.accountInfos };
 		}
 	}
+	for (const [key, token] of rejectedCredentials) {
+		if (store.s.accountTokens[key] !== token) continue;
+		const tokens = { ...store.s.accountTokens };
+		const accountInfos = { ...store.s.accountInfos };
+		delete tokens[key];
+		delete accountInfos[key];
+		store.r.accountTokens.value = store.s.accountTokens = tokens;
+		store.r.accountInfos.value = store.s.accountInfos = accountInfos;
+	}
 	return { tokens: store.s.accountTokens, accountInfos: store.s.accountInfos };
 }
 
@@ -43,20 +55,13 @@ export async function getAccounts(): Promise<{
 	user?: Misskey.entities.MeDetailed | null;
 	token: string | null;
 }[]> {
-	const accounts = prefer.s.accounts;
-	const keys = accounts.map(([host, user]) => host + '/' + user.id);
-	if ($i) keys.push(host + '/' + $i.id);
-	await loadAccountCredentials(keys);
-	// Repair legacy logins before the account list lets the user switch away.
-	// Do this here, not during credential rejection, to avoid reviving a rejected token.
-	if ($i && !store.s.accountTokens[host + '/' + $i.id]) {
-		const key = host + '/' + $i.id;
-		await store.set('accountTokens', { ...store.s.accountTokens, [key]: $i.token });
-		const account = getCurrentAccountInfo();
-		if (account && !store.s.accountInfos[key]) {
-			await store.set('accountInfos', { ...store.s.accountInfos, [key]: account });
-		}
+	await loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));
+	// Keep a different saved token, but repair missing legacy credentials and list entries.
+	const account = getCurrentAccountInfo();
+	if ($i && account && rejectedCredentials.get(host + '/' + $i.id) !== $i.token) {
+		await addAccount(host, account, store.s.accountTokens[host + '/' + $i.id] ?? $i.token);
 	}
+	const accounts = prefer.s.accounts;
 	const tokens = store.s.accountTokens;
 	const accountInfos = store.s.accountInfos;
 	return accounts.map(([host, user]) => ({
@@ -70,15 +75,19 @@ export async function getAccounts(): Promise<{
 
 async function addAccount(host: string, user: Misskey.entities.MeDetailed, token: AccountWithToken['token']) {
 	const key = host + '/' + user.id;
+	if (rejectedCredentials.get(key) === token) return;
 	await loadAccountCredentials([key]);
 	if (store.s.accountTokens[key] !== token) {
 		await store.set('accountTokens', { ...store.s.accountTokens, [key]: token });
 	}
-	if (!store.s.accountInfos[key]) {
-		await store.set('accountInfos', { ...store.s.accountInfos, [key]: user });
+	if (JSON.stringify(store.s.accountInfos[key]) !== JSON.stringify(user)) {
+		await store.set('accountInfos', { ...store.s.accountInfos, [key]: JSON.parse(JSON.stringify(user)) });
 	}
-	if (!prefer.s.accounts.some(x => x[0] === host && x[1].id === user.id)) {
+	const listed = prefer.s.accounts.find(x => x[0] === host && x[1].id === user.id);
+	if (!listed) {
 		prefer.commit('accounts', [...prefer.s.accounts, [host, { id: user.id, username: user.username }]]);
+	} else if (listed[1].username !== user.username) {
+		prefer.commit('accounts', prefer.s.accounts.map(entry => entry === listed ? [host, { id: user.id, username: user.username }] : entry));
 	}
 }
 
@@ -177,12 +186,14 @@ function getCurrentAccountInfo(): Misskey.entities.MeDetailed | null {
 	return accounts[$i.id];
 }
 
-function persistCurrentAccountInfo() {
+async function persistCurrentAccountInfo() {
 	if (!$i) return;
 	const accountInfos: Record<string, Misskey.entities.MeDetailed> = {};
 	for (const [key, value] of Object.entries(store.s.accountInfos)) Reflect.set(accountInfos, key, value);
-	Reflect.set(accountInfos, host + '/' + $i.id, getCurrentAccountInfo());
-	store.set('accountInfos', accountInfos);
+	Reflect.set(accountInfos, host + '/' + $i.id, JSON.parse(JSON.stringify(getCurrentAccountInfo())));
+	if (JSON.stringify(store.s.accountInfos) !== JSON.stringify(accountInfos)) {
+		await store.set('accountInfos', accountInfos);
+	}
 }
 
 export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
@@ -194,9 +205,10 @@ export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
 	for (const [key, value] of Object.entries(accountData)) {
 		Reflect.set($i, key, value);
 	}
-	persistCurrentAccountInfo();
 	$i.token = token;
+	const persisted = persistCurrentAccountInfo();
 	miLocalStorage.setItem('account', JSON.stringify($i));
+	return persisted;
 }
 
 export function updateCurrentAccountPartial(accountData: Partial<Misskey.entities.MeDetailed>) {
@@ -213,8 +225,15 @@ export function updateCurrentAccountPartial(accountData: Partial<Misskey.entitie
 export async function refreshCurrentAccount() {
 	if (!$i) return;
 	const me = $i;
-	return fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(async reason => {
+	return fetchAccount($i.token, $i.id).then(async account => {
+		rejectedCredentials.delete(host + '/' + me.id);
+		await loadAccountCredentials([host + '/' + me.id]);
+		await updateCurrentAccount(account);
+		const currentAccount = getCurrentAccountInfo();
+		if (currentAccount) await addAccount(host, currentAccount, me.token);
+	}).catch(async reason => {
 		if (reason === isCredentialRejected) {
+			rejectedCredentials.set(host + '/' + me.id, me.token);
 			// Load alternatives before removal so an IDB fallback cannot restore the rejected account.
 			await loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));
 			await removeAccount(host, me.id);
@@ -246,6 +265,12 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 			showing.value = false;
 			throw reason;
 		});
+	}
+
+	rejectedCredentials.delete(host + '/' + me.id);
+	const currentAccount = getCurrentAccountInfo();
+	if ($i && currentAccount && $i.id !== me.id) {
+		await addAccount(host, currentAccount, $i.token);
 	}
 
 	miLocalStorage.setItem('account', JSON.stringify({
