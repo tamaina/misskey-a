@@ -293,7 +293,7 @@ const services = [
 	['RegistryApiService', RegistryApiService, 3],
 	['RelayService', RelayService, 5],
 	['RemoteLoggerService', RemoteLoggerService, 1],
-	['RemoteUserResolveService', RemoteUserResolveService, 7],
+	['RemoteUserResolveService', RemoteUserResolveService, 9],
 	['ReversiService', ReversiService, 8],
 	['RoleService', RoleService, 14],
 	['S3Service', S3Service, 1],
