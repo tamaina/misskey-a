@@ -4,12 +4,14 @@
  */
 
 import { createHash } from 'node:crypto';
+import { restoreAccountSwitchBaseline } from './account-switch-source-rebase.js';
 import rebases from './browser-session-client-source-rebase.json';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 
 /** Reverse only the exact reviewed rejected-credential cleanup for older locale proofs. */
-export function restoreBrowserSessionClientBaseline(file: string, source: string): string {
+export function restoreBrowserSessionClientBaseline(file: string, currentSource: string): string {
+	const source = restoreAccountSwitchBaseline(file, currentSource);
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
 	const localeStart = source.search(/<locale\s/);

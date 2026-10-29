@@ -1,0 +1,136 @@
+[
+  {
+    "file": "packages/features/auth/frontend/accounts.ts",
+    "baselineBodySha256": "82a5e6e27e1767b569a47d250a7c53666b8951cf8adfe675cab29e1a21b523ac",
+    "currentBodySha256": "b3b73575c4bfb8290d7bd94fe56953287d2feceb926c6ec77609a34b802ea9a1",
+    "localeBlocksSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "edits": [
+      {
+        "start": 1037,
+        "end": 1108,
+        "current": "import { get } from '@features/runtime/frontend/utility/idb-proxy.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 1244,
+        "end": 2525,
+        "current": "\n// The live $i remains available until reload, even after its credential is removed.\nconst rejectedCredentials = new Map<string, string>();\n\n/** Recover device-only credentials without writing a stale device-state snapshot back. */\nasync function loadAccountCredentials(keys: string[]) {\n\tawait store.ready;\n\tif (keys.some(key => !store.s.accountTokens[key] || !store.s.accountInfos[key])) {\n\t\tconst saved: Partial<Pick<typeof store.s, 'accountTokens' | 'accountInfos'>> | undefined = await get(store.deviceStateKeyName);\n\t\tif (saved?.accountTokens) {\n\t\t\tstore.r.accountTokens.value = store.s.accountTokens = { ...saved.accountTokens, ...store.s.accountTokens };\n\t\t}\n\t\tif (saved?.accountInfos) {\n\t\t\tstore.r.accountInfos.value = store.s.accountInfos = { ...saved.accountInfos, ...store.s.accountInfos };\n\t\t}\n\t}\n\tfor (const [key, token] of rejectedCredentials) {\n\t\tif (store.s.accountTokens[key] !== token) continue;\n\t\tconst tokens = { ...store.s.accountTokens };\n\t\tconst accountInfos = { ...store.s.accountInfos };\n\t\tdelete tokens[key];\n\t\tdelete accountInfos[key];\n\t\tstore.r.accountTokens.value = store.s.accountTokens = tokens;\n\t\tstore.r.accountInfos.value = store.s.accountInfos = accountInfos;\n\t}\n\treturn { tokens: store.s.accountTokens, accountInfos: store.s.accountInfos };\n}\n",
+        "baseline": ""
+      },
+      {
+        "start": 2742,
+        "end": 3180,
+        "current": "\tawait loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));\n\t// Keep a different saved token, but repair missing legacy credentials and list entries.\n\tconst account = getCurrentAccountInfo();\n\tif ($i && account && rejectedCredentials.get(host + '/' + $i.id) !== $i.token) {\n\t\tawait addAccount(host, account, store.s.accountTokens[host + '/' + $i.id] ?? $i.token);\n\t}\n\tconst accounts = prefer.s.accounts;\n",
+        "baseline": ""
+      },
+      {
+        "start": 3263,
+        "end": 3263,
+        "current": "",
+        "baseline": "\tconst accounts = prefer.s.accounts;\n"
+      },
+      {
+        "start": 3566,
+        "end": 4102,
+        "current": "\tconst key = host + '/' + user.id;\n\tif (rejectedCredentials.get(key) === token) return;\n\tawait loadAccountCredentials([key]);\n\tif (store.s.accountTokens[key] !== token) {\n\t\tawait store.set('accountTokens', { ...store.s.accountTokens, [key]: token });\n\t}\n\tif (JSON.stringify(store.s.accountInfos[key]) !== JSON.stringify(user)) {\n\t\tawait store.set('accountInfos', { ...store.s.accountInfos, [key]: JSON.parse(JSON.stringify(user)) });\n\t}\n\tconst listed = prefer.s.accounts.find(x => x[0] === host && x[1].id === user.id);\n\tif (!listed) {\n",
+        "baseline": "\tif (!prefer.s.accounts.some(x => x[0] === host && x[1].id === user.id)) {\n\t\tstore.set('accountTokens', { ...store.s.accountTokens, [host + '/' + user.id]: token });\n\t\tstore.set('accountInfos', { ...store.s.accountInfos, [host + '/' + user.id]: user });\n"
+      },
+      {
+        "start": 4205,
+        "end": 4395,
+        "current": "\t} else if (listed[1].username !== user.username) {\n\t\tprefer.commit('accounts', prefer.s.accounts.map(entry => entry === listed ? [host, { id: user.id, username: user.username }] : entry));\n",
+        "baseline": ""
+      },
+      {
+        "start": 4581,
+        "end": 4624,
+        "current": "\tawait store.set('accountTokens', tokens);\n",
+        "baseline": "\tstore.set('accountTokens', tokens);\n"
+      },
+      {
+        "start": 4735,
+        "end": 4783,
+        "current": "\tawait store.set('accountInfos', accountInfos);\n",
+        "baseline": "\tstore.set('accountInfos', accountInfos);\n"
+      },
+      {
+        "start": 7653,
+        "end": 7698,
+        "current": "async function persistCurrentAccountInfo() {\n",
+        "baseline": "function persistCurrentAccountInfo() {\n"
+      },
+      {
+        "start": 7892,
+        "end": 8123,
+        "current": "\tReflect.set(accountInfos, host + '/' + $i.id, JSON.parse(JSON.stringify(getCurrentAccountInfo())));\n\tif (JSON.stringify(store.s.accountInfos) !== JSON.stringify(accountInfos)) {\n\t\tawait store.set('accountInfos', accountInfos);\n\t}\n",
+        "baseline": "\tReflect.set(accountInfos, host + '/' + $i.id, getCurrentAccountInfo());\n\tstore.set('accountInfos', accountInfos);\n"
+      },
+      {
+        "start": 8419,
+        "end": 8419,
+        "current": "",
+        "baseline": "\tpersistCurrentAccountInfo();\n"
+      },
+      {
+        "start": 8438,
+        "end": 8486,
+        "current": "\tconst persisted = persistCurrentAccountInfo();\n",
+        "baseline": ""
+      },
+      {
+        "start": 8542,
+        "end": 8561,
+        "current": "\treturn persisted;\n",
+        "baseline": ""
+      },
+      {
+        "start": 8945,
+        "end": 9300,
+        "current": "\treturn fetchAccount($i.token, $i.id).then(async account => {\n\t\trejectedCredentials.delete(host + '/' + me.id);\n\t\tawait loadAccountCredentials([host + '/' + me.id]);\n\t\tawait updateCurrentAccount(account);\n\t\tconst currentAccount = getCurrentAccountInfo();\n\t\tif (currentAccount) await addAccount(host, currentAccount, me.token);\n\t}).catch(async reason => {\n",
+        "baseline": "\treturn fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(async reason => {\n"
+      },
+      {
+        "start": 9341,
+        "end": 9590,
+        "current": "\t\t\trejectedCredentials.set(host + '/' + me.id, me.token);\n\t\t\t// Load alternatives before removal so an IDB fallback cannot restore the rejected account.\n\t\t\tawait loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));\n",
+        "baseline": ""
+      },
+      {
+        "start": 10384,
+        "end": 10586,
+        "current": "\trejectedCredentials.delete(host + '/' + me.id);\n\tconst currentAccount = getCurrentAccountInfo();\n\tif ($i && currentAccount && $i.id !== me.id) {\n\t\tawait addAccount(host, currentAccount, $i.token);\n\t}\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 10935,
+        "end": 11044,
+        "current": "\tconst { tokens } = await loadAccountCredentials([host + '/' + id]);\n\tconst token = tokens[host + '/' + id];\n",
+        "baseline": "\tconst token = store.s.accountTokens[host + '/' + id];\n"
+      },
+      {
+        "start": 11058,
+        "end": 11080,
+        "current": "\t\tawait login(token);\n",
+        "baseline": "\t\tlogin(token);\n"
+      },
+      {
+        "start": 11301,
+        "end": 11423,
+        "current": "\t\t\t\tawait store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });\n\t\t\t\tawait login(res.i);\n",
+        "baseline": "\t\t\t\tstore.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });\n\t\t\t\tlogin(res.i);\n"
+      },
+      {
+        "start": 13127,
+        "end": 13228,
+        "current": "\t\t\t\t\t\t\tawait store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });\n",
+        "baseline": "\t\t\t\t\t\t\tstore.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });\n"
+      },
+      {
+        "start": 13358,
+        "end": 13397,
+        "current": "\t\t\t\t\t\t\t\tawait switchAccount(host, id);\n",
+        "baseline": "\t\t\t\t\t\t\t\tswitchAccount(host, id);\n"
+      }
+    ]
+  }
+]
