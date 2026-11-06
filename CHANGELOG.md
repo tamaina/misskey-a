@@ -80,6 +80,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: 設定検索で動的な項目を扱う際に静的な検索項目が失われる問題を修正 (#25)
 - Fix: main/embedの言語別entry・翻訳の初期化と文書の表示方向を修正し、CSS moduleの元の識別子とカスタムCSSの優先順位を維持 (#22, #26, #52, #69)
 - Fix: Service Workerの通知からのフォロー操作で、通知元のユーザーIDが文字列であることを確認するように ([a1b3e952](https://github.com/tamaina/misskey-a/commit/a1b3e952d3e6d30cef7dfa4127f069df8642424b))
+- Fix: チャットのプッシュ通知をクリックすると自分自身とのチャットが開く問題を修正 ([upstream #18118](https://github.com/misskey-dev/misskey/issues/18118))
 
 ### Server
 - Fix: リモートユーザーの再取得で通信に失敗した場合は既存情報を表示し、停止・ブロック済みサーバーへの再取得を省略するように (#233)
