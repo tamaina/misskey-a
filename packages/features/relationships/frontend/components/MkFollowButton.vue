@@ -112,6 +112,8 @@ async function onClick() {
 			const { canceled } = await os.confirm({
 				type: 'question',
 				text: interpolateLocaleParameters($locale.value.sfc.cancelFollowRequestConfirm, { name: props.user.name || props.user.username }),
+				okText: $locale.value.sfc.yes,
+				cancelText: $locale.value.sfc.no,
 			});
 
 			if (canceled) {
@@ -381,6 +383,8 @@ onBeforeUnmount(() => {
 
 <locale lang="json" locale="ja-JP">
 {
+	"yes": "はい",
+	"no": "いいえ",
 	"unfollowConfirm": "{name}のフォローを解除しますか？",
 	"cancelFollowRequestConfirm": "{name}へのフォロー申請をキャンセルしますか？",
 	"followConfirm": "{name}をフォローしますか？",

@@ -80,6 +80,8 @@ async function cancel(user: Misskey.entities.UserLite) {
 	const { canceled } = await os.confirm({
 		type: 'question',
 		text: interpolateLocaleParameters($locale.value.sfc.cancelFollowRequestConfirm, { name: user.name || user.username }),
+		okText: $locale.value.sfc.yes,
+		cancelText: $locale.value.sfc.no,
 	});
 
 	if (canceled) return;
@@ -336,6 +338,8 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-JP">
 {
+	"yes": "はい",
+	"no": "いいえ",
 	"rejectFollowRequestConfirm": "{name}からのフォロー申請を拒否しますか？",
 	"cancelFollowRequestConfirm": "{name}へのフォロー申請をキャンセルしますか？",
 	"recieved": "受け取った申請",
