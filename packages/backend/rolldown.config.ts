@@ -3,7 +3,7 @@ import { globSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import sourcePaths from './tsconfig.paths.json' with { type: 'json' };
 import { version as summalyVersion } from '@misskey-dev/summaly';
-import type { ExternalOption, InputOptions } from 'rolldown';
+import type { Plugin, ExternalOption, InputOptions } from 'rolldown';
 import { backendDevServerPlugin } from './lib/backend-dev-server.ts';
 import { bullmqEsmPlugin } from './lib/bullmq-esm.ts';
 import { esmShimPlugin } from './lib/esm-shim.ts';

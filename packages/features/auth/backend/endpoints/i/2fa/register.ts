@@ -63,7 +63,7 @@ export function createI2faRegisterProcedure(deps: I2faRegisterDependencies) {
 				twoFactorTempSecret: secret.base32,
 			});
 
-			// Get the data URL of the authenticator URL
+			// Return the authenticator URL; the frontend renders its QR code.
 			const totp = new OTPAuth.TOTP({
 				secret,
 				digits: 6,
