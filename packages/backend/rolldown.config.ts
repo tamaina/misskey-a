@@ -3,81 +3,10 @@ import { globSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import sourcePaths from './tsconfig.paths.json' with { type: 'json' };
 import { version as summalyVersion } from '@misskey-dev/summaly';
-import type { Plugin, ExternalOption, InputOptions } from 'rolldown';
-import { execa, execaNode } from 'execa';
-import type { ResultPromise } from 'execa';
-import fkill from 'fkill';
-import esmShim from '@rollup/plugin-esm-shim';
-
-/**
- * Watchモード時にバックエンドの起動・停止制御を行うプラグイン
- */
-function backendDevServerPlugin(): Plugin {
-	let backendProcess: ResultPromise | null = null;
-	let backendShutdownPromise: Promise<void> | null = null;
-
-	async function runBuildAssets() {
-		await execa('pnpm', ['run', 'build-assets'], {
-			cwd: '../../',
-			stdout: process.stdout,
-			stderr: process.stderr,
-		});
-	}
-
-	async function killBackendProcess() {
-		if (backendShutdownPromise) return backendShutdownPromise;
-		if (!backendProcess) return;
-
-		const processToKill = backendProcess;
-		backendProcess = null;
-		processToKill.catch(() => {}); // プロセスの終了によって発生する例外を無視するためにcatch()を呼び出す
-
-		backendShutdownPromise = (async () => {
-			if (process.platform === 'win32' && processToKill.pid != null) {
-				await fkill(processToKill.pid, {
-					force: true,
-					tree: true,
-					silent: true,
-					waitForExit: 5000,
-				});
-			} else {
-				processToKill.kill();
-			}
-
-			await processToKill.catch(() => {});
-		})().finally(() => {
-			backendShutdownPromise = null;
-		});
-
-		return backendShutdownPromise;
-	}
-
-	return {
-		name: 'backend-dev-server',
-		async closeBundle() {
-			await runBuildAssets();
-			if (backendProcess) {
-				await killBackendProcess();
-			}
-			backendProcess = execaNode('./built/entry.js', [], {
-				stdout: process.stdout,
-				stderr: process.stderr,
-				env: {
-					NODE_ENV: 'development',
-				},
-			});
-		},
-		async watchChange() {
-			if (backendProcess) {
-				await killBackendProcess();
-				await runBuildAssets();
-			}
-		},
-		async closeWatcher() {
-			await killBackendProcess();
-		},
-	};
-}
+import type { ExternalOption, InputOptions } from 'rolldown';
+import { backendDevServerPlugin } from './lib/backend-dev-server.ts';
+import { bullmqEsmPlugin } from './lib/bullmq-esm.ts';
+import { esmShimPlugin } from './lib/esm-shim.ts';
 
 export default defineConfig((args) => {
 	const isWatchMode = args.watch != null && args.watch !== 'false';
@@ -139,7 +68,7 @@ export default defineConfig((args) => {
 			tsconfig: './test-server/tsconfig.json',
 			plugins: [
 				declarationDependencyPlugin,
-				esmShim(),
+				esmShimPlugin(),
 			],
 			transform: {
 				define,
@@ -147,9 +76,16 @@ export default defineConfig((args) => {
 			output: {
 				keepNames: true,
 				sourcemap: true,
+				// メモリ使用量削減に貢献するが、関数や正規表現のソース文字列がエスケープ表記になる
+				// それらに依存する処理が入った場合はここを疑うと良い
+				// https://rolldown.rs/reference/Interface.OutputOptions#charset
+				charset: 'ascii',
 				dir: './built-test',
 				cleanDir: true,
 				format: 'esm',
+			},
+			experimental: {
+				nativeMagicString: true,
 			},
 			// node_modulesまでバンドルしてしまうとカバレッジの収集に時間がかかるので全部外す
 			external: allExternalModulesRegex,
@@ -173,8 +109,9 @@ export default defineConfig((args) => {
 			tsconfig: './tsconfig.json',
 			plugins: [
 				declarationDependencyPlugin,
-				esmShim(),
+				esmShimPlugin(),
 				(isWatchMode ? backendDevServerPlugin() : undefined),
+				(isWatchMode ? undefined : bullmqEsmPlugin()),
 			],
 			transform: {
 				define,
@@ -183,6 +120,10 @@ export default defineConfig((args) => {
 				keepNames: true,
 				minify: !isWatchMode,
 				sourcemap: isWatchMode,
+				// メモリ使用量削減に貢献するが、関数や正規表現のソース文字列がエスケープ表記になる
+				// それらに依存する処理が入った場合はここを疑うと良い
+				// https://rolldown.rs/reference/Interface.OutputOptions#charset
+				charset: isWatchMode ? 'utf8' : 'ascii',
 				dir: './built',
 				cleanDir: !isWatchMode,
 				format: 'esm',
@@ -191,6 +132,7 @@ export default defineConfig((args) => {
 				include: ['src/**/*.{ts,mts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,mts,js,mjs,cjs,tsx,json}'],
 				clearScreen: false,
 			},
+			experimental: { nativeMagicString: true },
 			// ビルドの高速化のために、watchモードのときは外部モジュールは全てバンドルしないようにする
 			external: isWatchMode ? allExternalModulesRegex : externalModules,
 		};
