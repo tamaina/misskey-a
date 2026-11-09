@@ -126,7 +126,6 @@ const menu: MenuItem[] = [{
 }
 </style>
 
-
 <locale locale="ar-SA" lang="json">
 {
 	"channel": "القنوات",

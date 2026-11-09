@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 import { RolldownMagicString } from 'rolldown';
 import type { Plugin } from 'rolldown';
 
