@@ -31,7 +31,6 @@ export default defineConfig((args) => {
 		/^@sentry-internal\/.*/,
 		// Misskey uses application contexts and its own Fastify server, not Nest's optional HTTP adapter.
 		/^@nestjs\/(?:microservices|websockets|platform-express)(?:\/.*)?$/,
-		/^@napi-rs\/.*/,
 		'mock-aws-s3',
 		'aws-sdk',
 		'nock',
