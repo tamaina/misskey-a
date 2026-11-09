@@ -171,7 +171,7 @@ export const globalCatalogPilotOwners = [
 			"somethingHappened",
 			"areYouSure"
 		],
-		"currentSha256": "a522380fcbe7a70cc3bf6078a6d8c3809543c953e49f0bda991b7926cd7b7e90",
+		"currentSha256": "5bdfcf3ddeaf3f085b46c64660ecb934c21b48416fde9e5e5ef500581d911ee9",
 		"baselineSha256": "9693b25b97a6fff6ee8cabfc53e38e312fbfcd0be5e33418e98b6552bbdda003",
 		"order": [
 			"somethingHappened",
@@ -197,7 +197,57 @@ export const globalCatalogPilotOwners = [
 			"chatNotAvailableForThisAccountOrServer",
 			"newMessage"
 		],
-		"expanded": true
+		"expanded": true,
+		"edits": [
+			{
+				"start": 370,
+				"end": 436,
+				"current": "\n\t\t\t<MkResult v-else-if=\"fetchError != null\" :type=\"fetchError\"/>\n",
+				"baseline": ""
+			},
+			{
+				"start": 6041,
+				"end": 6100,
+				"current": "const fetchError = ref<'notFound' | 'error' | null>(null);\n",
+				"baseline": ""
+			},
+			{
+				"start": 7551,
+				"end": 7752,
+				"current": "function toFetchError(err: unknown): 'notFound' | 'error' {\n\tconst code = (err as { code?: string } | null)?.code;\n\treturn code === 'NO_SUCH_ROOM' || code === 'NO_SUCH_USER' ? 'notFound' : 'error';\n}\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 7892,
+				"end": 7918,
+				"current": "\tfetchError.value = null;\n",
+				"baseline": ""
+			},
+			{
+				"start": 7940,
+				"end": 7977,
+				"current": "\t\tconst result = await Promise.all([\n",
+				"baseline": "\t\tconst [u, m] = await Promise.all([\n"
+			},
+			{
+				"start": 8118,
+				"end": 8298,
+				"current": "\t\t]).catch(err => {\n\t\t\tfetchError.value = toFetchError(err);\n\t\t\treturn null;\n\t\t});\n\n\t\tif (result == null) {\n\t\t\tinitializing.value = false;\n\t\t\treturn;\n\t\t}\n\n\t\tconst [u, m] = result;\n",
+				"baseline": "\t\t]);\n"
+			},
+			{
+				"start": 8989,
+				"end": 9041,
+				"current": "\t\t\tfetchError.value = toFetchError(rResult.reason);\n",
+				"baseline": "\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttext: globalLocale.value.env.somethingHappened,\n\t\t\t});\n"
+			},
+			{
+				"start": 9633,
+				"end": 9897,
+				"current": "\t\t// ルーム情報は取れても、タイムラインの取得だけ失敗することがある（通信エラーなど）\n\t\tif (mResult.status === 'rejected') {\n\t\t\tfetchError.value = toFetchError(mResult.reason);\n\t\t\tinitializing.value = false;\n\t\t\treturn;\n\t\t}\n\n\t\tconst m = mResult.value as Misskey.entities.ChatMessagesRoomTimelineResponse;\n",
+				"baseline": "\t\tconst m = mResult.status === 'fulfilled' ? mResult.value as Misskey.entities.ChatMessagesRoomTimelineResponse : [];\n"
+			}
+		]
 	},
 	{
 		"file": "packages/features/collections/frontend/pages/gallery/post.vue",
@@ -450,7 +500,7 @@ export const globalCatalogPilotOwners = [
 		"keys": [
 			"search"
 		],
-		"currentSha256": "66952e6c16d38bbf4e53cdc89870ae1f66efbacd7774ac4036f9e00e9327669b",
+		"currentSha256": "dd48754152401497621f681f8593d68c7df6a4185e8a92f6e0d73b90d3f1a2f0",
 		"baselineSha256": "bd432936dd611d7a5d20e7c212b0fcd61b431dd6b7902c8ea7721f843a10fb62",
 		"order": [
 			"searchScopeAll",
@@ -470,7 +520,15 @@ export const globalCatalogPilotOwners = [
 			"search",
 			"searchResult"
 		],
-		"expanded": true
+		"expanded": true,
+		"edits": [
+			{
+				"start": 5121,
+				"end": 5186,
+				"current": "const user = shallowRef<Misskey.entities.UserLite | null>(null);\n",
+				"baseline": "const user = shallowRef<Misskey.entities.UserDetailed | null>(null);\n"
+			}
+		]
 	},
 	{
 		"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
@@ -710,7 +768,7 @@ export const globalCatalogPilotOwners = [
 			"all",
 			"users"
 		],
-		"currentSha256": "7d699f6da878a0c74a09ecafb5c5516dbee102e126f8f084a38c882e26837f02",
+		"currentSha256": "70ef27bcb679e40494efbbea32ab635088202f941f1d517e80894fe10b4cac72",
 		"baselineSha256": "52c0ad7178105965a2d7d6270fffd075551c38c3b3ed99a67a024f2ea177cd7a",
 		"order": [
 			"registeredDate",
@@ -736,7 +794,15 @@ export const globalCatalogPilotOwners = [
 			"instance",
 			"host"
 		],
-		"expanded": true
+		"expanded": true,
+		"edits": [
+			{
+				"start": 5514,
+				"end": 5563,
+				"current": "function show(user: Misskey.entities.UserLite) {\n",
+				"baseline": "function show(user: Misskey.entities.UserDetailed) {\n"
+			}
+		]
 	},
 	{
 		"file": "packages/features/web/frontend/components/MkEmbedCodeGenDialog.vue",

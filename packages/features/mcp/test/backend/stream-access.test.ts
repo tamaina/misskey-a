@@ -37,6 +37,7 @@ function fixture() {
 	const note = { id: 'note', userId: 'author', user: { id: 'author', host: null }, visibility: 'public', text: 'SYNTHETIC_CURRENT', fileIds: [], reactions: {} } as unknown as Packed<'Note'>;
 	notesRepo.findOneBy.mockResolvedValue({ id: 'note' } as never); noteEntity.pack.mockResolvedValue(note);
 	// Timeline channels attach the viewer's renote reaction through NoteEntityService (upstream #18021).
+	noteEntity.withMyPollVotes.mockImplementation(async value => value);
 	noteEntity.withMyRenoteReaction.mockImplementation(async (value) => value);
 	const cache = mockDeep<CacheService>(); cache.userProfileCache.fetch.mockResolvedValue({ mutedInstances: [] } as never);
 	cache.userFollowingsCache.fetch.mockResolvedValue({ author: { withReplies: false } }); cache.userMutingsCache.fetch.mockResolvedValue(new Set()); cache.userBlockedCache.fetch.mockResolvedValue(new Set()); cache.renoteMutingsCache.fetch.mockResolvedValue(new Set());

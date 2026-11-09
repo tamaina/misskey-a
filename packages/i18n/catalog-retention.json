@@ -427,22 +427,17 @@
 		},
 		{
 			"file": "packages/features/chat/frontend/pages/chat/room.vue",
-			"line": 212,
-			"path": "somethingHappened"
-		},
-		{
-			"file": "packages/features/chat/frontend/pages/chat/room.vue",
-			"line": 387,
+			"line": 410,
 			"path": "areYouSure"
 		},
 		{
 			"file": "packages/features/chat/frontend/pages/chat/room.vue",
-			"line": 435,
+			"line": 458,
 			"path": "search"
 		},
 		{
 			"file": "packages/features/chat/frontend/pages/chat/room.vue",
-			"line": 447,
+			"line": 470,
 			"path": "search"
 		},
 		{

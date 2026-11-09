@@ -38,6 +38,7 @@ function fixture() {
 	const notes = mockDeep<NoteEntityService>(); const hiding = mockDeep<NoteStreamingHidingService>();
 	const packed = { id: 'note', userId: 'author', user: { id: 'author', host: null }, visibility: 'public', text: 'SYNTHETIC_PACKED' } as Packed<'Note'>;
 	notes.pack.mockResolvedValue(packed); hiding.filter.mockImplementation(async note => ({ ...note, text: 'SYNTHETIC_FILTERED' }));
+	notes.withMyPollVotes.mockImplementation(async note => note);
 	notes.withMyRenoteReaction.mockImplementation(async note => ({ ...note, cw: 'SYNTHETIC_MY_RENOTE_REACTION' }));
 	const cache = mockDeep<CacheService>(); cache.userProfileCache.fetch.mockResolvedValue({ mutedInstances: [] } as never); cache.userFollowingsCache.fetch.mockResolvedValue({});
 	cache.userMutingsCache.fetch.mockResolvedValue(new Set()); cache.userBlockedCache.fetch.mockResolvedValue(new Set()); cache.renoteMutingsCache.fetch.mockResolvedValue(new Set());
@@ -90,6 +91,7 @@ it.each(scenarios)('filters the pre-packed live antenna note per subscriber with
 			expect(received()).toHaveLength(1);
 			expect(received()[0]).toMatchObject({ id: 'note', text: 'SYNTHETIC_FILTERED', cw: 'SYNTHETIC_MY_RENOTE_REACTION' });
 			expect(f.hiding.filter).toHaveBeenCalledWith(expect.objectContaining({ id: 'note' }), 'owner');
+			expect(f.notes.withMyPollVotes).toHaveBeenCalledWith(expect.objectContaining({ text: 'SYNTHETIC_FILTERED' }), 'owner');
 			expect(f.notes.withMyRenoteReaction).toHaveBeenCalledWith(expect.objectContaining({ text: 'SYNTHETIC_FILTERED' }), 'owner');
 		} else expect(received()).toEqual([]);
 		expect(f.antennas.exists).toHaveBeenCalledWith({ where: { id: 'antenna', userId: 'owner' } });

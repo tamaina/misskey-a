@@ -190,6 +190,19 @@ function restoreWebhookSchemaBaseline(name: string, schema: unknown): unknown {
 	return restored;
 }
 
+// Upstream #18100 moves QR rendering to the client. Pin the complete new
+// operation before restoring exactly the removed field for the frozen oracle.
+function restoreClientQrOperationBaseline(path: string, operation: unknown): unknown {
+	if (path !== '/i/2fa/register') return operation;
+	expect(schemaHash(operation)).toBe('a91d8c3ff490798e767bcead320574f7e1d5652e1b90d45898b179ebd2497eaf');
+	const restored: unknown = structuredClone(operation);
+	const output = signinOutput(restored);
+	output.properties = { qr: { type: 'string' }, ...object(output.properties) };
+	if (!Array.isArray(output.required)) throw new Error('Invalid TOTP output');
+	output.required = ['qr', ...output.required];
+	return restored;
+}
+
 test('actual portable generator preserves every legacy operation and public schema, with eight unique canonical IDs', async () => {
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
 	// Export before assertions so an intentional contract delta can be inspected.
@@ -197,7 +210,7 @@ test('actual portable generator preserves every legacy operation and public sche
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
 		const operation = spec.paths?.[path];
-		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreWebhookOperationBaseline(path, restoreAnnouncementOperationBaseline(path, operation))), path).toBe(hash);
+		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreClientQrOperationBaseline(path, restoreWebhookOperationBaseline(path, restoreAnnouncementOperationBaseline(path, operation)))), path).toBe(hash);
 	}
 	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreWebhookSchemaBaseline(name, spec.components?.schemas?.[name])), name).toBe(hash);
 	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);

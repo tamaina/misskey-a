@@ -11,6 +11,8 @@ import type { LocaleBundle, RuntimeLocaleDictionary } from 'vite-vue-internation
 export interface SourceRebase {
 	file: string;
 	sourceOnly?: boolean;
+	/** An independently frozen earlier layer may already have restored this source. */
+	historicalSha256?: string;
 	currentSha256: string;
 	baselineSha256: string;
 	edits: { start: number; end: number; current: string; baseline: string }[];
@@ -28,7 +30,7 @@ const sha256 = (source: string): string => createHash('sha256').update(source).d
 /** Restore only pinned source adaptations before replaying the unchanged historical proofs. */
 export function restoreUpstreamDevelopBaseline(file: string, source: string): string {
 	const rebase = rebases.find(entry => entry.file === file);
-	if (!rebase || sha256(source) === rebase.baselineSha256) return source;
+	if (!rebase || sha256(source) === rebase.baselineSha256 || sha256(source) === rebase.historicalSha256) return source;
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from reviewed upstream develop: ${file}`);
 	for (const edit of [...rebase.edits].reverse()) {
 		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Upstream develop boundary differs: ${file}`);
