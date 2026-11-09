@@ -111,7 +111,7 @@ export async function common(createVue: () => Promise<App<Element>>, internation
 
 	// 一斉リロード
 	reloadChannel.addEventListener('message', path => {
-		if (path !== null) window.location.href = path;
+		if (path.data !== null) window.location.href = path.data;
 		else window.location.reload();
 	});
 
