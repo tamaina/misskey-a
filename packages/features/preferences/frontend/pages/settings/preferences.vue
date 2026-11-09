@@ -762,6 +762,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['url', 'preview', 'autoplay', 'player', 'embed']">
+								<MkPreferenceContainer k="autoplayEmbededPlayerOfUrlPreview">
+									<MkSwitch v-model="autoplayEmbededPlayerOfUrlPreview">
+										<template #label><SearchLabel>{{ $locale.sfc.autoplayEmbededPlayerOfUrlPreview }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['effect', 'show']">
 								<MkPreferenceContainer k="enableSeasonalScreenEffect">
 									<MkSwitch v-model="enableSeasonalScreenEffect">
@@ -935,6 +943,7 @@ const showMediaListByGridInWideArea = prefer.model('showMediaListByGridInWideAre
 const reactionsDisplaySize = prefer.model('reactionsDisplaySize');
 const limitWidthOfReaction = prefer.model('limitWidthOfReaction');
 const squareAvatars = prefer.model('squareAvatars');
+const autoplayEmbededPlayerOfUrlPreview = prefer.model('autoplayEmbededPlayerOfUrlPreview');
 const enableSeasonalScreenEffect = prefer.model('enableSeasonalScreenEffect');
 const showAvatarDecorations = prefer.model('showAvatarDecorations');
 const nsfw = prefer.model('nsfw');
@@ -2811,6 +2820,7 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-JP">
 {
+	"autoplayEmbededPlayerOfUrlPreview": "URLプレビューの埋め込みプレイヤーを自動再生",
 	"preferences": "環境設定",
 	"settingsPreferencesBanner": "好みに応じた、クライアントの全体的な動作の設定が行えます。",
 	"general": "全般",
