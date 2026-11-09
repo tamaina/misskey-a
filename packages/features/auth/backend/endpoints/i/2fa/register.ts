@@ -6,7 +6,6 @@
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
 import * as OTPAuth from 'otpauth';
-import * as QRCode from 'qrcode';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -72,10 +71,8 @@ export function createI2faRegisterProcedure(deps: I2faRegisterDependencies) {
 				issuer: deps.config.host,
 			});
 			const url = totp.toString();
-			const qr = await QRCode.toDataURL(url);
 
 			return {
-				qr,
 				url,
 				secret: secret.base32,
 				label: me.username,

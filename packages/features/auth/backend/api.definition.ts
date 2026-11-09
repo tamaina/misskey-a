@@ -217,7 +217,6 @@ export const I2faRegisterContract = oc.$meta({
 	"password": v.string(),
 	"token": v.exactOptional(v.nullable(v.string())),
 })).output(v.strictObject({
-	"qr": v.string(),
 	"url": v.string(),
 	"secret": v.string(),
 	"label": v.string(),
