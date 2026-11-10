@@ -31,6 +31,14 @@ const emojiFixtures = [
 
 const modes = ['server', 'queue', 'combined', 'cluster', 'cluster-server', 'cluster-queue'] as const;
 
+// Minimal shapes of the JSON responses inspected below; `Response.json()` is `Promise<unknown>`.
+type ManifestResponse = { start_url?: unknown };
+type PingResponse = { pong?: unknown };
+type EmojisResponse = { emojis: { name: string; url: string }[] };
+type EmojiDetailResponse = Record<string, unknown>;
+type StatsResponse = Record<string, unknown>;
+type OnlineUsersCountResponse = { count?: unknown };
+
 describe('process roles', () => {
 	const config = loadConfig();
 	let db: DataSource;
@@ -73,7 +81,7 @@ describe('process roles', () => {
 		const manifest = await get('/manifest.json');
 		expect(manifest.status).toBe(200);
 		expect(manifest.headers.get('content-type')).toMatch(/application\/json/);
-		expect((await manifest.json()).start_url).toBe('/');
+		expect((await manifest.json() as ManifestResponse).start_url).toBe('/');
 		for (const asset of ['icons/192.png', 'icons/512.png', 'splash.png']) {
 			const response = await get(`/static-assets/${asset}`);
 			expect(response.status, asset).toBe(200);
@@ -91,7 +99,7 @@ describe('process roles', () => {
 
 		const ping = await post('/api/ping', {});
 		expect(ping.status).toBe(200);
-		expect(typeof (await ping.json()).pong).toBe('number');
+		expect(typeof (await ping.json() as PingResponse).pong).toBe('number');
 
 		const endpointNames = await post('/api/endpoints', { endpoint: 'ping' });
 		expect(endpointNames.status).toBe(200);
@@ -106,14 +114,14 @@ describe('process roles', () => {
 
 		const emojis = await get('/api/emojis');
 		expect(emojis.status).toBe(200);
-		const listed = ((await emojis.json()).emojis as { name: string; url: string }[])
+		const listed = (await emojis.json() as EmojisResponse).emojis
 			.filter(emoji => emojiFixtures.some(fixture => fixture.name === emoji.name));
 		expect(listed.map(emoji => emoji.name)).toEqual(['feature_a', 'feature_b', 'feature_c']);
 		expect(listed[0].url).toBe('https://example.invalid/a.png');
 		expect(listed[0]).not.toHaveProperty('localOnly');
 		const emoji = await post('/api/emoji', { name: 'feature_a' });
 		expect(emoji.status).toBe(200);
-		const detail = await emoji.json();
+		const detail = await emoji.json() as EmojiDetailResponse;
 		expect(detail.id).toBe('featureemoji000000000002');
 		expect(detail.host).toBeNull();
 		expect(detail.localOnly).toBe(false);
@@ -126,7 +134,7 @@ describe('process roles', () => {
 
 		const stats = await post('/api/stats', {});
 		expect(stats.status).toBe(200);
-		const totals = await stats.json();
+		const totals = await stats.json() as StatsResponse;
 		for (const key of ['notesCount', 'originalNotesCount', 'usersCount', 'originalUsersCount', 'reactionsCount', 'instances']) {
 			expect(typeof totals[key], key).toBe('number');
 		}
@@ -139,7 +147,7 @@ describe('process roles', () => {
 
 		const onlineUsersCount = await get('/api/get-online-users-count');
 		expect(onlineUsersCount.status).toBe(200);
-		const { count } = await onlineUsersCount.json();
+		const { count } = await onlineUsersCount.json() as OnlineUsersCountResponse;
 		expect(typeof count).toBe('number');
 		expect(count).toBeGreaterThanOrEqual(0);
 
