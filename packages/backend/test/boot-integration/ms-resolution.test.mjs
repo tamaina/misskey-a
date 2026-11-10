@@ -15,7 +15,7 @@ import configFactory from '../../rolldown.config.ts';
 // Both importer locations must select the same public package exports, including ESM conditions.
 const dependencies = [
 	'got', 'fluent-ffmpeg', 'cacheable-lookup', 'tinycolor2', 'web-push',
-	'@simplewebauthn/server/helpers', 'chalk', 'meilisearch', 'qrcode',
+	'@simplewebauthn/server/helpers', 'chalk', 'meilisearch',
 	'file-type', 'ms', 'sanitize-html', '@zip.js/zip.js', 'mime-types',
 ];
 for (const mode of ['production', 'e2e']) {
