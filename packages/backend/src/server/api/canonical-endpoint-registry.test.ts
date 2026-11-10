@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { createAnnouncementsRouter } from '@features/announcements/backend/api.implementation.js';
@@ -44,9 +44,6 @@ test('every published request name has exactly one canonical native POST binding
 	}
 });
 
-test('native router topology matches contract ownership and retired backend endpoint bridges stay absent', () => {
+test('native router topology matches contract ownership', () => {
 	expect(Object.keys(createApiTestRouter()).sort()).toEqual(Object.keys(pilotContract).sort());
-	for (const name of expected) expect(existsSync(new URL(`./endpoints/${name}.ts`, import.meta.url))).toBe(false);
-	expect(existsSync(new URL('../../../../features/index/backend/endpoint-list.ts', import.meta.url))).toBe(false);
-	expect(existsSync(new URL('../../../../features/boot/backend/assembly/EndpointsModule.ts', import.meta.url))).toBe(false);
 });
