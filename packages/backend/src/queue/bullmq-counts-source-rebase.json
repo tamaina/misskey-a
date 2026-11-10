@@ -1,6 +1,6 @@
 {
   "baselineVersion": "6.3.2",
-  "currentVersion": "6.3.15",
+  "currentVersion": "6.5.3",
   "sources": [
     {
       "file": "dist/esm/classes/queue-getters.js",
@@ -20,7 +20,7 @@
     },
     {
       "file": "dist/esm/classes/redis-queue-backend.js",
-      "currentSha256": "1e686d6a60f1fd955debfc992ae37ae090c8d5e38f4f2a37629d60a333941f05",
+      "currentSha256": "fc3b5eb254233d4df60e0d50f5a4f6784403739049fe2991f6f0e72095f38c7e",
       "identicalMethods": [
         {
           "method": "getCountsArgs",
@@ -57,7 +57,7 @@
     },
     {
       "file": "dist/cjs/classes/redis-queue-backend.js",
-      "currentSha256": "a3db4a1d9b10c9895a97f89dd225d56a21bd2b3de3a8a3025848c483f4657088",
+      "currentSha256": "7413ff7399ba37499df5a36163798939a7ff95c956d729347b7a3bc25762ca0d",
       "identicalMethods": [
         {
           "method": "getCountsArgs",
@@ -88,7 +88,7 @@
     },
     {
       "file": "package.json",
-      "currentSha256": "af606f2a5ce84d37527fee37871fd6229d6d80f965ea8ee176c60c40537b3392"
+      "currentSha256": "6169816c841533ded4ab51e925558f52bc6793888e1ffeda2f9d894347928d11"
     }
   ],
   "entryPoints": {
