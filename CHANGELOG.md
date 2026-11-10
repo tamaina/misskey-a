@@ -108,6 +108,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: プッシュ通知の送信先が HTTP 404 を返す場合も購読を削除 ([upstream #18104](https://github.com/misskey-dev/misskey/pull/18104))
 - Fix: ローカルタイムラインで返信非表示の設定が反映されない問題を修正 ([upstream #18086](https://github.com/misskey-dev/misskey/pull/18086))
 - Perf: Identicon の PNG 生成を軽量化 ([upstream #18099](https://github.com/misskey-dev/misskey/pull/18099))
+- Fix: 特定の条件下でドライブのファイル一覧がタイムアウトして開けない問題を修正 ([upstream #18129](https://github.com/misskey-dev/misskey/pull/18129))
 - Fix: リモートユーザーの再取得で通信に失敗した場合は既存情報を表示し、停止・ブロック済みサーバーへの再取得を省略するように (#233)
 - Enhance: Node.js のセキュリティアップデート（Brotli デコーダーの脆弱性 CVE-2026-111497）に伴い、最低動作バージョンを 22.23.4 / 24.22.1 / 26.12.1 に引き上げ、開発環境と Docker Image の Node.js を 26.12.1 に更新 (#225)
 - Feat: ユーザーの凍結時にフォロー関係を削除せず保持し、凍結解除後に復帰できるように (#1)
