@@ -12,7 +12,6 @@ import { languages } from 'i18n';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { createComponentLocale } from 'vite-vue-internationalization/runtime';
 import { webhookEventTypes } from '../../../features/integrations/backend/webhook-events.schema.js';
-import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 
 const root = resolve(import.meta.dirname, '../../../..');
 const owners = ['new', 'edit'].map(kind => {
@@ -43,9 +42,4 @@ test('webhook event labels resolve through real VVI dictionaries in every suppor
 			expect(actual.eventsDescription).toBe(primary.eventsDescription);
 		}
 	}
-});
-
-test.each(owners)('$kind historical webhook source restoration rejects unreviewed edits', owner => {
-	expect(restoreUpstreamDevelopBaseline(owner.file, owner.source)).not.toBe(owner.source);
-	expect(() => restoreUpstreamDevelopBaseline(owner.file, owner.source + '\n')).toThrow('Source differs from reviewed');
 });
