@@ -11,6 +11,17 @@ import { ref } from 'vue';
 const fetchMocker = createFetchMock(vi);
 fetchMocker.enableMocks();
 
+// XXX: happy-dom の Response には bytes() がない (Shiki 4.6 の inlined wasm 読み込みが使用する)
+if (typeof Response.prototype.bytes !== 'function') {
+	Object.defineProperty(Response.prototype, 'bytes', {
+		configurable: true,
+		writable: true,
+		async value(this: Response) {
+			return new Uint8Array(await this.arrayBuffer());
+		},
+	});
+}
+
 // XXX: misskey-js panics if WebSocket is not defined
 vi.stubGlobal('WebSocket', class WebSocket extends EventTarget { static CLOSING = 2; });
 

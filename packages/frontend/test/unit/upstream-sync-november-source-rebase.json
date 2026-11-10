@@ -72,7 +72,8 @@
         "baseline": "\t\tif (path !== null) window.location.href = path;\n"
       }
     ],
-    "sourceOnly": true
+    "sourceOnly": true,
+    "historicalSha256": "60572f31118e34f5d3d7aabba08708a171f2f1da3073fa10c8c603e3b15054f9"
   },
   {
     "file": "packages/features/channels/frontend/ui/deck/channel-column.vue",
@@ -915,7 +916,8 @@
         "current": "",
         "baseline": "\n\t\t\t\tvisibleUsers.value = [];\n\t\t\t\tdraft.visibleUserIds?.forEach(uid => {\n\t\t\t\t\tif (!visibleUsers.value.some(u => u.id === uid)) {\n\t\t\t\t\t\tmisskeyApi('users/show', { userId: uid }).then(user => {\n\t\t\t\t\t\t\tpushVisibleUser(user);\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t});\n"
       }
-    ]
+    ],
+    "historicalSha256": "8328d6105d250a4134999ac03ad519eb75c96ff1dc32f44248426870adca3764"
   },
   {
     "file": "packages/features/notes/frontend/types/post-form.ts",
@@ -1389,7 +1391,8 @@
         "baseline": "export async function selectUser(opts: { includeSelf?: boolean; localOnly?: boolean; } = {}): Promise<Misskey.entities.UserDetailed> {\n"
       }
     ],
-    "sourceOnly": true
+    "sourceOnly": true,
+    "historicalSha256": "230788a173619430091acccf208d01d9d6d0308991aed69e724da6427b693e7f"
   },
   {
     "file": "packages/features/ui/frontend/widgets/WidgetButton.vue",
@@ -1537,12 +1540,18 @@
   },
   {
     "file": "packages/frontend/test/setup.unit.ts",
-    "currentSha256": "10c112f62225383704b3aac886b2202587893839094838074632bb2807935709",
+    "currentSha256": "69d7ebdbe77efa9b3dcc0acac1ba20aa76eb1b48de974bc4b3f8b9e7779d9486",
     "baselineSha256": "f0788304561c0254f49d731ea7e4c74372b30173f87910e3cce087340197a908",
     "edits": [
       {
-        "start": 1275,
-        "end": 1317,
+        "start": 311,
+        "end": 637,
+        "current": "// XXX: happy-dom の Response には bytes() がない (Shiki 4.6 の inlined wasm 読み込みが使用する)\nif (typeof Response.prototype.bytes !== 'function') {\n\tObject.defineProperty(Response.prototype, 'bytes', {\n\t\tconfigurable: true,\n\t\twritable: true,\n\t\tasync value(this: Response) {\n\t\t\treturn new Uint8Array(await this.arrayBuffer());\n\t\t},\n\t});\n}\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 1601,
+        "end": 1643,
         "current": "\tautoplayEmbededPlayerOfUrlPreview: true,\n",
         "baseline": ""
       }
