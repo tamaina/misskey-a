@@ -60,6 +60,8 @@ beforeEach(() => {
 	deps.webhooks.createQueryBuilder.mockReturnValue(query);
 	const repo = mockDeep<WebhooksRepository>(); repo.createQueryBuilder.mockReturnValue(query);
 	repo.countBy.mockImplementation(async () => rows.size);
+	repo.find.mockImplementation(async () => [...rows.values()].filter(row => row.mode === 'mcp' && (!row.active || !row.mcpExpiresAt || row.mcpExpiresAt.getTime() <= Date.now())));
+	repo.delete.mockImplementation(async ids => { for (const id of ids as string[]) rows.delete(id); return {} as never; });
 	repo.save.mockImplementation(async values => { const row = Object.assign(new MiWebhook(), values); rows.set(row.id, row); return row; });
 	deps.webhooks.update.mockImplementation(async (where, values) => { for (const row of rows.values()) if (typeof where === 'object' && Object.entries(where).every(([key, value]) => row[key as keyof MiWebhook] === value)) Object.assign(row, values); return {} as never; });
 	repo.update.mockImplementation(deps.webhooks.update);
@@ -123,6 +125,19 @@ it('suppresses unsubscribe/expiry/recreation, current note visibility, deletion,
 	await service.invoke('events/unsubscribe', { name: input.name, arguments: {}, delivery: { mode: 'webhook', url: input.delivery.url } }, context());
 	expect(rows.get(id)!.secret).toBe('');
 	await subscribe(); expect(rows.get(id)!.mcpGeneration).not.toBe(currentGeneration);
+});
+it('reclaims unsubscribed and expired subscriptions before the quota check without reviving their generation', async () => {
+	deps.roles.getUserPolicies.mockResolvedValue({ webhookLimit: 1 } as never);
+	const other = (path: string) => ({ ...input, delivery: { ...input.delivery, url: `https://callback.example/${path}` } });
+	const { id } = await subscribe(); const generation = rows.get(id)!.mcpGeneration!;
+	await expect(subscribe(other('blocked'))).rejects.toMatchObject({ code: -32602, message: 'Webhook limit reached' });
+	await service.invoke('events/unsubscribe', { name: input.name, arguments: {}, delivery: { mode: 'webhook', url: input.delivery.url } }, context());
+	const next = await subscribe(other('next')); expect(rows.has(id)).toBe(false);
+	rows.get(next.id)!.mcpExpiresAt = new Date(0);
+	await subscribe(); expect(rows.has(next.id)).toBe(false); expect(rows.size).toBe(1);
+	expect(rows.get(id)!.mcpGeneration).not.toBe(generation);
+	expect(await service.authorizeDelivery(id, 'account', generation, 'note', 'mention')).toBeNull();
+	expect(await service.authorizeDelivery(id, 'account', rows.get(id)!.mcpGeneration!, 'note', 'mention')).not.toBeNull();
 });
 it.each(['mention', 'reply'] as const)('filters self %s only from MCP fanout, preserving other recipients and subscriptions', async type => {
 	const redis = mockDeep<Redis.Redis>();

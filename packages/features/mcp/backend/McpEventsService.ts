@@ -21,6 +21,7 @@ import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
+import { lockWebhookQuota } from '@features/integrations/backend/webhook-quota.js';
 import { mcpEventsContract, subscribeInput } from './api.definition.js';
 import { eventPermissions, eventPayloadSchema } from './events.schema.js';
 import type { McpEventName } from './events.schema.js';
@@ -90,7 +91,7 @@ export class McpEventsService {
 			const tokenId = await bind(ctx.principal.id, ctx.token?.id, ps.name);
 			const stream = streamSubscription(ps.name, ps.arguments);
 			const id = subscriptionId(ctx.principal.id, tokenId, this.url(ps.delivery.url), ps.name, 'antennaId' in ps.arguments ? ps.arguments.antennaId : undefined, stream ? canonicalStream(stream) : null);
-			// Tombstone rather than delete: refreshing after unsubscribe gets a new generation.
+			// Tombstone rather than delete: refreshing after unsubscribe gets a new generation; the next quota lock reclaims it.
 			await this.webhooks.manager.transaction(async manager => {
 				await manager.getRepository(this.users.target).createQueryBuilder('user').where('user.id = :userId', { userId: ctx.principal.id }).setLock('pessimistic_write').getOneOrFail();
 				await manager.getRepository(MiWebhook).update({ id, userId: ctx.principal.id, mcpTokenId: tokenId, mode: 'mcp' }, { active: false, secret: '', mcpPreviousSecret: null, mcpPreviousSecretUntil: null });
@@ -136,12 +137,13 @@ export class McpEventsService {
 		// Serialise per-account registration/quota; do not broadcast signing material over Redis.
 		const expires = new Date(Date.now() + Math.min(ps.ttlMs ?? 3600000, 86400000));
 		await this.webhooks.manager.transaction(async manager => {
-			await manager.getRepository(this.users.target).createQueryBuilder('user').where('user.id = :userId', { userId }).setLock('pessimistic_write').getOneOrFail();
+			// Dead rows are reclaimed first, so re-subscribing one is a fresh, quota-checked registration with a new generation.
+			const count = await lockWebhookQuota(manager, userId);
 			if (antennaId && !await manager.getRepository(this.antennas.target).existsBy({ id: antennaId, userId })) throw new McpEventError(-32602, 'Antenna access denied');
 			const repository = manager.getRepository(MiWebhook);
 			const previous = await repository.createQueryBuilder('webhook').addSelect('webhook.mcpPreviousSecret').where('webhook.id = :id', { id }).getOne();
 			if (previous && (previous.mode !== 'mcp' || previous.userId !== userId || previous.mcpTokenId !== tokenId)) throw new McpEventError(-32602, 'Subscription identity conflict');
-			if (!previous && await repository.countBy({ userId }) >= limit) throw new McpEventError(-32602, 'Webhook limit reached');
+			if (!previous && count >= limit) throw new McpEventError(-32602, 'Webhook limit reached');
 			const continuing = previous?.active && previous.mcpExpiresAt && previous.mcpExpiresAt.getTime() > Date.now();
 			const rotating = continuing && previous.secret !== ps.delivery.secret;
 			await repository.save({ id, userId, name: ps.name, mode: 'mcp', url, secret: ps.delivery.secret, on: ps.name === 'antenna.note' || stream ? [] : [eventType(ps.name)!], active: true, mcpAntennaId: antennaId ?? null, mcpStream: stream,
