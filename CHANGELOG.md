@@ -4,8 +4,8 @@
 - Node.js v22 のサポートを終了し、最低動作バージョンを 24.22.1 / 26.12.1 に変更しました ([upstream #18100](https://github.com/misskey-dev/misskey/pull/18100))。
 - `node scripts/start.mjs`（migration後の起動は `--migrate`）でpnpmの常駐プロセスを減らせます。`pnpm start` / `pnpm migrateandstart` も引き続き利用でき、forkの compile-config は維持しています。Docker・Procfileは新しい起動方式に変更しました ([upstream #18103](https://github.com/misskey-dev/misskey/pull/18103))。
 - 二要素認証登録APIのレスポンスから `qr` を削除しました。QRコードは `url` を使ってクライアント側で生成します ([upstream #18100](https://github.com/misskey-dev/misskey/pull/18100))。
-- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `f5c47baea0d449fcad1a0dcdbc9fd9989e859984` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
-- 開発環境の指定は Node.js 26.12.1 / pnpm 12.17.0、Docker のベースイメージは Node.js 26.12.1-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210, #225, #226)
+- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `bbe3c8a533e9790462e5a2f0c9d314c8133b1913` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
+- 開発環境の指定は Node.js 26.12.1 / pnpm 12.17.0、Docker のベースイメージは Node.js 26.12.1-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210, #225, #226, #238)
 - Sentry SDK を v11 に更新しています。`sentryForBackend.options.sendDefaultPii` / `sentryForFrontend.options.sendDefaultPii` は無視されるため（バックエンドでは起動時に警告）、同じ収集範囲を維持するには `dataCollection: {}` に書き換えてください。`dataCollection` 未指定時は利用者の情報を送らない絞った既定を適用し、`dataCollection` を明示するとこの既定を丸ごと置き換えます。`sentryForBackend.options.profilesSampleRate` も無視され、プロファイリングは引き続き `sentryForBackend.enableNodeProfiling` で有効化します。詳細は [Sentry の移行ガイド](https://docs.sentry.io/platforms/javascript/migration/v10-to-v11/) を参照してください。 (#212)
 - 上流由来の migration 名・履歴を復元しています。過去の実験版で異なる migration 名を適用したデータベースは、更新前に履歴の個別確認が必要です。 (#35)
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
@@ -42,6 +42,7 @@ APIの省略値・nullable・アップロード・エラー・キャンセル処
 - Fix: 自分で投稿した返信・メンションを、そのアカウント自身のMCPイベント購読へ送らないように（通常の通知・Webhookや他の受信者への配送は維持） (#215)
 - User WebhookとMCP Eventsで全通知トリガーおよび受信チャットの購読に対応し、通知の受信設定とミュートを反映するようにしました (#222)
 - 本家のアンテナのストリーミング変更 (misskey-dev/misskey#18021) に追従し、MCPのアンテナイベント・stream購読はノートIDのみを扱い、配送ごとに購読者として再取得・再判定するように（大きなノートが受信サイズ上限で落ちないように。silentで作成されたノートはライブのアンテナイベントを出さなくなりました） (#227)
+- Fix: 解除・期限切れになったMCPのイベント購読がWebhookの上限に数えられ続け、新しい購読やWebhookを作成できなくなる問題を修正 (#239)
 
 #### Perf: ActivityPubでのやり取りをEd25519に対応させ、配送を軽量に
 - 連合の署名について、複数公開鍵・受信時の鍵再取得・対応相手へのEd25519署名に対応（従来のRSA鍵との互換性を維持。RFC 9421対応を意味しない） (#16, #18, #19)
