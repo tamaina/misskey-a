@@ -14,7 +14,7 @@
 - [beta.3 の GitHub prerelease](https://github.com/tamaina/misskey-a/releases/tag/9000.0.0-beta.3) は公開済みですが、SDK の npm 公開は `404 Not Found`、Docker 公開は認証情報不足で失敗しています。beta.3 タグ後の変更も本節には含まれるため、利用するソースの commit を確認してください。
 
 ### General
-- Enhance: 依存関係を更新（pnpm 12.17.0、Nodemailer・minimatchのセキュリティ更新を含む）。公開後7日未満のNestJS 12.4.2は見送り ([upstream #18046](https://github.com/misskey-dev/misskey/pull/18046), [#18074](https://github.com/misskey-dev/misskey/pull/18074), [#18083](https://github.com/misskey-dev/misskey/pull/18083), [#18116](https://github.com/misskey-dev/misskey/pull/18116), [#18125](https://github.com/misskey-dev/misskey/pull/18125))
+- Enhance: 依存関係を更新（pnpm 12.17.0、NestJS 12.4.2、Nodemailer・minimatchのセキュリティ更新を含む） ([upstream #18046](https://github.com/misskey-dev/misskey/pull/18046), [#18074](https://github.com/misskey-dev/misskey/pull/18074), [#18083](https://github.com/misskey-dev/misskey/pull/18083), [#18116](https://github.com/misskey-dev/misskey/pull/18116), [#18125](https://github.com/misskey-dev/misskey/pull/18125))
 #### Enhance: Misskey 9000
 ソフトウェア名を **Misskey 9000** に変更し、リポジトリ・問い合わせ先・インスタンスの既定リンクをこのforkに変更 (#32, #50, #54)  
 Misskey 9000の独自SemVer採番を開始しています。NodeInfoの`software`は引き続き`misskey`です。

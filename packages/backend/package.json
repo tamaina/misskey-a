@@ -72,8 +72,8 @@
 		"@misskey-dev/sharp-read-bmp": "2.0.0",
 		"@misskey-dev/summaly": "5.5.2",
 		"@modelcontextprotocol/sdk": "1.32.0",
-		"@nestjs/common": "12.3.2",
-		"@nestjs/core": "12.3.2",
+		"@nestjs/common": "12.4.2",
+		"@nestjs/core": "12.4.2",
 		"@oxc-project/runtime": "0.156.0",
 		"@peertube/http-signature": "1.7.0",
 		"@sentry/node": "11.10.0",
@@ -195,7 +195,7 @@
 		"vite": "8.3.5",
 		"vitest": "5.0.5",
 		"vitest-mock-extended": "5.1.1",
-		"@nestjs/testing": "12.3.2",
+		"@nestjs/testing": "12.4.2",
 		"tsc-alias": "1.9.10"
 	}
 }
