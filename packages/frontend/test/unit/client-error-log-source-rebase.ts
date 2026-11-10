@@ -5,6 +5,7 @@
 
 import { createHash } from 'node:crypto';
 import { restoreBrowserSessionClientBaseline } from './browser-session-client-source-rebase.js';
+import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 import rebases from './client-error-log-source-rebase.json';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
@@ -13,6 +14,8 @@ const sha256 = (source: string) => createHash('sha256').update(source).digest('h
 export function restoreClientErrorLogBaseline(file: string, source: string): string {
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase || sha256(source) === rebase.baselineSha256) return source;
+	// Reverse later reviewed upstream ports first; unreviewed bytes are still rejected.
+	if (sha256(source) !== rebase.currentSha256) source = restoreUpstreamDevelopBaseline(file, source);
 	if (file === 'packages/features/preferences/frontend/pages/settings/other.vue' && sha256(source) !== rebase.currentSha256) {
 		source = restoreBrowserSessionClientBaseline(file, source);
 	}

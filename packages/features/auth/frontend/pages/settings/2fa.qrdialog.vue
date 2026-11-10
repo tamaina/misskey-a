@@ -36,9 +36,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</template>
 							</I18n>
 							<div>{{ $locale.sfc.twoFactorStep2 }}</div>
-							<div>
-								<a :class="$style.qrRoot" :href="twoFactorData.url"><img :class="$style.qr" :src="twoFactorData.qr"></a>
-								<!-- QRコード側にマージンが入っているので直下でOK -->
+							<div class="_gaps_s">
+								<a :class="$style.qrRoot" :href="twoFactorData.url" v-html="qrSvg"></a>
 								<div><MkButton inline rounded type="routerLink" :to="twoFactorData.url" :linkBehavior="'browser'">{{ $locale.sfc.launchApp }}</MkButton></div>
 							</div>
 							<MkKeyValue :copy="twoFactorData.url">
@@ -107,7 +106,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { hostname, port } from '@features/boot/frontend/shared/config.js';
-import { useTemplateRef, ref } from 'vue';
+import * as Misskey from 'misskey-js';
+import { qrcode } from 'etiket/qr';
+import { useTemplateRef, computed, ref } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
@@ -117,15 +118,13 @@ import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
+import { qrOptions } from '@features/share/frontend/utility/qr-code.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const $i = ensureSignin();
 
-defineProps<{
-	twoFactorData: {
-		qr: string;
-		url: string;
-	};
+const props = defineProps<{
+	twoFactorData: Misskey.entities.I2faRegisterResponse;
 }>();
 
 const emit = defineEmits<{
@@ -135,6 +134,11 @@ const emit = defineEmits<{
 const dialog = useTemplateRef('dialog');
 const page = ref(0);
 const token = ref<string | null>(null);
+const qrSvg = computed(() => qrcode(props.twoFactorData.url, {
+	...qrOptions,
+	color: '#000',
+	background: 'transparent',
+}));
 const backupCodes = ref<string[]>();
 
 function cancel() {
@@ -187,13 +191,17 @@ function allDone() {
 
 .qrRoot {
 	display: block;
+	background: #fff;
 	margin: 0 auto;
+	padding: 16px;
+	border-radius: var(--MI-radius);
 	width: 200px;
 	max-width: 100%;
-}
 
-.qr {
-	width: 100%;
+	& > svg {
+		width: 100%;
+		height: auto;
+	}
 }
 </style>
 

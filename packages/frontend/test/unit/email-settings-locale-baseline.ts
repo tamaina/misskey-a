@@ -4,6 +4,7 @@
  */
 
 import { parse } from 'vue/compiler-sfc';
+import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 import metadata from './email-settings-locale-baseline.json';
 
 type Dictionary = Record<string, string>;
@@ -49,6 +50,11 @@ export function restoreEmailHistoricalSource(file: string, source: string): stri
 		pieces.push(text.slice(previous));
 		return pieces.join('');
 	};
+	try {
+		source = restoreUpstreamDevelopBaseline(file, source);
+	} catch {
+		throw new Error('Email settings changed original component body');
+	}
 	if (withoutLocales(source) !== withoutLocales(metadata.originalSource)) throw new Error('Email settings changed original component body');
 	return metadata.originalSource;
 }

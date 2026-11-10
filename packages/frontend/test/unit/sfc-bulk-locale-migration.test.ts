@@ -20,6 +20,7 @@ import { locales } from './instance-pilot-locale-catalog.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import { restorePwaShareSourceBaseline } from './pwa-share-source-rebase.js';
+import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 import type { Component, ComputedRef } from 'vue';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
@@ -1589,7 +1590,7 @@ describe('expanded literal SFC-local locale migration', () => {
 
 	test.each(migrations)('$file preserves every translation, placeholder, occurrence and source boundary', migration => {
 		const { file, sha256, importOffset, keyPaths, references } = migration;
-		const source = restorePwaShareSourceBaseline(file, restoreGlobalCatalogPilotSource(file, readFileSync(resolve(repoRoot, file), 'utf8')));
+		const source = restorePwaShareSourceBaseline(file, restoreGlobalCatalogPilotSource(file, restoreUpstreamDevelopBaseline(file, readFileSync(resolve(repoRoot, file), 'utf8'))));
 		const blocks = getBlocks(file, source);
 		expect([...blocks.keys()]).toEqual(languages);
 		expect(source).not.toMatch(/\bi18n\s*\./);

@@ -5,6 +5,7 @@
 
 import { createHash } from 'node:crypto';
 import { restoreBrowserSessionClientBaseline } from './browser-session-client-source-rebase.js';
+import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 import rebases from './pwa-share-source-rebase.json';
 
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
@@ -14,6 +15,8 @@ export function restorePwaShareSourceBaseline(file: string, source: string): str
 	if (file === 'packages/features/auth/frontend/accounts.ts') source = restoreBrowserSessionClientBaseline(file, source);
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase) return source;
+	// Reverse later reviewed upstream ports first; unreviewed bytes are still rejected.
+	source = restoreUpstreamDevelopBaseline(file, source);
 	const localeStart = source.search(/<locale\s/);
 	let body = localeStart < 0 ? source : source.slice(0, localeStart);
 	let locales = localeStart < 0 ? '' : source.slice(localeStart);

@@ -84,7 +84,8 @@ export class AntennaChannel extends Channel {
 		const filtered = await this.noteStreamingHidingService.filter(note, this.user?.id ?? null);
 		if (!filtered) return null;
 
-		return await this.noteEntityService.withMyRenoteReaction(filtered, this.user?.id ?? null);
+		const withPollVotes = await this.noteEntityService.withMyPollVotes(filtered, this.user?.id ?? null);
+		return await this.noteEntityService.withMyRenoteReaction(withPollVotes, this.user?.id ?? null);
 	}
 
 	@bindThis

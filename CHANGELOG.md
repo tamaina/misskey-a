@@ -1,8 +1,11 @@
 ## 9000.0.0
 
 ### Note
+- Node.js v22 のサポートを終了し、最低動作バージョンを 24.22.1 / 26.12.1 に変更しました ([upstream #18100](https://github.com/misskey-dev/misskey/pull/18100))。
+- `node scripts/start.mjs`（migration後の起動は `--migrate`）でpnpmの常駐プロセスを減らせます。`pnpm start` / `pnpm migrateandstart` も引き続き利用でき、forkの compile-config は維持しています。Docker・Procfileは新しい起動方式に変更しました ([upstream #18103](https://github.com/misskey-dev/misskey/pull/18103))。
+- 二要素認証登録APIのレスポンスから `qr` を削除しました。QRコードは `url` を使ってクライアント側で生成します ([upstream #18100](https://github.com/misskey-dev/misskey/pull/18100))。
 - 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `f5c47baea0d449fcad1a0dcdbc9fd9989e859984` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
-- 開発環境の指定は Node.js 26.12.1 / pnpm 12.14.0、Docker のベースイメージは Node.js 26.12.1-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210, #225, #226)
+- 開発環境の指定は Node.js 26.12.1 / pnpm 12.17.0、Docker のベースイメージは Node.js 26.12.1-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210, #225, #226)
 - Sentry SDK を v11 に更新しています。`sentryForBackend.options.sendDefaultPii` / `sentryForFrontend.options.sendDefaultPii` は無視されるため（バックエンドでは起動時に警告）、同じ収集範囲を維持するには `dataCollection: {}` に書き換えてください。`dataCollection` 未指定時は利用者の情報を送らない絞った既定を適用し、`dataCollection` を明示するとこの既定を丸ごと置き換えます。`sentryForBackend.options.profilesSampleRate` も無視され、プロファイリングは引き続き `sentryForBackend.enableNodeProfiling` で有効化します。詳細は [Sentry の移行ガイド](https://docs.sentry.io/platforms/javascript/migration/v10-to-v11/) を参照してください。 (#212)
 - 上流由来の migration 名・履歴を復元しています。過去の実験版で異なる migration 名を適用したデータベースは、更新前に履歴の個別確認が必要です。 (#35)
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
@@ -11,6 +14,7 @@
 - [beta.3 の GitHub prerelease](https://github.com/tamaina/misskey-a/releases/tag/9000.0.0-beta.3) は公開済みですが、SDK の npm 公開は `404 Not Found`、Docker 公開は認証情報不足で失敗しています。beta.3 タグ後の変更も本節には含まれるため、利用するソースの commit を確認してください。
 
 ### General
+- Enhance: 依存関係を更新（pnpm 12.17.0、NestJS 12.4.2、Nodemailer・minimatchのセキュリティ更新を含む） ([upstream #18046](https://github.com/misskey-dev/misskey/pull/18046), [#18074](https://github.com/misskey-dev/misskey/pull/18074), [#18083](https://github.com/misskey-dev/misskey/pull/18083), [#18116](https://github.com/misskey-dev/misskey/pull/18116), [#18125](https://github.com/misskey-dev/misskey/pull/18125))
 #### Enhance: Misskey 9000
 ソフトウェア名を **Misskey 9000** に変更し、リポジトリ・問い合わせ先・インスタンスの既定リンクをこのforkに変更 (#32, #50, #54)  
 Misskey 9000の独自SemVer採番を開始しています。NodeInfoの`software`は引き続き`misskey`です。
@@ -60,6 +64,19 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Enhance: 開発者向けにOIDCのID token検証・discovery・短命transaction・token交換と認証進行管理の基盤を追加（ログイン経路への接続は未提供） (#109, #121, #131, #135)
 
 ### Client
+- Enhance: デッキのチャンネルカラムにも固定の投稿フォーム設定を反映 ([upstream #17247](https://github.com/misskey-dev/misskey/pull/17247))
+- Enhance: URLプレビューの埋め込みプレイヤーを自動再生するか設定可能に ([upstream #18112](https://github.com/misskey-dev/misskey/pull/18112))
+- Fix: 設定検索にプライバシー設定の項目が表示されない問題を修正 ([upstream #18058](https://github.com/misskey-dev/misskey/pull/18058))
+- Fix: デッキでノートのアイコンが横スクロールに追従する問題を修正 ([upstream #18073](https://github.com/misskey-dev/misskey/pull/18073))
+- Fix: 存在しない・権限のないチャットの取得失敗をページ内に表示 ([upstream #18065](https://github.com/misskey-dev/misskey/pull/18065))
+- Fix: 同じ名前のUnicode絵文字とカスタム絵文字を候補に表示 ([upstream #13817](https://github.com/misskey-dev/misskey/pull/13817))
+- Fix: AiScriptウィジェットの削除・再実行時のリソース解放漏れを修正 ([upstream #18076](https://github.com/misskey-dev/misskey/pull/18076))
+- Fix: チャットのプッシュ通知から送信者とのチャットを開くよう修正 ([upstream #18119](https://github.com/misskey-dev/misskey/pull/18119))
+- Fix: カスタム絵文字管理画面で変更行・エラー行の色が付かない問題を修正 ([upstream #18105](https://github.com/misskey-dev/misskey/pull/18105))
+- Fix: メール設定に未保存の変更がある間は配信テストを無効化 ([upstream #18067](https://github.com/misskey-dev/misskey/pull/18067))
+- Fix: MFM関連コンポーネントのprops変更を描画に反映 ([upstream #17954](https://github.com/misskey-dev/misskey/pull/17954))
+- Perf: テーマ解析・ビジター画面の遅延読込とネイティブBroadcastChannelで起動処理を軽量化 ([upstream #18064](https://github.com/misskey-dev/misskey/pull/18064))
+- Perf: Service Worker経由のアセット取得を削減 ([upstream #18088](https://github.com/misskey-dev/misskey/pull/18088))
 - Fix: 上流由来のアカウント切替時にサインインを再要求される問題を修正し、切替前の現在アカウント退避・一覧の追加更新・起動時の自己修復と、IndexedDB のトークン補完・再読込前の保存完了を行うように (#230)
 - Feat: PWAで共有されたファイルを投稿フォームに引き継ぐように (#17)
 - Feat: デッキにクリップ列を追加 (#162)
@@ -82,6 +99,14 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: Service Workerの通知からのフォロー操作で、通知元のユーザーIDが文字列であることを確認するように ([a1b3e952](https://github.com/tamaina/misskey-a/commit/a1b3e952d3e6d30cef7dfa4127f069df8642424b))
 
 ### Server
+- Perf: バンドルのESM shim・BullMQの読込を整理し、メモリ使用量を削減 ([upstream #18126](https://github.com/misskey-dev/misskey/pull/18126))
+- Fix: 引用ノートの本文に余分な RE: URL が付く問題を修正 ([upstream #18063](https://github.com/misskey-dev/misskey/pull/18063))
+- Fix: アンテナ配信時に引用・返信先を含めて自分の投票状態を反映 ([upstream #18056](https://github.com/misskey-dev/misskey/pull/18056))
+- Fix: キューの同時実行数が不正な場合は設定キーを示して起動時に停止 ([upstream #18081](https://github.com/misskey-dev/misskey/pull/18081))
+- Perf: UserLite 取得時の不要な詳細情報取得を削減し、メモの取得対象を絞り込み ([upstream #18093](https://github.com/misskey-dev/misskey/pull/18093))
+- Fix: プッシュ通知の送信先が HTTP 404 を返す場合も購読を削除 ([upstream #18104](https://github.com/misskey-dev/misskey/pull/18104))
+- Fix: ローカルタイムラインで返信非表示の設定が反映されない問題を修正 ([upstream #18086](https://github.com/misskey-dev/misskey/pull/18086))
+- Perf: Identicon の PNG 生成を軽量化 ([upstream #18099](https://github.com/misskey-dev/misskey/pull/18099))
 - Fix: リモートユーザーの再取得で通信に失敗した場合は既存情報を表示し、停止・ブロック済みサーバーへの再取得を省略するように (#233)
 - Enhance: Node.js のセキュリティアップデート（Brotli デコーダーの脆弱性 CVE-2026-111497）に伴い、最低動作バージョンを 22.23.4 / 24.22.1 / 26.12.1 に引き上げ、開発環境と Docker Image の Node.js を 26.12.1 に更新 (#225)
 - Feat: ユーザーの凍結時にフォロー関係を削除せず保持し、凍結解除後に復帰できるように (#1)

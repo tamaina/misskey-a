@@ -109,7 +109,7 @@ test('native finite auth inputs/defaults and outputs enforce declared fields', (
 		[requiredSchema(inline.AuthSessionGenerateContract['~orpc'].outputSchema), { token: 'token', url: 'https://example.com/auth' }, 'token'],
 		[requiredSchema(inline.EmailAddressAvailableContract['~orpc'].outputSchema), { available: true, reason: null }, 'available'],
 		[requiredSchema(inline.I2faDoneContract['~orpc'].outputSchema), { backupCodes: ['backup'] }, 'backupCodes'],
-		[requiredSchema(inline.I2faRegisterContract['~orpc'].outputSchema), { qr: 'qr', url: 'url', secret: 'secret', label: 'label', issuer: 'issuer' }, 'qr'],
+		[requiredSchema(inline.I2faRegisterContract['~orpc'].outputSchema), { url: 'url', secret: 'secret', label: 'label', issuer: 'issuer' }, 'url'],
 		[requiredSchema(inline.InviteLimitContract['~orpc'].outputSchema), { remaining: null }, 'remaining'],
 		[requiredSchema(inline.I2faKeyDoneContract['~orpc'].outputSchema), { id: 'key123', name: 'key' }, 'id'],
 	] as const) checkFinite(schema, value, required);

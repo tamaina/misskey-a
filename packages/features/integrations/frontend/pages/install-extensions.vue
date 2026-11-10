@@ -54,7 +54,7 @@ import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { parsePluginMeta, installPlugin } from '@features/integrations/frontend/plugin.js';
 import { installTheme } from '@features/preferences/frontend/theme.js';
-import { parseThemeCode } from '@features/preferences/frontend/shared/theme.js';
+import { parseThemeCode } from '@features/preferences/frontend/shared/theme-code.js';
 import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 
