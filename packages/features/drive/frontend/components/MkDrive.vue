@@ -168,11 +168,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { nextTick, onActivated, onBeforeUnmount, onMounted, ref, useTemplateRef, watch, computed, TransitionGroup, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import XNavFolder from '@features/drive/frontend/components/MkDrive.navFolder.vue';
 import XFolder from '@features/drive/frontend/components/MkDrive.folder.vue';
 import XFile from '@features/drive/frontend/components/MkDrive.file.vue';
@@ -188,6 +186,8 @@ import { globalEvents, useGlobalEvent } from '@features/runtime/frontend/events.
 import { checkDragDataType, getDragData, setDragData } from '@features/ui/frontend/drag-and-drop.js';
 import { getDriveFileMenu } from '@features/drive/frontend/utility/get-drive-file-menu.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -636,7 +636,7 @@ function getMenu() {
 		icon: 'ti ti-link',
 		action: () => { urlUpload(); },
 	}, { type: 'divider' }, {
-		text: folder.value ? folder.value.name : $locale.value.sfc.drive,
+		text: folder.value ? folder.value.name : globalLocale.value.env.drive,
 		type: 'label',
 	});
 
@@ -941,7 +941,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "الان الملف غير فارغ. لا يمكن حذفه",
 	"addFile": "إضافة ملف",
 	"fromUrl": "عبر رابط",
-	"drive": "قرص التخرين",
 	"sort": "ترتيب حسب",
 	"registeredDate": "انضم في",
 	"descendingOrder": "تنازلي",
@@ -975,7 +974,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "No és possible esborrar aquesta carpeta ja que no és buida",
 	"addFile": "Afegeix un fitxer",
 	"fromUrl": "Des d'un enllaç",
-	"drive": "Disc",
 	"sort": "Ordena",
 	"registeredDate": "Data de registre",
 	"descendingOrder": "Descendent",
@@ -1009,7 +1007,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Nemůžete odstranit složku, která není prázdná.",
 	"addFile": "Přidat soubor",
 	"fromUrl": "Z URL",
-	"drive": "Úložiště",
 	"sort": "Seřadit",
 	"registeredDate": "Datum registrace",
 	"descendingOrder": "Sestupně",
@@ -1043,7 +1040,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
@@ -1077,7 +1073,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Dieser Ordner kann nicht gelöscht werden, da er nicht leer ist.",
 	"addFile": "Datei hinzufügen",
 	"fromUrl": "Von einer URL",
-	"drive": "Drive",
 	"sort": "Sortieren",
 	"registeredDate": "Registrationsdatum",
 	"descendingOrder": "Absteigende Reihenfolge",
@@ -1111,7 +1106,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
@@ -1145,7 +1139,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "No se puede borrar esta carpeta. No está vacía.",
 	"addFile": "Agregar archivo",
 	"fromUrl": "Desde la URL",
-	"drive": "Drive",
 	"sort": "Ordenar",
 	"registeredDate": "Fecha de registro",
 	"descendingOrder": "Descendente",
@@ -1179,7 +1172,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Impossible de supprimer ce dossier car il n'est pas vide.",
 	"addFile": "Ajouter un fichier",
 	"fromUrl": "Depuis une URL",
-	"drive": "Disque",
 	"sort": "Trier",
 	"registeredDate": "Inscrit le",
 	"descendingOrder": "Descendant",
@@ -1213,7 +1205,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Karena folder ini tidak kosong, maka tidak dapat dihapus.",
 	"addFile": "Tambahkan berkas",
 	"fromUrl": "Dari URL",
-	"drive": "Drive",
 	"sort": "Urutkan",
 	"registeredDate": "Bergabung pada",
 	"descendingOrder": "Urutkan menurun",
@@ -1247,7 +1238,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Impossibile eliminare la cartella perché non è vuota",
 	"addFile": "Allega",
 	"fromUrl": "Dall'URL",
-	"drive": "Drive",
 	"sort": "Ordina per",
 	"registeredDate": "Data iscrizione",
 	"descendingOrder": "Diminuisce",
@@ -1281,7 +1271,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "このフォルダは空でないため、削除できません。",
 	"addFile": "ファイルを追加",
 	"fromUrl": "URLから",
-	"drive": "ドライブ",
 	"sort": "ソート",
 	"registeredDate": "登録日",
 	"descendingOrder": "降順",
@@ -1315,7 +1304,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "このフォルダは空っぽちゃうから消されへん",
 	"addFile": "ファイルを追加",
 	"fromUrl": "URLから",
-	"drive": "ドライブ",
 	"sort": "並び替え",
 	"registeredDate": "始めた日",
 	"descendingOrder": "大きい順",
@@ -1349,7 +1337,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
@@ -1383,7 +1370,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
@@ -1417,7 +1403,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "이 폴더는 비어있지 않기 때문에 삭제할 수 없습니다.",
 	"addFile": "파일 추가",
 	"fromUrl": "URL로부터",
-	"drive": "드라이브",
 	"sort": "정렬",
 	"registeredDate": "등록일",
 	"descendingOrder": "내림차순",
@@ -1451,7 +1436,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Omdat deze map niet leeg is, kan die niet worden verwijderd.",
 	"addFile": "Bestand toevoegen",
 	"fromUrl": "Van  URL",
-	"drive": "Schijf",
 	"sort": "Sorteren",
 	"registeredDate": "Inschrijvingsdatum",
 	"descendingOrder": "Aflopende volgorde",
@@ -1485,7 +1469,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Siden denne mappen ikke er tom, kan den ikke slettes.",
 	"addFile": "Legg til en fil",
 	"fromUrl": "Fra URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
@@ -1519,7 +1502,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Ponieważ ten katalog nie jest pusty, nie może być usunięty.",
 	"addFile": "Dodaj plik",
 	"fromUrl": "Z adresu URL",
-	"drive": "Dysk",
 	"sort": "Sortuj",
 	"registeredDate": "Zarejestrowano",
 	"descendingOrder": "Malejąco",
@@ -1553,7 +1535,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Esta pasta não está vazia e não pode ser excluída.",
 	"addFile": "Adicionar arquivo",
 	"fromUrl": "Da URL",
-	"drive": "Drive",
 	"sort": "Ordenação",
 	"registeredDate": "Data de registro",
 	"descendingOrder": "Descendente",
@@ -1587,7 +1568,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Эта папка не пуста и не может быть удалена.",
 	"addFile": "Добавить файл",
 	"fromUrl": "По ссылке",
-	"drive": "Диск",
 	"sort": "Сортировать",
 	"registeredDate": "Дата регистрации",
 	"descendingOrder": "По убыванию",
@@ -1621,7 +1601,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Nemôžete odstrániť priečinok sú súbormi.",
 	"addFile": "Pridať súbor",
 	"fromUrl": "Z URL",
-	"drive": "Disk",
 	"sort": "Zoradiť",
 	"registeredDate": "Dátum registrácie",
 	"descendingOrder": "Zostupne",
@@ -1655,7 +1634,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "เนื่องจากโฟลเดอร์นี้ไม่ว่างเปล่า จึงไม่สามารถลบ",
 	"addFile": "เพิ่มไฟล์",
 	"fromUrl": "จาก URL",
-	"drive": "ไดรฟ์",
 	"sort": "เรียงลำดับ",
 	"registeredDate": "วันที่ลงทะเบียน",
 	"descendingOrder": "เรียงลำดับลง",
@@ -1689,7 +1667,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Bu klasör boş olmadığı için silinemez.",
 	"addFile": "Bir dosya ekle",
 	"fromUrl": "URL'den",
-	"drive": "Drive",
 	"sort": "Sıralama düzeni",
 	"registeredDate": "Katılma tarihi",
 	"descendingOrder": "Azalan",
@@ -1723,7 +1700,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
@@ -1757,7 +1733,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Ця тека не порожня і не може бути видалена",
 	"addFile": "Додати файл",
 	"fromUrl": "З посилання",
-	"drive": "Диск",
 	"sort": "Сортування",
 	"registeredDate": "Приєднання",
 	"descendingOrder": "За спаданням",
@@ -1791,7 +1766,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "Không thể xóa cho đến khi không còn gì trong thư mục.",
 	"addFile": "Thêm tập tin",
 	"fromUrl": "Từ URL",
-	"drive": "Ổ đĩa",
 	"sort": "Sắp xếp",
 	"registeredDate": "Tham gia",
 	"descendingOrder": "Giảm dần",
@@ -1825,7 +1799,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "此文件夹中有文件，无法删除。",
 	"addFile": "添加文件",
 	"fromUrl": "从 URL",
-	"drive": "网盘",
 	"sort": "排序",
 	"registeredDate": "注册于",
 	"descendingOrder": "降序",
@@ -1859,7 +1832,6 @@ onBeforeUnmount(() => {
 	"hasChildFilesOrFolders": "此文件夾不是空的，無法刪除。",
 	"addFile": "加入附件",
 	"fromUrl": "從 URL 上傳",
-	"drive": "雲端硬碟",
 	"sort": "排序",
 	"registeredDate": "註冊日期",
 	"descendingOrder": "降冪",

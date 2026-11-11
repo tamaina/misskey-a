@@ -20,9 +20,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<span style="height: 1em; width: 1px; background: var(--MI_THEME-divider);"></span>
 						<span>{{ getSeparatorInfo(birthdayUsersPaginator.items.value[i - 1].birthday, user.birthday)?.nextText }} <i class="ti ti-chevron-down"></i></span>
 					</div>
-					<XUser :class="$style.user" :item="user" />
+					<XUser :class="$style.user" :item="user"/>
 				</div>
-				<XUser v-else :class="$style.user" :item="user" />
+				<XUser v-else :class="$style.user" :item="user"/>
 			</template>
 		</div>
 	</MkPagination>
@@ -30,17 +30,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, markRaw, ref, watch } from 'vue';
 import { useLowresTime } from '@features/ui/frontend/shared/use-lowres-time.js';
 import { isSeparatorNeeded, getSeparatorInfo } from '@features/timelines/frontend/utility/timeline-date-separate.js';
-import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
-import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
-import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 import MkContainer from '@features/ui/frontend/components/MkContainer.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
-import XUser from './WidgetBirthdayFollowings.user.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
+import XUser from './WidgetBirthdayFollowings.user.vue';
+import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
+import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const name = 'birthdayFollowings';
 
@@ -67,10 +71,10 @@ const widgetPropsDef = {
 			label: interpolateLocaleParameters($locale.value.sfc.dayX, { day: 3 }),
 		}, {
 			value: 'week' as const,
-			label: $locale.value.sfc.oneWeek,
+			label: globalLocale.value.env.oneWeek,
 		}, {
 			value: 'month' as const,
-			label: $locale.value.sfc.oneMonth,
+			label: globalLocale.value.env.oneMonth,
 		}],
 	},
 } satisfies FormWithDefault;
@@ -196,9 +200,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "الإرتفاع",
 	"widgetOptionsBirthdayFollowingsPeriod": "المدة",
 	"today": "اليوم",
-	"dayX": "{day}",
-	"oneWeek": "أسبوع",
-	"oneMonth": "شهر"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -209,9 +211,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Alçada ",
 	"widgetOptionsBirthdayFollowingsPeriod": "Període",
 	"today": "Avui",
-	"dayX": "{day}",
-	"oneWeek": "Una setmana",
-	"oneMonth": "Un mes"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -222,9 +222,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Výška",
 	"widgetOptionsBirthdayFollowingsPeriod": "Trvání",
 	"today": "Dnes",
-	"dayX": "{day}",
-	"oneWeek": "1 týden",
-	"oneMonth": "1 měsíc"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -235,9 +233,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Height",
 	"widgetOptionsBirthdayFollowingsPeriod": "Duration",
 	"today": "Today",
-	"dayX": "{day}",
-	"oneWeek": "One week",
-	"oneMonth": "One month"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -248,9 +244,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Höhe",
 	"widgetOptionsBirthdayFollowingsPeriod": "Dauer",
 	"today": "Heute",
-	"dayX": "{day}",
-	"oneWeek": "Eine Woche",
-	"oneMonth": "1 Monat"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -261,9 +255,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Height",
 	"widgetOptionsBirthdayFollowingsPeriod": "Duration",
 	"today": "Today",
-	"dayX": "{day}",
-	"oneWeek": "One week",
-	"oneMonth": "One month"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -274,9 +266,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Altura",
 	"widgetOptionsBirthdayFollowingsPeriod": "Duración",
 	"today": "Hoy",
-	"dayX": "Día {day}",
-	"oneWeek": "1 semana",
-	"oneMonth": "1 mes"
+	"dayX": "Día {day}"
 }
 </locale>
 
@@ -287,9 +277,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Hauteur",
 	"widgetOptionsBirthdayFollowingsPeriod": "Durée",
 	"today": "Aujourd’hui",
-	"dayX": "{day}",
-	"oneWeek": "1 semaine",
-	"oneMonth": "Un mois"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -300,9 +288,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Tinggi",
 	"widgetOptionsBirthdayFollowingsPeriod": "Durasi",
 	"today": "Hari ini",
-	"dayX": "{day}",
-	"oneWeek": "1 Bulan",
-	"oneMonth": "satu bulan"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -313,9 +299,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Altezza",
 	"widgetOptionsBirthdayFollowingsPeriod": "Durata",
 	"today": "Oggi",
-	"dayX": "{day}",
-	"oneWeek": "1 settimana",
-	"oneMonth": "Un mese"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -326,9 +310,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "高さ",
 	"widgetOptionsBirthdayFollowingsPeriod": "期間",
 	"today": "今日",
-	"dayX": "{day}日",
-	"oneWeek": "1週間",
-	"oneMonth": "1ヶ月"
+	"dayX": "{day}日"
 }
 </locale>
 
@@ -339,9 +321,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "高さ",
 	"widgetOptionsBirthdayFollowingsPeriod": "期間",
 	"today": "今日",
-	"dayX": "{day}日",
-	"oneWeek": "1週間",
-	"oneMonth": "1ヶ月"
+	"dayX": "{day}日"
 }
 </locale>
 
@@ -352,9 +332,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Height",
 	"widgetOptionsBirthdayFollowingsPeriod": "Duration",
 	"today": "Today",
-	"dayX": "{day}",
-	"oneWeek": "One week",
-	"oneMonth": "One month"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -365,9 +343,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Height",
 	"widgetOptionsBirthdayFollowingsPeriod": "Duration",
 	"today": "Today",
-	"dayX": "{day}",
-	"oneWeek": "One week",
-	"oneMonth": "One month"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -378,9 +354,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "높이",
 	"widgetOptionsBirthdayFollowingsPeriod": "기간",
 	"today": "오늘",
-	"dayX": "{day}일",
-	"oneWeek": "일주일",
-	"oneMonth": "1개월"
+	"dayX": "{day}일"
 }
 </locale>
 
@@ -391,9 +365,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Hoogte",
 	"widgetOptionsBirthdayFollowingsPeriod": "Duration",
 	"today": "Vandaag",
-	"dayX": "{day}",
-	"oneWeek": "One week",
-	"oneMonth": "One month"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -404,9 +376,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Høyde",
 	"widgetOptionsBirthdayFollowingsPeriod": "Duration",
 	"today": "I dag",
-	"dayX": "{day}",
-	"oneWeek": "1 uke",
-	"oneMonth": "1 måned"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -417,9 +387,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Wysokość",
 	"widgetOptionsBirthdayFollowingsPeriod": "Czas trwania",
 	"today": "Dziś",
-	"dayX": "{day}",
-	"oneWeek": "1 tydzień",
-	"oneMonth": "jeden miesiąc"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -430,9 +398,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Altura",
 	"widgetOptionsBirthdayFollowingsPeriod": "Duração",
 	"today": "Hoje",
-	"dayX": " Dia {day}",
-	"oneWeek": "1 semana",
-	"oneMonth": "1 mês"
+	"dayX": " Dia {day}"
 }
 </locale>
 
@@ -443,9 +409,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Высота",
 	"widgetOptionsBirthdayFollowingsPeriod": "Длительность",
 	"today": "Этот день",
-	"dayX": "{day} день",
-	"oneWeek": "1 неделя",
-	"oneMonth": "1 месяц"
+	"dayX": "{day} день"
 }
 </locale>
 
@@ -456,9 +420,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Výška",
 	"widgetOptionsBirthdayFollowingsPeriod": "Trvanie",
 	"today": "Dnes",
-	"dayX": "{day}",
-	"oneWeek": "1 týždeň",
-	"oneMonth": "1 mesiac"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -469,9 +431,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "ความสูง",
 	"widgetOptionsBirthdayFollowingsPeriod": "ระยะเวลา",
 	"today": "วันนี้",
-	"dayX": "{day}",
-	"oneWeek": "1 สัปดาห์",
-	"oneMonth": "หนึ่งเดือน"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -482,9 +442,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Yükseklik",
 	"widgetOptionsBirthdayFollowingsPeriod": "Süre",
 	"today": "Bugün",
-	"dayX": "{day}",
-	"oneWeek": "1 hafta",
-	"oneMonth": "1 ay"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -495,9 +453,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Height",
 	"widgetOptionsBirthdayFollowingsPeriod": "Duration",
 	"today": "Today",
-	"dayX": "{day}",
-	"oneWeek": "One week",
-	"oneMonth": "One month"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -508,9 +464,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Висота",
 	"widgetOptionsBirthdayFollowingsPeriod": "Тривалість",
 	"today": "День",
-	"dayX": "{day}",
-	"oneWeek": "1 тиждень",
-	"oneMonth": "1 місяць"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -521,9 +475,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "Chiều cao",
 	"widgetOptionsBirthdayFollowingsPeriod": "Thời hạn",
 	"today": "Hôm nay",
-	"dayX": "{day}",
-	"oneWeek": "1 tuần",
-	"oneMonth": "1 tháng"
+	"dayX": "{day}"
 }
 </locale>
 
@@ -534,9 +486,7 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "高度",
 	"widgetOptionsBirthdayFollowingsPeriod": "期限",
 	"today": "今天",
-	"dayX": "{day}日",
-	"oneWeek": "1 周",
-	"oneMonth": "1个月"
+	"dayX": "{day}日"
 }
 </locale>
 
@@ -547,8 +497,6 @@ defineExpose<WidgetComponentExpose>({
 	"widgetOptionsHeight": "高度",
 	"widgetOptionsBirthdayFollowingsPeriod": "時長",
 	"today": "本日",
-	"dayX": "{day} 日",
-	"oneWeek": "一週",
-	"oneMonth": "一個月"
+	"dayX": "{day} 日"
 }
 </locale>

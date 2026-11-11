@@ -3,18 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { customRef, ref, watch, onScopeDispose } from 'vue';
 import { EventEmitter } from 'eventemitter3';
 import { host, version } from '@features/boot/frontend/shared/config.js';
 import { PREF_DEF } from '@features/preferences/frontend/state/def.js';
-import type { Ref } from 'vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import FeatureLocaleMessages from '@features/preferences/frontend/ts-messages.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { deepEqual } from '@features/runtime/frontend/utility/deep-equal.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Ref } from 'vue';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 // NOTE: 明示的な設定値のひとつとして null もあり得るため、設定が存在しないかどうかを判定する目的で null で比較したり ?? を使ってはいけない
 
@@ -522,7 +528,7 @@ export class PreferencesManager extends EventEmitter<PreferencesManagerEvents> {
 
 			os.alert({
 				type: 'error',
-				title: FeatureLocaleMessages.$locale.somethingHappened,
+				title: getGlobalLocale().somethingHappened,
 			});
 
 			console.error(err);

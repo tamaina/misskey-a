@@ -3,12 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { action } from 'storybook/actions';
 import { expect, userEvent, waitFor, within } from '@storybook/test';
-import type { StoryObj } from '@storybook/vue3';
 import FeatureLocaleMessages from '@features/ui/frontend/ts-messages.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import MkDialog from '@features/ui/frontend/components/MkDialog.vue';
+import type { StoryObj } from '@storybook/vue3';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
+
 const Base = {
 	render(args) {
 		return {
@@ -89,17 +96,17 @@ export const DialogWithActions = {
 	...Question,
 	args: {
 		...Question.args,
-		text: FeatureLocaleMessages.$locale.areYouSure,
+		text: getGlobalLocale().areYouSure,
 		actions: [
 			{
-				text: FeatureLocaleMessages.$locale.yes,
+				text: getGlobalLocale().yes,
 				primary: true,
 				callback() {
 					action('YES')();
 				},
 			},
 			{
-				text: FeatureLocaleMessages.$locale.no,
+				text: getGlobalLocale().no,
 				callback() {
 					action('NO')();
 				},
@@ -111,10 +118,10 @@ export const DialogWithDangerActions = {
 	...Warning,
 	args: {
 		...Warning.args,
-		text: FeatureLocaleMessages.$locale.resetAreYouSure,
+		text: getGlobalLocale().resetAreYouSure,
 		actions: [
 			{
-				text: FeatureLocaleMessages.$locale.yes,
+				text: getGlobalLocale().yes,
 				danger: true,
 				primary: true,
 				callback() {
@@ -122,7 +129,7 @@ export const DialogWithDangerActions = {
 				},
 			},
 			{
-				text: FeatureLocaleMessages.$locale.no,
+				text: getGlobalLocale().no,
 				callback() {
 					action('NO')();
 				},
@@ -147,7 +154,7 @@ export const DialogWithInput = {
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement);
 		await expect(canvasElement).toHaveTextContent(interpolateLocaleParameters(FeatureLocaleMessages.$locale._dialog.charactersBelow, { current: 0, min: 2 }));
-		const okButton = canvas.getByRole('button', { name: FeatureLocaleMessages.$locale.ok });
+		const okButton = canvas.getByRole('button', { name: getGlobalLocale().ok });
 		await expect(okButton).toBeDisabled();
 		const input = canvas.getByRole<HTMLInputElement>('combobox');
 		await waitFor(() => userEvent.hover(input));

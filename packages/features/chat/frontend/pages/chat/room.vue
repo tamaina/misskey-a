@@ -91,7 +91,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { ref, useTemplateRef, computed, onMounted, onBeforeUnmount, onDeactivated, onActivated } from 'vue';
 import * as Misskey from 'misskey-js';
 import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
@@ -100,8 +99,6 @@ import XForm from '@features/chat/frontend/pages/chat/room.form.vue';
 import XSearch from '@features/chat/frontend/pages/chat/room.search.vue';
 import XMembers from '@features/chat/frontend/pages/chat/room.members.vue';
 import XInfo from '@features/chat/frontend/pages/chat/room.info.vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
 import * as os from '@features/ui/frontend/os.js';
 import { useStream } from '@features/api/frontend/stream.js';
 import * as sound from '@features/preferences/frontend/utility/sound.js';
@@ -114,6 +111,9 @@ import { useRouter } from '@features/navigation/frontend/router.js';
 import { useMutationObserver } from '@features/ui/frontend/composables/use-mutation-observer.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { makeDateSeparatedTimelineComputedRef } from '@features/timelines/frontend/utility/timeline-date-separate.js';
+import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -459,7 +459,7 @@ const headerTabs = computed(() => room.value ? [{
 	icon: 'ti ti-search',
 }, {
 	key: 'info',
-	title: $locale.value.sfc.info,
+	title: globalLocale.value.env.info,
 	icon: 'ti ti-info-circle',
 }] : [{
 	key: 'chat',
@@ -591,7 +591,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "الأعضاء",
-	"info": "عن",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -615,7 +614,6 @@ definePage(computed(() => {
 	"leave": "Marxar",
 	"messages": "Missatge",
 	"members": "Membres",
-	"info": "Informació",
 	"directMessage": "Xateja amb aquest usuari",
 	"noMessagesYet": "Encara no tens missatges ",
 	"thisUserAllowsChatOnlyFromFollowers": "Aquest usuari només accepta xats d'usuaris que el segueixen.",
@@ -639,7 +637,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Členové",
-	"info": "Informace",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -663,7 +660,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -687,7 +683,6 @@ definePage(computed(() => {
 	"leave": "Raum verlassen",
 	"messages": "Nachrichten",
 	"members": "Mitglieder",
-	"info": "Über",
 	"directMessage": "Mit dem Benutzer chatten",
 	"noMessagesYet": "Noch keine Nachrichten",
 	"thisUserAllowsChatOnlyFromFollowers": "Dieser Benutzer nimmt nur Chats von Followern an.",
@@ -711,7 +706,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -735,7 +729,6 @@ definePage(computed(() => {
 	"leave": "Dejar sala",
 	"messages": "Mensajes",
 	"members": "Miembros",
-	"info": "Información",
 	"directMessage": "Chatear",
 	"noMessagesYet": "Aún no hay mensajes",
 	"thisUserAllowsChatOnlyFromFollowers": "Este usuario sólo acepta chats de seguidores.",
@@ -759,7 +752,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Membres",
-	"info": "Informations",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -783,7 +775,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Anggota",
-	"info": "Informasi",
 	"directMessage": "Obrolan pengguna",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -807,7 +798,6 @@ definePage(computed(() => {
 	"leave": "Esci",
 	"messages": "Messaggi",
 	"members": "Membri",
-	"info": "Informazioni",
 	"directMessage": "Chattare insieme",
 	"noMessagesYet": "Ancora nessun messaggio",
 	"thisUserAllowsChatOnlyFromFollowers": "Questa persona permette di chattare soltanto i propri Follower.",
@@ -831,7 +821,6 @@ definePage(computed(() => {
 	"leave": "グループから退出",
 	"messages": "メッセージ",
 	"members": "メンバー",
-	"info": "情報",
 	"directMessage": "ダイレクトメッセージ",
 	"noMessagesYet": "まだメッセージはありません",
 	"thisUserAllowsChatOnlyFromFollowers": "このユーザーはフォロワーからのみメッセージを受け付けています。",
@@ -855,7 +844,6 @@ definePage(computed(() => {
 	"leave": "グループから抜ける",
 	"messages": "メッセージ",
 	"members": "メンバーはん",
-	"info": "情報",
 	"directMessage": "チャットしよか",
 	"noMessagesYet": "まだメッセージはあらへんで",
 	"thisUserAllowsChatOnlyFromFollowers": "このユーザーはフォロワーからのチャットしか受け付けとらんみたいやわ。",
@@ -879,7 +867,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -903,7 +890,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -927,7 +913,6 @@ definePage(computed(() => {
 	"leave": "룸을 떠나기",
 	"messages": "메시지",
 	"members": "멤버",
-	"info": "정보",
 	"directMessage": "채팅하기",
 	"noMessagesYet": "아직 메시지가 없습니다",
 	"thisUserAllowsChatOnlyFromFollowers": "이 유저는 팔로워만 채팅을 할 수 있습니다.",
@@ -951,7 +936,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Leden",
-	"info": "Over",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -975,7 +959,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Medlemmer",
-	"info": "Infomasjon",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -999,7 +982,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Członkowie",
-	"info": "Informacje",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -1023,7 +1005,6 @@ definePage(computed(() => {
 	"leave": "Deixar sala",
 	"messages": "Mensagem",
 	"members": "Membros",
-	"info": "Informações",
 	"directMessage": "Conversar com usuário",
 	"noMessagesYet": "Ainda não há mensagens",
 	"thisUserAllowsChatOnlyFromFollowers": "Esse usuário aceita conversar apenas com seguidores.",
@@ -1047,7 +1028,6 @@ definePage(computed(() => {
 	"leave": "Выйти из комнаты",
 	"messages": "Сообщения",
 	"members": "Участники",
-	"info": "Описание",
 	"directMessage": "Личные сообщения",
 	"noMessagesYet": "Сообщений пока нет",
 	"thisUserAllowsChatOnlyFromFollowers": "Пользователь принимает сообщения только от подписчиков.",
@@ -1071,7 +1051,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Členovia",
-	"info": "Informácie",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -1095,7 +1074,6 @@ definePage(computed(() => {
 	"leave": "ออกจากห้อง",
 	"messages": "ข้อความ",
 	"members": "สมาชิก",
-	"info": "เกี่ยวกับ",
 	"directMessage": "แชตเลย",
 	"noMessagesYet": "ยังไม่มีข้อความ",
 	"thisUserAllowsChatOnlyFromFollowers": "ผู้ใช้นี้รับแชตเฉพาะจากผู้ติดตามเท่านั้น",
@@ -1119,7 +1097,6 @@ definePage(computed(() => {
 	"leave": "Odadan çık",
 	"messages": "Mesaj",
 	"members": "Üyeler",
-	"info": "Hakkında",
 	"directMessage": "Kullanıcıyla sohbet et",
 	"noMessagesYet": "Henüz mesaj yok",
 	"thisUserAllowsChatOnlyFromFollowers": "Bu kullanıcı yalnızca takipçilerinden gelen sohbetleri kabul eder.",
@@ -1143,7 +1120,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Members",
-	"info": "About",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -1167,7 +1143,6 @@ definePage(computed(() => {
 	"leave": "Залишити групу",
 	"messages": "Повідомлення",
 	"members": "Учасники",
-	"info": "Інформація",
 	"directMessage": "Чат із користувачем",
 	"noMessagesYet": "Повідомлень поки немає",
 	"thisUserAllowsChatOnlyFromFollowers": "Цей користувач приймає особисті повідомлення лише від підписників.",
@@ -1191,7 +1166,6 @@ definePage(computed(() => {
 	"leave": "Leave room",
 	"messages": "Messages",
 	"members": "Thành viên",
-	"info": "Giới thiệu",
 	"directMessage": "Chat with user",
 	"noMessagesYet": "No messages yet",
 	"thisUserAllowsChatOnlyFromFollowers": "This user accepts chats from followers only.",
@@ -1215,7 +1189,6 @@ definePage(computed(() => {
 	"leave": "退出群聊",
 	"messages": "消息",
 	"members": "成员",
-	"info": "关于",
 	"directMessage": "私信",
 	"noMessagesYet": "还没有消息",
 	"thisUserAllowsChatOnlyFromFollowers": "此用户仅接受关注者发起的聊天。",
@@ -1239,7 +1212,6 @@ definePage(computed(() => {
 	"leave": "退出聊天室",
 	"messages": "訊息",
 	"members": "成員",
-	"info": "資訊",
 	"directMessage": "直接訊息",
 	"noMessagesYet": "尚無訊息",
 	"thisUserAllowsChatOnlyFromFollowers": "此使用者僅接受來自追隨者的聊天訊息。",

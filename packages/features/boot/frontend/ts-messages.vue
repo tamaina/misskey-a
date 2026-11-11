@@ -19,7 +19,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "انعش",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -51,7 +50,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Iniciar l'eina de reparació ",
 		"otherOption4": "Iniciar Misskey en mode segur"
 	},
-	"reload": "Actualitzar",
 	"_selfXssPrevention": {
 		"warning": "Advertència ",
 		"title": "\"Enganxa qualsevol cosa en aquesta finestra\"  És tot un engany.",
@@ -83,7 +81,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Aktualizovat",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -115,7 +112,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Refresh",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -147,7 +143,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Starte das Reparaturwerkzeug",
 		"otherOption4": "Misskey im abgesicherten Modus starten"
 	},
-	"reload": "Aktualisieren",
 	"_selfXssPrevention": {
 		"warning": "WARNUNG",
 		"title": "„Füge in diesen Bereich etwas ein“ ist eine Betrugsmasche.",
@@ -179,7 +174,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Refresh",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -211,7 +205,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Iniciar la herramienta de reparación",
 		"otherOption4": "Iniciar Misskey en modo seguro"
 	},
-	"reload": "Recargar",
 	"_selfXssPrevention": {
 		"warning": "Advertencia",
 		"title": "\"Pegar algo en esta pantalla\" es un timo.",
@@ -243,7 +236,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Rafraîchir",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -275,7 +267,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Muat ulang",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -307,7 +298,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Avviare lo strumento di riparazione",
 		"otherOption4": "Avvia Misskey in modalità sicura"
 	},
-	"reload": "Ricarica",
 	"_selfXssPrevention": {
 		"warning": "Avviso",
 		"title": "\"Incolla qualcosa su questa schermata\" è tutta una truffa.",
@@ -339,7 +329,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "修復ツールを起動",
 		"otherOption4": "Misskeyをセーフモードで起動"
 	},
-	"reload": "リロード",
 	"_selfXssPrevention": {
 		"warning": "警告",
 		"title": "「この画面に何か貼り付けろ」はすべて詐欺です。",
@@ -371,7 +360,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "修復ツールを起動",
 		"otherOption4": "Misskeyをセーフモードで起動"
 	},
-	"reload": "リロード",
 	"_selfXssPrevention": {
 		"warning": "警告",
 		"title": "「この画面になんか貼り付けろ」は全部詐欺やで。",
@@ -403,7 +391,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Refresh",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -435,7 +422,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Refresh",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -467,7 +453,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "복구 툴 실행",
 		"otherOption4": "Misskey를 세이프 모드로 열기"
 	},
-	"reload": "새로고침",
 	"_selfXssPrevention": {
 		"warning": "경고",
 		"title": "“이 화면에 뭔가를 붙여넣어라\"는 것은 모두 사기입니다.",
@@ -499,7 +484,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Verversen",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -531,7 +515,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Refresh",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -563,7 +546,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Odśwież",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -595,7 +577,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Iniciar ferramenta de reparo",
 		"otherOption4": "Abrir Misskey no modo seguro"
 	},
-	"reload": "Recarregar",
 	"_selfXssPrevention": {
 		"warning": "AVISO",
 		"title": "\"Cole algo nessa tela\" é uma fraude",
@@ -627,7 +608,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Перезагрузить",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -659,7 +639,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Obnoviť",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -691,7 +670,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "เปิดเครื่องมือซ่อมแซม",
 		"otherOption4": "เริ่มทำงาน Misskey ในโหมดปลอดภัย"
 	},
-	"reload": "รีโหลด",
 	"_selfXssPrevention": {
 		"warning": "คำเตือน",
 		"title": "“ข้อความที่บอกให้วางบางอย่างในหน้าจอนี้” ทั้งหมดเป็นการหลอกลวง",
@@ -723,7 +701,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Onarım aracını başlatın",
 		"otherOption4": "Misskey'i güvenli modda başlatın"
 	},
-	"reload": "Yenile",
 	"_selfXssPrevention": {
 		"warning": "UYARI",
 		"title": "“Bu ekrana bir şey yapıştırın” tamamen bir aldatmaca.",
@@ -755,7 +732,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Refresh",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -787,7 +763,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Оновити",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -819,7 +794,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "Launch the repair tool",
 		"otherOption4": "Launch Misskey in safe mode"
 	},
-	"reload": "Tải lại",
 	"_selfXssPrevention": {
 		"warning": "WARNING",
 		"title": "\"Paste something on this screen\" is all a scam.",
@@ -851,7 +825,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "启动修复工具",
 		"otherOption4": "以安全模式启动 Misskey"
 	},
-	"reload": "刷新",
 	"_selfXssPrevention": {
 		"warning": "警告",
 		"title": "任何要求 “在屏幕上贴些什么吧” 的都是诈骗。",
@@ -883,7 +856,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"otherOption3": "啟動修復工具",
 		"otherOption4": "以安全模式啟動 Misskey"
 	},
-	"reload": "重新整理",
 	"_selfXssPrevention": {
 		"warning": "警告",
 		"title": "「在此畫面貼上一些內容」完全是個騙局。",

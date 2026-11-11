@@ -6,14 +6,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div class="_gaps">
 	<MkInput v-model="name_" :disabled="!isOwner">
-		<template #label>{{ $locale.sfc.name }}</template>
+		<template #label>{{ globalLocale.env.name }}</template>
 	</MkInput>
 
 	<MkTextarea v-model="description_" :disabled="!isOwner">
-		<template #label>{{ $locale.sfc.description }}</template>
+		<template #label>{{ globalLocale.env.description }}</template>
 	</MkTextarea>
 
-	<MkButton v-if="isOwner" primary @click="save">{{ $locale.sfc.save }}</MkButton>
+	<MkButton v-if="isOwner" primary @click="save">{{ globalLocale.env.save }}</MkButton>
 
 	<hr>
 
@@ -26,6 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -35,6 +36,9 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import { useRouter } from '@features/navigation/frontend/router.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 const $i = ensureSignin();
@@ -99,308 +103,196 @@ watch(isMuted, async () => {
 
 <locale locale="ar-SA" lang="json">
 {
-	"name": "الإسم",
-	"description": "الوصف",
-	"save": "حفظ",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "متأكد من أنك تريد حذف {x}؟"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"name": "Nom",
-	"description": "Descripció",
-	"save": "Desa",
 	"deleteRoom": "Esborrar la sala",
-	"muteThisRoom": "Silenciar aquesta sala",
-	"deleteAreYouSure": "Segur que vols esborrar «{x}»?"
+	"muteThisRoom": "Silenciar aquesta sala"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"name": "Jméno",
-	"description": "Popis",
-	"save": "Uložit",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Jste si jistí že chcete smazat \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"name": "Name",
-	"description": "Description",
-	"save": "Save",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"name": "Name",
-	"description": "Beschreibung",
-	"save": "Speichern",
 	"deleteRoom": "Raum löschen",
-	"muteThisRoom": "Raum stummschalten",
-	"deleteAreYouSure": "Möchtest du „{x}“ wirklich löschen?"
+	"muteThisRoom": "Raum stummschalten"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"name": "Name",
-	"description": "Description",
-	"save": "Save",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"name": "Nombre",
-	"description": "Descripción",
-	"save": "Guardar",
 	"deleteRoom": "Borrar sala",
-	"muteThisRoom": "Silenciar esta sala",
-	"deleteAreYouSure": "¿Desea borrar \"{x}\"?"
+	"muteThisRoom": "Silenciar esta sala"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"name": "Nom",
-	"description": "Description",
-	"save": "Enregistrer",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Êtes-vous sûr·e de vouloir supprimer « {x} » ?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"name": "Nama",
-	"description": "Deskripsi",
-	"save": "Simpan",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Apakah kamu yakin ingin menghapus \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"name": "Nome",
-	"description": "Descrizione",
-	"save": "Salva",
 	"deleteRoom": "Elimina stanza",
-	"muteThisRoom": "Silenzia stanza",
-	"deleteAreYouSure": "Vuoi davvero eliminare \"{x}\"?"
+	"muteThisRoom": "Silenzia stanza"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"name": "名前",
-	"description": "説明",
-	"save": "保存",
 	"deleteRoom": "グループを削除",
-	"muteThisRoom": "このグループをミュート",
-	"deleteAreYouSure": "「{x}」を削除しますか？"
+	"muteThisRoom": "このグループをミュート"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"name": "名前",
-	"description": "説明",
-	"save": "とっとく",
 	"deleteRoom": "ルームをほかす",
-	"muteThisRoom": "このグループをミュート",
-	"deleteAreYouSure": "「{x}」はほかしてええか？"
+	"muteThisRoom": "このグループをミュート"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"name": "Name",
-	"description": "Description",
-	"save": "Sekles",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"name": "Name",
-	"description": "Description",
-	"save": "ಉಳಿಸಿ",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"name": "이름",
-	"description": "설명",
-	"save": "저장",
 	"deleteRoom": "방을 삭제하기",
-	"muteThisRoom": "이 방을 뮤트하기",
-	"deleteAreYouSure": "\"{x}\" 을(를) 삭제하시겠습니까?"
+	"muteThisRoom": "이 방을 뮤트하기"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"name": "Naam",
-	"description": "Beschrijving",
-	"save": "Opslaan",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Weet je zeker dat je \"{x}\" wil verwijderen?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"name": "Navn",
-	"description": "Beskrivelse",
-	"save": "Lagre",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Er du sikker på at du vil slette \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"name": "Nazwa",
-	"description": "Opis",
-	"save": "Zapisz",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Czy na pewno chcesz usunąć „{x}”?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"name": "Nome",
-	"description": "Descrição",
-	"save": "Salvar",
 	"deleteRoom": "Excluir sala",
-	"muteThisRoom": "Silenciar sala",
-	"deleteAreYouSure": "Deseja excluir \"{x}\"?"
+	"muteThisRoom": "Silenciar sala"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"name": "Название",
-	"description": "Описание",
-	"save": "Сохранить",
 	"deleteRoom": "Удалить комнату",
-	"muteThisRoom": "Заглушить комнату",
-	"deleteAreYouSure": "Хотите удалить «{x}»?"
+	"muteThisRoom": "Заглушить комнату"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"name": "Názov",
-	"description": "Popis",
-	"save": "Uložiť",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Naozaj chcete odstrániť \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"name": "ชื่อ",
-	"description": "คำอธิบาย",
-	"save": "บันทึก",
 	"deleteRoom": "ลบห้อง",
-	"muteThisRoom": "ปิดเสียงห้องนี้",
-	"deleteAreYouSure": "ต้องการลบ “{x}” ใช่ไหม?"
+	"muteThisRoom": "ปิดเสียงห้องนี้"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"name": "İsim",
-	"description": "Açıklama",
-	"save": "Kaydet",
 	"deleteRoom": "Odayı sil",
-	"muteThisRoom": "Sessiz oda",
-	"deleteAreYouSure": "“{x}” öğesini silmek istediğinizden emin misin?"
+	"muteThisRoom": "Sessiz oda"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"name": "Name",
-	"description": "Description",
-	"save": "Save",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"name": "Ім'я",
-	"description": "Опис",
-	"save": "Зберегти",
 	"deleteRoom": "Видалити групу",
-	"muteThisRoom": "Заглушити цю групу",
-	"deleteAreYouSure": "Ви впевнені, що хочете видалити \"{x}\"?"
+	"muteThisRoom": "Заглушити цю групу"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"name": "Tên",
-	"description": "Mô tả",
-	"save": "Lưu",
 	"deleteRoom": "Delete room",
-	"muteThisRoom": "Mute room",
-	"deleteAreYouSure": "Bạn có chắc muốn xóa \"{x}\"?"
+	"muteThisRoom": "Mute room"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"name": "名称",
-	"description": "描述",
-	"save": "保存",
 	"deleteRoom": "删除群聊",
-	"muteThisRoom": "消息免打扰",
-	"deleteAreYouSure": "要删掉「{x}」吗？"
+	"muteThisRoom": "消息免打扰"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"name": "名稱",
-	"description": "描述",
-	"save": "儲存",
 	"deleteRoom": "刪除聊天室",
-	"muteThisRoom": "此聊天室已靜音",
-	"deleteAreYouSure": "確定要刪掉「{x}」嗎？"
+	"muteThisRoom": "此聊天室已靜音"
 }
 </locale>

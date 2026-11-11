@@ -35,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<div style="font-size: 120%;">{{ $locale.sfc.initialTutorialLandingTitle }}</div>
 							<div>{{ $locale.sfc.initialTutorialLandingDescription }}</div>
 							<MkButton primary rounded gradate style="margin: 16px auto 0 auto;" @click="page++">{{ $locale.sfc.initialTutorialLaunchTutorial }} <i class="ti ti-arrow-right"></i></MkButton>
-							<MkButton style="margin: 0 auto;" transparent rounded @click="close(true)">{{ $locale.sfc.close }}</MkButton>
+							<MkButton style="margin: 0 auto;" transparent rounded @click="close(true)">{{ globalLocale.env.close }}</MkButton>
 						</div>
 					</div>
 				</div>
@@ -48,8 +48,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 						<div :class="$style.pageFooter">
 							<div class="_buttonsCenter">
-								<MkButton v-if="initialPage !== 1" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ $locale.sfc.goBack }}</MkButton>
-								<MkButton primary rounded gradate @click="page++">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+								<MkButton v-if="initialPage !== 1" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ globalLocale.env.goBack }}</MkButton>
+								<MkButton primary rounded gradate @click="page++">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 							</div>
 						</div>
 					</div>
@@ -66,8 +66,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 						<div :class="$style.pageFooter">
 							<div class="_buttonsCenter">
-								<MkButton v-if="initialPage !== 2" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ $locale.sfc.goBack }}</MkButton>
-								<MkButton primary rounded gradate :disabled="!isReactionTutorialPushed" @click="page++">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+								<MkButton v-if="initialPage !== 2" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ globalLocale.env.goBack }}</MkButton>
+								<MkButton primary rounded gradate :disabled="!isReactionTutorialPushed" @click="page++">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 							</div>
 						</div>
 					</div>
@@ -81,8 +81,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 						<div :class="$style.pageFooter">
 							<div class="_buttonsCenter">
-								<MkButton v-if="initialPage !== 3" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ $locale.sfc.goBack }}</MkButton>
-								<MkButton primary rounded gradate @click="page++">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+								<MkButton v-if="initialPage !== 3" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ globalLocale.env.goBack }}</MkButton>
+								<MkButton primary rounded gradate @click="page++">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 							</div>
 						</div>
 					</div>
@@ -96,8 +96,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 						<div :class="$style.pageFooter">
 							<div class="_buttonsCenter">
-								<MkButton v-if="initialPage !== 3" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ $locale.sfc.goBack }}</MkButton>
-								<MkButton primary rounded gradate @click="page++">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+								<MkButton v-if="initialPage !== 3" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ globalLocale.env.goBack }}</MkButton>
+								<MkButton primary rounded gradate @click="page++">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 							</div>
 						</div>
 					</div>
@@ -114,8 +114,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 						<div :class="$style.pageFooter">
 							<div class="_buttonsCenter">
-								<MkButton v-if="initialPage !== 2" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ $locale.sfc.goBack }}</MkButton>
-								<MkButton primary rounded gradate :disabled="!isSensitiveTutorialSucceeded" @click="page++">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+								<MkButton v-if="initialPage !== 2" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ globalLocale.env.goBack }}</MkButton>
+								<MkButton primary rounded gradate :disabled="!isSensitiveTutorialSucceeded" @click="page++">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 							</div>
 						</div>
 					</div>
@@ -135,8 +135,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</I18n>
 							<div>{{ interpolateLocaleParameters($locale.sfc.initialAccountSettingHaveFun, { name: instance.name ?? host }) }}</div>
 							<div class="_buttonsCenter" style="margin-top: 16px;">
-								<MkButton v-if="initialPage !== 4" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ $locale.sfc.goBack }}</MkButton>
-								<MkButton rounded primary gradate @click="close(false)">{{ $locale.sfc.close }}</MkButton>
+								<MkButton v-if="initialPage !== 4" rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ globalLocale.env.goBack }}</MkButton>
+								<MkButton rounded primary gradate @click="close(false)">{{ globalLocale.env.close }}</MkButton>
 							</div>
 						</div>
 					</div>
@@ -148,6 +148,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, useTemplateRef, watch } from 'vue';
 import { host } from '@features/boot/frontend/shared/config.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
@@ -161,6 +162,9 @@ import { interpolateLocaleParameters } from '@features/runtime/frontend/interpol
 import { instance } from '@features/instance/frontend/instance.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
 import * as os from '@features/ui/frontend/os.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	initialPage?: number;
@@ -271,9 +275,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "اغلق",
-	"goBack": "رجوع",
-	"continue": "متابعة",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -295,9 +296,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Benvingut al tutorial",
 	"initialTutorialLandingDescription": "Aquí aprendràs el bàsic per poder fer servir Misskey i les seves característiques.",
 	"initialTutorialLaunchTutorial": "Començar tutorial",
-	"close": "Tanca",
-	"goBack": "Tornar",
-	"continue": "Continuar",
 	"initialTutorialReactionReactToContinue": "Afegeix una reacció per continuar.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Marca el fitxer adjunt com a sensible per poder continuar.",
 	"initialTutorialDoneTitle": "Has completat el tutorial 🎉",
@@ -319,9 +317,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Zavřít",
-	"goBack": "Zpět",
-	"continue": "Pokračovat",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -343,9 +338,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Close",
-	"goBack": "Back",
-	"continue": "Continue",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -367,9 +359,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Willkommen zum Tutorial",
 	"initialTutorialLandingDescription": "Hier kannst du sehen, wie Misskey funktioniert",
 	"initialTutorialLaunchTutorial": "Tutorial ansehen",
-	"close": "Schließen",
-	"goBack": "Zurück",
-	"continue": "Fortfahren",
 	"initialTutorialReactionReactToContinue": "Füge eine Reaktion hinzu, um fortzufahren.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Markiere die angehängte Datei als sensibel, um fortzufahren.",
 	"initialTutorialDoneTitle": "Du hast das Tutorial abgeschlossen! 🎉",
@@ -391,9 +380,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Close",
-	"goBack": "Back",
-	"continue": "Continue",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -415,9 +401,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Bienvenid@ al tutorial",
 	"initialTutorialLandingDescription": "Aquí podrás aprender las nociones básicas sobre cómo usar Misskey y sus funciones.",
 	"initialTutorialLaunchTutorial": "Comenzar tutorial",
-	"close": "Cerrar",
-	"goBack": "Anterior",
-	"continue": "Continuar",
 	"initialTutorialReactionReactToContinue": "Añade una reacción para continuar.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Marca el archivo adjunto como sensible para continuar.",
 	"initialTutorialDoneTitle": "¡Has completado el tutorial! 🎉",
@@ -439,9 +422,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Bienvenue dans le tutoriel",
 	"initialTutorialLandingDescription": "Ici, vous pouvez apprendre l'utilisation de base de Misskey et ses fonctionnalités.",
 	"initialTutorialLaunchTutorial": "Visionner le tutoriel",
-	"close": "Fermer",
-	"goBack": "Retour",
-	"continue": "Continuer",
 	"initialTutorialReactionReactToContinue": "Ajoutez une réaction pour procéder.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Marquez le fichier joint comme sensible pour procéder.",
 	"initialTutorialDoneTitle": "Le tutoriel est terminé ! 🎉",
@@ -463,9 +443,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Selamat datang di Tutorial",
 	"initialTutorialLandingDescription": "Di sini kamu dapat mempelajari dasar-dasar dari penggunaan Misskey dan fitur-fiturnya.",
 	"initialTutorialLaunchTutorial": "Lihat Tutorial",
-	"close": "Tutup",
-	"goBack": "Kembali",
-	"continue": "Lanjutkan",
 	"initialTutorialReactionReactToContinue": "Tambahkan reaksi untuk melanjutkan.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Tandai berkas terlampir sebagai sensitif untuk melanjutkan.",
 	"initialTutorialDoneTitle": "Kamu telah menyelesaikan tutorial! 🎉",
@@ -487,9 +464,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Eccoci nel tutorial",
 	"initialTutorialLandingDescription": "Qui puoi verificare l'uso delle funzionalità base di Misskey.",
 	"initialTutorialLaunchTutorial": "Inizia il tutorial",
-	"close": "Chiudi",
-	"goBack": "Indietro",
-	"continue": "Continua",
 	"initialTutorialReactionReactToContinue": "Aggiungere la Reazione ti consentirà di procedere col tutorial.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Imposta l'immagine come esplicita per procedere col tutorial.",
 	"initialTutorialDoneTitle": "Il tutorial è finito! 🎉",
@@ -511,9 +485,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "チュートリアルへようこそ",
 	"initialTutorialLandingDescription": "ここでは、Misskeyの基本的な使い方や機能を確認できます。",
 	"initialTutorialLaunchTutorial": "チュートリアルを見る",
-	"close": "閉じる",
-	"goBack": "戻る",
-	"continue": "続ける",
 	"initialTutorialReactionReactToContinue": "リアクションをつけると先に進めるようになります。",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "画像をセンシティブに設定すると先に進めるようになります。",
 	"initialTutorialDoneTitle": "チュートリアルは終了です🎉",
@@ -535,9 +506,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "チュートリアルによう来たな",
 	"initialTutorialLandingDescription": "ここでは、Misskeyのカンタンな使い方とか機能を確かめれんで。",
 	"initialTutorialLaunchTutorial": "チュートリアル見るで",
-	"close": "さいなら",
-	"goBack": "戻る",
-	"continue": "続けるで",
 	"initialTutorialReactionReactToContinue": "ツッコんだら進めるようになるで。",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "画像をちゃんと設定したら先に進めるで。",
 	"initialTutorialDoneTitle": "チュートリアル終わり！おつかれさん🎉",
@@ -559,9 +527,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Close",
-	"goBack": "Back",
-	"continue": "Continue",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -583,9 +548,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Close",
-	"goBack": "Back",
-	"continue": "Continue",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -607,9 +569,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "튜토리얼에 오신 걸 환영합니다",
 	"initialTutorialLandingDescription": "여기서는 미스키의 기본적인 사용법이나 기능을 확인할 수 있습니다.",
 	"initialTutorialLaunchTutorial": "튜토리얼 보기",
-	"close": "닫기",
-	"goBack": "뒤로",
-	"continue": "계속",
 	"initialTutorialReactionReactToContinue": "다음으로 진행하려면 리액션을 보내세요.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "이미지를 열람 주의로 설정하면 다음으로 넘어갈 수 있게 됩니다.",
 	"initialTutorialDoneTitle": "튜토리얼이 끝났습니다! 🎉",
@@ -631,9 +590,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Sluiten",
-	"goBack": "Terug",
-	"continue": "Continue",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -655,9 +611,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Lukk",
-	"goBack": "Back",
-	"continue": "Fortsett",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -679,9 +632,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Zamknij",
-	"goBack": "Wróć",
-	"continue": "Continue",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -703,9 +653,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Bem-vindo ao Tutorial!",
 	"initialTutorialLandingDescription": "Aqui, você pode aprender o básico de como usar o Misskey e as suas funções.",
 	"initialTutorialLaunchTutorial": "Iniciar Tutorial",
-	"close": "Fechar",
-	"goBack": "Voltar",
-	"continue": "Continuar",
 	"initialTutorialReactionReactToContinue": "Adicione uma reação para continuar.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Marque o anexo como sensível para prosseguir.",
 	"initialTutorialDoneTitle": "Você completou o tutorial! 🎉",
@@ -727,9 +674,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Добро пожаловать в Туториал",
 	"initialTutorialLandingDescription": "Здесь вы можете изучить основы пользования Misskey и его особенностями.",
 	"initialTutorialLaunchTutorial": "Пройти обучение",
-	"close": "Закрыть",
-	"goBack": "Выход",
-	"continue": "Продолжить",
 	"initialTutorialReactionReactToContinue": "Добавьте реакцию, чтобы продолжить.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "Вы прошли туториал! 🎉",
@@ -751,9 +695,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Zavrieť",
-	"goBack": "Späť",
-	"continue": "Continue",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -775,9 +716,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "ยินดีต้อนรับสู่บทช่วยสอน",
 	"initialTutorialLandingDescription": "คุณสามารถตรวจสอบการใช้งานและฟังก์ชั่นพื้นฐานของ Misskey ได้ที่นี่",
 	"initialTutorialLaunchTutorial": "เริ่มบทช่วยสอน",
-	"close": "ปิด",
-	"goBack": "ย้อนกลับ",
-	"continue": "ดำเนินการต่อ",
 	"initialTutorialReactionReactToContinue": "เพิ่มรีแอคชั่นเพื่อดำเนินการต่อ",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "ทำเครื่องหมายกับรูปภาพว่ามีเนื้อหาละเอียดอ่อน เพื่อดำเนินการต่อ",
 	"initialTutorialDoneTitle": "บทเรียนจบลงแล้วจ้า เย่เย่เย่  🎉",
@@ -799,9 +737,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Öğreticiye hoş geldin",
 	"initialTutorialLandingDescription": "Burada, Misskey'i kullanmanın temellerini ve özelliklerini öğrenebilirsin.",
 	"initialTutorialLaunchTutorial": "Öğreticiyi izle",
-	"close": "Kapat",
-	"goBack": "Geri",
-	"continue": "Devam et",
 	"initialTutorialReactionReactToContinue": "Devam etmek için bir tepki ekle.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Devam etmek için ek dosyayı hassas olarak işaretle.",
 	"initialTutorialDoneTitle": "Eğitimi tamamladınız! 🎉",
@@ -823,9 +758,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Welcome to the Tutorial",
 	"initialTutorialLandingDescription": "Here, you can learn the basics of using Misskey and its features.",
 	"initialTutorialLaunchTutorial": "Start Tutorial",
-	"close": "Close",
-	"goBack": "Back",
-	"continue": "Continue",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -847,9 +779,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Ласкаво просимо до Посібника",
 	"initialTutorialLandingDescription": "Тут ви можете ознайомитися з основами використання Misskey та його особливостями. ",
 	"initialTutorialLaunchTutorial": "Почати посібник",
-	"close": "Закрити",
-	"goBack": "Назад",
-	"continue": "Продовжити",
 	"initialTutorialReactionReactToContinue": "Додайте реакцію, щоб продовжити.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Позначте доданий файл як чутливий щоб продовжити.",
 	"initialTutorialDoneTitle": "Ви завершили посібник! 🎉",
@@ -871,9 +800,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "Chào mừng đến với Hướng dẫn",
 	"initialTutorialLandingDescription": "Tại đây, bạn có thể tìm hiểu những điều cơ bản về cách sử dụng Misskey và các tính năng của nó.",
 	"initialTutorialLaunchTutorial": "Bắt đầu hướng dẫn",
-	"close": "Đóng",
-	"goBack": "Quay lại",
-	"continue": "Tiếp tục",
 	"initialTutorialReactionReactToContinue": "Add a reaction to proceed.",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "Mark the attachment file as sensitive to proceed.",
 	"initialTutorialDoneTitle": "You've completed the tutorial! 🎉",
@@ -895,9 +821,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "欢迎来到教学",
 	"initialTutorialLandingDescription": "在这里，您可以查看 Misskey 的基本使用方法和功能。",
 	"initialTutorialLaunchTutorial": "观看教学",
-	"close": "关闭",
-	"goBack": "返回",
-	"continue": "继续",
 	"initialTutorialReactionReactToContinue": "添加一个回应来继续",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "将图像标记为敏感后才能够继续",
 	"initialTutorialDoneTitle": "恭喜您，已经完成了教程🎉\n",
@@ -919,9 +842,6 @@ async function close(skip: boolean) {
 	"initialTutorialLandingTitle": "歡迎使用本教學課程",
 	"initialTutorialLandingDescription": "在這裡您可以查看 Misskey 的基本使用方法和功能。",
 	"initialTutorialLaunchTutorial": "觀看教學課程",
-	"close": "關閉",
-	"goBack": "返回",
-	"continue": "繼續",
 	"initialTutorialReactionReactToContinue": "添加反應以繼續教學課程。",
 	"initialTutorialHowToMakeAttachmentsSensitiveDoItToContinue": "把圖像標記為敏感內容以繼續教學課程。",
 	"initialTutorialDoneTitle": "教學課程已結束",

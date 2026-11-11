@@ -4,403 +4,405 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-	<div class="_gaps_s">
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsRateLimitFactor, 'rateLimitFactor'])" v-model:policyMeta="policyMetaModel.rateLimitFactor" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsRateLimitFactor }}</template>
-			<template #valueText>{{ Math.floor(valuesModel.rateLimitFactor * 100) }}%</template>
-			<template #default="{ disabled }">
-				<MkRange v-model="valuesModel.rateLimitFactor" :disabled="disabled" :min="0.3" :max="3" :step="0.1" :textConverter="(v) => `${Math.round(v * 100)}%`">
-					<template #caption>{{ $locale.sfc.roleOptionsDescriptionOfRateLimitFactor }}</template>
-				</MkRange>
-			</template>
-		</XFolder>
+<div class="_gaps_s">
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsRateLimitFactor, 'rateLimitFactor'])" v-model:policyMeta="policyMetaModel.rateLimitFactor" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsRateLimitFactor }}</template>
+		<template #valueText>{{ Math.floor(valuesModel.rateLimitFactor * 100) }}%</template>
+		<template #default="{ disabled }">
+			<MkRange v-model="valuesModel.rateLimitFactor" :disabled="disabled" :min="0.3" :max="3" :step="0.1" :textConverter="(v) => `${Math.round(v * 100)}%`">
+				<template #caption>{{ $locale.sfc.roleOptionsDescriptionOfRateLimitFactor }}</template>
+			</MkRange>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsGtlAvailable, 'gtlAvailable'])" v-model:policyMeta="policyMetaModel.gtlAvailable" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsGtlAvailable }}</template>
-			<template #valueText>{{ valuesModel.gtlAvailable ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.gtlAvailable" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsGtlAvailable, 'gtlAvailable'])" v-model:policyMeta="policyMetaModel.gtlAvailable" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsGtlAvailable }}</template>
+		<template #valueText>{{ valuesModel.gtlAvailable ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.gtlAvailable" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsLtlAvailable, 'ltlAvailable'])" v-model:policyMeta="policyMetaModel.ltlAvailable" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsLtlAvailable }}</template>
-			<template #valueText>{{ valuesModel.ltlAvailable ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.ltlAvailable" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsLtlAvailable, 'ltlAvailable'])" v-model:policyMeta="policyMetaModel.ltlAvailable" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsLtlAvailable }}</template>
+		<template #valueText>{{ valuesModel.ltlAvailable ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.ltlAvailable" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanPublicNote, 'canPublicNote'])" v-model:policyMeta="policyMetaModel.canPublicNote" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanPublicNote }}</template>
-			<template #valueText>{{ valuesModel.canPublicNote ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canPublicNote" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanPublicNote, 'canPublicNote'])" v-model:policyMeta="policyMetaModel.canPublicNote" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanPublicNote }}</template>
+		<template #valueText>{{ valuesModel.canPublicNote ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canPublicNote" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsChatAvailability, 'chatAvailability'])" v-model:policyMeta="policyMetaModel.chatAvailability" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsChatAvailability }}</template>
-			<template #valueText>{{ valuesModel.chatAvailability === 'available' ? $locale.sfc.yes : valuesModel.chatAvailability === 'readonly' ? $locale.sfc.readonly : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSelect
-					v-model="valuesModel.chatAvailability"
-					:disabled="disabled"
-					:items="[
-						{ label: $locale.sfc.enabled, value: 'available' },
-						{ label: $locale.sfc.readonly, value: 'readonly' },
-						{ label: $locale.sfc.disabled, value: 'unavailable' },
-					]"
-				>
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSelect>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsChatAvailability, 'chatAvailability'])" v-model:policyMeta="policyMetaModel.chatAvailability" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsChatAvailability }}</template>
+		<template #valueText>{{ valuesModel.chatAvailability === 'available' ? globalLocale.env.yes : valuesModel.chatAvailability === 'readonly' ? $locale.sfc.readonly : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSelect
+				v-model="valuesModel.chatAvailability"
+				:disabled="disabled"
+				:items="[
+					{ label: $locale.sfc.enabled, value: 'available' },
+					{ label: $locale.sfc.readonly, value: 'readonly' },
+					{ label: $locale.sfc.disabled, value: 'unavailable' },
+				]"
+			>
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSelect>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsMentionMax, 'mentionLimit'])" v-model:policyMeta="policyMetaModel.mentionLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsMentionMax }}</template>
-			<template #valueText>{{ valuesModel.mentionLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.mentionLimit" type="number" :disabled="disabled">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsMentionMax, 'mentionLimit'])" v-model:policyMeta="policyMetaModel.mentionLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsMentionMax }}</template>
+		<template #valueText>{{ valuesModel.mentionLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.mentionLimit" type="number" :disabled="disabled">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanInvite, 'canInvite'])" v-model:policyMeta="policyMetaModel.canInvite" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanInvite }}</template>
-			<template #valueText>{{ valuesModel.canInvite ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canInvite" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanInvite, 'canInvite'])" v-model:policyMeta="policyMetaModel.canInvite" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanInvite }}</template>
+		<template #valueText>{{ valuesModel.canInvite ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canInvite" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsInviteLimit, 'inviteLimit'])" v-model:policyMeta="policyMetaModel.inviteLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsInviteLimit }}</template>
-			<template #valueText>{{ valuesModel.inviteLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.inviteLimit" type="number" :disabled="disabled">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsInviteLimit, 'inviteLimit'])" v-model:policyMeta="policyMetaModel.inviteLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsInviteLimit }}</template>
+		<template #valueText>{{ valuesModel.inviteLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.inviteLimit" type="number" :disabled="disabled">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsInviteLimitCycle, 'inviteLimitCycle'])" v-model:policyMeta="policyMetaModel.inviteLimitCycle" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsInviteLimitCycle }}</template>
-			<template #valueText>{{ valuesModel.inviteLimitCycle + $locale.sfc.timeMinute }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.inviteLimitCycle" type="number" :disabled="disabled">
-					<template #suffix>{{ $locale.sfc.timeMinute }}</template>
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsInviteLimitCycle, 'inviteLimitCycle'])" v-model:policyMeta="policyMetaModel.inviteLimitCycle" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsInviteLimitCycle }}</template>
+		<template #valueText>{{ valuesModel.inviteLimitCycle + $locale.sfc.timeMinute }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.inviteLimitCycle" type="number" :disabled="disabled">
+				<template #suffix>{{ $locale.sfc.timeMinute }}</template>
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsInviteExpirationTime, 'inviteExpirationTime'])" v-model:policyMeta="policyMetaModel.inviteExpirationTime" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsInviteExpirationTime }}</template>
-			<template #valueText>{{ valuesModel.inviteExpirationTime + $locale.sfc.timeMinute }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.inviteExpirationTime" type="number" :disabled="disabled">
-					<template #suffix>{{ $locale.sfc.timeMinute }}</template>
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsInviteExpirationTime, 'inviteExpirationTime'])" v-model:policyMeta="policyMetaModel.inviteExpirationTime" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsInviteExpirationTime }}</template>
+		<template #valueText>{{ valuesModel.inviteExpirationTime + $locale.sfc.timeMinute }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.inviteExpirationTime" type="number" :disabled="disabled">
+				<template #suffix>{{ $locale.sfc.timeMinute }}</template>
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanManageAvatarDecorations, 'canManageAvatarDecorations'])" v-model:policyMeta="policyMetaModel.canManageAvatarDecorations" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanManageAvatarDecorations }}</template>
-			<template #valueText>{{ valuesModel.canManageAvatarDecorations ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canManageAvatarDecorations" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanManageAvatarDecorations, 'canManageAvatarDecorations'])" v-model:policyMeta="policyMetaModel.canManageAvatarDecorations" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanManageAvatarDecorations }}</template>
+		<template #valueText>{{ valuesModel.canManageAvatarDecorations ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canManageAvatarDecorations" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanManageCustomEmojis, 'canManageCustomEmojis'])" v-model:policyMeta="policyMetaModel.canManageCustomEmojis" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanManageCustomEmojis }}</template>
-			<template #valueText>{{ valuesModel.canManageCustomEmojis ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canManageCustomEmojis" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanManageCustomEmojis, 'canManageCustomEmojis'])" v-model:policyMeta="policyMetaModel.canManageCustomEmojis" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanManageCustomEmojis }}</template>
+		<template #valueText>{{ valuesModel.canManageCustomEmojis ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canManageCustomEmojis" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanSearchNotes, 'canSearchNotes'])" v-model:policyMeta="policyMetaModel.canSearchNotes" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanSearchNotes }}</template>
-			<template #valueText>{{ valuesModel.canSearchNotes ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canSearchNotes" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanSearchNotes, 'canSearchNotes'])" v-model:policyMeta="policyMetaModel.canSearchNotes" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanSearchNotes }}</template>
+		<template #valueText>{{ valuesModel.canSearchNotes ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canSearchNotes" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanSearchUsers, 'canSearchUsers'])" v-model:policyMeta="policyMetaModel.canSearchUsers" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanSearchUsers }}</template>
-			<template #valueText>{{ valuesModel.canSearchUsers ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canSearchUsers" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanSearchUsers, 'canSearchUsers'])" v-model:policyMeta="policyMetaModel.canSearchUsers" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanSearchUsers }}</template>
+		<template #valueText>{{ valuesModel.canSearchUsers ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canSearchUsers" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanUseTranslator, 'canUseTranslator'])" v-model:policyMeta="policyMetaModel.canUseTranslator" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanUseTranslator }}</template>
-			<template #valueText>{{ valuesModel.canUseTranslator ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canUseTranslator" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanUseTranslator, 'canUseTranslator'])" v-model:policyMeta="policyMetaModel.canUseTranslator" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanUseTranslator }}</template>
+		<template #valueText>{{ valuesModel.canUseTranslator ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canUseTranslator" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanCreateChannel, 'canCreateChannel'])" v-model:policyMeta="policyMetaModel.canCreateChannel" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanCreateChannel }}</template>
-			<template #valueText>{{ valuesModel.canCreateChannel ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canCreateChannel" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanCreateChannel, 'canCreateChannel'])" v-model:policyMeta="policyMetaModel.canCreateChannel" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanCreateChannel }}</template>
+		<template #valueText>{{ valuesModel.canCreateChannel ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canCreateChannel" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsDriveCapacity, 'driveCapacityMb'])" v-model:policyMeta="policyMetaModel.driveCapacityMb" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsDriveCapacity }}</template>
-			<template #valueText>{{ valuesModel.driveCapacityMb }}MB</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.driveCapacityMb" type="number" :disabled="disabled">
-					<template #suffix>MB</template>
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsDriveCapacity, 'driveCapacityMb'])" v-model:policyMeta="policyMetaModel.driveCapacityMb" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsDriveCapacity }}</template>
+		<template #valueText>{{ valuesModel.driveCapacityMb }}MB</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.driveCapacityMb" type="number" :disabled="disabled">
+				<template #suffix>MB</template>
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsMaxFileSize, 'maxFileSizeMb'])" v-model:policyMeta="policyMetaModel.maxFileSizeMb" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsMaxFileSize }}</template>
-			<template #valueText>{{ valuesModel.maxFileSizeMb }}MB</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.maxFileSizeMb" type="number" :disabled="disabled">
-					<template #suffix>MB</template>
-					<template #caption>
-						<div>{{ interpolateLocaleParameters($locale.sfc.roleOptionsMaxFileSize_caption2, { max: `${Math.floor(instance.maxFileSize / (1024 * 1024))}MB` }) }}</div>
-						<div><i class="ti ti-alert-triangle" style="color: var(--MI_THEME-warn);"></i> {{ $locale.sfc.roleOptionsMaxFileSize_caption }}</div>
-					</template>
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsMaxFileSize, 'maxFileSizeMb'])" v-model:policyMeta="policyMetaModel.maxFileSizeMb" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsMaxFileSize }}</template>
+		<template #valueText>{{ valuesModel.maxFileSizeMb }}MB</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.maxFileSizeMb" type="number" :disabled="disabled">
+				<template #suffix>MB</template>
+				<template #caption>
+					<div>{{ interpolateLocaleParameters($locale.sfc.roleOptionsMaxFileSize_caption2, { max: `${Math.floor(instance.maxFileSize / (1024 * 1024))}MB` }) }}</div>
+					<div><i class="ti ti-alert-triangle" style="color: var(--MI_THEME-warn);"></i> {{ $locale.sfc.roleOptionsMaxFileSize_caption }}</div>
+				</template>
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsUploadableFileTypes, 'uploadableFileTypes'])" v-model:policyMeta="policyMetaModel.uploadableFileTypes" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsUploadableFileTypes }}</template>
-			<template #valueText>...</template>
-			<template #default="{ disabled }">
-				<MkTextarea :modelValue="valuesModel.uploadableFileTypes.join('\n')" :disabled="disabled" @update:modelValue="v => valuesModel.uploadableFileTypes = v.split('\n')">
-					<template #caption>
-						<div>{{ $locale.sfc.roleOptionsUploadableFileTypes_caption }}</div>
-						<div><i class="ti ti-alert-triangle" style="color: var(--MI_THEME-warn);"></i> {{ interpolateLocaleParameters($locale.sfc.roleOptionsUploadableFileTypes_caption2, { x: 'application/octet-stream' }) }}</div>
-					</template>
-				</MkTextarea>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsUploadableFileTypes, 'uploadableFileTypes'])" v-model:policyMeta="policyMetaModel.uploadableFileTypes" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsUploadableFileTypes }}</template>
+		<template #valueText>...</template>
+		<template #default="{ disabled }">
+			<MkTextarea :modelValue="valuesModel.uploadableFileTypes.join('\n')" :disabled="disabled" @update:modelValue="v => valuesModel.uploadableFileTypes = v.split('\n')">
+				<template #caption>
+					<div>{{ $locale.sfc.roleOptionsUploadableFileTypes_caption }}</div>
+					<div><i class="ti ti-alert-triangle" style="color: var(--MI_THEME-warn);"></i> {{ interpolateLocaleParameters($locale.sfc.roleOptionsUploadableFileTypes_caption2, { x: 'application/octet-stream' }) }}</div>
+				</template>
+			</MkTextarea>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsAlwaysMarkNsfw, 'alwaysMarkNsfw'])" v-model:policyMeta="policyMetaModel.alwaysMarkNsfw" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsAlwaysMarkNsfw }}</template>
-			<template #valueText>{{ valuesModel.alwaysMarkNsfw ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.alwaysMarkNsfw" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsAlwaysMarkNsfw, 'alwaysMarkNsfw'])" v-model:policyMeta="policyMetaModel.alwaysMarkNsfw" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsAlwaysMarkNsfw }}</template>
+		<template #valueText>{{ valuesModel.alwaysMarkNsfw ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.alwaysMarkNsfw" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanUpdateBioMedia, 'canUpdateBioMedia'])" v-model:policyMeta="policyMetaModel.canUpdateBioMedia" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanUpdateBioMedia }}</template>
-			<template #valueText>{{ valuesModel.canUpdateBioMedia ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canUpdateBioMedia" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanUpdateBioMedia, 'canUpdateBioMedia'])" v-model:policyMeta="policyMetaModel.canUpdateBioMedia" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanUpdateBioMedia }}</template>
+		<template #valueText>{{ valuesModel.canUpdateBioMedia ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canUpdateBioMedia" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsPinMax, 'pinLimit'])" v-model:policyMeta="policyMetaModel.pinLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsPinMax }}</template>
-			<template #valueText>{{ valuesModel.pinLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.pinLimit" type="number" :disabled="disabled">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsPinMax, 'pinLimit'])" v-model:policyMeta="policyMetaModel.pinLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsPinMax }}</template>
+		<template #valueText>{{ valuesModel.pinLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.pinLimit" type="number" :disabled="disabled">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsAntennaMax, 'antennaLimit'])" v-model:policyMeta="policyMetaModel.antennaLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsAntennaMax }}</template>
-			<template #valueText>{{ valuesModel.antennaLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.antennaLimit" type="number" :disabled="disabled">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsAntennaMax, 'antennaLimit'])" v-model:policyMeta="policyMetaModel.antennaLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsAntennaMax }}</template>
+		<template #valueText>{{ valuesModel.antennaLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.antennaLimit" type="number" :disabled="disabled">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsWordMuteMax, 'wordMuteLimit'])" v-model:policyMeta="policyMetaModel.wordMuteLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsWordMuteMax }}</template>
-			<template #valueText>{{ valuesModel.wordMuteLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.wordMuteLimit" type="number" :disabled="disabled">
-					<template #suffix>chars</template>
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsWordMuteMax, 'wordMuteLimit'])" v-model:policyMeta="policyMetaModel.wordMuteLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsWordMuteMax }}</template>
+		<template #valueText>{{ valuesModel.wordMuteLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.wordMuteLimit" type="number" :disabled="disabled">
+				<template #suffix>chars</template>
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsWebhookMax, 'webhookLimit'])" v-model:policyMeta="policyMetaModel.webhookLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsWebhookMax }}</template>
-			<template #valueText>{{ valuesModel.webhookLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.webhookLimit" type="number" :disabled="disabled">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsWebhookMax, 'webhookLimit'])" v-model:policyMeta="policyMetaModel.webhookLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsWebhookMax }}</template>
+		<template #valueText>{{ valuesModel.webhookLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.webhookLimit" type="number" :disabled="disabled">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsClipMax, 'clipLimit'])" v-model:policyMeta="policyMetaModel.clipLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsClipMax }}</template>
-			<template #valueText>{{ valuesModel.clipLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.clipLimit" type="number" :disabled="disabled">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsClipMax, 'clipLimit'])" v-model:policyMeta="policyMetaModel.clipLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsClipMax }}</template>
+		<template #valueText>{{ valuesModel.clipLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.clipLimit" type="number" :disabled="disabled">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsNoteEachClipsMax, 'noteEachClipsLimit'])" v-model:policyMeta="policyMetaModel.noteEachClipsLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsNoteEachClipsMax }}</template>
-			<template #valueText>{{ valuesModel.noteEachClipsLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.noteEachClipsLimit" type="number" :disabled="disabled">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsNoteEachClipsMax, 'noteEachClipsLimit'])" v-model:policyMeta="policyMetaModel.noteEachClipsLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsNoteEachClipsMax }}</template>
+		<template #valueText>{{ valuesModel.noteEachClipsLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.noteEachClipsLimit" type="number" :disabled="disabled">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsUserListMax, 'userListLimit'])" v-model:policyMeta="policyMetaModel.userListLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsUserListMax }}</template>
-			<template #valueText>{{ valuesModel.userListLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.userListLimit" type="number" :disabled="disabled">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsUserListMax, 'userListLimit'])" v-model:policyMeta="policyMetaModel.userListLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsUserListMax }}</template>
+		<template #valueText>{{ valuesModel.userListLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.userListLimit" type="number" :disabled="disabled">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsUserEachUserListsMax, 'userEachUserListsLimit'])" v-model:policyMeta="policyMetaModel.userEachUserListsLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsUserEachUserListsMax }}</template>
-			<template #valueText>{{ valuesModel.userEachUserListsLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.userEachUserListsLimit" type="number" :disabled="disabled">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsUserEachUserListsMax, 'userEachUserListsLimit'])" v-model:policyMeta="policyMetaModel.userEachUserListsLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsUserEachUserListsMax }}</template>
+		<template #valueText>{{ valuesModel.userEachUserListsLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.userEachUserListsLimit" type="number" :disabled="disabled">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanHideAds, 'canHideAds'])" v-model:policyMeta="policyMetaModel.canHideAds" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanHideAds }}</template>
-			<template #valueText>{{ valuesModel.canHideAds ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canHideAds" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanHideAds, 'canHideAds'])" v-model:policyMeta="policyMetaModel.canHideAds" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanHideAds }}</template>
+		<template #valueText>{{ valuesModel.canHideAds ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canHideAds" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsAvatarDecorationLimit, 'avatarDecorationLimit'])" v-model:policyMeta="policyMetaModel.avatarDecorationLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsAvatarDecorationLimit }}</template>
-			<template #valueText>{{ valuesModel.avatarDecorationLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="avatarDecorationLimit" type="number" :disabled="disabled" :min="0" :max="16" @update:modelValue="updateAvatarDecorationLimit">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsAvatarDecorationLimit, 'avatarDecorationLimit'])" v-model:policyMeta="policyMetaModel.avatarDecorationLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsAvatarDecorationLimit }}</template>
+		<template #valueText>{{ valuesModel.avatarDecorationLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="avatarDecorationLimit" type="number" :disabled="disabled" :min="0" :max="16" @update:modelValue="updateAvatarDecorationLimit">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportAntennas, 'canImportAntennas'])" v-model:policyMeta="policyMetaModel.canImportAntennas" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanImportAntennas }}</template>
-			<template #valueText>{{ valuesModel.canImportAntennas ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canImportAntennas" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportAntennas, 'canImportAntennas'])" v-model:policyMeta="policyMetaModel.canImportAntennas" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanImportAntennas }}</template>
+		<template #valueText>{{ valuesModel.canImportAntennas ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canImportAntennas" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportBlocking, 'canImportBlocking'])" v-model:policyMeta="policyMetaModel.canImportBlocking" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanImportBlocking }}</template>
-			<template #valueText>{{ valuesModel.canImportBlocking ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canImportBlocking" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportBlocking, 'canImportBlocking'])" v-model:policyMeta="policyMetaModel.canImportBlocking" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanImportBlocking }}</template>
+		<template #valueText>{{ valuesModel.canImportBlocking ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canImportBlocking" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportFollowing, 'canImportFollowing'])" v-model:policyMeta="policyMetaModel.canImportFollowing" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanImportFollowing }}</template>
-			<template #valueText>{{ valuesModel.canImportFollowing ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canImportFollowing" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportFollowing, 'canImportFollowing'])" v-model:policyMeta="policyMetaModel.canImportFollowing" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanImportFollowing }}</template>
+		<template #valueText>{{ valuesModel.canImportFollowing ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canImportFollowing" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportMuting, 'canImportMuting'])" v-model:policyMeta="policyMetaModel.canImportMuting" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanImportMuting }}</template>
-			<template #valueText>{{ valuesModel.canImportMuting ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canImportMuting" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportMuting, 'canImportMuting'])" v-model:policyMeta="policyMetaModel.canImportMuting" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanImportMuting }}</template>
+		<template #valueText>{{ valuesModel.canImportMuting ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canImportMuting" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportUserLists, 'canImportUserList'])" v-model:policyMeta="policyMetaModel.canImportUserLists" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsCanImportUserLists }}</template>
-			<template #valueText>{{ valuesModel.canImportUserLists ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.canImportUserLists" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanImportUserLists, 'canImportUserList'])" v-model:policyMeta="policyMetaModel.canImportUserLists" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanImportUserLists }}</template>
+		<template #valueText>{{ valuesModel.canImportUserLists ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canImportUserLists" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsNoteDraftLimit, 'noteDraftLimit'])" v-model:policyMeta="policyMetaModel.noteDraftLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsNoteDraftLimit }}</template>
-			<template #valueText>{{ valuesModel.noteDraftLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.noteDraftLimit" type="number" :disabled="disabled" :min="0">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsNoteDraftLimit, 'noteDraftLimit'])" v-model:policyMeta="policyMetaModel.noteDraftLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsNoteDraftLimit }}</template>
+		<template #valueText>{{ valuesModel.noteDraftLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.noteDraftLimit" type="number" :disabled="disabled" :min="0">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsScheduledNoteLimit, 'scheduledNoteLimit'])" v-model:policyMeta="policyMetaModel.scheduledNoteLimit" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsScheduledNoteLimit }}</template>
-			<template #valueText>{{ valuesModel.scheduledNoteLimit }}</template>
-			<template #default="{ disabled }">
-				<MkInput v-model="valuesModel.scheduledNoteLimit" type="number" :disabled="disabled" :min="0">
-				</MkInput>
-			</template>
-		</XFolder>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsScheduledNoteLimit, 'scheduledNoteLimit'])" v-model:policyMeta="policyMetaModel.scheduledNoteLimit" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsScheduledNoteLimit }}</template>
+		<template #valueText>{{ valuesModel.scheduledNoteLimit }}</template>
+		<template #default="{ disabled }">
+			<MkInput v-model="valuesModel.scheduledNoteLimit" type="number" :disabled="disabled" :min="0">
+			</MkInput>
+		</template>
+	</XFolder>
 
-		<XFolder v-if="matchQuery([$locale.sfc.roleOptionsWatermarkAvailable, 'watermarkAvailable'])" v-model:policyMeta="policyMetaModel.watermarkAvailable" :isBaseRole="isBaseRole" :readonly="readonly">
-			<template #label>{{ $locale.sfc.roleOptionsWatermarkAvailable }}</template>
-			<template #valueText>{{ valuesModel.watermarkAvailable ? $locale.sfc.yes : $locale.sfc.no }}</template>
-			<template #default="{ disabled }">
-				<MkSwitch v-model="valuesModel.watermarkAvailable" :disabled="disabled">
-					<template #label>{{ $locale.sfc.enable }}</template>
-				</MkSwitch>
-			</template>
-		</XFolder>
-	</div>
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsWatermarkAvailable, 'watermarkAvailable'])" v-model:policyMeta="policyMetaModel.watermarkAvailable" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsWatermarkAvailable }}</template>
+		<template #valueText>{{ valuesModel.watermarkAvailable ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.watermarkAvailable" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
+</div>
 </template>
 
 <script lang="ts">
+import type { Locale } from 'i18n';
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { instance } from '@features/instance/frontend/instance.js';
 
@@ -415,6 +417,8 @@ type PolicyMetaRecord = {
 </script>
 
 <script setup lang="ts">
+const globalLocale = useLocale<Locale>(import.meta.url);
+
 import { computed, ref, watch } from 'vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import XFolder from '@features/roles/frontend/pages/admin/roles.policy-editor.folder.vue';
@@ -487,8 +491,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "نعم",
-	"no": "لا",
 	"enable": "تشغيل",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -543,8 +545,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Limitador",
 	"roleOptionsDescriptionOfRateLimitFactor": "Límits baixos són menys restrictius, límits alts són més restrictius.",
 	"roleOptionsGtlAvailable": "Pot veure la línia de temps global",
-	"yes": "Sí ",
-	"no": "No",
 	"enable": "Habilita",
 	"roleOptionsLtlAvailable": "Pot veure la línia de temps local",
 	"roleOptionsCanPublicNote": "Pot enviar notes públiques",
@@ -599,8 +599,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Limit rychlosti",
 	"roleOptionsDescriptionOfRateLimitFactor": "Nižší limity rychlosti jsou méně omezující, vyšší více omezující. ",
 	"roleOptionsGtlAvailable": "Může zobrazit globální časovou osu",
-	"yes": "Ano",
-	"no": "Ne",
 	"enable": "Povolit",
 	"roleOptionsLtlAvailable": "Může zobrazit místní časovou osu",
 	"roleOptionsCanPublicNote": "Může posílat veřejné poznámky",
@@ -655,8 +653,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Yes",
-	"no": "No",
 	"enable": "Enable",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -711,8 +707,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Versuchsanzahl",
 	"roleOptionsDescriptionOfRateLimitFactor": "Je niedriger desto weniger restriktiv, je höher destro restriktiver.",
 	"roleOptionsGtlAvailable": "Kann auf die globale Chronik zugreifen",
-	"yes": "Ja",
-	"no": "Nein",
 	"enable": "Aktivieren",
 	"roleOptionsLtlAvailable": "Kann auf die lokale Chronik zugreifen",
 	"roleOptionsCanPublicNote": "Kann öffentliche Notizen erstellen",
@@ -767,8 +761,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Yes",
-	"no": "No",
 	"enable": "Enable",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -823,8 +815,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Limitador",
 	"roleOptionsDescriptionOfRateLimitFactor": "Límites más bajos son menos restrictivos, más altos menos restrictivos",
 	"roleOptionsGtlAvailable": "Explorar la línea de tiempo global",
-	"yes": "Si",
-	"no": "No",
 	"enable": "Activar",
 	"roleOptionsLtlAvailable": "Explorar la línea de tiempo local",
 	"roleOptionsCanPublicNote": "Permitir la publicación",
@@ -879,8 +869,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Oui",
-	"no": "Non",
 	"enable": "Activer",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -935,8 +923,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Batas kecepatan",
 	"roleOptionsDescriptionOfRateLimitFactor": "Batas kecepatan yang rendah tidak begitu membatasi, batas kecepatan tinggi lebih membatasi. ",
 	"roleOptionsGtlAvailable": "Dapat melihat lini masa global",
-	"yes": "Iya",
-	"no": "Tidak",
 	"enable": "Aktifkan",
 	"roleOptionsLtlAvailable": "Dapat melihat lini masa lokal",
 	"roleOptionsCanPublicNote": "Dapat mengirim catatan publik",
@@ -991,8 +977,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Limite del rapporto",
 	"roleOptionsDescriptionOfRateLimitFactor": "I rapporti più bassi sono meno restrittivi, quelli più alti lo sono di più.",
 	"roleOptionsGtlAvailable": "Disponibilità della Timeline Federata",
-	"yes": "Sì",
-	"no": "No",
 	"enable": "Abilita",
 	"roleOptionsLtlAvailable": "Disponibilità della Timeline Locale",
 	"roleOptionsCanPublicNote": "Scrivere Note con Visibilità Pubblica",
@@ -1047,8 +1031,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "レートリミット",
 	"roleOptionsDescriptionOfRateLimitFactor": "小さいほど制限が緩和され、大きいほど制限が強化されます。",
 	"roleOptionsGtlAvailable": "グローバルタイムラインの閲覧",
-	"yes": "はい",
-	"no": "いいえ",
 	"enable": "有効にする",
 	"roleOptionsLtlAvailable": "ローカルタイムラインの閲覧",
 	"roleOptionsCanPublicNote": "パブリック投稿の許可",
@@ -1103,8 +1085,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "レートリミット",
 	"roleOptionsDescriptionOfRateLimitFactor": "ちっちゃいほど制限が緩なって、大きいほど制限されるで。",
 	"roleOptionsGtlAvailable": "グローバルタイムライン見る",
-	"yes": "ええで",
-	"no": "あかん",
 	"enable": "有効にするで",
 	"roleOptionsLtlAvailable": "ローカルタイムライン見る",
 	"roleOptionsCanPublicNote": "パブリック投稿できるか",
@@ -1159,8 +1139,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Yes",
-	"no": "No",
 	"enable": "Enable",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -1215,8 +1193,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Yes",
-	"no": "No",
 	"enable": "Enable",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -1271,8 +1247,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "요청 빈도 제한",
 	"roleOptionsDescriptionOfRateLimitFactor": "작을수록 제한이 완화되고, 클수록 제한이 강화됩니다.",
 	"roleOptionsGtlAvailable": "글로벌 타임라인 보이기",
-	"yes": "예",
-	"no": "아니오",
 	"enable": "사용",
 	"roleOptionsLtlAvailable": "로컬 타임라인 보이기",
 	"roleOptionsCanPublicNote": "공개 노트 허용",
@@ -1327,8 +1301,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Ja",
-	"no": "Nee",
 	"enable": "Inschakelen",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -1383,8 +1355,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Ja",
-	"no": "Nei",
 	"enable": "Enable",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -1439,8 +1409,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Tak",
-	"no": "Nie",
 	"enable": "Włącz",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -1495,8 +1463,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Taxa de limitação",
 	"roleOptionsDescriptionOfRateLimitFactor": "Valores menores são menos restritivos, valores maiores são mais restritivos.",
 	"roleOptionsGtlAvailable": "Visualizar Linha do Tempo Global",
-	"yes": "Sim",
-	"no": "Não",
 	"enable": "Habilitar",
 	"roleOptionsLtlAvailable": "Visualizar Linha do Tempo Local",
 	"roleOptionsCanPublicNote": "Permitir postagem pública",
@@ -1551,8 +1517,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Ограничение активности",
 	"roleOptionsDescriptionOfRateLimitFactor": "Меньшее значение — слабые ограничения, большее — сильные",
 	"roleOptionsGtlAvailable": "Может просматривать глобальную ленту",
-	"yes": "Да",
-	"no": "Нет",
 	"enable": "Включить",
 	"roleOptionsLtlAvailable": "Может просматривать местную ленту",
 	"roleOptionsCanPublicNote": "Может публиковать общедоступные заметки",
@@ -1607,8 +1571,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Áno",
-	"no": "Nie",
 	"enable": "Povoliť",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -1663,8 +1625,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "อัตราการจำกัด",
 	"roleOptionsDescriptionOfRateLimitFactor": "ยิ่งตัวเลขน้อยก็ยิ่งจำกัดน้อย ยิ่งมากก็ยิ่งเข้มงวดมากขึ้น",
 	"roleOptionsGtlAvailable": "สามารถดูไทม์ไลน์ทั่วโลกได้",
-	"yes": "ใช่",
-	"no": "ไม่",
 	"enable": "เปิดใช้งาน",
 	"roleOptionsLtlAvailable": "สามารถดูไทม์ไลน์ท้องถิ่นได้",
 	"roleOptionsCanPublicNote": "สามารถโพสต์แบบสาธารณะ",
@@ -1719,8 +1679,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Hız Sınırı",
 	"roleOptionsDescriptionOfRateLimitFactor": "Daha düşük oran sınırları daha az kısıtlayıcıdır, daha yüksek olanlar ise daha kısıtlayıcıdır.",
 	"roleOptionsGtlAvailable": "Global Pano'yu görüntüleyebilir",
-	"yes": "Evet",
-	"no": "Hayır",
 	"enable": "Etkin",
 	"roleOptionsLtlAvailable": "Yerel panoyu görüntüleyebilir",
 	"roleOptionsCanPublicNote": "Halka açık notlar gönderebilir",
@@ -1775,8 +1733,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Yes",
-	"no": "No",
 	"enable": "Enable",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -1831,8 +1787,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
-	"yes": "Так",
-	"no": "Ні",
 	"enable": "Увімкнути",
 	"roleOptionsLtlAvailable": "Can view the local timeline",
 	"roleOptionsCanPublicNote": "Can send public notes",
@@ -1887,8 +1841,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Xem Timeline xã hội",
-	"yes": "Đồng ý",
-	"no": "Từ chối",
 	"enable": "Bật",
 	"roleOptionsLtlAvailable": "Xem Timeline trong máy chủ này",
 	"roleOptionsCanPublicNote": "Cho phép đăng bài công khai",
@@ -1943,8 +1895,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "速率限制",
 	"roleOptionsDescriptionOfRateLimitFactor": "值越小限制越少，值越大限制越多。",
 	"roleOptionsGtlAvailable": "查看全局时间线",
-	"yes": "是",
-	"no": "否",
 	"enable": "启用",
 	"roleOptionsLtlAvailable": "查看本地时间线",
 	"roleOptionsCanPublicNote": "允许公开发帖",
@@ -1999,8 +1949,6 @@ function updateAvatarDecorationLimit(value: string | number) {
 	"roleOptionsRateLimitFactor": "速率限制",
 	"roleOptionsDescriptionOfRateLimitFactor": "值越小限制越少，值越大限制越多。",
 	"roleOptionsGtlAvailable": "瀏覽全域時間軸",
-	"yes": "是",
-	"no": "否",
 	"enable": "啟用",
 	"roleOptionsLtlAvailable": "瀏覽本地時間軸",
 	"roleOptionsCanPublicNote": "允許公開貼文",

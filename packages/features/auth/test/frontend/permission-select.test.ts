@@ -4,6 +4,8 @@
  */
 import { expect, it, vi } from 'vitest';
 import { createApp, defineComponent, h, nextTick, reactive } from 'vue';
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
+import { locales } from 'i18n';
 import MkPermissionSelect from '../../frontend/components/MkPermissionSelect.vue';
 
 vi.mock('@features/ui/frontend/components/MkButton.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('button', slots.default?.()) }) }));
@@ -15,12 +17,12 @@ vi.mock('@features/ui/frontend/components/MkSwitch.vue', () => ({ default: defin
 it('starts all OFF, records explicit toggles, and removes ineligible selections on account/resource changes', async () => {
 	const props = reactive({
 		modelValue: [] as string[], permissions: ['read:account', 'access:mcp', 'write:admin:meta'], administrator: false,
-		labels: { 'read:account': 'Read account', 'access:mcp': 'MCP', 'write:admin:meta': 'Admin' },
-		disableAllText: 'Disable all', enableAllText: 'Enable all', adminPermissionText: 'Admin permissions',
-		disableAllAdminText: 'Disable all admin permissions', enableAllAdminText: 'Enable all admin permissions',
 	});
 	const element = window.document.createElement('div'); window.document.body.appendChild(element);
 	const app = createApp({ render: () => h(MkPermissionSelect, { ...props, 'onUpdate:modelValue': (value: string[]) => { props.modelValue = value; } }) });
+	const internationalization = createInternationalization({ initialLocale: 'en-US' });
+	await internationalization.ready;
+	app.use(internationalization);
 	app.mount(element); await nextTick();
 	const inputs = () => [...element.querySelectorAll('input')];
 	const click = async (label: string) => {
@@ -32,6 +34,8 @@ it('starts all OFF, records explicit toggles, and removes ineligible selections 
 		expect(element.querySelectorAll('button')).toHaveLength(2);
 		expect(element.textContent).not.toContain('Enable all admin permissions');
 		expect(element.textContent).not.toContain('Disable all admin permissions');
+		expect(element.textContent).toContain(locales['en-US']._permissions['read:account']);
+		expect(element.textContent).toContain(locales['en-US']._permissions['access:mcp']);
 		expect(inputs()).toHaveLength(2); expect(inputs().every(input => !input.checked)).toBe(true);
 		await set(0); expect(props.modelValue).toEqual(['read:account']);
 		props.administrator = true; await nextTick(); expect(inputs()).toHaveLength(3);
@@ -48,12 +52,12 @@ it('changes ordinary and read/write admin groups independently, preserving the o
 	const admin = ['read:admin:meta', 'write:admin:meta'];
 	const props = reactive({
 		modelValue: ['read:account', 'read:admin:meta'], permissions: [...ordinary, ...admin], administrator: true,
-		labels: Object.fromEntries([...ordinary, ...admin].map(kind => [kind, kind])),
-		disableAllText: 'Disable all', enableAllText: 'Enable all', adminPermissionText: 'Admin permissions',
-		disableAllAdminText: 'Disable all admin permissions', enableAllAdminText: 'Enable all admin permissions',
 	});
 	const element = window.document.createElement('div'); window.document.body.appendChild(element);
 	const app = createApp({ render: () => h(MkPermissionSelect, { ...props, 'onUpdate:modelValue': (value: string[]) => { props.modelValue = value; } }) });
+	const internationalization = createInternationalization({ initialLocale: 'en-US' });
+	await internationalization.ready;
+	app.use(internationalization);
 	app.mount(element); await nextTick();
 	const click = async (label: string) => {
 		const button = [...element.querySelectorAll('button')].find(button => button.textContent === label);

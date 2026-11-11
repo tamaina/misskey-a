@@ -20,19 +20,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<div :class="$style.headerRight">
 			<template v-if="!(targetChannel != null && fixed)">
-				<button v-if="targetChannel == null" ref="visibilityButton" v-tooltip="$locale.sfc.visibility" :class="['_button', $style.headerRightItem, $style.visibility]" @click="setVisibility">
+				<button v-if="targetChannel == null" ref="visibilityButton" v-tooltip="globalLocale.env.visibility" :class="['_button', $style.headerRightItem, $style.visibility]" @click="setVisibility">
 					<span v-if="visibility === 'public'"><i class="ti ti-world"></i></span>
 					<span v-if="visibility === 'home'"><i class="ti ti-home"></i></span>
 					<span v-if="visibility === 'followers'"><i class="ti ti-lock"></i></span>
 					<span v-if="visibility === 'specified'"><i class="ti ti-mail"></i></span>
-					<span :class="$style.headerRightButtonText">{{ copyLocaleDictionary($locale.sfc.visibilityLabels)[visibility] }}</span>
+					<span :class="$style.headerRightButtonText">{{ copyLocaleDictionary(globalLocale.env._visibility)[visibility] }}</span>
 				</button>
 				<button v-else class="_button" :class="[$style.headerRightItem, $style.visibility]" disabled>
 					<span><i class="ti ti-device-tv"></i></span>
 					<span :class="$style.headerRightButtonText">{{ targetChannel.name }}</span>
 				</button>
 			</template>
-			<button v-if="visibility !== 'specified'" v-tooltip="$locale.sfc.visibilityDisableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="targetChannel != null" @click="toggleLocalOnly">
+			<button v-if="visibility !== 'specified'" v-tooltip="globalLocale.env.visibilityDisableFederation" class="_button" :class="[$style.headerRightItem, { [$style.danger]: localOnly }]" :disabled="targetChannel != null" @click="toggleLocalOnly">
 				<span v-if="!localOnly"><i class="ti ti-rocket"></i></span>
 				<span v-else><i class="ti ti-rocket-off"></i></span>
 			</button>
@@ -68,9 +68,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #x>
 				<MkTime :time="scheduledAt" :mode="'detail'" style="font-weight: bold;"/>
 			</template>
-		</I18n> - <button class="_textButton" @click="cancelSchedule()">{{ $locale.sfc.cancel }}</button>
+		</I18n> - <button class="_textButton" @click="cancelSchedule()">{{ globalLocale.env.cancel }}</button>
 	</MkInfo>
-	<MkInfo v-if="hasNotSpecifiedMentions" warn :class="$style.hasNotSpecifiedMentions">{{ $locale.sfc.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ $locale.sfc.add }}</button></MkInfo>
+	<MkInfo v-if="hasNotSpecifiedMentions" warn :class="$style.hasNotSpecifiedMentions">{{ $locale.sfc.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ globalLocale.env.add }}</button></MkInfo>
 	<div v-show="useCw" :class="$style.cwOuter">
 		<input ref="cwInputEl" v-model="cw" :class="$style.cw" :placeholder="$locale.sfc.annotation" @keydown="onKeydown" @keyup="onKeyup" @compositionend="onCompositionEnd">
 		<div v-if="maxCwTextLength - cwTextLength < 20" :class="['_acrylic', $style.cwTextCount, { [$style.cwTextOver]: cwTextLength > maxCwTextLength }]">{{ maxCwTextLength - cwTextLength }}</div>
@@ -94,9 +94,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<footer ref="footerEl" :class="$style.footer">
 		<div :class="$style.footerLeft">
-			<button v-tooltip="$locale.sfc.attachFile + ' (' + $locale.sfc.upload + ')'" class="_button" :class="$style.footerButton" @click="chooseFileFromPc"><i class="ti ti-photo-plus"></i></button>
-			<button v-tooltip="$locale.sfc.attachFile + ' (' + $locale.sfc.fromDrive + ')'" class="_button" :class="$style.footerButton" @click="chooseFileFromDrive"><i class="ti ti-cloud-download"></i></button>
-			<button v-tooltip="$locale.sfc.poll" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: poll }]" @click="togglePoll"><i class="ti ti-chart-arrows"></i></button>
+			<button v-tooltip="$locale.sfc.attachFile + ' (' + globalLocale.env.upload + ')'" class="_button" :class="$style.footerButton" @click="chooseFileFromPc"><i class="ti ti-photo-plus"></i></button>
+			<button v-tooltip="$locale.sfc.attachFile + ' (' + globalLocale.env.fromDrive + ')'" class="_button" :class="$style.footerButton" @click="chooseFileFromDrive"><i class="ti ti-cloud-download"></i></button>
+			<button v-tooltip="globalLocale.env.poll" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: poll }]" @click="togglePoll"><i class="ti ti-chart-arrows"></i></button>
 			<button v-tooltip="$locale.sfc.useCw" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: useCw }]" @click="useCw = !useCw"><i class="ti ti-eye-off"></i></button>
 			<button v-tooltip="$locale.sfc.hashtags" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: withHashtags }]" @click="withHashtags = !withHashtags"><i class="ti ti-hash"></i></button>
 			<button v-tooltip="$locale.sfc.mention" class="_button" :class="$style.footerButton" @click="insertMention"><i class="ti ti-at"></i></button>
@@ -114,6 +114,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { watch, nextTick, onMounted, defineAsyncComponent, provide, shallowRef, ref, computed, useTemplateRef, onUnmounted, onBeforeUnmount } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
@@ -121,11 +122,6 @@ import insertTextAtCursor from 'insert-text-at-cursor';
 import { toASCII } from 'punycode.js';
 import { host, url } from '@features/boot/frontend/shared/config.js';
 import MkUploaderItems from '@features/drive/frontend/components/MkUploaderItems.vue';
-import type { ShallowRef } from 'vue';
-import type { PostFormProps } from '../types/post-form.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import type { PollEditorModelValue } from '@features/notes/frontend/components/MkPollEditor.vue';
-import type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
 import MkNotePreview from '@features/notes/frontend/components/MkNotePreview.vue';
 import XPostFormAttaches from '@features/notes/frontend/components/MkPostFormAttaches.vue';
 import XTextCounter from '@features/notes/frontend/components/MkPostForm.TextCounter.vue';
@@ -158,6 +154,14 @@ import { checkDragDataType, getDragData } from '@features/ui/frontend/drag-and-d
 import { useUploader } from '@features/drive/frontend/composables/use-uploader.js';
 import { startTour } from '@features/navigation/frontend/utility/tour.js';
 import { closeTip } from '@features/web/frontend/tips.js';
+import type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
+import type { PollEditorModelValue } from '@features/notes/frontend/components/MkPollEditor.vue';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { PostFormProps } from '../types/post-form.js';
+import type { ShallowRef } from 'vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -286,9 +290,9 @@ const submitText = computed((): string => {
 	return scheduledAt.value != null
 		? $locale.value.sfc.schedule
 		: renoteTargetNote.value
-			? $locale.value.sfc.quote
+			? globalLocale.value.env.quote
 			: replyTargetNote.value
-				? $locale.value.sfc.reply
+				? globalLocale.value.env.reply
 				: $locale.value.sfc.note;
 });
 
@@ -575,7 +579,7 @@ async function toggleLocalOnly() {
 				},
 				{
 					value: 'no' as const,
-					text: $locale.value.sfc.cancel,
+					text: globalLocale.value.env.cancel,
 				},
 			],
 		});
@@ -597,7 +601,7 @@ async function toggleReactionAcceptance() {
 	const select = await os.select({
 		title: $locale.value.sfc.reactionAcceptance,
 		items: [
-			{ value: null, label: $locale.value.sfc.all },
+			{ value: null, label: globalLocale.value.env.all },
 			{ value: 'likeOnlyForRemote' as const, label: $locale.value.sfc.likeOnlyForRemote },
 			{ value: 'nonSensitiveOnly' as const, label: $locale.value.sfc.nonSensitiveOnly },
 			{ value: 'nonSensitiveOnlyForLocalLikeOnlyForRemote' as const, label: $locale.value.sfc.nonSensitiveOnlyForLocalLikeOnlyForRemote },
@@ -634,7 +638,7 @@ function showOtherSettings() {
 			break;
 
 		default:
-			reactionAcceptanceCaption = $locale.value.sfc.all;
+			reactionAcceptanceCaption = globalLocale.value.env.all;
 			break;
 	}
 
@@ -673,17 +677,17 @@ function showOtherSettings() {
 	}] : []), { type: 'divider' }, {
 		type: 'switch',
 		icon: 'ti ti-eye',
-		text: $locale.value.sfc.preview,
+		text: globalLocale.value.env.preview,
 		ref: showPreview,
 	}, {
 		icon: 'ti ti-trash',
-		text: $locale.value.sfc.reset,
+		text: globalLocale.value.env.reset,
 		danger: true,
 		action: async () => {
 			if (props.mock) return;
 			const { canceled } = await os.confirm({
 				type: 'question',
-				text: $locale.value.sfc.resetAreYouSure,
+				text: globalLocale.value.env.resetAreYouSure,
 			});
 			if (canceled) return;
 			clear();
@@ -1484,8 +1488,8 @@ async function canClose() {
 		const { canceled } = await os.confirm({
 			type: 'question',
 			text: $locale.value.sfc.postFormQuitInspiteOfThereAreUnuploadedFilesConfirm,
-			okText: $locale.value.sfc.yes,
-			cancelText: $locale.value.sfc.no,
+			okText: globalLocale.value.env.yes,
+			cancelText: globalLocale.value.env.no,
 		});
 		if (canceled) return false;
 	}
@@ -1897,35 +1901,16 @@ html[data-color-scheme=light] .preview {
 <locale lang="json" locale="ar-SA">
 {
 	"account": "الحسابات",
-	"visibility": "الظهور",
-	"visibilityLabels": {
-		"public": "علني",
-		"publicDescription": "ستكون ملاحظتك مرئية لكل المستخدمين",
-		"home": "الرئيسي",
-		"homeDescription": "انشر في الخيط الزمني الرئيسي فقط",
-		"followers": "المتابِعون",
-		"followersDescription": "اجعلها مرئية لمتابِعيك فقط",
-		"specified": "مباشرة",
-		"specifiedDescription": "اجعلها مرئية لمستخدمين محددين",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "منوعات",
 	"quoteAttached": "اِقتُبسَ",
 	"recipient": "المرسَل إليه·ها",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": " إلغاء",
 	"notSpecifiedMentionWarning": "في الملاحظة ذكر لمستخدمين لن يستلموها.",
-	"add": "إضافة",
 	"annotation": "التعليقات",
 	"hashtags": "الوسوم",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "أرفق ملفات",
-	"upload": "ارفع",
-	"fromDrive": "من المخزن",
-	"poll": "استطلاع رأي",
 	"useCw": "إخفاء المحتوى",
 	"mention": "أشر الى",
 	"addMfmFunction": "Add MFM",
@@ -1941,15 +1926,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "أكتب...",
 	"postFormPlaceholdersF": "بانتظارك لتكتب...",
 	"schedule": "Schedule",
-	"quote": "اقتبس",
-	"reply": "رد",
 	"note": "ملاحظة",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "عطّل",
 	"neverShow": "لا تظهره مجددًا",
 	"reactionAcceptance": "قبول التفاعلات",
-	"all": "الكل",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -1957,9 +1939,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "معاينة",
-	"reset": "Reset",
-	"resetAreYouSure": "هل تريد إعادة التعيين؟",
 	"quoteQuestion": "أتريد تضمينها كاقتباس",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "هذا قد يزعج الآخرين.",
@@ -1980,44 +1959,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "نعم",
-	"no": "لا"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="ca-ES">
 {
 	"account": "Compte",
-	"visibility": "Visibilitat",
-	"visibilityLabels": {
-		"public": "Públic ",
-		"publicDescription": "La teva nota la podrà veure tothom ",
-		"home": "Inici",
-		"homeDescription": "Publicar només a la línia de temps d'Inici ",
-		"followers": "Seguidors",
-		"followersDescription": "Fes només visible per als teus seguidors",
-		"specified": "Directe",
-		"specifiedDescription": "Fer visible només per alguns usuaris",
-		"disableFederation": "Sense federar",
-		"disableFederationDescription": "No enviar a altres servidors"
-	},
-	"visibilityDisableFederation": "Sense federar",
 	"other": "Altres",
 	"quoteAttached": "Frase adjunta",
 	"recipient": "Destinatari",
 	"postFormShowHowToUse": "Mostrar les instruccions",
 	"scheduleToPostOnX": "Programar una nota per {x}",
-	"cancel": "Cancel·lar",
 	"notSpecifiedMentionWarning": "Aquesta nota esmenta usuaris que no es troben com a destinataris",
-	"add": "Afegir",
 	"annotation": "Comentaris",
 	"hashtags": "Etiquetes",
 	"postFormUploaderTip": "L'arxiu encara no s'ha carregat. Des del menú arxiu pots canviar el nom, retallar imatges, posar marques d'aigua i comprimir o no l'arxiu. Els arxius es carreguen automàticament quan públiques una nota.",
 	"attachFile": "Afegeix un arxiu",
-	"upload": "Puja",
-	"fromDrive": "Des del Disc",
-	"poll": "Enquesta",
 	"useCw": "Amaga el contingut",
 	"mention": "Menció",
 	"addMfmFunction": "Afegeix funcions MFM",
@@ -2033,15 +1991,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Escriu alguna cosa...",
 	"postFormPlaceholdersF": "Esperant que escriguis qualsevol cosa...",
 	"schedule": "Programa",
-	"quote": "Cita",
-	"reply": "Respostes",
 	"note": "Nota",
 	"disableFederationConfirm": "Vols treure la federació?",
 	"disableFederationConfirmWarn": "Fins i tot traient la federació, les publicacions continuaren sent públiques, a no ser que es digui el contrari. Normalment no has de tocar això.",
 	"disableFederationOk": "Desactivar",
 	"neverShow": "No mostrar més ",
 	"reactionAcceptance": "Acceptació de reaccions ",
-	"all": "Tot",
 	"likeOnlyForRemote": "Tot (només m'agraden d'instàncies remotes)",
 	"nonSensitiveOnly": "Només sense contingut sensible",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Només contingut no sensible (Només m'agraden d'instàncies remotes)",
@@ -2049,9 +2004,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Desar com a esborrany",
 	"draftsCannotCreateDraft": "Amb aquest contingut no es poden crear esborranys.",
 	"schedulePost": "Programar una nota",
-	"preview": "Vista prèvia",
-	"reset": "Reiniciar",
-	"resetAreYouSure": "Segur que vols restablir-ho?",
 	"quoteQuestion": "Vols annexar-la com a cita?",
 	"attachAsFileQuestion": "El text copiat és massa llarg. Vols adjuntar-lo com un fitxer de text?",
 	"thisPostMayBeAnnoying": "Aquesta nota pot ser molesta per algú.",
@@ -2072,44 +2024,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "Pots fer altres accions com desar esborranys, programar publicacions i configurar reaccions.",
 	"postFormHowToUseSubmit_title": "Botó per publicar",
 	"postFormHowToUseSubmit_description": "Publica les teves notes. També pots fer servir Ctrl + Enter / Cmd + Enter",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Hi ha arxius que no s'han carregat, vols descartar-los i tancar el formulari?",
-	"yes": "Sí ",
-	"no": "No"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Hi ha arxius que no s'han carregat, vols descartar-los i tancar el formulari?"
 }
 </locale>
 
 <locale lang="json" locale="cs-CZ">
 {
 	"account": "Účty",
-	"visibility": "Viditelnost",
-	"visibilityLabels": {
-		"public": "Veřejný",
-		"publicDescription": "Vaše poznámka bude viditelná pro všechny uživatele",
-		"home": "Domů",
-		"homeDescription": "Zveřejnit příspěvek pouze na domovskou časovou osu",
-		"followers": "Sledující",
-		"followersDescription": "Zviditelnit pouze pro své sledující",
-		"specified": "Přímý",
-		"specifiedDescription": "Zviditelnit pouze pro určité uživatele",
-		"disableFederation": "Defederace",
-		"disableFederationDescription": "Nepřenášet do jiných instancí"
-	},
-	"visibilityDisableFederation": "Defederace",
 	"other": "Ostatní",
 	"quoteAttached": "Citace",
 	"recipient": "Pro",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Zrušit",
 	"notSpecifiedMentionWarning": "Tahle poznámka zmiňuje uživatele, které nejsou mezi adresáty",
-	"add": "Přidat",
 	"annotation": "Komentáře",
 	"hashtags": "Hashtagy",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Přiložit soubor",
-	"upload": "Nahrát soubory",
-	"fromDrive": "Z disku",
-	"poll": "Anketa",
 	"useCw": "Schovat obsah",
 	"mention": "Zmínění",
 	"addMfmFunction": "Add MFM",
@@ -2125,15 +2056,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Začít psát...",
 	"postFormPlaceholdersF": "Čekám, až něco napíšete...",
 	"schedule": "Schedule",
-	"quote": "Citovat",
-	"reply": "Odpovědět",
 	"note": "Poznámka",
 	"disableFederationConfirm": "Chcete opravdu vypnout federace?",
 	"disableFederationConfirmWarn": "I v případě defederace budou příspěvky nadále veřejné, pokud nebude nastaveno jinak. Obvykle to není nutné.",
 	"disableFederationOk": "Vypnout",
 	"neverShow": "Znovu nezobrazovat",
 	"reactionAcceptance": "Přijímání reakcí",
-	"all": "Vše",
 	"likeOnlyForRemote": "Všechny (Pouze \"oblíbené\" pro vzdálenou instanci)",
 	"nonSensitiveOnly": "Pouze bez citlivých medií",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Pouze bez citlivých medií (Pouze vzdálený \"oblíbený\")",
@@ -2141,9 +2069,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Náhled",
-	"reset": "Obnovit",
-	"resetAreYouSure": "Opravdu resetovat?",
 	"quoteQuestion": "Přiložit jako citaci?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "Tato poznámka může ostatní obtěžovat.",
@@ -2164,44 +2089,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Ano",
-	"no": "Ne"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="da-DK">
 {
 	"account": "Account",
-	"visibility": "Visibility",
-	"visibilityLabels": {
-		"public": "Public",
-		"publicDescription": "Your note will be visible for all users",
-		"home": "Home",
-		"homeDescription": "Post to home timeline only",
-		"followers": "Followers",
-		"followersDescription": "Make visible to your followers only",
-		"specified": "Direct",
-		"specifiedDescription": "Make visible for specified users only",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Other",
 	"quoteAttached": "Quote",
 	"recipient": "Recipient",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Cancel",
 	"notSpecifiedMentionWarning": "This note contains mentions of users not included as recipients",
-	"add": "Add",
 	"annotation": "Comments",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Attach files",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
-	"poll": "Poll",
 	"useCw": "Hide content",
 	"mention": "Mention",
 	"addMfmFunction": "Add MFM",
@@ -2217,15 +2121,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Start writing...",
 	"postFormPlaceholdersF": "Waiting for you to write...",
 	"schedule": "Schedule",
-	"quote": "Quote",
-	"reply": "Reply",
 	"note": "Note",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "Disable",
 	"neverShow": "Don't show again",
 	"reactionAcceptance": "Reaction Acceptance",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -2233,9 +2134,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Preview",
-	"reset": "Reset",
-	"resetAreYouSure": "Really reset?",
 	"quoteQuestion": "Append as quote?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "This note may annoy others.",
@@ -2256,44 +2154,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Yes",
-	"no": "No"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="de-DE">
 {
 	"account": "Benutzerkonto",
-	"visibility": "Sichtbarkeit",
-	"visibilityLabels": {
-		"public": "Öffentlich",
-		"publicDescription": "Deine Notiz wird global für alle Benutzer sichtbar sein",
-		"home": "Startseite",
-		"homeDescription": "Notiz nur in die Startseiten-Chronik schicken",
-		"followers": "Follower",
-		"followersDescription": "Nur für Follower sichtbar",
-		"specified": "Direkt",
-		"specifiedDescription": "Nur für bestimmte Benutzer sichtbar",
-		"disableFederation": "Deföderieren",
-		"disableFederationDescription": "Nicht an andere Instanzen übertragen"
-	},
-	"visibilityDisableFederation": "Deföderieren",
 	"other": "Anderes",
 	"quoteAttached": "Zitat",
 	"recipient": "Empfänger",
 	"postFormShowHowToUse": "Formularbeschreibung anzeigen",
 	"scheduleToPostOnX": "Der Beitrag wird für {x} geplant.x",
-	"cancel": "Abbrechen",
 	"notSpecifiedMentionWarning": "Diese Notiz enthält Erwähnungen von Nutzern, die nicht als Empfänger ausgewählt sind",
-	"add": "Hinzufügen",
 	"annotation": "Anmerkung",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "Die Datei wurde noch nicht hochgeladen. Über das Dateimenü kannst du sie umbenennen, das Bild zuschneiden, ein Wasserzeichen hinzufügen, komprimieren usw. Die Datei wird automatisch hochgeladen, wenn du eine Notiz veröffentlichst.",
 	"attachFile": "Datei anhängen",
-	"upload": "Hochladen",
-	"fromDrive": "Aus Drive",
-	"poll": "Umfrage",
 	"useCw": "Inhaltswarnung verwenden",
 	"mention": "Erwähnung",
 	"addMfmFunction": "MFM hinzufügen",
@@ -2309,15 +2186,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Fang an zu schreiben …",
 	"postFormPlaceholdersF": "Ich warte darauf, dass du schreibst …",
 	"schedule": "Planen",
-	"quote": "Zitieren",
-	"reply": "Antworten",
 	"note": "Notiz",
 	"disableFederationConfirm": "Föderation wirklich deaktivieren?",
 	"disableFederationConfirmWarn": "Auch mit deaktivierter Föderation bleiben Notizen, sofern nicht umgestellt, öffentlich. In den meisten Fällen wird dies nicht benötigt.",
 	"disableFederationOk": "Deaktivieren",
 	"neverShow": "Nicht wieder anzeigen",
 	"reactionAcceptance": "Reaktionsannahme",
-	"all": "Alle",
 	"likeOnlyForRemote": "Alle (Nur \"Gefällt mir\" für fremde Instanzen)",
 	"nonSensitiveOnly": "Keine Sensitiven",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Keine Sensitiven (Nur \"Gefällt mir\" von fremden Instanzen)",
@@ -2325,9 +2199,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Als Entwurf speichern",
 	"draftsCannotCreateDraft": "Mit diesem Inhalt kann kein Entwurf erstellt werden.",
 	"schedulePost": "Beitrag planen",
-	"preview": "Vorschau",
-	"reset": "Zurücksetzen",
-	"resetAreYouSure": "Wirklich zurücksetzen?",
 	"quoteQuestion": "Als Zitat anhängen?",
 	"attachAsFileQuestion": "Der Text in der Zwischenablage ist lang. Möchtest du ihn als Textdatei anhängen?",
 	"thisPostMayBeAnnoying": "Dieser Beitrag stört eventuell andere Benutzer.",
@@ -2348,44 +2219,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "Sie können außerdem weitere Aktionen durchführen, z.\u202fB. als Entwurf speichern, das Posten planen oder Reaktionen einstellen.",
 	"postFormHowToUseSubmit_title": "Senden-Button",
 	"postFormHowToUseSubmit_description": "Du kannst die Notiz posten. Du kannst sie auch mit Strg + Enter / Cmd + Enter posten.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Es gibt Dateien, die nicht hochgeladen wurden. Möchtest du diese verwerfen und das Formular schließen?",
-	"yes": "Ja",
-	"no": "Nein"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Es gibt Dateien, die nicht hochgeladen wurden. Möchtest du diese verwerfen und das Formular schließen?"
 }
 </locale>
 
 <locale lang="json" locale="en-US">
 {
 	"account": "Account",
-	"visibility": "Visibility",
-	"visibilityLabels": {
-		"public": "Public",
-		"publicDescription": "Your note will be visible for all users",
-		"home": "Home",
-		"homeDescription": "Post to home timeline only",
-		"followers": "Followers",
-		"followersDescription": "Make visible to your followers only",
-		"specified": "Direct",
-		"specifiedDescription": "Make visible for specified users only",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Other",
 	"quoteAttached": "Quote",
 	"recipient": "Recipient",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Cancel",
 	"notSpecifiedMentionWarning": "This note contains mentions of users not included as recipients",
-	"add": "Add",
 	"annotation": "Comments",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Attach files",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
-	"poll": "Poll",
 	"useCw": "Hide content",
 	"mention": "Mention",
 	"addMfmFunction": "Add MFM",
@@ -2401,15 +2251,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Start writing...",
 	"postFormPlaceholdersF": "Waiting for you to write...",
 	"schedule": "Schedule",
-	"quote": "Quote",
-	"reply": "Reply",
 	"note": "Note",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "Disable",
 	"neverShow": "Don't show again",
 	"reactionAcceptance": "Reaction Acceptance",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -2417,9 +2264,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Preview",
-	"reset": "Reset",
-	"resetAreYouSure": "Really reset?",
 	"quoteQuestion": "Append as quote?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "This note may annoy others.",
@@ -2440,44 +2284,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Yes",
-	"no": "No"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="es-ES">
 {
 	"account": "Cuentas",
-	"visibility": "Visibilidad",
-	"visibilityLabels": {
-		"public": "Público",
-		"publicDescription": "Visible para todos los usuarios",
-		"home": "Inicio",
-		"homeDescription": "Visible sólo en la linea de tiempo de inicio",
-		"followers": "Seguidores",
-		"followersDescription": "Visible sólo para tus seguidores",
-		"specified": "Nota directa",
-		"specifiedDescription": "Visible sólo para los usuarios elegidos",
-		"disableFederation": "No federado",
-		"disableFederationDescription": "No enviar a otras instancias"
-	},
-	"visibilityDisableFederation": "No federado",
 	"other": "Otro",
 	"quoteAttached": "Cita añadida",
 	"recipient": "Receptor",
 	"postFormShowHowToUse": "Mostrar el tutorial  de este formulario",
 	"scheduleToPostOnX": "Programar una nota para {x}",
-	"cancel": "Cancelar",
 	"notSpecifiedMentionWarning": "Algunas menciones no están incluidas en el destino",
-	"add": "Agregar",
 	"annotation": "Anotación",
 	"hashtags": "Hashtag",
 	"postFormUploaderTip": "El archivo aún no se ha cargado. Desde el menú de archivos, puedes cambiar el nombre, recortar la imagen, añadir una marca de agua y configurar la compresión, entre otras opciones. Los archivos se suben automáticamente al publicar una nota.",
 	"attachFile": "Añadir archivo",
-	"upload": "Subir",
-	"fromDrive": "Desde el drive",
-	"poll": "Encuesta",
 	"useCw": "Esconder contenidos",
 	"mention": "Menciones",
 	"addMfmFunction": "Añadir función MFM",
@@ -2493,15 +2316,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Escribe aquí",
 	"postFormPlaceholdersF": "Esperando a que escribas algo...",
 	"schedule": "Programar",
-	"quote": "Citar",
-	"reply": "Responder",
 	"note": "Nota",
 	"disableFederationConfirm": "¿Estas seguro que quieres desactivar la federación?",
 	"disableFederationConfirmWarn": "Aunque no exista federación los posts no serán marcados como privados. En la mayoría de los casos, no es necesario hacer los posts no federar.",
 	"disableFederationOk": "Desactivar.",
 	"neverShow": "No mostrar de nuevo",
 	"reactionAcceptance": "Aceptación de reacciones",
-	"all": "Todo",
 	"likeOnlyForRemote": "Sólo reacciones de instancias remotas",
 	"nonSensitiveOnly": "Solo no sensible",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Sólo no contenido sensible (sólo me gusta en remoto)",
@@ -2509,9 +2329,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Guardar como borrador",
 	"draftsCannotCreateDraft": "No se pueden crear borradores con este contenido.",
 	"schedulePost": "Programar una nota",
-	"preview": "Vista previa",
-	"reset": "Restablecer",
-	"resetAreYouSure": "¿Desea reestablecer?",
 	"quoteQuestion": "¿Quiere añadir una cita?",
 	"attachAsFileQuestion": "El texto del portapapeles es demasiado grande ¿Desea adjuntarlo como archivo de texto?",
 	"thisPostMayBeAnnoying": "Ésta publicación puede resultar molesta.",
@@ -2532,44 +2349,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "Puedes realizar otras acciones, como guardar borradores, programar publicaciones y configurar reacciones.",
 	"postFormHowToUseSubmit_title": "Botón de publicar",
 	"postFormHowToUseSubmit_description": "Publica tus notas pulsando este botón. También puedes publicar utilizando Ctrl + Intro / Cmd + Intro.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Hay archivos que no se han cargado, ¿deseas descartarlos y cerrar el formulario?",
-	"yes": "Si",
-	"no": "No"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Hay archivos que no se han cargado, ¿deseas descartarlos y cerrar el formulario?"
 }
 </locale>
 
 <locale lang="json" locale="fr-FR">
 {
 	"account": "Comptes",
-	"visibility": "Visibilité",
-	"visibilityLabels": {
-		"public": "Public",
-		"publicDescription": "Publier à tou·te·s les utilisateur·rice·s",
-		"home": "Principal",
-		"homeDescription": "Publier sur le fil principal uniquement",
-		"followers": "Abonné·e·s",
-		"followersDescription": "Publier à vos abonné·e·s uniquement",
-		"specified": "Direct",
-		"specifiedDescription": "Publier uniquement aux utilisateur·rice·s mentionné·e·s",
-		"disableFederation": "Défédérer",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Défédérer",
 	"other": "Autre",
 	"quoteAttached": "Avec citation",
 	"recipient": "Destinataire",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Annuler",
 	"notSpecifiedMentionWarning": "Vous avez mentionné des utilisateur·rice·s qui ne font pas partie de la liste des destinataires",
-	"add": "Ajouter",
 	"annotation": "Commentaires",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Joindre un fichier",
-	"upload": "Téléverser",
-	"fromDrive": "Depuis le Disque",
-	"poll": "Sondage",
 	"useCw": "Masquer le contenu",
 	"mention": "Mentionner",
 	"addMfmFunction": "Insérer MFM",
@@ -2585,15 +2381,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Écrivez ici",
 	"postFormPlaceholdersF": "En attente de vos écrits ...",
 	"schedule": "Schedule",
-	"quote": "Citer",
-	"reply": "Répondre",
 	"note": "Note",
 	"disableFederationConfirm": "Voulez-vous vraiment désactiver la fédération ?",
 	"disableFederationConfirmWarn": "Même sans fédération, la note ne sera pas privée. Dans la plupart des cas, ce n'est pas nécessaire de désactiver la fédération.",
 	"disableFederationOk": "Désactiver",
 	"neverShow": "Ne plus afficher",
 	"reactionAcceptance": "Acceptation des réactions",
-	"all": "Tous",
 	"likeOnlyForRemote": "Toutes (mentions j'aime seulement pour les instances distantes)",
 	"nonSensitiveOnly": "Non sensibles seulement",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non sensibles seulement (mentions j'aime seulement pour les instances distantes)",
@@ -2601,9 +2394,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Aperçu",
-	"reset": "Réinitialiser",
-	"resetAreYouSure": "Voulez-vous réinitialiser ?",
 	"quoteQuestion": "Souhaitez-vous ajouter une citation ?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "Cette note peut gêner d'autres personnes.",
@@ -2624,44 +2414,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Oui",
-	"no": "Non"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="id-ID">
 {
 	"account": "Akun",
-	"visibility": "Visibilitas",
-	"visibilityLabels": {
-		"public": "Publik",
-		"publicDescription": "Catat ke lini masa global",
-		"home": "Beranda",
-		"homeDescription": "Catat ke lini masa beranda saja",
-		"followers": "Pengikut",
-		"followersDescription": "Catat ke pengikut saja",
-		"specified": "Langsung",
-		"specifiedDescription": "Catat ke pengguna yang ditentukan saja",
-		"disableFederation": "Matikan federasi",
-		"disableFederationDescription": "Jangan kirimkan ke instansi lain"
-	},
-	"visibilityDisableFederation": "Matikan federasi",
 	"other": "Lainnya",
 	"quoteAttached": "Dikutip",
 	"recipient": "Penerima",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Batalkan",
 	"notSpecifiedMentionWarning": "Catatan ini mengandung sebutan dari pengguna yang tidak dimuat sebagai penerima",
-	"add": "Tambahkan",
 	"annotation": "Keterangan konten",
 	"hashtags": "Tagar",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Lampirkan berkas",
-	"upload": "Unggah",
-	"fromDrive": "Dari Drive",
-	"poll": "Angket",
 	"useCw": "Sembunyikan konten",
 	"mention": "Sebut",
 	"addMfmFunction": "Tambahkan dekorasi",
@@ -2677,15 +2446,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Tuliskan yang kamu ingin sampaikan...",
 	"postFormPlaceholdersF": "Menunggu kamu untuk menulis....",
 	"schedule": "Schedule",
-	"quote": "Kutip",
-	"reply": "Balas",
 	"note": "Catatan",
 	"disableFederationConfirm": "Matikan federasi?",
 	"disableFederationConfirmWarn": "Mematikan federasi tidak membuat kiriman menjadi privat. Umumnya, mematikan federasi tidak diperlukan.",
 	"disableFederationOk": "Matikan federasi",
 	"neverShow": "Jangan tampilkan lagi",
 	"reactionAcceptance": "Penerimaan reaksi",
-	"all": "Semua",
 	"likeOnlyForRemote": "Semua (Hanya suka dari instansi luar)",
 	"nonSensitiveOnly": "Hanya non-sensitif",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Hanya non-sensitif (Hanya suka dari instansi luar)",
@@ -2693,9 +2459,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Simpan ke Draf",
 	"draftsCannotCreateDraft": "Anda tidak dapat membuat draf dengan konten ini.",
 	"schedulePost": "Schedule note",
-	"preview": "Pratinjau",
-	"reset": "Reset",
-	"resetAreYouSure": "Yakin mau atur ulang?",
 	"quoteQuestion": "Apakah kamu ingin menambahkan kutipan?",
 	"attachAsFileQuestion": "Teks dalam papan klip terlalu panjang. Apakah kamu ingin melampirkannya sebagai berkas teks?",
 	"thisPostMayBeAnnoying": "Catatan ini mungkin dapat mengganggu orang lain.",
@@ -2716,44 +2479,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "Anda dapat menyimpan konten saat ini ke dalam draf, menjadwalkan note, mengatur reaksi, dan melakukan aksi lainnya.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Iya",
-	"no": "Tidak"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="it-IT">
 {
 	"account": "Account",
-	"visibility": "Visibilità",
-	"visibilityLabels": {
-		"public": "Pubblica",
-		"publicDescription": "Visibilità pubblica",
-		"home": "Home",
-		"homeDescription": "Visibile solo nella Home",
-		"followers": "Follower",
-		"followersDescription": "Visibile solo ai tuoi follower",
-		"specified": "Nota diretta",
-		"specifiedDescription": "Visibile solo ai profili menzionati",
-		"disableFederation": "Gestisci la federazione",
-		"disableFederationDescription": "Non spedire attività alle altre istanze remote"
-	},
-	"visibilityDisableFederation": "Gestisci la federazione",
 	"other": "Eccetera",
 	"quoteAttached": "Citazione allegata",
 	"recipient": "Destinatario",
 	"postFormShowHowToUse": "Mostra il tutorial",
 	"scheduleToPostOnX": "Pianificare la pubblicazione {x}",
-	"cancel": "Annulla",
 	"notSpecifiedMentionWarning": "Sono stati menzionati profili non inclusi fra i destinatari",
-	"add": "Aggiungi",
 	"annotation": "Annotazione preventiva",
 	"hashtags": "Hashtag",
 	"postFormUploaderTip": "Il file non è ancora stato caricato. Nel menu file (tre puntini), puoi ritagliare l'immagine, mettere la filigrana, decidere la presenza o l'assenza di compressione... Il file verrà caricato automaticamente quando pubblichi la Nota.",
 	"attachFile": "Allega file",
-	"upload": "Carica",
-	"fromDrive": "Dal Drive",
-	"poll": "Sondaggio",
 	"useCw": "Contenuto esplicito",
 	"mention": "Menzioni",
 	"addMfmFunction": "Aggiungi decorazioni",
@@ -2769,15 +2511,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Puoi scrivere qui...",
 	"postFormPlaceholdersF": "Inizia pure a scrivere...",
 	"schedule": "Pianificare",
-	"quote": "Citazione",
-	"reply": "Rispondi",
 	"note": "Nota",
 	"disableFederationConfirm": "Vuoi davvero disattivare la federazione?",
 	"disableFederationConfirmWarn": "Anche se defederate, le Note continueranno ad essere pubbliche, se non diversamente specificato. Di solito, non è necessario far questo.",
 	"disableFederationOk": "Disabilita federazione",
 	"neverShow": "Non mostrare più",
 	"reactionAcceptance": "Reazioni consentite",
-	"all": "Tutte",
 	"likeOnlyForRemote": "Solo Like remoti",
 	"nonSensitiveOnly": "Soltanto non espliciti",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Soltanto non espliciti (reazioni remote)",
@@ -2785,9 +2524,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Salva come bozza",
 	"draftsCannotCreateDraft": "Impossibile creare una bozza di questo contenuto.",
 	"schedulePost": "Pianificare la pubblicazione",
-	"preview": "Anteprima",
-	"reset": "Ripristina",
-	"resetAreYouSure": "Ripristinare?",
 	"quoteQuestion": "Vuoi aggiungere una citazione?",
 	"attachAsFileQuestion": "Il testo copiato eccede le dimensioni, vuoi allegarlo?",
 	"thisPostMayBeAnnoying": "Questa nota potrebbe essere offensiva",
@@ -2808,44 +2544,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "Puoi svolgere varie azioni, come salvare in bozza, pianificare le annotazioni, regolare le reazioni ricevute e altro.",
 	"postFormHowToUseSubmit_title": "Bottone invia",
 	"postFormHowToUseSubmit_description": "Pubblica la Nota. Funziona anche con \"Ctrl + Invio\", oppure \"Cmd + Invio\".",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Alcuni file non sono stati caricati. Vuoi annullare l'operazione?",
-	"yes": "Sì",
-	"no": "No"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Alcuni file non sono stati caricati. Vuoi annullare l'operazione?"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
 	"account": "アカウント",
-	"visibility": "公開範囲",
-	"visibilityLabels": {
-		"public": "パブリック",
-		"publicDescription": "全てのユーザーに公開",
-		"home": "ホーム",
-		"homeDescription": "ホームタイムラインのみに公開",
-		"followers": "フォロワー",
-		"followersDescription": "自分のフォロワーのみに公開",
-		"specified": "指名",
-		"specifiedDescription": "指定したユーザーのみに公開",
-		"disableFederation": "連合なし",
-		"disableFederationDescription": "他サーバーへの配信を行いません"
-	},
-	"visibilityDisableFederation": "連合なし",
 	"other": "その他",
 	"quoteAttached": "引用付き",
 	"recipient": "宛先",
 	"postFormShowHowToUse": "フォームの説明を表示",
 	"scheduleToPostOnX": "{x}に投稿を予約します",
-	"cancel": "キャンセル",
 	"notSpecifiedMentionWarning": "宛先に含まれていないメンションがあります",
-	"add": "追加",
 	"annotation": "注釈",
 	"hashtags": "ハッシュタグ",
 	"postFormUploaderTip": "ファイルはまだアップロードされていません。ファイルのメニューから、リネームや画像のクロップ、ウォーターマークの付与、圧縮の有無などを設定できます。ファイルはノート投稿時に自動でアップロードされます。",
 	"attachFile": "ファイルを添付",
-	"upload": "アップロード",
-	"fromDrive": "ドライブから",
-	"poll": "アンケート",
 	"useCw": "内容を隠す",
 	"mention": "メンション",
 	"addMfmFunction": "装飾を追加",
@@ -2861,15 +2576,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "ここに書いてください",
 	"postFormPlaceholdersF": "あなたが書くのを待っています...",
 	"schedule": "予約",
-	"quote": "引用",
-	"reply": "返信",
 	"note": "ノート",
 	"disableFederationConfirm": "連合なしにしますか？",
 	"disableFederationConfirmWarn": "連合なしにしても投稿は非公開になりません。ほとんどの場合、連合なしにする必要はありません。",
 	"disableFederationOk": "連合なしにする",
 	"neverShow": "今後表示しない",
 	"reactionAcceptance": "リアクションの受け入れ",
-	"all": "全て",
 	"likeOnlyForRemote": "全て (リモートはいいねのみ)",
 	"nonSensitiveOnly": "非センシティブのみ",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "非センシティブのみ (リモートはいいねのみ)",
@@ -2877,9 +2589,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "下書きへ保存",
 	"draftsCannotCreateDraft": "この内容では下書きを作成できません。",
 	"schedulePost": "投稿を予約",
-	"preview": "プレビュー",
-	"reset": "リセット",
-	"resetAreYouSure": "リセットしますか？",
 	"quoteQuestion": "引用として添付しますか？",
 	"attachAsFileQuestion": "クリップボードのテキストが長いです。テキストファイルとして添付しますか？",
 	"thisPostMayBeAnnoying": "この投稿は迷惑になる可能性があります。",
@@ -2900,44 +2609,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "下書きへの保存、投稿の予約、リアクションの設定など、その他のアクションが行えます。",
 	"postFormHowToUseSubmit_title": "投稿ボタン",
 	"postFormHowToUseSubmit_description": "ノートを投稿します。Ctrl + Enter / Cmd + Enter でも投稿できます。",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "アップロードされていないファイルがありますが、破棄してフォームを閉じますか？",
-	"yes": "はい",
-	"no": "いいえ"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "アップロードされていないファイルがありますが、破棄してフォームを閉じますか？"
 }
 </locale>
 
 <locale lang="json" locale="ja-KS">
 {
 	"account": "アカウント",
-	"visibility": "公開範囲",
-	"visibilityLabels": {
-		"public": "パブリック",
-		"publicDescription": "みんなに公開",
-		"home": "ホーム",
-		"homeDescription": "ホームタイムラインのみに公開するで",
-		"followers": "フォロワー",
-		"followersDescription": "自分のフォロワーのみに公開するで",
-		"specified": "ダイレクト",
-		"specifiedDescription": "選んだユーザーのみに公開するで",
-		"disableFederation": "連合なし",
-		"disableFederationDescription": "他サーバーへは送らんとくわ"
-	},
-	"visibilityDisableFederation": "連合なし",
 	"other": "その他",
 	"quoteAttached": "引用付いとるで",
 	"recipient": "宛先",
 	"postFormShowHowToUse": "フォームの説明を表示",
 	"scheduleToPostOnX": "{x}に投稿を予約します",
-	"cancel": "やめる",
 	"notSpecifiedMentionWarning": "宛先にないメンションがあるで",
-	"add": "増やす",
 	"annotation": "注釈",
 	"hashtags": "ハッシュタグ",
 	"postFormUploaderTip": "ファイルはまだアップロードされてへんで。ファイルのメニューから、リネームとか画像のクロップ、ウォーターマークをのっける、圧縮するかどうかなんかを設定できるで。ファイルはノートを投稿するときに自動でアップロードされるで。",
 	"attachFile": "ファイルのっける",
-	"upload": "アップロード",
-	"fromDrive": "ドライブから",
-	"poll": "アンケート",
 	"useCw": "内容を隠す",
 	"mention": "メンション",
 	"addMfmFunction": "装飾つける",
@@ -2953,15 +2641,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "ここに書いてーなー",
 	"postFormPlaceholdersF": "あんたが書くの待っとるで",
 	"schedule": "予約",
-	"quote": "引用",
-	"reply": "返事",
 	"note": "ノート",
 	"disableFederationConfirm": "連合なしにしとくか？",
 	"disableFederationConfirmWarn": "連合なしにしても投稿が非公開になるわけちゃうで。大体の場合は連合なしにする必要はないで。",
 	"disableFederationOk": "連合なしにしとく",
 	"neverShow": "今後表示しない",
 	"reactionAcceptance": "ツッコミの受け入れ",
-	"all": "みんな",
 	"likeOnlyForRemote": "リモートからはいいねだけな",
 	"nonSensitiveOnly": "いつ見ても大丈夫なやつだけ",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "いつ見ても大丈夫なやつだけ (リモートはいいねだけ)",
@@ -2969,9 +2654,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "下書きへ保存",
 	"draftsCannotCreateDraft": "この内容で下書きは作れへんな。",
 	"schedulePost": "投稿を予約",
-	"preview": "プレビュー",
-	"reset": "リセット",
-	"resetAreYouSure": "リセットしてええん？",
 	"quoteQuestion": "引用として添付してもええか？",
 	"attachAsFileQuestion": "クリップボードのテキストが長すぎるからテキストファイルとして添付してもええか？",
 	"thisPostMayBeAnnoying": "この投稿は迷惑かもしらんで。",
@@ -2992,44 +2674,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "下書きに保存したり、投稿の予約したり、リアクションの受け入れ設定とか…なんか色々できるで。",
 	"postFormHowToUseSubmit_title": "投稿ボタン",
 	"postFormHowToUseSubmit_description": "ノートを投稿するときはここ押してな。Ctrl + Enter / Cmd + Enter でも投稿できるで。",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "アップロードされてへんファイルがあるんやけど、ほかしてフォームを閉じてもええんか？",
-	"yes": "ええで",
-	"no": "あかん"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "アップロードされてへんファイルがあるんやけど、ほかしてフォームを閉じてもええんか？"
 }
 </locale>
 
 <locale lang="json" locale="kab-KAB">
 {
 	"account": "Imiḍan",
-	"visibility": "Visibility",
-	"visibilityLabels": {
-		"public": "Public",
-		"publicDescription": "Your note will be visible for all users",
-		"home": "Home",
-		"homeDescription": "Post to home timeline only",
-		"followers": "Imeḍfaṛen",
-		"followersDescription": "Make visible to your followers only",
-		"specified": "Direct",
-		"specifiedDescription": "Make visible for specified users only",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Wiyyaḍ",
 	"quoteAttached": "Quote",
 	"recipient": "Recipient",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Cancel",
 	"notSpecifiedMentionWarning": "This note contains mentions of users not included as recipients",
-	"add": "Add",
 	"annotation": "Comments",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Attach files",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
-	"poll": "Poll",
 	"useCw": "Hide content",
 	"mention": "Bder",
 	"addMfmFunction": "Add MFM",
@@ -3045,15 +2706,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Start writing...",
 	"postFormPlaceholdersF": "Waiting for you to write...",
 	"schedule": "Schedule",
-	"quote": "Quote",
-	"reply": "Err",
 	"note": "Note",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "Disable",
 	"neverShow": "Don't show again",
 	"reactionAcceptance": "Reaction Acceptance",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -3061,9 +2719,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Preview",
-	"reset": "Reset",
-	"resetAreYouSure": "Really reset?",
 	"quoteQuestion": "Append as quote?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "This note may annoy others.",
@@ -3084,44 +2739,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Yes",
-	"no": "No"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
 	"account": "Account",
-	"visibility": "Visibility",
-	"visibilityLabels": {
-		"public": "Public",
-		"publicDescription": "Your note will be visible for all users",
-		"home": "Home",
-		"homeDescription": "Post to home timeline only",
-		"followers": "Followers",
-		"followersDescription": "Make visible to your followers only",
-		"specified": "ನೇರ ಟಿಪ್ಪಣಿಗಳು",
-		"specifiedDescription": "Make visible for specified users only",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Other",
 	"quoteAttached": "Quote",
 	"recipient": "Recipient",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "ರದ್ದು",
 	"notSpecifiedMentionWarning": "This note contains mentions of users not included as recipients",
-	"add": "Add",
 	"annotation": "Comments",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Attach files",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
-	"poll": "Poll",
 	"useCw": "Hide content",
 	"mention": "ಹೆಸರಿಸಿದ",
 	"addMfmFunction": "Add MFM",
@@ -3137,15 +2771,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Start writing...",
 	"postFormPlaceholdersF": "Waiting for you to write...",
 	"schedule": "Schedule",
-	"quote": "Quote",
-	"reply": "ಉತ್ತರಿಸು",
 	"note": "Note",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "Disable",
 	"neverShow": "Don't show again",
 	"reactionAcceptance": "Reaction Acceptance",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -3153,9 +2784,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Preview",
-	"reset": "Reset",
-	"resetAreYouSure": "Really reset?",
 	"quoteQuestion": "Append as quote?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "This note may annoy others.",
@@ -3176,44 +2804,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Yes",
-	"no": "No"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="ko-KR">
 {
 	"account": "계정",
-	"visibility": "공개 범위",
-	"visibilityLabels": {
-		"public": "공개",
-		"publicDescription": "모든 유저에게 공개",
-		"home": "홈",
-		"homeDescription": "홈 타임라인에만 공개",
-		"followers": "팔로워",
-		"followersDescription": "팔로워에게만 공개",
-		"specified": "다이렉트",
-		"specifiedDescription": "지정한 유저에게만 공개",
-		"disableFederation": "연합에 보내지 않기",
-		"disableFederationDescription": "다른 서버로 보내지 않습니다"
-	},
-	"visibilityDisableFederation": "연합에 보내지 않기",
 	"other": "기타",
 	"quoteAttached": "인용함",
 	"recipient": "수신인",
 	"postFormShowHowToUse": "입력란의 설명 표시",
 	"scheduleToPostOnX": "{x}에 게시를 예약합니다.",
-	"cancel": "취소",
 	"notSpecifiedMentionWarning": "수신자가 선택되지 않은 멘션이 있어요",
-	"add": "추가",
 	"annotation": "내용에 대한 주석",
 	"hashtags": "해시태그",
 	"postFormUploaderTip": "파일이 아직 업로드돼있지 않습니다. 파일 메뉴에서 이름 바꾸기나 이미지의 자르기, 워터마크 넣기, 압축의 유무 등을 설정할 수 있습니다. 파일은 노트 게시 시 자동으로 업로드됩니다.",
 	"attachFile": "파일 첨부",
-	"upload": "업로드",
-	"fromDrive": "드라이브에서",
-	"poll": "투표",
 	"useCw": "내용 숨기기",
 	"mention": "멘션",
 	"addMfmFunction": "장식 추가하기",
@@ -3229,15 +2836,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "여기에 적어 주세요",
 	"postFormPlaceholdersF": "작성해주시길 기다리고 있어요...",
 	"schedule": "예약",
-	"quote": "인용",
-	"reply": "답글",
 	"note": "노트",
 	"disableFederationConfirm": "정말로 연합을 끄시겠습니까?",
 	"disableFederationConfirmWarn": "연합을 끄더라도 게시물이 비공개로 전환되는 것은 아닙니다. 대부분의 경우 연합을 비활성화할 필요가 없습니다.",
 	"disableFederationOk": "연합을 끄기",
 	"neverShow": "다시 보지 않기",
 	"reactionAcceptance": "리액션 수신",
-	"all": "전체",
 	"likeOnlyForRemote": "리모트에서는 좋아요만 받기",
 	"nonSensitiveOnly": "민감한 이모지를 제외하고 받기",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "민감한 이모지를 제외하고 받기(리모트에서는 좋아요만 받기)",
@@ -3245,9 +2849,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "초안에 저장",
 	"draftsCannotCreateDraft": "이 내용으로는 초안을 작성할 수 없습니다. ",
 	"schedulePost": "게시 예약",
-	"preview": "미리보기",
-	"reset": "초기화",
-	"resetAreYouSure": "초기화 하시겠습니까?",
 	"quoteQuestion": "인용해서 첨부하시겠습니까?",
 	"attachAsFileQuestion": "붙여넣으려는 글이 너무 깁니다. 텍스트 파일로 첨부하시겠습니까?",
 	"thisPostMayBeAnnoying": "이 게시물은 다른 유저에게 피해를 줄 가능성이 있습니다.",
@@ -3268,44 +2869,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "초안의 보존, 게시 예약, 리액션의 설정 등 그 외의 액션을 할 수 있습니다.",
 	"postFormHowToUseSubmit_title": "게시 버튼",
 	"postFormHowToUseSubmit_description": "노트를 게시합니다. Ctrl + Enter / Cmd + Enter로도 게시할 수 있습니다.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "업로드되지 않은 파일이 있습니다만, 없애고 폼을 닫겠습니까?",
-	"yes": "예",
-	"no": "아니오"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "업로드되지 않은 파일이 있습니다만, 없애고 폼을 닫겠습니까?"
 }
 </locale>
 
 <locale lang="json" locale="nl-NL">
 {
 	"account": "Gebruikersaccounts",
-	"visibility": "Zichtbaarheid",
-	"visibilityLabels": {
-		"public": "Public",
-		"publicDescription": "Your note will be visible for all users",
-		"home": "Startpagina",
-		"homeDescription": "Post to home timeline only",
-		"followers": "Volgers",
-		"followersDescription": "Make visible to your followers only",
-		"specified": "Directe notities",
-		"specifiedDescription": "Make visible for specified users only",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Ander",
 	"quoteAttached": "Citaat",
 	"recipient": "Ontvanger",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Annuleren",
 	"notSpecifiedMentionWarning": "Deze notitie bevat verwijzingen naar gebruikers die niet zijn geselecteerd als ontvangers",
-	"add": "Toevoegen",
 	"annotation": "Reacties",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Bestanden toevoegen",
-	"upload": "Uploaden",
-	"fromDrive": "Van schijf",
-	"poll": "Peiling",
 	"useCw": "Inhoudswaarschuwing gebruiken",
 	"mention": "Vermelding",
 	"addMfmFunction": "Add MFM",
@@ -3321,15 +2901,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Start writing...",
 	"postFormPlaceholdersF": "Waiting for you to write...",
 	"schedule": "Schedule",
-	"quote": "Quote",
-	"reply": "Antwoord",
 	"note": "Notitie",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "Disable",
 	"neverShow": "Don't show again",
 	"reactionAcceptance": "Reaction Acceptance",
-	"all": "Alle",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -3337,9 +2914,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Voorbeeld",
-	"reset": "Herstellen",
-	"resetAreYouSure": "Resetten?",
 	"quoteQuestion": "Toevoegen als citaat?",
 	"attachAsFileQuestion": "De tekst op het klembord is te lang. Wilt u het als een tekstbestand bijvoegen?",
 	"thisPostMayBeAnnoying": "This note may annoy others.",
@@ -3360,44 +2934,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Ja",
-	"no": "Nee"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
 	"account": "Konto",
-	"visibility": "Visibility",
-	"visibilityLabels": {
-		"public": "Public",
-		"publicDescription": "Your note will be visible for all users",
-		"home": "Hjem",
-		"homeDescription": "Post to home timeline only",
-		"followers": "Følgere",
-		"followersDescription": "Make visible to your followers only",
-		"specified": "Direct",
-		"specifiedDescription": "Make visible for specified users only",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Andre",
 	"quoteAttached": "Sitat",
 	"recipient": "Mottaker",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Avbryt",
 	"notSpecifiedMentionWarning": "This note contains mentions of users not included as recipients",
-	"add": "Legg til",
 	"annotation": "Kommentarer",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Legg ved filer",
-	"upload": "Laste opp",
-	"fromDrive": "From Drive",
-	"poll": "Avstemning",
 	"useCw": "Hide content",
 	"mention": "Mention",
 	"addMfmFunction": "Add MFM",
@@ -3413,15 +2966,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Start writing...",
 	"postFormPlaceholdersF": "Waiting for you to write...",
 	"schedule": "Schedule",
-	"quote": "Sitat",
-	"reply": "Svar",
 	"note": "Note",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "Disable",
 	"neverShow": "Ikke vis igjen",
 	"reactionAcceptance": "Reaction Acceptance",
-	"all": "Alle",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -3429,9 +2979,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Preview",
-	"reset": "Reset",
-	"resetAreYouSure": "Really reset?",
 	"quoteQuestion": "Append as quote?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "This note may annoy others.",
@@ -3452,44 +2999,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Ja",
-	"no": "Nei"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="pl-PL">
 {
 	"account": "Konta",
-	"visibility": "Widoczność",
-	"visibilityLabels": {
-		"public": "Publiczny",
-		"publicDescription": "Twój wpis pojawi się w publicznych osiach czasu",
-		"home": "Strona główna",
-		"homeDescription": "Publikuj tylko na głównej osi czasu",
-		"followers": "Obserwujący",
-		"followersDescription": "Widoczne tylko dla obserwujących",
-		"specified": "Bezpośredni",
-		"specifiedDescription": "Napisz tylko określonym użytkownikom",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Nie przesyłaj do innych instancji"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Inne",
 	"quoteAttached": "Zacytowano",
 	"recipient": "Odbiorca",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Anuluj",
 	"notSpecifiedMentionWarning": "Ten wpis zawiera wzmianki o użytkownikach niezawartych jako odbiorcy",
-	"add": "Dodaj",
 	"annotation": "Komentarze",
 	"hashtags": "Hashtag",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Załącz pliki",
-	"upload": "Wyślij",
-	"fromDrive": "Z dysku",
-	"poll": "Ankieta",
 	"useCw": "Ukryj zawartość",
 	"mention": "Wspomnij",
 	"addMfmFunction": "Add MFM",
@@ -3505,15 +3031,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Zacznij coś pisać…",
 	"postFormPlaceholdersF": "Czekamy, aż coś napiszesz.",
 	"schedule": "Schedule",
-	"quote": "Cytuj",
-	"reply": "Odpowiedz",
 	"note": "Utwórz wpis",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "Wyłącz federacje",
 	"neverShow": "Nie pokazuj ponownie",
 	"reactionAcceptance": "Reaction Acceptance",
-	"all": "Wszystkie",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -3521,9 +3044,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Podgląd",
-	"reset": "Reset",
-	"resetAreYouSure": "Czy na pewno chcesz zresetować?",
 	"quoteQuestion": "Czy na pewno chcesz umieścić cytat?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "Ten wpis może obrażać pozostałych użytkowników",
@@ -3544,44 +3064,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Tak",
-	"no": "Nie"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="pt-PT">
 {
 	"account": "Contas",
-	"visibility": "Visibilidade",
-	"visibilityLabels": {
-		"public": "Público",
-		"publicDescription": "Sua nota será visível para todos os usuários",
-		"home": "Início",
-		"homeDescription": "Publicar apenas na linha do tempo Início",
-		"followers": "Seguidores",
-		"followersDescription": "Tornar visível apenas para os meus seguidores",
-		"specified": "Mensagem Direta",
-		"specifiedDescription": "Tornar visível apenas para usuários específicos",
-		"disableFederation": "Defederar",
-		"disableFederationDescription": "Não transmitir às outras instâncias"
-	},
-	"visibilityDisableFederation": "Defederar",
 	"other": "Outros",
 	"quoteAttached": "Com citação",
 	"recipient": "Destinatário",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Agendar nota para {x}",
-	"cancel": "Cancelar",
 	"notSpecifiedMentionWarning": "Esta nota menciona usuários que não foram incluídos como recipientes.",
-	"add": "Adicionar",
 	"annotation": "Anotação",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "O arquivo ainda não foi enviado. No menu do arquivo, você pode renomear, cortar, adicionar uma marca d'água, comprimir ou descomprimir um arquivo. Arquivos serão enviados automaticamente ao publicar a nota.",
 	"attachFile": "Anexar arquivo",
-	"upload": "Fazer upload",
-	"fromDrive": "Do drive",
-	"poll": "Enquetes",
 	"useCw": "Ocultar conteúdo",
 	"mention": "Menção",
 	"addMfmFunction": "Adicionar MFM",
@@ -3597,15 +3096,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Comece a digitar...",
 	"postFormPlaceholdersF": "Esperando você digitar...",
 	"schedule": "Agendar",
-	"quote": "Citar",
-	"reply": "Responder",
 	"note": "Publicar",
 	"disableFederationConfirm": "Realmente desabilitar a federação?",
 	"disableFederationConfirmWarn": "Mesmo se defederado, publicações continuarão sendo públicas, a menos que seja definido o contrário. Você geralmente não precisa disso.",
 	"disableFederationOk": "Desabilitar",
 	"neverShow": "Não exibir novamente",
 	"reactionAcceptance": "Aceitação de Reações",
-	"all": "Todos",
 	"likeOnlyForRemote": "Tudo (somente curtidas remotas)",
 	"nonSensitiveOnly": "Apenas não-sensível",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Apenas não sensíveis (somente curtidas remotas)",
@@ -3613,9 +3109,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Salvar como Rascunho",
 	"draftsCannotCreateDraft": "Você não pode criar um rascunho com esse conteúdo.",
 	"schedulePost": "Agendar publicação",
-	"preview": "Pré-visualizar",
-	"reset": "Redefinir",
-	"resetAreYouSure": "Deseja reiniciar?",
 	"quoteQuestion": "Anexar como citação?",
 	"attachAsFileQuestion": "O texto na área de transferência é muito longo. Você gostaria de anexá-lo como um arquivo de texto?",
 	"thisPostMayBeAnnoying": "Esta nota pode incomodar outras pessoas.",
@@ -3636,44 +3129,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Há arquivos que não foram enviados, gostaria de descartá-los e fechar o editor?",
-	"yes": "Sim",
-	"no": "Não"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Há arquivos que não foram enviados, gostaria de descartá-los e fechar o editor?"
 }
 </locale>
 
 <locale lang="json" locale="ru-RU">
 {
 	"account": "Учётные записи",
-	"visibility": "Видимость",
-	"visibilityLabels": {
-		"public": "Общедоступно",
-		"publicDescription": "Открыто для всех",
-		"home": "Домашняя",
-		"homeDescription": "Не для общих лент",
-		"followers": "Для подписчиков",
-		"followersDescription": "Только вашим подписчикам",
-		"specified": "Личное",
-		"specifiedDescription": "Тем, кого укажете",
-		"disableFederation": "Отключить федерацию",
-		"disableFederationDescription": "Не доставляет в другие экземпляры"
-	},
-	"visibilityDisableFederation": "Отключить федерацию",
 	"other": "Другие",
 	"quoteAttached": "Цитата",
 	"recipient": "Кому",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Запланировать заметку на {x}",
-	"cancel": "Отмена",
 	"notSpecifiedMentionWarning": "В этой заметке есть упоминание тех, кто не включён в адресаты",
-	"add": "Добавить",
 	"annotation": "Примечание",
 	"hashtags": "Хештеги",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Прикрепить файлы",
-	"upload": "Загрузить",
-	"fromDrive": "С Диска",
-	"poll": "Опрос",
 	"useCw": "Скрывать содержимое под предупреждением",
 	"mention": "Упоминание",
 	"addMfmFunction": "Добавить MFM",
@@ -3689,15 +3161,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Напишите что-нибудь…",
 	"postFormPlaceholdersF": "В ожидании, когда вы напишете…",
 	"schedule": "Отложить",
-	"quote": "Цитата",
-	"reply": "Ответ",
 	"note": "Заметка",
 	"disableFederationConfirm": "Отключить федерацию?",
 	"disableFederationConfirmWarn": "Дефедерация не делает заметку приватной. В большинстве случаев без федерации не обойтись.",
 	"disableFederationOk": "Не федерируется",
 	"neverShow": "Больше не показывать",
 	"reactionAcceptance": "Допустимые реакции",
-	"all": "Все",
 	"likeOnlyForRemote": "Всё (с других серверов только «нравится!»)",
 	"nonSensitiveOnly": "Только безопасные",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Только безопасные (с других серверов только «нравится!»)",
@@ -3705,9 +3174,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Запланировать заметку",
-	"preview": "Предпросмотр",
-	"reset": "Сброс",
-	"resetAreYouSure": "На самом деле сбросить?",
 	"quoteQuestion": "Хотите добавить цитату?",
 	"attachAsFileQuestion": "Текста в буфере обмена слишком много. Прикрепить как текстовый файл?",
 	"thisPostMayBeAnnoying": "Эта заметка может быть сочтена неприятной.",
@@ -3728,44 +3194,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Да",
-	"no": "Нет"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="sk-SK">
 {
 	"account": "Účty",
-	"visibility": "Viditeľnosť",
-	"visibilityLabels": {
-		"public": "Verejné",
-		"publicDescription": "Vaša poznámku bude viditeľná všetkým používateľom",
-		"home": "Domov",
-		"homeDescription": "Pridať iba na domácu časovú os",
-		"followers": "Sledujúci",
-		"followersDescription": "Viditeľné iba tým, ktorí vás sledujú",
-		"specified": "Priame",
-		"specifiedDescription": "Viditeľné iba pre konkrétnych používateľov",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Ostatní",
 	"quoteAttached": "Citované",
 	"recipient": "Prijímateľ",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Zrušiť",
 	"notSpecifiedMentionWarning": "Táto poznámka obsahuje spomenutých používateľov, ktorí nie sú medzi adresátmi.",
-	"add": "Pridať",
 	"annotation": "Komentáre",
 	"hashtags": "Hashtagy",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Priložiť súbor",
-	"upload": "Nahrať súbor",
-	"fromDrive": "Z disku",
-	"poll": "Hlasovanie",
 	"useCw": "Skryť obsah",
 	"mention": "Zmienka",
 	"addMfmFunction": "Add MFM",
@@ -3781,15 +3226,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Začnite písať...",
 	"postFormPlaceholdersF": "Čaká sa na písanie...",
 	"schedule": "Schedule",
-	"quote": "Citovať",
-	"reply": "Odpovedať",
 	"note": "Poznámka",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "Disable",
 	"neverShow": "Nabudúce nezobrazovať",
 	"reactionAcceptance": "Reaction Acceptance",
-	"all": "Všetko",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -3797,9 +3239,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Náhľad",
-	"reset": "Reset",
-	"resetAreYouSure": "Naozaj resetovať?",
 	"quoteQuestion": "Pripojiť ako citát?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "This note may annoy others.",
@@ -3820,44 +3259,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Áno",
-	"no": "Nie"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="th-TH">
 {
 	"account": "บัญชีผู้ใช้",
-	"visibility": "การมองเห็น",
-	"visibilityLabels": {
-		"public": "สาธารณะ",
-		"publicDescription": "โน้ตของคุณจะปรากฏแก่ผู้ใช้ทุกคน",
-		"home": "หน้าหลัก",
-		"homeDescription": "โพสต์ลงไทม์ไลน์หลักเท่านั้น",
-		"followers": "ผู้ติดตาม",
-		"followersDescription": "เฉพาะผู้ติดตามเท่านั้นที่มองเห็นได้",
-		"specified": "ไดเร็ค",
-		"specifiedDescription": "ทำให้มองเห็นได้เฉพาะผู้ใช้ที่ระบุเท่านั้น",
-		"disableFederation": "การปิดใช้งานสหพันธ์",
-		"disableFederationDescription": "อย่าส่งข้อมูลไปยังเซิร์ฟเวอร์อื่น"
-	},
-	"visibilityDisableFederation": "การปิดใช้งานสหพันธ์",
 	"other": "อื่น ๆ",
 	"quoteAttached": "อ้างอิง",
 	"recipient": "ผู้รับ",
 	"postFormShowHowToUse": "แสดงวิธีใช้ฟอร์ม",
 	"scheduleToPostOnX": "กำหนดเวลาให้โพสต์ไว้ที่ {x}",
-	"cancel": "ยกเลิก",
 	"notSpecifiedMentionWarning": "โน้ตนี้มีการกล่าวถึงผู้ใช้งานที่ไม่รวมอยู่ในผู้รับ",
-	"add": "เพิ่ม",
 	"annotation": "ข้อความเกริ่น",
 	"hashtags": "แฮชแท็ก",
 	"postFormUploaderTip": "ไฟล์ยังไม่ได้อัปโหลด สามารถตั้งค่าต่างๆ ได้จากเมนูของไฟล์ เช่น การเปลี่ยนชื่อ การครอปรูป การใส่ลายน้ำ และการบีบอัด ไฟล์จะถูกอัปโหลดโดยอัตโนมัติเมื่อโพสต์โน้ต",
 	"attachFile": "แนบไฟล์",
-	"upload": "อัปโหลด",
-	"fromDrive": "จากไดรฟ์",
-	"poll": "โพล",
 	"useCw": "ซ่อนเนื้อหา",
 	"mention": "กล่าวถึง",
 	"addMfmFunction": "เพิ่มการตกแต่ง",
@@ -3873,15 +3291,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "มาเขียนกันเถอะ",
 	"postFormPlaceholdersF": "กำลังรอให้คุณเขียน...",
 	"schedule": "กำหนดเวลา",
-	"quote": "อ้างอิง",
-	"reply": "ตอบกลับ",
 	"note": " โน้ต",
 	"disableFederationConfirm": "ปิดใช้งานสหพันธ์เลยใช่ไหม?",
 	"disableFederationConfirmWarn": "โพสต์จะยังคงเป็นสาธารณะต่อไป เว้นแต่จะตั้งค่าเป็นอย่างอื่น",
 	"disableFederationOk": "ปิดการใช้งานสหพันธ์",
 	"neverShow": "ไม่ต้องแสดงข้อความนี้อีก",
 	"reactionAcceptance": "การยอมรับรีแอคชั่น",
-	"all": "ทั้งหมด",
 	"likeOnlyForRemote": "ทั้งหมด (เฉพาะการถูกใจจากเซิร์ฟเวอร์ระยะไกล)",
 	"nonSensitiveOnly": "เฉพาะไม่มีเนื้อหาละเอียดอ่อน",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "เฉพาะไม่มีเนื้อหาละเอียดอ่อน (เฉพาะการถูกใจจากระยะไกลเท่านั้น)",
@@ -3889,9 +3304,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "บันทึกเป็นฉบับร่าง",
 	"draftsCannotCreateDraft": "ไม่สามารถสร้างฉบับร่างด้วยเนื้อหานี้ได้",
 	"schedulePost": "กำหนดเวลาให้โพสต์",
-	"preview": "แสดงตัวอย่าง",
-	"reset": "รีเซ็ต",
-	"resetAreYouSure": "รีเซ็ตเลยไหม?",
 	"quoteQuestion": "ต้องการที่จะแนบมันเพื่ออ้างอิงใช่ไหม?",
 	"attachAsFileQuestion": "ข้อความในคลิปบอร์ดยาวเกินไป คุณต้องการแนบเป็นไฟล์ข้อความหรือไม่?",
 	"thisPostMayBeAnnoying": "โน้ตนี้อาจจะเป็นการรบกวนผู้อื่นนะคะ",
@@ -3912,44 +3324,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "สามารถบันทึกเป็นฉบับร่าง ตั้งเวลาการโพสต์ ตั้งค่ารีแอคชั่น และดำเนินการอื่นๆ ได้",
 	"postFormHowToUseSubmit_title": "ปุ่มโพสต์",
 	"postFormHowToUseSubmit_description": "กดปุ่มนั้นเพื่อโพสต์โน้ต หรือกด Ctrl + Enter / Cmd + Return เพื่อโพสต์ก็ได้เช่นกัน",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "มีไฟล์ที่ยังไม่ได้อัปโหลด ต้องการละทิ้งและปิดฟอร์มหรือไม่?",
-	"yes": "ใช่",
-	"no": "ไม่"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "มีไฟล์ที่ยังไม่ได้อัปโหลด ต้องการละทิ้งและปิดฟอร์มหรือไม่?"
 }
 </locale>
 
 <locale lang="json" locale="tr-TR">
 {
 	"account": "Hesap",
-	"visibility": "Görünürlük",
-	"visibilityLabels": {
-		"public": "Halka açık",
-		"publicDescription": "Notunuz tüm kullanıcılar tarafından görülebilir olacaktır.",
-		"home": "Pano",
-		"homeDescription": "Yalnızca ana panoya gönder",
-		"followers": "Takipçiler",
-		"followersDescription": "Sadece takipçilerine görünür hale getir",
-		"specified": "Doğrudan",
-		"specifiedDescription": "Yalnızca belirli kullanıcılar için görünür hale getir",
-		"disableFederation": "Federasyon olmadan",
-		"disableFederationDescription": "Diğer sunuculara aktarma"
-	},
-	"visibilityDisableFederation": "Federasyon olmadan",
 	"other": "Diğer",
 	"quoteAttached": "Alıntı",
 	"recipient": "Alıcı",
 	"postFormShowHowToUse": "Form açıklamasını göster",
 	"scheduleToPostOnX": "{x} için bir gönderi planla",
-	"cancel": "Vazgeç",
 	"notSpecifiedMentionWarning": "Bu notta, alıcılar arasında yer almayan kullanıcılar hakkında bilgiler bulunmaktadır.",
-	"add": "Ekle",
 	"annotation": "Yorumlar",
 	"hashtags": "Hashtag'ler",
 	"postFormUploaderTip": "Dosya henüz yüklenmemiş. Dosya menüsünden dosyayı yeniden adlandırabilir, görüntüleri kırpabilir, filigran ekleyebilir ve dosyayı sıkıştırabilir veya sıkıştırmayı kaldırabilirsin. Notu yayınladığında dosyalar otomatik olarak yüklenir.",
 	"attachFile": "Dosyaları ekle",
-	"upload": "Yükle",
-	"fromDrive": "Drive'den",
-	"poll": "Anket",
 	"useCw": "İçeriği gizle",
 	"mention": "Bahset",
 	"addMfmFunction": "MFM ekle",
@@ -3965,15 +3356,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Yazmaya başlayın...",
 	"postFormPlaceholdersF": "Yazmanızı bekliyoruz...",
 	"schedule": "rezervasyon",
-	"quote": "Alıntı",
-	"reply": "Yanıtla",
 	"note": "Not",
 	"disableFederationConfirm": "Federasyonu cidden devre dışı bırakmak istiyor musun?",
 	"disableFederationConfirmWarn": "Federasyondan ayrılsa bile, aksi belirtilmedikçe gönderiler herkese açık olmaya devam edecek. Genellikle bunu yapmanız gerekmez.",
 	"disableFederationOk": "Devre Dışı",
 	"neverShow": "Bir daha gösterme",
 	"reactionAcceptance": "Tepki Kabulü",
-	"all": "Tümü",
 	"likeOnlyForRemote": "Tüm (Yalnızca uzak sunucu için beğeniler)",
 	"nonSensitiveOnly": "Hassas olmayanlar için",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Yalnızca hassas olmayanlar (Yalnızca uzaktan beğeniler)",
@@ -3981,9 +3369,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Taslak olarak kaydet",
 	"draftsCannotCreateDraft": "Bu içerikle taslak oluşturamazsınız.",
 	"schedulePost": "Bir gönderi planla",
-	"preview": "Önizleme",
-	"reset": "Sıfırla",
-	"resetAreYouSure": "Cidden sıfırlansın mı?",
 	"quoteQuestion": "Alıntı olarak ekle?",
 	"attachAsFileQuestion": "Panodaki metin uzun. Metin dosyası olarak eklemek ister misin?",
 	"thisPostMayBeAnnoying": "Bu not başkalarını rahatsız edebilir.",
@@ -4004,44 +3389,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "Taslak olarak kaydetme, gönderi planlama ve tepki ayarlama gibi diğer işlemleri de gerçekleştirebilirsiniz.",
 	"postFormHowToUseSubmit_title": "Gönder düğmesi",
 	"postFormHowToUseSubmit_description": "Bir not paylaşacağım. Ctrl + Enter / Cmd + Enter tuşlarını kullanarak da paylaşım yapabilirsiniz.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Yüklenmemiş dosyalar var, bunları silip formu kapatmak ister misin?",
-	"yes": "Evet",
-	"no": "Hayır"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "Yüklenmemiş dosyalar var, bunları silip formu kapatmak ister misin?"
 }
 </locale>
 
 <locale lang="json" locale="ug-CN">
 {
 	"account": "Account",
-	"visibility": "Visibility",
-	"visibilityLabels": {
-		"public": "Public",
-		"publicDescription": "Your note will be visible for all users",
-		"home": "Home",
-		"homeDescription": "Post to home timeline only",
-		"followers": "Followers",
-		"followersDescription": "Make visible to your followers only",
-		"specified": "Direct",
-		"specifiedDescription": "Make visible for specified users only",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Other",
 	"quoteAttached": "Quote",
 	"recipient": "Recipient",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Cancel",
 	"notSpecifiedMentionWarning": "This note contains mentions of users not included as recipients",
-	"add": "Add",
 	"annotation": "Comments",
 	"hashtags": "Hashtags",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Attach files",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
-	"poll": "Poll",
 	"useCw": "Hide content",
 	"mention": "Mention",
 	"addMfmFunction": "Add MFM",
@@ -4057,15 +3421,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Start writing...",
 	"postFormPlaceholdersF": "Waiting for you to write...",
 	"schedule": "Schedule",
-	"quote": "Quote",
-	"reply": "Reply",
 	"note": "Note",
 	"disableFederationConfirm": "Really disable federation?",
 	"disableFederationConfirmWarn": "Even if defederated, posts will continue to be public unless set otherwise. You usually do not need to do this.",
 	"disableFederationOk": "Disable",
 	"neverShow": "Don't show again",
 	"reactionAcceptance": "Reaction Acceptance",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -4073,9 +3434,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Preview",
-	"reset": "Reset",
-	"resetAreYouSure": "Really reset?",
 	"quoteQuestion": "Append as quote?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
 	"thisPostMayBeAnnoying": "This note may annoy others.",
@@ -4096,44 +3454,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Yes",
-	"no": "No"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
 	"account": "Акаунти",
-	"visibility": "Видимість",
-	"visibilityLabels": {
-		"public": "Публічний",
-		"publicDescription": "Для всіх користувачів",
-		"home": "Домівка",
-		"homeDescription": "Лише на домашній стрічці",
-		"followers": "Підписники",
-		"followersDescription": "Тільки для підписників",
-		"specified": "Особисто",
-		"specifiedDescription": "Лише для певних користувачів",
-		"disableFederation": "Defederate",
-		"disableFederationDescription": "Don't transmit to other instances"
-	},
-	"visibilityDisableFederation": "Defederate",
 	"other": "Інше",
 	"quoteAttached": "Цитата",
 	"recipient": "Отримувач",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Заплановано створити нотатку на {x}",
-	"cancel": "Скасувати",
 	"notSpecifiedMentionWarning": "Згадки, не включені до пункту призначення",
-	"add": "Додати",
 	"annotation": "Коментарі",
 	"hashtags": "Хештеґ",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Прикріпити файл",
-	"upload": "Завантажити",
-	"fromDrive": "З диска",
-	"poll": "Опитування",
 	"useCw": "Приховати вміст",
 	"mention": "Згадка",
 	"addMfmFunction": "Додати MFM",
@@ -4149,15 +3486,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Напишіть тут, будь ласка...",
 	"postFormPlaceholdersF": "Чекаю коли ви напишете...",
 	"schedule": "Запланувати",
-	"quote": "Цитата",
-	"reply": "Відповісти",
 	"note": "Запис",
 	"disableFederationConfirm": "Справді вимкнути федерацію?",
 	"disableFederationConfirmWarn": "Навіть якщо федерацію вимкнено, дописи залишатимуться публічними, якщо не вказано інше. Зазвичай вам не потрібно цього робити.",
 	"disableFederationOk": "Не федерується",
 	"neverShow": "Більше не показувати",
 	"reactionAcceptance": "Прийняття реакцій",
-	"all": "Всі",
 	"likeOnlyForRemote": "Усі — лише вподобання для віддалених інстансів",
 	"nonSensitiveOnly": "Тільки нечутливий контент",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Тільки нечутливий контент (тільки віддалені вподобання)",
@@ -4165,9 +3499,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Запланувати нотатку",
-	"preview": "Попередній перегляд",
-	"reset": "Скинути",
-	"resetAreYouSure": "Справді скинути?",
 	"quoteQuestion": "Ви хочете додати цитату?",
 	"attachAsFileQuestion": "Текст у буфері обміну довгий. Хочете прикріпити його як текстовий файл?",
 	"thisPostMayBeAnnoying": "Ця нотатка може дратувати інших.",
@@ -4188,44 +3519,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Так",
-	"no": "Ні"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="vi-VN">
 {
 	"account": "Tài khoản của bạn",
-	"visibility": "Hiển thị",
-	"visibilityLabels": {
-		"public": "Công khai",
-		"publicDescription": "Mọi người đều có thể đọc tút của bạn",
-		"home": "Trang chính",
-		"homeDescription": "Chỉ đăng lên bảng tin nhà",
-		"followers": "Người theo dõi",
-		"followersDescription": "Dành riêng cho người theo dõi",
-		"specified": "Nhắn riêng",
-		"specifiedDescription": "Chỉ người được nhắc đến mới thấy",
-		"disableFederation": "Không liên hợp",
-		"disableFederationDescription": "Không đưa tin cho chủ máy khác"
-	},
-	"visibilityDisableFederation": "Không liên hợp",
 	"other": "Khác",
 	"quoteAttached": "Trích dẫn",
 	"recipient": "Người nhận",
 	"postFormShowHowToUse": "Show how to use this form",
 	"scheduleToPostOnX": "Scheduled to note on {x}",
-	"cancel": "Hủy",
 	"notSpecifiedMentionWarning": "Tút này có đề cập đến những người không mong muốn",
-	"add": "Thêm",
 	"annotation": "Bình luận",
 	"hashtags": "Hashtag",
 	"postFormUploaderTip": "The file has not yet been uploaded. From the file menu, you can rename, crop images, watermark and compress or uncompress the file. Files are automatically uploaded when you publish a note.",
 	"attachFile": "Đính kèm tập tin",
-	"upload": "Tải lên",
-	"fromDrive": "Từ ổ đĩa",
-	"poll": "Bình chọn",
 	"useCw": "Ẩn nội dung",
 	"mention": "Nhắc đến",
 	"addMfmFunction": "Add MFM",
@@ -4241,15 +3551,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "Cứ viết trên đây",
 	"postFormPlaceholdersF": "Đang chờ bạn viết...",
 	"schedule": "Schedule",
-	"quote": "Trích dẫn",
-	"reply": "Trả lời",
 	"note": "Bài viết",
 	"disableFederationConfirm": "Bạn có muốn làm điều đó mà không cần liên minh không?",
 	"disableFederationConfirmWarn": "Ngay cả khi bị trì hoãn, bài đăng vẫn sẽ tiếp tục là công khai trừ khi được thiết lập khác. Bạn thường không cần phải làm điều này.",
 	"disableFederationOk": "Vô hiệu hoá",
 	"neverShow": "Không hiển thị nữa",
 	"reactionAcceptance": "Phản ứng chấp nhận",
-	"all": "Tất cả",
 	"likeOnlyForRemote": "Tất cả (chỉ bao gồm lượt thích trên các máy chủ khác)",
 	"nonSensitiveOnly": "Chỉ nội dung không nhạy cảm",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Chỉ nội dung không nhạy cảm (chỉ bao gồm lượt thích từ máy chủ khác)",
@@ -4257,9 +3564,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "Save to Draft",
 	"draftsCannotCreateDraft": "You cannot create a draft with this content.",
 	"schedulePost": "Schedule note",
-	"preview": "Xem trước",
-	"reset": "cài lại",
-	"resetAreYouSure": "Bạn có chắc muốn đặt lại?",
 	"quoteQuestion": "Trích dẫn lại?",
 	"attachAsFileQuestion": "Văn bản ở trong bộ nhớ tạm rất dài. Bạn có muốn đăng nó dưới dạng một tệp văn bản không?",
 	"thisPostMayBeAnnoying": "Bạn đăng bài này có thể làm phiền cho người ta.",
@@ -4280,44 +3584,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "You can save current content to drafts, schedule posts, set reactions, and perform other actions.",
 	"postFormHowToUseSubmit_title": "Post button",
 	"postFormHowToUseSubmit_description": "Post your notes by pressing this button. You can also post using Ctrl + Enter / Cmd + Enter.",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?",
-	"yes": "Đồng ý",
-	"no": "Từ chối"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "There are files that have not been uploaded, do you want to discard them and close the form?"
 }
 </locale>
 
 <locale lang="json" locale="zh-CN">
 {
 	"account": "账户",
-	"visibility": "可见性",
-	"visibilityLabels": {
-		"public": "公开",
-		"publicDescription": "所有用户均可见",
-		"home": "首页",
-		"homeDescription": "仅发布至首页",
-		"followers": "仅关注者",
-		"followersDescription": "仅关注者可见",
-		"specified": "指定用户",
-		"specifiedDescription": "仅发送至指定用户",
-		"disableFederation": "仅限本地",
-		"disableFederationDescription": "不发送到其他服务器"
-	},
-	"visibilityDisableFederation": "仅限本地",
 	"other": "其他",
 	"quoteAttached": "已引用",
 	"recipient": "收件人",
 	"postFormShowHowToUse": "显示窗口说明",
 	"scheduleToPostOnX": "预定在 {x} 发出",
-	"cancel": "取消",
 	"notSpecifiedMentionWarning": "有未添加到收件人的提及",
-	"add": "添加",
 	"annotation": "注解",
 	"hashtags": "话题标签",
 	"postFormUploaderTip": "文件尚未上传。您可以在文件菜单中设置重命名、裁剪图片、添加水印以及是否压缩等功能。文件将在帖子发布时自动上传。",
 	"attachFile": "添加附件",
-	"upload": "本地上传",
-	"fromDrive": "从网盘中",
-	"poll": "投票",
 	"useCw": "隐藏内容",
 	"mention": "提及",
 	"addMfmFunction": "添加装饰",
@@ -4333,15 +3616,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "写些什么吧",
 	"postFormPlaceholdersF": "期待您的发文…",
 	"schedule": "定时",
-	"quote": "引用",
-	"reply": "回复",
 	"note": "发帖",
 	"disableFederationConfirm": "确定要禁用联邦交互？",
 	"disableFederationConfirmWarn": "即使禁用联邦交互，也不会将帖子设为私有。在大多数情况下，没有必要禁用联邦交互。",
 	"disableFederationOk": "禁用联邦",
 	"neverShow": "不再显示",
 	"reactionAcceptance": "接受表情回应",
-	"all": "全部",
 	"likeOnlyForRemote": "全部（远程仅点赞）",
 	"nonSensitiveOnly": "仅限非敏感内容",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "仅限非敏感内容（远程仅点赞）",
@@ -4349,9 +3629,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "保存到草稿",
 	"draftsCannotCreateDraft": "此内容无法创建草稿。",
 	"schedulePost": "定时发布",
-	"preview": "预览",
-	"reset": "重置",
-	"resetAreYouSure": "确定要重置吗？",
 	"quoteQuestion": "是否引用此链接内容？",
 	"attachAsFileQuestion": "剪贴板内的文字过长。要转换为文本文件并添加吗？",
 	"thisPostMayBeAnnoying": "该帖文可能会使他人感到不适。",
@@ -4372,44 +3649,23 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "可在此进行保存草稿、设置定时发帖、设置回应等其它操作。",
 	"postFormHowToUseSubmit_title": "发帖按钮",
 	"postFormHowToUseSubmit_description": "发布帖子。也可用 Ctrl + Enter / Cmd + Enter 来发帖。",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "还有一些文件尚未上传，要放弃上传并关闭窗口吗？",
-	"yes": "是",
-	"no": "否"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "还有一些文件尚未上传，要放弃上传并关闭窗口吗？"
 }
 </locale>
 
 <locale lang="json" locale="zh-TW">
 {
 	"account": "帳戶",
-	"visibility": "可見性",
-	"visibilityLabels": {
-		"public": "公開",
-		"publicDescription": "發佈給所有使用者",
-		"home": "首頁",
-		"homeDescription": "僅發布至首頁的時間軸",
-		"followers": "追隨者",
-		"followersDescription": "僅發布至關注者",
-		"specified": "指定使用者",
-		"specifiedDescription": "僅發布至指定使用者",
-		"disableFederation": "停用聯邦",
-		"disableFederationDescription": "不發送到其他伺服器"
-	},
-	"visibilityDisableFederation": "停用聯邦",
 	"other": "其他",
 	"quoteAttached": "引用",
 	"recipient": "收件人",
 	"postFormShowHowToUse": "顯示表單說明",
 	"scheduleToPostOnX": "排定在 {x} 發布",
-	"cancel": "取消",
 	"notSpecifiedMentionWarning": "此貼文有未指定的提及",
-	"add": "新增",
 	"annotation": "註解",
 	"hashtags": "標籤",
 	"postFormUploaderTip": "檔案尚未上傳。您可以從檔案選單中設定重新命名、裁切圖片、加上浮水印、是否壓縮等選項。檔案會在發布貼文時自動上傳。\n",
 	"attachFile": "上傳附件",
-	"upload": "上傳",
-	"fromDrive": "從雲端空間中選擇",
-	"poll": "票選活動",
 	"useCw": "隱藏內容",
 	"mention": "提及",
 	"addMfmFunction": "插入 MFM 功能語法",
@@ -4425,15 +3681,12 @@ html[data-color-scheme=light] .preview {
 	"postFormPlaceholdersE": "寫些什麼吧……",
 	"postFormPlaceholdersF": "靜待發文……",
 	"schedule": "排定",
-	"quote": "引用",
-	"reply": "回覆",
 	"note": "貼文",
 	"disableFederationConfirm": "要停止聯邦功能嗎？",
 	"disableFederationConfirmWarn": "即使停止了聯邦功能，貼文也不會變成私密的。在大部分的情況下，沒有必要停止聯邦功能。",
 	"disableFederationOk": "停止聯邦功能",
 	"neverShow": "不再顯示",
 	"reactionAcceptance": "接受表情反應",
-	"all": "全部",
 	"likeOnlyForRemote": "全部（遠端僅限讚）",
 	"nonSensitiveOnly": "僅限非敏感",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "僅限非敏感（遠端僅限讚）",
@@ -4441,9 +3694,6 @@ html[data-color-scheme=light] .preview {
 	"draftsSaveToDraft": "儲存為草稿",
 	"draftsCannotCreateDraft": "無法以此內容建立草稿。\n",
 	"schedulePost": "排定發布",
-	"preview": "預覽",
-	"reset": "重設",
-	"resetAreYouSure": "確定要重設嗎？",
 	"quoteQuestion": "是否要引用？",
 	"attachAsFileQuestion": "剪貼簿的文字較長。請問是否要將其以文字檔的方式附加呢？",
 	"thisPostMayBeAnnoying": "這篇貼文可能會造成別人的困擾。",
@@ -4464,8 +3714,6 @@ html[data-color-scheme=light] .preview {
 	"postFormHowToUseMenu_description": "可以進行其他操作，例如儲存為草稿、預約發佈貼文、或設定反應等。\n",
 	"postFormHowToUseSubmit_title": "貼文按鈕",
 	"postFormHowToUseSubmit_description": "發布貼文。也可以使用 Ctrl + Enter 或 Cmd + Enter 來發布。",
-	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "尚有未上傳的檔案，確定要放棄並關閉表單嗎？",
-	"yes": "是",
-	"no": "否"
+	"postFormQuitInspiteOfThereAreUnuploadedFilesConfirm": "尚有未上傳的檔案，確定要放棄並關閉表單嗎？"
 }
 </locale>

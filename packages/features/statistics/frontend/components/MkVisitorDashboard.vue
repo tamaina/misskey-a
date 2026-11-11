@@ -32,11 +32,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<div v-if="stats && instance.clientOptions.showActivitiesForVisitor !== false" :class="$style.stats">
 		<div :class="[$style.statsItem, $style.panel]">
-			<div :class="$style.statsItemLabel">{{ $locale.sfc.users }}</div>
+			<div :class="$style.statsItemLabel">{{ globalLocale.env.users }}</div>
 			<div :class="$style.statsItemCount"><MkNumber :value="stats.originalUsersCount"/></div>
 		</div>
 		<div :class="[$style.statsItem, $style.panel]">
-			<div :class="$style.statsItemLabel">{{ $locale.sfc.notes }}</div>
+			<div :class="$style.statsItemLabel">{{ globalLocale.env.notes }}</div>
 			<div :class="$style.statsItemCount"><MkNumber :value="stats.originalNotesCount"/></div>
 		</div>
 	</div>
@@ -53,6 +53,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { instanceName } from '@features/boot/frontend/shared/config.js';
@@ -64,6 +65,9 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import MkNumber from '@features/ui/frontend/components/MkNumber.vue';
 import { openInstanceMenu } from '@features/navigation/frontend/ui/_common_/common.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const XActiveUsersChart = defineAsyncComponent(() => import('@features/statistics/frontend/components/MkVisitorDashboard.ActiveUsersChart.vue'));
 
@@ -214,8 +218,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "سجل في هذا المثيل",
   "exploreOtherServers": "اعثر على مثيل آخر",
   "login": "لِج",
-  "users": "المستخدمون",
-  "notes": "الملاحظات",
   "letsLookAtTimeline": "Have a look at the timeline"
 }
 </locale>
@@ -229,8 +231,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Registra't en aquesta instància ",
   "exploreOtherServers": "Cerca una altra instància ",
   "login": "Iniciar sessió",
-  "users": "Usuaris",
-  "notes": "Notes",
   "letsLookAtTimeline": "Dona una ullada a la línia de temps"
 }
 </locale>
@@ -244,8 +244,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Zaregistrovat se v této instanci",
   "exploreOtherServers": "Podívat se na ostatní instance",
   "login": "Přihlásit se",
-  "users": "Uživatelé",
-  "notes": "Poznámky",
   "letsLookAtTimeline": "Podívejte se na časovou osu"
 }
 </locale>
@@ -259,8 +257,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Sign up at this instance",
   "exploreOtherServers": "Look for another instance",
   "login": "Sign In",
-  "users": "Users",
-  "notes": "Notes",
   "letsLookAtTimeline": "Have a look at the timeline"
 }
 </locale>
@@ -274,8 +270,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Bei dieser Instanz registrieren",
   "exploreOtherServers": "Eine andere Instanz finden",
   "login": "Anmelden",
-  "users": "Benutzer",
-  "notes": "Notizen",
   "letsLookAtTimeline": "Die Chronik durchstöbern"
 }
 </locale>
@@ -289,8 +283,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Sign up at this instance",
   "exploreOtherServers": "Look for another instance",
   "login": "Sign In",
-  "users": "Users",
-  "notes": "Notes",
   "letsLookAtTimeline": "Have a look at the timeline"
 }
 </locale>
@@ -304,8 +296,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Registrarse en esta instancia",
   "exploreOtherServers": "Buscar otra instancia",
   "login": "Iniciar sesión",
-  "users": "Usuarios",
-  "notes": "Notas",
   "letsLookAtTimeline": "Mira la línea de tiempo"
 }
 </locale>
@@ -319,8 +309,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "S'inscrire à cette instance",
   "exploreOtherServers": "Trouver une autre instance",
   "login": "Se connecter",
-  "users": "Utilisateur·rice·s",
-  "notes": "Notes",
   "letsLookAtTimeline": "Jetez un coup d'œil au fil"
 }
 </locale>
@@ -334,8 +322,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Gabung peladen ini",
   "exploreOtherServers": "Cari peladen lain",
   "login": "Masuk",
-  "users": "Pengguna",
-  "notes": "Catatan",
   "letsLookAtTimeline": "LIhat lini masa"
 }
 </locale>
@@ -349,8 +335,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Registrati su questa istanza",
   "exploreOtherServers": "Trova altre istanze",
   "login": "Accedi",
-  "users": "Profili",
-  "notes": "Note",
   "letsLookAtTimeline": "Sbircia la timeline"
 }
 </locale>
@@ -364,8 +348,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "このサーバーに登録する",
   "exploreOtherServers": "他のサーバーを探す",
   "login": "ログイン",
-  "users": "ユーザー",
-  "notes": "ノート",
   "letsLookAtTimeline": "タイムラインを見てみる"
 }
 </locale>
@@ -379,8 +361,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "このサーバーに登録するわ",
   "exploreOtherServers": "他のサーバー見てみる",
   "login": "ログイン",
-  "users": "ユーザー",
-  "notes": "ノート",
   "letsLookAtTimeline": "タイムライン見てみーや"
 }
 </locale>
@@ -394,8 +374,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Sign up at this instance",
   "exploreOtherServers": "Look for another instance",
   "login": "Sign In",
-  "users": "Users",
-  "notes": "Notes",
   "letsLookAtTimeline": "Have a look at the timeline"
 }
 </locale>
@@ -409,8 +387,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Sign up at this instance",
   "exploreOtherServers": "Look for another instance",
   "login": "ಪ್ರವೇಶ",
-  "users": "ಬಳಕೆದಾರ",
-  "notes": "Notes",
   "letsLookAtTimeline": "Have a look at the timeline"
 }
 </locale>
@@ -424,8 +400,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "이 서버에 가입",
   "exploreOtherServers": "다른 서버 찾기",
   "login": "로그인",
-  "users": "유저",
-  "notes": "노트",
   "letsLookAtTimeline": "타임라인 구경하기"
 }
 </locale>
@@ -439,8 +413,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Sign up at this instance",
   "exploreOtherServers": "Look for another instance",
   "login": "Inloggen",
-  "users": "Gebruikers",
-  "notes": "Notities",
   "letsLookAtTimeline": "Have a look at the timeline"
 }
 </locale>
@@ -454,8 +426,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Sign up at this instance",
   "exploreOtherServers": "Utforsk andre severe",
   "login": "Logg inn",
-  "users": "Brukere",
-  "notes": "Notes",
   "letsLookAtTimeline": "La oss se på tidslinje"
 }
 </locale>
@@ -469,8 +439,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Dołącz do chaty",
   "exploreOtherServers": "Szukaj innej instancji",
   "login": "Zaloguj się",
-  "users": "Użytkownicy",
-  "notes": "Wpisy",
   "letsLookAtTimeline": "Have a look at the timeline"
 }
 </locale>
@@ -484,8 +452,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Cadastrar-se na instância",
   "exploreOtherServers": "Buscar outra instância",
   "login": "Iniciar sessão",
-  "users": "Usuários",
-  "notes": "Posts",
   "letsLookAtTimeline": "Dar uma olhada na linha do tempo"
 }
 </locale>
@@ -499,8 +465,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Присоединяйтесь к этому серверу",
   "exploreOtherServers": "Искать другие сервера",
   "login": "Войти",
-  "users": "Пользователи",
-  "notes": "Заметки",
   "letsLookAtTimeline": "Давайте посмотрим на ленту"
 }
 </locale>
@@ -514,8 +478,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Sign up at this instance",
   "exploreOtherServers": "Look for another instance",
   "login": "Prihlásiť sa",
-  "users": "Používatelia",
-  "notes": "Poznámky",
   "letsLookAtTimeline": "Have a look at the timeline"
 }
 </locale>
@@ -529,8 +491,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "ลงทะเบียนในเซิร์ฟเวอร์นี้",
   "exploreOtherServers": "มองหาเซิร์ฟเวอร์อื่น",
   "login": "เข้าสู่ระบบ",
-  "users": "ผู้ใช้",
-  "notes": " โน้ต",
   "letsLookAtTimeline": "มาดูไทม์ไลน์กัน"
 }
 </locale>
@@ -544,8 +504,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Kaydol",
   "exploreOtherServers": "Diğer sunucuları keşfet",
   "login": "Oturum Aç",
-  "users": "Kullanıcılar",
-  "notes": "Notlar",
   "letsLookAtTimeline": "Pano'ya bir göz atın"
 }
 </locale>
@@ -559,8 +517,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Sign up at this instance",
   "exploreOtherServers": "Look for another instance",
   "login": "كىرىش",
-  "users": "Users",
-  "notes": "Notes",
   "letsLookAtTimeline": "Have a look at the timeline"
 }
 </locale>
@@ -574,8 +530,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Зареєструватися на цьому сервері",
   "exploreOtherServers": "Знайти інший сервер",
   "login": "Увійти",
-  "users": "Користувачі",
-  "notes": "Записи",
   "letsLookAtTimeline": "Перегляд історії"
 }
 </locale>
@@ -589,8 +543,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "Đăng ký trên chủ máy này",
   "exploreOtherServers": "Tìm chủ máy khác",
   "login": "Đăng nhập",
-  "users": "Người dùng",
-  "notes": "Bài Viết",
   "letsLookAtTimeline": "Thử xem Timeline"
 }
 </locale>
@@ -604,8 +556,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "在本服务器上注册",
   "exploreOtherServers": "探索其他服务器",
   "login": "登录",
-  "users": "用户",
-  "notes": "帖子",
   "letsLookAtTimeline": "看看时间线"
 }
 </locale>
@@ -619,8 +569,6 @@ function showMenu(ev: PointerEvent) {
   "joinThisServer": "在此伺服器上註冊",
   "exploreOtherServers": "探索其他伺服器",
   "login": "登入",
-  "users": "使用者",
-  "notes": "貼文",
   "letsLookAtTimeline": "看看時間軸"
 }
 </locale>

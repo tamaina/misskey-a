@@ -15,8 +15,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				{{ $locale.sfc.accountMigrationMoveFromDescription }}
 			</FormInfo>
 			<div>
-				<MkButton :disabled="accountAliases.length >= 10" inline style="margin-right: 8px;" @click="add"><i class="ti ti-plus"></i> {{ $locale.sfc.add }}</MkButton>
-				<MkButton inline primary @click="save"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
+				<MkButton :disabled="accountAliases.length >= 10" inline style="margin-right: 8px;" @click="add"><i class="ti ti-plus"></i> {{ globalLocale.env.add }}</MkButton>
+				<MkButton inline primary @click="save"><i class="ti ti-check"></i> {{ globalLocale.env.save }}</MkButton>
 			</div>
 			<div class="_gaps">
 				<MkInput v-for="(_, i) in accountAliases" v-model="accountAliases[i]">
@@ -58,6 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import FormInfo from '@features/ui/frontend/components/MkInfo.vue';
@@ -70,6 +71,9 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -133,8 +137,6 @@ init();
 	"accountMigrationMoveFrom": "انقل حسابًا آخر لهذا الحساب",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "إضافة",
-	"save": "حفظ",
 	"accountMigrationMoveFromLabel": "الحساب الأصلي #{n}",
 	"accountMigrationMoveTo": "انقل هذا الحساب لحساب آخر",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -154,8 +156,6 @@ init();
 	"accountMigrationMoveFrom": "Migrar un altre compte a aquest",
 	"accountMigrationMoveFromSub": "Crear un àlies per un altre compte",
 	"accountMigrationMoveFromDescription": "Has de crear un àlies del compte que vols migrar en aquest compte.\nFes servir aquest format per posar el compte que vols migrar: @nomusuari@servidor.exemple.com\nPer esborrar l'àlies deixa el camp en blanc (no és recomanable de fer)",
-	"add": "Afegir",
-	"save": "Desa",
 	"accountMigrationMoveFromLabel": "Compte original #{n}",
 	"accountMigrationMoveTo": "Migrar aquest compte a un altre",
 	"accountMigrationMoveAccountDescription": "Això migrarà el teu compte a un altre diferent.\n\u3000・Els seguidors d'aquest compte és passaran al compte nou de forma automàtica\n\u3000・Es deixaran de seguir a tots els usuaris que es segueixen actualment en aquest compte\n\u3000・No es poden crear notes noves, etc. en aquest compte\n\nSi bé la migració de seguidors es automàtica, has de preparar alguns pasos manualment per migrar la llista d'usuaris que segueixes. Per fer això has d'exportar els seguidors que després importaraes al compte nou mitjançant el menú de configuració. El mateix procediment s'ha de seguir per less teves llistes i els teus usuaris silenciats i bloquejats.\n\n(Aquesta explicació s'aplica a Misskey v13.12.0 i posteriors. Altres aplicacions, com Mastodon, poden funcionar diferent.)",
@@ -175,8 +175,6 @@ init();
 	"accountMigrationMoveFrom": "Migrace jiného účtu na tento účet",
 	"accountMigrationMoveFromSub": "Vytvořit alias na jiný účet",
 	"accountMigrationMoveFromDescription": "Pro účet, ze kterého se chcete přesunout, musíte vytvořit alias na tomto účtu.\nZadejte účet, ze kterého chcete přejít, v následujícím formátu: @username@server.example.com\nChcete-li alias odstranit, ponechte pole prázdné (nedoporučuje se).",
-	"add": "Přidat",
-	"save": "Uložit",
 	"accountMigrationMoveFromLabel": "Původní účet #{n}",
 	"accountMigrationMoveTo": "Přesunout tenhle účet do jiného",
 	"accountMigrationMoveAccountDescription": "Tím dojde k migraci vašeho účtu na jiný účet.\n\u3000・Sledovatelé z tohoto účtu budou automaticky převedeni na nový účet.\n\u3000・Tento účet zruší sledování všech uživatelů, které aktuálně sleduje.\n\u3000・Na tomto účtu nebude možné vytvářet nové poznámky atd.\n\nZatímco migrace sledovaných uživatelů probíhá automaticky, pro migraci seznamu sledovaných uživatelů je nutné připravit některé kroky ručně. Za tímto účelem proveďte export sledovaných, který později naimportujete na nový účet v nabídce nastavení. Stejný postup platí pro seznamy i pro ztlumené a zablokované uživatele.\n\n(Tento výklad platí pro Misskey v13.12.0 a novější. Jiný software ActivityPub, například Mastodon, může fungovat jinak.)",
@@ -196,8 +194,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Add",
-	"save": "Save",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -217,8 +213,6 @@ init();
 	"accountMigrationMoveFrom": "Von einem anderen Konto zu diesem migrieren",
 	"accountMigrationMoveFromSub": "Alias für ein anderes Konto erstellen",
 	"accountMigrationMoveFromDescription": "Um von einem anderen Konto zu diesem zu migrieren, muss zuvor hier ein Alias eingerichtet werden.\nGib das Konto, von dem migriert werden soll, in folgendem Format ein: @username@server.example.com\n\nZum Löschen des Alias kann das Feld leergelassen werden (nicht empfohlen).",
-	"add": "Hinzufügen",
-	"save": "Speichern",
 	"accountMigrationMoveFromLabel": "Migrationsursprung #{n}",
 	"accountMigrationMoveTo": "Dieses Konto zu einem neuen migrieren",
 	"accountMigrationMoveAccountDescription": "Hierdurch wird dein Konto zu einem anderen migriert.\n\u3000・Follower von diesem Konto werden automatisch auf das neue Konto migriert\n\u3000・Dieses Konto wird allen Nutzern, denen es derzeit folgt, nicht mehr folgen\n\u3000・Mit diesem Konto können keine neuen Notizen usw. erstellt werden\n\nWährend die Migration der Follower automatisch erfolgt, muss die Migration der Konten, denen du folgst, manuell vorbereitet werden. Exportiere hierzu die Liste der gefolgten Nutzer über das Einstellungsmenu, und importiere diese Liste im neuen Konto. Das gleiche Verfahren gilt für erstellte Listen und stummgeschaltete oder blockierte Nutzer.\n\n(Diese Erklärung gilt für Misskey v13.12.0 oder später. Die Funktionsweise andere ActivityPub-Software, beispielsweise Mastodon,  kann hiervon abweichen.)",
@@ -238,8 +232,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Add",
-	"save": "Save",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -259,8 +251,6 @@ init();
 	"accountMigrationMoveFrom": "Trasladar de otra cuenta a ésta",
 	"accountMigrationMoveFromSub": "Crear un alias para otra cuenta.",
 	"accountMigrationMoveFromDescription": "Si quieres transferir seguidores de otra cuenta a esta cuenta y trasladarlos, tendrás que crear un alias aquí. Asegúrate de crearlo antes de realizar el traslado. Introduce la cuenta desde la que estás moviendo los seguidores así: @person@instance.com",
-	"add": "Agregar",
-	"save": "Guardar",
 	"accountMigrationMoveFromLabel": "Cuenta desde la que se realiza el traslado #{n}",
 	"accountMigrationMoveTo": "Mover esta cuenta a una nueva",
 	"accountMigrationMoveAccountDescription": "Esta operación no puede deshacerse. En primer lugar, asegúrese de haber creado un alias para esta cuenta en la cuenta a la que se va a trasladar. Después de crear el alias, introduzca la cuenta a la que se está trasladando de la siguiente manera: @person@instance.com",
@@ -280,8 +270,6 @@ init();
 	"accountMigrationMoveFrom": "Migrer un autre compte vers le présent compte",
 	"accountMigrationMoveFromSub": "Créer un alias vers un autre compte",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Ajouter",
-	"save": "Enregistrer",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -301,8 +289,6 @@ init();
 	"accountMigrationMoveFrom": "Pindahkan akun lain ke akun ini",
 	"accountMigrationMoveFromSub": "Buat alias ke akun lain",
 	"accountMigrationMoveFromDescription": "Kamu harus membuat alias untuk akun asal kamu berpindah ke akun ini\nMasukkan alias akun asal kamu berpindah ke dalam format berikut: @namapengguna@nama.server.com\nUntuk menghapus alias, kosongkan kolom ini (tidak direkomendasikan).",
-	"add": "Tambahkan",
-	"save": "Simpan",
 	"accountMigrationMoveFromLabel": "Akun asli #{n}",
 	"accountMigrationMoveTo": "Pindahkan akun ini ke akun lain",
 	"accountMigrationMoveAccountDescription": "Hal ini akan memindahkan akun kamu ke akun lain.\n\u3000・Pengikut dari akun ini akan secara otomatis dipindahkan ke akun baru\n\u3000・Akun ini akan berhenti mengikuti dari semua pengguna yang sedang kamu ikuti\n\u3000・Kamu akan tidak dapat membuat catatan baru dan lain-lain pada akun ini\n\nMeskipun pemindahan pengikut dilakukan secara otomatis, kamu harus mempersiapkan beberapa langkah secara manual untuk memindahkan daftar pengguna yang sedang kamu ikuti. Untuk melakukan tersebut, lakukan ekspor daftar ikuti yang nantinya dapat kamu impor pada menu pengaturan di akun baru kamu. Prosedur yang sama juga dapat diterapkan pada daftar seperti pengguna yang kamu bisukan atau blokir.\n\n(Penjelasan ini hanya berlaku pada Misskey versi 13.12.0 dan setelahnya. Perangkat lunak ActivityPub lainnya seperti Mastodon berkemungkinan befungsi berbeda.)",
@@ -322,8 +308,6 @@ init();
 	"accountMigrationMoveFrom": "Migra un altro profilo dentro a questo",
 	"accountMigrationMoveFromSub": "Crea un alias verso un altro profilo remoto",
 	"accountMigrationMoveFromDescription": "Se desideri spostare i Follower da un altro profilo a questo, devi prima creare un alias qui. Assicurati averlo creato PRIMA di eseguire l'attività! Inserisci l'indirizzo del profilo mittente in questo modo: @persona@vecchia.istanza.it",
-	"add": "Aggiungi",
-	"save": "Salva",
 	"accountMigrationMoveFromLabel": "Profilo da cui migrare n. {n}",
 	"accountMigrationMoveTo": "Migrare questo profilo verso un un altro",
 	"accountMigrationMoveAccountDescription": "Questa attività è irreversibile! Innanzitutto, assicurati di aver creato, nella istanza di destinazione, un alias con l'indirizzo di questo profilo. Successivamente, indica qui il profilo di destinazione in questo modo: @persona@istanza.it",
@@ -343,8 +327,6 @@ init();
 	"accountMigrationMoveFrom": "別のアカウントからこのアカウントに移行",
 	"accountMigrationMoveFromSub": "別のアカウントへエイリアスを作成",
 	"accountMigrationMoveFromDescription": "別のアカウントからこのアカウントに移行したい場合、ここでエイリアスを作成しておく必要があります。\n移行元のアカウントをこのように入力してください: @username@server.example.com\n削除するには、入力欄を空にして保存します（非推奨）。",
-	"add": "追加",
-	"save": "保存",
 	"accountMigrationMoveFromLabel": "移行元のアカウント #{n}",
 	"accountMigrationMoveTo": "このアカウントを新しいアカウントへ移行",
 	"accountMigrationMoveAccountDescription": "新しいアカウントへ移行します。\n\u3000・フォロワーが新しいアカウントを自動でフォローします\n\u3000・このアカウントからのフォローは全て解除されます\n\u3000・このアカウントではノートの作成などができなくなります\n\nフォロワーの移行は自動ですが、フォローの移行は手動で行う必要があります。移行前にこのアカウントでフォローエクスポートし、移行後すぐに移行先アカウントでインポートを行なってください。\nリスト・ミュート・ブロックについても同様ですので、手動で移行する必要があります。\n\n（この説明はこのサーバー（Misskey v13.12.0以降）の仕様です。Mastodonなどの他のActivityPubソフトウェアでは挙動が異なる場合があります。）",
@@ -364,8 +346,6 @@ init();
 	"accountMigrationMoveFrom": "別のアカウントからこのアカウントに引っ越す",
 	"accountMigrationMoveFromSub": "別のアカウントへエイリアスを作る",
 	"accountMigrationMoveFromDescription": "別のアカウントからこのアカウントにフォロワーを引っ越ししたいんなら、ここでエイリアスを作っとかなアカンで。\n引っ越す前のアカウントをこんな感じに入力してや: @username@server.example.com\n入力欄空っぽやったら消しとくで（おすすめはせえへん）。",
-	"add": "増やす",
-	"save": "とっとく",
 	"accountMigrationMoveFromLabel": "引っ越しする前のアカウント #{n}",
 	"accountMigrationMoveTo": "このアカウントをさらのアカウントに引っ越すで",
 	"accountMigrationMoveAccountDescription": "おニューのアカウントに移行すんで。\n\u3000・フォロワーがおニューの方を勝手にフォローすんで。\n\u3000・このアカウントからのフォローはまるまる全部解除されんで。\n\u3000・このアカウントでノート作れへんようになるで。\n\nフォロワーの移行は勝手にこっちでやっとくけど、フォローの移行は自分でしてや。移行前にこのアカウントでフォローエクスポートして、移行したあとすぐにおニューのところでインポートしてくれな。\nリストとかミュート、あとブロックもおんなじや。自分で移行してな。\n\n（この説明はこのサーバー、つまりMisskey v13.12.0から後の仕様や。Mastodonとか他のActivityPubソフトやとちょっと挙動が違うこともあんで。）",
@@ -385,8 +365,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Add",
-	"save": "Sekles",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -406,8 +384,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Add",
-	"save": "ಉಳಿಸಿ",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -427,8 +403,6 @@ init();
 	"accountMigrationMoveFrom": "다른 계정에서 이 계정으로 이사",
 	"accountMigrationMoveFromSub": "다른 계정에 대한 별칭을 생성",
 	"accountMigrationMoveFromDescription": "다른 계정에서 이 계정으로 팔로워를 가져오려면, 우선 여기에서 별칭을 지정해야 합니다. 반드시 이사하기 전에 지정해야 합니다! 기존 계정을 다음과 같은 형식으로 입력해 주십시오: @person@instance.com",
-	"add": "추가",
-	"save": "저장",
 	"accountMigrationMoveFromLabel": "기존 계정 #{n}",
 	"accountMigrationMoveTo": "이 계정에서 다른 계정으로 이사",
 	"accountMigrationMoveAccountDescription": "새 계정으로 이전합니다.\n\u3000・팔로워가 새 계정을 자동으로 팔로우 합니다\n\u3000・이 계정에서 팔로우는 모두 해제됩니다\n\u3000・이 계정으로는 노트 작성 등을 할 수 없게 됩니다\n\n팔로워는 자동으로 이전되지만, 팔로우는 수동으로 진행해야 합니다. 이전하기 전에 이 계정에서 팔로우를 내보내고, 이전 후에는 즉시 이전한 계정에서 가져오기를 진행하십시오.\n리스트・뮤트・차단에 대해서도 마찬가지이므로 수동으로 이전해야 합니다.\n\n(이 설명은 이 서버(Misskey v13.12.0 이후)의 사양입니다. Mastodon 등의 다른 ActivityPub 소프트웨어에서는 작동이 다를 수 있습니다.)",
@@ -448,8 +422,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Toevoegen",
-	"save": "Opslaan",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -469,8 +441,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Legg til",
-	"save": "Lagre",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -490,8 +460,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Dodaj",
-	"save": "Zapisz",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -511,8 +479,6 @@ init();
 	"accountMigrationMoveFrom": "Migrar outra conta para essa",
 	"accountMigrationMoveFromSub": "Criar um 'alias' a outra conta",
 	"accountMigrationMoveFromDescription": "Se você deseja migrar de outra conta para esta, é necessário criar um alias aqui. Por favor, insira a conta de origem da migração no seguinte formato: @username@server.example.com. Para excluir o alias, deixe o campo em branco e clique em salvar (não recomendado).",
-	"add": "Adicionar",
-	"save": "Salvar",
 	"accountMigrationMoveFromLabel": "Conta original #{n}",
 	"accountMigrationMoveTo": "Migrar dessa conta para outra",
 	"accountMigrationMoveAccountDescription": "Você está migrando para uma nova conta.\n\u3000・Seus seguidores irão automaticamente seguir a nova conta.\n\u3000・Todas as suas conexões de seguidores nesta conta serão removidas.\n\u3000・Você não poderá mais criar novas notas nesta conta.\n\nA migração dos seguidores é automática, mas a migração das pessoas que você segue deve ser feita manualmente. Antes de migrar, exporte quem você está seguindo nesta conta e, assim que migrar, importe essa lista na nova conta.\nO mesmo se aplica para listas, silenciamentos e bloqueios, que também devem ser migrados manualmente.\n\n(Esta descrição se refere ao comportamento do servidor Misskey v13.12.0 ou posterior. Outros softwares ActivityPub, como Mastodon, podem ter comportamentos diferentes.)",
@@ -532,8 +498,6 @@ init();
 	"accountMigrationMoveFrom": "Перенести другую учётную запись сюда",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Добавить",
-	"save": "Сохранить",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Перенести учётную запись на другой сервер",
 	"accountMigrationMoveAccountDescription": "Это действие перенесёт ваш аккаунт на другой сервер.\n\u3000・Подписчики с этого аккаунта автоматически подпишутся на новый\n\u3000・Этот аккаунт отпишется от всех пользователей, на которых подписан сейчас\n\u3000・Вы не сможете создавать новые заметки и т.д. на этом аккаунте\n\nТогда как перенос подписчиков происходит автоматически, вы должны будете подготовиться, сделав некоторые шаги, чтобы перенести список пользователей, на которых вы подписаны. Чтобы сделать это, экспортируйте список подписчиков в файл, который затем импортируете на новом аккаунте в меню настроек. То же самое необходимо будет сделать со списками, также как и со скрытыми и заблокированными пользователями.\n\n(Это объяснение применяется к Misskey v13.12.0 и выше. Другое ActivityPub программное обеспечение, такое, как Mastodon, может работать по-другому.",
@@ -553,8 +517,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Pridať",
-	"save": "Uložiť",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -574,8 +536,6 @@ init();
 	"accountMigrationMoveFrom": "ย้ายจากบัญชีอื่นมาที่บัญชีนี้",
 	"accountMigrationMoveFromSub": "สร้างนามแฝงไปยังบัญชีอื่น",
 	"accountMigrationMoveFromDescription": "หากต้องการโอนข้อมูลจากบัญชีอื่นมายังบัญชีนี้ จำเป็นต้องสร้างบัญชีนามแฝง (alias) ไว้ที่นี่ด้วย\nกรุณากรอกบัญชีเดิมในรูปแบบ: @username@server.example.com\nหากต้องการลบ alias, ให้เว้นว่างไว้แล้วบันทึก (ไม่แนะนำ)",
-	"add": "เพิ่ม",
-	"save": "บันทึก",
 	"accountMigrationMoveFromLabel": "บัญชีที่จะย้ายจาก #{n}",
 	"accountMigrationMoveTo": "ย้ายบัญชีนี้ไปยังบัญชีใหม่",
 	"accountMigrationMoveAccountDescription": "การดำเนินการนี้จะย้ายบัญชีของคุณไปยังบัญชีอื่น\n・ผู้ที่กำลังติดตามคุณจากบัญชีนี้จะถูกย้ายไปยังบัญชีใหม่โดยอัตโนมัติ\n・บัญชีนี้จะเลิกติดตามผู้ใช้ทั้งหมดที่กำลังติดตามอยู่\n・คุณจะไม่สามารถสร้างโน้ต ฯลฯ ในบัญชีนี้ได้\n\nแม้ว่าการย้ายผู้ที่ติดตามคุณจะเป็นไปโดยอัตโนมัติ แต่คุณต้องเตรียมขั้นตอนบางอย่างด้วยตนเอง เพื่อย้ายรายชื่อผู้ใช้ที่คุณกำลังติดตาม โดยดำเนินการส่งออกรายชื่อแล้วค่อยนำเข้ามาภายหลังในเมนูการตั้งค่าของบัญชีใหม่ ใช้ขั้นตอนเดียวกันนี้ใช้รายชื่อผู้ใช้ที่ถูกปิดเสียงและถูกบล็อก\n\n(คำอธิบายนี้ใช้กับ Misskey v13.12.0 ขึ้นไป, ซอฟต์แวร์ ActivityPub อื่นๆ เช่น Mastodon อาจทำงานแตกต่างออกไป)",
@@ -595,8 +555,6 @@ init();
 	"accountMigrationMoveFrom": "Başka bir hesabı bu hesaba taşıyın",
 	"accountMigrationMoveFromSub": "Başka bir hesaba takma ad oluşturun",
 	"accountMigrationMoveFromDescription": "Bu hesaptan taşınacak hesap için bir takma ad oluşturmalısınız.\nTaşınacak hesabı aşağıdaki biçimde girin: @username@server.example.com\nTakma adı silmek için alanı boş bırakın (önerilmez).",
-	"add": "Ekle",
-	"save": "Kaydet",
 	"accountMigrationMoveFromLabel": "Orijinal Hesap #{n}",
 	"accountMigrationMoveTo": "Bu hesabı başka bir hesaba taşıyın",
 	"accountMigrationMoveAccountDescription": "Bu işlem, hesabını farklı bir hesaba taşıyacaktır.\n・Bu hesabın takipçileri otomatik olarak yeni hesaba taşınacak.\n・Bu hesap, şu anda takip ettiği tüm kullanıcıları takipten çıkaracak.\n・Bu hesapta yeni notlar vb. oluşturamayacaksın.\n\nTakipçilerin taşınması otomatik olarak gerçekleşirken, takip ettiğin kullanıcıların listesini taşımak için bazı adımları manuel olarak hazırlaman gerekir. Bunu yapmak için, ayarlar menüsünden takipçilerini dışa aktar ve daha sonra yeni hesaba içe aktar. Aynı prosedür, listelerinin yanı sıra sessize aldığın ve engellediğin kullanıcılar için de geçerli.\n\n(Bu açıklama Misskey v13.12.0 ve sonraki sürümler için geçerlidir. Mastodon gibi diğer ActivityPub yazılımları farklı şekilde çalışabilir.)",
@@ -616,8 +574,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Add",
-	"save": "Save",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -637,8 +593,6 @@ init();
 	"accountMigrationMoveFrom": "Migrate another account to this one",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Додати",
-	"save": "Зберегти",
 	"accountMigrationMoveFromLabel": "Original Account #{n}",
 	"accountMigrationMoveTo": "Migrate this account to a different one",
 	"accountMigrationMoveAccountDescription": "This will migrate your account to a different one.\n\u3000・Followers from this account will automatically be migrated to the new account\n\u3000・This account will unfollow all users it is currently following\n\u3000・You will be unable to create new notes etc. on this account\n\nWhile migration of followers is automatic, you must manually prepare some steps to migrate the list of users you are following. To do so, carry out a follows export that you will later import on the new account in the settings menu. The same procedure applies to your lists as well as your muted and blocked users.\n\n(This explanation applies to Misskey v13.12.0 and later. Other ActivityPub software, such as Mastodon, might function differently.)",
@@ -658,8 +612,6 @@ init();
 	"accountMigrationMoveFrom": "Chuyển một tài khoản khác vào tài khoản này",
 	"accountMigrationMoveFromSub": "Create alias to another account",
 	"accountMigrationMoveFromDescription": "You must create an alias for the account to move from on this account.\nEnter the account to migrate from in the following format: @username@server.example.com\nTo delete the alias, leave the field empty (not recommended).",
-	"add": "Thêm",
-	"save": "Lưu",
 	"accountMigrationMoveFromLabel": "Tài khoản gốc #{n}",
 	"accountMigrationMoveTo": "Chuyển tài khoản này vào một tài khoản khác",
 	"accountMigrationMoveAccountDescription": "Điều này sẽ chuyển tài khoản này sang một tài khoản khác.\n\u3000・Những người theo dõi sẽ tự động được chuyển sang tài khoản mới\n\u3000・Tài khoản này sẽ tự bỏ theo dõi những người mà bạn đã theo dõi trước đây\n\u3000・Bạn sẽ không thể đăng tút mới, v.v trên tài khoản này\n\nDù việc chuyển người theo dõi được diễn ra tự động, bạn vẫn phải tự chuẩn bị một vài bước để chuyển danh sách những người dùng bạn đang theo dõi. Để làm vậy, vui lòng thực hiện việc xuất dữ liệu những người dùng đã theo dõi mà sau này bạn sẽ dùng để nhập vào tài khoản mới ở menu Cài đặt. Hành động tương tự áp dụng với danh sách những người dùng bị chặn hoặc tắt tiếng.\n\n(Điều này áp dụng cho phiên bản Misskey v13.12.0 và sau này. Các phần mềm ActivityPub khác , ví dụ như Mastodon, sẽ có thể hoạt động khác đi.)",
@@ -679,8 +631,6 @@ init();
 	"accountMigrationMoveFrom": "从别的账号迁移到此账户",
 	"accountMigrationMoveFromSub": "为另一个账户建立别名",
 	"accountMigrationMoveFromDescription": "如果迁移时需要继承其他账户的关注者，你需要创建一个别名。此操作需要在迁移前完成！\n请像这样输入要迁移的账户：@username@server.example.com\n如果要删除，请将输入字段留空，并保存（不推荐）。",
-	"add": "添加",
-	"save": "保存",
 	"accountMigrationMoveFromLabel": "迁移前的账户 #{n}",
 	"accountMigrationMoveTo": "把这个账户迁移到新的账户",
 	"accountMigrationMoveAccountDescription": "\n迁移到新帐户。\n\u3000・现有的关注者自动关注新帐户\n\u3000・此帐户的所有关注者都将被删除\n\u3000・您将无法再使用此帐户发帖。\n关注者迁移是自动的，但关注中迁移必须手动完成。请在迁移前在此帐户上导出关注列表，并在迁移后立即在目标帐户上执行导入。\n列表、隐藏、屏蔽也是如此，因此您必须手动迁移它。\n（此描述适用于该服务器（Misskey v13.12.0 或更高版本）。其他 ActivityPub 软件（例如 Mastodon）的行为可能有所不同。）",
@@ -700,8 +650,6 @@ init();
 	"accountMigrationMoveFrom": "從其他帳戶遷移到這個帳戶",
 	"accountMigrationMoveFromSub": "為另一個帳戶建立別名",
 	"accountMigrationMoveFromDescription": "如果你想把追隨者從別的帳戶遷移過來，必須先在這裡建立別名。請務必在執行遷移之前建立別名！請像這樣輸入要遷移的帳戶：@person@instance.com",
-	"add": "新增",
-	"save": "儲存",
 	"accountMigrationMoveFromLabel": "要遷移過來的帳戶 #{n}",
 	"accountMigrationMoveTo": "將這個帳戶遷移至新的帳戶",
 	"accountMigrationMoveAccountDescription": "遷移至新帳戶。\n\u3000・此帳戶的追隨者將自動追隨新帳戶；\n\u3000・此帳戶的所有追隨者將被取消追隨；\n\u3000・此帳戶不能再發文。\n\n雖然會自動遷移您的追隨者，但必須手動遷移您追隨的帳戶。請在遷移前匯出此帳戶的「追隨中」名單，並在遷移後自行匯入。\n列表名單、靜音名單及封鎖名單也必須如此處理。\n\n（此說明適用於本伺服器，以及運行 Misskey v13.12.0 或更新版本的其他伺服器；如 Mastodon 等使用 ActivityPub 協定的其他軟體或有不同的處理方式。）",

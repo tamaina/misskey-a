@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkInput
 		v-if="searchIndex && searchIndex.length > 0"
 		v-model="searchQuery"
-		:placeholder="$locale.sfc.search"
+		:placeholder="globalLocale.env.search"
 		type="search"
 		style="margin-bottom: 16px;"
 		@input.passive="searchOnInput"
@@ -64,7 +64,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Awaitable } from '@features/ui/frontend/types/misc.js';
+import type { Locale } from 'i18n';
+import { useLocale } from 'virtual:vite-vue-internationalization';
 
 export type SuperMenuDef = {
 	title?: string;
@@ -95,13 +96,16 @@ export type SuperMenuDef = {
 </script>
 
 <script lang="ts" setup>
+const globalLocale = useLocale<Locale>(import.meta.url);
+
 import { useTemplateRef, ref, watch, nextTick, computed, onUnmounted } from 'vue';
 import { throttle } from 'throttle-debounce';
 import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
-import type { SearchIndexItem } from '@features/discovery/frontend/utility/inapp-search.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { initIntlString, compareStringIncludes } from '@features/web/frontend/utility/intl-string.js';
+import type { SearchIndexItem } from '@features/discovery/frontend/utility/inapp-search.js';
+import type { Awaitable } from '@features/ui/frontend/types/misc.js';
 
 const props = defineProps<{
 	def: SuperMenuDef[];
@@ -430,169 +434,113 @@ function searchOnKeyDown(ev: KeyboardEvent) {
 </style>
 
 <locale locale="ar-SA" lang="json">
-{
-  "search": "البحث"
-}
+{}
 </locale>
 
 <locale locale="ca-ES" lang="json">
-{
-  "search": "Cercar"
-}
+{}
 </locale>
 
 <locale locale="cs-CZ" lang="json">
-{
-  "search": "Vyhledávání"
-}
+{}
 </locale>
 
 <locale locale="da-DK" lang="json">
-{
-  "search": "Search"
-}
+{}
 </locale>
 
 <locale locale="de-DE" lang="json">
-{
-  "search": "Suchen"
-}
+{}
 </locale>
 
 <locale locale="en-US" lang="json">
-{
-  "search": "Search"
-}
+{}
 </locale>
 
 <locale locale="es-ES" lang="json">
-{
-  "search": "Buscar"
-}
+{}
 </locale>
 
 <locale locale="fr-FR" lang="json">
-{
-  "search": "Rechercher"
-}
+{}
 </locale>
 
 <locale locale="id-ID" lang="json">
-{
-  "search": "Cari"
-}
+{}
 </locale>
 
 <locale locale="it-IT" lang="json">
-{
-  "search": "Cerca"
-}
+{}
 </locale>
 
 <locale locale="ja-JP" lang="json">
-{
-  "search": "検索"
-}
+{}
 </locale>
 
 <locale locale="ja-KS" lang="json">
-{
-  "search": "探す"
-}
+{}
 </locale>
 
 <locale locale="kab-KAB" lang="json">
-{
-  "search": "Nadi"
-}
+{}
 </locale>
 
 <locale locale="kn-IN" lang="json">
-{
-  "search": "ಹುಡುಕು"
-}
+{}
 </locale>
 
 <locale locale="ko-KR" lang="json">
-{
-  "search": "검색"
-}
+{}
 </locale>
 
 <locale locale="nl-NL" lang="json">
-{
-  "search": "Zoeken"
-}
+{}
 </locale>
 
 <locale locale="no-NO" lang="json">
-{
-  "search": "Søk"
-}
+{}
 </locale>
 
 <locale locale="pl-PL" lang="json">
-{
-  "search": "Szukaj"
-}
+{}
 </locale>
 
 <locale locale="pt-PT" lang="json">
-{
-  "search": "Pesquisar"
-}
+{}
 </locale>
 
 <locale locale="ru-RU" lang="json">
-{
-  "search": "Поиск"
-}
+{}
 </locale>
 
 <locale locale="sk-SK" lang="json">
-{
-  "search": "Hľadať"
-}
+{}
 </locale>
 
 <locale locale="th-TH" lang="json">
-{
-  "search": "ค้นหา"
-}
+{}
 </locale>
 
 <locale locale="tr-TR" lang="json">
-{
-  "search": "Ara"
-}
+{}
 </locale>
 
 <locale locale="ug-CN" lang="json">
-{
-  "search": "ئىزدەش"
-}
+{}
 </locale>
 
 <locale locale="uk-UA" lang="json">
-{
-  "search": "Пошук"
-}
+{}
 </locale>
 
 <locale locale="vi-VN" lang="json">
-{
-  "search": "Tìm kiếm"
-}
+{}
 </locale>
 
 <locale locale="zh-CN" lang="json">
-{
-  "search": "搜索"
-}
+{}
 </locale>
 
 <locale locale="zh-TW" lang="json">
-{
-  "search": "搜尋"
-}
+{}
 </locale>

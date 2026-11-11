@@ -28,7 +28,7 @@ const notificationConfigTypes = [
 	'mutualFollow',
 	'followingOrFollower',
 	'list',
-	'never'
+	'never',
 ] as const;
 
 export type NotificationConfig = {
@@ -40,13 +40,13 @@ export type NotificationConfig = {
 </script>
 
 <script lang="ts" setup>
+const globalLocale = useLocale<Locale>(import.meta.url);
+
 import * as Misskey from 'misskey-js';
 import { ref, computed } from 'vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
-
-const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	value: NotificationConfig;
@@ -61,7 +61,7 @@ const emit = defineEmits<{
 const notificationConfigTypesI18nMap: Record<typeof notificationConfigTypes[number], string> = {
 	all: globalLocale.value.env.all,
 	following: globalLocale.value.env.following,
-	follower: $locale.value.sfc.followers,
+	follower: globalLocale.value.env.followers,
 	mutualFollow: $locale.value.sfc.mutualFollow,
 	followingOrFollower: $locale.value.sfc.followingOrFollower,
 	list: $locale.value.sfc.userList,
@@ -96,7 +96,6 @@ function save() {
 
 <locale locale="ar-SA" lang="json">
 {
-	"followers": "المتابِعون",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "القوائم"
@@ -105,7 +104,6 @@ function save() {
 
 <locale locale="ca-ES" lang="json">
 {
-	"followers": "Seguidors",
 	"mutualFollow": "Seguidor mutu",
 	"followingOrFollower": "Seguint o seguidor",
 	"userList": "Llistes"
@@ -114,7 +112,6 @@ function save() {
 
 <locale locale="cs-CZ" lang="json">
 {
-	"followers": "Sledující",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Seznamy"
@@ -123,7 +120,6 @@ function save() {
 
 <locale locale="da-DK" lang="json">
 {
-	"followers": "Followers",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lists"
@@ -132,7 +128,6 @@ function save() {
 
 <locale locale="de-DE" lang="json">
 {
-	"followers": "Gefolgt von",
 	"mutualFollow": "Gegenseitig gefolgt",
 	"followingOrFollower": "Follow oder Follower",
 	"userList": "Liste"
@@ -141,7 +136,6 @@ function save() {
 
 <locale locale="en-US" lang="json">
 {
-	"followers": "Followers",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lists"
@@ -150,7 +144,6 @@ function save() {
 
 <locale locale="es-ES" lang="json">
 {
-	"followers": "Seguidores",
 	"mutualFollow": "Os seguís mutuamente",
 	"followingOrFollower": "Siguiendo o seguidor",
 	"userList": "Lista"
@@ -159,7 +152,6 @@ function save() {
 
 <locale locale="fr-FR" lang="json">
 {
-	"followers": "Abonné·e·s",
 	"mutualFollow": "Abonnement mutuel",
 	"followingOrFollower": "Abonnement ou abonné",
 	"userList": "Listes"
@@ -168,7 +160,6 @@ function save() {
 
 <locale locale="id-ID" lang="json">
 {
-	"followers": "Pengikut",
 	"mutualFollow": "Saling mengikuti",
 	"followingOrFollower": "Mengikuti atau pengikut",
 	"userList": "Daftar"
@@ -177,7 +168,6 @@ function save() {
 
 <locale locale="it-IT" lang="json">
 {
-	"followers": "Follower",
 	"mutualFollow": "Follow reciproco",
 	"followingOrFollower": "Following o Follower",
 	"userList": "Liste"
@@ -186,7 +176,6 @@ function save() {
 
 <locale locale="ja-JP" lang="json">
 {
-	"followers": "フォロワー",
 	"mutualFollow": "相互フォロー",
 	"followingOrFollower": "フォロー中またはフォロワー",
 	"userList": "リスト"
@@ -195,7 +184,6 @@ function save() {
 
 <locale locale="ja-KS" lang="json">
 {
-	"followers": "フォロワー",
 	"mutualFollow": "お互いフォローしてんで",
 	"followingOrFollower": "フォロー中またはフォロワー",
 	"userList": "リスト"
@@ -204,7 +192,6 @@ function save() {
 
 <locale locale="kab-KAB" lang="json">
 {
-	"followers": "Imeḍfaṛen",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Tibdarin"
@@ -213,7 +200,6 @@ function save() {
 
 <locale locale="kn-IN" lang="json">
 {
-	"followers": "Followers",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lists"
@@ -222,7 +208,6 @@ function save() {
 
 <locale locale="ko-KR" lang="json">
 {
-	"followers": "팔로워",
 	"mutualFollow": "맞팔로우",
 	"followingOrFollower": "팔로 중이거나 팔로워",
 	"userList": "리스트"
@@ -231,7 +216,6 @@ function save() {
 
 <locale locale="nl-NL" lang="json">
 {
-	"followers": "Volgers",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Gevolgd of volger",
 	"userList": "Lijsten"
@@ -240,7 +224,6 @@ function save() {
 
 <locale locale="no-NO" lang="json">
 {
-	"followers": "Følgere",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lister"
@@ -249,7 +232,6 @@ function save() {
 
 <locale locale="pl-PL" lang="json">
 {
-	"followers": "Obserwujący",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Listy"
@@ -258,7 +240,6 @@ function save() {
 
 <locale locale="pt-PT" lang="json">
 {
-	"followers": "Seguidores",
 	"mutualFollow": "Seguidor mútuo",
 	"followingOrFollower": "Seguidor ou usuário seguido",
 	"userList": "Listas"
@@ -267,7 +248,6 @@ function save() {
 
 <locale locale="ru-RU" lang="json">
 {
-	"followers": "Подписчики",
 	"mutualFollow": "Взаимные подписки",
 	"followingOrFollower": "Подписки или подписчики",
 	"userList": "Списки"
@@ -276,7 +256,6 @@ function save() {
 
 <locale locale="sk-SK" lang="json">
 {
-	"followers": "Sledujúci",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Zoznamy"
@@ -285,7 +264,6 @@ function save() {
 
 <locale locale="th-TH" lang="json">
 {
-	"followers": "ผู้ติดตาม",
 	"mutualFollow": "ติดตามซึ่งกันและกัน",
 	"followingOrFollower": "กำลังติดตามหรือผู้ติดตาม",
 	"userList": "ลิสต์"
@@ -294,7 +272,6 @@ function save() {
 
 <locale locale="tr-TR" lang="json">
 {
-	"followers": "Takipçi",
 	"mutualFollow": "Karşılıklı takip",
 	"followingOrFollower": "Takip eden veya takipçi",
 	"userList": "Listeler"
@@ -303,7 +280,6 @@ function save() {
 
 <locale locale="ug-CN" lang="json">
 {
-	"followers": "Followers",
 	"mutualFollow": "Mutual follow",
 	"followingOrFollower": "Following or follower",
 	"userList": "Lists"
@@ -312,7 +288,6 @@ function save() {
 
 <locale locale="uk-UA" lang="json">
 {
-	"followers": "Підписники",
 	"mutualFollow": "Взаємна підписка",
 	"followingOrFollower": "Підписки або підписники",
 	"userList": "Списки"
@@ -321,7 +296,6 @@ function save() {
 
 <locale locale="vi-VN" lang="json">
 {
-	"followers": "Người theo dõi",
 	"mutualFollow": "Theo dõi lẫn nhau",
 	"followingOrFollower": "Đang theo dõi hoặc người theo dõi",
 	"userList": "Danh sách"
@@ -330,7 +304,6 @@ function save() {
 
 <locale locale="zh-CN" lang="json">
 {
-	"followers": "关注者",
 	"mutualFollow": "互相关注",
 	"followingOrFollower": "关注中或关注者",
 	"userList": "列表"
@@ -339,7 +312,6 @@ function save() {
 
 <locale locale="zh-TW" lang="json">
 {
-	"followers": "追隨者",
 	"mutualFollow": "互相追隨",
 	"followingOrFollower": "追隨中或追隨者",
 	"userList": "使用者清單"

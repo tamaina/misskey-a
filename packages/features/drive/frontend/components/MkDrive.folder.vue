@@ -33,10 +33,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { computed, defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
@@ -45,6 +43,8 @@ import { prefer } from '@features/preferences/frontend/preferences.js';
 import { globalEvents } from '@features/runtime/frontend/events.js';
 import { checkDragDataType, getDragData, setDragData } from '@features/ui/frontend/drag-and-drop.js';
 import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -293,7 +293,7 @@ function onContextmenu(ev: PointerEvent) {
 			});
 		},
 	}, { type: 'divider' }, {
-		text: $locale.value.sfc.rename,
+		text: globalLocale.value.env.rename,
 		icon: 'ti ti-forms',
 		action: rename,
 	}, {
@@ -413,7 +413,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "لا يمكن حذفه",
 	"hasChildFilesOrFolders": "الان الملف غير فارغ. لا يمكن حذفه",
 	"openInWindow": "افتح في نافذة جديدة",
-	"rename": "إعادة التسمية",
 	"move": "أنقل",
 	"copyFolderId": "انسخ معرّف المجلد",
 	"uploadFolder": "المجلد الافتراضي للرفع"
@@ -429,7 +428,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "No es pot eliminar",
 	"hasChildFilesOrFolders": "No és possible esborrar aquesta carpeta ja que no és buida",
 	"openInWindow": "Obrir en una finestra nova",
-	"rename": "Canvia el nom",
 	"move": "Mou",
 	"copyFolderId": "Copiar ID de la carpeta",
 	"uploadFolder": "Carpeta per defecte on desar els arxius pujats"
@@ -445,7 +443,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Nelze smazat",
 	"hasChildFilesOrFolders": "Nemůžete odstranit složku, která není prázdná.",
 	"openInWindow": "Otevřít v novém okně",
-	"rename": "Přejmenovat",
 	"move": "Přesunout",
 	"copyFolderId": "Kopírovat ID složky",
 	"uploadFolder": "Výchozí lokace pro upload"
@@ -461,7 +458,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
@@ -477,7 +473,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Nicht löschbar",
 	"hasChildFilesOrFolders": "Dieser Ordner kann nicht gelöscht werden, da er nicht leer ist.",
 	"openInWindow": "In einem Fenster öffnen",
-	"rename": "Umbenennen",
 	"move": "Verschieben",
 	"copyFolderId": "Ordner-ID kopieren",
 	"uploadFolder": "Standardordner für Uploads"
@@ -493,7 +488,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
@@ -509,7 +503,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "No se puede borrar",
 	"hasChildFilesOrFolders": "No se puede borrar esta carpeta. No está vacía.",
 	"openInWindow": "Abrir en una ventana",
-	"rename": "Renombrar",
 	"move": "Mover",
 	"copyFolderId": "Copiar ID de carpeta",
 	"uploadFolder": "Carpeta de subidas por defecto"
@@ -525,7 +518,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Suppression impossible",
 	"hasChildFilesOrFolders": "Impossible de supprimer ce dossier car il n'est pas vide.",
 	"openInWindow": "Ouvrir dans une nouvelle fenêtre",
-	"rename": "Renommer",
 	"move": "Déplacer",
 	"copyFolderId": "Copier l'identifiant du dossier",
 	"uploadFolder": "Emplacement de téléversement par défaut"
@@ -541,7 +533,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Tidak dapat menghapus",
 	"hasChildFilesOrFolders": "Karena folder ini tidak kosong, maka tidak dapat dihapus.",
 	"openInWindow": "Buka di jendela",
-	"rename": "Ubah nama",
 	"move": "Pindah",
 	"copyFolderId": "Salin Folder",
 	"uploadFolder": "Lokasi unggah folder bawaan"
@@ -557,7 +548,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Eliminazione impossibile",
 	"hasChildFilesOrFolders": "Impossibile eliminare la cartella perché non è vuota",
 	"openInWindow": "Apri in una finestra",
-	"rename": "Modifica nome",
 	"move": "Sposta",
 	"copyFolderId": "Copia ID della cartella",
 	"uploadFolder": "Destinazione caricamento predefinita"
@@ -573,7 +563,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "削除できません",
 	"hasChildFilesOrFolders": "このフォルダは空でないため、削除できません。",
 	"openInWindow": "ウィンドウで開く",
-	"rename": "名前を変更",
 	"move": "移動",
 	"copyFolderId": "フォルダーIDをコピー",
 	"uploadFolder": "既定アップロード先"
@@ -589,7 +578,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "消せんかったわ",
 	"hasChildFilesOrFolders": "このフォルダは空っぽちゃうから消されへん",
 	"openInWindow": "ウィンドウで開く",
-	"rename": "名前を変えるで",
 	"move": "移すで",
 	"copyFolderId": "フォルダーIDをコピー",
 	"uploadFolder": "とりあえずアップロードしたやつ置いとく所"
@@ -605,7 +593,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
@@ -621,7 +608,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
@@ -637,7 +623,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "삭제할 수 없습니다",
 	"hasChildFilesOrFolders": "이 폴더는 비어있지 않기 때문에 삭제할 수 없습니다.",
 	"openInWindow": "창으로 열기",
-	"rename": "이름 변경",
 	"move": "이동",
 	"copyFolderId": "폴더 ID 복사",
 	"uploadFolder": "기본 업로드 위치"
@@ -653,7 +638,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Kan niet worden verwijderd",
 	"hasChildFilesOrFolders": "Omdat deze map niet leeg is, kan die niet worden verwijderd.",
 	"openInWindow": "In een venster openen",
-	"rename": "Hernoemen",
 	"move": "Move",
 	"copyFolderId": "Kopieer folder ID",
 	"uploadFolder": "Standaardmap voor uploaden"
@@ -669,7 +653,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Kan ikke slette",
 	"hasChildFilesOrFolders": "Siden denne mappen ikke er tom, kan den ikke slettes.",
 	"openInWindow": "Åpne i vindu",
-	"rename": "Endre navn",
 	"move": "Flytt",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
@@ -685,7 +668,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Nie można usunąć",
 	"hasChildFilesOrFolders": "Ponieważ ten katalog nie jest pusty, nie może być usunięty.",
 	"openInWindow": "Otwórz w oknie",
-	"rename": "Zmień nazwę",
 	"move": "Przenieś",
 	"copyFolderId": "Kopiuj ID folderu",
 	"uploadFolder": "Domyślne położenie wysłanych"
@@ -701,7 +683,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Não é possível excluir",
 	"hasChildFilesOrFolders": "Esta pasta não está vazia e não pode ser excluída.",
 	"openInWindow": "Abrir em um janela",
-	"rename": "Renomear",
 	"move": "Mover",
 	"copyFolderId": "Copiar o ID da pasta",
 	"uploadFolder": "Destino de upload padrão"
@@ -717,7 +698,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Удаление невозможно",
 	"hasChildFilesOrFolders": "Эта папка не пуста и не может быть удалена.",
 	"openInWindow": "Открыть в плавающем окне",
-	"rename": "Переименовать",
 	"move": "Переместить",
 	"copyFolderId": "Скопировать ID папки",
 	"uploadFolder": "Место загрузки по умолчанию"
@@ -733,7 +713,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Nedá sa odstrániť",
 	"hasChildFilesOrFolders": "Nemôžete odstrániť priečinok sú súbormi.",
 	"openInWindow": "Otvoriť v novom okne",
-	"rename": "Premenovať",
 	"move": "Pohyb",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Predvolený priečinok pre nahrávanie"
@@ -749,7 +728,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "ไม่สามารถลบออกได้",
 	"hasChildFilesOrFolders": "เนื่องจากโฟลเดอร์นี้ไม่ว่างเปล่า จึงไม่สามารถลบ",
 	"openInWindow": "เปิดในหน้าต่าง",
-	"rename": "เปลี่ยนชื่อ",
 	"move": "ย้าย",
 	"copyFolderId": "คัดลอกโฟลเดอร์ ID",
 	"uploadFolder": "โฟลเดอร์เริ่มต้นสำหรับอัปโหลด"
@@ -765,7 +743,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Silinemiyor",
 	"hasChildFilesOrFolders": "Bu klasör boş olmadığı için silinemez.",
 	"openInWindow": "Pencerede aç",
-	"rename": "Yeniden adlandır",
 	"move": "Taşı",
 	"copyFolderId": "Klasör ID'yi kopyala",
 	"uploadFolder": "Yüklemeler için varsayılan klasör"
@@ -781,7 +758,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
@@ -797,7 +773,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Видалення неможливе",
 	"hasChildFilesOrFolders": "Ця тека не порожня і не може бути видалена",
 	"openInWindow": "Відкрити у вікні",
-	"rename": "Перейменувати",
 	"move": "Пересунути",
 	"copyFolderId": "Копіювати ID теки",
 	"uploadFolder": "Місце для завантаження за замовчуванням"
@@ -813,7 +788,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "Không thể xóa",
 	"hasChildFilesOrFolders": "Không thể xóa cho đến khi không còn gì trong thư mục.",
 	"openInWindow": "Mở trong cửa sổ mới",
-	"rename": "Đổi tên",
 	"move": "Di chuyển",
 	"copyFolderId": "Sao chép ID thư mục",
 	"uploadFolder": "Thư mục tải lên mặc định"
@@ -829,7 +803,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "无法删除",
 	"hasChildFilesOrFolders": "此文件夹中有文件，无法删除。",
 	"openInWindow": "在新窗口中打开",
-	"rename": "重命名",
 	"move": "移动",
 	"copyFolderId": "复制文件夹ID",
 	"uploadFolder": "默认上传文件夹"
@@ -845,7 +818,6 @@ function onContextmenu(ev: PointerEvent) {
 	"unableToDelete": "無法刪除",
 	"hasChildFilesOrFolders": "此文件夾不是空的，無法刪除。",
 	"openInWindow": "在新視窗開啟",
-	"rename": "重新命名",
 	"move": "移動 ",
 	"copyFolderId": "複製資料夾ID",
 	"uploadFolder": "預設上傳資料夾"

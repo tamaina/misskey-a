@@ -1,19 +1,247 @@
 {
 	"baseline": "23de9f6a1e23d1b14b75a81b2821d52c3420f2ae",
 	"promoted": [
-		"next",
-		"upload",
-		"preview",
-		"reset",
-		"name",
-		"title",
-		"description",
-		"none",
+		"_cw.hide",
+		"_cw.show",
+		"_deck._columns.antenna",
+		"_deck._columns.channel",
+		"_deck._columns.chat",
+		"_deck._columns.clip",
+		"_deck._columns.direct",
+		"_deck._columns.list",
+		"_deck._columns.main",
+		"_deck._columns.mentions",
+		"_deck._columns.notifications",
+		"_deck._columns.roleTimeline",
+		"_deck._columns.tl",
+		"_deck._columns.widgets",
+		"_notification._types.achievementEarned",
+		"_notification._types.all",
+		"_notification._types.app",
+		"_notification._types.chatRoomInvitationReceived",
+		"_notification._types.createToken",
+		"_notification._types.exportCompleted",
+		"_notification._types.follow",
+		"_notification._types.followRequestAccepted",
+		"_notification._types.login",
+		"_notification._types.mention",
+		"_notification._types.note",
+		"_notification._types.pollEnded",
+		"_notification._types.quote",
+		"_notification._types.reaction",
+		"_notification._types.receiveFollowRequest",
+		"_notification._types.renote",
+		"_notification._types.reply",
+		"_notification._types.roleAssigned",
+		"_notification._types.scheduledNotePostFailed",
+		"_notification._types.scheduledNotePosted",
+		"_notification._types.test",
+		"_permissions.access:mcp",
+		"_permissions.read:account",
+		"_permissions.read:admin:abuse-user-reports",
+		"_permissions.read:admin:account",
+		"_permissions.read:admin:ad",
+		"_permissions.read:admin:announcements",
+		"_permissions.read:admin:avatar-decorations",
+		"_permissions.read:admin:drive",
+		"_permissions.read:admin:emoji",
+		"_permissions.read:admin:index-stats",
+		"_permissions.read:admin:invite-codes",
+		"_permissions.read:admin:meta",
+		"_permissions.read:admin:queue",
+		"_permissions.read:admin:relays",
+		"_permissions.read:admin:roles",
+		"_permissions.read:admin:server-info",
+		"_permissions.read:admin:show-moderation-log",
+		"_permissions.read:admin:show-user",
+		"_permissions.read:admin:stream",
+		"_permissions.read:admin:table-stats",
+		"_permissions.read:admin:user-ips",
+		"_permissions.read:blocks",
+		"_permissions.read:channels",
+		"_permissions.read:chat",
+		"_permissions.read:clip-favorite",
+		"_permissions.read:drive",
+		"_permissions.read:favorites",
+		"_permissions.read:federation",
+		"_permissions.read:flash",
+		"_permissions.read:flash-likes",
+		"_permissions.read:following",
+		"_permissions.read:gallery",
+		"_permissions.read:gallery-likes",
+		"_permissions.read:invite-codes",
+		"_permissions.read:messaging",
+		"_permissions.read:mutes",
+		"_permissions.read:notifications",
+		"_permissions.read:page-likes",
+		"_permissions.read:pages",
+		"_permissions.read:reactions",
+		"_permissions.read:user-groups",
+		"_permissions.write:account",
+		"_permissions.write:admin:account",
+		"_permissions.write:admin:ad",
+		"_permissions.write:admin:announcements",
+		"_permissions.write:admin:avatar-decorations",
+		"_permissions.write:admin:delete-account",
+		"_permissions.write:admin:delete-all-files-of-a-user",
+		"_permissions.write:admin:drive",
+		"_permissions.write:admin:emoji",
+		"_permissions.write:admin:federation",
+		"_permissions.write:admin:invite-codes",
+		"_permissions.write:admin:meta",
+		"_permissions.write:admin:promo",
+		"_permissions.write:admin:queue",
+		"_permissions.write:admin:relays",
+		"_permissions.write:admin:reset-password",
+		"_permissions.write:admin:resolve-abuse-user-report",
+		"_permissions.write:admin:roles",
+		"_permissions.write:admin:send-email",
+		"_permissions.write:admin:suspend-user",
+		"_permissions.write:admin:unset-mfa",
+		"_permissions.write:admin:unset-user-avatar",
+		"_permissions.write:admin:unset-user-banner",
+		"_permissions.write:admin:unsuspend-user",
+		"_permissions.write:admin:user-note",
+		"_permissions.write:blocks",
+		"_permissions.write:channels",
+		"_permissions.write:chat",
+		"_permissions.write:clip-favorite",
+		"_permissions.write:drive",
+		"_permissions.write:favorites",
+		"_permissions.write:flash",
+		"_permissions.write:flash-likes",
+		"_permissions.write:following",
+		"_permissions.write:gallery",
+		"_permissions.write:gallery-likes",
+		"_permissions.write:invite-codes",
+		"_permissions.write:messaging",
+		"_permissions.write:mutes",
+		"_permissions.write:notes",
+		"_permissions.write:notifications",
+		"_permissions.write:page-likes",
+		"_permissions.write:pages",
+		"_permissions.write:reactions",
+		"_permissions.write:report-abuse",
+		"_permissions.write:user-groups",
+		"_permissions.write:votes",
+		"_timelines.global",
+		"_timelines.home",
+		"_timelines.local",
+		"_timelines.social",
+		"_visibility.disableFederation",
+		"_visibility.disableFederationDescription",
+		"_visibility.followers",
+		"_visibility.followersDescription",
+		"_visibility.home",
+		"_visibility.homeDescription",
+		"_visibility.public",
+		"_visibility.publicDescription",
+		"_visibility.specified",
+		"_visibility.specifiedDescription",
+		"add",
+		"adminPermission",
+		"administrator",
 		"all",
+		"announcements",
+		"areYouSure",
+		"channel",
+		"charts",
+		"clip",
+		"continue",
+		"copyUrl",
+		"create",
+		"createNew",
+		"createdAt",
 		"default",
+		"deleteAreYouSure",
+		"deletedNote",
+		"description",
+		"disableAll",
+		"disableAllAdmin",
+		"done",
+		"download",
+		"drive",
+		"driveFileDeleteConfirm",
+		"embed",
+		"enableAll",
+		"enableAllAdmin",
 		"error",
+		"favorite",
+		"filter",
+		"follow",
+		"followers",
+		"fromDrive",
+		"fromX",
+		"generateAccessToken",
+		"goBack",
+		"gotIt",
+		"hide",
+		"high",
+		"imageUrl",
+		"indefinitely",
+		"info",
+		"install",
+		"invite",
+		"learnMore",
+		"localOnly",
+		"low",
+		"markAsSensitive",
+		"medium",
+		"memo",
+		"moderator",
+		"more",
+		"mute",
+		"name",
+		"next",
+		"no",
+		"noName",
+		"none",
+		"noteOf",
+		"notifications",
+		"oneDay",
+		"oneHour",
+		"oneMonth",
+		"oneWeek",
+		"overview",
+		"period",
+		"permission",
+		"poll",
+		"preview",
+		"privacyPolicy",
+		"private",
+		"processing",
+		"public",
+		"quote",
+		"remove",
+		"removeAreYouSure",
+		"rename",
+		"renote",
+		"reply",
+		"reset",
+		"resetAreYouSure",
+		"retry",
+		"sensitive",
+		"settings",
+		"share",
+		"show",
+		"showLess",
+		"showMore",
+		"showRepliesToOthersInTimeline",
+		"termsOfService",
+		"timeline",
+		"title",
+		"unfavorite",
+		"unmarkAsSensitive",
+		"update",
+		"updatedAt",
+		"upload",
+		"user",
+		"userSaysSomething",
 		"users",
-		"areYouSure"
+		"visibility",
+		"visibilityDisableFederation",
+		"withNFiles",
+		"yes"
 	],
 	"deletedRaw": {
 		"ar-SA": {
@@ -10407,172 +10635,172 @@
 	},
 	"promotedRawHashes": {
 		"id-ID": {
-			"count": 13,
-			"sha256": "8a7f5323bdab42e5c039c3aff6e9e0b4cec1a86e3d6b1f3edf147a18844f676a"
+			"count": 241,
+			"sha256": "6ece09b8cf2e4dd9e1e2c7b2e466c22e84c46c2d2de947f0f43ac2fd701a571f"
 		},
 		"ko-GS": {
-			"count": 12,
-			"sha256": "94ccb7ae46f5d5634cb7d78defd1a1a6532ba4a07017f5a949697fbbf6455c9d"
+			"count": 240,
+			"sha256": "3a526fa027e10215b6f91c420703312781bfb314a693bcb3abef5c30c6b771ed"
 		},
 		"tl-PH": {
-			"count": 0,
-			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+			"count": 228,
+			"sha256": "46cdbed7c6974f7677cde0b8dcfbdb75eb2d19b7676fa8fdd0a93ce7642818ac"
 		},
 		"fa-IR": {
-			"count": 3,
-			"sha256": "e11d987c1846303efdd9441a36a135b6d7d4a15cf10341817fa0d997dbc39375"
+			"count": 231,
+			"sha256": "400b57d793716d79dc4de5b4a438a5b521888b2a26eb4b5b90c99da11a260409"
 		},
 		"tr-TR": {
-			"count": 13,
-			"sha256": "6078d9336f8d102441c79a57b28825a9ddf6dd8caa00caf5f1075c90ca7d241c"
+			"count": 241,
+			"sha256": "7028ac8b46c66994ba976c3749da35b6e5f678a3ab90e522a588b69772aa937c"
 		},
 		"zh-CN": {
-			"count": 13,
-			"sha256": "052cb378ae9810ad9c27d1ba6d4fe71343c8721e64aaa18f7789dc49b759883c"
+			"count": 241,
+			"sha256": "f0acefeae56955036d74849f50b9e74c41661104cb6eea79cf6613325d958408"
 		},
 		"nl-NL": {
-			"count": 13,
-			"sha256": "abc07dcf642dd7c9bb63869d7f108616beb06c21bf53058f1e2ffe77d85bc3d4"
+			"count": 241,
+			"sha256": "1982465f3d14ba8aac9d08dcf3da4ad3fc1fccec80779470c8aed24c6664de39"
 		},
 		"pl-PL": {
-			"count": 12,
-			"sha256": "92346c4c477a3ac93d2bc8722102d5c6b6556b725efbf4c3a485d387b666d63a"
+			"count": 240,
+			"sha256": "23ec216ba16a2d6703fc533cc006fc6b9bc95699e9b98311737083dac5fd57a6"
 		},
 		"ru-RU": {
-			"count": 13,
-			"sha256": "09507386c7f1474e20087910ee1e07f68dc7516ec59ddfd7d85302cbd60bdf08"
+			"count": 241,
+			"sha256": "db89d2eb078024733cdb617232459ae7173a25aaf34818521fdd7227761feb63"
 		},
 		"ro-RO": {
-			"count": 13,
-			"sha256": "c682b027763e16998bf93531d8f46dae61537cda9b1b1a1ee550130f3b111e35"
+			"count": 241,
+			"sha256": "483951ea0c812419806c90e53cd0dacffb3c3e2d16209a596a17538cb400cc43"
 		},
 		"cs-CZ": {
-			"count": 13,
-			"sha256": "0baf25604d263eb9b2b99b9831e334fc238776567579f8912c68e43c15eb0606"
+			"count": 241,
+			"sha256": "e564d66d781c68f27ad3c90ab1b510c711858dd506f7760dbfa8b27bb4282100"
 		},
 		"es-ES": {
-			"count": 13,
-			"sha256": "7c5bed9da546e7bc641fd67b75f7924890eb9bfa6cc727897b4a73563958988c"
+			"count": 241,
+			"sha256": "58970b6a17f8bf1a2b41e1f75619e23ace41b3866e0eca2edb9fbc863742ff55"
 		},
 		"no-NO": {
-			"count": 10,
-			"sha256": "5ed727a6aedf2c8b8714e32743587f9bd724fb32ec03deb0cb7ee0ffea9c3d91"
+			"count": 238,
+			"sha256": "3f5a280d7c6fe6f31575b5654c23345f5e849b3d2e392fe0a22ea28a812cf311"
 		},
 		"de-DE": {
-			"count": 13,
-			"sha256": "77f39e4e1b2e4a3881a5ade16b7816b933c062797222ac30f8ac51b9e49e489b"
+			"count": 241,
+			"sha256": "485878b6761b7898826fae0411097eef1204c3b7c3733d2c1bd52686746a1a2c"
 		},
 		"pt-PT": {
-			"count": 13,
-			"sha256": "a7818c77f29acf17cdeadde8acc6cf9fae1263a7445c4d8291e30048483e4150"
+			"count": 241,
+			"sha256": "bc6fcf3c184910edef58a12677e8961745344a465c6468aa75ac60624acc0541"
 		},
 		"da-DK": {
-			"count": 0,
-			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+			"count": 228,
+			"sha256": "01ed811b5f81701ce016663cf34402c681a9a032a67282e7c999fa2b6388ebc9"
 		},
 		"ar-SA": {
-			"count": 11,
-			"sha256": "7a5f465e801aa50b232fd4ba6562c2991eec44cebc224dd2678d9d71b74d75aa"
+			"count": 239,
+			"sha256": "4f3a9716a34c4e923bd2b7746984626a407eed6df1eb17803b25b21c6e9ec7f6"
 		},
 		"ca-ES": {
-			"count": 13,
-			"sha256": "abc57eba71674400c8e08ab27bb32ce006aa92c6683e06a735bf8794df1ba2ce"
+			"count": 241,
+			"sha256": "7116d8e10fb56db962900611aea75a4ac4dd6f7cece247047f702f3189d58f9e"
 		},
 		"ht-HT": {
-			"count": 0,
-			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+			"count": 228,
+			"sha256": "46cdbed7c6974f7677cde0b8dcfbdb75eb2d19b7676fa8fdd0a93ce7642818ac"
 		},
 		"vi-VN": {
-			"count": 13,
-			"sha256": "4cf1bbbc82cea1ec700519564e192382e55fb09edc7a75869650e587cd25f5e6"
+			"count": 241,
+			"sha256": "901fb317e3f428c0994caf11a3263f1165582e04995480bc1c83dfd9f7f5e805"
 		},
 		"ja-KS": {
-			"count": 13,
-			"sha256": "3b7fed7bb05aadb6c7b1f23cd66f118deeede46af06c63d26306501b3cef792d"
+			"count": 241,
+			"sha256": "9b3230c765456ee827106c45b2fed3f4726a7f77de1de15958c7fd0674e94597"
 		},
 		"ko-KR": {
-			"count": 13,
-			"sha256": "a000d7c1fab4a0bf37dec56ccb235f4fab5231ea048c0b956930d2a4afccfc01"
+			"count": 241,
+			"sha256": "4104859171655bf766e8ad7ded036ec7452e52689033813f26b31c1921b94fac"
 		},
 		"hr-HR": {
-			"count": 0,
-			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+			"count": 228,
+			"sha256": "46cdbed7c6974f7677cde0b8dcfbdb75eb2d19b7676fa8fdd0a93ce7642818ac"
 		},
 		"it-IT": {
-			"count": 13,
-			"sha256": "4b66fe55b5c58751dbe958fca28e1a0c78382431f410335e0e1406e970b229f7"
+			"count": 241,
+			"sha256": "022d00e2a1351a33fa29f57b672b6ef58b2c9f0413b7028621f667bb003dd6db"
 		},
 		"kn-IN": {
-			"count": 1,
-			"sha256": "d9799b1e47d33746d5751df51e09607b6ddde8d28806be0416f627eac21b428b"
+			"count": 229,
+			"sha256": "616ae2301077a41758483fb6592022611a3eefbbbc479decff9fcc6123381f8a"
 		},
 		"si-LK": {
-			"count": 2,
-			"sha256": "7e2e2648a20a35828de9d04e5f77fba2040a78516de3781684213652e5d75b5f"
+			"count": 230,
+			"sha256": "6465b3a5875ae01e0322d4c30342c40b0fcce0e1e6fe81a9ee1a150a3b0baa9c"
 		},
 		"uk-UA": {
-			"count": 13,
-			"sha256": "41166c22aed859f36a96508e226790499973204371b59e69109364b9775d507e"
+			"count": 241,
+			"sha256": "19f1b31166ac062b9aa6b79ae09e46ab318479f20389169b6fd3d76e5ba594f9"
 		},
 		"bn-BD": {
-			"count": 11,
-			"sha256": "6af3fed5d09cfb6d528876c52c5e3d8cb1248cb5ab2d7422ba02dde8a16e181d"
+			"count": 239,
+			"sha256": "4730b523a744a8470523f938bd193d63788442dee5a413770c12e0365fdfe349"
 		},
 		"fr-FR": {
-			"count": 13,
-			"sha256": "3c6fe032771df1ddb65dc8a196a339d809fc323aa5a818c00342b86ffe85e184"
+			"count": 241,
+			"sha256": "e570bc37a13c57a6a58d57ff54fc3087541a5469c1874d45872012379a66405f"
 		},
 		"kab-KAB": {
-			"count": 0,
-			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+			"count": 228,
+			"sha256": "30c937dc00c72733b8d3dcb56b811f49683da9383126e0be89509383533bb196"
 		},
 		"th-TH": {
-			"count": 13,
-			"sha256": "0b1adc34adde11fe27e8a92af3c22bdf9042efb9435a3748314d78db6a6d4531"
+			"count": 241,
+			"sha256": "2133597b110ec3fdf29e471341c8ec91b35cd3aafd45fe643058dc4078904d06"
 		},
 		"en-US": {
-			"count": 13,
-			"sha256": "d84f4ac34ef3e67c249fe39e22cf229405f2b58a24e01fe0e23e68b2d54aceca"
+			"count": 241,
+			"sha256": "79b716d6a83a7cad94b73ef9d10487ad515ff5d1c032924d3a6a6f556895dab2"
 		},
 		"jbo-EN": {
-			"count": 0,
-			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+			"count": 228,
+			"sha256": "46cdbed7c6974f7677cde0b8dcfbdb75eb2d19b7676fa8fdd0a93ce7642818ac"
 		},
 		"sk-SK": {
-			"count": 11,
-			"sha256": "81572e3101847d7e2ffb42c65781d667ae17a9b1144e588974a6a5aae2ca1cdb"
+			"count": 239,
+			"sha256": "3b651b1ad28b9790ecb0bb3d7d2872b54b5457bbeda8b9bed6e0f0dc2f9195c4"
 		},
 		"ja-JP": {
-			"count": 13,
-			"sha256": "e13e19986742c8149446a30a8bfcd6f923938b52d05af01cb6aafd56fd3fd21f"
+			"count": 241,
+			"sha256": "1ea16b7452973f02a9922ee51e34a092d40cd2d276835396dbda24cc616a07ee"
 		},
 		"zh-TW": {
-			"count": 13,
-			"sha256": "d0173775212accfadf6ca142e94b51abbec884340efed7585303678f4b48d673"
+			"count": 241,
+			"sha256": "8aa8b096cfa9cfd1ad04d1e7852b44e5d3d39e86e589757b0e859c9b937830d7"
 		},
 		"el-GR": {
-			"count": 6,
-			"sha256": "28b738b2a6f3a587ae0af3081e3adb45324f2def86b9f34e1fbcbf303262504c"
+			"count": 234,
+			"sha256": "be421c0c711c3e9035c05403a49bd121b1915bdc4b340f19c94624c07944f784"
 		},
 		"lo-LA": {
-			"count": 12,
-			"sha256": "a614de0d20636e2000690401519561d68ff6d4b5490f3a4623192851125e92a4"
+			"count": 240,
+			"sha256": "56b0664536f10dc403cf54c650c8cf76fdc3e732f8ac1e1ac16b6dea2edcc09c"
 		},
 		"sv-SE": {
-			"count": 10,
-			"sha256": "02b7574bb44e4012265467fbfdd6cd3dbfd8d008c4bcf671038c64ff45af563c"
+			"count": 238,
+			"sha256": "3f4ad915b813b1134fcbae740616226d6683f5fe7028e4562fc6476440419d40"
 		},
 		"hu-HU": {
-			"count": 1,
-			"sha256": "d48ad2bcd0e70fcac2073e206f1a31d7f0ce6f0de35f325d69a7d0b0a7473858"
+			"count": 229,
+			"sha256": "8c35d26fbdf7bc1978079e8bf58d8b9c1191e13e1d6699c6b4fd2356e4dee2d0"
 		},
 		"uz-UZ": {
-			"count": 11,
-			"sha256": "37c7700bfef5350e5c8c76d0d3d2d575503388b887f97825b82a3e2e238e89fe"
+			"count": 239,
+			"sha256": "f2eb426716dfda8b38e1f460affbf624cf44fe8b5da305a2c435676b076108f7"
 		},
 		"ug-CN": {
-			"count": 0,
-			"sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+			"count": 228,
+			"sha256": "4dc092d4b45a61ea475330e6f658c2b252336bf68cc4ae656cbbb86217197007"
 		}
 	}
 }

@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { defineAsyncComponent } from 'vue';
 import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import FeatureLocaleMessages from '@features/drive/frontend/ts-messages.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
@@ -14,6 +14,12 @@ import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { globalEvents } from '@features/runtime/frontend/events.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 function rename(file: Misskey.entities.DriveFile) {
 	os.inputText({
@@ -69,7 +75,7 @@ function toggleSensitive(file: Misskey.entities.DriveFile) {
 	}).catch(err => {
 		os.alert({
 			type: 'error',
-			title: FeatureLocaleMessages.$locale.error,
+			title: getGlobalLocale().error,
 			text: err.message,
 		});
 	});
@@ -87,7 +93,7 @@ function addApp() {
 async function deleteFile(file: Misskey.entities.DriveFile) {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: interpolateLocaleParameters(FeatureLocaleMessages.$locale.driveFileDeleteConfirm, { name: file.name }),
+		text: interpolateLocaleParameters(getGlobalLocale().driveFileDeleteConfirm, { name: file.name }),
 	});
 	if (canceled) return;
 
@@ -110,7 +116,7 @@ export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Miss
 		text: FeatureLocaleMessages.$locale._fileViewer.title,
 		icon: 'ti ti-info-circle',
 	}, { type: 'divider' }, {
-		text: FeatureLocaleMessages.$locale.rename,
+		text: getGlobalLocale().rename,
 		icon: 'ti ti-forms',
 		action: () => rename(file),
 	}, {
@@ -118,7 +124,7 @@ export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Miss
 		icon: 'ti ti-folder-symlink',
 		action: () => move(file),
 	}, {
-		text: file.isSensitive ? FeatureLocaleMessages.$locale.unmarkAsSensitive : FeatureLocaleMessages.$locale.markAsSensitive,
+		text: file.isSensitive ? getGlobalLocale().unmarkAsSensitive : getGlobalLocale().markAsSensitive,
 		icon: file.isSensitive ? 'ti ti-eye' : 'ti ti-eye-exclamation',
 		action: () => toggleSensitive(file),
 	}, {
@@ -135,18 +141,18 @@ export function getDriveFileMenu(file: Misskey.entities.DriveFile, folder?: Miss
 			instant: true,
 		}),
 	}, {
-		text: FeatureLocaleMessages.$locale.copyUrl,
+		text: getGlobalLocale().copyUrl,
 		icon: 'ti ti-link',
 		action: () => copyUrl(file),
 	}, {
 		type: 'a',
 		href: file.url,
 		target: '_blank',
-		text: FeatureLocaleMessages.$locale.download,
+		text: getGlobalLocale().download,
 		icon: 'ti ti-download',
 		download: file.name,
 	}, { type: 'divider' }, {
-		text: FeatureLocaleMessages.$locale.delete,
+		text: getGlobalLocale().delete,
 		icon: 'ti ti-trash',
 		danger: true,
 		action: () => deleteFile(file),

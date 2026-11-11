@@ -54,7 +54,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div v-else :class="$style.hiddenPlaceholder"></div>
 						<div :class="[$style.hiddenText, { [$style.withBlur]: content.type === 'video' && content.thumbnailUrl != null }]">
 							<div>
-								<b v-if="content.file?.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ $locale.sfc.sensitive }}</b>
+								<b v-if="content.file?.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ globalLocale.env.sensitive }}</b>
 								<b v-else style="display: block;"><i class="ti" :class="contentHideFileIcon"></i> {{ contentHideFileText }}</b>
 								<span style="display: block;">{{ $locale.sfc.clickToShow }}</span>
 							</div>
@@ -146,6 +146,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
+import type { Locale } from 'i18n';
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 
 type Size = {
@@ -197,12 +199,12 @@ export function calculateSourceTransform({
 </script>
 
 <script lang="ts" setup>
+const globalLocale = useLocale<Locale>(import.meta.url);
+
 import { computed, nextTick, ref, useTemplateRef, markRaw, watch, provide, onBeforeUnmount, defineAsyncComponent } from 'vue';
 import MkBlurhash from '@features/drive/frontend/components/MkBlurhash.vue';
 import XControl from '@features/drive/frontend/components/MkLightbox.item.controls.vue';
-import type XAudioVisualizer__TypeReferenceOnly from '@features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue';
 import XFileInfo from '@features/drive/frontend/components/MkLightbox.item.fileinfo.vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { DI } from '@features/ui/frontend/di.js';
 import * as os from '@features/ui/frontend/os.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
@@ -211,6 +213,8 @@ import { makeDoubleTapDetector } from '@features/ui/frontend/utility/double-tap.
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import { isTouchUsing } from '@features/ui/frontend/utility/touch.js';
 import { getFileMenu } from '@features/drive/frontend/utility/get-file-menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type XAudioVisualizer__TypeReferenceOnly from '@features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue';
 
 const props = withDefaults(defineProps<{
 	content: Content;
@@ -300,7 +304,7 @@ const contentHideFileText = computed(() => {
 const videoAspectRatio = ref<number | null>(
 	props.content.width != null && props.content.height != null && props.content.width > 0 && props.content.height > 0
 		? props.content.width / props.content.height
-		: null
+		: null,
 );
 
 function onVideoLoadedMetadata() {
@@ -986,7 +990,7 @@ function openMenu(ev: PointerEvent) {
 	}
 
 	menu.push({
-		text: $locale.value.sfc.hide,
+		text: globalLocale.value.env.hide,
 		icon: 'ti ti-eye-off',
 		action: () => {
 			hide.value = true;
@@ -1311,8 +1315,6 @@ defineExpose({
 	"video": "فيديو",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "إخفاء",
-	"sensitive": "محتوى حساس",
 	"clickToShow": "اضغط للعرض"
 }
 </locale>
@@ -1323,8 +1325,6 @@ defineExpose({
 	"video": "Vídeo",
 	"audio": "So",
 	"pixelatedZoom": "Mode de zoom d'art pixelat",
-	"hide": "Amagar",
-	"sensitive": "Sensible",
 	"clickToShow": "Fes clic per mostrar"
 }
 </locale>
@@ -1335,8 +1335,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Zvuk",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Skrýt",
-	"sensitive": "NSFW",
 	"clickToShow": "Klikněte pro zobrazení"
 }
 </locale>
@@ -1347,8 +1345,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1359,8 +1355,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Inhalt verbergen",
-	"sensitive": "Sensibel",
 	"clickToShow": "Zum Anzeigen anklicken"
 }
 </locale>
@@ -1371,8 +1365,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1383,8 +1375,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Sonido",
 	"pixelatedZoom": "Modo de ampliación para pixel art",
-	"hide": "Ocultar",
-	"sensitive": "Marcado como sensible (NSFW)",
 	"clickToShow": "Haz clic para verlo"
 }
 </locale>
@@ -1395,8 +1385,6 @@ defineExpose({
 	"video": "Vidéo",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Masquer",
-	"sensitive": "Contenu sensible",
 	"clickToShow": "Cliquer pour afficher"
 }
 </locale>
@@ -1407,8 +1395,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Suara",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Sembunyikan",
-	"sensitive": "Konten sensitif",
 	"clickToShow": "Klik untuk melihat"
 }
 </locale>
@@ -1419,8 +1405,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Ingrandimento pixelato",
-	"hide": "Nascondere",
-	"sensitive": "Esplicito",
 	"clickToShow": "Media nascosto, cliccare solo se si intende vedere"
 }
 </locale>
@@ -1431,8 +1415,6 @@ defineExpose({
 	"video": "動画",
 	"audio": "音声",
 	"pixelatedZoom": "ピクセルアート拡大モード",
-	"hide": "隠す",
-	"sensitive": "センシティブ",
 	"clickToShow": "クリックして表示"
 }
 </locale>
@@ -1443,8 +1425,6 @@ defineExpose({
 	"video": "動画",
 	"audio": "音声",
 	"pixelatedZoom": "ピクセルアート拡大モード",
-	"hide": "隠す",
-	"sensitive": "気いつけて見いや",
 	"clickToShow": "押したら見えるで"
 }
 </locale>
@@ -1455,8 +1435,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1467,8 +1445,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1479,8 +1455,6 @@ defineExpose({
 	"video": "동영상",
 	"audio": "소리",
 	"pixelatedZoom": "픽셀 아트 확대 모드",
-	"hide": "숨기기",
-	"sensitive": "열람 주의",
 	"clickToShow": "클릭하여 보기"
 }
 </locale>
@@ -1491,8 +1465,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Verbergen",
-	"sensitive": "NSFW",
 	"clickToShow": "Klik om te bekijken"
 }
 </locale>
@@ -1503,8 +1475,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Skjul",
-	"sensitive": "Sensitive",
 	"clickToShow": "Klikk for å vise"
 }
 </locale>
@@ -1515,8 +1485,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Ukryj",
-	"sensitive": "NSFW",
 	"clickToShow": "Kliknij, aby wyświetlić"
 }
 </locale>
@@ -1527,8 +1495,6 @@ defineExpose({
 	"video": "Vídeo",
 	"audio": "Áudio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Ocultar",
-	"sensitive": "Conteúdo sensível",
 	"clickToShow": "Clique para ver"
 }
 </locale>
@@ -1539,8 +1505,6 @@ defineExpose({
 	"video": "Видео",
 	"audio": "Звук",
 	"pixelatedZoom": "Пиксельное масштабирование",
-	"hide": "Спрятать",
-	"sensitive": "Содержимое не для всех",
 	"clickToShow": "Нажмите для просмотра"
 }
 </locale>
@@ -1551,8 +1515,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Skryť",
-	"sensitive": "NSFW",
 	"clickToShow": "Kliknutím zobrazíte"
 }
 </locale>
@@ -1563,8 +1525,6 @@ defineExpose({
 	"video": "วีดีโอ",
 	"audio": "เสียง",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "ซ่อน",
-	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
 	"clickToShow": "คลิกเพื่อแสดง"
 }
 </locale>
@@ -1575,8 +1535,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Ses",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Gizle",
-	"sensitive": "Hassas",
 	"clickToShow": "Göstermek için tıklayın"
 }
 </locale>
@@ -1587,8 +1545,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1599,8 +1555,6 @@ defineExpose({
 	"video": "Відео",
 	"audio": "Аудіо",
 	"pixelatedZoom": "Пікселізоване приближення",
-	"hide": "Сховати",
-	"sensitive": "NSFW",
 	"clickToShow": "Натисніть для перегляду"
 }
 </locale>
@@ -1611,8 +1565,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Âm thanh",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Ẩn",
-	"sensitive": "Nhạy cảm",
 	"clickToShow": "Nhấn để xem"
 }
 </locale>
@@ -1623,8 +1575,6 @@ defineExpose({
 	"video": "视频",
 	"audio": "音频",
 	"pixelatedZoom": "像素画放大模式",
-	"hide": "隐藏",
-	"sensitive": "敏感内容",
 	"clickToShow": "点击以显示"
 }
 </locale>
@@ -1635,8 +1585,6 @@ defineExpose({
 	"video": "影片",
 	"audio": "音效",
 	"pixelatedZoom": "像素藝術縮放模式",
-	"hide": "隱藏",
-	"sensitive": "敏感內容",
 	"clickToShow": "點擊查看"
 }
 </locale>
