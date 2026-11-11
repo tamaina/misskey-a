@@ -5,13 +5,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div class="_gaps_s">
 	<div class="_buttons">
-		<MkButton inline @click="selected = []">{{ disableAllText }}</MkButton>
-		<MkButton inline @click="selected = [...eligible]">{{ enableAllText }}</MkButton>
+		<MkButton inline @click="setPermissions(ordinaryPermissions, false)">{{ disableAllText }}</MkButton>
+		<MkButton inline @click="setPermissions(ordinaryPermissions, true)">{{ enableAllText }}</MkButton>
 	</div>
 	<MkSwitch v-for="kind in ordinaryPermissions" :key="kind" :modelValue="selected.includes(kind)" @update:modelValue="value => toggle(kind, value)">{{ labels[kind] }}</MkSwitch>
 	<div v-if="adminPermissions.length > 0" :class="$style.adminPermissions">
 		<div :class="$style.adminPermissionsHeader"><b>{{ adminPermissionText }}</b></div>
-		<MkSwitch v-for="kind in adminPermissions" :key="kind" :modelValue="selected.includes(kind)" @update:modelValue="value => toggle(kind, value)">{{ labels[kind] }}</MkSwitch>
+		<div class="_gaps_s">
+			<div class="_buttons">
+				<MkButton inline @click="setPermissions(adminPermissions, false)">{{ disableAllAdminText }}</MkButton>
+				<MkButton inline @click="setPermissions(adminPermissions, true)">{{ enableAllAdminText }}</MkButton>
+			</div>
+			<MkSwitch v-for="kind in adminPermissions" :key="kind" :modelValue="selected.includes(kind)" @update:modelValue="value => toggle(kind, value)">{{ labels[kind] }}</MkSwitch>
+		</div>
 	</div>
 </div>
 </template>
@@ -26,6 +32,8 @@ const props = defineProps<{
 	labels: Record<string, string>;
 	disableAllText: string;
 	enableAllText: string;
+	disableAllAdminText: string;
+	enableAllAdminText: string;
 	adminPermissionText: string;
 }>();
 const selected = defineModel<string[]>({ required: true });
@@ -34,6 +42,10 @@ const ordinaryPermissions = computed(() => eligible.value.filter(p => !p.startsW
 const adminPermissions = computed(() => eligible.value.filter(p => p.startsWith('read:admin') || p.startsWith('write:admin')));
 
 watch(eligible, permissions => { selected.value = selected.value.filter(p => permissions.includes(p)); }, { immediate: true });
+
+function setPermissions(permissions: readonly string[], enabled: boolean) {
+	selected.value = enabled ? [...new Set([...selected.value, ...permissions])] : selected.value.filter(p => !permissions.includes(p));
+}
 
 function toggle(kind: string, enabled: boolean) {
 	selected.value = enabled ? [...new Set([...selected.value, kind])] : selected.value.filter(p => p !== kind);

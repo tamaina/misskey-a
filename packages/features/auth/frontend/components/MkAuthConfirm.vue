@@ -65,7 +65,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div v-if="selectablePermissionsLabel && selectablePermissions" :class="$style.accountSelectorLabel">{{ selectablePermissionsLabel }}</div>
 			<MkPermissionSelect v-if="selectablePermissions" v-model="selectedPermissions" :permissions="selectablePermissions"
 				:administrator="selectedAdministrator" :labels="copyLocaleDictionary($locale.sfc.permissionsLabels)"
-				:disableAllText="$locale.sfc.disableAll" :enableAllText="$locale.sfc.enableAll" :adminPermissionText="$locale.sfc.adminPermission"/>
+				:disableAllText="$locale.sfc.disableAll" :enableAllText="$locale.sfc.enableAll"
+				:disableAllAdminText="$locale.sfc.disableAllAdmin" :enableAllAdminText="$locale.sfc.enableAllAdmin" :adminPermissionText="$locale.sfc.adminPermission"/>
 			<slot name="consentAdditionalInfo"></slot>
 			<div>
 				<div :class="$style.accountSelectorLabel">
@@ -587,6 +588,8 @@ defineExpose({
 	"createAccount": "أنشئ حسابًا",
 	"disableAll": "تعطيل الكل",
 	"enableAll": "تشغيل الكل",
+	"disableAllAdmin": "تعطيل الكل (Admin Permissions)",
+	"enableAllAdmin": "تشغيل الكل (Admin Permissions)",
 	"adminPermission": "Admin Permissions"
 }
 </locale>
@@ -703,6 +706,8 @@ defineExpose({
 	"createAccount": "Crea un compte",
 	"disableAll": "Deshabilita tot",
 	"enableAll": "Habilita tot",
+	"disableAllAdmin": "Deshabilita tot (Permisos d'administrador )",
+	"enableAllAdmin": "Habilita tot (Permisos d'administrador )",
 	"adminPermission": "Permisos d'administrador "
 }
 </locale>
@@ -819,6 +824,8 @@ defineExpose({
 	"createAccount": "Vytvořit účet",
 	"disableAll": "Vypnout vše",
 	"enableAll": "Povolit vše",
+	"disableAllAdmin": "Vypnout vše (Administrátorská práva)",
+	"enableAllAdmin": "Povolit vše (Administrátorská práva)",
 	"adminPermission": "Administrátorská práva"
 }
 </locale>
@@ -935,6 +942,8 @@ defineExpose({
 	"createAccount": "Create account",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"adminPermission": "Admin Permissions"
 }
 </locale>
@@ -1051,6 +1060,8 @@ defineExpose({
 	"createAccount": "Benutzerkonto erstellen",
 	"disableAll": "Alle deaktivieren",
 	"enableAll": "Alle aktivieren",
+	"disableAllAdmin": "Alle deaktivieren (Administratorberechtigung)",
+	"enableAllAdmin": "Alle aktivieren (Administratorberechtigung)",
 	"adminPermission": "Administratorberechtigung"
 }
 </locale>
@@ -1167,6 +1178,8 @@ defineExpose({
 	"createAccount": "Create account",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all admin permissions",
+	"enableAllAdmin": "Enable all admin permissions",
 	"adminPermission": "Admin Permissions"
 }
 </locale>
@@ -1283,6 +1296,8 @@ defineExpose({
 	"createAccount": "Crear cuenta",
 	"disableAll": "Desactivar todo",
 	"enableAll": "Activar todo",
+	"disableAllAdmin": "Desactivar todo (Permiso de administrador)",
+	"enableAllAdmin": "Activar todo (Permiso de administrador)",
 	"adminPermission": "Permiso de administrador"
 }
 </locale>
@@ -1399,6 +1414,8 @@ defineExpose({
 	"createAccount": "Créer un compte",
 	"disableAll": "Tout désactiver",
 	"enableAll": "Tout activer",
+	"disableAllAdmin": "Tout désactiver (Droits de l'administrateur)",
+	"enableAllAdmin": "Tout activer (Droits de l'administrateur)",
 	"adminPermission": "Droits de l'administrateur"
 }
 </locale>
@@ -1515,6 +1532,8 @@ defineExpose({
 	"createAccount": "Buat akun",
 	"disableAll": "Nonaktifkan semua",
 	"enableAll": "Aktifkan semua",
+	"disableAllAdmin": "Nonaktifkan semua (Wewenang Izin Admin)",
+	"enableAllAdmin": "Aktifkan semua (Wewenang Izin Admin)",
 	"adminPermission": "Wewenang Izin Admin"
 }
 </locale>
@@ -1631,6 +1650,8 @@ defineExpose({
 	"createAccount": "Crea il tuo profilo",
 	"disableAll": "Disabilitare tutto",
 	"enableAll": "Abilita tutto",
+	"disableAllAdmin": "Disabilitare tutto (Privilegi amministrativi)",
+	"enableAllAdmin": "Abilita tutto (Privilegi amministrativi)",
 	"adminPermission": "Privilegi amministrativi"
 }
 </locale>
@@ -1747,6 +1768,8 @@ defineExpose({
 	"createAccount": "アカウントを作成",
 	"disableAll": "全て無効にする",
 	"enableAll": "全て有効にする",
+	"disableAllAdmin": "管理者権限をすべて無効化",
+	"enableAllAdmin": "管理者権限をすべて有効化",
 	"adminPermission": "管理者権限"
 }
 </locale>
@@ -1863,6 +1886,8 @@ defineExpose({
 	"createAccount": "アカウントを作るで",
 	"disableAll": "全部使えへんようにする",
 	"enableAll": "全部使えるようにする",
+	"disableAllAdmin": "全部使えへんようにする (管理者権限)",
+	"enableAllAdmin": "全部使えるようにする (管理者権限)",
 	"adminPermission": "管理者権限"
 }
 </locale>
@@ -1979,6 +2004,8 @@ defineExpose({
 	"createAccount": "Create account",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"adminPermission": "Admin Permissions"
 }
 </locale>
@@ -2095,6 +2122,8 @@ defineExpose({
 	"createAccount": "Create account",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"adminPermission": "Admin Permissions"
 }
 </locale>
@@ -2211,6 +2240,8 @@ defineExpose({
 	"createAccount": "계정 만들기",
 	"disableAll": "전체 해제",
 	"enableAll": "전체 선택",
+	"disableAllAdmin": "전체 해제 (관리자 권한)",
+	"enableAllAdmin": "전체 선택 (관리자 권한)",
 	"adminPermission": "관리자 권한"
 }
 </locale>
@@ -2327,6 +2358,8 @@ defineExpose({
 	"createAccount": "Gebruikersaccount maken",
 	"disableAll": "Alle deactiveren",
 	"enableAll": "Alle activeren",
+	"disableAllAdmin": "Alle deactiveren (Administratorrechten)",
+	"enableAllAdmin": "Alle activeren (Administratorrechten)",
 	"adminPermission": "Administratorrechten"
 }
 </locale>
@@ -2443,6 +2476,8 @@ defineExpose({
 	"createAccount": "Opprett konto",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"adminPermission": "Admin Permissions"
 }
 </locale>
@@ -2559,6 +2594,8 @@ defineExpose({
 	"createAccount": "Utwórz konto",
 	"disableAll": "Wyłącz wszystko",
 	"enableAll": "Włącz wszystko",
+	"disableAllAdmin": "Wyłącz wszystko (Uprawnienia administracyjne)",
+	"enableAllAdmin": "Włącz wszystko (Uprawnienia administracyjne)",
 	"adminPermission": "Uprawnienia administracyjne"
 }
 </locale>
@@ -2675,6 +2712,8 @@ defineExpose({
 	"createAccount": "Criar conta",
 	"disableAll": "Desabilitar tudo",
 	"enableAll": "Habilitar tudo",
+	"disableAllAdmin": "Desabilitar tudo (Permissões de administrador)",
+	"enableAllAdmin": "Habilitar tudo (Permissões de administrador)",
 	"adminPermission": "Permissões de administrador"
 }
 </locale>
@@ -2791,6 +2830,8 @@ defineExpose({
 	"createAccount": "Новая учётная запись",
 	"disableAll": "Выключить всё",
 	"enableAll": "Включить все",
+	"disableAllAdmin": "Выключить всё (Доступ администратора)",
+	"enableAllAdmin": "Включить все (Доступ администратора)",
 	"adminPermission": "Доступ администратора"
 }
 </locale>
@@ -2907,6 +2948,8 @@ defineExpose({
 	"createAccount": "Vytvoriť účet",
 	"disableAll": "Vypnúť všetko",
 	"enableAll": "Povoliť všetko",
+	"disableAllAdmin": "Vypnúť všetko (Admin Permissions)",
+	"enableAllAdmin": "Povoliť všetko (Admin Permissions)",
 	"adminPermission": "Admin Permissions"
 }
 </locale>
@@ -3023,6 +3066,8 @@ defineExpose({
 	"createAccount": "สร้างบัญชี",
 	"disableAll": "ปิดการใช้งานทั้งหมด",
 	"enableAll": "เปิดใช้งานทั้งหมด",
+	"disableAllAdmin": "ปิดการใช้งานทั้งหมด (สิทธิ์ของผู้ดูแลระบบ)",
+	"enableAllAdmin": "เปิดใช้งานทั้งหมด (สิทธิ์ของผู้ดูแลระบบ)",
 	"adminPermission": "สิทธิ์ของผู้ดูแลระบบ"
 }
 </locale>
@@ -3139,6 +3184,8 @@ defineExpose({
 	"createAccount": "Hesap oluştur",
 	"disableAll": "Tümünü devre dışı bırak",
 	"enableAll": "Tümünü etkinleştir",
+	"disableAllAdmin": "Tümünü devre dışı bırak (Yönetici İzinleri)",
+	"enableAllAdmin": "Tümünü etkinleştir (Yönetici İzinleri)",
 	"adminPermission": "Yönetici İzinleri"
 }
 </locale>
@@ -3255,6 +3302,8 @@ defineExpose({
 	"createAccount": "Create account",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"adminPermission": "Admin Permissions"
 }
 </locale>
@@ -3371,6 +3420,8 @@ defineExpose({
 	"createAccount": "Створити акаунт",
 	"disableAll": "Вимкнути все",
 	"enableAll": "Увімкнути все",
+	"disableAllAdmin": "Вимкнути все (Права адміністратора)",
+	"enableAllAdmin": "Увімкнути все (Права адміністратора)",
 	"adminPermission": "Права адміністратора"
 }
 </locale>
@@ -3487,6 +3538,8 @@ defineExpose({
 	"createAccount": "Tạo tài khoản",
 	"disableAll": "Tắt toàn bộ",
 	"enableAll": "Bật toàn bộ",
+	"disableAllAdmin": "Tắt toàn bộ (Quyền quản trị viên)",
+	"enableAllAdmin": "Bật toàn bộ (Quyền quản trị viên)",
 	"adminPermission": "Quyền quản trị viên"
 }
 </locale>
@@ -3603,6 +3656,8 @@ defineExpose({
 	"createAccount": "注册账户",
 	"disableAll": "禁用全部",
 	"enableAll": "启用全部",
+	"disableAllAdmin": "禁用全部 (管理员权限)",
+	"enableAllAdmin": "启用全部 (管理员权限)",
 	"adminPermission": "管理员权限"
 }
 </locale>
@@ -3719,6 +3774,8 @@ defineExpose({
 	"createAccount": "建立帳戶",
 	"disableAll": "停用全部",
 	"enableAll": "啟用全部",
+	"disableAllAdmin": "停用全部 (管理員權限)",
+	"enableAllAdmin": "啟用全部 (管理員權限)",
 	"adminPermission": "管理員權限"
 }
 </locale>

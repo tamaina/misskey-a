@@ -29,7 +29,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div><b>{{ $locale.sfc.permission }}</b></div>
 			<MkPermissionSelect v-model="selectedPermissions" :permissions="Misskey.permissions" :administrator="!!iAmAdmin"
-				:labels="copyLocaleDictionary($locale.sfc.permissionsLabels)" :disableAllText="$locale.sfc.disableAll" :enableAllText="$locale.sfc.enableAll" :adminPermissionText="$locale.sfc.adminPermission"/>
+				:labels="copyLocaleDictionary($locale.sfc.permissionsLabels)" :disableAllText="$locale.sfc.disableAll" :enableAllText="$locale.sfc.enableAll"
+				:disableAllAdminText="$locale.sfc.disableAllAdmin" :enableAllAdminText="$locale.sfc.enableAllAdmin" :adminPermissionText="$locale.sfc.adminPermission"/>
 		</div>
 	</div>
 </MkModalWindow>
@@ -83,6 +84,8 @@ function ok(): void {
 	"permission": "أذونات",
 	"disableAll": "تعطيل الكل",
 	"enableAll": "تشغيل الكل",
+	"disableAllAdmin": "تعطيل الكل (Admin Permissions)",
+	"enableAllAdmin": "تشغيل الكل (Admin Permissions)",
 	"permissionsLabels": {
 		"access:mcp": "الاتصال بـ MCP (وفقًا لأذونات API ونطاق الرؤية الحاليين، وقد يتيح قراءة الملاحظات غير العامة للحساب نفسه)",
 		"read:account": "اعرض معلومات حسابك",
@@ -184,6 +187,8 @@ function ok(): void {
 	"permission": "Permisos",
 	"disableAll": "Deshabilita tot",
 	"enableAll": "Habilita tot",
+	"disableAllAdmin": "Deshabilita tot (Permisos d'administrador )",
+	"enableAllAdmin": "Habilita tot (Permisos d'administrador )",
 	"permissionsLabels": {
 		"access:mcp": "Connectar-se a MCP (segons els permisos de l’API i la visibilitat existents; pot permetre llegir notes no públiques del mateix compte)",
 		"read:account": "Veure la informació del compte.",
@@ -285,6 +290,8 @@ function ok(): void {
 	"permission": "Oprávnění",
 	"disableAll": "Vypnout vše",
 	"enableAll": "Povolit vše",
+	"disableAllAdmin": "Vypnout vše (Administrátorská práva)",
+	"enableAllAdmin": "Povolit vše (Administrátorská práva)",
 	"permissionsLabels": {
 		"access:mcp": "Připojit se k MCP (podle stávajících oprávnění API a viditelnosti; může umožnit čtení neveřejných poznámek tohoto účtu)",
 		"read:account": "Zobrazit informace o účtu",
@@ -386,6 +393,8 @@ function ok(): void {
 	"permission": "Permissions",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"permissionsLabels": {
 		"access:mcp": "Opret forbindelse til MCP (med de eksisterende API-tilladelser og synlighedsregler; kan give adgang til kontoens egne ikke-offentlige noter)",
 		"read:account": "View your account information",
@@ -487,6 +496,8 @@ function ok(): void {
 	"permission": "Berechtigungen",
 	"disableAll": "Alle deaktivieren",
 	"enableAll": "Alle aktivieren",
+	"disableAllAdmin": "Alle deaktivieren (Administratorberechtigung)",
+	"enableAllAdmin": "Alle aktivieren (Administratorberechtigung)",
 	"permissionsLabels": {
 		"access:mcp": "Mit MCP verbinden (gemäß den bestehenden API-Berechtigungen und Sichtbarkeitsregeln; kann das Lesen eigener nicht öffentlicher Notizen ermöglichen)",
 		"read:account": "Deine Benutzerkontoinformationen lesen",
@@ -588,6 +599,8 @@ function ok(): void {
 	"permission": "Permissions",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all admin permissions",
+	"enableAllAdmin": "Enable all admin permissions",
 	"permissionsLabels": {
 		"access:mcp": "Connect to MCP (subject to existing API permissions and visibility; may allow reading this account’s own nonpublic notes)",
 		"read:account": "View your account information",
@@ -689,6 +702,8 @@ function ok(): void {
 	"permission": "Permisos",
 	"disableAll": "Desactivar todo",
 	"enableAll": "Activar todo",
+	"disableAllAdmin": "Desactivar todo (Permiso de administrador)",
+	"enableAllAdmin": "Activar todo (Permiso de administrador)",
 	"permissionsLabels": {
 		"access:mcp": "Conectarse a MCP (según los permisos de la API y la visibilidad existentes; puede permitir leer las notas no públicas de la propia cuenta)",
 		"read:account": "Ver información de la cuenta",
@@ -790,6 +805,8 @@ function ok(): void {
 	"permission": "Autorisations\u00a0",
 	"disableAll": "Tout désactiver",
 	"enableAll": "Tout activer",
+	"disableAllAdmin": "Tout désactiver (Droits de l'administrateur)",
+	"enableAllAdmin": "Tout activer (Droits de l'administrateur)",
 	"permissionsLabels": {
 		"access:mcp": "Se connecter à MCP (selon les autorisations de l’API et la visibilité existantes ; peut permettre de lire les notes non publiques de ce compte)",
 		"read:account": "Afficher les informations du compte",
@@ -891,6 +908,8 @@ function ok(): void {
 	"permission": "Izin",
 	"disableAll": "Nonaktifkan semua",
 	"enableAll": "Aktifkan semua",
+	"disableAllAdmin": "Nonaktifkan semua (Wewenang Izin Admin)",
+	"enableAllAdmin": "Aktifkan semua (Wewenang Izin Admin)",
 	"permissionsLabels": {
 		"access:mcp": "Terhubung ke MCP (sesuai izin API dan visibilitas yang berlaku; dapat mengizinkan pembacaan catatan nonpublik milik akun ini)",
 		"read:account": "Lihat informasi akun",
@@ -992,6 +1011,8 @@ function ok(): void {
 	"permission": "Autorizzazioni ",
 	"disableAll": "Disabilitare tutto",
 	"enableAll": "Abilita tutto",
+	"disableAllAdmin": "Disabilitare tutto (Privilegi amministrativi)",
+	"enableAllAdmin": "Abilita tutto (Privilegi amministrativi)",
 	"permissionsLabels": {
 		"access:mcp": "Connettersi a MCP (secondo le autorizzazioni API e la visibilità esistenti; può consentire la lettura delle note non pubbliche del proprio account)",
 		"read:account": "Vedere le informazioni sul profilo",
@@ -1093,6 +1114,8 @@ function ok(): void {
 	"permission": "権限",
 	"disableAll": "全て無効にする",
 	"enableAll": "全て有効にする",
+	"disableAllAdmin": "管理者権限をすべて無効化",
+	"enableAllAdmin": "管理者権限をすべて有効化",
 	"permissionsLabels": {
 		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）",
 		"read:account": "アカウントの情報を見る",
@@ -1194,6 +1217,8 @@ function ok(): void {
 	"permission": "権限",
 	"disableAll": "全部使えへんようにする",
 	"enableAll": "全部使えるようにする",
+	"disableAllAdmin": "全部使えへんようにする (管理者権限)",
+	"enableAllAdmin": "全部使えるようにする (管理者権限)",
 	"permissionsLabels": {
 		"access:mcp": "MCPに接続する（通常のAPI権限・公開範囲に従って、本人の非公開ノートも読める場合があるで）",
 		"read:account": "アカウントの情報を見るで",
@@ -1295,6 +1320,8 @@ function ok(): void {
 	"permission": "Permissions",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"permissionsLabels": {
 		"access:mcp": "Qqen ɣer MCP (ilmend n tsirag n API d tilisa n useknen yellan; yezmer ad isireg taɣuri n tezmilin tudmawin n umiḍan-agi)",
 		"read:account": "View your account information",
@@ -1396,6 +1423,8 @@ function ok(): void {
 	"permission": "Permissions",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"permissionsLabels": {
 		"access:mcp": "MCPಗೆ ಸಂಪರ್ಕಿಸಿ (ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ API ಅನುಮತಿಗಳು ಮತ್ತು ಗೋಚರತೆಯ ನಿಯಮಗಳಿಗೆ ಒಳಪಟ್ಟಿರುತ್ತದೆ; ಈ ಖಾತೆಯ ಸ್ವಂತ ಸಾರ್ವಜನಿಕವಲ್ಲದ ಟಿಪ್ಪಣಿಗಳನ್ನು ಓದಲು ಅವಕಾಶ ನೀಡಬಹುದು)",
 		"read:account": "View your account information",
@@ -1497,6 +1526,8 @@ function ok(): void {
 	"permission": "권한",
 	"disableAll": "전체 해제",
 	"enableAll": "전체 선택",
+	"disableAllAdmin": "전체 해제 (관리자 권한)",
+	"enableAllAdmin": "전체 선택 (관리자 권한)",
 	"permissionsLabels": {
 		"access:mcp": "MCP에 연결하기 (기존 API 권한과 공개 범위에 따르며, 이 계정의 비공개 노트를 읽을 수 있는 경우가 있습니다)",
 		"read:account": "계정의 정보를 봅니다",
@@ -1598,6 +1629,8 @@ function ok(): void {
 	"permission": "Machtigingen",
 	"disableAll": "Alle deactiveren",
 	"enableAll": "Alle activeren",
+	"disableAllAdmin": "Alle deactiveren (Administratorrechten)",
+	"enableAllAdmin": "Alle activeren (Administratorrechten)",
 	"permissionsLabels": {
 		"access:mcp": "Verbinding maken met MCP (volgens de bestaande API-rechten en zichtbaarheid; kan het lezen van eigen niet-openbare notities toestaan)",
 		"read:account": "View your account information",
@@ -1699,6 +1732,8 @@ function ok(): void {
 	"permission": "Permissions",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"permissionsLabels": {
 		"access:mcp": "Koble til MCP (i henhold til eksisterende API-tillatelser og synlighetsregler; kan gi tilgang til kontoens egne ikke-offentlige notater)",
 		"read:account": "View your account information",
@@ -1800,6 +1835,8 @@ function ok(): void {
 	"permission": "Uprawnienia",
 	"disableAll": "Wyłącz wszystko",
 	"enableAll": "Włącz wszystko",
+	"disableAllAdmin": "Wyłącz wszystko (Uprawnienia administracyjne)",
+	"enableAllAdmin": "Włącz wszystko (Uprawnienia administracyjne)",
 	"permissionsLabels": {
 		"access:mcp": "Połącz z MCP (zgodnie z istniejącymi uprawnieniami API i widocznością; może umożliwić odczyt niepublicznych notatek tego konta)",
 		"read:account": "Wyświetl informacje o swoim koncie",
@@ -1901,6 +1938,8 @@ function ok(): void {
 	"permission": "Permissões",
 	"disableAll": "Desabilitar tudo",
 	"enableAll": "Habilitar tudo",
+	"disableAllAdmin": "Desabilitar tudo (Permissões de administrador)",
+	"enableAllAdmin": "Habilitar tudo (Permissões de administrador)",
 	"permissionsLabels": {
 		"access:mcp": "Ligar ao MCP (de acordo com as permissões da API e a visibilidade existentes; pode permitir ler as notas não públicas da própria conta)",
 		"read:account": "Visualizar informações da conta",
@@ -2002,6 +2041,8 @@ function ok(): void {
 	"permission": "Разрешения",
 	"disableAll": "Выключить всё",
 	"enableAll": "Включить все",
+	"disableAllAdmin": "Выключить всё (Доступ администратора)",
+	"enableAllAdmin": "Включить все (Доступ администратора)",
 	"permissionsLabels": {
 		"access:mcp": "Подключение к MCP (с учётом существующих разрешений API и правил видимости; может разрешать чтение собственных непубличных заметок этого аккаунта)",
 		"read:account": "Просматривать данные учётной записи",
@@ -2103,6 +2144,8 @@ function ok(): void {
 	"permission": "Oprávnenia",
 	"disableAll": "Vypnúť všetko",
 	"enableAll": "Povoliť všetko",
+	"disableAllAdmin": "Vypnúť všetko (Admin Permissions)",
+	"enableAllAdmin": "Povoliť všetko (Admin Permissions)",
 	"permissionsLabels": {
 		"access:mcp": "Pripojiť sa k MCP (podľa existujúcich oprávnení API a viditeľnosti; môže umožniť čítanie neverejných poznámok tohto účtu)",
 		"read:account": "Vidieť informácie o vašom účte",
@@ -2204,6 +2247,8 @@ function ok(): void {
 	"permission": "สิทธิ์",
 	"disableAll": "ปิดการใช้งานทั้งหมด",
 	"enableAll": "เปิดใช้งานทั้งหมด",
+	"disableAllAdmin": "ปิดการใช้งานทั้งหมด (สิทธิ์ของผู้ดูแลระบบ)",
+	"enableAllAdmin": "เปิดใช้งานทั้งหมด (สิทธิ์ของผู้ดูแลระบบ)",
 	"permissionsLabels": {
 		"access:mcp": "เชื่อมต่อกับ MCP (ตามสิทธิ์ API และขอบเขตการมองเห็นที่มีอยู่ ซึ่งอาจอนุญาตให้อ่านโน้ตที่ไม่เป็นสาธารณะของบัญชีนี้เองได้)",
 		"read:account": "ดูข้อมูลบัญชี",
@@ -2305,6 +2350,8 @@ function ok(): void {
 	"permission": "İzinler",
 	"disableAll": "Tümünü devre dışı bırak",
 	"enableAll": "Tümünü etkinleştir",
+	"disableAllAdmin": "Tümünü devre dışı bırak (Yönetici İzinleri)",
+	"enableAllAdmin": "Tümünü etkinleştir (Yönetici İzinleri)",
 	"permissionsLabels": {
 		"access:mcp": "MCP’ye bağlan (mevcut API izinleri ve görünürlük kurallarına tabidir; bu hesabın kendi herkese açık olmayan notlarının okunmasına izin verebilir)",
 		"read:account": "Hesap bilgilerini gör",
@@ -2406,6 +2453,8 @@ function ok(): void {
 	"permission": "Permissions",
 	"disableAll": "Disable all",
 	"enableAll": "Enable all",
+	"disableAllAdmin": "Disable all (Admin Permissions)",
+	"enableAllAdmin": "Enable all (Admin Permissions)",
 	"permissionsLabels": {
 		"access:mcp": "MCP غا ئۇلىنىش (مەۋجۇت API ئىجازەتلىرى ۋە كۆرۈنۈش دائىرىسىگە ئاساسەن، بۇ ھېساباتنىڭ ئۆزىگە تەۋە ئاشكارا بولمىغان خاتىرىلەرنى ئوقۇشقا رۇخسەت بېرىشى مۇمكىن)",
 		"read:account": "View your account information",
@@ -2507,6 +2556,8 @@ function ok(): void {
 	"permission": "Права",
 	"disableAll": "Вимкнути все",
 	"enableAll": "Увімкнути все",
+	"disableAllAdmin": "Вимкнути все (Права адміністратора)",
+	"enableAllAdmin": "Увімкнути все (Права адміністратора)",
 	"permissionsLabels": {
 		"access:mcp": "Підключення до MCP (згідно з чинними дозволами API та правилами видимості; може дозволяти читання власних непублічних нотаток цього облікового запису)",
 		"read:account": "Переглядати дані профілю",
@@ -2608,6 +2659,8 @@ function ok(): void {
 	"permission": "Cho phép ",
 	"disableAll": "Tắt toàn bộ",
 	"enableAll": "Bật toàn bộ",
+	"disableAllAdmin": "Tắt toàn bộ (Quyền quản trị viên)",
+	"enableAllAdmin": "Bật toàn bộ (Quyền quản trị viên)",
 	"permissionsLabels": {
 		"access:mcp": "Kết nối với MCP (theo quyền API và phạm vi hiển thị hiện có; có thể cho phép đọc ghi chú không công khai của chính tài khoản này)",
 		"read:account": "Xem thông tin tài khoản của bạn",
@@ -2709,6 +2762,8 @@ function ok(): void {
 	"permission": "权限",
 	"disableAll": "禁用全部",
 	"enableAll": "启用全部",
+	"disableAllAdmin": "禁用全部 (管理员权限)",
+	"enableAllAdmin": "启用全部 (管理员权限)",
 	"permissionsLabels": {
 		"access:mcp": "连接到 MCP（遵循现有 API 权限和可见范围，可能允许读取此账户自己的非公开笔记）",
 		"read:account": "查看账户信息",
@@ -2810,6 +2865,8 @@ function ok(): void {
 	"permission": "權限",
 	"disableAll": "停用全部",
 	"enableAll": "啟用全部",
+	"disableAllAdmin": "停用全部 (管理員權限)",
+	"enableAllAdmin": "啟用全部 (管理員權限)",
 	"permissionsLabels": {
 		"access:mcp": "連線至 MCP（遵循現有 API 權限與可見範圍，可能允許讀取此帳號自己的非公開筆記）",
 		"read:account": "查看我的帳戶資訊",
