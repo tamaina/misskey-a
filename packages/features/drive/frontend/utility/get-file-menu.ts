@@ -3,13 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { $i, iAmModerator } from '@features/auth/frontend/i.js';
 import FeatureLocaleMessages from '@features/drive/frontend/ts-messages.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import * as os from '@features/ui/frontend/os.js';
+import type { Locale } from 'i18n';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 /** 添付ファイルなど、公開ファイル用のメニュー */
 export function getFileMenu(file: Misskey.entities.DriveFile, onHideStateUpdated?: (newState: boolean) => void): MenuItem[] {
@@ -17,7 +23,7 @@ export function getFileMenu(file: Misskey.entities.DriveFile, onHideStateUpdated
 
 	if (onHideStateUpdated != null) {
 		menuItems.push({
-			text: FeatureLocaleMessages.$locale.hide,
+			text: getGlobalLocale().hide,
 			icon: 'ti ti-eye-off',
 			action: () => {
 				onHideStateUpdated(true);
@@ -27,7 +33,7 @@ export function getFileMenu(file: Misskey.entities.DriveFile, onHideStateUpdated
 
 	if (iAmModerator) {
 		menuItems.push({
-			text: file.isSensitive ? FeatureLocaleMessages.$locale.unmarkAsSensitive : FeatureLocaleMessages.$locale.markAsSensitive,
+			text: file.isSensitive ? getGlobalLocale().unmarkAsSensitive : getGlobalLocale().markAsSensitive,
 			icon: 'ti ti-eye-exclamation',
 			danger: true,
 			action: async () => {

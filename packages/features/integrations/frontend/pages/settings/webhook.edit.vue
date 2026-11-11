@@ -64,16 +64,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkSwitch v-model="active">{{ $locale.sfc.webhookSettingsActive }}</MkSwitch>
 
 	<div class="_buttons">
-		<MkButton primary inline @click="save"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
-		<MkButton danger inline @click="del"><i class="ti ti-trash"></i> {{ $locale.sfc.delete }}</MkButton>
+		<MkButton primary inline @click="save"><i class="ti ti-check"></i> {{ globalLocale.env.save }}</MkButton>
+		<MkButton danger inline @click="del"><i class="ti ti-trash"></i> {{ globalLocale.env.delete }}</MkButton>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, reactive, computed } from 'vue';
 import * as Misskey from 'misskey-js';
-import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
@@ -83,6 +83,10 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
+import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -119,7 +123,7 @@ function save() {
 async function del(): Promise<void> {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: interpolateLocaleParameters($locale.value.sfc.deleteAreYouSure, { x: webhook.name }),
+		text: interpolateLocaleParameters(globalLocale.value.env.deleteAreYouSure, { x: webhook.name }),
 	});
 	if (canceled) return;
 
@@ -191,10 +195,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "عند التفاعل",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "مُفعّل",
-	"save": "حفظ",
-	"delete": "حذف",
-	"deleteAreYouSure": "متأكد من أنك تريد حذف {x}؟"
+	"webhookSettingsActive": "مُفعّل"
 }
 </locale>
 
@@ -211,10 +212,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Quan es rep una reacció ",
 	"webhookSettingsEventsMention": "Quan et mencionen",
 	"webhookSettingsTestRemarks": "Si feu clic al botó a la dreta de l'interruptor, podeu enviar un webhook de prova amb dades dummy.",
-	"webhookSettingsActive": "Activat",
-	"save": "Desa",
-	"delete": "Elimina",
-	"deleteAreYouSure": "Segur que vols esborrar «{x}»?"
+	"webhookSettingsActive": "Activat"
 }
 </locale>
 
@@ -231,10 +229,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Při obdržení reakce",
 	"webhookSettingsEventsMention": "Při zmínce",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Zapnuto",
-	"save": "Uložit",
-	"delete": "Smazat",
-	"deleteAreYouSure": "Jste si jistí že chcete smazat \"{x}\"?"
+	"webhookSettingsActive": "Zapnuto"
 }
 </locale>
 
@@ -251,10 +246,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Enabled",
-	"save": "Save",
-	"delete": "Delete",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"webhookSettingsActive": "Enabled"
 }
 </locale>
 
@@ -271,10 +263,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Wenn du eine Reaktion erhältst",
 	"webhookSettingsEventsMention": "Wenn du erwähnt wirst",
 	"webhookSettingsTestRemarks": "Klicke auf die Schaltfläche rechts neben dem Schalter, um einen Test-Webhook mit Dummy-Daten zu senden.",
-	"webhookSettingsActive": "Aktiviert",
-	"save": "Speichern",
-	"delete": "Löschen",
-	"deleteAreYouSure": "Möchtest du „{x}“ wirklich löschen?"
+	"webhookSettingsActive": "Aktiviert"
 }
 </locale>
 
@@ -291,10 +280,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Enabled",
-	"save": "Save",
-	"delete": "Delete",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"webhookSettingsActive": "Enabled"
 }
 </locale>
 
@@ -311,10 +297,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Cuando se recibe una reacción",
 	"webhookSettingsEventsMention": "Cuando hay una mención",
 	"webhookSettingsTestRemarks": "Haz clic en el botón de la derecha del switch para mandar una prueba Webhook con datos ficticios",
-	"webhookSettingsActive": "Activado",
-	"save": "Guardar",
-	"delete": "Borrar",
-	"deleteAreYouSure": "¿Desea borrar \"{x}\"?"
+	"webhookSettingsActive": "Activado"
 }
 </locale>
 
@@ -331,10 +314,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Activé",
-	"save": "Enregistrer",
-	"delete": "Supprimer",
-	"deleteAreYouSure": "Êtes-vous sûr·e de vouloir supprimer « {x} » ?"
+	"webhookSettingsActive": "Activé"
 }
 </locale>
 
@@ -351,10 +331,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Ketika menerima reaksi",
 	"webhookSettingsEventsMention": "Ketika sedang disebut",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Aktif",
-	"save": "Simpan",
-	"delete": "Hapus",
-	"deleteAreYouSure": "Apakah kamu yakin ingin menghapus \"{x}\"?"
+	"webhookSettingsActive": "Aktif"
 }
 </locale>
 
@@ -371,10 +348,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Quando ricevo una reazione",
 	"webhookSettingsEventsMention": "Quando mi menzionano",
 	"webhookSettingsTestRemarks": "Clicca il bottone a destra dell'interruttore, per provare l'invio di un webhook con dati fittizi.",
-	"webhookSettingsActive": "Attivo",
-	"save": "Salva",
-	"delete": "Elimina",
-	"deleteAreYouSure": "Vuoi davvero eliminare \"{x}\"?"
+	"webhookSettingsActive": "Attivo"
 }
 </locale>
 
@@ -392,9 +366,6 @@ definePage(() => ({
 	"webhookSettingsEventsMention": "メンションされたとき",
 	"webhookSettingsTestRemarks": "スイッチの右にあるボタンをクリックするとダミーのデータを使用したテスト用Webhookを送信できます。",
 	"webhookSettingsActive": "有効",
-	"save": "保存",
-	"delete": "削除",
-	"deleteAreYouSure": "「{x}」を削除しますか？",
 	"eventsDescription": "通知に由来するイベントには通知の受信設定やミュートが適用されます。MCPで mention / reply と旧名 note.mentioned / note.replied の両方を購読すると、同じイベントが2回届くことがあります。",
 	"unfollow": "フォローを解除したとき",
 	"subscribedNote": "通知をオンにしたユーザーが投稿したとき",
@@ -429,10 +400,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "ツッコまれたとき～！",
 	"webhookSettingsEventsMention": "メンションがあるとき～！",
 	"webhookSettingsTestRemarks": "スイッチ右のボタンを押すとダミーデータを使ったテスト用Webhookを送れるで。",
-	"webhookSettingsActive": "有効",
-	"save": "とっとく",
-	"delete": "ほかす",
-	"deleteAreYouSure": "「{x}」はほかしてええか？"
+	"webhookSettingsActive": "有効"
 }
 </locale>
 
@@ -449,10 +417,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Enabled",
-	"save": "Sekles",
-	"delete": "Kkes",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"webhookSettingsActive": "Enabled"
 }
 </locale>
 
@@ -469,10 +434,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Enabled",
-	"save": "ಉಳಿಸಿ",
-	"delete": "ಅಳಿಸು",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"webhookSettingsActive": "Enabled"
 }
 </locale>
 
@@ -489,10 +451,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "누군가 내 노트에 리액션했을 때",
 	"webhookSettingsEventsMention": "누군가 나를 멘션했을 때",
 	"webhookSettingsTestRemarks": "스위치 오른쪽에 있는 버튼을 클릭하여 더미 데이터를 사용한 테스트용 웹 훅을 보낼 수 있습니다.",
-	"webhookSettingsActive": "활성화",
-	"save": "저장",
-	"delete": "삭제",
-	"deleteAreYouSure": "\"{x}\" 을(를) 삭제하시겠습니까?"
+	"webhookSettingsActive": "활성화"
 }
 </locale>
 
@@ -509,10 +468,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Ingeschakeld",
-	"save": "Opslaan",
-	"delete": "Verwijderen",
-	"deleteAreYouSure": "Weet je zeker dat je \"{x}\" wil verwijderen?"
+	"webhookSettingsActive": "Ingeschakeld"
 }
 </locale>
 
@@ -529,10 +485,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Enabled",
-	"save": "Lagre",
-	"delete": "Slett",
-	"deleteAreYouSure": "Er du sikker på at du vil slette \"{x}\"?"
+	"webhookSettingsActive": "Enabled"
 }
 </locale>
 
@@ -549,10 +502,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Po otrzymaniu reakcji",
 	"webhookSettingsEventsMention": "Po zostaniu wspomnianym",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Właczono",
-	"save": "Zapisz",
-	"delete": "Usuń",
-	"deleteAreYouSure": "Czy na pewno chcesz usunąć „{x}”?"
+	"webhookSettingsActive": "Właczono"
 }
 </locale>
 
@@ -569,10 +519,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Quando receber uma reação",
 	"webhookSettingsEventsMention": "Quando for mencionado",
 	"webhookSettingsTestRemarks": "Clique no botão à direita do interruptor para enviar um Webhook de teste com dados fictícios.",
-	"webhookSettingsActive": "Ativado",
-	"save": "Salvar",
-	"delete": "Excluir",
-	"deleteAreYouSure": "Deseja excluir \"{x}\"?"
+	"webhookSettingsActive": "Ativado"
 }
 </locale>
 
@@ -589,10 +536,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Когда получили реакцию",
 	"webhookSettingsEventsMention": "Когда вас упоминают",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Вкл.",
-	"save": "Сохранить",
-	"delete": "Удалить",
-	"deleteAreYouSure": "Хотите удалить «{x}»?"
+	"webhookSettingsActive": "Вкл."
 }
 </locale>
 
@@ -609,10 +553,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Zapnuté",
-	"save": "Uložiť",
-	"delete": "Odstrániť",
-	"deleteAreYouSure": "Naozaj chcete odstrániť \"{x}\"?"
+	"webhookSettingsActive": "Zapnuté"
 }
 </locale>
 
@@ -629,10 +570,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "เมื่อได้รับรีแอคชั่น",
 	"webhookSettingsEventsMention": "เมื่อกำลังถูกกล่าวถึง",
 	"webhookSettingsTestRemarks": "คลิกปุ่มทางด้านขวาของสวิตช์เพื่อส่ง Webhook ทดสอบที่มีข้อมูลจำลอง",
-	"webhookSettingsActive": "เปิดใช้งาน",
-	"save": "บันทึก",
-	"delete": "ลบ",
-	"deleteAreYouSure": "ต้องการลบ “{x}” ใช่ไหม?"
+	"webhookSettingsActive": "เปิดใช้งาน"
 }
 </locale>
 
@@ -649,10 +587,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Tepki aldığınızda",
 	"webhookSettingsEventsMention": "Bahsedildiğinde",
 	"webhookSettingsTestRemarks": "Anahtarın sağındaki düğmeyi tıklayarak sahte verilerle bir test Webhook gönderin.",
-	"webhookSettingsActive": "Etkin",
-	"save": "Kaydet",
-	"delete": "Sil",
-	"deleteAreYouSure": "“{x}” öğesini silmek istediğinizden emin misin?"
+	"webhookSettingsActive": "Etkin"
 }
 </locale>
 
@@ -669,10 +604,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Enabled",
-	"save": "Save",
-	"delete": "ئۆچۈرۈش",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?"
+	"webhookSettingsActive": "Enabled"
 }
 </locale>
 
@@ -689,10 +621,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "When receiving a reaction",
 	"webhookSettingsEventsMention": "When being mentioned",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Увімкнено",
-	"save": "Зберегти",
-	"delete": "Видалити",
-	"deleteAreYouSure": "Ви впевнені, що хочете видалити \"{x}\"?"
+	"webhookSettingsActive": "Увімкнено"
 }
 </locale>
 
@@ -709,10 +638,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "Khi nhận được sự kiện",
 	"webhookSettingsEventsMention": "Khi có người nhắc tới bạn",
 	"webhookSettingsTestRemarks": "Click the button to the right of the switch to send a test Webhook with dummy data.",
-	"webhookSettingsActive": "Đã bật",
-	"save": "Lưu",
-	"delete": "Xóa",
-	"deleteAreYouSure": "Bạn có chắc muốn xóa \"{x}\"?"
+	"webhookSettingsActive": "Đã bật"
 }
 </locale>
 
@@ -729,10 +655,7 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "被回应时",
 	"webhookSettingsEventsMention": "被提及时",
 	"webhookSettingsTestRemarks": "点击开关右侧的按钮，可以发送使用假数据的测试 Webhook。",
-	"webhookSettingsActive": "已启用",
-	"save": "保存",
-	"delete": "删除",
-	"deleteAreYouSure": "要删掉「{x}」吗？"
+	"webhookSettingsActive": "已启用"
 }
 </locale>
 
@@ -749,9 +672,6 @@ definePage(() => ({
 	"webhookSettingsEventsReaction": "當獲得反應時",
 	"webhookSettingsEventsMention": "當被提到時",
 	"webhookSettingsTestRemarks": "按下切換開關右側的按鈕，就會將假資料發送至 Webhook。",
-	"webhookSettingsActive": "已啟用",
-	"save": "儲存",
-	"delete": "刪除",
-	"deleteAreYouSure": "確定要刪掉「{x}」嗎？"
+	"webhookSettingsActive": "已啟用"
 }
 </locale>

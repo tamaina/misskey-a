@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { watch, version as vueVersion } from 'vue';
-import type { InternationalizationInstance } from '../index.js';
 import { compareVersions } from 'compare-versions';
 import { version, lang, isSafeMode } from '@features/boot/frontend/shared/config.js';
 import defaultLightTheme from '@features/preferences/frontend/themes/l-light.json5';
 import defaultDarkTheme from '@features/preferences/frontend/themes/d-green-lime.json5';
 import { storeBootloaderErrors } from '@features/boot/frontend/shared/store-boot-errors.js';
-import type { App } from 'vue';
 import widgets from '@features/index/frontend/widgets.js';
 import directives from '@features/index/frontend/directives.js';
 import components from '@features/index/frontend/components.js';
@@ -34,6 +33,13 @@ import { $i } from '@features/auth/frontend/i.js';
 import { launchPlugins } from '@features/integrations/frontend/plugin.js';
 import { initClientErrorLog, attachClientErrorLog } from '@features/runtime/frontend/error-log.js';
 import { initTelemetry } from '@features/statistics/frontend/telemetry.js';
+import type { App } from 'vue';
+import type { InternationalizationInstance } from '../index.js';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 export async function common(createVue: () => Promise<App<Element>>, internationalization: InternationalizationInstance) {
 	initClientErrorLog();
@@ -84,7 +90,7 @@ export async function common(createVue: () => Promise<App<Element>>, internation
 	//#endregion
 
 	//#region Detect language & fetch translations
-	storeBootloaderErrors({ ...FeatureLocaleMessages.$locale._bootErrors, reload: FeatureLocaleMessages.$locale.reload });
+	storeBootloaderErrors({ ...FeatureLocaleMessages.$locale._bootErrors, reload: getGlobalLocale().reload });
 
 	if (import.meta.hot) {
 		import.meta.hot.on('locale-update', async (updatedLang: string) => {

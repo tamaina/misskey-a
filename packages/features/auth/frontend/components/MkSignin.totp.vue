@@ -21,17 +21,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #caption><button class="_textButton" type="button" @click="isBackupCode = !isBackupCode">{{ isBackupCode ? $locale.sfc.useTotp : $locale.sfc.useBackupCode }}</button></template>
 			</MkInput>
 
-			<MkButton type="submit" large primary rounded style="margin: 0 auto;">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+			<MkButton type="submit" large primary rounded style="margin: 0 auto;">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 		</form>
 	</div>
 </div>
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const emit = defineEmits<{
 	(ev: 'totpSubmitted', token: string): void;
@@ -76,8 +80,7 @@ const isBackupCode = ref(false);
 	"2fa": "الاستيثاق بعاملَيْن",
 	"token": "الرمز المميز",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "متابعة"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -86,8 +89,7 @@ const isBackupCode = ref(false);
 	"2fa": "Autenticació de doble factor",
 	"token": "Codi de verificació",
 	"useTotp": "Usa una contrasenya d'un sol ús",
-	"useBackupCode": "Usa un codi de recuperació",
-	"continue": "Continuar"
+	"useBackupCode": "Usa un codi de recuperació"
 }
 </locale>
 
@@ -96,8 +98,7 @@ const isBackupCode = ref(false);
 	"2fa": "Dvoufázové ověření",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Pokračovat"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -106,8 +107,7 @@ const isBackupCode = ref(false);
 	"2fa": "Two-factor authentication",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Continue"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -116,8 +116,7 @@ const isBackupCode = ref(false);
 	"2fa": "Zwei-Faktor-Authentifizierung",
 	"token": "Token",
 	"useTotp": "Gib das Einmalpasswort ein",
-	"useBackupCode": "Verwende die Backup-Codes",
-	"continue": "Fortfahren"
+	"useBackupCode": "Verwende die Backup-Codes"
 }
 </locale>
 
@@ -126,8 +125,7 @@ const isBackupCode = ref(false);
 	"2fa": "Two-factor authentication",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Continue"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -136,8 +134,7 @@ const isBackupCode = ref(false);
 	"2fa": "Autenticación de doble factor",
 	"token": "Token",
 	"useTotp": "Introduce la contraseña de un solo uso",
-	"useBackupCode": "Usar códigos de respaldo",
-	"continue": "Continuar"
+	"useBackupCode": "Usar códigos de respaldo"
 }
 </locale>
 
@@ -146,8 +143,7 @@ const isBackupCode = ref(false);
 	"2fa": "Authentification à deux facteurs",
 	"token": "Jeton",
 	"useTotp": "Entrer un mot de passe à usage unique",
-	"useBackupCode": "Utiliser le codes de secours",
-	"continue": "Continuer"
+	"useBackupCode": "Utiliser le codes de secours"
 }
 </locale>
 
@@ -156,8 +152,7 @@ const isBackupCode = ref(false);
 	"2fa": "Autentikasi 2-faktor",
 	"token": "Token",
 	"useTotp": "Gunakan TOTP",
-	"useBackupCode": "Gunakan kode cadangan",
-	"continue": "Lanjutkan"
+	"useBackupCode": "Gunakan kode cadangan"
 }
 </locale>
 
@@ -166,8 +161,7 @@ const isBackupCode = ref(false);
 	"2fa": "Autenticazione a due fattori",
 	"token": "Token",
 	"useTotp": "Usare il codice OTP",
-	"useBackupCode": "Usare il codice usa-e-getta",
-	"continue": "Continua"
+	"useBackupCode": "Usare il codice usa-e-getta"
 }
 </locale>
 
@@ -176,8 +170,7 @@ const isBackupCode = ref(false);
 	"2fa": "二要素認証",
 	"token": "確認コード",
 	"useTotp": "ワンタイムパスワードを使う",
-	"useBackupCode": "バックアップコードを使う",
-	"continue": "続ける"
+	"useBackupCode": "バックアップコードを使う"
 }
 </locale>
 
@@ -186,8 +179,7 @@ const isBackupCode = ref(false);
 	"2fa": "二要素認証",
 	"token": "確認コード",
 	"useTotp": "ワンタイムパスワードを使う",
-	"useBackupCode": "バックアップコードを使う",
-	"continue": "続けるで"
+	"useBackupCode": "バックアップコードを使う"
 }
 </locale>
 
@@ -196,8 +188,7 @@ const isBackupCode = ref(false);
 	"2fa": "Two-factor authentication",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Continue"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -206,8 +197,7 @@ const isBackupCode = ref(false);
 	"2fa": "Two-factor authentication",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Continue"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -216,8 +206,7 @@ const isBackupCode = ref(false);
 	"2fa": "2단계 인증",
 	"token": "토큰",
 	"useTotp": "일회용 비밀번호 사용",
-	"useBackupCode": "백업 코드 사용",
-	"continue": "계속"
+	"useBackupCode": "백업 코드 사용"
 }
 </locale>
 
@@ -226,8 +215,7 @@ const isBackupCode = ref(false);
 	"2fa": "Twee factor authenticatie",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Continue"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -236,8 +224,7 @@ const isBackupCode = ref(false);
 	"2fa": "Two-factor authentication",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Fortsett"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -246,8 +233,7 @@ const isBackupCode = ref(false);
 	"2fa": "Klucz 2FA ",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Continue"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -256,8 +242,7 @@ const isBackupCode = ref(false);
 	"2fa": "Autenticação de dois fatores",
 	"token": "Símbolo",
 	"useTotp": "Digite a senha de uso único",
-	"useBackupCode": "Usar códigos de “backup”",
-	"continue": "Continuar"
+	"useBackupCode": "Usar códigos de “backup”"
 }
 </locale>
 
@@ -266,8 +251,7 @@ const isBackupCode = ref(false);
 	"2fa": "Двухфакторная аутентификация",
 	"token": "Токен",
 	"useTotp": "Включить двухэтапную проверку",
-	"useBackupCode": "Использовать резервные коды",
-	"continue": "Продолжить"
+	"useBackupCode": "Использовать резервные коды"
 }
 </locale>
 
@@ -276,8 +260,7 @@ const isBackupCode = ref(false);
 	"2fa": "Dvojfaktorové overenie (2FA)",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Continue"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -286,8 +269,7 @@ const isBackupCode = ref(false);
 	"2fa": "การยืนยันตัวตนแบบสองชั้น",
 	"token": "โทเค็น",
 	"useTotp": "ใช้รหัสผ่านแบบใช้ครั้งเดียว (TOTP)",
-	"useBackupCode": "ใช้รหัสแบ๊กอัป",
-	"continue": "ดำเนินการต่อ"
+	"useBackupCode": "ใช้รหัสแบ๊กอัป"
 }
 </locale>
 
@@ -296,8 +278,7 @@ const isBackupCode = ref(false);
 	"2fa": "İki faktörlü kimlik doğrulama",
 	"token": "Token",
 	"useTotp": "Tek Kullanımlık Şifreyi Girin",
-	"useBackupCode": "Yedek kodları kullanın",
-	"continue": "Devam et"
+	"useBackupCode": "Yedek kodları kullanın"
 }
 </locale>
 
@@ -306,8 +287,7 @@ const isBackupCode = ref(false);
 	"2fa": "Two-factor authentication",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Continue"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -316,8 +296,7 @@ const isBackupCode = ref(false);
 	"2fa": "Двофакторна аутентифікація",
 	"token": "Токен",
 	"useTotp": "Введіть одноразовий пароль",
-	"useBackupCode": "Використати резервні коди",
-	"continue": "Продовжити"
+	"useBackupCode": "Використати резервні коди"
 }
 </locale>
 
@@ -326,8 +305,7 @@ const isBackupCode = ref(false);
 	"2fa": "Xác thực 2 yếu tố",
 	"token": "Token",
 	"useTotp": "Enter the One-Time Password",
-	"useBackupCode": "Use the backup codes",
-	"continue": "Tiếp tục"
+	"useBackupCode": "Use the backup codes"
 }
 </locale>
 
@@ -336,8 +314,7 @@ const isBackupCode = ref(false);
 	"2fa": "双重认证",
 	"token": "Token (令牌)",
 	"useTotp": "使用一次性代码",
-	"useBackupCode": "使用备用代码",
-	"continue": "继续"
+	"useBackupCode": "使用备用代码"
 }
 </locale>
 
@@ -346,7 +323,6 @@ const isBackupCode = ref(false);
 	"2fa": "雙重驗證",
 	"token": "權杖",
 	"useTotp": "使用一次性密碼",
-	"useBackupCode": "使用備用驗證碼",
-	"continue": "繼續"
+	"useBackupCode": "使用備用驗證碼"
 }
 </locale>

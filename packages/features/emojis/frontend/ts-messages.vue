@@ -11,7 +11,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -27,7 +26,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Calaix d'emojis principal",
 		"paletteForReaction": "Calaix d'emojis per reaccions"
 	},
-	"noName": "No hi ha un nom disponible ",
 	"emojiPaletteAlreadyAddedConfirm": "Aquest emoji ja està inclòs en aquest calaix d'emojis. Vols afegir-lo de nou?",
 	"prepend": "Afegeix al principi",
 	"append": "Afegeix al final",
@@ -43,7 +41,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -59,7 +56,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -75,7 +71,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Hauptpalette",
 		"paletteForReaction": "Reaktions-Palette"
 	},
-	"noName": "Kein Name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -91,7 +86,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -107,7 +101,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Paleta principal",
 		"paletteForReaction": "Paleta utilizada para las reacciones"
 	},
-	"noName": "No hay nombre.",
 	"emojiPaletteAlreadyAddedConfirm": "Este emoji ya está incluido en esta paleta de emojis. ¿Quieres volver a añadirlo?",
 	"prepend": "Añadir al principio",
 	"append": "Añadir al final",
@@ -123,7 +116,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -139,7 +131,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "Tidak ada nama",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -155,7 +146,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Tavolozza principale",
 		"paletteForReaction": "Tavolozza per reazioni"
 	},
-	"noName": "Senza nome",
 	"emojiPaletteAlreadyAddedConfirm": "Questa emoji è già inclusa in nella tavolozza. Vuoi davvero aggiungerla?",
 	"prepend": "Anteporre",
 	"append": "Accodare",
@@ -171,7 +161,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "メインで使用するパレット",
 		"paletteForReaction": "リアクションで使用するパレット"
 	},
-	"noName": "名前はありません",
 	"emojiPaletteAlreadyAddedConfirm": "この絵文字はすでにこの絵文字パレットに含まれています。追加しなおしますか？",
 	"prepend": "先頭に追加",
 	"append": "末尾に追加",
@@ -187,7 +176,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "メインで使うパレット",
 		"paletteForReaction": "リアクションで使うパレット"
 	},
-	"noName": "名前はあらへんで",
 	"emojiPaletteAlreadyAddedConfirm": "この絵文字はすでにこの絵文字パレットに含まれています。追加しなおしますか？",
 	"prepend": "先頭に追加",
 	"append": "末尾に追加",
@@ -203,7 +191,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -219,7 +206,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -235,7 +221,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "메인으로 사용할 팔레트",
 		"paletteForReaction": "리액션으로 사용할 팔레트"
 	},
-	"noName": "이름이 없습니다.",
 	"emojiPaletteAlreadyAddedConfirm": "이 이모지는 이미 이 이모지 팔레트에 포함돼있습니다. 다시 추가하시겠습니까?",
 	"prepend": "맨앞에 추가",
 	"append": "맨뒤에 추가",
@@ -251,7 +236,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -267,7 +251,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -283,7 +266,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -299,7 +281,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Paleta principal",
 		"paletteForReaction": "Paleta de reações"
 	},
-	"noName": "Sem nome",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -315,7 +296,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Основная палитра",
 		"paletteForReaction": "Палитра реакций"
 	},
-	"noName": "Имя не указано",
 	"emojiPaletteAlreadyAddedConfirm": "Этот эмодзи уже есть в этой палитре. Хотите добавить его снова?",
 	"prepend": "Добавить в начало",
 	"append": "Добавить в конец",
@@ -331,7 +311,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -347,7 +326,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "จานสีหลักที่ใช้",
 		"paletteForReaction": "จานสีที่ใช้ในการรีแอคชั่น"
 	},
-	"noName": "ไม่มีชื่อ",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -363,7 +341,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Ana palet",
 		"paletteForReaction": "Reaksiyon paleti"
 	},
-	"noName": "İsim yok",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -379,7 +356,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -395,7 +371,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Головна палітра",
 		"paletteForReaction": "Палітра реакцій"
 	},
-	"noName": "Ім'я не вказано",
 	"emojiPaletteAlreadyAddedConfirm": "Ця емодзі вже включена у цю палітру емодзі. Бажали б ви додати її ще раз?",
 	"prepend": "Додати у початок",
 	"append": "Додати у кінець",
@@ -411,7 +386,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "Main palette",
 		"paletteForReaction": "Reaction palette"
 	},
-	"noName": "No name",
 	"emojiPaletteAlreadyAddedConfirm": "This emoji is already included in this emoji palette. Do you want to add it again?",
 	"prepend": "Append to beginning",
 	"append": "Append to end",
@@ -427,7 +401,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "主表情符号托盘",
 		"paletteForReaction": "回应时的表情符号托盘"
 	},
-	"noName": "未命名",
 	"emojiPaletteAlreadyAddedConfirm": "此表情符号已存在于此表情符号选择器中。要再次添加吗？",
 	"prepend": "加到最前",
 	"append": "加到最后",
@@ -443,7 +416,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"paletteForMain": "主要使用的調色盤",
 		"paletteForReaction": "反應用的調色盤"
 	},
-	"noName": "沒有名稱",
 	"emojiPaletteAlreadyAddedConfirm": "此表情符號在這個表情符號調色盤裡已經有了。確定要增加嗎？",
 	"prepend": "加在前面",
 	"append": "加在最後",

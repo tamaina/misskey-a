@@ -18,7 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					@contextmenu.stop="$event => onContextMenu($event, file)"
 				>
 					<div :class="$style.file">
-						<div v-if="file.isSensitive" class="sensitive-label">{{ $locale.sfc.sensitive }}</div>
+						<div v-if="file.isSensitive" class="sensitive-label">{{ globalLocale.env.sensitive }}</div>
 						<MkDriveFileThumbnail :class="$style.fileThumbnail" :file="file" fit="contain"/>
 						<div :class="$style.fileBody">
 							<div style="margin-bottom: 4px;">
@@ -47,10 +47,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { computed, markRaw, ref, watch } from 'vue';
 import tinycolor from 'tinycolor2';
-import type { StyleValue } from 'vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
@@ -62,6 +62,10 @@ import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { useGlobalEvent } from '@features/runtime/frontend/events.js';
 import { getDriveFileMenu } from '@features/drive/frontend/utility/get-drive-file-menu.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { StyleValue } from 'vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const sortMode = ref<Misskey.entities.DriveFilesRequest['sort']>('+size');
 const paginator = markRaw(new Paginator('drive/files', {
@@ -175,7 +179,6 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"sort": "ترتيب حسب",
-	"sensitive": "محتوى حساس",
 	"registeredDate": "انضم في",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -186,7 +189,6 @@ definePage(() => ({
 <locale locale="ca-ES" lang="json">
 {
 	"sort": "Ordena",
-	"sensitive": "Sensible",
 	"registeredDate": "Data de registre",
 	"orderBySizeDesc": "Mida del fitxer descendent",
 	"orderByCreatedAtAsc": "Data ascendent",
@@ -197,7 +199,6 @@ definePage(() => ({
 <locale locale="cs-CZ" lang="json">
 {
 	"sort": "Seřadit",
-	"sensitive": "NSFW",
 	"registeredDate": "Datum registrace",
 	"orderBySizeDesc": "Sestupná velikost souborů",
 	"orderByCreatedAtAsc": "Vzestupné datumy",
@@ -208,7 +209,6 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"sort": "Sorting order",
-	"sensitive": "Sensitive",
 	"registeredDate": "Joined on",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -219,7 +219,6 @@ definePage(() => ({
 <locale locale="de-DE" lang="json">
 {
 	"sort": "Sortieren",
-	"sensitive": "Sensibel",
 	"registeredDate": "Registrationsdatum",
 	"orderBySizeDesc": "Absteigende Dateigrößen",
 	"orderByCreatedAtAsc": "Aufsteigendes Erstelldatum",
@@ -230,7 +229,6 @@ definePage(() => ({
 <locale locale="en-US" lang="json">
 {
 	"sort": "Sorting order",
-	"sensitive": "Sensitive",
 	"registeredDate": "Joined on",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -241,7 +239,6 @@ definePage(() => ({
 <locale locale="es-ES" lang="json">
 {
 	"sort": "Ordenar",
-	"sensitive": "Marcado como sensible (NSFW)",
 	"registeredDate": "Fecha de registro",
 	"orderBySizeDesc": "Tamaño descendiente",
 	"orderByCreatedAtAsc": "Fecha ascendente",
@@ -252,7 +249,6 @@ definePage(() => ({
 <locale locale="fr-FR" lang="json">
 {
 	"sort": "Trier",
-	"sensitive": "Contenu sensible",
 	"registeredDate": "Inscrit le",
 	"orderBySizeDesc": "Taille descendante",
 	"orderByCreatedAtAsc": "Date d'ajout ascendante",
@@ -263,7 +259,6 @@ definePage(() => ({
 <locale locale="id-ID" lang="json">
 {
 	"sort": "Urutkan",
-	"sensitive": "Konten sensitif",
 	"registeredDate": "Bergabung pada",
 	"orderBySizeDesc": "Ukuran berkas (Turun)",
 	"orderByCreatedAtAsc": "Tanggal (Naik)",
@@ -274,7 +269,6 @@ definePage(() => ({
 <locale locale="it-IT" lang="json">
 {
 	"sort": "Ordina per",
-	"sensitive": "Esplicito",
 	"registeredDate": "Data iscrizione",
 	"orderBySizeDesc": "Dal file più grosso al più piccolo",
 	"orderByCreatedAtAsc": "Dal file più vecchio al più recente",
@@ -285,7 +279,6 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"sort": "ソート",
-	"sensitive": "センシティブ",
 	"registeredDate": "登録日",
 	"orderBySizeDesc": "サイズが大きい順",
 	"orderByCreatedAtAsc": "追加日が古い順",
@@ -296,7 +289,6 @@ definePage(() => ({
 <locale locale="ja-KS" lang="json">
 {
 	"sort": "並び替え",
-	"sensitive": "気いつけて見いや",
 	"registeredDate": "始めた日",
 	"orderBySizeDesc": "サイズのでかい順",
 	"orderByCreatedAtAsc": "追加日の古い順",
@@ -307,7 +299,6 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"sort": "Sorting order",
-	"sensitive": "Sensitive",
 	"registeredDate": "Joined on",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -318,7 +309,6 @@ definePage(() => ({
 <locale locale="kn-IN" lang="json">
 {
 	"sort": "Sorting order",
-	"sensitive": "Sensitive",
 	"registeredDate": "Joined on",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -329,7 +319,6 @@ definePage(() => ({
 <locale locale="ko-KR" lang="json">
 {
 	"sort": "정렬",
-	"sensitive": "열람 주의",
 	"registeredDate": "등록일",
 	"orderBySizeDesc": "크기가 큰 순",
 	"orderByCreatedAtAsc": "등록일이 오래된 순",
@@ -340,7 +329,6 @@ definePage(() => ({
 <locale locale="nl-NL" lang="json">
 {
 	"sort": "Sorteren",
-	"sensitive": "NSFW",
 	"registeredDate": "Inschrijvingsdatum",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -351,7 +339,6 @@ definePage(() => ({
 <locale locale="no-NO" lang="json">
 {
 	"sort": "Sorting order",
-	"sensitive": "Sensitive",
 	"registeredDate": "Joined on",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -362,7 +349,6 @@ definePage(() => ({
 <locale locale="pl-PL" lang="json">
 {
 	"sort": "Sortuj",
-	"sensitive": "NSFW",
 	"registeredDate": "Zarejestrowano",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -373,7 +359,6 @@ definePage(() => ({
 <locale locale="pt-PT" lang="json">
 {
 	"sort": "Ordenação",
-	"sensitive": "Conteúdo sensível",
 	"registeredDate": "Data de registro",
 	"orderBySizeDesc": "Tamanho descendente",
 	"orderByCreatedAtAsc": "Data ascendente",
@@ -384,7 +369,6 @@ definePage(() => ({
 <locale locale="ru-RU" lang="json">
 {
 	"sort": "Сортировать",
-	"sensitive": "Содержимое не для всех",
 	"registeredDate": "Дата регистрации",
 	"orderBySizeDesc": "Размеры файлов по убыванию",
 	"orderByCreatedAtAsc": "По увеличению даты",
@@ -395,7 +379,6 @@ definePage(() => ({
 <locale locale="sk-SK" lang="json">
 {
 	"sort": "Zoradiť",
-	"sensitive": "NSFW",
 	"registeredDate": "Dátum registrácie",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -406,7 +389,6 @@ definePage(() => ({
 <locale locale="th-TH" lang="json">
 {
 	"sort": "เรียงลำดับ",
-	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
 	"registeredDate": "วันที่ลงทะเบียน",
 	"orderBySizeDesc": "ขนาดไฟล์จากมากไปหาน้อย",
 	"orderByCreatedAtAsc": "วันที่จากน้อยไปหามาก",
@@ -417,7 +399,6 @@ definePage(() => ({
 <locale locale="tr-TR" lang="json">
 {
 	"sort": "Sıralama düzeni",
-	"sensitive": "Hassas",
 	"registeredDate": "Katılma tarihi",
 	"orderBySizeDesc": "Azalan Dosya Boyutları",
 	"orderByCreatedAtAsc": "Yükselen Tarihler",
@@ -428,7 +409,6 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"sort": "Sorting order",
-	"sensitive": "Sensitive",
 	"registeredDate": "Joined on",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -439,7 +419,6 @@ definePage(() => ({
 <locale locale="uk-UA" lang="json">
 {
 	"sort": "Сортування",
-	"sensitive": "NSFW",
 	"registeredDate": "Приєднання",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -450,7 +429,6 @@ definePage(() => ({
 <locale locale="vi-VN" lang="json">
 {
 	"sort": "Sắp xếp",
-	"sensitive": "Nhạy cảm",
 	"registeredDate": "Tham gia",
 	"orderBySizeDesc": "Descending Filesizes",
 	"orderByCreatedAtAsc": "Ascending Dates",
@@ -461,7 +439,6 @@ definePage(() => ({
 <locale locale="zh-CN" lang="json">
 {
 	"sort": "排序",
-	"sensitive": "敏感内容",
 	"registeredDate": "注册于",
 	"orderBySizeDesc": "按大小降序排列",
 	"orderByCreatedAtAsc": "按添加日期降序排列",
@@ -472,7 +449,6 @@ definePage(() => ({
 <locale locale="zh-TW" lang="json">
 {
 	"sort": "排序",
-	"sensitive": "敏感內容",
 	"registeredDate": "註冊日期",
 	"orderBySizeDesc": "按大小降序排列",
 	"orderByCreatedAtAsc": "按新增日期降序排列",

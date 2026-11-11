@@ -23,7 +23,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<div v-if="file.isSensitive" :class="[$style.label, $style.red]">
 			<img :class="$style.labelImg" src="/client-assets/label-red.svg"/>
-			<p :class="$style.labelText">{{ $locale.sfc.sensitive }}</p>
+			<p :class="$style.labelText">{{ globalLocale.env.sensitive }}</p>
 		</div>
 
 		<MkDriveFileThumbnail :class="$style.thumbnail" :file="file" fit="contain"/>
@@ -37,6 +37,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkDriveFileThumbnail from '@features/drive/frontend/components/MkDriveFileThumbnail.vue';
@@ -45,6 +46,9 @@ import * as os from '@features/ui/frontend/os.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { getDriveFileMenu } from '@features/drive/frontend/utility/get-drive-file-menu.js';
 import { setDragData } from '@features/ui/frontend/drag-and-drop.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	file: Misskey.entities.DriveFile;
@@ -254,223 +258,195 @@ function onDragend() {
 <locale locale="ar-SA" lang="json">
 {
   "avatar": "الصورة الرمزية",
-  "banner": "الصورة الرأسية",
-  "sensitive": "محتوى حساس"
+  "banner": "الصورة الرأسية"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
   "avatar": "Icona",
-  "banner": "Bàner",
-  "sensitive": "Sensible"
+  "banner": "Bàner"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Baner",
-  "sensitive": "NSFW"
+  "banner": "Baner"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "Sensitive"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
   "avatar": "Profilbild",
-  "banner": "Banner",
-  "sensitive": "Sensibel"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "Sensitive"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "Marcado como sensible (NSFW)"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Bannière",
-  "sensitive": "Contenu sensible"
+  "banner": "Bannière"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "Konten sensitif"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
   "avatar": "Foto del profilo",
-  "banner": "Intestazione",
-  "sensitive": "Esplicito"
+  "banner": "Intestazione"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
   "avatar": "アイコン",
-  "banner": "バナー",
-  "sensitive": "センシティブ"
+  "banner": "バナー"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
   "avatar": "アイコン",
-  "banner": "バナー",
-  "sensitive": "気いつけて見いや"
+  "banner": "バナー"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "Sensitive"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "Sensitive"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
   "avatar": "아바타",
-  "banner": "배너",
-  "sensitive": "열람 주의"
+  "banner": "배너"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "NSFW"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "Sensitive"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
   "avatar": "Awatar",
-  "banner": "Baner",
-  "sensitive": "NSFW"
+  "banner": "Baner"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Capa",
-  "sensitive": "Conteúdo sensível"
+  "banner": "Capa"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
   "avatar": "Аватар",
-  "banner": "Шапка",
-  "sensitive": "Содержимое не для всех"
+  "banner": "Шапка"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "BAnner",
-  "sensitive": "NSFW"
+  "banner": "BAnner"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
   "avatar": "ไอคอน",
-  "banner": "แบนเนอร์",
-  "sensitive": "เนื้อหาที่ละเอียดอ่อน"
+  "banner": "แบนเนอร์"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "Hassas"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
   "avatar": "Avatar",
-  "banner": "Banner",
-  "sensitive": "Sensitive"
+  "banner": "Banner"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
   "avatar": "Аватар",
-  "banner": "Банер",
-  "sensitive": "NSFW"
+  "banner": "Банер"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
   "avatar": "Ảnh đại diện",
-  "banner": "Ảnh bìa",
-  "sensitive": "Nhạy cảm"
+  "banner": "Ảnh bìa"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
   "avatar": "头像",
-  "banner": "横幅",
-  "sensitive": "敏感内容"
+  "banner": "横幅"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
   "avatar": "大頭貼",
-  "banner": "橫幅",
-  "sensitive": "敏感內容"
+  "banner": "橫幅"
 }
 </locale>

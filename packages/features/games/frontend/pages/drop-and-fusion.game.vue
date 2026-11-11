@@ -128,7 +128,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div class="_buttonsCenter">
 						<MkButton primary rounded @click="backToTitle">{{ $locale.sfc.backToTitle }}</MkButton>
 						<MkButton primary rounded @click="replay">{{ $locale.sfc.showReplay }}</MkButton>
-						<MkButton primary rounded @click="share">{{ $locale.sfc.share }}</MkButton>
+						<MkButton primary rounded @click="share">{{ globalLocale.env.share }}</MkButton>
 						<MkButton rounded @click="exportLog">{{ $locale.sfc.copyReplayData }}</MkButton>
 					</div>
 				</div>
@@ -191,13 +191,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, onDeactivated, onMounted, onUnmounted, ref, shallowRef, watch, useTemplateRef } from 'vue';
 import * as Matter from 'matter-js';
 import * as Misskey from 'misskey-js';
 import { DropAndFusionGame } from 'misskey-bubble-game';
 import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
 import { apiUrl } from '@features/boot/frontend/shared/config.js';
-import type { Mono } from 'misskey-bubble-game';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkRippleEffect from '@features/ui/frontend/components/MkRippleEffect.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -212,6 +212,10 @@ import * as sound from '@features/preferences/frontend/utility/sound.js';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { Mono } from 'misskey-bubble-game';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 type FrontendMonoDefinition = {
 	id: string;
@@ -765,7 +769,7 @@ function hold() {
 async function surrender() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: $locale.value.sfc.areYouSure,
+		text: globalLocale.value.env.areYouSure,
 	});
 	if (canceled) return;
 	game.surrender();
@@ -1522,14 +1526,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "شارِك",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "مستوى الصوت",
 	"sfx": "Sound Effects",
 	"surrender": "ألغِ",
 	"gameRetry": "Retry",
-	"areYouSure": "Are you sure?",
 	"cannotLoad": "تعذر التحميل"
 }
 </locale>
@@ -1549,14 +1551,12 @@ definePage(() => ({
 	"endReplay": "Tanca la redifusió",
 	"backToTitle": "Torna al títol",
 	"showReplay": "Veure reproducció",
-	"share": "Comparteix",
 	"copyReplayData": "Copia les dades de la resposta",
 	"bubbleGameScoreHighScore": "Millor puntuació ",
 	"volume": "Volum",
 	"sfx": "Efectes de so",
 	"surrender": "Cancel·lar ",
 	"gameRetry": "Torna a provar",
-	"areYouSure": "Estàs segur?",
 	"cannotLoad": "No es pot carregar"
 }
 </locale>
@@ -1576,14 +1576,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Sdílet",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Hlasitost",
 	"sfx": "Sound Effects",
 	"surrender": "Zrušit",
 	"gameRetry": "Retry",
-	"areYouSure": "Jste si jistí?",
 	"cannotLoad": "Načtení se nezdařilo"
 }
 </locale>
@@ -1603,14 +1601,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Share",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Volume",
 	"sfx": "Sound Effects",
 	"surrender": "Cancel",
 	"gameRetry": "Retry",
-	"areYouSure": "Are you sure?",
 	"cannotLoad": "Unable to load"
 }
 </locale>
@@ -1630,14 +1626,12 @@ definePage(() => ({
 	"endReplay": "Aufzeichnung verlassen",
 	"backToTitle": "Zurück zum Startbildschirm",
 	"showReplay": "Wiederholung anzeigen",
-	"share": "Teilen",
 	"copyReplayData": "Aufzeichnung kopieren",
 	"bubbleGameScoreHighScore": "Höchstpunktzahl",
 	"volume": "Lautstärke",
 	"sfx": "Soundeffekte",
 	"surrender": "Abbrechen",
 	"gameRetry": "Erneut versuchen",
-	"areYouSure": "Bist du sicher?",
 	"cannotLoad": "Kann nicht geladen werden"
 }
 </locale>
@@ -1657,14 +1651,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Share",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Volume",
 	"sfx": "Sound Effects",
 	"surrender": "Cancel",
 	"gameRetry": "Retry",
-	"areYouSure": "Are you sure?",
 	"cannotLoad": "Unable to load"
 }
 </locale>
@@ -1684,14 +1676,12 @@ definePage(() => ({
 	"endReplay": "Terminar reproducción",
 	"backToTitle": "Regresar al inicio",
 	"showReplay": "Ver reproducción",
-	"share": "Compartir",
 	"copyReplayData": "Copiar datos de reproducción",
 	"bubbleGameScoreHighScore": "Puntuación más alta",
 	"volume": "Volumen",
 	"sfx": "Efectos de sonido",
 	"surrender": "detener",
 	"gameRetry": "Reintentar",
-	"areYouSure": "¿Estás conforme?",
 	"cannotLoad": "No se puede cargar."
 }
 </locale>
@@ -1711,14 +1701,12 @@ definePage(() => ({
 	"endReplay": "Arrêter la rediffusion",
 	"backToTitle": "Retourner au titre",
 	"showReplay": "Voir le replay",
-	"share": "Partager",
 	"copyReplayData": "Copier les données de la rediffusion",
 	"bubbleGameScoreHighScore": "Meilleur score",
 	"volume": "Volume",
 	"sfx": "Effets sonores",
 	"surrender": "Annuler",
 	"gameRetry": "Réessayer",
-	"areYouSure": "Êtes-vous sûr·e ?",
 	"cannotLoad": "Chargement impossible"
 }
 </locale>
@@ -1738,14 +1726,12 @@ definePage(() => ({
 	"endReplay": "Keluat dari tayangan ulang",
 	"backToTitle": "Ke Judul",
 	"showReplay": "Lihat tayangan ulang",
-	"share": "Bagikan",
 	"copyReplayData": "Salin data tayangan ulang",
 	"bubbleGameScoreHighScore": "Skor tertinggi",
 	"volume": "Volume",
 	"sfx": "Efek Suara",
 	"surrender": "Batalkan",
 	"gameRetry": "Coba lagi",
-	"areYouSure": "Apakah kamu yakin?",
 	"cannotLoad": "Tidak dapat memuat"
 }
 </locale>
@@ -1765,14 +1751,12 @@ definePage(() => ({
 	"endReplay": "Termina replay",
 	"backToTitle": "Torna al titolo",
 	"showReplay": "Vedi i replay",
-	"share": "Condividi",
 	"copyReplayData": "Copia replay",
 	"bubbleGameScoreHighScore": "Punteggio migliore",
 	"volume": "Volume",
 	"sfx": "Effetti sonori",
 	"surrender": "Annulla",
 	"gameRetry": "Riprova",
-	"areYouSure": "Confermi?",
 	"cannotLoad": "Caricamento impossibile"
 }
 </locale>
@@ -1792,14 +1776,12 @@ definePage(() => ({
 	"endReplay": "リプレイを終了",
 	"backToTitle": "タイトルへ",
 	"showReplay": "リプレイを見る",
-	"share": "共有",
 	"copyReplayData": "リプレイデータをコピー",
 	"bubbleGameScoreHighScore": "ハイスコア",
 	"volume": "音量",
 	"sfx": "効果音",
 	"surrender": "やめる",
 	"gameRetry": "リトライ",
-	"areYouSure": "よろしいですか？",
 	"cannotLoad": "読み込めません"
 }
 </locale>
@@ -1819,14 +1801,12 @@ definePage(() => ({
 	"endReplay": "リプレイを終了",
 	"backToTitle": "タイトルへ",
 	"showReplay": "リプレイ見る",
-	"share": "わけわけ",
 	"copyReplayData": "リプレイデータをコピー",
 	"bubbleGameScoreHighScore": "ハイスコア",
 	"volume": "音のでかさ",
 	"sfx": "効果音",
 	"surrender": "やめとく",
 	"gameRetry": "もういっちょ",
-	"areYouSure": "いいん？",
 	"cannotLoad": "読み込めへんで"
 }
 </locale>
@@ -1846,14 +1826,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Share",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Volume",
 	"sfx": "Sound Effects",
 	"surrender": "Cancel",
 	"gameRetry": "Retry",
-	"areYouSure": "Are you sure?",
 	"cannotLoad": "Unable to load"
 }
 </locale>
@@ -1873,14 +1851,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Share",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Volume",
 	"sfx": "Sound Effects",
 	"surrender": "Cancel",
 	"gameRetry": "Retry",
-	"areYouSure": "Are you sure?",
 	"cannotLoad": "Unable to load"
 }
 </locale>
@@ -1900,14 +1876,12 @@ definePage(() => ({
 	"endReplay": "리플레이 종료",
 	"backToTitle": "타이틀로 가기",
 	"showReplay": "리플레이 보기",
-	"share": "공유",
 	"copyReplayData": "리플레이 데이터를 복사",
 	"bubbleGameScoreHighScore": "최고 점수",
 	"volume": "음량",
 	"sfx": "효과음",
 	"surrender": "그만두기",
 	"gameRetry": "다시 시도",
-	"areYouSure": "계속 진행하시겠습니까?",
 	"cannotLoad": "불러오지 못했습니다"
 }
 </locale>
@@ -1927,14 +1901,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Delen",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Volume",
 	"sfx": "Sound Effects",
 	"surrender": "Cancel",
 	"gameRetry": "Retry",
-	"areYouSure": "Weet je het zeker?",
 	"cannotLoad": "Unable to load"
 }
 </locale>
@@ -1954,14 +1926,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Del",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Volum",
 	"sfx": "Sound Effects",
 	"surrender": "Avbryt",
 	"gameRetry": "Retry",
-	"areYouSure": "Are you sure?",
 	"cannotLoad": "Unable to load"
 }
 </locale>
@@ -1981,14 +1951,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Udostępnij",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Głośność",
 	"sfx": "Sound Effects",
 	"surrender": "Odrzuć",
 	"gameRetry": "Spróbuj ponownie",
-	"areYouSure": "Na pewno?",
 	"cannotLoad": "Nie można wczytać"
 }
 </locale>
@@ -2008,14 +1976,12 @@ definePage(() => ({
 	"endReplay": "Sair do Replay",
 	"backToTitle": "Voltar à página inicial",
 	"showReplay": "Ver Replay",
-	"share": "Compartilhar",
 	"copyReplayData": "Copiar dados de Replay",
 	"bubbleGameScoreHighScore": "Melhor pontuação",
 	"volume": "Volume",
 	"sfx": "Efeitos Sonoros",
 	"surrender": "Cancelar",
 	"gameRetry": "Tentar Novamente",
-	"areYouSure": "Tem certeza?",
 	"cannotLoad": "Não foi possível carregar"
 }
 </locale>
@@ -2035,14 +2001,12 @@ definePage(() => ({
 	"endReplay": "Конец повтора",
 	"backToTitle": "Вернуться к заголовку",
 	"showReplay": "Показать повтор",
-	"share": "Поделиться",
 	"copyReplayData": "Копировать данные повтора",
 	"bubbleGameScoreHighScore": "Рекорд",
 	"volume": "Громкость",
 	"sfx": "Звуковые эффекты",
 	"surrender": "Отменить",
 	"gameRetry": "Повторить попытку",
-	"areYouSure": "Вы уверены?",
 	"cannotLoad": "Не удалось загрузить"
 }
 </locale>
@@ -2062,14 +2026,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Zdieľať",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Hlasitosť",
 	"sfx": "Sound Effects",
 	"surrender": "Cancel",
 	"gameRetry": "Retry",
-	"areYouSure": "Are you sure?",
 	"cannotLoad": "Nedá sa načítať."
 }
 </locale>
@@ -2089,14 +2051,12 @@ definePage(() => ({
 	"endReplay": "ออกจากรีเพลย์",
 	"backToTitle": "กลับไปหน้าไตเติ้ล",
 	"showReplay": "ดูรีเพลย์",
-	"share": "แบ่งปัน",
 	"copyReplayData": "คัดลอกข้อมูลรีเพลย์",
 	"bubbleGameScoreHighScore": "คะแนนสูงสุด",
 	"volume": "ระดับเสียง",
 	"sfx": "เสียงเอฟเฟ็กต์",
 	"surrender": "ยอมแพ้",
 	"gameRetry": "เริ่มเกมใหม่",
-	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?",
 	"cannotLoad": "ไม่สามารถโหลดได้"
 }
 </locale>
@@ -2116,14 +2076,12 @@ definePage(() => ({
 	"endReplay": "Tekrardan çık",
 	"backToTitle": "Başlığa geri dön",
 	"showReplay": "Tekrarı izle",
-	"share": "Paylaş",
 	"copyReplayData": "Tekrar oynatma verilerini kopyala",
 	"bubbleGameScoreHighScore": "Yüksek puan",
 	"volume": "Ses hacmi",
 	"sfx": "Ses Efektleri",
 	"surrender": "İptal",
 	"gameRetry": "Tekrar dene",
-	"areYouSure": "Emin misin?",
 	"cannotLoad": "Yüklenemiyor"
 }
 </locale>
@@ -2143,14 +2101,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Share",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Volume",
 	"sfx": "Sound Effects",
 	"surrender": "Cancel",
 	"gameRetry": "Retry",
-	"areYouSure": "Are you sure?",
 	"cannotLoad": "Unable to load"
 }
 </locale>
@@ -2170,14 +2126,12 @@ definePage(() => ({
 	"endReplay": "Вийти з повтору",
 	"backToTitle": "Повернутися до заголовного екрана",
 	"showReplay": "Переглянути повтор",
-	"share": "Поділитись",
 	"copyReplayData": "Копіювати дані повтору",
 	"bubbleGameScoreHighScore": "Найвищий рахунок",
 	"volume": "Гучність",
 	"sfx": "Звукові ефекти",
 	"surrender": "Скасувати",
 	"gameRetry": "Спробувати знову",
-	"areYouSure": "Ви впевнені?",
 	"cannotLoad": "Не вдалося завантажити"
 }
 </locale>
@@ -2197,14 +2151,12 @@ definePage(() => ({
 	"endReplay": "Exit Replay",
 	"backToTitle": "Go back to title",
 	"showReplay": "View Replay",
-	"share": "Chia sẻ",
 	"copyReplayData": "Copy replay data",
 	"bubbleGameScoreHighScore": "High score",
 	"volume": "Âm lượng",
 	"sfx": "Sound Effects",
 	"surrender": "Từ chối",
 	"gameRetry": "Retry",
-	"areYouSure": "Bạn chắc chứ?",
 	"cannotLoad": "Không tải được"
 }
 </locale>
@@ -2224,14 +2176,12 @@ definePage(() => ({
 	"endReplay": "结束回放",
 	"backToTitle": "返回标题",
 	"showReplay": "观看回放",
-	"share": "分享",
 	"copyReplayData": "复制回放数据",
 	"bubbleGameScoreHighScore": "最高分",
 	"volume": "音量",
 	"sfx": "音效",
 	"surrender": "取消",
 	"gameRetry": "重试",
-	"areYouSure": "你确定吗？",
 	"cannotLoad": "无法加载"
 }
 </locale>
@@ -2251,14 +2201,12 @@ definePage(() => ({
 	"endReplay": "退出重播",
 	"backToTitle": "回到遊戲標題頁",
 	"showReplay": "觀看重播",
-	"share": "分享",
 	"copyReplayData": "複製重播資料",
 	"bubbleGameScoreHighScore": "最高分",
 	"volume": "音量",
 	"sfx": "音效",
 	"surrender": "退出",
 	"gameRetry": "再試一次",
-	"areYouSure": "是否確定？",
 	"cannotLoad": "無法載入"
 }
 </locale>

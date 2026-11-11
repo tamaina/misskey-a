@@ -276,10 +276,45 @@
 		"_achievements._types._tutorialCompleted.title",
 		"_achievements._types._viewAchievements3min.title",
 		"_achievements._types._viewInstanceChart.title",
+		"_cw.hide",
+		"_cw.show",
+		"_deck._columns.antenna",
+		"_deck._columns.channel",
+		"_deck._columns.chat",
+		"_deck._columns.clip",
+		"_deck._columns.direct",
+		"_deck._columns.list",
+		"_deck._columns.main",
+		"_deck._columns.mentions",
+		"_deck._columns.notifications",
+		"_deck._columns.roleTimeline",
+		"_deck._columns.tl",
+		"_deck._columns.widgets",
 		"_lang_",
 		"_notification._actions.followBack",
 		"_notification._actions.renote",
 		"_notification._actions.reply",
+		"_notification._types.achievementEarned",
+		"_notification._types.all",
+		"_notification._types.app",
+		"_notification._types.chatRoomInvitationReceived",
+		"_notification._types.createToken",
+		"_notification._types.exportCompleted",
+		"_notification._types.follow",
+		"_notification._types.followRequestAccepted",
+		"_notification._types.login",
+		"_notification._types.mention",
+		"_notification._types.note",
+		"_notification._types.pollEnded",
+		"_notification._types.quote",
+		"_notification._types.reaction",
+		"_notification._types.receiveFollowRequest",
+		"_notification._types.renote",
+		"_notification._types.reply",
+		"_notification._types.roleAssigned",
+		"_notification._types.scheduledNotePostFailed",
+		"_notification._types.scheduledNotePosted",
+		"_notification._types.test",
 		"_notification.achievementEarned",
 		"_notification.exportOfXCompleted",
 		"_notification.login",
@@ -297,42 +332,235 @@
 		"_notification.yourFollowRequestAccepted",
 		"_offlineScreen.header",
 		"_offlineScreen.title",
+		"_permissions.access:mcp",
+		"_permissions.read:account",
+		"_permissions.read:admin:abuse-user-reports",
+		"_permissions.read:admin:account",
+		"_permissions.read:admin:ad",
+		"_permissions.read:admin:announcements",
+		"_permissions.read:admin:avatar-decorations",
+		"_permissions.read:admin:drive",
+		"_permissions.read:admin:emoji",
+		"_permissions.read:admin:index-stats",
+		"_permissions.read:admin:invite-codes",
+		"_permissions.read:admin:meta",
+		"_permissions.read:admin:queue",
+		"_permissions.read:admin:relays",
+		"_permissions.read:admin:roles",
+		"_permissions.read:admin:server-info",
+		"_permissions.read:admin:show-moderation-log",
+		"_permissions.read:admin:show-user",
+		"_permissions.read:admin:stream",
+		"_permissions.read:admin:table-stats",
+		"_permissions.read:admin:user-ips",
+		"_permissions.read:blocks",
+		"_permissions.read:channels",
+		"_permissions.read:chat",
+		"_permissions.read:clip-favorite",
+		"_permissions.read:drive",
+		"_permissions.read:favorites",
+		"_permissions.read:federation",
+		"_permissions.read:flash",
+		"_permissions.read:flash-likes",
+		"_permissions.read:following",
+		"_permissions.read:gallery",
+		"_permissions.read:gallery-likes",
+		"_permissions.read:invite-codes",
+		"_permissions.read:messaging",
+		"_permissions.read:mutes",
+		"_permissions.read:notifications",
+		"_permissions.read:page-likes",
+		"_permissions.read:pages",
+		"_permissions.read:reactions",
+		"_permissions.read:user-groups",
+		"_permissions.write:account",
+		"_permissions.write:admin:account",
+		"_permissions.write:admin:ad",
+		"_permissions.write:admin:announcements",
+		"_permissions.write:admin:avatar-decorations",
+		"_permissions.write:admin:delete-account",
+		"_permissions.write:admin:delete-all-files-of-a-user",
+		"_permissions.write:admin:drive",
+		"_permissions.write:admin:emoji",
+		"_permissions.write:admin:federation",
+		"_permissions.write:admin:invite-codes",
+		"_permissions.write:admin:meta",
+		"_permissions.write:admin:promo",
+		"_permissions.write:admin:queue",
+		"_permissions.write:admin:relays",
+		"_permissions.write:admin:reset-password",
+		"_permissions.write:admin:resolve-abuse-user-report",
+		"_permissions.write:admin:roles",
+		"_permissions.write:admin:send-email",
+		"_permissions.write:admin:suspend-user",
+		"_permissions.write:admin:unset-mfa",
+		"_permissions.write:admin:unset-user-avatar",
+		"_permissions.write:admin:unset-user-banner",
+		"_permissions.write:admin:unsuspend-user",
+		"_permissions.write:admin:user-note",
+		"_permissions.write:blocks",
+		"_permissions.write:channels",
+		"_permissions.write:chat",
+		"_permissions.write:clip-favorite",
+		"_permissions.write:drive",
+		"_permissions.write:favorites",
+		"_permissions.write:flash",
+		"_permissions.write:flash-likes",
+		"_permissions.write:following",
+		"_permissions.write:gallery",
+		"_permissions.write:gallery-likes",
+		"_permissions.write:invite-codes",
+		"_permissions.write:messaging",
+		"_permissions.write:mutes",
+		"_permissions.write:notes",
+		"_permissions.write:notifications",
+		"_permissions.write:page-likes",
+		"_permissions.write:pages",
+		"_permissions.write:reactions",
+		"_permissions.write:report-abuse",
+		"_permissions.write:user-groups",
+		"_permissions.write:votes",
+		"_timelines.global",
+		"_timelines.home",
+		"_timelines.local",
+		"_timelines.social",
+		"_visibility.disableFederation",
+		"_visibility.disableFederationDescription",
+		"_visibility.followers",
+		"_visibility.followersDescription",
+		"_visibility.home",
+		"_visibility.homeDescription",
+		"_visibility.public",
+		"_visibility.publicDescription",
+		"_visibility.specified",
+		"_visibility.specifiedDescription",
 		"accept",
+		"add",
+		"adminPermission",
+		"administrator",
 		"all",
+		"announcements",
 		"antennas",
 		"areYouSure",
 		"blockedUsers",
 		"cancel",
+		"channel",
+		"charts",
+		"clip",
 		"clips",
 		"close",
+		"continue",
 		"copy",
+		"copyUrl",
+		"create",
+		"createNew",
+		"createdAt",
 		"customEmojis",
 		"default",
 		"delete",
+		"deleteAreYouSure",
+		"deletedNote",
 		"description",
+		"disableAll",
+		"disableAllAdmin",
+		"done",
+		"download",
+		"drive",
+		"driveFileDeleteConfirm",
 		"edit",
+		"embed",
+		"enableAll",
+		"enableAllAdmin",
 		"error",
+		"favorite",
 		"favorites",
+		"filter",
+		"follow",
+		"followers",
 		"following",
+		"fromDrive",
+		"fromX",
+		"generateAccessToken",
+		"goBack",
+		"gotIt",
+		"hide",
+		"high",
+		"imageUrl",
+		"indefinitely",
+		"info",
+		"install",
+		"invite",
+		"learnMore",
 		"lists",
+		"localOnly",
+		"low",
 		"markAllAsRead",
+		"markAsSensitive",
+		"medium",
+		"memo",
+		"moderator",
+		"more",
+		"mute",
 		"mutedUsers",
 		"name",
 		"next",
+		"no",
+		"noName",
 		"none",
+		"noteOf",
 		"notes",
 		"notificationSettings",
+		"notifications",
 		"ok",
+		"oneDay",
+		"oneHour",
+		"oneMonth",
+		"oneWeek",
+		"overview",
+		"period",
+		"permission",
+		"poll",
 		"preview",
+		"privacyPolicy",
+		"private",
+		"processing",
+		"public",
+		"quote",
 		"reject",
 		"reload",
+		"remove",
+		"removeAreYouSure",
+		"rename",
+		"renote",
+		"reply",
 		"reset",
+		"resetAreYouSure",
+		"retry",
 		"save",
 		"search",
+		"sensitive",
+		"settings",
+		"share",
+		"show",
+		"showLess",
+		"showMore",
+		"showRepliesToOthersInTimeline",
 		"somethingHappened",
+		"termsOfService",
+		"timeline",
 		"title",
+		"unfavorite",
+		"unmarkAsSensitive",
+		"update",
+		"updatedAt",
 		"upload",
-		"users"
+		"user",
+		"userSaysSomething",
+		"users",
+		"visibility",
+		"visibilityDisableFederation",
+		"withNFiles",
+		"yes"
 	],
 	"removedClassifications": {
 		"unconfirmedKeys": 168,
@@ -351,34 +579,629 @@
 	"unconfirmedKeys": [],
 	"sharedUses": [
 		{
-			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
-			"line": 10,
-			"path": "title"
+			"file": "packages/features/announcements/frontend/components/MkAnnouncementDialog.vue",
+			"line": 27,
+			"path": "close"
 		},
 		{
-			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
 			"line": 14,
-			"path": "description"
+			"path": "filter"
 		},
 		{
-			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
-			"line": 28,
+			"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
+			"line": 38,
 			"path": "save"
 		},
 		{
-			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
-			"line": 31,
+			"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
+			"line": 41,
 			"path": "delete"
 		},
 		{
-			"file": "packages/features/federation/frontend/pages/lookup.vue",
-			"line": 10,
-			"path": "close"
+			"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
+			"line": 47,
+			"path": "title"
 		},
 		{
-			"file": "packages/features/ui/frontend/components/MkWindow.vue",
+			"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
+			"line": 53,
+			"path": "imageUrl"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
+			"line": 95,
+			"path": "more"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
+			"line": 200,
+			"path": "deleteAreYouSure"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
+			"line": 286,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
+			"line": 294,
+			"path": "announcements"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/announcement.vue",
+			"line": 32,
+			"path": "createdAt"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/announcement.vue",
+			"line": 35,
+			"path": "updatedAt"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/announcement.vue",
+			"line": 39,
+			"path": "gotIt"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/announcement.vue",
+			"line": 109,
+			"path": "announcements"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/announcements.vue",
+			"line": 29,
+			"path": "createdAt"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/announcements.vue",
+			"line": 32,
+			"path": "updatedAt"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/announcements.vue",
+			"line": 37,
+			"path": "gotIt"
+		},
+		{
+			"file": "packages/features/announcements/frontend/pages/announcements.vue",
+			"line": 108,
+			"path": "announcements"
+		},
+		{
+			"file": "packages/features/api/frontend/ui/_common_/stream-indicator.vue",
+			"line": 10,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkAuthConfirm.vue",
+			"line": 46,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkAuthConfirm.vue",
+			"line": 61,
+			"path": "_permissions"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkAuthConfirm.vue",
+			"line": 86,
+			"path": "reject"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkAuthConfirm.vue",
+			"line": 87,
+			"path": "accept"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkAuthConfirm.vue",
+			"line": 112,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkInviteCode.vue",
+			"line": 16,
+			"path": "copy"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkInviteCode.vue",
+			"line": 17,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkInviteCode.vue",
+			"line": 54,
+			"path": "createdAt"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkPasswordDialog.vue",
+			"line": 35,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignin.input.vue",
+			"line": 39,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignin.passkey.vue",
+			"line": 16,
+			"path": "retry"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignin.password.vue",
 			"line": 34,
-			"path": "close"
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignin.totp.vue",
+			"line": 24,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignupDialog.form.vue",
+			"line": 26,
+			"path": "error"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignupDialog.form.vue",
+			"line": 45,
+			"path": "error"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignupDialog.form.vue",
+			"line": 321,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignupDialog.rules.vue",
+			"line": 39,
+			"path": "termsOfService"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignupDialog.rules.vue",
+			"line": 40,
+			"path": "privacyPolicy"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignupDialog.rules.vue",
+			"line": 58,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignupDialog.rules.vue",
+			"line": 59,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignupDialog.rules.vue",
+			"line": 101,
+			"path": "termsOfService"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkSignupDialog.rules.vue",
+			"line": 103,
+			"path": "privacyPolicy"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkTokenGenerateWindow.vue",
+			"line": 18,
+			"path": "generateAccessToken"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkTokenGenerateWindow.vue",
+			"line": 27,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkTokenGenerateWindow.vue",
+			"line": 30,
+			"path": "permission"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/admin/bot-protection.vue",
+			"line": 16,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/admin/bot-protection.vue",
+			"line": 25,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/admin/invites.vue",
+			"line": 24,
+			"path": "create"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/admin/invites.vue",
+			"line": 73,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/admin/invites.vue",
+			"line": 85,
+			"path": "createdAt"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/admin/invites.vue",
+			"line": 86,
+			"path": "createdAt"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/admin/invites.vue",
+			"line": 130,
+			"path": "invite"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/auth.form.vue",
+			"line": 11,
+			"path": "_permissions"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/auth.form.vue",
+			"line": 16,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/auth.form.vue",
+			"line": 17,
+			"path": "accept"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/auth.vue",
+			"line": 10,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/invite.vue",
+			"line": 89,
+			"path": "invite"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/reset-password.vue",
+			"line": 15,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
+			"line": 49,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
+			"line": 50,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
+			"line": 64,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
+			"line": 65,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
+			"line": 92,
+			"path": "download"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
+			"line": 97,
+			"path": "done"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/2fa.vue",
+			"line": 37,
+			"path": "learnMore"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/2fa.vue",
+			"line": 65,
+			"path": "rename"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/2fa.vue",
+			"line": 185,
+			"path": "rename"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/accounts.vue",
+			"line": 52,
+			"path": "remove"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/apps.vue",
+			"line": 21,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/apps.vue",
+			"line": 37,
+			"path": "permission"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/apps.vue",
+			"line": 38,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/apps.vue",
+			"line": 40,
+			"path": "_permissions"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/settings/connect.vue",
+			"line": 18,
+			"path": "generateAccessToken"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/signup-complete.vue",
+			"line": 14,
+			"path": "gotIt"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/signup-complete.vue",
+			"line": 17,
+			"path": "processing"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/signup-complete.vue",
+			"line": 17,
+			"path": "gotIt"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/signup-complete.vue",
+			"line": 57,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/verify-email.vue",
+			"line": 21,
+			"path": "gotIt"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/verify-email.vue",
+			"line": 24,
+			"path": "processing"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/verify-email.vue",
+			"line": 24,
+			"path": "gotIt"
+		},
+		{
+			"file": "packages/features/auth/frontend/pages/verify-email.vue",
+			"line": 74,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
+			"line": 30,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
+			"line": 33,
+			"path": "imageUrl"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
+			"line": 39,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
+			"line": 43,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
+			"line": 46,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
+			"line": 55,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
+			"line": 59,
+			"path": "update"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
+			"line": 59,
+			"path": "create"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
+			"line": 164,
+			"path": "removeAreYouSure"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/avatar-decorations.vue",
+			"line": 93,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/settings/avatar-decoration.dialog.vue",
+			"line": 39,
+			"path": "update"
+		},
+		{
+			"file": "packages/features/avatar-decorations/frontend/pages/settings/avatar-decoration.vue",
+			"line": 140,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 59,
+			"path": "learnMore"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 64,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 65,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 106,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 106,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 110,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 110,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 114,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 114,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 118,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 118,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 122,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 122,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 126,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 126,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 130,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 130,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 134,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 134,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 138,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 138,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 168,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 168,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 172,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 172,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 176,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 176,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 180,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 180,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 184,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
+			"line": 184,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/boot/frontend/components/MkUpdated.vue",
+			"line": 13,
+			"path": "gotIt"
+		},
+		{
+			"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
+			"line": 73,
+			"path": "processing"
 		},
 		{
 			"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
@@ -392,13 +1215,153 @@
 		},
 		{
 			"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
+			"line": 114,
+			"path": "learnMore"
+		},
+		{
+			"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
 			"line": 168,
 			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/boot/frontend/ui/_common_/ReloadSuggestion.vue",
+			"line": 12,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/channels/frontend/components/MkChannelFollowButton.vue",
+			"line": 18,
+			"path": "follow"
+		},
+		{
+			"file": "packages/features/channels/frontend/components/MkChannelFollowButton.vue",
+			"line": 22,
+			"path": "processing"
+		},
+		{
+			"file": "packages/features/channels/frontend/components/MkChannelPreview.vue",
+			"line": 12,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/channels/frontend/components/MkChannelPreview.vue",
+			"line": 41,
+			"path": "updatedAt"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel-editor.vue",
+			"line": 11,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel-editor.vue",
+			"line": 15,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel-editor.vue",
+			"line": 23,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel-editor.vue",
+			"line": 62,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel-editor.vue",
+			"line": 62,
+			"path": "create"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 12,
+			"path": "unfavorite"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 13,
+			"path": "favorite"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 20,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 52,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 204,
+			"path": "indefinitely"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 208,
+			"path": "oneHour"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 210,
+			"path": "oneDay"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 212,
+			"path": "oneWeek"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 268,
+			"path": "copyUrl"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 281,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 300,
+			"path": "mute"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 318,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 331,
+			"path": "overview"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 335,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 343,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channel.vue",
+			"line": 348,
+			"path": "channel"
 		},
 		{
 			"file": "packages/features/channels/frontend/pages/channels.vue",
 			"line": 23,
 			"path": "search"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channels.vue",
+			"line": 53,
+			"path": "createNew"
 		},
 		{
 			"file": "packages/features/channels/frontend/pages/channels.vue",
@@ -409,6 +1372,11 @@
 			"file": "packages/features/channels/frontend/pages/channels.vue",
 			"line": 152,
 			"path": "favorites"
+		},
+		{
+			"file": "packages/features/channels/frontend/pages/channels.vue",
+			"line": 165,
+			"path": "channel"
 		},
 		{
 			"file": "packages/features/chat/frontend/pages/chat/XMessage.vue",
@@ -426,6 +1394,26 @@
 			"path": "name"
 		},
 		{
+			"file": "packages/features/chat/frontend/pages/chat/room.info.vue",
+			"line": 9,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/room.info.vue",
+			"line": 13,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/room.info.vue",
+			"line": 16,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/room.search.vue",
+			"line": 17,
+			"path": "search"
+		},
+		{
 			"file": "packages/features/chat/frontend/pages/chat/room.vue",
 			"line": 410,
 			"path": "areYouSure"
@@ -437,8 +1425,133 @@
 		},
 		{
 			"file": "packages/features/chat/frontend/pages/chat/room.vue",
+			"line": 462,
+			"path": "info"
+		},
+		{
+			"file": "packages/features/chat/frontend/pages/chat/room.vue",
 			"line": 470,
 			"path": "search"
+		},
+		{
+			"file": "packages/features/collections/frontend/components/MkClipPreview.vue",
+			"line": 12,
+			"path": "updatedAt"
+		},
+		{
+			"file": "packages/features/collections/frontend/embed/pages/clip.vue",
+			"line": 16,
+			"path": "fromX"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 17,
+			"path": "unfavorite"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 18,
+			"path": "favorite"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 115,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 122,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 130,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 135,
+			"path": "public"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 151,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 157,
+			"path": "copyUrl"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 163,
+			"path": "embed"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 172,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 187,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 194,
+			"path": "deleteAreYouSure"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/clip.vue",
+			"line": 207,
+			"path": "clip"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/favorites.vue",
+			"line": 36,
+			"path": "favorites"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 10,
+			"path": "title"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 14,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 20,
+			"path": "remove"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 25,
+			"path": "markAsSensitive"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 28,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
+			"line": 31,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/edit.vue",
+			"line": 38,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/index.vue",
+			"line": 87,
+			"path": "create"
 		},
 		{
 			"file": "packages/features/collections/frontend/pages/gallery/post.vue",
@@ -447,8 +1560,83 @@
 		},
 		{
 			"file": "packages/features/collections/frontend/pages/gallery/post.vue",
+			"line": 32,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/gallery/post.vue",
 			"line": 199,
 			"path": "delete"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/my-clips/index.vue",
+			"line": 13,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/my-clips/index.vue",
+			"line": 57,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/my-clips/index.vue",
+			"line": 64,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/my-clips/index.vue",
+			"line": 68,
+			"path": "public"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/my-clips/index.vue",
+			"line": 98,
+			"path": "favorites"
+		},
+		{
+			"file": "packages/features/collections/frontend/pages/my-clips/index.vue",
+			"line": 103,
+			"path": "clip"
+		},
+		{
+			"file": "packages/features/collections/frontend/ui/deck/clip-column.vue",
+			"line": 9,
+			"path": "clip"
+		},
+		{
+			"file": "packages/features/collections/frontend/ui/deck/clip-column.vue",
+			"line": 164,
+			"path": "clips"
+		},
+		{
+			"file": "packages/features/collections/frontend/ui/deck/clip-column.vue",
+			"line": 169,
+			"path": "favorites"
+		},
+		{
+			"file": "packages/features/collections/frontend/ui/deck/clip-column.vue",
+			"line": 200,
+			"path": "show"
+		},
+		{
+			"file": "packages/features/discovery/frontend/embed/pages/tag.vue",
+			"line": 16,
+			"path": "fromX"
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/explore.featured.vue",
+			"line": 11,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/explore.featured.vue",
+			"line": 12,
+			"path": "poll"
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/explore.vue",
+			"line": 48,
+			"path": "users"
 		},
 		{
 			"file": "packages/features/discovery/frontend/pages/search.user.vue",
@@ -461,14 +1649,54 @@
 			"path": "search"
 		},
 		{
+			"file": "packages/features/discovery/frontend/pages/search.vue",
+			"line": 67,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/search.vue",
+			"line": 71,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/search.vue",
+			"line": 76,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/tag.vue",
+			"line": 59,
+			"path": "more"
+		},
+		{
+			"file": "packages/features/discovery/frontend/pages/tag.vue",
+			"line": 62,
+			"path": "embed"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.file.vue",
+			"line": 26,
+			"path": "sensitive"
+		},
+		{
 			"file": "packages/features/drive/frontend/components/MkDrive.folder.vue",
 			"line": 191,
 			"path": "somethingHappened"
 		},
 		{
 			"file": "packages/features/drive/frontend/components/MkDrive.folder.vue",
+			"line": 296,
+			"path": "rename"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.folder.vue",
 			"line": 304,
 			"path": "delete"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.navFolder.vue",
+			"line": 15,
+			"path": "drive"
 		},
 		{
 			"file": "packages/features/drive/frontend/components/MkDrive.vue",
@@ -479,6 +1707,11 @@
 			"file": "packages/features/drive/frontend/components/MkDrive.vue",
 			"line": 626,
 			"path": "upload"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkDrive.vue",
+			"line": 639,
+			"path": "drive"
 		},
 		{
 			"file": "packages/features/drive/frontend/components/MkDrive.vue",
@@ -496,6 +1729,531 @@
 			"path": "edit"
 		},
 		{
+			"file": "packages/features/drive/frontend/components/MkDriveWindow.vue",
+			"line": 13,
+			"path": "drive"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkFileListForAdmin.vue",
+			"line": 23,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkImageEffectorDialog.vue",
+			"line": 23,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkImageFrameEditorDialog.vue",
+			"line": 23,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkImageFrameEditorDialog.vue",
+			"line": 60,
+			"path": "show"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkImageFrameEditorDialog.vue",
+			"line": 94,
+			"path": "show"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkImageFrameEditorDialog.vue",
+			"line": 367,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkLightbox.item.fileinfo.vue",
+			"line": 13,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkLightbox.item.fileinfo.vue",
+			"line": 15,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkLightbox.item.vue",
+			"line": 57,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkLightbox.item.vue",
+			"line": 993,
+			"path": "hide"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkMediaAudio.vue",
+			"line": 17,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkMediaBanner.vue",
+			"line": 10,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkMediaImage.vue",
+			"line": 52,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkMediaImage.vue",
+			"line": 62,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkMediaVideo.vue",
+			"line": 18,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
+			"line": 44,
+			"path": "upload"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
+			"line": 46,
+			"path": "retry"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
+			"line": 47,
+			"path": "done"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
+			"line": 131,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
+			"line": 132,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
+			"line": 150,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
+			"line": 151,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
+			"line": 163,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
+			"line": 164,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkWatermarkEditorDialog.vue",
+			"line": 23,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/drive/frontend/components/MkWatermarkEditorDialog.vue",
+			"line": 328,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/drive/frontend/embed/components/EmMediaImage.vue",
+			"line": 30,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/embed/components/EmMediaImage.vue",
+			"line": 39,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/admin-file.root.vue",
+			"line": 31,
+			"path": "createdAt"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/admin-file.root.vue",
+			"line": 40,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/admin-file.root.vue",
+			"line": 44,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/admin-file.root.vue",
+			"line": 118,
+			"path": "removeAreYouSure"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/admin-file.root.vue",
+			"line": 152,
+			"path": "overview"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/admin/files.vue",
+			"line": 53,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 23,
+			"path": "unmarkAsSensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 26,
+			"path": "markAsSensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 29,
+			"path": "download"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 32,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 46,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 47,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 99,
+			"path": "drive"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 100,
+			"path": "drive"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 161,
+			"path": "error"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
+			"line": 213,
+			"path": "driveFileDeleteConfirm"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.file.vue",
+			"line": 46,
+			"path": "info"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/drive.vue",
+			"line": 33,
+			"path": "drive"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive-cleaner.vue",
+			"line": 21,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.ImageFrameItem.vue",
+			"line": 9,
+			"path": "noName"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.ImageFrameItem.vue",
+			"line": 12,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.ImageFrameItem.vue",
+			"line": 60,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.WatermarkItem.vue",
+			"line": 9,
+			"path": "noName"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.WatermarkItem.vue",
+			"line": 12,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.WatermarkItem.vue",
+			"line": 60,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 7,
+			"path": "drive"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 118,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 118,
+			"path": "noName"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 159,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 160,
+			"path": "low"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 161,
+			"path": "medium"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 162,
+			"path": "high"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 183,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 184,
+			"path": "low"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 185,
+			"path": "medium"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 186,
+			"path": "high"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 395,
+			"path": "error"
+		},
+		{
+			"file": "packages/features/drive/frontend/pages/settings/drive.vue",
+			"line": 407,
+			"path": "drive"
+		},
+		{
+			"file": "packages/features/emojis/frontend/EmojiCatalog.vue",
+			"line": 11,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/emojis/frontend/EmojiCatalogItem.vue",
+			"line": 39,
+			"path": "copy"
+		},
+		{
+			"file": "packages/features/emojis/frontend/EmojiCatalogItem.vue",
+			"line": 45,
+			"path": "info"
+		},
+		{
+			"file": "packages/features/emojis/frontend/EmojiCatalogItem.vue",
+			"line": 60,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 16,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 22,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 32,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 35,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 36,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 36,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 39,
+			"path": "localOnly"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 40,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 40,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
+			"line": 44,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkEmojiPicker.vue",
+			"line": 14,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkEmojiPicker.vue",
+			"line": 67,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkEmojiPicker.vue",
+			"line": 90,
+			"path": "customEmojis"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/MkRemoteEmojiEditDialog.vue",
+			"line": 36,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/global/MkCustomEmoji.vue",
+			"line": 128,
+			"path": "copy"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/global/MkCustomEmoji.vue",
+			"line": 150,
+			"path": "info"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/global/MkCustomEmoji.vue",
+			"line": 196,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/emojis/frontend/components/global/MkEmoji.vue",
+			"line": 82,
+			"path": "copy"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.search.vue",
+			"line": 15,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.search.vue",
+			"line": 117,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.search.vue",
+			"line": 120,
+			"path": "reset"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue",
+			"line": 32,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue",
+			"line": 42,
+			"path": "update"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue",
+			"line": 44,
+			"path": "reset"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue",
+			"line": 362,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue",
+			"line": 414,
+			"path": "resetAreYouSure"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue",
+			"line": 533,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.register.vue",
+			"line": 36,
+			"path": "upload"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.register.vue",
+			"line": 37,
+			"path": "fromDrive"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.register.vue",
+			"line": 279,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.remote.vue",
+			"line": 89,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.remote.vue",
+			"line": 92,
+			"path": "reset"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.remote.vue",
+			"line": 344,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager2.vue",
+			"line": 41,
+			"path": "customEmojis"
+		},
+		{
 			"file": "packages/features/emojis/frontend/pages/custom-emojis-manager.vue",
 			"line": 13,
 			"path": "search"
@@ -507,8 +2265,488 @@
 		},
 		{
 			"file": "packages/features/emojis/frontend/pages/custom-emojis-manager.vue",
+			"line": 338,
+			"path": "more"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/custom-emojis-manager.vue",
 			"line": 351,
 			"path": "customEmojis"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+			"line": 37,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+			"line": 54,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+			"line": 57,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+			"line": 69,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+			"line": 70,
+			"path": "localOnly"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+			"line": 71,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+			"line": 75,
+			"path": "update"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+			"line": 75,
+			"path": "create"
+		},
+		{
+			"file": "packages/features/emojis/frontend/pages/emoji-edit-dialog.vue",
+			"line": 210,
+			"path": "removeAreYouSure"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/federation.vue",
+			"line": 59,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/federation.vue",
+			"line": 77,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/federation.vue",
+			"line": 78,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/federation.vue",
+			"line": 79,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/federation.vue",
+			"line": 80,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/federation.vue",
+			"line": 81,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/federation.vue",
+			"line": 82,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/federation.vue",
+			"line": 83,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/federation.vue",
+			"line": 84,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/admin/relays.vue",
+			"line": 19,
+			"path": "remove"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/instance-info.vue",
+			"line": 24,
+			"path": "administrator"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/instance-info.vue",
+			"line": 29,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/instance-info.vue",
+			"line": 63,
+			"path": "updatedAt"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/instance-info.vue",
+			"line": 304,
+			"path": "overview"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/instance-info.vue",
+			"line": 308,
+			"path": "charts"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/instance-info.vue",
+			"line": 312,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/federation/frontend/pages/lookup.vue",
+			"line": 10,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/games/frontend/pages/drop-and-fusion.game.vue",
+			"line": 131,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/games/frontend/pages/drop-and-fusion.game.vue",
+			"line": 772,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/games/frontend/pages/drop-and-fusion.vue",
+			"line": 35,
+			"path": "mute"
+		},
+		{
+			"file": "packages/features/games/frontend/pages/reversi/game.board.vue",
+			"line": 134,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/games/frontend/pages/reversi/game.board.vue",
+			"line": 415,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/games/frontend/pages/reversi/game.setting.vue",
+			"line": 99,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/games/frontend/pages/reversi/game.setting.vue",
+			"line": 211,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/games/frontend/pages/reversi/index.vue",
+			"line": 16,
+			"path": "invite"
+		},
+		{
+			"file": "packages/features/games/frontend/pages/reversi/index.vue",
+			"line": 101,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.federation.vue",
+			"line": 54,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.federation.vue",
+			"line": 72,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.federation.vue",
+			"line": 73,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.federation.vue",
+			"line": 74,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.federation.vue",
+			"line": 75,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.federation.vue",
+			"line": 76,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.federation.vue",
+			"line": 77,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.federation.vue",
+			"line": 78,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.federation.vue",
+			"line": 79,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.overview.vue",
+			"line": 18,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.overview.vue",
+			"line": 48,
+			"path": "administrator"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.overview.vue",
+			"line": 51,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.overview.vue",
+			"line": 58,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.overview.vue",
+			"line": 65,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.overview.vue",
+			"line": 85,
+			"path": "termsOfService"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.overview.vue",
+			"line": 89,
+			"path": "privacyPolicy"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.overview.vue",
+			"line": 104,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.overview.vue",
+			"line": 108,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.vue",
+			"line": 57,
+			"path": "overview"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.vue",
+			"line": 60,
+			"path": "customEmojis"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/about.vue",
+			"line": 68,
+			"path": "charts"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+			"line": 22,
+			"path": "imageUrl"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+			"line": 49,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+			"line": 67,
+			"path": "memo"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+			"line": 74,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+			"line": 77,
+			"path": "remove"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+			"line": 83,
+			"path": "more"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+			"line": 126,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+			"line": 186,
+			"path": "removeAreYouSure"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/ads.vue",
+			"line": 275,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/branding.vue",
+			"line": 99,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/branding.vue",
+			"line": 148,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/security.vue",
+			"line": 17,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/security.vue",
+			"line": 18,
+			"path": "localOnly"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/security.vue",
+			"line": 20,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/security.vue",
+			"line": 33,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/security.vue",
+			"line": 34,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/security.vue",
+			"line": 35,
+			"path": "localOnly"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/server-rules.vue",
+			"line": 33,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/server-rules.vue",
+			"line": 34,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/settings.vue",
+			"line": 14,
+			"path": "info"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/settings.vue",
+			"line": 259,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/settings.vue",
+			"line": 261,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/settings.vue",
+			"line": 271,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/settings.vue",
+			"line": 273,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/admin/settings.vue",
+			"line": 293,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/contact.vue",
+			"line": 11,
+			"path": "administrator"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/contact.vue",
+			"line": 14,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/contact.vue",
+			"line": 21,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/instance/frontend/pages/contact.vue",
+			"line": 28,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 28,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 37,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 38,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 45,
+			"path": "permission"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 48,
+			"path": "_permissions"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 50,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 71,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 81,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 97,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
+			"line": 98,
+			"path": "install"
 		},
 		{
 			"file": "packages/features/integrations/frontend/components/MkSystemWebhookEditor.vue",
@@ -529,6 +2767,236 @@
 			"file": "packages/features/integrations/frontend/components/MkSystemWebhookEditor.vue",
 			"line": 256,
 			"path": "error"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/admin/system-webhook.item.vue",
+			"line": 27,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/admin/system-webhook.item.vue",
+			"line": 30,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/install-extensions.vue",
+			"line": 36,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/plugin.install.vue",
+			"line": 15,
+			"path": "install"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/plugin.vue",
+			"line": 37,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/plugin.vue",
+			"line": 39,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/plugin.vue",
+			"line": 54,
+			"path": "description"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/plugin.vue",
+			"line": 58,
+			"path": "permission"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/plugin.vue",
+			"line": 61,
+			"path": "_permissions"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/plugin.vue",
+			"line": 62,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/plugin.vue",
+			"line": 126,
+			"path": "removeAreYouSure"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/webhook.edit.vue",
+			"line": 67,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/webhook.edit.vue",
+			"line": 68,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/webhook.edit.vue",
+			"line": 126,
+			"path": "deleteAreYouSure"
+		},
+		{
+			"file": "packages/features/integrations/frontend/pages/settings/webhook.new.vue",
+			"line": 38,
+			"path": "create"
+		},
+		{
+			"file": "packages/features/markup/frontend/components/MkCodeEditor.vue",
+			"line": 30,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/markup/frontend/components/MkUrlPreview.vue",
+			"line": 42,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/moderation/frontend/components/MkAbuseReport.vue",
+			"line": 64,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/moderation/frontend/components/MkAbuseReport.vue",
+			"line": 73,
+			"path": "moderator"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 41,
+			"path": "createdAt"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 75,
+			"path": "updatedAt"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 150,
+			"path": "indefinitely"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 156,
+			"path": "createNew"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 159,
+			"path": "filter"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 260,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 474,
+			"path": "period"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 476,
+			"path": "indefinitely"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 478,
+			"path": "oneHour"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 480,
+			"path": "oneDay"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 482,
+			"path": "oneWeek"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 484,
+			"path": "oneMonth"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 550,
+			"path": "overview"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 558,
+			"path": "overview"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 566,
+			"path": "announcements"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 570,
+			"path": "drive"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin-user.vue",
+			"line": 574,
+			"path": "charts"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuse-report/notification-recipient.editor.vue",
+			"line": 23,
+			"path": "title"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuse-report/notification-recipient.editor.vue",
+			"line": 55,
+			"path": "ok"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuse-report/notification-recipient.editor.vue",
+			"line": 56,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuse-report/notification-recipient.editor.vue",
+			"line": 191,
+			"path": "error"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuse-report/notification-recipient.editor.vue",
+			"line": 226,
+			"path": "createNew"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuse-report/notification-recipient.editor.vue",
+			"line": 284,
+			"path": "error"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuse-report/notification-recipient.vue",
+			"line": 63,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuses.vue",
+			"line": 71,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuses.vue",
+			"line": 82,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/abuses.vue",
+			"line": 93,
+			"path": "all"
 		},
 		{
 			"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
@@ -571,9 +3039,844 @@
 			"path": "save"
 		},
 		{
+			"file": "packages/features/moderation/frontend/pages/admin/modlog.ModLog.vue",
+			"line": 139,
+			"path": "moderator"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/modlog.ModLog.vue",
+			"line": 149,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/modlog.ModLog.vue",
+			"line": 155,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/modlog.ModLog.vue",
+			"line": 158,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/modlog.ModLog.vue",
+			"line": 166,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/modlog.ModLog.vue",
+			"line": 170,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/modlog.vue",
+			"line": 16,
+			"path": "moderator"
+		},
+		{
+			"file": "packages/features/moderation/frontend/pages/admin/modlog.vue",
+			"line": 70,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkSuperMenu.vue",
+			"line": 11,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 38,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 51,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 52,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 69,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 70,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 84,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 85,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 99,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 100,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 117,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 118,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 138,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
+			"line": 139,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/admin/index.vue",
+			"line": 114,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/admin/index.vue",
+			"line": 119,
+			"path": "invite"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/admin/index.vue",
+			"line": 129,
+			"path": "customEmojis"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/admin/index.vue",
+			"line": 134,
+			"path": "customEmojis"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/admin/index.vue",
+			"line": 164,
+			"path": "announcements"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/admin/index.vue",
+			"line": 184,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/admin/index.vue",
+			"line": 237,
+			"path": "info"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/admin/index.vue",
+			"line": 302,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/admin/index.vue",
+			"line": 308,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/settings/index.vue",
+			"line": 64,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/settings/index.vue",
+			"line": 101,
+			"path": "notifications"
+		},
+		{
+			"file": "packages/features/navigation/frontend/pages/settings/index.vue",
+			"line": 145,
+			"path": "drive"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/_common_/navbar-h.vue",
+			"line": 13,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/_common_/navbar-h.vue",
+			"line": 33,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/_common_/navbar.vue",
+			"line": 22,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/_common_/navbar.vue",
+			"line": 23,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/_common_/navbar.vue",
+			"line": 49,
+			"path": "more"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/_common_/navbar.vue",
+			"line": 52,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/_common_/navbar.vue",
+			"line": 53,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck.vue",
+			"line": 60,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck.vue",
+			"line": 74,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck.vue",
+			"line": 191,
+			"path": "_deck._columns"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck.vue",
+			"line": 232,
+			"path": "deleteAreYouSure"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck/column.vue",
+			"line": 37,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck/column.vue",
+			"line": 128,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck/column.vue",
+			"line": 147,
+			"path": "_deck._columns"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck/column.vue",
+			"line": 151,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck/column.vue",
+			"line": 243,
+			"path": "remove"
+		},
+		{
+			"file": "packages/features/navigation/frontend/ui/deck/widgets-column.vue",
+			"line": 8,
+			"path": "_deck._columns"
+		},
+		{
 			"file": "packages/features/note-search/frontend/pages/search.note.vue",
 			"line": 108,
 			"path": "search"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkCwButton.vue",
+			"line": 37,
+			"path": "quote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkCwButton.vue",
+			"line": 39,
+			"path": "poll"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNote.vue",
+			"line": 32,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNote.vue",
+			"line": 37,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNote.vue",
+			"line": 42,
+			"path": "deletedNote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNote.vue",
+			"line": 68,
+			"path": "private"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNote.vue",
+			"line": 107,
+			"path": "showMore"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNote.vue",
+			"line": 110,
+			"path": "showLess"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNote.vue",
+			"line": 126,
+			"path": "more"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNote.vue",
+			"line": 172,
+			"path": "userSaysSomething"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+			"line": 38,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+			"line": 43,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+			"line": 47,
+			"path": "deletedNote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+			"line": 60,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+			"line": 65,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+			"line": 92,
+			"path": "private"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+			"line": 144,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
+			"line": 231,
+			"path": "userSaysSomething"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDraftsDialog.vue",
+			"line": 77,
+			"path": "deletedNote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDraftsDialog.vue",
+			"line": 92,
+			"path": "deletedNote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDraftsDialog.vue",
+			"line": 106,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteDraftsDialog.vue",
+			"line": 112,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteHeader.vue",
+			"line": 26,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteHeader.vue",
+			"line": 31,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteMediaGrid.vue",
+			"line": 24,
+			"path": "sensitive"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteSimple.vue",
+			"line": 23,
+			"path": "deletedNote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteSub.vue",
+			"line": 8,
+			"path": "deletedNote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkNoteSub.vue",
+			"line": 35,
+			"path": "userSaysSomething"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPollEditor.vue",
+			"line": 20,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 23,
+			"path": "visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 28,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 35,
+			"path": "visibilityDisableFederation"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 71,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 73,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 97,
+			"path": "upload"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 98,
+			"path": "fromDrive"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 99,
+			"path": "poll"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 293,
+			"path": "quote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 295,
+			"path": "reply"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 582,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 604,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 641,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 680,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 684,
+			"path": "reset"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 690,
+			"path": "resetAreYouSure"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 1491,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostForm.vue",
+			"line": 1492,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostFormAttaches.vue",
+			"line": 95,
+			"path": "driveFileDeleteConfirm"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostFormAttaches.vue",
+			"line": 168,
+			"path": "unmarkAsSensitive"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostFormAttaches.vue",
+			"line": 168,
+			"path": "markAsSensitive"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkPostFormAttaches.vue",
+			"line": 179,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkReactionsViewer.reaction.vue",
+			"line": 171,
+			"path": "info"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
+			"line": 9,
+			"path": "private"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
+			"line": 10,
+			"path": "deletedNote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
+			"line": 16,
+			"path": "withNFiles"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
+			"line": 20,
+			"path": "poll"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
+			"line": 30,
+			"path": "poll"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
+			"line": 32,
+			"path": "showMore"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkSubNoteContent.vue",
+			"line": 35,
+			"path": "showLess"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkTutorialDialog.Note.vue",
+			"line": 11,
+			"path": "reply"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkTutorialDialog.Note.vue",
+			"line": 12,
+			"path": "renote"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkTutorialDialog.PostNote.vue",
+			"line": 11,
+			"path": "visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkTutorialDialog.PostNote.vue",
+			"line": 23,
+			"path": "visibilityDisableFederation"
+		},
+		{
+			"file": "packages/features/notes/frontend/components/MkVisibilityPicker.vue",
+			"line": 10,
+			"path": "visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+			"line": 33,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+			"line": 38,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+			"line": 51,
+			"path": "_cw.hide"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+			"line": 51,
+			"path": "_cw.show"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+			"line": 55,
+			"path": "private"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+			"line": 74,
+			"path": "showMore"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+			"line": 77,
+			"path": "showLess"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNote.vue",
+			"line": 84,
+			"path": "more"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 29,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 34,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 63,
+			"path": "_cw.hide"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 63,
+			"path": "_cw.show"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 66,
+			"path": "private"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 83,
+			"path": "showMore"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 86,
+			"path": "showLess"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 93,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 98,
+			"path": "_visibility"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
+			"line": 105,
+			"path": "more"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteSimple.vue",
+			"line": 14,
+			"path": "_cw.hide"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteSimple.vue",
+			"line": 14,
+			"path": "_cw.show"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteSub.vue",
+			"line": 16,
+			"path": "_cw.hide"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmNoteSub.vue",
+			"line": 16,
+			"path": "_cw.show"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmSubNoteContent.vue",
+			"line": 9,
+			"path": "private"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmSubNoteContent.vue",
+			"line": 10,
+			"path": "deletedNote"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmSubNoteContent.vue",
+			"line": 16,
+			"path": "withNFiles"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmSubNoteContent.vue",
+			"line": 20,
+			"path": "poll"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmSubNoteContent.vue",
+			"line": 24,
+			"path": "showMore"
+		},
+		{
+			"file": "packages/features/notes/frontend/embed/components/EmSubNoteContent.vue",
+			"line": 27,
+			"path": "showLess"
+		},
+		{
+			"file": "packages/features/notes/frontend/pages/note.vue",
+			"line": 25,
+			"path": "clip"
+		},
+		{
+			"file": "packages/features/notes/frontend/pages/note.vue",
+			"line": 178,
+			"path": "noteOf"
+		},
+		{
+			"file": "packages/features/notes/frontend/pages/user/index.files.vue",
+			"line": 16,
+			"path": "showMore"
+		},
+		{
+			"file": "packages/features/notes/frontend/pages/user/notes.vue",
+			"line": 15,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/notes/frontend/pages/user/notes.vue",
+			"line": 16,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 146,
+			"path": "accept"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 147,
+			"path": "reject"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 211,
+			"path": "antennas"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 212,
+			"path": "blockedUsers"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 213,
+			"path": "clips"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 214,
+			"path": "customEmojis"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 215,
+			"path": "favorites"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 216,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 217,
+			"path": "mutedUsers"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 218,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotification.vue",
+			"line": 219,
+			"path": "lists"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotificationSelectWindow.vue",
+			"line": 23,
+			"path": "disableAll"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotificationSelectWindow.vue",
+			"line": 24,
+			"path": "enableAll"
+		},
+		{
+			"file": "packages/features/notifications/frontend/components/MkNotificationSelectWindow.vue",
+			"line": 26,
+			"path": "_notification._types"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/notifications.vue",
+			"line": 54,
+			"path": "_notification._types"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/notifications.vue",
+			"line": 71,
+			"path": "filter"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/notifications.vue",
+			"line": 76,
+			"path": "markAllAsRead"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/notifications.vue",
+			"line": 85,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/notifications.vue",
+			"line": 98,
+			"path": "notifications"
 		},
 		{
 			"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
@@ -592,13 +3895,163 @@
 		},
 		{
 			"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
+			"line": 64,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
 			"line": 68,
 			"path": "none"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+			"line": 7,
+			"path": "notifications"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+			"line": 17,
+			"path": "_notification._types"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+			"line": 20,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+			"line": 21,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+			"line": 22,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+			"line": 26,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+			"line": 184,
+			"path": "resetAreYouSure"
+		},
+		{
+			"file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+			"line": 197,
+			"path": "notifications"
+		},
+		{
+			"file": "packages/features/notifications/frontend/widgets/WidgetNotifications.vue",
+			"line": 9,
+			"path": "notifications"
+		},
+		{
+			"file": "packages/features/operations/frontend/pages/admin/job-queue.job.vue",
+			"line": 262,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/operations/frontend/pages/admin/job-queue.job.vue",
+			"line": 272,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/operations/frontend/pages/admin/job-queue.vue",
+			"line": 141,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/operations/frontend/pages/admin/job-queue.vue",
+			"line": 269,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/operations/frontend/pages/admin/job-queue.vue",
+			"line": 284,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/operations/frontend/pages/admin/job-queue.vue",
+			"line": 299,
+			"path": "areYouSure"
+		},
+		{
+			"file": "packages/features/operations/frontend/pages/admin/job-queue.vue",
+			"line": 323,
+			"path": "areYouSure"
 		},
 		{
 			"file": "packages/features/operations/frontend/pages/admin/object-storage.vue",
 			"line": 101,
 			"path": "save"
+		},
+		{
+			"file": "packages/features/pages/frontend/components/MkPageWindow.vue",
+			"line": 68,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/pages/frontend/components/MkPageWindow.vue",
+			"line": 75,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page-editor/page-editor.vue",
+			"line": 11,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page-editor/page-editor.vue",
+			"line": 13,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page-editor/page-editor.vue",
+			"line": 153,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page-editor/page-editor.vue",
+			"line": 162,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page-editor/page-editor.vue",
+			"line": 182,
+			"path": "removeAreYouSure"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page-editor/page-editor.vue",
+			"line": 200,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page.vue",
+			"line": 50,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page.vue",
+			"line": 66,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page.vue",
+			"line": 79,
+			"path": "createdAt"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page.vue",
+			"line": 80,
+			"path": "updatedAt"
+		},
+		{
+			"file": "packages/features/pages/frontend/pages/page.vue",
+			"line": 182,
+			"path": "share"
 		},
 		{
 			"file": "packages/features/pages/frontend/pages/page.vue",
@@ -611,14 +4064,94 @@
 			"path": "delete"
 		},
 		{
+			"file": "packages/features/pages/frontend/pages/pages.vue",
+			"line": 70,
+			"path": "create"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-edit.vue",
+			"line": 14,
+			"path": "visibility"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-edit.vue",
+			"line": 30,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-edit.vue",
+			"line": 31,
+			"path": "show"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-edit.vue",
+			"line": 32,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-edit.vue",
+			"line": 395,
+			"path": "public"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-edit.vue",
+			"line": 396,
+			"path": "private"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-edit.vue",
+			"line": 467,
+			"path": "deleteAreYouSure"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-index.vue",
+			"line": 14,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-index.vue",
+			"line": 109,
+			"path": "create"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash-index.vue",
+			"line": 115,
+			"path": "search"
+		},
+		{
 			"file": "packages/features/play/frontend/pages/flash/flash.vue",
 			"line": 18,
 			"path": "reload"
 		},
 		{
 			"file": "packages/features/play/frontend/pages/flash/flash.vue",
+			"line": 24,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash.vue",
+			"line": 49,
+			"path": "updatedAt"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash.vue",
+			"line": 50,
+			"path": "createdAt"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash.vue",
+			"line": 123,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/play/frontend/pages/flash/flash.vue",
 			"line": 303,
 			"path": "delete"
+		},
+		{
+			"file": "packages/features/portability/frontend/pages/settings/account-data.vue",
+			"line": 140,
+			"path": "antennas"
 		},
 		{
 			"file": "packages/features/preferences/frontend/pages/registry.value.vue",
@@ -627,8 +4160,68 @@
 		},
 		{
 			"file": "packages/features/preferences/frontend/pages/registry.value.vue",
+			"line": 35,
+			"path": "updatedAt"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/registry.value.vue",
 			"line": 39,
 			"path": "delete"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.palette.vue",
+			"line": 9,
+			"path": "noName"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.palette.vue",
+			"line": 12,
+			"path": "rename"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.palette.vue",
+			"line": 13,
+			"path": "copy"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.palette.vue",
+			"line": 84,
+			"path": "remove"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.palette.vue",
+			"line": 109,
+			"path": "rename"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.palette.vue",
+			"line": 132,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.vue",
+			"line": 112,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.vue",
+			"line": 147,
+			"path": "noName"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.vue",
+			"line": 155,
+			"path": "noName"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.vue",
+			"line": 162,
+			"path": "medium"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/emoji-palette.vue",
+			"line": 180,
+			"path": "medium"
 		},
 		{
 			"file": "packages/features/preferences/frontend/pages/settings/navbar.vue",
@@ -639,6 +4232,61 @@
 			"file": "packages/features/preferences/frontend/pages/settings/navbar.vue",
 			"line": 33,
 			"path": "save"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 57,
+			"path": "low"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 57,
+			"path": "high"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 182,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 183,
+			"path": "remove"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 255,
+			"path": "medium"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 277,
+			"path": "default"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 388,
+			"path": "visibilityDisableFederation"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 400,
+			"path": "notifications"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 721,
+			"path": "enableAll"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 722,
+			"path": "disableAll"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+			"line": 850,
+			"path": "remove"
 		},
 		{
 			"file": "packages/features/preferences/frontend/pages/settings/sounds.sound.vue",
@@ -652,8 +4300,48 @@
 		},
 		{
 			"file": "packages/features/preferences/frontend/pages/settings/sounds.sound.vue",
+			"line": 126,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/sounds.sound.vue",
 			"line": 127,
 			"path": "cancel"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/sounds.vue",
+			"line": 55,
+			"path": "default"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/sounds.vue",
+			"line": 99,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/statusbar.statusbar.vue",
+			"line": 25,
+			"path": "medium"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/statusbar.statusbar.vue",
+			"line": 83,
+			"path": "remove"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/statusbar.vue",
+			"line": 13,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/theme.install.vue",
+			"line": 13,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/settings/theme.install.vue",
+			"line": 14,
+			"path": "install"
 		},
 		{
 			"file": "packages/features/preferences/frontend/pages/settings/theme.manage.vue",
@@ -666,14 +4354,1094 @@
 			"path": "copy"
 		},
 		{
+			"file": "packages/features/preferences/frontend/pages/settings/theme.vue",
+			"line": 329,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/theme-editor.vue",
+			"line": 200,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/preferences/frontend/pages/theme-editor.vue",
+			"line": 227,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/preferences/frontend/ui/_common_/ThemePreviewing.vue",
+			"line": 12,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/preferences/frontend/widgets/WidgetMemo.vue",
+			"line": 12,
+			"path": "memo"
+		},
+		{
+			"file": "packages/features/preferences/frontend/widgets/WidgetMemo.vue",
+			"line": 13,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/relationships/frontend/components/MkFollowButton.vue",
+			"line": 19,
+			"path": "processing"
+		},
+		{
+			"file": "packages/features/relationships/frontend/components/MkFollowButton.vue",
+			"line": 28,
+			"path": "follow"
+		},
+		{
+			"file": "packages/features/relationships/frontend/components/MkFollowButton.vue",
+			"line": 32,
+			"path": "processing"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/follow-requests.vue",
+			"line": 21,
+			"path": "accept"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/follow-requests.vue",
+			"line": 22,
+			"path": "reject"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/follow-requests.vue",
+			"line": 25,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/list.vue",
+			"line": 106,
+			"path": "lists"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/index.vue",
+			"line": 66,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 11,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 15,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 17,
+			"path": "public"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 19,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 20,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 124,
+			"path": "remove"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 150,
+			"path": "showRepliesToOthersInTimeline"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 173,
+			"path": "removeAreYouSure"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 202,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/my-lists/list.vue",
+			"line": 215,
+			"path": "lists"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.emoji-mute.vue",
+			"line": 29,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.instance-mute.vue",
+			"line": 13,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.vue",
+			"line": 81,
+			"path": "mutedUsers"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.vue",
+			"line": 81,
+			"path": "renote"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.vue",
+			"line": 107,
+			"path": "mutedUsers"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.vue",
+			"line": 112,
+			"path": "mutedUsers"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.vue",
+			"line": 130,
+			"path": "indefinitely"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.vue",
+			"line": 140,
+			"path": "blockedUsers"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.vue",
+			"line": 145,
+			"path": "blockedUsers"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/settings/mute-block.word-mute.vue",
+			"line": 14,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/user-list-timeline.vue",
+			"line": 57,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/user-list-timeline.vue",
+			"line": 64,
+			"path": "lists"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/user/followers.vue",
+			"line": 58,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/user/followers.vue",
+			"line": 62,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/user/following.vue",
+			"line": 58,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/relationships/frontend/pages/user/following.vue",
+			"line": 62,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/relationships/frontend/ui/deck/list-column.vue",
+			"line": 67,
+			"path": "createNew"
+		},
+		{
+			"file": "packages/features/relationships/frontend/widgets/WidgetBirthdayFollowings.vue",
+			"line": 74,
+			"path": "oneWeek"
+		},
+		{
+			"file": "packages/features/relationships/frontend/widgets/WidgetBirthdayFollowings.vue",
+			"line": 77,
+			"path": "oneMonth"
+		},
+		{
+			"file": "packages/features/roles/frontend/components/MkRoleSelectDialog.vue",
+			"line": 21,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/roles/frontend/components/MkRoleSelectDialog.vue",
+			"line": 37,
+			"path": "ok"
+		},
+		{
+			"file": "packages/features/roles/frontend/components/MkRoleSelectDialog.vue",
+			"line": 38,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/RolesEditorFormula.vue",
+			"line": 41,
+			"path": "add"
+		},
+		{
 			"file": "packages/features/roles/frontend/pages/admin/roles.edit.vue",
 			"line": 14,
 			"path": "save"
 		},
 		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.editor.vue",
+			"line": 180,
+			"path": "moderator"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.editor.vue",
+			"line": 181,
+			"path": "administrator"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 20,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 20,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 30,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 30,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 40,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 40,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 50,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 50,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 77,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 77,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 116,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 116,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 126,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 126,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 136,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 136,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 146,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 146,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 156,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 156,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 166,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 166,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 213,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 213,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 223,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 223,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 306,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 306,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 325,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 325,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 335,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 335,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 345,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 345,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 355,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 355,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 365,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 365,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 393,
+			"path": "yes"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+			"line": 393,
+			"path": "no"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 11,
+			"path": "edit"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 12,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 16,
+			"path": "info"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 21,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 42,
+			"path": "indefinitely"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 106,
+			"path": "deleteAreYouSure"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 121,
+			"path": "period"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 123,
+			"path": "indefinitely"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 125,
+			"path": "oneHour"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 127,
+			"path": "oneDay"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 129,
+			"path": "oneWeek"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.role.vue",
+			"line": 131,
+			"path": "oneMonth"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/admin/roles.vue",
+			"line": 13,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/role.vue",
+			"line": 62,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/role.vue",
+			"line": 77,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/roles/frontend/pages/role.vue",
+			"line": 81,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/share/frontend/pages/qr.read.vue",
+			"line": 45,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/share/frontend/pages/qr.read.vue",
+			"line": 46,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/share/frontend/pages/qr.read.vue",
+			"line": 47,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/share/frontend/pages/qr.read.vue",
+			"line": 303,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/share/frontend/pages/share.vue",
+			"line": 25,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/share/frontend/pages/share.vue",
+			"line": 304,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/share/frontend/pages/share.vue",
+			"line": 315,
+			"path": "share"
+		},
+		{
+			"file": "packages/features/statistics/frontend/components/MkInstanceStats.vue",
+			"line": 116,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/statistics/frontend/components/MkInstanceStats.vue",
+			"line": 137,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/statistics/frontend/components/MkInstanceStats.vue",
+			"line": 143,
+			"path": "drive"
+		},
+		{
+			"file": "packages/features/statistics/frontend/components/MkVisitorDashboard.vue",
+			"line": 35,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/statistics/frontend/components/MkVisitorDashboard.vue",
+			"line": 39,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/statistics/frontend/pages/user/index.activity.vue",
+			"line": 44,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/statistics/frontend/pages/user/index.activity.vue",
+			"line": 56,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/statistics/frontend/pages/user/index.activity.vue",
+			"line": 61,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/timelines/frontend/components/MkAntennaEditor.vue",
+			"line": 11,
+			"path": "name"
+		},
+		{
+			"file": "packages/features/timelines/frontend/components/MkAntennaEditor.vue",
+			"line": 20,
+			"path": "users"
+		},
+		{
+			"file": "packages/features/timelines/frontend/components/MkAntennaEditor.vue",
+			"line": 33,
+			"path": "localOnly"
+		},
+		{
+			"file": "packages/features/timelines/frontend/components/MkAntennaEditor.vue",
+			"line": 40,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/timelines/frontend/components/MkAntennaEditor.vue",
+			"line": 41,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/timelines/frontend/components/MkAntennaEditor.vue",
+			"line": 177,
+			"path": "removeAreYouSure"
+		},
+		{
+			"file": "packages/features/timelines/frontend/components/MkTutorialDialog.Timeline.vue",
+			"line": 11,
+			"path": "_timelines"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/antenna-timeline.vue",
+			"line": 61,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/antenna-timeline.vue",
+			"line": 68,
+			"path": "antennas"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/my-antennas/edit.vue",
+			"line": 44,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/my-antennas/index.vue",
+			"line": 12,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/my-antennas/index.vue",
+			"line": 45,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 125,
+			"path": "createNew"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 145,
+			"path": "createNew"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 170,
+			"path": "createNew"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 229,
+			"path": "showRepliesToOthersInTimeline"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 261,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 278,
+			"path": "_timelines"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 283,
+			"path": "lists"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 288,
+			"path": "antennas"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 293,
+			"path": "channel"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 300,
+			"path": "_timelines"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/timeline.vue",
+			"line": 306,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/user/index.timeline.vue",
+			"line": 13,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/timelines/frontend/pages/user/index.timeline.vue",
+			"line": 14,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/timelines/frontend/ui/deck/antenna-column.vue",
+			"line": 69,
+			"path": "createNew"
+		},
+		{
+			"file": "packages/features/timelines/frontend/ui/deck/tl-column.vue",
+			"line": 10,
+			"path": "_timelines"
+		},
+		{
+			"file": "packages/features/timelines/frontend/ui/deck/tl-column.vue",
+			"line": 101,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/timelines/frontend/ui/deck/tl-column.vue",
+			"line": 130,
+			"path": "timeline"
+		},
+		{
+			"file": "packages/features/timelines/frontend/ui/deck/tl-column.vue",
+			"line": 145,
+			"path": "showRepliesToOthersInTimeline"
+		},
+		{
+			"file": "packages/features/timelines/frontend/widgets/WidgetTimeline.vue",
+			"line": 105,
+			"path": "_timelines"
+		},
+		{
+			"file": "packages/features/timelines/frontend/widgets/WidgetTimeline.vue",
+			"line": 140,
+			"path": "_timelines"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkContainer.vue",
+			"line": 34,
+			"path": "showMore"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkDialog.vue",
+			"line": 34,
+			"path": "ok"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkDialog.vue",
+			"line": 34,
+			"path": "gotIt"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkDialog.vue",
+			"line": 35,
+			"path": "cancel"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkFormFooter.vue",
+			"line": 11,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkInput.vue",
+			"line": 42,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkKeyValue.vue",
+			"line": 13,
+			"path": "copy"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkMenu.vue",
+			"line": 211,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkModalWindow.vue",
+			"line": 15,
+			"path": "done"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkOmit.vue",
+			"line": 10,
+			"path": "showMore"
+		},
+		{
 			"file": "packages/features/ui/frontend/components/MkPagination.vue",
 			"line": 101,
 			"path": "reload"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkPaginationControl.vue",
+			"line": 12,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkPaginationControl.vue",
+			"line": 13,
+			"path": "filter"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkPaginationControl.vue",
+			"line": 15,
+			"path": "reload"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkPaginationControl.vue",
+			"line": 24,
+			"path": "search"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkSpot.vue",
+			"line": 15,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkSpot.vue",
+			"line": 16,
+			"path": "next"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkSpot.vue",
+			"line": 17,
+			"path": "done"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkTextarea.vue",
+			"line": 29,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkTextarea.vue",
+			"line": 34,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkWidgetSettingsDialog.vue",
+			"line": 23,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkWidgets.vue",
+			"line": 13,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkWidgets.vue",
+			"line": 14,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkWidgets.vue",
+			"line": 98,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkWidgets.vue",
+			"line": 133,
+			"path": "settings"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/MkWindow.vue",
+			"line": 34,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/global/MkError.vue",
+			"line": 8,
+			"path": "retry"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/global/MkResult.vue",
+			"line": 16,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/global/MkSuspense.vue",
+			"line": 16,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/global/MkSuspense.vue",
+			"line": 18,
+			"path": "retry"
+		},
+		{
+			"file": "packages/features/ui/frontend/components/global/MkTip.vue",
+			"line": 11,
+			"path": "gotIt"
+		},
+		{
+			"file": "packages/features/ui/frontend/embed/components/EmError.vue",
+			"line": 8,
+			"path": "somethingHappened"
+		},
+		{
+			"file": "packages/features/ui/frontend/embed/components/EmError.vue",
+			"line": 9,
+			"path": "retry"
+		},
+		{
+			"file": "packages/features/ui/frontend/pages/preview.vue",
+			"line": 26,
+			"path": "preview"
+		},
+		{
+			"file": "packages/features/ui/frontend/widgets/WidgetClock.vue",
+			"line": 62,
+			"path": "medium"
+		},
+		{
+			"file": "packages/features/ui/frontend/widgets/WidgetClock.vue",
+			"line": 89,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/ui/frontend/widgets/WidgetClock.vue",
+			"line": 112,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/ui/frontend/widgets/WidgetClock.vue",
+			"line": 132,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserAnnouncementEditDialog.vue",
+			"line": 20,
+			"path": "title"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserAnnouncementEditDialog.vue",
+			"line": 54,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserAnnouncementEditDialog.vue",
+			"line": 58,
+			"path": "update"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserAnnouncementEditDialog.vue",
+			"line": 58,
+			"path": "create"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserAnnouncementEditDialog.vue",
+			"line": 158,
+			"path": "removeAreYouSure"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserInfo.vue",
+			"line": 25,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserInfo.vue",
+			"line": 28,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserInfo.vue",
+			"line": 31,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserPopup.vue",
+			"line": 38,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserPopup.vue",
+			"line": 42,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserPopup.vue",
+			"line": 46,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.User.vue",
+			"line": 21,
+			"path": "follow"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 17,
+			"path": "follow"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 19,
+			"path": "done"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 55,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 56,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 70,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 71,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 85,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 86,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 101,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 102,
+			"path": "continue"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 120,
+			"path": "goBack"
+		},
+		{
+			"file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+			"line": 121,
+			"path": "close"
+		},
+		{
+			"file": "packages/features/users/frontend/embed/pages/user-timeline.vue",
+			"line": 15,
+			"path": "noteOf"
+		},
+		{
+			"file": "packages/features/users/frontend/embed/pages/user-timeline.vue",
+			"line": 20,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/users/frontend/embed/pages/user-timeline.vue",
+			"line": 23,
+			"path": "fromX"
 		},
 		{
 			"file": "packages/features/users/frontend/pages/admin/users.vue",
@@ -684,6 +5452,16 @@
 			"file": "packages/features/users/frontend/pages/admin/users.vue",
 			"line": 94,
 			"path": "all"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/admin/users.vue",
+			"line": 96,
+			"path": "administrator"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/admin/users.vue",
+			"line": 97,
+			"path": "moderator"
 		},
 		{
 			"file": "packages/features/users/frontend/pages/admin/users.vue",
@@ -699,6 +5477,196 @@
 			"file": "packages/features/users/frontend/pages/admin/users.vue",
 			"line": 194,
 			"path": "users"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/migration.vue",
+			"line": 18,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/migration.vue",
+			"line": 19,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 146,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 196,
+			"path": "none"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 338,
+			"path": "error"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 357,
+			"path": "public"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 358,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 359,
+			"path": "private"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 368,
+			"path": "public"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 369,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 370,
+			"path": "private"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 410,
+			"path": "oneHour"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 411,
+			"path": "oneDay"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 413,
+			"path": "oneWeek"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 414,
+			"path": "oneMonth"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 462,
+			"path": "oneHour"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 463,
+			"path": "oneDay"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 465,
+			"path": "oneWeek"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/privacy.vue",
+			"line": 466,
+			"path": "oneMonth"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/profile.vue",
+			"line": 68,
+			"path": "save"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/profile.vue",
+			"line": 69,
+			"path": "add"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/profile.vue",
+			"line": 70,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/profile.vue",
+			"line": 119,
+			"path": "all"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/profile.vue",
+			"line": 303,
+			"path": "upload"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/profile.vue",
+			"line": 328,
+			"path": "fromDrive"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/profile.vue",
+			"line": 379,
+			"path": "upload"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/profile.vue",
+			"line": 404,
+			"path": "fromDrive"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/settings/profiles.vue",
+			"line": 11,
+			"path": "delete"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/home.vue",
+			"line": 74,
+			"path": "memo"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/home.vue",
+			"line": 118,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/home.vue",
+			"line": 122,
+			"path": "following"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/home.vue",
+			"line": 126,
+			"path": "followers"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/index.vue",
+			"line": 106,
+			"path": "overview"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/index.vue",
+			"line": 110,
+			"path": "notes"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/index.vue",
+			"line": 130,
+			"path": "clips"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/index.vue",
+			"line": 134,
+			"path": "lists"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/index.vue",
+			"line": 155,
+			"path": "user"
+		},
+		{
+			"file": "packages/features/users/frontend/pages/user/raw.vue",
+			"line": 28,
+			"path": "createdAt"
 		},
 		{
 			"file": "packages/features/web/frontend/components/MkEmbedCodeGenDialog.vue",
@@ -724,6 +5692,46 @@
 			"file": "packages/features/web/frontend/pages/_error_.vue",
 			"line": 74,
 			"path": "error"
+		},
+		{
+			"file": "packages/features/web/frontend/pages/about-misskey.vue",
+			"line": 24,
+			"path": "learnMore"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkPermissionSelect.vue",
+			"line": 8,
+			"path": "disableAll"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkPermissionSelect.vue",
+			"line": 9,
+			"path": "enableAll"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkPermissionSelect.vue",
+			"line": 11,
+			"path": "_permissions"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkPermissionSelect.vue",
+			"line": 13,
+			"path": "adminPermission"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkPermissionSelect.vue",
+			"line": 16,
+			"path": "disableAllAdmin"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkPermissionSelect.vue",
+			"line": 17,
+			"path": "enableAllAdmin"
+		},
+		{
+			"file": "packages/features/auth/frontend/components/MkPermissionSelect.vue",
+			"line": 19,
+			"path": "_permissions"
 		}
 	],
 	"resolvedRemovals": [

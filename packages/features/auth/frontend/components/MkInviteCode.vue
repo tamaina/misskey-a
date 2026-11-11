@@ -13,8 +13,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 	<template #footer>
 		<div class="_buttons">
-			<MkButton v-if="!invite.used && !isExpired" primary rounded @click="copyInviteCode()"><i class="ti ti-copy"></i> {{ $locale.sfc.copy }}</MkButton>
-			<MkButton v-if="!invite.used || moderator" danger rounded @click="deleteCode()"><i class="ti ti-trash"></i> {{ $locale.sfc.delete }}</MkButton>
+			<MkButton v-if="!invite.used && !isExpired" primary rounded @click="copyInviteCode()"><i class="ti ti-copy"></i> {{ globalLocale.env.copy }}</MkButton>
+			<MkButton v-if="!invite.used || moderator" danger rounded @click="deleteCode()"><i class="ti ti-trash"></i> {{ globalLocale.env.delete }}</MkButton>
 		</div>
 	</template>
 
@@ -51,7 +51,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div><MkTime :time="invite.usedAt" mode="absolute"/></div>
 			</div>
 			<div v-if="moderator">
-				<div :class="$style.label">{{ $locale.sfc.createdAt }}</div>
+				<div :class="$style.label">{{ globalLocale.env.createdAt }}</div>
 				<div><MkTime :time="invite.createdAt" mode="absolute"/></div>
 			</div>
 		</div>
@@ -60,12 +60,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import * as os from '@features/ui/frontend/os.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	invite: Misskey.entities.InviteCode;
@@ -128,16 +132,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "منتهية صلاحيته",
   "unused": "غير مستعمَل",
-  "copy": "نسخ",
-  "delete": "حذف",
   "invitationCode": "رمز الدعوة",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "اِستخدم رمز الدعوة",
   "unknown": "مجهول",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "تاريخ انتهاء الصلاحية",
-  "inviteCodeUsedAt": "اُستخدم رمز الدعوة في",
-  "createdAt": "أُنشئ في"
+  "inviteCodeUsedAt": "اُستخدم رمز الدعوة في"
 }
 </locale>
 
@@ -146,16 +147,13 @@ function copyInviteCode() {
   "used": "Utilitzada",
   "expired": "Caducat",
   "unused": "Sense utilitzar",
-  "copy": "Copiar",
-  "delete": "Elimina",
   "invitationCode": "Codi d'invitació",
   "inviteCodeCreator": "Invitació creada per",
   "registeredUserUsingInviteCode": "Codi d'invitació fet servir per l'usuari ",
   "unknown": "Desconegut",
   "waitingForMailAuth": "Esperant la verificació per correu electrònic ",
   "expirationDate": "Data de venciment",
-  "inviteCodeUsedAt": "Codi d'invitació fet servir el",
-  "createdAt": "Creat el"
+  "inviteCodeUsedAt": "Codi d'invitació fet servir el"
 }
 </locale>
 
@@ -164,16 +162,13 @@ function copyInviteCode() {
   "used": "Používaná",
   "expired": "Prošlá",
   "unused": "Nepoužívaná",
-  "copy": "Kopírovat",
-  "delete": "Smazat",
   "invitationCode": "Kód pozvánky",
   "inviteCodeCreator": "Pozvánku vytvořil",
   "registeredUserUsingInviteCode": "Pozvánku používá",
   "unknown": "Neznámý",
   "waitingForMailAuth": "Čeká se na ověření emailu",
   "expirationDate": "Datum expirace",
-  "inviteCodeUsedAt": "Kód pozvánky použitý na",
-  "createdAt": "Vytvořeno"
+  "inviteCodeUsedAt": "Kód pozvánky použitý na"
 }
 </locale>
 
@@ -182,16 +177,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "Expired",
   "unused": "Unused",
-  "copy": "Copy",
-  "delete": "Delete",
   "invitationCode": "Invitation code",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "Invite used by",
   "unknown": "Unknown",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "Expiration date",
-  "inviteCodeUsedAt": "Invite code used at",
-  "createdAt": "Created at"
+  "inviteCodeUsedAt": "Invite code used at"
 }
 </locale>
 
@@ -200,16 +192,13 @@ function copyInviteCode() {
   "used": "Benutzt",
   "expired": "Abgelaufen",
   "unused": "Unbenutzt",
-  "copy": "Kopieren",
-  "delete": "Löschen",
   "invitationCode": "Einladungscode",
   "inviteCodeCreator": "Einladung erstellt von",
   "registeredUserUsingInviteCode": "Einladung verwendet von",
   "unknown": "Unbekannt",
   "waitingForMailAuth": "Bestätigungsemail ausstehend",
   "expirationDate": "Ablaufdatum",
-  "inviteCodeUsedAt": "Einladung verwendet am",
-  "createdAt": "Erstellt am"
+  "inviteCodeUsedAt": "Einladung verwendet am"
 }
 </locale>
 
@@ -218,16 +207,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "Expired",
   "unused": "Unused",
-  "copy": "Copy",
-  "delete": "Delete",
   "invitationCode": "Invitation code",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "Invite used by",
   "unknown": "Unknown",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "Expiration date",
-  "inviteCodeUsedAt": "Invite code used at",
-  "createdAt": "Created at"
+  "inviteCodeUsedAt": "Invite code used at"
 }
 </locale>
 
@@ -236,16 +222,13 @@ function copyInviteCode() {
   "used": "Usada",
   "expired": "Caducada",
   "unused": "Sin usar",
-  "copy": "Copiar",
-  "delete": "Borrar",
   "invitationCode": "Código de invitación",
   "inviteCodeCreator": "Invitación creada por",
   "registeredUserUsingInviteCode": "Invitación usada por",
   "unknown": "Desconocido",
   "waitingForMailAuth": "Verificación de correo pendiente",
   "expirationDate": "Fecha de caducidad",
-  "inviteCodeUsedAt": "Código de invitación usado el",
-  "createdAt": "Fecha de creación"
+  "inviteCodeUsedAt": "Código de invitación usado el"
 }
 </locale>
 
@@ -254,16 +237,13 @@ function copyInviteCode() {
   "used": "Utilisé",
   "expired": "Expiré",
   "unused": "Non-utilisé",
-  "copy": "Copier",
-  "delete": "Supprimer",
   "invitationCode": "Code d’invitation",
   "inviteCodeCreator": "Créateur·rice de ce code d'invitation",
   "registeredUserUsingInviteCode": "Code d'invitation utilisé par",
   "unknown": "Inconnu",
   "waitingForMailAuth": "En attente de la vérification de l'adresse courriel",
   "expirationDate": "Date d’expiration",
-  "inviteCodeUsedAt": "Code d'invitation utilisé à",
-  "createdAt": "Date de création"
+  "inviteCodeUsedAt": "Code d'invitation utilisé à"
 }
 </locale>
 
@@ -272,16 +252,13 @@ function copyInviteCode() {
   "used": "Digunakan",
   "expired": "Kedaluwarsa",
   "unused": "Tidak digunakan",
-  "copy": "Salin",
-  "delete": "Hapus",
   "invitationCode": "Kode undangan",
   "inviteCodeCreator": "Undangan dibuat oleh",
   "registeredUserUsingInviteCode": "Undangan digunakan oleh",
   "unknown": "Tidak diketahui",
   "waitingForMailAuth": "Menunggu verifikasi surel",
   "expirationDate": "Tanggal kedaluwarsa",
-  "inviteCodeUsedAt": "Kode undangan digunakan pada",
-  "createdAt": "Dibuat pada"
+  "inviteCodeUsedAt": "Kode undangan digunakan pada"
 }
 </locale>
 
@@ -290,16 +267,13 @@ function copyInviteCode() {
   "used": "Utilizzato",
   "expired": "Scaduto",
   "unused": "Inutilizzato",
-  "copy": "Copia",
-  "delete": "Elimina",
   "invitationCode": "Codice di invito",
   "inviteCodeCreator": "Codice di invito creato da",
   "registeredUserUsingInviteCode": "Codice di invito usato da",
   "unknown": "Sconosciuto",
   "waitingForMailAuth": "In attesa della verifica email",
   "expirationDate": "Scadenza",
-  "inviteCodeUsedAt": "Codice di invito usato alle",
-  "createdAt": "Data di creazione"
+  "inviteCodeUsedAt": "Codice di invito usato alle"
 }
 </locale>
 
@@ -308,16 +282,13 @@ function copyInviteCode() {
   "used": "使用済み",
   "expired": "期限切れ",
   "unused": "未使用",
-  "copy": "コピー",
-  "delete": "削除",
   "invitationCode": "招待コード",
   "inviteCodeCreator": "招待コードを作成したユーザー",
   "registeredUserUsingInviteCode": "招待コードを使用したユーザー",
   "unknown": "不明",
   "waitingForMailAuth": "メール認証待ち",
   "expirationDate": "有効期限",
-  "inviteCodeUsedAt": "招待コードが使用された日時",
-  "createdAt": "作成日時"
+  "inviteCodeUsedAt": "招待コードが使用された日時"
 }
 </locale>
 
@@ -326,16 +297,13 @@ function copyInviteCode() {
   "used": "もうつこてる",
   "expired": "期限切れ",
   "unused": "つこてへん",
-  "copy": "コピー",
-  "delete": "ほかす",
   "invitationCode": "招待コード",
   "inviteCodeCreator": "招待コードを作った人",
   "registeredUserUsingInviteCode": "招待コードを使うた人",
   "unknown": "不明",
   "waitingForMailAuth": "メール認証待ち",
   "expirationDate": "有効期限",
-  "inviteCodeUsedAt": "招待コードが使われた時",
-  "createdAt": "作成した日"
+  "inviteCodeUsedAt": "招待コードが使われた時"
 }
 </locale>
 
@@ -344,16 +312,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "Expired",
   "unused": "Unused",
-  "copy": "Copy",
-  "delete": "Kkes",
   "invitationCode": "Invitation code",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "Invite used by",
   "unknown": "Unknown",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "Expiration date",
-  "inviteCodeUsedAt": "Invite code used at",
-  "createdAt": "Created at"
+  "inviteCodeUsedAt": "Invite code used at"
 }
 </locale>
 
@@ -362,16 +327,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "Expired",
   "unused": "Unused",
-  "copy": "Copy",
-  "delete": "ಅಳಿಸು",
   "invitationCode": "Invitation code",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "Invite used by",
   "unknown": "Unknown",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "Expiration date",
-  "inviteCodeUsedAt": "Invite code used at",
-  "createdAt": "Created at"
+  "inviteCodeUsedAt": "Invite code used at"
 }
 </locale>
 
@@ -380,16 +342,13 @@ function copyInviteCode() {
   "used": "사용됨",
   "expired": "만료됨",
   "unused": "사용되지 않음",
-  "copy": "복사",
-  "delete": "삭제",
   "invitationCode": "초대 코드",
   "inviteCodeCreator": "초대 코드 생성자",
   "registeredUserUsingInviteCode": "초대 코드 사용 대상",
   "unknown": "알 수 없음",
   "waitingForMailAuth": "이메일 인증 보류 중",
   "expirationDate": "만료 날짜",
-  "inviteCodeUsedAt": "다음에 사용된 초대 코드",
-  "createdAt": "생성된 날짜"
+  "inviteCodeUsedAt": "다음에 사용된 초대 코드"
 }
 </locale>
 
@@ -398,16 +357,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "Expired",
   "unused": "Unused",
-  "copy": "Kopiëren",
-  "delete": "Verwijderen",
   "invitationCode": "Uitnodigingscode",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "Invite used by",
   "unknown": "Onbekend",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "Expiration date",
-  "inviteCodeUsedAt": "Invite code used at",
-  "createdAt": "Aangemaakt at"
+  "inviteCodeUsedAt": "Invite code used at"
 }
 </locale>
 
@@ -416,16 +372,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "Expired",
   "unused": "Unused",
-  "copy": "Kopier",
-  "delete": "Slett",
   "invitationCode": "Invitation code",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "Invite used by",
   "unknown": "Ukjent",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "Expiration date",
-  "inviteCodeUsedAt": "Invite code used at",
-  "createdAt": "Created at"
+  "inviteCodeUsedAt": "Invite code used at"
 }
 </locale>
 
@@ -434,16 +387,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "Expired",
   "unused": "Unused",
-  "copy": "Kopiuj",
-  "delete": "Usuń",
   "invitationCode": "Kod zaproszenia",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "Invite used by",
   "unknown": "Nieznane",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "Expiration date",
-  "inviteCodeUsedAt": "Invite code used at",
-  "createdAt": "Utworzono"
+  "inviteCodeUsedAt": "Invite code used at"
 }
 </locale>
 
@@ -452,16 +402,13 @@ function copyInviteCode() {
   "used": "Usado",
   "expired": "Expirado",
   "unused": "Não foi usado",
-  "copy": "Copiar",
-  "delete": "Excluir",
   "invitationCode": "Código de convite",
   "inviteCodeCreator": "Convite criado por",
   "registeredUserUsingInviteCode": "Convite usado por",
   "unknown": "Desconhecido",
   "waitingForMailAuth": "Verificação de e-mail pendente ",
   "expirationDate": "Data de expiração",
-  "inviteCodeUsedAt": "Código de convite usado em",
-  "createdAt": "Data de criação"
+  "inviteCodeUsedAt": "Código de convite usado em"
 }
 </locale>
 
@@ -470,16 +417,13 @@ function copyInviteCode() {
   "used": "Использован",
   "expired": "Срок действия приглашения истёк",
   "unused": "Неиспользованное",
-  "copy": "Копировать",
-  "delete": "Удалить",
   "invitationCode": "Код приглашения",
   "inviteCodeCreator": "Создатель приглашения",
   "registeredUserUsingInviteCode": "Пользователи, которые использовали пригласительный код",
   "unknown": "Неизвестно",
   "waitingForMailAuth": "Подтвердите вашу электронную почту",
   "expirationDate": "Дата истечения",
-  "inviteCodeUsedAt": "Дата и время, когда был использован пригласительный код",
-  "createdAt": "Создано"
+  "inviteCodeUsedAt": "Дата и время, когда был использован пригласительный код"
 }
 </locale>
 
@@ -488,16 +432,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "Expired",
   "unused": "Unused",
-  "copy": "Kopírovať",
-  "delete": "Odstrániť",
   "invitationCode": "Kód pozvánky",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "Invite used by",
   "unknown": "Neznáme",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "Expiration date",
-  "inviteCodeUsedAt": "Invite code used at",
-  "createdAt": "Vytvorené"
+  "inviteCodeUsedAt": "Invite code used at"
 }
 </locale>
 
@@ -506,16 +447,13 @@ function copyInviteCode() {
   "used": "ถูกใช้แล้ว",
   "expired": "หมดอายุแล้ว",
   "unused": "ยังไม่ได้ใช้",
-  "copy": "คัดลอก",
-  "delete": "ลบ",
   "invitationCode": "รหัสเชิญ",
   "inviteCodeCreator": "ผู้ใช้ที่สร้างรหัสเชิญ",
   "registeredUserUsingInviteCode": "ผู้ใช้ที่ใช้รหัสเชิญ",
   "unknown": "ไม่ทราบสถานะ",
   "waitingForMailAuth": "กำลังรอการยืนยันอีเมล",
   "expirationDate": "วันที่หมดอายุ",
-  "inviteCodeUsedAt": "วันเวลาที่ใช้รหัสเชิญ",
-  "createdAt": "สร้างเมื่อ"
+  "inviteCodeUsedAt": "วันเวลาที่ใช้รหัสเชิญ"
 }
 </locale>
 
@@ -524,16 +462,13 @@ function copyInviteCode() {
   "used": "Kullanılmış",
   "expired": "Süresi dolmuş",
   "unused": "Kullanılmamış",
-  "copy": "Kopyala",
-  "delete": "Sil",
   "invitationCode": "Davet kodu",
   "inviteCodeCreator": "Davet oluşturuldu",
   "registeredUserUsingInviteCode": "Kullanılan davet",
   "unknown": "Bilinmiyor",
   "waitingForMailAuth": "E-Posta doğrulama beklemede",
   "expirationDate": "Son kullanma tarihi",
-  "inviteCodeUsedAt": "Kullanılan davet kodu",
-  "createdAt": "Oluşturuldu"
+  "inviteCodeUsedAt": "Kullanılan davet kodu"
 }
 </locale>
 
@@ -542,16 +477,13 @@ function copyInviteCode() {
   "used": "Used",
   "expired": "Expired",
   "unused": "Unused",
-  "copy": "Copy",
-  "delete": "ئۆچۈرۈش",
   "invitationCode": "Invitation code",
   "inviteCodeCreator": "Invite created by",
   "registeredUserUsingInviteCode": "Invite used by",
   "unknown": "Unknown",
   "waitingForMailAuth": "Email verification pending",
   "expirationDate": "Expiration date",
-  "inviteCodeUsedAt": "Invite code used at",
-  "createdAt": "Created at"
+  "inviteCodeUsedAt": "Invite code used at"
 }
 </locale>
 
@@ -560,16 +492,13 @@ function copyInviteCode() {
   "used": "Використаний",
   "expired": "Термін дії минув",
   "unused": "Не використано",
-  "copy": "Скопіювати",
-  "delete": "Видалити",
   "invitationCode": "Код запрошення",
   "inviteCodeCreator": "Запрошення створив(-ла)",
   "registeredUserUsingInviteCode": "Запрошення використав(-ла)",
   "unknown": "Невідомо",
   "waitingForMailAuth": "Очікується підтвердження електронної пошти",
   "expirationDate": "Дата закінчення терміну дії",
-  "inviteCodeUsedAt": "Код запрошення використано о",
-  "createdAt": "Створено"
+  "inviteCodeUsedAt": "Код запрошення використано о"
 }
 </locale>
 
@@ -578,16 +507,13 @@ function copyInviteCode() {
   "used": "Đã được sử dụng",
   "expired": "Đã hết hạn",
   "unused": "Chưa được sử dụng",
-  "copy": "Sao chép",
-  "delete": "Xóa",
   "invitationCode": "Mã mời",
   "inviteCodeCreator": "Lời mời đã được tạo bởi",
   "registeredUserUsingInviteCode": "Lời mời đã được sử dụng bởi",
   "unknown": "Chưa biết",
   "waitingForMailAuth": "Đang chờ xác nhận email",
   "expirationDate": "Ngày hết hạn",
-  "inviteCodeUsedAt": "Mã mời đã được sử dụng lúc",
-  "createdAt": "Ngày tạo"
+  "inviteCodeUsedAt": "Mã mời đã được sử dụng lúc"
 }
 </locale>
 
@@ -596,16 +522,13 @@ function copyInviteCode() {
   "used": "已使用",
   "expired": "已过期",
   "unused": "未使用",
-  "copy": "复制",
-  "delete": "删除",
   "invitationCode": "邀请码",
   "inviteCodeCreator": "生成邀请码的用户",
   "registeredUserUsingInviteCode": "使用了邀请码的用户",
   "unknown": "未知",
   "waitingForMailAuth": "等待验证电子邮件",
   "expirationDate": "有效日期",
-  "inviteCodeUsedAt": "邀请码被使用的日期和时间",
-  "createdAt": "创建日期"
+  "inviteCodeUsedAt": "邀请码被使用的日期和时间"
 }
 </locale>
 
@@ -614,15 +537,12 @@ function copyInviteCode() {
   "used": "已使用",
   "expired": "過期",
   "unused": "未使用",
-  "copy": "複製",
-  "delete": "刪除",
   "invitationCode": "邀請碼",
   "inviteCodeCreator": "建立了邀請碼的使用者",
   "registeredUserUsingInviteCode": "用了邀請碼的使用者",
   "unknown": "未知",
   "waitingForMailAuth": "等待電子郵件認證",
   "expirationDate": "有效日期",
-  "inviteCodeUsedAt": "使用邀請碼的日期和時間",
-  "createdAt": "建立於"
+  "inviteCodeUsedAt": "使用邀請碼的日期和時間"
 }
 </locale>

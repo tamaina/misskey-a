@@ -46,8 +46,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</MkKeyValue>
 						</div>
 						<div class="_buttonsCenter" style="margin-top: 16px;">
-							<MkButton rounded @click="cancel">{{ $locale.sfc.cancel }}</MkButton>
-							<MkButton primary rounded gradate @click="page++">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+							<MkButton rounded @click="cancel">{{ globalLocale.env.cancel }}</MkButton>
+							<MkButton primary rounded gradate @click="page++">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 						</div>
 					</div>
 				</div>
@@ -61,8 +61,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<div>{{ $locale.sfc.twoFactorStep3 }}</div>
 						</div>
 						<div class="_buttonsCenter" style="margin-top: 16px;">
-							<MkButton rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ $locale.sfc.goBack }}</MkButton>
-							<MkButton primary rounded gradate @click="tokenDone">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+							<MkButton rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ globalLocale.env.goBack }}</MkButton>
+							<MkButton primary rounded gradate @click="tokenDone">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 						</div>
 					</div>
 				</div>
@@ -89,12 +89,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 										</MkKeyValue>
 									</div>
 
-									<MkButton primary rounded gradate @click="downloadBackupCodes"><i class="ti ti-download"></i> {{ $locale.sfc.download }}</MkButton>
+									<MkButton primary rounded gradate @click="downloadBackupCodes"><i class="ti ti-download"></i> {{ globalLocale.env.download }}</MkButton>
 								</div>
 							</MkFolder>
 						</div>
 						<div class="_buttonsCenter" style="margin-top: 16px;">
-							<MkButton primary rounded gradate @click="allDone">{{ $locale.sfc.done }}</MkButton>
+							<MkButton primary rounded gradate @click="allDone">{{ globalLocale.env.done }}</MkButton>
 						</div>
 					</div>
 				</div>
@@ -105,6 +105,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { hostname, port } from '@features/boot/frontend/shared/config.js';
 import * as Misskey from 'misskey-js';
 import { qrcode } from 'etiket/qr';
@@ -120,6 +121,9 @@ import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
 import { qrOptions } from '@features/share/frontend/utility/qr-code.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -213,18 +217,13 @@ function allDone() {
 	"twoFactorStep2": "امسح رمز الاستجابة السريعة الموجد على الشاشة.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": " إلغاء",
-	"continue": "متابعة",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "أدخل الرمز الموجود في تطبيقك لإكمال التثبيت.",
-	"goBack": "رجوع",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "من هذه اللحظة أثناء ولوجك سيُطلب منك الرمز.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "تنزيل",
-	"done": "تمّ"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -236,18 +235,13 @@ function allDone() {
 	"twoFactorStep2": "Després escaneja el codi QR que es mostra en aquesta pantalla.",
 	"launchApp": "Inicia l'aplicació ",
 	"twoFactorStep2Uri": "Escriu la següent URI si estàs fent servir una aplicació d'escriptori ",
-	"cancel": "Cancel·lar",
-	"continue": "Continuar",
 	"twoFactorStep3Title": "Escriu un codi d'autenticació",
 	"twoFactorStep3": "Escriu el codi d'autenticació (token) que es mostra a la teva aplicació per finalitzar la configuració.",
-	"goBack": "Tornar",
 	"twoFactorSetupCompleted": "Configuració terminada",
 	"twoFactorStep4": "D'ara endavant quan accedeixis se't demanarà el token que has introduït.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Abans de tancar aquesta finestra, comprova el següent codi de seguretat.",
 	"twoFactorBackupCodes": "Codi de seguretat.",
-	"twoFactorBackupCodesDescription": "Si l'aplicació d'autenticació no es pot utilitzar, es pot accedir al compte utilitzant els següents codis de còpia de seguretat. Assegura't de mantenir aquests codis en un lloc segur. Cada codi es pot utilitzar només una vegada.",
-	"download": "Descarregar",
-	"done": "Fet"
+	"twoFactorBackupCodesDescription": "Si l'aplicació d'autenticació no es pot utilitzar, es pot accedir al compte utilitzant els següents codis de còpia de seguretat. Assegura't de mantenir aquests codis en un lloc segur. Cada codi es pot utilitzar només una vegada."
 }
 </locale>
 
@@ -259,18 +253,13 @@ function allDone() {
 	"twoFactorStep2": "Poté naskenujte QR kód zobrazený na této obrazovce.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Zrušit",
-	"continue": "Pokračovat",
 	"twoFactorStep3Title": "Zadejte ověřovací kód",
 	"twoFactorStep3": "Pro dokončení nastavení zadejte token poskytnutý vaší aplikací.",
-	"goBack": "Zpět",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "Od této chvíle budou všechny budoucí pokusy o přihlášení vyžadovat tento přihlašovací token.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Stáhnout",
-	"done": "Hotovo"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -282,18 +271,13 @@ function allDone() {
 	"twoFactorStep2": "Then, scan the QR code displayed on this screen.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Cancel",
-	"continue": "Continue",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Enter the authentication code (token) provided by your app to finish setup.",
-	"goBack": "Back",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "From now on, any future login attempts will ask for such a login token.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Download",
-	"done": "Done"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -305,18 +289,13 @@ function allDone() {
 	"twoFactorStep2": "Dann, scanne den angezeigten QR-Code mit deinem Gerät.",
 	"launchApp": "Starte die App",
 	"twoFactorStep2Uri": "Nutzt du ein Desktopprogramm, gib folgende URI eingeben",
-	"cancel": "Abbrechen",
-	"continue": "Fortfahren",
 	"twoFactorStep3Title": "Authentifizierungsscode eingeben",
 	"twoFactorStep3": "Gib zum Abschluss den Code (Token) ein, der von deiner App angezeigt wird.",
-	"goBack": "Zurück",
 	"twoFactorSetupCompleted": "Einrichtung abgeschlossen",
 	"twoFactorStep4": "Alle folgenden Anmeldeversuche werden ab sofort die Eingabe eines solchen Tokens benötigen.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Notiere bitte deine Backup-Codes, bevor du dieses Fenster schließt.",
 	"twoFactorBackupCodes": "Backup-Codes",
-	"twoFactorBackupCodesDescription": "Verwende diese Codes, falls du nicht mehr auf deine App zur Zweifaktorauthentifizierung zugreifen kannst. Jeder Code kann nur einmal verwendet werden. Bewahre sie an einem sicheren Ort auf.",
-	"download": "Herunterladen",
-	"done": "Fertig"
+	"twoFactorBackupCodesDescription": "Verwende diese Codes, falls du nicht mehr auf deine App zur Zweifaktorauthentifizierung zugreifen kannst. Jeder Code kann nur einmal verwendet werden. Bewahre sie an einem sicheren Ort auf."
 }
 </locale>
 
@@ -328,18 +307,13 @@ function allDone() {
 	"twoFactorStep2": "Then, scan the QR code displayed on this screen.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Cancel",
-	"continue": "Continue",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Enter the authentication code (token) provided by your app to finish setup.",
-	"goBack": "Back",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "From now on, any future login attempts will ask for such a login token.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Download",
-	"done": "Done"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -351,18 +325,13 @@ function allDone() {
 	"twoFactorStep2": "Luego, escanee con la aplicación el código QR mostrado en pantalla.",
 	"launchApp": "Ejecutar la app",
 	"twoFactorStep2Uri": "Si usas una aplicación de escritorio, introduce en ella la siguiente URL.",
-	"cancel": "Cancelar",
-	"continue": "Continuar",
 	"twoFactorStep3Title": "Ingresa un código de autenticación",
 	"twoFactorStep3": "Para terminar, ingrese el token mostrado en la aplicación.",
-	"goBack": "Anterior",
 	"twoFactorSetupCompleted": "Configuración completada",
 	"twoFactorStep4": "Ahora cuando inicie sesión, ingrese el mismo token",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Por favor, copia los siguientes códigos de respaldo antes de finalizar el asistente.",
 	"twoFactorBackupCodes": "Códigos de Respaldo",
-	"twoFactorBackupCodesDescription": "En caso de que no puedas usar tu aplicación de autenticación, podrás usar los códigos de respaldo que figuran abajo para acceder a tu cuenta. Asegúrate de guardar en lugar seguro los códigos de respaldo. Cada uno de los códigos de respaldo es de un solo uso.",
-	"download": "Descargar",
-	"done": "Hecho"
+	"twoFactorBackupCodesDescription": "En caso de que no puedas usar tu aplicación de autenticación, podrás usar los códigos de respaldo que figuran abajo para acceder a tu cuenta. Asegúrate de guardar en lugar seguro los códigos de respaldo. Cada uno de los códigos de respaldo es de un solo uso."
 }
 </locale>
 
@@ -374,18 +343,13 @@ function allDone() {
 	"twoFactorStep2": "Ensuite, scannez le code QR affiché sur l’écran.",
 	"launchApp": "Lancer l'app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Annuler",
-	"continue": "Continuer",
 	"twoFactorStep3Title": "Veuillez saisir le code d’authentification",
 	"twoFactorStep3": "Entrez le jeton affiché sur votre application pour compléter la configuration.",
-	"goBack": "Retour",
 	"twoFactorSetupCompleted": "Configuration terminée avec succès !",
 	"twoFactorStep4": "À partir de maintenant, ce même jeton vous sera demandé à chacune de vos connexions.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Codes de Secours",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Télécharger",
-	"done": "Terminé"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -397,18 +361,13 @@ function allDone() {
 	"twoFactorStep2": "Lalu, pindai kode QR yang ada di layar.",
 	"launchApp": "Luncurkan Aplikasi",
 	"twoFactorStep2Uri": "Masukkan URI berikut jika kamu menggunakan program desktop",
-	"cancel": "Batalkan",
-	"continue": "Lanjutkan",
 	"twoFactorStep3Title": "Masukkan kode autentikasi",
 	"twoFactorStep3": "Masukkan token yang telah disediakan oleh aplikasimu untuk menyelesaikan pemasangan.",
-	"goBack": "Kembali",
 	"twoFactorSetupCompleted": "Penyetelan autentikasi 2-faktor selesai",
 	"twoFactorStep4": "Mulai sekarang, upaya login apapun akan meminta token login dari aplikasi autentikasi kamu.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Sebelum kamu menutup jendela ini, pastikan untuk memperhatikan dan mencadangkan kode cadangan berikut.",
 	"twoFactorBackupCodes": "Kode Pencadangan",
-	"twoFactorBackupCodesDescription": "Kamu dapat menggunakan kode ini untuk mendapatkan akses ke akun kamu apabila berada dalam situasi tidak dapat menggunakan aplikasi autentikasi 2-faktor yang kamu miliki. Setiap kode hanya dapat digunakan satu kali. Mohon simpan kode ini di tempat yang aman.",
-	"download": "Unduh",
-	"done": "Selesai"
+	"twoFactorBackupCodesDescription": "Kamu dapat menggunakan kode ini untuk mendapatkan akses ke akun kamu apabila berada dalam situasi tidak dapat menggunakan aplikasi autentikasi 2-faktor yang kamu miliki. Setiap kode hanya dapat digunakan satu kali. Mohon simpan kode ini di tempat yang aman."
 }
 </locale>
 
@@ -420,18 +379,13 @@ function allDone() {
 	"twoFactorStep2": "Quindi, tramite la App installata, scansiona questo codice QR.",
 	"launchApp": "Esegui l'App",
 	"twoFactorStep2Uri": "Inserisci il seguente URL se desideri utilizzare una App per PC",
-	"cancel": "Annulla",
-	"continue": "Continua",
 	"twoFactorStep3Title": "Inserisci il codice di verifica",
 	"twoFactorStep3": "Inserite il token visualizzato nell'app e il gioco è fatto.",
-	"goBack": "Indietro",
 	"twoFactorSetupCompleted": "Impostazione completata! 🎉",
 	"twoFactorStep4": "D'ora in poi, quando si accede, si inserisce il token nello stesso modo.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Prima di chiudere questa procedura guidata, salva i tuoi codici usa-e-getta in un posto sicuro.",
 	"twoFactorBackupCodes": "Codici usa-e-getta",
-	"twoFactorBackupCodesDescription": "Puoi usare questi codici usa-e-getta per ottenere l'accesso al tuo profilo in caso sia impossibile usare l'App col codice OTP. Salvali in un posto sicuro.",
-	"download": "Scarica",
-	"done": "Fine"
+	"twoFactorBackupCodesDescription": "Puoi usare questi codici usa-e-getta per ottenere l'accesso al tuo profilo in caso sia impossibile usare l'App col codice OTP. Salvali in un posto sicuro."
 }
 </locale>
 
@@ -443,18 +397,13 @@ function allDone() {
 	"twoFactorStep2": "次に、表示されているQRコードをアプリでスキャンするか、ボタンをクリックして端末上でアプリを開きます。",
 	"launchApp": "アプリを起動",
 	"twoFactorStep2Uri": "デスクトップアプリを使用する場合は次のURIを入力します",
-	"cancel": "キャンセル",
-	"continue": "続ける",
 	"twoFactorStep3Title": "確認コードを入力",
 	"twoFactorStep3": "アプリに表示されている確認コード（トークン）を入力します。",
-	"goBack": "戻る",
 	"twoFactorSetupCompleted": "設定が完了しました",
 	"twoFactorStep4": "これからログインするときも、同じようにコードを入力します。",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "このウィザードを閉じる前に、以下のバックアップコードを確認してください。",
 	"twoFactorBackupCodes": "バックアップコード",
-	"twoFactorBackupCodesDescription": "認証アプリが使用できなくなった場合、以下のバックアップコードを使ってアカウントにアクセスできます。これらのコードは必ず安全な場所に保管してください。各コードは一回だけ使用できます。",
-	"download": "ダウンロード",
-	"done": "完了"
+	"twoFactorBackupCodesDescription": "認証アプリが使用できなくなった場合、以下のバックアップコードを使ってアカウントにアクセスできます。これらのコードは必ず安全な場所に保管してください。各コードは一回だけ使用できます。"
 }
 </locale>
 
@@ -466,18 +415,13 @@ function allDone() {
 	"twoFactorStep2": "次に、ここにあるQRコードをアプリでスキャンしてな～。",
 	"launchApp": "アプリを起動",
 	"twoFactorStep2Uri": "デスクトップアプリを使う時は次のURIを入れるで",
-	"cancel": "やめる",
-	"continue": "続けるで",
 	"twoFactorStep3Title": "確認コードを入れてーや",
 	"twoFactorStep3": "アプリに映っとる確認コード（トークン）を入れて終わりや。",
-	"goBack": "戻る",
 	"twoFactorSetupCompleted": "設定が終わったで。",
 	"twoFactorStep4": "これからログインするときも、同じようにコードを入れるんや。",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "このウィザードを閉じる前に、したのバックアップコードを確認しいや。",
 	"twoFactorBackupCodes": "バックアップコード",
-	"twoFactorBackupCodesDescription": "認証アプリが使用できんなった場合、以下のバックアップコードを使ってアカウントにアクセスできるで。これらのコードは必ず安全な場所に置いときや。各コードは一回だけ使用できるで。",
-	"download": "ダウンロード",
-	"done": "でけた"
+	"twoFactorBackupCodesDescription": "認証アプリが使用できんなった場合、以下のバックアップコードを使ってアカウントにアクセスできるで。これらのコードは必ず安全な場所に置いときや。各コードは一回だけ使用できるで。"
 }
 </locale>
 
@@ -489,18 +433,13 @@ function allDone() {
 	"twoFactorStep2": "Then, scan the QR code displayed on this screen.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Cancel",
-	"continue": "Continue",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Enter the authentication code (token) provided by your app to finish setup.",
-	"goBack": "Back",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "From now on, any future login attempts will ask for such a login token.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Sider",
-	"done": "Done"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -512,18 +451,13 @@ function allDone() {
 	"twoFactorStep2": "Then, scan the QR code displayed on this screen.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "ರದ್ದು",
-	"continue": "Continue",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Enter the authentication code (token) provided by your app to finish setup.",
-	"goBack": "Back",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "From now on, any future login attempts will ask for such a login token.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "ಜಾಲದಿಂದಿಳಿಸು",
-	"done": "Done"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -535,18 +469,13 @@ function allDone() {
 	"twoFactorStep2": "그 후, 표시되어 있는 QR코드를 앱으로 스캔합니다.",
 	"launchApp": "앱 실행",
 	"twoFactorStep2Uri": "데스크톱 앱을 사용하려면 다음 URI를 입력하십시오",
-	"cancel": "취소",
-	"continue": "계속",
 	"twoFactorStep3Title": "인증 코드 입력",
 	"twoFactorStep3": "앱에 표시된 토큰을 입력하시면 완료됩니다.",
-	"goBack": "뒤로",
 	"twoFactorSetupCompleted": "설정 완료했습니다",
 	"twoFactorStep4": "다음 로그인부터는 토큰을 입력해야 합니다.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "이 위자드를 닫기 전에 아래 백업 코드를 확인하십시오",
 	"twoFactorBackupCodes": "백업 코드",
-	"twoFactorBackupCodesDescription": "인증 앱을 사용할 수 없게 된 경우 아래 백업 코드를 사용하여 계정에 액세스 할 수 있습니다.이 코드들은 반드시 안전한 장소에 보관하십시오.각 코드는 한 번만 사용할 수 있습니다.",
-	"download": "다운로드",
-	"done": "완료"
+	"twoFactorBackupCodesDescription": "인증 앱을 사용할 수 없게 된 경우 아래 백업 코드를 사용하여 계정에 액세스 할 수 있습니다.이 코드들은 반드시 안전한 장소에 보관하십시오.각 코드는 한 번만 사용할 수 있습니다."
 }
 </locale>
 
@@ -558,18 +487,13 @@ function allDone() {
 	"twoFactorStep2": "Then, scan the QR code displayed on this screen.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Annuleren",
-	"continue": "Continue",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Enter the authentication code (token) provided by your app to finish setup.",
-	"goBack": "Terug",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "From now on, any future login attempts will ask for such a login token.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Downloaden",
-	"done": "Klaar"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -581,18 +505,13 @@ function allDone() {
 	"twoFactorStep2": "Then, scan the QR code displayed on this screen.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Avbryt",
-	"continue": "Fortsett",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Enter the authentication code (token) provided by your app to finish setup.",
-	"goBack": "Back",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "From now on, any future login attempts will ask for such a login token.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Nedlastinger",
-	"done": "Ferdig"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -604,18 +523,13 @@ function allDone() {
 	"twoFactorStep2": "Następnie, zeskanuje kod QR z ekranu.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Anuluj",
-	"continue": "Continue",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Wprowadź token podany w aplikacji, aby ukończyć konfigurację.",
-	"goBack": "Wróć",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "Od teraz, przy każdej próbie logowania otrzymasz prośbę o token logowania.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Pobierz",
-	"done": "Gotowe"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -627,18 +541,13 @@ function allDone() {
 	"twoFactorStep2": "Então, escaneie o código QR exibido na tela.",
 	"launchApp": "Iniciar aplicação",
 	"twoFactorStep2Uri": "Acesse o seguinte URI se você estiver utilizando um aplicativo no computador",
-	"cancel": "Cancelar",
-	"continue": "Continuar",
 	"twoFactorStep3Title": "Insira o código de autenticação",
 	"twoFactorStep3": "Insira o código de autenticação (token) providenciado pelo seu aplicativo para terminar a configuração.",
-	"goBack": "Voltar",
 	"twoFactorSetupCompleted": "Configuração completa",
 	"twoFactorStep4": "De agora em diante, quaisquer solicitações de entrada pedirão pelo código.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Antes de fechar essa janela, anote os códigos de backup a seguir.",
 	"twoFactorBackupCodes": "Códigos de backup",
-	"twoFactorBackupCodesDescription": "Você pode utilizar esses códigos para ganhar acesso à conta caso sua autenticação de dois fatores esteja indisponível. Cada código pode ser utilizado apenas uma vez. Por favor, guarde-os em um local seguro.",
-	"download": "Descarregar",
-	"done": "Concluído"
+	"twoFactorBackupCodesDescription": "Você pode utilizar esses códigos para ganhar acesso à conta caso sua autenticação de dois fatores esteja indisponível. Cada código pode ser utilizado apenas uma vez. Por favor, guarde-os em um local seguro."
 }
 </locale>
 
@@ -650,18 +559,13 @@ function allDone() {
 	"twoFactorStep2": "Далее отсканируйте отображаемый QR-код при помощи приложения.",
 	"launchApp": "Запустить приложение",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Отмена",
-	"continue": "Продолжить",
 	"twoFactorStep3Title": "Введите проверочный код",
 	"twoFactorStep3": "И наконец, введите код, который покажет приложение.",
-	"goBack": "Выход",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "Теперь при каждом входе на сайт вам нужно будет вводить код из приложения аналогичным образом.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Скачать",
-	"done": "Готово"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -673,18 +577,13 @@ function allDone() {
 	"twoFactorStep2": "Potom, naskenujte QR kód zobrazený na obrazovke.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Zrušiť",
-	"continue": "Continue",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Nastavenie dokončíte zadaním tokenu z vašej aplikácie.",
-	"goBack": "Späť",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "Od teraz, všetky ďalšie prihlásenia budú vyžadovať prihlasovací token.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Stiahnuť",
-	"done": "Hotovo"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -696,18 +595,13 @@ function allDone() {
 	"twoFactorStep2": "จากนั้นสแกนรหัส QR ที่แสดงบนหน้าจอนี้",
 	"launchApp": "เริ่มแอป",
 	"twoFactorStep2Uri": "ป้อนใส่ URL ดังต่อไปนี้ถ้าหากคุณใช้โปรแกรมเดสก์ท็อป",
-	"cancel": "ยกเลิก",
-	"continue": "ดำเนินการต่อ",
 	"twoFactorStep3Title": "ป้อนรหัสยืนยัน",
 	"twoFactorStep3": "ป้อนโทเค็นที่แอปของคุณให้มาเพื่อเสร็จสิ้นการตั้งค่า",
-	"goBack": "ย้อนกลับ",
 	"twoFactorSetupCompleted": "ตั้งค่าสำเร็จแล้ว",
 	"twoFactorStep4": "นับจากนี้เป็นต้นไปการพยายามเข้าสู่ระบบในอนาคตนั้น อาจจะต้องขอโทเค็นในการเข้าสู่ระบบดังกล่าว",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "โปรดตรวจสอบรหัสแบ๊กอัปด้านล่างก่อนที่จะปิดวิซาร์ดนี้",
 	"twoFactorBackupCodes": "รหัสแบ๊กอัป",
-	"twoFactorBackupCodesDescription": "หากแอปยืนยันตัวตนของคุณไม่พร้อมใช้งาน คุณสามารถใช้รหัสสำรองด้านล่างเพื่อเข้าถึงบัญชีของคุณได้ อย่าลืมเก็บรหัสเหล่านี้ไว้ในที่ปลอดภัย แต่ละรหัสสามารถใช้ได้เพียงครั้งเดียวเท่านั้น",
-	"download": "ดาวน์โหลด",
-	"done": "เสร็จสิ้น"
+	"twoFactorBackupCodesDescription": "หากแอปยืนยันตัวตนของคุณไม่พร้อมใช้งาน คุณสามารถใช้รหัสสำรองด้านล่างเพื่อเข้าถึงบัญชีของคุณได้ อย่าลืมเก็บรหัสเหล่านี้ไว้ในที่ปลอดภัย แต่ละรหัสสามารถใช้ได้เพียงครั้งเดียวเท่านั้น"
 }
 </locale>
 
@@ -719,18 +613,13 @@ function allDone() {
 	"twoFactorStep2": "Ardından, bu ekranda görüntülenen QR kodunu tarayın.",
 	"launchApp": "Uygulamayı başlatın",
 	"twoFactorStep2Uri": "Masaüstü programı kullanıyorsanız aşağıdaki URI'yi girin",
-	"cancel": "Vazgeç",
-	"continue": "Devam et",
 	"twoFactorStep3Title": "Doğrulama kodunu girin",
 	"twoFactorStep3": "Uygulamanız tarafından sağlanan kimlik doğrulama kodunu (token) girerek kurulumu tamamlayın.",
-	"goBack": "Geri",
 	"twoFactorSetupCompleted": "Kurulum tamamlandı",
 	"twoFactorStep4": "Bundan sonra, gelecekteki tüm oturum açma girişimlerinde bu tür bir oturum açma jetonu istenecek.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Bu pencereyi kapatmadan önce, lütfen aşağıdaki yedek kodları not edin.",
 	"twoFactorBackupCodes": "Yedek kodlar",
-	"twoFactorBackupCodesDescription": "İki faktörlü kimlik doğrulama uygulamasını kullanamaz hale gelmen durumunda, bu kodları kullanarak hesabınıza erişebilirsin. Her kod yalnızca bir kez kullanılabilir. Lütfen bu kodları güvenli bir yerde sakla.",
-	"download": "İndir",
-	"done": "Tamam"
+	"twoFactorBackupCodesDescription": "İki faktörlü kimlik doğrulama uygulamasını kullanamaz hale gelmen durumunda, bu kodları kullanarak hesabınıza erişebilirsin. Her kod yalnızca bir kez kullanılabilir. Lütfen bu kodları güvenli bir yerde sakla."
 }
 </locale>
 
@@ -742,18 +631,13 @@ function allDone() {
 	"twoFactorStep2": "Then, scan the QR code displayed on this screen.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Cancel",
-	"continue": "Continue",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Enter the authentication code (token) provided by your app to finish setup.",
-	"goBack": "Back",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "From now on, any future login attempts will ask for such a login token.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Download",
-	"done": "Done"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -765,18 +649,13 @@ function allDone() {
 	"twoFactorStep2": "Потім відскануйте QR-код, який відображається на цьому екрані.",
 	"launchApp": "Запуск додатку",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Скасувати",
-	"continue": "Продовжити",
 	"twoFactorStep3Title": "Enter an authentication code",
 	"twoFactorStep3": "Щоб завершити налаштування, введіть токен, наданий вашою програмою.",
-	"goBack": "Назад",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "Відтепер будь-які майбутні спроби входу вимагатимуть такого токена.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Завантажити",
-	"done": "Готово"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -788,18 +667,13 @@ function allDone() {
 	"twoFactorStep2": "Sau đó, quét mã QR hiển thị trên màn hình này.",
 	"launchApp": "Launch the app",
 	"twoFactorStep2Uri": "Enter the following URI if you are using a desktop program",
-	"cancel": "Hủy",
-	"continue": "Tiếp tục",
 	"twoFactorStep3Title": "Nhập mã xác thực",
 	"twoFactorStep3": "Nhập mã token do ứng dụng của bạn cung cấp để hoàn tất thiết lập.",
-	"goBack": "Quay lại",
 	"twoFactorSetupCompleted": "Setup complete",
 	"twoFactorStep4": "Kể từ bây giờ, những lần đăng nhập trong tương lai sẽ yêu cầu mã token đăng nhập đó.",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "Before you close this window, please note the following backup codes.",
 	"twoFactorBackupCodes": "Backup codes",
-	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place.",
-	"download": "Tải xuống",
-	"done": "Xong"
+	"twoFactorBackupCodesDescription": "You can use these codes to gain access to your account in case of becoming unable to use your two-factor authentificator app. Each can only be used once. Please keep them in a safe place."
 }
 </locale>
 
@@ -811,18 +685,13 @@ function allDone() {
 	"twoFactorStep2": "然后，扫描屏幕上显示的二维码。",
 	"launchApp": "启动应用",
 	"twoFactorStep2Uri": "如果使用桌面应用程序的话，请输入下面的 URI",
-	"cancel": "取消",
-	"continue": "继续",
 	"twoFactorStep3Title": "输入验证码",
 	"twoFactorStep3": "输入您的应用提供的动态口令以完成设置。",
-	"goBack": "返回",
 	"twoFactorSetupCompleted": "设置完成",
 	"twoFactorStep4": "从现在开始，任何登录操作都将要求您提供动态口令。",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "在关闭此窗口前，请确认下面的备用代码",
 	"twoFactorBackupCodes": "备用代码",
-	"twoFactorBackupCodesDescription": "如果无法使用验证器，可以使用以下的备用代码来访问账户。请务必将这些代码保存在安全的地方。每个代码仅可使用一次。",
-	"download": "下载",
-	"done": "完成"
+	"twoFactorBackupCodesDescription": "如果无法使用验证器，可以使用以下的备用代码来访问账户。请务必将这些代码保存在安全的地方。每个代码仅可使用一次。"
 }
 </locale>
 
@@ -834,17 +703,12 @@ function allDone() {
 	"twoFactorStep2": "然後，掃描螢幕上的 QR 碼。",
 	"launchApp": "啟動 APP",
 	"twoFactorStep2Uri": "使用桌面版應用程式時，請輸入以下的 URI",
-	"cancel": "取消",
-	"continue": "繼續",
 	"twoFactorStep3Title": "輸入驗證碼",
 	"twoFactorStep3": "輸入應用程式所提供的權杖以完成設定。",
-	"goBack": "返回",
 	"twoFactorSetupCompleted": "設定完成",
 	"twoFactorStep4": "從現在開始，任何登入操作都將要求您提供權杖。",
 	"twoFactorCheckBackupCodesBeforeCloseThisWizard": "請先確認下列備用驗證碼，再關閉此精靈視窗。",
 	"twoFactorBackupCodes": "備用驗證碼",
-	"twoFactorBackupCodesDescription": "如果驗證應用程式不能用了，可以使用以下的備用驗證碼存取您的帳戶。請務必妥善保管這個驗證碼。每個驗證碼只能使用一次。",
-	"download": "下載",
-	"done": "完成"
+	"twoFactorBackupCodesDescription": "如果驗證應用程式不能用了，可以使用以下的備用驗證碼存取您的帳戶。請務必妥善保管這個驗證碼。每個驗證碼只能使用一次。"
 }
 </locale>

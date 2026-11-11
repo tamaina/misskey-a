@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkFolder>
 				<template #label>{{ $locale.sfc.baseRole }}</template>
 				<template #footer>
-					<MkButton primary rounded @click="updateBaseRole">{{ $locale.sfc.save }}</MkButton>
+					<MkButton primary rounded @click="updateBaseRole">{{ globalLocale.env.save }}</MkButton>
 				</template>
 				<div class="_gaps_s">
 					<MkInput v-model="baseRoleQ" type="search">
@@ -45,6 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, reactive, ref } from 'vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
@@ -58,6 +59,9 @@ import { instance, fetchInstance } from '@features/instance/frontend/instance.js
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 const baseRoleQ = ref('');
@@ -94,7 +98,6 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "حفظ",
 	"new": "دور جديد",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -105,7 +108,6 @@ definePage(() => ({
 <locale locale="ca-ES" lang="json">
 {
 	"baseRole": "Plantilla de rols",
-	"save": "Desa",
 	"new": "Nou rol",
 	"manualRoles": "Rols manuals",
 	"conditionalRoles": "Rols condicionals",
@@ -116,7 +118,6 @@ definePage(() => ({
 <locale locale="cs-CZ" lang="json">
 {
 	"baseRole": "Šablona role",
-	"save": "Uložit",
 	"new": "Nová role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -127,7 +128,6 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Save",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -138,7 +138,6 @@ definePage(() => ({
 <locale locale="de-DE" lang="json">
 {
 	"baseRole": "Rollenvorlage",
-	"save": "Speichern",
 	"new": "Rolle erstellen",
 	"manualRoles": "Manuelle Rollen",
 	"conditionalRoles": "Bedingte Rolle",
@@ -149,7 +148,6 @@ definePage(() => ({
 <locale locale="en-US" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Save",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -160,7 +158,6 @@ definePage(() => ({
 <locale locale="es-ES" lang="json">
 {
 	"baseRole": "Rol base",
-	"save": "Guardar",
 	"new": "Crear rol",
 	"manualRoles": "Roles manuales",
 	"conditionalRoles": "Roles condicionales",
@@ -171,7 +168,6 @@ definePage(() => ({
 <locale locale="fr-FR" lang="json">
 {
 	"baseRole": "Modèle de rôle",
-	"save": "Enregistrer",
 	"new": "Nouveau rôle",
 	"manualRoles": "Rôles manuels",
 	"conditionalRoles": "Rôles conditionnels",
@@ -182,7 +178,6 @@ definePage(() => ({
 <locale locale="id-ID" lang="json">
 {
 	"baseRole": "Templat peran",
-	"save": "Simpan",
 	"new": "Buat peran",
 	"manualRoles": "Peran manual",
 	"conditionalRoles": "Peran kondisional",
@@ -193,7 +188,6 @@ definePage(() => ({
 <locale locale="it-IT" lang="json">
 {
 	"baseRole": "Ruolo di base",
-	"save": "Salva",
 	"new": "Nuovo ruolo",
 	"manualRoles": "Ruoli assegnati manualmente",
 	"conditionalRoles": "Ruoli condizionati",
@@ -204,7 +198,6 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"baseRole": "ベースロール",
-	"save": "保存",
 	"new": "ロールの作成",
 	"manualRoles": "マニュアルロール",
 	"conditionalRoles": "コンディショナルロール",
@@ -215,7 +208,6 @@ definePage(() => ({
 <locale locale="ja-KS" lang="json">
 {
 	"baseRole": "ベースロール",
-	"save": "とっとく",
 	"new": "ロールの作成",
 	"manualRoles": "マニュアルロール",
 	"conditionalRoles": "コンディショナルロール",
@@ -226,7 +218,6 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Sekles",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -237,7 +228,6 @@ definePage(() => ({
 <locale locale="kn-IN" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "ಉಳಿಸಿ",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -248,7 +238,6 @@ definePage(() => ({
 <locale locale="ko-KR" lang="json">
 {
 	"baseRole": "기본 역할",
-	"save": "저장",
 	"new": "새 역할 생성",
 	"manualRoles": "수동 역할",
 	"conditionalRoles": "조건부 역할",
@@ -259,7 +248,6 @@ definePage(() => ({
 <locale locale="nl-NL" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Opslaan",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -270,7 +258,6 @@ definePage(() => ({
 <locale locale="no-NO" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Lagre",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -281,7 +268,6 @@ definePage(() => ({
 <locale locale="pl-PL" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Zapisz",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -292,7 +278,6 @@ definePage(() => ({
 <locale locale="pt-PT" lang="json">
 {
 	"baseRole": "Cargo padrão",
-	"save": "Salvar",
 	"new": "Novo cargo",
 	"manualRoles": "Cargos manuais",
 	"conditionalRoles": "Cargos condicionais",
@@ -303,7 +288,6 @@ definePage(() => ({
 <locale locale="ru-RU" lang="json">
 {
 	"baseRole": "Шаблон роли",
-	"save": "Сохранить",
 	"new": "Новая роль",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -314,7 +298,6 @@ definePage(() => ({
 <locale locale="sk-SK" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Uložiť",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -325,7 +308,6 @@ definePage(() => ({
 <locale locale="th-TH" lang="json">
 {
 	"baseRole": "แม่แบบบทบาท",
-	"save": "บันทึก",
 	"new": "บทบาทใหม่",
 	"manualRoles": "บทบาทแบบทำมือ",
 	"conditionalRoles": "บทบาทแบบมีเงื่อนไข",
@@ -336,7 +318,6 @@ definePage(() => ({
 <locale locale="tr-TR" lang="json">
 {
 	"baseRole": "Rol şablonu",
-	"save": "Kaydet",
 	"new": "Yeni rol",
 	"manualRoles": "Manuel roller",
 	"conditionalRoles": "Koşullu roller",
@@ -347,7 +328,6 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Save",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -358,7 +338,6 @@ definePage(() => ({
 <locale locale="uk-UA" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Зберегти",
 	"new": "Нова роль",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -369,7 +348,6 @@ definePage(() => ({
 <locale locale="vi-VN" lang="json">
 {
 	"baseRole": "Role template",
-	"save": "Lưu",
 	"new": "New role",
 	"manualRoles": "Manual roles",
 	"conditionalRoles": "Conditional roles",
@@ -380,7 +358,6 @@ definePage(() => ({
 <locale locale="zh-CN" lang="json">
 {
 	"baseRole": "基本角色",
-	"save": "保存",
 	"new": "创建角色",
 	"manualRoles": "手动角色",
 	"conditionalRoles": "条件角色",
@@ -391,7 +368,6 @@ definePage(() => ({
 <locale locale="zh-TW" lang="json">
 {
 	"baseRole": "基本角色",
-	"save": "儲存",
 	"new": "建立角色",
 	"manualRoles": "手動角色",
 	"conditionalRoles": "有條件的角色",

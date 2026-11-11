@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<h2 :class="$style.extInstallerTitle">{{ errorKV?.title }}</h2>
 			<div :class="$style.extInstallerNormDesc">{{ errorKV?.description }}</div>
 			<div class="_buttonsCenter">
-				<MkButton @click="close_()">{{ $locale.sfc.close }}</MkButton>
+				<MkButton @click="close_()">{{ globalLocale.env.close }}</MkButton>
 			</div>
 		</div>
 	</div>
@@ -41,9 +41,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed, nextTick } from 'vue';
-import type { Extension } from '@features/integrations/frontend/components/MkExtensionInstaller.vue';
-import type { AiScriptPluginMeta } from '@features/integrations/frontend/plugin.js';
 import MkLoading from '@features/ui/frontend/components/global/MkLoading.vue';
 import MkExtensionInstaller from '@features/integrations/frontend/components/MkExtensionInstaller.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -57,6 +56,11 @@ import { installTheme } from '@features/preferences/frontend/theme.js';
 import { parseThemeCode } from '@features/preferences/frontend/shared/theme-code.js';
 import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 import { definePage } from '@features/navigation/frontend/page.js';
+import type { AiScriptPluginMeta } from '@features/integrations/frontend/plugin.js';
+import type { Extension } from '@features/integrations/frontend/components/MkExtensionInstaller.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const uiPhase = ref<'fetching' | 'confirm' | 'error'>('fetching');
 const errorKV = ref<{
@@ -282,7 +286,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "اغلق",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -307,7 +310,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Punt final referenciat",
 	"externalResourceInstallerVendorInfoHashVerify": "Verificació d'integritat ",
-	"close": "Tanca",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Paràmetres no vàlids ",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "No hi ha suficient informació per carregar les dades del lloc extern. Confirma l'URL que hi ha escrita.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Ha fallat l'obtenció de dades",
@@ -332,7 +334,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Zavřít",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -357,7 +358,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Close",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -382,7 +382,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenzierter Endpunkt",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash-Verifikation",
-	"close": "Schließen",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Ungültige Parameter",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "Es fehlen Informationen zum Laden der externen Ressource. Überprüfe die übergebene URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Fehler beim Abrufen der Daten",
@@ -407,7 +406,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Close",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -432,7 +430,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Terminal referenciada",
 	"externalResourceInstallerVendorInfoHashVerify": "Verificación de hash",
-	"close": "Cerrar",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Parámetros inválidos",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "No hay información suficiente para cargar datos de un sitio externo. Por favor, confirma la URL introducida.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "No se pudo obtener los datos",
@@ -457,7 +454,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Point de terminaison référencé",
 	"externalResourceInstallerVendorInfoHashVerify": "Vérification de l'intégrité du fichier",
-	"close": "Fermer",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Paramètres invalides",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "Il y a un manque d'informations nécessaires pour obtenir des données à partir de sites externes. Veuillez vérifier l'URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Échec de récupération des données",
@@ -482,7 +478,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referensi Endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Verifikasi hash",
-	"close": "Tutup",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Parameter tidak valid",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "Tidak cukup informasi untuk memuat data dari situs eksternal. Mohon konfirmasi kembali URL yang dimasukkan.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Gagal memuat data",
@@ -507,7 +502,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Punto di riferimento della fonte",
 	"externalResourceInstallerVendorInfoHashVerify": "Codice di verifica della fonte",
-	"close": "Chiudi",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Parametri non validi",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "Mancano alcuni parametri per il caricamento, per favore, verifica la URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Impossibile ottenere i dati",
@@ -532,7 +526,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "参照したエンドポイント",
 	"externalResourceInstallerVendorInfoHashVerify": "ファイル整合性の確認",
-	"close": "閉じる",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "パラメータが不足しています",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "外部サイトからデータを取得するために必要な情報が不足しています。URLをお確かめください。",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "データの取得に失敗しました",
@@ -557,7 +550,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "参照したエンドポイント",
 	"externalResourceInstallerVendorInfoHashVerify": "ファイル整合性の確認",
-	"close": "さいなら",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "パラメータが不足しています",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "外部サイトからデータを持ってくるのに欲しい情報が足らへんみたいやわ。URLは合っとる？",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "データの取得に失敗しました",
@@ -582,7 +574,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Close",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -607,7 +598,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Close",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -632,7 +622,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "참조한 엔드포인트",
 	"externalResourceInstallerVendorInfoHashVerify": "파일 무결성 확인",
-	"close": "닫기",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "파라미터가 부족합니다",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "외부 사이트로부터 데이터를 불러오기 위해 필요한 정보가 부족합니다. URL을 다시 한 번 확인하십시오.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "데이터를 불러올 수 없습니다",
@@ -657,7 +646,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Sluiten",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -682,7 +670,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Lukk",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -707,7 +694,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Zamknij",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -732,7 +718,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Endpoint referenciado",
 	"externalResourceInstallerVendorInfoHashVerify": "Verificação de hashes",
-	"close": "Fechar",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Parâmetros inválidos",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "Não há informações suficientes para carregar dados do site externo. Por favor, confirme o URL inserido.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Não foi possível obter dados",
@@ -757,7 +742,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Закрыть",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -782,7 +766,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Zavrieť",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -807,7 +790,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "จุดอ้างอิงปลายทาง (Referenced endpoint)",
 	"externalResourceInstallerVendorInfoHashVerify": "การตรวจสอบแฮช (ความสมบูรณ์ของไฟล์)",
-	"close": "ปิด",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "พารามิเตอร์ไม่ถูกต้อง",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "มีสารสนเทศไม่เพียงพอที่จะโหลดข้อมูลจากไซต์ภายนอก โปรดยืนยัน URL ที่ป้อน",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "รับข้อมูลล้มเหลว",
@@ -832,7 +814,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referans uç nokta",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash doğrulama",
-	"close": "Kapat",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Geçersiz parametreler",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "Harici bir siteden veri yüklemek için yeterli bilgi yok. Lütfen girdiğin URL'yi kontrol et.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Veriler alınamadı",
@@ -857,7 +838,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Close",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -882,7 +862,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Закрити",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -907,7 +886,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "Referenced endpoint",
 	"externalResourceInstallerVendorInfoHashVerify": "Hash verification",
-	"close": "Đóng",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "Invalid parameters",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "There is not enough information to load data from an external site. Please confirm the entered URL.",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "Failed to fetch data",
@@ -932,7 +910,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "参考端点",
 	"externalResourceInstallerVendorInfoHashVerify": "确认文件完整性",
-	"close": "关闭",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "缺少参数",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "缺少从外部站点获取数据所需的信息。请检查 URL。",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "获取数据失败",
@@ -957,7 +934,6 @@ definePage(() => ({
 {
 	"externalResourceInstallerVendorInfoEndpoint": "引用端點",
 	"externalResourceInstallerVendorInfoHashVerify": "確認檔案的完整性",
-	"close": "關閉",
 	"externalResourceInstallerErrorsInvalidParamsTitle": "缺少參數",
 	"externalResourceInstallerErrorsInvalidParamsDescription": "缺少從外部網站取得資料的必要資訊。請檢查 URL 是否正確。",
 	"externalResourceInstallerErrorsFailedToFetchTitle": "無法取得資料",

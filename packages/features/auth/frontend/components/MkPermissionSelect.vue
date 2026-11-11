@@ -5,36 +5,34 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <div class="_gaps_s">
 	<div class="_buttons">
-		<MkButton inline @click="setPermissions(ordinaryPermissions, false)">{{ disableAllText }}</MkButton>
-		<MkButton inline @click="setPermissions(ordinaryPermissions, true)">{{ enableAllText }}</MkButton>
+		<MkButton inline @click="setPermissions(ordinaryPermissions, false)">{{ globalLocale.env.disableAll }}</MkButton>
+		<MkButton inline @click="setPermissions(ordinaryPermissions, true)">{{ globalLocale.env.enableAll }}</MkButton>
 	</div>
-	<MkSwitch v-for="kind in ordinaryPermissions" :key="kind" :modelValue="selected.includes(kind)" @update:modelValue="value => toggle(kind, value)">{{ labels[kind] }}</MkSwitch>
+	<MkSwitch v-for="kind in ordinaryPermissions" :key="kind" :modelValue="selected.includes(kind)" @update:modelValue="value => toggle(kind, value)">{{ globalLocale.env._permissions[kind as keyof Locale['_permissions']] }}</MkSwitch>
 	<div v-if="adminPermissions.length > 0" :class="$style.adminPermissions">
-		<div :class="$style.adminPermissionsHeader"><b>{{ adminPermissionText }}</b></div>
+		<div :class="$style.adminPermissionsHeader"><b>{{ globalLocale.env.adminPermission }}</b></div>
 		<div class="_gaps_s">
 			<div class="_buttons">
-				<MkButton inline @click="setPermissions(adminPermissions, false)">{{ disableAllAdminText }}</MkButton>
-				<MkButton inline @click="setPermissions(adminPermissions, true)">{{ enableAllAdminText }}</MkButton>
+				<MkButton inline @click="setPermissions(adminPermissions, false)">{{ globalLocale.env.disableAllAdmin }}</MkButton>
+				<MkButton inline @click="setPermissions(adminPermissions, true)">{{ globalLocale.env.enableAllAdmin }}</MkButton>
 			</div>
-			<MkSwitch v-for="kind in adminPermissions" :key="kind" :modelValue="selected.includes(kind)" @update:modelValue="value => toggle(kind, value)">{{ labels[kind] }}</MkSwitch>
+			<MkSwitch v-for="kind in adminPermissions" :key="kind" :modelValue="selected.includes(kind)" @update:modelValue="value => toggle(kind, value)">{{ globalLocale.env._permissions[kind as keyof Locale['_permissions']] }}</MkSwitch>
 		</div>
 	</div>
 </div>
 </template>
 <script setup lang="ts">
 import { computed, watch } from 'vue';
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	permissions: readonly string[];
 	administrator: boolean;
-	labels: Record<string, string>;
-	disableAllText: string;
-	enableAllText: string;
-	disableAllAdminText: string;
-	enableAllAdminText: string;
-	adminPermissionText: string;
 }>();
 const selected = defineModel<string[]>({ required: true });
 const eligible = computed(() => props.permissions.filter(p => props.administrator || (!p.startsWith('read:admin') && !p.startsWith('write:admin'))));

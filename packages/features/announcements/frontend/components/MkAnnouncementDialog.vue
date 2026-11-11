@@ -23,13 +23,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 				full
 				:disabled="!hasReachedBottom"
 				@click="ok"
-			>{{ hasReachedBottom ? $locale.sfc.close : $locale.sfc.scrollToClose }}</MkButton>
+			>
+				{{ hasReachedBottom ? globalLocale.env.close : $locale.sfc.scrollToClose }}
+			</MkButton>
 		</div>
 	</div>
 </MkModal>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onMounted, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@features/ui/frontend/os.js';
@@ -38,6 +41,9 @@ import MkModal from '@features/ui/frontend/components/MkModal.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	announcement: Misskey.entities.Announcement | Misskey.entities.MeDetailed['unreadAnnouncements'][number];
@@ -158,7 +164,6 @@ onMounted(() => {
 
 <locale locale="ar-SA" lang="json">
 {
-	"close": "اغلق",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -167,7 +172,6 @@ onMounted(() => {
 
 <locale locale="ca-ES" lang="json">
 {
-	"close": "Tanca",
 	"scrollToClose": "Desplaçar per tancar",
 	"readConfirmTitle": "Marcar com llegida?",
 	"readConfirmText": "Això marcarà el contingut de \"{title}\" com llegit."
@@ -176,7 +180,6 @@ onMounted(() => {
 
 <locale locale="cs-CZ" lang="json">
 {
-	"close": "Zavřít",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -185,7 +188,6 @@ onMounted(() => {
 
 <locale locale="da-DK" lang="json">
 {
-	"close": "Close",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -194,7 +196,6 @@ onMounted(() => {
 
 <locale locale="de-DE" lang="json">
 {
-	"close": "Schließen",
 	"scrollToClose": "Zum Schließen scrollen",
 	"readConfirmTitle": "Als gelesen markieren?",
 	"readConfirmText": "Dies markiert den Inhalt von \"{title}\" als gelesen."
@@ -203,7 +204,6 @@ onMounted(() => {
 
 <locale locale="en-US" lang="json">
 {
-	"close": "Close",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -212,7 +212,6 @@ onMounted(() => {
 
 <locale locale="es-ES" lang="json">
 {
-	"close": "Cerrar",
 	"scrollToClose": "Desliza para cerrar",
 	"readConfirmTitle": "¿Marcar como leído?",
 	"readConfirmText": "Esto marcará el contenido de \"{title}\" como leído."
@@ -221,7 +220,6 @@ onMounted(() => {
 
 <locale locale="fr-FR" lang="json">
 {
-	"close": "Fermer",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Marquer comme lu ?",
 	"readConfirmText": "Cela marquera le contenu de  « {title} » comme lu."
@@ -230,7 +228,6 @@ onMounted(() => {
 
 <locale locale="id-ID" lang="json">
 {
-	"close": "Tutup",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Tandai telah dibaca?",
 	"readConfirmText": "Aksi ini akan menandai konten dari \"{title}\" telah dibaca."
@@ -239,7 +236,6 @@ onMounted(() => {
 
 <locale locale="it-IT" lang="json">
 {
-	"close": "Chiudi",
 	"scrollToClose": "Scorri per chiudere",
 	"readConfirmTitle": "Segnare come già letto?",
 	"readConfirmText": "Hai già letto \"{title}˝?"
@@ -248,7 +244,6 @@ onMounted(() => {
 
 <locale locale="ja-JP" lang="json">
 {
-	"close": "閉じる",
 	"scrollToClose": "スクロールして閉じる",
 	"readConfirmTitle": "既読にしますか？",
 	"readConfirmText": "「{title}」の内容を読み、既読にします。"
@@ -257,7 +252,6 @@ onMounted(() => {
 
 <locale locale="ja-KS" lang="json">
 {
-	"close": "さいなら",
 	"scrollToClose": "スクロールして閉じる",
 	"readConfirmTitle": "既読にしてええんやな?",
 	"readConfirmText": "「{title}」はもう読んだから既読にするで。"
@@ -266,7 +260,6 @@ onMounted(() => {
 
 <locale locale="kab-KAB" lang="json">
 {
-	"close": "Close",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -275,7 +268,6 @@ onMounted(() => {
 
 <locale locale="kn-IN" lang="json">
 {
-	"close": "Close",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -284,7 +276,6 @@ onMounted(() => {
 
 <locale locale="ko-KR" lang="json">
 {
-	"close": "닫기",
 	"scrollToClose": "스크롤하여 닫기",
 	"readConfirmTitle": "읽음으로 표시합니까?",
 	"readConfirmText": "〈{title}〉의 내용을 읽음으로 표시합니다."
@@ -293,7 +284,6 @@ onMounted(() => {
 
 <locale locale="nl-NL" lang="json">
 {
-	"close": "Sluiten",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -302,7 +292,6 @@ onMounted(() => {
 
 <locale locale="no-NO" lang="json">
 {
-	"close": "Lukk",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -311,7 +300,6 @@ onMounted(() => {
 
 <locale locale="pl-PL" lang="json">
 {
-	"close": "Zamknij",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -320,7 +308,6 @@ onMounted(() => {
 
 <locale locale="pt-PT" lang="json">
 {
-	"close": "Fechar",
 	"scrollToClose": "Role a página para fechar",
 	"readConfirmTitle": "Marcar como lido?",
 	"readConfirmText": "Isso marcará o conteúdo de \"{title}\" como lido."
@@ -329,7 +316,6 @@ onMounted(() => {
 
 <locale locale="ru-RU" lang="json">
 {
-	"close": "Закрыть",
 	"scrollToClose": "Пролистайте для закрытия",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -338,7 +324,6 @@ onMounted(() => {
 
 <locale locale="sk-SK" lang="json">
 {
-	"close": "Zavrieť",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -347,7 +332,6 @@ onMounted(() => {
 
 <locale locale="th-TH" lang="json">
 {
-	"close": "ปิด",
 	"scrollToClose": "เลื่อนเพื่อปิด",
 	"readConfirmTitle": "ทำเครื่องหมายว่าอ่านแล้วเลยไหม?",
 	"readConfirmText": "จะทำเครื่องหมายใส่ “{title}” ว่าอ่านแล้ว"
@@ -356,7 +340,6 @@ onMounted(() => {
 
 <locale locale="tr-TR" lang="json">
 {
-	"close": "Kapat",
 	"scrollToClose": "Kaydırarak kapatın",
 	"readConfirmTitle": "Okundu olarak işaretle?",
 	"readConfirmText": "Bu, “{title}” içeriğini okundu olarak işaretleyecek."
@@ -365,7 +348,6 @@ onMounted(() => {
 
 <locale locale="ug-CN" lang="json">
 {
-	"close": "Close",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Mark as read?",
 	"readConfirmText": "This will mark the contents of \"{title}\" as read."
@@ -374,7 +356,6 @@ onMounted(() => {
 
 <locale locale="uk-UA" lang="json">
 {
-	"close": "Закрити",
 	"scrollToClose": "Прокрутіть, щоб закрити",
 	"readConfirmTitle": "Позначити як прочитане?",
 	"readConfirmText": "Це позначить зміст \"{title}\" як прочитаний."
@@ -383,7 +364,6 @@ onMounted(() => {
 
 <locale locale="vi-VN" lang="json">
 {
-	"close": "Đóng",
 	"scrollToClose": "Scroll to close",
 	"readConfirmTitle": "Đánh dấu là đã đọc?",
 	"readConfirmText": "Điều này sẽ đánh dấu nội dung của \"{title}\" là đã đọc."
@@ -392,7 +372,6 @@ onMounted(() => {
 
 <locale locale="zh-CN" lang="json">
 {
-	"close": "关闭",
 	"scrollToClose": "滑动并关闭",
 	"readConfirmTitle": "标记为已读？",
 	"readConfirmText": "阅读 “{title}” 的内容，并标记为已读。"
@@ -401,7 +380,6 @@ onMounted(() => {
 
 <locale locale="zh-TW" lang="json">
 {
-	"close": "關閉",
 	"scrollToClose": "用滾輪關閉",
 	"readConfirmTitle": "標記為已讀嗎？",
 	"readConfirmText": "閱讀「{title}」的內容並標記為已讀。"

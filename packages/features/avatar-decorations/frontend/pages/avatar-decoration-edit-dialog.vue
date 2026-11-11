@@ -27,23 +27,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</div>
 				<MkInput v-model="name">
-					<template #label>{{ $locale.sfc.name }}</template>
+					<template #label>{{ globalLocale.env.name }}</template>
 				</MkInput>
 				<MkInput v-model="url">
-					<template #label>{{ $locale.sfc.imageUrl }}</template>
+					<template #label>{{ globalLocale.env.imageUrl }}</template>
 				</MkInput>
 				<MkInput v-model="category" :datalist="props.categories || []">
 					<template #label>{{ $locale.sfc.category }}</template>
 				</MkInput>
 				<MkTextarea v-model="description">
-					<template #label>{{ $locale.sfc.description }}</template>
+					<template #label>{{ globalLocale.env.description }}</template>
 				</MkTextarea>
 				<MkFolder>
 					<template #label>{{ $locale.sfc.availableRoles }}</template>
-					<template #suffix>{{ rolesThatCanBeUsedThisDecoration.length === 0 ? $locale.sfc.all : rolesThatCanBeUsedThisDecoration.length }}</template>
+					<template #suffix>{{ rolesThatCanBeUsedThisDecoration.length === 0 ? globalLocale.env.all : rolesThatCanBeUsedThisDecoration.length }}</template>
 
 					<div class="_gaps">
-						<MkButton rounded @click="addRole"><i class="ti ti-plus"></i> {{ $locale.sfc.add }}</MkButton>
+						<MkButton rounded @click="addRole"><i class="ti ti-plus"></i> {{ globalLocale.env.add }}</MkButton>
 
 						<div v-for="role in rolesThatCanBeUsedThisDecoration" :key="role.id" :class="$style.roleItem">
 							<MkRolePreview :class="$style.role" :role="role" :forModeration="true" :detailed="false" style="pointer-events: none;"/>
@@ -52,17 +52,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</div>
 				</MkFolder>
-				<MkButton v-if="avatarDecoration" danger @click="del()"><i class="ti ti-trash"></i> {{ $locale.sfc.delete }}</MkButton>
+				<MkButton v-if="avatarDecoration" danger @click="del()"><i class="ti ti-trash"></i> {{ globalLocale.env.delete }}</MkButton>
 			</div>
 		</div>
 		<div :class="$style.footer">
-			<MkButton primary rounded style="margin: 0 auto;" @click="done"><i class="ti ti-check"></i> {{ props.avatarDecoration ? $locale.sfc.update : $locale.sfc.create }}</MkButton>
+			<MkButton primary rounded style="margin: 0 auto;" @click="done"><i class="ti ti-check"></i> {{ props.avatarDecoration ? globalLocale.env.update : globalLocale.env.create }}</MkButton>
 		</div>
 	</div>
 </MkWindow>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, watch, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkWindow from '@features/ui/frontend/components/MkWindow.vue';
@@ -77,6 +78,9 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRolePreview from '@features/roles/frontend/components/MkRolePreview.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import { ensureSignin } from '@features/auth/frontend/i.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -157,7 +161,7 @@ async function del() {
 
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: interpolateLocaleParameters($locale.value.sfc.removeAreYouSure, { x: name.value }),
+		text: interpolateLocaleParameters(globalLocale.value.env.removeAreYouSure, { x: name.value }),
 	});
 	if (canceled) return;
 
@@ -229,448 +233,196 @@ async function del() {
 
 <locale lang="json" locale="ar-SA">
 {
-	"removeAreYouSure": "متأكد من أنك تريد حذف {x}؟",
-	"name": "الإسم",
-	"imageUrl": "رابط الصورة",
 	"category": "الفئات",
-	"description": "الوصف",
-	"availableRoles": "Available roles",
-	"all": "الكل",
-	"add": "إضافة",
-	"delete": "حذف",
-	"update": "حدِّث",
-	"create": "أنشئ"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="ca-ES">
 {
-	"removeAreYouSure": "Segur que vols esborrar «{x}»?",
-	"name": "Nom",
-	"imageUrl": "URL de la imatge",
 	"category": "Categoria",
-	"description": "Descripció",
-	"availableRoles": "Roles disponibles ",
-	"all": "Tot",
-	"add": "Afegir",
-	"delete": "Elimina",
-	"update": "Actualitzar",
-	"create": "Crear"
+	"availableRoles": "Roles disponibles "
 }
 </locale>
 
 <locale lang="json" locale="cs-CZ">
 {
-	"removeAreYouSure": "Jste si jistí že chcete smazat \"{x}\"?",
-	"name": "Jméno",
-	"imageUrl": "URL obrázku",
 	"category": "Kategorie",
-	"description": "Popis",
-	"availableRoles": "Available roles",
-	"all": "Vše",
-	"add": "Přidat",
-	"delete": "Smazat",
-	"update": "Aktualizovat",
-	"create": "Vytvořit"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="da-DK">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"name": "Name",
-	"imageUrl": "Image URL",
 	"category": "Category",
-	"description": "Description",
-	"availableRoles": "Available roles",
-	"all": "All",
-	"add": "Add",
-	"delete": "Delete",
-	"update": "Update",
-	"create": "Create"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="de-DE">
 {
-	"removeAreYouSure": "Möchtest du „{x}“ wirklich entfernen?",
-	"name": "Name",
-	"imageUrl": "Bild-URL",
 	"category": "Kategorie",
-	"description": "Beschreibung",
-	"availableRoles": "Verfügbare Rollen",
-	"all": "Alle",
-	"add": "Hinzufügen",
-	"delete": "Löschen",
-	"update": "Aktualisieren",
-	"create": "Erstellen"
+	"availableRoles": "Verfügbare Rollen"
 }
 </locale>
 
 <locale lang="json" locale="en-US">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"name": "Name",
-	"imageUrl": "Image URL",
 	"category": "Category",
-	"description": "Description",
-	"availableRoles": "Available roles",
-	"all": "All",
-	"add": "Add",
-	"delete": "Delete",
-	"update": "Update",
-	"create": "Create"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="es-ES">
 {
-	"removeAreYouSure": "¿Desea borrar \"{x}\"?",
-	"name": "Nombre",
-	"imageUrl": "URL de la imagen.",
 	"category": "Categoría",
-	"description": "Descripción",
-	"availableRoles": "Roles disponibles ",
-	"all": "Todo",
-	"add": "Agregar",
-	"delete": "Borrar",
-	"update": "Actualizar",
-	"create": "Crear"
+	"availableRoles": "Roles disponibles "
 }
 </locale>
 
 <locale lang="json" locale="fr-FR">
 {
-	"removeAreYouSure": "Êtes-vous sûr·e de vouloir supprimer « {x} »\u202f?",
-	"name": "Nom",
-	"imageUrl": "URL de l’image",
 	"category": "Catégorie",
-	"description": "Description",
-	"availableRoles": "Rôles disponibles",
-	"all": "Tous",
-	"add": "Ajouter",
-	"delete": "Supprimer",
-	"update": "Mettre à jour",
-	"create": "Créer"
+	"availableRoles": "Rôles disponibles"
 }
 </locale>
 
 <locale lang="json" locale="id-ID">
 {
-	"removeAreYouSure": "Apakah kamu yakin ingin menghapus \"{x}\"?",
-	"name": "Nama",
-	"imageUrl": "URL Gambar",
 	"category": "Kategori",
-	"description": "Deskripsi",
-	"availableRoles": "Peran tersedia",
-	"all": "Semua",
-	"add": "Tambahkan",
-	"delete": "Hapus",
-	"update": "Perbarui",
-	"create": "Buat"
+	"availableRoles": "Peran tersedia"
 }
 </locale>
 
 <locale lang="json" locale="it-IT">
 {
-	"removeAreYouSure": "Vuoi davvero eliminare \"{x}\"?",
-	"name": "Nome",
-	"imageUrl": "URL dell'immagine",
 	"category": "Categoria",
-	"description": "Descrizione",
-	"availableRoles": "Ruoli disponibili",
-	"all": "Tutte",
-	"add": "Aggiungi",
-	"delete": "Elimina",
-	"update": "Aggiorna",
-	"create": "Crea"
+	"availableRoles": "Ruoli disponibili"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
-	"removeAreYouSure": "「{x}」を削除しますか？",
-	"name": "名前",
-	"imageUrl": "画像URL",
 	"category": "カテゴリ",
-	"description": "説明",
-	"availableRoles": "利用可能なロール",
-	"all": "全て",
-	"add": "追加",
-	"delete": "削除",
-	"update": "更新",
-	"create": "作成"
+	"availableRoles": "利用可能なロール"
 }
 </locale>
 
 <locale lang="json" locale="ja-KS">
 {
-	"removeAreYouSure": "「{x}」はほかしてええか？",
-	"name": "名前",
-	"imageUrl": "画像URL",
 	"category": "カテゴリ",
-	"description": "説明",
-	"availableRoles": "使えるロール",
-	"all": "みんな",
-	"add": "増やす",
-	"delete": "ほかす",
-	"update": "更新",
-	"create": "作成"
+	"availableRoles": "使えるロール"
 }
 </locale>
 
 <locale lang="json" locale="kab-KAB">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"name": "Name",
-	"imageUrl": "Image URL",
 	"category": "Category",
-	"description": "Description",
-	"availableRoles": "Available roles",
-	"all": "All",
-	"add": "Add",
-	"delete": "Kkes",
-	"update": "Update",
-	"create": "Create"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"name": "Name",
-	"imageUrl": "Image URL",
 	"category": "Category",
-	"description": "Description",
-	"availableRoles": "Available roles",
-	"all": "All",
-	"add": "Add",
-	"delete": "ಅಳಿಸು",
-	"update": "Update",
-	"create": "Create"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="ko-KR">
 {
-	"removeAreYouSure": "\"{x}\" 을(를) 삭제하시겠습니까?",
-	"name": "이름",
-	"imageUrl": "이미지 URL",
 	"category": "카테고리",
-	"description": "설명",
-	"availableRoles": "사용 가능한 역할",
-	"all": "전체",
-	"add": "추가",
-	"delete": "삭제",
-	"update": "업데이트",
-	"create": "생성"
+	"availableRoles": "사용 가능한 역할"
 }
 </locale>
 
 <locale lang="json" locale="nl-NL">
 {
-	"removeAreYouSure": "Weet je zeker dat je \"{x}\" wil verwijderen?",
-	"name": "Naam",
-	"imageUrl": "AfbeeldingsURL",
 	"category": "Categorie",
-	"description": "Beschrijving",
-	"availableRoles": "Available roles",
-	"all": "Alle",
-	"add": "Toevoegen",
-	"delete": "Verwijderen",
-	"update": "Update",
-	"create": "Creëer"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
-	"removeAreYouSure": "Er du sikker på at du vil fjerne \"{x}\"?",
-	"name": "Navn",
-	"imageUrl": "Image URL",
 	"category": "Kategori",
-	"description": "Beskrivelse",
-	"availableRoles": "Available roles",
-	"all": "Alle",
-	"add": "Legg til",
-	"delete": "Slett",
-	"update": "Update",
-	"create": "Opprett"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="pl-PL">
 {
-	"removeAreYouSure": "Czy na pewno chcesz usunąć „{x}”?",
-	"name": "Nazwa",
-	"imageUrl": "Adres URL obrazka",
 	"category": "Kategoria",
-	"description": "Opis",
-	"availableRoles": "Available roles",
-	"all": "Wszystkie",
-	"add": "Dodaj",
-	"delete": "Usuń",
-	"update": "Update",
-	"create": "Utwórz"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="pt-PT">
 {
-	"removeAreYouSure": "Deseja excluir \"{x}\"?",
-	"name": "Nome",
-	"imageUrl": "URL da imagem",
 	"category": "Categoria",
-	"description": "Descrição",
-	"availableRoles": "Cargos disponíveis",
-	"all": "Todos",
-	"add": "Adicionar",
-	"delete": "Excluir",
-	"update": "Atualizar",
-	"create": "Criar"
+	"availableRoles": "Cargos disponíveis"
 }
 </locale>
 
 <locale lang="json" locale="ru-RU">
 {
-	"removeAreYouSure": "Хотите удалить «{x}»?",
-	"name": "Название",
-	"imageUrl": "Ссылка на изображение",
 	"category": "Категория",
-	"description": "Описание",
-	"availableRoles": "Доступные роли",
-	"all": "Все",
-	"add": "Добавить",
-	"delete": "Удалить",
-	"update": "Обновить",
-	"create": "Создать"
+	"availableRoles": "Доступные роли"
 }
 </locale>
 
 <locale lang="json" locale="sk-SK">
 {
-	"removeAreYouSure": "Naozaj chcete odstrániť \"{x}\"?",
-	"name": "Názov",
-	"imageUrl": "URL obrázku",
 	"category": "Kategórie",
-	"description": "Popis",
-	"availableRoles": "Available roles",
-	"all": "Všetko",
-	"add": "Pridať",
-	"delete": "Odstrániť",
-	"update": "Update",
-	"create": "Vytvoriť"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="th-TH">
 {
-	"removeAreYouSure": "ต้องการลบ “{x}” ใช่ไหม?",
-	"name": "ชื่อ",
-	"imageUrl": "URL รูปภาพ",
 	"category": "หมวดหมู่",
-	"description": "คำอธิบาย",
-	"availableRoles": "บทบาทที่ใช้ได้",
-	"all": "ทั้งหมด",
-	"add": "เพิ่ม",
-	"delete": "ลบ",
-	"update": "อัปเดต",
-	"create": "สร้าง"
+	"availableRoles": "บทบาทที่ใช้ได้"
 }
 </locale>
 
 <locale lang="json" locale="tr-TR">
 {
-	"removeAreYouSure": "“{x}” öğesini kaldırmak istediğinizden emin misin?",
-	"name": "İsim",
-	"imageUrl": "Görsel URL",
 	"category": "Kategori",
-	"description": "Açıklama",
-	"availableRoles": "Mevcut roller",
-	"all": "Tümü",
-	"add": "Ekle",
-	"delete": "Sil",
-	"update": "Güncelle",
-	"create": "Oluştur"
+	"availableRoles": "Mevcut roller"
 }
 </locale>
 
 <locale lang="json" locale="ug-CN">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"name": "Name",
-	"imageUrl": "Image URL",
 	"category": "Category",
-	"description": "Description",
-	"availableRoles": "Available roles",
-	"all": "All",
-	"add": "Add",
-	"delete": "ئۆچۈرۈش",
-	"update": "Update",
-	"create": "Create"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
-	"removeAreYouSure": "Ви впевнені, що хочете видалити \"{x}\"?",
-	"name": "Ім'я",
-	"imageUrl": "Посилання на зображення",
 	"category": "Категорія",
-	"description": "Опис",
-	"availableRoles": "Доступні ролі",
-	"all": "Всі",
-	"add": "Додати",
-	"delete": "Видалити",
-	"update": "Оновити",
-	"create": "Створити"
+	"availableRoles": "Доступні ролі"
 }
 </locale>
 
 <locale lang="json" locale="vi-VN">
 {
-	"removeAreYouSure": "Bạn có chắc muốn gỡ \"{x}\"?",
-	"name": "Tên",
-	"imageUrl": "URL ảnh",
 	"category": "Phân loại",
-	"description": "Mô tả",
-	"availableRoles": "Available roles",
-	"all": "Tất cả",
-	"add": "Thêm",
-	"delete": "Xóa",
-	"update": "Cập nhật",
-	"create": "Tạo"
+	"availableRoles": "Available roles"
 }
 </locale>
 
 <locale lang="json" locale="zh-CN">
 {
-	"removeAreYouSure": "要删掉「{x}」吗？",
-	"name": "名称",
-	"imageUrl": "图片 URL",
 	"category": "类别",
-	"description": "描述",
-	"availableRoles": "可用角色",
-	"all": "全部",
-	"add": "添加",
-	"delete": "删除",
-	"update": "更新",
-	"create": "创建"
+	"availableRoles": "可用角色"
 }
 </locale>
 
 <locale lang="json" locale="zh-TW">
 {
-	"removeAreYouSure": "確定要刪掉「{x}」嗎？",
-	"name": "名稱",
-	"imageUrl": "圖片URL",
 	"category": "類別",
-	"description": "描述",
-	"availableRoles": "可用角色",
-	"all": "全部",
-	"add": "新增",
-	"delete": "刪除",
-	"update": "更新",
-	"create": "新增"
+	"availableRoles": "可用角色"
 }
 </locale>

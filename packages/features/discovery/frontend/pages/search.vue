@@ -26,11 +26,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, defineAsyncComponent, ref, toRef } from 'vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { notesSearchAvailable, usersSearchAvailable } from '@features/roles/frontend/utility/check-permissions.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	query?: string,
@@ -60,16 +64,16 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => [{
 	key: 'note',
-	title: $locale.value.sfc.notes,
+	title: globalLocale.value.env.notes,
 	icon: 'ti ti-pencil',
 }, {
 	key: 'user',
-	title: $locale.value.sfc.users,
+	title: globalLocale.value.env.users,
 	icon: 'ti ti-users',
 }]);
 
 definePage(() => ({
-	title: $locale.value.sfc.search,
+	title: globalLocale.value.env.search,
 	icon: 'ti ti-search',
 }));
 </script>
@@ -77,279 +81,195 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "الملاحظات",
-	"users": "المستخدمون",
-	"search": "البحث"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
 	"notesSearchNotAvailable": "La cerca de notes no es troba disponible.",
-	"usersSearchNotAvailable": "La cerca d'usuaris no està disponible.",
-	"notes": "Notes",
-	"users": "Usuaris",
-	"search": "Cercar"
+	"usersSearchNotAvailable": "La cerca d'usuaris no està disponible."
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
 	"notesSearchNotAvailable": "Vyhledávání poznámek je nedostupné.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Poznámky",
-	"users": "Uživatelé",
-	"search": "Vyhledávání"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Notes",
-	"users": "Users",
-	"search": "Search"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
 	"notesSearchNotAvailable": "Die Notizsuche ist nicht verfügbar.",
-	"usersSearchNotAvailable": "Die Benutzersuche ist nicht verfügbar.",
-	"notes": "Notizen",
-	"users": "Benutzer",
-	"search": "Suchen"
+	"usersSearchNotAvailable": "Die Benutzersuche ist nicht verfügbar."
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Notes",
-	"users": "Users",
-	"search": "Search"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
 	"notesSearchNotAvailable": "No se puede buscar una nota",
-	"usersSearchNotAvailable": "La búsqueda de usuarios no está disponible.",
-	"notes": "Notas",
-	"users": "Usuarios",
-	"search": "Buscar"
+	"usersSearchNotAvailable": "La búsqueda de usuarios no está disponible."
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
 	"notesSearchNotAvailable": "La recherche de notes n'est pas disponible.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Notes",
-	"users": "Utilisateur·rice·s",
-	"search": "Rechercher"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
 	"notesSearchNotAvailable": "Pencarian catatan tidak tersedia.",
-	"usersSearchNotAvailable": "Pencarian pengguna tidak tersedia.",
-	"notes": "Catatan",
-	"users": "Pengguna",
-	"search": "Cari"
+	"usersSearchNotAvailable": "Pencarian pengguna tidak tersedia."
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
 	"notesSearchNotAvailable": "Non è possibile cercare tra le Note.",
-	"usersSearchNotAvailable": "La ricerca profili non è disponibile.",
-	"notes": "Note",
-	"users": "Profili",
-	"search": "Cerca"
+	"usersSearchNotAvailable": "La ricerca profili non è disponibile."
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
 	"notesSearchNotAvailable": "ノート検索は利用できません。",
-	"usersSearchNotAvailable": "ユーザー検索は利用できません。",
-	"notes": "ノート",
-	"users": "ユーザー",
-	"search": "検索"
+	"usersSearchNotAvailable": "ユーザー検索は利用できません。"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
 	"notesSearchNotAvailable": "なんかノート探せへん。",
-	"usersSearchNotAvailable": "ユーザーを探すことはできへんみたいや。",
-	"notes": "ノート",
-	"users": "ユーザー",
-	"search": "探す"
+	"usersSearchNotAvailable": "ユーザーを探すことはできへんみたいや。"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Notes",
-	"users": "Users",
-	"search": "Nadi"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Notes",
-	"users": "ಬಳಕೆದಾರ",
-	"search": "ಹುಡುಕು"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
 	"notesSearchNotAvailable": "노트 검색을 이용하실 수 없습니다.",
-	"usersSearchNotAvailable": "유저 검색을 이용하실 수 없습니다.",
-	"notes": "노트",
-	"users": "유저",
-	"search": "검색"
+	"usersSearchNotAvailable": "유저 검색을 이용하실 수 없습니다."
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Notities",
-	"users": "Gebruikers",
-	"search": "Zoeken"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Notes",
-	"users": "Brukere",
-	"search": "Søk"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Wpisy",
-	"users": "Użytkownicy",
-	"search": "Szukaj"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
 	"notesSearchNotAvailable": "A pesquisa de notas está indisponível.",
-	"usersSearchNotAvailable": "Pesquisa de usuário está indisponível.",
-	"notes": "Posts",
-	"users": "Usuários",
-	"search": "Pesquisar"
+	"usersSearchNotAvailable": "Pesquisa de usuário está indisponível."
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
 	"notesSearchNotAvailable": "Поиск заметок недоступен",
-	"usersSearchNotAvailable": "Функция \"поиска пользователей\" отключена",
-	"notes": "Заметки",
-	"users": "Пользователи",
-	"search": "Поиск"
+	"usersSearchNotAvailable": "Функция \"поиска пользователей\" отключена"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Poznámky",
-	"users": "Používatelia",
-	"search": "Hľadať"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
 	"notesSearchNotAvailable": "การค้นหาโน้ตไม่พร้อมใช้งาน",
-	"usersSearchNotAvailable": "การค้นหาผู้ใช้ไม่พร้อมใช้งาน",
-	"notes": " โน้ต",
-	"users": "ผู้ใช้",
-	"search": "ค้นหา"
+	"usersSearchNotAvailable": "การค้นหาผู้ใช้ไม่พร้อมใช้งาน"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
 	"notesSearchNotAvailable": "Not arama özelliği kullanılamıyor.",
-	"usersSearchNotAvailable": "Kullanıcı araması mevcut değildir.",
-	"notes": "Notlar",
-	"users": "Kullanıcılar",
-	"search": "Ara"
+	"usersSearchNotAvailable": "Kullanıcı araması mevcut değildir."
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
 	"notesSearchNotAvailable": "Note search is unavailable.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Notes",
-	"users": "Users",
-	"search": "ئىزدەش"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
 	"notesSearchNotAvailable": "Пошук нотаток недоступний.",
-	"usersSearchNotAvailable": "Пошук користувачів недоступний.",
-	"notes": "Записи",
-	"users": "Користувачі",
-	"search": "Пошук"
+	"usersSearchNotAvailable": "Пошук користувачів недоступний."
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
 	"notesSearchNotAvailable": "Tìm kiếm bài đăng hiện không khả dụng.",
-	"usersSearchNotAvailable": "User search is not available.",
-	"notes": "Bài Viết",
-	"users": "Người dùng",
-	"search": "Tìm kiếm"
+	"usersSearchNotAvailable": "User search is not available."
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
 	"notesSearchNotAvailable": "帖子检索不可用",
-	"usersSearchNotAvailable": "用户检索不可用",
-	"notes": "帖子",
-	"users": "用户",
-	"search": "搜索"
+	"usersSearchNotAvailable": "用户检索不可用"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
 	"notesSearchNotAvailable": "無法使用搜尋貼文功能。",
-	"usersSearchNotAvailable": "無法使用使用者搜尋功能。",
-	"notes": "貼文",
-	"users": "使用者",
-	"search": "搜尋"
+	"usersSearchNotAvailable": "無法使用使用者搜尋功能。"
 }
 </locale>

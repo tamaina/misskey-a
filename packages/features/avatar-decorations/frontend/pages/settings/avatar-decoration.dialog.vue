@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 
 		<div :class="$style.footer" class="_buttonsCenter">
-			<MkButton v-if="usingIndex != null" primary rounded @click="update"><i class="ti ti-check"></i> {{ $locale.sfc.update }}</MkButton>
+			<MkButton v-if="usingIndex != null" primary rounded @click="update"><i class="ti ti-check"></i> {{ globalLocale.env.update }}</MkButton>
 			<MkButton v-if="usingIndex != null" rounded @click="detach"><i class="ti ti-x"></i> {{ $locale.sfc.detach }}</MkButton>
 			<MkButton v-else :disabled="exceeded || locked" primary rounded @click="attach"><i class="ti ti-check"></i> {{ $locale.sfc.attach }}</MkButton>
 		</div>
@@ -45,12 +45,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { useTemplateRef, ref, computed } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import { ensureSignin } from '@features/auth/frontend/i.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -163,7 +167,6 @@ async function detach() {
   "angle": "Angle",
   "position": "الموضع",
   "flip": "اقلب",
-  "update": "حدِّث",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -175,7 +178,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Posició ",
   "flip": "Girar",
-  "update": "Actualitzar",
   "detach": "Eliminar",
   "attach": "Adjuntar"
 }
@@ -187,7 +189,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Pozice",
   "flip": "Otočit",
-  "update": "Aktualizovat",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -199,7 +200,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Flip",
-  "update": "Update",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -211,7 +211,6 @@ async function detach() {
   "angle": "Winkel",
   "position": "Position",
   "flip": "Umdrehen",
-  "update": "Aktualisieren",
   "detach": "Entfernen",
   "attach": "Anbringen"
 }
@@ -223,7 +222,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Flip",
-  "update": "Update",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -235,7 +233,6 @@ async function detach() {
   "angle": "Ángulo",
   "position": "Posición",
   "flip": "Echar de un capirotazo",
-  "update": "Actualizar",
   "detach": "Quitar",
   "attach": "Acoplar"
 }
@@ -247,7 +244,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Inverser",
-  "update": "Mettre à jour",
   "detach": "Enlever",
   "attach": "Mettre"
 }
@@ -259,7 +255,6 @@ async function detach() {
   "angle": "Sudut",
   "position": "Posisi",
   "flip": "Balik",
-  "update": "Perbarui",
   "detach": "Hapus",
   "attach": "Lampirkan"
 }
@@ -271,7 +266,6 @@ async function detach() {
   "angle": "Angolo",
   "position": "Posizione",
   "flip": "Inverti",
-  "update": "Aggiorna",
   "detach": "Rimuovi",
   "attach": "Applica"
 }
@@ -283,7 +277,6 @@ async function detach() {
   "angle": "角度",
   "position": "位置",
   "flip": "反転",
-  "update": "更新",
   "detach": "外す",
   "attach": "付ける"
 }
@@ -295,7 +288,6 @@ async function detach() {
   "angle": "角度",
   "position": "位置",
   "flip": "反転",
-  "update": "更新",
   "detach": "取る",
   "attach": "のっける"
 }
@@ -307,7 +299,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Flip",
-  "update": "Update",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -319,7 +310,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Flip",
-  "update": "Update",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -331,7 +321,6 @@ async function detach() {
   "angle": "각도",
   "position": "위치",
   "flip": "플립",
-  "update": "업데이트",
   "detach": "빼기",
   "attach": "붙이기"
 }
@@ -343,7 +332,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Flip",
-  "update": "Update",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -355,7 +343,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Flip",
-  "update": "Update",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -367,7 +354,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Odwróć",
-  "update": "Update",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -379,7 +365,6 @@ async function detach() {
   "angle": "Ângulo",
   "position": "Posição",
   "flip": "Inversão",
-  "update": "Atualizar",
   "detach": "Remover",
   "attach": "Anexar"
 }
@@ -391,7 +376,6 @@ async function detach() {
   "angle": "Угол",
   "position": "Позиция",
   "flip": "Переворот",
-  "update": "Обновить",
   "detach": "Открепить",
   "attach": "Прикрепить"
 }
@@ -403,7 +387,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Preklopiť",
-  "update": "Update",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -415,7 +398,6 @@ async function detach() {
   "angle": "แองเกิล",
   "position": "ตำแหน่ง",
   "flip": "พลิก",
-  "update": "อัปเดต",
   "detach": "นำออก",
   "attach": "แนบ"
 }
@@ -427,7 +409,6 @@ async function detach() {
   "angle": "Açı",
   "position": "Pozisyon",
   "flip": "Çevir",
-  "update": "Güncelle",
   "detach": "Kaldır",
   "attach": "Ek"
 }
@@ -439,7 +420,6 @@ async function detach() {
   "angle": "Angle",
   "position": "Position",
   "flip": "Flip",
-  "update": "Update",
   "detach": "Remove",
   "attach": "Attach"
 }
@@ -451,7 +431,6 @@ async function detach() {
   "angle": "Кут",
   "position": "Позиція",
   "flip": "Перевернути",
-  "update": "Оновити",
   "detach": "Відкріпити",
   "attach": "Прикріпити"
 }
@@ -463,7 +442,6 @@ async function detach() {
   "angle": "Góc",
   "position": "Vị trí",
   "flip": "Lật",
-  "update": "Cập nhật",
   "detach": "Bỏ",
   "attach": "Mặc"
 }
@@ -475,7 +453,6 @@ async function detach() {
   "angle": "角度",
   "position": "位置",
   "flip": "翻转",
-  "update": "更新",
   "detach": "卸下",
   "attach": "佩戴"
 }
@@ -487,7 +464,6 @@ async function detach() {
   "angle": "角度",
   "position": "位置",
   "flip": "翻轉",
-  "update": "更新",
   "detach": "取下",
   "attach": "裝上"
 }

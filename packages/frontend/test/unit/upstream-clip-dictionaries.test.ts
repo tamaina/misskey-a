@@ -15,7 +15,8 @@ test('new clip column dictionaries cover the same active locales as Deck', () =>
 	const deck = dictionaries(readFileSync(resolve(root, 'packages/features/navigation/frontend/ui/deck.vue'), 'utf8'));
 	expect([...column.keys()]).toEqual([...deck.keys()]);
 	for (const [language, values] of column) {
-		expect(Object.keys(values)).toEqual(['clip', 'selectClip', 'clips', 'favorites', 'show']);
-		expect(values.clip).toBe((deck.get(language)?.deckColumnsLabels as Record<string, string>).clip);
+		expect(Object.keys(values)).toEqual(['selectClip']);
+		expect(typeof values.selectClip, language).toBe('string');
+		expect(values.selectClip, language).not.toBe('');
 	}
 });

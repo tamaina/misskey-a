@@ -646,6 +646,92 @@ export interface Locale extends ILocale {
              */
             "renote": string;
         };
+        "_types": {
+            /**
+             * すべて
+             */
+            "all": string;
+            /**
+             * ユーザーの新規投稿
+             */
+            "note": string;
+            /**
+             * フォロー
+             */
+            "follow": string;
+            /**
+             * メンション
+             */
+            "mention": string;
+            /**
+             * リプライ
+             */
+            "reply": string;
+            /**
+             * リノート
+             */
+            "renote": string;
+            /**
+             * 引用
+             */
+            "quote": string;
+            /**
+             * リアクション
+             */
+            "reaction": string;
+            /**
+             * アンケートが終了
+             */
+            "pollEnded": string;
+            /**
+             * 予約投稿が成功した
+             */
+            "scheduledNotePosted": string;
+            /**
+             * 予約投稿が失敗した
+             */
+            "scheduledNotePostFailed": string;
+            /**
+             * フォロー申請を受け取った
+             */
+            "receiveFollowRequest": string;
+            /**
+             * フォローが受理された
+             */
+            "followRequestAccepted": string;
+            /**
+             * ロールが付与された
+             */
+            "roleAssigned": string;
+            /**
+             * ダイレクトメッセージのグループへ招待された
+             */
+            "chatRoomInvitationReceived": string;
+            /**
+             * 実績の獲得
+             */
+            "achievementEarned": string;
+            /**
+             * エクスポートが完了した
+             */
+            "exportCompleted": string;
+            /**
+             * ログイン
+             */
+            "login": string;
+            /**
+             * アクセストークンの作成
+             */
+            "createToken": string;
+            /**
+             * 通知のテスト
+             */
+            "test": string;
+            /**
+             * 連携アプリからの通知
+             */
+            "app": string;
+        };
     };
     "_offlineScreen": {
         /**
@@ -709,4 +795,844 @@ export interface Locale extends ILocale {
      * よろしいですか？
      */
     "areYouSure": string;
+    /**
+     * 権限
+     */
+    "permission": string;
+    /**
+     * 管理者権限
+     */
+    "adminPermission": string;
+    /**
+     * 全て有効にする
+     */
+    "enableAll": string;
+    /**
+     * 全て無効にする
+     */
+    "disableAll": string;
+    /**
+     * アクセストークンの発行
+     */
+    "generateAccessToken": string;
+    /**
+     * 管理者権限をすべて有効化
+     */
+    "enableAllAdmin": string;
+    /**
+     * 管理者権限をすべて無効化
+     */
+    "disableAllAdmin": string;
+    /**
+     * 追加
+     */
+    "add": string;
+    /**
+     * 削除
+     */
+    "remove": string;
+    /**
+     * はい
+     */
+    "yes": string;
+    /**
+     * いいえ
+     */
+    "no": string;
+    /**
+     * わかった
+     */
+    "gotIt": string;
+    /**
+     * 続ける
+     */
+    "continue": string;
+    /**
+     * 作成
+     */
+    "create": string;
+    /**
+     * 新規作成
+     */
+    "createNew": string;
+    /**
+     * 設定
+     */
+    "settings": string;
+    /**
+     * 共有
+     */
+    "share": string;
+    /**
+     * もっと！
+     */
+    "more": string;
+    /**
+     * もっと見る
+     */
+    "showMore": string;
+    /**
+     * 閉じる
+     */
+    "showLess": string;
+    /**
+     * 完了
+     */
+    "done": string;
+    /**
+     * ダウンロード
+     */
+    "download": string;
+    /**
+     * 更新
+     */
+    "update": string;
+    /**
+     * 再試行
+     */
+    "retry": string;
+    /**
+     * 戻る
+     */
+    "goBack": string;
+    /**
+     * 詳しく
+     */
+    "learnMore": string;
+    /**
+     * 情報
+     */
+    "info": string;
+    /**
+     * フィルタ
+     */
+    "filter": string;
+    /**
+     * インストール
+     */
+    "install": string;
+    /**
+     * 招待
+     */
+    "invite": string;
+    /**
+     * 名前を変更
+     */
+    "rename": string;
+    /**
+     * URLをコピー
+     */
+    "copyUrl": string;
+    /**
+     * 埋め込み
+     */
+    "embed": string;
+    /**
+     * 処理中
+     */
+    "processing": string;
+    /**
+     * ドライブから
+     */
+    "fromDrive": string;
+    /**
+     * {x}から
+     */
+    "fromX": ParameterizedString<"x">;
+    /**
+     * 公開範囲
+     */
+    "visibility": string;
+    /**
+     * パブリック
+     */
+    "public": string;
+    /**
+     * 非公開
+     */
+    "private": string;
+    /**
+     * センシティブ
+     */
+    "sensitive": string;
+    /**
+     * センシティブとして設定
+     */
+    "markAsSensitive": string;
+    /**
+     * センシティブを解除する
+     */
+    "unmarkAsSensitive": string;
+    /**
+     * 削除されたノート
+     */
+    "deletedNote": string;
+    /**
+     * アンケート
+     */
+    "poll": string;
+    /**
+     * ドライブ
+     */
+    "drive": string;
+    /**
+     * タイムライン
+     */
+    "timeline": string;
+    /**
+     * クリップ
+     */
+    "clip": string;
+    /**
+     * メモ
+     */
+    "memo": string;
+    /**
+     * 概要
+     */
+    "overview": string;
+    /**
+     * 1日
+     */
+    "oneDay": string;
+    /**
+     * 1時間
+     */
+    "oneHour": string;
+    /**
+     * 1ヶ月
+     */
+    "oneMonth": string;
+    /**
+     * 1週間
+     */
+    "oneWeek": string;
+    /**
+     * 無期限
+     */
+    "indefinitely": string;
+    /**
+     * 期限
+     */
+    "period": string;
+    /**
+     * 作成日時
+     */
+    "createdAt": string;
+    /**
+     * 更新日時
+     */
+    "updatedAt": string;
+    /**
+     * TLに他の人への返信を含める
+     */
+    "showRepliesToOthersInTimeline": string;
+    /**
+     * 連合なし
+     */
+    "visibilityDisableFederation": string;
+    /**
+     * 「{x}」を削除しますか？
+     */
+    "removeAreYouSure": ParameterizedString<"x">;
+    /**
+     * 「{x}」を削除しますか？
+     */
+    "deleteAreYouSure": ParameterizedString<"x">;
+    /**
+     * リセットしますか？
+     */
+    "resetAreYouSure": string;
+    /**
+     * ファイル「{name}」を削除しますか？このファイルを使用した一部のコンテンツも削除されます。
+     */
+    "driveFileDeleteConfirm": ParameterizedString<"name">;
+    /**
+     * フォロー
+     */
+    "follow": string;
+    /**
+     * フォロワー
+     */
+    "followers": string;
+    /**
+     * お気に入り
+     */
+    "favorite": string;
+    /**
+     * お気に入り解除
+     */
+    "unfavorite": string;
+    /**
+     * ミュート
+     */
+    "mute": string;
+    /**
+     * 管理者
+     */
+    "administrator": string;
+    /**
+     * モデレーター
+     */
+    "moderator": string;
+    /**
+     * お知らせ
+     */
+    "announcements": string;
+    /**
+     * チャンネル
+     */
+    "channel": string;
+    /**
+     * 通知
+     */
+    "notifications": string;
+    /**
+     * ユーザー
+     */
+    "user": string;
+    /**
+     * {user}のノート
+     */
+    "noteOf": ParameterizedString<"user">;
+    /**
+     * {name}が何かを言いました
+     */
+    "userSaysSomething": ParameterizedString<"name">;
+    /**
+     * チャート
+     */
+    "charts": string;
+    /**
+     * 名前はありません
+     */
+    "noName": string;
+    /**
+     * {n}つのファイル
+     */
+    "withNFiles": ParameterizedString<"n">;
+    /**
+     * 画像URL
+     */
+    "imageUrl": string;
+    /**
+     * 利用規約
+     */
+    "termsOfService": string;
+    /**
+     * プライバシーポリシー
+     */
+    "privacyPolicy": string;
+    /**
+     * 高
+     */
+    "high": string;
+    /**
+     * 中
+     */
+    "medium": string;
+    /**
+     * 低
+     */
+    "low": string;
+    /**
+     * 引用
+     */
+    "quote": string;
+    /**
+     * ローカルのみ
+     */
+    "localOnly": string;
+    /**
+     * 表示
+     */
+    "show": string;
+    /**
+     * 返信
+     */
+    "reply": string;
+    /**
+     * リノート
+     */
+    "renote": string;
+    "_timelines": {
+        /**
+         * ホーム
+         */
+        "home": string;
+        /**
+         * ローカル
+         */
+        "local": string;
+        /**
+         * ソーシャル
+         */
+        "social": string;
+        /**
+         * グローバル
+         */
+        "global": string;
+    };
+    "_visibility": {
+        /**
+         * パブリック
+         */
+        "public": string;
+        /**
+         * 全てのユーザーに公開
+         */
+        "publicDescription": string;
+        /**
+         * ホーム
+         */
+        "home": string;
+        /**
+         * ホームタイムラインのみに公開
+         */
+        "homeDescription": string;
+        /**
+         * フォロワー
+         */
+        "followers": string;
+        /**
+         * 自分のフォロワーのみに公開
+         */
+        "followersDescription": string;
+        /**
+         * 指名
+         */
+        "specified": string;
+        /**
+         * 指定したユーザーのみに公開
+         */
+        "specifiedDescription": string;
+        /**
+         * 連合なし
+         */
+        "disableFederation": string;
+        /**
+         * 他サーバーへの配信を行いません
+         */
+        "disableFederationDescription": string;
+    };
+    "_deck": {
+        "_columns": {
+            /**
+             * メイン
+             */
+            "main": string;
+            /**
+             * ウィジェット
+             */
+            "widgets": string;
+            /**
+             * 通知
+             */
+            "notifications": string;
+            /**
+             * タイムライン
+             */
+            "tl": string;
+            /**
+             * アンテナ
+             */
+            "antenna": string;
+            /**
+             * リスト
+             */
+            "list": string;
+            /**
+             * チャンネル
+             */
+            "channel": string;
+            /**
+             * メンション
+             */
+            "mentions": string;
+            /**
+             * 指名
+             */
+            "direct": string;
+            /**
+             * ロールタイムライン
+             */
+            "roleTimeline": string;
+            /**
+             * ダイレクトメッセージ
+             */
+            "chat": string;
+            /**
+             * クリップ
+             */
+            "clip": string;
+        };
+    };
+    "_permissions": {
+        /**
+         * MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）
+         */
+        "access:mcp": string;
+        /**
+         * アカウントの情報を見る
+         */
+        "read:account": string;
+        /**
+         * アカウントの情報を変更する
+         */
+        "write:account": string;
+        /**
+         * ブロックを見る
+         */
+        "read:blocks": string;
+        /**
+         * ブロックを操作する
+         */
+        "write:blocks": string;
+        /**
+         * ドライブを見る
+         */
+        "read:drive": string;
+        /**
+         * ドライブを操作する
+         */
+        "write:drive": string;
+        /**
+         * お気に入りを見る
+         */
+        "read:favorites": string;
+        /**
+         * お気に入りを操作する
+         */
+        "write:favorites": string;
+        /**
+         * フォローの情報を見る
+         */
+        "read:following": string;
+        /**
+         * フォロー・フォロー解除する
+         */
+        "write:following": string;
+        /**
+         * ダイレクトメッセージを見る
+         */
+        "read:messaging": string;
+        /**
+         * ダイレクトメッセージを操作する
+         */
+        "write:messaging": string;
+        /**
+         * ミュートを見る
+         */
+        "read:mutes": string;
+        /**
+         * ミュートを操作する
+         */
+        "write:mutes": string;
+        /**
+         * ノートを作成・削除する
+         */
+        "write:notes": string;
+        /**
+         * 通知を見る
+         */
+        "read:notifications": string;
+        /**
+         * 通知を操作する
+         */
+        "write:notifications": string;
+        /**
+         * リアクションを見る
+         */
+        "read:reactions": string;
+        /**
+         * リアクションを操作する
+         */
+        "write:reactions": string;
+        /**
+         * 投票する
+         */
+        "write:votes": string;
+        /**
+         * ページを見る
+         */
+        "read:pages": string;
+        /**
+         * ページを操作する
+         */
+        "write:pages": string;
+        /**
+         * ページのいいねを見る
+         */
+        "read:page-likes": string;
+        /**
+         * ページのいいねを操作する
+         */
+        "write:page-likes": string;
+        /**
+         * ユーザーグループを見る
+         */
+        "read:user-groups": string;
+        /**
+         * ユーザーグループを操作する
+         */
+        "write:user-groups": string;
+        /**
+         * チャンネルを見る
+         */
+        "read:channels": string;
+        /**
+         * チャンネルを操作する
+         */
+        "write:channels": string;
+        /**
+         * ギャラリーを見る
+         */
+        "read:gallery": string;
+        /**
+         * ギャラリーを操作する
+         */
+        "write:gallery": string;
+        /**
+         * ギャラリーのいいねを見る
+         */
+        "read:gallery-likes": string;
+        /**
+         * ギャラリーのいいねを操作する
+         */
+        "write:gallery-likes": string;
+        /**
+         * Playを見る
+         */
+        "read:flash": string;
+        /**
+         * Playを操作する
+         */
+        "write:flash": string;
+        /**
+         * Playのいいねを見る
+         */
+        "read:flash-likes": string;
+        /**
+         * Playのいいねを操作する
+         */
+        "write:flash-likes": string;
+        /**
+         * ユーザーからの通報を見る
+         */
+        "read:admin:abuse-user-reports": string;
+        /**
+         * ユーザーアカウントを削除する
+         */
+        "write:admin:delete-account": string;
+        /**
+         * ユーザーのすべてのファイルを削除する
+         */
+        "write:admin:delete-all-files-of-a-user": string;
+        /**
+         * データベースインデックスに関する情報を見る
+         */
+        "read:admin:index-stats": string;
+        /**
+         * データベーステーブルに関する情報を見る
+         */
+        "read:admin:table-stats": string;
+        /**
+         * ユーザーのIPアドレスを見る
+         */
+        "read:admin:user-ips": string;
+        /**
+         * インスタンスのメタデータを見る
+         */
+        "read:admin:meta": string;
+        /**
+         * ユーザーのパスワードをリセットする
+         */
+        "write:admin:reset-password": string;
+        /**
+         * ユーザーからの通報を解決する
+         */
+        "write:admin:resolve-abuse-user-report": string;
+        /**
+         * メールを送る
+         */
+        "write:admin:send-email": string;
+        /**
+         * サーバーの情報を見る
+         */
+        "read:admin:server-info": string;
+        /**
+         * モデレーションログを見る
+         */
+        "read:admin:show-moderation-log": string;
+        /**
+         * ユーザーのプライベートな情報を見る
+         */
+        "read:admin:show-user": string;
+        /**
+         * ユーザーを凍結する
+         */
+        "write:admin:suspend-user": string;
+        /**
+         * ユーザーの二要素認証を解除する
+         */
+        "write:admin:unset-mfa": string;
+        /**
+         * ユーザーのアバターを削除する
+         */
+        "write:admin:unset-user-avatar": string;
+        /**
+         * ユーザーのバーナーを削除する
+         */
+        "write:admin:unset-user-banner": string;
+        /**
+         * ユーザーの凍結を解除する
+         */
+        "write:admin:unsuspend-user": string;
+        /**
+         * インスタンスのメタデータを操作する
+         */
+        "write:admin:meta": string;
+        /**
+         * モデレーションノートを操作する
+         */
+        "write:admin:user-note": string;
+        /**
+         * ロールを操作する
+         */
+        "write:admin:roles": string;
+        /**
+         * ロールを見る
+         */
+        "read:admin:roles": string;
+        /**
+         * リレーを操作する
+         */
+        "write:admin:relays": string;
+        /**
+         * リレーを見る
+         */
+        "read:admin:relays": string;
+        /**
+         * 招待コードを操作する
+         */
+        "write:admin:invite-codes": string;
+        /**
+         * 招待コードを見る
+         */
+        "read:admin:invite-codes": string;
+        /**
+         * お知らせを操作する
+         */
+        "write:admin:announcements": string;
+        /**
+         * お知らせを見る
+         */
+        "read:admin:announcements": string;
+        /**
+         * アバターデコレーションを操作する
+         */
+        "write:admin:avatar-decorations": string;
+        /**
+         * アバターデコレーションを見る
+         */
+        "read:admin:avatar-decorations": string;
+        /**
+         * 連合に関する情報を操作する
+         */
+        "write:admin:federation": string;
+        /**
+         * ユーザーアカウントを操作する
+         */
+        "write:admin:account": string;
+        /**
+         * ユーザーに関する情報を見る
+         */
+        "read:admin:account": string;
+        /**
+         * 絵文字を操作する
+         */
+        "write:admin:emoji": string;
+        /**
+         * 絵文字を見る
+         */
+        "read:admin:emoji": string;
+        /**
+         * ジョブキューを操作する
+         */
+        "write:admin:queue": string;
+        /**
+         * ジョブキューに関する情報を見る
+         */
+        "read:admin:queue": string;
+        /**
+         * プロモーションノートを操作する
+         */
+        "write:admin:promo": string;
+        /**
+         * ユーザーのドライブを操作する
+         */
+        "write:admin:drive": string;
+        /**
+         * ユーザーのドライブの関する情報を見る
+         */
+        "read:admin:drive": string;
+        /**
+         * 管理者用のWebsocket APIを使う
+         */
+        "read:admin:stream": string;
+        /**
+         * 広告を操作する
+         */
+        "write:admin:ad": string;
+        /**
+         * 広告を見る
+         */
+        "read:admin:ad": string;
+        /**
+         * 招待コードを作成する
+         */
+        "write:invite-codes": string;
+        /**
+         * 招待コードを取得する
+         */
+        "read:invite-codes": string;
+        /**
+         * クリップのいいねを操作する
+         */
+        "write:clip-favorite": string;
+        /**
+         * クリップのいいねを見る
+         */
+        "read:clip-favorite": string;
+        /**
+         * 連合に関する情報を取得する
+         */
+        "read:federation": string;
+        /**
+         * 違反を報告する
+         */
+        "write:report-abuse": string;
+        /**
+         * ダイレクトメッセージを操作する
+         */
+        "write:chat": string;
+        /**
+         * ダイレクトメッセージを閲覧する
+         */
+        "read:chat": string;
+    };
+    "_cw": {
+        /**
+         * 隠す
+         */
+        "hide": string;
+        /**
+         * もっと見る
+         */
+        "show": string;
+    };
+    /**
+     * 隠す
+     */
+    "hide": string;
 }

@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="banner" :style="bannerStyle">
 			<div class="fade"></div>
 			<div class="name"><i class="ti ti-device-tv"></i> {{ channel.name }}</div>
-			<div v-if="channel.isSensitive" class="sensitiveIndicator">{{ $locale.sfc.sensitive }}</div>
+			<div v-if="channel.isSensitive" class="sensitiveIndicator">{{ globalLocale.env.sensitive }}</div>
 			<div class="status">
 				<div>
 					<i class="ti ti-users ti-fw"></i>
@@ -38,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</article>
 		<footer>
 			<span v-if="channel.lastNotedAt">
-				{{ $locale.sfc.updatedAt }}: <MkTime :time="channel.lastNotedAt"/>
+				{{ globalLocale.env.updatedAt }}: <MkTime :time="channel.lastNotedAt"/>
 			</span>
 		</footer>
 	</MkA>
@@ -50,10 +50,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { $i } from '@features/auth/frontend/i.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	channel: Misskey.entities.Channel;
@@ -232,280 +236,224 @@ const bannerStyle = computed(() => {
 
 <locale locale="ar-SA" lang="json">
 {
-	"sensitive": "محتوى حساس",
 	"usersCount": "{n} منتسب",
 	"notesCount": "{n} ملاحظة",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "حُدّث في"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"sensitive": "Sensible",
 	"usersCount": "{n} Participants",
 	"notesCount": "{n} Notes",
-	"youAreAdmin": "Ets l'administrador ",
-	"updatedAt": "Actualitzat el"
+	"youAreAdmin": "Ets l'administrador "
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"sensitive": "NSFW",
 	"usersCount": "{n} Účastníků",
 	"notesCount": "{n} Poznámek",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Upraveno"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"sensitive": "Sensitive",
 	"usersCount": "{n} Participants",
 	"notesCount": "{n} Notes",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Updated at"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"sensitive": "Sensibel",
 	"usersCount": "{n} Teilnehmer",
 	"notesCount": "{n} Notizen",
-	"youAreAdmin": "Sie sind ein Administrator",
-	"updatedAt": "Zuletzt geändert am"
+	"youAreAdmin": "Sie sind ein Administrator"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"sensitive": "Sensitive",
 	"usersCount": "{n} Participants",
 	"notesCount": "{n} Notes",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Updated at"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"sensitive": "Marcado como sensible (NSFW)",
 	"usersCount": "{n} participantes",
 	"notesCount": "{n} notas",
-	"youAreAdmin": "Eres administrador.",
-	"updatedAt": "Actualizado"
+	"youAreAdmin": "Eres administrador."
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"sensitive": "Contenu sensible",
 	"usersCount": "{n} Participant·e·s",
 	"notesCount": "{n} Notes",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Mis à jour le"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"sensitive": "Konten sensitif",
 	"usersCount": "{n} Partisipan",
 	"notesCount": "terdapat {n} catatan",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Diperbarui pada"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"sensitive": "Esplicito",
 	"usersCount": "{n} partecipanti",
 	"notesCount": "{n} note",
-	"youAreAdmin": "Sei un amministratore",
-	"updatedAt": "Aggiornato il"
+	"youAreAdmin": "Sei un amministratore"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"sensitive": "センシティブ",
 	"usersCount": "{n}人が参加中",
 	"notesCount": "{n}投稿があります",
-	"youAreAdmin": "あなたは管理者です",
-	"updatedAt": "更新日時"
+	"youAreAdmin": "あなたは管理者です"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"sensitive": "気いつけて見いや",
 	"usersCount": "{n}人が参加しとる",
 	"notesCount": "{n}こ投稿があるで",
-	"youAreAdmin": "あんた、管理者やで",
-	"updatedAt": "更新日時"
+	"youAreAdmin": "あんた、管理者やで"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"sensitive": "Sensitive",
 	"usersCount": "{n} Participants",
 	"notesCount": "{n} Notes",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Updated at"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"sensitive": "Sensitive",
 	"usersCount": "{n} Participants",
 	"notesCount": "{n} Notes",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Updated at"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"sensitive": "열람 주의",
 	"usersCount": "{n}명 참여 중",
 	"notesCount": "{n}노트",
-	"youAreAdmin": "당신은 관리자입니다.",
-	"updatedAt": "수정한 날짜"
+	"youAreAdmin": "당신은 관리자입니다."
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"sensitive": "NSFW",
 	"usersCount": "{n} Participants",
 	"notesCount": "{n} Notes",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Laatst gewijzigd at"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"sensitive": "Sensitive",
 	"usersCount": "{n} Participants",
 	"notesCount": "{n} Notes",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Updated at"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"sensitive": "NSFW",
 	"usersCount": "{n} uczestnicy",
 	"notesCount": "{n} wpisy",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Zaktualizowano"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"sensitive": "Conteúdo sensível",
 	"usersCount": "{n} usuários ativos",
 	"notesCount": "{n} notas",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Última atualização"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"sensitive": "Содержимое не для всех",
 	"usersCount": "Участников: {n}",
 	"notesCount": "Заметок: {n}",
-	"youAreAdmin": "Вы администратор",
-	"updatedAt": "Обновлено"
+	"youAreAdmin": "Вы администратор"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"sensitive": "NSFW",
 	"usersCount": "{n} účastníkov",
 	"notesCount": "{n} poznámok",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Upravené"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
 	"usersCount": "{n} ผู้เข้าร่วม",
 	"notesCount": "มี {n} โน้ต",
-	"youAreAdmin": "คุณคือผู้ดูแลระบบ",
-	"updatedAt": "อัปเดตล่าสุด"
+	"youAreAdmin": "คุณคือผู้ดูแลระบบ"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"sensitive": "Hassas",
 	"usersCount": "{n} Katılımcılar",
 	"notesCount": "{n} Notlar",
-	"youAreAdmin": "Siz yöneticisiniz.",
-	"updatedAt": "Güncellendi"
+	"youAreAdmin": "Siz yöneticisiniz."
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"sensitive": "Sensitive",
 	"usersCount": "{n} Participants",
 	"notesCount": "{n} Notes",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Updated at"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"sensitive": "NSFW",
 	"usersCount": "{n} учасників",
 	"notesCount": "{n} дописів",
-	"youAreAdmin": "Ви адмін",
-	"updatedAt": "Останнє оновлення"
+	"youAreAdmin": "Ви адмін"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"sensitive": "Nhạy cảm",
 	"usersCount": "{n} Thành viên",
 	"notesCount": "{n} Tút",
-	"youAreAdmin": "You are admin",
-	"updatedAt": "Cập nhật lúc"
+	"youAreAdmin": "You are admin"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"sensitive": "敏感内容",
 	"usersCount": "{n} 人参与",
 	"notesCount": "{n} 篇帖子",
-	"youAreAdmin": "你是管理员",
-	"updatedAt": "更新日期"
+	"youAreAdmin": "你是管理员"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"sensitive": "敏感內容",
 	"usersCount": "有 {n} 人參與",
 	"notesCount": "有 {n} 篇貼文",
-	"youAreAdmin": "您是管理員",
-	"updatedAt": "最後更新"
+	"youAreAdmin": "您是管理員"
 }
 </locale>

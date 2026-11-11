@@ -10,16 +10,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, inject } from 'vue';
 import { colorizeEmoji, getEmojiName } from '@features/emojis/frontend/shared/emojilist.js';
 import { char2fluentEmojiFilePath, char2twemojiFilePath } from '@features/emojis/frontend/shared/emoji-base.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import * as os from '@features/ui/frontend/os.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { DI } from '@features/ui/frontend/di.js';
 import { mute as muteEmoji, unmute as unmuteEmoji, checkMuted as checkMutedEmoji } from '@features/emojis/frontend/utility/emoji-mute.js';
 import { addToEmojiPalette } from '@features/emojis/frontend/utility/emoji-palette.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	emoji: string;
@@ -75,7 +79,7 @@ function onClick(ev: PointerEvent) {
 			type: 'label',
 			text: props.emoji,
 		}, {
-			text: $locale.value.sfc.copy,
+			text: globalLocale.value.env.copy,
 			icon: 'ti ti-copy',
 			action: () => {
 				copyToClipboard(props.emoji);
@@ -138,7 +142,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "نسخ",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -150,7 +153,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Silenciar {x}",
 	"unmuteX": "Deixar de silenciar {x}",
-	"copy": "Copiar",
 	"doReaction": "Afegeix una reacció ",
 	"emojiUnmute": "Deixar de silenciar emojis",
 	"emojiMute": "Silenciar emojis",
@@ -162,7 +164,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Kopírovat",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -174,7 +175,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Copy",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -186,7 +186,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "{x} stummschalten",
 	"unmuteX": "Stummschaltung von {x} aufheben",
-	"copy": "Kopieren",
 	"doReaction": "Reagieren",
 	"emojiUnmute": "Emoji-Stummschaltung aufheben",
 	"emojiMute": "Emoji stummschalten",
@@ -198,7 +197,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Copy",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -210,7 +208,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Silenciar {x}",
 	"unmuteX": "Dejar de silenciar {x}",
-	"copy": "Copiar",
 	"doReaction": "Añadir reacción",
 	"emojiUnmute": "No silenciar emoji",
 	"emojiMute": "Silenciar emoji",
@@ -222,7 +219,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Copier",
 	"doReaction": "Réagir",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -234,7 +230,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Salin",
 	"doReaction": "Tambahkan reaksi",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -246,7 +241,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Silenzia {x}",
 	"unmuteX": "De silenzia {x}",
-	"copy": "Copia",
 	"doReaction": "Reagisci",
 	"emojiUnmute": "De silenzia emoji",
 	"emojiMute": "Silenzia emoji",
@@ -258,7 +252,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "{x}をミュート",
 	"unmuteX": "{x}のミュートを解除",
-	"copy": "コピー",
 	"doReaction": "リアクションする",
 	"emojiUnmute": "絵文字ミュート解除",
 	"emojiMute": "絵文字ミュート",
@@ -270,7 +263,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "{x}をミュート",
 	"unmuteX": "{x}のミュートやめたる",
-	"copy": "コピー",
 	"doReaction": "ツッコむで",
 	"emojiUnmute": "絵文字ミュートやめたる",
 	"emojiMute": "絵文字ミュート",
@@ -282,7 +274,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Copy",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -294,7 +285,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Copy",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -306,7 +296,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "{x}를 뮤트",
 	"unmuteX": "{x}의 뮤트를 해제",
-	"copy": "복사",
 	"doReaction": "리액션 추가",
 	"emojiUnmute": "이모티콘 뮤트 해제",
 	"emojiMute": "이모티콘 뮤트",
@@ -318,7 +307,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Kopiëren",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -330,7 +318,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Kopier",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -342,7 +329,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Kopiuj",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -354,7 +340,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Silenciar {x}",
 	"unmuteX": "Reativar {x}",
-	"copy": "Copiar",
 	"doReaction": "Adicionar reação",
 	"emojiUnmute": "Reativar emoji",
 	"emojiMute": "Silenciar emoji",
@@ -366,7 +351,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Скрыть {x}",
 	"unmuteX": "Показать {x}",
-	"copy": "Копировать",
 	"doReaction": "Добавить реакцию",
 	"emojiUnmute": "Показать эмодзи",
 	"emojiMute": "Скрыть эмодзи",
@@ -378,7 +362,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Kopírovať",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -390,7 +373,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "ปิดเสียง {x}",
 	"unmuteX": "เลิกปิดเสียง {x}",
-	"copy": "คัดลอก",
 	"doReaction": "เพิ่มรีแอคชั่น",
 	"emojiUnmute": "เลิกปิดเสียงเอโมจิ",
 	"emojiMute": "ปิดเสียงเอโมจิ",
@@ -402,7 +384,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Sessiz {x}",
 	"unmuteX": "Sesi aç {x}",
-	"copy": "Kopyala",
 	"doReaction": "Tepki ekle",
 	"emojiUnmute": "Emoji ses aç",
 	"emojiMute": "Emoji ses kapat",
@@ -414,7 +395,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Copy",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -426,7 +406,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Приховати {x}",
 	"unmuteX": "Показувати {x}",
-	"copy": "Скопіювати",
 	"doReaction": "Додати реакцію",
 	"emojiUnmute": "Показувати емодзі",
 	"emojiMute": "Приховати емодзі",
@@ -438,7 +417,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "Mute {x}",
 	"unmuteX": "Unmute {x}",
-	"copy": "Sao chép",
 	"doReaction": "Add reaction",
 	"emojiUnmute": "Unmute emoji",
 	"emojiMute": "Mute emoji",
@@ -450,7 +428,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "隐藏{x}",
 	"unmuteX": "取消对{x}的隐藏",
-	"copy": "复制",
 	"doReaction": "回应",
 	"emojiUnmute": "取消屏蔽表情符号",
 	"emojiMute": "屏蔽表情符号",
@@ -462,7 +439,6 @@ function onClick(ev: PointerEvent) {
 {
 	"muteX": "將 {x} 靜音",
 	"unmuteX": "將 {x} 解除靜音",
-	"copy": "複製",
 	"doReaction": "做出反應",
 	"emojiUnmute": "表情符號解除靜音",
 	"emojiMute": "表情符號靜音",

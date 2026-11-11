@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <XColumn :menu="menu" :column="column" :isStacked="isStacked" :refresher="async () => { await paginator.reload() }">
 	<template #header>
-		<i class="ti ti-paperclip"></i><span style="margin-left: 8px;">{{ column.name || column.timelineNameCache || $locale.sfc.clip }}</span>
+		<i class="ti ti-paperclip"></i><span style="margin-left: 8px;">{{ column.name || column.timelineNameCache || globalLocale.env.clip }}</span>
 	</template>
 
 	<MkResult v-if="notFound" type="notFound"/>
@@ -15,11 +15,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, markRaw, onMounted, onUnmounted, provide, ref, shallowRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import XColumn from '@features/navigation/frontend/ui/deck/column.vue';
-import type { Column } from '@features/preferences/frontend/deck.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { updateColumn } from '@features/preferences/frontend/deck.js';
 import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -30,6 +29,11 @@ import { useStream } from '@features/api/frontend/stream.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import { getClipColumnReloadDelayMs } from './clip-column.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Column } from '@features/preferences/frontend/deck.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	column: Column;
@@ -157,12 +161,12 @@ async function setClip() {
 		items: [
 			(myClips.length > 0 ? {
 				type: 'group' as const,
-				label: $locale.value.sfc.clips,
+				label: globalLocale.value.env.clips,
 				items: myClips.map(x => ({ value: x.id, label: x.name })),
 			} : undefined),
 			(otherFavoritedClips.length > 0 ? {
 				type: 'group' as const,
-				label: $locale.value.sfc.favorites,
+				label: globalLocale.value.env.favorites,
 				items: otherFavoritedClips.map(x => ({ value: x.id, label: x.name })),
 			} : undefined),
 		],
@@ -193,7 +197,7 @@ const menu: MenuItem[] = [
 	},
 	{
 		icon: 'ti ti-paperclip',
-		text: $locale.value.sfc.show,
+		text: globalLocale.value.env.show,
 		action: openClip,
 	},
 ];
@@ -201,280 +205,168 @@ const menu: MenuItem[] = [
 
 <locale lang="json" locale="ar-SA">
 {
-	"clip": "مِشبك",
-	"selectClip": "クリップを選択",
-	"clips": "مشابك",
-	"favorites": "المفضلات",
-	"show": "المظهر"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="ca-ES">
 {
-	"clip": "Retalls",
-	"selectClip": "Seleccioneu un fragment",
-	"clips": "Retalls",
-	"favorites": "Favorits",
-	"show": "Veure"
+	"selectClip": "Seleccioneu un fragment"
 }
 </locale>
 
 <locale lang="json" locale="cs-CZ">
 {
-	"clip": "Oříznout",
-	"selectClip": "クリップを選択",
-	"clips": "Oříznout",
-	"favorites": "Oblíbené",
-	"show": "Zobrazit"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="da-DK">
 {
-	"clip": "Clip",
-	"selectClip": "クリップを選択",
-	"clips": "Clips",
-	"favorites": "Favorites",
-	"show": "Show"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="de-DE">
 {
-	"clip": "Clip erstellen",
-	"selectClip": "クリップを選択",
-	"clips": "Clips",
-	"favorites": "Favoriten",
-	"show": "Anzeigen"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="en-US">
 {
-	"clip": "Clip",
-	"selectClip": "クリップを選択",
-	"clips": "Clips",
-	"favorites": "Favorites",
-	"show": "Show"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="es-ES">
 {
-	"clip": "Clip",
-	"selectClip": "Seleccionar clip",
-	"clips": "Clip",
-	"favorites": "Favoritos",
-	"show": "Apariencia"
+	"selectClip": "Seleccionar clip"
 }
 </locale>
 
 <locale lang="json" locale="fr-FR">
 {
-	"clip": "Clip",
-	"selectClip": "クリップを選択",
-	"clips": "Clips",
-	"favorites": "Favoris",
-	"show": "Affichage"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="id-ID">
 {
-	"clip": "Klip",
-	"selectClip": "クリップを選択",
-	"clips": "Klip",
-	"favorites": "Favorit",
-	"show": "Tampilkan"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="it-IT">
 {
-	"clip": "Clip",
-	"selectClip": "Seleziona Clip",
-	"clips": "Clip",
-	"favorites": "Preferiti",
-	"show": "Visualizza"
+	"selectClip": "Seleziona Clip"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
-	"clip": "クリップ",
-	"selectClip": "クリップを選択",
-	"clips": "クリップ",
-	"favorites": "お気に入り",
-	"show": "表示"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="ja-KS">
 {
-	"clip": "クリップ",
-	"selectClip": "クリップを選択",
-	"clips": "クリップ",
-	"favorites": "お気に入り",
-	"show": "表示"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="kab-KAB">
 {
-	"clip": "Clip",
-	"selectClip": "クリップを選択",
-	"clips": "Clips",
-	"favorites": "Favorites",
-	"show": "Show"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
-	"clip": "Clip",
-	"selectClip": "クリップを選択",
-	"clips": "Clips",
-	"favorites": "ಮೆಚ್ಚಿನವುಗಳು",
-	"show": "Show"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="ko-KR">
 {
-	"clip": "클립",
-	"selectClip": "클립 선택",
-	"clips": "클립",
-	"favorites": "즐겨찾기",
-	"show": "표시"
+	"selectClip": "클립 선택"
 }
 </locale>
 
 <locale lang="json" locale="nl-NL">
 {
-	"clip": "Clip aanmaken",
-	"selectClip": "クリップを選択",
-	"clips": "Clips",
-	"favorites": "Toevoegen aan favorieten",
-	"show": "Weergave"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
-	"clip": "Clip",
-	"selectClip": "クリップを選択",
-	"clips": "Clips",
-	"favorites": "Favoritter",
-	"show": "Vis"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="pl-PL">
 {
-	"clip": "Klip",
-	"selectClip": "クリップを選択",
-	"clips": "Klipy",
-	"favorites": "Ulubione",
-	"show": "Wyświetlanie"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="pt-PT">
 {
-	"clip": "Clipe",
-	"selectClip": "クリップを選択",
-	"clips": "Clipe",
-	"favorites": "Favoritos",
-	"show": "Visualizar"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="ru-RU">
 {
-	"clip": "Подборка",
-	"selectClip": "クリップを選択",
-	"clips": "Подборки",
-	"favorites": "Избранное",
-	"show": "Показать"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="sk-SK">
 {
-	"clip": "Klip",
-	"selectClip": "クリップを選択",
-	"clips": "Klip",
-	"favorites": "Obľúbené",
-	"show": "Zobraziť"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="th-TH">
 {
-	"clip": "คลิป",
-	"selectClip": "クリップを選択",
-	"clips": "คลิป",
-	"favorites": "รายการโปรด",
-	"show": "แสดงผล"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="tr-TR">
 {
-	"clip": "Klip",
-	"selectClip": "クリップを選択",
-	"clips": "Klipler",
-	"favorites": "Favoriler",
-	"show": "Göster"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="ug-CN">
 {
-	"clip": "Clip",
-	"selectClip": "クリップを選択",
-	"clips": "Clips",
-	"favorites": "Favorites",
-	"show": "Show"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
-	"clip": "Добірка",
-	"selectClip": "クリップを選択",
-	"clips": "Добірки",
-	"favorites": "Обране",
-	"show": "Відображення"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="vi-VN">
 {
-	"clip": "Lưu bài viết",
-	"selectClip": "クリップを選択",
-	"clips": "Lưu bài viết",
-	"favorites": "Lượt thích",
-	"show": "Hiển thị"
+	"selectClip": "クリップを選択"
 }
 </locale>
 
 <locale lang="json" locale="zh-CN">
 {
-	"clip": "便签",
-	"selectClip": "选择便签",
-	"clips": "便签",
-	"favorites": "收藏",
-	"show": "显示"
+	"selectClip": "选择便签"
 }
 </locale>
 
 <locale lang="json" locale="zh-TW">
 {
-	"clip": "摘錄",
-	"selectClip": "クリップを選択",
-	"clips": "摘錄",
-	"favorites": "我的最愛",
-	"show": "檢視"
+	"selectClip": "クリップを選択"
 }
 </locale>

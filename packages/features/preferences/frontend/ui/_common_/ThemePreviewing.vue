@@ -9,12 +9,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<i class="ti ti-info-circle"></i>
 	</span>
 	<span :class="$style.title">{{ $locale.sfc.previewingTheme }}</span>
-	<span :class="$style.body"><button class="_textButton" style="color: var(--MI_THEME-fgOnAccent);" @click="restore">{{ $locale.sfc.previewingThemeRestore }}</button> | <MkA class="_textButton" style="color: var(--MI_THEME-fgOnAccent);" to="/settings/theme">{{ $locale.sfc.settings }}</MkA></span>
+	<span :class="$style.body"><button class="_textButton" style="color: var(--MI_THEME-fgOnAccent);" @click="restore">{{ $locale.sfc.previewingThemeRestore }}</button> | <MkA class="_textButton" style="color: var(--MI_THEME-fgOnAccent);" to="/settings/theme">{{ globalLocale.env.settings }}</MkA></span>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { themeManager } from '@features/preferences/frontend/theme.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 function restore() {
 	themeManager.clearPreview();
@@ -58,223 +62,195 @@ function restore() {
 <locale locale="ar-SA" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "استرجاع",
-  "settings": "الاعدادات"
+  "previewingThemeRestore": "استرجاع"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
   "previewingTheme": "Previsualització del tema",
-  "previewingThemeRestore": "Restaurar",
-  "settings": "Preferències"
+  "previewingThemeRestore": "Restaurar"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Obnovit",
-  "settings": "Nastavení"
+  "previewingThemeRestore": "Obnovit"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Restore",
-  "settings": "Settings"
+  "previewingThemeRestore": "Restore"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Wiederherstellen",
-  "settings": "Einstellungen"
+  "previewingThemeRestore": "Wiederherstellen"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Restore",
-  "settings": "Settings"
+  "previewingThemeRestore": "Restore"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
   "previewingTheme": "Vista previa del tema",
-  "previewingThemeRestore": "Regresar",
-  "settings": "Configuración"
+  "previewingThemeRestore": "Regresar"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Restaurer",
-  "settings": "Paramètres"
+  "previewingThemeRestore": "Restaurer"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Kembalikan",
-  "settings": "Pengaturan"
+  "previewingThemeRestore": "Kembalikan"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
   "previewingTheme": "Anteprima del Tema",
-  "previewingThemeRestore": "Ripristina",
-  "settings": "Impostazioni"
+  "previewingThemeRestore": "Ripristina"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
   "previewingTheme": "テーマのプレビュー中",
-  "previewingThemeRestore": "元に戻す",
-  "settings": "設定"
+  "previewingThemeRestore": "元に戻す"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
   "previewingTheme": "テーマのプレビュー中",
-  "previewingThemeRestore": "元に戻す",
-  "settings": "設定"
+  "previewingThemeRestore": "元に戻す"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Restore",
-  "settings": "Iɣewwaṛen"
+  "previewingThemeRestore": "Restore"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Restore",
-  "settings": "ಸಿದ್ಧತೆಗಳು"
+  "previewingThemeRestore": "Restore"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
   "previewingTheme": "테마 미리보기 중",
-  "previewingThemeRestore": "복구",
-  "settings": "설정"
+  "previewingThemeRestore": "복구"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Herstellen",
-  "settings": "Instellingen"
+  "previewingThemeRestore": "Herstellen"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Restore",
-  "settings": "Innstillinger"
+  "previewingThemeRestore": "Restore"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Przywróć",
-  "settings": "Ustawienia"
+  "previewingThemeRestore": "Przywróć"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Restaurar",
-  "settings": "Configurações"
+  "previewingThemeRestore": "Restaurar"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Восстановить",
-  "settings": "Настройки"
+  "previewingThemeRestore": "Восстановить"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Obnoviť",
-  "settings": "Nastavenia"
+  "previewingThemeRestore": "Obnoviť"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "เลิกทำ",
-  "settings": "การตั้งค่า"
+  "previewingThemeRestore": "เลิกทำ"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Geri yükle",
-  "settings": "Ayarlar"
+  "previewingThemeRestore": "Geri yükle"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Restore",
-  "settings": "Settings"
+  "previewingThemeRestore": "Restore"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
   "previewingTheme": "Попередній перегляд теми",
-  "previewingThemeRestore": "Відновити",
-  "settings": "Налаштування"
+  "previewingThemeRestore": "Відновити"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
   "previewingTheme": "Previewing theme",
-  "previewingThemeRestore": "Khôi phục",
-  "settings": "Cài đặt"
+  "previewingThemeRestore": "Khôi phục"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
   "previewingTheme": "正在预览主题",
-  "previewingThemeRestore": "还原",
-  "settings": "设置"
+  "previewingThemeRestore": "还原"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
   "previewingTheme": "正在預覽主題",
-  "previewingThemeRestore": "復原",
-  "settings": "設定"
+  "previewingThemeRestore": "復原"
 }
 </locale>

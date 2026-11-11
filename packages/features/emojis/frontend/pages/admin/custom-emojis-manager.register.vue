@@ -33,8 +33,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkFolder>
 
 		<div class="_buttonsCenter">
-			<MkButton primary rounded @click="onFileSelectClicked">{{ $locale.sfc.upload }}</MkButton>
-			<MkButton primary rounded @click="onDriveSelectClicked">{{ $locale.sfc.fromDrive }}</MkButton>
+			<MkButton primary rounded @click="onFileSelectClicked">{{ globalLocale.env.upload }}</MkButton>
+			<MkButton primary rounded @click="onDriveSelectClicked">{{ globalLocale.env.fromDrive }}</MkButton>
 		</div>
 
 		<div v-if="gridItems.length > 0" :class="$style.gridArea">
@@ -58,13 +58,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { computed, onMounted, ref } from 'vue';
-import type { RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
-import type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@features/ui/frontend/components/grid/grid-event.js';
-import type { DroppedFile } from '@features/drive/frontend/utility/file-drop.js';
-import type { GridSetting } from '@features/ui/frontend/components/grid/grid.js';
-import type { GridRow } from '@features/ui/frontend/components/grid/row.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import {
 	emptyStrToEmptyArray,
@@ -86,6 +82,14 @@ import { copyGridDataToClipboard } from '@features/ui/frontend/components/grid/g
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { GridRow } from '@features/ui/frontend/components/grid/row.js';
+import type { GridSetting } from '@features/ui/frontend/components/grid/grid.js';
+import type { DroppedFile } from '@features/drive/frontend/utility/file-drop.js';
+import type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@features/ui/frontend/components/grid/grid-event.js';
+import type { RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const MAXIMUM_EMOJI_REGISTER_COUNT = 100;
 
@@ -272,7 +276,7 @@ async function onRegistryClicked() {
 	if (failedItems.length > 0) {
 		await os.alert({
 			type: 'error',
-			title: $locale.value.sfc.somethingHappened,
+			title: globalLocale.value.env.somethingHappened,
 			text: $locale.value.sfc.customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription,
 		});
 	}
@@ -405,8 +409,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "ارفع",
-	"fromDrive": "من المخزن",
 	"registration": "إنشاء حساب",
 	"clear": "عودة",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -416,7 +418,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "حدث خطأ",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -431,8 +432,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "Quan arrossegues un directori, escriu el nom del directori al camp categoria.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registres d'inscripcions ",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Quan s'actualitzin o s'esborrin emojis es mostrarà un registre. Desapareixeran quan s'actualitzin, s'esborrin, visitis una nova pàgina o la recarreguis.",
-	"upload": "Puja",
-	"fromDrive": "Des del Disc",
 	"registration": "Registre",
 	"clear": "Tornar",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copiar línies seleccionades ",
@@ -442,7 +441,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copiar selecció ",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Esborrar files de la selecció ",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Registrar els Emojis de la llista com a nous Emojis personalitzats. Vols continuar? (Per evitar una sobrecàrrega només {count} Emojis es poden registrar d'una sola vegada)",
-	"somethingHappened": "S'ha produït un error",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "No s'ha pogut actualitzar o esborrar l'emoji. Si us plau, dona una ullada al registre per més detalls.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Descartar els canvis i esborrar els Emojis de la llista. Vols continuar?"
 }
@@ -457,8 +455,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Nahrát soubory",
-	"fromDrive": "Z disku",
 	"registration": "Registrace",
 	"clear": "Vrátit",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -468,7 +464,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -483,8 +478,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
 	"registration": "Register",
 	"clear": "Return",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -494,7 +487,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "An error has occurred",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -509,8 +501,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "Wenn du ein Verzeichnis ziehst und ablegst, gib den Verzeichnisnamen in das Feld „Kategorie“ ein.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registrierungsprotokoll",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Protokolle werden beim Aktualisieren oder Löschen von Emojis angezeigt. Sie verschwinden nach dem Aktualisieren oder Löschen, dem Wechsel zu einer neuen Seite oder dem Neuladen.",
-	"upload": "Hochladen",
-	"fromDrive": "Aus Drive",
 	"registration": "Registrieren",
 	"clear": "Zurückkehren",
 	"customEmojisManagerGridCommonCopySelectionRows": "Ausgewählte Zeilen kopieren",
@@ -520,7 +510,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Auswahl kopieren",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Zeilen in der Auswahl löschen",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Füge die in der Liste aufgeführten Emojis als neue benutzerdefinierte Emojis hinzu. Bist du sicher? (Um eine Überlastung zu vermeiden, können nur {count} Emoji(s) in einem Vorgang hinzugefügt werden)",
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Emoji konnte nicht aktualisiert oder gelöscht werden. Bitte prüfe das Registrierungsprotokoll für Details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Verwerfe die Bearbeitungen und lösche die Emojis aus der Liste. Bist du sicher, dass du fortfahren möchtest?"
 }
@@ -535,8 +524,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
 	"registration": "Register",
 	"clear": "Return",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -546,7 +533,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "An error has occurred",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -561,8 +547,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "Cuando arrastres y sueltes un directorio, introduce el nombre del directorio en el campo \"categoría\".",
 	"customEmojisManagerGridCommonRegistrationLogs": "Log de registros ",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Los registros se mostrarán al actualizar o borrar Emojis. Desaparecerán después de actualizarlos o eliminarlos, pasar a una nueva página o recargar.",
-	"upload": "Subir",
-	"fromDrive": "Desde el drive",
 	"registration": "Registro",
 	"clear": "Limpiar",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copiar filas seleccionadas",
@@ -572,7 +556,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copiar selección",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Borrar las filas de la selección",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Registra los Emojis de la lista como nuevos Emojis personalizados. ¿Estás seguro de continuar? (Para evitar sobrecargas, sólo {count} Emoji(s) en una sola operación)",
-	"somethingHappened": "Ocurrió un error",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "No se ha podido actualizar o borrar el emoji. Por favor comprueba el log del registro para más detalles.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Descartar las ediciones y borrar los Emojis de la lista. ¿Estás seguro de continuar?"
 }
@@ -587,8 +570,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Téléverser",
-	"fromDrive": "Depuis le Disque",
 	"registration": "S’inscrire",
 	"clear": "Effacer",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -598,7 +579,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "Une erreur est survenue",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -613,8 +593,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Unggah",
-	"fromDrive": "Dari Drive",
 	"registration": "Pendaftaran",
 	"clear": "Bersihkan",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -624,7 +602,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "Terjadi kesalahan",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -639,8 +616,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "Crea il campo categoria in base alla cartella.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Storico della registrazione",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Lo storico verrà visualizzato in base alla attività sulle emoji. Scompare quando si esegue un'operazione di aggiornamento/eliminazione o si modifica/ricarica la pagina.",
-	"upload": "Carica",
-	"fromDrive": "Dal Drive",
 	"registration": "Registrazione",
 	"clear": "Cancella",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copia le righe selezionate",
@@ -650,7 +625,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copia l'intervallo selezionato",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Elimina le righe nell'intervallo selezionato",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Registrazione delle emoji elencate come nuove emoji personalizzate. Vuoi davvero procedere? (Per evitare sovraccarichi, puoi registrare al massimo {count} emoji per volta)",
-	"somethingHappened": "Si è verificato un problema",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Attenzione, è impossibile modificare la emoji. Si prega di controllare lo storico per ulteriori dettagli.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Annullare le modifiche e cancella le emoji nell'elenco. Confermi?"
 }
@@ -665,8 +639,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "ディレクトリをドラッグ・ドロップした時に、ディレクトリ名を\"category\"に入力します。",
 	"customEmojisManagerGridCommonRegistrationLogs": "登録ログ",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "絵文字更新・削除時のログが表示されます。更新・削除操作を行ったり、ページを遷移・リロードすると消えます。",
-	"upload": "アップロード",
-	"fromDrive": "ドライブから",
 	"registration": "登録",
 	"clear": "クリア",
 	"customEmojisManagerGridCommonCopySelectionRows": "選択行をコピー",
@@ -676,7 +648,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "選択範囲をコピー",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "選択範囲の値をクリア",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "リストに表示されている絵文字を新たなカスタム絵文字として登録します。よろしいですか？（負荷を避けるため、一度の操作で登録可能な絵文字は{count}件までです）",
-	"somethingHappened": "問題が発生しました",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "絵文字の更新・削除に失敗しました。詳細は登録ログをご確認ください。",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "編集内容を破棄し、リストに表示されている絵文字をクリアします。よろしいですか？"
 }
@@ -691,8 +662,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "ディレクトリをドラッグ・ドロップした時に、ディレクトリ名を\"category\"に入力します。",
 	"customEmojisManagerGridCommonRegistrationLogs": "登録ログ",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "絵文字更新・削除時のログが表示されるで。更新・削除操作をしたり、ページを遷移・リロードしたら消えるから気ぃつけてな。",
-	"upload": "アップロード",
-	"fromDrive": "ドライブから",
 	"registration": "登録",
 	"clear": "クリア",
 	"customEmojisManagerGridCommonCopySelectionRows": "選択行をコピーするで",
@@ -702,7 +671,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "選択範囲をコピーするで",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "選択範囲の値をクリアするで",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "リストに表示されてる絵文字を新たなカスタム絵文字として登録するで。ほんまにええか？ (サーバーがしんどくなるから、一回で登録できる絵文字は{count}件までやで)",
-	"somethingHappened": "なんかあかんわ",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "絵文字の更新・削除に失敗したで。詳細は登録ログを確認してな。",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "編集内容をほかして、リストに表示されている絵文字をクリアするで。ほんまにええか？"
 }
@@ -717,8 +685,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
 	"registration": "Register",
 	"clear": "Return",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -728,7 +694,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "An error has occurred",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -743,8 +708,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
 	"registration": "Register",
 	"clear": "Return",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -754,7 +717,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "An error has occurred",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -769,8 +731,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "디렉토리를 드래그 앤 드롭한 경우, 디렉토리 이름을 \"category\"로 입력합니다.",
 	"customEmojisManagerGridCommonRegistrationLogs": "등록 로그",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "이모지를 갱신하거나 삭제할 때 로그가 표시됩니다. 갱신 또는 삭제하거나, 페이지 이동, 새로 고침하면 삭제됩니다.",
-	"upload": "업로드",
-	"fromDrive": "드라이브에서",
 	"registration": "등록",
 	"clear": "지우기",
 	"customEmojisManagerGridCommonCopySelectionRows": "선택한 행을 복사하기",
@@ -780,7 +740,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "선택범위를 복사하기",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "선택한 행을 삭제",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "리스트에 표시되어진 이모지를 새로운 커스텀 이모지로 등록합니다. 실행할까요? (부하를 피하기 위해, 한 번에 등록할 수 있는 이모지는 {count}건까지 입니다.)",
-	"somethingHappened": "오류가 발생했습니다",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "이모지를 갱신 또는 삭제하지 못했습니다. 자세한 내용은 등록 로그를 확인해주세요.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "편집 내용을 지우고, 목록에 표시되어진 이모지를 지웁니다. 실행할까요?"
 }
@@ -795,8 +754,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Uploaden",
-	"fromDrive": "Van schijf",
 	"registration": "Registreren",
 	"clear": "Terugkeren",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -806,7 +763,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "Er is iets misgegaan.",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -821,8 +777,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Laste opp",
-	"fromDrive": "From Drive",
 	"registration": "Registrer",
 	"clear": "Tøm",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -832,7 +786,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "En feil har oppstått",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -847,8 +800,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Wyślij",
-	"fromDrive": "Z dysku",
 	"registration": "Zarejestruj się",
 	"clear": "Wróć",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -858,7 +809,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "Coś poszło nie tak",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -873,8 +823,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "Quando você arrastar um diretório, converter o caminho das pastas no campo \"categoria\".",
 	"customEmojisManagerGridCommonRegistrationLogs": "Histórico de registros",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Atualizações e remoções de emoji serão gravadas no histórico. Atualizar, remover, mover a uma nova página ou recarregar limpará o histórico",
-	"upload": "Fazer upload",
-	"fromDrive": "Do drive",
 	"registration": "Registar",
 	"clear": "Limpar",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copiar linhas selecionadas",
@@ -884,7 +832,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copiar seleção",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Excluir valores selecionados",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Registrando os Emojis da lista como novos Emojis personalizados. Deseja continuar? (Para evitar sobrecarga, apenas {count} Emoji(s) podem ser registrados em uma única operação)",
-	"somethingHappened": "Ocorreu um erro",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Não foi possível atualizar ou remover emojis. Por favor, confira o histórico de registro para mais detalhes.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Descartando edições e limpando Emojis da lista. Deseja continuar?"
 }
@@ -899,8 +846,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Журнал регистрации",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Журнал будет показан при изменении или удалении эмодзи. Он будет очищен при их изменении или удалении, перемещении на новую страницу или обновлении страницы.",
-	"upload": "Загрузить",
-	"fromDrive": "С Диска",
 	"registration": "Регистрация",
 	"clear": "Очистить",
 	"customEmojisManagerGridCommonCopySelectionRows": "Скопировать выбранную строку",
@@ -910,7 +855,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Скопировать выбранное",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Удалить строки в выделении",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "Что-то пошло не так",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Не удалось обновить или удалить эмодзи. Посмотрите журнал регистрации для подробностей",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -925,8 +869,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Nahrať súbor",
-	"fromDrive": "Z disku",
 	"registration": "Registrácia",
 	"clear": "Vrátiť",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -936,7 +878,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -951,8 +892,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "เมื่อทำการลากและวางไดเรกทอรี ชื่อจะถูกป้อนเป็น \"category\"",
 	"customEmojisManagerGridCommonRegistrationLogs": "ปูมการลงทะเบียน",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "จะแสดงปูมเมื่อมีการอัปเดตหรือลบเอโมจิ หากดำเนินการอัปเดต/ลบ หรือเปลี่ยนหน้า/รีโหลด หน้านี้ ปูมจะหายไป",
-	"upload": "อัปโหลด",
-	"fromDrive": "จากไดรฟ์",
 	"registration": "ลงทะเบียน",
 	"clear": "ล้าง",
 	"customEmojisManagerGridCommonCopySelectionRows": "คัดลอกแถวที่เลือกไว้",
@@ -962,7 +901,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "คัดลือกที่เลือกไว้",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "ล้างค่าช่วงที่เลือก",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "จะลงทะเบียนเอโมจิที่แสดงในรายการเป็นเอโมจิแบบกำหนดเองใหม่\nดำเนินการต่อหรือไม่? (เพื่อหลีกเลี่ยงภาระโหลดหนัก ระบบจะสามารถลงทะเบียนเอโมจิได้สูงสุด {count} รายการต่อครั้ง)",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "การอัปเดตหรือลบเอโมจิล้มเหลว กรุณาตรวจสอบรายละเอียดในปูมการลงทะเบียน",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "ต้องการยกเลิกการแก้ไขและล้างรายการเอโมจิที่แสดงอยู่หรือไม่?"
 }
@@ -977,8 +915,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "Bir dizini sürükleyip bıraktığınızda, “kategori” alanına dizin adını girin.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Kayıt günlüğü",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Emojileri güncellerken veya silerken günlükler görüntülenecek. Güncelleme veya silme işleminden sonra, yeni bir sayfaya geçildiğinde veya yeniden yüklendiğinde günlükler kaybolacak.",
-	"upload": "Yükle",
-	"fromDrive": "Drive'den",
 	"registration": "Kaydol",
 	"clear": "Temizle",
 	"customEmojisManagerGridCommonCopySelectionRows": "Seçili satırları kopyala",
@@ -988,7 +924,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Seçimi kopyala",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Seçimdeki satırları sil",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Listeden Emojileri yeni özel Emojiler olarak kaydet. Devam etmek istediğinden emin misin? (Aşırı yüklemeyi önlemek için, tek bir işlemde yalnızca {count} Emoji kaydedilebilir)",
-	"somethingHappened": "Bir hata oluştu",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Emojileri güncelleyemedi veya silemedi. Ayrıntılar için kayıt günlüğünü kontrol edin.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Düzenlemeleri sil ve listeden Emojileri temizle. Devam etmek istediğinden emin misiniz?"
 }
@@ -1003,8 +938,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Upload",
-	"fromDrive": "From Drive",
 	"registration": "Register",
 	"clear": "Return",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -1014,7 +947,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "An error has occurred",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -1029,8 +961,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Завантажити",
-	"fromDrive": "З диска",
 	"registration": "Реєстрація",
 	"clear": "Очистити",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -1040,7 +970,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "Щось пішло не так",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -1055,8 +984,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "When you drag and drop a directory, enter the directory name in the \"category\" field.",
 	"customEmojisManagerGridCommonRegistrationLogs": "Registration log",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "Logs will be displayed when updating or deleting Emojis. They will disappear after updating or deleting them, moving to a new page, or reloading.",
-	"upload": "Tải lên",
-	"fromDrive": "Từ ổ đĩa",
 	"registration": "Đăng ký",
 	"clear": "Hoàn lại",
 	"customEmojisManagerGridCommonCopySelectionRows": "Copy selected rows",
@@ -1066,7 +993,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "Copy selection",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "Delete rows in the selection",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "Register the Emojis from the list as new custom Emojis. Are you sure to continue? (To avoid overload, only {count} Emoji(s) can be registered in a single operation)",
-	"somethingHappened": "Xảy ra lỗi",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "Failed to update or delete Emojis. Please check the registration log for details.",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "Discard the edits and clear the Emojis from the list. Are you sure to continue?"
 }
@@ -1081,8 +1007,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "拖放目录时，将目录名设置为 “category”。",
 	"customEmojisManagerGridCommonRegistrationLogs": "注册日志",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "将显示更新和删除表情符号的日志。执行更新或删除操作，又或者更改或重新加载页面时会消失。",
-	"upload": "本地上传",
-	"fromDrive": "从网盘中",
 	"registration": "注册",
 	"clear": "清除",
 	"customEmojisManagerGridCommonCopySelectionRows": "复制所选行",
@@ -1092,7 +1016,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "复制所选范围",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "删除所选范围的行",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "要将列表内显示的表情符号替换为新的自定义表情符号吗？（为降低服务器负载，一次操作最多只能注册 {count} 个表情符号）",
-	"somethingHappened": "出错了",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "更新或删除表情符号失败。详情请确认注册日志。",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "要放弃编辑并将列表内表示的表情符号清空吗？"
 }
@@ -1107,8 +1030,6 @@ onMounted(async () => {
 	"customEmojisManagerLocalRegisterDirectoryToCategoryCaption": "拖放目錄時，請在「類別」欄位中輸入目錄名稱。",
 	"customEmojisManagerGridCommonRegistrationLogs": "登錄日誌",
 	"customEmojisManagerGridCommonRegistrationLogsCaption": "會顯示更新或刪除表情符號時的日誌。進行更新或刪除操作，或切換頁面、重新載入後，日誌將會消失。",
-	"upload": "上傳",
-	"fromDrive": "從雲端空間中選擇",
 	"registration": "註冊",
 	"clear": "清除",
 	"customEmojisManagerGridCommonCopySelectionRows": "複製選取的行",
@@ -1118,7 +1039,6 @@ onMounted(async () => {
 	"customEmojisManagerGridCommonCopySelectionRanges": "複製選取的範圍",
 	"customEmojisManagerGridCommonDeleteSelectionRanges": "刪除選取範圍的行",
 	"customEmojisManagerLocalRegisterConfirmRegisterEmojisDescription": "將列表中顯示的表情符號登錄為新的自定表情符號。是否確定？（為避免過高負荷，每次操作最多可登錄{count}個表情符號）",
-	"somethingHappened": "發生錯誤",
 	"customEmojisManagerGridCommonAlertEmojisRegisterFailedDescription": "更新或刪除表情符號失敗。詳情請查看登錄日誌。",
 	"customEmojisManagerLocalRegisterConfirmClearEmojisDescription": "放棄編輯內容並清除列表中顯示的表情符號。是否確定？"
 }
