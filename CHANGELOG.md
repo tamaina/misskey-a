@@ -35,7 +35,7 @@ APIの省略値・nullable・アップロード・エラー・キャンセル処
 - 翻訳の更新 (#41, #42, #44, #155)
 
 #### Feat: MCP連携を搭載, 通常のOAuthで権限を追加できるように
-- Enhance: MCPのAPI呼び出しツールを権限ごとに分割し、付与権限と現在のロールに応じて表示するように（権限なしのAPIは `call_api_general`）
+- Enhance: MCPのAPI呼び出しツールを権限ごとに分割し、付与権限と現在のロールに応じて表示するように（権限なしのAPIは `call_api_general`） (#246)
 - トークンの権限に沿ったAPI検出・呼び出しを行うMCPとOAuth/CIMD連携を追加 (#36, #43, #46, #56, #62)
 - MCPのメンション・返信・アンテナ・main/broadcastなどのイベント購読と、永続化された送信キューを追加 (#66, #72, #74, #76)
 - 通常の OAuth でも明示的な opt-in で権限を選択・追加できるようにし、MCP の同意画面では任意権限を初期 OFF で表示 (#56, #59, #63)
@@ -66,7 +66,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Enhance: 開発者向けにOIDCのID token検証・discovery・短命transaction・token交換と認証進行管理の基盤を追加（ログイン経路への接続は未提供） (#109, #121, #131, #135)
 
 ### Client
-- Fix: アクセストークン作成・OAuth同意画面の管理者権限の項目間隔を揃え、通常権限と管理者権限の一括有効化・無効化を分離
+- Fix: アクセストークン作成・OAuth同意画面の管理者権限の項目間隔を揃え、通常権限と管理者権限の一括有効化・無効化を分離 (#246)
 - Enhance: デッキのチャンネルカラムにも固定の投稿フォーム設定を反映 ([upstream #17247](https://github.com/misskey-dev/misskey/pull/17247))
 - Enhance: URLプレビューの埋め込みプレイヤーを自動再生するか設定可能に ([upstream #18112](https://github.com/misskey-dev/misskey/pull/18112))
 - Fix: 設定検索にプライバシー設定の項目が表示されない問題を修正 ([upstream #18058](https://github.com/misskey-dev/misskey/pull/18058))
