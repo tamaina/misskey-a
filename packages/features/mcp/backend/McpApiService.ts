@@ -8,6 +8,7 @@ import { isContractProcedure } from '@orpc/contract';
 import * as v from 'valibot';
 import { availableEndpointsResult } from '@features/instance/backend/endpoints/available-endpoints.contract.js';
 import { mcpScopes } from './discovery.js';
+import { callToolDefinition, callToolKinds, callToolName } from './call-tools.js';
 import { McpEventsService } from './McpEventsService.js';
 import { ORPCError } from '@orpc/server';
 import { ApiRouterProvider } from '@features/index/backend/api.implementation.js';
@@ -46,6 +47,7 @@ const nonProductiveEndpoints = nonProductiveEndpointNames(pilotContract);
 @Injectable()
 export class McpApiService {
 	private readonly endpoints = endpointPolicies(pilotContract).filter(endpoint => endpoint.mcpSupported && !nonProductiveEndpoints.has(endpoint.name));
+	private readonly callKinds = callToolKinds(this.endpoints.map(endpoint => endpoint.policy.kind ?? null));
 	private genericCaller: ReturnType<typeof createAllowedApiCaller> | undefined;
 	private caller: ReturnType<typeof createAllowedApiCaller> | undefined;
 	constructor(private readonly contexts: ApiExecutionContextFactory, private readonly moduleRef: ModuleRef,
@@ -70,9 +72,9 @@ export class McpApiService {
 			const bound: ApiContext<MiLocalUser> = { ...operationContext, services: { ...operationContext.services, authenticate: async () => [actor, { ...token, permission }] } };
 			return this.moduleRef.get(McpEventsService, { strict: false }).invoke(method, input, bound, invocationSignal);
 		}, invoke: async (tool: string, input: unknown, invocationSignal?: AbortSignal): Promise<unknown> => {
-			validateSelection(tool, input);
+			this.validateSelection(tool, input);
 			const { actor, permission } = await this.checkAccess(principal.id, tokenId);
-			const endpointName = tool === 'call_api' && typeof input.endpoint === 'string' ? input.endpoint : tool === 'list_api_endpoints' ? 'available-endpoints' : 'users/notes';
+			const endpointName = this.callKinds.has(tool) && typeof input.endpoint === 'string' ? input.endpoint : tool === 'list_api_endpoints' ? 'available-endpoints' : 'users/notes';
 			const operationContext = this.contexts.create({ ...request, safeDiagnostics: true, freshAuthorization: true }, endpointName);
 			const bound: ApiContext = { ...operationContext, services: { ...operationContext.services, authenticate: async () => [actor, { ...token, permission }] } };
 			const generic = () => this.genericCaller ??= createAllowedApiCaller(this.moduleRef.get(ApiRouterProvider, { strict: false }).compose(), pilotContract, this.endpoints.map(endpoint => endpoint.name));
@@ -80,10 +82,12 @@ export class McpApiService {
 				if (Object.keys(input).some(key => key !== 'endpoint')) throw new ORPCError('BAD_REQUEST', { message: 'Unexpected discovery argument' });
 				const directory = v.parse(availableEndpointsResult, await generic()('available-endpoints', input, bound, invocationSignal));
 				const supported = new Set(this.endpoints.map(endpoint => endpoint.name));
-				return { ...directory, endpoints: directory.endpoints.filter(name => supported.has(name)), definitions: directory.definitions.filter(endpoint => supported.has(endpoint.name)) };
+				return { ...directory, endpoints: directory.endpoints.filter(name => supported.has(name)), definitions: directory.definitions.filter(endpoint => supported.has(endpoint.name)).map(endpoint => ({ ...endpoint, callTool: callToolName(endpoint.permission) })) };
 			}
-			if (tool === 'call_api') {
+			if (this.callKinds.has(tool)) {
 				if (typeof input.endpoint !== 'string' || !/^[a-z0-9-]+(?:\/[a-z0-9-]+)*$/.test(input.endpoint)) throw new McpSelectionError('TOOL_UNAVAILABLE');
+				const endpoint = this.endpoints.find(endpoint => endpoint.name === input.endpoint);
+				if (!endpoint || (endpoint.policy.kind ?? null) !== this.callKinds.get(tool)) throw new McpSelectionError('TOOL_UNAVAILABLE');
 				if (!isInputObject(input.arguments) || 'i' in input.arguments) throw new ORPCError('BAD_REQUEST', { message: 'Expected API arguments without credentials' });
 				if (Object.keys(input).some(key => key !== 'endpoint' && key !== 'arguments')) throw new ORPCError('BAD_REQUEST', { message: 'Unexpected invocation argument' });
 				return generic()(input.endpoint, input.arguments, bound, invocationSignal);
@@ -96,9 +100,21 @@ export class McpApiService {
 
 	/** Advertise the native endpoint's additional scope only after a real permission denial. */
 	requiredScopes(tool: string, input: unknown): readonly string[] {
-		if (tool !== 'call_api' || !isInputObject(input)) return mcpScopes;
+		if (!this.callKinds.has(tool) || !isInputObject(input)) return mcpScopes;
 		const kind = this.endpoints.find(endpoint => endpoint.name === input.endpoint)?.policy.kind;
-		return kind ? [...new Set([...mcpScopes, kind])] : mcpScopes;
+		return kind && kind === this.callKinds.get(tool) ? [...mcpScopes, kind] : mcpScopes;
+	}
+
+	/** Only groups with at least one currently authorized discoverable endpoint are advertised. */
+	callTools(endpointNames: readonly string[]) {
+		const visible = new Set(endpointNames);
+		const kinds = new Set(this.endpoints.filter(endpoint => visible.has(endpoint.name)).map(endpoint => endpoint.policy.kind ?? null));
+		return [...kinds].map(callToolDefinition).sort((a, b) => a.name.localeCompare(b.name));
+	}
+
+	private validateSelection(tool: string, input: unknown): asserts input is Record<string, unknown> {
+		if (!['list_my_notes', 'list_api_endpoints'].includes(tool) && !this.callKinds.has(tool)) throw new McpSelectionError('TOOL_UNAVAILABLE');
+		if (!isInputObject(input)) throw new ORPCError('BAD_REQUEST', { message: 'Expected an argument object' });
 	}
 
 	private async checkAccess(userId: string, tokenId: string) {
@@ -112,14 +128,9 @@ export class McpApiService {
 	}
 
 	async invoke(tool: string, input: unknown, request: ApiRequestContext, signal?: AbortSignal): Promise<unknown> {
-		validateSelection(tool, input);
+		this.validateSelection(tool, input);
 		return (await this.prepare(request, signal)).invoke(tool, input, signal);
 	}
-}
-
-function validateSelection(tool: string, input: unknown): asserts input is Record<string, unknown> {
-	if (!['list_my_notes', 'call_api', 'list_api_endpoints'].includes(tool)) throw new McpSelectionError('TOOL_UNAVAILABLE');
-	if (!isInputObject(input)) throw new ORPCError('BAD_REQUEST', { message: 'Expected an argument object' });
 }
 
 function isInputObject(input: unknown): input is Record<string, unknown> {

@@ -5,15 +5,16 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { createLocalMcpPilot } from '../../backend/local-transport.js';
+import { callToolDefinition } from '../../backend/call-tools.js';
 import type { McpApiService } from '../../backend/McpApiService.js';
 const close: (() => Promise<unknown>)[] = [];
 
 afterEach(async () => { for (const callback of close.splice(0)) await callback(); });
 
 async function pilot() {
-	const invoke = vi.fn(async () => []);
+	const invoke = vi.fn(async (tool: string) => tool === 'list_api_endpoints' ? { endpoints: ['users/notes'] } : []);
 	const events = vi.fn(async (method: string) => method === 'events/subscribe' ? { id: 'synthetic-sub', refreshBefore: '2026-10-12T00:00:00Z', cursor: null, truncated: false } : method === 'events/list' ? { events: [] } : {});
-	const service = { prepare: vi.fn(async () => ({ invoke, events })), requiredScopes: () => ['access:mcp'] } as unknown as McpApiService;
+	const service = { callTools: () => [callToolDefinition(null)], prepare: vi.fn(async () => ({ invoke, events })), requiredScopes: () => ['access:mcp'] } as unknown as McpApiService;
 	const p = createLocalMcpPilot(service, { enabled: true, resource: 'http://127.0.0.1:61836/mcp' }); await p.app.ready(); close.push(() => p.app.close());
 	const request = (method: string, params: object = {}, extra: Record<string, string> = {}) => p.app.inject({ method: 'POST', url: '/mcp', headers: {
 		host: '127.0.0.1:61836', authorization: 'Bearer synthetic', 'content-type': 'application/json', accept: 'application/json, text/event-stream',
@@ -31,7 +32,7 @@ it('serves modern discovery, events and tools on the same authenticated endpoint
 		const response = await request(method, { synthetic: true }); expect(response.statusCode).toBe(200); expect(response.json().result.resultType).toBe('complete');
 		expect(events).toHaveBeenCalledWith(method, { synthetic: true }, expect.any(AbortSignal));
 	}
-	expect((await request('tools/list')).json().result.tools).toHaveLength(3);
+	expect((await request('tools/list')).json().result.tools.map((tool: { name: string }) => tool.name)).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general']);
 	expect((await request('tools/call', { name: 'list_my_notes', arguments: {} }, { 'mcp-name': 'list_my_notes' })).json().result.resultType).toBe('complete'); expect(invoke).toHaveBeenCalled();
 });
 it('rejects mirrored-header mismatch and missing authorization without executing events', async () => {

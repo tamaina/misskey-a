@@ -156,7 +156,7 @@ describe.skipIf(!socket)('synthetic OAuth discovery through native MCP (isolated
 		const client = new Client({ name: 'synthetic-oauth-client', version: '0' });
 		await client.connect(new StreamableHTTPClientTransport(new URL(resource), { fetch: s.fetchFixture, requestInit: { headers: { authorization: `Bearer ${token.access_token}` } } }));
 		try {
-			expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api']);
+			expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general']);
 			const result = await client.callTool({ name: 'list_my_notes', arguments: {} });
 			expect(result.structuredContent).toEqual({ notes: (await s.f.ordinary({ userId: s.f.own.id }, token.access_token)).json() });
 			await expect(client.callTool({ name: 'list_my_notes', arguments: { userId: s.f.otherId } })).rejects.toBeDefined();
