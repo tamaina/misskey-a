@@ -36,6 +36,7 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import { useRouter } from '@features/navigation/frontend/router.js';
+import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
@@ -65,7 +66,7 @@ function save() {
 async function del() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: $l.value.sfc.deleteAreYouSure({ x: name_.value }),
+		text: interpolateLocaleParameters(globalLocale.value.env.deleteAreYouSure, { x: name_.value }),
 	});
 	if (canceled) return;
 

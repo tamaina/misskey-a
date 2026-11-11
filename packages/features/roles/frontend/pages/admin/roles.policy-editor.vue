@@ -401,8 +401,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Locale } from 'i18n';
-import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { instance } from '@features/instance/frontend/instance.js';
 
@@ -417,8 +415,8 @@ type PolicyMetaRecord = {
 </script>
 
 <script setup lang="ts">
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed, ref, watch } from 'vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import XFolder from '@features/roles/frontend/pages/admin/roles.policy-editor.folder.vue';
@@ -428,6 +426,8 @@ import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	isBaseRole: boolean;

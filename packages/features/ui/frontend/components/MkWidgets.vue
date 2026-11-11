@@ -34,8 +34,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Locale } from 'i18n';
-import { useLocale } from 'virtual:vite-vue-internationalization';
 export type Widget = {
 	name: string;
 	id: string;
@@ -47,8 +45,8 @@ export type DefaultStoredWidget = {
 </script>
 
 <script lang="ts" setup>
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed } from 'vue';
 import { isLink } from '@features/ui/frontend/shared/is-link.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
@@ -61,6 +59,8 @@ import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dic
 import { instance } from '@features/instance/frontend/instance.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import type { Component } from 'vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	widgets: Widget[];

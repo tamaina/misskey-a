@@ -64,8 +64,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Locale } from 'i18n';
-import { useLocale } from 'virtual:vite-vue-internationalization';
 
 export type SuperMenuDef = {
 	title?: string;
@@ -96,8 +94,8 @@ export type SuperMenuDef = {
 </script>
 
 <script lang="ts" setup>
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { useTemplateRef, ref, watch, nextTick, computed, onUnmounted } from 'vue';
 import { throttle } from 'throttle-debounce';
 import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
@@ -106,6 +104,8 @@ import { useRouter } from '@features/navigation/frontend/router.js';
 import { initIntlString, compareStringIncludes } from '@features/web/frontend/utility/intl-string.js';
 import type { SearchIndexItem } from '@features/discovery/frontend/utility/inapp-search.js';
 import type { Awaitable } from '@features/ui/frontend/types/misc.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	def: SuperMenuDef[];

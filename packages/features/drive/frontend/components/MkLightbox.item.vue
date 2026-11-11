@@ -146,8 +146,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Locale } from 'i18n';
-import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 
 type Size = {
@@ -199,8 +197,8 @@ export function calculateSourceTransform({
 </script>
 
 <script lang="ts" setup>
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed, nextTick, ref, useTemplateRef, markRaw, watch, provide, onBeforeUnmount, defineAsyncComponent } from 'vue';
 import MkBlurhash from '@features/drive/frontend/components/MkBlurhash.vue';
 import XControl from '@features/drive/frontend/components/MkLightbox.item.controls.vue';
@@ -215,6 +213,8 @@ import { isTouchUsing } from '@features/ui/frontend/utility/touch.js';
 import { getFileMenu } from '@features/drive/frontend/utility/get-file-menu.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import type XAudioVisualizer__TypeReferenceOnly from '@features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	content: Content;

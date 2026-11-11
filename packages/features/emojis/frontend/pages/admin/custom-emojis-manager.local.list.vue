@@ -49,8 +49,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Locale } from 'i18n';
-import { useLocale } from 'virtual:vite-vue-internationalization';
 
 export type EmojiSearchQuery = {
 	name: string | null;
@@ -69,8 +67,8 @@ export type EmojiSearchQuery = {
 </script>
 
 <script setup lang="ts">
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed, defineAsyncComponent, onMounted, ref, nextTick } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@features/ui/frontend/os.js';
@@ -95,6 +93,8 @@ import type { SortOrder } from '@features/preferences/frontend/components/MkSort
 import type { RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
 import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
 import type { GridSortOrderKey } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 type GridItem = {
 	checked: boolean;

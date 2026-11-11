@@ -15,7 +15,7 @@ import type { RuntimeLocaleDictionary } from 'vite-vue-internationalization/runt
 export const globalCatalogPilotOwners = [
 	{
 		"file": "packages/features/announcements/frontend/components/MkAnnouncementDialog.vue",
-		"currentSha256": "a49b1b88c6ec7cb5a2ff19b4d7eecba80931d43585c79bf4157b5b68657c44a9",
+		"currentSha256": "5984bb18c1d84eec2e86b3cf483c011412d7dd17e7c288f0cd5db463ca072db4",
 		"baselineSha256": "39e6076f76e0ce6e7a6b9e6b9b72873a0658112f877ab85a4902fd305f678bc4",
 		"keys": [
 			"close"
@@ -28,28 +28,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1210,
-				"end": 1246,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 1046,
+				"end": 1146,
+				"current": "\t\t\t>\n\t\t\t\t{{ hasReachedBottom ? globalLocale.env.close : $locale.sfc.scrollToClose }}\n\t\t\t</MkButton>\n",
+				"baseline": "\t\t\t>{{ hasReachedBottom ? globalLocale.env.close : $locale.sfc.scrollToClose }}</MkButton>\n"
 			},
 			{
-				"start": 1305,
-				"end": 1305,
+				"start": 1279,
+				"end": 1279,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1796,
-				"end": 1854,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1771,
+				"end": 1865,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/announcements/frontend/pages/admin/announcements.vue",
-		"currentSha256": "1a8e79446a17395586d6eb21df6187c074f020ea622d0083a4929e8446a3425d",
+		"currentSha256": "8d2c1c9e0396bd444906f60514b5c31f1d93f84487173e60080335a195a75fe8",
 		"baselineSha256": "8216ce30170a3c8b35764c8415014c1bd47299d42978a107a5a9c5ddb1033f03",
 		"keys": [
 			"save",
@@ -99,28 +99,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 5197,
-				"end": 5233,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 5292,
-				"end": 5292,
+				"start": 5257,
+				"end": 5257,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 6671,
-				"end": 6729,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 5340,
+				"end": 5340,
+				"current": "",
+				"baseline": "import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';\n"
+			},
+			{
+				"start": 6559,
+				"end": 6731,
+				"current": "import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/announcements/frontend/pages/announcement.vue",
-		"currentSha256": "3c31b666fba79fcc5e383c584981167192025991c945fd3a5d86d4d1f159c90f",
+		"currentSha256": "d954fa5afb911e83783877b46210196716049de1fced7dc638f7c87d9823ba60",
 		"baselineSha256": "7772f834f22b870fb4462d7d00604869042fc074e01d833ad02cb71b27c61f7c",
 		"keys": [
 			"gotIt",
@@ -139,28 +139,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2374,
-				"end": 2410,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2469,
-				"end": 2469,
+				"start": 2434,
+				"end": 2434,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3022,
-				"end": 3080,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2988,
+				"end": 3082,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/announcements/frontend/pages/announcements.vue",
-		"currentSha256": "029bc857f1291a2c0a1c998e255ba25fc47fce54efa59d3e852df5b8799f40bc",
+		"currentSha256": "e536cf3644ff55c46daa69253a0f096abe2743d4377a50302c2eb6fe1a537e54",
 		"baselineSha256": "4e57ca112c9e1ead4de6afe497f1c9595d45c027fc05ece0ab57c106993c86da",
 		"keys": [
 			"gotIt",
@@ -182,28 +176,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2439,
-				"end": 2475,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2534,
-				"end": 2534,
+				"start": 2499,
+				"end": 2499,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3340,
-				"end": 3398,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 3306,
+				"end": 3400,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/api/frontend/ui/_common_/stream-indicator.vue",
-		"currentSha256": "aff67a030c2169baf5c69919689e829a2a43fcf55a882e18676c961c98a94980",
+		"currentSha256": "03000d26b3108e8b07e799609335144e39ccede6b7bc5f2a982cc3cea67bf58e",
 		"baselineSha256": "47259b21d93960db7d5aba4701546f318918b3d607238bc3a85aaa869ade1b67",
 		"keys": [
 			"reload"
@@ -215,28 +203,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 600,
-				"end": 636,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 695,
-				"end": 695,
+				"start": 660,
+				"end": 660,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1054,
-				"end": 1112,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1020,
+				"end": 1114,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkAuthConfirm.vue",
-		"currentSha256": "3122bd5cfcbeb23a9d89f6de8225cbeb378317c95523f6ef6c38b69c9f12aec9",
+		"currentSha256": "5d1e9415e15fcfc5a973bbe6939d4405cb528aa4307b5806114159e231b57cfd",
 		"baselineSha256": "d36befd86c58d5f8f193dfba5dc43edaab4138f5dc9a535cfe517b16cc5f8245",
 		"keys": [
 			"somethingHappened",
@@ -278,34 +260,132 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3293,
-				"end": 3293,
+				"start": 2847,
+				"end": 2985,
+				"current": "\t\t\t\t\t\t<li v-for=\"p in permissions\" :key=\"p\">{{ (copyLocaleDictionary(globalLocale.env._permissions) as Record<string, string>)[p] }}</li>\n",
+				"baseline": "\t\t\t\t\t\t<li v-for=\"p in permissions\" :key=\"p\">{{ copyLocaleDictionary(globalLocale.env._permissions)[p] }}</li>\n"
+			},
+			{
+				"start": 3160,
+				"end": 3332,
+				"current": "\t\t\t<MkPermissionSelect\n\t\t\t\tv-if=\"selectablePermissions\" v-model=\"selectedPermissions\" :permissions=\"selectablePermissions\"\n\t\t\t\t:administrator=\"selectedAdministrator\"\n\t\t\t/>\n",
+				"baseline": "\t\t\t<MkPermissionSelect v-if=\"selectablePermissions\" v-model=\"selectedPermissions\" :permissions=\"selectablePermissions\"\n\t\t\t\t:administrator=\"selectedAdministrator\" :labels=\"copyLocaleDictionary(globalLocale.env._permissions)\"\n\t\t\t\t:disableAllText=\"globalLocale.env.disableAll\" :enableAllText=\"globalLocale.env.enableAll\"\n\t\t\t\t:disableAllAdminText=\"globalLocale.env.disableAllAdmin\" :enableAllAdminText=\"globalLocale.env.enableAllAdmin\" :adminPermissionText=\"globalLocale.env.adminPermission\"/>\n"
+			},
+			{
+				"start": 5611,
+				"end": 5611,
 				"current": "",
-				"baseline": " :labels=\"copyLocaleDictionary(globalLocale.env._permissions)\"\n\t\t\t\t:disableAllText=\"globalLocale.env.disableAll\" :enableAllText=\"globalLocale.env.enableAll\"\n\t\t\t\t:disableAllAdminText=\"globalLocale.env.disableAllAdmin\" :enableAllAdminText=\"globalLocale.env.enableAllAdmin\" :adminPermissionText=\"globalLocale.env.adminPermission\""
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 5515,
-				"end": 5551,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 5610,
-				"end": 5610,
+				"start": 5687,
+				"end": 5687,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import MkPermissionSelect from './MkPermissionSelect.vue';\n"
 			},
 			{
-				"start": 6401,
-				"end": 6459,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 6344,
+				"end": 6497,
+				"current": "import MkPermissionSelect from './MkPermissionSelect.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"permissionsLabels": [
+				"access:mcp",
+				"read:account",
+				"write:account",
+				"read:blocks",
+				"write:blocks",
+				"read:drive",
+				"write:drive",
+				"read:favorites",
+				"write:favorites",
+				"read:following",
+				"write:following",
+				"read:messaging",
+				"write:messaging",
+				"read:mutes",
+				"write:mutes",
+				"write:notes",
+				"read:notifications",
+				"write:notifications",
+				"read:reactions",
+				"write:reactions",
+				"write:votes",
+				"read:pages",
+				"write:pages",
+				"read:page-likes",
+				"write:page-likes",
+				"read:user-groups",
+				"write:user-groups",
+				"read:channels",
+				"write:channels",
+				"read:gallery",
+				"write:gallery",
+				"read:gallery-likes",
+				"write:gallery-likes",
+				"read:flash",
+				"write:flash",
+				"read:flash-likes",
+				"write:flash-likes",
+				"read:admin:abuse-user-reports",
+				"write:admin:delete-account",
+				"write:admin:delete-all-files-of-a-user",
+				"read:admin:index-stats",
+				"read:admin:table-stats",
+				"read:admin:user-ips",
+				"read:admin:meta",
+				"write:admin:reset-password",
+				"write:admin:resolve-abuse-user-report",
+				"write:admin:send-email",
+				"read:admin:server-info",
+				"read:admin:show-moderation-log",
+				"read:admin:show-user",
+				"write:admin:suspend-user",
+				"write:admin:unset-mfa",
+				"write:admin:unset-user-avatar",
+				"write:admin:unset-user-banner",
+				"write:admin:unsuspend-user",
+				"write:admin:meta",
+				"write:admin:user-note",
+				"write:admin:roles",
+				"read:admin:roles",
+				"write:admin:relays",
+				"read:admin:relays",
+				"write:admin:invite-codes",
+				"read:admin:invite-codes",
+				"write:admin:announcements",
+				"read:admin:announcements",
+				"write:admin:avatar-decorations",
+				"read:admin:avatar-decorations",
+				"write:admin:federation",
+				"write:admin:account",
+				"read:admin:account",
+				"write:admin:emoji",
+				"read:admin:emoji",
+				"write:admin:queue",
+				"read:admin:queue",
+				"write:admin:promo",
+				"write:admin:drive",
+				"read:admin:drive",
+				"read:admin:stream",
+				"write:admin:ad",
+				"read:admin:ad",
+				"write:invite-codes",
+				"read:invite-codes",
+				"write:clip-favorite",
+				"read:clip-favorite",
+				"read:federation",
+				"write:report-abuse",
+				"write:chat",
+				"read:chat"
+			]
+		}
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkInviteCode.vue",
-		"currentSha256": "92fc709f5addffc762072e4c5f5d405702686bbddec603217e470529263f36bc",
+		"currentSha256": "fd58a271311dbf4cd710fbad7ff482d34c7ba5aaeb2b3f6ce42d74e433dd5d24",
 		"baselineSha256": "bc19a1c54705e39d82f1e975dc8f224ab3c35d26757ae8eaf4ecfe634a47af12",
 		"keys": [
 			"delete",
@@ -329,28 +409,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2508,
-				"end": 2544,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2603,
-				"end": 2603,
+				"start": 2568,
+				"end": 2568,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2950,
-				"end": 3008,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2916,
+				"end": 3010,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkPasswordDialog.vue",
-		"currentSha256": "02925ecc24e8ad685a2ce41b9d86a02f680e792b0bf6e18f8ec5df88c25274d5",
+		"currentSha256": "89d063643c4f508d7548b0a37043c64bd3fe161fed921b0f25b6a0627690ee95",
 		"baselineSha256": "5d88f7f78a6b070f88db5c7a4465aae7d8a940e25688d05be7d2621041c314aa",
 		"keys": [
 			"continue"
@@ -367,28 +441,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1958,
-				"end": 1994,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2053,
-				"end": 2053,
+				"start": 2018,
+				"end": 2018,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2385,
-				"end": 2443,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2351,
+				"end": 2445,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignin.input.vue",
-		"currentSha256": "ca0e851be26e8a519324a9454bc94d971754d15f0661f490e1fc16f168ba4b64",
+		"currentSha256": "98c31eab52bce347ae1ef1f36e9690773bd01ccb80782e7d3cbdcda3d1e70d81",
 		"baselineSha256": "cc8fc6d7882268e3a8a0b8d704c5f86625bc1c0a318c21651f4bc7c66e1c4464",
 		"keys": [
 			"continue"
@@ -406,28 +474,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1973,
-				"end": 2009,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 545,
+				"end": 621,
+				"current": "\t\t\t\t\t{{ $locale.sfc.continueOnRemote }} <i class=\"ti ti-external-link\"></i>\n",
+				"baseline": "\t\t\t\t\t{{ globalLocale.env.continueOnRemote }} <i class=\"ti ti-external-link\"></i>\n"
 			},
 			{
-				"start": 2068,
-				"end": 2068,
+				"start": 2033,
+				"end": 2033,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2640,
-				"end": 2698,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2258,
+				"end": 2258,
+				"current": "",
+				"baseline": "import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';\n"
+			},
+			{
+				"start": 2514,
+				"end": 2700,
+				"current": "import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignin.passkey.vue",
-		"currentSha256": "7e701febddfad910787889844ed315175b634d17c9348088a28a9844605cd3d0",
+		"currentSha256": "fce447069c14359af20864626d428bc8dbf72df7c118d40fa71bfc83bc0cfb54",
 		"baselineSha256": "f0ac9281aabe608396969de32b234c1fa1d5f57ff4f016a019782c3749ccca37",
 		"keys": [
 			"retry"
@@ -439,28 +513,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 797,
-				"end": 833,
-				"current": "type { Locale } from 'i18n';\nimport ",
+				"start": 857,
+				"end": 857,
+				"current": "",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 1029,
+				"end": 1065,
+				"current": "import type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 892,
-				"end": 892,
-				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
-			},
-			{
-				"start": 1178,
-				"end": 1236,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1180,
+				"end": 1238,
+				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignin.password.vue",
-		"currentSha256": "460a8099586b71fd5fc612d156da8d9fcd08b3c4684d7d3344a38ed03c786e7d",
+		"currentSha256": "d52c6926a2c6c4837e977617b3fa9313d96266cbcf57c2b58d6739322c94edfe",
 		"baselineSha256": "deec8dc8ff34adb89d26b6ba8a56cfed188acc0d159000a6cc290020080b085b",
 		"keys": [
 			"continue"
@@ -473,28 +547,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2264,
-				"end": 2300,
-				"current": "type { Locale } from 'i18n';\nimport ",
+				"start": 2257,
+				"end": 2257,
+				"current": "",
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 2538,
+				"end": 2641,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 2359,
-				"end": 2359,
-				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
-			},
-			{
-				"start": 3086,
-				"end": 3144,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 3088,
+				"end": 3146,
+				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignin.totp.vue",
-		"currentSha256": "3406115d62d89d041a5035b394d8323051004297cd6f040d4c8c9f71ca13af80",
+		"currentSha256": "d5df15ace2eebe10d6078cf158fbd1d293ed8710766052bfa49c0fbad61ec805",
 		"baselineSha256": "6b19cabca936e5980d2807f1f4a6a36df058dfed62803c05f3989aab2f6d86b2",
 		"keys": [
 			"continue"
@@ -508,28 +582,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1289,
-				"end": 1325,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1384,
-				"end": 1384,
+				"start": 1349,
+				"end": 1349,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1549,
-				"end": 1607,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1515,
+				"end": 1609,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignupDialog.form.vue",
-		"currentSha256": "0b01d687a5f5315d68e4c114a02fa723589e5e63335f3c0b1b51f264a32eca9b",
+		"currentSha256": "5520a3fa578f59b238f1d855cba577a4eea404a0be70783ce998b48dd296277c",
 		"baselineSha256": "66697782b1d396279dfc7174c47befe85c85301ffd2e20514a39308cfae8b92b",
 		"keys": [
 			"somethingHappened",
@@ -569,28 +637,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 7344,
-				"end": 7380,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 7439,
-				"end": 7439,
+				"start": 7404,
+				"end": 7404,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 8279,
-				"end": 8337,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 7727,
+				"end": 7727,
+				"current": "",
+				"baseline": "import type { Captcha } from '@features/auth/frontend/components/MkCaptcha.vue';\n"
+			},
+			{
+				"start": 8164,
+				"end": 8339,
+				"current": "import type { Captcha } from '@features/auth/frontend/components/MkCaptcha.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignupDialog.rules.vue",
-		"currentSha256": "8bb93c3e456f7725362d14f098e274070733191be6bf586475ef336e4385f267",
+		"currentSha256": "7da9a633d3133089ea5ad00366af71a7be78e0d5ad8bc03a01e3bfb177b7f7f4",
 		"baselineSha256": "cc1386f44e5b9f520032ac0a1762d76a6853f36663e4bf6c4d7579bd771662fc",
 		"keys": [
 			"cancel",
@@ -618,28 +686,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3536,
-				"end": 3572,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 3631,
-				"end": 3631,
+				"start": 3596,
+				"end": 3596,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 4169,
-				"end": 4227,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 4135,
+				"end": 4229,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkTokenGenerateWindow.vue",
-		"currentSha256": "472304bdee7ade8cfbfa89a4903e9267ba77168e4927d3baaf2c648970224bdc",
+		"currentSha256": "6c6fe37202261ef1bf8d6ce9c11cbcbabe7a4e2eee759ce0de0bd6bbf3dcc192",
 		"baselineSha256": "ea0dc9eccc892bbb4e8ad2656cb4b795db0739eb194d3899b17bcd839aa60010",
 		"keys": [
 			"name",
@@ -665,40 +727,132 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 863,
-				"end": 863,
+				"start": 748,
+				"end": 866,
+				"current": "\t\t\t<MkPermissionSelect v-model=\"selectedPermissions\" :permissions=\"Misskey.permissions\" :administrator=\"!!iAmAdmin\"/>\n",
+				"baseline": "\t\t\t<MkPermissionSelect v-model=\"selectedPermissions\" :permissions=\"Misskey.permissions\" :administrator=\"!!iAmAdmin\"\n\t\t\t\t:labels=\"copyLocaleDictionary(globalLocale.env.permissionsLabels)\" :disableAllText=\"globalLocale.env.disableAll\" :enableAllText=\"globalLocale.env.enableAll\"\n\t\t\t\t:disableAllAdminText=\"globalLocale.env.disableAllAdmin\" :enableAllAdminText=\"globalLocale.env.enableAllAdmin\" :adminPermissionText=\"globalLocale.env.adminPermission\"/>\n"
+			},
+			{
+				"start": 1005,
+				"end": 1005,
 				"current": "",
-				"baseline": "\n\t\t\t\t:labels=\"copyLocaleDictionary(globalLocale.env._permissions)\" :disableAllText=\"globalLocale.env.disableAll\" :enableAllText=\"globalLocale.env.enableAll\"\n\t\t\t\t:disableAllAdminText=\"globalLocale.env.disableAllAdmin\" :enableAllAdminText=\"globalLocale.env.enableAllAdmin\" :adminPermissionText=\"globalLocale.env.adminPermission\""
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 945,
-				"end": 981,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1040,
-				"end": 1040,
+				"start": 1155,
+				"end": 1155,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import MkPermissionSelect from './MkPermissionSelect.vue';\n"
 			},
 			{
-				"start": 1405,
-				"end": 1405,
+				"start": 1301,
+				"end": 1301,
 				"current": "",
-				"baseline": "copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';\nimport { "
+				"baseline": "import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';\n"
 			},
 			{
-				"start": 1451,
-				"end": 1509,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1358,
+				"end": 1511,
+				"current": "import MkPermissionSelect from './MkPermissionSelect.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"permissionsLabels": [
+				"access:mcp",
+				"read:account",
+				"write:account",
+				"read:blocks",
+				"write:blocks",
+				"read:drive",
+				"write:drive",
+				"read:favorites",
+				"write:favorites",
+				"read:following",
+				"write:following",
+				"read:messaging",
+				"write:messaging",
+				"read:mutes",
+				"write:mutes",
+				"write:notes",
+				"read:notifications",
+				"write:notifications",
+				"read:reactions",
+				"write:reactions",
+				"write:votes",
+				"read:pages",
+				"write:pages",
+				"read:page-likes",
+				"write:page-likes",
+				"read:user-groups",
+				"write:user-groups",
+				"read:channels",
+				"write:channels",
+				"read:gallery",
+				"write:gallery",
+				"read:gallery-likes",
+				"write:gallery-likes",
+				"read:flash",
+				"write:flash",
+				"read:flash-likes",
+				"write:flash-likes",
+				"read:admin:abuse-user-reports",
+				"write:admin:delete-account",
+				"write:admin:delete-all-files-of-a-user",
+				"read:admin:index-stats",
+				"read:admin:table-stats",
+				"read:admin:user-ips",
+				"read:admin:meta",
+				"write:admin:reset-password",
+				"write:admin:resolve-abuse-user-report",
+				"write:admin:send-email",
+				"read:admin:server-info",
+				"read:admin:show-moderation-log",
+				"read:admin:show-user",
+				"write:admin:suspend-user",
+				"write:admin:unset-mfa",
+				"write:admin:unset-user-avatar",
+				"write:admin:unset-user-banner",
+				"write:admin:unsuspend-user",
+				"write:admin:meta",
+				"write:admin:user-note",
+				"write:admin:roles",
+				"read:admin:roles",
+				"write:admin:relays",
+				"read:admin:relays",
+				"write:admin:invite-codes",
+				"read:admin:invite-codes",
+				"write:admin:announcements",
+				"read:admin:announcements",
+				"write:admin:avatar-decorations",
+				"read:admin:avatar-decorations",
+				"write:admin:federation",
+				"write:admin:account",
+				"read:admin:account",
+				"write:admin:emoji",
+				"read:admin:emoji",
+				"write:admin:queue",
+				"read:admin:queue",
+				"write:admin:promo",
+				"write:admin:drive",
+				"read:admin:drive",
+				"read:admin:stream",
+				"write:admin:ad",
+				"read:admin:ad",
+				"write:invite-codes",
+				"read:invite-codes",
+				"write:clip-favorite",
+				"read:clip-favorite",
+				"read:federation",
+				"write:report-abuse",
+				"write:chat",
+				"read:chat"
+			]
+		}
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/admin/bot-protection.vue",
-		"currentSha256": "85f90d05a79b27eec96e4f9e54d351bd6c553baa492a85f22fca9c6ae683ef84",
+		"currentSha256": "e9fcf480149f6a8505c30f53a3d5b26f62dfdab7b0a55fb942761303b4364417",
 		"baselineSha256": "5760426b24bc3d8a0b2a1ea46b7fb49634da82a64deeb074acde35b908fabf6b",
 		"keys": [
 			"none"
@@ -728,28 +882,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 6923,
-				"end": 6959,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 7018,
-				"end": 7018,
+				"start": 6983,
+				"end": 6983,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 7896,
-				"end": 7954,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 7088,
+				"end": 7088,
+				"current": "",
+				"baseline": "import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';\n"
+			},
+			{
+				"start": 7784,
+				"end": 7956,
+				"current": "import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/admin/invites.vue",
-		"currentSha256": "da3f9cf9f398401392c4b44c0874b3da6c60e1f1370552bf9b1f332cacbcc9cc",
+		"currentSha256": "32913ba69661d02fb3187eac4040462a881e6d8e50b46e5e2e9e821afb3212f4",
 		"baselineSha256": "1032324f77bd3d24f197477828485a4a1f40c36210903fe903a98abf24fefbb1",
 		"keys": [
 			"all",
@@ -778,28 +932,40 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1654,
-				"end": 1690,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 339,
+				"end": 406,
+				"current": "\t\t\t\t<template #label>{{ $locale.sfc.createInviteCode }}</template>\n",
+				"baseline": "\t\t\t\t<template #label>{{ globalLocale.env.createInviteCode }}</template>\n"
 			},
 			{
-				"start": 1749,
-				"end": 1749,
+				"start": 787,
+				"end": 851,
+				"current": "\t\t\t\t\t\t<template #label>{{ $locale.sfc.createCount }}</template>\n",
+				"baseline": "\t\t\t\t\t\t<template #label>{{ globalLocale.env.createCount }}</template>\n"
+			},
+			{
+				"start": 1714,
+				"end": 1714,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2703,
-				"end": 2761,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2669,
+				"end": 2763,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 4129,
+				"end": 4175,
+				"current": "\t\ttitle: $locale.value.sfc.inviteCodeCreated,\n",
+				"baseline": "\t\ttitle: globalLocale.value.env.inviteCodeCreated,\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/auth.form.vue",
-		"currentSha256": "ddb681326b1e2f00d3f5cfcaa638848f0e71915976ce81635ebce1d13227acb4",
+		"currentSha256": "f1198325be0cce660efecfa016e54b07877a2204665d309925207b3f48639bf3",
 		"baselineSha256": "8a39620c5410146d90c720df4518695894cba8dfa2231d4ae61381bb8c12c54c",
 		"keys": [
 			"cancel",
@@ -815,28 +981,120 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 737,
-				"end": 773,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 246,
+				"end": 386,
+				"current": "\t\t\t<li v-for=\"p in permissions\" :key=\"p\">{{ (copyLocaleDictionary(globalLocale.env._permissions) as Record<string, string>)[p] ?? p }}</li>\n",
+				"baseline": "\t\t\t<li v-for=\"p in permissions\" :key=\"p\">{{ copyLocaleDictionary(globalLocale.env._permissions)[p] ?? p }}</li>\n"
 			},
 			{
-				"start": 832,
-				"end": 832,
+				"start": 825,
+				"end": 825,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1248,
-				"end": 1306,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1242,
+				"end": 1336,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"permissionsLabels": [
+				"access:mcp",
+				"read:account",
+				"write:account",
+				"read:blocks",
+				"write:blocks",
+				"read:drive",
+				"write:drive",
+				"read:favorites",
+				"write:favorites",
+				"read:following",
+				"write:following",
+				"read:messaging",
+				"write:messaging",
+				"read:mutes",
+				"write:mutes",
+				"write:notes",
+				"read:notifications",
+				"write:notifications",
+				"read:reactions",
+				"write:reactions",
+				"write:votes",
+				"read:pages",
+				"write:pages",
+				"read:page-likes",
+				"write:page-likes",
+				"read:user-groups",
+				"write:user-groups",
+				"read:channels",
+				"write:channels",
+				"read:gallery",
+				"write:gallery",
+				"read:gallery-likes",
+				"write:gallery-likes",
+				"read:flash",
+				"write:flash",
+				"read:flash-likes",
+				"write:flash-likes",
+				"read:admin:abuse-user-reports",
+				"write:admin:delete-account",
+				"write:admin:delete-all-files-of-a-user",
+				"read:admin:index-stats",
+				"read:admin:table-stats",
+				"read:admin:user-ips",
+				"read:admin:meta",
+				"write:admin:reset-password",
+				"write:admin:resolve-abuse-user-report",
+				"write:admin:send-email",
+				"read:admin:server-info",
+				"read:admin:show-moderation-log",
+				"read:admin:show-user",
+				"write:admin:suspend-user",
+				"write:admin:unset-mfa",
+				"write:admin:unset-user-avatar",
+				"write:admin:unset-user-banner",
+				"write:admin:unsuspend-user",
+				"write:admin:meta",
+				"write:admin:user-note",
+				"write:admin:roles",
+				"read:admin:roles",
+				"write:admin:relays",
+				"read:admin:relays",
+				"write:admin:invite-codes",
+				"read:admin:invite-codes",
+				"write:admin:announcements",
+				"read:admin:announcements",
+				"write:admin:avatar-decorations",
+				"read:admin:avatar-decorations",
+				"write:admin:federation",
+				"write:admin:account",
+				"read:admin:account",
+				"write:admin:emoji",
+				"read:admin:emoji",
+				"write:admin:queue",
+				"read:admin:queue",
+				"write:admin:promo",
+				"write:admin:drive",
+				"read:admin:drive",
+				"read:admin:stream",
+				"write:admin:ad",
+				"read:admin:ad",
+				"write:invite-codes",
+				"read:invite-codes",
+				"write:clip-favorite",
+				"read:clip-favorite",
+				"read:federation",
+				"write:report-abuse",
+				"write:chat",
+				"read:chat"
+			]
+		}
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/auth.vue",
-		"currentSha256": "e56abe80ecc91bdf3d700b3e9865be1dea20423a7dd5bebef9c9d34e15e829f4",
+		"currentSha256": "d2fb8b2b4cdbc0209d67e0b724fdf77c2b3f4b4750a418ef6c1c1ab044bf0d0a",
 		"baselineSha256": "beb2072811e658ccade5c93cafa794aab61b1f564d6766443988d3e70b8b63c4",
 		"keys": [
 			"somethingHappened"
@@ -853,28 +1111,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1183,
-				"end": 1219,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1278,
-				"end": 1278,
+				"start": 1243,
+				"end": 1243,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1757,
-				"end": 1815,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1723,
+				"end": 1817,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/invite.vue",
-		"currentSha256": "c457fcf609527805658c3eeae4ec3cc3b6122f45d9547abf12337306d9280560",
+		"currentSha256": "e27edd2f48cc11b0f29d5b07551b3fac0c4b555425b34292651c076394a4ebd3",
 		"baselineSha256": "0c7c224e7d671f76ac170d1650eaa76383d458ca26a630668e0a5d5dc4703a84",
 		"keys": [
 			"invite"
@@ -891,28 +1143,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1246,
-				"end": 1282,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 416,
+				"end": 574,
+				"current": "\t\t\t<div v-if=\"resetCycle && inviteLimit\">{{ interpolateLocaleParameters($locale.sfc.inviteLimitResetCycle, { time: resetCycle, limit: inviteLimit }) }}</div>\n",
+				"baseline": "\t\t\t<div v-if=\"resetCycle && inviteLimit\">{{ interpolateLocaleParameters(globalLocale.env.inviteLimitResetCycle, { time: resetCycle, limit: inviteLimit }) }}</div>\n"
 			},
 			{
-				"start": 1341,
-				"end": 1341,
+				"start": 1306,
+				"end": 1306,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2146,
-				"end": 2204,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2112,
+				"end": 2206,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 3049,
+				"end": 3095,
+				"current": "\t\ttitle: $locale.value.sfc.inviteCodeCreated,\n",
+				"baseline": "\t\ttitle: globalLocale.value.env.inviteCodeCreated,\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/reset-password.vue",
-		"currentSha256": "6d72fb7439b9f21333e5b05bd7cd08758e5df88535958a9515f073912b8c30d2",
+		"currentSha256": "f9d3857275d352e1f670797571eb52cebd8fbdad6d4389d8fa8b024998354433",
 		"baselineSha256": "21c9838538962a0d8035a08362af9d5572b6155a90e18d3f454e0d856527dffd",
 		"keys": [
 			"save"
@@ -924,28 +1182,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 647,
-				"end": 683,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 742,
-				"end": 742,
+				"start": 707,
+				"end": 707,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1138,
-				"end": 1196,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1104,
+				"end": 1198,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
-		"currentSha256": "3ab3257bc3853b1f81089e61e052d2b792d4f500f94eadbd4b0a1d924f2e0a6e",
+		"currentSha256": "dff0a032b822cb4ff5e65406c991f7e98302ad6856c4c148be134c1c9ff1f847",
 		"baselineSha256": "1fbfe1551acb011d45077e483b5b7980b94b430be924f8c7e27b15e853d3aaab",
 		"keys": [
 			"cancel",
@@ -976,28 +1228,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 4520,
-				"end": 4556,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 4615,
-				"end": 4615,
+				"start": 4580,
+				"end": 4580,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 5574,
-				"end": 5632,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 5540,
+				"end": 5634,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/2fa.vue",
-		"currentSha256": "9063cfa38e152ed9fa181f21616961b13ad023612f0053b07adc72995fa112a0",
+		"currentSha256": "94744730037de5c0a7630d10936b5e6894ced4af05bcba6727e336c5a66dae99",
 		"baselineSha256": "27c6f44fce8b2b8e8d05629bb00f8431cab3e7ea3b28d5a8b0cd2c903c24c068",
 		"keys": [
 			"learnMore",
@@ -1034,28 +1280,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3856,
-				"end": 3892,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 3951,
-				"end": 3951,
+				"start": 3916,
+				"end": 3916,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 4836,
-				"end": 4894,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 4802,
+				"end": 4896,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/accounts.vue",
-		"currentSha256": "5afb1ff008e96ccb30f58792aea9eb69ec202cf24a80237f6858bb12f4d47c2d",
+		"currentSha256": "692e71099d58f9338b74d9e6e50f21c115e6b6484cbdbf176d7d81b97a4202aa",
 		"baselineSha256": "b7a1ea8c65613114118ba1baa1182c396b7dd5976dfcbb4f08120ba75935288a",
 		"keys": [
 			"remove"
@@ -1070,28 +1310,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 737,
-				"end": 773,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 832,
-				"end": 832,
+				"start": 797,
+				"end": 797,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1617,
-				"end": 1675,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 873,
+				"end": 873,
+				"current": "",
+				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
+			},
+			{
+				"start": 1506,
+				"end": 1677,
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/apps.vue",
-		"currentSha256": "9c034971172eb5ea4ac96fab0464f7cd6a1c4cb4a173521de8157d51613333bd",
+		"currentSha256": "423c24ccdad7cd2c3f96d055cd7637581ccd87680eb56e437d2a867e5e7f69f4",
 		"baselineSha256": "ff21ef25f6d281d99d18339133d080a3f55cddb4e86c9ed5b76aa8f46c0f8664",
 		"keys": [
 			"delete",
@@ -1110,28 +1350,120 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1971,
-				"end": 2007,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 1688,
+				"end": 1838,
+				"current": "\t\t\t\t\t\t\t\t<li v-for=\"p in token.permission\" :key=\"p\">{{ (copyLocaleDictionary(globalLocale.env._permissions) as Record<string, string>)[p] ?? p }}</li>\n",
+				"baseline": "\t\t\t\t\t\t\t\t<li v-for=\"p in token.permission\" :key=\"p\">{{ (copyLocaleDictionary(globalLocale.env.permissionsLabels) as any)[p] ?? p }}</li>\n"
 			},
 			{
-				"start": 2066,
-				"end": 2066,
+				"start": 2050,
+				"end": 2050,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2751,
-				"end": 2809,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2736,
+				"end": 2830,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"permissionsLabels": [
+				"access:mcp",
+				"read:account",
+				"write:account",
+				"read:blocks",
+				"write:blocks",
+				"read:drive",
+				"write:drive",
+				"read:favorites",
+				"write:favorites",
+				"read:following",
+				"write:following",
+				"read:messaging",
+				"write:messaging",
+				"read:mutes",
+				"write:mutes",
+				"write:notes",
+				"read:notifications",
+				"write:notifications",
+				"read:reactions",
+				"write:reactions",
+				"write:votes",
+				"read:pages",
+				"write:pages",
+				"read:page-likes",
+				"write:page-likes",
+				"read:user-groups",
+				"write:user-groups",
+				"read:channels",
+				"write:channels",
+				"read:gallery",
+				"write:gallery",
+				"read:gallery-likes",
+				"write:gallery-likes",
+				"read:flash",
+				"write:flash",
+				"read:flash-likes",
+				"write:flash-likes",
+				"read:admin:abuse-user-reports",
+				"write:admin:delete-account",
+				"write:admin:delete-all-files-of-a-user",
+				"read:admin:index-stats",
+				"read:admin:table-stats",
+				"read:admin:user-ips",
+				"read:admin:meta",
+				"write:admin:reset-password",
+				"write:admin:resolve-abuse-user-report",
+				"write:admin:send-email",
+				"read:admin:server-info",
+				"read:admin:show-moderation-log",
+				"read:admin:show-user",
+				"write:admin:suspend-user",
+				"write:admin:unset-mfa",
+				"write:admin:unset-user-avatar",
+				"write:admin:unset-user-banner",
+				"write:admin:unsuspend-user",
+				"write:admin:meta",
+				"write:admin:user-note",
+				"write:admin:roles",
+				"read:admin:roles",
+				"write:admin:relays",
+				"read:admin:relays",
+				"write:admin:invite-codes",
+				"read:admin:invite-codes",
+				"write:admin:announcements",
+				"read:admin:announcements",
+				"write:admin:avatar-decorations",
+				"read:admin:avatar-decorations",
+				"write:admin:federation",
+				"write:admin:account",
+				"read:admin:account",
+				"write:admin:emoji",
+				"read:admin:emoji",
+				"write:admin:queue",
+				"read:admin:queue",
+				"write:admin:promo",
+				"write:admin:drive",
+				"read:admin:drive",
+				"read:admin:stream",
+				"write:admin:ad",
+				"read:admin:ad",
+				"write:invite-codes",
+				"read:invite-codes",
+				"write:clip-favorite",
+				"read:clip-favorite",
+				"read:federation",
+				"write:report-abuse",
+				"write:chat",
+				"read:chat"
+			]
+		}
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/connect.vue",
-		"currentSha256": "cb35ffca8efbd36c1a9cda11b1033ceca2d222172dc678e462334a34aee30737",
+		"currentSha256": "491298dbff015f24acbad102964449cf14b11fdf1e1b93fbed120a712cc1cfb8",
 		"baselineSha256": "d2e031de7854a1707a347f36b5f3b2104c2b8aa6f377f1bf19737e1d988eb3ed",
 		"keys": [
 			"generateAccessToken"
@@ -1149,28 +1481,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2475,
-				"end": 2511,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2570,
-				"end": 2570,
+				"start": 2535,
+				"end": 2535,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3355,
-				"end": 3413,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 3321,
+				"end": 3415,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/signup-complete.vue",
-		"currentSha256": "911d049994ff1f52a66edefa663b1515c4f666b4d92703c2e8f594f23b415a5b",
+		"currentSha256": "1870ebe81d16b4aadf2851ce4201ba132be6c0b2cf9d521fca6e57e308a904b0",
 		"baselineSha256": "8d088996d45d2faab79ccc570a897977fa2cb1fbe8186627358f7a42d02205a8",
 		"keys": [
 			"somethingHappened",
@@ -1186,28 +1512,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 849,
-				"end": 885,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 944,
-				"end": 944,
+				"start": 909,
+				"end": 909,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1335,
-				"end": 1393,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1301,
+				"end": 1395,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/verify-email.vue",
-		"currentSha256": "26677e6bc91f1c3964565ceea408d9bf4e5f4b31bb72e3f5663cd0d4d1641f26",
+		"currentSha256": "0e201458b9802bfeb3bc921084ae0cfff2bbfc3cbf95c539978d0271381ea8ef",
 		"baselineSha256": "5cb03f5a1d5e0cf28eb1d5203fc68c669b41806cebf2b833dbcf7226fac6e695",
 		"keys": [
 			"somethingHappened",
@@ -1225,28 +1545,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1483,
-				"end": 1519,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1578,
-				"end": 1578,
+				"start": 1543,
+				"end": 1543,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1908,
-				"end": 1966,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1874,
+				"end": 1968,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue",
-		"currentSha256": "796fa7f4557653fd75f54c1627e660d777a64d46bebdfdb7328a6c706ce9cbef",
+		"currentSha256": "646041259297d3b40051224a8d24af85407fb3f0503301426d8de6231427c7bf",
 		"baselineSha256": "9320aa48a96c0d534ff36c32bdbe50e65d1fae09f28c181a137eaf5ed7ad7e0f",
 		"keys": [
 			"delete",
@@ -1274,28 +1588,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2835,
-				"end": 2871,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2930,
-				"end": 2930,
+				"start": 2895,
+				"end": 2895,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3894,
-				"end": 3952,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 3860,
+				"end": 3954,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/avatar-decorations/frontend/pages/avatar-decorations.vue",
-		"currentSha256": "486c783480466d64191224ded9b7cc081276e13b1bab9556debe9496223add73",
+		"currentSha256": "a7fa90be2ffcfc80d84cb67aba9c20e2c996a61fda3858489e6ee4134eab5527",
 		"baselineSha256": "2086989a64273520f4e75134866e708d9564d7856e661cff48913b1aa9576715",
 		"keys": [
 			"add"
@@ -1307,28 +1615,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1045,
-				"end": 1081,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1140,
-				"end": 1140,
+				"start": 1105,
+				"end": 1105,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1697,
-				"end": 1755,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1663,
+				"end": 1757,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/avatar-decorations/frontend/pages/settings/avatar-decoration.dialog.vue",
-		"currentSha256": "c4ef5577b75107d60866b95300659a860b45244b429930120e6cc6ecdf0356d8",
+		"currentSha256": "5cc49b716d4e6c2d9d5ab664620f37bcb36764684a98a27c59b62e5f5facb063",
 		"baselineSha256": "9045ea39c6917ebf31ebb3f3cb8d964b61f5aae7bc08965642879ea68edbe789",
 		"keys": [
 			"update"
@@ -1344,28 +1646,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1938,
-				"end": 1974,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2033,
-				"end": 2033,
+				"start": 1998,
+				"end": 1998,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2434,
-				"end": 2492,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2400,
+				"end": 2494,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/avatar-decorations/frontend/pages/settings/avatar-decoration.vue",
-		"currentSha256": "dbbfb4f176f619bee3f3a5c87f7bd72c1e945974e0c3e0a2191cd5a1a5d04c2c",
+		"currentSha256": "d427ed1aa34b52fdd637edc2bb250e5b82ca5ca5eda57be11eb339b55b52a0a7",
 		"baselineSha256": "2b8d8bd653a6587ce15de0903f8149ecde1d9c4c8a205b07c33ce797870575f9",
 		"keys": [
 			"areYouSure"
@@ -1381,28 +1677,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1899,
-				"end": 1935,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1994,
-				"end": 1994,
+				"start": 1959,
+				"end": 1959,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2905,
-				"end": 2963,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2871,
+				"end": 2965,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/boot/frontend/components/MkServerSetupWizard.vue",
-		"currentSha256": "2d91f7c1ef38a34b116946f023d3c46d2f5015c4044feab13d1062c111de7cbe",
+		"currentSha256": "427d8b0e299cdb581fefad49889605fe79e640fa96aa46e9fcd357dfd5364ec2",
 		"baselineSha256": "6a7bfc05835a1e8c432d5eda06fd3e390b40e0768230d49e78fab1e86449b9da",
 		"keys": [
 			"all",
@@ -1466,28 +1756,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 7570,
-				"end": 7606,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 7665,
-				"end": 7665,
+				"start": 7630,
+				"end": 7630,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 8355,
-				"end": 8413,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 8321,
+				"end": 8415,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/boot/frontend/components/MkUpdated.vue",
-		"currentSha256": "75db506b37ced0fdf4eab0b723a2f1aa795011480062acd8e86a964040ed86fb",
+		"currentSha256": "9e51a3f7125ff2e6ba7a9491761ef89af0bd718c204866f590614f571cc85ca3",
 		"baselineSha256": "c7a1599fcc395015d012d5908575e9ab15b64f5878c7836df388e2b6c7e23992",
 		"keys": [
 			"gotIt"
@@ -1500,28 +1784,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 736,
-				"end": 772,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 831,
-				"end": 831,
+				"start": 796,
+				"end": 796,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1227,
-				"end": 1285,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1193,
+				"end": 1287,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/boot/frontend/pages/welcome.setup.vue",
-		"currentSha256": "5e1be9f2d70d791ecd21720dc71b91feca7deb5ea9127e6658850427b67c4fbc",
+		"currentSha256": "ba6174b123e067c101a88a8b0b76c0cc9c16d8ac462150cb3914ceeffd82b7a4",
 		"baselineSha256": "fe0288a83b7d0eb29ee74dbe96b0116a60042bb2601cd154c0dae45932a440d6",
 		"keys": [
 			"somethingHappened",
@@ -1576,7 +1854,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/boot/frontend/ts-messages.vue",
-		"currentSha256": "19860c6222113f5628acde2a6f5eb9debf6eb36f8d5f05b91805b7440b1694f2",
+		"currentSha256": "810cd830475d5e5fc2fdec0df79e4076b789163a3518d4bffdb2be727432cf3c",
 		"baselineSha256": "0558ed96ffe2aad54482c247b8ed6f8c630b115595c9b81526ddd56b4a4ccdf5",
 		"keys": [
 			"reload"
@@ -1591,18 +1869,11 @@ export const globalCatalogPilotOwners = [
 			"switchDarkModeManuallyWhenSyncEnabledConfirm",
 			"syncDeviceDarkMode"
 		],
-		"edits": [
-			{
-				"start": 97,
-				"end": 295,
-				"current": ">\n\n\n<script setup lang=\"ts\">\nimport type { Locale } from 'i18n';\nimport { useLocale } from 'virtual:vite-vue-internationalization';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n</script",
-				"baseline": ""
-			}
-		]
+		"edits": []
 	},
 	{
 		"file": "packages/features/boot/frontend/ui/_common_/ReloadSuggestion.vue",
-		"currentSha256": "b5734e083340ea9c5df524fe4d49e08e55e9ced0fa9c20189b121e35e9a8c876",
+		"currentSha256": "88a9db01c1c848b794b0928df5c1876bfacb00a280d8aa6bf066227801fa391a",
 		"baselineSha256": "3b696ffa950dfaadb38f20cd7ee91d575845f6f9b2490627dfc9dee64d28f763",
 		"keys": [
 			"reload"
@@ -1614,28 +1885,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 628,
-				"end": 664,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 212,
+				"end": 296,
+				"current": "\t<span :class=\"$style.title\">{{ $locale.sfc.reloadRequiredToApplySettings }}</span>\n",
+				"baseline": "\t<span :class=\"$style.title\">{{ globalLocale.env.reloadRequiredToApplySettings }}</span>\n"
 			},
 			{
-				"start": 723,
-				"end": 723,
+				"start": 688,
+				"end": 688,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 895,
-				"end": 953,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 861,
+				"end": 955,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/channels/frontend/components/MkChannelFollowButton.vue",
-		"currentSha256": "108955085abab9c6a908eb551886d4f43c803f4e1b58dddb2a61e4ca608aa213",
+		"currentSha256": "4bf65af7312de1858eee29de914445a18584b8c7931b32b46a7212d117db9c2f",
 		"baselineSha256": "76c1c808ef2dc710aeafe8a34a90188291b223360f9a85ad7320361b2ef63ddb",
 		"keys": [
 			"processing",
@@ -1648,28 +1919,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 792,
-				"end": 828,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 887,
-				"end": 887,
+				"start": 852,
+				"end": 852,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1028,
-				"end": 1086,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 994,
+				"end": 1088,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/channels/frontend/components/MkChannelPreview.vue",
-		"currentSha256": "b445e868ad086e92c475ef94653d6245dd5b1fdb3e163371735c5a17ea3579d8",
+		"currentSha256": "2bb4ab47dd6430709ea8c8fc73e13652eaf4189c42a459a6f5a830609b6e3f73",
 		"baselineSha256": "7b2ae479a0b56a22da2f2969265a07707ff03bbd7f7e1279de3f13ecd361a9e5",
 		"keys": [
 			"sensitive",
@@ -1684,28 +1949,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1789,
-				"end": 1825,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1884,
-				"end": 1884,
+				"start": 1849,
+				"end": 1849,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2099,
-				"end": 2157,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2065,
+				"end": 2159,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/channels/frontend/pages/channel-editor.vue",
-		"currentSha256": "a9d8e2e7d269c1f9d355003e59bb4d4498040f75c55a475d21a1f73fb7ce8bd2",
+		"currentSha256": "cbd379418a3d6d8ede064b7d1a450164b5158cbca56ce2006b76ec57339846bd",
 		"baselineSha256": "492e8cdc1d3a33eade0aa59001dda94ab0f351d27b3190aa2121f5cb298d3d6e",
 		"keys": [
 			"save",
@@ -1734,28 +1993,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2572,
-				"end": 2608,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2667,
-				"end": 2667,
+				"start": 2632,
+				"end": 2632,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3698,
-				"end": 3756,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 3664,
+				"end": 3758,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/channels/frontend/pages/channel.vue",
-		"currentSha256": "2eb2b1cb52f54934d84de12cc7ed8dfe2df47f91786584aae67c5d440cdc880b",
+		"currentSha256": "32c5542cb2ed8d8abd0f00693df876e4deb56e9c1b847b76baffc6c4a235c785",
 		"baselineSha256": "c081657742fe47caf88fce524c7b3c3fde840df0b2c42f2ad7f230ec85d458d0",
 		"keys": [
 			"search",
@@ -1805,28 +2058,46 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3874,
-				"end": 3910,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 990,
+				"end": 1377,
+				"current": "\t\t\t\t\t\t<div><i class=\"ti ti-users ti-fw\"></i><I18n :src=\"$locale.sfc.channelUsersCount\" tag=\"span\" style=\"margin-left: 4px;\"><template #n><b>{{ channel.usersCount }}</b></template></I18n></div>\n\t\t\t\t\t\t<div><i class=\"ti ti-pencil ti-fw\"></i><I18n :src=\"$locale.sfc.channelNotesCount\" tag=\"span\" style=\"margin-left: 4px;\"><template #n><b>{{ channel.notesCount }}</b></template></I18n></div>\n",
+				"baseline": "\t\t\t\t\t\t<div><i class=\"ti ti-users ti-fw\"></i><I18n :src=\"globalLocale.env.channelUsersCount\" tag=\"span\" style=\"margin-left: 4px;\"><template #n><b>{{ channel.usersCount }}</b></template></I18n></div>\n\t\t\t\t\t\t<div><i class=\"ti ti-pencil ti-fw\"></i><I18n :src=\"globalLocale.env.channelNotesCount\" tag=\"span\" style=\"margin-left: 4px;\"><template #n><b>{{ channel.notesCount }}</b></template></I18n></div>\n"
 			},
 			{
-				"start": 3969,
-				"end": 3969,
+				"start": 3934,
+				"end": 3934,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 6014,
-				"end": 6072,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 4178,
+				"end": 4178,
+				"current": "",
+				"baseline": "import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\n"
+			},
+			{
+				"start": 5890,
+				"end": 6074,
+				"current": "import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 7918,
+				"end": 7963,
+				"current": "\t\ttext: $locale.value.sfc.unfavoriteConfirm,\n",
+				"baseline": "\t\ttext: globalLocale.value.env.unfavoriteConfirm,\n"
+			},
+			{
+				"start": 8303,
+				"end": 8342,
+				"current": "\t\ttitle: $locale.value.sfc.mutePeriod,\n",
+				"baseline": "\t\ttitle: globalLocale.value.env.mutePeriod,\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/channels/frontend/pages/channels.vue",
-		"currentSha256": "9605931c0b96ad9241bb9d4903e3a01073698e7a9ac49aae3535cc8770d0b700",
+		"currentSha256": "6c5b53a7fef53f15e52304bd573ea5c58646582805f9e78db105f209b67ca8ff",
 		"baselineSha256": "52c58c290e4b67682b4c3e06ec86b41ec5fc93e9a0aca9a82213cb040791c52a",
 		"keys": [
 			"search",
@@ -1864,7 +2135,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/channels/frontend/ts-messages.vue",
-		"currentSha256": "d8bea47091716227e3dd789f8cd1d5b430aeec04df6f102f569307183dc7c263",
+		"currentSha256": "1a3e0b78cefb3e88fac96e993db9c8ec42eed7b939402e5ce6c2bfdc00bc43a3",
 		"baselineSha256": "c5288aee1e22fa264343e1ea84c3af20bfba431e7c25a907fec07885b5ddc681",
 		"keys": [
 			"follow"
@@ -1873,14 +2144,7 @@ export const globalCatalogPilotOwners = [
 			"follow",
 			"unfollow"
 		],
-		"edits": [
-			{
-				"start": 97,
-				"end": 295,
-				"current": ">\n\n\n<script setup lang=\"ts\">\nimport type { Locale } from 'i18n';\nimport { useLocale } from 'virtual:vite-vue-internationalization';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n</script",
-				"baseline": ""
-			}
-		]
+		"edits": []
 	},
 	{
 		"file": "packages/features/chat/frontend/pages/chat/XMessage.vue",
@@ -1952,7 +2216,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/chat/frontend/pages/chat/room.info.vue",
-		"currentSha256": "32f0851cd5f403c9fc0300f14aa32295ee752dc7d9631b3741e22c19e87a1a73",
+		"currentSha256": "7d215f586f2ebca827367f4978eeeaa3dd804510af7e5fb3fd300cf1715a094c",
 		"baselineSha256": "b187fae03df3db2a372fb484e2ab138f43a85b59390fd609f5497bc14a1a2029",
 		"keys": [
 			"save",
@@ -1970,28 +2234,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 777,
-				"end": 813,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 872,
-				"end": 872,
+				"start": 837,
+				"end": 837,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1417,
-				"end": 1475,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1383,
+				"end": 1584,
+				"current": "import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 2104,
+				"end": 2202,
+				"current": "\t\ttext: interpolateLocaleParameters(globalLocale.value.env.deleteAreYouSure, { x: name_.value }),\n",
+				"baseline": "\t\ttext: $l.value.sfc.deleteAreYouSure({ x: name_.value }),\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/chat/frontend/pages/chat/room.search.vue",
-		"currentSha256": "cc7e4fe05ec107f7c82901527ffa96cdeedb908914d7ec810e56c522023c2752",
+		"currentSha256": "d418a432452cb9e24369a89793138eaf15c2d61f1c3539bb050750e7fa39d18d",
 		"baselineSha256": "f7b2fd005a99324818397f6b74c78580d29d3f1fe607729c0ca353b12013507c",
 		"keys": [
 			"search"
@@ -2003,28 +2267,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 868,
-				"end": 904,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 165,
+				"end": 209,
+				"current": "\t\t:placeholder=\"$locale.sfc.searchMessages\"\n",
+				"baseline": "\t\t:placeholder=\"globalLocale.env.searchMessages\"\n"
 			},
 			{
-				"start": 963,
-				"end": 963,
+				"start": 443,
+				"end": 505,
+				"current": "\t\t<template #header>{{ $locale.sfc.searchResult }}</template>\n",
+				"baseline": "\t\t<template #header>{{ globalLocale.env.searchResult }}</template>\n"
+			},
+			{
+				"start": 928,
+				"end": 928,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1402,
-				"end": 1460,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1368,
+				"end": 1462,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/chat/frontend/pages/chat/room.vue",
-		"currentSha256": "fecbaababc5ed72ec3c0123bafba62f2646075ae834611df1840182dfee07a3b",
+		"currentSha256": "0883ae7f4701188ff2053e629cee55fd7138ea073e4fce3bf1a9e88416d4891f",
 		"baselineSha256": "9693b25b97a6fff6ee8cabfc53e38e312fbfcd0be5e33418e98b6552bbdda003",
 		"keys": [
 			"search",
@@ -2059,27 +2329,33 @@ export const globalCatalogPilotOwners = [
 		"expanded": true,
 		"edits": [
 			{
-				"start": 368,
-				"end": 434,
-				"current": ">\n\n\t\t\t<MkResult v-else-if=\"fetchError != null\" :type=\"fetchError\"/",
+				"start": 370,
+				"end": 436,
+				"current": "\n\t\t\t<MkResult v-else-if=\"fetchError != null\" :type=\"fetchError\"/>\n",
 				"baseline": ""
 			},
 			{
-				"start": 3890,
-				"end": 3890,
+				"start": 3854,
+				"end": 3854,
 				"current": "",
-				"baseline": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 5537,
-				"end": 5595,
-				"current": "globalLocale = useLocale<Locale>(import.meta.url);\n\nconst ",
+				"start": 4441,
+				"end": 4441,
+				"current": "",
+				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\n"
+			},
+			{
+				"start": 5327,
+				"end": 5588,
+				"current": "import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			},
 			{
-				"start": 6038,
-				"end": 6097,
-				"current": ");\nconst fetchError = ref<'notFound' | 'error' | null>(null",
+				"start": 6041,
+				"end": 6100,
+				"current": "const fetchError = ref<'notFound' | 'error' | null>(null);\n",
 				"baseline": ""
 			},
 			{
@@ -2095,130 +2371,34 @@ export const globalCatalogPilotOwners = [
 				"baseline": ""
 			},
 			{
-				"start": 7948,
-				"end": 7951,
-				"current": "res",
-				"baseline": "["
+				"start": 7940,
+				"end": 7977,
+				"current": "\t\tconst result = await Promise.all([\n",
+				"baseline": "\t\tconst [u, m] = await Promise.all([\n"
 			},
 			{
-				"start": 7952,
-				"end": 7954,
-				"current": "lt",
-				"baseline": ", m]"
+				"start": 8118,
+				"end": 8298,
+				"current": "\t\t]).catch(err => {\n\t\t\tfetchError.value = toFetchError(err);\n\t\t\treturn null;\n\t\t});\n\n\t\tif (result == null) {\n\t\t\tinitializing.value = false;\n\t\t\treturn;\n\t\t}\n\n\t\tconst [u, m] = result;\n",
+				"baseline": "\t\t]);\n"
 			},
 			{
-				"start": 8122,
-				"end": 8296,
-				"current": ".catch(err => {\n\t\t\tfetchError.value = toFetchError(err);\n\t\t\treturn null;\n\t\t});\n\n\t\tif (result == null) {\n\t\t\tinitializing.value = false;\n\t\t\treturn;\n\t\t}\n\n\t\tconst [u, m] = result",
-				"baseline": ""
+				"start": 8989,
+				"end": 9041,
+				"current": "\t\t\tfetchError.value = toFetchError(rResult.reason);\n",
+				"baseline": "\t\t\tos.alert({\n\t\t\t\ttype: 'error',\n\t\t\t\ttext: globalLocale.value.env.somethingHappened,\n\t\t\t});\n"
 			},
 			{
-				"start": 8992,
-				"end": 8993,
-				"current": "f",
-				"baseline": "os.al"
-			},
-			{
-				"start": 8994,
-				"end": 8994,
-				"current": "",
-				"baseline": "r"
-			},
-			{
-				"start": 8995,
-				"end": 8998,
-				"current": "chE",
-				"baseline": "({\n\t\t\t\ttype: 'e"
-			},
-			{
-				"start": 9002,
-				"end": 9002,
-				"current": "",
-				"baseline": "',\n\t\t\t\ttext: globalLocale"
-			},
-			{
-				"start": 9008,
-				"end": 9012,
-				"current": " = t",
-				"baseline": ".env.s"
-			},
-			{
-				"start": 9013,
-				"end": 9014,
-				"current": "F",
-				"baseline": "m"
-			},
-			{
-				"start": 9016,
-				"end": 9017,
-				"current": "c",
-				"baseline": ""
-			},
-			{
-				"start": 9018,
-				"end": 9026,
-				"current": "Error(rR",
-				"baseline": "ingHapp"
-			},
-			{
-				"start": 9027,
-				"end": 9033,
-				"current": "sult.r",
-				"baseline": "n"
-			},
-			{
-				"start": 9034,
-				"end": 9038,
-				"current": "ason",
-				"baseline": "d,\n\t\t\t}"
-			},
-			{
-				"start": 9635,
-				"end": 9637,
-				"current": "//",
-				"baseline": "const"
-			},
-			{
-				"start": 9638,
-				"end": 9683,
-				"current": "ルーム情報は取れても、タイムラインの取得だけ失敗することがある（通信エラーなど）\n\t\tif",
-				"baseline": "m"
-			},
-			{
-				"start": 9684,
-				"end": 9685,
-				"current": "(",
-				"baseline": "= "
-			},
-			{
-				"start": 9705,
-				"end": 9711,
-				"current": "reject",
-				"baseline": "fulfill"
-			},
-			{
-				"start": 9714,
-				"end": 9715,
-				"current": ")",
-				"baseline": ""
-			},
-			{
-				"start": 9716,
-				"end": 9828,
-				"current": "{\n\t\t\tfetchError.value = toFetchError(mResult.reason);\n\t\t\tinitializing.value = false;\n\t\t\treturn;\n\t\t}\n\n\t\tconst m =",
-				"baseline": "?"
-			},
-			{
-				"start": 9895,
-				"end": 9895,
-				"current": "",
-				"baseline": " : []"
+				"start": 9633,
+				"end": 9897,
+				"current": "\t\t// ルーム情報は取れても、タイムラインの取得だけ失敗することがある（通信エラーなど）\n\t\tif (mResult.status === 'rejected') {\n\t\t\tfetchError.value = toFetchError(mResult.reason);\n\t\t\tinitializing.value = false;\n\t\t\treturn;\n\t\t}\n\n\t\tconst m = mResult.value as Misskey.entities.ChatMessagesRoomTimelineResponse;\n",
+				"baseline": "\t\tconst m = mResult.status === 'fulfilled' ? mResult.value as Misskey.entities.ChatMessagesRoomTimelineResponse : [];\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/collections/frontend/components/MkClipPreview.vue",
-		"currentSha256": "519a64d22159c437529b76e4406fa4d44d6686d4c4fc033994478f5f846eb02b",
+		"currentSha256": "3ef1986445ef6590479d79db19ef304eb604250125acf5fe6de859542e8fcc85",
 		"baselineSha256": "8ee65f3ffadce9e4827b01f3c4250479a8edae62fe21ad078cf14fe05b9a5acb",
 		"keys": [
 			"updatedAt"
@@ -2231,28 +2411,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1000,
-				"end": 1036,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1095,
-				"end": 1095,
+				"start": 1060,
+				"end": 1060,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1278,
-				"end": 1336,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1244,
+				"end": 1338,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/collections/frontend/embed/pages/clip.vue",
-		"currentSha256": "268422e83701ae986b619c002bbab6dcfd76dddded916df852587d3944dc8ec4",
+		"currentSha256": "817eb7f642bf359437e3516f63a5420eb1461ac69d37d1c423fc05240ee448ee",
 		"baselineSha256": "bef75ab46370764ab708a5d0082349b4e875a0f1139caf92ce0c735dc2c47585",
 		"keys": [
 			"fromX"
@@ -2262,28 +2436,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1135,
-				"end": 1171,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1230,
-				"end": 1230,
+				"start": 1195,
+				"end": 1195,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2294,
-				"end": 2352,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1591,
+				"end": 1591,
+				"current": "",
+				"baseline": "import type { Paging } from '@features/ui/frontend/embed/components/EmPagination.vue';\n"
+			},
+			{
+				"start": 2173,
+				"end": 2354,
+				"current": "import type { Paging } from '@features/ui/frontend/embed/components/EmPagination.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/collections/frontend/pages/clip.vue",
-		"currentSha256": "f8f19e459d1f11f8e6d1d2873f7ba0671c2affb459faa06ef5360b20e4f3f9b1",
+		"currentSha256": "9e00956a596d90f43d3408bd02ce164ebc065a3f90c631a70e5c18a36eaf5825",
 		"baselineSha256": "0b55e9b6cddb4dca1bc1091919a2d5739d64768c4136fc4688a9814b172b1e4c",
 		"keys": [
 			"delete",
@@ -2317,28 +2491,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1314,
-				"end": 1350,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1409,
-				"end": 1409,
+				"start": 1374,
+				"end": 1374,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2743,
-				"end": 2801,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1539,
+				"end": 1539,
+				"current": "",
+				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\n"
+			},
+			{
+				"start": 2542,
+				"end": 2803,
+				"current": "import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 3876,
+				"end": 3921,
+				"current": "\t\ttext: $locale.value.sfc.unfavoriteConfirm,\n",
+				"baseline": "\t\ttext: globalLocale.value.env.unfavoriteConfirm,\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/collections/frontend/pages/favorites.vue",
-		"currentSha256": "6c196fdea0631aade683d4ce3eb1199e6171108ba2498a46469f312e2bcb0075",
+		"currentSha256": "b63d9bfb927c752dc803b0eebca28cb13d71c09e91b8e86c024c51eb25078bf6",
 		"baselineSha256": "ec5861c581eccdc16955237c01c9386b423aa5e9647464a75da40bb98587ba65",
 		"keys": [
 			"favorites"
@@ -2349,28 +2529,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 535,
-				"end": 571,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 630,
-				"end": 630,
+				"start": 595,
+				"end": 595,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 947,
-				"end": 1005,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 913,
+				"end": 1007,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/collections/frontend/pages/gallery/edit.root.vue",
-		"currentSha256": "af6a8393dbe395b6ab3e81b7b63b4ece55c55bd2c91d926fee99340121479ef2",
+		"currentSha256": "802b00f85b159ec22512e2d994d03dabc63336d423c1b7ae64ca415f05fe5578",
 		"baselineSha256": "53fe5b78ff387ba19e7de58d01e6c3bab36a237b5c7efc260857547b89ddf845",
 		"keys": [
 			"save",
@@ -2408,7 +2582,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/collections/frontend/pages/gallery/edit.vue",
-		"currentSha256": "729ccd6beb61c531df81926c78afed602ced497b4e867fcaee790b862fbace08",
+		"currentSha256": "f785771a96fc6a3dcd81cf12013db56db6b166d7406abbe7964ef9f75d40b506",
 		"baselineSha256": "2fa197c472279f8921fe501428f1ec907aa3603ba87185a3673e3b9309000d12",
 		"keys": [
 			"edit"
@@ -2419,28 +2593,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 241,
-				"end": 277,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 336,
-				"end": 336,
+				"start": 301,
+				"end": 301,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 625,
-				"end": 683,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 591,
+				"end": 685,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/collections/frontend/pages/gallery/index.vue",
-		"currentSha256": "33af14e01aa54f50af586e9e1f91881cced6808c530b75d3ae774ad7de5984da",
+		"currentSha256": "319901649bf9b44fb6322f54cd0d6fc9fb4a6c6b875478e469693bc8ab4113af",
 		"baselineSha256": "0d3eb4d4695b59a61ae7cc2d3e01628cc7567b688f70230c716467c330ba70f6",
 		"keys": [
 			"create"
@@ -2456,28 +2624,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1798,
-				"end": 1834,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1893,
-				"end": 1893,
+				"start": 1858,
+				"end": 1858,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2423,
-				"end": 2481,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2389,
+				"end": 2483,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/collections/frontend/pages/gallery/post.vue",
-		"currentSha256": "64268c6c88ab4851d03215b6cac16e4b3844a4d1bc8c1c754efa36b81ada2b36",
+		"currentSha256": "cd826000c1fcf89e7e566ff661652491bae0f4d2fb413f47d22cda96cc85590e",
 		"baselineSha256": "d103fab6b961758083b7d2977ce5b9884b3111bff0724f8177e20c4bae2d586f",
 		"keys": [
 			"delete",
@@ -2501,22 +2663,40 @@ export const globalCatalogPilotOwners = [
 		"expanded": true,
 		"edits": [
 			{
-				"start": 3370,
-				"end": 3370,
-				"current": "",
-				"baseline": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+				"start": 1540,
+				"end": 1691,
+				"current": "\t\t\t\t\t\t\t\t<button v-tooltip=\"$locale.sfc.shareWithNote\" v-click-anime class=\"_button\" @click=\"shareWithNote\"><i class=\"ti ti-repeat ti-fw\"></i></button>\n",
+				"baseline": "\t\t\t\t\t\t\t\t<button v-tooltip=\"globalLocale.env.shareWithNote\" v-click-anime class=\"_button\" @click=\"shareWithNote\"><i class=\"ti ti-repeat ti-fw\"></i></button>\n"
 			},
 			{
-				"start": 4673,
-				"end": 4731,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 3334,
+				"end": 3334,
+				"current": "",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 3512,
+				"end": 3512,
+				"current": "",
+				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
+			},
+			{
+				"start": 4562,
+				"end": 4733,
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 7223,
+				"end": 7267,
+				"current": "\t\t\t\t\ttext: $locale.value.sfc.deleteConfirm,\n",
+				"baseline": "\t\t\t\t\ttext: globalLocale.value.env.deleteConfirm,\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/collections/frontend/pages/my-clips/index.vue",
-		"currentSha256": "c1a9a453e3f4195dbafa3f5f39ca1fba3e5634463e40160fd681a10eb445a995",
+		"currentSha256": "b5fcf158f2675f27826cb36e447f127a11acccd4fcdad0eab4117d1a0cf3a03f",
 		"baselineSha256": "470b9ee28d6c483568060a3f6b5b3c42f2cee98f2e2f4c3cd4bc103f6e3807bd",
 		"keys": [
 			"favorites",
@@ -2539,28 +2719,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1015,
-				"end": 1051,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1110,
-				"end": 1110,
+				"start": 1075,
+				"end": 1075,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1695,
-				"end": 1753,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1661,
+				"end": 1755,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/collections/frontend/ui/deck/clip-column.vue",
-		"currentSha256": "ddd43bb836c24e5de21a6cbbbaca1ac2c8bdc17c7d71c43bbdf58314b065769c",
+		"currentSha256": "75fa37f977b344b84af0735954b19e620bb843955073321626c5b2ea9951e16b",
 		"baselineSha256": "7d3ca912e4566dd45f49696ce37a893a34978a22bd8e121d2f412c170976c51e",
 		"keys": [
 			"favorites",
@@ -2577,28 +2751,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 610,
-				"end": 646,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 705,
-				"end": 705,
+				"start": 670,
+				"end": 670,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1761,
-				"end": 1819,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 879,
+				"end": 879,
+				"current": "",
+				"baseline": "import type { Column } from '@features/preferences/frontend/deck.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
+			},
+			{
+				"start": 1580,
+				"end": 1821,
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Column } from '@features/preferences/frontend/deck.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/discovery/frontend/embed/pages/tag.vue",
-		"currentSha256": "b369636d622e360822f972e3326abbd8a3f007922c37e06bff0f276e6f23f078",
+		"currentSha256": "c9c1b3888c3a0c0532f22228bd1f93918acb9bc0968ebd1a8dfb52a2494a1d8b",
 		"baselineSha256": "4dff963245be7d7477ffd5b2e4238e7544e393d87a3af5a41e3e8f4956221386",
 		"keys": [
 			"fromX"
@@ -2608,28 +2782,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1119,
-				"end": 1155,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1214,
-				"end": 1214,
+				"start": 1179,
+				"end": 1179,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2073,
-				"end": 2131,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1531,
+				"end": 1531,
+				"current": "",
+				"baseline": "import type { Paging } from '@features/ui/frontend/embed/components/EmPagination.vue';\n"
+			},
+			{
+				"start": 1952,
+				"end": 2133,
+				"current": "import type { Paging } from '@features/ui/frontend/embed/components/EmPagination.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/discovery/frontend/pages/explore.featured.vue",
-		"currentSha256": "0baa12deb894a2db30f20a817acdfc90a2c8bf40950767be588e16580db6d733",
+		"currentSha256": "c5c0be77c621307759b84e0266fee6cfceafc7fdd5ce1f5052e58d8cfb383938",
 		"baselineSha256": "24804205cc50fdbde9f7288f3ae63cee7ea9fbfea0f89f7ab5b86d238dd08d75",
 		"keys": [
 			"notes",
@@ -2641,28 +2815,23 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 567,
-				"end": 603,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 662,
-				"end": 662,
+				"start": 627,
+				"end": 627,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 924,
-				"end": 982,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 890,
+				"end": 984,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/discovery/frontend/pages/explore.vue",
-		"currentSha256": "fbca4e879f26b2d3db6cadc92472f99dadb88a008cdde5180942753a6917553b",
+		"currentSha256": "0e1b33c80089f88e53105d5183e7fe2c846768105a4624c490a64c2415da3d58",
 		"baselineSha256": "784146206619f9f127a8db64df6c6684ebdbb4168df2bf82c98241e819ae9629",
 		"keys": [
 			"users"
@@ -2675,21 +2844,15 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 436,
-				"end": 472,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 531,
-				"end": 531,
+				"start": 496,
+				"end": 496,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 885,
-				"end": 943,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 851,
+				"end": 945,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
@@ -2730,7 +2893,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/discovery/frontend/pages/search.vue",
-		"currentSha256": "4f485f18f4cf7d0f30e90deb522cf85da57915a6fed7e6be45d677bfb80d360b",
+		"currentSha256": "22b4a24362980dc8330219c9742d5dd09e8b487bacd5e733325ab60184bbbf5d",
 		"baselineSha256": "ce487aa6c26ce43b65a6fb6c019de2051483b1b3cfbfd233e3b9601c7abde840",
 		"keys": [
 			"search",
@@ -2746,28 +2909,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 798,
-				"end": 834,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 399,
+				"end": 466,
+				"current": "\t\t\t<MkInfo warn>{{ $locale.sfc.notesSearchNotAvailable }}</MkInfo>\n",
+				"baseline": "\t\t\t<MkInfo warn>{{ globalLocale.env.notesSearchNotAvailable }}</MkInfo>\n"
 			},
 			{
-				"start": 893,
-				"end": 893,
+				"start": 651,
+				"end": 718,
+				"current": "\t\t\t<MkInfo warn>{{ $locale.sfc.usersSearchNotAvailable }}</MkInfo>\n",
+				"baseline": "\t\t\t<MkInfo warn>{{ globalLocale.env.usersSearchNotAvailable }}</MkInfo>\n"
+			},
+			{
+				"start": 858,
+				"end": 858,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1259,
-				"end": 1317,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1225,
+				"end": 1319,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/discovery/frontend/pages/tag.vue",
-		"currentSha256": "c9b8aa42120822c879145ac14ff341dfdfccc1f350ef43e4c533e1802500faa9",
+		"currentSha256": "d81012d8f9c1d8c9da7293c8902d1627e8cc42f5eebae0466f3504d7e9038352",
 		"baselineSha256": "3a1f2d0bd1457a267fc90d2590d04f15a9eeb4573d4cbd725f060c5af2325cd9",
 		"keys": [
 			"more",
@@ -2780,28 +2949,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 674,
-				"end": 710,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 769,
-				"end": 769,
+				"start": 734,
+				"end": 734,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1453,
-				"end": 1511,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 780,
+				"end": 780,
+				"current": "",
+				"baseline": "import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\n"
+			},
+			{
+				"start": 1329,
+				"end": 1513,
+				"current": "import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/discovery/frontend/ts-messages.vue",
-		"currentSha256": "ccd4664d9541dad09dc227d2268eceb053829c79440ad3d268ad00a75d23acc1",
+		"currentSha256": "8ef1f79e34f467f25ac60a13b1d3bb7b115ae16c1a3e74f35d1a510d3a54941d",
 		"baselineSha256": "6b661694590ce365f56408768cde360b938e2b78fb450facf3f3a7d56505c04d",
 		"keys": [
 			"somethingHappened"
@@ -2812,18 +2981,11 @@ export const globalCatalogPilotOwners = [
 			"_remoteLookupErrors",
 			"fetchingAsApObject"
 		],
-		"edits": [
-			{
-				"start": 97,
-				"end": 295,
-				"current": ">\n\n\n<script setup lang=\"ts\">\nimport type { Locale } from 'i18n';\nimport { useLocale } from 'virtual:vite-vue-internationalization';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n</script",
-				"baseline": ""
-			}
-		]
+		"edits": []
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkDrive.file.vue",
-		"currentSha256": "715ee5514f7a7cf6d70c0292e3f9a8d75b78aa9701634cf11e59119dab934cc2",
+		"currentSha256": "ee92ae349da06b7601742e6692a2d413f41311de0e24357ccb5b9e32adb26893",
 		"baselineSha256": "a3757b8af5ab0ac7e4d2e0d03608668357e097d7d4f584d9a6c3d5dffe442383",
 		"keys": [
 			"sensitive"
@@ -2835,28 +2997,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1407,
-				"end": 1443,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1502,
-				"end": 1502,
+				"start": 1467,
+				"end": 1467,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1998,
-				"end": 2056,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1964,
+				"end": 2058,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkDrive.folder.vue",
-		"currentSha256": "5c66acc95863e565c35a4bacc07ed959ab40fe366faf0375c151a8e0e2a87e6e",
+		"currentSha256": "2ca101e06ce32560c1b3d843f18240e0cdf9f37f2810fdbba1cd4bd8512b8201",
 		"baselineSha256": "499cf397197d0a3bb34639bbf565c53547b59e10674789246f5e8bff5eb0676b",
 		"keys": [
 			"delete",
@@ -2881,22 +3037,34 @@ export const globalCatalogPilotOwners = [
 		"expanded": true,
 		"edits": [
 			{
-				"start": 1516,
-				"end": 1516,
+				"start": 1480,
+				"end": 1480,
 				"current": "",
-				"baseline": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2309,
-				"end": 2367,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1578,
+				"end": 1578,
+				"current": "",
+				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
+			},
+			{
+				"start": 2198,
+				"end": 2369,
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 6018,
+				"end": 6059,
+				"current": "\t\ttitle: $locale.value.sfc.renameFolder,\n",
+				"baseline": "\t\ttitle: globalLocale.value.env.renameFolder,\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkDrive.navFolder.vue",
-		"currentSha256": "24106a20e42ad8be6f309c0eb4d8a718b424992a11510f36c395ed37d9ffcbf1",
+		"currentSha256": "44b9e729f334caa8face6e0af57518c3e5aae477faee776e0ff7e535d05a7b36",
 		"baselineSha256": "3b3e9ee89ab2b443bd15ca69396e7f3d9c3fba67ab5771044960e0ca4a9e4c84",
 		"keys": [
 			"drive"
@@ -2906,28 +3074,23 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 491,
-				"end": 527,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 586,
-				"end": 586,
+				"start": 551,
+				"end": 551,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 885,
-				"end": 943,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 851,
+				"end": 945,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkDrive.vue",
-		"currentSha256": "bbc82f02a8a50f7f5951a04d5a77bd4a44a307a35684efaf04400b5a8b3e105b",
+		"currentSha256": "84ce654df378ce46ee571701b2041860b1edb9d049ca3e4cc9b26dac979aea24",
 		"baselineSha256": "768f5a8ad56451dc23e3cae9630c3de472f345f2d3f1841bb9a500cfb78c8934",
 		"keys": [
 			"somethingHappened",
@@ -2974,45 +3137,75 @@ export const globalCatalogPilotOwners = [
 		"expanded": true,
 		"edits": [
 			{
-				"start": 4071,
-				"end": 4129,
-				"current": ":isDisabled=\"excludeSensitive && file.isSensitive\"\n\t\t\t\t\t\t\t",
+				"start": 2256,
+				"end": 2332,
+				"current": "\t\t\t\t<MkTip k=\"drive\"><div v-html=\"$locale.sfc.driveAboutTip\"></div></MkTip>\n",
+				"baseline": "\t\t\t\t<MkTip k=\"drive\"><div v-html=\"globalLocale.env.driveAboutTip\"></div></MkTip>\n"
+			},
+			{
+				"start": 4064,
+				"end": 4122,
+				"current": "\t\t\t\t\t\t\t:isDisabled=\"excludeSensitive && file.isSensitive\"\n",
 				"baseline": ""
 			},
 			{
-				"start": 5014,
-				"end": 5070,
-				"current": "\"\n\t\t\t\t\t:isDisabled=\"excludeSensitive && file.isSensitive",
+				"start": 5016,
+				"end": 5072,
+				"current": "\t\t\t\t\t:isDisabled=\"excludeSensitive && file.isSensitive\"\n",
 				"baseline": ""
 			},
 			{
-				"start": 6340,
-				"end": 6340,
+				"start": 6305,
+				"end": 6305,
 				"current": "",
-				"baseline": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 7892,
-				"end": 7950,
-				"current": "globalLocale = useLocale<Locale>(import.meta.url);\n\nconst ",
+				"start": 6551,
+				"end": 6551,
+				"current": "",
+				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
+			},
+			{
+				"start": 7772,
+				"end": 7943,
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			},
 			{
-				"start": 8114,
-				"end": 8143,
-				"current": "excludeSensitive?: boolean;\n\t",
+				"start": 8113,
+				"end": 8142,
+				"current": "\texcludeSensitive?: boolean;\n",
 				"baseline": ""
 			},
 			{
-				"start": 8255,
-				"end": 8281,
-				"current": "e: false,\n\texcludeSensitiv",
+				"start": 8265,
+				"end": 8291,
+				"current": "\texcludeSensitive: false,\n",
 				"baseline": ""
 			},
 			{
-				"start": 16605,
-				"end": 16663,
-				"current": "\n\tif (props.excludeSensitive && file.isSensitive) return;\n",
+				"start": 14618,
+				"end": 14660,
+				"current": "\t\ttitle: $locale.value.sfc.uploadFromUrl,\n",
+				"baseline": "\t\ttitle: globalLocale.value.env.uploadFromUrl,\n"
+			},
+			{
+				"start": 14675,
+				"end": 14734,
+				"current": "\t\tplaceholder: $locale.value.sfc.uploadFromUrlDescription,\n",
+				"baseline": "\t\tplaceholder: globalLocale.value.env.uploadFromUrlDescription,\n"
+			},
+			{
+				"start": 14914,
+				"end": 15017,
+				"current": "\t\ttitle: $locale.value.sfc.uploadFromUrlRequested,\n\t\ttext: $locale.value.sfc.uploadFromUrlMayTakeTime,\n",
+				"baseline": "\t\ttitle: globalLocale.value.env.uploadFromUrlRequested,\n\t\ttext: globalLocale.value.env.uploadFromUrlMayTakeTime,\n"
+			},
+			{
+				"start": 16606,
+				"end": 16664,
+				"current": "\tif (props.excludeSensitive && file.isSensitive) return;\n\n",
 				"baseline": ""
 			}
 		]
@@ -3029,28 +3222,29 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 346,
-				"end": 382,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 441,
-				"end": 441,
+				"start": 339,
+				"end": 339,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\n"
 			},
 			{
-				"start": 643,
-				"end": 701,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 375,
+				"end": 442,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\n",
+				"baseline": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 645,
+				"end": 703,
+				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkFileListForAdmin.vue",
-		"currentSha256": "9c721ee721988fe5ce697ad2d0100b4c76d6ebf6cc29699806fecb9c1f8df8ad",
+		"currentSha256": "869b0b591fcfe4ff60bb7204c50f63093024306dfde76dcbddbf57d74a1ff9d1",
 		"baselineSha256": "a835f007d9f397c6cce7f98d4e88e1f69664c78fc3d3f893aa3ad096d48b8c07",
 		"keys": [
 			"sensitive"
@@ -3062,28 +3256,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1435,
-				"end": 1471,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1530,
-				"end": 1530,
+				"start": 1495,
+				"end": 1495,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1948,
-				"end": 2006,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1534,
+				"end": 1534,
+				"current": "",
+				"baseline": "import type { Paginator } from '@features/ui/frontend/utility/paginator.js';\n"
+			},
+			{
+				"start": 1837,
+				"end": 2008,
+				"current": "import type { Paginator } from '@features/ui/frontend/utility/paginator.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkImageEffectorDialog.vue",
-		"currentSha256": "8bd3ecf846cac31f1a835cffc63215bc68b16bd7f3d11f67309c08f7d5c58508",
+		"currentSha256": "8e58c79d994419c8d0f948a22c2795d228986a151341f9a0f563c65bd604e55f",
 		"baselineSha256": "71943a90d8e68418e0782f70179f94d1ac4507463fad09cb02d73225e29a7417",
 		"keys": [
 			"preview"
@@ -3100,28 +3294,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1791,
-				"end": 1827,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1886,
-				"end": 1886,
+				"start": 1851,
+				"end": 1851,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2720,
-				"end": 2778,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1945,
+				"end": 1945,
+				"current": "",
+				"baseline": "import type { ImageEffectorLayer } from '@features/drive/frontend/utility/image-effector/ImageEffector.js';\n"
+			},
+			{
+				"start": 2578,
+				"end": 2780,
+				"current": "import type { ImageEffectorLayer } from '@features/drive/frontend/utility/image-effector/ImageEffector.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkImageFrameEditorDialog.vue",
-		"currentSha256": "469d0124627ad43db29d0d29fdd65756e590e9c2213b4f5e7e2454db4fc89474",
+		"currentSha256": "8e142a8b4a7f8cdc92826f7f915f9c49390c52e694be5bed4809657a2f97c067",
 		"baselineSha256": "af5f8588b01ecfc3ab5ab8099f504706c9fd0b6a6c0ec18f507da6f687809b19",
 		"keys": [
 			"preview",
@@ -3172,28 +3366,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 7236,
-				"end": 7272,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 7331,
-				"end": 7331,
+				"start": 7296,
+				"end": 7296,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 8673,
-				"end": 8731,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 7573,
+				"end": 7573,
+				"current": "",
+				"baseline": "import type { ImageFrameParams, ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';\n"
+			},
+			{
+				"start": 8504,
+				"end": 8733,
+				"current": "import type { ImageFrameParams, ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkLightbox.item.fileinfo.vue",
-		"currentSha256": "1e6eb34b275863598c1b19042656e81d9936f571798c22cde5f47fcd4ccd9941",
+		"currentSha256": "61ee6489d3c69d65a932a8b0a3d6a5e2cfc2974d75531b2d92e177aa1d48ea37",
 		"baselineSha256": "cad17f0c197d073e6622b3a1d965f8f9a550ec601043132e230c31c30890c7c9",
 		"keys": [
 			"description",
@@ -3206,28 +3400,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 656,
-				"end": 692,
-				"current": "type { Locale } from 'i18n';\nimport ",
+				"start": 111,
+				"end": 599,
+				"current": "<div :class=\"$style.root\" class=\"_gaps_s\">\n\t<MkKeyValue v-if=\"content.filename != null\">\n\t\t<template #key>{{ $locale.sfc.fileName }}</template>\n\t\t<template #value>{{ content.filename }}</template>\n\t</MkKeyValue>\n\t<MkKeyValue v-if=\"content.file != null\">\n\t\t<template #key>{{ globalLocale.env.description }}</template>\n\t\t<template #value>\n\t\t\t<div :class=\"$style.pre\">{{ content.file.comment ? content.file.comment : `(${globalLocale.env.none})` }}</div>\n\t\t</template>\n\t</MkKeyValue>\n</div>\n",
+				"baseline": "\t<div :class=\"$style.root\" class=\"_gaps_s\">\n\t\t<MkKeyValue v-if=\"content.filename != null\">\n\t\t\t<template #key>{{ $locale.sfc.fileName }}</template>\n\t\t\t<template #value>{{ content.filename }}</template>\n\t\t</MkKeyValue>\n\t\t<MkKeyValue v-if=\"content.file != null\">\n\t\t\t<template #key>{{ globalLocale.env.description }}</template>\n\t\t\t<template #value>\n\t\t\t\t<div :class=\"$style.pre\">{{ content.file.comment ? content.file.comment : `(${globalLocale.env.none})` }}</div>\n\t\t\t</template>\n\t\t</MkKeyValue>\n\t</div>\n"
+			},
+			{
+				"start": 704,
+				"end": 704,
+				"current": "",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 778,
+				"end": 814,
+				"current": "import type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 751,
-				"end": 751,
-				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
-			},
-			{
-				"start": 912,
-				"end": 970,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 902,
+				"end": 960,
+				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkLightbox.item.vue",
-		"currentSha256": "1f0b4c420bcf8a2a56a58dc071f4bbf9eb3060ea32ae343269bb36af1c388732",
+		"currentSha256": "1503cab69db003ae900ef34939fabb871e9493faad8ed580034f6623ef5d8e96",
 		"baselineSha256": "6b146954369cf3a0c5cdeaae585a3726df73907f986df01e548c1e4e18366e5f",
 		"keys": [
 			"sensitive"
@@ -3243,34 +3443,220 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 5383,
-				"end": 5419,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 5478,
-				"end": 5478,
+				"start": 5376,
+				"end": 5376,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 6834,
-				"end": 6892,
-				"current": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n",
+				"start": 6731,
+				"end": 6834,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 8074,
+				"start": 7127,
+				"end": 7127,
+				"current": "",
+				"baseline": "import type XAudioVisualizer__TypeReferenceOnly from '@features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue';\n"
+			},
+			{
+				"start": 7217,
+				"end": 7217,
+				"current": "",
+				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
+			},
+			{
+				"start": 7811,
 				"end": 8075,
-				"current": "\n",
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type XAudioVisualizer__TypeReferenceOnly from '@features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 11163,
+				"end": 11173,
+				"current": "\t\t: null,\n",
+				"baseline": "\t\t: null\n"
+			},
+			{
+				"start": 30256,
+				"end": 30293,
+				"current": "\t\ttext: globalLocale.value.env.hide,\n",
+				"baseline": "\t\ttext: $locale.value.sfc.hide,\n"
+			},
+			{
+				"start": 35513,
+				"end": 35513,
+				"current": "",
+				"baseline": "\t\"hide\": \"إخفاء\",\n"
+			},
+			{
+				"start": 35696,
+				"end": 35696,
+				"current": "",
+				"baseline": "\t\"hide\": \"Amagar\",\n"
+			},
+			{
+				"start": 35880,
+				"end": 35880,
+				"current": "",
+				"baseline": "\t\"hide\": \"Skrýt\",\n"
+			},
+			{
+				"start": 36065,
+				"end": 36065,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 36240,
+				"end": 36240,
+				"current": "",
+				"baseline": "\t\"hide\": \"Inhalt verbergen\",\n"
+			},
+			{
+				"start": 36425,
+				"end": 36425,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 36624,
+				"end": 36624,
+				"current": "",
+				"baseline": "\t\"hide\": \"Ocultar\",\n"
+			},
+			{
+				"start": 36807,
+				"end": 36807,
+				"current": "",
+				"baseline": "\t\"hide\": \"Masquer\",\n"
+			},
+			{
+				"start": 36992,
+				"end": 36992,
+				"current": "",
+				"baseline": "\t\"hide\": \"Sembunyikan\",\n"
+			},
+			{
+				"start": 37184,
+				"end": 37184,
+				"current": "",
+				"baseline": "\t\"hide\": \"Nascondere\",\n"
+			},
+			{
+				"start": 37386,
+				"end": 37386,
+				"current": "",
+				"baseline": "\t\"hide\": \"隠す\",\n"
+			},
+			{
+				"start": 37546,
+				"end": 37546,
+				"current": "",
+				"baseline": "\t\"hide\": \"隠す\",\n"
+			},
+			{
+				"start": 37719,
+				"end": 37719,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 37895,
+				"end": 37895,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 38061,
+				"end": 38061,
+				"current": "",
+				"baseline": "\t\"hide\": \"숨기기\",\n"
+			},
+			{
+				"start": 38238,
+				"end": 38238,
+				"current": "",
+				"baseline": "\t\"hide\": \"Verbergen\",\n"
+			},
+			{
+				"start": 38420,
+				"end": 38420,
+				"current": "",
+				"baseline": "\t\"hide\": \"Skjul\",\n"
+			},
+			{
+				"start": 38601,
+				"end": 38601,
+				"current": "",
+				"baseline": "\t\"hide\": \"Ukryj\",\n"
+			},
+			{
+				"start": 38788,
+				"end": 38788,
+				"current": "",
+				"baseline": "\t\"hide\": \"Ocultar\",\n"
+			},
+			{
+				"start": 38983,
+				"end": 38983,
+				"current": "",
+				"baseline": "\t\"hide\": \"Спрятать\",\n"
+			},
+			{
+				"start": 39169,
+				"end": 39169,
+				"current": "",
+				"baseline": "\t\"hide\": \"Skryť\",\n"
+			},
+			{
+				"start": 39353,
+				"end": 39353,
+				"current": "",
+				"baseline": "\t\"hide\": \"ซ่อน\",\n"
+			},
+			{
+				"start": 39528,
+				"end": 39528,
+				"current": "",
+				"baseline": "\t\"hide\": \"Gizle\",\n"
+			},
+			{
+				"start": 39714,
+				"end": 39714,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 39906,
+				"end": 39906,
+				"current": "",
+				"baseline": "\t\"hide\": \"Сховати\",\n"
+			},
+			{
+				"start": 40098,
+				"end": 40098,
+				"current": "",
+				"baseline": "\t\"hide\": \"Ẩn\",\n"
+			},
+			{
+				"start": 40256,
+				"end": 40256,
+				"current": "",
+				"baseline": "\t\"hide\": \"隐藏\",\n"
+			},
+			{
+				"start": 40409,
+				"end": 40409,
+				"current": "",
+				"baseline": "\t\"hide\": \"隱藏\",\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkMediaAudio.vue",
-		"currentSha256": "049ce46d7b04db3ac75bcc519ac8567e2fa29b5ffebdd1343e520c7c7756f7dd",
+		"currentSha256": "9b36bb03b88bdc08a4455028f15d7e24ebd8f718acffaa58d8099e21cc78bff1",
 		"baselineSha256": "46f8d4f3201acc3048ca2360f2c0a2a85ffb933f14780647fbe138b121c1d579",
 		"keys": [
 			"sensitive"
@@ -3282,28 +3668,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 5653,
-				"end": 5689,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 5748,
-				"end": 5748,
+				"start": 5713,
+				"end": 5713,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 6186,
-				"end": 6244,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 6152,
+				"end": 6246,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkMediaBanner.vue",
-		"currentSha256": "c0343b80aaae9c443affb47c1886d91fc5c1ec9ff809f382d21ed6071a0a2a07",
+		"currentSha256": "bba2ca8b628a4ae3ba984233e00ec373b72907825e17187a930270f90fedccc0",
 		"baselineSha256": "2eed2197c0c5fd4f476ace9d5830e314cc0062d355fbefd7eae119cda171bb45",
 		"keys": [
 			"sensitive"
@@ -3314,28 +3694,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 636,
-				"end": 672,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 731,
-				"end": 731,
+				"start": 696,
+				"end": 696,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 905,
-				"end": 963,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 871,
+				"end": 965,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkMediaImage.vue",
-		"currentSha256": "7dbe330fc7ff55d104d5154ac53f01fc6db55f7bf0245e22654d18eacc30e772",
+		"currentSha256": "fa70886f919e77736d3abd5add370d699913aac7c82859de067bda56a606ee81",
 		"baselineSha256": "edcd4771eb6876a5d8a7bfc3606636fbd4d4963a1cd328dc28e91c4b9e47ab98",
 		"keys": [
 			"sensitive"
@@ -3347,28 +3721,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2824,
-				"end": 2860,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2919,
-				"end": 2919,
+				"start": 2884,
+				"end": 2884,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3646,
-				"end": 3704,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2967,
+				"end": 2967,
+				"current": "",
+				"baseline": "import type { MediaComponentExposes } from '@features/drive/frontend/types/media-component.js';\n"
+			},
+			{
+				"start": 3516,
+				"end": 3706,
+				"current": "import type { MediaComponentExposes } from '@features/drive/frontend/types/media-component.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkMediaVideo.vue",
-		"currentSha256": "b5f3f8d86531a1b65b23594d8cd1db1e3c0c4f3837fa553359dbc389dc7e1738",
+		"currentSha256": "f4c2623d5c03b9551198d025823ea313e248dfc4ac880a1ba95e3cbdd38ab238",
 		"baselineSha256": "0c146d9e615895a22f3e0c93fde45003cf0d557918eb634d818149b918cc9a2c",
 		"keys": [
 			"sensitive"
@@ -3380,28 +3754,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1769,
-				"end": 1805,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1864,
-				"end": 1864,
+				"start": 1829,
+				"end": 1829,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2398,
-				"end": 2456,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1895,
+				"end": 1895,
+				"current": "",
+				"baseline": "import type { MediaComponentExposes } from '@features/drive/frontend/types/media-component.js';\n"
+			},
+			{
+				"start": 2268,
+				"end": 2458,
+				"current": "import type { MediaComponentExposes } from '@features/drive/frontend/types/media-component.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkUploaderDialog.vue",
-		"currentSha256": "4027c7a71b6642daf9dc95a679fd1868e4c5a7c1499759b1c142734e124d1ab2",
+		"currentSha256": "04fa83d453e6cb6f6a4fac3c28fb838e7a16365baebe362618bdf24256d2b939",
 		"baselineSha256": "b6b3d095096b4ad99bfb1d075367d3511973ce103304615dd20f09cb44c0d6bd",
 		"keys": [
 			"upload",
@@ -3426,28 +3800,70 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2152,
-				"end": 2188,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 236,
+				"end": 348,
+				"current": "\t\t<i class=\"ti ti-upload\"></i> {{ interpolateLocaleParameters($locale.sfc.uploadNFiles, { n: files.length }) }}\n",
+				"baseline": "\t\t<i class=\"ti ti-upload\"></i> {{ interpolateLocaleParameters(globalLocale.env.uploadNFiles, { n: files.length }) }}\n"
 			},
 			{
-				"start": 2247,
-				"end": 2247,
+				"start": 585,
+				"end": 619,
+				"current": "\t\t\t\t{{ $locale.sfc.uploaderTip }}\n",
+				"baseline": "\t\t\t\t{{ globalLocale.env.uploaderTip }}\n"
+			},
+			{
+				"start": 971,
+				"end": 1096,
+				"current": "\t\t\t<div>{{ interpolateLocaleParameters($locale.sfc.uploaderMaxFileSizeIsX, { x: $i.policies.maxFileSizeMb + 'MB' }) }}</div>\n",
+				"baseline": "\t\t\t<div>{{ interpolateLocaleParameters(globalLocale.env.uploaderMaxFileSizeIsX, { x: $i.policies.maxFileSizeMb + 'MB' }) }}</div>\n"
+			},
+			{
+				"start": 1305,
+				"end": 1415,
+				"current": "\t\t\t<!--<div>{{ $locale.sfc.uploaderAllowedTypes }}: {{ $i.policies.uploadableFileTypes.join(', ') }}</div>-->\n",
+				"baseline": "\t\t\t<!--<div>{{ globalLocale.env.uploaderAllowedTypes }}: {{ $i.policies.uploadableFileTypes.join(', ') }}</div>-->\n"
+			},
+			{
+				"start": 2212,
+				"end": 2212,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3004,
-				"end": 3062,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2322,
+				"end": 2322,
+				"current": "",
+				"baseline": "import type { UploaderFeatures, UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';\n"
+			},
+			{
+				"start": 2862,
+				"end": 3064,
+				"current": "import type { UploaderFeatures, UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 4545,
+				"end": 4593,
+				"current": "\t\ttext: $locale.value.sfc.uploaderAbortConfirm,\n",
+				"baseline": "\t\ttext: globalLocale.value.env.uploaderAbortConfirm,\n"
+			},
+			{
+				"start": 4945,
+				"end": 4993,
+				"current": "\t\ttext: $locale.value.sfc.uploaderAbortConfirm,\n",
+				"baseline": "\t\ttext: globalLocale.value.env.uploaderAbortConfirm,\n"
+			},
+			{
+				"start": 5254,
+				"end": 5302,
+				"current": "\t\t\ttext: $locale.value.sfc.uploaderDoneConfirm,\n",
+				"baseline": "\t\t\ttext: globalLocale.value.env.uploaderDoneConfirm,\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkWatermarkEditorDialog.vue",
-		"currentSha256": "5ad008fdf20ce7b34a6821b262d1de4e28ad6c6413f28a22e19f2ac974d38060",
+		"currentSha256": "f78f4fc0a2eed84c21d4dcc93a30b9dcf29a64e79851cc9377a414b489a3b29f",
 		"baselineSha256": "0df6796d3dc80307bab41dc42865553667f3338c348034858e49757c5864f5ae",
 		"keys": [
 			"preview",
@@ -3468,28 +3884,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2602,
-				"end": 2638,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2697,
-				"end": 2697,
+				"start": 2662,
+				"end": 2662,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3898,
-				"end": 3956,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2756,
+				"end": 2756,
+				"current": "",
+				"baseline": "import type { WatermarkLayers, WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';\n"
+			},
+			{
+				"start": 3743,
+				"end": 3958,
+				"current": "import type { WatermarkLayers, WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/embed/components/EmMediaImage.vue",
-		"currentSha256": "fd6a132af2aa7c674473eaef29e5031a6caa0fe3cf0f9b4b540fcea4f765ac16",
+		"currentSha256": "2ea28c10db75a219f67ddcc9b3be8764a306c8a82b0706cbaf21969cbad047f4",
 		"baselineSha256": "7e24f51a89f99ea8870c2d7b6f0e052270df9c468764f0e9ca459692766a2016",
 		"keys": [
 			"sensitive"
@@ -3501,28 +3917,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1601,
-				"end": 1637,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1696,
-				"end": 1696,
+				"start": 1661,
+				"end": 1661,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1868,
-				"end": 1926,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1834,
+				"end": 1928,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/admin-file.root.vue",
-		"currentSha256": "87689969a5c2c37197edbff1bbaf990b5aab539ccac036d13941433c532e3ed7",
+		"currentSha256": "d66211a8b0f25246a2acdc65719fbb7644eb009a6cdfb7b1c678654ae9dd1921",
 		"baselineSha256": "03160cd7181452854f9409780eb6eee13ebff524b6478a7352413b35f948a0c2",
 		"keys": [
 			"delete",
@@ -3545,28 +3955,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3141,
-				"end": 3177,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 3236,
-				"end": 3236,
+				"start": 3201,
+				"end": 3201,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 4305,
-				"end": 4363,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 4271,
+				"end": 4365,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/admin/files.vue",
-		"currentSha256": "bfc751c292b833f3021d0b0ba71daa8a219dd3e5b4261292317c0979da6f8cc3",
+		"currentSha256": "d0beef6162023d5cfade4656b1af4125020b06b8b69a5924d155ce8db17afeaf",
 		"baselineSha256": "5ea2078767b78f4cf9ca5e51d3d1023a9b9ba065d0f54855fe1b9a8a23f052f5",
 		"keys": [
 			"all"
@@ -3584,28 +3988,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1266,
-				"end": 1302,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1361,
-				"end": 1361,
+				"start": 1326,
+				"end": 1326,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2032,
-				"end": 2090,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1998,
+				"end": 2092,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/drive.file.info.vue",
-		"currentSha256": "616102942faa7cc5828f1cb4a6de7ddd1386f3609421ad407b4328c35408f344",
+		"currentSha256": "9707d4c86610f1c8b053bb92c3310fd25c2a0c7c17762c2505ce9b978922585a",
 		"baselineSha256": "db9985b735a088f46889e26f6ecf3fd338776ca3d7802efee9c6de67435aed3f",
 		"keys": [
 			"delete",
@@ -3639,28 +4037,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3279,
-				"end": 3315,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 3374,
-				"end": 3374,
+				"start": 3339,
+				"end": 3339,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 4212,
-				"end": 4270,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 4178,
+				"end": 4272,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/drive.file.vue",
-		"currentSha256": "8e95f2b1df3f4bedda8915dfaaab1d71547dfca46a275b98770313707cdf8e74",
+		"currentSha256": "4f69beb23e38d7db4f02f60e67703ae940903c3415098e8b6a632bde2b8da293",
 		"baselineSha256": "1a3ec9ad6a834881926bb7fba878ac82e08d2523a40b107853f9d7051aa7950d",
 		"keys": [
 			"info"
@@ -3672,28 +4064,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 613,
-				"end": 649,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 708,
-				"end": 708,
+				"start": 673,
+				"end": 673,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 904,
-				"end": 962,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 870,
+				"end": 964,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/drive.vue",
-		"currentSha256": "d9e22a1e470ecb075349ecb6a778e595e51477a6e90ff07dfd4dbc5de67d982b",
+		"currentSha256": "c2d296d92244d53ef2302e5b8cab71b5b84123994c70fcb2311a0fb50e55c5ad",
 		"baselineSha256": "af416f1f769d6ab1d185c2a41c0e1e8619bdfaedac8ddf5a65b58d28fdff4eb3",
 		"keys": [
 			"drive"
@@ -3703,28 +4089,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 249,
-				"end": 285,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 344,
-				"end": 344,
+				"start": 309,
+				"end": 309,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 681,
-				"end": 739,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 647,
+				"end": 741,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/settings/drive-cleaner.vue",
-		"currentSha256": "f99a878f0360e6128847c7e919b9f3739f64b2082b1cff89eb3354186a75d577",
+		"currentSha256": "8b5369bb8254f61c6cbbe12b1837b24ba46bfb905ddf36ad40789a715b17fa0b",
 		"baselineSha256": "0e292f56304f7486b094c14a780adef1bde502bc6628cc8119c7c251f20e4e6a",
 		"keys": [
 			"sensitive"
@@ -3739,28 +4119,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1486,
-				"end": 1522,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1581,
-				"end": 1581,
+				"start": 1546,
+				"end": 1546,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2563,
-				"end": 2621,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1674,
+				"end": 1674,
+				"current": "",
+				"baseline": "import type { StyleValue } from 'vue';\n"
+			},
+			{
+				"start": 2490,
+				"end": 2623,
+				"current": "import type { StyleValue } from 'vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/settings/drive.ImageFrameItem.vue",
-		"currentSha256": "14bd5b57c0280da7ed22ecd66b1b13f02af6b41c4ff0bf128e41ff811ef47152",
+		"currentSha256": "adce24eee19539f98811435cabacb1e85ede18dd4b2f1a273e16b86af6bc53db",
 		"baselineSha256": "c22b0807ccfa8206d132247b896ee86179df2e5521e43a0c462e4d26afeeb30b",
 		"keys": [
 			"delete",
@@ -3775,28 +4155,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 757,
-				"end": 793,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 852,
-				"end": 852,
+				"start": 817,
+				"end": 817,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1442,
-				"end": 1500,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 913,
+				"end": 913,
+				"current": "",
+				"baseline": "import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';\n"
+			},
+			{
+				"start": 1291,
+				"end": 1502,
+				"current": "import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/settings/drive.WatermarkItem.vue",
-		"currentSha256": "5f99993a86655e659d596d4582c719d9ad53f9ffb4c89f6829e8cee8546569ce",
+		"currentSha256": "daf93aadfa36b204b718da2fee0d6824ddb4cac2f17f2af03f30187ddad89cf6",
 		"baselineSha256": "a8749b9ba075a16c55a6a9eb33ea874bf1ea75b4bda325fc6e1262d9d9515693",
 		"keys": [
 			"delete",
@@ -3811,28 +4191,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 757,
-				"end": 793,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 852,
-				"end": 852,
+				"start": 817,
+				"end": 817,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1416,
-				"end": 1474,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 913,
+				"end": 913,
+				"current": "",
+				"baseline": "import type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';\n"
+			},
+			{
+				"start": 1278,
+				"end": 1476,
+				"current": "import type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/settings/drive.vue",
-		"currentSha256": "03be7e9f6d52b77304d7925e33bb7802813990ad22ffad739b633a111be44661",
+		"currentSha256": "33b899b527129ff9777def075759c65c6415871966a5c31616f6a6a7c85d67c4",
 		"baselineSha256": "47d8ea90036533baf3110ed304fecebe2d681a8eaf099ac56d47ba9f14b36f85",
 		"keys": [
 			"none",
@@ -3884,28 +4264,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 8851,
-				"end": 8887,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
+				"start": 2038,
+				"end": 2075,
+				"current": "\t\t\t\t\t\t{{ $locale.sfc.drivecleaner }}\n",
+				"baseline": "\t\t\t\t\t\t{{ globalLocale.env.drivecleaner }}\n"
 			},
 			{
-				"start": 8946,
-				"end": 8946,
+				"start": 8911,
+				"end": 8911,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 10864,
-				"end": 10922,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 9235,
+				"end": 9235,
+				"current": "",
+				"baseline": "import type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';\nimport type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';\n"
+			},
+			{
+				"start": 10609,
+				"end": 10924,
+				"current": "import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';\nimport type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/drive/frontend/ts-messages.vue",
-		"currentSha256": "298c4f95846ab1cb99f4123521f5ddb5bcc5f124c40b1d1d2fe7d07af8f99fd2",
+		"currentSha256": "9fc565b40635356c0944050ff4a10d4837cbe0ff914e2b510f321b8d534cf196",
 		"baselineSha256": "60b93be53a51f7654a1b3070157ce364516d313bbb274b7b40f854a7df2c6fcf",
 		"keys": [
 			"delete",
@@ -3980,16 +4366,178 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 97,
-				"end": 295,
-				"current": ">\n\n\n<script setup lang=\"ts\">\nimport type { Locale } from 'i18n';\nimport { useLocale } from 'virtual:vite-vue-internationalization';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n</script",
-				"baseline": ""
+				"start": 1267,
+				"end": 1267,
+				"current": "",
+				"baseline": "\t\"hide\": \"إخفاء\",\n"
+			},
+			{
+				"start": 2970,
+				"end": 2970,
+				"current": "",
+				"baseline": "\t\"hide\": \"Amagar\",\n"
+			},
+			{
+				"start": 4596,
+				"end": 4596,
+				"current": "",
+				"baseline": "\t\"hide\": \"Skrýt\",\n"
+			},
+			{
+				"start": 6177,
+				"end": 6177,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 7954,
+				"end": 7954,
+				"current": "",
+				"baseline": "\t\"hide\": \"Inhalt verbergen\",\n"
+			},
+			{
+				"start": 9560,
+				"end": 9560,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 11280,
+				"end": 11280,
+				"current": "",
+				"baseline": "\t\"hide\": \"Ocultar\",\n"
+			},
+			{
+				"start": 13089,
+				"end": 13089,
+				"current": "",
+				"baseline": "\t\"hide\": \"Masquer\",\n"
+			},
+			{
+				"start": 14745,
+				"end": 14745,
+				"current": "",
+				"baseline": "\t\"hide\": \"Sembunyikan\",\n"
+			},
+			{
+				"start": 16439,
+				"end": 16439,
+				"current": "",
+				"baseline": "\t\"hide\": \"Nascondere\",\n"
+			},
+			{
+				"start": 17790,
+				"end": 17790,
+				"current": "",
+				"baseline": "\t\"hide\": \"隠す\",\n"
+			},
+			{
+				"start": 19045,
+				"end": 19045,
+				"current": "",
+				"baseline": "\t\"hide\": \"隠す\",\n"
+			},
+			{
+				"start": 20532,
+				"end": 20532,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 22113,
+				"end": 22113,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 23420,
+				"end": 23420,
+				"current": "",
+				"baseline": "\t\"hide\": \"숨기기\",\n"
+			},
+			{
+				"start": 24945,
+				"end": 24945,
+				"current": "",
+				"baseline": "\t\"hide\": \"Verbergen\",\n"
+			},
+			{
+				"start": 26530,
+				"end": 26530,
+				"current": "",
+				"baseline": "\t\"hide\": \"Skjul\",\n"
+			},
+			{
+				"start": 28171,
+				"end": 28171,
+				"current": "",
+				"baseline": "\t\"hide\": \"Ukryj\",\n"
+			},
+			{
+				"start": 29915,
+				"end": 29915,
+				"current": "",
+				"baseline": "\t\"hide\": \"Ocultar\",\n"
+			},
+			{
+				"start": 31534,
+				"end": 31534,
+				"current": "",
+				"baseline": "\t\"hide\": \"Спрятать\",\n"
+			},
+			{
+				"start": 33004,
+				"end": 33004,
+				"current": "",
+				"baseline": "\t\"hide\": \"Skryť\",\n"
+			},
+			{
+				"start": 34602,
+				"end": 34602,
+				"current": "",
+				"baseline": "\t\"hide\": \"ซ่อน\",\n"
+			},
+			{
+				"start": 36234,
+				"end": 36234,
+				"current": "",
+				"baseline": "\t\"hide\": \"Gizle\",\n"
+			},
+			{
+				"start": 37806,
+				"end": 37806,
+				"current": "",
+				"baseline": "\t\"hide\": \"Hide\",\n"
+			},
+			{
+				"start": 39468,
+				"end": 39468,
+				"current": "",
+				"baseline": "\t\"hide\": \"Сховати\",\n"
+			},
+			{
+				"start": 41055,
+				"end": 41055,
+				"current": "",
+				"baseline": "\t\"hide\": \"Ẩn\",\n"
+			},
+			{
+				"start": 42240,
+				"end": 42240,
+				"current": "",
+				"baseline": "\t\"hide\": \"隐藏\",\n"
+			},
+			{
+				"start": 43323,
+				"end": 43323,
+				"current": "",
+				"baseline": "\t\"hide\": \"隱藏\",\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/emojis/frontend/EmojiCatalog.vue",
-		"currentSha256": "2c42152c29c1f4234c059778c96fc5a49b403352e4e529e7ca6f276d0490aeaf",
+		"currentSha256": "eb160b2942cdb2f333bc079e54dac40f07dc69138b9460861a9317489b1f0519",
 		"baselineSha256": "0e7575cf6e0fa1d988436d84566d0c478d4ac41ddbc3273b61c534e6b4de6181",
 		"keys": [
 			"search"
@@ -4002,28 +4550,40 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1185,
-				"end": 1221,
-				"current": "type { Locale } from 'i18n';\nimport ",
+				"start": 550,
+				"end": 612,
+				"current": "\t\t<template #header>{{ $locale.sfc.searchResult }}</template>\n",
+				"baseline": "\t\t<template #header>{{ globalLocale.env.searchResult }}</template>\n"
+			},
+			{
+				"start": 1245,
+				"end": 1245,
+				"current": "",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 1279,
+				"end": 1279,
+				"current": "",
+				"baseline": "import type { EmojiSimple } from '../backend/api.definition.js';\nimport EmojiCatalogItem from './EmojiCatalogItem.vue';\n"
+			},
+			{
+				"start": 1654,
+				"end": 1709,
+				"current": "import EmojiCatalogItem from './EmojiCatalogItem.vue';\n",
 				"baseline": ""
 			},
 			{
-				"start": 1280,
-				"end": 1280,
-				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
-			},
-			{
-				"start": 1858,
-				"end": 1916,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1759,
+				"end": 1918,
+				"current": "import type { EmojiSimple } from '../backend/api.definition.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/emojis/frontend/EmojiCatalogItem.vue",
-		"currentSha256": "93bff5d5a5d8a2fe1902cfb367eddbfd84390074c6acd841cbde1654143cace1",
+		"currentSha256": "e70665b3bde9de952cf49ae7d40db8d0b5cb1ff3070827012624bd9a04a6d6b4",
 		"baselineSha256": "43fbf198094e13f3734a3b5b0920589fbec565e5e7410c29caad7dec99f32497",
 		"keys": [
 			"edit",
@@ -4037,28 +4597,23 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 456,
-				"end": 492,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 551,
-				"end": 551,
+				"start": 516,
+				"end": 516,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport type { EmojiSimple } from '../backend/api.definition.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
 			},
 			{
-				"start": 1071,
-				"end": 1129,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 895,
+				"end": 1131,
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { EmojiSimple } from '../backend/api.definition.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue",
-		"currentSha256": "9db8e9cf1d0fc76b4d57ebe0e043ea5249c39330070eee9fd346497f695b9368",
+		"currentSha256": "ff77a4b0e07e29fb188d734b702884224cf428d1406e30eed8c49b2a32ded79c",
 		"baselineSha256": "9566024d1dd6bca764563ba5f5ffaddd757403ce0b927c95948a1f3c3aa288c0",
 		"keys": [
 			"name",
@@ -4082,28 +4637,22 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2132,
-				"end": 2168,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 2227,
-				"end": 2227,
+				"start": 2192,
+				"end": 2192,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2531,
-				"end": 2589,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2497,
+				"end": 2591,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/emojis/frontend/components/MkEmojiPicker.vue",
-		"currentSha256": "95794d62ca6405d29e0e95295cf7bbf98782b7ca298c1f4f161be26173f267a1",
+		"currentSha256": "357c8788a60d859c4481dd87ef2cf5c4d6419854ade8f3fb8f3b04aced72ef91",
 		"baselineSha256": "7569d2a5e32386460ff776b5473a8f1d8034a5ba2c41d0ee2b0ec6f2bcbe0333",
 		"keys": [
 			"search",
@@ -4120,28 +4669,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 4439,
-				"end": 4475,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 4534,
-				"end": 4534,
+				"start": 4499,
+				"end": 4499,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 5837,
-				"end": 5895,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 4724,
+				"end": 4724,
+				"current": "",
+				"baseline": "} from '@features/emojis/frontend/shared/emojilist.js';\nimport type {\n\tUnicodeEmojiDef,\n\tCustomEmojiFolderTree,\n"
+			},
+			{
+				"start": 5691,
+				"end": 5897,
+				"current": "import type {\n\tUnicodeEmojiDef,\n\tCustomEmojiFolderTree,\n} from '@features/emojis/frontend/shared/emojilist.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/emojis/frontend/components/MkRemoteEmojiEditDialog.vue",
-		"currentSha256": "b09ab6ae5c5c3d65747c2624a889373c6dd437b0ad56df348cecccfff0750df9",
+		"currentSha256": "c38166ecc1cf5995a7ec6b4c187161dba40fbb9142631184b7ad72bd5b191e24",
 		"baselineSha256": "450f99dff42dd91874bd1a645fd08853391a691a6c5be25481525be491283356",
 		"keys": [
 			"name"
@@ -4154,28 +4703,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1774,
-				"end": 1810,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1869,
-				"end": 1869,
+				"start": 1834,
+				"end": 1834,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2328,
-				"end": 2386,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2031,
+				"end": 2031,
+				"current": "",
+				"baseline": "import MkInput from '@features/ui/frontend/components/MkInput.vue';\nimport MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';\n"
+			},
+			{
+				"start": 2152,
+				"end": 2246,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/emojis/frontend/components/global/MkCustomEmoji.vue",
-		"currentSha256": "b6498511be207b535867d5939c6361d57635c544b0c9d01d66d79f3fd3207afd",
+		"currentSha256": "93fd0e88215f261bb1de4f89c1d4468c426318ee4725743dd992b32c7229ebb4",
 		"baselineSha256": "3cb344259782727298bf6468cd56d0051bdf5c9c26f9ee87bc876e556461fb81",
 		"keys": [
 			"edit",
@@ -4195,28 +4744,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 905,
-				"end": 941,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1000,
-				"end": 1000,
+				"start": 965,
+				"end": 965,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2338,
-				"end": 2396,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1179,
+				"end": 1179,
+				"current": "",
+				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
+			},
+			{
+				"start": 2227,
+				"end": 2398,
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/emojis/frontend/components/global/MkEmoji.vue",
-		"currentSha256": "839a7d0c64805f27786110b084b21698ade49c0bb65d69c2a54386d2c393bf76",
+		"currentSha256": "8b96bf1b4eb17493995512e7279b11e34a1fa6dfa410802023390e7a4e131c09",
 		"baselineSha256": "96de49a152abb9384ff712b38ba7d712b7031811d8cd50a6601f4f3b126067fe",
 		"keys": [
 			"copy"
@@ -4232,28 +4781,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 581,
-				"end": 617,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 676,
-				"end": 676,
+				"start": 641,
+				"end": 641,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1484,
-				"end": 1542,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 887,
+				"end": 887,
+				"current": "",
+				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
+			},
+			{
+				"start": 1373,
+				"end": 1544,
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.search.vue",
-		"currentSha256": "efb7fdb24ed2fe5b84565aef347de277cb340d3d300b5655669b034c68f7580b",
+		"currentSha256": "1c1fa839c7730286de3b28df37f8556f947d0f3acbc9febf23634e106742ccec",
 		"baselineSha256": "5766cad7f6b06244e2156d72fceb0c3230536d786fcfa97d63bb04f3eb7244e0",
 		"keys": [
 			"search",
@@ -4267,28 +4816,28 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3025,
-				"end": 3061,
-				"current": "type { Locale } from 'i18n';\nimport ",
+				"start": 3085,
+				"end": 3085,
+				"current": "",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 3734,
+				"end": 3770,
+				"current": "import type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 3120,
-				"end": 3120,
-				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
-			},
-			{
-				"start": 4098,
-				"end": 4156,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 4100,
+				"end": 4158,
+				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue",
-		"currentSha256": "f497af6cd1cbc4ff42c3db8d3f5030a898cf9d513f42f52e3d9e0c5d2c93ed64",
+		"currentSha256": "cf8f01be12a1aeb8b438a4c1c3712efed85dc6e08dca94330d7f2facde7d4ba0",
 		"baselineSha256": "b1d9978a444479b4cc37bdb1d5b6d854f7e9da158d1a2fc2beffa4a5561e395c",
 		"keys": [
 			"search",
@@ -4328,27 +4877,27 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1648,
-				"end": 1684,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 1743,
-				"end": 1743,
+				"start": 1641,
+				"end": 1641,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport type { SortOrder } from '@features/preferences/frontend/components/MkSortOrderEditor.define.js';\nimport type { GridSortOrderKey } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';\nimport type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\n"
 			},
 			{
-				"start": 2453,
-				"end": 2511,
-				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"start": 2048,
+				"end": 2151,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 3933,
+				"start": 2270,
+				"end": 2270,
+				"current": "",
+				"baseline": "import type { RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';\nimport type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@features/ui/frontend/components/grid/grid-event.js';\nimport type { GridSetting } from '@features/ui/frontend/components/grid/grid.js';\n"
+			},
+			{
+				"start": 3247,
 				"end": 3934,
-				"current": "\n",
+				"current": "import type { GridSetting } from '@features/ui/frontend/components/grid/grid.js';\nimport type { GridCellValidationEvent, GridCellValueChangeEvent, GridEvent } from '@features/ui/frontend/components/grid/grid-event.js';\nimport type { SortOrder } from '@features/preferences/frontend/components/MkSortOrderEditor.define.js';\nimport type { RequestLogItem } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';\nimport type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\nimport type { GridSortOrderKey } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
@@ -4576,7 +5125,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/emojis/frontend/ts-messages.vue",
-		"currentSha256": "d6ce9eedb4ced2a0dd98a4ed57787206f6e8a5415bb4568fa9036749b2416f64",
+		"currentSha256": "04d075da0035d9cb49b8d17ff4d903cb3e329c9c3a08b492d5ba673a6991ddfb",
 		"baselineSha256": "8195e95596974c759531dfa06fadb7dfcbb023b92643266eac82f458616ed803",
 		"keys": [
 			"noName"
@@ -4591,14 +5140,7 @@ export const globalCatalogPilotOwners = [
 			"append",
 			"doNothing"
 		],
-		"edits": [
-			{
-				"start": 97,
-				"end": 294,
-				"current": ">\n\n<script setup lang=\"ts\">\nimport { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n</script",
-				"baseline": ""
-			}
-		]
+		"edits": []
 	},
 	{
 		"file": "packages/features/federation/frontend/pages/admin/federation.vue",
@@ -5509,7 +6051,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/integrations/frontend/components/MkExtensionInstaller.vue",
-		"currentSha256": "23f3e1969cd52aad9f2602c57b6e55a7fbf1ab38e764f66b6c9709e6ed9648a3",
+		"currentSha256": "d57a29c4ddc790a6ecee5d716096715be5290cd8ac86f78ac948e9575bfab8ab",
 		"baselineSha256": "0abb18582c2717f2b38df025b123dc59a5f0c51474f45e778089693b496874b7",
 		"keys": [
 			"cancel",
@@ -5542,36 +6084,122 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1947,
-				"end": 1948,
-				"current": "(",
-				"baseline": ""
+				"start": 1866,
+				"end": 2061,
+				"current": "\t\t\t\t\t\t\t<li v-for=\"permission in extension.meta.permissions\" :key=\"permission\">{{ (copyLocaleDictionary(globalLocale.env._permissions) as Record<string, string>)[permission] ?? permission }}</li>\n",
+				"baseline": "\t\t\t\t\t\t\t<li v-for=\"permission in extension.meta.permissions\" :key=\"permission\">{{ copyLocaleDictionary(globalLocale.env.permissionsLabels)[permission] ?? permission }}</li>\n"
 			},
 			{
-				"start": 1998,
-				"end": 2025,
-				"current": ") as Record<string, string>",
-				"baseline": ""
-			},
-			{
-				"start": 3879,
-				"end": 3915,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 3974,
-				"end": 3974,
+				"start": 3872,
+				"end": 3872,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 4401,
-				"end": 4459,
+				"start": 4299,
+				"end": 4402,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
+				"baseline": ""
+			},
+			{
+				"start": 4950,
+				"end": 5008,
 				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"permissionsLabels": [
+				"access:mcp",
+				"read:account",
+				"write:account",
+				"read:blocks",
+				"write:blocks",
+				"read:drive",
+				"write:drive",
+				"read:favorites",
+				"write:favorites",
+				"read:following",
+				"write:following",
+				"read:messaging",
+				"write:messaging",
+				"read:mutes",
+				"write:mutes",
+				"write:notes",
+				"read:notifications",
+				"write:notifications",
+				"read:reactions",
+				"write:reactions",
+				"write:votes",
+				"read:pages",
+				"write:pages",
+				"read:page-likes",
+				"write:page-likes",
+				"read:user-groups",
+				"write:user-groups",
+				"read:channels",
+				"write:channels",
+				"read:gallery",
+				"write:gallery",
+				"read:gallery-likes",
+				"write:gallery-likes",
+				"read:flash",
+				"write:flash",
+				"read:flash-likes",
+				"write:flash-likes",
+				"read:admin:abuse-user-reports",
+				"write:admin:delete-account",
+				"write:admin:delete-all-files-of-a-user",
+				"read:admin:index-stats",
+				"read:admin:table-stats",
+				"read:admin:user-ips",
+				"read:admin:meta",
+				"write:admin:reset-password",
+				"write:admin:resolve-abuse-user-report",
+				"write:admin:send-email",
+				"read:admin:server-info",
+				"read:admin:show-moderation-log",
+				"read:admin:show-user",
+				"write:admin:suspend-user",
+				"write:admin:unset-mfa",
+				"write:admin:unset-user-avatar",
+				"write:admin:unset-user-banner",
+				"write:admin:unsuspend-user",
+				"write:admin:meta",
+				"write:admin:user-note",
+				"write:admin:roles",
+				"read:admin:roles",
+				"write:admin:relays",
+				"read:admin:relays",
+				"write:admin:invite-codes",
+				"read:admin:invite-codes",
+				"write:admin:announcements",
+				"read:admin:announcements",
+				"write:admin:avatar-decorations",
+				"read:admin:avatar-decorations",
+				"write:admin:federation",
+				"write:admin:account",
+				"read:admin:account",
+				"write:admin:emoji",
+				"read:admin:emoji",
+				"write:admin:queue",
+				"read:admin:queue",
+				"write:admin:promo",
+				"write:admin:drive",
+				"read:admin:drive",
+				"read:admin:stream",
+				"write:admin:ad",
+				"read:admin:ad",
+				"write:invite-codes",
+				"read:invite-codes",
+				"write:clip-favorite",
+				"read:clip-favorite",
+				"read:federation",
+				"write:report-abuse",
+				"write:chat",
+				"read:chat"
+			]
+		}
 	},
 	{
 		"file": "packages/features/integrations/frontend/components/MkSystemWebhookEditor.vue",
@@ -5630,18 +6258,19 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1421,
-				"end": 1421,
+				"start": 1414,
+				"end": 1414,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1695,
-				"end": 1789,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1697,
+				"end": 1791,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/integrations/frontend/pages/install-extensions.vue",
@@ -5784,7 +6413,99 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Plugin } from '@features/integrations/frontend/plugin.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"permissionsLabels": [
+				"access:mcp",
+				"read:account",
+				"write:account",
+				"read:blocks",
+				"write:blocks",
+				"read:drive",
+				"write:drive",
+				"read:favorites",
+				"write:favorites",
+				"read:following",
+				"write:following",
+				"read:messaging",
+				"write:messaging",
+				"read:mutes",
+				"write:mutes",
+				"write:notes",
+				"read:notifications",
+				"write:notifications",
+				"read:reactions",
+				"write:reactions",
+				"write:votes",
+				"read:pages",
+				"write:pages",
+				"read:page-likes",
+				"write:page-likes",
+				"read:user-groups",
+				"write:user-groups",
+				"read:channels",
+				"write:channels",
+				"read:gallery",
+				"write:gallery",
+				"read:gallery-likes",
+				"write:gallery-likes",
+				"read:flash",
+				"write:flash",
+				"read:flash-likes",
+				"write:flash-likes",
+				"read:admin:abuse-user-reports",
+				"write:admin:delete-account",
+				"write:admin:delete-all-files-of-a-user",
+				"read:admin:index-stats",
+				"read:admin:table-stats",
+				"read:admin:user-ips",
+				"read:admin:meta",
+				"write:admin:reset-password",
+				"write:admin:resolve-abuse-user-report",
+				"write:admin:send-email",
+				"read:admin:server-info",
+				"read:admin:show-moderation-log",
+				"read:admin:show-user",
+				"write:admin:suspend-user",
+				"write:admin:unset-mfa",
+				"write:admin:unset-user-avatar",
+				"write:admin:unset-user-banner",
+				"write:admin:unsuspend-user",
+				"write:admin:meta",
+				"write:admin:user-note",
+				"write:admin:roles",
+				"read:admin:roles",
+				"write:admin:relays",
+				"read:admin:relays",
+				"write:admin:invite-codes",
+				"read:admin:invite-codes",
+				"write:admin:announcements",
+				"read:admin:announcements",
+				"write:admin:avatar-decorations",
+				"read:admin:avatar-decorations",
+				"write:admin:federation",
+				"write:admin:account",
+				"read:admin:account",
+				"write:admin:emoji",
+				"read:admin:emoji",
+				"write:admin:queue",
+				"read:admin:queue",
+				"write:admin:promo",
+				"write:admin:drive",
+				"read:admin:drive",
+				"read:admin:stream",
+				"write:admin:ad",
+				"read:admin:ad",
+				"write:invite-codes",
+				"read:invite-codes",
+				"write:clip-favorite",
+				"read:clip-favorite",
+				"read:federation",
+				"write:report-abuse",
+				"write:chat",
+				"read:chat"
+			]
+		}
 	},
 	{
 		"file": "packages/features/integrations/frontend/pages/settings/webhook.edit.vue",
@@ -5832,23 +6553,44 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3604,
-				"end": 3604,
+				"start": 3597,
+				"end": 3597,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3678,
-				"end": 3678,
+				"start": 3683,
+				"end": 3683,
 				"current": "",
-				"baseline": "js';\nimport { webhookEventTypes } from '../../../backend/webhook-events.schema."
+				"baseline": "import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';\n"
 			},
 			{
-				"start": 4337,
-				"end": 4510,
-				"current": ";\nimport { webhookEventTypes } from '../../../backend/webhook-events.schema.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 4339,
+				"end": 4512,
+				"current": "import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
+		],
+		"dictionaryIndent": "\t",
+		"nonPrimaryOrder": [
+			"webhookSettingsName",
+			"webhookSettingsSecret",
+			"webhookSettingsTrigger",
+			"webhookSettingsEventsFollow",
+			"webhookSettingsEventsFollowed",
+			"webhookSettingsEventsNote",
+			"webhookSettingsEventsReply",
+			"webhookSettingsEventsRenote",
+			"webhookSettingsEventsReaction",
+			"webhookSettingsEventsMention",
+			"webhookSettingsTestRemarks",
+			"webhookSettingsActive",
+			"save",
+			"delete",
+			"deleteAreYouSure"
+		],
+		"primaryOrderLocales": [
+			"ja-JP"
 		]
 	},
 	{
@@ -5891,23 +6633,40 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1675,
-				"end": 1675,
+				"start": 1668,
+				"end": 1668,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1749,
-				"end": 1749,
+				"start": 1754,
+				"end": 1754,
 				"current": "",
-				"baseline": "js';\nimport { webhookEventTypes } from '../../../backend/webhook-events.schema."
+				"baseline": "import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';\n"
 			},
 			{
-				"start": 2156,
-				"end": 2329,
-				"current": ";\nimport { webhookEventTypes } from '../../../backend/webhook-events.schema.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2158,
+				"end": 2331,
+				"current": "import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
+		],
+		"dictionaryIndent": "  ",
+		"nonPrimaryOrder": [
+			"name",
+			"secret",
+			"trigger",
+			"follow",
+			"followed",
+			"note",
+			"reply",
+			"renote",
+			"reaction",
+			"mention",
+			"create"
+		],
+		"primaryOrderLocales": [
+			"ja-JP"
 		]
 	},
 	{
@@ -5922,18 +6681,19 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1101,
-				"end": 1101,
+				"start": 1094,
+				"end": 1094,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1350,
-				"end": 1444,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1352,
+				"end": 1446,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/markup/frontend/components/MkUrlPreview.vue",
@@ -6108,6 +6868,61 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
+		],
+		"nonPrimaryOrder": [
+			"isSystemAccount",
+			"instanceInfo",
+			"createdAt",
+			"lastActiveDate",
+			"email",
+			"moderationNote",
+			"moderationNoteDescription",
+			"updatedAt",
+			"updateRemoteUser",
+			"suspend",
+			"resetPassword",
+			"unsetMfa",
+			"rolePolicies",
+			"requireAdminForView",
+			"unsetUserAvatar",
+			"unsetUserBanner",
+			"deleteAccount",
+			"assign",
+			"indefinitely",
+			"createNew",
+			"filter",
+			"messageRead",
+			"recentNHours",
+			"recentNDays",
+			"notes",
+			"active",
+			"archived",
+			"resetPasswordConfirm",
+			"newPasswordIs",
+			"unsetMfaConfirm",
+			"suspendConfirm",
+			"unsuspendConfirm",
+			"unsetUserAvatarConfirm",
+			"unsetUserBannerConfirm",
+			"deleteAllFilesConfirm",
+			"deleteAccountConfirm",
+			"typeToConfirm",
+			"roleChooseRoleToAssign",
+			"period",
+			"oneHour",
+			"oneDay",
+			"oneWeek",
+			"oneMonth",
+			"unassign",
+			"overview",
+			"roles",
+			"announcements",
+			"drive",
+			"charts",
+			"userInfo"
+		],
+		"primaryOrderLocales": [
+			"ja-JP"
 		]
 	},
 	{
@@ -6228,7 +7043,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/moderation/frontend/pages/admin/moderation.vue",
-		"currentSha256": "3ff49394ac5af53555a1b943582ef54e85a7b55cb55e7efeb0706f12013e27f2",
+		"currentSha256": "975f8d3f144659224224518bd4508992ee27bbd76482bd93f9bace4e66806bfc",
 		"baselineSha256": "7c95232a27f9ff2423a0e61c5a063a7afd30cc8df201a4d1cd4367870c5bd58b",
 		"keys": [
 			"save"
@@ -6270,21 +7085,15 @@ export const globalCatalogPilotOwners = [
 		"expanded": true,
 		"edits": [
 			{
-				"start": 7142,
-				"end": 7142,
+				"start": 7171,
+				"end": 7171,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 7359,
-				"end": 7359,
-				"current": "",
-				"baseline": ".vue';\nimport MkInput from '@features/ui/frontend/components/MkInput"
-			},
-			{
-				"start": 8068,
-				"end": 8162,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 8174,
+				"end": 8232,
+				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
@@ -6353,7 +7162,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/navigation/frontend/components/MkSuperMenu.vue",
-		"currentSha256": "6eb287eddb49f135dfbfa37299272c88f2fca2332aba6bc52a866431306291cf",
+		"currentSha256": "cda65590167df4fed68ed33e7e14fd219fe2a3f28e18507ee6bb919580a37335",
 		"baselineSha256": "a7f6806b9be47afac699ef03f0feef325af937e3c4ca57d044c736e26d574067",
 		"keys": [
 			"search"
@@ -6363,36 +7172,31 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2377,
-				"end": 2413,
-				"current": "type { Locale } from 'i18n';\nimport ",
+				"start": 2370,
+				"end": 2370,
+				"current": "",
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport type { Awaitable } from '@features/ui/frontend/types/misc.js';\n"
+			},
+			{
+				"start": 2853,
+				"end": 2956,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 2470,
-				"end": 2470,
+				"start": 3162,
+				"end": 3162,
 				"current": "",
-				"baseline": "';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport type { Awaitable } from '@features/ui/frontend/types/misc.js"
+				"baseline": "import type { SearchIndexItem } from '@features/discovery/frontend/utility/inapp-search.js';\n"
 			},
 			{
-				"start": 2956,
-				"end": 3014,
-				"current": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n",
-				"baseline": ""
-			},
-			{
-				"start": 3214,
-				"end": 3214,
-				"current": "",
-				"baseline": ".js';\nimport type { SearchIndexItem } from '@features/discovery/frontend/utility/inapp-search"
-			},
-			{
-				"start": 3454,
-				"end": 3617,
-				"current": ".js';\nimport type { SearchIndexItem } from '@features/discovery/frontend/utility/inapp-search.js';\nimport type { Awaitable } from '@features/ui/frontend/types/misc",
+				"start": 3402,
+				"end": 3623,
+				"current": "import type { SearchIndexItem } from '@features/discovery/frontend/utility/inapp-search.js';\nimport type { Awaitable } from '@features/ui/frontend/types/misc.js';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/navigation/frontend/components/MkTutorialDialog.vue",
@@ -6762,7 +7566,23 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport XCommon from './_common_/common.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"deckColumnsLabels": [
+				"main",
+				"widgets",
+				"notifications",
+				"tl",
+				"antenna",
+				"list",
+				"channel",
+				"mentions",
+				"direct",
+				"roleTimeline",
+				"chat",
+				"clip"
+			]
+		}
 	},
 	{
 		"file": "packages/features/navigation/frontend/ui/deck/column.vue",
@@ -6795,24 +7615,40 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2065,
-				"end": 2065,
+				"start": 2058,
+				"end": 2058,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2152,
-				"end": 2152,
+				"start": 2155,
+				"end": 2155,
 				"current": "",
-				"baseline": "';\nimport type { Column } from '@features/preferences/frontend/deck.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js"
+				"baseline": "import type { Column } from '@features/preferences/frontend/deck.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
 			},
 			{
-				"start": 2682,
-				"end": 2923,
-				"current": ";\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Column } from '@features/preferences/frontend/deck.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2684,
+				"end": 2925,
+				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Column } from '@features/preferences/frontend/deck.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "\t",
+		"groupOrders": {
+			"deckColumnsLabels": [
+				"main",
+				"widgets",
+				"notifications",
+				"tl",
+				"antenna",
+				"list",
+				"channel",
+				"mentions",
+				"direct",
+				"roleTimeline",
+				"chat"
+			]
+		}
 	},
 	{
 		"file": "packages/features/navigation/frontend/ui/deck/widgets-column.vue",
@@ -6828,24 +7664,40 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 857,
-				"end": 857,
+				"start": 850,
+				"end": 850,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 871,
-				"end": 871,
+				"start": 877,
+				"end": 877,
 				"current": "",
-				"baseline": "vue';\nimport XColumn from './column.vue';\nimport type { Column } from '@features/preferences/frontend/deck.js';\nimport type { Widget } from '@features/ui/frontend/components/MkWidgets."
+				"baseline": "import XColumn from './column.vue';\nimport type { Column } from '@features/preferences/frontend/deck.js';\nimport type { Widget } from '@features/ui/frontend/components/MkWidgets.vue';\n"
 			},
 			{
-				"start": 1171,
-				"end": 1449,
-				"current": ";\nimport XColumn from './column.vue';\nimport type { Column } from '@features/preferences/frontend/deck.js';\nimport type { Widget } from '@features/ui/frontend/components/MkWidgets.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1173,
+				"end": 1451,
+				"current": "import XColumn from './column.vue';\nimport type { Column } from '@features/preferences/frontend/deck.js';\nimport type { Widget } from '@features/ui/frontend/components/MkWidgets.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "\t",
+		"groupOrders": {
+			"deckColumnsLabels": [
+				"main",
+				"widgets",
+				"notifications",
+				"tl",
+				"antenna",
+				"list",
+				"channel",
+				"mentions",
+				"direct",
+				"roleTimeline",
+				"chat"
+			]
+		}
 	},
 	{
 		"file": "packages/features/note-search/frontend/pages/search.note.vue",
@@ -6995,7 +7847,21 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Keymap } from '@features/ui/frontend/utility/hotkey.js';\nimport type { Ref } from 'vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"visibilityLabels": [
+				"public",
+				"publicDescription",
+				"home",
+				"homeDescription",
+				"followers",
+				"followersDescription",
+				"specified",
+				"specifiedDescription",
+				"disableFederation",
+				"disableFederationDescription"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkNoteDetailed.vue",
@@ -7039,7 +7905,21 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Keymap } from '@features/ui/frontend/utility/hotkey.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"visibilityLabels": [
+				"public",
+				"publicDescription",
+				"home",
+				"homeDescription",
+				"followers",
+				"followersDescription",
+				"specified",
+				"specifiedDescription",
+				"disableFederation",
+				"disableFederationDescription"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkNoteDraftsDialog.vue",
@@ -7078,7 +7958,21 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"visibilityLabels": [
+				"public",
+				"publicDescription",
+				"home",
+				"homeDescription",
+				"followers",
+				"followersDescription",
+				"specified",
+				"specifiedDescription",
+				"disableFederation",
+				"disableFederationDescription"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkNoteHeader.vue",
@@ -7103,7 +7997,21 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"visibilityLabels": [
+				"public",
+				"publicDescription",
+				"home",
+				"homeDescription",
+				"followers",
+				"followersDescription",
+				"specified",
+				"specifiedDescription",
+				"disableFederation",
+				"disableFederationDescription"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkNoteMediaGrid.vue",
@@ -7144,18 +8052,19 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 999,
-				"end": 999,
+				"start": 992,
+				"end": 992,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1375,
-				"end": 1469,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1377,
+				"end": 1471,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkNoteSub.vue",
@@ -7344,7 +8253,21 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';\nimport type { PollEditorModelValue } from '@features/notes/frontend/components/MkPollEditor.vue';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { PostFormProps } from '../types/post-form.js';\nimport type { ShallowRef } from 'vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"visibilityLabels": [
+				"public",
+				"publicDescription",
+				"home",
+				"homeDescription",
+				"followers",
+				"followersDescription",
+				"specified",
+				"specifiedDescription",
+				"disableFederation",
+				"disableFederationDescription"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkPostFormAttaches.vue",
@@ -7671,7 +8594,21 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"visibilityLabels": [
+				"public",
+				"publicDescription",
+				"home",
+				"homeDescription",
+				"followers",
+				"followersDescription",
+				"specified",
+				"specifiedDescription",
+				"disableFederation",
+				"disableFederationDescription"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notes/frontend/embed/components/EmNoteDetailed.vue",
@@ -7709,7 +8646,21 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"visibilityLabels": [
+				"public",
+				"publicDescription",
+				"home",
+				"homeDescription",
+				"followers",
+				"followersDescription",
+				"specified",
+				"specifiedDescription",
+				"disableFederation",
+				"disableFederationDescription"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notes/frontend/embed/components/EmNoteSimple.vue",
@@ -8088,7 +9039,32 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Ref } from 'vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"notificationTypesLabels": [
+				"all",
+				"note",
+				"follow",
+				"mention",
+				"reply",
+				"renote",
+				"quote",
+				"reaction",
+				"pollEnded",
+				"scheduledNotePosted",
+				"scheduledNotePostFailed",
+				"receiveFollowRequest",
+				"followRequestAccepted",
+				"roleAssigned",
+				"chatRoomInvitationReceived",
+				"achievementEarned",
+				"exportCompleted",
+				"login",
+				"createToken",
+				"test",
+				"app"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notifications/frontend/pages/notifications.vue",
@@ -8130,11 +9106,36 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"notificationTypesLabels": [
+				"all",
+				"note",
+				"follow",
+				"mention",
+				"reply",
+				"renote",
+				"quote",
+				"reaction",
+				"pollEnded",
+				"scheduledNotePosted",
+				"scheduledNotePostFailed",
+				"receiveFollowRequest",
+				"followRequestAccepted",
+				"roleAssigned",
+				"chatRoomInvitationReceived",
+				"achievementEarned",
+				"exportCompleted",
+				"login",
+				"createToken",
+				"test",
+				"app"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notifications/frontend/pages/settings/notifications.notification-config.vue",
-		"currentSha256": "8835829c8c3c86c54e2c672fd2b7ea5bdfb6ee4b9eb2035ce394e9713a182ad0",
+		"currentSha256": "4e5dcaee842429e88e250da9209fcde09ef8d3f781e232231b6f3136ce5d552f",
 		"baselineSha256": "17e3110fbd3866c59c8cfa03a24d7d14d1c6cea4cc2e6b29b8311834cfb5bf25",
 		"keys": [
 			"save",
@@ -8156,22 +9157,34 @@ export const globalCatalogPilotOwners = [
 		"expanded": true,
 		"edits": [
 			{
-				"start": 680,
-				"end": 680,
+				"start": 571,
+				"end": 571,
 				"current": "",
-				"baseline": "globalLocale = useLocale<Locale>(import.meta.url);\n\nconst "
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 801,
-				"end": 802,
-				"current": ",",
+				"start": 690,
+				"end": 700,
+				"current": "\t'never',\n",
+				"baseline": "\t'never'\n"
+			},
+			{
+				"start": 893,
+				"end": 996,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 995,
-				"end": 1053,
+				"start": 1293,
+				"end": 1351,
 				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 1909,
+				"end": 1970,
+				"current": "\tfollowingOrFollower: $locale.value.sfc.followingOrFollower,\n",
+				"baseline": "\tfollowingOrFollower: globalLocale.value.env.followingOrFollower,\n"
 			}
 		]
 	},
@@ -8231,7 +9244,32 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { NotificationConfig } from '@features/notifications/frontend/pages/settings/notifications.notification-config.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"notificationTypesLabels": [
+				"all",
+				"note",
+				"follow",
+				"mention",
+				"reply",
+				"renote",
+				"quote",
+				"reaction",
+				"pollEnded",
+				"scheduledNotePosted",
+				"scheduledNotePostFailed",
+				"receiveFollowRequest",
+				"followRequestAccepted",
+				"roleAssigned",
+				"chatRoomInvitationReceived",
+				"achievementEarned",
+				"exportCompleted",
+				"login",
+				"createToken",
+				"test",
+				"app"
+			]
+		}
 	},
 	{
 		"file": "packages/features/notifications/frontend/widgets/WidgetNotifications.vue",
@@ -9136,6 +10174,173 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
+		],
+		"nonPrimaryOrder": [
+			"preferences",
+			"settingsPreferencesBanner",
+			"general",
+			"uiLanguage",
+			"i18nInfo",
+			"auto",
+			"smartphone",
+			"tablet",
+			"desktop",
+			"overridedDeviceKind",
+			"realtimeMode",
+			"settingsRealtimeMode_description",
+			"low",
+			"middle",
+			"high",
+			"settingsContentsUpdateFrequency",
+			"settingsContentsUpdateFrequency_description",
+			"settingsContentsUpdateFrequency_description2",
+			"showTitlebar",
+			"showAvatarDecorations",
+			"alwaysConfirmFollow",
+			"highlightSensitiveMedia",
+			"confirmWhenRevealingSensitiveMedia",
+			"enableAdvancedMfm",
+			"enableInfiniteScroll",
+			"native",
+			"emojiStyle",
+			"settingsTimelineAndNote",
+			"showFixedPostForm",
+			"showFixedPostFormInChannel",
+			"collapseRenotes",
+			"collapseRenotesDescription",
+			"pinnedList",
+			"add",
+			"remove",
+			"showNoteActionsOnlyHover",
+			"showClipButtonInNoteFooter",
+			"showReactionsCount",
+			"confirmOnReact",
+			"loadRawImages",
+			"useReactionPickerForContextMenu",
+			"settingsShowAvailableReactionsFirstInNote",
+			"small",
+			"medium",
+			"large",
+			"reactionsDisplaySize",
+			"limitWidthOfReaction",
+			"default",
+			"limitTo",
+			"mediaListWithOneImageAppearance",
+			"showMediaListByGridInWideArea",
+			"instanceTickerNone",
+			"instanceTickerRemote",
+			"instanceTickerAlways",
+			"instanceTicker",
+			"displayOfSensitiveMediaRespect",
+			"displayOfSensitiveMediaIgnore",
+			"displayOfSensitiveMediaForce",
+			"displayOfSensitiveMedia",
+			"postForm",
+			"keepCw",
+			"rememberNoteVisibility",
+			"enableQuickAddMfmFunction",
+			"defaultNoteVisibility",
+			"visibilityPublic",
+			"visibilityHome",
+			"visibilityFollowers",
+			"visibilitySpecified",
+			"visibilityDisableFederation",
+			"notifications",
+			"useGroupedNotifications",
+			"leftTop",
+			"rightTop",
+			"leftBottom",
+			"rightBottom",
+			"position",
+			"vertical",
+			"horizontal",
+			"stackAxis",
+			"notificationCheckNotificationBehavior",
+			"directMessage",
+			"settingsChatShowSenderName",
+			"settingsChatSendOnEnter",
+			"settingsIfOn",
+			"chatSend",
+			"chatNewline",
+			"settingsIfOff",
+			"accessibility",
+			"settingsAccessibilityBanner",
+			"reduceUiAnimation",
+			"disableShowingAnimatedImages",
+			"disableShowingAnimatedImages_caption",
+			"enableAnimatedMfm",
+			"settingsShowPageTabBarBottom",
+			"enableHorizontalSwipe",
+			"settingsEnablePullToRefresh",
+			"settingsEnablePullToRefresh_description",
+			"keepScreenOn",
+			"useNativeUIForVideoAudioPlayer",
+			"settingsMakeEveryTextElementsSelectable",
+			"settingsMakeEveryTextElementsSelectable_description",
+			"popup",
+			"drawer",
+			"menuStyle",
+			"contextMenuApp",
+			"contextMenuAppWithShift",
+			"contextMenuNative",
+			"contextMenuTitle",
+			"fontSize",
+			"useSystemFont",
+			"performance",
+			"settingsUiAnimations",
+			"turnOffToImprovePerformance",
+			"settingsEnableAnimatedImages",
+			"useBlurEffect",
+			"useBlurEffectForModal",
+			"settingsEnableHighQualityImagePlaceholders",
+			"settingsUseStickyIcons",
+			"clientPerformanceIssueTipTitle",
+			"clientPerformanceIssueTipMakeSureDisabledAdBlocker",
+			"clientPerformanceIssueTipMakeSureDisabledAdBlocker_description",
+			"clientPerformanceIssueTipMakeSureDisabledCustomCss",
+			"clientPerformanceIssueTipMakeSureDisabledCustomCss_description",
+			"clientPerformanceIssueTipMakeSureDisabledAddons",
+			"clientPerformanceIssueTipMakeSureDisabledAddons_description",
+			"dataSaver",
+			"reloadRequiredToApplySettings",
+			"enableAll",
+			"disableAll",
+			"dataSaverMediaTitle",
+			"dataSaverMediaDescription",
+			"dataSaverAvatarTitle",
+			"dataSaverAvatarDescription",
+			"dataSaverDisableUrlPreviewTitle",
+			"dataSaverDisableUrlPreviewDescription",
+			"dataSaverUrlPreviewThumbnailTitle",
+			"dataSaverUrlPreviewThumbnailDescription",
+			"dataSaverCodeTitle",
+			"dataSaverCodeDescription",
+			"other",
+			"squareAvatars",
+			"seasonalScreenEffect",
+			"openImageInNewTab",
+			"withRepliesByDefaultForNewlyFollowed",
+			"serverDisconnectedBehaviorReload",
+			"serverDisconnectedBehaviorDialog",
+			"serverDisconnectedBehaviorQuiet",
+			"whenServerDisconnected",
+			"numberOfPageCache",
+			"numberOfPageCacheDescription",
+			"forceShowAds",
+			"hemisphereN",
+			"hemisphereS",
+			"hemisphere",
+			"hemisphereCaption",
+			"additionalEmojiDictionary",
+			"installed",
+			"navbar",
+			"statusbar",
+			"deck",
+			"customCss",
+			"selectList"
+		],
+		"primaryOrderLocales": [
+			"ja-JP"
 		]
 	},
 	{
@@ -9647,17 +10852,49 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1600,
-				"end": 1600,
-				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"start": 424,
+				"end": 549,
+				"current": "\t\t\t<span v-if=\"full\" :class=\"$style.text\">{{ $locale.sfc.followRequestPending }}</span><i class=\"ti ti-hourglass-empty\"></i>\n",
+				"baseline": "\t\t\t<span v-if=\"full\" :class=\"$style.text\">{{ globalLocale.env.followRequestPending }}</span><i class=\"ti ti-hourglass-empty\"></i>\n"
 			},
 			{
-				"start": 2399,
-				"end": 2493,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1015,
+				"end": 1122,
+				"current": "\t\t\t<span v-if=\"full\" :class=\"$style.text\">{{ $locale.sfc.followRequest }}</span><i class=\"ti ti-plus\"></i>\n",
+				"baseline": "\t\t\t<span v-if=\"full\" :class=\"$style.text\">{{ globalLocale.env.followRequest }}</span><i class=\"ti ti-plus\"></i>\n"
+			},
+			{
+				"start": 1593,
+				"end": 1593,
+				"current": "",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 2401,
+				"end": 2495,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 4561,
+				"end": 4684,
+				"current": "\t\t\t\t\ttext: interpolateLocaleParameters($locale.value.sfc.followConfirm, { name: props.user.name || props.user.username }),\n",
+				"baseline": "\t\t\t\t\ttext: interpolateLocaleParameters(globalLocale.value.env.followConfirm, { name: props.user.name || props.user.username }),\n"
 			}
+		],
+		"dictionaryIndent": "\t",
+		"nonPrimaryOrder": [
+			"unfollowConfirm",
+			"cancelFollowRequestConfirm",
+			"followConfirm",
+			"followRequestPending",
+			"processing",
+			"youFollowing",
+			"followRequest",
+			"follow"
+		],
+		"primaryOrderLocales": [
+			"ja-JP"
 		]
 	},
 	{
@@ -9684,17 +10921,44 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1664,
-				"end": 1664,
+				"start": 1657,
+				"end": 1657,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2318,
-				"end": 2412,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 2320,
+				"end": 2414,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 3077,
+				"end": 3198,
+				"current": "\t\ttext: interpolateLocaleParameters($locale.value.sfc.rejectFollowRequestConfirm, { name: user.name || user.username }),\n",
+				"baseline": "\t\ttext: interpolateLocaleParameters(globalLocale.value.env.rejectFollowRequestConfirm, { name: user.name || user.username }),\n"
+			},
+			{
+				"start": 3463,
+				"end": 3584,
+				"current": "\t\ttext: interpolateLocaleParameters($locale.value.sfc.cancelFollowRequestConfirm, { name: user.name || user.username }),\n",
+				"baseline": "\t\ttext: interpolateLocaleParameters(globalLocale.value.env.cancelFollowRequestConfirm, { name: user.name || user.username }),\n"
 			}
+		],
+		"dictionaryIndent": "\t",
+		"nonPrimaryOrder": [
+			"rejectFollowRequestConfirm",
+			"cancelFollowRequestConfirm",
+			"recieved",
+			"sent",
+			"followRequests",
+			"noFollowRequests",
+			"accept",
+			"reject",
+			"cancel"
+		],
+		"primaryOrderLocales": [
+			"ja-JP"
 		]
 	},
 	{
@@ -10368,7 +11632,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
-		"currentSha256": "3bfa19c99bd7bb8ce720952c07a7bbf7f0c23268caef10cde90fd92c5509693d",
+		"currentSha256": "898cc1f3a58834079b0245a9a6de499e842bd7bc86cb59231fd8079081d1690a",
 		"baselineSha256": "671e99e15eb3258afb4c78a4d3b09aa88d968e751fa5a16b0d036d43041ffd76",
 		"keys": [
 			"yes",
@@ -10430,2155 +11694,253 @@ export const globalCatalogPilotOwners = [
 		"edits": [
 			{
 				"start": 111,
-				"end": 111,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 133,
-				"end": 133,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 324,
-				"end": 324,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 397,
-				"end": 397,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 486,
-				"end": 486,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 521,
-				"end": 521,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 679,
-				"end": 679,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 770,
-				"end": 770,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 781,
-				"end": 781,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 796,
-				"end": 796,
-				"current": "",
-				"baseline": "\t"
+				"end": 807,
+				"current": "<div class=\"_gaps_s\">\n\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsRateLimitFactor, 'rateLimitFactor'])\" v-model:policyMeta=\"policyMetaModel.rateLimitFactor\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsRateLimitFactor }}</template>\n\t\t<template #valueText>{{ Math.floor(valuesModel.rateLimitFactor * 100) }}%</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkRange v-model=\"valuesModel.rateLimitFactor\" :disabled=\"disabled\" :min=\"0.3\" :max=\"3\" :step=\"0.1\" :textConverter=\"(v) => `${Math.round(v * 100)}%`\">\n\t\t\t\t<template #caption>{{ $locale.sfc.roleOptionsDescriptionOfRateLimitFactor }}</template>\n\t\t\t</MkRange>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t<div class=\"_gaps_s\">\n\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsRateLimitFactor, 'rateLimitFactor'])\" v-model:policyMeta=\"policyMetaModel.rateLimitFactor\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsRateLimitFactor }}</template>\n\t\t\t<template #valueText>{{ Math.floor(valuesModel.rateLimitFactor * 100) }}%</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkRange v-model=\"valuesModel.rateLimitFactor\" :disabled=\"disabled\" :min=\"0.3\" :max=\"3\" :step=\"0.1\" :textConverter=\"(v) => `${Math.round(v * 100)}%`\">\n\t\t\t\t\t<template #caption>{{ $locale.sfc.roleOptionsDescriptionOfRateLimitFactor }}</template>\n\t\t\t\t</MkRange>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 808,
-				"end": 808,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 990,
-				"end": 990,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1060,
-				"end": 1060,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1172,
-				"end": 1172,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1207,
-				"end": 1207,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1281,
-				"end": 1281,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1337,
-				"end": 1337,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1349,
-				"end": 1349,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1364,
-				"end": 1364,
-				"current": "",
-				"baseline": "\t"
+				"end": 1375,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsGtlAvailable, 'gtlAvailable'])\" v-model:policyMeta=\"policyMetaModel.gtlAvailable\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsGtlAvailable }}</template>\n\t\t<template #valueText>{{ valuesModel.gtlAvailable ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.gtlAvailable\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsGtlAvailable, 'gtlAvailable'])\" v-model:policyMeta=\"policyMetaModel.gtlAvailable\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsGtlAvailable }}</template>\n\t\t\t<template #valueText>{{ valuesModel.gtlAvailable ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.gtlAvailable\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 1376,
-				"end": 1376,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1558,
-				"end": 1558,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1628,
-				"end": 1628,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1740,
-				"end": 1740,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1775,
-				"end": 1775,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1849,
-				"end": 1849,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1905,
-				"end": 1905,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1917,
-				"end": 1917,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 1932,
-				"end": 1932,
-				"current": "",
-				"baseline": "\t"
+				"end": 1943,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsLtlAvailable, 'ltlAvailable'])\" v-model:policyMeta=\"policyMetaModel.ltlAvailable\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsLtlAvailable }}</template>\n\t\t<template #valueText>{{ valuesModel.ltlAvailable ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.ltlAvailable\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsLtlAvailable, 'ltlAvailable'])\" v-model:policyMeta=\"policyMetaModel.ltlAvailable\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsLtlAvailable }}</template>\n\t\t\t<template #valueText>{{ valuesModel.ltlAvailable ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.ltlAvailable\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 1944,
-				"end": 1944,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2129,
-				"end": 2129,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2200,
-				"end": 2200,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2313,
-				"end": 2313,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2348,
-				"end": 2348,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2423,
-				"end": 2423,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2479,
-				"end": 2479,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2491,
-				"end": 2491,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2506,
-				"end": 2506,
-				"current": "",
-				"baseline": "\t"
+				"end": 2517,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanPublicNote, 'canPublicNote'])\" v-model:policyMeta=\"policyMetaModel.canPublicNote\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanPublicNote }}</template>\n\t\t<template #valueText>{{ valuesModel.canPublicNote ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canPublicNote\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanPublicNote, 'canPublicNote'])\" v-model:policyMeta=\"policyMetaModel.canPublicNote\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanPublicNote }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canPublicNote ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canPublicNote\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 2518,
-				"end": 2518,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2712,
-				"end": 2712,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2786,
-				"end": 2786,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 2987,
-				"end": 2987,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3025,
-				"end": 3025,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3035,
-				"end": 3035,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3082,
-				"end": 3082,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3107,
-				"end": 3107,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3117,
-				"end": 3117,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3179,
-				"end": 3179,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3231,
-				"end": 3231,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3295,
-				"end": 3295,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3301,
-				"end": 3301,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3303,
-				"end": 3303,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3363,
-				"end": 3363,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3375,
-				"end": 3375,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3390,
-				"end": 3390,
-				"current": "",
-				"baseline": "\t"
+				"end": 3401,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsChatAvailability, 'chatAvailability'])\" v-model:policyMeta=\"policyMetaModel.chatAvailability\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsChatAvailability }}</template>\n\t\t<template #valueText>{{ valuesModel.chatAvailability === 'available' ? globalLocale.env.yes : valuesModel.chatAvailability === 'readonly' ? $locale.sfc.readonly : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSelect\n\t\t\t\tv-model=\"valuesModel.chatAvailability\"\n\t\t\t\t:disabled=\"disabled\"\n\t\t\t\t:items=\"[\n\t\t\t\t\t{ label: $locale.sfc.enabled, value: 'available' },\n\t\t\t\t\t{ label: $locale.sfc.readonly, value: 'readonly' },\n\t\t\t\t\t{ label: $locale.sfc.disabled, value: 'unavailable' },\n\t\t\t\t]\"\n\t\t\t>\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSelect>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsChatAvailability, 'chatAvailability'])\" v-model:policyMeta=\"policyMetaModel.chatAvailability\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsChatAvailability }}</template>\n\t\t\t<template #valueText>{{ valuesModel.chatAvailability === 'available' ? globalLocale.env.yes : valuesModel.chatAvailability === 'readonly' ? $locale.sfc.readonly : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSelect\n\t\t\t\t\tv-model=\"valuesModel.chatAvailability\"\n\t\t\t\t\t:disabled=\"disabled\"\n\t\t\t\t\t:items=\"[\n\t\t\t\t\t\t{ label: $locale.sfc.enabled, value: 'available' },\n\t\t\t\t\t\t{ label: $locale.sfc.readonly, value: 'readonly' },\n\t\t\t\t\t\t{ label: $locale.sfc.disabled, value: 'unavailable' },\n\t\t\t\t\t]\"\n\t\t\t\t>\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSelect>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 3402,
-				"end": 3402,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3582,
-				"end": 3582,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3652,
-				"end": 3652,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3717,
-				"end": 3717,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3752,
-				"end": 3752,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3838,
-				"end": 3838,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3849,
-				"end": 3849,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 3864,
-				"end": 3864,
-				"current": "",
-				"baseline": "\t"
+				"end": 3875,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsMentionMax, 'mentionLimit'])\" v-model:policyMeta=\"policyMetaModel.mentionLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsMentionMax }}</template>\n\t\t<template #valueText>{{ valuesModel.mentionLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.mentionLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsMentionMax, 'mentionLimit'])\" v-model:policyMeta=\"policyMetaModel.mentionLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsMentionMax }}</template>\n\t\t\t<template #valueText>{{ valuesModel.mentionLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.mentionLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 3876,
-				"end": 3876,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4049,
-				"end": 4049,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4116,
-				"end": 4116,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4225,
-				"end": 4225,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4260,
-				"end": 4260,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4331,
-				"end": 4331,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4387,
-				"end": 4387,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4399,
-				"end": 4399,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4414,
-				"end": 4414,
-				"current": "",
-				"baseline": "\t"
+				"end": 4425,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanInvite, 'canInvite'])\" v-model:policyMeta=\"policyMetaModel.canInvite\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanInvite }}</template>\n\t\t<template #valueText>{{ valuesModel.canInvite ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canInvite\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanInvite, 'canInvite'])\" v-model:policyMeta=\"policyMetaModel.canInvite\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanInvite }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canInvite ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canInvite\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 4426,
-				"end": 4426,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4605,
-				"end": 4605,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4676,
-				"end": 4676,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4740,
-				"end": 4740,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4775,
-				"end": 4775,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4860,
-				"end": 4860,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4871,
-				"end": 4871,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 4886,
-				"end": 4886,
-				"current": "",
-				"baseline": "\t"
+				"end": 4897,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsInviteLimit, 'inviteLimit'])\" v-model:policyMeta=\"policyMetaModel.inviteLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsInviteLimit }}</template>\n\t\t<template #valueText>{{ valuesModel.inviteLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.inviteLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsInviteLimit, 'inviteLimit'])\" v-model:policyMeta=\"policyMetaModel.inviteLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsInviteLimit }}</template>\n\t\t\t<template #valueText>{{ valuesModel.inviteLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.inviteLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 4898,
-				"end": 4898,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5092,
-				"end": 5092,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5166,
-				"end": 5166,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5262,
-				"end": 5262,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5297,
-				"end": 5297,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5388,
-				"end": 5388,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5449,
-				"end": 5449,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5460,
-				"end": 5460,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5475,
-				"end": 5475,
-				"current": "",
-				"baseline": "\t"
+				"end": 5486,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsInviteLimitCycle, 'inviteLimitCycle'])\" v-model:policyMeta=\"policyMetaModel.inviteLimitCycle\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsInviteLimitCycle }}</template>\n\t\t<template #valueText>{{ valuesModel.inviteLimitCycle + $locale.sfc.timeMinute }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.inviteLimitCycle\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t<template #suffix>{{ $locale.sfc.timeMinute }}</template>\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsInviteLimitCycle, 'inviteLimitCycle'])\" v-model:policyMeta=\"policyMetaModel.inviteLimitCycle\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsInviteLimitCycle }}</template>\n\t\t\t<template #valueText>{{ valuesModel.inviteLimitCycle + $locale.sfc.timeMinute }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.inviteLimitCycle\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t\t<template #suffix>{{ $locale.sfc.timeMinute }}</template>\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 5487,
-				"end": 5487,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5693,
-				"end": 5693,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5771,
-				"end": 5771,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5871,
-				"end": 5871,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 5906,
-				"end": 5906,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6001,
-				"end": 6001,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6062,
-				"end": 6062,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6073,
-				"end": 6073,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6088,
-				"end": 6088,
-				"current": "",
-				"baseline": "\t"
+				"end": 6099,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsInviteExpirationTime, 'inviteExpirationTime'])\" v-model:policyMeta=\"policyMetaModel.inviteExpirationTime\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsInviteExpirationTime }}</template>\n\t\t<template #valueText>{{ valuesModel.inviteExpirationTime + $locale.sfc.timeMinute }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.inviteExpirationTime\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t<template #suffix>{{ $locale.sfc.timeMinute }}</template>\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsInviteExpirationTime, 'inviteExpirationTime'])\" v-model:policyMeta=\"policyMetaModel.inviteExpirationTime\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsInviteExpirationTime }}</template>\n\t\t\t<template #valueText>{{ valuesModel.inviteExpirationTime + $locale.sfc.timeMinute }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.inviteExpirationTime\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t\t<template #suffix>{{ $locale.sfc.timeMinute }}</template>\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 6100,
-				"end": 6100,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6324,
-				"end": 6324,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6408,
-				"end": 6408,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6534,
-				"end": 6534,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6569,
-				"end": 6569,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6657,
-				"end": 6657,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6713,
-				"end": 6713,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6725,
-				"end": 6725,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6740,
-				"end": 6740,
-				"current": "",
-				"baseline": "\t"
+				"end": 6751,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanManageAvatarDecorations, 'canManageAvatarDecorations'])\" v-model:policyMeta=\"policyMetaModel.canManageAvatarDecorations\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanManageAvatarDecorations }}</template>\n\t\t<template #valueText>{{ valuesModel.canManageAvatarDecorations ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canManageAvatarDecorations\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanManageAvatarDecorations, 'canManageAvatarDecorations'])\" v-model:policyMeta=\"policyMetaModel.canManageAvatarDecorations\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanManageAvatarDecorations }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canManageAvatarDecorations ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canManageAvatarDecorations\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 6752,
-				"end": 6752,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 6961,
-				"end": 6961,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7040,
-				"end": 7040,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7161,
-				"end": 7161,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7196,
-				"end": 7196,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7279,
-				"end": 7279,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7335,
-				"end": 7335,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7347,
-				"end": 7347,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7362,
-				"end": 7362,
-				"current": "",
-				"baseline": "\t"
+				"end": 7373,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanManageCustomEmojis, 'canManageCustomEmojis'])\" v-model:policyMeta=\"policyMetaModel.canManageCustomEmojis\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanManageCustomEmojis }}</template>\n\t\t<template #valueText>{{ valuesModel.canManageCustomEmojis ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canManageCustomEmojis\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanManageCustomEmojis, 'canManageCustomEmojis'])\" v-model:policyMeta=\"policyMetaModel.canManageCustomEmojis\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanManageCustomEmojis }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canManageCustomEmojis ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canManageCustomEmojis\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 7374,
-				"end": 7374,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7562,
-				"end": 7562,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7634,
-				"end": 7634,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7748,
-				"end": 7748,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7783,
-				"end": 7783,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7859,
-				"end": 7859,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7915,
-				"end": 7915,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7927,
-				"end": 7927,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 7942,
-				"end": 7942,
-				"current": "",
-				"baseline": "\t"
+				"end": 7953,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanSearchNotes, 'canSearchNotes'])\" v-model:policyMeta=\"policyMetaModel.canSearchNotes\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanSearchNotes }}</template>\n\t\t<template #valueText>{{ valuesModel.canSearchNotes ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canSearchNotes\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanSearchNotes, 'canSearchNotes'])\" v-model:policyMeta=\"policyMetaModel.canSearchNotes\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanSearchNotes }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canSearchNotes ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canSearchNotes\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 7954,
-				"end": 7954,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8142,
-				"end": 8142,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8214,
-				"end": 8214,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8328,
-				"end": 8328,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8363,
-				"end": 8363,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8439,
-				"end": 8439,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8495,
-				"end": 8495,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8507,
-				"end": 8507,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8522,
-				"end": 8522,
-				"current": "",
-				"baseline": "\t"
+				"end": 8533,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanSearchUsers, 'canSearchUsers'])\" v-model:policyMeta=\"policyMetaModel.canSearchUsers\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanSearchUsers }}</template>\n\t\t<template #valueText>{{ valuesModel.canSearchUsers ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canSearchUsers\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanSearchUsers, 'canSearchUsers'])\" v-model:policyMeta=\"policyMetaModel.canSearchUsers\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanSearchUsers }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canSearchUsers ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canSearchUsers\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 8534,
-				"end": 8534,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8728,
-				"end": 8728,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8802,
-				"end": 8802,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8918,
-				"end": 8918,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 8953,
-				"end": 8953,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9031,
-				"end": 9031,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9087,
-				"end": 9087,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9099,
-				"end": 9099,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9114,
-				"end": 9114,
-				"current": "",
-				"baseline": "\t"
+				"end": 9125,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanUseTranslator, 'canUseTranslator'])\" v-model:policyMeta=\"policyMetaModel.canUseTranslator\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanUseTranslator }}</template>\n\t\t<template #valueText>{{ valuesModel.canUseTranslator ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canUseTranslator\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanUseTranslator, 'canUseTranslator'])\" v-model:policyMeta=\"policyMetaModel.canUseTranslator\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanUseTranslator }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canUseTranslator ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canUseTranslator\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 9126,
-				"end": 9126,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9320,
-				"end": 9320,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9394,
-				"end": 9394,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9510,
-				"end": 9510,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9545,
-				"end": 9545,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9623,
-				"end": 9623,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9679,
-				"end": 9679,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9691,
-				"end": 9691,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9706,
-				"end": 9706,
-				"current": "",
-				"baseline": "\t"
+				"end": 9717,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanCreateChannel, 'canCreateChannel'])\" v-model:policyMeta=\"policyMetaModel.canCreateChannel\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanCreateChannel }}</template>\n\t\t<template #valueText>{{ valuesModel.canCreateChannel ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canCreateChannel\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanCreateChannel, 'canCreateChannel'])\" v-model:policyMeta=\"policyMetaModel.canCreateChannel\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanCreateChannel }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canCreateChannel ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canCreateChannel\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 9718,
-				"end": 9718,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9907,
-				"end": 9907,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 9980,
-				"end": 9980,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10050,
-				"end": 10050,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10085,
-				"end": 10085,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10175,
-				"end": 10175,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10210,
-				"end": 10210,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10221,
-				"end": 10221,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10236,
-				"end": 10236,
-				"current": "",
-				"baseline": "\t"
+				"end": 10247,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsDriveCapacity, 'driveCapacityMb'])\" v-model:policyMeta=\"policyMetaModel.driveCapacityMb\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsDriveCapacity }}</template>\n\t\t<template #valueText>{{ valuesModel.driveCapacityMb }}MB</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.driveCapacityMb\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t<template #suffix>MB</template>\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsDriveCapacity, 'driveCapacityMb'])\" v-model:policyMeta=\"policyMetaModel.driveCapacityMb\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsDriveCapacity }}</template>\n\t\t\t<template #valueText>{{ valuesModel.driveCapacityMb }}MB</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.driveCapacityMb\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t\t<template #suffix>MB</template>\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 10248,
-				"end": 10248,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10431,
-				"end": 10431,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10502,
-				"end": 10502,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10570,
-				"end": 10570,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10605,
-				"end": 10605,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10693,
-				"end": 10693,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10729,
-				"end": 10729,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10749,
-				"end": 10749,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 10915,
-				"end": 10915,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11053,
-				"end": 11053,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11065,
-				"end": 11065,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11081,
-				"end": 11081,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11094,
-				"end": 11094,
-				"current": "",
-				"baseline": "\t"
+				"end": 11105,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsMaxFileSize, 'maxFileSizeMb'])\" v-model:policyMeta=\"policyMetaModel.maxFileSizeMb\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsMaxFileSize }}</template>\n\t\t<template #valueText>{{ valuesModel.maxFileSizeMb }}MB</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.maxFileSizeMb\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t<template #suffix>MB</template>\n\t\t\t\t<template #caption>\n\t\t\t\t\t<div>{{ interpolateLocaleParameters($locale.sfc.roleOptionsMaxFileSize_caption2, { max: `${Math.floor(instance.maxFileSize / (1024 * 1024))}MB` }) }}</div>\n\t\t\t\t\t<div><i class=\"ti ti-alert-triangle\" style=\"color: var(--MI_THEME-warn);\"></i> {{ $locale.sfc.roleOptionsMaxFileSize_caption }}</div>\n\t\t\t\t</template>\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsMaxFileSize, 'maxFileSizeMb'])\" v-model:policyMeta=\"policyMetaModel.maxFileSizeMb\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsMaxFileSize }}</template>\n\t\t\t<template #valueText>{{ valuesModel.maxFileSizeMb }}MB</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.maxFileSizeMb\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t\t<template #suffix>MB</template>\n\t\t\t\t\t<template #caption>\n\t\t\t\t\t\t<div>{{ interpolateLocaleParameters($locale.sfc.roleOptionsMaxFileSize_caption2, { max: `${Math.floor(instance.maxFileSize / (1024 * 1024))}MB` }) }}</div>\n\t\t\t\t\t\t<div><i class=\"ti ti-alert-triangle\" style=\"color: var(--MI_THEME-warn);\"></i> {{ $locale.sfc.roleOptionsMaxFileSize_caption }}</div>\n\t\t\t\t\t</template>\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 11106,
-				"end": 11106,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11309,
-				"end": 11309,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11388,
-				"end": 11388,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11426,
-				"end": 11426,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11461,
-				"end": 11461,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11633,
-				"end": 11633,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11653,
-				"end": 11653,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11726,
-				"end": 11726,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11942,
-				"end": 11942,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11954,
-				"end": 11954,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11973,
-				"end": 11973,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 11986,
-				"end": 11986,
-				"current": "",
-				"baseline": "\t"
+				"end": 11997,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsUploadableFileTypes, 'uploadableFileTypes'])\" v-model:policyMeta=\"policyMetaModel.uploadableFileTypes\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsUploadableFileTypes }}</template>\n\t\t<template #valueText>...</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkTextarea :modelValue=\"valuesModel.uploadableFileTypes.join('\\n')\" :disabled=\"disabled\" @update:modelValue=\"v => valuesModel.uploadableFileTypes = v.split('\\n')\">\n\t\t\t\t<template #caption>\n\t\t\t\t\t<div>{{ $locale.sfc.roleOptionsUploadableFileTypes_caption }}</div>\n\t\t\t\t\t<div><i class=\"ti ti-alert-triangle\" style=\"color: var(--MI_THEME-warn);\"></i> {{ interpolateLocaleParameters($locale.sfc.roleOptionsUploadableFileTypes_caption2, { x: 'application/octet-stream' }) }}</div>\n\t\t\t\t</template>\n\t\t\t</MkTextarea>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsUploadableFileTypes, 'uploadableFileTypes'])\" v-model:policyMeta=\"policyMetaModel.uploadableFileTypes\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsUploadableFileTypes }}</template>\n\t\t\t<template #valueText>...</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkTextarea :modelValue=\"valuesModel.uploadableFileTypes.join('\\n')\" :disabled=\"disabled\" @update:modelValue=\"v => valuesModel.uploadableFileTypes = v.split('\\n')\">\n\t\t\t\t\t<template #caption>\n\t\t\t\t\t\t<div>{{ $locale.sfc.roleOptionsUploadableFileTypes_caption }}</div>\n\t\t\t\t\t\t<div><i class=\"ti ti-alert-triangle\" style=\"color: var(--MI_THEME-warn);\"></i> {{ interpolateLocaleParameters($locale.sfc.roleOptionsUploadableFileTypes_caption2, { x: 'application/octet-stream' }) }}</div>\n\t\t\t\t\t</template>\n\t\t\t\t</MkTextarea>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 11998,
-				"end": 11998,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12186,
-				"end": 12186,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12258,
-				"end": 12258,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12372,
-				"end": 12372,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12407,
-				"end": 12407,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12483,
-				"end": 12483,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12539,
-				"end": 12539,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12551,
-				"end": 12551,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12566,
-				"end": 12566,
-				"current": "",
-				"baseline": "\t"
+				"end": 12577,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsAlwaysMarkNsfw, 'alwaysMarkNsfw'])\" v-model:policyMeta=\"policyMetaModel.alwaysMarkNsfw\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsAlwaysMarkNsfw }}</template>\n\t\t<template #valueText>{{ valuesModel.alwaysMarkNsfw ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.alwaysMarkNsfw\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsAlwaysMarkNsfw, 'alwaysMarkNsfw'])\" v-model:policyMeta=\"policyMetaModel.alwaysMarkNsfw\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsAlwaysMarkNsfw }}</template>\n\t\t\t<template #valueText>{{ valuesModel.alwaysMarkNsfw ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.alwaysMarkNsfw\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 12578,
-				"end": 12578,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12775,
-				"end": 12775,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12850,
-				"end": 12850,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 12967,
-				"end": 12967,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13002,
-				"end": 13002,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13081,
-				"end": 13081,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13137,
-				"end": 13137,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13149,
-				"end": 13149,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13164,
-				"end": 13164,
-				"current": "",
-				"baseline": "\t"
+				"end": 13175,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanUpdateBioMedia, 'canUpdateBioMedia'])\" v-model:policyMeta=\"policyMetaModel.canUpdateBioMedia\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanUpdateBioMedia }}</template>\n\t\t<template #valueText>{{ valuesModel.canUpdateBioMedia ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canUpdateBioMedia\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanUpdateBioMedia, 'canUpdateBioMedia'])\" v-model:policyMeta=\"policyMetaModel.canUpdateBioMedia\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanUpdateBioMedia }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canUpdateBioMedia ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canUpdateBioMedia\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 13176,
-				"end": 13176,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13344,
-				"end": 13344,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13410,
-				"end": 13410,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13471,
-				"end": 13471,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13506,
-				"end": 13506,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13588,
-				"end": 13588,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13599,
-				"end": 13599,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13614,
-				"end": 13614,
-				"current": "",
-				"baseline": "\t"
+				"end": 13625,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsPinMax, 'pinLimit'])\" v-model:policyMeta=\"policyMetaModel.pinLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsPinMax }}</template>\n\t\t<template #valueText>{{ valuesModel.pinLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.pinLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsPinMax, 'pinLimit'])\" v-model:policyMeta=\"policyMetaModel.pinLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsPinMax }}</template>\n\t\t\t<template #valueText>{{ valuesModel.pinLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.pinLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 13626,
-				"end": 13626,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13806,
-				"end": 13806,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13876,
-				"end": 13876,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13941,
-				"end": 13941,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 13976,
-				"end": 13976,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14062,
-				"end": 14062,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14073,
-				"end": 14073,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14088,
-				"end": 14088,
-				"current": "",
-				"baseline": "\t"
+				"end": 14099,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsAntennaMax, 'antennaLimit'])\" v-model:policyMeta=\"policyMetaModel.antennaLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsAntennaMax }}</template>\n\t\t<template #valueText>{{ valuesModel.antennaLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.antennaLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsAntennaMax, 'antennaLimit'])\" v-model:policyMeta=\"policyMetaModel.antennaLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsAntennaMax }}</template>\n\t\t\t<template #valueText>{{ valuesModel.antennaLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.antennaLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 14100,
-				"end": 14100,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14283,
-				"end": 14283,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14354,
-				"end": 14354,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14420,
-				"end": 14420,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14455,
-				"end": 14455,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14543,
-				"end": 14543,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14581,
-				"end": 14581,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14592,
-				"end": 14592,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14607,
-				"end": 14607,
-				"current": "",
-				"baseline": "\t"
+				"end": 14618,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsWordMuteMax, 'wordMuteLimit'])\" v-model:policyMeta=\"policyMetaModel.wordMuteLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsWordMuteMax }}</template>\n\t\t<template #valueText>{{ valuesModel.wordMuteLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.wordMuteLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t<template #suffix>chars</template>\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsWordMuteMax, 'wordMuteLimit'])\" v-model:policyMeta=\"policyMetaModel.wordMuteLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsWordMuteMax }}</template>\n\t\t\t<template #valueText>{{ valuesModel.wordMuteLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.wordMuteLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t\t<template #suffix>chars</template>\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 14619,
-				"end": 14619,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14799,
-				"end": 14799,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14869,
-				"end": 14869,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14934,
-				"end": 14934,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 14969,
-				"end": 14969,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15055,
-				"end": 15055,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15066,
-				"end": 15066,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15081,
-				"end": 15081,
-				"current": "",
-				"baseline": "\t"
+				"end": 15092,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsWebhookMax, 'webhookLimit'])\" v-model:policyMeta=\"policyMetaModel.webhookLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsWebhookMax }}</template>\n\t\t<template #valueText>{{ valuesModel.webhookLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.webhookLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsWebhookMax, 'webhookLimit'])\" v-model:policyMeta=\"policyMetaModel.webhookLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsWebhookMax }}</template>\n\t\t\t<template #valueText>{{ valuesModel.webhookLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.webhookLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 15093,
-				"end": 15093,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15264,
-				"end": 15264,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15331,
-				"end": 15331,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15393,
-				"end": 15393,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15428,
-				"end": 15428,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15511,
-				"end": 15511,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15522,
-				"end": 15522,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15537,
-				"end": 15537,
-				"current": "",
-				"baseline": "\t"
+				"end": 15548,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsClipMax, 'clipLimit'])\" v-model:policyMeta=\"policyMetaModel.clipLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsClipMax }}</template>\n\t\t<template #valueText>{{ valuesModel.clipLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.clipLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsClipMax, 'clipLimit'])\" v-model:policyMeta=\"policyMetaModel.clipLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsClipMax }}</template>\n\t\t\t<template #valueText>{{ valuesModel.clipLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.clipLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 15549,
-				"end": 15549,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15747,
-				"end": 15747,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15823,
-				"end": 15823,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15894,
-				"end": 15894,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 15929,
-				"end": 15929,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16021,
-				"end": 16021,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16032,
-				"end": 16032,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16047,
-				"end": 16047,
-				"current": "",
-				"baseline": "\t"
+				"end": 16058,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsNoteEachClipsMax, 'noteEachClipsLimit'])\" v-model:policyMeta=\"policyMetaModel.noteEachClipsLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsNoteEachClipsMax }}</template>\n\t\t<template #valueText>{{ valuesModel.noteEachClipsLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.noteEachClipsLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsNoteEachClipsMax, 'noteEachClipsLimit'])\" v-model:policyMeta=\"policyMetaModel.noteEachClipsLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsNoteEachClipsMax }}</template>\n\t\t\t<template #valueText>{{ valuesModel.noteEachClipsLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.noteEachClipsLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 16059,
-				"end": 16059,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16242,
-				"end": 16242,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16313,
-				"end": 16313,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16379,
-				"end": 16379,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16414,
-				"end": 16414,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16501,
-				"end": 16501,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16512,
-				"end": 16512,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16527,
-				"end": 16527,
-				"current": "",
-				"baseline": "\t"
+				"end": 16538,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsUserListMax, 'userListLimit'])\" v-model:policyMeta=\"policyMetaModel.userListLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsUserListMax }}</template>\n\t\t<template #valueText>{{ valuesModel.userListLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.userListLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsUserListMax, 'userListLimit'])\" v-model:policyMeta=\"policyMetaModel.userListLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsUserListMax }}</template>\n\t\t\t<template #valueText>{{ valuesModel.userListLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.userListLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 16539,
-				"end": 16539,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16749,
-				"end": 16749,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16829,
-				"end": 16829,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16904,
-				"end": 16904,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 16939,
-				"end": 16939,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17035,
-				"end": 17035,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17046,
-				"end": 17046,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17061,
-				"end": 17061,
-				"current": "",
-				"baseline": "\t"
+				"end": 17072,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsUserEachUserListsMax, 'userEachUserListsLimit'])\" v-model:policyMeta=\"policyMetaModel.userEachUserListsLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsUserEachUserListsMax }}</template>\n\t\t<template #valueText>{{ valuesModel.userEachUserListsLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.userEachUserListsLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsUserEachUserListsMax, 'userEachUserListsLimit'])\" v-model:policyMeta=\"policyMetaModel.userEachUserListsLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsUserEachUserListsMax }}</template>\n\t\t\t<template #valueText>{{ valuesModel.userEachUserListsLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.userEachUserListsLimit\" type=\"number\" :disabled=\"disabled\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 17073,
-				"end": 17073,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17249,
-				"end": 17249,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17317,
-				"end": 17317,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17427,
-				"end": 17427,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17462,
-				"end": 17462,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17534,
-				"end": 17534,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17590,
-				"end": 17590,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17602,
-				"end": 17602,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17617,
-				"end": 17617,
-				"current": "",
-				"baseline": "\t"
+				"end": 17628,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanHideAds, 'canHideAds'])\" v-model:policyMeta=\"policyMetaModel.canHideAds\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanHideAds }}</template>\n\t\t<template #valueText>{{ valuesModel.canHideAds ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canHideAds\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanHideAds, 'canHideAds'])\" v-model:policyMeta=\"policyMetaModel.canHideAds\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanHideAds }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canHideAds ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canHideAds\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 17629,
-				"end": 17629,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17838,
-				"end": 17838,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17919,
-				"end": 17919,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 17993,
-				"end": 17993,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18028,
-				"end": 18028,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18179,
-				"end": 18179,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18190,
-				"end": 18190,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18205,
-				"end": 18205,
-				"current": "",
-				"baseline": "\t"
+				"end": 18216,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsAvatarDecorationLimit, 'avatarDecorationLimit'])\" v-model:policyMeta=\"policyMetaModel.avatarDecorationLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsAvatarDecorationLimit }}</template>\n\t\t<template #valueText>{{ valuesModel.avatarDecorationLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"avatarDecorationLimit\" type=\"number\" :disabled=\"disabled\" :min=\"0\" :max=\"16\" @update:modelValue=\"updateAvatarDecorationLimit\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsAvatarDecorationLimit, 'avatarDecorationLimit'])\" v-model:policyMeta=\"policyMetaModel.avatarDecorationLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsAvatarDecorationLimit }}</template>\n\t\t\t<template #valueText>{{ valuesModel.avatarDecorationLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"avatarDecorationLimit\" type=\"number\" :disabled=\"disabled\" :min=\"0\" :max=\"16\" @update:modelValue=\"updateAvatarDecorationLimit\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 18217,
-				"end": 18217,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18414,
-				"end": 18414,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18489,
-				"end": 18489,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18606,
-				"end": 18606,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18641,
-				"end": 18641,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18720,
-				"end": 18720,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18776,
-				"end": 18776,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18788,
-				"end": 18788,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 18803,
-				"end": 18803,
-				"current": "",
-				"baseline": "\t"
+				"end": 18814,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportAntennas, 'canImportAntennas'])\" v-model:policyMeta=\"policyMetaModel.canImportAntennas\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportAntennas }}</template>\n\t\t<template #valueText>{{ valuesModel.canImportAntennas ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canImportAntennas\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportAntennas, 'canImportAntennas'])\" v-model:policyMeta=\"policyMetaModel.canImportAntennas\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportAntennas }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canImportAntennas ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canImportAntennas\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 18815,
-				"end": 18815,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19012,
-				"end": 19012,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19087,
-				"end": 19087,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19204,
-				"end": 19204,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19239,
-				"end": 19239,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19318,
-				"end": 19318,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19374,
-				"end": 19374,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19386,
-				"end": 19386,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19401,
-				"end": 19401,
-				"current": "",
-				"baseline": "\t"
+				"end": 19412,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportBlocking, 'canImportBlocking'])\" v-model:policyMeta=\"policyMetaModel.canImportBlocking\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportBlocking }}</template>\n\t\t<template #valueText>{{ valuesModel.canImportBlocking ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canImportBlocking\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportBlocking, 'canImportBlocking'])\" v-model:policyMeta=\"policyMetaModel.canImportBlocking\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportBlocking }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canImportBlocking ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canImportBlocking\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 19413,
-				"end": 19413,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19613,
-				"end": 19613,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19689,
-				"end": 19689,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19807,
-				"end": 19807,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19842,
-				"end": 19842,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19922,
-				"end": 19922,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19978,
-				"end": 19978,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 19990,
-				"end": 19990,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20005,
-				"end": 20005,
-				"current": "",
-				"baseline": "\t"
+				"end": 20016,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportFollowing, 'canImportFollowing'])\" v-model:policyMeta=\"policyMetaModel.canImportFollowing\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportFollowing }}</template>\n\t\t<template #valueText>{{ valuesModel.canImportFollowing ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canImportFollowing\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportFollowing, 'canImportFollowing'])\" v-model:policyMeta=\"policyMetaModel.canImportFollowing\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportFollowing }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canImportFollowing ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canImportFollowing\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 20017,
-				"end": 20017,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20208,
-				"end": 20208,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20281,
-				"end": 20281,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20396,
-				"end": 20396,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20431,
-				"end": 20431,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20508,
-				"end": 20508,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20564,
-				"end": 20564,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20576,
-				"end": 20576,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20591,
-				"end": 20591,
-				"current": "",
-				"baseline": "\t"
+				"end": 20602,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportMuting, 'canImportMuting'])\" v-model:policyMeta=\"policyMetaModel.canImportMuting\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportMuting }}</template>\n\t\t<template #valueText>{{ valuesModel.canImportMuting ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canImportMuting\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportMuting, 'canImportMuting'])\" v-model:policyMeta=\"policyMetaModel.canImportMuting\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportMuting }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canImportMuting ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canImportMuting\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 20603,
-				"end": 20603,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20802,
-				"end": 20802,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20878,
-				"end": 20878,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 20996,
-				"end": 20996,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21031,
-				"end": 21031,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21111,
-				"end": 21111,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21167,
-				"end": 21167,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21179,
-				"end": 21179,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21194,
-				"end": 21194,
-				"current": "",
-				"baseline": "\t"
+				"end": 21205,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportUserLists, 'canImportUserList'])\" v-model:policyMeta=\"policyMetaModel.canImportUserLists\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportUserLists }}</template>\n\t\t<template #valueText>{{ valuesModel.canImportUserLists ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canImportUserLists\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanImportUserLists, 'canImportUserList'])\" v-model:policyMeta=\"policyMetaModel.canImportUserLists\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsCanImportUserLists }}</template>\n\t\t\t<template #valueText>{{ valuesModel.canImportUserLists ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.canImportUserLists\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 21206,
-				"end": 21206,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21394,
-				"end": 21394,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21468,
-				"end": 21468,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21535,
-				"end": 21535,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21570,
-				"end": 21570,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21667,
-				"end": 21667,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21678,
-				"end": 21678,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21693,
-				"end": 21693,
-				"current": "",
-				"baseline": "\t"
+				"end": 21704,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsNoteDraftLimit, 'noteDraftLimit'])\" v-model:policyMeta=\"policyMetaModel.noteDraftLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsNoteDraftLimit }}</template>\n\t\t<template #valueText>{{ valuesModel.noteDraftLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.noteDraftLimit\" type=\"number\" :disabled=\"disabled\" :min=\"0\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsNoteDraftLimit, 'noteDraftLimit'])\" v-model:policyMeta=\"policyMetaModel.noteDraftLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsNoteDraftLimit }}</template>\n\t\t\t<template #valueText>{{ valuesModel.noteDraftLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.noteDraftLimit\" type=\"number\" :disabled=\"disabled\" :min=\"0\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 21705,
-				"end": 21705,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21905,
-				"end": 21905,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 21983,
-				"end": 21983,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22054,
-				"end": 22054,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22089,
-				"end": 22089,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22190,
-				"end": 22190,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22201,
-				"end": 22201,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22216,
-				"end": 22216,
-				"current": "",
-				"baseline": "\t"
+				"end": 22227,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsScheduledNoteLimit, 'scheduledNoteLimit'])\" v-model:policyMeta=\"policyMetaModel.scheduledNoteLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsScheduledNoteLimit }}</template>\n\t\t<template #valueText>{{ valuesModel.scheduledNoteLimit }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkInput v-model=\"valuesModel.scheduledNoteLimit\" type=\"number\" :disabled=\"disabled\" :min=\"0\">\n\t\t\t</MkInput>\n\t\t</template>\n\t</XFolder>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsScheduledNoteLimit, 'scheduledNoteLimit'])\" v-model:policyMeta=\"policyMetaModel.scheduledNoteLimit\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsScheduledNoteLimit }}</template>\n\t\t\t<template #valueText>{{ valuesModel.scheduledNoteLimit }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkInput v-model=\"valuesModel.scheduledNoteLimit\" type=\"number\" :disabled=\"disabled\" :min=\"0\">\n\t\t\t\t</MkInput>\n\t\t\t</template>\n\t\t</XFolder>\n"
 			},
 			{
 				"start": 22228,
-				"end": 22228,
-				"current": "",
-				"baseline": "\t"
+				"end": 22838,
+				"current": "\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsWatermarkAvailable, 'watermarkAvailable'])\" v-model:policyMeta=\"policyMetaModel.watermarkAvailable\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsWatermarkAvailable }}</template>\n\t\t<template #valueText>{{ valuesModel.watermarkAvailable ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.watermarkAvailable\" :disabled=\"disabled\">\n\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n</div>\n",
+				"baseline": "\t\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsWatermarkAvailable, 'watermarkAvailable'])\" v-model:policyMeta=\"policyMetaModel.watermarkAvailable\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t\t<template #label>{{ $locale.sfc.roleOptionsWatermarkAvailable }}</template>\n\t\t\t<template #valueText>{{ valuesModel.watermarkAvailable ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t\t<template #default=\"{ disabled }\">\n\t\t\t\t<MkSwitch v-model=\"valuesModel.watermarkAvailable\" :disabled=\"disabled\">\n\t\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t\t</MkSwitch>\n\t\t\t</template>\n\t\t</XFolder>\n\t</div>\n"
 			},
 			{
-				"start": 22428,
-				"end": 22428,
+				"start": 22870,
+				"end": 22870,
 				"current": "",
-				"baseline": "\t"
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 22504,
-				"end": 22504,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22622,
-				"end": 22622,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22657,
-				"end": 22657,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22737,
-				"end": 22737,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22793,
-				"end": 22793,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22805,
-				"end": 22805,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22820,
-				"end": 22820,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22831,
-				"end": 22831,
-				"current": "",
-				"baseline": "\t"
-			},
-			{
-				"start": 22869,
-				"end": 22905,
-				"current": "\nimport type { Locale } from 'i18n';",
+				"start": 23172,
+				"end": 23275,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 22972,
-				"end": 22972,
-				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
-			},
-			{
-				"start": 23274,
-				"end": 23332,
+				"start": 23868,
+				"end": 23926,
 				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
@@ -12775,11 +12137,20 @@ export const globalCatalogPilotOwners = [
 				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1676,
-				"end": 1770,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1678,
+				"end": 1772,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
+		],
+		"dictionaryIndent": "\t",
+		"nonPrimaryOrder": [
+			"close",
+			"goToMisskey",
+			"share"
+		],
+		"primaryOrderLocales": [
+			"ja-JP"
 		]
 	},
 	{
@@ -12983,7 +12354,15 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"timelinesLabels": [
+				"home",
+				"local",
+				"social",
+				"global"
+			]
+		}
 	},
 	{
 		"file": "packages/features/timelines/frontend/pages/antenna-timeline.vue",
@@ -13115,7 +12494,15 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';\nimport type { BasicTimelineType } from '@features/timelines/frontend/timelines.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Tab } from '@features/navigation/frontend/components/global/MkPageHeader.tabs.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"timelinesLabels": [
+				"home",
+				"local",
+				"social",
+				"global"
+			]
+		}
 	},
 	{
 		"file": "packages/features/timelines/frontend/pages/user/index.timeline.vue",
@@ -13226,7 +12613,15 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport XColumn from '../../../../navigation/frontend/ui/deck/column.vue';\nimport type { SoundStore } from '@features/preferences/frontend/state/def.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Column } from '@features/preferences/frontend/deck.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"timelinesLabels": [
+				"home",
+				"local",
+				"social",
+				"global"
+			]
+		}
 	},
 	{
 		"file": "packages/features/timelines/frontend/widgets/WidgetTimeline.vue",
@@ -13259,7 +12654,15 @@ export const globalCatalogPilotOwners = [
 				"current": ";\nimport { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';\nimport type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
-		]
+		],
+		"groupOrders": {
+			"timelinesLabels": [
+				"home",
+				"local",
+				"social",
+				"global"
+			]
+		}
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkContainer.vue",
@@ -13273,22 +12676,23 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1700,
-				"end": 1700,
+				"start": 1693,
+				"end": 1693,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1837,
-				"end": 1931,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1839,
+				"end": 1933,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkDialog.vue",
-		"currentSha256": "346d2275f3f8416df674bda5016d5f07af31650b889a77d7a97a5f620aceacbf",
+		"currentSha256": "bec1089dfae969c8c155f31fdc66a4d0ff1b6abcf52d326e9fefbc2002c19ba3",
 		"baselineSha256": "8fe1f6218e425fc9c6aab5a43bd213c697db1805463f6a081c2c4c359c600193",
 		"keys": [
 			"ok",
@@ -13304,33 +12708,27 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2976,
-				"end": 3012,
-				"current": "type { Locale } from 'i18n';\nimport ",
+				"start": 2969,
+				"end": 2969,
+				"current": "",
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 3174,
+				"end": 3277,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 3071,
-				"end": 3071,
+				"start": 3606,
+				"end": 3606,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';\nimport type { OptionValue } from '@features/ui/frontend/types/option-value.js';\n"
 			},
 			{
-				"start": 3276,
-				"end": 3334,
-				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
-				"baseline": ""
-			},
-			{
-				"start": 3671,
-				"end": 3671,
-				"current": "",
-				"baseline": "type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';\nimport type { OptionValue } from '@features/ui/frontend/types/option-value.js';\nimport "
-			},
-			{
-				"start": 3849,
-				"end": 4012,
-				"current": "';\nimport type { OptionValue } from '@features/ui/frontend/types/option-value.js';\nimport type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue",
+				"start": 3794,
+				"end": 4015,
+				"current": "import type { OptionValue } from '@features/ui/frontend/types/option-value.js';\nimport type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
@@ -13370,7 +12768,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkInput.vue",
-		"currentSha256": "c5503a08daabf904bf685d3b77f89b967d7b3c2bc90a92ae084e199900baddc1",
+		"currentSha256": "ba4dcf4d59aecdeee98731a1b2435f204a3296bd386807800c9bd81551b989e6",
 		"baselineSha256": "55773dedf102145685dab3f2e0c21f4dfd062a728cb47781edf525f75c47da00",
 		"keys": [
 			"save"
@@ -13380,36 +12778,31 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1405,
-				"end": 1441,
-				"current": "type { Locale } from 'i18n';\nimport ",
+				"start": 1398,
+				"end": 1398,
+				"current": "",
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 1829,
+				"end": 1932,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 1500,
-				"end": 1500,
+				"start": 2090,
+				"end": 2090,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { InputHTMLAttributes } from 'vue';\nimport type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';\n"
 			},
 			{
-				"start": 1932,
-				"end": 1990,
-				"current": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n",
-				"baseline": ""
-			},
-			{
-				"start": 2145,
-				"end": 2145,
-				"current": "",
-				"baseline": "';\nimport type { InputHTMLAttributes } from 'vue';\nimport type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js"
-			},
-			{
-				"start": 2366,
-				"end": 2506,
-				"current": "';\nimport type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';\nimport type { InputHTMLAttributes } from 'vue",
+				"start": 2311,
+				"end": 2509,
+				"current": "import type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';\nimport type { InputHTMLAttributes } from 'vue';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkKeyValue.vue",
@@ -13423,24 +12816,25 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 526,
-				"end": 562,
-				"current": "type { Locale } from 'i18n';\nimport ",
-				"baseline": ""
-			},
-			{
-				"start": 621,
-				"end": 621,
+				"start": 519,
+				"end": 519,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\n"
 			},
 			{
-				"start": 780,
-				"end": 838,
-				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 555,
+				"end": 622,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\n",
+				"baseline": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 782,
+				"end": 840,
+				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkMenu.vue",
@@ -13454,16 +12848,16 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 9132,
-				"end": 9132,
+				"start": 9125,
+				"end": 9125,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 9286,
-				"end": 9286,
+				"start": 9289,
+				"end": 9289,
 				"current": "",
-				"baseline": "';\nimport type { MenuItem, InnerMenuItem, MenuPending, MenuAction, MenuSwitch, MenuRadio, MenuRadioOption, MenuParent } from '@features/navigation/frontend/types/menu.js';\nimport type { Keymap } from '@features/ui/frontend/utility/hotkey.js"
+				"baseline": "import type { MenuItem, InnerMenuItem, MenuPending, MenuAction, MenuSwitch, MenuRadio, MenuRadioOption, MenuParent } from '@features/navigation/frontend/types/menu.js';\nimport type { Keymap } from '@features/ui/frontend/utility/hotkey.js';\n"
 			},
 			{
 				"start": 9651,
@@ -13472,12 +12866,13 @@ export const globalCatalogPilotOwners = [
 				"baseline": ""
 			},
 			{
-				"start": 10024,
-				"end": 10082,
-				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"start": 10025,
+				"end": 10083,
+				"current": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkModalWindow.vue",
@@ -13491,18 +12886,19 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1290,
-				"end": 1290,
+				"start": 1283,
+				"end": 1283,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1561,
-				"end": 1655,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1563,
+				"end": 1657,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkOmit.vue",
@@ -13516,18 +12912,19 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 523,
-				"end": 523,
+				"start": 516,
+				"end": 516,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 581,
-				"end": 675,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 583,
+				"end": 677,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkPagination.vue",
@@ -13610,18 +13007,19 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 946,
-				"end": 946,
+				"start": 939,
+				"end": 939,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1220,
-				"end": 1314,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1222,
+				"end": 1316,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkTextarea.vue",
@@ -13637,24 +13035,25 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1392,
-				"end": 1392,
+				"start": 1385,
+				"end": 1385,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1530,
-				"end": 1530,
+				"start": 1533,
+				"end": 1533,
 				"current": "",
-				"baseline": "';\nimport type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js"
+				"baseline": "import type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';\n"
 			},
 			{
-				"start": 1686,
-				"end": 1872,
-				"current": ";\nimport type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1688,
+				"end": 1874,
+				"current": "import type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkWidgetSettingsDialog.vue",
@@ -13690,7 +13089,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkWidgets.vue",
-		"currentSha256": "5be94e377c021055922abda1933ad09658019840353d72be2e5dbbfe610fbf39",
+		"currentSha256": "1a9073de1e3bc3de4db0a2c558258b2f32c739ea308c0617cf9b34638ab5a7a0",
 		"baselineSha256": "4e88902f8293886a2609351dc1305097e273b2edc2bc194d6f9e26fa63342ca8",
 		"keys": [
 			"close",
@@ -13708,33 +13107,27 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1878,
-				"end": 1914,
-				"current": "type { Locale } from 'i18n';\nimport ",
+				"start": 1871,
+				"end": 1871,
+				"current": "",
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 2060,
+				"end": 2163,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 1973,
-				"end": 1973,
+				"start": 2261,
+				"end": 2261,
 				"current": "",
-				"baseline": "\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+				"baseline": "import type { Component } from 'vue';\n"
 			},
 			{
-				"start": 2163,
-				"end": 2221,
-				"current": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n",
-				"baseline": ""
-			},
-			{
-				"start": 2316,
-				"end": 2316,
-				"current": "",
-				"baseline": "';\nimport type { Component } from 'vue"
-			},
-			{
-				"start": 2987,
-				"end": 3025,
-				"current": "';\nimport type { Component } from 'vue",
+				"start": 2932,
+				"end": 3028,
+				"current": "import type { Component } from 'vue';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
 		]
@@ -13839,18 +13232,19 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 745,
-				"end": 745,
+				"start": 738,
+				"end": 738,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 840,
-				"end": 934,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 842,
+				"end": 936,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/ui/frontend/components/global/MkTip.vue",
@@ -14770,7 +14164,245 @@ export const globalCatalogPilotOwners = [
 				"current": "\t},\n",
 				"baseline": ""
 			}
-		]
+		],
+		"nonPrimaryOrder": [
+			"yourNameContainsProhibitedWords",
+			"yourNameContainsProhibitedWordsDescription",
+			"avatar",
+			"upload",
+			"cropImageAsk",
+			"cropYes",
+			"cropNo",
+			"fromDrive",
+			"banner",
+			"profile",
+			"changeBanner",
+			"changeAvatar",
+			"decorate",
+			"name",
+			"description",
+			"youCanIncludeHashtags",
+			"location",
+			"birthday",
+			"language",
+			"metadataEdit",
+			"save",
+			"add",
+			"delete",
+			"rearrange",
+			"verifiedLinkDescription",
+			"metadataLabel",
+			"metadataContent",
+			"metadataDescription",
+			"followedMessage",
+			"followedMessageDescription",
+			"followedMessageDescriptionForLockedAccount",
+			"all",
+			"likeOnlyForRemote",
+			"nonSensitiveOnly",
+			"nonSensitiveOnlyForLocalLikeOnlyForRemote",
+			"likeOnly",
+			"reactionAcceptance",
+			"advancedSettings",
+			"flagAsCat",
+			"flagAsCatDescription",
+			"flagAsBot",
+			"flagAsBotDescription",
+			"qr"
+		],
+		"primaryOrderLocales": [
+			"ja-JP"
+		],
+		"localeOrders": {
+			"ca-ES": [
+				"yourNameContainsProhibitedWords",
+				"yourNameContainsProhibitedWordsDescription",
+				"avatar",
+				"upload",
+				"cropImageAsk",
+				"cropYes",
+				"cropNo",
+				"fromDrive",
+				"banner",
+				"profile",
+				"changeBanner",
+				"changeAvatar",
+				"decorate",
+				"name",
+				"description",
+				"youCanIncludeHashtags",
+				"location",
+				"birthday",
+				"language",
+				"metadataEdit",
+				"save",
+				"add",
+				"delete",
+				"rearrange",
+				"verifiedLinkDescription",
+				"metadataLabel",
+				"metadataContent",
+				"metadataDescription",
+				"followedMessage",
+				"followedMessageDescription",
+				"followedMessageDescriptionForLockedAccount",
+				"all",
+				"likeOnlyForRemote",
+				"nonSensitiveOnly",
+				"nonSensitiveOnlyForLocalLikeOnlyForRemote",
+				"likeOnly",
+				"reactionAcceptance",
+				"advancedSettings",
+				"flagAsCat",
+				"flagAsCatDescription",
+				"flagAsBot",
+				"flagAsBotDescription",
+				"qr",
+				"cannotSelectSensitiveMedia",
+				"cannotSelectSensitiveMediaDescription"
+			],
+			"es-ES": [
+				"yourNameContainsProhibitedWords",
+				"yourNameContainsProhibitedWordsDescription",
+				"avatar",
+				"upload",
+				"cropImageAsk",
+				"cropYes",
+				"cropNo",
+				"fromDrive",
+				"banner",
+				"profile",
+				"changeBanner",
+				"changeAvatar",
+				"decorate",
+				"name",
+				"description",
+				"youCanIncludeHashtags",
+				"location",
+				"birthday",
+				"language",
+				"metadataEdit",
+				"save",
+				"add",
+				"delete",
+				"rearrange",
+				"verifiedLinkDescription",
+				"metadataLabel",
+				"metadataContent",
+				"metadataDescription",
+				"followedMessage",
+				"followedMessageDescription",
+				"followedMessageDescriptionForLockedAccount",
+				"all",
+				"likeOnlyForRemote",
+				"nonSensitiveOnly",
+				"nonSensitiveOnlyForLocalLikeOnlyForRemote",
+				"likeOnly",
+				"reactionAcceptance",
+				"advancedSettings",
+				"flagAsCat",
+				"flagAsCatDescription",
+				"flagAsBot",
+				"flagAsBotDescription",
+				"qr",
+				"cannotSelectSensitiveMedia",
+				"cannotSelectSensitiveMediaDescription"
+			],
+			"ko-KR": [
+				"yourNameContainsProhibitedWords",
+				"yourNameContainsProhibitedWordsDescription",
+				"avatar",
+				"upload",
+				"cropImageAsk",
+				"cropYes",
+				"cropNo",
+				"fromDrive",
+				"banner",
+				"profile",
+				"changeBanner",
+				"changeAvatar",
+				"decorate",
+				"name",
+				"description",
+				"youCanIncludeHashtags",
+				"location",
+				"birthday",
+				"language",
+				"metadataEdit",
+				"save",
+				"add",
+				"delete",
+				"rearrange",
+				"verifiedLinkDescription",
+				"metadataLabel",
+				"metadataContent",
+				"metadataDescription",
+				"followedMessage",
+				"followedMessageDescription",
+				"followedMessageDescriptionForLockedAccount",
+				"all",
+				"likeOnlyForRemote",
+				"nonSensitiveOnly",
+				"nonSensitiveOnlyForLocalLikeOnlyForRemote",
+				"likeOnly",
+				"reactionAcceptance",
+				"advancedSettings",
+				"flagAsCat",
+				"flagAsCatDescription",
+				"flagAsBot",
+				"flagAsBotDescription",
+				"qr",
+				"cannotSelectSensitiveMedia",
+				"cannotSelectSensitiveMediaDescription"
+			],
+			"zh-CN": [
+				"yourNameContainsProhibitedWords",
+				"yourNameContainsProhibitedWordsDescription",
+				"avatar",
+				"upload",
+				"cropImageAsk",
+				"cropYes",
+				"cropNo",
+				"fromDrive",
+				"banner",
+				"profile",
+				"changeBanner",
+				"changeAvatar",
+				"decorate",
+				"name",
+				"description",
+				"youCanIncludeHashtags",
+				"location",
+				"birthday",
+				"language",
+				"metadataEdit",
+				"save",
+				"add",
+				"delete",
+				"rearrange",
+				"verifiedLinkDescription",
+				"metadataLabel",
+				"metadataContent",
+				"metadataDescription",
+				"followedMessage",
+				"followedMessageDescription",
+				"followedMessageDescriptionForLockedAccount",
+				"all",
+				"likeOnlyForRemote",
+				"nonSensitiveOnly",
+				"nonSensitiveOnlyForLocalLikeOnlyForRemote",
+				"likeOnly",
+				"reactionAcceptance",
+				"advancedSettings",
+				"flagAsCat",
+				"flagAsCatDescription",
+				"flagAsBot",
+				"flagAsBotDescription",
+				"qr",
+				"cannotSelectSensitiveMedia",
+				"cannotSelectSensitiveMediaDescription"
+			]
+		}
 	},
 	{
 		"file": "packages/features/users/frontend/pages/settings/profiles.vue",
@@ -14902,18 +14534,19 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1609,
-				"end": 1609,
+				"start": 1602,
+				"end": 1602,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1964,
-				"end": 2058,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1966,
+				"end": 2060,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			}
-		]
+		],
+		"dictionaryIndent": "  "
 	},
 	{
 		"file": "packages/features/users/frontend/ts-messages.vue",
@@ -15108,6 +14741,16 @@ const promotedGroups: Record<string, string> = {
 	"cwShow": "_cw.show"
 };
 const globalPath = (key: string): string => promotedGroups[key] ?? key;
+type PilotOwner = typeof globalCatalogPilotOwners[number];
+const historicalOrder = (owner: PilotOwner, language: string): readonly string[] => {
+	const order = 'localeOrders' in owner ? (owner.localeOrders as Record<string, readonly string[]>)[language] : undefined;
+	return order ?? ('nonPrimaryOrder' in owner && !(owner.primaryOrderLocales as readonly string[]).includes(language) ? owner.nonPrimaryOrder : owner.order);
+};
+const historicalValue = (owner: PilotOwner, dictionary: unknown, key: string): unknown => {
+	const value = globalValue(dictionary, key);
+	const order = 'groupOrders' in owner ? (owner.groupOrders as Record<string, readonly string[]>)[key] : undefined;
+	return order ? Object.fromEntries(order.map(part => [part, Reflect.get(value as object, part)])) : value;
+};
 const globalValue = (dictionary: unknown, key: string): unknown => {
 	for (const part of globalPath(key).split('.')) dictionary = dictionary && typeof dictionary === 'object' ? Reflect.get(dictionary, part) : undefined;
 	return dictionary;
@@ -15135,8 +14778,9 @@ export function restoreGlobalCatalogPilotSource(file: string, source: string): s
 		const current = JSON.parse(content) as Record<string, string>;
 		const messages = locales[language];
 		if (!messages) throw new Error(`Unexpected global catalog pilot language: ${language}`);
-		const original = Object.fromEntries(owner.order.map(key => [key, Object.hasOwn(current, key) ? current[key] : globalValue(messages, key)]));
-		const indent = content.match(/\n([ \t]+)"/)?.[1] ?? '\t';
+		const original = Object.fromEntries(historicalOrder(owner, language).map(key => [key, Object.hasOwn(current, key) ? current[key] : historicalValue(owner, messages, key)]));
+		// Empty local dictionaries no longer carry their historical indentation.
+		const indent = content.match(/\n([ \t]+)"/)?.[1] ?? ('dictionaryIndent' in owner ? owner.dictionaryIndent : '\t');
 		if (!indent) throw new Error(`Missing global catalog pilot dictionary indent: ${file}`);
 		let json = JSON.stringify(original, null, indent);
 		for (const escape of lexicalEscapes[file]?.[language] ?? []) json = json.replaceAll(String.fromCharCode(Number.parseInt(escape.slice(2), 16)), escape);
@@ -15161,7 +14805,7 @@ export function restoreGlobalCatalogPilotDictionary(file: string, language: stri
 	for (const key of owner.keys) {
 		if (JSON.stringify(globalValue(global, key)) !== JSON.stringify(globalValue(locales[language], key))) throw new Error(`Global catalog pilot shared label differs: ${language}:${key}`);
 	}
-	const restored = Object.fromEntries(owner.order.map(key => [key, Object.hasOwn(dictionary, key) ? dictionary[key] : globalValue(global, key)]));
+	const restored = Object.fromEntries(historicalOrder(owner, language).map(key => [key, Object.hasOwn(dictionary, key) ? dictionary[key] : historicalValue(owner, global, key)]));
 	if (JSON.stringify(restored) !== JSON.stringify(collect(baseline))) throw new Error(`Global catalog pilot historical dictionary differs: ${file}:${language}`);
 	return restored;
 }

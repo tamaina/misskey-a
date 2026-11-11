@@ -38,8 +38,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Locale } from 'i18n';
-import { useLocale } from 'virtual:vite-vue-internationalization';
 export type PwResponse = {
 	password: string;
 	captcha: {
@@ -53,8 +51,8 @@ export type PwResponse = {
 </script>
 
 <script setup lang="ts">
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { ref, computed, useTemplateRef, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 
@@ -64,6 +62,8 @@ import * as os from '@features/ui/frontend/os.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkCaptcha from '@features/auth/frontend/components/MkCaptcha.vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	user: Misskey.entities.UserDetailed;

@@ -19,8 +19,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 const notificationConfigTypes = [
 	'all',
 	'following',
@@ -40,13 +38,15 @@ export type NotificationConfig = {
 </script>
 
 <script lang="ts" setup>
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import * as Misskey from 'misskey-js';
 import { ref, computed } from 'vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	value: NotificationConfig;

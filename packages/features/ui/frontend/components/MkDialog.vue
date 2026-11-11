@@ -42,15 +42,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Locale } from 'i18n';
-import { useLocale } from 'virtual:vite-vue-internationalization';
 export type Result = string | number | true | null;
 export type MkDialogReturnType<T = Result> = { canceled: true, result: undefined } | { canceled: false, result: T };
 </script>
 
 <script lang="ts" setup>
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { ref, useTemplateRef, computed } from 'vue';
 import MkModal from '@features/ui/frontend/components/MkModal.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -60,6 +58,8 @@ import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import type { OptionValue } from '@features/ui/frontend/types/option-value.js';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 type Input = {
 	type?: 'text' | 'number' | 'password' | 'email' | 'url' | 'date' | 'time' | 'search' | 'datetime-local';

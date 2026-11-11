@@ -44,8 +44,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Locale } from 'i18n';
-import { useLocale } from 'virtual:vite-vue-internationalization';
 type SupportedTypes = 'text' | 'password' | 'email' | 'url' | 'tel' | 'number' | 'search' | 'date' | 'time' | 'datetime-local' | 'color';
 type ModelValueType<T extends SupportedTypes> =
 	T extends 'number' ? number :
@@ -54,8 +52,8 @@ type ModelValueType<T extends SupportedTypes> =
 </script>
 
 <script lang="ts" setup generic="T extends SupportedTypes = 'text'">
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { onMounted, onUnmounted, nextTick, ref, useTemplateRef, watch, computed, toRefs } from 'vue';
 import { throttle, debounce } from 'throttle-debounce';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -63,6 +61,8 @@ import { Autocomplete } from '@features/discovery/frontend/utility/autocomplete.
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';
 import type { InputHTMLAttributes } from 'vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	modelValue: ModelValueType<T> | null;

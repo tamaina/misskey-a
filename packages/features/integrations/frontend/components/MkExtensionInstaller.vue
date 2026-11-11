@@ -101,8 +101,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts">
-import type { Locale } from 'i18n';
-import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 
 export type Extension = {
@@ -127,8 +125,8 @@ export type Extension = {
 };
 </script>
 <script lang="ts" setup>
-const globalLocale = useLocale<Locale>(import.meta.url);
-
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
@@ -137,6 +135,8 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const isPlugin = computed(() => props.extension.type === 'plugin');
 const isTheme = computed(() => props.extension.type === 'theme');
