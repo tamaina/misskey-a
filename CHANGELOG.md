@@ -65,6 +65,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Enhance: 開発者向けにOIDCのID token検証・discovery・短命transaction・token交換と認証進行管理の基盤を追加（ログイン経路への接続は未提供） (#109, #121, #131, #135)
 
 ### Client
+- Feat: 重要なアカウント操作の本人確認ダイアログ、独立パスキーMFAを含むセキュリティ設定、ブラウザーセッション管理、アクセストークンの有効期限の指定に対応 (#188)
 - Fix: ナビゲーションとLaunchPadで、SFC側に残る文言が空になる問題を修正 (#250)
 - Fix: グローバル翻訳への移行後、ナビゲーションメニューなどの文言が空になる問題を修正
 - Refactor: 権限・種別ラベルと共通のコアUI文字列をグローバル翻訳カタログへ移しました。
@@ -104,6 +105,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: Service Workerの通知からのフォロー操作で、通知元のユーザーIDが文字列であることを確認するように ([a1b3e952](https://github.com/tamaina/misskey-a/commit/a1b3e952d3e6d30cef7dfa4127f069df8642424b))
 
 ### Server
+- Feat: 重要なアカウント操作の本人確認を共通化し、独立パスキーMFA・セッション管理・tokenの有効期限を追加 (#188)
 - Fix: 復旧コードの同時使用による二重認証や、消費済みコードの復活を防止 (#146)
 - Enhance: Node.js のセキュリティアップデートに伴い、最低動作バージョンを 24.22.3 / 26.13.1 に引き上げ、開発環境と Docker Image の Node.js を 26.13.1 に更新 (#249)
 - Perf: バンドルのESM shim・BullMQの読込を整理し、メモリ使用量を削減 ([upstream #18126](https://github.com/misskey-dev/misskey/pull/18126))
