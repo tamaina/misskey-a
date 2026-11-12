@@ -26,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</div>
 
-	<MkButton primary inline @click="add"><i class="ti ti-plus"></i> {{ $locale.sfc.add }}</MkButton>
+	<MkButton primary inline @click="add"><i class="ti ti-plus"></i> {{ globalLocale.env.add }}</MkButton>
 
 	<hr>
 
@@ -39,8 +39,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -51,6 +51,10 @@ import {
 	extractCustomEmojiName as customEmojiName,
 	extractCustomEmojiHost as customEmojiHost,
 } from '@features/emojis/frontend/utility/emoji-mute.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const emojis = prefer.model('mutingEmojis');
 
@@ -133,7 +137,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="ar-SA" lang="json">
 {
-	"add": "إضافة",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -142,7 +145,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="ca-ES" lang="json">
 {
-	"add": "Afegir",
 	"syncBetweenDevices": "Sincronització entre dispositius",
 	"emojiUnmute": "Deixar de silenciar emojis",
 	"unmuteX": "Deixar de silenciar {x}"
@@ -151,7 +153,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="cs-CZ" lang="json">
 {
-	"add": "Přidat",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -160,7 +161,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="da-DK" lang="json">
 {
-	"add": "Add",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -169,7 +169,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="de-DE" lang="json">
 {
-	"add": "Hinzufügen",
 	"syncBetweenDevices": "Zwischen Geräten synchronisieren",
 	"emojiUnmute": "Emoji-Stummschaltung aufheben",
 	"unmuteX": "Stummschaltung von {x} aufheben"
@@ -178,7 +177,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="en-US" lang="json">
 {
-	"add": "Add",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -187,7 +185,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="es-ES" lang="json">
 {
-	"add": "Agregar",
 	"syncBetweenDevices": "Sincronizar entre dispositivos",
 	"emojiUnmute": "No silenciar emoji",
 	"unmuteX": "Dejar de silenciar {x}"
@@ -196,7 +193,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="fr-FR" lang="json">
 {
-	"add": "Ajouter",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -205,7 +201,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="id-ID" lang="json">
 {
-	"add": "Tambahkan",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -214,7 +209,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="it-IT" lang="json">
 {
-	"add": "Aggiungi",
 	"syncBetweenDevices": "Sincronizzazione tra i dispositivi",
 	"emojiUnmute": "De silenzia emoji",
 	"unmuteX": "De silenzia {x}"
@@ -223,7 +217,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="ja-JP" lang="json">
 {
-	"add": "追加",
 	"syncBetweenDevices": "デバイス間で同期",
 	"emojiUnmute": "絵文字ミュート解除",
 	"unmuteX": "{x}のミュートを解除"
@@ -232,7 +225,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="ja-KS" lang="json">
 {
-	"add": "増やす",
 	"syncBetweenDevices": "デバイス間で同期",
 	"emojiUnmute": "絵文字ミュートやめたる",
 	"unmuteX": "{x}のミュートやめたる"
@@ -241,7 +233,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="kab-KAB" lang="json">
 {
-	"add": "Add",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -250,7 +241,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="kn-IN" lang="json">
 {
-	"add": "Add",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -259,7 +249,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="ko-KR" lang="json">
 {
-	"add": "추가",
 	"syncBetweenDevices": "장치간 동기화",
 	"emojiUnmute": "이모티콘 뮤트 해제",
 	"unmuteX": "{x}의 뮤트를 해제"
@@ -268,7 +257,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="nl-NL" lang="json">
 {
-	"add": "Toevoegen",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -277,7 +265,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="no-NO" lang="json">
 {
-	"add": "Legg til",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -286,7 +273,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="pl-PL" lang="json">
 {
-	"add": "Dodaj",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -295,7 +281,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="pt-PT" lang="json">
 {
-	"add": "Adicionar",
 	"syncBetweenDevices": "Sincronizar entre dispositivos",
 	"emojiUnmute": "Reativar emoji",
 	"unmuteX": "Reativar {x}"
@@ -304,7 +289,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="ru-RU" lang="json">
 {
-	"add": "Добавить",
 	"syncBetweenDevices": "Синхронизировать между устройствами",
 	"emojiUnmute": "Показать эмодзи",
 	"unmuteX": "Показать {x}"
@@ -313,7 +297,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="sk-SK" lang="json">
 {
-	"add": "Pridať",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -322,7 +305,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="th-TH" lang="json">
 {
-	"add": "เพิ่ม",
 	"syncBetweenDevices": "ซิงค์ระหว่างอุปกรณ์",
 	"emojiUnmute": "เลิกปิดเสียงเอโมจิ",
 	"unmuteX": "เลิกปิดเสียง {x}"
@@ -331,7 +313,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="tr-TR" lang="json">
 {
-	"add": "Ekle",
 	"syncBetweenDevices": "Cihazlar arasında senkronizasyon",
 	"emojiUnmute": "Emoji ses aç",
 	"unmuteX": "Sesi aç {x}"
@@ -340,7 +321,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="ug-CN" lang="json">
 {
-	"add": "Add",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -349,7 +329,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="uk-UA" lang="json">
 {
-	"add": "Додати",
 	"syncBetweenDevices": "Синхронізувати між пристроями",
 	"emojiUnmute": "Показувати емодзі",
 	"unmuteX": "Показувати {x}"
@@ -358,7 +337,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="vi-VN" lang="json">
 {
-	"add": "Thêm",
 	"syncBetweenDevices": "Sync between devices",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}"
@@ -367,7 +345,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="zh-CN" lang="json">
 {
-	"add": "添加",
 	"syncBetweenDevices": "设备间同步",
 	"emojiUnmute": "取消屏蔽表情符号",
 	"unmuteX": "取消对{x}的隐藏"
@@ -376,7 +353,6 @@ function changeSyncEnabled(value: boolean) {
 
 <locale locale="zh-TW" lang="json">
 {
-	"add": "新增",
 	"syncBetweenDevices": "裝置之間的同步化",
 	"emojiUnmute": "表情符號解除靜音",
 	"unmuteX": "將 {x} 解除靜音"

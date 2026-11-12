@@ -24,15 +24,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<div class="_buttons">
 		<MkButton inline @click="listen"><i class="ti ti-player-play"></i> {{ $locale.sfc.listen }}</MkButton>
-		<MkButton inline primary :disabled="!hasChanged || driveFileError" @click="save"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
+		<MkButton inline primary :disabled="!hasChanged || driveFileError" @click="save"><i class="ti ti-check"></i> {{ globalLocale.env.save }}</MkButton>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed, watch } from 'vue';
-import type { SoundType } from '@features/preferences/frontend/utility/sound.js';
-import type { SoundStore } from '@features/preferences/frontend/state/def.js';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
@@ -41,6 +40,11 @@ import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { playMisskeySfxFile, soundsTypes, getSoundDuration } from '@features/preferences/frontend/utility/sound.js';
 import { selectFile } from '@features/drive/frontend/utility/drive.js';
+import type { SoundStore } from '@features/preferences/frontend/state/def.js';
+import type { SoundType } from '@features/preferences/frontend/utility/sound.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	def: SoundStore;
@@ -80,7 +84,7 @@ if (type.value === '_driveFile_' && fileId.value) {
 function getSoundTypeName(f: SoundType): string {
 	switch (f) {
 		case null:
-			return $locale.value.sfc.none;
+			return globalLocale.value.env.none;
 		case '_driveFile_':
 			return $locale.value.sfc.driveFile;
 		default:
@@ -119,8 +123,8 @@ function selectSound(ev: PointerEvent) {
 				type: 'warning',
 				title: $locale.value.sfc.driveFileDurationWarn,
 				text: $locale.value.sfc.driveFileDurationWarnDescription,
-				okText: $locale.value.sfc.continue,
-				cancelText: $locale.value.sfc.cancel,
+				okText: globalLocale.value.env.continue,
+				cancelText: globalLocale.value.env.cancel,
 			});
 			if (canceled) return;
 		}
@@ -219,560 +223,448 @@ function save() {
 
 <locale locale="ar-SA" lang="json">
 {
-	"none": "لا شيء",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "متابعة",
-	"cancel": " إلغاء",
 	"sound": "الرنات",
 	"selectFile": "اختر ملفًا",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "مستوى الصوت",
-	"listen": "استمع",
-	"save": "حفظ"
+	"listen": "استمع"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"none": "Res",
 	"driveFile": "Fer servir un fitxer d'àudio del disc",
 	"driveFileWarn": "Seleccionar un fitxer d'àudio del disc",
 	"driveFileTypeWarn": "Fitxer no suportat ",
 	"driveFileTypeWarnDescription": "Seleccionar un fitxer d'àudio ",
 	"driveFileDurationWarn": "L'àudio és massa llarg",
 	"driveFileDurationWarnDescription": "Els àudios molt llargs pot interrompre l'ús de Misskey. Vols continuar?",
-	"continue": "Continuar",
-	"cancel": "Cancel·lar",
 	"sound": "So",
 	"selectFile": "Selecciona un fitxer",
 	"driveFileError": "El so no es pot carregar. Canvia la configuració",
 	"volume": "Volum",
-	"listen": "Escoltar",
-	"save": "Desa"
+	"listen": "Escoltar"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"none": "Žádný",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Pokračovat",
-	"cancel": "Zrušit",
 	"sound": "Zvuky",
 	"selectFile": "Vybrat soubor",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Hlasitost",
-	"listen": "Poslouchat",
-	"save": "Uložit"
+	"listen": "Poslouchat"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
-	"cancel": "Cancel",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Volume",
-	"listen": "Listen",
-	"save": "Save"
+	"listen": "Listen"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"none": "Nichts",
 	"driveFile": "Audiodatei aus dem Drive verwenden",
 	"driveFileWarn": "Wähle eine Audiodatei aus dem Drive",
 	"driveFileTypeWarn": "Diese Datei wird nicht unterstützt",
 	"driveFileTypeWarnDescription": "Bitte wähle eine Audiodatei",
 	"driveFileDurationWarn": "Audio zu lang.",
 	"driveFileDurationWarnDescription": "Lange Töne kann die Verwendung von Misskey stören. Trotzdem fortfahren?",
-	"continue": "Fortfahren",
-	"cancel": "Abbrechen",
 	"sound": "Töne",
 	"selectFile": "Datei auswählen",
 	"driveFileError": "Audio konnte nicht geladen werden. Bitte ändere die Einstellung.",
 	"volume": "Lautstärke",
-	"listen": "Anhören",
-	"save": "Speichern"
+	"listen": "Anhören"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
-	"cancel": "Cancel",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Volume",
-	"listen": "Listen",
-	"save": "Save"
+	"listen": "Listen"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"none": "Ninguna",
 	"driveFile": "Usar un archivo de audio en Drive",
 	"driveFileWarn": "Selecciona un archivo de audio en Drive.",
 	"driveFileTypeWarn": "Este archivo es incompatible",
 	"driveFileTypeWarnDescription": "Selecciona un archivo de audio",
 	"driveFileDurationWarn": "La duración del audio es demasiado larga.",
 	"driveFileDurationWarnDescription": "Usar un audio de larga duración puede llegar a molestar mientras usas Misskey. ¿Quieres continuar?",
-	"continue": "Continuar",
-	"cancel": "Cancelar",
 	"sound": "Sonidos",
 	"selectFile": "Elegir archivo",
 	"driveFileError": "No puedo cargar el sonido. Por favor cambia la configuración.",
 	"volume": "Volumen",
-	"listen": "Escuchar",
-	"save": "Guardar"
+	"listen": "Escuchar"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"none": "Rien",
 	"driveFile": "Utiliser un effet sonore sur le Disque",
 	"driveFileWarn": "Veuillez sélectionner le fichier sur le Disque",
 	"driveFileTypeWarn": "Ce fichier n'est pas pris en charge",
 	"driveFileTypeWarnDescription": "Veuillez sélectionner un fichier audio",
 	"driveFileDurationWarn": "L'effet sonore est trop long",
 	"driveFileDurationWarnDescription": "Utiliser un effet sonore long peut affecter l'utilisation de Misskey. Voulez-vous encore continuer ?",
-	"continue": "Continuer",
-	"cancel": "Annuler",
 	"sound": "Sons",
 	"selectFile": "Choisir le fichier",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Volume",
-	"listen": "Écouter",
-	"save": "Enregistrer"
+	"listen": "Écouter"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"none": "Tidak ada",
 	"driveFile": "Menggunakan berkas audio dalam Drive",
 	"driveFileWarn": "Pilih berkas audio dari Drive",
 	"driveFileTypeWarn": "Berkas ini tidak didukung",
 	"driveFileTypeWarnDescription": "Pilih berkas audio",
 	"driveFileDurationWarn": "Audio ini terlalu panjang",
 	"driveFileDurationWarnDescription": "Audio panjang dapat mengganggu penggunaan Misskey. Masih ingin melanjutkan?",
-	"continue": "Lanjutkan",
-	"cancel": "Batalkan",
 	"sound": "Bunyi",
 	"selectFile": "Pilih berkas",
 	"driveFileError": "Tak bisa memuat audio. Mohon ubah pengaturan",
 	"volume": "Volume",
-	"listen": "Dengarkan",
-	"save": "Simpan"
+	"listen": "Dengarkan"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"none": "Nessuna",
 	"driveFile": "Suoni del Drive",
 	"driveFileWarn": "Seleziona file dal dispositivo",
 	"driveFileTypeWarn": "Formato file non supportato",
 	"driveFileTypeWarnDescription": "Per favore, scegli un file di tipo audio",
 	"driveFileDurationWarn": "La durata dell'audio è troppo lunga",
 	"driveFileDurationWarnDescription": "Scegliere un audio lungo potrebbe interferire con l'uso di Misskey. Vuoi continuare lo stesso?",
-	"continue": "Continua",
-	"cancel": "Annulla",
 	"sound": "Suono",
 	"selectFile": "Scelta allegato",
 	"driveFileError": "Impossibile caricare l'audio. Si prega di modificare le impostazioni",
 	"volume": "Volume",
-	"listen": "Ascolta",
-	"save": "Salva"
+	"listen": "Ascolta"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"none": "なし",
 	"driveFile": "ドライブの音声を使用",
 	"driveFileWarn": "ドライブのファイルを選択してください",
 	"driveFileTypeWarn": "このファイルは対応していません",
 	"driveFileTypeWarnDescription": "音声ファイルを選択してください",
 	"driveFileDurationWarn": "音声が長すぎます",
 	"driveFileDurationWarnDescription": "長い音声を使用するとMisskeyの使用に支障をきたす可能性があります。それでも続行しますか？",
-	"continue": "続ける",
-	"cancel": "キャンセル",
 	"sound": "サウンド",
 	"selectFile": "ファイルを選択",
 	"driveFileError": "音声が読み込めませんでした。設定を変更してください",
 	"volume": "音量",
-	"listen": "聴く",
-	"save": "保存"
+	"listen": "聴く"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"none": "なし",
 	"driveFile": "ドライブん中の音使う",
 	"driveFileWarn": "ドライブん中のファイル選びや",
 	"driveFileTypeWarn": "このファイルは対応しとらへん",
 	"driveFileTypeWarnDescription": "音声ファイルを選びや",
 	"driveFileDurationWarn": "音が長すぎるわ",
 	"driveFileDurationWarnDescription": "長い音使うたらMisskey使うのに良うないかもしれへんで。それでもええか？",
-	"continue": "続けるで",
-	"cancel": "やめる",
 	"sound": "音",
 	"selectFile": "ファイル選んでや",
 	"driveFileError": "音声が読み込めへんかったで。設定を変更せえや",
 	"volume": "音のでかさ",
-	"listen": "聴く",
-	"save": "とっとく"
+	"listen": "聴く"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
-	"cancel": "Cancel",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Volume",
-	"listen": "Listen",
-	"save": "Sekles"
+	"listen": "Listen"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
-	"cancel": "ರದ್ದು",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Volume",
-	"listen": "Listen",
-	"save": "ಉಳಿಸಿ"
+	"listen": "Listen"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"none": "없음",
 	"driveFile": "드라이브에 있는 오디오를 사용",
 	"driveFileWarn": "드라이브에 있는 파일을 선택하세요.",
 	"driveFileTypeWarn": "이 파이",
 	"driveFileTypeWarnDescription": "오디오 파일을 선택하세요.",
 	"driveFileDurationWarn": "오디오가 너무 깁니다",
 	"driveFileDurationWarnDescription": "긴 오디오로 설정할 경우 미스키 사용에 지장이 갈 수도 있습니다. 그래도 괜찮습니까?",
-	"continue": "계속",
-	"cancel": "취소",
 	"sound": "소리",
 	"selectFile": "파일 선택",
 	"driveFileError": "오디오를 불러올 수 없습니다. 설정을 바꿔주세요.",
 	"volume": "음량",
-	"listen": "듣기",
-	"save": "저장"
+	"listen": "듣기"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"none": "Niets",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
-	"cancel": "Annuleren",
 	"sound": "Geluid",
 	"selectFile": "Kies een bestand",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Volume",
-	"listen": "Luisteren",
-	"save": "Opslaan"
+	"listen": "Luisteren"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"none": "Ingen",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Fortsett",
-	"cancel": "Avbryt",
 	"sound": "Sounds",
 	"selectFile": "Velg en fil",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Volum",
-	"listen": "Lytt",
-	"save": "Lagre"
+	"listen": "Lytt"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"none": "Brak",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
-	"cancel": "Anuluj",
 	"sound": "Dźwięki",
 	"selectFile": "Wybierz plik",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Głośność",
-	"listen": "Słuchaj",
-	"save": "Zapisz"
+	"listen": "Słuchaj"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"none": "Nenhum",
 	"driveFile": "Usar um arquivo de áudio do Drive.",
 	"driveFileWarn": "Selecione um arquivo de áudio do Drive.",
 	"driveFileTypeWarn": "Esse arquivo não é compatível",
 	"driveFileTypeWarnDescription": "Selecione um arquivo de áudio",
 	"driveFileDurationWarn": "O áudio é muito longo.",
 	"driveFileDurationWarnDescription": "Áudios longos podem atrapalhar o funcionamento do Misskey. Deseja continuar?",
-	"continue": "Continuar",
-	"cancel": "Cancelar",
 	"sound": "Sons",
 	"selectFile": "Selecione os arquivos",
 	"driveFileError": "Não foi possível carregar o som. Por favor, altere a configuração.",
 	"volume": "Volume",
-	"listen": "Ouvir",
-	"save": "Salvar"
+	"listen": "Ouvir"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"none": "Ничего",
 	"driveFile": "Использовать аудиофайл с Диска.",
 	"driveFileWarn": "Выбрать аудиофайл с Диска.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Продолжить",
-	"cancel": "Отмена",
 	"sound": "Звуки",
 	"selectFile": "Выберите файл",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Громкость",
-	"listen": "Слушать",
-	"save": "Сохранить"
+	"listen": "Слушать"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"none": "Žiadne",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
-	"cancel": "Zrušiť",
 	"sound": "Zvuky",
 	"selectFile": "Vyberte súbor",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Hlasitosť",
-	"listen": "Počúvať",
-	"save": "Uložiť"
+	"listen": "Počúvať"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"none": "ไม่มี",
 	"driveFile": "ใช้เสียงจากไดรฟ์",
 	"driveFileWarn": "เลือกไฟล์ในไดรฟ์ของคุณ",
 	"driveFileTypeWarn": "ไม่รองรับไฟล์นี้",
 	"driveFileTypeWarnDescription": "กรุณาเลือกไฟล์เสียง",
 	"driveFileDurationWarn": "เสียงยาวเกินไป",
 	"driveFileDurationWarnDescription": "การใช้เสียงที่ยาว อาจรบกวนการใช้งาน Misskey, ต้องการดำเนินการต่อใช่ไหม?",
-	"continue": "ดำเนินการต่อ",
-	"cancel": "ยกเลิก",
 	"sound": "เสียง",
 	"selectFile": "เลือกไฟล์",
 	"driveFileError": "ไม่สามารถโหลดไฟล์เสียงได้ กรุณาเปลี่ยนแปลงการตั้งค่า",
 	"volume": "ระดับเสียง",
-	"listen": "ฟัง",
-	"save": "บันทึก"
+	"listen": "ฟัง"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"none": "Hiçbiri",
 	"driveFile": "Drive'da bir ses dosyası kullanın.",
 	"driveFileWarn": "Drive'dan bir ses dosyası seçin.",
 	"driveFileTypeWarn": "Bu dosya desteklenmiyor",
 	"driveFileTypeWarnDescription": "Bir ses dosyası seçin",
 	"driveFileDurationWarn": "Ses kaydı çok uzun.",
 	"driveFileDurationWarnDescription": "Uzun sesli mesajlar Misskey'in kullanımını engelleyebilir. Devam etmek istiyor musunuz?",
-	"continue": "Devam et",
-	"cancel": "Vazgeç",
 	"sound": "Ses",
 	"selectFile": "Dosya seçin",
 	"driveFileError": "Ses yüklenemedi. Lütfen ayarları değiştir.",
 	"volume": "Ses hacmi",
-	"listen": "Dinle",
-	"save": "Kaydet"
+	"listen": "Dinle"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"none": "None",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
-	"cancel": "Cancel",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Volume",
-	"listen": "Listen",
-	"save": "Save"
+	"listen": "Listen"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"none": "Відсутній",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Продовжити",
-	"cancel": "Скасувати",
 	"sound": "Звуки",
 	"selectFile": "Вибрати файл",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Гучність",
-	"listen": "Слухати",
-	"save": "Зберегти"
+	"listen": "Слухати"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"none": "Không",
 	"driveFile": "Use an audio file in Drive.",
 	"driveFileWarn": "Select an audio file from Drive.",
 	"driveFileTypeWarn": "This file is not supported",
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Tiếp tục",
-	"cancel": "Hủy",
 	"sound": "Âm thanh",
 	"selectFile": "Chọn tập tin",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
 	"volume": "Âm lượng",
-	"listen": "Nghe",
-	"save": "Lưu"
+	"listen": "Nghe"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"none": "无",
 	"driveFile": "使用网盘内的音频",
 	"driveFileWarn": "选择网盘上的文件",
 	"driveFileTypeWarn": "不支持此文件",
 	"driveFileTypeWarnDescription": "请选择音频文件",
 	"driveFileDurationWarn": "音频过长",
 	"driveFileDurationWarnDescription": "使用长音频可能会影响 Misskey 的使用。即使这样也要继续吗？",
-	"continue": "继续",
-	"cancel": "取消",
 	"sound": "提示音",
 	"selectFile": "选择文件",
 	"driveFileError": "无法读取声音。请更改设置。",
 	"volume": "音量",
-	"listen": "试听",
-	"save": "保存"
+	"listen": "试听"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"none": "無",
 	"driveFile": "使用雲端硬碟的音效檔案",
 	"driveFileWarn": "請選擇雲端硬碟中的檔案",
 	"driveFileTypeWarn": "不支援此檔案",
 	"driveFileTypeWarnDescription": "請選擇音效檔案",
 	"driveFileDurationWarn": "音效太長了",
 	"driveFileDurationWarnDescription": "使用長音效檔可能會影響 Misskey 的使用體驗。仍要使用此檔案嗎？",
-	"continue": "繼續",
-	"cancel": "取消",
 	"sound": "音效",
 	"selectFile": "選擇檔案",
 	"driveFileError": "無法載入語音。請變更設定",
 	"volume": "音量",
-	"listen": "聆聽",
-	"save": "儲存"
+	"listen": "聆聽"
 }
 </locale>

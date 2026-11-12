@@ -96,7 +96,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<SearchMarker :keywords="['image']">
 					<MkInput v-model="serverErrorImageUrl" type="url">
 						<template #prefix><i class="ti ti-link"></i></template>
-						<template #label><SearchLabel>{{ $locale.sfc.somethingHappened }}</SearchLabel></template>
+						<template #label><SearchLabel>{{ globalLocale.env.somethingHappened }}</SearchLabel></template>
 					</MkInput>
 				</SearchMarker>
 
@@ -145,7 +145,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #footer>
 		<div :class="$style.footer">
 			<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 16px;">
-				<MkButton primary rounded @click="save"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
+				<MkButton primary rounded @click="save"><i class="ti ti-check"></i> {{ globalLocale.env.save }}</MkButton>
 			</div>
 		</div>
 	</template>
@@ -153,6 +153,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed } from 'vue';
 import JSON5 from 'json5';
 import * as Misskey from 'misskey-js';
@@ -168,6 +169,9 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkColorInput from '@features/ui/frontend/components/MkColorInput.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const meta = await misskeyApi('admin/meta');
 
@@ -246,15 +250,13 @@ definePage(() => ({
 	"backgroundImageUrl": "رابط صورة الخلفية",
 	"notFoundDescription": "تعذر العثور على صفحة يقود إليها هذا الرابط.",
 	"nothing": "لا يوجد شيء هنا",
-	"somethingHappened": "حدث خطأ",
 	"themeColor": "لون السمة",
 	"instanceDefaultLightTheme": "Instance-wide default light theme",
 	"instanceDefaultThemeDescription": "Enter the theme code in object format.",
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "حفظ"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -273,15 +275,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Adreça URL de la imatge de fons",
 	"notFoundDescription": "No es troba cap pàgina que correspongui a aquesta adreça",
 	"nothing": "No hi ha res per veure aquí ",
-	"somethingHappened": "S'ha produït un error",
 	"themeColor": "Color del tema",
 	"instanceDefaultLightTheme": "Tema clar per defecte de tota la instància ",
 	"instanceDefaultThemeDescription": "Introdueix el codi del tema en format d'objecte",
 	"instanceDefaultDarkTheme": "Tema fosc per defecte de tota la instància ",
 	"repositoryUrl": "URL del repositori",
 	"feedbackUrl": "URL per a opinar",
-	"serverSettingsManifestJsonOverride": "Sobreescriure manifest.json",
-	"save": "Desa"
+	"serverSettingsManifestJsonOverride": "Sobreescriure manifest.json"
 }
 </locale>
 
@@ -300,15 +300,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Adresa URL obrázku pozadí",
 	"notFoundDescription": "Nebyla nalezená žádná stránka korespondující se zadanou URL.",
 	"nothing": "Nic nebylo nalezeno",
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"themeColor": "Barva motivu",
 	"instanceDefaultLightTheme": "Výchozí světlý motiv instance",
 	"instanceDefaultThemeDescription": "Zadejte kód motivu v objektovém formátu",
 	"instanceDefaultDarkTheme": "Výhozí tmavý motiv instance",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Uložit"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -327,15 +325,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Background image URL",
 	"notFoundDescription": "No page corresponding to this URL could be found.",
 	"nothing": "There's nothing to see here",
-	"somethingHappened": "An error has occurred",
 	"themeColor": "Instance Ticker Color",
 	"instanceDefaultLightTheme": "Instance-wide default light theme",
 	"instanceDefaultThemeDescription": "Enter the theme code in object format.",
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Save"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -354,15 +350,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Hintergrundbild-URL",
 	"notFoundDescription": "Es konnte keine Seite unter dieser URL gefunden werden.",
 	"nothing": "Hier gibt es nichts zu sehen",
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"themeColor": "Farbe der Instanz-Information",
 	"instanceDefaultLightTheme": "Instanzweites Standardfarbschema (Hell)",
 	"instanceDefaultThemeDescription": "Gib den Farbschemencode im Objektformat ein.",
 	"instanceDefaultDarkTheme": "Instanzweites Standardfarbschema (Dunkel)",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback-Website",
-	"serverSettingsManifestJsonOverride": "Überschreiben von manifest.json",
-	"save": "Speichern"
+	"serverSettingsManifestJsonOverride": "Überschreiben von manifest.json"
 }
 </locale>
 
@@ -381,15 +375,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Background image URL",
 	"notFoundDescription": "No page corresponding to this URL could be found.",
 	"nothing": "There's nothing to see here",
-	"somethingHappened": "An error has occurred",
 	"themeColor": "Instance Ticker Color",
 	"instanceDefaultLightTheme": "Instance-wide default light theme",
 	"instanceDefaultThemeDescription": "Enter the theme code in object format.",
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Save"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -408,15 +400,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL de la imagen de fondo",
 	"notFoundDescription": "No se encontró la página correspondiente a la URL elegida",
 	"nothing": "No hay nada que ver aqui",
-	"somethingHappened": "Ocurrió un error",
 	"themeColor": "Color del tema",
 	"instanceDefaultLightTheme": "Tema claro por defecto de la instancia",
 	"instanceDefaultThemeDescription": "Ingrese el código del tema en formato objeto",
 	"instanceDefaultDarkTheme": "Tema oscuro por defecto de la instancia",
 	"repositoryUrl": "URL del repositorio",
 	"feedbackUrl": "URL de comentarios",
-	"serverSettingsManifestJsonOverride": "Sobreescribir manifest.json",
-	"save": "Guardar"
+	"serverSettingsManifestJsonOverride": "Sobreescribir manifest.json"
 }
 </locale>
 
@@ -435,15 +425,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL de l'image d'arrière-plan",
 	"notFoundDescription": "Aucune page ne correspond à l’URL spécifiée.",
 	"nothing": "Il n'y a rien à voir ici",
-	"somethingHappened": "Une erreur est survenue",
 	"themeColor": "Couleur du thème",
 	"instanceDefaultLightTheme": "Thème clair par défaut sur toute l’instance",
 	"instanceDefaultThemeDescription": "Saisissez le code du thème en format objet.",
 	"instanceDefaultDarkTheme": "Thème sombre par défaut sur toute l’instance",
 	"repositoryUrl": "URL du dépôt",
 	"feedbackUrl": "URL pour les commentaires",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Enregistrer"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -462,15 +450,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL Gambar latar",
 	"notFoundDescription": "Tidak ada halaman sesuai dengan URL yang ditentukan.",
 	"nothing": "Tidak ada sama sekali disini",
-	"somethingHappened": "Terjadi kesalahan",
 	"themeColor": "Warna Tema",
 	"instanceDefaultLightTheme": "Bawaan instan tema terang",
 	"instanceDefaultThemeDescription": "Masukkan kode tema di format obyek.",
 	"instanceDefaultDarkTheme": "Bawaan instan tema gelap",
 	"repositoryUrl": "URL Repositori",
 	"feedbackUrl": "URL Umpan balik",
-	"serverSettingsManifestJsonOverride": "Ambil alih manifest.json",
-	"save": "Simpan"
+	"serverSettingsManifestJsonOverride": "Ambil alih manifest.json"
 }
 </locale>
 
@@ -489,15 +475,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL dello sfondo",
 	"notFoundDescription": "Nessuna pagina corrisponde all'URL indicata.",
 	"nothing": "Niente da visualizzare",
-	"somethingHappened": "Si è verificato un problema",
 	"themeColor": "Colore del tema",
 	"instanceDefaultLightTheme": "Istanza, tema luminoso predefinito.",
 	"instanceDefaultThemeDescription": "Compilare il codice del tema nel modulo dell'oggetto.",
 	"instanceDefaultDarkTheme": "Istanza, tema scuro predefinito.",
 	"repositoryUrl": "URL della repository",
 	"feedbackUrl": "URL di feedback",
-	"serverSettingsManifestJsonOverride": "Sostituire il file manifest.json",
-	"save": "Salva"
+	"serverSettingsManifestJsonOverride": "Sostituire il file manifest.json"
 }
 </locale>
 
@@ -516,15 +500,13 @@ definePage(() => ({
 	"backgroundImageUrl": "背景画像のURL",
 	"notFoundDescription": "指定されたURLに該当するページはありませんでした。",
 	"nothing": "ありません",
-	"somethingHappened": "問題が発生しました",
 	"themeColor": "テーマカラー",
 	"instanceDefaultLightTheme": "サーバーデフォルトのライトテーマ",
 	"instanceDefaultThemeDescription": "オブジェクト形式のテーマコードを記入します。",
 	"instanceDefaultDarkTheme": "サーバーデフォルトのダークテーマ",
 	"repositoryUrl": "リポジトリURL",
 	"feedbackUrl": "フィードバックURL",
-	"serverSettingsManifestJsonOverride": "manifest.jsonのオーバーライド",
-	"save": "保存"
+	"serverSettingsManifestJsonOverride": "manifest.jsonのオーバーライド"
 }
 </locale>
 
@@ -543,15 +525,13 @@ definePage(() => ({
 	"backgroundImageUrl": "背景画像のURL",
 	"notFoundDescription": "言われたURLのページはなかったで。",
 	"nothing": "あらへん",
-	"somethingHappened": "なんかあかんわ",
 	"themeColor": "テーマカラー",
 	"instanceDefaultLightTheme": "サーバーおすすめの明るいテーマ",
 	"instanceDefaultThemeDescription": "オブジェクト形式のテーマコードを記入するで。",
 	"instanceDefaultDarkTheme": "サーバーおすすめのの暗いテーマ",
 	"repositoryUrl": "リポジトリURL",
 	"feedbackUrl": "フィードバックURL",
-	"serverSettingsManifestJsonOverride": "manifest.jsonのオーバーライド",
-	"save": "とっとく"
+	"serverSettingsManifestJsonOverride": "manifest.jsonのオーバーライド"
 }
 </locale>
 
@@ -570,15 +550,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Background image URL",
 	"notFoundDescription": "No page corresponding to this URL could be found.",
 	"nothing": "There's nothing to see here",
-	"somethingHappened": "An error has occurred",
 	"themeColor": "Instance Ticker Color",
 	"instanceDefaultLightTheme": "Instance-wide default light theme",
 	"instanceDefaultThemeDescription": "Enter the theme code in object format.",
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Sekles"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -597,15 +575,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Background image URL",
 	"notFoundDescription": "No page corresponding to this URL could be found.",
 	"nothing": "There's nothing to see here",
-	"somethingHappened": "An error has occurred",
 	"themeColor": "Instance Ticker Color",
 	"instanceDefaultLightTheme": "Instance-wide default light theme",
 	"instanceDefaultThemeDescription": "Enter the theme code in object format.",
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "ಉಳಿಸಿ"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -624,15 +600,13 @@ definePage(() => ({
 	"backgroundImageUrl": "배경 이미지 URL",
 	"notFoundDescription": "지정한 URL에 해당하는 페이지가 존재하지 않습니다.",
 	"nothing": "아무것도 없습니다",
-	"somethingHappened": "오류가 발생했습니다",
 	"themeColor": "테마 컬러",
 	"instanceDefaultLightTheme": "서버 기본 라이트 테마",
 	"instanceDefaultThemeDescription": "객체 형식({}로 감싼 형태)의 테마 코드를 입력해 주세요.",
 	"instanceDefaultDarkTheme": "서버 기본 다크 테마",
 	"repositoryUrl": "저장소 URL",
 	"feedbackUrl": "피드백 URL",
-	"serverSettingsManifestJsonOverride": "manifest.json 오버라이드",
-	"save": "저장"
+	"serverSettingsManifestJsonOverride": "manifest.json 오버라이드"
 }
 </locale>
 
@@ -651,15 +625,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL afbeelding",
 	"notFoundDescription": "Er is geen pagina gevonden onder deze URL.",
 	"nothing": "Niets te zien hier",
-	"somethingHappened": "Er is iets misgegaan.",
 	"themeColor": "Instance Ticker Color",
 	"instanceDefaultLightTheme": "Instance-wide default light theme",
 	"instanceDefaultThemeDescription": "Enter the theme code in object format.",
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Opslaan"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -678,15 +650,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Background image URL",
 	"notFoundDescription": "No page corresponding to this URL could be found.",
 	"nothing": "Ingenting",
-	"somethingHappened": "En feil har oppstått",
 	"themeColor": "Instance Ticker Color",
 	"instanceDefaultLightTheme": "Instance-wide default light theme",
 	"instanceDefaultThemeDescription": "Enter the theme code in object format.",
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Lagre"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -705,15 +675,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Adres URL tła",
 	"notFoundDescription": "Nie ma strony odpowiadającej określonemu adresowi URL.",
 	"nothing": "Nie ma tu niczego",
-	"somethingHappened": "Coś poszło nie tak",
 	"themeColor": "Motyw kolorystyczny",
 	"instanceDefaultLightTheme": "Domyślny motyw dla trybu jasnego",
 	"instanceDefaultThemeDescription": "Opis domyślnego motywu instancji",
 	"instanceDefaultDarkTheme": "Domyślny motyw dla trybu ciemnego",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Zapisz"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -732,15 +700,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL da imagem de fundo",
 	"notFoundDescription": "Não havia página correspondente ao URL especificado.",
 	"nothing": "Não há nada aqui",
-	"somethingHappened": "Ocorreu um erro",
 	"themeColor": "Cor do tema",
 	"instanceDefaultLightTheme": "Tema diurno padrão para toda a instância",
 	"instanceDefaultThemeDescription": "Insira o código do tema em formato de objeto.",
 	"instanceDefaultDarkTheme": "Tema noturno para toda a instância",
 	"repositoryUrl": "URL do repositório",
 	"feedbackUrl": "Link para Feedback",
-	"serverSettingsManifestJsonOverride": "Sobrescrever manifest.json",
-	"save": "Salvar"
+	"serverSettingsManifestJsonOverride": "Sobrescrever manifest.json"
 }
 </locale>
 
@@ -759,15 +725,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Ссылка на фоновое изображение",
 	"notFoundDescription": "Страница по указанной ссылке не найдена",
 	"nothing": "Ничего нет",
-	"somethingHappened": "Что-то пошло не так",
 	"themeColor": "Цвет темы",
 	"instanceDefaultLightTheme": "Светлая тема по умолчанию",
 	"instanceDefaultThemeDescription": "Введите код темы в формате объекта.",
 	"instanceDefaultDarkTheme": "Темная тема по умолчанию",
 	"repositoryUrl": "Ссылка на репозиторий",
 	"feedbackUrl": "Ссылка для обратной связи",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Сохранить"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -786,15 +750,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL obrázku pozadia",
 	"notFoundDescription": "Nenašla sa žiadna stránka na zadanej URL.",
 	"nothing": "Nič tu nie je",
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"themeColor": "Farba témy",
 	"instanceDefaultLightTheme": "Predvolená svetlá téma",
 	"instanceDefaultThemeDescription": "Vložte kód témy v objektovom formáte",
 	"instanceDefaultDarkTheme": "Predvolená tmavá téma",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Uložiť"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -813,15 +775,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL ภาพพื้นหลัง",
 	"notFoundDescription": "ไม่พบหน้าตาม URL ที่ระบุ",
 	"nothing": "ไม่พบผลลัพธ์",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"themeColor": "สีธีม",
 	"instanceDefaultLightTheme": "ธีมสว่างตามค่าเริ่มต้นของเซิร์ฟเวอร์",
 	"instanceDefaultThemeDescription": "ป้อนรหัสธีมในรูปแบบออบเจ็กต์",
 	"instanceDefaultDarkTheme": "ธีมมืดตามค่าเริ่มต้นของเซิร์ฟเวอร์",
 	"repositoryUrl": "URL ของ repository",
 	"feedbackUrl": "URLของฟีดแบ็ก",
-	"serverSettingsManifestJsonOverride": "เขียนทับ manifest.json",
-	"save": "บันทึก"
+	"serverSettingsManifestJsonOverride": "เขียนทับ manifest.json"
 }
 </locale>
 
@@ -840,15 +800,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Arka plan görseli URL",
 	"notFoundDescription": "Bu URL'ye karşılık gelen sayfa bulunamadı.",
 	"nothing": "Burada görülecek bir şey yok.",
-	"somethingHappened": "Bir hata oluştu",
 	"themeColor": "Örnek Ticker Rengi",
 	"instanceDefaultLightTheme": "Sunucu genelinde varsayılan açık tema",
 	"instanceDefaultThemeDescription": "Tema kodunu nesne biçiminde girin.",
 	"instanceDefaultDarkTheme": "Sunucu genelinde varsayılan koyu tema",
 	"repositoryUrl": "Depo URL'si",
 	"feedbackUrl": "Geri Bildirim URL'si",
-	"serverSettingsManifestJsonOverride": "manifest.json Geçersiz Kılma",
-	"save": "Kaydet"
+	"serverSettingsManifestJsonOverride": "manifest.json Geçersiz Kılma"
 }
 </locale>
 
@@ -867,15 +825,13 @@ definePage(() => ({
 	"backgroundImageUrl": "Background image URL",
 	"notFoundDescription": "No page corresponding to this URL could be found.",
 	"nothing": "There's nothing to see here",
-	"somethingHappened": "An error has occurred",
 	"themeColor": "Instance Ticker Color",
 	"instanceDefaultLightTheme": "Instance-wide default light theme",
 	"instanceDefaultThemeDescription": "Enter the theme code in object format.",
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override",
-	"save": "Save"
+	"serverSettingsManifestJsonOverride": "manifest.json Override"
 }
 </locale>
 
@@ -894,15 +850,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL-адреса фонового зображення",
 	"notFoundDescription": "Сторінка за вказаною адресою не знайдена.",
 	"nothing": "Тут нічого немає",
-	"somethingHappened": "Щось пішло не так",
 	"themeColor": "Колір теми",
 	"instanceDefaultLightTheme": "Світла тема за промовчанням",
 	"instanceDefaultThemeDescription": "Введіть код теми у форматі об’єкта.",
 	"instanceDefaultDarkTheme": "Темна тема за промовчанням",
 	"repositoryUrl": "URL репозиторію",
 	"feedbackUrl": "URL відгуків",
-	"serverSettingsManifestJsonOverride": "Перевизначення manifest.json ",
-	"save": "Зберегти"
+	"serverSettingsManifestJsonOverride": "Перевизначення manifest.json "
 }
 </locale>
 
@@ -921,15 +875,13 @@ definePage(() => ({
 	"backgroundImageUrl": "URL Ảnh nền",
 	"notFoundDescription": "Không tìm thấy trang nào tương ứng với URL này.",
 	"nothing": "Không có gì ở đây",
-	"somethingHappened": "Xảy ra lỗi",
 	"themeColor": "Màu theme",
 	"instanceDefaultLightTheme": "Theme máy chủ Sáng-Rộng",
 	"instanceDefaultThemeDescription": "Nhập mã theme trong định dạng đối tượng.",
 	"instanceDefaultDarkTheme": "Theme máy chủ Tối-Rộng",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "URL phản hồi",
-	"serverSettingsManifestJsonOverride": "Ghi đè manifest.json",
-	"save": "Lưu"
+	"serverSettingsManifestJsonOverride": "Ghi đè manifest.json"
 }
 </locale>
 
@@ -948,15 +900,13 @@ definePage(() => ({
 	"backgroundImageUrl": "背景图片的链接",
 	"notFoundDescription": "没有与指定 URL 对应的页面。",
 	"nothing": "无",
-	"somethingHappened": "出错了",
 	"themeColor": "主题颜色",
 	"instanceDefaultLightTheme": "服务器默认浅色主题",
 	"instanceDefaultThemeDescription": "以对象格式输入主题代码",
 	"instanceDefaultDarkTheme": "服务器默认深色主题",
 	"repositoryUrl": "仓库地址",
 	"feedbackUrl": "反馈地址",
-	"serverSettingsManifestJsonOverride": "覆盖 manifest.json",
-	"save": "保存"
+	"serverSettingsManifestJsonOverride": "覆盖 manifest.json"
 }
 </locale>
 
@@ -975,14 +925,12 @@ definePage(() => ({
 	"backgroundImageUrl": "背景圖片的來源網址 ",
 	"notFoundDescription": "查無此頁",
 	"nothing": "查無項目",
-	"somethingHappened": "發生錯誤",
 	"themeColor": "佈景主題顏色",
 	"instanceDefaultLightTheme": "實例預設的淺色佈景主題",
 	"instanceDefaultThemeDescription": "輸入物件形式的佈景主題代碼",
 	"instanceDefaultDarkTheme": "實例預設的深色佈景主題",
 	"repositoryUrl": "儲存庫 URL",
 	"feedbackUrl": "意見回饋 URL",
-	"serverSettingsManifestJsonOverride": "覆寫 manifest.json",
-	"save": "儲存"
+	"serverSettingsManifestJsonOverride": "覆寫 manifest.json"
 }
 </locale>

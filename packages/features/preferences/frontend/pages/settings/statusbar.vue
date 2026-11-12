@@ -10,11 +10,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #suffix>{{ x.name }}</template>
 		<XStatusbar :_id="x.id" :userLists="userLists"/>
 	</MkFolder>
-	<MkButton primary @click="add">{{ $locale.sfc.add }}</MkButton>
+	<MkButton primary @click="add">{{ globalLocale.env.add }}</MkButton>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onMounted, ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import XStatusbar from '@features/preferences/frontend/pages/settings/statusbar.statusbar.vue';
@@ -24,6 +25,9 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const statusbars = prefer.r.statusbars;
 
@@ -59,7 +63,6 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"notSet": "لم يعيّن",
-	"add": "إضافة",
 	"statusbar": "شريط الحالة"
 }
 </locale>
@@ -67,7 +70,6 @@ definePage(() => ({
 <locale locale="ca-ES" lang="json">
 {
 	"notSet": "Sense definir",
-	"add": "Afegir",
 	"statusbar": "Barra d'estat"
 }
 </locale>
@@ -75,7 +77,6 @@ definePage(() => ({
 <locale locale="cs-CZ" lang="json">
 {
 	"notSet": "Není nastaveno",
-	"add": "Přidat",
 	"statusbar": "Stavový řádek"
 }
 </locale>
@@ -83,7 +84,6 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"notSet": "Not set",
-	"add": "Add",
 	"statusbar": "Status bar"
 }
 </locale>
@@ -91,7 +91,6 @@ definePage(() => ({
 <locale locale="de-DE" lang="json">
 {
 	"notSet": "Nicht konfiguriert",
-	"add": "Hinzufügen",
 	"statusbar": "Statusleiste"
 }
 </locale>
@@ -99,7 +98,6 @@ definePage(() => ({
 <locale locale="en-US" lang="json">
 {
 	"notSet": "Not set",
-	"add": "Add",
 	"statusbar": "Status bar"
 }
 </locale>
@@ -107,7 +105,6 @@ definePage(() => ({
 <locale locale="es-ES" lang="json">
 {
 	"notSet": "Sin especificar",
-	"add": "Agregar",
 	"statusbar": "Barra de estado"
 }
 </locale>
@@ -115,7 +112,6 @@ definePage(() => ({
 <locale locale="fr-FR" lang="json">
 {
 	"notSet": "Non défini",
-	"add": "Ajouter",
 	"statusbar": "Barre d’état"
 }
 </locale>
@@ -123,7 +119,6 @@ definePage(() => ({
 <locale locale="id-ID" lang="json">
 {
 	"notSet": "Tidak disetel",
-	"add": "Tambahkan",
 	"statusbar": "Bilah status"
 }
 </locale>
@@ -131,7 +126,6 @@ definePage(() => ({
 <locale locale="it-IT" lang="json">
 {
 	"notSet": "Non impostato",
-	"add": "Aggiungi",
 	"statusbar": "Barra di stato"
 }
 </locale>
@@ -139,7 +133,6 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"notSet": "未設定",
-	"add": "追加",
 	"statusbar": "ステータスバー"
 }
 </locale>
@@ -147,7 +140,6 @@ definePage(() => ({
 <locale locale="ja-KS" lang="json">
 {
 	"notSet": "未設定",
-	"add": "増やす",
 	"statusbar": "ステータスバー"
 }
 </locale>
@@ -155,7 +147,6 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"notSet": "Not set",
-	"add": "Add",
 	"statusbar": "Status bar"
 }
 </locale>
@@ -163,7 +154,6 @@ definePage(() => ({
 <locale locale="kn-IN" lang="json">
 {
 	"notSet": "Not set",
-	"add": "Add",
 	"statusbar": "Status bar"
 }
 </locale>
@@ -171,7 +161,6 @@ definePage(() => ({
 <locale locale="ko-KR" lang="json">
 {
 	"notSet": "설정되지 않음",
-	"add": "추가",
 	"statusbar": "상태바"
 }
 </locale>
@@ -179,7 +168,6 @@ definePage(() => ({
 <locale locale="nl-NL" lang="json">
 {
 	"notSet": "Niet geconfigureerd",
-	"add": "Toevoegen",
 	"statusbar": "Status bar"
 }
 </locale>
@@ -187,7 +175,6 @@ definePage(() => ({
 <locale locale="no-NO" lang="json">
 {
 	"notSet": "Not set",
-	"add": "Legg til",
 	"statusbar": "Status bar"
 }
 </locale>
@@ -195,7 +182,6 @@ definePage(() => ({
 <locale locale="pl-PL" lang="json">
 {
 	"notSet": "Nie ustawiono",
-	"add": "Dodaj",
 	"statusbar": "Pasek stanu"
 }
 </locale>
@@ -203,7 +189,6 @@ definePage(() => ({
 <locale locale="pt-PT" lang="json">
 {
 	"notSet": "Não definido",
-	"add": "Adicionar",
 	"statusbar": "Barra de status"
 }
 </locale>
@@ -211,7 +196,6 @@ definePage(() => ({
 <locale locale="ru-RU" lang="json">
 {
 	"notSet": "Не настроено",
-	"add": "Добавить",
 	"statusbar": "Статусбар"
 }
 </locale>
@@ -219,7 +203,6 @@ definePage(() => ({
 <locale locale="sk-SK" lang="json">
 {
 	"notSet": "Nenastavené",
-	"add": "Pridať",
 	"statusbar": "Stavový riadok"
 }
 </locale>
@@ -227,7 +210,6 @@ definePage(() => ({
 <locale locale="th-TH" lang="json">
 {
 	"notSet": "ไม่ได้ตั้งค่า",
-	"add": "เพิ่ม",
 	"statusbar": "แถบสถานะ"
 }
 </locale>
@@ -235,7 +217,6 @@ definePage(() => ({
 <locale locale="tr-TR" lang="json">
 {
 	"notSet": "Ayarlı değil",
-	"add": "Ekle",
 	"statusbar": "Durum çubuğu"
 }
 </locale>
@@ -243,7 +224,6 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"notSet": "Not set",
-	"add": "Add",
 	"statusbar": "Status bar"
 }
 </locale>
@@ -251,7 +231,6 @@ definePage(() => ({
 <locale locale="uk-UA" lang="json">
 {
 	"notSet": "Не налаштовано",
-	"add": "Додати",
 	"statusbar": "Рядок стану"
 }
 </locale>
@@ -259,7 +238,6 @@ definePage(() => ({
 <locale locale="vi-VN" lang="json">
 {
 	"notSet": "Chưa đặt",
-	"add": "Thêm",
 	"statusbar": "Thanh trạng thái"
 }
 </locale>
@@ -267,7 +245,6 @@ definePage(() => ({
 <locale locale="zh-CN" lang="json">
 {
 	"notSet": "未设置",
-	"add": "添加",
 	"statusbar": "状态栏"
 }
 </locale>
@@ -275,7 +252,6 @@ definePage(() => ({
 <locale locale="zh-TW" lang="json">
 {
 	"notSet": "未設定",
-	"add": "新增",
 	"statusbar": "狀態列"
 }
 </locale>

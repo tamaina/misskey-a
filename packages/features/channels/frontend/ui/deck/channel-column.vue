@@ -9,12 +9,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<i class="ti ti-device-tv"></i><span style="margin-left: 8px;">{{ column.name || column.timelineNameCache || $locale.sfc.channel }}</span>
 	</template>
 
-	<template v-if="column.channelId">
-		<div style="padding: 8px; text-align: center;">
+	<div v-if="column.channelId" class="_gaps_s">
+		<MkPostForm v-if="$i && channel != null && channel.id === column.channelId && prefer.r.showFixedPostFormInChannel.value" :key="channel.id" :channel="channel" :class="$style.postForm" fixed :autofocus="false"/>
+		<div v-else style="padding: 10px 8px 0; text-align: center;">
 			<MkButton primary gradate rounded inline small @click="post"><i class="ti ti-pencil"></i></MkButton>
 		</div>
 		<MkStreamingNotesTimeline ref="timeline" src="channel" :channel="column.channelId"/>
-	</template>
+	</div>
 </XColumn>
 </template>
 
@@ -27,6 +28,9 @@ import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import type { SoundStore } from '@features/preferences/frontend/state/def.js';
 import { updateColumn } from '@features/preferences/frontend/deck.js';
 import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
+import MkPostForm from '@features/notes/frontend/components/MkPostForm.vue';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { $i } from '@features/auth/frontend/i.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { favoritedChannelsCache } from '@features/runtime/frontend/cache.js';
@@ -42,14 +46,33 @@ const timeline = useTemplateRef('timeline');
 const channel = shallowRef<Misskey.entities.Channel>();
 const soundSetting = ref<SoundStore>(props.column.soundSetting ?? { type: null, volume: 1 });
 
-onMounted(() => {
-	if (props.column.channelId == null) {
-		setChannel();
-	} else if (!props.column.name && props.column.channelId) {
-		misskeyApi('channels/show', { channelId: props.column.channelId })
-			.then(value => updateColumn(props.column.id, { timelineNameCache: value.name }));
+watch([() => props.column.channelId, () => prefer.r.showFixedPostFormInChannel.value], ([newChannelId, showFixedPostForm], oldValue, onCleanup) => {
+	if (newChannelId == null) {
+		// 設定値の変更だけで選択ダイアログを開かないよう、初回実行時か channelId が変わったときのみ
+		// (複数ソースの immediate watcher では初回の oldValue が空配列になる)
+		if (oldValue == null || !(0 in oldValue) || oldValue[0] !== newChannelId) setChannel();
+		return;
 	}
-});
+	if (!showFixedPostForm && props.column.name) return;
+	if (channel.value != null && channel.value.id === newChannelId) return;
+
+	let invalidated = false;
+	onCleanup(() => {
+		invalidated = true;
+	});
+	misskeyApi('channels/show', { channelId: newChannelId })
+		.then(value => {
+			if (invalidated || props.column.channelId !== newChannelId) return;
+			if (value.name !== props.column.timelineNameCache) {
+				updateColumn(props.column.id, { timelineNameCache: value.name });
+			}
+			channel.value = value;
+		})
+		.catch(err => {
+			if (invalidated || props.column.channelId !== newChannelId) return;
+			console.error('Failed to fetch channel:', err);
+		});
+}, { immediate: true });
 
 watch(soundSetting, v => {
 	updateColumn(props.column.id, { soundSetting: v });
@@ -95,6 +118,13 @@ const menu: MenuItem[] = [{
 	action: () => soundSettingsButton(soundSetting),
 }];
 </script>
+
+<style module>
+.postForm {
+	background: var(--MI_THEME-panel);
+	overflow: clip;
+}
+</style>
 
 <locale locale="ar-SA" lang="json">
 {

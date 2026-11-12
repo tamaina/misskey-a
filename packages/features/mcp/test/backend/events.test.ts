@@ -18,6 +18,9 @@ import { streamEventCatalog } from '../../backend/stream-catalog.js';
 import { modernRequest } from '../../backend/modern-request.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
+import { UserWebhookService, type UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
+import type { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import type * as Redis from 'ioredis';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
@@ -29,10 +32,12 @@ import type { AntennaNoteAccessService } from '@features/timelines/backend/servi
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';
 import type { UserWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
+vi.mock('@features/runtime/backend/services/QueueService.js', () => ({ QueueService: class {} }));
 vi.mock('@features/runtime/backend/services/HttpRequestService.js', () => ({ HttpRequestService: class {} }));
 vi.mock('@features/roles/backend/services/RoleService.js', () => ({ RoleService: class {} }));
 vi.mock('@features/notes/backend/serializers/NoteEntityService.js', () => ({ NoteEntityService: class {} }));
 vi.mock('@features/runtime/backend/queue/QueueLoggerService.js', () => ({ QueueLoggerService: class {} }));
+const notificationNames = ['subscribedNote', 'followed', 'mention', 'reply', 'renote', 'quote', 'reaction', 'pollEnded', 'scheduledNotePosted', 'scheduledNotePostFailed', 'receiveFollowRequest', 'followRequestAccepted', 'roleAssigned', 'chatRoomInvitationReceived', 'achievementEarned', 'exportCompleted', 'app', 'test'];
 const secret = 'whsec_' + Buffer.alloc(32, 42).toString('base64');
 const input = { name: 'note.mentioned' as const, arguments: {}, delivery: { mode: 'webhook' as const, url: 'https://callback.example/events', secret }, cursor: null, ttlMs: 3600000 };
 const stores = () => ({ webhooks: mockDeep<WebhooksRepository>(), tokens: mockDeep<AccessTokensRepository>(), apps: mockDeep<AppsRepository>(), users: mockDeep<UsersRepository>(), notes: mockDeep<NotesRepository>(), http: mockDeep<HttpRequestService>(), roles: mockDeep<RoleService>(), noteEntity: mockDeep<NoteEntityService>(), antennas: mockDeep<AntennasRepository>(), antennaAccess: mockDeep<AntennaNoteAccessService>() });
@@ -55,13 +60,15 @@ beforeEach(() => {
 	deps.webhooks.createQueryBuilder.mockReturnValue(query);
 	const repo = mockDeep<WebhooksRepository>(); repo.createQueryBuilder.mockReturnValue(query);
 	repo.countBy.mockImplementation(async () => rows.size);
+	repo.find.mockImplementation(async () => [...rows.values()].filter(row => row.mode === 'mcp' && (!row.active || !row.mcpExpiresAt || row.mcpExpiresAt.getTime() <= Date.now())));
+	repo.delete.mockImplementation(async ids => { for (const id of ids as string[]) rows.delete(id); return {} as never; });
 	repo.save.mockImplementation(async values => { const row = Object.assign(new MiWebhook(), values); rows.set(row.id, row); return row; });
 	deps.webhooks.update.mockImplementation(async (where, values) => { for (const row of rows.values()) if (typeof where === 'object' && Object.entries(where).every(([key, value]) => row[key as keyof MiWebhook] === value)) Object.assign(row, values); return {} as never; });
 	repo.update.mockImplementation(deps.webhooks.update);
 	const manager = mockDeep<WebhooksRepository['manager']>(); manager.getRepository.mockImplementation(target => target === deps.antennas.target ? deps.antennas as never : repo as never);
 	deps.webhooks.manager.transaction.mockImplementation(async (...args) => (args.at(-1) as unknown as (manager: unknown) => Promise<unknown>)(manager) as never);
 	deps.http.sendMcpWebhook.mockImplementation(async (_url, body) => ({ status: 200, ok: true, text: JSON.stringify({ challenge: JSON.parse(body).challenge }) }));
-	deps.notes.findOneBy.mockResolvedValue({ id: 'note', mentions: ['account'], replyUserId: 'account' } as never);
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: 'other-author', mentions: ['account'], replyUserId: 'account' } as never);
 	deps.noteEntity.isVisibleForMe.mockResolvedValue(true); deps.noteEntity.pack.mockResolvedValue({ isHidden: false } as never);
 	service = new McpEventsService(deps.webhooks, deps.tokens, deps.apps, deps.users, deps.notes, deps.http, deps.roles, deps.noteEntity, deps.antennas, deps.antennaAccess);
 });
@@ -118,6 +125,58 @@ it('suppresses unsubscribe/expiry/recreation, current note visibility, deletion,
 	await service.invoke('events/unsubscribe', { name: input.name, arguments: {}, delivery: { mode: 'webhook', url: input.delivery.url } }, context());
 	expect(rows.get(id)!.secret).toBe('');
 	await subscribe(); expect(rows.get(id)!.mcpGeneration).not.toBe(currentGeneration);
+});
+it('reclaims unsubscribed and expired subscriptions before the quota check without reviving their generation', async () => {
+	deps.roles.getUserPolicies.mockResolvedValue({ webhookLimit: 1 } as never);
+	const other = (path: string) => ({ ...input, delivery: { ...input.delivery, url: `https://callback.example/${path}` } });
+	const { id } = await subscribe(); const generation = rows.get(id)!.mcpGeneration!;
+	await expect(subscribe(other('blocked'))).rejects.toMatchObject({ code: -32602, message: 'Webhook limit reached' });
+	await service.invoke('events/unsubscribe', { name: input.name, arguments: {}, delivery: { mode: 'webhook', url: input.delivery.url } }, context());
+	const next = await subscribe(other('next')); expect(rows.has(id)).toBe(false);
+	rows.get(next.id)!.mcpExpiresAt = new Date(0);
+	await subscribe(); expect(rows.has(next.id)).toBe(false); expect(rows.size).toBe(1);
+	expect(rows.get(id)!.mcpGeneration).not.toBe(generation);
+	expect(await service.authorizeDelivery(id, 'account', generation, 'note', 'mention')).toBeNull();
+	expect(await service.authorizeDelivery(id, 'account', rows.get(id)!.mcpGeneration!, 'note', 'mention')).not.toBeNull();
+});
+it.each(['mention', 'reply'] as const)('filters self %s only from MCP fanout, preserving other recipients and subscriptions', async type => {
+	const redis = mockDeep<Redis.Redis>();
+	const queue = mockDeep<QueueService>();
+	const legacy = Object.assign(new MiWebhook(), { id: 'legacy', userId: 'account', mode: 'legacy', on: [type] });
+	const otherLegacy = Object.assign(new MiWebhook(), { id: 'other-legacy', userId: 'other', mode: 'legacy', on: [type] });
+	const subscriptions = ['account', 'other'].flatMap(userId => [1, 2].map(index =>
+		Object.assign(new MiWebhook(), { id: `${userId}-${index}`, userId, mode: 'mcp', on: [type] })));
+	deps.webhooks.findBy.mockImplementation(async where => {
+		if (Array.isArray(where)) return [];
+		return where.mode === 'legacy' ? [legacy, otherLegacy] : subscriptions.filter(row => row.userId === where.userId);
+	});
+	const producer = new UserWebhookService(redis, deps.webhooks, queue);
+	const content = { note: { id: 'note', userId: 'account', mentions: ['account', 'other'] } } as UserWebhookPayload<'mention'>;
+	await producer.enqueueUserWebhook('account', type, content);
+	await producer.enqueueUserWebhook('other', type, content);
+	expect(queue.userWebhookDeliver.mock.calls.map(([webhook]) => webhook.id)).toEqual(['legacy', 'other-legacy', 'other-1', 'other-2']);
+	expect(queue.userWebhookDeliver.mock.calls.every(([, event, payload]) => event === type && payload === content)).toBe(true);
+	producer.dispose();
+});
+it.each(['mention', 'reply'] as const)('suppresses already queued self %s on every attempt while delivering other authors', async type => {
+	const { id } = await subscribe({ ...input, name: type === 'mention' ? 'note.mentioned' : 'note.replied' });
+	const logger = mockDeep<QueueLoggerService>(); logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, deps.webhooks, deps.http, service, logger);
+	const job = { data: { mode: 'mcp', type, webhookId: id, userId: 'account', generation: rows.get(id)!.mcpGeneration!, noteId: 'note', createdAt: 1000, eventId: 'stable' } } as Bull.Job<UserWebhookDeliverJobData>;
+	deps.http.sendMcpWebhook.mockClear();
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: 'account', mentions: ['account', 'other'], replyUserId: 'account' } as never);
+	expect(await worker.process(job)).toBe('Suppressed');
+	expect(await worker.process(job)).toBe('Suppressed');
+	expect(deps.http.sendMcpWebhook).not.toHaveBeenCalled();
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: 'other-author', mentions: ['account'], replyUserId: 'account' } as never);
+	deps.http.sendMcpWebhook.mockResolvedValue({ ok: false, status: 500, text: '' });
+	await expect(worker.process(job)).rejects.toThrow('500');
+	deps.http.sendMcpWebhook.mockResolvedValue({ ok: true, status: 200, text: '' });
+	expect(await worker.process(job)).toBe('Success');
+	expect(deps.http.sendMcpWebhook.mock.calls.map(([, body, headers]) => [JSON.parse(body).name, headers['webhook-id']])).toEqual([
+		[type === 'mention' ? 'note.mentioned' : 'note.replied', 'stable'],
+		[type === 'mention' ? 'note.mentioned' : 'note.replied', 'stable'],
+	]);
 });
 it('rotates keys without changing live generation or extending expired subscriptions', async () => {
 	const { id } = await subscribe(); const generation = rows.get(id)!.mcpGeneration;
@@ -218,10 +277,10 @@ it('advertises strict antenna arguments separately from empty mention/reply argu
 	expect(result.events.find(event => event.name === 'note.mentioned')?.inputSchema).toEqual({ type: 'object', properties: {}, additionalProperties: false });
 });
 
-it('advertises object input schemas for all six event definitions', async () => {
+it('advertises object input schemas for all available event definitions', async () => {
 	permission.push('read:account');
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
-	expect(result.events).toHaveLength(6);
+	expect(result.events).toHaveLength(27);
 	for (const event of result.events) expect(ToolSchema.shape.inputSchema.safeParse(event.inputSchema).success, event.name).toBe(true);
 });
 
@@ -249,9 +308,11 @@ it('keeps the stream catalog outside JSON Schema and preserves it through the na
 });
 
 it.each([
-	{ scopes: ['read:notifications'], names: ['note.mentioned', 'note.replied'] },
-	{ scopes: ['read:account'], names: ['stream.channel', 'stream.broadcast', 'stream.note'] },
-	{ scopes: ['read:notifications', 'read:account'], names: ['note.mentioned', 'note.replied', 'antenna.note', 'stream.channel', 'stream.broadcast', 'stream.note'] },
+	{ scopes: ['read:notifications'], names: [...notificationNames, 'note.mentioned', 'note.replied'] },
+	{ scopes: ['read:chat'], names: ['chatMessage'] },
+	{ scopes: ['read:following'], names: ['unfollow', 'follow'] },
+	{ scopes: ['read:account'], names: ['note', 'stream.channel', 'stream.broadcast', 'stream.note'] },
+	{ scopes: ['read:notifications', 'read:account'], names: ['note', ...notificationNames.slice(0, -2), 'login', 'createToken', 'app', 'test', 'note.mentioned', 'note.replied', 'antenna.note', 'stream.channel', 'stream.broadcast', 'stream.note'] },
 ])('lists only events admitted by current native scopes: $scopes', async ({ scopes, names }) => {
 	permission = ['access:mcp', ...scopes];
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string }[] };
@@ -270,11 +331,11 @@ it.each([
 it('rechecks native scope changes between event discoveries', async () => {
 	const list = async () => (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.map(event => event.name);
 	permission = ['access:mcp', 'read:notifications', 'read:account'];
-	expect(await list()).toHaveLength(6);
+	expect(await list()).toHaveLength(27);
 	permission = ['access:mcp', 'read:account'];
-	expect(await list()).toEqual(['stream.channel', 'stream.broadcast', 'stream.note']);
+	expect(await list()).toEqual(['note', 'stream.channel', 'stream.broadcast', 'stream.note']);
 	permission = ['access:mcp', 'read:notifications'];
-	expect(await list()).toEqual(['note.mentioned', 'note.replied']);
+	expect(await list()).toEqual([...notificationNames, 'note.mentioned', 'note.replied']);
 	permission = ['access:mcp'];
 	await expect(list()).rejects.toThrow('Event access denied');
 });
@@ -284,9 +345,9 @@ it('filters using current app permissions rather than the token/context scope sn
 	deps.tokens.findOneBy.mockResolvedValue({ id: 'grant', userId: actor.id, appId: 'app', permission } as never);
 	deps.apps.findOneBy.mockResolvedValue({ id: 'app', permission: ['access:mcp', 'read:account'] } as never);
 	const list = async () => (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.map(event => event.name);
-	expect(await list()).toEqual(['stream.channel', 'stream.broadcast', 'stream.note']);
+	expect(await list()).toEqual(['note', 'stream.channel', 'stream.broadcast', 'stream.note']);
 	deps.apps.findOneBy.mockResolvedValue({ id: 'app', permission: ['access:mcp', 'read:notifications'] } as never);
-	expect(await list()).toEqual(['note.mentioned', 'note.replied']);
+	expect(await list()).toEqual([...notificationNames, 'note.mentioned', 'note.replied']);
 	deps.apps.findOneBy.mockResolvedValue(null);
 	await expect(list()).rejects.toThrow('Event access denied');
 });
@@ -299,4 +360,117 @@ it('retains current grant and account-state checks when listing events', async (
 	await expect(service.invoke('events/list', {}, context())).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_MOVED' });
 	actor.movedToUri = null; deps.tokens.findOneBy.mockResolvedValue(null);
 	await expect(service.invoke('events/list', {}, context())).rejects.toThrow('Event access denied');
+});
+
+it('delivers canonical names and aliases independently, suppressing both after grant revocation', async () => {
+	const canonical = await subscribe({ ...input, name: 'mention' });
+	const alias = await subscribe();
+	expect(canonical.id).not.toBe(alias.id);
+	for (const id of [canonical.id, alias.id]) {
+		const row = rows.get(id)!;
+		expect(await service.authorizeDelivery(id, actor.id, row.mcpGeneration!, 'note', 'mention')).toMatchObject({ name: row.name });
+	}
+	permission = ['access:mcp'];
+	for (const id of [canonical.id, alias.id]) expect(await service.authorizeDelivery(id, actor.id, rows.get(id)!.mcpGeneration!, 'note', 'mention')).toBeNull();
+});
+
+it.each(['login', 'createToken'] as const)('requires account and notification permissions again at delivery for %s', async name => {
+	await expect(subscribe({ ...input, name })).rejects.toThrow('Event access denied');
+	permission.push('read:account');
+	const { id } = await subscribe({ ...input, name });
+	const generation = rows.get(id)!.mcpGeneration!;
+	const getNotification = vi.fn(async () => ({ id: 'notification', type: name }));
+	Object.assign(service, { moduleRef: { get: () => ({ getNotification }) } });
+	const data = { notificationId: 'notification' };
+	expect(await service.authorizeDelivery(id, actor.id, generation, 'note', name)).toBeNull();
+	expect(await service.authorizeDelivery(id, actor.id, generation, '', name, undefined, data)).not.toBeNull();
+	permission = ['access:mcp', 'read:notifications'];
+	expect(await service.authorizeDelivery(id, actor.id, generation, '', name, undefined, data)).toBeNull();
+});
+
+it('rechecks chat access immediately before delivery with only the native chat scope', async () => {
+	permission = ['access:mcp', 'read:chat'];
+	const canReceiveMessageEvent = vi.fn(async () => true);
+	Object.assign(service, { moduleRef: { get: () => ({ canReceiveMessageEvent }) } });
+	const { id } = await subscribe({ ...input, name: 'chatMessage' });
+	const generation = rows.get(id)!.mcpGeneration!;
+	const data = { messageId: 'message' };
+	expect(await service.authorizeDelivery(id, actor.id, generation, '', 'chatMessage', undefined, data)).not.toBeNull();
+	expect(canReceiveMessageEvent).toHaveBeenCalledWith(actor.id, 'message');
+	canReceiveMessageEvent.mockResolvedValue(false);
+	expect(await service.authorizeDelivery(id, actor.id, generation, '', 'chatMessage', undefined, data)).toBeNull();
+	canReceiveMessageEvent.mockResolvedValue(true); permission = ['access:mcp'];
+	expect(await service.authorizeDelivery(id, actor.id, generation, '', 'chatMessage', undefined, data)).toBeNull();
+});
+
+it.each(['quote', 'subscribedNote', 'reaction'] as const)('rechecks note visibility for %s references', async name => {
+	const { id } = await subscribe({ ...input, name }); const generation = rows.get(id)!.mcpGeneration!;
+	deps.notes.findOneBy.mockResolvedValue({ id: 'note', userId: actor.id } as never);
+	expect(await service.authorizeDelivery(id, actor.id, generation, 'note', name)).not.toBeNull();
+	deps.noteEntity.isVisibleForMe.mockResolvedValue(false);
+	expect(await service.authorizeDelivery(id, actor.id, generation, 'note', name)).toBeNull();
+});
+
+it('binds chat delivery to the subscription name and recipient even with a permissive on list', async () => {
+	permission = ['access:mcp', 'read:chat', 'read:notifications'];
+	const canReceiveMessageEvent = vi.fn(async (userId: string, messageId: string) => userId === actor.id && messageId === 'received');
+	Object.assign(service, { moduleRef: { get: () => ({ canReceiveMessageEvent }) } });
+	const { id } = await subscribe({ ...input, name: 'chatMessage' });
+	const row = rows.get(id)!;
+	const authorize = (data: Record<string, string>, userId = actor.id) => service.authorizeDelivery(id, userId, row.mcpGeneration!, '', 'chatMessage', undefined, data);
+	expect(await authorize({ messageId: 'received', userId: actor.id })).not.toBeNull();
+	const invalidReferences: Record<string, string>[] = [{ messageId: 'foreign' }, { messageId: 'received', userId: 'other' }, { messageId: 'received', notificationId: 'foreign' }];
+	for (const data of invalidReferences) {
+		expect(await authorize(data)).toBeNull();
+	}
+	expect(await authorize({ messageId: 'received' }, 'other')).toBeNull();
+	row.name = 'note.mentioned';
+	expect(await authorize({ messageId: 'received' })).toBeNull();
+});
+
+it.each(['login', 'createToken', 'followed', 'roleAssigned', 'mention', 'note.mentioned', 'note.replied', 'subscribedNote'] as const)('validates stored notification ownership and type for %s references', async name => {
+	permission.push('read:account');
+	const { id } = await subscribe({ ...input, name });
+	const row = rows.get(id)!;
+	const type = row.on[0];
+	const notificationType = name === 'followed' ? 'follow' : name === 'subscribedNote' ? 'note' : name === 'note.mentioned' ? 'mention' : name === 'note.replied' ? 'reply' : name;
+	const notification = { id: 'notification', type: notificationType, notifierId: 'sender', noteId: 'note' };
+	const getNotification = vi.fn(async (userId: string, notificationId: string) => userId === actor.id && notificationId === notification.id ? notification : null);
+	Object.assign(service, { moduleRef: { get: () => ({ getNotification }) } });
+	const authorize = (data?: Record<string, string>, noteId = '') => service.authorizeDelivery(id, actor.id, row.mcpGeneration!, noteId, type, undefined, data);
+	const data = { notificationId: 'notification', notificationType };
+	expect(await authorize(data)).not.toBeNull();
+	expect(getNotification).toHaveBeenCalledWith(actor.id, 'notification');
+	for (const invalid of [undefined, {}, { ...data, notificationId: 'foreign' }, { ...data, notificationType: 'test' }, { ...data, userId: 'other' }, { ...data, noteId: 'other' }]) {
+		expect(await authorize(invalid)).toBeNull();
+	}
+	expect(await authorize(data, 'other')).toBeNull();
+	getNotification.mockResolvedValue({ ...notification, id: 'other' });
+	expect(await authorize(data)).toBeNull();
+	getNotification.mockResolvedValue({ ...notification, type: 'test' });
+	expect(await authorize(data)).toBeNull();
+	getNotification.mockResolvedValue(null);
+	expect(await authorize(data)).toBeNull();
+});
+
+it('suppresses a notification removed after DNS without sending the callback', async () => {
+	permission.push('read:account');
+	const { id } = await subscribe({ ...input, name: 'login' });
+	let present = true;
+	const getNotification = vi.fn(async () => present ? { id: 'notification', type: 'login' } : null);
+	Object.assign(service, { moduleRef: { get: () => ({ getNotification }) } });
+	const logger = mockDeep<QueueLoggerService>(); logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, deps.webhooks, deps.http, service, logger);
+	let sent = false;
+	deps.http.sendMcpWebhook.mockImplementation(async (_url, _body, _headers, _signal, beforeSend) => {
+		present = false;
+		await beforeSend?.();
+		sent = true;
+		return { ok: true, status: 200, text: '' };
+	});
+	const job = mockDeep<Bull.Job<UserWebhookDeliverJobData>>();
+	job.data = { mode: 'mcp', type: 'login', webhookId: id, userId: actor.id, generation: rows.get(id)!.mcpGeneration!, noteId: '', data: { notificationId: 'notification' }, createdAt: 1000, eventId: 'event' };
+	expect(await worker.process(job)).toBe('Suppressed');
+	expect(getNotification).toHaveBeenCalledTimes(2);
+	expect(sent).toBe(false);
 });

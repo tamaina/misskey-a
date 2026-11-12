@@ -234,7 +234,7 @@ id: 'aidx'
 # inboxJobConcurrency: 16
 
 # Job rate limiter
-# deliverJobPerSec: 128
+# deliverJobPerSec: 2048
 # inboxJobPerSec: 32
 
 # Job attempts

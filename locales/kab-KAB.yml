@@ -1,107 +1,246 @@
----
-_lang_: "Taqbaylit"
-monthAndDay: "{day}/{month}"
-search: "Nadi"
-notifications: "Ilɣuyen"
-username: "Isem n umseqdac"
-password: "Awal uffir"
-ok: "IH"
-settings: "Iɣewwaṛen"
-profile: "Amaɣnu"
-signup: "Jerred"
-save: "Sekles"
-delete: "Kkes"
-addToList: "Rnu ɣer tebdart"
-reply: "Err"
-loadMore: "Wali ugar"
-showMore: "Wali ugar"
-youGotNewFollower: "Yeṭṭafaṛ-ik·em-id"
-mention: "Bder"
-import: "Kter"
-export: "Sifeḍ"
-files: "Ifuyla"
-download: "Sider"
-lists: "Tibdarin"
-following: "Ig ṭṭafaṛ"
-followers: "Imeḍfaṛen"
-followsYou: "Yeṭṭafaṛ-ik·em-id"
-createList: "Snulfu-d tabdart"
-enterListName: "Isem n tebdart"
-privacy: "Tabaḍnit"
-follow: "Ḍfeṛ"
-you: "Kečči·mmi"
-selectList: "Fren tabdart"
-security: "Taɣellist"
-remove: "Kkes"
-userList: "Tibdarin"
-signinRequired: "Ttxil jerred"
-uiLanguage: "Tutlayt n wegrudem"
-plugins: "Izegrar"
-email: "Imayl"
-emailAddress: "Tansa imayl"
-smtpUser: "Isem n umseqdac"
-smtpPass: "Awal uffir"
-other: "Wiyyaḍ"
-accountInfo: "Talɣut n umiḍan"
-emailNotification: "Ilɣa imayl"
-selectAccount: "Fren amiḍan"
-accounts: "Imiḍan"
-searchByGoogle: "Nadi"
-file: "Ifuyla"
-account: "Imiḍan"
-replies: "Err"
-_imageFrameEditor:
-  font: "Tasefsit"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-_email:
-  _follow:
-    title: "Yeṭṭafaṛ-ik·em-id"
-_theme:
-  keys:
-    mention: "Bder"
-_sfx:
-  notification: "Ilɣuyen"
-_permissions:
-  "write:account": "Ẓreg talɣut n umiḍan-ik·im"
-_widgets:
-  profile: "Amaɣnu"
-  notifications: "Ilɣuyen"
-  _userList:
-    chooseList: "Fren tabdart"
-_cw:
-  show: "Wali ugar"
-_visibility:
-  followers: "Imeḍfaṛen"
-_profile:
-  username: "Isem n umseqdac"
-_exportOrImport:
-  followingList: "Ig ṭṭafaṛ"
-  muteList: "Sgugem"
-  blockingList: "Seḥbes"
-  userLists: "Tibdarin"
-_pages:
-  contents: "Agbur"
-  font: "Tasefsit"
-  fontSerif: "Serif"
-  fontSansSerif: "Sans Serif"
-  eyeCatchingImageRemove: "Kkes tugna i d-ijebden"
-  selectType: "Fren anaw"
-  contentBlocks: "Agbur"
-  inputBlocks: "Anekcum"
-  specialBlocks: "Uzzig"
+_lang_: 'Taqbaylit'
+search: 'Nadi'
+ok: 'IH'
+save: 'Sekles'
+delete: 'Kkes'
+lists: 'Tibdarin'
+following: 'Ig ṭṭafaṛ'
 _notification:
-  youWereFollowed: "Yeṭṭafaṛ-ik·em-id"
-  _types:
-    follow: "Ig ṭṭafaṛ"
-    mention: "Bder"
+  youWereFollowed: 'Yeṭṭafaṛ-ik·em-id'
   _actions:
-    reply: "Err"
+    reply: 'Err'
+  _types:
+    all: 'All'
+    note: 'New notes'
+    follow: 'Ig ṭṭafaṛ'
+    mention: 'Bder'
+    reply: 'Replies'
+    renote: 'Renotes'
+    quote: 'Quotes'
+    reaction: 'Reactions'
+    pollEnded: 'Polls ending'
+    scheduledNotePosted: 'Scheduled note was successful'
+    scheduledNotePostFailed: 'Scheduled note failed'
+    receiveFollowRequest: 'Received follow requests'
+    followRequestAccepted: 'Accepted follow requests'
+    roleAssigned: 'Role given'
+    chatRoomInvitationReceived: 'Invited to chat room'
+    achievementEarned: 'Achievement unlocked'
+    exportCompleted: 'The export has been completed'
+    login: 'Sign In'
+    createToken: 'Create access token'
+    test: 'Notification test'
+    app: 'Notifications from linked apps'
+permission: 'Permissions'
+adminPermission: 'Admin Permissions'
+enableAll: 'Enable all'
+disableAll: 'Disable all'
+generateAccessToken: 'Generate access token'
+enableAllAdmin: 'Enable all (Admin Permissions)'
+disableAllAdmin: 'Disable all (Admin Permissions)'
+add: 'Add'
+remove: 'Kkes'
+'yes': 'Yes'
+'no': 'No'
+gotIt: 'Got it!'
+continue: 'Continue'
+create: 'Create'
+createNew: 'Create new'
+settings: 'Iɣewwaṛen'
+share: 'Share'
+more: 'More!'
+showMore: 'Wali ugar'
+showLess: 'Close'
+done: 'Done'
+download: 'Sider'
+update: 'Update'
+retry: 'Retry'
+goBack: 'Back'
+learnMore: 'Learn more'
+info: 'About'
+filter: 'Filter'
+install: 'Install'
+invite: 'Invite'
+rename: 'Rename'
+copyUrl: 'Copy URL'
+embed: 'Embed'
+processing: 'Processing...'
+fromDrive: 'From Drive'
+fromX: 'From {x}'
+visibility: 'Visibility'
+public: 'Public'
+private: 'Private'
+sensitive: 'Sensitive'
+markAsSensitive: 'Mark as sensitive'
+unmarkAsSensitive: 'Unmark as sensitive'
+deletedNote: 'Deleted note'
+poll: 'Poll'
+drive: 'Drive'
+timeline: 'Timeline'
+clip: 'Clip'
+memo: 'Memo'
+overview: 'Overview'
+oneDay: 'One day'
+oneHour: 'One hour'
+oneMonth: 'One month'
+oneWeek: 'One week'
+indefinitely: 'Permanently'
+period: 'Time limit'
+createdAt: 'Created at'
+updatedAt: 'Updated at'
+showRepliesToOthersInTimeline: 'Show replies to others in timeline'
+visibilityDisableFederation: 'Defederate'
+removeAreYouSure: 'Are you sure that you want to remove "{x}"?'
+deleteAreYouSure: 'Are you sure that you want to delete "{x}"?'
+resetAreYouSure: 'Really reset?'
+driveFileDeleteConfirm: 'Are you sure you want to delete "{name}"? All notes with this file attached will also be deleted.'
+follow: 'Ḍfeṛ'
+followers: 'Imeḍfaṛen'
+favorite: 'Add to favorites'
+unfavorite: 'Remove from favorites'
+mute: 'Mute'
+administrator: 'Administrator'
+moderator: 'Moderator'
+announcements: 'Announcements'
+channel: 'Channels'
+notifications: 'Ilɣuyen'
+user: 'User'
+noteOf: 'Note by {user}'
+userSaysSomething: '{name} said something'
+charts: 'Charts'
+noName: 'No name'
+withNFiles: '{n} file(s)'
+imageUrl: 'Image URL'
+termsOfService: 'Terms of Service'
+privacyPolicy: 'Privacy Policy'
+high: 'High'
+medium: 'Medium'
+low: 'Low'
+quote: 'Quote'
+localOnly: 'Local only'
+show: 'Show'
+reply: 'Err'
+renote: 'Renote'
+_timelines:
+  home: 'Home'
+  local: 'Local'
+  social: 'Social'
+  global: 'Global'
+_visibility:
+  public: 'Public'
+  publicDescription: 'Your note will be visible for all users'
+  home: 'Home'
+  homeDescription: 'Post to home timeline only'
+  followers: 'Imeḍfaṛen'
+  followersDescription: 'Make visible to your followers only'
+  specified: 'Direct'
+  specifiedDescription: 'Make visible for specified users only'
+  disableFederation: 'Defederate'
+  disableFederationDescription: 'Don''t transmit to other instances'
 _deck:
   _columns:
-    notifications: "Ilɣuyen"
-    list: "Tibdarin"
-_abuseReport:
-  _notificationRecipient:
-    _recipientType:
-      mail: "Imayl"
+    main: 'Main'
+    widgets: 'Widgets'
+    notifications: 'Ilɣuyen'
+    tl: 'Timeline'
+    antenna: 'Antennas'
+    list: 'Tibdarin'
+    channel: 'Channel'
+    mentions: 'Mentions'
+    direct: 'Direct notes'
+    roleTimeline: 'Role Timeline'
+    chat: 'Chat with user'
+    clip: 'Clip'
+_permissions:
+  "access:mcp": 'Qqen ɣer MCP (ilmend n tsirag n API d tilisa n useknen yellan; yezmer ad isireg taɣuri n tezmilin tudmawin n umiḍan-agi)'
+  "read:account": 'View your account information'
+  "write:account": 'Ẓreg talɣut n umiḍan-ik·im'
+  "read:blocks": 'View your list of blocked users'
+  "write:blocks": 'Edit your list of blocked users'
+  "read:drive": 'Access your Drive files and folders'
+  "write:drive": 'Edit or delete your Drive files and folders'
+  "read:favorites": 'View your list of favorites'
+  "write:favorites": 'Edit your list of favorites'
+  "read:following": 'View information on who you follow'
+  "write:following": 'Follow or unfollow other accounts'
+  "read:messaging": 'View your chats'
+  "write:messaging": 'Compose or delete chat messages'
+  "read:mutes": 'View your list of muted users'
+  "write:mutes": 'Edit your list of muted users'
+  "write:notes": 'Compose or delete notes'
+  "read:notifications": 'View your notifications'
+  "write:notifications": 'Manage your notifications'
+  "read:reactions": 'View your reactions'
+  "write:reactions": 'Edit your reactions'
+  "write:votes": 'Vote on a poll'
+  "read:pages": 'View your Pages'
+  "write:pages": 'Edit or delete your Pages'
+  "read:page-likes": 'View list of liked Pages'
+  "write:page-likes": 'Edit list of liked Pages'
+  "read:user-groups": 'View your user groups'
+  "write:user-groups": 'Edit or delete your user groups'
+  "read:channels": 'View your channels'
+  "write:channels": 'Edit your channels'
+  "read:gallery": 'View your gallery'
+  "write:gallery": 'Edit your gallery'
+  "read:gallery-likes": 'View your list of liked gallery posts'
+  "write:gallery-likes": 'Edit your list of liked gallery posts'
+  "read:flash": 'View Play'
+  "write:flash": 'Edit Plays'
+  "read:flash-likes": 'View list of liked Plays'
+  "write:flash-likes": 'Edit list of liked Plays'
+  "read:admin:abuse-user-reports": 'View user reports'
+  "write:admin:delete-account": 'Delete user account'
+  "write:admin:delete-all-files-of-a-user": 'Delete all files of a user'
+  "read:admin:index-stats": 'View database index stats'
+  "read:admin:table-stats": 'View database table stats'
+  "read:admin:user-ips": 'View user IP addresses'
+  "read:admin:meta": 'View server metadata'
+  "write:admin:reset-password": 'Reset user password'
+  "write:admin:resolve-abuse-user-report": 'Resolve user report'
+  "write:admin:send-email": 'Send email'
+  "read:admin:server-info": 'View server info'
+  "read:admin:show-moderation-log": 'View moderation log'
+  "read:admin:show-user": 'View private user info'
+  "write:admin:suspend-user": 'Suspend user'
+  "write:admin:unset-mfa": 'Reset two-factor authentication for the user'
+  "write:admin:unset-user-avatar": 'Remove user avatar'
+  "write:admin:unset-user-banner": 'Remove user banner'
+  "write:admin:unsuspend-user": 'Unsuspend user'
+  "write:admin:meta": 'Manage server metadata'
+  "write:admin:user-note": 'Manage moderation note'
+  "write:admin:roles": 'Manage roles'
+  "read:admin:roles": 'View roles'
+  "write:admin:relays": 'Manage relays'
+  "read:admin:relays": 'View relays'
+  "write:admin:invite-codes": 'Manage invite codes'
+  "read:admin:invite-codes": 'View invite codes'
+  "write:admin:announcements": 'Manage announcements'
+  "read:admin:announcements": 'View announcements'
+  "write:admin:avatar-decorations": 'Can manage avatar decorations'
+  "read:admin:avatar-decorations": 'View avatar decorations'
+  "write:admin:federation": 'Manage federation data'
+  "write:admin:account": 'Manage user account'
+  "read:admin:account": 'View user account'
+  "write:admin:emoji": 'Manage emoji'
+  "read:admin:emoji": 'View emoji'
+  "write:admin:queue": 'Manage job queue'
+  "read:admin:queue": 'View job queue info'
+  "write:admin:promo": 'Manage promotion notes'
+  "write:admin:drive": 'Manage user drive'
+  "read:admin:drive": 'View user drive info'
+  "read:admin:stream": 'Use WebSocket API for Admin'
+  "write:admin:ad": 'Manage ads'
+  "read:admin:ad": 'View ads'
+  "write:invite-codes": 'Create invite codes'
+  "read:invite-codes": 'Get invite codes'
+  "write:clip-favorite": 'Manage favorited clips'
+  "read:clip-favorite": 'View favorited clips'
+  "read:federation": 'Get federation data'
+  "write:report-abuse": 'Report violation'
+  "write:chat": 'Compose or delete chat messages'
+  "read:chat": 'Browse Chat'
+_cw:
+  hide: 'Hide'
+  show: 'Wali ugar'
+hide: 'Hide'

@@ -20005,6 +20005,12 @@ export default {
 					"BANNER_NOT_AN_IMAGE": {
 						"status": 400
 					},
+					"AVATAR_IS_SENSITIVE": {
+						"status": 400
+					},
+					"BANNER_IS_SENSITIVE": {
+						"status": 400
+					},
 					"NO_SUCH_PAGE": {
 						"status": 400
 					},

@@ -24,7 +24,7 @@ vi.mock('@features/preferences/frontend/store.js', () => ({ store: { s: { accoun
 vi.mock('@features/preferences/frontend/state/utility.js', () => ({ cloudBackup: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({ waiting: () => mocks.finishWaiting, popup: () => ({ dispose: vi.fn() }), popupMenu: vi.fn(), success: vi.fn(), alert: vi.fn() }));
 vi.mock('@features/runtime/frontend/utility/unison-reload.js', () => ({ unisonReload: mocks.reload, reloadChannel: { postMessage: vi.fn() } }));
-vi.mock('@features/runtime/frontend/utility/idb-proxy.js', () => ({ clear: vi.fn() }));
+vi.mock('@features/runtime/frontend/utility/idb-proxy.js', () => ({ clear: vi.fn(), get: vi.fn() }));
 vi.mock('@features/moderation/frontend/utility/show-suspended-dialog.js', () => ({ showSuspendedDialog: vi.fn() }));
 vi.mock('@features/auth/frontend/ts-messages.vue', () => ({ default: { $locale: {} } }));
 

@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.shape2"></div>
 	<div :class="$style.logoWrapper">
 		<div :class="$style.poweredBy">Powered by</div>
-		<img :src="misskeysvg" :class="$style.misskey" :alt="productName"/><span :class="$style.productEdition" aria-hidden="true">9000</span>
+		<img :src="misskeysvg" :class="$style.misskey" :alt="productName"/>
 	</div>
 	<div :class="$style.contents">
 		<MkVisitorDashboard/>
@@ -131,13 +131,6 @@ misskeyApiGet('federation/instances', {
 	margin-bottom: 2px;
 }
 
-.productEdition {
-	margin-left: 8px;
-	font-size: 24px;
-	font-weight: bold;
-	vertical-align: middle;
-}
-
 .misskey {
 	vertical-align: middle;
 	width: 120px;
@@ -151,7 +144,7 @@ misskeyApiGet('federation/instances', {
 	position: relative;
 	width: min(430px, calc(100% - 32px));
 	margin-left: 128px;
-	padding: 100px 0 100px 0;
+	padding: 128px 0 100px 0;
 
 	@media (max-width: 1200px) {
 		margin: auto;

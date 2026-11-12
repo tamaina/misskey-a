@@ -23,7 +23,7 @@ import type { AntennaArtifact } from '@features/portability/backend/antenna-arti
 import { ApRequestCreator } from '@features/federation/backend/services/ApRequestService.js';
 import { type SystemWebhookPayload } from '@features/integrations/backend/services/SystemWebhookService.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
-import { type UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
+import { type UserWebhookPayload, type NotificationWebhookOccurrence } from '@features/integrations/backend/services/UserWebhookService.js';
 import type {
 	DbJobData,
 	ArchiveAnnouncementJobData,
@@ -713,14 +713,22 @@ export class QueueService {
 		webhook: MiWebhook,
 		type: T,
 		content: UserWebhookPayload<T>,
-		opts?: { attempts?: number },
+		opts?: { attempts?: number; notification?: NotificationWebhookOccurrence },
 	) {
 		if (webhook.mode === 'mcp') {
-			if ((type !== 'mention' && type !== 'reply') || !('note' in content) || !webhook.mcpGeneration
-				|| !webhook.mcpExpiresAt || new Date(webhook.mcpExpiresAt).getTime() <= Date.now()) return;
-			const eventId = createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, type, content.note.id])).digest('hex');
+			if (!webhook.mcpGeneration || !webhook.mcpExpiresAt || new Date(webhook.mcpExpiresAt).getTime() <= Date.now()) return;
+			// Queue only references; packed private content never enters MCP jobs.
+			const reference: Record<string, string> = 'notification' in content
+				? { notificationId: content.notification.id, notificationType: content.notification.type,
+					...('note' in content.notification ? { noteId: content.notification.note.id } : {}),
+					...('userId' in content.notification && content.notification.userId ? { userId: content.notification.userId } : {}) }
+				: 'message' in content ? { messageId: content.message.id }
+					: 'note' in content ? { noteId: content.note.id } : { userId: content.user.id };
+			if (opts?.notification) Object.assign(reference, { notificationId: opts.notification.id, notificationType: opts.notification.type });
+			const sourceId = reference.notificationId ?? reference.messageId ?? reference.noteId ?? randomUUID();
+			const eventId = createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, type, sourceId])).digest('hex');
 			const data: UserWebhookDeliverJobData = { mode: 'mcp', type, webhookId: webhook.id, userId: webhook.userId,
-				generation: webhook.mcpGeneration, noteId: content.note.id, createdAt: new Date(content.note.createdAt).getTime(), eventId };
+				generation: webhook.mcpGeneration, noteId: reference.noteId ?? '', data: reference, createdAt: opts?.notification ? new Date(opts.notification.createdAt).getTime() : Date.now(), eventId };
 			return this.userWebhookDeliverQueue.add(webhook.id, data, { jobId: eventId, attempts: 4,
 				backoff: { type: 'custom' }, removeOnComplete: { age: 86400, count: 1000 }, removeOnFail: { age: 86400, count: 1000 } });
 		}

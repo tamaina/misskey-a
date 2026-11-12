@@ -13,11 +13,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template #label>{{ $locale.sfc.author }}</template>
 		</MkInput>
 		<MkTextarea v-if="selectedTheme.desc" readonly :modelValue="selectedTheme.desc">
-			<template #label>{{ $locale.sfc.description }}</template>
+			<template #label>{{ globalLocale.env.description }}</template>
 		</MkTextarea>
 		<MkTextarea readonly tall :modelValue="selectedThemeCode">
 			<template #label>{{ $locale.sfc.code }}</template>
-			<template #caption><button class="_textButton" @click="copyThemeCode()">{{ $locale.sfc.copy }}</button></template>
+			<template #caption><button class="_textButton" @click="copyThemeCode()">{{ globalLocale.env.copy }}</button></template>
 		</MkTextarea>
 		<MkButton v-if="!builtinThemes.some(t => t.id == selectedTheme!.id)" danger @click="uninstall()"><i class="ti ti-trash"></i> {{ $locale.sfc.uninstall }}</MkButton>
 	</template>
@@ -25,6 +25,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed, ref } from 'vue';
 import JSON5 from 'json5';
 import type { Theme } from '@features/preferences/frontend/shared/theme.js';
@@ -40,6 +42,8 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import { prefer } from '@features/preferences/frontend/preferences';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const installedThemes = prefer.r.themes;
 const builtinThemes = ref<Theme[]>([]);
@@ -103,9 +107,7 @@ definePage(() => ({
 	"manage": "إدارة القوالب",
 	"theme": "المظهر",
 	"author": "الكاتب",
-	"description": "الوصف",
 	"code": "شيفرة القالب",
-	"copy": "نسخ",
 	"uninstall": "إلغاء التثبيت"
 }
 </locale>
@@ -117,9 +119,7 @@ definePage(() => ({
 	"manage": "Gestionar els temes ",
 	"theme": "Tema",
 	"author": "Autor",
-	"description": "Descripció",
 	"code": "Codi del tema",
-	"copy": "Copiar",
 	"uninstall": "Desinstal·la"
 }
 </locale>
@@ -131,9 +131,7 @@ definePage(() => ({
 	"manage": "Správa vzhledů",
 	"theme": "Vzhled",
 	"author": "Autor",
-	"description": "Popis",
 	"code": "Kód vzhledu",
-	"copy": "Kopírovat",
 	"uninstall": "Odinstalovat"
 }
 </locale>
@@ -145,9 +143,7 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -159,9 +155,7 @@ definePage(() => ({
 	"manage": "Farbschemaverwaltung",
 	"theme": "Farbschema",
 	"author": "Autor",
-	"description": "Beschreibung",
 	"code": "Farbschemencode",
-	"copy": "Kopieren",
 	"uninstall": "Deinstallieren"
 }
 </locale>
@@ -173,9 +167,7 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -187,9 +179,7 @@ definePage(() => ({
 	"manage": "Gestor de temas",
 	"theme": "Tema",
 	"author": "Autor",
-	"description": "Descripción",
 	"code": "Código del tema",
-	"copy": "Copiar",
 	"uninstall": "Desinstalar"
 }
 </locale>
@@ -201,9 +191,7 @@ definePage(() => ({
 	"manage": "Gestion des thèmes",
 	"theme": "Thème",
 	"author": "Auteur·rice",
-	"description": "Description",
 	"code": "Code du thème",
-	"copy": "Copier",
 	"uninstall": "Désinstaller"
 }
 </locale>
@@ -215,9 +203,7 @@ definePage(() => ({
 	"manage": "Manajer tema",
 	"theme": "Tema",
 	"author": "Pembuat",
-	"description": "Deskripsi",
 	"code": "Kode tema",
-	"copy": "Salin",
 	"uninstall": "Copot pemasangan"
 }
 </locale>
@@ -229,9 +215,7 @@ definePage(() => ({
 	"manage": "Gestione dei temi",
 	"theme": "Tema",
 	"author": "Autore",
-	"description": "Descrizione",
 	"code": "Codice tema",
-	"copy": "Copia",
 	"uninstall": "Disinstalla"
 }
 </locale>
@@ -243,9 +227,7 @@ definePage(() => ({
 	"manage": "テーマの管理",
 	"theme": "テーマ",
 	"author": "作者",
-	"description": "説明",
 	"code": "テーマコード",
-	"copy": "コピー",
 	"uninstall": "アンインストール"
 }
 </locale>
@@ -257,9 +239,7 @@ definePage(() => ({
 	"manage": "テーマの管理",
 	"theme": "テーマ",
 	"author": "作者",
-	"description": "説明",
 	"code": "テーマコード",
-	"copy": "コピー",
 	"uninstall": "アンインストール"
 }
 </locale>
@@ -271,9 +251,7 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -285,9 +263,7 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -299,9 +275,7 @@ definePage(() => ({
 	"manage": "테마 관리",
 	"theme": "테마",
 	"author": "작성자",
-	"description": "설명",
 	"code": "테마 코드",
-	"copy": "복사",
 	"uninstall": "삭제"
 }
 </locale>
@@ -313,9 +287,7 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Thema's",
 	"author": "Auteur",
-	"description": "Beschrijving",
 	"code": "Theme code",
-	"copy": "Kopiëren",
 	"uninstall": "Deinstalleren"
 }
 </locale>
@@ -327,9 +299,7 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Temaer",
 	"author": "Forfatter",
-	"description": "Beskrivelse",
 	"code": "Theme code",
-	"copy": "Kopier",
 	"uninstall": "Avinstaller"
 }
 </locale>
@@ -341,9 +311,7 @@ definePage(() => ({
 	"manage": "Zarządzanie motywami",
 	"theme": "Motywy",
 	"author": "Autor",
-	"description": "Opis",
 	"code": "Kod motywu",
-	"copy": "Kopiuj",
 	"uninstall": "Odinstaluj"
 }
 </locale>
@@ -355,9 +323,7 @@ definePage(() => ({
 	"manage": "Gerenciar temas",
 	"theme": "Tema",
 	"author": "Autor",
-	"description": "Descrição",
 	"code": "Código do tema",
-	"copy": "Copiar",
 	"uninstall": "Desinstalar"
 }
 </locale>
@@ -369,9 +335,7 @@ definePage(() => ({
 	"manage": "Менеджер тем",
 	"theme": "Тема",
 	"author": "Автор",
-	"description": "Описание",
 	"code": "Код темы",
-	"copy": "Копировать",
 	"uninstall": "Удалить"
 }
 </locale>
@@ -383,9 +347,7 @@ definePage(() => ({
 	"manage": "Spravovať témy",
 	"theme": "Téma",
 	"author": "Autor",
-	"description": "Popis",
 	"code": "Kód témy",
-	"copy": "Kopírovať",
 	"uninstall": "Odinštalovať"
 }
 </locale>
@@ -397,9 +359,7 @@ definePage(() => ({
 	"manage": "จัดการธีม",
 	"theme": "ธีม",
 	"author": "ผู้เขียน",
-	"description": "คำอธิบาย",
 	"code": "โค้ดธีม",
-	"copy": "คัดลอก",
 	"uninstall": "ถอนการติดตั้ง"
 }
 </locale>
@@ -411,9 +371,7 @@ definePage(() => ({
 	"manage": "Temaları yönet",
 	"theme": "Tema",
 	"author": "Yazar",
-	"description": "Açıklama",
 	"code": "Tema kodu",
-	"copy": "Kopyala",
 	"uninstall": "Kaldır"
 }
 </locale>
@@ -425,9 +383,7 @@ definePage(() => ({
 	"manage": "Manage themes",
 	"theme": "Themes",
 	"author": "Author",
-	"description": "Description",
 	"code": "Theme code",
-	"copy": "Copy",
 	"uninstall": "Uninstall"
 }
 </locale>
@@ -439,9 +395,7 @@ definePage(() => ({
 	"manage": "Керування темами",
 	"theme": "Тема",
 	"author": "Автор",
-	"description": "Опис",
 	"code": "Код теми",
-	"copy": "Скопіювати",
 	"uninstall": "Видалити"
 }
 </locale>
@@ -453,9 +407,7 @@ definePage(() => ({
 	"manage": "Quản lý theme",
 	"theme": "Chủ đề",
 	"author": "Tác giả",
-	"description": "Mô tả",
 	"code": "Mã theme",
-	"copy": "Sao chép",
 	"uninstall": "Gỡ bỏ"
 }
 </locale>
@@ -467,9 +419,7 @@ definePage(() => ({
 	"manage": "主题管理",
 	"theme": "主题",
 	"author": "作者",
-	"description": "描述",
 	"code": "主题代码",
-	"copy": "复制",
 	"uninstall": "卸载"
 }
 </locale>
@@ -481,9 +431,7 @@ definePage(() => ({
 	"manage": "管理佈景主題",
 	"theme": "佈景主題",
 	"author": "作者",
-	"description": "描述",
 	"code": "佈景主題代碼",
-	"copy": "複製",
 	"uninstall": "解除安裝"
 }
 </locale>

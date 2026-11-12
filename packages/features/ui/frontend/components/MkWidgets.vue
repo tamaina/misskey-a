@@ -10,8 +10,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkSelect v-model="widgetAdderSelected" :items="widgetAdderSelectedDef" style="margin-bottom: var(--MI-margin)" data-testid="widget-select">
 				<template #label>{{ $locale.sfc.selectWidget }}</template>
 			</MkSelect>
-			<MkButton inline primary data-testid="widget-add" @click="addWidget"><i class="ti ti-plus"></i> {{ $locale.sfc.add }}</MkButton>
-			<MkButton inline @click="emit('exit')">{{ $locale.sfc.close }}</MkButton>
+			<MkButton inline primary data-testid="widget-add" @click="addWidget"><i class="ti ti-plus"></i> {{ globalLocale.env.add }}</MkButton>
+			<MkButton inline @click="emit('exit')">{{ globalLocale.env.close }}</MkButton>
 		</header>
 		<MkDraggable
 			:modelValue="props.widgets"
@@ -45,9 +45,10 @@ export type DefaultStoredWidget = {
 </script>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed } from 'vue';
 import { isLink } from '@features/ui/frontend/shared/is-link.js';
-import type { Component } from 'vue';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -57,6 +58,9 @@ import * as os from '@features/ui/frontend/os.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import type { Component } from 'vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	widgets: Widget[];
@@ -91,7 +95,7 @@ const {
 	model: widgetAdderSelected,
 	def: widgetAdderSelectedDef,
 } = useMkSelect({
-	items: computed(() => [{ label: $locale.value.sfc.none, value: null }, ..._widgetDefs.value.map(x => ({ label: copyLocaleDictionary($locale.value.sfc.widgetsLabels)[x], value: x }))]),
+	items: computed(() => [{ label: globalLocale.value.env.none, value: null }, ..._widgetDefs.value.map(x => ({ label: copyLocaleDictionary($locale.value.sfc.widgetsLabels)[x], value: x }))]),
 	initialValue: null,
 });
 
@@ -126,7 +130,7 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		text: copyLocaleDictionary($locale.value.sfc.widgetsLabels)[widget.name as typeof widgetDefs[number]],
 	}, {
 		icon: 'ti ti-settings',
-		text: $locale.value.sfc.settings,
+		text: globalLocale.value.env.settings,
 		action: () => {
 			configWidget(widget.id);
 		},
@@ -192,9 +196,6 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 <locale lang="json" locale="ar-SA">
 {
 	"selectWidget": "اختر ودجة",
-	"add": "إضافة",
-	"close": "اغلق",
-	"none": "لا شيء",
 	"widgetsLabels": {
 		"profile": "الملف التعريفي",
 		"instanceInfo": "معلومات مثيل الخادم",
@@ -228,17 +229,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "الاعدادات"
+	}
 }
 </locale>
 
 <locale lang="json" locale="ca-ES">
 {
 	"selectWidget": "Triar un giny",
-	"add": "Afegir",
-	"close": "Tanca",
-	"none": "Res",
 	"widgetsLabels": {
 		"profile": "Perfil",
 		"instanceInfo": "Informació del fitxer d'instal·lació",
@@ -272,17 +269,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Usuaris que fan l'aniversari avui",
 		"chat": "Xateja amb aquest usuari"
-	},
-	"settings": "Preferències"
+	}
 }
 </locale>
 
 <locale lang="json" locale="cs-CZ">
 {
 	"selectWidget": "Zvolte widget",
-	"add": "Přidat",
-	"close": "Zavřít",
-	"none": "Žádný",
 	"widgetsLabels": {
 		"profile": "Váš profil",
 		"instanceInfo": "Informace o instanci",
@@ -316,17 +309,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Nastavení"
+	}
 }
 </locale>
 
 <locale lang="json" locale="da-DK">
 {
 	"selectWidget": "Select a widget",
-	"add": "Add",
-	"close": "Close",
-	"none": "None",
 	"widgetsLabels": {
 		"profile": "Profile",
 		"instanceInfo": "Instance Information",
@@ -360,17 +349,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Settings"
+	}
 }
 </locale>
 
 <locale lang="json" locale="de-DE">
 {
 	"selectWidget": "Widget auswählen",
-	"add": "Hinzufügen",
-	"close": "Schließen",
-	"none": "Nichts",
 	"widgetsLabels": {
 		"profile": "Profil",
 		"instanceInfo": "Instanzinformationen",
@@ -404,17 +389,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Klickzähler",
 		"birthdayFollowings": "Nutzer, die heute Geburtstag haben",
 		"chat": "Mit dem Benutzer chatten"
-	},
-	"settings": "Einstellungen"
+	}
 }
 </locale>
 
 <locale lang="json" locale="en-US">
 {
 	"selectWidget": "Select a widget",
-	"add": "Add",
-	"close": "Close",
-	"none": "None",
 	"widgetsLabels": {
 		"profile": "Profile",
 		"instanceInfo": "Instance Information",
@@ -448,17 +429,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Settings"
+	}
 }
 </locale>
 
 <locale lang="json" locale="es-ES">
 {
 	"selectWidget": "Seleccionar widget",
-	"add": "Agregar",
-	"close": "Cerrar",
-	"none": "Ninguna",
 	"widgetsLabels": {
 		"profile": "Perfil",
 		"instanceInfo": "información de la instancia",
@@ -492,17 +469,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Cliqueador",
 		"birthdayFollowings": "Hoy cumplen años",
 		"chat": "Chatear"
-	},
-	"settings": "Configuración"
+	}
 }
 </locale>
 
 <locale lang="json" locale="fr-FR">
 {
 	"selectWidget": "Sélectionner un widget",
-	"add": "Ajouter",
-	"close": "Fermer",
-	"none": "Rien",
 	"widgetsLabels": {
 		"profile": "Profil",
 		"instanceInfo": "Informations sur l’instance",
@@ -536,17 +509,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Utilisateurs qui fêtent l'anniversaire aujourd'hui",
 		"chat": "Chat with user"
-	},
-	"settings": "Paramètres"
+	}
 }
 </locale>
 
 <locale lang="json" locale="id-ID">
 {
 	"selectWidget": "Pilih gawit",
-	"add": "Tambahkan",
-	"close": "Tutup",
-	"none": "Tidak ada",
 	"widgetsLabels": {
 		"profile": "Profil",
 		"instanceInfo": "Informasi Instansi",
@@ -580,17 +549,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Pengeklik",
 		"birthdayFollowings": "Pengguna yang merayakan hari ulang tahunnya hari ini",
 		"chat": "Obrolan pengguna"
-	},
-	"settings": "Pengaturan"
+	}
 }
 </locale>
 
 <locale lang="json" locale="it-IT">
 {
 	"selectWidget": "Seleziona il riquadro",
-	"add": "Aggiungi",
-	"close": "Chiudi",
-	"none": "Nessuna",
 	"widgetsLabels": {
 		"profile": "Profilo",
 		"instanceInfo": "Informazioni sull'istanza",
@@ -624,17 +589,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Cliccheria",
 		"birthdayFollowings": "Compleanni del giorno",
 		"chat": "Messaggi diretti"
-	},
-	"settings": "Impostazioni"
+	}
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
 	"selectWidget": "ウィジェットを選択",
-	"add": "追加",
-	"close": "閉じる",
-	"none": "なし",
 	"widgetsLabels": {
 		"profile": "プロフィール",
 		"instanceInfo": "サーバー情報",
@@ -668,17 +629,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "クリッカー",
 		"birthdayFollowings": "もうすぐ誕生日のユーザー",
 		"chat": "ダイレクトメッセージ"
-	},
-	"settings": "設定"
+	}
 }
 </locale>
 
 <locale lang="json" locale="ja-KS">
 {
 	"selectWidget": "ウィジェットを選ぶ",
-	"add": "増やす",
-	"close": "さいなら",
-	"none": "なし",
 	"widgetsLabels": {
 		"profile": "プロフィール",
 		"instanceInfo": "サーバー情報",
@@ -712,17 +669,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "クリッカー",
 		"birthdayFollowings": "今日誕生日のツレ",
 		"chat": "チャットしよか"
-	},
-	"settings": "設定"
+	}
 }
 </locale>
 
 <locale lang="json" locale="kab-KAB">
 {
 	"selectWidget": "Select a widget",
-	"add": "Add",
-	"close": "Close",
-	"none": "None",
 	"widgetsLabels": {
 		"profile": "Amaɣnu",
 		"instanceInfo": "Instance Information",
@@ -756,17 +709,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Iɣewwaṛen"
+	}
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
 	"selectWidget": "Select a widget",
-	"add": "Add",
-	"close": "Close",
-	"none": "None",
 	"widgetsLabels": {
 		"profile": "ಪ್ರೊಫೈಲು",
 		"instanceInfo": "Instance Information",
@@ -800,17 +749,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "ಸಿದ್ಧತೆಗಳು"
+	}
 }
 </locale>
 
 <locale lang="json" locale="ko-KR">
 {
 	"selectWidget": "위젯 선택",
-	"add": "추가",
-	"close": "닫기",
-	"none": "없음",
 	"widgetsLabels": {
 		"profile": "프로필",
 		"instanceInfo": "서버 정보",
@@ -844,17 +789,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "클리커",
 		"birthdayFollowings": "곧 생일인 사용자",
 		"chat": "채팅하기"
-	},
-	"settings": "설정"
+	}
 }
 </locale>
 
 <locale lang="json" locale="nl-NL">
 {
 	"selectWidget": "Kies een widget",
-	"add": "Toevoegen",
-	"close": "Sluiten",
-	"none": "Niets",
 	"widgetsLabels": {
 		"profile": "Profiel",
 		"instanceInfo": "Serverinformatie",
@@ -888,17 +829,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Instellingen"
+	}
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
 	"selectWidget": "Velg en widget",
-	"add": "Legg til",
-	"close": "Lukk",
-	"none": "Ingen",
 	"widgetsLabels": {
 		"profile": "Profil",
 		"instanceInfo": "Serverinformasjon",
@@ -932,17 +869,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Innstillinger"
+	}
 }
 </locale>
 
 <locale lang="json" locale="pl-PL">
 {
 	"selectWidget": "Wybierz widżet",
-	"add": "Dodaj",
-	"close": "Zamknij",
-	"none": "Brak",
 	"widgetsLabels": {
 		"profile": "Profil",
 		"instanceInfo": "Informacje o instancji",
@@ -976,17 +909,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Ustawienia"
+	}
 }
 </locale>
 
 <locale lang="json" locale="pt-PT">
 {
 	"selectWidget": "Selecione um widget",
-	"add": "Adicionar",
-	"close": "Fechar",
-	"none": "Nenhum",
 	"widgetsLabels": {
 		"profile": "Perfil",
 		"instanceInfo": "Informações da instância",
@@ -1020,17 +949,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Usuários de aniversário hoje",
 		"chat": "Conversar com usuário"
-	},
-	"settings": "Configurações"
+	}
 }
 </locale>
 
 <locale lang="json" locale="ru-RU">
 {
 	"selectWidget": "Выберите виджет",
-	"add": "Добавить",
-	"close": "Закрыть",
-	"none": "Ничего",
 	"widgetsLabels": {
 		"profile": "Профиль",
 		"instanceInfo": "Информация об инстансе",
@@ -1064,17 +989,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Счётчик щелчков",
 		"birthdayFollowings": "Пользователи, у которых сегодня день рождения",
 		"chat": "Открыть личные сообщения"
-	},
-	"settings": "Настройки"
+	}
 }
 </locale>
 
 <locale lang="json" locale="sk-SK">
 {
 	"selectWidget": "Vyberte widget",
-	"add": "Pridať",
-	"close": "Zavrieť",
-	"none": "Žiadne",
 	"widgetsLabels": {
 		"profile": "Profil",
 		"instanceInfo": "Informácie o serveri",
@@ -1108,17 +1029,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Nastavenia"
+	}
 }
 </locale>
 
 <locale lang="json" locale="th-TH">
 {
 	"selectWidget": "เลือกวิดเจ็ต",
-	"add": "เพิ่ม",
-	"close": "ปิด",
-	"none": "ไม่มี",
 	"widgetsLabels": {
 		"profile": "โปรไฟล์",
 		"instanceInfo": "ข้อมูลเซิร์ฟเวอร์",
@@ -1152,17 +1069,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "คลิกเกอร์",
 		"birthdayFollowings": "วันเกิดผู้ใช้ในวันนี้",
 		"chat": "แชตเลย"
-	},
-	"settings": "การตั้งค่า"
+	}
 }
 </locale>
 
 <locale lang="json" locale="tr-TR">
 {
 	"selectWidget": "Araç seç",
-	"add": "Ekle",
-	"close": "Kapat",
-	"none": "Hiçbiri",
 	"widgetsLabels": {
 		"profile": "Profil",
 		"instanceInfo": "Sunucu Bilgisi",
@@ -1196,17 +1109,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Tıklayıcı",
 		"birthdayFollowings": "Bugünün Doğum Günleri",
 		"chat": "Sohbet"
-	},
-	"settings": "Ayarlar"
+	}
 }
 </locale>
 
 <locale lang="json" locale="ug-CN">
 {
 	"selectWidget": "Select a widget",
-	"add": "Add",
-	"close": "Close",
-	"none": "None",
 	"widgetsLabels": {
 		"profile": "profile",
 		"instanceInfo": "Instance Information",
@@ -1240,17 +1149,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Settings"
+	}
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
 	"selectWidget": "Виберіть віджет",
-	"add": "Додати",
-	"close": "Закрити",
-	"none": "Відсутній",
 	"widgetsLabels": {
 		"profile": "Профіль",
 		"instanceInfo": "Про цей інстанс",
@@ -1284,17 +1189,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Написати цьому користувачу"
-	},
-	"settings": "Налаштування"
+	}
 }
 </locale>
 
 <locale lang="json" locale="vi-VN">
 {
 	"selectWidget": "Chọn tiện ích",
-	"add": "Thêm",
-	"close": "Đóng",
-	"none": "Không",
 	"widgetsLabels": {
 		"profile": "Trang cá nhân",
 		"instanceInfo": "Thông tin máy chủ",
@@ -1328,17 +1229,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"settings": "Cài đặt"
+	}
 }
 </locale>
 
 <locale lang="json" locale="zh-CN">
 {
 	"selectWidget": "选择小工具",
-	"add": "添加",
-	"close": "关闭",
-	"none": "无",
 	"widgetsLabels": {
 		"profile": "个人资料",
 		"instanceInfo": "服务器信息",
@@ -1372,17 +1269,13 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "点击器",
 		"birthdayFollowings": "今天是他们的生日",
 		"chat": "私信"
-	},
-	"settings": "设置"
+	}
 }
 </locale>
 
 <locale lang="json" locale="zh-TW">
 {
 	"selectWidget": "選擇小工具",
-	"add": "新增",
-	"close": "關閉",
-	"none": "無",
 	"widgetsLabels": {
 		"profile": "個人檔案",
 		"instanceInfo": "伺服器資訊",
@@ -1416,7 +1309,6 @@ function onContextmenu(widget: Widget, ev: PointerEvent) {
 		"clicker": "點擊器",
 		"birthdayFollowings": "今天生日的使用者",
 		"chat": "聊天"
-	},
-	"settings": "設定"
+	}
 }
 </locale>

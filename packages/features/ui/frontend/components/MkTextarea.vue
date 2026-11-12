@@ -26,21 +26,25 @@ SPDX-License-Identifier: AGPL-3.0-only
 		></textarea>
 	</div>
 	<div :class="$style.caption"><slot name="caption"></slot></div>
-	<button v-if="mfmPreview" style="font-size: 0.85em;" class="_textButton" type="button" @click="preview = !preview">{{ $locale.sfc.preview }}</button>
+	<button v-if="mfmPreview" style="font-size: 0.85em;" class="_textButton" type="button" @click="preview = !preview">{{ globalLocale.env.preview }}</button>
 	<div v-if="mfmPreview" v-show="preview" v-panel :class="$style.mfmPreview">
 		<Mfm :text="v"/>
 	</div>
 
-	<MkButton v-if="manualSave && changed" primary :class="$style.save" @click="updated"><i class="ti ti-device-floppy"></i> {{ $locale.sfc.save }}</MkButton>
+	<MkButton v-if="manualSave && changed" primary :class="$style.save" @click="updated"><i class="ti ti-device-floppy"></i> {{ globalLocale.env.save }}</MkButton>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onMounted, onUnmounted, nextTick, ref, watch, computed, toRefs, useTemplateRef } from 'vue';
 import { debounce } from 'throttle-debounce';
-import type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { Autocomplete } from '@features/discovery/frontend/utility/autocomplete.js';
+import type { SuggestionType } from '@features/discovery/frontend/utility/autocomplete.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	modelValue: string | null;
@@ -243,197 +247,113 @@ onUnmounted(() => {
 </style>
 
 <locale locale="ar-SA" lang="json">
-{
-  "preview": "معاينة",
-  "save": "حفظ"
-}
+{}
 </locale>
 
 <locale locale="ca-ES" lang="json">
-{
-  "preview": "Vista prèvia",
-  "save": "Desa"
-}
+{}
 </locale>
 
 <locale locale="cs-CZ" lang="json">
-{
-  "preview": "Náhled",
-  "save": "Uložit"
-}
+{}
 </locale>
 
 <locale locale="da-DK" lang="json">
-{
-  "preview": "Preview",
-  "save": "Save"
-}
+{}
 </locale>
 
 <locale locale="de-DE" lang="json">
-{
-  "preview": "Vorschau",
-  "save": "Speichern"
-}
+{}
 </locale>
 
 <locale locale="en-US" lang="json">
-{
-  "preview": "Preview",
-  "save": "Save"
-}
+{}
 </locale>
 
 <locale locale="es-ES" lang="json">
-{
-  "preview": "Vista previa",
-  "save": "Guardar"
-}
+{}
 </locale>
 
 <locale locale="fr-FR" lang="json">
-{
-  "preview": "Aperçu",
-  "save": "Enregistrer"
-}
+{}
 </locale>
 
 <locale locale="id-ID" lang="json">
-{
-  "preview": "Pratinjau",
-  "save": "Simpan"
-}
+{}
 </locale>
 
 <locale locale="it-IT" lang="json">
-{
-  "preview": "Anteprima",
-  "save": "Salva"
-}
+{}
 </locale>
 
 <locale locale="ja-JP" lang="json">
-{
-  "preview": "プレビュー",
-  "save": "保存"
-}
+{}
 </locale>
 
 <locale locale="ja-KS" lang="json">
-{
-  "preview": "プレビュー",
-  "save": "とっとく"
-}
+{}
 </locale>
 
 <locale locale="kab-KAB" lang="json">
-{
-  "preview": "Preview",
-  "save": "Sekles"
-}
+{}
 </locale>
 
 <locale locale="kn-IN" lang="json">
-{
-  "preview": "Preview",
-  "save": "ಉಳಿಸಿ"
-}
+{}
 </locale>
 
 <locale locale="ko-KR" lang="json">
-{
-  "preview": "미리보기",
-  "save": "저장"
-}
+{}
 </locale>
 
 <locale locale="nl-NL" lang="json">
-{
-  "preview": "Voorbeeld",
-  "save": "Opslaan"
-}
+{}
 </locale>
 
 <locale locale="no-NO" lang="json">
-{
-  "preview": "Preview",
-  "save": "Lagre"
-}
+{}
 </locale>
 
 <locale locale="pl-PL" lang="json">
-{
-  "preview": "Podgląd",
-  "save": "Zapisz"
-}
+{}
 </locale>
 
 <locale locale="pt-PT" lang="json">
-{
-  "preview": "Pré-visualizar",
-  "save": "Salvar"
-}
+{}
 </locale>
 
 <locale locale="ru-RU" lang="json">
-{
-  "preview": "Предпросмотр",
-  "save": "Сохранить"
-}
+{}
 </locale>
 
 <locale locale="sk-SK" lang="json">
-{
-  "preview": "Náhľad",
-  "save": "Uložiť"
-}
+{}
 </locale>
 
 <locale locale="th-TH" lang="json">
-{
-  "preview": "แสดงตัวอย่าง",
-  "save": "บันทึก"
-}
+{}
 </locale>
 
 <locale locale="tr-TR" lang="json">
-{
-  "preview": "Önizleme",
-  "save": "Kaydet"
-}
+{}
 </locale>
 
 <locale locale="ug-CN" lang="json">
-{
-  "preview": "Preview",
-  "save": "Save"
-}
+{}
 </locale>
 
 <locale locale="uk-UA" lang="json">
-{
-  "preview": "Попередній перегляд",
-  "save": "Зберегти"
-}
+{}
 </locale>
 
 <locale locale="vi-VN" lang="json">
-{
-  "preview": "Xem trước",
-  "save": "Lưu"
-}
+{}
 </locale>
 
 <locale locale="zh-CN" lang="json">
-{
-  "preview": "预览",
-  "save": "保存"
-}
+{}
 </locale>
 
 <locale locale="zh-TW" lang="json">
-{
-  "preview": "預覽",
-  "save": "儲存"
-}
+{}
 </locale>

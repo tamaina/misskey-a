@@ -3,10 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import * as os from '@features/ui/frontend/os.js';
 import FeatureLocaleMessages from '@features/emojis/frontend/ts-messages.vue';
+import type { Locale } from 'i18n';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 export function chooseEmojiPalette() {
 	return os.select({
@@ -22,7 +28,7 @@ export function chooseEmojiPalette() {
 			}
 
 			return {
-				label: palette.name || `(${FeatureLocaleMessages.$locale.noName})`,
+				label: palette.name || `(${getGlobalLocale().noName})`,
 				caption,
 				value: palette.id,
 			};

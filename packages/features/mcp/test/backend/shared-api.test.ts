@@ -144,31 +144,48 @@ it('discovers current token API candidates and provides native input definitions
 	expect((await f.ordinary({}, f.grant.token, 'available-endpoints')).json().endpoints).toContain('notes/reactions/create');
 	f.rows.delete(f.grant.id); expect((await f.ordinary({}, f.grant.token, 'available-endpoints')).statusCode).toBe(401);
 });
+it('omits non-productive contract endpoints from MCP discovery and call_api while native listing still includes them', async () => {
+	const f = await fixture(); const service = f.module.get(McpApiService);
+	const listed = await service.invoke('list_api_endpoints', {}, f.request()) as { endpoints: string[] };
+	expect(listed.endpoints).toContain('users/notes');
+	expect(listed.endpoints).not.toContain('reset-db');
+	expect(listed.endpoints).not.toContain('test');
+	for (const endpoint of ['reset-db', 'test']) {
+		const lookup = await service.invoke('list_api_endpoints', { endpoint }, f.request()) as { endpoints: string[]; definitions: { name: string }[] };
+		expect(lookup.endpoints).not.toContain(endpoint);
+		expect(lookup.definitions).toEqual([]);
+		await expect(service.invoke('call_api_general', { endpoint, arguments: {} }, f.request())).rejects.toMatchObject({ code: 'TOOL_UNAVAILABLE' });
+	}
+	expect(await service.invoke('call_api_general', { endpoint: 'users/notes', arguments: { userId: f.own.id } }, f.request())).toEqual((await f.ordinary({ userId: f.own.id })).json());
+	const http = await f.ordinary({}, f.grant.token, 'available-endpoints');
+	expect(http.statusCode).toBe(200);
+	expect(http.json().endpoints).toEqual(expect.arrayContaining(['reset-db', 'test', 'users/notes']));
+});
 it('routes generic reads and writes through native validation/permissions, with fresh revocation and no arbitrary URLs', async () => {
 	const f = await fixture(); const prepared = await f.module.get(McpApiService).prepare(f.request());
 	const visiblePrivate = f.notes.find(note => note.userId === f.otherId && note.visibility === 'specified')!;
 	visiblePrivate.visibleUserIds = [f.own.id];
 	const read = { endpoint: 'users/notes', arguments: { userId: f.otherId } };
-	const viewed = await prepared.invoke('call_api', read);
+	const viewed = await prepared.invoke('call_api_general', read);
 	expect(viewed).toEqual((await f.ordinary(read.arguments)).json());
 	expect(viewed).toContainEqual(expect.objectContaining({ id: visiblePrivate.id, visibility: 'specified' }));
 	const write = { endpoint: 'notes/reactions/create', arguments: { noteId: 'aaaaaaaaaaaaaaa0', reaction: '❤️' } };
-	await expect(prepared.invoke('call_api', write)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+	await expect(prepared.invoke('call_api_write_reactions', write)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
 	expect(f.reactions.createReaction).not.toHaveBeenCalled();
 	f.grant.permission.push('write:reactions');
-	await prepared.invoke('call_api', write); expect(f.reactions.createReaction).toHaveBeenCalledTimes(1);
+	await prepared.invoke('call_api_write_reactions', write); expect(f.reactions.createReaction).toHaveBeenCalledTimes(1);
 	f.grant.permission = ['access:mcp'];
-	await expect(prepared.invoke('call_api', write)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
-	await expect(prepared.invoke('call_api', { endpoint: 'users/notes', arguments: { userId: f.own.id, limit: '1' } })).rejects.toBeDefined();
+	await expect(prepared.invoke('call_api_write_reactions', write)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+	await expect(prepared.invoke('call_api_general', { endpoint: 'users/notes', arguments: { userId: f.own.id, limit: '1' } })).rejects.toBeDefined();
 	for (const endpoint of ['https://remote.invalid/api', '../users/notes', '/users/notes', 'miauth/gen-token', 'i/regenerate-token', 'i/webhooks/create', 'not-found']) {
-		await expect(prepared.invoke('call_api', { endpoint, arguments: {} })).rejects.toMatchObject({ code: 'TOOL_UNAVAILABLE' });
+		await expect(prepared.invoke('call_api_general', { endpoint, arguments: {} })).rejects.toMatchObject({ code: 'TOOL_UNAVAILABLE' });
 	}
-	await expect(prepared.invoke('call_api', { endpoint: 'users/notes', arguments: { userId: f.own.id, i: f.own.token } })).rejects.toBeDefined();
+	await expect(prepared.invoke('call_api_general', { endpoint: 'users/notes', arguments: { userId: f.own.id, i: f.own.token } })).rejects.toBeDefined();
 	f.grant.permission = ['access:mcp', 'write:reactions']; f.own.movedToUri = 'https://other.invalid';
-	await expect(prepared.invoke('call_api', write)).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_MOVED' });
+	await expect(prepared.invoke('call_api_write_reactions', write)).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_MOVED' });
 	f.own.movedToUri = null; f.own.isSuspended = true;
-	await expect(prepared.invoke('call_api', write)).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_SUSPENDED' });
-	f.rows.delete(f.grant.id); await expect(prepared.invoke('call_api', read)).rejects.toMatchObject({ code: 'AUTHENTICATION_FAILED' });
+	await expect(prepared.invoke('call_api_write_reactions', write)).rejects.toMatchObject({ code: 'YOUR_ACCOUNT_SUSPENDED' });
+	f.rows.delete(f.grant.id); await expect(prepared.invoke('call_api_general', read)).rejects.toMatchObject({ code: 'AUTHENTICATION_FAILED' });
 });
 
 it('refreshes app permissions for native discovery and excludes denied definitions without caching grants', async () => {
@@ -193,6 +210,26 @@ it('preserves a declared native rate limit before executing a generic tool handl
 		.use(apiPolicy<MiLocalUser>({ name: 'users/notes', limit: { duration: 60000, max: 1 } })).handler(handler);
 	const provider = f.module.get(ApiRouterProvider);
 	vi.spyOn(provider, 'compose').mockReturnValue(Object.assign({}, provider.compose(), { timelines: Object.assign({}, f.router.timelines, { usersNotes: limited }) }));
-	await expect(f.module.get(McpApiService).invoke('call_api', { endpoint: 'users/notes', arguments: { userId: f.own.id } }, f.request())).rejects.toMatchObject({ code: 'RATE_LIMIT_EXCEEDED' });
+	await expect(f.module.get(McpApiService).invoke('call_api_general', { endpoint: 'users/notes', arguments: { userId: f.own.id } }, f.request())).rejects.toMatchObject({ code: 'RATE_LIMIT_EXCEEDED' });
 	expect(limiter.limit).toHaveBeenCalled(); expect(handler).not.toHaveBeenCalled();
+});
+
+it('rejects the removed generic tool and cross-kind paths before native dispatch', async () => {
+	const f = await fixture(); const service = f.module.get(McpApiService);
+	f.grant.permission.push('write:reactions', 'read:admin:ad', 'write:admin:ad');
+	const prepared = await service.prepare(f.request());
+	for (const [tool, endpoint] of [
+		['call_api', 'users/notes'],
+		['call_api_unknown', 'users/notes'],
+		['call_api_general', 'notes/reactions/create'],
+		['call_api_write_reactions', 'users/notes'],
+		['call_api_read_admin_ad', 'admin/ad/create'],
+		['call_api_write_admin_ad', 'admin/ad/list'],
+	]) await expect(prepared.invoke(tool, { endpoint, arguments: {} })).rejects.toMatchObject({ code: 'TOOL_UNAVAILABLE' });
+	expect(f.reactions.createReaction).not.toHaveBeenCalled();
+	expect(f.ads.adsRepository.insertOne).not.toHaveBeenCalled();
+	expect(f.ads.queryService.makePaginationQuery).not.toHaveBeenCalled();
+	const discovery = await prepared.invoke('list_api_endpoints', { endpoint: 'users/notes' }) as { definitions: object[] };
+	expect(discovery.definitions).toContainEqual(expect.objectContaining({ name: 'users/notes', permission: null, callTool: 'call_api_general' }));
+	expect(service.callTools([])).toEqual([]);
 });

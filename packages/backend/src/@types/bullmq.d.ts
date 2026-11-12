@@ -12,7 +12,7 @@ import type { queueCounterSchema } from '@features/operations/backend/queue.sche
  * QueueGetters.sanitizeJobTypes defaults seven counters; getJobCounts fills each
  * result with res || 0. RedisQueueBackend.getCounts and getCounts-1.lua return one
  * result per requested state. Keep the upstream argumentful overload unchanged.
- * Recheck the source guarantee and queue-counts regression when upgrading BullMQ.
+ * Recheck this source guarantee when upgrading BullMQ.
  */
 declare module 'bullmq' {
 	interface QueueGetters<JobBase extends Job = Job, B extends IQueueBackend = IQueueBackend> {

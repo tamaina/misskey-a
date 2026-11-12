@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		class="search"
 		data-prevent-emoji-insert
 		:class="{ filled: q != null && q != '' }"
-		:placeholder="$locale.sfc.search"
+		:placeholder="globalLocale.env.search"
 		type="search"
 		autocapitalize="off"
 		@input="input()"
@@ -64,7 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkCustomEmoji v-if="!emoji.hasOwnProperty('char')" class="emoji" :name="getKey(emoji)" :normal="true"/>
 						<MkEmoji v-else class="emoji" :emoji="getKey(emoji)" :normal="true"/>
 					</button>
-					<button v-tooltip="$locale.sfc.settings" class="_button config" @click="settings"><i class="ti ti-settings"></i></button>
+					<button v-tooltip="globalLocale.env.settings" class="_button config" @click="settings"><i class="ti ti-settings"></i></button>
 				</div>
 			</section>
 
@@ -87,7 +87,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</section>
 		</div>
 		<div v-once class="group">
-			<header class="_acrylic">{{ $locale.sfc.customEmojis }}</header>
+			<header class="_acrylic">{{ globalLocale.env.customEmojis }}</header>
 			<XSection
 				v-for="child in customEmojiFolderRoot.children"
 				:key="`custom:${child.value}`"
@@ -116,6 +116,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, useTemplateRef, computed, watch, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import {
@@ -124,10 +125,6 @@ import {
 	unicodeEmojiCategories as categories,
 	getEmojiName,
 	getUnicodeEmoji,
-} from '@features/emojis/frontend/shared/emojilist.js';
-import type {
-	UnicodeEmojiDef,
-	CustomEmojiFolderTree,
 } from '@features/emojis/frontend/shared/emojilist.js';
 import XSection from '@features/emojis/frontend/components/MkEmojiPicker.section.vue';
 import MkRippleEffect from '@features/ui/frontend/components/MkRippleEffect.vue';
@@ -141,6 +138,13 @@ import { checkReactionPermissions } from '@features/notes/frontend/utility/check
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { haptic } from '@features/ui/frontend/utility/haptic.js';
+import type {
+	UnicodeEmojiDef,
+	CustomEmojiFolderTree,
+} from '@features/emojis/frontend/shared/emojilist.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -803,10 +807,7 @@ defineExpose({
 
 <locale locale="ar-SA" lang="json">
 {
-  "search": "البحث",
-  "settings": "الاعدادات",
   "recentUsed": "المستخدمة مؤخرا",
-  "customEmojis": "إيموجي مخصص",
   "other": "منوعات",
   "emoji": "إيموجي"
 }
@@ -814,10 +815,7 @@ defineExpose({
 
 <locale locale="ca-ES" lang="json">
 {
-  "search": "Cercar",
-  "settings": "Preferències",
   "recentUsed": "Utilitzat recentment",
-  "customEmojis": "Emojis personalitzats",
   "other": "Altres",
   "emoji": "Emoji"
 }
@@ -825,10 +823,7 @@ defineExpose({
 
 <locale locale="cs-CZ" lang="json">
 {
-  "search": "Vyhledávání",
-  "settings": "Nastavení",
   "recentUsed": "Naposledy použité",
-  "customEmojis": "Vlastní emoji",
   "other": "Ostatní",
   "emoji": "Emoji"
 }
@@ -836,10 +831,7 @@ defineExpose({
 
 <locale locale="da-DK" lang="json">
 {
-  "search": "Search",
-  "settings": "Settings",
   "recentUsed": "Recently used",
-  "customEmojis": "Custom Emoji",
   "other": "Other",
   "emoji": "Emoji"
 }
@@ -847,10 +839,7 @@ defineExpose({
 
 <locale locale="de-DE" lang="json">
 {
-  "search": "Suchen",
-  "settings": "Einstellungen",
   "recentUsed": "Vor kurzem verwendet",
-  "customEmojis": "Benutzerdefinierte Emojis",
   "other": "Anderes",
   "emoji": "Emoji"
 }
@@ -858,10 +847,7 @@ defineExpose({
 
 <locale locale="en-US" lang="json">
 {
-  "search": "Search",
-  "settings": "Settings",
   "recentUsed": "Recently used",
-  "customEmojis": "Custom Emoji",
   "other": "Other",
   "emoji": "Emoji"
 }
@@ -869,10 +855,7 @@ defineExpose({
 
 <locale locale="es-ES" lang="json">
 {
-  "search": "Buscar",
-  "settings": "Configuración",
   "recentUsed": "Usado recientemente",
-  "customEmojis": "Emojis personalizados",
   "other": "Otro",
   "emoji": "Emoji"
 }
@@ -880,10 +863,7 @@ defineExpose({
 
 <locale locale="fr-FR" lang="json">
 {
-  "search": "Rechercher",
-  "settings": "Paramètres",
   "recentUsed": "Utilisé récemment",
-  "customEmojis": "Émojis personnalisés",
   "other": "Autre",
   "emoji": "Émoji"
 }
@@ -891,10 +871,7 @@ defineExpose({
 
 <locale locale="id-ID" lang="json">
 {
-  "search": "Cari",
-  "settings": "Pengaturan",
   "recentUsed": "Baru saja digunakan",
-  "customEmojis": "Emoji kustom",
   "other": "Lainnya",
   "emoji": "Emoji"
 }
@@ -902,10 +879,7 @@ defineExpose({
 
 <locale locale="it-IT" lang="json">
 {
-  "search": "Cerca",
-  "settings": "Impostazioni",
   "recentUsed": "Usato di recente",
-  "customEmojis": "Emoji personalizzate",
   "other": "Eccetera",
   "emoji": "Emoji"
 }
@@ -913,10 +887,7 @@ defineExpose({
 
 <locale locale="ja-JP" lang="json">
 {
-  "search": "検索",
-  "settings": "設定",
   "recentUsed": "最近使用",
-  "customEmojis": "カスタム絵文字",
   "other": "その他",
   "emoji": "絵文字"
 }
@@ -924,10 +895,7 @@ defineExpose({
 
 <locale locale="ja-KS" lang="json">
 {
-  "search": "探す",
-  "settings": "設定",
   "recentUsed": "最近使ったやつ",
-  "customEmojis": "カスタム絵文字",
   "other": "その他",
   "emoji": "絵文字"
 }
@@ -935,10 +903,7 @@ defineExpose({
 
 <locale locale="kab-KAB" lang="json">
 {
-  "search": "Nadi",
-  "settings": "Iɣewwaṛen",
   "recentUsed": "Recently used",
-  "customEmojis": "Custom Emoji",
   "other": "Wiyyaḍ",
   "emoji": "Emoji"
 }
@@ -946,10 +911,7 @@ defineExpose({
 
 <locale locale="kn-IN" lang="json">
 {
-  "search": "ಹುಡುಕು",
-  "settings": "ಸಿದ್ಧತೆಗಳು",
   "recentUsed": "Recently used",
-  "customEmojis": "Custom Emoji",
   "other": "Other",
   "emoji": "Emoji"
 }
@@ -957,10 +919,7 @@ defineExpose({
 
 <locale locale="ko-KR" lang="json">
 {
-  "search": "검색",
-  "settings": "설정",
   "recentUsed": "최근 사용",
-  "customEmojis": "커스텀 이모지",
   "other": "기타",
   "emoji": "이모지"
 }
@@ -968,10 +927,7 @@ defineExpose({
 
 <locale locale="nl-NL" lang="json">
 {
-  "search": "Zoeken",
-  "settings": "Instellingen",
   "recentUsed": "Recent gebruikt",
-  "customEmojis": "Eigen emoji",
   "other": "Ander",
   "emoji": "Emoji"
 }
@@ -979,10 +935,7 @@ defineExpose({
 
 <locale locale="no-NO" lang="json">
 {
-  "search": "Søk",
-  "settings": "Innstillinger",
   "recentUsed": "Sist brukte",
-  "customEmojis": "Custom Emoji",
   "other": "Andre",
   "emoji": "Emoji"
 }
@@ -990,10 +943,7 @@ defineExpose({
 
 <locale locale="pl-PL" lang="json">
 {
-  "search": "Szukaj",
-  "settings": "Ustawienia",
   "recentUsed": "Ostatnio używane",
-  "customEmojis": "Niestandardowe emoji",
   "other": "Inne",
   "emoji": "Emoji"
 }
@@ -1001,10 +951,7 @@ defineExpose({
 
 <locale locale="pt-PT" lang="json">
 {
-  "search": "Pesquisar",
-  "settings": "Configurações",
   "recentUsed": "Usado recentemente",
-  "customEmojis": "Emoji personalizado",
   "other": "Outros",
   "emoji": "Emoji"
 }
@@ -1012,10 +959,7 @@ defineExpose({
 
 <locale locale="ru-RU" lang="json">
 {
-  "search": "Поиск",
-  "settings": "Настройки",
   "recentUsed": "Последние использованные",
-  "customEmojis": "Собственные эмодзи",
   "other": "Другие",
   "emoji": "Эмодзи"
 }
@@ -1023,10 +967,7 @@ defineExpose({
 
 <locale locale="sk-SK" lang="json">
 {
-  "search": "Hľadať",
-  "settings": "Nastavenia",
   "recentUsed": "Neposledy použité",
-  "customEmojis": "Vlastné emoji",
   "other": "Ostatní",
   "emoji": "Emoji"
 }
@@ -1034,10 +975,7 @@ defineExpose({
 
 <locale locale="th-TH" lang="json">
 {
-  "search": "ค้นหา",
-  "settings": "การตั้งค่า",
   "recentUsed": "ใช้ล่าสุด",
-  "customEmojis": "เอโมจิที่กำหนดเอง",
   "other": "อื่น ๆ",
   "emoji": "เอโมจิ"
 }
@@ -1045,10 +983,7 @@ defineExpose({
 
 <locale locale="tr-TR" lang="json">
 {
-  "search": "Ara",
-  "settings": "Ayarlar",
   "recentUsed": "Son kullanılan",
-  "customEmojis": "Özel Emoji",
   "other": "Diğer",
   "emoji": "Emoji"
 }
@@ -1056,10 +991,7 @@ defineExpose({
 
 <locale locale="ug-CN" lang="json">
 {
-  "search": "ئىزدەش",
-  "settings": "Settings",
   "recentUsed": "Recently used",
-  "customEmojis": "Custom Emoji",
   "other": "Other",
   "emoji": "Emoji"
 }
@@ -1067,10 +999,7 @@ defineExpose({
 
 <locale locale="uk-UA" lang="json">
 {
-  "search": "Пошук",
-  "settings": "Налаштування",
   "recentUsed": "Нещодавні",
-  "customEmojis": "Кастомні емоджі",
   "other": "Інше",
   "emoji": "Емодзі"
 }
@@ -1078,10 +1007,7 @@ defineExpose({
 
 <locale locale="vi-VN" lang="json">
 {
-  "search": "Tìm kiếm",
-  "settings": "Cài đặt",
   "recentUsed": "Sử dụng gần đây",
-  "customEmojis": "Tùy chỉnh emoji",
   "other": "Khác",
   "emoji": "Emoji"
 }
@@ -1089,10 +1015,7 @@ defineExpose({
 
 <locale locale="zh-CN" lang="json">
 {
-  "search": "搜索",
-  "settings": "设置",
   "recentUsed": "最近使用",
-  "customEmojis": "自定义表情符号",
   "other": "其他",
   "emoji": "表情符号"
 }
@@ -1100,10 +1023,7 @@ defineExpose({
 
 <locale locale="zh-TW" lang="json">
 {
-  "search": "搜尋",
-  "settings": "設定",
   "recentUsed": "最近使用",
-  "customEmojis": "自訂表情符號",
   "other": "其他",
   "emoji": "表情符號"
 }

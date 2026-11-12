@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					@update:modelValue="search()"
 				>
 				</MkRadios>
-				<MkButton large primary gradate rounded @click="search">{{ $locale.sfc.search }}</MkButton>
+				<MkButton large primary gradate rounded @click="search">{{ globalLocale.env.search }}</MkButton>
 			</div>
 
 			<MkFoldableSection v-if="channelPaginator">
@@ -50,7 +50,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkPagination>
 		</div>
 		<div v-else-if="tab === 'owned'" class="_gaps">
-			<MkButton v-if="$i?.policies.canCreateChannel" type="routerLink" primary rounded to="/channels/new"><i class="ti ti-plus"></i> {{ $locale.sfc.createNew }}</MkButton>
+			<MkButton v-if="$i?.policies.canCreateChannel" type="routerLink" primary rounded to="/channels/new"><i class="ti ti-plus"></i> {{ globalLocale.env.createNew }}</MkButton>
 			<MkPagination v-slot="{items}" :paginator="ownedPaginator">
 				<div :class="$style.root">
 					<MkChannelPreview v-for="channel in items" :key="channel.id" :channel="channel"/>
@@ -62,6 +62,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';
 import MkChannelPreview from '@features/channels/frontend/components/MkChannelPreview.vue';
 import MkChannelList from '@features/channels/frontend/components/MkChannelList.vue';
@@ -74,6 +75,9 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import { $i } from '@features/auth/frontend/i.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -137,7 +141,7 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => [{
 	key: 'search',
-	title: $locale.value.sfc.search,
+	title: globalLocale.value.env.search,
 	icon: 'ti ti-search',
 }, {
 	key: 'featured',
@@ -145,7 +149,7 @@ const headerTabs = computed(() => [{
 	icon: 'ti ti-comet',
 }, {
 	key: 'favorites',
-	title: $locale.value.sfc.favorites,
+	title: globalLocale.value.env.favorites,
 	icon: 'ti ti-star',
 }, {
 	key: 'following',
@@ -158,7 +162,7 @@ const headerTabs = computed(() => [{
 }]);
 
 definePage(() => ({
-	title: $locale.value.sfc.channel,
+	title: globalLocale.value.env.channel,
 	icon: 'ti ti-device-tv',
 }));
 </script>
@@ -179,420 +183,308 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"search": "البحث",
 	"featured": "المتداوَلة",
-	"favorites": "المفضلات",
 	"following": "متابَع",
 	"owned": "قنواتي",
-	"channel": "القنوات",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "نتائج البحث",
-	"createNew": "أنشِئ جديد"
+	"searchResult": "نتائج البحث"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"search": "Cercar",
 	"featured": "Popular",
-	"favorites": "Favorits",
 	"following": "Seguin",
 	"owned": "Propietat",
-	"channel": "Canals",
 	"nameAndDescription": "Nom i descripció ",
 	"nameOnly": "Nom només ",
-	"searchResult": "Resultats de la cerca",
-	"createNew": "Crear"
+	"searchResult": "Resultats de la cerca"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"search": "Vyhledávání",
 	"featured": "Trendy",
-	"favorites": "Oblíbené",
 	"following": "Sledovaný",
 	"owned": "Vlastněný",
-	"channel": "Kanály",
 	"nameAndDescription": "Název a popis",
 	"nameOnly": "Pouze název",
-	"searchResult": "Výsledky hledání",
-	"createNew": "Vytvořit nový"
+	"searchResult": "Výsledky hledání"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"search": "Search",
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"search": "Suchen",
 	"featured": "Trends",
-	"favorites": "Favoriten",
 	"following": "Gefolgt",
 	"owned": "In Besitz",
-	"channel": "Kanäle",
 	"nameAndDescription": "Name und Beschreibung",
 	"nameOnly": "Nur Name",
-	"searchResult": "Suchergebnisse",
-	"createNew": "Neu erstellen"
+	"searchResult": "Suchergebnisse"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"search": "Search",
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"search": "Buscar",
 	"featured": "Tendencias",
-	"favorites": "Favoritos",
 	"following": "Siguiendo",
 	"owned": "Dueño",
-	"channel": "Canal",
 	"nameAndDescription": "Nombre y descripción",
 	"nameOnly": "Sólo nombre",
-	"searchResult": "Resultados de búsqueda",
-	"createNew": "Crear Nuevo"
+	"searchResult": "Resultados de búsqueda"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"search": "Rechercher",
 	"featured": "Tendances",
-	"favorites": "Favoris",
 	"following": "Abonné·e",
 	"owned": "Mes canaux",
-	"channel": "Canaux",
 	"nameAndDescription": "Nom et description",
 	"nameOnly": "Nom seulement",
-	"searchResult": "Résultats de la recherche",
-	"createNew": "Créer"
+	"searchResult": "Résultats de la recherche"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"search": "Cari",
 	"featured": "Tren",
-	"favorites": "Favorit",
 	"following": "Mengikuti",
 	"owned": "Dimiliki",
-	"channel": "Kanal",
 	"nameAndDescription": "Nama dan deskripsi",
 	"nameOnly": "Hanya nama",
-	"searchResult": "Hasil Penelusuran",
-	"createNew": "Buat baru"
+	"searchResult": "Hasil Penelusuran"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"search": "Cerca",
 	"featured": "Popolari nel canale",
-	"favorites": "Preferiti",
 	"following": "Following",
 	"owned": "I miei canali",
-	"channel": "Canale",
 	"nameAndDescription": "Nome e descrizione",
 	"nameOnly": "Solo il nome",
-	"searchResult": "Risultati della Ricerca",
-	"createNew": "Crea"
+	"searchResult": "Risultati della Ricerca"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"search": "検索",
 	"featured": "トレンド",
-	"favorites": "お気に入り",
 	"following": "フォロー中",
 	"owned": "管理中",
-	"channel": "チャンネル",
 	"nameAndDescription": "名前と説明",
 	"nameOnly": "名前のみ",
-	"searchResult": "検索結果",
-	"createNew": "新規作成"
+	"searchResult": "検索結果"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"search": "探す",
 	"featured": "トレンド",
-	"favorites": "お気に入り",
 	"following": "フォロー中やで",
 	"owned": "管理しとる",
-	"channel": "チャンネル",
 	"nameAndDescription": "名前と説明",
 	"nameOnly": "名前だけ",
-	"searchResult": "検索結果やで",
-	"createNew": "新しく作るで"
+	"searchResult": "検索結果やで"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"search": "Nadi",
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"search": "ಹುಡುಕು",
 	"featured": "Trending",
-	"favorites": "ಮೆಚ್ಚಿನವುಗಳು",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"search": "검색",
 	"featured": "트렌드",
-	"favorites": "즐겨찾기",
 	"following": "팔로잉",
 	"owned": "관리중",
-	"channel": "채널",
 	"nameAndDescription": "이름과 설명",
 	"nameOnly": "이름만",
-	"searchResult": "검색 결과",
-	"createNew": "새로 만들기"
+	"searchResult": "검색 결과"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"search": "Zoeken",
 	"featured": "Trending",
-	"favorites": "Toevoegen aan favorieten",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Kanalen",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Zoekresultaten",
-	"createNew": "Nieuwe aanmaken"
+	"searchResult": "Zoekresultaten"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"search": "Søk",
 	"featured": "Populært",
-	"favorites": "Favoritter",
 	"following": "Følger",
 	"owned": "Owned",
-	"channel": "Kanaler",
 	"nameAndDescription": "Navn og beskrivelse",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"search": "Szukaj",
 	"featured": "Na czasie",
-	"favorites": "Ulubione",
 	"following": "Śledzeni",
 	"owned": "Własny",
-	"channel": "Kanały",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Wyniki wyszukiwania",
-	"createNew": "Utwórz nowy"
+	"searchResult": "Wyniki wyszukiwania"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"search": "Pesquisar",
 	"featured": "Destaques",
-	"favorites": "Favoritos",
 	"following": "Seguindo",
 	"owned": "Autoral",
-	"channel": "Canais",
 	"nameAndDescription": "Nome e descrição",
 	"nameOnly": "Apenas o nome",
-	"searchResult": "Pesquisar",
-	"createNew": "Criar novo"
+	"searchResult": "Pesquisar"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"search": "Поиск",
 	"featured": "Актуальные",
-	"favorites": "Избранное",
 	"following": "Подписки",
 	"owned": "Собственные",
-	"channel": "Каналы",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Результаты поиска",
-	"createNew": "Новый документ"
+	"searchResult": "Результаты поиска"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"search": "Hľadať",
 	"featured": "Trendy",
-	"favorites": "Obľúbené",
 	"following": "Sledované",
 	"owned": "Vlastnené",
-	"channel": "Kanály",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Výsledky hľadania",
-	"createNew": "Vytvoriť nový"
+	"searchResult": "Výsledky hľadania"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"search": "ค้นหา",
 	"featured": "เทรนด์",
-	"favorites": "รายการโปรด",
 	"following": "ติดตามแล้ว",
 	"owned": "เจ้าของ",
-	"channel": "ช่อง",
 	"nameAndDescription": "ชื่อและคำอธิบาย",
 	"nameOnly": "ชื่อเท่านั้น",
-	"searchResult": "ผลการค้นหา",
-	"createNew": "สร้างใหม่"
+	"searchResult": "ผลการค้นหา"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"search": "Ara",
 	"featured": "Trend olan",
-	"favorites": "Favoriler",
 	"following": "Takip edildi",
 	"owned": "Sahip olunan",
-	"channel": "Kanallar",
 	"nameAndDescription": "Adı ve açıklaması",
 	"nameOnly": "Sadece isim",
-	"searchResult": "Arama sonuçları",
-	"createNew": "Yeni oluştur"
+	"searchResult": "Arama sonuçları"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"search": "ئىزدەش",
 	"featured": "Trending",
-	"favorites": "Favorites",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"search": "Пошук",
 	"featured": "Тренди",
-	"favorites": "Обране",
 	"following": "Підписки",
 	"owned": "Owned",
-	"channel": "Канали",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Результати пошуку",
-	"createNew": "Створити новий"
+	"searchResult": "Результати пошуку"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"search": "Tìm kiếm",
 	"featured": "Xu hướng",
-	"favorites": "Lượt thích",
 	"following": "Đang theo dõi",
 	"owned": "Do tôi quản lý",
-	"channel": "Kênh",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Kết quả tìm kiếm",
-	"createNew": "Tạo mới"
+	"searchResult": "Kết quả tìm kiếm"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"search": "搜索",
 	"featured": "热门",
-	"favorites": "收藏",
 	"following": "正在关注",
 	"owned": "我的频道",
-	"channel": "频道",
 	"nameAndDescription": "名称与描述",
 	"nameOnly": "仅名称",
-	"searchResult": "搜索结果",
-	"createNew": "新建"
+	"searchResult": "搜索结果"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"search": "搜尋",
 	"featured": "熱門貼文",
-	"favorites": "我的最愛",
 	"following": "追隨中",
 	"owned": "管理中",
-	"channel": "頻道",
 	"nameAndDescription": "名稱",
 	"nameOnly": "僅名稱",
-	"searchResult": "搜尋結果",
-	"createNew": "新建"
+	"searchResult": "搜尋結果"
 }
 </locale>

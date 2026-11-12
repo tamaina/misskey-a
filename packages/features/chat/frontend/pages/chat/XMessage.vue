@@ -51,6 +51,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed, defineAsyncComponent, provide } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
@@ -72,6 +74,8 @@ import MkReactionIcon from '@features/notes/frontend/components/MkReactionIcon.v
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { DI } from '@features/ui/frontend/di.js';
 import { getHTMLElementOrNull } from '@features/ui/frontend/utility/get-dom-node-or-null.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -165,7 +169,7 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 
 	if (isMe.value && $i.policies.chatAvailability === 'available') {
 		menu.push({
-			text: $locale.value.sfc.delete,
+			text: globalLocale.value.env.delete,
 			icon: 'ti ti-trash',
 			danger: true,
 			action: () => {
@@ -334,7 +338,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "التفاعلات",
 	"copyContent": "انسخ المحتوى",
-	"delete": "حذف",
 	"reportAbuse": "أبلغ"
 }
 </locale>
@@ -343,7 +346,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reacció ",
 	"copyContent": "Copia el contingut",
-	"delete": "Elimina",
 	"reportAbuse": "Denuncia un abús "
 }
 </locale>
@@ -352,7 +354,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reakce",
 	"copyContent": "Zkopírovat obsah",
-	"delete": "Smazat",
 	"reportAbuse": "Nahlášení"
 }
 </locale>
@@ -361,7 +362,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reactions",
 	"copyContent": "Copy contents",
-	"delete": "Delete",
 	"reportAbuse": "Report"
 }
 </locale>
@@ -370,7 +370,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reaktionen",
 	"copyContent": "Inhalt kopieren",
-	"delete": "Löschen",
 	"reportAbuse": "Melden"
 }
 </locale>
@@ -379,7 +378,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reactions",
 	"copyContent": "Copy contents",
-	"delete": "Delete",
 	"reportAbuse": "Report"
 }
 </locale>
@@ -388,7 +386,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reacción",
 	"copyContent": "Copiar contenido",
-	"delete": "Borrar",
 	"reportAbuse": "Reportar"
 }
 </locale>
@@ -397,7 +394,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Réactions",
 	"copyContent": "Copier le contenu",
-	"delete": "Supprimer",
 	"reportAbuse": "Signaler"
 }
 </locale>
@@ -406,7 +402,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reaksi",
 	"copyContent": "Salin isi",
-	"delete": "Hapus",
 	"reportAbuse": "Laporkan"
 }
 </locale>
@@ -415,7 +410,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reazioni",
 	"copyContent": "Copia il contenuto",
-	"delete": "Elimina",
 	"reportAbuse": "Segnalare"
 }
 </locale>
@@ -424,7 +418,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "リアクション",
 	"copyContent": "内容をコピー",
-	"delete": "削除",
 	"reportAbuse": "通報"
 }
 </locale>
@@ -433,7 +426,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "ツッコミ",
 	"copyContent": "内容をコピー",
-	"delete": "ほかす",
 	"reportAbuse": "通報"
 }
 </locale>
@@ -442,7 +434,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reactions",
 	"copyContent": "Copy contents",
-	"delete": "Kkes",
 	"reportAbuse": "Report"
 }
 </locale>
@@ -451,7 +442,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reactions",
 	"copyContent": "ವಿಷಯವನ್ನು ನಕಲಿಸು",
-	"delete": "ಅಳಿಸು",
 	"reportAbuse": "Report"
 }
 </locale>
@@ -460,7 +450,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "리액션",
 	"copyContent": "내용 복사",
-	"delete": "삭제",
 	"reportAbuse": "신고"
 }
 </locale>
@@ -469,7 +458,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reacties",
 	"copyContent": "Kopiëren inhoud",
-	"delete": "Verwijderen",
 	"reportAbuse": "Meld"
 }
 </locale>
@@ -478,7 +466,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reaksjon",
 	"copyContent": "Kopier innhold",
-	"delete": "Slett",
 	"reportAbuse": "Rappoter"
 }
 </locale>
@@ -487,7 +474,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reakcja",
 	"copyContent": "Skopiuj zawartość",
-	"delete": "Usuń",
 	"reportAbuse": "Zgłoś"
 }
 </locale>
@@ -496,7 +482,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reações",
 	"copyContent": "Copiar conteúdos",
-	"delete": "Excluir",
 	"reportAbuse": "Denunciar"
 }
 </locale>
@@ -505,7 +490,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Реакции",
 	"copyContent": "Скопировать содержимое",
-	"delete": "Удалить",
 	"reportAbuse": "Жалоба"
 }
 </locale>
@@ -514,7 +498,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reakcie",
 	"copyContent": "Kopírovať obsah",
-	"delete": "Odstrániť",
 	"reportAbuse": "Nahlásiť"
 }
 </locale>
@@ -523,7 +506,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "รีแอคชั่น",
 	"copyContent": "คัดลอกเนื้อหา",
-	"delete": "ลบ",
 	"reportAbuse": "รายงาน"
 }
 </locale>
@@ -532,7 +514,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Tepki",
 	"copyContent": "İçeriği kopyala",
-	"delete": "Sil",
 	"reportAbuse": "Rapor"
 }
 </locale>
@@ -541,7 +522,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Reactions",
 	"copyContent": "Copy contents",
-	"delete": "ئۆچۈرۈش",
 	"reportAbuse": "Report"
 }
 </locale>
@@ -550,7 +530,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Реакції",
 	"copyContent": "Скопіювати контент",
-	"delete": "Видалити",
 	"reportAbuse": "Поскаржитись"
 }
 </locale>
@@ -559,7 +538,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "Biểu cảm",
 	"copyContent": "Chép nội dung",
-	"delete": "Xóa",
 	"reportAbuse": "Báo cáo"
 }
 </locale>
@@ -568,7 +546,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "回应",
 	"copyContent": "复制内容",
-	"delete": "删除",
 	"reportAbuse": "举报"
 }
 </locale>
@@ -577,7 +554,6 @@ function showMenu(ev: PointerEvent, contextmenu = false) {
 {
 	"reaction": "反應",
 	"copyContent": "複製內容",
-	"delete": "刪除",
 	"reportAbuse": "檢舉"
 }
 </locale>

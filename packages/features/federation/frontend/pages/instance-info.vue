@@ -21,12 +21,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #value><span class="_monospace">{{ instance.softwareName || `(${$locale.sfc.unknown})` }} / {{ instance.softwareVersion || `(${$locale.sfc.unknown})` }}</span></template>
 				</MkKeyValue>
 				<MkKeyValue oneline>
-					<template #key>{{ $locale.sfc.administrator }}</template>
+					<template #key>{{ globalLocale.env.administrator }}</template>
 					<template #value>{{ instance.maintainerName || `(${$locale.sfc.unknown})` }} ({{ instance.maintainerEmail || `(${$locale.sfc.unknown})` }})</template>
 				</MkKeyValue>
 			</div>
 			<MkKeyValue>
-				<template #key>{{ $locale.sfc.description }}</template>
+				<template #key>{{ globalLocale.env.description }}</template>
 				<template #value>{{ instance.description }}</template>
 			</MkKeyValue>
 
@@ -60,7 +60,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #value><MkTime mode="detail" :time="instance.firstRetrievedAt"/></template>
 				</MkKeyValue>
 				<MkKeyValue oneline style="margin: 1em 0;">
-					<template #key>{{ $locale.sfc.updatedAt }}</template>
+					<template #key>{{ globalLocale.env.updatedAt }}</template>
 					<template #value><MkTime mode="detail" :time="instance.infoUpdatedAt"/></template>
 				</MkKeyValue>
 				<MkKeyValue oneline style="margin: 1em 0;">
@@ -121,9 +121,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed, watch, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';
 import MkChart from '@features/statistics/frontend/components/MkChart.vue';
 import MkObjectView from '@features/ui/frontend/components/MkObjectView.vue';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
@@ -147,6 +147,10 @@ import { dateString } from '@features/ui/frontend/filters/date.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	host: string;
@@ -297,15 +301,15 @@ const headerActions = computed(() => [{
 
 const headerTabs = computed(() => [{
 	key: 'overview',
-	title: $locale.value.sfc.overview,
+	title: globalLocale.value.env.overview,
 	icon: 'ti ti-info-circle',
 }, ...(iAmModerator ? [{
 	key: 'chart',
-	title: $locale.value.sfc.charts,
+	title: globalLocale.value.env.charts,
 	icon: 'ti ti-chart-line',
 }, {
 	key: 'users',
-	title: $locale.value.sfc.users,
+	title: globalLocale.value.env.users,
 	icon: 'ti ti-users',
 }] : []), {
 	key: 'raw',
@@ -352,8 +356,6 @@ definePage(() => ({
 {
 	"unknown": "مجهول",
 	"software": "البرمجية",
-	"administrator": "المدير",
-	"description": "الوصف",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publishing",
@@ -370,7 +372,6 @@ definePage(() => ({
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "مسجل منذ",
-	"updatedAt": "حُدّث في",
 	"latestRequestReceivedAt": "آخر طلب تُلقي في",
 	"recentNHours": "آخر {n} ساعة",
 	"recentNDays": "آخر {n} أيام",
@@ -384,10 +385,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Difference in cache size",
 	"instanceChartsCacheSizeTotal": "Cumulative total cache size",
 	"instanceChartsFiles": "تباين عدد الملفات",
-	"instanceChartsFilesTotal": "تباين عدد الملفات",
-	"overview": "ملخص عام",
-	"charts": "المنحنيات البيانية",
-	"users": "المستخدمون"
+	"instanceChartsFilesTotal": "تباين عدد الملفات"
 }
 </locale>
 
@@ -395,8 +393,6 @@ definePage(() => ({
 {
 	"unknown": "Desconegut",
 	"software": "Programari",
-	"administrator": "Administrador/a",
-	"description": "Descripció",
 	"deliveryStatus": "Estat d'entrega ",
 	"deliveryTypeLabels": {
 		"none": "S'està publicant",
@@ -413,7 +409,6 @@ definePage(() => ({
 	"moderationNote": "Nota de moderació ",
 	"moderationNoteDescription": "Pots escriure notes que es compartiran entre els moderadors.",
 	"registeredAt": "Registrat a",
-	"updatedAt": "Actualitzat el",
 	"latestRequestReceivedAt": "Última petició rebuda",
 	"recentNHours": "Últimes {n} hores",
 	"recentNDays": "Últims {n} dies",
@@ -427,10 +422,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Diferència a la mida de la memòria cau",
 	"instanceChartsCacheSizeTotal": "Total acumulat de la mida de la memòria cau",
 	"instanceChartsFiles": "Diferència al nombre d'arxius",
-	"instanceChartsFilesTotal": "Nombre acumulatiu de fitxers",
-	"overview": "Visió General",
-	"charts": "Gràfics",
-	"users": "Usuaris"
+	"instanceChartsFilesTotal": "Nombre acumulatiu de fitxers"
 }
 </locale>
 
@@ -438,8 +430,6 @@ definePage(() => ({
 {
 	"unknown": "Neznámý",
 	"software": "Software",
-	"administrator": "Administrátor",
-	"description": "Popis",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publikuji",
@@ -456,7 +446,6 @@ definePage(() => ({
 	"moderationNote": "Poznámka moderátora",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "Registrován",
-	"updatedAt": "Upraveno",
 	"latestRequestReceivedAt": "Poslední požadavek přijat",
 	"recentNHours": "Posledních {n} hodin",
 	"recentNDays": "Posledních {n} dnů",
@@ -470,10 +459,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Rozdíl ve velikosti mezipaměti",
 	"instanceChartsCacheSizeTotal": "Kumulativní celková velikost mezipaměti",
 	"instanceChartsFiles": "Rozdíl v počtu souborů",
-	"instanceChartsFilesTotal": "Kumulativní počet souborů",
-	"overview": "Shrnutí",
-	"charts": "Grafy",
-	"users": "Uživatelé"
+	"instanceChartsFilesTotal": "Kumulativní počet souborů"
 }
 </locale>
 
@@ -481,8 +467,6 @@ definePage(() => ({
 {
 	"unknown": "Unknown",
 	"software": "Software",
-	"administrator": "Administrator",
-	"description": "Description",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publishing",
@@ -499,7 +483,6 @@ definePage(() => ({
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "Registered at",
-	"updatedAt": "Updated at",
 	"latestRequestReceivedAt": "Last request received",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
@@ -513,10 +496,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Difference in cache size",
 	"instanceChartsCacheSizeTotal": "Cumulative total cache size",
 	"instanceChartsFiles": "Difference in the number of files",
-	"instanceChartsFilesTotal": "Cumulative number of files",
-	"overview": "Overview",
-	"charts": "Charts",
-	"users": "Users"
+	"instanceChartsFilesTotal": "Cumulative number of files"
 }
 </locale>
 
@@ -524,8 +504,6 @@ definePage(() => ({
 {
 	"unknown": "Unbekannt",
 	"software": "Software",
-	"administrator": "Administrator",
-	"description": "Beschreibung",
 	"deliveryStatus": "Auslieferungsstatus",
 	"deliveryTypeLabels": {
 		"none": "Wird veröffentlicht",
@@ -542,7 +520,6 @@ definePage(() => ({
 	"moderationNote": "Moderationsnotiz",
 	"moderationNoteDescription": "Trage hier Notizen ein. Diese sind nur für die Moderatoren sichtbar.",
 	"registeredAt": "Registriert am",
-	"updatedAt": "Zuletzt geändert am",
 	"latestRequestReceivedAt": "Letzte Anfrage erhalten",
 	"recentNHours": "Letzte {n} Stunden",
 	"recentNDays": "Letzte {n} Tage",
@@ -556,10 +533,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Unterschied in der Größe des Caches",
 	"instanceChartsCacheSizeTotal": "Gesamtgröße des Caches",
 	"instanceChartsFiles": "Unterschied in der Anzahl an Dateien",
-	"instanceChartsFilesTotal": "Gesamtanzahl an Dateien",
-	"overview": "Übersicht",
-	"charts": "Diagramme",
-	"users": "Benutzer"
+	"instanceChartsFilesTotal": "Gesamtanzahl an Dateien"
 }
 </locale>
 
@@ -567,8 +541,6 @@ definePage(() => ({
 {
 	"unknown": "Unknown",
 	"software": "Software",
-	"administrator": "Administrator",
-	"description": "Description",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publishing",
@@ -585,7 +557,6 @@ definePage(() => ({
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "Registered at",
-	"updatedAt": "Updated at",
 	"latestRequestReceivedAt": "Last request received",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
@@ -599,10 +570,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Difference in cache size",
 	"instanceChartsCacheSizeTotal": "Cumulative total cache size",
 	"instanceChartsFiles": "Difference in the number of files",
-	"instanceChartsFilesTotal": "Cumulative number of files",
-	"overview": "Overview",
-	"charts": "Charts",
-	"users": "Users"
+	"instanceChartsFilesTotal": "Cumulative number of files"
 }
 </locale>
 
@@ -610,8 +578,6 @@ definePage(() => ({
 {
 	"unknown": "Desconocido",
 	"software": "Software",
-	"administrator": "Administrador",
-	"description": "Descripción",
 	"deliveryStatus": "Estado de la entrega",
 	"deliveryTypeLabels": {
 		"none": "Publicando",
@@ -628,7 +594,6 @@ definePage(() => ({
 	"moderationNote": "Nota de moderación",
 	"moderationNoteDescription": "Puedes rellenar notas que solo se comparten entre moderadores.",
 	"registeredAt": "Registrado en",
-	"updatedAt": "Actualizado",
 	"latestRequestReceivedAt": "Última petición recibida",
 	"recentNHours": "Últimas {n} horas",
 	"recentNDays": "Últimos {n} días",
@@ -642,10 +607,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Variación del tamaño de la caché",
 	"instanceChartsCacheSizeTotal": "Total acumulado del tamaño de la caché",
 	"instanceChartsFiles": "Variación de cantidad de archivos",
-	"instanceChartsFilesTotal": "Total acumulado de cantidad de archivos",
-	"overview": "Resumen",
-	"charts": "Métricas",
-	"users": "Usuarios"
+	"instanceChartsFilesTotal": "Total acumulado de cantidad de archivos"
 }
 </locale>
 
@@ -653,8 +615,6 @@ definePage(() => ({
 {
 	"unknown": "Inconnu",
 	"software": "Logiciel",
-	"administrator": "Administrateur",
-	"description": "Description",
 	"deliveryStatus": "Statut de la diffusion",
 	"deliveryTypeLabels": {
 		"none": "Publié",
@@ -671,7 +631,6 @@ definePage(() => ({
 	"moderationNote": "Note de modération",
 	"moderationNoteDescription": "Vous pouvez remplir des notes qui seront partagés seulement entre modérateurs.",
 	"registeredAt": "Premier contact le",
-	"updatedAt": "Mis à jour le",
 	"latestRequestReceivedAt": "Dernière requête reçue",
 	"recentNHours": "Dernières {n} heures",
 	"recentNDays": "Derniers {n} jours",
@@ -685,10 +644,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Variation de la taille du cache",
 	"instanceChartsCacheSizeTotal": "Total cumulé de la taille du cache",
 	"instanceChartsFiles": "Variation du nombre de fichiers",
-	"instanceChartsFilesTotal": "Total cumulé du nombre de fichiers",
-	"overview": "Aperçu",
-	"charts": "Graphiques",
-	"users": "Utilisateur·rice·s"
+	"instanceChartsFilesTotal": "Total cumulé du nombre de fichiers"
 }
 </locale>
 
@@ -696,8 +652,6 @@ definePage(() => ({
 {
 	"unknown": "Tidak diketahui",
 	"software": "Perangkat lunak",
-	"administrator": "Admin",
-	"description": "Deskripsi",
 	"deliveryStatus": "Status pengiriman",
 	"deliveryTypeLabels": {
 		"none": "Sedang menyiarkan langsung",
@@ -714,7 +668,6 @@ definePage(() => ({
 	"moderationNote": "Catatan moderasi",
 	"moderationNoteDescription": "Anda dapat mengisi note yang hanya akan dibagikan diantara moderator.",
 	"registeredAt": "Terdaftar",
-	"updatedAt": "Diperbarui pada",
 	"latestRequestReceivedAt": "Permintaan terakhir diterima pada",
 	"recentNHours": "{n} jam terakhir",
 	"recentNDays": "{n} hari terakhir",
@@ -728,10 +681,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Perbedaan dalam ukuran tembolok",
 	"instanceChartsCacheSizeTotal": "Total ukuran tembolok kumulatif",
 	"instanceChartsFiles": "Perbedaan dalam # berkas",
-	"instanceChartsFilesTotal": "Jumlah # berkas kumulatif",
-	"overview": "Ikhtisar",
-	"charts": "Grafik",
-	"users": "Pengguna"
+	"instanceChartsFilesTotal": "Jumlah # berkas kumulatif"
 }
 </locale>
 
@@ -739,8 +689,6 @@ definePage(() => ({
 {
 	"unknown": "Sconosciuto",
 	"software": "Software",
-	"administrator": "Amministratore",
-	"description": "Descrizione",
 	"deliveryStatus": "Stato della consegna",
 	"deliveryTypeLabels": {
 		"none": "Pubblicazione",
@@ -757,7 +705,6 @@ definePage(() => ({
 	"moderationNote": "Promemoria di moderazione",
 	"moderationNoteDescription": "Puoi scrivere promemoria condivisi solo tra moderatori.",
 	"registeredAt": "Prima federazione",
-	"updatedAt": "Aggiornato il",
 	"latestRequestReceivedAt": "Ultima richiesta ricevuta",
 	"recentNHours": "Ultime {n} ore",
 	"recentNDays": "Ultimi {n} giorni",
@@ -771,10 +718,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Variazione dello spazio occupato dalla cache",
 	"instanceChartsCacheSizeTotal": "Totale cumulato dello spazio occupato dalla cache",
 	"instanceChartsFiles": "Variazione del numero di file",
-	"instanceChartsFilesTotal": "Totale cumulato del numero di file",
-	"overview": "Anteprima",
-	"charts": "Grafici",
-	"users": "Profili"
+	"instanceChartsFilesTotal": "Totale cumulato del numero di file"
 }
 </locale>
 
@@ -782,8 +726,6 @@ definePage(() => ({
 {
 	"unknown": "不明",
 	"software": "ソフトウェア",
-	"administrator": "管理者",
-	"description": "説明",
 	"deliveryStatus": "配信状態",
 	"deliveryTypeLabels": {
 		"none": "配信中",
@@ -800,7 +742,6 @@ definePage(() => ({
 	"moderationNote": "モデレーションノート",
 	"moderationNoteDescription": "モデレーター間でだけ共有されるメモを記入することができます。",
 	"registeredAt": "初観測",
-	"updatedAt": "更新日時",
 	"latestRequestReceivedAt": "直近のリクエスト受信",
 	"recentNHours": "直近{n}時間",
 	"recentNDays": "直近{n}日",
@@ -814,10 +755,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "キャッシュサイズの増減",
 	"instanceChartsCacheSizeTotal": "キャッシュサイズの累積",
 	"instanceChartsFiles": "ファイル数の増減",
-	"instanceChartsFilesTotal": "ファイル数の累積",
-	"overview": "概要",
-	"charts": "チャート",
-	"users": "ユーザー"
+	"instanceChartsFilesTotal": "ファイル数の累積"
 }
 </locale>
 
@@ -825,8 +763,6 @@ definePage(() => ({
 {
 	"unknown": "不明",
 	"software": "ソフトウェア",
-	"administrator": "管理者",
-	"description": "説明",
 	"deliveryStatus": "配信状態",
 	"deliveryTypeLabels": {
 		"none": "配信しとる",
@@ -843,7 +779,6 @@ definePage(() => ({
 	"moderationNote": "モデレーションノート",
 	"moderationNoteDescription": "モデレーターの中だけで共有するメモを入れれるで。",
 	"registeredAt": "初観測",
-	"updatedAt": "更新日時",
 	"latestRequestReceivedAt": "ちょっと前のリクエスト受信",
 	"recentNHours": "直近{n}時間",
 	"recentNDays": "直近{n}日",
@@ -857,10 +792,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "キャッシュサイズの増減",
 	"instanceChartsCacheSizeTotal": "キャッシュサイズの累積",
 	"instanceChartsFiles": "ファイル数の増減",
-	"instanceChartsFilesTotal": "ファイル数の累積",
-	"overview": "概要",
-	"charts": "チャート",
-	"users": "ユーザー"
+	"instanceChartsFilesTotal": "ファイル数の累積"
 }
 </locale>
 
@@ -868,8 +800,6 @@ definePage(() => ({
 {
 	"unknown": "Unknown",
 	"software": "Software",
-	"administrator": "Administrator",
-	"description": "Description",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publishing",
@@ -886,7 +816,6 @@ definePage(() => ({
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "Registered at",
-	"updatedAt": "Updated at",
 	"latestRequestReceivedAt": "Last request received",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
@@ -900,10 +829,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Difference in cache size",
 	"instanceChartsCacheSizeTotal": "Cumulative total cache size",
 	"instanceChartsFiles": "Difference in the number of files",
-	"instanceChartsFilesTotal": "Cumulative number of files",
-	"overview": "Overview",
-	"charts": "Charts",
-	"users": "Users"
+	"instanceChartsFilesTotal": "Cumulative number of files"
 }
 </locale>
 
@@ -911,8 +837,6 @@ definePage(() => ({
 {
 	"unknown": "Unknown",
 	"software": "Software",
-	"administrator": "Administrator",
-	"description": "Description",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publishing",
@@ -929,7 +853,6 @@ definePage(() => ({
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "Registered at",
-	"updatedAt": "Updated at",
 	"latestRequestReceivedAt": "Last request received",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
@@ -943,10 +866,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Difference in cache size",
 	"instanceChartsCacheSizeTotal": "Cumulative total cache size",
 	"instanceChartsFiles": "Difference in the number of files",
-	"instanceChartsFilesTotal": "Cumulative number of files",
-	"overview": "Overview",
-	"charts": "Charts",
-	"users": "ಬಳಕೆದಾರ"
+	"instanceChartsFilesTotal": "Cumulative number of files"
 }
 </locale>
 
@@ -954,8 +874,6 @@ definePage(() => ({
 {
 	"unknown": "알 수 없음",
 	"software": "소프트웨어",
-	"administrator": "관리자",
-	"description": "설명",
 	"deliveryStatus": "전송 상태",
 	"deliveryTypeLabels": {
 		"none": "배포 중",
@@ -972,7 +890,6 @@ definePage(() => ({
 	"moderationNote": "조정 기록",
 	"moderationNoteDescription": "모더레이터 역할을 가진 유저만 보이는 메모를 적을 수 있습니다.",
 	"registeredAt": "등록 날짜",
-	"updatedAt": "수정한 날짜",
 	"latestRequestReceivedAt": "마지막으로 요청을 받은 시간",
 	"recentNHours": "최근 {n}시간",
 	"recentNDays": "최근 {n}일",
@@ -986,10 +903,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "캐시 용량 증감",
 	"instanceChartsCacheSizeTotal": "누적 캐시 용량",
 	"instanceChartsFiles": "파일 수 증감",
-	"instanceChartsFilesTotal": "누적 파일 수",
-	"overview": "요약",
-	"charts": "차트",
-	"users": "유저"
+	"instanceChartsFilesTotal": "누적 파일 수"
 }
 </locale>
 
@@ -997,8 +911,6 @@ definePage(() => ({
 {
 	"unknown": "Onbekend",
 	"software": "Software",
-	"administrator": "Beheerder",
-	"description": "Beschrijving",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publiceren",
@@ -1015,7 +927,6 @@ definePage(() => ({
 	"moderationNote": "Moderatienotitie",
 	"moderationNoteDescription": "Voer hier notities in. Deze zijn alleen zichtbaar voor de moderators.",
 	"registeredAt": "Geregistreerd op",
-	"updatedAt": "Laatst gewijzigd at",
 	"latestRequestReceivedAt": "Laatste aanvraag ontvangen",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
@@ -1029,10 +940,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Difference in cache size",
 	"instanceChartsCacheSizeTotal": "Cumulative total cache size",
 	"instanceChartsFiles": "Difference in the number of files",
-	"instanceChartsFilesTotal": "Cumulative number of files",
-	"overview": "Overzicht",
-	"charts": "Grafieken",
-	"users": "Gebruikers"
+	"instanceChartsFilesTotal": "Cumulative number of files"
 }
 </locale>
 
@@ -1040,8 +948,6 @@ definePage(() => ({
 {
 	"unknown": "Ukjent",
 	"software": "Programvare",
-	"administrator": "Administrator",
-	"description": "Beskrivelse",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publishing",
@@ -1058,7 +964,6 @@ definePage(() => ({
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "Registrerte seg",
-	"updatedAt": "Updated at",
 	"latestRequestReceivedAt": "Siste forespørsel mottatt",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
@@ -1072,10 +977,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Difference in cache size",
 	"instanceChartsCacheSizeTotal": "Cumulative total cache size",
 	"instanceChartsFiles": "Forskjell på antall filer",
-	"instanceChartsFilesTotal": "Cumulative number of files",
-	"overview": "Overview",
-	"charts": "Diagrammer",
-	"users": "Brukere"
+	"instanceChartsFilesTotal": "Cumulative number of files"
 }
 </locale>
 
@@ -1083,8 +985,6 @@ definePage(() => ({
 {
 	"unknown": "Nieznane",
 	"software": "Oprogramowanie",
-	"administrator": "Admin",
-	"description": "Opis",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publikowanie",
@@ -1101,7 +1001,6 @@ definePage(() => ({
 	"moderationNote": "Notka moderacyjna",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "Zarejestrowano",
-	"updatedAt": "Zaktualizowano",
 	"latestRequestReceivedAt": "Ostatnie żądanie otrzymano o",
 	"recentNHours": "W ciągu ostatnich {n} godzin",
 	"recentNDays": "W ciągu ostatnich {n} dni",
@@ -1115,10 +1014,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Różnica w rozmiarze pamięci podręcznej",
 	"instanceChartsCacheSizeTotal": "Łączny rozmiar pamięci podręcznej",
 	"instanceChartsFiles": "Różnica # plików",
-	"instanceChartsFilesTotal": "Łącznie # plików",
-	"overview": "Przegląd",
-	"charts": "Wykresy",
-	"users": "Użytkownicy"
+	"instanceChartsFilesTotal": "Łącznie # plików"
 }
 </locale>
 
@@ -1126,8 +1022,6 @@ definePage(() => ({
 {
 	"unknown": "Desconhecido",
 	"software": "Software",
-	"administrator": "Administrador",
-	"description": "Descrição",
 	"deliveryStatus": "Estado de entrega",
 	"deliveryTypeLabels": {
 		"none": "Publicando",
@@ -1144,7 +1038,6 @@ definePage(() => ({
 	"moderationNote": "Nota de moderação",
 	"moderationNoteDescription": "Você pode preencher notas que serão compartilhadas apenas com moderadores.",
 	"registeredAt": "Registrado em",
-	"updatedAt": "Última atualização",
 	"latestRequestReceivedAt": "Última solicitação recebida",
 	"recentNHours": "Últimas {n} horas",
 	"recentNDays": "Últimos {n} dias",
@@ -1158,10 +1051,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Diferença do tamanho do cache",
 	"instanceChartsCacheSizeTotal": "Tamanho cumulativo do cache",
 	"instanceChartsFiles": "Diferença no número de arquivos",
-	"instanceChartsFilesTotal": "Número cumulativo de arquivos",
-	"overview": "Visão geral",
-	"charts": "Gráfico",
-	"users": "Usuários"
+	"instanceChartsFilesTotal": "Número cumulativo de arquivos"
 }
 </locale>
 
@@ -1169,8 +1059,6 @@ definePage(() => ({
 {
 	"unknown": "Неизвестно",
 	"software": "Программы",
-	"administrator": "Администратор",
-	"description": "Описание",
 	"deliveryStatus": "Статус отправки",
 	"deliveryTypeLabels": {
 		"none": "Публикация",
@@ -1187,7 +1075,6 @@ definePage(() => ({
 	"moderationNote": "Примечания модератора",
 	"moderationNoteDescription": "Вы можете заполнять заметки, которые будут доступны только модераторам.",
 	"registeredAt": "Первое наблюдение",
-	"updatedAt": "Обновлено",
 	"latestRequestReceivedAt": "Последний полученный запрос",
 	"recentNHours": "Последние {n} ч",
 	"recentNDays": "Последние {n} сут",
@@ -1201,10 +1088,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Изменения размера кэша",
 	"instanceChartsCacheSizeTotal": "Суммарный размер кэша",
 	"instanceChartsFiles": "Изменения числа файлов",
-	"instanceChartsFilesTotal": "Суммарное количество файлов",
-	"overview": "Обзор",
-	"charts": "Диаграммы",
-	"users": "Пользователи"
+	"instanceChartsFilesTotal": "Суммарное количество файлов"
 }
 </locale>
 
@@ -1212,8 +1096,6 @@ definePage(() => ({
 {
 	"unknown": "Neznáme",
 	"software": "Softvér",
-	"administrator": "Administrátor",
-	"description": "Popis",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Zverejňovanie",
@@ -1230,7 +1112,6 @@ definePage(() => ({
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "Registrácia",
-	"updatedAt": "Upravené",
 	"latestRequestReceivedAt": "Posledná prijatá požiadavka",
 	"recentNHours": "Posledných {n} hodín",
 	"recentNDays": "Posledných {n} dní",
@@ -1244,10 +1125,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Rozdiel vo veľkosti cache",
 	"instanceChartsCacheSizeTotal": "Celkom spolu veľkosť cache",
 	"instanceChartsFiles": "Rozdiel v počte súborov",
-	"instanceChartsFilesTotal": "Celkom spolu počet súborov",
-	"overview": "Prehľad",
-	"charts": "Grafy",
-	"users": "Používatelia"
+	"instanceChartsFilesTotal": "Celkom spolu počet súborov"
 }
 </locale>
 
@@ -1255,8 +1133,6 @@ definePage(() => ({
 {
 	"unknown": "ไม่ทราบสถานะ",
 	"software": "ซอฟต์แวร์",
-	"administrator": "ผู้ดูแลระบบ",
-	"description": "คำอธิบาย",
 	"deliveryStatus": "สถานะการจัดส่ง",
 	"deliveryTypeLabels": {
 		"none": "กำลังเผยแพร่",
@@ -1273,7 +1149,6 @@ definePage(() => ({
 	"moderationNote": "โน้ตการกลั่นกรอง",
 	"moderationNoteDescription": "สามารถจดเมโมที่จะแบ่งปันเฉพาะระหว่างผู้ควบคุมได้",
 	"registeredAt": "วันที่ลงทะเบียน",
-	"updatedAt": "อัปเดตล่าสุด",
 	"latestRequestReceivedAt": "คำขอล่าสุดที่ได้รับ",
 	"recentNHours": "ล่าสุด {n} ชั่วโมงที่แล้ว",
 	"recentNDays": "ล่าสุด {n} วันที่แล้ว",
@@ -1287,10 +1162,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "การเพิ่มลดขนาดของแคช",
 	"instanceChartsCacheSizeTotal": "ขนาดแคชสะสม",
 	"instanceChartsFiles": "การเพิ่มลดของจำนวนไฟล์",
-	"instanceChartsFilesTotal": "จำนวนไฟล์สะสม",
-	"overview": "ภาพรวม",
-	"charts": "แผนภูมิ",
-	"users": "ผู้ใช้"
+	"instanceChartsFilesTotal": "จำนวนไฟล์สะสม"
 }
 </locale>
 
@@ -1298,8 +1170,6 @@ definePage(() => ({
 {
 	"unknown": "Bilinmiyor",
 	"software": "Yazılım",
-	"administrator": "Yönetici",
-	"description": "Açıklama",
 	"deliveryStatus": "Teslimat durumu",
 	"deliveryTypeLabels": {
 		"none": "Paylaşım",
@@ -1316,7 +1186,6 @@ definePage(() => ({
 	"moderationNote": "Moderasyon notu",
 	"moderationNoteDescription": "Moderatörler arasında paylaşılacak notları girebilirsin.",
 	"registeredAt": "Kayıtlı",
-	"updatedAt": "Güncellendi",
 	"latestRequestReceivedAt": "Son talep alındı",
 	"recentNHours": "Son {n} saat",
 	"recentNDays": "Son {n} gün",
@@ -1330,10 +1199,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Önbellek boyutundaki fark",
 	"instanceChartsCacheSizeTotal": "Önbelleğin toplam boyutu",
 	"instanceChartsFiles": "Dosya sayısındaki fark",
-	"instanceChartsFilesTotal": "Toplam dosya sayısı",
-	"overview": "Genel Bakış",
-	"charts": "Grafikler",
-	"users": "Kullanıcılar"
+	"instanceChartsFilesTotal": "Toplam dosya sayısı"
 }
 </locale>
 
@@ -1341,8 +1207,6 @@ definePage(() => ({
 {
 	"unknown": "Unknown",
 	"software": "Software",
-	"administrator": "Administrator",
-	"description": "Description",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Publishing",
@@ -1359,7 +1223,6 @@ definePage(() => ({
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"registeredAt": "Registered at",
-	"updatedAt": "Updated at",
 	"latestRequestReceivedAt": "Last request received",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
@@ -1373,10 +1236,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Difference in cache size",
 	"instanceChartsCacheSizeTotal": "Cumulative total cache size",
 	"instanceChartsFiles": "Difference in the number of files",
-	"instanceChartsFilesTotal": "Cumulative number of files",
-	"overview": "Overview",
-	"charts": "Charts",
-	"users": "Users"
+	"instanceChartsFilesTotal": "Cumulative number of files"
 }
 </locale>
 
@@ -1384,8 +1244,6 @@ definePage(() => ({
 {
 	"unknown": "Невідомо",
 	"software": "Програмне забезпечення",
-	"administrator": "Адмін",
-	"description": "Опис",
 	"deliveryStatus": "Статус доставлення",
 	"deliveryTypeLabels": {
 		"none": "Публікація",
@@ -1402,7 +1260,6 @@ definePage(() => ({
 	"moderationNote": "Модераторська нотатка",
 	"moderationNoteDescription": "Ви можете додати нотатки, які будуть доступні лише модераторам.\n",
 	"registeredAt": "Реєстрація",
-	"updatedAt": "Останнє оновлення",
 	"latestRequestReceivedAt": "Останній запит прийнято",
 	"recentNHours": "Останні {n} годин",
 	"recentNDays": "Останні {n} днів",
@@ -1416,10 +1273,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Difference in cache size",
 	"instanceChartsCacheSizeTotal": "Сумарний розмір кешу",
 	"instanceChartsFiles": "Різниця в кількості файлів",
-	"instanceChartsFilesTotal": "Сумарна кількість файлів",
-	"overview": "Огляд",
-	"charts": "Графіки",
-	"users": "Користувачі"
+	"instanceChartsFilesTotal": "Сумарна кількість файлів"
 }
 </locale>
 
@@ -1427,8 +1281,6 @@ definePage(() => ({
 {
 	"unknown": "Chưa biết",
 	"software": "Phần mềm",
-	"administrator": "Quản trị viên",
-	"description": "Mô tả",
 	"deliveryStatus": "Delivery status",
 	"deliveryTypeLabels": {
 		"none": "Đang đăng",
@@ -1445,7 +1297,6 @@ definePage(() => ({
 	"moderationNote": "Ghi chú kiểm duyệt",
 	"moderationNoteDescription": "Bạn có thể điền vào những ghi chú chỉ được chia sẻ giữa những người kiểm duyệt.",
 	"registeredAt": "Đăng ký vào",
-	"updatedAt": "Cập nhật lúc",
 	"latestRequestReceivedAt": "Yêu cầu cuối nhận lúc",
 	"recentNHours": "{n}h trước",
 	"recentNDays": "{n} ngày trước",
@@ -1459,10 +1310,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "Sự khác biệt về dung lượng bộ nhớ đệm",
 	"instanceChartsCacheSizeTotal": "Dung lượng bộ nhớ đệm tích lũy",
 	"instanceChartsFiles": "Sự khác biệt về số lượng tập tin",
-	"instanceChartsFilesTotal": "Số lượng tập tin tích lũy",
-	"overview": "Tổng quan",
-	"charts": "Đồ thị",
-	"users": "Người dùng"
+	"instanceChartsFilesTotal": "Số lượng tập tin tích lũy"
 }
 </locale>
 
@@ -1470,8 +1318,6 @@ definePage(() => ({
 {
 	"unknown": "未知",
 	"software": "软件",
-	"administrator": "管理员",
-	"description": "描述",
 	"deliveryStatus": "投递状态",
 	"deliveryTypeLabels": {
 		"none": "投递中",
@@ -1488,7 +1334,6 @@ definePage(() => ({
 	"moderationNote": "管理笔记",
 	"moderationNoteDescription": "可以用来记录仅在管理员之间共享的笔记。",
 	"registeredAt": "初次观测",
-	"updatedAt": "更新日期",
 	"latestRequestReceivedAt": "上次收到的请求",
 	"recentNHours": "最近{n}小时",
 	"recentNDays": "最近{n}天",
@@ -1502,10 +1347,7 @@ definePage(() => ({
 	"instanceChartsCacheSize": "缓存大小：增加/减少",
 	"instanceChartsCacheSizeTotal": "缓存大小总计",
 	"instanceChartsFiles": "文件总数增减",
-	"instanceChartsFilesTotal": "文件数总计",
-	"overview": "概览",
-	"charts": "图表",
-	"users": "用户"
+	"instanceChartsFilesTotal": "文件数总计"
 }
 </locale>
 
@@ -1513,8 +1355,6 @@ definePage(() => ({
 {
 	"unknown": "未知",
 	"software": "軟體",
-	"administrator": "管理員",
-	"description": "描述",
 	"deliveryStatus": "傳送狀態",
 	"deliveryTypeLabels": {
 		"none": "發送中",
@@ -1531,7 +1371,6 @@ definePage(() => ({
 	"moderationNote": "管理筆記",
 	"moderationNoteDescription": "您可以編寫僅在審查員之間共用的註解。",
 	"registeredAt": "初次觀測",
-	"updatedAt": "最後更新",
 	"latestRequestReceivedAt": "上次收到的請求",
 	"recentNHours": "過去 {n} 小時",
 	"recentNDays": "過去 {n} 天",
@@ -1545,9 +1384,6 @@ definePage(() => ({
 	"instanceChartsCacheSize": "快取用量增減",
 	"instanceChartsCacheSizeTotal": "快取用量總數",
 	"instanceChartsFiles": "檔案總數增減",
-	"instanceChartsFilesTotal": "檔案總數累計",
-	"overview": "概覽",
-	"charts": "圖表",
-	"users": "使用者"
+	"instanceChartsFilesTotal": "檔案總數累計"
 }
 </locale>

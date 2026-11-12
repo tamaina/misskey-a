@@ -15,9 +15,8 @@ import * as os from '@features/ui/frontend/os.js';
 import { getNavbarMessages } from './navbar-locale.js';
 import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
 
-const messages = getNavbarMessages();
-const defaultUiLabel = messages.default;
-const deckUiLabel = messages.deck;
+// Navbar definitions are imported before the locale runtime may be installed.
+const messages = computed(() => getNavbarMessages());
 
 export const navbarItemDef = reactive<{
 	[key: string]: {
@@ -31,7 +30,9 @@ export const navbarItemDef = reactive<{
 	};
 }>({
 	notifications: {
-		title: messages.notifications,
+		get title() {
+			return messages.value.notifications;
+		},
 		icon: 'ti ti-bell',
 		show: computed(() => $i != null),
 		indicated: computed(() => $i != null && $i.hasUnreadNotification),
@@ -47,66 +48,88 @@ export const navbarItemDef = reactive<{
 		to: '/my/notifications',
 	},
 	drive: {
-		title: messages.drive,
+		get title() {
+			return messages.value.drive;
+		},
 		icon: 'ti ti-cloud',
 		show: computed(() => $i != null),
 		to: '/my/drive',
 	},
 	followRequests: {
-		title: messages.followRequests,
+		get title() {
+			return messages.value.followRequests;
+		},
 		icon: 'ti ti-user-plus',
 		indicated: computed(() => $i != null && $i.hasPendingReceivedFollowRequest),
 		to: '/my/follow-requests',
 	},
 	explore: {
-		title: messages.explore,
+		get title() {
+			return messages.value.explore;
+		},
 		icon: 'ti ti-hash',
 		to: '/explore',
 	},
 	announcements: {
-		title: messages.announcements,
+		get title() {
+			return messages.value.announcements;
+		},
 		icon: 'ti ti-speakerphone',
 		indicated: computed(() => $i != null && $i.hasUnreadAnnouncement),
 		to: '/announcements',
 	},
 	search: {
-		title: messages.search,
+		get title() {
+			return messages.value.search;
+		},
 		icon: 'ti ti-search',
 		to: '/search',
 	},
 	lookup: {
-		title: messages.lookup,
+		get title() {
+			return messages.value.lookup;
+		},
 		icon: 'ti ti-world-search',
 		action: (ev) => {
 			lookup();
 		},
 	},
 	qr: {
-		title: messages.qr,
+		get title() {
+			return messages.value.qr;
+		},
 		icon: 'ti ti-qrcode',
 		show: computed(() => $i != null),
 		to: '/qr',
 	},
 	lists: {
-		title: messages.lists,
+		get title() {
+			return messages.value.lists;
+		},
 		icon: 'ti ti-list',
 		show: computed(() => $i != null),
 		to: '/my/lists',
 	},
 	antennas: {
-		title: messages.antennas,
+		get title() {
+			return messages.value.antennas;
+		},
 		icon: 'ti ti-antenna',
 		show: computed(() => $i != null),
 		to: '/my/antennas',
 	},
 	favorites: {
-		title: messages.favorites,
+		get title() {
+			return messages.value.favorites;
+		},
 		icon: 'ti ti-star',
 		show: computed(() => $i != null),
 		to: '/my/favorites',
 	},
 	pages: {
-		title: messages.pages,
+		get title() {
+			return messages.value.pages;
+		},
 		icon: 'ti ti-news',
 		to: '/pages',
 	},
@@ -116,30 +139,40 @@ export const navbarItemDef = reactive<{
 		to: '/play',
 	},
 	gallery: {
-		title: messages.gallery,
+		get title() {
+			return messages.value.gallery;
+		},
 		icon: 'ti ti-icons',
 		to: '/gallery',
 	},
 	clips: {
-		title: messages.clip,
+		get title() {
+			return messages.value.clip;
+		},
 		icon: 'ti ti-paperclip',
 		show: computed(() => $i != null),
 		to: '/my/clips',
 	},
 	channels: {
-		title: messages.channel,
+		get title() {
+			return messages.value.channel;
+		},
 		icon: 'ti ti-device-tv',
 		to: '/channels',
 	},
 	chat: {
-		title: messages.directMessage_short,
+		get title() {
+			return messages.value.directMessage_short;
+		},
 		icon: 'ti ti-messages',
 		to: '/chat',
 		show: computed(() => $i != null && $i.policies.chatAvailability !== 'unavailable'),
 		indicated: computed(() => $i != null && $i.hasUnreadChatMessages),
 	},
 	achievements: {
-		title: messages.achievements,
+		get title() {
+			return messages.value.achievements;
+		},
 		icon: 'ti ti-medal',
 		show: computed(() => $i != null),
 		to: '/my/achievements',
@@ -150,18 +183,20 @@ export const navbarItemDef = reactive<{
 		to: '/games',
 	},
 	ui: {
-		title: messages.switchUi,
+		get title() {
+			return messages.value.switchUi;
+		},
 		icon: 'ti ti-devices',
 		action: (ev) => {
 			os.popupMenu([{
-				text: defaultUiLabel,
+				text: messages.value.default,
 				active: ui === 'default' || ui === null,
 				action: () => {
 					miLocalStorage.setItem('ui', 'default');
 					unisonReload();
 				},
 			}, {
-				text: deckUiLabel,
+				text: messages.value.deck,
 				active: ui === 'deck',
 				action: () => {
 					miLocalStorage.setItem('ui', 'deck');
@@ -171,34 +206,44 @@ export const navbarItemDef = reactive<{
 		},
 	},
 	about: {
-		title: messages.about,
+		get title() {
+			return messages.value.about;
+		},
 		icon: 'ti ti-info-circle',
 		action: (ev) => {
 			openInstanceMenu(ev);
 		},
 	},
 	tools: {
-		title: messages.tools,
+		get title() {
+			return messages.value.tools;
+		},
 		icon: 'ti ti-tool',
 		action: (ev) => {
 			openToolsMenu(ev);
 		},
 	},
 	reload: {
-		title: messages.reload,
+		get title() {
+			return messages.value.reload;
+		},
 		icon: 'ti ti-refresh',
 		action: (ev) => {
 			window.location.reload();
 		},
 	},
 	profile: {
-		title: messages.profile,
+		get title() {
+			return messages.value.profile;
+		},
 		icon: 'ti ti-user',
 		show: computed(() => $i != null),
 		to: `/@${$i?.username}`,
 	},
 	cacheClear: {
-		title: messages.clearCache,
+		get title() {
+			return messages.value.clearCache;
+		},
 		icon: 'ti ti-trash',
 		action: (ev) => {
 			clearCache();

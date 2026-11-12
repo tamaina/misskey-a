@@ -31,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<button v-else-if="canResize && !maximized" v-tooltip="$locale.sfc.windowMinimize" class="_button" :class="$style.headerButton" @click="minimize()"><i class="ti ti-minimize"></i></button>
 					<button v-if="canResize && maximized" v-tooltip="$locale.sfc.windowRestore" class="_button" :class="$style.headerButton" @click="unMaximize()"><i class="ti ti-picture-in-picture"></i></button>
 					<button v-else-if="canResize && !maximized && !minimized" v-tooltip="$locale.sfc.windowMaximize" class="_button" :class="$style.headerButton" @click="maximize()"><i class="ti ti-rectangle"></i></button>
-					<button v-if="closeButton" v-tooltip="$locale.sfc.close" class="_button" :class="$style.headerButton" @click="close()"><i class="ti ti-x"></i></button>
+					<button v-if="closeButton" v-tooltip="globalLocale.env.close" class="_button" :class="$style.headerButton" @click="close()"><i class="ti ti-x"></i></button>
 				</span>
 			</div>
 			<div :class="$style.content">
@@ -53,11 +53,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { onBeforeUnmount, onMounted, provide, useTemplateRef, ref } from 'vue';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { elementContains } from '@features/ui/frontend/utility/element-contains.js';
 import * as os from '@features/ui/frontend/os.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 type WindowButton = {
 	title: string;
@@ -704,8 +708,7 @@ $handleSize: 8px;
 {
   "windowRestore": "استرجاع",
   "windowMinimize": "Minimize",
-  "windowMaximize": "املأ الشاشة",
-  "close": "اغلق"
+  "windowMaximize": "املأ الشاشة"
 }
 </locale>
 
@@ -713,8 +716,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Restaurar",
   "windowMinimize": "Minimitzar",
-  "windowMaximize": "Maximitzar ",
-  "close": "Tanca"
+  "windowMaximize": "Maximitzar "
 }
 </locale>
 
@@ -722,8 +724,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Obnovit",
   "windowMinimize": "Minimalizovat",
-  "windowMaximize": "Maximalizovat",
-  "close": "Zavřít"
+  "windowMaximize": "Maximalizovat"
 }
 </locale>
 
@@ -731,8 +732,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Restore",
   "windowMinimize": "Minimize",
-  "windowMaximize": "Maximize",
-  "close": "Close"
+  "windowMaximize": "Maximize"
 }
 </locale>
 
@@ -740,8 +740,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Wiederherstellen",
   "windowMinimize": "Minimieren",
-  "windowMaximize": "Maximieren",
-  "close": "Schließen"
+  "windowMaximize": "Maximieren"
 }
 </locale>
 
@@ -749,8 +748,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Restore",
   "windowMinimize": "Minimize",
-  "windowMaximize": "Maximize",
-  "close": "Close"
+  "windowMaximize": "Maximize"
 }
 </locale>
 
@@ -758,8 +756,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Regresar",
   "windowMinimize": "Minimizar",
-  "windowMaximize": "Maximizar",
-  "close": "Cerrar"
+  "windowMaximize": "Maximizar"
 }
 </locale>
 
@@ -767,8 +764,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Restaurer",
   "windowMinimize": "Minimaliser",
-  "windowMaximize": "Maximiser",
-  "close": "Fermer"
+  "windowMaximize": "Maximiser"
 }
 </locale>
 
@@ -776,8 +772,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Kembalikan",
   "windowMinimize": "Minimalkan",
-  "windowMaximize": "Maksimalkan",
-  "close": "Tutup"
+  "windowMaximize": "Maksimalkan"
 }
 </locale>
 
@@ -785,8 +780,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Ripristina",
   "windowMinimize": "Contrai finestra",
-  "windowMaximize": "Ingrandisci",
-  "close": "Chiudi"
+  "windowMaximize": "Ingrandisci"
 }
 </locale>
 
@@ -794,8 +788,7 @@ $handleSize: 8px;
 {
   "windowRestore": "元に戻す",
   "windowMinimize": "最小化",
-  "windowMaximize": "最大化",
-  "close": "閉じる"
+  "windowMaximize": "最大化"
 }
 </locale>
 
@@ -803,8 +796,7 @@ $handleSize: 8px;
 {
   "windowRestore": "元に戻す",
   "windowMinimize": "最小化",
-  "windowMaximize": "最大化",
-  "close": "さいなら"
+  "windowMaximize": "最大化"
 }
 </locale>
 
@@ -812,8 +804,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Restore",
   "windowMinimize": "Minimize",
-  "windowMaximize": "Maximize",
-  "close": "Close"
+  "windowMaximize": "Maximize"
 }
 </locale>
 
@@ -821,8 +812,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Restore",
   "windowMinimize": "Minimize",
-  "windowMaximize": "Maximize",
-  "close": "Close"
+  "windowMaximize": "Maximize"
 }
 </locale>
 
@@ -830,8 +820,7 @@ $handleSize: 8px;
 {
   "windowRestore": "복구",
   "windowMinimize": "최소화",
-  "windowMaximize": "최대화",
-  "close": "닫기"
+  "windowMaximize": "최대화"
 }
 </locale>
 
@@ -839,8 +828,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Herstellen",
   "windowMinimize": "Minimize",
-  "windowMaximize": "Maximaliseren",
-  "close": "Sluiten"
+  "windowMaximize": "Maximaliseren"
 }
 </locale>
 
@@ -848,8 +836,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Restore",
   "windowMinimize": "Minimize",
-  "windowMaximize": "Maximize",
-  "close": "Lukk"
+  "windowMaximize": "Maximize"
 }
 </locale>
 
@@ -857,8 +844,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Przywróć",
   "windowMinimize": "Minimalizuj",
-  "windowMaximize": "Maksymalizuj",
-  "close": "Zamknij"
+  "windowMaximize": "Maksymalizuj"
 }
 </locale>
 
@@ -866,8 +852,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Restaurar",
   "windowMinimize": "Minimizar",
-  "windowMaximize": "Maximizar",
-  "close": "Fechar"
+  "windowMaximize": "Maximizar"
 }
 </locale>
 
@@ -875,8 +860,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Восстановить",
   "windowMinimize": "Свернуть",
-  "windowMaximize": "Развернуть",
-  "close": "Закрыть"
+  "windowMaximize": "Развернуть"
 }
 </locale>
 
@@ -884,8 +868,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Obnoviť",
   "windowMinimize": "Minimize",
-  "windowMaximize": "Maximalizovať",
-  "close": "Zavrieť"
+  "windowMaximize": "Maximalizovať"
 }
 </locale>
 
@@ -893,8 +876,7 @@ $handleSize: 8px;
 {
   "windowRestore": "เลิกทำ",
   "windowMinimize": "ย่อเล็กที่สุด",
-  "windowMaximize": "ขยายใหญ่สุด",
-  "close": "ปิด"
+  "windowMaximize": "ขยายใหญ่สุด"
 }
 </locale>
 
@@ -902,8 +884,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Geri yükle",
   "windowMinimize": "Minimize et",
-  "windowMaximize": "Maksimize et",
-  "close": "Kapat"
+  "windowMaximize": "Maksimize et"
 }
 </locale>
 
@@ -911,8 +892,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Restore",
   "windowMinimize": "Minimize",
-  "windowMaximize": "Maximize",
-  "close": "Close"
+  "windowMaximize": "Maximize"
 }
 </locale>
 
@@ -920,8 +900,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Відновити",
   "windowMinimize": "Згорнути",
-  "windowMaximize": "Розгорнути",
-  "close": "Закрити"
+  "windowMaximize": "Розгорнути"
 }
 </locale>
 
@@ -929,8 +908,7 @@ $handleSize: 8px;
 {
   "windowRestore": "Khôi phục",
   "windowMinimize": "Thu nhỏ tối đa",
-  "windowMaximize": "Phóng to",
-  "close": "Đóng"
+  "windowMaximize": "Phóng to"
 }
 </locale>
 
@@ -938,8 +916,7 @@ $handleSize: 8px;
 {
   "windowRestore": "还原",
   "windowMinimize": "最小化",
-  "windowMaximize": "最大化",
-  "close": "关闭"
+  "windowMaximize": "最大化"
 }
 </locale>
 
@@ -947,7 +924,6 @@ $handleSize: 8px;
 {
   "windowRestore": "復原",
   "windowMinimize": "最小化",
-  "windowMaximize": "最大化",
-  "close": "關閉"
+  "windowMaximize": "最大化"
 }
 </locale>

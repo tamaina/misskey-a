@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div v-if="tab === 'local'" class="local">
 				<MkInput v-model="query" :debounce="true" type="search" autocapitalize="off">
 					<template #prefix><i class="ti ti-search"></i></template>
-					<template #label>{{ $locale.sfc.search }}</template>
+					<template #label>{{ globalLocale.env.search }}</template>
 				</MkInput>
 				<MkSwitch v-model="selectMode" style="margin: 8px 0;">
 					<template #label>Select mode</template>
@@ -44,7 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<FormSplit>
 					<MkInput v-model="queryRemote" :debounce="true" type="search" autocapitalize="off">
 						<template #prefix><i class="ti ti-search"></i></template>
-						<template #label>{{ $locale.sfc.search }}</template>
+						<template #label>{{ globalLocale.env.search }}</template>
 					</MkInput>
 					<MkInput v-model="host" :debounce="true">
 						<template #label>{{ $locale.sfc.host }}</template>
@@ -71,6 +71,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { computed, markRaw, ref } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -86,6 +87,9 @@ import { getProxiedImageUrl } from '@features/drive/frontend/utility/media-proxy
 import { iAmAdmin } from '@features/auth/frontend/i.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const tab = ref('local');
 const query = ref<string | null>(null);
@@ -331,7 +335,7 @@ const headerActions = computed(() => [{
 	handler: add,
 }, {
 	icon: 'ti ti-dots',
-	text: $locale.value.sfc.more,
+	text: globalLocale.value.env.more,
 	handler: menu,
 }]);
 
@@ -344,7 +348,7 @@ const headerTabs = computed(() => [{
 }]);
 
 definePage(() => ({
-	title: $locale.value.sfc.customEmojis,
+	title: globalLocale.value.env.customEmojis,
 	icon: 'ti ti-icons',
 }));
 </script>
@@ -462,11 +466,8 @@ definePage(() => ({
 	"importRequested": "يستغرق الاستيراد بعض الوقت",
 	"deleteConfirm": "أمتأكد من الحذف؟",
 	"addEmoji": "إضافة إيموجي",
-	"more": "المزيد!",
 	"local": "المحلي",
 	"remote": "بُعدي",
-	"customEmojis": "إيموجي مخصص",
-	"search": "البحث",
 	"noCustomEmojis": "ليس هناك إيموجي",
 	"host": "المضيف"
 }
@@ -481,11 +482,8 @@ definePage(() => ({
 	"importRequested": "Has sol·licitat una importació de dades. Això pot trigar una estona.",
 	"deleteConfirm": "Segur que vols esborrar?",
 	"addEmoji": "Afegeix un emoji",
-	"more": "Més",
 	"local": "Local",
 	"remote": "Remot",
-	"customEmojis": "Emojis personalitzats",
-	"search": "Cercar",
 	"noCustomEmojis": "No hi ha emojis personalitzats",
 	"host": "Amfitrió"
 }
@@ -500,11 +498,8 @@ definePage(() => ({
 	"importRequested": "Požádali jste o export. To může chvilku trvat.",
 	"deleteConfirm": "Opravdu smazat?",
 	"addEmoji": "Přidat emoji",
-	"more": "Více!",
 	"local": "Lokální",
 	"remote": "Vzdálené",
-	"customEmojis": "Vlastní emoji",
-	"search": "Vyhledávání",
 	"noCustomEmojis": "Bez Emoji",
 	"host": "Hostitel"
 }
@@ -519,11 +514,8 @@ definePage(() => ({
 	"importRequested": "You've requested an import. This may take a while.",
 	"deleteConfirm": "Really delete?",
 	"addEmoji": "Add an emoji",
-	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "Search",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -538,11 +530,8 @@ definePage(() => ({
 	"importRequested": "Du hast einen Import angefragt. Dies kann etwas Zeit in Anspruch nehmen.",
 	"deleteConfirm": "Wirklich löschen?",
 	"addEmoji": "Emoji hinzufügen",
-	"more": "Mehr!",
 	"local": "Lokal",
 	"remote": "Fremd",
-	"customEmojis": "Benutzerdefinierte Emojis",
-	"search": "Suchen",
 	"noCustomEmojis": "Keine benutzerdefinierten Emojis gefunden",
 	"host": "Hostname"
 }
@@ -557,11 +546,8 @@ definePage(() => ({
 	"importRequested": "You've requested an import. This may take a while.",
 	"deleteConfirm": "Really delete?",
 	"addEmoji": "Add an emoji",
-	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "Search",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -576,11 +562,8 @@ definePage(() => ({
 	"importRequested": "Has solicitado la importación. Puede llevar un tiempo.",
 	"deleteConfirm": "¿Desea eliminarlo?",
 	"addEmoji": "Añadir emoji",
-	"more": "¡Más!",
 	"local": "Local",
 	"remote": "Remoto",
-	"customEmojis": "Emojis personalizados",
-	"search": "Buscar",
 	"noCustomEmojis": "No hay emojis personalizados",
 	"host": "Instancia"
 }
@@ -595,11 +578,8 @@ definePage(() => ({
 	"importRequested": "Vous avez initié un import. Cela pourrait prendre un peu de temps.",
 	"deleteConfirm": "Confirmez-vous la suppression?",
 	"addEmoji": "Ajouter un émoji",
-	"more": "Plus !",
 	"local": "Local",
 	"remote": "Distant",
-	"customEmojis": "Émojis personnalisés",
-	"search": "Rechercher",
 	"noCustomEmojis": "Il n'y a pas d’émoji",
 	"host": "Serveur distant"
 }
@@ -614,11 +594,8 @@ definePage(() => ({
 	"importRequested": "Kamu telah meminta impor. Ini akan memakan waktu sesaat.",
 	"deleteConfirm": "Yakin hapus?",
 	"addEmoji": "Tambahkan emoji",
-	"more": "Lainnya",
 	"local": "Lokal",
 	"remote": "Remote",
-	"customEmojis": "Emoji kustom",
-	"search": "Cari",
 	"noCustomEmojis": "Tidak ada emoji kustom",
 	"host": "Host"
 }
@@ -633,11 +610,8 @@ definePage(() => ({
 	"importRequested": "Hai richiesto un'importazione. Potrebbe richiedere un po' di tempo.",
 	"deleteConfirm": "Rimuovere?",
 	"addEmoji": "Aggiungi un emoji",
-	"more": "Di più!",
 	"local": "Locale",
 	"remote": "Remota",
-	"customEmojis": "Emoji personalizzate",
-	"search": "Cerca",
 	"noCustomEmojis": "Nessun emoji",
 	"host": "Host"
 }
@@ -652,11 +626,8 @@ definePage(() => ({
 	"importRequested": "インポートをリクエストしました。これには時間がかかる場合があります。",
 	"deleteConfirm": "削除しますか？",
 	"addEmoji": "絵文字を追加",
-	"more": "もっと！",
 	"local": "ローカル",
 	"remote": "リモート",
-	"customEmojis": "カスタム絵文字",
-	"search": "検索",
 	"noCustomEmojis": "絵文字はありません",
 	"host": "ホスト"
 }
@@ -671,11 +642,8 @@ definePage(() => ({
 	"importRequested": "インポートしてな、ってリクエストしたけど、これ多分めっちゃ時間かかるで。",
 	"deleteConfirm": "ホンマにほかすで？",
 	"addEmoji": "絵文字を追加",
-	"more": "他のん",
 	"local": "ローカル",
 	"remote": "リモート",
-	"customEmojis": "カスタム絵文字",
-	"search": "探す",
 	"noCustomEmojis": "絵文字はあらへん",
 	"host": "ホスト"
 }
@@ -690,11 +658,8 @@ definePage(() => ({
 	"importRequested": "You've requested an import. This may take a while.",
 	"deleteConfirm": "Really delete?",
 	"addEmoji": "Add an emoji",
-	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "Nadi",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -709,11 +674,8 @@ definePage(() => ({
 	"importRequested": "You've requested an import. This may take a while.",
 	"deleteConfirm": "Really delete?",
 	"addEmoji": "Add an emoji",
-	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "ಹುಡುಕು",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -728,11 +690,8 @@ definePage(() => ({
 	"importRequested": "가져오기를 요청하였습니다. 이 작업에는 시간이 걸릴 수 있습니다.",
 	"deleteConfirm": "삭제하시겠습니까?",
 	"addEmoji": "이모지 추가",
-	"more": "더 보기!",
 	"local": "로컬",
 	"remote": "리모트",
-	"customEmojis": "커스텀 이모지",
-	"search": "검색",
 	"noCustomEmojis": "이모지가 없습니다",
 	"host": "호스트"
 }
@@ -747,11 +706,8 @@ definePage(() => ({
 	"importRequested": "Je hebt een import aangevraagd. Dit kan even duren.",
 	"deleteConfirm": "Echt verwijderen?",
 	"addEmoji": "Toevoegen emoji",
-	"more": "Meer!",
 	"local": "Lokaal",
 	"remote": "Remote",
-	"customEmojis": "Eigen emoji",
-	"search": "Zoeken",
 	"noCustomEmojis": "Er zijn geen emojis",
 	"host": "Server"
 }
@@ -766,11 +722,8 @@ definePage(() => ({
 	"importRequested": "Du har bedt om import. Dette kan ta en stund.",
 	"deleteConfirm": "Vil du slette?",
 	"addEmoji": "Legg til emoji",
-	"more": "Mer!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "Søk",
 	"noCustomEmojis": "Det er ingen emoji",
 	"host": "Vert"
 }
@@ -785,11 +738,8 @@ definePage(() => ({
 	"importRequested": "Zażądano importu. Może to zająć\u00a0chwilę.",
 	"deleteConfirm": "Na pewno usunąć?",
 	"addEmoji": "Dodaj emoji",
-	"more": "Więcej!",
 	"local": "Lokalne",
 	"remote": "Zdalny",
-	"customEmojis": "Niestandardowe emoji",
-	"search": "Szukaj",
 	"noCustomEmojis": "Brak emoji",
 	"host": "Host"
 }
@@ -804,11 +754,8 @@ definePage(() => ({
 	"importRequested": "A sua solicitação de importação foi enviada. Isso pode levar algum tempo.",
 	"deleteConfirm": "Confirma a exclusão?",
 	"addEmoji": "Adicionar um Emoji",
-	"more": "Mais!",
 	"local": "Local",
 	"remote": "Remoto",
-	"customEmojis": "Emoji personalizado",
-	"search": "Pesquisar",
 	"noCustomEmojis": "Não há emojis",
 	"host": "Host"
 }
@@ -823,11 +770,8 @@ definePage(() => ({
 	"importRequested": "Вы запросили импорт. Это может занять некоторое время.",
 	"deleteConfirm": "Удалить?",
 	"addEmoji": "Добавить эмодзи",
-	"more": "Ещё!",
 	"local": "С этого сайта",
 	"remote": "С других сайтов",
-	"customEmojis": "Собственные эмодзи",
-	"search": "Поиск",
 	"noCustomEmojis": "Собственные эмодзи отсутствуют",
 	"host": "Хост"
 }
@@ -842,11 +786,8 @@ definePage(() => ({
 	"importRequested": "Požiadali ste o export. Môže to chvíľu trvať.",
 	"deleteConfirm": "Naozaj odstrániť?",
 	"addEmoji": "Pridať emoji",
-	"more": "Viac!",
 	"local": "Lokálne",
 	"remote": "Vzdialené",
-	"customEmojis": "Vlastné emoji",
-	"search": "Hľadať",
 	"noCustomEmojis": "Žiadne emoji",
 	"host": "Host"
 }
@@ -861,11 +802,8 @@ definePage(() => ({
 	"importRequested": "คุณได้ร้องขอการนำเข้า การดำเนินการนี้อาจใช้เวลาสักครู่",
 	"deleteConfirm": "ต้องการลบใช่ไหม?",
 	"addEmoji": "แทรกเอโมจิ",
-	"more": "เพิ่มเติม!",
 	"local": "ท้องถิ่น",
 	"remote": "ระยะไกล",
-	"customEmojis": "เอโมจิที่กำหนดเอง",
-	"search": "ค้นหา",
 	"noCustomEmojis": "ไม่มีเอโมจิ",
 	"host": "โฮสต์"
 }
@@ -880,11 +818,8 @@ definePage(() => ({
 	"importRequested": "İçe aktarma talebinde bulundun. Bu işlem biraz zaman alabilir.",
 	"deleteConfirm": "Cidden silmek istiyor musunuz?",
 	"addEmoji": "Emoji ekle",
-	"more": "Daha fazlası!",
 	"local": "Yerel",
 	"remote": "Uzak",
-	"customEmojis": "Özel Emoji",
-	"search": "Ara",
 	"noCustomEmojis": "Emoji yok",
 	"host": "Host"
 }
@@ -899,11 +834,8 @@ definePage(() => ({
 	"importRequested": "You've requested an import. This may take a while.",
 	"deleteConfirm": "Really delete?",
 	"addEmoji": "Add an emoji",
-	"more": "More!",
 	"local": "Local",
 	"remote": "Remote",
-	"customEmojis": "Custom Emoji",
-	"search": "ئىزدەش",
 	"noCustomEmojis": "There are no emoji",
 	"host": "Host"
 }
@@ -918,11 +850,8 @@ definePage(() => ({
 	"importRequested": "Імпортування розпочато. Це може зайняти деякий час.",
 	"deleteConfirm": "Ви дійсно бажаєте це видалити?",
 	"addEmoji": "Додати емодзі",
-	"more": "Бiльше!",
 	"local": "Локальні",
 	"remote": "Віддалені",
-	"customEmojis": "Кастомні емоджі",
-	"search": "Пошук",
 	"noCustomEmojis": "Немає нетипових емоджі",
 	"host": "Хост"
 }
@@ -937,11 +866,8 @@ definePage(() => ({
 	"importRequested": "Bạn vừa yêu cầu nhập dữ liệu. Quá trình này có thể mất ít phút.",
 	"deleteConfirm": "Bạn có muốn xóa không?",
 	"addEmoji": "Thêm emoji",
-	"more": "Thêm nữa!",
 	"local": "Máy chủ này",
 	"remote": "Máy chủ khác",
-	"customEmojis": "Tùy chỉnh emoji",
-	"search": "Tìm kiếm",
 	"noCustomEmojis": "Không có emoji",
 	"host": "Host"
 }
@@ -956,11 +882,8 @@ definePage(() => ({
 	"importRequested": "导入请求已提交，这可能需要花一点时间。",
 	"deleteConfirm": "确定删除?",
 	"addEmoji": "添加表情符号",
-	"more": "更多！",
 	"local": "本地",
 	"remote": "远程",
-	"customEmojis": "自定义表情符号",
-	"search": "搜索",
 	"noCustomEmojis": "没有自定义表情符号",
 	"host": "主机名"
 }
@@ -975,11 +898,8 @@ definePage(() => ({
 	"importRequested": "已請求匯入。這可能會花一點時間。",
 	"deleteConfirm": "你確定要刪除嗎？",
 	"addEmoji": "新增表情符號",
-	"more": "更多！",
 	"local": "本地",
 	"remote": "遠端",
-	"customEmojis": "自訂表情符號",
-	"search": "搜尋",
 	"noCustomEmojis": "沒有自訂的表情符號",
 	"host": "主機"
 }
