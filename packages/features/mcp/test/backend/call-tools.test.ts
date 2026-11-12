@@ -18,9 +18,17 @@ it('derives stable valid names and rejects future aliases or invalid MCP names',
 });
 
 it('advertises native scopes, read hints, and conservative write/general hints', () => {
-	expect(callToolDefinition('read:account')).toMatchObject({
+	expect(callToolDefinition('read:account', ['i'])).toMatchObject({
 		securitySchemes: [{ type: 'oauth2', scopes: ['access:mcp', 'read:account'] }],
 		annotations: { readOnlyHint: true, destructiveHint: false },
 	});
-	for (const kind of [null, 'write:notes']) expect(callToolDefinition(kind).annotations).toMatchObject({ readOnlyHint: false, destructiveHint: true, idempotentHint: false });
+	for (const kind of [null, 'write:notes']) expect(callToolDefinition(kind, []).annotations).toMatchObject({ readOnlyHint: false, destructiveHint: true, idempotentHint: false });
+});
+
+it.each([
+	[null, 'Call APIs with no permission kind'],
+	['read:account', 'Call read:account API'],
+	['write:notes', 'Call write:notes API'],
+])('keeps the description short for %s', (kind, description) => {
+	expect(callToolDefinition(kind, []).description).toBe(description);
 });

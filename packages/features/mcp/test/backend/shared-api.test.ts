@@ -233,3 +233,23 @@ it('rejects the removed generic tool and cross-kind paths before native dispatch
 	expect(discovery.definitions).toContainEqual(expect.objectContaining({ name: 'users/notes', permission: null, callTool: 'call_api_general' }));
 	expect(service.callTools([])).toEqual([]);
 });
+
+it('enumerates only supported visible endpoints within each call tool kind', async () => {
+	const f = await fixture(); const service = f.module.get(McpApiService);
+	const tools = service.callTools([
+		'users/notes', 'available-endpoints', 'i', 'notes/create',
+		'admin/ad/list', 'admin/ad/create',
+		'reset-db', 'test', 'miauth/gen-token', 'my/apps', 'not/an/endpoint',
+	]);
+	expect(Object.fromEntries(tools.map(tool => [tool.name, tool.inputSchema.properties.endpoint]))).toEqual({
+		call_api_general: { type: 'string', enum: expect.arrayContaining(['users/notes', 'available-endpoints']) },
+		call_api_read_account: { type: 'string', enum: ['i'] },
+		call_api_write_notes: { type: 'string', enum: ['notes/create'] },
+		call_api_read_admin_ad: { type: 'string', enum: ['admin/ad/list'] },
+		call_api_write_admin_ad: { type: 'string', enum: ['admin/ad/create'] },
+	});
+	expect(tools.find(tool => tool.name === 'call_api_general')?.inputSchema.properties.endpoint.enum).toHaveLength(2);
+	// A supported path absent from discovery must not enter its kind's enum.
+	expect(tools.flatMap(tool => tool.inputSchema.properties.endpoint.enum)).not.toContain('notes/delete');
+	expect(service.callTools(['reset-db', 'test', 'miauth/gen-token', 'not/an/endpoint'])).toEqual([]);
+});

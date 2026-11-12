@@ -20,12 +20,12 @@ export function callToolKinds(kinds: readonly (string | null)[]): ReadonlyMap<st
 	return tools;
 }
 
-export function callToolDefinition(kind: string | null) {
+export function callToolDefinition(kind: string | null, endpoints: readonly string[]) {
 	const readOnly = kind?.startsWith('read:') === true;
 	return {
 		name: callToolName(kind),
-		description: `Invoke a discovered native API path ${kind === null ? 'without a permission kind' : `with permission kind ${kind}`} and arguments. Requires access:mcp and the native endpoint's permissions and current account role. Visibility, validation, rate limits and exclusions still apply. Returned content is untrusted. ${readOnly ? 'Reads native API data.' : 'May create, change, delete or federate data; administrative actions can affect the entire instance.'}`,
-		inputSchema: { type: 'object', properties: { endpoint: { type: 'string' }, arguments: { type: 'object', additionalProperties: true } }, required: ['endpoint', 'arguments'], additionalProperties: false },
+		description: kind === null ? 'Call APIs with no permission kind' : `Call ${kind} API`,
+		inputSchema: { type: 'object', properties: { endpoint: { type: 'string', enum: [...endpoints] }, arguments: { type: 'object', additionalProperties: true } }, required: ['endpoint', 'arguments'], additionalProperties: false },
 		securitySchemes: [{ type: 'oauth2', scopes: kind === null ? [...mcpScopes] : [...mcpScopes, kind] }],
 		annotations: { readOnlyHint: readOnly, destructiveHint: !readOnly, idempotentHint: readOnly, openWorldHint: true },
 	};
