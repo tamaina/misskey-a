@@ -34,7 +34,13 @@ export class MiBrowserSession {
 	@Column('timestamp with time zone', { nullable: true })
 	public revokedAt: Date | null;
 
-	/** Reserved for a separately reviewed elevation flow; issuance never grants it. */
+	/** Absolute five-minute elevation expiry; ordinary issuance never grants it. */
 	@Column('timestamp with time zone', { nullable: true })
 	public sudoUntil: Date | null;
+
+	@Column('varchar', { length: 43, nullable: true, select: false })
+	public sudoGrantId: string | null;
+
+	@Column('varchar', { length: 64, nullable: true, select: false })
+	public sudoPolicyStamp: string | null;
 }

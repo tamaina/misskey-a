@@ -34,7 +34,7 @@ export const meta = {
 	},
 } as const;
 export interface AdminAccountsCreateDependencies {
-	browserSessionService: Pick<BrowserSessionService, 'issue'>;
+	browserSessionService: Pick<BrowserSessionService, 'issueForNewAccount'>;
 	config: Config;
 	serverSettings: MiMeta;
 	usersRepository: UsersRepository;
@@ -77,7 +77,7 @@ export function createAdminAccountsCreateProcedure(deps: AdminAccountsCreateDepe
 				includeSecrets: true,
 			});
 
-			return { ...res, token: (await deps.browserSessionService.issue(account.id)).token };
+			return { ...res, token: (await deps.browserSessionService.issueForNewAccount(account)).token };
 		})();
 		return { ...toPackedUserDetailed(result), token: result.token };
 	});

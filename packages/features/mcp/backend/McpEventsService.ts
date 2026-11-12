@@ -4,6 +4,7 @@
  */
 
 import { randomUUID, createHash } from 'node:crypto';
+import { accessTokenExpired } from '@features/auth/backend/access-token-expiry.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { canonicalStream, streamSubscription, streamChannelInputSchema, streamNoteInputSchema } from './stream-parameters.js';
@@ -59,7 +60,7 @@ export class McpEventsService {
 		const canRead = name === 'list'
 			? eventNames.some(event => eventPermissions(event).every(scope => permission?.includes(scope)))
 			: required.every(scope => permission?.includes(scope));
-		if (!grant || !actor || actor.host !== null || actor.isSuspended || actor.movedToUri
+		if (!grant || accessTokenExpired(grant) || !actor || actor.host !== null || actor.isSuspended || actor.movedToUri
 			|| !permission?.includes('access:mcp') || !canRead || antenna && !permission.includes('read:account')) throw new McpEventError(-32602, 'Event access denied');
 		return { actor, grant: { ...grant, permission } };
 	}

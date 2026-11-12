@@ -42,6 +42,7 @@ export function createIAppsProcedure(deps: IAppsDependencies) {
 				name: token.name ?? token.app?.name,
 				createdAt: deps.idService.parse(token.id).date.toISOString(),
 				lastUsedAt: token.lastUsedAt?.toISOString(),
+				expiresAt: token.expiresAt?.toISOString() ?? null,
 				permission: token.app ? token.app.permission : token.permission,
 				iconUrl: token.iconUrl,
 				description: token.description ?? token.app?.description ?? null,

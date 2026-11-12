@@ -3,8 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { legacyManagementOnly } from '../../../legacy-management.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import type { DataSource } from 'typeorm';
+import { MiUserSecurityKey } from '../../../models/UserSecurityKey.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { assertLegacyMfaManagement, assertMfaFactorRetained } from '../../../mfa-policy.js';
+import { withLockedMfaProfile } from '../../../locked-mfa-profile.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -27,6 +33,7 @@ export const meta = {
 	},
 } as const;
 export interface I2faRemoveKeyDependencies {
+	db: DataSource;
 	userSecurityKeysRepository: UserSecurityKeysRepository;
 	userProfilesRepository: UserProfilesRepository;
 	userEntityService: Pick<UserEntityService, 'packSelf'>;
@@ -34,12 +41,13 @@ export interface I2faRemoveKeyDependencies {
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createI2faRemoveKeyProcedure(deps: I2faRemoveKeyDependencies) {
-	return createApiProcedure<MiLocalUser>()(I2faRemoveKeyContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faRemoveKeyContract).use(requirePrincipal<MiLocalUser>()).use(legacyManagementOnly()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
 			const token = ps.token;
 			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			assertLegacyMfaManagement(profile);
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -58,29 +66,17 @@ export function createI2faRemoveKeyProcedure(deps: I2faRemoveKeyDependencies) {
 				throw apiError(meta.errors.incorrectPassword);
 			}
 
-			// Make sure we only delete the user's own creds
-			await deps.userSecurityKeysRepository.delete({
-				userId: me.id,
-				id: ps.credentialId,
+			await withLockedMfaProfile(deps.db, me.id, profile, async (current, manager) => {
+				assertLegacyMfaManagement(current);
+				const keys = manager.getRepository(MiUserSecurityKey);
+				// Only owned credentials can be deleted, and a rejected policy rolls it back.
+				await keys.delete({ userId: me.id, id: ps.credentialId });
+				const keyCount = await keys.count({ where: { userId: me.id } });
+				assertMfaFactorRetained(current, keyCount);
+				if (keyCount === 0) {
+					await manager.getRepository(MiUserProfile).update({ userId: me.id }, { usePasswordLessLogin: false, passkeyMfaEnabled: false });
+				}
 			});
-
-			// 使われているキーがなくなったらパスワードレスログインをやめる
-			const keyCount = await deps.userSecurityKeysRepository.count({
-				where: {
-					userId: me.id,
-				},
-				select: {
-					id: true,
-					name: true,
-					lastUsed: true,
-				},
-			});
-
-			if (keyCount === 0) {
-				await deps.userProfilesRepository.update(me.id, {
-					usePasswordLessLogin: false,
-				});
-			}
 
 			// Publish meUpdated event
 			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {

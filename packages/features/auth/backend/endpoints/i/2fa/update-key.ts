@@ -2,7 +2,12 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { legacyManagementOnly } from '../../../legacy-management.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { DataSource } from 'typeorm';
+import { MiUserSecurityKey } from '../../../models/UserSecurityKey.js';
+import { assertLegacyMfaManagement } from '../../../mfa-policy.js';
+import { withLockedMfaProfile } from '../../../locked-mfa-profile.js';
 import type { UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -30,29 +35,34 @@ export const meta = {
 	},
 } as const;
 export interface I2faUpdateKeyDependencies {
+	db: DataSource;
 	userSecurityKeysRepository: UserSecurityKeysRepository;
 	userEntityService: Pick<UserEntityService, 'packSelf'>;
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createI2faUpdateKeyProcedure(deps: I2faUpdateKeyDependencies) {
-	return createApiProcedure<MiLocalUser>()(I2faUpdateKeyContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faUpdateKeyContract).use(requirePrincipal<MiLocalUser>()).use(legacyManagementOnly()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
-			const key = await deps.userSecurityKeysRepository.findOneBy({
-				id: ps.credentialId,
-			});
+			await withLockedMfaProfile(deps.db, me.id, undefined, async (profile, manager) => {
+				assertLegacyMfaManagement(profile);
+				const keys = manager.getRepository(MiUserSecurityKey);
+				const key = await keys.findOneBy({
+					id: ps.credentialId,
+				});
 
-			if (key == null) {
-				throw apiError(meta.errors.noSuchKey);
-			}
+				if (key == null) {
+					throw apiError(meta.errors.noSuchKey);
+				}
 
-			if (key.userId !== me.id) {
-				throw apiError(meta.errors.accessDenied);
-			}
+				if (key.userId !== me.id) {
+					throw apiError(meta.errors.accessDenied);
+				}
 
-			await deps.userSecurityKeysRepository.update(key.id, {
-				name: ps.name,
+				await keys.update({ id: key.id, userId: me.id }, {
+					name: ps.name,
+				});
 			});
 
 			// Publish meUpdated event

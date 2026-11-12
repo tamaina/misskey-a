@@ -7,11 +7,12 @@ import { readFileSync } from 'node:fs';
 import { parse } from 'vue/compiler-sfc';
 import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import { createApp, defineComponent, h, nextTick, onMounted } from 'vue';
-import Signin from '../../frontend/components/MkSignin.vue';
+import { createApp, defineComponent, h, KeepAlive, nextTick, onMounted, ref } from 'vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { login } from '../../frontend/accounts.js';
+import { alert as showAlert } from '@features/ui/frontend/os.js';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
+import { login } from '../../frontend/accounts.js';
+import Signin from '../../frontend/components/MkSignin.vue';
 import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 
 vi.mock('vue', async original => {
@@ -25,6 +26,7 @@ vi.mock('@features/auth/frontend/accounts.js', () => ({ login: vi.fn() }));
 vi.mock('@features/moderation/frontend/utility/show-suspended-dialog.js', () => ({ showSuspendedDialog: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({ alert: vi.fn() }));
 vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: vi.fn(), startAuthentication: vi.fn() }));
+// Provider discovery belongs to the dedicated OIDC child tests.
 vi.mock('@features/auth/frontend/components/MkSignin.input.vue', () => ({ default: defineComponent({
 	emits: ['usernameSubmitted', 'passkeyClick'], setup(_, { emit }) {
 		state.handlers.username = value => emit('usernameSubmitted', value);
@@ -40,17 +42,17 @@ vi.mock('@features/auth/frontend/components/MkSignin.password.vue', () => ({ def
 	},
 }) }));
 vi.mock('@features/auth/frontend/components/MkSignin.totp.vue', () => ({ default: defineComponent({
-	emits: ['totpSubmitted'], setup(_, { emit }) {
+	props: ['allowTotp', 'allowRecovery'], emits: ['totpSubmitted'], setup(props, { emit }) {
 		state.handlers.totp = value => emit('totpSubmitted', value);
-		return () => h('div', { 'data-page': 'totp' });
+		return () => h('div', { 'data-page': 'totp', 'data-allow-totp': String(props.allowTotp), 'data-allow-recovery': String(props.allowRecovery) });
 	},
 }) }));
 vi.mock('@features/auth/frontend/components/MkSignin.passkey.vue', () => ({ default: defineComponent({
-	props: ['credentialRequest', 'isPerformingPasswordlessLogin', 'canUseTotp'], emits: ['done', 'useTotp'], setup(props, { emit }) {
+	props: ['credentialRequest', 'isPerformingPasswordlessLogin', 'canUseTotp', 'recoveryOnly'], emits: ['done', 'useTotp'], setup(props, { emit }) {
 		onMounted(() => state.requests.push(props.credentialRequest));
 		state.handlers.credential = value => emit('done', value);
 		state.handlers.cancel = () => emit('useTotp');
-		return () => h('div', { 'data-page': 'passkey', 'data-passwordless': String(props.isPerformingPasswordlessLogin), 'data-totp-available': String(props.canUseTotp) });
+		return () => h('div', { 'data-page': 'passkey', 'data-passwordless': String(props.isPerformingPasswordlessLogin), 'data-totp-available': String(props.canUseTotp), 'data-recovery-only': String(props.recoveryOnly) });
 	},
 }) }));
 vi.mock('@features/ui/frontend/components/MkButton.vue', () => ({ default: defineComponent({
@@ -70,7 +72,7 @@ const errors: unknown[] = [];
 let expectedError: unknown;
 const option = (challenge: string): PublicKeyCredentialRequestOptionsJSON => ({ challenge, rpId: 'synthetic.example', userVerification: 'required' });
 const finished = { finished: true, i: 'synthetic-session', id: 'synthetic-user' };
-const credential = { id: 'synthetic-key', rawId: 'AA', type: 'public-key', response: { clientDataJSON: 'AA', authenticatorData: 'AA', signature: 'AA' }, clientExtensionResults: {} };
+const credential = { id: 'synthetic-key', rawId: 'AA', type: 'public-key' as const, response: { clientDataJSON: 'AA', authenticatorData: 'AA', signature: 'AA' }, clientExtensionResults: {} };
 const pw = { password: 'synthetic-password', captcha: { hCaptchaResponse: 'h', mCaptchaResponse: 'm', reCaptchaResponse: 'r', turnstileResponse: 't', testcaptchaResponse: 'test' } };
 
 function mount(autoSet = false) {
@@ -93,7 +95,7 @@ async function passwordPath() {
 
 function page() { return element.querySelector('[data-page]')?.getAttribute('data-page'); }
 
-function fallback() { return element.querySelector('button') as HTMLButtonElement | null; }
+function fallback() { return Array.from(element.querySelectorAll('button')).find(button => button.textContent?.trim() === 'Sign in with Passkey') ?? null; }
 
 beforeEach(() => {
 	vi.resetAllMocks(); state.handlers = {}; state.requests = []; errors.length = 0; expectedError = undefined;
@@ -110,15 +112,15 @@ afterEach(() => {
 
 test('password path shows TOTP without mounting passkey or relying on public MFA flags', async () => {
 	mount(); await passwordPath();
-	expect(page()).toBe('totp'); expect(state.requests).toEqual([]); expect(fallback()?.disabled).toBe(false); expect(fallback()?.textContent).toBe("Sign in with Passkey");
-	expect(misskeyApi).toHaveBeenNthCalledWith(3, 'signin-flow', { username: 'synthetic', password: pw.password, 'hcaptcha-response': 'h', 'm-captcha-response': 'm', 'g-recaptcha-response': 'r', 'turnstile-response': 't', 'testcaptcha-response': 'test' });
+	expect(page()).toBe('totp'); expect(state.requests).toEqual([]); expect(fallback()?.disabled).toBe(false); expect(fallback()?.textContent).toBe('Sign in with Passkey');
+	expect(misskeyApi).toHaveBeenNthCalledWith(3, 'signin-flow', { username: 'synthetic', progressMode: 'v1', password: pw.password, 'hcaptcha-response': 'h', 'm-captcha-response': 'm', 'g-recaptcha-response': 'r', 'turnstile-response': 't', 'testcaptcha-response': 'test' });
 });
 
 test.each(['123456', 'A'.repeat(32)])('TOTP/backup token is sent unchanged and login emits only server success: %s', async token => {
 	mount(true); await passwordPath();
 	vi.mocked(misskeyApi).mockResolvedValueOnce(finished as never);
 	state.handlers.totp(token); await settle();
-	expect(misskeyApi).toHaveBeenNthCalledWith(4, 'signin-flow', { username: 'synthetic', password: pw.password, token });
+	expect(misskeyApi).toHaveBeenNthCalledWith(4, 'signin-flow', { progressMode: 'v1', username: 'synthetic', password: pw.password, token });
 	expect(emitted).toHaveBeenCalledWith(finished); expect(login).toHaveBeenCalledWith('synthetic-session');
 });
 
@@ -129,7 +131,7 @@ test('explicit passkey fallback obtains fresh challenge and verifies through pas
 	expect(state.requests).toEqual([option('fresh')]); expect(page()).toBe('passkey');
 	vi.mocked(misskeyApi).mockResolvedValueOnce(finished as never);
 	state.handlers.credential(credential); await settle();
-	expect(misskeyApi).toHaveBeenLastCalledWith('signin-flow', { username: 'synthetic', password: pw.password, credential });
+	expect(misskeyApi).toHaveBeenLastCalledWith('signin-flow', { progressMode: 'v1', username: 'synthetic', password: pw.password, credential });
 	expect(emitted).toHaveBeenCalledWith(finished); expect(login).not.toHaveBeenCalled();
 });
 
@@ -242,4 +244,67 @@ test.each([
 	app.config.errorHandler = error => { errors.push(error); };
 	app.mount(element); await settle();
 	expect(element.querySelectorAll('button')).toHaveLength(scenario.visible ? 2 : 1);
+});
+
+test('independent passkey policy starts with a key and exposes only an actual recovery fallback', async () => {
+	vi.mocked(misskeyApi).mockReset().mockResolvedValueOnce({ username: 'synthetic' } as never)
+		.mockResolvedValueOnce({ finished: false, next: 'password' } as never)
+		.mockResolvedValueOnce({ finished: false, next: 'passkey', authRequest: option('independent'), availableFactors: ['passkey', 'recovery'] } as never);
+	mount(); await passwordPath(); expect(page()).toBe('passkey');
+	expect(element.querySelector('[data-recovery-only]')?.getAttribute('data-recovery-only')).toBe('true');
+	state.handlers.cancel(); await settle(); expect(page()).toBe('totp');
+	expect(element.querySelector('[data-allow-totp]')?.getAttribute('data-allow-totp')).toBe('false');
+	expect(element.querySelector('[data-allow-recovery]')?.getAttribute('data-allow-recovery')).toBe('true');
+});
+
+test('ordinary passkey-only fallback clears the credential context and requests named password authentication', async () => {
+	vi.mocked(misskeyApi).mockReset().mockResolvedValueOnce({ context: 'synthetic-context', option: option('standalone') } as never).mockResolvedValueOnce({ passwordFlowRequired: true } as never);
+	mount(true); state.handlers.standalone(); await settle(); state.handlers.credential(credential); await settle();
+	expect(page()).toBe('input'); expect(emitted).not.toHaveBeenCalled(); expect(login).not.toHaveBeenCalled();
+	expect(showAlert).toHaveBeenCalledWith({ type: 'info', text: 'このアカウントはパスワードと追加の本人確認が必要です。ユーザー名を入力してログインしてください。' });
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ username: 'synthetic' } as never).mockResolvedValueOnce({ finished: false, next: 'password' } as never);
+	state.handlers.username('synthetic'); await settle(); expect(page()).toBe('password');
+	expect(misskeyApi).toHaveBeenLastCalledWith('signin-flow', { username: 'synthetic', progressMode: 'v1' });
+});
+
+test('unmounted ordinary login ignores a late successful server response', async () => {
+	mount(true); await passwordPath(); let finish!: (value: never) => void;
+	vi.mocked(misskeyApi).mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+	state.handlers.totp('123456'); await settle(); app!.unmount(); app = undefined;
+	finish(finished as never); await settle(); expect(emitted).not.toHaveBeenCalled(); expect(login).not.toHaveBeenCalled();
+});
+
+test('native cancellation in the real passkey view neither emits a credential nor becomes an unhandled failure', async () => {
+	const { default: Passkey } = await vi.importActual<typeof import('../../frontend/components/MkSignin.passkey.vue')>('../../frontend/components/MkSignin.passkey.vue');
+	vi.mocked(startAuthentication).mockRejectedValue(new DOMException('Cancelled', 'NotAllowedError'));
+	app = createApp(Passkey, { credentialRequest: option('synthetic'), onDone: emitted });
+	app.use(internationalization); app.config.errorHandler = error => { errors.push(error); }; app.mount(element); await settle();
+	expect(emitted).not.toHaveBeenCalled(); expect(element.querySelector('button')?.disabled).toBe(false);
+});
+
+test('KeepAlive deactivation clears the old password flow and ignores its late completion after reactivation', async () => {
+	const visible = ref(true);
+	app = createApp(defineComponent({ setup: () => () => h(KeepAlive, () => visible.value ? h(Signin, { autoSet: true, onLogin: emitted }) : null) }));
+	app.use(internationalization); app.config.errorHandler = error => { errors.push(error); }; app.mount(element);
+	await passwordPath(); let finish!: (value: never) => void;
+	vi.mocked(misskeyApi).mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+	state.handlers.totp('123456'); await settle(); visible.value = false; await settle(); visible.value = true; await settle();
+	finish(finished as never); await settle(); expect(page()).toBe('input'); expect(emitted).not.toHaveBeenCalled(); expect(login).not.toHaveBeenCalled();
+});
+
+test('real cached passkey view discards its old native credential after deactivation and reactivation', async () => {
+	const { default: Passkey } = await vi.importActual<typeof import('../../frontend/components/MkSignin.passkey.vue')>('../../frontend/components/MkSignin.passkey.vue');
+	let finish!: (value: typeof credential) => void; vi.mocked(startAuthentication).mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+	const visible = ref(true);
+	app = createApp(defineComponent({ setup: () => () => h(KeepAlive, () => visible.value ? h(Passkey, { credentialRequest: option('synthetic'), onDone: emitted }) : null) }));
+	app.use(internationalization); app.config.errorHandler = error => { errors.push(error); }; app.mount(element); await settle();
+	visible.value = false; await settle(); visible.value = true; await settle(); finish(credential); await settle(); expect(emitted).not.toHaveBeenCalled();
+});
+
+test('real passkey recovery-only fallback resolves its exact new primary label in English UI', async () => {
+	const { default: Passkey } = await vi.importActual<typeof import('../../frontend/components/MkSignin.passkey.vue')>('../../frontend/components/MkSignin.passkey.vue');
+	vi.mocked(startAuthentication).mockReturnValue(new Promise<never>(() => {}));
+	app = createApp(Passkey, { credentialRequest: option('synthetic'), canUseTotp: true, recoveryOnly: true });
+	app.use(internationalization); app.config.errorHandler = error => { errors.push(error); }; app.mount(element); await settle();
+	expect(element.querySelectorAll('button')[1].textContent).toBe('バックアップコードを使う');
 });

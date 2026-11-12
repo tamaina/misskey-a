@@ -27,6 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #label>{{ globalLocale.env.name }}</template>
 				</MkInput>
 			</div>
+			<MkTokenExpiry v-model="expiry"/>
 			<div><b>{{ globalLocale.env.permission }}</b></div>
 			<MkPermissionSelect v-model="selectedPermissions" :permissions="Misskey.permissions" :administrator="!!iAmAdmin"/>
 		</div>
@@ -42,7 +43,10 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import { iAmAdmin } from '@features/auth/frontend/i.js';
+import * as os from '@features/ui/frontend/os.js';
+import { selectedCredentialExpiry } from '../utility/use-credential-operation.js';
 import MkPermissionSelect from './MkPermissionSelect.vue';
+import MkTokenExpiry from './MkTokenExpiry.vue';
 import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
@@ -61,17 +65,21 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
 	(ev: 'closed'): void;
-	(ev: 'done', result: { name: string | null, permissions: string[] }): void;
+	(ev: 'done', result: { name: string | null, permissions: string[], expiresAt?: string }): void;
 }>();
 
 const dialog = useTemplateRef('dialog');
 const name = ref(props.initialName);
+const expiry = ref<string | null>(null);
 const selectedPermissions = ref<string[]>(props.initialPermissions ? [...props.initialPermissions] : []);
 
-function ok(): void {
+async function ok(): Promise<void> {
+	let expiresAt: string | undefined;
+	try { expiresAt = selectedCredentialExpiry(expiry.value); } catch { await os.alert({ type: 'error', text: $locale.value.sfc.invalidExpiry }); return; }
 	emit('done', {
 		name: name.value,
 		permissions: selectedPermissions.value,
+		...(expiresAt ? { expiresAt } : {}),
 	});
 	dialog.value?.close();
 }
@@ -119,7 +127,9 @@ function ok(): void {
 </locale>
 
 <locale lang="json" locale="ja-JP">
-{}
+{
+	"invalidExpiry": "有効期限には未来の日時を指定してください。"
+}
 </locale>
 
 <locale lang="json" locale="ja-KS">

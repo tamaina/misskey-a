@@ -5,6 +5,7 @@
 
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
+import { IsNull, MoreThan, Or } from 'typeorm';
 import type { MiAbuseReportNotificationRecipient, MiAbuseUserReport, MiAntenna, MiApp, MiAuthSession, MiBlocking, MiChannel, MiChatMessage, MiDriveFile, MiDriveFolder, MiEmoji, MiFollowing, MiFollowRequest, MiHashtag, MiInstance, MiMeta, MiModerationLog, MiMuting, MiRegistrationTicket, MiRenoteMuting, MiReversiGame, MiRole, MiSignin, MiSystemWebhook, MiUser, MiUserList, MiUserListMembership } from '@features/persistence/backend/repositories/models.js';
 import { authServices } from '@features/auth/backend/services.js';
 import { channelServices } from '@features/channels/backend/services.js';
@@ -35,19 +36,24 @@ const detailedUser = fixture<Packed<'UserDetailedNotMe'>>({ id: 'user' });
 
 describe('annotation-free feature serializers', () => {
 	test('auth sessions reuse their composed app serializer and preserve secret visibility', async () => {
-		const deps = mockDeep<Inputs<typeof authServices>>();
-		const app = fixture<MiApp>({ id: 'app', secret: 'secret', permission: [] });
-		deps.appsRepository.findOneByOrFail.mockResolvedValue(app);
-		deps.accessTokensRepository.countBy.mockResolvedValue(1);
-		const services = authServices.create(deps);
-		const packApp = vi.spyOn(services.AppEntityService, 'pack');
-		const pack = services.AuthSessionEntityService.pack;
-		const packed = await pack(fixture<MiAuthSession>({ id: 'session', appId: 'app', token: 'token' }), viewer);
-		expect(packApp).toHaveBeenCalledWith('app', viewer);
-		expect(packed.app).toMatchObject({ id: 'app', isAuthorized: true });
-		expect(packed.app).not.toHaveProperty('secret');
-		expect(await services.AppEntityService.pack(app, null, { includeSecret: true })).toHaveProperty('secret', 'secret');
-		expect(deps.accessTokensRepository.countBy).toHaveBeenCalledWith({ appId: 'app', userId: 'viewer' });
+		vi.useFakeTimers({ now: date });
+		try {
+			const deps = mockDeep<Inputs<typeof authServices>>();
+			const app = fixture<MiApp>({ id: 'app', secret: 'secret', permission: [] });
+			deps.appsRepository.findOneByOrFail.mockResolvedValue(app);
+			deps.accessTokensRepository.countBy.mockResolvedValue(1);
+			const services = authServices.create(deps);
+			const packApp = vi.spyOn(services.AppEntityService, 'pack');
+			const pack = services.AuthSessionEntityService.pack;
+			const packed = await pack(fixture<MiAuthSession>({ id: 'session', appId: 'app', token: 'token' }), viewer);
+			expect(packApp).toHaveBeenCalledWith('app', viewer);
+			expect(packed.app).toMatchObject({ id: 'app', isAuthorized: true });
+			expect(packed.app).not.toHaveProperty('secret');
+			expect(await services.AppEntityService.pack(app, null, { includeSecret: true })).toHaveProperty('secret', 'secret');
+			expect(deps.accessTokensRepository.countBy).toHaveBeenCalledWith({ appId: 'app', userId: 'viewer', expiresAt: Or(IsNull(), MoreThan(date)) });
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
 	test('invite codes keep dates and batch user hints without repacking', async () => {

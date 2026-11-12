@@ -7,8 +7,9 @@ import { call } from '@orpc/server';
 import bcrypt from 'bcryptjs';
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import type { MiUserProfile } from '../../../persistence/backend/repositories/models.js';
 import { createSigninFlowProcedure } from '../../backend/endpoints/signinFlow.js';
+import type { MiUserProfile } from '../../../persistence/backend/repositories/models.js';
+import type { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
 import type { SigninFlowDependencies } from '../../backend/endpoints/signinFlow.js';
 import type { PackedJsonValue } from '../../../users/backend/json-value.schema.js';
 import type { AuthSessionContext } from '../../backend/session.effects.js';
@@ -19,8 +20,8 @@ function fixture(twoFactorEnabled = true) {
 	const deps = mockDeep<SigninFlowDependencies>();
 	const user = mockDeep<MiLocalUser>({ id: 'alice', host: null, isSuspended: false, isDeleted: false });
 	deps.usersRepository.findOneBy.mockResolvedValue(user);
-	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled, usePasswordLessLogin: false }));
-	deps.userSecurityKeysRepository.countBy.mockResolvedValue(0);
+	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled, twoFactorSecret: twoFactorEnabled ? 'synthetic-secret' : null, passkeyMfaEnabled: false, twoFactorBackupSecret: [], usePasswordLessLogin: false }));
+	deps.userSecurityKeysRepository.findBy.mockResolvedValue([]);
 	deps.loggerService.getLogger.mockReturnValue(mockDeep<Logger>());
 	deps.rateLimiterService.limit.mockResolvedValue(null);
 	deps.signinService.signin.mockResolvedValue({ finished: true, id: 'alice', i: 'bs_synthetic' });
@@ -53,10 +54,15 @@ test('wrong password and rejected MFA never reach browser session issuance', asy
 
 test('passkey completion also awaits the shared issuer, while rejected credentials issue nothing', async () => {
 	const h = fixture();
-	h.deps.webAuthnService.verifyAuthentication.mockResolvedValue(true);
+	h.deps.userSecurityKeysRepository.findBy.mockResolvedValue([mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: 'alice', publicKey: 'AQID' })]);
+	h.deps.webAuthnService.verifyAuthenticationWithProof.mockImplementation(async (_id, _response, before) => {
+		const key = { id: 'AQID', userId: 'alice', publicKey: 'AQID', userVerified: true, deadline: performance.now() + 90_000 };
+		return { key, expected: await before(key) };
+	});
 	expect(await h.invoke({ password: 'synthetic-password', credential: {} })).toEqual({ finished: true, id: 'alice', i: 'bs_synthetic' });
 	const rejected = fixture();
-	rejected.deps.webAuthnService.verifyAuthentication.mockResolvedValue(false);
+	rejected.deps.userSecurityKeysRepository.findBy.mockResolvedValue([mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: 'alice', publicKey: 'AQID' })]);
+	rejected.deps.webAuthnService.verifyAuthenticationWithProof.mockResolvedValue(null);
 	await rejected.invoke({ password: 'synthetic-password', credential: {} });
 	expect(rejected.deps.signinService.signin).not.toHaveBeenCalled();
 });

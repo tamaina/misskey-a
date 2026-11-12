@@ -7,7 +7,8 @@ import { createApp, defineComponent, h, nextTick } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import MkAuthConfirm from '../../frontend/components/MkAuthConfirm.vue';
 
-vi.mock('@features/auth/frontend/i.js', () => ({ $i: { id: 'synthetic-user', token: 'synthetic-login', isAdmin: false } }));
+vi.mock('@features/auth/frontend/i.js', () => ({ $i: { id: 'synthetic-user', token: `bs_${'a'.repeat(43)}`, isAdmin: false } }));
+vi.mock('../../frontend/utility/ensure-sudo.js', () => ({ ensureSudo: vi.fn(async () => true) }));
 vi.mock('@features/auth/frontend/accounts.js', () => ({ getAccounts: async () => [] }));
 vi.mock('@features/ui/frontend/os.js', () => ({}));
 vi.mock('@features/drive/frontend/utility/media-proxy.js', () => ({ getProxiedImageUrl: () => '' }));
@@ -51,6 +52,6 @@ it.each([
 		if (add) { checkbox.checked = true; checkbox.dispatchEvent(new Event('change')); await flush(); }
 		accept.click(); await flush();
 		if (requested.length === 0 && !add) expect(accepted).not.toHaveBeenCalled();
-		else expect(accepted).toHaveBeenCalledWith('synthetic-login', add ? ['read:account'] : []);
+		else expect(accepted).toHaveBeenCalledWith(`bs_${'a'.repeat(43)}`, add ? ['read:account'] : [], undefined);
 	} finally { app.unmount(); element.remove(); }
 });

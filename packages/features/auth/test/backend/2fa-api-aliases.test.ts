@@ -26,6 +26,7 @@ import { aliasTwoFactorContract } from '../../backend/2fa-api-aliases.contract.j
 import { aliasTwoFactorProcedure, createAuthRouter } from '../../backend/api.implementation.js';
 import { authContract } from '../../backend/api.definition.js';
 import baseline from './fixtures/2fa-api-alias-baseline.json';
+import expiryRebases from './fixtures/credential-expiry-operation-rebase.json';
 import { restoreAnnouncementOperationBaseline } from '../../../announcements/test/backend/operation-rebase.js';
 import { testContext } from './native-context.js';
 import type { AuthRouterDependencies } from '../../backend/api.implementation.js';
@@ -111,6 +112,85 @@ function signinBranches(operation: unknown): unknown[] {
 	if (!Array.isArray(success.anyOf)) throw new Error('Invalid availability success union');
 	expect(success.anyOf).toHaveLength(4);
 	return success.anyOf;
+}
+
+const progressOpaqueShape = { type: 'string', pattern: '^[A-Za-z0-9_-]{43}$' };
+const progressShape = { type: 'object', properties: {
+	ticket: progressOpaqueShape, browserSecret: progressOpaqueShape, nonce: progressOpaqueShape,
+	version: { type: 'integer', minimum: 0, maximum: Number.MAX_SAFE_INTEGER },
+}, required: ['ticket', 'browserSecret', 'nonce', 'version'], additionalProperties: false };
+
+function restorePreProgressSigninOperation(operation: unknown): unknown {
+	const restored: unknown = structuredClone(operation);
+	const branches = signinBranches(restored);
+	for (const index of [2, 3]) {
+		const branch = object(branches[index]);
+		const properties = object(branch.properties);
+		expect(properties.authenticationProgress).toEqual(progressShape);
+		expect(branch.required).toEqual(index === 2 ? ['finished', 'next'] : ['finished', 'next', 'authRequest']);
+		delete properties.authenticationProgress;
+	}
+	expect(schemaHash(restored)).toBe(signinPolicyOperationHashes['/signin-flow']);
+	return restored;
+}
+
+// Issue #180 changes only these two response boundaries. Restore them before
+// applying the unchanged availability and historical alias oracles.
+const signinPolicyOperationHashes = {
+	'/signin-flow': '1cfb7d68266d3cc3a3be88acb287eac09d5a3a1a3febc3c6ee50313c764da040',
+	'/signin-with-passkey': '57ce9cdbbf224ee25817ea295d31b185d24fe58f92a0a75de021aa5aaff2127e',
+};
+const recoveryFactorsShape = { type: 'array', items: { enum: ['totp', 'passkey', 'recovery'], type: 'string' }, minItems: 1, maxItems: 3 };
+
+/** Accept only the pinned optional expiry additions, then apply the frozen legacy oracle. */
+function restorePreExpiryOperation(path: string, operation: unknown): unknown {
+	const rebase = expiryRebases.find(entry => entry.path === path);
+	if (!rebase) return operation;
+	expect(schemaHash(operation), path).toBe(rebase.currentSha256);
+	const restored: unknown = structuredClone(operation);
+	for (const removal of rebase.removals) {
+		let parent: unknown = restored;
+		for (const part of removal.parent) {
+			if (parent === null || typeof parent !== 'object' || !(part in parent)) throw new Error('Expiry inverse parent differs');
+			parent = Reflect.get(parent, part);
+		}
+		if (typeof removal.key === 'number') {
+			if (!Array.isArray(parent)) throw new Error('Expiry inverse array differs');
+			expect(parent[removal.key]).toEqual(removal.current);
+			parent.splice(removal.key, 1);
+		} else {
+			expect(object(parent)[removal.key]).toEqual(removal.current);
+			delete object(parent)[removal.key];
+		}
+	}
+	expect(schemaHash(restored), path).toBe(rebase.baselineSha256);
+	return restored;
+}
+
+function restorePreSigninPolicyOperation(path: string, operation: unknown): unknown {
+	if (path !== '/signin-flow' && path !== '/signin-with-passkey') return operation;
+	if (path === '/signin-flow') operation = restorePreProgressSigninOperation(operation);
+	expect(schemaHash(operation)).toBe(signinPolicyOperationHashes[path]);
+	const restored: unknown = structuredClone(operation);
+	if (path === '/signin-flow') {
+		const branches = signinBranches(restored);
+		for (const index of [2, 3]) {
+			const properties = object(object(branches[index]).properties);
+			expect(properties.availableFactors).toEqual(recoveryFactorsShape);
+			properties.availableFactors = structuredClone(availableFactorsShape);
+		}
+		expect(schemaHash(restored)).toBe(availableSigninOperationHash);
+	} else {
+		const output = signinOutput(restored);
+		expect(Object.keys(output).sort()).toEqual(['$schema', 'anyOf']);
+		expect(output.$schema).toBe('https://json-schema.org/draft/2020-12/schema');
+		if (!Array.isArray(output.anyOf)) throw new Error('Invalid login policy union');
+		expect(output.anyOf).toHaveLength(4);
+		expect(output.anyOf[3]).toEqual({ type: 'object', properties: { passwordFlowRequired: { const: true } }, required: ['passwordFlowRequired'], additionalProperties: false });
+		output.anyOf.pop();
+		expect(schemaHash(restored)).toBe(baseline.operationHashes[path]);
+	}
+	return restored;
 }
 
 function restorePreAvailabilitySigninOperation(operation: unknown): unknown {
@@ -209,7 +289,7 @@ test('actual portable generator preserves every legacy operation and public sche
 	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
-		const operation = spec.paths?.[path];
+		const operation = restorePreSigninPolicyOperation(path, restorePreExpiryOperation(path, spec.paths?.[path]));
 		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreClientQrOperationBaseline(path, restoreWebhookOperationBaseline(path, restoreAnnouncementOperationBaseline(path, operation)))), path).toBe(hash);
 	}
 	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreWebhookSchemaBaseline(name, spec.components?.schemas?.[name])), name).toBe(hash);
@@ -227,9 +307,27 @@ test('actual portable generator preserves every legacy operation and public sche
 	}
 });
 
+test('expiry inverse rejects changed constraints and unrelated operation metadata', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	for (const rebase of expiryRebases) {
+		const original = spec.paths?.[rebase.path];
+		expect(schemaHash(restorePreExpiryOperation(rebase.path, original))).toBe(baseline.operationHashes[rebase.path as keyof typeof baseline.operationHashes]);
+		for (const removal of rebase.removals) {
+			const changed: unknown = structuredClone(original);
+			let parent: unknown = changed;
+			for (const part of removal.parent) parent = Reflect.get(parent as object, part);
+			Reflect.set(parent as object, removal.key, null);
+			expect(() => restorePreExpiryOperation(rebase.path, changed)).toThrow();
+		}
+		const changed: unknown = structuredClone(original);
+		object(object(changed).post).operationId = 'unexpected';
+		expect(() => restorePreExpiryOperation(rebase.path, changed)).toThrow();
+	}
+});
+
 test('availability inverse rejects tampering at every allowed boundary and outside the response', async () => {
 	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
-	const original = spec.paths?.['/signin-flow'];
+	const original = restorePreSigninPolicyOperation('/signin-flow', spec.paths?.['/signin-flow']);
 	const originalHash = schemaHash(original);
 	expect(schemaHash(restorePreAvailabilitySigninOperation(original))).toBe(baseline.operationHashes['/signin-flow']);
 	expect(schemaHash(original)).toBe(originalHash);
@@ -253,6 +351,41 @@ test('availability inverse rejects tampering at every allowed boundary and outsi
 		const changed: unknown = structuredClone(original);
 		change(changed);
 		expect(() => restorePreAvailabilitySigninOperation(changed)).toThrow();
+	}
+});
+
+test('login policy inverse is exact, immutable and rejects added outcomes or changed factor boundaries', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	for (const path of ['/signin-flow', '/signin-with-passkey'] as const) {
+		const original = spec.paths?.[path]; const originalHash = schemaHash(original);
+		const restored = restorePreSigninPolicyOperation(path, original);
+		expect(schemaHash(original)).toBe(originalHash);
+		expect(schemaHash(restored)).toBe(path === '/signin-flow' ? availableSigninOperationHash : baseline.operationHashes[path]);
+		const changes: Array<(operation: unknown) => void> = [
+			operation => { object(object(operation).post).operationId = 'wrong'; },
+			operation => { object(object(operation).post).security = []; },
+			operation => { object(object(operation).post).requestBody = {}; },
+			operation => { object(object(object(operation).post).responses)['403'] = {}; },
+		];
+		if (path === '/signin-flow') {
+			for (const index of [2, 3]) {
+				changes.push(operation => { object(object(object(signinBranches(operation)[index]).properties).availableFactors).maxItems = 4; });
+				changes.push(operation => { object(object(object(signinBranches(operation)[index]).properties).availableFactors).minItems = 0; });
+				changes.push(operation => { object(object(object(signinBranches(operation)[index]).properties).availableFactors).items = { type: 'string', enum: ['totp', 'passkey'] }; });
+				changes.push(operation => { object(signinBranches(operation)[index]).required = ['finished', 'next', 'availableFactors']; });
+			}
+		} else {
+			const fallback = (operation: unknown) => { const branches = signinOutput(operation).anyOf; if (!Array.isArray(branches)) throw new Error('Invalid union'); return object(branches[3]); };
+			changes.push(operation => { fallback(operation).additionalProperties = true; });
+			changes.push(operation => { fallback(operation).required = []; });
+			changes.push(operation => { object(fallback(operation).properties).passwordFlowRequired = { type: 'boolean' }; });
+			changes.push(operation => { object(fallback(operation).properties).signinResponse = { type: 'string' }; });
+			changes.push(operation => { const branches = signinOutput(operation).anyOf; if (!Array.isArray(branches)) throw new Error('Invalid union'); branches.push({}); });
+		}
+		for (const change of changes) {
+			const changed: unknown = structuredClone(original); change(changed);
+			expect(() => restorePreSigninPolicyOperation(path, changed)).toThrow();
+		}
 	}
 });
 

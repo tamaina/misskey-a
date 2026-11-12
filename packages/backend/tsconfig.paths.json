@@ -25,6 +25,7 @@
 			"typeorm": ["./node_modules/typeorm/index.d.ts"],
 			"typeorm/*": ["./node_modules/typeorm/*"],
 			"jose": ["./node_modules/jose/dist/types/index.d.ts"],
+			"cbor2": ["./node_modules/cbor2/lib/index.d.ts"],
 			"json5": ["./node_modules/json5"],
 			"ioredis": ["./node_modules/ioredis"],
 			"rss-parser": ["./node_modules/rss-parser"],

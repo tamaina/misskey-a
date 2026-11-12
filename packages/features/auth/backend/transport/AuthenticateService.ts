@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { accessTokenExpired } from '../access-token-expiry.js';
 import { IsNull } from 'typeorm';
 import { BrowserSessionService } from '../services/BrowserSessionService.js';
 import type { BrowserSessionIdentity } from '@features/api/backend/transport/context.js';
@@ -77,7 +78,7 @@ export class AuthenticateService implements OnApplicationShutdown {
 				}],
 			});
 
-			if (accessToken == null) {
+			if (accessToken == null || accessTokenExpired(accessToken)) {
 				throw new AuthenticationError('invalid signature');
 			}
 
@@ -96,6 +97,7 @@ export class AuthenticateService implements OnApplicationShutdown {
 
 				return [user, {
 					id: accessToken.id,
+					expiresAt: accessToken.expiresAt ?? null,
 					permission: app.permission,
 				} as MiAccessToken];
 			} else {

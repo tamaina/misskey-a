@@ -5,6 +5,10 @@
 
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
+import type { DataSource } from 'typeorm';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { MiPasswordResetRequest } from '../models/PasswordResetRequest.js';
 import { IsNull } from 'typeorm';
 import type { PasswordResetRequestsRepository, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 
@@ -26,6 +30,7 @@ export const meta = {
 	},
 } as const;
 export interface RequestResetPasswordDependencies {
+	db: Pick<DataSource, 'transaction'>;
 	config: Config;
 	usersRepository: UsersRepository;
 	userProfilesRepository: UserProfilesRepository;
@@ -61,15 +66,19 @@ export function createRequestResetPasswordProcedure(deps: RequestResetPasswordDe
 
 			const token = secureRndstr(64, { chars: L_CHARS });
 
-			await deps.passwordResetRequestsRepository.insert({
-				id: deps.idService.gen(),
-				userId: profile.userId,
-				token,
+			const inserted = await deps.db.transaction(async manager => {
+				const currentUser = await manager.getRepository(MiUser).findOne({ where: { id: user.id }, lock: { mode: 'pessimistic_write' } });
+				const current = await manager.getRepository(MiUserProfile).findOne({ where: { userId: user.id }, lock: { mode: 'pessimistic_write' } });
+				if (!currentUser || currentUser.host !== null || currentUser.isDeleted || currentUser.isSuspended
+					|| !current || current.email !== ps.email || !current.emailVerified || current.password !== profile.password) return false;
+				await manager.getRepository(MiPasswordResetRequest).insert({ id: deps.idService.gen(), userId: user.id, token });
+				return true;
 			});
+			if (!inserted) return;
 
 			const link = `${deps.config.url}/reset-password/${token}`;
 
-			deps.emailService.sendEmail(ps.email, 'Password reset requested',
+			await deps.emailService.sendEmail(ps.email, 'Password reset requested',
 				`To reset password, please click this link:<br><a href="${link}">${link}</a>`,
 				`To reset password, please click this link: ${link}`);
 		})();

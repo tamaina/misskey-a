@@ -218,7 +218,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkAuthConfirm.vue",
-		"currentSha256": "5d1e9415e15fcfc5a973bbe6939d4405cb528aa4307b5806114159e231b57cfd",
+		"currentSha256": "44893dc863faef52c8f0864d4f6a3b4ea10f844c45af7e66940ede61f38eb778",
 		"baselineSha256": "d36befd86c58d5f8f193dfba5dc43edaab4138f5dc9a535cfe517b16cc5f8245",
 		"keys": [
 			"somethingHappened",
@@ -267,27 +267,63 @@ export const globalCatalogPilotOwners = [
 			},
 			{
 				"start": 3160,
-				"end": 3332,
-				"current": "\t\t\t<MkPermissionSelect\n\t\t\t\tv-if=\"selectablePermissions\" v-model=\"selectedPermissions\" :permissions=\"selectablePermissions\"\n\t\t\t\t:administrator=\"selectedAdministrator\"\n\t\t\t/>\n",
+				"end": 3461,
+				"current": "\t\t\t<MkPermissionSelect\n\t\t\t\tv-if=\"selectablePermissions\" v-model=\"selectedPermissions\" :permissions=\"selectablePermissions\"\n\t\t\t\t:administrator=\"selectedAdministrator\"\n\t\t\t/>\n\t\t\t<MkTokenExpiry v-model=\"expiry\" :disabled=\"waiting\"/>\n\t\t\t<p v-if=\"!canAuthorize\">{{ $locale.sfc.currentAccountRequired }}</p>\n",
 				"baseline": "\t\t\t<MkPermissionSelect v-if=\"selectablePermissions\" v-model=\"selectedPermissions\" :permissions=\"selectablePermissions\"\n\t\t\t\t:administrator=\"selectedAdministrator\" :labels=\"copyLocaleDictionary(globalLocale.env._permissions)\"\n\t\t\t\t:disableAllText=\"globalLocale.env.disableAll\" :enableAllText=\"globalLocale.env.enableAll\"\n\t\t\t\t:disableAllAdminText=\"globalLocale.env.disableAllAdmin\" :enableAllAdminText=\"globalLocale.env.enableAllAdmin\" :adminPermissionText=\"globalLocale.env.adminPermission\"/>\n"
 			},
 			{
-				"start": 5611,
-				"end": 5611,
+				"start": 4302,
+				"end": 4521,
+				"current": "\t\t\t\t<MkButton rounded gradate :disabled=\"!canAuthorize || (selectablePermissions !== undefined && !permissions?.length && selectedPermissions.length === 0)\" @click=\"clickAccept\">{{ globalLocale.env.accept }}</MkButton>\n",
+				"baseline": "\t\t\t\t<MkButton rounded gradate :disabled=\"selectablePermissions !== undefined && !permissions?.length && selectedPermissions.length === 0\" @click=\"clickAccept\">{{ globalLocale.env.accept }}</MkButton>\n"
+			},
+			{
+				"start": 5759,
+				"end": 5759,
 				"current": "",
 				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 5687,
-				"end": 5687,
+				"start": 5835,
+				"end": 5835,
 				"current": "",
 				"baseline": "import MkPermissionSelect from './MkPermissionSelect.vue';\n"
 			},
 			{
-				"start": 6344,
-				"end": 6497,
-				"current": "import MkPermissionSelect from './MkPermissionSelect.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"start": 6492,
+				"end": 6857,
+				"current": "import { ensureSudo } from '../utility/ensure-sudo.js';\nimport { selectedCredentialExpiry, useCredentialOperation } from '../utility/use-credential-operation.js';\nimport MkPermissionSelect from './MkPermissionSelect.vue';\nimport MkTokenExpiry from './MkTokenExpiry.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 7129,
+				"end": 7211,
+				"current": "\t(ev: 'accept', token: string, permissions?: string[], expiresAt?: string): void;\n",
+				"baseline": "\t(ev: 'accept', token: string, permissions?: string[]): void;\n"
+			},
+			{
+				"start": 7254,
+				"end": 7392,
+				"current": "const expiry = ref<string | null>(null);\nconst operation = useCredentialOperation(() => { expiry.value = null; waiting.value = false; });\n",
+				"baseline": ""
+			},
+			{
+				"start": 7894,
+				"end": 8116,
+				"current": "\nconst canAuthorize = computed(() => { const user = selectedUser.value ? users.value.get(selectedUser.value) : undefined; return !!user && $i?.id === user.id && $i.token === user.token && user.token.startsWith('bs_'); });\n",
+				"baseline": ""
+			},
+			{
+				"start": 10428,
+				"end": 11102,
+				"current": "\tif (selectedUser.value === null || !canAuthorize.value) return;\n\tconst user = users.value.get(selectedUser.value)!; const permissions = props.selectablePermissions === undefined ? undefined : [...selectedPermissions.value]; const targetExpiry = expiry.value;\n\tawait operation.run(async (current, signal) => {\n\t\twaiting.value = true;\n\t\ttry {\n\t\t\tconst expiresAt = selectedCredentialExpiry(targetExpiry);\n\t\t\tif (!await ensureSudo(current, signal) || !current() || !canAuthorize.value || selectedUser.value !== user.id) { if (current()) waiting.value = false; return; }\n\t\t\temit('accept', user.token, permissions, expiresAt);\n\t\t} catch { if (current()) showUI('failed'); }\n\t});\n",
+				"baseline": "\tif (selectedUser.value === null) return;\n\n\tconst user = users.value.get(selectedUser.value)!;\n\n\tconst token = user.token;\n\n\twaiting.value = true;\n\temit('accept', token, props.selectablePermissions === undefined ? undefined : [...selectedPermissions.value]);\n"
+			},
+			{
+				"start": 22545,
+				"end": 22676,
+				"current": "\t\"createAccount\": \"アカウントを作成\",\n\t\"currentAccountRequired\": \"対象アカウントへ切り替え、通常のログインで個別セッションを作成してから承認してください。保存済みの別アカウントや旧トークンでは承認できません。\"\n",
+				"baseline": "\t\"createAccount\": \"アカウントを作成\"\n"
 			}
 		],
 		"groupOrders": {
@@ -501,7 +537,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignin.passkey.vue",
-		"currentSha256": "fce447069c14359af20864626d428bc8dbf72df7c118d40fa71bfc83bc0cfb54",
+		"currentSha256": "a69d8a69b3364c4b9f631d799743c3f9be5cfcee60fb95b614181ffc90fc2bb0",
 		"baselineSha256": "f0ac9281aabe608396969de32b234c1fa1d5f57ff4f016a019782c3749ccca37",
 		"keys": [
 			"retry"
@@ -513,21 +549,63 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 857,
-				"end": 857,
-				"current": "",
-				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+				"start": 525,
+				"end": 782,
+				"current": "\t\t<MkButton v-if=\"isPerformingPasswordlessLogin !== true && canUseTotp !== false\" transparent rounded :disabled=\"queryingKey\" style=\"margin: 0 auto;\" @click=\"emit('useTotp')\">{{ recoveryOnly ? $locale.sfc.useRecoveryCode : $locale.sfc.useTotp }}</MkButton>\n",
+				"baseline": "\t\t<MkButton v-if=\"isPerformingPasswordlessLogin !== true && canUseTotp !== false\" transparent rounded :disabled=\"queryingKey\" style=\"margin: 0 auto;\" @click=\"emit('useTotp')\">{{ $locale.sfc.useTotp }}</MkButton>\n"
 			},
 			{
-				"start": 1029,
-				"end": 1065,
+				"start": 902,
+				"end": 985,
+				"current": "import { ref, onActivated, onBeforeUnmount, onDeactivated, onMounted } from 'vue';\n",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport { ref, onMounted } from 'vue';\n"
+			},
+			{
+				"start": 1119,
+				"end": 1155,
 				"current": "import type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 1180,
-				"end": 1238,
+				"start": 1270,
+				"end": 1328,
 				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"baseline": ""
+			},
+			{
+				"start": 1494,
+				"end": 1569,
+				"current": "\trecoveryOnly?: boolean;\n}>(), { canUseTotp: true, recoveryOnly: false });\n",
+				"baseline": "}>(), { canUseTotp: true });\n"
+			},
+			{
+				"start": 1721,
+				"end": 1761,
+				"current": "let active = true;\nlet generation = 0;\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 1789,
+				"end": 1838,
+				"current": "\tif (!active) return;\n\tconst run = ++generation;\n",
+				"baseline": ""
+			},
+			{
+				"start": 1865,
+				"end": 2187,
+				"current": "\ttry {\n\t\tconst credential = await startAuthentication({ optionsJSON: props.credentialRequest });\n\t\tif (active && run === generation) emit('done', credential);\n\t} catch {\n\t\t// Cancellation keeps the owned retry and code alternatives available.\n\t} finally {\n\t\tif (active && run === generation) queryingKey.value = false;\n\t}\n",
+				"baseline": "\tawait startAuthentication({ optionsJSON: props.credentialRequest })\n\t\t.catch(() => {\n\t\t\treturn Promise.reject(null);\n\t\t})\n\t\t.then((credential) => {\n\t\t\temit('done', credential);\n\t\t})\n\t\t.finally(() => {\n\t\t\tqueryingKey.value = false;\n\t\t});\n"
+			},
+			{
+				"start": 2189,
+				"end": 2370,
+				"current": "\nonActivated(() => { active = true; });\nonDeactivated(() => { active = false; generation++; queryingKey.value = false; });\nonBeforeUnmount(() => { active = false; generation++; });\n",
+				"baseline": ""
+			},
+			{
+				"start": 5050,
+				"end": 5087,
+				"current": "  \"useRecoveryCode\": \"バックアップコードを使う\",\n",
 				"baseline": ""
 			}
 		]
@@ -568,7 +646,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignin.totp.vue",
-		"currentSha256": "d5df15ace2eebe10d6078cf158fbd1d293ed8710766052bfa49c0fbad61ec805",
+		"currentSha256": "5f2988ded97deea691eb8777b5717140e233f61eb1fb63d6d21b42b963da69db",
 		"baselineSha256": "6b19cabca936e5980d2807f1f4a6a36df058dfed62803c05f3989aab2f6d86b2",
 		"keys": [
 			"continue"
@@ -582,15 +660,39 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1349,
-				"end": 1349,
-				"current": "",
-				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+				"start": 281,
+				"end": 395,
+				"current": "\t\t\t<div :class=\"$style.totpDescription\">{{ isBackupCode ? $locale.sfc.useBackupCode : $locale.sfc['2fa'] }}</div>\n",
+				"baseline": "\t\t\t<div :class=\"$style.totpDescription\">{{ $locale.sfc['2fa'] }}</div>\n"
 			},
 			{
-				"start": 1515,
-				"end": 1609,
-				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"start": 905,
+				"end": 1131,
+				"current": "\t\t\t\t<template v-if=\"allowTotp && allowRecovery\" #caption><button class=\"_textButton\" type=\"button\" @click=\"isBackupCode = !isBackupCode\">{{ isBackupCode ? $locale.sfc.useTotp : $locale.sfc.useBackupCode }}</button></template>\n",
+				"baseline": "\t\t\t\t<template #caption><button class=\"_textButton\" type=\"button\" @click=\"isBackupCode = !isBackupCode\">{{ isBackupCode ? $locale.sfc.useTotp : $locale.sfc.useBackupCode }}</button></template>\n"
+			},
+			{
+				"start": 1146,
+				"end": 1337,
+				"current": "\t\t\t<MkButton type=\"submit\" :disabled=\"!allowTotp && !allowRecovery\" large primary rounded style=\"margin: 0 auto;\">{{ globalLocale.env.continue }} <i class=\"ti ti-arrow-right\"></i></MkButton>\n",
+				"baseline": "\t\t\t<MkButton type=\"submit\" large primary rounded style=\"margin: 0 auto;\">{{ globalLocale.env.continue }} <i class=\"ti ti-arrow-right\"></i></MkButton>\n"
+			},
+			{
+				"start": 1467,
+				"end": 1501,
+				"current": "import { ref, watch } from 'vue';\n",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport { ref } from 'vue';\n"
+			},
+			{
+				"start": 1640,
+				"end": 1870,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nconst props = withDefaults(defineProps<{ allowTotp?: boolean; allowRecovery?: boolean }>(), { allowTotp: true, allowRecovery: true });\n",
+				"baseline": ""
+			},
+			{
+				"start": 2006,
+				"end": 2201,
+				"current": "watch(() => [props.allowTotp, props.allowRecovery], () => {\n\tif (!props.allowTotp) isBackupCode.value = true;\n\telse if (!props.allowRecovery) isBackupCode.value = false;\n}, { immediate: true });\n",
 				"baseline": ""
 			}
 		]
@@ -701,7 +803,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkTokenGenerateWindow.vue",
-		"currentSha256": "6c6fe37202261ef1bf8d6ce9c11cbcbabe7a4e2eee759ce0de0bd6bbf3dcc192",
+		"currentSha256": "c76faacbecd033a99aa601ccaaab1ccd9291b2208eb6631ba9ac04f6b39bf4e7",
 		"baselineSha256": "ea0dc9eccc892bbb4e8ad2656cb4b795db0739eb194d3899b17bcd839aa60010",
 		"keys": [
 			"name",
@@ -727,34 +829,70 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 748,
-				"end": 866,
+				"start": 693,
+				"end": 730,
+				"current": "\t\t\t<MkTokenExpiry v-model=\"expiry\"/>\n",
+				"baseline": ""
+			},
+			{
+				"start": 785,
+				"end": 903,
 				"current": "\t\t\t<MkPermissionSelect v-model=\"selectedPermissions\" :permissions=\"Misskey.permissions\" :administrator=\"!!iAmAdmin\"/>\n",
 				"baseline": "\t\t\t<MkPermissionSelect v-model=\"selectedPermissions\" :permissions=\"Misskey.permissions\" :administrator=\"!!iAmAdmin\"\n\t\t\t\t:labels=\"copyLocaleDictionary(globalLocale.env.permissionsLabels)\" :disableAllText=\"globalLocale.env.disableAll\" :enableAllText=\"globalLocale.env.enableAll\"\n\t\t\t\t:disableAllAdminText=\"globalLocale.env.disableAllAdmin\" :enableAllAdminText=\"globalLocale.env.enableAllAdmin\" :adminPermissionText=\"globalLocale.env.adminPermission\"/>\n"
 			},
 			{
-				"start": 1005,
-				"end": 1005,
+				"start": 1042,
+				"end": 1042,
 				"current": "",
 				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1155,
-				"end": 1155,
+				"start": 1192,
+				"end": 1192,
 				"current": "",
 				"baseline": "import MkPermissionSelect from './MkPermissionSelect.vue';\n"
 			},
 			{
-				"start": 1301,
-				"end": 1301,
+				"start": 1338,
+				"end": 1338,
 				"current": "",
 				"baseline": "import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';\n"
 			},
 			{
-				"start": 1358,
-				"end": 1511,
-				"current": "import MkPermissionSelect from './MkPermissionSelect.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"start": 1395,
+				"end": 1731,
+				"current": "import * as os from '@features/ui/frontend/os.js';\nimport { selectedCredentialExpiry } from '../utility/use-credential-operation.js';\nimport MkPermissionSelect from './MkPermissionSelect.vue';\nimport MkTokenExpiry from './MkTokenExpiry.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 2070,
+				"end": 2167,
+				"current": "\t(ev: 'done', result: { name: string | null, permissions: string[], expiresAt?: string }): void;\n",
+				"baseline": "\t(ev: 'done', result: { name: string | null, permissions: string[] }): void;\n"
+			},
+			{
+				"start": 2252,
+				"end": 2293,
+				"current": "const expiry = ref<string | null>(null);\n",
+				"baseline": ""
+			},
+			{
+				"start": 2400,
+				"end": 2626,
+				"current": "async function ok(): Promise<void> {\n\tlet expiresAt: string | undefined;\n\ttry { expiresAt = selectedCredentialExpiry(expiry.value); } catch { await os.alert({ type: 'error', text: $locale.value.sfc.invalidExpiry }); return; }\n",
+				"baseline": "function ok(): void {\n"
+			},
+			{
+				"start": 2704,
+				"end": 2743,
+				"current": "\t\t...(expiresAt ? { expiresAt } : {}),\n",
+				"baseline": ""
+			},
+			{
+				"start": 3322,
+				"end": 3368,
+				"current": "{\n\t\"invalidExpiry\": \"有効期限には未来の日時を指定してください。\"\n}\n",
+				"baseline": "{}\n"
 			}
 		],
 		"groupOrders": {
@@ -965,7 +1103,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/auth.form.vue",
-		"currentSha256": "f1198325be0cce660efecfa016e54b07877a2204665d309925207b3f48639bf3",
+		"currentSha256": "f6e4277f9397166dd259f84cc3c6e8c6d4a65026f9783368c9db5939cb541542",
 		"baselineSha256": "8a39620c5410146d90c720df4518695894cba8dfa2231d4ae61381bb8c12c54c",
 		"keys": [
 			"cancel",
@@ -987,16 +1125,46 @@ export const globalCatalogPilotOwners = [
 				"baseline": "\t\t\t<li v-for=\"p in permissions\" :key=\"p\">{{ copyLocaleDictionary(globalLocale.env._permissions)[p] ?? p }}</li>\n"
 			},
 			{
-				"start": 825,
-				"end": 825,
-				"current": "",
-				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+				"start": 510,
+				"end": 630,
+				"current": "\t<p v-if=\"failed\" role=\"alert\">{{ $locale.sfc.issuanceFailed }}</p>\n\t<MkTokenExpiry v-model=\"expiry\" :disabled=\"busy\"/>\n",
+				"baseline": ""
 			},
 			{
-				"start": 1242,
-				"end": 1336,
-				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"start": 661,
+				"end": 855,
+				"current": "\t\t<MkButton inline :disabled=\"busy\" @click=\"cancel\">{{ globalLocale.env.cancel }}</MkButton>\n\t\t<MkButton inline primary :disabled=\"busy\" @click=\"accept\">{{ globalLocale.env.accept }}</MkButton>\n",
+				"baseline": "\t\t<MkButton inline @click=\"cancel\">{{ globalLocale.env.cancel }}</MkButton>\n\t\t<MkButton inline primary @click=\"accept\">{{ globalLocale.env.accept }}</MkButton>\n"
+			},
+			{
+				"start": 979,
+				"end": 1016,
+				"current": "import { computed, ref } from 'vue';\n",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport { computed } from 'vue';\n"
+			},
+			{
+				"start": 1401,
+				"end": 1719,
+				"current": "import { ensureSudo } from '../utility/ensure-sudo.js';\nimport { selectedCredentialExpiry, useCredentialOperation } from '../utility/use-credential-operation.js';\nimport MkTokenExpiry from '../components/MkTokenExpiry.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 1894,
+				"end": 2063,
+				"current": "\nconst expiry = ref<string | null>(null); const failed = ref(false);\nconst { run, busy } = useCredentialOperation(() => { expiry.value = null; failed.value = false; });\n",
+				"baseline": ""
+			},
+			{
+				"start": 2559,
+				"end": 3083,
+				"current": "async function accept() {\n\tconst target = props.session.token; const targetExpiry = expiry.value;\n\tawait run(async (current, signal) => {\n\t\tconst owns = () => current() && props.session.token === target;\n\t\tfailed.value = false;\n\t\ttry {\n\t\tconst expiresAt = selectedCredentialExpiry(targetExpiry);\n\t\tif (!await ensureSudo(owns, signal) || !owns()) return;\n\t\tawait misskeyApi('auth/accept', { token: target, ...(expiresAt ? { expiresAt } : {}) });\n\t\tif (owns()) emit('accepted');\n\t\t} catch { if (owns()) failed.value = true; }\n",
+				"baseline": "function accept() {\n\tmisskeyApi('auth/accept', {\n\t\ttoken: props.session.token,\n\t}).then(() => {\n\t\temit('accepted');\n"
+			},
+			{
+				"start": 5197,
+				"end": 5316,
+				"current": "\t\"authShareAccess\": \"「{name}」がアカウントにアクセスすることを許可しますか？\",\n\t\"issuanceFailed\": \"承認できませんでした。対象アカウント・再認証・有効期限を確認してやり直してください。\"\n",
+				"baseline": "\t\"authShareAccess\": \"「{name}」がアカウントにアクセスすることを許可しますか？\"\n"
 			}
 		],
 		"groupOrders": {
@@ -1094,7 +1262,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/auth.vue",
-		"currentSha256": "d2fb8b2b4cdbc0209d67e0b724fdf77c2b3f4b4750a418ef6c1c1ab044bf0d0a",
+		"currentSha256": "5adbaf2503cbf2efb7701ed39090ab052feb72b45305acae58606960f35db560",
 		"baselineSha256": "beb2072811e658ccade5c93cafa794aab61b1f564d6766443988d3e70b8b63c4",
 		"keys": [
 			"somethingHappened"
@@ -1111,16 +1279,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1243,
-				"end": 1243,
+				"start": 1071,
+				"end": 1111,
+				"current": "\t\t\t<MkSignin enabled @login=\"onLogin\"/>\n",
+				"baseline": "\t\t\t<MkSignin @login=\"onLogin\"/>\n"
+			},
+			{
+				"start": 1251,
+				"end": 1251,
 				"current": "",
 				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 1723,
-				"end": 1817,
+				"start": 1403,
+				"end": 1487,
+				"current": "import MkSignin from '@features/auth/frontend/components/MkSignin.conditional.vue';\n",
+				"baseline": "import MkSignin from '@features/auth/frontend/components/MkSignin.vue';\n"
+			},
+			{
+				"start": 1743,
+				"end": 1837,
 				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 2702,
+				"end": 2817,
+				"current": "\t\t// Reused app grants still require explicit consent and current local authentication.\n\t\tstate.value = 'waiting';\n",
+				"baseline": "\t\t// 既に連携していた場合\n\t\tif (result.app.isAuthorized) {\n\t\t\tawait misskeyApi('auth/accept', {\n\t\t\t\ttoken: result.token,\n\t\t\t});\n\t\t\taccepted();\n\t\t} else {\n\t\t\tstate.value = 'waiting';\n\t\t}\n"
 			}
 		]
 	},
@@ -1331,7 +1517,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/apps.vue",
-		"currentSha256": "423c24ccdad7cd2c3f96d055cd7637581ccd87680eb56e437d2a867e5e7f69f4",
+		"currentSha256": "05397b63322badb8e62b6aa3c8097c79c08f0762d6dedb9703343f27328e910e",
 		"baselineSha256": "ff21ef25f6d281d99d18339133d080a3f55cddb4e86c9ed5b76aa8f46c0f8664",
 		"keys": [
 			"delete",
@@ -1350,22 +1536,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 1688,
-				"end": 1838,
+				"start": 1195,
+				"end": 1465,
+				"current": "\t\t\t\t\t\t\t<MkKeyValue oneline>\n\t\t\t\t\t\t\t\t<template #key>{{ $locale.sfc.tokenExpiry }}</template>\n\t\t\t\t\t\t\t\t<template #value><MkTime v-if=\"token.expiresAt\" :time=\"token.expiresAt\" :mode=\"'detail'\"/><span v-else>{{ $locale.sfc.unbounded }}</span></template>\n\t\t\t\t\t\t\t</MkKeyValue>\n",
+				"baseline": ""
+			},
+			{
+				"start": 1958,
+				"end": 2108,
 				"current": "\t\t\t\t\t\t\t\t<li v-for=\"p in token.permission\" :key=\"p\">{{ (copyLocaleDictionary(globalLocale.env._permissions) as Record<string, string>)[p] ?? p }}</li>\n",
 				"baseline": "\t\t\t\t\t\t\t\t<li v-for=\"p in token.permission\" :key=\"p\">{{ (copyLocaleDictionary(globalLocale.env.permissionsLabels) as any)[p] ?? p }}</li>\n"
 			},
 			{
-				"start": 2050,
-				"end": 2050,
+				"start": 2320,
+				"end": 2320,
 				"current": "",
 				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 2736,
-				"end": 2830,
+				"start": 3006,
+				"end": 3100,
 				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 5471,
+				"end": 5558,
+				"current": "\t\"installedApps\": \"インストールされたアプリ\",\n\t\"tokenExpiry\": \"アクセストークンの有効期限\",\n\t\"unbounded\": \"無期限\"\n",
+				"baseline": "\t\"installedApps\": \"インストールされたアプリ\"\n"
 			}
 		],
 		"groupOrders": {
@@ -1463,7 +1661,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/connect.vue",
-		"currentSha256": "491298dbff015f24acbad102964449cf14b11fdf1e1b93fbed120a712cc1cfb8",
+		"currentSha256": "e10f08b17169917619fbe8393f13f676e9f50396e47c8257cb3c9dd63c482ad7",
 		"baselineSha256": "d2e031de7854a1707a347f36b5f3b2104c2b8aa6f377f1bf19737e1d988eb3ed",
 		"keys": [
 			"generateAccessToken"
@@ -1481,16 +1679,46 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 2535,
-				"end": 2535,
+				"start": 678,
+				"end": 918,
+				"current": "\t\t\t\t\t<p v-if=\"!individualCredential\">{{ $locale.sfc.individualCredentialRequired }}</p>\n\t\t\t\t\t<MkButton primary :disabled=\"credentialBusy || !individualCredential\" @click=\"generateToken\">{{ globalLocale.env.generateAccessToken }}</MkButton>\n",
+				"baseline": "\t\t\t\t\t<MkButton primary @click=\"generateToken\">{{ globalLocale.env.generateAccessToken }}</MkButton>\n"
+			},
+			{
+				"start": 2675,
+				"end": 2675,
 				"current": "",
 				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3321,
-				"end": 3415,
-				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"start": 3249,
+				"end": 3319,
+				"current": "import MkDialog from '@features/ui/frontend/components/MkDialog.vue';\n",
 				"baseline": ""
+			},
+			{
+				"start": 3531,
+				"end": 3801,
+				"current": "import { ensureSudo } from '../../utility/ensure-sudo.js';\nimport { useCredentialOperation } from '../../utility/use-credential-operation.js';\nimport { $i } from '../../i.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"baseline": ""
+			},
+			{
+				"start": 3950,
+				"end": 4103,
+				"current": "const individualCredential = computed(() => $i?.token.startsWith('bs_'));\nconst { run: runCredential, busy: credentialBusy } = useCredentialOperation();\n",
+				"baseline": "async function generateToken() {\n\tconst { dispose } = await os.popupAsyncWithDialog(import('@features/auth/frontend/components/MkTokenGenerateWindow.vue').then(x => x.default), {}, {\n\t\tdone: async result => {\n\t\t\tconst { name, permissions } = result;\n\t\t\tconst { token } = await misskeyApi('miauth/gen-token', {\n\t\t\t\tsession: null,\n\t\t\t\tname: name,\n\t\t\t\tpermission: permissions,\n\t\t\t});\n"
+			},
+			{
+				"start": 4104,
+				"end": 5860,
+				"current": "async function generateToken() {\n\tif (!individualCredential.value) return;\n\tawait runCredential(async (current, signal) => {\n\t\tlet dispose: (() => void) | undefined; let onAbort: () => void = () => {};\n\t\ttype Selection = { name: string | null; permissions: string[]; expiresAt?: string };\n\t\tconst result = await new Promise<Selection | undefined>((resolve, reject) => {\n\t\t\tonAbort = () => { dispose?.(); resolve(undefined); }; signal.addEventListener('abort', onAbort, { once: true });\n\t\t\tvoid os.popupAsyncWithDialog(import('@features/auth/frontend/components/MkTokenGenerateWindow.vue').then(x => x.default), {}, {\n\t\t\t\tdone: selection => resolve(selection), closed: () => { dispose?.(); resolve(undefined); },\n\t\t\t}).then(popup => { dispose = popup.dispose; if (!current()) onAbort(); }).catch(reject);\n\t\t}).finally(() => { signal.removeEventListener('abort', onAbort); dispose?.(); });\n\t\tif (!result || !current() || !await ensureSudo(current, signal) || !current()) return;\n\t\tlet issued: { token: string };\n\t\ttry { issued = await misskeyApi('miauth/gen-token', { session: null, name: result.name, permission: result.permissions, ...(result.expiresAt ? { expiresAt: result.expiresAt } : {}) }); } catch { if (current()) await os.alert({ type: 'error', text: $locale.value.sfc.issuanceFailed }); return; }\n\t\tconst { token } = issued;\n\t\tif (!current()) return;\n\t\tawait new Promise<void>(resolve => {\n\t\t\tconst dialog = os.popup(MkDialog, { type: 'success', title: $locale.value.sfc.accessToken, text: token }, { done: () => { dialog.dispose(); resolve(); }, closed: () => { dialog.dispose(); resolve(); } });\n\t\t\tconst close = () => { dialog.dispose(); resolve(); }; signal.addEventListener('abort', close, { once: true });\n\t\t\tif (!current()) close();\n\t\t});\n",
+				"baseline": "\t\t\tos.alert({\n\t\t\t\ttype: 'success',\n\t\t\t\ttitle: $locale.value.sfc.accessToken,\n\t\t\t\ttext: token,\n\t\t\t});\n\t\t},\n\t\tclosed: () => dispose(),\n"
+			},
+			{
+				"start": 10396,
+				"end": 10560,
+				"current": "\t\"manage\": \"管理\",\n\t\"individualCredentialRequired\": \"トークンを発行するには通常のログインで個別セッションを作成し、発行時に再認証してください。\",\n\t\"issuanceFailed\": \"発行できませんでした。現在のアカウント・再認証・有効期限を確認してやり直してください。\"\n",
+				"baseline": "\t\"manage\": \"管理\"\n"
 			}
 		]
 	},

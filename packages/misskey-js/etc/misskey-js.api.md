@@ -1669,6 +1669,7 @@ declare namespace entities {
         SignupResponse,
         SignupPendingRequest,
         SignupPendingResponse,
+        SigninProgressChallenge,
         SigninFlowRequest,
         SigninFlowResponse,
         SigninWithPasskeyRequest,
@@ -1930,6 +1931,45 @@ declare namespace entities {
         IImportFollowingRequest,
         IImportMutingRequest,
         IImportUserListsRequest,
+        ISudoStartRequest,
+        ISudoStartResponse,
+        ISudoCompleteRequest,
+        ISudoCompleteResponse,
+        ISudoStatusRequest,
+        ISudoStatusResponse,
+        ISudoExitRequest,
+        ISecurityAccountDeleteRequest,
+        ISecurityPasskeyPasswordlessStartRequest,
+        ISecurityPasskeyPasswordlessStartResponse,
+        ISecurityPasskeyPasswordlessCompleteRequest,
+        ISecurityPasswordLoginDisableStartRequest,
+        ISecurityPasswordLoginDisableStartResponse,
+        ISecurityPasswordLoginDisableCompleteRequest,
+        ISecurityPasswordRequest,
+        ISecurityEmailRequest,
+        ISecurityRegenerateTokenRequest,
+        ISecurityStateRequest,
+        ISecurityStateResponse,
+        ISecurityKeysListRequest,
+        ISecurityKeysListResponse,
+        ISecurityPasskeyRegisterStartRequest,
+        ISecurityPasskeyRegisterStartResponse,
+        ISecurityPasskeyRegisterCompleteRequest,
+        ISecurityPasskeyRegisterCompleteResponse,
+        ISecurityPasskeyMfaStartRequest,
+        ISecurityPasskeyMfaStartResponse,
+        ISecurityPasskeyMfaCompleteRequest,
+        ISecurityPasskeyMfaDisableRequest,
+        ISecurityPasskeyRemoveRequest,
+        ISecurityPasskeyRenameRequest,
+        ISecurityPasskeyPasswordlessRequest,
+        ISecurityTotpStartRequest,
+        ISecurityTotpStartResponse,
+        ISecurityTotpCompleteRequest,
+        ISecurityTotpCompleteResponse,
+        ISecurityTotpRemoveRequest,
+        ISecurityRecoveryCodesRequest,
+        ISecurityRecoveryCodesResponse,
         AdminAccountsCreateRequest,
         AdminAccountsCreateResponse,
         AdminCaptchaCurrentRequest,
@@ -1973,7 +2013,13 @@ declare namespace entities {
         IAuthorizedAppsRequest,
         IAuthorizedAppsResponse,
         IChangePasswordRequest,
+        IChangePasswordPasskeyStartRequest,
+        IChangePasswordPasskeyStartResponse,
+        IChangePasswordPasskeyCompleteRequest,
         IRegenerateTokenRequest,
+        IRegenerateTokenPasskeyStartRequest,
+        IRegenerateTokenPasskeyStartResponse,
+        IRegenerateTokenPasskeyCompleteRequest,
         IRevokeTokenRequest,
         ISigninHistoryRequest,
         ISigninHistoryResponse,
@@ -1983,6 +2029,9 @@ declare namespace entities {
         ISignoutRequest,
         IUpdateEmailRequest,
         IUpdateEmailResponse,
+        IUpdateEmailPasskeyStartRequest,
+        IUpdateEmailPasskeyStartResponse,
+        IUpdateEmailPasskeyCompleteRequest,
         InviteCreateRequest,
         InviteCreateResponse,
         InviteDeleteRequest,
@@ -3911,6 +3960,15 @@ type IAuthorizedAppsRequest = ContractRequest<'i/authorized-apps'>;
 type IAuthorizedAppsResponse = ContractResponse<'i/authorized-apps'>;
 
 // @public (undocumented)
+type IChangePasswordPasskeyCompleteRequest = ContractRequest<'i/change-password/passkey/complete'>;
+
+// @public (undocumented)
+type IChangePasswordPasskeyStartRequest = ContractRequest<'i/change-password/passkey/start'>;
+
+// @public (undocumented)
+type IChangePasswordPasskeyStartResponse = ContractResponse<'i/change-password/passkey/start'>;
+
+// @public (undocumented)
 type IChangePasswordRequest = ContractRequest<'i/change-password'>;
 
 // @public (undocumented)
@@ -4061,6 +4119,15 @@ type IPinResponse = ContractResponse<'i/pin'>;
 type IReadAnnouncementRequest = ContractRequest<'i/read-announcement'>;
 
 // @public (undocumented)
+type IRegenerateTokenPasskeyCompleteRequest = ContractRequest<'i/regenerate-token/passkey/complete'>;
+
+// @public (undocumented)
+type IRegenerateTokenPasskeyStartRequest = ContractRequest<'i/regenerate-token/passkey/start'>;
+
+// @public (undocumented)
+type IRegenerateTokenPasskeyStartResponse = ContractResponse<'i/regenerate-token/passkey/start'>;
+
+// @public (undocumented)
 type IRegenerateTokenRequest = ContractRequest<'i/regenerate-token'>;
 
 // @public (undocumented)
@@ -4118,6 +4185,102 @@ type IRevokeTokenRequest = ContractRequest<'i/revoke-token'>;
 function isAPIError(reason: Record<PropertyKey, unknown>): reason is APIError;
 
 // @public (undocumented)
+type ISecurityAccountDeleteRequest = ContractRequest<'i/security/account/delete'>;
+
+// @public (undocumented)
+type ISecurityEmailRequest = ContractRequest<'i/security/email'>;
+
+// @public (undocumented)
+type ISecurityKeysListRequest = ContractRequest<'i/security/keys/list'>;
+
+// @public (undocumented)
+type ISecurityKeysListResponse = ContractResponse<'i/security/keys/list'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaCompleteRequest = ContractRequest<'i/security/passkey/mfa/complete'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaDisableRequest = ContractRequest<'i/security/passkey/mfa/disable'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaStartRequest = ContractRequest<'i/security/passkey/mfa/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaStartResponse = ContractResponse<'i/security/passkey/mfa/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyPasswordlessCompleteRequest = ContractRequest<'i/security/passkey/passwordless/complete'>;
+
+// @public (undocumented)
+type ISecurityPasskeyPasswordlessRequest = ContractRequest<'i/security/passkey/passwordless'>;
+
+// @public (undocumented)
+type ISecurityPasskeyPasswordlessStartRequest = ContractRequest<'i/security/passkey/passwordless/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyPasswordlessStartResponse = ContractResponse<'i/security/passkey/passwordless/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRegisterCompleteRequest = ContractRequest<'i/security/passkey/register/complete'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRegisterCompleteResponse = ContractResponse<'i/security/passkey/register/complete'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRegisterStartRequest = ContractRequest<'i/security/passkey/register/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRegisterStartResponse = ContractResponse<'i/security/passkey/register/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRemoveRequest = ContractRequest<'i/security/passkey/remove'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRenameRequest = ContractRequest<'i/security/passkey/rename'>;
+
+// @public (undocumented)
+type ISecurityPasswordLoginDisableCompleteRequest = ContractRequest<'i/security/password-login/disable/complete'>;
+
+// @public (undocumented)
+type ISecurityPasswordLoginDisableStartRequest = ContractRequest<'i/security/password-login/disable/start'>;
+
+// @public (undocumented)
+type ISecurityPasswordLoginDisableStartResponse = ContractResponse<'i/security/password-login/disable/start'>;
+
+// @public (undocumented)
+type ISecurityPasswordRequest = ContractRequest<'i/security/password'>;
+
+// @public (undocumented)
+type ISecurityRecoveryCodesRequest = ContractRequest<'i/security/recovery-codes'>;
+
+// @public (undocumented)
+type ISecurityRecoveryCodesResponse = ContractResponse<'i/security/recovery-codes'>;
+
+// @public (undocumented)
+type ISecurityRegenerateTokenRequest = ContractRequest<'i/security/regenerate-token'>;
+
+// @public (undocumented)
+type ISecurityStateRequest = ContractRequest<'i/security/state'>;
+
+// @public (undocumented)
+type ISecurityStateResponse = ContractResponse<'i/security/state'>;
+
+// @public (undocumented)
+type ISecurityTotpCompleteRequest = ContractRequest<'i/security/totp/complete'>;
+
+// @public (undocumented)
+type ISecurityTotpCompleteResponse = ContractResponse<'i/security/totp/complete'>;
+
+// @public (undocumented)
+type ISecurityTotpRemoveRequest = ContractRequest<'i/security/totp/remove'>;
+
+// @public (undocumented)
+type ISecurityTotpStartRequest = ContractRequest<'i/security/totp/start'>;
+
+// @public (undocumented)
+type ISecurityTotpStartResponse = ContractResponse<'i/security/totp/start'>;
+
+// @public (undocumented)
 type ISessionsRequest = ContractRequest<'i/sessions'>;
 
 // @public (undocumented)
@@ -4173,10 +4336,40 @@ export interface IStream extends EventEmitter<StreamEvents> {
 }
 
 // @public (undocumented)
+type ISudoCompleteRequest = ContractRequest<'i/sudo/complete'>;
+
+// @public (undocumented)
+type ISudoCompleteResponse = ContractResponse<'i/sudo/complete'>;
+
+// @public (undocumented)
+type ISudoExitRequest = ContractRequest<'i/sudo/exit'>;
+
+// @public (undocumented)
+type ISudoStartRequest = ContractRequest<'i/sudo/start'>;
+
+// @public (undocumented)
+type ISudoStartResponse = ContractResponse<'i/sudo/start'>;
+
+// @public (undocumented)
+type ISudoStatusRequest = ContractRequest<'i/sudo/status'>;
+
+// @public (undocumented)
+type ISudoStatusResponse = ContractResponse<'i/sudo/status'>;
+
+// @public (undocumented)
 type IUnpinRequest = ContractRequest<'i/unpin'>;
 
 // @public (undocumented)
 type IUnpinResponse = ContractResponse<'i/unpin'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyCompleteRequest = ContractRequest<'i/update-email/passkey/complete'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyStartRequest = ContractRequest<'i/update-email/passkey/start'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyStartResponse = ContractResponse<'i/update-email/passkey/start'>;
 
 // @public (undocumented)
 type IUpdateEmailRequest = ContractRequest<'i/update-email'>;
@@ -7934,6 +8127,8 @@ type Signin = ContractModel<'Signin'>;
 
 // @public (undocumented)
 type SigninFlowRequest = {
+    progressMode?: 'v1';
+    authenticationProgress?: SigninProgressChallenge;
     username: string;
     password?: string;
     token?: string;
@@ -7956,12 +8151,22 @@ type SigninFlowResponse = {
 } | {
     finished: false;
     next: 'totp';
-    availableFactors?: ('totp' | 'passkey')[];
+    authenticationProgress?: SigninProgressChallenge;
+    availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 } | {
     finished: false;
     next: 'passkey';
+    authenticationProgress?: SigninProgressChallenge;
     authRequest: PublicKeyCredentialRequestOptionsJSON_2;
-    availableFactors?: ('totp' | 'passkey')[];
+    availableFactors?: ('totp' | 'passkey' | 'recovery')[];
+};
+
+// @public (undocumented)
+type SigninProgressChallenge = {
+    ticket: string;
+    browserSecret: string;
+    nonce: string;
+    version: number;
 };
 
 // @public (undocumented)
@@ -7981,6 +8186,10 @@ type SigninWithPasskeyResponse = {
     signinResponse: SigninFlowResponse & {
         finished: true;
     };
+    passwordFlowRequired?: never;
+} | {
+    passwordFlowRequired: true;
+    signinResponse?: never;
 };
 
 // @public (undocumented)

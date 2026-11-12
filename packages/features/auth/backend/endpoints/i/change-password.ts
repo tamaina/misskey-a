@@ -5,6 +5,10 @@
 
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import type { DataSource } from 'typeorm';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { assertLegacyMfaManagement } from '../../mfa-policy.js';
+import { withLockedMfaProfile } from '../../locked-mfa-profile.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserAuthService } from '../../services/UserAuthService.js';
 
@@ -17,6 +21,7 @@ export const meta = {
 
 } as const;
 export interface IChangePasswordDependencies {
+	db: DataSource;
 	userProfilesRepository: UserProfilesRepository;
 	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
 }
@@ -27,6 +32,7 @@ export function createIChangePasswordProcedure(deps: IChangePasswordDependencies
 		const result = await (async () => {
 			const token = ps.token;
 			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			assertLegacyMfaManagement(profile);
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -50,8 +56,9 @@ export function createIChangePasswordProcedure(deps: IChangePasswordDependencies
 			const salt = await bcrypt.genSalt(8);
 			const hash = await bcrypt.hash(ps.newPassword, salt);
 
-			await deps.userProfilesRepository.update(me.id, {
-				password: hash,
+			await withLockedMfaProfile(deps.db, me.id, profile, async (locked, manager) => {
+				assertLegacyMfaManagement(locked);
+				await manager.getRepository(MiUserProfile).update({ userId: me.id }, { password: hash });
 			});
 		})();
 		return result;

@@ -4,13 +4,19 @@
  */
 
 import 'reflect-metadata';
-import { IsNull } from 'typeorm';
+import { performance } from 'node:perf_hooks';
+import { IsNull, type EntityManager } from 'typeorm';
 import { afterEach, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
+import { MiUser } from '../../../users/backend/models/User.js';
+import { MiUserProfile } from '../../../users/backend/models/UserProfile.js';
+import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
+import { MiBrowserSession } from '../../backend/models/BrowserSession.js';
+import { createSigninAssurance, signinPolicyStamp } from '../../backend/signin-assurance.js';
 import { AuthenticateService } from '../../backend/transport/AuthenticateService.js';
 import { SigninService } from '../../backend/transport/SigninService.js';
 import type { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
-import type { UsersRepository, MiUser } from '../../../persistence/backend/repositories/models.js';
+import type { UsersRepository } from '../../../persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import type { CacheService } from '../../../users/backend/services/CacheService.js';
 
@@ -77,23 +83,61 @@ function signinFixture() {
 	vi.useFakeTimers({ toFake: ['setImmediate'] });
 	const sessions = mockDeep<BrowserSessionService>();
 	const effects = mockDeep<Parameters<SigninService['signin']>[1]>();
-	const service = new SigninService(mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), sessions);
-	return { service, sessions, effects };
+	const profiles = mockDeep<ConstructorParameters<typeof SigninService>[1]>();
+	const user = mockDeep<MiUser>({ id: 'alice', token: 'old-master', host: null, isSuspended: false, isDeleted: false });
+	const profile = mockDeep<MiUserProfile>({ userId: user.id, password: 'synthetic-hash', twoFactorEnabled: false, twoFactorSecret: null, passkeyMfaEnabled: false, usePasswordLessLogin: false });
+	const userRepo = { findOne: vi.fn(async () => user) };
+	const profileRepo = { findOne: vi.fn(async () => profile) };
+	const keyRepo = { findBy: vi.fn(async () => [] as MiUserSecurityKey[]) };
+	const sessionRepo = { insert: vi.fn() };
+	const manager = mockDeep<EntityManager>();
+	manager.getRepository.mockImplementation(target => ({ [MiUser.name]: userRepo, [MiUserProfile.name]: profileRepo, [MiUserSecurityKey.name]: keyRepo, [MiBrowserSession.name]: sessionRepo })[(target as { name: string }).name] as never);
+	let committed = false;
+	profiles.manager.transaction.mockImplementation(async (isolationOrRun, maybeRun) => { const run = typeof isolationOrRun === 'function' ? isolationOrRun : maybeRun!; const result = await run(manager); committed = true; return result; });
+	const service = new SigninService(mockDeep(), profiles, mockDeep(), mockDeep(), mockDeep(), mockDeep(), mockDeep(), sessions);
+	const proof = () => createSigninAssurance({ userId: user.id, policyStamp: signinPolicyStamp(user, profile, []), mode: 'password', passwordVerified: true, factor: 'none', deadline: performance.now() + 90_000 });
+	const invoke = (assurance = proof()) => service.signin({ ip: '127.0.0.1', headers: {} }, effects, user, assurance);
+	return { service, sessions, effects, user, profile, proof, invoke, sessionRepo, userRepo, profileRepo, committed: () => committed };
 }
 
 test('successful signin issues a fresh credential instead of returning the master token', async () => {
 	const h = signinFixture();
 	h.sessions.issue.mockResolvedValue({ token: 'bs_synthetic', session: { id: 'session1', userId: 'alice', createdAt: new Date(0), lastUsedAt: new Date(0), revokedAt: null, sudoUntil: null } });
-	const result = await h.service.signin({ ip: '127.0.0.1', headers: {} }, h.effects, { id: 'alice', token: 'old-master' });
+	const result = await h.invoke();
 	expect(result).toEqual({ finished: true, id: 'alice', i: 'bs_synthetic' });
-	expect(h.sessions.issue).toHaveBeenCalledWith('alice');
+	expect(h.sessions.issue).toHaveBeenCalledWith('alice', h.sessionRepo);
 	expect(h.effects.code).toHaveBeenCalledWith(200);
 });
 
 test('failed session persistence never reports a successful signin or schedules notifications', async () => {
 	const h = signinFixture();
 	h.sessions.issue.mockRejectedValue(new Error('synthetic insert failure'));
-	await expect(h.service.signin({ ip: '127.0.0.1', headers: {} }, h.effects, { id: 'alice', token: 'old-master' })).rejects.toThrow('insert failure');
+	await expect(h.invoke()).rejects.toThrow('insert failure');
 	expect(h.effects.code).not.toHaveBeenCalled();
 	expect(vi.getTimerCount()).toBe(0);
+});
+
+test('policy mutation between proof and issuance rejects before persistence or notifications', async () => {
+	const h = signinFixture(); const proof = h.proof(); h.profile.passkeyMfaEnabled = true;
+	await expect(h.invoke(proof)).rejects.toThrow('authentication failed');
+	expect(h.sessions.issue).not.toHaveBeenCalled(); expect(h.effects.code).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+});
+
+test('expired-after-insert proof rolls back and never publishes success', async () => {
+	const h = signinFixture(); const proof = h.proof();
+	h.sessions.issue.mockImplementation(async () => {
+		vi.spyOn(performance, 'now').mockReturnValue(proof.deadline);
+		return { token: 'bs_synthetic', session: { id: 's', userId: 'alice', createdAt: new Date(), lastUsedAt: new Date(), revokedAt: null, sudoUntil: null } };
+	});
+	try {
+		await expect(h.invoke(proof)).rejects.toThrow('authentication failed');
+		expect(h.committed()).toBe(false); expect(h.effects.code).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+	} finally { vi.restoreAllMocks(); }
+});
+
+test('proof cannot issue a second session after a failed persistence attempt', async () => {
+	const h = signinFixture(); const proof = h.proof(); h.sessions.issue.mockRejectedValue(new Error('synthetic failure'));
+	await expect(h.invoke(proof)).rejects.toThrow('synthetic failure');
+	await expect(h.invoke(proof)).rejects.toThrow('authentication failed');
+	expect(h.sessions.issue).toHaveBeenCalledOnce();
 });

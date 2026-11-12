@@ -67,8 +67,27 @@ test('executes the actual migration down/up only on an empty fixture and checks 
 	const { source, runner, builder } = fixture();
 	await verifyBrowserSessionMigration(source);
 	const queries = runner.query.mock.calls.map(([sql]) => sql);
-	expect(queries[3]).toBe('DROP TABLE "browser_session"');
-	expect(queries[4]).toContain('CREATE TABLE "browser_session"');
+	const drop = queries.indexOf('DROP TABLE "browser_session"');
+	const create = queries.findIndex(sql => sql.startsWith('CREATE TABLE "browser_session"'));
+	expect(queries).toContain('DROP TABLE "oauth_approval"');
+	expect(drop).toBeGreaterThan(queries.indexOf('DROP TABLE "oauth_approval"'));
+	expect(queries).toContain('ALTER TABLE "browser_session" DROP COLUMN "sudoGrantId"');
+	expect(queries.indexOf('ALTER TABLE "browser_session" DROP COLUMN "sudoGrantId"')).toBeLessThan(drop);
+	expect(create).toBeGreaterThan(drop);
+	expect(queries.findIndex(sql => sql.startsWith('CREATE TABLE "oauth_approval"'))).toBeGreaterThan(create);
+	expect(queries).not.toContain('DROP TABLE "browser_session" CASCADE');
 	expect(runner.commitTransaction).toHaveBeenCalledOnce();
 	expect(builder.log).toHaveBeenCalledOnce();
+});
+
+test('dependent migration refusal rolls the entire fixture transaction back', async () => {
+	const { source, runner, builder } = fixture();
+	const ordinary = runner.query.getMockImplementation()!;
+	runner.query.mockImplementation((...args) => args[0].startsWith('SELECT 1 FROM "access_token"') ? Promise.resolve([{ row: 1 }]) : ordinary(...args));
+	await expect(verifyBrowserSessionMigration(source)).rejects.toThrow('Revoke expiring tokens');
+	expect(runner.query.mock.calls.some(([sql]) => sql.includes('DROP TABLE'))).toBe(false);
+	expect(runner.rollbackTransaction).toHaveBeenCalledOnce();
+	expect(runner.release).toHaveBeenCalledOnce();
+	expect(source.destroy).toHaveBeenCalledOnce();
+	expect(builder.log).not.toHaveBeenCalled();
 });

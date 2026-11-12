@@ -83,6 +83,9 @@ export type DBExportAntennasData = {
 export type DbUserDeleteJobData = {
 	user: ThinUser;
 	soft?: boolean;
+	/** The worker must serialize on the user and observe committed isDeleted before any effect. */
+	requiresCommittedDeletion?: true;
+	deletionIntentId?: string;
 };
 
 export type DbUserImportJobData = {

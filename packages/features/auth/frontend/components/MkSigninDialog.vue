@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button :class="$style.closeButton" class="_button" @click="onClose"><i class="ti ti-x"></i></button>
 		</div>
 		<div :class="$style.content">
-			<MkSignin :autoSet="autoSet" :message="message" :openOnRemote="openOnRemote" :initialUsername="initialUsername" @login="onLogin"/>
+			<MkSignin ref="conditionalSignin" :enabled="!closing" :autoSet="autoSet" :message="message" :openOnRemote="openOnRemote" :initialUsername="initialUsername" @login="onLogin"/>
 		</div>
 	</div>
 </MkModal>
@@ -24,9 +24,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import * as Misskey from 'misskey-js';
-import { useTemplateRef } from 'vue';
+import { useTemplateRef, ref } from 'vue';
 import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
-import MkSignin from '@features/auth/frontend/components/MkSignin.vue';
+import MkSignin from '@features/auth/frontend/components/MkSignin.conditional.vue';
 import MkModal from '@features/ui/frontend/components/MkModal.vue';
 
 withDefaults(defineProps<{
@@ -48,13 +48,17 @@ const emit = defineEmits<{
 }>();
 
 const modal = useTemplateRef('modal');
+const conditionalSignin = useTemplateRef<InstanceType<typeof MkSignin>>('conditionalSignin');
+const closing = ref(false);
 
 function onClose() {
+	closing.value = true; conditionalSignin.value?.cancel();
 	emit('cancelled');
 	if (modal.value) modal.value.close();
 }
 
 function onLogin(res: Misskey.entities.SigninFlowResponse & { finished: true }) {
+	closing.value = true; conditionalSignin.value?.cancel();
 	emit('done', res);
 	if (modal.value) modal.value.close();
 }

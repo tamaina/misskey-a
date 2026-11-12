@@ -21,6 +21,7 @@ import { WebAuthnService } from '../../backend/services/WebAuthnService.js';
 import type { ApiContext, ApiServices, ApiToken } from '../../../api/backend/transport/context.js';
 import type { MiAccessToken } from '../../backend/models/AccessToken.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
+const settingsPaths = Object.keys(authContract).filter(path => path.startsWith('i/security/') || path.startsWith('i/sudo/'));
 const actor = mockDeep<MiLocalUser>({ id: 'user123', isSuspended: false, movedToUri: null });
 
 function harness() {
@@ -34,8 +35,16 @@ function harness() {
 	return { services, operations, context, router: createAuthRouter(operations) };
 }
 
-test('all 50 native auth routes retain secure policy enforcement', async () => {
-	expect(Object.keys(authContract)).toHaveLength(50);
+test('all 82 native auth routes retain secure policy enforcement', async () => {
+	expect(Object.keys(authContract)).toHaveLength(82);
+	expect(settingsPaths).toHaveLength(26);
+	for (const path of settingsPaths) expect(authContract[path as keyof typeof authContract]['~orpc'].meta).toMatchObject({ requestName: path, requireCredential: true, secure: true });
+	for (const path of ['i/regenerate-token/passkey/start', 'i/regenerate-token/passkey/complete'] as const) {
+		expect(authContract[path]['~orpc'].meta).toMatchObject({ requestName: path, requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-token-regeneration' } });
+	}
+	for (const path of ['i/update-email/passkey/start', 'i/update-email/passkey/complete'] as const) {
+		expect(authContract[path]['~orpc'].meta).toMatchObject({ requestName: path, requireCredential: true, secure: true, limit: path.endsWith('/complete') ? { duration: 3_600_000, max: 3, key: 'i/update-email' } : { duration: 60_000, max: 10, key: 'fresh-email-change' } });
+	}
 	const h = harness();
 	h.services.authenticate.mockResolvedValue([actor, { permission: ['write:account'] }]);
 	await expect(call(h.router['i/change-password'], { currentPassword: 'old', newPassword: 'new' }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED', data: { id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
@@ -43,6 +52,23 @@ test('all 50 native auth routes retain secure policy enforcement', async () => {
 	h.services.authenticate.mockResolvedValue([null, null]);
 	await expect(call(h.router['i/2fa/key-done'], { password: 'password', name: '', credential: null }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
 	for (const value of [undefined, null, 5, true, ['ignored'], { ignored: { future: true } }]) expect(v.safeParse(requiredSchema(AdminCaptchaCurrentContract['~orpc'].inputSchema), value).success).toBe(true);
+});
+
+test('deferred external-provider login has no public, settings or administrator HTTP routes', async () => {
+	const h = harness();
+	const handler = new OpenAPIHandler(h.router, { customErrorResponseBodyEncoder: misskeyErrorBody });
+	const app = Fastify();
+	await app.register(async api => registerPilotHttp(api, handler, {
+		maxFileSize: 1024, context: () => h.context, runSpan: (_name, run) => run(),
+	}), { prefix: '/api' });
+	try {
+		for (const path of ['oidc/providers', 'oidc/start', 'oidc/callback', 'oidc/status', 'oidc/cancel', 'oidc/login', 'oidc/onboarding', 'oidc/onboarding/verify', 'i/oidc/links', 'i/oidc/link/start', 'i/oidc/link/complete', 'i/oidc/unlink', 'admin/oidc/providers', 'admin/oidc/create', 'admin/oidc/update']) {
+			expect(Object.hasOwn(authContract, path)).toBe(false);
+			const response = await app.inject({ method: 'POST', url: `/api/${path}`, payload: {} });
+			expect(response.statusCode, path).toBe(404);
+		}
+		expect(h.services.authenticate).not.toHaveBeenCalled();
+	} finally { await app.close(); }
 });
 
 test('malformed HTTP inputs fail authentication and secure-token policy before input validation', async () => {
@@ -57,6 +83,11 @@ test('malformed HTTP inputs fail authentication and secure-token policy before i
 		const secure = await app.inject({ method: 'POST', url: '/api/i/change-password', payload: { currentPassword: 42, newPassword: null } });
 		expect(secure.statusCode).toBe(400);
 		expect(secure.json()).toMatchObject({ error: { code: 'ACCESS_DENIED', id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
+		for (const path of ['i/regenerate-token/passkey/start', 'i/regenerate-token/passkey/complete', 'i/update-email/passkey/start', 'i/update-email/passkey/complete', ...settingsPaths]) {
+			const fresh = await app.inject({ method: 'POST', url: `/api/${path}`, payload: { currentPassword: 42, credential: null } });
+			expect(fresh.statusCode).toBe(400);
+			expect(fresh.json()).toMatchObject({ error: { code: 'ACCESS_DENIED', id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
+		}
 		h.services.authenticate.mockResolvedValue([null, null]);
 		const anonymous = await app.inject({ method: 'POST', url: '/api/i/2fa/key-done', payload: { password: 42, name: false, credential: [] } });
 		expect(anonymous.statusCode).toBe(400);
@@ -65,7 +96,7 @@ test('malformed HTTP inputs fail authentication and secure-token policy before i
 		const authenticated = await app.inject({ method: 'POST', url: '/api/i/change-password', payload: { currentPassword: 42, newPassword: null } });
 		expect(authenticated.statusCode).toBe(400);
 		expect(authenticated.json()).toMatchObject({ error: { code: 'INVALID_PARAM' } });
-		expect(h.services.authenticate).toHaveBeenCalledTimes(3);
+		expect(h.services.authenticate).toHaveBeenCalledTimes(33);
 		expect(h.operations['i/change-password'].userProfilesRepository.findOneByOrFail).not.toHaveBeenCalled();
 		expect(h.operations['i/2fa/key-done'].userProfilesRepository.findOneByOrFail).not.toHaveBeenCalled();
 	} finally { await app.close(); }
@@ -92,7 +123,7 @@ test('malformed registration credentials retain password and stored challenge or
 	const auth = mockDeep<Parameters<typeof createI2faKeyDoneProcedure>[0]['userAuthService']>();
 	const redis = mockDeep<ConstructorParameters<typeof WebAuthnService>[2]>();
 	const domain = new WebAuthnService(mockDeep<ConstructorParameters<typeof WebAuthnService>[0]>({ url: 'https://example.com', hostname: 'example.com', host: 'example.com' }), mockDeep<ConstructorParameters<typeof WebAuthnService>[1]>({ name: 'Fixture' }), redis, mockDeep());
-	const operation = createI2faKeyDoneProcedure({ userProfilesRepository: profiles, userSecurityKeysRepository: mockDeep(), webAuthnService: domain, userAuthService: auth, userEntityService: mockDeep(), globalEventService: mockDeep() });
+	const operation = createI2faKeyDoneProcedure({ db: mockDeep(), userProfilesRepository: profiles, userSecurityKeysRepository: mockDeep(), webAuthnService: domain, userAuthService: auth, userEntityService: mockDeep(), globalEventService: mockDeep() });
 	const me = mockDeep<MiLocalUser>({ id: actor.id, isSuspended: false, movedToUri: null });
 	profiles.findOneByOrFail.mockResolvedValue(mockDeep<NonNullable<Awaited<ReturnType<Parameters<typeof createI2faKeyDoneProcedure>[0]['userProfilesRepository']['findOneByOrFail']>>>>({ userId: me.id, password: bcrypt.hashSync('password', 4), twoFactorEnabled: true }));
 	const input = v.parse(requiredSchema(I2faKeyDoneContract['~orpc'].inputSchema), { password: 'wrong', token: 'totp', name: 'Key', credential: {} });

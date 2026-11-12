@@ -6,6 +6,8 @@
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 import { BrowserSession1791849600000 } from '../../../../backend/migration/1791849600000-BrowserSession.js';
+import { SudoPolicy1792300000001 } from '../../../../backend/migration/1792300000001-SudoPolicy.js';
+import { AccessTokenExpiry1792300000004 } from '../../../../backend/migration/1792300000004-AccessTokenExpiry.js';
 
 /** @param {Record<string, string | undefined>} environment */
 export function assertFixtureEnvironment(environment) {
@@ -41,10 +43,18 @@ export async function verifyBrowserSessionMigration(source) {
 		await runner.query('LOCK TABLE "browser_session" IN ACCESS EXCLUSIVE MODE');
 		assert.equal((await runner.query('SELECT 1 FROM "browser_session" LIMIT 1')).length, 0, 'Refusing to drop a populated browser_session table.');
 		const migration = new BrowserSession1791849600000();
+		const sudo = new SudoPolicy1792300000001();
+		const expiry = new AccessTokenExpiry1792300000004();
+		// Later migrations own columns/FKs on this table. Revert those exact
+		// dependencies first and restore them afterward; never use DROP CASCADE.
+		await expiry.down(runner);
+		await sudo.down(runner);
 		await migration.down(runner);
 		assert.equal(await runner.hasTable('browser_session'), false, 'down must remove the table.');
 		await migration.up(runner);
 		assert.equal(await runner.hasTable('browser_session'), true, 'up must restore the table.');
+		await sudo.up(runner);
+		await expiry.up(runner);
 		await runner.commitTransaction();
 		const pending = await source.driver.createSchemaBuilder().log();
 		assert.equal(pending.upQueries.length, 0, 'No pending up DDL is allowed after the round trip.');
