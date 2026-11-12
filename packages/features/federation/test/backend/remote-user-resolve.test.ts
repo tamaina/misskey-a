@@ -308,8 +308,11 @@ describe('WebFinger JRD and XRD discovery', () => {
 
 	test('does not classify response-size errors as parse failures', async () => {
 		const f = fixture();
-		f.send.mockResolvedValue(new Response(xrd(), { size: 10 }));
-		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toMatchObject({ cause: { type: 'max-size' } });
+		const failure = new FetchError('too large', 'max-size');
+		const response = new Response(xrd());
+		vi.spyOn(response, 'text').mockRejectedValue(failure);
+		f.send.mockResolvedValue(response);
+		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toMatchObject({ cause: failure });
 		expect(f.logger.warn).not.toHaveBeenCalled();
 	});
 });
