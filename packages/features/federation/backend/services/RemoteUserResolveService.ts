@@ -139,7 +139,7 @@ export class RemoteUserResolveService {
 			try {
 				self = await this.resolveSelf(acctLower);
 			} catch (err) {
-				// Only discovery body/communication failures can return the cached user.
+				// Only discovery content-type/JSON or communication failures can return the cached user.
 				// A parsed document without a self link still propagates an error.
 				if (!(err instanceof Error)
 					|| !(isCommunicationError(err.cause) || err.cause instanceof WebfingerResponseError)) throw err;
@@ -197,11 +197,7 @@ export class RemoteUserResolveService {
 			this.logger.error(`Failed to WebFinger for ${chalk.yellow(acctLower)}: ${ err.statusCode ?? err.message }`);
 			throw new Error(`Failed to WebFinger for ${acctLower}: ${ err.statusCode ?? err.message }`, { cause: err });
 		});
-		const selfLinks = finger.links.filter(link => link.rel != null && link.rel.toLowerCase() === 'self');
-		// XRD can advertise several self representations (for example Atom and AP).
-		const self = selfLinks.find(link => link.type === 'application/activity+json'
-			|| (link.type?.split(';')[0].trim() === 'application/ld+json' && link.type.includes('https://www.w3.org/ns/activitystreams')))
-			?? selfLinks[0];
+		const self = finger.links.find(link => link.rel != null && link.rel.toLowerCase() === 'self');
 		if (!self) {
 			this.logger.error(`Failed to WebFinger for ${chalk.yellow(acctLower)}: self link not found`);
 			throw new Error('self link not found');
