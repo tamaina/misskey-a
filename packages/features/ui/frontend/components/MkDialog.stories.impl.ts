@@ -96,17 +96,23 @@ export const DialogWithActions = {
 	...Question,
 	args: {
 		...Question.args,
-		text: getGlobalLocale().areYouSure,
+		get text() {
+			return getGlobalLocale().areYouSure;
+		},
 		actions: [
 			{
-				text: getGlobalLocale().yes,
+				get text() {
+					return getGlobalLocale().yes;
+				},
 				primary: true,
 				callback() {
 					action('YES')();
 				},
 			},
 			{
-				text: getGlobalLocale().no,
+				get text() {
+					return getGlobalLocale().no;
+				},
 				callback() {
 					action('NO')();
 				},
@@ -118,10 +124,14 @@ export const DialogWithDangerActions = {
 	...Warning,
 	args: {
 		...Warning.args,
-		text: getGlobalLocale().resetAreYouSure,
+		get text() {
+			return getGlobalLocale().resetAreYouSure;
+		},
 		actions: [
 			{
-				text: getGlobalLocale().yes,
+				get text() {
+					return getGlobalLocale().yes;
+				},
 				danger: true,
 				primary: true,
 				callback() {
@@ -129,7 +139,9 @@ export const DialogWithDangerActions = {
 				},
 			},
 			{
-				text: getGlobalLocale().no,
+				get text() {
+					return getGlobalLocale().no;
+				},
 				callback() {
 					action('NO')();
 				},
