@@ -104,6 +104,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: Service Workerの通知からのフォロー操作で、通知元のユーザーIDが文字列であることを確認するように ([a1b3e952](https://github.com/tamaina/misskey-a/commit/a1b3e952d3e6d30cef7dfa4127f069df8642424b))
 
 ### Server
+- Fix: 復旧コードの同時使用による二重認証や、消費済みコードの復活を防止 (#146)
 - Enhance: Node.js のセキュリティアップデートに伴い、最低動作バージョンを 24.22.3 / 26.13.1 に引き上げ、開発環境と Docker Image の Node.js を 26.13.1 に更新 (#249)
 - Perf: バンドルのESM shim・BullMQの読込を整理し、メモリ使用量を削減 ([upstream #18126](https://github.com/misskey-dev/misskey/pull/18126))
 - Fix: 引用ノートの本文に余分な RE: URL が付く問題を修正 ([upstream #18063](https://github.com/misskey-dev/misskey/pull/18063))
