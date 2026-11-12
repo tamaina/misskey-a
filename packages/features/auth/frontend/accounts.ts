@@ -16,9 +16,37 @@ import { unisonReload, reloadChannel } from '@features/runtime/frontend/utility/
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { store } from '@features/preferences/frontend/store.js';
 import { $i } from '@features/auth/frontend/i.js';
+import { get } from '@features/runtime/frontend/utility/idb-proxy.js';
 import { signout } from '@features/auth/frontend/signout.js';
 
 type AccountWithToken = Misskey.entities.MeDetailed & { token: string };
+
+// The live $i remains available until reload, even after its credential is removed.
+const rejectedCredentials = new Map<string, string>();
+
+/** Recover device-only credentials without writing a stale device-state snapshot back. */
+async function loadAccountCredentials(keys: string[]) {
+	await store.ready;
+	if (keys.some(key => !store.s.accountTokens[key] || !store.s.accountInfos[key])) {
+		const saved: Partial<Pick<typeof store.s, 'accountTokens' | 'accountInfos'>> | undefined = await get(store.deviceStateKeyName);
+		if (saved?.accountTokens) {
+			store.r.accountTokens.value = store.s.accountTokens = { ...saved.accountTokens, ...store.s.accountTokens };
+		}
+		if (saved?.accountInfos) {
+			store.r.accountInfos.value = store.s.accountInfos = { ...saved.accountInfos, ...store.s.accountInfos };
+		}
+	}
+	for (const [key, token] of rejectedCredentials) {
+		if (store.s.accountTokens[key] !== token) continue;
+		const tokens = { ...store.s.accountTokens };
+		const accountInfos = { ...store.s.accountInfos };
+		delete tokens[key];
+		delete accountInfos[key];
+		store.r.accountTokens.value = store.s.accountTokens = tokens;
+		store.r.accountInfos.value = store.s.accountInfos = accountInfos;
+	}
+	return { tokens: store.s.accountTokens, accountInfos: store.s.accountInfos };
+}
 
 export async function getAccounts(): Promise<{
 	host: string;
@@ -27,9 +55,15 @@ export async function getAccounts(): Promise<{
 	user?: Misskey.entities.MeDetailed | null;
 	token: string | null;
 }[]> {
+	await loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));
+	// Keep a different saved token, but repair missing legacy credentials and list entries.
+	const account = getCurrentAccountInfo();
+	if ($i && account && rejectedCredentials.get(host + '/' + $i.id) !== $i.token) {
+		await addAccount(host, account, store.s.accountTokens[host + '/' + $i.id] ?? $i.token);
+	}
+	const accounts = prefer.s.accounts;
 	const tokens = store.s.accountTokens;
 	const accountInfos = store.s.accountInfos;
-	const accounts = prefer.s.accounts;
 	return accounts.map(([host, user]) => ({
 		host,
 		id: user.id,
@@ -40,20 +74,30 @@ export async function getAccounts(): Promise<{
 }
 
 async function addAccount(host: string, user: Misskey.entities.MeDetailed, token: AccountWithToken['token']) {
-	if (!prefer.s.accounts.some(x => x[0] === host && x[1].id === user.id)) {
-		store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + user.id]: token });
-		store.set('accountInfos', { ...store.s.accountInfos, [host + '/' + user.id]: user });
+	const key = host + '/' + user.id;
+	if (rejectedCredentials.get(key) === token) return;
+	await loadAccountCredentials([key]);
+	if (store.s.accountTokens[key] !== token) {
+		await store.set('accountTokens', { ...store.s.accountTokens, [key]: token });
+	}
+	if (JSON.stringify(store.s.accountInfos[key]) !== JSON.stringify(user)) {
+		await store.set('accountInfos', { ...store.s.accountInfos, [key]: JSON.parse(JSON.stringify(user)) });
+	}
+	const listed = prefer.s.accounts.find(x => x[0] === host && x[1].id === user.id);
+	if (!listed) {
 		prefer.commit('accounts', [...prefer.s.accounts, [host, { id: user.id, username: user.username }]]);
+	} else if (listed[1].username !== user.username) {
+		prefer.commit('accounts', prefer.s.accounts.map(entry => entry === listed ? [host, { id: user.id, username: user.username }] : entry));
 	}
 }
 
 export async function removeAccount(host: string, id: AccountWithToken['id']) {
 	const tokens = JSON.parse(JSON.stringify(store.s.accountTokens));
 	delete tokens[host + '/' + id];
-	store.set('accountTokens', tokens);
+	await store.set('accountTokens', tokens);
 	const accountInfos = JSON.parse(JSON.stringify(store.s.accountInfos));
 	delete accountInfos[host + '/' + id];
-	store.set('accountInfos', accountInfos);
+	await store.set('accountInfos', accountInfos);
 
 	prefer.commit('accounts', prefer.s.accounts.filter(x => x[0] !== host || x[1].id !== id));
 }
@@ -142,12 +186,14 @@ function getCurrentAccountInfo(): Misskey.entities.MeDetailed | null {
 	return accounts[$i.id];
 }
 
-function persistCurrentAccountInfo() {
+async function persistCurrentAccountInfo() {
 	if (!$i) return;
 	const accountInfos: Record<string, Misskey.entities.MeDetailed> = {};
 	for (const [key, value] of Object.entries(store.s.accountInfos)) Reflect.set(accountInfos, key, value);
-	Reflect.set(accountInfos, host + '/' + $i.id, getCurrentAccountInfo());
-	store.set('accountInfos', accountInfos);
+	Reflect.set(accountInfos, host + '/' + $i.id, JSON.parse(JSON.stringify(getCurrentAccountInfo())));
+	if (JSON.stringify(store.s.accountInfos) !== JSON.stringify(accountInfos)) {
+		await store.set('accountInfos', accountInfos);
+	}
 }
 
 export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
@@ -159,9 +205,10 @@ export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
 	for (const [key, value] of Object.entries(accountData)) {
 		Reflect.set($i, key, value);
 	}
-	persistCurrentAccountInfo();
 	$i.token = token;
+	const persisted = persistCurrentAccountInfo();
 	miLocalStorage.setItem('account', JSON.stringify($i));
+	return persisted;
 }
 
 export function updateCurrentAccountPartial(accountData: Partial<Misskey.entities.MeDetailed>) {
@@ -178,8 +225,17 @@ export function updateCurrentAccountPartial(accountData: Partial<Misskey.entitie
 export async function refreshCurrentAccount() {
 	if (!$i) return;
 	const me = $i;
-	return fetchAccount($i.token, $i.id).then(updateCurrentAccount).catch(async reason => {
+	return fetchAccount($i.token, $i.id).then(async account => {
+		rejectedCredentials.delete(host + '/' + me.id);
+		await loadAccountCredentials([host + '/' + me.id]);
+		await updateCurrentAccount(account);
+		const currentAccount = getCurrentAccountInfo();
+		if (currentAccount) await addAccount(host, currentAccount, me.token);
+	}).catch(async reason => {
 		if (reason === isCredentialRejected) {
+			rejectedCredentials.set(host + '/' + me.id, me.token);
+			// Load alternatives before removal so an IDB fallback cannot restore the rejected account.
+			await loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));
 			await removeAccount(host, me.id);
 			if (Object.keys(store.s.accountTokens).length > 0) {
 				await login(Object.values(store.s.accountTokens)[0]);
@@ -211,6 +267,12 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 		});
 	}
 
+	rejectedCredentials.delete(host + '/' + me.id);
+	const currentAccount = getCurrentAccountInfo();
+	if ($i && currentAccount && $i.id !== me.id) {
+		await addAccount(host, currentAccount, $i.token);
+	}
+
 	miLocalStorage.setItem('account', JSON.stringify({
 		...me,
 		token,
@@ -230,14 +292,15 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 }
 
 export async function switchAccount(host: string, id: string) {
-	const token = store.s.accountTokens[host + '/' + id];
+	const { tokens } = await loadAccountCredentials([host + '/' + id]);
+	const token = tokens[host + '/' + id];
 	if (token) {
-		login(token);
+		await login(token);
 	} else {
 		const { dispose } = popup(defineAsyncComponent(() => import('@features/auth/frontend/components/MkSigninDialog.vue')), {}, {
 			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
-				store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
-				login(res.i);
+				await store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
+				await login(res.i);
 			},
 			closed: () => {
 				dispose();
@@ -296,14 +359,14 @@ export async function getAccountMenu(opts: {
 						initialUsername: username,
 					}, {
 						done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
-							store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
+							await store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
 
 							if (callback) {
 								fetchAccount(res.i, id).then(account => {
 									callback(account);
 								});
 							} else {
-								switchAccount(host, id);
+								await switchAccount(host, id);
 							}
 						},
 						closed: () => {

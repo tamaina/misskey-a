@@ -13,14 +13,13 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
 import type { MiUser, MiUserProfile } from '@features/persistence/backend/repositories/models.js';
-import { authSecurityServices, authServices } from '@features/auth/backend/services.js';
-import { discoveryServices, userSearchServices } from '@features/discovery/backend/services.js';
+import { authSecurityServices } from '@features/auth/backend/services.js';
+import { userSearchServices } from '@features/discovery/backend/services.js';
 import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { UserSearchService } from '@features/discovery/backend/services/UserSearchService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { MiUserSecurityKey } from '@features/auth/backend/models/UserSecurityKey.js';
-import { ports } from '@features/index/backend/service-ports.js';
 import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
@@ -68,14 +67,6 @@ afterEach(() => {
 });
 
 describe('auth and search declaration boundaries', () => {
-	test('old auth and zero-input discovery definition/output shapes remain unchanged', () => {
-		expect(Object.keys(authServices.definitions).sort()).toEqual(['AppEntityService', 'AuthSessionEntityService', 'InviteCodeEntityService', 'SigninEntityService']);
-		expect(Object.keys(discoveryServices.definitions)).toEqual(['HashtagEntityService']);
-		expect(Object.keys(discoveryServices.create())).toEqual(['HashtagEntityService']);
-		expect(ports.redisClient.token).toBe(DI.redis);
-		expect(authSecurityServices.ports.map(port => port.name).sort()).toEqual(['browserSessionsRepository', 'config', 'idService', 'meta', 'redisClient', 'userProfilesRepository', 'userSecurityKeysRepository', 'usersRepository']);
-	});
-
 	test('plain security factories borrow one Redis object and direct constructors remain equivalent', () => {
 		const inputs = securityInputs();
 		const first = authSecurityServices.create(inputs);

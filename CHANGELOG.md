@@ -1,75 +1,146 @@
 ## 9000.0.0
 
 ### Note
-- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `e1a614df68f226a8c9ee831994e1727a1ded061f` までの変更を記載しています。分岐元の develop に含まれていた [upstream #17993](https://github.com/misskey-dev/misskey/pull/17993) と、その後に個別に取り込んだ上流変更も対象です。未マージの Draft や別ブランチの機能は含みません。
-- Misskey 9000 の独自 SemVer 採番を開始しています。NodeInfo の software 名は引き続き `misskey` です。 (#50, #54)
-- 開発環境の指定は Node.js 26.4.0 / pnpm 12.9.1、Docker のベースイメージは Node.js 26.10.0-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202)
+- Node.js v22 のサポートを終了し、最低動作バージョンを 24.22.3 / 26.13.1 に変更しました ([upstream #18100](https://github.com/misskey-dev/misskey/pull/18100))。
+- `node scripts/start.mjs`（migration後の起動は `--migrate`）でpnpmの常駐プロセスを減らせます。`pnpm start` / `pnpm migrateandstart` も引き続き利用でき、forkの compile-config は維持しています。Docker・Procfileは新しい起動方式に変更しました ([upstream #18103](https://github.com/misskey-dev/misskey/pull/18103))。
+- 二要素認証登録APIのレスポンスから `qr` を削除しました。QRコードは `url` を使ってクライアント側で生成します ([upstream #18100](https://github.com/misskey-dev/misskey/pull/18100))。
+- 本家の正式 [2026.10.0 タグ](https://github.com/misskey-dev/misskey/tree/de89118a225fbe0833e42ab94e8d5af1e5211208) から develop `d47261417b167c566a4f3caf2cfbb360d43c414e` までの変更を記載しています。
+- 開発環境の指定は Node.js 26.13.1 / pnpm 12.17.0、Docker のベースイメージは Node.js 26.13.1-trixie です。更新前にデータベース・設定・アップロードファイルをバックアップし、検証環境でビルド・migration・起動を確認してください。 (#153, #202, #210, #225, #226, #238, #249)
+- Sentry SDK を v11 に更新しています。`sentryForBackend.options.sendDefaultPii` / `sentryForFrontend.options.sendDefaultPii` は無視されるため（バックエンドでは起動時に警告）、同じ収集範囲を維持するには `dataCollection: {}` に書き換えてください。`dataCollection` 未指定時は利用者の情報を送らない絞った既定を適用し、`dataCollection` を明示するとこの既定を丸ごと置き換えます。`sentryForBackend.options.profilesSampleRate` も無視され、プロファイリングは引き続き `sentryForBackend.enableNodeProfiling` で有効化します。詳細は [Sentry の移行ガイド](https://docs.sentry.io/platforms/javascript/migration/v10-to-v11/) を参照してください。 (#212)
 - 上流由来の migration 名・履歴を復元しています。過去の実験版で異なる migration 名を適用したデータベースは、更新前に履歴の個別確認が必要です。 (#35)
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
 - OIDC によるログインは未接続の基盤段階です。Conditional Mediation も既存のログイン画面を置き換えない、既定無効の試験部品です。課金やチャンネル連合の未マージ機能は含みません。 (#99, #109, #121, #131, #135)
 - commit ごとの収録先・除外理由は [差分棚卸し記録](https://github.com/tamaina/misskey-a/blob/develop/docs/release/9000.0.0-audit.json) を参照してください。
-- beta.2 の GitHub prerelease は公開済みですが、SDK の npm 公開は `404 Not Found`、Docker 公開は認証情報不足で失敗しています。beta.2 タグ後の変更も本節には含まれるため、利用するソースの commit を確認してください。
 
 ### General
-- Enhance: 表示名を Misskey 9000 に変更し、リポジトリ・問い合わせ先・インスタンスの既定リンクをこの fork に変更 (#32, #50, #54)
-- Enhance: API、モデル、サービス、画面、ジョブを機能単位へ移し、依存関係の組み立てと責務を整理 (#9, #14, #20)
-- Enhance: oRPC / Valibot の契約から API・SDK の型、ルーティング情報、DTO を導出するようにし、従来の再帰的な SchemaType・legacy validation を置き換え (#9)
-- Enhance: API の省略値・nullable・アップロード・エラー・キャンセル処理との互換性を維持し、SDK の公開型と宣言の解決を整理 (#9, #13)
-- Enhance: サーバー・キュー・CLI の起動終了を明示的に管理し、初期化失敗時の巻き戻し、受付停止・処理待機・リソース解放の順序を整理 ([fb671a5c](https://github.com/tamaina/misskey-a/commit/fb671a5cf930c8c567d57d983fa5e8b4906619ea))
-- Enhance: VVI 1.1.5 によりコンポーネント・TypeScript の翻訳を機能ごとに管理し、言語別 JavaScript コピーと移行済みの重複翻訳キーを削除 (#12, #27, #34, #37, #38, #39)
-- Enhance: 翻訳の更新 (#41, #42, #44, #155)
-- Enhance: 依存関係の更新（NestJS・Sentry などの連携調整、MFM 0.27.0、Docker ビルド環境の更新を含む） (#153, #202)
-- Enhance: SDK で `acct:` 付きのアカウント表記をパースできるように (#2)
-- Fix: ESM での `ms` 読み込みをアダプターに統一し、機能分割後の backend の読み込みを修正 ([b94a454b](https://github.com/tamaina/misskey-a/commit/b94a454b2b126ad97489b305c0759bea36687e89))
-- Enhance: 機能別の契約・翻訳・DB・起動停止・連合の回帰検証をビルドと CI に統合し、テスト終了時の非同期処理待機を改善 (#13, #20, #85, #138, #170)
-- Enhance: CI の安定ブランチ対象を main に揃え、API 差分コメントの上限・全量 artifact 保存と release 見出しの検証に対応 (#84, #97, [8e243e7d](https://github.com/tamaina/misskey-a/commit/8e243e7d16f7e62594f2474ee60dd61c719650f8))
-- Enhance: 既存の Release Manager Action と GitHub App を使うリリース準備・公開処理を整備 (#11, #50)
-- Enhance: 開発・Issue/PR・検証ガイドを整理し、脆弱性の報告ガイドラインを上流に合わせて更新 (#29, #199)
-- Enhance: 開発者向けに OIDC の ID token 検証・discovery・短命 transaction・token 交換と認証進行管理の基盤を追加（ログイン経路への接続は未提供） (#109, #121, #131, #135)
+- Enhance: 依存関係を更新（pnpm 12.17.0、NestJS 12.4.2、Nodemailer・minimatchのセキュリティ更新を含む） ([upstream #18046](https://github.com/misskey-dev/misskey/pull/18046), [#18074](https://github.com/misskey-dev/misskey/pull/18074), [#18083](https://github.com/misskey-dev/misskey/pull/18083), [#18116](https://github.com/misskey-dev/misskey/pull/18116), [#18125](https://github.com/misskey-dev/misskey/pull/18125))
+#### Enhance: Misskey 9000
+ソフトウェア名を **Misskey 9000** に変更し、リポジトリ・問い合わせ先・インスタンスの既定リンクをこのforkに変更 (#32, #50, #54)  
+Misskey 9000の独自SemVer採番を開始しています。NodeInfoの`software`は引き続き`misskey`です。
+
+既定のアイコン・ファビコン・スプラッシュ・メールヘッダー・ようこそ画面のロゴを Misskey 9000 / Mi9k のロゴに変更 (#231)
+
+#### Enhance: ディレクトリ構造の変更
+API、モデル、サービス、画面、ジョブを`feature`単位へ移し、依存関係の組み立てと責務を整理 (#9, #14, #20)
+
+#### Enhance: API等の契約・型定義にoRPC/Valibotを採用
+oRPC/Valibotの契約からAPI, misskey-jsの型, ルーティング情報を導出するようにし、従来の再帰的なJSON Schema, SchemaType, ajv等を置き換え (#9)  
+APIの省略値・nullable・アップロード・エラー・キャンセル処理との互換性は維持し、misskey-jsの公開型と宣言の解決を整理 (#9, #13)
+
+#### Enhance: クライアントのi18nライブラリにVVIを採用
+- [VVI](https://github.com/tamaina/vite-vue-internationalization)によりコンポーネント・TypeScriptの翻訳をテンプレートや機能ごとに管理
+- 言語別JavaScriptコピーと移行済みの重複翻訳キーを削除 (#12, #27, #34, #37, #38, #39, #204)
+- 共有ラベルを既存の翻訳カタログと生成済み`Locale`型から直接利用するようにし、個別のキー登録表を削除 (#204)
+- 翻訳の更新 (#41, #42, #44, #155)
+
+#### Feat: MCP連携を搭載, 通常のOAuthで権限を追加できるように
+- Enhance: MCPのAPI呼び出しツールを権限ごとに分割し、付与権限と現在のロールに応じて表示するように（権限なしのAPIは `call_api_general`） (#246)
+- トークンの権限に沿ったAPI検出・呼び出しを行うMCPとOAuth/CIMD連携を追加 (#36, #43, #46, #56, #62)
+- MCPのメンション・返信・アンテナ・main/broadcastなどのイベント購読と、永続化された送信キューを追加 (#66, #72, #74, #76)
+- 通常の OAuth でも明示的な opt-in で権限を選択・追加できるようにし、MCP の同意画面では任意権限を初期 OFF で表示 (#56, #59, #63)
+- MCPのイベント記述・JSON Schema 2020-12・フィルター型を整理し、現在の権限・キャッシュに沿った検出結果を返すように (#79, #102, #130, #159, #173)
+- Fix: 自分で投稿した返信・メンションを、そのアカウント自身のMCPイベント購読へ送らないように（通常の通知・Webhookや他の受信者への配送は維持） (#215)
+- User WebhookとMCP Eventsで全通知トリガーおよび受信チャットの購読に対応し、通知の受信設定とミュートを反映するようにしました (#222)
+- 本家のアンテナのストリーミング変更 (misskey-dev/misskey#18021) に追従し、MCPのアンテナイベント・stream購読はノートIDのみを扱い、配送ごとに購読者として再取得・再判定するように（大きなノートが受信サイズ上限で落ちないように。silentで作成されたノートはライブのアンテナイベントを出さなくなりました） (#227)
+- Fix: 解除・期限切れになったMCPのイベント購読がWebhookの上限に数えられ続け、新しい購読やWebhookを作成できなくなる問題を修正 (#239)
+
+#### Perf: ActivityPubでのやり取りをEd25519に対応させ、配送を軽量に
+- 連合の署名について、複数公開鍵・受信時の鍵再取得・対応相手へのEd25519署名に対応（従来のRSA鍵との互換性を維持。RFC 9421対応を意味しない） (#16, #18, #19)
+- Enhance: 配送ジョブの `deliverJobPerSec` 未指定時の既定値を毎秒128件から2048件に変更（並列数の既定値128と明示設定は維持） (#197)
+- Fix: 既存のinbox署名の正規化処理を維持するように (#49)
+
+#### Feat: リモートのアバターデコレーションを反映
+Tempuraから実装を移植し、リモートユーザーのアバターデコレーションが反映されるようになります (#191)
+
+#### その他
+- Enhance: サーバー・キュー・CLI の起動終了を明示的に管理し、初期化失敗時の巻き戻し、受付停止・処理待機・リソース解放の順序を整理 ([fb671a5c](https://github.com/tamaina/misskey-a/commit/fb671a5cf930c8c567d57d983fa5e8b4906619ea))  
+  機能別の契約・翻訳・DB・起動停止・連合の回帰検証をビルドとCIに統合し、テスト終了時の非同期処理待機を改善 (#13, #20, #85, #138, #170)
+- Enhance: 依存関係の更新（NestJS・Sentry などの連携調整、MFM 0.27.0、メディア・フォント処理、Docker・ビルド・テスト環境の更新を含む） (#153, #202, #210, #212, #213)
+- Fix: 翻訳チャンクの直接re-exportを認識できない問題と、ビルド環境更新後のCSS module変換の互換性を修正 (#207, #210)
+- Fix: Storybookの依存関係をMSW 3 / Storybook 10に揃え、モック通信と翻訳・設定の初期化順序を修正 (#211)
+- Enhance: 上流 2026.10.1 までの依存関係の更新に追従（MFM 0.28.0、pnpm 12.14.0、sanitize-html・undici のセキュリティ更新を含む） ([upstream #18039](https://github.com/misskey-dev/misskey/pull/18039), [upstream #18042](https://github.com/misskey-dev/misskey/pull/18042), [upstream #18055](https://github.com/misskey-dev/misskey/pull/18055))
+- Enhance: misskey-jsで `acct:` 付きのアカウント表記をパースできるように (#2)
+- Fix: ESM での `ms` 読み込みをアダプターに統一し、機能分割後のbackendの読み込みを修正 ([b94a454b](https://github.com/tamaina/misskey-a/commit/b94a454b2b126ad97489b305c0759bea36687e89))
+- Enhance: CIの安定ブランチ対象をmainに揃え、API差分コメントの上限・全量artifact保存とリリース見出しの検証に対応 (#84, #97, [8e243e7d](https://github.com/tamaina/misskey-a/commit/8e243e7d16f7e62594f2474ee60dd61c719650f8))
+- Enhance: 開発者向けにOIDCのID token検証・discovery・短命transaction・token交換と認証進行管理の基盤を追加（ログイン経路への接続は未提供） (#109, #121, #131, #135)
 
 ### Client
+- Fix: ナビゲーションとLaunchPadで、SFC側に残る文言が空になる問題を修正 (#250)
+- Fix: グローバル翻訳への移行後、ナビゲーションメニューなどの文言が空になる問題を修正
+- Refactor: 権限・種別ラベルと共通のコアUI文字列をグローバル翻訳カタログへ移しました。
+- Fix: アクセストークン作成・OAuth同意画面の管理者権限の項目間隔を揃え、通常権限と管理者権限の一括有効化・無効化を分離 (#246)
+- Enhance: デッキのチャンネルカラムにも固定の投稿フォーム設定を反映 ([upstream #17247](https://github.com/misskey-dev/misskey/pull/17247))
+- Enhance: URLプレビューの埋め込みプレイヤーを自動再生するか設定可能に ([upstream #18112](https://github.com/misskey-dev/misskey/pull/18112))
+- Fix: 設定検索にプライバシー設定の項目が表示されない問題を修正 ([upstream #18058](https://github.com/misskey-dev/misskey/pull/18058))
+- Fix: デッキでノートのアイコンが横スクロールに追従する問題を修正 ([upstream #18073](https://github.com/misskey-dev/misskey/pull/18073))
+- Fix: 存在しない・権限のないチャットの取得失敗をページ内に表示 ([upstream #18065](https://github.com/misskey-dev/misskey/pull/18065))
+- Fix: 同じ名前のUnicode絵文字とカスタム絵文字を候補に表示 ([upstream #13817](https://github.com/misskey-dev/misskey/pull/13817))
+- Fix: AiScriptウィジェットの削除・再実行時のリソース解放漏れを修正 ([upstream #18076](https://github.com/misskey-dev/misskey/pull/18076))
+- Fix: チャットのプッシュ通知から送信者とのチャットを開くよう修正 ([upstream #18119](https://github.com/misskey-dev/misskey/pull/18119))
+- Fix: カスタム絵文字管理画面で変更行・エラー行の色が付かない問題を修正 ([upstream #18105](https://github.com/misskey-dev/misskey/pull/18105))
+- Fix: メール設定に未保存の変更がある間は配信テストを無効化 ([upstream #18067](https://github.com/misskey-dev/misskey/pull/18067))
+- Fix: MFM関連コンポーネントのprops変更を描画に反映 ([upstream #17954](https://github.com/misskey-dev/misskey/pull/17954))
+- Perf: テーマ解析・ビジター画面の遅延読込とネイティブBroadcastChannelで起動処理を軽量化 ([upstream #18064](https://github.com/misskey-dev/misskey/pull/18064))
+- Perf: Service Worker経由のアセット取得を削減 ([upstream #18088](https://github.com/misskey-dev/misskey/pull/18088))
+- Fix: 上流由来のアカウント切替時にサインインを再要求される問題を修正し、切替前の現在アカウント退避・一覧の追加更新・起動時の自己修復と、IndexedDB のトークン補完・再読込前の保存完了を行うように (#230)
+- Feat: PWAで共有されたファイルを投稿フォームに引き継ぐように (#17)
 - Feat: デッキにクリップ列を追加 (#162)
-- Feat: PWA で共有されたファイルを投稿フォームに引き継ぐように (#17)
 - Feat: クライアントのエラーログを永続的に保存できるように (#113)
 - Enhance: ブラウザーごとのセッションに対応し、現在のセッションの失効を伴うログアウトとアカウント切替の後処理を整理 (#104, #119)
-- Enhance: モデレーションログの差分表示に Shiki を使用 (#140)
-- Enhance: 通常画面と埋め込み画面の MFM 描画を共通化 (#154)
-- Enhance: WebAuthn autofill を利用する Conditional Mediation の opt-in 試験部品を追加（通常のログイン画面では既定で使用しない） (#99)
-- Fix: 埋め込み画面の内部リンク判定、MFM のクリック要素・リンク・タグ描画、相対時刻更新を本体側と揃えるように ([upstream #17993](https://github.com/misskey-dev/misskey/pull/17993))
+- Enhance: モデレーションログの差分表示にShikiを使用 (#140)
+- Enhance: 通常画面と埋め込み画面のMFM描画を共通化 (#154)
+- Enhance: アイコン画像・バナー画像を外せるように ([upstream #13676](https://github.com/misskey-dev/misskey/pull/13676))
+- Enhance: WebAuthn autofillを利用するConditional Mediationのopt-in 試験部品を追加（通常のログイン画面では既定で使用しない） (#99)
+- Fix: 埋め込み画面の内部リンク判定、MFMのクリック要素・リンク・タグ描画、相対時刻更新を本体側と揃えるように ([upstream #17993](https://github.com/misskey-dev/misskey/pull/17993))
 - Fix: 初期設定ダイアログでフッターが内容に重なる問題を修正 (#201)
 - Fix: パスワード変更時に現在のパスワードを先に、二要素認証を最後に入力するように (#80)
 - Fix: パスキー登録完了時の不要なパスワード再入力を省くように (#87)
-- Fix: パスワードログイン後は TOTP を優先し、利用可能な認証手段の情報に沿って明示的なパスキー代替で新しい challenge を取得するように (#117, #124)
-- Fix: Safari でデッキ列の表示が崩れる問題を修正 (#5)
+- Fix: パスワードログイン後はTOTPを優先し、利用可能な認証手段の情報に沿って明示的なパスキー代替で新しい challenge を取得するように (#117, #124)
+- Fix: Safariでデッキ列の表示が崩れる問題を修正 (#5)
 - Fix: テーマ切替が非同期処理で失敗した場合にも後処理を行うように (#4)
 - Fix: 画像加工の出力に失敗した後で再試行できない問題を修正 (#21)
 - Fix: 設定検索で動的な項目を扱う際に静的な検索項目が失われる問題を修正 (#25)
-- Fix: main/embed の言語別 entry・翻訳の初期化と文書の表示方向を修正し、CSS module の元の識別子とカスタム CSS の優先順位を維持 (#22, #26, #52, #69)
-- Fix: Service Worker の通知からのフォロー操作で、通知元のユーザー ID が文字列であることを確認するように ([a1b3e952](https://github.com/tamaina/misskey-a/commit/a1b3e952d3e6d30cef7dfa4127f069df8642424b))
+- Fix: main/embedの言語別entry・翻訳の初期化と文書の表示方向を修正し、CSS moduleの元の識別子とカスタムCSSの優先順位を維持 (#22, #26, #52, #69)
+- Fix: Service Workerの通知からのフォロー操作で、通知元のユーザーIDが文字列であることを確認するように ([a1b3e952](https://github.com/tamaina/misskey-a/commit/a1b3e952d3e6d30cef7dfa4127f069df8642424b))
 
 ### Server
+- Enhance: Node.js のセキュリティアップデートに伴い、最低動作バージョンを 24.22.3 / 26.13.1 に引き上げ、開発環境と Docker Image の Node.js を 26.13.1 に更新 (#249)
+- Perf: バンドルのESM shim・BullMQの読込を整理し、メモリ使用量を削減 ([upstream #18126](https://github.com/misskey-dev/misskey/pull/18126))
+- Fix: 引用ノートの本文に余分な RE: URL が付く問題を修正 ([upstream #18063](https://github.com/misskey-dev/misskey/pull/18063))
+- Fix: アンテナ配信時に引用・返信先を含めて自分の投票状態を反映 ([upstream #18056](https://github.com/misskey-dev/misskey/pull/18056))
+- Fix: キューの同時実行数が不正な場合は設定キーを示して起動時に停止 ([upstream #18081](https://github.com/misskey-dev/misskey/pull/18081))
+- Perf: UserLite 取得時の不要な詳細情報取得を削減し、メモの取得対象を絞り込み ([upstream #18093](https://github.com/misskey-dev/misskey/pull/18093))
+- Fix: プッシュ通知の送信先が HTTP 404 を返す場合も購読を削除 ([upstream #18104](https://github.com/misskey-dev/misskey/pull/18104))
+- Fix: ローカルタイムラインで返信非表示の設定が反映されない問題を修正 ([upstream #18086](https://github.com/misskey-dev/misskey/pull/18086))
+- Perf: Identicon の PNG 生成を軽量化 ([upstream #18099](https://github.com/misskey-dev/misskey/pull/18099))
+- Fix: 特定の条件下でドライブのファイル一覧がタイムアウトして開けない問題を修正 ([upstream #18129](https://github.com/misskey-dev/misskey/pull/18129))
+- Fix: リモートユーザーの再取得で通信に失敗した場合は既存情報を表示し、停止・ブロック済みサーバーへの再取得を省略するように (#233)
+- Enhance: Node.js のセキュリティアップデート（Brotli デコーダーの脆弱性 CVE-2026-111497）に伴い、最低動作バージョンを 22.23.4 / 24.22.1 / 26.12.1 に引き上げ、開発環境と Docker Image の Node.js を 26.12.1 に更新 (#225)
 - Feat: ユーザーの凍結時にフォロー関係を削除せず保持し、凍結解除後に復帰できるように (#1)
 - Feat: 新しいアカウントからのフォローを、ローカルの作成日時・リモートを最初に認識した日時からの期間で承認制にできるように (#14)
-- Feat: ブラウザーセッションを個別に発行・検証・失効し、`i/sessions`・`i/sessions/revoke`・`i/signout` とストリーム接続の失効に対応 (#104, #119)
-- Feat: トークンの権限に沿った API 検出・呼び出しを行う MCP と OAuth/CIMD 連携を追加 (#36, #43, #46, #56, #62)
-- Feat: MCP のメンション・返信・アンテナ・main/broadcast などのイベント購読と、永続化された有界の送信キューを試験的に追加 (#66, #72, #74, #76)
-- Feat: Tempura 互換のアバターデコレーション連合に対応 (#191)
+- Feat: ブラウザーセッションを個別に発行・検証・失効し、`i/sessions`・`i/sessions/revoke`・`i/signout`とストリーム接続の失効に対応 (#104, #119)
 - Feat: お知らせの自動アーカイブを予約できるように (#156)
-- Enhance: 通常の OAuth でも明示的な opt-in で権限を選択・追加できるようにし、MCP の同意画面では任意権限を初期 OFF で表示 (#56, #59, #63)
-- Enhance: 連合の Draft 署名を native ライブラリへ移し、複数公開鍵・受信時の鍵再取得・対応相手への Ed25519 署名に対応（従来の RSA 鍵との互換性を維持。RFC 9421 対応を意味しない） (#16, #18, #19)
 - Enhance: リモートの凍結状態をローカルの凍結と分離し、凍結状態の通知先を配信レシピに集約 (#3, #15)
-- Enhance: 配送ジョブの `deliverJobPerSec` 未指定時の既定値を毎秒128件から2048件に変更（並列数の既定値128と明示設定は維持） (#197)
 - Enhance: クリップの更新ストリームで閲覧権限を確認するように (#162)
-- Enhance: TOTP / パスキー API の canonical alias と設定画面の呼び出し先を整理 (#111, #123, #127)
-- Enhance: MCP のイベント記述・JSON Schema 2020-12・フィルター型を整理し、現在の権限・キャッシュに沿った検出結果を返すように (#79, #102, #130, #159, #173)
-- Fix: リモートへの引用 Renote でローカル限定絵文字を使用できる問題を修正 (#160)
+- Enhance: TOTP/パスキーAPIのcanonical aliasと設定画面の呼び出し先を整理 (#111, #123, #127)
+- Fix: リモートへの引用Renoteでローカル限定絵文字を使用できる問題を修正 (#160)
 - Fix: ピン留め解除で削除完了を待たずに応答する問題を修正 (#134)
 - Fix: 統計ログの応答待ちリスナーを接続終了時に解除するように (#91)
 - Fix: ログイントークンの再生成時に二要素認証を確認するように (#95)
-- Fix: WebAuthn の本人確認要求をサーバーの検証条件と揃えるように (#96)
-- Fix: 既存の inbox 署名の正規化処理を維持するように (#49)
-- Fix: UserProfile の password 列コメントを修正する migration を追加（パスワード処理自体の変更はなし） (#200)
-
+- Fix: WebAuthnの本人確認要求をサーバーの検証条件と揃えるように (#96)
+- Enhance: カスタム絵文字ZIPの生成・読み取りをzip.jsに統一し、重複画像と生成失敗時の一時ファイル処理を改善 (#208)
+- Fix: リストの作成・複製・名前変更で、名前の文字数制限をUnicodeコードポイント数の1〜100文字として判定するように（絵文字などの非BMP文字を含む名前に対応） (#217)
+- Fix: UserProfileのpassword列コメントを修正するmigrationを追加（パスワード処理自体の変更はなし） (#200)
+- Fix: Client ID Metadata Document に loopback の HTTP リダイレクトが含まれていても、登録済みの redirect_uri なら認可できるよう修正 (#220)
+- Fix: MCP の API 一覧と呼び出しから、契約の non-productive タグが付いたエンドポイントを除外するように (#221)
+- Enhance: ノート中のURLを正規化して禁止ワード・センシティブワードを判定するように ([upstream #18044](https://github.com/misskey-dev/misskey/pull/18044))
+- Perf: ストリーミングでのRenoteへの自分のリアクション取得・ミュートしたサーバーの参照をまとめ、受信メッセージとクライアントへの送信待ちバッファに上限を設定 ([upstream #18021](https://github.com/misskey-dev/misskey/pull/18021))
+- Fix: ルーム招待時にブロック状態を考慮するように ([upstream #18041](https://github.com/misskey-dev/misskey/pull/18041))
+- Fix: アカウント移行時に移行先サーバーのフォロワーを引き継げない問題を修正 ([upstream #18023](https://github.com/misskey-dev/misskey/pull/18023))
+- Fix: サーバーの紹介にHTMLを使うとリンクプレビューの説明文にHTMLタグが表示される問題を修正 ([upstream #18013](https://github.com/misskey-dev/misskey/pull/18013))
+- Fix: センシティブな画像をアイコン・バナーに指定できないように ([upstream #13676](https://github.com/misskey-dev/misskey/pull/13676))
+- Fix: 新規登録の同時実行時の競合、未ログイン時のロール権限判定、お知らせ更新の存在確認などを修正 ([upstream #18035](https://github.com/misskey-dev/misskey/pull/18035), [upstream #18045](https://github.com/misskey-dev/misskey/pull/18045))
+- Fix: セキュリティに関する修正 ([upstream be48948a](https://github.com/misskey-dev/misskey/commit/be48948adf))
 
 ## 2026.10.0
 

@@ -22,9 +22,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, defineAsyncComponent } from 'vue';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkSwiper from '@features/ui/frontend/components/MkSwiper.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	fileId: string;
@@ -39,7 +43,7 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => [{
 	key: 'info',
-	title: $locale.value.sfc.info,
+	title: globalLocale.value.env.info,
 	icon: 'ti ti-info-circle',
 }, {
 	key: 'notes',
@@ -55,7 +59,6 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"info": "عن",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -63,7 +66,6 @@ definePage(() => ({
 
 <locale locale="ca-ES" lang="json">
 {
-	"info": "Informació",
 	"attachedNotes": "Notes amb aquest fitxer",
 	"title": "Detall del fitxer"
 }
@@ -71,7 +73,6 @@ definePage(() => ({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"info": "Informace",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -79,7 +80,6 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
-	"info": "About",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -87,7 +87,6 @@ definePage(() => ({
 
 <locale locale="de-DE" lang="json">
 {
-	"info": "Über",
 	"attachedNotes": "Zugehörige Notizen",
 	"title": "Dateiinformationen"
 }
@@ -95,7 +94,6 @@ definePage(() => ({
 
 <locale locale="en-US" lang="json">
 {
-	"info": "About",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -103,7 +101,6 @@ definePage(() => ({
 
 <locale locale="es-ES" lang="json">
 {
-	"info": "Información",
 	"attachedNotes": "Notas adjuntas",
 	"title": "Detalles del archivo"
 }
@@ -111,7 +108,6 @@ definePage(() => ({
 
 <locale locale="fr-FR" lang="json">
 {
-	"info": "Informations",
 	"attachedNotes": "Notes avec ce fichier",
 	"title": "Détails du fichier"
 }
@@ -119,7 +115,6 @@ definePage(() => ({
 
 <locale locale="id-ID" lang="json">
 {
-	"info": "Informasi",
 	"attachedNotes": "Catatan yang dilampirkan",
 	"title": "Rincian berkas"
 }
@@ -127,7 +122,6 @@ definePage(() => ({
 
 <locale locale="it-IT" lang="json">
 {
-	"info": "Informazioni",
 	"attachedNotes": "Note a cui è allegato",
 	"title": "Dettagli del file"
 }
@@ -135,7 +129,6 @@ definePage(() => ({
 
 <locale locale="ja-JP" lang="json">
 {
-	"info": "情報",
 	"attachedNotes": "添付されているノート",
 	"title": "ファイルの詳細"
 }
@@ -143,7 +136,6 @@ definePage(() => ({
 
 <locale locale="ja-KS" lang="json">
 {
-	"info": "情報",
 	"attachedNotes": "ファイルがついてきてるノート",
 	"title": "ファイルの詳しい情報"
 }
@@ -151,7 +143,6 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"info": "About",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -159,7 +150,6 @@ definePage(() => ({
 
 <locale locale="kn-IN" lang="json">
 {
-	"info": "About",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -167,7 +157,6 @@ definePage(() => ({
 
 <locale locale="ko-KR" lang="json">
 {
-	"info": "정보",
 	"attachedNotes": "첨부된 노트",
 	"title": "파일 상세"
 }
@@ -175,7 +164,6 @@ definePage(() => ({
 
 <locale locale="nl-NL" lang="json">
 {
-	"info": "Over",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -183,7 +171,6 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
-	"info": "Infomasjon",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -191,7 +178,6 @@ definePage(() => ({
 
 <locale locale="pl-PL" lang="json">
 {
-	"info": "Informacje",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -199,7 +185,6 @@ definePage(() => ({
 
 <locale locale="pt-PT" lang="json">
 {
-	"info": "Informações",
 	"attachedNotes": "Notas anexadas",
 	"title": "Detalhes do arquivo"
 }
@@ -207,7 +192,6 @@ definePage(() => ({
 
 <locale locale="ru-RU" lang="json">
 {
-	"info": "Описание",
 	"attachedNotes": "Закреплённые заметки",
 	"title": "File details"
 }
@@ -215,7 +199,6 @@ definePage(() => ({
 
 <locale locale="sk-SK" lang="json">
 {
-	"info": "Informácie",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -223,7 +206,6 @@ definePage(() => ({
 
 <locale locale="th-TH" lang="json">
 {
-	"info": "เกี่ยวกับ",
 	"attachedNotes": "โน้ตที่แนบมาด้วย",
 	"title": "รายละเอียดไฟล์"
 }
@@ -231,7 +213,6 @@ definePage(() => ({
 
 <locale locale="tr-TR" lang="json">
 {
-	"info": "Hakkında",
 	"attachedNotes": "Ekli notlar",
 	"title": "Dosya ayrıntıları"
 }
@@ -239,7 +220,6 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
-	"info": "About",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -247,7 +227,6 @@ definePage(() => ({
 
 <locale locale="uk-UA" lang="json">
 {
-	"info": "Інформація",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -255,7 +234,6 @@ definePage(() => ({
 
 <locale locale="vi-VN" lang="json">
 {
-	"info": "Giới thiệu",
 	"attachedNotes": "Attached notes",
 	"title": "File details"
 }
@@ -263,7 +241,6 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
-	"info": "关于",
 	"attachedNotes": "附加到的帖子",
 	"title": "文件信息"
 }
@@ -271,7 +248,6 @@ definePage(() => ({
 
 <locale locale="zh-TW" lang="json">
 {
-	"info": "資訊",
 	"attachedNotes": "含有附件的貼文",
 	"title": "檔案詳細資訊"
 }

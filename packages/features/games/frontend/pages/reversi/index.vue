@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_panel _gaps" style="padding: 16px;">
 			<div class="_buttonsCenter">
 				<MkButton primary gradate rounded @click="matchAny">{{ $locale.sfc.reversiFreeMatch }}</MkButton>
-				<MkButton primary gradate rounded @click="matchUser">{{ $locale.sfc.invite }}</MkButton>
+				<MkButton primary gradate rounded @click="matchUser">{{ globalLocale.env.invite }}</MkButton>
 			</div>
 			<div style="font-size: 90%; opacity: 0.7; text-align: center;"><i class="ti ti-music"></i> {{ $locale.sfc.soundWillBePlayed }}</div>
 		</div>
@@ -98,13 +98,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 			{{ $locale.sfc.reversiLookingForPlayer }}<MkEllipsis/>
 		</div>
 		<div class="cancel">
-			<MkButton inline rounded @click="cancelMatching">{{ $locale.sfc.cancel }}</MkButton>
+			<MkButton inline rounded @click="cancelMatching">{{ globalLocale.env.cancel }}</MkButton>
 		</div>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { markRaw, onDeactivated, onMounted, onUnmounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { useInterval } from '@features/ui/frontend/shared/use-interval.js';
@@ -120,6 +121,9 @@ import * as os from '@features/ui/frontend/os.js';
 import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 import * as sound from '@features/preferences/frontend/utility/sound.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const myGamesPaginator = markRaw(new Paginator('reversi/games', {
 	limit: 10,
@@ -363,7 +367,6 @@ definePage(() => ({
 <locale lang="json" locale="ar-SA">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "دعوة",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "دعوة",
 	"reversiMyGames": "My rounds",
@@ -372,7 +375,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "في انتظار {x}",
 	"reversiLookingForPlayer": "يبحث عن خصم...",
-	"cancel": " إلغاء",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -381,7 +383,6 @@ definePage(() => ({
 <locale lang="json" locale="ca-ES">
 {
 	"reversiFreeMatch": "Partida lliure",
-	"invite": "Convida",
 	"soundWillBePlayed": "Es reproduiran efectes de so",
 	"invitations": "Convida",
 	"reversiMyGames": "Jugades",
@@ -390,7 +391,6 @@ definePage(() => ({
 	"reversiAllGames": "Totes les jugades",
 	"waitingFor": "Esperant {x}",
 	"reversiLookingForPlayer": "Buscant contrincant...",
-	"cancel": "Cancel·lar",
 	"reversiAllowIrregularRules": "Regles irregulars (totalment lliure)",
 	"reversiDisallowIrregularRules": "Sense regles irregulars"
 }
@@ -399,7 +399,6 @@ definePage(() => ({
 <locale lang="json" locale="cs-CZ">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Pozvat",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Pozvat",
 	"reversiMyGames": "My rounds",
@@ -408,7 +407,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Čeká se na {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Zrušit",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -417,7 +415,6 @@ definePage(() => ({
 <locale lang="json" locale="da-DK">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Invite",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Invites",
 	"reversiMyGames": "My rounds",
@@ -426,7 +423,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Waiting for {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Cancel",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -435,7 +431,6 @@ definePage(() => ({
 <locale lang="json" locale="de-DE">
 {
 	"reversiFreeMatch": "Freies Spiel",
-	"invite": "Einladen",
 	"soundWillBePlayed": "Es wird Ton wiedergegeben",
 	"invitations": "Einladungen",
 	"reversiMyGames": "Meine Runden",
@@ -444,7 +439,6 @@ definePage(() => ({
 	"reversiAllGames": "Alle Runden",
 	"waitingFor": "Warte auf {x} …",
 	"reversiLookingForPlayer": "Gegner werden gesucht...",
-	"cancel": "Abbrechen",
 	"reversiAllowIrregularRules": "Irreguläre Regeln (völlig frei)",
 	"reversiDisallowIrregularRules": "Keine irregulären Regeln"
 }
@@ -453,7 +447,6 @@ definePage(() => ({
 <locale lang="json" locale="en-US">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Invite",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Invites",
 	"reversiMyGames": "My rounds",
@@ -462,7 +455,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Waiting for {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Cancel",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -471,7 +463,6 @@ definePage(() => ({
 <locale lang="json" locale="es-ES">
 {
 	"reversiFreeMatch": "Partida libre",
-	"invite": "Invitar",
 	"soundWillBePlayed": "Con música y efectos sonoros",
 	"invitations": "Invitar",
 	"reversiMyGames": "Mis rondas",
@@ -480,7 +471,6 @@ definePage(() => ({
 	"reversiAllGames": "Todos los juegos",
 	"waitingFor": "Esperando a {x}",
 	"reversiLookingForPlayer": "Buscando oponente",
-	"cancel": "Cancelar",
 	"reversiAllowIrregularRules": "Reglas irregulares (completamente libre)",
 	"reversiDisallowIrregularRules": "Sin reglas irregulares "
 }
@@ -489,7 +479,6 @@ definePage(() => ({
 <locale lang="json" locale="fr-FR">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Inviter",
 	"soundWillBePlayed": "Le son sera joué",
 	"invitations": "Invitations",
 	"reversiMyGames": "My rounds",
@@ -498,7 +487,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "En attente de {x}",
 	"reversiLookingForPlayer": "Recherche d'adversaire",
-	"cancel": "Annuler",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -507,7 +495,6 @@ definePage(() => ({
 <locale lang="json" locale="id-ID">
 {
 	"reversiFreeMatch": "Pertandingan bebas",
-	"invite": "Undang",
 	"soundWillBePlayed": "Suara yang akan dimainkan",
 	"invitations": "Undangan",
 	"reversiMyGames": "Rondeku",
@@ -516,7 +503,6 @@ definePage(() => ({
 	"reversiAllGames": "Semua ronde",
 	"waitingFor": "Menunggu untuk {x}",
 	"reversiLookingForPlayer": "Mencari lawan...",
-	"cancel": "Batalkan",
 	"reversiAllowIrregularRules": "Aturan non-reguler (bebas sepenuhnya)",
 	"reversiDisallowIrregularRules": "Tanpa aturan non-reguler"
 }
@@ -525,7 +511,6 @@ definePage(() => ({
 <locale lang="json" locale="it-IT">
 {
 	"reversiFreeMatch": "Sfida libera",
-	"invite": "Invita",
 	"soundWillBePlayed": "Con musica ed effetti sonori",
 	"invitations": "Inviti",
 	"reversiMyGames": "Le mie sfide",
@@ -534,7 +519,6 @@ definePage(() => ({
 	"reversiAllGames": "Tutte le sfide",
 	"waitingFor": "Aspettando {x}",
 	"reversiLookingForPlayer": "Alla ricerca di un avversario",
-	"cancel": "Annulla",
 	"reversiAllowIrregularRules": "Regole inconsuete (completamente libere)",
 	"reversiDisallowIrregularRules": "Impedire le regole inconsuete"
 }
@@ -543,7 +527,6 @@ definePage(() => ({
 <locale lang="json" locale="ja-JP">
 {
 	"reversiFreeMatch": "フリーマッチ",
-	"invite": "招待",
 	"soundWillBePlayed": "サウンドが再生されます",
 	"invitations": "招待",
 	"reversiMyGames": "自分の対局",
@@ -552,7 +535,6 @@ definePage(() => ({
 	"reversiAllGames": "みんなの対局",
 	"waitingFor": "{x}を待っています",
 	"reversiLookingForPlayer": "対戦相手を探しています",
-	"cancel": "キャンセル",
 	"reversiAllowIrregularRules": "変則許可 (完全フリー)",
 	"reversiDisallowIrregularRules": "変則なし"
 }
@@ -561,7 +543,6 @@ definePage(() => ({
 <locale lang="json" locale="ja-KS">
 {
 	"reversiFreeMatch": "フリーマッチ",
-	"invite": "来てや",
 	"soundWillBePlayed": "サウンドが再生されるで",
 	"invitations": "来てや",
 	"reversiMyGames": "自分の対局",
@@ -570,7 +551,6 @@ definePage(() => ({
 	"reversiAllGames": "みんなの対局",
 	"waitingFor": "{x}を待っとるで",
 	"reversiLookingForPlayer": "対戦相手を探してるで",
-	"cancel": "やめる",
 	"reversiAllowIrregularRules": "変則許可 (完全フリー)",
 	"reversiDisallowIrregularRules": "変則なし"
 }
@@ -579,7 +559,6 @@ definePage(() => ({
 <locale lang="json" locale="kab-KAB">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Invite",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Invites",
 	"reversiMyGames": "My rounds",
@@ -588,7 +567,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Waiting for {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Cancel",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -597,7 +575,6 @@ definePage(() => ({
 <locale lang="json" locale="kn-IN">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Invite",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Invites",
 	"reversiMyGames": "My rounds",
@@ -606,7 +583,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Waiting for {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "ರದ್ದು",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -615,7 +591,6 @@ definePage(() => ({
 <locale lang="json" locale="ko-KR">
 {
 	"reversiFreeMatch": "자유 대국",
-	"invite": "초대",
 	"soundWillBePlayed": "소리가 재생됩니다",
 	"invitations": "초대",
 	"reversiMyGames": "내 대국",
@@ -624,7 +599,6 @@ definePage(() => ({
 	"reversiAllGames": "모든 대국",
 	"waitingFor": "{x}을(를) 기다리고 있습니다",
 	"reversiLookingForPlayer": "대국 상대를 찾고 있습니다",
-	"cancel": "취소",
 	"reversiAllowIrregularRules": "규칙 변경 허용(완전 자유)",
 	"reversiDisallowIrregularRules": "규칙 변경 없음"
 }
@@ -633,7 +607,6 @@ definePage(() => ({
 <locale lang="json" locale="nl-NL">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Uitnodigen",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Uitnodigen",
 	"reversiMyGames": "My rounds",
@@ -642,7 +615,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Wachten op {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Annuleren",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -651,7 +623,6 @@ definePage(() => ({
 <locale lang="json" locale="no-NO">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Inviter",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Inviter",
 	"reversiMyGames": "My rounds",
@@ -660,7 +631,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Venter på {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Avbryt",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -669,7 +639,6 @@ definePage(() => ({
 <locale lang="json" locale="pl-PL">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Zaproś",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Zaproś",
 	"reversiMyGames": "My rounds",
@@ -678,7 +647,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Oczekiwanie na {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Anuluj",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -687,7 +655,6 @@ definePage(() => ({
 <locale lang="json" locale="pt-PT">
 {
 	"reversiFreeMatch": "Partida Livre",
-	"invite": "Convidar",
 	"soundWillBePlayed": "Sons serão reproduzidos",
 	"invitations": "Convidar",
 	"reversiMyGames": "Meus jogos",
@@ -696,7 +663,6 @@ definePage(() => ({
 	"reversiAllGames": "Todos os jogos",
 	"waitingFor": "Aguardando por {x}",
 	"reversiLookingForPlayer": "À procura de adversários...",
-	"cancel": "Cancelar",
 	"reversiAllowIrregularRules": "Regras irregulares (completamente livre)",
 	"reversiDisallowIrregularRules": "Sem regras irregulares"
 }
@@ -705,7 +671,6 @@ definePage(() => ({
 <locale lang="json" locale="ru-RU">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Пригласить",
 	"soundWillBePlayed": "Будет воспроизведен звук",
 	"invitations": "Приглашения",
 	"reversiMyGames": "My rounds",
@@ -714,7 +679,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Ждём, когда {x} ответит",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Отмена",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -723,7 +687,6 @@ definePage(() => ({
 <locale lang="json" locale="sk-SK">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Pozvať",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Pozvať",
 	"reversiMyGames": "My rounds",
@@ -732,7 +695,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Čaká sa na {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Zrušiť",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -741,7 +703,6 @@ definePage(() => ({
 <locale lang="json" locale="th-TH">
 {
 	"reversiFreeMatch": "ฟรีแมตช์",
-	"invite": "คำเชิญ",
 	"soundWillBePlayed": "จะมีการเล่นเอฟเฟกต์เสียง",
 	"invitations": "คำเชิญ",
 	"reversiMyGames": "การเล่นของตัวเอง",
@@ -750,7 +711,6 @@ definePage(() => ({
 	"reversiAllGames": "การเล่นของทุกคน",
 	"waitingFor": "กำลังรอ {x}",
 	"reversiLookingForPlayer": "กำลังมองหาคู่ต่อสู้อยู่",
-	"cancel": "ยกเลิก",
 	"reversiAllowIrregularRules": "อนุญาตกฎที่ไม่ปรกติ (โหมดฟรีทุกอย่าง)",
 	"reversiDisallowIrregularRules": "ไม่อนุญาตกฎที่ไม่ปรกติ"
 }
@@ -759,7 +719,6 @@ definePage(() => ({
 <locale lang="json" locale="tr-TR">
 {
 	"reversiFreeMatch": "Ücretsiz Eşleştirme",
-	"invite": "Davet et",
 	"soundWillBePlayed": "Ses çalınacaktır",
 	"invitations": "Davetler",
 	"reversiMyGames": "Benim turlarım",
@@ -768,7 +727,6 @@ definePage(() => ({
 	"reversiAllGames": "Tüm turlar",
 	"waitingFor": "{x} bekleniyor",
 	"reversiLookingForPlayer": "Rakip aranıyor...",
-	"cancel": "Vazgeç",
 	"reversiAllowIrregularRules": "Düzensiz kurallar (tamamen ücretsiz)",
 	"reversiDisallowIrregularRules": "Düzensiz kurallar yok"
 }
@@ -777,7 +735,6 @@ definePage(() => ({
 <locale lang="json" locale="ug-CN">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Invite",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Invites",
 	"reversiMyGames": "My rounds",
@@ -786,7 +743,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Waiting for {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Cancel",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -795,7 +751,6 @@ definePage(() => ({
 <locale lang="json" locale="uk-UA">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Запросити",
 	"soundWillBePlayed": "Буде відтворено звук",
 	"invitations": "Запрошення",
 	"reversiMyGames": "My rounds",
@@ -804,7 +759,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Чекаємо на {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Скасувати",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -813,7 +767,6 @@ definePage(() => ({
 <locale lang="json" locale="vi-VN">
 {
 	"reversiFreeMatch": "Free Match",
-	"invite": "Mời",
 	"soundWillBePlayed": "Sound will be played",
 	"invitations": "Mời",
 	"reversiMyGames": "My rounds",
@@ -822,7 +775,6 @@ definePage(() => ({
 	"reversiAllGames": "All rounds",
 	"waitingFor": "Đang đợi {x}",
 	"reversiLookingForPlayer": "Finding opponent...",
-	"cancel": "Hủy",
 	"reversiAllowIrregularRules": "Irregular rules (completely free)",
 	"reversiDisallowIrregularRules": "No irregular rules"
 }
@@ -831,7 +783,6 @@ definePage(() => ({
 <locale lang="json" locale="zh-CN">
 {
 	"reversiFreeMatch": "自由匹配",
-	"invite": "邀请",
 	"soundWillBePlayed": "声音将会播放",
 	"invitations": "邀请",
 	"reversiMyGames": "我的对局",
@@ -840,7 +791,6 @@ definePage(() => ({
 	"reversiAllGames": "所有对局",
 	"waitingFor": "等待 {x}",
 	"reversiLookingForPlayer": "正在寻找对手",
-	"cancel": "取消",
 	"reversiAllowIrregularRules": "允许特殊规则（完全自由）",
 	"reversiDisallowIrregularRules": "禁止特殊规则"
 }
@@ -849,7 +799,6 @@ definePage(() => ({
 <locale lang="json" locale="zh-TW">
 {
 	"reversiFreeMatch": "自由對戰",
-	"invite": "邀請",
 	"soundWillBePlayed": "將播放音效",
 	"invitations": "邀請",
 	"reversiMyGames": "我的對弈",
@@ -858,7 +807,6 @@ definePage(() => ({
 	"reversiAllGames": "所有對弈",
 	"waitingFor": "等待{x}",
 	"reversiLookingForPlayer": "正在搜尋對手",
-	"cancel": "取消",
 	"reversiAllowIrregularRules": "允許異常規則（完全自由）",
 	"reversiDisallowIrregularRules": "不允許異常規則"
 }

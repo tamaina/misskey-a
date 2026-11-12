@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import { apiUrl } from '@features/boot/frontend/shared/config.js';
-import type { UploaderFeatures } from '@features/drive/frontend/composables/use-uploader.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { useStream } from '@features/api/frontend/stream.js';
@@ -17,6 +17,12 @@ import { instance } from '@features/instance/frontend/instance.js';
 import { globalEvents } from '@features/runtime/frontend/events.js';
 import { getProxiedImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
+import type { UploaderFeatures } from '@features/drive/frontend/composables/use-uploader.js';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 type UploadReturnType = {
 	filePromise: Promise<Misskey.entities.DriveFile>;
@@ -179,11 +185,13 @@ export function chooseFileFromPcAndUpload(
 
 export function chooseDriveFile(options: {
 	multiple?: boolean;
+	excludeSensitive?: boolean;
 } = {}): Promise<Misskey.entities.DriveFile[]> {
 	return new Promise((resolve, rej) => {
 		let dispose: () => void;
 		os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkDriveFileSelectDialog.vue').then(x => x.default), {
 			multiple: options.multiple ?? false,
+			excludeSensitive: options.excludeSensitive ?? false,
 		}, {
 			done: files => {
 				if (files) {
@@ -235,11 +243,11 @@ function select(anchorElement: HTMLElement | EventTarget | null, label: string |
 			text: label,
 			type: 'label',
 		} : null, {
-			text: FeatureLocaleMessages.$locale.upload,
+			text: getGlobalLocale().upload,
 			icon: 'ti ti-upload',
 			action: () => chooseFileFromPcAndUpload({ multiple, features }).then(files => res(files)),
 		}, {
-			text: FeatureLocaleMessages.$locale.fromDrive,
+			text: getGlobalLocale().fromDrive,
 			icon: 'ti ti-cloud',
 			action: () => chooseDriveFile({ multiple }).then(files => res(files)),
 		}, {

@@ -17,12 +17,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_gaps_s">
 			<div v-for="file in files" :key="file.id" class="wqugxsfx" :style="{ backgroundImage: file ? `url(${ file.thumbnailUrl })` : '' }">
 				<div class="name">{{ file.name }}</div>
-				<button v-tooltip="$locale.sfc.remove" class="remove _button" @click="remove(file)"><i class="ti ti-x"></i></button>
+				<button v-tooltip="globalLocale.env.remove" class="remove _button" @click="remove(file)"><i class="ti ti-x"></i></button>
 			</div>
 			<MkButton primary @click="chooseFile"><i class="ti ti-plus"></i> {{ $locale.sfc.attachFile }}</MkButton>
 		</div>
 
-		<MkSwitch v-model="isSensitive">{{ $locale.sfc.markAsSensitive }}</MkSwitch>
+		<MkSwitch v-model="isSensitive">{{ globalLocale.env.markAsSensitive }}</MkSwitch>
 
 		<div class="_buttons">
 			<MkButton v-if="props.post != null" primary @click="save"><i class="ti ti-device-floppy"></i> {{ globalLocale.env.save }}</MkButton>
@@ -36,7 +36,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { computed, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -47,6 +46,7 @@ import { selectFile } from '@features/drive/frontend/utility/drive.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -150,9 +150,7 @@ const headerTabs = computed(() => []);
 <locale locale="ar-SA" lang="json">
 {
 	"deleteConfirm": "أمتأكد من الحذف؟",
-	"remove": "حذف",
 	"attachFile": "أرفق ملفات",
-	"markAsSensitive": "علّمه كمحتوى حساس",
 	"publish": "علني"
 }
 </locale>
@@ -160,9 +158,7 @@ const headerTabs = computed(() => []);
 <locale locale="ca-ES" lang="json">
 {
 	"deleteConfirm": "Segur que vols esborrar?",
-	"remove": "Eliminar",
 	"attachFile": "Afegeix un arxiu",
-	"markAsSensitive": "Marcar com a sensible",
 	"publish": "Publicar"
 }
 </locale>
@@ -170,9 +166,7 @@ const headerTabs = computed(() => []);
 <locale locale="cs-CZ" lang="json">
 {
 	"deleteConfirm": "Opravdu smazat?",
-	"remove": "Smazat",
 	"attachFile": "Přiložit soubor",
-	"markAsSensitive": "Označit jako NSFW",
 	"publish": "Zveřejnit"
 }
 </locale>
@@ -180,9 +174,7 @@ const headerTabs = computed(() => []);
 <locale locale="da-DK" lang="json">
 {
 	"deleteConfirm": "Really delete?",
-	"remove": "Delete",
 	"attachFile": "Attach files",
-	"markAsSensitive": "Mark as sensitive",
 	"publish": "Publish"
 }
 </locale>
@@ -190,9 +182,7 @@ const headerTabs = computed(() => []);
 <locale locale="de-DE" lang="json">
 {
 	"deleteConfirm": "Wirklich löschen?",
-	"remove": "Löschen",
 	"attachFile": "Datei anhängen",
-	"markAsSensitive": "Als sensibel markieren",
 	"publish": "Veröffentlichen"
 }
 </locale>
@@ -200,9 +190,7 @@ const headerTabs = computed(() => []);
 <locale locale="en-US" lang="json">
 {
 	"deleteConfirm": "Really delete?",
-	"remove": "Delete",
 	"attachFile": "Attach files",
-	"markAsSensitive": "Mark as sensitive",
 	"publish": "Publish"
 }
 </locale>
@@ -210,9 +198,7 @@ const headerTabs = computed(() => []);
 <locale locale="es-ES" lang="json">
 {
 	"deleteConfirm": "¿Desea eliminarlo?",
-	"remove": "Borrar",
 	"attachFile": "Añadir archivo",
-	"markAsSensitive": "Marcar como sensible",
 	"publish": "Publicar"
 }
 </locale>
@@ -220,9 +206,7 @@ const headerTabs = computed(() => []);
 <locale locale="fr-FR" lang="json">
 {
 	"deleteConfirm": "Confirmez-vous la suppression?",
-	"remove": "Supprimer",
 	"attachFile": "Joindre un fichier",
-	"markAsSensitive": "Marquer comme sensible",
 	"publish": "Public"
 }
 </locale>
@@ -230,9 +214,7 @@ const headerTabs = computed(() => []);
 <locale locale="id-ID" lang="json">
 {
 	"deleteConfirm": "Yakin hapus?",
-	"remove": "Hapus",
 	"attachFile": "Lampirkan berkas",
-	"markAsSensitive": "Tandai sebagai konten sensitif",
 	"publish": "Terbitkan"
 }
 </locale>
@@ -240,9 +222,7 @@ const headerTabs = computed(() => []);
 <locale locale="it-IT" lang="json">
 {
 	"deleteConfirm": "Rimuovere?",
-	"remove": "Elimina",
 	"attachFile": "Allega file",
-	"markAsSensitive": "Segna come esplicito",
 	"publish": "Pubblicare"
 }
 </locale>
@@ -250,9 +230,7 @@ const headerTabs = computed(() => []);
 <locale locale="ja-JP" lang="json">
 {
 	"deleteConfirm": "削除しますか？",
-	"remove": "削除",
 	"attachFile": "ファイルを添付",
-	"markAsSensitive": "センシティブとして設定",
 	"publish": "公開"
 }
 </locale>
@@ -260,9 +238,7 @@ const headerTabs = computed(() => []);
 <locale locale="ja-KS" lang="json">
 {
 	"deleteConfirm": "ホンマにほかすで？",
-	"remove": "ほかす",
 	"attachFile": "ファイルのっける",
-	"markAsSensitive": "ちょっと見せられへんわ",
 	"publish": "公開"
 }
 </locale>
@@ -270,9 +246,7 @@ const headerTabs = computed(() => []);
 <locale locale="kab-KAB" lang="json">
 {
 	"deleteConfirm": "Really delete?",
-	"remove": "Kkes",
 	"attachFile": "Attach files",
-	"markAsSensitive": "Mark as sensitive",
 	"publish": "Publish"
 }
 </locale>
@@ -280,9 +254,7 @@ const headerTabs = computed(() => []);
 <locale locale="kn-IN" lang="json">
 {
 	"deleteConfirm": "Really delete?",
-	"remove": "ಅಳಿಸು",
 	"attachFile": "Attach files",
-	"markAsSensitive": "Mark as sensitive",
 	"publish": "Publish"
 }
 </locale>
@@ -290,9 +262,7 @@ const headerTabs = computed(() => []);
 <locale locale="ko-KR" lang="json">
 {
 	"deleteConfirm": "삭제하시겠습니까?",
-	"remove": "삭제",
 	"attachFile": "파일 첨부",
-	"markAsSensitive": "열람주의로 설정",
 	"publish": "공개"
 }
 </locale>
@@ -300,9 +270,7 @@ const headerTabs = computed(() => []);
 <locale locale="nl-NL" lang="json">
 {
 	"deleteConfirm": "Echt verwijderen?",
-	"remove": "Verwijderen",
 	"attachFile": "Bestanden toevoegen",
-	"markAsSensitive": "Markeren als NSFW",
 	"publish": "Publiceren"
 }
 </locale>
@@ -310,9 +278,7 @@ const headerTabs = computed(() => []);
 <locale locale="no-NO" lang="json">
 {
 	"deleteConfirm": "Vil du slette?",
-	"remove": "Slett",
 	"attachFile": "Legg ved filer",
-	"markAsSensitive": "Mark as sensitive",
 	"publish": "Publish"
 }
 </locale>
@@ -320,9 +286,7 @@ const headerTabs = computed(() => []);
 <locale locale="pl-PL" lang="json">
 {
 	"deleteConfirm": "Na pewno usunąć?",
-	"remove": "Usuń",
 	"attachFile": "Załącz pliki",
-	"markAsSensitive": "Oznacz jako NSFW",
 	"publish": "Publikuj"
 }
 </locale>
@@ -330,9 +294,7 @@ const headerTabs = computed(() => []);
 <locale locale="pt-PT" lang="json">
 {
 	"deleteConfirm": "Confirma a exclusão?",
-	"remove": "Remover",
 	"attachFile": "Anexar arquivo",
-	"markAsSensitive": "Marcar como sensível",
 	"publish": "Publicar"
 }
 </locale>
@@ -340,9 +302,7 @@ const headerTabs = computed(() => []);
 <locale locale="ru-RU" lang="json">
 {
 	"deleteConfirm": "Удалить?",
-	"remove": "Удалить",
 	"attachFile": "Прикрепить файлы",
-	"markAsSensitive": "Отметить как «не для всех»",
 	"publish": "Опубликовать"
 }
 </locale>
@@ -350,9 +310,7 @@ const headerTabs = computed(() => []);
 <locale locale="sk-SK" lang="json">
 {
 	"deleteConfirm": "Naozaj odstrániť?",
-	"remove": "Odstrániť",
 	"attachFile": "Priložiť súbor",
-	"markAsSensitive": "Označiť ako NSFW",
 	"publish": "Zverejniť"
 }
 </locale>
@@ -360,9 +318,7 @@ const headerTabs = computed(() => []);
 <locale locale="th-TH" lang="json">
 {
 	"deleteConfirm": "ต้องการลบใช่ไหม?",
-	"remove": "ลบ",
 	"attachFile": "แนบไฟล์",
-	"markAsSensitive": "ทำเครื่องหมายว่ามีเนื้อหาละเอียดอ่อน",
 	"publish": "เผยแพร่"
 }
 </locale>
@@ -370,9 +326,7 @@ const headerTabs = computed(() => []);
 <locale locale="tr-TR" lang="json">
 {
 	"deleteConfirm": "Cidden silmek istiyor musunuz?",
-	"remove": "Sil",
 	"attachFile": "Dosyaları ekle",
-	"markAsSensitive": "Hassas içerik olarak işaretle",
 	"publish": "Yayınla"
 }
 </locale>
@@ -380,9 +334,7 @@ const headerTabs = computed(() => []);
 <locale locale="ug-CN" lang="json">
 {
 	"deleteConfirm": "Really delete?",
-	"remove": "ئۆچۈرۈش",
 	"attachFile": "Attach files",
-	"markAsSensitive": "Mark as sensitive",
 	"publish": "Publish"
 }
 </locale>
@@ -390,9 +342,7 @@ const headerTabs = computed(() => []);
 <locale locale="uk-UA" lang="json">
 {
 	"deleteConfirm": "Ви дійсно бажаєте це видалити?",
-	"remove": "Видалити",
 	"attachFile": "Прикріпити файл",
-	"markAsSensitive": "Позначити як NSFW",
 	"publish": "Опублікувати"
 }
 </locale>
@@ -400,9 +350,7 @@ const headerTabs = computed(() => []);
 <locale locale="vi-VN" lang="json">
 {
 	"deleteConfirm": "Bạn có muốn xóa không?",
-	"remove": "Xóa",
 	"attachFile": "Đính kèm tập tin",
-	"markAsSensitive": "Đánh dấu là nhạy cảm",
 	"publish": "Đăng"
 }
 </locale>
@@ -410,9 +358,7 @@ const headerTabs = computed(() => []);
 <locale locale="zh-CN" lang="json">
 {
 	"deleteConfirm": "确定删除?",
-	"remove": "删除",
 	"attachFile": "添加附件",
-	"markAsSensitive": "标记为敏感内容",
 	"publish": "发布"
 }
 </locale>
@@ -420,9 +366,7 @@ const headerTabs = computed(() => []);
 <locale locale="zh-TW" lang="json">
 {
 	"deleteConfirm": "你確定要刪除嗎？",
-	"remove": "刪除",
 	"attachFile": "上傳附件",
-	"markAsSensitive": "標記為敏感內容",
 	"publish": "發布"
 }
 </locale>

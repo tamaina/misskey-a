@@ -38,6 +38,18 @@ export const iUpdateErrors = {
 		id: '75aedb19-2afd-4e6d-87fc-67941256fa60',
 	},
 
+	avatarIsSensitive: {
+		message: 'The file specified as an avatar is marked as sensitive.',
+		code: 'AVATAR_IS_SENSITIVE',
+		id: '71bb5e53-4742-4609-b465-36081e131208',
+	},
+
+	bannerIsSensitive: {
+		message: 'The file specified as a banner is marked as sensitive.',
+		code: 'BANNER_IS_SENSITIVE',
+		id: 'e148b34c-9f33-4300-93e0-7817008fb366',
+	},
+
 	noSuchPage: {
 		message: 'No such page.',
 		code: 'NO_SUCH_PAGE',
@@ -97,7 +109,7 @@ export const iUpdateContract = oc.$meta({
 		},
 } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/i/update', tags: ['account'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-	.errors({ ...commonErrors, NO_SUCH_AVATAR: { status: 400, data: apiErrorData }, NO_SUCH_BANNER: { status: 400, data: apiErrorData }, AVATAR_NOT_AN_IMAGE: { status: 400, data: apiErrorData }, BANNER_NOT_AN_IMAGE: { status: 400, data: apiErrorData }, NO_SUCH_PAGE: { status: 400, data: apiErrorData }, INVALID_REGEXP: { status: 400, data: apiErrorData }, TOO_MANY_MUTED_WORDS: { status: 400, data: apiErrorData }, NO_SUCH_USER: { status: 400, data: apiErrorData }, URI_NULL: { status: 400, data: apiErrorData }, FORBIDDEN_TO_SET_YOURSELF: { status: 400, data: apiErrorData }, RESTRICTED_BY_ROLE: { status: 400, data: apiErrorData }, YOUR_NAME_CONTAINS_PROHIBITED_WORDS: { status: 422, data: apiErrorData } }).input(v.pipe(objectInput({
+	.errors({ ...commonErrors, NO_SUCH_AVATAR: { status: 400, data: apiErrorData }, NO_SUCH_BANNER: { status: 400, data: apiErrorData }, AVATAR_NOT_AN_IMAGE: { status: 400, data: apiErrorData }, BANNER_NOT_AN_IMAGE: { status: 400, data: apiErrorData }, AVATAR_IS_SENSITIVE: { status: 400, data: apiErrorData }, BANNER_IS_SENSITIVE: { status: 400, data: apiErrorData }, NO_SUCH_PAGE: { status: 400, data: apiErrorData }, INVALID_REGEXP: { status: 400, data: apiErrorData }, TOO_MANY_MUTED_WORDS: { status: 400, data: apiErrorData }, NO_SUCH_USER: { status: 400, data: apiErrorData }, URI_NULL: { status: 400, data: apiErrorData }, FORBIDDEN_TO_SET_YOURSELF: { status: 400, data: apiErrorData }, RESTRICTED_BY_ROLE: { status: 400, data: apiErrorData }, YOUR_NAME_CONTAINS_PROHIBITED_WORDS: { status: 422, data: apiErrorData } }).input(v.pipe(objectInput({
 	name: v.optional(v.nullable(v.pipe(v.string(), v.minCodePoints(1), v.maxCodePoints(50)))),
 	description: v.optional(v.nullable(description)),
 	followedMessage: v.optional(v.nullable(v.pipe(v.string(), v.minCodePoints(1), v.maxCodePoints(256)))),

@@ -10,7 +10,7 @@ import { EventEmitter } from 'eventemitter3';
 import lightTheme from '@features/preferences/frontend/themes/_light.json5';
 import darkTheme from '@features/preferences/frontend/themes/_dark.json5';
 import { version } from '@features/boot/frontend/shared/config.js';
-import { getBuiltinThemes, parseThemeCode, themeProps, compile } from '@features/preferences/frontend/shared/theme.js';
+import { getBuiltinThemes, themeProps, compile } from '@features/preferences/frontend/shared/theme.js';
 import type { Theme, CompiledTheme } from '@features/preferences/frontend/shared/theme.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
@@ -203,6 +203,7 @@ export async function removeTheme(theme: Theme): Promise<void> {
 }
 
 export async function installTheme(code: string): Promise<void> {
+	const { parseThemeCode } = await import('@features/preferences/frontend/shared/theme-code.js');
 	const theme = parseThemeCode(code);
 	if (theme == null) return;
 	await addTheme(theme);

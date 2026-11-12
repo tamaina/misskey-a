@@ -205,12 +205,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, watch } from 'vue';
 import JSON5 from 'json5';
 import defaultLightTheme from '@features/preferences/frontend/themes/l-light.json5';
 import defaultDarkTheme from '@features/preferences/frontend/themes/d-green-lime.json5';
 import { isSafeMode } from '@features/boot/frontend/shared/config.js';
-import type { Theme } from '@features/preferences/frontend/shared/theme.js';
 import * as os from '@features/ui/frontend/os.js';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -229,6 +229,10 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { checkDragDataType, getDragData, getPlainDragData, setDragData, setPlainDragData } from '@features/ui/frontend/drag-and-drop.js';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const installedThemes = prefer.r.themes;
 const builtinThemes = ref<Theme[]>([]);
@@ -322,7 +326,7 @@ function onThemeContextmenu(theme: Theme, ev: PointerEvent) {
 		},
 	}, {
 		icon: 'ti ti-trash',
-		text: $locale.value.sfc.delete,
+		text: globalLocale.value.env.delete,
 		danger: true,
 		action: () => {
 			removeTheme(theme);
@@ -666,8 +670,7 @@ definePage(() => ({
 	"themeInstall": "تنصيب قالب",
 	"themeMake": "إنشاء قالب",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "حذف"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -689,8 +692,7 @@ definePage(() => ({
 	"themeInstall": "Instal·lar un tema",
 	"themeMake": "Crear un tema",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" es troba activat. Vols desactivar la sincronització i canviar de mode manualment?",
-	"themeCopyThemeCode": "Copiar el codi del tema",
-	"delete": "Elimina"
+	"themeCopyThemeCode": "Copiar el codi del tema"
 }
 </locale>
 
@@ -712,8 +714,7 @@ definePage(() => ({
 	"themeInstall": "Nainstalovat vzhled",
 	"themeMake": "Vytvořit téma",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Smazat"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -735,8 +736,7 @@ definePage(() => ({
 	"themeInstall": "Install a theme",
 	"themeMake": "Make a theme",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Delete"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -758,8 +758,7 @@ definePage(() => ({
 	"themeInstall": "Farbschemata installieren",
 	"themeMake": "Farbschema erstellen",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" ist eingeschaltet. Möchtest du die Synchronisation ausschalten und den Modus manuell wechseln?",
-	"themeCopyThemeCode": "Farbschemencode kopieren",
-	"delete": "Löschen"
+	"themeCopyThemeCode": "Farbschemencode kopieren"
 }
 </locale>
 
@@ -781,8 +780,7 @@ definePage(() => ({
 	"themeInstall": "Install a theme",
 	"themeMake": "Make a theme",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Delete"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -804,8 +802,7 @@ definePage(() => ({
 	"themeInstall": "Instalar tema",
 	"themeMake": "Crear tema",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "{x} está activado ¿Te gustaría desactivar la sincronización y cambiar al modo manual?",
-	"themeCopyThemeCode": "Copiar el código del tema",
-	"delete": "Borrar"
+	"themeCopyThemeCode": "Copiar el código del tema"
 }
 </locale>
 
@@ -827,8 +824,7 @@ definePage(() => ({
 	"themeInstall": "Installer un thème",
 	"themeMake": "Créer un thème",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Supprimer"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -850,8 +846,7 @@ definePage(() => ({
 	"themeInstall": "Pasang tema",
 	"themeMake": "Buat tema",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" sedang dinyalakan. Apa anda ingin untuk menghentikan sinkronisasi dan mengganti mode secara manual?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Hapus"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -873,8 +868,7 @@ definePage(() => ({
 	"themeInstall": "Installa un tema",
 	"themeMake": "Crea un tema",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "({x}) è attiva. Vuoi disattivare la sincronizzazione e passare alla modalità manuale?",
-	"themeCopyThemeCode": "Copia il codice del Tema",
-	"delete": "Elimina"
+	"themeCopyThemeCode": "Copia il codice del Tema"
 }
 </locale>
 
@@ -896,8 +890,7 @@ definePage(() => ({
 	"themeInstall": "テーマのインストール",
 	"themeMake": "テーマを作る",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "「{x}」がオンになっています。同期をオフにして手動でモードを切り替えますか？",
-	"themeCopyThemeCode": "テーマコードをコピー",
-	"delete": "削除"
+	"themeCopyThemeCode": "テーマコードをコピー"
 }
 </locale>
 
@@ -919,8 +912,7 @@ definePage(() => ({
 	"themeInstall": "テーマのインストール",
 	"themeMake": "テーマ作る",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "「{x}」がオンになってるで。同期切って手動でモード切り替える？",
-	"themeCopyThemeCode": "テーマコードをコピー",
-	"delete": "ほかす"
+	"themeCopyThemeCode": "テーマコードをコピー"
 }
 </locale>
 
@@ -942,8 +934,7 @@ definePage(() => ({
 	"themeInstall": "Install a theme",
 	"themeMake": "Make a theme",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Kkes"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -965,8 +956,7 @@ definePage(() => ({
 	"themeInstall": "Install a theme",
 	"themeMake": "Make a theme",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "ಅಳಿಸು"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -988,8 +978,7 @@ definePage(() => ({
 	"themeInstall": "테마 설치",
 	"themeMake": "테마 만들기",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "'{x}'가 켜져 있습니다. 동기화를 끄고 수동으로 모드를 변경하겠습니까?",
-	"themeCopyThemeCode": "테마 코드 복사",
-	"delete": "삭제"
+	"themeCopyThemeCode": "테마 코드 복사"
 }
 </locale>
 
@@ -1011,8 +1000,7 @@ definePage(() => ({
 	"themeInstall": "Install a theme",
 	"themeMake": "Make a theme",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Verwijderen"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -1034,8 +1022,7 @@ definePage(() => ({
 	"themeInstall": "Install a theme",
 	"themeMake": "Make a theme",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Slett"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -1057,8 +1044,7 @@ definePage(() => ({
 	"themeInstall": "Zainstaluj motyw",
 	"themeMake": "Utwórz motyw",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Usuń"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -1080,8 +1066,7 @@ definePage(() => ({
 	"themeInstall": "Instalar um tema",
 	"themeMake": "Fazer um tema",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" está ativado. Você gostaria de desligar a sincronização e alterar manualmente?",
-	"themeCopyThemeCode": "Copiar código do tema",
-	"delete": "Excluir"
+	"themeCopyThemeCode": "Copiar código do tema"
 }
 </locale>
 
@@ -1103,8 +1088,7 @@ definePage(() => ({
 	"themeInstall": "Установить тему",
 	"themeMake": "Создать тему",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "Включена функция \"{x}\". Отключить синхронизацию, чтобы переключать режим вручную?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Удалить"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -1126,8 +1110,7 @@ definePage(() => ({
 	"themeInstall": "Nainštalovať tému",
 	"themeMake": "Vytvoriť tému",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Odstrániť"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -1149,8 +1132,7 @@ definePage(() => ({
 	"themeInstall": "ติดตั้งธีม",
 	"themeMake": "ทำธีม",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "“{x}” เปิดอยู่ ต้องการปิดการซิงค์และสลับโหมดด้วยตนเองหรือไม่?",
-	"themeCopyThemeCode": "คัดลอกรหัสธีม",
-	"delete": "ลบ"
+	"themeCopyThemeCode": "คัดลอกรหัสธีม"
 }
 </locale>
 
@@ -1172,8 +1154,7 @@ definePage(() => ({
 	"themeInstall": "Bir tema yükle",
 	"themeMake": "Bir tema oluşturun",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" açık. Senkronizasyonu kapatıp modları manuel olarak değiştirmek ister misin?",
-	"themeCopyThemeCode": "Tema kodunu kopyala",
-	"delete": "Sil"
+	"themeCopyThemeCode": "Tema kodunu kopyala"
 }
 </locale>
 
@@ -1195,8 +1176,7 @@ definePage(() => ({
 	"themeInstall": "Install a theme",
 	"themeMake": "Make a theme",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "ئۆچۈرۈش"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -1218,8 +1198,7 @@ definePage(() => ({
 	"themeInstall": "Встановити тему",
 	"themeMake": "Створити тему",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "Увімкнено «{x}». Бажаєте вимкнути синхронізацію та перемикати режими вручну?\n",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Видалити"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -1241,8 +1220,7 @@ definePage(() => ({
 	"themeInstall": "Cài đặt theme",
 	"themeMake": "Tạo theme",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "\"{x}\" is turned on. Would you like to turn off synchronization and switch modes manually?",
-	"themeCopyThemeCode": "Copy theme code",
-	"delete": "Xóa"
+	"themeCopyThemeCode": "Copy theme code"
 }
 </locale>
 
@@ -1264,8 +1242,7 @@ definePage(() => ({
 	"themeInstall": "安装主题",
 	"themeMake": "制作主题",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "“{x}” 已开启。要关闭同步并手动切换模式吗？",
-	"themeCopyThemeCode": "复制主题代码",
-	"delete": "删除"
+	"themeCopyThemeCode": "复制主题代码"
 }
 </locale>
 
@@ -1287,7 +1264,6 @@ definePage(() => ({
 	"themeInstall": "安裝佈景主題",
 	"themeMake": "製作佈景主題",
 	"switchDarkModeManuallyWhenSyncEnabledConfirm": "「{x}」已開啟。要關閉同步並手動切換模式嗎？\n",
-	"themeCopyThemeCode": "複製主題代碼",
-	"delete": "刪除"
+	"themeCopyThemeCode": "複製主題代碼"
 }
 </locale>

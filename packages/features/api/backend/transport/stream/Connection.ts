@@ -54,6 +54,7 @@ const MAX_PENDING_BROWSER_SESSION_OUTPUTS = 64;
 const MAX_PENDING_BROWSER_SESSION_OUTPUT_BYTES = 1024 * 1024;
 const MAX_PENDING_BROWSER_SESSION_INPUTS = 64;
 const MAX_PENDING_BROWSER_SESSION_INPUT_BYTES = 1024 * 1024;
+const MAX_BUFFERED_AMOUNT_PER_CONNECTION = 1024 * 1024 * 8; // 8MiB
 
 /**
  * Main stream connection
@@ -480,10 +481,18 @@ export default class Connection {
 			return;
 		}
 		if (this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return;
-		this.wsConnection.send(JSON.stringify({
+		const message = JSON.stringify({
 			type: type,
 			body: payload,
-		}));
+		});
+
+		// 受信が追いつかないクライアントのために送信バッファを溜め続けないよう、閾値を超えたら切断して再接続させる
+		if (this.wsConnection.bufferedAmount + Buffer.byteLength(message) > MAX_BUFFERED_AMOUNT_PER_CONNECTION) {
+			this.wsConnection.terminate();
+			return;
+		}
+
+		this.wsConnection.send(message);
 		return;
 	}
 

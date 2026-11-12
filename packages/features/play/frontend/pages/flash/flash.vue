@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkButton v-if="flash.isLiked" v-tooltip="$locale.sfc.unlike" asLike class="button" rounded primary @click="unlike()"><i class="ti ti-heart"></i><span v-if="flash?.likedCount && flash.likedCount > 0" style="margin-left: 6px;">{{ flash.likedCount }}</span></MkButton>
 								<MkButton v-else v-tooltip="$locale.sfc.like" asLike class="button" rounded @click="like()"><i class="ti ti-heart"></i><span v-if="flash?.likedCount && flash.likedCount > 0" style="margin-left: 6px;">{{ flash.likedCount }}</span></MkButton>
 								<MkButton v-tooltip="$locale.sfc.copyLink" class="button" rounded @click="copyLink"><i class="ti ti-link ti-fw"></i></MkButton>
-								<MkButton v-tooltip="$locale.sfc.share" class="button" rounded @click="share"><i class="ti ti-share ti-fw"></i></MkButton>
+								<MkButton v-tooltip="globalLocale.env.share" class="button" rounded @click="share"><i class="ti ti-share ti-fw"></i></MkButton>
 								<MkButton v-if="$i && $i.id !== flash.user.id" class="button" rounded @mousedown="showMenu"><i class="ti ti-dots ti-fw"></i></MkButton>
 							</div>
 						</div>
@@ -46,8 +46,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div :class="$style.footer">
 					<Mfm :text="`By @${flash.user.username}`"/>
 					<div class="date">
-						<div v-if="flash.createdAt != flash.updatedAt"><i class="ti ti-clock"></i> {{ $locale.sfc.updatedAt }}: <MkTime :time="flash.updatedAt" mode="detail"/></div>
-						<div><i class="ti ti-clock"></i> {{ $locale.sfc.createdAt }}: <MkTime :time="flash.createdAt" mode="detail"/></div>
+						<div v-if="flash.createdAt != flash.updatedAt"><i class="ti ti-clock"></i> {{ globalLocale.env.updatedAt }}: <MkTime :time="flash.updatedAt" mode="detail"/></div>
+						<div><i class="ti ti-clock"></i> {{ globalLocale.env.createdAt }}: <MkTime :time="flash.createdAt" mode="detail"/></div>
 					</div>
 				</div>
 				<MkA v-if="$i && $i.id === flash.userId" :to="`/play/${flash.id}/edit`" style="color: var(--MI_THEME-accent);">{{ $locale.sfc.editThisPage }}</MkA>
@@ -62,16 +62,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { computed, onDeactivated, onUnmounted, ref, watch, shallowRef, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 import { utils } from '@syuilo/aiscript';
 import { compareVersions } from 'compare-versions';
 import { url } from '@features/boot/frontend/shared/config.js';
-import type { Ref } from 'vue';
-import type { AsUiComponent, AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import type { Interpreter } from '@syuilo/aiscript';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
@@ -86,6 +81,11 @@ import { $i } from '@features/auth/frontend/i.js';
 import { isSupportShare } from '@features/navigation/frontend/utility/navigator.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
+import type { Interpreter } from '@syuilo/aiscript';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { AsUiComponent, AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';
+import type { Ref } from 'vue';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -120,7 +120,7 @@ function share(ev: PointerEvent) {
 
 	if (isSupportShare()) {
 		menuItems.push({
-			text: $locale.value.sfc.share,
+			text: globalLocale.value.env.share,
 			icon: 'ti ti-share',
 			action: shareWithNavigator,
 		});
@@ -441,7 +441,6 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"shareWithNote": "شاركه في ملاحظة",
-	"share": "شارِك",
 	"unlikeConfirm": "أتريد إلغاء إعجابك؟",
 	"reportAbuse": "أبلغ",
 	"deleteConfirm": "أمتأكد من الحذف؟",
@@ -450,8 +449,6 @@ definePage(() => ({
 	"copyLink": "انسخ الرابط",
 	"numberOfLikes": "الإعجابات",
 	"viewSource": "اظهر المصدر",
-	"updatedAt": "حُدّث في",
-	"createdAt": "أُنشئ في",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -459,7 +456,6 @@ definePage(() => ({
 <locale locale="ca-ES" lang="json">
 {
 	"shareWithNote": "Comparteix amb una nota",
-	"share": "Comparteix",
 	"unlikeConfirm": "Vols esborrar el teu m'agrada?",
 	"reportAbuse": "Denuncia un abús ",
 	"deleteConfirm": "Segur que vols esborrar?",
@@ -468,8 +464,6 @@ definePage(() => ({
 	"copyLink": "Copia l'enllaç",
 	"numberOfLikes": "M'agraden ",
 	"viewSource": "Veure l'origen ",
-	"updatedAt": "Actualitzat el",
-	"createdAt": "Creat el",
 	"editThisPage": "Edita aquest guió"
 }
 </locale>
@@ -477,7 +471,6 @@ definePage(() => ({
 <locale locale="cs-CZ" lang="json">
 {
 	"shareWithNote": "Sdílet s poznámkou",
-	"share": "Sdílet",
 	"unlikeConfirm": "Opravdu chcete odstranit like?",
 	"reportAbuse": "Nahlášení",
 	"deleteConfirm": "Opravdu smazat?",
@@ -486,8 +479,6 @@ definePage(() => ({
 	"copyLink": "Kopírovat odkaz",
 	"numberOfLikes": "Počet \"To se mi líbí\"",
 	"viewSource": "Zobrazit zdroj",
-	"updatedAt": "Upraveno",
-	"createdAt": "Vytvořeno",
 	"editThisPage": "Upravit tenhle Play"
 }
 </locale>
@@ -495,7 +486,6 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
 	"deleteConfirm": "Really delete?",
@@ -504,8 +494,6 @@ definePage(() => ({
 	"copyLink": "Copy link",
 	"numberOfLikes": "Likes",
 	"viewSource": "View source",
-	"updatedAt": "Updated at",
-	"createdAt": "Created at",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -513,7 +501,6 @@ definePage(() => ({
 <locale locale="de-DE" lang="json">
 {
 	"shareWithNote": "Mit Notiz teilen",
-	"share": "Teilen",
 	"unlikeConfirm": "\"Gefällt mir\" wirklich entfernen?",
 	"reportAbuse": "Melden",
 	"deleteConfirm": "Wirklich löschen?",
@@ -522,8 +509,6 @@ definePage(() => ({
 	"copyLink": "Link kopieren",
 	"numberOfLikes": "\"Gefällt mir\"-Anzahl",
 	"viewSource": "Quelltext anzeigen",
-	"updatedAt": "Zuletzt geändert am",
-	"createdAt": "Erstellt am",
 	"editThisPage": "Dieses Play bearbeiten"
 }
 </locale>
@@ -531,7 +516,6 @@ definePage(() => ({
 <locale locale="en-US" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
 	"deleteConfirm": "Really delete?",
@@ -540,8 +524,6 @@ definePage(() => ({
 	"copyLink": "Copy link",
 	"numberOfLikes": "Likes",
 	"viewSource": "View source",
-	"updatedAt": "Updated at",
-	"createdAt": "Created at",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -549,7 +531,6 @@ definePage(() => ({
 <locale locale="es-ES" lang="json">
 {
 	"shareWithNote": "Compartir con una nota",
-	"share": "Compartir",
 	"unlikeConfirm": "¿Quitar como favorito?",
 	"reportAbuse": "Reportar",
 	"deleteConfirm": "¿Desea eliminarlo?",
@@ -558,8 +539,6 @@ definePage(() => ({
 	"copyLink": "Copiar enlace",
 	"numberOfLikes": "Cantidad de 'Me gusta'",
 	"viewSource": "Ver la fuente",
-	"updatedAt": "Actualizado",
-	"createdAt": "Fecha de creación",
 	"editThisPage": "Editar este guión"
 }
 </locale>
@@ -567,7 +546,6 @@ definePage(() => ({
 <locale locale="fr-FR" lang="json">
 {
 	"shareWithNote": "Partager dans une note",
-	"share": "Partager",
 	"unlikeConfirm": "Êtes-vous sûr·e de ne plus vouloir aimer cette publication ?",
 	"reportAbuse": "Signaler",
 	"deleteConfirm": "Confirmez-vous la suppression?",
@@ -576,8 +554,6 @@ definePage(() => ({
 	"copyLink": "Copier le lien",
 	"numberOfLikes": "Favoris",
 	"viewSource": "Afficher la source",
-	"updatedAt": "Mis à jour le",
-	"createdAt": "Date de création",
 	"editThisPage": "Modifier ce Play"
 }
 </locale>
@@ -585,7 +561,6 @@ definePage(() => ({
 <locale locale="id-ID" lang="json">
 {
 	"shareWithNote": "Bagikan dengan catatan",
-	"share": "Bagikan",
 	"unlikeConfirm": "Yakin ingin hapus sukamu?",
 	"reportAbuse": "Laporkan",
 	"deleteConfirm": "Yakin hapus?",
@@ -594,8 +569,6 @@ definePage(() => ({
 	"copyLink": "Salin tautan",
 	"numberOfLikes": "Jumlah yang disukai",
 	"viewSource": "Lihat sumber",
-	"updatedAt": "Diperbarui pada",
-	"createdAt": "Dibuat pada",
 	"editThisPage": "Sunting Permainan ini"
 }
 </locale>
@@ -603,7 +576,6 @@ definePage(() => ({
 <locale locale="it-IT" lang="json">
 {
 	"shareWithNote": "Condividere in nota",
-	"share": "Condividi",
 	"unlikeConfirm": "Non ti piace più?",
 	"reportAbuse": "Segnalare",
 	"deleteConfirm": "Rimuovere?",
@@ -612,8 +584,6 @@ definePage(() => ({
 	"copyLink": "Copia il link",
 	"numberOfLikes": "Quantità di Like",
 	"viewSource": "Visualizza sorgente",
-	"updatedAt": "Aggiornato il",
-	"createdAt": "Data di creazione",
 	"editThisPage": "Modifica il Play"
 }
 </locale>
@@ -621,7 +591,6 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"shareWithNote": "ノートで共有",
-	"share": "共有",
 	"unlikeConfirm": "いいね解除しますか？",
 	"reportAbuse": "通報",
 	"deleteConfirm": "削除しますか？",
@@ -630,8 +599,6 @@ definePage(() => ({
 	"copyLink": "リンクをコピー",
 	"numberOfLikes": "いいね数",
 	"viewSource": "ソースを表示",
-	"updatedAt": "更新日時",
-	"createdAt": "作成日時",
 	"editThisPage": "このPlayを編集"
 }
 </locale>
@@ -639,7 +606,6 @@ definePage(() => ({
 <locale locale="ja-KS" lang="json">
 {
 	"shareWithNote": "ノートで共有",
-	"share": "わけわけ",
 	"unlikeConfirm": "いいね解除するんか？",
 	"reportAbuse": "通報",
 	"deleteConfirm": "ホンマにほかすで？",
@@ -648,8 +614,6 @@ definePage(() => ({
 	"copyLink": "リンクをコピー",
 	"numberOfLikes": "いいね数",
 	"viewSource": "ソースを表示",
-	"updatedAt": "更新日時",
-	"createdAt": "作成した日",
 	"editThisPage": "このPlayを編集"
 }
 </locale>
@@ -657,7 +621,6 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
 	"deleteConfirm": "Really delete?",
@@ -666,8 +629,6 @@ definePage(() => ({
 	"copyLink": "Copy link",
 	"numberOfLikes": "Likes",
 	"viewSource": "View source",
-	"updatedAt": "Updated at",
-	"createdAt": "Created at",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -675,7 +636,6 @@ definePage(() => ({
 <locale locale="kn-IN" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
 	"deleteConfirm": "Really delete?",
@@ -684,8 +644,6 @@ definePage(() => ({
 	"copyLink": "ಲಿಂಕನ್ನು ನಕಲಿಸು",
 	"numberOfLikes": "Likes",
 	"viewSource": "View source",
-	"updatedAt": "Updated at",
-	"createdAt": "Created at",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -693,7 +651,6 @@ definePage(() => ({
 <locale locale="ko-KR" lang="json">
 {
 	"shareWithNote": "노트로 공유",
-	"share": "공유",
 	"unlikeConfirm": "좋아요를 취소할까요?",
 	"reportAbuse": "신고",
 	"deleteConfirm": "삭제하시겠습니까?",
@@ -702,8 +659,6 @@ definePage(() => ({
 	"copyLink": "링크 복사",
 	"numberOfLikes": "좋아요 수",
 	"viewSource": "소스 보기",
-	"updatedAt": "수정한 날짜",
-	"createdAt": "생성된 날짜",
 	"editThisPage": "이 Play를 수정"
 }
 </locale>
@@ -711,7 +666,6 @@ definePage(() => ({
 <locale locale="nl-NL" lang="json">
 {
 	"shareWithNote": "Delen met notitie",
-	"share": "Delen",
 	"unlikeConfirm": "Wil je echt je like verwijderen?",
 	"reportAbuse": "Meld",
 	"deleteConfirm": "Echt verwijderen?",
@@ -720,8 +674,6 @@ definePage(() => ({
 	"copyLink": "Kopiëren link",
 	"numberOfLikes": "Likes",
 	"viewSource": "View source",
-	"updatedAt": "Laatst gewijzigd at",
-	"createdAt": "Aangemaakt at",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -729,7 +681,6 @@ definePage(() => ({
 <locale locale="no-NO" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Del",
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Rappoter",
 	"deleteConfirm": "Vil du slette?",
@@ -738,8 +689,6 @@ definePage(() => ({
 	"copyLink": "Kopier lenke",
 	"numberOfLikes": "Likerklikk",
 	"viewSource": "View source",
-	"updatedAt": "Updated at",
-	"createdAt": "Created at",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -747,7 +696,6 @@ definePage(() => ({
 <locale locale="pl-PL" lang="json">
 {
 	"shareWithNote": "Udostępnij z wpisem",
-	"share": "Udostępnij",
 	"unlikeConfirm": "Na pewno chcesz usunąć\u00a0polubienie?",
 	"reportAbuse": "Zgłoś",
 	"deleteConfirm": "Na pewno usunąć?",
@@ -756,8 +704,6 @@ definePage(() => ({
 	"copyLink": "Skopiuj odnośnik",
 	"numberOfLikes": "Liczba polubień",
 	"viewSource": "Zobacz źródło",
-	"updatedAt": "Zaktualizowano",
-	"createdAt": "Utworzono",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -765,7 +711,6 @@ definePage(() => ({
 <locale locale="pt-PT" lang="json">
 {
 	"shareWithNote": "Compartilhar em Notas",
-	"share": "Compartilhar",
 	"unlikeConfirm": "Deseja realmente deixar de curtir?",
 	"reportAbuse": "Denunciar",
 	"deleteConfirm": "Confirma a exclusão?",
@@ -774,8 +719,6 @@ definePage(() => ({
 	"copyLink": "Copiar link",
 	"numberOfLikes": "Número de curtidas",
 	"viewSource": "Ver fonte",
-	"updatedAt": "Última atualização",
-	"createdAt": "Data de criação",
 	"editThisPage": "Editar este Play"
 }
 </locale>
@@ -783,7 +726,6 @@ definePage(() => ({
 <locale locale="ru-RU" lang="json">
 {
 	"shareWithNote": "Поделиться заметкой",
-	"share": "Поделиться",
 	"unlikeConfirm": "В самом деле убрать «нравится»?",
 	"reportAbuse": "Жалоба",
 	"deleteConfirm": "Удалить?",
@@ -792,8 +734,6 @@ definePage(() => ({
 	"copyLink": "Скопировать ссылку",
 	"numberOfLikes": "Количество лайков",
 	"viewSource": "Просмотр исходника",
-	"updatedAt": "Обновлено",
-	"createdAt": "Создано",
 	"editThisPage": "Отредактировать страницу"
 }
 </locale>
@@ -801,7 +741,6 @@ definePage(() => ({
 <locale locale="sk-SK" lang="json">
 {
 	"shareWithNote": "Zdieľať s poznámkou",
-	"share": "Zdieľať",
 	"unlikeConfirm": "Naozaj odstrániť váš like?",
 	"reportAbuse": "Nahlásiť",
 	"deleteConfirm": "Naozaj odstrániť?",
@@ -810,8 +749,6 @@ definePage(() => ({
 	"copyLink": "Kopírovať odkaz",
 	"numberOfLikes": "Likes",
 	"viewSource": "Ukázať zdroj",
-	"updatedAt": "Upravené",
-	"createdAt": "Vytvorené",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -819,7 +756,6 @@ definePage(() => ({
 <locale locale="th-TH" lang="json">
 {
 	"shareWithNote": "แบ่งปันด้วยโน้ต",
-	"share": "แบ่งปัน",
 	"unlikeConfirm": "ต้องการเลิกถูกใจใช่ไหม?",
 	"reportAbuse": "รายงาน",
 	"deleteConfirm": "ต้องการลบใช่ไหม?",
@@ -828,8 +764,6 @@ definePage(() => ({
 	"copyLink": "คัดลอกลิงก์",
 	"numberOfLikes": "จำนวนยอดถูกใจ",
 	"viewSource": "ดูต้นฉบับ",
-	"updatedAt": "อัปเดตล่าสุด",
-	"createdAt": "สร้างเมื่อ",
 	"editThisPage": "แก้ไข Play นี้"
 }
 </locale>
@@ -837,7 +771,6 @@ definePage(() => ({
 <locale locale="tr-TR" lang="json">
 {
 	"shareWithNote": "Notla paylaş",
-	"share": "Paylaş",
 	"unlikeConfirm": "Cidden beğenini kaldırmak mı istiyorsun?",
 	"reportAbuse": "Rapor",
 	"deleteConfirm": "Cidden silmek istiyor musunuz?",
@@ -846,8 +779,6 @@ definePage(() => ({
 	"copyLink": "Link kopyala",
 	"numberOfLikes": "Beğeniler",
 	"viewSource": "Kaynak görüntüle",
-	"updatedAt": "Güncellendi",
-	"createdAt": "Oluşturuldu",
 	"editThisPage": "Bu Oyunu Düzenle"
 }
 </locale>
@@ -855,7 +786,6 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
 	"deleteConfirm": "Really delete?",
@@ -864,8 +794,6 @@ definePage(() => ({
 	"copyLink": "Copy link",
 	"numberOfLikes": "Likes",
 	"viewSource": "View source",
-	"updatedAt": "Updated at",
-	"createdAt": "Created at",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -873,7 +801,6 @@ definePage(() => ({
 <locale locale="uk-UA" lang="json">
 {
 	"shareWithNote": "Поділитися нотаткою",
-	"share": "Поділитись",
 	"unlikeConfirm": "Бажаєте відписатися від подібних?",
 	"reportAbuse": "Поскаржитись",
 	"deleteConfirm": "Ви дійсно бажаєте це видалити?",
@@ -882,8 +809,6 @@ definePage(() => ({
 	"copyLink": "Скопіювати посилання",
 	"numberOfLikes": "Вподобання",
 	"viewSource": "Переглянути вихідний код",
-	"updatedAt": "Останнє оновлення",
-	"createdAt": "Створено",
 	"editThisPage": "Edit this Play"
 }
 </locale>
@@ -891,7 +816,6 @@ definePage(() => ({
 <locale locale="vi-VN" lang="json">
 {
 	"shareWithNote": "Chia sẻ kèm với tút",
-	"share": "Chia sẻ",
 	"unlikeConfirm": "Bạn có chắc muốn bỏ thích ?",
 	"reportAbuse": "Báo cáo",
 	"deleteConfirm": "Bạn có muốn xóa không?",
@@ -900,8 +824,6 @@ definePage(() => ({
 	"copyLink": "Chép liên kết",
 	"numberOfLikes": "Lượt thích",
 	"viewSource": "Xem mã nguồn",
-	"updatedAt": "Cập nhật lúc",
-	"createdAt": "Ngày tạo",
 	"editThisPage": "Edit play này"
 }
 </locale>
@@ -909,7 +831,6 @@ definePage(() => ({
 <locale locale="zh-CN" lang="json">
 {
 	"shareWithNote": "分享到帖文",
-	"share": "分享",
 	"unlikeConfirm": "取消赞？",
 	"reportAbuse": "举报",
 	"deleteConfirm": "确定删除?",
@@ -918,8 +839,6 @@ definePage(() => ({
 	"copyLink": "复制链接",
 	"numberOfLikes": "点赞数",
 	"viewSource": "查看源代码",
-	"updatedAt": "更新日期",
-	"createdAt": "创建日期",
 	"editThisPage": "编辑此 Play"
 }
 </locale>
@@ -927,7 +846,6 @@ definePage(() => ({
 <locale locale="zh-TW" lang="json">
 {
 	"shareWithNote": "在貼文中分享",
-	"share": "分享",
 	"unlikeConfirm": "要取消按讚嗎？",
 	"reportAbuse": "檢舉",
 	"deleteConfirm": "你確定要刪除嗎？",
@@ -936,8 +854,6 @@ definePage(() => ({
 	"copyLink": "複製連結",
 	"numberOfLikes": "讚數",
 	"viewSource": "檢視原始碼",
-	"updatedAt": "最後更新",
-	"createdAt": "建立於",
 	"editThisPage": "編輯此 Play"
 }
 </locale>

@@ -14,10 +14,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
 						<template #icon><SearchIcon><i class="ti ti-eye-off"></i></SearchIcon></template>
 						<template #label><SearchLabel>{{ $locale.sfc.sensitiveMediaDetection }}</SearchLabel></template>
-						<template v-if="sensitiveMediaDetectionForm.savedState.sensitiveMediaDetection === 'all'" #suffix>{{ $locale.sfc.all }}</template>
-						<template v-else-if="sensitiveMediaDetectionForm.savedState.sensitiveMediaDetection === 'local'" #suffix>{{ $locale.sfc.localOnly }}</template>
+						<template v-if="sensitiveMediaDetectionForm.savedState.sensitiveMediaDetection === 'all'" #suffix>{{ globalLocale.env.all }}</template>
+						<template v-else-if="sensitiveMediaDetectionForm.savedState.sensitiveMediaDetection === 'local'" #suffix>{{ globalLocale.env.localOnly }}</template>
 						<template v-else-if="sensitiveMediaDetectionForm.savedState.sensitiveMediaDetection === 'remote'" #suffix>{{ $locale.sfc.remoteOnly }}</template>
-						<template v-else #suffix>{{ $locale.sfc.none }}</template>
+						<template v-else #suffix>{{ globalLocale.env.none }}</template>
 						<template v-if="sensitiveMediaDetectionForm.modified.value" #footer>
 							<MkFormFooter :form="sensitiveMediaDetectionForm"/>
 						</template>
@@ -30,9 +30,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkRadios
 								v-model="sensitiveMediaDetectionForm.state.sensitiveMediaDetection"
 								:options="[
-									{ value: 'none', label: $locale.sfc.none },
-									{ value: 'all', label: $locale.sfc.all },
-									{ value: 'local', label: $locale.sfc.localOnly },
+									{ value: 'none', label: globalLocale.env.none },
+									{ value: 'all', label: globalLocale.env.all },
+									{ value: 'local', label: globalLocale.env.localOnly },
 									{ value: 'remote', label: $locale.sfc.remoteOnly },
 								]"
 							>
@@ -193,6 +193,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed } from 'vue';
 import XBotProtection from '@features/auth/frontend/pages/admin/bot-protection.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
@@ -208,6 +209,9 @@ import { fetchInstance } from '@features/instance/frontend/instance.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { useForm } from '@features/ui/frontend/composables/use-form.js';
 import MkFormFooter from '@features/ui/frontend/components/MkFormFooter.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const meta = await misskeyApi('admin/meta');
 
@@ -295,10 +299,7 @@ definePage(() => ({
 {
 	"security": "الأمان",
 	"sensitiveMediaDetection": "التعرف على المحتوى الحساس",
-	"all": "الكل",
-	"localOnly": "المحلي فقط",
 	"remoteOnly": "بُعدي فقط",
-	"none": "لا شيء",
 	"description": "Reduces the effort of server moderation through automatically recognizing sensitive media via Machine Learning. This will slightly increase the load on the server.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -325,10 +326,7 @@ definePage(() => ({
 {
 	"security": "Seguretat",
 	"sensitiveMediaDetection": "Detecció de contingut sensible",
-	"all": "Tot",
-	"localOnly": "Només local",
 	"remoteOnly": "Només remot",
-	"none": "Res",
 	"description": "Redueix els esforços de moderació gràcies al reconeixement automàtic dels fitxers amb contingut sensible mitjançant Machine Learing. Això augmentarà la càrrega del servidor.",
 	"externalServiceInfo": "La detecció de mitjans sensibles s'ha delegat a un servei extern (sensitive-detector). Per utilitzar aquesta funció, cal configurar un servei sidecar separat i establir els detalls de connexió que es detallen a continuació. Si no es configuren els detalls de connexió, no es durà a terme cap detecció (el contingut es tractarà com a no sensible).",
 	"apiUrl": "URL per connectar-se al servei de verificació",
@@ -355,10 +353,7 @@ definePage(() => ({
 {
 	"security": "Zabezpečení",
 	"sensitiveMediaDetection": "Detekce citlivého média",
-	"all": "Vše",
-	"localOnly": "Jenom lokální",
 	"remoteOnly": "Jenom vzdáleně",
-	"none": "Žádný",
 	"description": "Snižuje náročnost moderování serveru díky automatickému rozpoznávání citlivých médií pomocí strojového učení. Tím se mírně zvýší zatížení serveru.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -385,10 +380,7 @@ definePage(() => ({
 {
 	"security": "Security",
 	"sensitiveMediaDetection": "Detection of sensitive media",
-	"all": "All",
-	"localOnly": "Local only",
 	"remoteOnly": "Remote only",
-	"none": "None",
 	"description": "Reduces the effort of server moderation through automatically recognizing sensitive media via Machine Learning. This will slightly increase the load on the server.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -415,10 +407,7 @@ definePage(() => ({
 {
 	"security": "Sicherheit",
 	"sensitiveMediaDetection": "Erkennung von sensiblen Medien",
-	"all": "Alle",
-	"localOnly": "Nur Lokal",
 	"remoteOnly": "Nur für fremde Instanzen",
-	"none": "Nichts",
 	"description": "Ermöglicht eine Erleichterung der Servermoderation durch die automatische Erkennungen von sensiblen Medien unter Verwendung von Machine Learning. Hierdurch wird die Serverlast etwas erhöht.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -445,10 +434,7 @@ definePage(() => ({
 {
 	"security": "Security",
 	"sensitiveMediaDetection": "Detection of sensitive media",
-	"all": "All",
-	"localOnly": "Local only",
 	"remoteOnly": "Remote only",
-	"none": "None",
 	"description": "Reduces the effort of server moderation through automatically recognizing sensitive media via Machine Learning. This will slightly increase the load on the server.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -475,10 +461,7 @@ definePage(() => ({
 {
 	"security": "Seguridad",
 	"sensitiveMediaDetection": "Detección de contenido NSFW",
-	"all": "Todo",
-	"localOnly": "Solo local",
 	"remoteOnly": "Sólo remoto",
-	"none": "Ninguna",
 	"description": "Reduce el esfuerzo de la moderación en el servidor a través del reconocimiento automático de contenido NSFW usando 'Machine Learning'. Esto puede incrementar ligeramente la carga en el servidor.",
 	"externalServiceInfo": "La detección de contenidos sensibles se ha externalizado a un servicio externo (sensitive-detector). Para utilizar esta función, es necesario configurar por separado un servicio «sidecar» y establecer los datos de conexión que se indican a continuación. Si no se configuran los datos de conexión, no se realizará la detección (se tratará como contenido no sensible).",
 	"apiUrl": "URL de conexión al servicio de verificación",
@@ -505,10 +488,7 @@ definePage(() => ({
 {
 	"security": "Sécurité",
 	"sensitiveMediaDetection": "Détection des médias sensibles",
-	"all": "Tous",
-	"localOnly": "Local seulement",
 	"remoteOnly": "Distant uniquement",
-	"none": "Rien",
 	"description": "L'apprentissage automatique peut être utilisé pour détecter automatiquement les médias sensibles à modérer. La sollicitation des serveurs augmente légèrement.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -535,10 +515,7 @@ definePage(() => ({
 {
 	"security": "Keamanan",
 	"sensitiveMediaDetection": "Deteksi media NSFW",
-	"all": "Semua",
-	"localOnly": "Hanya lokal",
 	"remoteOnly": "Hanya luar instansi",
-	"none": "Tidak ada",
 	"description": "Mengurangi usaha moderasi peladen dengan mengenali media NSFW secara otomatis menggunakan Pembelajaran Mesin. Fungsi ini akan sedikit menaikkan beban peladen.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -565,10 +542,7 @@ definePage(() => ({
 {
 	"security": "Sicurezza",
 	"sensitiveMediaDetection": "Rilevamento dei contenuti espliciti",
-	"all": "Tutte",
-	"localOnly": "Soltanto locale",
 	"remoteOnly": "Solo remoto",
-	"none": "Nessuna",
 	"description": "Utilizzare l'apprendimento automatico (machine learning) per riconoscere media espliciti e sottoporli alla moderazione. Aumenterà lievemente il carico del server.",
 	"externalServiceInfo": "Abbiamo spostato esternamente il riconoscimento di media espliciti (sensitive-detector). Per usufruirne devi impostare un servizio separato e indicare di seguito la destinazione. Se non è impostata, non viene emesso alcun giudizio (contenuto NON esplicito).",
 	"apiUrl": "URL di connessione a Sensitive-Detector",
@@ -595,10 +569,7 @@ definePage(() => ({
 {
 	"security": "セキュリティ",
 	"sensitiveMediaDetection": "センシティブなメディアの検出",
-	"all": "全て",
-	"localOnly": "ローカルのみ",
 	"remoteOnly": "リモートのみ",
-	"none": "なし",
 	"description": "機械学習を使って自動でセンシティブなメディアを検出し、モデレーションに役立てることができます。サーバーの負荷が少し増えます。",
 	"externalServiceInfo": "センシティブメディアの判定は外部サービス (sensitive-detector) に分離されました。この機能を利用するには、別途サイドカーサービスをセットアップし、下記の接続先を設定する必要があります。接続先が未設定の場合、判定は行われません (非センシティブ扱い)。",
 	"apiUrl": "判定サービスの接続先URL",
@@ -625,10 +596,7 @@ definePage(() => ({
 {
 	"security": "セキュリティ",
 	"sensitiveMediaDetection": "きわどいやつの検出",
-	"all": "みんな",
-	"localOnly": "ローカルだけ",
 	"remoteOnly": "リモートだけ",
-	"none": "なし",
 	"description": "機械学習で自動できわどいメディアを検出して、運営しやすくするで。でもサーバーが少し重くなってまうわ。",
 	"externalServiceInfo": "センシティブメディアの判定は外部サービス (sensitive-detector) に分離されました。この機能を利用するには、別途サイドカーサービスをセットアップし、下記の接続先を設定する必要があります。接続先が未設定の場合、判定は行われません (非センシティブ扱い)。",
 	"apiUrl": "判定サービスの接続先URL",
@@ -655,10 +623,7 @@ definePage(() => ({
 {
 	"security": "Taɣellist",
 	"sensitiveMediaDetection": "Detection of sensitive media",
-	"all": "All",
-	"localOnly": "Local only",
 	"remoteOnly": "Remote only",
-	"none": "None",
 	"description": "Reduces the effort of server moderation through automatically recognizing sensitive media via Machine Learning. This will slightly increase the load on the server.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -685,10 +650,7 @@ definePage(() => ({
 {
 	"security": "Security",
 	"sensitiveMediaDetection": "Detection of sensitive media",
-	"all": "All",
-	"localOnly": "Local only",
 	"remoteOnly": "Remote only",
-	"none": "None",
 	"description": "Reduces the effort of server moderation through automatically recognizing sensitive media via Machine Learning. This will slightly increase the load on the server.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -715,10 +677,7 @@ definePage(() => ({
 {
 	"security": "보안",
 	"sensitiveMediaDetection": "민감한 미디어 탐지",
-	"all": "전체",
-	"localOnly": "로컬에만",
 	"remoteOnly": "리모트만",
-	"none": "없음",
 	"description": "기계 학습으로 민감한 미디어를 알아서 찾아내어 조정에 참고하도록 합니다. 서버가 부하를 다소 받습니다.",
 	"externalServiceInfo": "민감한 미디어 판정은 외부 서비스(sensitive-detector)로 분리됐습니다. 이 기능을 이용하려면 별도 사이드카 서비스를 설정하고, 아래의 접속 위치를 설정해야 합니다. 접속 위치가 설정되지 않은 경우에는 판정이 이루어지지 않습니다. (민감하지 않음 처리)",
 	"apiUrl": "판정 서비스의 접속 위치 URL",
@@ -745,10 +704,7 @@ definePage(() => ({
 {
 	"security": "Beveiliging",
 	"sensitiveMediaDetection": "Detection of sensitive media",
-	"all": "Alle",
-	"localOnly": "Local only",
 	"remoteOnly": "Remote only",
-	"none": "Niets",
 	"description": "Reduces the effort of server moderation through automatically recognizing sensitive media via Machine Learning. This will slightly increase the load on the server.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -775,10 +731,7 @@ definePage(() => ({
 {
 	"security": "Sikkerhet",
 	"sensitiveMediaDetection": "Detection of sensitive media",
-	"all": "Alle",
-	"localOnly": "Local only",
 	"remoteOnly": "Remote only",
-	"none": "Ingen",
 	"description": "Reduces the effort of server moderation through automatically recognizing sensitive media via Machine Learning. This will slightly increase the load on the server.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -805,10 +758,7 @@ definePage(() => ({
 {
 	"security": "Bezpieczeństwo",
 	"sensitiveMediaDetection": "Detekcja wrażliwej zawartości",
-	"all": "Wszystkie",
-	"localOnly": "Lokalne tylko",
 	"remoteOnly": "Tylko zdalne instancje",
-	"none": "Brak",
 	"description": "Zmniejsza wysiłek związany z moderacją serwera dzięki automatycznemu rozpoznawaniu zawartości NSFW za pomocą uczenia maszynowego. To nieznacznie zwiększy obciążenie serwera.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -835,10 +785,7 @@ definePage(() => ({
 {
 	"security": "Segurança",
 	"sensitiveMediaDetection": "Detecção de conteúdo sensível",
-	"all": "Todos",
-	"localOnly": "Apenas local",
 	"remoteOnly": "Apenas remoto",
-	"none": "Nenhum",
 	"description": "Use o aprendizado de máquina para detectar automaticamente mídias sensíveis para moderação. Isso pode aumentar ligeiramente a carga no servidor.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -865,10 +812,7 @@ definePage(() => ({
 {
 	"security": "Безопасность",
 	"sensitiveMediaDetection": "Распознание содержимого не для всех",
-	"all": "Все",
-	"localOnly": "Локально",
 	"remoteOnly": "Только удалённо",
-	"none": "Ничего",
 	"description": "Машинное обучение может быть использовано для автоматического обнаружения чувствительных медиа для модерации. Нагрузка на сервер увеличивается незначительно.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -895,10 +839,7 @@ definePage(() => ({
 {
 	"security": "Zabezpečenie",
 	"sensitiveMediaDetection": "Detekcia citlivých médií.",
-	"all": "Všetko",
-	"localOnly": "Iba lokálne",
 	"remoteOnly": "Len vzdialené",
-	"none": "Žiadne",
 	"description": "Strojové učenie sa použije na automatickú detekciu citlivých médií na účely ich moderovania. Mierne sa zvýši zaťaženie servera.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -925,10 +866,7 @@ definePage(() => ({
 {
 	"security": "ความปลอดภัย",
 	"sensitiveMediaDetection": "การตรวจจับสื่อที่มีเนื้อหาละเอียดอ่อน",
-	"all": "ทั้งหมด",
-	"localOnly": "เฉพาะท้องถิ่น",
 	"remoteOnly": "ระยะไกลเท่านั้น",
-	"none": "ไม่มี",
 	"description": "ใช้ Machine Learning เพื่อตรวจจับสื่อที่มีเนื้อหาละเอียดอ่อนโดยอัตโนมัติและใช้เพื่อการกลั่นกรอง ภาระของเซิร์ฟเวอร์จะเพิ่มขึ้นเล็กน้อย",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -955,10 +893,7 @@ definePage(() => ({
 {
 	"security": "Güvenlik",
 	"sensitiveMediaDetection": "Hassas ortamların tespiti",
-	"all": "Tümü",
-	"localOnly": "Yalnızca yerel",
 	"remoteOnly": "Sadece uzaktan",
-	"none": "Hiçbiri",
 	"description": "Makine öğrenimi yoluyla hassas medyayı otomatik olarak tanıyarak sunucu moderasyonunun yükünü azaltır. Bu, sunucu üzerindeki yükü biraz artıracaktır.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -985,10 +920,7 @@ definePage(() => ({
 {
 	"security": "Security",
 	"sensitiveMediaDetection": "Detection of sensitive media",
-	"all": "All",
-	"localOnly": "Local only",
 	"remoteOnly": "Remote only",
-	"none": "None",
 	"description": "Reduces the effort of server moderation through automatically recognizing sensitive media via Machine Learning. This will slightly increase the load on the server.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -1015,10 +947,7 @@ definePage(() => ({
 {
 	"security": "Безпека",
 	"sensitiveMediaDetection": "Виявлення NSFW",
-	"all": "Всі",
-	"localOnly": "Локально",
 	"remoteOnly": "Тільки віддаленi",
-	"none": "Відсутній",
 	"description": "Reduces the effort of server moderation through automatically recognizing sensitive media via Machine Learning. This will slightly increase the load on the server.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -1045,10 +974,7 @@ definePage(() => ({
 {
 	"security": "Bảo mật",
 	"sensitiveMediaDetection": "Tự động phát hiện NSFW",
-	"all": "Tất cả",
-	"localOnly": "Chỉ trên máy chủ",
 	"remoteOnly": "Chỉ máy chủ từ xa",
-	"none": "Không",
 	"description": "Giảm nỗ lực kiểm duyệt máy chủ thông qua việc tự động nhận dạng media NSFW thông qua học máy. Điều này sẽ làm tăng một chút áp lực trên máy chủ.",
 	"externalServiceInfo": "The detection of sensitive media has been offloaded to an external service (sensitive-detector). To use this feature, you must set up a separate service and configure the connection details provided below. If no connection details are configured, no detection will be performed (it will be treated as non-sensitive).",
 	"apiUrl": "Detection service endpoint URL",
@@ -1075,10 +1001,7 @@ definePage(() => ({
 {
 	"security": "安全",
 	"sensitiveMediaDetection": "检测到敏感媒体",
-	"all": "全部",
-	"localOnly": "仅限本地",
 	"remoteOnly": "仅远程",
-	"none": "无",
 	"description": "使用机器学习技术自动检测敏感媒体，以便进行审核。服务器负载将略微增加。",
 	"externalServiceInfo": "检测敏感媒体已分离至外部服务 (sensitive-detector)。若要使用，需额外部署 Sidecar 服务，并设置下方的连接 URL。未设定时将不会进行检测（视为非敏感媒体）。",
 	"apiUrl": "检测服务的连接 URL",
@@ -1105,10 +1028,7 @@ definePage(() => ({
 {
 	"security": "安全性",
 	"sensitiveMediaDetection": "敏感檔案的檢測",
-	"all": "全部",
-	"localOnly": "僅限本地",
 	"remoteOnly": "僅限遠端",
-	"none": "無",
 	"description": "您可以使用機器學習自動檢測敏感檔案以便審查。這會稍微增加伺服器負荷。",
 	"externalServiceInfo": "敏感媒體的判定已分離至外部服務（sensitive-detector）。若要使用此功能，必須另外設定 Sidecar 服務，並設定下方的連接資訊。若未設定連接資訊，則不會執行判定（視為非敏感內容）。",
 	"apiUrl": "判定服務的連接資訊 URL",

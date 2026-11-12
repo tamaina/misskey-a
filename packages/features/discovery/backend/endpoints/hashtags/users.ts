@@ -4,7 +4,7 @@
  */
 import { safeForSql } from '@features/persistence/backend/utility/safe-for-sql.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
-import { normalizeForSearch } from '../../utility/normalize-for-search.js';
+import { normalizeTag } from '../../utility/normalize-tag.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
@@ -18,9 +18,9 @@ export interface HashtagsUsersDependencies {
 }
 export function createHashtagsUsersProcedure<Actor extends MiLocalUser>(deps: HashtagsUsersDependencies) {
 	const handler = async ({ input: ps, context: { principal: me } }: { input: DiscoveryInputs['hashtags/users']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
-		if (!safeForSql(normalizeForSearch(ps.tag))) throw new Error('Injection');
+		if (!safeForSql(normalizeTag(ps.tag))) throw new Error('Injection');
 		const query = deps.usersRepository.createQueryBuilder('user')
-			.where(':tag <@ user.tags', { tag: [normalizeForSearch(ps.tag)] })
+			.where(':tag <@ user.tags', { tag: [normalizeTag(ps.tag)] })
 			.andWhere('user.isSuspended = FALSE')
 			.andWhere('user.isRemoteSuspended = FALSE');
 

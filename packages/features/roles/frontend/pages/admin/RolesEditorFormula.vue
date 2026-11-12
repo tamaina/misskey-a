@@ -38,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</template>
 		</MkDraggable>
-		<MkButton rounded style="margin: 0 auto;" @click="addChildValue"><i class="ti ti-plus"></i> {{ $locale.sfc.add }}</MkButton>
+		<MkButton rounded style="margin: 0 auto;" @click="addChildValue"><i class="ti ti-plus"></i> {{ globalLocale.env.add }}</MkButton>
 	</div>
 
 	<div v-else-if="v.type === 'not'" :class="$style.item">
@@ -58,17 +58,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { GetMkSelectValueTypesFromDef, MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
+import { rolesCache } from '@features/runtime/frontend/cache.js';
 import { initializeRoleFormula } from './role-formula-editor.js';
 import type { EditableRoleFormula } from './role-formula-editor.js';
-import { rolesCache } from '@features/runtime/frontend/cache.js';
+import type { GetMkSelectValueTypesFromDef, MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const emit = defineEmits<{
 	(ev: 'update:modelValue', value: EditableRoleFormula): void;
@@ -217,8 +221,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "إضافة"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -242,8 +245,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Les publicacions són més o igual a ",
 	"and": "AND condicional ",
 	"or": "OR condicional",
-	"not": "NOT condicional",
-	"add": "Afegir"
+	"not": "NOT condicional"
 }
 </locale>
 
@@ -267,8 +269,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Počet příspěvků je větší než/rovná se",
 	"and": "AND kondice",
 	"or": "OR kondice",
-	"not": "NOT kondice",
-	"add": "Přidat"
+	"not": "NOT kondice"
 }
 </locale>
 
@@ -292,8 +293,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Add"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -317,8 +317,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Beitragszahl ist größer-gleich",
 	"and": "UND-Bedingung",
 	"or": "ODER-Bedingung",
-	"not": "NICHT-Bedingung",
-	"add": "Hinzufügen"
+	"not": "NICHT-Bedingung"
 }
 </locale>
 
@@ -342,8 +341,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Add"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -367,8 +365,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "El número de notas es superior o igual a",
 	"and": "Condicional AND",
 	"or": "Condicional OR",
-	"not": "Condicional NOT",
-	"add": "Agregar"
+	"not": "Condicional NOT"
 }
 </locale>
 
@@ -392,8 +389,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Ajouter"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -417,8 +413,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Jumlah postingan lebih dari sama dengan",
 	"and": "Kondisi-AND",
 	"or": "Kondisi-OR",
-	"not": "Kondisi-NOT",
-	"add": "Tambahkan"
+	"not": "Kondisi-NOT"
 }
 </locale>
 
@@ -442,8 +437,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Conteggio Note maggiore o uguale a",
 	"and": "E",
 	"or": "O",
-	"not": "NON",
-	"add": "Aggiungi"
+	"not": "NON"
 }
 </locale>
 
@@ -467,8 +461,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "投稿数が～以上",
 	"and": "～かつ～",
 	"or": "～または～",
-	"not": "～ではない",
-	"add": "追加"
+	"not": "～ではない"
 }
 </locale>
 
@@ -492,8 +485,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "投稿を～以上しとる",
 	"and": "～かつ～",
 	"or": "～または～",
-	"not": "～じゃない",
-	"add": "増やす"
+	"not": "～じゃない"
 }
 </locale>
 
@@ -517,8 +509,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Add"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -542,8 +533,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Add"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -567,8 +557,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "노트 수가 다음보다 많은 유저",
 	"and": "다음을 모두 만족",
 	"or": "다음을 하나라도 만족",
-	"not": "다음을 만족하지 않음",
-	"add": "추가"
+	"not": "다음을 만족하지 않음"
 }
 </locale>
 
@@ -592,8 +581,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Toevoegen"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -617,8 +605,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Legg til"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -642,8 +629,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Dodaj"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -667,8 +653,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "A quantidade de postagens é maior ou igual a",
 	"and": "~ E ~ (Condicional)",
 	"or": "~ OU ~ (Condicional)",
-	"not": "Não ~ (Condicional)",
-	"add": "Adicionar"
+	"not": "Não ~ (Condicional)"
 }
 </locale>
 
@@ -692,8 +677,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "Выполнено несколько условий:..",
 	"or": "Выполнено любое из условий:..",
-	"not": "Кроме тех, у кого…",
-	"add": "Добавить"
+	"not": "Кроме тех, у кого…"
 }
 </locale>
 
@@ -717,8 +701,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Pridať"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -742,8 +725,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "จำนวนโพสต์มากกว่าเท่ากับ",
 	"and": "และ",
 	"or": "หรือ",
-	"not": "ไม่",
-	"add": "เพิ่ม"
+	"not": "ไม่"
 }
 </locale>
 
@@ -767,8 +749,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Gönderi sayısı şundan büyük/eşit",
 	"and": "Koşul-AND",
 	"or": "Koşul-QR",
-	"not": "Koşul-NOT",
-	"add": "Ekle"
+	"not": "Koşul-NOT"
 }
 </locale>
 
@@ -792,8 +773,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Add"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -817,8 +797,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "AND-Condition",
 	"or": "OR-Condition",
-	"not": "NOT-Condition",
-	"add": "Додати"
+	"not": "NOT-Condition"
 }
 </locale>
 
@@ -842,8 +821,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "Post count is greater than/equal to",
 	"and": "～ mà ～",
 	"or": "～ hay là ～",
-	"not": "Không phải ～",
-	"add": "Thêm"
+	"not": "Không phải ～"
 }
 </locale>
 
@@ -867,8 +845,7 @@ function removeSelf() {
 	"notesMoreThanOrEq": "帖子数在～以上",
 	"and": "符合以下全部条件",
 	"or": "符合以下任一条件",
-	"not": "不符合以下任何条件",
-	"add": "添加"
+	"not": "不符合以下任何条件"
 }
 </locale>
 
@@ -892,7 +869,6 @@ function removeSelf() {
 	"notesMoreThanOrEq": "貼文數在～以上",
 	"and": "～及～",
 	"or": "～或～",
-	"not": "～否",
-	"add": "新增"
+	"not": "～否"
 }
 </locale>

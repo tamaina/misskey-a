@@ -4,6 +4,8 @@
  */
 import { IdService } from '../../../../../runtime/backend/services/IdService.js';
 import type { WebhooksRepository } from '../../../../../persistence/backend/repositories/models.js';
+import { MiWebhook } from '../../../models/Webhook.js';
+import { lockWebhookQuota } from '../../../webhook-quota.js';
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
@@ -24,19 +26,23 @@ export function createIWebhooksCreateProcedure(deps: IWebhooksCreateDependencies
 			const ps = input;
 			const me = context.principal;
 			const result = await (async () => {
-				const currentWebhooksCount = await deps.webhooksRepository.countBy({
-					userId: me.id,
-				});
-				if (currentWebhooksCount >= (await deps.roleService.getUserPolicies(me.id)).webhookLimit) {
-					throw apiError(iWebhooksCreateErrors.tooManyWebhooks);
-				}
-				const webhook = await deps.webhooksRepository.insertOne({
-					id: deps.idService.gen(),
-					userId: me.id,
-					name: ps.name,
-					url: ps.url,
-					secret: ps.secret,
-					on: ps.on,
+				const limit = (await deps.roleService.getUserPolicies(me.id)).webhookLimit;
+				// Share the MCP subscription lock so concurrent registrations cannot exceed the quota.
+				const webhook = await deps.webhooksRepository.manager.transaction(async manager => {
+					if (await lockWebhookQuota(manager, me.id) >= limit) {
+						throw apiError(iWebhooksCreateErrors.tooManyWebhooks);
+					}
+					const repository = manager.getRepository(MiWebhook);
+					const id = deps.idService.gen();
+					await repository.insert({
+						id,
+						userId: me.id,
+						name: ps.name,
+						url: ps.url,
+						secret: ps.secret,
+						on: ps.on,
+					});
+					return repository.findOneByOrFail({ id });
 				});
 				deps.globalEventService.publishInternalEvent('webhookCreated', webhook);
 				return {

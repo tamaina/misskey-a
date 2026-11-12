@@ -10,6 +10,9 @@ import type { LocaleBundle, RuntimeLocaleDictionary } from 'vite-vue-internation
 
 export interface SourceRebase {
 	file: string;
+	sourceOnly?: boolean;
+	/** An independently frozen earlier layer may already have restored this source. */
+	historicalSha256?: string;
 	currentSha256: string;
 	baselineSha256: string;
 	edits: { start: number; end: number; current: string; baseline: string }[];
@@ -17,17 +20,17 @@ export interface SourceRebase {
 
 /** Each purpose contributes only its own reviewed sources; identical helpers merge in any order. */
 export const sourceRebases: SourceRebase[] = readdirSync(import.meta.dirname)
-	.filter(name => /^upstream-sync-[a-z]+-source-rebase\.json$/.test(name))
+	.filter(name => /^(?:upstream-sync|feature-update)-[a-z]+-source-rebase\.json$/.test(name))
 	.sort()
 	.flatMap(name => JSON.parse(readFileSync(resolve(import.meta.dirname, name), 'utf8')) as SourceRebase[]);
 const rebases = sourceRebases;
 if (new Set(rebases.map(entry => entry.file)).size !== rebases.length) throw new Error('Duplicate upstream source rebase');
 
 const sha256 = (source: string): string => createHash('sha256').update(source).digest('hex');
-/** Restore only pinned upstream adaptations before replaying the unchanged historical proofs. */
+/** Restore only pinned source adaptations before replaying the unchanged historical proofs. */
 export function restoreUpstreamDevelopBaseline(file: string, source: string): string {
 	const rebase = rebases.find(entry => entry.file === file);
-	if (!rebase || sha256(source) === rebase.baselineSha256) return source;
+	if (!rebase || sha256(source) === rebase.baselineSha256 || sha256(source) === rebase.historicalSha256) return source;
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from reviewed upstream develop: ${file}`);
 	for (const edit of [...rebase.edits].reverse()) {
 		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Upstream develop boundary differs: ${file}`);
@@ -43,7 +46,7 @@ const localeCache = new Map<string, { current: Map<string, RuntimeLocaleDictiona
 export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBundle): LocaleBundle {
 	const modules = bundle.modules;
 	if (!modules) return bundle;
-	for (const rebase of rebases.filter(entry => entry.file.endsWith('.vue'))) {
+	for (const rebase of rebases.filter(entry => !entry.sourceOnly && entry.file.endsWith('.vue'))) {
 		const moduleId = rebase.file.replace('packages/', '/');
 		if (!Object.hasOwn(modules, moduleId)) continue;
 		const source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');
@@ -54,8 +57,10 @@ export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBund
 			dictionaries = { current: collect(source), baseline: collect(restoreUpstreamDevelopBaseline(rebase.file, source)) };
 			localeCache.set(rebase.file, dictionaries);
 		}
-		const current = dictionaries.current.get(language);
-		const baseline = dictionaries.baseline.get(language);
+		// VVI loaders fill keys missing from a language with the primary (ja-JP) messages, in the primary key order.
+		const withPrimary = (dictionary: RuntimeLocaleDictionary | undefined, primary: RuntimeLocaleDictionary | undefined): RuntimeLocaleDictionary | undefined => dictionary && primary ? { ...Object.fromEntries(Object.entries(primary).map(([key, value]) => [key, Object.hasOwn(dictionary, key) ? dictionary[key] : value])), ...dictionary } : dictionary;
+		const current = withPrimary(dictionaries.current.get(language), dictionaries.current.get('ja-JP'));
+		const baseline = withPrimary(dictionaries.baseline.get(language), dictionaries.baseline.get('ja-JP'));
 		if (!current || !baseline || JSON.stringify(modules[moduleId]) !== JSON.stringify(current)) throw new Error(`Locale loader differs from reviewed upstream develop: ${rebase.file}:${language}`);
 		modules[moduleId] = structuredClone(baseline);
 	}

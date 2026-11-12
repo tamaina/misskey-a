@@ -3,13 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { defineAsyncComponent } from 'vue';
 import { host } from '@features/boot/frontend/shared/config.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import * as os from '@features/ui/frontend/os.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import FeatureLocaleMessages from '@features/navigation/frontend/ts-messages.vue';
 import { $i } from '@features/auth/frontend/i.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 function toolsMenuItems(): MenuItem[] {
 	const items: MenuItem[] = [{
@@ -63,7 +69,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 		to: '/about',
 	}, {
 		type: 'link',
-		text: FeatureLocaleMessages.$locale.customEmojis,
+		text: getGlobalLocale().customEmojis,
 		icon: 'ti ti-icons',
 		to: '/about#emojis',
 	});
@@ -79,7 +85,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 
 	menuItems.push({
 		type: 'link',
-		text: FeatureLocaleMessages.$locale.charts,
+		text: getGlobalLocale().charts,
 		icon: 'ti ti-chart-line',
 		to: '/about#charts',
 	}, { type: 'divider' }, {
@@ -93,7 +99,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 		menuItems.push({
 			type: 'link',
 			to: '/invite',
-			text: FeatureLocaleMessages.$locale.invite,
+			text: getGlobalLocale().invite,
 			icon: 'ti ti-user-plus',
 		});
 	}
@@ -123,7 +129,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 	if (instance.tosUrl) {
 		menuItems.push({
 			type: 'a',
-			text: FeatureLocaleMessages.$locale.termsOfService,
+			text: getGlobalLocale().termsOfService,
 			icon: 'ti ti-notebook',
 			href: instance.tosUrl,
 			target: '_blank',
@@ -133,7 +139,7 @@ export function openInstanceMenu(ev: PointerEvent) {
 	if (instance.privacyPolicyUrl) {
 		menuItems.push({
 			type: 'a',
-			text: FeatureLocaleMessages.$locale.privacyPolicy,
+			text: getGlobalLocale().privacyPolicy,
 			icon: 'ti ti-shield-lock',
 			href: instance.privacyPolicyUrl,
 			target: '_blank',

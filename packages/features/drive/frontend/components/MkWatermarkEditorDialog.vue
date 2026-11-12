@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #preview>
 			<canvas ref="canvasEl" :class="$style.previewCanvas"></canvas>
 			<div :class="$style.previewContainer">
-				<div class="_acrylic" :class="$style.previewTitle">{{ $locale.sfc.preview }}</div>
+				<div class="_acrylic" :class="$style.previewTitle">{{ globalLocale.env.preview }}</div>
 				<div v-if="props.image == null" class="_acrylic" :class="$style.previewControls">
 					<button class="_button" :class="[$style.previewControlsButton, sampleImageType === '3_2' ? $style.active : null]" @click="sampleImageType = '3_2'"><i class="ti ti-crop-landscape"></i></button>
 					<button class="_button" :class="[$style.previewControlsButton, sampleImageType === '2_3' ? $style.active : null]" @click="sampleImageType = '2_3'"><i class="ti ti-crop-portrait"></i></button>
@@ -63,8 +63,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, useTemplateRef, watch, onMounted, onUnmounted, reactive, nextTick } from 'vue';
-import type { WatermarkLayers, WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
 import { WatermarkRenderer } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
@@ -78,6 +78,10 @@ import { ensureSignin } from '@features/auth/frontend/i.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { WatermarkLayers, WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -321,7 +325,7 @@ onUnmounted(() => {
 async function save() {
 	if (props.presetEditMode) {
 		const { canceled, result: name } = await os.inputText({
-			title: $locale.value.sfc.name,
+			title: globalLocale.value.env.name,
 			default: preset.name,
 		});
 		if (canceled) return;
@@ -462,15 +466,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "الإسم",
 	"text": "نص",
 	"image": "صور",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "معاينة"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -478,15 +480,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Sortir sense desar?",
 	"failedToLoadImage": "Error en carregar la imatge",
-	"name": "Nom",
 	"text": "Text",
 	"image": "Imatges",
 	"qr": "Codi QR",
 	"stripe": "Bandes",
 	"polkadot": "Lunars",
 	"checker": "Escacs",
-	"title": "Editar la marca d'aigua ",
-	"preview": "Vista prèvia"
+	"title": "Editar la marca d'aigua "
 }
 </locale>
 
@@ -494,15 +494,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Jméno",
 	"text": "Text",
 	"image": "Obrázky",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Náhled"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -510,15 +508,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"text": "Text",
 	"image": "Images",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Preview"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -526,15 +522,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Nicht gespeicherte Änderungen verwerfen?",
 	"failedToLoadImage": "Bild konnte nicht geladen werden",
-	"name": "Name",
 	"text": "Text",
 	"image": "Bilder",
 	"qr": "QR-Code",
 	"stripe": "Streifen",
 	"polkadot": "Punktmuster",
 	"checker": "Prüfer",
-	"title": "Wasserzeichen bearbeiten",
-	"preview": "Vorschau"
+	"title": "Wasserzeichen bearbeiten"
 }
 </locale>
 
@@ -542,15 +536,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"text": "Text",
 	"image": "Images",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Preview"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -558,15 +550,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "¿Descartar cambios no guardados?",
 	"failedToLoadImage": "Error al cargar la imagen",
-	"name": "Nombre",
 	"text": "Texto",
 	"image": "Imágenes",
 	"qr": "Código QR",
 	"stripe": "Rayas",
 	"polkadot": "Patrón de Lunares",
 	"checker": "Patrón de Damas / Tablero de Ajedrez",
-	"title": "Editar la marca de agua",
-	"preview": "Vista previa"
+	"title": "Editar la marca de agua"
 }
 </locale>
 
@@ -574,15 +564,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Nom",
 	"text": "Texte",
 	"image": "Images",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Aperçu"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -590,15 +578,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Nama",
 	"text": "Teks",
 	"image": "Gambar",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Pratinjau"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -606,15 +592,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Uscire senza salvare?",
 	"failedToLoadImage": "Impossibile caricare l'immagine",
-	"name": "Nome",
 	"text": "Testo",
 	"image": "Immagini",
 	"qr": "QR Code",
 	"stripe": "Strisce",
 	"polkadot": "A pallini",
 	"checker": "Scacchiera",
-	"title": "Modifica la filigrana",
-	"preview": "Anteprima"
+	"title": "Modifica la filigrana"
 }
 </locale>
 
@@ -622,15 +606,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "保存せずに終了しますか？",
 	"failedToLoadImage": "画像の読み込みに失敗しました",
-	"name": "名前",
 	"text": "テキスト",
 	"image": "画像",
 	"qr": "二次元コード",
 	"stripe": "ストライプ",
 	"polkadot": "ポルカドット",
 	"checker": "チェッカー",
-	"title": "ウォーターマークの編集",
-	"preview": "プレビュー"
+	"title": "ウォーターマークの編集"
 }
 </locale>
 
@@ -638,15 +620,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "保存せずに終わってもええんか？",
 	"failedToLoadImage": "あかん、画像読み込まれへんわ",
-	"name": "名前",
 	"text": "テキスト",
 	"image": "画像",
 	"qr": "二次元コード",
 	"stripe": "ストライプ",
 	"polkadot": "ポルカドット",
 	"checker": "チェッカー",
-	"title": "ウォーターマークの編集",
-	"preview": "プレビュー"
+	"title": "ウォーターマークの編集"
 }
 </locale>
 
@@ -654,15 +634,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"text": "Text",
 	"image": "Images",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Preview"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -670,15 +648,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"text": "Text",
 	"image": "Images",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Preview"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -686,15 +662,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "보존하지 않고 종료하시겠습니까?",
 	"failedToLoadImage": "이미지 로딩에 실패했습니다.",
-	"name": "이름",
 	"text": "텍스트",
 	"image": "이미지",
 	"qr": "QR 코드",
 	"stripe": "줄무늬",
 	"polkadot": "물방울 무늬",
 	"checker": "체크 무늬",
-	"title": "워터마크 편집",
-	"preview": "미리보기"
+	"title": "워터마크 편집"
 }
 </locale>
 
@@ -702,15 +676,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Naam",
 	"text": "Text",
 	"image": "Afbeeldingen",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Voorbeeld"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -718,15 +690,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Navn",
 	"text": "Tekst",
 	"image": "Bilder",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Preview"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -734,15 +704,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Nazwa",
 	"text": "Tekst",
 	"image": "Zdjęcia",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Podgląd"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -750,15 +718,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Descartar mudanças?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Nome",
 	"text": "Texto",
 	"image": "imagem",
 	"qr": "Código QR",
 	"stripe": "Listras",
 	"polkadot": "Bolinhas",
 	"checker": "Xadrez",
-	"title": "Editar marca d'água",
-	"preview": "Pré-visualizar"
+	"title": "Editar marca d'água"
 }
 </locale>
 
@@ -766,15 +732,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Не удалось загрузить изображение",
-	"name": "Название",
 	"text": "Текст",
 	"image": "Изображения",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Предпросмотр"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -782,15 +746,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Názov",
 	"text": "Text",
 	"image": "Obrázky",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Náhľad"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -798,15 +760,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "ต้องการออกโดยไม่บันทึกหรือไม่?",
 	"failedToLoadImage": "โหลดภาพล้มเหลว",
-	"name": "ชื่อ",
 	"text": "ข้อความ",
 	"image": "รูปภาพ",
 	"qr": "QR โค้ด",
 	"stripe": "ริ้ว",
 	"polkadot": "ลายจุด",
 	"checker": "ช่องตาราง",
-	"title": "แก้ไขลายน้ำ",
-	"preview": "แสดงตัวอย่าง"
+	"title": "แก้ไขลายน้ำ"
 }
 </locale>
 
@@ -814,15 +774,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Kaydedilmemiş değişiklikleri silmek ister misin?",
 	"failedToLoadImage": "Görüntü yükleme başarısız oldu ",
-	"name": "İsim",
 	"text": "Metin",
 	"image": "Görseller",
 	"qr": "2 boyutlu kod",
 	"stripe": "Çizgiler",
 	"polkadot": "Nokta deseni",
 	"checker": "Kontrolcü",
-	"title": "Filigranı Düzenle",
-	"preview": "Önizleme"
+	"title": "Filigranı Düzenle"
 }
 </locale>
 
@@ -830,15 +788,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"text": "Text",
 	"image": "Images",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Preview"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -846,15 +802,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Не вдалося завантажити зображення",
-	"name": "Ім'я",
 	"text": "Текст",
 	"image": "Зображення",
 	"qr": "QR-код",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Попередній перегляд"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -862,15 +816,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Tên",
 	"text": "Văn bản",
 	"image": "Hình ảnh",
 	"qr": "QR Code",
 	"stripe": "Stripes",
 	"polkadot": "Polkadot",
 	"checker": "Checker",
-	"title": "Edit Watermark",
-	"preview": "Xem trước"
+	"title": "Edit Watermark"
 }
 </locale>
 
@@ -878,15 +830,13 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "放弃未保存的更改？",
 	"failedToLoadImage": "图片加载失败",
-	"name": "名称",
 	"text": "文本",
 	"image": "图片",
 	"qr": "二维码",
 	"stripe": "条纹",
 	"polkadot": "波点",
 	"checker": "检查",
-	"title": "编辑水印",
-	"preview": "预览"
+	"title": "编辑水印"
 }
 </locale>
 
@@ -894,14 +844,12 @@ function removeLayer(layer: WatermarkPreset['layers'][number]) {
 {
 	"quitWithoutSaveConfirm": "不儲存就退出嗎？",
 	"failedToLoadImage": "圖片載入失敗",
-	"name": "名稱",
 	"text": "文字",
 	"image": "圖片",
 	"qr": "二維條碼",
 	"stripe": "條紋",
 	"polkadot": "波卡圓點",
 	"checker": "棋盤格",
-	"title": "編輯浮水印",
-	"preview": "預覽"
+	"title": "編輯浮水印"
 }
 </locale>

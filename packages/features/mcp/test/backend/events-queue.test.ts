@@ -67,3 +67,55 @@ it.each([true, false, null])('suppresses mode-less legacy jobs for MCP rows (act
 	expect(http.send).not.toHaveBeenCalled(); expect(http.sendMcpWebhook).not.toHaveBeenCalled();
 	expect(webhooks.update).not.toHaveBeenCalled();
 });
+
+it.each(['subscribedNote', 'quote', 'login', 'createToken'] as const)('queues only notification references for MCP %s', async type => {
+	const add = vi.fn(); const queue = Object.assign(Object.create(QueueService.prototype), { userWebhookDeliverQueue: { add } }) as QueueService;
+	const notification = { id: 'notification', type: type === 'subscribedNote' ? 'note' : type, createdAt: '2026-10-23T00:00:00Z', body: 'PRIVATE', token: 'SECRET', ip: '192.0.2.1' } as UserWebhookPayload<typeof type>['notification'];
+	await queue.userWebhookDeliver({ ...mcp, on: [type] }, type, { notification });
+	const job = add.mock.calls[0][1];
+	expect(job.data).toEqual({ notificationId: 'notification', notificationType: notification.type });
+	expect(JSON.stringify(job)).not.toMatch(/PRIVATE|SECRET|192\.0\.2\.1/);
+});
+
+it('selects MCP reaction subscriptions even when the recipient owns the reacted note', async () => {
+	const redis = mockDeep<Redis.Redis>(); const webhooks = mockDeep<WebhooksRepository>(); const queue = mockDeep<QueueService>();
+	const row = { ...mcp, on: ['reaction'] } as MiWebhook;
+	webhooks.findBy.mockResolvedValue([row]);
+	const service = new UserWebhookService(redis, webhooks, queue);
+	const payload = { note: { ...content.note, userId: 'account' }, user: { id: 'reactor' }, reaction: '👍' } as UserWebhookPayload<'reaction'>;
+	await service.enqueueUserWebhook('account', 'reaction', payload);
+	expect(queue.userWebhookDeliver).toHaveBeenCalledWith(row, 'reaction', payload); service.dispose();
+});
+
+it('sends canonical notification references with the MCP envelope and rechecks before opening the connection', async () => {
+	const webhooks = mockDeep<WebhooksRepository>(); const http = mockDeep<HttpRequestService>(); const events = mockDeep<McpEventsService>(); const logger = mockDeep<QueueLoggerService>(); logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	const row = { ...mcp, name: 'login', secret: 'whsec_' + Buffer.alloc(32, 42).toString('base64') };
+	events.authorizeDelivery.mockResolvedValue(row);
+	http.sendMcpWebhook.mockImplementation(async (_url, body, _headers, _signal, beforeSend) => {
+		await beforeSend?.();
+		expect(JSON.parse(body)).toEqual({ eventId: 'event', name: 'login', timestamp: '1970-01-01T00:00:01.000Z', data: { notificationId: 'notification', notificationType: 'login' }, cursor: null });
+		return { status: 200, ok: true, text: '' };
+	});
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, webhooks, http, events, logger);
+	const data = { mode: 'mcp', type: 'login', webhookId: row.id, userId: row.userId, generation: 'generation', noteId: '', createdAt: 1000, eventId: 'event', data: { notificationId: 'notification', notificationType: 'login' } } as const;
+	expect(await worker.process({ data } as unknown as Bull.Job<UserWebhookDeliverJobData>)).toBe('Success');
+	expect(events.authorizeDelivery).toHaveBeenCalledTimes(2);
+	expect(events.authorizeDelivery).toHaveBeenCalledWith(row.id, row.userId, 'generation', '', 'login', undefined, data.data);
+});
+
+it('does not collapse separate reaction notifications on the same note', async () => {
+	const add = vi.fn(); const queue = Object.assign(Object.create(QueueService.prototype), { userWebhookDeliverQueue: { add } }) as QueueService;
+	const payload = { note: content.note, user: { id: 'reactor' }, reaction: '👍' } as UserWebhookPayload<'reaction'>;
+	for (const id of ['notification1', 'notification2', 'notification1']) await queue.userWebhookDeliver(mcp, 'reaction', payload, { notification: { id, type: 'reaction', createdAt: '2026-10-23T00:00:00Z' } });
+	expect(add.mock.calls[0][1].eventId).not.toBe(add.mock.calls[1][1].eventId);
+	expect(add.mock.calls[0][1].eventId).toBe(add.mock.calls[2][1].eventId);
+	expect(add.mock.calls[0][1].data).toEqual({ noteId: 'note', notificationId: 'notification1', notificationType: 'reaction' });
+});
+
+it.each(['user', 'room'])('queues only message references for received %s chat', async destination => {
+	const add = vi.fn(); const queue = Object.assign(Object.create(QueueService.prototype), { userWebhookDeliverQueue: { add } }) as QueueService;
+	const message = { id: 'message', fromUserId: 'sender', text: 'PRIVATE_CHAT', ...(destination === 'user' ? { toUserId: 'account' } : { toRoomId: 'room' }) } as UserWebhookPayload<'chatMessage'>['message'];
+	await queue.userWebhookDeliver(mcp, 'chatMessage', { message });
+	expect(add.mock.calls[0][1].data).toEqual({ messageId: 'message' });
+	expect(JSON.stringify(add.mock.calls[0][1])).not.toContain('PRIVATE_CHAT');
+});
