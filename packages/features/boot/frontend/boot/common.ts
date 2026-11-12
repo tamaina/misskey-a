@@ -90,7 +90,8 @@ export async function common(createVue: () => Promise<App<Element>>, internation
 	//#endregion
 
 	//#region Detect language & fetch translations
-	storeBootloaderErrors({ ...FeatureLocaleMessages.$locale._bootErrors, reload: getGlobalLocale().reload });
+	// createComponentLocale() proxies are not enumerable; do not spread them.
+	storeBootloaderErrors(Object.assign(Object.create(FeatureLocaleMessages.$locale._bootErrors), { reload: getGlobalLocale().reload }));
 
 	if (import.meta.hot) {
 		import.meta.hot.on('locale-update', async (updatedLang: string) => {
