@@ -8,6 +8,7 @@ import { expect, test, vi } from 'vitest';
 import { createInternationalization, useLocale } from 'virtual:vite-vue-internationalization';
 import { locales } from 'i18n';
 import { navbarItemDef } from '../../frontend/navbar.js';
+import Messages from '../../frontend/navbar-messages.vue';
 import * as os from '@features/ui/frontend/os.js';
 
 // Keep the actual navbar and generated VVI runtime; isolate unrelated app services.
@@ -42,11 +43,11 @@ test('navbar imported before runtime installation resolves catalog titles when r
 	}
 
 	navbarItemDef.ui.action!(new PointerEvent('click'));
-	// `deck` remains SFC-local (Messages.$locale). This test does not load component
-	// dictionaries, so only the globally migrated default label is asserted.
+	// The generated bundle loads both global and component dictionaries.
+	// Verify the SFC-local UI label as well as the promoted global default label.
 	expect(os.popupMenu).toHaveBeenLastCalledWith([
 		expect.objectContaining({ text: locales[language].default }),
-		expect.objectContaining({ action: expect.any(Function) }),
+		expect.objectContaining({ text: Messages.$locale.deck, action: expect.any(Function) }),
 	], null);
 	expect(locales[language].default).toBeTruthy();
 });

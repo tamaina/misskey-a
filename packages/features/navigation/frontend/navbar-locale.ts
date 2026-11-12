@@ -7,11 +7,12 @@ import { useLocale } from 'virtual:vite-vue-internationalization';
 import Messages from './navbar-messages.vue';
 import type { Locale } from 'i18n';
 
-/** Capture raw owner messages after the entry has activated its loaded runtime. */
+/** Overlay global labels without enumerating VVI's lazy owner proxy. */
 export function getNavbarMessages() {
 	const globalLocale = useLocale<Locale>(import.meta.url);
-	return {
-		...Messages.$locale,
+	// createComponentLocale() only traps property reads, so spreading $locale
+	// copies no keys. Delegate owner reads instead, including its locale fallback.
+	return Object.assign(Object.create(Messages.$locale) as typeof Messages.$locale, {
 		search: globalLocale.value.env.search,
 		favorites: globalLocale.value.env.favorites,
 		lists: globalLocale.value.env.lists,
@@ -23,5 +24,5 @@ export function getNavbarMessages() {
 		announcements: globalLocale.value.env.announcements,
 		channel: globalLocale.value.env.channel,
 		notifications: globalLocale.value.env.notifications,
-	};
+	});
 }
