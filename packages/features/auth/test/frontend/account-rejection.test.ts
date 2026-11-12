@@ -8,7 +8,7 @@ import { refreshCurrentAccount } from '@features/auth/frontend/accounts.js';
 
 const m = vi.hoisted(() => ({
 	account: { id: 'current', username: 'synthetic', token: 'synthetic-current' },
-	store: { s: { enablePreferencesAutoCloudBackup: true, accountTokens: {} as Record<string, string>, accountInfos: {} as Record<string, unknown> }, set: vi.fn() },
+	store: { r: { accountTokens: { value: {} }, accountInfos: { value: {} } }, s: { enablePreferencesAutoCloudBackup: true, accountTokens: {} as Record<string, string>, accountInfos: {} as Record<string, unknown> }, set: vi.fn() },
 	prefer: { s: { accounts: [] as [string, { id: string; username: string }][] }, commit: vi.fn() },
 	api: vi.fn(), backup: vi.fn(), files: vi.fn(), clear: vi.fn(), reload: vi.fn(), choice: vi.fn(), alert: vi.fn(), suspended: vi.fn(), finish: vi.fn(),
 }));
@@ -27,7 +27,7 @@ vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: m.
 vi.mock('@@/js/shared-files.js', () => ({ clearSharedFiles: m.files }));
 vi.mock('@features/preferences/frontend/state/utility.js', () => ({ cloudBackup: m.backup }));
 vi.mock('@features/auth/frontend/signout-choice.js', () => ({ signoutChoice: m.choice }));
-vi.mock('@features/runtime/frontend/utility/idb-proxy.js', () => ({ clear: m.clear }));
+vi.mock('@features/runtime/frontend/utility/idb-proxy.js', () => ({ clear: m.clear, get: vi.fn() }));
 vi.mock('@features/runtime/frontend/utility/unison-reload.js', () => ({ unisonReload: m.reload, reloadChannel: { postMessage: vi.fn() } }));
 vi.mock('@features/notifications/frontend/utility/encode-push-subscription-key.js', () => ({ encodePushSubscriptionKey: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({

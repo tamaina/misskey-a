@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #preview>
 			<canvas ref="canvasEl" :class="$style.previewCanvas" @pointerdown.prevent.stop="onImagePointerdown"></canvas>
 			<div :class="$style.previewContainer">
-				<div class="_acrylic" :class="$style.previewTitle">{{ $locale.sfc.preview }}</div>
+				<div class="_acrylic" :class="$style.previewTitle">{{ globalLocale.env.preview }}</div>
 				<div class="_acrylic" :class="$style.editControls">
 					<button class="_button" :class="[$style.previewControlsButton, penMode != null ? $style.active : null]" @click="showPenMenu"><i class="ti ti-pencil"></i></button>
 				</div>
@@ -50,8 +50,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, useTemplateRef, watch, onMounted, onUnmounted, reactive, nextTick } from 'vue';
-import type { ImageEffectorLayer } from '@features/drive/frontend/utility/image-effector/ImageEffector.js';
 import { ImageEffector } from '@features/drive/frontend/utility/image-effector/ImageEffector.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
@@ -60,6 +60,10 @@ import XLayer from '@features/drive/frontend/components/MkImageEffectorDialog.La
 import * as os from '@features/ui/frontend/os.js';
 import { FXS } from '@features/drive/frontend/utility/image-effector/fxs.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
+import type { ImageEffectorLayer } from '@features/drive/frontend/utility/image-effector/ImageEffector.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	image: File;
@@ -435,7 +439,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "معاينة",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -448,7 +451,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Desenfocament",
 	"pixelate": "Mosaic",
 	"title": "Efecte",
-	"preview": "Vista prèvia",
 	"addEffect": "Afegeix un efecte"
 }
 </locale>
@@ -461,7 +463,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Náhled",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -474,7 +475,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Preview",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -487,7 +487,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Verwischen",
 	"pixelate": "Verpixeln",
 	"title": "Effekte",
-	"preview": "Vorschau",
 	"addEffect": "Effekte hinzufügen"
 }
 </locale>
@@ -500,7 +499,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Preview",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -513,7 +511,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Difuminar",
 	"pixelate": "Pixelar",
 	"title": "Efecto",
-	"preview": "Vista previa",
 	"addEffect": "Añadir Efecto"
 }
 </locale>
@@ -526,7 +523,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Aperçu",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -539,7 +535,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Pratinjau",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -552,7 +547,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Sfocatura",
 	"pixelate": "Mosaico",
 	"title": "Effetto",
-	"preview": "Anteprima",
 	"addEffect": "Aggiungi effetto"
 }
 </locale>
@@ -565,7 +559,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "ぼかし",
 	"pixelate": "モザイク",
 	"title": "エフェクト",
-	"preview": "プレビュー",
 	"addEffect": "エフェクトを追加"
 }
 </locale>
@@ -578,7 +571,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "ぼかし",
 	"pixelate": "モザイク",
 	"title": "エフェクト",
-	"preview": "プレビュー",
 	"addEffect": "エフェクトを追加"
 }
 </locale>
@@ -591,7 +583,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Preview",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -604,7 +595,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Preview",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -617,7 +607,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "흐림 효과",
 	"pixelate": "모자이크",
 	"title": "이펙트",
-	"preview": "미리보기",
 	"addEffect": "이펙트를 추가"
 }
 </locale>
@@ -630,7 +619,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Voorbeeld",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -643,7 +631,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Preview",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -656,7 +643,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Podgląd",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -669,7 +655,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Desfoque",
 	"pixelate": "Pixelizar",
 	"title": "Efeitos",
-	"preview": "Pré-visualizar",
 	"addEffect": "Adicionar efeitos"
 }
 </locale>
@@ -682,7 +667,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Предпросмотр",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -695,7 +679,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Náhľad",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -708,7 +691,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "มัว",
 	"pixelate": "โมเสก",
 	"title": "เอฟเฟกต์",
-	"preview": "แสดงตัวอย่าง",
 	"addEffect": "เพิ่มเอฟเฟกต์"
 }
 </locale>
@@ -721,7 +703,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Bulanıklık",
 	"pixelate": "Mozaik",
 	"title": "Effektler",
-	"preview": "Önizleme",
 	"addEffect": "Efektler Ekle"
 }
 </locale>
@@ -734,7 +715,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Preview",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -747,7 +727,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Попередній перегляд",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -760,7 +739,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "Blur",
 	"pixelate": "Pixelate",
 	"title": "Effects",
-	"preview": "Xem trước",
 	"addEffect": "Add Effects"
 }
 </locale>
@@ -773,7 +751,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "模糊",
 	"pixelate": "马赛克",
 	"title": "效果",
-	"preview": "预览",
 	"addEffect": "添加效果"
 }
 </locale>
@@ -786,7 +763,6 @@ function onImagePointerdown(ev: PointerEvent) {
 	"blur": "模糊",
 	"pixelate": "馬賽克",
 	"title": "特效",
-	"preview": "預覽",
 	"addEffect": "新增特效"
 }
 </locale>

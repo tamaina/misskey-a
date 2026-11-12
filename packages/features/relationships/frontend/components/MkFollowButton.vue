@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 		<template v-else-if="hasPendingFollowRequestFromYou && !user.isLocked">
 			<!-- つまりリモートフォローの場合。 -->
-			<span v-if="full" :class="$style.text">{{ $locale.sfc.processing }}</span><MkLoading :em="true" :colored="false"/>
+			<span v-if="full" :class="$style.text">{{ globalLocale.env.processing }}</span><MkLoading :em="true" :colored="false"/>
 		</template>
 		<template v-else-if="isFollowing">
 			<span v-if="full" :class="$style.text">{{ $locale.sfc.youFollowing }}</span><i class="ti ti-minus"></i>
@@ -25,16 +25,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<span v-if="full" :class="$style.text">{{ $locale.sfc.followRequest }}</span><i class="ti ti-plus"></i>
 		</template>
 		<template v-else-if="!isFollowing && !user.isLocked">
-			<span v-if="full" :class="$style.text">{{ $locale.sfc.follow }}</span><i class="ti ti-plus"></i>
+			<span v-if="full" :class="$style.text">{{ globalLocale.env.follow }}</span><i class="ti ti-plus"></i>
 		</template>
 	</template>
 	<template v-else>
-		<span v-if="full" :class="$style.text">{{ $locale.sfc.processing }}</span><MkLoading :em="true" :colored="false"/>
+		<span v-if="full" :class="$style.text">{{ globalLocale.env.processing }}</span><MkLoading :em="true" :colored="false"/>
 	</template>
 </button>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { host } from '@features/boot/frontend/shared/config.js';
@@ -47,6 +48,9 @@ import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { haptic } from '@features/ui/frontend/utility/haptic.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	user: Misskey.entities.UserDetailed,
@@ -112,6 +116,8 @@ async function onClick() {
 			const { canceled } = await os.confirm({
 				type: 'question',
 				text: interpolateLocaleParameters($locale.value.sfc.cancelFollowRequestConfirm, { name: props.user.name || props.user.username }),
+				okText: $locale.value.sfc.yes,
+				cancelText: $locale.value.sfc.no,
 			});
 
 			if (canceled) {
@@ -255,10 +261,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "أتريد متابعة {name}؟",
 	"followRequestPending": "طلبات الإشتراك المعلّقة",
-	"processing": "المعالجة جارية",
 	"youFollowing": "متابَع",
-	"followRequest": "طلب اشتراك",
-	"follow": "تابِع"
+	"followRequest": "طلب اشتراك"
 }
 </locale>
 
@@ -268,10 +272,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Vols cancel·lar la teva sol·licitud de seguiment a {name}?",
 	"followConfirm": "Segur que vols seguir a {name}?",
 	"followRequestPending": "Sol·licituds de seguiment pendents",
-	"processing": "S'està processant...",
 	"youFollowing": "Segueixes ",
-	"followRequest": "Enviar sol·licitud de seguiment",
-	"follow": "Segueix"
+	"followRequest": "Enviar sol·licitud de seguiment"
 }
 </locale>
 
@@ -281,10 +283,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Jste si jisti, že chcete sledovat {name}?",
 	"followRequestPending": "Čekající žádosti o sledování",
-	"processing": "Zpracovávám",
 	"youFollowing": "Sleduji",
-	"followRequest": "Odeslat žádost o sledování",
-	"follow": "Sledovaní"
+	"followRequest": "Odeslat žádost o sledování"
 }
 </locale>
 
@@ -294,10 +294,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Are you sure that you want to follow {name}?",
 	"followRequestPending": "Follow request pending",
-	"processing": "Processing...",
 	"youFollowing": "Followed",
-	"followRequest": "Send follow request",
-	"follow": "Follow"
+	"followRequest": "Send follow request"
 }
 </locale>
 
@@ -307,10 +305,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Möchten Sie die Voll-Anfrage an {name} zurückziehen?",
 	"followConfirm": "Möchtest du {name} wirklich folgen?",
 	"followRequestPending": "Follow-Anfrage ausstehend",
-	"processing": "In Bearbeitung …",
 	"youFollowing": "Gefolgt",
-	"followRequest": "Follow-Anfrage senden",
-	"follow": "Folgen"
+	"followRequest": "Follow-Anfrage senden"
 }
 </locale>
 
@@ -320,10 +316,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Are you sure that you want to follow {name}?",
 	"followRequestPending": "Follow request pending",
-	"processing": "Processing...",
 	"youFollowing": "Followed",
-	"followRequest": "Send follow request",
-	"follow": "Follow"
+	"followRequest": "Send follow request"
 }
 </locale>
 
@@ -333,10 +327,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "¿Desea cancelar su solicitud de seguimiento a {name}?",
 	"followConfirm": "¿Quieres seguir a {name}?",
 	"followRequestPending": "Solicitudes de seguimiento pendiente",
-	"processing": "Procesando...",
 	"youFollowing": "Siguiendo",
-	"followRequest": "Enviar solicitud de seguimiento",
-	"follow": "Seguir"
+	"followRequest": "Enviar solicitud de seguimiento"
 }
 </locale>
 
@@ -346,10 +338,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Est-te vous sur de vouloir annuler la demande de suivi de {name} ?",
 	"followConfirm": "Êtes-vous sûr·e de vouloir suivre {name} ?",
 	"followRequestPending": "Demande d'abonnement en attente de confirmation",
-	"processing": "Traitement en cours",
 	"youFollowing": "Abonné·e",
-	"followRequest": "Demande d’abonnement",
-	"follow": "S’abonner"
+	"followRequest": "Demande d’abonnement"
 }
 </locale>
 
@@ -359,10 +349,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Apa anda yakin ingin membatalkan permintaan mengikuti ke {name}?",
 	"followConfirm": "Apakah kamu yakin ingin mengikuti {name}?",
 	"followRequestPending": "Permintaan mengikuti yang menunggu",
-	"processing": "Memproses",
 	"youFollowing": "Mengikuti",
-	"followRequest": "Permintaan mengikuti",
-	"follow": "Ikuti"
+	"followRequest": "Permintaan mengikuti"
 }
 </locale>
 
@@ -372,23 +360,21 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Vuoi annullare la tua richiesta di follow inviata a {name}?",
 	"followConfirm": "Confermi il Following a {name}?",
 	"followRequestPending": "Richiesta in approvazione",
-	"processing": "In elaborazione",
 	"youFollowing": "Following",
-	"followRequest": "Richiesta di follow",
-	"follow": "Segui"
+	"followRequest": "Richiesta di follow"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
+	"yes": "はい",
+	"no": "いいえ",
 	"unfollowConfirm": "{name}のフォローを解除しますか？",
 	"cancelFollowRequestConfirm": "{name}へのフォロー申請をキャンセルしますか？",
 	"followConfirm": "{name}をフォローしますか？",
 	"followRequestPending": "フォロー許可待ち",
-	"processing": "処理中",
 	"youFollowing": "フォロー中",
-	"followRequest": "フォロー申請",
-	"follow": "フォロー"
+	"followRequest": "フォロー申請"
 }
 </locale>
 
@@ -398,10 +384,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "{name}へのフォロー申請をキャンセルしますか？",
 	"followConfirm": "{name}をフォローしてええか？",
 	"followRequestPending": "フォロー許してくれるん待っとる",
-	"processing": "処理しとる",
 	"youFollowing": "フォロー中やで",
-	"followRequest": "フォローを頼む",
-	"follow": "フォロー"
+	"followRequest": "フォローを頼む"
 }
 </locale>
 
@@ -411,10 +395,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Are you sure that you want to follow {name}?",
 	"followRequestPending": "Follow request pending",
-	"processing": "Processing...",
 	"youFollowing": "Followed",
-	"followRequest": "Send follow request",
-	"follow": "Ḍfeṛ"
+	"followRequest": "Send follow request"
 }
 </locale>
 
@@ -424,10 +406,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Are you sure that you want to follow {name}?",
 	"followRequestPending": "Follow request pending",
-	"processing": "Processing...",
 	"youFollowing": "Followed",
-	"followRequest": "Send follow request",
-	"follow": "Follow"
+	"followRequest": "Send follow request"
 }
 </locale>
 
@@ -437,10 +417,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "{name}(으)로의 팔로우 신청을 취소하시겠습니까?",
 	"followConfirm": "{name}님을 팔로우 하시겠습니까?",
 	"followRequestPending": "팔로우 허가 대기중",
-	"processing": "처리중",
 	"youFollowing": "팔로잉",
-	"followRequest": "팔로우 요청",
-	"follow": "팔로우"
+	"followRequest": "팔로우 요청"
 }
 </locale>
 
@@ -450,10 +428,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Weet je zeker dat je {name} wilt volgen?",
 	"followRequestPending": "Wachten op goedkeuring volgverzoek",
-	"processing": "Bezig met verwerken",
 	"youFollowing": "Followed",
-	"followRequest": "Verzoek om te mogen volgen",
-	"follow": "Volgen"
+	"followRequest": "Verzoek om te mogen volgen"
 }
 </locale>
 
@@ -463,10 +439,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Er du sikker på at du vil følge {name}?",
 	"followRequestPending": "Venter på godkjenning",
-	"processing": "Processing...",
 	"youFollowing": "Følger",
-	"followRequest": "Følgeforespørsel",
-	"follow": "Følg"
+	"followRequest": "Følgeforespørsel"
 }
 </locale>
 
@@ -476,10 +450,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Czy na pewno chcesz zaobserwować {name}?",
 	"followRequestPending": "Oczekująca prośba o możliwość obserwacji",
-	"processing": "Przetwarzanie",
 	"youFollowing": "Śledzeni",
-	"followRequest": "Poproś o możliwość obserwacji",
-	"follow": "Obserwuj"
+	"followRequest": "Poproś o możliwość obserwacji"
 }
 </locale>
 
@@ -489,10 +461,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Tem certeza que quer seguir {name}?",
 	"followRequestPending": "Pedido de seguidor pendente",
-	"processing": "Em Progresso",
 	"youFollowing": "Seguindo",
-	"followRequest": "Enviar pedido de seguidor",
-	"follow": "Seguir"
+	"followRequest": "Enviar pedido de seguidor"
 }
 </locale>
 
@@ -502,10 +472,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Вы уверены, что хотите отменить запрос на подписку пользователю {name}?",
 	"followConfirm": "Подписаться на {name}?",
 	"followRequestPending": "Нерассмотренный запрос на подписку",
-	"processing": "Обработка",
 	"youFollowing": "Вы подписаны",
-	"followRequest": "Запрос на подписку",
-	"follow": "Подписка"
+	"followRequest": "Запрос на подписку"
 }
 </locale>
 
@@ -515,10 +483,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Naozaj chcete sledovať {name}?",
 	"followRequestPending": "Žiadosť o sledovanie čaká",
-	"processing": "Pracujem...",
 	"youFollowing": "Sledované",
-	"followRequest": "Požiadať o sledovanie",
-	"follow": "Sledovať"
+	"followRequest": "Požiadať o sledovanie"
 }
 </locale>
 
@@ -528,10 +494,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "ยกเลิกคำขอติดตาม {name} ใช่ไหม?",
 	"followConfirm": "ต้องการติดตาม {name} ใช่ไหม?",
 	"followRequestPending": "รออนุมัติคำขอติดตาม",
-	"processing": "กำลังประมวลผล...",
 	"youFollowing": "ติดตามแล้ว",
-	"followRequest": "ส่งคำขอติดตาม",
-	"follow": "ติดตาม"
+	"followRequest": "ส่งคำขอติดตาม"
 }
 </locale>
 
@@ -541,10 +505,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "{name} adlı kişiye gönderdiğiniz takip isteğini iptal etmek ister misiniz?",
 	"followConfirm": "{name} kullanıcısını takip etmek istediğinden emin misin?",
 	"followRequestPending": "Takip isteği beklemede",
-	"processing": "İşleniyor...",
 	"youFollowing": "Takip edildi",
-	"followRequest": "Takip isteği gönder",
-	"follow": "Takip et"
+	"followRequest": "Takip isteği gönder"
 }
 </locale>
 
@@ -554,10 +516,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Are you sure that you want to follow {name}?",
 	"followRequestPending": "Follow request pending",
-	"processing": "Processing...",
 	"youFollowing": "Followed",
-	"followRequest": "Send follow request",
-	"follow": "Follow"
+	"followRequest": "Send follow request"
 }
 </locale>
 
@@ -567,10 +527,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Ви впевнені, що хочете скасувати запит на підписку до {name}?",
 	"followConfirm": "Підписатися на {name}?",
 	"followRequestPending": "Очікуючі запити на підписку",
-	"processing": "Обробка",
 	"youFollowing": "Підписки",
-	"followRequest": "Запит на підписку",
-	"follow": "Підписатись"
+	"followRequest": "Запит на підписку"
 }
 </locale>
 
@@ -580,10 +538,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "Are you sure that you want to cancel your follow request to {name}?",
 	"followConfirm": "Bạn theo dõi {name}？",
 	"followRequestPending": "Yêu cầu theo dõi đang chờ",
-	"processing": "Đang xử lý",
 	"youFollowing": "Đang theo dõi",
-	"followRequest": "Gửi yêu cầu theo dõi",
-	"follow": "Theo dõi"
+	"followRequest": "Gửi yêu cầu theo dõi"
 }
 </locale>
 
@@ -593,10 +549,8 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "要取消申请关注{name}吗？",
 	"followConfirm": "确定要关注 {name} 吗？",
 	"followRequestPending": "关注请求待批准",
-	"processing": "正在处理",
 	"youFollowing": "正在关注",
-	"followRequest": "申请关注",
-	"follow": "关注"
+	"followRequest": "申请关注"
 }
 </locale>
 
@@ -606,9 +560,7 @@ onBeforeUnmount(() => {
 	"cancelFollowRequestConfirm": "要取消向 {name} 送出的追隨申請嗎？",
 	"followConfirm": "你真的要追隨{name}嗎？",
 	"followRequestPending": "追隨許可待批准",
-	"processing": "處理中",
 	"youFollowing": "追隨中",
-	"followRequest": "追隨請求",
-	"follow": "追隨"
+	"followRequest": "追隨請求"
 }
 </locale>

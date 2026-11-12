@@ -266,6 +266,7 @@ export class NotificationEntityService implements OnModuleInit {
 				});
 			case 'login':
 			case 'createToken':
+				return { ...packedBase, type: notification.type };
 			case 'test':
 				return await awaitAll({
 					...packedCommon,

@@ -6,7 +6,7 @@
 
 import type { AnyContractProcedure } from '@orpc/contract';
 import { ArraySchema } from 'valibot';
-import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
+import type { AuthenticationResponseJSON as AuthenticationResponseJSON_2 } from '@simplewebauthn/browser';
 import { BooleanSchema } from 'valibot';
 import { CheckAction } from 'valibot';
 import { ContractProcedure } from '@orpc/contract';
@@ -46,7 +46,7 @@ import type { PublicKeyCredentialRequestOptionsJSON as PublicKeyCredentialReques
 import _ReconnectingWebSocket from 'reconnecting-websocket';
 import { RecordSchema } from 'valibot';
 import { RegexAction } from 'valibot';
-import type { RegistrationResponseJSON } from '@simplewebauthn/browser';
+import type { RegistrationResponseJSON as RegistrationResponseJSON_2 } from '@simplewebauthn/browser';
 import { SchemaWithPipe } from 'valibot';
 import { StrictObjectSchema } from 'valibot';
 import { StringSchema } from 'valibot';
@@ -3869,7 +3869,7 @@ type I2faKeyDoneRequest = {
     password: string;
     token?: string | null;
     name: string;
-    credential: RegistrationResponseJSON;
+    credential: RegistrationResponseJSON_2;
 };
 
 // @public (undocumented)
@@ -8132,7 +8132,7 @@ type SigninFlowRequest = {
     username: string;
     password?: string;
     token?: string;
-    credential?: AuthenticationResponseJSON;
+    credential?: AuthenticationResponseJSON_2;
     'hcaptcha-response'?: string | null;
     'g-recaptcha-response'?: string | null;
     'turnstile-response'?: string | null;
@@ -8177,7 +8177,7 @@ type SigninWithPasskeyInitResponse = {
 
 // @public (undocumented)
 type SigninWithPasskeyRequest = {
-    credential?: AuthenticationResponseJSON;
+    credential?: AuthenticationResponseJSON_2;
     context?: string;
 };
 

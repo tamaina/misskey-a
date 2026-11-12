@@ -72,6 +72,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { watch, ref, computed } from 'vue';
 import { toUnicode } from 'punycode.js';
 import tinycolor from 'tinycolor2';
@@ -79,7 +80,6 @@ import JSON5 from 'json5';
 import lightTheme from '@features/preferences/frontend/themes/_light.json5';
 import darkTheme from '@features/preferences/frontend/themes/_dark.json5';
 import { host } from '@features/boot/frontend/shared/config.js';
-import type { Theme } from '@features/preferences/frontend/shared/theme.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
@@ -94,6 +94,10 @@ import { interpolateLocaleParameters } from '@features/runtime/frontend/interpol
 import { useLeaveGuard } from '@features/navigation/frontend/composables/use-leave-guard.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { Theme } from '@features/preferences/frontend/shared/theme.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -193,7 +197,7 @@ function applyThemeCode() {
 
 async function saveAs() {
 	const { canceled, result: name } = await os.inputText({
-		title: $locale.value.sfc.name,
+		title: globalLocale.value.env.name,
 		minLength: 1,
 	});
 	if (canceled) return;
@@ -220,7 +224,7 @@ watch(theme, apply, { deep: true });
 const headerActions = computed(() => [{
 	asFullButton: true,
 	icon: 'ti ti-eye',
-	text: $locale.value.sfc.preview,
+	text: globalLocale.value.env.preview,
 	handler: showPreview,
 }, {
 	asFullButton: true,
@@ -302,9 +306,7 @@ definePage(() => ({
 	"addDescription": "أضف وصفًا",
 	"themeDescription": "الوصف",
 	"themeInvalid": "تنسيق السمة غير صالح",
-	"name": "الإسم",
 	"themeInstalled": "تم تنصيب {name}",
-	"preview": "معاينة",
 	"saveAs": "احفظ كـ...",
 	"themeEditor": "مصمم القوالب"
 }
@@ -321,9 +323,7 @@ definePage(() => ({
 	"addDescription": "Afegeix una descripció ",
 	"themeDescription": "Descripció",
 	"themeInvalid": "El format d'aquest tema no és correcte",
-	"name": "Nom",
 	"themeInstalled": "{name} Instal·lat ",
-	"preview": "Vista prèvia",
 	"saveAs": "Desar com...",
 	"themeEditor": "Editor de temes"
 }
@@ -340,9 +340,7 @@ definePage(() => ({
 	"addDescription": "Přidat popis",
 	"themeDescription": "Popis",
 	"themeInvalid": "Formát tohoto tématu je neplatný",
-	"name": "Jméno",
 	"themeInstalled": "{name} byl nainstalován",
-	"preview": "Náhled",
 	"saveAs": "Uložit jako…",
 	"themeEditor": "Editor témat"
 }
@@ -359,9 +357,7 @@ definePage(() => ({
 	"addDescription": "Add description",
 	"themeDescription": "Description",
 	"themeInvalid": "The format of this theme is invalid",
-	"name": "Name",
 	"themeInstalled": "{name} has been installed",
-	"preview": "Preview",
 	"saveAs": "Save as...",
 	"themeEditor": "Theme editor"
 }
@@ -378,9 +374,7 @@ definePage(() => ({
 	"addDescription": "Beschreibung hinzufügen",
 	"themeDescription": "Beschreibung",
 	"themeInvalid": "Der Code dieses Farbschemas ist ungültig",
-	"name": "Name",
 	"themeInstalled": "{name} wurde installiert",
-	"preview": "Vorschau",
 	"saveAs": "Speichern als …",
 	"themeEditor": "Farbschema-Editor"
 }
@@ -397,9 +391,7 @@ definePage(() => ({
 	"addDescription": "Add description",
 	"themeDescription": "Description",
 	"themeInvalid": "The format of this theme is invalid",
-	"name": "Name",
 	"themeInstalled": "{name} has been installed",
-	"preview": "Preview",
 	"saveAs": "Save as...",
 	"themeEditor": "Theme editor"
 }
@@ -416,9 +408,7 @@ definePage(() => ({
 	"addDescription": "Agregar descripción",
 	"themeDescription": "Descripción",
 	"themeInvalid": "El formato del tema no es válido",
-	"name": "Nombre",
 	"themeInstalled": "{name} ha sido instalado",
-	"preview": "Vista previa",
 	"saveAs": "Guardar como…",
 	"themeEditor": "Editor de temas"
 }
@@ -435,9 +425,7 @@ definePage(() => ({
 	"addDescription": "Ajouter une description",
 	"themeDescription": "Description",
 	"themeInvalid": "Le format du thème n'est pas valide",
-	"name": "Nom",
 	"themeInstalled": "{name} a été installé",
-	"preview": "Aperçu",
 	"saveAs": "Enregistrer sous ...",
 	"themeEditor": "Éditeur de thèmes"
 }
@@ -454,9 +442,7 @@ definePage(() => ({
 	"addDescription": "Tambahkan deskripsi",
 	"themeDescription": "Deskripsi",
 	"themeInvalid": "Format tema tidak valid",
-	"name": "Nama",
 	"themeInstalled": "{name} telah dipasang",
-	"preview": "Pratinjau",
 	"saveAs": "Simpan sebagai…",
 	"themeEditor": "Penyunting tema"
 }
@@ -473,9 +459,7 @@ definePage(() => ({
 	"addDescription": "Aggiungi descrizione",
 	"themeDescription": "Descrizione",
 	"themeInvalid": "Il formato tema non è valido",
-	"name": "Nome",
 	"themeInstalled": "{name} è installato",
-	"preview": "Anteprima",
 	"saveAs": "Salva con nome",
 	"themeEditor": "Editor di temi"
 }
@@ -492,9 +476,7 @@ definePage(() => ({
 	"addDescription": "説明を追加",
 	"themeDescription": "説明",
 	"themeInvalid": "テーマの形式が間違っています",
-	"name": "名前",
 	"themeInstalled": "{name}をインストールしました",
-	"preview": "プレビュー",
 	"saveAs": "名前を付けて保存",
 	"themeEditor": "テーマエディター"
 }
@@ -511,9 +493,7 @@ definePage(() => ({
 	"addDescription": "説明を入れるで",
 	"themeDescription": "説明",
 	"themeInvalid": "テーマの形式が間違ってるみたいや",
-	"name": "名前",
 	"themeInstalled": "{name}をインストールしたで。",
-	"preview": "プレビュー",
 	"saveAs": "名前を付けて保存",
 	"themeEditor": "テーマエディター"
 }
@@ -530,9 +510,7 @@ definePage(() => ({
 	"addDescription": "Add description",
 	"themeDescription": "Description",
 	"themeInvalid": "The format of this theme is invalid",
-	"name": "Name",
 	"themeInstalled": "{name} has been installed",
-	"preview": "Preview",
 	"saveAs": "Save as...",
 	"themeEditor": "Theme editor"
 }
@@ -549,9 +527,7 @@ definePage(() => ({
 	"addDescription": "Add description",
 	"themeDescription": "Description",
 	"themeInvalid": "The format of this theme is invalid",
-	"name": "Name",
 	"themeInstalled": "{name} has been installed",
-	"preview": "Preview",
 	"saveAs": "Save as...",
 	"themeEditor": "Theme editor"
 }
@@ -568,9 +544,7 @@ definePage(() => ({
 	"addDescription": "설명 추가",
 	"themeDescription": "설명",
 	"themeInvalid": "테마 형식이 올바르지 않습니다",
-	"name": "이름",
 	"themeInstalled": "{name} 테마가 설치되었습니다",
-	"preview": "미리보기",
 	"saveAs": "다른 이름으로 저장",
 	"themeEditor": "테마 에디터"
 }
@@ -587,9 +561,7 @@ definePage(() => ({
 	"addDescription": "Beschrijving toevoegen",
 	"themeDescription": "Beschrijving",
 	"themeInvalid": "The format of this theme is invalid",
-	"name": "Naam",
 	"themeInstalled": "{name} has been installed",
-	"preview": "Voorbeeld",
 	"saveAs": "Opslaan als…",
 	"themeEditor": "Thema-editor"
 }
@@ -606,9 +578,7 @@ definePage(() => ({
 	"addDescription": "Legg til beskrivelse",
 	"themeDescription": "Beskrivelse",
 	"themeInvalid": "The format of this theme is invalid",
-	"name": "Navn",
 	"themeInstalled": "{name} has been installed",
-	"preview": "Preview",
 	"saveAs": "Lagre som",
 	"themeEditor": "Theme editor"
 }
@@ -625,9 +595,7 @@ definePage(() => ({
 	"addDescription": "Dodaj opis",
 	"themeDescription": "Opis",
 	"themeInvalid": "Format motywu jest nieprawidłowy.",
-	"name": "Nazwa",
 	"themeInstalled": "Zainstalowano {name}",
-	"preview": "Podgląd",
 	"saveAs": "Zapisz jako…",
 	"themeEditor": "Edytor motywu"
 }
@@ -644,9 +612,7 @@ definePage(() => ({
 	"addDescription": "Adicionar descrição",
 	"themeDescription": "Descrição",
 	"themeInvalid": "O formato desse tema é invalido",
-	"name": "Nome",
 	"themeInstalled": "{name} foi instalado",
-	"preview": "Pré-visualizar",
 	"saveAs": "Salvar como",
 	"themeEditor": "Editor de temas"
 }
@@ -663,9 +629,7 @@ definePage(() => ({
 	"addDescription": "Добавить описание",
 	"themeDescription": "Описание",
 	"themeInvalid": "Формат темы некорректный.",
-	"name": "Название",
 	"themeInstalled": "Тема «{name}» установлена.",
-	"preview": "Предпросмотр",
 	"saveAs": "Сохранить под названием…",
 	"themeEditor": "Редактор темы оформления"
 }
@@ -682,9 +646,7 @@ definePage(() => ({
 	"addDescription": "Pridať popis",
 	"themeDescription": "Popis",
 	"themeInvalid": "Formát tejto témy je nesprávny",
-	"name": "Názov",
 	"themeInstalled": "{name} je nainštalovaná",
-	"preview": "Náhľad",
 	"saveAs": "Uložiť ako...",
 	"themeEditor": "Editor tém"
 }
@@ -701,9 +663,7 @@ definePage(() => ({
 	"addDescription": "เพิ่มคำอธิบาย",
 	"themeDescription": "คำอธิบาย",
 	"themeInvalid": "รูปแบบของธีมนี้ไม่ถูกต้องนะ",
-	"name": "ชื่อ",
 	"themeInstalled": "{name} ได้รับการติดตั้ง",
-	"preview": "แสดงตัวอย่าง",
 	"saveAs": "บันทึกเป็น...",
 	"themeEditor": "ตัวแก้ไขธีม"
 }
@@ -720,9 +680,7 @@ definePage(() => ({
 	"addDescription": "Açıklama ekle",
 	"themeDescription": "Açıklama",
 	"themeInvalid": "Bu temanın biçimi geçersizdir.",
-	"name": "İsim",
 	"themeInstalled": "{name} kuruldu",
-	"preview": "Önizleme",
 	"saveAs": "Farklı kaydet",
 	"themeEditor": "Tema düzenleyici"
 }
@@ -739,9 +697,7 @@ definePage(() => ({
 	"addDescription": "Add description",
 	"themeDescription": "Description",
 	"themeInvalid": "The format of this theme is invalid",
-	"name": "Name",
 	"themeInstalled": "{name} has been installed",
-	"preview": "Preview",
 	"saveAs": "Save as...",
 	"themeEditor": "Theme editor"
 }
@@ -758,9 +714,7 @@ definePage(() => ({
 	"addDescription": "Додатковий опис.",
 	"themeDescription": "Опис",
 	"themeInvalid": "Неправильний формат теми",
-	"name": "Ім'я",
 	"themeInstalled": "Тему {name} встановлено",
-	"preview": "Попередній перегляд",
 	"saveAs": "Зберегти як…",
 	"themeEditor": "Редактор тем"
 }
@@ -777,9 +731,7 @@ definePage(() => ({
 	"addDescription": "Thêm mô tả",
 	"themeDescription": "Mô tả",
 	"themeInvalid": "Định dạng của theme này không hợp lệ",
-	"name": "Tên",
 	"themeInstalled": "{name} đã được cài đặt",
-	"preview": "Xem trước",
 	"saveAs": "Lưu thành",
 	"themeEditor": "Công cụ thiết kế theme"
 }
@@ -796,9 +748,7 @@ definePage(() => ({
 	"addDescription": "添加描述",
 	"themeDescription": "描述",
 	"themeInvalid": "主题格式错误",
-	"name": "名称",
 	"themeInstalled": "{name} 已安装",
-	"preview": "预览",
 	"saveAs": "另存为",
 	"themeEditor": "主题编辑器"
 }
@@ -815,9 +765,7 @@ definePage(() => ({
 	"addDescription": "新增描述",
 	"themeDescription": "描述",
 	"themeInvalid": "佈景主題格式錯誤",
-	"name": "名稱",
 	"themeInstalled": "{name}已安裝",
-	"preview": "預覽",
 	"saveAs": "另存新檔",
 	"themeEditor": "佈景主題編輯器"
 }

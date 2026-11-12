@@ -10,18 +10,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div :class="$style.version">✨{{ version }}🚀</div>
 		<div v-if="isBeta" :class="$style.beta">{{ $locale.sfc.thankYouForTestingBeta }}</div>
 		<MkButton full @click="whatIsNew">{{ $locale.sfc.whatIsNew }}</MkButton>
-		<MkButton :class="$style.gotIt" primary full @click="modal?.close()">{{ $locale.sfc.gotIt }}</MkButton>
+		<MkButton :class="$style.gotIt" primary full @click="modal?.close()">{{ globalLocale.env.gotIt }}</MkButton>
 	</div>
 </MkModal>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onMounted, useTemplateRef } from 'vue';
 import { version } from '@features/boot/frontend/shared/config.js';
 import MkModal from '@features/ui/frontend/components/MkModal.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkSparkle from '@features/ui/frontend/components/MkSparkle.vue';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const modal = useTemplateRef('modal');
 
@@ -81,8 +85,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "حُدث ميسكي!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "اعرض التغييرات",
-  "gotIt": "فهِمت"
+  "whatIsNew": "اعرض التغييرات"
 }
 </locale>
 
@@ -90,8 +93,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey s'ha actualitzat ",
   "thankYouForTestingBeta": "Gràcies per ajudar-nos a provar la versió beta!",
-  "whatIsNew": "Mostra canvis",
-  "gotIt": "D'acord "
+  "whatIsNew": "Mostra canvis"
 }
 </locale>
 
@@ -99,8 +101,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey byl aktualizován!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Zobrazit změny",
-  "gotIt": "Rozumím!"
+  "whatIsNew": "Zobrazit změny"
 }
 </locale>
 
@@ -108,8 +109,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey has been updated!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Show changes",
-  "gotIt": "Got it!"
+  "whatIsNew": "Show changes"
 }
 </locale>
 
@@ -117,8 +117,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey wurde aktualisiert!",
   "thankYouForTestingBeta": "Vielen Dank für Ihre Unterstützung beim Testen der Beta-Version!",
-  "whatIsNew": "Änderungen anzeigen",
-  "gotIt": "Verstanden!"
+  "whatIsNew": "Änderungen anzeigen"
 }
 </locale>
 
@@ -126,8 +125,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey has been updated!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Show changes",
-  "gotIt": "Got it!"
+  "whatIsNew": "Show changes"
 }
 </locale>
 
@@ -135,8 +133,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "¡Misskey ha sido actualizado!",
   "thankYouForTestingBeta": "¡Gracias por tu colaboración en la prueba de la versión beta!",
-  "whatIsNew": "Mostrar cambios",
-  "gotIt": "¡Lo tengo!"
+  "whatIsNew": "Mostrar cambios"
 }
 </locale>
 
@@ -144,8 +141,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey a été mis à jour !",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Voir les derniers changements",
-  "gotIt": "J’ai compris !"
+  "whatIsNew": "Voir les derniers changements"
 }
 </locale>
 
@@ -153,8 +149,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey telah dimutakhirkan!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Lihat perubahan pemutakhiran",
-  "gotIt": "Mengerti"
+  "whatIsNew": "Lihat perubahan pemutakhiran"
 }
 </locale>
 
@@ -162,8 +157,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey è stato aggiornato!",
   "thankYouForTestingBeta": "Grazie per la tua collaborazione nella verifica delle versioni beta!",
-  "whatIsNew": "Informazioni sull'aggiornamento",
-  "gotIt": "ok!"
+  "whatIsNew": "Informazioni sull'aggiornamento"
 }
 </locale>
 
@@ -171,8 +165,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskeyが更新されました！",
   "thankYouForTestingBeta": "ベータ版の検証にご協力いただきありがとうございます！",
-  "whatIsNew": "更新情報を見る",
-  "gotIt": "わかった"
+  "whatIsNew": "更新情報を見る"
 }
 </locale>
 
@@ -180,8 +173,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskeyが更新されたで！\nモデレーターの人らに感謝せなあかんで",
   "thankYouForTestingBeta": "ベータ版使うてくれておおきに！",
-  "whatIsNew": "更新情報を見るで",
-  "gotIt": "ほい"
+  "whatIsNew": "更新情報を見るで"
 }
 </locale>
 
@@ -189,8 +181,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey has been updated!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Show changes",
-  "gotIt": "Got it!"
+  "whatIsNew": "Show changes"
 }
 </locale>
 
@@ -198,8 +189,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey has been updated!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Show changes",
-  "gotIt": "ಅರ್ಥವಾಯಿತು!"
+  "whatIsNew": "Show changes"
 }
 </locale>
 
@@ -207,8 +197,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey가 업데이트 되었습니다!",
   "thankYouForTestingBeta": "베타 버전의 검증에 협력해 주셔서 감사합니다!",
-  "whatIsNew": "패치 정보 보기",
-  "gotIt": "알겠어요"
+  "whatIsNew": "패치 정보 보기"
 }
 </locale>
 
@@ -216,8 +205,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey is bijgewerkt!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Wijzigingen tonen",
-  "gotIt": "Begrepen"
+  "whatIsNew": "Wijzigingen tonen"
 }
 </locale>
 
@@ -225,8 +213,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey har blitt oppdatert!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Show changes",
-  "gotIt": "Skjønner"
+  "whatIsNew": "Show changes"
 }
 </locale>
 
@@ -234,8 +221,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey zostało zaktualizowane!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Pokaż zmiany",
-  "gotIt": "Rozumiem!"
+  "whatIsNew": "Pokaż zmiany"
 }
 </locale>
 
@@ -243,8 +229,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey foi atualizado!",
   "thankYouForTestingBeta": "Obrigado por nos ajudar a testar a versão beta!",
-  "whatIsNew": "Ver atualizações",
-  "gotIt": "Entendi"
+  "whatIsNew": "Ver atualizações"
 }
 </locale>
 
@@ -252,8 +237,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey обновился!",
   "thankYouForTestingBeta": "Спасибо вам за помощь с тестированием бета-версии!",
-  "whatIsNew": "Что новенького?",
-  "gotIt": "Ясно!"
+  "whatIsNew": "Что новенького?"
 }
 </locale>
 
@@ -261,8 +245,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey sa aktualizoval!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Čo je nové?",
-  "gotIt": "Rozumiem!"
+  "whatIsNew": "Čo je nové?"
 }
 </locale>
 
@@ -270,8 +253,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey ได้รับการอัปเดตแล้ว!",
   "thankYouForTestingBeta": "ขอบคุณที่ให้ความร่วมมือในการทดสอบเวอร์ชันเบต้า!",
-  "whatIsNew": "แสดงการเปลี่ยนแปลง",
-  "gotIt": "เข้าใจแล้ว !"
+  "whatIsNew": "แสดงการเปลี่ยนแปลง"
 }
 </locale>
 
@@ -279,8 +261,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey güncellendi!",
   "thankYouForTestingBeta": "Beta sürümünü test ettiğin için teşekkür ederiz!",
-  "whatIsNew": "Değişiklikleri göster",
-  "gotIt": "Anladım!"
+  "whatIsNew": "Değişiklikleri göster"
 }
 </locale>
 
@@ -288,8 +269,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey has been updated!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Show changes",
-  "gotIt": "Got it!"
+  "whatIsNew": "Show changes"
 }
 </locale>
 
@@ -297,8 +277,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey оновлено!",
   "thankYouForTestingBeta": "Дякуємо, що допомагаєте нам тестувати бета-версію!",
-  "whatIsNew": "Показати зміни",
-  "gotIt": "Зрозуміло!"
+  "whatIsNew": "Показати зміни"
 }
 </locale>
 
@@ -306,8 +285,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey vừa được cập nhật!",
   "thankYouForTestingBeta": "Thank you for helping us test the beta version!",
-  "whatIsNew": "Hiện những thay đổi",
-  "gotIt": "Hiểu rồi!"
+  "whatIsNew": "Hiện những thay đổi"
 }
 </locale>
 
@@ -315,8 +293,7 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey 更新完成！",
   "thankYouForTestingBeta": "感谢您协助测试 beta 版！",
-  "whatIsNew": "显示更新信息",
-  "gotIt": "好"
+  "whatIsNew": "显示更新信息"
 }
 </locale>
 
@@ -324,7 +301,6 @@ onMounted(() => {
 {
   "misskeyUpdated": "Misskey 更新完成！",
   "thankYouForTestingBeta": "感謝您協助驗證 beta 版！",
-  "whatIsNew": "顯示更新資訊",
-  "gotIt": "知道了"
+  "whatIsNew": "顯示更新資訊"
 }
 </locale>

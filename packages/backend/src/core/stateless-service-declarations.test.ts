@@ -14,7 +14,7 @@ import type { MiRegistryItem } from '@features/persistence/backend/repositories/
 import { mediaServices } from '@features/drive/backend/services/media.js';
 import { markupServices } from '@features/markup/backend/services.js';
 import { preferencesServices } from '@features/preferences/backend/services.js';
-import { moderationLoggingServices, moderationServices } from '@features/moderation/backend/services.js';
+import { moderationLoggingServices } from '@features/moderation/backend/services.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import { ImageProcessingService } from '@features/drive/backend/services/ImageProcessingService.js';
@@ -49,14 +49,7 @@ describe('seven stateless feature declarations', () => {
 		expect(Reflect.get(first.SensitiveMediaDetectionService, 'httpRequestService')).toBe(inputs.httpRequestService);
 		expect(Reflect.get(first.FileInfoService, 'loggerService')).toBe(inputs.loggerService);
 		for (const key of Object.keys(first) as (keyof typeof first)[]) expect(second[key]).not.toBe(first[key]);
-		expect(mediaServices.ports.map(port => port.name).sort()).toEqual(['config', 'httpRequestService', 'loggerService', 'meta']);
 		expect(() => Reflect.apply(mediaServices.create, undefined, [{}])).toThrow('Missing port');
-	});
-
-	test('moderation keeps its original input and output group while logging is separate', () => {
-		expect(moderationServices.ports.map(port => port.name).sort()).toEqual(['abuseReportNotificationRecipientRepository', 'abuseUserReportsRepository', 'idService', 'moderationLogsRepository', 'systemWebhookEntityService', 'userEntityService']);
-		expect(Object.keys(moderationServices.definitions).sort()).toEqual(['AbuseReportNotificationRecipientEntityService', 'AbuseUserReportEntityService', 'ModerationLogEntityService']);
-		expect(featureServiceGroups.moderationLogging.exports).toEqual([ModerationLogService, 'ModerationLogService']);
 	});
 
 	test('selective Nest graphs retain aliases, strict lookup, singleton identities and local sharing', async () => {

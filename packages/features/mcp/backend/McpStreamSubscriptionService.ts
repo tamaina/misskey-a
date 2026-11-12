@@ -28,21 +28,36 @@ export class McpStreamSubscriptionService implements OnApplicationBootstrap, OnA
 		private readonly access: McpStreamAccessService, private readonly queue: QueueService) { }
 	private readonly onMessage = (_: string, data: string) => {
 		if (this.stopping) return;
+		// Reduce to references before admission: the bounded FIFO and the size limit apply to the
+		// reduced occurrence, so large packed publications (e.g. antenna notes) are never dropped for size.
+		let source: StreamOccurrence | null;
+		try { source = this.admit(data); } catch { this.dropped++; return; }
+		if (!source) return;
 		// Bounded FIFO ingress. Overflow is best-effort loss, never unbounded memory.
 		if (this.pending >= 32) { this.dropped++; return; }
 		this.pending++;
-		this.tail = this.tail.then(() => this.receive(data)).catch(() => { this.dropped++; console.error('MCP stream enqueue failed'); }).finally(() => { this.pending--; });
+		this.tail = this.tail.then(() => this.deliver(source)).catch(() => { this.dropped++; console.error('MCP stream enqueue failed'); }).finally(() => { this.pending--; });
 	};
 	onApplicationBootstrap() {
 		if (this.stopping || this.listening) return;
 		this.listening = true; this.redis.on('message', this.onMessage);
 	}
-	async receive(data: string) {
-		if (this.stopping || Buffer.byteLength(data) > 262144) return;
-		let parsed: JsonValue; try { parsed = JSON.parse(data); } catch { return; }
-		if (!isJsonObject(parsed) || typeof parsed.channel !== 'string' || typeof parsed.occurrenceId !== 'string' || typeof parsed.createdAt !== 'number' || parsed.message === undefined) return;
+	/** Parses one publication and strips it to native routing/hydration references (no packed content is retained). */
+	admit(data: string): StreamOccurrence | null {
+		if (this.stopping) return null;
+		let parsed: JsonValue; try { parsed = JSON.parse(data); } catch { return null; }
+		if (!isJsonObject(parsed) || typeof parsed.channel !== 'string' || typeof parsed.occurrenceId !== 'string' || typeof parsed.createdAt !== 'number' || parsed.message === undefined) return null;
 		const source = reduceOccurrence({ id: parsed.occurrenceId, createdAt: parsed.createdAt, channel: parsed.channel, message: parsed.message } satisfies StreamOccurrence);
-		if (!source) return;
+		if (!source) return null;
+		if (Buffer.byteLength(JSON.stringify(source)) > 262144) { this.dropped++; return null; }
+		return source;
+	}
+	async receive(data: string) {
+		const source = this.admit(data);
+		if (source) await this.deliver(source);
+	}
+	private async deliver(source: StreamOccurrence) {
+		if (this.stopping) return;
 		if (source.createdAt > Date.now() + 5000 || source.createdAt < Date.now() - 900000) return;
 		// Page bounded reads; no process-local subscription registry or grants to restore.
 		for (let skip = 0; !this.stopping; skip += 128) {

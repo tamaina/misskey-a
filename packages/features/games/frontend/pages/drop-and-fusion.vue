@@ -32,7 +32,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div class="_gaps" style="padding: 16px;">
 							<div style="font-size: 90%;"><i class="ti ti-music"></i> {{ $locale.sfc.soundWillBePlayed }}</div>
 							<MkSwitch v-model="mute">
-								<template #label>{{ $locale.sfc.mute }}</template>
+								<template #label>{{ globalLocale.env.mute }}</template>
 							</MkSwitch>
 						</div>
 					</div>
@@ -81,6 +81,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import XGame from '@features/games/frontend/pages/drop-and-fusion.game.vue';
@@ -91,6 +92,9 @@ import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const {
 	model: gameMode,
@@ -173,7 +177,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "البداية",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "اكتم",
 	"lastNDays": "آخر {n} أيام",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -189,7 +192,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Comença",
 	"soundWillBePlayed": "Es reproduiran efectes de so",
-	"mute": "Silencia",
 	"lastNDays": "Últims {n} dies",
 	"ranking": "Classificació",
 	"loading": "S’està carregant",
@@ -205,7 +207,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Začít",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Ztlumit",
 	"lastNDays": "Posledních {n} dnů",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -221,7 +222,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Begin",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Mute",
 	"lastNDays": "Last {n} days",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -237,7 +237,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Anfangen",
 	"soundWillBePlayed": "Es wird Ton wiedergegeben",
-	"mute": "Stummschalten",
 	"lastNDays": "Letzte {n} Tage",
 	"ranking": "Rangliste",
 	"loading": "Laden",
@@ -253,7 +252,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Begin",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Mute",
 	"lastNDays": "Last {n} days",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -269,7 +267,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Comenzar",
 	"soundWillBePlayed": "Con música y efectos sonoros",
-	"mute": "Silenciar",
 	"lastNDays": "Últimos {n} días",
 	"ranking": "Clasificación",
 	"loading": "Cargando",
@@ -285,7 +282,6 @@ definePage(() => ({
 	"bubbleGame": "Jeu de bulles",
 	"start": "Commencer",
 	"soundWillBePlayed": "Le son sera joué",
-	"mute": "Masquer",
 	"lastNDays": "Derniers {n} jours",
 	"ranking": "Classement",
 	"loading": "Chargement en cours",
@@ -301,7 +297,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Mulai",
 	"soundWillBePlayed": "Suara yang akan dimainkan",
-	"mute": "Bisukan",
 	"lastNDays": "{n} hari terakhir",
 	"ranking": "Peringkat",
 	"loading": "Memuat...",
@@ -317,7 +312,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Inizia!",
 	"soundWillBePlayed": "Con musica ed effetti sonori",
-	"mute": "Silenziare",
 	"lastNDays": "Ultimi {n} giorni",
 	"ranking": "Classifica",
 	"loading": "Caricamento",
@@ -333,7 +327,6 @@ definePage(() => ({
 	"bubbleGame": "バブルゲーム",
 	"start": "始める",
 	"soundWillBePlayed": "サウンドが再生されます",
-	"mute": "ミュート",
 	"lastNDays": "直近{n}日",
 	"ranking": "ランキング",
 	"loading": "読み込み中",
@@ -349,7 +342,6 @@ definePage(() => ({
 	"bubbleGame": "バブルゲーム",
 	"start": "始める",
 	"soundWillBePlayed": "サウンドが再生されるで",
-	"mute": "ミュート",
 	"lastNDays": "直近{n}日",
 	"ranking": "ランキング",
 	"loading": "読み込み中",
@@ -365,7 +357,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Begin",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Mute",
 	"lastNDays": "Last {n} days",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -381,7 +372,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Begin",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Mute",
 	"lastNDays": "Last {n} days",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -397,7 +387,6 @@ definePage(() => ({
 	"bubbleGame": "버블 게임",
 	"start": "시작하기",
 	"soundWillBePlayed": "소리가 재생됩니다",
-	"mute": "뮤트",
 	"lastNDays": "최근 {n}일",
 	"ranking": "랭킹",
 	"loading": "불러오는 중",
@@ -413,7 +402,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Aan de slag",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Dempen",
 	"lastNDays": "Last {n} days",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -429,7 +417,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Begin",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Skjul",
 	"lastNDays": "Last {n} days",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -445,7 +432,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Rozpocznij",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Wycisz",
 	"lastNDays": "W ciągu ostatnich {n} dni",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -461,7 +447,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "começar",
 	"soundWillBePlayed": "Sons serão reproduzidos",
-	"mute": "Silenciar",
 	"lastNDays": "Últimos {n} dias",
 	"ranking": "Ranking",
 	"loading": "Carregando",
@@ -477,7 +462,6 @@ definePage(() => ({
 	"bubbleGame": "BubbleGame",
 	"start": "Начать",
 	"soundWillBePlayed": "Будет воспроизведен звук",
-	"mute": "Скрыть",
 	"lastNDays": "Последние {n} сут",
 	"ranking": "Рейтинги",
 	"loading": "Загрузка",
@@ -493,7 +477,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Začať",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Vypnúť zvuk",
 	"lastNDays": "Posledných {n} dní",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -509,7 +492,6 @@ definePage(() => ({
 	"bubbleGame": "เกมบับเบิ้ล",
 	"start": "เริ่ม",
 	"soundWillBePlayed": "จะมีการเล่นเอฟเฟกต์เสียง",
-	"mute": "ปิดเสียง",
 	"lastNDays": "ล่าสุด {n} วันที่แล้ว",
 	"ranking": "อันดับ",
 	"loading": "กำลังโหลด",
@@ -525,7 +507,6 @@ definePage(() => ({
 	"bubbleGame": "Kabarcık Oyunu",
 	"start": "Başla",
 	"soundWillBePlayed": "Ses çalınacaktır",
-	"mute": "Gizle",
 	"lastNDays": "Son {n} gün",
 	"ranking": "Sıralama",
 	"loading": "Yükleniyor",
@@ -541,7 +522,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Begin",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Mute",
 	"lastNDays": "Last {n} days",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -557,7 +537,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Розпочати",
 	"soundWillBePlayed": "Буде відтворено звук",
-	"mute": "Ігнорувати",
 	"lastNDays": "Останні {n} днів",
 	"ranking": "Рейтинг",
 	"loading": "Завантаження",
@@ -573,7 +552,6 @@ definePage(() => ({
 	"bubbleGame": "Bubble Game",
 	"start": "Bắt đầu",
 	"soundWillBePlayed": "Sound will be played",
-	"mute": "Ẩn",
 	"lastNDays": "{n} ngày trước",
 	"ranking": "Ranking",
 	"loading": "Loading",
@@ -589,7 +567,6 @@ definePage(() => ({
 	"bubbleGame": "泡泡游戏",
 	"start": "开始",
 	"soundWillBePlayed": "声音将会播放",
-	"mute": "屏蔽",
 	"lastNDays": "最近{n}天",
 	"ranking": "排行榜",
 	"loading": "读取中",
@@ -605,7 +582,6 @@ definePage(() => ({
 	"bubbleGame": "氣泡遊戲",
 	"start": "開始",
 	"soundWillBePlayed": "將播放音效",
-	"mute": "靜音",
 	"lastNDays": "過去 {n} 天",
 	"ranking": "排行榜",
 	"loading": "載入中",

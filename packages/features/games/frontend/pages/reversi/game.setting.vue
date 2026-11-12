@@ -96,7 +96,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<template v-if="!isReady && !isOpReady">{{ $locale.sfc.reversiWaitingBoth }}<MkEllipsis/></template>
 					</div>
 					<div class="_buttonsCenter">
-						<MkButton rounded danger @click="cancel">{{ $locale.sfc.cancel }}</MkButton>
+						<MkButton rounded danger @click="cancel">{{ globalLocale.env.cancel }}</MkButton>
 						<MkButton v-if="!isReady" rounded primary @click="ready">{{ $locale.sfc.reversiReady }}</MkButton>
 						<MkButton v-if="isReady" rounded @click="unready">{{ $locale.sfc.reversiCancelReady }}</MkButton>
 					</div>
@@ -111,10 +111,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, watch, ref, onUnmounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as Reversi from 'misskey-reversi';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -122,8 +122,12 @@ import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import * as os from '@features/ui/frontend/os.js';
-import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
 import { useRouter } from '@features/navigation/frontend/router.js';
+import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -204,7 +208,7 @@ function chooseMap(ev: PointerEvent) {
 async function cancel() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: $locale.value.sfc.areYouSure,
+		text: globalLocale.value.env.areYouSure,
 	});
 	if (canceled) return;
 
@@ -329,11 +333,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": " إلغاء",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Are you sure?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -356,11 +358,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Esperant la tirada de l'oponent ",
 	"reversiWaitingForMe": "Esperant el teu torn",
 	"reversiWaitingBoth": "Prepara't ",
-	"cancel": "Cancel·lar",
 	"reversiReady": "Preparat ",
 	"reversiCancelReady": " No preparat ",
-	"reversiShareToTlTheGameWhenStart": "Compartir la partida a la línia de temps quan comenci",
-	"areYouSure": "Estàs segur?"
+	"reversiShareToTlTheGameWhenStart": "Compartir la partida a la línia de temps quan comenci"
 }
 </locale>
 
@@ -383,11 +383,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Zrušit",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Jste si jistí?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -410,11 +408,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Cancel",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Are you sure?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -437,11 +433,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Warte auf den Zug des Gegenspielers",
 	"reversiWaitingForMe": "Warte auf deinen Zug",
 	"reversiWaitingBoth": "Mach dich bereit",
-	"cancel": "Abbrechen",
 	"reversiReady": "Bereit",
 	"reversiCancelReady": "Nicht bereit",
-	"reversiShareToTlTheGameWhenStart": "Spiel in der Chronik teilen, wenn es gestartet wurde",
-	"areYouSure": "Bist du sicher?"
+	"reversiShareToTlTheGameWhenStart": "Spiel in der Chronik teilen, wenn es gestartet wurde"
 }
 </locale>
 
@@ -464,11 +458,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Cancel",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Are you sure?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -491,11 +483,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Esperando el turno del adversario",
 	"reversiWaitingForMe": "Esperando tu turno",
 	"reversiWaitingBoth": "Prepárate",
-	"cancel": "Cancelar",
 	"reversiReady": "Listo",
 	"reversiCancelReady": "No estoy listo",
-	"reversiShareToTlTheGameWhenStart": "Compartir la partida en la línea de tiempo cuando comience ",
-	"areYouSure": "¿Estás conforme?"
+	"reversiShareToTlTheGameWhenStart": "Compartir la partida en la línea de tiempo cuando comience "
 }
 </locale>
 
@@ -518,11 +508,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Préparez-vous",
-	"cancel": "Annuler",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Êtes-vous sûr·e ?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -545,11 +533,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Menunggu langkah giliran dari lawan",
 	"reversiWaitingForMe": "Menungguh langkah giliran dari kamu",
 	"reversiWaitingBoth": "Bersiap",
-	"cancel": "Batalkan",
 	"reversiReady": "Siap",
 	"reversiCancelReady": "Belum siap",
-	"reversiShareToTlTheGameWhenStart": "Bagikan permainan ke lini masa ketika dimulai",
-	"areYouSure": "Apakah kamu yakin?"
+	"reversiShareToTlTheGameWhenStart": "Bagikan permainan ke lini masa ketika dimulai"
 }
 </locale>
 
@@ -572,11 +558,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Attendere l'avversario",
 	"reversiWaitingForMe": "Ti stanno aspettando",
 	"reversiWaitingBoth": "Preparatevi",
-	"cancel": "Annulla",
 	"reversiReady": "Pronti",
 	"reversiCancelReady": "Riprendere la preparazione",
-	"reversiShareToTlTheGameWhenStart": "Pubblica l'inizio della partita sulla tua Timeline",
-	"areYouSure": "Confermi?"
+	"reversiShareToTlTheGameWhenStart": "Pubblica l'inizio della partita sulla tua Timeline"
 }
 </locale>
 
@@ -599,11 +583,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "相手の準備が完了するのを待っています",
 	"reversiWaitingForMe": "あなたの準備が完了するのを待っています",
 	"reversiWaitingBoth": "準備してください",
-	"cancel": "キャンセル",
 	"reversiReady": "準備完了",
 	"reversiCancelReady": "準備を再開",
-	"reversiShareToTlTheGameWhenStart": "開始時に対局をタイムラインに投稿",
-	"areYouSure": "よろしいですか？"
+	"reversiShareToTlTheGameWhenStart": "開始時に対局をタイムラインに投稿"
 }
 </locale>
 
@@ -626,11 +608,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "相手の準備が完了するのを待ってんで。",
 	"reversiWaitingForMe": "あんさんの準備が完了すんのを待ってんで",
 	"reversiWaitingBoth": "準備してなー",
-	"cancel": "やめる",
 	"reversiReady": "準備完了",
 	"reversiCancelReady": "準備を再開",
-	"reversiShareToTlTheGameWhenStart": "初めの時に対局をタイムラインに投稿するで",
-	"areYouSure": "いいん？"
+	"reversiShareToTlTheGameWhenStart": "初めの時に対局をタイムラインに投稿するで"
 }
 </locale>
 
@@ -653,11 +633,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Cancel",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Are you sure?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -680,11 +658,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "ರದ್ದು",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Are you sure?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -707,11 +683,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "상대의 준비가 끝나기를 기다리고 있습니다.",
 	"reversiWaitingForMe": "나의 준비가 끝나기를 기다리고 있습니다.",
 	"reversiWaitingBoth": "준비하세요",
-	"cancel": "취소",
 	"reversiReady": "준비 완료",
 	"reversiCancelReady": "준비되지 않음",
-	"reversiShareToTlTheGameWhenStart": "대국이 시작할 때 타임라인에 공유",
-	"areYouSure": "계속 진행하시겠습니까?"
+	"reversiShareToTlTheGameWhenStart": "대국이 시작할 때 타임라인에 공유"
 }
 </locale>
 
@@ -734,11 +708,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Annuleren",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Weet je het zeker?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -761,11 +733,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Avbryt",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Are you sure?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -788,11 +758,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Anuluj",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Na pewno?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -815,11 +783,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Esperando o turno do oponente",
 	"reversiWaitingForMe": "Esperando o seu turno",
 	"reversiWaitingBoth": "Prepare-se",
-	"cancel": "Cancelar",
 	"reversiReady": "Pronto",
 	"reversiCancelReady": "Não pronto",
-	"reversiShareToTlTheGameWhenStart": "Compartilhar jogo na linha do tempo ao iniciar",
-	"areYouSure": "Tem certeza?"
+	"reversiShareToTlTheGameWhenStart": "Compartilhar jogo na linha do tempo ao iniciar"
 }
 </locale>
 
@@ -842,11 +808,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Отмена",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Вы уверены?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -869,11 +833,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Zrušiť",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Are you sure?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -896,11 +858,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "กำลังรออีกฝ่ายเตรียมตัวให้เสร็จ",
 	"reversiWaitingForMe": "กำลังรอฝ่ายคุณเตรียมตัวให้เสร็จ",
 	"reversiWaitingBoth": "กรุณาเตรียมตัว",
-	"cancel": "ยกเลิก",
 	"reversiReady": "เตรียมตัวพร้อมแล้ว",
 	"reversiCancelReady": "ยกเลิกการเตรียมตัวพร้อม",
-	"reversiShareToTlTheGameWhenStart": "โพสต์ลงไทม์ไลน์เมื่อเริ่มการเล่น",
-	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?"
+	"reversiShareToTlTheGameWhenStart": "โพสต์ลงไทม์ไลน์เมื่อเริ่มการเล่น"
 }
 </locale>
 
@@ -923,11 +883,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Rakibin sırasını bekle",
 	"reversiWaitingForMe": "Sıranı bekliyorsun",
 	"reversiWaitingBoth": "Hazır olun",
-	"cancel": "Vazgeç",
 	"reversiReady": "Hazır",
 	"reversiCancelReady": "Hazır değil",
-	"reversiShareToTlTheGameWhenStart": "Oyun başlatıldığında panoda paylaş",
-	"areYouSure": "Emin misin?"
+	"reversiShareToTlTheGameWhenStart": "Oyun başlatıldığında panoda paylaş"
 }
 </locale>
 
@@ -950,11 +908,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Cancel",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Are you sure?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -977,11 +933,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Скасувати",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Ви впевнені?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -1004,11 +958,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "Waiting for opponent's turn",
 	"reversiWaitingForMe": "Waiting for your turn",
 	"reversiWaitingBoth": "Get ready",
-	"cancel": "Hủy",
 	"reversiReady": "Ready",
 	"reversiCancelReady": "Not ready",
-	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started",
-	"areYouSure": "Bạn chắc chứ?"
+	"reversiShareToTlTheGameWhenStart": "Share Game to timeline when started"
 }
 </locale>
 
@@ -1031,11 +983,9 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "等待对手准备",
 	"reversiWaitingForMe": "等待你的准备",
 	"reversiWaitingBoth": "请准备",
-	"cancel": "取消",
 	"reversiReady": "准备就绪",
 	"reversiCancelReady": "重新准备",
-	"reversiShareToTlTheGameWhenStart": "开始时在时间线发布对局",
-	"areYouSure": "你确定吗？"
+	"reversiShareToTlTheGameWhenStart": "开始时在时间线发布对局"
 }
 </locale>
 
@@ -1058,10 +1008,8 @@ onUnmounted(() => {
 	"reversiWaitingForOther": "等待對手準備就緒",
 	"reversiWaitingForMe": "等待您準備就緒",
 	"reversiWaitingBoth": "請準備",
-	"cancel": "取消",
 	"reversiReady": "準備就緒",
 	"reversiCancelReady": "重新準備",
-	"reversiShareToTlTheGameWhenStart": "在遊戲開始時將對弈資訊發布到時間軸",
-	"areYouSure": "是否確定？"
+	"reversiShareToTlTheGameWhenStart": "在遊戲開始時將對弈資訊發布到時間軸"
 }
 </locale>

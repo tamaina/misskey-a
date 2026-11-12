@@ -4,47 +4,28 @@
  */
 
 import { createRequire } from 'node:module';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import type { StorybookConfig } from '@storybook/vue3-vite';
 import { type PluginOption, mergeConfig } from 'vite';
 import turbosnap from 'vite-plugin-turbosnap';
 
 const require = createRequire(import.meta.url);
-// The authentication preview uses the installed Storybook 10 framework without legacy 8.x addons.
-const authOnly = process.env.MISSKEY_STORYBOOK_AUTH_ONLY === '1';
-const _dirname = fileURLToPath(new URL('.', import.meta.url));
-
-// Retain the project's legacy autodocs option alongside the current config type.
-type CompatibleStorybookConfig = StorybookConfig & { docs: NonNullable<StorybookConfig['docs']> & { autodocs: 'tag' } };
 
 function hasPluginName(plugin: PluginOption, name: string): boolean {
 	return !!plugin && typeof plugin === 'object' && !Array.isArray(plugin) && 'name' in plugin && plugin.name === name;
 }
 
 const config = {
-	stories: authOnly ? [
-		'../../features/auth/frontend/components/{MkSignin,MkSecuritySettings,MkBrowserSessions,MkTokenExpiry,MkSudoDialog}.stories.ts',
-	] : [
+	stories: [
 		'./index.mdx',
 		'../../features/*/frontend/**/*.mdx',
 		'../../features/*/frontend/**/*.stories.@(js|jsx|ts|tsx)',
 	],
 	staticDirs: [{ from: '../assets', to: '/client-assets' }, '../public'],
-	addons: authOnly ? [getAbsolutePath('@storybook/addon-links')] : [
-		getAbsolutePath('@storybook/addon-essentials'),
-		getAbsolutePath('@storybook/addon-interactions'),
-		getAbsolutePath('@storybook/addon-links'),
-		getAbsolutePath('@storybook/addon-storysource'),
-		getAbsolutePath('@storybook/addon-mdx-gfm'),
-		resolve(_dirname, '../node_modules/storybook-addon-misskey-theme'),
-	],
+	addons: [getAbsolutePath('@storybook/addon-docs'), getAbsolutePath('@storybook/addon-links')],
 	framework: {
 		name: getAbsolutePath('@storybook/vue3-vite') as '@storybook/vue3-vite',
 		options: {},
-	},
-	docs: {
-		autodocs: 'tag',
 	},
 	core: {
 		disableTelemetry: true,
@@ -59,7 +40,6 @@ const config = {
 		config.plugins = config.plugins?.filter(plugin => plugin && !hasPluginName(plugin, 'createSearchIndex')) ?? [];
 
 		return mergeConfig(config, {
-			define: { 'import.meta.env.MISSKEY_STORYBOOK_AUTH_ONLY': authOnly },
 			resolve: { alias: { '@storybook/test': 'storybook/test' } },
 			plugins: [
 				{
@@ -79,7 +59,7 @@ const config = {
 			},
 		});
 	},
-} satisfies CompatibleStorybookConfig;
+} satisfies StorybookConfig;
 export default config;
 
 function getAbsolutePath(value: string): string {

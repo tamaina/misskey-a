@@ -91,7 +91,7 @@ test('key insertion commits before notification and preserves key metadata', asy
 
 test('TOTP setup returns the secret committed under the common profile lock', async () => {
 	const f = fixture(); const result = await f.invoke.register();
-	expect(result.secret).toMatch(/^[A-Z2-7]+$/); expect(result.qr).toMatch(/^data:image\/png;base64,/);
+	expect(result.secret).toMatch(/^[A-Z2-7]+$/); expect(result.url).toMatch(/^otpauth:\/\/totp\//); expect(result).not.toHaveProperty('qr');
 	expect(f.profiles.update).toHaveBeenCalledWith({ userId: f.profile.userId }, { twoFactorTempSecret: result.secret }); expect(f.committed).toHaveBeenCalledOnce();
 });
 

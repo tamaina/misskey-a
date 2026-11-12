@@ -19,8 +19,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</button>
 		</div>
 		<div :class="$style.middle">
-			<MkA v-tooltip.noDelay.right="$locale.sfc.timeline" :class="$style.item" :activeClass="$style.active" to="/" exact>
-				<i :class="$style.itemIcon" class="ti ti-home ti-fw" style="view-transition-name: navbar-homeIcon;"></i><span :class="$style.itemText">{{ $locale.sfc.timeline }}</span>
+			<MkA v-tooltip.noDelay.right="globalLocale.env.timeline" :class="$style.item" :activeClass="$style.active" to="/" exact>
+				<i :class="$style.itemIcon" class="ti ti-home ti-fw" style="view-transition-name: navbar-homeIcon;"></i><span :class="$style.itemText">{{ globalLocale.env.timeline }}</span>
 			</MkA>
 			<template v-for="item in prefer.r.menu.value">
 				<div v-if="item === '-'" :class="$style.divider"></div>
@@ -46,11 +46,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<i :class="$style.itemIcon" class="ti ti-dashboard ti-fw" style="view-transition-name: navbar-controlPanel;"></i><span :class="$style.itemText">{{ $locale.sfc.controlPanel }}</span>
 			</MkA>
 			<button class="_button" :class="$style.item" @click="more">
-				<i :class="$style.itemIcon" class="ti ti-grid-dots ti-fw" style="view-transition-name: navbar-more;"></i><span :class="$style.itemText">{{ $locale.sfc.more }}</span>
+				<i :class="$style.itemIcon" class="ti ti-grid-dots ti-fw" style="view-transition-name: navbar-more;"></i><span :class="$style.itemText">{{ globalLocale.env.more }}</span>
 				<span v-if="otherMenuItemIndicated" :class="$style.itemIndicator" class="_blink"><i class="_indicatorCircle"></i></span>
 			</button>
-			<MkA v-tooltip.noDelay.right="$locale.sfc.settings" :class="$style.item" :activeClass="$style.active" to="/settings">
-				<i :class="$style.itemIcon" class="ti ti-settings ti-fw" style="view-transition-name: navbar-settings;"></i><span :class="$style.itemText">{{ $locale.sfc.settings }}</span>
+			<MkA v-tooltip.noDelay.right="globalLocale.env.settings" :class="$style.item" :activeClass="$style.active" to="/settings">
+				<i :class="$style.itemIcon" class="ti ti-settings ti-fw" style="view-transition-name: navbar-settings;"></i><span :class="$style.itemText">{{ globalLocale.env.settings }}</span>
 			</MkA>
 		</div>
 		<div :class="$style.bottom">
@@ -104,6 +104,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { openInstanceMenu } from '@features/navigation/frontend/ui/_common_/common.js';
 import * as os from '@features/ui/frontend/os.js';
@@ -115,6 +116,9 @@ import { useRouter } from '@features/navigation/frontend/router.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { getAccountMenu } from '@features/auth/frontend/accounts.js';
 import { $i } from '@features/auth/frontend/i.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -845,10 +849,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "مثيل الخادم",
 	"widgets": "التطبيقات المُصغّرة",
-	"timeline": "الخيط الزمني",
 	"controlPanel": "لوحة التحكم",
-	"more": "المزيد!",
-	"settings": "الاعدادات",
 	"note": "ملاحظة",
 	"account": "الحسابات"
 }
@@ -861,10 +862,7 @@ function menuEdit() {
 	"turnItOn": "Activar",
 	"instance": "Instància ",
 	"widgets": "Ginys",
-	"timeline": "Línia de temps",
 	"controlPanel": "Tauler de control",
-	"more": "Més",
-	"settings": "Preferències",
 	"note": "Nota",
 	"account": "Compte"
 }
@@ -877,10 +875,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Instance",
 	"widgets": "Widgety",
-	"timeline": "Časová osa",
 	"controlPanel": "Ovládací panel",
-	"more": "Více!",
-	"settings": "Nastavení",
 	"note": "Poznámka",
 	"account": "Účty"
 }
@@ -893,10 +888,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Instance",
 	"widgets": "Widgets",
-	"timeline": "Timeline",
 	"controlPanel": "Control Panel",
-	"more": "More!",
-	"settings": "Settings",
 	"note": "Note",
 	"account": "Account"
 }
@@ -909,10 +901,7 @@ function menuEdit() {
 	"turnItOn": "Einschalten",
 	"instance": "Instanz",
 	"widgets": "Widgets",
-	"timeline": "Chronik",
 	"controlPanel": "Systemsteuerung",
-	"more": "Mehr!",
-	"settings": "Einstellungen",
 	"note": "Notiz",
 	"account": "Benutzerkonto"
 }
@@ -925,10 +914,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Instance",
 	"widgets": "Widgets",
-	"timeline": "Timeline",
 	"controlPanel": "Control Panel",
-	"more": "More!",
-	"settings": "Settings",
 	"note": "Note",
 	"account": "Account"
 }
@@ -941,10 +927,7 @@ function menuEdit() {
 	"turnItOn": "Activar",
 	"instance": "Instancia",
 	"widgets": "Widgets",
-	"timeline": "Línea de tiempo",
 	"controlPanel": "Panel de control",
-	"more": "¡Más!",
-	"settings": "Configuración",
 	"note": "Nota",
 	"account": "Cuentas"
 }
@@ -957,10 +940,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Instance",
 	"widgets": "Widgets",
-	"timeline": "Fil",
 	"controlPanel": "Panneau de configuration",
-	"more": "Plus !",
-	"settings": "Paramètres",
 	"note": "Note",
 	"account": "Comptes"
 }
@@ -973,10 +953,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Server",
 	"widgets": "Widget",
-	"timeline": "Lini masa",
 	"controlPanel": "Panel kendali",
-	"more": "Lainnya",
-	"settings": "Pengaturan",
 	"note": "Catatan",
 	"account": "Akun"
 }
@@ -989,10 +966,7 @@ function menuEdit() {
 	"turnItOn": "Attivare",
 	"instance": "Istanza",
 	"widgets": "Riquadri",
-	"timeline": "Timeline",
 	"controlPanel": "Pannello di controllo",
-	"more": "Di più!",
-	"settings": "Impostazioni",
 	"note": "Nota",
 	"account": "Account"
 }
@@ -1005,10 +979,7 @@ function menuEdit() {
 	"turnItOn": "オンにする",
 	"instance": "サーバー",
 	"widgets": "ウィジェット",
-	"timeline": "タイムライン",
 	"controlPanel": "コントロールパネル",
-	"more": "もっと！",
-	"settings": "設定",
 	"note": "ノート",
 	"account": "アカウント"
 }
@@ -1021,10 +992,7 @@ function menuEdit() {
 	"turnItOn": "オンにしとこ",
 	"instance": "サーバー",
 	"widgets": "ウィジェット",
-	"timeline": "タイムライン",
 	"controlPanel": "コントロールパネル",
-	"more": "他のん",
-	"settings": "設定",
 	"note": "ノート",
 	"account": "アカウント"
 }
@@ -1037,10 +1005,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Instance",
 	"widgets": "Widgets",
-	"timeline": "Timeline",
 	"controlPanel": "Control Panel",
-	"more": "More!",
-	"settings": "Iɣewwaṛen",
 	"note": "Note",
 	"account": "Imiḍan"
 }
@@ -1053,10 +1018,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "ನಿದರ್ಶನ",
 	"widgets": "Widgets",
-	"timeline": "ಸಮಯಸಾಲು",
 	"controlPanel": "Control Panel",
-	"more": "More!",
-	"settings": "ಸಿದ್ಧತೆಗಳು",
 	"note": "Note",
 	"account": "Account"
 }
@@ -1069,10 +1031,7 @@ function menuEdit() {
 	"turnItOn": "켜기",
 	"instance": "서버",
 	"widgets": "위젯",
-	"timeline": "타임라인",
 	"controlPanel": "제어판",
-	"more": "더 보기!",
-	"settings": "설정",
 	"note": "노트",
 	"account": "계정"
 }
@@ -1085,10 +1044,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Server",
 	"widgets": "Widgets",
-	"timeline": "Tijdlijn",
 	"controlPanel": "Controlepaneel",
-	"more": "Meer!",
-	"settings": "Instellingen",
 	"note": "Notitie",
 	"account": "Gebruikersaccounts"
 }
@@ -1101,10 +1057,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Server",
 	"widgets": "Widgets",
-	"timeline": "Tidslinje",
 	"controlPanel": "Control Panel",
-	"more": "Mer!",
-	"settings": "Innstillinger",
 	"note": "Note",
 	"account": "Konto"
 }
@@ -1117,10 +1070,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Instancja",
 	"widgets": "Widżety",
-	"timeline": "Oś czasu",
 	"controlPanel": "Panel sterowania",
-	"more": "Więcej!",
-	"settings": "Ustawienia",
 	"note": "Utwórz wpis",
 	"account": "Konta"
 }
@@ -1133,10 +1083,7 @@ function menuEdit() {
 	"turnItOn": "Ativar",
 	"instance": "Instância",
 	"widgets": "Widgets",
-	"timeline": "Linha do tempo",
 	"controlPanel": "Painel de controle",
-	"more": "Mais!",
-	"settings": "Configurações",
 	"note": "Publicar",
 	"account": "Contas"
 }
@@ -1149,10 +1096,7 @@ function menuEdit() {
 	"turnItOn": "Включить",
 	"instance": "Экземпляр",
 	"widgets": "Виджеты",
-	"timeline": "Лента",
 	"controlPanel": "Панель управления",
-	"more": "Ещё!",
-	"settings": "Настройки",
 	"note": "Заметка",
 	"account": "Учётные записи"
 }
@@ -1165,10 +1109,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Inštancia",
 	"widgets": "Widgety",
-	"timeline": "Časová os",
 	"controlPanel": "Ovládací panel",
-	"more": "Viac!",
-	"settings": "Nastavenia",
 	"note": "Poznámka",
 	"account": "Účty"
 }
@@ -1181,10 +1122,7 @@ function menuEdit() {
 	"turnItOn": "เปิดใช้งาน",
 	"instance": "เซิร์ฟเวอร์",
 	"widgets": "วิดเจ็ต",
-	"timeline": "ไทม์ไลน์",
 	"controlPanel": "แผงควบคุม",
-	"more": "เพิ่มเติม!",
-	"settings": "การตั้งค่า",
 	"note": " โน้ต",
 	"account": "บัญชีผู้ใช้"
 }
@@ -1197,10 +1135,7 @@ function menuEdit() {
 	"turnItOn": "Aç",
 	"instance": "Sunucu",
 	"widgets": "Widget'lar",
-	"timeline": "Pano",
 	"controlPanel": "Kontrol Paneli",
-	"more": "Daha fazlası!",
-	"settings": "Ayarlar",
 	"note": "Not",
 	"account": "Hesap"
 }
@@ -1213,10 +1148,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Instance",
 	"widgets": "Widgets",
-	"timeline": "Timeline",
 	"controlPanel": "Control Panel",
-	"more": "More!",
-	"settings": "Settings",
 	"note": "Note",
 	"account": "Account"
 }
@@ -1229,10 +1161,7 @@ function menuEdit() {
 	"turnItOn": "Увімкнути",
 	"instance": "Інстанс",
 	"widgets": "Віджети",
-	"timeline": "Стрічка",
 	"controlPanel": "Панель керування",
-	"more": "Бiльше!",
-	"settings": "Налаштування",
 	"note": "Запис",
 	"account": "Акаунти"
 }
@@ -1245,10 +1174,7 @@ function menuEdit() {
 	"turnItOn": "Turn on",
 	"instance": "Máy chủ",
 	"widgets": "Tiện ích",
-	"timeline": "Bảng tin",
 	"controlPanel": "Bảng điều khiển",
-	"more": "Thêm nữa!",
-	"settings": "Cài đặt",
 	"note": "Bài viết",
 	"account": "Tài khoản của bạn"
 }
@@ -1261,10 +1187,7 @@ function menuEdit() {
 	"turnItOn": "开启",
 	"instance": "服务器",
 	"widgets": "小工具",
-	"timeline": "时间线",
 	"controlPanel": "控制面板",
-	"more": "更多！",
-	"settings": "设置",
 	"note": "发帖",
 	"account": "账户"
 }
@@ -1277,10 +1200,7 @@ function menuEdit() {
 	"turnItOn": "開啟",
 	"instance": "伺服器",
 	"widgets": "小工具",
-	"timeline": "時間軸",
 	"controlPanel": "控制臺",
-	"more": "更多！",
-	"settings": "設定",
 	"note": "貼文",
 	"account": "帳戶"
 }

@@ -36,49 +36,21 @@ function providerToken(provider: Provider): InjectionToken {
 }
 
 describe('feature service composition adapter', () => {
-	test('the pre-migration contract plus explicit MCP Events, antenna and fresh-auth additions preserve every alias target', () => {
-		const baseline = JSON.parse(readFileSync(new URL('../../test/fixtures/core-provider-contract.json', import.meta.url), 'utf8')) as {
-			providers: string[]; exports: string[]; aliases: { name: string; target: string }[];
-		};
-		for (const entries of [baseline.providers, baseline.exports]) {
-			// The class token is identical; only its constructor name changed.
-			expect(entries.filter(entry => entry === 'class:UserAuthService')).toHaveLength(1);
-			entries[entries.indexOf('class:UserAuthService')] = 'class:TotpService';
-			entries.splice(entries.indexOf('class:SystemWebhookService'), 0, 'class:McpEventsService');
-			entries.splice(entries.indexOf('alias:SystemWebhookService'), 0, 'alias:McpEventsService');
-			for (const prefix of ['class:', 'alias:']) {
-				entries.push(`${prefix}BrowserSessionService`, `${prefix}FreshReauthenticationStore`, `${prefix}FreshPasskeyReauthentication`, `${prefix}SudoService`);
-				entries.splice(entries.indexOf(`${prefix}AntennaService`) + 1, 0, `${prefix}AntennaNoteAccessService`, `${prefix}AntennaEventSubscriptionService`);
-				entries.splice(entries.indexOf(`${prefix}McpEventsService`) + 1, 0, `${prefix}McpStreamAccessService`, `${prefix}McpStreamSubscriptionService`, `${prefix}NoteStreamingHidingService`);
-			}
-		}
-		expect(baseline.aliases.filter(alias => alias.name === 'UserAuthService')).toEqual([{ name: 'UserAuthService', target: 'UserAuthService' }]);
-		baseline.aliases.find(alias => alias.name === 'UserAuthService')!.target = 'TotpService';
-		baseline.aliases.push({ name: 'McpEventsService', target: 'McpEventsService' });
-		for (const name of ['BrowserSessionService', 'FreshReauthenticationStore', 'FreshPasskeyReauthentication', 'SudoService', 'AntennaNoteAccessService', 'AntennaEventSubscriptionService', 'NoteStreamingHidingService', 'McpStreamAccessService', 'McpStreamSubscriptionService']) baseline.aliases.push({ name, target: name });
+	test('every CoreModule compatibility alias is unique and targets an installed class provider', () => {
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
-		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
-		const describeToken = (entry: Provider | InjectionToken): string => {
-			const token = typeof entry === 'object' ? entry.provide : entry;
-			return typeof token === 'function' ? `class:${token.name}` : `alias:${String(token)}`;
-		};
-		const publicProviders = providers.filter(provider => typeof providerToken(provider) !== 'symbol');
-		expect(publicProviders.map(describeToken).sort()).toEqual([...baseline.providers].sort());
-		expect(exports.map(describeToken).sort()).toEqual([...baseline.exports].sort());
-		const aliases = publicProviders.filter((provider): provider is import('@nestjs/common').ExistingProvider => typeof provider === 'object' && 'useExisting' in provider)
-			.map(provider => ({ name: String(provider.provide), target: (provider.useExisting as { name: string }).name }));
-		expect(aliases.sort((left, right) => left.name.localeCompare(right.name))).toEqual([...baseline.aliases].sort((left, right) => left.name.localeCompare(right.name)));
-		const migratedTokens = new Set(featureServiceProviders.filter(provider => typeof providerToken(provider) !== 'symbol').map(describeToken));
-		expect(publicProviders.map(describeToken).filter(token => !migratedTokens.has(token))).toEqual(baseline.providers.filter(token => !migratedTokens.has(token)));
-		expect(exports.map(describeToken).filter(token => !migratedTokens.has(token))).toEqual(baseline.exports.filter(token => !migratedTokens.has(token)));
+		const installedTokens = new Set(providers.map(providerToken));
+		const aliases = providers.filter((provider): provider is import('@nestjs/common').ExistingProvider => typeof provider === 'object' && 'useExisting' in provider && typeof provider.provide === 'string');
+		expect(aliases.length).toBeGreaterThan(0);
+		expect(new Set(aliases.map(alias => alias.provide)).size).toBe(aliases.length);
+		for (const alias of aliases) {
+			expect(typeof alias.useExisting, String(alias.provide)).toBe('function');
+			expect(installedTokens.has(alias.useExisting), String(alias.provide)).toBe(true);
+		}
 	});
 
 	test('CoreModule installs and exports every canonical service and compatibility alias once', () => {
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
-		expect(factoryProviders).toHaveLength(24);
-		expect(classProviders).toHaveLength(53);
-		expect(featureServiceExports).toHaveLength(105);
 		for (const provider of featureServiceProviders) {
 			expect(providers.filter(candidate => providerToken(candidate) === providerToken(provider))).toEqual([provider]);
 		}

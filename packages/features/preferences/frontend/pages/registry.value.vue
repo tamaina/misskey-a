@@ -32,7 +32,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkButton primary @click="save"><i class="ti ti-device-floppy"></i> {{ globalLocale.env.save }}</MkButton>
 
 				<MkKeyValue>
-					<template #key>{{ $locale.sfc.updatedAt }}</template>
+					<template #key>{{ globalLocale.env.updatedAt }}</template>
 					<template #value><MkTime :time="value.updatedAt" mode="detail"/></template>
 				</MkKeyValue>
 
@@ -45,11 +45,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { watch, computed, ref } from 'vue';
 import JSON5 from 'json5';
 import * as v from 'valibot';
-import { packedJsonValueSchema } from '../../../users/backend/json-value.schema.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
@@ -58,6 +56,8 @@ import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import FormInfo from '@features/ui/frontend/components/MkInfo.vue';
+import { packedJsonValueSchema } from '../../../users/backend/json-value.schema.js';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -144,8 +144,7 @@ definePage(() => ({
 	"system": "النظام",
 	"scope": "الحيّز",
 	"key": "مفتاح",
-	"value": "القيمة",
-	"updatedAt": "حُدّث في"
+	"value": "القيمة"
 }
 </locale>
 
@@ -160,8 +159,7 @@ definePage(() => ({
 	"system": "Sistema",
 	"scope": "Àmbit ",
 	"key": "Clau",
-	"value": "Valor",
-	"updatedAt": "Actualitzat el"
+	"value": "Valor"
 }
 </locale>
 
@@ -176,8 +174,7 @@ definePage(() => ({
 	"system": "Systém",
 	"scope": "Rozsah",
 	"key": "Klíč",
-	"value": "Hodnota",
-	"updatedAt": "Upraveno"
+	"value": "Hodnota"
 }
 </locale>
 
@@ -192,8 +189,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"updatedAt": "Updated at"
+	"value": "Value"
 }
 </locale>
 
@@ -208,8 +204,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Schlüssel",
-	"value": "Wert",
-	"updatedAt": "Zuletzt geändert am"
+	"value": "Wert"
 }
 </locale>
 
@@ -224,8 +219,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"updatedAt": "Updated at"
+	"value": "Value"
 }
 </locale>
 
@@ -240,8 +234,7 @@ definePage(() => ({
 	"system": "Sistema",
 	"scope": "Alcance",
 	"key": "Clave",
-	"value": "Valores",
-	"updatedAt": "Actualizado"
+	"value": "Valores"
 }
 </locale>
 
@@ -256,8 +249,7 @@ definePage(() => ({
 	"system": "Système",
 	"scope": "Portée",
 	"key": "Clé ",
-	"value": "Valeur",
-	"updatedAt": "Mis à jour le"
+	"value": "Valeur"
 }
 </locale>
 
@@ -272,8 +264,7 @@ definePage(() => ({
 	"system": "Sistem",
 	"scope": "Lingkup",
 	"key": "Kunci",
-	"value": "Nilai",
-	"updatedAt": "Diperbarui pada"
+	"value": "Nilai"
 }
 </locale>
 
@@ -288,8 +279,7 @@ definePage(() => ({
 	"system": "Sistema",
 	"scope": "Ambito di applicazione.",
 	"key": "Dati",
-	"value": "Valore",
-	"updatedAt": "Aggiornato il"
+	"value": "Valore"
 }
 </locale>
 
@@ -304,8 +294,7 @@ definePage(() => ({
 	"system": "システム",
 	"scope": "スコープ",
 	"key": "キー",
-	"value": "値",
-	"updatedAt": "更新日時"
+	"value": "値"
 }
 </locale>
 
@@ -320,8 +309,7 @@ definePage(() => ({
 	"system": "システム",
 	"scope": "スコープ",
 	"key": "キー",
-	"value": "値",
-	"updatedAt": "更新日時"
+	"value": "値"
 }
 </locale>
 
@@ -336,8 +324,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"updatedAt": "Updated at"
+	"value": "Value"
 }
 </locale>
 
@@ -352,8 +339,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"updatedAt": "Updated at"
+	"value": "Value"
 }
 </locale>
 
@@ -368,8 +354,7 @@ definePage(() => ({
 	"system": "시스템",
 	"scope": "범위",
 	"key": "키",
-	"value": "값",
-	"updatedAt": "수정한 날짜"
+	"value": "값"
 }
 </locale>
 
@@ -384,8 +369,7 @@ definePage(() => ({
 	"system": "Systeem",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Waarde",
-	"updatedAt": "Laatst gewijzigd at"
+	"value": "Waarde"
 }
 </locale>
 
@@ -400,8 +384,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Nøkkel",
-	"value": "Verdi",
-	"updatedAt": "Updated at"
+	"value": "Verdi"
 }
 </locale>
 
@@ -416,8 +399,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Zakres",
 	"key": "Klucz",
-	"value": "Wartość",
-	"updatedAt": "Zaktualizowano"
+	"value": "Wartość"
 }
 </locale>
 
@@ -432,8 +414,7 @@ definePage(() => ({
 	"system": "Sistema",
 	"scope": "Escopo",
 	"key": "Chave",
-	"value": "Valor",
-	"updatedAt": "Última atualização"
+	"value": "Valor"
 }
 </locale>
 
@@ -448,8 +429,7 @@ definePage(() => ({
 	"system": "Система",
 	"scope": "Область",
 	"key": "Ключ",
-	"value": "Значения",
-	"updatedAt": "Обновлено"
+	"value": "Значения"
 }
 </locale>
 
@@ -464,8 +444,7 @@ definePage(() => ({
 	"system": "Systém",
 	"scope": "Oblasť",
 	"key": "Kľúč",
-	"value": "Hodnoty",
-	"updatedAt": "Upravené"
+	"value": "Hodnoty"
 }
 </locale>
 
@@ -480,8 +459,7 @@ definePage(() => ({
 	"system": "ระบบ",
 	"scope": "สโคป",
 	"key": "คีย์",
-	"value": "ค่า",
-	"updatedAt": "อัปเดตล่าสุด"
+	"value": "ค่า"
 }
 </locale>
 
@@ -496,8 +474,7 @@ definePage(() => ({
 	"system": "Sistem",
 	"scope": "Kapsam",
 	"key": "Anahtar",
-	"value": "Değer",
-	"updatedAt": "Güncellendi"
+	"value": "Değer"
 }
 </locale>
 
@@ -512,8 +489,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"updatedAt": "Updated at"
+	"value": "Value"
 }
 </locale>
 
@@ -528,8 +504,7 @@ definePage(() => ({
 	"system": "Система",
 	"scope": "Область дії",
 	"key": "Ключ",
-	"value": "Значення",
-	"updatedAt": "Останнє оновлення"
+	"value": "Значення"
 }
 </locale>
 
@@ -544,8 +519,7 @@ definePage(() => ({
 	"system": "Hệ thống",
 	"scope": "Phạm vi",
 	"key": "Mã",
-	"value": "Giá trị",
-	"updatedAt": "Cập nhật lúc"
+	"value": "Giá trị"
 }
 </locale>
 
@@ -560,8 +534,7 @@ definePage(() => ({
 	"system": "系统",
 	"scope": "范围",
 	"key": "键",
-	"value": "值",
-	"updatedAt": "更新日期"
+	"value": "值"
 }
 </locale>
 
@@ -576,7 +549,6 @@ definePage(() => ({
 	"system": "系統",
 	"scope": "範圍",
 	"key": "機碼",
-	"value": "數值",
-	"updatedAt": "最後更新"
+	"value": "數值"
 }
 </locale>

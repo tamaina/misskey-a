@@ -56,13 +56,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #icon><i class="ti ti-planet"></i></template>
 
 		<div class="_gaps_s">
-			<div>{{ $locale.sfc.doYouConnectToFediverse_description1 }}<br>{{ $locale.sfc.doYouConnectToFediverse_description2 }}<br><MkLink target="_blank" url="https://wikipedia.org/wiki/Fediverse">{{ $locale.sfc.learnMore }}</MkLink></div>
+			<div>{{ $locale.sfc.doYouConnectToFediverse_description1 }}<br>{{ $locale.sfc.doYouConnectToFediverse_description2 }}<br><MkLink target="_blank" url="https://wikipedia.org/wiki/Fediverse">{{ globalLocale.env.learnMore }}</MkLink></div>
 
 			<MkRadios
 				v-model="q_federation"
 				:options="[
-					{ value: 'yes', label: $locale.sfc.yes },
-					{ value: 'no', label: $locale.sfc.no },
+					{ value: 'yes', label: globalLocale.env.yes },
+					{ value: 'no', label: globalLocale.env.no },
 				]"
 				vertical
 			>
@@ -103,39 +103,39 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_gaps_s">
 			<div>
 				<div><b>{{ $locale.sfc.singleUserMode }}:</b></div>
-				<div>{{ serverSettings.singleUserMode ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ serverSettings.singleUserMode ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>{{ $locale.sfc.openRegistration }}:</b></div>
-				<div>{{ !serverSettings.disableRegistration ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ !serverSettings.disableRegistration ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>{{ $locale.sfc.emailRequiredForSignup }}:</b></div>
-				<div>{{ serverSettings.emailRequiredForSignup ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ serverSettings.emailRequiredForSignup ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>Log IP:</b></div>
-				<div>{{ serverSettings.enableIpLogging ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ serverSettings.enableIpLogging ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>{{ $locale.sfc.federation }}:</b></div>
-				<div>{{ serverSettings.federation === 'none' ? $locale.sfc.no : $locale.sfc.all }}</div>
+				<div>{{ serverSettings.federation === 'none' ? globalLocale.env.no : globalLocale.env.all }}</div>
 			</div>
 			<div>
 				<div><b>{{ $locale.sfc.remoteNotesCleaning }}:</b></div>
-				<div>{{ serverSettings.enableRemoteNotesCleaning ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ serverSettings.enableRemoteNotesCleaning ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>FTT:</b></div>
-				<div>{{ serverSettings.enableFanoutTimeline ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ serverSettings.enableFanoutTimeline ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>FTT/{{ $locale.sfc.fanoutTimelineDbFallback }}:</b></div>
-				<div>{{ serverSettings.enableFanoutTimelineDbFallback ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ serverSettings.enableFanoutTimelineDbFallback ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>RBT:</b></div>
-				<div>{{ serverSettings.enableReactionsBuffering ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ serverSettings.enableReactionsBuffering ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 
 			<div>
@@ -165,23 +165,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div>
 				<div><b>{{ $locale.sfc.baseRole }}/{{ $locale.sfc.canImportFollowing }}:</b></div>
-				<div>{{ defaultPolicies.canImportFollowing ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ defaultPolicies.canImportFollowing ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>{{ $locale.sfc.baseRole }}/{{ $locale.sfc.canImportMuting }}:</b></div>
-				<div>{{ defaultPolicies.canImportMuting ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ defaultPolicies.canImportMuting ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>{{ $locale.sfc.baseRole }}/{{ $locale.sfc.canImportBlocking }}:</b></div>
-				<div>{{ defaultPolicies.canImportBlocking ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ defaultPolicies.canImportBlocking ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>{{ $locale.sfc.baseRole }}/{{ $locale.sfc.canImportUserLists }}:</b></div>
-				<div>{{ defaultPolicies.canImportUserLists ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ defaultPolicies.canImportUserLists ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 			<div>
 				<div><b>{{ $locale.sfc.baseRole }}/{{ $locale.sfc.canImportAntennas }}:</b></div>
-				<div>{{ defaultPolicies.canImportAntennas ? $locale.sfc.yes : $locale.sfc.no }}</div>
+				<div>{{ defaultPolicies.canImportAntennas ? globalLocale.env.yes : globalLocale.env.no }}</div>
 			</div>
 		</div>
 
@@ -195,6 +195,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -206,6 +207,9 @@ import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const emit = defineEmits<{
 	(ev: 'finished'): void;
@@ -397,9 +401,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "راجع المزيد",
-  "yes": "نعم",
-  "no": "لا",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -413,7 +414,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "عنوان البريد الإلكتروني إلزامي للتسجيل",
   "federation": "الفديرالية",
-  "all": "الكل",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -454,9 +454,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Desitges connectar-te amb el Fedivers?",
   "doYouConnectToFediverse_description1": "Quan es connecta amb una xarxa de servidors distribuïts (Fedivers), els continguts poden intercanviar-se amb altres servidors i entre ells.",
   "doYouConnectToFediverse_description2": "La connexió amb el Fedivers també es coneix com a \"federació\".",
-  "learnMore": "Saber-ne més ",
-  "yes": "Sí ",
-  "no": "No",
   "youCanConfigureMoreFederationSettingsLater": "Les configuracions avançades, com especificar els servidors amb els quals es pot federar, es poden fer més tard.",
   "remoteContentsCleaning": "Neteja automàtica del contingut rebut",
   "remoteContentsCleaning_description": "Quan es comença a federar es rep un munt de contingut, quan s'activa la neteja automàtica el contingut antic que no es consulta serà eliminat del servidor, el que permet estalviar espai d'emmagatzematge.",
@@ -470,7 +467,6 @@ function applySettings() {
   "openRegistration": "Registres oberts",
   "emailRequiredForSignup": "Demanar correu electrònic per registrar-se ",
   "federation": "Federació",
-  "all": "Tot",
   "remoteNotesCleaning": "Neteja automàtica de notes remotes",
   "fanoutTimelineDbFallback": "Carregar de la base de dades",
   "entrancePageStyle": "Estil de la pàgina d'inici",
@@ -511,9 +507,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Zjistit více",
-  "yes": "Ano",
-  "no": "Ne",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -527,7 +520,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Vyžadovat email pro registraci",
   "federation": "Federace",
-  "all": "Vše",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -568,9 +560,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Learn more",
-  "yes": "Yes",
-  "no": "No",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -584,7 +573,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Require email address for sign-up",
   "federation": "Federation",
-  "all": "All",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -625,9 +613,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Mit dem Fediverse verbinden?",
   "doYouConnectToFediverse_description1": "Bei Anschluss an ein Netz von verteilten Servern (Fediverse) können Inhalte mit anderen Servern ausgetauscht werden.",
   "doYouConnectToFediverse_description2": "Die Verbindung mit dem Fediverse wird auch als „Föderation“ bezeichnet.",
-  "learnMore": "Mehr erfahren",
-  "yes": "Ja",
-  "no": "Nein",
   "youCanConfigureMoreFederationSettingsLater": "Erweiterte Einstellungen, wie z. B. die Angabe von föderierbaren Servern, können später vorgenommen werden.",
   "remoteContentsCleaning": "Automatische Bereinigung von Remote-Inhalten",
   "remoteContentsCleaning_description": "Wenn Sie eine Föderation durchführen, empfangen Sie fortlaufend viele Inhalte. Wenn Sie die automatische Bereinigung aktivieren, werden Remote-Inhalte, deren bestimmter Zeitraum abgelaufen ist, automatisch vom Server gelöscht, wodurch Speicherplatz eingespart werden kann.",
@@ -641,7 +626,6 @@ function applySettings() {
   "openRegistration": "Registrierung von Konten aktivieren",
   "emailRequiredForSignup": "Angabe einer Email-Adresse als benötigt markieren",
   "federation": "Föderation",
-  "all": "Alle",
   "remoteNotesCleaning": "Automatische Bereinigung von Remote-Beiträgen",
   "fanoutTimelineDbFallback": "Auf die Datenbank zurückfallen",
   "entrancePageStyle": "Stil der Einstiegsseite",
@@ -682,9 +666,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Learn more",
-  "yes": "Yes",
-  "no": "No",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -698,7 +679,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Require email address for sign-up",
   "federation": "Federation",
-  "all": "All",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -739,9 +719,6 @@ function applySettings() {
   "doYouConnectToFediverse": "¿Quieres conectarte al Fediverso?",
   "doYouConnectToFediverse_description1": "Cuando se conecta a una red de servidores distribuidos (Fediverso), el contenido puede intercambiarse con otros servidores.",
   "doYouConnectToFediverse_description2": "Conectarse con el Fediverso también se conoce como \"federación\".",
-  "learnMore": "Ver más",
-  "yes": "Si",
-  "no": "No",
   "youCanConfigureMoreFederationSettingsLater": "Los ajustes avanzados, como la especificación de servidores federados, pueden configurarse más adelante.",
   "remoteContentsCleaning": "Limpieza automática de los contenidos recibidos",
   "remoteContentsCleaning_description": "La federación puede dar lugar a un flujo continuo de contenido. Al habilitar la limpieza automática, se eliminará del servidor el contenido obsoleto y sin referencias para ahorrar espacio de almacenamiento.",
@@ -755,7 +732,6 @@ function applySettings() {
   "openRegistration": "Registros Abiertos",
   "emailRequiredForSignup": "Se requiere una dirección de correo electrónico para el registro de la cuenta",
   "federation": "Federación",
-  "all": "Todo",
   "remoteNotesCleaning": "Limpieza automática de notas (publicaciones) remotas",
   "fanoutTimelineDbFallback": "Cargar desde la base de datos",
   "entrancePageStyle": "Estilo de la página de inicio",
@@ -796,9 +772,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Plus d'informations",
-  "yes": "Oui",
-  "no": "Non",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -812,7 +785,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Une adresse e-mail est nécessaire pour créer un compte",
   "federation": "Fédération",
-  "all": "Tous",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Recours à la base de données",
   "entrancePageStyle": "Entrance page style",
@@ -853,9 +825,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Pelajari lebih lanjut",
-  "yes": "Iya",
-  "no": "Tidak",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -869,7 +838,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Membutuhkan alamat surel untuk mendaftar",
   "federation": "Federasi",
-  "all": "Semua",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback ke database",
   "entrancePageStyle": "Entrance page style",
@@ -910,9 +878,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Vuoi connetterti al Fediverso?",
   "doYouConnectToFediverse_description1": "Collegandosi a una rete di server distribuiti, denominata Fediverso, potrai scambiare contenuti con altri server, tramite il protocollo di comunicazione ActivityPub.",
   "doYouConnectToFediverse_description2": "Connettersi al Fediverso è anche detto \"federazione\".",
-  "learnMore": "Per saperne di più",
-  "yes": "Sì",
-  "no": "No",
   "youCanConfigureMoreFederationSettingsLater": "Puoi svolgere la configurazione avanzata anche dopo. Ad esempio specificando quali server possono federarsi.",
   "remoteContentsCleaning": "Pulizia automatica dei contenuti in arrivo",
   "remoteContentsCleaning_description": "Con la federazione funzionante, riceverai sempre più contenuti. Abilitando la pulizia automatica, i contenuti non referenziati e obsoleti verranno rimossi automaticamente dai tuoi server, risparmiando spazio di archiviazione.",
@@ -926,7 +891,6 @@ function applySettings() {
   "openRegistration": "Registrazioni aperte",
   "emailRequiredForSignup": "L'indirizzo e-mail è obbligatorio per registrarsi",
   "federation": "Federazione",
-  "all": "Tutte",
   "remoteNotesCleaning": "Pulizia automatica dei contenuti remoti",
   "fanoutTimelineDbFallback": "Elaborazione dati alternativa",
   "entrancePageStyle": "Stile della pagina di ingresso",
@@ -967,9 +931,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Fediverseと接続しますか？",
   "doYouConnectToFediverse_description1": "分散型サーバーで構成されるネットワーク(Fediverse)に接続すると、他のサーバーと相互にコンテンツのやり取りが可能です。",
   "doYouConnectToFediverse_description2": "Fediverseと接続することは「連合」とも呼ばれます。",
-  "learnMore": "詳しく",
-  "yes": "はい",
-  "no": "いいえ",
   "youCanConfigureMoreFederationSettingsLater": "連合可能なサーバーの指定など、高度な設定も後ほど可能です。",
   "remoteContentsCleaning": "リモートコンテンツの自動クリーニング",
   "remoteContentsCleaning_description": "連合を行うと、継続して多くのコンテンツを受信します。自動クリーニングを有効にすると、一定期間経過したリモートコンテンツを自動でサーバーから削除し、ストレージを節約できます。",
@@ -983,7 +944,6 @@ function applySettings() {
   "openRegistration": "アカウントの作成をオープンにする",
   "emailRequiredForSignup": "アカウント登録にメールアドレスを必須にする",
   "federation": "連合",
-  "all": "全て",
   "remoteNotesCleaning": "リモート投稿の自動クリーニング",
   "fanoutTimelineDbFallback": "データベースへのフォールバック",
   "entrancePageStyle": "エントランスページのスタイル",
@@ -1024,9 +984,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Fediverseと接続するんやっけ？",
   "doYouConnectToFediverse_description1": "分散型サーバーでできたネットワーク(Fediverse)に繋げると、他のサーバーと相互にコンテンツのやり取りができるようになるで。",
   "doYouConnectToFediverse_description2": "Fediverseと接続することは「連合」とも呼ばれるな。",
-  "learnMore": "詳しく",
-  "yes": "ええで",
-  "no": "あかん",
   "youCanConfigureMoreFederationSettingsLater": "連合してもええサーバーの指定とか、高度な設定も後でできるで。",
   "remoteContentsCleaning": "リモートコンテンツの自動クリーニング",
   "remoteContentsCleaning_description": "連合すると、ぎょうさんコンテンツを受け取り続けることになるねん。自動クリーニングをつけると、参照されてない古いコンテンツを自動でサーバーからほかして、ストレージを節約できるで。",
@@ -1040,7 +997,6 @@ function applySettings() {
   "openRegistration": "アカウントの作成をオープンにする",
   "emailRequiredForSignup": "アカウント作るのにメールアドレスを必須にするで",
   "federation": "連合",
-  "all": "みんな",
   "remoteNotesCleaning": "リモート投稿の自動クリーニング",
   "fanoutTimelineDbFallback": "データベースにフォールバックする",
   "entrancePageStyle": "エントランスページのスタイル",
@@ -1081,9 +1037,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Learn more",
-  "yes": "Yes",
-  "no": "No",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1097,7 +1050,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Require email address for sign-up",
   "federation": "Federation",
-  "all": "All",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1138,9 +1090,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Learn more",
-  "yes": "Yes",
-  "no": "No",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1154,7 +1103,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Require email address for sign-up",
   "federation": "Federation",
-  "all": "All",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1195,9 +1143,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Fediverse에 접속하시겠습니까?",
   "doYouConnectToFediverse_description1": "분산형 서버로 구성된 네트워크(Fediverse)에 접속하면 다른 서버와 서로 콘텐츠의 주고받기를 할 수 있습니다.",
   "doYouConnectToFediverse_description2": "Fediverse에 접속하는 것을 '연합'이라고도 부릅니다.",
-  "learnMore": "자세히",
-  "yes": "예",
-  "no": "아니오",
   "youCanConfigureMoreFederationSettingsLater": "나중에 연합 가능한 서버의 지정 등 고급 설정을 할 수 있습니다.",
   "remoteContentsCleaning": "리모트 콘텐츠 자동 정리",
   "remoteContentsCleaning_description": "연합 중인 서버가 있는 경우, 리모트 서버에서 대단히 많은 콘텐츠를 받아오게 됩니다. 자동 정리 기능을 활성화하면, 오래되고 서버에서 더 이상 조회되지 않는 콘텐츠를 자동으로 서버에서 삭제하여, 스토리지를 절약할 수 있습니다.",
@@ -1211,7 +1156,6 @@ function applySettings() {
   "openRegistration": "회원 가입을 활성화 하기",
   "emailRequiredForSignup": "가입할 때 이메일 주소 입력을 필수로 하기",
   "federation": "연합",
-  "all": "전체",
   "remoteNotesCleaning": "리모트 서버 노트 자동 정리 ",
   "fanoutTimelineDbFallback": "데이터베이스를 예비로 사용하기",
   "entrancePageStyle": "입구 페이지의 스타일",
@@ -1252,9 +1196,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Meer leren",
-  "yes": "Ja",
-  "no": "Nee",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1268,7 +1209,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Vereist e-mailadres voor aanmelding",
   "federation": "Federatie",
-  "all": "Alle",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1309,9 +1249,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Les mer",
-  "yes": "Ja",
-  "no": "Nei",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1325,7 +1262,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Require email address for sign-up",
   "federation": "Føderasjon",
-  "all": "Alle",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1366,9 +1302,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Dowiedz się więcej",
-  "yes": "Tak",
-  "no": "Nie",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1382,7 +1315,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Wymagaj adresu e-mail do rejestracji",
   "federation": "Federacja",
-  "all": "Wszystkie",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1423,9 +1355,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Você deseja conectar-se com o Fediverso?",
   "doYouConnectToFediverse_description1": "Quando conectado com uma rede distribuída de servidores (Fediverso), o conteúdo pode ser trocado com outros servidores.",
   "doYouConnectToFediverse_description2": "Conectar com o Fediverso também é chamado de \"federação\"",
-  "learnMore": "Saiba mais",
-  "yes": "Sim",
-  "no": "Não",
   "youCanConfigureMoreFederationSettingsLater": "Configurações adicionais como especificar servidores para conectar-se com podem ser feitas posteriormente",
   "remoteContentsCleaning": "Limpeza automática de conteúdos recebidos",
   "remoteContentsCleaning_description": "A federação pode resultar em uma entrada contínua de conteúdo. Habilitar a limpeza automática removerá conteúdo obsoleto e não referenciado do servidor para economizar armazenamento.",
@@ -1439,7 +1368,6 @@ function applySettings() {
   "openRegistration": "Abrir a criação de contas",
   "emailRequiredForSignup": "Tornar o endereço de e-mail obrigatório durante o cadastro",
   "federation": "Federação",
-  "all": "Todos",
   "remoteNotesCleaning": "Limpeza automática de notas remotas",
   "fanoutTimelineDbFallback": "\"Fallback\" ao banco de dados",
   "entrancePageStyle": "Estilo da página de entrada",
@@ -1480,9 +1408,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Подробнее",
-  "yes": "Да",
-  "no": "Нет",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1496,7 +1421,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Для регистрации учётной записи нужен адрес электронной почты",
   "federation": "Федерация",
-  "all": "Все",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1537,9 +1461,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Zistiť viac",
-  "yes": "Áno",
-  "no": "Nie",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1553,7 +1474,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Registrácia vyžaduje emailovú adresu",
   "federation": "Federácia",
-  "all": "Všetko",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1594,9 +1514,6 @@ function applySettings() {
   "doYouConnectToFediverse": "เชื่อมต่อกับ Fediverse หรือไม่?",
   "doYouConnectToFediverse_description1": "หากเชื่อมต่อกับเครือข่ายที่ประกอบด้วยเซิร์ฟเวอร์แบบกระจาย (Fediverse) จะสามารถแลกเปลี่ยนเนื้อหากับเซิร์ฟเวอร์อื่นๆ ได้",
   "doYouConnectToFediverse_description2": "การเชื่อมต่อกับ Fediverse เรียกว่า “สหพันธ์”",
-  "learnMore": "แสดงให้ดูหน่อย",
-  "yes": "ใช่",
-  "no": "ไม่",
   "youCanConfigureMoreFederationSettingsLater": "หลังจากนี้ยังสามารถตั้งค่าแบบขั้นสูง เช่น การกำหนดเซิร์ฟเวอร์ที่อนุญาตให้สหพันธ์ต่อกันได้เพิ่มเติม",
   "remoteContentsCleaning": "การล้างข้อมูลเนื้อหาที่ได้รับโดยอัตโนมัติ",
   "remoteContentsCleaning_description": "เมื่อมีการเชื่อมโยงสหพันธ์ จะได้รับเนื้อหาเป็นจำนวนมากอย่างต่อเนื่อง เมื่อเปิดใช้งานการล้างข้อมูลอัตโนมัติ จะทำการลบเนื้อหาเก่าที่ไม่ถูกอ้างอิง ไปจากเซิร์ฟเวอร์โดยอัตโนมัติ เพื่อประหยัดพื้นที่จัดเก็บข้อมูล",
@@ -1610,7 +1527,6 @@ function applySettings() {
   "openRegistration": "เปิดให้สร้างบัญชีได้",
   "emailRequiredForSignup": "จำเป็นต้องการใช้ที่อยู่อีเมลสำหรับการสมัคร",
   "federation": "สหพันธ์",
-  "all": "ทั้งหมด",
   "remoteNotesCleaning": "การล้างข้อมูลโพสต์จากระยะไกลโดยอัตโนมัติ",
   "fanoutTimelineDbFallback": "ฟอลแบ๊กกลับฐานข้อมูล",
   "entrancePageStyle": "สไตล์ของหน้าเพจทางเข้า",
@@ -1651,9 +1567,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Fediverse'e bağlanmak ister misin?",
   "doYouConnectToFediverse_description1": "Dağıtılmış sunucular ağına (Fediverse) bağlandığında, içerik diğer sunucularla paylaşılabilir.",
   "doYouConnectToFediverse_description2": "Fediverse ile bağlantı kurmak “federasyon” olarak da adlandırılır.",
-  "learnMore": "Daha fazla bilgi edinin",
-  "yes": "Evet",
-  "no": "Hayır",
   "youCanConfigureMoreFederationSettingsLater": "Birleştirilmiş sunucuları belirtme gibi gelişmiş ayarlar daha sonra yapılandırılabilir.",
   "remoteContentsCleaning": "Alınan içeriklerin otomatik olarak temizlenmesi",
   "remoteContentsCleaning_description": "Federasyon, sürekli içerik akışına neden olabilir. Otomatik temizleme özelliğini etkinleştirmek, depolama alanından tasarruf etmek için sunucudan eski ve referanslanmamış içeriği kaldıracak.",
@@ -1667,7 +1580,6 @@ function applySettings() {
   "openRegistration": "Hesap oluşturmayı açık hale getir",
   "emailRequiredForSignup": "Kayıt için E-posta adresi gereklidir.",
   "federation": "Federasyon",
-  "all": "Tümü",
   "remoteNotesCleaning": "Uzak notların otomatik olarak temizlenmesi",
   "fanoutTimelineDbFallback": "Veritabanına geri dön",
   "entrancePageStyle": "Giriş sayfası stili",
@@ -1708,9 +1620,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Learn more",
-  "yes": "Yes",
-  "no": "No",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1724,7 +1633,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Require email address for sign-up",
   "federation": "Federation",
-  "all": "All",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1765,9 +1673,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Докладніше",
-  "yes": "Так",
-  "no": "Ні",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1781,7 +1686,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Вимагати email адресу для реєстрації",
   "federation": "Федіверс",
-  "all": "Всі",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1822,9 +1726,6 @@ function applySettings() {
   "doYouConnectToFediverse": "Do you want to connect to the Fediverse?",
   "doYouConnectToFediverse_description1": "When connected to a network of distributed servers (Fediverse) content can be exchanged with other servers.",
   "doYouConnectToFediverse_description2": "Connecting with the Fediverse is also called \"federation\"",
-  "learnMore": "Tìm hiểu thêm",
-  "yes": "Đồng ý",
-  "no": "Từ chối",
   "youCanConfigureMoreFederationSettingsLater": "Advanced settings such as specifying federated servers can be configured later.",
   "remoteContentsCleaning": "Automatic cleanup of received contents",
   "remoteContentsCleaning_description": "Federation may result in a continuous inflow of content. Enabling automatic cleanup will remove outdated and unreferenced content from the server to save storage.",
@@ -1838,7 +1739,6 @@ function applySettings() {
   "openRegistration": "Make the account creation open",
   "emailRequiredForSignup": "Yêu cầu địa chỉ email khi đăng ký",
   "federation": "Liên hợp",
-  "all": "Tất cả",
   "remoteNotesCleaning": "Automatic cleanup of remote notes",
   "fanoutTimelineDbFallback": "Fallback to database",
   "entrancePageStyle": "Entrance page style",
@@ -1879,9 +1779,6 @@ function applySettings() {
   "doYouConnectToFediverse": "要加入 Fediverse 吗？",
   "doYouConnectToFediverse_description1": "若加入由分散性服务器所构成的网络（Fediverse），将能与其它服务器交换内容。",
   "doYouConnectToFediverse_description2": "接入 Fediverse 被称为 “联邦”。",
-  "learnMore": "更多信息",
-  "yes": "是",
-  "no": "否",
   "youCanConfigureMoreFederationSettingsLater": "可在之后进行如哪些服务器允许进行联邦交互等高级设置。",
   "remoteContentsCleaning": "自动清理传入内容",
   "remoteContentsCleaning_description": "开启联邦互通后，服务器将持续接收大量内容。打开自动清理后，将自动删除无法找到的旧内容，可节省存储空间。",
@@ -1895,7 +1792,6 @@ function applySettings() {
   "openRegistration": "开放注册",
   "emailRequiredForSignup": "注册账户需要电子邮件地址",
   "federation": "联邦",
-  "all": "全部",
   "remoteNotesCleaning": "自动清理远程投稿",
   "fanoutTimelineDbFallback": "回退到数据库",
   "entrancePageStyle": "入口页面样式",
@@ -1936,9 +1832,6 @@ function applySettings() {
   "doYouConnectToFediverse": "您要連接到聯邦宇宙（Fediverse）嗎？\n",
   "doYouConnectToFediverse_description1": "連接到由分散型伺服器構成的網絡（聯邦宇宙）後，您可以與其他伺服器進行內容的互相交流。\n",
   "doYouConnectToFediverse_description2": "連接到聯邦宇宙被稱為「聯邦」。\n",
-  "learnMore": "更多資訊",
-  "yes": "是",
-  "no": "否",
   "youCanConfigureMoreFederationSettingsLater": "您可以在稍後進行更高級的設定，例如指定可以聯繫的伺服器等。\n",
   "remoteContentsCleaning": "自動清理接收的內容",
   "remoteContentsCleaning_description": "進行聯邦後，會持續接收大量內容。啟用自動清理功能後，系統會自動從伺服器中刪除未被參照的過時內容，以節省儲存空間。",
@@ -1952,7 +1845,6 @@ function applySettings() {
   "openRegistration": "允許建立帳戶",
   "emailRequiredForSignup": "註冊帳戶需要電子郵件地址",
   "federation": "站台聯邦",
-  "all": "全部",
   "remoteNotesCleaning": "自動清除遠端發佈內容",
   "fanoutTimelineDbFallback": "資料庫的回退",
   "entrancePageStyle": "入口頁面的樣式",

@@ -5,20 +5,9 @@
 
 // TODO: なんでもかんでもos.tsに突っ込むのやめたいのでよしなに分割する
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { markRaw, ref, defineAsyncComponent, nextTick } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { Component, MaybeRef } from 'vue';
-import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-helpers';
-import type { Form, GetFormResultType } from '@features/ui/frontend/utility/form.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import type { PostFormProps } from '@features/notes/frontend/types/post-form.js';
-import type { UploaderFeatures } from '@features/drive/frontend/composables/use-uploader.js';
-import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
-import type { OptionValue } from '@features/ui/frontend/types/option-value.js';
-import type { MkDialogReturnType } from '@features/ui/frontend/components/MkDialog.vue';
-import type { OverloadToUnion } from '@features/ui/frontend/types/overload-to-union.js';
-import type MkRoleSelectDialog_TypeReferenceOnly from '@features/roles/frontend/components/MkRoleSelectDialog.vue';
-import type MkEmojiPickerDialog_TypeReferenceOnly from '@features/emojis/frontend/components/MkEmojiPickerDialog.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import FeatureLocaleMessages from '@features/ui/frontend/ts-messages.vue';
@@ -34,6 +23,23 @@ import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';
 import { showMovedDialog } from '@features/users/frontend/utility/show-moved-dialog.js';
 import { getHTMLElementOrNull } from '@features/ui/frontend/utility/get-dom-node-or-null.js';
 import { focusParent } from '@features/ui/frontend/utility/focus.js';
+import type MkEmojiPickerDialog_TypeReferenceOnly from '@features/emojis/frontend/components/MkEmojiPickerDialog.vue';
+import type MkRoleSelectDialog_TypeReferenceOnly from '@features/roles/frontend/components/MkRoleSelectDialog.vue';
+import type { OverloadToUnion } from '@features/ui/frontend/types/overload-to-union.js';
+import type { MkDialogReturnType } from '@features/ui/frontend/components/MkDialog.vue';
+import type { OptionValue } from '@features/ui/frontend/types/option-value.js';
+import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+import type { UploaderFeatures } from '@features/drive/frontend/composables/use-uploader.js';
+import type { PostFormProps } from '@features/notes/frontend/types/post-form.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Form, GetFormResultType } from '@features/ui/frontend/utility/form.js';
+import type { ComponentEmit, ComponentProps as CP } from 'vue-component-type-helpers';
+import type { Component, MaybeRef } from 'vue';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 export const openingWindowsCount = ref(0);
 
@@ -58,7 +64,7 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 				text,
 				actions: [{
 					value: 'ok',
-					text: FeatureLocaleMessages.$locale.gotIt,
+					text: getGlobalLocale().gotIt,
 					primary: true,
 				}, {
 					value: 'copy',
@@ -80,7 +86,7 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 			text = FeatureLocaleMessages.$locale.permissionDeniedErrorDescription;
 		} else if (err.code.startsWith('TOO_MANY')) { // TODO: バックエンドに kind: client/contentsLimitExceeded みたいな感じで送るように統一してもらってそれで判定する
 			title = FeatureLocaleMessages.$locale.youCannotCreateAnymore;
-			text = `${FeatureLocaleMessages.$locale.error}: ${err.id}`;
+			text = `${getGlobalLocale().error}: ${err.id}`;
 		} else if (err.message.startsWith('Unexpected token')) {
 			title = FeatureLocaleMessages.$locale.gotInvalidResponseError;
 			text = FeatureLocaleMessages.$locale.gotInvalidResponseErrorDescription;
@@ -231,7 +237,7 @@ export async function popupAsyncWithDialog<T extends Component>(
 		closeWaiting();
 		alert({
 			type: 'error',
-			title: FeatureLocaleMessages.$locale.somethingHappened,
+			title: getGlobalLocale().somethingHappened,
 			text: 'CODE: ASYNC_COMP_LOAD_FAIL',
 		});
 		throw err;
@@ -556,7 +562,7 @@ export function form<F extends Form>(title: string, f: F): Promise<{ canceled: t
 	});
 }
 
-export async function selectUser(opts: { includeSelf?: boolean; localOnly?: boolean; } = {}): Promise<Misskey.entities.UserDetailed> {
+export async function selectUser(opts: { includeSelf?: boolean; localOnly?: boolean; } = {}): Promise<Misskey.entities.UserLite> {
 	return new Promise(resolve => {
 		const { dispose } = popup(defineAsyncComponent(() => import('@features/users/frontend/components/MkUserSelectDialog.vue')), {
 			includeSelf: opts.includeSelf,

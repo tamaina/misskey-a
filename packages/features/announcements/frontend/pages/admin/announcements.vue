@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkInfo v-if="announcementsStatus === 'active' && announcements.length > 5" warn>{{ $locale.sfc.announcementTooManyActiveAnnouncementDescription }}</MkInfo>
 
 			<MkSelect v-model="announcementsStatus" :items="announcementsStatusDef">
-				<template #label>{{ $locale.sfc.filter }}</template>
+				<template #label>{{ globalLocale.env.filter }}</template>
 			</MkSelect>
 
 			<MkLoading v-if="loading"/>
@@ -35,22 +35,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</template>
 					<template #footer>
 						<div class="_buttons">
-							<MkButton rounded primary @click="save(announcement)"><i class="ti ti-device-floppy"></i> {{ $locale.sfc.save }}</MkButton>
+							<MkButton rounded primary @click="save(announcement)"><i class="ti ti-device-floppy"></i> {{ globalLocale.env.save }}</MkButton>
 							<MkButton v-if="announcement.id != null && announcement.isActive" rounded @click="archive(announcement)"><i class="ti ti-check"></i> {{ $locale.sfc.announcementEnd }} ({{ $locale.sfc.archive }})</MkButton>
 							<MkButton v-if="announcement.id != null && !announcement.isActive" rounded @click="unarchive(announcement)"><i class="ti ti-restore"></i> {{ $locale.sfc.unarchive }}</MkButton>
-							<MkButton v-if="announcement.id != null" rounded danger @click="del(announcement)"><i class="ti ti-trash"></i> {{ $locale.sfc.delete }}</MkButton>
+							<MkButton v-if="announcement.id != null" rounded danger @click="del(announcement)"><i class="ti ti-trash"></i> {{ globalLocale.env.delete }}</MkButton>
 						</div>
 					</template>
 
 					<div class="_gaps">
 						<MkInput v-model="announcement.title">
-							<template #label>{{ $locale.sfc.title }}</template>
+							<template #label>{{ globalLocale.env.title }}</template>
 						</MkInput>
 						<MkTextarea v-model="announcement.text" mfmAutocomplete :mfmPreview="true">
 							<template #label>{{ $locale.sfc.text }}</template>
 						</MkTextarea>
 						<MkInput v-model="announcement.imageUrl" type="url">
-							<template #label>{{ $locale.sfc.imageUrl }}</template>
+							<template #label>{{ globalLocale.env.imageUrl }}</template>
 						</MkInput>
 						<MkInput v-model="announcement.autoArchiveAt" type="datetime-local">
 							<template #label>{{ $locale.sfc.autoArchiveAt }}</template>
@@ -92,7 +92,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 				<MkLoading v-if="loadingMore"/>
 				<MkButton @click="more()">
-					<i class="ti ti-reload"></i>{{ $locale.sfc.more }}
+					<i class="ti ti-reload"></i>{{ globalLocale.env.more }}
 				</MkButton>
 			</template>
 		</div>
@@ -101,9 +101,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed, watch } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -120,6 +120,10 @@ import { genId } from '@features/runtime/frontend/utility/id.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { buildAnnouncementUpdate } from '@features/announcements/frontend/update-input.js';
 import { formatAutoArchiveInput, parseAutoArchiveInput } from '@features/announcements/frontend/auto-archive-input.js';
+import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const {
 	model: announcementsStatus,
@@ -193,7 +197,7 @@ async function del(announcement: (typeof announcements)['value'][number]) {
 	if (announcement.id == null) return;
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: interpolateLocaleParameters($locale.value.sfc.deleteAreYouSure, { x: announcement.title }),
+		text: interpolateLocaleParameters(globalLocale.value.env.deleteAreYouSure, { x: announcement.title }),
 	});
 	if (canceled) return;
 	announcements.value = announcements.value.filter(x => x !== announcement);
@@ -279,7 +283,7 @@ function refresh() {
 const headerActions = computed(() => [{
 	asFullButton: true,
 	icon: 'ti ti-plus',
-	text: $locale.value.sfc.add,
+	text: globalLocale.value.env.add,
 	handler: add,
 	disabled: announcementsStatus.value === 'archived',
 }]);
@@ -287,7 +291,7 @@ const headerActions = computed(() => [{
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: $locale.value.sfc.announcements,
+	title: globalLocale.value.env.announcements,
 	icon: 'ti ti-speakerphone',
 }));
 </script>
@@ -309,15 +313,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "رشّح",
-	"save": "حفظ",
 	"announcementEnd": "Archive announcement",
 	"archive": "الأرشيف",
 	"unarchive": "Unarchive",
-	"delete": "حذف",
-	"title": "العنوان",
 	"text": "النص",
-	"imageUrl": "رابط الصورة",
 	"icon": "الصورة الرمزية",
 	"normal": "عادي",
 	"banner": "الصورة الرأسية",
@@ -331,12 +330,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "قرأه {n}",
-	"more": "المزيد!",
 	"active": "نشط",
 	"archived": "Archived",
-	"deleteAreYouSure": "متأكد من أنك تريد حذف {x}؟",
-	"add": "إضافة",
-	"announcements": "الإعلانات",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -347,15 +342,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "Ja que l'ús de notificacions pot impactar l'experiència dels nous usuaris, és recomanable fer servir les notificacions amb el flux d'informació en comptes de fer-les servir en un únic bloc.",
 	"announcementTooManyActiveAnnouncementDescription": "Tenir masses notificacions actives pot empitjorar l'experiència de l'usuari. Considera finalitzar els avisos que siguin antics.",
-	"filter": "Filtrar",
-	"save": "Desa",
 	"announcementEnd": "Final de la notificació ",
 	"archive": "Arxiu",
 	"unarchive": "Desarxivar",
-	"delete": "Elimina",
-	"title": "Títol",
 	"text": "Text",
-	"imageUrl": "URL de la imatge",
 	"icon": "Icona",
 	"normal": "Normal",
 	"banner": "Bàner",
@@ -369,12 +359,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "Si s'activa es mostrarà un diàleg per confirmar la lectura d'aquesta notificació. A més aquesta notificació serà exclosa de qualsevol funcionalitat com \"Marcar tot com a llegit\".",
 	"announcementNeedConfirmationToRead": "Es necessita confirmació de lectura de la notificació ",
 	"nUsersRead": "Vist per {n}",
-	"more": "Més",
 	"active": "Actiu",
 	"archived": "Arxivat",
-	"deleteAreYouSure": "Segur que vols esborrar «{x}»?",
-	"add": "Afegir",
-	"announcements": "Avisos",
 	"autoArchiveAt": "Data i hora d'arxivament automàtic",
 	"autoArchiveAtDescription": "Un cop hagin passat la data i l'hora especificades, aquest avís s'arxivarà automàticament. Si aquest camp es deixa en blanc, no s'arxivarà automàticament.",
 	"autoArchiveAtMustBeInFuture": "Indiqueu una data i una hora per a l'arxivament automàtic posteriors a la data i l'hora actuals."
@@ -385,15 +371,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filtr",
-	"save": "Uložit",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archiv",
 	"unarchive": "Obnovit",
-	"delete": "Smazat",
-	"title": "Titulek",
 	"text": "Text",
-	"imageUrl": "URL obrázku",
 	"icon": "Avatar",
 	"normal": "Normální",
 	"banner": "Baner",
@@ -407,12 +388,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "přečteno {n} uživateli",
-	"more": "Více!",
 	"active": "Aktivní",
 	"archived": "Archivované",
-	"deleteAreYouSure": "Jste si jistí že chcete smazat \"{x}\"?",
-	"add": "Přidat",
-	"announcements": "Oznámení",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -423,15 +400,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filter",
-	"save": "Save",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archive",
 	"unarchive": "Unarchive",
-	"delete": "Delete",
-	"title": "Title",
 	"text": "Text",
-	"imageUrl": "Image URL",
 	"icon": "Icon",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -445,12 +417,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "read by {n}",
-	"more": "More!",
 	"active": "Active",
 	"archived": "Archived",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
-	"add": "Add",
-	"announcements": "Announcements",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -461,15 +429,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "Es wird empfohlen, Ankündigungen für aktuelle und zeitlich begrenzte Neuigkeiten zu nutzen, statt für Informationen, die langfristig relevant sind.",
 	"announcementTooManyActiveAnnouncementDescription": "Zu viele aktive Ankündigungen können die Benutzerfreundlichkeit verschlechtern. Es wird empfohlen, veraltete Ankündigungen zu archivieren.",
-	"filter": "Filter",
-	"save": "Speichern",
 	"announcementEnd": "Ankündigung archivieren",
 	"archive": "Archivieren",
 	"unarchive": "Dearchivieren",
-	"delete": "Löschen",
-	"title": "Titel",
 	"text": "Text",
-	"imageUrl": "Bild-URL",
 	"icon": "Symbol",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -483,12 +446,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "Ist dies aktiviert, so wird beim Markieren dieser Ankündigung als gelesen ein separates Bestätigungsfenster angezeigt. Auch wird sie von der \"Alle als gelesen markieren\"-Funktion ausgenommen.",
 	"announcementNeedConfirmationToRead": "Separate Lesebestätigung erfordern",
 	"nUsersRead": "Von {n} Benutzern gelesen",
-	"more": "Mehr!",
 	"active": "Aktiv",
 	"archived": "Archiviert",
-	"deleteAreYouSure": "Möchtest du „{x}“ wirklich löschen?",
-	"add": "Hinzufügen",
-	"announcements": "Ankündigungen",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -499,15 +458,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filter",
-	"save": "Save",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archive",
 	"unarchive": "Unarchive",
-	"delete": "Delete",
-	"title": "Title",
 	"text": "Text",
-	"imageUrl": "Image URL",
 	"icon": "Icon",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -521,12 +475,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "read by {n}",
-	"more": "More!",
 	"active": "Active",
 	"archived": "Archived",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
-	"add": "Add",
-	"announcements": "Announcements",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -537,15 +487,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "Se recomienda utilizar los avisos para publicar información que requiera inmediatez, en lugar de hacerlo constantemente, ya que esto perjudica especialmente la UX de los nuevos usuarios.",
 	"announcementTooManyActiveAnnouncementDescription": "Tener demasiados anuncios activos empeora la experiencia de usuario. Por favor, considera archivar aquellos anuncios que hayan quedado obsoletos.",
-	"filter": "Filtrar",
-	"save": "Guardar",
 	"announcementEnd": "Anuncios archivados",
 	"archive": "Archivo",
 	"unarchive": "Desarchivar",
-	"delete": "Borrar",
-	"title": "Título",
 	"text": "Texto",
-	"imageUrl": "URL de la imagen.",
 	"icon": "Avatar",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -559,15 +504,11 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "Si se habilita esta opción, se pedirá una confirmación de lectura aparte. Además, este anuncio será excluido de cualquier funcionalidad de \"Marcar todos como leídos\".",
 	"announcementNeedConfirmationToRead": "Requerir confirmación de lectura aparte",
 	"nUsersRead": "Leído por {n} personas",
-	"more": "¡Más!",
 	"active": "Activo",
 	"archived": "Archivado",
-	"deleteAreYouSure": "¿Desea borrar \"{x}\"?",
-	"add": "Agregar",
-	"announcements": "Avisos",
-	"autoArchiveAt": "自動アーカイブ日時",
-	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
-	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
+	"autoArchiveAt": "Fecha y hora del archivo automático",
+	"autoArchiveAtDescription": "Una vez pasada la fecha y la hora indicadas, este aviso se archivará automáticamente. Si se deja en blanco, no se archivará automáticamente.",
+	"autoArchiveAtMustBeInFuture": "Especifica una fecha y hora para el archivo automático posteriores a la actual."
 }
 </locale>
 
@@ -575,15 +516,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "Puisque cela pourrait nuire considérablement à l'expérience utilisateur pour les nouveaux utilisateurs, il est recommandé d'utiliser les annonces pour afficher des informations temporaires plutôt que des informations persistantes.",
 	"announcementTooManyActiveAnnouncementDescription": "Un grand nombre d'annonces actives peut baisser l'expérience utilisateur. Considérez d'archiver les annonces obsolètes.",
-	"filter": "Filtre",
-	"save": "Enregistrer",
 	"announcementEnd": "Archiver l'annonce",
 	"archive": "Archive",
 	"unarchive": "Annuler l'archivage",
-	"delete": "Supprimer",
-	"title": "Titre",
 	"text": "Texte",
-	"imageUrl": "URL de l’image",
 	"icon": "Avatar",
 	"normal": "Normal",
 	"banner": "Bannière",
@@ -597,12 +533,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "Si activé, afficher un dialogue de confirmation quand l'annonce est marquée comme lue. Aussi, elle sera exclue de « marquer tout comme lu » .",
 	"announcementNeedConfirmationToRead": "Exiger la confirmation de la lecture",
 	"nUsersRead": "Lu par {n} personnes",
-	"more": "Plus !",
 	"active": "Actif·ve",
 	"archived": "Archivé",
-	"deleteAreYouSure": "Êtes-vous sûr·e de vouloir supprimer « {x} » ?",
-	"add": "Ajouter",
-	"announcements": "Annonces",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -613,15 +545,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "Karena dapat berdampak pada pengalaman pengguna untuk pengguna baru, sangat direkomendasikan untuk menggunakan notifikasi secara mengalir daripada tetap.",
 	"announcementTooManyActiveAnnouncementDescription": "Terlalu banyak pengumuman dapat memperburuk pengalaman pengguna. Mohon pertimbangkan untuk mengarsipkan pengumuman yang sudah usang/tidak relevan.",
-	"filter": "Saring",
-	"save": "Simpan",
 	"announcementEnd": "Arsipkan pengumuman",
 	"archive": "Arsipkan",
 	"unarchive": "Batalkan pengarsipan",
-	"delete": "Hapus",
-	"title": "Judul",
 	"text": "Teks",
-	"imageUrl": "URL Gambar",
 	"icon": "Avatar",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -635,12 +562,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "Permintaan terpisah untuk mengonfirmasi menandai pengumuman ini telah dibaca akan ditampilkan apabila fitur ini dinyalakan. Pengumuman ini juga akan dikecualikan dari fungsi \"Tandai semua telah dibaca\".",
 	"announcementNeedConfirmationToRead": "Membutuhkan konfirmasi terpisah bahwa telah dibaca",
 	"nUsersRead": "Dibaca oleh {n}",
-	"more": "Lainnya",
 	"active": "Aktif",
 	"archived": "Diarsipkan",
-	"deleteAreYouSure": "Apakah kamu yakin ingin menghapus \"{x}\"?",
-	"add": "Tambahkan",
-	"announcements": "Pengumuman",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -651,15 +574,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "Ti consigliamo di utilizzare gli annunci per pubblicare informazioni tempestive e limitate nel tempo, anziché informazioni importanti a lungo andare nel tempo, poiché potrebbero risultare difficili da ritrovare e peggiorare la fruibilità del servizio, specialmente alle nuove persone iscritte.",
 	"announcementTooManyActiveAnnouncementDescription": "L'esperienza delle persone può peggiorare se ci sono troppi annunci attivi. Considera anche l'archiviazione degli annunci conclusi.",
-	"filter": "Filtri",
-	"save": "Salva",
 	"announcementEnd": "Archivia l'annuncio",
 	"archive": "Archivio",
 	"unarchive": "Annulla archiviazione",
-	"delete": "Elimina",
-	"title": "Titolo",
 	"text": "Testo",
-	"imageUrl": "URL dell'immagine",
 	"icon": "Ritratto",
 	"normal": "Normale",
 	"banner": "Intestazione",
@@ -673,15 +591,11 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "I profili riceveranno una finestra di dialogo che richiede di accettare obbligatoriamente per procedere. Tale richiesta è esente da  \"conferma tutte\".",
 	"announcementNeedConfirmationToRead": "Conferma di lettura obbligatoria",
 	"nUsersRead": "Letto da {n} persone",
-	"more": "Di più!",
 	"active": "Attivo",
 	"archived": "Archiviato",
-	"deleteAreYouSure": "Vuoi davvero eliminare \"{x}\"?",
-	"add": "Aggiungi",
-	"announcements": "Annunci",
-	"autoArchiveAt": "自動アーカイブ日時",
-	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
-	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
+	"autoArchiveAt": "Data e ora di archiviazione automatica",
+	"autoArchiveAtDescription": "Dal momento specificato, la notifica verrà archiviata automaticamente. Se è vuoto, non verrà archiviata automaticamente.",
+	"autoArchiveAtMustBeInFuture": "Specificare data e ora futura."
 }
 </locale>
 
@@ -689,15 +603,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "特に新規ユーザーのUXを損ねる可能性が高いため、常時掲示するための情報ではなく、即時性が求められる情報の掲示のためにお知らせを使用することを推奨します。",
 	"announcementTooManyActiveAnnouncementDescription": "アクティブなお知らせが多いため、UXが低下する可能性があります。終了したお知らせはアーカイブすることを検討してください。",
-	"filter": "フィルタ",
-	"save": "保存",
 	"announcementEnd": "お知らせを終了",
 	"archive": "アーカイブ",
 	"unarchive": "アーカイブ解除",
-	"delete": "削除",
-	"title": "タイトル",
 	"text": "テキスト",
-	"imageUrl": "画像URL",
 	"icon": "アイコン",
 	"normal": "通常",
 	"banner": "バナー",
@@ -711,12 +620,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "有効にすると、このお知らせを既読にする際に確認ダイアログが表示されます。また、一括既読操作の対象になりません。",
 	"announcementNeedConfirmationToRead": "既読にするのに確認が必要",
 	"nUsersRead": "{n}人が読みました",
-	"more": "もっと！",
 	"active": "アクティブ",
 	"archived": "アーカイブ済み",
-	"deleteAreYouSure": "「{x}」を削除しますか？",
-	"add": "追加",
-	"announcements": "お知らせ",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -727,15 +632,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "新規ユーザーのUXを損ねやすいから、お知らせはストック情報やのうてフロー情報の掲示に使った方がええで。",
 	"announcementTooManyActiveAnnouncementDescription": "お知らせが多すぎてUXが落ちそうや。終わったお知らせはアーカイブに突っ込んだほうがええかも。",
-	"filter": "フィルタ",
-	"save": "とっとく",
 	"announcementEnd": "お知らせやめる",
 	"archive": "アーカイブ",
 	"unarchive": "アーカイブ解除",
-	"delete": "ほかす",
-	"title": "タイトル",
 	"text": "テキスト",
-	"imageUrl": "画像URL",
 	"icon": "アイコン",
 	"normal": "ええ感じ",
 	"banner": "バナー",
@@ -749,12 +649,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "オンにしたら、このお知らせを既読にする時に確認するで。ついでに、一括既読しても既読扱いにならへんで。",
 	"announcementNeedConfirmationToRead": "既読にするんやったら確認してや",
 	"nUsersRead": "{n}人が読んでもうた",
-	"more": "他のん",
 	"active": "アクティブ",
 	"archived": "アーカイブ済み",
-	"deleteAreYouSure": "「{x}」はほかしてええか？",
-	"add": "増やす",
-	"announcements": "お知らせ",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -765,15 +661,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filter",
-	"save": "Sekles",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archive",
 	"unarchive": "Unarchive",
-	"delete": "Kkes",
-	"title": "Title",
 	"text": "Text",
-	"imageUrl": "Image URL",
 	"icon": "Icon",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -787,12 +678,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "read by {n}",
-	"more": "More!",
 	"active": "Active",
 	"archived": "Archived",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
-	"add": "Add",
-	"announcements": "Announcements",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -803,15 +690,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filter",
-	"save": "ಉಳಿಸಿ",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archive",
 	"unarchive": "Unarchive",
-	"delete": "ಅಳಿಸು",
-	"title": "Title",
 	"text": "Text",
-	"imageUrl": "Image URL",
 	"icon": "Icon",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -825,12 +707,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "read by {n}",
-	"more": "More!",
 	"active": "Active",
 	"archived": "Archived",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
-	"add": "Add",
-	"announcements": "Announcements",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -841,15 +719,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "신규 유저의 이용 경험에 악영향을 끼칠 수 있으므로, 일시적인 알림 수단으로만 사용하고 고정된 정보에는 사용을 지양하는 것을 추천합니다.",
 	"announcementTooManyActiveAnnouncementDescription": "공지사항이 너무 많을 경우, 유저 경험에 영향을 끼칠 가능성이 있습니다. 오래된 공지사항은 아카이브하시는 것을 권장드립니다.",
-	"filter": "필터",
-	"save": "저장",
 	"announcementEnd": "공지에서 내리기",
 	"archive": "아카이브",
 	"unarchive": "보관 취소",
-	"delete": "삭제",
-	"title": "제목",
 	"text": "텍스트",
-	"imageUrl": "이미지 URL",
 	"icon": "아바타",
 	"normal": "일반",
 	"banner": "배너",
@@ -863,12 +736,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "활성화하면 이 공지사항을 읽음으로 표시하기 전에 확인 알림창을 띄웁니다. '모두 읽음'의 대상에서도 제외됩니다.",
 	"announcementNeedConfirmationToRead": "읽음으로 표시하기 전에 확인하기",
 	"nUsersRead": "{n}명이 읽음",
-	"more": "더 보기!",
 	"active": "최근에 활동함",
 	"archived": "아카이브 됨",
-	"deleteAreYouSure": "\"{x}\" 을(를) 삭제하시겠습니까?",
-	"add": "추가",
-	"announcements": "공지사항",
 	"autoArchiveAt": "자동 아카이브 날짜 및 시각",
 	"autoArchiveAtDescription": "지정한 날짜 및 시각이 지나면 이 알림은 자동적으로 아카이브됩니다. 빈칸일 경우에는 자동적으로 아카이브되지 않습니다.",
 	"autoArchiveAtMustBeInFuture": "자동 아카이브 날짜 및 시각에는 현재보다 후의 날짜 및 시각으로 지정해 주십시오."
@@ -879,15 +748,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filter",
-	"save": "Opslaan",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archive",
 	"unarchive": "Dearchiveren",
-	"delete": "Verwijderen",
-	"title": "Titel",
 	"text": "Tekst",
-	"imageUrl": "AfbeeldingsURL",
 	"icon": "Avatar",
 	"normal": "Normaal",
 	"banner": "Banner",
@@ -901,12 +765,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "gelezen door {n}",
-	"more": "Meer!",
 	"active": "Actief",
 	"archived": "Gearchiveerd",
-	"deleteAreYouSure": "Weet je zeker dat je \"{x}\" wil verwijderen?",
-	"add": "Toevoegen",
-	"announcements": "Aankondigingen",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -917,15 +777,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filter",
-	"save": "Lagre",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archive",
 	"unarchive": "Unarchive",
-	"delete": "Slett",
-	"title": "Tittel",
 	"text": "Tekst",
-	"imageUrl": "Image URL",
 	"icon": "Avatar",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -939,12 +794,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "lest av {n}",
-	"more": "Mer!",
 	"active": "Active",
 	"archived": "Archived",
-	"deleteAreYouSure": "Er du sikker på at du vil slette \"{x}\"?",
-	"add": "Legg til",
-	"announcements": "Kunngjøringer",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -955,15 +806,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filtr",
-	"save": "Zapisz",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archive",
 	"unarchive": "Unarchive",
-	"delete": "Usuń",
-	"title": "Tytuł",
 	"text": "Tekst",
-	"imageUrl": "Adres URL obrazka",
 	"icon": "Awatar",
 	"normal": "Normalny",
 	"banner": "Baner",
@@ -977,12 +823,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "przeczytano przez {n}",
-	"more": "Więcej!",
 	"active": "Aktywny",
 	"archived": "Archived",
-	"deleteAreYouSure": "Czy na pewno chcesz usunąć „{x}”?",
-	"add": "Dodaj",
-	"announcements": "Ogłoszenia",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -993,15 +835,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "É preferível utilizar anúncios para publicar informações atuais e de curto prazo, e não informações que serão relevantes por muito tempo.",
 	"announcementTooManyActiveAnnouncementDescription": "O excesso de anúncios pode atrapalhar a experiência do usuário. Considere arquivar anúncios obsoletos.",
-	"filter": "Filtrar",
-	"save": "Salvar",
 	"announcementEnd": "Arquivar anúncio",
 	"archive": "Arquivo",
 	"unarchive": "Desarquivar",
-	"delete": "Excluir",
-	"title": "Título",
 	"text": "Texto",
-	"imageUrl": "URL da imagem",
 	"icon": "Avatar",
 	"normal": "Normal",
 	"banner": "Capa",
@@ -1015,12 +852,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "Um lembrete adicional será exibido para confirmar a leitura do anúncio. Esse anúncio também será excluído de qualquer forma de \"Marcar tudo como lido\".",
 	"announcementNeedConfirmationToRead": "Exigir confirmação de leitura",
 	"nUsersRead": "{n} pessoas leram",
-	"more": "Mais!",
 	"active": "Ativo",
 	"archived": "Arquivado",
-	"deleteAreYouSure": "Deseja excluir \"{x}\"?",
-	"add": "Adicionar",
-	"announcements": "Avisos",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -1031,15 +864,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Большое количество оповещений может ухудшить пользовательский опыт. Рассмотрите архивирование неактуальных оповещений. ",
-	"filter": "Фильтры",
-	"save": "Сохранить",
 	"announcementEnd": "Archive announcement",
 	"archive": "Архив",
 	"unarchive": "Разархивировать",
-	"delete": "Удалить",
-	"title": "Заголовок",
 	"text": "Текст",
-	"imageUrl": "Ссылка на изображение",
 	"icon": "Аватар",
 	"normal": "Стабильно",
 	"banner": "Шапка",
@@ -1053,12 +881,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "Прочитали {n}",
-	"more": "Ещё!",
 	"active": "Действует",
 	"archived": "Архивировано",
-	"deleteAreYouSure": "Хотите удалить «{x}»?",
-	"add": "Добавить",
-	"announcements": "Оповещения",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -1069,15 +893,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filter",
-	"save": "Uložiť",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archive",
 	"unarchive": "Unarchive",
-	"delete": "Odstrániť",
-	"title": "Nadpis",
 	"text": "Text",
-	"imageUrl": "URL obrázku",
 	"icon": "Avatar",
 	"normal": "Normálne",
 	"banner": "BAnner",
@@ -1091,12 +910,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "prečítané {n} používateľmi",
-	"more": "Viac!",
 	"active": "Aktívny",
 	"archived": "Archived",
-	"deleteAreYouSure": "Naozaj chcete odstrániť \"{x}\"?",
-	"add": "Pridať",
-	"announcements": "Oznamy",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -1107,15 +922,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "เนื่องจากมีความเป็นไปได้สูงที่จะส่งผลเสียต่อง UX ของผู้ใช้ใหม่ จึงขอแนะนำให้ใช้ประกาศสำหรับข้อมูลที่ต้องการการตอบสนองในทันที ไม่ใช่ข้อมูลที่ต้องการแสดงตลอดเวลา",
 	"announcementTooManyActiveAnnouncementDescription": "เนื่องจากมีการประกาศที่ยังใช้งานอยู่จำนวนมาก อาจทำให้ UX ลดลง แนะนำให้พิจารณาการเก็บประกาศที่สิ้นสุดไปแล้ว",
-	"filter": "กรอง",
-	"save": "บันทึก",
 	"announcementEnd": "เก็บประกาศ",
 	"archive": "เก็บถาวร",
 	"unarchive": "เลิกการเก็บถาวร",
-	"delete": "ลบ",
-	"title": "หัวข้อ",
 	"text": "ข้อความ",
-	"imageUrl": "URL รูปภาพ",
 	"icon": "ไอคอน",
 	"normal": "ปกติ",
 	"banner": "แบนเนอร์",
@@ -1129,12 +939,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "กล่องโต้ตอบการยืนยันจะปรากฏขึ้นเมื่อจะทำเครื่องหมายว่าอ่านแล้ว นอกจากนี้ยังทำให้ประกาศนี้ยังไม่ถูกอ่านเมื่อใช้ฟังก์ชั่น “ทำเครื่องหมายฯ ทั้งหมดว่าอ่านแล้ว”",
 	"announcementNeedConfirmationToRead": "จำเป็นต้องยืนยันว่าอ่านแล้ว",
 	"nUsersRead": "อ่านโดย {n}",
-	"more": "เพิ่มเติม!",
 	"active": "ใช้งานอยู่",
 	"archived": "เก็บถาวรแล้ว",
-	"deleteAreYouSure": "ต้องการลบ “{x}” ใช่ไหม?",
-	"add": "เพิ่ม",
-	"announcements": "ประกาศ",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -1145,15 +951,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "Duyuruları, uzun vadede geçerli olacak bilgiler için değil, güncel ve zaman sınırlı bilgileri yayınlamak için kullanmak en iyisidir.",
 	"announcementTooManyActiveAnnouncementDescription": "Çok fazla aktif duyuru olması kullanıcı deneyimini kötüleştirebilir. Artık geçerliliğini yitirmiş duyuruları arşivlemeyi düşün.",
-	"filter": "Filtre",
-	"save": "Kaydet",
 	"announcementEnd": "Arşiv duyurusu",
 	"archive": "Arşiv",
 	"unarchive": "Arşivden çıkar",
-	"delete": "Sil",
-	"title": "Başlık",
 	"text": "Metin",
-	"imageUrl": "Görsel URL",
 	"icon": "Avatar",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -1167,12 +968,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "Etkinleştirildiğinde, bu duyuruyu okundu olarak işaretlemek için ayrı bir onay mesajı görüntülenir. Bu duyuru, “Tümünü okundu olarak işaretle” işlevinden de hariç tutulur.",
 	"announcementNeedConfirmationToRead": "Ayrı okuma onayı gerektirir",
 	"nUsersRead": "{n} tarafından okundu",
-	"more": "Daha fazlası!",
 	"active": "Aktif",
 	"archived": "Arşivle",
-	"deleteAreYouSure": "“{x}” öğesini silmek istediğinizden emin misin?",
-	"add": "Ekle",
-	"announcements": "Duyurular",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -1183,15 +980,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Having too many active announcements may worsen the user experience. Please consider archiving announcements that have become obsolete.",
-	"filter": "Filter",
-	"save": "Save",
 	"announcementEnd": "Archive announcement",
 	"archive": "Archive",
 	"unarchive": "Unarchive",
-	"delete": "ئۆچۈرۈش",
-	"title": "Title",
 	"text": "Text",
-	"imageUrl": "Image URL",
 	"icon": "Icon",
 	"normal": "Normal",
 	"banner": "Banner",
@@ -1205,12 +997,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "read by {n}",
-	"more": "More!",
 	"active": "Active",
 	"archived": "Archived",
-	"deleteAreYouSure": "Are you sure that you want to delete \"{x}\"?",
-	"add": "Add",
-	"announcements": "Announcements",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -1221,15 +1009,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "Краще за все використовувати оголошення щоб повідомляти про свіжу й обмежену по часу інформацію, аніж стару й постійно актуальну.",
 	"announcementTooManyActiveAnnouncementDescription": "Велика кількість оголошень може погіршити досвід користувача. Будь ласка, архівуйте оголошення, які здаються вам неактуальними.",
-	"filter": "Фільтр",
-	"save": "Зберегти",
 	"announcementEnd": "Архівувати оголошення",
 	"archive": "Архів",
 	"unarchive": "Розархівувати",
-	"delete": "Видалити",
-	"title": "Тема",
 	"text": "Текст",
-	"imageUrl": "Посилання на зображення",
 	"icon": "Аватар",
 	"normal": "Нормальний",
 	"banner": "Банер",
@@ -1243,12 +1026,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "Окремий запит заради позначення цього оголошення прочитаним буде показано якщо ввімкнуто. Це оголошення також буде виключено з будь-якого функціоналу \"Позначити як прочитане\".",
 	"announcementNeedConfirmationToRead": "Вимагати окреме підтвердження заради позначення прочитаним",
 	"nUsersRead": "Прочитали {n}",
-	"more": "Бiльше!",
 	"active": "Активовано",
 	"archived": "Заархівовано",
-	"deleteAreYouSure": "Ви впевнені, що хочете видалити \"{x}\"?",
-	"add": "Додати",
-	"announcements": "Оголошення",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -1259,15 +1038,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "It's best to use announcements to publish fresh and time-bound information, not for information that will be relevant in the long term.",
 	"announcementTooManyActiveAnnouncementDescription": "Có quá nhiều thông báo sẽ làm trải nghiệm của người dùng tệ đi. Vui lòng lưu trữ những thông báo đã hết hiệu lực.",
-	"filter": "Bộ lọc",
-	"save": "Lưu",
 	"announcementEnd": "Lưu trữ thông báo",
 	"archive": "Lưu trữ",
 	"unarchive": "Unarchive",
-	"delete": "Xóa",
-	"title": "Tựa đề",
 	"text": "Nội dung",
-	"imageUrl": "URL ảnh",
 	"icon": "Ảnh đại diện",
 	"normal": "Bình thường",
 	"banner": "Ảnh bìa",
@@ -1281,12 +1055,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
 	"announcementNeedConfirmationToRead": "Require separate read confirmation",
 	"nUsersRead": "đọc bởi {n}",
-	"more": "Thêm nữa!",
 	"active": "Hoạt động",
 	"archived": "Archived",
-	"deleteAreYouSure": "Bạn có chắc muốn xóa \"{x}\"?",
-	"add": "Thêm",
-	"announcements": "Thông báo máy chủ",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
@@ -1297,15 +1067,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "因可能损坏新用户的 UX 体验，建议将通知用于发布具有时效性的信息，而不是用于长期展示的信息。",
 	"announcementTooManyActiveAnnouncementDescription": "若有大量活动公告，可能会造成用户体验下降。请考虑归档已完成的公告。",
-	"filter": "筛选",
-	"save": "保存",
 	"announcementEnd": "结束公告",
 	"archive": "归档",
 	"unarchive": "取消归档",
-	"delete": "删除",
-	"title": "标题",
 	"text": "文本",
-	"imageUrl": "图片 URL",
 	"icon": "头像",
 	"normal": "正常",
 	"banner": "横幅",
@@ -1319,12 +1084,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "若启用，则会在标记已读时会显示确认对话框。此外，它也会不受批量已读操作的影响。",
 	"announcementNeedConfirmationToRead": "需要确认才能标记为已读",
 	"nUsersRead": "{n}人已读",
-	"more": "更多！",
 	"active": "活动",
 	"archived": "已归档",
-	"deleteAreYouSure": "要删掉「{x}」吗？",
-	"add": "添加",
-	"announcements": "公告",
 	"autoArchiveAt": "自动存档时间",
 	"autoArchiveAtDescription": "当超过指定的时间时，此通知将自动存档。留空则不自动存档。",
 	"autoArchiveAtMustBeInFuture": "请指定晚于当前时间的值。"
@@ -1335,15 +1096,10 @@ definePage(() => ({
 {
 	"announcementShouldNotBeUsedToPresentPermanentInfo": "為了避免損害新用戶的使用體驗，建議使用公告來發布即時性的訊息，而不是用於固定不變的資訊。",
 	"announcementTooManyActiveAnnouncementDescription": "有過多公告可能會影響使用者體驗。請考慮歸檔已結束的公告。",
-	"filter": "篩選",
-	"save": "儲存",
 	"announcementEnd": "結束公告",
 	"archive": "封存",
 	"unarchive": "取消封存",
-	"delete": "刪除",
-	"title": "標題",
 	"text": "文字",
-	"imageUrl": "圖片URL",
 	"icon": "圖示",
 	"normal": "正常",
 	"banner": "橫幅",
@@ -1357,12 +1113,8 @@ definePage(() => ({
 	"announcementNeedConfirmationToReadDescription": "啟用代表此公告將顯示對話方塊以確認是否標記為已讀，同時不會受「標記所有公告為已讀」功能影響。",
 	"announcementNeedConfirmationToRead": "必須確認才能標記為已讀",
 	"nUsersRead": "{n} 人已讀",
-	"more": "更多！",
 	"active": "最近活躍",
 	"archived": "已封存",
-	"deleteAreYouSure": "確定要刪掉「{x}」嗎？",
-	"add": "新增",
-	"announcements": "公告",
 	"autoArchiveAt": "自動アーカイブ日時",
 	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
 	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"

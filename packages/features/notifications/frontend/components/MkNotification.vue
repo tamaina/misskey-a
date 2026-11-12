@@ -143,8 +143,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template v-else-if="notification.type === 'receiveFollowRequest'">
 				<span :class="$style.text" style="opacity: 0.6;">{{ $locale.sfc.receiveFollowRequest }}</span>
 				<div v-if="full && !followRequestDone" :class="$style.followRequestCommands">
-					<MkButton :class="$style.followRequestCommandButton" rounded primary @click="acceptFollowRequest()"><i class="ti ti-check"></i> {{ $locale.sfc.accept }}</MkButton>
-					<MkButton :class="$style.followRequestCommandButton" rounded danger @click="rejectFollowRequest()"><i class="ti ti-x"></i> {{ $locale.sfc.reject }}</MkButton>
+					<MkButton :class="$style.followRequestCommandButton" rounded primary @click="acceptFollowRequest()"><i class="ti ti-check"></i> {{ globalLocale.env.accept }}</MkButton>
+					<MkButton :class="$style.followRequestCommandButton" rounded danger @click="rejectFollowRequest()"><i class="ti ti-x"></i> {{ globalLocale.env.reject }}</MkButton>
 				</div>
 			</template>
 			<span v-else-if="notification.type === 'test'" :class="$style.text">{{ $locale.sfc.notificationNotificationWillBeDisplayedLikeThis }}</span>
@@ -176,6 +176,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkReactionIcon from '@features/notes/frontend/components/MkReactionIcon.vue';
@@ -187,6 +188,9 @@ import { interpolateLocaleParameters } from '@features/runtime/frontend/interpol
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -204,15 +208,15 @@ const props = withDefaults(defineProps<{
 type ExportCompletedNotification = Misskey.entities.Notification & { type: 'exportCompleted' };
 
 const exportEntityName = {
-	antenna: $locale.value.sfc.antennas,
-	blocking: $locale.value.sfc.blockedUsers,
-	clip: $locale.value.sfc.clips,
-	customEmoji: $locale.value.sfc.customEmojis,
-	favorite: $locale.value.sfc.favorites,
-	following: $locale.value.sfc.following,
-	muting: $locale.value.sfc.mutedUsers,
-	note: $locale.value.sfc.notes,
-	userList: $locale.value.sfc.lists,
+	antenna: globalLocale.value.env.antennas,
+	blocking: globalLocale.value.env.blockedUsers,
+	clip: globalLocale.value.env.clips,
+	customEmoji: globalLocale.value.env.customEmojis,
+	favorite: globalLocale.value.env.favorites,
+	following: globalLocale.value.env.following,
+	muting: globalLocale.value.env.mutedUsers,
+	note: globalLocale.value.env.notes,
+	userList: globalLocale.value.env.lists,
 } as const satisfies Record<ExportCompletedNotification['exportedEntity'], string>;
 
 const followRequestDone = ref(false);
@@ -850,18 +854,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "يتابعك",
 	"followRequestAccepted": "قُبل طلب المتابعة",
 	"receiveFollowRequest": "تلقيت طلب متابعة",
-	"accept": "السماح",
-	"reject": "رفض",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "الهوائيات",
-	"blockedUsers": "الحسابات المحجوبة",
-	"clips": "مشابك",
-	"customEmojis": "إيموجي مخصص",
-	"favorites": "المفضلات",
-	"following": "المتابَعون",
-	"mutedUsers": "الحسابات المكتومة",
-	"notes": "الملاحظات",
-	"lists": "القوائم"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -1216,18 +1209,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "t'ha seguit",
 	"followRequestAccepted": "Sol·licitud de seguiment acceptada",
 	"receiveFollowRequest": "Has rebut una sol·licitud de seguiment",
-	"accept": "Acceptar",
-	"reject": "Denega",
-	"notificationNotificationWillBeDisplayedLikeThis": "Les notificacions és veure'n així ",
-	"antennas": "Antena",
-	"blockedUsers": "Usuaris bloquejats",
-	"clips": "Retalls",
-	"customEmojis": "Emojis personalitzats",
-	"favorites": "Favorits",
-	"following": "Segueixes ",
-	"mutedUsers": "Usuaris silenciats",
-	"notes": "Notes",
-	"lists": "Llistes"
+	"notificationNotificationWillBeDisplayedLikeThis": "Les notificacions és veure'n així "
 }
 </locale>
 
@@ -1582,18 +1564,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Máte nového následovníka",
 	"followRequestAccepted": "Žádost o sledování přijata",
 	"receiveFollowRequest": "Žádost o sledování přijata",
-	"accept": "Souhlasím",
-	"reject": "Odmítnout",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antény",
-	"blockedUsers": "Blokovaní uživatelé",
-	"clips": "Oříznout",
-	"customEmojis": "Vlastní emoji",
-	"favorites": "Oblíbené",
-	"following": "Sledovaní",
-	"mutedUsers": "Zltumení uživatelé",
-	"notes": "Poznámky",
-	"lists": "Seznamy"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -1948,18 +1919,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "followed you",
 	"followRequestAccepted": "Follow request accepted",
 	"receiveFollowRequest": "Follow request received",
-	"accept": "Accept",
-	"reject": "Reject",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antennas",
-	"blockedUsers": "Blocked users",
-	"clips": "Clips",
-	"customEmojis": "Custom Emoji",
-	"favorites": "Favorites",
-	"following": "Following",
-	"mutedUsers": "Muted users",
-	"notes": "Notes",
-	"lists": "Lists"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -2314,18 +2274,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "ist dir gefolgt",
 	"followRequestAccepted": "Follow-Anfrage akzeptiert",
 	"receiveFollowRequest": "Follow-Anfrage erhalten",
-	"accept": "Akzeptieren",
-	"reject": "Ablehnen",
-	"notificationNotificationWillBeDisplayedLikeThis": "Benachrichtigungen sehen so aus",
-	"antennas": "Antennen",
-	"blockedUsers": "Blockierte Benutzer",
-	"clips": "Clips",
-	"customEmojis": "Benutzerdefinierte Emojis",
-	"favorites": "Favoriten",
-	"following": "Folgt",
-	"mutedUsers": "Stummgeschaltete Benutzer",
-	"notes": "Notizen",
-	"lists": "Listen"
+	"notificationNotificationWillBeDisplayedLikeThis": "Benachrichtigungen sehen so aus"
 }
 </locale>
 
@@ -2680,18 +2629,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "followed you",
 	"followRequestAccepted": "Follow request accepted",
 	"receiveFollowRequest": "Follow request received",
-	"accept": "Accept",
-	"reject": "Reject",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antennas",
-	"blockedUsers": "Blocked users",
-	"clips": "Clips",
-	"customEmojis": "Custom Emoji",
-	"favorites": "Favorites",
-	"following": "Following",
-	"mutedUsers": "Muted users",
-	"notes": "Notes",
-	"lists": "Lists"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -3046,18 +2984,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "ahora te sigue",
 	"followRequestAccepted": "La solicitud de seguimiento fue aceptada",
 	"receiveFollowRequest": "Recibiste una solicitud de seguimiento",
-	"accept": "Aceptar",
-	"reject": "Rechazar",
-	"notificationNotificationWillBeDisplayedLikeThis": "Las notificaciones tendrán este aspecto",
-	"antennas": "Antenas",
-	"blockedUsers": "Usuarios bloqueados",
-	"clips": "Clip",
-	"customEmojis": "Emojis personalizados",
-	"favorites": "Favoritos",
-	"following": "Siguiendo",
-	"mutedUsers": "Usuarios silenciados",
-	"notes": "Notas",
-	"lists": "Listas"
+	"notificationNotificationWillBeDisplayedLikeThis": "Las notificaciones tendrán este aspecto"
 }
 </locale>
 
@@ -3412,18 +3339,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Vous suit",
 	"followRequestAccepted": "La demande d’abonnement a été acceptée",
 	"receiveFollowRequest": "Demande d’abonnement reçue",
-	"accept": "Autoriser",
-	"reject": "Refuser",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antennes",
-	"blockedUsers": "Utilisateur·rice·s bloqué·e·s",
-	"clips": "Clips",
-	"customEmojis": "Émojis personnalisés",
-	"favorites": "Favoris",
-	"following": "Abonnements",
-	"mutedUsers": "Utilisateur·rice·s en sourdine",
-	"notes": "Notes",
-	"lists": "Listes"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -3778,18 +3694,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Mengikuti kamu",
 	"followRequestAccepted": "Permintaan mengikuti telah disetujui",
 	"receiveFollowRequest": "Ingin mengikuti kamu",
-	"accept": "Terima",
-	"reject": "Tolak",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifikasi akan terlihat seperti ini",
-	"antennas": "Antena",
-	"blockedUsers": "Pengguna yang diblokir",
-	"clips": "Klip",
-	"customEmojis": "Emoji kustom",
-	"favorites": "Favorit",
-	"following": "Ikuti",
-	"mutedUsers": "Pengguna yang dibisukan",
-	"notes": "Catatan",
-	"lists": "Daftar"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifikasi akan terlihat seperti ini"
 }
 </locale>
 
@@ -4144,18 +4049,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Hai un nuovo Follower",
 	"followRequestAccepted": "Ha accettato la tua richiesta di follow",
 	"receiveFollowRequest": "Hai ricevuto una richiesta di follow",
-	"accept": "Accetta",
-	"reject": "Rifiuta",
-	"notificationNotificationWillBeDisplayedLikeThis": "La notifica apparirà così",
-	"antennas": "Antenne",
-	"blockedUsers": "Profili bloccati",
-	"clips": "Clip",
-	"customEmojis": "Emoji personalizzate",
-	"favorites": "Preferiti",
-	"following": "Following",
-	"mutedUsers": "Profili silenziati",
-	"notes": "Note",
-	"lists": "Liste"
+	"notificationNotificationWillBeDisplayedLikeThis": "La notifica apparirà così"
 }
 </locale>
 
@@ -4510,18 +4404,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "フォローされました",
 	"followRequestAccepted": "フォローが承認されました",
 	"receiveFollowRequest": "フォローリクエストされました",
-	"accept": "許可",
-	"reject": "拒否",
-	"notificationNotificationWillBeDisplayedLikeThis": "通知はこのように表示されます",
-	"antennas": "アンテナ",
-	"blockedUsers": "ブロックしたユーザー",
-	"clips": "クリップ",
-	"customEmojis": "カスタム絵文字",
-	"favorites": "お気に入り",
-	"following": "フォロー",
-	"mutedUsers": "ミュートしたユーザー",
-	"notes": "ノート",
-	"lists": "リスト"
+	"notificationNotificationWillBeDisplayedLikeThis": "通知はこのように表示されます"
 }
 </locale>
 
@@ -4876,18 +4759,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "フォローされたで",
 	"followRequestAccepted": "フォローが承認されたで",
 	"receiveFollowRequest": "フォローリクエストされたで",
-	"accept": "ええで",
-	"reject": "あかん",
-	"notificationNotificationWillBeDisplayedLikeThis": "通知はこのように表示されるで",
-	"antennas": "アンテナ",
-	"blockedUsers": "ブロックしとるユーザー",
-	"clips": "クリップ",
-	"customEmojis": "カスタム絵文字",
-	"favorites": "お気に入り",
-	"following": "フォロー",
-	"mutedUsers": "ミュートしとるユーザー",
-	"notes": "ノート",
-	"lists": "リスト"
+	"notificationNotificationWillBeDisplayedLikeThis": "通知はこのように表示されるで"
 }
 </locale>
 
@@ -5242,18 +5114,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Yeṭṭafaṛ-ik·em-id",
 	"followRequestAccepted": "Follow request accepted",
 	"receiveFollowRequest": "Follow request received",
-	"accept": "Accept",
-	"reject": "Reject",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antennas",
-	"blockedUsers": "Blocked users",
-	"clips": "Clips",
-	"customEmojis": "Custom Emoji",
-	"favorites": "Favorites",
-	"following": "Ig ṭṭafaṛ",
-	"mutedUsers": "Muted users",
-	"notes": "Notes",
-	"lists": "Tibdarin"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -5608,18 +5469,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "ಹಿಂಬಾಲಿಸಿದರು",
 	"followRequestAccepted": "ಹಿಂಬಾಲನೆ ವಿನಂತಿ ಸ್ವೀಕರಿಸಲಾಯಿತು",
 	"receiveFollowRequest": "ಹಿಂಬಾಲನೆ ವಿನಂತಿ ಬಂದಿದೆ",
-	"accept": "Accept",
-	"reject": "Reject",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antennas",
-	"blockedUsers": "Blocked users",
-	"clips": "Clips",
-	"customEmojis": "Custom Emoji",
-	"favorites": "ಮೆಚ್ಚಿನವುಗಳು",
-	"following": "Following",
-	"mutedUsers": "Muted users",
-	"notes": "Notes",
-	"lists": "Lists"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -5974,18 +5824,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "새로운 팔로워가 있습니다",
 	"followRequestAccepted": "팔로우가 수락되었습니다",
 	"receiveFollowRequest": "새로운 팔로우 요청이 있습니다",
-	"accept": "수락하기",
-	"reject": "거절하기",
-	"notificationNotificationWillBeDisplayedLikeThis": "알림이 이렇게 표시됩니다",
-	"antennas": "안테나",
-	"blockedUsers": "차단한 유저",
-	"clips": "클립",
-	"customEmojis": "커스텀 이모지",
-	"favorites": "즐겨찾기",
-	"following": "팔로잉",
-	"mutedUsers": "뮤트한 유저",
-	"notes": "노트",
-	"lists": "리스트"
+	"notificationNotificationWillBeDisplayedLikeThis": "알림이 이렇게 표시됩니다"
 }
 </locale>
 
@@ -6340,18 +6179,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "volgde jou",
 	"followRequestAccepted": "Volgverzoek geaccepteerd",
 	"receiveFollowRequest": "Volgverzoek ontvangen",
-	"accept": "Accepteren",
-	"reject": "Weigeren",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antennes",
-	"blockedUsers": "Geblokkeerde gebruikers",
-	"clips": "Clips",
-	"customEmojis": "Eigen emoji",
-	"favorites": "Toevoegen aan favorieten",
-	"following": "Volgend",
-	"mutedUsers": "Gedempte gebruikers",
-	"notes": "Notities",
-	"lists": "Lijsten"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -6706,18 +6534,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "fulgte deg",
 	"followRequestAccepted": "Følgeforespørsel akseptert",
 	"receiveFollowRequest": "Follow request received",
-	"accept": "Tillatt",
-	"reject": "Avslå",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antenner",
-	"blockedUsers": "Blokkerte brukere",
-	"clips": "Clips",
-	"customEmojis": "Custom Emoji",
-	"favorites": "Favoritter",
-	"following": "Følger",
-	"mutedUsers": "Skjulte brukere",
-	"notes": "Notes",
-	"lists": "Lister"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -7072,18 +6889,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Zaobserwował(a) Cię",
 	"followRequestAccepted": "Zaakceptowano prośbę o możliwość obserwacji",
 	"receiveFollowRequest": "Otrzymano prośbę o możliwość obserwacji",
-	"accept": "Akceptuj",
-	"reject": "Odrzuć",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Anteny",
-	"blockedUsers": "Zablokowani użytkownicy",
-	"clips": "Klipy",
-	"customEmojis": "Niestandardowe emoji",
-	"favorites": "Ulubione",
-	"following": "Obserwowani",
-	"mutedUsers": "Wyciszeni użytkownicy",
-	"notes": "Wpisy",
-	"lists": "Listy"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -7438,18 +7244,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Você tem um novo seguidor",
 	"followRequestAccepted": "Pedido de seguidor aceito",
 	"receiveFollowRequest": "Pedido de seguidor recebido",
-	"accept": "Aceitar",
-	"reject": "Rejeitar",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notificações se parecem com isso",
-	"antennas": "Antenas",
-	"blockedUsers": "Usuários bloqueados",
-	"clips": "Clipe",
-	"customEmojis": "Emoji personalizado",
-	"favorites": "Favoritos",
-	"following": "Seguindo",
-	"mutedUsers": "Usuários silenciados",
-	"notes": "Posts",
-	"lists": "Listas"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notificações se parecem com isso"
 }
 </locale>
 
@@ -7804,18 +7599,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Новый подписчик",
 	"followRequestAccepted": "Запрос на подписку принят",
 	"receiveFollowRequest": "Получен запрос на подписку",
-	"accept": "Принять",
-	"reject": "Отклонить",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Антенны",
-	"blockedUsers": "Заблокированные пользователи",
-	"clips": "Подборки",
-	"customEmojis": "Собственные эмодзи",
-	"favorites": "Избранное",
-	"following": "Подписки",
-	"mutedUsers": "Скрытые пользователи",
-	"notes": "Заметки",
-	"lists": "Списки"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -8170,18 +7954,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Máte nového sledujúceho",
 	"followRequestAccepted": "Žiadosť o sledovanie akceptovaná",
 	"receiveFollowRequest": "Žiadosť o sledovanie prijatá",
-	"accept": "Súhlasím",
-	"reject": "Nesúhlasím",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antény",
-	"blockedUsers": "Blokovaní používatelia",
-	"clips": "Klip",
-	"customEmojis": "Vlastné emoji",
-	"favorites": "Obľúbené",
-	"following": "Sledujete",
-	"mutedUsers": "Umlčaní používatelia",
-	"notes": "Poznámky",
-	"lists": "Zoznamy"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -8536,18 +8309,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "ได้ติดตามคุณ",
 	"followRequestAccepted": "การติดตามได้รับการอนุมัติแล้ว",
 	"receiveFollowRequest": "มีคำขอติดตามส่งมาหา",
-	"accept": "ยอมรับ",
-	"reject": "ปฏิเสธ",
-	"notificationNotificationWillBeDisplayedLikeThis": "การแจ้งเตือนมีลักษณะแบบนี้",
-	"antennas": "เสาอากาศ",
-	"blockedUsers": "ผู้ใช้ที่ถูกบล็อก",
-	"clips": "คลิป",
-	"customEmojis": "เอโมจิที่กำหนดเอง",
-	"favorites": "รายการโปรด",
-	"following": "กำลังติดตาม",
-	"mutedUsers": "ผู้ใช้ที่ถูกปิดเสียง",
-	"notes": " โน้ต",
-	"lists": "รายชื่อ"
+	"notificationNotificationWillBeDisplayedLikeThis": "การแจ้งเตือนมีลักษณะแบบนี้"
 }
 </locale>
 
@@ -8902,18 +8664,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "seni takip etti",
 	"followRequestAccepted": "Takip isteği kabul edildi",
 	"receiveFollowRequest": "Takip isteği alındı",
-	"accept": "Kabul et",
-	"reject": "Reddet",
-	"notificationNotificationWillBeDisplayedLikeThis": "Bildirimler şöyle görünür",
-	"antennas": "Antenler",
-	"blockedUsers": "Engellenen kullanıcılar",
-	"clips": "Klipler",
-	"customEmojis": "Özel Emoji",
-	"favorites": "Favoriler",
-	"following": "Takip",
-	"mutedUsers": "Sessize alınan kullanıcılar",
-	"notes": "Notlar",
-	"lists": "Listeler"
+	"notificationNotificationWillBeDisplayedLikeThis": "Bildirimler şöyle görünür"
 }
 </locale>
 
@@ -9268,18 +9019,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "followed you",
 	"followRequestAccepted": "Follow request accepted",
 	"receiveFollowRequest": "Follow request received",
-	"accept": "Accept",
-	"reject": "Reject",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Antennas",
-	"blockedUsers": "Blocked users",
-	"clips": "Clips",
-	"customEmojis": "Custom Emoji",
-	"favorites": "Favorites",
-	"following": "Following",
-	"mutedUsers": "Muted users",
-	"notes": "Notes",
-	"lists": "Lists"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -9634,18 +9374,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "Новий підписник",
 	"followRequestAccepted": "Підписка прийнята",
 	"receiveFollowRequest": "Отримано запит на підписку",
-	"accept": "Прийняти",
-	"reject": "Відхилити",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Антени",
-	"blockedUsers": "Заблоковані користувачі",
-	"clips": "Добірки",
-	"customEmojis": "Кастомні емоджі",
-	"favorites": "Обране",
-	"following": "Підписки",
-	"mutedUsers": "Заглушені користувачі",
-	"notes": "Записи",
-	"lists": "Списки"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -10000,18 +9729,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "đã theo dõi bạn",
 	"followRequestAccepted": "Đã chấp nhận yêu cầu theo dõi",
 	"receiveFollowRequest": "Đã yêu cầu theo dõi",
-	"accept": "Đồng ý",
-	"reject": "Từ chối",
-	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this",
-	"antennas": "Trạm phát sóng",
-	"blockedUsers": "Người đã chặn",
-	"clips": "Lưu bài viết",
-	"customEmojis": "Tùy chỉnh emoji",
-	"favorites": "Lượt thích",
-	"following": "Đang theo dõi",
-	"mutedUsers": "Người đã ẩn",
-	"notes": "Bài Viết",
-	"lists": "Danh sách"
+	"notificationNotificationWillBeDisplayedLikeThis": "Notifications look like this"
 }
 </locale>
 
@@ -10366,18 +10084,7 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "你有新的关注者",
 	"followRequestAccepted": "您的关注请求被通过了",
 	"receiveFollowRequest": "您收到了关注请求",
-	"accept": "允许",
-	"reject": "拒绝",
-	"notificationNotificationWillBeDisplayedLikeThis": "通知将会这样表示",
-	"antennas": "天线",
-	"blockedUsers": "已屏蔽的用户",
-	"clips": "便签",
-	"customEmojis": "自定义表情符号",
-	"favorites": "收藏",
-	"following": "关注中",
-	"mutedUsers": "已隐藏的用户",
-	"notes": "帖子",
-	"lists": "列表"
+	"notificationNotificationWillBeDisplayedLikeThis": "通知将会这样表示"
 }
 </locale>
 
@@ -10732,17 +10439,6 @@ function getActualReactedUsersCount(notification: Misskey.entities.Notification)
 	"youGotNewFollower": "您有新的追隨者",
 	"followRequestAccepted": "追隨請求已被接受",
 	"receiveFollowRequest": "您有新的追隨請求",
-	"accept": "接受",
-	"reject": "拒絕",
-	"notificationNotificationWillBeDisplayedLikeThis": "通知會以這樣的方式顯示",
-	"antennas": "天線",
-	"blockedUsers": "被封鎖的使用者",
-	"clips": "摘錄",
-	"customEmojis": "自訂表情符號",
-	"favorites": "我的最愛",
-	"following": "追隨中",
-	"mutedUsers": "被靜音的使用者",
-	"notes": "貼文",
-	"lists": "清單"
+	"notificationNotificationWillBeDisplayedLikeThis": "通知會以這樣的方式顯示"
 }
 </locale>

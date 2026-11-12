@@ -15,7 +15,7 @@ export interface ApiActor {
 export interface ApiAuthorization<Actor extends ApiActor> {
 	rootUserId(): string | null;
 	roles(actor: Actor): Promise<readonly { isModerator: boolean; isAdministrator: boolean }[]>;
-	policyAllowed(actor: Actor, key: string): Promise<boolean>;
+	policyAllowed(actor: Actor | null, key: string): Promise<boolean>;
 }
 
 export interface BrowserSessionIdentity { id: string; userId: string }

@@ -9,6 +9,7 @@ on:
       - improve-misskey-js-autogen-check
     paths:
       - packages/backend/**
+      - packages/features/relationships/backend/**
 
 jobs:
   generate-misskey-js:

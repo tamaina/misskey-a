@@ -109,7 +109,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkPreferenceContainer>
 					</SearchMarker>
 
-					<MkButton @click="previewPicker"><i class="ti ti-eye"></i> {{ $locale.sfc.preview }}</MkButton>
+					<MkButton @click="previewPicker"><i class="ti ti-eye"></i> {{ globalLocale.env.preview }}</MkButton>
 				</div>
 			</FormSection>
 		</SearchMarker>
@@ -118,10 +118,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, watch } from 'vue';
 import XPalette from '@features/preferences/frontend/pages/settings/emoji-palette.palette.vue';
-import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
-import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
@@ -135,12 +134,17 @@ import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkPreferenceContainer from '@features/preferences/frontend/components/MkPreferenceContainer.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import { emojiPicker } from '@features/emojis/frontend/utility/emoji-picker.js';
+import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
+import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const emojiPaletteForReaction = prefer.model('emojiPaletteForReaction');
 const emojiPaletteForReactionDef = computed<MkSelectItem[]>(() => [
 	{ label: `(${$locale.value.sfc.auto})`, value: null },
 	...prefer.s.emojiPalettes.map(palette => ({
-		label: palette.name === '' ? `(${$locale.value.sfc.noName})` : palette.name,
+		label: palette.name === '' ? `(${globalLocale.value.env.noName})` : palette.name,
 		value: palette.id,
 	})),
 ]);
@@ -148,14 +152,14 @@ const emojiPaletteForMain = prefer.model('emojiPaletteForMain');
 const emojiPaletteForMainDef = computed<MkSelectItem[]>(() => [
 	{ label: `(${$locale.value.sfc.auto})`, value: null },
 	...prefer.s.emojiPalettes.map(palette => ({
-		label: palette.name === '' ? `(${$locale.value.sfc.noName})` : palette.name,
+		label: palette.name === '' ? `(${globalLocale.value.env.noName})` : palette.name,
 		value: palette.id,
 	})),
 ]);
 const emojiPickerScale = prefer.model('emojiPickerScale');
 const emojiPickerScaleDef = [
 	{ label: $locale.value.sfc.small, value: 1 },
-	{ label: $locale.value.sfc.medium, value: 2 },
+	{ label: globalLocale.value.env.medium, value: 2 },
 	{ label: $locale.value.sfc.large, value: 3 },
 	{ label: $locale.value.sfc.large + '+', value: 4 },
 	{ label: $locale.value.sfc.large + '++', value: 5 },
@@ -173,7 +177,7 @@ const emojiPickerWidthDef = [
 const emojiPickerHeight = prefer.model('emojiPickerHeight');
 const emojiPickerHeightDef = [
 	{ label: $locale.value.sfc.small, value: 1 },
-	{ label: $locale.value.sfc.medium, value: 2 },
+	{ label: globalLocale.value.env.medium, value: 2 },
 	{ label: $locale.value.sfc.large, value: 3 },
 	{ label: $locale.value.sfc.large + '+', value: 4 },
 ] as MkRadiosOption<number>[];
@@ -286,9 +290,7 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"auto": "تلقائي",
-	"noName": "No name",
 	"small": "صغير",
-	"medium": "متوسط",
 	"large": "كبير",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -303,17 +305,14 @@ definePage(() => ({
 	"popup": "Pop up",
 	"drawer": "Drawer",
 	"style": "Style",
-	"needReloadToApply": "سيطبق هذا بعد إعادة التحميل.",
-	"preview": "معاينة"
+	"needReloadToApply": "سيطبق هذا بعد إعادة التحميل."
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
 	"auto": "Automàtic ",
-	"noName": "No hi ha un nom disponible ",
 	"small": "Petit",
-	"medium": "Mitjà",
 	"large": "Gran",
 	"emojiPalette": "Calaix d'emojis",
 	"emojiPaletteBanner": "Pots registrar ajustos preestablerts com paletes perquè es mostrin permanentment al selector d'emojis, o personalitzar la configuració de visió del selector.",
@@ -328,17 +327,14 @@ definePage(() => ({
 	"popup": "Emergent",
 	"drawer": "Calaix",
 	"style": "Estil",
-	"needReloadToApply": "Es requereix recarregar per reflectir aquesta opció ",
-	"preview": "Vista prèvia"
+	"needReloadToApply": "Es requereix recarregar per reflectir aquesta opció "
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
 	"auto": "Auto",
-	"noName": "No name",
 	"small": "Malé",
-	"medium": "Střední",
 	"large": "Velké",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -353,17 +349,14 @@ definePage(() => ({
 	"popup": "Vyskakovací okno",
 	"drawer": "Boční menu",
 	"style": "Vzhled",
-	"needReloadToApply": "K projevení nastavení je zapotřebí obnovit stránku.",
-	"preview": "Náhled"
+	"needReloadToApply": "K projevení nastavení je zapotřebí obnovit stránku."
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
 	"auto": "Auto",
-	"noName": "No name",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -378,17 +371,14 @@ definePage(() => ({
 	"popup": "Pop up",
 	"drawer": "Drawer",
 	"style": "Style",
-	"needReloadToApply": "A reload is required for this to be reflected.",
-	"preview": "Preview"
+	"needReloadToApply": "A reload is required for this to be reflected."
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
 	"auto": "Automatisch",
-	"noName": "Kein Name",
 	"small": "Klein",
-	"medium": "Mittel",
 	"large": "Groß",
 	"emojiPalette": "Emoji-Palette",
 	"emojiPaletteBanner": "Sie können Voreinstellungen, die im Emoji-Picker dauerhaft angezeigt werden sollen, als Palette registrieren oder die Anzeigeart des Pickers anpassen.",
@@ -403,17 +393,14 @@ definePage(() => ({
 	"popup": "Pop-up",
 	"drawer": "App-Übersicht",
 	"style": "Stil",
-	"needReloadToApply": "Diese Einstellung tritt nach einer Aktualisierung der Seite in Kraft.",
-	"preview": "Vorschau"
+	"needReloadToApply": "Diese Einstellung tritt nach einer Aktualisierung der Seite in Kraft."
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
 	"auto": "Auto",
-	"noName": "No name",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -428,17 +415,14 @@ definePage(() => ({
 	"popup": "Pop up",
 	"drawer": "Drawer",
 	"style": "Style",
-	"needReloadToApply": "A reload is required for this to be reflected.",
-	"preview": "Preview"
+	"needReloadToApply": "A reload is required for this to be reflected."
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
 	"auto": "Automático",
-	"noName": "No hay nombre.",
 	"small": "Pequeño",
-	"medium": "Mediano",
 	"large": "Grande",
 	"emojiPalette": "Paleta emoji",
 	"emojiPaletteBanner": "Puedes registrar ajustes preestablecidos como paletas para que se muestren permanentemente en el selector de emojis, o personalizar el método de visualización del selector.",
@@ -453,17 +437,14 @@ definePage(() => ({
 	"popup": "Ventana emergente",
 	"drawer": "Cajón de Aplicaciones",
 	"style": "Diseño",
-	"needReloadToApply": "Se requiere un reinicio para la aplicar los cambios",
-	"preview": "Vista previa"
+	"needReloadToApply": "Se requiere un reinicio para la aplicar los cambios"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
 	"auto": "Automatique",
-	"noName": "No name",
 	"small": "Petit",
-	"medium": "Moyen",
 	"large": "Grand",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -478,17 +459,14 @@ definePage(() => ({
 	"popup": "Pop-up",
 	"drawer": "Sélecteur",
 	"style": "Style",
-	"needReloadToApply": "Ce paramètre s'appliquera après un rechargement.",
-	"preview": "Aperçu"
+	"needReloadToApply": "Ce paramètre s'appliquera après un rechargement."
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
 	"auto": "Otomatis",
-	"noName": "Tidak ada nama",
 	"small": "Kecil",
-	"medium": "Sedang",
 	"large": "Besar",
 	"emojiPalette": "Palet emoji",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -503,17 +481,14 @@ definePage(() => ({
 	"popup": "Pemunculan",
 	"drawer": "Drawer",
 	"style": "Gaya",
-	"needReloadToApply": "Pengaturan ini hanya akan diterapkan setelah memuat ulang halaman.",
-	"preview": "Pratinjau"
+	"needReloadToApply": "Pengaturan ini hanya akan diterapkan setelah memuat ulang halaman."
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
 	"auto": "Automatico",
-	"noName": "Senza nome",
 	"small": "Piccolo",
-	"medium": "Medio",
 	"large": "Grande",
 	"emojiPalette": "Tavolozza emoji",
 	"emojiPaletteBanner": "Puoi salvare i le emoji predefinite da appuntare in alto nel raccoglitore emoji come tavolozza e personalizzare in che modo visualizzare il raccoglitore.",
@@ -528,17 +503,14 @@ definePage(() => ({
 	"popup": "Popup",
 	"drawer": "Drawer",
 	"style": "Stile",
-	"needReloadToApply": "È necessario riavviare per rendere effettive le modifiche.",
-	"preview": "Anteprima"
+	"needReloadToApply": "È necessario riavviare per rendere effettive le modifiche."
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
 	"auto": "自動",
-	"noName": "名前はありません",
 	"small": "小",
-	"medium": "中",
 	"large": "大",
 	"emojiPalette": "絵文字パレット",
 	"emojiPaletteBanner": "絵文字ピッカーに固定表示するプリセットをパレットとして登録したり、ピッカーの表示方法をカスタマイズしたりできます。",
@@ -553,17 +525,14 @@ definePage(() => ({
 	"popup": "ポップアップ",
 	"drawer": "ドロワー",
 	"style": "スタイル",
-	"needReloadToApply": "反映には再起動が必要です。",
-	"preview": "プレビュー"
+	"needReloadToApply": "反映には再起動が必要です。"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
 	"auto": "自動",
-	"noName": "名前はあらへんで",
 	"small": "ちいさい",
-	"medium": "ふつう",
 	"large": "でかい",
 	"emojiPalette": "絵文字パレット",
 	"emojiPaletteBanner": "絵文字ピッカーに置いとくプリセットをパレットっていうので登録したり、ピッカーの見た目を変えたりできるで。",
@@ -578,17 +547,14 @@ definePage(() => ({
 	"popup": "ポップアップ",
 	"drawer": "ドロワー",
 	"style": "スタイル",
-	"needReloadToApply": "反映には再起動せなあかんで",
-	"preview": "プレビュー"
+	"needReloadToApply": "反映には再起動せなあかんで"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
 	"auto": "Auto",
-	"noName": "No name",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -603,17 +569,14 @@ definePage(() => ({
 	"popup": "Pop up",
 	"drawer": "Drawer",
 	"style": "Style",
-	"needReloadToApply": "A reload is required for this to be reflected.",
-	"preview": "Preview"
+	"needReloadToApply": "A reload is required for this to be reflected."
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
 	"auto": "Auto",
-	"noName": "No name",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -628,17 +591,14 @@ definePage(() => ({
 	"popup": "Pop up",
 	"drawer": "Drawer",
 	"style": "Style",
-	"needReloadToApply": "A reload is required for this to be reflected.",
-	"preview": "Preview"
+	"needReloadToApply": "A reload is required for this to be reflected."
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
 	"auto": "자동",
-	"noName": "이름이 없습니다.",
 	"small": "작게",
-	"medium": "보통",
 	"large": "크게",
 	"emojiPalette": "이모지 팔레트",
 	"emojiPaletteBanner": "이모티콘 선택기에 고정 표시되는 프리셋을 팔레트로 등록하거나 선택기의 표시 방법을 커스터마이징할 수 있습니다.",
@@ -653,17 +613,14 @@ definePage(() => ({
 	"popup": "팝업",
 	"drawer": "서랍",
 	"style": "스타일",
-	"needReloadToApply": "변경 사항은 새로고침하면 적용됩니다.",
-	"preview": "미리보기"
+	"needReloadToApply": "변경 사항은 새로고침하면 적용됩니다."
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
 	"auto": "Auto",
-	"noName": "No name",
 	"small": "Klein",
-	"medium": "Medium",
 	"large": "Groot",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -678,17 +635,14 @@ definePage(() => ({
 	"popup": "Pop-up",
 	"drawer": "Lade",
 	"style": "Stijl",
-	"needReloadToApply": "Deze instelling wordt van kracht nadat de pagina is vernieuwd.",
-	"preview": "Voorbeeld"
+	"needReloadToApply": "Deze instelling wordt van kracht nadat de pagina is vernieuwd."
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
 	"auto": "Automatisk",
-	"noName": "No name",
 	"small": "Liten",
-	"medium": "Medium",
 	"large": "Stor",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -703,17 +657,14 @@ definePage(() => ({
 	"popup": "Pop up",
 	"drawer": "Drawer",
 	"style": "Style",
-	"needReloadToApply": "A reload is required for this to be reflected.",
-	"preview": "Preview"
+	"needReloadToApply": "A reload is required for this to be reflected."
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
 	"auto": "Automatycznie",
-	"noName": "No name",
 	"small": "Małe",
-	"medium": "Średnie",
 	"large": "Duże",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -728,17 +679,14 @@ definePage(() => ({
 	"popup": "Wyskakujące okienka",
 	"drawer": "Schowek",
 	"style": "Styl",
-	"needReloadToApply": "To ustawienie zostanie zastosowane po odświeżeniu strony",
-	"preview": "Podgląd"
+	"needReloadToApply": "To ustawienie zostanie zastosowane po odświeżeniu strony"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
 	"auto": "Automático",
-	"noName": "Sem nome",
 	"small": "Pequeno",
-	"medium": "Médio",
 	"large": "Grande",
 	"emojiPalette": "Paleta de emojis",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -753,17 +701,14 @@ definePage(() => ({
 	"popup": "Pop-up",
 	"drawer": "Gaveta",
 	"style": "Estilo",
-	"needReloadToApply": "É necessário recarregar a página para refletir as alterações.",
-	"preview": "Pré-visualizar"
+	"needReloadToApply": "É necessário recarregar a página para refletir as alterações."
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
 	"auto": "Автоматически",
-	"noName": "Имя не указано",
 	"small": "Мелко",
-	"medium": "Средне",
 	"large": "Крупно",
 	"emojiPalette": "Палитра эмодзи",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -778,17 +723,14 @@ definePage(() => ({
 	"popup": "Всплывающие окна",
 	"drawer": "Панель",
 	"style": "Стиль",
-	"needReloadToApply": "Изменения вступят в силу после перезагрузки страницы.",
-	"preview": "Предпросмотр"
+	"needReloadToApply": "Изменения вступят в силу после перезагрузки страницы."
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
 	"auto": "Automaticky",
-	"noName": "No name",
 	"small": "Malé",
-	"medium": "Stredné",
 	"large": "Veľké",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -803,17 +745,14 @@ definePage(() => ({
 	"popup": "Pop up",
 	"drawer": "Drawer",
 	"style": "Style",
-	"needReloadToApply": "Toto nastavenie sa prejaví až po obnovení stránky.",
-	"preview": "Náhľad"
+	"needReloadToApply": "Toto nastavenie sa prejaví až po obnovení stránky."
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
 	"auto": "อัตโนมัติ",
-	"noName": "ไม่มีชื่อ",
 	"small": "เล็ก",
-	"medium": "ปานกลาง",
 	"large": "ใหญ่",
 	"emojiPalette": "จานสีเอโมจิ",
 	"emojiPaletteBanner": "สามารถบันทึกพรีเซ็ตเป็นจานสีเพื่อตรึงไว้ในตัวจิ้มเอโมจิ หรือปรับแต่งวิธีการแสดงผลของตัวจิ้มเอโมจิได้",
@@ -828,17 +767,14 @@ definePage(() => ({
 	"popup": "ป๊อปอัพ",
 	"drawer": "ตัววาด",
 	"style": "สไตล์",
-	"needReloadToApply": "ต้องรีโหลดเพื่อให้การเปลี่ยนแปลงมีผล",
-	"preview": "แสดงตัวอย่าง"
+	"needReloadToApply": "ต้องรีโหลดเพื่อให้การเปลี่ยนแปลงมีผล"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
 	"auto": "Otomatik",
-	"noName": "İsim yok",
 	"small": "Küçük",
-	"medium": "Orta",
 	"large": "Büyük",
 	"emojiPalette": "Emoji paleti",
 	"emojiPaletteBanner": "Emoji seçiciye kalıcı olarak bir palet olarak görüntülenecek ön ayarları kaydedebilir veya seçicinin nasıl görüntüleneceğini özelleştirebilirsiniz.",
@@ -853,17 +789,14 @@ definePage(() => ({
 	"popup": "Pop-up",
 	"drawer": "Çekmece",
 	"style": "Stil",
-	"needReloadToApply": "Bunun yansıtılması için yeniden yükleme yapılması gerekir.",
-	"preview": "Önizleme"
+	"needReloadToApply": "Bunun yansıtılması için yeniden yükleme yapılması gerekir."
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
 	"auto": "Auto",
-	"noName": "No name",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -878,17 +811,14 @@ definePage(() => ({
 	"popup": "Pop up",
 	"drawer": "Drawer",
 	"style": "Style",
-	"needReloadToApply": "A reload is required for this to be reflected.",
-	"preview": "Preview"
+	"needReloadToApply": "A reload is required for this to be reflected."
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
 	"auto": "Автоматично",
-	"noName": "Ім'я не вказано",
 	"small": "Маленький",
-	"medium": "Середній",
 	"large": "Крупний",
 	"emojiPalette": "Палітра емодзі",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -903,17 +833,14 @@ definePage(() => ({
 	"popup": "Спливаючі вікна",
 	"drawer": "Панель",
 	"style": "Стиль",
-	"needReloadToApply": "Зміни набудуть чинності після перезавантаження сторінки.",
-	"preview": "Попередній перегляд"
+	"needReloadToApply": "Зміни набудуть чинності після перезавантаження сторінки."
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
 	"auto": "Tự động",
-	"noName": "No name",
 	"small": "Nhỏ",
-	"medium": "Vừa",
 	"large": "Lớn",
 	"emojiPalette": "Emoji palette",
 	"emojiPaletteBanner": "You can register presets as palettes to display prominently in the emoji picker or customize the appearance of the picker.",
@@ -928,17 +855,14 @@ definePage(() => ({
 	"popup": "Cửa sổ bật lên",
 	"drawer": "Ngăn ứng dụng",
 	"style": "Phong cách",
-	"needReloadToApply": "Cần tải lại để điều này được áp dụng.",
-	"preview": "Xem trước"
+	"needReloadToApply": "Cần tải lại để điều này được áp dụng."
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
 	"auto": "自动",
-	"noName": "未命名",
 	"small": "小",
-	"medium": "中",
 	"large": "大",
 	"emojiPalette": "表情符号选择器",
 	"emojiPaletteBanner": "可以将固定显示在表情符号选择器中的预设注册为调色板，也可以自定义表情符号选择器的显示方式。",
@@ -953,17 +877,14 @@ definePage(() => ({
 	"popup": "弹窗",
 	"drawer": "抽屉",
 	"style": "样式",
-	"needReloadToApply": "重新载入后应用才会生效。",
-	"preview": "预览"
+	"needReloadToApply": "重新载入后应用才会生效。"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
 	"auto": "自動",
-	"noName": "沒有名稱",
 	"small": "小",
-	"medium": "中",
 	"large": "大",
 	"emojiPalette": "表情符號調色盤",
 	"emojiPaletteBanner": "可以將固定顯示在表情符號選擇器的預設項目註冊為調色盤，或者自訂選擇器的顯示方式。",
@@ -978,7 +899,6 @@ definePage(() => ({
 	"popup": "彈出式視窗",
 	"drawer": "側邊欄",
 	"style": "風格",
-	"needReloadToApply": "必須重新載入才會生效。",
-	"preview": "預覽"
+	"needReloadToApply": "必須重新載入才會生效。"
 }
 </locale>

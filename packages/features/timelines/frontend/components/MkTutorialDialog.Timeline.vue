@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div style="text-align: center; padding: 0 16px;">{{ $locale.sfc.initialTutorialTimelineDescription1 }}</div>
 	<div class="_gaps_s">
 		<div v-for="tl in basicTimelineTypes">
-			<i :class="basicTimelineIconClass(tl)"></i> <b>{{ copyLocaleDictionary($locale.sfc.timelinesLabels)[tl] }}</b> … {{ copyLocaleDictionary($locale.sfc.initialTutorialTimelineLabels)[tl] }}
+			<i :class="basicTimelineIconClass(tl)"></i> <b>{{ copyLocaleDictionary(globalLocale.env._timelines)[tl] }}</b> … {{ copyLocaleDictionary($locale.sfc.initialTutorialTimelineLabels)[tl] }}
 		</div>
 	</div>
 	<div class="_gaps_s">
@@ -25,8 +25,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/frontend/timelines.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 </script>
 
 <style lang="scss" module>
@@ -88,12 +92,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="ar-SA">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "الرئيسي",
-		"local": "المحلي",
-		"social": "الاجتماعي",
-		"global": "الشامل"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -113,12 +111,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="ca-ES">
 {
 	"initialTutorialTimelineDescription1": "Misskey mostra diferents línies de temps basades en l'ús (algunes poden no estar disponibles depenent de la política del servidor)",
-	"timelinesLabels": {
-		"home": "Inici",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "El concepte de les línies de temps",
 		"description1": "Misskey mostra diferents línies de temps basades en l'ús (algunes poden no estar disponibles depenent de la política del servidor)",
@@ -138,12 +130,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="cs-CZ">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Domů",
-		"local": "Místní",
-		"social": "Sociální síť",
-		"global": "Globální"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -163,12 +149,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="da-DK">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -188,12 +168,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="de-DE">
 {
 	"initialTutorialTimelineDescription1": "Misskey stellt mehrere Chroniken bereit (einige können je nach den Richtlinien des Servers nicht verfügbar sein).",
-	"timelinesLabels": {
-		"home": "Startseite",
-		"local": "Lokal",
-		"social": "Sozial",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "So funktionieren die Chroniken",
 		"description1": "Misskey stellt mehrere Chroniken bereit (einige können je nach den Richtlinien des Servers nicht verfügbar sein).",
@@ -213,12 +187,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="en-US">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -238,12 +206,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="es-ES">
 {
 	"initialTutorialTimelineDescription1": "Misskey proporciona múltiples líneas de tiempo basadas en su uso (algunas pueden no estar disponibles dependiendo de las políticas de la instancia).",
-	"timelinesLabels": {
-		"home": "Inicio",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "El concepto de Línea de tiempo",
 		"description1": "Misskey proporciona múltiples líneas de tiempo basadas en su uso (algunas pueden no estar disponibles dependiendo de las políticas de la instancia).",
@@ -263,12 +225,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="fr-FR">
 {
 	"initialTutorialTimelineDescription1": "Misskey offre plusieurs fils selon l'usage (certains peuvent être désactivés par le serveur).",
-	"timelinesLabels": {
-		"home": "Principal",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "Fonctionnement des fils",
 		"description1": "Misskey offre plusieurs fils selon l'usage (certains peuvent être désactivés par le serveur).",
@@ -288,12 +244,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="id-ID">
 {
 	"initialTutorialTimelineDescription1": "Misskey menyediakan berbagai lini masa sesuai dengan penggunaan (beberapa mungkin tidak tersedia karena bergantung dengan kebijakan peladen).",
-	"timelinesLabels": {
-		"home": "Beranda",
-		"local": "Lokal",
-		"social": "Sosial",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "Konsep Lini Masa",
 		"description1": "Misskey menyediakan berbagai lini masa sesuai dengan penggunaan (beberapa mungkin tidak tersedia karena bergantung dengan kebijakan peladen).",
@@ -313,12 +263,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="it-IT">
 {
 	"initialTutorialTimelineDescription1": "Misskey fornisce alcune Timeline (sequenze cronologiche di Note). Una di queste potrebbe essere stata disattivata dagli amministratori.",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Locale",
-		"social": "Sociale",
-		"global": "Federata"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "Come funziona la Timeline",
 		"description1": "Misskey fornisce alcune Timeline (sequenze cronologiche di Note). Una di queste potrebbe essere stata disattivata dagli amministratori.",
@@ -338,12 +282,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="ja-JP">
 {
 	"initialTutorialTimelineDescription1": "Misskeyには、使い方に応じて複数のタイムラインが用意されています（サーバーによってはいずれかが無効になっていることがあります）。",
-	"timelinesLabels": {
-		"home": "ホーム",
-		"local": "ローカル",
-		"social": "ソーシャル",
-		"global": "グローバル"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "タイムラインのしくみ",
 		"description1": "Misskeyには、使い方に応じて複数のタイムラインが用意されています（サーバーによってはいずれかが無効になっていることがあります）。",
@@ -363,12 +301,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="ja-KS">
 {
 	"initialTutorialTimelineDescription1": "Misskeyには、いろいろタイムラインがあんで（ただ、サーバーによっては無効化されてるところもあるな）。",
-	"timelinesLabels": {
-		"home": "ホーム",
-		"local": "ローカル",
-		"social": "ソーシャル",
-		"global": "グローバル"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "タイムラインのしくみ",
 		"description1": "Misskeyには、いろいろタイムラインがあんで（ただ、サーバーによっては無効化されてるところもあるな）。",
@@ -388,12 +320,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="kab-KAB">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -413,12 +339,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="kn-IN">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -438,12 +358,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="ko-KR">
 {
 	"initialTutorialTimelineDescription1": "Misskey에는 종류에 따라 여러 가지의 타임라인으로 구성되어 있습니다.(서버에 따라서는 일부 타임라인을 사용할 수 없는 경우가 있습니다)",
-	"timelinesLabels": {
-		"home": "홈",
-		"local": "로컬",
-		"social": "소셜",
-		"global": "글로벌"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "타임라인에 대하여",
 		"description1": "Misskey에는 종류에 따라 여러 가지의 타임라인으로 구성되어 있습니다.(서버에 따라서는 일부 타임라인을 사용할 수 없는 경우가 있습니다)",
@@ -463,12 +377,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="nl-NL">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Startpagina",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -488,12 +396,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="no-NO">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Hjem",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -513,12 +415,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="pl-PL">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Strona główna",
-		"local": "Lokalne",
-		"social": "Społeczność",
-		"global": "Globalna"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -538,12 +434,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="pt-PT">
 {
 	"initialTutorialTimelineDescription1": "Misskey providencia diversas linhas do tempo baseadas na sua utilidade (algumas podem não estar disponíveis a partir das configurações da instância).",
-	"timelinesLabels": {
-		"home": "Início",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "O Conceito das Linhas do Tempo",
 		"description1": "Misskey providencia diversas linhas do tempo baseadas na sua utilidade (algumas podem não estar disponíveis a partir das configurações da instância).",
@@ -563,12 +453,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="ru-RU">
 {
 	"initialTutorialTimelineDescription1": "Misskey предоставляет несколько лент в зависимости от того как вы им пользуетесь (некоторые могут быть недоступны в зависимости от правил сервера).",
-	"timelinesLabels": {
-		"home": "Персональная",
-		"local": "Местная",
-		"social": "Социальная",
-		"global": "Всеобщая"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "Концепция Лент",
 		"description1": "Misskey предоставляет несколько лент в зависимости от того как вы им пользуетесь (некоторые могут быть недоступны в зависимости от правил сервера).",
@@ -588,12 +472,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="sk-SK">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Domov",
-		"local": "Lokálne",
-		"social": "Sociálne",
-		"global": "Globálne"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -613,12 +491,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="th-TH">
 {
 	"initialTutorialTimelineDescription1": "Misskey มีหลายไทม์ไลน์ขึ้นอยู่กับวิธีการใช้งานของคุณ (บางไทม์ไลน์อาจไม่สามารถใช้ได้ขึ้นอยู่กับนโยบายของเซิร์ฟเวอร์)",
-	"timelinesLabels": {
-		"home": "หน้าหลัก",
-		"local": "ท้องถิ่น",
-		"social": "โซเชียล",
-		"global": "ทั่วโลก"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "แนวคิดเรื่องของไทม์ไลน์",
 		"description1": "Misskey มีหลายไทม์ไลน์ขึ้นอยู่กับวิธีการใช้งานของคุณ (บางไทม์ไลน์อาจไม่สามารถใช้ได้ขึ้นอยู่กับนโยบายของเซิร์ฟเวอร์)",
@@ -638,12 +510,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="tr-TR">
 {
 	"initialTutorialTimelineDescription1": "Misskey, kullanıma göre birden fazla Pano sunar (Bazı Pano'lar sunucunun politikalarına bağlı olarak kullanılamayabilir).",
-	"timelinesLabels": {
-		"home": "Pano",
-		"local": "Yerel",
-		"social": "Sosyal",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "Pano Kavramı",
 		"description1": "Misskey, kullanıma göre birden fazla Pano sunar (Bazı Pano'lar sunucunun politikalarına bağlı olarak kullanılamayabilir).",
@@ -663,12 +529,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="ug-CN">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -688,12 +548,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="uk-UA">
 {
 	"initialTutorialTimelineDescription1": "Misskey надає декілька стрічок в залежності від того, як ви ними користуєтесь (деякі можуть бути недоступні в залежності від правил серверу).",
-	"timelinesLabels": {
-		"home": "Домівка",
-		"local": "Локальна",
-		"social": "Соціальна",
-		"global": "Глобальна"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "Концепт Стрічок",
 		"description1": "Misskey надає декілька стрічок в залежності від того, як ви ними користуєтесь (деякі можуть бути недоступні в залежності від правил серверу).",
@@ -713,12 +567,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="vi-VN">
 {
 	"initialTutorialTimelineDescription1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
-	"timelinesLabels": {
-		"home": "Trang chính",
-		"local": "Máy chủ này",
-		"social": "Xã hội",
-		"global": "Liên hợp"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "The Concept of Timelines",
 		"description1": "Misskey provides multiple timelines based on usage (some may not be available depending on the server's policies).",
@@ -738,12 +586,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="zh-CN">
 {
 	"initialTutorialTimelineDescription1": "Misskey 根据使用方式提供了多个时间线（根据服务器的设定，可能有一些被禁用）。",
-	"timelinesLabels": {
-		"home": "首页",
-		"local": "本地",
-		"social": "社交",
-		"global": "全局"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "时间线的运作方式",
 		"description1": "Misskey 根据使用方式提供了多个时间线（根据服务器的设定，可能有一些被禁用）。",
@@ -763,12 +605,6 @@ import { basicTimelineIconClass, basicTimelineTypes } from '@features/timelines/
 <locale lang="json" locale="zh-TW">
 {
 	"initialTutorialTimelineDescription1": "Misskey根據使用方式提供了多個時間軸（伺服器可能會將部份時間軸停用）。",
-	"timelinesLabels": {
-		"home": "首頁",
-		"local": "本地",
-		"social": "社交",
-		"global": "公開"
-	},
 	"initialTutorialTimelineLabels": {
 		"title": "時間軸如何運作",
 		"description1": "Misskey根據使用方式提供了多個時間軸（伺服器可能會將部份時間軸停用）。",

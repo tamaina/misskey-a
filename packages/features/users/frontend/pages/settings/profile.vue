@@ -65,9 +65,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #label><SearchLabel>{{ $locale.sfc.metadataEdit }}</SearchLabel></template>
 					<template #footer>
 						<div class="_buttons">
-							<MkButton primary @click="saveFields"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
-							<MkButton :disabled="fields.length >= 16" @click="addField"><i class="ti ti-plus"></i> {{ $locale.sfc.add }}</MkButton>
-							<MkButton v-if="!fieldEditMode" :disabled="fields.length <= 1" danger @click="fieldEditMode = !fieldEditMode"><i class="ti ti-trash"></i> {{ $locale.sfc.delete }}</MkButton>
+							<MkButton primary @click="saveFields"><i class="ti ti-check"></i> {{ globalLocale.env.save }}</MkButton>
+							<MkButton :disabled="fields.length >= 16" @click="addField"><i class="ti ti-plus"></i> {{ globalLocale.env.add }}</MkButton>
+							<MkButton v-if="!fieldEditMode" :disabled="fields.length <= 1" danger @click="fieldEditMode = !fieldEditMode"><i class="ti ti-trash"></i> {{ globalLocale.env.delete }}</MkButton>
 							<MkButton v-else @click="fieldEditMode = !fieldEditMode"><i class="ti ti-arrows-sort"></i> {{ $locale.sfc.rearrange }}</MkButton>
 						</div>
 					</template>
@@ -116,7 +116,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkSelect
 				v-model="reactionAcceptance"
 				:items="[
-					{ label: $locale.sfc.all, value: null },
+					{ label: globalLocale.env.all, value: null },
 					{ label: $locale.sfc.likeOnlyForRemote, value: 'likeOnlyForRemote' },
 					{ label: $locale.sfc.nonSensitiveOnly, value: 'nonSensitiveOnly' },
 					{ label: $locale.sfc.nonSensitiveOnlyForLocalLikeOnlyForRemote, value: 'nonSensitiveOnlyForLocalLikeOnlyForRemote' },
@@ -162,6 +162,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, reactive, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -183,6 +184,10 @@ import { store } from '@features/preferences/frontend/store.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import { genId } from '@features/runtime/frontend/utility/id.js';
+import { updateCurrentAccount, updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -256,7 +261,12 @@ function save() {
 			title: $locale.value.sfc.yourNameContainsProhibitedWords,
 			text: $locale.value.sfc.yourNameContainsProhibitedWordsDescription,
 		},
+	}).then((res) => {
+		updateCurrentAccount(res);
+	}).catch(() => {
+		// エラーダイアログは apiWithDialog 側で表示済み
 	});
+
 	claimAchievement('profileFilled');
 	if (profile.name === 'syuilo' || profile.name === 'しゅいろ') {
 		claimAchievement('setNameToSyuilo');
@@ -270,9 +280,19 @@ function changeAvatar(ev: PointerEvent) {
 	async function done(driveFile: Misskey.entities.DriveFile) {
 		const i = await os.apiWithDialog('i/update', {
 			avatarId: driveFile.id,
+		}, undefined, {
+			'71bb5e53-4742-4609-b465-36081e131208': {
+				title: $locale.value.sfc.cannotSelectSensitiveMedia,
+				text: $locale.value.sfc.cannotSelectSensitiveMediaDescription,
+			},
+		}).catch(() => null); // エラーダイアログは apiWithDialog 側で表示済み
+		if (i == null) return;
+
+		updateCurrentAccountPartial({
+			avatarId: i.avatarId,
+			avatarUrl: i.avatarUrl,
+			avatarBlurhash: i.avatarBlurhash,
 		});
-		$i.avatarId = i.avatarId;
-		$i.avatarUrl = i.avatarUrl;
 		claimAchievement('profileFilled');
 	}
 
@@ -280,7 +300,7 @@ function changeAvatar(ev: PointerEvent) {
 		text: $locale.value.sfc.avatar,
 		type: 'label',
 	}, {
-		text: $locale.value.sfc.upload,
+		text: globalLocale.value.env.upload,
 		icon: 'ti ti-upload',
 		action: async () => {
 			const files = await os.chooseFileFromPc({ multiple: false });
@@ -305,30 +325,58 @@ function changeAvatar(ev: PointerEvent) {
 			done(driveFile);
 		},
 	}, {
-		text: $locale.value.sfc.fromDrive,
+		text: globalLocale.value.env.fromDrive,
 		icon: 'ti ti-cloud',
 		action: () => {
-			chooseDriveFile({ multiple: false }).then(files => {
+			chooseDriveFile({ multiple: false, excludeSensitive: true }).then(files => {
 				done(files[0]);
 			});
 		},
-	}], ev.currentTarget ?? ev.target);
+	}, ...($i.avatarId != null ? [
+		{ type: 'divider' as const },
+		{
+			type: 'button' as const,
+			text: $locale.value.sfc.detach,
+			icon: 'ti ti-circle-x',
+			action: () => {
+				os.apiWithDialog('i/update', {
+					avatarId: null,
+				}).then((res) => {
+					updateCurrentAccountPartial({
+						avatarId: res.avatarId,
+						avatarUrl: res.avatarUrl,
+						avatarBlurhash: res.avatarBlurhash,
+					});
+				}).catch(() => {
+					// エラーダイアログは apiWithDialog 側で表示済み
+				});
+			},
+		},
+	] : [])], ev.currentTarget ?? ev.target);
 }
 
 function changeBanner(ev: PointerEvent) {
 	async function done(driveFile: Misskey.entities.DriveFile) {
 		const i = await os.apiWithDialog('i/update', {
 			bannerId: driveFile.id,
+		}, undefined, {
+			'e148b34c-9f33-4300-93e0-7817008fb366': {
+				title: $locale.value.sfc.cannotSelectSensitiveMedia,
+				text: $locale.value.sfc.cannotSelectSensitiveMediaDescription,
+			},
+		}).catch(() => null); // エラーダイアログは apiWithDialog 側で表示済み
+		if (i == null) return;
+		updateCurrentAccountPartial({
+			bannerId: i.bannerId,
+			bannerUrl: i.bannerUrl,
 		});
-		$i.bannerId = i.bannerId;
-		$i.bannerUrl = i.bannerUrl;
 	}
 
 	os.popupMenu([{
 		text: $locale.value.sfc.banner,
 		type: 'label',
 	}, {
-		text: $locale.value.sfc.upload,
+		text: globalLocale.value.env.upload,
 		icon: 'ti ti-upload',
 		action: async () => {
 			const files = await os.chooseFileFromPc({ multiple: false });
@@ -353,14 +401,33 @@ function changeBanner(ev: PointerEvent) {
 			done(driveFile);
 		},
 	}, {
-		text: $locale.value.sfc.fromDrive,
+		text: globalLocale.value.env.fromDrive,
 		icon: 'ti ti-cloud',
 		action: () => {
-			chooseDriveFile({ multiple: false }).then(files => {
+			chooseDriveFile({ multiple: false, excludeSensitive: true }).then(files => {
 				done(files[0]);
 			});
 		},
-	}], ev.currentTarget ?? ev.target);
+	}, ...($i.bannerId ? [
+		{ type: 'divider' as const },
+		{
+			type: 'button' as const,
+			text: $locale.value.sfc.detach,
+			icon: 'ti ti-circle-x',
+			action: () => {
+				os.apiWithDialog('i/update', {
+					bannerId: null,
+				}).then((res) => {
+					updateCurrentAccountPartial({
+						bannerId: res.bannerId,
+						bannerUrl: res.bannerUrl,
+					});
+				}).catch(() => {
+					// エラーダイアログは apiWithDialog 側で表示済み
+				});
+			},
+		},
+	] : [])], ev.currentTarget ?? ev.target);
 }
 
 const headerActions = computed(() => []);
@@ -457,11 +524,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "الصورة الرمزية",
-	"upload": "ارفع",
 	"cropImageAsk": "أتريد اقتصاص هذه الصورة",
 	"cropYes": "اقتص",
 	"cropNo": "استخدمها كما هي",
-	"fromDrive": "من المخزن",
 	"banner": "الصورة الرأسية",
 	"profile": "الملف التعريفي",
 	"changeBanner": "غيّر اللافتة",
@@ -474,9 +539,6 @@ definePage(() => ({
 	"birthday": "تاريخ الميلاد",
 	"language": "اللغة",
 	"metadataEdit": "عدّل المعلومات الإضافية",
-	"save": "حفظ",
-	"add": "إضافة",
-	"delete": "حذف",
 	"rearrange": "أعد الترتيب",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "التسمية",
@@ -485,7 +547,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "الكل",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -505,11 +566,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "El nom conté paraules prohibides ",
 	"yourNameContainsProhibitedWordsDescription": "Si de veritat vols fer servir aquest nom posat en contacte amb l'administrador.",
 	"avatar": "Icona",
-	"upload": "Puja",
 	"cropImageAsk": "Vols retallar la imatge?",
 	"cropYes": "Retallar",
 	"cropNo": "Fer servir tal qual",
-	"fromDrive": "Des del Disc",
 	"banner": "Bàner",
 	"profile": "Perfil",
 	"changeBanner": "Canviar el bàner ",
@@ -522,9 +581,6 @@ definePage(() => ({
 	"birthday": "Aniversari",
 	"language": "Idioma",
 	"metadataEdit": "Editar la informació adicional ",
-	"save": "Desa",
-	"add": "Afegir",
-	"delete": "Elimina",
 	"rearrange": "Torna a ordenar",
 	"verifiedLinkDescription": "Escrivint una adreça URL que enllaci a aquest perfil, una icona de propietat verificada es mostrarà al costat del camp.",
 	"metadataLabel": "Etiqueta ",
@@ -533,7 +589,6 @@ definePage(() => ({
 	"followedMessage": "Missatge als nous seguidors",
 	"followedMessageDescription": "Es pot configurar un missatge curt que es mostra a l'altra persona quan comença a seguir-te.",
 	"followedMessageDescriptionForLockedAccount": "Si comencen a seguir-te es mostra un missatge de quan es permet aquesta sol·licitud. ",
-	"all": "Tot",
 	"likeOnlyForRemote": "Tot (només m'agraden d'instàncies remotes)",
 	"nonSensitiveOnly": "Només sense contingut sensible",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Només contingut no sensible (Només m'agraden d'instàncies remotes)",
@@ -544,7 +599,9 @@ definePage(() => ({
 	"flagAsCatDescription": "Activeu aquesta opció per marcar aquest compte com a gat.",
 	"flagAsBot": "Marca aquest compte com a bot",
 	"flagAsBotDescription": "Activa aquesta opció si el compte el controla un programa. Si s'activa, actuarà com un senyal per altres desenvolupadors per prevenir cadenes d'interacció sense fi i ajustar els paràmetres interns de Misskey pe tractar el compte com un bot.",
-	"qr": "Codi QR"
+	"qr": "Codi QR",
+	"cannotSelectSensitiveMedia": "No podeu seleccionar mitjans sensibles",
+	"cannotSelectSensitiveMediaDescription": "Si aquest error apareix tot i que no heu marcat el contingut com a sensible vosaltres mateixos, pot ser que s'hagi considerat un mitjà sensible per una detecció automàtica.\nSi, d'acord amb les normes del servidor, no cal que ho sigui, desactiveu la configuració de contingut sensible del fitxer i torneu-ho a provar."
 }
 </locale>
 
@@ -553,11 +610,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Nahrát soubory",
 	"cropImageAsk": "Chcete oříznout tenhle obrázek?",
 	"cropYes": "Uříznout",
 	"cropNo": "Použít tak jak je",
-	"fromDrive": "Z disku",
 	"banner": "Baner",
 	"profile": "Váš profil",
 	"changeBanner": "Změnit banner",
@@ -570,9 +625,6 @@ definePage(() => ({
 	"birthday": "Datum narození",
 	"language": "Jazyk",
 	"metadataEdit": "Upravit doplňující informace",
-	"save": "Uložit",
-	"add": "Přidat",
-	"delete": "Smazat",
 	"rearrange": "Přeřadit",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Popisek",
@@ -581,7 +633,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Vše",
 	"likeOnlyForRemote": "Všechny (Pouze \"oblíbené\" pro vzdálenou instanci)",
 	"nonSensitiveOnly": "Pouze bez citlivých medií",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Pouze bez citlivých medií (Pouze vzdálený \"oblíbený\")",
@@ -601,11 +652,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Upload",
 	"cropImageAsk": "Do you want to crop this image?",
 	"cropYes": "Crop",
 	"cropNo": "Use as-is",
-	"fromDrive": "From Drive",
 	"banner": "Banner",
 	"profile": "Profile",
 	"changeBanner": "Change banner",
@@ -618,9 +667,6 @@ definePage(() => ({
 	"birthday": "Birthday",
 	"language": "Language",
 	"metadataEdit": "Edit additional Information",
-	"save": "Save",
-	"add": "Add",
-	"delete": "Delete",
 	"rearrange": "Rearrange",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Label",
@@ -629,7 +675,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -649,11 +694,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Dein Name enthält einen verbotenen Begriff",
 	"yourNameContainsProhibitedWordsDescription": "Der Name enthält eine verbotene Zeichenfolge. Wende dich an deinen Serveradministrator, wenn du diesen Namen verwenden möchtest.",
 	"avatar": "Profilbild",
-	"upload": "Hochladen",
 	"cropImageAsk": "Möchtest du das Bild zuschneiden?",
 	"cropYes": "Zuschneiden",
 	"cropNo": "Unbearbeitet verwenden",
-	"fromDrive": "Aus Drive",
 	"banner": "Banner",
 	"profile": "Profil",
 	"changeBanner": "Banner ändern",
@@ -666,9 +709,6 @@ definePage(() => ({
 	"birthday": "Geburtstag",
 	"language": "Sprache",
 	"metadataEdit": "Zusätzliche Informationen bearbeiten",
-	"save": "Speichern",
-	"add": "Hinzufügen",
-	"delete": "Löschen",
 	"rearrange": "Sortieren",
 	"verifiedLinkDescription": "Gibst du hier eine URL ein, die einen Link zu deinem Profile enthält, wird neben diesem Feld ein Icon zur Besitzbestätigung angezeigt.",
 	"metadataLabel": "Beschriftung",
@@ -677,7 +717,6 @@ definePage(() => ({
 	"followedMessage": "Nachricht, wenn dir jemand folgt",
 	"followedMessageDescription": "Du kannst eine kurze Nachricht festlegen, die dem Empfänger angezeigt wird, wenn er dir folgt.",
 	"followedMessageDescriptionForLockedAccount": "Wenn Folgeanfragen deine Genehmigung brauchen, wird dies beim Genehmigen einer Anfrage angezeigt.",
-	"all": "Alle",
 	"likeOnlyForRemote": "Alle (Nur \"Gefällt mir\" für fremde Instanzen)",
 	"nonSensitiveOnly": "Keine Sensitiven",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Keine Sensitiven (Nur \"Gefällt mir\" von fremden Instanzen)",
@@ -697,11 +736,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Upload",
 	"cropImageAsk": "Do you want to crop this image?",
 	"cropYes": "Crop",
 	"cropNo": "Use as-is",
-	"fromDrive": "From Drive",
 	"banner": "Banner",
 	"profile": "Profile",
 	"changeBanner": "Change banner",
@@ -714,9 +751,6 @@ definePage(() => ({
 	"birthday": "Birthday",
 	"language": "Language",
 	"metadataEdit": "Edit additional Information",
-	"save": "Save",
-	"add": "Add",
-	"delete": "Delete",
 	"rearrange": "Rearrange",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Label",
@@ -725,7 +759,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -745,11 +778,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Tu nombre contiene palabras prohibidas",
 	"yourNameContainsProhibitedWordsDescription": "Si deseas usar este nombre, por favor contacta con tu administrador/a de tu servidor",
 	"avatar": "Avatar",
-	"upload": "Subir",
 	"cropImageAsk": "¿Desea recortar la imagen?",
 	"cropYes": "Recortar",
 	"cropNo": "Usar como está",
-	"fromDrive": "Desde el drive",
 	"banner": "Banner",
 	"profile": "Perfil",
 	"changeBanner": "Cambiar banner",
@@ -762,9 +793,6 @@ definePage(() => ({
 	"birthday": "Cumpleaños",
 	"language": "Idioma",
 	"metadataEdit": "Editar información adicional",
-	"save": "Guardar",
-	"add": "Agregar",
-	"delete": "Borrar",
 	"rearrange": "Ordenar",
 	"verifiedLinkDescription": "Introduciendo una URL que contiene un enlace a tu perfil, se puede mostrar un icono de verificación de propiedad al lado del campo.",
 	"metadataLabel": "Etiqueta",
@@ -773,7 +801,6 @@ definePage(() => ({
 	"followedMessage": "Mensaje cuando te han seguido",
 	"followedMessageDescription": "Puedes establecer un mensaje de bienvenida para nuevos seguidores.",
 	"followedMessageDescriptionForLockedAccount": "Si apruebas manualmente seguidores, el mensaje se mostrará al seguidor en el momento de la aprobación.",
-	"all": "Todo",
 	"likeOnlyForRemote": "Sólo reacciones de instancias remotas",
 	"nonSensitiveOnly": "Solo no sensible",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Sólo no contenido sensible (sólo me gusta en remoto)",
@@ -784,7 +811,9 @@ definePage(() => ({
 	"flagAsCatDescription": "Activa esta opción para marcar esta cuenta como un gato.",
 	"flagAsBot": "Esta cuenta es un bot",
 	"flagAsBotDescription": "Activa esta opción si la cuenta es utilizada por un programa. Si se activa, actuará como una etiqueta para otros desarrolladores para prevenir cadenas eternas de interacción con otros bots, y ajustará los sistemas internos de Misskey para tratar esta cuenta de manera acorde.",
-	"qr": "Código QR"
+	"qr": "Código QR",
+	"cannotSelectSensitiveMedia": "No se puede seleccionar contenido sensible",
+	"cannotSelectSensitiveMediaDescription": "Si te aparece este error sin haber marcado el contenido como sensible, es posible que el archivo se haya clasificado como tal de manera automática.\nSi no va en contra de las normas del servidor,  quita la marca de contenido sensible del archivo e inténtalo de nuevo."
 }
 </locale>
 
@@ -793,11 +822,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Téléverser",
 	"cropImageAsk": "Voulez-vous recadrer cette image ?",
 	"cropYes": "Rogner",
 	"cropNo": "Utiliser en l'état",
-	"fromDrive": "Depuis le Disque",
 	"banner": "Bannière",
 	"profile": "Profil",
 	"changeBanner": "Changer de bannière",
@@ -810,9 +837,6 @@ definePage(() => ({
 	"birthday": "Date de naissance",
 	"language": "Langue",
 	"metadataEdit": "Éditer les informations supplémentaires",
-	"save": "Enregistrer",
-	"add": "Ajouter",
-	"delete": "Supprimer",
 	"rearrange": "Trier par",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Étiquette",
@@ -821,7 +845,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Tous",
 	"likeOnlyForRemote": "Toutes (mentions j'aime seulement pour les instances distantes)",
 	"nonSensitiveOnly": "Non sensibles seulement",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non sensibles seulement (mentions j'aime seulement pour les instances distantes)",
@@ -841,11 +864,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Nama yang ingin dipakai memuat kata terlarang",
 	"yourNameContainsProhibitedWordsDescription": "Jika anda ingin menggunakan nama ini, mohon hubungi admin peladen.",
 	"avatar": "Avatar",
-	"upload": "Unggah",
 	"cropImageAsk": "Ingin memotong gambar?",
 	"cropYes": "Potong",
 	"cropNo": "Gunakan apa adanya",
-	"fromDrive": "Dari Drive",
 	"banner": "Banner",
 	"profile": "Profil",
 	"changeBanner": "Ubah header",
@@ -858,9 +879,6 @@ definePage(() => ({
 	"birthday": "Tanggal lahir",
 	"language": "Bahasa",
 	"metadataEdit": "Sunting informasi tambahan",
-	"save": "Simpan",
-	"add": "Tambahkan",
-	"delete": "Hapus",
 	"rearrange": "Tata ulang",
 	"verifiedLinkDescription": "Dengan memasukkan URL yang mengandung tautan ke profil kamu di sini, ikon verifikasi kepemilikan dapat ditampilkan di sebelah kolom ini.",
 	"metadataLabel": "Label",
@@ -869,7 +887,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Semua",
 	"likeOnlyForRemote": "Semua (Hanya suka dari instansi luar)",
 	"nonSensitiveOnly": "Hanya non-sensitif",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Hanya non-sensitif (Hanya suka dari instansi luar)",
@@ -889,11 +906,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Il nome che hai scelto contiene una o più parole vietate",
 	"yourNameContainsProhibitedWordsDescription": "Se desideri comunque utilizzare questo nome, contatta l''amministrazione.",
 	"avatar": "Foto del profilo",
-	"upload": "Carica",
 	"cropImageAsk": "Vuoi ritagliare l'immagine?",
 	"cropYes": "Ritaglia",
 	"cropNo": "Non ritagliare",
-	"fromDrive": "Dal Drive",
 	"banner": "Intestazione",
 	"profile": "Profilo",
 	"changeBanner": "Cambia intestazione",
@@ -906,9 +921,6 @@ definePage(() => ({
 	"birthday": "Compleanno",
 	"language": "Lingua",
 	"metadataEdit": "Modifica informazioni aggiuntive",
-	"save": "Salva",
-	"add": "Aggiungi",
-	"delete": "Elimina",
 	"rearrange": "Riordina",
 	"verifiedLinkDescription": "Come avere i collegamenti verificati: inserisci la URL ad una pagina che contiene un collegamento al tuo profilo.\nVedrai una spunta di conferma se, in quella pagina, il collegamento al tuo profilo Misskey ha attributo rel='me'.",
 	"metadataLabel": "Etichetta",
@@ -917,7 +929,6 @@ definePage(() => ({
 	"followedMessage": "Messaggio, quando qualcuno ti segue",
 	"followedMessageDescription": "Puoi impostare un breve messaggio da mostrare agli altri profili quando ti seguono.",
 	"followedMessageDescriptionForLockedAccount": "Quando approvi una richiesta di follow, verrà visualizzato questo testo.",
-	"all": "Tutte",
 	"likeOnlyForRemote": "Solo Like remoti",
 	"nonSensitiveOnly": "Soltanto non espliciti",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Soltanto non espliciti (reazioni remote)",
@@ -937,11 +948,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "変更しようとした名前に禁止された文字列が含まれています",
 	"yourNameContainsProhibitedWordsDescription": "名前に禁止されている文字列が含まれています。この名前を使用したい場合は、サーバー管理者にお問い合わせください。",
 	"avatar": "アイコン",
-	"upload": "アップロード",
 	"cropImageAsk": "画像をクロップしますか？",
 	"cropYes": "クロップする",
 	"cropNo": "そのまま使う",
-	"fromDrive": "ドライブから",
 	"banner": "バナー",
 	"profile": "プロフィール",
 	"changeBanner": "バナー画像を変更",
@@ -954,9 +963,6 @@ definePage(() => ({
 	"birthday": "誕生日",
 	"language": "言語",
 	"metadataEdit": "追加情報を編集",
-	"save": "保存",
-	"add": "追加",
-	"delete": "削除",
 	"rearrange": "並び替え",
 	"verifiedLinkDescription": "内容にURLを設定すると、リンク先のWebサイトに自分のプロフィールへのリンクが含まれている場合に所有者確認済みアイコンを表示させることができます。",
 	"metadataLabel": "ラベル",
@@ -965,7 +971,6 @@ definePage(() => ({
 	"followedMessage": "フォローされた時のメッセージ",
 	"followedMessageDescription": "フォローされた時に相手に表示する短いメッセージを設定できます。",
 	"followedMessageDescriptionForLockedAccount": "フォローを承認制にしている場合、フォローリクエストを許可した時に表示されます。",
-	"all": "全て",
 	"likeOnlyForRemote": "全て (リモートはいいねのみ)",
 	"nonSensitiveOnly": "非センシティブのみ",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "非センシティブのみ (リモートはいいねのみ)",
@@ -976,7 +981,10 @@ definePage(() => ({
 	"flagAsCatDescription": "にゃにゃにゃ？？",
 	"flagAsBot": "Botとして設定",
 	"flagAsBotDescription": "このアカウントがプログラムによって運用される場合は、このフラグをオンにします。オンにすると、反応の連鎖を防ぐためのフラグとして他の開発者に役立ったり、Misskeyのシステム上での扱いがBotに合ったものになります。",
-	"qr": "二次元コード"
+	"qr": "二次元コード",
+	"detach": "外す",
+	"cannotSelectSensitiveMedia": "センシティブなメディアは選択できません",
+	"cannotSelectSensitiveMediaDescription": "自分でセンシティブ設定を行っていないのにこのエラーが出ている場合、自動判定によりセンシティブなメディアとされている可能性があります。\nサーバーの規則に照らして不要な場合は、ファイルのセンシティブ設定を解除してもう一度お試しください。"
 }
 </locale>
 
@@ -985,11 +993,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "その名前は禁止した文字列が含まれとるで",
 	"yourNameContainsProhibitedWordsDescription": "その名前は禁止した文字列が含まれとるわ。どうしてもって言うなら、サーバー管理者に言うしかないで。",
 	"avatar": "アイコン",
-	"upload": "アップロード",
 	"cropImageAsk": "画像を切り取ってもええか？",
 	"cropYes": "切り抜いたる",
 	"cropNo": "切り抜かへん",
-	"fromDrive": "ドライブから",
 	"banner": "バナー",
 	"profile": "プロフィール",
 	"changeBanner": "バナー画像を変更するで",
@@ -1002,9 +1008,6 @@ definePage(() => ({
 	"birthday": "生まれた日",
 	"language": "言語",
 	"metadataEdit": "追加情報を編集するで",
-	"save": "とっとく",
-	"add": "増やす",
-	"delete": "ほかす",
 	"rearrange": "並び替え",
 	"verifiedLinkDescription": "内容をURLに設定すると、リンク先のwebサイトに自分のプロフのリンクが含まれてる場合に所有者確認済みアイコンを表示させることができるで。",
 	"metadataLabel": "ラベル",
@@ -1013,7 +1016,6 @@ definePage(() => ({
 	"followedMessage": "フォローされたら返すメッセージ",
 	"followedMessageDescription": "フォローされたときに相手に返す短めのメッセージを決めれるで。",
 	"followedMessageDescriptionForLockedAccount": "フォローが承認制なら、フォローリクエストをOKしたときに見せるで。",
-	"all": "みんな",
 	"likeOnlyForRemote": "リモートからはいいねだけな",
 	"nonSensitiveOnly": "いつ見ても大丈夫なやつだけ",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "いつ見ても大丈夫なやつだけ (リモートはいいねだけ)",
@@ -1033,11 +1035,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Upload",
 	"cropImageAsk": "Do you want to crop this image?",
 	"cropYes": "Crop",
 	"cropNo": "Use as-is",
-	"fromDrive": "From Drive",
 	"banner": "Banner",
 	"profile": "Amaɣnu",
 	"changeBanner": "Change banner",
@@ -1050,9 +1050,6 @@ definePage(() => ({
 	"birthday": "Birthday",
 	"language": "Language",
 	"metadataEdit": "Edit additional Information",
-	"save": "Sekles",
-	"add": "Add",
-	"delete": "Kkes",
 	"rearrange": "Rearrange",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Label",
@@ -1061,7 +1058,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -1081,11 +1077,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Upload",
 	"cropImageAsk": "Do you want to crop this image?",
 	"cropYes": "Crop",
 	"cropNo": "Use as-is",
-	"fromDrive": "From Drive",
 	"banner": "Banner",
 	"profile": "ಪ್ರೊಫೈಲು",
 	"changeBanner": "Change banner",
@@ -1098,9 +1092,6 @@ definePage(() => ({
 	"birthday": "Birthday",
 	"language": "Language",
 	"metadataEdit": "Edit additional Information",
-	"save": "ಉಳಿಸಿ",
-	"add": "Add",
-	"delete": "ಅಳಿಸು",
 	"rearrange": "Rearrange",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Label",
@@ -1109,7 +1100,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -1129,11 +1119,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "바꾸려는 이름에 금지된 키워드가 포함되어 있습니다.",
 	"yourNameContainsProhibitedWordsDescription": "이름에 금지된 키워드가 있습니다. 이름을 사용해야 하는 경우, 서버 관리자에 문의하세요.",
 	"avatar": "아바타",
-	"upload": "업로드",
 	"cropImageAsk": "이미지를 자르시겠습니까?",
 	"cropYes": "잘라내기",
 	"cropNo": "그대로 사용",
-	"fromDrive": "드라이브에서",
 	"banner": "배너",
 	"profile": "프로필",
 	"changeBanner": "배너 이미지 변경",
@@ -1146,9 +1134,6 @@ definePage(() => ({
 	"birthday": "생일",
 	"language": "언어",
 	"metadataEdit": "추가 정보 편집",
-	"save": "저장",
-	"add": "추가",
-	"delete": "삭제",
 	"rearrange": "정렬",
 	"verifiedLinkDescription": "내용에 자신의 프로필로 향하는 링크가 포함된 페이지의 URL을 삽입하면 소유자 인증 마크가 표시됩니다.",
 	"metadataLabel": "라벨",
@@ -1157,7 +1142,6 @@ definePage(() => ({
 	"followedMessage": "팔로우 받았을 때 메시지",
 	"followedMessageDescription": "팔로우 받았을 때 상대방에게 보여줄 단문 메시지를 설정할 수 있습니다.",
 	"followedMessageDescriptionForLockedAccount": "팔로우를 승인제로 한 경우, 팔로우 요청을 수락했을 때 보여줍니다.",
-	"all": "전체",
 	"likeOnlyForRemote": "리모트에서는 좋아요만 받기",
 	"nonSensitiveOnly": "민감한 이모지를 제외하고 받기",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "민감한 이모지를 제외하고 받기(리모트에서는 좋아요만 받기)",
@@ -1168,7 +1152,9 @@ definePage(() => ({
 	"flagAsCatDescription": "야옹?(이 계정이 고양이라면 눌러 주세요.)",
 	"flagAsBot": "나는 봇입니다",
 	"flagAsBotDescription": "이 계정을 자동화된 수단으로 운용할 경우에 활성화해 주세요. 이 플래그를 활성화하면, 다른 봇이 이를 참고하여 봇 끼리의 무한 연쇄 반응을 회피하거나, 이 계정의 시스템 상에서의 취급이 Bot 운영에 최적화되는 등의 변화가 생깁니다.",
-	"qr": "QR 코드"
+	"qr": "QR 코드",
+	"cannotSelectSensitiveMedia": "민감한 미디어는 선택할 수 없습니다.",
+	"cannotSelectSensitiveMediaDescription": "자신이 민감함 설정을 하고 있지 않음에도 이 에러가 나온 경우, 자동 판정에 의해 민감한 미디어로 간주됐을 수 있습니다.\n서버의 규칙과 대조했을 때 불필요한 경우에는 파일의 민감함 설정을 해제하고 한 번 더 시도해 주십시오."
 }
 </locale>
 
@@ -1177,11 +1163,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Uploaden",
 	"cropImageAsk": "Bijsnijdengevraagd",
 	"cropYes": "Crop",
 	"cropNo": "Use as-is",
-	"fromDrive": "Van schijf",
 	"banner": "Banner",
 	"profile": "Profiel",
 	"changeBanner": "Change banner",
@@ -1194,9 +1178,6 @@ definePage(() => ({
 	"birthday": "Geboortedatum",
 	"language": "Taal",
 	"metadataEdit": "Edit additional Information",
-	"save": "Opslaan",
-	"add": "Toevoegen",
-	"delete": "Verwijderen",
 	"rearrange": "Sorteren",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Label",
@@ -1205,7 +1186,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Alle",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -1225,11 +1205,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Laste opp",
 	"cropImageAsk": "Do you want to crop this image?",
 	"cropYes": "Crop",
 	"cropNo": "Use as-is",
-	"fromDrive": "From Drive",
 	"banner": "Banner",
 	"profile": "Profil",
 	"changeBanner": "Change banner",
@@ -1242,9 +1220,6 @@ definePage(() => ({
 	"birthday": "Bursdag",
 	"language": "Språk",
 	"metadataEdit": "Edit additional Information",
-	"save": "Lagre",
-	"add": "Legg til",
-	"delete": "Slett",
 	"rearrange": "Rearrange",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Label",
@@ -1253,7 +1228,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Alle",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -1273,11 +1247,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Awatar",
-	"upload": "Wyślij",
 	"cropImageAsk": "Czy chcesz przyciąć obrazek?",
 	"cropYes": "Tak, przytnij",
 	"cropNo": "Nie chce przycinać",
-	"fromDrive": "Z dysku",
 	"banner": "Baner",
 	"profile": "Profil",
 	"changeBanner": "Zmień baner",
@@ -1290,9 +1262,6 @@ definePage(() => ({
 	"birthday": "Data urodzenia",
 	"language": "Język",
 	"metadataEdit": "Edytuj dodatkowe informacje",
-	"save": "Zapisz",
-	"add": "Dodaj",
-	"delete": "Usuń",
 	"rearrange": "Posortuj",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Etykieta",
@@ -1301,7 +1270,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Wszystkie",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -1321,11 +1289,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "O seu nome possui palavras proibidas",
 	"yourNameContainsProhibitedWordsDescription": "Se você deseja utilizar esse nome, entre em contato com o administrador do servidor.",
 	"avatar": "Avatar",
-	"upload": "Fazer upload",
 	"cropImageAsk": "Deseja recortar esta imagem?",
 	"cropYes": "Recortar",
 	"cropNo": "Manter deste jeito",
-	"fromDrive": "Do drive",
 	"banner": "Capa",
 	"profile": "Perfil",
 	"changeBanner": "Mudar banner",
@@ -1338,9 +1304,6 @@ definePage(() => ({
 	"birthday": "Aniversário",
 	"language": "Idioma",
 	"metadataEdit": "Editar informações adicionais",
-	"save": "Salvar",
-	"add": "Adicionar",
-	"delete": "Excluir",
 	"rearrange": "Reordernar",
 	"verifiedLinkDescription": "Ao inserir um URL que contém um link para essa conta, um ícone de verificação será exibido ao lado do campo",
 	"metadataLabel": "Rótulo",
@@ -1349,7 +1312,6 @@ definePage(() => ({
 	"followedMessage": "Mensagem exibida quando alguém segue você",
 	"followedMessageDescription": "Você pode definir uma curta mensagem que será exibida aos usuários que seguirem você.",
 	"followedMessageDescriptionForLockedAccount": "Se você aceita pedidos de seguidor manualmente, isso será exibido quando você aceitá-los.",
-	"all": "Todos",
 	"likeOnlyForRemote": "Tudo (somente curtidas remotas)",
 	"nonSensitiveOnly": "Apenas não-sensível",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Apenas não sensíveis (somente curtidas remotas)",
@@ -1369,11 +1331,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Имя, которое вы пытаетесь изменить, содержит запрещенную строку символов",
 	"yourNameContainsProhibitedWordsDescription": "Имя содержит запрещённую строку символов. Если вы хотите использовать это имя, обратитесь к администратору сервера",
 	"avatar": "Аватар",
-	"upload": "Загрузить",
 	"cropImageAsk": "Обрезать изображение?",
 	"cropYes": "Обрезать",
 	"cropNo": "Не обрезать",
-	"fromDrive": "С Диска",
 	"banner": "Шапка",
 	"profile": "Профиль",
 	"changeBanner": "Поменять изображение в шапке",
@@ -1386,9 +1346,6 @@ definePage(() => ({
 	"birthday": "День рождения",
 	"language": "Язык",
 	"metadataEdit": "Редактировать дополнительные сведения",
-	"save": "Сохранить",
-	"add": "Добавить",
-	"delete": "Удалить",
 	"rearrange": "Сортировать по",
 	"verifiedLinkDescription": "Указывая здесь URL, содержащий ссылку на профиль, иконка владения ресурсом может быть отображена рядом с полем",
 	"metadataLabel": "Метка",
@@ -1397,7 +1354,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Все",
 	"likeOnlyForRemote": "Всё (с других серверов только «нравится!»)",
 	"nonSensitiveOnly": "Только безопасные",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Только безопасные (с других серверов только «нравится!»)",
@@ -1417,11 +1373,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Nahrať súbor",
 	"cropImageAsk": "Chcete orezať obrázok?",
 	"cropYes": "Crop",
 	"cropNo": "Use as-is",
-	"fromDrive": "Z disku",
 	"banner": "BAnner",
 	"profile": "Profil",
 	"changeBanner": "Zmeniť banner",
@@ -1434,9 +1388,6 @@ definePage(() => ({
 	"birthday": "Dátum narodenia",
 	"language": "Jazyk",
 	"metadataEdit": "Upraviť dodatočné informácie",
-	"save": "Uložiť",
-	"add": "Pridať",
-	"delete": "Odstrániť",
 	"rearrange": "Rearrange",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Popisok",
@@ -1445,7 +1396,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Všetko",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -1465,11 +1415,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "ชื่อของคุณนั้นมีคำที่ต้องห้าม",
 	"yourNameContainsProhibitedWordsDescription": "ถ้าหากคุณต้องการใช้ชื่อนี้ กรุณาติดต่อผู้ดูแลระบบของเซิร์ฟเวอร์นะค่ะ",
 	"avatar": "ไอคอน",
-	"upload": "อัปโหลด",
 	"cropImageAsk": "คุณต้องการครอบตัดรูปภาพนี้อย่างงั้นหรือ?",
 	"cropYes": "ครอบตัด",
 	"cropNo": "ใช้ตามที่เป็นอยู่",
-	"fromDrive": "จากไดรฟ์",
 	"banner": "แบนเนอร์",
 	"profile": "โปรไฟล์",
 	"changeBanner": "เปลี่ยนแบนเนอร์",
@@ -1482,9 +1430,6 @@ definePage(() => ({
 	"birthday": "วันเกิด",
 	"language": "ภาษา",
 	"metadataEdit": "แก้ไขข้อมูลเพิ่มเติม",
-	"save": "บันทึก",
-	"add": "เพิ่ม",
-	"delete": "ลบ",
 	"rearrange": "จัดใหม่",
 	"verifiedLinkDescription": "หากป้อน URL ที่มีลิงก์ไปยังโปรไฟล์ของคุณ ไอคอนการยืนยันความเป็นเจ้าของจะแสดงถัดจากฟิลด์นั้น ๆ",
 	"metadataLabel": "ป้าย",
@@ -1493,7 +1438,6 @@ definePage(() => ({
 	"followedMessage": "ส่งข้อความเมื่อมีคนกดติดตาม",
 	"followedMessageDescription": "ส่งข้อความเมื่อมีคนกดติดตามแล้ว",
 	"followedMessageDescriptionForLockedAccount": "ถ้าหากคุณตั้งค่าให้คนอื่นต้องขออนุญาตก่อนที่จะติดตามคุณ ระบบจะขึ้นข้อความนี้ในตอนที่คุณอนุมัติให้เขาติดตาม",
-	"all": "ทั้งหมด",
 	"likeOnlyForRemote": "ทั้งหมด (เฉพาะการถูกใจจากเซิร์ฟเวอร์ระยะไกล)",
 	"nonSensitiveOnly": "เฉพาะไม่มีเนื้อหาละเอียดอ่อน",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "เฉพาะไม่มีเนื้อหาละเอียดอ่อน (เฉพาะการถูกใจจากระยะไกลเท่านั้น)",
@@ -1513,11 +1457,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Adınız yasaklanmış kelimeler içeriyor",
 	"yourNameContainsProhibitedWordsDescription": "Bu adı kullanmak istiyorsan, lütfen sunucu yöneticinizle iletişime geç.",
 	"avatar": "Avatar",
-	"upload": "Yükle",
 	"cropImageAsk": "Bu görüntüyü kırpmak ister misin?",
 	"cropYes": "Kırp",
 	"cropNo": "Olduğu gibi kullanın",
-	"fromDrive": "Drive'den",
 	"banner": "Banner",
 	"profile": "Profil",
 	"changeBanner": "Banner değiştir",
@@ -1530,9 +1472,6 @@ definePage(() => ({
 	"birthday": "Doğum günü",
 	"language": "Dil",
 	"metadataEdit": "Ek bilgileri düzenle",
-	"save": "Kaydet",
-	"add": "Ekle",
-	"delete": "Sil",
 	"rearrange": "Yeniden düzenle",
 	"verifiedLinkDescription": "Buraya profiline bağlantı içeren bir URL girerek, alanın yanında bir sahiplik doğrulama simgesi görüntülenebilir.",
 	"metadataLabel": "Etiket",
@@ -1541,7 +1480,6 @@ definePage(() => ({
 	"followedMessage": "Takip edildiğinizde gönderilen mesaj",
 	"followedMessageDescription": "Abonelerin seni takip ettiklerinde görüntülenmesini istediğin kısa bir mesaj ayarlayabilirsin.",
 	"followedMessageDescriptionForLockedAccount": "Takip isteklerinin onay gerektirmesini ayarladıysan, bir takip isteğini kabul ettiğinde bu mesaj görüntülenir.",
-	"all": "Tümü",
 	"likeOnlyForRemote": "Tüm (Yalnızca uzak sunucu için beğeniler)",
 	"nonSensitiveOnly": "Hassas olmayanlar için",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Yalnızca hassas olmayanlar (Yalnızca uzaktan beğeniler)",
@@ -1561,11 +1499,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Your name contains prohibited words",
 	"yourNameContainsProhibitedWordsDescription": "If you wish to use this name, please contact your server administrator.",
 	"avatar": "Avatar",
-	"upload": "Upload",
 	"cropImageAsk": "Do you want to crop this image?",
 	"cropYes": "Crop",
 	"cropNo": "Use as-is",
-	"fromDrive": "From Drive",
 	"banner": "Banner",
 	"profile": "profile",
 	"changeBanner": "Change banner",
@@ -1578,9 +1514,6 @@ definePage(() => ({
 	"birthday": "Birthday",
 	"language": "Language",
 	"metadataEdit": "Edit additional Information",
-	"save": "Save",
-	"add": "Add",
-	"delete": "ئۆچۈرۈش",
 	"rearrange": "Rearrange",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Label",
@@ -1589,7 +1522,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "All",
 	"likeOnlyForRemote": "All (Only likes for remote instances)",
 	"nonSensitiveOnly": "Non-sensitive only",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Non-sensitive only (Only likes from remote)",
@@ -1609,11 +1541,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Ваше ім'я має заборонені слова",
 	"yourNameContainsProhibitedWordsDescription": "Якщо ви бажаєте використовувати це ім'я, зв'яжіться з адміністратором вашого сервера.",
 	"avatar": "Аватар",
-	"upload": "Завантажити",
 	"cropImageAsk": "Бажаєте кадрувати це зображення?",
 	"cropYes": "Crop",
 	"cropNo": "Використати як є",
-	"fromDrive": "З диска",
 	"banner": "Банер",
 	"profile": "Профіль",
 	"changeBanner": "Змінити банер",
@@ -1626,9 +1556,6 @@ definePage(() => ({
 	"birthday": "День народження",
 	"language": "Мова",
 	"metadataEdit": "Редагувати додаткову інформацію",
-	"save": "Зберегти",
-	"add": "Додати",
-	"delete": "Видалити",
 	"rearrange": "Сортувати за",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Назва",
@@ -1637,7 +1564,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Всі",
 	"likeOnlyForRemote": "Усі — лише вподобання для віддалених інстансів",
 	"nonSensitiveOnly": "Тільки нечутливий контент",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Тільки нечутливий контент (тільки віддалені вподобання)",
@@ -1657,11 +1583,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "Tên bạn đang cố gắng đổi có chứa chuỗi ký tự bị cấm.",
 	"yourNameContainsProhibitedWordsDescription": "Tên có chứa chuỗi ký tự bị cấm. Nếu bạn muốn sử dụng tên này, hãy liên hệ với quản trị viên máy chủ của bạn.",
 	"avatar": "Ảnh đại diện",
-	"upload": "Tải lên",
 	"cropImageAsk": "Bạn có muốn cắt ảnh này?",
 	"cropYes": "Cắt",
 	"cropNo": "Để nguyên",
-	"fromDrive": "Từ ổ đĩa",
 	"banner": "Ảnh bìa",
 	"profile": "Trang cá nhân",
 	"changeBanner": "Đổi ảnh bìa",
@@ -1674,9 +1598,6 @@ definePage(() => ({
 	"birthday": "Sinh nhật",
 	"language": "Ngôn ngữ",
 	"metadataEdit": "Sửa thông tin bổ sung",
-	"save": "Lưu",
-	"add": "Thêm",
-	"delete": "Xóa",
 	"rearrange": "Sắp xếp lại",
 	"verifiedLinkDescription": "By entering an URL that contains a link to your profile here, an ownership verification icon can be displayed next to the field.",
 	"metadataLabel": "Nhãn",
@@ -1685,7 +1606,6 @@ definePage(() => ({
 	"followedMessage": "Message when you are followed",
 	"followedMessageDescription": "You can set a short message to be displayed to the recipient when they follow you.",
 	"followedMessageDescriptionForLockedAccount": "If you have set up that follow requests require approval, this will be displayed when you grant a follow request.",
-	"all": "Tất cả",
 	"likeOnlyForRemote": "Tất cả (chỉ bao gồm lượt thích trên các máy chủ khác)",
 	"nonSensitiveOnly": "Chỉ nội dung không nhạy cảm",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "Chỉ nội dung không nhạy cảm (chỉ bao gồm lượt thích từ máy chủ khác)",
@@ -1705,11 +1625,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "目标用户名包含违禁词",
 	"yourNameContainsProhibitedWordsDescription": "用户名内含有违禁词。若想使用此用户名，请联系服务器管理员。",
 	"avatar": "头像",
-	"upload": "本地上传",
 	"cropImageAsk": "是否要裁剪图像？",
 	"cropYes": "去裁剪",
 	"cropNo": "就这样吧！",
-	"fromDrive": "从网盘中",
 	"banner": "横幅",
 	"profile": "个人资料",
 	"changeBanner": "更换横幅",
@@ -1722,9 +1640,6 @@ definePage(() => ({
 	"birthday": "生日",
 	"language": "语言",
 	"metadataEdit": "附加信息编辑",
-	"save": "保存",
-	"add": "添加",
-	"delete": "删除",
 	"rearrange": "排序方式",
 	"verifiedLinkDescription": "如果将内容设置为 URL，当链接所指向的网页内包含自己的个人资料链接时，可以显示一个已验证图标。",
 	"metadataLabel": "标签",
@@ -1733,7 +1648,6 @@ definePage(() => ({
 	"followedMessage": "被关注时的信息",
 	"followedMessageDescription": "被关注时，可设置向关注者显示的信息。",
 	"followedMessageDescriptionForLockedAccount": "需要批准才能关注的情况下，消息会在请求被批准后显示。",
-	"all": "全部",
 	"likeOnlyForRemote": "全部（远程仅点赞）",
 	"nonSensitiveOnly": "仅限非敏感内容",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "仅限非敏感内容（远程仅点赞）",
@@ -1744,7 +1658,9 @@ definePage(() => ({
 	"flagAsCatDescription": "喵喵喵？？",
 	"flagAsBot": "这是一个机器人账号",
 	"flagAsBotDescription": "如果此账户由程序控制，请启用此项。启用后，此标志可以帮助其他开发人员防止机器人之间产生无限互动的行为，并让 Misskey 的内部系统将此账户识别为机器人。",
-	"qr": "二维码"
+	"qr": "二维码",
+	"cannotSelectSensitiveMedia": "无法选择敏感媒体",
+	"cannotSelectSensitiveMediaDescription": "若并未自行设为敏感媒体却仍出现此错误，则可能是自动判定将其归类为敏感媒体。如果依服务器规则其并非敏感媒体，则可解除设置再试一次。"
 }
 </locale>
 
@@ -1753,11 +1669,9 @@ definePage(() => ({
 	"yourNameContainsProhibitedWords": "您嘗試更改的名稱包含禁止的字串",
 	"yourNameContainsProhibitedWordsDescription": "名稱中包含禁止使用的字串。 如果您想使用此名稱，請聯絡您的伺服器管理員。",
 	"avatar": "大頭貼",
-	"upload": "上傳",
 	"cropImageAsk": "要剪裁圖片嗎？",
 	"cropYes": "裁剪",
 	"cropNo": "使用原圖",
-	"fromDrive": "從雲端空間中選擇",
 	"banner": "橫幅",
 	"profile": "個人檔案",
 	"changeBanner": "變更橫幅圖像",
@@ -1770,9 +1684,6 @@ definePage(() => ({
 	"birthday": "生日",
 	"language": "語言",
 	"metadataEdit": "編輯附加資訊",
-	"save": "儲存",
-	"add": "新增",
-	"delete": "刪除",
 	"rearrange": "排序方式",
 	"verifiedLinkDescription": "如果輸入包含您個人資料的網站 URL，欄位旁邊將出現驗證圖示。",
 	"metadataLabel": "標籤",
@@ -1781,7 +1692,6 @@ definePage(() => ({
 	"followedMessage": "被追隨時的訊息",
 	"followedMessageDescription": "可以設定被追隨時顯示給對方的訊息。",
 	"followedMessageDescriptionForLockedAccount": "如果追隨需要核准的話，將在通過追隨請求之後顯示。",
-	"all": "全部",
 	"likeOnlyForRemote": "全部（遠端僅限讚）",
 	"nonSensitiveOnly": "僅限非敏感",
 	"nonSensitiveOnlyForLocalLikeOnlyForRemote": "僅限非敏感（遠端僅限讚）",

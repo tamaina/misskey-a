@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, watch } from 'vue';
-import type { PreferencesProfile } from '@features/preferences/frontend/state/manager.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import FeatureLocaleMessages from '@features/preferences/frontend/ts-messages.vue';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
@@ -15,6 +14,13 @@ import { store } from '@features/preferences/frontend/store.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { PreferencesProfile } from '@features/preferences/frontend/state/manager.js';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 function canAutoBackup() {
 	return prefer.profile.name != null && prefer.profile.name.trim() !== '';
@@ -44,9 +50,9 @@ export function getPreferencesProfileMenu(): MenuItem[] {
 
 	const menu: MenuItem[] = [{
 		type: 'label',
-		text: prefer.profile.name || `(${FeatureLocaleMessages.$locale.noName})`,
+		text: prefer.profile.name || `(${getGlobalLocale().noName})`,
 	}, {
-		text: FeatureLocaleMessages.$locale.rename,
+		text: getGlobalLocale().rename,
 		icon: 'ti ti-pencil',
 		action: () => {
 			renameProfile();

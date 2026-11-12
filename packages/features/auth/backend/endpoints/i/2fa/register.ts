@@ -11,7 +11,6 @@ import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { assertLegacyMfaManagement } from '../../../mfa-policy.js';
 import { withLockedMfaProfile } from '../../../locked-mfa-profile.js';
 import * as OTPAuth from 'otpauth';
-import * as QRCode from 'qrcode';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -72,7 +71,7 @@ export function createI2faRegisterProcedure(deps: I2faRegisterDependencies) {
 				await manager.getRepository(MiUserProfile).update({ userId: me.id }, { twoFactorTempSecret: secret.base32 });
 			});
 
-			// Get the data URL of the authenticator URL
+			// Return the authenticator URL; the frontend renders its QR code.
 			const totp = new OTPAuth.TOTP({
 				secret,
 				digits: 6,
@@ -80,10 +79,8 @@ export function createI2faRegisterProcedure(deps: I2faRegisterDependencies) {
 				issuer: deps.config.host,
 			});
 			const url = totp.toString();
-			const qr = await QRCode.toDataURL(url);
 
 			return {
-				qr,
 				url,
 				secret: secret.base32,
 				label: me.username,

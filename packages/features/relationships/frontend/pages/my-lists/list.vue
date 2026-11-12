@@ -8,16 +8,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<div v-if="list" class="_gaps">
 			<MkFolder>
-				<template #label>{{ $locale.sfc.settings }}</template>
+				<template #label>{{ globalLocale.env.settings }}</template>
 
 				<div class="_gaps">
 					<MkInput v-model="name">
-						<template #label>{{ $locale.sfc.name }}</template>
+						<template #label>{{ globalLocale.env.name }}</template>
 					</MkInput>
-					<MkSwitch v-model="isPublic">{{ $locale.sfc.public }}</MkSwitch>
+					<MkSwitch v-model="isPublic">{{ globalLocale.env.public }}</MkSwitch>
 					<div class="_buttons">
-						<MkButton rounded primary @click="updateSettings">{{ $locale.sfc.save }}</MkButton>
-						<MkButton rounded danger @click="deleteList()">{{ $locale.sfc.delete }}</MkButton>
+						<MkButton rounded primary @click="updateSettings">{{ globalLocale.env.save }}</MkButton>
+						<MkButton rounded danger @click="deleteList()">{{ globalLocale.env.delete }}</MkButton>
 					</div>
 				</div>
 			</MkFolder>
@@ -52,6 +52,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, markRaw, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -69,6 +70,9 @@ import { ensureSignin } from '@features/auth/frontend/i.js';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -117,7 +121,7 @@ function addUser() {
 
 async function removeUser(item: Misskey.entities.UsersListsGetMembershipsResponse[number], ev: PointerEvent) {
 	os.popupMenu([{
-		text: $locale.value.sfc.remove,
+		text: globalLocale.value.env.remove,
 		icon: 'ti ti-x',
 		danger: true,
 		action: async () => {
@@ -143,7 +147,7 @@ async function showMembershipMenu(item: Misskey.entities.UsersListsGetMembership
 
 	os.popupMenu([{
 		type: 'switch',
-		text: $locale.value.sfc.showRepliesToOthersInTimeline,
+		text: globalLocale.value.env.showRepliesToOthersInTimeline,
 		icon: 'ti ti-messages',
 		ref: withRepliesRef,
 	}], ev.currentTarget ?? ev.target);
@@ -166,7 +170,7 @@ async function deleteList() {
 	if (!list.value) return;
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: interpolateLocaleParameters($locale.value.sfc.removeAreYouSure, { x: list.value.name }),
+		text: interpolateLocaleParameters(globalLocale.value.env.removeAreYouSure, { x: list.value.name }),
 	});
 	if (canceled) return;
 
@@ -195,7 +199,7 @@ watch(() => props.listId, fetchList, { immediate: true });
 
 const headerActions = computed(() => list.value ? [{
 	icon: 'ti ti-timeline',
-	text: $locale.value.sfc.timeline,
+	text: globalLocale.value.env.timeline,
 	handler: () => {
 		router.push('/timeline/list/:listId', {
 			params: {
@@ -208,7 +212,7 @@ const headerActions = computed(() => list.value ? [{
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: list.value ? list.value.name : $locale.value.sfc.lists,
+	title: list.value ? list.value.name : globalLocale.value.env.lists,
 	icon: 'ti ti-list',
 }));
 </script>
@@ -254,16 +258,6 @@ definePage(() => ({
 
 <locale lang="json" locale="ar-SA">
 {
-	"remove": "حذف",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "متأكد من أنك تريد حذف {x}؟",
-	"timeline": "الخيط الزمني",
-	"lists": "القوائم",
-	"settings": "الاعدادات",
-	"name": "الإسم",
-	"public": "علني",
-	"save": "حفظ",
-	"delete": "حذف",
 	"members": "الأعضاء",
 	"nUsers": "{n} مستخدم",
 	"addUser": "اضافة مستخدم"
@@ -272,16 +266,6 @@ definePage(() => ({
 
 <locale lang="json" locale="ca-ES">
 {
-	"remove": "Eliminar",
-	"showRepliesToOthersInTimeline": "Mostrar les respostes a altres a la línia de temps",
-	"removeAreYouSure": "Segur que vols esborrar «{x}»?",
-	"timeline": "Línia de temps",
-	"lists": "Llistes",
-	"settings": "Preferències",
-	"name": "Nom",
-	"public": "Públic ",
-	"save": "Desa",
-	"delete": "Elimina",
 	"members": "Membres",
 	"nUsers": "{n} Usuaris",
 	"addUser": "Afegir un usuari"
@@ -290,16 +274,6 @@ definePage(() => ({
 
 <locale lang="json" locale="cs-CZ">
 {
-	"remove": "Smazat",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Jste si jistí že chcete smazat \"{x}\"?",
-	"timeline": "Časová osa",
-	"lists": "Seznamy",
-	"settings": "Nastavení",
-	"name": "Jméno",
-	"public": "Veřejný",
-	"save": "Uložit",
-	"delete": "Smazat",
 	"members": "Členové",
 	"nUsers": "{n} užívatelů",
 	"addUser": "Přidat uživatele"
@@ -308,16 +282,6 @@ definePage(() => ({
 
 <locale lang="json" locale="da-DK">
 {
-	"remove": "Delete",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"timeline": "Timeline",
-	"lists": "Lists",
-	"settings": "Settings",
-	"name": "Name",
-	"public": "Public",
-	"save": "Save",
-	"delete": "Delete",
 	"members": "Members",
 	"nUsers": "{n} Users",
 	"addUser": "Add a user"
@@ -326,16 +290,6 @@ definePage(() => ({
 
 <locale lang="json" locale="de-DE">
 {
-	"remove": "Löschen",
-	"showRepliesToOthersInTimeline": "Antworten in Chronik anzeigen",
-	"removeAreYouSure": "Möchtest du „{x}“ wirklich entfernen?",
-	"timeline": "Chronik",
-	"lists": "Listen",
-	"settings": "Einstellungen",
-	"name": "Name",
-	"public": "Öffentlich",
-	"save": "Speichern",
-	"delete": "Löschen",
 	"members": "Mitglieder",
 	"nUsers": "{n} Benutzer",
 	"addUser": "Benutzer hinzufügen"
@@ -344,16 +298,6 @@ definePage(() => ({
 
 <locale lang="json" locale="en-US">
 {
-	"remove": "Delete",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"timeline": "Timeline",
-	"lists": "Lists",
-	"settings": "Settings",
-	"name": "Name",
-	"public": "Public",
-	"save": "Save",
-	"delete": "Delete",
 	"members": "Members",
 	"nUsers": "{n} Users",
 	"addUser": "Add a user"
@@ -362,16 +306,6 @@ definePage(() => ({
 
 <locale lang="json" locale="es-ES">
 {
-	"remove": "Borrar",
-	"showRepliesToOthersInTimeline": "Mostrar respuestas a otros en la línea de tiempo",
-	"removeAreYouSure": "¿Desea borrar \"{x}\"?",
-	"timeline": "Línea de tiempo",
-	"lists": "Listas",
-	"settings": "Configuración",
-	"name": "Nombre",
-	"public": "Público",
-	"save": "Guardar",
-	"delete": "Borrar",
 	"members": "Miembros",
 	"nUsers": "{n} Usuarios",
 	"addUser": "Agregar usuario"
@@ -380,16 +314,6 @@ definePage(() => ({
 
 <locale lang="json" locale="fr-FR">
 {
-	"remove": "Supprimer",
-	"showRepliesToOthersInTimeline": "Afficher les réponses aux autres dans le fil",
-	"removeAreYouSure": "Êtes-vous sûr·e de vouloir supprimer « {x} »\u202f?",
-	"timeline": "Fil",
-	"lists": "Listes",
-	"settings": "Paramètres",
-	"name": "Nom",
-	"public": "Public",
-	"save": "Enregistrer",
-	"delete": "Supprimer",
 	"members": "Membres",
 	"nUsers": "{n} utilisateur·rice·s",
 	"addUser": "Ajouter un·e utilisateur·rice"
@@ -398,16 +322,6 @@ definePage(() => ({
 
 <locale lang="json" locale="id-ID">
 {
-	"remove": "Hapus",
-	"showRepliesToOthersInTimeline": "Tampilkan balasan ke pengguna lain dalam lini masa",
-	"removeAreYouSure": "Apakah kamu yakin ingin menghapus \"{x}\"?",
-	"timeline": "Lini masa",
-	"lists": "Daftar",
-	"settings": "Pengaturan",
-	"name": "Nama",
-	"public": "Publik",
-	"save": "Simpan",
-	"delete": "Hapus",
 	"members": "Anggota",
 	"nUsers": "{n} Pengguna",
 	"addUser": "Tambah pengguna"
@@ -416,16 +330,6 @@ definePage(() => ({
 
 <locale lang="json" locale="it-IT">
 {
-	"remove": "Elimina",
-	"showRepliesToOthersInTimeline": "Risposte altrui nella TL",
-	"removeAreYouSure": "Vuoi davvero eliminare \"{x}\"?",
-	"timeline": "Timeline",
-	"lists": "Liste",
-	"settings": "Impostazioni",
-	"name": "Nome",
-	"public": "Pubblica",
-	"save": "Salva",
-	"delete": "Elimina",
 	"members": "Membri",
 	"nUsers": "{n} profili",
 	"addUser": "Aggiungi profilo"
@@ -434,16 +338,6 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-JP">
 {
-	"remove": "削除",
-	"showRepliesToOthersInTimeline": "TLに他の人への返信を含める",
-	"removeAreYouSure": "「{x}」を削除しますか？",
-	"timeline": "タイムライン",
-	"lists": "リスト",
-	"settings": "設定",
-	"name": "名前",
-	"public": "パブリック",
-	"save": "保存",
-	"delete": "削除",
 	"members": "メンバー",
 	"nUsers": "{n}ユーザー",
 	"addUser": "ユーザーを追加"
@@ -452,16 +346,6 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-KS">
 {
-	"remove": "ほかす",
-	"showRepliesToOthersInTimeline": "タイムラインに他の人への返信とかも入れるで",
-	"removeAreYouSure": "「{x}」はほかしてええか？",
-	"timeline": "タイムライン",
-	"lists": "リスト",
-	"settings": "設定",
-	"name": "名前",
-	"public": "パブリック",
-	"save": "とっとく",
-	"delete": "ほかす",
 	"members": "メンバーはん",
 	"nUsers": "{n}ユーザー",
 	"addUser": "ユーザーを追加や"
@@ -470,16 +354,6 @@ definePage(() => ({
 
 <locale lang="json" locale="kab-KAB">
 {
-	"remove": "Kkes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"timeline": "Timeline",
-	"lists": "Tibdarin",
-	"settings": "Iɣewwaṛen",
-	"name": "Name",
-	"public": "Public",
-	"save": "Sekles",
-	"delete": "Kkes",
 	"members": "Members",
 	"nUsers": "{n} Users",
 	"addUser": "Add a user"
@@ -488,16 +362,6 @@ definePage(() => ({
 
 <locale lang="json" locale="kn-IN">
 {
-	"remove": "ಅಳಿಸು",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"timeline": "ಸಮಯಸಾಲು",
-	"lists": "Lists",
-	"settings": "ಸಿದ್ಧತೆಗಳು",
-	"name": "Name",
-	"public": "Public",
-	"save": "ಉಳಿಸಿ",
-	"delete": "ಅಳಿಸು",
 	"members": "Members",
 	"nUsers": "{n} Users",
 	"addUser": "ಬಳಕೆದಾರರನ್ನು ಸೇರಿಸಿ"
@@ -506,16 +370,6 @@ definePage(() => ({
 
 <locale lang="json" locale="ko-KR">
 {
-	"remove": "삭제",
-	"showRepliesToOthersInTimeline": "타임라인에 다른 사람에게 보내는 답글을 포함",
-	"removeAreYouSure": "\"{x}\" 을(를) 삭제하시겠습니까?",
-	"timeline": "타임라인",
-	"lists": "리스트",
-	"settings": "설정",
-	"name": "이름",
-	"public": "공개",
-	"save": "저장",
-	"delete": "삭제",
 	"members": "멤버",
 	"nUsers": "{n} 유저",
 	"addUser": "유저 추가"
@@ -524,16 +378,6 @@ definePage(() => ({
 
 <locale lang="json" locale="nl-NL">
 {
-	"remove": "Verwijderen",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Weet je zeker dat je \"{x}\" wil verwijderen?",
-	"timeline": "Tijdlijn",
-	"lists": "Lijsten",
-	"settings": "Instellingen",
-	"name": "Naam",
-	"public": "Openbare",
-	"save": "Opslaan",
-	"delete": "Verwijderen",
 	"members": "Leden",
 	"nUsers": "{n} Gebruikers",
 	"addUser": "Toevoegen gebruiker"
@@ -542,16 +386,6 @@ definePage(() => ({
 
 <locale lang="json" locale="no-NO">
 {
-	"remove": "Slett",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Er du sikker på at du vil fjerne \"{x}\"?",
-	"timeline": "Tidslinje",
-	"lists": "Lister",
-	"settings": "Innstillinger",
-	"name": "Navn",
-	"public": "Public",
-	"save": "Lagre",
-	"delete": "Slett",
 	"members": "Medlemmer",
 	"nUsers": "{n} Users",
 	"addUser": "Legg til bruker"
@@ -560,16 +394,6 @@ definePage(() => ({
 
 <locale lang="json" locale="pl-PL">
 {
-	"remove": "Usuń",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Czy na pewno chcesz usunąć „{x}”?",
-	"timeline": "Oś czasu",
-	"lists": "Listy",
-	"settings": "Ustawienia",
-	"name": "Nazwa",
-	"public": "Publiczny",
-	"save": "Zapisz",
-	"delete": "Usuń",
 	"members": "Członkowie",
 	"nUsers": "{n} użytkowników",
 	"addUser": "Dodaj użytkownika"
@@ -578,16 +402,6 @@ definePage(() => ({
 
 <locale lang="json" locale="pt-PT">
 {
-	"remove": "Remover",
-	"showRepliesToOthersInTimeline": "Mostrar respostas aos outros na linha do tempo",
-	"removeAreYouSure": "Deseja excluir \"{x}\"?",
-	"timeline": "Linha do tempo",
-	"lists": "Listas",
-	"settings": "Configurações",
-	"name": "Nome",
-	"public": "Público",
-	"save": "Salvar",
-	"delete": "Excluir",
 	"members": "Membros",
 	"nUsers": "{n} Usuários",
 	"addUser": "Adicionar usuário"
@@ -596,16 +410,6 @@ definePage(() => ({
 
 <locale lang="json" locale="ru-RU">
 {
-	"remove": "Удалить",
-	"showRepliesToOthersInTimeline": "Показывать ответы в ленте",
-	"removeAreYouSure": "Хотите удалить «{x}»?",
-	"timeline": "Лента",
-	"lists": "Списки",
-	"settings": "Настройки",
-	"name": "Название",
-	"public": "Общедоступно",
-	"save": "Сохранить",
-	"delete": "Удалить",
 	"members": "Участники",
 	"nUsers": "Пользователей: {n}",
 	"addUser": "Добавить пользователя"
@@ -614,16 +418,6 @@ definePage(() => ({
 
 <locale lang="json" locale="sk-SK">
 {
-	"remove": "Odstrániť",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Naozaj chcete odstrániť \"{x}\"?",
-	"timeline": "Časová os",
-	"lists": "Zoznamy",
-	"settings": "Nastavenia",
-	"name": "Názov",
-	"public": "Verejné",
-	"save": "Uložiť",
-	"delete": "Odstrániť",
 	"members": "Členovia",
 	"nUsers": "{n} používateľov",
 	"addUser": "Pridať používateľa"
@@ -632,16 +426,6 @@ definePage(() => ({
 
 <locale lang="json" locale="th-TH">
 {
-	"remove": "ลบ",
-	"showRepliesToOthersInTimeline": "แสดงการตอบกลับผู้อื่นลงในไทม์ไลน์",
-	"removeAreYouSure": "ต้องการลบ “{x}” ใช่ไหม?",
-	"timeline": "ไทม์ไลน์",
-	"lists": "รายชื่อ",
-	"settings": "การตั้งค่า",
-	"name": "ชื่อ",
-	"public": "สาธารณะ",
-	"save": "บันทึก",
-	"delete": "ลบ",
 	"members": "สมาชิก",
 	"nUsers": "{n} ผู้ใช้งาน",
 	"addUser": "เพิ่มผู้ใช้"
@@ -650,16 +434,6 @@ definePage(() => ({
 
 <locale lang="json" locale="tr-TR">
 {
-	"remove": "Sil",
-	"showRepliesToOthersInTimeline": "Pano'da diğer kişilere verilen yanıtları göster",
-	"removeAreYouSure": "“{x}” öğesini kaldırmak istediğinizden emin misin?",
-	"timeline": "Pano",
-	"lists": "Listeler",
-	"settings": "Ayarlar",
-	"name": "İsim",
-	"public": "Herkese açık",
-	"save": "Kaydet",
-	"delete": "Sil",
 	"members": "Üyeler",
 	"nUsers": "{n} Kullanıcı",
 	"addUser": "Kullanıcı ekle"
@@ -668,16 +442,6 @@ definePage(() => ({
 
 <locale lang="json" locale="ug-CN">
 {
-	"remove": "ئۆچۈرۈش",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"timeline": "Timeline",
-	"lists": "Lists",
-	"settings": "Settings",
-	"name": "Name",
-	"public": "Public",
-	"save": "Save",
-	"delete": "ئۆچۈرۈش",
 	"members": "Members",
 	"nUsers": "{n} Users",
 	"addUser": "Add a user"
@@ -686,16 +450,6 @@ definePage(() => ({
 
 <locale lang="json" locale="uk-UA">
 {
-	"remove": "Видалити",
-	"showRepliesToOthersInTimeline": "Показувати відповіді іншим у стрічці",
-	"removeAreYouSure": "Ви впевнені, що хочете видалити \"{x}\"?",
-	"timeline": "Стрічка",
-	"lists": "Списки",
-	"settings": "Налаштування",
-	"name": "Ім'я",
-	"public": "Публічний",
-	"save": "Зберегти",
-	"delete": "Видалити",
 	"members": "Учасники",
 	"nUsers": "{n} Користувачів",
 	"addUser": "Додати користувача"
@@ -704,16 +458,6 @@ definePage(() => ({
 
 <locale lang="json" locale="vi-VN">
 {
-	"remove": "Xóa",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
-	"removeAreYouSure": "Bạn có chắc muốn gỡ \"{x}\"?",
-	"timeline": "Bảng tin",
-	"lists": "Danh sách",
-	"settings": "Cài đặt",
-	"name": "Tên",
-	"public": "Công khai",
-	"save": "Lưu",
-	"delete": "Xóa",
 	"members": "Thành viên",
 	"nUsers": "{n} Người",
 	"addUser": "Thêm người dùng"
@@ -722,16 +466,6 @@ definePage(() => ({
 
 <locale lang="json" locale="zh-CN">
 {
-	"remove": "删除",
-	"showRepliesToOthersInTimeline": "在时间线中显示对他人的回复",
-	"removeAreYouSure": "要删掉「{x}」吗？",
-	"timeline": "时间线",
-	"lists": "列表",
-	"settings": "设置",
-	"name": "名称",
-	"public": "公开",
-	"save": "保存",
-	"delete": "删除",
 	"members": "成员",
 	"nUsers": "{n} 位用户",
 	"addUser": "添加用户"
@@ -740,16 +474,6 @@ definePage(() => ({
 
 <locale lang="json" locale="zh-TW">
 {
-	"remove": "刪除",
-	"showRepliesToOthersInTimeline": "在時間軸上顯示給其他人的回覆",
-	"removeAreYouSure": "確定要刪掉「{x}」嗎？",
-	"timeline": "時間軸",
-	"lists": "清單",
-	"settings": "設定",
-	"name": "名稱",
-	"public": "公開",
-	"save": "儲存",
-	"delete": "刪除",
 	"members": "成員",
 	"nUsers": "{n} 使用者",
 	"addUser": "新增使用者"
