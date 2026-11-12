@@ -17,14 +17,14 @@ import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { MiMeta } from '@features/instance/backend/models/Meta.js';
 import { FederatedInstanceService } from './FederatedInstanceService.js';
 import { UtilityService } from './UtilityService.js';
-import { ILink, WebfingerService } from './WebfingerService.js';
+import { ILink, WebfingerResponseError, WebfingerService } from './WebfingerService.js';
 import { RemoteLoggerService } from '@features/runtime/backend/services/RemoteLoggerService.js';
 import { ApDbResolverService } from './ApDbResolverService.js';
 import { ApPersonService } from './ApPersonService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 
 // HttpRequestService uses node-fetch for both signed Actor GETs and WebFinger.
-// Match transport failures only: invalid JSON, size limits and Actor validation
+// Match transport failures only: Actor JSON, size limits and Actor validation
 // errors must still propagate. Do not classify arbitrary Error.code values here:
 // updatePerson also performs DB writes whose connection errors must not be hidden.
 function isCommunicationError(err: unknown): boolean {
@@ -139,8 +139,10 @@ export class RemoteUserResolveService {
 			try {
 				self = await this.resolveSelf(acctLower);
 			} catch (err) {
-				// resolveSelf preserves the original HTTP/transport error as its cause.
-				if (!(err instanceof Error) || !isCommunicationError(err.cause)) throw err;
+				// Only discovery body/communication failures can return the cached user.
+				// A parsed document without a self link still propagates an error.
+				if (!(err instanceof Error)
+					|| !(isCommunicationError(err.cause) || err.cause instanceof WebfingerResponseError)) throw err;
 				this.logger.warn(`return existing remote user after failed WebFinger: ${acctLower}`, { err });
 				return user;
 			}
@@ -195,7 +197,11 @@ export class RemoteUserResolveService {
 			this.logger.error(`Failed to WebFinger for ${chalk.yellow(acctLower)}: ${ err.statusCode ?? err.message }`);
 			throw new Error(`Failed to WebFinger for ${acctLower}: ${ err.statusCode ?? err.message }`, { cause: err });
 		});
-		const self = finger.links.find(link => link.rel != null && link.rel.toLowerCase() === 'self');
+		const selfLinks = finger.links.filter(link => link.rel != null && link.rel.toLowerCase() === 'self');
+		// XRD can advertise several self representations (for example Atom and AP).
+		const self = selfLinks.find(link => link.type === 'application/activity+json'
+			|| (link.type?.split(';')[0].trim() === 'application/ld+json' && link.type.includes('https://www.w3.org/ns/activitystreams')))
+			?? selfLinks[0];
 		if (!self) {
 			this.logger.error(`Failed to WebFinger for ${chalk.yellow(acctLower)}: self link not found`);
 			throw new Error('self link not found');

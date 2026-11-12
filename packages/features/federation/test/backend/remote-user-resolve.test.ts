@@ -10,7 +10,7 @@ import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { ApPersonService } from '../../backend/services/ApPersonService.js';
 import { RemoteUserResolveService } from '../../backend/services/RemoteUserResolveService.js';
-import { WebfingerService } from '../../backend/services/WebfingerService.js';
+import { WebfingerResponseError, WebfingerService } from '../../backend/services/WebfingerService.js';
 import { UtilityService } from '../../backend/services/UtilityService.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
@@ -44,7 +44,7 @@ function fixture(existing = true, stale = true) {
 		usersRepository: { findOneBy: vi.fn(async () => row), update },
 		webfingerService: webfinger, apPersonService: { createPerson, updatePerson },
 	});
-	return { service, row, send, update, createPerson, updatePerson, logger, fetchInstance, meta };
+	return { service, webfinger, row, send, update, createPerson, updatePerson, logger, fetchInstance, meta };
 }
 
 describe('cached remote user refresh', () => {
@@ -90,7 +90,7 @@ describe('cached remote user refresh', () => {
 		expect(f.updatePerson).not.toHaveBeenCalled();
 	});
 
-	test.each(['{}', '{', '<?xml version="1.0"?><XRD/>', '{"links":[]}'])('rejects malformed or missing self discovery: %s', async body => {
+	test.each(['{}', '<?xml version="1.0"?><XRD/>', '{"links":[]}'])('rejects malformed or missing self discovery: %s', async body => {
 		const f = fixture();
 		f.send.mockResolvedValue(new Response(body));
 		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toThrow();
@@ -203,5 +203,113 @@ describe('cached remote user refresh', () => {
 		f.update.mockRejectedValue(failure);
 		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toBe(failure);
 		expect(f.send).not.toHaveBeenCalled();
+	});
+});
+
+const xrd = (href = uri, type = 'application/activity+json') => `<?xml version="1.0" encoding="UTF-8"?>
+<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
+	<Subject>acct:alice@remote.example</Subject>
+	<Link rel="self" type="application/atom+xml" href="https://remote.example/alice.atom"/>
+	<Link rel="self" type='${type}' href="${href}"/>
+	<Link rel="http://ostatus.org/schema/1.0/subscribe" template="https://remote.example/authorize?acct={uri}"/>
+</XRD>`;
+
+describe('WebFinger JRD and XRD discovery', () => {
+	test.each(['application/xrd+xml; charset=utf-8', 'application/xml', 'application/jrd+json', 'text/plain'])('parses XRD despite the requested/returned media type: %s', async contentType => {
+		const f = fixture();
+		f.send.mockResolvedValue(new Response(xrd(), { headers: { 'Content-Type': contentType } }));
+		await expect(f.webfinger.webfinger('alice@remote.example')).resolves.toEqual({
+			subject: 'acct:alice@remote.example',
+			links: [
+				{ rel: 'self', type: 'application/atom+xml', href: 'https://remote.example/alice.atom' },
+				{ rel: 'self', type: 'application/activity+json', href: uri },
+			],
+		});
+		expect(f.send).toHaveBeenCalledExactlyOnceWith('https://remote.example/.well-known/webfinger?resource=acct%3Aalice%40remote.example', {
+			method: 'GET', headers: { Accept: 'application/jrd+json, application/json, application/xrd+xml;q=0.9' },
+			timeout: 5000, size: 1024 * 256,
+		});
+	});
+
+	test('parses prefixed XRD and decodes XML entities', async () => {
+		const f = fixture();
+		f.send.mockResolvedValue(new Response(`\uFEFF  <x:XRD xmlns:x="http://docs.oasis-open.org/ns/xri/xrd-1.0">
+			<x:Subject>acct:alice@remote.example</x:Subject>
+			<x:Link rel="self" type="application/activity+json" href="${uri}?a=1&amp;b=2"/>
+			<other:Link xmlns:other="urn:other" rel="self" href="https://other.example/ignored"/>
+		</x:XRD>`));
+		await expect(f.webfinger.webfinger('alice@remote.example')).resolves.toEqual({
+			subject: 'acct:alice@remote.example',
+			links: [{ rel: 'self', type: 'application/activity+json', href: `${uri}?a=1&b=2` }],
+		});
+	});
+
+	test.each([true, false])('JRD still resolves users (existing=%s)', async existing => {
+		const f = fixture(existing);
+		const created = { id: 'created-alice' };
+		f.createPerson.mockResolvedValue(created);
+		await expect(f.service.resolveUser('alice', 'remote.example')).resolves.toBe(existing ? f.row : created);
+		expect(existing ? f.updatePerson : f.createPerson).toHaveBeenCalledExactlyOnceWith(uri);
+	});
+
+	test.each(['application/activity+json', 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'])('XRD self links resolve new and existing users: %s', async type => {
+		for (const existing of [true, false]) {
+			const f = fixture(existing);
+			const created = { id: 'created-alice' };
+			f.createPerson.mockResolvedValue(created);
+			f.send.mockResolvedValue(new Response(xrd(uri, type)));
+			await expect(f.service.resolveUser('alice', 'remote.example')).resolves.toBe(existing ? f.row : created);
+			expect(existing ? f.updatePerson : f.createPerson).toHaveBeenCalledExactlyOnceWith(uri);
+			expect(f.logger.warn).not.toHaveBeenCalled();
+		}
+	});
+
+	test.each([
+		'<?xml version="1.0"?><error>upstream failure</error>',
+		'<XRD><Link rel="self" href="https://remote.example/users/alice"></XRD>',
+		'<XRD xmlns="urn:not-xrd"><Link rel="self" href="https://remote.example/users/alice"/></XRD>',
+		'<!DOCTYPE XRD [<!ENTITY actor SYSTEM "file:///etc/passwd">]><XRD><Subject>&actor;</Subject></XRD>',
+		'<html><body>Bad gateway</body></html>', 'not JSON or XML', '{', '',
+	])('only cached users tolerate an unparseable discovery body: %s', async body => {
+		const cached = fixture();
+		cached.send.mockResolvedValue(new Response(body));
+		await expect(cached.service.resolveUser('alice', 'remote.example')).resolves.toBe(cached.row);
+		expect(cached.logger.warn).toHaveBeenCalledWith(expect.stringContaining('after failed WebFinger'), {
+			err: expect.objectContaining({ cause: expect.any(WebfingerResponseError) }),
+		});
+		expect(cached.update).toHaveBeenCalledExactlyOnceWith('remote-alice', { lastFetchedAt: expect.any(Date) });
+		expect(cached.updatePerson).not.toHaveBeenCalled();
+		await cached.service.resolveUser('alice', 'remote.example');
+		expect(cached.send).toHaveBeenCalledOnce();
+
+		const first = fixture(false);
+		first.send.mockResolvedValue(new Response(body));
+		await expect(first.service.resolveUser('alice', 'remote.example')).rejects.toMatchObject({ cause: expect.any(WebfingerResponseError) });
+		expect(first.createPerson).not.toHaveBeenCalled();
+		expect(first.update).not.toHaveBeenCalled();
+	});
+
+	test.each([true, false])('parsed XRD without a self link still fails (existing=%s)', async existing => {
+		const f = fixture(existing);
+		f.send.mockResolvedValue(new Response('<XRD><Link rel="lrdd" template="https://remote.example/?resource={uri}"/></XRD>'));
+		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toThrow('self link not found');
+		expect(f.logger.warn).not.toHaveBeenCalled();
+		expect(f.createPerson).not.toHaveBeenCalled();
+		expect(f.updatePerson).not.toHaveBeenCalled();
+	});
+
+	test('XRD does not bypass URI host validation', async () => {
+		const f = fixture();
+		f.send.mockResolvedValue(new Response(xrd('https://other.example/users/alice')));
+		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toThrow('Invalid uri');
+		expect(f.logger.warn).not.toHaveBeenCalled();
+		expect(f.updatePerson).not.toHaveBeenCalled();
+	});
+
+	test('does not classify response-size errors as parse failures', async () => {
+		const f = fixture();
+		f.send.mockResolvedValue(new Response(xrd(), { size: 10 }));
+		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toMatchObject({ cause: { type: 'max-size' } });
+		expect(f.logger.warn).not.toHaveBeenCalled();
 	});
 });
