@@ -11,7 +11,6 @@
 - MCP は既定で無効です。有効化には `enableMcp: true`、HTTPS と正しい Host を維持するプロキシ、`access:mcp` と対象操作の権限が必要です。 (#36, #43)
 - OIDC によるログインは未接続の基盤段階です。Conditional Mediation も既存のログイン画面を置き換えない、既定無効の試験部品です。課金やチャンネル連合の未マージ機能は含みません。 (#99, #109, #121, #131, #135)
 - commit ごとの収録先・除外理由は [差分棚卸し記録](https://github.com/tamaina/misskey-a/blob/develop/docs/release/9000.0.0-audit.json) を参照してください。
-- [beta.3 の GitHub prerelease](https://github.com/tamaina/misskey-a/releases/tag/9000.0.0-beta.3) は公開済みですが、SDK の npm 公開は `404 Not Found`、Docker 公開は認証情報不足で失敗しています。beta.3 タグ後の変更も本節には含まれるため、利用するソースの commit を確認してください。
 
 ### General
 - Enhance: 依存関係を更新（pnpm 12.17.0、NestJS 12.4.2、Nodemailer・minimatchのセキュリティ更新を含む） ([upstream #18046](https://github.com/misskey-dev/misskey/pull/18046), [#18074](https://github.com/misskey-dev/misskey/pull/18074), [#18083](https://github.com/misskey-dev/misskey/pull/18083), [#18116](https://github.com/misskey-dev/misskey/pull/18116), [#18125](https://github.com/misskey-dev/misskey/pull/18125))
