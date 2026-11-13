@@ -2,43 +2,29 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { toPackedFlash } from '../../flash.schema.js';
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFlashSearchDefinition, packedFlashSearchInput, packedFlashSearchOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { FlashEntityService } from '../../serializers/FlashEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { FlashService } from '../../services/FlashService.js';
-
-const contractProjection = projectEndpointContract(packedFlashSearchDefinition);
-
-export const meta = {
-	tags: ['flash'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFlashSearchInput, typeof packedFlashSearchOutput> {
-	constructor(
-		private flashService: FlashService,
-		private flashEntityService: FlashEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const result = await this.flashService.search(ps.query, {
+import { flashSearchContract } from './search.contract.js';
+import type { FlashEntityService } from '../../serializers/FlashEntityService.js';
+import type { FlashService } from '../../services/FlashService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface FlashSearchDependencies {
+	flashService: Pick<FlashService, 'search'>;
+	flashEntityService: Pick<FlashEntityService, 'packMany'>;
+}
+export function createFlashSearchProcedure(deps: FlashSearchDependencies) {
+	return createApiProcedure<MiLocalUser>()(flashSearchContract)
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const result = await deps.flashService.search(ps.query, {
 				sinceId: ps.sinceId,
 				untilId: ps.untilId,
 				sinceDate: ps.sinceDate,
 				untilDate: ps.untilDate,
 				limit: ps.limit,
 			});
-
-			return await this.flashEntityService.packMany(result, me);
+			return (await deps.flashEntityService.packMany(result, me)).map(toPackedFlash);
 		});
-	}
 }

@@ -39,7 +39,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<div :class="$style.action">
 		<MkButton :small="true" inline @click="tweetExpanded = false">
-			<i class="ti ti-x"></i> {{ $locale.sfc.close }}
+			<i class="ti ti-x"></i> {{ globalLocale.env.close }}
 		</MkButton>
 	</div>
 </template>
@@ -83,10 +83,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';
 import { url as local } from '@features/boot/frontend/shared/config.js';
 import { versatileLang } from '@features/ui/frontend/shared/intl-const.js';
-import type { SummalyResult } from '@misskey-dev/summaly';
 import * as os from '@features/ui/frontend/os.js';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -94,6 +94,10 @@ import { transformPlayerUrl } from '@features/markup/frontend/utility/url-previe
 import { store } from '@features/preferences/frontend/store.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { maybeMakeRelative } from '@features/web/frontend/shared/url.js';
+import type { SummalyResult } from '@misskey-dev/summaly';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	url: string;
@@ -392,7 +396,6 @@ onUnmounted(() => {
 <locale locale="ar-SA" lang="json">
 {
   "disablePlayer": "أغلق مشغل الفيديو",
-  "close": "اغلق",
   "failedToPreviewUrl": "تتعذر المعاينة",
   "expandTweet": "وسّع التغريدة",
   "enablePlayer": "افتح مشغل الفيديو",
@@ -403,7 +406,6 @@ onUnmounted(() => {
 <locale locale="ca-ES" lang="json">
 {
   "disablePlayer": "Tanca el reproductor de vídeo",
-  "close": "Tanca",
   "failedToPreviewUrl": "Vista prèvia no disponible",
   "expandTweet": "Expandir post",
   "enablePlayer": "Obre el reproductor de vídeo",
@@ -414,7 +416,6 @@ onUnmounted(() => {
 <locale locale="cs-CZ" lang="json">
 {
   "disablePlayer": "Zavřít video přehrávač",
-  "close": "Zavřít",
   "failedToPreviewUrl": "Náhled se nezdařil",
   "expandTweet": "Rozbalit tweet",
   "enablePlayer": "Otevřít video přehrávač",
@@ -425,7 +426,6 @@ onUnmounted(() => {
 <locale locale="da-DK" lang="json">
 {
   "disablePlayer": "Close video player",
-  "close": "Close",
   "failedToPreviewUrl": "Could not preview",
   "expandTweet": "Expand post",
   "enablePlayer": "Open video player",
@@ -436,7 +436,6 @@ onUnmounted(() => {
 <locale locale="de-DE" lang="json">
 {
   "disablePlayer": "Video-Player schließen",
-  "close": "Schließen",
   "failedToPreviewUrl": "Vorschau nicht anzeigbar",
   "expandTweet": "Tweet ausklappen",
   "enablePlayer": "Video-Player öffnen",
@@ -447,7 +446,6 @@ onUnmounted(() => {
 <locale locale="en-US" lang="json">
 {
   "disablePlayer": "Close video player",
-  "close": "Close",
   "failedToPreviewUrl": "Could not preview",
   "expandTweet": "Expand post",
   "enablePlayer": "Open video player",
@@ -458,7 +456,6 @@ onUnmounted(() => {
 <locale locale="es-ES" lang="json">
 {
   "disablePlayer": "Cerrar reproductor",
-  "close": "Cerrar",
   "failedToPreviewUrl": "No se pudo generar la vista previa",
   "expandTweet": "Expandir tweet",
   "enablePlayer": "Abrir reproductor",
@@ -469,7 +466,6 @@ onUnmounted(() => {
 <locale locale="fr-FR" lang="json">
 {
   "disablePlayer": "Fermer le lecteur vidéo",
-  "close": "Fermer",
   "failedToPreviewUrl": "Aperçu d'URL échoué",
   "expandTweet": "Étendre le tweet",
   "enablePlayer": "Ouvrir dans le lecteur vidéo",
@@ -480,7 +476,6 @@ onUnmounted(() => {
 <locale locale="id-ID" lang="json">
 {
   "disablePlayer": "Tutup pemutar video",
-  "close": "Tutup",
   "failedToPreviewUrl": "Tidak dapat dipratinjau",
   "expandTweet": "Perluas utas",
   "enablePlayer": "Buka pemutar video",
@@ -491,7 +486,6 @@ onUnmounted(() => {
 <locale locale="it-IT" lang="json">
 {
   "disablePlayer": "Chiudi",
-  "close": "Chiudi",
   "failedToPreviewUrl": "Anteprima non disponibile",
   "expandTweet": "Espandi tweet",
   "enablePlayer": "Visualizza",
@@ -502,7 +496,6 @@ onUnmounted(() => {
 <locale locale="ja-JP" lang="json">
 {
   "disablePlayer": "プレイヤーを閉じる",
-  "close": "閉じる",
   "failedToPreviewUrl": "プレビューできません",
   "expandTweet": "ポストを展開する",
   "enablePlayer": "プレイヤーを開く",
@@ -513,7 +506,6 @@ onUnmounted(() => {
 <locale locale="ja-KS" lang="json">
 {
   "disablePlayer": "プレイヤー閉じる",
-  "close": "さいなら",
   "failedToPreviewUrl": "プレビューできへん",
   "expandTweet": "ポスト展開しとく",
   "enablePlayer": "プレイヤー開く",
@@ -524,7 +516,6 @@ onUnmounted(() => {
 <locale locale="kab-KAB" lang="json">
 {
   "disablePlayer": "Close video player",
-  "close": "Close",
   "failedToPreviewUrl": "Could not preview",
   "expandTweet": "Expand post",
   "enablePlayer": "Open video player",
@@ -535,7 +526,6 @@ onUnmounted(() => {
 <locale locale="kn-IN" lang="json">
 {
   "disablePlayer": "Close video player",
-  "close": "Close",
   "failedToPreviewUrl": "Could not preview",
   "expandTweet": "Expand post",
   "enablePlayer": "Open video player",
@@ -546,7 +536,6 @@ onUnmounted(() => {
 <locale locale="ko-KR" lang="json">
 {
   "disablePlayer": "플레이어 닫기",
-  "close": "닫기",
   "failedToPreviewUrl": "미리 볼 수 없음",
   "expandTweet": "게시물 확장하기",
   "enablePlayer": "플레이어 열기",
@@ -557,7 +546,6 @@ onUnmounted(() => {
 <locale locale="nl-NL" lang="json">
 {
   "disablePlayer": "Videospeler sluiten",
-  "close": "Sluiten",
   "failedToPreviewUrl": "Could not preview",
   "expandTweet": "Notitie uitklappen",
   "enablePlayer": "Videospeler openen",
@@ -568,7 +556,6 @@ onUnmounted(() => {
 <locale locale="no-NO" lang="json">
 {
   "disablePlayer": "Close video player",
-  "close": "Lukk",
   "failedToPreviewUrl": "Could not preview",
   "expandTweet": "Expand post",
   "enablePlayer": "Open video player",
@@ -579,7 +566,6 @@ onUnmounted(() => {
 <locale locale="pl-PL" lang="json">
 {
   "disablePlayer": "Zamknij odtwarzacz wideo",
-  "close": "Zamknij",
   "failedToPreviewUrl": "Could not preview",
   "expandTweet": "Rozwiń tweet",
   "enablePlayer": "Otwórz odtwarzacz wideo",
@@ -590,7 +576,6 @@ onUnmounted(() => {
 <locale locale="pt-PT" lang="json">
 {
   "disablePlayer": "Fechar o reprodutor de mídia",
-  "close": "Fechar",
   "failedToPreviewUrl": "Não foi possível carregar prévia",
   "expandTweet": "Expandir tweet",
   "enablePlayer": "Abrir o reprodutor de mídia",
@@ -601,7 +586,6 @@ onUnmounted(() => {
 <locale locale="ru-RU" lang="json">
 {
   "disablePlayer": "Выключить проигрыватель",
-  "close": "Закрыть",
   "failedToPreviewUrl": "Предварительный просмотр недоступен",
   "expandTweet": "Развернуть заметку",
   "enablePlayer": "Включить проигрыватель",
@@ -612,7 +596,6 @@ onUnmounted(() => {
 <locale locale="sk-SK" lang="json">
 {
   "disablePlayer": "Zavrieť video prehrávač",
-  "close": "Zavrieť",
   "failedToPreviewUrl": "Could not preview",
   "expandTweet": "Rozšíriť tweet",
   "enablePlayer": "Otvoriť video prehrávač",
@@ -623,7 +606,6 @@ onUnmounted(() => {
 <locale locale="th-TH" lang="json">
 {
   "disablePlayer": "ปิดเครื่องเล่นวิดีโอ",
-  "close": "ปิด",
   "failedToPreviewUrl": "ไม่สามารถดูตัวอย่างได้",
   "expandTweet": "ขยายทวีต",
   "enablePlayer": "เปิดเครื่องเล่นวิดีโอ",
@@ -634,7 +616,6 @@ onUnmounted(() => {
 <locale locale="tr-TR" lang="json">
 {
   "disablePlayer": "Video oynatıcıyı kapat",
-  "close": "Kapat",
   "failedToPreviewUrl": "Önizleme yapılamadı",
   "expandTweet": "Notu genişlet",
   "enablePlayer": "Video oynatıcıyı aç",
@@ -645,7 +626,6 @@ onUnmounted(() => {
 <locale locale="ug-CN" lang="json">
 {
   "disablePlayer": "Close video player",
-  "close": "Close",
   "failedToPreviewUrl": "Could not preview",
   "expandTweet": "Expand post",
   "enablePlayer": "Open video player",
@@ -656,7 +636,6 @@ onUnmounted(() => {
 <locale locale="uk-UA" lang="json">
 {
   "disablePlayer": "Закрити відеоплеєр",
-  "close": "Закрити",
   "failedToPreviewUrl": "Не вдалося переглянути",
   "expandTweet": "Розгорнути твіт",
   "enablePlayer": "Відкрити відеоплеєр",
@@ -667,7 +646,6 @@ onUnmounted(() => {
 <locale locale="vi-VN" lang="json">
 {
   "disablePlayer": "Đóng trình phát video",
-  "close": "Đóng",
   "failedToPreviewUrl": "Không thể xem trước",
   "expandTweet": "Mở rộng tweet",
   "enablePlayer": "Mở trình phát video",
@@ -678,7 +656,6 @@ onUnmounted(() => {
 <locale locale="zh-CN" lang="json">
 {
   "disablePlayer": "关闭播放器",
-  "close": "关闭",
   "failedToPreviewUrl": "无法预览",
   "expandTweet": "展开帖子",
   "enablePlayer": "打开播放器",
@@ -689,7 +666,6 @@ onUnmounted(() => {
 <locale locale="zh-TW" lang="json">
 {
   "disablePlayer": "關閉播放器",
-  "close": "關閉",
   "failedToPreviewUrl": "無法預覽",
   "expandTweet": "展開推文",
   "enablePlayer": "開啟播放器",

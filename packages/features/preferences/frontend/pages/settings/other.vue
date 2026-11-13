@@ -108,6 +108,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 			</SearchMarker>
 
+			<SearchMarker :keywords="['client', 'error', 'log']">
+				<MkFolder>
+					<template #icon><SearchIcon><i class="ti ti-bug"></i></SearchIcon></template>
+					<template #label><SearchLabel>{{ $locale.sfc.clientErrorLogTitle }}</SearchLabel></template>
+					<MkClientErrorLog/>
+				</MkFolder>
+			</SearchMarker>
+
 			<SearchMarker :keywords="['developer', 'mode', 'debug']">
 				<MkFolder>
 					<template #icon><SearchIcon><i class="ti ti-code"></i></SearchIcon></template>
@@ -147,6 +155,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import MkClientErrorLog from './error-log.vue';
 import { computed, watch } from 'vue';
 import XMigration from '@features/users/frontend/pages/settings/migration.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
@@ -205,7 +214,7 @@ async function deleteAccount() {
 		title: $locale.value.sfc.started,
 	});
 
-	await signout();
+	await signout('account-deletion-accepted');
 }
 
 function resetAllTips() {
@@ -260,7 +269,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -287,7 +297,8 @@ definePage(() => ({
 	"hideAllTips": "Amagar tots els trucs i consells",
 	"readAllChatMessages": "Marcar tots els missatges com a llegits",
 	"settingsPersistence_title": "Persistència de la configuració ",
-	"forceBackup": "Còpia de seguretat forçada de la configuració "
+	"forceBackup": "Còpia de seguretat forçada de la configuració ",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -314,7 +325,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Označit všechny zprávy za přečtené",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -341,7 +353,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -368,7 +381,8 @@ definePage(() => ({
 	"hideAllTips": "Alle „Tipps und Tricks“ ausblenden",
 	"readAllChatMessages": "Alle Nachrichten als gelesen markieren",
 	"settingsPersistence_title": "Persistenz der Einstellungen",
-	"forceBackup": "Erzwungenes Backup der Einstellungen"
+	"forceBackup": "Erzwungenes Backup der Einstellungen",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -395,7 +409,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -422,7 +437,8 @@ definePage(() => ({
 	"hideAllTips": "Ocultar todos los \"Trucos y consejos\"",
 	"readAllChatMessages": "Marcar todos los mensajes como leídos",
 	"settingsPersistence_title": "Persistencia de la configuración",
-	"forceBackup": "Forzar una copia de seguridad de la configuración"
+	"forceBackup": "Forzar una copia de seguridad de la configuración",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -449,7 +465,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -476,7 +493,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Tandai semua pesan menjadi terbaca",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -503,7 +521,8 @@ definePage(() => ({
 	"hideAllTips": "Nascondi tutti i suggerimenti",
 	"readAllChatMessages": "Segna tutti i messaggi come già letti",
 	"settingsPersistence_title": "Configurazione persistente",
-	"forceBackup": "Backup forzato delle impostazioni"
+	"forceBackup": "Backup forzato delle impostazioni",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -530,7 +549,8 @@ definePage(() => ({
 	"hideAllTips": "全ての「ヒントとコツ」を非表示",
 	"readAllChatMessages": "すべてのメッセージを既読にする",
 	"settingsPersistence_title": "設定の永続化",
-	"forceBackup": "設定の強制バックアップ"
+	"forceBackup": "設定の強制バックアップ",
+	"clientErrorLogTitle": "クライアントエラーログ"
 }
 </locale>
 
@@ -557,7 +577,8 @@ definePage(() => ({
 	"hideAllTips": "「ヒントとコツ」は全部表示せんでええ",
 	"readAllChatMessages": "メッセージを全部読んだことにしとく",
 	"settingsPersistence_title": "設定の永続化",
-	"forceBackup": "設定の強制バックアップ"
+	"forceBackup": "設定の強制バックアップ",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -584,7 +605,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -611,7 +633,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -638,7 +661,8 @@ definePage(() => ({
 	"hideAllTips": "모든 '팁과 유용한 정보'를 비표시",
 	"readAllChatMessages": "모든 메시지를 읽은 상태로 표시",
 	"settingsPersistence_title": "설정 영구화",
-	"forceBackup": "설정 강제 백업"
+	"forceBackup": "설정 강제 백업",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -665,7 +689,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -692,7 +717,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -719,7 +745,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -746,7 +773,8 @@ definePage(() => ({
 	"hideAllTips": "Ocultas todas as \"Dicas e Truques\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -773,7 +801,8 @@ definePage(() => ({
 	"hideAllTips": "Скрыть все \"Советы и рекомендации\"",
 	"readAllChatMessages": "Отметить прочитанным",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -800,7 +829,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -827,7 +857,8 @@ definePage(() => ({
 	"hideAllTips": "ซ่อนคำแนะนำและเคล็ดลับทั้งหมด",
 	"readAllChatMessages": "ทำเครื่องหมายใส่ข้อความทั้งหมดว่าอ่านแล้ว",
 	"settingsPersistence_title": "คงสภาพการตั้งค่า",
-	"forceBackup": "บังคับสำรองการตั้งค่า"
+	"forceBackup": "บังคับสำรองการตั้งค่า",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -854,7 +885,8 @@ definePage(() => ({
 	"hideAllTips": "Tüm “İpucu & Püf Nokta” gizle",
 	"readAllChatMessages": "Tüm mesajları okundu olarak işaretle",
 	"settingsPersistence_title": "Ayarların kalıcılığı",
-	"forceBackup": "Ayarların zorunlu yedeklenmesi"
+	"forceBackup": "Ayarların zorunlu yedeklenmesi",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -881,7 +913,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -908,7 +941,8 @@ definePage(() => ({
 	"hideAllTips": "Приховати всі «Поради й підказки»",
 	"readAllChatMessages": "Позначити всі повідомлення як прочитані",
 	"settingsPersistence_title": "Збереження налаштувань",
-	"forceBackup": "Примусово створити резервну копію налаштувань"
+	"forceBackup": "Примусово створити резервну копію налаштувань",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -935,7 +969,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -962,7 +997,8 @@ definePage(() => ({
 	"hideAllTips": "隐藏所有的 “提示与技巧”",
 	"readAllChatMessages": "将所有消息标记为已读",
 	"settingsPersistence_title": "设置持久化",
-	"forceBackup": "强制备份设置"
+	"forceBackup": "强制备份设置",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -989,6 +1025,7 @@ definePage(() => ({
 	"hideAllTips": "隱藏所有「提示與技巧」",
 	"readAllChatMessages": "將所有訊息標記為已讀",
 	"settingsPersistence_title": "設定的持久化",
-	"forceBackup": "強制備份設定"
+	"forceBackup": "強制備份設定",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>

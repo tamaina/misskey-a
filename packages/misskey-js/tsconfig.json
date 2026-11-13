@@ -5,6 +5,7 @@
 		"module": "nodenext",
 		"moduleResolution": "nodenext",
 		"declaration": true,
+		"resolveJsonModule": true,
 		"declarationMap": true,
 		"sourceMap": false,
 		"outDir": "./built",

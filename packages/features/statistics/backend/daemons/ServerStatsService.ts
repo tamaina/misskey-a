@@ -5,6 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import Xev from 'xev';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import * as osUtils from 'os-utils';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { MiMeta } from '@features/persistence/backend/repositories/models.js';
@@ -28,6 +29,8 @@ export class ServerStatsService implements OnApplicationShutdown {
 	constructor(
 		@Inject(DI.meta)
 		private meta: MiMeta,
+
+		private globalEventService: GlobalEventService,
 	) {
 	}
 
@@ -69,6 +72,7 @@ export class ServerStatsService implements OnApplicationShutdown {
 			};
 			if (this.disposing) return;
 			ev.emit('serverStats', stats);
+			this.globalEventService.publishStatisticsStream('serverStats', stats);
 			log.unshift(stats);
 			if (log.length > 200) log.pop();
 		};

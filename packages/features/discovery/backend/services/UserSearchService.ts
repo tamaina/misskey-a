@@ -199,7 +199,7 @@ export class UserSearchService {
 			}
 		}
 
-		userQuery.andWhere('user.isSuspended = FALSE');
+		userQuery.andWhere('user.isSuspended = FALSE').andWhere('user.isRemoteSuspended = FALSE');
 
 		return userQuery;
 	}
@@ -235,7 +235,7 @@ export class UserSearchService {
 					.where('user.updatedAt IS NULL')
 					.orWhere('user.updatedAt > :activeThreshold', { activeThreshold: activeThreshold });
 			}))
-			.andWhere('user.isSuspended = FALSE');
+			.andWhere('user.isSuspended = FALSE').andWhere('user.isRemoteSuspended = FALSE');
 
 		if (mutingQuery) {
 			nameQuery.andWhere(`user.id NOT IN (${mutingQuery.getQuery()})`);
@@ -277,7 +277,7 @@ export class UserSearchService {
 						.where('user.updatedAt IS NULL')
 						.orWhere('user.updatedAt > :activeThreshold', { activeThreshold: activeThreshold });
 				}))
-				.andWhere('user.isSuspended = FALSE')
+				.andWhere('user.isSuspended = FALSE').andWhere('user.isRemoteSuspended = FALSE')
 				.setParameters(profQuery.getParameters());
 
 			users = users.concat(await userQuery

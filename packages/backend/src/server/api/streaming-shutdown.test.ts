@@ -38,7 +38,7 @@ test('detach disposes a stream whose initialization completes after shutdown sta
 });
 test('detach closes an established WebSocket and removes the Redis listener', async () => {
 	const redis = new EventEmitter(); const server = createServer();
-	const stream = { init: async () => {}, listen: async () => {}, dispose: vi.fn() };
+	const stream = { checkBrowserSession: async () => true, init: async () => {}, listen: async () => {}, dispose: vi.fn() };
 	const moduleRef = { create: async () => stream, registerRequestByContextId: vi.fn() };
 	const service = new StreamingApiServerService(redis as never, moduleRef as never, { authenticate: async () => [null, null] } as never, {} as never);
 	service.attach(server);
@@ -54,4 +54,21 @@ test('detach closes an established WebSocket and removes the Redis listener', as
 		client.terminate(); await service.detach();
 		await new Promise<void>(resolve => server.close(() => resolve()));
 	}
+});
+
+test('carries browser-session identity and refuses a session revoked during initialization', async () => {
+	const browserSession = { id: 'session-a', userId: 'owner' };
+	const user = { id: 'owner', isSuspended: false };
+	const stream = { init: async () => {}, checkBrowserSession: async () => false, dispose: vi.fn() };
+	const moduleRef = { create: async () => stream, registerRequestByContextId: vi.fn() };
+	const redis = new EventEmitter(); const server = new EventEmitter();
+	const service = new StreamingApiServerService(redis as never, moduleRef as never, { authenticate: async () => [user, null, browserSession] } as never, {} as never);
+	service.attach(server as never);
+	const socket = { destroy: vi.fn(), write: vi.fn() };
+	server.emit('upgrade', { url: '/streaming', headers: {} }, socket, Buffer.alloc(0));
+	try {
+		await vi.waitFor(() => { expect(socket.destroy).toHaveBeenCalledOnce(); });
+		expect(moduleRef.registerRequestByContextId).toHaveBeenCalledWith({ user, token: null, browserSession }, expect.anything());
+		expect(stream.dispose).toHaveBeenCalledOnce();
+	} finally { await service.detach(); }
 });

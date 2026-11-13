@@ -10,20 +10,52 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<SearchText>{{ $locale.sfc.settingsPrivacyBanner }}</SearchText>
 		</MkFeatureBanner>
 
-		<SearchMarker :keywords="['follow', 'lock']">
-			<MkSwitch v-model="isLocked" @update:modelValue="save()">
-				<template #label><SearchLabel>{{ $locale.sfc.makeFollowManuallyApprove }}</SearchLabel></template>
-				<template #caption><SearchText>{{ $locale.sfc.lockedAccountInfo }}</SearchText></template>
-			</MkSwitch>
-		</SearchMarker>
+		<FormSection first>
+			<template #label><SearchLabel>{{ $locale.sfc.followApprovalGroupTitle }}</SearchLabel></template>
+			<div class="_gaps_m">
+				<SearchMarker :keywords="['follow', 'lock']">
+					<MkSwitch v-model="isLocked" @update:modelValue="save()">
+						<template #label><SearchLabel>{{ $locale.sfc.makeFollowManuallyApprove }}</SearchLabel></template>
+						<template #caption><SearchText>{{ $locale.sfc.lockedAccountInfo }}</SearchText></template>
+					</MkSwitch>
+				</SearchMarker>
 
-		<MkDisableSection :disabled="!isLocked">
-			<SearchMarker :keywords="['follow', 'auto', 'accept']">
-				<MkSwitch v-model="autoAcceptFollowed" @update:modelValue="save()">
-					<template #label><SearchLabel>{{ $locale.sfc.autoAcceptFollowed }}</SearchLabel></template>
-				</MkSwitch>
-			</SearchMarker>
-		</MkDisableSection>
+				<SearchMarker :keywords="['follow', 'request', 'approval', 'age', $locale.sfc.followApprovalLocal, $locale.sfc.followApprovalLocalDescription, $locale.sfc.followApprovalRemote, $locale.sfc.followApprovalRemoteDescription]">
+					<FormSlot>
+						<template #label><SearchLabel>{{ $locale.sfc.followApprovalTitle }}</SearchLabel></template>
+						<div class="_gaps_m">
+							<div><SearchText>{{ $locale.sfc.followApprovalDescription }}</SearchText></div>
+							<MkInfo v-if="isLocked"><SearchText>{{ $locale.sfc.followApprovalInactiveDescription }}</SearchText></MkInfo>
+							<MkDisableSection :disabled="isLocked">
+								<div class="_gaps_m">
+									<div v-for="setting in followApprovalSettings" :key="setting.key" class="_gaps_s">
+										<MkSelect v-model="setting.mode" :items="followApprovalModes" @update:modelValue="saveFollowApproval(setting)">
+											<template #label>{{ setting.label }}</template>
+											<template #caption>{{ setting.caption }}</template>
+										</MkSelect>
+										<MkInput v-if="setting.mode === 'custom'" v-model="setting.amount" type="number" :min="1 / FOLLOW_APPROVAL_UNIT_SECONDS[setting.unit]" :max="FOLLOW_APPROVAL_MAX_SECONDS / FOLLOW_APPROVAL_UNIT_SECONDS[setting.unit]" step="any" @update:modelValue="scheduleFollowApprovalSave(setting)">
+											<template #label>{{ $locale.sfc.followApprovalPeriod }}</template>
+											<template #suffix>{{ setting.unit === 'day' ? $locale.sfc.timeDay : $locale.sfc.timeHour }}</template>
+											<template v-if="followApprovalPeriodToSeconds(setting.amount, setting.unit) == null" #caption>{{ $locale.sfc.followApprovalInvalidPeriod }}</template>
+										</MkInput>
+										<MkSelect v-if="setting.mode === 'custom'" v-model="setting.unit" :items="followApprovalUnits" @update:modelValue="saveFollowApproval(setting)">
+											<template #label>{{ $locale.sfc.followApprovalUnit }}</template>
+										</MkSelect>
+									</div>
+								</div>
+							</MkDisableSection>
+						</div>
+					</FormSlot>
+				</SearchMarker>
+
+				<SearchMarker :keywords="['follow', 'auto', 'accept']">
+					<MkSwitch v-model="autoAcceptFollowed" @update:modelValue="save()">
+						<template #label><SearchLabel>{{ $locale.sfc.autoAcceptFollowed }}</SearchLabel></template>
+						<template #caption><SearchText>{{ $locale.sfc.followApprovalAutoAcceptDescription }}</SearchText></template>
+					</MkSwitch>
+				</SearchMarker>
+			</div>
+		</FormSection>
 
 		<SearchMarker :keywords="['reaction', 'public']">
 			<MkSwitch v-model="publicReactions" @update:modelValue="save()">
@@ -111,7 +143,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkSelect
 									v-model="makeNotesFollowersOnlyBefore_type"
 									:items="[
-										{ label: $locale.sfc.none, value: null },
+										{ label: globalLocale.env.none, value: null },
 										{ label: $locale.sfc.accountSettingsNotesHavePassedSpecifiedPeriod, value: 'relative' },
 										{ label: $locale.sfc.accountSettingsNotesOlderThanSpecifiedDateAndTime, value: 'absolute' },
 									]"
@@ -161,7 +193,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkSelect
 									v-model="makeNotesHiddenBefore_type"
 									:items="[
-										{ label: $locale.sfc.none, value: null },
+										{ label: globalLocale.env.none, value: null },
 										{ label: $locale.sfc.accountSettingsNotesHavePassedSpecifiedPeriod, value: 'relative' },
 										{ label: $locale.sfc.accountSettingsNotesOlderThanSpecifiedDateAndTime, value: 'absolute' },
 									]"
@@ -212,8 +244,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
-import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { FOLLOW_APPROVAL_MAX_SECONDS, FOLLOW_APPROVAL_UNIT_SECONDS, followApprovalPeriodFromSeconds, followApprovalPeriodToSeconds } from '@features/users/frontend/utility/follow-approval.js';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -229,11 +262,85 @@ import * as os from '@features/ui/frontend/os.js';
 import MkDisableSection from '@features/ui/frontend/components/MkDisableSection.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
+import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
+import type { FollowApprovalPeriodUnit } from '@features/users/frontend/utility/follow-approval.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
 const isLocked = ref($i.isLocked);
 const autoAcceptFollowed = ref($i.autoAcceptFollowed);
+
+type FollowApprovalSetting = {
+	key: 'followApprovalLocalSeconds' | 'followApprovalRemoteSeconds';
+	mode: 'default' | 'disabled' | 'custom';
+	amount: number | null;
+	unit: FollowApprovalPeriodUnit;
+	label: string;
+	caption: string;
+};
+
+const followApprovalSettings = ref<FollowApprovalSetting[]>([
+	{
+		key: 'followApprovalLocalSeconds',
+		mode: $i.followApprovalLocalSeconds == null ? 'default' : $i.followApprovalLocalSeconds === 0 ? 'disabled' : 'custom',
+		...followApprovalPeriodFromSeconds($i.followApprovalLocalSeconds || 7 * 86400),
+		get label() { return $locale.value.sfc.followApprovalLocal; },
+		get caption() { return $locale.value.sfc.followApprovalLocalDescription; },
+	},
+	{
+		key: 'followApprovalRemoteSeconds',
+		mode: $i.followApprovalRemoteSeconds == null ? 'default' : $i.followApprovalRemoteSeconds === 0 ? 'disabled' : 'custom',
+		...followApprovalPeriodFromSeconds($i.followApprovalRemoteSeconds || 7 * 86400),
+		get label() { return $locale.value.sfc.followApprovalRemote; },
+		get caption() { return $locale.value.sfc.followApprovalRemoteDescription; },
+	},
+]);
+
+const followApprovalModes = computed(() => [
+	{ label: $locale.value.sfc.followApprovalUseDefault, value: 'default' },
+	{ label: $locale.value.sfc.disabled, value: 'disabled' },
+	{ label: $locale.value.sfc.followApprovalCustom, value: 'custom' },
+]);
+
+const followApprovalUnits = computed(() => [
+	{ label: $locale.value.sfc.timeHour, value: 'hour' },
+	{ label: $locale.value.sfc.timeDay, value: 'day' },
+]);
+
+const followApprovalSaveTimers = new Map<FollowApprovalSetting['key'], number>();
+
+function scheduleFollowApprovalSave(setting: FollowApprovalSetting) {
+	window.clearTimeout(followApprovalSaveTimers.get(setting.key));
+	followApprovalSaveTimers.set(setting.key, window.setTimeout(() => saveFollowApproval(setting), 1000));
+}
+
+onBeforeUnmount(() => {
+	for (const setting of followApprovalSettings.value) {
+		if (followApprovalSaveTimers.has(setting.key)) saveFollowApproval(setting);
+	}
+});
+
+function saveFollowApproval(setting: FollowApprovalSetting) {
+	window.clearTimeout(followApprovalSaveTimers.get(setting.key));
+	followApprovalSaveTimers.delete(setting.key);
+	const seconds = followApprovalPeriodToSeconds(setting.amount, setting.unit);
+	if (setting.mode === 'custom' && seconds == null) {
+		return;
+	}
+	misskeyApi('i/update', {
+		[setting.key]: setting.mode === 'default' ? null : setting.mode === 'disabled' ? 0 : seconds,
+	}).catch(err => {
+		os.alert({
+			type: 'error',
+			title: globalLocale.value.env.error,
+			text: err.code === 'RATE_LIMIT_EXCEEDED' ? $locale.value.sfc.cannotPerformTemporaryDescription : err.message,
+		});
+	});
+}
+
 const noCrawle = ref($i.noCrawle);
 const preventAiLearning = ref($i.preventAiLearning);
 const isExplorable = ref($i.isExplorable);
@@ -247,9 +354,9 @@ const {
 	def: followingVisibilityDef,
 } = useMkSelect({
 	items: [
-		{ label: $locale.value.sfc.public, value: 'public' },
-		{ label: $locale.value.sfc.followers, value: 'followers' },
-		{ label: $locale.value.sfc.private, value: 'private' },
+		{ label: globalLocale.value.env.public, value: 'public' },
+		{ label: globalLocale.value.env.followers, value: 'followers' },
+		{ label: globalLocale.value.env.private, value: 'private' },
 	],
 	initialValue: $i.followingVisibility,
 });
@@ -258,9 +365,9 @@ const {
 	def: followersVisibilityDef,
 } = useMkSelect({
 	items: [
-		{ label: $locale.value.sfc.public, value: 'public' },
-		{ label: $locale.value.sfc.followers, value: 'followers' },
-		{ label: $locale.value.sfc.private, value: 'private' },
+		{ label: globalLocale.value.env.public, value: 'public' },
+		{ label: globalLocale.value.env.followers, value: 'followers' },
+		{ label: globalLocale.value.env.private, value: 'private' },
 	],
 	initialValue: $i.followersVisibility,
 });
@@ -300,11 +407,11 @@ const makeNotesFollowersOnlyBefore_type = computed({
 });
 
 const makeNotesFollowersOnlyBefore_presets = [
-	{ label: $locale.value.sfc.oneHour, value: -3600 },
-	{ label: $locale.value.sfc.oneDay, value: -86400 },
+	{ label: globalLocale.value.env.oneHour, value: -3600 },
+	{ label: globalLocale.value.env.oneDay, value: -86400 },
 	{ label: $locale.value.sfc.threeDays, value: -259200 },
-	{ label: $locale.value.sfc.oneWeek, value: -604800 },
-	{ label: $locale.value.sfc.oneMonth, value: -2592000 },
+	{ label: globalLocale.value.env.oneWeek, value: -604800 },
+	{ label: globalLocale.value.env.oneMonth, value: -2592000 },
 	{ label: $locale.value.sfc.threeMonths, value: -7776000 },
 	{ label: $locale.value.sfc.oneYear, value: -31104000 },
 ] satisfies MkSelectItem[];
@@ -352,11 +459,11 @@ const makeNotesHiddenBefore_type = computed({
 });
 
 const makeNotesHiddenBefore_presets = [
-	{ label: $locale.value.sfc.oneHour, value: -3600 },
-	{ label: $locale.value.sfc.oneDay, value: -86400 },
+	{ label: globalLocale.value.env.oneHour, value: -3600 },
+	{ label: globalLocale.value.env.oneDay, value: -86400 },
 	{ label: $locale.value.sfc.threeDays, value: -259200 },
-	{ label: $locale.value.sfc.oneWeek, value: -604800 },
-	{ label: $locale.value.sfc.oneMonth, value: -2592000 },
+	{ label: globalLocale.value.env.oneWeek, value: -604800 },
+	{ label: globalLocale.value.env.oneMonth, value: -2592000 },
 	{ label: $locale.value.sfc.threeMonths, value: -7776000 },
 	{ label: $locale.value.sfc.oneYear, value: -31104000 },
 ] satisfies MkSelectItem[];
@@ -455,7 +562,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "لا شيء",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -464,22 +570,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "علني",
-	"followers": "المتابِعون",
-	"private": "خاص",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "ساعة",
-	"oneDay": "يوم",
 	"threeDays": "3 days",
-	"oneWeek": "أسبوع",
-	"oneMonth": "شهر",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "معطّل",
+	"timeHour": "سا",
+	"timeDay": "ي",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -511,7 +628,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Es requereix l'inici de sessió per poder veure totes les notes i el contingut que has creat. Amb això esperem evitar que els rastrejadors recopilin informació.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "També es desactivaran les vistes prèvies d'URLS (OGP), la incrustació a pàgines web i la visualització des de servidors que no admetin la citació de notes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Permetre que les notes antigues només es mostrin als seguidors.",
-	"none": "Res",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes publicades durant un període de temps especificat.",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes més antigues de la data i temps especificat ",
 	"custom": "Personalitzat",
@@ -520,22 +636,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Fes que les notes antigues siguin privades",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "Mentres aquesta funció estigui activada les notes que hagin superat una data i hora fixada o hagi passat el temps establert només seran visibles per a tu. Si la desactives es restablirà també l'estat públic de les notes.",
 	"accountSettingsMayNotEffectSomeSituations": "Aquestes restriccions són simplificades. Pot ser que no s'apliquin en determinades situacions, com quan es modera o visualitza un servidor remot.",
-	"public": "Públic ",
-	"followers": "Seguidors",
-	"private": "Privat",
 	"chatChatAllowedUsersEveryone": "Tothom",
 	"chatChatAllowedUsersFollowers": "Només els teus seguidors",
 	"chatChatAllowedUsersFollowing": "Només usuaris als que segueixes",
 	"chatChatAllowedUsersMutual": "Només seguidors mutus",
 	"chatChatAllowedUsersNone": "Ningú ",
-	"oneHour": "1 hora",
-	"oneDay": "Un dia",
 	"threeDays": "3 dies",
-	"oneWeek": "Una setmana",
-	"oneMonth": "Un mes",
 	"threeMonths": "3 mesos",
 	"oneYear": "1 any",
-	"acknowledgeNotesAndEnable": "Activa'l després de comprendre els possibles perills."
+	"acknowledgeNotesAndEnable": "Activa'l després de comprendre els possibles perills.",
+	"followApprovalGroupTitle": "Segueix la sol·licitud aprovada",
+	"followApprovalInactiveDescription": "Com que tots els seguiments estaran subjectes a aprovació, no s'aplicaran els paràmetres basats en el temps. Si desactiveu el sistema d'aprovació de seguiments, s'aplicaran de nou els paràmetres següents.",
+	"followApprovalTitle": "Establiu que els seguiments de comptes nous requereixin aprovació.",
+	"followApprovalAutoAcceptDescription": "Fins i tot si has configurat el teu compte perquè requereixi aprovació per als nous seguidors, o si estàs pendent de sol·licituds de seguiment de nous comptes, les persones que segueixes seran aprovades automàticament.",
+	"followApprovalDescription": "Les sol·licituds de seguiment d'usuaris que no t'han seguit durant el període especificat es consideraran sol·licituds de seguiment. Això no afectarà els teus seguidors actuals. Si tens habilitada l'aprovació automàtica per als usuaris que segueixes, aquests usuaris seran aprovats automàticament.",
+	"followApprovalLocal": "Segueix usuaris locals",
+	"followApprovalLocalDescription": "Això es determina pel temps transcorregut des que es va crear el compte en aquest servidor.",
+	"followApprovalRemote": "Seguidors d'usuaris remots",
+	"followApprovalRemoteDescription": "Això es determina pel temps transcorregut des que aquest servidor va reconèixer per primera vegada aquest compte, en lloc de la data i l'hora de creació a l'altre servidor.",
+	"followApprovalUseDefault": "Utilitzar valors per defecte (actualment desactivat)",
+	"followApprovalCustom": "Especifiqueu un període",
+	"followApprovalPeriod": "Període que requereix aprovació",
+	"followApprovalUnit": "Unitat",
+	"followApprovalInvalidPeriod": "La durada és incorrecta. Si us plau, introduïu una durada d'almenys 1 segon, dins de l'interval permès.",
+	"disabled": "Desactivat",
+	"timeHour": "Hor(a)(es)",
+	"timeDay": "Di(a)(es)",
+	"cannotPerformTemporaryDescription": "Aquesta acció no es pot dur a terme temporalment per arribar al seu límit d'execució. Pots esperar una mica i tornar-ho a intentar."
 }
 </locale>
 
@@ -567,7 +694,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "Žádný",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -576,22 +702,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Veřejný",
-	"followers": "Sledující",
-	"private": "Soukromý",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "1 hodina",
-	"oneDay": "1 den",
 	"threeDays": "3 dny",
-	"oneWeek": "1 týden",
-	"oneMonth": "1 měsíc",
 	"threeMonths": "3 měsíce",
 	"oneYear": "1 rok",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Vypnuto",
+	"timeHour": "Hodin",
+	"timeDay": "Dnů",
+	"cannotPerformTemporaryDescription": "Tuto akci nelze dočasně provést z důvodu překročení limitu provedení. Chvíli počkejte a zkuste to znovu."
 }
 </locale>
 
@@ -623,7 +760,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "None",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -632,22 +768,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Public",
-	"followers": "Followers",
-	"private": "Private",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "One hour",
-	"oneDay": "One day",
 	"threeDays": "3 days",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -679,7 +826,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Erfordere eine Anmeldung, um alle Notizen und andere Inhalte anzuzeigen, die du erstellt hast. Dadurch wird verhindert, dass Crawler deine Informationen sammeln.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Der Inhalt wird nicht in URL-Vorschauen (OGP), eingebettet in Webseiten oder auf Servern, die keine Zitate unterstützen, angezeigt.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Macht frühere Notizen nur für Follower sichtbar",
-	"none": "Nichts",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notizen die nach der folgenden Zeit veröffentlicht worden",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notizen vor einem bestimmtem Datum und Uhrzeit",
 	"custom": "Benutzerdefiniert",
@@ -688,22 +834,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Frühere Notizen privat machen",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "Diese Einschränkungen sind vereinfacht. Sie gelten möglicherweise nicht in allen Situationen, z. B. bei der Anzeige auf einem fremden Server oder während der Moderation.",
-	"public": "Öffentlich",
-	"followers": "Gefolgt von",
-	"private": "Privat",
 	"chatChatAllowedUsersEveryone": "Jeder",
 	"chatChatAllowedUsersFollowers": "Nur deine Follower",
 	"chatChatAllowedUsersFollowing": "Nur Benutzer, denen du folgst",
 	"chatChatAllowedUsersMutual": "Nur Benutzer, die sich gegenseitig folgen",
 	"chatChatAllowedUsersNone": "Niemand",
-	"oneHour": "Eine Stunde",
-	"oneDay": "Einen Tag",
 	"threeDays": "3 Tage",
-	"oneWeek": "Eine Woche",
-	"oneMonth": "1 Monat",
 	"threeMonths": "3 Monate",
 	"oneYear": "1 Jahr",
-	"acknowledgeNotesAndEnable": "Schalten Sie dies erst ein, wenn Sie die Vorsichtsmaßnahmen verstanden haben."
+	"acknowledgeNotesAndEnable": "Schalten Sie dies erst ein, wenn Sie die Vorsichtsmaßnahmen verstanden haben.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Deaktiviert",
+	"timeHour": "Stunde(n)",
+	"timeDay": "Tag(en)",
+	"cannotPerformTemporaryDescription": "Diese Aktion ist wegen des Überschreitenes des Ausführungslimits temporär nicht verfügbar. Bitte versuche es nach einiger Zeit erneut."
 }
 </locale>
 
@@ -735,7 +892,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "None",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -744,22 +900,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Public",
-	"followers": "Followers",
-	"private": "Private",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "One hour",
-	"oneDay": "One day",
 	"threeDays": "3 days",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -791,7 +958,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Requiere iniciar sesión para ver todas las notas y otros contenidos que hayas creado. Se espera que esto evite que los rastreadores recopilen información.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "El contenido no se mostrará en vistas previas de URL (OGP), incrustado en páginas web o en servidores que no admitan citas de notas.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Hacer que las notas antiguas sólo se muestren a los seguidores",
-	"none": "Ninguna",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notas publicadas durante el siguiente tiempo específico",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notas antes de la fecha y hora especificadas",
 	"custom": "Personalizado",
@@ -800,22 +966,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Hacer privadas las notas antiguas ",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "Mientras esta función esté activada, las notas que hayan pasado la fecha y hora fijadas o hayan transcurrido el tiempo establecido sólo serán visibles para ti (se harán privadas). Si la desactivas, también se restablecerá el estado público de las notas.",
 	"accountSettingsMayNotEffectSomeSituations": "Estas restricciones son simplificadas. Pueden no aplicarse en algunas situaciones, como cuando se visualiza en un servidor remoto o durante la moderación.",
-	"public": "Público",
-	"followers": "Seguidores",
-	"private": "Privado",
 	"chatChatAllowedUsersEveryone": "Todos",
 	"chatChatAllowedUsersFollowers": "Sólo sus propios seguidores.",
 	"chatChatAllowedUsersFollowing": "Solo usuarios que sigues",
 	"chatChatAllowedUsersMutual": "Solo seguidores mutuos",
 	"chatChatAllowedUsersNone": "Nadie",
-	"oneHour": "1 hora",
-	"oneDay": "1 día",
 	"threeDays": "Tres días",
-	"oneWeek": "1 semana",
-	"oneMonth": "1 mes",
 	"threeMonths": "Tres meses",
 	"oneYear": "Un año",
-	"acknowledgeNotesAndEnable": "Activar después de comprender las precauciones"
+	"acknowledgeNotesAndEnable": "Activar después de comprender las precauciones",
+	"followApprovalGroupTitle": "Aceptar seguimiento",
+	"followApprovalInactiveDescription": "Dado que todas las solicitudes de seguimiento pasarán a requerir aprobación, no se aplicarán los ajustes relacionados con el periodo. Si desactivas el sistema de aprobación de solicitudes de seguimiento, se volverán a aplicar los siguientes ajustes.",
+	"followApprovalTitle": "Habilitar la aprobación de seguidores de cuentas nuevas",
+	"followApprovalAutoAcceptDescription": "Aunque tengas configurada la opción de aprobación de seguidores o hayas puesto en espera las solicitudes de seguimiento de cuentas nuevas, se aprobarán automáticamente las personas a las que tú sigues.",
+	"followApprovalDescription": "Las solicitudes de seguimiento de usuarios que no hayan transcurrido el periodo especificado se pondrán en espera. Esto no afecta a los seguidores actuales. Si tienes activada la aceptación automática de los usuarios a los que sigues, se aceptarán automáticamente.",
+	"followApprovalLocal": "Sigue a usuarios locales",
+	"followApprovalLocalDescription": "Se determinará en función del tiempo transcurrido desde la creación de la cuenta en este servidor.",
+	"followApprovalRemote": "Seguimiento por parte de usuarios remotos",
+	"followApprovalRemoteDescription": "No se tiene en cuenta la fecha y hora de creación en el servidor del destinatario, sino el tiempo transcurrido desde que este servidor reconoció por primera vez dicha cuenta.",
+	"followApprovalUseDefault": "Utilizar valores predeterminados (actualmente desactivado)",
+	"followApprovalCustom": "Específica un periodo",
+	"followApprovalPeriod": "Plazo para la aprobación",
+	"followApprovalUnit": "Unidad",
+	"followApprovalInvalidPeriod": "El intervalo de tiempo no es correcto. Introduzca un intervalo de al menos 1 segundo, dentro del rango permitido.",
+	"disabled": "Desactivado",
+	"timeHour": "Horas",
+	"timeDay": "Días",
+	"cannotPerformTemporaryDescription": "Esta acción no se puede realizar porque se excedió el límite de ejecución. Espera un poco y prueba de nuevo."
 }
 </locale>
 
@@ -847,7 +1024,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "Rien",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -856,22 +1032,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Public",
-	"followers": "Abonné·e·s",
-	"private": "Privé",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "1 heure",
-	"oneDay": "1 jour",
 	"threeDays": "3 jours",
-	"oneWeek": "1 semaine",
-	"oneMonth": "Un mois",
 	"threeMonths": "3 mois",
 	"oneYear": "1 an",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Désactivé",
+	"timeHour": "h",
+	"timeDay": "j",
+	"cannotPerformTemporaryDescription": "Temporairement indisponible puisque le nombre d'opérations dépasse la limite. Veuillez patienter un peu, puis réessayer."
 }
 </locale>
 
@@ -903,7 +1090,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "Tidak ada",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Penyesuaian",
@@ -912,22 +1098,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "Saat fitur ini diaktifkan, note sebelum tanggal dan waktu tertentu hanya akan terlihat oleh anda. Setelah dinonaktifkan, status publikasi note juga akan dikembalikan seperti semula.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Publik",
-	"followers": "Pengikut",
-	"private": "Tersembunyi",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "1 Jam",
-	"oneDay": "1 Hari",
 	"threeDays": "3 hari",
-	"oneWeek": "1 Bulan",
-	"oneMonth": "satu bulan",
 	"threeMonths": "3 bulan",
 	"oneYear": "1 tahun",
-	"acknowledgeNotesAndEnable": "Aktifkan setelah memahami catatan penting."
+	"acknowledgeNotesAndEnable": "Aktifkan setelah memahami catatan penting.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Nonaktif",
+	"timeHour": "jam",
+	"timeDay": "hari",
+	"cannotPerformTemporaryDescription": "Aksi ini tidak dapat dilakukan sementara karena melewati batas eksekusi. Mohon tunggu sejenak dan coba lagi."
 }
 </locale>
 
@@ -959,7 +1156,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Richiedere l'iscrizione per visualizzare tutte le Note e gli altri contenuti che hai creato. Probabilmente l'effetto è impedire la raccolta di informazioni da parte dei bot crawler.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "La visualizzazione verrà disabilitata a server che non supportano l'anteprima URL (OGP), all'incorporamento nelle pagine Web e alla citazione delle Note.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Rendi visibili solo ai Follower le Note pubblicate in precedenza",
-	"none": "Nessuna",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Note antecedenti al periodo specificato",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Note antecedenti al momento specificato",
 	"custom": "Personalizzato",
@@ -968,22 +1164,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Nascondi le Note pubblicate in precedenza",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "Mentre questa funzione è abilitata, le Note antecedenti al momento impostato, saranno visibili soltanto a te (private). Disabilitandola nuovamente, verrà ripristinata anche la visibilità pubblica della Nota.",
 	"accountSettingsMayNotEffectSomeSituations": "Queste restrizioni sono semplificate. In alcuni casi, potrebbero anche non avvenire. Ad esempio visionando un server remoto o durante la moderazione.",
-	"public": "Pubblica",
-	"followers": "Follower",
-	"private": "Privato",
 	"chatChatAllowedUsersEveryone": "Chiunque",
 	"chatChatAllowedUsersFollowers": "Solo i tuoi Follower",
 	"chatChatAllowedUsersFollowing": "Solo i tuoi Follow",
 	"chatChatAllowedUsersMutual": "Solo relazioni reciproche",
 	"chatChatAllowedUsersNone": "Nessuno",
-	"oneHour": "1 ora",
-	"oneDay": "1 giorno",
 	"threeDays": "3 giorni",
-	"oneWeek": "1 settimana",
-	"oneMonth": "Un mese",
 	"threeMonths": "3 mesi",
 	"oneYear": "1 anno",
-	"acknowledgeNotesAndEnable": "Attivare dopo averne compreso il comportamento."
+	"acknowledgeNotesAndEnable": "Attivare dopo averne compreso il comportamento.",
+	"followApprovalGroupTitle": "Approvazione dei Follow",
+	"followApprovalInactiveDescription": "Poiché i Follow sono soggetti ad approvazione, non si applicano le impostazioni basate sul periodo. Disattivando il sistema di approvazione, verranno nuovamente applicate le seguenti impostazioni.",
+	"followApprovalTitle": "Le richieste di follow da parte di nuovi account richiedono l'approvazione.",
+	"followApprovalAutoAcceptDescription": "Anche se attivi \"Richiedi approvazione per le richieste di follow\" o \"Richiedi approvazione per le richieste di follow da nuovi account\", le richieste di follow provenienti da account che già segui verranno approvate automaticamente.",
+	"followApprovalDescription": "Le richieste di follow da profili registrati prima del tempo specificato verranno non verranno approvate. Questo non influisce sui Follower esistenti; se è attiva l'opzione “Accetta automaticamente le richieste di follow da chi mi segue”, le richieste di follow da quei profili verranno approvate automaticamente.",
+	"followApprovalLocal": "Richieste da profili locali",
+	"followApprovalLocalDescription": "Si calcola la durata relativamente alla data di iscrizione del profilo in questo server.",
+	"followApprovalRemote": "Richieste da profili remoti",
+	"followApprovalRemoteDescription": "Si calcola la durata in base a quando il profilo remoto è stato federato su questo server la prima volta; non si calcola la data di iscrizione sul server remoto.",
+	"followApprovalUseDefault": "Utilizzare il valore predefinito (attualmente disabilitato)",
+	"followApprovalCustom": "Periodo specifico",
+	"followApprovalPeriod": "Periodo richiesto per l'iscrizione",
+	"followApprovalUnit": "Unità",
+	"followApprovalInvalidPeriod": "Periodo sbagliato. Indicare da 1 secondo fino al limite consentito.",
+	"disabled": "Inattivo",
+	"timeHour": "ore",
+	"timeDay": "giorni",
+	"cannotPerformTemporaryDescription": "L'attività non può essere svolta, poiché si è raggiunto il limite di esecuzioni possibili. Per favore, riprova più tardi."
 }
 </locale>
 
@@ -1015,7 +1222,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "あなたが作成した全てのノートなどのコンテンツを表示するのにログインを必須にします。クローラーに情報が収集されるのを防ぐ効果が期待できます。",
 	"accountSettingsRequireSigninToViewContentsDescription2": "URLプレビュー(OGP)、Webページへの埋め込み、ノートの引用に対応していないサーバーからの表示も不可になります。",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "過去のノートをフォロワーのみ表示可能にする",
-	"none": "なし",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "指定した時間を経過しているノート",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "指定した日時より前のノート",
 	"custom": "カスタム",
@@ -1024,22 +1230,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "過去のノートを非公開化する",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "この機能が有効になっている間、設定された日時より過去、または設定された時間を経過しているノートが自分のみ表示可能(非公開化)になります。無効に戻すと、ノートの公開状態も元に戻ります。",
 	"accountSettingsMayNotEffectSomeSituations": "これらの制限は簡易的なものです。リモートサーバーでの閲覧やモデレーション時など、一部のシチュエーションでは適用されない場合があります。",
-	"public": "パブリック",
-	"followers": "フォロワー",
-	"private": "非公開",
 	"chatChatAllowedUsersEveryone": "誰でも",
 	"chatChatAllowedUsersFollowers": "自分のフォロワーのみ",
 	"chatChatAllowedUsersFollowing": "自分がフォローしているユーザーのみ",
 	"chatChatAllowedUsersMutual": "相互フォローのユーザーのみ",
 	"chatChatAllowedUsersNone": "誰も許可しない",
-	"oneHour": "1時間",
-	"oneDay": "1日",
 	"threeDays": "3日",
-	"oneWeek": "1週間",
-	"oneMonth": "1ヶ月",
 	"threeMonths": "3ヶ月",
 	"oneYear": "1年",
-	"acknowledgeNotesAndEnable": "注意事項を理解した上でオンにします。"
+	"acknowledgeNotesAndEnable": "注意事項を理解した上でオンにします。",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "無効",
+	"timeHour": "時間",
+	"timeDay": "日",
+	"cannotPerformTemporaryDescription": "操作回数が制限を超過するため一時的に利用できません。しばらく時間を置いてから再度お試しください。"
 }
 </locale>
 
@@ -1071,7 +1288,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "あなたが作成した全部のノートとかのコンテンツを見れるようにするのにログインがいるようにするで。クローラーにいろいろ収集されるんを防げるかもしれん。",
 	"accountSettingsRequireSigninToViewContentsDescription2": "URLプレビュー(OGP)、Webページへの埋め込み、ノートの引用に対応してないサーバーからの表示ができんくなるで。",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "昔のノートをフォロワーだけに見てもらう",
-	"none": "なし",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "決めた時間が経ったノート",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "決めた日時より前のノート",
 	"custom": "カスタム",
@@ -1080,22 +1296,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "昔のノートを見れんようにする",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "この機能が有効になってる間は、設定された日時より前、それか設定された時間が経ったノートがあんただけ見れるようになるで。無効に戻すと、ノートの公開状態も戻るで。",
 	"accountSettingsMayNotEffectSomeSituations": "これらの制限は簡易的なものやで。リモートサーバーでの閲覧とかモデレーション時とか、一部のシチュエーションでは適用されへんかもしれん。",
-	"public": "パブリック",
-	"followers": "フォロワー",
-	"private": "非公開",
 	"chatChatAllowedUsersEveryone": "誰でも",
 	"chatChatAllowedUsersFollowers": "自分のフォロワーだけ",
 	"chatChatAllowedUsersFollowing": "自分がフォローしとるユーザーだけ",
 	"chatChatAllowedUsersMutual": "相互フォローのユーザーだけ",
 	"chatChatAllowedUsersNone": "誰もかもあかん",
-	"oneHour": "1時間",
-	"oneDay": "1日",
 	"threeDays": "3日",
-	"oneWeek": "1週間",
-	"oneMonth": "1ヶ月",
 	"threeMonths": "3ヶ月",
 	"oneYear": "1年",
-	"acknowledgeNotesAndEnable": "注意事項をわかった上でオンにする。"
+	"acknowledgeNotesAndEnable": "注意事項をわかった上でオンにする。",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "無効",
+	"timeHour": "時間",
+	"timeDay": "日",
+	"cannotPerformTemporaryDescription": "操作し過ぎてちょっと今は使えへんくしとるで。ちょっと待ってからもっかいやってや。"
 }
 </locale>
 
@@ -1127,7 +1354,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "None",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -1136,22 +1362,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Public",
-	"followers": "Imeḍfaṛen",
-	"private": "Private",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "One hour",
-	"oneDay": "One day",
 	"threeDays": "3 days",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1183,7 +1420,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "None",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -1192,22 +1428,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Public",
-	"followers": "Followers",
-	"private": "Private",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "One hour",
-	"oneDay": "One day",
 	"threeDays": "3 days",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1239,7 +1486,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "자신이 작성한 모든 노트 등의 콘텐츠를 보기 위해 로그인을 필수로 설정합니다. 크롤러가 정보 수집하는 것을 방지하는 효과를 기대할 수 있습니다.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "URL 미리보기(OGP), 웹페이지에 삽입, 노트 인용을 지원하지 않는 서버에서 볼 수 없게 됩니다.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "과거 노트는 팔로워만 볼 수 있도록 설정하기",
-	"none": "없음",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "지정한 시간이 경과된 노트",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "지정된 날짜 및 시간 이전의 노트",
 	"custom": "커스텀",
@@ -1248,22 +1494,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "과거 노트 비공개로 전환하기",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "이 기능이 활성화되어 있는 동안 설정한 날짜 및 시간보다 과거 또는 설정한 시간이 지난 노트는 본인만 볼 수 있게(비공개로 전환) 됩니다. 비활성화하면 노트의 공개 상태도 원래대로 돌아갑니다.",
 	"accountSettingsMayNotEffectSomeSituations": "여기서 설정하는 제한은 모더레이션이나 리모트 서버에서 볼 때 등 일부 환경에서는 적용되지 않을 수도 있습니다.",
-	"public": "공개",
-	"followers": "팔로워",
-	"private": "비공개",
 	"chatChatAllowedUsersEveryone": "누구나",
 	"chatChatAllowedUsersFollowers": "자신의 팔로워만",
 	"chatChatAllowedUsersFollowing": "자신이 팔로우한 유저만",
 	"chatChatAllowedUsersMutual": "상호 팔로우한 유저만",
 	"chatChatAllowedUsersNone": "아무도 허락하지 않기",
-	"oneHour": "1시간",
-	"oneDay": "1일",
 	"threeDays": "3일",
-	"oneWeek": "일주일",
-	"oneMonth": "1개월",
 	"threeMonths": "3개월",
 	"oneYear": "1년",
-	"acknowledgeNotesAndEnable": "활성화 하기 전에 주의 사항을 확인했습니다."
+	"acknowledgeNotesAndEnable": "활성화 하기 전에 주의 사항을 확인했습니다.",
+	"followApprovalGroupTitle": "팔로우 승인",
+	"followApprovalInactiveDescription": "모든 팔로우가 승인제로 되어 기간에 따른 설정은 적용되지 않습니다. 팔로우의 승인제를 해제하면 아래의 설정이 다시 적용됩니다.",
+	"followApprovalTitle": "새로운 계정으로부터의 팔로우를 승인제로 변경",
+	"followApprovalAutoAcceptDescription": "팔로우를 승인제로 한 경우나 새로운 계정으로부터의 팔로우를 보류하는 경우에도 사용자님께서 팔로우하고 있는 상대는 자동 승인됩니다.",
+	"followApprovalDescription": "지정한 기간이 경과하지 않은 상대로부터의 팔로우를 팔로우 요청으로 보류합니다. 기존 팔로워에는 영향을 끼치지 않습니다. 팔로우하고 있는 상대의 자동 승인이 활성화된 경우, 그 상대는 자동 승인됩니다.",
+	"followApprovalLocal": "로컬 유저로부터의 팔로우",
+	"followApprovalLocalDescription": "이 서버에서의 계정 생성으로부터의 기간으로 판정됩니다.",
+	"followApprovalRemote": "리모트 유저로부터의 팔로우",
+	"followApprovalRemoteDescription": "상대 서버에서의 생성 시각이 아닌 이 서버가 처음 그 계정을 인식한 뒤부터의 기간으로 판정됩니다.",
+	"followApprovalUseDefault": "미리 정해둔 값을 사용 (현재는 유효하지 않음)",
+	"followApprovalCustom": "기간 지정",
+	"followApprovalPeriod": "승인이 필요한 기간",
+	"followApprovalUnit": "단위",
+	"followApprovalInvalidPeriod": "기간이 올바르지 않습니다. 1초 이상의 기간을 지정 가능한 범위 내에 입력해 주십시오.",
+	"disabled": "비활성화",
+	"timeHour": "시간",
+	"timeDay": "일",
+	"cannotPerformTemporaryDescription": "조작 횟수 제한을 초과하여 일시적으로 사용이 불가합니다. 잠시 후 다시 시도해 주세요."
 }
 </locale>
 
@@ -1295,7 +1552,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "Niets",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -1304,22 +1560,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Openbare",
-	"followers": "Volgers",
-	"private": "Privé",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "One hour",
-	"oneDay": "One day",
 	"threeDays": "3 dagen",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"threeMonths": "3 maanden",
 	"oneYear": "1 jaar",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Uitgeschakeld",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1351,7 +1618,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "Ingen",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -1360,22 +1626,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Public",
-	"followers": "Følgere",
-	"private": "Private",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "1 time",
-	"oneDay": "1 dag",
 	"threeDays": "3 days",
-	"oneWeek": "1 uke",
-	"oneMonth": "1 måned",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Timer",
+	"timeDay": "Dager",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1407,7 +1684,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "Brak",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -1416,22 +1692,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Publiczny",
-	"followers": "Obserwujący",
-	"private": "Prywatne",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "1 godzina",
-	"oneDay": "1 dzień",
 	"threeDays": "3 dni",
-	"oneWeek": "1 tydzień",
-	"oneMonth": "jeden miesiąc",
 	"threeMonths": "3 miesiące",
 	"oneYear": "Rok",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Wyłączono",
+	"timeHour": "godz.",
+	"timeDay": "dzień",
+	"cannotPerformTemporaryDescription": "Ta akcja nie może zostać wykonana, z powodu przekroczenia limitu wykonań. Prosimy poczekać chwilę i spróbować ponownie"
 }
 </locale>
 
@@ -1463,7 +1750,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Exigir cadastro para ver todas as notas e outro conteúdo que você criou. Isso previne 'crawlers' de coletar os seus dados.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Conteúdo não será exibido nas prévias de URL (OGP), incorporado em outras páginas web ou em servidores que não têm suporte a citações.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Tornar notas passadas visíveis apenas para seguidores.",
-	"none": "Nenhum",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notas que duraram um tempo específico.",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notas antes do tempo específico.",
 	"custom": "Personalizado",
@@ -1472,22 +1758,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Tornar notas passadas privadas",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "Com essa função ativada, apenas você poderá ver as notas anteriores à data e hora marcadas. Se isso for desativado, o status de publicação da nota será reestabelecido.",
 	"accountSettingsMayNotEffectSomeSituations": "Essas restrições são simplificadas. Elas podem não ser aplicadas em algumas situações, como ao visualizar num servidor remoto ou durante a moderação.",
-	"public": "Público",
-	"followers": "Seguidores",
-	"private": "Privado",
 	"chatChatAllowedUsersEveryone": "Todos",
 	"chatChatAllowedUsersFollowers": "Seus seguidores",
 	"chatChatAllowedUsersFollowing": "Quem você segue",
 	"chatChatAllowedUsersMutual": "Seguidores mútuos",
 	"chatChatAllowedUsersNone": "Ninguém",
-	"oneHour": "1 hora",
-	"oneDay": "1 dia",
 	"threeDays": "3 dias",
-	"oneWeek": "1 semana",
-	"oneMonth": "1 mês",
 	"threeMonths": "3 meses",
 	"oneYear": "1 ano",
-	"acknowledgeNotesAndEnable": "Ative após compreender as precauções."
+	"acknowledgeNotesAndEnable": "Ative após compreender as precauções.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Desativado",
+	"timeHour": "Hora(s)",
+	"timeDay": "Dia(s)",
+	"cannotPerformTemporaryDescription": "Esta ação não pôde ser concluída devido ao excesso de pedidos em sucessão. Tente novamente em alguns momentos."
 }
 </locale>
 
@@ -1519,7 +1816,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Требовать входа в аккаунт для просмотра заметок и прочего вашего контента. Это не позволит ботам сканировать вашу информацию.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "Ничего",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Заметки после указанной даты",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Заметки до указанной даты",
 	"custom": "Пользовательские",
@@ -1528,22 +1824,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Общедоступно",
-	"followers": "Подписчики",
-	"private": "Личное",
 	"chatChatAllowedUsersEveryone": "Всем",
 	"chatChatAllowedUsersFollowers": "Только подписчикам",
 	"chatChatAllowedUsersFollowing": "Только тем на кого вы подписаны",
 	"chatChatAllowedUsersMutual": "Только взаимным подписчикам",
 	"chatChatAllowedUsersNone": "Никому",
-	"oneHour": "1 час",
-	"oneDay": "1 день",
 	"threeDays": "3 дня",
-	"oneWeek": "1 неделя",
-	"oneMonth": "1 месяц",
 	"threeMonths": "3 месяца",
 	"oneYear": "1 год",
-	"acknowledgeNotesAndEnable": "Включайте только после понимания мер предосторожности"
+	"acknowledgeNotesAndEnable": "Включайте только после понимания мер предосторожности",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Откл.",
+	"timeHour": "ч",
+	"timeDay": "сут",
+	"cannotPerformTemporaryDescription": "Это действие временно невозможно выполнить из-за превышения лимита выполнения."
 }
 </locale>
 
@@ -1575,7 +1882,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "Žiadne",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -1584,22 +1890,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Verejné",
-	"followers": "Sledujúci",
-	"private": "Súkromné",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "1 hodina",
-	"oneDay": "1 deň",
 	"threeDays": "3 days",
-	"oneWeek": "1 týždeň",
-	"oneMonth": "1 mesiac",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Vypnuté",
+	"timeHour": "hod",
+	"timeDay": "dní",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1631,7 +1948,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "กำหนดให้ต้องเข้าสู่ระบบก่อนจึงจะสามารถดูโน้ตหรือเนื้อหาทั้งหมดที่สร้างไว้ได้ ซึ่งช่วยป้องกันไม่ให้ข้อมูลถูกเก็บโดยบอตหรือ Crawler (โปรแกรมรวบรวมข้อมูล)",
 	"accountSettingsRequireSigninToViewContentsDescription2": "จะไม่สามารถแสดงผลจากเซิร์ฟเวอร์ที่ไม่รองรับการแสดงตัวอย่าง URL (OGP), การฝังในหน้าเว็บ, หรือการอ้างอิงโน้ตได้",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "แสดงโน้ตเก่าเฉพาะกับผู้ติดตามเท่านั้น",
-	"none": "ไม่มี",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "โน้ตที่เลยเวลาที่กำหนดไว้แล้ว",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "โน้ตก่อนเวลาที่กำหนดไว้",
 	"custom": "แบบกำหนดเอง",
@@ -1640,22 +1956,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "ทำให้โน้ตเก่าทั้งหมดเป็นแบบส่วนตัว",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "ขณะที่เปิดฟังก์ชันนี้ โน้ตที่เก่ากว่าหรือเลยเวลาที่กำหนดจะแสดงเฉพาะกับตนเอง (กลายเป็นแบบส่วนตัว) หากปิดใช้งาน สถานะการเปิดเผยจะกลับไปเป็นแบบเดิม",
 	"accountSettingsMayNotEffectSomeSituations": "ข้อจำกัดเหล่านี้เป็นเพียงการกรองเบื้องต้น ในบางกรณี เช่น การดูจากเซิร์ฟเวอร์อื่นหรือในระหว่างการตรวจสอบโดยผู้ดูแล อาจไม่สามารถใช้งานได้",
-	"public": "สาธารณะ",
-	"followers": "ผู้ติดตาม",
-	"private": "ส่วนตัว",
 	"chatChatAllowedUsersEveryone": "ใครก็ได้หมด",
 	"chatChatAllowedUsersFollowers": "เฉพาะผู้ติดตามเท่านั้น",
 	"chatChatAllowedUsersFollowing": "เฉพาะผู้ที่ตัวเองติดตามเท่านั้น",
 	"chatChatAllowedUsersMutual": "เฉพาะผู้ใช้ที่ติดตามซึ่งกันและกันทั้งสองฝ่ายเท่านั้น",
 	"chatChatAllowedUsersNone": "ไม่อนุญาตให้ใครเลย",
-	"oneHour": "1 ชั่วโมง",
-	"oneDay": "1 วัน",
 	"threeDays": "3 วัน",
-	"oneWeek": "1 สัปดาห์",
-	"oneMonth": "หนึ่งเดือน",
 	"threeMonths": "3 เดือน",
 	"oneYear": "1 ปี",
-	"acknowledgeNotesAndEnable": "เปิดใช้งานหลังจากที่เข้าใจข้อควรระวังแล้ว"
+	"acknowledgeNotesAndEnable": "เปิดใช้งานหลังจากที่เข้าใจข้อควรระวังแล้ว",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "ปิดการใช้งาน",
+	"timeHour": "ชั่วโมง",
+	"timeDay": "วัน",
+	"cannotPerformTemporaryDescription": "ไม่สามารถดําเนินการได้ชั่วคราว เนื่องจากเกินขีดจํากัดการดําเนินการ กรุณารอสักครู่แล้วลองใหม่อีกครั้ง"
 }
 </locale>
 
@@ -1687,7 +2014,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Oluşturduğun tüm notları ve diğer içeriği görüntülemek için oturum açman gerekir. Bu, tarayıcıların bilgilerini toplamasına engel olacaktır.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "İçerik, URL önizlemelerinde (OGP), web sayfalarına gömülü olarak veya not alıntıları desteklemeyen sunucularda görüntülenmeyecek.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Geçmiş notların yalnızca takipçilere gösterilmesini sağlayın",
-	"none": "Hiçbiri",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Belirtilen sürenin geçtiğini unutmayın.",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Belirtilen tarih ve saatten önceki notlar",
 	"custom": "Özel",
@@ -1696,22 +2022,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Geçmiş notları gizli yap",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "Bu özellik etkinleştirildiğinde, belirlenen tarih ve saatten geçmiş olan veya yalnızca sizin görebildiğiniz notlar. Bu özellik devre dışı bırakıldığında, notun yayın durumu da geri yüklenecek.",
 	"accountSettingsMayNotEffectSomeSituations": "Bu kısıtlamalar basitleştirilmiştir. Uzaktaki bir sunucuda görüntüleme veya moderasyon sırasında gibi bazı durumlarda geçerli olmayabilir.",
-	"public": "Herkese açık",
-	"followers": "Takipçi",
-	"private": "Özel",
 	"chatChatAllowedUsersEveryone": "Herkes",
 	"chatChatAllowedUsersFollowers": "Sadece takipçilerin",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Sadece takiplerin",
 	"chatChatAllowedUsersNone": "Kimse",
-	"oneHour": "1 saat",
-	"oneDay": "1 gün",
 	"threeDays": "3 gün",
-	"oneWeek": "1 hafta",
-	"oneMonth": "1 ay",
 	"threeMonths": "3 ay",
 	"oneYear": "1 yıl",
-	"acknowledgeNotesAndEnable": "Önlemleri anladıktan sonra açın."
+	"acknowledgeNotesAndEnable": "Önlemleri anladıktan sonra açın.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Devre Dışı",
+	"timeHour": "Saat(ler)",
+	"timeDay": "Gün(ler)",
+	"cannotPerformTemporaryDescription": "Bu işlem, yürütme sınırını aştığı için geçici olarak gerçekleştirilememekte. Lütfen bir süre bekle ve tekrar dene."
 }
 </locale>
 
@@ -1743,7 +2080,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Require login to view all notes and other content you have created. This will have the effect of preventing crawlers from collecting your information.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "None",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -1752,22 +2088,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Public",
-	"followers": "Followers",
-	"private": "Private",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "One hour",
-	"oneDay": "One day",
 	"threeDays": "3 days",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"threeMonths": "3 months",
 	"oneYear": "1 year",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Disabled",
+	"timeHour": "Hour(s)",
+	"timeDay": "Day(s)",
+	"cannotPerformTemporaryDescription": "This action cannot be performed temporarily due to exceeding the execution limit. Please wait for a while and then try again."
 }
 </locale>
 
@@ -1799,7 +2146,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Вимагатиму входження для перегляду усіх нотаток й іншого створеного вами контенту. Це матиме ефект на запобігання збирачів збирати вашу інформацію.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Контент не буде показуватися у попередніх переглядах посилань (OGP), в інтеграціях у вебсторінки, або на серверах, які не підтримують цитати у нотатках.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Показувати минулі нотатки лише для підписників",
-	"none": "Відсутній",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Нотатки, які знаходяться в обраному періоді",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Нотатки, які були створені до обраної дати та часу",
 	"custom": "Користувацькі",
@@ -1808,22 +2154,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Зробити минулі нотатки приватними",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "Поки ця функція ввімкнена, тільки ви можете бачити нотатки створенні до обраної дати та часу або були видимі протягом зазначеного часу. У разі вимкнення, статус публікації нотаток також буде відновлено. ",
 	"accountSettingsMayNotEffectSomeSituations": "Ці обмеження спрощенні. Вони можуть бути не застосовуваними у деяких випадках, таких як перегляд на видаленому сервері під час модерації. ",
-	"public": "Публічний",
-	"followers": "Підписники",
-	"private": "Приватне",
 	"chatChatAllowedUsersEveryone": "Усі",
 	"chatChatAllowedUsersFollowers": "Тільки ваши підписники",
 	"chatChatAllowedUsersFollowing": "Тільки користувачі, за якими ви слідкуєте",
 	"chatChatAllowedUsersMutual": "Тільки підписники, за якими ви слідкуєте",
 	"chatChatAllowedUsersNone": "Ніхто",
-	"oneHour": "1 година",
-	"oneDay": "1 день",
 	"threeDays": "3 дні",
-	"oneWeek": "1 тиждень",
-	"oneMonth": "1 місяць",
 	"threeMonths": "3 months",
 	"oneYear": "1 рік",
-	"acknowledgeNotesAndEnable": "Ввімкніть після зрозуміння попереджень."
+	"acknowledgeNotesAndEnable": "Ввімкніть після зрозуміння попереджень.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Вимкнено",
+	"timeHour": "г",
+	"timeDay": "д",
+	"cannotPerformTemporaryDescription": "Цю дію тимчасово неможливо виконати через перевищення ліміту виконання. Будь ласка, зачекайте трохи й спробуйте ще раз."
 }
 </locale>
 
@@ -1855,7 +2212,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "Yêu cầu đăng nhập để xem tất cả ghi chú và nội dung khác mà bạn tạo. Điều này được kỳ vọng sẽ có hiệu quả trong việc ngăn chặn thông tin bị thu thập bởi các trình thu thập thông tin.",
 	"accountSettingsRequireSigninToViewContentsDescription2": "Content will not be displayed in URL previews (OGP), embedded in web pages, or on servers that don't support note quotes.",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "Make past notes to be displayed only to followers",
-	"none": "Không",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "Notes after the specified date and time",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "Notes before the specified date and time",
 	"custom": "Custom",
@@ -1864,22 +2220,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "Make past notes private",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "While this feature is enabled, notes that are past the set date and time or have been visible only to you. When it is deactivated, the note publication status will also be restored.",
 	"accountSettingsMayNotEffectSomeSituations": "These restrictions are simplified. They may not apply in some situations, such as when viewing on a remote server or during moderation.",
-	"public": "Công khai",
-	"followers": "Người theo dõi",
-	"private": "Riêng tư",
 	"chatChatAllowedUsersEveryone": "Everyone",
 	"chatChatAllowedUsersFollowers": "Only your followers",
 	"chatChatAllowedUsersFollowing": "Only users you are following",
 	"chatChatAllowedUsersMutual": "Mutual followers only",
 	"chatChatAllowedUsersNone": "Nobody",
-	"oneHour": "1 giờ",
-	"oneDay": "1 ngày",
 	"threeDays": "3 ngày ",
-	"oneWeek": "1 tuần",
-	"oneMonth": "1 tháng",
 	"threeMonths": "3 tháng",
 	"oneYear": "1 năm",
-	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions."
+	"acknowledgeNotesAndEnable": "Turn on after understanding the precautions.",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "Đã tắt",
+	"timeHour": "giờ",
+	"timeDay": "ngày",
+	"cannotPerformTemporaryDescription": "Tạm thời không sử dụng được vì lần số điều kiện quá giới hạn. Thử lại sau mọt lát nữa."
 }
 </locale>
 
@@ -1911,7 +2278,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "您发布的所有帖子将变成需要登入后才会显示。有望防止爬虫收集各种信息。",
 	"accountSettingsRequireSigninToViewContentsDescription2": "没有 URL 预览（OGP）、内嵌网页、引用帖子的功能的服务器也将无法显示。",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "可将过去的帖子设为仅关注者可见",
-	"none": "无",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "超过指定时间的帖子",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "指定日期前的帖子",
 	"custom": "自定义",
@@ -1920,22 +2286,33 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "将过去的帖子设为私密",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "开启此设定时，超过设定的时间或日期后，帖子将变为仅自己可见。关闭后帖子的公开状态将恢复成原本的设定。",
 	"accountSettingsMayNotEffectSomeSituations": "此限制功能非常简单，在与远程服务器联合等情形时可能不适用。",
-	"public": "公开",
-	"followers": "关注者",
-	"private": "私密",
 	"chatChatAllowedUsersEveryone": "任何人",
 	"chatChatAllowedUsersFollowers": "仅关注者",
 	"chatChatAllowedUsersFollowing": "仅关注的人",
 	"chatChatAllowedUsersMutual": "仅相互关注",
 	"chatChatAllowedUsersNone": "没有人",
-	"oneHour": "1 小时",
-	"oneDay": "1天",
 	"threeDays": "3天",
-	"oneWeek": "1 周",
-	"oneMonth": "1个月",
 	"threeMonths": "3个月",
 	"oneYear": "1 年",
-	"acknowledgeNotesAndEnable": "理解注意事项后再开启。"
+	"acknowledgeNotesAndEnable": "理解注意事项后再开启。",
+	"followApprovalGroupTitle": "批准关注请求",
+	"followApprovalInactiveDescription": "因为所有的关注请求都需要批准，因此按时间段设置的规则将不再生效。关闭「关注请求需要批准」后下面的设置将重新生效。",
+	"followApprovalTitle": "新账户的关注请求需要批准",
+	"followApprovalAutoAcceptDescription": "就算开启了「关注请求需要批准」或「新账户的关注请求需要批准」，您已关注的账户的关注请求将被自动批准。",
+	"followApprovalDescription": "注册未达指定时长的账户的关注将作为关注请求予以保留。这不影响现有的关注者。已开启「自动允许我关注的人的关注请求」的话，对方的关注请求将被自动批准。",
+	"followApprovalLocal": "从本地用户发来的关注",
+	"followApprovalLocalDescription": "以本服务器的账户注册时间来计算时长。",
+	"followApprovalRemote": "从远程用户发来的关注",
+	"followApprovalRemoteDescription": "不是以远程服务器上的注册时间，而是以本服务器最初认知到这个账户的时间来计算时长。",
+	"followApprovalUseDefault": "使用默认值（当前为无效）",
+	"followApprovalCustom": "指定时间段",
+	"followApprovalPeriod": "批准所需注册时长",
+	"followApprovalUnit": "单位",
+	"followApprovalInvalidPeriod": "输入的时间不正确。请在可输入的范围内输入 1 秒以上的时间。",
+	"disabled": "已禁用 ",
+	"timeHour": "小时",
+	"timeDay": "天",
+	"cannotPerformTemporaryDescription": "因操作过于频繁，暂时不可用，请稍后再试。"
 }
 </locale>
 
@@ -1967,7 +2344,6 @@ definePage(() => ({
 	"accountSettingsRequireSigninToViewContentsDescription1": "必須登入才會顯示您建立的貼文等內容。可望有效防止資訊被爬蟲蒐集。",
 	"accountSettingsRequireSigninToViewContentsDescription2": "針對您貼文的 URL 預覽 (OGP) 與網頁嵌入功能將會無法使用。而不支援引用貼文的伺服器，也將停止顯示。",
 	"accountSettingsMakeNotesFollowersOnlyBefore": "讓過去的貼文僅對追隨者顯示",
-	"none": "無",
 	"accountSettingsNotesHavePassedSpecifiedPeriod": "早於指定時間的貼文",
 	"accountSettingsNotesOlderThanSpecifiedDateAndTime": "指定時間和日期之前的貼文",
 	"custom": "自訂",
@@ -1976,21 +2352,32 @@ definePage(() => ({
 	"accountSettingsMakeNotesHiddenBefore": "隱藏過去的貼文",
 	"accountSettingsMakeNotesHiddenBeforeDescription": "啟用此功能後，超過設定的日期和時間或超過設定時間的貼文將僅對自己顯示（私密化）。 如果您再次停用它，貼文的公開狀態也會恢復原狀。",
 	"accountSettingsMayNotEffectSomeSituations": "這些限制僅是簡化版本。在某些情況下，例如在遠端伺服器上瀏覽或進行審核時，可能不會套用這些限制。",
-	"public": "公開",
-	"followers": "追隨者",
-	"private": "私密",
 	"chatChatAllowedUsersEveryone": "任何人",
 	"chatChatAllowedUsersFollowers": "追隨自己的使用者",
 	"chatChatAllowedUsersFollowing": "只有您追隨的使用者",
 	"chatChatAllowedUsersMutual": "互相追隨",
 	"chatChatAllowedUsersNone": "無",
-	"oneHour": "一小時",
-	"oneDay": "一天",
 	"threeDays": "3 日",
-	"oneWeek": "一週",
-	"oneMonth": "一個月",
 	"threeMonths": "3 個月",
 	"oneYear": "1 年",
-	"acknowledgeNotesAndEnable": "了解注意事項後再開啟。"
+	"acknowledgeNotesAndEnable": "了解注意事項後再開啟。",
+	"followApprovalGroupTitle": "フォロー承認",
+	"followApprovalInactiveDescription": "すべてのフォローが承認制になるため、期間による設定は適用されません。フォローの承認制を解除すると、以下の設定が再び適用されます。",
+	"followApprovalTitle": "新しいアカウントからのフォローを承認制にする",
+	"followApprovalAutoAcceptDescription": "フォローを承認制にしている場合や、新しいアカウントからのフォローを保留する場合にも、あなたがフォローしている相手は自動承認します。",
+	"followApprovalDescription": "指定した期間が経過していない相手からのフォローを、フォローリクエストとして保留します。既存のフォロワーには影響しません。フォローしている相手の自動承認が有効な場合、その相手は自動承認されます。",
+	"followApprovalLocal": "ローカルユーザーからのフォロー",
+	"followApprovalLocalDescription": "このサーバーでのアカウント作成からの期間で判定します。",
+	"followApprovalRemote": "リモートユーザーからのフォロー",
+	"followApprovalRemoteDescription": "相手のサーバーでの作成日時ではなく、このサーバーが初めてそのアカウントを認識してからの期間で判定します。",
+	"followApprovalUseDefault": "既定値を使う（現在は無効）",
+	"followApprovalCustom": "期間を指定する",
+	"followApprovalPeriod": "承認が必要な期間",
+	"followApprovalUnit": "単位",
+	"followApprovalInvalidPeriod": "期間が正しくありません。1秒以上の期間を、指定できる範囲内で入力してください。",
+	"disabled": "已停用",
+	"timeHour": "小時",
+	"timeDay": "日",
+	"cannotPerformTemporaryDescription": "由於超過操作次數限制，因此暫時無法進行。請稍後再嘗試。"
 }
 </locale>

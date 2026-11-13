@@ -96,3 +96,17 @@ export function checkNewTopic(base: Release[], head: Release[]): Result {
 
 	return Result.ofSuccess();
 }
+
+/**
+ * Release Manager が先頭の Unreleased を manifest のバージョンに昇格する場合。
+ * リリース PR でのみ使用し、過去の履歴には通常の追記と同じ検査を適用する。
+ */
+export function checkReleasePromotion(base: Release[], head: Release[], packageVersion: string): Result {
+	const version = /^(\d+\.\d+\.\d+)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.exec(packageVersion)?.[1];
+	if (!version || base[0]?.releaseName !== 'Unreleased' || head[0]?.releaseName !== version) {
+		return Result.ofFailed('Release promotion must replace Unreleased with the package version.');
+	}
+
+	const normalizedBase = [new Release(version, base[0].categories), ...base.slice(1)];
+	return checkNewTopic(normalizedBase, head);
+}

@@ -71,7 +71,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</div>
 						</div>
 						<div v-if="isEditingMemo || memoDraft" class="memo" :class="{'no-memo': !memoDraft}">
-							<div class="heading">{{ $locale.sfc.memo }}</div>
+							<div class="heading">{{ globalLocale.env.memo }}</div>
 							<textarea
 								ref="memoTextareaEl"
 								v-model="memoDraft"
@@ -115,15 +115,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div class="status">
 							<MkA :to="userPage(user, 'notes')">
 								<b>{{ number(user.notesCount) }}</b>
-								<span>{{ $locale.sfc.notes }}</span>
+								<span>{{ globalLocale.env.notes }}</span>
 							</MkA>
 							<MkA v-if="isFollowingVisibleForMe(user)" :to="userPage(user, 'following')">
 								<b>{{ number(user.followingCount) }}</b>
-								<span>{{ $locale.sfc.following }}</span>
+								<span>{{ globalLocale.env.following }}</span>
 							</MkA>
 							<MkA v-if="isFollowersVisibleForMe(user)" :to="userPage(user, 'followers')">
 								<b>{{ number(user.followersCount) }}</b>
-								<span>{{ $locale.sfc.followers }}</span>
+								<span>{{ globalLocale.env.followers }}</span>
 							</MkA>
 						</div>
 					</div>
@@ -159,6 +159,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { defineAsyncComponent, computed, onMounted, onUnmounted, onActivated, onDeactivated, nextTick, watch, ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import { getScrollContainer } from '@features/ui/frontend/shared/scroll.js';
@@ -173,7 +174,7 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { getUserMenu } from '@features/users/frontend/utility/get-user-menu.js';
 import number from '@features/ui/frontend/filters/number.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import * as os from '@features/ui/frontend/os.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { $i, iAmModerator } from '@features/auth/frontend/i.js';
@@ -187,7 +188,10 @@ import MkSparkle from '@features/ui/frontend/components/MkSparkle.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vue';
 import { isBirthday } from '@features/users/frontend/utility/is-birthday.js';
+import type { Locale } from 'i18n';
 import type XTimeline_TypeReferenceOnly from '@features/timelines/frontend/pages/user/index.timeline.vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 function calcAge(birthdate: string): number {
 	const date = new Date(birthdate);
@@ -804,16 +808,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Add moderation note",
-	"memo": "تذكير",
 	"noAccountDescription": "لم يكتب هذا المستخدم سيرته بعد.",
 	"location": "الموقع الجغرافي",
 	"birthday": "تاريخ الميلاد",
 	"yearsOld": "{age} سنة",
 	"registeredDate": "انضم في",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "الملاحظات",
-	"following": "المتابَعون",
-	"followers": "المتابِعون",
 	"userPagePinTip": "لعرض ملاحظة هنا اختر \"ثبتها على الصفحة الشخصية\" من قائمة تلك الملاحظة."
 }
 </locale>
@@ -829,16 +829,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Nota de moderació ",
 	"moderationNoteDescription": "Pots escriure notes que es compartiran entre els moderadors.",
 	"addModerationNote": "Afegeix una nota de moderació ",
-	"memo": "Recordatori",
 	"noAccountDescription": "Aquest usuari encara no ha escrit la seva biografia.",
 	"location": "Ubicació",
 	"birthday": "Aniversari",
 	"yearsOld": "{age} anys",
 	"registeredDate": "Data de registre",
 	"verifiedLink": "La propietat de l'enllaç ha sigut verificada",
-	"notes": "Notes",
-	"following": "Segueixes ",
-	"followers": "Seguidors",
 	"userPagePinTip": "Podeu seleccionar \"Fixar al perfil\" del menú de notes individuals per mostrar les notes aquí."
 }
 </locale>
@@ -854,16 +850,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Poznámka moderátora",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Add moderation note",
-	"memo": "Memo",
 	"noAccountDescription": "Tento uživatel zatím nenapsal svou biografii.",
 	"location": "Lokace",
 	"birthday": "Datum narození",
 	"yearsOld": "{age} let",
 	"registeredDate": "Datum registrace",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Poznámky",
-	"following": "Sledovaní",
-	"followers": "Sledující",
 	"userPagePinTip": "Zde můžete zobrazovat poznámky vybráním \"Připnout na profil\" z menu jednotlivých poznámek."
 }
 </locale>
@@ -879,16 +871,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Add moderation note",
-	"memo": "Memo",
 	"noAccountDescription": "This user has not written their bio yet.",
 	"location": "Location",
 	"birthday": "Birthday",
 	"yearsOld": "{age} years old",
 	"registeredDate": "Joined on",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Notes",
-	"following": "Following",
-	"followers": "Followers",
 	"userPagePinTip": "You can display notes here by selecting \"Pin to profile\" from the menu of individual notes."
 }
 </locale>
@@ -904,16 +892,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderationsnotiz",
 	"moderationNoteDescription": "Trage hier Notizen ein. Diese sind nur für die Moderatoren sichtbar.",
 	"addModerationNote": "Moderationsnotiz hinzufügen",
-	"memo": "Merkzettel",
 	"noAccountDescription": "Dieser Nutzer hat seine Profilbeschreibung noch nicht ausgefüllt",
 	"location": "Ort",
 	"birthday": "Geburtstag",
 	"yearsOld": "{age} Jahre alt",
 	"registeredDate": "Registrationsdatum",
 	"verifiedLink": "Link-Besitz wurde verifiziert",
-	"notes": "Notizen",
-	"following": "Folgt",
-	"followers": "Gefolgt von",
 	"userPagePinTip": "Um Notizen hier erscheinen zu lassen, drücke \"An dein Profil anheften\" im Menü individueller Notizen."
 }
 </locale>
@@ -929,16 +913,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Add moderation note",
-	"memo": "Memo",
 	"noAccountDescription": "This user has not written their bio yet.",
 	"location": "Location",
 	"birthday": "Birthday",
 	"yearsOld": "{age} years old",
 	"registeredDate": "Joined on",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Notes",
-	"following": "Following",
-	"followers": "Followers",
 	"userPagePinTip": "You can display notes here by selecting \"Pin to profile\" from the menu of individual notes."
 }
 </locale>
@@ -954,16 +934,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Nota de moderación",
 	"moderationNoteDescription": "Puedes rellenar notas que solo se comparten entre moderadores.",
 	"addModerationNote": "Añadir nota de moderación",
-	"memo": "Notas",
 	"noAccountDescription": "Este usuario no ha escrito su biografía aún",
 	"location": "Ubicación",
 	"birthday": "Cumpleaños",
 	"yearsOld": "{age} años",
 	"registeredDate": "Fecha de registro",
 	"verifiedLink": "Propiedad del enlace verificada",
-	"notes": "Notas",
-	"following": "Siguiendo",
-	"followers": "Seguidores",
 	"userPagePinTip": "Puede mantener sus notas visibles aquí seleccionando 'Fijar al perfil' en el menú de notas individuales"
 }
 </locale>
@@ -979,16 +955,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Note de modération",
 	"moderationNoteDescription": "Vous pouvez remplir des notes qui seront partagés seulement entre modérateurs.",
 	"addModerationNote": "Ajouter une note de modération",
-	"memo": "Pense-bête",
 	"noAccountDescription": "L’utilisateur·rice n’a pas encore renseigné de biographie de présentation sur son profil.",
 	"location": "Localisation",
 	"birthday": "Date de naissance",
 	"yearsOld": "{age} ans",
 	"registeredDate": "Inscrit le",
 	"verifiedLink": "Votre propriété de ce lien a été vérifiée",
-	"notes": "Notes",
-	"following": "Abonnements",
-	"followers": "Abonné·e·s",
 	"userPagePinTip": "Vous pouvez afficher des notes ici en sélectionnant l'option « Épingler au profil » dans le menu de chaque note."
 }
 </locale>
@@ -1004,16 +976,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Catatan moderasi",
 	"moderationNoteDescription": "Anda dapat mengisi note yang hanya akan dibagikan diantara moderator.",
 	"addModerationNote": "Tambahkan catatan moderasi",
-	"memo": "Memo",
 	"noAccountDescription": "Belum ada bio",
 	"location": "Lokasi",
 	"birthday": "Tanggal lahir",
 	"yearsOld": "{age} tahun",
 	"registeredDate": "Bergabung pada",
 	"verifiedLink": "Tautan kepemilikan telah diverifikasi",
-	"notes": "Catatan",
-	"following": "Ikuti",
-	"followers": "Pengikut",
 	"userPagePinTip": "Kamu dapat membuat catatan untuk ditampilkan disini dengan memilih \"Sematkan ke profil\" dari menu pada catatan individu."
 }
 </locale>
@@ -1029,16 +997,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Promemoria di moderazione",
 	"moderationNoteDescription": "Puoi scrivere promemoria condivisi solo tra moderatori.",
 	"addModerationNote": "Aggiungi promemoria di moderazione",
-	"memo": "Promemoria",
 	"noAccountDescription": "La persona non ha ancora scritto alcuna autobiografia.",
 	"location": "Posizione",
 	"birthday": "Compleanno",
 	"yearsOld": "{age} anni",
 	"registeredDate": "Data iscrizione",
 	"verifiedLink": "Abbiamo confermato la validità di questo collegamento",
-	"notes": "Note",
-	"following": "Following",
-	"followers": "Follower",
 	"userPagePinTip": "Qui puoi appuntare note, premendo \"Fissa sul profilo\" nel menù delle singole note."
 }
 </locale>
@@ -1054,16 +1018,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "モデレーションノート",
 	"moderationNoteDescription": "モデレーター間でだけ共有されるメモを記入することができます。",
 	"addModerationNote": "モデレーションノートを追加する",
-	"memo": "メモ",
 	"noAccountDescription": "自己紹介はありません",
 	"location": "場所",
 	"birthday": "誕生日",
 	"yearsOld": "{age}歳",
 	"registeredDate": "登録日",
 	"verifiedLink": "このリンク先の所有者であることが確認されました",
-	"notes": "ノート",
-	"following": "フォロー",
-	"followers": "フォロワー",
 	"userPagePinTip": "個々のノートのメニューから「ピン留め」を選択することで、ここにノートを表示しておくことができます。"
 }
 </locale>
@@ -1079,16 +1039,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "モデレーションノート",
 	"moderationNoteDescription": "モデレーターの中だけで共有するメモを入れれるで。",
 	"addModerationNote": "モデレーションノートを追加するで",
-	"memo": "メモ",
 	"noAccountDescription": "自己紹介食ってもた",
 	"location": "場所",
 	"birthday": "生まれた日",
 	"yearsOld": "{age}歳",
 	"registeredDate": "始めた日",
 	"verifiedLink": "このリンク先の所有者ってわかったわ。",
-	"notes": "ノート",
-	"following": "フォロー",
-	"followers": "フォロワー",
 	"userPagePinTip": "ノートのメニューから「ピン留め」を選んどいたら、ここにノートを置いとけるで。"
 }
 </locale>
@@ -1104,16 +1060,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Add moderation note",
-	"memo": "Memo",
 	"noAccountDescription": "This user has not written their bio yet.",
 	"location": "Location",
 	"birthday": "Birthday",
 	"yearsOld": "{age} years old",
 	"registeredDate": "Joined on",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Notes",
-	"following": "Ig ṭṭafaṛ",
-	"followers": "Imeḍfaṛen",
 	"userPagePinTip": "You can display notes here by selecting \"Pin to profile\" from the menu of individual notes."
 }
 </locale>
@@ -1129,16 +1081,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Add moderation note",
-	"memo": "Memo",
 	"noAccountDescription": "ಇವರು ಸ್ವಯಂ ಪರಿಚಯ ರಚಿಸಿಲ್ಲ",
 	"location": "Location",
 	"birthday": "Birthday",
 	"yearsOld": "{age} years old",
 	"registeredDate": "Joined on",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Notes",
-	"following": "Following",
-	"followers": "Followers",
 	"userPagePinTip": "You can display notes here by selecting \"Pin to profile\" from the menu of individual notes."
 }
 </locale>
@@ -1154,16 +1102,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "조정 기록",
 	"moderationNoteDescription": "모더레이터 역할을 가진 유저만 보이는 메모를 적을 수 있습니다.",
 	"addModerationNote": "조정 기록 추가하기",
-	"memo": "메모",
 	"noAccountDescription": "자기소개가 없습니다",
 	"location": "장소",
 	"birthday": "생일",
 	"yearsOld": "{age}세",
 	"registeredDate": "등록일",
 	"verifiedLink": "이 링크의 소유자임이 확인되었습니다.",
-	"notes": "노트",
-	"following": "팔로잉",
-	"followers": "팔로워",
 	"userPagePinTip": "각 노트의 메뉴에서 「프로필에 고정」을 선택하는 것으로, 여기에 노트를 표시해 둘 수 있어요."
 }
 </locale>
@@ -1179,16 +1123,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderatienotitie",
 	"moderationNoteDescription": "Voer hier notities in. Deze zijn alleen zichtbaar voor de moderators.",
 	"addModerationNote": "Moderatienotitie toevoegen",
-	"memo": "Memo",
 	"noAccountDescription": "Deze gebruiker heeft nog geen bio geschreven",
 	"location": "Locatie",
 	"birthday": "Geboortedatum",
 	"yearsOld": "{age} jaar",
 	"registeredDate": "Inschrijvingsdatum",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Notities",
-	"following": "Volgend",
-	"followers": "Volgers",
 	"userPagePinTip": "Je kunt hier notities tonen door “Vastmaken aan profiel” te selecteren in het menu van de individuele notities."
 }
 </locale>
@@ -1204,16 +1144,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Add moderation note",
-	"memo": "Notat",
 	"noAccountDescription": "Denne brukeren har ikke skrevet sin biografi ennå.",
 	"location": "Location",
 	"birthday": "Bursdag",
 	"yearsOld": "{age} år gammel",
 	"registeredDate": "Joined on",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Notes",
-	"following": "Følger",
-	"followers": "Følgere",
 	"userPagePinTip": "You can display notes here by selecting \"Pin to profile\" from the menu of individual notes."
 }
 </locale>
@@ -1229,16 +1165,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Notka moderacyjna",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Dodaj notkę moderacyjną",
-	"memo": "Notatki",
 	"noAccountDescription": "Ten użytkownik nie napisał jeszcze swojej biografii.",
 	"location": "Lokalizacja",
 	"birthday": "Data urodzenia",
 	"yearsOld": "{age} lat",
 	"registeredDate": "Zarejestrowano",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Wpisy",
-	"following": "Obserwowani",
-	"followers": "Obserwujący",
 	"userPagePinTip": "Możesz wyświetlać wpisy w tym miejscu po wybraniu \"Przypnij do profilu\" z menu pojedyńczego wpisu"
 }
 </locale>
@@ -1254,16 +1186,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Nota de moderação",
 	"moderationNoteDescription": "Você pode preencher notas que serão compartilhadas apenas com moderadores.",
 	"addModerationNote": "Adicionar nota de moderação",
-	"memo": "Nota",
 	"noAccountDescription": "Este usuário não tem uma descrição.",
 	"location": "Localização",
 	"birthday": "Aniversário",
 	"yearsOld": "{age} anos",
 	"registeredDate": "Data de registro",
 	"verifiedLink": "A autoria do link foi verificada",
-	"notes": "Posts",
-	"following": "Seguindo",
-	"followers": "Seguidores",
 	"userPagePinTip": "Notas podem ser mostradas aqui ao clicar em \"Fixar no Perfil\" no menu de notas individuais."
 }
 </locale>
@@ -1279,16 +1207,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Примечания модератора",
 	"moderationNoteDescription": "Вы можете заполнять заметки, которые будут доступны только модераторам.",
 	"addModerationNote": "Оставить заметку",
-	"memo": "Памятка",
 	"noAccountDescription": "Пользователь ничего не написал про себя",
 	"location": "Местоположение",
 	"birthday": "День рождения",
 	"yearsOld": "Возраст: {age}",
 	"registeredDate": "Дата регистрации",
 	"verifiedLink": "Эта ссылка принадлежит пользователю",
-	"notes": "Заметки",
-	"following": "Подписки",
-	"followers": "Подписчики",
 	"userPagePinTip": "Можно добавить сюда заметки, выбрав нужную, и включив в её меню пункт «Закрепить в профиле»."
 }
 </locale>
@@ -1304,16 +1228,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Add moderation note",
-	"memo": "Memo",
 	"noAccountDescription": "Tento používateľ zatiaľ nenapísal o sebe.",
 	"location": "Lokalita",
 	"birthday": "Dátum narodenia",
 	"yearsOld": "{age} rokov",
 	"registeredDate": "Dátum registrácie",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Poznámky",
-	"following": "Sledujete",
-	"followers": "Sledujúci",
 	"userPagePinTip": "Tu môžete zobraziť poznámky zvolením \"Pripnúť na profil\" z menu jednotlivých poznámok."
 }
 </locale>
@@ -1329,16 +1249,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "โน้ตการกลั่นกรอง",
 	"moderationNoteDescription": "สามารถจดเมโมที่จะแบ่งปันเฉพาะระหว่างผู้ควบคุมได้",
 	"addModerationNote": "เพิ่มโน้ตการกลั่นกรอง",
-	"memo": "เมโม",
 	"noAccountDescription": "ผู้ใช้รายนี้ยังไม่ได้เขียนคำแนะนำตัว",
 	"location": "ตำแหน่งที่ตั้ง",
 	"birthday": "วันเกิด",
 	"yearsOld": "{age} ปี",
 	"registeredDate": "วันที่ลงทะเบียน",
 	"verifiedLink": "ความเป็นเจ้าของลิงก์ได้รับการยืนยันแล้ว",
-	"notes": " โน้ต",
-	"following": "กำลังติดตาม",
-	"followers": "ผู้ติดตาม",
 	"userPagePinTip": "ปักหมุดโน้ตให้แสดงที่นี่ได้โดยเลือกเมนู “ปักหมุด” ของโน้ตนั้นๆ"
 }
 </locale>
@@ -1354,16 +1270,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderasyon notu",
 	"moderationNoteDescription": "Moderatörler arasında paylaşılacak notları girebilirsin.",
 	"addModerationNote": "Moderasyon notu ekle",
-	"memo": "Hatırlatıcı",
 	"noAccountDescription": "Bu kullanıcı henüz biyografisini yazmamış.",
 	"location": "Konum",
 	"birthday": "Doğum günü",
 	"yearsOld": "{age} yaşında",
 	"registeredDate": "Katılma tarihi",
 	"verifiedLink": "Bağlantı sahipliği doğrulanmıştır.",
-	"notes": "Notlar",
-	"following": "Takip",
-	"followers": "Takipçi",
 	"userPagePinTip": "Bireysel notların menüsünden “Profiline sabitle” seçeneğini seçerek notları burada görüntüleyebilirsin."
 }
 </locale>
@@ -1379,16 +1291,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
 	"addModerationNote": "Add moderation note",
-	"memo": "Memo",
 	"noAccountDescription": "This user has not written their bio yet.",
 	"location": "Location",
 	"birthday": "Birthday",
 	"yearsOld": "{age} years old",
 	"registeredDate": "Joined on",
 	"verifiedLink": "Link ownership has been verified",
-	"notes": "Notes",
-	"following": "Following",
-	"followers": "Followers",
 	"userPagePinTip": "You can display notes here by selecting \"Pin to profile\" from the menu of individual notes."
 }
 </locale>
@@ -1404,16 +1312,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Модераторська нотатка",
 	"moderationNoteDescription": "Ви можете додати нотатки, які будуть доступні лише модераторам.\n",
 	"addModerationNote": "Додати модераторську нотатку",
-	"memo": "Примітка",
 	"noAccountDescription": "Цей користувач ще нічого не написав про себе",
 	"location": "Локація",
 	"birthday": "День народження",
 	"yearsOld": "{age} років",
 	"registeredDate": "Приєднання",
 	"verifiedLink": "Право власності на посилання підтверджено",
-	"notes": "Записи",
-	"following": "Підписки",
-	"followers": "Підписники",
 	"userPagePinTip": "Ви можете зберегти відображені тут нотатки, вибравши \"Закріпити\" в меню окремих нотаток."
 }
 </locale>
@@ -1429,16 +1333,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "Ghi chú kiểm duyệt",
 	"moderationNoteDescription": "Bạn có thể điền vào những ghi chú chỉ được chia sẻ giữa những người kiểm duyệt.",
 	"addModerationNote": "Thêm ghi chú kiểm duyệt",
-	"memo": "Lưu ý",
 	"noAccountDescription": "Người này chưa viết mô tả.",
 	"location": "Đến từ",
 	"birthday": "Sinh nhật",
 	"yearsOld": "{age} tuổi",
 	"registeredDate": "Tham gia",
 	"verifiedLink": "Chúng tôi đã xác nhận bạn là chủ sở hữu của đường dẫn này",
-	"notes": "Bài Viết",
-	"following": "Đang theo dõi",
-	"followers": "Người theo dõi",
 	"userPagePinTip": "Bạn có thể hiển thị các tút ở đây bằng cách chọn \"Ghim vào hồ sơ\" từ menu của mỗi tút."
 }
 </locale>
@@ -1454,16 +1354,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "管理笔记",
 	"moderationNoteDescription": "可以用来记录仅在管理员之间共享的笔记。",
 	"addModerationNote": "添加管理笔记",
-	"memo": "备注",
 	"noAccountDescription": "此用户尚无自我介绍",
 	"location": "位置",
 	"birthday": "生日",
 	"yearsOld": "{age}岁",
 	"registeredDate": "注册于",
 	"verifiedLink": "已验证的链接",
-	"notes": "帖子",
-	"following": "关注中",
-	"followers": "关注者",
 	"userPagePinTip": "在帖子的菜单中选择“置顶”，即可显示该条帖子。"
 }
 </locale>
@@ -1479,16 +1375,12 @@ onDeactivated(disposeBannerParallaxResizeObserver);
 	"moderationNote": "管理筆記",
 	"moderationNoteDescription": "您可以編寫僅在審查員之間共用的註解。",
 	"addModerationNote": "新增管理筆記",
-	"memo": "備忘錄",
 	"noAccountDescription": "此使用者尚未自我介紹",
 	"location": "位置",
 	"birthday": "生日",
 	"yearsOld": "{age} 歲",
 	"registeredDate": "註冊日期",
 	"verifiedLink": "已驗證連結",
-	"notes": "貼文",
-	"following": "追隨中",
-	"followers": "追隨者",
 	"userPagePinTip": "在貼文的選單中選擇「置頂」，即可置頂該貼文至您的個人檔案頁面。"
 }
 </locale>

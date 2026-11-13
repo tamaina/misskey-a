@@ -1,0 +1,4105 @@
+{
+  "schema_version": 1,
+  "baseline": {
+    "repository": "misskey-dev/misskey",
+    "tag": "2026.10.0",
+    "sha": "de89118a225fbe0833e42ab94e8d5af1e5211208"
+  },
+  "target": {
+    "repository": "tamaina/misskey-a",
+    "head": "8b3bbc05b6a1e4686e4f1c793383d3457545c8e0",
+    "branch": "develop"
+  },
+  "initial_target": "3c215bd72640dd882feacd8b97ef92ebf2c4c180",
+  "pre_push_increment": {
+    "sha": "e1a614df68f226a8c9ee831994e1727a1ded061f",
+    "pr": 197,
+    "reason": "開始後にdevelopへのmergeを検知し追加棚卸し"
+  },
+  "scope": "正式タグからtargetまでの全到達commit。未マージbranch/Draftは含めない。CHANGELOG補完commit自体はtargetより後のdocs-only作業。",
+  "upstream_before_fork": [
+    "ed9654bde032199fd7530407410a56c7cf4cda75",
+    "17196baaa89ff28ed5868b5a029a2460852df6de"
+  ],
+  "method": [
+    "git rev-list baseline..targetで母集合を固定",
+    "mergeのcombined diffとversion-only差分を区別",
+    "既存APIの契約化を新APIと数えない",
+    "同機能の実装・型・試験・文書checkpointを統合",
+    "OIDC/Conditional Mediationは未接続・opt-inとして明記",
+    "全記載PRのtarget包含とbaseline非包含を確認",
+    "push前にremote develop増分を再確認する"
+  ],
+  "groups": {
+    "architecture": {
+      "changelog_anchor": "API、モデル、サービス、画面、ジョブを`feature`単位"
+    },
+    "lifecycle": {
+      "changelog_anchor": "サーバー・キュー・CLI の起動終了"
+    },
+    "contracts": {
+      "changelog_anchor": "oRPC/Valibotの契約からAPI"
+    },
+    "locales": {
+      "changelog_anchor": "クライアントのi18nライブラリにVVIを採用"
+    },
+    "build": {
+      "changelog_anchor": "機能別の契約・翻訳・DB・起動停止・連合の回帰検証"
+    },
+    "ci": {
+      "changelog_anchor": "CIの安定ブランチ対象をmain"
+    },
+    "release": {
+      "changelog_anchor": null,
+      "editorial_omission": {
+        "commit": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+        "reason": "ユーザーが公開CHANGELOGから削除した旧説明。以前の文章へ戻さず監査上の分類を保持。"
+      }
+    },
+    "branding": {
+      "changelog_anchor": "ソフトウェア名を **Misskey 9000**"
+    },
+    "dependencies": {
+      "changelog_anchor": "依存関係の更新"
+    },
+    "security_docs": {
+      "changelog_anchor": null,
+      "editorial_omission": {
+        "commit": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+        "reason": "ユーザーが公開CHANGELOGから削除した旧説明。以前の文章へ戻さず監査上の分類を保持。"
+      }
+    },
+    "follow_suspend": {
+      "changelog_anchor": "ユーザーの凍結時にフォロー関係を削除せず"
+    },
+    "follow_age": {
+      "changelog_anchor": "新しいアカウントからのフォロー"
+    },
+    "signature": {
+      "changelog_anchor": "連合の署名について、複数公開鍵"
+    },
+    "remote_suspend": {
+      "changelog_anchor": "リモートの凍結状態をローカル"
+    },
+    "migration": {
+      "changelog_anchor": "上流由来の migration 名・履歴を復元"
+    },
+    "pwa": {
+      "changelog_anchor": "PWAで共有されたファイル"
+    },
+    "ui": {
+      "changelog_anchor": "Safariでデッキ列"
+    },
+    "upstream_embed": {
+      "changelog_anchor": "埋め込み画面の内部リンク判定"
+    },
+    "auth_ui": {
+      "changelog_anchor": "パスワード変更時に現在のパスワード"
+    },
+    "auth_session": {
+      "changelog_anchor": "ブラウザーセッションを個別に発行"
+    },
+    "auth_api": {
+      "changelog_anchor": "TOTP/パスキーAPIのcanonical alias"
+    },
+    "auth_foundation": {
+      "changelog_anchor": "開発者向けにOIDC"
+    },
+    "mcp": {
+      "changelog_anchor": "トークンの権限に沿ったAPI検出"
+    },
+    "mcp_events": {
+      "changelog_anchor": "MCPのイベント記述・JSON Schema"
+    },
+    "oauth": {
+      "changelog_anchor": "通常の OAuth でも明示的な opt-in"
+    },
+    "sdk_acct": {
+      "changelog_anchor": "misskey-jsで `acct:`"
+    },
+    "clip": {
+      "changelog_anchor": "デッキにクリップ列"
+    },
+    "announcement": {
+      "changelog_anchor": "お知らせの自動アーカイブ"
+    },
+    "quote_emoji": {
+      "changelog_anchor": "リモートへの引用Renote"
+    },
+    "pin": {
+      "changelog_anchor": "ピン留め解除で削除完了"
+    },
+    "client_log": {
+      "changelog_anchor": "クライアントのエラーログ"
+    },
+    "moderation_diff": {
+      "changelog_anchor": "モデレーションログの差分表示"
+    },
+    "sw_follow": {
+      "changelog_anchor": "Service Workerの通知からのフォロー操作"
+    },
+    "stream_cleanup": {
+      "changelog_anchor": "統計ログの応答待ちリスナー"
+    },
+    "markup": {
+      "changelog_anchor": "通常画面と埋め込み画面のMFM"
+    },
+    "avatar_federation": {
+      "changelog_anchor": "リモートユーザーのアバターデコレーションが反映"
+    },
+    "profile_comment": {
+      "changelog_anchor": "UserProfileのpassword列コメント"
+    },
+    "setup_ui": {
+      "changelog_anchor": "初期設定ダイアログでフッター"
+    },
+    "delivery_rate": {
+      "changelog_anchor": "配送ジョブの `deliverJobPerSec`"
+    },
+    "zip": {
+      "changelog_anchor": "カスタム絵文字ZIPの生成・読み取り"
+    },
+    "vvi_facade": {
+      "changelog_anchor": "翻訳チャンクの直接re-export"
+    },
+    "storybook": {
+      "changelog_anchor": "Storybookの依存関係をMSW 3 / Storybook 10"
+    },
+    "mcp_self_events": {
+      "changelog_anchor": "自分で投稿した返信・メンション"
+    },
+    "list_name_unicode": {
+      "changelog_anchor": "リストの作成・複製・名前変更で、名前の文字数制限をUnicodeコードポイント数"
+    }
+  },
+  "review": {
+    "checks": [
+      "全到達commitのgroup/exclusionを再照合",
+      "merged PRの機能変更と未接続の認証基盤を区別",
+      "初期契約化のping/server-info/emojisは新APIではないことをdiffで確認",
+      "全mergeのcombined diffを確認",
+      "旧リリース節はbyte単位で保持",
+      "af016bb8fの機能別見出し・削除済み旧項目と以後の差分を照合",
+      "最新pnpm、beta.3、MCP自己通知除外の実装と未マージ境界を照合",
+      "本文のfork PR94件をGitHub merged状態・target包含・baseline非包含まで照合（upstream #17993は別集計）",
+      "対象268commitの母集合と全changed_paths_sha256を再計算し一致確認"
+    ],
+    "not_claimed": [
+      "本家developの未マージ変更",
+      "測定で確立していない性能改善",
+      "OIDCの完成済みログイン対応"
+    ]
+  },
+  "summary": {
+    "commit_count": 271,
+    "dispositions": {
+      "excluded": 16,
+      "grouped": 255
+    },
+    "referenced_fork_pr_count": 95
+  },
+  "commits": [
+    {
+      "sha": "ed9654bde032199fd7530407410a56c7cf4cda75",
+      "subject": "[skip ci] Update CHANGELOG.md (prepend template)",
+      "parents": [
+        "de89118a225fbe0833e42ab94e8d5af1e5211208"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "06572a96a58dc510037d5efa622f9bec8519bc1beab13c9f251e97e657a9d4ed",
+      "disposition": "excluded",
+      "reason": "上流リリース後の Unreleased 雛形追加。アプリの実動作差分なし。生成元の履歴として記録。"
+    },
+    {
+      "sha": "17196baaa89ff28ed5868b5a029a2460852df6de",
+      "subject": "fix(frontend-embed): frontend側にしか入っていない修正を同期 (#17993)",
+      "parents": [
+        "ed9654bde032199fd7530407410a56c7cf4cda75"
+      ],
+      "changed_file_count": 11,
+      "changed_paths_sha256": "4cd11d91a88cee5e26f9a0d2f4b10d67ce3d333e3f6aec53676b1e2eb80cee46",
+      "disposition": "grouped",
+      "groups": [
+        "upstream_embed"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "fb671a5cf930c8c567d57d983fa5e8b4906619ea",
+      "subject": "refactor: establish feature-owned boot lifecycle foundation",
+      "parents": [
+        "17196baaa89ff28ed5868b5a029a2460852df6de"
+      ],
+      "changed_file_count": 12,
+      "changed_paths_sha256": "230cbb8bac41c52e6fc5f10186f40822304be7156f68668145b9dc73b3ce9cc9",
+      "disposition": "grouped",
+      "groups": [
+        "lifecycle",
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a9f9ec62ec921d716f9c0a7989f4b4d861d1d3d6",
+      "subject": "refactor(boot): dispatch CLI before acquiring service resources",
+      "parents": [
+        "fb671a5cf930c8c567d57d983fa5e8b4906619ea"
+      ],
+      "changed_file_count": 7,
+      "changed_paths_sha256": "803f5ac457c8050e99d06bc98d894fedfdae0748ee761b4441ddecedafa13017",
+      "disposition": "grouped",
+      "groups": [
+        "lifecycle"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "661bd6d1896bb05a7e5cc48f3b7206b05d78ffd8",
+      "subject": "feat: derive instance ping API from feature contract",
+      "parents": [
+        "a9f9ec62ec921d716f9c0a7989f4b4d861d1d3d6"
+      ],
+      "changed_file_count": 15,
+      "changed_paths_sha256": "37398d4fec1329cb5e915c0c57961f911973035fe229c134970b33b4eb8ffa10",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。",
+      "review_note": "既存 ping endpoint の契約化。endpoint 名は以前から存在し、新しい利用者向け API と数えない。"
+    },
+    {
+      "sha": "e10b1e903fb78af20e2430610212e28f69d19f72",
+      "subject": "feat: migrate not-found locale tags to VVI",
+      "parents": [
+        "661bd6d1896bb05a7e5cc48f3b7206b05d78ffd8"
+      ],
+      "changed_file_count": 10,
+      "changed_paths_sha256": "69f0d1ecc10601347919a9247cb46b4aaad1f2fd019d670582505023276e07ed",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "4e2ae0ba6e6808a04ab585ddc7bda872f6a9767f",
+      "subject": "refactor: extract note creation predicates",
+      "parents": [
+        "e10b1e903fb78af20e2430610212e28f69d19f72"
+      ],
+      "changed_file_count": 12,
+      "changed_paths_sha256": "328ff032b83e550494c6b084a098210c69943be86d5c658cfee92df887f27e69",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e4778cafc0849dc27c37071117d1c95523d70ece",
+      "subject": "feat: add contract-backed server info endpoint",
+      "parents": [
+        "4e2ae0ba6e6808a04ab585ddc7bda872f6a9767f"
+      ],
+      "changed_file_count": 8,
+      "changed_paths_sha256": "3bace10989f0c6f8756c3a6eeaed64973ac4c9600c6d1454681f2b1fd27f661b",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。",
+      "review_note": "既存 server-info endpoint の契約化。既存のHTTPルート・ポリシーを維持。"
+    },
+    {
+      "sha": "33d8840a3d536fba628fc450e7282bf6ac281d80",
+      "subject": "fix: build workspace contract before misskey-js",
+      "parents": [
+        "e4778cafc0849dc27c37071117d1c95523d70ece"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "b12eeff83990e1ee38c24dfc0eb229f733345db5911e1af13faeca0da9b657de",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "52964c5b77de781e3ce6f23b903206bd980ccf36",
+      "subject": "refactor: compose captcha maintenance without the legacy container",
+      "parents": [
+        "33d8840a3d536fba628fc450e7282bf6ac281d80"
+      ],
+      "changed_file_count": 16,
+      "changed_paths_sha256": "f850d93721f527fc0f5316e347bbffc3cd81cd47418bf79fffa13df178403944",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "28ad66da422587ae3800e1fe845c835abac0cb6b",
+      "subject": "fix: generate metadata before maintenance CI",
+      "parents": [
+        "52964c5b77de781e3ce6f23b903206bd980ccf36"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "27aa1d42283790051db8f5c3c6e18b4bde8f17ea5712c689eeedd922dc8e8f0e",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c3b46a740243f869ea4912d9320ca4fe441dcec8",
+      "subject": "refactor: keep feature build ownership in application packages",
+      "parents": [
+        "28ad66da422587ae3800e1fe845c835abac0cb6b"
+      ],
+      "changed_file_count": 47,
+      "changed_paths_sha256": "d331d7abde9b6fca826cbde40df95345e1b18eb97679a5c091561cbeaf5b5405",
+      "disposition": "grouped",
+      "groups": [
+        "architecture",
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3442dbbf0fffc54de5cbebb41d18f0e39e9e3023",
+      "subject": "Move server and queue lifecycle into boot feature",
+      "parents": [
+        "c3b46a740243f869ea4912d9320ca4fe441dcec8"
+      ],
+      "changed_file_count": 36,
+      "changed_paths_sha256": "6dc2fe26d5201406a5cf8b98e4e9e041f8ae9db861198ce944655aff5eca9da4",
+      "disposition": "grouped",
+      "groups": [
+        "lifecycle",
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "b7cda8fd6cc9295404f264bd35d90252556f26dd",
+      "subject": "Construct migrated instance handlers through one feature factory",
+      "parents": [
+        "3442dbbf0fffc54de5cbebb41d18f0e39e9e3023"
+      ],
+      "changed_file_count": 11,
+      "changed_paths_sha256": "8e55ad3dcf69da91dd813c936ce0df817afe1609746817af43703bc89e6bfe10",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "99d9c68d3e7a4bfa2886a4d7f2248c715fadcada",
+      "subject": "Migrate shared result labels to component locales",
+      "parents": [
+        "b7cda8fd6cc9295404f264bd35d90252556f26dd"
+      ],
+      "changed_file_count": 8,
+      "changed_paths_sha256": "a3cc79985da078e0ed184c68e2a247f8aff17fd3f79d36855f9a7da0725d15f6",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "de884decc51610e2f3e314b1749379bd2a43567f",
+      "subject": "Migrate online user count to instance contract",
+      "parents": [
+        "99d9c68d3e7a4bfa2886a4d7f2248c715fadcada"
+      ],
+      "changed_file_count": 11,
+      "changed_paths_sha256": "deab3f1ee61de88a24d18dd679de33f5674152c43315c62b66ea005c23ff93bd",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "b4b54d673db829fd4afb31483b1579a6ac19a60c",
+      "subject": "Move not-found view into navigation feature",
+      "parents": [
+        "de884decc51610e2f3e314b1749379bd2a43567f"
+      ],
+      "changed_file_count": 15,
+      "changed_paths_sha256": "ae53fee8f45a8ea61f4f8f997ee25ee35a8f2323d8750afc671d11cafa163e68",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "6936660945c6e2d958d6c07594199c4ff6ebb3ca",
+      "subject": "Extend feature contracts and frontend boot coverage",
+      "parents": [
+        "b4b54d673db829fd4afb31483b1579a6ac19a60c"
+      ],
+      "changed_file_count": 20,
+      "changed_paths_sha256": "f89b8ca6af64f3a5e940bf2df9025389b5486ec8b792f789fb42b62c3fa26e2d",
+      "disposition": "grouped",
+      "groups": [
+        "contracts",
+        "lifecycle",
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "100924ca5d882c23db8396052a1d75973ff64eb2",
+      "subject": "Migrate statistics to feature contract",
+      "parents": [
+        "6936660945c6e2d958d6c07594199c4ff6ebb3ca"
+      ],
+      "changed_file_count": 21,
+      "changed_paths_sha256": "6d5c9c492e9e9ac06d2ccef4aa3449ef54f9163e2eff38c17736822db76e4fa0",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "2a8dad183e0851469fbeaca44dbadd32e9be5972",
+      "subject": "Extract avatar decorations into feature contract",
+      "parents": [
+        "100924ca5d882c23db8396052a1d75973ff64eb2"
+      ],
+      "changed_file_count": 11,
+      "changed_paths_sha256": "6b538643e9611701311c768a6621a2b92a8d1d22b6e7dce9c8943a252d817a53",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "97973f78deb840c49841a8bb3c321f79e7f5b6d7",
+      "subject": "refactor: centralize legacy JSON schema bridge",
+      "parents": [
+        "2a8dad183e0851469fbeaca44dbadd32e9be5972"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "08464470d87d0014422250e0ceabda2976974ae81214d5fff5ea401135a80e80",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "2c0474f0a25b77578d16387829d4c8a54ed8d2b6",
+      "subject": "feat: add public emoji list API",
+      "parents": [
+        "97973f78deb840c49841a8bb3c321f79e7f5b6d7"
+      ],
+      "changed_file_count": 18,
+      "changed_paths_sha256": "2b2a8e9afcb2cad2fd2fe8f90af461bc0c046639c8b544c5da707fa1b769efe8",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。",
+      "review_note": "既存 emoji/emojis endpoint と公開モデルを機能契約へ移行。subject の add public emoji list API を新設APIと誤読しない。"
+    },
+    {
+      "sha": "a0747ffeb05188858cf6bcce7c07d0cc2bba66e1",
+      "subject": "feat: move emoji catalog into feature package",
+      "parents": [
+        "2c0474f0a25b77578d16387829d4c8a54ed8d2b6"
+      ],
+      "changed_file_count": 17,
+      "changed_paths_sha256": "950ed147834ae6bc449d0555c74279d54d2a291a434b711fc09ffbbe08bb9b75",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "8307961988e23c566b768d89606905d3327140ce",
+      "subject": "test: wait for emoji catalog render",
+      "parents": [
+        "a0747ffeb05188858cf6bcce7c07d0cc2bba66e1"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "25ad9ec60bca580ef65659182885bbe07a0e1f1eb6df04790205f623bf48c0c2",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "5bed49eee284001917e71f19443a2338b6f9e010",
+      "subject": "refactor: migrate feature templates and operations",
+      "parents": [
+        "8307961988e23c566b768d89606905d3327140ce"
+      ],
+      "changed_file_count": 78,
+      "changed_paths_sha256": "b3f2b49ecce72f0707c446462c0858299f050de9b02fa4912dba5176fb362dbb",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ea2d4bc5542e818ec241d8a1d00615807401f23b",
+      "subject": "test: add feature template paths to backend configs",
+      "parents": [
+        "5bed49eee284001917e71f19443a2338b6f9e010"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "8f85e89faa923146a0fdcc3dfb02c9e809943ecb05029410dfcefca935dd6802",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "633161ce0f8404c32b3d04618b988bedecf28b48",
+      "subject": "build: resolve feature TSX with backend config",
+      "parents": [
+        "ea2d4bc5542e818ec241d8a1d00615807401f23b"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "1ff8b25fc5bec055f5e8392e6554923bc37ffe164a58915058c3a9a2a3bf294d",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "467fcef670dceebb991ac272961acfaf5af62993",
+      "subject": "refactor: move entity serializers into features",
+      "parents": [
+        "633161ce0f8404c32b3d04618b988bedecf28b48"
+      ],
+      "changed_file_count": 87,
+      "changed_paths_sha256": "9da6b93fe9e1726a9070733af1dee96f5f80cd61d2160c382297ee7847c3510e",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "4d6e8d07bf50175035a8f3f29abda31529707c68",
+      "subject": "refactor: migrate feature commands and index entries",
+      "parents": [
+        "467fcef670dceebb991ac272961acfaf5af62993"
+      ],
+      "changed_file_count": 56,
+      "changed_paths_sha256": "03282ff4d8f4a51d00b923ff72f860357125f758c5f544e383bbf0761c189501",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "894788a51e2b628eb3759e11026ed6aeb8a06dbb",
+      "subject": "refactor: migrate list and announcement commands",
+      "parents": [
+        "4d6e8d07bf50175035a8f3f29abda31529707c68"
+      ],
+      "changed_file_count": 35,
+      "changed_paths_sha256": "9035a8dcb84fad8089bb1991e46358adc9207e9666e0c69439b59bd9219e620e",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ad72e5cea1f8ecd7cd99f6d92e9e724d612562fa",
+      "subject": "refactor: migrate channel and clip commands",
+      "parents": [
+        "894788a51e2b628eb3759e11026ed6aeb8a06dbb"
+      ],
+      "changed_file_count": 23,
+      "changed_paths_sha256": "c3c65385f87109b1ad9d192f5ffde0ff95aa6130d9cee7f11d1a90907b86cceb",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "0781ae026b148a4f864620379f4d3fff22eb5322",
+      "subject": "refactor: move queue processors into features",
+      "parents": [
+        "ad72e5cea1f8ecd7cd99f6d92e9e724d612562fa"
+      ],
+      "changed_file_count": 70,
+      "changed_paths_sha256": "d448d568493440156b30fa0c8f38101d1600bf15611551c353098cf8f05011fc",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c489f439553c1f5b0193c0c50a9073b0239b8338",
+      "subject": "refactor: move backend models into features",
+      "parents": [
+        "0781ae026b148a4f864620379f4d3fff22eb5322"
+      ],
+      "changed_file_count": 160,
+      "changed_paths_sha256": "06cb10b87ad349a455fad5af691fe22eb8571e636c88f3ce2717f9273800632c",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "5345d9398273adde546ea8799c4e824f9e939ba5",
+      "subject": "refactor: move services and pages into features",
+      "parents": [
+        "c489f439553c1f5b0193c0c50a9073b0239b8338"
+      ],
+      "changed_file_count": 696,
+      "changed_paths_sha256": "1570c734c4d79c35010ddaba7a314d2386cc00e96f5b1912b2ba0bc00f34f21f",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "9cb2588441712259c1d4ce4cd4963ecb0e663bf0",
+      "subject": "test: update moved emoji fixture alias",
+      "parents": [
+        "5345d9398273adde546ea8799c4e824f9e939ba5"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "25ad9ec60bca580ef65659182885bbe07a0e1f1eb6df04790205f623bf48c0c2",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "fc0fc87321ad2012ba5526987d2a77435d814561",
+      "subject": "refactor: migrate components and protocols into features",
+      "parents": [
+        "9cb2588441712259c1d4ce4cd4963ecb0e663bf0"
+      ],
+      "changed_file_count": 1393,
+      "changed_paths_sha256": "64170b9afbceaf37a9b1c15dfc826a584f7335c9d9ef0e84ae001461d1a25cc4",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "efda187fca21c54418e7960c21b0c006f7ccfe4e",
+      "subject": "refactor: migrate endpoint implementations into features",
+      "parents": [
+        "fc0fc87321ad2012ba5526987d2a77435d814561"
+      ],
+      "changed_file_count": 780,
+      "changed_paths_sha256": "b9078c83126f672d5b2a377473438424e1d95dea9927207dd462bf76013dff44",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "b94a454b2b126ad97489b305c0759bea36687e89",
+      "subject": "fix: resolve ms imports through ESM adapter",
+      "parents": [
+        "efda187fca21c54418e7960c21b0c006f7ccfe4e"
+      ],
+      "changed_file_count": 54,
+      "changed_paths_sha256": "e3a0e70bfe4f0bf126f51cc9943f8a0cb92754b5eef70bc7b45b6c100dc536ba",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "18cd5a8c0346e925a9a282a8f0f8319984514ae3",
+      "subject": "feat: add reversible follower suspension",
+      "parents": [
+        "b94a454b2b126ad97489b305c0759bea36687e89"
+      ],
+      "changed_file_count": 23,
+      "changed_paths_sha256": "3a7c5cfc219135d289db6dcc7e775205d363b538e90a1a6127d646f39864a926",
+      "disposition": "grouped",
+      "groups": [
+        "follow_suspend"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "90885dfc2233e7b5eac124fd981ac0026c3794e3",
+      "subject": "test: mount feature TypeScript configs for federation",
+      "parents": [
+        "18cd5a8c0346e925a9a282a8f0f8319984514ae3"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "124a65ab459a893f2045fb1cfec5e8cdeb037963fe25982e652124e6fdfe9a9b",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a9da6c4c0697dc7439f1841d85619343bb49f669",
+      "subject": "test: build generated contracts before SDK typecheck",
+      "parents": [
+        "90885dfc2233e7b5eac124fd981ac0026c3794e3"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "e52754d12071ca9a326f792b39821f846476853b8630f7ccedd914279ae9a11d",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3ae401918cd7ee2835dbb5afbfc024769cb84450",
+      "subject": "Merge pull request #1 from tamaina/port/16279-reversible-suspension",
+      "parents": [
+        "b94a454b2b126ad97489b305c0759bea36687e89",
+        "a9da6c4c0697dc7439f1841d85619343bb49f669"
+      ],
+      "changed_file_count": 0,
+      "changed_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fork_pr": 1,
+      "disposition": "excluded",
+      "reason": "mergeのみ。親側の実装commitを個別に棚卸し済みで、combined diffに固有変更なし。"
+    },
+    {
+      "sha": "7fae39978ce1a05f5e4f788d2e6a17bfb7de662a",
+      "subject": "refactor: add VVI locale tags to frontend pages",
+      "parents": [
+        "3ae401918cd7ee2835dbb5afbfc024769cb84450"
+      ],
+      "changed_file_count": 50,
+      "changed_paths_sha256": "172ad6c9ee70983a451b7012d3ae96ed61c845fa352e294de3fcc6a7e34f3042",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "63160a1cd32de3379c078c464213c97edca3ed10",
+      "subject": "refactor: remove backend feature bridges and compose command APIs",
+      "parents": [
+        "7fae39978ce1a05f5e4f788d2e6a17bfb7de662a"
+      ],
+      "changed_file_count": 1439,
+      "changed_paths_sha256": "1e7bf80bab885e8f4c2f6ce27e25f0f413442746294d76bc52ba301699832e7a",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f2800235255832f565067da2d5f208905b6e193f",
+      "subject": "test: remove unused import route fixture",
+      "parents": [
+        "63160a1cd32de3379c078c464213c97edca3ed10"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "cd82b88346edc0668bb032bf39619a7801a29a10732d0eb83515f7b4f1a4cb25",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "cfe216b873f799cd70ad80cee2d5decd73cb6bb2",
+      "subject": "refactor: finish frontend feature placement",
+      "parents": [
+        "f2800235255832f565067da2d5f208905b6e193f"
+      ],
+      "changed_file_count": 938,
+      "changed_paths_sha256": "c1f79e0fe95f5d4d6f390861611e1a927678396ec3dd09df278e10d50d5a5b11",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "5b66e2bcae755ed2fbc2421ca249f429d94636a2",
+      "subject": "refactor: derive packed models from feature Valibot contracts",
+      "parents": [
+        "cfe216b873f799cd70ad80cee2d5decd73cb6bb2"
+      ],
+      "changed_file_count": 157,
+      "changed_paths_sha256": "f622b3dc14aeec0c358099479c8676245dadd69685c1c4c8d33f278017e17996",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "8e56aac40e037a369b694cc6eb021ee11bc5f08f",
+      "subject": "refactor: bind legacy API handlers to native contracts",
+      "parents": [
+        "5b66e2bcae755ed2fbc2421ca249f429d94636a2"
+      ],
+      "changed_file_count": 8,
+      "changed_paths_sha256": "891cfe9582c3de0d07646512fd709c2a8321ad2fa9a9ff50892cf09d9fe34af3",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ebac570ccb2b8477e918c3138a1d52827d18ee82",
+      "subject": "refactor: migrate 35 inline endpoints to native contracts",
+      "parents": [
+        "8e56aac40e037a369b694cc6eb021ee11bc5f08f"
+      ],
+      "changed_file_count": 59,
+      "changed_paths_sha256": "6a8d776e33a3a42615463ffbd7f97d80143cda6012fe77db16418d411c1e4524",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7ace9868e3e06825ad2557b10204f822590c658c",
+      "subject": "refactor: migrate 40 packed-response endpoints to native contracts",
+      "parents": [
+        "ebac570ccb2b8477e918c3138a1d52827d18ee82"
+      ],
+      "changed_file_count": 52,
+      "changed_paths_sha256": "0110f808bb00fce51951f1752999255721de43637319099b1a478d17e0e831ff",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7932d455eb3d7c1eeb4b3d76d8ad153ebc4684b6",
+      "subject": "refactor: expand native API contracts and feature-local locales",
+      "parents": [
+        "7ace9868e3e06825ad2557b10204f822590c658c"
+      ],
+      "changed_file_count": 180,
+      "changed_paths_sha256": "d238dd63f67d56b8903bfd6ee66381e7aeb712d348280e4631a3df9e1d266207",
+      "disposition": "grouped",
+      "groups": [
+        "contracts",
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a59809ff83565fc099bdd2edee2fdea600415c86",
+      "subject": "refactor: migrate no-content contracts and feature services",
+      "parents": [
+        "7932d455eb3d7c1eeb4b3d76d8ad153ebc4684b6"
+      ],
+      "changed_file_count": 154,
+      "changed_paths_sha256": "70932b352fe16171b00d9fe698d6ebff6966b06a7e5c36dc8fdaefb82dfa52f3",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "5767fb17db9e9bf3c127739c64d52fc3a9858007",
+      "subject": "refactor: extend native contracts and feature-local composition",
+      "parents": [
+        "a59809ff83565fc099bdd2edee2fdea600415c86"
+      ],
+      "changed_file_count": 114,
+      "changed_paths_sha256": "af34d18c5b0e1931081099a9706dcde805db5c59d27dc5c2dd33dc69035094e4",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "16ac9b06d03cf211194c934b8f0f9ebd85ef58bd",
+      "subject": "refactor: derive chart contracts from portable descriptors",
+      "parents": [
+        "5767fb17db9e9bf3c127739c64d52fc3a9858007"
+      ],
+      "changed_file_count": 34,
+      "changed_paths_sha256": "5980c5aa43e3bf57fdbdf4e39381a70685080a0fd10f95640856b748d24b285f",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "0fccf3d2ca8cfc4c05d59891011c06e3e32cd8b5",
+      "subject": "ci: cover feature service database tests",
+      "parents": [
+        "16ac9b06d03cf211194c934b8f0f9ebd85ef58bd"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "27aa1d42283790051db8f5c3c6e18b4bde8f17ea5712c689eeedd922dc8e8f0e",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "219cd09ba83b848e8de3b9ed638618edc31b1f81",
+      "subject": "refactor: expand native contracts and typed feature composition",
+      "parents": [
+        "0fccf3d2ca8cfc4c05d59891011c06e3e32cd8b5"
+      ],
+      "changed_file_count": 234,
+      "changed_paths_sha256": "7c21c0324772e397a3b61b8e43b3fdc76c8ab4eb69b48ed6ce4501a9bd305e94",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e96ddf77362b8ef957b7684cd68a3fa407650e58",
+      "subject": "refactor: complete native contracts and retire SchemaType",
+      "parents": [
+        "219cd09ba83b848e8de3b9ed638618edc31b1f81"
+      ],
+      "changed_file_count": 427,
+      "changed_paths_sha256": "c1a32a34c8ea80f1f546721439334b1bd474ce9499d82d2ebf04af27343df289",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "df10a2860a018438f7959e47607be55615433236",
+      "subject": "refactor: remove redundant feature service aliases",
+      "parents": [
+        "e96ddf77362b8ef957b7684cd68a3fa407650e58"
+      ],
+      "changed_file_count": 28,
+      "changed_paths_sha256": "b7e21b15f91eb765725737b77b17201f792bbc78436ae9679ca4fd38555819f2",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "46083e565102acaedd36dda661ee5b30a65734ba",
+      "subject": "refactor: migrate twenty formatter components to VVI",
+      "parents": [
+        "df10a2860a018438f7959e47607be55615433236"
+      ],
+      "changed_file_count": 23,
+      "changed_paths_sha256": "bb6511c401a38eb43847a215593b64900c3ef91f2046005dc466d87acbd15783",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3804c53e02d84357c2a5627d0b27c7a6567c2819",
+      "subject": "refactor: use aliases for backend cross-feature imports",
+      "parents": [
+        "46083e565102acaedd36dda661ee5b30a65734ba"
+      ],
+      "changed_file_count": 645,
+      "changed_paths_sha256": "ba9f2eb48f0c9a6ee01c83176359826391913384317eeb072844f85a385a4a55",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "27acda4a9e32e8076437d940363e453b0465d034",
+      "subject": "refactor: migrate ten formatter components to VVI",
+      "parents": [
+        "3804c53e02d84357c2a5627d0b27c7a6567c2819"
+      ],
+      "changed_file_count": 13,
+      "changed_paths_sha256": "eeae1e3545062758c60884e9c0b33e70d24130092c4d5a6e9b8b27101ee1315c",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "396a177396b81790fd476cff6240ee9acf0b0277",
+      "subject": "refactor: migrate remaining static formatter components to VVI",
+      "parents": [
+        "27acda4a9e32e8076437d940363e453b0465d034"
+      ],
+      "changed_file_count": 24,
+      "changed_paths_sha256": "3fd3f18e0c105b6b1667f54144cf2b8634c0e9714e6524217aa362b3e17466fa",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "1a9a4c1a81507cdb948716816a631ac1f3df2335",
+      "subject": "refactor: assign shared browser sources to feature owners",
+      "parents": [
+        "396a177396b81790fd476cff6240ee9acf0b0277"
+      ],
+      "changed_file_count": 340,
+      "changed_paths_sha256": "2fa1242091ac26381013511082e73584257fd974e6567f5129c47b3168b70dd9",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "0786e4b0c942f386fa5bc43f9acb0c64e2df610c",
+      "subject": "fix: constrain embed pagination to compatible endpoint types",
+      "parents": [
+        "1a9a4c1a81507cdb948716816a631ac1f3df2335"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "ba25a06393cd6b735a4ad972a190c9a8a0bd4ed2c2d6c65e85421615d4a45c93",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "120d0779e6e99989c02edeb68f3ff763caedd32d",
+      "subject": "refactor: move embedded frontend sources to feature owners",
+      "parents": [
+        "0786e4b0c942f386fa5bc43f9acb0c64e2df610c"
+      ],
+      "changed_file_count": 136,
+      "changed_paths_sha256": "50465d341982c70bc8b4a43c4c7c5cd3cf4e48b9b38ec745249bd31c77665a9b",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f7143cd9a44c76fa0f9dfc0d5b913e034431956c",
+      "subject": "refactor(statistics): own backend chart implementations",
+      "parents": [
+        "120d0779e6e99989c02edeb68f3ff763caedd32d"
+      ],
+      "changed_file_count": 111,
+      "changed_paths_sha256": "005ca73ef6dbba4deaf523945482d5f5f20f99371315763a77fc91fe036aad22",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ad4f9c3b2ba49e5be3d9b2a39447f37105d4949b",
+      "subject": "docs(features): remove repeated directory explanations",
+      "parents": [
+        "f7143cd9a44c76fa0f9dfc0d5b913e034431956c"
+      ],
+      "changed_file_count": 37,
+      "changed_paths_sha256": "b6c6d23345371f6bb1b188dae47573f5deb79a74aa0654b3930c59801446ba1c",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "d8eb5dfcd5e9feec0452d08388fe0cfa1f5e2156",
+      "subject": "refactor(runtime): own backend logging implementations",
+      "parents": [
+        "ad4f9c3b2ba49e5be3d9b2a39447f37105d4949b"
+      ],
+      "changed_file_count": 120,
+      "changed_paths_sha256": "a6ecc78dbc237784473a7854cd36445548fed1b8ab26f1577756831bfc7b3e66",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "b9de0edacf544c3e121742c3d8d53ae782500afa",
+      "subject": "refactor(persistence): own SQL and model ID helpers",
+      "parents": [
+        "d8eb5dfcd5e9feec0452d08388fe0cfa1f5e2156"
+      ],
+      "changed_file_count": 111,
+      "changed_paths_sha256": "081dd36fd7ecf2eb8981b165d3170fd4c1fe17b764aa59ae21c8c71976722ae2",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "34f31778a242cfc552374e6137848d45de58fa68",
+      "subject": "refactor(email): own delivery and address validation service",
+      "parents": [
+        "b9de0edacf544c3e121742c3d8d53ae782500afa"
+      ],
+      "changed_file_count": 20,
+      "changed_paths_sha256": "9519e9c09136782ecf37e3cac30523386a0c50dd7a3498be431be6a87528f961",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "665ae645765064119d2b8dcd8ea815987e4f1e08",
+      "subject": "refactor(features): own backend domain constants",
+      "parents": [
+        "34f31778a242cfc552374e6137848d45de58fa68"
+      ],
+      "changed_file_count": 20,
+      "changed_paths_sha256": "6294e1698f637ff2a7d7e908ab4da496e150abe94b9f3aa0e32b9bd55ac6ca1d",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "8a8c643d4c6a424c540ea3e5b0aeccf3282a750d",
+      "subject": "refactor(auth): own authentication transport and helpers",
+      "parents": [
+        "665ae645765064119d2b8dcd8ea815987e4f1e08"
+      ],
+      "changed_file_count": 55,
+      "changed_paths_sha256": "21dc7d0dd956f3b470791c02de8841e2f84db84ff5f619b8ad51d87b3af10948",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "d6b83fd17ef4aa362cb47a70645e42c1e3b4fe86",
+      "subject": "refactor(backend): move API transport into its feature",
+      "parents": [
+        "8a8c643d4c6a424c540ea3e5b0aeccf3282a750d"
+      ],
+      "changed_file_count": 557,
+      "changed_paths_sha256": "fb66dc5736ee225500d68e14fb6c15a730cf5a70319b95090a30d1472e85392e",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "40d2dba020eb5e0581a880a7da414bab30375377",
+      "subject": "refactor(backend): move web HTTP services into their feature",
+      "parents": [
+        "d6b83fd17ef4aa362cb47a70645e42c1e3b4fe86"
+      ],
+      "changed_file_count": 15,
+      "changed_paths_sha256": "5fceb7c594f2a1cc0a185c73d0589f9194ed35226dbf2b9a5af3dc1b3d68dc24",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "758d69960af8c3493d138c929951b02d7b96964b",
+      "subject": "refactor(backend): place shared helpers under runtime ownership",
+      "parents": [
+        "40d2dba020eb5e0581a880a7da414bab30375377"
+      ],
+      "changed_file_count": 234,
+      "changed_paths_sha256": "0620e18723f92413e94a4eccada9c2894b1a0dd90b7e5e615109df4366ab4003",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c38e4e01e8fcf4f54cdc322679a69f5bdb3be1f3",
+      "subject": "refactor(backend): own intact cross-domain services in features",
+      "parents": [
+        "758d69960af8c3493d138c929951b02d7b96964b"
+      ],
+      "changed_file_count": 153,
+      "changed_paths_sha256": "62159f807cc1e8ed28ea9004196db5eaf05a972b6c5777290f14dbdc0d165156",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "6c18c7579cfa02e9e0e1f782181070e230dc4815",
+      "subject": "refactor(backend): retire dependency export shims",
+      "parents": [
+        "c38e4e01e8fcf4f54cdc322679a69f5bdb3be1f3"
+      ],
+      "changed_file_count": 99,
+      "changed_paths_sha256": "d497a416be1a52808a59a17202f941e1e83f54a946e7fca049e5f79ec29ef92a",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "98b455076703657a8dc18ef08c45a16c6223ba04",
+      "subject": "refactor(persistence): own connection and repository assembly",
+      "parents": [
+        "6c18c7579cfa02e9e0e1f782181070e230dc4815"
+      ],
+      "changed_file_count": 461,
+      "changed_paths_sha256": "e4b34585d6e457307634f16df622ce2f4866204825f2fc190398fe0a1fd82c6c",
+      "disposition": "grouped",
+      "groups": [
+        "lifecycle",
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f323e025d9215506853834d3692f67de42cd3d27",
+      "subject": "refactor(runtime): own queue execution and shared definitions",
+      "parents": [
+        "98b455076703657a8dc18ef08c45a16c6223ba04"
+      ],
+      "changed_file_count": 267,
+      "changed_paths_sha256": "85dca3b22c8e65dee1267824828f9b86fecde2f95e07690b8a7637e112453864",
+      "disposition": "grouped",
+      "groups": [
+        "lifecycle",
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "d8dc4c4f49af04bdf91aaf7a71dc5aaca6cc228f",
+      "subject": "refactor(boot): own Node entry and lifecycle execution",
+      "parents": [
+        "f323e025d9215506853834d3692f67de42cd3d27"
+      ],
+      "changed_file_count": 30,
+      "changed_paths_sha256": "57d6b51342817bbaaf1ff0ce4ed5d7e9491e3198b458b99f1f96823dfd803687",
+      "disposition": "grouped",
+      "groups": [
+        "lifecycle",
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "40bc83b039990ca3e061adec09518c084f79b4d3",
+      "subject": "refactor(boot): own application resource and HTTP assembly",
+      "parents": [
+        "d8dc4c4f49af04bdf91aaf7a71dc5aaca6cc228f"
+      ],
+      "changed_file_count": 62,
+      "changed_paths_sha256": "7e84d9661d26a9c732f7cb6845c691b6fab79954b1e9814f3395a313391d88f5",
+      "disposition": "grouped",
+      "groups": [
+        "lifecycle",
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "b15f1ca49b06676c34900a1161be369cb4555ba7",
+      "subject": "refactor(index): own backend endpoint and service registries",
+      "parents": [
+        "40bc83b039990ca3e061adec09518c084f79b4d3"
+      ],
+      "changed_file_count": 50,
+      "changed_paths_sha256": "83d7c599ca1edba83a93b94c70394aa64681e48c043f22b22328d3894a4e07ed",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7e55bf6f677c5f367a936d54525b46e48981a18c",
+      "subject": "test(index): inspect canonical registry at its feature path",
+      "parents": [
+        "b15f1ca49b06676c34900a1161be369cb4555ba7"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "31cb9bee8fca0a282779028c9114d81252ce7f4666155ba5cf2cec085dd8dc75",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3eee5c6b8f9199674f21b4fe209e7bcc6802a26e",
+      "subject": "refactor(features): own domain-specific backend utilities",
+      "parents": [
+        "7e55bf6f677c5f367a936d54525b46e48981a18c"
+      ],
+      "changed_file_count": 118,
+      "changed_paths_sha256": "8bedbc14b169454e454b449c1af454a0a287d2f1844848847f3935e66f66f61b",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "bb6297ca2abad9e5f4488537c2929114315ae7ee",
+      "subject": "refactor(statistics): own telemetry and server metrics lifecycle",
+      "parents": [
+        "3eee5c6b8f9199674f21b4fe209e7bcc6802a26e"
+      ],
+      "changed_file_count": 17,
+      "changed_paths_sha256": "0a34ab32a39a3c640c7929addebc33dd1946ba5be311c837791d6835b230b88e",
+      "disposition": "grouped",
+      "groups": [
+        "lifecycle",
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7cbc4b4391b1a9f7151847ed53f21c2b1690c463",
+      "subject": "refactor(features): own federation and file HTTP adapters",
+      "parents": [
+        "bb6297ca2abad9e5f4488537c2929114315ae7ee"
+      ],
+      "changed_file_count": 26,
+      "changed_paths_sha256": "77c9c3051cc8aa36526a3c1f7ae26e40e21c7f58f3518b9efd434264d142f0bb",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "61cc44476ec668472463f73844997af46f09d71b",
+      "subject": "refactor(features): own remaining cleanup jobs",
+      "parents": [
+        "7cbc4b4391b1a9f7151847ed53f21c2b1690c463"
+      ],
+      "changed_file_count": 11,
+      "changed_paths_sha256": "9b959a24de7a5f1006364687553cf85b3a4d67de1d094db94ee45ec1cc09c4d5",
+      "disposition": "grouped",
+      "groups": [
+        "lifecycle",
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "058428310a9fb12136b281a642b8eca224a338bb",
+      "subject": "refactor(frontend): migrate tutorial and preference formatters to VVI",
+      "parents": [
+        "61cc44476ec668472463f73844997af46f09d71b"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "cc12cffda398be6521951f66cd0182f9680ddabd82bab611eb9c0fdc73d1c9de",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "9bad322f2203c24d24a8a1ac377eea55cdb653cf",
+      "subject": "fix(frontend): activate component locales before evaluating boot modules",
+      "parents": [
+        "058428310a9fb12136b281a642b8eca224a338bb"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "8f9dd266aac12ec69599b35819859a85a453ee89855a7abd13b8391a35d25e27",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "6c220708cf916cc35146b3c6839888be174b2581",
+      "subject": "refactor(frontend): localize 22 more components with VVI",
+      "parents": [
+        "9bad322f2203c24d24a8a1ac377eea55cdb653cf"
+      ],
+      "changed_file_count": 24,
+      "changed_paths_sha256": "6945850b21aaa56d89150be1483b118479392c3ffe6a1ef4f097c0860dec39a5",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "95bb5a8289ef32bf7b18ee8166ae552a9f2dc66f",
+      "subject": "refactor(embed): load component locales before application boot",
+      "parents": [
+        "6c220708cf916cc35146b3c6839888be174b2581"
+      ],
+      "changed_file_count": 10,
+      "changed_paths_sha256": "debd4e6ea7ee9ce2e52f445b9fd5bb2a612676db16acbb321829fb854afd0d99",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a9c5e1f916a5a0a0ec05a8b9a0f4bc4d59580c4a",
+      "subject": "refactor(drive): own media processing and presentation",
+      "parents": [
+        "95bb5a8289ef32bf7b18ee8166ae552a9f2dc66f"
+      ],
+      "changed_file_count": 303,
+      "changed_paths_sha256": "70979af44943df76cb02cfdc6b9c2a034bdbc2f3dd3e6d3dcf33e23a137a7193",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "fd5cd4ec5dfac7eca38ea201d94437c4771c4d0c",
+      "subject": "refactor(collections): own gallery features",
+      "parents": [
+        "a9c5e1f916a5a0a0ec05a8b9a0f4bc4d59580c4a"
+      ],
+      "changed_file_count": 90,
+      "changed_paths_sha256": "11c0167d6a1c8cf832690bdaf737b09ee6946330ff40054ec04f1862fcdcbbcd",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "59325645b0fc99d40d9bf3f61f605e2d76d23be3",
+      "subject": "style(frontend): fix gallery ownership proof spacing",
+      "parents": [
+        "fd5cd4ec5dfac7eca38ea201d94437c4771c4d0c"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "e4f3c8a508c5df8a8c52e19fcb50b36a784c41eefe00de2c624f01152f4da92b",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "982b00a9f224676376f7f842909b09f4052f29b5",
+      "subject": "docs(architecture): classify tests by behavior ownership",
+      "parents": [
+        "59325645b0fc99d40d9bf3f61f605e2d76d23be3"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "147951674b9a8e9da65dacdc7441f754be6bb6ee07e258f61d5958fd34c72c6f",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "cf76748f689e0457966bf5b9718f09a4c4f02d28",
+      "subject": "refactor(note-search): own search service, endpoint and page",
+      "parents": [
+        "982b00a9f224676376f7f842909b09f4052f29b5"
+      ],
+      "changed_file_count": 34,
+      "changed_paths_sha256": "164325f01984c7295984d26377ab99577d4580cfd7fdedbced97539132c9240a",
+      "disposition": "grouped",
+      "groups": [
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7750b72c5feab6164fd5220c41bded845ebf56dd",
+      "subject": "refactor(tests): place first API and frontend ownership cohort",
+      "parents": [
+        "cf76748f689e0457966bf5b9718f09a4c4f02d28"
+      ],
+      "changed_file_count": 24,
+      "changed_paths_sha256": "71515ac457752c057ea7f5ad1855d47b546c68523f1fadcdd00adf8be0bdb765",
+      "disposition": "grouped",
+      "groups": [
+        "architecture",
+        "contracts",
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "8c291d7ecf418015c0800c7eab6e195a18ab1b8c",
+      "subject": "refactor(notes): pilot explicit notes state contract schemas",
+      "parents": [
+        "7750b72c5feab6164fd5220c41bded845ebf56dd"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "d8d4066ea56cc0487d84294e2321d3c720957b5321f718fb2551eefd3ab4bc1e",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "44a868830a1536752c2b56a269ec095b45f989e7",
+      "subject": "ci: exercise notes state pilot and moved result object test",
+      "parents": [
+        "8c291d7ecf418015c0800c7eab6e195a18ab1b8c"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "27aa1d42283790051db8f5c3c6e18b4bde8f17ea5712c689eeedd922dc8e8f0e",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a820800090cfe54a29dc10182fecdb5c83beff18",
+      "subject": "refactor(notes): close finite outputs and guard legacy object inventory",
+      "parents": [
+        "44a868830a1536752c2b56a269ec095b45f989e7"
+      ],
+      "changed_file_count": 9,
+      "changed_paths_sha256": "f69fccc051505821292e5a964f7d3c01f7c531c150577483f55d0c5c626eb585",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "bf3ba47872172d5b6c47fe2ab0fd58a4eefadf28",
+      "subject": "refactor(boot): migrate embed boot messages to VVI",
+      "parents": [
+        "a820800090cfe54a29dc10182fecdb5c83beff18"
+      ],
+      "changed_file_count": 8,
+      "changed_paths_sha256": "96163a5349e2009cabf0548eebccf3b8264a5a943f2e71c53c28deabdddb870b",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "5c8f137db982d7ecb264992d903f532c2106da97",
+      "subject": "refactor(contracts): close ten finite feature cohorts",
+      "parents": [
+        "bf3ba47872172d5b6c47fe2ab0fd58a4eefadf28"
+      ],
+      "changed_file_count": 56,
+      "changed_paths_sha256": "17c1fa6fe8f258d79ef9098a50d119ec528fbe8476f49b2d2d41879c450873e2",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "9afce5a00e108442f795ee0591bf373e537b1716",
+      "subject": "fix(contracts): preserve typed embed pagination and run cohort CI",
+      "parents": [
+        "5c8f137db982d7ecb264992d903f532c2106da97"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "497e59eb573f15d93463812a3cb2924f870f7814398e4b318fe985498e70ebdb",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a1b3e952d3e6d30cef7dfa4127f069df8642424b",
+      "subject": "fix(notifications): require a notifier ID for service-worker follow actions",
+      "parents": [
+        "9afce5a00e108442f795ee0591bf373e537b1716"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "5510d456fa5256f256abba0011e46e24155d492a30e5052e8e870814ae5287ed",
+      "disposition": "grouped",
+      "groups": [
+        "sw_follow"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e4b8d0b72c35baf5d168129fdf202752853e5b7c",
+      "subject": "test(embed): record reviewed typed pagination unwrapping",
+      "parents": [
+        "a1b3e952d3e6d30cef7dfa4127f069df8642424b"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "68364f4323691a4413b91312c5f12b29428202d8deeb5f0ce7e96c50dcbf1d2e",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "6116acdb334157421b5eee557f71836cfb40a496",
+      "subject": "refactor(contracts): close finite schemas across thirteen features",
+      "parents": [
+        "e4b8d0b72c35baf5d168129fdf202752853e5b7c"
+      ],
+      "changed_file_count": 92,
+      "changed_paths_sha256": "1dc1b78ead7c80fe373208c7e96beef00fb5f8b26edb3530f6a619bb0fae27f6",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "81bd5183aaff10a01cb60e73034e5c45df5c39ba",
+      "subject": "refactor(contracts): close remaining finite schemas and stabilize packed inference",
+      "parents": [
+        "6116acdb334157421b5eee557f71836cfb40a496"
+      ],
+      "changed_file_count": 34,
+      "changed_paths_sha256": "7337c9552571816aacddeaeec397695bc8aea9c6e6c09c6cc2841391b63115d1",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "735b5af7bdba45ddf3ab2be90fd4830bef7cc81b",
+      "subject": "refactor(i18n): migrate eager feature labels to VVI owners",
+      "parents": [
+        "81bd5183aaff10a01cb60e73034e5c45df5c39ba"
+      ],
+      "changed_file_count": 31,
+      "changed_paths_sha256": "ec5e5727b51929fda3971a8ebc62cfeaa1fdae4d3fc7760fd2aba264eda1b947",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7cd0e45b1b4c259792d435a18d77656ea3afb30e",
+      "subject": "refactor(notes): close finite packed note composition",
+      "parents": [
+        "735b5af7bdba45ddf3ab2be90fd4830bef7cc81b"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "41385f616317636ab6c4c42b350ecec1c6ae779ca96686af44f5def96a471905",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e54f1d5772787331078ca0b6aa3f090040b9eb07",
+      "subject": "test(notes): align nested composition checks with finite schema",
+      "parents": [
+        "7cd0e45b1b4c259792d435a18d77656ea3afb30e"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "843d34747ca36f9c2533cfccadbe7712a8bdcd34d8bbe2c9dc5a446b3bfca583",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "9e9083df0f40fdbd9d55f7c4004f1745341ad2de",
+      "subject": "refactor(operations): model all pg_indexes wire columns",
+      "parents": [
+        "e54f1d5772787331078ca0b6aa3f090040b9eb07"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "ababee315d1967096be00b7aa240e24d3573b04845e9465c1b588e89cfd3e60b",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f500713dde961ab40757157463b1f1bbe2346dee",
+      "subject": "feat(api): define canonical recursive JSON wire values",
+      "parents": [
+        "9e9083df0f40fdbd9d55f7c4004f1745341ad2de"
+      ],
+      "changed_file_count": 15,
+      "changed_paths_sha256": "21ff2e36fcba19cac934e5b333f5da987a494a6d8f5b8488b45575bc2c98afa4",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "8e3d75a1340c5c13d897187bc9d53efa0b2cbbf3",
+      "subject": "fix(api): preserve lazy projection admission order",
+      "parents": [
+        "f500713dde961ab40757157463b1f1bbe2346dee"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "3a84a2f8307983e848fdc212ef7c45411f33a6bb0a0d2ef3aab2de3ad235fddc",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ec5614c195df25beae927dbffcc2bb969a230a9f",
+      "subject": "refactor(roles): close envelopes and type stored JSON policy values",
+      "parents": [
+        "8e3d75a1340c5c13d897187bc9d53efa0b2cbbf3"
+      ],
+      "changed_file_count": 9,
+      "changed_paths_sha256": "9760cd4756b1c955de62a42dfcf92e7f7803c20bd6b8c09db4a25c2afcf7b51d",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "1c1de8f44a41cc9b1b70b1b19d03df6e652945a5",
+      "subject": "refactor(users): type finite native and wire serialization contracts",
+      "parents": [
+        "ec5614c195df25beae927dbffcc2bb969a230a9f"
+      ],
+      "changed_file_count": 63,
+      "changed_paths_sha256": "bf76d5bea020f48f3b7ac8b0547d3fc9d5310799d9fec26c50a7d28bb15cbf1b",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "dd9b23930a0e4939913046ab57997df8653d0e1e",
+      "subject": "refactor(api): type RSS and WebAuthn producer contracts",
+      "parents": [
+        "1c1de8f44a41cc9b1b70b1b19d03df6e652945a5"
+      ],
+      "changed_file_count": 30,
+      "changed_paths_sha256": "3ba29418b0f7ae2f8a7acac6afbcefcc77670ff1f2a9f7af1806d8598e20469d",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c8235d46de88159ac0ae7bfab936d9c2b6ae163a",
+      "subject": "refactor(api): separate finite Meta wire and native configuration contracts",
+      "parents": [
+        "dd9b23930a0e4939913046ab57997df8653d0e1e"
+      ],
+      "changed_file_count": 14,
+      "changed_paths_sha256": "05a38cd49d0bef372d7b6f77e2cd7e9f7648ed7d639c922171a8cd60b79c5356",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "756878cef662ed5f42265b8a084de850e702dc2f",
+      "subject": "refactor(frontend): finish main and embed screen VVI locales",
+      "parents": [
+        "c8235d46de88159ac0ae7bfab936d9c2b6ae163a"
+      ],
+      "changed_file_count": 61,
+      "changed_paths_sha256": "6a5228999e5ca3c9ccf360f5ec4c733a2d88532c6dcd5a2d5b4559418cd881ba",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "4a208034cf1c77696e2e72cd50293d189e53e52a",
+      "subject": "refactor(frontend): finish TS and story VVI locale ownership",
+      "parents": [
+        "756878cef662ed5f42265b8a084de850e702dc2f"
+      ],
+      "changed_file_count": 59,
+      "changed_paths_sha256": "c9e2bb0967286ea9496f40db4fc9c0c05388a51b6e505f5e95a6ae0850f6801d",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "47cb546623fe4e205332ecdb477ddf8483eb2c5f",
+      "subject": "fix(web): select application boot entries explicitly",
+      "parents": [
+        "4a208034cf1c77696e2e72cd50293d189e53e52a"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "99816394b7880422768e861de3f60a1aea5865e0eaa7c0d061816f25969c5664",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e5c48b8a95d0451eb834a6bd06212484de38fd93",
+      "subject": "docs: report controlled VVI strategy comparison",
+      "parents": [
+        "47cb546623fe4e205332ecdb477ddf8483eb2c5f"
+      ],
+      "changed_file_count": 23,
+      "changed_paths_sha256": "928e1c8a0ece29d1a58a4c338b3a0f4d1388ef03112db98c17eb99b5921c9400",
+      "disposition": "excluded",
+      "reason": "一時的な VVI ベンチマーク資料。ebc0353af4 で同じ資料を削除しており最終 tree に含まれない。性能改善の根拠として採用しない。"
+    },
+    {
+      "sha": "ebc0353af42a32033603de92321032f633d9deaf",
+      "subject": "docs: keep VVI comparison in issue discussion",
+      "parents": [
+        "e5c48b8a95d0451eb834a6bd06212484de38fd93"
+      ],
+      "changed_file_count": 23,
+      "changed_paths_sha256": "928e1c8a0ece29d1a58a4c338b3a0f4d1388ef03112db98c17eb99b5921c9400",
+      "disposition": "excluded",
+      "reason": "一時的な VVI ベンチマーク資料の削除。比較資料の追加と相殺し、独立した機能変更として記載しない。"
+    },
+    {
+      "sha": "37cb4db9ae46d9575393872422a3064d95a15690",
+      "subject": "build: update VVI to verified 1.1.4 release",
+      "parents": [
+        "ebc0353af42a32033603de92321032f633d9deaf"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "f44530522ae2a61a276b6b61b7b56c1740870daf7bfea4b7c38ee375be7463c8",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a20f997d7f86053b7db5f4e52b628f54f8f57ee4",
+      "subject": "build(embed): serve canonical VVI assets without locale copies",
+      "parents": [
+        "37cb4db9ae46d9575393872422a3064d95a15690"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "633e0885c1bb441521aac022e98faecfeee1b4c046b85a5d21dc9b4579bd719b",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "fbcf6d486ddff1b401c9e2234bb39da1e2e5a68f",
+      "subject": "test(embed): preserve locale case tuple types",
+      "parents": [
+        "a20f997d7f86053b7db5f4e52b628f54f8f57ee4"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "80e8e3a36fd28507010f632698b11b1546941d9dfa02e2f50ca3de401d03ec57",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "781d5dd41050cc4e3f11b68942d7c4b575ebe38a",
+      "subject": "feat(api): pilot native oRPC procedures and SDK transport",
+      "parents": [
+        "fbcf6d486ddff1b401c9e2234bb39da1e2e5a68f"
+      ],
+      "changed_file_count": 77,
+      "changed_paths_sha256": "4df460a97c95c624f50112d847689f88813cd93468484ff87f59b0fd65b3a605",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "5b001dcb65ee82135ccb29010583bd2afa6e9171",
+      "subject": "fix(api): preserve pilot transport and cancellation semantics",
+      "parents": [
+        "781d5dd41050cc4e3f11b68942d7c4b575ebe38a"
+      ],
+      "changed_file_count": 20,
+      "changed_paths_sha256": "0ff06dec3913ca903f5afaeeab76870ec6be0b8ee6cba7dcd1cd84a7bc213f0d",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "17fe9b4402e5c9ae10386211ed78311856c6434b",
+      "subject": "fix(api): reject framed bodyless pilot requests before decoding",
+      "parents": [
+        "5b001dcb65ee82135ccb29010583bd2afa6e9171"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "6da22575805dc20110b007dda297b7965b0e41fbd9ebe5ab1d3dfd480c8cc664",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "d64bc9f6625f3406e7844b22afdd5b65b75f33fd",
+      "subject": "fix(sdk): validate declared error data through portable schema",
+      "parents": [
+        "17fe9b4402e5c9ae10386211ed78311856c6434b"
+      ],
+      "changed_file_count": 7,
+      "changed_paths_sha256": "a6cd72214082cd8e9284fe53591b25950857fed6aeacd6852061a526e6d21ebc",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3aa82ac6d1874d9cbae2779231103b3cf575a6bf",
+      "subject": "refactor(api): migrate 86 routes to native oRPC procedures",
+      "parents": [
+        "d64bc9f6625f3406e7844b22afdd5b65b75f33fd"
+      ],
+      "changed_file_count": 196,
+      "changed_paths_sha256": "48e357746f503e05402099e4b4f6d32fc297fae425e43211a0fb4ba45f9b959e",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "86e5dd1322662d6210b5416f4be72f36705480e5",
+      "subject": "refactor(api): migrate 120 routes to native oRPC procedures",
+      "parents": [
+        "3aa82ac6d1874d9cbae2779231103b3cf575a6bf"
+      ],
+      "changed_file_count": 387,
+      "changed_paths_sha256": "aa3d08b18b57ecdabe9d67b910608dc494cac166335b4ac021c101ab61ac6f33",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "137c731a0ba75f5406718ac3b6a9191ba3b8da08",
+      "subject": "refactor(api): complete native oRPC migration and retire legacy validation",
+      "parents": [
+        "86e5dd1322662d6210b5416f4be72f36705480e5"
+      ],
+      "changed_file_count": 1151,
+      "changed_paths_sha256": "9a6f84e379888e17ce4911f8f9c575f88416db05c200fe03eef9731f4eeb0f29",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "25ee85e246b411dc403420b4b4e535d05e6aad93",
+      "subject": "Fix native oRPC compatibility and migrate CI coverage",
+      "parents": [
+        "137c731a0ba75f5406718ac3b6a9191ba3b8da08"
+      ],
+      "changed_file_count": 67,
+      "changed_paths_sha256": "ffdded43f38f26dd51acd0f810c22e9375332ffe1b65e4af25efc25109cb5391",
+      "disposition": "grouped",
+      "groups": [
+        "contracts",
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "587a651dfdaf16d9584ccff90102674235a7940f",
+      "subject": "Preserve frozen locale proofs and correct native API test fixtures",
+      "parents": [
+        "25ee85e246b411dc403420b4b4e535d05e6aad93"
+      ],
+      "changed_file_count": 10,
+      "changed_paths_sha256": "96e9c24aa8bd1ec0993b9c058956dae19c0fcff98de545494f4935bab7bc0afe",
+      "disposition": "grouped",
+      "groups": [
+        "contracts",
+        "locales",
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "da4a692ca4b0bf648d09d3d4bdbbcbb618546a1f",
+      "subject": "refactor(api): inline endpoint contract schemas",
+      "parents": [
+        "587a651dfdaf16d9584ccff90102674235a7940f"
+      ],
+      "changed_file_count": 570,
+      "changed_paths_sha256": "9e037cbcea8c91e6e26895050c37a6faa977a9021e98c78f288cbd059f0c77bd",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "4577d1c85f38e7cc21cf68201a4a251ec49ea950",
+      "subject": "chore(release): prepare guarded GITHUB_TOKEN Release Manager flow",
+      "parents": [
+        "fbcf6d486ddff1b401c9e2234bb39da1e2e5a68f"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "c2f9d96b3a1751939d502a7c0207f138b3d555252b381256a95aa2074c5f88d6",
+      "disposition": "grouped",
+      "groups": [
+        "release"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "811845f3cd395c64f8f023060b351711f537668a",
+      "subject": "chore(release): include README ready-for-review workflow",
+      "parents": [
+        "4577d1c85f38e7cc21cf68201a4a251ec49ea950"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "7b59e6f9db33ec20a8847ece3cc01c93eb97275eaa33c9a916a0397b983263b7",
+      "disposition": "grouped",
+      "groups": [
+        "release"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a906fecab79a51338d470f68d5649d05d1c741a1",
+      "subject": "chore(release): delegate approval and check validation to upstream",
+      "parents": [
+        "811845f3cd395c64f8f023060b351711f537668a"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "565d8527d6fee0b179711d901fe9f8b4bcbebf01a229af4d52df5d9ab75c6ff3",
+      "disposition": "grouped",
+      "groups": [
+        "release"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "28a12b6f22a84c6a6176d1c2a75189b203a88fe8",
+      "subject": "chore(release): restrict inherited Docker publishing to upstream",
+      "parents": [
+        "a906fecab79a51338d470f68d5649d05d1c741a1"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "d158080a531cc7d0d29ca5015af055b1b9425ed05c73c53c86aeda4f1fd18a37",
+      "disposition": "grouped",
+      "groups": [
+        "release"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c75166668a99227c50531cfb72483e78d50ad443",
+      "subject": "chore(release): use README templates with external release app",
+      "parents": [
+        "28a12b6f22a84c6a6176d1c2a75189b203a88fe8"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "f443c2eecb496ac81f1b7e5a36945dd370a493676fc339641dd8136ec213d515",
+      "disposition": "grouped",
+      "groups": [
+        "release"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "65c671268114094f4870bc7b676c7c6dbf1aa154",
+      "subject": "chore(release): follow upstream without ready-triggered prereleases",
+      "parents": [
+        "c75166668a99227c50531cfb72483e78d50ad443"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "72b079e73412ba22b09f29c84b4205de9370875dc1aa56f9b27a7797941e578e",
+      "disposition": "grouped",
+      "groups": [
+        "release"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "1b7741226159d61f836a5e0ec066b8457b301199",
+      "subject": "refactor(api): compose native procedures through feature providers",
+      "parents": [
+        "da4a692ca4b0bf648d09d3d4bdbbcbb618546a1f"
+      ],
+      "changed_file_count": 800,
+      "changed_paths_sha256": "96edf2336efc68443c9c11bf7cd0bf7f46fd5f237f4d8d81b4d386b4d4379e63",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "d902e00d81972760d7680d74bd96c8c65c1022e0",
+      "subject": "Merge pull request #11 from tamaina/codex/release-manager-main",
+      "parents": [
+        "fbcf6d486ddff1b401c9e2234bb39da1e2e5a68f",
+        "65c671268114094f4870bc7b676c7c6dbf1aa154"
+      ],
+      "changed_file_count": 0,
+      "changed_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fork_pr": 11,
+      "disposition": "excluded",
+      "reason": "mergeのみ。親側の実装commitを個別に棚卸し済みで、combined diffに固有変更なし。"
+    },
+    {
+      "sha": "0c38d22afb663fe70ddb24ac91825927320dced9",
+      "subject": "refactor(api): trial consolidated avatar decoration files",
+      "parents": [
+        "1b7741226159d61f836a5e0ec066b8457b301199"
+      ],
+      "changed_file_count": 23,
+      "changed_paths_sha256": "d9fd9dbadece7f1102d98a91a58e10f10885c8d4670855532a6e920dea36e109",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "58af0b1f4841283a4ae2d20f49ce3990d03fa2fd",
+      "subject": "chore(frontend): update VVI to 1.1.5 and adapt hook fixtures",
+      "parents": [
+        "d902e00d81972760d7680d74bd96c8c65c1022e0"
+      ],
+      "changed_file_count": 18,
+      "changed_paths_sha256": "318d208a5d3a3cd7b7f0af3e1190e0cf4a31212b82b894568124a4300cded1bf",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7d80611e872e52e89d211ba5cfbb5dd87b6083b3",
+      "subject": "test(frontend): avoid redundant eager locale owner scans",
+      "parents": [
+        "58af0b1f4841283a4ae2d20f49ce3990d03fa2fd"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "82ee31b9ba14bcb660762d69102b4e475e3c832dec81a5433b2ae665d7e04ef1",
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7a60e9deac96be913d302098d1e39e1aa4352bc8",
+      "subject": "Merge pull request #12 from tamaina/codex/vvi-1-1-5",
+      "parents": [
+        "d902e00d81972760d7680d74bd96c8c65c1022e0",
+        "7d80611e872e52e89d211ba5cfbb5dd87b6083b3"
+      ],
+      "changed_file_count": 0,
+      "changed_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fork_pr": 12,
+      "disposition": "excluded",
+      "reason": "mergeのみ。親側の実装commitを個別に棚卸し済みで、combined diffに固有変更なし。"
+    },
+    {
+      "sha": "5c960c3958be5ff6c001e6d66367cb5f2585aebe",
+      "subject": "refactor(api): trial typed avatar outputs without runtime validation",
+      "parents": [
+        "0c38d22afb663fe70ddb24ac91825927320dced9"
+      ],
+      "changed_file_count": 7,
+      "changed_paths_sha256": "2797e12ccf51772284f45c5cf68c17b2c8e54037c45160de2b1495828d69b1bc",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ac7706850f35d5f2c4ac218688aa5b148e2eacdb",
+      "subject": "Merge remote-tracking branch 'origin/develop' into codex/orpc-vertical-pilot",
+      "parents": [
+        "5c960c3958be5ff6c001e6d66367cb5f2585aebe",
+        "7a60e9deac96be913d302098d1e39e1aa4352bc8"
+      ],
+      "changed_file_count": 0,
+      "changed_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "disposition": "grouped",
+      "groups": [
+        "locales",
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。",
+      "review_note": "combined diff を確認。locale proofテストの型/async調整とlockfileの統合を開発基盤の項目へ集約。"
+    },
+    {
+      "sha": "500a3288c11943ec46afb8d8f771340547b8e43f",
+      "subject": "refactor(api): consolidate feature implementations and definitions",
+      "parents": [
+        "ac7706850f35d5f2c4ac218688aa5b148e2eacdb"
+      ],
+      "changed_file_count": 498,
+      "changed_paths_sha256": "3a7fd899422787478e22a157b159aab46252fcebf4c4c3a8e258734f067aa6b5",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "67b211ec42f04779cb7ff60ce2b3619967ae894b",
+      "subject": "refactor(api): trial native procedure factory for avatar decorations",
+      "parents": [
+        "500a3288c11943ec46afb8d8f771340547b8e43f"
+      ],
+      "changed_file_count": 9,
+      "changed_paths_sha256": "295bab8b69c62d2abd51cfe140b0bf4b996a52487f4f1f2db561545d0aa5505e",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "45454e52e194059514f13185640db1a69dc8851e",
+      "subject": "fix(misskey-js): include routing metadata in autogen output",
+      "parents": [
+        "67b211ec42f04779cb7ff60ce2b3619967ae894b"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "73142db72878b9de036482fa7cb806a2041aab36e1d0e4ca0743c7b632ba6d10",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "b8d85cdaf357474062dce190f9f2e98c9173b239",
+      "subject": "refactor(api): declare avatar authorization in portable contracts",
+      "parents": [
+        "45454e52e194059514f13185640db1a69dc8851e"
+      ],
+      "changed_file_count": 11,
+      "changed_paths_sha256": "d4ad2537947dffec5ce0b1abba1fe7778d0f70b52bd76dd95d92505f9c948040",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ccb3bfd5f1b4ee0af432fb1a3a74980b94d87a30",
+      "subject": "refactor(api): name portable policy types and format avatar metadata",
+      "parents": [
+        "b8d85cdaf357474062dce190f9f2e98c9173b239"
+      ],
+      "changed_file_count": 8,
+      "changed_paths_sha256": "fe0e6aae36600912cee0c48994be574241518ac4508ebc6cd2fe680e96ab0452",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "9a4273843ce83d92a914145de9c2e8bd4bf26444",
+      "subject": "refactor(api): drive native execution from portable metadata",
+      "parents": [
+        "ccb3bfd5f1b4ee0af432fb1a3a74980b94d87a30"
+      ],
+      "changed_file_count": 17,
+      "changed_paths_sha256": "4a79e938077a16737fd4da89719eca39ba0c83b9fc501a10bba1f0f06cc60135",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "6d2cecc517e04c92e129227581aeedecada6a91a",
+      "subject": "refactor(api): project announcement channel chat and collection DTOs",
+      "parents": [
+        "9a4273843ce83d92a914145de9c2e8bd4bf26444"
+      ],
+      "changed_file_count": 130,
+      "changed_paths_sha256": "4ff6a267f8f0a1530601b77cfd47cf0df1f932c4851d86e92a47b128567e0e28",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e395d3751334f4ea8cf2f03fe02b239219d1ef4a",
+      "subject": "refactor(api): project discovery integration game and role DTOs",
+      "parents": [
+        "6d2cecc517e04c92e129227581aeedecada6a91a"
+      ],
+      "changed_file_count": 140,
+      "changed_paths_sha256": "d3ad0ffb9f580ddb04070c00da8085bc2f067c3674c095f3a88fd39fbe194dd5",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f6c0035458bde7c2618ab95d555d0c0d61c7f923",
+      "subject": "refactor(api): project instance moderation and operations DTOs",
+      "parents": [
+        "e395d3751334f4ea8cf2f03fe02b239219d1ef4a"
+      ],
+      "changed_file_count": 118,
+      "changed_paths_sha256": "21d78b239653ecf310e6fd764836e8a66b906a7d207fa6a961cdac5d75a789ce",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "2d5bb8dc708a0d43e0b0150c67274921d1f152c8",
+      "subject": "refactor(api): project user preference and relationship DTOs",
+      "parents": [
+        "f6c0035458bde7c2618ab95d555d0c0d61c7f923"
+      ],
+      "changed_file_count": 87,
+      "changed_paths_sha256": "43bae9396d6e7eaea64b9fa6f08dc1c31a7cc0d93970fa7f3e99c10626c6da5d",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "34786a703bbe31b1399eab965b90e37c2ca55fb6",
+      "subject": "refactor(api): project auth notification page and statistics DTOs",
+      "parents": [
+        "2d5bb8dc708a0d43e0b0150c67274921d1f152c8"
+      ],
+      "changed_file_count": 150,
+      "changed_paths_sha256": "d52dd837d12478bf2c54ed3de8a81714ad57a0eff56360eff97883c929625ca5",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "90a6050532452c9424c28e17efef8e43c20d4b09",
+      "subject": "refactor(api): project note drive search and timeline DTOs",
+      "parents": [
+        "34786a703bbe31b1399eab965b90e37c2ca55fb6"
+      ],
+      "changed_file_count": 149,
+      "changed_paths_sha256": "b2b16841b1a76749c2d4be73f4715ee7c245927413ad452eab01b5ea240e7d54",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "6e966f8f68c233fe9e621da6cfe30dfac555c817",
+      "subject": "refactor(sdk): derive compatibility types and routing from contracts",
+      "parents": [
+        "90a6050532452c9424c28e17efef8e43c20d4b09"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "b1361f8ea2009a02a29d41c18d08ecaf5841b78626c1eaf160d8cdddf90982b5",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "84de0d0a084a366069d424515b3f33596298638f",
+      "subject": "perf(api): validate stored JSON once before materializing",
+      "parents": [
+        "6e966f8f68c233fe9e621da6cfe30dfac555c817"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "05fdd08596246d154a1aafad45efc12b5a8b65424d6c2ba6591ce5a3869ea277",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3f2d8dd63f27b926c849b71a37affe7cb6af4028",
+      "subject": "fix(api): copy validated JSON descriptor values in one pass",
+      "parents": [
+        "84de0d0a084a366069d424515b3f33596298638f"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "05fdd08596246d154a1aafad45efc12b5a8b65424d6c2ba6591ce5a3869ea277",
+      "disposition": "grouped",
+      "groups": [
+        "contracts"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "2d6748554c87e1d9263d074e72b7779021c05d4a",
+      "subject": "Merge pull request #9 from tamaina/codex/orpc-vertical-pilot",
+      "parents": [
+        "7a60e9deac96be913d302098d1e39e1aa4352bc8",
+        "3f2d8dd63f27b926c849b71a37affe7cb6af4028"
+      ],
+      "changed_file_count": 0,
+      "changed_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fork_pr": 9,
+      "disposition": "excluded",
+      "reason": "mergeのみ。親側の実装commitを個別に棚卸し済みで、combined diffに固有変更なし。"
+    },
+    {
+      "sha": "7c7389b08a53ed11e1e92fcb93c097ee4a55789c",
+      "subject": "fix(types): resolve owned declarations without ambient conflicts",
+      "parents": [
+        "2d6748554c87e1d9263d074e72b7779021c05d4a"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "1a9cd595b09893805475f2f15282e337e634b2d505a159e4995a38dc36b1c827",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "b8f659694577948eddb99692a5f240a9ffe19571",
+      "subject": "fix(types): import shared globals using lint-compliant syntax",
+      "parents": [
+        "7c7389b08a53ed11e1e92fcb93c097ee4a55789c"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "7c25b5117671ffc5595254b0740dd44076f1faeff92c5bd6465394bbb461ec32",
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "1a014657c9fd8a89bfca885ceaeae76aac5e14cf",
+      "subject": "Merge pull request #13 from tamaina/codex/check-dts-root-fix",
+      "parents": [
+        "2d6748554c87e1d9263d074e72b7779021c05d4a",
+        "b8f659694577948eddb99692a5f240a9ffe19571"
+      ],
+      "changed_file_count": 0,
+      "changed_paths_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fork_pr": 13,
+      "disposition": "excluded",
+      "reason": "mergeのみ。親側の実装commitを個別に棚卸し済みで、combined diffに固有変更なし。"
+    },
+    {
+      "sha": "5039a57d568d7ff61a774cfcd2065721f45be40c",
+      "subject": "feat: follow upstream shared utilities and account-age approval (#14)",
+      "parents": [
+        "1a014657c9fd8a89bfca885ceaeae76aac5e14cf"
+      ],
+      "changed_file_count": 85,
+      "changed_paths_sha256": "cff57a2866b1f9d5d6e73d828918b6d5c8c00360fca0d41c69075c8481505d07",
+      "fork_pr": 14,
+      "disposition": "grouped",
+      "groups": [
+        "follow_age",
+        "architecture"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "5fa8f40983592218b73163d53c6e4b91dabf227a",
+      "subject": "enhance(misskey-js): acct: 付きのアカウント表記をパースする (#2)",
+      "parents": [
+        "5039a57d568d7ff61a774cfcd2065721f45be40c"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "38dcbcb44ed30d7508a522e49f1f167169d3ff2e24d96e790eef7020f4ad00ae",
+      "fork_pr": 2,
+      "disposition": "grouped",
+      "groups": [
+        "sdk_acct"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "150b4d6b00cc75749cec03bd8ae4a91b296a4bc0",
+      "subject": "enhance(activitypub): 凍結状態の通知先を配信レシピにまとめる (#3)",
+      "parents": [
+        "5fa8f40983592218b73163d53c6e4b91dabf227a"
+      ],
+      "changed_file_count": 7,
+      "changed_paths_sha256": "5c3b3554ae3f0a53fcd4dfa595356f3f175353cdb45c1566948fe587a7303f32",
+      "fork_pr": 3,
+      "disposition": "grouped",
+      "groups": [
+        "remote_suspend"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "bca7207f52eb3996eb898044148581fadf132ace",
+      "subject": "fix(frontend): テーマ切替の非同期失敗でも後処理する (#4)",
+      "parents": [
+        "150b4d6b00cc75749cec03bd8ae4a91b296a4bc0"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "30aa16844f6d80f8da8f3cc14c2237b372f80bf77ec6d1c15c97036c2e5d943a",
+      "fork_pr": 4,
+      "disposition": "grouped",
+      "groups": [
+        "ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "eb87b0f6d05266cf3da472d6556ab02cfb7b56aa",
+      "subject": "fix(frontend): Safari向けにデッキ列のlayout containmentを外す (#5)",
+      "parents": [
+        "bca7207f52eb3996eb898044148581fadf132ace"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "aed64d9a478238b44b4637328e303352e1c74c29ba4236aa1440695b8f3506b4",
+      "fork_pr": 5,
+      "disposition": "grouped",
+      "groups": [
+        "ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "544fafa7f4b2393ea89492039d33a8d3d56a5933",
+      "subject": "feat(activitypub): リモート凍結状態をローカル凍結と分離する (#15)",
+      "parents": [
+        "eb87b0f6d05266cf3da472d6556ab02cfb7b56aa"
+      ],
+      "changed_file_count": 45,
+      "changed_paths_sha256": "cdffe2821aa8d98399b4b24bd5b45a75c959d80bc03fb3157e52e6710ab0a419",
+      "fork_pr": 15,
+      "disposition": "grouped",
+      "groups": [
+        "remote_suspend"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f7e53afeceee5d0cb2b74d50312a4475ebb02ee1",
+      "subject": "refactor(activitypub): Draft署名をnativeライブラリに移行する (#16)",
+      "parents": [
+        "544fafa7f4b2393ea89492039d33a8d3d56a5933"
+      ],
+      "changed_file_count": 12,
+      "changed_paths_sha256": "17f00f2638174c83221846af74af21ec5aa4022008ffd004b4782011fcfef737",
+      "fork_pr": 16,
+      "disposition": "grouped",
+      "groups": [
+        "signature"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7f26081cfeac24e38b74557e7704ecdeea14c055",
+      "subject": "feat(activitypub): 複数鍵対応と受信時の鍵再確認を追加する (#18)",
+      "parents": [
+        "f7e53afeceee5d0cb2b74d50312a4475ebb02ee1"
+      ],
+      "changed_file_count": 32,
+      "changed_paths_sha256": "8439fc81d603e5035f119627cf58336c17e00a5bfbcdc7aaa3ccfe5040414d03",
+      "fork_pr": 18,
+      "disposition": "grouped",
+      "groups": [
+        "signature"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "1b8de73c60e5e3b39f6fc6c2b5f3e7ad4f7c5f09",
+      "subject": "feat(pwa): 共有したファイルを投稿フォームに引き継ぐ (#17)",
+      "parents": [
+        "7f26081cfeac24e38b74557e7704ecdeea14c055"
+      ],
+      "changed_file_count": 26,
+      "changed_paths_sha256": "b5da23bc0092531c56ab344e37080ac65c57ccfc41fb4e2b9fcb991fdbe880d2",
+      "fork_pr": 17,
+      "disposition": "grouped",
+      "groups": [
+        "pwa"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "dcba6ca11638b417fb664cc828ded21fb994d786",
+      "subject": "perf(federation): 連合の署名をEd25519鍵に対応 (#19)",
+      "parents": [
+        "1b8de73c60e5e3b39f6fc6c2b5f3e7ad4f7c5f09"
+      ],
+      "changed_file_count": 25,
+      "changed_paths_sha256": "2b0c47df056d5b1fa76c9bcbb4af3e2e34c75050a6e14b30599ed75a113795c0",
+      "fork_pr": 19,
+      "disposition": "grouped",
+      "groups": [
+        "signature"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "98843e8769169ac27ee11986ae0a4046aa969295",
+      "subject": "refactor: 構成テストを集約しビルドの薄いラッパーを整理 (#20)",
+      "parents": [
+        "dcba6ca11638b417fb664cc828ded21fb994d786"
+      ],
+      "changed_file_count": 20,
+      "changed_paths_sha256": "7935b39c4562814aca0522377728cddcd7974210243b58dd404996170230f5c8",
+      "fork_pr": 20,
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "da39bb8b94c63b9addafdf53ec2fb3738be17621",
+      "subject": "fix(drive): 画像加工の出力失敗後に再試行できるようにする (#21)",
+      "parents": [
+        "98843e8769169ac27ee11986ae0a4046aa969295"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "667cba533c34a3bc74ea8139499f27a8900f66781d11b1848d64b0801b7d3ac1",
+      "fork_pr": 21,
+      "disposition": "grouped",
+      "groups": [
+        "ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "df9891e56ee22132cde5aa6c17606108c9e7c902",
+      "subject": "fix(web): VVI の言語別 entry 選択と embed helper import を修正 (#22)",
+      "parents": [
+        "da39bb8b94c63b9addafdf53ec2fb3738be17621"
+      ],
+      "changed_file_count": 14,
+      "changed_paths_sha256": "d5abd3ad3473084c96e49198d02e9e53ad7e88833c5ecc2949322218186d3807",
+      "fork_pr": 22,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f8767639e168962ab3924e1411fc45de1901451a",
+      "subject": "fix(frontend): 設定検索の runtime field で静的 index を失わない (#25)",
+      "parents": [
+        "df9891e56ee22132cde5aa6c17606108c9e7c902"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "0bea0da474ce6f7a1a5a9f9a8b5262107b1b744e8037de07d75c643e76f5ce3c",
+      "fork_pr": 25,
+      "disposition": "grouped",
+      "groups": [
+        "ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "18067f7cb77a3eb13973dccfb9c0c3869097fa6d",
+      "subject": "fix(web): main/embed の locale から document direction を初期化 (#26)",
+      "parents": [
+        "f8767639e168962ab3924e1411fc45de1901451a"
+      ],
+      "changed_file_count": 9,
+      "changed_paths_sha256": "13b19ee210a866c49cf3e9d8f071b40256ff42fd7faec3653ada598da8e3f957",
+      "fork_pr": 26,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "58dde9291646403a90f12feb510cf16d4602d4a0",
+      "subject": "refactor(frontend): VVI の言語別 JavaScript コピーを廃止",
+      "parents": [
+        "18067f7cb77a3eb13973dccfb9c0c3869097fa6d"
+      ],
+      "changed_file_count": 12,
+      "changed_paths_sha256": "79671895033607c63f70bccffaf60a830a3a6ff973fe93d9aba17eb5cc7a078a",
+      "fork_pr": 27,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c7fc09e8d10db690ab78502e3c75c2b521c17054",
+      "subject": "docs: エージェント向け指示を簡素化する (#29)",
+      "parents": [
+        "58dde9291646403a90f12feb510cf16d4602d4a0"
+      ],
+      "changed_file_count": 36,
+      "changed_paths_sha256": "d7c64aeccaf45a3536c2b0a904d27845c37e3db48478245aa353190c9009d9dc",
+      "fork_pr": 29,
+      "disposition": "grouped",
+      "groups": [
+        "security_docs"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ac218f7f55b1f7d9eb1c4383add14d777de6a8e1",
+      "subject": "chore(locales): remove 145 unreferenced translation keys",
+      "parents": [
+        "c7fc09e8d10db690ab78502e3c75c2b521c17054"
+      ],
+      "changed_file_count": 40,
+      "changed_paths_sha256": "c8787a31727b203b6389aff7fe69c12fdd567a87356d25aff07279d67c0b01b5",
+      "fork_pr": 34,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "dc340a4407648ef852a27aae74289c2ecd3f5d43",
+      "subject": "chore(locales): retire 55 migrated drive translation keys",
+      "parents": [
+        "ac218f7f55b1f7d9eb1c4383add14d777de6a8e1"
+      ],
+      "changed_file_count": 27,
+      "changed_paths_sha256": "35834f2b2dd9036b9638bcceabb8a5d8b91870c00c0e5a3f775c491199e49620",
+      "fork_pr": 37,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "6db7188f49aa8b15610522aee7e535c0c99a7b14",
+      "subject": "fix: restore original upstream migration lineage",
+      "parents": [
+        "dc340a4407648ef852a27aae74289c2ecd3f5d43"
+      ],
+      "changed_file_count": 17,
+      "changed_paths_sha256": "d11f9643267ace5a579744464df642ef1275f848742f5c161da7ea85189c20ee",
+      "fork_pr": 35,
+      "disposition": "grouped",
+      "groups": [
+        "migration"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ff08393747ff1ddbda824992cfda1fcece5b9ffd",
+      "subject": "fix: route repository links, support and instance defaults to misskey-a",
+      "parents": [
+        "6db7188f49aa8b15610522aee7e535c0c99a7b14"
+      ],
+      "changed_file_count": 15,
+      "changed_paths_sha256": "ceb76399c3e48bc3f2cdaf7877090601d123c12a428e4afb8e08f919d3dbf287",
+      "fork_pr": 32,
+      "disposition": "grouped",
+      "groups": [
+        "branding"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "76a94c2c130b360c2af7fd3c1413b65fd3d41939",
+      "subject": "chore(locales): retire 263 VVI-owned UI translation keys",
+      "parents": [
+        "ff08393747ff1ddbda824992cfda1fcece5b9ffd"
+      ],
+      "changed_file_count": 39,
+      "changed_paths_sha256": "a3d5e96edc7847120c319e5b0b49200c176894d72add1063e3184c78bba6e409",
+      "fork_pr": 38,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e28462fc8b8565d9f8bf0274a336050cee2bea4a",
+      "subject": "chore(locales): retire 789 VVI-owned UI translation keys",
+      "parents": [
+        "76a94c2c130b360c2af7fd3c1413b65fd3d41939"
+      ],
+      "changed_file_count": 35,
+      "changed_paths_sha256": "e088f8d4f9233c9ad071b5dac0b0c900f4bca72dc6547c3d54748b2f2133ec4a",
+      "fork_pr": 39,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "1c0eb2a60698fa76fe5cb3b37ca45ca6e560d88d",
+      "subject": "feat(locales): complete 12 instance messages across 42 languages",
+      "parents": [
+        "e28462fc8b8565d9f8bf0274a336050cee2bea4a"
+      ],
+      "changed_file_count": 57,
+      "changed_paths_sha256": "9642e148fd856d044704c4a068fdbcd5768932fabdc7aa12217ffc15efb65a35",
+      "fork_pr": 41,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f7b805c7aa383c274c60e36a2cc6df45a9db1c7d",
+      "subject": "feat(mcp): scoped access:mcp permissionとdefault-disabled local transport",
+      "parents": [
+        "1c0eb2a60698fa76fe5cb3b37ca45ca6e560d88d"
+      ],
+      "changed_file_count": 31,
+      "changed_paths_sha256": "900eb91071c97cff6afe980709bd02d1be42d79eb0dc71778703ad328a060d9f",
+      "fork_pr": 36,
+      "disposition": "grouped",
+      "groups": [
+        "mcp"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c73a4c8f78d3e769b2eb1f5c837d4178961b5f11",
+      "subject": "feat(locales): complete 65 email settings translations in existing languages",
+      "parents": [
+        "f7b805c7aa383c274c60e36a2cc6df45a9db1c7d"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "1d51a8bfc587db3c73ce4d7499c4984de6aeed004425aba09be86fc7d72c1bcf",
+      "fork_pr": 42,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "dc3c24caeef1cc61c910ff96bca4e7fb67fb87bb",
+      "subject": "feat(mcp): register opt-in native-token transport in normal server",
+      "parents": [
+        "c73a4c8f78d3e769b2eb1f5c837d4178961b5f11"
+      ],
+      "changed_file_count": 10,
+      "changed_paths_sha256": "b8475ea670310cf4b7f7df17ecd7fa3ac45ceb2e7b42e1ecda6af404e0125bba",
+      "fork_pr": 43,
+      "disposition": "grouped",
+      "groups": [
+        "mcp"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "b9a1a17c356d9f136d893a06de8457990c7ece34",
+      "subject": "feat(locales): complete 226 auth, QR and server rules translations",
+      "parents": [
+        "dc3c24caeef1cc61c910ff96bca4e7fb67fb87bb"
+      ],
+      "changed_file_count": 11,
+      "changed_paths_sha256": "4067404994a2299ea963f5f8255ba8ff73409d194a050b6e686d5ab4a844a7e4",
+      "fork_pr": 44,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c771d10b92c998e6a345757af22e218b0e91925b",
+      "subject": "chore(release): start independent SemVer at 9000.0.0 (#50)",
+      "parents": [
+        "b9a1a17c356d9f136d893a06de8457990c7ece34"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "e589bd5afd94a57ddde6b0de25c136595c6ae3d60150905474f1c56b3c940d02",
+      "fork_pr": 50,
+      "disposition": "grouped",
+      "groups": [
+        "branding",
+        "release"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "d46b395bbd02455c129c1f15122d1a9925ce9c37",
+      "subject": "fix(frontend): preserve legacy CSS module source identities",
+      "parents": [
+        "c771d10b92c998e6a345757af22e218b0e91925b"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "c1874f932720731ea7a229ed5ebabf7218a500352d08c5d02ff5e80ab6b42101",
+      "fork_pr": 52,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "6afeba7f963a1c4ea155b01887917ff087674064",
+      "subject": "feat(branding): display Misskey 9000",
+      "parents": [
+        "d46b395bbd02455c129c1f15122d1a9925ce9c37"
+      ],
+      "changed_file_count": 12,
+      "changed_paths_sha256": "b9291955d3a30795478741d6830b78494ec181f3e026963e01da9097c4cb8243",
+      "fork_pr": 54,
+      "disposition": "grouped",
+      "groups": [
+        "branding"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3197c44a307739b0963181355f6548d5fa319996",
+      "subject": "feat(mcp): connect existing OAuth through public-client CIMD",
+      "parents": [
+        "6afeba7f963a1c4ea155b01887917ff087674064"
+      ],
+      "changed_file_count": 18,
+      "changed_paths_sha256": "985548271e850853ffe28704fe61831170a89b52298eefda123510c76a540957",
+      "fork_pr": 46,
+      "disposition": "grouped",
+      "groups": [
+        "mcp",
+        "oauth"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3dac9157c7cc8dff33ae0501a3418f0f10c9d3d6",
+      "subject": "fix(federation): restore original canonical inbox signature wrappers",
+      "parents": [
+        "3197c44a307739b0963181355f6548d5fa319996"
+      ],
+      "changed_file_count": 12,
+      "changed_paths_sha256": "6b8981775a47eb41d81b892c7bd0dd3fc3eac21c979bbd58758deb749c9c4ea6",
+      "fork_pr": 49,
+      "disposition": "grouped",
+      "groups": [
+        "signature"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "363eb50b98d3011f03dbf3a8dad407c8f987010c",
+      "subject": "feat: discover authorized APIs and select empty OAuth scopes",
+      "parents": [
+        "3dac9157c7cc8dff33ae0501a3418f0f10c9d3d6"
+      ],
+      "changed_file_count": 38,
+      "changed_paths_sha256": "2dc5d05a3640cd8110d97bea8ef9ac9fb8a6719561db5438e44d6ba02c6fc14b",
+      "fork_pr": 56,
+      "disposition": "grouped",
+      "groups": [
+        "mcp",
+        "oauth"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a88e75890ccab6d580c23e576fdc2e1b7f865a80",
+      "subject": "feat: allow optional API permissions in explicit MCP consent",
+      "parents": [
+        "363eb50b98d3011f03dbf3a8dad407c8f987010c"
+      ],
+      "changed_file_count": 10,
+      "changed_paths_sha256": "a998fd85eb96a1f511a57960393716cb5b443318e4c4a95fe0e53922e5a8f76f",
+      "fork_pr": 59,
+      "disposition": "grouped",
+      "groups": [
+        "oauth"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "6474669654e6e3df8e2595d4f61bc631591089a8",
+      "subject": "feat: expose natively authorized admin APIs through MCP",
+      "parents": [
+        "a88e75890ccab6d580c23e576fdc2e1b7f865a80"
+      ],
+      "changed_file_count": 9,
+      "changed_paths_sha256": "865c5c811ccc02a16d98142a0b196e61b6d4e664d24a445b949e62c4e3fa1457",
+      "fork_pr": 62,
+      "disposition": "grouped",
+      "groups": [
+        "mcp"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7f47f1b1b1bc086cf6e5f67bd17b0102af2895ad",
+      "subject": "feat: opt into ordinary OAuth permission customization",
+      "parents": [
+        "6474669654e6e3df8e2595d4f61bc631591089a8"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "3a44dbbc962ee56d0e5b8e7e44afac194992e540ab8872dc7ac824e4ab869421",
+      "fork_pr": 63,
+      "disposition": "grouped",
+      "groups": [
+        "oauth"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "03f6713d7febbbe168f9d3fa9f79859d1152c084",
+      "subject": "fix(frontend): retain custom CSS precedence after lazy styles",
+      "parents": [
+        "7f47f1b1b1bc086cf6e5f67bd17b0102af2895ad"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "7f7cc22c05e10b8e005727760ee253fa5c71e44d08935d1e36ad17e43f13b563",
+      "fork_pr": 69,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ac3b55b26702223361e4edfe76dbbd7e178635ef",
+      "subject": "feat: prototype MCP Events for mentions and replies",
+      "parents": [
+        "03f6713d7febbbe168f9d3fa9f79859d1152c084"
+      ],
+      "changed_file_count": 33,
+      "changed_paths_sha256": "81b9848a60c26102d935cc7d271c58b71458f34eab7e8b2cec1e327b9aad995e",
+      "fork_pr": 66,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_events"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "cca638e833b63492dc47c567da74c6a517e01f1c",
+      "subject": "feat(mcp): persist antenna subscriptions and coordinate delivery jobs",
+      "parents": [
+        "ac3b55b26702223361e4edfe76dbbd7e178635ef"
+      ],
+      "changed_file_count": 34,
+      "changed_paths_sha256": "0b980ed5946b3fb4938d2ecf8cede497b96a2be6549f4298ce261d5a11204958",
+      "fork_pr": 72,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_events"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a40112eda89eabdc0f66c8f6bc9625bc8c8ae400",
+      "subject": "refactor(mcp): pilot native main and broadcast event output",
+      "parents": [
+        "cca638e833b63492dc47c567da74c6a517e01f1c"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "066f57f678ba91580527c9f0e6c6bf1f09b159c75b685ce59d866ce082311293",
+      "fork_pr": 74,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_events"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "17ca5fc5092fa996a413676f531011711621bdc1",
+      "subject": "feat(mcp): persist bounded native outbound stream subscriptions",
+      "parents": [
+        "a40112eda89eabdc0f66c8f6bc9625bc8c8ae400"
+      ],
+      "changed_file_count": 53,
+      "changed_paths_sha256": "7378162e3cc9d08ffe0ec33977d0aa29ddd6a7e41cb6ffe8f95f172f575a3653",
+      "fork_pr": 76,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_events"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3afd79a6511b32b558984dfb980cc7e37346048e",
+      "subject": "fix(auth): パスワード変更で現在のパスワードを先に、2FAを最後に入力する",
+      "parents": [
+        "17ca5fc5092fa996a413676f531011711621bdc1"
+      ],
+      "changed_file_count": 12,
+      "changed_paths_sha256": "a9cbadfc302c210e0ef5d6376c170700035517cacae20c662c48bc3f923457fa",
+      "fork_pr": 80,
+      "disposition": "grouped",
+      "groups": [
+        "auth_ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "8d7b1feb519539cbe4012b2586eb471e503afd99",
+      "subject": "fix(auth): パスキー登録完了時のパスワード再入力を省く",
+      "parents": [
+        "3afd79a6511b32b558984dfb980cc7e37346048e"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "8637209c41f4bce93845cbf961b30c3a456205464dcb2bb809678b8395eb405e",
+      "fork_pr": 87,
+      "disposition": "grouped",
+      "groups": [
+        "auth_ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a4080f4061f3054d11b779186d4ac854f73625aa",
+      "subject": "fix(mcp): expose object root for event channel settings",
+      "parents": [
+        "8d7b1feb519539cbe4012b2586eb471e503afd99"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "be723a516348e55d6026190821e5e154606b4555efffe762fab731acd9558782",
+      "fork_pr": 79,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_events"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3caf6e65f0329f77c1a43fe8ad902a96c318126f",
+      "subject": "fix(stream): 統計ログの応答待ちリスナーを切断時に解除する",
+      "parents": [
+        "a4080f4061f3054d11b779186d4ac854f73625aa"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "286e62a3b31d13f0804c6a9a68efc4709dc985e38f96ac228efd092fcc53fee0",
+      "fork_pr": 91,
+      "disposition": "grouped",
+      "groups": [
+        "stream_cleanup"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e9d2c2b473ef893b0f303cbd05711222fa6c35d3",
+      "subject": "fix(auth): ログイントークン再生成時に二要素認証を検証する",
+      "parents": [
+        "3caf6e65f0329f77c1a43fe8ad902a96c318126f"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "4b3d500083f8c78009d1e2c017b041f35b5349d72ee29964ffbc66a5c3c2a04a",
+      "fork_pr": 95,
+      "disposition": "grouped",
+      "groups": [
+        "auth_ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f939e284866b3dbce4870527ebd28d9f8b8ed510",
+      "subject": "fix(ci): align release CI branch filters with main",
+      "parents": [
+        "e9d2c2b473ef893b0f303cbd05711222fa6c35d3"
+      ],
+      "changed_file_count": 17,
+      "changed_paths_sha256": "5c411d7106582bb9b7b4b46c1a59426e09a67e08e8149bb99ef84abe4776d38f",
+      "fork_pr": 97,
+      "disposition": "grouped",
+      "groups": [
+        "ci"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ee85dff1584633f3b4a86dbfa1e3169b6a03f959",
+      "subject": "fix(auth): WebAuthn の本人確認要求を必須のサーバー検証と揃える",
+      "parents": [
+        "f939e284866b3dbce4870527ebd28d9f8b8ed510"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "fd4eba7bf6e8f57069247aabe7c3c0023a3dbd95fe3c43238751e9eb25562344",
+      "fork_pr": 96,
+      "disposition": "grouped",
+      "groups": [
+        "auth_ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "03f4fbf901042a9765810369a4092faae7f36b33",
+      "subject": "fix(mcp): advertise 2020-12 event schemas with explicit filter types",
+      "parents": [
+        "ee85dff1584633f3b4a86dbfa1e3169b6a03f959"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "cbcc52767b556dc1e36e1a41fdffe4d0cbd21e10ef23d87d480451416f32bb09",
+      "fork_pr": 102,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_events"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "4ef9b0b1045ae3f46614c71dba8d0c2f3657a454",
+      "subject": "refactor(auth): TotpService に整理し UserAuthService の同一 constructor 互換を維持する",
+      "parents": [
+        "03f4fbf901042a9765810369a4092faae7f36b33"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "a30eb1fe46047a7e03e956a8a8d8c603b9481aa6f58452da1e2b79f9052137ce",
+      "fork_pr": 111,
+      "disposition": "grouped",
+      "groups": [
+        "auth_api"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "45b2b8645ddf6590399a2912f44a177c9db9c966",
+      "subject": "feat(auth): Conditional Mediation の opt-in ログイン pilot",
+      "parents": [
+        "4ef9b0b1045ae3f46614c71dba8d0c2f3657a454"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "9b710536eb13f7e92dc092dd4519cb316d76e975b7fdd1847c512dc41707a66d",
+      "fork_pr": 99,
+      "disposition": "grouped",
+      "groups": [
+        "auth_foundation"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "52cbba35e66994f53e7977add96df8fc6447f19f",
+      "subject": "feat(auth): OIDC ID token の検証基盤を追加する",
+      "parents": [
+        "45b2b8645ddf6590399a2912f44a177c9db9c966"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "9f8a064aa82945a9119d3e224904c041562c33ed13bc80d137c8ec25af463477",
+      "fork_pr": 109,
+      "disposition": "grouped",
+      "groups": [
+        "auth_foundation"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "398952645f7d7e3104c8927b71eb9abab041a424",
+      "subject": "fix(auth): TOTP を優先し明示的なパスキー代替で fresh challenge を取得する",
+      "parents": [
+        "52cbba35e66994f53e7977add96df8fc6447f19f"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "71036ba3184f0fb0a72cafef1ca0cc705f11a5929e8ded772a906d7edcfefe03",
+      "fork_pr": 117,
+      "disposition": "grouped",
+      "groups": [
+        "auth_ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "877f7f31966b66e3e981d2315e11a20dcaee7db2",
+      "subject": "feat(auth): OIDC discovery と短命 transaction の境界を追加する",
+      "parents": [
+        "398952645f7d7e3104c8927b71eb9abab041a424"
+      ],
+      "changed_file_count": 7,
+      "changed_paths_sha256": "e05e5ef9e629bd3be5b95b68e1cdac44c4a6edb9e77f51b68244449e44533add",
+      "fork_pr": 121,
+      "disposition": "grouped",
+      "groups": [
+        "auth_foundation"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3829603e75b6ed7e3db183d177d3533ffd5b1827",
+      "subject": "fix(ci): bound API diff comments and retain full artifact evidence",
+      "parents": [
+        "877f7f31966b66e3e981d2315e11a20dcaee7db2"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "7fba1170624130c010a5d9aa0d0571609ce123bb1541fa382b812e90485bbe2b",
+      "fork_pr": 84,
+      "disposition": "grouped",
+      "groups": [
+        "ci"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c74d7a4241fa6a4393662cbc0360abc97ca7d03b",
+      "subject": "test(federation): actor 登録後の inbox 自動再試行による回復を保護する",
+      "parents": [
+        "3829603e75b6ed7e3db183d177d3533ffd5b1827"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "0aa9ed4fc42d795ad5fcd14b30aff2f2e8bd16dab8e057012fe9cf47920efd7f",
+      "fork_pr": 85,
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7c3ce9031c4b31b9e7590b3f037ae61a7f1b8c1e",
+      "subject": "feat(frontend): add persistent client error logs",
+      "parents": [
+        "c74d7a4241fa6a4393662cbc0360abc97ca7d03b"
+      ],
+      "changed_file_count": 17,
+      "changed_paths_sha256": "77420edebab142fc694dc4a28063991586c666d26a8d30a7363b59258317b4fc",
+      "fork_pr": 113,
+      "disposition": "grouped",
+      "groups": [
+        "client_log"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ec4587d5dca0d66437e76cd251a0925dae49bee2",
+      "subject": "fix(mcp): move event catalog into descriptor metadata",
+      "parents": [
+        "7c3ce9031c4b31b9e7590b3f037ae61a7f1b8c1e"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "1f39f13b29077d53de19e468025579a938ccd8f56ebc495ec996b82c16c7714d",
+      "fork_pr": 130,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_events"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c8e599b2ba7977cdad9451fd08959823713f55dc",
+      "subject": "fix(notes): await pinned note deletion before returning",
+      "parents": [
+        "ec4587d5dca0d66437e76cd251a0925dae49bee2"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "66147f02d53fca9cfbed1009da0199bcdc5ede4d2f2e63c27f6068594cea9a73",
+      "fork_pr": 134,
+      "disposition": "grouped",
+      "groups": [
+        "pin"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "acc2fe2a6bb093278f3fbff423968f974cab8029",
+      "subject": "feat(auth): 個別ブラウザーセッションの保存・検証・失効基盤",
+      "parents": [
+        "c8e599b2ba7977cdad9451fd08959823713f55dc"
+      ],
+      "changed_file_count": 18,
+      "changed_paths_sha256": "439df127a36f5497b1ee56bd5615a1379a81e9bb5abd5e0d5cce5b779fa9e767",
+      "fork_pr": 104,
+      "disposition": "grouped",
+      "groups": [
+        "auth_session"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ee4cfef91588e917959d48c8302c586a4e925831",
+      "subject": "refactor(auth): add canonical TOTP/passkey API aliases",
+      "parents": [
+        "acc2fe2a6bb093278f3fbff423968f974cab8029"
+      ],
+      "changed_file_count": 18,
+      "changed_paths_sha256": "4f8fd88d5789714e6f6495f6f00d0eb37a5b75e4ea816aef43aaa25e03ff4748",
+      "fork_pr": 123,
+      "disposition": "grouped",
+      "groups": [
+        "auth_api"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "c4ff0892c54c138b670d306e6d3a4e8bd5fae30c",
+      "subject": "feat(auth): 未接続の認証進行 metadata store を追加する",
+      "parents": [
+        "ee4cfef91588e917959d48c8302c586a4e925831"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "45a2afa451560514ed5b0282b3229f2bc8e3302b0d21a209e7ee7dcb52d0d2a9",
+      "fork_pr": 131,
+      "disposition": "grouped",
+      "groups": [
+        "auth_foundation"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "d1659943978b3b051360f3ddf161a2e183d3c525",
+      "subject": "feat(auth): add unconnected pinned OIDC token exchange transport",
+      "parents": [
+        "c4ff0892c54c138b670d306e6d3a4e8bd5fae30c"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "a298a8e7f6f5d07c76b0a2535a86880006ecf00320ddbb2fb155cc55ca938295",
+      "fork_pr": 135,
+      "disposition": "grouped",
+      "groups": [
+        "auth_foundation"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "915eede79989931ff3854e19449390aebf60c5f6",
+      "subject": "feat(auth): 本人確認後に利用可能な signin factor を明示する",
+      "parents": [
+        "d1659943978b3b051360f3ddf161a2e183d3c525"
+      ],
+      "changed_file_count": 13,
+      "changed_paths_sha256": "d0769624bda3401e5ddf1d5b90fed403f85705dbeead00b4b0ad0de3ff399554",
+      "fork_pr": 124,
+      "disposition": "grouped",
+      "groups": [
+        "auth_ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "1fe28cddaa93a7c93e6aa0cfbecbd41c5eef1aeb",
+      "subject": "fix(notifications): drain delayed query during test shutdown",
+      "parents": [
+        "915eede79989931ff3854e19449390aebf60c5f6"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "4c364f3cfcf49b6160715d790221bd82c3e5e30b9281c2da06dfacc96cdca1b1",
+      "fork_pr": 138,
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "5e2e10df6ae11e031c79299b7c19ec2b0808830f",
+      "subject": "refactor(auth): use canonical 2FA API paths in settings callers",
+      "parents": [
+        "1fe28cddaa93a7c93e6aa0cfbecbd41c5eef1aeb"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "fbc7dd51bbd62033d3f07df45dbd96a7ced8b9c56293b30c68d2ea15e214bbd1",
+      "fork_pr": 127,
+      "disposition": "grouped",
+      "groups": [
+        "auth_api"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "1692cd9a46f826ee78c8d6a00d96aeb8eca1d1ee",
+      "subject": "feat(auth): issue and revoke individual browser sessions across runtime",
+      "parents": [
+        "5e2e10df6ae11e031c79299b7c19ec2b0808830f"
+      ],
+      "changed_file_count": 66,
+      "changed_paths_sha256": "7cc651d5497c507d3bfde602aa30301c88ac5f39b2c65b4379540007566a0f17",
+      "fork_pr": 119,
+      "disposition": "grouped",
+      "groups": [
+        "auth_session"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "45ad40a83d9bf845ec9387e5747801341e9317bd",
+      "subject": "enhance(frontend): replace moderation log diffs with Shiki (#140)",
+      "parents": [
+        "1692cd9a46f826ee78c8d6a00d96aeb8eca1d1ee"
+      ],
+      "changed_file_count": 17,
+      "changed_paths_sha256": "e185aac365f96cda62eecfb6550de6538f6d337da88bde36eba4f8e63ce49f7c",
+      "fork_pr": 140,
+      "disposition": "grouped",
+      "groups": [
+        "moderation_diff"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ac202c9dd66bd1970e98b49e1840b4d439a7dd01",
+      "subject": "fix: include required MCP discovery cache fields",
+      "parents": [
+        "45ad40a83d9bf845ec9387e5747801341e9317bd"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "0d5fcfcdd4ac3d9ca026cbb4d6aaf5f745afcd75aa4d2bdd1c7fb8203bf96421",
+      "fork_pr": 159,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_events"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "0a36d7f8d9ce51ea4fb2b3fb1c4cb88f754f79ac",
+      "subject": "chore: follow upstream dependency upgrades independently (#153)",
+      "parents": [
+        "ac202c9dd66bd1970e98b49e1840b4d439a7dd01"
+      ],
+      "changed_file_count": 48,
+      "changed_paths_sha256": "594a107c6849f815a63257e9d67be46e73081f99b6104f74dce50118795dffcf",
+      "fork_pr": 153,
+      "disposition": "grouped",
+      "groups": [
+        "dependencies"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "030176f05448b22e4adc5ad0c31fab2471313276",
+      "subject": "refactor: share normal and embedded MFM rendering (#154)",
+      "parents": [
+        "0a36d7f8d9ce51ea4fb2b3fb1c4cb88f754f79ac"
+      ],
+      "changed_file_count": 8,
+      "changed_paths_sha256": "29cd3cafd99f200f1ebeb5d25aebbbb825dedff1f2a505ed1dc471bf90f2afa0",
+      "fork_pr": 154,
+      "disposition": "grouped",
+      "groups": [
+        "markup"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e307d5dc42ddd1218265f5e747aba0aa388eba87",
+      "subject": "i18n: apply upstream Crowdin values independently (#155)",
+      "parents": [
+        "030176f05448b22e4adc5ad0c31fab2471313276"
+      ],
+      "changed_file_count": 18,
+      "changed_paths_sha256": "16057a23d3a2329b4fbd0a1eaa6c80a33c9b062274fc649ddb3875a241be7c95",
+      "fork_pr": 155,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f0ea2af6068d4bcf748277870d150b0fa74b4e10",
+      "subject": "feat: schedule announcement auto-archiving independently (#156)",
+      "parents": [
+        "e307d5dc42ddd1218265f5e747aba0aa388eba87"
+      ],
+      "changed_file_count": 50,
+      "changed_paths_sha256": "c650ea22897a22ecf0ac843f110e8319aa39154d617640025d57afc26afc0dc7",
+      "fork_pr": 156,
+      "disposition": "grouped",
+      "groups": [
+        "announcement"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "4b8d039dfd58ff8989d63f4eed565c3708ac537a",
+      "subject": "fix: restrict local-only emoji on remote quote Renotes (#160)",
+      "parents": [
+        "f0ea2af6068d4bcf748277870d150b0fa74b4e10"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "a3388baabf9e9077a1dae6a4150a83f565190236eeaa3a2b7a757fa3ae6a685c",
+      "fork_pr": 160,
+      "disposition": "grouped",
+      "groups": [
+        "quote_emoji"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7fcc3a1adf6c7b760df4d5d506ec22391f24aa2e",
+      "subject": "feat: add Deck Clip column and authorized Clip stream (#162)",
+      "parents": [
+        "4b8d039dfd58ff8989d63f4eed565c3708ac537a"
+      ],
+      "changed_file_count": 23,
+      "changed_paths_sha256": "77e00fd7c44ac251856e472ae7589c08ecd9b69869f33adb5490023a4d2891f2",
+      "fork_pr": 162,
+      "disposition": "grouped",
+      "groups": [
+        "clip"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "ac01b19b15be4605a96c0c5a287cd30ad6bf8280",
+      "subject": "test: await exact local reply count in federation consistency (#170)",
+      "parents": [
+        "7fcc3a1adf6c7b760df4d5d506ec22391f24aa2e"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "dd0aa25076c61db1681caeff9a39847561f97ebe8924289884d864e493f83d5f",
+      "fork_pr": 170,
+      "disposition": "grouped",
+      "groups": [
+        "build"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "664f17217f4a9406154cb77bb1c3222ab63cdd33",
+      "subject": "fix: filter MCP event discovery by current native permissions",
+      "parents": [
+        "ac01b19b15be4605a96c0c5a287cd30ad6bf8280"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "456ae9d70af2fc5a8816eaadd79fe50ce2101197ac353d82f521e4b71838b65c",
+      "fork_pr": 173,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_events"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "a1580eec576c1fe4403cb132d84f4f7ceeebfe2f",
+      "subject": "Bump version to 9000.0.0-beta.0",
+      "parents": [
+        "664f17217f4a9406154cb77bb1c3222ab63cdd33"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "242b5489f79b19b73163a107d30c081c9de2f68d4f1350ada9ccc5e0293a7b91",
+      "disposition": "excluded",
+      "reason": "beta.0 の package version と CHANGELOG 見出しの更新だけ。9000 採番の方針は #50 に集約。"
+    },
+    {
+      "sha": "8e243e7d16f7e62594f2474ee60dd61c719650f8",
+      "subject": "fix(ci): validate changelog promotion for release PRs",
+      "parents": [
+        "a1580eec576c1fe4403cb132d84f4f7ceeebfe2f"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "538efbe3edd5bc6df154c729b25076b93a2f23442833eb0644efbe82382341b7",
+      "disposition": "grouped",
+      "groups": [
+        "ci"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "7239f8b5a1b7150b05104da2e02425a22f03e970",
+      "subject": "Bump version to 9000.0.0-beta.1",
+      "parents": [
+        "8e243e7d16f7e62594f2474ee60dd61c719650f8"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "355df13ce35a258b468406649d072be524c74e25320c2ff4c21023bd989b52bc",
+      "disposition": "excluded",
+      "reason": "beta.1 の root/SDK version 更新2行だけ。独立した機能変更なし。"
+    },
+    {
+      "sha": "72c677c323f8efff4d1e6031318e31a1ff1c6ce8",
+      "subject": "feat: Tempura互換のアバターデコレーション連合に対応 (#191)",
+      "parents": [
+        "7239f8b5a1b7150b05104da2e02425a22f03e970"
+      ],
+      "changed_file_count": 12,
+      "changed_paths_sha256": "833e8a70f8ac917bc48b686aa1c355748386084bc453c4c19572faf07aac8b21",
+      "fork_pr": 191,
+      "disposition": "grouped",
+      "groups": [
+        "avatar_federation"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "0f2a5ee4d3d270a5f32ffa88e80df8283d92e1d2",
+      "subject": "Bump version to 9000.0.0-beta.2",
+      "parents": [
+        "72c677c323f8efff4d1e6031318e31a1ff1c6ce8"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "355df13ce35a258b468406649d072be524c74e25320c2ff4c21023bd989b52bc",
+      "disposition": "excluded",
+      "reason": "beta.2 の root/SDK version 更新2行だけ。#191 の実変更は別途収録。"
+    },
+    {
+      "sha": "cd5e911eecf7ba721abe8ff8ebbd3141cc3c1ebe",
+      "subject": "docs(release): populate 9000.0.0 changelog",
+      "parents": [
+        "0f2a5ee4d3d270a5f32ffa88e80df8283d92e1d2"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "06572a96a58dc510037d5efa622f9bec8519bc1beab13c9f251e97e657a9d4ed",
+      "disposition": "excluded",
+      "reason": "従前の部分的な9000.0.0 CHANGELOG補完。本作業で置き換える文書のみの変更。"
+    },
+    {
+      "sha": "bd4d2ec5ea3c47b6aa45afa5c14258276351aa43",
+      "subject": "docs: follow upstream security reporting guidelines (#199)",
+      "parents": [
+        "cd5e911eecf7ba721abe8ff8ebbd3141cc3c1ebe"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "f6ed156e4bf5c791680662464b94ea5d753f219ee816b385f67870e2c0d7d4c7",
+      "fork_pr": 199,
+      "disposition": "grouped",
+      "groups": [
+        "security_docs"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "2e48ee5756df51c4b29ecf68fce0d52fdc41a480",
+      "subject": "fix: correct UserProfile password column comment (#200)",
+      "parents": [
+        "bd4d2ec5ea3c47b6aa45afa5c14258276351aa43"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "a845b7f347bf0d7d5ca2ceaca9f83d27806b66c9a6c02428407e546e2d2f7e94",
+      "fork_pr": 200,
+      "disposition": "grouped",
+      "groups": [
+        "profile_comment"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "796821caadead89f33f446d3c6d673c5b8182999",
+      "subject": "fix(frontend): prevent setup dialog footer overlap (#201)",
+      "parents": [
+        "2e48ee5756df51c4b29ecf68fce0d52fdc41a480"
+      ],
+      "changed_file_count": 3,
+      "changed_paths_sha256": "61dc45f3fad7f6b31c30a66ca07cee333c74f213cc396295bec9df30508afc67",
+      "fork_pr": 201,
+      "disposition": "grouped",
+      "groups": [
+        "setup_ui"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "3c215bd72640dd882feacd8b97ef92ebf2c4c180",
+      "subject": "chore(deps): follow upstream MFM and container updates (#202)",
+      "parents": [
+        "796821caadead89f33f446d3c6d673c5b8182999"
+      ],
+      "changed_file_count": 7,
+      "changed_paths_sha256": "3832036423f058ee356e8f12603bb8bf2bd40eb58c543c4af65085d1b2435334",
+      "fork_pr": 202,
+      "disposition": "grouped",
+      "groups": [
+        "dependencies"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "e1a614df68f226a8c9ee831994e1727a1ded061f",
+      "subject": "perf: raise delivery rate limit default to 2048 per second (#197)",
+      "parents": [
+        "3c215bd72640dd882feacd8b97ef92ebf2c4c180"
+      ],
+      "changed_file_count": 5,
+      "changed_paths_sha256": "8dec6c18e072f9865b5de0357e76931674839d853fbb45ad259a104574202ac5",
+      "fork_pr": 197,
+      "disposition": "grouped",
+      "groups": [
+        "delivery_rate"
+      ],
+      "reason": "同じ機能・移行の細分commitを対応するCHANGELOG項目に統合。"
+    },
+    {
+      "sha": "f1bedff6085348d80dd5825eeddce1cacde1fe78",
+      "subject": "docs(release): cover changes since upstream 2026.10.0",
+      "parents": [
+        "e1a614df68f226a8c9ee831994e1727a1ded061f"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "dbeecc9f4e7b128f4d224df3dcda0253ff997c8e4c0c212f1c332ac9c65dd266",
+      "disposition": "excluded",
+      "reason": "文書のみの前回CHANGELOG補完。"
+    },
+    {
+      "sha": "64b11074dcf3b47a40b9f37a9a4f3ec8f583806e",
+      "subject": "refactor(i18n): expand shared VVI labels and prune migrated catalogs (#204)",
+      "parents": [
+        "f1bedff6085348d80dd5825eeddce1cacde1fe78"
+      ],
+      "changed_file_count": 113,
+      "changed_paths_sha256": "baee31c2e4ea959249ec3c231fd7f29df1fec7a5332f93c9fbd648f150c85356",
+      "fork_pr": 204,
+      "disposition": "grouped",
+      "groups": [
+        "locales"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "60d5ece7ffb1c401ad137ca22ae0ab6b4797b7ec",
+      "subject": "fix(i18n): accept direct re-export facade chunks (#207)",
+      "parents": [
+        "64b11074dcf3b47a40b9f37a9a4f3ec8f583806e"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "5453540bc691bc3d0183538d38b78e02a9cda4bc8f09793c8d4be30427e3ff6b",
+      "fork_pr": 207,
+      "disposition": "grouped",
+      "groups": [
+        "vvi_facade"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "3da6cbe5773215282cfb4fe38694f65e07ffcddf",
+      "subject": "refactor(zip): unify emoji archives with zip.js (#208)",
+      "parents": [
+        "60d5ece7ffb1c401ad137ca22ae0ab6b4797b7ec"
+      ],
+      "changed_file_count": 8,
+      "changed_paths_sha256": "2ef85f2689c512de8aed34e13c23c6165d9d1ce8f7c55485fd242dc2278b4edb",
+      "fork_pr": 208,
+      "disposition": "grouped",
+      "groups": [
+        "zip"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "0ce2b9cd270f21e5d0120f44ff9a6fb2b66012fd",
+      "subject": "chore(deps): align upstream build and test toolchain (#210)",
+      "parents": [
+        "3da6cbe5773215282cfb4fe38694f65e07ffcddf"
+      ],
+      "changed_file_count": 19,
+      "changed_paths_sha256": "0a8fd9933e9630228529d3740b4050463674e06bc4e5b84a5b6875b1793b096f",
+      "fork_pr": 210,
+      "disposition": "grouped",
+      "groups": [
+        "dependencies",
+        "vvi_facade"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "e2bb37384f3b7f2e2f2b0103a04e5c5281952e08",
+      "subject": "chore(deps): follow upstream frontend media dependencies (#213)",
+      "parents": [
+        "0ce2b9cd270f21e5d0120f44ff9a6fb2b66012fd"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "5dd026833fb712152f4972a5a7ca3a3003a2bfc4c3f7d19bf141aa1328f2c15f",
+      "fork_pr": 213,
+      "disposition": "grouped",
+      "groups": [
+        "dependencies"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "9aeadebf7a0b7e0d485b0973024a845770e5c139",
+      "subject": "chore(deps): follow upstream backend and Sentry dependencies (#212)",
+      "parents": [
+        "e2bb37384f3b7f2e2f2b0103a04e5c5281952e08"
+      ],
+      "changed_file_count": 6,
+      "changed_paths_sha256": "3c074a39083a06fa534b6bf5fe9c5e068c3fe011e3286a91be05847b55cef4ad",
+      "fork_pr": 212,
+      "disposition": "grouped",
+      "groups": [
+        "dependencies"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "e391187600a90dd263da7ff8dc1e3b6efc1a2c8a",
+      "subject": "fix(storybook): migrate MSW 3 and align Storybook 10 addons (#211)",
+      "parents": [
+        "9aeadebf7a0b7e0d485b0973024a845770e5c139"
+      ],
+      "changed_file_count": 13,
+      "changed_paths_sha256": "b53e5372414d523b4d0da4537d3cee85c59b73039963ff1780f63f3208c3a157",
+      "fork_pr": 211,
+      "disposition": "grouped",
+      "groups": [
+        "storybook"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "297fd7f2d1418f50f4135d034c45f4c1589ca7c1",
+      "subject": "Bump version to 9000.0.0-beta.3",
+      "parents": [
+        "e391187600a90dd263da7ff8dc1e3b6efc1a2c8a"
+      ],
+      "changed_file_count": 2,
+      "changed_paths_sha256": "355df13ce35a258b468406649d072be524c74e25320c2ff4c21023bd989b52bc",
+      "disposition": "excluded",
+      "reason": "公式Release Managerによるbeta.3のversion-only変更。新機能としては数えずNoteの公開タグ情報に反映。"
+    },
+    {
+      "sha": "40191c3301cc47d512b725f14e49f88ab9b13409",
+      "subject": "fix(mcp): exclude self-authored reply and mention events (#215)",
+      "parents": [
+        "297fd7f2d1418f50f4135d034c45f4c1589ca7c1"
+      ],
+      "changed_file_count": 4,
+      "changed_paths_sha256": "05fa4fa1b38e1b5a47c3b881a52b358ca980624dc24ed2dc4aa25f3cc7f4ef6a",
+      "fork_pr": 215,
+      "disposition": "grouped",
+      "groups": [
+        "mcp_self_events"
+      ],
+      "reason": "追加のマージ済み変更を、ユーザー編集後の該当見出しに統合。"
+    },
+    {
+      "sha": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+      "subject": "Update CHANGELOG",
+      "parents": [
+        "40191c3301cc47d512b725f14e49f88ab9b13409"
+      ],
+      "changed_file_count": 1,
+      "changed_paths_sha256": "06572a96a58dc510037d5efa622f9bec8519bc1beab13c9f251e97e657a9d4ed",
+      "disposition": "excluded",
+      "reason": "ユーザーの構成・表現を参照する文書編集。公開機能を増やす変更ではない。"
+    },
+    {
+      "sha": "f7950b3420643dc75d2e77d394ee0b01edb161c3",
+      "subject": "fix: preserve Unicode code-point limits for list names",
+      "parents": [
+        "af016bb8f56e762d9864bc88710737c88a7b10a5"
+      ],
+      "diff_base": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+      "changed_file_count": 5,
+      "changed_paths_sha256": "9a992122ee9026d95db37983a28a9883eb14aba91187bb2d49577d31f246a6ed",
+      "disposition": "grouped",
+      "groups": [
+        "list_name_unicode",
+        "ci"
+      ],
+      "reason": "Unicodeリスト名の既存1〜100コードポイント制限を復元し、関連CIのpathsを補完。同機能の実装・mergeを1項目に統合。"
+    },
+    {
+      "sha": "4085154bda21f0b200179c28e06682728f69bb27",
+      "subject": "docs: refresh changelog while preserving author edits (#218)",
+      "parents": [
+        "af016bb8f56e762d9864bc88710737c88a7b10a5"
+      ],
+      "diff_base": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+      "changed_file_count": 2,
+      "changed_paths_sha256": "dbeecc9f4e7b128f4d224df3dcda0253ff997c8e4c0c212f1c332ac9c65dd266",
+      "fork_pr": 218,
+      "disposition": "excluded",
+      "reason": "ユーザー編集を保持したCHANGELOG/監査JSONの文書更新。機能として重複掲載しない。"
+    },
+    {
+      "sha": "8b3bbc05b6a1e4686e4f1c793383d3457545c8e0",
+      "subject": "Merge pull request #217 from tamaina/fix/list-name-code-points",
+      "parents": [
+        "4085154bda21f0b200179c28e06682728f69bb27",
+        "f7950b3420643dc75d2e77d394ee0b01edb161c3"
+      ],
+      "diff_base": "4085154bda21f0b200179c28e06682728f69bb27",
+      "changed_file_count": 5,
+      "changed_paths_sha256": "9a992122ee9026d95db37983a28a9883eb14aba91187bb2d49577d31f246a6ed",
+      "disposition": "grouped",
+      "groups": [
+        "list_name_unicode",
+        "ci"
+      ],
+      "reason": "Unicodeリスト名の既存1〜100コードポイント制限を復元し、関連CIのpathsを補完。同機能の実装・mergeを1項目に統合。",
+      "fork_pr": 217
+    }
+  ],
+  "editorial_refresh": {
+    "author_edit": "af016bb8f56e762d9864bc88710737c88a7b10a5",
+    "previous_audit_target": "e1a614df68f226a8c9ee831994e1727a1ded061f",
+    "policy": "ユーザーが付けたGeneral内の機能別見出し・説明・Client/Serverの構成と表現を維持。削除済みの旧項目は復活させず、以後の実変更だけ統合。",
+    "not_merged_at_snapshot": [
+      "authentication #188 and related Draft branches"
+    ],
+    "latest_public_beta": {
+      "tag": "9000.0.0-beta.3",
+      "sha": "297fd7f2d1418f50f4135d034c45f4c1589ca7c1"
+    },
+    "publication_boundary": "beta.3後に統合済みのMCP #215も掲載。developで実装済みであることと公開タグ収録を区別。",
+    "merged_during_validation": {
+      "pr": 217,
+      "sha": "8b3bbc05b6a1e4686e4f1c793383d3457545c8e0",
+      "reason": "最初のdocs PR218のマージ後確認中に別workerの修正が統合されたため、この1件のみ追加。"
+    }
+  }
+}

@@ -5,7 +5,7 @@
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 import { createApp, defineComponent, h } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import locales from 'i18n';
+import { locales } from '../../../frontend/test/unit/pruned-global-locale-baseline.js';
 import { loadNotFoundPage } from './index.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { pleaseLogin } from '@features/auth/frontend/utility/please-login.js';

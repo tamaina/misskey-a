@@ -6,6 +6,7 @@
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@features/persistence/backend/models/util/id.js';
 import { MiUser } from '@features/users/backend/models/User.js';
+import type { RegistryJsonValue } from '../endpoints/i/registry/registry.schema.js';
 
 // TODO: 同じdomain、同じscope、同じkeyのレコードは二つ以上存在しないように制約付けたい
 @Entity('registry_item')
@@ -41,7 +42,7 @@ export class MiRegistryItem {
 		default: {}, nullable: true,
 		comment: 'The value of the RegistryItem.',
 	})
-	public value: any | null;
+	public value: RegistryJsonValue;
 
 	@Index()
 	@Column('varchar', {

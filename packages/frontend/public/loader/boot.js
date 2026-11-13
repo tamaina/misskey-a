@@ -44,11 +44,14 @@
 	}
 
 	localStorage.setItem('lang', lang);
+	document.documentElement.lang = lang;
+	document.documentElement.dir = typeof CLIENT_LOCALE_DIRECTIONS !== 'undefined' ? CLIENT_LOCALE_DIRECTIONS?.[lang] ?? 'ltr' : 'ltr';
 	//#endregion
 
 	//#region Script
 	async function importAppScript() {
-		await import(CLIENT_ENTRY ? `/vite/${CLIENT_ENTRY.replace('scripts', lang)}` : '/vite/src/_boot_.ts')
+		const localeEntry = typeof CLIENT_LOCALE_ENTRIES !== 'undefined' && CLIENT_LOCALE_ENTRIES?.[lang];
+		await import(localeEntry ? `/vite/${localeEntry}` : CLIENT_ENTRY ? `/vite/${CLIENT_ENTRY.replace('scripts', lang)}` : '/vite/src/_boot_.ts')
 			.catch(async e => {
 				console.error(e);
 				renderError('APP_IMPORT', e);
@@ -118,6 +121,17 @@
 			const style = document.createElement('style');
 			style.innerHTML = customCss;
 			document.head.appendChild(style);
+			// Lazy Vite styles arrive after boot. Keep equal-specificity user
+			// overrides last, including the post composer's font-family reset.
+			const observer = new MutationObserver(() => {
+				if (!style.isConnected) {
+					observer.disconnect();
+					return;
+				}
+				const styles = document.head.querySelectorAll('style, link[rel="stylesheet"]');
+				if (styles[styles.length - 1] !== style) document.head.appendChild(style);
+			});
+			observer.observe(document.head, { childList: true, subtree: true, attributes: true, attributeFilter: ['rel'] });
 		}
 	}
 

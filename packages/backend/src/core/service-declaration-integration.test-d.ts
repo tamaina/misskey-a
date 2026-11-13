@@ -27,6 +27,7 @@ import { AbuseUserReportEntityService } from '@features/moderation/backend/seria
 import { ModerationLogEntityService } from '@features/moderation/backend/serializers/ModerationLogEntityService.js';
 import { service } from '@features/index/backend/service-definitions.js';
 import { ports } from '@features/index/backend/service-ports.js';
+import { BrowserSessionService } from '@features/auth/backend/services/BrowserSessionService.js';
 import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import type { Inputs } from '@features/index/backend/service-definitions.js';
@@ -151,12 +152,13 @@ declare const security: Inputs<typeof authSecurityServices>;
 declare const userSearch: Inputs<typeof userSearchServices>;
 authSecurityServices.create(security);
 userSearchServices.create(userSearch);
+service(BrowserSessionService, [ports.browserSessionsRepository, ports.idService]);
 service(UserAuthService, [ports.redisClient, ports.usersRepository, ports.userProfilesRepository]);
 service(WebAuthnService, [ports.config, ports.meta, ports.redisClient, ports.userSecurityKeysRepository]);
 // @ts-expect-error Config cannot replace the Redis constructor input.
 service(UserAuthService, [ports.config, ports.usersRepository, ports.userProfilesRepository]);
 // @ts-expect-error Redis is a required borrowed input, never created by the feature factory.
-authSecurityServices.create({ config: security.config, meta: security.meta, usersRepository: security.usersRepository, userProfilesRepository: security.userProfilesRepository, userSecurityKeysRepository: security.userSecurityKeysRepository });
+authSecurityServices.create({ browserSessionsRepository: security.browserSessionsRepository, idService: security.idService, config: security.config, meta: security.meta, usersRepository: security.usersRepository, userProfilesRepository: security.userProfilesRepository, userSecurityKeysRepository: security.userSecurityKeysRepository });
 
 // Ranking keeps the former constructor types and excludes its local Featured edge from inputs.
 type RankingArgs = ConstructorParameters<typeof import('@features/discovery/backend/services/HashtagService.js').HashtagService>;

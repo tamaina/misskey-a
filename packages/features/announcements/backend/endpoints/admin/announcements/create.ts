@@ -3,47 +3,28 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminAnnouncementsCreateDefinition, inlineAdminAnnouncementsCreateInput, inlineAdminAnnouncementsCreateOutput } from '../../../../contract/endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { toPackedAnnouncement, toAnnouncementAutoArchiveAt } from '../../../api.dto.js';
 
-import { AnnouncementService } from '../../../services/AnnouncementService.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-const contractProjection = projectEndpointContract(inlineAdminAnnouncementsCreateDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:announcements',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminAnnouncementsCreateInput, typeof inlineAdminAnnouncementsCreateOutput> {
-	constructor(
-		private announcementService: AnnouncementService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const { packed } = await this.announcementService.create({
-				updatedAt: null,
-				title: ps.title,
-				text: ps.text,
-				/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- 空の文字列の場合、nullを渡すようにするため */
-				imageUrl: ps.imageUrl || null,
-				icon: ps.icon,
-				display: ps.display,
-				forExistingUsers: ps.forExistingUsers,
-				silence: ps.silence,
-				needConfirmationToRead: ps.needConfirmationToRead,
-				userId: ps.userId,
-			}, me);
-
-			return packed;
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { announcementsContract } from '../../../api.definition.js';
+import type { AnnouncementsDependencies } from '../../../api.implementation.js';
+export interface AnnouncementCreateDependencies<Actor extends ApiActor> {
+	announcementService: Pick<AnnouncementsDependencies<Actor>['announcementService'], 'create'>;
+}
+export function createAnnouncementCreateProcedure<Actor extends ApiActor>(deps: AnnouncementCreateDependencies<Actor>) {
+	return createApiProcedure<Actor>()(announcementsContract.create)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const autoArchiveAt = toAnnouncementAutoArchiveAt(input.autoArchiveAt);
+			if (autoArchiveAt != null && (Number.isNaN(autoArchiveAt.getTime()) || autoArchiveAt.getTime() <= Date.now())) {
+				throw apiError({ code: 'INVALID_AUTO_ARCHIVE_AT', message: 'Invalid auto archive date.', id: '2a892bd5-487d-46a2-a5fe-3d85ad51defe' });
+			}
+			const { packed } = await deps.announcementService.create({ ...input, autoArchiveAt, updatedAt: null, imageUrl: input.imageUrl || null }, actor);
+			return toPackedAnnouncement(packed);
 		});
-	}
 }

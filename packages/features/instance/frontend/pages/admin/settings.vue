@@ -11,6 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<SearchMarker v-slot="slotProps" :keywords="['information', 'meta']">
 					<MkFolder :defaultOpen="true">
 						<template #icon><SearchIcon><i class="ti ti-info-circle"></i></SearchIcon></template>
+						<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
 						<template #label><SearchLabel>{{ $locale.sfc.info }}</SearchLabel></template>
 						<template v-if="infoForm.modified.value" #footer>
 							<MkFormFooter :form="infoForm"/>
@@ -256,9 +257,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
 						<template #icon><SearchIcon><i class="ti ti-planet"></i></SearchIcon></template>
 						<template #label><SearchLabel>{{ $locale.sfc.federation }}</SearchLabel></template>
-						<template v-if="federationForm.savedState.federation === 'all'" #suffix>{{ $locale.sfc.all }}</template>
+						<template v-if="federationForm.savedState.federation === 'all'" #suffix>{{ globalLocale.env.all }}</template>
 						<template v-else-if="federationForm.savedState.federation === 'specified'" #suffix>{{ $locale.sfc.specifyHost }}</template>
-						<template v-else-if="federationForm.savedState.federation === 'none'" #suffix>{{ $locale.sfc.none }}</template>
+						<template v-else-if="federationForm.savedState.federation === 'none'" #suffix>{{ globalLocale.env.none }}</template>
 						<template v-if="federationForm.modified.value" #footer>
 							<MkFormFooter :form="federationForm"/>
 						</template>
@@ -268,9 +269,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkRadios
 									v-model="federationForm.state.federation"
 									:options="[
-										{ value: 'all', label: $locale.sfc.all },
+										{ value: 'all', label: globalLocale.env.all },
 										{ value: 'specified', label: $locale.sfc.specifyHost },
-										{ value: 'none', label: $locale.sfc.none },
+										{ value: 'none', label: globalLocale.env.none },
 									]"
 								>
 									<template #label><SearchLabel>{{ $locale.sfc.behavior }}</SearchLabel><span v-if="federationForm.modifiedStates.federation" class="_modified">{{ $locale.sfc.modified }}</span></template>
@@ -290,7 +291,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 									<template #label><SearchLabel>{{ $locale.sfc.deliverSuspendedSoftware }}</SearchLabel></template>
 									<template #footer>
 										<div class="_buttons">
-											<MkButton @click="federationForm.state.deliverSuspendedSoftware.push({software: '', versionRange: ''})"><i class="ti ti-plus"></i> {{ $locale.sfc.add }}</MkButton>
+											<MkButton @click="federationForm.state.deliverSuspendedSoftware.push({software: '', versionRange: ''})"><i class="ti ti-plus"></i> {{ globalLocale.env.add }}</MkButton>
 										</div>
 									</template>
 
@@ -385,6 +386,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed } from 'vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -400,6 +402,9 @@ import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import { useForm } from '@features/ui/frontend/composables/use-form.js';
 import MkFormFooter from '@features/ui/frontend/components/MkFormFooter.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const meta = await misskeyApi('admin/meta');
 
@@ -601,7 +606,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "الرئيسية",
-	"info": "عن",
 	"instanceName": "اسم مثيل الخادم",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -646,14 +650,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "الفديرالية",
-	"all": "الكل",
 	"specifyHost": "Specific host",
-	"none": "لا شيء",
 	"behavior": "السلوك",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "إضافة",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "الإصدار",
@@ -672,7 +673,8 @@ definePage(() => ({
 	"proxyAccount": "حساب وكيل البروكسي",
 	"proxyAccountDescription": "يتصرف حساب الوكيل كمتابع بعيد لمستخدمين تحت ظروف معينة. على سبيل المثال ، عندما يضيف مستخدم مستخدمًا بعيدًا إلى قائمة  فإن ملاحظاته لن تُرسل إلى المثيل ما لم يُتابعه مستخدم محلي. وبالتالي فإن حساب الوكيل سوف يتابع هذا المستخدم لكي تُرسل ملاحظاته.",
 	"description": "السيرة",
-	"youCanIncludeHashtags": "يمكنك أيضًا إضافة وسوم إلى سيرتك التعريفية."
+	"youCanIncludeHashtags": "يمكنك أيضًا إضافة وسوم إلى سيرتك التعريفية.",
+	"info": "عن"
 }
 </locale>
 
@@ -681,7 +683,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Vols tornar a executar l'assistent de configuració inicial del servidor?",
 	"restartServerSetupWizardConfirm_text": "Algunes configuracions actuals seran restablertes.",
 	"general": "General",
-	"info": "Informació",
 	"instanceName": "Nom del servidor",
 	"modified": "Modificat",
 	"shortName": "Nom curt",
@@ -726,14 +727,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "Llista d'URLs per restringir la visualització de miniatures",
 	"urlPreviewSensitiveListDescription": "Si separeu els termes amb un espai, s'interpretarà com una condició 'AND'; si els separeu amb un salt de línia, s'interpretarà com una condició 'OR'. Si envolupeu els termes amb barres obliqües, s'interpretarà com una expressió regular. Si es troba una coincidència, la miniatura ja no es mostrarà.",
 	"federation": "Federació",
-	"all": "Tot",
 	"specifyHost": "Especifica un servidor",
-	"none": "Res",
 	"behavior": "Comportament",
 	"federationAllowedHosts": "Llista de servidors federats",
 	"federationAllowedHostsDescription": "Llista dels servidors amb els quals es federa.",
 	"deliverSuspendedSoftware": "Programari que ja no es distribueix",
-	"add": "Afegir",
 	"deliverSuspendedSoftwareDescription": "Pots especificar un rang de noms i versions del programari del servidor per detenir l'entrega, per exemple, degut a vulnerabilitats. Aquesta informació la proporciona el servidor i la seva fiabilitat no es garantitzada. Es pot fer servir una especificació de rang sencer per especificar una versió, però es recomana especificar una versió anterior, com >= 2024.3.1-0, perquè especificar  >= 2024.3.1 no incloure versions personalitzades com 2024.3.1-custom.0.",
 	"softwareName": "Nom del programari",
 	"version": "Versió",
@@ -752,7 +750,8 @@ definePage(() => ({
 	"proxyAccount": "Compte de proxy",
 	"proxyAccountDescription": "Un compte proxy és un compte que actua com a seguidor remot per als usuaris en determinades condicions. Per exemple, quan un usuari afegeix un usuari remot a la llista, l'activitat de l'usuari remot no es lliurarà al servidor si cap usuari local segueix aquest usuari, de manera que el compte proxy el seguirà.",
 	"description": "Biografia ",
-	"youCanIncludeHashtags": "Pots posar etiquetes a la teva biografia "
+	"youCanIncludeHashtags": "Pots posar etiquetes a la teva biografia ",
+	"info": "Informació"
 }
 </locale>
 
@@ -761,7 +760,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Obecně",
-	"info": "Informace",
 	"instanceName": "Název instance",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -806,14 +804,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federace",
-	"all": "Vše",
 	"specifyHost": "Specific host",
-	"none": "Žádný",
 	"behavior": "Chování",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Přidat",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Verze",
@@ -832,7 +827,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy účet",
 	"proxyAccountDescription": "Proxy účet je účet, který za určitých podmínek sleduje uživatele na dálku vaším jménem. Například když uživatel zařadí vzdáleného uživatele do seznamu, pokud nikdo nesleduje uživatele na seznamu, aktivita nebude doručena instanci, takže místo toho bude uživatele sledovat účet proxy.",
 	"description": "O mně",
-	"youCanIncludeHashtags": "V popisku o Vás můžete použít i hastagy."
+	"youCanIncludeHashtags": "V popisku o Vás můžete použít i hastagy.",
+	"info": "Informace"
 }
 </locale>
 
@@ -841,7 +837,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "General",
-	"info": "About",
 	"instanceName": "Instance name",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -886,14 +881,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federation",
-	"all": "All",
 	"specifyHost": "Specific host",
-	"none": "None",
 	"behavior": "Behavior",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Add",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Version",
@@ -912,7 +904,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -921,7 +914,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Möchten Sie den Assistenten für die Ersteinrichtung des Servers erneut ausführen?",
 	"restartServerSetupWizardConfirm_text": "Einige aktuelle Einstellungen werden zurückgesetzt.",
 	"general": "Allgemein",
-	"info": "Über",
 	"instanceName": "Name der Instanz",
 	"modified": "Bearbeitet",
 	"shortName": "Abkürzung",
@@ -966,14 +958,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Föderation",
-	"all": "Alle",
 	"specifyHost": "Host",
-	"none": "Nichts",
 	"behavior": "Verhalten",
 	"federationAllowedHosts": "Föderierte Instanzen",
 	"federationAllowedHostsDescription": "Trage die Hostnamen ein mit den du eine Föderation eingehen möchtest. Trenne mit Zeilenumbruch.",
 	"deliverSuspendedSoftware": "Software, die nicht mehr beliefert wird",
-	"add": "Hinzufügen",
 	"deliverSuspendedSoftwareDescription": "Sie können eine Auswahl von Namen und Versionen verschiedener Serversoftware angeben, um die Zustellung zu stoppen, z. B. aufgrund von Sicherheitslücken. Diese Versionsinformationen werden vom Server bereitgestellt und ihre Zuverlässigkeit ist nicht garantiert. Es wird jedoch empfohlen, eine Vorabversion anzugeben, wie z. B. >= 2024.3.1-0, da die Angabe >= 2024.3.1 keine benutzerdefinierten Versionen wie 2024.3.1-custom.0 einschließt.",
 	"softwareName": "Software Name",
 	"version": "Version",
@@ -992,7 +981,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy-Benutzerkonto",
 	"proxyAccountDescription": "Ein Proxy-Konto ist ein Benutzerkonto, das unter bestimmten Bedingungen als Follower für Benutzer fremder Instanzen fungiert. Wenn zum Beispiel ein Benutzer einen Benutzer einer fremden Instanz zu einer Liste hinzufügt, werden die Aktivitäten des entfernten Benutzers nicht an die Instanz übermittelt, wenn kein lokaler Benutzer diesem Benutzer folgt; stattdessen folgt das Proxy-Konto.",
 	"description": "Profilbeschreibung",
-	"youCanIncludeHashtags": "Du kannst auch Hashtags in deiner Profilbeschreibung verwenden."
+	"youCanIncludeHashtags": "Du kannst auch Hashtags in deiner Profilbeschreibung verwenden.",
+	"info": "Über"
 }
 </locale>
 
@@ -1001,7 +991,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "General",
-	"info": "About",
 	"instanceName": "Instance name",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -1046,14 +1035,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federation",
-	"all": "All",
 	"specifyHost": "Specific host",
-	"none": "None",
 	"behavior": "Behavior",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Add",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Version",
@@ -1072,7 +1058,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -1081,7 +1068,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "¿Reiniciar el asistente de configuración del servidor?",
 	"restartServerSetupWizardConfirm_text": "Algunas configuraciones actuales se restablecerán",
 	"general": "General",
-	"info": "Información",
 	"instanceName": "Nombre de la instancia",
 	"modified": "Modificado",
 	"shortName": "Nombre corto",
@@ -1126,14 +1112,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL para restringir la visualización de miniaturas",
 	"urlPreviewSensitiveListDescription": "Si se separan con un espacio, se interpretará como una condición «AND»; si se separan con un salto de línea, se interpretará como una condición «OR». Si se escriben entre barras, se interpretarán como expresiones regulares. Si se encuentra una coincidencia, no se mostrará la miniatura.",
 	"federation": "Federación",
-	"all": "Todo",
 	"specifyHost": "Especificar Host",
-	"none": "Ninguna",
 	"behavior": "Comportamiento",
 	"federationAllowedHosts": "Servidores federados",
 	"federationAllowedHostsDescription": "La lista de los dominios de las instancias cuya federación está permitida, separadas por saltos de línea.",
 	"deliverSuspendedSoftware": "Software suspendido.",
-	"add": "Agregar",
 	"deliverSuspendedSoftwareDescription": "Puede especificar un rango de nombres y versiones del software del servidor para detener la entrega, por ejemplo, debido a vulnerabilidades. Esta información sobre la versión la proporciona el servidor y su fiabilidad no está garantizada. Se puede utilizar una especificación de rango  para especificar una versión, pero se recomienda especificar una versión previa, como >= 2024.3.1-0, ya que especificar >= 2024.3.1 no incluirá versiones personalizadas como 2024.3.1-custom.0.",
 	"softwareName": "Nombre del software",
 	"version": "Versión",
@@ -1152,7 +1135,8 @@ definePage(() => ({
 	"proxyAccount": "Cuenta proxy",
 	"proxyAccountDescription": "Una cuenta proxy es una cuenta que actúa como un seguidor remoto de un usuario bajo ciertas condiciones. Por ejemplo, cuando un usuario añade un usuario remoto a una lista, si ningún usuario local sigue al usuario agregado a la lista, la instancia no puede obtener su actividad, así que la cuenta proxy sigue al usuario añadido a la lista",
 	"description": "Descripción",
-	"youCanIncludeHashtags": "También puedes incluir hashtags en tu biografía"
+	"youCanIncludeHashtags": "También puedes incluir hashtags en tu biografía",
+	"info": "Información"
 }
 </locale>
 
@@ -1161,7 +1145,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Général",
-	"info": "Informations",
 	"instanceName": "Nom de l’instance",
 	"modified": "Modifié",
 	"shortName": "Nom court",
@@ -1206,14 +1189,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Fédération",
-	"all": "Tous",
 	"specifyHost": "Spécifier un serveur distant",
-	"none": "Rien",
 	"behavior": "Comportement",
 	"federationAllowedHosts": "Serveurs qui autorisent la fédération",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Ajouter",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Nom du logiciel",
 	"version": "Version",
@@ -1232,7 +1212,8 @@ definePage(() => ({
 	"proxyAccount": "Compte proxy",
 	"proxyAccountDescription": "Un compte proxy se comporte, dans certaines conditions, comme un·e abonné·e distant·e pour les utilisateurs d'autres instances. Par exemple, quand un·e utilisateur·rice ajoute un·e utilisateur·rice distant·e à une liste, ses notes ne seront pas visibles sur l'instance si personne ne suit cet·te utilisateur·rice. Le compte proxy va donc suivre cet·te utilisateur·rice pour que ses notes soient acheminées.",
 	"description": "À propos de moi",
-	"youCanIncludeHashtags": "Vous pouvez également inclure des hashtags."
+	"youCanIncludeHashtags": "Vous pouvez également inclure des hashtags.",
+	"info": "Informations"
 }
 </locale>
 
@@ -1241,7 +1222,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Umum",
-	"info": "Informasi",
 	"instanceName": "Nama instansi",
 	"modified": "Diubah",
 	"shortName": "Nama pendek",
@@ -1286,14 +1266,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federasi",
-	"all": "Semua",
 	"specifyHost": "Tentukan host",
-	"none": "Tidak ada",
 	"behavior": "Perilaku",
 	"federationAllowedHosts": "Peladen yang membolehkan federasi",
 	"federationAllowedHostsDescription": "Cantumkan nama domain (hostname) peladen yang ingin anda perbolehkan untuk terdesentralisasi, dipisah dengan jeda baris.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Tambahkan",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Nama Perangkat Lunak",
 	"version": "Versi",
@@ -1312,7 +1289,8 @@ definePage(() => ({
 	"proxyAccount": "Akun proksi",
 	"proxyAccountDescription": "Akun proksi merupakan sebuah akun yang bertindak sebagai pengikut instansi luar untuk pengguna dalam kondisi tertentu. Sebagai contoh, ketika pengguna menambahkan seorang pengguna instansi luar ke dalam daftar, aktivitas dari pengguna instansi luar tidak akan disampaikan ke instansi apabila tidak ada pengguna lokal yang mengikuti pengguna tersebut, dengan begitu akun proksilah yang akan mengikutinya.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "Kamu juga dapat menambahkan tagar ke dalam bio."
+	"youCanIncludeHashtags": "Kamu juga dapat menambahkan tagar ke dalam bio.",
+	"info": "Informasi"
 }
 </locale>
 
@@ -1321,7 +1299,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Vuoi ripetere la procedura guidata di configurazione iniziale del server?",
 	"restartServerSetupWizardConfirm_text": "Verranno ripristinate alcune tue impostazioni personalizzate.",
 	"general": "Generali",
-	"info": "Informazioni",
 	"instanceName": "Nome dell'istanza",
 	"modified": "Modificato",
 	"shortName": "Abbreviazione",
@@ -1366,14 +1343,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL da impedire alla vista delle anteprime",
 	"urlPreviewSensitiveListDescription": "Separando con uno spazio si indica E, separando con una linea si indica O. Circondando con barre / si indica una Espressione Regolare.\nLe URL che coincidono con le indicazioni non verranno visualizzate.",
 	"federation": "Federazione",
-	"all": "Tutte",
 	"specifyHost": "Host specifici",
-	"none": "Nessuna",
 	"behavior": "Comportamento",
 	"federationAllowedHosts": "Server a cui consentire la federazione",
 	"federationAllowedHostsDescription": "Indica gli host dei server a cui è consentita la federazione, uno per ogni linea.",
 	"deliverSuspendedSoftware": "Software fuori produzione",
-	"add": "Aggiungi",
 	"deliverSuspendedSoftwareDescription": "A causa di vulnerabilità o altri motivi, puoi interrompere la distribuzione di un software da un server specificandone il nome e la versione. Le informazioni sono fornite dall'altro server e l'autenticità non è garantita. Puoi indicare un intervallo di versione semantica, ma specificando >= 2024.3.1 non verranno incluse le versioni personalizzate come ad esempio 2024.3.1-custom.0, pertanto ti consigliamo di specificare una versione come >= 2024.3.1-0.",
 	"softwareName": "Nome del software",
 	"version": "Versione",
@@ -1392,7 +1366,8 @@ definePage(() => ({
 	"proxyAccount": "Profilo proxy",
 	"proxyAccountDescription": "Un profilo proxy funziona come follower per i profili remoti, sotto certe condizioni. Ad esempio, quando un profilo locale ne inserisce uno remoto in una lista (senza seguirlo), se nessun altro segue quel profilo remoto, le attività non possono essere distribuite. Dunque, il profilo proxy le seguirà per tutti.",
 	"description": "Biografia",
-	"youCanIncludeHashtags": "Puoi anche includere hashtag."
+	"youCanIncludeHashtags": "Puoi anche includere hashtag.",
+	"info": "Informazioni"
 }
 </locale>
 
@@ -1401,7 +1376,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "サーバーの初期設定ウィザードをやり直しますか？",
 	"restartServerSetupWizardConfirm_text": "現在の一部の設定はリセットされます。",
 	"general": "全般",
-	"info": "情報",
 	"instanceName": "サーバー名",
 	"modified": "変更あり",
 	"shortName": "略称",
@@ -1446,14 +1420,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "サムネイルの表示を制限するURL",
 	"urlPreviewSensitiveListDescription": "スペースで区切るとAND指定になり、改行で区切るとOR指定になります。スラッシュで囲むと正規表現になります。一致した場合、サムネイルが表示されなくなります。",
 	"federation": "連合",
-	"all": "全て",
 	"specifyHost": "ホスト指定",
-	"none": "なし",
 	"behavior": "動作",
 	"federationAllowedHosts": "連合を許可するサーバー",
 	"federationAllowedHostsDescription": "連合を許可するサーバーのホストを改行で区切って設定します。",
 	"deliverSuspendedSoftware": "配信停止中のソフトウェア",
-	"add": "追加",
 	"deliverSuspendedSoftwareDescription": "脆弱性などの理由で、サーバーのソフトウェアの名前及びバージョンの範囲を指定して配信を停止できます。このバージョン情報はサーバーが提供したものであり、信頼性は保証されません。バージョン指定には semver の範囲指定が使用できますが、>= 2024.3.1 と指定すると 2024.3.1-custom.0 のようなカスタムバージョンが含まれないため、>= 2024.3.1-0 のように prerelease の指定を行うことを推奨します。",
 	"softwareName": "ソフトウェア名",
 	"version": "バージョン",
@@ -1472,7 +1443,8 @@ definePage(() => ({
 	"proxyAccount": "プロキシアカウント",
 	"proxyAccountDescription": "プロキシアカウントは、特定の条件下でユーザーのリモートフォローを代行するアカウントです。例えば、ユーザーがリモートユーザーをリストに入れたとき、リストに入れられたユーザーを誰もフォローしていないとアクティビティがサーバーに配達されないため、代わりにプロキシアカウントがフォローするようにします。",
 	"description": "自己紹介",
-	"youCanIncludeHashtags": "ハッシュタグを含めることができます。"
+	"youCanIncludeHashtags": "ハッシュタグを含めることができます。",
+	"info": "情報"
 }
 </locale>
 
@@ -1481,7 +1453,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "サーバーの初期設定ウィザードをやり直すん？",
 	"restartServerSetupWizardConfirm_text": "現在の一部の設定はリセットされるで。",
 	"general": "全般",
-	"info": "情報",
 	"instanceName": "サーバー名",
 	"modified": "変更あり",
 	"shortName": "略称",
@@ -1526,14 +1497,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "サムネイルの表示を制限するURL",
 	"urlPreviewSensitiveListDescription": "スペースで区切るとAND指定になり、改行で区切るとOR指定になります。スラッシュで囲むと正規表現になります。一致した場合、サムネイルが表示されなくなります。",
 	"federation": "連合",
-	"all": "みんな",
 	"specifyHost": "ホスト指定",
-	"none": "なし",
 	"behavior": "動作",
 	"federationAllowedHosts": "連合を許すサーバー",
 	"federationAllowedHostsDescription": "連合してもいいサーバーのホストを行ごとに区切って設定してや。",
 	"deliverSuspendedSoftware": "配信停止中のソフトウェア",
-	"add": "増やす",
 	"deliverSuspendedSoftwareDescription": "脆弱性とかの理由で、サーバーのソフトウェアの名前とバージョンの範囲を決めて配信を止められるで。このバージョン情報はサーバーが提供したものやから、信頼性は保証されへん。バージョン指定には semver の範囲指定が使えるねんけど、>= 2024.3.1と指定すると 2024.3.1-custom.0 みたいなカスタムバージョンが含まれへんから、>= 2024.3.1-0 みたいに prerelease を指定するとええかもしれへんな。",
 	"softwareName": "ソフトウェア名",
 	"version": "バージョン",
@@ -1552,7 +1520,8 @@ definePage(() => ({
 	"proxyAccount": "プロキシアカウント",
 	"proxyAccountDescription": "プロキシアカウントは、代わりにフォローしてくれるアカウントや。例えば、551に豚まんが無いときやったり、ユーザーがリモートユーザーをアカウントに入れたとき、リストに入れられたユーザーが誰からもフォローされてないと寂しいやん。寂しいし、アクティビティも配達されへんから、プロキシアカウントがフォローしてくれるで。ええやつやん…",
 	"description": "自己紹介",
-	"youCanIncludeHashtags": "ハッシュタグを含めることができるで。"
+	"youCanIncludeHashtags": "ハッシュタグを含めることができるで。",
+	"info": "情報"
 }
 </locale>
 
@@ -1561,7 +1530,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "General",
-	"info": "About",
 	"instanceName": "Instance name",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -1606,14 +1574,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federation",
-	"all": "All",
 	"specifyHost": "Specific host",
-	"none": "None",
 	"behavior": "Behavior",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Add",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Version",
@@ -1632,7 +1597,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -1641,7 +1607,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "General",
-	"info": "About",
 	"instanceName": "Instance name",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -1686,14 +1651,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federation",
-	"all": "All",
 	"specifyHost": "Specific host",
-	"none": "None",
 	"behavior": "Behavior",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Add",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Version",
@@ -1712,7 +1674,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -1721,7 +1684,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "서버의 초기 설정 위자드를 재시도하시겠습니까?",
 	"restartServerSetupWizardConfirm_text": "현재 일부 설정은 리셋됩니다.",
 	"general": "일반",
-	"info": "정보",
 	"instanceName": "서버 이름",
 	"modified": "변경 있음",
 	"shortName": "약칭",
@@ -1766,14 +1728,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "썸네일 표시 제한 URL",
 	"urlPreviewSensitiveListDescription": "공백으로 구분하면 AND 지정으로 되고, 줄내림으로 구분하면 OR 지정으로 됩니다. 슬래시로 감싸면 정규 표현으로 됩니다. 일치한 경우에 썸네일이 표시되지 않게 됩니다.",
 	"federation": "연합",
-	"all": "전체",
 	"specifyHost": "호스트 지정",
-	"none": "없음",
 	"behavior": "동작",
 	"federationAllowedHosts": "연합을 허가하는 서버",
 	"federationAllowedHostsDescription": "연합을 허가하는 서버의 호스트를 엔터로 구분해서 설정합니다.",
 	"deliverSuspendedSoftware": "전달 정지 중인 소프트웨어",
-	"add": "추가",
 	"deliverSuspendedSoftwareDescription": "취약성 등의 이유로 서버의 소프트웨어 이름 및 버전 범위를 지정하여 전달을 정지할 수 있어요. 이 버전 정보는 서버가 제공한 것이며 신뢰성은 보장되지 않아요. 버전 지정에는 semver의 범위 지정을 사용할 수 있지만, >= 2024.3.1로 지정하면 2024.3.1-custom.0과 같은 custom.0과 같은 custom 버전이 포함되지 않기 때문에 >= 2024.3.1-0과 같이 prerelease를 지정하는 것이 좋아요.",
 	"softwareName": "소프트웨어 이름",
 	"version": "버전",
@@ -1792,7 +1751,8 @@ definePage(() => ({
 	"proxyAccount": "프록시 계정",
 	"proxyAccountDescription": "프록시 계정은 특정 조건 하에서 유저의 리모트 팔로우를 대행하는 계정입니다. 예를 들면, 유저가 리모트 유저를 리스트에 넣었을 때, 리스트에 들어간 유저를 아무도 팔로우한 적이 없다면 액티비티가 서버로 배달되지 않기 때문에, 대신 프록시 계정이 해당 유저를 팔로우하도록 합니다.",
 	"description": "자기소개",
-	"youCanIncludeHashtags": "해시 태그를 포함할 수 있습니다."
+	"youCanIncludeHashtags": "해시 태그를 포함할 수 있습니다.",
+	"info": "정보"
 }
 </locale>
 
@@ -1801,7 +1761,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Algemeen",
-	"info": "Over",
 	"instanceName": "Naam van de server",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -1846,14 +1805,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federatie",
-	"all": "Alle",
 	"specifyHost": "Specificeer host",
-	"none": "Niets",
 	"behavior": "Gedrag",
 	"federationAllowedHosts": "Servers die mogen federeren ",
 	"federationAllowedHostsDescription": "Geef de hostnamen van de servers die mogen federeren op, elk op hun eigen regel.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Toevoegen",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Versie",
@@ -1872,7 +1828,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "Een proxy-account is een account dat onder bepaalde voorwaarden fungeert als externe volger voor gebruikers. Als een gebruiker bijvoorbeeld een externe gebruiker aan de lijst toevoegt, wordt de activiteit van de externe gebruiker niet aan de server geleverd als geen lokale gebruiker die gebruiker volgt, dus het proxy-account volgt in plaats daarvan.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "Over"
 }
 </locale>
 
@@ -1881,7 +1838,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Generelt",
-	"info": "Infomasjon",
 	"instanceName": "Servernavn",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -1926,14 +1882,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Føderasjon",
-	"all": "Alle",
 	"specifyHost": "Specific host",
-	"none": "Ingen",
 	"behavior": "Oppførsel",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Legg til",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Versjon",
@@ -1952,7 +1905,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Biografi",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "Infomasjon"
 }
 </locale>
 
@@ -1961,7 +1915,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Ogólne",
-	"info": "Informacje",
 	"instanceName": "Nazwa instancji",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -2006,14 +1959,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federacja",
-	"all": "Wszystkie",
 	"specifyHost": "Specific host",
-	"none": "Brak",
 	"behavior": "Zachowanie",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Dodaj",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Wersja",
@@ -2032,7 +1982,8 @@ definePage(() => ({
 	"proxyAccount": "Konto proxy",
 	"proxyAccountDescription": "Opis konta pełnomocniczego",
 	"description": "Opis",
-	"youCanIncludeHashtags": "Możesz umieścić hashtagi w swoim opisie."
+	"youCanIncludeHashtags": "Możesz umieścić hashtagi w swoim opisie.",
+	"info": "Informacje"
 }
 </locale>
 
@@ -2041,7 +1992,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Reiniciar o assistente de configuração?",
 	"restartServerSetupWizardConfirm_text": "Algumas configurações atuais serão reiniciadas.",
 	"general": "Geral",
-	"info": "Informações",
 	"instanceName": "Nome da instância",
 	"modified": "Modificado",
 	"shortName": "Abreviação",
@@ -2086,14 +2036,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federação",
-	"all": "Todos",
 	"specifyHost": "Especificar um hospedeiro",
-	"none": "Nenhum",
 	"behavior": "Comportamento",
 	"federationAllowedHosts": "Servidores com federação permitida",
 	"federationAllowedHostsDescription": "Especifique o endereço dos servidores em que deseja permitir a federação separados por linha.",
 	"deliverSuspendedSoftware": "Software Suspenso",
-	"add": "Adicionar",
 	"deliverSuspendedSoftwareDescription": "Você pode especificar uma faixa de nomes e versões do software de servidores para cancelar o envio de conteúdo por motivos como vulnerabilidades. Essa informação da versão é providenciada pelo servidor e pode não ser confiável. Uma faixa semver pode ser utilizada para especificar a versão, mas colocar '>= 2024.3.1' não incluirá versões personalizadas como '2024.3.1-custom.0'. Logo, é recomendado inserir uma especificação como '>= 2024.3.1-0'",
 	"softwareName": "Software",
 	"version": "Versão",
@@ -2112,7 +2059,8 @@ definePage(() => ({
 	"proxyAccount": "Conta proxy",
 	"proxyAccountDescription": "Uma conta de proxy é uma conta que assume o acompanhamento remoto de um usuário sob certas condições específicas. Por exemplo, quando um usuário inclui um usuário remoto em uma lista, mas ninguém na lista está seguindo o usuário remoto, a atividade não é entregue ao servidor. Nesse caso, a conta de proxy entra em ação para seguir o usuário remoto em vez disso.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "Você pode incluir hashtags em sua bio."
+	"youCanIncludeHashtags": "Você pode incluir hashtags em sua bio.",
+	"info": "Informações"
 }
 </locale>
 
@@ -2121,7 +2069,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Общее",
-	"info": "Описание",
 	"instanceName": "Название инстанса",
 	"modified": "Изменено",
 	"shortName": "Short name",
@@ -2166,14 +2113,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Федерация",
-	"all": "Все",
 	"specifyHost": "Указать сайт",
-	"none": "Ничего",
 	"behavior": "Поведение",
 	"federationAllowedHosts": "Серверы, поддерживающие федерацию",
 	"federationAllowedHostsDescription": "Укажите имена серверов, для которых вы хотите разрешить объединение, разделив их разделителями строк.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Добавить",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software Name",
 	"version": "Версия",
@@ -2192,7 +2136,8 @@ definePage(() => ({
 	"proxyAccount": "Учётная запись прокси",
 	"proxyAccountDescription": "Учетная запись прокси предназначена служить подписчиком на пользователей с других сайтов. Например: если пользователь добавит кого-то с другого сайта в список, то деятельность того не отобразится, пока никто с этого же сайта не подписан на него. Чтобы это стало возможным, на него подписывается прокси.",
 	"description": "О себе",
-	"youCanIncludeHashtags": "Можете использовать здесь хештеги."
+	"youCanIncludeHashtags": "Можете использовать здесь хештеги.",
+	"info": "Описание"
 }
 </locale>
 
@@ -2201,7 +2146,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Všeobecné",
-	"info": "Informácie",
 	"instanceName": "Názov servera",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -2246,14 +2190,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federácia",
-	"all": "Všetko",
 	"specifyHost": "Specific host",
-	"none": "Žiadne",
 	"behavior": "Správanie",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Pridať",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Verzia",
@@ -2272,7 +2213,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy účet",
 	"proxyAccountDescription": "Proxy účet je účet, ktorý za určitých podmienok sleduje používateľov na diaľku vaším menom. Napríklad keď používateľ zaradí vzdialeného používateľa do zoznamu, pokiaľ nikto nesleduje používateľa na zozname, aktivita nebude doručená na server, takže namiesto toho bude používateľa sledova proxy účet.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "Vo svojom bio môžete mať aj hashtagy."
+	"youCanIncludeHashtags": "Vo svojom bio môžete mať aj hashtagy.",
+	"info": "Informácie"
 }
 </locale>
 
@@ -2281,7 +2223,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "ต้องการเริ่มวิซาร์ดการตั้งค่าเซิร์ฟเวอร์ใหม่หรือไม่?",
 	"restartServerSetupWizardConfirm_text": "การตั้งค่าบางส่วนในปัจจุบันจะถูกรีเซ็ต",
 	"general": "ทั่วไป",
-	"info": "เกี่ยวกับ",
 	"instanceName": "ชื่อเซิร์ฟเวอร์",
 	"modified": "แก้ไข",
 	"shortName": "ชื่อย่อ",
@@ -2326,14 +2267,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "สหพันธ์",
-	"all": "ทั้งหมด",
 	"specifyHost": "ระบุโฮสต์",
-	"none": "ไม่มี",
 	"behavior": "พฤติกรรม",
 	"federationAllowedHosts": "เซิร์ฟเวอร์ที่อนุญาตให้เชื่อมกับสหพันธ์",
 	"federationAllowedHostsDescription": "ระบุโฮสต์ของเซิร์ฟเวอร์ที่อนุญาตให้เชื่อมกับสหพันธ์ โดยแยกแต่ละรายการด้วยบรรทัดใหม่",
 	"deliverSuspendedSoftware": "ซอฟต์แวร์ที่หยุดการเผยแพร่",
-	"add": "เพิ่ม",
 	"deliverSuspendedSoftwareDescription": "เนื่องจากเหตุผลด้านช่องโหว่ เป็นต้น สามารถหยุดการแจกจ่ายโดยระบุชื่อซอฟต์แวร์ของเซิร์ฟเวอร์และช่วงของเวอร์ชันได้ ข้อมูลเวอร์ชันนี้เป็นข้อมูลที่เซิร์ฟเวอร์ให้มา จึงไม่สามารถรับประกันความน่าเชื่อถือได้ สามารถใช้การระบุช่วงเวอร์ชันแบบ semver ได้ แต่ถ้าระบุเป็น >= 2024.3.1 จะไม่รวมเวอร์ชันแบบกำหนดเอง เช่น 2024.3.1-custom.0 จึงแนะนำให้ระบุเป็น >= 2024.3.1-0 ซึ่งเป็นการระบุแบบ prerelease",
 	"softwareName": "ชื่อซอฟต์แวร์",
 	"version": "เวอร์ชั่น",
@@ -2352,7 +2290,8 @@ definePage(() => ({
 	"proxyAccount": "บัญชีพร็อกซี่",
 	"proxyAccountDescription": "บัญชีพร็อกซี คือ บัญชีที่ทำหน้าที่ติดตาม(ผู้ใช้)ระยะไกลภายใต้เงื่อนไขบางประการ ตัวอย่างเช่น เมื่อผู้ใช้ท้องถิ่นเพิ่มผู้ใช้ระยะไกลลงรายชื่อ หากไม่มีใครติดตามผู้ใช้ระยะไกลในรายชื่อนั้น กิจกรรมก็จะไม่ถูกส่งมายังเซิร์ฟเวอร์ ดังนั้นจึงมีบัญชีพร็อกซีไว้ติดตามผู้ใช้ระยะไกลเหล่านั้น",
 	"description": "แนะนำตัว",
-	"youCanIncludeHashtags": "คุณสามารถใส่แฮชแท็กในส่วนแนะนำตัวของคุณได้"
+	"youCanIncludeHashtags": "คุณสามารถใส่แฮชแท็กในส่วนแนะนำตัวของคุณได้",
+	"info": "เกี่ยวกับ"
 }
 </locale>
 
@@ -2361,7 +2300,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Sunucu kurulum sihirbazını yeniden başlatmak ister misin?",
 	"restartServerSetupWizardConfirm_text": "Bazı mevcut ayarlar sıfırlanacaktır.",
 	"general": "Genel",
-	"info": "Hakkında",
 	"instanceName": "Sunucu adı",
 	"modified": "Değiştirilmiş",
 	"shortName": "Kısa ad",
@@ -2406,14 +2344,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federasyon",
-	"all": "Tümü",
 	"specifyHost": "Belirli ana bilgisayar",
-	"none": "Hiçbiri",
 	"behavior": "Davranış",
 	"federationAllowedHosts": "Federasyona izin verilen sunucular",
 	"federationAllowedHostsDescription": "Federasyona izin vermek istediğiniz sunucuların ana bilgisayar adlarını satır sonlarıyla ayırın.",
 	"deliverSuspendedSoftware": "Askıya Alınan Yazılım",
-	"add": "Ekle",
 	"deliverSuspendedSoftwareDescription": "Güvenlik açığı veya diğer nedenlerle sunucunun yazılımının belirli bir isim ve sürüm aralığı için teslimatı durdurabilirsiniz. Bu sürüm bilgileri sunucu tarafından sağlanır ve güvenilirliği garanti edilmez. Sürümü belirtmek için semver aralığı belirtilebilir, ancak >= 2024.3.1 belirtildiğinde 2024.3.1-custom.0 gibi özel sürümler dahil edilmez, bu nedenle >= 2024.3.1-0 gibi ön sürüm belirtimi kullanılması önerilir.",
 	"softwareName": "Yazılım",
 	"version": "Sürüm",
@@ -2432,7 +2367,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy hesabı",
 	"proxyAccountDescription": "Proxy hesabı, belirli koşullar altında kullanıcılar için uzaktan takipçi görevi gören bir hesap. Örneğin, bir kullanıcı listeye uzaktan bir kullanıcı eklediğinde, o kullanıcıyı takip eden yerel kullanıcı yoksa uzaktan kullanıcının etkinliği örneğe iletilmez, bunun yerine proxy hesabı takip eder.",
 	"description": "Biyografi",
-	"youCanIncludeHashtags": "Biyografinize hashtag'ler de ekleyebilirsiniz."
+	"youCanIncludeHashtags": "Biyografinize hashtag'ler de ekleyebilirsiniz.",
+	"info": "Hakkında"
 }
 </locale>
 
@@ -2441,7 +2377,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "General",
-	"info": "About",
 	"instanceName": "Instance name",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -2486,14 +2421,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Federation",
-	"all": "All",
 	"specifyHost": "Specific host",
-	"none": "None",
 	"behavior": "Behavior",
 	"federationAllowedHosts": "Federation allowed servers",
 	"federationAllowedHostsDescription": "Specify the hostnames of the servers you want to allow federation separated by line breaks.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Add",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Software",
 	"version": "Version",
@@ -2512,7 +2444,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -2521,7 +2454,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Загальне",
-	"info": "Інформація",
 	"instanceName": "Назва інстансу",
 	"modified": "Змінено",
 	"shortName": "Коротке ім'я",
@@ -2566,14 +2498,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "Посилання для обмеження показу мініатюр",
 	"urlPreviewSensitiveListDescription": "Використовуйте пробіл щоб зазначити умову AND, та перенесення на наступний ряд щоб зазначити умову OR. Закрийте текст використовуючи символ \"/\" для використання регулярних виразів. Якщо збіг знайдено, мініатюру буде сховано.",
 	"federation": "Федіверс",
-	"all": "Всі",
 	"specifyHost": "Вказати хост",
-	"none": "Відсутній",
 	"behavior": "Поведінка",
 	"federationAllowedHosts": "Сервери, що підтримують федерацію",
 	"federationAllowedHostsDescription": "Вкажіть імена хостів серверів, з якими потрібно дозволити федерацію, кожне з нового рядка.",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Додати",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Програмне забезпечення",
 	"version": "Версія",
@@ -2592,7 +2521,8 @@ definePage(() => ({
 	"proxyAccount": "Проксі-акаунт",
 	"proxyAccountDescription": "Обліковий запис проксі – це обліковий запис, який діє як віддалений підписник для користувачів за певних умов. Наприклад, коли користувач додає віддаленого користувача до списку, активність віддаленого користувача не буде доставлена на сервер, якщо жоден локальний користувач не стежить за цим користувачем, то замість нього буде використовуватися обліковий запис проксі-сервера.",
 	"description": "Про себе",
-	"youCanIncludeHashtags": "Ви також можете включити хештеги у свій опис."
+	"youCanIncludeHashtags": "Ви також можете включити хештеги у свій опис.",
+	"info": "Інформація"
 }
 </locale>
 
@@ -2601,7 +2531,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "Restart server setup wizard?",
 	"restartServerSetupWizardConfirm_text": "Some current settings will be reset.",
 	"general": "Tổng quan",
-	"info": "Giới thiệu",
 	"instanceName": "Tên máy chủ",
 	"modified": "Modified",
 	"shortName": "Short name",
@@ -2646,14 +2575,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "URL to restrict thumbnail display",
 	"urlPreviewSensitiveListDescription": "Use spaces to specify AND conditions, and line breaks to specify OR conditions. Enclose text in slashes to use regular expressions. If a match is found, the thumbnail will be hidden.",
 	"federation": "Liên hợp",
-	"all": "Tất cả",
 	"specifyHost": "Specific host",
-	"none": "Không",
 	"behavior": "Thao tác",
 	"federationAllowedHosts": "Các máy chủ được phép liên kết",
 	"federationAllowedHostsDescription": "Điền tên các máy chủ mà bạn muốn cho phép liên kết, cách nhau bởi dấu xuống dòng",
 	"deliverSuspendedSoftware": "Suspended Software",
-	"add": "Thêm",
 	"deliverSuspendedSoftwareDescription": "You can specify a range of names and versions of the server's software to stop delivery for vulnerability or other reasons. This version information is provided by the server and is not guaranteed to be reliable. A semver range specification can be used to specify the version, but specifying >= 2024.3.1 will not include custom versions such as 2024.3.1-custom.0, so it is recommended that a prerelease specification be used, such as >= 2024.3.1-0",
 	"softwareName": "Tên phần mềm",
 	"version": "Phiên bản",
@@ -2672,7 +2598,8 @@ definePage(() => ({
 	"proxyAccount": "Tài khoản proxy",
 	"proxyAccountDescription": "Tài khoản proxy là tài khoản hoạt động như một người theo dõi từ xa cho người dùng trong những điều kiện nhất định. Ví dụ: khi người dùng thêm người dùng từ xa vào danh sách, hoạt động của người dùng từ xa sẽ không được chuyển đến phiên bản nếu không có người dùng cục bộ nào theo dõi người dùng đó, vì vậy tài khoản proxy sẽ theo dõi.",
 	"description": "Tiểu sử",
-	"youCanIncludeHashtags": "Bạn có thể dùng hashtag trong tiểu sử."
+	"youCanIncludeHashtags": "Bạn có thể dùng hashtag trong tiểu sử.",
+	"info": "Giới thiệu"
 }
 </locale>
 
@@ -2681,7 +2608,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "要重新开始服务器初始设定向导吗？",
 	"restartServerSetupWizardConfirm_text": "当前的部分设置将被重置。",
 	"general": "常规设置",
-	"info": "关于",
 	"instanceName": "服务器名称",
 	"modified": "有变更",
 	"shortName": "简称",
@@ -2726,14 +2652,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "限制显示缩略图的 URL",
 	"urlPreviewSensitiveListDescription": "AND 条件用空格分隔，OR 条件用换行符分隔，正则表达式用斜线包裹。成功匹配则不再显示缩略图。",
 	"federation": "联邦",
-	"all": "全部",
 	"specifyHost": "指定主机名",
-	"none": "无",
 	"behavior": "行为",
 	"federationAllowedHosts": "允许联邦交互的服务器",
 	"federationAllowedHostsDescription": "设定允许联邦通信的服务器，以换行分隔。",
 	"deliverSuspendedSoftware": "停止投递的软件",
-	"add": "添加",
 	"deliverSuspendedSoftwareDescription": "可因安全漏洞之类的原因，停止向指定的服务器及服务器版本送信。版本信息由服务器提供，不保证可靠性。可使用 semver 范围来指定版本，但指定 >= 2024.3.1 将不包括如 2024.3.1-custom.0 等自定义版本，因此建议像 >= 2024.3.1-0 这样指定 prerelease 版本。",
 	"softwareName": "软件名",
 	"version": "版本",
@@ -2752,7 +2675,8 @@ definePage(() => ({
 	"proxyAccount": "代理账户",
 	"proxyAccountDescription": "代理账户是在某些情况下替代用户进行远程关注用的账户。 例如说，当用户将一位远程用户放入一个列表中时，如果本地服务器上没有任何人关注这位远程用户，则这位远程用户的账户活动将不会被送到本地服务器上。作为替代，此时将使用代理账户进行关注。",
 	"description": "个人简介",
-	"youCanIncludeHashtags": "可以在个人简介中包含 #标签。"
+	"youCanIncludeHashtags": "可以在个人简介中包含 #标签。",
+	"info": "关于"
 }
 </locale>
 
@@ -2761,7 +2685,6 @@ definePage(() => ({
 	"restartServerSetupWizardConfirm_title": "要重新執行伺服器的初始設定精靈嗎？",
 	"restartServerSetupWizardConfirm_text": "當前的部分設定將會被重設。",
 	"general": "一般",
-	"info": "資訊",
 	"instanceName": "伺服器名稱",
 	"modified": "已變更",
 	"shortName": "簡稱",
@@ -2806,14 +2729,11 @@ definePage(() => ({
 	"urlPreviewSensitiveList": "限制縮圖顯示的 URL",
 	"urlPreviewSensitiveListDescription": "以空格指定為 AND，以換行指定為 OR。若以斜線（/）包圍則視為正規表達式。符合條件時，將不再顯示縮圖。",
 	"federation": "站台聯邦",
-	"all": "全部",
 	"specifyHost": "指定主機",
-	"none": "無",
 	"behavior": "行為",
 	"federationAllowedHosts": "允許聯邦通訊的伺服器",
 	"federationAllowedHostsDescription": "設定允許聯邦通訊的伺服器主機，以換行符號分隔。",
 	"deliverSuspendedSoftware": "已停止發佈的軟體",
-	"add": "新增",
 	"deliverSuspendedSoftwareDescription": "由於脆弱性等原因，可以指定伺服器軟體的名稱與版本範圍來停止其發佈。這些版本資訊是由伺服器所提供，其可靠性無法保證。版本的指定可以使用 semver（語意化版本控制） 的範圍語法，但如果指定為 >= 2024.3.1，則像 2024.3.1-custom.0 這樣的自訂版本將不會被包含在內，因此建議使用 >= 2024.3.1-0 的方式來同時包含預發佈版本。",
 	"softwareName": "軟體名稱",
 	"version": "版本",
@@ -2832,6 +2752,7 @@ definePage(() => ({
 	"proxyAccount": "代理帳戶",
 	"proxyAccountDescription": "代理帳戶是在特定條件下充當遠端追隨者的帳戶。例如，當使用者新增遠端使用者至其列表時，若沒有本地使用者追隨該遠端使用者，則其活動將不會傳送至伺服器，此時便會由代理帳戶代為追隨以解決問題。",
 	"description": "關於我",
-	"youCanIncludeHashtags": "你也可以在「關於我」中加上 #tag"
+	"youCanIncludeHashtags": "你也可以在「關於我」中加上 #tag",
+	"info": "資訊"
 }
 </locale>

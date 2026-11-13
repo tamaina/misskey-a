@@ -35,15 +35,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div :class="$style.status">
 				<MkA :class="$style.statusItem" :to="userPage(user, 'notes')">
-					<div :class="$style.statusItemLabel">{{ $locale.sfc.notes }}</div>
+					<div :class="$style.statusItemLabel">{{ globalLocale.env.notes }}</div>
 					<div>{{ number(user.notesCount) }}</div>
 				</MkA>
 				<MkA v-if="isFollowingVisibleForMe(user)" :class="$style.statusItem" :to="userPage(user, 'following')">
-					<div :class="$style.statusItemLabel">{{ $locale.sfc.following }}</div>
+					<div :class="$style.statusItemLabel">{{ globalLocale.env.following }}</div>
 					<div>{{ number(user.followingCount) }}</div>
 				</MkA>
 				<MkA v-if="isFollowersVisibleForMe(user)" :class="$style.statusItem" :to="userPage(user, 'followers')">
-					<div :class="$style.statusItemLabel">{{ $locale.sfc.followers }}</div>
+					<div :class="$style.statusItemLabel">{{ globalLocale.env.followers }}</div>
 					<div>{{ number(user.followersCount) }}</div>
 				</MkA>
 			</div>
@@ -58,10 +58,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onMounted, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkFollowButton from '@features/relationships/frontend/components/MkFollowButton.vue';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { getUserMenu } from '@features/users/frontend/utility/get-user-menu.js';
@@ -70,6 +71,9 @@ import { prefer } from '@features/preferences/frontend/preferences.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { isFollowingVisibleForMe, isFollowersVisibleForMe } from '@features/relationships/frontend/utility/isFfVisibleForMe.js';
 import { getStaticImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	showing: boolean;
@@ -100,12 +104,11 @@ async function fetchUser() {
 		user.value = props.q;
 		error.value = false;
 	} else {
-		const query: Misskey.entities.UsersShowRequest = props.q.startsWith('@') ?
+		const query: { userId: string } | { username: string; host?: string | null } = props.q.startsWith('@') ?
 			Misskey.acct.parse(props.q.substring(1)) :
 			{ userId: props.q };
 
-		// @ts-expect-error payloadの引数側の型が正常に解決されない
-		misskeyApi('users/show', query).then(res => {
+		misskeyApi<void, 'users/show', typeof query>('users/show', query).then(res => {
 			if (!props.showing) return;
 			user.value = res;
 			error.value = false;
@@ -254,279 +257,195 @@ onMounted(() => {
 <locale locale="ar-SA" lang="json">
 {
   "followsYou": "يتابعك",
-  "noAccountDescription": "لم يكتب هذا المستخدم سيرته بعد.",
-  "notes": "الملاحظات",
-  "following": "المتابَعون",
-  "followers": "المتابِعون"
+  "noAccountDescription": "لم يكتب هذا المستخدم سيرته بعد."
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
   "followsYou": "Et segueix",
-  "noAccountDescription": "Aquest usuari encara no ha escrit la seva biografia.",
-  "notes": "Notes",
-  "following": "Segueixes ",
-  "followers": "Seguidors"
+  "noAccountDescription": "Aquest usuari encara no ha escrit la seva biografia."
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
   "followsYou": "Sledují vás",
-  "noAccountDescription": "Tento uživatel zatím nenapsal svou biografii.",
-  "notes": "Poznámky",
-  "following": "Sledovaní",
-  "followers": "Sledující"
+  "noAccountDescription": "Tento uživatel zatím nenapsal svou biografii."
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
   "followsYou": "Follows you",
-  "noAccountDescription": "This user has not written their bio yet.",
-  "notes": "Notes",
-  "following": "Following",
-  "followers": "Followers"
+  "noAccountDescription": "This user has not written their bio yet."
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
   "followsYou": "Folgt dir",
-  "noAccountDescription": "Dieser Nutzer hat seine Profilbeschreibung noch nicht ausgefüllt",
-  "notes": "Notizen",
-  "following": "Folgt",
-  "followers": "Gefolgt von"
+  "noAccountDescription": "Dieser Nutzer hat seine Profilbeschreibung noch nicht ausgefüllt"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
   "followsYou": "Follows you",
-  "noAccountDescription": "This user has not written their bio yet.",
-  "notes": "Notes",
-  "following": "Following",
-  "followers": "Followers"
+  "noAccountDescription": "This user has not written their bio yet."
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
   "followsYou": "Te sigue",
-  "noAccountDescription": "Este usuario no ha escrito su biografía aún",
-  "notes": "Notas",
-  "following": "Siguiendo",
-  "followers": "Seguidores"
+  "noAccountDescription": "Este usuario no ha escrito su biografía aún"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
   "followsYou": "Vous suit",
-  "noAccountDescription": "L’utilisateur·rice n’a pas encore renseigné de biographie de présentation sur son profil.",
-  "notes": "Notes",
-  "following": "Abonnements",
-  "followers": "Abonné·e·s"
+  "noAccountDescription": "L’utilisateur·rice n’a pas encore renseigné de biographie de présentation sur son profil."
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
   "followsYou": "Mengikuti kamu",
-  "noAccountDescription": "Belum ada bio",
-  "notes": "Catatan",
-  "following": "Ikuti",
-  "followers": "Pengikut"
+  "noAccountDescription": "Belum ada bio"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
   "followsYou": "Follower",
-  "noAccountDescription": "La persona non ha ancora scritto alcuna autobiografia.",
-  "notes": "Note",
-  "following": "Following",
-  "followers": "Follower"
+  "noAccountDescription": "La persona non ha ancora scritto alcuna autobiografia."
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
   "followsYou": "フォローされています",
-  "noAccountDescription": "自己紹介はありません",
-  "notes": "ノート",
-  "following": "フォロー",
-  "followers": "フォロワー"
+  "noAccountDescription": "自己紹介はありません"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
   "followsYou": "フォローされとるで",
-  "noAccountDescription": "自己紹介食ってもた",
-  "notes": "ノート",
-  "following": "フォロー",
-  "followers": "フォロワー"
+  "noAccountDescription": "自己紹介食ってもた"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
   "followsYou": "Yeṭṭafaṛ-ik·em-id",
-  "noAccountDescription": "This user has not written their bio yet.",
-  "notes": "Notes",
-  "following": "Ig ṭṭafaṛ",
-  "followers": "Imeḍfaṛen"
+  "noAccountDescription": "This user has not written their bio yet."
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
   "followsYou": "Follows you",
-  "noAccountDescription": "ಇವರು ಸ್ವಯಂ ಪರಿಚಯ ರಚಿಸಿಲ್ಲ",
-  "notes": "Notes",
-  "following": "Following",
-  "followers": "Followers"
+  "noAccountDescription": "ಇವರು ಸ್ವಯಂ ಪರಿಚಯ ರಚಿಸಿಲ್ಲ"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
   "followsYou": "나를 팔로우 합니다",
-  "noAccountDescription": "자기소개가 없습니다",
-  "notes": "노트",
-  "following": "팔로잉",
-  "followers": "팔로워"
+  "noAccountDescription": "자기소개가 없습니다"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
   "followsYou": "Volgt jou",
-  "noAccountDescription": "Deze gebruiker heeft nog geen bio geschreven",
-  "notes": "Notities",
-  "following": "Volgend",
-  "followers": "Volgers"
+  "noAccountDescription": "Deze gebruiker heeft nog geen bio geschreven"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
   "followsYou": "Følger deg",
-  "noAccountDescription": "Denne brukeren har ikke skrevet sin biografi ennå.",
-  "notes": "Notes",
-  "following": "Følger",
-  "followers": "Følgere"
+  "noAccountDescription": "Denne brukeren har ikke skrevet sin biografi ennå."
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
   "followsYou": "Obserwuje Cię",
-  "noAccountDescription": "Ten użytkownik nie napisał jeszcze swojej biografii.",
-  "notes": "Wpisy",
-  "following": "Obserwowani",
-  "followers": "Obserwujący"
+  "noAccountDescription": "Ten użytkownik nie napisał jeszcze swojej biografii."
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
   "followsYou": "Te seguem",
-  "noAccountDescription": "Este usuário não tem uma descrição.",
-  "notes": "Posts",
-  "following": "Seguindo",
-  "followers": "Seguidores"
+  "noAccountDescription": "Este usuário não tem uma descrição."
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
   "followsYou": "Читает вас",
-  "noAccountDescription": "Пользователь ничего не написал про себя",
-  "notes": "Заметки",
-  "following": "Подписки",
-  "followers": "Подписчики"
+  "noAccountDescription": "Пользователь ничего не написал про себя"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
   "followsYou": "Sledujú vás",
-  "noAccountDescription": "Tento používateľ zatiaľ nenapísal o sebe.",
-  "notes": "Poznámky",
-  "following": "Sledujete",
-  "followers": "Sledujúci"
+  "noAccountDescription": "Tento používateľ zatiaľ nenapísal o sebe."
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
   "followsYou": "ติดตามคุณ",
-  "noAccountDescription": "ผู้ใช้รายนี้ยังไม่ได้เขียนคำแนะนำตัว",
-  "notes": " โน้ต",
-  "following": "กำลังติดตาม",
-  "followers": "ผู้ติดตาม"
+  "noAccountDescription": "ผู้ใช้รายนี้ยังไม่ได้เขียนคำแนะนำตัว"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
   "followsYou": "Sizi takip ediyor",
-  "noAccountDescription": "Bu kullanıcı henüz biyografisini yazmamış.",
-  "notes": "Notlar",
-  "following": "Takip",
-  "followers": "Takipçi"
+  "noAccountDescription": "Bu kullanıcı henüz biyografisini yazmamış."
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
   "followsYou": "Follows you",
-  "noAccountDescription": "This user has not written their bio yet.",
-  "notes": "Notes",
-  "following": "Following",
-  "followers": "Followers"
+  "noAccountDescription": "This user has not written their bio yet."
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
   "followsYou": "Підписаний(-а) на вас",
-  "noAccountDescription": "Цей користувач ще нічого не написав про себе",
-  "notes": "Записи",
-  "following": "Підписки",
-  "followers": "Підписники"
+  "noAccountDescription": "Цей користувач ще нічого не написав про себе"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
   "followsYou": "Theo dõi bạn",
-  "noAccountDescription": "Người này chưa viết mô tả.",
-  "notes": "Bài Viết",
-  "following": "Đang theo dõi",
-  "followers": "Người theo dõi"
+  "noAccountDescription": "Người này chưa viết mô tả."
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
   "followsYou": "正在关注你",
-  "noAccountDescription": "此用户尚无自我介绍",
-  "notes": "帖子",
-  "following": "关注中",
-  "followers": "关注者"
+  "noAccountDescription": "此用户尚无自我介绍"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
   "followsYou": "追隨你的人",
-  "noAccountDescription": "此使用者尚未自我介紹",
-  "notes": "貼文",
-  "following": "追隨中",
-  "followers": "追隨者"
+  "noAccountDescription": "此使用者尚未自我介紹"
 }
 </locale>

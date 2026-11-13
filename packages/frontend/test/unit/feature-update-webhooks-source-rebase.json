@@ -1,0 +1,108 @@
+[
+  {
+    "file": "packages/features/integrations/frontend/pages/settings/webhook.edit.vue",
+    "sourceOnly": true,
+    "currentSha256": "41871180faccef3deb3339bfc23ae87fdba7436d5599cea4b1ae326f1a3906c7",
+    "baselineSha256": "8aff757ed2f293563ba47e6cea587edb8dadb1e132b5c08a71a37894d275b3a9",
+    "edits": [
+      {
+        "start": 662,
+        "end": 929,
+        "current": "\t\t\t\t\t<MkSwitch v-model=\"selectedEvents.follow\">{{ $locale.sfc.webhookSettingsEventsFollow }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && selectedEvents.follow)\" @click=\"test('follow')\"><i class=\"ti ti-send\"></i></MkButton>\n",
+        "baseline": "\t\t\t\t\t<MkSwitch v-model=\"event_follow\">{{ $locale.sfc.webhookSettingsEventsFollow }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && event_follow)\" @click=\"test('follow')\"><i class=\"ti ti-send\"></i></MkButton>\n"
+      },
+      {
+        "start": 976,
+        "end": 1251,
+        "current": "\t\t\t\t\t<MkSwitch v-model=\"selectedEvents.followed\">{{ $locale.sfc.webhookSettingsEventsFollowed }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && selectedEvents.followed)\" @click=\"test('followed')\"><i class=\"ti ti-send\"></i></MkButton>\n",
+        "baseline": "\t\t\t\t\t<MkSwitch v-model=\"event_followed\">{{ $locale.sfc.webhookSettingsEventsFollowed }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && event_followed)\" @click=\"test('followed')\"><i class=\"ti ti-send\"></i></MkButton>\n"
+      },
+      {
+        "start": 1298,
+        "end": 1557,
+        "current": "\t\t\t\t\t<MkSwitch v-model=\"selectedEvents.note\">{{ $locale.sfc.webhookSettingsEventsNote }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && selectedEvents.note)\" @click=\"test('note')\"><i class=\"ti ti-send\"></i></MkButton>\n",
+        "baseline": "\t\t\t\t\t<MkSwitch v-model=\"event_note\">{{ $locale.sfc.webhookSettingsEventsNote }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && event_note)\" @click=\"test('note')\"><i class=\"ti ti-send\"></i></MkButton>\n"
+      },
+      {
+        "start": 1604,
+        "end": 1867,
+        "current": "\t\t\t\t\t<MkSwitch v-model=\"selectedEvents.reply\">{{ $locale.sfc.webhookSettingsEventsReply }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && selectedEvents.reply)\" @click=\"test('reply')\"><i class=\"ti ti-send\"></i></MkButton>\n",
+        "baseline": "\t\t\t\t\t<MkSwitch v-model=\"event_reply\">{{ $locale.sfc.webhookSettingsEventsReply }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && event_reply)\" @click=\"test('reply')\"><i class=\"ti ti-send\"></i></MkButton>\n"
+      },
+      {
+        "start": 1914,
+        "end": 2181,
+        "current": "\t\t\t\t\t<MkSwitch v-model=\"selectedEvents.renote\">{{ $locale.sfc.webhookSettingsEventsRenote }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && selectedEvents.renote)\" @click=\"test('renote')\"><i class=\"ti ti-send\"></i></MkButton>\n",
+        "baseline": "\t\t\t\t\t<MkSwitch v-model=\"event_renote\">{{ $locale.sfc.webhookSettingsEventsRenote }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && event_renote)\" @click=\"test('renote')\"><i class=\"ti ti-send\"></i></MkButton>\n"
+      },
+      {
+        "start": 2228,
+        "end": 2503,
+        "current": "\t\t\t\t\t<MkSwitch v-model=\"selectedEvents.reaction\">{{ $locale.sfc.webhookSettingsEventsReaction }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && selectedEvents.reaction)\" @click=\"test('reaction')\"><i class=\"ti ti-send\"></i></MkButton>\n",
+        "baseline": "\t\t\t\t\t<MkSwitch v-model=\"event_reaction\" :disabled=\"true\">{{ $locale.sfc.webhookSettingsEventsReaction }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && event_reaction)\" @click=\"test('reaction')\"><i class=\"ti ti-send\"></i></MkButton>\n"
+      },
+      {
+        "start": 2550,
+        "end": 2821,
+        "current": "\t\t\t\t\t<MkSwitch v-model=\"selectedEvents.mention\">{{ $locale.sfc.webhookSettingsEventsMention }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && selectedEvents.mention)\" @click=\"test('mention')\"><i class=\"ti ti-send\"></i></MkButton>\n",
+        "baseline": "\t\t\t\t\t<MkSwitch v-model=\"event_mention\">{{ $locale.sfc.webhookSettingsEventsMention }}</MkSwitch>\n\t\t\t\t\t<MkButton transparent :class=\"$style.testButton\" :disabled=\"!(active && event_mention)\" @click=\"test('mention')\"><i class=\"ti ti-send\"></i></MkButton>\n"
+      },
+      {
+        "start": 2832,
+        "end": 2975,
+        "current": "\t\t\t\t<MkSwitch v-for=\"event in additionalEvents\" :key=\"event\" v-model=\"selectedEvents[event]\">{{ $locale.sfc[event] }} ({{ event }})</MkSwitch>\n",
+        "baseline": ""
+      },
+      {
+        "start": 3091,
+        "end": 3140,
+        "current": "\t\t<div>{{ $locale.sfc.eventsDescription }}</div>\n",
+        "baseline": ""
+      },
+      {
+        "start": 3520,
+        "end": 3567,
+        "current": "import { ref, reactive, computed } from 'vue';\n",
+        "baseline": "import { ref, computed } from 'vue';\n"
+      },
+      {
+        "start": 3606,
+        "end": 3685,
+        "current": "import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 4649,
+        "end": 5109,
+        "current": "const existingEvents = ['follow', 'followed', 'note', 'reply', 'renote', 'reaction', 'mention'] as const;\nconst additionalEvents = webhookEventTypes.filter((event): event is Exclude<typeof event, typeof existingEvents[number]> => !existingEvents.some(existing => existing === event));\nconst selectedEvents = reactive(Object.fromEntries(webhookEventTypes.map(event => [event, webhook.on.includes(event)])) as Record<typeof webhookEventTypes[number], boolean>);\n",
+        "baseline": "const event_follow = ref(webhook.on.includes('follow'));\nconst event_followed = ref(webhook.on.includes('followed'));\nconst event_note = ref(webhook.on.includes('note'));\nconst event_reply = ref(webhook.on.includes('reply'));\nconst event_renote = ref(webhook.on.includes('renote'));\nconst event_reaction = ref(webhook.on.includes('reaction'));\nconst event_mention = ref(webhook.on.includes('mention'));\n"
+      },
+      {
+        "start": 5128,
+        "end": 5238,
+        "current": "\tconst events: Misskey.entities.UserWebhook['on'] = webhookEventTypes.filter(event => selectedEvents[event]);\n",
+        "baseline": "\tconst events: Misskey.entities.UserWebhook['on'] = [];\n\tif (event_follow.value) events.push('follow');\n\tif (event_followed.value) events.push('followed');\n\tif (event_note.value) events.push('note');\n\tif (event_reply.value) events.push('reply');\n\tif (event_renote.value) events.push('renote');\n\tif (event_reaction.value) events.push('reaction');\n\tif (event_mention.value) events.push('mention');\n"
+      },
+      {
+        "start": 15488,
+        "end": 16272,
+        "current": "\t\"deleteAreYouSure\": \"「{x}」を削除しますか？\",\n\t\"eventsDescription\": \"通知に由来するイベントには通知の受信設定やミュートが適用されます。MCPで mention / reply と旧名 note.mentioned / note.replied の両方を購読すると、同じイベントが2回届くことがあります。\",\n\t\"unfollow\": \"フォローを解除したとき\",\n\t\"subscribedNote\": \"通知をオンにしたユーザーが投稿したとき\",\n\t\"quote\": \"引用Renoteされたとき\",\n\t\"pollEnded\": \"アンケートが終了したとき\",\n\t\"scheduledNotePosted\": \"予約ノートが投稿されたとき\",\n\t\"scheduledNotePostFailed\": \"予約ノートの投稿に失敗したとき\",\n\t\"receiveFollowRequest\": \"フォローリクエストを受け取ったとき\",\n\t\"followRequestAccepted\": \"フォローリクエストが承認されたとき\",\n\t\"roleAssigned\": \"ロールを付与されたとき\",\n\t\"chatRoomInvitationReceived\": \"チャットルームに招待されたとき\",\n\t\"achievementEarned\": \"実績を獲得したとき\",\n\t\"exportCompleted\": \"エクスポートが完了したとき\",\n\t\"login\": \"ログインしたとき\",\n\t\"createToken\": \"トークンが作成されたとき\",\n\t\"app\": \"アプリ通知を受け取ったとき\",\n\t\"test\": \"テスト通知を受け取ったとき\",\n\t\"chatMessage\": \"チャットメッセージを受け取ったとき\"\n",
+        "baseline": "\t\"deleteAreYouSure\": \"「{x}」を削除しますか？\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/integrations/frontend/pages/settings/webhook.new.vue",
+    "sourceOnly": true,
+    "currentSha256": "ffe8a8c0aac09bc56006796169f105458f52163356875fcb08b66b8a1293f3a2",
+    "baselineSha256": "ef154487b57c5670089c367619aa31c762074feed341d46ca826c4623c5869f6",
+    "edits": [
+      {
+        "start": 7477,
+        "end": 8242,
+        "current": ",\n  \"eventsDescription\": \"通知に由来するイベントには通知の受信設定やミュートが適用されます。MCPで mention / reply と旧名 note.mentioned / note.replied の両方を購読すると、同じイベントが2回届くことがあります。\",\n  \"unfollow\": \"フォローを解除したとき\",\n  \"subscribedNote\": \"通知をオンにしたユーザーが投稿したとき\",\n  \"quote\": \"引用Renoteされたとき\",\n  \"pollEnded\": \"アンケートが終了したとき\",\n  \"scheduledNotePosted\": \"予約ノートが投稿されたとき\",\n  \"scheduledNotePostFailed\": \"予約ノートの投稿に失敗したとき\",\n  \"receiveFollowRequest\": \"フォローリクエストを受け取ったとき\",\n  \"followRequestAccepted\": \"フォローリクエストが承認されたとき\",\n  \"roleAssigned\": \"ロールを付与されたとき\",\n  \"chatRoomInvitationReceived\": \"チャットルームに招待されたとき\",\n  \"achievementEarned\": \"実績を獲得したとき\",\n  \"exportCompleted\": \"エクスポートが完了したとき\",\n  \"login\": \"ログインしたとき\",\n  \"createToken\": \"トークンが作成されたとき\",\n  \"app\": \"アプリ通知を受け取ったとき\",\n  \"test\": \"テスト通知を受け取ったとき\",\n  \"chatMessage\": \"チャットメッセージを受け取ったとき\"",
+        "baseline": ""
+      }
+    ]
+  }
+]

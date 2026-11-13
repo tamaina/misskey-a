@@ -6,14 +6,14 @@
 import { h, inject } from 'vue';
 import { expect, test, vi } from 'vitest';
 import { createInternationalization, setActiveInternationalization, useInternationalization } from 'vite-vue-internationalization/runtime';
-import locales from 'i18n';
+import { locales } from './pruned-global-locale-baseline.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import messages from '../../../features/boot/frontend/embed/boot-messages.json';
 
 test.each(['ja-JP', 'en-US', 'fr-FR', 'pt-PT'] as const)('real embed boot installs the supplied runtime and preserves boot errors, ready and self-XSS messages in %s', async language => {
 	vi.resetModules();
 	localStorage.setItem('lang', language);
-	document.body.innerHTML = '<div id="splash"></div>';
+	window.document.body.innerHTML = '<div id="splash"></div>';
 	const metadata = { defaultLightTheme: null, defaultDarkTheme: null };
 	const context = { noteId: 'test' };
 	const theme = vi.fn();
@@ -51,7 +51,7 @@ test.each(['ja-JP', 'en-US', 'fr-FR', 'pt-PT'] as const)('real embed boot instal
 		await embedBoot(runtime);
 		await vi.waitFor(() => expect(mounted).toHaveBeenCalledExactlyOnceWith(runtime, runtime, metadata, context));
 		expect(install).toHaveBeenCalledTimes(1);
-		expect(document.getElementById('embed-mounted')?.textContent).toBe('ready');
+		expect(window.document.getElementById('embed-mounted')?.textContent).toBe('ready');
 		expect(JSON.parse(localStorage.getItem('bootloaderLocales')!)).toEqual({ ...dictionary._bootErrors, reload: dictionary.reload });
 		const legacy = new I18n(dictionary);
 		expect(log.mock.calls.slice(-5).map(call => call[0])).toEqual([
@@ -66,7 +66,7 @@ test.each(['ja-JP', 'en-US', 'fr-FR', 'pt-PT'] as const)('real embed boot instal
 	} finally {
 		log.mockRestore();
 		install.mockRestore();
-		document.body.innerHTML = '';
+		window.document.body.innerHTML = '';
 		localStorage.clear();
 	}
 });

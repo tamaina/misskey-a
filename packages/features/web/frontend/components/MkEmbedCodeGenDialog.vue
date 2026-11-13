@@ -26,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkPreviewWithControls v-if="phase === 'input'" key="input" :previewLoading="iframeLoading">
 				<template #preview>
 					<div :class="$style.embedCodeGenPreviewWrapper">
-						<div class="_acrylic" :class="$style.embedCodeGenPreviewTitle">{{ $locale.sfc.preview }}</div>
+						<div class="_acrylic" :class="$style.embedCodeGenPreviewTitle">{{ globalLocale.env.preview }}</div>
 						<div ref="resizerRootEl" :class="$style.embedCodeGenPreviewResizerRoot" inert>
 							<div
 								:class="$style.embedCodeGenPreviewResizer"
@@ -74,9 +74,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 					<div class="_gaps_s">
 						<MkCode :code="result" lang="html" :forceShow="true" :copyButton="false" :class="$style.embedCodeGenResultCode"/>
-						<MkButton :class="$style.embedCodeGenResultButtons" rounded primary @click="doCopy"><i class="ti ti-copy"></i> {{ $locale.sfc.copy }}</MkButton>
+						<MkButton :class="$style.embedCodeGenResultButtons" rounded primary @click="doCopy"><i class="ti ti-copy"></i> {{ globalLocale.env.copy }}</MkButton>
 					</div>
-					<MkButton :class="$style.embedCodeGenResultButtons" rounded transparent @click="close">{{ $locale.sfc.close }}</MkButton>
+					<MkButton :class="$style.embedCodeGenResultButtons" rounded transparent @click="close">{{ globalLocale.env.close }}</MkButton>
 				</div>
 			</div>
 		</Transition>
@@ -85,6 +85,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { useTemplateRef, ref, computed, nextTick, onMounted, onDeactivated, onUnmounted } from 'vue';
 import { url } from '@features/boot/frontend/shared/config.js';
 import { embedRouteWithScrollbar } from '@features/web/frontend/shared/embed-page.js';
@@ -100,6 +102,8 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { normalizeEmbedParams, getEmbedCode } from '@features/web/frontend/utility/get-embed-code.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const emit = defineEmits<{
 	(ev: 'ok'): void;
@@ -396,7 +400,6 @@ onUnmounted(() => {
 	"light": "فاتح",
 	"dark": "داكن",
 	"title": "Customize embed code",
-	"preview": "معاينة",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "المظهر",
@@ -408,9 +411,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "نسخ",
-	"close": "اغلق"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -420,7 +421,6 @@ onUnmounted(() => {
 	"light": "Clar",
 	"dark": "Fosc",
 	"title": "Personalitza el codi per incrustar",
-	"preview": "Vista prèvia",
 	"maxHeight": "Alçada màxima",
 	"maxHeightDescription": "0 anul·la la configuració màxima. Per evitar que continuï creixent verticalment, especifiqui qualsevol valor.",
 	"theme": "Tema",
@@ -432,9 +432,7 @@ onUnmounted(() => {
 	"applyToPreview": "Aplica a la vista prèvia",
 	"generateCode": "Crea el codi per incrustar",
 	"codeGenerated": "Codi generat",
-	"codeGeneratedDescription": "Si us plau, enganxeu el codi generat al lloc web.",
-	"copy": "Copiar",
-	"close": "Tanca"
+	"codeGeneratedDescription": "Si us plau, enganxeu el codi generat al lloc web."
 }
 </locale>
 
@@ -444,7 +442,6 @@ onUnmounted(() => {
 	"light": "Světlý",
 	"dark": "Tmavý",
 	"title": "Customize embed code",
-	"preview": "Náhled",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Vzhled",
@@ -456,9 +453,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopírovat",
-	"close": "Zavřít"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -468,7 +463,6 @@ onUnmounted(() => {
 	"light": "Light",
 	"dark": "Dark",
 	"title": "Customize embed code",
-	"preview": "Preview",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Themes",
@@ -480,9 +474,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -492,7 +484,6 @@ onUnmounted(() => {
 	"light": "Hell",
 	"dark": "Dunkel",
 	"title": "Einbettungscode anpassen",
-	"preview": "Vorschau",
 	"maxHeight": "Maximale Höhe",
 	"maxHeightDescription": "Der Wert 0 deaktiviert die Einstellung der maximalen Höhe. Gib einen Wert an, um zu verhindern, dass das Widget weiterhin vertikal vergrößert wird.",
 	"theme": "Farbschema",
@@ -504,9 +495,7 @@ onUnmounted(() => {
 	"applyToPreview": "Auf die Vorschau anwenden",
 	"generateCode": "Einbettungscode generieren",
 	"codeGenerated": "Der Code wurde generiert",
-	"codeGeneratedDescription": "Füge den generierten Code in deine Website ein, um den Inhalt einzubetten.",
-	"copy": "Kopieren",
-	"close": "Schließen"
+	"codeGeneratedDescription": "Füge den generierten Code in deine Website ein, um den Inhalt einzubetten."
 }
 </locale>
 
@@ -516,7 +505,6 @@ onUnmounted(() => {
 	"light": "Light",
 	"dark": "Dark",
 	"title": "Customize embed code",
-	"preview": "Preview",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Themes",
@@ -528,9 +516,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -540,7 +526,6 @@ onUnmounted(() => {
 	"light": "Claro",
 	"dark": "Oscuro",
 	"title": "Personalizar el código de incrustación",
-	"preview": "Vista previa",
 	"maxHeight": "Altura máxima",
 	"maxHeightDescription": "0 desactiva el ajuste del valor máximo. Para evitar que el widget siga creciendo verticalmente, especifica algún valor.",
 	"theme": "Tema",
@@ -552,9 +537,7 @@ onUnmounted(() => {
 	"applyToPreview": "Aplicar a la vista previa",
 	"generateCode": "Crear el código para incrustar",
 	"codeGenerated": "El código ha sido generado",
-	"codeGeneratedDescription": "Pegue el código generado en su sitio web para incrustar el contenido.",
-	"copy": "Copiar",
-	"close": "Cerrar"
+	"codeGeneratedDescription": "Pegue el código generado en su sitio web para incrustar el contenido."
 }
 </locale>
 
@@ -564,7 +547,6 @@ onUnmounted(() => {
 	"light": "Clair",
 	"dark": "Sombre",
 	"title": "Personnaliser le code d'intégration",
-	"preview": "Aperçu",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Thème",
@@ -576,9 +558,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Générer le code d'intégration",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copier",
-	"close": "Fermer"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -588,7 +568,6 @@ onUnmounted(() => {
 	"light": "Terang",
 	"dark": "Gelap",
 	"title": "Customize embed code",
-	"preview": "Pratinjau",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Tema",
@@ -600,9 +579,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Salin",
-	"close": "Tutup"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -612,7 +589,6 @@ onUnmounted(() => {
 	"light": "Chiaro",
 	"dark": "Scuro",
 	"title": "Personalizza il codice per incorporare",
-	"preview": "Anteprima",
 	"maxHeight": "Altezza massima",
 	"maxHeightDescription": "Specifica un valore per evitare che continui a crescere verticalmente. Il valore 0 disabilita il limite d'altezza.",
 	"theme": "Tema",
@@ -624,9 +600,7 @@ onUnmounted(() => {
 	"applyToPreview": "Aggiorna l'anteprima",
 	"generateCode": "Crea il codice per incorporare",
 	"codeGenerated": "Codice generato",
-	"codeGeneratedDescription": "Incolla il codice appena generato sul tuo sito web.",
-	"copy": "Copia",
-	"close": "Chiudi"
+	"codeGeneratedDescription": "Incolla il codice appena generato sul tuo sito web."
 }
 </locale>
 
@@ -636,7 +610,6 @@ onUnmounted(() => {
 	"light": "ライト",
 	"dark": "ダーク",
 	"title": "埋め込みコードをカスタマイズ",
-	"preview": "プレビュー",
 	"maxHeight": "高さの最大値",
 	"maxHeightDescription": "0で最大値の設定が無効になります。ウィジェットが縦に伸び続けるのを防ぐために、何らかの値に指定してください。",
 	"theme": "テーマ",
@@ -648,9 +621,7 @@ onUnmounted(() => {
 	"applyToPreview": "プレビューに反映",
 	"generateCode": "埋め込みコードを作成",
 	"codeGenerated": "コードが生成されました",
-	"codeGeneratedDescription": "生成されたコードをウェブサイトに貼り付けてご利用ください。",
-	"copy": "コピー",
-	"close": "閉じる"
+	"codeGeneratedDescription": "生成されたコードをウェブサイトに貼り付けてご利用ください。"
 }
 </locale>
 
@@ -660,7 +631,6 @@ onUnmounted(() => {
 	"light": "ライト",
 	"dark": "ダーク",
 	"title": "埋め込みコードをカスタム",
-	"preview": "プレビュー",
 	"maxHeight": "高さの最大値",
 	"maxHeightDescription": "0は最大値を指定せえへんけど、ウィジェットが伸び続けるから絶対1以上にしといてや。",
 	"theme": "テーマ",
@@ -672,9 +642,7 @@ onUnmounted(() => {
 	"applyToPreview": "プレビューに反映",
 	"generateCode": "埋め込みコード作る",
 	"codeGenerated": "コード作ったで",
-	"codeGeneratedDescription": "作ったコードはウェブサイトに貼っつけて使ってや。",
-	"copy": "コピー",
-	"close": "さいなら"
+	"codeGeneratedDescription": "作ったコードはウェブサイトに貼っつけて使ってや。"
 }
 </locale>
 
@@ -684,7 +652,6 @@ onUnmounted(() => {
 	"light": "Light",
 	"dark": "Dark",
 	"title": "Customize embed code",
-	"preview": "Preview",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Themes",
@@ -696,9 +663,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -708,7 +673,6 @@ onUnmounted(() => {
 	"light": "Light",
 	"dark": "Dark",
 	"title": "Customize embed code",
-	"preview": "Preview",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Themes",
@@ -720,9 +684,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -732,7 +694,6 @@ onUnmounted(() => {
 	"light": "라이트",
 	"dark": "다크",
 	"title": "임베디드 코드를 커스터마이즈",
-	"preview": "미리보기",
 	"maxHeight": "최대 높이",
 	"maxHeightDescription": "최대 값을 무시하려면 0을 입력하세요. 위젯이 상하로 길어지는 것을 방지하려면, 임의의 값을 입력해 주세요.",
 	"theme": "테마",
@@ -744,9 +705,7 @@ onUnmounted(() => {
 	"applyToPreview": "미리보기에 반영",
 	"generateCode": "임베디드 코드를 만들기",
 	"codeGenerated": "코드를 만들었습니다.",
-	"codeGeneratedDescription": "만들어진 코드를 웹 사이트에 붙여서 사용하세요.",
-	"copy": "복사",
-	"close": "닫기"
+	"codeGeneratedDescription": "만들어진 코드를 웹 사이트에 붙여서 사용하세요."
 }
 </locale>
 
@@ -756,7 +715,6 @@ onUnmounted(() => {
 	"light": "Licht",
 	"dark": "Donker",
 	"title": "Customize embed code",
-	"preview": "Voorbeeld",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Thema's",
@@ -768,9 +726,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopiëren",
-	"close": "Sluiten"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -780,7 +736,6 @@ onUnmounted(() => {
 	"light": "Lys",
 	"dark": "Mørk",
 	"title": "Customize embed code",
-	"preview": "Preview",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Temaer",
@@ -792,9 +747,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopier",
-	"close": "Lukk"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -804,7 +757,6 @@ onUnmounted(() => {
 	"light": "Jasny",
 	"dark": "Ciemny",
 	"title": "Customize embed code",
-	"preview": "Podgląd",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Motywy",
@@ -816,9 +768,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopiuj",
-	"close": "Zamknij"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -828,7 +778,6 @@ onUnmounted(() => {
 	"light": "Claro",
 	"dark": "Escuro",
 	"title": "Personalizar código do embed",
-	"preview": "Pré-visualizar",
 	"maxHeight": "Altura máxima",
 	"maxHeightDescription": "Colocar em 0 desabilita a altura máxima. Especifique um valor para prevenir uma expansão vertical contínua.",
 	"theme": "Tema",
@@ -840,9 +789,7 @@ onUnmounted(() => {
 	"applyToPreview": "Aplicar para a prévia",
 	"generateCode": "Gerar código de embed",
 	"codeGenerated": "O código foi gerado",
-	"codeGeneratedDescription": "Coloque o código no seu website para incorporar o conteúdo.",
-	"copy": "Copiar",
-	"close": "Fechar"
+	"codeGeneratedDescription": "Coloque o código no seu website para incorporar o conteúdo."
 }
 </locale>
 
@@ -852,7 +799,6 @@ onUnmounted(() => {
 	"light": "Светлый",
 	"dark": "Тёмный",
 	"title": "Customize embed code",
-	"preview": "Предпросмотр",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Тема",
@@ -864,9 +810,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Копировать",
-	"close": "Закрыть"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -876,7 +820,6 @@ onUnmounted(() => {
 	"light": "Svetlá",
 	"dark": "Tmavá",
 	"title": "Customize embed code",
-	"preview": "Náhľad",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Téma",
@@ -888,9 +831,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Kopírovať",
-	"close": "Zavrieť"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -900,7 +841,6 @@ onUnmounted(() => {
 	"light": "สว่าง",
 	"dark": "มืด",
 	"title": "ปรับแต่งโค้ดฝัง",
-	"preview": "แสดงตัวอย่าง",
 	"maxHeight": "ความสูงสุด",
 	"maxHeightDescription": "หากถ้าตั้งค่าเป็น 0 จะทำให้ไม่มีการจำกัดความสูงของวิดเจ็ต แต่ควรตั้งค่าเป็นตัวเลขอื่นๆ เพื่อไม่ให้วิดเจ็ตยืดตัวลงไปเรื่อยๆ",
 	"theme": "ธีม",
@@ -912,9 +852,7 @@ onUnmounted(() => {
 	"applyToPreview": "นำไปใช้กับการแสดงตัวอย่าง",
 	"generateCode": "สร้างโค้ดสำหรับการฝัง",
 	"codeGenerated": "รหัสถูกสร้างขึ้นแล้ว",
-	"codeGeneratedDescription": "นำโค้ดที่สร้างแล้วไปวางในเว็บไซต์ของคุณเพื่อฝังเนื้อหา",
-	"copy": "คัดลอก",
-	"close": "ปิด"
+	"codeGeneratedDescription": "นำโค้ดที่สร้างแล้วไปวางในเว็บไซต์ของคุณเพื่อฝังเนื้อหา"
 }
 </locale>
 
@@ -924,7 +862,6 @@ onUnmounted(() => {
 	"light": "Aydınlık",
 	"dark": "Karanlık",
 	"title": "Gömme kodunu özelleştir",
-	"preview": "Önizleme",
 	"maxHeight": "Maksimum yükseklik",
 	"maxHeightDescription": "0 olarak ayarlandığında maksimum yükseklik ayarı devre dışı bırakılır. Widget'ın dikey olarak genişlemeye devam etmesini önlemek için bir değer belirt.",
 	"theme": "Tema",
@@ -936,9 +873,7 @@ onUnmounted(() => {
 	"applyToPreview": "Önizlemeye başvur",
 	"generateCode": "Gömme kodu oluştur",
 	"codeGenerated": "Kod oluşturuldu",
-	"codeGeneratedDescription": "Oluşturulan kodu web sitene yapıştırarak içeriği göm.",
-	"copy": "Kopyala",
-	"close": "Kapat"
+	"codeGeneratedDescription": "Oluşturulan kodu web sitene yapıştırarak içeriği göm."
 }
 </locale>
 
@@ -948,7 +883,6 @@ onUnmounted(() => {
 	"light": "Light",
 	"dark": "Dark",
 	"title": "Customize embed code",
-	"preview": "Preview",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Themes",
@@ -960,9 +894,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Copy",
-	"close": "Close"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -972,7 +904,6 @@ onUnmounted(() => {
 	"light": "Світла",
 	"dark": "Темна",
 	"title": "Customize embed code",
-	"preview": "Попередній перегляд",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Тема",
@@ -984,9 +915,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Скопіювати",
-	"close": "Закрити"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -996,7 +925,6 @@ onUnmounted(() => {
 	"light": "Sáng",
 	"dark": "Tối",
 	"title": "Customize embed code",
-	"preview": "Xem trước",
 	"maxHeight": "Max height",
 	"maxHeightDescription": "Setting it to 0 disables the max height setting. Specify some value to prevent the widget from continuing to expand vertically.",
 	"theme": "Chủ đề",
@@ -1008,9 +936,7 @@ onUnmounted(() => {
 	"applyToPreview": "Apply to the preview",
 	"generateCode": "Generate embed code",
 	"codeGenerated": "The code has been generated",
-	"codeGeneratedDescription": "Paste the generated code into your website to embed the content.",
-	"copy": "Sao chép",
-	"close": "Đóng"
+	"codeGeneratedDescription": "Paste the generated code into your website to embed the content."
 }
 </locale>
 
@@ -1020,7 +946,6 @@ onUnmounted(() => {
 	"light": "浅色",
 	"dark": "深色",
 	"title": "自定义嵌入代码",
-	"preview": "预览",
 	"maxHeight": "最大高度",
 	"maxHeightDescription": "若将最大值设为 0 则不限制最大高度。为防止小工具无限增高，建议设置一下。",
 	"theme": "主题",
@@ -1032,9 +957,7 @@ onUnmounted(() => {
 	"applyToPreview": "应用预览",
 	"generateCode": "生成嵌入代码",
 	"codeGenerated": "已生成代码",
-	"codeGeneratedDescription": "将生成的代码贴到网站上来使用。",
-	"copy": "复制",
-	"close": "关闭"
+	"codeGeneratedDescription": "将生成的代码贴到网站上来使用。"
 }
 </locale>
 
@@ -1044,7 +967,6 @@ onUnmounted(() => {
 	"light": "淺色",
 	"dark": "深色",
 	"title": "自訂嵌入程式碼",
-	"preview": "預覽",
 	"maxHeight": "最大高度",
 	"maxHeightDescription": "設定為 0 時代表沒有最大值。請指定某個值以避免小工具持續在縱向延伸。",
 	"theme": "佈景主題",
@@ -1056,8 +978,6 @@ onUnmounted(() => {
 	"applyToPreview": "反映在預覽中",
 	"generateCode": "建立嵌入程式碼",
 	"codeGenerated": "已產生程式碼",
-	"codeGeneratedDescription": "請將產生的程式碼貼到您的網站上。",
-	"copy": "複製",
-	"close": "關閉"
+	"codeGeneratedDescription": "請將產生的程式碼貼到您的網站上。"
 }
 </locale>

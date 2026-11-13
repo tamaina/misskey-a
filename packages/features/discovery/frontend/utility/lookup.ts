@@ -3,12 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { Router } from '@features/navigation/frontend/router.js';
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import FeatureLocaleMessages from '@features/discovery/frontend/ts-messages.vue';
 import { mainRouter } from '@features/navigation/frontend/router.js';
-import { acct } from '@features/users/frontend/filters/user.js';
+import { acct } from '@features/users/frontend/shared/user.js';
+import type { Router } from '@features/navigation/frontend/router.js';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 export async function lookup(router?: Router) {
 	const _router = router ?? mainRouter;
@@ -28,7 +34,7 @@ export async function lookup(router?: Router) {
 		_router.push('/tags/:tag', {
 			params: {
 				tag: query.substring(1),
-			}
+			},
 		});
 		return;
 	}
@@ -60,7 +66,7 @@ export async function apLookup(query: string) {
 	});
 
 	os.promiseDialog(promise, null, (err) => {
-		let title = FeatureLocaleMessages.$locale.somethingHappened;
+		let title = getGlobalLocale().somethingHappened;
 		let text = err.message + '\n' + err.id;
 
 		switch (err.id) {

@@ -1,0 +1,75 @@
+[
+  {
+    "file": "packages/features/users/frontend/components/MkUserSetupDialog.vue",
+    "currentSha256": "95d6e0998304a89efda9f7c747304bfcf1db0f9e35f68512055a87a0be6498ab",
+    "baselineSha256": "19b08988bfb02a27b71eb80f20b34d5a1d8d33b2e1cfdd43ab8edb1987909888",
+    "edits": [
+      {
+        "start": 3788,
+        "end": 3825,
+        "current": ":class=\"$style.pageRoot\">\n\t\t\t\t\t\t<div ",
+        "baseline": ""
+      },
+      {
+        "start": 3894,
+        "end": 3919,
+        "current": " :class=\"$style.pageMain\"",
+        "baseline": ""
+      },
+      {
+        "start": 3921,
+        "end": 3922,
+        "current": "\t",
+        "baseline": ""
+      },
+      {
+        "start": 3944,
+        "end": 3945,
+        "current": "\t",
+        "baseline": ""
+      },
+      {
+        "start": 3952,
+        "end": 3953,
+        "current": "\t",
+        "baseline": ""
+      },
+      {
+        "start": 3997,
+        "end": 3998,
+        "current": "\t",
+        "baseline": ""
+      },
+      {
+        "start": 4027,
+        "end": 4028,
+        "current": "\t",
+        "baseline": ""
+      },
+      {
+        "start": 4168,
+        "end": 4169,
+        "current": "\t",
+        "baseline": ""
+      },
+      {
+        "start": 4339,
+        "end": 4353,
+        "current": ">\n\t\t\t\t\t\t\t</div",
+        "baseline": ""
+      },
+      {
+        "start": 9953,
+        "end": 9976,
+        "current": "\tpadding-bottom: 72px;\n",
+        "baseline": ""
+      },
+      {
+        "start": 10010,
+        "end": 10024,
+        "current": ";\n\tz-index: 10",
+        "baseline": ""
+      }
+    ]
+  }
+]

@@ -3,52 +3,38 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineAdminGetTableStatsDefinition, inlineAdminGetTableStatsInput, inlineAdminGetTableStatsOutput } from '../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
-
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(inlineAdminGetTableStatsDefinition);
-
-export const meta = {
-	requireCredential: true,
-	requireAdmin: true,
-	kind: 'read:admin:table-stats',
-
-	tags: ['admin'],
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineAdminGetTableStatsInput, typeof inlineAdminGetTableStatsOutput> {
-	constructor(
-		@Inject(DI.db)
-		private db: DataSource,
-	) {
-		super(meta, contractProjection, async () => {
-			const sizes = await this.db.query(`
-			SELECT relname AS "table", reltuples as "count", pg_total_relation_size(C.oid) AS "size"
-			FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)
-			WHERE nspname NOT IN ('pg_catalog', 'information_schema')
-				AND C.relkind <> 'i'
-				AND nspname !~ '^pg_toast';`)
-				.then(recs => {
-					const res = {} as Record<string, { count: number; size: number; }>;
-					for (const rec of recs) {
-						res[rec.table] = {
-							count: parseInt(rec.count, 10),
-							size: parseInt(rec.size, 10),
-						};
-					}
-					return res;
-				});
-
-			return sizes;
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { adminGetTableStatsContract } from './get-table-stats.contract.js';
+import type { DataSource } from 'typeorm';
+import * as v from 'valibot';
+export interface AdminGetTableStatsDependencies {
+	db: Pick<DataSource, 'query'>;
+}
+export function createAdminGetTableStatsProcedure<Actor extends ApiActor>(deps: AdminGetTableStatsDependencies) {
+	return createApiProcedure<Actor>()(adminGetTableStatsContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async () => {
+			const result = await (async () => {
+				const sizes = await deps.db.query<unknown>(`
+		SELECT relname AS "table", reltuples as "count", pg_total_relation_size(C.oid) AS "size"
+		FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)
+		WHERE nspname NOT IN ('pg_catalog', 'information_schema')
+			AND C.relkind <> 'i'
+			AND nspname !~ '^pg_toast';`)
+					.then(raw => {
+						const recs = v.parse(v.array(v.strictObject({
+							table: v.string(),
+							count: v.union([v.string(), v.pipe(v.number(), v.finite())]),
+							size: v.union([v.string(), v.pipe(v.number(), v.finite())]),
+						})), raw);
+						return Object.fromEntries(recs.map((rec): [string, { count: number; size: number }] => [rec.table, {
+							count: parseInt(String(rec.count), 10), size: parseInt(String(rec.size), 10),
+						}]));
+					});
+				return sizes;
+			})();
+			return result;
 		});
-	}
 }

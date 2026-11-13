@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ASSERTION_METHOD_DRAFT_LEVEL } from '@features/federation/backend/protocol/misc/http-signature-capabilities.js';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
-import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/contract/note-text-limit.js';
+import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/backend/request.schema.js';
 import { MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { NotesChart } from '@features/statistics/backend/charts/notes.js';
@@ -92,6 +93,7 @@ export class NodeinfoServerService {
 					localComments: 0,
 				},
 				metadata: {
+					httpMessageSignaturesImplementationLevel: ASSERTION_METHOD_DRAFT_LEVEL,
 					nodeName: meta.name,
 					nodeDescription: meta.description,
 					nodeAdmins: [{

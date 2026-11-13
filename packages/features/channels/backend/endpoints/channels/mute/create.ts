@@ -3,25 +3,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { channelContract, channelErrors } from '@features/channels/contract';
-import { legacyChannelSchemas } from '@features/channels/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['channels', 'mute'],
+import { channelsMuteCreateContract, channelsMuteCreateErrors } from './create.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-	requireCredential: true,
-	prohibitMoved: true,
-
-	kind: 'write:channels',
-
-	errors: channelErrors['channels/mute/create'],
-} as const;
-
-export const paramDef = legacyChannelSchemas['channels/mute/create'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('channelCommands', commands => createContractTransportEndpoint(meta, paramDef, channelContract['channels/mute/create'], async (params, user) => commands['channels/mute/create'](params, {
-	context: { actor: user },
-})));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
+import { type ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
+export interface ChannelsMuteCreateDependencies {
+	channelsRepository: ChannelsRepository;
+	channelMutingService: ChannelMutingService;
+}
+export function createChannelsMuteCreateProcedure<Actor extends MiLocalUser>(deps: ChannelsMuteCreateDependencies) {
+	return createApiProcedure<Actor>()(channelsMuteCreateContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const channel = await deps.channelsRepository.findOneBy({ id: input.channelId });
+			if (channel == null) throw apiError(channelsMuteCreateErrors.noSuchChannel);
+			const isAlreadyMuted = await deps.channelMutingService.isMuted({ requestUserId: actor.id, targetChannelId: channel.id });
+			if (isAlreadyMuted) throw apiError(channelsMuteCreateErrors.alreadyMuting);
+			// Preserve the legacy truthy check: null, zero, and an omitted value create an indefinite mute.
+			if (input.expiresAt && input.expiresAt <= Date.now()) {
+				throw apiError(channelsMuteCreateErrors.expiresAtIsPast);
+			}
+			await deps.channelMutingService.mute({
+				requestUserId: actor.id,
+				targetChannelId: channel.id,
+				expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
+			});
+		});
+}

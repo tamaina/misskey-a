@@ -30,6 +30,7 @@ import { MiMeta, MiNote, UserProfilesRepository } from '@features/persistence/ba
 import { DI } from '@/di-symbols.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
+import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { genAidx } from '@features/runtime/backend/id/aidx.js';
 
 const _filename = fileURLToPath(import.meta.url);
@@ -100,6 +101,8 @@ describe('ActivityPub', () => {
 	let rendererService: ApRendererService;
 	let jsonLdService: JsonLdService;
 	let resolver: MockResolver;
+	let federatedInstanceService: FederatedInstanceService;
+	let httpRequestService: HttpRequestService;
 
 	const metaInitial = {
 		cacheRemoteFiles: true,
@@ -153,14 +156,16 @@ describe('ActivityPub', () => {
 		imageService = app.get<ApImageService>(ApImageService);
 		jsonLdService = app.get<JsonLdService>(JsonLdService);
 		resolver = new MockResolver(await app.resolve<LoggerService>(LoggerService));
-
-		// Prevent ApPersonService from fetching instance, as it causes Jest import-after-test error
-		const federatedInstanceService = app.get<FederatedInstanceService>(FederatedInstanceService);
-		vi.spyOn(federatedInstanceService, 'fetch').mockImplementation(() => new Promise(() => { }));
+		federatedInstanceService = app.get(FederatedInstanceService);
+		httpRequestService = app.get(HttpRequestService);
 	});
 
 	beforeEach(() => {
 		resolver.clear();
+		// Reapply after restoreMocks; no background metadata or supplemental API network calls.
+		vi.spyOn(federatedInstanceService, 'fetchOrRegister').mockImplementation(() => new Promise(() => { }));
+		vi.spyOn(federatedInstanceService, 'fetch').mockResolvedValue(null);
+		vi.spyOn(httpRequestService, 'postPublicJson').mockResolvedValue({});
 	});
 
 	describe('Parse minimum object', () => {

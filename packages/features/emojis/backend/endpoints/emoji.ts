@@ -3,20 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { emojisContract } from '../../contract/index.js';
-import { legacyEmojiSchemas } from '@features/emojis/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { toEmojiDetailed } from '../emoji-output.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
 
-export const meta = {
-	tags: ['meta'],
-	requireCredential: false,
-	allowGet: true,
-	cacheSec: 3600,
-	res: legacyEmojiSchemas.output as Schema,
-} as const;
-
-export const paramDef = legacyEmojiSchemas.input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('emojis', emojis => createContractTransportEndpoint(meta, paramDef, emojisContract['emoji'], async params => emojis.emoji(params)));
+import { emojisContract } from '../api.definition.js';
+import type { EmojisDependencies } from '../api.implementation.js';
+import { IsNull } from 'typeorm';
+export function createEmojiProcedure<Actor extends ApiActor>(deps: Pick<EmojisDependencies<Actor>, 'emojiEntityService' | 'emojisRepository'>) {
+	return createApiProcedure<Actor>()(emojisContract.emoji)
+		.handler(async ({ input, context }) => {
+			return toEmojiDetailed(await deps.emojiEntityService.packDetailed(await deps.emojisRepository.findOneOrFail({ where: { name: input.name, host: IsNull() } })));
+		});
+}

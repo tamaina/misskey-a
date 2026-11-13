@@ -1,0 +1,93 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { createHash } from 'node:crypto';
+import * as OTPAuth from 'otpauth';
+import { IsNull, Raw } from 'typeorm';
+import type { MiUserProfile, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { bindThis } from '@features/runtime/backend/decorators.js';
+import type * as Redis from 'ioredis';
+
+export class TotpService {
+	constructor(
+		private redisClient: Redis.Redis,
+
+		private usersRepository: UsersRepository,
+
+		private userProfilesRepository: UserProfilesRepository,
+	) {
+	}
+
+	@bindThis
+	public async twoFactorAuthenticate(profile: MiUserProfile, token: string): Promise<void> {
+		if (profile.twoFactorBackupSecret?.includes(token)) {
+			// The database owns consumption: parallel requests must not restore a
+			// different code or accept the same snapshot after it was consumed.
+			const consumed = await this.userProfilesRepository.update({
+				userId: profile.userId,
+				password: profile.password ?? IsNull(),
+				twoFactorEnabled: profile.twoFactorEnabled === true,
+				twoFactorSecret: profile.twoFactorSecret ?? IsNull(),
+				twoFactorBackupSecret: Raw(column => `:backupCode = ANY(${column})`, { backupCode: token }),
+			}, {
+				twoFactorBackupSecret: () => 'array_remove("twoFactorBackupSecret", :backupCode)',
+			});
+			if (consumed.affected !== 1) throw new Error('authentication failed');
+		} else {
+			if (!await this.validateOtp(profile.userId, profile.twoFactorSecret!, token)) {
+				throw new Error('authentication failed');
+			}
+		}
+	}
+
+	public async validateOtp(
+		userId: MiUserProfile['userId'],
+		twoFactorSecret: string,
+		token: string,
+	) {
+		if (process.env.NODE_ENV === 'test' && process.env.MISSKEY_TEST_CHECK_DUPLICATED_TOTP !== '1') {
+			return true;
+		}
+
+		// 1. 判定に用いるタイムスタンプを固定
+		const now = Date.now();
+		const normalizedToken = token.trim();
+		const validationWindow = 1;
+		const timeStep = 30; // TOTPの周期（秒）
+
+		// 2. TOTPインスタンスを生成（設定を一元管理するため）
+		const totp = new OTPAuth.TOTP({
+			secret: OTPAuth.Secret.fromBase32(twoFactorSecret),
+			digits: 6,
+			period: timeStep,
+		});
+
+		// 3. 固定したタイムスタンプを使って検証
+		const delta = totp.validate({
+			token: normalizedToken,
+			window: validationWindow,
+			timestamp: now,
+		});
+
+		if (delta === null) {
+			throw new Error('authentication failed');
+		}
+
+		// 4. totp.counter() を用い、同じタイムスタンプから基準ステップを取得
+		const currentStep = totp.counter({ timestamp: now });
+		const step = currentStep + delta;
+		const secretFingerprint = createHash('sha256')
+			.update(twoFactorSecret ?? '')
+			.digest('base64url');
+
+		const usedTokenRedisKey = `2fa:used:${userId}:${secretFingerprint}:${step}`;
+
+		// 5. TTL（有効期限）を設定いてredis set
+		const ttl = timeStep * (validationWindow * 2 + 1);
+		const setResult = await this.redisClient.set(usedTokenRedisKey, normalizedToken, 'EX', ttl, 'NX');
+
+		return setResult === 'OK';
+	}
+}

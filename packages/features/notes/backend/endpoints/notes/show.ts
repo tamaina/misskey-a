@@ -2,79 +2,49 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesShowDefinition, packedNotesShowInput, packedNotesShowOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import { NoteEntityService } from '../../serializers/NoteEntityService.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
 import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { DI } from '@/di-symbols.js';
 import { MiMeta } from '@features/instance/backend/models/Meta.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { NoteEntityService } from '../../serializers/NoteEntityService.js';
 
-const contractProjection = projectEndpointContract(packedNotesShowDefinition);
+import { apiError } from "@features/api/backend/transport/orpc-error.js";
+import { readErrorId } from '../../request.schema.js';
+import { notesShowContract, notesShowErrors } from './show.contract.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 
-export const meta = {
-	tags: ['notes'],
+export interface NotesShowDependencies {
+	serverSettings: MiMeta;
+	noteEntityService: Pick<NoteEntityService, 'pack'>;
+	getterService: Pick<GetterService, 'getNoteWithRelations'>;
+}
+export function createNotesShowProcedure(deps: NotesShowDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesShowContract).handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
 
-	requireCredential: false,
+					const note = await deps.getterService.getNoteWithRelations(ps.noteId).catch((err: unknown) => {
+						if (readErrorId(err) === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(notesShowErrors.noSuchNote);
+						throw err;
+					});
 
-	res: contractProjection.response,
+					if (note.user!.requireSigninToViewContents && me == null) {
+						throw apiError(notesShowErrors.contentRestrictedByUser);
+					}
 
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: '24fcbfc6-2e37-42b6-8388-c29b3861a08d',
-		},
+					if (deps.serverSettings.ugcVisibilityForVisitor === 'none' && me == null) {
+						throw apiError(notesShowErrors.contentRestrictedByServer);
+					}
 
-		contentRestrictedByUser: {
-			message: 'Content restricted by user. Please sign in to view.',
-			code: 'CONTENT_RESTRICTED_BY_USER',
-			id: 'fbcc002d-37d9-4944-a6b0-d9e29f2d33ab',
-		},
+					if (deps.serverSettings.ugcVisibilityForVisitor === 'local' && note.userHost != null && me == null) {
+						throw apiError(notesShowErrors.contentRestrictedByServer);
+					}
 
-		contentRestrictedByServer: {
-			message: 'Content restricted by server settings. Please sign in to view.',
-			code: 'CONTENT_RESTRICTED_BY_SERVER',
-			id: '145f88d2-b03d-4087-8143-a78928883c4b',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesShowInput, typeof packedNotesShowOutput> {
-	constructor(
-		@Inject(DI.meta)
-		private serverSettings: MiMeta,
-
-		private noteEntityService: NoteEntityService,
-		private getterService: GetterService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const note = await this.getterService.getNoteWithRelations(ps.noteId).catch(err => {
-				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
-				throw err;
-			});
-
-			if (note.user!.requireSigninToViewContents && me == null) {
-				throw new ApiError(meta.errors.contentRestrictedByUser);
-			}
-
-			if (this.serverSettings.ugcVisibilityForVisitor === 'none' && me == null) {
-				throw new ApiError(meta.errors.contentRestrictedByServer);
-			}
-
-			if (this.serverSettings.ugcVisibilityForVisitor === 'local' && note.userHost != null && me == null) {
-				throw new ApiError(meta.errors.contentRestrictedByServer);
-			}
-
-			return await this.noteEntityService.pack(note, me, {
-				detail: true,
-			});
+					return await deps.noteEntityService.pack(note, me, {
+						detail: true,
+					});
+			})();
+			return toPackedNote(result);
 		});
-	}
 }

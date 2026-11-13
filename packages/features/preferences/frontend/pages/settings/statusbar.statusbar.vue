@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		:options="[
 			{ value: 'verySmall', label: $locale.sfc.small + '+' },
 			{ value: 'small', label: $locale.sfc.small },
-			{ value: 'medium', label: $locale.sfc.medium },
+			{ value: 'medium', label: globalLocale.env.medium },
 			{ value: 'large', label: $locale.sfc.large },
 			{ value: 'veryLarge', label: $locale.sfc.large + '+' },
 		]"
@@ -80,12 +80,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</template>
 
 	<div class="_buttons">
-		<MkButton danger @click="del">{{ $locale.sfc.remove }}</MkButton>
+		<MkButton danger @click="del">{{ globalLocale.env.remove }}</MkButton>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { reactive, computed, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -97,8 +98,11 @@ import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import { instance } from '@features/instance/frontend/instance.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { Locale } from 'i18n';
 import type { MkSelectItem } from '@features/ui/frontend/components/MkSelect.vue';
 import type { StatusbarStore } from '@features/preferences/frontend/state/def.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	_id: string;
@@ -169,7 +173,6 @@ function del() {
 	"type": "نوع",
 	"label": "التسمية",
 	"small": "صغير",
-	"medium": "متوسط",
 	"large": "كبير",
 	"size": "الحجم",
 	"shuffle": "خلط",
@@ -178,8 +181,7 @@ function del() {
 	"fast": "سريع",
 	"slow": "بطيء",
 	"reverse": "اقلب",
-	"colored": "ملوّن",
-	"remove": "حذف"
+	"colored": "ملوّن"
 }
 </locale>
 
@@ -189,7 +191,6 @@ function del() {
 	"type": "Tipus",
 	"label": "Etiqueta",
 	"small": "Petit",
-	"medium": "Mitjà",
 	"large": "Gran",
 	"size": "Mida",
 	"shuffle": "Aleatori",
@@ -198,8 +199,7 @@ function del() {
 	"fast": "Ràpid ",
 	"slow": "Lent",
 	"reverse": "Invertir",
-	"colored": "Colorit",
-	"remove": "Eliminar"
+	"colored": "Colorit"
 }
 </locale>
 
@@ -209,7 +209,6 @@ function del() {
 	"type": "Typ",
 	"label": "Popisek",
 	"small": "Malé",
-	"medium": "Střední",
 	"large": "Velké",
 	"size": "Velikost",
 	"shuffle": "Zamíchat",
@@ -218,8 +217,7 @@ function del() {
 	"fast": "Rychlá",
 	"slow": "Pomalá",
 	"reverse": "Otočit",
-	"colored": "Barevné",
-	"remove": "Smazat"
+	"colored": "Barevné"
 }
 </locale>
 
@@ -229,7 +227,6 @@ function del() {
 	"type": "Type",
 	"label": "Label",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"size": "Size",
 	"shuffle": "Shuffle",
@@ -238,8 +235,7 @@ function del() {
 	"fast": "Fast",
 	"slow": "Slow",
 	"reverse": "Reverse",
-	"colored": "Colored",
-	"remove": "Delete"
+	"colored": "Colored"
 }
 </locale>
 
@@ -249,7 +245,6 @@ function del() {
 	"type": "Art",
 	"label": "Beschriftung",
 	"small": "Klein",
-	"medium": "Mittel",
 	"large": "Groß",
 	"size": "Größe",
 	"shuffle": "Mischen",
@@ -258,8 +253,7 @@ function del() {
 	"fast": "Schnell",
 	"slow": "Langsam",
 	"reverse": "Umkehren",
-	"colored": "Farbig",
-	"remove": "Löschen"
+	"colored": "Farbig"
 }
 </locale>
 
@@ -269,7 +263,6 @@ function del() {
 	"type": "Type",
 	"label": "Label",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"size": "Size",
 	"shuffle": "Shuffle",
@@ -278,8 +271,7 @@ function del() {
 	"fast": "Fast",
 	"slow": "Slow",
 	"reverse": "Reverse",
-	"colored": "Colored",
-	"remove": "Delete"
+	"colored": "Colored"
 }
 </locale>
 
@@ -289,7 +281,6 @@ function del() {
 	"type": "Tipo",
 	"label": "Etiqueta",
 	"small": "Pequeño",
-	"medium": "Mediano",
 	"large": "Grande",
 	"size": "Tamaño",
 	"shuffle": "Aleatorio",
@@ -298,8 +289,7 @@ function del() {
 	"fast": "Rápido",
 	"slow": "Lento",
 	"reverse": "Echar de un capirotazo",
-	"colored": "Color",
-	"remove": "Borrar"
+	"colored": "Color"
 }
 </locale>
 
@@ -309,7 +299,6 @@ function del() {
 	"type": "Type",
 	"label": "Étiquette",
 	"small": "Petit",
-	"medium": "Moyen",
 	"large": "Grand",
 	"size": "Taille",
 	"shuffle": "Lecture aléatoire",
@@ -318,8 +307,7 @@ function del() {
 	"fast": "Rapide",
 	"slow": "Lente",
 	"reverse": "Inverser",
-	"colored": "Coloré",
-	"remove": "Supprimer"
+	"colored": "Coloré"
 }
 </locale>
 
@@ -329,7 +317,6 @@ function del() {
 	"type": "Tipe",
 	"label": "Label",
 	"small": "Kecil",
-	"medium": "Sedang",
 	"large": "Besar",
 	"size": "Ukuran",
 	"shuffle": "Acak",
@@ -338,8 +325,7 @@ function del() {
 	"fast": "Cepat",
 	"slow": "Lambat",
 	"reverse": "Balik",
-	"colored": "Diwarnai",
-	"remove": "Hapus"
+	"colored": "Diwarnai"
 }
 </locale>
 
@@ -349,7 +335,6 @@ function del() {
 	"type": "Tipo",
 	"label": "Etichetta",
 	"small": "Piccolo",
-	"medium": "Medio",
 	"large": "Grande",
 	"size": "Dimensioni",
 	"shuffle": "Casuale",
@@ -358,8 +343,7 @@ function del() {
 	"fast": "Veloce",
 	"slow": "Lento",
 	"reverse": "Inverti",
-	"colored": "Colorato",
-	"remove": "Elimina"
+	"colored": "Colorato"
 }
 </locale>
 
@@ -369,7 +353,6 @@ function del() {
 	"type": "タイプ",
 	"label": "ラベル",
 	"small": "小",
-	"medium": "中",
 	"large": "大",
 	"size": "サイズ",
 	"shuffle": "シャッフル",
@@ -378,8 +361,7 @@ function del() {
 	"fast": "速い",
 	"slow": "遅い",
 	"reverse": "反転",
-	"colored": "色付き",
-	"remove": "削除"
+	"colored": "色付き"
 }
 </locale>
 
@@ -389,7 +371,6 @@ function del() {
 	"type": "タイプ",
 	"label": "ラベル",
 	"small": "ちいさい",
-	"medium": "ふつう",
 	"large": "でかい",
 	"size": "大きさ",
 	"shuffle": "シャッフルするで",
@@ -398,8 +379,7 @@ function del() {
 	"fast": "速い",
 	"slow": "遅い",
 	"reverse": "反転",
-	"colored": "色付き",
-	"remove": "ほかす"
+	"colored": "色付き"
 }
 </locale>
 
@@ -409,7 +389,6 @@ function del() {
 	"type": "Type",
 	"label": "Label",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"size": "Size",
 	"shuffle": "Shuffle",
@@ -418,8 +397,7 @@ function del() {
 	"fast": "Fast",
 	"slow": "Slow",
 	"reverse": "Reverse",
-	"colored": "Colored",
-	"remove": "Kkes"
+	"colored": "Colored"
 }
 </locale>
 
@@ -429,7 +407,6 @@ function del() {
 	"type": "Type",
 	"label": "Label",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"size": "Size",
 	"shuffle": "Shuffle",
@@ -438,8 +415,7 @@ function del() {
 	"fast": "Fast",
 	"slow": "Slow",
 	"reverse": "Reverse",
-	"colored": "Colored",
-	"remove": "ಅಳಿಸು"
+	"colored": "Colored"
 }
 </locale>
 
@@ -449,7 +425,6 @@ function del() {
 	"type": "종류",
 	"label": "라벨",
 	"small": "작게",
-	"medium": "보통",
 	"large": "크게",
 	"size": "크기",
 	"shuffle": "셔플",
@@ -458,8 +433,7 @@ function del() {
 	"fast": "빠르게",
 	"slow": "느리게",
 	"reverse": "플립",
-	"colored": "색 입히기",
-	"remove": "삭제"
+	"colored": "색 입히기"
 }
 </locale>
 
@@ -469,7 +443,6 @@ function del() {
 	"type": "Type",
 	"label": "Label",
 	"small": "Klein",
-	"medium": "Medium",
 	"large": "Groot",
 	"size": "Size",
 	"shuffle": "Shuffle",
@@ -478,8 +451,7 @@ function del() {
 	"fast": "Fast",
 	"slow": "Slow",
 	"reverse": "Reverse",
-	"colored": "Colored",
-	"remove": "Verwijderen"
+	"colored": "Colored"
 }
 </locale>
 
@@ -489,7 +461,6 @@ function del() {
 	"type": "Type",
 	"label": "Label",
 	"small": "Liten",
-	"medium": "Medium",
 	"large": "Stor",
 	"size": "Størrelse",
 	"shuffle": "Shuffle",
@@ -498,8 +469,7 @@ function del() {
 	"fast": "Fast",
 	"slow": "Slow",
 	"reverse": "Reverse",
-	"colored": "Colored",
-	"remove": "Slett"
+	"colored": "Colored"
 }
 </locale>
 
@@ -509,7 +479,6 @@ function del() {
 	"type": "Typ",
 	"label": "Etykieta",
 	"small": "Małe",
-	"medium": "Średnie",
 	"large": "Duże",
 	"size": "Rozmiar",
 	"shuffle": "Mieszaj",
@@ -518,8 +487,7 @@ function del() {
 	"fast": "Szybki",
 	"slow": "Wolny",
 	"reverse": "Odwróć",
-	"colored": "Kolorowe",
-	"remove": "Usuń"
+	"colored": "Kolorowe"
 }
 </locale>
 
@@ -529,7 +497,6 @@ function del() {
 	"type": "Tipo",
 	"label": "Etiqueta",
 	"small": "Pequeno",
-	"medium": "Médio",
 	"large": "Grande",
 	"size": "Tamanho",
 	"shuffle": "Aleatório",
@@ -538,8 +505,7 @@ function del() {
 	"fast": "Rápido",
 	"slow": "Lento",
 	"reverse": "Inversão",
-	"colored": "Colorido",
-	"remove": "Remover"
+	"colored": "Colorido"
 }
 </locale>
 
@@ -549,7 +515,6 @@ function del() {
 	"type": "Тип",
 	"label": "Метка",
 	"small": "Мелко",
-	"medium": "Средне",
 	"large": "Крупно",
 	"size": "Размер",
 	"shuffle": "Перемешать",
@@ -558,8 +523,7 @@ function del() {
 	"fast": "Быстрая",
 	"slow": "Медленная",
 	"reverse": "Переворот",
-	"colored": "Выделена цветом",
-	"remove": "Удалить"
+	"colored": "Выделена цветом"
 }
 </locale>
 
@@ -569,7 +533,6 @@ function del() {
 	"type": "Typ",
 	"label": "Popisok",
 	"small": "Malé",
-	"medium": "Stredné",
 	"large": "Veľké",
 	"size": "Veľkosť",
 	"shuffle": "Zamiešať",
@@ -578,8 +541,7 @@ function del() {
 	"fast": "Rýchlo",
 	"slow": "Pomaly",
 	"reverse": "Preklopiť",
-	"colored": "Farebné",
-	"remove": "Odstrániť"
+	"colored": "Farebné"
 }
 </locale>
 
@@ -589,7 +551,6 @@ function del() {
 	"type": "รูปแบบ",
 	"label": "ป้าย",
 	"small": "เล็ก",
-	"medium": "ปานกลาง",
 	"large": "ใหญ่",
 	"size": "ขนาด",
 	"shuffle": "สลับ",
@@ -598,8 +559,7 @@ function del() {
 	"fast": "เร็ว",
 	"slow": "ช้า",
 	"reverse": "พลิก",
-	"colored": "สี",
-	"remove": "ลบ"
+	"colored": "สี"
 }
 </locale>
 
@@ -609,7 +569,6 @@ function del() {
 	"type": "Tür",
 	"label": "Etiket",
 	"small": "Küçük",
-	"medium": "Orta",
 	"large": "Büyük",
 	"size": "Boyut",
 	"shuffle": "Karıştır",
@@ -618,8 +577,7 @@ function del() {
 	"fast": "Hızlı",
 	"slow": "Yavaş",
 	"reverse": "Tersine",
-	"colored": "Renkli",
-	"remove": "Sil"
+	"colored": "Renkli"
 }
 </locale>
 
@@ -629,7 +587,6 @@ function del() {
 	"type": "Type",
 	"label": "Label",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"size": "Size",
 	"shuffle": "Shuffle",
@@ -638,8 +595,7 @@ function del() {
 	"fast": "Fast",
 	"slow": "Slow",
 	"reverse": "Reverse",
-	"colored": "Colored",
-	"remove": "ئۆچۈرۈش"
+	"colored": "Colored"
 }
 </locale>
 
@@ -649,7 +605,6 @@ function del() {
 	"type": "Тип",
 	"label": "Назва",
 	"small": "Маленький",
-	"medium": "Середній",
 	"large": "Крупний",
 	"size": "Розмір",
 	"shuffle": "Перемішати",
@@ -658,8 +613,7 @@ function del() {
 	"fast": "Швидко",
 	"slow": "Повільно",
 	"reverse": "Перевернути",
-	"colored": "Кольоровий",
-	"remove": "Видалити"
+	"colored": "Кольоровий"
 }
 </locale>
 
@@ -669,7 +623,6 @@ function del() {
 	"type": "Loại",
 	"label": "Nhãn",
 	"small": "Nhỏ",
-	"medium": "Vừa",
 	"large": "Lớn",
 	"size": "Kích thước",
 	"shuffle": "Xáo trộn",
@@ -678,8 +631,7 @@ function del() {
 	"fast": "Nhanh",
 	"slow": "Chậm",
 	"reverse": "Lật",
-	"colored": "Với màu",
-	"remove": "Xóa"
+	"colored": "Với màu"
 }
 </locale>
 
@@ -689,7 +641,6 @@ function del() {
 	"type": "类型",
 	"label": "标签",
 	"small": "小",
-	"medium": "中",
 	"large": "大",
 	"size": "大小",
 	"shuffle": "随机",
@@ -698,8 +649,7 @@ function del() {
 	"fast": "快",
 	"slow": "慢",
 	"reverse": "翻转",
-	"colored": "彩色",
-	"remove": "删除"
+	"colored": "彩色"
 }
 </locale>
 
@@ -709,7 +659,6 @@ function del() {
 	"type": "類型",
 	"label": "標籤",
 	"small": "小",
-	"medium": "中",
 	"large": "大",
 	"size": "大小",
 	"shuffle": "隨機",
@@ -718,7 +667,6 @@ function del() {
 	"fast": "快",
 	"slow": "慢",
 	"reverse": "翻轉",
-	"colored": "彩色",
-	"remove": "刪除"
+	"colored": "彩色"
 }
 </locale>

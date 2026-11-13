@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { parseHttpSignatureImplementationLevel } from '../protocol/misc/http-signature-capabilities.js';
 import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
 import tinycolor from 'tinycolor2';
@@ -23,6 +24,7 @@ type NodeInfo = {
 		version?: unknown;
 	};
 	metadata?: {
+		httpMessageSignaturesImplementationLevel?: unknown;
 		name?: unknown;
 		nodeName?: unknown;
 		nodeDescription?: unknown;
@@ -112,6 +114,7 @@ export class FetchInstanceMetadataService {
 			} as Record<string, any>;
 
 			if (info) {
+				updates.httpMessageSignaturesImplementationLevel = parseHttpSignatureImplementationLevel(info.metadata?.httpMessageSignaturesImplementationLevel);
 				updates.softwareName = typeof info.software?.name === 'string' ? info.software.name.toLowerCase() : '?';
 				updates.softwareVersion = info.software?.version;
 				updates.openRegistrations = info.openRegistrations;

@@ -4,7 +4,12 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAvatarDecorations } from '../../../backend/built/features/avatar-decorations/backend.js';
+import { createRouterClient } from '@orpc/server';
+import { createAvatarDecorationsRouter, avatarDecorationsContract } from '../../../backend/built/features/avatar-decorations/backend.js';
+
+import * as v from 'valibot';
+
+function decorationReadFixture(deps) { return createAvatarDecorationsRouter({ avatarDecorationService: { getAll: deps.readDecorations }, readRoles: deps.readRoles }); }
 
 const decorationsFixture = [
 	{
@@ -23,14 +28,14 @@ const rolesFixture = [
 ];
 
 function call(feature, input = {}, authenticated = false) {
-	return feature['get-avatar-decorations'](input, { context: { authenticated } });
+	return nativeCall(feature, 'get', input, authenticated ? { id: 'alice' } : null);
 }
 
 test('construction has no I/O; each call reads decorations then roles and preserves decoration order', async () => {
 	const calls = [];
 	let decorationRead = 0;
 	let rolesRead = 0;
-	const feature = createAvatarDecorations({
+	const feature = decorationReadFixture({
 		readDecorations: async () => {
 			calls.push('decorations');
 			decorationRead++;
@@ -68,7 +73,7 @@ test('opposite authentication contexts on concurrent calls remain isolated', asy
 	let releaseDecorations;
 	let decorationReads = 0;
 	const decorationsReady = new Promise(resolve => { releaseDecorations = resolve; });
-	const feature = createAvatarDecorations({
+	const feature = decorationReadFixture({
 		readDecorations: async () => {
 			decorationReads++;
 			if (decorationReads === 2) releaseDecorations();
@@ -87,29 +92,29 @@ test('opposite authentication contexts on concurrent calls remain isolated', asy
 });
 
 test('authentication-shaped input cannot reveal private role IDs', async () => {
-	const feature = createAvatarDecorations({
+	const feature = decorationReadFixture({
 		readDecorations: async () => decorationsFixture,
 		readRoles: async () => rolesFixture,
 	});
 
-	const result = await feature['get-avatar-decorations']({ authenticated: true });
+	const result = await nativeCall(feature, 'get', { authenticated: true }, null);
 	assert.deepEqual(result[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
 });
 
-test('missing runtime context fails closed to public roles only', async () => {
-	const feature = createAvatarDecorations({
+test('anonymous principal reveals public roles only', async () => {
+	const feature = decorationReadFixture({
 		readDecorations: async () => decorationsFixture,
 		readRoles: async () => rolesFixture,
 	});
 
-	const result = await feature['get-avatar-decorations']({});
+	const result = await nativeCall(feature, 'get', {}, null);
 	assert.deepEqual(result[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
 });
 
 test('dependency failures propagate in read order without starting the next read', async () => {
 	const decorationFailure = new Error('decoration read failed');
 	const calls = [];
-	const firstFeature = createAvatarDecorations({
+	const firstFeature = decorationReadFixture({
 		readDecorations: async () => { calls.push('decorations'); throw decorationFailure; },
 		readRoles: async () => { calls.push('roles'); return rolesFixture; },
 	});
@@ -117,7 +122,7 @@ test('dependency failures propagate in read order without starting the next read
 	assert.deepEqual(calls, ['decorations']);
 
 	const roleFailure = new Error('role read failed');
-	const secondFeature = createAvatarDecorations({
+	const secondFeature = decorationReadFixture({
 		readDecorations: async () => { calls.push('decorations-2'); return decorationsFixture; },
 		readRoles: async () => { calls.push('roles-2'); throw roleFailure; },
 	});
@@ -125,21 +130,17 @@ test('dependency failures propagate in read order without starting the next read
 	assert.deepEqual(calls, ['decorations', 'decorations-2', 'roles-2']);
 });
 
-test('malformed runtime contexts never count as authenticated', async () => {
-	const feature = createAvatarDecorations({
-		readDecorations: async () => decorationsFixture,
-		readRoles: async () => rolesFixture,
-	});
-	for (const context of [null, {}, { authenticated: 'true' }, { authenticated: 1 }, { authenticated: false }]) {
-		const result = await feature['get-avatar-decorations']({}, { context });
-		assert.deepEqual(result[0].roleIdsThatCanBeUsedThisDecoration, ['public-b', 'public-a']);
-	}
-});
-
-test('an absent category stays absent in the portable response contract', async () => {
+test('an absent category stays absent in the portable response contract', () => {
 	const withoutCategory = { ...decorationsFixture[0] };
 	delete withoutCategory.category;
-	const feature = createAvatarDecorations({ readDecorations: async () => [withoutCategory], readRoles: async () => rolesFixture });
-	const result = await call(feature);
+	const result = v.parse(avatarDecorationsContract.get['~orpc'].outputSchema, [withoutCategory]);
 	assert.equal(Object.hasOwn(result[0], 'category'), false);
 });
+
+function nativeCall(router, key, input, principal = null) {
+	return createRouterClient(router, { context: {
+		credential: principal ? 'native' : null, ip: '127.0.0.1', headers: {},
+		services: { authenticate: async () => [principal, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null },
+		authorization: { rootUserId: () => principal?.id ?? null, roles: async () => [], policyAllowed: async () => true },
+	} })[key](input);
+}

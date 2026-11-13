@@ -29,14 +29,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template #label>{{ $locale.sfc.value }} (JSON)</template>
 				</MkCodeEditor>
 
-				<MkButton primary @click="save"><i class="ti ti-device-floppy"></i> {{ $locale.sfc.save }}</MkButton>
+				<MkButton primary @click="save"><i class="ti ti-device-floppy"></i> {{ globalLocale.env.save }}</MkButton>
 
 				<MkKeyValue>
-					<template #key>{{ $locale.sfc.updatedAt }}</template>
+					<template #key>{{ globalLocale.env.updatedAt }}</template>
 					<template #value><MkTime :time="value.updatedAt" mode="detail"/></template>
 				</MkKeyValue>
 
-				<MkButton danger @click="del"><i class="ti ti-trash"></i> {{ $locale.sfc.delete }}</MkButton>
+				<MkButton danger @click="del"><i class="ti ti-trash"></i> {{ globalLocale.env.delete }}</MkButton>
 			</template>
 		</div>
 	</div>
@@ -44,8 +44,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { watch, computed, ref } from 'vue';
 import JSON5 from 'json5';
+import * as v from 'valibot';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
@@ -54,6 +56,10 @@ import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
 import FormSplit from '@features/ui/frontend/components/form/split.vue';
 import FormInfo from '@features/ui/frontend/components/MkInfo.vue';
+import { packedJsonValueSchema } from '../../../users/backend/json-value.schema.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	path: string;
@@ -79,7 +85,7 @@ function fetchValue() {
 
 async function save() {
 	try {
-		JSON5.parse(valueForEditor.value);
+		v.parse(packedJsonValueSchema, JSON5.parse(valueForEditor.value));
 	} catch (err) {
 		os.alert({
 			type: 'error',
@@ -95,7 +101,7 @@ async function save() {
 		os.apiWithDialog('i/registry/set', {
 			scope: scope.value,
 			key: key.value,
-			value: JSON5.parse(valueForEditor.value),
+			value: v.parse(packedJsonValueSchema, JSON5.parse(valueForEditor.value)),
 			domain: props.domain === '@' ? null : props.domain,
 		});
 	});
@@ -138,10 +144,7 @@ definePage(() => ({
 	"system": "النظام",
 	"scope": "الحيّز",
 	"key": "مفتاح",
-	"value": "القيمة",
-	"save": "حفظ",
-	"updatedAt": "حُدّث في",
-	"delete": "حذف"
+	"value": "القيمة"
 }
 </locale>
 
@@ -156,10 +159,7 @@ definePage(() => ({
 	"system": "Sistema",
 	"scope": "Àmbit ",
 	"key": "Clau",
-	"value": "Valor",
-	"save": "Desa",
-	"updatedAt": "Actualitzat el",
-	"delete": "Elimina"
+	"value": "Valor"
 }
 </locale>
 
@@ -174,10 +174,7 @@ definePage(() => ({
 	"system": "Systém",
 	"scope": "Rozsah",
 	"key": "Klíč",
-	"value": "Hodnota",
-	"save": "Uložit",
-	"updatedAt": "Upraveno",
-	"delete": "Smazat"
+	"value": "Hodnota"
 }
 </locale>
 
@@ -192,10 +189,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"save": "Save",
-	"updatedAt": "Updated at",
-	"delete": "Delete"
+	"value": "Value"
 }
 </locale>
 
@@ -210,10 +204,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Schlüssel",
-	"value": "Wert",
-	"save": "Speichern",
-	"updatedAt": "Zuletzt geändert am",
-	"delete": "Löschen"
+	"value": "Wert"
 }
 </locale>
 
@@ -228,10 +219,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"save": "Save",
-	"updatedAt": "Updated at",
-	"delete": "Delete"
+	"value": "Value"
 }
 </locale>
 
@@ -246,10 +234,7 @@ definePage(() => ({
 	"system": "Sistema",
 	"scope": "Alcance",
 	"key": "Clave",
-	"value": "Valores",
-	"save": "Guardar",
-	"updatedAt": "Actualizado",
-	"delete": "Borrar"
+	"value": "Valores"
 }
 </locale>
 
@@ -264,10 +249,7 @@ definePage(() => ({
 	"system": "Système",
 	"scope": "Portée",
 	"key": "Clé ",
-	"value": "Valeur",
-	"save": "Enregistrer",
-	"updatedAt": "Mis à jour le",
-	"delete": "Supprimer"
+	"value": "Valeur"
 }
 </locale>
 
@@ -282,10 +264,7 @@ definePage(() => ({
 	"system": "Sistem",
 	"scope": "Lingkup",
 	"key": "Kunci",
-	"value": "Nilai",
-	"save": "Simpan",
-	"updatedAt": "Diperbarui pada",
-	"delete": "Hapus"
+	"value": "Nilai"
 }
 </locale>
 
@@ -300,10 +279,7 @@ definePage(() => ({
 	"system": "Sistema",
 	"scope": "Ambito di applicazione.",
 	"key": "Dati",
-	"value": "Valore",
-	"save": "Salva",
-	"updatedAt": "Aggiornato il",
-	"delete": "Elimina"
+	"value": "Valore"
 }
 </locale>
 
@@ -318,10 +294,7 @@ definePage(() => ({
 	"system": "システム",
 	"scope": "スコープ",
 	"key": "キー",
-	"value": "値",
-	"save": "保存",
-	"updatedAt": "更新日時",
-	"delete": "削除"
+	"value": "値"
 }
 </locale>
 
@@ -336,10 +309,7 @@ definePage(() => ({
 	"system": "システム",
 	"scope": "スコープ",
 	"key": "キー",
-	"value": "値",
-	"save": "とっとく",
-	"updatedAt": "更新日時",
-	"delete": "ほかす"
+	"value": "値"
 }
 </locale>
 
@@ -354,10 +324,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"save": "Sekles",
-	"updatedAt": "Updated at",
-	"delete": "Kkes"
+	"value": "Value"
 }
 </locale>
 
@@ -372,10 +339,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"save": "ಉಳಿಸಿ",
-	"updatedAt": "Updated at",
-	"delete": "ಅಳಿಸು"
+	"value": "Value"
 }
 </locale>
 
@@ -390,10 +354,7 @@ definePage(() => ({
 	"system": "시스템",
 	"scope": "범위",
 	"key": "키",
-	"value": "값",
-	"save": "저장",
-	"updatedAt": "수정한 날짜",
-	"delete": "삭제"
+	"value": "값"
 }
 </locale>
 
@@ -408,10 +369,7 @@ definePage(() => ({
 	"system": "Systeem",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Waarde",
-	"save": "Opslaan",
-	"updatedAt": "Laatst gewijzigd at",
-	"delete": "Verwijderen"
+	"value": "Waarde"
 }
 </locale>
 
@@ -426,10 +384,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Nøkkel",
-	"value": "Verdi",
-	"save": "Lagre",
-	"updatedAt": "Updated at",
-	"delete": "Slett"
+	"value": "Verdi"
 }
 </locale>
 
@@ -444,10 +399,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Zakres",
 	"key": "Klucz",
-	"value": "Wartość",
-	"save": "Zapisz",
-	"updatedAt": "Zaktualizowano",
-	"delete": "Usuń"
+	"value": "Wartość"
 }
 </locale>
 
@@ -462,10 +414,7 @@ definePage(() => ({
 	"system": "Sistema",
 	"scope": "Escopo",
 	"key": "Chave",
-	"value": "Valor",
-	"save": "Salvar",
-	"updatedAt": "Última atualização",
-	"delete": "Excluir"
+	"value": "Valor"
 }
 </locale>
 
@@ -480,10 +429,7 @@ definePage(() => ({
 	"system": "Система",
 	"scope": "Область",
 	"key": "Ключ",
-	"value": "Значения",
-	"save": "Сохранить",
-	"updatedAt": "Обновлено",
-	"delete": "Удалить"
+	"value": "Значения"
 }
 </locale>
 
@@ -498,10 +444,7 @@ definePage(() => ({
 	"system": "Systém",
 	"scope": "Oblasť",
 	"key": "Kľúč",
-	"value": "Hodnoty",
-	"save": "Uložiť",
-	"updatedAt": "Upravené",
-	"delete": "Odstrániť"
+	"value": "Hodnoty"
 }
 </locale>
 
@@ -516,10 +459,7 @@ definePage(() => ({
 	"system": "ระบบ",
 	"scope": "สโคป",
 	"key": "คีย์",
-	"value": "ค่า",
-	"save": "บันทึก",
-	"updatedAt": "อัปเดตล่าสุด",
-	"delete": "ลบ"
+	"value": "ค่า"
 }
 </locale>
 
@@ -534,10 +474,7 @@ definePage(() => ({
 	"system": "Sistem",
 	"scope": "Kapsam",
 	"key": "Anahtar",
-	"value": "Değer",
-	"save": "Kaydet",
-	"updatedAt": "Güncellendi",
-	"delete": "Sil"
+	"value": "Değer"
 }
 </locale>
 
@@ -552,10 +489,7 @@ definePage(() => ({
 	"system": "System",
 	"scope": "Scope",
 	"key": "Key",
-	"value": "Value",
-	"save": "Save",
-	"updatedAt": "Updated at",
-	"delete": "ئۆچۈرۈش"
+	"value": "Value"
 }
 </locale>
 
@@ -570,10 +504,7 @@ definePage(() => ({
 	"system": "Система",
 	"scope": "Область дії",
 	"key": "Ключ",
-	"value": "Значення",
-	"save": "Зберегти",
-	"updatedAt": "Останнє оновлення",
-	"delete": "Видалити"
+	"value": "Значення"
 }
 </locale>
 
@@ -588,10 +519,7 @@ definePage(() => ({
 	"system": "Hệ thống",
 	"scope": "Phạm vi",
 	"key": "Mã",
-	"value": "Giá trị",
-	"save": "Lưu",
-	"updatedAt": "Cập nhật lúc",
-	"delete": "Xóa"
+	"value": "Giá trị"
 }
 </locale>
 
@@ -606,10 +534,7 @@ definePage(() => ({
 	"system": "系统",
 	"scope": "范围",
 	"key": "键",
-	"value": "值",
-	"save": "保存",
-	"updatedAt": "更新日期",
-	"delete": "删除"
+	"value": "值"
 }
 </locale>
 
@@ -624,9 +549,6 @@ definePage(() => ({
 	"system": "系統",
 	"scope": "範圍",
 	"key": "機碼",
-	"value": "數值",
-	"save": "儲存",
-	"updatedAt": "最後更新",
-	"delete": "刪除"
+	"value": "數值"
 }
 </locale>

@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <MkModal ref="modal" v-slot="{ type }" :zPriority="'high'" :anchorElement="anchorElement" @click="modal?.close()" @closed="emit('closed')" @esc="modal?.close()">
 	<div class="_popup" :class="{ [$style.root]: true, [$style.asDrawer]: type === 'drawer' }">
 		<div :class="[$style.label, $style.item]">
-			{{ $locale.sfc.visibility }}
+			{{ globalLocale.env.visibility }}
 		</div>
 		<button key="public" :disabled="isSilenced || isReplyVisibilitySpecified" class="_button" :class="[$style.item, { [$style.active]: v === 'public' }]" data-index="1" @click="choose('public')">
 			<div :class="$style.icon"><i class="ti ti-world"></i></div>
@@ -42,9 +42,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { nextTick, useTemplateRef, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkModal from '@features/ui/frontend/components/MkModal.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const modal = useTemplateRef('modal');
 
@@ -157,7 +161,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="ar-SA" lang="json">
 {
-  "visibility": "الظهور",
   "public": "علني",
   "publicDescription": "ستكون ملاحظتك مرئية لكل المستخدمين",
   "home": "الرئيسي",
@@ -171,7 +174,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="ca-ES" lang="json">
 {
-  "visibility": "Visibilitat",
   "public": "Públic ",
   "publicDescription": "La teva nota la podrà veure tothom ",
   "home": "Inici",
@@ -185,7 +187,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="cs-CZ" lang="json">
 {
-  "visibility": "Viditelnost",
   "public": "Veřejný",
   "publicDescription": "Vaše poznámka bude viditelná pro všechny uživatele",
   "home": "Domů",
@@ -199,7 +200,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="da-DK" lang="json">
 {
-  "visibility": "Visibility",
   "public": "Public",
   "publicDescription": "Your note will be visible for all users",
   "home": "Home",
@@ -213,7 +213,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="de-DE" lang="json">
 {
-  "visibility": "Sichtbarkeit",
   "public": "Öffentlich",
   "publicDescription": "Deine Notiz wird global für alle Benutzer sichtbar sein",
   "home": "Startseite",
@@ -227,7 +226,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="en-US" lang="json">
 {
-  "visibility": "Visibility",
   "public": "Public",
   "publicDescription": "Your note will be visible for all users",
   "home": "Home",
@@ -241,7 +239,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="es-ES" lang="json">
 {
-  "visibility": "Visibilidad",
   "public": "Público",
   "publicDescription": "Visible para todos los usuarios",
   "home": "Inicio",
@@ -255,7 +252,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="fr-FR" lang="json">
 {
-  "visibility": "Visibilité",
   "public": "Public",
   "publicDescription": "Publier à tou·te·s les utilisateur·rice·s",
   "home": "Principal",
@@ -269,7 +265,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="id-ID" lang="json">
 {
-  "visibility": "Visibilitas",
   "public": "Publik",
   "publicDescription": "Catat ke lini masa global",
   "home": "Beranda",
@@ -283,7 +278,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="it-IT" lang="json">
 {
-  "visibility": "Visibilità",
   "public": "Pubblica",
   "publicDescription": "Visibilità pubblica",
   "home": "Home",
@@ -297,7 +291,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="ja-JP" lang="json">
 {
-  "visibility": "公開範囲",
   "public": "パブリック",
   "publicDescription": "全てのユーザーに公開",
   "home": "ホーム",
@@ -311,7 +304,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="ja-KS" lang="json">
 {
-  "visibility": "公開範囲",
   "public": "パブリック",
   "publicDescription": "みんなに公開",
   "home": "ホーム",
@@ -325,7 +317,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="kab-KAB" lang="json">
 {
-  "visibility": "Visibility",
   "public": "Public",
   "publicDescription": "Your note will be visible for all users",
   "home": "Home",
@@ -339,7 +330,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="kn-IN" lang="json">
 {
-  "visibility": "Visibility",
   "public": "Public",
   "publicDescription": "Your note will be visible for all users",
   "home": "Home",
@@ -353,7 +343,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="ko-KR" lang="json">
 {
-  "visibility": "공개 범위",
   "public": "공개",
   "publicDescription": "모든 유저에게 공개",
   "home": "홈",
@@ -367,7 +356,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="nl-NL" lang="json">
 {
-  "visibility": "Zichtbaarheid",
   "public": "Public",
   "publicDescription": "Your note will be visible for all users",
   "home": "Startpagina",
@@ -381,7 +369,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="no-NO" lang="json">
 {
-  "visibility": "Visibility",
   "public": "Public",
   "publicDescription": "Your note will be visible for all users",
   "home": "Hjem",
@@ -395,7 +382,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="pl-PL" lang="json">
 {
-  "visibility": "Widoczność",
   "public": "Publiczny",
   "publicDescription": "Twój wpis pojawi się w publicznych osiach czasu",
   "home": "Strona główna",
@@ -409,7 +395,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="pt-PT" lang="json">
 {
-  "visibility": "Visibilidade",
   "public": "Público",
   "publicDescription": "Sua nota será visível para todos os usuários",
   "home": "Início",
@@ -423,7 +408,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="ru-RU" lang="json">
 {
-  "visibility": "Видимость",
   "public": "Общедоступно",
   "publicDescription": "Открыто для всех",
   "home": "Домашняя",
@@ -437,7 +421,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="sk-SK" lang="json">
 {
-  "visibility": "Viditeľnosť",
   "public": "Verejné",
   "publicDescription": "Vaša poznámku bude viditeľná všetkým používateľom",
   "home": "Domov",
@@ -451,7 +434,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="th-TH" lang="json">
 {
-  "visibility": "การมองเห็น",
   "public": "สาธารณะ",
   "publicDescription": "โน้ตของคุณจะปรากฏแก่ผู้ใช้ทุกคน",
   "home": "หน้าหลัก",
@@ -465,7 +447,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="tr-TR" lang="json">
 {
-  "visibility": "Görünürlük",
   "public": "Halka açık",
   "publicDescription": "Notunuz tüm kullanıcılar tarafından görülebilir olacaktır.",
   "home": "Pano",
@@ -479,7 +460,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="ug-CN" lang="json">
 {
-  "visibility": "Visibility",
   "public": "Public",
   "publicDescription": "Your note will be visible for all users",
   "home": "Home",
@@ -493,7 +473,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="uk-UA" lang="json">
 {
-  "visibility": "Видимість",
   "public": "Публічний",
   "publicDescription": "Для всіх користувачів",
   "home": "Домівка",
@@ -507,7 +486,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="vi-VN" lang="json">
 {
-  "visibility": "Hiển thị",
   "public": "Công khai",
   "publicDescription": "Mọi người đều có thể đọc tút của bạn",
   "home": "Trang chính",
@@ -521,7 +499,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="zh-CN" lang="json">
 {
-  "visibility": "可见性",
   "public": "公开",
   "publicDescription": "所有用户均可见",
   "home": "首页",
@@ -535,7 +512,6 @@ function choose(visibility: typeof Misskey.noteVisibilities[number]): void {
 
 <locale locale="zh-TW" lang="json">
 {
-  "visibility": "可見性",
   "public": "公開",
   "publicDescription": "發佈給所有使用者",
   "home": "首頁",

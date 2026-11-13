@@ -7,45 +7,47 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithAnimBg>
 	<div :class="$style.formContainer">
 		<div :class="$style.form" class="_panel">
-			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="z-index:1;position:relative" viewBox="0 0 854 300">
-				<defs>
-					<linearGradient id="linear" x1="0%" y1="0%" x2="100%" y2="0%">
-						<stop offset="0%" stop-color="#86b300"/><stop offset="100%" stop-color="#4ab300"/>
-					</linearGradient>
-				</defs>
+			<div :class="$style.header">
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="z-index:1;position:relative" viewBox="0 0 854 300">
+					<defs>
+						<linearGradient id="linear" x1="0%" y1="0%" x2="100%" y2="0%">
+							<stop offset="0%" stop-color="#86b300"/><stop offset="100%" stop-color="#4ab300"/>
+						</linearGradient>
+					</defs>
 
-				<g transform="translate(427, 150) scale(1, 1) translate(-427, -150)">
-					<path d="" fill="url(#linear)" opacity="0.4">
-						<animate
-							attributeName="d"
-							dur="20s"
-							repeatCount="indefinite"
-							keyTimes="0;0.333;0.667;1"
-							calcmod="spline"
-							keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
-							begin="0s"
-							values="M0 0L 0 220Q 213.5 260 427 230T 854 255L 854 0 Z;M0 0L 0 245Q 213.5 260 427 240T 854 230L 854 0 Z;M0 0L 0 265Q 213.5 235 427 265T 854 230L 854 0 Z;M0 0L 0 220Q 213.5 260 427 230T 854 255L 854 0 Z"
-						>
-						</animate>
-					</path>
-					<path d="" fill="url(#linear)" opacity="0.4">
-						<animate
-							attributeName="d"
-							dur="20s"
-							repeatCount="indefinite"
-							keyTimes="0;0.333;0.667;1"
-							calcmod="spline"
-							keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
-							begin="-10s"
-							values="M0 0L 0 235Q 213.5 280 427 250T 854 260L 854 0 Z;M0 0L 0 250Q 213.5 220 427 220T 854 240L 854 0 Z;M0 0L 0 245Q 213.5 225 427 250T 854 265L 854 0 Z;M0 0L 0 235Q 213.5 280 427 250T 854 260L 854 0 Z"
-						>
-						</animate>
-					</path>
-				</g>
-			</svg>
-			<div :class="$style.title">
-				<div>Welcome to Misskey!</div>
-				<div :class="$style.version">v{{ version }}</div>
+					<g transform="translate(427, 150) scale(1, 1) translate(-427, -150)">
+						<path d="" fill="url(#linear)" opacity="0.4">
+							<animate
+								attributeName="d"
+								dur="20s"
+								repeatCount="indefinite"
+								keyTimes="0;0.333;0.667;1"
+								calcmod="spline"
+								keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
+								begin="0s"
+								values="M0 0L 0 220Q 213.5 260 427 230T 854 255L 854 0 Z;M0 0L 0 245Q 213.5 260 427 240T 854 230L 854 0 Z;M0 0L 0 265Q 213.5 235 427 265T 854 230L 854 0 Z;M0 0L 0 220Q 213.5 260 427 230T 854 255L 854 0 Z"
+							>
+							</animate>
+						</path>
+						<path d="" fill="url(#linear)" opacity="0.4">
+							<animate
+								attributeName="d"
+								dur="20s"
+								repeatCount="indefinite"
+								keyTimes="0;0.333;0.667;1"
+								calcmod="spline"
+								keySplines="0.2 0 0.2 1;0.2 0 0.2 1;0.2 0 0.2 1"
+								begin="-10s"
+								values="M0 0L 0 235Q 213.5 280 427 250T 854 260L 854 0 Z;M0 0L 0 250Q 213.5 220 427 220T 854 240L 854 0 Z;M0 0L 0 245Q 213.5 225 427 250T 854 265L 854 0 Z;M0 0L 0 235Q 213.5 280 427 250T 854 260L 854 0 Z"
+							>
+							</animate>
+						</path>
+					</g>
+				</svg>
+				<div :class="$style.title">
+					<div>Welcome to {{ productName }}!</div>
+					<div :class="$style.version">v{{ version }}</div>
+				</div>
 			</div>
 			<div style="padding: 16px 32px 32px 32px;">
 				<form v-if="!accountCreated" class="_gaps_m" @submit.prevent="createAccount()">
@@ -68,7 +70,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</MkInput>
 					<div>
 						<MkButton gradate large rounded :disabled="accountCreating" data-testid="admin-ok" style="margin: 0 auto;" type="submit">
-							{{ accountCreating ? $locale.sfc.processing : $locale.sfc.next }}<MkEllipsis v-if="accountCreating"/>
+							{{ accountCreating ? globalLocale.env.processing : globalLocale.env.next }}<MkEllipsis v-if="accountCreating"/>
 						</MkButton>
 					</div>
 				</form>
@@ -77,7 +79,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div><b>{{ $locale.sfc.accountCreated }}</b></div>
 					</div>
 					<MkButton gradate large rounded data-testid="next" style="margin: 0 auto;" @click="step++">
-						{{ $locale.sfc.next }}
+						{{ globalLocale.env.next }}
 					</MkButton>
 				</div>
 				<div v-else-if="step === 1" class="_gaps_m">
@@ -109,7 +111,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div class="_gaps_s" :class="$style.donation">
 						<div><b>{{ $locale.sfc.donationRequest }}</b></div>
 						<div>{{ $locale.sfc.text1 }}<br>{{ $locale.sfc.text2 }}<br>{{ $locale.sfc.text3 }}</div>
-						<MkLink target="_blank" url="https://misskey-hub.net/docs/donate/" style="margin: 0 auto;">{{ $locale.sfc.learnMore }}</MkLink>
+						<MkLink target="_blank" url="https://misskey-hub.net/docs/donate/" style="margin: 0 auto;">{{ globalLocale.env.learnMore }}</MkLink>
 					</div>
 					<div class="_buttonsCenter">
 						<MkButton gradate large rounded data-testid="next" style="margin: 0 auto;" @click="finish">
@@ -124,8 +126,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
-import { host, version } from '@features/boot/frontend/shared/config.js';
+import { host, version, productName } from '@features/boot/frontend/shared/config.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -133,6 +136,9 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { login } from '@features/auth/frontend/accounts.js';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import MkServerSetupWizard from '@features/boot/frontend/components/MkServerSetupWizard.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const username = ref('');
 const password = ref('');
@@ -159,7 +165,7 @@ function createAccount() {
 	}).catch((err) => {
 		accountCreating.value = false;
 
-		let title: string = $locale.value.sfc.somethingHappened;
+		let title: string = globalLocale.value.env.somethingHappened;
 		let text = err.message + '\n' + err.id;
 
 		if (err.code === 'ACCESS_DENIED') {
@@ -212,16 +218,23 @@ function finish() {
 	margin: 0 auto;
 }
 
+.header {
+	display: grid;
+
+	> svg {
+		grid-area: 1 / 1;
+		width: 100%;
+	}
+}
+
 .title {
-	position: absolute;
-	top: 16px;
-	left: 0;
-	right: 0;
+	position: relative;
+	grid-area: 1 / 1;
 	z-index: 1;
 	margin: 0;
 	font-size: 1.5em;
 	text-align: center;
-	padding: 32px;
+	padding: 48px 32px 32px;
 	color: #fff;
 	font-weight: bold;
 }
@@ -242,7 +255,6 @@ function finish() {
 
 <locale locale="ar-SA" lang="json">
 {
-	"somethingHappened": "حدث خطأ",
 	"permissionDeniedError": "رُفضة العملية",
 	"operationForbidden": "عملية ممنوعة",
 	"incorrectPassword": "كلمة السر خاطئة.",
@@ -253,8 +265,6 @@ function finish() {
 	"username": "اسم المستخدم",
 	"usernameInfo": "الاسم الذي يميزك عن بافي مستخدمي هذا الخادم، يمكنك استخدام الحروف اللاتينية (a~z, A~Z) والأرقام (0~9) والشرطة السفلية (_). لا يمكنك تغييره بعد تسجيله.",
 	"password": "الكلمة السرية",
-	"processing": "المعالجة جارية",
-	"next": "التالية",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -267,14 +277,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "راجع المزيد",
 	"start": "البداية"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"somethingHappened": "S'ha produït un error",
 	"permissionDeniedError": "Operació no permesa ",
 	"operationForbidden": "Operació no permesa ",
 	"incorrectPassword": "Contrasenya incorrecta.",
@@ -285,8 +293,6 @@ function finish() {
 	"username": "Nom d'usuari",
 	"usernameInfo": "Un nom que identifiqui el teu compte d'altres en aquest servidor. Pots fer servir lletres (a~z, A~Z), números (0~9) i guions baixos (_). Els noms d'usuari no es poden canviar després.",
 	"password": "Contrasenya",
-	"processing": "S'està processant...",
-	"next": "Següent",
 	"accountCreated": "Compte d'administrador creat.",
 	"serverSetting": "Configuració del servidor",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "Aquest assistent t'ajuda a fer una configuració òptima del servidor.",
@@ -299,14 +305,12 @@ function finish() {
 	"text1": "Misskey és un programari gratuït fet per voluntaris.",
 	"text2": "Si ho desitges, agrairíem molt la teva donació per poder seguir desenvolupant el projecte.",
 	"text3": "També hi ha privilegis especials per als donants!",
-	"learnMore": "Saber-ne més ",
 	"start": "Comença"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"permissionDeniedError": "Operace zamítnuta",
 	"operationForbidden": "Zakázaná operace",
 	"incorrectPassword": "Nesprávné heslo.",
@@ -317,8 +321,6 @@ function finish() {
 	"username": "Uživatelské jméno",
 	"usernameInfo": "Jméno které identifikuje váš účet od jiných na tomhle serveru. Můžete použít abecedu (a~z, A~Z), čísla (0~9) nebo podtržítka (_). Uživatelské jména nemůžou být změněna později.",
 	"password": "Heslo",
-	"processing": "Zpracovávám",
-	"next": "Další",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -331,14 +333,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Zjistit více",
 	"start": "Začít"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -349,8 +349,6 @@ function finish() {
 	"username": "Username",
 	"usernameInfo": "A name that identifies your account from others on this server.  You can use the alphabet (a~z, A~Z), digits (0~9) or underscores (_). Usernames cannot be changed later.",
 	"password": "Password",
-	"processing": "Processing...",
-	"next": "Next",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -363,14 +361,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Learn more",
 	"start": "Begin"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"permissionDeniedError": "Aktion verweigert",
 	"operationForbidden": "Aktion nicht möglich",
 	"incorrectPassword": "Falsches Passwort.",
@@ -381,8 +377,6 @@ function finish() {
 	"username": "Benutzername",
 	"usernameInfo": "Ein Name, durch den dein Benutzerkonto auf diesem Server identifiziert werden kann. Du kannst das Alphabet (a~z, A~Z), Ziffern (0~9) oder Unterstriche (_) verwenden. Benutzernamen können später nicht geändert werden.",
 	"password": "Passwort",
-	"processing": "In Bearbeitung …",
-	"next": "Weiter",
 	"accountCreated": "Ein Administratorkonto wurde angelegt!",
 	"serverSetting": "Servereinstellungen",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "Mit diesem Assistenten lässt sich die optimale Serverkonfiguration leicht einrichten.",
@@ -395,14 +389,12 @@ function finish() {
 	"text1": "Misskey ist eine freie Software, die von Freiwilligen entwickelt wird.",
 	"text2": "Wir würden uns über deine Unterstützung freuen, damit wir dieses Projekt auch in Zukunft weiterentwickeln können.",
 	"text3": "Für Unterstützer gibt es auch besondere Vorteile!",
-	"learnMore": "Mehr erfahren",
 	"start": "Anfangen"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -413,8 +405,6 @@ function finish() {
 	"username": "Username",
 	"usernameInfo": "A name that identifies your account from others on this server.  You can use the alphabet (a~z, A~Z), digits (0~9) or underscores (_). Usernames cannot be changed later.",
 	"password": "Password",
-	"processing": "Processing...",
-	"next": "Next",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -427,14 +417,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Learn more",
 	"start": "Begin"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"somethingHappened": "Ocurrió un error",
 	"permissionDeniedError": "Operación denegada",
 	"operationForbidden": "Operación prohibida",
 	"incorrectPassword": "La contraseña es incorrecta",
@@ -445,8 +433,6 @@ function finish() {
 	"username": "Nombre de usuario",
 	"usernameInfo": "Un nombre que identifique su cuenta de otras en este servidor.  Puede utilizar el alfabeto (a~z, A~Z), dígitos (0~9) o guiones bajos (_). Los nombres de usuario no se pueden cambiar posteriormente.",
 	"password": "Contraseña",
-	"processing": "Procesando...",
-	"next": "Siguiente",
 	"accountCreated": "¡La cuenta de administrador se ha creado! ",
 	"serverSetting": "Configuración del servidor",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "Este asistente te facilita una configuración óptima del servidor.",
@@ -459,14 +445,12 @@ function finish() {
 	"text1": "Misskey es un software libre desarrollado por voluntarios.",
 	"text2": "Agradeceríamos su apoyo para que podamos seguir desarrollando este software en el futuro.",
 	"text3": "También hay beneficios especiales para los donantes",
-	"learnMore": "Ver más",
 	"start": "Comenzar"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"somethingHappened": "Une erreur est survenue",
 	"permissionDeniedError": "Opération refusée",
 	"operationForbidden": "Opération non autorisée",
 	"incorrectPassword": "Le mot de passe est incorrect.",
@@ -477,8 +461,6 @@ function finish() {
 	"username": "Nom d’utilisateur·rice",
 	"usernameInfo": "C'est un nom qui identifie votre compte sur l'instance de manière unique. Vous pouvez utiliser des lettres de l'alphabet (minuscules et majuscules), des chiffres (de 0 à 9), ou bien le tiret « _ ». Vous ne pourrez pas modifier votre nom d'utilisateur·rice par la suite.",
 	"password": "Mot de passe",
-	"processing": "Traitement en cours",
-	"next": "Suivant",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -491,14 +473,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Plus d'informations",
 	"start": "Commencer"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"somethingHappened": "Terjadi kesalahan",
 	"permissionDeniedError": "Operasi ditolak",
 	"operationForbidden": "Operasi dilarang",
 	"incorrectPassword": "Kata sandi salah.",
@@ -509,8 +489,6 @@ function finish() {
 	"username": "Nama Pengguna",
 	"usernameInfo": "Nama yang mengidentifikasikan akun kamu dari yang lain pada peladen ini. Kamu dapat menggunakan alfabet (a~z, A~Z), digit (0~9) atau garis bawah (_). Username tidak dapat diubah setelahnya.",
 	"password": "Kata sandi",
-	"processing": "Memproses",
-	"next": "Selanjutnya",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -523,14 +501,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Pelajari lebih lanjut",
 	"start": "Mulai"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"somethingHappened": "Si è verificato un problema",
 	"permissionDeniedError": "Errore, attività non autorizzata",
 	"operationForbidden": "Operazione non consentita",
 	"incorrectPassword": "La password è errata.",
@@ -541,8 +517,6 @@ function finish() {
 	"username": "Nome utente",
 	"usernameInfo": "Un nome per identificare univocamente il tuo profilo sull'istanza. Puoi utilizzare caratteri alfanumerici maiuscoli, minuscoli e il trattino basso (_). Non potrai cambiare nome utente in seguito.",
 	"password": "Password",
-	"processing": "In elaborazione",
-	"next": "Avanti",
 	"accountCreated": "Il tuo account amministratore è stato creato!",
 	"serverSetting": "Configurazione del server",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "Questa procedura guidata ti aiuterà a configurare facilmente il tuo server in modo ottimale.",
@@ -555,14 +529,12 @@ function finish() {
 	"text1": "Misskey è un software libero sviluppato da volontari.",
 	"text2": "Se puoi, ti preghiamo di prendere in considerazione l'idea di fare una donazione, così potremo continuare a sviluppare.",
 	"text3": "Sono previsti anche dei vantaggi speciali per i sostenitori!",
-	"learnMore": "Per saperne di più",
 	"start": "Inizia!"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"somethingHappened": "問題が発生しました",
 	"permissionDeniedError": "操作が拒否されました",
 	"operationForbidden": "この操作はできません",
 	"incorrectPassword": "パスワードが間違っています。",
@@ -573,8 +545,6 @@ function finish() {
 	"username": "ユーザー名",
 	"usernameInfo": "サーバー上であなたのアカウントを一意に識別するための名前。アルファベット(a~z, A~Z)、数字(0~9)、およびアンダーバー(_)が使用できます。ユーザー名は後から変更することは出来ません。",
 	"password": "パスワード",
-	"processing": "処理中",
-	"next": "次",
 	"accountCreated": "管理者アカウントが作成されました！",
 	"serverSetting": "サーバーの設定",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "このウィザードで簡単に最適なサーバーの設定が行えます。",
@@ -587,14 +557,12 @@ function finish() {
 	"text1": "Misskeyは有志によって開発されている無料のソフトウェアです。",
 	"text2": "今後も開発を続けられるように、よろしければぜひカンパをお願いいたします。",
 	"text3": "支援者向け特典もあります！",
-	"learnMore": "詳しく",
 	"start": "始める"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"somethingHappened": "なんかあかんわ",
 	"permissionDeniedError": "操作が拒否されてもうた。",
 	"operationForbidden": "この操作はできまへん",
 	"incorrectPassword": "パスワードがちゃうわ。",
@@ -605,8 +573,6 @@ function finish() {
 	"username": "ユーザー名",
 	"usernameInfo": "サーバー上であんたのアカウントをあんたやと分かるようにするための名前やで。アルファベット(a~z, A~Z)、数字(0~9)、それとアンダーバー(_)が使って考えてな。この名前は後から変更することはできへんからちゃんと考えるんやで。",
 	"password": "パスワード",
-	"processing": "処理しとる",
-	"next": "次",
 	"accountCreated": "管理者アカウントができたで！",
 	"serverSetting": "サーバーの設定",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "このウィザードで簡単にええ感じのサーバーの設定ができるで。",
@@ -619,14 +585,12 @@ function finish() {
 	"text1": "Misskeyは有志で開発されとる無料のソフトウェアやで。",
 	"text2": "今後も開発を続けられるように、よかったらぜひカンパをお願いするわ。",
 	"text3": "支援者向け特典もあるで！",
-	"learnMore": "詳しく",
 	"start": "始める"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -637,8 +601,6 @@ function finish() {
 	"username": "Isem n umseqdac",
 	"usernameInfo": "A name that identifies your account from others on this server.  You can use the alphabet (a~z, A~Z), digits (0~9) or underscores (_). Usernames cannot be changed later.",
 	"password": "Awal uffir",
-	"processing": "Processing...",
-	"next": "Next",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -651,14 +613,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Learn more",
 	"start": "Begin"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -669,8 +629,6 @@ function finish() {
 	"username": "ಬಳಕೆಹೆಸರು",
 	"usernameInfo": "A name that identifies your account from others on this server.  You can use the alphabet (a~z, A~Z), digits (0~9) or underscores (_). Usernames cannot be changed later.",
 	"password": "ಗುಪ್ತಪದ",
-	"processing": "Processing...",
-	"next": "Next",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -683,14 +641,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Learn more",
 	"start": "Begin"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"somethingHappened": "오류가 발생했습니다",
 	"permissionDeniedError": "작업이 거부되었습니다",
 	"operationForbidden": "사용할 수 없습니다",
 	"incorrectPassword": "비밀번호가 올바르지 않습니다.",
@@ -701,8 +657,6 @@ function finish() {
 	"username": "유저명",
 	"usernameInfo": "서버상에서 계정을 식별하기 위한 이름. 알파벳(a~z, A~Z), 숫자(0~9) 및 언더바(_)를 사용할 수 있습니다. 유저명은 나중에 변경할 수 없습니다.",
 	"password": "비밀번호",
-	"processing": "처리중",
-	"next": "다음",
 	"accountCreated": "관리자 계정이 만들어졌습니다!",
 	"serverSetting": "서버 설정",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "이 위자드로 쉽게 최적화된 서버의 설정을 할 수 있습니다.",
@@ -715,14 +669,12 @@ function finish() {
 	"text1": "Misskey는 자원봉사자들에 의해 개발되는 무료 소프트웨어입니다.",
 	"text2": "앞으로도 계속해서 개발을 할 수 있도록 괜찮으시다면 부디 기부를 부탁드립니다.",
 	"text3": "지원자 대상 특전도 있습니다!",
-	"learnMore": "자세히",
 	"start": "시작하기"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"somethingHappened": "Er is iets misgegaan.",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Onjuist wachtwoord.",
@@ -733,8 +685,6 @@ function finish() {
 	"username": "Gebruikersnaam",
 	"usernameInfo": "Een naam die kan worden gebruikt om je gebruikersaccount op deze server te identificeren. Je kunt het alfabet (a~z, A~Z), cijfers (0~9) of underscores (_) gebruiken. Gebruikersnamen kunnen later niet worden gewijzigd.",
 	"password": "Wachtwoord",
-	"processing": "Bezig met verwerken",
-	"next": "Volgende",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -747,14 +697,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Meer leren",
 	"start": "Aan de slag"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"somethingHappened": "En feil har oppstått",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -765,8 +713,6 @@ function finish() {
 	"username": "Brukernavn",
 	"usernameInfo": "A name that identifies your account from others on this server.  You can use the alphabet (a~z, A~Z), digits (0~9) or underscores (_). Usernames cannot be changed later.",
 	"password": "Passord",
-	"processing": "Processing...",
-	"next": "Neste",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -779,14 +725,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Les mer",
 	"start": "Begin"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"somethingHappened": "Coś poszło nie tak",
 	"permissionDeniedError": "Odrzucono operacje",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Nieprawidłowe hasło.",
@@ -797,8 +741,6 @@ function finish() {
 	"username": "Nazwa użytkownika",
 	"usernameInfo": "Nazwa, która identyfikuje Twoje konto spośród innych na tym serwerze.  Możesz użyć alfabetu (a~z, A~Z), cyfr (0~9) lub podkreślników (_). Nazwy użytkownika nie mogą być później zmieniane.",
 	"password": "Hasło",
-	"processing": "Przetwarzanie",
-	"next": "Dalej",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -811,14 +753,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Dowiedz się więcej",
 	"start": "Rozpocznij"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"somethingHappened": "Ocorreu um erro",
 	"permissionDeniedError": "Operação recusada",
 	"operationForbidden": "Operação proibída",
 	"incorrectPassword": "Senha inválida.",
@@ -829,8 +769,6 @@ function finish() {
 	"username": "Nome de usuário",
 	"usernameInfo": "O nome para identificar exclusivamente a sua conta no servidor. Pode conter letras (az, AZ), números (0~9) e sublinhados (_). O nome de usuário não pode ser alterado posteriormente.",
 	"password": "Senha",
-	"processing": "Em Progresso",
-	"next": "Seguinte",
 	"accountCreated": "Conta de administrador foi criada!",
 	"serverSetting": "Configurações de Servidor",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "O assistente facilita a configuração do servidor.",
@@ -843,14 +781,12 @@ function finish() {
 	"text1": "Misskey é software aberto desenvolvido por voluntários.",
 	"text2": "Nós apreciaríamos o seu apoio para podermos continuar o desenvolvimento desse software no futuro.",
 	"text3": "Também há benefícios especiais para apoiadores!",
-	"learnMore": "Saiba mais",
 	"start": "começar"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"somethingHappened": "Что-то пошло не так",
 	"permissionDeniedError": "Операция запрещена",
 	"operationForbidden": "Это действие запрещено",
 	"incorrectPassword": "Пароль неверен.",
@@ -861,8 +797,6 @@ function finish() {
 	"username": "Имя пользователя",
 	"usernameInfo": "Имя, которое отличает вашу учетную запись от других на этом сервере. Вы можете использовать алфавит (a~z, A~Z), цифры (0~9) или символы подчеркивания (_). Имена пользователей не могут быть изменены позже.",
 	"password": "Пароль",
-	"processing": "Обработка",
-	"next": "Дальше",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -875,14 +809,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Подробнее",
 	"start": "Начать"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Nesprávne heslo.",
@@ -893,8 +825,6 @@ function finish() {
 	"username": "Meno používateľa",
 	"usernameInfo": "Meno, ktoré odlišuje váš účet od ostatných na tomto serveri. Môžete použiť abecedu (a~z, A~Z), čísla (0~9) alebo podtržník (_). Používateľské mená sa nedajú neskôr zmeniť.",
 	"password": "Heslo",
-	"processing": "Pracujem...",
-	"next": "Ďalší",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -907,14 +837,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Zistiť viac",
 	"start": "Začať"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"permissionDeniedError": "การดำเนินถูกปฏิเสธ",
 	"operationForbidden": "การดำเนินการถูกห้าม",
 	"incorrectPassword": "รหัสผ่านไม่ถูกต้อง",
@@ -925,8 +853,6 @@ function finish() {
 	"username": "ชื่อผู้ใช้",
 	"usernameInfo": "ชื่อที่ระบุบัญชีของคุณจากผู้อื่นในเซิร์ฟเวอร์นี้ คุณสามารถใช้ตัวอักษร (a~z, A~Z), ตัวเลข (0~9) หรือขีดล่าง (_) ชื่อผู้ใช้ไม่สามารถเปลี่ยนแปลงได้ในภายหลัง",
 	"password": "รหัสผ่าน",
-	"processing": "กำลังประมวลผล...",
-	"next": "ถัด\u200bไป",
 	"accountCreated": "บัญชีผู้ดูแลระบบถูกสร้างขึ้นแล้ว!",
 	"serverSetting": "การตั้งค่าเซิร์ฟเวอร์",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "สามารถตั้งค่าเซิร์ฟเวอร์ได้อย่างง่ายดายด้วยวิซาร์ดนี้",
@@ -939,14 +865,12 @@ function finish() {
 	"text1": "Misskey เป็นซอฟต์แวร์ฟรีที่พัฒนาโดยอาสาสมัคร",
 	"text2": "เพื่อให้การพัฒนางานนี้สามารถดำเนินต่อไปได้ในอนาคต หากไม่เป็นการรบกวน รบกวนพิจารณาร่วมสมทบทุนด้วยนะคะ",
 	"text3": "นอกจากนี้ยังมีสิทธิพิเศษสำหรับผู้สนับสนุนอีกด้วยค่ะ",
-	"learnMore": "แสดงให้ดูหน่อย",
 	"start": "เริ่ม"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"somethingHappened": "Bir hata oluştu",
 	"permissionDeniedError": "İşlem reddedildi",
 	"operationForbidden": "İşlem yasak",
 	"incorrectPassword": "Yanlış şifre.",
@@ -957,8 +881,6 @@ function finish() {
 	"username": "Kullanıcı Adı",
 	"usernameInfo": "Bu sunucudaki diğer hesaplardan hesabını ayıran bir isim.  Alfabe (a~z, A~Z), rakamlar (0~9) veya alt çizgi (_) kullanabilirsin. Kullanıcı adları daha sonra değiştirilemez.",
 	"password": "Şifre",
-	"processing": "İşleniyor...",
-	"next": "Sonraki",
 	"accountCreated": "Yönetici hesabı oluşturuldu!",
 	"serverSetting": "Sunucu Ayarları",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "Bu sihirbaz, sunucu ayarlarını yapılandırmayı kolaylaştırır.",
@@ -971,14 +893,12 @@ function finish() {
 	"text1": "Misskey, gönüllüler tarafından geliştirilen ücretsiz bir yazılımdır.",
 	"text2": "Bu yazılımı gelecekte de geliştirmeye devam edebilmemiz için desteğini rica ederiz.",
 	"text3": "Destekçilere özel avantajlar da var!",
-	"learnMore": "Daha fazla bilgi edinin",
 	"start": "Başla"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"permissionDeniedError": "Operation denied",
 	"operationForbidden": "Operation forbidden",
 	"incorrectPassword": "Incorrect password.",
@@ -989,8 +909,6 @@ function finish() {
 	"username": "Username",
 	"usernameInfo": "A name that identifies your account from others on this server.  You can use the alphabet (a~z, A~Z), digits (0~9) or underscores (_). Usernames cannot be changed later.",
 	"password": "Password",
-	"processing": "Processing...",
-	"next": "Next",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -1003,14 +921,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Learn more",
 	"start": "Begin"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"somethingHappened": "Щось пішло не так",
 	"permissionDeniedError": "Операцію заборонено",
 	"operationForbidden": "Операцію заборонено",
 	"incorrectPassword": "Неправильний пароль.",
@@ -1021,8 +937,6 @@ function finish() {
 	"username": "Ім'я користувача",
 	"usernameInfo": "Ім’я, яке відрізняє ваш обліковий запис від інших на цьому сервері. Можна використовувати латинські літери (az, AZ), цифри (0~9) або підкреслення (_). Ім’я користувача не можна буде змінити пізніше.",
 	"password": "Пароль",
-	"processing": "Обробка",
-	"next": "Далі",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -1035,14 +949,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Докладніше",
 	"start": "Розпочати"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"somethingHappened": "Xảy ra lỗi",
 	"permissionDeniedError": "Thao tác bị từ chối",
 	"operationForbidden": "Thao tác này không thể thực hiện",
 	"incorrectPassword": "Sai mật khẩu.",
@@ -1053,8 +965,6 @@ function finish() {
 	"username": "Tên người dùng",
 	"usernameInfo": "Bạn có thể sử dụng chữ cái (a ~ z, A ~ Z), chữ số (0 ~ 9) hoặc dấu gạch dưới (_). Tên người dùng không thể thay đổi sau này.",
 	"password": "Mật khẩu",
-	"processing": "Đang xử lý",
-	"next": "Kế tiếp",
 	"accountCreated": "Administrator account has been created!",
 	"serverSetting": "Server Settings",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "This wizard makes it easier to configure the server settings.",
@@ -1067,14 +977,12 @@ function finish() {
 	"text1": "Misskey is a free software developed by volunteers.",
 	"text2": "We would appreciate your support so that we can continue to develop this software further into the future.",
 	"text3": "There are also special benefits for supporters!",
-	"learnMore": "Tìm hiểu thêm",
 	"start": "Bắt đầu"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"somethingHappened": "出错了",
 	"permissionDeniedError": "操作被拒绝",
 	"operationForbidden": "不允许此操作",
 	"incorrectPassword": "密码错误",
@@ -1085,8 +993,6 @@ function finish() {
 	"username": "用户名",
 	"usernameInfo": "在服务器上唯一标识您的帐户的名称。您可以使用字母 (a ~ z, A ~ Z)、数字 (0 ~ 9) 和下划线 (_)。用户名以后不能更改。",
 	"password": "密码",
-	"processing": "正在处理",
-	"next": "下一个",
 	"accountCreated": "管理员账号已创建！",
 	"serverSetting": "服务器设置",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "用此向导来轻松地以最佳方式配置服务器。",
@@ -1099,14 +1005,12 @@ function finish() {
 	"text1": "Misskey 是由志愿者开发的免费软件。",
 	"text2": "为了今后也能继续开发，如果可以的话，请考虑一下捐助。",
 	"text3": "也有面向支援者的特典！",
-	"learnMore": "更多信息",
 	"start": "开始"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"somethingHappened": "發生錯誤",
 	"permissionDeniedError": "操作被拒絕",
 	"operationForbidden": "不允許此操作",
 	"incorrectPassword": "密碼錯誤。",
@@ -1117,8 +1021,6 @@ function finish() {
 	"username": "使用者名稱",
 	"usernameInfo": "在伺服器上您的帳戶是唯一的識別名稱。您可以使用字母 (a ~ z, A ~ Z)、數字 (0 ~ 9) 和下底線 (_)。之後帳戶名是不能更改的。",
 	"password": "密碼",
-	"processing": "處理中",
-	"next": "下一步",
 	"accountCreated": "已建立管理者帳戶！",
 	"serverSetting": "伺服器設定",
 	"youCanEasilyConfigureOptimalServerSettingsWithThisWizard": "利用這個精靈，可以簡單地最佳化伺服器的設定。",
@@ -1131,7 +1033,6 @@ function finish() {
 	"text1": "Misskey 是由志願者開發的免費軟體。",
 	"text2": "為了能夠繼續開發，若您願意的話，請考慮進行捐款。\n",
 	"text3": "也有提供支援者專屬的特典！\n",
-	"learnMore": "更多資訊",
 	"start": "開始"
 }
 </locale>

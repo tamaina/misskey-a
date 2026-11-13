@@ -14,19 +14,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onMounted, ref, useTemplateRef, watch, defineAsyncComponent, provide } from 'vue';
-import XColumn from '../../../../navigation/frontend/ui/deck/column.vue';
-import type * as Misskey from 'misskey-js';
-import type { entities as MisskeyEntities } from 'misskey-js';
-import type { Column } from '@features/preferences/frontend/deck.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import type { SoundStore } from '@features/preferences/frontend/state/def.js';
 import { updateColumn } from '@features/preferences/frontend/deck.js';
 import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { antennasCache } from '@features/runtime/frontend/cache.js';
 import { soundSettingsButton } from '@features/notes/frontend/ui/deck/tl-note-notification.js';
+import XColumn from '../../../../navigation/frontend/ui/deck/column.vue';
+import type * as Misskey from 'misskey-js';
+import type { entities as MisskeyEntities } from 'misskey-js';
+import type { Column } from '@features/preferences/frontend/deck.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { SoundStore } from '@features/preferences/frontend/state/def.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	column: Column;
@@ -62,7 +66,7 @@ async function setAntenna() {
 	const { canceled, result: antennaIdOrOperation } = await os.select({
 		title: $locale.value.sfc.selectAntenna,
 		items: [
-			{ value: '_CREATE_', label: $locale.value.sfc.createNew },
+			{ value: '_CREATE_', label: globalLocale.value.env.createNew },
 			(antennas.length > 0 ? {
 				type: 'group' as const,
 				label: $locale.value.sfc.createdAntennas,
@@ -138,7 +142,6 @@ defineExpose({
 {
 	"antenna": "الهوائيات",
 	"selectAntenna": "اختر هوائيًا",
-	"createNew": "أنشِئ جديد",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "عدّل الهوائي",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -149,7 +152,6 @@ defineExpose({
 {
 	"antenna": "Antena",
 	"selectAntenna": "Tria una antena",
-	"createNew": "Crear",
 	"createdAntennas": "Antenes creades",
 	"editAntenna": "Modificar antena",
 	"newNoteNotificationSettings": "Configuració de notificacions per a notes noves"
@@ -160,7 +162,6 @@ defineExpose({
 {
 	"antenna": "Antény",
 	"selectAntenna": "Vyberte Anténu",
-	"createNew": "Vytvořit nový",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Upravit anténu",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -171,7 +172,6 @@ defineExpose({
 {
 	"antenna": "Antennas",
 	"selectAntenna": "Select an antenna",
-	"createNew": "Create new",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Edit antenna",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -182,7 +182,6 @@ defineExpose({
 {
 	"antenna": "Antennen",
 	"selectAntenna": "Antenne auswählen",
-	"createNew": "Neu erstellen",
 	"createdAntennas": "Erstellte Antennen",
 	"editAntenna": "Antenne bearbeiten",
 	"newNoteNotificationSettings": "Benachrichtigungseinstellungen für neue Notizen"
@@ -193,7 +192,6 @@ defineExpose({
 {
 	"antenna": "Antennas",
 	"selectAntenna": "Select an antenna",
-	"createNew": "Create new",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Edit antenna",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -204,7 +202,6 @@ defineExpose({
 {
 	"antenna": "Antenas",
 	"selectAntenna": "Seleccionar antena",
-	"createNew": "Crear Nuevo",
 	"createdAntennas": "Antenas creadas",
 	"editAntenna": "Editar antena",
 	"newNoteNotificationSettings": "Configuración de las notificaciones para notas nuevas"
@@ -215,7 +212,6 @@ defineExpose({
 {
 	"antenna": "Antennes",
 	"selectAntenna": "Sélectionner une antenne",
-	"createNew": "Créer",
 	"createdAntennas": "Antennes créées",
 	"editAntenna": "Modifier l'antenne",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -226,7 +222,6 @@ defineExpose({
 {
 	"antenna": "Antena",
 	"selectAntenna": "Pilih Antena",
-	"createNew": "Buat baru",
 	"createdAntennas": "Antena yang dibuat",
 	"editAntenna": "Sunting antena",
 	"newNoteNotificationSettings": "Pengaturan notifikasi untuk note baru"
@@ -237,7 +232,6 @@ defineExpose({
 {
 	"antenna": "Antenne",
 	"selectAntenna": "Scegli un'antenna",
-	"createNew": "Crea",
 	"createdAntennas": "Antenne create",
 	"editAntenna": "Modifica Antenna",
 	"newNoteNotificationSettings": "Preferenze per le notifiche di nuove Note"
@@ -248,7 +242,6 @@ defineExpose({
 {
 	"antenna": "アンテナ",
 	"selectAntenna": "アンテナを選択",
-	"createNew": "新規作成",
 	"createdAntennas": "作成したアンテナ",
 	"editAntenna": "アンテナを編集",
 	"newNoteNotificationSettings": "新着ノート通知の設定"
@@ -259,7 +252,6 @@ defineExpose({
 {
 	"antenna": "アンテナ",
 	"selectAntenna": "アンテナを選ぶ",
-	"createNew": "新しく作るで",
 	"createdAntennas": "作成したアンテナ",
 	"editAntenna": "アンテナいじる",
 	"newNoteNotificationSettings": "新着ノート通知の設定"
@@ -270,7 +262,6 @@ defineExpose({
 {
 	"antenna": "Antennas",
 	"selectAntenna": "Select an antenna",
-	"createNew": "Create new",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Edit antenna",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -281,7 +272,6 @@ defineExpose({
 {
 	"antenna": "Antennas",
 	"selectAntenna": "Select an antenna",
-	"createNew": "Create new",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Edit antenna",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -292,7 +282,6 @@ defineExpose({
 {
 	"antenna": "안테나",
 	"selectAntenna": "안테나 선택",
-	"createNew": "새로 만들기",
 	"createdAntennas": "만든 안테나",
 	"editAntenna": "안테나 편집",
 	"newNoteNotificationSettings": "새 노트 알림 설정"
@@ -303,7 +292,6 @@ defineExpose({
 {
 	"antenna": "Antennes",
 	"selectAntenna": "Kies een antenne",
-	"createNew": "Nieuwe aanmaken",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Antenne bewerken",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -314,7 +302,6 @@ defineExpose({
 {
 	"antenna": "Antenner",
 	"selectAntenna": "Velg en antenne",
-	"createNew": "Create new",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Edit antenna",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -325,7 +312,6 @@ defineExpose({
 {
 	"antenna": "Anteny",
 	"selectAntenna": "Wybierz Antennę",
-	"createNew": "Utwórz nowy",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Edytuj antenę",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -336,7 +322,6 @@ defineExpose({
 {
 	"antenna": "Antenas",
 	"selectAntenna": "Selecione uma antena",
-	"createNew": "Criar novo",
 	"createdAntennas": "Antenas criadas",
 	"editAntenna": "Editar antena",
 	"newNoteNotificationSettings": "Opções de notificação para novas notas"
@@ -347,7 +332,6 @@ defineExpose({
 {
 	"antenna": "Антенны",
 	"selectAntenna": "Выберите антенну",
-	"createNew": "Новый документ",
 	"createdAntennas": "Созданные антенны",
 	"editAntenna": "Редактировать антенну",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -358,7 +342,6 @@ defineExpose({
 {
 	"antenna": "Antény",
 	"selectAntenna": "Vyberte anténu",
-	"createNew": "Vytvoriť nový",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Edit antenna",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -369,7 +352,6 @@ defineExpose({
 {
 	"antenna": "เสาอากาศ",
 	"selectAntenna": "เลือกเสาอากาศ",
-	"createNew": "สร้างใหม่",
 	"createdAntennas": "เสาอากาศที่ถูกสร้าง",
 	"editAntenna": "แก้ไขเสาอากาศ",
 	"newNoteNotificationSettings": "ตั้งค่าการแจ้งเตือนเมื่อมีโน้ตใหม่"
@@ -380,7 +362,6 @@ defineExpose({
 {
 	"antenna": "Antenler",
 	"selectAntenna": "Bir anten seç",
-	"createNew": "Yeni oluştur",
 	"createdAntennas": "Oluşturulan antenler",
 	"editAntenna": "Anteni düzenle",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -391,7 +372,6 @@ defineExpose({
 {
 	"antenna": "Antennas",
 	"selectAntenna": "Select an antenna",
-	"createNew": "Create new",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Edit antenna",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -402,7 +382,6 @@ defineExpose({
 {
 	"antenna": "Антени",
 	"selectAntenna": "Виберіть антену",
-	"createNew": "Створити новий",
 	"createdAntennas": "Створені антени",
 	"editAntenna": "Редагувати антену",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -413,7 +392,6 @@ defineExpose({
 {
 	"antenna": "Trạm phát sóng",
 	"selectAntenna": "Chọn một antenna",
-	"createNew": "Tạo mới",
 	"createdAntennas": "Created antennas",
 	"editAntenna": "Chỉnh sửa Ăngten",
 	"newNoteNotificationSettings": "Notification setting for new notes"
@@ -424,7 +402,6 @@ defineExpose({
 {
 	"antenna": "天线",
 	"selectAntenna": "选择天线",
-	"createNew": "新建",
 	"createdAntennas": "已创建的天线",
 	"editAntenna": "编辑天线",
 	"newNoteNotificationSettings": "新帖子通知设定"
@@ -435,7 +412,6 @@ defineExpose({
 {
 	"antenna": "天線",
 	"selectAntenna": "選擇天線",
-	"createNew": "新建",
 	"createdAntennas": "已建立的天線",
 	"editAntenna": "編輯天線",
 	"newNoteNotificationSettings": "新貼文通知的設定"

@@ -2,51 +2,27 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { referenceAdminMetaDefinition, referenceAdminMetaInput, referenceAdminMetaOutput } from '../../../contract/reference-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import { MetaService } from '../../services/MetaService.js';
-import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedRecord, toPackedJsonValue } from '@features/users/backend/json-value.schema.js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
-import { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
-
-const contractProjection = projectEndpointContract(referenceAdminMetaDefinition);
-
-export const meta = {
-	tags: ['meta'],
-
-	requireCredential: true,
-	requireAdmin: true,
-	kind: 'read:admin:meta',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof referenceAdminMetaInput, typeof referenceAdminMetaOutput> {
-	constructor(
-		@Inject(DI.config)
-		private config: Config,
-
-		private metaService: MetaService,
-		private systemAccountService: SystemAccountService,
-	) {
-		super(meta, contractProjection, async () => {
-			const instance = await this.metaService.fetch(true);
-
-			const proxy = await this.systemAccountService.fetch('proxy');
-
+import { adminMetaContract } from './meta.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { InstanceApiDependencies } from '../../api.implementation.js';
+export type AdminMetaDependencies = Pick<InstanceApiDependencies, 'metaService' | 'systemAccountService' | 'config'>;
+export function createAdminMetaProcedure<Actor extends ApiActor>(deps: AdminMetaDependencies) {
+	return createApiProcedure<Actor>()(adminMetaContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const instance = await deps.metaService.fetch(true);
+			const proxy = await deps.systemAccountService.fetch('proxy');
 			return {
 				maintainerName: instance.maintainerName,
 				maintainerEmail: instance.maintainerEmail,
-				version: this.config.version,
+				version: deps.config.version,
 				name: instance.name,
 				shortName: instance.shortName,
-				uri: this.config.url,
+				uri: deps.config.url,
 				description: instance.description,
 				langs: instance.langs,
 				tosUrl: instance.termsOfServiceUrl,
@@ -145,7 +121,7 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				enableServerMachineStats: instance.enableServerMachineStats,
 				enableIdenticonGeneration: instance.enableIdenticonGeneration,
 				bannedEmailDomains: instance.bannedEmailDomains,
-				policies: { ...DEFAULT_POLICIES, ...instance.policies },
+				policies: Object.fromEntries(Object.entries(toPackedRecord({ ...DEFAULT_POLICIES, ...instance.policies })).map(([key, value]) => [key, toPackedJsonValue(value)])),
 				manifestJsonOverride: instance.manifestJsonOverride,
 				enableFanoutTimeline: instance.enableFanoutTimeline,
 				enableFanoutTimelineDbFallback: instance.enableFanoutTimelineDbFallback,
@@ -178,5 +154,4 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				showRoleBadgesOfRemoteUsers: instance.showRoleBadgesOfRemoteUsers,
 			};
 		});
-	}
 }

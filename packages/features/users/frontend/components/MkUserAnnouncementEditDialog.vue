@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px;">
 			<div class="_gaps_m">
 				<MkInput v-model="title">
-					<template #label>{{ $locale.sfc.title }}</template>
+					<template #label>{{ globalLocale.env.title }}</template>
 				</MkInput>
 				<MkTextarea v-model="text">
 					<template #label>{{ $locale.sfc.text }}</template>
@@ -43,42 +43,54 @@ SPDX-License-Identifier: AGPL-3.0-only
 				>
 					<template #label>{{ $locale.sfc.display }}</template>
 				</MkRadios>
+				<MkInput v-model="autoArchiveAt" type="datetime-local">
+					<template #label>{{ $locale.sfc.autoArchiveAt }}</template>
+					<template #caption>{{ $locale.sfc.autoArchiveAtDescription }}</template>
+				</MkInput>
 				<MkSwitch v-model="needConfirmationToRead">
 					{{ $locale.sfc.needConfirmationToRead }}
 					<template #caption>{{ $locale.sfc.needConfirmationToReadDescription }}</template>
 				</MkSwitch>
-				<MkButton v-if="announcement" danger @click="del()"><i class="ti ti-trash"></i> {{ $locale.sfc.delete }}</MkButton>
+				<MkButton v-if="announcement" danger @click="del()"><i class="ti ti-trash"></i> {{ globalLocale.env.delete }}</MkButton>
 			</div>
 		</div>
 		<div :class="$style.footer">
-			<MkButton primary rounded style="margin: 0 auto;" @click="done"><i class="ti ti-check"></i> {{ props.announcement ? $locale.sfc.update : $locale.sfc.create }}</MkButton>
+			<MkButton primary rounded style="margin: 0 auto;" @click="done"><i class="ti ti-check"></i> {{ props.announcement ? globalLocale.env.update : globalLocale.env.create }}</MkButton>
 		</div>
 	</div>
 </MkModalWindow>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import * as os from '@features/ui/frontend/os.js';
-import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import { buildAnnouncementUpdate } from '@features/announcements/frontend/update-input.js';
+import { formatAutoArchiveInput, parseAutoArchiveInput } from '@features/announcements/frontend/auto-archive-input.js';
+import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';
+import type { Locale } from 'i18n';
 
-type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsCreateRequest & { id: string; };
+const globalLocale = useLocale<Locale>(import.meta.url);
+
+type AdminAnnouncementType = Misskey.entities.AdminAnnouncementsListResponse[number];
+type AdminAnnouncementUpdate = Misskey.entities.AdminAnnouncementsUpdateRequest;
 
 const props = defineProps<{
 	user: Misskey.entities.User,
-	announcement?: Required<AdminAnnouncementType>,
+	announcement?: AdminAnnouncementType,
 }>();
 
 const emit = defineEmits<{
-	(ev: 'done', v: { deleted?: boolean; updated?: AdminAnnouncementType; created?: AdminAnnouncementType; }): void,
+	(ev: 'done', v: { deleted?: boolean; updated?: AdminAnnouncementUpdate; created?: Misskey.entities.AdminAnnouncementsCreateResponse; }): void,
 	(ev: 'closed'): void
 }>();
 
@@ -88,8 +100,27 @@ const text = ref(props.announcement ? props.announcement.text : '');
 const icon = ref(props.announcement ? props.announcement.icon : 'info');
 const display = ref(props.announcement ? props.announcement.display : 'dialog');
 const needConfirmationToRead = ref(props.announcement ? props.announcement.needConfirmationToRead : false);
+const initialAutoArchiveAt = formatAutoArchiveInput(props.announcement?.autoArchiveAt);
+const autoArchiveAt = ref(initialAutoArchiveAt);
+
+const createAnnouncementErrors: ApiWithDialogCustomErrors = {
+	'2a892bd5-487d-46a2-a5fe-3d85ad51defe': {
+		title: $locale.value.sfc.autoArchiveAt,
+		text: $locale.value.sfc.autoArchiveAtMustBeInFuture,
+	},
+};
 
 async function done() {
+	const autoArchiveAtMs = parseAutoArchiveInput(autoArchiveAt.value, props.announcement?.autoArchiveAt);
+	if (!props.announcement && autoArchiveAtMs != null && (Number.isNaN(autoArchiveAtMs) || autoArchiveAtMs <= Date.now())) {
+		await os.alert({
+			type: 'error',
+			title: $locale.value.sfc.autoArchiveAt,
+			text: $locale.value.sfc.autoArchiveAtMustBeInFuture,
+		});
+		return;
+	}
+
 	const params = {
 		title: title.value,
 		text: text.value,
@@ -98,27 +129,23 @@ async function done() {
 		display: display.value,
 		needConfirmationToRead: needConfirmationToRead.value,
 		userId: props.user.id,
+		autoArchiveAt: autoArchiveAtMs,
 	} satisfies Misskey.entities.AdminAnnouncementsCreateRequest;
 
 	if (props.announcement) {
-		await os.apiWithDialog('admin/announcements/update', {
-			...params,
-			id: props.announcement.id,
-		});
+		const update = buildAnnouncementUpdate({ ...params, id: props.announcement.id });
+		await os.apiWithDialog('admin/announcements/update', update);
 
 		emit('done', {
-			updated: {
-				...params,
-				id: props.announcement.id,
-			},
+			updated: update,
 		});
 
 		dialog.value?.close();
 	} else {
-		const created = await os.apiWithDialog('admin/announcements/create', params);
+		const created = await os.apiWithDialog('admin/announcements/create', params, undefined, createAnnouncementErrors);
 
 		emit('done', {
-			created: created,
+			created,
 		});
 
 		dialog.value?.close();
@@ -128,7 +155,7 @@ async function done() {
 async function del() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: interpolateLocaleParameters($locale.value.sfc.removeAreYouSure, { x: title.value }),
+		text: interpolateLocaleParameters(globalLocale.value.env.removeAreYouSure, { x: title.value }),
 	});
 	if (canceled) return;
 
@@ -159,8 +186,6 @@ async function del() {
 
 <locale lang="json" locale="ar-SA">
 {
-	"removeAreYouSure": "متأكد من أنك تريد حذف {x}؟",
-	"title": "العنوان",
 	"text": "النص",
 	"icon": "الصورة الرمزية",
 	"normal": "عادي",
@@ -169,16 +194,14 @@ async function del() {
 	"display": "المظهر",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "حذف",
-	"update": "حدِّث",
-	"create": "أنشئ"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="ca-ES">
 {
-	"removeAreYouSure": "Segur que vols esborrar «{x}»?",
-	"title": "Títol",
 	"text": "Text",
 	"icon": "Icona",
 	"normal": "Normal",
@@ -187,16 +210,14 @@ async function del() {
 	"display": "Veure",
 	"needConfirmationToRead": "Es necessita confirmació de lectura de la notificació ",
 	"needConfirmationToReadDescription": "Si s'activa es mostrarà un diàleg per confirmar la lectura d'aquesta notificació. A més aquesta notificació serà exclosa de qualsevol funcionalitat com \"Marcar tot com a llegit\".",
-	"delete": "Elimina",
-	"update": "Actualitzar",
-	"create": "Crear"
+	"autoArchiveAt": "Data i hora d'arxivament automàtic",
+	"autoArchiveAtDescription": "Un cop hagin passat la data i l'hora especificades, aquest avís s'arxivarà automàticament. Si aquest camp es deixa en blanc, no s'arxivarà automàticament.",
+	"autoArchiveAtMustBeInFuture": "Indiqueu una data i una hora per a l'arxivament automàtic posteriors a la data i l'hora actuals."
 }
 </locale>
 
 <locale lang="json" locale="cs-CZ">
 {
-	"removeAreYouSure": "Jste si jistí že chcete smazat \"{x}\"?",
-	"title": "Titulek",
 	"text": "Text",
 	"icon": "Avatar",
 	"normal": "Normální",
@@ -205,16 +226,14 @@ async function del() {
 	"display": "Zobrazit",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Smazat",
-	"update": "Aktualizovat",
-	"create": "Vytvořit"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="da-DK">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"title": "Title",
 	"text": "Text",
 	"icon": "Icon",
 	"normal": "Normal",
@@ -223,16 +242,14 @@ async function del() {
 	"display": "Display",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Delete",
-	"update": "Update",
-	"create": "Create"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="de-DE">
 {
-	"removeAreYouSure": "Möchtest du „{x}“ wirklich entfernen?",
-	"title": "Titel",
 	"text": "Text",
 	"icon": "Symbol",
 	"normal": "Normal",
@@ -241,16 +258,14 @@ async function del() {
 	"display": "Anzeigeart",
 	"needConfirmationToRead": "Separate Lesebestätigung erfordern",
 	"needConfirmationToReadDescription": "Ist dies aktiviert, so wird beim Markieren dieser Ankündigung als gelesen ein separates Bestätigungsfenster angezeigt. Auch wird sie von der \"Alle als gelesen markieren\"-Funktion ausgenommen.",
-	"delete": "Löschen",
-	"update": "Aktualisieren",
-	"create": "Erstellen"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="en-US">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"title": "Title",
 	"text": "Text",
 	"icon": "Icon",
 	"normal": "Normal",
@@ -259,16 +274,14 @@ async function del() {
 	"display": "Display",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Delete",
-	"update": "Update",
-	"create": "Create"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="es-ES">
 {
-	"removeAreYouSure": "¿Desea borrar \"{x}\"?",
-	"title": "Título",
 	"text": "Texto",
 	"icon": "Avatar",
 	"normal": "Normal",
@@ -277,16 +290,14 @@ async function del() {
 	"display": "Apariencia",
 	"needConfirmationToRead": "Requerir confirmación de lectura aparte",
 	"needConfirmationToReadDescription": "Si se habilita esta opción, se pedirá una confirmación de lectura aparte. Además, este anuncio será excluido de cualquier funcionalidad de \"Marcar todos como leídos\".",
-	"delete": "Borrar",
-	"update": "Actualizar",
-	"create": "Crear"
+	"autoArchiveAt": "Fecha y hora del archivo automático",
+	"autoArchiveAtDescription": "Una vez pasada la fecha y la hora indicadas, este aviso se archivará automáticamente. Si se deja en blanco, no se archivará automáticamente.",
+	"autoArchiveAtMustBeInFuture": "Especifica una fecha y hora para el archivo automático posteriores a la actual."
 }
 </locale>
 
 <locale lang="json" locale="fr-FR">
 {
-	"removeAreYouSure": "Êtes-vous sûr·e de vouloir supprimer « {x} »\u202f?",
-	"title": "Titre",
 	"text": "Texte",
 	"icon": "Avatar",
 	"normal": "Normal",
@@ -295,16 +306,14 @@ async function del() {
 	"display": "Affichage",
 	"needConfirmationToRead": "Exiger la confirmation de la lecture",
 	"needConfirmationToReadDescription": "Si activé, afficher un dialogue de confirmation quand l'annonce est marquée comme lue. Aussi, elle sera exclue de « marquer tout comme lu » .",
-	"delete": "Supprimer",
-	"update": "Mettre à jour",
-	"create": "Créer"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="id-ID">
 {
-	"removeAreYouSure": "Apakah kamu yakin ingin menghapus \"{x}\"?",
-	"title": "Judul",
 	"text": "Teks",
 	"icon": "Avatar",
 	"normal": "Normal",
@@ -313,16 +322,14 @@ async function del() {
 	"display": "Tampilkan",
 	"needConfirmationToRead": "Membutuhkan konfirmasi terpisah bahwa telah dibaca",
 	"needConfirmationToReadDescription": "Permintaan terpisah untuk mengonfirmasi menandai pengumuman ini telah dibaca akan ditampilkan apabila fitur ini dinyalakan. Pengumuman ini juga akan dikecualikan dari fungsi \"Tandai semua telah dibaca\".",
-	"delete": "Hapus",
-	"update": "Perbarui",
-	"create": "Buat"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="it-IT">
 {
-	"removeAreYouSure": "Vuoi davvero eliminare \"{x}\"?",
-	"title": "Titolo",
 	"text": "Testo",
 	"icon": "Ritratto",
 	"normal": "Normale",
@@ -331,16 +338,14 @@ async function del() {
 	"display": "Visualizza",
 	"needConfirmationToRead": "Conferma di lettura obbligatoria",
 	"needConfirmationToReadDescription": "I profili riceveranno una finestra di dialogo che richiede di accettare obbligatoriamente per procedere. Tale richiesta è esente da  \"conferma tutte\".",
-	"delete": "Elimina",
-	"update": "Aggiorna",
-	"create": "Crea"
+	"autoArchiveAt": "Data e ora di archiviazione automatica",
+	"autoArchiveAtDescription": "Dal momento specificato, la notifica verrà archiviata automaticamente. Se è vuoto, non verrà archiviata automaticamente.",
+	"autoArchiveAtMustBeInFuture": "Specificare data e ora futura."
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
-	"removeAreYouSure": "「{x}」を削除しますか？",
-	"title": "タイトル",
 	"text": "テキスト",
 	"icon": "アイコン",
 	"normal": "通常",
@@ -349,16 +354,14 @@ async function del() {
 	"display": "表示",
 	"needConfirmationToRead": "既読にするのに確認が必要",
 	"needConfirmationToReadDescription": "有効にすると、このお知らせを既読にする際に確認ダイアログが表示されます。また、一括既読操作の対象になりません。",
-	"delete": "削除",
-	"update": "更新",
-	"create": "作成"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="ja-KS">
 {
-	"removeAreYouSure": "「{x}」はほかしてええか？",
-	"title": "タイトル",
 	"text": "テキスト",
 	"icon": "アイコン",
 	"normal": "ええ感じ",
@@ -367,16 +370,14 @@ async function del() {
 	"display": "表示",
 	"needConfirmationToRead": "既読にするんやったら確認してや",
 	"needConfirmationToReadDescription": "オンにしたら、このお知らせを既読にする時に確認するで。ついでに、一括既読しても既読扱いにならへんで。",
-	"delete": "ほかす",
-	"update": "更新",
-	"create": "作成"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="kab-KAB">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"title": "Title",
 	"text": "Text",
 	"icon": "Icon",
 	"normal": "Normal",
@@ -385,16 +386,14 @@ async function del() {
 	"display": "Display",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Kkes",
-	"update": "Update",
-	"create": "Create"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"title": "Title",
 	"text": "Text",
 	"icon": "Icon",
 	"normal": "Normal",
@@ -403,16 +402,14 @@ async function del() {
 	"display": "Display",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "ಅಳಿಸು",
-	"update": "Update",
-	"create": "Create"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="ko-KR">
 {
-	"removeAreYouSure": "\"{x}\" 을(를) 삭제하시겠습니까?",
-	"title": "제목",
 	"text": "텍스트",
 	"icon": "아바타",
 	"normal": "일반",
@@ -421,16 +418,14 @@ async function del() {
 	"display": "보기",
 	"needConfirmationToRead": "읽음으로 표시하기 전에 확인하기",
 	"needConfirmationToReadDescription": "활성화하면 이 공지사항을 읽음으로 표시하기 전에 확인 알림창을 띄웁니다. '모두 읽음'의 대상에서도 제외됩니다.",
-	"delete": "삭제",
-	"update": "업데이트",
-	"create": "생성"
+	"autoArchiveAt": "자동 아카이브 날짜 및 시각",
+	"autoArchiveAtDescription": "지정한 날짜 및 시각이 지나면 이 알림은 자동적으로 아카이브됩니다. 빈칸일 경우에는 자동적으로 아카이브되지 않습니다.",
+	"autoArchiveAtMustBeInFuture": "자동 아카이브 날짜 및 시각에는 현재보다 후의 날짜 및 시각으로 지정해 주십시오."
 }
 </locale>
 
 <locale lang="json" locale="nl-NL">
 {
-	"removeAreYouSure": "Weet je zeker dat je \"{x}\" wil verwijderen?",
-	"title": "Titel",
 	"text": "Tekst",
 	"icon": "Avatar",
 	"normal": "Normaal",
@@ -439,16 +434,14 @@ async function del() {
 	"display": "Weergave",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Verwijderen",
-	"update": "Update",
-	"create": "Creëer"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
-	"removeAreYouSure": "Er du sikker på at du vil fjerne \"{x}\"?",
-	"title": "Tittel",
 	"text": "Tekst",
 	"icon": "Avatar",
 	"normal": "Normal",
@@ -457,16 +450,14 @@ async function del() {
 	"display": "Display",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Slett",
-	"update": "Update",
-	"create": "Opprett"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="pl-PL">
 {
-	"removeAreYouSure": "Czy na pewno chcesz usunąć „{x}”?",
-	"title": "Tytuł",
 	"text": "Tekst",
 	"icon": "Awatar",
 	"normal": "Normalny",
@@ -475,16 +466,14 @@ async function del() {
 	"display": "Wyświetlanie",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Usuń",
-	"update": "Update",
-	"create": "Utwórz"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="pt-PT">
 {
-	"removeAreYouSure": "Deseja excluir \"{x}\"?",
-	"title": "Título",
 	"text": "Texto",
 	"icon": "Avatar",
 	"normal": "Normal",
@@ -493,16 +482,14 @@ async function del() {
 	"display": "Visualizar",
 	"needConfirmationToRead": "Exigir confirmação de leitura",
 	"needConfirmationToReadDescription": "Um lembrete adicional será exibido para confirmar a leitura do anúncio. Esse anúncio também será excluído de qualquer forma de \"Marcar tudo como lido\".",
-	"delete": "Excluir",
-	"update": "Atualizar",
-	"create": "Criar"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="ru-RU">
 {
-	"removeAreYouSure": "Хотите удалить «{x}»?",
-	"title": "Заголовок",
 	"text": "Текст",
 	"icon": "Аватар",
 	"normal": "Стабильно",
@@ -511,16 +498,14 @@ async function del() {
 	"display": "Отображение",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Удалить",
-	"update": "Обновить",
-	"create": "Создать"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="sk-SK">
 {
-	"removeAreYouSure": "Naozaj chcete odstrániť \"{x}\"?",
-	"title": "Nadpis",
 	"text": "Text",
 	"icon": "Avatar",
 	"normal": "Normálne",
@@ -529,16 +514,14 @@ async function del() {
 	"display": "Zobraziť",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Odstrániť",
-	"update": "Update",
-	"create": "Vytvoriť"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="th-TH">
 {
-	"removeAreYouSure": "ต้องการลบ “{x}” ใช่ไหม?",
-	"title": "หัวข้อ",
 	"text": "ข้อความ",
 	"icon": "ไอคอน",
 	"normal": "ปกติ",
@@ -547,16 +530,14 @@ async function del() {
 	"display": "แสดงผล",
 	"needConfirmationToRead": "จำเป็นต้องยืนยันว่าอ่านแล้ว",
 	"needConfirmationToReadDescription": "กล่องโต้ตอบการยืนยันจะปรากฏขึ้นเมื่อจะทำเครื่องหมายว่าอ่านแล้ว นอกจากนี้ยังทำให้ประกาศนี้ยังไม่ถูกอ่านเมื่อใช้ฟังก์ชั่น “ทำเครื่องหมายฯ ทั้งหมดว่าอ่านแล้ว”",
-	"delete": "ลบ",
-	"update": "อัปเดต",
-	"create": "สร้าง"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="tr-TR">
 {
-	"removeAreYouSure": "“{x}” öğesini kaldırmak istediğinizden emin misin?",
-	"title": "Başlık",
 	"text": "Metin",
 	"icon": "Avatar",
 	"normal": "Normal",
@@ -565,16 +546,14 @@ async function del() {
 	"display": "Ekran",
 	"needConfirmationToRead": "Ayrı okuma onayı gerektirir",
 	"needConfirmationToReadDescription": "Etkinleştirildiğinde, bu duyuruyu okundu olarak işaretlemek için ayrı bir onay mesajı görüntülenir. Bu duyuru, “Tümünü okundu olarak işaretle” işlevinden de hariç tutulur.",
-	"delete": "Sil",
-	"update": "Güncelle",
-	"create": "Oluştur"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="ug-CN">
 {
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
-	"title": "Title",
 	"text": "Text",
 	"icon": "Icon",
 	"normal": "Normal",
@@ -583,16 +562,14 @@ async function del() {
 	"display": "Display",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "ئۆچۈرۈش",
-	"update": "Update",
-	"create": "Create"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
-	"removeAreYouSure": "Ви впевнені, що хочете видалити \"{x}\"?",
-	"title": "Тема",
 	"text": "Текст",
 	"icon": "Аватар",
 	"normal": "Нормальний",
@@ -601,16 +578,14 @@ async function del() {
 	"display": "Відображення",
 	"needConfirmationToRead": "Вимагати окреме підтвердження заради позначення прочитаним",
 	"needConfirmationToReadDescription": "Окремий запит заради позначення цього оголошення прочитаним буде показано якщо ввімкнуто. Це оголошення також буде виключено з будь-якого функціоналу \"Позначити як прочитане\".",
-	"delete": "Видалити",
-	"update": "Оновити",
-	"create": "Створити"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="vi-VN">
 {
-	"removeAreYouSure": "Bạn có chắc muốn gỡ \"{x}\"?",
-	"title": "Tựa đề",
 	"text": "Nội dung",
 	"icon": "Ảnh đại diện",
 	"normal": "Bình thường",
@@ -619,16 +594,14 @@ async function del() {
 	"display": "Hiển thị",
 	"needConfirmationToRead": "Require separate read confirmation",
 	"needConfirmationToReadDescription": "A separate prompt to confirm marking this announcement as read will be displayed if enabled. This announcement will also be excluded from any \"Mark all as read\" functionality.",
-	"delete": "Xóa",
-	"update": "Cập nhật",
-	"create": "Tạo"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>
 
 <locale lang="json" locale="zh-CN">
 {
-	"removeAreYouSure": "要删掉「{x}」吗？",
-	"title": "标题",
 	"text": "文本",
 	"icon": "头像",
 	"normal": "正常",
@@ -637,16 +610,14 @@ async function del() {
 	"display": "显示",
 	"needConfirmationToRead": "需要确认才能标记为已读",
 	"needConfirmationToReadDescription": "若启用，则会在标记已读时会显示确认对话框。此外，它也会不受批量已读操作的影响。",
-	"delete": "删除",
-	"update": "更新",
-	"create": "创建"
+	"autoArchiveAt": "自动存档时间",
+	"autoArchiveAtDescription": "当超过指定的时间时，此通知将自动存档。留空则不自动存档。",
+	"autoArchiveAtMustBeInFuture": "请指定晚于当前时间的值。"
 }
 </locale>
 
 <locale lang="json" locale="zh-TW">
 {
-	"removeAreYouSure": "確定要刪掉「{x}」嗎？",
-	"title": "標題",
 	"text": "文字",
 	"icon": "圖示",
 	"normal": "正常",
@@ -655,8 +626,8 @@ async function del() {
 	"display": "檢視",
 	"needConfirmationToRead": "必須確認才能標記為已讀",
 	"needConfirmationToReadDescription": "啟用代表此公告將顯示對話方塊以確認是否標記為已讀，同時不會受「標記所有公告為已讀」功能影響。",
-	"delete": "刪除",
-	"update": "更新",
-	"create": "新增"
+	"autoArchiveAt": "自動アーカイブ日時",
+	"autoArchiveAtDescription": "指定した日時を過ぎると、このお知らせは自動的にアーカイブされます。空欄の場合は自動的にアーカイブされません。",
+	"autoArchiveAtMustBeInFuture": "自動アーカイブ日時には現在より後の日時を指定してください。"
 }
 </locale>

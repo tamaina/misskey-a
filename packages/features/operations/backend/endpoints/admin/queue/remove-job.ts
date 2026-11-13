@@ -3,22 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { operationsContract } from '../../../../contract/index.js';
-import { legacyOperationsSchemas } from '@features/operations/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requireModerator: true,
-	kind: 'write:admin:queue',
-} as const;
-
-export const paramDef = legacyOperationsSchemas['admin/queue/remove-job'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('operations', operations => createContractTransportEndpoint(meta, paramDef, operationsContract['admin/queue/remove-job'], async (params, user) => operations['admin/queue/remove-job'](params, {
-	context: { actor: { id: user.id } },
-})));
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { adminQueueRemoveJobContract } from './remove-job.contract.js';
+import type { QueueService } from '../../../../../runtime/backend/services/QueueService.js';
+export interface AdminQueueRemoveJobDependencies {
+	queueService: Pick<QueueService, 'queueRemoveJob'>;
+}
+export function createAdminQueueRemoveJobProcedure<Actor extends ApiActor>(deps: AdminQueueRemoveJobDependencies) {
+	return createApiProcedure<Actor>()(adminQueueRemoveJobContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input }) => {
+			const ps = input;
+			void deps.queueService.queueRemoveJob(ps.queue, ps.jobId);
+		});
+}

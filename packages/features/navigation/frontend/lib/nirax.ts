@@ -5,17 +5,10 @@
 
 // NIRAX --- A lightweight router
 
+import { safeURIDecode } from '@features/web/frontend/shared/url.js';
 import { onBeforeUnmount, onMounted, shallowRef } from 'vue';
 import { EventEmitter } from 'eventemitter3';
 import type { Component, ShallowRef } from 'vue';
-
-function safeURIDecode(str: string): string {
-	try {
-		return decodeURIComponent(str);
-	} catch {
-		return str;
-	}
-}
 
 interface RouteDefBase {
 	path: string;

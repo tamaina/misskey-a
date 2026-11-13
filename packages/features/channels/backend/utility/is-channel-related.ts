@@ -4,7 +4,7 @@
  */
 
 import { MiNote } from '@features/notes/backend/models/Note.js';
-import { Packed } from '@features/index/contract/packed.js';
+import { Packed } from '@features/index/backend/packed.schema.js';
 
 /**
  * {@link note}が{@link channelIds}のチャンネルに関連するかどうかを判定し、関連する場合はtrueを返します。

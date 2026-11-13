@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { EmojiSimple } from '../contract/index.js';
+import type { EmojiSimple } from '../backend/api.definition.js';
 
 export function searchEmojiCatalog(emojis: EmojiSimple[], query: string | null): EmojiSimple[] | null {
 	if (query === '' || query == null) return null;

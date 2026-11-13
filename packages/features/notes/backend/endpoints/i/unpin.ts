@@ -2,51 +2,32 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { NativeContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedIUnpinDefinition, packedIUnpinInput, packedIUnpinOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { nativeMeDetailedSchema } from '@features/users/backend/serializers/native-user.js';
-import { Injectable } from '@nestjs/common';
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { NotePiningService } from '../../services/NotePiningService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { apiError } from "@features/api/backend/transport/orpc-error.js";
+import { readErrorId } from '../../request.schema.js';
+import { toPackedUserDetailed } from "@features/users/backend/user.schema.js";
+import { iUnpinContract, iUnpinErrors } from './unpin.contract.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 
-const contractProjection = projectEndpointContract(packedIUnpinDefinition);
+export interface IUnpinDependencies {
+	userEntityService: Pick<UserEntityService, 'packSelf'>;
+	notePiningService: Pick<NotePiningService, 'removePinned'>;
+}
+export function createIUnpinProcedure(deps: IUnpinDependencies) {
+	return createApiProcedure<MiLocalUser>()(iUnpinContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			return toPackedUserDetailed(await (async () => {
+				await deps.notePiningService.removePinned(me, ps.noteId).catch((err: unknown) => {
+					if (readErrorId(err) === 'b302d4cf-c050-400a-bbb3-be208681f40c') throw apiError(iUnpinErrors.noSuchNote);
+					throw err;
+				});
 
-export const meta = {
-	tags: ['account', 'notes'],
-
-	requireCredential: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: '454170ce-9d63-4a43-9da1-ea10afe81e21',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends NativeContractEndpoint<typeof meta, typeof packedIUnpinInput, typeof packedIUnpinOutput, typeof nativeMeDetailedSchema> {
-	constructor(
-		private userEntityService: UserEntityService,
-		private notePiningService: NotePiningService,
-	) {
-		super(meta, contractProjection, nativeMeDetailedSchema, async (ps, me) => {
-			await this.notePiningService.removePinned(me, ps.noteId).catch(err => {
-				if (err.id === 'b302d4cf-c050-400a-bbb3-be208681f40c') throw new ApiError(meta.errors.noSuchNote);
-				throw err;
-			});
-
-			return await this.userEntityService.packSelf(me.id);
+				return await deps.userEntityService.packSelf(me.id);
+			})());
 		});
-	}
 }

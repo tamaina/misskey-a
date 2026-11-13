@@ -3,48 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedIGalleryLikesDefinition, packedIGalleryLikesInput, packedIGalleryLikesOutput } from '../../../../contract/gallery/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import type { GalleryLikesRepository } from '@features/persistence/backend/repositories/models.js';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { GalleryLikeEntityService } from '../../../serializers/GalleryLikeEntityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(packedIGalleryLikesDefinition);
-
-export const meta = {
-	tags: ['account', 'gallery'],
-
-	requireCredential: true,
-
-	kind: 'read:gallery-likes',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedIGalleryLikesInput, typeof packedIGalleryLikesOutput> {
-	constructor(
-		@Inject(DI.galleryLikesRepository)
-		private galleryLikesRepository: GalleryLikesRepository,
-
-		private galleryLikeEntityService: GalleryLikeEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.galleryLikesRepository.createQueryBuilder('like'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+import { toPackedGalleryLike } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal, decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../../api.definition.js';
+import type { CollectionsDependencies } from '../../../api.implementation.js';
+export interface IGalleryLikesDependencies<Actor extends ApiActor> {
+	queryService: Pick<CollectionsDependencies<Actor>['queryService'], 'makePaginationQuery'>;
+	galleryLikesRepository: Pick<CollectionsDependencies<Actor>['galleryLikesRepository'], 'createQueryBuilder'>;
+	galleryLikeEntityService: Pick<CollectionsDependencies<Actor>['galleryLikeEntityService'], 'packMany'>;
+}
+export function createIGalleryLikesProcedure<Actor extends ApiActor>(deps: IGalleryLikesDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.iGalleryLikes).use(requirePrincipal<Actor>()).use(decodeScalarInput<Actor>({ limit: 'integer', sinceDate: 'integer', untilDate: 'integer' }))
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const query = deps.queryService.makePaginationQuery(deps.galleryLikesRepository.createQueryBuilder('like'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('like.userId = :meId', { meId: me.id })
 				.leftJoinAndSelect('like.post', 'post');
-
 			const likes = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await this.galleryLikeEntityService.packMany(likes, me);
+			return (await deps.galleryLikeEntityService.packMany(likes, me)).map(toPackedGalleryLike);
 		});
-	}
 }

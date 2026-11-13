@@ -3,26 +3,26 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { channelContract, channelErrors } from '@features/channels/contract';
-import { legacyChannelSchemas } from '@features/channels/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['channels'],
+import { channelsUnfollowContract, channelsUnfollowErrors } from './unfollow.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:channels',
-
-	errors: channelErrors['channels/unfollow'],
-} as const;
-
-export const paramDef = legacyChannelSchemas['channels/unfollow'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('channelCommands', commands => createContractTransportEndpoint(meta, paramDef, channelContract['channels/unfollow'], async (params, user) => commands['channels/unfollow'](params, {
-	context: { actor: user },
-})));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
+import { type ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
+export interface ChannelsUnfollowDependencies {
+	channelsRepository: ChannelsRepository;
+	channelFollowingService: ChannelFollowingService;
+}
+export function createChannelsUnfollowProcedure<Actor extends MiLocalUser>(deps: ChannelsUnfollowDependencies) {
+	return createApiProcedure<Actor>()(channelsUnfollowContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const channel = await deps.channelsRepository.findOneBy({ id: input.channelId });
+			if (channel == null) throw apiError(channelsUnfollowErrors.noSuchChannel);
+			await deps.channelFollowingService.unfollow(actor, channel);
+		});
+}

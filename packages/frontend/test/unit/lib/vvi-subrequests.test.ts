@@ -24,7 +24,7 @@ describe('VVI SFC subrequest guard', () => {
 			const sfc = '<template><p>{{ $locale.sfc.title }}</p></template><locale locale="ja-JP" lang="json">{"title":"Fixture"}</locale>';
 			writeFileSync(join(root, 'features/navigation/frontend/Page.vue'), sfc);
 			const plugin = pluginVvi();
-			hook(plugin.configResolved, { root: join(root, 'frontend'), command: 'serve', base: '/' });
+			hook(plugin.configResolved, { root: join(root, 'frontend'), command: 'serve', base: '/', build: { ssr: false } });
 			hook(plugin.buildStart);
 			const locale = hook(plugin.load, '\0virtual:vite-vue-internationalization/locale/ja-JP');
 			expect(locale).toContain('/features/navigation/frontend/Page.vue');
@@ -33,7 +33,7 @@ describe('VVI SFC subrequest guard', () => {
 		}
 	});
 
-	test.each(['serve', 'build'])('keeps complete dictionaries after style/template requests during %s', command => {
+	test.each(['serve', 'build'])('keeps complete dictionaries after style/template requests during %s', async command => {
 		const root = mkdtempSync(join(tmpdir(), 'misskey-a-vvi-subrequest-'));
 		try {
 			const frontend = join(root, 'frontend');
@@ -44,15 +44,15 @@ describe('VVI SFC subrequest guard', () => {
 			writeFileSync(id, '<template><p>{{ $locale.sfc.text }}</p></template><locale locale="ja-JP" lang="json">{"text":"Result"}</locale>');
 			writeFileSync(join(components, 'Error.vue'), '<template><p>{{ $locale.sfc.text }}</p></template><locale locale="ja-JP" lang="json">{"text":"Error"}</locale>');
 			const plugin = pluginVvi();
-			hook(plugin.configResolved, { root: frontend, command, base: '/' });
+			hook(plugin.configResolved, { root: frontend, command, base: '/', build: { ssr: false } });
 			hook(plugin.buildStart);
-			hook(plugin.transform, readFileSync(id, 'utf8'), id);
+			await hook(plugin.transform, readFileSync(id, 'utf8'), id);
 			const localeId = '\0virtual:vite-vue-internationalization/locale/ja-JP';
 			const before = hook(plugin.load, localeId);
 			expect(before).toContain('/features/ui/frontend/components/Result.vue');
 			expect(before).toContain('/features/ui/frontend/components/Error.vue');
 			for (const query of ['?vue&type=style&index=0&lang.scss', '?vue&type=template', '?vue&type=script&setup=true&lang.ts']) {
-				expect(hook(plugin.transform, '/* compiled fragment without locale blocks */', id + query)).toBeNull();
+				expect(await hook(plugin.transform, '/* compiled fragment without locale blocks */', id + query)).toBeNull();
 				expect(hook(plugin.load, localeId)).toBe(before);
 			}
 		} finally {
@@ -71,7 +71,7 @@ describe('main/embed locale scan isolation', () => {
 			writeFileSync(join(root, 'features/demo/frontend/Main.vue'), '<locale locale="ja-JP" lang="json">{"main":"Main only"}</locale>');
 			writeFileSync(join(root, 'features/demo/frontend/embed/Embed.vue'), '<locale locale="ja-JP" lang="json">{"embed":"Embed only"}</locale>');
 			const plugin = pluginVvi({ embed });
-			hook(plugin.configResolved, { root: join(root, host), command: 'build', base: '/' });
+			hook(plugin.configResolved, { root: join(root, host), command: 'build', base: '/', build: { ssr: false } });
 			hook(plugin.buildStart);
 			const primary = hook(plugin.load, '\0virtual:vite-vue-internationalization/locale/ja-JP');
 			expect(primary).toContain(embed ? 'Embed only' : 'Main only');

@@ -32,9 +32,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
@@ -43,6 +43,10 @@ import { prefer } from '@features/preferences/frontend/preferences.js';
 import { globalEvents } from '@features/runtime/frontend/events.js';
 import { checkDragDataType, getDragData, setDragData } from '@features/ui/frontend/drag-and-drop.js';
 import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	folder: Misskey.entities.DriveFolder;
@@ -184,7 +188,7 @@ function onDrop(ev: DragEvent) {
 					default:
 						os.alert({
 							type: 'error',
-							text: $locale.value.sfc.somethingHappened,
+							text: globalLocale.value.env.somethingHappened,
 						});
 				}
 			});
@@ -289,7 +293,7 @@ function onContextmenu(ev: PointerEvent) {
 			});
 		},
 	}, { type: 'divider' }, {
-		text: $locale.value.sfc.rename,
+		text: globalLocale.value.env.rename,
 		icon: 'ti ti-forms',
 		action: rename,
 	}, {
@@ -297,7 +301,7 @@ function onContextmenu(ev: PointerEvent) {
 		icon: 'ti ti ti-folder-symlink',
 		action: move,
 	}, { type: 'divider' }, {
-		text: $locale.value.sfc.delete,
+		text: globalLocale.value.env.delete,
 		icon: 'ti ti-trash',
 		danger: true,
 		action: deleteFolder,
@@ -404,15 +408,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "يتعذر إكمال العملية",
 	"circularReferenceFolder": "المجلد المستهدف ينتمي للمجلد الذي تريد حذفه",
-	"somethingHappened": "حدث خطأ",
 	"renameFolder": "إعادة تسمية المجلد",
 	"inputNewFolderName": "ادخل الإسم الجديد للمجلد",
 	"unableToDelete": "لا يمكن حذفه",
 	"hasChildFilesOrFolders": "الان الملف غير فارغ. لا يمكن حذفه",
 	"openInWindow": "افتح في نافذة جديدة",
-	"rename": "إعادة التسمية",
 	"move": "أنقل",
-	"delete": "حذف",
 	"copyFolderId": "انسخ معرّف المجلد",
 	"uploadFolder": "المجلد الافتراضي للرفع"
 }
@@ -422,15 +423,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "L'operació no pot ser completada ",
 	"circularReferenceFolder": "La carpeta destinatària és una subcarpeta de la carpeta a la qual la desitges moure",
-	"somethingHappened": "S'ha produït un error",
 	"renameFolder": "Canvia el nom de la carpeta",
 	"inputNewFolderName": "Introduïu el nom de la carpeta nova",
 	"unableToDelete": "No es pot eliminar",
 	"hasChildFilesOrFolders": "No és possible esborrar aquesta carpeta ja que no és buida",
 	"openInWindow": "Obrir en una finestra nova",
-	"rename": "Canvia el nom",
 	"move": "Mou",
-	"delete": "Elimina",
 	"copyFolderId": "Copiar ID de la carpeta",
 	"uploadFolder": "Carpeta per defecte on desar els arxius pujats"
 }
@@ -440,15 +438,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Operace nebyla dokončena.",
 	"circularReferenceFolder": "Koncová složka je podsložka složky, kterou chcete přesunout.",
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"renameFolder": "Přejmenovat složku",
 	"inputNewFolderName": "Zadejte název nové složky",
 	"unableToDelete": "Nelze smazat",
 	"hasChildFilesOrFolders": "Nemůžete odstranit složku, která není prázdná.",
 	"openInWindow": "Otevřít v novém okně",
-	"rename": "Přejmenovat",
 	"move": "Přesunout",
-	"delete": "Smazat",
 	"copyFolderId": "Kopírovat ID složky",
 	"uploadFolder": "Výchozí lokace pro upload"
 }
@@ -458,15 +453,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"renameFolder": "Rename this folder",
 	"inputNewFolderName": "Enter a new folder name",
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
-	"delete": "Delete",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
 }
@@ -476,15 +468,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Der Vorgang konnte nicht abgeschlossen werden",
 	"circularReferenceFolder": "Der Zielordner ist ein Unterorder des Ordners, den du verschieben möchtest.",
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"renameFolder": "Ordner umbenennen",
 	"inputNewFolderName": "Gib einen neuen Ordnernamen ein",
 	"unableToDelete": "Nicht löschbar",
 	"hasChildFilesOrFolders": "Dieser Ordner kann nicht gelöscht werden, da er nicht leer ist.",
 	"openInWindow": "In einem Fenster öffnen",
-	"rename": "Umbenennen",
 	"move": "Verschieben",
-	"delete": "Löschen",
 	"copyFolderId": "Ordner-ID kopieren",
 	"uploadFolder": "Standardordner für Uploads"
 }
@@ -494,15 +483,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"renameFolder": "Rename this folder",
 	"inputNewFolderName": "Enter a new folder name",
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
-	"delete": "Delete",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
 }
@@ -512,15 +498,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "La operación no se puede llevar a cabo",
 	"circularReferenceFolder": "La carpeta de destino es una sub-carpeta de la carpeta que quieres mover.",
-	"somethingHappened": "Ocurrió un error",
 	"renameFolder": "Renombrar carpeta",
 	"inputNewFolderName": "Ingrese un nuevo nombre de la carpeta",
 	"unableToDelete": "No se puede borrar",
 	"hasChildFilesOrFolders": "No se puede borrar esta carpeta. No está vacía.",
 	"openInWindow": "Abrir en una ventana",
-	"rename": "Renombrar",
 	"move": "Mover",
-	"delete": "Borrar",
 	"copyFolderId": "Copiar ID de carpeta",
 	"uploadFolder": "Carpeta de subidas por defecto"
 }
@@ -530,15 +513,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "L’opération n’a pas pu être complétée.",
 	"circularReferenceFolder": "Le dossier de destination est un sous-dossier du dossier que vous souhaitez déplacer.",
-	"somethingHappened": "Une erreur est survenue",
 	"renameFolder": "Renommer le dossier",
 	"inputNewFolderName": "Entrez un nouveau nom de dossier",
 	"unableToDelete": "Suppression impossible",
 	"hasChildFilesOrFolders": "Impossible de supprimer ce dossier car il n'est pas vide.",
 	"openInWindow": "Ouvrir dans une nouvelle fenêtre",
-	"rename": "Renommer",
 	"move": "Déplacer",
-	"delete": "Supprimer",
 	"copyFolderId": "Copier l'identifiant du dossier",
 	"uploadFolder": "Emplacement de téléversement par défaut"
 }
@@ -548,15 +528,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Operasi tersebut tidak dapat diselesaikan.",
 	"circularReferenceFolder": "Folder tujuan adalah subfolder dari folder yang ingin kamu pindahkan.",
-	"somethingHappened": "Terjadi kesalahan",
 	"renameFolder": "Ubah nama folder",
 	"inputNewFolderName": "Masukkan nama folder yang baru",
 	"unableToDelete": "Tidak dapat menghapus",
 	"hasChildFilesOrFolders": "Karena folder ini tidak kosong, maka tidak dapat dihapus.",
 	"openInWindow": "Buka di jendela",
-	"rename": "Ubah nama",
 	"move": "Pindah",
-	"delete": "Hapus",
 	"copyFolderId": "Salin Folder",
 	"uploadFolder": "Lokasi unggah folder bawaan"
 }
@@ -566,15 +543,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Impossibile compiere l'operazione",
 	"circularReferenceFolder": "La cartella di destinazione è una sottocartella della cartella che vuoi spostare.",
-	"somethingHappened": "Si è verificato un problema",
 	"renameFolder": "Rinomina cartella",
 	"inputNewFolderName": "Inserisci nome della nuova cartella",
 	"unableToDelete": "Eliminazione impossibile",
 	"hasChildFilesOrFolders": "Impossibile eliminare la cartella perché non è vuota",
 	"openInWindow": "Apri in una finestra",
-	"rename": "Modifica nome",
 	"move": "Sposta",
-	"delete": "Elimina",
 	"copyFolderId": "Copia ID della cartella",
 	"uploadFolder": "Destinazione caricamento predefinita"
 }
@@ -584,15 +558,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "操作を完了できません",
 	"circularReferenceFolder": "移動先のフォルダーは、移動するフォルダーのサブフォルダーです。",
-	"somethingHappened": "問題が発生しました",
 	"renameFolder": "フォルダー名を変更",
 	"inputNewFolderName": "新しいフォルダ名を入力してください",
 	"unableToDelete": "削除できません",
 	"hasChildFilesOrFolders": "このフォルダは空でないため、削除できません。",
 	"openInWindow": "ウィンドウで開く",
-	"rename": "名前を変更",
 	"move": "移動",
-	"delete": "削除",
 	"copyFolderId": "フォルダーIDをコピー",
 	"uploadFolder": "既定アップロード先"
 }
@@ -602,15 +573,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "なんか奥の方で詰まってもうた",
 	"circularReferenceFolder": "移動先のフォルダーは、移動するフォルダーのサブフォルダーや。",
-	"somethingHappened": "なんかあかんわ",
 	"renameFolder": "フォルダー名を変える",
 	"inputNewFolderName": "今度のフォルダ名は何にするん？",
 	"unableToDelete": "消せんかったわ",
 	"hasChildFilesOrFolders": "このフォルダは空っぽちゃうから消されへん",
 	"openInWindow": "ウィンドウで開く",
-	"rename": "名前を変えるで",
 	"move": "移すで",
-	"delete": "ほかす",
 	"copyFolderId": "フォルダーIDをコピー",
 	"uploadFolder": "とりあえずアップロードしたやつ置いとく所"
 }
@@ -620,15 +588,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"renameFolder": "Rename this folder",
 	"inputNewFolderName": "Enter a new folder name",
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
-	"delete": "Kkes",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
 }
@@ -638,15 +603,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"renameFolder": "Rename this folder",
 	"inputNewFolderName": "Enter a new folder name",
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
-	"delete": "ಅಳಿಸು",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
 }
@@ -656,15 +618,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "작업을 완료할 수 없습니다",
 	"circularReferenceFolder": "지정한 폴더가 이동할 폴더의 하위 폴더입니다.",
-	"somethingHappened": "오류가 발생했습니다",
 	"renameFolder": "폴더 이름 바꾸기",
 	"inputNewFolderName": "바꿀 폴더명을 입력해 주세요",
 	"unableToDelete": "삭제할 수 없습니다",
 	"hasChildFilesOrFolders": "이 폴더는 비어있지 않기 때문에 삭제할 수 없습니다.",
 	"openInWindow": "창으로 열기",
-	"rename": "이름 변경",
 	"move": "이동",
-	"delete": "삭제",
 	"copyFolderId": "폴더 ID 복사",
 	"uploadFolder": "기본 업로드 위치"
 }
@@ -674,15 +633,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "De operatie kan niet worden voltooid.",
 	"circularReferenceFolder": "De bestemmingsmap is een submap van de map die je wilt verplaatsen.",
-	"somethingHappened": "Er is iets misgegaan.",
 	"renameFolder": "Map hernoemen",
 	"inputNewFolderName": "Naam invoeren voor nieuwe map",
 	"unableToDelete": "Kan niet worden verwijderd",
 	"hasChildFilesOrFolders": "Omdat deze map niet leeg is, kan die niet worden verwijderd.",
 	"openInWindow": "In een venster openen",
-	"rename": "Hernoemen",
 	"move": "Move",
-	"delete": "Verwijderen",
 	"copyFolderId": "Kopieer folder ID",
 	"uploadFolder": "Standaardmap voor uploaden"
 }
@@ -692,15 +648,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "Målmappen er en undermappe til mappen du ønsker å flytte.",
-	"somethingHappened": "En feil har oppstått",
 	"renameFolder": "Endre mappenavn",
 	"inputNewFolderName": "Skriv inn et nytt mappenavn",
 	"unableToDelete": "Kan ikke slette",
 	"hasChildFilesOrFolders": "Siden denne mappen ikke er tom, kan den ikke slettes.",
 	"openInWindow": "Åpne i vindu",
-	"rename": "Endre navn",
 	"move": "Flytt",
-	"delete": "Slett",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
 }
@@ -710,15 +663,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Nie udało się dokończyć działania.",
 	"circularReferenceFolder": "Katalog docelowy jest podkatalogiem katalogu, który chcesz przenieść.",
-	"somethingHappened": "Coś poszło nie tak",
 	"renameFolder": "Zmień nazwę katalogu",
 	"inputNewFolderName": "Wprowadź nową nazwę katalogu",
 	"unableToDelete": "Nie można usunąć",
 	"hasChildFilesOrFolders": "Ponieważ ten katalog nie jest pusty, nie może być usunięty.",
 	"openInWindow": "Otwórz w oknie",
-	"rename": "Zmień nazwę",
 	"move": "Przenieś",
-	"delete": "Usuń",
 	"copyFolderId": "Kopiuj ID folderu",
 	"uploadFolder": "Domyślne położenie wysłanych"
 }
@@ -728,15 +678,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Não é possível concluir a operação",
 	"circularReferenceFolder": "A pasta de destino é uma subpasta da pasta que você deseja mover.",
-	"somethingHappened": "Ocorreu um erro",
 	"renameFolder": "Renomear Pasta",
 	"inputNewFolderName": "Por favor, digite um novo nome para a pasta!",
 	"unableToDelete": "Não é possível excluir",
 	"hasChildFilesOrFolders": "Esta pasta não está vazia e não pode ser excluída.",
 	"openInWindow": "Abrir em um janela",
-	"rename": "Renomear",
 	"move": "Mover",
-	"delete": "Excluir",
 	"copyFolderId": "Copiar o ID da pasta",
 	"uploadFolder": "Destino de upload padrão"
 }
@@ -746,15 +693,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Не удаётся завершить операцию",
 	"circularReferenceFolder": "Вы пытаетесь переместить папку внутрь себя.",
-	"somethingHappened": "Что-то пошло не так",
 	"renameFolder": "Переименовать папку",
 	"inputNewFolderName": "Пожалуйста, введите новое имя папки!",
 	"unableToDelete": "Удаление невозможно",
 	"hasChildFilesOrFolders": "Эта папка не пуста и не может быть удалена.",
 	"openInWindow": "Открыть в плавающем окне",
-	"rename": "Переименовать",
 	"move": "Переместить",
-	"delete": "Удалить",
 	"copyFolderId": "Скопировать ID папки",
 	"uploadFolder": "Место загрузки по умолчанию"
 }
@@ -764,15 +708,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Operáciu sa nepodarilo dokončiť.",
 	"circularReferenceFolder": "Cieľový priečinok je podpriečinkom priečinka, ktorý chcete presunúť.",
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"renameFolder": "Premenovať priečinok",
 	"inputNewFolderName": "Zadajte nový názov priečinka",
 	"unableToDelete": "Nedá sa odstrániť",
 	"hasChildFilesOrFolders": "Nemôžete odstrániť priečinok sú súbormi.",
 	"openInWindow": "Otvoriť v novom okne",
-	"rename": "Premenovať",
 	"move": "Pohyb",
-	"delete": "Odstrániť",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Predvolený priečinok pre nahrávanie"
 }
@@ -782,15 +723,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "ไม่สามารถดำเนินการให้เสร็จสิ้นได้",
 	"circularReferenceFolder": "โฟลเดอร์ปลายทางคือโฟลเดอร์ย่อยของโฟลเดอร์ที่คุณกำลังย้าย",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"renameFolder": "เปลี่ยนชื่อโฟลเดอร์",
 	"inputNewFolderName": "กรุณาใส่ชื่อโฟลเดอร์ใหม่",
 	"unableToDelete": "ไม่สามารถลบออกได้",
 	"hasChildFilesOrFolders": "เนื่องจากโฟลเดอร์นี้ไม่ว่างเปล่า จึงไม่สามารถลบ",
 	"openInWindow": "เปิดในหน้าต่าง",
-	"rename": "เปลี่ยนชื่อ",
 	"move": "ย้าย",
-	"delete": "ลบ",
 	"copyFolderId": "คัดลอกโฟลเดอร์ ID",
 	"uploadFolder": "โฟลเดอร์เริ่มต้นสำหรับอัปโหลด"
 }
@@ -800,15 +738,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "İşlem tamamlanamadı.",
 	"circularReferenceFolder": "Hedef klasör, taşımak istediğiniz klasörün bir alt klasörü.",
-	"somethingHappened": "Bir hata oluştu",
 	"renameFolder": "Bu klasörü yeniden adlandır",
 	"inputNewFolderName": "Yeni bir klasör adı girin",
 	"unableToDelete": "Silinemiyor",
 	"hasChildFilesOrFolders": "Bu klasör boş olmadığı için silinemez.",
 	"openInWindow": "Pencerede aç",
-	"rename": "Yeniden adlandır",
 	"move": "Taşı",
-	"delete": "Sil",
 	"copyFolderId": "Klasör ID'yi kopyala",
 	"uploadFolder": "Yüklemeler için varsayılan klasör"
 }
@@ -818,15 +753,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"renameFolder": "Rename this folder",
 	"inputNewFolderName": "Enter a new folder name",
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"openInWindow": "Open in window",
-	"rename": "Rename",
 	"move": "Move",
-	"delete": "ئۆچۈرۈش",
 	"copyFolderId": "Copy folder ID",
 	"uploadFolder": "Default folder for uploads"
 }
@@ -836,15 +768,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Не вдається завершити операцію",
 	"circularReferenceFolder": "Ви намагаєтесь перемістити папку в її підпапку.",
-	"somethingHappened": "Щось пішло не так",
 	"renameFolder": "Перейменувати теку",
 	"inputNewFolderName": "Введіть ім'я нової теки",
 	"unableToDelete": "Видалення неможливе",
 	"hasChildFilesOrFolders": "Ця тека не порожня і не може бути видалена",
 	"openInWindow": "Відкрити у вікні",
-	"rename": "Перейменувати",
 	"move": "Пересунути",
-	"delete": "Видалити",
 	"copyFolderId": "Копіювати ID теки",
 	"uploadFolder": "Місце для завантаження за замовчуванням"
 }
@@ -854,15 +783,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "Không thể hoàn tất hành động",
 	"circularReferenceFolder": "Thư mục đích là một thư mục con của thư mục bạn muốn di chuyển.",
-	"somethingHappened": "Xảy ra lỗi",
 	"renameFolder": "Đổi tên thư mục",
 	"inputNewFolderName": "Nhập tên mới cho thư mục",
 	"unableToDelete": "Không thể xóa",
 	"hasChildFilesOrFolders": "Không thể xóa cho đến khi không còn gì trong thư mục.",
 	"openInWindow": "Mở trong cửa sổ mới",
-	"rename": "Đổi tên",
 	"move": "Di chuyển",
-	"delete": "Xóa",
 	"copyFolderId": "Sao chép ID thư mục",
 	"uploadFolder": "Thư mục tải lên mặc định"
 }
@@ -872,15 +798,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "操作无法完成",
 	"circularReferenceFolder": "目标文件夹是要移动的文件夹的子文件夹。",
-	"somethingHappened": "出错了",
 	"renameFolder": "重命名文件夹",
 	"inputNewFolderName": "请输入新文件夹名",
 	"unableToDelete": "无法删除",
 	"hasChildFilesOrFolders": "此文件夹中有文件，无法删除。",
 	"openInWindow": "在新窗口中打开",
-	"rename": "重命名",
 	"move": "移动",
-	"delete": "删除",
 	"copyFolderId": "复制文件夹ID",
 	"uploadFolder": "默认上传文件夹"
 }
@@ -890,15 +813,12 @@ function onContextmenu(ev: PointerEvent) {
 {
 	"unableToProcess": "操作無法完成",
 	"circularReferenceFolder": "目標文件夾是您要移動的文件夾的子文件夾。",
-	"somethingHappened": "發生錯誤",
 	"renameFolder": "重新命名資料夾",
 	"inputNewFolderName": "輸入新資料夾的名稱",
 	"unableToDelete": "無法刪除",
 	"hasChildFilesOrFolders": "此文件夾不是空的，無法刪除。",
 	"openInWindow": "在新視窗開啟",
-	"rename": "重新命名",
 	"move": "移動 ",
-	"delete": "刪除",
 	"copyFolderId": "複製資料夾ID",
 	"uploadFolder": "預設上傳資料夾"
 }

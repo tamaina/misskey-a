@@ -92,11 +92,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { watch, ref, computed } from 'vue';
 import { throttle } from 'throttle-debounce';
 import * as Misskey from 'misskey-js';
 import RolesEditorFormula from '@features/roles/frontend/pages/admin/RolesEditorFormula.vue';
-import type { MkSelectItem, GetMkSelectValueTypesFromDef } from '@features/ui/frontend/components/MkSelect.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkColorInput from '@features/ui/frontend/components/MkColorInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -107,7 +107,11 @@ import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import XPolicyEditor from '@features/roles/frontend/pages/admin/roles.policy-editor.vue';
 import { instance } from '@features/instance/frontend/instance.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
+import type { MkSelectItem, GetMkSelectValueTypesFromDef } from '@features/ui/frontend/components/MkSelect.vue';
+import type { Locale } from 'i18n';
 import type { PolicyMeta } from '@features/roles/frontend/pages/admin/roles.policy-editor.vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 type RoleLike = Pick<Misskey.entities.Role, 'name' | 'description' | 'isAdministrator' | 'isModerator' | 'color' | 'iconUrl' | 'target' | 'isPublic' | 'isExplorable' | 'asBadge' | 'canEditMembersByModerator' | 'displayOrder' | 'preserveAssignmentOnMoveAccount'> & {
 	id?: Misskey.entities.Role['id'] | null;
@@ -173,8 +177,8 @@ const rolePolicyMeta = computed<any>({
 
 const rolePermissionDef = [
 	{ label: $locale.value.sfc.normalUser, value: 'normal' },
-	{ label: $locale.value.sfc.moderator, value: 'moderator' },
-	{ label: $locale.value.sfc.administrator, value: 'administrator' },
+	{ label: globalLocale.value.env.moderator, value: 'moderator' },
+	{ label: globalLocale.value.env.administrator, value: 'administrator' },
 ] as const satisfies MkSelectItem[];
 
 const rolePermission = computed<GetMkSelectValueTypesFromDef<typeof rolePermissionDef>>({
@@ -238,9 +242,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "السياسة العامة",
-	"normalUser": "مستخدم عادي",
-	"moderator": "مشرِف",
-	"administrator": "المدير"
+	"normalUser": "مستخدم عادي"
 }
 </locale>
 
@@ -270,9 +272,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Fer el rol explorable",
 	"roleDescriptionOfIsExplorable": "La línia de temps d'aquest rol i la llista d'usuaris seran públics si s'activa.",
 	"rolePolicies": "Polítiques",
-	"normalUser": "Usuari normal",
-	"moderator": "Moderador/a",
-	"administrator": "Administrador/a"
+	"normalUser": "Usuari normal"
 }
 </locale>
 
@@ -302,9 +302,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Udělat roli objevitelnou",
 	"roleDescriptionOfIsExplorable": "Časová osa této role a seznam uživatelů s touto rolí budou zveřejněny, pokud jsou povoleny.",
 	"rolePolicies": "Zásady",
-	"normalUser": "Normální uživatel",
-	"moderator": "Moderátor",
-	"administrator": "Administrátor"
+	"normalUser": "Normální uživatel"
 }
 </locale>
 
@@ -334,9 +332,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Normal user",
-	"moderator": "Moderator",
-	"administrator": "Administrator"
+	"normalUser": "Normal user"
 }
 </locale>
 
@@ -366,9 +362,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Benutzerliste veröffentlichen",
 	"roleDescriptionOfIsExplorable": "Ist dies aktiviert, so ist die Chronik dieser Rolle, sowie eine Liste der Benutzer mit dieser Rolle, frei zugänglich.",
 	"rolePolicies": "Richtlinien",
-	"normalUser": "Standardbenutzer",
-	"moderator": "Moderator",
-	"administrator": "Administrator"
+	"normalUser": "Standardbenutzer"
 }
 </locale>
 
@@ -398,9 +392,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Normal user",
-	"moderator": "Moderator",
-	"administrator": "Administrator"
+	"normalUser": "Normal user"
 }
 </locale>
 
@@ -430,9 +422,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Hacer el rol explorable",
 	"roleDescriptionOfIsExplorable": "La línea de tiempo de éste rol y la lista de usuarios serán públicos si se activa..",
 	"rolePolicies": "Política",
-	"normalUser": "Usuario normal",
-	"moderator": "Moderador",
-	"administrator": "Administrador"
+	"normalUser": "Usuario normal"
 }
 </locale>
 
@@ -462,9 +452,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Stratégies",
-	"normalUser": "Simple utilisateur·rice",
-	"moderator": "Modérateur·rice·s",
-	"administrator": "Administrateur"
+	"normalUser": "Simple utilisateur·rice"
 }
 </locale>
 
@@ -494,9 +482,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Buat peran dapat terjelajahi",
 	"roleDescriptionOfIsExplorable": "Lini masa peran ini dan daftar pengguna dengan peran ini akan dibuat publik apabila dinyalakan.",
 	"rolePolicies": "Kebijakan",
-	"normalUser": "Pengguna umum",
-	"moderator": "Moderator",
-	"administrator": "Admin"
+	"normalUser": "Pengguna umum"
 }
 </locale>
 
@@ -526,9 +512,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "La timeline del ruolo è pubblica",
 	"roleDescriptionOfIsExplorable": "Selezionandolo, la timeline del ruolo diventerà accessibile pubblicamente. Tranne se il ruolo non è pubblico.",
 	"rolePolicies": "Policy",
-	"normalUser": "Profilo standard",
-	"moderator": "Moderatore",
-	"administrator": "Amministratore"
+	"normalUser": "Profilo standard"
 }
 </locale>
 
@@ -558,9 +542,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "ユーザーを見つけやすくする",
 	"roleDescriptionOfIsExplorable": "オンにすると、「みつける」でメンバー一覧が公開されるほか、ロールのタイムラインが利用可能になります。",
 	"rolePolicies": "ポリシー",
-	"normalUser": "一般ユーザー",
-	"moderator": "モデレーター",
-	"administrator": "管理者"
+	"normalUser": "一般ユーザー"
 }
 </locale>
 
@@ -590,9 +572,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "ユーザーを見つけやすくしたる",
 	"roleDescriptionOfIsExplorable": "オンにしたらロールの面子一覧が「みつける」で公開されるし、ロールのタイムラインが使えるようになるで。",
 	"rolePolicies": "ポリシー",
-	"normalUser": "一般ユーザー",
-	"moderator": "モデレーター",
-	"administrator": "管理者"
+	"normalUser": "一般ユーザー"
 }
 </locale>
 
@@ -622,9 +602,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Normal user",
-	"moderator": "Moderator",
-	"administrator": "Administrator"
+	"normalUser": "Normal user"
 }
 </locale>
 
@@ -654,9 +632,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Normal user",
-	"moderator": "Moderator",
-	"administrator": "Administrator"
+	"normalUser": "Normal user"
 }
 </locale>
 
@@ -686,9 +662,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "역할 타임라인 공개",
 	"roleDescriptionOfIsExplorable": "활성화하면 역할 타임라인을 공개합니다. 비활성화 시 타임라인이 공개되지 않습니다.",
 	"rolePolicies": "정책",
-	"normalUser": "일반 유저",
-	"moderator": "모더레이터",
-	"administrator": "관리자"
+	"normalUser": "일반 유저"
 }
 </locale>
 
@@ -718,9 +692,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Normal user",
-	"moderator": "Moderator",
-	"administrator": "Beheerder"
+	"normalUser": "Normal user"
 }
 </locale>
 
@@ -750,9 +722,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Normal user",
-	"moderator": "Moderator",
-	"administrator": "Administrator"
+	"normalUser": "Normal user"
 }
 </locale>
 
@@ -782,9 +752,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Normalny użytkownik",
-	"moderator": "Moderator",
-	"administrator": "Admin"
+	"normalUser": "Normalny użytkownik"
 }
 </locale>
 
@@ -814,9 +782,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Fazer o cargo explorável",
 	"roleDescriptionOfIsExplorable": "Ao ativar, a lista de membros será pública na seção 'Explorar' e a linha do tempo do cargo ficará disponível.",
 	"rolePolicies": "Políticas",
-	"normalUser": "Usuários padrão",
-	"moderator": "Moderador",
-	"administrator": "Administrador"
+	"normalUser": "Usuários padrão"
 }
 </locale>
 
@@ -846,9 +812,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Политики",
-	"normalUser": "Обычный пользователь",
-	"moderator": "Модератор",
-	"administrator": "Администратор"
+	"normalUser": "Обычный пользователь"
 }
 </locale>
 
@@ -878,9 +842,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Normal user",
-	"moderator": "Moderátor",
-	"administrator": "Administrátor"
+	"normalUser": "Normal user"
 }
 </locale>
 
@@ -910,9 +872,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "ค้นหาผู้ใช้ได้ง่ายขึ้นโดยดูจากบทบาท",
 	"roleDescriptionOfIsExplorable": "เมื่อเปิดใช้งาน ไทมไลน์บทบาทนี้และสมาชิกที่มีบทบาทนี้จะเปิดเผยเป็นสาธารณะ",
 	"rolePolicies": "นโยบาย",
-	"normalUser": "ผู้ใช้มาตรฐาน",
-	"moderator": "ผู้ควบคุม",
-	"administrator": "ผู้ดูแลระบบ"
+	"normalUser": "ผู้ใช้มาตรฐาน"
 }
 </locale>
 
@@ -942,9 +902,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Rolü keşfedilebilir hale getir",
 	"roleDescriptionOfIsExplorable": "Bu rolün panosu ve bu role sahip kullanıcıların listesi, etkinleştirilirse kamuya açık hale getirilecek.",
 	"rolePolicies": "Politikalar",
-	"normalUser": "Normal kullanıcı",
-	"moderator": "Moderatör",
-	"administrator": "Yönetici"
+	"normalUser": "Normal kullanıcı"
 }
 </locale>
 
@@ -974,9 +932,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Normal user",
-	"moderator": "Moderator",
-	"administrator": "Administrator"
+	"normalUser": "Normal user"
 }
 </locale>
 
@@ -1006,9 +962,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Звичайний користувач",
-	"moderator": "Модератор",
-	"administrator": "Адмін"
+	"normalUser": "Звичайний користувач"
 }
 </locale>
 
@@ -1038,9 +992,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "Make role explorable",
 	"roleDescriptionOfIsExplorable": "This role's timeline and the list of users with this will be made public if enabled.",
 	"rolePolicies": "Policies",
-	"normalUser": "Người dùng bình thường",
-	"moderator": "Kiểm duyệt viên",
-	"administrator": "Quản trị viên"
+	"normalUser": "Người dùng bình thường"
 }
 </locale>
 
@@ -1070,9 +1022,7 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "公开角色时间线",
 	"roleDescriptionOfIsExplorable": "开启后将公开角色时间线。如果角色为非公开，则无法公开时间线。",
 	"rolePolicies": "策略",
-	"normalUser": "普通用户",
-	"moderator": "监察员",
-	"administrator": "管理员"
+	"normalUser": "普通用户"
 }
 </locale>
 
@@ -1102,8 +1052,6 @@ watch(role, save, { deep: true });
 	"roleIsExplorable": "讓使用者更容易找到您",
 	"roleDescriptionOfIsExplorable": "若開啟則公開角色時間軸。若角色不是公開的，則無法公開時間軸。",
 	"rolePolicies": "政策",
-	"normalUser": "一般使用者",
-	"moderator": "審查員",
-	"administrator": "管理員"
+	"normalUser": "一般使用者"
 }
 </locale>

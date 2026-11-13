@@ -3,24 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { portabilityContract } from '../../../contract/index.js';
-import ms from 'ms';
-import { legacyPortabilitySchemas } from '@features/portability/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = {
-	secure: true,
-	requireCredential: true,
-	limit: {
-		duration: ms('1min'),
-		max: 1,
-	},
-} as const;
-
-export const paramDef = legacyPortabilitySchemas['i/export-user-lists'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('portability', portability => createContractTransportEndpoint(meta, paramDef, portabilityContract['i/export-user-lists'], async (params, user) => portability['i/export-user-lists'](params, {
-	context: { actor: { id: user.id } },
-})));
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { iExportUserListsContract } from './export-user-lists.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { PortabilityDependencies } from '../../api.implementation.js';
+export function createIExportUserListsProcedure<Actor extends ApiActor, File extends { id: string; size: number; url: string }>(deps: Pick<PortabilityDependencies<Actor, File>, 'createExportUserListsJob'>) {
+	return createApiProcedure<Actor>()(iExportUserListsContract).use(requirePrincipal<Actor>())
+		.handler(async ({ context }) => {
+			const actor = context.principal;
+			deps.createExportUserListsJob({ id: actor.id });
+		});
+}

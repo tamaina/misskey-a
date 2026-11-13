@@ -6,10 +6,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <MkFolder :defaultOpen="false" :canPage="false">
 	<template #icon><i class="ti ti-pencil"></i></template>
-	<template #label>{{ $locale.sfc.preset }}: {{ preset.name === '' ? '(' + $locale.sfc.noName + ')' : preset.name }}</template>
+	<template #label>{{ $locale.sfc.preset }}: {{ preset.name === '' ? '(' + globalLocale.env.noName + ')' : preset.name }}</template>
 	<template #footer>
 		<div class="_buttons">
-			<MkButton @click="edit"><i class="ti ti-pencil"></i> {{ $locale.sfc.edit }}</MkButton>
+			<MkButton @click="edit"><i class="ti ti-pencil"></i> {{ globalLocale.env.edit }}</MkButton>
 			<MkButton danger iconOnly style="margin-left: auto;" @click="del"><i class="ti ti-trash"></i></MkButton>
 		</div>
 	</template>
@@ -21,13 +21,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { defineAsyncComponent, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
-import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import { ImageFrameRenderer } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	preset: ImageFramePreset;
@@ -53,7 +57,7 @@ async function edit() {
 
 function del(ev: PointerEvent) {
 	os.popupMenu([{
-		text: $locale.value.sfc.delete,
+		text: globalLocale.value.env.delete,
 		action: () => {
 			emit('del');
 		},
@@ -113,252 +117,168 @@ watch(() => props.preset, async () => {
 
 <locale locale="ar-SA" lang="json">
 {
-	"preset": "إعدادات مسبقة",
-	"noName": "No name",
-	"edit": "التعديل",
-	"delete": "حذف"
+	"preset": "إعدادات مسبقة"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"preset": "Predefinit",
-	"noName": "No hi ha un nom disponible ",
-	"edit": "Editar",
-	"delete": "Elimina"
+	"preset": "Predefinit"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"preset": "Předvolba",
-	"noName": "No name",
-	"edit": "Upravit",
-	"delete": "Smazat"
+	"preset": "Předvolba"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"preset": "Preset",
-	"noName": "No name",
-	"edit": "Edit",
-	"delete": "Delete"
+	"preset": "Preset"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"preset": "Vorlage",
-	"noName": "Kein Name",
-	"edit": "Bearbeiten",
-	"delete": "Löschen"
+	"preset": "Vorlage"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"preset": "Preset",
-	"noName": "No name",
-	"edit": "Edit",
-	"delete": "Delete"
+	"preset": "Preset"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"preset": "Predefinido",
-	"noName": "No hay nombre.",
-	"edit": "Editar",
-	"delete": "Borrar"
+	"preset": "Predefinido"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"preset": "Préréglage",
-	"noName": "No name",
-	"edit": "Editer",
-	"delete": "Supprimer"
+	"preset": "Préréglage"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"preset": "Prasetel",
-	"noName": "Tidak ada nama",
-	"edit": "Sunting",
-	"delete": "Hapus"
+	"preset": "Prasetel"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"preset": "Preimpostato",
-	"noName": "Senza nome",
-	"edit": "Modifica",
-	"delete": "Elimina"
+	"preset": "Preimpostato"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"preset": "プリセット",
-	"noName": "名前はありません",
-	"edit": "編集",
-	"delete": "削除"
+	"preset": "プリセット"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"preset": "プリセット",
-	"noName": "名前はあらへんで",
-	"edit": "編集",
-	"delete": "ほかす"
+	"preset": "プリセット"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"preset": "Preset",
-	"noName": "No name",
-	"edit": "Edit",
-	"delete": "Kkes"
+	"preset": "Preset"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"preset": "Preset",
-	"noName": "No name",
-	"edit": "Edit",
-	"delete": "ಅಳಿಸು"
+	"preset": "Preset"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"preset": "프리셋",
-	"noName": "이름이 없습니다.",
-	"edit": "편집",
-	"delete": "삭제"
+	"preset": "프리셋"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"preset": "Preset",
-	"noName": "No name",
-	"edit": "Bewerken",
-	"delete": "Verwijderen"
+	"preset": "Preset"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"preset": "Preset",
-	"noName": "No name",
-	"edit": "Rediger",
-	"delete": "Slett"
+	"preset": "Preset"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"preset": "Konfiguracja",
-	"noName": "No name",
-	"edit": "Edytuj",
-	"delete": "Usuń"
+	"preset": "Konfiguracja"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"preset": "Predefinições",
-	"noName": "Sem nome",
-	"edit": "Editar",
-	"delete": "Excluir"
+	"preset": "Predefinições"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"preset": "Шаблоны",
-	"noName": "Имя не указано",
-	"edit": "Изменить",
-	"delete": "Удалить"
+	"preset": "Шаблоны"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"preset": "Preset",
-	"noName": "No name",
-	"edit": "Upraviť",
-	"delete": "Odstrániť"
+	"preset": "Preset"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"preset": "พรีเซ็ต",
-	"noName": "ไม่มีชื่อ",
-	"edit": "แก้ไข",
-	"delete": "ลบ"
+	"preset": "พรีเซ็ต"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"preset": "Ön ayar",
-	"noName": "İsim yok",
-	"edit": "Düzenle",
-	"delete": "Sil"
+	"preset": "Ön ayar"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"preset": "Preset",
-	"noName": "No name",
-	"edit": "Edit",
-	"delete": "ئۆچۈرۈش"
+	"preset": "Preset"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"preset": "Пресет",
-	"noName": "Ім'я не вказано",
-	"edit": "Редагувати",
-	"delete": "Видалити"
+	"preset": "Пресет"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"preset": "Mẫu thiết lập",
-	"noName": "No name",
-	"edit": "Sửa",
-	"delete": "Xóa"
+	"preset": "Mẫu thiết lập"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"preset": "预设值",
-	"noName": "未命名",
-	"edit": "编辑",
-	"delete": "删除"
+	"preset": "预设值"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"preset": "預設值",
-	"noName": "沒有名稱",
-	"edit": "編輯",
-	"delete": "刪除"
+	"preset": "預設值"
 }
 </locale>

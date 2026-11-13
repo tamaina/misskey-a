@@ -1,0 +1,33 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import * as v from 'valibot';
+import {
+	packedNoteSchema as __ref_Note
+} from '../../notes/backend/note.schema.js';
+
+export const packedChannelSchema = v.strictObject({
+	"id": v.pipe(v.string(), v.metadata({ "format": "id", "example": "xxxxxxxxxx" })),
+	"createdAt": v.pipe(v.string(), v.metadata({ "format": "date-time" })),
+	"lastNotedAt": v.pipe(v.nullable(v.string()), v.metadata({ "format": "date-time" })),
+	"name": v.string(),
+	"description": v.nullable(v.string()),
+	"userId": v.pipe(v.nullable(v.string()), v.metadata({ "format": "id" })),
+	"bannerUrl": v.pipe(v.nullable(v.string()), v.metadata({ "format": "url" })),
+	"bannerId": v.pipe(v.nullable(v.string()), v.metadata({ "format": "id" })),
+	"pinnedNoteIds": v.array(v.pipe(v.string(), v.metadata({ "format": "id" }))),
+	"color": v.string(),
+	"isArchived": v.boolean(),
+	"usersCount": v.pipe(v.number(), v.finite()),
+	"notesCount": v.pipe(v.number(), v.finite()),
+	"isSensitive": v.boolean(),
+	"allowRenoteToExternal": v.boolean(),
+	"isFollowing": v.optional(v.boolean()),
+	"isFavorited": v.optional(v.boolean()),
+	"isMuting": v.optional(v.boolean()),
+	// Authenticated packing emits this compatibility field.
+	"hasUnreadNote": v.optional(v.boolean()),
+	"pinnedNotes": v.optional(v.array(v.lazy(() => __ref_Note)))
+});

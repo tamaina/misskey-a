@@ -2,24 +2,18 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidInviteDeleteDefinition, voidInviteDeleteInput, voidInviteDeleteOutput } from '../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { RegistrationTicketsRepository } from '@features/persistence/backend/repositories/models.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-const contractProjection = projectEndpointContract(voidInviteDeleteDefinition);
+import { InviteDeleteContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
 	tags: ['meta'],
-
-	requireCredential: true,
-	requiredRolePolicy: 'canInvite',
-	kind: 'write:invite-codes',
 
 	errors: {
 		noSuchCode: {
@@ -41,34 +35,32 @@ export const meta = {
 		},
 	},
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidInviteDeleteInput, typeof voidInviteDeleteOutput> {
-	constructor(
-		@Inject(DI.registrationTicketsRepository)
-		private registrationTicketsRepository: RegistrationTicketsRepository,
-
-		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const ticket = await this.registrationTicketsRepository.findOneBy({ id: ps.inviteId });
-			const isModerator = await this.roleService.isModerator(me);
+export interface InviteDeleteDependencies {
+	registrationTicketsRepository: RegistrationTicketsRepository;
+	roleService: Pick<RoleService, 'isModerator'>;
+}
+export function createInviteDeleteProcedure(deps: InviteDeleteDependencies) {
+	return createApiProcedure<MiLocalUser>()(InviteDeleteContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const ticket = await deps.registrationTicketsRepository.findOneBy({ id: ps.inviteId });
+			const isModerator = await deps.roleService.isModerator(me);
 
 			if (ticket == null) {
-				throw new ApiError(meta.errors.noSuchCode);
+				throw apiError(meta.errors.noSuchCode);
 			}
 
 			if (ticket.createdById !== me.id && !isModerator) {
-				throw new ApiError(meta.errors.accessDenied);
+				throw apiError(meta.errors.accessDenied);
 			}
 
 			if (ticket.usedAt && !isModerator) {
-				throw new ApiError(meta.errors.cantDelete);
+				throw apiError(meta.errors.cantDelete);
 			}
 
-			await this.registrationTicketsRepository.delete(ticket.id);
-		});
-	}
+			await deps.registrationTicketsRepository.delete(ticket.id);
+		})();
+		return result;
+	});
 }

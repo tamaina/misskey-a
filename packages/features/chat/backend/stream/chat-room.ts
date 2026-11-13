@@ -45,7 +45,7 @@ export class ChatRoomChannel extends Channel {
 		});
 
 		if (room == null) return false;
-		if (!(await this.chatService.hasPermissionToViewRoomTimeline(this.user.id, room))) return false;
+		if (!(await this.chatService.hasPermissionToViewRoomTimeline(this.user.id, room, this.connection.isNativeOutput))) return false;
 
 		this.subscriber.on(`chatRoomStream:${this.roomId}`, this.onEvent);
 

@@ -3,21 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { chatContract } from '../../../contract/index.js';
-import { legacyChatSchemas } from '@features/chat/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['chat'],
-	requireCredential: true,
-	kind: 'write:chat',
-	errors: {},
-} as const;
+import { chatReadAllContract } from './read-all.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const paramDef = legacyChatSchemas['chat/read-all'].input as Schema;
+import type { InferSchemaOutput } from '@orpc/contract';
+import { type ChatService } from '@features/chat/backend/services/ChatService.js';
+export interface ChatReadAllDependencies {
+	chatService: Pick<ChatService, 'checkChatAvailability' | 'readAllChatMessages'>;
+}
+export function createChatReadAllProcedure(deps: ChatReadAllDependencies) {
+	async function execute(input: InferSchemaOutput<NonNullable<typeof chatReadAllContract['~orpc']['inputSchema']>>, actor: MiLocalUser): Promise<void> {
+		await deps.chatService.checkChatAvailability(actor.id, 'read');
+		await deps.chatService.readAllChatMessages(actor.id);
+	}
 
-export const { feature, createEndpoint } = defineFeatureEndpoint('chatCommands', commands => createContractTransportEndpoint(meta, paramDef, chatContract['chat/read-all'], async (params, user) => commands['chat/read-all'](params, {
-	context: { actor: user },
-})));
+	return createApiProcedure<MiLocalUser>()(chatReadAllContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
+}

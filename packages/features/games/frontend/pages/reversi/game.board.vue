@@ -131,7 +131,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<div class="_buttonsCenter">
 			<MkButton v-if="!game.isEnded && iAmPlayer" danger @click="surrender">{{ $locale.sfc.reversiSurrender }}</MkButton>
-			<MkButton @click="share">{{ $locale.sfc.share }}</MkButton>
+			<MkButton @click="share">{{ globalLocale.env.share }}</MkButton>
 		</div>
 
 		<MkA v-if="game.isEnded" :to="`/reversi`">
@@ -142,6 +142,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, onActivated, onDeactivated, onMounted, onUnmounted, ref, shallowRef, triggerRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as Reversi from 'misskey-reversi';
@@ -154,11 +155,14 @@ import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import * as sound from '@features/preferences/frontend/utility/sound.js';
 import * as os from '@features/ui/frontend/os.js';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	game: Misskey.entities.ReversiGameDetailed;
@@ -408,7 +412,7 @@ function restoreGame(_game: Misskey.entities.ReversiGameDetailed) {
 async function surrender() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: $locale.value.sfc.areYouSure,
+		text: globalLocale.value.env.areYouSure,
 	});
 	if (canceled) return;
 
@@ -649,9 +653,7 @@ $gap: 4px;
 	"options": "خيارات",
 	"reversiShowBoardLabels": "اعرض ترقيم الصفوف والأعمدة على اللوح",
 	"reversiUseAvatarAsStone": "حوَل الحجارة إلى صور مستخدمين",
-	"reversiSurrender": "Surrender",
-	"share": "شارِك",
-	"areYouSure": "Are you sure?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -676,9 +678,7 @@ $gap: 4px;
 	"options": "Opcions",
 	"reversiShowBoardLabels": "Mostrar el número de línia i columna al tauler de joc",
 	"reversiUseAvatarAsStone": "Fer servir els avatars dels usuaris com a fitxes",
-	"reversiSurrender": "Rendeix-te",
-	"share": "Comparteix",
-	"areYouSure": "Estàs segur?"
+	"reversiSurrender": "Rendeix-te"
 }
 </locale>
 
@@ -703,9 +703,7 @@ $gap: 4px;
 	"options": "Možnosti",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Sdílet",
-	"areYouSure": "Jste si jistí?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -730,9 +728,7 @@ $gap: 4px;
 	"options": "Options",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Share",
-	"areYouSure": "Are you sure?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -757,9 +753,7 @@ $gap: 4px;
 	"options": "Optionen",
 	"reversiShowBoardLabels": "Anzeige der Zeilen- und Spaltennummern am Spielbrett",
 	"reversiUseAvatarAsStone": "Steine in Benutzeravatare umwandeln",
-	"reversiSurrender": "Aufgeben",
-	"share": "Teilen",
-	"areYouSure": "Bist du sicher?"
+	"reversiSurrender": "Aufgeben"
 }
 </locale>
 
@@ -784,9 +778,7 @@ $gap: 4px;
 	"options": "Options",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Share",
-	"areYouSure": "Are you sure?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -811,9 +803,7 @@ $gap: 4px;
 	"options": "Opciones",
 	"reversiShowBoardLabels": "Mostrar el número de línea y la letra de columna en el tablero de juego.",
 	"reversiUseAvatarAsStone": "Usar los avatares de los usuarios como fichas\n",
-	"reversiSurrender": "Rendirse",
-	"share": "Compartir",
-	"areYouSure": "¿Estás conforme?"
+	"reversiSurrender": "Rendirse"
 }
 </locale>
 
@@ -838,9 +828,7 @@ $gap: 4px;
 	"options": "Options",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Se rendre",
-	"share": "Partager",
-	"areYouSure": "Êtes-vous sûr·e ?"
+	"reversiSurrender": "Se rendre"
 }
 </locale>
 
@@ -865,9 +853,7 @@ $gap: 4px;
 	"options": "Opsi peran",
 	"reversiShowBoardLabels": "Tampilkan penomoran baris dan kolom pada papan",
 	"reversiUseAvatarAsStone": "Ubah batu menjadi avatar pengguna",
-	"reversiSurrender": "Menyerah",
-	"share": "Bagikan",
-	"areYouSure": "Apakah kamu yakin?"
+	"reversiSurrender": "Menyerah"
 }
 </locale>
 
@@ -892,9 +878,7 @@ $gap: 4px;
 	"options": "Opzioni del ruolo",
 	"reversiShowBoardLabels": "Mostra le coordinate del gioco",
 	"reversiUseAvatarAsStone": "Immagini profilo come pedine",
-	"reversiSurrender": "Mi arrendo",
-	"share": "Condividi",
-	"areYouSure": "Confermi?"
+	"reversiSurrender": "Mi arrendo"
 }
 </locale>
 
@@ -919,9 +903,7 @@ $gap: 4px;
 	"options": "オプション",
 	"reversiShowBoardLabels": "盤面に行・列番号を表示",
 	"reversiUseAvatarAsStone": "石をアイコンにする",
-	"reversiSurrender": "投了",
-	"share": "共有",
-	"areYouSure": "よろしいですか？"
+	"reversiSurrender": "投了"
 }
 </locale>
 
@@ -946,9 +928,7 @@ $gap: 4px;
 	"options": "オプション",
 	"reversiShowBoardLabels": "盤面に行・列番号を表示",
 	"reversiUseAvatarAsStone": "石をアイコンにする",
-	"reversiSurrender": "投了",
-	"share": "わけわけ",
-	"areYouSure": "いいん？"
+	"reversiSurrender": "投了"
 }
 </locale>
 
@@ -973,9 +953,7 @@ $gap: 4px;
 	"options": "Options",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Share",
-	"areYouSure": "Are you sure?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1000,9 +978,7 @@ $gap: 4px;
 	"options": "Options",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Share",
-	"areYouSure": "Are you sure?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1027,9 +1003,7 @@ $gap: 4px;
 	"options": "옵션",
 	"reversiShowBoardLabels": "판에 행·열 번호 표시",
 	"reversiUseAvatarAsStone": "돌을 아이콘으로 표시",
-	"reversiSurrender": "기권",
-	"share": "공유",
-	"areYouSure": "계속 진행하시겠습니까?"
+	"reversiSurrender": "기권"
 }
 </locale>
 
@@ -1054,9 +1028,7 @@ $gap: 4px;
 	"options": "Options",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Delen",
-	"areYouSure": "Weet je het zeker?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1081,9 +1053,7 @@ $gap: 4px;
 	"options": "Alternativ",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Del",
-	"areYouSure": "Are you sure?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1108,9 +1078,7 @@ $gap: 4px;
 	"options": "Options",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Udostępnij",
-	"areYouSure": "Na pewno?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1135,9 +1103,7 @@ $gap: 4px;
 	"options": "Opções",
 	"reversiShowBoardLabels": "Exibir numeração de linha e coluna no tabuleiro",
 	"reversiUseAvatarAsStone": "Utilizar avatares de usuário como as pedras",
-	"reversiSurrender": "Desistir",
-	"share": "Compartilhar",
-	"areYouSure": "Tem certeza?"
+	"reversiSurrender": "Desistir"
 }
 </locale>
 
@@ -1162,9 +1128,7 @@ $gap: 4px;
 	"options": "Настройки ролей",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Поделиться",
-	"areYouSure": "Вы уверены?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1189,9 +1153,7 @@ $gap: 4px;
 	"options": "Options",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Zdieľať",
-	"areYouSure": "Are you sure?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1216,9 +1178,7 @@ $gap: 4px;
 	"options": "ตัวเลือก",
 	"reversiShowBoardLabels": "แสดงหมายเลขแถว/คอลัมน์บนกระดาน",
 	"reversiUseAvatarAsStone": "ใช้ไอคอนประจำตัวเป็นหมาก",
-	"reversiSurrender": "ยอมแพ้",
-	"share": "แบ่งปัน",
-	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?"
+	"reversiSurrender": "ยอมแพ้"
 }
 </locale>
 
@@ -1243,9 +1203,7 @@ $gap: 4px;
 	"options": "Seçenekler",
 	"reversiShowBoardLabels": "Tahtada satır ve sütun numaralarını göster",
 	"reversiUseAvatarAsStone": "Taşları kullanıcı avatarlarına dönüştürün",
-	"reversiSurrender": "Teslimiyet",
-	"share": "Paylaş",
-	"areYouSure": "Emin misin?"
+	"reversiSurrender": "Teslimiyet"
 }
 </locale>
 
@@ -1270,9 +1228,7 @@ $gap: 4px;
 	"options": "Options",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Share",
-	"areYouSure": "Are you sure?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1297,9 +1253,7 @@ $gap: 4px;
 	"options": "Опції",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Поділитись",
-	"areYouSure": "Ви впевнені?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1324,9 +1278,7 @@ $gap: 4px;
 	"options": "Tùy chọn",
 	"reversiShowBoardLabels": "Display row and column numbering on the board",
 	"reversiUseAvatarAsStone": "Turn stones into user avatars",
-	"reversiSurrender": "Surrender",
-	"share": "Chia sẻ",
-	"areYouSure": "Bạn chắc chứ?"
+	"reversiSurrender": "Surrender"
 }
 </locale>
 
@@ -1351,9 +1303,7 @@ $gap: 4px;
 	"options": "选项",
 	"reversiShowBoardLabels": "显示行号和列号",
 	"reversiUseAvatarAsStone": "用头像作为棋子",
-	"reversiSurrender": "认输",
-	"share": "分享",
-	"areYouSure": "你确定吗？"
+	"reversiSurrender": "认输"
 }
 </locale>
 
@@ -1378,8 +1328,6 @@ $gap: 4px;
 	"options": "選項",
 	"reversiShowBoardLabels": "在棋盤上顯示行、列號",
 	"reversiUseAvatarAsStone": "用大頭貼當作棋子",
-	"reversiSurrender": "認輸",
-	"share": "分享",
-	"areYouSure": "是否確定？"
+	"reversiSurrender": "認輸"
 }
 </locale>

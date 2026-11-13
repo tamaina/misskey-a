@@ -9,9 +9,7 @@ It will also allow the reader to use the translation tool of their preference if
 ## Issues
 Before creating an issue, please check the following:
 - To avoid duplication, please search for similar issues before creating a new issue.
-- Do not use Issues as a question.
-	- Issues should only be used to feature requests, suggestions, and report problems.
-	- Please ask questions in [GitHub Discussions](https://github.com/misskey-dev/misskey/discussions) or [Discord](https://discord.gg/Wp8gVStHW3).
+- Use [misskey-a Issues](https://github.com/tamaina/misskey-a/issues) for questions, troubleshooting, feature requests, suggestions, and bug reports.
 
 ## Creating a PR
 Thank you for your PR! Before creating a PR, please check the following:

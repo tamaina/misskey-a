@@ -3,58 +3,33 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedClipsUpdateDefinition, packedClipsUpdateInput, packedClipsUpdateOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-
-import { ClipEntityService } from '../../serializers/ClipEntityService.js';
+import { toPackedClip } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../api.definition.js';
+import type { CollectionsDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { collectionsErrors } from '../../api.errors.js';
 import { ClipService } from '../../services/ClipService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedClipsUpdateDefinition);
-
-export const meta = {
-	tags: ['clips'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:account',
-
-	errors: {
-		noSuchClip: {
-			message: 'No such clip.',
-			code: 'NO_SUCH_CLIP',
-			id: 'b4d92d70-b216-46fa-9a3f-a8c811699257',
-		},
-	},
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedClipsUpdateInput, typeof packedClipsUpdateOutput> {
-	constructor(
-		private clipService: ClipService,
-
-		private clipEntityService: ClipEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface ClipsUpdateDependencies<Actor extends ApiActor> {
+	clipService: Pick<CollectionsDependencies<Actor>['clipService'], 'update'>;
+	clipEntityService: Pick<CollectionsDependencies<Actor>['clipEntityService'], 'pack'>;
+}
+export function createClipsUpdateProcedure<Actor extends ApiActor>(deps: ClipsUpdateDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.clipsUpdate).use(requirePrincipal<Actor>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
 			try {
 				// 空文字列をnullにしたいので??は使わない
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-				await this.clipService.update(me, ps.clipId, ps.name, ps.isPublic, ps.description || null);
+				await deps.clipService.update(me, ps.clipId, ps.name, ps.isPublic, ps.description || null);
 			} catch (e) {
 				if (e instanceof ClipService.NoSuchClipError) {
-					throw new ApiError(meta.errors.noSuchClip);
+					throw apiError(collectionsErrors.clipsUpdate.noSuchClip);
 				}
 				throw e;
 			}
-
-			return await this.clipEntityService.pack(ps.clipId, me);
+			return toPackedClip(await deps.clipEntityService.pack(ps.clipId, me));
 		});
-	}
 }

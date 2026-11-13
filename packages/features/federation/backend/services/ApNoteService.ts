@@ -173,7 +173,7 @@ export class ApNoteService {
 		// ローカルで投稿者を検索し、もし凍結されていたらスキップ
 		// eslint-disable-next-line no-param-reassign
 		actor ??= await this.apPersonService.fetchPerson(uri) as MiRemoteUser | undefined;
-		if (actor && actor.isSuspended) {
+		if (actor && (actor.isSuspended || actor.isRemoteSuspended)) {
 			throw new IdentifiableError('85ab9bd7-3a41-4530-959d-f07073900109', 'actor has been suspended');
 		}
 
@@ -190,7 +190,7 @@ export class ApNoteService {
 		} else if (typeof note._misskey_content !== 'undefined') {
 			text = note._misskey_content;
 		} else if (typeof note.content === 'string') {
-			text = this.apMfmService.htmlToMfm(note.content, note.tag);
+			text = this.apMfmService.htmlToMfm(note.content, { tag: note.tag, hasQuote: !!(note._misskey_quote ?? note.quoteUrl) });
 		}
 
 		const poll = await this.apQuestionService.extractPollFromQuestion(note, resolver).catch(() => undefined);
@@ -210,7 +210,7 @@ export class ApNoteService {
 		actor ??= await this.apPersonService.resolvePerson(uri, resolver) as MiRemoteUser;
 
 		// 解決した投稿者が凍結されていたらスキップ
-		if (actor.isSuspended) {
+		if ((actor.isSuspended || actor.isRemoteSuspended)) {
 			throw new IdentifiableError('85ab9bd7-3a41-4530-959d-f07073900109', 'actor has been suspended');
 		}
 

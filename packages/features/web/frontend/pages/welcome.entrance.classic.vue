@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.shape2"></div>
 	<div :class="$style.logoWrapper">
 		<div :class="$style.poweredBy">Powered by</div>
-		<img :src="misskeysvg" :class="$style.misskey"/>
+		<img :src="misskeysvg" :class="$style.misskey" :alt="productName"/>
 	</div>
 	<div :class="$style.contents">
 		<MkVisitorDashboard/>
@@ -35,6 +35,7 @@ import XTimeline from '@features/timelines/frontend/pages/welcome.timeline.vue';
 import MkMarqueeText from '@features/ui/frontend/components/MkMarqueeText.vue';
 import MkFeaturedPhotos from '@features/drive/frontend/components/MkFeaturedPhotos.vue';
 import misskeysvg from '/client-assets/misskey.svg';
+import { productName } from '@features/boot/frontend/shared/config.js';
 import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 import MkVisitorDashboard from '@features/statistics/frontend/components/MkVisitorDashboard.vue';
 import { getProxiedImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
@@ -131,6 +132,7 @@ misskeyApiGet('federation/instances', {
 }
 
 .misskey {
+	vertical-align: middle;
 	width: 120px;
 
 	@media (max-width: 450px) {
@@ -142,7 +144,7 @@ misskeyApiGet('federation/instances', {
 	position: relative;
 	width: min(430px, calc(100% - 32px));
 	margin-left: 128px;
-	padding: 100px 0 100px 0;
+	padding: 128px 0 100px 0;
 
 	@media (max-width: 1200px) {
 		margin: auto;

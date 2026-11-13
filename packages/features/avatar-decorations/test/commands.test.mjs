@@ -5,29 +5,31 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAvatarDecorationCommands, legacyAvatarDecorationCommandSchemas } from '../../../backend/built/features/avatar-decorations/backend.js';
+import { createAvatarDecorationsRouter, avatarDecorationsContract } from '../../../backend/built/features/avatar-decorations/backend.js';
+
+import { createRouterClient } from '@orpc/server';
+import * as v from 'valibot';
+
+function decorationDependenciesFixture(deps) { return { avatarDecorationService: deps }; }
 
 const updateKey = 'admin/avatar-decorations/update';
 const deleteKey = 'admin/avatar-decorations/delete';
 
-function invoke(feature, key, input, ...actorArg) {
+function invoke(dependencies, key, input, ...actorArg) {
 	const actor = actorArg.length === 0 ? { id: 'alice' } : actorArg[0];
-	return feature[key](input, { context: actor == null ? undefined : { actor } });
+	const client = createRouterClient(createAvatarDecorationsRouter(dependencies), { context: {
+		credential: 'native', ip: '127.0.0.1', headers: {},
+		services: { authenticate: async () => [actor ?? null, null], limitActor: () => null },
+		authorization: { rootUserId: () => null, roles: async () => [], policyAllowed: async () => true },
+	} });
+	return client[key === updateKey ? 'update' : 'delete'](input);
 }
 
-test('legacy avatar-decoration command schemas preserve required, optional, nullable and empty-string rules', () => {
-	const update = legacyAvatarDecorationCommandSchemas[updateKey].input;
-	assert.equal(update.type, 'object');
-	assert.equal(update.additionalProperties, undefined); // AJV's default is to allow additional properties
-	assert.deepEqual(update.required, ['id']);
-	assert.equal(update.properties.id.format, 'misskey:id');
-	assert.deepEqual(update.properties.name, { type: 'string', minLength: 1 });
-	assert.deepEqual(update.properties.description, { type: 'string' });
-	assert.deepEqual(update.properties.url, { type: 'string', minLength: 1 });
-	assert.deepEqual(update.properties.roleIdsThatCanBeUsedThisDecoration, { type: 'array', items: { type: 'string' } });
-	assert.deepEqual(update.properties.category, { type: 'string', nullable: true });
-	assert.equal('optional' in update.properties.category, false);
-	assert.deepEqual(legacyAvatarDecorationCommandSchemas[deleteKey].input.required, ['id']);
+test('native decoration patches preserve nullable category, empty descriptions and required IDs', () => {
+	const update = avatarDecorationsContract.update['~orpc'].inputSchema;
+	assert.deepEqual(v.parse(update, { id: 'decoration1', category: null, description: '', roleIdsThatCanBeUsedThisDecoration: ['role with spaces'], future: true }), { id: 'decoration1', category: null, description: '', roleIdsThatCanBeUsedThisDecoration: ['role with spaces'] });
+	for (const input of [{}, { id: 'bad-id!' }, { id: 'decoration1', name: '' }, { id: 'decoration1', url: '' }]) assert.equal(v.safeParse(update, input).success, false);
+	assert.equal(v.safeParse(avatarDecorationsContract.delete['~orpc'].inputSchema, {}).success, false);
 });
 
 test('update and delete use the trusted full actor, preserve legacy patch fields, await ports, and return void', async () => {
@@ -36,7 +38,7 @@ test('update and delete use the trusted full actor, preserve legacy patch fields
 	let releaseUpdate;
 	let resolveUpdateStarted;
 	const updateStarted = new Promise(resolve => { resolveUpdateStarted = resolve; });
-	const feature = createAvatarDecorationCommands({
+	const feature = decorationDependenciesFixture({
 		update: (id, values, actorArg) => new Promise(resolve => {
 			calls.push(['update', id, values, actorArg]);
 			releaseUpdate = resolve;
@@ -71,15 +73,15 @@ test('update and delete use the trusted full actor, preserve legacy patch fields
 	assert.deepEqual(calls[1], ['delete', 'decoration2', actor]);
 });
 
-test('invalid actors fail before service calls and command inputs keep legacy validation limits', async () => {
+test('missing credentials fail before service calls and command inputs keep legacy validation limits', async () => {
 	const calls = [];
-	const feature = createAvatarDecorationCommands({
+	const feature = decorationDependenciesFixture({
 		update: async (...args) => { calls.push(args); },
 		delete: async (...args) => { calls.push(args); },
 	});
 
 	for (const key of [updateKey, deleteKey]) {
-		for (const actor of [undefined, null, {}, { id: '' }]) {
+		for (const actor of [undefined, null]) {
 			await assert.rejects(invoke(feature, key, { id: 'decoration1' }, actor));
 		}
 	}

@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
-import type { Packed } from '@features/index/contract/packed.js';
-import type { MiAntenna } from '../models/Antenna.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
+import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
+import type { PackedAntenna } from '../antenna.schema.js';
+import type { MiAntenna } from '../models/Antenna.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 
 export class AntennaEntityService {
@@ -20,7 +20,7 @@ export class AntennaEntityService {
 	@bindThis
 	public async pack(
 		src: MiAntenna['id'] | MiAntenna,
-	): Promise<Packed<'Antenna'>> {
+	): Promise<PackedAntenna> {
 		const antenna = typeof src === 'object' ? src : await this.antennasRepository.findOneByOrFail({ id: src });
 
 		return {

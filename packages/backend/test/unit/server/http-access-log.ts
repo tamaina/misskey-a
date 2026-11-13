@@ -78,6 +78,27 @@ afterEach(async () => {
 });
 
 describe('registerHttpAccessLog', () => {
+	test('sensitive OAuth routes omit form, token and consent HTML bodies and query credentials', async () => {
+		const { manager, writeAccess } = createManager({ requestBody: true, responseBody: true });
+		const fastify = Fastify({ logger: false });
+		servers.push(fastify);
+		registerHttpAccessLog(fastify, manager);
+		fastify.get('/oauth/authorize', { config: { sensitiveAccessLogBody: true } }, (_request, reply) => reply.type('text/html').send('<meta content="CONSENT_SECRET">'));
+		fastify.post('/oauth/token', { config: { sensitiveAccessLogBody: true } }, () => ({ access_token: 'BEARER_SECRET' }));
+		fastify.post('/ordinary', request => ({ visible: request.body }));
+		await fastify.ready();
+		await fastify.inject({ method: 'GET', url: '/oauth/authorize?state=STATE_SECRET&code_challenge=CHALLENGE_SECRET' });
+		await fastify.inject({ method: 'POST', url: '/oauth/token', payload: { code: 'CODE_SECRET', code_verifier: 'VERIFIER_SECRET', login_token: 'LOGIN_SECRET' } });
+		await fastify.inject({ method: 'POST', url: '/ordinary', payload: { visible: 'ordinary' } });
+		const captured = JSON.stringify(writeAccess.mock.calls);
+		for (const value of ['CONSENT_SECRET', 'STATE_SECRET', 'CHALLENGE_SECRET', 'CODE_SECRET', 'VERIFIER_SECRET', 'LOGIN_SECRET', 'BEARER_SECRET']) expect(captured).not.toContain(value);
+		for (const [record] of writeAccess.mock.calls.slice(0, 2)) {
+			expect(record).not.toHaveProperty('requestBody');
+			expect(record).not.toHaveProperty('responseBody');
+		}
+		expect(writeAccess.mock.calls[2][0]).toHaveProperty('requestBody', { visible: 'ordinary' });
+	});
+
 	test('filters responses by configured status classes and keeps the route template', async () => {
 		const server = await createServer({ statusClasses: ['4xx', '5xx'] });
 		servers.push(server.fastify);

@@ -3,14 +3,14 @@ name: api.json validation
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/backend/**
       - .github/workflows/validate-api-json.yml
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/backend/**
       - .github/workflows/validate-api-json.yml

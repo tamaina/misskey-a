@@ -4,7 +4,7 @@
  */
 
 import type { MiUserListMembership, UserListMembershipsRepository, UserListsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { } from '../models/Blocking.js';
 import type { MiUserList } from '../models/UserList.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';

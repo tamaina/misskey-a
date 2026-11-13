@@ -137,6 +137,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<SearchMarker :keywords="['antennas']">
 				<MkFolder>
 					<template #icon><i class="ti ti-antenna"></i></template>
+					<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
 					<template #label><SearchLabel>{{ $locale.sfc.antennas }}</SearchLabel></template>
 					<div class="_gaps_s">
 						<MkFolder :defaultOpen="true">

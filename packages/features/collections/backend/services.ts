@@ -12,5 +12,5 @@ import { ClipService } from './services/ClipService.js';
 export const collectionServices = defineServices({
 	ClipEntityService: service(ClipEntityService, [ports.clipsRepository, ports.clipNotesRepository, ports.clipFavoritesRepository, ports.userEntityService, ports.idService]),
 	NoteFavoriteEntityService: service(NoteFavoriteEntityService, [ports.noteFavoritesRepository, ports.noteEntityService, ports.idService]),
-	ClipService: service(ClipService, [ports.clipsRepository, ports.clipNotesRepository, ports.notesRepository, ports.roleService, ports.idService]),
+	ClipService: service(ClipService, [ports.clipsRepository, ports.clipNotesRepository, ports.notesRepository, ports.roleService, ports.idService, ports.globalEventService]),
 });

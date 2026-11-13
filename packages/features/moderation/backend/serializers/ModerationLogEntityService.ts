@@ -9,7 +9,7 @@ import type { } from '@features/relationships/backend/models/Blocking.js';
 import { MiModerationLog } from '../models/ModerationLog.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 export class ModerationLogEntityService {

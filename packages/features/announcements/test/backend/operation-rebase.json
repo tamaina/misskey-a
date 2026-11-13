@@ -1,0 +1,251 @@
+[
+  {
+    "path": "/admin/announcements/create",
+    "currentSha256": "76a34f7dc3352af8711e124a586b95570e891a27021bd5711c40286fbe44668b",
+    "baselineSha256": "40dd9b6f4cbfa0ca847ae718f6f06479d7453dc6ba9b42995dab8644788cc0c3",
+    "removals": [
+      {
+        "parent": [
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+          "allOf",
+          0,
+          "properties"
+        ],
+        "key": "autoArchiveAt",
+        "current": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      {
+        "parent": [
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+          "properties"
+        ],
+        "key": "autoArchiveAt",
+        "current": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      {
+        "parent": [
+          "post",
+          "responses",
+          "400",
+          "content",
+          "application/json",
+          "schema",
+          "properties",
+          "error",
+          "anyOf"
+        ],
+        "key": 2,
+        "current": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "client",
+                "permission",
+                "server"
+              ],
+              "type": "string"
+            },
+            "info": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            "code": {
+              "const": "INVALID_AUTO_ARCHIVE_AT"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "id",
+            "kind"
+          ],
+          "$schema": "https://json-schema.org/draft/2020-12/schema"
+        }
+      }
+    ]
+  },
+  {
+    "path": "/admin/announcements/list",
+    "currentSha256": "31e2945fdddb48f74c02f4b82faffb07679dd41336522ffc06aed73448afc75a",
+    "baselineSha256": "14d830f3f5644d7e16547226307fead4cfb6d19a5f1da444075c33e06ce1a305",
+    "removals": [
+      {
+        "parent": [
+          "post",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+          "items",
+          "properties"
+        ],
+        "key": "autoArchiveAt",
+        "current": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      {
+        "parent": [
+          "post",
+          "responses",
+          "200",
+          "content",
+          "application/json",
+          "schema",
+          "items",
+          "required"
+        ],
+        "key": 14,
+        "current": "autoArchiveAt"
+      }
+    ]
+  },
+  {
+    "path": "/admin/announcements/update",
+    "currentSha256": "bfc752bdda7048fd8ccc53c9cab75baefd31dd68b27d36b683d34ce5cb0fbbd2",
+    "baselineSha256": "75de4c46d469a192172f9db706c82f0a1c189fa529f543c71124253be7cf3df0",
+    "removals": [
+      {
+        "parent": [
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+          "allOf",
+          0,
+          "properties"
+        ],
+        "key": "autoArchiveAt",
+        "current": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      {
+        "parent": [
+          "post",
+          "requestBody",
+          "content",
+          "application/json",
+          "schema",
+          "properties"
+        ],
+        "key": "autoArchiveAt",
+        "current": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      {
+        "parent": [
+          "post",
+          "responses",
+          "400",
+          "content",
+          "application/json",
+          "schema",
+          "properties",
+          "error",
+          "anyOf"
+        ],
+        "key": 3,
+        "current": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "client",
+                "permission",
+                "server"
+              ],
+              "type": "string"
+            },
+            "info": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            "code": {
+              "const": "INVALID_AUTO_ARCHIVE_AT"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "id",
+            "kind"
+          ],
+          "$schema": "https://json-schema.org/draft/2020-12/schema"
+        }
+      }
+    ]
+  }
+]

@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { IsNull } from 'typeorm';
+import { BrowserSessionService } from '../services/BrowserSessionService.js';
+import type { BrowserSessionIdentity } from '@features/api/backend/transport/context.js';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { AccessTokensRepository, AppsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
@@ -36,14 +39,24 @@ export class AuthenticateService implements OnApplicationShutdown {
 		private appsRepository: AppsRepository,
 
 		private cacheService: CacheService,
+		private browserSessionService: BrowserSessionService,
 	) {
 		this.appCache = new MemoryKVCache<MiApp>(1000 * 60 * 60 * 24 * 7); // 1w
 	}
 
 	@bindThis
-	public async authenticate(token: string | null | undefined): Promise<[MiLocalUser | null, MiAccessToken | null]> {
+	public async authenticate(token: string | null | undefined): Promise<[MiLocalUser | null, MiAccessToken | null, BrowserSessionIdentity?]> {
 		if (token == null) {
 			return [null, null];
+		}
+
+		if (token.startsWith('bs_')) {
+			const session = await this.browserSessionService.verify(token);
+			if (!session) throw new AuthenticationError('invalid browser session');
+			// Browser credentials never borrow the legacy user cache or app scopes.
+			const user = await this.usersRepository.findOneBy({ id: session.userId, host: IsNull(), isSuspended: false, isDeleted: false }) as MiLocalUser | null;
+			if (!user || user.host !== null || user.isSuspended || user.isDeleted) throw new AuthenticationError('local user not found');
+			return [user, null, { id: session.id, userId: session.userId }];
 		}
 
 		if (isNativeUserToken(token)) {

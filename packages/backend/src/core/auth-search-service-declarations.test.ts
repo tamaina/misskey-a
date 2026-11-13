@@ -13,18 +13,18 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
 import type { MiUser, MiUserProfile } from '@features/persistence/backend/repositories/models.js';
-import { authSecurityServices, authServices } from '@features/auth/backend/services.js';
-import { discoveryServices, userSearchServices } from '@features/discovery/backend/services.js';
+import { authSecurityServices } from '@features/auth/backend/services.js';
+import { userSearchServices } from '@features/discovery/backend/services.js';
 import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { UserSearchService } from '@features/discovery/backend/services/UserSearchService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { MiUserSecurityKey } from '@features/auth/backend/models/UserSecurityKey.js';
-import { ports } from '@features/index/backend/service-ports.js';
 import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
-import type { SelectQueryBuilder } from 'typeorm';
+import { FindOperator } from 'typeorm';
+import type { FindOptionsWhere, SelectQueryBuilder } from 'typeorm';
 import type { Inputs } from '@features/index/backend/service-definitions.js';
 
 vi.mock('@simplewebauthn/server', () => ({
@@ -44,16 +44,20 @@ function securityInputs() {
 	return inputs;
 }
 
-function authenticationResponse() {
-	return mockDeep<AuthenticationResponseJSON>({ id: 'credential-id' });
+function authenticationResponse(): AuthenticationResponseJSON {
+	return {
+		id: 'credential-id', rawId: 'credential-id', type: 'public-key',
+		response: { clientDataJSON: '', authenticatorData: '', signature: '' },
+		clientExtensionResults: {},
+	};
 }
 
 function storedKey() {
 	return new MiUserSecurityKey({ id: 'credential-id', userId: 'user', publicKey: Buffer.from([1, 2, 3]).toString('base64url'), counter: 4, transports: ['internal'] });
 }
 
-function verifiedAuthentication(verified = true) {
-	return mockDeep<Awaited<ReturnType<typeof verifyAuthenticationResponse>>>({ verified, authenticationInfo: { newCounter: 5, credentialDeviceType: 'singleDevice', credentialBackedUp: false } });
+function verifiedAuthentication(verified = true): Awaited<ReturnType<typeof verifyAuthenticationResponse>> {
+	return { verified, authenticationInfo: { credentialID: 'credential-id', newCounter: 5, userVerified: true, credentialDeviceType: 'singleDevice', credentialBackedUp: false, origin: 'https://example.test', rpID: 'example.test' } };
 }
 
 afterEach(() => {
@@ -63,14 +67,6 @@ afterEach(() => {
 });
 
 describe('auth and search declaration boundaries', () => {
-	test('old auth and zero-input discovery definition/output shapes remain unchanged', () => {
-		expect(Object.keys(authServices.definitions).sort()).toEqual(['AppEntityService', 'AuthSessionEntityService', 'InviteCodeEntityService', 'SigninEntityService']);
-		expect(Object.keys(discoveryServices.definitions)).toEqual(['HashtagEntityService']);
-		expect(Object.keys(discoveryServices.create())).toEqual(['HashtagEntityService']);
-		expect(ports.redisClient.token).toBe(DI.redis);
-		expect(authSecurityServices.ports.map(port => port.name).sort()).toEqual(['config', 'meta', 'redisClient', 'userProfilesRepository', 'userSecurityKeysRepository', 'usersRepository']);
-	});
-
 	test('plain security factories borrow one Redis object and direct constructors remain equivalent', () => {
 		const inputs = securityInputs();
 		const first = authSecurityServices.create(inputs);
@@ -104,8 +100,9 @@ describe('auth and search declaration boundaries', () => {
 			for (const ctor of [UserAuthService, WebAuthnService, UserSearchService]) {
 				const service = module.get<object>(ctor);
 				expect(service).toBeInstanceOf(ctor);
-				expect(module.get(ctor.name)).toBe(service);
-				expect(resolver.get(ctor.name)).toBe(service);
+				const alias = ctor === UserAuthService ? 'UserAuthService' : ctor.name;
+				expect(module.get(alias)).toBe(service);
+				expect(resolver.get(alias)).toBe(service);
 				expect(Reflect.getMetadata('design:paramtypes', ctor)).toBeUndefined();
 			}
 			expect(Reflect.get(module.get(UserAuthService), 'redisClient')).toBe(module.get(DI.redis));
@@ -140,10 +137,23 @@ describe('auth and search declaration boundaries', () => {
 		vi.stubEnv('NODE_ENV', 'test');
 		vi.stubEnv('MISSKEY_TEST_CHECK_DUPLICATED_TOTP', '1');
 		const inputs = securityInputs();
+		let remaining = ['used', 'keep'];
+		inputs.userProfilesRepository.update.mockImplementation(async criteria => {
+			const condition = (criteria as FindOptionsWhere<MiUserProfile>).twoFactorBackupSecret;
+
+			if (!(condition instanceof FindOperator)) throw new Error('Expected conditional recovery update');
+			const code: unknown = condition.objectLiteralParameters?.backupCode;
+
+			if (typeof code !== 'string') throw new Error('Expected bound recovery code');
+			const previous = remaining.length;
+			remaining = remaining.filter(value => value !== code);
+			return { affected: previous === remaining.length ? 0 : 1, raw: [], generatedMaps: [] };
+		});
 		const service = authSecurityServices.create(inputs).UserAuthService;
 		const authenticate = service.twoFactorAuthenticate;
 		await authenticate(mockDeep<MiUserProfile>({ userId: 'user', twoFactorBackupSecret: ['used', 'keep'] }), 'used');
-		expect(inputs.userProfilesRepository.update).toHaveBeenCalledWith({ userId: 'user' }, { twoFactorBackupSecret: ['keep'] });
+		expect(inputs.userProfilesRepository.update).toHaveBeenCalledWith(expect.objectContaining({ userId: 'user' }), { twoFactorBackupSecret: expect.any(Function) });
+		expect(remaining).toEqual(['keep']);
 		expect(inputs.redisClient.set).not.toHaveBeenCalled();
 		inputs.redisClient.set.mockResolvedValue(null);
 		const token = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(secret), digits: 6, period: 30 }).generate({ timestamp });
@@ -153,11 +163,19 @@ describe('auth and search declaration boundaries', () => {
 	test('WebAuthn registration options preserve relying party, policy and ninety-second challenge TTL', async () => {
 		const inputs = securityInputs();
 		inputs.userSecurityKeysRepository.findBy.mockResolvedValue([storedKey()]);
-		const options = mockDeep<PublicKeyCredentialCreationOptionsJSON>({ challenge: 'registration-challenge' });
+		const options: PublicKeyCredentialCreationOptionsJSON = {
+			challenge: 'registration-challenge',
+			rp: { name: 'Example', id: 'example.test' },
+			user: { id: 'dXNlcg', name: 'name', displayName: 'Display' },
+			pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+			timeout: 60000, attestation: 'none',
+			excludeCredentials: [{ id: 'credential-id', type: 'public-key', transports: ['internal'] }],
+			authenticatorSelection: { residentKey: 'required', requireResidentKey: true, userVerification: 'required' },
+		};
 		vi.mocked(generateRegistrationOptions).mockResolvedValue(options);
 		const service = authSecurityServices.create(inputs).WebAuthnService;
 		expect(await service.initiateRegistration('user', 'name', 'Display')).toBe(options);
-		expect(generateRegistrationOptions).toHaveBeenCalledWith(expect.objectContaining({ rpName: 'Example', rpID: 'example.test', userName: 'name', userDisplayName: 'Display', excludeCredentials: [{ id: 'credential-id', transports: ['internal'] }], authenticatorSelection: { residentKey: 'required', userVerification: 'preferred' } }));
+		expect(generateRegistrationOptions).toHaveBeenCalledWith(expect.objectContaining({ rpName: 'Example', rpID: 'example.test', userName: 'name', userDisplayName: 'Display', excludeCredentials: [{ id: 'credential-id', transports: ['internal'] }], authenticatorSelection: { residentKey: 'required', userVerification: 'required' } }));
 		expect(inputs.redisClient.setex).toHaveBeenCalledWith('webauthn:registrationChallenge:user', 90, 'registration-challenge');
 	});
 
@@ -176,14 +194,17 @@ describe('auth and search declaration boundaries', () => {
 	test('WebAuthn authentication and passkey challenges retain TTL and scoped credential options', async () => {
 		const inputs = securityInputs();
 		inputs.userSecurityKeysRepository.findBy.mockResolvedValue([storedKey()]);
-		const options = mockDeep<PublicKeyCredentialRequestOptionsJSON>({ challenge: 'authentication-challenge' });
+		const options: PublicKeyCredentialRequestOptionsJSON = {
+			challenge: 'authentication-challenge', rpId: 'example.test', timeout: 60000,
+			userVerification: 'required', allowCredentials: [],
+		};
 		vi.mocked(generateAuthenticationOptions).mockResolvedValue(options);
 		const service = authSecurityServices.create(inputs).WebAuthnService;
 		await service.initiateAuthentication('user');
-		expect(generateAuthenticationOptions).toHaveBeenNthCalledWith(1, { rpID: 'example.test', allowCredentials: [{ id: 'credential-id', transports: ['internal'] }], userVerification: 'preferred' });
+		expect(generateAuthenticationOptions).toHaveBeenNthCalledWith(1, { rpID: 'example.test', allowCredentials: [{ id: 'credential-id', transports: ['internal'] }], userVerification: 'required' });
 		expect(inputs.redisClient.setex).toHaveBeenCalledWith('webauthn:authenticationChallenge:user', 90, 'authentication-challenge');
 		await service.initiateSignInWithPasskeyAuthentication('context');
-		expect(generateAuthenticationOptions).toHaveBeenNthCalledWith(2, { rpID: 'example.test', userVerification: 'preferred' });
+		expect(generateAuthenticationOptions).toHaveBeenNthCalledWith(2, { rpID: 'example.test', userVerification: 'required' });
 		expect(inputs.redisClient.setex).toHaveBeenCalledWith('webauthn:passkeyChallenge:context', 90, 'authentication-challenge');
 	});
 
@@ -199,7 +220,8 @@ describe('auth and search declaration boundaries', () => {
 		expect(await service.verifyAuthentication('user', response)).toBe(true);
 		expect(inputs.redisClient.getdel).toHaveBeenCalledWith('webauthn:authenticationChallenge:user');
 		expect(inputs.userSecurityKeysRepository.findOneBy).toHaveBeenCalledWith({ id: 'credential-id', userId: 'user' });
-		expect(verifyAuthenticationResponse).toHaveBeenCalledWith(expect.objectContaining({ response, expectedChallenge: 'authentication-challenge', expectedOrigin: 'https://example.test', expectedRPID: 'example.test', requireUserVerification: true }));
+		expect(verifyAuthenticationResponse).toHaveBeenCalledWith({ response, expectedChallenge: 'authentication-challenge', expectedOrigin: 'https://example.test', expectedRPID: 'example.test', credential: { id: 'credential-id', publicKey: Buffer.from([1, 2, 3]), counter: 4, transports: ['internal'] }, requireUserVerification: true });
+		expect(inputs.redisClient.getdel.mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(verifyAuthenticationResponse).mock.invocationCallOrder[0]);
 		expect(inputs.userSecurityKeysRepository.update).toHaveBeenCalledWith({ id: 'credential-id', userId: 'user' }, { lastUsed: new Date(timestamp), counter: 5, credentialDeviceType: 'singleDevice', credentialBackedUp: false });
 		await expect(service.verifyAuthentication('user', response)).rejects.toThrow('challenge not found');
 		expect(verifyAuthenticationResponse).toHaveBeenCalledTimes(1);
@@ -216,6 +238,17 @@ describe('auth and search declaration boundaries', () => {
 		expect(inputs.userSecurityKeysRepository.findOneBy).toHaveBeenCalledWith({ id: 'credential-id' });
 		expect(await service.verifySignInWithPasskeyAuthentication('context', authenticationResponse())).toBeNull();
 		expect(inputs.userSecurityKeysRepository.update).toHaveBeenCalledTimes(1);
+	});
+
+	test('malformed passkey protocol consumes its challenge without invoking verification or updating the credential', async () => {
+		const inputs = securityInputs();
+		inputs.redisClient.getdel.mockResolvedValue('passkey-challenge');
+		inputs.userSecurityKeysRepository.findOneBy.mockResolvedValue(storedKey());
+		const service = authSecurityServices.create(inputs).WebAuthnService;
+		await expect(service.verifySignInWithPasskeyAuthentication('context', { id: 'credential-id' })).rejects.toMatchObject({ id: 'b18c89a7-5b5e-4cec-bb5b-0419f332d430' });
+		expect(inputs.redisClient.getdel).toHaveBeenCalledWith('webauthn:passkeyChallenge:context');
+		expect(verifyAuthenticationResponse).not.toHaveBeenCalled();
+		expect(inputs.userSecurityKeysRepository.update).not.toHaveBeenCalled();
 	});
 
 	test('search factory and direct constructor preserve ordered ID packing and borrowed serializer', async () => {

@@ -3,46 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { remainingRetentionDefinition, remainingRetentionInput, remainingRetentionOutput } from '../../contract/remaining-inline-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { RetentionAggregationsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
+import { toPackedRecord } from '@features/users/backend/json-value.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-const contractProjection = projectEndpointContract(remainingRetentionDefinition);
-
-export const meta = {
-	tags: ['users'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingRetentionInput, typeof remainingRetentionOutput> {
-	constructor(
-		@Inject(DI.retentionAggregationsRepository)
-		private retentionAggregationsRepository: RetentionAggregationsRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const records = await this.retentionAggregationsRepository.find({
-				order: {
-					id: 'DESC',
-				},
-				take: 30,
-			});
-
-			return records.map(record => ({
-				createdAt: record.createdAt.toISOString(),
-				users: record.usersCount,
-				data: record.data,
-			}));
+import { retentionContract, retentionGetContract } from './retention.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../api.implementation.js';
+export function createRetentionProcedure<Actor extends ApiActor>(deps: Pick<StatisticsDependencies, 'readRetention'>) {
+	return createApiProcedure<Actor>()(retentionContract)
+		.handler(async () => {
+			const records = await deps.readRetention({ order: { id: 'DESC' }, take: 30 });
+			return records.map(record => ({ createdAt: record.createdAt.toISOString(), users: record.usersCount, data: toPackedRecord(record.data) }));
 		});
-	}
+}
+export function createRetentionGetProcedure<Actor extends ApiActor>(deps: Pick<StatisticsDependencies, 'readRetention'>) {
+	return createApiProcedure<Actor>()(retentionGetContract)
+		.handler(async () => {
+			const records = await deps.readRetention({ order: { id: 'DESC' }, take: 30 });
+			return records.map(record => ({ createdAt: record.createdAt.toISOString(), users: record.usersCount, data: toPackedRecord(record.data) }));
+		});
 }

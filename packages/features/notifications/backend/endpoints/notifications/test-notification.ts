@@ -3,26 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { notificationsContract } from '../../../contract/index.js';
-import { legacyNotificationsSchemas } from '@features/notifications/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['notifications'],
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { testNotificationContract } from './test-notification.contract.js';
 
-	requireCredential: true,
-
-	kind: 'write:notifications',
-
-	limit: {
-		duration: 1000 * 60,
-		max: 10,
-	},
-} as const;
-
-export const paramDef = legacyNotificationsSchemas['notifications/test-notification'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notifications', notifications => createContractTransportEndpoint(meta, paramDef, notificationsContract['notifications/test-notification'], async (params, user) =>
-	notifications['notifications/test-notification'](params, { context: { actor: { id: user.id }, token: null } })));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotificationsDependencies } from '@features/notifications/backend/api.implementation.js';
+export type TestNotificationDependencies = Pick<NotificationsDependencies, 'createTestNotification'>;
+export function createTestNotificationProcedure(deps: TestNotificationDependencies) {
+	return createApiProcedure<MiLocalUser>()(testNotificationContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			deps.createTestNotification(actor.id);
+		});
+}

@@ -3,10 +3,12 @@ name: Test (frontend)
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       # for permissions
       - packages/misskey-js/**
       # for e2e
@@ -15,9 +17,11 @@ on:
       - .github/misskey/test.yml
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/frontend/**
+      - packages/features/auth/frontend/**
+      - packages/features/auth/test/frontend/**
       # for permissions
       - packages/misskey-js/**
       # for e2e

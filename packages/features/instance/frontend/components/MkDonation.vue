@@ -144,11 +144,11 @@ function neverShow() {
 
 <locale lang="json" locale="da-DK">
 {
-	"didYouLikeMisskey": "Have you taken a liking to Misskey?",
-	"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
-	"learnMore": "Learn more",
-	"remindMeLater": "Maybe later",
-	"neverShow": "Don't show again"
+	"didYouLikeMisskey": "Kan du lide Misskey?",
+	"pleaseDonate": "{host} bruger den gratis software Misskey. Vi sætter stor pris på donationer, så udviklingen af Misskey kan fortsætte!",
+	"learnMore": "Læs mere",
+	"remindMeLater": "Måske senere",
+	"neverShow": "Vis ikke igen"
 }
 </locale>
 
@@ -234,21 +234,21 @@ function neverShow() {
 
 <locale lang="json" locale="kab-KAB">
 {
-	"didYouLikeMisskey": "Have you taken a liking to Misskey?",
-	"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
-	"learnMore": "Learn more",
-	"remindMeLater": "Maybe later",
-	"neverShow": "Don't show again"
+	"didYouLikeMisskey": "Tḥemmleḍ Misskey?",
+	"pleaseDonate": "{host} iseqdac aseɣẓan ilelli Misskey. Ma tzemrem, efket-d tikci i wakken ad tkemmel tneflit n Misskey!",
+	"learnMore": "Issin ugar",
+	"remindMeLater": "Ahat ticki",
+	"neverShow": "Ur t-id-skan ara tikkelt-nniḍen"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
-	"didYouLikeMisskey": "Have you taken a liking to Misskey?",
-	"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
-	"learnMore": "Learn more",
-	"remindMeLater": "Maybe later",
-	"neverShow": "Don't show again"
+	"didYouLikeMisskey": "ನಿಮಗೆ Misskey ಇಷ್ಟವಾಯಿತೇ?",
+	"pleaseDonate": "{host} ಉಚಿತ ಸಾಫ್ಟ್‌ವೇರ್ ಆದ Misskeyಯನ್ನು ಬಳಸುತ್ತದೆ. Misskeyಯ ಅಭಿವೃದ್ಧಿ ಮುಂದುವರಿಯಲು ದಯವಿಟ್ಟು ದೇಣಿಗೆ ನೀಡಿ!",
+	"learnMore": "ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ",
+	"remindMeLater": "ನಂತರ ನೋಡೋಣ",
+	"neverShow": "ಮತ್ತೆ ತೋರಿಸಬೇಡಿ"
 }
 </locale>
 
@@ -264,18 +264,18 @@ function neverShow() {
 
 <locale lang="json" locale="nl-NL">
 {
-	"didYouLikeMisskey": "Have you taken a liking to Misskey?",
-	"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+	"didYouLikeMisskey": "Vind je Misskey leuk?",
+	"pleaseDonate": "{host} gebruikt de gratis software Misskey. We stellen donaties zeer op prijs, zodat de ontwikkeling van Misskey kan doorgaan!",
 	"learnMore": "Meer leren",
-	"remindMeLater": "Maybe later",
-	"neverShow": "Don't show again"
+	"remindMeLater": "Misschien later",
+	"neverShow": "Niet meer tonen"
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
 	"didYouLikeMisskey": "Likte du Misskey?",
-	"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
+	"pleaseDonate": "{host} bruker den gratis programvaren Misskey. Vi setter stor pris på donasjoner, slik at utviklingen av Misskey kan fortsette!",
 	"learnMore": "Les mer",
 	"remindMeLater": "Kanskje senere",
 	"neverShow": "Ikke vis igjen"
@@ -344,11 +344,11 @@ function neverShow() {
 
 <locale lang="json" locale="ug-CN">
 {
-	"didYouLikeMisskey": "Have you taken a liking to Misskey?",
-	"pleaseDonate": "{host} uses the free software, Misskey. We would highly appreciate your donations so development of Misskey can continue!",
-	"learnMore": "Learn more",
-	"remindMeLater": "Maybe later",
-	"neverShow": "Don't show again"
+	"didYouLikeMisskey": "Misskey نى ياقتۇردىڭىزمۇ؟",
+	"pleaseDonate": "{host} ھەقسىز يۇمشاق دېتال Misskey نى ئىشلىتىدۇ. Misskey نىڭ تەرەققىياتىنى داۋاملاشتۇرۇش ئۈچۈن ئىئانە قىلىشىڭىزنى ئۈمىد قىلىمىز!",
+	"learnMore": "تېخىمۇ كۆپ بىلىش",
+	"remindMeLater": "كېيىنچە",
+	"neverShow": "قايتا كۆرسەتمە"
 }
 </locale>
 
@@ -389,5 +389,145 @@ function neverShow() {
 	"learnMore": "更多資訊",
 	"remindMeLater": "以後再說",
 	"neverShow": "不再顯示"
+}
+</locale>
+
+<locale lang="json" locale="bn-BD">
+{
+	"didYouLikeMisskey": "আপনার কি Misskey ভালো লেগেছে?",
+	"pleaseDonate": "{host} বিনামূল্যের সফটওয়্যার Misskey ব্যবহার করে। Misskey-এর উন্নয়ন চালিয়ে যেতে আপনার অনুদান আমাদের অনেক সাহায্য করবে!",
+	"learnMore": "আরও জানুন",
+	"remindMeLater": "পরে মনে করিয়ে দিন",
+	"neverShow": "আর দেখাবেন না"
+}
+</locale>
+
+<locale lang="json" locale="el-GR">
+{
+	"didYouLikeMisskey": "Σας αρέσει το Misskey;",
+	"pleaseDonate": "Το {host} χρησιμοποιεί το δωρεάν λογισμικό Misskey. Θα εκτιμούσαμε ιδιαίτερα τη δωρεά σας, ώστε να συνεχιστεί η ανάπτυξη του Misskey!",
+	"learnMore": "Μάθετε περισσότερα",
+	"remindMeLater": "Ίσως αργότερα",
+	"neverShow": "Να μην εμφανιστεί ξανά"
+}
+</locale>
+
+<locale lang="json" locale="fa-IR">
+{
+	"didYouLikeMisskey": "آیا از Misskey خوشتان آمده است؟",
+	"pleaseDonate": "{host} از نرم‌افزار رایگان Misskey استفاده می‌کند. با کمک مالی شما می‌توانیم توسعهٔ Misskey را ادامه دهیم!",
+	"learnMore": "بیشتر بدانید",
+	"remindMeLater": "بعداً یادآوری کن",
+	"neverShow": "دیگر نشان نده"
+}
+</locale>
+
+<locale lang="json" locale="hr-HR">
+{
+	"didYouLikeMisskey": "Sviđa li vam se Misskey?",
+	"pleaseDonate": "{host} koristi besplatni softver Misskey. Bili bismo vrlo zahvalni na vašim donacijama kako bi se razvoj Misskeyja mogao nastaviti!",
+	"learnMore": "Saznajte više",
+	"remindMeLater": "Možda kasnije",
+	"neverShow": "Ne prikazuj ponovno"
+}
+</locale>
+
+<locale lang="json" locale="ht-HT">
+{
+	"didYouLikeMisskey": "Èske ou renmen Misskey?",
+	"pleaseDonate": "{host} sèvi ak Misskey, yon lojisyèl gratis. Nou ta apresye don ou anpil pou devlopman Misskey kapab kontinye!",
+	"learnMore": "Aprann plis",
+	"remindMeLater": "Petèt pita",
+	"neverShow": "Pa montre sa ankò"
+}
+</locale>
+
+<locale lang="json" locale="hu-HU">
+{
+	"didYouLikeMisskey": "Tetszik a Misskey?",
+	"pleaseDonate": "{host} az ingyenes Misskey szoftvert használja. Nagyon hálásak lennénk az adományodért, hogy folytatódhasson a Misskey fejlesztése!",
+	"learnMore": "További információ",
+	"remindMeLater": "Talán később",
+	"neverShow": "Ne jelenjen meg újra"
+}
+</locale>
+
+<locale lang="json" locale="jbo-EN">
+{
+	"didYouLikeMisskey": "xu do nelci la'o gy. Misskey .gy.",
+	"pleaseDonate": "la'o gy. {host} .gy. cu pilno la'o gy. Misskey .gy. noi samru'e gi'e se jdima li no .i .e'o ko dunda lo jdini mi te zu'e lo nu lo nu zbasu la'o gy. Misskey .gy. cu ranji",
+	"learnMore": "ko cilre lo zmadu",
+	"remindMeLater": "ko ba gasnu lo nu mi morji ti",
+	"neverShow": "ko na za'u re'u jarco"
+}
+</locale>
+
+<locale lang="json" locale="ko-GS">
+{
+	"didYouLikeMisskey": "Misskey가 맘에 드십니꺼?",
+	"pleaseDonate": "Misskey넌 {host}서 서넌 무료 소프트웨어입니다. 앞으로도 개발얼 이을 수 잇도록 후원해 주이소!",
+	"learnMore": "더 알아보기",
+	"remindMeLater": "나중에 알려 주이소",
+	"neverShow": "다시 비이지 않기"
+}
+</locale>
+
+<locale lang="json" locale="lo-LA">
+{
+	"didYouLikeMisskey": "ເຈົ້າມັກ Misskey ບໍ່?",
+	"pleaseDonate": "{host} ໃຊ້ຊອບແວຟຣີ Misskey. ການບໍລິຈາກຂອງເຈົ້າຈະຊ່ວຍໃຫ້ການພັດທະນາ Misskey ສາມາດດຳເນີນຕໍ່ໄປໄດ້!",
+	"learnMore": "ຮຽນຮູ້ເພີ່ມເຕີມ",
+	"remindMeLater": "ແຈ້ງເຕືອນຂ້ອຍພາຍຫຼັງ",
+	"neverShow": "ບໍ່ຕ້ອງສະແດງອີກ"
+}
+</locale>
+
+<locale lang="json" locale="ro-RO">
+{
+	"didYouLikeMisskey": "A început sa îți placa Misskey?",
+	"pleaseDonate": "{host} folosește software-ul gratuit, Misskey. Am aprecia foarte mult donațiile dumneavoastră, astfel încât dezvoltarea Misskey să poată continua!",
+	"learnMore": "Află mai multe",
+	"remindMeLater": "Poate mai târziu",
+	"neverShow": "Nu mai afișa"
+}
+</locale>
+
+<locale lang="json" locale="si-LK">
+{
+	"didYouLikeMisskey": "ඔබ Misskey වලට කැමතිද?",
+	"pleaseDonate": "{host} භාවිත කරන්නේ නොමිලේ ලබා දෙන Misskey මෘදුකාංගයයි. Misskey සංවර්ධනය දිගටම කරගෙන යාමට ඔබගේ පරිත්‍යාග අපට බෙහෙවින් උපකාරී වේ!",
+	"learnMore": "තව දැනගන්න",
+	"remindMeLater": "පසුව මතක් කරන්න",
+	"neverShow": "නැවත නොපෙන්වන්න"
+}
+</locale>
+
+<locale lang="json" locale="sv-SE">
+{
+	"didYouLikeMisskey": "Tycker du om Misskey?",
+	"pleaseDonate": "Misskey är en gratis programvara som används på {host}. Donera gärna för att göra utvecklingen ständigt, tack!",
+	"learnMore": "Läs mer",
+	"remindMeLater": "Kanske senare",
+	"neverShow": "Visa inte igen"
+}
+</locale>
+
+<locale lang="json" locale="tl-PH">
+{
+	"didYouLikeMisskey": "Nagustuhan mo ba ang Misskey?",
+	"pleaseDonate": "Ginagamit ng {host} ang libreng software na Misskey. Malaking tulong ang inyong mga donasyon upang maipagpatuloy ang pagbuo ng Misskey!",
+	"learnMore": "Alamin pa",
+	"remindMeLater": "Ipaalala sa akin mamaya",
+	"neverShow": "Huwag nang ipakita muli"
+}
+</locale>
+
+<locale lang="json" locale="uz-UZ">
+{
+	"didYouLikeMisskey": "Misskey sizga yoqdimi?",
+	"pleaseDonate": "{host} bepul Misskey dasturidan foydalanadi. Misskey rivojlantirilishini davom ettirish uchun xayriyangizdan juda minnatdor bo‘lamiz!",
+	"learnMore": "Batafsilroq",
+	"remindMeLater": "Balki keyinroq",
+	"neverShow": "Boshqa ko‘rsatilmasin"
 }
 </locale>

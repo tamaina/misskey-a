@@ -23,6 +23,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, watch, ref, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
@@ -30,6 +31,9 @@ import MkUserList from '@features/relationships/frontend/components/MkUserList.v
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	roleId: string;
@@ -55,7 +59,7 @@ watch(() => props.roleId, () => {
 		if (err.code === 'NO_SUCH_ROLE') {
 			error.value = $locale.value.sfc.noRole;
 		} else {
-			error.value = $locale.value.sfc.somethingHappened;
+			error.value = globalLocale.value.env.somethingHappened;
 		}
 	});
 }, { immediate: true });
@@ -70,11 +74,11 @@ const usersPaginator = markRaw(new Paginator('roles/users', {
 const headerTabs = computed(() => [{
 	key: 'users',
 	icon: 'ti ti-users',
-	title: $locale.value.sfc.users,
+	title: globalLocale.value.env.users,
 }, {
 	key: 'timeline',
 	icon: 'ti ti-pencil',
-	title: $locale.value.sfc.timeline,
+	title: globalLocale.value.env.timeline,
 }]);
 
 definePage(() => ({
@@ -87,9 +91,6 @@ definePage(() => ({
 {
 	"nothing": "لا يوجد شيء هنا",
 	"noRole": "لم يُعثر على دور",
-	"somethingHappened": "حدث خطأ",
-	"users": "المستخدمون",
-	"timeline": "الخيط الزمني",
 	"role": "الدور"
 }
 </locale>
@@ -98,9 +99,6 @@ definePage(() => ({
 {
 	"nothing": "No hi ha res per veure aquí ",
 	"noRole": "No s'han trobat rols",
-	"somethingHappened": "S'ha produït un error",
-	"users": "Usuaris",
-	"timeline": "Línia de temps",
 	"role": "Rols"
 }
 </locale>
@@ -109,9 +107,6 @@ definePage(() => ({
 {
 	"nothing": "Nic nebylo nalezeno",
 	"noRole": "Role nenalezena",
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
-	"users": "Uživatelé",
-	"timeline": "Časová osa",
 	"role": "Role"
 }
 </locale>
@@ -120,9 +115,6 @@ definePage(() => ({
 {
 	"nothing": "There's nothing to see here",
 	"noRole": "Role not found",
-	"somethingHappened": "An error has occurred",
-	"users": "Users",
-	"timeline": "Timeline",
 	"role": "Role"
 }
 </locale>
@@ -131,9 +123,6 @@ definePage(() => ({
 {
 	"nothing": "Hier gibt es nichts zu sehen",
 	"noRole": "Rolle nicht gefunden",
-	"somethingHappened": "Ein Fehler ist aufgetreten",
-	"users": "Benutzer",
-	"timeline": "Chronik",
 	"role": "Rolle"
 }
 </locale>
@@ -142,9 +131,6 @@ definePage(() => ({
 {
 	"nothing": "There's nothing to see here",
 	"noRole": "Role not found",
-	"somethingHappened": "An error has occurred",
-	"users": "Users",
-	"timeline": "Timeline",
 	"role": "Role"
 }
 </locale>
@@ -153,9 +139,6 @@ definePage(() => ({
 {
 	"nothing": "No hay nada que ver aqui",
 	"noRole": "Rol no encontrado",
-	"somethingHappened": "Ocurrió un error",
-	"users": "Usuarios",
-	"timeline": "Línea de tiempo",
 	"role": "Rol"
 }
 </locale>
@@ -164,9 +147,6 @@ definePage(() => ({
 {
 	"nothing": "Il n'y a rien à voir ici",
 	"noRole": "Aucun rôle",
-	"somethingHappened": "Une erreur est survenue",
-	"users": "Utilisateur·rice·s",
-	"timeline": "Fil",
 	"role": "Rôles"
 }
 </locale>
@@ -175,9 +155,6 @@ definePage(() => ({
 {
 	"nothing": "Tidak ada sama sekali disini",
 	"noRole": "Peran tidak temukan",
-	"somethingHappened": "Terjadi kesalahan",
-	"users": "Pengguna",
-	"timeline": "Lini masa",
 	"role": "Peran"
 }
 </locale>
@@ -186,9 +163,6 @@ definePage(() => ({
 {
 	"nothing": "Niente da visualizzare",
 	"noRole": "Ruolo non trovato",
-	"somethingHappened": "Si è verificato un problema",
-	"users": "Profili",
-	"timeline": "Timeline",
 	"role": "Ruolo"
 }
 </locale>
@@ -197,9 +171,6 @@ definePage(() => ({
 {
 	"nothing": "ありません",
 	"noRole": "ロールはありません",
-	"somethingHappened": "問題が発生しました",
-	"users": "ユーザー",
-	"timeline": "タイムライン",
 	"role": "ロール"
 }
 </locale>
@@ -208,9 +179,6 @@ definePage(() => ({
 {
 	"nothing": "あらへん",
 	"noRole": "ロールはありまへん",
-	"somethingHappened": "なんかあかんわ",
-	"users": "ユーザー",
-	"timeline": "タイムライン",
 	"role": "ロール"
 }
 </locale>
@@ -219,9 +187,6 @@ definePage(() => ({
 {
 	"nothing": "There's nothing to see here",
 	"noRole": "Role not found",
-	"somethingHappened": "An error has occurred",
-	"users": "Users",
-	"timeline": "Timeline",
 	"role": "Role"
 }
 </locale>
@@ -230,9 +195,6 @@ definePage(() => ({
 {
 	"nothing": "There's nothing to see here",
 	"noRole": "Role not found",
-	"somethingHappened": "An error has occurred",
-	"users": "ಬಳಕೆದಾರ",
-	"timeline": "ಸಮಯಸಾಲು",
 	"role": "Role"
 }
 </locale>
@@ -241,9 +203,6 @@ definePage(() => ({
 {
 	"nothing": "아무것도 없습니다",
 	"noRole": "역할이 없습니다",
-	"somethingHappened": "오류가 발생했습니다",
-	"users": "유저",
-	"timeline": "타임라인",
 	"role": "역할"
 }
 </locale>
@@ -252,9 +211,6 @@ definePage(() => ({
 {
 	"nothing": "Niets te zien hier",
 	"noRole": "Role not found",
-	"somethingHappened": "Er is iets misgegaan.",
-	"users": "Gebruikers",
-	"timeline": "Tijdlijn",
 	"role": "Role"
 }
 </locale>
@@ -263,9 +219,6 @@ definePage(() => ({
 {
 	"nothing": "Ingenting",
 	"noRole": "Role not found",
-	"somethingHappened": "En feil har oppstått",
-	"users": "Brukere",
-	"timeline": "Tidslinje",
 	"role": "Rolle"
 }
 </locale>
@@ -274,9 +227,6 @@ definePage(() => ({
 {
 	"nothing": "Nie ma tu niczego",
 	"noRole": "Rola nie znaleziona",
-	"somethingHappened": "Coś poszło nie tak",
-	"users": "Użytkownicy",
-	"timeline": "Oś czasu",
 	"role": "Rola"
 }
 </locale>
@@ -285,9 +235,6 @@ definePage(() => ({
 {
 	"nothing": "Não há nada aqui",
 	"noRole": "Nenhum cargo",
-	"somethingHappened": "Ocorreu um erro",
-	"users": "Usuários",
-	"timeline": "Linha do tempo",
 	"role": "Cargo"
 }
 </locale>
@@ -296,9 +243,6 @@ definePage(() => ({
 {
 	"nothing": "Ничего нет",
 	"noRole": "Нет роли",
-	"somethingHappened": "Что-то пошло не так",
-	"users": "Пользователи",
-	"timeline": "Лента",
 	"role": "Роль"
 }
 </locale>
@@ -307,9 +251,6 @@ definePage(() => ({
 {
 	"nothing": "Nič tu nie je",
 	"noRole": "Role not found",
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
-	"users": "Používatelia",
-	"timeline": "Časová os",
 	"role": "Role"
 }
 </locale>
@@ -318,9 +259,6 @@ definePage(() => ({
 {
 	"nothing": "ไม่พบผลลัพธ์",
 	"noRole": "ไม่พบบทบาท",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
-	"users": "ผู้ใช้",
-	"timeline": "ไทม์ไลน์",
 	"role": "บทบาท"
 }
 </locale>
@@ -329,9 +267,6 @@ definePage(() => ({
 {
 	"nothing": "Burada görülecek bir şey yok.",
 	"noRole": "Rol bulunamadı",
-	"somethingHappened": "Bir hata oluştu",
-	"users": "Kullanıcılar",
-	"timeline": "Pano",
 	"role": "Rol"
 }
 </locale>
@@ -340,9 +275,6 @@ definePage(() => ({
 {
 	"nothing": "There's nothing to see here",
 	"noRole": "Role not found",
-	"somethingHappened": "An error has occurred",
-	"users": "Users",
-	"timeline": "Timeline",
 	"role": "Role"
 }
 </locale>
@@ -351,9 +283,6 @@ definePage(() => ({
 {
 	"nothing": "Тут нічого немає",
 	"noRole": "Роль не знайдено",
-	"somethingHappened": "Щось пішло не так",
-	"users": "Користувачі",
-	"timeline": "Стрічка",
 	"role": "Роль"
 }
 </locale>
@@ -362,9 +291,6 @@ definePage(() => ({
 {
 	"nothing": "Không có gì ở đây",
 	"noRole": "Bạn chưa được cấp quyền.",
-	"somethingHappened": "Xảy ra lỗi",
-	"users": "Người dùng",
-	"timeline": "Bảng tin",
 	"role": "Vai trò"
 }
 </locale>
@@ -373,9 +299,6 @@ definePage(() => ({
 {
 	"nothing": "无",
 	"noRole": "角色不存在",
-	"somethingHappened": "出错了",
-	"users": "用户",
-	"timeline": "时间线",
 	"role": "角色"
 }
 </locale>
@@ -384,9 +307,6 @@ definePage(() => ({
 {
 	"nothing": "查無項目",
 	"noRole": "沒有角色",
-	"somethingHappened": "發生錯誤",
-	"users": "使用者",
-	"timeline": "時間軸",
 	"role": "角色"
 }
 </locale>

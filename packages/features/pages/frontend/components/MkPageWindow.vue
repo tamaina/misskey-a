@@ -28,9 +28,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, onMounted, onUnmounted, provide, ref, useTemplateRef, nextTick } from 'vue';
 import { url } from '@features/boot/frontend/shared/config.js';
-import type { PageMetadata } from '@features/navigation/frontend/page.js';
 import RouterView from '@features/navigation/frontend/components/global/RouterView.vue';
 import MkWindow from '@features/ui/frontend/components/MkWindow.vue';
 import { popout as _popout } from '@features/ui/frontend/utility/popout.js';
@@ -42,6 +42,10 @@ import { createRouter, mainRouter } from '@features/navigation/frontend/router.j
 import { analytics } from '@features/statistics/frontend/analytics.js';
 import { DI } from '@features/ui/frontend/di.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { PageMetadata } from '@features/navigation/frontend/page.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	initialPath: string;
@@ -61,14 +65,14 @@ const _history_ = ref<{ path: string; }[]>([{
 const buttonsLeft = computed(() => {
 	return _history_.value.length > 1 ? [{
 		icon: 'ti ti-arrow-left',
-		title: $locale.value.sfc.goBack,
+		title: globalLocale.value.env.goBack,
 		onClick: back,
 	}] : [];
 });
 const buttonsRight = computed(() => {
 	const buttons = [{
 		icon: 'ti ti-reload',
-		title: $locale.value.sfc.reload,
+		title: globalLocale.value.env.reload,
 		onClick: reload,
 	}, {
 		icon: 'ti ti-player-eject',
@@ -214,8 +218,6 @@ defineExpose({
 
 <locale locale="ar-SA" lang="json">
 {
-	"goBack": "رجوع",
-	"reload": "انعش",
 	"showInPage": "اعرض في الصفحة",
 	"popout": "منبثقة",
 	"openInNewTab": "افتح في لسان جديد",
@@ -225,8 +227,6 @@ defineExpose({
 
 <locale locale="ca-ES" lang="json">
 {
-	"goBack": "Tornar",
-	"reload": "Actualitzar",
 	"showInPage": "Mostrar a la pàgina ",
 	"popout": "Finestra emergent",
 	"openInNewTab": "Obre a una pestanya nova",
@@ -236,8 +236,6 @@ defineExpose({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"goBack": "Zpět",
-	"reload": "Aktualizovat",
 	"showInPage": "Zobrazit na stránce",
 	"popout": "Pop-out",
 	"openInNewTab": "Otevřít v nové kartě",
@@ -247,8 +245,6 @@ defineExpose({
 
 <locale locale="da-DK" lang="json">
 {
-	"goBack": "Back",
-	"reload": "Refresh",
 	"showInPage": "Show in page",
 	"popout": "Pop-out",
 	"openInNewTab": "Open in new tab",
@@ -258,8 +254,6 @@ defineExpose({
 
 <locale locale="de-DE" lang="json">
 {
-	"goBack": "Zurück",
-	"reload": "Aktualisieren",
 	"showInPage": "In einer Seite anzeigen",
 	"popout": "Pop-Up",
 	"openInNewTab": "In neuem Tab öffnen",
@@ -269,8 +263,6 @@ defineExpose({
 
 <locale locale="en-US" lang="json">
 {
-	"goBack": "Back",
-	"reload": "Refresh",
 	"showInPage": "Show in page",
 	"popout": "Pop-out",
 	"openInNewTab": "Open in new tab",
@@ -280,8 +272,6 @@ defineExpose({
 
 <locale locale="es-ES" lang="json">
 {
-	"goBack": "Anterior",
-	"reload": "Recargar",
 	"showInPage": "Mostrar en la página",
 	"popout": "Popout",
 	"openInNewTab": "Abrir en una Nueva Pestaña",
@@ -291,8 +281,6 @@ defineExpose({
 
 <locale locale="fr-FR" lang="json">
 {
-	"goBack": "Retour",
-	"reload": "Rafraîchir",
 	"showInPage": "Afficher dans la page",
 	"popout": "Fenêtre contextuelle",
 	"openInNewTab": "Ouvrir dans un nouvel onglet",
@@ -302,8 +290,6 @@ defineExpose({
 
 <locale locale="id-ID" lang="json">
 {
-	"goBack": "Kembali",
-	"reload": "Muat ulang",
 	"showInPage": "Tampilkan di halaman",
 	"popout": "Pop-out",
 	"openInNewTab": "Buka di tab baru",
@@ -313,8 +299,6 @@ defineExpose({
 
 <locale locale="it-IT" lang="json">
 {
-	"goBack": "Indietro",
-	"reload": "Ricarica",
 	"showInPage": "Visualizza in pagina",
 	"popout": "Finestra pop-out",
 	"openInNewTab": "Apri in una nuova scheda",
@@ -324,8 +308,6 @@ defineExpose({
 
 <locale locale="ja-JP" lang="json">
 {
-	"goBack": "戻る",
-	"reload": "リロード",
 	"showInPage": "ページで表示",
 	"popout": "ポップアウト",
 	"openInNewTab": "新しいタブで開く",
@@ -335,8 +317,6 @@ defineExpose({
 
 <locale locale="ja-KS" lang="json">
 {
-	"goBack": "戻る",
-	"reload": "リロード",
 	"showInPage": "ページで表示",
 	"popout": "ポップアウト",
 	"openInNewTab": "新しいタブで開く",
@@ -346,8 +326,6 @@ defineExpose({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"goBack": "Back",
-	"reload": "Refresh",
 	"showInPage": "Show in page",
 	"popout": "Pop-out",
 	"openInNewTab": "Open in new tab",
@@ -357,8 +335,6 @@ defineExpose({
 
 <locale locale="kn-IN" lang="json">
 {
-	"goBack": "Back",
-	"reload": "Refresh",
 	"showInPage": "Show in page",
 	"popout": "Pop-out",
 	"openInNewTab": "Open in new tab",
@@ -368,8 +344,6 @@ defineExpose({
 
 <locale locale="ko-KR" lang="json">
 {
-	"goBack": "뒤로",
-	"reload": "새로고침",
 	"showInPage": "페이지로 보기",
 	"popout": "새 창으로 열기",
 	"openInNewTab": "새 탭에서 열기",
@@ -379,8 +353,6 @@ defineExpose({
 
 <locale locale="nl-NL" lang="json">
 {
-	"goBack": "Terug",
-	"reload": "Verversen",
 	"showInPage": "Weergeven in een pagina",
 	"popout": "Pop-Up",
 	"openInNewTab": "In nieuw tabblad openen",
@@ -390,8 +362,6 @@ defineExpose({
 
 <locale locale="no-NO" lang="json">
 {
-	"goBack": "Back",
-	"reload": "Refresh",
 	"showInPage": "Show in page",
 	"popout": "Pop-out",
 	"openInNewTab": "Åpne i ny fane",
@@ -401,8 +371,6 @@ defineExpose({
 
 <locale locale="pl-PL" lang="json">
 {
-	"goBack": "Wróć",
-	"reload": "Odśwież",
 	"showInPage": "Pokaż na stronie",
 	"popout": "Popout",
 	"openInNewTab": "Otwórz w nowej karcie",
@@ -412,8 +380,6 @@ defineExpose({
 
 <locale locale="pt-PT" lang="json">
 {
-	"goBack": "Voltar",
-	"reload": "Recarregar",
 	"showInPage": "Ver na página",
 	"popout": "Sair",
 	"openInNewTab": "Abrir em nova aba",
@@ -423,8 +389,6 @@ defineExpose({
 
 <locale locale="ru-RU" lang="json">
 {
-	"goBack": "Выход",
-	"reload": "Перезагрузить",
 	"showInPage": "Показать страницу",
 	"popout": "Развернуть",
 	"openInNewTab": "Открыть в новой вкладке",
@@ -434,8 +398,6 @@ defineExpose({
 
 <locale locale="sk-SK" lang="json">
 {
-	"goBack": "Späť",
-	"reload": "Obnoviť",
 	"showInPage": "Zobraziť v stránke",
 	"popout": "Pop-out",
 	"openInNewTab": "Otvoriť v novom tabe",
@@ -445,8 +407,6 @@ defineExpose({
 
 <locale locale="th-TH" lang="json">
 {
-	"goBack": "ย้อนกลับ",
-	"reload": "รีโหลด",
 	"showInPage": "แสดงในเพจ",
 	"popout": "ป๊อปเอาต์",
 	"openInNewTab": "เปิดในแท็บใหม่",
@@ -456,8 +416,6 @@ defineExpose({
 
 <locale locale="tr-TR" lang="json">
 {
-	"goBack": "Geri",
-	"reload": "Yenile",
 	"showInPage": "Sayfada göster",
 	"popout": "Açılır pencere",
 	"openInNewTab": "Yeni sekmede aç",
@@ -467,8 +425,6 @@ defineExpose({
 
 <locale locale="ug-CN" lang="json">
 {
-	"goBack": "Back",
-	"reload": "Refresh",
 	"showInPage": "Show in page",
 	"popout": "Pop-out",
 	"openInNewTab": "Open in new tab",
@@ -478,8 +434,6 @@ defineExpose({
 
 <locale locale="uk-UA" lang="json">
 {
-	"goBack": "Назад",
-	"reload": "Оновити",
 	"showInPage": "Показати на сторінці",
 	"popout": "Від'єднати",
 	"openInNewTab": "Відкрити в новій вкладці",
@@ -489,8 +443,6 @@ defineExpose({
 
 <locale locale="vi-VN" lang="json">
 {
-	"goBack": "Quay lại",
-	"reload": "Tải lại",
 	"showInPage": "Hiện trong trang",
 	"popout": "Pop-out",
 	"openInNewTab": "Mở trong tab mới",
@@ -500,8 +452,6 @@ defineExpose({
 
 <locale locale="zh-CN" lang="json">
 {
-	"goBack": "返回",
-	"reload": "刷新",
 	"showInPage": "在页面中显示",
 	"popout": "弹窗",
 	"openInNewTab": "在新标签页中打开",
@@ -511,8 +461,6 @@ defineExpose({
 
 <locale locale="zh-TW" lang="json">
 {
-	"goBack": "返回",
-	"reload": "重新整理",
 	"showInPage": "在頁面中顯示",
 	"popout": "彈出式視窗",
 	"openInNewTab": "在新分頁中開啟",

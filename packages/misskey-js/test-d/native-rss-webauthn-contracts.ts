@@ -4,26 +4,33 @@
  */
 import type * as v from 'valibot';
 import type { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/browser';
-import type { FeatureEndpoints } from '../built/contracts/index/contract/index.js';
+import type { InferContractRouterOutputs } from '@orpc/contract';
+import type { authContract } from '../built/contracts/auth/backend/api.definition.js';
+import type { integrationsContract } from '../built/contracts/integrations/backend/api.definition.js';
 import type { ContractEndpoints } from '../built/contract.types.js';
 import type { Endpoints } from '../built/api.types.js';
 import type { I2faRegisterKeyResponse, FetchRssResponse } from '../built/entities.js';
-import type { webAuthnRegistrationOptionsSchema } from '../built/contracts/auth/contract/webauthn-registration-options.js';
-import type { rssFeedSchema } from '../built/contracts/integrations/contract/rss-feed.js';
-import type { JsonObject } from '../built/contracts/api/contract/json-value.js';
+import type { webAuthnRegistrationOptionsSchema } from '../built/contracts/auth/backend/webauthn.schema.js';
+import type { fetchRssContract } from '../built/contracts/integrations/backend/endpoints/fetch-rss.contract.js';
+import type { PackedJsonValue } from '../built/contracts/users/backend/json-value.schema.js';
+type JsonObject = { [key: string]: PackedJsonValue };
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;
 type Routes = 'i/2fa/register-key' | 'fetch-rss';
 type Outputs = {
 	'i/2fa/register-key': v.InferOutput<typeof webAuthnRegistrationOptionsSchema>;
-	'fetch-rss': v.InferOutput<typeof rssFeedSchema>;
+	'fetch-rss': InferContractRouterOutputs<typeof fetchRssContract>;
 };
-export type NativeParity = Assert<Equal<{ [K in Routes]: Equal<FeatureEndpoints[K]['res'], Outputs[K]> }[Routes], true>>;
+type NativeContracts = { 'i/2fa/register-key': typeof authContract['i/2fa/register-key']; 'fetch-rss': typeof integrationsContract['fetchRss'] };
+export type NativeParity = Assert<Equal<{ [K in Routes]: Equal<InferContractRouterOutputs<NativeContracts[K]>, Outputs[K]> }[Routes], true>>;
 export type PublishedParity = Assert<Equal<{ [K in Routes]: Equal<ContractEndpoints[K]['res'], Outputs[K]> }[Routes], true>>;
 export type SdkParity = Assert<Equal<{ [K in Routes]: Equal<Endpoints[K]['res'], Outputs[K]> }[Routes], true>>;
 export type RegistrationAlias = Assert<Equal<I2faRegisterKeyResponse, Outputs['i/2fa/register-key']>>;
 export type BrowserCompatible = Assert<I2faRegisterKeyResponse extends PublicKeyCredentialCreationOptionsJSON ? true : false>;
+export type AttestationFormatsMatchBrowser = Assert<Equal<I2faRegisterKeyResponse['attestationFormats'], PublicKeyCredentialCreationOptionsJSON['attestationFormats']>>;
+// @ts-expect-error Only formats emitted by the installed WebAuthn producer are supported.
+const unsupportedAttestationFormat: NonNullable<I2faRegisterKeyResponse['attestationFormats']>[number] = 'future-format';
 export type RssAlias = Assert<Equal<FetchRssResponse, Outputs['fetch-rss']>>;
 export type EnclosureLengthIsXmlString = Assert<Equal<NonNullable<FetchRssResponse['items'][number]['enclosure']>['length'], string | undefined>>;
 // Object-with-rest inference retains an empty object intersection; verify the exact domain both ways.

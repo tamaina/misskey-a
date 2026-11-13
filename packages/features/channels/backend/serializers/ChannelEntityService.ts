@@ -13,7 +13,7 @@ import type {
 	MiNote,
 	NotesRepository,
 } from '@features/persistence/backend/repositories/models.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiChannel } from '../models/Channel.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';

@@ -136,89 +136,89 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 	<div>
 		<div style="display: flex; gap: var(--MI-margin); flex-wrap: wrap;">
-			<div style="flex: 1;">{{ $locale.sfc.moderator }}: <MkA :to="`/admin/user/${log.userId}`" class="_link">@{{ log.user?.username }}</MkA></div>
+			<div style="flex: 1;">{{ globalLocale.env.moderator }}: <MkA :to="`/admin/user/${log.userId}`" class="_link">@{{ log.user?.username }}</MkA></div>
 			<div style="flex: 1;">{{ $locale.sfc.dateAndTime }}: <MkTime :time="log.createdAt" mode="detail"/></div>
 		</div>
 
 		<template v-if="log.type === 'updateServerSettings'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateUserNote'">
-			<div>{{ $locale.sfc.user }}: {{ log.info.userId }}</div>
+			<div>{{ globalLocale.env.user }}: {{ log.info.userId }}</div>
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="log.info.before ?? ''" :newString="log.info.after ?? ''" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="log.info.before ?? ''" :code="log.info.after ?? ''" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'suspend'">
-			<div>{{ $locale.sfc.user }}: <MkA :to="`/admin/user/${log.info.userId}`" class="_link">@{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</MkA></div>
+			<div>{{ globalLocale.env.user }}: <MkA :to="`/admin/user/${log.info.userId}`" class="_link">@{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</MkA></div>
 		</template>
 		<template v-else-if="log.type === 'unsuspend'">
-			<div>{{ $locale.sfc.user }}: <MkA :to="`/admin/user/${log.info.userId}`" class="_link">@{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</MkA></div>
+			<div>{{ globalLocale.env.user }}: <MkA :to="`/admin/user/${log.info.userId}`" class="_link">@{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</MkA></div>
 		</template>
 		<template v-else-if="log.type === 'updateRole'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'assignRole'">
-			<div>{{ $locale.sfc.user }}: {{ log.info.userId }}</div>
+			<div>{{ globalLocale.env.user }}: {{ log.info.userId }}</div>
 			<div>{{ $locale.sfc.role }}: {{ log.info.roleName }} [{{ log.info.roleId }}]</div>
 		</template>
 		<template v-else-if="log.type === 'unassignRole'">
-			<div>{{ $locale.sfc.user }}: {{ log.info.userId }}</div>
+			<div>{{ globalLocale.env.user }}: {{ log.info.userId }}</div>
 			<div>{{ $locale.sfc.role }}: {{ log.info.roleName }} [{{ log.info.roleId }}]</div>
 		</template>
 		<template v-else-if="log.type === 'updateCustomEmoji'">
 			<div>{{ $locale.sfc.emoji }}: {{ log.info.emojiId }}</div>
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateAd'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateGlobalAnnouncement'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateUserAnnouncement'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateAvatarDecoration'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateRemoteInstanceNote'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="log.info.before ?? ''" :newString="log.info.after ?? ''" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="log.info.before ?? ''" :code="log.info.after ?? ''" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateSystemWebhook'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateAbuseReportNotificationRecipient'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="JSON5.stringify(log.info.before, null, '\t')" :newString="JSON5.stringify(log.info.after, null, '\t')" language="javascript" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="JSON5.stringify(log.info.before, null, '\t')" :code="JSON5.stringify(log.info.after, null, '\t')" lang="javascript" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateAbuseReportNote'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="log.info.before ?? ''" :newString="log.info.after ?? ''" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="log.info.before ?? ''" :code="log.info.after ?? ''" :maxHeight="300"/>
 			</div>
 		</template>
 		<template v-else-if="log.type === 'updateProxyAccountDescription'">
 			<div :class="$style.diff">
-				<CodeDiff :context="5" :hideHeader="true" :oldString="log.info.before ?? ''" :newString="log.info.after ?? ''" maxHeight="300px"/>
+				<MkCodeDiff forceShow :diffBase="log.info.before ?? ''" :code="log.info.after ?? ''" :maxHeight="300"/>
 			</div>
 		</template>
 
@@ -231,11 +231,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
-import { CodeDiff } from 'v-code-diff';
+import MkCodeDiff from '@features/markup/frontend/components/MkCodeDiff.vue';
 import JSON5 from 'json5';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	log: Misskey.entities.ModerationLog;
@@ -244,8 +248,8 @@ const props = defineProps<{
 
 <style lang="scss" module>
 .diff {
-	background: #fff;
-	color: #000;
+	background: var(--MI_THEME-panel);
+	color: var(--MI_THEME-fg);
 	border-radius: 6px;
 	overflow: clip;
 }
@@ -320,9 +324,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "مشرِف",
 	"dateAndTime": "Timestamp",
-	"user": "المستخدمون",
 	"role": "الدور",
 	"emoji": "إيموجي"
 }
@@ -385,9 +387,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Esborra la sala de xat",
 		"updateProxyAccountDescription": "Actualitzar descripció del compte proxy"
 	},
-	"moderator": "Moderador/a",
 	"dateAndTime": "Data i hora",
-	"user": "Usuaris",
 	"role": "Rols",
 	"emoji": "Emoji"
 }
@@ -450,9 +450,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderátor",
 	"dateAndTime": "Timestamp",
-	"user": "Uživatelé",
 	"role": "Role",
 	"emoji": "Emoji"
 }
@@ -515,9 +513,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Timestamp",
-	"user": "User",
 	"role": "Role",
 	"emoji": "Emoji"
 }
@@ -580,9 +576,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Chatraum gelöscht",
 		"updateProxyAccountDescription": "Beschreibung des Proxy-Benutzerkontos aktualisiert"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Zeit",
-	"user": "Benutzer",
 	"role": "Rolle",
 	"emoji": "Emoji"
 }
@@ -645,9 +639,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Timestamp",
-	"user": "User",
 	"role": "Role",
 	"emoji": "Emoji"
 }
@@ -710,9 +702,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Borrar  sala del chat",
 		"updateProxyAccountDescription": "Actualizar la descripción de la cuenta proxy"
 	},
-	"moderator": "Moderador",
 	"dateAndTime": "Fecha y hora",
-	"user": "Usuarios",
 	"role": "Rol",
 	"emoji": "Emoji"
 }
@@ -775,9 +765,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Modérateur·rice·s",
 	"dateAndTime": "Date et heure",
-	"user": "Utilisateur·rice·s",
 	"role": "Rôles",
 	"emoji": "Émoji"
 }
@@ -840,9 +828,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Tanggal dan Waktu",
-	"user": "Pengguna",
 	"role": "Peran",
 	"emoji": "Emoji"
 }
@@ -905,9 +891,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Elimina una Chat",
 		"updateProxyAccountDescription": "Aggiorna la descrizione del profilo proxy"
 	},
-	"moderator": "Moderatore",
 	"dateAndTime": "Data e Ora",
-	"user": "Profilo",
 	"role": "Ruolo",
 	"emoji": "Emoji"
 }
@@ -970,9 +954,7 @@ const props = defineProps<{
 		"deleteChatRoom": "ダイレクトメッセージのグループを削除",
 		"updateProxyAccountDescription": "プロキシアカウントの説明を更新"
 	},
-	"moderator": "モデレーター",
 	"dateAndTime": "日時",
-	"user": "ユーザー",
 	"role": "ロール",
 	"emoji": "絵文字"
 }
@@ -1035,9 +1017,7 @@ const props = defineProps<{
 		"deleteChatRoom": "ダイレクトメッセージのグループを削除",
 		"updateProxyAccountDescription": "プロキシアカウントの説明を更新"
 	},
-	"moderator": "モデレーター",
 	"dateAndTime": "日時",
-	"user": "ユーザー",
 	"role": "ロール",
 	"emoji": "絵文字"
 }
@@ -1100,9 +1080,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Timestamp",
-	"user": "User",
 	"role": "Role",
 	"emoji": "Emoji"
 }
@@ -1165,9 +1143,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Timestamp",
-	"user": "ಬಳಕೆದಾರ",
 	"role": "Role",
 	"emoji": "Emoji"
 }
@@ -1230,9 +1206,7 @@ const props = defineProps<{
 		"deleteChatRoom": "채팅방 삭제하기",
 		"updateProxyAccountDescription": "프록시 계정의 설명 업데이트"
 	},
-	"moderator": "모더레이터",
 	"dateAndTime": "일시",
-	"user": "유저",
 	"role": "역할",
 	"emoji": "이모지"
 }
@@ -1295,9 +1269,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Timestamp",
-	"user": "Gebruikers",
 	"role": "Role",
 	"emoji": "Emoji"
 }
@@ -1360,9 +1332,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Timestamp",
-	"user": "Brukere",
 	"role": "Rolle",
 	"emoji": "Emoji"
 }
@@ -1425,9 +1395,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Timestamp",
-	"user": "Użytkownicy",
 	"role": "Rola",
 	"emoji": "Emoji"
 }
@@ -1490,9 +1458,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Sala de Conversas Excluída",
 		"updateProxyAccountDescription": "Atualizar descrição da conta de proxy"
 	},
-	"moderator": "Moderador",
 	"dateAndTime": "Data e Hora",
-	"user": "Usuário",
 	"role": "Cargo",
 	"emoji": "Emoji"
 }
@@ -1555,9 +1521,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Удалить чат",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Модератор",
 	"dateAndTime": "Дата и время",
-	"user": "Пользователи",
 	"role": "Роль",
 	"emoji": "Эмодзи"
 }
@@ -1620,9 +1584,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderátor",
 	"dateAndTime": "Timestamp",
-	"user": "Používatelia",
 	"role": "Role",
 	"emoji": "Emoji"
 }
@@ -1685,9 +1647,7 @@ const props = defineProps<{
 		"deleteChatRoom": "ลบห้องแชต",
 		"updateProxyAccountDescription": "อัปเดตคำอธิบายของบัญชีพร็อกซี"
 	},
-	"moderator": "ผู้ควบคุม",
 	"dateAndTime": "วันเวลา",
-	"user": "ผู้ใช้",
 	"role": "บทบาท",
 	"emoji": "เอโมจิ"
 }
@@ -1750,9 +1710,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Proxy hesabının açıklamasını güncelle"
 	},
-	"moderator": "Moderatör",
 	"dateAndTime": "Zaman damgası",
-	"user": "Kullanıcı",
 	"role": "Rol",
 	"emoji": "Emoji"
 }
@@ -1815,9 +1773,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Moderator",
 	"dateAndTime": "Timestamp",
-	"user": "User",
 	"role": "Role",
 	"emoji": "Emoji"
 }
@@ -1880,9 +1836,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Модератор",
 	"dateAndTime": "Дата та час",
-	"user": "Користувачі",
 	"role": "Роль",
 	"emoji": "Емодзі"
 }
@@ -1945,9 +1899,7 @@ const props = defineProps<{
 		"deleteChatRoom": "Deleted Chat Room",
 		"updateProxyAccountDescription": "Update the description of the proxy account"
 	},
-	"moderator": "Kiểm duyệt viên",
 	"dateAndTime": "Ngày và giờ",
-	"user": "Người dùng",
 	"role": "Vai trò",
 	"emoji": "Emoji"
 }
@@ -2010,9 +1962,7 @@ const props = defineProps<{
 		"deleteChatRoom": "删除群聊",
 		"updateProxyAccountDescription": "更新代理账户的简介"
 	},
-	"moderator": "监察员",
 	"dateAndTime": "日期和时间",
-	"user": "用户",
 	"role": "角色",
 	"emoji": "表情符号"
 }
@@ -2075,9 +2025,7 @@ const props = defineProps<{
 		"deleteChatRoom": "刪除聊天室",
 		"updateProxyAccountDescription": "更新代理帳戶的說明"
 	},
-	"moderator": "審查員",
 	"dateAndTime": "日期與時間",
-	"user": "使用者",
 	"role": "角色",
 	"emoji": "表情符號"
 }

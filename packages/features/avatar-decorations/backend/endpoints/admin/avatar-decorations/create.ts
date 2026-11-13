@@ -2,51 +2,28 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Injectable } from '@nestjs/common';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { createAvatarDecorationDefinition, createAvatarDecorationInput, createAvatarDecorationOutput } from '../../../../contract/index.js';
-import { AvatarDecorationService } from '../../../services/AvatarDecorationService.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
-
-const contractProjection = projectEndpointContract(createAvatarDecorationDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requiredRolePolicy: 'canManageAvatarDecorations',
-	kind: 'write:admin:avatar-decorations',
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof createAvatarDecorationInput, typeof createAvatarDecorationOutput> {
-	constructor(
-		private avatarDecorationService: AvatarDecorationService,
-		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const created = await this.avatarDecorationService.create({
-				name: ps.name,
-				description: ps.description,
-				url: ps.url,
-				roleIdsThatCanBeUsedThisDecoration: ps.roleIdsThatCanBeUsedThisDecoration,
-				category: ps.category,
-			}, me);
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { avatarDecorationsContract } from '../../../api.definition.js';
+import type { AvatarDecorationsDependencies } from '../../../api.implementation.js';
+export interface AvatarDecorationCreateDependencies<Actor extends ApiActor> {
+	avatarDecorationService: Pick<AvatarDecorationsDependencies<Actor>['avatarDecorationService'], 'create'>;
+	idService: Pick<AvatarDecorationsDependencies<Actor>['idService'], 'parse'>;
+}
+export function createAvatarDecorationCreateProcedure<Actor extends ApiActor>(deps: AvatarDecorationCreateDependencies<Actor>) {
+	return createApiProcedure<Actor>()(avatarDecorationsContract.create)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const row = await deps.avatarDecorationService.create({
+				name: input.name, description: input.description, url: input.url,
+				roleIdsThatCanBeUsedThisDecoration: input.roleIdsThatCanBeUsedThisDecoration, category: input.category,
+			}, actor);
 			return {
-				id: created.id,
-				createdAt: this.idService.parse(created.id).date.toISOString(),
-				updatedAt: null,
-				name: created.name,
-				description: created.description,
-				url: created.url,
-				roleIdsThatCanBeUsedThisDecoration: created.roleIdsThatCanBeUsedThisDecoration,
-				category: created.category,
+				id: row.id, createdAt: deps.idService.parse(row.id).date.toISOString(), updatedAt: null,
+				name: row.name, description: row.description, url: row.url,
+				roleIdsThatCanBeUsedThisDecoration: row.roleIdsThatCanBeUsedThisDecoration, category: row.category,
 			};
 		});
-	}
 }

@@ -16,7 +16,7 @@ import type { MiPoll } from '../models/Poll.js';
 import type { MiNote } from '../models/Note.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DriveFileEntityService } from '@features/drive/backend/serializers/DriveFileEntityService.js';
-import { Packed } from '@features/index/contract/packed.js';
+import { Packed } from '@features/index/backend/packed.schema.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { JsonArrayStream } from '@features/runtime/backend/io/JsonArrayStream.js';

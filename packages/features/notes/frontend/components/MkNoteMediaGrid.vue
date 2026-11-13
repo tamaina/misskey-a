@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		/>
 		<div :class="$style.sensitive">
 			<div>
-				<div v-if="file.isSensitive"><i class="ti ti-eye-exclamation"></i> {{ $locale.sfc.sensitive }}{{ prefer.s.dataSaver.media && file.size ? ` (${bytes(file.size)})` : '' }}</div>
+				<div v-if="file.isSensitive"><i class="ti ti-eye-exclamation"></i> {{ globalLocale.env.sensitive }}{{ prefer.s.dataSaver.media && file.size ? ` (${bytes(file.size)})` : '' }}</div>
 				<div v-else><i class="ti ti-photo"></i> {{ prefer.s.dataSaver.media && file.size ? bytes(file.size) : $locale.sfc.image }}</div>
 				<div>{{ $locale.sfc.clickToShow }}</div>
 			</div>
@@ -40,14 +40,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import { notePage } from '@features/notes/frontend/filters/note.js';
+import { notePage } from '@features/notes/frontend/shared/note.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { shouldHideFileByDefault, canRevealFile } from '@features/drive/frontend/utility/sensitive-file.js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
 
 import MkDriveFileThumbnail from '@features/drive/frontend/components/MkDriveFileThumbnail.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 defineProps<{
 	note: Misskey.entities.Note;
@@ -125,7 +129,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="ar-SA" lang="json">
 {
-  "sensitive": "محتوى حساس",
   "image": "صور",
   "clickToShow": "اضغط للعرض"
 }
@@ -133,7 +136,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="ca-ES" lang="json">
 {
-  "sensitive": "Sensible",
   "image": "Imatge",
   "clickToShow": "Fes clic per mostrar"
 }
@@ -141,7 +143,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="cs-CZ" lang="json">
 {
-  "sensitive": "NSFW",
   "image": "Obrázky",
   "clickToShow": "Klikněte pro zobrazení"
 }
@@ -149,7 +150,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="da-DK" lang="json">
 {
-  "sensitive": "Sensitive",
   "image": "Image",
   "clickToShow": "Click to show"
 }
@@ -157,7 +157,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="de-DE" lang="json">
 {
-  "sensitive": "Sensibel",
   "image": "Bild",
   "clickToShow": "Zum Anzeigen anklicken"
 }
@@ -165,7 +164,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="en-US" lang="json">
 {
-  "sensitive": "Sensitive",
   "image": "Image",
   "clickToShow": "Click to show"
 }
@@ -173,7 +171,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="es-ES" lang="json">
 {
-  "sensitive": "Marcado como sensible (NSFW)",
   "image": "Imágenes",
   "clickToShow": "Haz clic para verlo"
 }
@@ -181,7 +178,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="fr-FR" lang="json">
 {
-  "sensitive": "Contenu sensible",
   "image": "Images",
   "clickToShow": "Cliquer pour afficher"
 }
@@ -189,7 +185,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="id-ID" lang="json">
 {
-  "sensitive": "Konten sensitif",
   "image": "Gambar",
   "clickToShow": "Klik untuk melihat"
 }
@@ -197,7 +192,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="it-IT" lang="json">
 {
-  "sensitive": "Esplicito",
   "image": "Immagini",
   "clickToShow": "Media nascosto, cliccare solo se si intende vedere"
 }
@@ -205,7 +199,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="ja-JP" lang="json">
 {
-  "sensitive": "センシティブ",
   "image": "画像",
   "clickToShow": "クリックして表示"
 }
@@ -213,7 +206,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="ja-KS" lang="json">
 {
-  "sensitive": "気いつけて見いや",
   "image": "画像",
   "clickToShow": "押したら見えるで"
 }
@@ -221,7 +213,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="kab-KAB" lang="json">
 {
-  "sensitive": "Sensitive",
   "image": "Image",
   "clickToShow": "Click to show"
 }
@@ -229,7 +220,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="kn-IN" lang="json">
 {
-  "sensitive": "Sensitive",
   "image": "Image",
   "clickToShow": "Click to show"
 }
@@ -237,7 +227,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="ko-KR" lang="json">
 {
-  "sensitive": "열람 주의",
   "image": "이미지",
   "clickToShow": "클릭하여 보기"
 }
@@ -245,7 +234,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="nl-NL" lang="json">
 {
-  "sensitive": "NSFW",
   "image": "Afbeeldingen",
   "clickToShow": "Klik om te bekijken"
 }
@@ -253,7 +241,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="no-NO" lang="json">
 {
-  "sensitive": "Sensitive",
   "image": "Bilde",
   "clickToShow": "Klikk for å vise"
 }
@@ -261,7 +248,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="pl-PL" lang="json">
 {
-  "sensitive": "NSFW",
   "image": "Zdjęcia",
   "clickToShow": "Kliknij, aby wyświetlić"
 }
@@ -269,7 +255,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="pt-PT" lang="json">
 {
-  "sensitive": "Conteúdo sensível",
   "image": "imagem",
   "clickToShow": "Clique para ver"
 }
@@ -277,7 +262,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="ru-RU" lang="json">
 {
-  "sensitive": "Содержимое не для всех",
   "image": "Изображения",
   "clickToShow": "Нажмите для просмотра"
 }
@@ -285,7 +269,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="sk-SK" lang="json">
 {
-  "sensitive": "NSFW",
   "image": "Obrázky",
   "clickToShow": "Kliknutím zobrazíte"
 }
@@ -293,7 +276,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="th-TH" lang="json">
 {
-  "sensitive": "เนื้อหาที่ละเอียดอ่อน",
   "image": "รูปภาพ",
   "clickToShow": "คลิกเพื่อแสดง"
 }
@@ -301,7 +283,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="tr-TR" lang="json">
 {
-  "sensitive": "Hassas",
   "image": "Görsel",
   "clickToShow": "Göstermek için tıklayın"
 }
@@ -309,7 +290,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="ug-CN" lang="json">
 {
-  "sensitive": "Sensitive",
   "image": "Image",
   "clickToShow": "Click to show"
 }
@@ -317,7 +297,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="uk-UA" lang="json">
 {
-  "sensitive": "NSFW",
   "image": "Зображення",
   "clickToShow": "Натисніть для перегляду"
 }
@@ -325,7 +304,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="vi-VN" lang="json">
 {
-  "sensitive": "Nhạy cảm",
   "image": "Hình ảnh",
   "clickToShow": "Nhấn để xem"
 }
@@ -333,7 +311,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="zh-CN" lang="json">
 {
-  "sensitive": "敏感内容",
   "image": "图片",
   "clickToShow": "点击以显示"
 }
@@ -341,7 +318,6 @@ async function reveal(file: Misskey.entities.DriveFile) {
 
 <locale locale="zh-TW" lang="json">
 {
-  "sensitive": "敏感內容",
   "image": "圖片",
   "clickToShow": "點擊查看"
 }

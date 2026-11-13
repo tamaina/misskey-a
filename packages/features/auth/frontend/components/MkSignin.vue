@@ -53,11 +53,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			:credentialRequest="credentialRequest!"
 			:isPerformingPasswordlessLogin="doingPasskeyFromInputPage"
+			:canUseTotp="totpAvailable"
 
 			@done="onPasskeyDone"
 			@useTotp="onUseTotp"
 		/>
 	</Transition>
+	<XPasskeyAlternative v-if="page === 'totp' && passkeyAvailable" :disabled="waiting" @choose="onUsePasskey"/>
 	<div v-if="waiting" :class="$style.waitingRoot">
 		<MkLoading/>
 	</div>
@@ -79,6 +81,7 @@ import XInput from '@features/auth/frontend/components/MkSignin.input.vue';
 import XPassword from '@features/auth/frontend/components/MkSignin.password.vue';
 import XTotp from '@features/auth/frontend/components/MkSignin.totp.vue';
 import XPasskey from '@features/auth/frontend/components/MkSignin.passkey.vue';
+import XPasskeyAlternative from '@features/auth/frontend/components/MkSignin.passkey-alternative.vue';
 import { login } from '@features/auth/frontend/accounts.js';
 
 const emit = defineEmits<{
@@ -110,6 +113,8 @@ const password = ref('');
 const credentialRequest = shallowRef<PublicKeyCredentialRequestOptionsJSON | null>(null);
 const passkeyContext = ref('');
 const doingPasskeyFromInputPage = ref(false);
+const passkeyAvailable = ref(false);
+const totpAvailable = ref(true);
 
 function onPasskeyLogin(): void {
 	if (browserSupportsWebAuthn()) {
@@ -152,7 +157,16 @@ function onPasskeyDone(credential: AuthenticationResponseJSON): void {
 }
 
 function onUseTotp(): void {
+	if (!totpAvailable.value) return;
+	credentialRequest.value = null;
 	page.value = 'totp';
+}
+
+async function onUsePasskey(): Promise<void> {
+	if (waiting.value || !passkeyAvailable.value || userInfo.value == null) return;
+	waiting.value = true;
+	// Always obtain a fresh challenge after waiting for or returning from TOTP.
+	await tryLogin({ username: userInfo.value.username, password: password.value }, true);
 }
 //#endregion
 
@@ -213,7 +227,7 @@ async function onTotpSubmitted(token: string) {
 	}
 }
 
-async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>): Promise<Misskey.entities.SigninFlowResponse> {
+async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>, preferPasskey = false): Promise<Misskey.entities.SigninFlowResponse> {
 	const _req = {
 		username: req.username ?? userInfo.value?.username,
 		...req,
@@ -244,16 +258,25 @@ async function tryLogin(req: Partial<Misskey.entities.SigninFlowRequest>): Promi
 					break;
 				}
 				case 'totp': {
+					totpAvailable.value = true;
+					passkeyAvailable.value = false;
+					credentialRequest.value = null;
 					page.value = 'totp';
 					break;
 				}
 				case 'passkey': {
-					if (browserSupportsWebAuthn()) {
-						credentialRequest.value = res.authRequest;
-						page.value = 'passkey';
-					} else {
-						page.value = 'totp';
+					// Older servers send this step only when TOTP is enabled.
+					const useTotp = res.availableFactors === undefined || res.availableFactors.includes('totp');
+					totpAvailable.value = useTotp;
+					passkeyAvailable.value = browserSupportsWebAuthn() && (res.availableFactors === undefined || res.availableFactors.includes('passkey'));
+					credentialRequest.value = passkeyAvailable.value && (preferPasskey || !useTotp) ? res.authRequest : null;
+					if (!useTotp && !passkeyAvailable.value) {
+						page.value = 'input';
+						password.value = '';
+						await os.alert({ type: 'error', title: $locale.value.sfc.loginFailed, text: $locale.value.sfc.passkeyVerificationFailed });
+						break;
 					}
+					page.value = credentialRequest.value ? 'passkey' : 'totp';
 					break;
 				}
 			}
@@ -422,11 +445,11 @@ onBeforeUnmount(() => {
 	"signinFailed": "فشل الولوج، خطأ في اسم المستخدم أو كلمة المرور.",
 	"loginFailed": "فشل الولوج",
 	"incorrectPassword": "كلمة السر خاطئة.",
-	"rateLimitExceeded": "Rate limit exceeded",
-	"incorrectTotp": "The one-time password is incorrect or has expired.",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"rateLimitExceeded": "تم تجاوز الحد المسموح لعدد الطلبات",
+	"incorrectTotp": "كلمة المرور لمرة واحدة غير صحيحة أو انتهت صلاحيتها.",
+	"unknownWebAuthnKey": "مفتاح مرور غير معروف",
+	"passkeyVerificationFailed": "فشل التحقق من مفتاح المرور.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "نجح التحقق من مفتاح المرور، لكن تسجيل الدخول دون كلمة مرور معطّل."
 }
 </locale>
 
@@ -451,24 +474,24 @@ onBeforeUnmount(() => {
 	"loginFailed": "Přihlášení se nezdařilo.",
 	"incorrectPassword": "Nesprávné heslo.",
 	"rateLimitExceeded": "Překročení rychlostního limitu",
-	"incorrectTotp": "The one-time password is incorrect or has expired.",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"incorrectTotp": "Jednorázové heslo je nesprávné nebo vypršela jeho platnost.",
+	"unknownWebAuthnKey": "Neznámý přístupový klíč",
+	"passkeyVerificationFailed": "Ověření přístupového klíče selhalo.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Ověření přístupového klíče proběhlo úspěšně, ale přihlašování bez hesla je zakázáno."
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
 	"noSuchUser": "User not found",
-	"signinFailed": "Unable to sign in. The entered username or password is incorrect.",
-	"loginFailed": "Failed to sign in",
+	"signinFailed": "Kunne ikke logge ind. Det indtastede brugernavn eller den indtastede adgangskode er forkert.",
+	"loginFailed": "Login mislykkedes",
 	"incorrectPassword": "Incorrect password.",
-	"rateLimitExceeded": "Rate limit exceeded",
-	"incorrectTotp": "The one-time password is incorrect or has expired.",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"rateLimitExceeded": "Grænsen for antal forespørgsler er overskredet",
+	"incorrectTotp": "Engangsadgangskoden er forkert eller udløbet.",
+	"unknownWebAuthnKey": "Ukendt adgangsnøgle",
+	"passkeyVerificationFailed": "Bekræftelse af adgangsnøglen mislykkedes.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Adgangsnøglen blev bekræftet, men login uden adgangskode er deaktiveret."
 }
 </locale>
 
@@ -587,28 +610,28 @@ onBeforeUnmount(() => {
 <locale locale="kab-KAB" lang="json">
 {
 	"noSuchUser": "User not found",
-	"signinFailed": "Unable to sign in. The entered username or password is incorrect.",
-	"loginFailed": "Failed to sign in",
+	"signinFailed": "Ur tezmireḍ ara ad tkecmeḍ. Isem n umseqdac neɣ awal uffir i teskecmeḍ d arameɣtu.",
+	"loginFailed": "Anekcum ur yeddi ara",
 	"incorrectPassword": "Incorrect password.",
-	"rateLimitExceeded": "Rate limit exceeded",
-	"incorrectTotp": "The one-time password is incorrect or has expired.",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"rateLimitExceeded": "Tezriḍ talast n usuter",
+	"incorrectTotp": "Awal uffir n yiwet n tikkelt d arameɣtu neɣ yezri wakud-is.",
+	"unknownWebAuthnKey": "Tasarut n unekcum tarussint",
+	"passkeyVerificationFailed": "Asesteb n tsarut n unekcum ur yeddi ara.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Asesteb n tsarut n unekcum yedda, maca anekcum war awal uffir yensa."
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
 	"noSuchUser": "User not found",
-	"signinFailed": "Unable to sign in. The entered username or password is incorrect.",
-	"loginFailed": "Failed to sign in",
+	"signinFailed": "ಪ್ರವೇಶಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ನಮೂದಿಸಿದ ಬಳಕೆದಾರಹೆಸರು ಅಥವಾ ಗುಪ್ತಪದ ತಪ್ಪಾಗಿದೆ.",
+	"loginFailed": "ಪ್ರವೇಶ ವಿಫಲವಾಗಿದೆ",
 	"incorrectPassword": "Incorrect password.",
-	"rateLimitExceeded": "Rate limit exceeded",
-	"incorrectTotp": "The one-time password is incorrect or has expired.",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"rateLimitExceeded": "ವಿನಂತಿಗಳ ಮಿತಿಯನ್ನು ಮೀರಲಾಗಿದೆ",
+	"incorrectTotp": "ಒಮ್ಮೆ ಬಳಸುವ ಗುಪ್ತಪದ ತಪ್ಪಾಗಿದೆ ಅಥವಾ ಅದರ ಅವಧಿ ಮುಗಿದಿದೆ.",
+	"unknownWebAuthnKey": "ಅಪರಿಚಿತ ಪಾಸ್‌ಕೀ",
+	"passkeyVerificationFailed": "ಪಾಸ್‌ಕೀ ಪರಿಶೀಲನೆ ವಿಫಲವಾಗಿದೆ.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "ಪಾಸ್‌ಕೀ ಪರಿಶೀಲನೆ ಯಶಸ್ವಿಯಾಗಿದೆ, ಆದರೆ ಗುಪ್ತಪದವಿಲ್ಲದ ಪ್ರವೇಶವನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ."
 }
 </locale>
 
@@ -632,11 +655,11 @@ onBeforeUnmount(() => {
 	"signinFailed": "Inloggen mislukt. Controleer gebruikersnaam en wachtwoord.",
 	"loginFailed": "Aanmelding mislukt.",
 	"incorrectPassword": "Onjuist wachtwoord.",
-	"rateLimitExceeded": "Rate limit exceeded",
+	"rateLimitExceeded": "Limiet voor het aantal verzoeken overschreden",
 	"incorrectTotp": "Het eenmalige wachtwoord is incorrect of verlopen",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"unknownWebAuthnKey": "Onbekende passkey",
+	"passkeyVerificationFailed": "Verificatie van de passkey is mislukt.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "De passkey is geverifieerd, maar aanmelden zonder wachtwoord is uitgeschakeld."
 }
 </locale>
 
@@ -646,11 +669,11 @@ onBeforeUnmount(() => {
 	"signinFailed": "Kunne ikke logge inn. Det oppgitte brukernavnet eller passordet er feil.",
 	"loginFailed": "Kunne ikke logge inn",
 	"incorrectPassword": "Incorrect password.",
-	"rateLimitExceeded": "Rate limit exceeded",
-	"incorrectTotp": "The one-time password is incorrect or has expired.",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"rateLimitExceeded": "Grensen for antall forespørsler er overskredet",
+	"incorrectTotp": "Engangspassordet er feil eller har utløpt.",
+	"unknownWebAuthnKey": "Ukjent tilgangsnøkkel",
+	"passkeyVerificationFailed": "Bekreftelse av tilgangsnøkkelen mislyktes.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Tilgangsnøkkelen ble bekreftet, men innlogging uten passord er deaktivert."
 }
 </locale>
 
@@ -662,9 +685,9 @@ onBeforeUnmount(() => {
 	"incorrectPassword": "Nieprawidłowe hasło.",
 	"rateLimitExceeded": "Limit szybkości przekroczony",
 	"incorrectTotp": "Hasło pojedynczego użytku jest nie poprawne, lub straciło ważność",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"unknownWebAuthnKey": "Nieznany klucz dostępu",
+	"passkeyVerificationFailed": "Weryfikacja klucza dostępu nie powiodła się.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Weryfikacja klucza dostępu powiodła się, ale logowanie bez hasła jest wyłączone."
 }
 </locale>
 
@@ -703,10 +726,10 @@ onBeforeUnmount(() => {
 	"loginFailed": "Prihlásenie sa nepodarilo.",
 	"incorrectPassword": "Nesprávne heslo.",
 	"rateLimitExceeded": "Prekročený limit rýchlosti",
-	"incorrectTotp": "The one-time password is incorrect or has expired.",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"incorrectTotp": "Jednorazové heslo je nesprávne alebo jeho platnosť vypršala.",
+	"unknownWebAuthnKey": "Neznámy prístupový kľúč",
+	"passkeyVerificationFailed": "Overenie prístupového kľúča zlyhalo.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Overenie prístupového kľúča bolo úspešné, ale prihlasovanie bez hesla je zakázané."
 }
 </locale>
 
@@ -741,14 +764,14 @@ onBeforeUnmount(() => {
 <locale locale="ug-CN" lang="json">
 {
 	"noSuchUser": "User not found",
-	"signinFailed": "Unable to sign in. The entered username or password is incorrect.",
-	"loginFailed": "Failed to sign in",
+	"signinFailed": "كىرەلمىدىڭىز. كىرگۈزگەن ئىشلەتكۈچى نامى ياكى پارول خاتا.",
+	"loginFailed": "كىرىش مەغلۇپ بولدى",
 	"incorrectPassword": "Incorrect password.",
-	"rateLimitExceeded": "Rate limit exceeded",
-	"incorrectTotp": "The one-time password is incorrect or has expired.",
-	"unknownWebAuthnKey": "Unknown Passkey",
-	"passkeyVerificationFailed": "Passkey verification has failed.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"rateLimitExceeded": "تەلەپ سانى چەكتىن ئېشىپ كەتتى",
+	"incorrectTotp": "بىر قېتىملىق پارول خاتا ياكى ۋاقتى ئۆتكەن.",
+	"unknownWebAuthnKey": "نامەلۇم كىرىش ئاچقۇچى",
+	"passkeyVerificationFailed": "كىرىش ئاچقۇچىنى دەلىللەش مەغلۇپ بولدى.",
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "كىرىش ئاچقۇچى مۇۋەپپەقىيەتلىك دەلىللەندى، ئەمما پارولسىز كىرىش چەكلەنگەن."
 }
 </locale>
 
@@ -774,9 +797,9 @@ onBeforeUnmount(() => {
 	"incorrectPassword": "Sai mật khẩu.",
 	"rateLimitExceeded": "Giới hạn quá mức",
 	"incorrectTotp": "Mã OTP không đúng hoặc đã quá hạn",
-	"unknownWebAuthnKey": "Unknown Passkey",
+	"unknownWebAuthnKey": "Khóa truy cập không xác định",
 	"passkeyVerificationFailed": "Xác minh mật khẩu không thành công.",
-	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Passkey verification has succeeded but password-less login is disabled."
+	"passkeyVerificationSucceededButPasswordlessLoginDisabled": "Xác minh khóa truy cập đã thành công, nhưng đăng nhập không cần mật khẩu đang bị tắt."
 }
 </locale>
 

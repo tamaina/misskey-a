@@ -5,7 +5,7 @@
 
 import type { BlockingsRepository } from '@features/persistence/backend/repositories/models.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { MiBlocking } from '../models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';

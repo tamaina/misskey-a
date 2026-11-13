@@ -3,7 +3,7 @@ name: Check the description in CHANGELOG.md
 on:
   pull_request:
     branches:
-      - master
+      - main
       - develop
 
 jobs:
@@ -44,4 +44,6 @@ jobs:
         run: pnpm --filter changelog-checker... install --frozen-lockfile
 
       - name: Run Checker
+        env:
+          RELEASE_PR: ${{ github.base_ref == vars.STABLE_BRANCH && github.head_ref == 'develop' && github.event.pull_request.head.repo.full_name == github.repository }}
         run: pnpm --filter changelog-checker check

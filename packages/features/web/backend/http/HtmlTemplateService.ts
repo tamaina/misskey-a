@@ -5,6 +5,7 @@
 
 import { resolve } from 'node:path';
 import { promises as fsp } from 'node:fs';
+import { localeEntryManifestFile, parseLocaleEntryManifest } from '../../shared/locale-entry-manifest.js';
 import { languages } from 'i18n/const';
 import { Injectable, Inject } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
@@ -95,10 +96,20 @@ export class HtmlTemplateService {
 		};
 	}
 
+	private async readLocaleEntries(directory: string): Promise<Record<string, string> | undefined> {
+		try {
+			const content = await fsp.readFile(resolve(directory, localeEntryManifestFile), 'utf8');
+			return parseLocaleEntryManifest(JSON.parse(content)).entries;
+		} catch (error) {
+			// Builds predating the host map keep their existing entry behavior.
+			if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
+			throw error;
+		}
+	}
+
 	@bindThis
 	private async prepareFrontendAssets() {
 		if (this.frontendAssetsFetched) return;
-		this.frontendAssetsFetched = true;
 
 		const [
 			bootJs,
@@ -127,6 +138,7 @@ export class HtmlTemplateService {
 
 		if (feViteManifest != null) {
 			this.frontendViteFiles = this.collectViteAssetFiles(feViteManifest, 'src/_boot_.ts');
+			this.frontendViteFiles.localeEntries = await this.readLocaleEntries(this.frontendViteBuilt);
 		}
 
 		if (bootJs != null) {
@@ -139,6 +151,7 @@ export class HtmlTemplateService {
 
 		if (embedFeViteManifest != null) {
 			this.frontendEmbedViteFiles = this.collectViteAssetFiles(embedFeViteManifest, 'src/boot.ts');
+			this.frontendEmbedViteFiles.localeEntries = await this.readLocaleEntries(this.frontendEmbedViteBuilt);
 		}
 
 		if (embedBootJs != null) {
@@ -148,6 +161,8 @@ export class HtmlTemplateService {
 		if (embedBootCss != null) {
 			this.frontendEmbedBootloaderCss = embedBootCss;
 		}
+
+		this.frontendAssetsFetched = true;
 	}
 
 	@bindThis

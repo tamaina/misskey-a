@@ -3,38 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { remainingIRegistryRemoveDefinition, remainingIRegistryRemoveInput, remainingIRegistryRemoveOutput } from '../../../../contract/remaining-inline-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { RegistryItemsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-import { RegistryApiService } from '../../../services/RegistryApiService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(remainingIRegistryRemoveDefinition);
-
-export const meta = {
-	requireCredential: true,
-	kind: 'write:account',
-
-	errors: {
-		noSuchKey: {
-			message: 'No such key.',
-			code: 'NO_SUCH_KEY',
-			id: '1fac4e8a-a6cd-4e39-a4a5-3a7e11f1b019',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof remainingIRegistryRemoveInput, typeof remainingIRegistryRemoveOutput> {
-	constructor(
-		private registryApiService: RegistryApiService,
-	) {
-		super(meta, contractProjection, async (ps, me, accessToken) => {
-			await this.registryApiService.remove(me.id, accessToken != null ? accessToken.id : (ps.domain ?? null), ps.scope, ps.key);
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { registryRemoveContract } from './remove.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { PreferencesDependencies } from '../../../api.implementation.js';
+import { registryTenant } from './registry.helpers.js';
+export function createRegistryRemoveProcedure<Actor extends ApiActor>(deps: PreferencesDependencies) {
+	return createApiProcedure<Actor>()(registryRemoveContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const principal = context.principal;
+			const token = context.token;
+			return deps.registry.remove(principal.id, registryTenant(input.domain, token), input.scope, input.key);
 		});
-	}
 }

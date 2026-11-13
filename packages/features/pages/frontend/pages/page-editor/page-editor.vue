@@ -8,9 +8,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<div class="jqqmcavi">
 			<MkButton v-if="pageId && author != null" class="button" inline type="routerLink" :to="`/@${ author.username }/pages/${ currentName }`"><i class="ti ti-external-link"></i> {{ $locale.sfc.pagesViewPage }}</MkButton>
-			<MkButton v-if="!readonly" inline primary class="button" @click="save"><i class="ti ti-device-floppy"></i> {{ $locale.sfc.save }}</MkButton>
+			<MkButton v-if="!readonly" inline primary class="button" @click="save"><i class="ti ti-device-floppy"></i> {{ globalLocale.env.save }}</MkButton>
 			<MkButton v-if="pageId" inline class="button" @click="duplicate"><i class="ti ti-copy"></i> {{ $locale.sfc.duplicate }}</MkButton>
-			<MkButton v-if="pageId && !readonly" inline class="button" danger @click="del"><i class="ti ti-trash"></i> {{ $locale.sfc.delete }}</MkButton>
+			<MkButton v-if="pageId && !readonly" inline class="button" danger @click="del"><i class="ti ti-trash"></i> {{ globalLocale.env.delete }}</MkButton>
 		</div>
 
 		<div v-if="tab === 'settings'">
@@ -58,6 +58,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, provide, watch, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@features/boot/frontend/shared/config.js';
@@ -76,6 +77,9 @@ import { $i } from '@features/auth/frontend/i.js';
 import { mainRouter } from '@features/navigation/frontend/router.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { getPageBlockList } from '@features/pages/frontend/pages/page-editor/common.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	initPageId?: string;
@@ -146,7 +150,7 @@ async function save() {
 
 		await os.apiWithDialog('pages/update', updateOptions, undefined, {
 			'2298a392-d4a1-44c5-9ebb-ac1aeaa5a9ab': {
-				title: $locale.value.sfc.somethingHappened,
+				title: globalLocale.value.env.somethingHappened,
 				text: $locale.value.sfc.pagesNameAlreadyExists,
 			},
 		});
@@ -155,7 +159,7 @@ async function save() {
 	} else {
 		const created = await os.apiWithDialog('pages/create', options, undefined, {
 			'4650348e-301c-499a-83c9-6aa988c66bc1': {
-				title: $locale.value.sfc.somethingHappened,
+				title: globalLocale.value.env.somethingHappened,
 				text: $locale.value.sfc.pagesNameAlreadyExists,
 			},
 		});
@@ -175,7 +179,7 @@ async function del() {
 
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		text: interpolateLocaleParameters($locale.value.sfc.removeAreYouSure, { x: title.value.trim() }),
+		text: interpolateLocaleParameters(globalLocale.value.env.removeAreYouSure, { x: title.value.trim() }),
 	});
 
 	if (canceled) return;
@@ -193,7 +197,7 @@ async function duplicate() {
 
 	const created = await os.apiWithDialog('pages/create', getSaveOptions(), undefined, {
 		'4650348e-301c-499a-83c9-6aa988c66bc1': {
-			title: $locale.value.sfc.somethingHappened,
+			title: globalLocale.value.env.somethingHappened,
 			text: $locale.value.sfc.pagesNameAlreadyExists,
 		},
 	});
@@ -420,9 +424,7 @@ definePage(() => ({
 <locale lang="json" locale="ar-SA">
 {
 	"pagesViewPage": "اعرض صفحاتك",
-	"save": "حفظ",
 	"duplicate": "Duplicate",
-	"delete": "حذف",
 	"pagesTitle": "العنوان",
 	"pagesSummary": "ملخص الصفحة",
 	"pagesUrl": "رابط الصفحة",
@@ -433,9 +435,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "احذف صورة مصغّرة",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "حدث خطأ",
 	"pagesNameAlreadyExists": "رابط الصفحة موجود مسبقًا",
-	"removeAreYouSure": "متأكد من أنك تريد حذف {x}؟",
 	"pagesChooseBlock": "إضافة كتلة",
 	"pagesPageSetting": "إعدادات الصفحة",
 	"pagesContents": "المحتوى",
@@ -448,9 +448,7 @@ definePage(() => ({
 <locale lang="json" locale="ca-ES">
 {
 	"pagesViewPage": "Veure les teves pàgines ",
-	"save": "Desa",
 	"duplicate": "Duplicat",
-	"delete": "Elimina",
 	"pagesTitle": "Títol ",
 	"pagesSummary": "Resum de la pàgina ",
 	"pagesUrl": "URL de la pàgina ",
@@ -461,9 +459,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Esborrar la miniatura",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "S'ha produït un error",
 	"pagesNameAlreadyExists": "L'adreça URL de la pàgina ja existeix",
-	"removeAreYouSure": "Segur que vols esborrar «{x}»?",
 	"pagesChooseBlock": "Afegeix un bloc",
 	"pagesPageSetting": "Configuració de la pàgina",
 	"pagesContents": "Contingut",
@@ -476,9 +472,7 @@ definePage(() => ({
 <locale lang="json" locale="cs-CZ">
 {
 	"pagesViewPage": "Zobrazit své stránky",
-	"save": "Uložit",
 	"duplicate": "Duplikovat",
-	"delete": "Smazat",
 	"pagesTitle": "Titulek",
 	"pagesSummary": "Přehled stránky",
 	"pagesUrl": "URL stránky",
@@ -489,9 +483,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Smazání miniatury",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"pagesNameAlreadyExists": "Zadaná adresa URL stránky již existuje",
-	"removeAreYouSure": "Jste si jistí že chcete smazat \"{x}\"?",
 	"pagesChooseBlock": "Přidat blok",
 	"pagesPageSetting": "Nastavení stránky",
 	"pagesContents": "Obsah",
@@ -504,9 +496,7 @@ definePage(() => ({
 <locale lang="json" locale="da-DK">
 {
 	"pagesViewPage": "View your Pages",
-	"save": "Save",
 	"duplicate": "Duplicate",
-	"delete": "Delete",
 	"pagesTitle": "Title",
 	"pagesSummary": "Page summary",
 	"pagesUrl": "Page URL",
@@ -517,9 +507,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Delete thumbnail",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "An error has occurred",
 	"pagesNameAlreadyExists": "The specified Page URL already exists",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
 	"pagesChooseBlock": "Add a block",
 	"pagesPageSetting": "Page settings",
 	"pagesContents": "Contents",
@@ -532,9 +520,7 @@ definePage(() => ({
 <locale lang="json" locale="de-DE">
 {
 	"pagesViewPage": "Seite anschauen",
-	"save": "Speichern",
 	"duplicate": "Duplizieren",
-	"delete": "Löschen",
 	"pagesTitle": "Titel",
 	"pagesSummary": "Zusammenfassung",
 	"pagesUrl": "Seiten-URL",
@@ -545,9 +531,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Vorschaubild entfernen",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"pagesNameAlreadyExists": "Die angegebene Seiten-URL existiert bereits",
-	"removeAreYouSure": "Möchtest du „{x}“ wirklich entfernen?",
 	"pagesChooseBlock": "Block hinzufügen",
 	"pagesPageSetting": "Seiteneinstellungen",
 	"pagesContents": "Inhalte",
@@ -560,9 +544,7 @@ definePage(() => ({
 <locale lang="json" locale="en-US">
 {
 	"pagesViewPage": "View your Pages",
-	"save": "Save",
 	"duplicate": "Duplicate",
-	"delete": "Delete",
 	"pagesTitle": "Title",
 	"pagesSummary": "Page summary",
 	"pagesUrl": "Page URL",
@@ -573,9 +555,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Delete thumbnail",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "An error has occurred",
 	"pagesNameAlreadyExists": "The specified Page URL already exists",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
 	"pagesChooseBlock": "Add a block",
 	"pagesPageSetting": "Page settings",
 	"pagesContents": "Contents",
@@ -588,9 +568,7 @@ definePage(() => ({
 <locale lang="json" locale="es-ES">
 {
 	"pagesViewPage": "Ver página",
-	"save": "Guardar",
 	"duplicate": "Duplicar",
-	"delete": "Borrar",
 	"pagesTitle": "Título",
 	"pagesSummary": "Resumen de la página",
 	"pagesUrl": "URL de la página",
@@ -601,9 +579,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Borrar imagen llamativa",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Ocurrió un error",
 	"pagesNameAlreadyExists": "La URL de la página especificada ya existe",
-	"removeAreYouSure": "¿Desea borrar \"{x}\"?",
 	"pagesChooseBlock": "Agregar bloque",
 	"pagesPageSetting": "Configurar página",
 	"pagesContents": "Contenido",
@@ -616,9 +592,7 @@ definePage(() => ({
 <locale lang="json" locale="fr-FR">
 {
 	"pagesViewPage": "Afficher la page",
-	"save": "Enregistrer",
 	"duplicate": "Duliquer",
-	"delete": "Supprimer",
 	"pagesTitle": "Titre",
 	"pagesSummary": "Résumé de page",
 	"pagesUrl": "URL de la page",
@@ -629,9 +603,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Supprimer la miniature",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Une erreur est survenue",
 	"pagesNameAlreadyExists": "L'URL de page spécifiée existe déjà",
-	"removeAreYouSure": "Êtes-vous sûr·e de vouloir supprimer « {x} »\u202f?",
 	"pagesChooseBlock": "Ajouter un bloc",
 	"pagesPageSetting": "Paramètres de la Page",
 	"pagesContents": "Contenu",
@@ -644,9 +616,7 @@ definePage(() => ({
 <locale lang="json" locale="id-ID">
 {
 	"pagesViewPage": "Lihat Halaman",
-	"save": "Simpan",
 	"duplicate": "Duplikat",
-	"delete": "Hapus",
 	"pagesTitle": "Judul",
 	"pagesSummary": "Ringkasan Halaman",
 	"pagesUrl": "URL Halaman",
@@ -657,9 +627,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Hapus gambar yang menarik",
 	"pagesFontSansSerif": "Sans-serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Terjadi kesalahan",
 	"pagesNameAlreadyExists": "URL Halaman yang ditentukan sudah ada",
-	"removeAreYouSure": "Apakah kamu yakin ingin menghapus \"{x}\"?",
 	"pagesChooseBlock": "Tambahkan blokir",
 	"pagesPageSetting": "Pengaturan Halaman",
 	"pagesContents": "Konten",
@@ -672,9 +640,7 @@ definePage(() => ({
 <locale lang="json" locale="it-IT">
 {
 	"pagesViewPage": "Visualizza pagina",
-	"save": "Salva",
 	"duplicate": "Duplica",
-	"delete": "Elimina",
 	"pagesTitle": "Titolo",
 	"pagesSummary": "Riassunto di pagina",
 	"pagesUrl": "URL della pagina",
@@ -685,9 +651,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Elimina immagine attraente",
 	"pagesFontSansSerif": "Sans serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Si è verificato un problema",
 	"pagesNameAlreadyExists": "Esiste già una pagina con lo stesso URL.",
-	"removeAreYouSure": "Vuoi davvero eliminare \"{x}\"?",
 	"pagesChooseBlock": "Aggiungi blocco",
 	"pagesPageSetting": "Impostazioni pagina",
 	"pagesContents": "Contenuto",
@@ -700,9 +664,7 @@ definePage(() => ({
 <locale lang="json" locale="ja-JP">
 {
 	"pagesViewPage": "ページを見る",
-	"save": "保存",
 	"duplicate": "複製",
-	"delete": "削除",
 	"pagesTitle": "タイトル",
 	"pagesSummary": "ページの要約",
 	"pagesUrl": "ページURL",
@@ -713,9 +675,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "アイキャッチ画像を削除",
 	"pagesFontSansSerif": "サンセリフ",
 	"pagesFontSerif": "セリフ",
-	"somethingHappened": "問題が発生しました",
 	"pagesNameAlreadyExists": "指定されたページURLは既に存在しています",
-	"removeAreYouSure": "「{x}」を削除しますか？",
 	"pagesChooseBlock": "ブロックを追加",
 	"pagesPageSetting": "ページ設定",
 	"pagesContents": "コンテンツ",
@@ -728,9 +688,7 @@ definePage(() => ({
 <locale lang="json" locale="ja-KS">
 {
 	"pagesViewPage": "ページを見る",
-	"save": "とっとく",
 	"duplicate": "複製",
-	"delete": "ほかす",
 	"pagesTitle": "タイトル",
 	"pagesSummary": "ページの要約",
 	"pagesUrl": "ページURL",
@@ -741,9 +699,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "アイキャッチ画像を削除",
 	"pagesFontSansSerif": "サンセリフ",
 	"pagesFontSerif": "セリフ",
-	"somethingHappened": "なんかあかんわ",
 	"pagesNameAlreadyExists": "指定されたページURLはもうあるみたいや",
-	"removeAreYouSure": "「{x}」はほかしてええか？",
 	"pagesChooseBlock": "ブロックを追加",
 	"pagesPageSetting": "ページ設定",
 	"pagesContents": "コンテンツ",
@@ -756,9 +712,7 @@ definePage(() => ({
 <locale lang="json" locale="kab-KAB">
 {
 	"pagesViewPage": "View your Pages",
-	"save": "Sekles",
 	"duplicate": "Duplicate",
-	"delete": "Kkes",
 	"pagesTitle": "Title",
 	"pagesSummary": "Page summary",
 	"pagesUrl": "Page URL",
@@ -769,9 +723,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Kkes tugna i d-ijebden",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "An error has occurred",
 	"pagesNameAlreadyExists": "The specified Page URL already exists",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
 	"pagesChooseBlock": "Add a block",
 	"pagesPageSetting": "Page settings",
 	"pagesContents": "Agbur",
@@ -784,9 +736,7 @@ definePage(() => ({
 <locale lang="json" locale="kn-IN">
 {
 	"pagesViewPage": "View your Pages",
-	"save": "ಉಳಿಸಿ",
 	"duplicate": "Duplicate",
-	"delete": "ಅಳಿಸು",
 	"pagesTitle": "Title",
 	"pagesSummary": "Page summary",
 	"pagesUrl": "Page URL",
@@ -797,9 +747,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Delete thumbnail",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "An error has occurred",
 	"pagesNameAlreadyExists": "The specified Page URL already exists",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
 	"pagesChooseBlock": "Add a block",
 	"pagesPageSetting": "Page settings",
 	"pagesContents": "Contents",
@@ -812,9 +760,7 @@ definePage(() => ({
 <locale lang="json" locale="ko-KR">
 {
 	"pagesViewPage": "페이지 보기",
-	"save": "저장",
 	"duplicate": "복제",
-	"delete": "삭제",
 	"pagesTitle": "제목",
 	"pagesSummary": "페이지 요약",
 	"pagesUrl": "페이지 URL",
@@ -825,9 +771,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "아이캐치 이미지를 삭제",
 	"pagesFontSansSerif": "고딕체",
 	"pagesFontSerif": "명조체",
-	"somethingHappened": "오류가 발생했습니다",
 	"pagesNameAlreadyExists": "지정한 페이지 URL이 이미 존재합니다",
-	"removeAreYouSure": "\"{x}\" 을(를) 삭제하시겠습니까?",
 	"pagesChooseBlock": "블록 추가",
 	"pagesPageSetting": "페이지 설정",
 	"pagesContents": "콘텐츠",
@@ -840,9 +784,7 @@ definePage(() => ({
 <locale lang="json" locale="nl-NL">
 {
 	"pagesViewPage": "View your Pages",
-	"save": "Opslaan",
 	"duplicate": "Dupliceren",
-	"delete": "Verwijderen",
 	"pagesTitle": "Title",
 	"pagesSummary": "Page summary",
 	"pagesUrl": "Page URL",
@@ -853,9 +795,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Delete thumbnail",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Er is iets misgegaan.",
 	"pagesNameAlreadyExists": "The specified Page URL already exists",
-	"removeAreYouSure": "Weet je zeker dat je \"{x}\" wil verwijderen?",
 	"pagesChooseBlock": "Add a block",
 	"pagesPageSetting": "Page settings",
 	"pagesContents": "Contents",
@@ -868,9 +808,7 @@ definePage(() => ({
 <locale lang="json" locale="no-NO">
 {
 	"pagesViewPage": "View your Pages",
-	"save": "Lagre",
 	"duplicate": "Duplicate",
-	"delete": "Slett",
 	"pagesTitle": "Tittel",
 	"pagesSummary": "Page summary",
 	"pagesUrl": "Side URL",
@@ -881,9 +819,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Delete thumbnail",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "En feil har oppstått",
 	"pagesNameAlreadyExists": "The specified Page URL already exists",
-	"removeAreYouSure": "Er du sikker på at du vil fjerne \"{x}\"?",
 	"pagesChooseBlock": "Add a block",
 	"pagesPageSetting": "Page settings",
 	"pagesContents": "Innhold",
@@ -896,9 +832,7 @@ definePage(() => ({
 <locale lang="json" locale="pl-PL">
 {
 	"pagesViewPage": "Wyświetlanie Twoich stron",
-	"save": "Zapisz",
 	"duplicate": "Duplikuj",
-	"delete": "Usuń",
 	"pagesTitle": "Tytuł",
 	"pagesSummary": "Podsumowanie strony",
 	"pagesUrl": "URL strony",
@@ -909,9 +843,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Usuń przyciągające wzrok zdjęcie",
 	"pagesFontSansSerif": "Bezszeryfowa",
 	"pagesFontSerif": "Szeryfowa",
-	"somethingHappened": "Coś poszło nie tak",
 	"pagesNameAlreadyExists": "Określony adres URL strony już istnieje",
-	"removeAreYouSure": "Czy na pewno chcesz usunąć „{x}”?",
 	"pagesChooseBlock": "Dodaj blok",
 	"pagesPageSetting": "Ustawienia strony",
 	"pagesContents": "Zawartość",
@@ -924,9 +856,7 @@ definePage(() => ({
 <locale lang="json" locale="pt-PT">
 {
 	"pagesViewPage": "Visualizar as suas páginas",
-	"save": "Salvar",
 	"duplicate": "Duplicar",
-	"delete": "Excluir",
 	"pagesTitle": "Título",
 	"pagesSummary": "Resumo da página",
 	"pagesUrl": "URL da Página",
@@ -937,9 +867,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Excluir miniatura",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Ocorreu um erro",
 	"pagesNameAlreadyExists": "O URL de Página especificado já existe",
-	"removeAreYouSure": "Deseja excluir \"{x}\"?",
 	"pagesChooseBlock": "Adicionar bloco",
 	"pagesPageSetting": "Configurações da página",
 	"pagesContents": "Conteúdo",
@@ -952,9 +880,7 @@ definePage(() => ({
 <locale lang="json" locale="ru-RU">
 {
 	"pagesViewPage": "Смотреть страницы",
-	"save": "Сохранить",
 	"duplicate": "Дубликат",
-	"delete": "Удалить",
 	"pagesTitle": "Заголовок",
 	"pagesSummary": "Краткое содержание",
 	"pagesUrl": "Адрес страницы",
@@ -965,9 +891,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Убрать картинку для привлечения внимания",
 	"pagesFontSansSerif": "Гротеск (без засечек)",
 	"pagesFontSerif": "Антиква (с засечками)",
-	"somethingHappened": "Что-то пошло не так",
 	"pagesNameAlreadyExists": "Указанный адрес страницы уже существует.",
-	"removeAreYouSure": "Хотите удалить «{x}»?",
 	"pagesChooseBlock": "Добавить блок",
 	"pagesPageSetting": "Настройки страницы",
 	"pagesContents": "Содержимое",
@@ -980,9 +904,7 @@ definePage(() => ({
 <locale lang="json" locale="sk-SK">
 {
 	"pagesViewPage": "Ukázať vaše stránky",
-	"save": "Uložiť",
 	"duplicate": "Duplikovať",
-	"delete": "Odstrániť",
 	"pagesTitle": "Nadpis",
 	"pagesSummary": "Zhrnutie stránky",
 	"pagesUrl": "URL stránky",
@@ -993,9 +915,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Odstrániť miniatúru",
 	"pagesFontSansSerif": "Bezpätkové",
 	"pagesFontSerif": "Pätkové",
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"pagesNameAlreadyExists": "Zadaná URL stránku už existuje",
-	"removeAreYouSure": "Naozaj chcete odstrániť \"{x}\"?",
 	"pagesChooseBlock": "Pridať blok",
 	"pagesPageSetting": "Nastavenia stránky",
 	"pagesContents": "Obsah",
@@ -1008,9 +928,7 @@ definePage(() => ({
 <locale lang="json" locale="th-TH">
 {
 	"pagesViewPage": "ดูหน้าเพจ",
-	"save": "บันทึก",
 	"duplicate": "ทำซ้ำ",
-	"delete": "ลบ",
 	"pagesTitle": "หัวข้อ",
 	"pagesSummary": "สรุปเพจ",
 	"pagesUrl": "URL ของหน้า",
@@ -1021,9 +939,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "ลบภาพขนาดย่อ",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"pagesNameAlreadyExists": "URL ของหน้าที่ระบุนั้นมีอยู่แล้ว",
-	"removeAreYouSure": "ต้องการลบ “{x}” ใช่ไหม?",
 	"pagesChooseBlock": "เพิ่มบล็อก",
 	"pagesPageSetting": "การตั้งค่าหน้าเพจ",
 	"pagesContents": "เนื้อหา",
@@ -1036,9 +952,7 @@ definePage(() => ({
 <locale lang="json" locale="tr-TR">
 {
 	"pagesViewPage": "Sayfalarını görüntüle",
-	"save": "Kaydet",
 	"duplicate": "Çoğalt",
-	"delete": "Sil",
 	"pagesTitle": "Başlık",
 	"pagesSummary": "Sayfa özeti",
 	"pagesUrl": "Sayfa URL'si",
@@ -1049,9 +963,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Küçük resmi sil",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Bir hata oluştu",
 	"pagesNameAlreadyExists": "Belirtilen Sayfa URL'si zaten mevcut.",
-	"removeAreYouSure": "“{x}” öğesini kaldırmak istediğinizden emin misin?",
 	"pagesChooseBlock": "Blok ekle",
 	"pagesPageSetting": "Sayfa ayarları",
 	"pagesContents": "İçindekiler",
@@ -1064,9 +976,7 @@ definePage(() => ({
 <locale lang="json" locale="ug-CN">
 {
 	"pagesViewPage": "View your Pages",
-	"save": "Save",
 	"duplicate": "Duplicate",
-	"delete": "ئۆچۈرۈش",
 	"pagesTitle": "Title",
 	"pagesSummary": "Page summary",
 	"pagesUrl": "Page URL",
@@ -1077,9 +987,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Delete thumbnail",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "An error has occurred",
 	"pagesNameAlreadyExists": "The specified Page URL already exists",
-	"removeAreYouSure": "Are you sure that you want to remove \"{x}\"?",
 	"pagesChooseBlock": "Add a block",
 	"pagesPageSetting": "Page settings",
 	"pagesContents": "Contents",
@@ -1092,9 +1000,7 @@ definePage(() => ({
 <locale lang="json" locale="uk-UA">
 {
 	"pagesViewPage": "Переглянути свої сторінки",
-	"save": "Зберегти",
 	"duplicate": "Дублікат",
-	"delete": "Видалити",
 	"pagesTitle": "Заголовок",
 	"pagesSummary": "Короткий зміст",
 	"pagesUrl": "URL сторінки",
@@ -1105,9 +1011,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Видалити привабливе зображення",
 	"pagesFontSansSerif": "Sans serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Щось пішло не так",
 	"pagesNameAlreadyExists": "Вказана адреса сторінки вже існує.",
-	"removeAreYouSure": "Ви впевнені, що хочете видалити \"{x}\"?",
 	"pagesChooseBlock": "Додати блок",
 	"pagesPageSetting": "Налаштування сторінки",
 	"pagesContents": "Вміст",
@@ -1120,9 +1024,7 @@ definePage(() => ({
 <locale lang="json" locale="vi-VN">
 {
 	"pagesViewPage": "Xem trang của tôi",
-	"save": "Lưu",
 	"duplicate": "Tạo bản sao",
-	"delete": "Xóa",
 	"pagesTitle": "Tựa đề",
 	"pagesSummary": "Mô tả Trang",
 	"pagesUrl": "URL Trang",
@@ -1133,9 +1035,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "Xóa ảnh thu nhỏ",
 	"pagesFontSansSerif": "Sans Serif",
 	"pagesFontSerif": "Serif",
-	"somethingHappened": "Xảy ra lỗi",
 	"pagesNameAlreadyExists": "URL Trang đã tồn tại",
-	"removeAreYouSure": "Bạn có chắc muốn gỡ \"{x}\"?",
 	"pagesChooseBlock": "Thêm khối",
 	"pagesPageSetting": "Cài đặt trang",
 	"pagesContents": "Nội dung",
@@ -1148,9 +1048,7 @@ definePage(() => ({
 <locale lang="json" locale="zh-CN">
 {
 	"pagesViewPage": "查看页面",
-	"save": "保存",
 	"duplicate": "复制",
-	"delete": "删除",
 	"pagesTitle": "标题",
 	"pagesSummary": "页面摘要",
 	"pagesUrl": "页面 URL",
@@ -1161,9 +1059,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "删除封面图片",
 	"pagesFontSansSerif": "无衬线字体",
 	"pagesFontSerif": "衬线字体",
-	"somethingHappened": "出错了",
 	"pagesNameAlreadyExists": "该页面 URL 已存在",
-	"removeAreYouSure": "要删掉「{x}」吗？",
 	"pagesChooseBlock": "添加内容块",
 	"pagesPageSetting": "页面设置",
 	"pagesContents": "内容",
@@ -1176,9 +1072,7 @@ definePage(() => ({
 <locale lang="json" locale="zh-TW">
 {
 	"pagesViewPage": "顯示頁面",
-	"save": "儲存",
 	"duplicate": "複製",
-	"delete": "刪除",
 	"pagesTitle": "標題",
 	"pagesSummary": "頁面摘要",
 	"pagesUrl": "頁面網址",
@@ -1189,9 +1083,7 @@ definePage(() => ({
 	"pagesEyeCatchingImageRemove": "刪除封面影像",
 	"pagesFontSansSerif": "無襯線體",
 	"pagesFontSerif": "襯線體",
-	"somethingHappened": "發生錯誤",
 	"pagesNameAlreadyExists": "該頁面 URL 已存在",
-	"removeAreYouSure": "確定要刪掉「{x}」嗎？",
 	"pagesChooseBlock": "新增方塊",
 	"pagesPageSetting": "頁面設定",
 	"pagesContents": "內容",

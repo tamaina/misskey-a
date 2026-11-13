@@ -73,7 +73,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 16px;">
 				<div class="_buttons">
 					<MkButton primary rounded @click="save"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
-					<MkButton rounded @click="testEmail"><i class="ti ti-send"></i> {{ $locale.sfc.testEmail }}</MkButton>
+					<MkButton rounded :disabled="!canTestEmail" @click="testEmail"><i class="ti ti-send"></i> {{ $locale.sfc.testEmail }}</MkButton>
 				</div>
 			</div>
 		</div>
@@ -104,6 +104,33 @@ const smtpPort = ref(meta.smtpPort);
 const smtpUser = ref(meta.smtpUser);
 const smtpPass = ref(meta.smtpPass);
 
+function getSettings() {
+	return {
+		enableEmail: enableEmail.value,
+		email: email.value,
+		smtpSecure: smtpSecure.value,
+		smtpHost: smtpHost.value,
+		smtpPort: smtpPort.value,
+		smtpUser: smtpUser.value,
+		smtpPass: smtpPass.value,
+	};
+}
+
+// 未入力を表す値（null・空文字・数値欄を空にしたときの NaN）を同じものとして比べる
+function normalizeSettingValue(value: unknown) {
+	if (value === '' || (typeof value === 'number' && Number.isNaN(value))) return null;
+	return value;
+}
+
+// 配信テストは保存済みの設定で行われるため、未保存の変更がある間や、SMTP サーバーが保存されていない間はテストできないようにする
+// メール配信が無効だと送信されずに正常終了し、テストが成功したように見えるため、配信が無効な間もテストできないようにする
+const savedSettings = ref(getSettings());
+const hasUnsavedChanges = computed(() => {
+	const current = getSettings();
+	return (Object.keys(current) as (keyof typeof current)[]).some(key => normalizeSettingValue(current[key]) !== normalizeSettingValue(savedSettings.value[key]));
+});
+const canTestEmail = computed(() => !hasUnsavedChanges.value && savedSettings.value.enableEmail && (savedSettings.value.smtpHost ?? '').trim() !== '');
+
 async function testEmail() {
 	const { canceled, result: destination } = await os.inputText({
 		title: 'To',
@@ -121,15 +148,9 @@ async function testEmail() {
 }
 
 function save() {
-	os.apiWithDialog('admin/update-meta', {
-		enableEmail: enableEmail.value,
-		email: email.value,
-		smtpSecure: smtpSecure.value,
-		smtpHost: smtpHost.value,
-		smtpPort: smtpPort.value,
-		smtpUser: smtpUser.value,
-		smtpPass: smtpPass.value,
-	}).then(() => {
+	const settings = getSettings();
+	os.apiWithDialog('admin/update-meta', settings).then(() => {
+		savedSettings.value = settings;
 		fetchInstance(true);
 	});
 }
@@ -152,7 +173,7 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"emailServer": "خادم البريد الإلكتروني",
-	"enableEmail": "Enable email distribution",
+	"enableEmail": "تفعيل إرسال البريد الإلكتروني",
 	"recommended": "مقترح",
 	"emailConfigInfo": "يستخدم لتأكيد عنوان بريدك الإلكتروني ولإعادة تعيين كلمة المرور إن نسيتها.",
 	"emailAddress": "عنوان البريد الالكتروني",
@@ -162,10 +183,10 @@ definePage(() => ({
 	"smtpUser": "اسم المستخدم",
 	"smtpPass": "الكلمة السرية",
 	"emptyToDisableSmtpAuth": "اترك اسم المستخدم وكلمة المرور فارغين لتعطيل التحقق من SMTP",
-	"smtpSecure": "Use implicit SSL/TLS for SMTP connections",
+	"smtpSecure": "استخدام SSL/TLS منذ بدء اتصالات SMTP",
 	"smtpSecureInfo": "عطل هذا الخيار عند استخدام STARTTLS",
 	"save": "حفظ",
-	"testEmail": "Test email delivery"
+	"testEmail": "اختبار إرسال البريد الإلكتروني"
 }
 </locale>
 
@@ -211,21 +232,21 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
-	"emailServer": "Email server",
-	"enableEmail": "Enable email distribution",
-	"recommended": "Recommended",
-	"emailConfigInfo": "Used to confirm your email during sign-up or if you forget your password",
-	"emailAddress": "Email address",
-	"smtpConfig": "SMTP Server Configuration",
-	"smtpHost": "Host",
+	"emailServer": "E-mailserver",
+	"enableEmail": "Aktivér afsendelse af e-mails",
+	"recommended": "Anbefalet",
+	"emailConfigInfo": "Bruges til at bekræfte din e-mailadresse ved tilmelding eller til at nulstille din adgangskode, hvis du glemmer den",
+	"emailAddress": "E-mailadresse",
+	"smtpConfig": "Indstillinger for SMTP-serveren",
+	"smtpHost": "Vært",
 	"smtpPort": "Port",
-	"smtpUser": "Username",
-	"smtpPass": "Password",
-	"emptyToDisableSmtpAuth": "Leave username and password empty to disable SMTP authentication",
-	"smtpSecure": "Use implicit SSL/TLS for SMTP connections",
-	"smtpSecureInfo": "Turn this off when using STARTTLS",
-	"save": "Save",
-	"testEmail": "Test email delivery"
+	"smtpUser": "Brugernavn",
+	"smtpPass": "Adgangskode",
+	"emptyToDisableSmtpAuth": "Lad brugernavn og adgangskode være tomme for at deaktivere SMTP-godkendelse",
+	"smtpSecure": "Brug implicit SSL/TLS til SMTP-forbindelser",
+	"smtpSecureInfo": "Slå dette fra, når du bruger STARTTLS",
+	"save": "Gem",
+	"testEmail": "Test levering af e-mails"
 }
 </locale>
 
@@ -391,41 +412,41 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"emailServer": "Email server",
-	"enableEmail": "Enable email distribution",
-	"recommended": "Recommended",
-	"emailConfigInfo": "Used to confirm your email during sign-up or if you forget your password",
+	"emailServer": "Aqeddac n yimayl",
+	"enableEmail": "Rmed tuzna n yimaylen",
+	"recommended": "Yettusemter",
+	"emailConfigInfo": "Yettuseqdec i usentem n tansa-k n yimayl deg ujerred neɣ i uwennez n wawal uffir ma tettuḍ-t.",
 	"emailAddress": "Tansa imayl",
-	"smtpConfig": "SMTP Server Configuration",
-	"smtpHost": "Host",
-	"smtpPort": "Port",
+	"smtpConfig": "Iɣewwaṛen n uqeddac SMTP",
+	"smtpHost": "Asenneftaɣ",
+	"smtpPort": "Tawwurt",
 	"smtpUser": "Isem n umseqdac",
 	"smtpPass": "Awal uffir",
-	"emptyToDisableSmtpAuth": "Leave username and password empty to disable SMTP authentication",
-	"smtpSecure": "Use implicit SSL/TLS for SMTP connections",
-	"smtpSecureInfo": "Turn this off when using STARTTLS",
+	"emptyToDisableSmtpAuth": "Eǧǧ isem n umseqdac d wawal uffir d ilmawen i usensi n usesteb SMTP.",
+	"smtpSecure": "Seqdec SSL/TLS seg tazwara n tuqqniwin SMTP",
+	"smtpSecureInfo": "Sens asefran-a mi ara tesqedceḍ STARTTLS.",
 	"save": "Sekles",
-	"testEmail": "Test email delivery"
+	"testEmail": "Sekyed tuzna n yimayl"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"emailServer": "Email server",
-	"enableEmail": "Enable email distribution",
-	"recommended": "Recommended",
-	"emailConfigInfo": "Used to confirm your email during sign-up or if you forget your password",
-	"emailAddress": "Email address",
-	"smtpConfig": "SMTP Server Configuration",
-	"smtpHost": "Host",
-	"smtpPort": "Port",
+	"emailServer": "ಇಮೇಲ್ ಸರ್ವರ್",
+	"enableEmail": "ಇಮೇಲ್ ಕಳುಹಿಸುವುದನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ",
+	"recommended": "ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ",
+	"emailConfigInfo": "ನೋಂದಣಿ ಸಮಯದಲ್ಲಿ ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ದೃಢೀಕರಿಸಲು ಅಥವಾ ಗುಪ್ತಪದವನ್ನು ಮರೆತಾಗ ಅದನ್ನು ಮರುಹೊಂದಿಸಲು ಬಳಸಲಾಗುತ್ತದೆ.",
+	"emailAddress": "ಇಮೇಲ್ ವಿಳಾಸ",
+	"smtpConfig": "SMTP ಸರ್ವರ್ ಸಂರಚನೆ",
+	"smtpHost": "ಹೋಸ್ಟ್",
+	"smtpPort": "ಪೋರ್ಟ್",
 	"smtpUser": "ಬಳಕೆಹೆಸರು",
 	"smtpPass": "ಗುಪ್ತಪದ",
-	"emptyToDisableSmtpAuth": "Leave username and password empty to disable SMTP authentication",
-	"smtpSecure": "Use implicit SSL/TLS for SMTP connections",
-	"smtpSecureInfo": "Turn this off when using STARTTLS",
+	"emptyToDisableSmtpAuth": "SMTP ದೃಢೀಕರಣವನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲು ಬಳಕೆಹೆಸರು ಮತ್ತು ಗುಪ್ತಪದವನ್ನು ಖಾಲಿ ಬಿಡಿ.",
+	"smtpSecure": "SMTP ಸಂಪರ್ಕಗಳ ಆರಂಭದಿಂದಲೇ SSL/TLS ಬಳಸಿ",
+	"smtpSecureInfo": "STARTTLS ಬಳಸುವಾಗ ಈ ಆಯ್ಕೆಯನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಿ.",
 	"save": "ಉಳಿಸಿ",
-	"testEmail": "Test email delivery"
+	"testEmail": "ಇಮೇಲ್ ಕಳುಹಿಸುವಿಕೆಯನ್ನು ಪರೀಕ್ಷಿಸಿ"
 }
 </locale>
 
@@ -453,7 +474,7 @@ definePage(() => ({
 {
 	"emailServer": "Email-Server",
 	"enableEmail": "Email distributie inschakelen",
-	"recommended": "Recommended",
+	"recommended": "Aanbevolen",
 	"emailConfigInfo": "Wordt gebruikt om je email te bevestigen tijdens het aanmelden of als je je wachtwoord bent vergeten",
 	"emailAddress": "Email adres",
 	"smtpConfig": "SMTP-server configuratie",
@@ -471,21 +492,21 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
-	"emailServer": "Email server",
-	"enableEmail": "Enable email distribution",
+	"emailServer": "E-postserver",
+	"enableEmail": "Aktiver sending av e-post",
 	"recommended": "Anbefalt",
-	"emailConfigInfo": "Used to confirm your email during sign-up or if you forget your password",
-	"emailAddress": "Email address",
-	"smtpConfig": "SMTP Server Configuration",
+	"emailConfigInfo": "Brukes til å bekrefte e-postadressen din ved registrering eller til å tilbakestille passordet hvis du glemmer det",
+	"emailAddress": "E-postadresse",
+	"smtpConfig": "Innstillinger for SMTP-serveren",
 	"smtpHost": "Vert",
 	"smtpPort": "Port",
 	"smtpUser": "Brukernavn",
 	"smtpPass": "Passord",
-	"emptyToDisableSmtpAuth": "Leave username and password empty to disable SMTP authentication",
-	"smtpSecure": "Use implicit SSL/TLS for SMTP connections",
-	"smtpSecureInfo": "Turn this off when using STARTTLS",
+	"emptyToDisableSmtpAuth": "La brukernavn og passord stå tomme for å deaktivere SMTP-autentisering",
+	"smtpSecure": "Bruk implisitt SSL/TLS for SMTP-tilkoblinger",
+	"smtpSecureInfo": "Slå av dette når du bruker STARTTLS",
 	"save": "Lagre",
-	"testEmail": "Test email delivery"
+	"testEmail": "Test levering av e-post"
 }
 </locale>
 
@@ -611,21 +632,21 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
-	"emailServer": "Email server",
-	"enableEmail": "Enable email distribution",
-	"recommended": "Recommended",
-	"emailConfigInfo": "Used to confirm your email during sign-up or if you forget your password",
-	"emailAddress": "Email address",
-	"smtpConfig": "SMTP Server Configuration",
-	"smtpHost": "Host",
-	"smtpPort": "Port",
-	"smtpUser": "Username",
-	"smtpPass": "Password",
-	"emptyToDisableSmtpAuth": "Leave username and password empty to disable SMTP authentication",
-	"smtpSecure": "Use implicit SSL/TLS for SMTP connections",
-	"smtpSecureInfo": "Turn this off when using STARTTLS",
-	"save": "Save",
-	"testEmail": "Test email delivery"
+	"emailServer": "ئېلېكترونلۇق خەت مۇلازىمېتىرى",
+	"enableEmail": "ئېلېكترونلۇق خەت يوللاشنى قوزغىتىش",
+	"recommended": "تەۋسىيە قىلىنىدۇ",
+	"emailConfigInfo": "تىزىملىتىش ۋاقتىدا ئېلېكترونلۇق خەت ئادرېسىڭىزنى دەلىللەش ياكى پارولنى ئۇنتۇپ قالغاندا قايتا تەڭشەش ئۈچۈن ئىشلىتىلىدۇ.",
+	"emailAddress": "ئېلېكترونلۇق خەت ئادرېسى",
+	"smtpConfig": "SMTP مۇلازىمېتىرىنىڭ تەڭشىكى",
+	"smtpHost": "باش ئاپپارات",
+	"smtpPort": "ئېغىز",
+	"smtpUser": "ئىشلەتكۈچى نامى",
+	"smtpPass": "پارول",
+	"emptyToDisableSmtpAuth": "SMTP دەلىللەشنى تاقاش ئۈچۈن ئىشلەتكۈچى نامى ۋە پارولنى بوش قالدۇرۇڭ.",
+	"smtpSecure": "SMTP ئۇلىنىشى باشلانغاندىن تارتىپ SSL/TLS ئىشلىتىش",
+	"smtpSecureInfo": "STARTTLS ئىشلەتكەندە بۇ تاللاشنى تاقاڭ.",
+	"save": "ساقلاش",
+	"testEmail": "ئېلېكترونلۇق خەت يوللاشنى سىناش"
 }
 </locale>
 

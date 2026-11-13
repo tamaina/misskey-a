@@ -14,6 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span class="sub"><span class="acct _monospace">@{{ acct(user) }}</span></span>
 					<span class="state">
 						<span v-if="suspended" class="suspended">Suspended</span>
+						<span v-if="remoteSuspended" class="suspended">{{ copyLocaleDictionary($locale.sfc).remoteSuspended ?? $locale.sfc.suspend }}</span>
 						<span v-if="silenced" class="silenced">Silenced</span>
 						<span v-if="moderator" class="moderator">Moderator</span>
 					</span>
@@ -37,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					-->
 				<template v-if="!isSystem">
 					<MkKeyValue oneline>
-						<template #key>{{ $locale.sfc.createdAt }}</template>
+						<template #key>{{ globalLocale.env.createdAt }}</template>
 						<template #value><span class="_monospace"><MkTime :time="user.createdAt" :mode="'detail'"/></span></template>
 					</MkKeyValue>
 					<MkKeyValue v-if="info" oneline>
@@ -71,7 +72,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<template #value>(Local user)</template>
 							</MkKeyValue>
 							<MkKeyValue oneline>
-								<template #key>{{ $locale.sfc.updatedAt }}</template>
+								<template #key>{{ globalLocale.env.updatedAt }}</template>
 								<template #value><MkTime v-if="user.lastFetchedAt" mode="detail" :time="user.lastFetchedAt"/><span v-else>N/A</span></template>
 							</MkKeyValue>
 							<MkKeyValue v-if="ap" oneline>
@@ -146,16 +147,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div v-if="expandedRoleIds.includes(role.id)" :class="$style.roleItemSub">
 					<div>Assigned: <MkTime :time="info.roleAssigns.find(a => a.roleId === role.id)!.createdAt" mode="detail"/></div>
 					<div v-if="info.roleAssigns.find(a => a.roleId === role.id)!.expiresAt">Period: {{ new Date(info.roleAssigns.find(a => a.roleId === role.id)!.expiresAt!).toLocaleString() }}</div>
-					<div v-else>Period: {{ $locale.sfc.indefinitely }}</div>
+					<div v-else>Period: {{ globalLocale.env.indefinitely }}</div>
 				</div>
 			</div>
 		</div>
 
 		<div v-else-if="tab === 'announcements'" class="_gaps">
-			<MkButton primary rounded @click="createAnnouncement"><i class="ti ti-plus"></i> {{ $locale.sfc.createNew }}</MkButton>
+			<MkButton primary rounded @click="createAnnouncement"><i class="ti ti-plus"></i> {{ globalLocale.env.createNew }}</MkButton>
 
 			<MkSelect v-model="announcementsStatus" :items="announcementsStatusDef">
-				<template #label>{{ $locale.sfc.filter }}</template>
+				<template #label>{{ globalLocale.env.filter }}</template>
 			</MkSelect>
 
 			<MkPagination :paginator="announcementsPaginator">
@@ -207,10 +208,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { computed, defineAsyncComponent, watch, ref, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@features/boot/frontend/shared/config.js';
-import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';
 import MkChart from '@features/statistics/frontend/components/MkChart.vue';
 import MkObjectView from '@features/ui/frontend/components/MkObjectView.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
@@ -225,7 +227,7 @@ import MkFileListForAdmin from '@features/drive/frontend/components/MkFileListFo
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { acct } from '@features/users/frontend/filters/user.js';
+import { acct } from '@features/users/frontend/shared/user.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
@@ -233,6 +235,10 @@ import { ensureSignin, iAmAdmin, iAmModerator } from '@features/auth/frontend/i.
 import MkRolePreview from '@features/roles/frontend/components/MkRolePreview.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -251,7 +257,7 @@ const {
 	def: chartSrcDef,
 } = useMkSelect({
 	items: [
-		{ label: $locale.value.sfc.notes, value: 'per-user-notes' },
+		{ label: globalLocale.value.env.notes, value: 'per-user-notes' },
 	],
 	initialValue: 'per-user-notes',
 });
@@ -262,6 +268,7 @@ const ap = ref<Misskey.Endpoints['ap/get']['res'] | null>(null);
 const moderator = ref(info.value.isModerator);
 const silenced = ref(info.value.isSilenced);
 const suspended = ref(info.value.isSuspended);
+const remoteSuspended = ref(info.value.isRemoteSuspended);
 const isSystem = ref(user.value.host == null && user.value.username.includes('.'));
 const moderationNote = ref(info.value.moderationNote);
 const filesPaginator = markRaw(new Paginator('admin/drive/files', {
@@ -318,6 +325,7 @@ async function refreshUser() {
 	moderator.value = info.value.isModerator;
 	silenced.value = info.value.isSilenced;
 	suspended.value = info.value.isSuspended;
+	remoteSuspended.value = info.value.isRemoteSuspended;
 	isSystem.value = user.value.host == null && user.value.username.includes('.');
 	moderationNote.value = info.value.moderationNote;
 }
@@ -463,17 +471,17 @@ async function assignRole() {
 	if (canceled || roleId == null) return;
 
 	const { canceled: canceled2, result: period } = await os.select({
-		title: $locale.value.sfc.period + ': ' + roles.find(r => r.id === roleId)!.name,
+		title: globalLocale.value.env.period + ': ' + roles.find(r => r.id === roleId)!.name,
 		items: [{
-			value: 'indefinitely', label: $locale.value.sfc.indefinitely,
+			value: 'indefinitely', label: globalLocale.value.env.indefinitely,
 		}, {
-			value: 'oneHour', label: $locale.value.sfc.oneHour,
+			value: 'oneHour', label: globalLocale.value.env.oneHour,
 		}, {
-			value: 'oneDay', label: $locale.value.sfc.oneDay,
+			value: 'oneDay', label: globalLocale.value.env.oneDay,
 		}, {
-			value: 'oneWeek', label: $locale.value.sfc.oneWeek,
+			value: 'oneWeek', label: globalLocale.value.env.oneWeek,
 		}, {
-			value: 'oneMonth', label: $locale.value.sfc.oneMonth,
+			value: 'oneMonth', label: globalLocale.value.env.oneMonth,
 		}],
 		default: 'indefinitely',
 	});
@@ -533,13 +541,13 @@ watch(user, () => {
 	}).then(res => {
 		ap.value = res;
 	});
-});
+}, { immediate: true });
 
 const headerActions = computed(() => []);
 
 const headerTabs = computed(() => isSystem.value ? [{
 	key: 'overview',
-	title: $locale.value.sfc.overview,
+	title: globalLocale.value.env.overview,
 	icon: 'ti ti-info-circle',
 }, {
 	key: 'raw',
@@ -547,7 +555,7 @@ const headerTabs = computed(() => isSystem.value ? [{
 	icon: 'ti ti-code',
 }] : [{
 	key: 'overview',
-	title: $locale.value.sfc.overview,
+	title: globalLocale.value.env.overview,
 	icon: 'ti ti-info-circle',
 }, {
 	key: 'roles',
@@ -555,15 +563,15 @@ const headerTabs = computed(() => isSystem.value ? [{
 	icon: 'ti ti-badges',
 }, {
 	key: 'announcements',
-	title: $locale.value.sfc.announcements,
+	title: globalLocale.value.env.announcements,
 	icon: 'ti ti-speakerphone',
 }, {
 	key: 'drive',
-	title: $locale.value.sfc.drive,
+	title: globalLocale.value.env.drive,
 	icon: 'ti ti-cloud',
 }, {
 	key: 'chart',
-	title: $locale.value.sfc.charts,
+	title: globalLocale.value.env.charts,
 	icon: 'ti ti-chart-line',
 }, {
 	key: 'raw',
@@ -711,12 +719,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "حساب أنشأه النظام ويُدار من قِبله.",
 	"instanceInfo": "معلومات مثيل الخادم",
-	"createdAt": "أُنشئ في",
 	"lastActiveDate": "آخر استخدام",
 	"email": "البريد الإلكتروني ",
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "حُدّث في",
 	"updateRemoteUser": "تحديث المعلومات عن المستخدم البعيد",
 	"suspend": "علِق",
 	"resetPassword": "أعد تعيين كلمتك السرية",
@@ -727,13 +733,9 @@ definePage(() => ({
 	"unsetUserBanner": "Unset banner",
 	"deleteAccount": "احذف الحساب",
 	"assign": "أسند",
-	"indefinitely": "أبدًا",
-	"createNew": "أنشِئ جديد",
-	"filter": "رشّح",
 	"messageRead": "مقروءة",
 	"recentNHours": "آخر {n} ساعة",
 	"recentNDays": "آخر {n} أيام",
-	"notes": "الملاحظات",
 	"active": "نشط",
 	"archived": "Archived",
 	"resetPasswordConfirm": "هل تريد إعادة تعيين كلمة السر؟",
@@ -747,17 +749,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "سيحذف حسابك نهائيًا، أتريد المتابعة؟",
 	"typeToConfirm": "أدخل {x} للتأكيد",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "ينتهي استطلاع الرأي في",
-	"oneHour": "ساعة",
-	"oneDay": "يوم",
-	"oneWeek": "أسبوع",
-	"oneMonth": "شهر",
 	"unassign": "ألغ الإسناد",
-	"overview": "ملخص عام",
 	"roles": "الأدوار",
-	"announcements": "الإعلانات",
-	"drive": "قرص التخرين",
-	"charts": "المنحنيات البيانية",
 	"userInfo": "معلومات المستخدم"
 }
 </locale>
@@ -766,12 +759,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Un compte creat i operat automàticament pel sistema.",
 	"instanceInfo": "Informació del fitxer d'instal·lació",
-	"createdAt": "Creat el",
 	"lastActiveDate": "Fet servir per última vegada",
 	"email": "Correu electrònic",
 	"moderationNote": "Nota de moderació ",
 	"moderationNoteDescription": "Pots escriure notes que es compartiran entre els moderadors.",
-	"updatedAt": "Actualitzat el",
 	"updateRemoteUser": "Actualitzar la informació de l'usuari remot",
 	"suspend": "Suspèn",
 	"resetPassword": "Restableix la contrasenya",
@@ -782,13 +773,9 @@ definePage(() => ({
 	"unsetUserBanner": "Desactiva el bàner ",
 	"deleteAccount": "Esborrar el compte",
 	"assign": "Assignar ",
-	"indefinitely": "Permanent",
-	"createNew": "Crear",
-	"filter": "Filtrar",
 	"messageRead": "Vist",
 	"recentNHours": "Últimes {n} hores",
 	"recentNDays": "Últims {n} dies",
-	"notes": "Notes",
 	"active": "Actiu",
 	"archived": "Arxivat",
 	"resetPasswordConfirm": "Vols canviar la teva contrasenya?",
@@ -802,17 +789,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Això eliminarà el teu compte irreversiblement. Procedir?",
 	"typeToConfirm": "Si us plau, escriu {x} per confirmar",
 	"roleChooseRoleToAssign": "Selecciona els rols a assignar",
-	"period": "Límit de temps",
-	"oneHour": "1 hora",
-	"oneDay": "Un dia",
-	"oneWeek": "Una setmana",
-	"oneMonth": "Un mes",
 	"unassign": "Treure",
-	"overview": "Visió General",
 	"roles": "Rols",
-	"announcements": "Avisos",
-	"drive": "Disc",
-	"charts": "Gràfics",
 	"userInfo": "Informació de l'usuari"
 }
 </locale>
@@ -821,12 +799,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Účet automaticky vytvořený a ovládaný serverem.",
 	"instanceInfo": "Informace o instanci",
-	"createdAt": "Vytvořeno",
 	"lastActiveDate": "Naposledy použito",
 	"email": "Email",
 	"moderationNote": "Poznámka moderátora",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "Upraveno",
 	"updateRemoteUser": "Aktualizovat informace o vzdáleném účtu",
 	"suspend": "Zmrazit",
 	"resetPassword": "Resetovat heslo",
@@ -837,13 +813,9 @@ definePage(() => ({
 	"unsetUserBanner": "Unset banner",
 	"deleteAccount": "Odstranit účet",
 	"assign": "Přiřadit",
-	"indefinitely": "Navždy",
-	"createNew": "Vytvořit nový",
-	"filter": "Filtr",
 	"messageRead": "Přečtené",
 	"recentNHours": "Posledních {n} hodin",
 	"recentNDays": "Posledních {n} dnů",
-	"notes": "Poznámky",
 	"active": "Aktivní",
 	"archived": "Archivované",
 	"resetPasswordConfirm": "Opravdu chcete resetovat heslo?",
@@ -857,17 +829,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Tohle nenávratně smaže váš účet, chcete pokračovat?",
 	"typeToConfirm": "Prosíme zadejte {x} pro potvrzení",
 	"roleChooseRoleToAssign": "Vyberte roli, kterou chcete přiřadit",
-	"period": "Časový limit",
-	"oneHour": "1 hodina",
-	"oneDay": "1 den",
-	"oneWeek": "1 týden",
-	"oneMonth": "1 měsíc",
 	"unassign": "Zrušit přirazení",
-	"overview": "Shrnutí",
 	"roles": "Role",
-	"announcements": "Oznámení",
-	"drive": "Úložiště",
-	"charts": "Grafy",
 	"userInfo": "Informace o uživateli"
 }
 </locale>
@@ -876,12 +839,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "An account created and automatically operated by the system.",
 	"instanceInfo": "Instance Information",
-	"createdAt": "Created at",
 	"lastActiveDate": "Last used at",
 	"email": "Email",
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "Updated at",
 	"updateRemoteUser": "Update remote user information",
 	"suspend": "Suspend",
 	"resetPassword": "Reset password",
@@ -892,13 +853,9 @@ definePage(() => ({
 	"unsetUserBanner": "Unset banner",
 	"deleteAccount": "Delete account",
 	"assign": "Assign",
-	"indefinitely": "Permanently",
-	"createNew": "Create new",
-	"filter": "Filter",
 	"messageRead": "Read",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
-	"notes": "Notes",
 	"active": "Active",
 	"archived": "Archived",
 	"resetPasswordConfirm": "Really reset your password?",
@@ -912,17 +869,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "This will irreversibly delete your account. Proceed?",
 	"typeToConfirm": "Please enter {x} to confirm",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Time limit",
-	"oneHour": "One hour",
-	"oneDay": "One day",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"unassign": "Unassign",
-	"overview": "Overview",
 	"roles": "Roles",
-	"announcements": "Announcements",
-	"drive": "Drive",
-	"charts": "Charts",
 	"userInfo": "User information"
 }
 </locale>
@@ -931,12 +879,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Ein Benutzerkonto, das durch das System erstellt und automatisch verwaltet wird.",
 	"instanceInfo": "Instanzinformationen",
-	"createdAt": "Erstellt am",
 	"lastActiveDate": "Zuletzt verwendet am",
 	"email": "Email",
 	"moderationNote": "Moderationsnotiz",
 	"moderationNoteDescription": "Trage hier Notizen ein. Diese sind nur für die Moderatoren sichtbar.",
-	"updatedAt": "Zuletzt geändert am",
 	"updateRemoteUser": "Benutzerinformationen aktualisieren",
 	"suspend": "Sperren",
 	"resetPassword": "Passwort zurücksetzen",
@@ -947,13 +893,9 @@ definePage(() => ({
 	"unsetUserBanner": "Entferne Profilbanner",
 	"deleteAccount": "Benutzerkonto löschen",
 	"assign": "Zuweisen",
-	"indefinitely": "Dauerhaft",
-	"createNew": "Neu erstellen",
-	"filter": "Filter",
 	"messageRead": "Gelesen",
 	"recentNHours": "Letzte {n} Stunden",
 	"recentNDays": "Letzte {n} Tage",
-	"notes": "Notizen",
 	"active": "Aktiv",
 	"archived": "Archiviert",
 	"resetPasswordConfirm": "Wirklich Passwort zurücksetzen?",
@@ -967,17 +909,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Dein Benutzerkonto wird unwiderruflich gelöscht. Trotzdem fortfahren?",
 	"typeToConfirm": "Bitte gib zur Bestätigung {x} ein",
 	"roleChooseRoleToAssign": "Zuzuweisende Rolle auswählen",
-	"period": "Zeitlimit",
-	"oneHour": "Eine Stunde",
-	"oneDay": "Einen Tag",
-	"oneWeek": "Eine Woche",
-	"oneMonth": "1 Monat",
 	"unassign": "Entfernen",
-	"overview": "Übersicht",
 	"roles": "Rollen",
-	"announcements": "Ankündigungen",
-	"drive": "Drive",
-	"charts": "Diagramme",
 	"userInfo": "Benutzerinformation"
 }
 </locale>
@@ -986,12 +919,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "An account created and automatically operated by the system.",
 	"instanceInfo": "Instance Information",
-	"createdAt": "Created at",
 	"lastActiveDate": "Last used at",
 	"email": "Email",
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "Updated at",
 	"updateRemoteUser": "Update remote user information",
 	"suspend": "Suspend",
 	"resetPassword": "Reset password",
@@ -1002,13 +933,9 @@ definePage(() => ({
 	"unsetUserBanner": "Unset banner",
 	"deleteAccount": "Delete account",
 	"assign": "Assign",
-	"indefinitely": "Permanently",
-	"createNew": "Create new",
-	"filter": "Filter",
 	"messageRead": "Read",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
-	"notes": "Notes",
 	"active": "Active",
 	"archived": "Archived",
 	"resetPasswordConfirm": "Really reset your password?",
@@ -1022,17 +949,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "This will irreversibly delete your account. Proceed?",
 	"typeToConfirm": "Please enter {x} to confirm",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Time limit",
-	"oneHour": "One hour",
-	"oneDay": "One day",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"unassign": "Unassign",
-	"overview": "Overview",
 	"roles": "Roles",
-	"announcements": "Announcements",
-	"drive": "Drive",
-	"charts": "Charts",
 	"userInfo": "User information"
 }
 </locale>
@@ -1041,12 +959,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Cuenta creada y operada automáticamente por el sistema",
 	"instanceInfo": "Información de la instancia",
-	"createdAt": "Fecha de creación",
 	"lastActiveDate": "Utilizado por última vez el",
 	"email": "Correo",
 	"moderationNote": "Nota de moderación",
 	"moderationNoteDescription": "Puedes rellenar notas que solo se comparten entre moderadores.",
-	"updatedAt": "Actualizado",
 	"updateRemoteUser": "Actualizar información de usuario remoto",
 	"suspend": "Suspender",
 	"resetPassword": "Resetear contraseña",
@@ -1057,13 +973,9 @@ definePage(() => ({
 	"unsetUserBanner": "Quitar banner",
 	"deleteAccount": "Borrar cuenta",
 	"assign": "Asignar",
-	"indefinitely": "Sin límite de tiempo",
-	"createNew": "Crear Nuevo",
-	"filter": "Filtrar",
 	"messageRead": "Ya leído",
 	"recentNHours": "Últimas {n} horas",
 	"recentNDays": "Últimos {n} días",
-	"notes": "Notas",
 	"active": "Activo",
 	"archived": "Archivado",
 	"resetPasswordConfirm": "¿Realmente quieres cambiar la contraseña?",
@@ -1077,17 +989,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "La cuenta será borrada. ¿Está seguro?",
 	"typeToConfirm": "Ingrese {x} para confirmar",
 	"roleChooseRoleToAssign": "Selecciona el rol para asignar",
-	"period": "Termina el",
-	"oneHour": "1 hora",
-	"oneDay": "1 día",
-	"oneWeek": "1 semana",
-	"oneMonth": "1 mes",
 	"unassign": "Quitar",
-	"overview": "Resumen",
 	"roles": "Roles",
-	"announcements": "Avisos",
-	"drive": "Drive",
-	"charts": "Métricas",
 	"userInfo": "Información del usuario"
 }
 </locale>
@@ -1096,12 +999,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Ces comptes sont automatiquement créés et gérés par le système.",
 	"instanceInfo": "Informations sur l’instance",
-	"createdAt": "Date de création",
 	"lastActiveDate": "Dernière utilisation",
 	"email": "E-mail ",
 	"moderationNote": "Note de modération",
 	"moderationNoteDescription": "Vous pouvez remplir des notes qui seront partagés seulement entre modérateurs.",
-	"updatedAt": "Mis à jour le",
 	"updateRemoteUser": "Mettre à jour les informations de l’utilisateur·rice distant·e",
 	"suspend": "Suspendre",
 	"resetPassword": "Réinitialiser le mot de passe",
@@ -1112,13 +1013,9 @@ definePage(() => ({
 	"unsetUserBanner": "Supprimer la bannière",
 	"deleteAccount": "Supprimer le compte",
 	"assign": "Attribuer",
-	"indefinitely": "Illimité",
-	"createNew": "Créer",
-	"filter": "Filtre",
 	"messageRead": "Lu",
 	"recentNHours": "Dernières {n} heures",
 	"recentNDays": "Derniers {n} jours",
-	"notes": "Notes",
 	"active": "Actif·ve",
 	"archived": "Archivé",
 	"resetPasswordConfirm": "Souhaitez-vous réinitialiser votre mot de passe\u00a0?",
@@ -1132,17 +1029,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Votre compte sera supprimé. Êtes vous certain ?",
 	"typeToConfirm": "Pour effectuer cette opération, tapez {x}",
 	"roleChooseRoleToAssign": "Sélectionner le rôle à assigner",
-	"period": "Fin du sondage",
-	"oneHour": "1 heure",
-	"oneDay": "1 jour",
-	"oneWeek": "1 semaine",
-	"oneMonth": "Un mois",
 	"unassign": "Retirer",
-	"overview": "Aperçu",
 	"roles": "Rôles",
-	"announcements": "Annonces",
-	"drive": "Disque",
-	"charts": "Graphiques",
 	"userInfo": "Informations sur l'utilisateur·rice"
 }
 </locale>
@@ -1151,12 +1039,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Akun yang dibuat dan otomatis dioperasikan oleh sistem.",
 	"instanceInfo": "Informasi Instansi",
-	"createdAt": "Dibuat pada",
 	"lastActiveDate": "Terakhir digunakan",
 	"email": "Surel",
 	"moderationNote": "Catatan moderasi",
 	"moderationNoteDescription": "Anda dapat mengisi note yang hanya akan dibagikan diantara moderator.",
-	"updatedAt": "Diperbarui pada",
 	"updateRemoteUser": "Perbaharui informasi pengguna instansi luar",
 	"suspend": "Tangguhkan",
 	"resetPassword": "Atur ulang kata sandi",
@@ -1167,13 +1053,9 @@ definePage(() => ({
 	"unsetUserBanner": "Hapus banner",
 	"deleteAccount": "Hapus Akun",
 	"assign": "Tetapkan\n",
-	"indefinitely": "Selamanya",
-	"createNew": "Buat baru",
-	"filter": "Saring",
 	"messageRead": "Telah dibaca",
 	"recentNHours": "{n} jam terakhir",
 	"recentNDays": "{n} hari terakhir",
-	"notes": "Catatan",
 	"active": "Aktif",
 	"archived": "Diarsipkan",
 	"resetPasswordConfirm": "Yakin untuk mereset kata sandimu?",
@@ -1187,17 +1069,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Akun akan dihapus. Apakah kamu yakin?",
 	"typeToConfirm": "Mohon masukkan {x} untuk mengonfirmasi",
 	"roleChooseRoleToAssign": "Pilih peran yang ditugaskan",
-	"period": "Batas akhir",
-	"oneHour": "1 Jam",
-	"oneDay": "1 Hari",
-	"oneWeek": "1 Bulan",
-	"oneMonth": "satu bulan",
 	"unassign": "Batalkan penetapan",
-	"overview": "Ikhtisar",
 	"roles": "Peran",
-	"announcements": "Pengumuman",
-	"drive": "Drive",
-	"charts": "Grafik",
 	"userInfo": "Informasi pengguna"
 }
 </locale>
@@ -1206,12 +1079,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Si tratta di un profilo creato e gestito automaticamente dal sistema.",
 	"instanceInfo": "Informazioni sul server",
-	"createdAt": "Data di creazione",
 	"lastActiveDate": "Data dell'ultimo utilizzo",
 	"email": "Email",
 	"moderationNote": "Promemoria di moderazione",
 	"moderationNoteDescription": "Puoi scrivere promemoria condivisi solo tra moderatori.",
-	"updatedAt": "Aggiornato il",
 	"updateRemoteUser": "Aggiorna dati dal profilo remoto",
 	"suspend": "Sospensione",
 	"resetPassword": "Ripristina la password",
@@ -1222,13 +1093,9 @@ definePage(() => ({
 	"unsetUserBanner": "Rimuovi intestazione profilo",
 	"deleteAccount": "Eliminazione profilo",
 	"assign": "Assegna",
-	"indefinitely": "Non scade",
-	"createNew": "Crea",
-	"filter": "Filtri",
 	"messageRead": "Visualizzato",
 	"recentNHours": "Ultime {n} ore",
 	"recentNDays": "Ultimi {n} giorni",
-	"notes": "Note",
 	"active": "Attivo",
 	"archived": "Archiviato",
 	"resetPasswordConfirm": "Vuoi davvero ripristinare la password?",
@@ -1242,31 +1109,21 @@ definePage(() => ({
 	"deleteAccountConfirm": "Così verrà eliminato il profilo. Vuoi procedere?",
 	"typeToConfirm": "Digita {x} per continuare",
 	"roleChooseRoleToAssign": "Seleziona il ruolo da assegnare",
-	"period": "Scadenza",
-	"oneHour": "1 ora",
-	"oneDay": "1 giorno",
-	"oneWeek": "1 settimana",
-	"oneMonth": "Un mese",
 	"unassign": "Disassegna",
-	"overview": "Anteprima",
 	"roles": "Ruoli",
-	"announcements": "Annunci",
-	"drive": "Drive",
-	"charts": "Grafici",
 	"userInfo": "Informazioni sul profilo"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
+	"remoteSuspended": "リモートで凍結済み",
 	"isSystemAccount": "システムにより自動で作成・管理されているアカウントです。",
 	"instanceInfo": "サーバー情報",
-	"createdAt": "作成日時",
 	"lastActiveDate": "最終利用日時",
 	"email": "メール",
 	"moderationNote": "モデレーションノート",
 	"moderationNoteDescription": "モデレーター間でだけ共有されるメモを記入することができます。",
-	"updatedAt": "更新日時",
 	"updateRemoteUser": "リモートユーザー情報の更新",
 	"suspend": "凍結",
 	"resetPassword": "パスワードをリセット",
@@ -1277,13 +1134,9 @@ definePage(() => ({
 	"unsetUserBanner": "バナーを解除",
 	"deleteAccount": "アカウント削除",
 	"assign": "アサイン",
-	"indefinitely": "無期限",
-	"createNew": "新規作成",
-	"filter": "フィルタ",
 	"messageRead": "既読",
 	"recentNHours": "直近{n}時間",
 	"recentNDays": "直近{n}日",
-	"notes": "ノート",
 	"active": "アクティブ",
 	"archived": "アーカイブ済み",
 	"resetPasswordConfirm": "パスワードリセットしますか？",
@@ -1297,17 +1150,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "アカウントが削除されます。よろしいですか？",
 	"typeToConfirm": "この操作を行うには {x} と入力してください",
 	"roleChooseRoleToAssign": "アサインするロールを選択",
-	"period": "期限",
-	"oneHour": "1時間",
-	"oneDay": "1日",
-	"oneWeek": "1週間",
-	"oneMonth": "1ヶ月",
 	"unassign": "アサインを解除",
-	"overview": "概要",
 	"roles": "ロール",
-	"announcements": "お知らせ",
-	"drive": "ドライブ",
-	"charts": "チャート",
 	"userInfo": "ユーザー情報"
 }
 </locale>
@@ -1316,12 +1160,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "システムが自動で作成・管理しとるアカウントやで。",
 	"instanceInfo": "サーバー情報",
-	"createdAt": "作成した日",
 	"lastActiveDate": "最後に使った日時",
 	"email": "メール",
 	"moderationNote": "モデレーションノート",
 	"moderationNoteDescription": "モデレーターの中だけで共有するメモを入れれるで。",
-	"updatedAt": "更新日時",
 	"updateRemoteUser": "リモートユーザー情報の更新してくれん？",
 	"suspend": "凍結",
 	"resetPassword": "パスワードをリセット",
@@ -1332,13 +1174,9 @@ definePage(() => ({
 	"unsetUserBanner": "バナー戻す",
 	"deleteAccount": "アカウント削除するで",
 	"assign": "アサイン",
-	"indefinitely": "無期限",
-	"createNew": "新しく作るで",
-	"filter": "フィルタ",
 	"messageRead": "もう読んだ",
 	"recentNHours": "直近{n}時間",
 	"recentNDays": "直近{n}日",
-	"notes": "ノート",
 	"active": "アクティブ",
 	"archived": "アーカイブ済み",
 	"resetPasswordConfirm": "パスワード作り直すんでええな？",
@@ -1352,17 +1190,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "アカウントを消すで？ええんか？",
 	"typeToConfirm": "これやるんなら {x} って入力してなー",
 	"roleChooseRoleToAssign": "アサインするロール選ぶ",
-	"period": "期限",
-	"oneHour": "1時間",
-	"oneDay": "1日",
-	"oneWeek": "1週間",
-	"oneMonth": "1ヶ月",
 	"unassign": "アサインやめる",
-	"overview": "概要",
 	"roles": "ロール",
-	"announcements": "お知らせ",
-	"drive": "ドライブ",
-	"charts": "チャート",
 	"userInfo": "ユーザー情報やで"
 }
 </locale>
@@ -1371,12 +1200,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "An account created and automatically operated by the system.",
 	"instanceInfo": "Instance Information",
-	"createdAt": "Created at",
 	"lastActiveDate": "Last used at",
 	"email": "Imayl",
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "Updated at",
 	"updateRemoteUser": "Update remote user information",
 	"suspend": "Suspend",
 	"resetPassword": "Reset password",
@@ -1387,13 +1214,9 @@ definePage(() => ({
 	"unsetUserBanner": "Unset banner",
 	"deleteAccount": "Delete account",
 	"assign": "Assign",
-	"indefinitely": "Permanently",
-	"createNew": "Create new",
-	"filter": "Filter",
 	"messageRead": "Read",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
-	"notes": "Notes",
 	"active": "Active",
 	"archived": "Archived",
 	"resetPasswordConfirm": "Really reset your password?",
@@ -1407,17 +1230,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "This will irreversibly delete your account. Proceed?",
 	"typeToConfirm": "Please enter {x} to confirm",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Time limit",
-	"oneHour": "One hour",
-	"oneDay": "One day",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"unassign": "Unassign",
-	"overview": "Overview",
 	"roles": "Roles",
-	"announcements": "Announcements",
-	"drive": "Drive",
-	"charts": "Charts",
 	"userInfo": "User information"
 }
 </locale>
@@ -1426,12 +1240,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "An account created and automatically operated by the system.",
 	"instanceInfo": "Instance Information",
-	"createdAt": "Created at",
 	"lastActiveDate": "Last used at",
 	"email": "Email",
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "Updated at",
 	"updateRemoteUser": "Update remote user information",
 	"suspend": "Suspend",
 	"resetPassword": "Reset password",
@@ -1442,13 +1254,9 @@ definePage(() => ({
 	"unsetUserBanner": "Unset banner",
 	"deleteAccount": "Delete account",
 	"assign": "Assign",
-	"indefinitely": "Permanently",
-	"createNew": "Create new",
-	"filter": "Filter",
 	"messageRead": "Read",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
-	"notes": "Notes",
 	"active": "Active",
 	"archived": "Archived",
 	"resetPasswordConfirm": "Really reset your password?",
@@ -1462,17 +1270,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "This will irreversibly delete your account. Proceed?",
 	"typeToConfirm": "Please enter {x} to confirm",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Time limit",
-	"oneHour": "One hour",
-	"oneDay": "One day",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"unassign": "Unassign",
-	"overview": "Overview",
 	"roles": "Roles",
-	"announcements": "Announcements",
-	"drive": "Drive",
-	"charts": "Charts",
 	"userInfo": "User information"
 }
 </locale>
@@ -1481,12 +1280,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "시스템에 의해 자동으로 생성되어 관리되는 계정입니다.",
 	"instanceInfo": "서버 정보",
-	"createdAt": "생성된 날짜",
 	"lastActiveDate": "마지막 이용",
 	"email": "이메일",
 	"moderationNote": "조정 기록",
 	"moderationNoteDescription": "모더레이터 역할을 가진 유저만 보이는 메모를 적을 수 있습니다.",
-	"updatedAt": "수정한 날짜",
 	"updateRemoteUser": "리모트 유저 정보 갱신",
 	"suspend": "정지",
 	"resetPassword": "비밀번호 재설정",
@@ -1497,13 +1294,9 @@ definePage(() => ({
 	"unsetUserBanner": "배너 제거",
 	"deleteAccount": "계정 삭제",
 	"assign": "할당",
-	"indefinitely": "무기한",
-	"createNew": "새로 만들기",
-	"filter": "필터",
 	"messageRead": "읽음",
 	"recentNHours": "최근 {n}시간",
 	"recentNDays": "최근 {n}일",
-	"notes": "노트",
 	"active": "최근에 활동함",
 	"archived": "아카이브 됨",
 	"resetPasswordConfirm": "비밀번호를 재설정하시겠습니까?",
@@ -1517,17 +1310,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "계정이 삭제되고 되돌릴 수 없게 됩니다. 계속하시겠습니까? ",
 	"typeToConfirm": "계속하시려면 {x} 을 입력하세요",
 	"roleChooseRoleToAssign": "할당할 역할 선택",
-	"period": "기간",
-	"oneHour": "1시간",
-	"oneDay": "1일",
-	"oneWeek": "일주일",
-	"oneMonth": "1개월",
 	"unassign": "할당 취소",
-	"overview": "요약",
 	"roles": "역할",
-	"announcements": "공지사항",
-	"drive": "드라이브",
-	"charts": "차트",
 	"userInfo": "유저 정보"
 }
 </locale>
@@ -1536,12 +1320,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "An account created and automatically operated by the system.",
 	"instanceInfo": "Serverinformatie",
-	"createdAt": "Aangemaakt at",
 	"lastActiveDate": "Last used at",
 	"email": "Email",
 	"moderationNote": "Moderatienotitie",
 	"moderationNoteDescription": "Voer hier notities in. Deze zijn alleen zichtbaar voor de moderators.",
-	"updatedAt": "Laatst gewijzigd at",
 	"updateRemoteUser": "Gebruikersinformatie bijwerken",
 	"suspend": "Opschorten",
 	"resetPassword": "Wachtwoord terugzetten",
@@ -1552,13 +1334,9 @@ definePage(() => ({
 	"unsetUserBanner": "Banner verwijderen",
 	"deleteAccount": "Delete account",
 	"assign": "Assign",
-	"indefinitely": "Permanently",
-	"createNew": "Nieuwe aanmaken",
-	"filter": "Filter",
 	"messageRead": "Lezen",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
-	"notes": "Notities",
 	"active": "Actief",
 	"archived": "Gearchiveerd",
 	"resetPasswordConfirm": "Really reset your password?",
@@ -1572,17 +1350,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Je gebruikersaccount wordt onherroepelijk verwijderd. Wil je nog steeds doorgaan?",
 	"typeToConfirm": "Please enter {x} to confirm",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Time limit",
-	"oneHour": "One hour",
-	"oneDay": "One day",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"unassign": "Unassign",
-	"overview": "Overzicht",
 	"roles": "Roles",
-	"announcements": "Aankondigingen",
-	"drive": "Schijf",
-	"charts": "Grafieken",
 	"userInfo": "Gebruikersinformatie"
 }
 </locale>
@@ -1591,12 +1360,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "An account created and automatically operated by the system.",
 	"instanceInfo": "Serverinformasjon",
-	"createdAt": "Created at",
 	"lastActiveDate": "Last used at",
 	"email": "E-post",
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "Updated at",
 	"updateRemoteUser": "Update remote user information",
 	"suspend": "Suspender",
 	"resetPassword": "Reset password",
@@ -1607,13 +1374,9 @@ definePage(() => ({
 	"unsetUserBanner": "Unset banner",
 	"deleteAccount": "Slett konto",
 	"assign": "Assign",
-	"indefinitely": "Permanently",
-	"createNew": "Create new",
-	"filter": "Filter",
 	"messageRead": "Lest",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
-	"notes": "Notes",
 	"active": "Active",
 	"archived": "Archived",
 	"resetPasswordConfirm": "Really reset your password?",
@@ -1627,17 +1390,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "This will irreversibly delete your account. Proceed?",
 	"typeToConfirm": "Please enter {x} to confirm",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Time limit",
-	"oneHour": "1 time",
-	"oneDay": "1 dag",
-	"oneWeek": "1 uke",
-	"oneMonth": "1 måned",
 	"unassign": "Unassign",
-	"overview": "Overview",
 	"roles": "Roller",
-	"announcements": "Kunngjøringer",
-	"drive": "Drive",
-	"charts": "Diagrammer",
 	"userInfo": "User information"
 }
 </locale>
@@ -1646,12 +1400,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "To jest konto stworzone i zarządzane przez system",
 	"instanceInfo": "Informacje o instancji",
-	"createdAt": "Utworzono",
 	"lastActiveDate": "Ostatnio użyte w",
 	"email": "Adres e-mail",
 	"moderationNote": "Notka moderacyjna",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "Zaktualizowano",
 	"updateRemoteUser": "Aktualizuj zdalne dane o użytkowniku",
 	"suspend": "Zawieś",
 	"resetPassword": "Zresetuj hasło",
@@ -1662,13 +1414,9 @@ definePage(() => ({
 	"unsetUserBanner": "Usuń baner",
 	"deleteAccount": "Usuń konto",
 	"assign": "Przydziel",
-	"indefinitely": "Nigdy",
-	"createNew": "Utwórz nowy",
-	"filter": "Filtr",
 	"messageRead": "Przeczytano",
 	"recentNHours": "W ciągu ostatnich {n} godzin",
 	"recentNDays": "W ciągu ostatnich {n} dni",
-	"notes": "Wpisy",
 	"active": "Aktywny",
 	"archived": "Archived",
 	"resetPasswordConfirm": "Really reset your password?",
@@ -1682,17 +1430,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Spowoduje to nieodwracalne usunięcie Twojego konta. Kontynuować?",
 	"typeToConfirm": "Wprowadź {x}, aby potwierdzić",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Ankieta kończy się",
-	"oneHour": "1 godzina",
-	"oneDay": "1 dzień",
-	"oneWeek": "1 tydzień",
-	"oneMonth": "jeden miesiąc",
 	"unassign": "Cofnij przydzielenie",
-	"overview": "Przegląd",
 	"roles": "Role",
-	"announcements": "Ogłoszenia",
-	"drive": "Dysk",
-	"charts": "Wykresy",
 	"userInfo": "Informacje o użykowniku"
 }
 </locale>
@@ -1701,12 +1440,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "É uma conta criada e gerenciada automaticamente pelo sistema.",
 	"instanceInfo": "Informações da instância",
-	"createdAt": "Data de criação",
 	"lastActiveDate": "Última data de uso",
 	"email": "E-mail",
 	"moderationNote": "Nota de moderação",
 	"moderationNoteDescription": "Você pode preencher notas que serão compartilhadas apenas com moderadores.",
-	"updatedAt": "Última atualização",
 	"updateRemoteUser": "Atualizar informações do usuário remoto",
 	"suspend": "Suspender",
 	"resetPassword": "Redefinir senha",
@@ -1717,13 +1454,9 @@ definePage(() => ({
 	"unsetUserBanner": "Remover banner",
 	"deleteAccount": "Excluir conta",
 	"assign": "Atribuir",
-	"indefinitely": "Indefinitivamente",
-	"createNew": "Criar novo",
-	"filter": "Filtrar",
 	"messageRead": "Lida",
 	"recentNHours": "Últimas {n} horas",
 	"recentNDays": "Últimos {n} dias",
-	"notes": "Posts",
 	"active": "Ativo",
 	"archived": "Arquivado",
 	"resetPasswordConfirm": "Deseja realmente mudar a sua senha?",
@@ -1737,17 +1470,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Deseja realmente excluir a conta?",
 	"typeToConfirm": "Para realizar essa operação, digite {x}.",
 	"roleChooseRoleToAssign": "Selecionar o cargo a ser atribuído",
-	"period": "Data limite",
-	"oneHour": "1 hora",
-	"oneDay": "1 dia",
-	"oneWeek": "1 semana",
-	"oneMonth": "1 mês",
 	"unassign": "Remover",
-	"overview": "Visão geral",
 	"roles": "Cargos",
-	"announcements": "Avisos",
-	"drive": "Drive",
-	"charts": "Gráfico",
 	"userInfo": "Informações do Usuário"
 }
 </locale>
@@ -1756,12 +1480,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Данная учётная запись создана автоматически и управляется системой",
 	"instanceInfo": "Информация об инстансе",
-	"createdAt": "Создано",
 	"lastActiveDate": "Последняя дата использования",
 	"email": "Электронная почта",
 	"moderationNote": "Примечания модератора",
 	"moderationNoteDescription": "Вы можете заполнять заметки, которые будут доступны только модераторам.",
-	"updatedAt": "Обновлено",
 	"updateRemoteUser": "Обновить данные пользователя с его сервера",
 	"suspend": "Заморозить",
 	"resetPassword": "Сброс пароля:",
@@ -1772,13 +1494,9 @@ definePage(() => ({
 	"unsetUserBanner": "Убрать баннер",
 	"deleteAccount": "Удаление учётной записи",
 	"assign": "Назначить",
-	"indefinitely": "вечно",
-	"createNew": "Новый документ",
-	"filter": "Фильтры",
 	"messageRead": "Прочитали",
 	"recentNHours": "Последние {n} ч",
 	"recentNDays": "Последние {n} сут",
-	"notes": "Заметки",
 	"active": "Действует",
 	"archived": "Архивировано",
 	"resetPasswordConfirm": "Сбросить пароль?",
@@ -1792,17 +1510,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Учётная запись будет безвозвратно удалена. Подтверждаете?",
 	"typeToConfirm": "Введите {x} для продолжения",
 	"roleChooseRoleToAssign": "Выберите роль, которую хотите выдать",
-	"period": "Опрос длится",
-	"oneHour": "1 час",
-	"oneDay": "1 день",
-	"oneWeek": "1 неделя",
-	"oneMonth": "1 месяц",
 	"unassign": "Отменить назначение",
-	"overview": "Обзор",
 	"roles": "Роли",
-	"announcements": "Оповещения",
-	"drive": "Диск",
-	"charts": "Диаграммы",
 	"userInfo": "Сведения о пользователе"
 }
 </locale>
@@ -1811,12 +1520,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Tieto účty automaticky vytvoril a spravuje systém.",
 	"instanceInfo": "Informácie o serveri",
-	"createdAt": "Vytvorené",
 	"lastActiveDate": "Last used at",
 	"email": "Email",
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "Upravené",
 	"updateRemoteUser": "Aktualizovať informácie o vzdialenom účte",
 	"suspend": "Zmraziť",
 	"resetPassword": "Resetovať heslo",
@@ -1827,13 +1534,9 @@ definePage(() => ({
 	"unsetUserBanner": "Unset banner",
 	"deleteAccount": "Vymazať účet",
 	"assign": "Assign",
-	"indefinitely": "Navždy",
-	"createNew": "Vytvoriť nový",
-	"filter": "Filter",
 	"messageRead": "Prečítané",
 	"recentNHours": "Posledných {n} hodín",
 	"recentNDays": "Posledných {n} dní",
-	"notes": "Poznámky",
 	"active": "Aktívny",
 	"archived": "Archived",
 	"resetPasswordConfirm": "Really reset your password?",
@@ -1847,17 +1550,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Toto nezvrátiteľne vymaže váš účet. Pokračovať?",
 	"typeToConfirm": "Ak chcete vykonať túto operáciu, napíšte {x}",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Ukončiť hlasovanie",
-	"oneHour": "1 hodina",
-	"oneDay": "1 deň",
-	"oneWeek": "1 týždeň",
-	"oneMonth": "1 mesiac",
 	"unassign": "Unassign",
-	"overview": "Prehľad",
 	"roles": "Roles",
-	"announcements": "Oznamy",
-	"drive": "Disk",
-	"charts": "Grafy",
 	"userInfo": "Informácie o používateľovi"
 }
 </locale>
@@ -1866,12 +1560,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "บัญชีที่ถูกสร้างมานั้น และถูกดำเนินการโดยอัตโนมัติด้วยระบบ",
 	"instanceInfo": "ข้อมูลเซิร์ฟเวอร์",
-	"createdAt": "สร้างเมื่อ",
 	"lastActiveDate": "ใช้งานล่าสุดเมื่อ",
 	"email": "อีเมล",
 	"moderationNote": "โน้ตการกลั่นกรอง",
 	"moderationNoteDescription": "สามารถจดเมโมที่จะแบ่งปันเฉพาะระหว่างผู้ควบคุมได้",
-	"updatedAt": "อัปเดตล่าสุด",
 	"updateRemoteUser": "อัปเดตข้อมูลผู้ใช้ระยะไกล",
 	"suspend": "ระงับ",
 	"resetPassword": "รีเซ็ตรหัสผ่าน",
@@ -1882,13 +1574,9 @@ definePage(() => ({
 	"unsetUserBanner": "เลิกตั้งแบนเนอร์",
 	"deleteAccount": "ลบบัญชี",
 	"assign": "มอบหมาย",
-	"indefinitely": "ตลอดไป",
-	"createNew": "สร้างใหม่",
-	"filter": "กรอง",
 	"messageRead": "อ่านแล้ว",
 	"recentNHours": "ล่าสุด {n} ชั่วโมงที่แล้ว",
 	"recentNDays": "ล่าสุด {n} วันที่แล้ว",
-	"notes": " โน้ต",
 	"active": "ใช้งานอยู่",
 	"archived": "เก็บถาวรแล้ว",
 	"resetPasswordConfirm": "ต้องการรีเซ็ตรหัสผ่านใช่ไหม?",
@@ -1902,17 +1590,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "บัญชีจะถูกลบ ดำเนินการต่อใช่ไหม?",
 	"typeToConfirm": "โปรดป้อน {x} เพื่อยืนยัน",
 	"roleChooseRoleToAssign": "เลือกบทบาทที่ต้องการกำหนด",
-	"period": "ระยะเวลา",
-	"oneHour": "1 ชั่วโมง",
-	"oneDay": "1 วัน",
-	"oneWeek": "1 สัปดาห์",
-	"oneMonth": "หนึ่งเดือน",
 	"unassign": "เลิกมอบหมาย",
-	"overview": "ภาพรวม",
 	"roles": "บทบาท",
-	"announcements": "ประกาศ",
-	"drive": "ไดรฟ์",
-	"charts": "แผนภูมิ",
 	"userInfo": "ข้อมูลผู้ใช้"
 }
 </locale>
@@ -1921,12 +1600,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Sistem tarafından oluşturulan ve otomatik olarak işletilen bir hesap.",
 	"instanceInfo": "Sunucu Bilgisi",
-	"createdAt": "Oluşturuldu",
 	"lastActiveDate": "Son kullanımı",
 	"email": "E-Posta",
 	"moderationNote": "Moderasyon notu",
 	"moderationNoteDescription": "Moderatörler arasında paylaşılacak notları girebilirsin.",
-	"updatedAt": "Güncellendi",
 	"updateRemoteUser": "Uzak kullanıcı bilgilerini güncelle",
 	"suspend": "askıya al",
 	"resetPassword": "Şifreyi sıfırla",
@@ -1937,13 +1614,9 @@ definePage(() => ({
 	"unsetUserBanner": "Banner'ı kaldır",
 	"deleteAccount": "Hesabı sil",
 	"assign": "Atama",
-	"indefinitely": "Kalıcı olarak",
-	"createNew": "Yeni oluştur",
-	"filter": "Filtre",
 	"messageRead": "Oku",
 	"recentNHours": "Son {n} saat",
 	"recentNDays": "Son {n} gün",
-	"notes": "Notlar",
 	"active": "Aktif",
 	"archived": "Arşivle",
 	"resetPasswordConfirm": "Şifreni gerçekten sıfırlamak istiyor musun?",
@@ -1957,17 +1630,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Bu, hesabını geri dönüşü olmayan bir şekilde silecek. Devam etmek istiyor musun?",
 	"typeToConfirm": "Onaylamak için lütfen {x} girin.",
 	"roleChooseRoleToAssign": "Atamak istediğin rolü seç",
-	"period": "Zaman sınırı",
-	"oneHour": "1 saat",
-	"oneDay": "1 gün",
-	"oneWeek": "1 hafta",
-	"oneMonth": "1 ay",
 	"unassign": "Atamayı kaldır",
-	"overview": "Genel Bakış",
 	"roles": "Roller",
-	"announcements": "Duyurular",
-	"drive": "Drive",
-	"charts": "Grafikler",
 	"userInfo": "Kullanıcı hakkında"
 }
 </locale>
@@ -1976,12 +1640,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "An account created and automatically operated by the system.",
 	"instanceInfo": "Instance Information",
-	"createdAt": "Created at",
 	"lastActiveDate": "Last used at",
 	"email": "Email",
 	"moderationNote": "Moderation note",
 	"moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-	"updatedAt": "Updated at",
 	"updateRemoteUser": "Update remote user information",
 	"suspend": "Suspend",
 	"resetPassword": "Reset password",
@@ -1992,13 +1654,9 @@ definePage(() => ({
 	"unsetUserBanner": "Unset banner",
 	"deleteAccount": "Delete account",
 	"assign": "Assign",
-	"indefinitely": "Permanently",
-	"createNew": "Create new",
-	"filter": "Filter",
 	"messageRead": "Read",
 	"recentNHours": "Last {n} hours",
 	"recentNDays": "Last {n} days",
-	"notes": "Notes",
 	"active": "Active",
 	"archived": "Archived",
 	"resetPasswordConfirm": "Really reset your password?",
@@ -2012,17 +1670,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "This will irreversibly delete your account. Proceed?",
 	"typeToConfirm": "Please enter {x} to confirm",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Time limit",
-	"oneHour": "One hour",
-	"oneDay": "One day",
-	"oneWeek": "One week",
-	"oneMonth": "One month",
 	"unassign": "Unassign",
-	"overview": "Overview",
 	"roles": "Roles",
-	"announcements": "Announcements",
-	"drive": "Drive",
-	"charts": "Charts",
 	"userInfo": "User information"
 }
 </locale>
@@ -2031,12 +1680,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Акаунт, створений і автоматично керований системою.",
 	"instanceInfo": "Про цей інстанс",
-	"createdAt": "Створено",
 	"lastActiveDate": "Останнє використання",
 	"email": "E-mail",
 	"moderationNote": "Модераторська нотатка",
 	"moderationNoteDescription": "Ви можете додати нотатки, які будуть доступні лише модераторам.\n",
-	"updatedAt": "Останнє оновлення",
 	"updateRemoteUser": "Оновити інформацію про віддаленого користувача",
 	"suspend": "Призупинити",
 	"resetPassword": "Скинути пароль",
@@ -2047,13 +1694,9 @@ definePage(() => ({
 	"unsetUserBanner": "Випустити прапор.",
 	"deleteAccount": "Видалення акаунту",
 	"assign": "Призначити",
-	"indefinitely": "Ніколи",
-	"createNew": "Створити новий",
-	"filter": "Фільтр",
 	"messageRead": "Прочитано",
 	"recentNHours": "Останні {n} годин",
 	"recentNDays": "Останні {n} днів",
-	"notes": "Записи",
 	"active": "Активовано",
 	"archived": "Заархівовано",
 	"resetPasswordConfirm": "Справді скинути пароль?",
@@ -2067,17 +1710,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Це незворотно видалить ваш акаунт. Продовжити?",
 	"typeToConfirm": "Введіть {x} для підтвердження",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Опитування закінчується",
-	"oneHour": "1 година",
-	"oneDay": "1 день",
-	"oneWeek": "1 тиждень",
-	"oneMonth": "1 місяць",
 	"unassign": "Скасувати призначення",
-	"overview": "Огляд",
 	"roles": "Ролі",
-	"announcements": "Оголошення",
-	"drive": "Диск",
-	"charts": "Графіки",
 	"userInfo": "Інформація про користувача"
 }
 </locale>
@@ -2086,12 +1720,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "Đã tạo một tài khoản và tự động vận hành bởi hệ thống.",
 	"instanceInfo": "Thông tin máy chủ",
-	"createdAt": "Ngày tạo",
 	"lastActiveDate": "Lần cuối vào",
 	"email": "Email",
 	"moderationNote": "Ghi chú kiểm duyệt",
 	"moderationNoteDescription": "Bạn có thể điền vào những ghi chú chỉ được chia sẻ giữa những người kiểm duyệt.",
-	"updatedAt": "Cập nhật lúc",
 	"updateRemoteUser": "Cập nhật thông tin người dùng ở máy chủ khác",
 	"suspend": "Vô hiệu hóa",
 	"resetPassword": "Đặt lại mật khẩu",
@@ -2102,13 +1734,9 @@ definePage(() => ({
 	"unsetUserBanner": "Gỡ ảnh bìa",
 	"deleteAccount": "Xóa tài khoản",
 	"assign": "Phân công",
-	"indefinitely": "Vĩnh viễn",
-	"createNew": "Tạo mới",
-	"filter": "Bộ lọc",
 	"messageRead": "Đã đọc",
 	"recentNHours": "{n}h trước",
 	"recentNDays": "{n} ngày trước",
-	"notes": "Bài Viết",
 	"active": "Hoạt động",
 	"archived": "Archived",
 	"resetPasswordConfirm": "Bạn thực sự muốn đặt lại mật khẩu?",
@@ -2122,17 +1750,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "Điều này sẽ khiến tài khoản bị xóa vĩnh viễn. Vẫn tiếp tục?",
 	"typeToConfirm": "Nhấn {x} để xác nhận",
 	"roleChooseRoleToAssign": "Select the role to assign",
-	"period": "Thời hạn",
-	"oneHour": "1 giờ",
-	"oneDay": "1 ngày",
-	"oneWeek": "1 tuần",
-	"oneMonth": "1 tháng",
 	"unassign": "Hủy phân công",
-	"overview": "Tổng quan",
 	"roles": "Vai trò",
-	"announcements": "Thông báo máy chủ",
-	"drive": "Ổ đĩa",
-	"charts": "Đồ thị",
 	"userInfo": "Thông tin người dùng"
 }
 </locale>
@@ -2141,12 +1760,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "该账号由系统自动创建和管理。",
 	"instanceInfo": "服务器信息",
-	"createdAt": "创建日期",
 	"lastActiveDate": "最后活跃时间",
 	"email": "邮箱",
 	"moderationNote": "管理笔记",
 	"moderationNoteDescription": "可以用来记录仅在管理员之间共享的笔记。",
-	"updatedAt": "更新日期",
 	"updateRemoteUser": "更新远程用户信息",
 	"suspend": "冻结",
 	"resetPassword": "重置密码",
@@ -2157,13 +1774,9 @@ definePage(() => ({
 	"unsetUserBanner": "清除横幅",
 	"deleteAccount": "删除账户",
 	"assign": "分配",
-	"indefinitely": "永久",
-	"createNew": "新建",
-	"filter": "筛选",
 	"messageRead": "已读",
 	"recentNHours": "最近{n}小时",
 	"recentNDays": "最近{n}天",
-	"notes": "帖子",
 	"active": "活动",
 	"archived": "已归档",
 	"resetPasswordConfirm": "确定重置密码？",
@@ -2177,17 +1790,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "将要删除账户。是否确认？",
 	"typeToConfirm": "输入 {x} 以确认操作。",
 	"roleChooseRoleToAssign": "选择要分配的角色",
-	"period": "截止时间",
-	"oneHour": "1 小时",
-	"oneDay": "1天",
-	"oneWeek": "1 周",
-	"oneMonth": "1个月",
 	"unassign": "取消分配",
-	"overview": "概览",
 	"roles": "角色",
-	"announcements": "公告",
-	"drive": "网盘",
-	"charts": "图表",
 	"userInfo": "用户信息"
 }
 </locale>
@@ -2196,12 +1800,10 @@ definePage(() => ({
 {
 	"isSystemAccount": "由系統自動建立與管理的帳戶。",
 	"instanceInfo": "伺服器資訊",
-	"createdAt": "建立於",
 	"lastActiveDate": "上次使用日期及時間",
 	"email": "電子郵件",
 	"moderationNote": "管理筆記",
 	"moderationNoteDescription": "您可以編寫僅在審查員之間共用的註解。",
-	"updatedAt": "最後更新",
 	"updateRemoteUser": "更新遠端使用者資訊",
 	"suspend": "凍結",
 	"resetPassword": "重設密碼",
@@ -2212,13 +1814,9 @@ definePage(() => ({
 	"unsetUserBanner": "移除使用者的橫幅圖像",
 	"deleteAccount": "刪除帳戶",
 	"assign": "指派",
-	"indefinitely": "無期限",
-	"createNew": "新建",
-	"filter": "篩選",
 	"messageRead": "已讀",
 	"recentNHours": "過去 {n} 小時",
 	"recentNDays": "過去 {n} 天",
-	"notes": "貼文",
 	"active": "最近活躍",
 	"archived": "已封存",
 	"resetPasswordConfirm": "重設密碼？",
@@ -2232,17 +1830,8 @@ definePage(() => ({
 	"deleteAccountConfirm": "將要刪除帳戶。是否確定？",
 	"typeToConfirm": "要執行這項操作，請輸入 {x} ",
 	"roleChooseRoleToAssign": "選擇要指派的角色",
-	"period": "期限",
-	"oneHour": "一小時",
-	"oneDay": "一天",
-	"oneWeek": "一週",
-	"oneMonth": "一個月",
 	"unassign": "取消指派",
-	"overview": "概覽",
 	"roles": "角色",
-	"announcements": "公告",
-	"drive": "雲端硬碟",
-	"charts": "圖表",
 	"userInfo": "使用者資訊"
 }
 </locale>
