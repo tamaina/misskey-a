@@ -108,8 +108,15 @@ export class McpApiService {
 	/** Only groups with at least one currently authorized discoverable endpoint are advertised. */
 	callTools(endpointNames: readonly string[]) {
 		const visible = new Set(endpointNames);
-		const kinds = new Set(this.endpoints.filter(endpoint => visible.has(endpoint.name)).map(endpoint => endpoint.policy.kind ?? null));
-		return [...kinds].map(callToolDefinition).sort((a, b) => a.name.localeCompare(b.name));
+		const groups = new Map<string | null, string[]>();
+		for (const endpoint of this.endpoints) {
+			if (!visible.has(endpoint.name)) continue;
+			const kind = endpoint.policy.kind ?? null;
+			const paths = groups.get(kind) ?? [];
+			paths.push(endpoint.name);
+			groups.set(kind, paths);
+		}
+		return [...groups].map(([kind, paths]) => callToolDefinition(kind, paths)).sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	private validateSelection(tool: string, input: unknown): asserts input is Record<string, unknown> {

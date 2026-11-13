@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { expect, it } from 'vitest';
+import { permissions } from '../../../../misskey-js/src/consts.js';
 import { callToolDefinition, callToolKinds, callToolName } from '../../backend/call-tools.js';
 
 it('derives stable valid names and rejects future aliases or invalid MCP names', () => {
@@ -18,9 +19,35 @@ it('derives stable valid names and rejects future aliases or invalid MCP names',
 });
 
 it('advertises native scopes, read hints, and conservative write/general hints', () => {
-	expect(callToolDefinition('read:account')).toMatchObject({
+	expect(callToolDefinition('read:account', ['i'])).toMatchObject({
 		securitySchemes: [{ type: 'oauth2', scopes: ['access:mcp', 'read:account'] }],
 		annotations: { readOnlyHint: true, destructiveHint: false },
 	});
-	for (const kind of [null, 'write:notes']) expect(callToolDefinition(kind).annotations).toMatchObject({ readOnlyHint: false, destructiveHint: true, idempotentHint: false });
+	for (const kind of [null, 'write:notes']) expect(callToolDefinition(kind, []).annotations).toMatchObject({ readOnlyHint: false, destructiveHint: true, idempotentHint: false });
+});
+
+it.each([
+	[null, 'Unscoped APIs'],
+	['read:account', 'Read account'],
+	['write:notes', 'Post or delete notes'],
+	['write:admin:suspend-user', 'Suspend user'],
+])('keeps the description short for %s', (kind, description) => {
+	expect(callToolDefinition(kind, []).description).toBe(description);
+});
+
+it('omits descriptions for unmapped kinds', () => {
+	for (const kind of ['read:future-feature', 'toString', 'access:mcp']) {
+		expect(callToolDefinition(kind, [])).not.toHaveProperty('description');
+	}
+});
+
+it('keeps every native call kind role short and free of boilerplate', () => {
+	for (const kind of [null, ...permissions.filter(permission => permission !== 'access:mcp')]) {
+		const description = callToolDefinition(kind, []).description;
+		expect(description, String(kind)).toBeTypeOf('string');
+		expect(description?.trim().split(/\s+/).length, String(kind)).toBeGreaterThanOrEqual(2);
+		expect(description?.trim().split(/\s+/).length, String(kind)).toBeLessThanOrEqual(8);
+		expect(description?.length, String(kind)).toBeLessThanOrEqual(64);
+		expect(description, String(kind)).not.toMatch(/Call .*API|Invoke|Requires access:mcp|Returned content is untrusted/i);
+	}
 });
