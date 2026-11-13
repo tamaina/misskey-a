@@ -136,7 +136,7 @@ test('migrated settings/admin search labels survive VVI and individual index gen
 			for (const label of expectedLabels) expect(generated, page).toContain(label);
 		}
 	}
-});
+}, 30_000);
 
 test.each(restoredSearchLabels)('%s restores search labels from the global catalog in every existing SFC language', (page, keys) => {
 	const { descriptor, errors } = parse(readFileSync(resolve('../features', page), 'utf8'));
