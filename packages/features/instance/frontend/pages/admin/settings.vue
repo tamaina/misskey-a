@@ -11,7 +11,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<SearchMarker v-slot="slotProps" :keywords="['information', 'meta']">
 					<MkFolder :defaultOpen="true">
 						<template #icon><SearchIcon><i class="ti ti-info-circle"></i></SearchIcon></template>
-						<template #label><SearchLabel>{{ globalLocale.env.info }}</SearchLabel></template>
+						<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
+						<template #label><SearchLabel>{{ $locale.sfc.info }}</SearchLabel></template>
 						<template v-if="infoForm.modified.value" #footer>
 							<MkFormFooter :form="infoForm"/>
 						</template>
@@ -672,7 +673,8 @@ definePage(() => ({
 	"proxyAccount": "حساب وكيل البروكسي",
 	"proxyAccountDescription": "يتصرف حساب الوكيل كمتابع بعيد لمستخدمين تحت ظروف معينة. على سبيل المثال ، عندما يضيف مستخدم مستخدمًا بعيدًا إلى قائمة  فإن ملاحظاته لن تُرسل إلى المثيل ما لم يُتابعه مستخدم محلي. وبالتالي فإن حساب الوكيل سوف يتابع هذا المستخدم لكي تُرسل ملاحظاته.",
 	"description": "السيرة",
-	"youCanIncludeHashtags": "يمكنك أيضًا إضافة وسوم إلى سيرتك التعريفية."
+	"youCanIncludeHashtags": "يمكنك أيضًا إضافة وسوم إلى سيرتك التعريفية.",
+	"info": "عن"
 }
 </locale>
 
@@ -748,7 +750,8 @@ definePage(() => ({
 	"proxyAccount": "Compte de proxy",
 	"proxyAccountDescription": "Un compte proxy és un compte que actua com a seguidor remot per als usuaris en determinades condicions. Per exemple, quan un usuari afegeix un usuari remot a la llista, l'activitat de l'usuari remot no es lliurarà al servidor si cap usuari local segueix aquest usuari, de manera que el compte proxy el seguirà.",
 	"description": "Biografia ",
-	"youCanIncludeHashtags": "Pots posar etiquetes a la teva biografia "
+	"youCanIncludeHashtags": "Pots posar etiquetes a la teva biografia ",
+	"info": "Informació"
 }
 </locale>
 
@@ -824,7 +827,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy účet",
 	"proxyAccountDescription": "Proxy účet je účet, který za určitých podmínek sleduje uživatele na dálku vaším jménem. Například když uživatel zařadí vzdáleného uživatele do seznamu, pokud nikdo nesleduje uživatele na seznamu, aktivita nebude doručena instanci, takže místo toho bude uživatele sledovat účet proxy.",
 	"description": "O mně",
-	"youCanIncludeHashtags": "V popisku o Vás můžete použít i hastagy."
+	"youCanIncludeHashtags": "V popisku o Vás můžete použít i hastagy.",
+	"info": "Informace"
 }
 </locale>
 
@@ -900,7 +904,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -976,7 +981,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy-Benutzerkonto",
 	"proxyAccountDescription": "Ein Proxy-Konto ist ein Benutzerkonto, das unter bestimmten Bedingungen als Follower für Benutzer fremder Instanzen fungiert. Wenn zum Beispiel ein Benutzer einen Benutzer einer fremden Instanz zu einer Liste hinzufügt, werden die Aktivitäten des entfernten Benutzers nicht an die Instanz übermittelt, wenn kein lokaler Benutzer diesem Benutzer folgt; stattdessen folgt das Proxy-Konto.",
 	"description": "Profilbeschreibung",
-	"youCanIncludeHashtags": "Du kannst auch Hashtags in deiner Profilbeschreibung verwenden."
+	"youCanIncludeHashtags": "Du kannst auch Hashtags in deiner Profilbeschreibung verwenden.",
+	"info": "Über"
 }
 </locale>
 
@@ -1052,7 +1058,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -1128,7 +1135,8 @@ definePage(() => ({
 	"proxyAccount": "Cuenta proxy",
 	"proxyAccountDescription": "Una cuenta proxy es una cuenta que actúa como un seguidor remoto de un usuario bajo ciertas condiciones. Por ejemplo, cuando un usuario añade un usuario remoto a una lista, si ningún usuario local sigue al usuario agregado a la lista, la instancia no puede obtener su actividad, así que la cuenta proxy sigue al usuario añadido a la lista",
 	"description": "Descripción",
-	"youCanIncludeHashtags": "También puedes incluir hashtags en tu biografía"
+	"youCanIncludeHashtags": "También puedes incluir hashtags en tu biografía",
+	"info": "Información"
 }
 </locale>
 
@@ -1204,7 +1212,8 @@ definePage(() => ({
 	"proxyAccount": "Compte proxy",
 	"proxyAccountDescription": "Un compte proxy se comporte, dans certaines conditions, comme un·e abonné·e distant·e pour les utilisateurs d'autres instances. Par exemple, quand un·e utilisateur·rice ajoute un·e utilisateur·rice distant·e à une liste, ses notes ne seront pas visibles sur l'instance si personne ne suit cet·te utilisateur·rice. Le compte proxy va donc suivre cet·te utilisateur·rice pour que ses notes soient acheminées.",
 	"description": "À propos de moi",
-	"youCanIncludeHashtags": "Vous pouvez également inclure des hashtags."
+	"youCanIncludeHashtags": "Vous pouvez également inclure des hashtags.",
+	"info": "Informations"
 }
 </locale>
 
@@ -1280,7 +1289,8 @@ definePage(() => ({
 	"proxyAccount": "Akun proksi",
 	"proxyAccountDescription": "Akun proksi merupakan sebuah akun yang bertindak sebagai pengikut instansi luar untuk pengguna dalam kondisi tertentu. Sebagai contoh, ketika pengguna menambahkan seorang pengguna instansi luar ke dalam daftar, aktivitas dari pengguna instansi luar tidak akan disampaikan ke instansi apabila tidak ada pengguna lokal yang mengikuti pengguna tersebut, dengan begitu akun proksilah yang akan mengikutinya.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "Kamu juga dapat menambahkan tagar ke dalam bio."
+	"youCanIncludeHashtags": "Kamu juga dapat menambahkan tagar ke dalam bio.",
+	"info": "Informasi"
 }
 </locale>
 
@@ -1356,7 +1366,8 @@ definePage(() => ({
 	"proxyAccount": "Profilo proxy",
 	"proxyAccountDescription": "Un profilo proxy funziona come follower per i profili remoti, sotto certe condizioni. Ad esempio, quando un profilo locale ne inserisce uno remoto in una lista (senza seguirlo), se nessun altro segue quel profilo remoto, le attività non possono essere distribuite. Dunque, il profilo proxy le seguirà per tutti.",
 	"description": "Biografia",
-	"youCanIncludeHashtags": "Puoi anche includere hashtag."
+	"youCanIncludeHashtags": "Puoi anche includere hashtag.",
+	"info": "Informazioni"
 }
 </locale>
 
@@ -1432,7 +1443,8 @@ definePage(() => ({
 	"proxyAccount": "プロキシアカウント",
 	"proxyAccountDescription": "プロキシアカウントは、特定の条件下でユーザーのリモートフォローを代行するアカウントです。例えば、ユーザーがリモートユーザーをリストに入れたとき、リストに入れられたユーザーを誰もフォローしていないとアクティビティがサーバーに配達されないため、代わりにプロキシアカウントがフォローするようにします。",
 	"description": "自己紹介",
-	"youCanIncludeHashtags": "ハッシュタグを含めることができます。"
+	"youCanIncludeHashtags": "ハッシュタグを含めることができます。",
+	"info": "情報"
 }
 </locale>
 
@@ -1508,7 +1520,8 @@ definePage(() => ({
 	"proxyAccount": "プロキシアカウント",
 	"proxyAccountDescription": "プロキシアカウントは、代わりにフォローしてくれるアカウントや。例えば、551に豚まんが無いときやったり、ユーザーがリモートユーザーをアカウントに入れたとき、リストに入れられたユーザーが誰からもフォローされてないと寂しいやん。寂しいし、アクティビティも配達されへんから、プロキシアカウントがフォローしてくれるで。ええやつやん…",
 	"description": "自己紹介",
-	"youCanIncludeHashtags": "ハッシュタグを含めることができるで。"
+	"youCanIncludeHashtags": "ハッシュタグを含めることができるで。",
+	"info": "情報"
 }
 </locale>
 
@@ -1584,7 +1597,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -1660,7 +1674,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -1736,7 +1751,8 @@ definePage(() => ({
 	"proxyAccount": "프록시 계정",
 	"proxyAccountDescription": "프록시 계정은 특정 조건 하에서 유저의 리모트 팔로우를 대행하는 계정입니다. 예를 들면, 유저가 리모트 유저를 리스트에 넣었을 때, 리스트에 들어간 유저를 아무도 팔로우한 적이 없다면 액티비티가 서버로 배달되지 않기 때문에, 대신 프록시 계정이 해당 유저를 팔로우하도록 합니다.",
 	"description": "자기소개",
-	"youCanIncludeHashtags": "해시 태그를 포함할 수 있습니다."
+	"youCanIncludeHashtags": "해시 태그를 포함할 수 있습니다.",
+	"info": "정보"
 }
 </locale>
 
@@ -1812,7 +1828,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "Een proxy-account is een account dat onder bepaalde voorwaarden fungeert als externe volger voor gebruikers. Als een gebruiker bijvoorbeeld een externe gebruiker aan de lijst toevoegt, wordt de activiteit van de externe gebruiker niet aan de server geleverd als geen lokale gebruiker die gebruiker volgt, dus het proxy-account volgt in plaats daarvan.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "Over"
 }
 </locale>
 
@@ -1888,7 +1905,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Biografi",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "Infomasjon"
 }
 </locale>
 
@@ -1964,7 +1982,8 @@ definePage(() => ({
 	"proxyAccount": "Konto proxy",
 	"proxyAccountDescription": "Opis konta pełnomocniczego",
 	"description": "Opis",
-	"youCanIncludeHashtags": "Możesz umieścić hashtagi w swoim opisie."
+	"youCanIncludeHashtags": "Możesz umieścić hashtagi w swoim opisie.",
+	"info": "Informacje"
 }
 </locale>
 
@@ -2040,7 +2059,8 @@ definePage(() => ({
 	"proxyAccount": "Conta proxy",
 	"proxyAccountDescription": "Uma conta de proxy é uma conta que assume o acompanhamento remoto de um usuário sob certas condições específicas. Por exemplo, quando um usuário inclui um usuário remoto em uma lista, mas ninguém na lista está seguindo o usuário remoto, a atividade não é entregue ao servidor. Nesse caso, a conta de proxy entra em ação para seguir o usuário remoto em vez disso.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "Você pode incluir hashtags em sua bio."
+	"youCanIncludeHashtags": "Você pode incluir hashtags em sua bio.",
+	"info": "Informações"
 }
 </locale>
 
@@ -2116,7 +2136,8 @@ definePage(() => ({
 	"proxyAccount": "Учётная запись прокси",
 	"proxyAccountDescription": "Учетная запись прокси предназначена служить подписчиком на пользователей с других сайтов. Например: если пользователь добавит кого-то с другого сайта в список, то деятельность того не отобразится, пока никто с этого же сайта не подписан на него. Чтобы это стало возможным, на него подписывается прокси.",
 	"description": "О себе",
-	"youCanIncludeHashtags": "Можете использовать здесь хештеги."
+	"youCanIncludeHashtags": "Можете использовать здесь хештеги.",
+	"info": "Описание"
 }
 </locale>
 
@@ -2192,7 +2213,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy účet",
 	"proxyAccountDescription": "Proxy účet je účet, ktorý za určitých podmienok sleduje používateľov na diaľku vaším menom. Napríklad keď používateľ zaradí vzdialeného používateľa do zoznamu, pokiaľ nikto nesleduje používateľa na zozname, aktivita nebude doručená na server, takže namiesto toho bude používateľa sledova proxy účet.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "Vo svojom bio môžete mať aj hashtagy."
+	"youCanIncludeHashtags": "Vo svojom bio môžete mať aj hashtagy.",
+	"info": "Informácie"
 }
 </locale>
 
@@ -2268,7 +2290,8 @@ definePage(() => ({
 	"proxyAccount": "บัญชีพร็อกซี่",
 	"proxyAccountDescription": "บัญชีพร็อกซี คือ บัญชีที่ทำหน้าที่ติดตาม(ผู้ใช้)ระยะไกลภายใต้เงื่อนไขบางประการ ตัวอย่างเช่น เมื่อผู้ใช้ท้องถิ่นเพิ่มผู้ใช้ระยะไกลลงรายชื่อ หากไม่มีใครติดตามผู้ใช้ระยะไกลในรายชื่อนั้น กิจกรรมก็จะไม่ถูกส่งมายังเซิร์ฟเวอร์ ดังนั้นจึงมีบัญชีพร็อกซีไว้ติดตามผู้ใช้ระยะไกลเหล่านั้น",
 	"description": "แนะนำตัว",
-	"youCanIncludeHashtags": "คุณสามารถใส่แฮชแท็กในส่วนแนะนำตัวของคุณได้"
+	"youCanIncludeHashtags": "คุณสามารถใส่แฮชแท็กในส่วนแนะนำตัวของคุณได้",
+	"info": "เกี่ยวกับ"
 }
 </locale>
 
@@ -2344,7 +2367,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy hesabı",
 	"proxyAccountDescription": "Proxy hesabı, belirli koşullar altında kullanıcılar için uzaktan takipçi görevi gören bir hesap. Örneğin, bir kullanıcı listeye uzaktan bir kullanıcı eklediğinde, o kullanıcıyı takip eden yerel kullanıcı yoksa uzaktan kullanıcının etkinliği örneğe iletilmez, bunun yerine proxy hesabı takip eder.",
 	"description": "Biyografi",
-	"youCanIncludeHashtags": "Biyografinize hashtag'ler de ekleyebilirsiniz."
+	"youCanIncludeHashtags": "Biyografinize hashtag'ler de ekleyebilirsiniz.",
+	"info": "Hakkında"
 }
 </locale>
 
@@ -2420,7 +2444,8 @@ definePage(() => ({
 	"proxyAccount": "Proxy account",
 	"proxyAccountDescription": "A proxy account is an account that acts as a remote follower for users under certain conditions. For example, when a user adds a remote user to the list, the remote user's activity will not be delivered to the instance if no local user is following that user, so the proxy account will follow instead.",
 	"description": "Bio",
-	"youCanIncludeHashtags": "You can also include hashtags in your bio."
+	"youCanIncludeHashtags": "You can also include hashtags in your bio.",
+	"info": "About"
 }
 </locale>
 
@@ -2496,7 +2521,8 @@ definePage(() => ({
 	"proxyAccount": "Проксі-акаунт",
 	"proxyAccountDescription": "Обліковий запис проксі – це обліковий запис, який діє як віддалений підписник для користувачів за певних умов. Наприклад, коли користувач додає віддаленого користувача до списку, активність віддаленого користувача не буде доставлена на сервер, якщо жоден локальний користувач не стежить за цим користувачем, то замість нього буде використовуватися обліковий запис проксі-сервера.",
 	"description": "Про себе",
-	"youCanIncludeHashtags": "Ви також можете включити хештеги у свій опис."
+	"youCanIncludeHashtags": "Ви також можете включити хештеги у свій опис.",
+	"info": "Інформація"
 }
 </locale>
 
@@ -2572,7 +2598,8 @@ definePage(() => ({
 	"proxyAccount": "Tài khoản proxy",
 	"proxyAccountDescription": "Tài khoản proxy là tài khoản hoạt động như một người theo dõi từ xa cho người dùng trong những điều kiện nhất định. Ví dụ: khi người dùng thêm người dùng từ xa vào danh sách, hoạt động của người dùng từ xa sẽ không được chuyển đến phiên bản nếu không có người dùng cục bộ nào theo dõi người dùng đó, vì vậy tài khoản proxy sẽ theo dõi.",
 	"description": "Tiểu sử",
-	"youCanIncludeHashtags": "Bạn có thể dùng hashtag trong tiểu sử."
+	"youCanIncludeHashtags": "Bạn có thể dùng hashtag trong tiểu sử.",
+	"info": "Giới thiệu"
 }
 </locale>
 
@@ -2648,7 +2675,8 @@ definePage(() => ({
 	"proxyAccount": "代理账户",
 	"proxyAccountDescription": "代理账户是在某些情况下替代用户进行远程关注用的账户。 例如说，当用户将一位远程用户放入一个列表中时，如果本地服务器上没有任何人关注这位远程用户，则这位远程用户的账户活动将不会被送到本地服务器上。作为替代，此时将使用代理账户进行关注。",
 	"description": "个人简介",
-	"youCanIncludeHashtags": "可以在个人简介中包含 #标签。"
+	"youCanIncludeHashtags": "可以在个人简介中包含 #标签。",
+	"info": "关于"
 }
 </locale>
 
@@ -2724,6 +2752,7 @@ definePage(() => ({
 	"proxyAccount": "代理帳戶",
 	"proxyAccountDescription": "代理帳戶是在特定條件下充當遠端追隨者的帳戶。例如，當使用者新增遠端使用者至其列表時，若沒有本地使用者追隨該遠端使用者，則其活動將不會傳送至伺服器，此時便會由代理帳戶代為追隨以解決問題。",
 	"description": "關於我",
-	"youCanIncludeHashtags": "你也可以在「關於我」中加上 #tag"
+	"youCanIncludeHashtags": "你也可以在「關於我」中加上 #tag",
+	"info": "資訊"
 }
 </locale>

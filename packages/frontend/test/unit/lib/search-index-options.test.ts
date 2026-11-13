@@ -6,6 +6,8 @@
 import { existsSync, globSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createApp } from 'vue';
+import { parse } from 'vue/compiler-sfc';
+import { locales } from 'i18n';
 import {
 	createComponentLocale,
 	createInternationalization as createTestInternationalization,
@@ -86,6 +88,71 @@ test('server-rules SFC locale falls back to the primary locale for a missing act
 	await runtime.loadLocale('ja-JP');
 	createApp({}).use(runtime);
 	expect(createComponentLocale(serverRulesModuleId).serverRules).toBe('Primary server rules');
+});
+
+// These labels must stay component-local: globalLocale is invisible to the static indexer.
+const restoredSearchLabels: [string, string[]][] = [
+	['drive/frontend/pages/settings/drive.vue', ['drive']],
+	['notifications/frontend/pages/settings/notifications.vue', ['notifications']],
+	['instance/frontend/pages/admin/branding.vue', ['somethingHappened']],
+	['instance/frontend/pages/admin/settings.vue', ['info']],
+	['portability/frontend/pages/settings/account-data.vue', ['antennas']],
+	['preferences/frontend/pages/settings/preferences.vue', ['notifications']],
+	['relationships/frontend/pages/settings/mute-block.vue', ['mutedUsers', 'renote', 'blockedUsers']],
+];
+
+test('migrated settings/admin search labels survive VVI and individual index generation', async () => {
+	const vvi = pluginVvi();
+	if (typeof vvi.configResolved !== 'function' || !vvi.transform || typeof vvi.transform === 'function') throw new Error('Expected VVI hooks');
+	await vvi.configResolved.call({} as never, { root: resolve('.'), command: 'build', base: '/vite/', build: { ssr: false } } as never);
+	for (const [page, keys] of restoredSearchLabels) {
+		const file = resolve('../features', page);
+		const source = readFileSync(file, 'utf8');
+		const transformed = await vvi.transform.handler.call({} as never, source, file);
+		const code = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? source;
+		const reference = (key: string) => `\${createComponentLocale('/features/${page}').${key}}`;
+		const expectedLabels = page.endsWith('/mute-block.vue')
+			? [reference('mutedUsers'), reference('blockedUsers'), `${reference('mutedUsers')} (${reference('renote')})`]
+			: keys.map(reference);
+		for (const input of [source, code]) {
+			const assigner = new MarkerIdAssigner();
+			const assigned = assigner.processFile(file, input)?.code;
+			const markers = collectFileMarkers(file, assigned, resolve('..'));
+			const labels = markers.map(marker => marker.label);
+			for (const label of expectedLabels) expect(labels, page).toContain(label);
+			if (page.startsWith('drive/') || page.startsWith('notifications/')) {
+				expect(markers.find(marker => !marker.parentId), page).toMatchObject({
+					path: `/settings/${keys[0]}`,
+					label: reference(keys[0]),
+				});
+			}
+			const section = page.includes('/admin/') ? 'admin' : 'settings';
+			const sectionOptions = searchIndexes.find(item => item.mainVirtualModule === `search-index:${section}`);
+			if (!sectionOptions) throw new Error('Expected section search options');
+			const options = { ...sectionOptions, componentLocaleRoot: resolve('..') };
+			const load = pluginCreateSearchIndexVirtualModule(options, assigner).load;
+			if (typeof load !== 'function') throw new Error('Expected a load hook');
+			const generated = await load.call({ addWatchFile: () => {} } as never, `search-index-individual:${file}.ts`);
+			for (const label of expectedLabels) expect(generated, page).toContain(label);
+		}
+	}
+}, 30_000);
+
+test.each(restoredSearchLabels)('%s restores search labels from the global catalog in every existing SFC language', (page, keys) => {
+	const { descriptor, errors } = parse(readFileSync(resolve('../features', page), 'utf8'));
+	expect(errors).toEqual([]);
+	const blocks = descriptor.customBlocks.filter(block => block.type === 'locale');
+	expect(blocks.map(block => block.attrs.locale)).toEqual(Object.keys(locales));
+	for (const block of blocks) {
+		const language = String(block.attrs.locale);
+		const messages = JSON.parse(block.content);
+		for (const key of keys) {
+			const expected = locales[language][key as keyof typeof locales[string]];
+			expect(typeof expected, `${language}.${key}`).toBe('string');
+			expect(expected, `${language}.${key}`).not.toBe('');
+			expect(messages[key], `${page}: ${language}.${key}`).toBe(expected);
+		}
+	}
 });
 
 for (const section of ['settings', 'admin']) {

@@ -4,7 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<SearchMarker path="/settings/drive" :label="globalLocale.env.drive" :keywords="['drive']" icon="ti ti-cloud">
+<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
+<SearchMarker path="/settings/drive" :label="$locale.sfc.drive" :keywords="['drive']" icon="ti ti-cloud">
 	<div class="_gaps_m">
 		<MkFeatureBanner icon="/fluent-emoji/2601.png" color="#0059ff">
 			<SearchText>{{ $locale.sfc.settingsDriveBanner }}</SearchText>
@@ -454,7 +455,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "فيديو"
+	"video": "فيديو",
+	"drive": "قرص التخرين"
 }
 </locale>
 
@@ -489,7 +491,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Mida petita",
 	"defaultCompressionLevel": "Nivell de compressió predeterminat",
 	"defaultCompressionLevel_description": "Si el redueixes augmentaràs la qualitat de la imatge, però la mida de l'arxiu serà més gran. <br>Si augmentes l'opció redueixes la mida de l'arxiu i la qualitat de la imatge és pitjor.",
-	"video": "Vídeo"
+	"video": "Vídeo",
+	"drive": "Disc"
 }
 </locale>
 
@@ -524,7 +527,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Úložiště"
 }
 </locale>
 
@@ -559,7 +563,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -594,7 +599,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Klein",
 	"defaultCompressionLevel": "Standard-Kompressionsgrad",
 	"defaultCompressionLevel_description": "Bei einem niedrigeren Wert bleibt die Qualität erhalten, aber die Dateigröße nimmt zu.<br> Bei einem höheren Wert lässt sich die Dateigröße verringern, aber die Qualität nimmt ab.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -629,7 +635,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -664,7 +671,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Tamaño pequeño",
 	"defaultCompressionLevel": "Nivel de compresión predeterminado",
 	"defaultCompressionLevel_description": "Al reducir el ajuste se conserva la calidad, pero aumenta el tamaño del archivo.<br>Al aumentar el ajuste se reduce el tamaño del archivo, pero disminuye la calidad.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -699,7 +707,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Vidéo"
+	"video": "Vidéo",
+	"drive": "Disque"
 }
 </locale>
 
@@ -734,7 +743,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Kompresi yang rendah akan menjaga kualitas namun memperbesar ukuran berkas. Kompresi yang tinggi akan mengurangi ukuran berkas namun mengurangi kualitas.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -769,7 +779,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Taglia piccola",
 	"defaultCompressionLevel": "Compressione predefinita",
 	"defaultCompressionLevel_description": "Diminuisci per mantenere la qualità aumentando le dimensioni del file.<br> Aumenta per ridurre le dimensioni del file e anche la qualità.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -804,7 +815,8 @@ definePage(() => ({
 	"compressionSizeSmall": "サイズ小",
 	"defaultCompressionLevel": "デフォルトの圧縮度",
 	"defaultCompressionLevel_description": "低くすると品質を保てますが、ファイルサイズは増加します。<br>高くするとファイルサイズを減らせますが、品質は低下します。",
-	"video": "動画"
+	"video": "動画",
+	"drive": "ドライブ"
 }
 </locale>
 
@@ -839,7 +851,8 @@ definePage(() => ({
 	"compressionSizeSmall": "サイズ小",
 	"defaultCompressionLevel": "デフォルトの圧縮度",
 	"defaultCompressionLevel_description": "低くすると品質は保てるんやけど、ファイルサイズが増えるで。<br>高くするとファイルサイズは減らせるんやけど、品質が落ちるで。",
-	"video": "動画"
+	"video": "動画",
+	"drive": "ドライブ"
 }
 </locale>
 
@@ -874,7 +887,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -909,7 +923,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -944,7 +959,8 @@ definePage(() => ({
 	"compressionSizeSmall": "소형",
 	"defaultCompressionLevel": "기본 압축 정도 ",
 	"defaultCompressionLevel_description": "낮추면 품질을 유지합니다만 파일 크기는 증가합니다. <br>높이면 파일 크기를 줄일 수 있습니다만 품질은 저하됩니다.",
-	"video": "동영상"
+	"video": "동영상",
+	"drive": "드라이브"
 }
 </locale>
 
@@ -979,7 +995,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Schijf"
 }
 </locale>
 
@@ -1014,7 +1031,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -1049,7 +1067,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Dysk"
 }
 </locale>
 
@@ -1084,7 +1103,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Tamanho pequeno",
 	"defaultCompressionLevel": "Nível padrão de compressão",
 	"defaultCompressionLevel_description": "Menor compressão preserva a qualidade mas aumenta o tamanho do arquivo.<br>Maior compressão reduz o tamanho do arquivo mas diminui a qualidade.",
-	"video": "Vídeo"
+	"video": "Vídeo",
+	"drive": "Drive"
 }
 </locale>
 
@@ -1119,7 +1139,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Маленький размер",
 	"defaultCompressionLevel": "Уровень сжатия по умолчанию",
 	"defaultCompressionLevel_description": "Уровень сжатия ниже сохраняет качество лучше, но увеличивает размер файла.<br>Уровень сжатия выше уменьшает размер файла, но уменьшает качество.",
-	"video": "Видео"
+	"video": "Видео",
+	"drive": "Диск"
 }
 </locale>
 
@@ -1154,7 +1175,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Disk"
 }
 </locale>
 
@@ -1189,7 +1211,8 @@ definePage(() => ({
 	"compressionSizeSmall": "ขนาดเล็ก",
 	"defaultCompressionLevel": "ค่าการบีบอัดเริ่มต้น",
 	"defaultCompressionLevel_description": "ถ้าต่ำ จะรักษาคุณภาพได้ แต่ขนาดไฟล์จะเพิ่มขึ้น<br>ถ้าสูง จะลดขนาดไฟล์ได้ แต่คุณภาพจะลดลง",
-	"video": "วีดีโอ"
+	"video": "วีดีโอ",
+	"drive": "ไดรฟ์"
 }
 </locale>
 
@@ -1224,7 +1247,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Küçük Boyut",
 	"defaultCompressionLevel": "Varsayılan sıkıştırma seviyesi",
 	"defaultCompressionLevel_description": "Ayarı düşürmek kaliteyi koruyacak ancak dosya boyutunu artıracaktır. <br> Ayarı yükseltmek dosya boyutunu küçültecek ancak kaliteyi düşürecektir.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -1259,7 +1283,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Drive"
 }
 </locale>
 
@@ -1294,7 +1319,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Малий розмір",
 	"defaultCompressionLevel": "Рівень стиснення по замовчуванню",
 	"defaultCompressionLevel_description": "Нижчий рівень стиснення зберігає якість, але збільшує розмір файлу.<br>Вищий рівень стиснення зменшує розмір файлу, але погіршує якість.",
-	"video": "Відео"
+	"video": "Відео",
+	"drive": "Диск"
 }
 </locale>
 
@@ -1329,7 +1355,8 @@ definePage(() => ({
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
-	"video": "Video"
+	"video": "Video",
+	"drive": "Ổ đĩa"
 }
 </locale>
 
@@ -1364,7 +1391,8 @@ definePage(() => ({
 	"compressionSizeSmall": "小",
 	"defaultCompressionLevel": "默认压缩等级",
 	"defaultCompressionLevel_description": "较低的等级可以保持质量，但会增加文件大小。<br>较高的等级可以减少文件大小，但相对应的质量将会降低。",
-	"video": "视频"
+	"video": "视频",
+	"drive": "网盘"
 }
 </locale>
 
@@ -1399,6 +1427,7 @@ definePage(() => ({
 	"compressionSizeSmall": "小",
 	"defaultCompressionLevel": "預設的壓縮程度",
 	"defaultCompressionLevel_description": "低的話可以保留品質，但是會增加檔案的大小。<br>高的話可以減少檔案大小，但是會降低品質。",
-	"video": "影片"
+	"video": "影片",
+	"drive": "雲端硬碟"
 }
 </locale>

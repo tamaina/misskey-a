@@ -4212,7 +4212,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/drive/frontend/pages/settings/drive.vue",
-		"currentSha256": "33b899b527129ff9777def075759c65c6415871966a5c31616f6a6a7c85d67c4",
+		"currentSha256": "8feede6194fd59132cc68a996573b438e6d1971bd0e4b43bf0a329122aa43c4c",
 		"baselineSha256": "47d8ea90036533baf3110ed304fecebe2d681a8eaf099ac56d47ba9f14b36f85",
 		"keys": [
 			"none",
@@ -4286,6 +4286,180 @@ export const globalCatalogPilotOwners = [
 				"end": 10924,
 				"current": "import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';\nimport type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 111,
+				"end": 296,
+				"current": "<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n<SearchMarker path=\"/settings/drive\" :label=\"$locale.sfc.drive\" :keywords=\"['drive']\" icon=\"ti ti-cloud\">\n",
+				"baseline": "<SearchMarker path=\"/settings/drive\" :label=\"globalLocale.env.drive\" :keywords=\"['drive']\" icon=\"ti ti-cloud\">\n"
+			},
+			{
+				"start": 17912,
+				"end": 17955,
+				"current": "\t\"video\": \"فيديو\",\n\t\"drive\": \"قرص التخرين\"\n",
+				"baseline": "\t\"video\": \"فيديو\"\n"
+			},
+			{
+				"start": 19927,
+				"end": 19963,
+				"current": "\t\"video\": \"Vídeo\",\n\t\"drive\": \"Disc\"\n",
+				"baseline": "\t\"video\": \"Vídeo\"\n"
+			},
+			{
+				"start": 21704,
+				"end": 21744,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Úložiště\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 23467,
+				"end": 23504,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 25481,
+				"end": 25518,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 27241,
+				"end": 27278,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 29226,
+				"end": 29263,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 31147,
+				"end": 31185,
+				"current": "\t\"video\": \"Vidéo\",\n\t\"drive\": \"Disque\"\n",
+				"baseline": "\t\"video\": \"Vidéo\"\n"
+			},
+			{
+				"start": 33016,
+				"end": 33053,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 34925,
+				"end": 34962,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 36184,
+				"end": 36217,
+				"current": "\t\"video\": \"動画\",\n\t\"drive\": \"ドライブ\"\n",
+				"baseline": "\t\"video\": \"動画\"\n"
+			},
+			{
+				"start": 37454,
+				"end": 37487,
+				"current": "\t\"video\": \"動画\",\n\t\"drive\": \"ドライブ\"\n",
+				"baseline": "\t\"video\": \"動画\"\n"
+			},
+			{
+				"start": 39212,
+				"end": 39249,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 40972,
+				"end": 41009,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 42219,
+				"end": 42253,
+				"current": "\t\"video\": \"동영상\",\n\t\"drive\": \"드라이브\"\n",
+				"baseline": "\t\"video\": \"동영상\"\n"
+			},
+			{
+				"start": 44002,
+				"end": 44040,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Schijf\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 45764,
+				"end": 45801,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 47529,
+				"end": 47565,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Dysk\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 49499,
+				"end": 49536,
+				"current": "\t\"video\": \"Vídeo\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Vídeo\"\n"
+			},
+			{
+				"start": 51418,
+				"end": 51454,
+				"current": "\t\"video\": \"Видео\",\n\t\"drive\": \"Диск\"\n",
+				"baseline": "\t\"video\": \"Видео\"\n"
+			},
+			{
+				"start": 53201,
+				"end": 53237,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Disk\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 54908,
+				"end": 54946,
+				"current": "\t\"video\": \"วีดีโอ\",\n\t\"drive\": \"ไดรฟ์\"\n",
+				"baseline": "\t\"video\": \"วีดีโอ\"\n"
+			},
+			{
+				"start": 56818,
+				"end": 56855,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 58578,
+				"end": 58615,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Drive\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 60478,
+				"end": 60514,
+				"current": "\t\"video\": \"Відео\",\n\t\"drive\": \"Диск\"\n",
+				"baseline": "\t\"video\": \"Відео\"\n"
+			},
+			{
+				"start": 62215,
+				"end": 62252,
+				"current": "\t\"video\": \"Video\",\n\t\"drive\": \"Ổ đĩa\"\n",
+				"baseline": "\t\"video\": \"Video\"\n"
+			},
+			{
+				"start": 63336,
+				"end": 63367,
+				"current": "\t\"video\": \"视频\",\n\t\"drive\": \"网盘\"\n",
+				"baseline": "\t\"video\": \"视频\"\n"
+			},
+			{
+				"start": 64454,
+				"end": 64487,
+				"current": "\t\"video\": \"影片\",\n\t\"drive\": \"雲端硬碟\"\n",
+				"baseline": "\t\"video\": \"影片\"\n"
 			}
 		]
 	},
@@ -5779,7 +5953,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/instance/frontend/pages/admin/branding.vue",
-		"currentSha256": "6f903a667a7a69f1aa9544615c5fd8dbce8df0c6211cd6ed2355f9493467c6f0",
+		"currentSha256": "8034f4e174eb867b6d09ef350a285b0a9dc7c872e163141baac95687cb2601a8",
 		"baselineSha256": "84bc7c7995b932c35612119a6d79dfd5abeb1076148d26ece47dd1b06e4c4791",
 		"keys": [
 			"save",
@@ -5821,6 +5995,180 @@ export const globalCatalogPilotOwners = [
 				"end": 7769,
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
+			},
+			{
+				"start": 4466,
+				"end": 4648,
+				"current": "\t\t\t\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.somethingHappened }}</SearchLabel></template>\n",
+				"baseline": "\t\t\t\t\t\t<template #label><SearchLabel>{{ globalLocale.env.somethingHappened }}</SearchLabel></template>\n"
+			},
+			{
+				"start": 11741,
+				"end": 11838,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"حدث خطأ\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 13241,
+				"end": 13357,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"Sobreescriure manifest.json\",\n\t\"somethingHappened\": \"S'ha produït un error\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"Sobreescriure manifest.json\"\n"
+			},
+			{
+				"start": 14609,
+				"end": 14724,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"Jejda. Něco se nepovedlo.\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 15993,
+				"end": 16104,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"An error has occurred\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 17456,
+				"end": 17581,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"Überschreiben von manifest.json\",\n\t\"somethingHappened\": \"Ein Fehler ist aufgetreten\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"Überschreiben von manifest.json\"\n"
+			},
+			{
+				"start": 18850,
+				"end": 18961,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"An error has occurred\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 20364,
+				"end": 20475,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"Sobreescribir manifest.json\",\n\t\"somethingHappened\": \"Ocurrió un error\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"Sobreescribir manifest.json\"\n"
+			},
+			{
+				"start": 21811,
+				"end": 21924,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"Une erreur est survenue\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 23213,
+				"end": 23322,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"Ambil alih manifest.json\",\n\t\"somethingHappened\": \"Terjadi kesalahan\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"Ambil alih manifest.json\"\n"
+			},
+			{
+				"start": 24745,
+				"end": 24872,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"Sostituire il file manifest.json\",\n\t\"somethingHappened\": \"Si è verificato un problema\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"Sostituire il file manifest.json\"\n"
+			},
+			{
+				"start": 25866,
+				"end": 25964,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.jsonのオーバーライド\",\n\t\"somethingHappened\": \"問題が発生しました\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.jsonのオーバーライド\"\n"
+			},
+			{
+				"start": 26932,
+				"end": 27028,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.jsonのオーバーライド\",\n\t\"somethingHappened\": \"なんかあかんわ\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.jsonのオーバーライド\"\n"
+			},
+			{
+				"start": 28299,
+				"end": 28410,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"An error has occurred\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 29679,
+				"end": 29790,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"An error has occurred\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 30787,
+				"end": 30884,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json 오버라이드\",\n\t\"somethingHappened\": \"오류가 발생했습니다\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json 오버라이드\"\n"
+			},
+			{
+				"start": 32125,
+				"end": 32236,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"Er is iets misgegaan.\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 33487,
+				"end": 33597,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"En feil har oppstått\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 34846,
+				"end": 34954,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"Coś poszło nie tak\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 36287,
+				"end": 36396,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"Sobrescrever manifest.json\",\n\t\"somethingHappened\": \"Ocorreu um erro\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"Sobrescrever manifest.json\"\n"
+			},
+			{
+				"start": 37658,
+				"end": 37767,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"Что-то пошло не так\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 38981,
+				"end": 39096,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"Ups. Niečo sa nepodarilo.\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 40278,
+				"end": 40396,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"เขียนทับ manifest.json\",\n\t\"somethingHappened\": \"อุ๊ย ! มีอะไรบางอย่างผิดพลาด\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"เขียนทับ manifest.json\"\n"
+			},
+			{
+				"start": 41726,
+				"end": 41837,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Geçersiz Kılma\",\n\t\"somethingHappened\": \"Bir hata oluştu\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Geçersiz Kılma\"\n"
+			},
+			{
+				"start": 43106,
+				"end": 43217,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\",\n\t\"somethingHappened\": \"An error has occurred\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"manifest.json Override\"\n"
+			},
+			{
+				"start": 44497,
+				"end": 44611,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"Перевизначення manifest.json \",\n\t\"somethingHappened\": \"Щось пішло не так\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"Перевизначення manifest.json \"\n"
+			},
+			{
+				"start": 45833,
+				"end": 45931,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"Ghi đè manifest.json\",\n\t\"somethingHappened\": \"Xảy ra lỗi\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"Ghi đè manifest.json\"\n"
+			},
+			{
+				"start": 46789,
+				"end": 46876,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"覆盖 manifest.json\",\n\t\"somethingHappened\": \"出错了\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"覆盖 manifest.json\"\n"
+			},
+			{
+				"start": 47739,
+				"end": 47827,
+				"current": "\t\"serverSettingsManifestJsonOverride\": \"覆寫 manifest.json\",\n\t\"somethingHappened\": \"發生錯誤\"\n",
+				"baseline": "\t\"serverSettingsManifestJsonOverride\": \"覆寫 manifest.json\"\n"
 			}
 		]
 	},
@@ -5906,7 +6254,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/instance/frontend/pages/admin/settings.vue",
-		"currentSha256": "ff60c1c9230fee8123f48c5b0cae24ca6eb00503585bd5f75cec4986ed8ef7eb",
+		"currentSha256": "b9d891d4feb433306a4bf91e1f2d0172d37f33e09877dfc28dc3ad34ea4288ea",
 		"baselineSha256": "41cc31a894e477568d421faf897294021637bbeffa1cbb6fedc0047865676ee3",
 		"keys": [
 			"none",
@@ -6003,6 +6351,180 @@ export const globalCatalogPilotOwners = [
 				"end": 22612,
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
+			},
+			{
+				"start": 600,
+				"end": 769,
+				"current": "\t\t\t\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.info }}</SearchLabel></template>\n",
+				"baseline": "\t\t\t\t\t\t<template #label><SearchLabel>{{ globalLocale.env.info }}</SearchLabel></template>\n"
+			},
+			{
+				"start": 34371,
+				"end": 34458,
+				"current": "\t\"youCanIncludeHashtags\": \"يمكنك أيضًا إضافة وسوم إلى سيرتك التعريفية.\",\n\t\"info\": \"عن\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"يمكنك أيضًا إضافة وسوم إلى سيرتك التعريفية.\"\n"
+			},
+			{
+				"start": 41717,
+				"end": 41810,
+				"current": "\t\"youCanIncludeHashtags\": \"Pots posar etiquetes a la teva biografia \",\n\t\"info\": \"Informació\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Pots posar etiquetes a la teva biografia \"\n"
+			},
+			{
+				"start": 48198,
+				"end": 48289,
+				"current": "\t\"youCanIncludeHashtags\": \"V popisku o Vás můžete použít i hastagy.\",\n\t\"info\": \"Informace\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"V popisku o Vás můžete použít i hastagy.\"\n"
+			},
+			{
+				"start": 54634,
+				"end": 54723,
+				"current": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\",\n\t\"info\": \"About\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\"\n"
+			},
+			{
+				"start": 61942,
+				"end": 62051,
+				"current": "\t\"youCanIncludeHashtags\": \"Du kannst auch Hashtags in deiner Profilbeschreibung verwenden.\",\n\t\"info\": \"Über\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Du kannst auch Hashtags in deiner Profilbeschreibung verwenden.\"\n"
+			},
+			{
+				"start": 68396,
+				"end": 68485,
+				"current": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\",\n\t\"info\": \"About\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\"\n"
+			},
+			{
+				"start": 75649,
+				"end": 75749,
+				"current": "\t\"youCanIncludeHashtags\": \"También puedes incluir hashtags en tu biografía\",\n\t\"info\": \"Información\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"También puedes incluir hashtags en tu biografía\"\n"
+			},
+			{
+				"start": 82681,
+				"end": 82778,
+				"current": "\t\"youCanIncludeHashtags\": \"Vous pouvez également inclure des hashtags.\",\n\t\"info\": \"Informations\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Vous pouvez également inclure des hashtags.\"\n"
+			},
+			{
+				"start": 89667,
+				"end": 89765,
+				"current": "\t\"youCanIncludeHashtags\": \"Kamu juga dapat menambahkan tagar ke dalam bio.\",\n\t\"info\": \"Informasi\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Kamu juga dapat menambahkan tagar ke dalam bio.\"\n"
+			},
+			{
+				"start": 96855,
+				"end": 96938,
+				"current": "\t\"youCanIncludeHashtags\": \"Puoi anche includere hashtag.\",\n\t\"info\": \"Informazioni\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Puoi anche includere hashtag.\"\n"
+			},
+			{
+				"start": 101281,
+				"end": 101343,
+				"current": "\t\"youCanIncludeHashtags\": \"ハッシュタグを含めることができます。\",\n\t\"info\": \"情報\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"ハッシュタグを含めることができます。\"\n"
+			},
+			{
+				"start": 105757,
+				"end": 105819,
+				"current": "\t\"youCanIncludeHashtags\": \"ハッシュタグを含めることができるで。\",\n\t\"info\": \"情報\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"ハッシュタグを含めることができるで。\"\n"
+			},
+			{
+				"start": 112166,
+				"end": 112255,
+				"current": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\",\n\t\"info\": \"About\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\"\n"
+			},
+			{
+				"start": 118600,
+				"end": 118689,
+				"current": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\",\n\t\"info\": \"About\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\"\n"
+			},
+			{
+				"start": 123215,
+				"end": 123277,
+				"current": "\t\"youCanIncludeHashtags\": \"해시 태그를 포함할 수 있습니다.\",\n\t\"info\": \"정보\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"해시 태그를 포함할 수 있습니다.\"\n"
+			},
+			{
+				"start": 129806,
+				"end": 129894,
+				"current": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\",\n\t\"info\": \"Over\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\"\n"
+			},
+			{
+				"start": 136249,
+				"end": 136343,
+				"current": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\",\n\t\"info\": \"Infomasjon\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\"\n"
+			},
+			{
+				"start": 142512,
+				"end": 142604,
+				"current": "\t\"youCanIncludeHashtags\": \"Możesz umieścić hashtagi w swoim opisie.\",\n\t\"info\": \"Informacje\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Możesz umieścić hashtagi w swoim opisie.\"\n"
+			},
+			{
+				"start": 149468,
+				"end": 149559,
+				"current": "\t\"youCanIncludeHashtags\": \"Você pode incluir hashtags em sua bio.\",\n\t\"info\": \"Informações\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Você pode incluir hashtags em sua bio.\"\n"
+			},
+			{
+				"start": 156050,
+				"end": 156134,
+				"current": "\t\"youCanIncludeHashtags\": \"Можете использовать здесь хештеги.\",\n\t\"info\": \"Описание\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Можете использовать здесь хештеги.\"\n"
+			},
+			{
+				"start": 162500,
+				"end": 162589,
+				"current": "\t\"youCanIncludeHashtags\": \"Vo svojom bio môžete mať aj hashtagy.\",\n\t\"info\": \"Informácie\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Vo svojom bio môžete mať aj hashtagy.\"\n"
+			},
+			{
+				"start": 169081,
+				"end": 169174,
+				"current": "\t\"youCanIncludeHashtags\": \"คุณสามารถใส่แฮชแท็กในส่วนแนะนำตัวของคุณได้\",\n\t\"info\": \"เกี่ยวกับ\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"คุณสามารถใส่แฮชแท็กในส่วนแนะนำตัวของคุณได้\"\n"
+			},
+			{
+				"start": 175908,
+				"end": 176004,
+				"current": "\t\"youCanIncludeHashtags\": \"Biyografinize hashtag'ler de ekleyebilirsiniz.\",\n\t\"info\": \"Hakkında\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Biyografinize hashtag'ler de ekleyebilirsiniz.\"\n"
+			},
+			{
+				"start": 182349,
+				"end": 182438,
+				"current": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\",\n\t\"info\": \"About\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"You can also include hashtags in your bio.\"\n"
+			},
+			{
+				"start": 188934,
+				"end": 189031,
+				"current": "\t\"youCanIncludeHashtags\": \"Ви також можете включити хештеги у свій опис.\",\n\t\"info\": \"Інформація\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Ви також можете включити хештеги у свій опис.\"\n"
+			},
+			{
+				"start": 195523,
+				"end": 195613,
+				"current": "\t\"youCanIncludeHashtags\": \"Bạn có thể dùng hashtag trong tiểu sử.\",\n\t\"info\": \"Giới thiệu\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"Bạn có thể dùng hashtag trong tiểu sử.\"\n"
+			},
+			{
+				"start": 199276,
+				"end": 199335,
+				"current": "\t\"youCanIncludeHashtags\": \"可以在个人简介中包含 #标签。\",\n\t\"info\": \"关于\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"可以在个人简介中包含 #标签。\"\n"
+			},
+			{
+				"start": 202968,
+				"end": 203030,
+				"current": "\t\"youCanIncludeHashtags\": \"你也可以在「關於我」中加上 #tag\",\n\t\"info\": \"資訊\"\n",
+				"baseline": "\t\"youCanIncludeHashtags\": \"你也可以在「關於我」中加上 #tag\"\n"
 			}
 		]
 	},
@@ -9190,7 +9712,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
-		"currentSha256": "375013b98b05786f47ea555ae36dbb1d7f65177e63943c451b4a5cb7fbedba19",
+		"currentSha256": "77b7f2cf1e34903e16b91d3178c0a105dbcc30174b44c7e20a71f867e8e04575",
 		"baselineSha256": "91206c1c60857fb1cb4d982f5dc589098d66a2299216f0bd9cf634daa6876afc",
 		"keys": [
 			"following",
@@ -9243,6 +9765,180 @@ export const globalCatalogPilotOwners = [
 				"end": 5702,
 				"current": ";\nimport type { NotificationConfig } from '@features/notifications/frontend/pages/settings/notifications.notification-config.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
+			},
+			{
+				"start": 111,
+				"end": 319,
+				"current": "<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n<SearchMarker path=\"/settings/notifications\" :label=\"$locale.sfc.notifications\" :keywords=\"['notifications']\" icon=\"ti ti-bell\">\n",
+				"baseline": "<SearchMarker path=\"/settings/notifications\" :label=\"globalLocale.env.notifications\" :keywords=\"['notifications']\" icon=\"ti ti-bell\">\n"
+			},
+			{
+				"start": 9762,
+				"end": 9834,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"الإشعارات\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 10871,
+				"end": 10959,
+				"current": "\t\"notifyNotes\": \"Notificar quan hi hagi notes noves\",\n\t\"notifications\": \"Notificacions\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notificar quan hi hagi notes noves\"\n"
+			},
+			{
+				"start": 11883,
+				"end": 11954,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Oznámení\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 12885,
+				"end": 12961,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Notifications\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 13990,
+				"end": 14082,
+				"current": "\t\"notifyNotes\": \"Über neue Notizen benachrichtigen\",\n\t\"notifications\": \"Benachrichtigungen\"\n",
+				"baseline": "\t\"notifyNotes\": \"Über neue Notizen benachrichtigen\"\n"
+			},
+			{
+				"start": 15013,
+				"end": 15089,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Notifications\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 16190,
+				"end": 16267,
+				"current": "\t\"notifyNotes\": \"Notificar nuevas notas\",\n\t\"notifications\": \"Notificaciones\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notificar nuevas notas\"\n"
+			},
+			{
+				"start": 17297,
+				"end": 17388,
+				"current": "\t\"notifyNotes\": \"Notifier à propos des nouvelles notes\",\n\t\"notifications\": \"Notifications\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notifier à propos des nouvelles notes\"\n"
+			},
+			{
+				"start": 18461,
+				"end": 18542,
+				"current": "\t\"notifyNotes\": \"Beritahu mengenai catatan baru\",\n\t\"notifications\": \"Notifikasi\"\n",
+				"baseline": "\t\"notifyNotes\": \"Beritahu mengenai catatan baru\"\n"
+			},
+			{
+				"start": 19608,
+				"end": 19677,
+				"current": "\t\"notifyNotes\": \"Notifica nuove Note\",\n\t\"notifications\": \"Notifiche\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notifica nuove Note\"\n"
+			},
+			{
+				"start": 20341,
+				"end": 20389,
+				"current": "\t\"notifyNotes\": \"投稿を通知\",\n\t\"notifications\": \"通知\"\n",
+				"baseline": "\t\"notifyNotes\": \"投稿を通知\"\n"
+			},
+			{
+				"start": 21064,
+				"end": 21112,
+				"current": "\t\"notifyNotes\": \"投稿を通知\",\n\t\"notifications\": \"通知\"\n",
+				"baseline": "\t\"notifyNotes\": \"投稿を通知\"\n"
+			},
+			{
+				"start": 22048,
+				"end": 22118,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Ilɣuyen\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 23049,
+				"end": 23123,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"ಅಧಿಸೂಚನೆಗಳು\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 23841,
+				"end": 23894,
+				"current": "\t\"notifyNotes\": \"새 노트 알림 켜기\",\n\t\"notifications\": \"알림\"\n",
+				"baseline": "\t\"notifyNotes\": \"새 노트 알림 켜기\"\n"
+			},
+			{
+				"start": 24822,
+				"end": 24894,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Meldingen\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 25816,
+				"end": 25886,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Varsler\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 26900,
+				"end": 26976,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Powiadomienia\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 27948,
+				"end": 28028,
+				"current": "\t\"notifyNotes\": \"Notificar sobre novas notas\",\n\t\"notifications\": \"Notificações\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notificar sobre novas notas\"\n"
+			},
+			{
+				"start": 29048,
+				"end": 29123,
+				"current": "\t\"notifyNotes\": \"Оповещать о публикациях\",\n\t\"notifications\": \"Уведомления\"\n",
+				"baseline": "\t\"notifyNotes\": \"Оповещать о публикациях\"\n"
+			},
+			{
+				"start": 30110,
+				"end": 30182,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Oznámenia\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 31131,
+				"end": 31209,
+				"current": "\t\"notifyNotes\": \"แจ้งเตือนเกี่ยวกับโพสต์ใหม่\",\n\t\"notifications\": \"เเจ้งเตือน\"\n",
+				"baseline": "\t\"notifyNotes\": \"แจ้งเตือนเกี่ยวกับโพสต์ใหม่\"\n"
+			},
+			{
+				"start": 32142,
+				"end": 32231,
+				"current": "\t\"notifyNotes\": \"Yeni notlar hakkında bildirimde bulun\",\n\t\"notifications\": \"Bildirimler\"\n",
+				"baseline": "\t\"notifyNotes\": \"Yeni notlar hakkında bildirimde bulun\"\n"
+			},
+			{
+				"start": 33162,
+				"end": 33238,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Notifications\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 34186,
+				"end": 34263,
+				"current": "\t\"notifyNotes\": \"Сповіщати про нові нотатки\",\n\t\"notifications\": \"Сповіщення\"\n",
+				"baseline": "\t\"notifyNotes\": \"Сповіщати про нові нотатки\"\n"
+			},
+			{
+				"start": 35283,
+				"end": 35355,
+				"current": "\t\"notifyNotes\": \"Notify about new notes\",\n\t\"notifications\": \"Thông báo\"\n",
+				"baseline": "\t\"notifyNotes\": \"Notify about new notes\"\n"
+			},
+			{
+				"start": 35967,
+				"end": 36016,
+				"current": "\t\"notifyNotes\": \"开启发帖通知\",\n\t\"notifications\": \"通知\"\n",
+				"baseline": "\t\"notifyNotes\": \"开启发帖通知\"\n"
+			},
+			{
+				"start": 36639,
+				"end": 36688,
+				"current": "\t\"notifyNotes\": \"開啟貼文通知\",\n\t\"notifications\": \"通知\"\n",
+				"baseline": "\t\"notifyNotes\": \"開啟貼文通知\"\n"
 			}
 		],
 		"groupOrders": {
@@ -9773,7 +10469,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/portability/frontend/pages/settings/account-data.vue",
-		"currentSha256": "2e8f6272870b570363112c76b39ac9f47a6637dafe29a5f3eab8fc4240606d99",
+		"currentSha256": "2bfe51514a2e269bd7b0076d7c0d4de3ec0afe3e196ca06422bb6d29b58a1b69",
 		"baselineSha256": "9e8d6a5f5dd2069d527e8c7b91156b0f6212f4ce95f0f5d82e3ac959dc0d2357",
 		"keys": [
 			"antennas"
@@ -9809,6 +10505,192 @@ export const globalCatalogPilotOwners = [
 				"end": 8515,
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
+			},
+			{
+				"start": 6681,
+				"end": 6852,
+				"current": "\t\t\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.antennas }}</SearchLabel></template>\n",
+				"baseline": "\t\t\t\t\t<template #label><SearchLabel>{{ globalLocale.env.antennas }}</SearchLabel></template>\n"
+			},
+			{
+				"start": 7713,
+				"end": 7713,
+				"current": "",
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\n"
+			},
+			{
+				"start": 8435,
+				"end": 8435,
+				"current": "",
+				"baseline": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n"
+			},
+			{
+				"start": 12101,
+				"end": 12167,
+				"current": "\t\"blockingList\": \"المستخدمون المحجوبون\",\n\t\"antennas\": \"الهوائيات\"\n",
+				"baseline": "\t\"blockingList\": \"المستخدمون المحجوبون\"\n"
+			},
+			{
+				"start": 12995,
+				"end": 13046,
+				"current": "\t\"blockingList\": \"Bloqueja\",\n\t\"antennas\": \"Antena\"\n",
+				"baseline": "\t\"blockingList\": \"Bloqueja\"\n"
+			},
+			{
+				"start": 13783,
+				"end": 13836,
+				"current": "\t\"blockingList\": \"Zablokovat\",\n\t\"antennas\": \"Antény\"\n",
+				"baseline": "\t\"blockingList\": \"Zablokovat\"\n"
+			},
+			{
+				"start": 14564,
+				"end": 14622,
+				"current": "\t\"blockingList\": \"Blocked users\",\n\t\"antennas\": \"Antennas\"\n",
+				"baseline": "\t\"blockingList\": \"Blocked users\"\n"
+			},
+			{
+				"start": 15497,
+				"end": 15555,
+				"current": "\t\"blockingList\": \"Blockierungen\",\n\t\"antennas\": \"Antennen\"\n",
+				"baseline": "\t\"blockingList\": \"Blockierungen\"\n"
+			},
+			{
+				"start": 16283,
+				"end": 16341,
+				"current": "\t\"blockingList\": \"Blocked users\",\n\t\"antennas\": \"Antennas\"\n",
+				"baseline": "\t\"blockingList\": \"Blocked users\"\n"
+			},
+			{
+				"start": 17256,
+				"end": 17310,
+				"current": "\t\"blockingList\": \"Bloqueados\",\n\t\"antennas\": \"Antenas\"\n",
+				"baseline": "\t\"blockingList\": \"Bloqueados\"\n"
+			},
+			{
+				"start": 18157,
+				"end": 18217,
+				"current": "\t\"blockingList\": \"Comptes bloqués\",\n\t\"antennas\": \"Antennes\"\n",
+				"baseline": "\t\"blockingList\": \"Comptes bloqués\"\n"
+			},
+			{
+				"start": 19006,
+				"end": 19055,
+				"current": "\t\"blockingList\": \"Blokir\",\n\t\"antennas\": \"Antena\"\n",
+				"baseline": "\t\"blockingList\": \"Blokir\"\n"
+			},
+			{
+				"start": 19889,
+				"end": 19956,
+				"current": "\t\"blockingList\": \"Elenco profili bloccati\",\n\t\"antennas\": \"Antenne\"\n",
+				"baseline": "\t\"blockingList\": \"Elenco profili bloccati\"\n"
+			},
+			{
+				"start": 20579,
+				"end": 20624,
+				"current": "\t\"blockingList\": \"ブロック\",\n\t\"antennas\": \"アンテナ\"\n",
+				"baseline": "\t\"blockingList\": \"ブロック\"\n"
+			},
+			{
+				"start": 21234,
+				"end": 21279,
+				"current": "\t\"blockingList\": \"ブロック\",\n\t\"antennas\": \"アンテナ\"\n",
+				"baseline": "\t\"blockingList\": \"ブロック\"\n"
+			},
+			{
+				"start": 21994,
+				"end": 22045,
+				"current": "\t\"blockingList\": \"Seḥbes\",\n\t\"antennas\": \"Antennas\"\n",
+				"baseline": "\t\"blockingList\": \"Seḥbes\"\n"
+			},
+			{
+				"start": 22770,
+				"end": 22828,
+				"current": "\t\"blockingList\": \"Blocked users\",\n\t\"antennas\": \"Antennas\"\n",
+				"baseline": "\t\"blockingList\": \"Blocked users\"\n"
+			},
+			{
+				"start": 23413,
+				"end": 23455,
+				"current": "\t\"blockingList\": \"차단\",\n\t\"antennas\": \"안테나\"\n",
+				"baseline": "\t\"blockingList\": \"차단\"\n"
+			},
+			{
+				"start": 24207,
+				"end": 24261,
+				"current": "\t\"blockingList\": \"Blokkeren\",\n\t\"antennas\": \"Antennes\"\n",
+				"baseline": "\t\"blockingList\": \"Blokkeren\"\n"
+			},
+			{
+				"start": 24969,
+				"end": 25021,
+				"current": "\t\"blockingList\": \"Blokker\",\n\t\"antennas\": \"Antenner\"\n",
+				"baseline": "\t\"blockingList\": \"Blokker\"\n"
+			},
+			{
+				"start": 25780,
+				"end": 25831,
+				"current": "\t\"blockingList\": \"Zablokuj\",\n\t\"antennas\": \"Anteny\"\n",
+				"baseline": "\t\"blockingList\": \"Zablokuj\"\n"
+			},
+			{
+				"start": 26652,
+				"end": 26704,
+				"current": "\t\"blockingList\": \"Bloquear\",\n\t\"antennas\": \"Antenas\"\n",
+				"baseline": "\t\"blockingList\": \"Bloquear\"\n"
+			},
+			{
+				"start": 27473,
+				"end": 27532,
+				"current": "\t\"blockingList\": \"Заблокированные\",\n\t\"antennas\": \"Антенны\"\n",
+				"baseline": "\t\"blockingList\": \"Заблокированные\"\n"
+			},
+			{
+				"start": 28265,
+				"end": 28318,
+				"current": "\t\"blockingList\": \"Zablokovať\",\n\t\"antennas\": \"Antény\"\n",
+				"baseline": "\t\"blockingList\": \"Zablokovať\"\n"
+			},
+			{
+				"start": 29049,
+				"end": 29099,
+				"current": "\t\"blockingList\": \"บล็อก\",\n\t\"antennas\": \"เสาอากาศ\"\n",
+				"baseline": "\t\"blockingList\": \"บล็อก\"\n"
+			},
+			{
+				"start": 29946,
+				"end": 30014,
+				"current": "\t\"blockingList\": \"Engellenen kullanıcılar\",\n\t\"antennas\": \"Antenler\"\n",
+				"baseline": "\t\"blockingList\": \"Engellenen kullanıcılar\"\n"
+			},
+			{
+				"start": 30742,
+				"end": 30800,
+				"current": "\t\"blockingList\": \"Blocked users\",\n\t\"antennas\": \"Antennas\"\n",
+				"baseline": "\t\"blockingList\": \"Blocked users\"\n"
+			},
+			{
+				"start": 31613,
+				"end": 31667,
+				"current": "\t\"blockingList\": \"Заблокувати\",\n\t\"antennas\": \"Антени\"\n",
+				"baseline": "\t\"blockingList\": \"Заблокувати\"\n"
+			},
+			{
+				"start": 32471,
+				"end": 32526,
+				"current": "\t\"blockingList\": \"Chặn\",\n\t\"antennas\": \"Trạm phát sóng\"\n",
+				"baseline": "\t\"blockingList\": \"Chặn\"\n"
+			},
+			{
+				"start": 33006,
+				"end": 33049,
+				"current": "\t\"blockingList\": \"屏蔽列表\",\n\t\"antennas\": \"天线\"\n",
+				"baseline": "\t\"blockingList\": \"屏蔽列表\"\n"
+			},
+			{
+				"start": 33543,
+				"end": 33584,
+				"current": "\t\"blockingList\": \"封鎖\",\n\t\"antennas\": \"天線\"\n",
+				"baseline": "\t\"blockingList\": \"封鎖\"\n"
 			}
 		]
 	},
@@ -9982,7 +10864,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
-		"currentSha256": "72b7587528753682d1808b0d615e7729c088c71d2a5abb210f6b6a82e7605bf0",
+		"currentSha256": "29749ad8071bdf46376d8f2de1de901371d6a262e6586e58ea3e39d783428593",
 		"baselineSha256": "b4f0d6f5bd2b505080654a35748b3c440c48306461bbb002f05767ab893a6b17",
 		"keys": [
 			"default",
@@ -10173,6 +11055,180 @@ export const globalCatalogPilotOwners = [
 				"end": 42423,
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
+			},
+			{
+				"start": 18562,
+				"end": 18738,
+				"current": "\t\t\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.notifications }}</SearchLabel></template>\n",
+				"baseline": "\t\t\t\t\t<template #label><SearchLabel>{{ globalLocale.env.notifications }}</SearchLabel></template>\n"
+			},
+			{
+				"start": 60257,
+				"end": 60316,
+				"current": "\t\"selectList\": \"اختر قائمة\",\n\t\"notifications\": \"الإشعارات\"\n",
+				"baseline": "\t\"selectList\": \"اختر قائمة\"\n"
+			},
+			{
+				"start": 70922,
+				"end": 70990,
+				"current": "\t\"selectList\": \"Tria una llista\",\n\t\"notifications\": \"Notificacions\"\n",
+				"baseline": "\t\"selectList\": \"Tria una llista\"\n"
+			},
+			{
+				"start": 80629,
+				"end": 80690,
+				"current": "\t\"selectList\": \"Vybrat seznam\",\n\t\"notifications\": \"Oznámení\"\n",
+				"baseline": "\t\"selectList\": \"Vybrat seznam\"\n"
+			},
+			{
+				"start": 90158,
+				"end": 90224,
+				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
+				"baseline": "\t\"selectList\": \"Select a list\"\n"
+			},
+			{
+				"start": 100804,
+				"end": 100877,
+				"current": "\t\"selectList\": \"Liste auswählen\",\n\t\"notifications\": \"Benachrichtigungen\"\n",
+				"baseline": "\t\"selectList\": \"Liste auswählen\"\n"
+			},
+			{
+				"start": 110345,
+				"end": 110411,
+				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
+				"baseline": "\t\"selectList\": \"Select a list\"\n"
+			},
+			{
+				"start": 121210,
+				"end": 121284,
+				"current": "\t\"selectList\": \"Selecciona una lista\",\n\t\"notifications\": \"Notificaciones\"\n",
+				"baseline": "\t\"selectList\": \"Selecciona una lista\"\n"
+			},
+			{
+				"start": 131421,
+				"end": 131496,
+				"current": "\t\"selectList\": \"Sélectionner une liste\",\n\t\"notifications\": \"Notifications\"\n",
+				"baseline": "\t\"selectList\": \"Sélectionner une liste\"\n"
+			},
+			{
+				"start": 141364,
+				"end": 141426,
+				"current": "\t\"selectList\": \"Pilih daftar\",\n\t\"notifications\": \"Notifikasi\"\n",
+				"baseline": "\t\"selectList\": \"Pilih daftar\"\n"
+			},
+			{
+				"start": 151592,
+				"end": 151660,
+				"current": "\t\"selectList\": \"Seleziona una lista\",\n\t\"notifications\": \"Notifiche\"\n",
+				"baseline": "\t\"selectList\": \"Seleziona una lista\"\n"
+			},
+			{
+				"start": 158693,
+				"end": 158741,
+				"current": "\t\"selectList\": \"リストを選択\",\n\t\"notifications\": \"通知\"\n",
+				"baseline": "\t\"selectList\": \"リストを選択\"\n"
+			},
+			{
+				"start": 165697,
+				"end": 165745,
+				"current": "\t\"selectList\": \"リストを選ぶ\",\n\t\"notifications\": \"通知\"\n",
+				"baseline": "\t\"selectList\": \"リストを選ぶ\"\n"
+			},
+			{
+				"start": 175211,
+				"end": 175270,
+				"current": "\t\"selectList\": \"Fren tabdart\",\n\t\"notifications\": \"Ilɣuyen\"\n",
+				"baseline": "\t\"selectList\": \"Fren tabdart\"\n"
+			},
+			{
+				"start": 184746,
+				"end": 184810,
+				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"ಅಧಿಸೂಚನೆಗಳು\"\n",
+				"baseline": "\t\"selectList\": \"Select a list\"\n"
+			},
+			{
+				"start": 191799,
+				"end": 191847,
+				"current": "\t\"selectList\": \"리스트 선택\",\n\t\"notifications\": \"알림\"\n",
+				"baseline": "\t\"selectList\": \"리스트 선택\"\n"
+			},
+			{
+				"start": 201561,
+				"end": 201625,
+				"current": "\t\"selectList\": \"Kies een lijst.\",\n\t\"notifications\": \"Meldingen\"\n",
+				"baseline": "\t\"selectList\": \"Kies een lijst.\"\n"
+			},
+			{
+				"start": 211101,
+				"end": 211161,
+				"current": "\t\"selectList\": \"Velg en liste\",\n\t\"notifications\": \"Varsler\"\n",
+				"baseline": "\t\"selectList\": \"Velg en liste\"\n"
+			},
+			{
+				"start": 220857,
+				"end": 220923,
+				"current": "\t\"selectList\": \"Wybierz listę\",\n\t\"notifications\": \"Powiadomienia\"\n",
+				"baseline": "\t\"selectList\": \"Wybierz listę\"\n"
+			},
+			{
+				"start": 231141,
+				"end": 231212,
+				"current": "\t\"selectList\": \"Selecione uma lista\",\n\t\"notifications\": \"Notificações\"\n",
+				"baseline": "\t\"selectList\": \"Selecione uma lista\"\n"
+			},
+			{
+				"start": 241232,
+				"end": 241298,
+				"current": "\t\"selectList\": \"Выберите список\",\n\t\"notifications\": \"Уведомления\"\n",
+				"baseline": "\t\"selectList\": \"Выберите список\"\n"
+			},
+			{
+				"start": 250843,
+				"end": 250906,
+				"current": "\t\"selectList\": \"Vyberte zoznam\",\n\t\"notifications\": \"Oznámenia\"\n",
+				"baseline": "\t\"selectList\": \"Vyberte zoznam\"\n"
+			},
+			{
+				"start": 260079,
+				"end": 260141,
+				"current": "\t\"selectList\": \"เลือกรายชื่อ\",\n\t\"notifications\": \"เเจ้งเตือน\"\n",
+				"baseline": "\t\"selectList\": \"เลือกรายชื่อ\"\n"
+			},
+			{
+				"start": 270272,
+				"end": 270336,
+				"current": "\t\"selectList\": \"Bir liste seç\",\n\t\"notifications\": \"Bildirimler\"\n",
+				"baseline": "\t\"selectList\": \"Bir liste seç\"\n"
+			},
+			{
+				"start": 279804,
+				"end": 279870,
+				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
+				"baseline": "\t\"selectList\": \"Select a list\"\n"
+			},
+			{
+				"start": 289936,
+				"end": 290001,
+				"current": "\t\"selectList\": \"Виберіть список\",\n\t\"notifications\": \"Сповіщення\"\n",
+				"baseline": "\t\"selectList\": \"Виберіть список\"\n"
+			},
+			{
+				"start": 299671,
+				"end": 299734,
+				"current": "\t\"selectList\": \"Chọn danh sách\",\n\t\"notifications\": \"Thông báo\"\n",
+				"baseline": "\t\"selectList\": \"Chọn danh sách\"\n"
+			},
+			{
+				"start": 305750,
+				"end": 305796,
+				"current": "\t\"selectList\": \"选择列表\",\n\t\"notifications\": \"通知\"\n",
+				"baseline": "\t\"selectList\": \"选择列表\"\n"
+			},
+			{
+				"start": 311895,
+				"end": 311941,
+				"current": "\t\"selectList\": \"選擇清單\",\n\t\"notifications\": \"通知\"\n",
+				"baseline": "\t\"selectList\": \"選擇清單\"\n"
 			}
 		],
 		"nonPrimaryOrder": [
@@ -11132,7 +12188,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/relationships/frontend/pages/settings/mute-block.vue",
-		"currentSha256": "ee30314f3c1b69326319f8a6f6ffe134e02f92b8001dedcb8a2c0dd82b9a6594",
+		"currentSha256": "79af83278304007e8991107198c141a7e15fbe53c2b12930c5634aebcc6ff8f8",
 		"baselineSha256": "97febbee03406b296bf5593e5ef41357f9b79212153cd93e66646825ace46340",
 		"keys": [
 			"mutedUsers",
@@ -11171,6 +12227,204 @@ export const globalCatalogPilotOwners = [
 				"end": 8285,
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
+			},
+			{
+				"start": 2415,
+				"end": 2615,
+				"current": "\t\t\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.mutedUsers }} ({{ $locale.sfc.renote }})</SearchLabel></template>\n",
+				"baseline": "\t\t\t\t\t<template #label><SearchLabel>{{ globalLocale.env.mutedUsers }} ({{ globalLocale.env.renote }})</SearchLabel></template>\n"
+			},
+			{
+				"start": 3781,
+				"end": 3863,
+				"current": "\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n",
+				"baseline": ""
+			},
+			{
+				"start": 3880,
+				"end": 3916,
+				"current": "\t\t\t\t:label=\"$locale.sfc.mutedUsers\"\n",
+				"baseline": "\t\t\t\t:label=\"globalLocale.env.mutedUsers\"\n"
+			},
+			{
+				"start": 5421,
+				"end": 5503,
+				"current": "\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n",
+				"baseline": ""
+			},
+			{
+				"start": 5520,
+				"end": 5558,
+				"current": "\t\t\t\t:label=\"$locale.sfc.blockedUsers\"\n",
+				"baseline": "\t\t\t\t:label=\"globalLocale.env.blockedUsers\"\n"
+			},
+			{
+				"start": 12588,
+				"end": 12718,
+				"current": "\t\"noUsers\": \"ليس هناك مستخدمون\",\n\t\"mutedUsers\": \"الحسابات المكتومة\",\n\t\"renote\": \"أعد النشر\",\n\t\"blockedUsers\": \"الحسابات المحجوبة\"\n",
+				"baseline": "\t\"noUsers\": \"ليس هناك مستخدمون\"\n"
+			},
+			{
+				"start": 13598,
+				"end": 13728,
+				"current": "\t\"noUsers\": \"No hi ha usuaris\",\n\t\"mutedUsers\": \"Usuaris silenciats\",\n\t\"renote\": \"Impulsar\",\n\t\"blockedUsers\": \"Usuaris bloquejats\"\n",
+				"baseline": "\t\"noUsers\": \"No hi ha usuaris\"\n"
+			},
+			{
+				"start": 14493,
+				"end": 14624,
+				"current": "\t\"noUsers\": \"Žádní uživatelé\",\n\t\"mutedUsers\": \"Zltumení uživatelé\",\n\t\"renote\": \"Přeposlat\",\n\t\"blockedUsers\": \"Blokovaní uživatelé\"\n",
+				"baseline": "\t\"noUsers\": \"Žádní uživatelé\"\n"
+			},
+			{
+				"start": 15363,
+				"end": 15481,
+				"current": "\t\"noUsers\": \"There are no users\",\n\t\"mutedUsers\": \"Muted users\",\n\t\"renote\": \"Renote\",\n\t\"blockedUsers\": \"Blocked users\"\n",
+				"baseline": "\t\"noUsers\": \"There are no users\"\n"
+			},
+			{
+				"start": 16454,
+				"end": 16597,
+				"current": "\t\"noUsers\": \"Keine Benutzer gefunden\",\n\t\"mutedUsers\": \"Stummgeschaltete Benutzer\",\n\t\"renote\": \"Renote\",\n\t\"blockedUsers\": \"Blockierte Benutzer\"\n",
+				"baseline": "\t\"noUsers\": \"Keine Benutzer gefunden\"\n"
+			},
+			{
+				"start": 17336,
+				"end": 17454,
+				"current": "\t\"noUsers\": \"There are no users\",\n\t\"mutedUsers\": \"Muted users\",\n\t\"renote\": \"Renote\",\n\t\"blockedUsers\": \"Blocked users\"\n",
+				"baseline": "\t\"noUsers\": \"There are no users\"\n"
+			},
+			{
+				"start": 18327,
+				"end": 18458,
+				"current": "\t\"noUsers\": \"No hay usuarios\",\n\t\"mutedUsers\": \"Usuarios silenciados\",\n\t\"renote\": \"Renotar\",\n\t\"blockedUsers\": \"Usuarios bloqueados\"\n",
+				"baseline": "\t\"noUsers\": \"No hay usuarios\"\n"
+			},
+			{
+				"start": 19243,
+				"end": 19412,
+				"current": "\t\"noUsers\": \"Il n’y a pas d’utilisateur·rice·s\",\n\t\"mutedUsers\": \"Utilisateur·rice·s en sourdine\",\n\t\"renote\": \"Renoter\",\n\t\"blockedUsers\": \"Utilisateur·rice·s bloqué·e·s\"\n",
+				"baseline": "\t\"noUsers\": \"Il n’y a pas d’utilisateur·rice·s\"\n"
+			},
+			{
+				"start": 20257,
+				"end": 20396,
+				"current": "\t\"noUsers\": \"Tidak ada pengguna\",\n\t\"mutedUsers\": \"Pengguna yang dibisukan\",\n\t\"renote\": \"Renote\",\n\t\"blockedUsers\": \"Pengguna yang diblokir\"\n",
+				"baseline": "\t\"noUsers\": \"Tidak ada pengguna\"\n"
+			},
+			{
+				"start": 21225,
+				"end": 21354,
+				"current": "\t\"noUsers\": \"Non ci sono profili\",\n\t\"mutedUsers\": \"Profili silenziati\",\n\t\"renote\": \"Rinota\",\n\t\"blockedUsers\": \"Profili bloccati\"\n",
+				"baseline": "\t\"noUsers\": \"Non ci sono profili\"\n"
+			},
+			{
+				"start": 21889,
+				"end": 21992,
+				"current": "\t\"noUsers\": \"ユーザーはいません\",\n\t\"mutedUsers\": \"ミュートしたユーザー\",\n\t\"renote\": \"リノート\",\n\t\"blockedUsers\": \"ブロックしたユーザー\"\n",
+				"baseline": "\t\"noUsers\": \"ユーザーはいません\"\n"
+			},
+			{
+				"start": 22534,
+				"end": 22638,
+				"current": "\t\"noUsers\": \"ユーザーはおらん\",\n\t\"mutedUsers\": \"ミュートしとるユーザー\",\n\t\"renote\": \"リノート\",\n\t\"blockedUsers\": \"ブロックしとるユーザー\"\n",
+				"baseline": "\t\"noUsers\": \"ユーザーはおらん\"\n"
+			},
+			{
+				"start": 23379,
+				"end": 23497,
+				"current": "\t\"noUsers\": \"There are no users\",\n\t\"mutedUsers\": \"Muted users\",\n\t\"renote\": \"Renote\",\n\t\"blockedUsers\": \"Blocked users\"\n",
+				"baseline": "\t\"noUsers\": \"There are no users\"\n"
+			},
+			{
+				"start": 24236,
+				"end": 24354,
+				"current": "\t\"noUsers\": \"There are no users\",\n\t\"mutedUsers\": \"Muted users\",\n\t\"renote\": \"Renote\",\n\t\"blockedUsers\": \"Blocked users\"\n",
+				"baseline": "\t\"noUsers\": \"There are no users\"\n"
+			},
+			{
+				"start": 24875,
+				"end": 24968,
+				"current": "\t\"noUsers\": \"아무도 없습니다\",\n\t\"mutedUsers\": \"뮤트한 유저\",\n\t\"renote\": \"리노트\",\n\t\"blockedUsers\": \"차단한 유저\"\n",
+				"baseline": "\t\"noUsers\": \"아무도 없습니다\"\n"
+			},
+			{
+				"start": 25801,
+				"end": 25945,
+				"current": "\t\"noUsers\": \"Er zijn geen gebruikers.\",\n\t\"mutedUsers\": \"Gedempte gebruikers\",\n\t\"renote\": \"Herdelen\",\n\t\"blockedUsers\": \"Geblokkeerde gebruikers\"\n",
+				"baseline": "\t\"noUsers\": \"Er zijn geen gebruikers.\"\n"
+			},
+			{
+				"start": 26688,
+				"end": 26816,
+				"current": "\t\"noUsers\": \"Det er ingen brukere\",\n\t\"mutedUsers\": \"Skjulte brukere\",\n\t\"renote\": \"Renote\",\n\t\"blockedUsers\": \"Blokkerte brukere\"\n",
+				"baseline": "\t\"noUsers\": \"Det er ingen brukere\"\n"
+			},
+			{
+				"start": 27600,
+				"end": 27741,
+				"current": "\t\"noUsers\": \"Brak użytkowników\",\n\t\"mutedUsers\": \"Wyciszeni użytkownicy\",\n\t\"renote\": \"Udostępnij\",\n\t\"blockedUsers\": \"Zablokowani użytkownicy\"\n",
+				"baseline": "\t\"noUsers\": \"Brak użytkowników\"\n"
+			},
+			{
+				"start": 28554,
+				"end": 28683,
+				"current": "\t\"noUsers\": \"Sem usuários\",\n\t\"mutedUsers\": \"Usuários silenciados\",\n\t\"renote\": \"Repostar\",\n\t\"blockedUsers\": \"Usuários bloqueados\"\n",
+				"baseline": "\t\"noUsers\": \"Sem usuários\"\n"
+			},
+			{
+				"start": 29488,
+				"end": 29638,
+				"current": "\t\"noUsers\": \"Нет ни одного пользователя\",\n\t\"mutedUsers\": \"Скрытые пользователи\",\n\t\"renote\": \"Репост\",\n\t\"blockedUsers\": \"Заблокированные пользователи\"\n",
+				"baseline": "\t\"noUsers\": \"Нет ни одного пользователя\"\n"
+			},
+			{
+				"start": 30394,
+				"end": 30534,
+				"current": "\t\"noUsers\": \"Žiadni používatelia\",\n\t\"mutedUsers\": \"Umlčaní používatelia\",\n\t\"renote\": \"Preposlať\",\n\t\"blockedUsers\": \"Blokovaní používatelia\"\n",
+				"baseline": "\t\"noUsers\": \"Žiadni používatelia\"\n"
+			},
+			{
+				"start": 31204,
+				"end": 31331,
+				"current": "\t\"noUsers\": \"ไม่พบผู้ใช้งาน\",\n\t\"mutedUsers\": \"ผู้ใช้ที่ถูกปิดเสียง\",\n\t\"renote\": \"รีโน้ต\",\n\t\"blockedUsers\": \"ผู้ใช้ที่ถูกบล็อก\"\n",
+				"baseline": "\t\"noUsers\": \"ไม่พบผู้ใช้งาน\"\n"
+			},
+			{
+				"start": 32195,
+				"end": 32334,
+				"current": "\t\"noUsers\": \"Kullanıcı yok\",\n\t\"mutedUsers\": \"Sessize alınan kullanıcılar\",\n\t\"renote\": \"Renote\",\n\t\"blockedUsers\": \"Engellenen kullanıcılar\"\n",
+				"baseline": "\t\"noUsers\": \"Kullanıcı yok\"\n"
+			},
+			{
+				"start": 33073,
+				"end": 33191,
+				"current": "\t\"noUsers\": \"There are no users\",\n\t\"mutedUsers\": \"Muted users\",\n\t\"renote\": \"Renote\",\n\t\"blockedUsers\": \"Blocked users\"\n",
+				"baseline": "\t\"noUsers\": \"There are no users\"\n"
+			},
+			{
+				"start": 34017,
+				"end": 34157,
+				"current": "\t\"noUsers\": \"Немає користувачів\",\n\t\"mutedUsers\": \"Заглушені користувачі\",\n\t\"renote\": \"Поширити\",\n\t\"blockedUsers\": \"Заблоковані користувачі\"\n",
+				"baseline": "\t\"noUsers\": \"Немає користувачів\"\n"
+			},
+			{
+				"start": 34864,
+				"end": 34976,
+				"current": "\t\"noUsers\": \"Chưa có ai\",\n\t\"mutedUsers\": \"Người đã ẩn\",\n\t\"renote\": \"Đăng lại\",\n\t\"blockedUsers\": \"Người đã chặn\"\n",
+				"baseline": "\t\"noUsers\": \"Chưa có ai\"\n"
+			},
+			{
+				"start": 35417,
+				"end": 35504,
+				"current": "\t\"noUsers\": \"无用户\",\n\t\"mutedUsers\": \"已隐藏的用户\",\n\t\"renote\": \"转发\",\n\t\"blockedUsers\": \"已屏蔽的用户\"\n",
+				"baseline": "\t\"noUsers\": \"无用户\"\n"
+			},
+			{
+				"start": 35952,
+				"end": 36045,
+				"current": "\t\"noUsers\": \"沒有任何使用者\",\n\t\"mutedUsers\": \"被靜音的使用者\",\n\t\"renote\": \"轉發\",\n\t\"blockedUsers\": \"被封鎖的使用者\"\n",
+				"baseline": "\t\"noUsers\": \"沒有任何使用者\"\n"
 			}
 		]
 	},
