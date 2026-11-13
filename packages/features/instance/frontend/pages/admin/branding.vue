@@ -96,7 +96,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<SearchMarker :keywords="['image']">
 					<MkInput v-model="serverErrorImageUrl" type="url">
 						<template #prefix><i class="ti ti-link"></i></template>
-						<template #label><SearchLabel>{{ globalLocale.env.somethingHappened }}</SearchLabel></template>
+						<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
+						<template #label><SearchLabel>{{ $locale.sfc.somethingHappened }}</SearchLabel></template>
 					</MkInput>
 				</SearchMarker>
 
@@ -256,7 +257,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "حدث خطأ"
 }
 </locale>
 
@@ -281,7 +283,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Tema fosc per defecte de tota la instància ",
 	"repositoryUrl": "URL del repositori",
 	"feedbackUrl": "URL per a opinar",
-	"serverSettingsManifestJsonOverride": "Sobreescriure manifest.json"
+	"serverSettingsManifestJsonOverride": "Sobreescriure manifest.json",
+	"somethingHappened": "S'ha produït un error"
 }
 </locale>
 
@@ -306,7 +309,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Výhozí tmavý motiv instance",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "Jejda. Něco se nepovedlo."
 }
 </locale>
 
@@ -331,7 +335,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "An error has occurred"
 }
 </locale>
 
@@ -356,7 +361,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Instanzweites Standardfarbschema (Dunkel)",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback-Website",
-	"serverSettingsManifestJsonOverride": "Überschreiben von manifest.json"
+	"serverSettingsManifestJsonOverride": "Überschreiben von manifest.json",
+	"somethingHappened": "Ein Fehler ist aufgetreten"
 }
 </locale>
 
@@ -381,7 +387,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "An error has occurred"
 }
 </locale>
 
@@ -406,7 +413,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Tema oscuro por defecto de la instancia",
 	"repositoryUrl": "URL del repositorio",
 	"feedbackUrl": "URL de comentarios",
-	"serverSettingsManifestJsonOverride": "Sobreescribir manifest.json"
+	"serverSettingsManifestJsonOverride": "Sobreescribir manifest.json",
+	"somethingHappened": "Ocurrió un error"
 }
 </locale>
 
@@ -431,7 +439,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Thème sombre par défaut sur toute l’instance",
 	"repositoryUrl": "URL du dépôt",
 	"feedbackUrl": "URL pour les commentaires",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "Une erreur est survenue"
 }
 </locale>
 
@@ -456,7 +465,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Bawaan instan tema gelap",
 	"repositoryUrl": "URL Repositori",
 	"feedbackUrl": "URL Umpan balik",
-	"serverSettingsManifestJsonOverride": "Ambil alih manifest.json"
+	"serverSettingsManifestJsonOverride": "Ambil alih manifest.json",
+	"somethingHappened": "Terjadi kesalahan"
 }
 </locale>
 
@@ -481,7 +491,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Istanza, tema scuro predefinito.",
 	"repositoryUrl": "URL della repository",
 	"feedbackUrl": "URL di feedback",
-	"serverSettingsManifestJsonOverride": "Sostituire il file manifest.json"
+	"serverSettingsManifestJsonOverride": "Sostituire il file manifest.json",
+	"somethingHappened": "Si è verificato un problema"
 }
 </locale>
 
@@ -506,7 +517,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "サーバーデフォルトのダークテーマ",
 	"repositoryUrl": "リポジトリURL",
 	"feedbackUrl": "フィードバックURL",
-	"serverSettingsManifestJsonOverride": "manifest.jsonのオーバーライド"
+	"serverSettingsManifestJsonOverride": "manifest.jsonのオーバーライド",
+	"somethingHappened": "問題が発生しました"
 }
 </locale>
 
@@ -531,7 +543,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "サーバーおすすめのの暗いテーマ",
 	"repositoryUrl": "リポジトリURL",
 	"feedbackUrl": "フィードバックURL",
-	"serverSettingsManifestJsonOverride": "manifest.jsonのオーバーライド"
+	"serverSettingsManifestJsonOverride": "manifest.jsonのオーバーライド",
+	"somethingHappened": "なんかあかんわ"
 }
 </locale>
 
@@ -556,7 +569,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "An error has occurred"
 }
 </locale>
 
@@ -581,7 +595,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "An error has occurred"
 }
 </locale>
 
@@ -606,7 +621,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "서버 기본 다크 테마",
 	"repositoryUrl": "저장소 URL",
 	"feedbackUrl": "피드백 URL",
-	"serverSettingsManifestJsonOverride": "manifest.json 오버라이드"
+	"serverSettingsManifestJsonOverride": "manifest.json 오버라이드",
+	"somethingHappened": "오류가 발생했습니다"
 }
 </locale>
 
@@ -631,7 +647,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "Er is iets misgegaan."
 }
 </locale>
 
@@ -656,7 +673,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "En feil har oppstått"
 }
 </locale>
 
@@ -681,7 +699,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Domyślny motyw dla trybu ciemnego",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "Coś poszło nie tak"
 }
 </locale>
 
@@ -706,7 +725,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Tema noturno para toda a instância",
 	"repositoryUrl": "URL do repositório",
 	"feedbackUrl": "Link para Feedback",
-	"serverSettingsManifestJsonOverride": "Sobrescrever manifest.json"
+	"serverSettingsManifestJsonOverride": "Sobrescrever manifest.json",
+	"somethingHappened": "Ocorreu um erro"
 }
 </locale>
 
@@ -731,7 +751,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Темная тема по умолчанию",
 	"repositoryUrl": "Ссылка на репозиторий",
 	"feedbackUrl": "Ссылка для обратной связи",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "Что-то пошло не так"
 }
 </locale>
 
@@ -756,7 +777,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Predvolená tmavá téma",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "Ups. Niečo sa nepodarilo."
 }
 </locale>
 
@@ -781,7 +803,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "ธีมมืดตามค่าเริ่มต้นของเซิร์ฟเวอร์",
 	"repositoryUrl": "URL ของ repository",
 	"feedbackUrl": "URLของฟีดแบ็ก",
-	"serverSettingsManifestJsonOverride": "เขียนทับ manifest.json"
+	"serverSettingsManifestJsonOverride": "เขียนทับ manifest.json",
+	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด"
 }
 </locale>
 
@@ -806,7 +829,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Sunucu genelinde varsayılan koyu tema",
 	"repositoryUrl": "Depo URL'si",
 	"feedbackUrl": "Geri Bildirim URL'si",
-	"serverSettingsManifestJsonOverride": "manifest.json Geçersiz Kılma"
+	"serverSettingsManifestJsonOverride": "manifest.json Geçersiz Kılma",
+	"somethingHappened": "Bir hata oluştu"
 }
 </locale>
 
@@ -831,7 +855,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Instance-wide default dark theme",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "Feedback URL",
-	"serverSettingsManifestJsonOverride": "manifest.json Override"
+	"serverSettingsManifestJsonOverride": "manifest.json Override",
+	"somethingHappened": "An error has occurred"
 }
 </locale>
 
@@ -856,7 +881,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Темна тема за промовчанням",
 	"repositoryUrl": "URL репозиторію",
 	"feedbackUrl": "URL відгуків",
-	"serverSettingsManifestJsonOverride": "Перевизначення manifest.json "
+	"serverSettingsManifestJsonOverride": "Перевизначення manifest.json ",
+	"somethingHappened": "Щось пішло не так"
 }
 </locale>
 
@@ -881,7 +907,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "Theme máy chủ Tối-Rộng",
 	"repositoryUrl": "Repository URL",
 	"feedbackUrl": "URL phản hồi",
-	"serverSettingsManifestJsonOverride": "Ghi đè manifest.json"
+	"serverSettingsManifestJsonOverride": "Ghi đè manifest.json",
+	"somethingHappened": "Xảy ra lỗi"
 }
 </locale>
 
@@ -906,7 +933,8 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "服务器默认深色主题",
 	"repositoryUrl": "仓库地址",
 	"feedbackUrl": "反馈地址",
-	"serverSettingsManifestJsonOverride": "覆盖 manifest.json"
+	"serverSettingsManifestJsonOverride": "覆盖 manifest.json",
+	"somethingHappened": "出错了"
 }
 </locale>
 
@@ -931,6 +959,7 @@ definePage(() => ({
 	"instanceDefaultDarkTheme": "實例預設的深色佈景主題",
 	"repositoryUrl": "儲存庫 URL",
 	"feedbackUrl": "意見回饋 URL",
-	"serverSettingsManifestJsonOverride": "覆寫 manifest.json"
+	"serverSettingsManifestJsonOverride": "覆寫 manifest.json",
+	"somethingHappened": "發生錯誤"
 }
 </locale>
