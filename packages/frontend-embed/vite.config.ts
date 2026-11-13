@@ -13,7 +13,6 @@ import meta from '../../package.json';
 import packageInfo from './package.json' with { type: 'json' };
 import embedSourcePaths from './lib/embed-source-paths.json' with { type: 'json' };
 import pluginJson5 from './lib/vite-plugin-json5.js';
-import { pluginRemoveUnrefI18n } from '../frontend-builder/rollup-plugin-remove-unref-i18n';
 import { Features } from 'lightningcss';
 
 const url = process.env.NODE_ENV === 'development' ? (loadYaml(await fsp.readFile('../../.config/default.yml', 'utf-8')) as any).url : null;
@@ -97,7 +96,6 @@ export function getConfig(): UserConfig {
 			pluginHostLocaleEntries({ embed: true }),
 			pluginVvi({ embed: true }),
 			pluginVue(),
-			pluginRemoveUnrefI18n(),
 			pluginJson5(),
 		],
 
