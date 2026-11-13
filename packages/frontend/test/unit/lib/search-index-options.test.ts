@@ -59,9 +59,9 @@ test('search markers preserve SFC locale references for the public VVI runtime',
 	const load = plugin.load;
 	if (typeof load !== 'function') throw new Error('Expected a load hook');
 	const generated = await load.call({ addWatchFile: () => {} } as never, `search-index-individual:${serverRulesFile}.ts`);
+	expect(generated).not.toContain("import { i18n }");
 	expect(generated).toContain("import { createComponentLocale } from 'vite-vue-internationalization/runtime';");
 	expect(generated).toContain("${createComponentLocale('/features/instance/frontend/pages/admin/server-rules.vue').serverRules}");
-	expect(generated).toContain("import { i18n } from '@features/runtime/frontend/i18n.js';");
 });
 
 test.each([
