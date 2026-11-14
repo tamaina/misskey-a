@@ -249,7 +249,6 @@ test('native Accept consumption and channel cancellation are serialized before c
 	expect(locks.size).toBe(0);
 });
 
-
 describe('channel federation freeze lifecycle', () => {
 	test('frozen Group discards Create before author import but preserves verified Delete', async () => {
 		const f = fixture();
@@ -318,7 +317,6 @@ describe('channel federation freeze lifecycle', () => {
 	});
 });
 
-
 test.each([false, true])('inherited frozen-channel remote replies require verified historical membership (%s)', async historical => {
 	const channel = mockDeep<MiChannel>({ id: 'channel123', host: 'remote.test', isFederated: true, isFederationFrozen: true });
 	const channels = mockDeep<ChannelsRepository>();
@@ -352,7 +350,6 @@ test('local frozen-channel posts are marked permanently localOnly before normal 
 	expect(data.localOnly).toBe(true);
 });
 
-
 test('replayed Group Update cannot override the current canonical freeze state', async () => {
 	const f = fixture();
 	const channel = mockDeep<MiChannel>({ id: 'channel123', host: remote.host, uri: groupUri, isFederated: true, isFederationFrozen: true });
@@ -365,7 +362,6 @@ test('replayed Group Update cannot override the current canonical freeze state',
 	await f.service.receiveUpdate(remote, { type: 'Group', id: groupUri, _misskey_channel: true, _misskey_channelFrozen: true });
 	expect(f.channels.update).toHaveBeenCalledWith(channel.id, { isFederationFrozen: false });
 });
-
 
 test('an overlapping eligibility mutation scan is not skipped behind an earlier scan', async () => {
 	const f = fixture();

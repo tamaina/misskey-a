@@ -243,7 +243,6 @@ test.each(['inReplyTo', '_misskey_quote'] as const)('ordinary acquisition verifi
 	assertNoSubscription(f);
 });
 
-
 test('a frozen Group retains acquisition of a canonical previously public Note without accepting a new contribution', async () => {
 	const f = fixture();
 	f.group._misskey_channelFrozen = true;

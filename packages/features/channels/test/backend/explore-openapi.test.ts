@@ -44,13 +44,13 @@ test.each(['channelsFeatured', 'channelsSearch'] as const)('%s keeps origin opti
 	for (const origin of ['all', '', null, true]) expect(v.safeParse(input, { ...params, origin }).success).toBe(false);
 });
 
-
 test('freeze and eligibility proof rejects changed types and requiredness', async () => {
 	const spec = await genCompatibleOpenapiSpec({ version: 'test', apiUrl: 'https://example.test/api' });
 	for (const field of ['canFederateChannel', 'isFederationFrozen']) {
 		for (const mutation of ['type', 'required']) {
 			const invalid = structuredClone(spec);
 			let changed = false;
+
 			function mutate(value: unknown): void {
 				if (changed || value == null || typeof value !== 'object') return;
 				const schema = value as { properties?: Record<string, unknown>; required?: string[] };
@@ -62,6 +62,7 @@ test('freeze and eligibility proof rejects changed types and requiredness', asyn
 				}
 				Object.values(value).forEach(mutate);
 			}
+
 			mutate(invalid);
 			expect(changed).toBe(true);
 			expect(() => restoreChannelFederationOpenapiBaseline(invalid)).toThrow();

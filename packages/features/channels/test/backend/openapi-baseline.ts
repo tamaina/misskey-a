@@ -16,6 +16,7 @@ export function restoreChannelFederationOpenapiBaseline<T extends { paths?: Reco
 	// Reverse the separately reviewed freeze/role additions before replaying the
 	// existing federation proof. Validate their types, owners and requiredness.
 	const freezeCounts = { policy: 0, channel: 0, input: 0 };
+
 	function restoreFreezeFields(value: unknown): void {
 		if (Array.isArray(value)) { value.forEach(restoreFreezeFields); return; }
 		if (!record(value)) return;
@@ -44,6 +45,7 @@ export function restoreChannelFederationOpenapiBaseline<T extends { paths?: Reco
 		}
 		Object.values(value).forEach(restoreFreezeFields);
 	}
+
 	restoreFreezeFields(restored);
 	deepStrictEqual(freezeCounts, { policy: 39, channel: 10, input: 2 }, 'Documented channel freeze change inventory differs');
 	const counts = { input: 0, channel: 0, noteChannel: 0, error: 0 };
