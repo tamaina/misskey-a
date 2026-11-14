@@ -11,7 +11,7 @@ const id = v.pipe(v.string(), v.minLength(1), v.maxLength(128));
 const rowSchema = v.strictObject({
 	v: v.literal(1), kind: v.picklist(['register-passkey', 'activate-passkey-mfa', 'disable-password-login', 'enable-passwordless-login']),
 	userId: id, sessionId: id, policyStamp: v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/)),
-	sudoUntil: v.pipe(v.number(), v.integer()), sudoGrantId: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)),
+	sudoUntil: v.nullable(v.pipe(v.number(), v.integer())), sudoGrantId: v.nullable(v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/))),
 	challenge: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{1,1024}$/)), requireUV: v.boolean(),
 	name: v.nullable(v.pipe(v.string(), v.minLength(1), v.maxLength(30))),
 	backupCodes: v.nullable(v.pipe(v.array(v.pipe(v.string(), v.maxLength(128))), v.maxLength(5))),
@@ -27,7 +27,9 @@ export class SecurityOperationStore {
 	constructor(private redis: Pick<Redis, 'eval'>) {}
 	async create(value: SecurityOperation): Promise<string> {
 		const row = v.parse(rowSchema, { v: 1, ...value });
-		const remaining = Math.min(90_000, value.sudoUntil - Date.now());
+		const deadline = value.kind === 'enable-passwordless-login' ? Date.now() + 90_000 : value.sudoUntil;
+		if (deadline === null) throw new Error('Elevation required');
+		const remaining = Math.min(90_000, deadline - Date.now());
 		if (remaining <= 0) throw new Error('Elevation expired');
 		const ticket = randomBytes(32).toString('base64url');
 		const result = await this.redis.eval(`
@@ -35,7 +37,7 @@ local t = redis.call('TIME'); local now = tonumber(t[1]) * 1000 + math.floor(ton
 local ttl = math.min(90000, tonumber(ARGV[2]) - now, tonumber(ARGV[3]))
 if ttl <= 0 then return nil end
 return redis.call('SET', KEYS[1], ARGV[1], 'PX', ttl, 'NX')
-`, 1, key(ticket), JSON.stringify(row), row.sudoUntil, remaining);
+`, 1, key(ticket), JSON.stringify(row), deadline, remaining);
 		if (result !== 'OK') throw new Error('Cannot start confirmation');
 		return ticket;
 	}

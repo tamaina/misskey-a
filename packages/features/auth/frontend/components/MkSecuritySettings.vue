@@ -12,18 +12,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template v-else>
 			<p>{{ state.passkeyMfaEnabled ? $locale.sfc.mfaActive : $locale.sfc.mfaInactive }}</p>
 			<MkInfo v-if="(state.totpEnabled || state.passkeyMfaEnabled) && state.recoveryCodesRemaining < 5" warn>{{ $locale.sfc.codesWarning }}</MkInfo>
-			<div class="_buttons">
-				<MkButton :disabled="busy || !supportsPasskey" @click="registerKey">{{ $locale.sfc.registerKey }}</MkButton>
-				<MkButton :disabled="busy" @click="loadKeys">{{ $locale.sfc.showKeys }}</MkButton>
-			</div>
-			<MkInfo v-if="!supportsPasskey" warn>{{ $locale.sfc.unsupported }}</MkInfo>
-			<div v-for="key in keys" :key="key.id" class="_gaps_s">
-				<strong>{{ key.name }}</strong><MkTime :time="key.lastUsedAt"/>
-				<div class="_buttons">
-					<MkButton :disabled="busy" @click="renameKey(key)">{{ $locale.sfc.rename }}</MkButton>
-					<MkButton danger :disabled="busy" @click="removeKey(key)">{{ $locale.sfc.remove }}</MkButton>
+			<MkFolder @opened="loadKeys">
+				<template #icon><i class="ti ti-key"></i></template>
+				<template #label>{{ $locale.sfc.securityKeyAndPasskey }}</template>
+				<div class="_gaps_m">
+					<MkInfo v-if="!supportsPasskey" warn>{{ $locale.sfc.unsupported }}</MkInfo>
+					<MkFolder v-for="key in keys" :key="key.id">
+						<template #label>{{ key.name }}</template>
+						<template #suffix><MkTime :time="key.lastUsedAt"/></template>
+						<div class="_buttons">
+							<MkButton :disabled="busy" @click="renameKey(key)">{{ $locale.sfc.rename }}</MkButton>
+							<MkButton danger :disabled="busy" @click="removeKey(key)">{{ $locale.sfc.remove }}</MkButton>
+						</div>
+					</MkFolder>
+					<MkButton :disabled="busy || !supportsPasskey" @click="registerKey">{{ $locale.sfc.registerKey }}</MkButton>
 				</div>
-			</div>
+			</MkFolder>
 			<MkButton v-if="state.passkeyMfaEnabled" danger :disabled="busy" @click="disableMfa">{{ $locale.sfc.disableMfa }}</MkButton>
 			<MkSwitch :modelValue="state.passwordlessEnabled" :disabled="busy || state.passkeyCount === 0 || state.passwordLoginDisabled" @update:modelValue="setPasswordless">
 				{{ $locale.sfc.passwordless }}
@@ -48,15 +52,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkButton :disabled="busy" @click="clearPending">{{ $locale.sfc.cancel }}</MkButton>
 				</div>
 			</form>
-			<div v-if="state.totpEnabled || state.passkeyMfaEnabled" class="_buttons">
-				<MkButton :disabled="busy" @click="showCodes(false)">{{ $locale.sfc.showCodes }}</MkButton>
-				<MkButton :disabled="busy" @click="showCodes(true)">{{ $locale.sfc.regenerateCodes }}</MkButton>
-			</div>
-			<div v-if="codes" class="_gaps_s">
-				<MkInfo warn>{{ $locale.sfc.codesDescription }}</MkInfo>
-				<ul><li v-for="code in codes" :key="code"><code>{{ code }}</code></li></ul>
-				<MkButton @click="codes = null">{{ $locale.sfc.hideCodes }}</MkButton>
-			</div>
+			<MkButton v-if="state.totpEnabled || state.passkeyMfaEnabled" :disabled="busy" @click="regenerateCodes">{{ $locale.sfc.regenerateCodes }}</MkButton>
 		</template>
 		<p v-if="error" role="alert">{{ $locale.sfc.failed }}</p>
 	</div>
@@ -66,6 +62,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
 import { browserSupportsWebAuthn, startAuthentication, startRegistration, WebAuthnAbortService } from '@simplewebauthn/browser';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import MkRecoveryCodesDialog from './MkRecoveryCodesDialog.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -85,7 +83,7 @@ const state = ref<Awaited<ReturnType<typeof readState>> | null>(null);
 const keys = ref<{ id: string; name: string; lastUsedAt: string }[]>([]);
 const totp = ref<{ secret: string; url: string } | null>(null);
 const totpCode = ref('');
-const codes = ref<string[] | null>(null);
+let codesDialog: { dispose: () => void } | null = null;
 const busy = ref(false);
 const error = ref(false);
 let generation = 0;
@@ -96,7 +94,7 @@ const currentActor = () => active && ensureSignin().id === ownerId && ensureSign
 const readState = () => misskeyApi('i/security/state', {});
 
 function clearPending() {
-	totp.value = null; totpCode.value = ''; codes.value = null;
+	totp.value = null; totpCode.value = ''; codesDialog?.dispose(); codesDialog = null;
 }
 
 function leave() {
@@ -136,7 +134,7 @@ function registerKey() {
 		nativePending = false;
 		if (!isCurrent()) return;
 		const value = await misskeyApi('i/security/passkey/register/complete', { ticket: started.ticket, credential: registrationWire(credential) });
-		if (isCurrent()) { keys.value = []; clearPending(); codes.value = value.backupCodes; await refresh(isCurrent); }
+		if (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); if (isCurrent()) { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; } }
 	});
 }
 
@@ -183,7 +181,7 @@ function setPasswordless(enabled: boolean) {
 			await misskeyApi('i/security/passkey/passwordless/complete', { ticket: pending.ticket, credential });
 		} else await misskeyApi('i/security/passkey/passwordless', { enabled: false });
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
-	});
+	}, !enabled);
 }
 
 function disablePassword() {
@@ -209,7 +207,7 @@ function completeTotp() {
 	return run(async isCurrent => {
 		if (!totp.value || !totpCode.value) return;
 		const value = await misskeyApi('i/security/totp/complete', { token: totpCode.value });
-		if (isCurrent()) { clearPending(); codes.value = value.backupCodes; await refresh(isCurrent); }
+		if (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); }
 	});
 }
 
@@ -222,15 +220,20 @@ function removeTotp() {
 	});
 }
 
-function showCodes(regenerate: boolean) {
+function showCodes(codes: string[]) {
+	if (!codes.length) return;
+	codesDialog?.dispose();
+	const dialog = os.popup(MkRecoveryCodesDialog, { codes }, { closed: () => { dialog.dispose(); if (codesDialog === dialog) codesDialog = null; } });
+	codesDialog = dialog;
+}
+
+function regenerateCodes() {
 	return run(async isCurrent => {
 		clearPending();
-		if (regenerate) {
-			const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.regenerateWarning });
-			if (!isCurrent() || confirmation.canceled) return;
-		}
-		const value = await misskeyApi('i/security/recovery-codes', { regenerate });
-		if (isCurrent()) { codes.value = value.backupCodes; await refresh(isCurrent); }
+		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.regenerateWarning });
+		if (!isCurrent() || confirmation.canceled) return;
+		const value = await misskeyApi('i/security/recovery-codes', { regenerate: true });
+		if (isCurrent()) { showCodes(value.backupCodes); await refresh(isCurrent); }
 	});
 }
 
@@ -248,13 +251,13 @@ onUnmounted(leave);
 <locale locale="ja-JP" lang="json">
 {
 	"title": "ログインと多要素認証",
-	"otherSessionsWarning": "パスキーの削除、認証アプリの設定・削除、多要素認証やパスキー単独ログイン、パスワードログインの設定を変更すると、この端末以外のログインはすべて無効になります。名前の変更や復旧コードの表示・再生成では無効になりません。",
-	"explanation": "パスキーは端末やセキュリティキーで使う認証方法です。認証アプリを先に設定しなくても登録できます。登録するとすぐに多要素認証が有効になり、認証アプリの設定時と同じように復旧コードが表示されます。重要な設定には、このログインで5分間有効な本人確認が必要です。",
+	"otherSessionsWarning": "パスキーの削除、認証アプリの設定・削除、多要素認証やパスキー単独ログイン、パスワードログインの設定を変更すると、この端末以外のログインはすべて無効になります。名前の変更や復旧コードの再生成では無効になりません。",
+	"explanation": "パスキーは端末やセキュリティキーで使う認証方法です。認証アプリを先に設定しなくても登録できます。登録するとすぐに多要素認証が有効になり、認証アプリの設定時と同じように初回のみ復旧コードが表示されます。重要な設定には、このログインで5分間有効な本人確認が必要です。",
 	"loading": "設定を読み込んでいます…",
 	"mfaActive": "パスキーによる多要素認証は有効です。",
 	"mfaInactive": "パスキーによる多要素認証は無効です。",
 	"registerKey": "パスキーを登録",
-	"showKeys": "登録済みのパスキーを表示",
+	"securityKeyAndPasskey": "セキュリティキー・パスキー",
 	"unsupported": "このブラウザではパスキーを利用できません。認証アプリまたは復旧コードを使用してください。",
 	"keyName": "パスキーの名前",
 	"rename": "名前を変更",
@@ -278,12 +281,9 @@ onUnmounted(leave);
 	"openAuthenticator": "認証アプリで開く",
 	"totpCode": "認証アプリのコード",
 	"confirmTotp": "コードを確認して設定",
-	"showCodes": "復旧コードを表示",
 	"regenerateCodes": "復旧コードを再生成",
 	"regenerateWarning": "復旧コードを再生成すると、以前の復旧コードは使えなくなります。続けますか。",
-	"codesDescription": "復旧コードはそれぞれ一度だけ使えます。安全な場所に保存し、表示を閉じてください。",
-	"codesWarning": "使用済みの復旧コードがあります。残りのコードを確認し、必要なら再生成してください。",
-	"hideCodes": "表示を閉じる",
+	"codesWarning": "使用済みの復旧コードがあります。必要なら再生成して安全な場所に保存してください。",
 	"cancel": "キャンセル",
 	"failed": "操作を完了できませんでした。本人確認の有効期限や設定を確認し、もう一度開始してください。"
 }

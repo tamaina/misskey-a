@@ -41,21 +41,21 @@ function submit() { element.querySelector('form')!.dispatchEvent(new Event('subm
 function cancel() { [...element.querySelectorAll('button')].find(button => button.textContent === 'キャンセル')!.click(); }
 
 test('TOTP is the initial choice and the common endpoint receives password plus current code', async () => {
-	expect(element.querySelector('select')!.value).toBe('totp'); input('password', 'synthetic-password'); input('text', '123456'); submit();
+	expect(element.querySelector('select')).toBeNull(); expect(element.querySelector('[aria-checked=true]')?.textContent).toContain('認証アプリのコード'); expect(element.querySelector('form ._buttons')?.textContent).toContain('キャンセル'); input('password', 'synthetic-password'); input('text', '123456'); submit();
 	await vi.waitFor(() => expect(done).toHaveBeenCalledWith(true));
 	expect(misskeyApi).toHaveBeenCalledWith('i/sudo/start', { password: 'synthetic-password', usePasskey: false, token: '123456' }); expect(startAuthentication).not.toHaveBeenCalled();
-	expect([...element.querySelectorAll('input')].every(field => !field.value)).toBe(true);
+	expect([...element.querySelectorAll('input:not([type=radio])')].every(field => !field.value)).toBe(true);
 });
 test('passkey choice completes only the server-owned sudo ticket', async () => {
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ status: 'passkey-required', ticket: 'synthetic-ticket', options } as never).mockResolvedValueOnce({ expiresAt, grantId } as never);
-	input('password', 'synthetic-password'); const select = element.querySelector('select')!; select.value = 'passkey'; select.dispatchEvent(new Event('change')); await nextTick(); submit();
+	input('password', 'synthetic-password'); [...element.querySelectorAll<HTMLElement>('[aria-checked]')].find(option => option.textContent?.includes('パスキー・セキュリティキー'))!.click(); await nextTick(); submit();
 	await vi.waitFor(() => expect(done).toHaveBeenCalledWith(true)); expect(startAuthentication).toHaveBeenCalledWith({ optionsJSON: options });
 	expect(misskeyApi).toHaveBeenCalledWith('i/sudo/complete', { ticket: 'synthetic-ticket', credential });
 });
 test('cancellation while native proof waits aborts the ceremony and prevents completion', async () => {
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ status: 'passkey-required', ticket: 'synthetic-ticket', options } as never);
 	let release!: (value: never) => void; vi.mocked(startAuthentication).mockReturnValue(new Promise(resolve => { release = resolve; }));
-	input('password', 'synthetic-password'); const select = element.querySelector('select')!; select.value = 'passkey'; select.dispatchEvent(new Event('change')); await nextTick(); submit();
+	input('password', 'synthetic-password'); [...element.querySelectorAll<HTMLElement>('[aria-checked]')].find(option => option.textContent?.includes('パスキー・セキュリティキー'))!.click(); await nextTick(); submit();
 	await vi.waitFor(() => expect(startAuthentication).toHaveBeenCalledOnce()); cancel(); release(credential as never); await nextTick();
 	expect(WebAuthnAbortService.cancelCeremony).toHaveBeenCalledOnce(); expect(done).toHaveBeenCalledExactlyOnceWith(false);
 	expect(vi.mocked(misskeyApi).mock.calls.some(([route]) => route === 'i/sudo/complete')).toBe(false);
@@ -70,6 +70,26 @@ test('an abandoned start cleans only its exact elevation using the original sess
 test('server rejection clears entered secrets and never changes authentication purpose', async () => {
 	vi.mocked(misskeyApi).mockRejectedValueOnce(new Error('Synthetic rejected proof')); input('password', 'synthetic-password'); input('text', '123456'); submit();
 	await vi.waitFor(() => expect(element.querySelector('[role=alert]')).not.toBeNull());
-	expect([...element.querySelectorAll('input')].every(field => !field.value)).toBe(true); expect(done).not.toHaveBeenCalled(); expect(startAuthentication).not.toHaveBeenCalled();
+	expect([...element.querySelectorAll('input:not([type=radio])')].every(field => !field.value)).toBe(true); expect(done).not.toHaveBeenCalled(); expect(startAuthentication).not.toHaveBeenCalled();
 	expect(vi.mocked(misskeyApi).mock.calls.map(([route]) => route)).toEqual(['i/security/state', 'i/sudo/start']);
+});
+
+test('recovery radio sends the chosen recovery code to sudo', async () => {
+	input('password', 'synthetic-password');
+	[...element.querySelectorAll<HTMLElement>('[aria-checked]')].find(option => option.textContent?.includes('復旧コード'))!.click();
+	await nextTick(); input('text', 'synthetic-recovery'); submit();
+	await vi.waitFor(() => expect(done).toHaveBeenCalledWith(true));
+	expect(misskeyApi).toHaveBeenCalledWith('i/sudo/start', { password: 'synthetic-password', usePasskey: false, token: 'synthetic-recovery' });
+});
+
+test('password-login-disabled sudo keeps the strict passkey path without password or method radios', async () => {
+	app.unmount(); state.passwordLoginDisabled = true;
+	app = createApp({ render: () => h(Dialog, { isCurrent: () => current.value, onDone: done }) }); app.use(internationalization); app.mount(element);
+	await vi.waitFor(() => expect(element.querySelector('form')).not.toBeNull());
+	expect(element.querySelector('input[type=password]')).toBeNull(); expect(element.querySelector('[aria-checked]')).toBeNull();
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ status: 'passkey-required', ticket: 'synthetic-ticket', options } as never).mockResolvedValueOnce({ expiresAt, grantId } as never);
+	submit();
+	await vi.waitFor(() => expect(startAuthentication).toHaveBeenCalledOnce());
+	expect(misskeyApi).toHaveBeenCalledWith('i/sudo/start', { usePasskey: true });
+	await vi.waitFor(() => expect(done).toHaveBeenLastCalledWith(true));
 });

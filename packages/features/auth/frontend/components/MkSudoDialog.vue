@@ -14,31 +14,31 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkInput v-if="!state.passwordLoginDisabled" v-model="password" type="password" autocomplete="current-password" :disabled="busy" required>
 				<template #label>{{ $locale.sfc.password }}</template>
 			</MkInput>
-			<label v-if="!state.passwordLoginDisabled && (state.totpEnabled || state.passkeyMfaEnabled)">
-				{{ $locale.sfc.factor }}
-				<select v-model="factor" :disabled="busy">
-					<option v-if="state.totpEnabled" value="totp">{{ $locale.sfc.totp }}</option>
-					<option v-if="state.passkeyCount > 0 && supportsPasskey" value="passkey">{{ $locale.sfc.passkey }}</option>
-					<option value="recovery">{{ $locale.sfc.recovery }}</option>
-				</select>
-			</label>
+			<MkRadios v-if="!state.passwordLoginDisabled && (state.totpEnabled || state.passkeyMfaEnabled)" v-model="factor" vertical :options="factorOptions">
+				<template #label>{{ $locale.sfc.factor }}</template>
+			</MkRadios>
 			<MkInput v-if="!state.passwordLoginDisabled && (state.totpEnabled || state.passkeyMfaEnabled) && factor !== 'passkey'" v-model="token" type="text" autocomplete="one-time-code" :disabled="busy" required>
 				<template #label>{{ factor === 'recovery' ? $locale.sfc.recovery : $locale.sfc.totp }}</template>
 			</MkInput>
 			<MkInfo v-if="state.passwordLoginDisabled">{{ $locale.sfc.strictPasskey }}</MkInfo>
 			<MkInfo v-if="state.passkeyCount === 0">{{ $locale.sfc.passkeyHint }}</MkInfo>
 			<p v-if="error" role="alert">{{ $locale.sfc.failed }}</p>
-			<MkButton type="submit" primary :disabled="busy || (state.passwordLoginDisabled ? !supportsPasskey : !password)">{{ busy ? $locale.sfc.waiting : $locale.sfc.confirm }}</MkButton>
+			<div class="_buttons">
+				<MkButton type="submit" primary :disabled="busy || (state.passwordLoginDisabled ? !supportsPasskey : !password)">{{ busy ? $locale.sfc.waiting : $locale.sfc.confirm }}</MkButton>
+				<MkButton @click="cancel">{{ $locale.sfc.cancel }}</MkButton>
+			</div>
 		</form>
-		<MkButton :disabled="false" @click="cancel">{{ $locale.sfc.cancel }}</MkButton>
+		<MkButton v-if="!state" @click="cancel">{{ $locale.sfc.cancel }}</MkButton>
 	</div>
 </MkModalWindow>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import { browserSupportsWebAuthn, startAuthentication, WebAuthnAbortService } from '@simplewebauthn/browser';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
+import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
+import type { MkRadiosOption } from '@features/ui/frontend/components/MkRadios.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
@@ -55,6 +55,11 @@ const state = ref<{ totpEnabled: boolean; passkeyMfaEnabled: boolean; passkeyCou
 const password = ref('');
 const token = ref('');
 const factor = ref<'totp' | 'passkey' | 'recovery'>('totp');
+const factorOptions = computed<MkRadiosOption<'totp' | 'passkey' | 'recovery'>[]>(() => [
+	...(state.value?.totpEnabled ? [{ value: 'totp' as const, label: $locale.value.sfc.totp, icon: 'ti ti-device-mobile', disabled: busy.value }] : []),
+	...(state.value && state.value.passkeyCount > 0 && supportsPasskey ? [{ value: 'passkey' as const, label: $locale.value.sfc.passkey, icon: 'ti ti-key', disabled: busy.value }] : []),
+	{ value: 'recovery', label: $locale.value.sfc.recovery, icon: 'ti ti-lifebuoy', disabled: busy.value },
+]);
 const busy = ref(false);
 const error = ref(false);
 let settled = false;

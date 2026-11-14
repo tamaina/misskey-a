@@ -81,7 +81,7 @@ function acceptRegistration() {
 	} } as Awaited<ReturnType<typeof webauthn.verifyRegistrationResponse>>);
 }
 
-test.each([false, true])('registration immediately enables MFA with TOTP=%s and returns saved recovery codes', async totp => {
+test.each([false, true])('registration immediately enables MFA with TOTP=%s and returns only newly issued recovery codes', async totp => {
 	const f = fixture(); f.context.keys = []; f.profile.twoFactorEnabled = totp;
 	f.profile.twoFactorSecret = totp ? 'synthetic-secret' : null;
 	f.profile.twoFactorBackupSecret = totp ? ['unspent-code'] : null;
@@ -89,10 +89,10 @@ test.each([false, true])('registration immediately enables MFA with TOTP=%s and 
 	const started = await f.service.registerStart(identity, 'New key');
 	const result = await f.service.registerComplete(identity, started.ticket, registrationCredential);
 	expect(result).toMatchObject({ id: 'AQID', name: 'New key' });
-	if (totp) expect(result.backupCodes).toEqual(['unspent-code']);
+	if (totp) expect(result.backupCodes).toEqual([]);
 	else { expect(result.backupCodes).toHaveLength(5); expect(new Set(result.backupCodes).size).toBe(5); }
 	expect(webauthn.verifyRegistrationResponse).toHaveBeenCalledWith(expect.objectContaining({ requireUserVerification: false, expectedChallenge: started.options.challenge }));
-	expect(f.profiles.update).toHaveBeenCalledExactlyOnceWith({ userId: identity.userId }, { passkeyMfaEnabled: true, twoFactorBackupSecret: result.backupCodes });
+	expect(f.profiles.update).toHaveBeenCalledExactlyOnceWith({ userId: identity.userId }, { passkeyMfaEnabled: true, ...(totp ? {} : { twoFactorBackupSecret: result.backupCodes }) });
 	expect(f.deps.events.publishInternalEvent).not.toHaveBeenCalled();
 	expect(f.sessions.find).not.toHaveBeenCalled(); expect(f.sessions.update).toHaveBeenCalledOnce();
 	expect(f.users.update).not.toHaveBeenCalled();
@@ -130,7 +130,7 @@ test.each([false, true])('registration can repeatedly add usable keys with passw
 			credentialDeviceType: 'singleDevice', credentialBackedUp: false,
 		} } as Awaited<ReturnType<typeof webauthn.verifyRegistrationResponse>>);
 		const completed = await f.service.registerComplete(identity, started.ticket, { ...registrationCredential, id, rawId: id });
-		expect(completed).toEqual({ id, name: id, backupCodes: ['keep'] });
+		expect(completed).toEqual({ id, name: id, backupCodes: [] });
 		expect(webauthn.verifyRegistrationResponse).toHaveBeenLastCalledWith(expect.objectContaining({ requireUserVerification: true }));
 		Object.assign(f.profile, f.profiles.update.mock.calls.at(-1)![1]); f.context.keys.push(added);
 	}
@@ -252,4 +252,45 @@ test('password change still rotates legacy credentials and revokes all browser s
 	expect(f.sessions.update).toHaveBeenCalledExactlyOnceWith({ userId: identity.userId }, { revokedAt: expect.any(Date), sudoUntil: null, sudoPolicyStamp: null });
 	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('userTokenRegenerated', expect.objectContaining({ oldToken: 'synthetic-native', newToken: expect.any(String) }));
 	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('browserSessionRevoked', { id: null, userId: identity.userId });
+});
+
+test('existing recovery codes cannot be read, including through factor setup', async () => {
+	const f = fixture(); f.profile.passkeyMfaEnabled = true; f.profile.twoFactorBackupSecret = ['stored-secret'];
+	await expect(f.service.recoveryCodes(identity, false)).rejects.toMatchObject({ code: 'CONFIRMATION_FAILED' });
+	expect(f.deps.sudo.transaction).not.toHaveBeenCalled();
+	f.profile.passkeyMfaEnabled = false;
+	const activated = await f.service.activateStart(identity); expect(activated.backupCodes).toEqual([]);
+	f.profile.twoFactorTempSecret = 'synthetic-secret'; f.deps.totp.validateOtp.mockResolvedValue(true);
+	const completed = await f.service.totpComplete(identity, '123456'); expect(completed.backupCodes).toEqual([]);
+	expect(f.profiles.update).not.toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ twoFactorBackupSecret: expect.anything() }));
+});
+
+test('regeneration invalidates old recovery codes and returns only the new generation', async () => {
+	const f = fixture(); f.profile.passkeyMfaEnabled = true; f.profile.twoFactorBackupSecret = ['stored-secret'];
+	const result = await f.service.recoveryCodes(identity, true);
+	expect(result.backupCodes).toHaveLength(5); expect(result.backupCodes).not.toContain('stored-secret');
+	expect(f.profiles.update).toHaveBeenCalledWith({ userId: identity.userId }, { twoFactorBackupSecret: result.backupCodes });
+});
+
+test('one session-bound UV assertion enables passwordless without prior sudo', async () => {
+	const f = fixture(); f.context.session.sudoUntil = null; f.context.session.sudoGrantId = null;
+	f.deps.sudo.status.mockResolvedValue({ active: false, expiresAt: null });
+	const started = await f.service.passwordlessStart(identity);
+	expect(started.options.userVerification).toBe('required'); expect(started.options.allowCredentials).toBeUndefined();
+	vi.mocked(webauthn.verifyAuthenticationResponse).mockResolvedValue({ verified: true, authenticationInfo: { userVerified: true, newCounter: 2 } } as never);
+	await f.service.passwordlessComplete(identity, started.ticket, credential);
+	expect(f.deps.sudo.status).not.toHaveBeenCalled();
+	expect(f.deps.sudo.transaction.mock.calls.every(call => call[2] === false)).toBe(true);
+	expect(webauthn.verifyAuthenticationResponse).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ requireUserVerification: true, expectedChallenge: started.options.challenge }));
+	expect(f.profiles.update).toHaveBeenCalledWith({ userId: identity.userId }, { usePasswordLessLogin: true });
+	await expect(f.service.passwordlessComplete(identity, started.ticket, credential)).rejects.toThrow();
+});
+
+test.each(['no-uv', 'policy', 'foreign-session', 'expired'] as const)('passwordless single proof rejects %s without changing policy', async kind => {
+	const f = fixture(); const started = await f.service.passwordlessStart(identity);
+	if (kind === 'policy') f.profile.password = 'changed';
+	if (kind === 'expired') f.deps.operations.consume.mockImplementationOnce(async () => ({ ...f.pending()!, expiresAtMonotonic: performance.now() - 1 }));
+	const actor = kind === 'foreign-session' ? { ...identity, browserSession: { id: 'foreign', userId: identity.userId } } : identity;
+	await expect(f.service.passwordlessComplete(actor, started.ticket, credential)).rejects.toThrow();
+	expect(f.profiles.update).not.toHaveBeenCalled();
 });

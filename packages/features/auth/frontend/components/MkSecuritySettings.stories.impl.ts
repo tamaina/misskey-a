@@ -60,8 +60,10 @@ export const RecoveryCodes = {
 	...IndependentPasskey,
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement);
-		await userEvent.click(await canvas.findByRole('button', { name: '復旧コードを表示' }));
-		for (const code of backupCodes) await expect(canvas.findByText(code)).resolves.toBeVisible();
+		await userEvent.click(await canvas.findByRole('button', { name: '復旧コードを再生成' }));
+		const body = within(canvasElement.ownerDocument.body);
+		await userEvent.click(await body.findByRole('button', { name: /はい|OK/ }));
+		for (const code of backupCodes) await expect(body.findByText(code)).resolves.toBeVisible();
 	},
 } satisfies StoryObj<typeof MkSecuritySettings>;
 export const TotpSetup = {

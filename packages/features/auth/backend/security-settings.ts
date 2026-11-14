@@ -119,26 +119,31 @@ export class SecuritySettings {
 	}
 
 	async passwordlessStart(identity: SudoIdentity) {
+		// This operation supplies its own strict UV proof, bound to this live session.
 		return this.deps.sudo.transaction(identity, async context => {
 			if (context.profile.usePasswordLessLogin || !context.keys.length) throw failure();
 			const options = await generateAuthenticationOptions({ rpID: this.deps.config.hostname, userVerification: 'required' });
 			v.assert(nativeAuthenticationOptionsSchema, options);
 			const ticket = await this.deps.operations.create({ kind: 'enable-passwordless-login', userId: context.user.id,
-				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), sudoGrantId: context.session.sudoGrantId!, policyStamp: operationStamp(context),
+				sessionId: context.session.id, sudoUntil: null, sudoGrantId: null, policyStamp: operationStamp(context),
 				challenge: options.challenge, requireUV: true, name: null, backupCodes: null });
 			return { ticket, options };
-		});
+		}, false);
 	}
 	async passwordlessComplete(identity: SudoIdentity, ticket: string, response: unknown) {
-		const row = await this.claim(identity, 'enable-passwordless-login', ticket);
+		if (identity.accessToken != null || !identity.browserSession || identity.browserSession.userId !== identity.userId) throw failure();
+		const row = await this.deps.operations.consume('enable-passwordless-login', identity.userId, identity.browserSession.id, ticket).catch(error => {
+			if (error instanceof SecurityConfirmationRejected) throw failure();
+			throw error;
+		});
 		const revokedIds = await this.deps.sudo.transaction(identity, async context => {
-			this.check(context, row);
+			if (operationStamp(context) !== row.policyStamp || performance.now() >= row.expiresAtMonotonic) throw failure();
 			if (context.profile.usePasswordLessLogin || !row.requireUV) throw failure();
 			await this.verifyKey(context, row, response);
 			const revokedIds = await this.updated(context, { usePasswordLessLogin: true });
 			if (performance.now() >= row.expiresAtMonotonic) throw failure();
 			return revokedIds;
-		});
+		}, false);
 		await this.published(identity.userId, revokedIds);
 	}
 
@@ -238,8 +243,8 @@ export class SecuritySettings {
 				transports: info.credential.transports ?? null });
 			const keys = await context.manager.getRepository(MiUserSecurityKey).findBy({ userId: context.user.id });
 			// Registration is also MFA setup, just like completing TOTP setup.
-			const backupCodes = context.profile.twoFactorBackupSecret?.length ? context.profile.twoFactorBackupSecret : newCodes();
-			await this.savePolicy(context, { passkeyMfaEnabled: true, twoFactorBackupSecret: backupCodes }, keys);
+			const backupCodes = context.profile.twoFactorBackupSecret?.length ? [] : newCodes();
+			await this.savePolicy(context, { passkeyMfaEnabled: true, ...(backupCodes.length ? { twoFactorBackupSecret: backupCodes } : {}) }, keys);
 			if (performance.now() >= row.expiresAtMonotonic) throw failure();
 			return backupCodes;
 		});
@@ -254,7 +259,7 @@ export class SecuritySettings {
 			const options = await generateAuthenticationOptions({ rpID: this.deps.config.hostname,
 				userVerification: requireUV ? 'required' : 'preferred', allowCredentials: context.keys.map(key => ({ id: key.id })) });
 			v.assert(nativeAuthenticationOptionsSchema, options);
-			const backupCodes = context.profile.twoFactorBackupSecret?.length ? context.profile.twoFactorBackupSecret : newCodes();
+			const backupCodes = context.profile.twoFactorBackupSecret?.length ? [] : newCodes();
 			const ticket = await this.deps.operations.create({ kind: 'activate-passkey-mfa', userId: context.user.id,
 				sessionId: context.session.id, sudoUntil: context.session.sudoUntil!.getTime(), sudoGrantId: context.session.sudoGrantId!, policyStamp: operationStamp(context),
 				challenge: options.challenge, requireUV, name: null, backupCodes });
@@ -268,9 +273,9 @@ export class SecuritySettings {
 		const credential = v.parse(webAuthnAuthenticationResponseSchema, response);
 		await this.deps.sudo.transaction(identity, async context => {
 			this.check(context, row);
-			if (context.profile.passkeyMfaEnabled || context.profile.usePasswordLessLogin || !row.backupCodes?.length) throw failure();
+			if (context.profile.passkeyMfaEnabled || context.profile.usePasswordLessLogin || row.backupCodes === null) throw failure();
 			await this.verifyKey(context, row, credential);
-			revokedIds = await this.updated(context, { passkeyMfaEnabled: true, twoFactorBackupSecret: row.backupCodes });
+			revokedIds = await this.updated(context, { passkeyMfaEnabled: true, ...(row.backupCodes.length ? { twoFactorBackupSecret: row.backupCodes } : {}) });
 			if (performance.now() >= row.expiresAtMonotonic) throw failure();
 		});
 		await this.published(identity.userId, revokedIds);
@@ -327,8 +332,8 @@ export class SecuritySettings {
 				if (error instanceof TotpAuthenticationFailed) throw failure();
 				throw error;
 			})) throw failure();
-			const backupCodes = context.profile.twoFactorBackupSecret?.length ? context.profile.twoFactorBackupSecret : newCodes();
-			revokedIds = await this.updated(context, { twoFactorEnabled: true, twoFactorTempSecret: null, twoFactorSecret: secret, twoFactorBackupSecret: backupCodes });
+			const backupCodes = context.profile.twoFactorBackupSecret?.length ? [] : newCodes();
+			revokedIds = await this.updated(context, { twoFactorEnabled: true, twoFactorTempSecret: null, twoFactorSecret: secret, ...(backupCodes.length ? { twoFactorBackupSecret: backupCodes } : {}) });
 			return backupCodes;
 		});
 		await this.published(identity.userId, revokedIds);
@@ -344,9 +349,9 @@ export class SecuritySettings {
 		await this.published(identity.userId, revokedIds);
 	}
 	async recoveryCodes(identity: SudoIdentity, regenerate: boolean) {
+		if (!regenerate) throw failure();
 		const result = await this.deps.sudo.transaction(identity, async context => {
 			if (!context.profile.passkeyMfaEnabled && !context.profile.twoFactorEnabled) throw failure();
-			if (!regenerate) return { backupCodes: context.profile.twoFactorBackupSecret ?? [] };
 			const backupCodes = newCodes();
 			await context.manager.getRepository(MiUserProfile).update({ userId: context.user.id }, { twoFactorBackupSecret: backupCodes });
 			return { backupCodes };
