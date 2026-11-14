@@ -33,7 +33,7 @@ export function createISessionIpsProcedure(deps: SessionIpsDependencies) {
 
 export function createISessionsProcedure(deps: BrowserSessionDependencies) {
 	return createApiProcedure<MiLocalUser>()(ISessionsContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
-		const sessions = await deps.browserSessionService.listOwned(context.principal.id, input.limit, input.offset);
+		const sessions = await deps.browserSessionService.listOwned(context.principal.id, input.limit, input.offset, undefined, input.unlinkedOnly);
 		return sessions.map(session => ({
 			id: session.id, createdAt: session.createdAt.toISOString(), lastUsedAt: session.lastUsedAt.toISOString(),
 			lastIp: session.lastIp ?? null, lastUserAgent: session.lastUserAgent ?? null,

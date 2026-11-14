@@ -499,7 +499,7 @@ export const I2faPasskeyPasswordLessContract = aliasTwoFactorContract(I2faPasswo
 
 export const ISessionsContract = oc.$meta({ requestName: 'i/sessions', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/i/sessions', tags: ['account'] }).errors(commonErrors)
-	.input(objectInput({ limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100), offset: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0) }))
+	.input(objectInput({ unlinkedOnly: v.optional(v.boolean(), false), limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100), offset: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0) }))
 	.output(v.array(packedBrowserSessionSchema));
 export const ISessionIpsContract = oc.$meta({ requestName: 'i/session-ips', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/i/session-ips', tags: ['account'] }).errors(commonErrors)

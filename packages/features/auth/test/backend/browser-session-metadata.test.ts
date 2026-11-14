@@ -10,6 +10,7 @@ import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { BrowserSessionHistory1794614400000 } from '../../../../backend/migration/1794614400000-BrowserSessionHistory.js';
+import { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
 import { MiSignin } from '../../backend/models/Signin.js';
 import { MiBrowserSession } from '../../backend/models/BrowserSession.js';
 import { SudoPolicy1792300000001 } from '../../../../backend/migration/1792300000001-SudoPolicy.js';
@@ -93,4 +94,26 @@ test('session history migration matches nullable metadata and reverses without a
 		'ALTER TABLE "signin" DROP COLUMN "browserSessionId"',
 		'ALTER TABLE "browser_session" DROP COLUMN "lastUserAgent", DROP COLUMN "lastIp"',
 	]);
+});
+
+test('unlinked session query excludes all linked owned signins before pagination, without needing an IP or UA', async () => {
+	const source = new MetadataSource({ type: 'postgres', entities, synchronize: false, dropSchema: false });
+	await source.prepare();
+	const repository = source.getRepository(MiBrowserSession);
+	let sql = ''; let values: unknown[] = [];
+	const service = new BrowserSessionService({
+		find: async options => {
+			const query = repository.createQueryBuilder('session').setFindOptions(options);
+			[sql, values] = query.getQueryAndParameters();
+			return [];
+		},
+	} as ConstructorParameters<typeof BrowserSessionService>[0], { gen: () => 'unused' });
+	expect(await service.listOwned('alice', 5, 10, undefined, true)).toEqual([]);
+	expect(sql).toContain('NOT EXISTS (SELECT 1 FROM "signin" linked');
+	expect(sql).toContain('linked."browserSessionId" = "session"."id"');
+	expect(sql).toContain('linked."userId" ='); expect(sql).toContain('"session"."userId" =');
+	expect(sql).toContain('LIMIT 5 OFFSET 10'); expect(values).toEqual(['alice', 'alice']);
+	expect(sql.indexOf('NOT EXISTS')).toBeLessThan(sql.indexOf('LIMIT'));
+	expect(sql).not.toContain('"lastUserAgent" IS NOT NULL');
+	expect(sql).not.toContain('user_ip'); expect(sql).not.toContain('"tokenHash"');
 });

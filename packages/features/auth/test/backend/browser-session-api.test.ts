@@ -27,7 +27,7 @@ test('bounded owned list returns only public metadata with current identity', as
 	const { deps, context } = fixture(current);
 	deps.browserSessionService.listOwned.mockResolvedValue([{ ...current, createdAt: new Date(0), lastUsedAt: new Date(0), lastIp: '192.0.2.1', lastUserAgent: 'Synthetic UA', revokedAt: null, sudoUntil: new Date(1000) }]);
 	const result = await call(createISessionsProcedure(deps), { limit: 10, offset: 3 }, { context });
-	expect(deps.browserSessionService.listOwned).toHaveBeenCalledWith('alice', 10, 3);
+	expect(deps.browserSessionService.listOwned).toHaveBeenCalledWith('alice', 10, 3, undefined, false);
 	expect(result).toEqual([{ id: 'session1', createdAt: new Date(0).toISOString(), lastUsedAt: new Date(0).toISOString(), lastIp: '192.0.2.1', lastUserAgent: 'Synthetic UA', revokedAt: null, current: true }]);
 });
 
@@ -79,4 +79,15 @@ test('storage failure never reports successful signout or publishes', async () =
 	await expect(call(createISignoutProcedure(deps), {}, { context })).rejects.toThrow();
 	expect(context.response?.header).not.toHaveBeenCalled();
 	expect(deps.globalEventService.publishInternalEvent).not.toHaveBeenCalled();
+});
+
+test('unlinked session page is owned and retains the same revocation target without a signin', async () => {
+	const { deps, context } = fixture(current);
+	deps.browserSessionService.listOwned.mockResolvedValue([{ id: 'unlinked', userId: 'alice', createdAt: new Date(0), lastUsedAt: new Date(0), lastIp: null, lastUserAgent: null, revokedAt: null, sudoUntil: null }]);
+	const result = await call(createISessionsProcedure(deps), { unlinkedOnly: true, limit: 5, offset: 5 }, { context });
+	expect(deps.browserSessionService.listOwned).toHaveBeenCalledWith('alice', 5, 5, undefined, true);
+	expect(result[0]).toMatchObject({ id: 'unlinked', revokedAt: null, current: false });
+	deps.browserSessionService.revokeOwned.mockResolvedValue(true);
+	await call(createISessionsRevokeProcedure(deps), { sessionId: result[0].id }, { context });
+	expect(deps.browserSessionService.revokeOwned).toHaveBeenCalledWith('alice', 'unlinked');
 });
