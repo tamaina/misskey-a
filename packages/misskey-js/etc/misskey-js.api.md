@@ -1520,6 +1520,69 @@ type EmailAddressAvailableRequest = ContractRequest<'email-address/available'>;
 type EmailAddressAvailableResponse = ContractResponse<'email-address/available'>;
 
 // @public (undocumented)
+type EmailAttachmentRequest = ContractRequest<'email/attachment'>;
+
+// @public (undocumented)
+type EmailAttachmentResponse = ContractResponse<'email/attachment'>;
+
+// @public (undocumented)
+type EmailConfigureRequest = ContractRequest<'email/configure'>;
+
+// @public (undocumented)
+type EmailDeleteRequest = ContractRequest<'email/delete'>;
+
+// @public (undocumented)
+type EmailForwardingConfigureRequest = ContractRequest<'email/forwarding/configure'>;
+
+// @public (undocumented)
+type EmailForwardingConfirmRequest = ContractRequest<'email/forwarding/confirm'>;
+
+// @public (undocumented)
+type EmailListRequest = ContractRequest<'email/list'>;
+
+// @public (undocumented)
+type EmailListResponse = ContractResponse<'email/list'>;
+
+// @public (undocumented)
+type EmailPreviewRequest = ContractRequest<'email/preview'>;
+
+// @public (undocumented)
+type EmailPreviewResponse = ContractResponse<'email/preview'>;
+
+// @public (undocumented)
+type EmailRawRequest = ContractRequest<'email/raw'>;
+
+// @public (undocumented)
+type EmailRawResponse = ContractResponse<'email/raw'>;
+
+// @public (undocumented)
+type EmailReadRequest = ContractRequest<'email/read'>;
+
+// @public (undocumented)
+type EmailSendRequest = ContractRequest<'email/send'>;
+
+// @public (undocumented)
+type EmailSendResponse = ContractResponse<'email/send'>;
+
+// @public (undocumented)
+type EmailSentRequest = ContractRequest<'email/sent'>;
+
+// @public (undocumented)
+type EmailSentResponse = ContractResponse<'email/sent'>;
+
+// @public (undocumented)
+type EmailShowRequest = ContractRequest<'email/show'>;
+
+// @public (undocumented)
+type EmailShowResponse = ContractResponse<'email/show'>;
+
+// @public (undocumented)
+type EmailStateRequest = ContractRequest<'email/state'>;
+
+// @public (undocumented)
+type EmailStateResponse = ContractResponse<'email/state'>;
+
+// @public (undocumented)
 type EmojiAdded = {
     emoji: EmojiDetailed;
 };
@@ -1680,6 +1743,27 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        EmailStateRequest,
+        EmailStateResponse,
+        EmailConfigureRequest,
+        EmailListRequest,
+        EmailListResponse,
+        EmailShowRequest,
+        EmailShowResponse,
+        EmailReadRequest,
+        EmailDeleteRequest,
+        EmailRawRequest,
+        EmailRawResponse,
+        EmailAttachmentRequest,
+        EmailAttachmentResponse,
+        EmailSendRequest,
+        EmailSendResponse,
+        EmailPreviewRequest,
+        EmailPreviewResponse,
+        EmailSentRequest,
+        EmailSentResponse,
+        EmailForwardingConfigureRequest,
+        EmailForwardingConfirmRequest,
         ChatMessagesCreateToUserRequest,
         ChatMessagesCreateToUserResponse,
         ChatMessagesCreateToRoomRequest,

@@ -1,6 +1,27 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	EmailStateRequest,
+	EmailStateResponse,
+	EmailConfigureRequest,
+	EmailListRequest,
+	EmailListResponse,
+	EmailShowRequest,
+	EmailShowResponse,
+	EmailReadRequest,
+	EmailDeleteRequest,
+	EmailRawRequest,
+	EmailRawResponse,
+	EmailAttachmentRequest,
+	EmailAttachmentResponse,
+	EmailSendRequest,
+	EmailSendResponse,
+	EmailPreviewRequest,
+	EmailPreviewResponse,
+	EmailSentRequest,
+	EmailSentResponse,
+	EmailForwardingConfigureRequest,
+	EmailForwardingConfirmRequest,
 	ChatMessagesCreateToUserRequest,
 	ChatMessagesCreateToUserResponse,
 	ChatMessagesCreateToRoomRequest,
@@ -750,6 +771,19 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'email/state': { req: EmailStateRequest; res: EmailStateResponse };
+	'email/configure': { req: EmailConfigureRequest; res: EmptyResponse };
+	'email/list': { req: EmailListRequest; res: EmailListResponse };
+	'email/show': { req: EmailShowRequest; res: EmailShowResponse };
+	'email/read': { req: EmailReadRequest; res: EmptyResponse };
+	'email/delete': { req: EmailDeleteRequest; res: EmptyResponse };
+	'email/raw': { req: EmailRawRequest; res: EmailRawResponse };
+	'email/attachment': { req: EmailAttachmentRequest; res: EmailAttachmentResponse };
+	'email/send': { req: EmailSendRequest; res: EmailSendResponse };
+	'email/preview': { req: EmailPreviewRequest; res: EmailPreviewResponse };
+	'email/sent': { req: EmailSentRequest; res: EmailSentResponse };
+	'email/forwarding/configure': { req: EmailForwardingConfigureRequest; res: EmptyResponse };
+	'email/forwarding/confirm': { req: EmailForwardingConfirmRequest; res: EmptyResponse };
 	'clear-browser-cache': { req: EmptyRequest; res: EmptyResponse };
 	'chat/messages/create-to-user': { req: ChatMessagesCreateToUserRequest; res: ChatMessagesCreateToUserResponse };
 	'chat/messages/create-to-room': { req: ChatMessagesCreateToRoomRequest; res: ChatMessagesCreateToRoomResponse };
