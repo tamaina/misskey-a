@@ -1,24 +1,24 @@
 [
 	{
 		"file": "packages/features/notes/frontend/components/MkPostForm.vue",
-		"currentSha256": "6d2027a2b6b8abc3005a7f79aedb36e79b05bd735b811e2ef56408b418f98536",
-		"baselineSha256": "2dc2f5b18e7cc5f75809749d20da7250c8bfd9438146924b5441d7e638527a94",
+		"currentSha256": "b8118ea1d197d1f278cd84b842a977b3bccde9c81273db8cdaf683734faf78be",
+		"baselineSha256": "934a67f3125f5bf6e031aca8c96fc8e2c127e385bc3dac6ced9c5aa326c80f0b",
 		"edits": [
 			{
-				"start": 19160,
-				"end": 19213,
+				"start": 19362,
+				"end": 19415,
 				"current": "\tlocalOnly.value = !targetChannel.value.isFederated;\n",
 				"baseline": "\tlocalOnly.value = true; // TODO: チャンネルが連合するようになった折には消す\n"
 			},
 			{
-				"start": 23070,
-				"end": 23124,
+				"start": 23201,
+				"end": 23255,
 				"current": "\t\tlocalOnly.value = !targetChannel.value.isFederated;\n",
 				"baseline": "\t\tlocalOnly.value = true; // TODO: チャンネルが連合するようになった折には消す\n"
 			},
 			{
-				"start": 23781,
-				"end": 23835,
+				"start": 23912,
+				"end": 23966,
 				"current": "\t\tlocalOnly.value = !targetChannel.value.isFederated;\n",
 				"baseline": "\t\tlocalOnly.value = true; // TODO: チャンネルが連合するようになった折には消す\n"
 			}
@@ -26,61 +26,79 @@
 	},
 	{
 		"file": "packages/features/channels/frontend/pages/channel-editor.vue",
-		"currentSha256": "b98d468e2367a9094e88450ff4d631e1252fb57fff30ed0ec4ed36669e3df8ad",
-		"baselineSha256": "492e8cdc1d3a33eade0aa59001dda94ab0f351d27b3190aa2121f5cb298d3d6e",
+		"currentSha256": "cb2df82dbfadfc1a95e94d6bef2897440f16eae2416f3781a46038847ea78b82",
+		"baselineSha256": "cbd379418a3d6d8ede064b7d1a450164b5158cbca56ce2006b76ec57339846bd",
 		"edits": [
 			{
-				"start": 766,
-				"end": 1037,
-				"current": "\t\t\t<MkSwitch v-model=\"isFederated\">\n\t\t\t\t<template #label>{{ $locale.sfc.channelFederation }}</template>\n\t\t\t\t<template #caption>{{ $locale.sfc.channelFederationDescription }}</template>\n\t\t\t</MkSwitch>\n\n\t\t\t<MkSwitch v-model=\"allowRenoteToExternal\" :disabled=\"isFederated\">\n",
+				"start": 781,
+				"end": 1475,
+				"current": "\t\t\t<MkSwitch v-model=\"isFederated\" :disabled=\"!isOwner || (!isFederated && !$i?.policies.canFederateChannel)\">\n\t\t\t\t<template #label>{{ $locale.sfc.channelFederation }}</template>\n\t\t\t\t<template #caption>{{ $locale.sfc.channelFederationDescription }}</template>\n\t\t\t</MkSwitch>\n\n\t\t\t<MkSwitch v-if=\"channel && $i?.isModerator\" v-model=\"isFederationFrozen\">\n\t\t\t\t<template #label>{{ $locale.sfc.channelFederationFrozen }}</template>\n\t\t\t\t<template #caption>{{ $locale.sfc.channelFederationFrozenDescription }}</template>\n\t\t\t</MkSwitch>\n\t\t\t<p v-else-if=\"isFederationFrozen\">{{ $locale.sfc.channelFederationFrozenDescription }}</p>\n\n\t\t\t<MkSwitch v-model=\"allowRenoteToExternal\" :disabled=\"isFederated\">\n",
 				"baseline": "\t\t\t<MkSwitch v-model=\"allowRenoteToExternal\">\n"
 			},
 			{
-				"start": 4206,
-				"end": 4324,
-				"current": "const isFederated = ref(false);\n\nwatch(isFederated, enabled => { if (enabled) allowRenoteToExternal.value = true; });\n",
+				"start": 4243,
+				"end": 4300,
+				"current": "import { $i } from '@features/auth/frontend/account.js';\n",
 				"baseline": ""
 			},
 			{
-				"start": 5077,
-				"end": 5118,
-				"current": "\tisFederated.value = result.isFederated;\n",
+				"start": 4872,
+				"end": 5119,
+				"current": "const isFederated = ref(false);\nconst isFederationFrozen = ref(false);\nconst isOwner = computed(() => channel.value == null || channel.value.userId === $i?.id);\n\nwatch(isFederated, enabled => { if (enabled) allowRenoteToExternal.value = true; });\n",
 				"baseline": ""
 			},
 			{
-				"start": 5821,
-				"end": 5930,
-				"current": "\t\tisFederated: isFederated.value,\n\t\tallowRenoteToExternal: isFederated.value || allowRenoteToExternal.value,\n",
+				"start": 5872,
+				"end": 5968,
+				"current": "\tisFederated.value = result.isFederated;\n\tisFederationFrozen.value = result.isFederationFrozen;\n",
+				"baseline": ""
+			},
+			{
+				"start": 6671,
+				"end": 7050,
+				"current": "\t\t...(isOwner.value && (channel.value == null || isFederated.value !== channel.value.isFederated) ? { isFederated: isFederated.value } : {}),\n\t\t...(channel.value && $i?.isModerator && isFederationFrozen.value !== channel.value.isFederationFrozen ? { isFederationFrozen: isFederationFrozen.value } : {}),\n\t\tallowRenoteToExternal: isFederated.value || allowRenoteToExternal.value,\n",
 				"baseline": "\t\tallowRenoteToExternal: allowRenoteToExternal.value,\n"
 			},
 			{
-				"start": 11369,
-				"end": 11590,
+				"start": 11933,
+				"end": 12154,
 				"current": "\t\"channelFederation\": \"Federate this channel\",\n\t\"channelFederationDescription\": \"New posts are public and federated. Local-only posts are rejected and renotes outside the channel are allowed. Existing posts stay local.\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 15420,
-				"end": 15557,
-				"current": "\t\"channelFederation\": \"チャンネルを連合する\",\n\t\"channelFederationDescription\": \"新規投稿は公開・連合されます。ローカル限定の投稿は作成できず、チャンネル外へのリノートを許可します。過去の投稿は公開されません。\",\n",
+				"start": 15381,
+				"end": 15672,
+				"current": "\t\"channelFederation\": \"チャンネルを連合する\",\n\t\"channelFederationFrozen\": \"チャンネル連合を凍結する\",\n\t\"channelFederationFrozenDescription\": \"連合は凍結されています。新しい投稿の送受信は停止し、凍結中のローカル投稿は解除後も公開されません。解除には所有者の連合権限が必要です。\",\n\t\"channelFederationDescription\": \"新規投稿は公開・連合されます。ローカル限定の投稿は作成できず、チャンネル外へのリノートを許可します。過去の投稿は公開されません。\",\n",
 				"baseline": ""
 			}
 		]
 	},
 	{
 		"file": "packages/features/channels/frontend/pages/channel.vue",
-		"currentSha256": "6af7801c883946a3c2ac922d3d995db0ef67b0829a1de0b86db221c67f27c040",
-		"baselineSha256": "c081657742fe47caf88fce524c7b3c3fde840df0b2c42f2ad7f230ec85d458d0",
+		"currentSha256": "ecdcc4b1d3e5a4646b79c74610bf9ffdab1b0959158366d749b779c7e024b2a6",
+		"baselineSha256": "32c5542cb2ed8d8abd0f00693df876e4deb56e9c1b847b76baffc6c4a235c785",
 		"edits": [
 			{
-				"start": 2497,
-				"end": 2674,
+				"start": 2512,
+				"end": 2689,
 				"current": "\t\t\t<MkPostForm v-if=\"$i && !channel.host && prefer.r.showFixedPostFormInChannel.value\" :channel=\"channel\" class=\"post-form _panel\" fixed :autofocus=\"deviceKind === 'desktop'\"/>\n",
 				"baseline": "\t\t\t<MkPostForm v-if=\"$i && prefer.r.showFixedPostFormInChannel.value\" :channel=\"channel\" class=\"post-form _panel\" fixed :autofocus=\"deviceKind === 'desktop'\"/>\n"
 			},
 			{
-				"start": 10788,
-				"end": 10877,
+				"start": 3455,
+				"end": 3513,
+				"current": "\t<template v-if=\"$i && channel && !channel.host\" #footer>\n",
+				"baseline": "\t<template #footer>\n"
+			},
+			{
+				"start": 7603,
+				"end": 7661,
+				"current": "\tif (!$i || !channel.value || channel.value.host) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 11100,
+				"end": 11189,
 				"current": "\t\tif (!channel.value.host && (($i && $i.id === channel.value.userId) || iAmModerator)) {\n",
 				"baseline": "\t\tif (($i && $i.id === channel.value.userId) || iAmModerator) {\n"
 			}
@@ -88,8 +106,8 @@
 	},
 	{
 		"file": "packages/features/channels/frontend/pages/channels.vue",
-		"currentSha256": "80c6d1fdf738cd0f2e10a6ddc01fe1f17ce413985b15f9e98e2397a4143c3e49",
-		"baselineSha256": "631263469940d924c6eea86aef7773ecf7080c23c51eb42f9558e4cf44cda52b",
+		"currentSha256": "e9a9a1b3864e63eef8e37a64e021ebf1512a5f81b54951962a135956e915b699",
+		"baselineSha256": "6c5b53a7fef53f15e52304bd573ea5c58646582805f9e78db105f209b67ca8ff",
 		"edits": [
 			{
 				"start": 261,
@@ -104,213 +122,238 @@
 				"baseline": "\t\t\t<MkPagination v-slot=\"{items}\" :paginator=\"featuredPaginator\">\n"
 			},
 			{
-				"start": 2743,
-				"end": 2819,
+				"start": 2712,
+				"end": 2788,
 				"current": "import { computed, markRaw, onMounted, ref, shallowRef, watch } from 'vue';\n",
 				"baseline": "import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';\n"
 			},
 			{
-				"start": 3075,
-				"end": 3139,
+				"start": 3044,
+				"end": 3108,
 				"current": "import MkTab from '@features/ui/frontend/components/MkTab.vue';\n",
 				"baseline": ""
 			},
 			{
-				"start": 3958,
-				"end": 4007,
+				"start": 3963,
+				"end": 4012,
 				"current": "const origin = ref<'local' | 'remote'>('local');\n",
 				"baseline": ""
 			},
 			{
-				"start": 4253,
-				"end": 4339,
+				"start": 4258,
+				"end": 4344,
 				"current": "const featuredPaginator = computed(() => markRaw(new Paginator('channels/featured', {\n",
 				"baseline": "const featuredPaginator = markRaw(new Paginator('channels/featured', {\n"
 			},
 			{
-				"start": 4368,
-				"end": 4475,
+				"start": 4373,
+				"end": 4480,
 				"current": "\tparams: { origin: origin.value },\n})));\n\nwatch(origin, () => {\n\tif (channelPaginator.value) search();\n});\n",
 				"baseline": "}));\n"
 			},
 			{
-				"start": 5184,
-				"end": 5209,
+				"start": 5189,
+				"end": 5214,
 				"current": "\t\t\torigin: origin.value,\n",
 				"baseline": ""
 			},
 			{
-				"start": 5221,
-				"end": 5279,
+				"start": 5226,
+				"end": 5284,
 				"current": "\tkey.value = JSON.stringify([origin.value, query, type]);\n",
 				"baseline": "\tkey.value = query + type;\n"
 			},
 			{
-				"start": 6121,
-				"end": 6161,
+				"start": 6131,
+				"end": 6171,
 				"current": "\t\"local\": \"المحلي\",\n\t\"remote\": \"بُعدي\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 6438,
-				"end": 6477,
+				"start": 6397,
+				"end": 6436,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remot\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 6756,
-				"end": 6800,
+				"start": 6670,
+				"end": 6714,
 				"current": "\t\"local\": \"Lokální\",\n\t\"remote\": \"Vzdálené\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 7081,
-				"end": 7121,
+				"start": 6942,
+				"end": 6982,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 7401,
-				"end": 7440,
+				"start": 7210,
+				"end": 7249,
 				"current": "\t\"local\": \"Lokal\",\n\t\"remote\": \"Fremd\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 7722,
-				"end": 7762,
+				"start": 7478,
+				"end": 7518,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 8042,
-				"end": 8082,
+				"start": 7746,
+				"end": 7786,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remoto\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 8373,
-				"end": 8414,
+				"start": 8027,
+				"end": 8068,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Distant\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 8706,
-				"end": 8746,
+				"start": 8315,
+				"end": 8355,
 				"current": "\t\"local\": \"Lokal\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 9024,
-				"end": 9065,
+				"start": 8585,
+				"end": 8626,
 				"current": "\t\"local\": \"Locale\",\n\t\"remote\": \"Remota\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 9367,
-				"end": 9404,
+				"start": 8884,
+				"end": 8921,
 				"current": "\t\"local\": \"ローカル\",\n\t\"remote\": \"リモート\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 9636,
-				"end": 9673,
+				"start": 9110,
+				"end": 9147,
 				"current": "\t\"local\": \"ローカル\",\n\t\"remote\": \"リモート\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 9915,
-				"end": 9955,
+				"start": 9344,
+				"end": 9384,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 10235,
-				"end": 10275,
+				"start": 9612,
+				"end": 9652,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 10555,
-				"end": 10589,
+				"start": 9880,
+				"end": 9914,
 				"current": "\t\"local\": \"로컬\",\n\t\"remote\": \"리모트\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 10818,
-				"end": 10859,
+				"start": 10101,
+				"end": 10142,
 				"current": "\t\"local\": \"Lokaal\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 11143,
-				"end": 11183,
+				"start": 10370,
+				"end": 10410,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 11459,
-				"end": 11501,
+				"start": 10635,
+				"end": 10677,
 				"current": "\t\"local\": \"Lokalne\",\n\t\"remote\": \"Zdalny\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 11787,
-				"end": 11827,
+				"start": 10912,
+				"end": 10952,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remoto\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 12103,
-				"end": 12160,
+				"start": 11178,
+				"end": 11235,
 				"current": "\t\"local\": \"С этого сайта\",\n\t\"remote\": \"С других сайтов\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 12453,
-				"end": 12498,
+				"start": 11474,
+				"end": 11519,
 				"current": "\t\"local\": \"Lokálne\",\n\t\"remote\": \"Vzdialené\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 12785,
-				"end": 12829,
+				"start": 11753,
+				"end": 11797,
 				"current": "\t\"local\": \"ท้องถิ่น\",\n\t\"remote\": \"ระยะไกล\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 13100,
-				"end": 13138,
+				"start": 12021,
+				"end": 12059,
 				"current": "\t\"local\": \"Yerel\",\n\t\"remote\": \"Uzak\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 13433,
-				"end": 13473,
+				"start": 12300,
+				"end": 12340,
 				"current": "\t\"local\": \"Local\",\n\t\"remote\": \"Remote\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 13753,
-				"end": 13799,
+				"start": 12568,
+				"end": 12614,
 				"current": "\t\"local\": \"Локальні\",\n\t\"remote\": \"Віддалені\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 14082,
-				"end": 14134,
+				"start": 12843,
+				"end": 12895,
 				"current": "\t\"local\": \"Máy chủ này\",\n\t\"remote\": \"Máy chủ khác\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 14424,
-				"end": 14457,
+				"start": 13140,
+				"end": 13173,
 				"current": "\t\"local\": \"本地\",\n\t\"remote\": \"远程\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 14681,
-				"end": 14714,
+				"start": 13359,
+				"end": 13392,
 				"current": "\t\"local\": \"本地\",\n\t\"remote\": \"遠端\",\n",
+				"baseline": ""
+			}
+		]
+	},
+	{
+		"file": "packages/features/roles/frontend/pages/admin/roles.policy-editor.vue",
+		"currentSha256": "e32b30a4e7b2697fe3234a7b374d7c90caec5c1edd1ddb96b13922ecfc69931d",
+		"baselineSha256": "898cc1f3a58834079b0245a9a6de499e842bd7bc86cb59231fd8079081d1690a",
+		"edits": [
+			{
+				"start": 9619,
+				"end": 10223,
+				"current": "\t\t\t\t<template #label>{{ $locale.sfc.enable }}</template>\n\t\t\t</MkSwitch>\n\t\t</template>\n\t</XFolder>\n\n\t<XFolder v-if=\"matchQuery([$locale.sfc.roleOptionsCanFederateChannel, 'canFederateChannel'])\" v-model:policyMeta=\"policyMetaModel.canFederateChannel\" :isBaseRole=\"isBaseRole\" :readonly=\"readonly\">\n\t\t<template #label>{{ $locale.sfc.roleOptionsCanFederateChannel }}</template>\n\t\t<template #valueText>{{ valuesModel.canFederateChannel ? globalLocale.env.yes : globalLocale.env.no }}</template>\n\t\t<template #default=\"{ disabled }\">\n\t\t\t<MkSwitch v-model=\"valuesModel.canFederateChannel\" :disabled=\"disabled\">\n",
+				"baseline": ""
+			},
+			{
+				"start": 43903,
+				"end": 43965,
+				"current": "\t\"roleOptionsCanFederateChannel\": \"Allow channel federation\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 61379,
+				"end": 61428,
+				"current": "\t\"roleOptionsCanFederateChannel\": \"チャンネルの連合を許可\",\n",
 				"baseline": ""
 			}
 		]

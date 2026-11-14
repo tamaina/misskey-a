@@ -4,9 +4,9 @@
  */
 
 import { isDeepStrictEqual } from 'node:util';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, type OnModuleInit, type OnApplicationShutdown } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { In, IsNull } from 'typeorm';
+import { In, IsNull, Not } from 'typeorm';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { ChannelsRepository, ChannelFollowingsRepository, UsersRepository, NotesRepository, FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
@@ -22,6 +22,7 @@ import { ApResolverService } from '@features/federation/backend/services/ApResol
 import type { ApNoteService } from '@features/federation/backend/services/ApNoteService.js';
 import type { ApPersonService } from '@features/federation/backend/services/ApPersonService.js';
 import type { NoteDeleteService } from '@features/notes/backend/services/NoteDeleteService.js';
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { getApId, getApIds, getOneApId, isCreate, isDelete, isPost } from '@features/federation/backend/protocol/type.js';
 import type { IActivity, IAnnounce, IActor, ICreate, IFollow, IObject, IPost } from '@features/federation/backend/protocol/type.js';
@@ -36,7 +37,60 @@ type NoteMembership =
 
 /** Prototype: local authors publish through a dedicated Group; remote submissions are not accepted. */
 @Injectable()
-export class ChannelFederationService {
+export class ChannelFederationService implements OnModuleInit, OnApplicationShutdown {
+	private eligibilityTimer?: ReturnType<typeof setInterval>;
+
+	public async onModuleInit(): Promise<void> {
+		// A migration may have frozen an already published Group. Reannounce its
+		// canonical state at boot as well, so existing followers learn the freeze.
+		const frozen = await this.channels.findBy({ host: IsNull(), isFederationFrozen: true, federationPublicKey: Not(IsNull()) });
+		for (const channel of frozen) await this.deliverUpdate(channel);
+		// Expiring and conditional role assignments also revoke eligibility.
+		this.eligibilityTimer = setInterval(() => {
+			void this.reconcileEligibility().catch(error => console.error('Channel eligibility reconciliation failed', error));
+		}, 60_000);
+		this.eligibilityTimer.unref();
+	}
+
+	public onApplicationShutdown(): void {
+		clearInterval(this.eligibilityTimer);
+	}
+
+	public async refreshEligibility(channel: MiChannel): Promise<MiChannel> {
+		if (channel.host != null || !channel.isFederated || channel.isFederationFrozen) return channel;
+		const roles = this.moduleRef.get<RoleService>('RoleService', { strict: false });
+		if (channel.userId && (await roles.getUserPolicies(channel.userId, true)).canFederateChannel) return channel;
+		const result = await this.channels.update({ id: channel.id, isFederationFrozen: false }, { isFederationFrozen: true });
+		channel = { ...channel, isFederationFrozen: true };
+		if (result.affected) await this.deliverUpdate(channel);
+		return channel;
+	}
+
+	public async reconcileEligibility(userId?: string): Promise<void> {
+		// Never skip a mutation-triggered scan behind a timer: even a short revocation
+		// must be persisted before the mutation completes. The conditional update
+		// in refreshEligibility makes concurrent scans idempotent.
+		const channels = await this.channels.findBy({ host: IsNull(), isFederated: true, isFederationFrozen: false, ...(userId ? { userId } : {}) });
+		for (const channel of channels) await this.refreshEligibility(channel);
+	}
+
+	public async deliverUpdate(channel: MiChannel): Promise<void> {
+		if (channel.host != null || (!channel.isFederated && !channel.federationPublicKey)) return;
+		const uri = this.actorUri(channel);
+		await this.deliver(channel, this.renderer.addContext({
+			type: 'Update', id: `${uri}/updates/${this.idService.gen()}`, actor: uri,
+			to: [PUBLIC], cc: [`${uri}/followers`], object: await this.renderActor(channel, false),
+		}));
+	}
+
+	public async receiveUpdate(actor: MiRemoteUser, object: IObject): Promise<void> {
+		if (object.type !== 'Group' || object._misskey_channel !== true || object.id !== actor.uri) return;
+		// Fetch canonical state: delayed/replayed signed Updates must not lift a newer freeze.
+		const resolver = await this.resolverService.createResolver();
+		const canonical = await resolver.resolve(actor.uri);
+		if (canonical.type !== 'Group' || canonical._misskey_channel !== true || canonical.id !== actor.uri) return;
+		await this.remoteChannel(actor, canonical);
+	}
 	constructor(
 		@Inject(DI.config) private config: Config,
 		@Inject(DI.redis) private redis: Redis.Redis,
@@ -68,15 +122,15 @@ export class ChannelFederationService {
 		return await this.channels.findOneByOrFail({ id: channel.id });
 	}
 
-	public async renderActor(channel: MiChannel): Promise<IObject> {
-		const keyed = await this.ensureKeys(channel);
+	public async renderActor(channel: MiChannel, refresh = true): Promise<IObject> {
+		const keyed = await this.ensureKeys(refresh ? await this.refreshEligibility(channel) : channel);
 		const uri = this.actorUri(keyed);
 		return this.renderer.addContext({
 			type: 'Group', id: uri, name: keyed.name,
 			preferredUsername: `channel-${keyed.id}`,
 			inbox: `${uri}/inbox`, outbox: `${uri}/outbox`, followers: `${uri}/followers`, following: `${uri}/following`,
 			url: uri, summary: '', _misskey_summary: keyed.description,
-			_misskey_channel: true, sensitive: keyed.isSensitive, manuallyApprovesFollowers: false,
+			_misskey_channel: true, _misskey_channelFrozen: !keyed.isFederated || keyed.isFederationFrozen || keyed.isArchived, sensitive: keyed.isSensitive, manuallyApprovesFollowers: false,
 			publicKey: { id: `${uri}#main-key`, owner: uri, publicKeyPem: keyed.federationPublicKey },
 			endpoints: { sharedInbox: `${this.config.url}/inbox` },
 		} as IObject);
@@ -89,14 +143,15 @@ export class ChannelFederationService {
 	}
 
 	public async follow(actor: MiRemoteUser, activity: IFollow, undo = false): Promise<string | null> {
-		const channel = await this.localChannel(getApId(activity.object));
+		let channel = await this.localChannel(getApId(activity.object));
 		if (!channel) return null;
 		if (getApId(activity.actor) !== actor.uri) return 'skip: mismatched Group follower';
 		if (undo) {
 			await this.channelFollowings.delete({ followeeId: channel.id, followerId: actor.id });
 			return 'ok: Group unfollowed';
 		}
-		if (!channel.isFederated || channel.isArchived || actor.isSuspended || actor.isRemoteSuspended) return 'skip: Group disabled';
+		channel = await this.refreshEligibility(channel);
+		if (!channel.isFederated || channel.isFederationFrozen || channel.isArchived || actor.isSuspended || actor.isRemoteSuspended) return 'skip: Group disabled';
 		await this.ensureKeys(channel);
 		await this.channelFollowings.upsert({ id: this.idService.gen(), followeeId: channel.id, followerId: actor.id }, ['followeeId', 'followerId']);
 		await this.queue.deliver({ id: channel.id, channelId: channel.id }, this.renderer.addContext({
@@ -135,8 +190,8 @@ export class ChannelFederationService {
 
 	public async deliverNote(note: MiNote): Promise<void> {
 		if (!note.channelId || note.localOnly || note.userHost != null || note.visibility !== 'public') return;
-		const channel = await this.channels.findOneByOrFail({ id: note.channelId });
-		if (!channel.isFederated || channel.host != null || channel.isArchived) return;
+		const channel = await this.refreshEligibility(await this.channels.findOneByOrFail({ id: note.channelId }));
+		if (channel.isFederationFrozen || !channel.isFederated || channel.host != null || channel.isArchived) return;
 		// Pure Renotes are deferred; do not misrepresent them as a new author Note.
 		if (note.renoteId && !note.text && !note.cw && note.fileIds.length === 0 && !note.hasPoll) return;
 		await this.ensureKeys(channel);
@@ -243,6 +298,7 @@ export class ChannelFederationService {
 				await this.moduleRef.get<NoteDeleteService>('NoteDeleteService', { strict: false }).delete(author, note);
 				return 'ok: Group note deleted';
 			}
+			if (group._misskey_channelFrozen === true) return 'skip: Group frozen';
 			const object = await this.verifyCreate(actor.uri, inner as ICreate, resolver);
 			if (!object) return 'skip: invalid Group Create';
 			if (await this.notes.existsBy({ uri: noteUri })) return 'skip: note exists';
@@ -324,9 +380,14 @@ export class ChannelFederationService {
 			await this.channels.createQueryBuilder().insert().values({
 				id: this.idService.gen(), uri: actor.uri, host: actor.host,
 				name: (group.name ?? actor.username).slice(0, 128), description: group._misskey_summary?.slice(0, 2048) ?? null,
-				isFederated: true, isSensitive: group.sensitive === true, allowRenoteToExternal: true, userId: null,
+				isFederated: true, isFederationFrozen: group._misskey_channelFrozen === true, isSensitive: group.sensitive === true, allowRenoteToExternal: true, userId: null,
 			}).orIgnore().execute();
 			channel = await this.channels.findOneByOrFail({ uri: actor.uri });
+		}
+		const isFederationFrozen = group._misskey_channelFrozen === true;
+		if (channel.isFederationFrozen !== isFederationFrozen) {
+			await this.channels.update(channel.id, { isFederationFrozen });
+			channel = { ...channel, isFederationFrozen };
 		}
 		return channel;
 	}

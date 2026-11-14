@@ -5,14 +5,24 @@
 
 ## Federation pilot (#128)
 
-The existing channel editor permission controls `isFederated`: the owner and the
-instance root/administrator/moderator. Existing channels default to OFF. ON forces
-external Renotes to be allowed. It does not publish any old `localOnly` notes.
+The owner controls `isFederated`, independently of the moderator-only sticky
+`isFederationFrozen` flag. The `canFederateChannel` role policy (default false)
+is required to enable federation or lift a freeze. The migration freezes existing
+local federated channels: an operator must explicitly grant eligibility and unfreeze
+them. Losing eligibility freezes a Group without changing the owner's preference;
+restoring a role never automatically unfreezes it. Role changes reconcile immediately,
+with periodic and publication-time checks for expired/conditional assignments.
+ON forces external Renotes to be allowed. Frozen-channel local posts are permanently
+`localOnly`; unfreezing never publishes them or other old local-only notes.
 
 A local channel has a dedicated Group actor at `/channels/:id`, an independent RSA
 key, Follow/Accept/Undo handling, and a small outbox. The key stays in the database;
 delivery jobs contain only the channel ID. OFF and archive stop queued publications;
-author deletion of an already published note continues to propagate.
+author deletion of an already published note continues to propagate. A Group-signed
+Update advertises `_misskey_channelFrozen` in the Misskey namespace when effective
+federation changes. Receivers discard incoming new contributions while frozen, but
+still process author Deletes and Unfollows. Source-approved historical public objects
+remain retrievable; freezing is not a retroactive privacy change.
 
 Only public, federated notes can be created in an enabled channel. Local-only
 input, local-only or nonpublic reply/quote targets, `canPublicNote`, sensitive words,

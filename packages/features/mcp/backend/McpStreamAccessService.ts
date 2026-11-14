@@ -107,7 +107,7 @@ export class McpStreamAccessService {
 			// the freshly fetched relationship snapshot. No deleted content is retained.
 			return message;
 		}
-		if (message.type === 'note' && !source.channel.startsWith('antennaStream:') || source.channel.startsWith('mainStream:') && ['mention', 'reply', 'renote'].includes(String(message.type))) {
+		if (message.type === 'note' || source.channel.startsWith('mainStream:') && ['mention', 'reply', 'renote'].includes(String(message.type))) {
 			if (!isJsonObject(message.body) || typeof message.body.id !== 'string') return undefined;
 			const current = await this.currentNote(message.body.id, userId); if (!current) return undefined;
 			message.body = current;

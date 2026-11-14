@@ -30,6 +30,7 @@ function fixture(twoFactorEnabled = true) {
 	vi.spyOn(Date, 'now').mockReturnValue(now);
 	const users = mockDeep<ConstructorParameters<typeof UserAuthService>[1]>();
 	const profiles = mockDeep<ConstructorParameters<typeof UserAuthService>[2]>();
+	profiles.update.mockResolvedValue({ affected: 1, raw: [], generatedMaps: [] });
 	const redis = mockDeep<ConstructorParameters<typeof UserAuthService>[0]>();
 	const events = mockDeep<Parameters<typeof createIRegenerateTokenProcedure>[0]['globalEventService']>();
 	const me = mockDeep<MiLocalUser>({ id: 'synthetic-user', token: 'synthetic-old-token', isSuspended: false, movedToUri: null });
@@ -109,9 +110,17 @@ test('already-used TOTP cannot rotate the token', async () => {
 test('backup proof is consumed by the existing verifier before rotation', async () => {
 	const h = fixture();
 	await expect(h.invoke(backup)).resolves.toBeUndefined();
-	expect(h.profiles.update).toHaveBeenCalledWith({ userId: h.me.id }, { twoFactorBackupSecret: [] });
+	expect(h.profiles.update).toHaveBeenCalledWith(expect.objectContaining({ userId: h.me.id }), { twoFactorBackupSecret: expect.any(Function) });
 	expect(h.redis.set).not.toHaveBeenCalled();
 	expect(h.profiles.update.mock.invocationCallOrder[0]).toBeLessThan(h.users.update.mock.invocationCallOrder[0]);
+});
+
+test('a recovery code not consumed by persistence cannot rotate credentials', async () => {
+	const h = fixture();
+	h.profiles.update.mockResolvedValue({ affected: 0, raw: [], generatedMaps: [] });
+	await expect(h.invoke(backup)).rejects.toThrow('authentication failed');
+	expect(h.profiles.update).toHaveBeenCalledOnce();
+	h.noRotation();
 });
 
 test.each([undefined, null, 'unused-code'])('MFA-off preserves password-only compatibility (%s)', async proof => {

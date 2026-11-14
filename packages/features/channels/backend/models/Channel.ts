@@ -108,6 +108,10 @@ export class MiChannel {
 	@Column('boolean', { default: false })
 	public isFederated: boolean;
 
+	/** Sticky moderation/eligibility freeze; independent of the owner preference. */
+	@Column('boolean', { default: false })
+	public isFederationFrozen: boolean;
+
 	@Index('IDX_channel_uri', { unique: true })
 	@Column('varchar', { length: 512, nullable: true })
 	public uri: string | null;

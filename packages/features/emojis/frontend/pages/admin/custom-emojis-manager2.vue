@@ -12,11 +12,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref } from 'vue';
 import { definePage } from '@features/navigation/frontend/page.js';
 import XGridLocalComponent from '@features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue';
 import XGridRemoteComponent from '@features/emojis/frontend/pages/admin/custom-emojis-manager.remote.vue';
 import XRegisterComponent from '@features/emojis/frontend/pages/admin/custom-emojis-manager.register.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 type PageMode = 'local' | 'remote';
 
@@ -34,7 +38,7 @@ const headerTabs = computed(() => [{
 }]);
 
 definePage(computed(() => ({
-	title: $locale.value.sfc.customEmojis,
+	title: globalLocale.value.env.customEmojis,
 	icon: 'ti ti-icons',
 	needWideArea: true,
 })));
@@ -51,8 +55,7 @@ definePage(computed(() => ({
 {
 	"local": "المحلي",
 	"remote": "بُعدي",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "إيموجي مخصص"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -60,8 +63,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Remot",
-	"tabTitleRegister": "Registre d'Emojis",
-	"customEmojis": "Emojis personalitzats"
+	"tabTitleRegister": "Registre d'Emojis"
 }
 </locale>
 
@@ -69,8 +71,7 @@ definePage(computed(() => ({
 {
 	"local": "Lokální",
 	"remote": "Vzdálené",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Vlastní emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -78,8 +79,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Custom Emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -87,8 +87,7 @@ definePage(computed(() => ({
 {
 	"local": "Lokal",
 	"remote": "Fremd",
-	"tabTitleRegister": "Emojis hinzufügen",
-	"customEmojis": "Benutzerdefinierte Emojis"
+	"tabTitleRegister": "Emojis hinzufügen"
 }
 </locale>
 
@@ -96,8 +95,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Custom Emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -105,8 +103,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Remoto",
-	"tabTitleRegister": "Registro de Emojis",
-	"customEmojis": "Emojis personalizados"
+	"tabTitleRegister": "Registro de Emojis"
 }
 </locale>
 
@@ -114,8 +111,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Distant",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Émojis personnalisés"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -123,8 +119,7 @@ definePage(computed(() => ({
 {
 	"local": "Lokal",
 	"remote": "Remote",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Emoji kustom"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -132,8 +127,7 @@ definePage(computed(() => ({
 {
 	"local": "Locale",
 	"remote": "Remota",
-	"tabTitleRegister": "Registrazione emoji",
-	"customEmojis": "Emoji personalizzate"
+	"tabTitleRegister": "Registrazione emoji"
 }
 </locale>
 
@@ -141,8 +135,7 @@ definePage(computed(() => ({
 {
 	"local": "ローカル",
 	"remote": "リモート",
-	"tabTitleRegister": "絵文字の登録",
-	"customEmojis": "カスタム絵文字"
+	"tabTitleRegister": "絵文字の登録"
 }
 </locale>
 
@@ -150,8 +143,7 @@ definePage(computed(() => ({
 {
 	"local": "ローカル",
 	"remote": "リモート",
-	"tabTitleRegister": "絵文字の登録",
-	"customEmojis": "カスタム絵文字"
+	"tabTitleRegister": "絵文字の登録"
 }
 </locale>
 
@@ -159,8 +151,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Custom Emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -168,8 +159,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Custom Emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -177,8 +167,7 @@ definePage(computed(() => ({
 {
 	"local": "로컬",
 	"remote": "리모트",
-	"tabTitleRegister": "이모지 등록",
-	"customEmojis": "커스텀 이모지"
+	"tabTitleRegister": "이모지 등록"
 }
 </locale>
 
@@ -186,8 +175,7 @@ definePage(computed(() => ({
 {
 	"local": "Lokaal",
 	"remote": "Remote",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Eigen emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -195,8 +183,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Custom Emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -204,8 +191,7 @@ definePage(computed(() => ({
 {
 	"local": "Lokalne",
 	"remote": "Zdalny",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Niestandardowe emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -213,8 +199,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Remoto",
-	"tabTitleRegister": "Registro de Emoji",
-	"customEmojis": "Emoji personalizado"
+	"tabTitleRegister": "Registro de Emoji"
 }
 </locale>
 
@@ -222,8 +207,7 @@ definePage(computed(() => ({
 {
 	"local": "С этого сайта",
 	"remote": "С других сайтов",
-	"tabTitleRegister": "Регистрация эмодзи",
-	"customEmojis": "Собственные эмодзи"
+	"tabTitleRegister": "Регистрация эмодзи"
 }
 </locale>
 
@@ -231,8 +215,7 @@ definePage(computed(() => ({
 {
 	"local": "Lokálne",
 	"remote": "Vzdialené",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Vlastné emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -240,8 +223,7 @@ definePage(computed(() => ({
 {
 	"local": "ท้องถิ่น",
 	"remote": "ระยะไกล",
-	"tabTitleRegister": "ลงทะเบียนเอโมจิ",
-	"customEmojis": "เอโมจิที่กำหนดเอง"
+	"tabTitleRegister": "ลงทะเบียนเอโมจิ"
 }
 </locale>
 
@@ -249,8 +231,7 @@ definePage(computed(() => ({
 {
 	"local": "Yerel",
 	"remote": "Uzak",
-	"tabTitleRegister": "Emoji kaydı",
-	"customEmojis": "Özel Emoji"
+	"tabTitleRegister": "Emoji kaydı"
 }
 </locale>
 
@@ -258,8 +239,7 @@ definePage(computed(() => ({
 {
 	"local": "Local",
 	"remote": "Remote",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Custom Emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -267,8 +247,7 @@ definePage(computed(() => ({
 {
 	"local": "Локальні",
 	"remote": "Віддалені",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Кастомні емоджі"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -276,8 +255,7 @@ definePage(computed(() => ({
 {
 	"local": "Máy chủ này",
 	"remote": "Máy chủ khác",
-	"tabTitleRegister": "Emoji registration",
-	"customEmojis": "Tùy chỉnh emoji"
+	"tabTitleRegister": "Emoji registration"
 }
 </locale>
 
@@ -285,8 +263,7 @@ definePage(computed(() => ({
 {
 	"local": "本地",
 	"remote": "远程",
-	"tabTitleRegister": "注册表情符号",
-	"customEmojis": "自定义表情符号"
+	"tabTitleRegister": "注册表情符号"
 }
 </locale>
 
@@ -294,7 +271,6 @@ definePage(computed(() => ({
 {
 	"local": "本地",
 	"remote": "遠端",
-	"tabTitleRegister": "登錄表情符號",
-	"customEmojis": "自訂表情符號"
+	"tabTitleRegister": "登錄表情符號"
 }
 </locale>

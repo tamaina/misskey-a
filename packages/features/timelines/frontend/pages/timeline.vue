@@ -27,11 +27,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, watch, provide, useTemplateRef, ref, onMounted, onActivated } from 'vue';
-import type { Tab } from '@features/navigation/frontend/components/global/MkPageHeader.tabs.vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import type { BasicTimelineType } from '@features/timelines/frontend/timelines.js';
-import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
 import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
 import MkPostForm from '@features/notes/frontend/components/MkPostForm.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -45,6 +42,13 @@ import { deepMerge } from '@features/runtime/frontend/utility/merge.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 import { availableBasicTimelines, hasWithReplies, isAvailableBasicTimeline, isBasicTimeline, basicTimelineIconClass } from '@features/timelines/frontend/timelines.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
+import type { BasicTimelineType } from '@features/timelines/frontend/timelines.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Tab } from '@features/navigation/frontend/components/global/MkPageHeader.tabs.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const tlComponent = useTemplateRef('tlComponent');
 
@@ -118,7 +122,7 @@ async function chooseList(ev: PointerEvent): Promise<void> {
 		{
 			type: 'link' as const,
 			icon: 'ti ti-plus',
-			text: $locale.value.sfc.createNew,
+			text: globalLocale.value.env.createNew,
 			to: '/my/lists',
 		},
 	];
@@ -138,7 +142,7 @@ async function chooseAntenna(ev: PointerEvent): Promise<void> {
 		{
 			type: 'link' as const,
 			icon: 'ti ti-plus',
-			text: $locale.value.sfc.createNew,
+			text: globalLocale.value.env.createNew,
 			to: '/my/antennas',
 		},
 	];
@@ -163,7 +167,7 @@ async function chooseChannel(ev: PointerEvent): Promise<void> {
 		{
 			type: 'link',
 			icon: 'ti ti-plus',
-			text: $locale.value.sfc.createNew,
+			text: globalLocale.value.env.createNew,
 			to: '/channels/new',
 		},
 	];
@@ -222,7 +226,7 @@ const headerActions = computed<PageHeaderItem[]>(() => {
 				menuItems.push({
 					type: 'switch',
 					icon: 'ti ti-messages',
-					text: $locale.value.sfc.showRepliesToOthersInTimeline,
+					text: globalLocale.value.env.showRepliesToOthersInTimeline,
 					ref: withReplies,
 					disabled: onlyFiles,
 				});
@@ -254,7 +258,7 @@ const headerActions = computed<PageHeaderItem[]>(() => {
 	if (deviceKind === 'desktop') {
 		items.unshift({
 			icon: 'ti ti-refresh',
-			text: $locale.value.sfc.reload,
+			text: globalLocale.value.env.reload,
 			handler: () => {
 				tlComponent.value?.reloadTimeline();
 			},
@@ -271,35 +275,35 @@ const headerTabs = computed(() => [...(prefer.r.pinnedUserLists.value.map(l => (
 	iconOnly: true,
 }))), ...availableBasicTimelines().map(tl => ({
 	key: tl,
-	title: copyLocaleDictionary($locale.value.sfc.timelinesLabels)[tl],
+	title: copyLocaleDictionary(globalLocale.value.env._timelines)[tl],
 	icon: basicTimelineIconClass(tl),
 	iconOnly: true,
 })), {
 	icon: 'ti ti-list',
-	title: $locale.value.sfc.lists,
+	title: globalLocale.value.env.lists,
 	iconOnly: true,
 	onClick: chooseList,
 }, {
 	icon: 'ti ti-antenna',
-	title: $locale.value.sfc.antennas,
+	title: globalLocale.value.env.antennas,
 	iconOnly: true,
 	onClick: chooseAntenna,
 }, {
 	icon: 'ti ti-device-tv',
-	title: $locale.value.sfc.channel,
+	title: globalLocale.value.env.channel,
 	iconOnly: true,
 	onClick: chooseChannel,
 }] as Tab[]);
 
 const headerTabsWhenNotLogin = computed(() => [...availableBasicTimelines().map(tl => ({
 	key: tl,
-	title: copyLocaleDictionary($locale.value.sfc.timelinesLabels)[tl],
+	title: copyLocaleDictionary(globalLocale.value.env._timelines)[tl],
 	icon: basicTimelineIconClass(tl),
 	iconOnly: true,
 }))] as Tab[]);
 
 definePage(() => ({
-	title: $locale.value.sfc.timeline,
+	title: globalLocale.value.env.timeline,
 	icon: isBasicTimeline(src.value) ? basicTimelineIconClass(src.value) : 'ti ti-home',
 }));
 </script>
@@ -343,24 +347,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "أنشِئ جديد",
 	"options": "خيارات",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "أظهر نموذج الكتابة في أعلى الصفحة",
-	"reload": "انعش",
-	"timelinesLabels": {
-		"home": "الرئيسي",
-		"local": "المحلي",
-		"social": "الاجتماعي",
-		"global": "الشامل"
-	},
-	"lists": "القوائم",
-	"antennas": "الهوائيات",
-	"channel": "القنوات",
-	"timeline": "الخيط الزمني"
+	"showFixedPostForm": "أظهر نموذج الكتابة في أعلى الصفحة"
 }
 </locale>
 
@@ -372,24 +363,11 @@ definePage(() => ({
 		"social": "La línia de temps Social mostren les notes de les línies de temps d'Inici i Local.",
 		"global": "A la línia de temps Global pots veure les notes de tots els servidors connectats."
 	},
-	"createNew": "Crear",
 	"options": "Opcions",
 	"showRenotes": "Mostrar impulsos",
-	"showRepliesToOthersInTimeline": "Mostrar les respostes a altres a la línia de temps",
 	"withSensitive": "Incloure notes amb fitxers sensibles",
 	"fileAttachedOnly": "Només notes amb adjunts",
-	"showFixedPostForm": "Mostrar el formulari per escriure a l'inici de la línia de temps",
-	"reload": "Actualitzar",
-	"timelinesLabels": {
-		"home": "Inici",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Llistes",
-	"antennas": "Antena",
-	"channel": "Canals",
-	"timeline": "Línia de temps"
+	"showFixedPostForm": "Mostrar el formulari per escriure a l'inici de la línia de temps"
 }
 </locale>
 
@@ -401,24 +379,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Vytvořit nový",
 	"options": "Možnosti",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Zobrazit formulář pro nové příspěvky nad časovou osou",
-	"reload": "Aktualizovat",
-	"timelinesLabels": {
-		"home": "Domů",
-		"local": "Místní",
-		"social": "Sociální síť",
-		"global": "Globální"
-	},
-	"lists": "Seznamy",
-	"antennas": "Antény",
-	"channel": "Kanály",
-	"timeline": "Časová osa"
+	"showFixedPostForm": "Zobrazit formulář pro nové příspěvky nad časovou osou"
 }
 </locale>
 
@@ -430,24 +395,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Create new",
 	"options": "Options",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Display the posting form at the top of the timeline",
-	"reload": "Refresh",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Lists",
-	"antennas": "Antennas",
-	"channel": "Channels",
-	"timeline": "Timeline"
+	"showFixedPostForm": "Display the posting form at the top of the timeline"
 }
 </locale>
 
@@ -459,24 +411,11 @@ definePage(() => ({
 		"social": "Die soziale Chronik zeigt Notizen von der Startseite und der lokalen Chronik.",
 		"global": "In der globalen Chronik siehst du Notizen von allen föderierten Servern."
 	},
-	"createNew": "Neu erstellen",
 	"options": "Optionen",
 	"showRenotes": "Renotes anzeigen",
-	"showRepliesToOthersInTimeline": "Antworten in Chronik anzeigen",
 	"withSensitive": "Zeige \"sensitive Inhalte\" an",
 	"fileAttachedOnly": "Nur Notizen mit Dateien",
-	"showFixedPostForm": "Bereich zum Schreiben neuer Notizen am Anfang der Chronik anzeigen",
-	"reload": "Aktualisieren",
-	"timelinesLabels": {
-		"home": "Startseite",
-		"local": "Lokal",
-		"social": "Sozial",
-		"global": "Global"
-	},
-	"lists": "Listen",
-	"antennas": "Antennen",
-	"channel": "Kanäle",
-	"timeline": "Chronik"
+	"showFixedPostForm": "Bereich zum Schreiben neuer Notizen am Anfang der Chronik anzeigen"
 }
 </locale>
 
@@ -488,24 +427,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Create new",
 	"options": "Options",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Display the posting form at the top of the timeline",
-	"reload": "Refresh",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Lists",
-	"antennas": "Antennas",
-	"channel": "Channels",
-	"timeline": "Timeline"
+	"showFixedPostForm": "Display the posting form at the top of the timeline"
 }
 </locale>
 
@@ -517,24 +443,11 @@ definePage(() => ({
 		"social": "En la línea de tiempo Social verás las notas de Inicio y Local a la vez.",
 		"global": "En la línea de tiempo Global verás las notas de todos los servidores conectados."
 	},
-	"createNew": "Crear Nuevo",
 	"options": "Opciones",
 	"showRenotes": "Mostrar renotas",
-	"showRepliesToOthersInTimeline": "Mostrar respuestas a otros en la línea de tiempo",
 	"withSensitive": "Mostrar notas que contengan material sensible",
 	"fileAttachedOnly": "Solo notas con archivos",
-	"showFixedPostForm": "Mostrar formulario de publicación sobre la línea de tiempo.",
-	"reload": "Recargar",
-	"timelinesLabels": {
-		"home": "Inicio",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Listas",
-	"antennas": "Antenas",
-	"channel": "Canal",
-	"timeline": "Línea de tiempo"
+	"showFixedPostForm": "Mostrar formulario de publicación sobre la línea de tiempo."
 }
 </locale>
 
@@ -546,24 +459,11 @@ definePage(() => ({
 		"social": "Sur le fil social, les notes des fils principal et local sont affichées.",
 		"global": "Sur le fil global, vous pouvez voir les notes de toutes les instances connectées."
 	},
-	"createNew": "Créer",
 	"options": "Options",
 	"showRenotes": "Afficher les renotes",
-	"showRepliesToOthersInTimeline": "Afficher les réponses aux autres dans le fil",
 	"withSensitive": "Afficher les notes contenant des fichiers joints sensibles",
 	"fileAttachedOnly": "Avec fichiers joints seulement",
-	"showFixedPostForm": "Afficher le formulaire de publication en haut du fil d'actualité",
-	"reload": "Rafraîchir",
-	"timelinesLabels": {
-		"home": "Principal",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Listes",
-	"antennas": "Antennes",
-	"channel": "Canaux",
-	"timeline": "Fil"
+	"showFixedPostForm": "Afficher le formulaire de publication en haut du fil d'actualité"
 }
 </locale>
 
@@ -575,24 +475,11 @@ definePage(() => ({
 		"social": "Linimasa sosial menampilkan catatan dari kedua linimasa Beranda dan Lokal.",
 		"global": "Pada linimasa Global, kamu dapat melihat catatan dari semua peladen yang terhubung."
 	},
-	"createNew": "Buat baru",
 	"options": "Opsi peran",
 	"showRenotes": "Tampilkan renote",
-	"showRepliesToOthersInTimeline": "Tampilkan balasan ke pengguna lain dalam lini masa",
 	"withSensitive": "Lampirkan catatan dengan berkas sensitif",
 	"fileAttachedOnly": "Hanya catatan dengan berkas",
-	"showFixedPostForm": "Tampilkan form posting di atas lini masa",
-	"reload": "Muat ulang",
-	"timelinesLabels": {
-		"home": "Beranda",
-		"local": "Lokal",
-		"social": "Sosial",
-		"global": "Global"
-	},
-	"lists": "Daftar",
-	"antennas": "Antena",
-	"channel": "Kanal",
-	"timeline": "Lini masa"
+	"showFixedPostForm": "Tampilkan form posting di atas lini masa"
 }
 </locale>
 
@@ -604,24 +491,11 @@ definePage(() => ({
 		"social": "La Timeline Sociale elenca, in ordine cronologico, il flusso di Note nella Timeline Home e Locale.",
 		"global": "Nella Timeline Federata trovi il flusso di Note provenienti da profili iscritti ad altri server, federati a questo."
 	},
-	"createNew": "Crea",
 	"options": "Opzioni del ruolo",
 	"showRenotes": "Includi le Rinota",
-	"showRepliesToOthersInTimeline": "Risposte altrui nella TL",
 	"withSensitive": "Includi con allegati espliciti",
 	"fileAttachedOnly": "Solo con allegati",
-	"showFixedPostForm": "Modulo di pubblicazione in cima",
-	"reload": "Ricarica",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Locale",
-		"social": "Sociale",
-		"global": "Federata"
-	},
-	"lists": "Liste",
-	"antennas": "Antenne",
-	"channel": "Canale",
-	"timeline": "Timeline"
+	"showFixedPostForm": "Modulo di pubblicazione in cima"
 }
 </locale>
 
@@ -633,24 +507,11 @@ definePage(() => ({
 		"social": "ソーシャルタイムラインには、ホームタイムラインとローカルタイムラインの投稿が両方表示されます。",
 		"global": "グローバルタイムラインでは、接続している他のすべてのサーバーからの投稿を見られます。"
 	},
-	"createNew": "新規作成",
 	"options": "オプション",
 	"showRenotes": "リノートを表示",
-	"showRepliesToOthersInTimeline": "TLに他の人への返信を含める",
 	"withSensitive": "センシティブなファイルを含むノートを表示",
 	"fileAttachedOnly": "ファイル付きのみ",
-	"showFixedPostForm": "タイムライン上部に投稿フォームを表示する",
-	"reload": "リロード",
-	"timelinesLabels": {
-		"home": "ホーム",
-		"local": "ローカル",
-		"social": "ソーシャル",
-		"global": "グローバル"
-	},
-	"lists": "リスト",
-	"antennas": "アンテナ",
-	"channel": "チャンネル",
-	"timeline": "タイムライン"
+	"showFixedPostForm": "タイムライン上部に投稿フォームを表示する"
 }
 </locale>
 
@@ -662,24 +523,11 @@ definePage(() => ({
 		"social": "ソーシャルタイムラインは、ホームタイムラインの投稿もローカルタイムラインのも一緒に見れるで。",
 		"global": "グローバルタイムラインは、繋がっとる他のサーバーの投稿、全部ひっくるめて見れるで。"
 	},
-	"createNew": "新しく作るで",
 	"options": "オプション",
 	"showRenotes": "リノート出す",
-	"showRepliesToOthersInTimeline": "タイムラインに他の人への返信とかも入れるで",
 	"withSensitive": "センシティブなファイルを含むノートを表示",
 	"fileAttachedOnly": "ファイルのっけてあるやつだけ",
-	"showFixedPostForm": "タイムラインの上の方で投稿できるようにするわ",
-	"reload": "リロード",
-	"timelinesLabels": {
-		"home": "ホーム",
-		"local": "ローカル",
-		"social": "ソーシャル",
-		"global": "グローバル"
-	},
-	"lists": "リスト",
-	"antennas": "アンテナ",
-	"channel": "チャンネル",
-	"timeline": "タイムライン"
+	"showFixedPostForm": "タイムラインの上の方で投稿できるようにするわ"
 }
 </locale>
 
@@ -691,24 +539,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Create new",
 	"options": "Options",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Display the posting form at the top of the timeline",
-	"reload": "Refresh",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Tibdarin",
-	"antennas": "Antennas",
-	"channel": "Channels",
-	"timeline": "Timeline"
+	"showFixedPostForm": "Display the posting form at the top of the timeline"
 }
 </locale>
 
@@ -720,24 +555,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Create new",
 	"options": "Options",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Display the posting form at the top of the timeline",
-	"reload": "Refresh",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Lists",
-	"antennas": "Antennas",
-	"channel": "Channels",
-	"timeline": "ಸಮಯಸಾಲು"
+	"showFixedPostForm": "Display the posting form at the top of the timeline"
 }
 </locale>
 
@@ -749,24 +571,11 @@ definePage(() => ({
 		"social": "소셜 타임라인에서는, 홈 타임라인과 로컬 타임라인의 게시물을 모두 볼 수 있습니다.",
 		"global": "글로벌 타임라인에서는, 여기와 연결된 다른 모든 서버의 게시물을 볼 수 있습니다."
 	},
-	"createNew": "새로 만들기",
 	"options": "옵션",
 	"showRenotes": "리노트 보기",
-	"showRepliesToOthersInTimeline": "타임라인에 다른 사람에게 보내는 답글을 포함",
 	"withSensitive": "민감한 파일이 포함된 노트 보기",
 	"fileAttachedOnly": "미디어를 포함한 노트만",
-	"showFixedPostForm": "타임라인 상단에 글 입력란을 표시",
-	"reload": "새로고침",
-	"timelinesLabels": {
-		"home": "홈",
-		"local": "로컬",
-		"social": "소셜",
-		"global": "글로벌"
-	},
-	"lists": "리스트",
-	"antennas": "안테나",
-	"channel": "채널",
-	"timeline": "타임라인"
+	"showFixedPostForm": "타임라인 상단에 글 입력란을 표시"
 }
 </locale>
 
@@ -778,24 +587,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Nieuwe aanmaken",
 	"options": "Options",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Het postingformulier bovenaan de tijdbalk weergeven",
-	"reload": "Verversen",
-	"timelinesLabels": {
-		"home": "Startpagina",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Lijsten",
-	"antennas": "Antennes",
-	"channel": "Kanalen",
-	"timeline": "Tijdlijn"
+	"showFixedPostForm": "Het postingformulier bovenaan de tijdbalk weergeven"
 }
 </locale>
 
@@ -807,24 +603,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Create new",
 	"options": "Alternativ",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Display the posting form at the top of the timeline",
-	"reload": "Refresh",
-	"timelinesLabels": {
-		"home": "Hjem",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Lister",
-	"antennas": "Antenner",
-	"channel": "Kanaler",
-	"timeline": "Tidslinje"
+	"showFixedPostForm": "Display the posting form at the top of the timeline"
 }
 </locale>
 
@@ -836,24 +619,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Utwórz nowy",
 	"options": "Options",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Wyświetlaj formularz tworzenia wpisu w górnej części osi czasu",
-	"reload": "Odśwież",
-	"timelinesLabels": {
-		"home": "Strona główna",
-		"local": "Lokalne",
-		"social": "Społeczność",
-		"global": "Globalna"
-	},
-	"lists": "Listy",
-	"antennas": "Anteny",
-	"channel": "Kanały",
-	"timeline": "Oś czasu"
+	"showFixedPostForm": "Wyświetlaj formularz tworzenia wpisu w górnej części osi czasu"
 }
 </locale>
 
@@ -865,24 +635,11 @@ definePage(() => ({
 		"social": "Na linha do tempo Social, você verá notas do Início e Local.",
 		"global": "Na linha do tempo Global, você verá notas de todas as instâncias conectadas."
 	},
-	"createNew": "Criar novo",
 	"options": "Opções",
 	"showRenotes": "Exibir reposts",
-	"showRepliesToOthersInTimeline": "Mostrar respostas aos outros na linha do tempo",
 	"withSensitive": "Incluir notas com arquivos sensíveis",
 	"fileAttachedOnly": "Apenas notas com arquivos",
-	"showFixedPostForm": "Exibir o formulário de postagem na parte superior da linha do tempo",
-	"reload": "Recarregar",
-	"timelinesLabels": {
-		"home": "Início",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Listas",
-	"antennas": "Antenas",
-	"channel": "Canais",
-	"timeline": "Linha do tempo"
+	"showFixedPostForm": "Exibir o formulário de postagem na parte superior da linha do tempo"
 }
 </locale>
 
@@ -894,24 +651,11 @@ definePage(() => ({
 		"social": "В социальной ленте собирается всё, что есть в персональной и местной лентах.",
 		"global": "В глобальную ленту попадает вообще всё со связанных экземпляров."
 	},
-	"createNew": "Новый документ",
 	"options": "Настройки ролей",
 	"showRenotes": "Показывать репосты",
-	"showRepliesToOthersInTimeline": "Показывать ответы в ленте",
 	"withSensitive": "Показывать заметки с NSFW контентом",
 	"fileAttachedOnly": "Только заметки с файлами",
-	"showFixedPostForm": "Показывать поле для ввода новой заметки наверху ленты",
-	"reload": "Перезагрузить",
-	"timelinesLabels": {
-		"home": "Персональная",
-		"local": "Местная",
-		"social": "Социальная",
-		"global": "Всеобщая"
-	},
-	"lists": "Списки",
-	"antennas": "Антенны",
-	"channel": "Каналы",
-	"timeline": "Лента"
+	"showFixedPostForm": "Показывать поле для ввода новой заметки наверху ленты"
 }
 </locale>
 
@@ -923,24 +667,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Vytvoriť nový",
 	"options": "Options",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Zobraziť formulár na nové príspevky nad časovou osou",
-	"reload": "Obnoviť",
-	"timelinesLabels": {
-		"home": "Domov",
-		"local": "Lokálne",
-		"social": "Sociálne",
-		"global": "Globálne"
-	},
-	"lists": "Zoznamy",
-	"antennas": "Antény",
-	"channel": "Kanály",
-	"timeline": "Časová os"
+	"showFixedPostForm": "Zobraziť formulár na nové príspevky nad časovou osou"
 }
 </locale>
 
@@ -952,24 +683,11 @@ definePage(() => ({
 		"social": "ไทม์ไลน์โซเชียลจะแสดงโพสต์จากทั้งไทม์ไลน์หลักและไทม์ไลน์ท้องถิ่น",
 		"global": "ในไทม์ไลน์ทั่วโลก คุณสามารถดูโน้ตจากเซิร์ฟเวอร์ที่เชื่อมต่อทั้งหมดได้"
 	},
-	"createNew": "สร้างใหม่",
 	"options": "ตัวเลือก",
 	"showRenotes": "แสดงรีโน้ต",
-	"showRepliesToOthersInTimeline": "แสดงการตอบกลับผู้อื่นลงในไทม์ไลน์",
 	"withSensitive": "แสดงโน้ตที่มีไฟล์เนื้อหาละเอียดอ่อน",
 	"fileAttachedOnly": "เฉพาะโน้ตที่มีไฟล์เท่านั้น",
-	"showFixedPostForm": "แสดงแบบฟอร์มการโพสต์ที่ด้านบนสุดของไทม์ไลน์",
-	"reload": "รีโหลด",
-	"timelinesLabels": {
-		"home": "หน้าหลัก",
-		"local": "ท้องถิ่น",
-		"social": "โซเชียล",
-		"global": "ทั่วโลก"
-	},
-	"lists": "รายชื่อ",
-	"antennas": "เสาอากาศ",
-	"channel": "ช่อง",
-	"timeline": "ไทม์ไลน์"
+	"showFixedPostForm": "แสดงแบบฟอร์มการโพสต์ที่ด้านบนสุดของไทม์ไลน์"
 }
 </locale>
 
@@ -981,24 +699,11 @@ definePage(() => ({
 		"social": "Pano, Sosyal Pano ve Yerel Pano'dan gelen notları görüntüler.",
 		"global": "Global Pano'da, bağlı tüm sunuculardan gelen notları görebilirsin."
 	},
-	"createNew": "Yeni oluştur",
 	"options": "Seçenekler",
 	"showRenotes": "Renote'ları göster",
-	"showRepliesToOthersInTimeline": "Pano'da diğer kişilere verilen yanıtları göster",
 	"withSensitive": "Hassas dosyalara notlar ekle",
 	"fileAttachedOnly": "Yalnızca dosya içeren notlar",
-	"showFixedPostForm": "Gönderi formunu pano üstünde görüntüle",
-	"reload": "Yenile",
-	"timelinesLabels": {
-		"home": "Pano",
-		"local": "Yerel",
-		"social": "Sosyal",
-		"global": "Global"
-	},
-	"lists": "Listeler",
-	"antennas": "Antenler",
-	"channel": "Kanallar",
-	"timeline": "Pano"
+	"showFixedPostForm": "Gönderi formunu pano üstünde görüntüle"
 }
 </locale>
 
@@ -1010,24 +715,11 @@ definePage(() => ({
 		"social": "The Social timeline displays notes from both the Home and Local timelines.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Create new",
 	"options": "Options",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Display the posting form at the top of the timeline",
-	"reload": "Refresh",
-	"timelinesLabels": {
-		"home": "Home",
-		"local": "Local",
-		"social": "Social",
-		"global": "Global"
-	},
-	"lists": "Lists",
-	"antennas": "Antennas",
-	"channel": "Channels",
-	"timeline": "Timeline"
+	"showFixedPostForm": "Display the posting form at the top of the timeline"
 }
 </locale>
 
@@ -1039,24 +731,11 @@ definePage(() => ({
 		"social": "Соціальна стрічка показує нотатки й з домашньої, й з локальної стрічок. ",
 		"global": "У глобальній стрічці ви можете побачити нотатки з усіх під'єднаних серверів."
 	},
-	"createNew": "Створити новий",
 	"options": "Опції",
 	"showRenotes": "Показати поширення",
-	"showRepliesToOthersInTimeline": "Показувати відповіді іншим у стрічці",
 	"withSensitive": "Допис від {name} містить чутливий вміст",
 	"fileAttachedOnly": "Лише нотатки з файлами",
-	"showFixedPostForm": "Показати форму запису над стрічкою новин.",
-	"reload": "Оновити",
-	"timelinesLabels": {
-		"home": "Домівка",
-		"local": "Локальна",
-		"social": "Соціальна",
-		"global": "Глобальна"
-	},
-	"lists": "Списки",
-	"antennas": "Антени",
-	"channel": "Канали",
-	"timeline": "Стрічка"
+	"showFixedPostForm": "Показати форму запису над стрічкою новин."
 }
 </locale>
 
@@ -1068,24 +747,11 @@ definePage(() => ({
 		"social": "Dòng thời gian Xã hội hiển thị các ghi chú từ cả dòng thời gian Trang chủ và Địa phương.",
 		"global": "In the Global timeline, you can see notes from all connected servers."
 	},
-	"createNew": "Tạo mới",
 	"options": "Tùy chọn",
 	"showRenotes": "Show renotes",
-	"showRepliesToOthersInTimeline": "Show replies to others in timeline",
 	"withSensitive": "Include notes with sensitive files",
 	"fileAttachedOnly": "Only notes with files",
-	"showFixedPostForm": "Hiện khung soạn tút ở phía trên bảng tin",
-	"reload": "Tải lại",
-	"timelinesLabels": {
-		"home": "Trang chính",
-		"local": "Máy chủ này",
-		"social": "Xã hội",
-		"global": "Liên hợp"
-	},
-	"lists": "Danh sách",
-	"antennas": "Trạm phát sóng",
-	"channel": "Kênh",
-	"timeline": "Bảng tin"
+	"showFixedPostForm": "Hiện khung soạn tút ở phía trên bảng tin"
 }
 </locale>
 
@@ -1097,24 +763,11 @@ definePage(() => ({
 		"social": "社交时间线将同时显示首页时间线和本地时间线的内容。",
 		"global": "全局时间线可以查看所有已联合的服务器上的帖子。"
 	},
-	"createNew": "新建",
 	"options": "选项",
 	"showRenotes": "显示转帖",
-	"showRepliesToOthersInTimeline": "在时间线中显示对他人的回复",
 	"withSensitive": "显示包含敏感媒体的帖子",
 	"fileAttachedOnly": "仅限媒体",
-	"showFixedPostForm": "在时间线顶部显示发帖框",
-	"reload": "刷新",
-	"timelinesLabels": {
-		"home": "首页",
-		"local": "本地",
-		"social": "社交",
-		"global": "全局"
-	},
-	"lists": "列表",
-	"antennas": "天线",
-	"channel": "频道",
-	"timeline": "时间线"
+	"showFixedPostForm": "在时间线顶部显示发帖框"
 }
 </locale>
 
@@ -1126,23 +779,10 @@ definePage(() => ({
 		"social": "在社交時間軸上，可以看到首頁與本地時間軸的貼文。",
 		"global": "在公開時間軸上，可以看到其他已連接伺服器的貼文。\n"
 	},
-	"createNew": "新建",
 	"options": "選項",
 	"showRenotes": "顯示其他人的轉發貼文",
-	"showRepliesToOthersInTimeline": "在時間軸上顯示給其他人的回覆",
 	"withSensitive": "顯示包含敏感檔案的貼文",
 	"fileAttachedOnly": "只顯示包含附件的貼文",
-	"showFixedPostForm": "於時間軸頁頂顯示「發送貼文」方框",
-	"reload": "重新整理",
-	"timelinesLabels": {
-		"home": "首頁",
-		"local": "本地",
-		"social": "社交",
-		"global": "公開"
-	},
-	"lists": "清單",
-	"antennas": "天線",
-	"channel": "頻道",
-	"timeline": "時間軸"
+	"showFixedPostForm": "於時間軸頁頂顯示「發送貼文」方框"
 }
 </locale>

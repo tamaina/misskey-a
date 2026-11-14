@@ -12,6 +12,10 @@ test.each(['alias.ts.title', 'alias.tsx.greeting({ name: "test" })'])('rejects e
 	expect(() => assertNoLegacyLabels([runtime, { fileName: 'scripts/app.js', code: `import { i18n as alias } from "./i18n.js"; console.log(${expression});` }], runtime.fileName)).toThrow('Legacy labels remain');
 });
 
+test.each(['unref(alias).ts.title', 'unwrap(alias).tsx.greeting({ name: "test" })'])('rejects wrapped legacy references without unref normalization: %s', expression => {
+	expect(() => assertNoLegacyLabels([runtime, { fileName: 'scripts/app.js', code: `import { i18n as alias } from "./i18n.js"; console.log(${expression});` }], runtime.fileName)).toThrow('Legacy label validation failed');
+});
+
 test('resolves renamed facade exports before rejecting legacy labels', () => {
 	const facade = { fileName: 'scripts/facade.js', code: 'import { internal as renamed } from "./shared.js"; export { renamed as i18n };' };
 	expect(() => assertNoLegacyLabels([facade, { fileName: 'scripts/shared.js', code: 'export const internal = {};' }, { fileName: 'scripts/app.js', code: 'import { internal as labels } from "./shared.js"; console.log(labels.ts.title);' }], facade.fileName)).toThrow('Legacy labels remain');

@@ -58,6 +58,7 @@ const html = computed(() => highlighter.codeToHtml(diffRows.value ? diffRows.val
 
 async function fetchLanguage(to: string): Promise<void> {
 	const language = to as BundledLanguage;
+	let resolvedLang: BundledLanguage | 'aiscript' = language;
 
 	// Check for the loaded languages, and load the language if it's not loaded yet.
 	if (!highlighter.getLoadedLanguages().includes(language)) {
@@ -69,13 +70,14 @@ async function fetchLanguage(to: string): Promise<void> {
 		if (bundles.length > 0) {
 			if (_DEV_) console.log(`Loading language: ${language}`);
 			await highlighter.loadLanguage(bundles[0].import);
-			codeLang.value = language;
 		} else {
-			codeLang.value = 'js';
+			resolvedLang = 'js';
 		}
-	} else {
-		codeLang.value = language;
 	}
+
+	// Discard the result if the lang prop has changed while loading the language
+	if (props.lang !== to) return;
+	codeLang.value = resolvedLang;
 }
 
 watch(() => props.lang, (to) => {

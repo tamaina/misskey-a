@@ -9,6 +9,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { registerHttpAccessLog } from '@features/runtime/backend/http/http-access-log.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiRole } from '@features/roles/backend/models/Role.js';
 import type { LogManager } from '@features/runtime/backend/logging/LogManager.js';
 import { McpApiService } from '../../backend/McpApiService.js';
 import { registerMcpServer } from '../../backend/server.js';
@@ -78,11 +79,13 @@ it('declares OAuth access:mcp on the tool and challenges invalid or insufficient
 	expect(denied.headers['www-authenticate']).toContain('scope="access:mcp"');
 });
 
-it('advertises generic write potential and challenges the native endpoint permission', async () => {
-	const { invoke } = await server(true);
+it('advertises kind-specific write potential and challenges the native endpoint permission', async () => {
+	const { invoke, f } = await server(true);
+	f.grant.permission.push('write:reactions');
 	const tools = (await invoke()).json().result.tools;
-	expect(tools.find((tool: { name: string }) => tool.name === 'call_api').annotations).toEqual({ readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: true });
-	const response = await invoke(message('tools/call', { name: 'call_api', arguments: { endpoint: 'notes/reactions/create', arguments: { noteId: 'aaaaaaaaaaaaaaa0', reaction: '❤️' } } }));
+	expect(tools.find((tool: { name: string }) => tool.name === 'call_api_write_reactions').annotations).toEqual({ readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: true });
+	f.grant.permission = ['access:mcp'];
+	const response = await invoke(message('tools/call', { name: 'call_api_write_reactions', arguments: { endpoint: 'notes/reactions/create', arguments: { noteId: 'aaaaaaaaaaaaaaa0', reaction: '❤️' } } }));
 	const result = response.json().result;
 	expect(result.isError).toBe(true);
 	expect(result._meta['mcp/www_authenticate'][0]).toContain('scope="access:mcp write:reactions"');
@@ -208,11 +211,48 @@ it('runs the SDK against the normal-server plugin and rejects revocation, inject
 	const client = new Client({ name: 'synthetic-native-token', version: '0' });
 	await client.connect(new StreamableHTTPClientTransport(new URL(resource), { fetch: fetchFixture, requestInit: { headers: { authorization: headers.authorization } } }));
 	try {
-		expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api']);
+		expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general']);
 		expect((await client.callTool({ name: 'list_my_notes', arguments: {} })).structuredContent).toEqual({ notes: (await f.ordinary({ userId: f.own.id })).json() });
 		await expect(client.callTool({ name: 'list_my_notes', arguments: { userId: f.otherId } })).rejects.toBeDefined();
 		await expect(client.callTool({ name: 'notes/delete', arguments: {} })).rejects.toBeDefined();
 		f.rows.delete(f.grant.id);
 		await expect(client.listTools()).rejects.toBeDefined();
 	} finally { await client.close(); }
+});
+
+it.each([false, true])('filters call tools by fresh grants and roles (modern protocol: %s)', async modern => {
+	const { invoke, f } = await server(true);
+	const list = async () => {
+		const params = modern ? { _meta: { 'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientCapabilities': {} } } : {};
+		const response = await invoke(message('tools/list', params), modern ? { 'mcp-method': 'tools/list', 'mcp-protocol-version': '2026-07-28' } : {});
+		expect(response.statusCode).toBe(200);
+		return response.json().result.tools as { name: string; annotations: { readOnlyHint: boolean }; inputSchema: { properties: { endpoint: { enum: string[] } } } }[];
+	};
+	const names = async () => (await list()).map(tool => tool.name);
+	const general = (await list()).find(tool => tool.name === 'call_api_general');
+	expect(general?.inputSchema.properties.endpoint.enum).toContain('users/notes');
+	for (const endpoint of ['reset-db', 'test', 'my/apps', 'admin/ad/list', 'notes/reactions/create']) {
+		expect(general?.inputSchema.properties.endpoint.enum).not.toContain(endpoint);
+	}
+	expect(await names()).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general']);
+	f.grant.permission.push('write:reactions', 'read:admin:ad', 'write:admin:ad');
+	expect(await names()).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general', 'call_api_write_reactions']);
+	f.roles.getUserRoles.mockResolvedValue([{ isAdministrator: true, isModerator: false } as MiRole]);
+	expect(await names()).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general', 'call_api_read_admin_ad', 'call_api_write_admin_ad', 'call_api_write_reactions']);
+	const adminRead = (await list()).find(tool => tool.name === 'call_api_read_admin_ad');
+	expect(adminRead?.annotations.readOnlyHint).toBe(true);
+	expect(adminRead?.inputSchema.properties.endpoint.enum).toEqual(['admin/ad/list']);
+	const reactionWrite = (await list()).find(tool => tool.name === 'call_api_write_reactions');
+	expect(reactionWrite?.inputSchema.properties.endpoint.enum).toContain('notes/reactions/create');
+	expect(reactionWrite?.inputSchema.properties.endpoint.enum).not.toContain('users/notes');
+	f.roles.getUserRoles.mockResolvedValue([]);
+	f.grant.permission = ['access:mcp'];
+	expect(await names()).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general']);
+	// App-derived native permissions, rather than the token row's permissions.
+	const appList = async () => (await invoke(message('tools/list'), { authorization: `Bearer ${f.appGrant.hash}` })).json().result.tools.map((tool: { name: string }) => tool.name);
+	expect(await appList()).toContain('call_api_read_account');
+	expect(await appList()).not.toContain('call_api_write_notes');
+	f.apps.findOneBy.mockResolvedValue(Object.assign({}, f.app, { permission: ['access:mcp', 'write:reactions'] }));
+	expect(await appList()).toContain('call_api_write_reactions');
+	expect(await appList()).not.toContain('call_api_read_account');
 });

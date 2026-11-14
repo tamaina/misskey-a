@@ -49,6 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, defineAsyncComponent, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import XDecoration from '@features/avatar-decorations/frontend/pages/settings/avatar-decoration.decoration.vue';
@@ -61,6 +62,9 @@ import { ensureSignin } from '@features/auth/frontend/i.js';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { groupAvatarDecorations } from '@features/avatar-decorations/frontend/utility/group-avatar-decorations.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -133,7 +137,7 @@ async function openDecoration(avatarDecoration: {
 function detachAllDecorations() {
 	os.confirm({
 		type: 'warning',
-		text: $locale.value.sfc.areYouSure,
+		text: globalLocale.value.env.areYouSure,
 	}).then(async ({ canceled }) => {
 		if (canceled) return;
 		await os.apiWithDialog('i/update', {
@@ -180,8 +184,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "مستخدم",
 	"detachAll": "Remove All",
-	"other": "منوعات",
-	"areYouSure": "Are you sure?"
+	"other": "منوعات"
 }
 </locale>
 
@@ -192,8 +195,7 @@ definePage(() => ({
 	"remainingN": "Queden: {n}",
 	"inUse": "Fet servir",
 	"detachAll": "Treure tot",
-	"other": "Altres",
-	"areYouSure": "Estàs segur?"
+	"other": "Altres"
 }
 </locale>
 
@@ -204,8 +206,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Používáno",
 	"detachAll": "Remove All",
-	"other": "Ostatní",
-	"areYouSure": "Jste si jistí?"
+	"other": "Ostatní"
 }
 </locale>
 
@@ -216,8 +217,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Used",
 	"detachAll": "Remove All",
-	"other": "Other",
-	"areYouSure": "Are you sure?"
+	"other": "Other"
 }
 </locale>
 
@@ -228,8 +228,7 @@ definePage(() => ({
 	"remainingN": "Verbleibend: {n}",
 	"inUse": "Verwendet",
 	"detachAll": "Alles Entfernen",
-	"other": "Anderes",
-	"areYouSure": "Bist du sicher?"
+	"other": "Anderes"
 }
 </locale>
 
@@ -240,8 +239,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Used",
 	"detachAll": "Remove All",
-	"other": "Other",
-	"areYouSure": "Are you sure?"
+	"other": "Other"
 }
 </locale>
 
@@ -252,8 +250,7 @@ definePage(() => ({
 	"remainingN": "Faltan: {n}",
 	"inUse": "Usado",
 	"detachAll": "Quitar todo",
-	"other": "Otro",
-	"areYouSure": "¿Estás conforme?"
+	"other": "Otro"
 }
 </locale>
 
@@ -264,8 +261,7 @@ definePage(() => ({
 	"remainingN": "Restants : {n}",
 	"inUse": "utilisé",
 	"detachAll": "Tout enlever",
-	"other": "Autre",
-	"areYouSure": "Êtes-vous sûr·e ?"
+	"other": "Autre"
 }
 </locale>
 
@@ -276,8 +272,7 @@ definePage(() => ({
 	"remainingN": "Sisa : {n}",
 	"inUse": "Digunakan",
 	"detachAll": "Lepas Semua",
-	"other": "Lainnya",
-	"areYouSure": "Apakah kamu yakin?"
+	"other": "Lainnya"
 }
 </locale>
 
@@ -288,8 +283,7 @@ definePage(() => ({
 	"remainingN": "Rimangono: {n}",
 	"inUse": "Usata da",
 	"detachAll": "Togli tutto",
-	"other": "Eccetera",
-	"areYouSure": "Confermi?"
+	"other": "Eccetera"
 }
 </locale>
 
@@ -300,8 +294,7 @@ definePage(() => ({
 	"remainingN": "残り: {n}",
 	"inUse": "使用中",
 	"detachAll": "全て外す",
-	"other": "その他",
-	"areYouSure": "よろしいですか？"
+	"other": "その他"
 }
 </locale>
 
@@ -312,8 +305,7 @@ definePage(() => ({
 	"remainingN": "残り:{n}",
 	"inUse": "使用中",
 	"detachAll": "全部とる",
-	"other": "その他",
-	"areYouSure": "いいん？"
+	"other": "その他"
 }
 </locale>
 
@@ -324,8 +316,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Used",
 	"detachAll": "Remove All",
-	"other": "Wiyyaḍ",
-	"areYouSure": "Are you sure?"
+	"other": "Wiyyaḍ"
 }
 </locale>
 
@@ -336,8 +327,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Used",
 	"detachAll": "Remove All",
-	"other": "Other",
-	"areYouSure": "Are you sure?"
+	"other": "Other"
 }
 </locale>
 
@@ -348,8 +338,7 @@ definePage(() => ({
 	"remainingN": "나머지: {n}",
 	"inUse": "사용중",
 	"detachAll": "모두 빼기",
-	"other": "기타",
-	"areYouSure": "계속 진행하시겠습니까?"
+	"other": "기타"
 }
 </locale>
 
@@ -360,8 +349,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Gebruikt",
 	"detachAll": "Remove All",
-	"other": "Ander",
-	"areYouSure": "Weet je het zeker?"
+	"other": "Ander"
 }
 </locale>
 
@@ -372,8 +360,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Used",
 	"detachAll": "Remove All",
-	"other": "Andre",
-	"areYouSure": "Are you sure?"
+	"other": "Andre"
 }
 </locale>
 
@@ -384,8 +371,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Użyto",
 	"detachAll": "Remove All",
-	"other": "Inne",
-	"areYouSure": "Na pewno?"
+	"other": "Inne"
 }
 </locale>
 
@@ -396,8 +382,7 @@ definePage(() => ({
 	"remainingN": "Restante: {n}",
 	"inUse": "Em uso",
 	"detachAll": "Remover Tudo",
-	"other": "Outros",
-	"areYouSure": "Tem certeza?"
+	"other": "Outros"
 }
 </locale>
 
@@ -408,8 +393,7 @@ definePage(() => ({
 	"remainingN": "Остаётся: {n}",
 	"inUse": "Занято",
 	"detachAll": "Убрать всё",
-	"other": "Другие",
-	"areYouSure": "Вы уверены?"
+	"other": "Другие"
 }
 </locale>
 
@@ -420,8 +404,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Použité",
 	"detachAll": "Remove All",
-	"other": "Ostatní",
-	"areYouSure": "Are you sure?"
+	"other": "Ostatní"
 }
 </locale>
 
@@ -432,8 +415,7 @@ definePage(() => ({
 	"remainingN": "เหลือ : {n}",
 	"inUse": "ใช้แล้ว",
 	"detachAll": "เอาออกทั้งหมด",
-	"other": "อื่น ๆ",
-	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?"
+	"other": "อื่น ๆ"
 }
 </locale>
 
@@ -444,8 +426,7 @@ definePage(() => ({
 	"remainingN": "Kalan: {n}",
 	"inUse": "Kullanılıyor",
 	"detachAll": "Tümünü Kaldır",
-	"other": "Diğer",
-	"areYouSure": "Emin misin?"
+	"other": "Diğer"
 }
 </locale>
 
@@ -456,8 +437,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Used",
 	"detachAll": "Remove All",
-	"other": "Other",
-	"areYouSure": "Are you sure?"
+	"other": "Other"
 }
 </locale>
 
@@ -468,8 +448,7 @@ definePage(() => ({
 	"remainingN": "Залишилося: {n}",
 	"inUse": "Зайнято",
 	"detachAll": "Видалити все",
-	"other": "Інше",
-	"areYouSure": "Ви впевнені?"
+	"other": "Інше"
 }
 </locale>
 
@@ -480,8 +459,7 @@ definePage(() => ({
 	"remainingN": "Remaining: {n}",
 	"inUse": "Đã dùng",
 	"detachAll": "Bỏ tất cả",
-	"other": "Khác",
-	"areYouSure": "Bạn chắc chứ?"
+	"other": "Khác"
 }
 </locale>
 
@@ -492,8 +470,7 @@ definePage(() => ({
 	"remainingN": "剩余：{n}",
 	"inUse": "已使用",
 	"detachAll": "全部卸下",
-	"other": "其他",
-	"areYouSure": "你确定吗？"
+	"other": "其他"
 }
 </locale>
 
@@ -504,7 +481,6 @@ definePage(() => ({
 	"remainingN": "剩餘：{n}",
 	"inUse": "已使用",
 	"detachAll": "全部移除",
-	"other": "其他",
-	"areYouSure": "是否確定？"
+	"other": "其他"
 }
 </locale>

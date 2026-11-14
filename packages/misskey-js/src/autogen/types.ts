@@ -3970,6 +3970,7 @@ export type components = {
             notesCount: number;
             isSensitive: boolean;
             isFederated: boolean;
+            isFederationFrozen: boolean;
             uri: string | null;
             host: string | null;
             allowRenoteToExternal: boolean;
@@ -4794,7 +4795,7 @@ export type components = {
             /** Format: id */
             userId: string;
             name: string;
-            on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+            on: ('unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage')[];
             url: string;
             secret: string;
             active: boolean;
@@ -5289,6 +5290,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -5872,6 +5874,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -6203,6 +6206,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -6534,6 +6538,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -8166,6 +8171,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -8811,6 +8817,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -9456,6 +9463,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -10101,6 +10109,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -17145,6 +17154,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -17476,6 +17486,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -18995,6 +19006,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -19585,6 +19597,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -20550,6 +20563,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -21163,6 +21177,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -21874,6 +21889,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -22260,6 +22276,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -22591,6 +22608,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -23922,6 +23940,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -24253,6 +24272,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -24584,6 +24604,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -24915,6 +24936,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -26005,6 +26027,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -26336,6 +26359,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -29371,6 +29395,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -29702,6 +29727,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -30033,6 +30059,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -30402,6 +30429,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -30733,6 +30761,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -31064,6 +31093,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -33195,6 +33225,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -33526,6 +33557,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -34171,6 +34203,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -34502,6 +34535,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -35147,6 +35181,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -35792,6 +35827,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -36123,6 +36159,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -36454,6 +36491,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -38622,6 +38660,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -43669,6 +43708,7 @@ export interface operations {
                         notesCount: number;
                         isSensitive: boolean;
                         isFederated: boolean;
+                        isFederationFrozen: boolean;
                         uri: string | null;
                         host: string | null;
                         allowRenoteToExternal: boolean;
@@ -44075,6 +44115,7 @@ export interface operations {
                         notesCount: number;
                         isSensitive: boolean;
                         isFederated: boolean;
+                        isFederationFrozen: boolean;
                         uri: string | null;
                         host: string | null;
                         allowRenoteToExternal: boolean;
@@ -44489,6 +44530,7 @@ export interface operations {
                         notesCount: number;
                         isSensitive: boolean;
                         isFederated: boolean;
+                        isFederationFrozen: boolean;
                         uri: string | null;
                         host: string | null;
                         allowRenoteToExternal: boolean;
@@ -44695,6 +44737,7 @@ export interface operations {
                         notesCount: number;
                         isSensitive: boolean;
                         isFederated: boolean;
+                        isFederationFrozen: boolean;
                         uri: string | null;
                         host: string | null;
                         allowRenoteToExternal: boolean;
@@ -44915,6 +44958,7 @@ export interface operations {
                         notesCount: number;
                         isSensitive: boolean;
                         isFederated: boolean;
+                        isFederationFrozen: boolean;
                         uri: string | null;
                         host: string | null;
                         allowRenoteToExternal: boolean;
@@ -45151,6 +45195,7 @@ export interface operations {
                         notesCount: number;
                         isSensitive: boolean;
                         isFederated: boolean;
+                        isFederationFrozen: boolean;
                         uri: string | null;
                         host: string | null;
                         allowRenoteToExternal: boolean;
@@ -45361,6 +45406,7 @@ export interface operations {
                         notesCount: number;
                         isSensitive: boolean;
                         isFederated: boolean;
+                        isFederationFrozen: boolean;
                         uri: string | null;
                         host: string | null;
                         allowRenoteToExternal: boolean;
@@ -46203,6 +46249,7 @@ export interface operations {
                     color?: string;
                     isSensitive?: boolean | null;
                     isFederated?: boolean;
+                    isFederationFrozen?: boolean;
                     allowRenoteToExternal?: boolean | null;
                 } & ({
                     channelId: string;
@@ -46214,6 +46261,7 @@ export interface operations {
                     color?: string;
                     isSensitive?: boolean | null;
                     isFederated?: boolean;
+                    isFederationFrozen?: boolean;
                     allowRenoteToExternal?: boolean | null;
                 } & unknown);
             };
@@ -46250,6 +46298,7 @@ export interface operations {
                         notesCount: number;
                         isSensitive: boolean;
                         isFederated: boolean;
+                        isFederationFrozen: boolean;
                         uri: string | null;
                         host: string | null;
                         allowRenoteToExternal: boolean;
@@ -46878,6 +46927,7 @@ export interface operations {
                         notesCount: number;
                         isSensitive: boolean;
                         isFederated: boolean;
+                        isFederationFrozen: boolean;
                         uri: string | null;
                         host: string | null;
                         allowRenoteToExternal: boolean;
@@ -63502,13 +63552,13 @@ export interface operations {
                     url: string;
                     /** @default  */
                     secret?: string;
-                    on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+                    on: ('unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage')[];
                 } & ({
                     name: string;
                     url: string;
                     /** @default  */
                     secret?: string;
-                    on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+                    on: ('unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage')[];
                 } & unknown);
             };
         };
@@ -63525,7 +63575,7 @@ export interface operations {
                         /** Format: misskey:id */
                         userId: string;
                         name: string;
-                        on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+                        on: ('unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage')[];
                         url: string;
                         secret: string;
                         active: boolean;
@@ -63905,7 +63955,7 @@ export interface operations {
                         /** Format: id */
                         userId: string;
                         name: string;
-                        on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+                        on: ('unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage')[];
                         url: string;
                         secret: string;
                         active: boolean;
@@ -64095,7 +64145,7 @@ export interface operations {
                         /** Format: id */
                         userId: string;
                         name: string;
-                        on: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+                        on: ('unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage')[];
                         url: string;
                         secret: string;
                         active: boolean;
@@ -64278,7 +64328,7 @@ export interface operations {
                 'application/json': {
                     webhookId: string;
                     /** @enum {string} */
-                    type: 'mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction';
+                    type: 'unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage';
                     override?: {
                         url?: string;
                         secret?: string;
@@ -64289,7 +64339,7 @@ export interface operations {
                 } & ({
                     webhookId: string;
                     /** @enum {string} */
-                    type: 'mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction';
+                    type: 'unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage';
                     override?: {
                         url?: string;
                         secret?: string;
@@ -64482,14 +64532,14 @@ export interface operations {
                     name?: string;
                     url?: string;
                     secret?: string | null;
-                    on?: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+                    on?: ('unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage')[];
                     active?: boolean;
                 } & ({
                     webhookId: string;
                     name?: string;
                     url?: string;
                     secret?: string | null;
-                    on?: ('mention' | 'unfollow' | 'follow' | 'followed' | 'note' | 'reply' | 'renote' | 'reaction')[];
+                    on?: ('unfollow' | 'follow' | 'note' | 'subscribedNote' | 'followed' | 'mention' | 'reply' | 'renote' | 'quote' | 'reaction' | 'pollEnded' | 'scheduledNotePosted' | 'scheduledNotePostFailed' | 'receiveFollowRequest' | 'followRequestAccepted' | 'roleAssigned' | 'chatRoomInvitationReceived' | 'achievementEarned' | 'exportCompleted' | 'login' | 'createToken' | 'app' | 'test' | 'chatMessage')[];
                     active?: boolean;
                 } & unknown);
             };
@@ -76291,7 +76341,6 @@ export interface operations {
                 };
                 content: {
                     'application/json': {
-                        qr: string;
                         url: string;
                         secret: string;
                         label: string;
@@ -84224,6 +84273,7 @@ export interface operations {
                             canUseTranslator: boolean;
                             canHideAds: boolean;
                             canCreateChannel: boolean;
+                            canFederateChannel: boolean;
                             driveCapacityMb: number;
                             maxFileSizeMb: number;
                             uploadableFileTypes: string[];
@@ -120090,6 +120140,26 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                             /** @constant */
+                            code: 'AVATAR_IS_SENSITIVE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BANNER_IS_SENSITIVE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
                             code: 'NO_SUCH_PAGE';
                             message: string;
                         } | {
@@ -143273,7 +143343,6 @@ export interface operations {
                 };
                 content: {
                     'application/json': {
-                        qr: string;
                         url: string;
                         secret: string;
                         label: string;

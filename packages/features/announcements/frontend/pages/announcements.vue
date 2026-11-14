@@ -26,15 +26,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<img v-if="announcement.imageUrl" :src="announcement.imageUrl"/>
 						<MkA :to="`/announcements/${announcement.id}`">
 							<div style="margin-top: 8px; opacity: 0.7; font-size: 85%;">
-								{{ $locale.sfc.createdAt }}: <MkTime :time="announcement.createdAt" mode="detail"/>
+								{{ globalLocale.env.createdAt }}: <MkTime :time="announcement.createdAt" mode="detail"/>
 							</div>
 							<div v-if="announcement.updatedAt" style="opacity: 0.7; font-size: 85%;">
-								{{ $locale.sfc.updatedAt }}: <MkTime :time="announcement.updatedAt" mode="detail"/>
+								{{ globalLocale.env.updatedAt }}: <MkTime :time="announcement.updatedAt" mode="detail"/>
 							</div>
 						</MkA>
 					</div>
 					<div v-if="tab !== 'past' && $i != null && !announcement.silence && !announcement.isRead" :class="$style.footer">
-						<MkButton primary @click="read(announcement)"><i class="ti ti-check"></i> {{ $locale.sfc.gotIt }}</MkButton>
+						<MkButton primary @click="read(announcement)"><i class="ti ti-check"></i> {{ globalLocale.env.gotIt }}</MkButton>
 					</div>
 				</section>
 			</MkPagination>
@@ -44,6 +44,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
@@ -56,6 +57,9 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const paginator = markRaw(new Paginator('announcements', {
 	limit: 10,
@@ -101,7 +105,7 @@ const headerTabs = computed(() => [{
 }]);
 
 definePage(() => ({
-	title: $locale.value.sfc.announcements,
+	title: globalLocale.value.env.announcements,
 	icon: 'ti ti-speakerphone',
 }));
 </script>
@@ -144,12 +148,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "الإعلانات",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "أُنشئ في",
-	"updatedAt": "حُدّث في",
-	"gotIt": "فهِمت"
+	"forYou": "For you"
 }
 </locale>
 
@@ -159,12 +159,8 @@ definePage(() => ({
 	"readConfirmText": "Això marcarà el contingut de \"{title}\" com llegit.",
 	"currentAnnouncements": "Avisos actuals",
 	"pastAnnouncements": "Avisos passats",
-	"announcements": "Avisos",
 	"youHaveUnreadAnnouncements": "Tens informes per llegir.",
-	"forYou": "Per a tu",
-	"createdAt": "Creat el",
-	"updatedAt": "Actualitzat el",
-	"gotIt": "D'acord "
+	"forYou": "Per a tu"
 }
 </locale>
 
@@ -174,12 +170,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Oznámení",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "Pro vás",
-	"createdAt": "Vytvořeno",
-	"updatedAt": "Upraveno",
-	"gotIt": "Rozumím!"
+	"forYou": "Pro vás"
 }
 </locale>
 
@@ -189,12 +181,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Announcements",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
-	"gotIt": "Got it!"
+	"forYou": "For you"
 }
 </locale>
 
@@ -204,12 +192,8 @@ definePage(() => ({
 	"readConfirmText": "Dies markiert den Inhalt von \"{title}\" als gelesen.",
 	"currentAnnouncements": "Aktuelle Ankündigungen",
 	"pastAnnouncements": "Alte Ankündigungen",
-	"announcements": "Ankündigungen",
 	"youHaveUnreadAnnouncements": "Es gibt neue Ankündigungen.",
-	"forYou": "Für dich",
-	"createdAt": "Erstellt am",
-	"updatedAt": "Zuletzt geändert am",
-	"gotIt": "Verstanden!"
+	"forYou": "Für dich"
 }
 </locale>
 
@@ -219,12 +203,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Announcements",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
-	"gotIt": "Got it!"
+	"forYou": "For you"
 }
 </locale>
 
@@ -234,12 +214,8 @@ definePage(() => ({
 	"readConfirmText": "Esto marcará el contenido de \"{title}\" como leído.",
 	"currentAnnouncements": "Avisos actuales",
 	"pastAnnouncements": "Avisos anteriores",
-	"announcements": "Avisos",
 	"youHaveUnreadAnnouncements": "Hay anuncios sin leer",
-	"forYou": "Para ti",
-	"createdAt": "Fecha de creación",
-	"updatedAt": "Actualizado",
-	"gotIt": "¡Lo tengo!"
+	"forYou": "Para ti"
 }
 </locale>
 
@@ -249,12 +225,8 @@ definePage(() => ({
 	"readConfirmText": "Cela marquera le contenu de  « {title} » comme lu.",
 	"currentAnnouncements": "Annonces actuelles",
 	"pastAnnouncements": "Annonces passées",
-	"announcements": "Annonces",
 	"youHaveUnreadAnnouncements": "Il y a des annonces non lues.",
-	"forYou": "Pour vous",
-	"createdAt": "Date de création",
-	"updatedAt": "Mis à jour le",
-	"gotIt": "J’ai compris !"
+	"forYou": "Pour vous"
 }
 </locale>
 
@@ -264,12 +236,8 @@ definePage(() => ({
 	"readConfirmText": "Aksi ini akan menandai konten dari \"{title}\" telah dibaca.",
 	"currentAnnouncements": "Pengumuman Saat Ini",
 	"pastAnnouncements": "Pengumuman Terdahulu",
-	"announcements": "Pengumuman",
 	"youHaveUnreadAnnouncements": "Terdapat pengumuman yang belum dibaca",
-	"forYou": "Untuk Anda",
-	"createdAt": "Dibuat pada",
-	"updatedAt": "Diperbarui pada",
-	"gotIt": "Mengerti"
+	"forYou": "Untuk Anda"
 }
 </locale>
 
@@ -279,12 +247,8 @@ definePage(() => ({
 	"readConfirmText": "Hai già letto \"{title}˝?",
 	"currentAnnouncements": "Annunci attuali",
 	"pastAnnouncements": "Annunci precedenti",
-	"announcements": "Annunci",
 	"youHaveUnreadAnnouncements": "Ci sono Annunci non letti",
-	"forYou": "Per te",
-	"createdAt": "Data di creazione",
-	"updatedAt": "Aggiornato il",
-	"gotIt": "ok!"
+	"forYou": "Per te"
 }
 </locale>
 
@@ -294,12 +258,8 @@ definePage(() => ({
 	"readConfirmText": "「{title}」の内容を読み、既読にします。",
 	"currentAnnouncements": "現在のお知らせ",
 	"pastAnnouncements": "過去のお知らせ",
-	"announcements": "お知らせ",
 	"youHaveUnreadAnnouncements": "未読のお知らせがあります。",
-	"forYou": "あなたへ",
-	"createdAt": "作成日時",
-	"updatedAt": "更新日時",
-	"gotIt": "わかった"
+	"forYou": "あなたへ"
 }
 </locale>
 
@@ -309,12 +269,8 @@ definePage(() => ({
 	"readConfirmText": "「{title}」はもう読んだから既読にするで。",
 	"currentAnnouncements": "現在のお知らせやで",
 	"pastAnnouncements": "過去のお知らせやで",
-	"announcements": "お知らせ",
 	"youHaveUnreadAnnouncements": "あんたまだこのお知らせ読んどらんやろ。",
-	"forYou": "あんたへ",
-	"createdAt": "作成した日",
-	"updatedAt": "更新日時",
-	"gotIt": "ほい"
+	"forYou": "あんたへ"
 }
 </locale>
 
@@ -324,12 +280,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Announcements",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
-	"gotIt": "Got it!"
+	"forYou": "For you"
 }
 </locale>
 
@@ -339,12 +291,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Announcements",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
-	"gotIt": "ಅರ್ಥವಾಯಿತು!"
+	"forYou": "For you"
 }
 </locale>
 
@@ -354,12 +302,8 @@ definePage(() => ({
 	"readConfirmText": "〈{title}〉의 내용을 읽음으로 표시합니다.",
 	"currentAnnouncements": "현재 공지사항",
 	"pastAnnouncements": "과거 공지사항",
-	"announcements": "공지사항",
 	"youHaveUnreadAnnouncements": "읽지 않은 공지사항이 있습니다.",
-	"forYou": "나에게",
-	"createdAt": "생성된 날짜",
-	"updatedAt": "수정한 날짜",
-	"gotIt": "알겠어요"
+	"forYou": "나에게"
 }
 </locale>
 
@@ -369,12 +313,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Aankondigingen",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "Aangemaakt at",
-	"updatedAt": "Laatst gewijzigd at",
-	"gotIt": "Begrepen"
+	"forYou": "For you"
 }
 </locale>
 
@@ -384,12 +324,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Kunngjøringer",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
-	"gotIt": "Skjønner"
+	"forYou": "For you"
 }
 </locale>
 
@@ -399,12 +335,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Ogłoszenia",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "Utworzono",
-	"updatedAt": "Zaktualizowano",
-	"gotIt": "Rozumiem!"
+	"forYou": "For you"
 }
 </locale>
 
@@ -414,12 +346,8 @@ definePage(() => ({
 	"readConfirmText": "Isso marcará o conteúdo de \"{title}\" como lido.",
 	"currentAnnouncements": "Anúncios atuais",
 	"pastAnnouncements": "Anúncios passados",
-	"announcements": "Avisos",
 	"youHaveUnreadAnnouncements": "Há anúncios não lidos.",
-	"forYou": "Para você",
-	"createdAt": "Data de criação",
-	"updatedAt": "Última atualização",
-	"gotIt": "Entendi"
+	"forYou": "Para você"
 }
 </locale>
 
@@ -429,12 +357,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Текущие новости",
 	"pastAnnouncements": "Предыдущие новости",
-	"announcements": "Оповещения",
 	"youHaveUnreadAnnouncements": "У вас есть непрочитанные уведомления",
-	"forYou": "Для вас",
-	"createdAt": "Создано",
-	"updatedAt": "Обновлено",
-	"gotIt": "Ясно!"
+	"forYou": "Для вас"
 }
 </locale>
 
@@ -444,12 +368,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Oznamy",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "Vytvorené",
-	"updatedAt": "Upravené",
-	"gotIt": "Rozumiem!"
+	"forYou": "For you"
 }
 </locale>
 
@@ -459,12 +379,8 @@ definePage(() => ({
 	"readConfirmText": "จะทำเครื่องหมายใส่ “{title}” ว่าอ่านแล้ว",
 	"currentAnnouncements": "ประกาศในปัจจุบัน",
 	"pastAnnouncements": "ประกาศที่ผ่านมา",
-	"announcements": "ประกาศ",
 	"youHaveUnreadAnnouncements": "มีการประกาศที่ยังไม่ได้อ่าน",
-	"forYou": "สำหรับคุณ",
-	"createdAt": "สร้างเมื่อ",
-	"updatedAt": "อัปเดตล่าสุด",
-	"gotIt": "เข้าใจแล้ว !"
+	"forYou": "สำหรับคุณ"
 }
 </locale>
 
@@ -474,12 +390,8 @@ definePage(() => ({
 	"readConfirmText": "Bu, “{title}” içeriğini okundu olarak işaretleyecek.",
 	"currentAnnouncements": "Güncel duyurular",
 	"pastAnnouncements": "Geçmiş duyurular",
-	"announcements": "Duyurular",
 	"youHaveUnreadAnnouncements": "Okunmamış duyurular var.",
-	"forYou": "Senin için",
-	"createdAt": "Oluşturuldu",
-	"updatedAt": "Güncellendi",
-	"gotIt": "Anladım!"
+	"forYou": "Senin için"
 }
 </locale>
 
@@ -489,12 +401,8 @@ definePage(() => ({
 	"readConfirmText": "This will mark the contents of \"{title}\" as read.",
 	"currentAnnouncements": "Current announcements",
 	"pastAnnouncements": "Past announcements",
-	"announcements": "Announcements",
 	"youHaveUnreadAnnouncements": "There are unread announcements.",
-	"forYou": "For you",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
-	"gotIt": "Got it!"
+	"forYou": "For you"
 }
 </locale>
 
@@ -504,12 +412,8 @@ definePage(() => ({
 	"readConfirmText": "Це позначить зміст \"{title}\" як прочитаний.",
 	"currentAnnouncements": "Поточні оголошення",
 	"pastAnnouncements": "Минулі оголошення",
-	"announcements": "Оголошення",
 	"youHaveUnreadAnnouncements": "Є непрочитані оголошення.",
-	"forYou": "Для вас",
-	"createdAt": "Створено",
-	"updatedAt": "Останнє оновлення",
-	"gotIt": "Зрозуміло!"
+	"forYou": "Для вас"
 }
 </locale>
 
@@ -519,12 +423,8 @@ definePage(() => ({
 	"readConfirmText": "Điều này sẽ đánh dấu nội dung của \"{title}\" là đã đọc.",
 	"currentAnnouncements": "Thông báo hiện tại",
 	"pastAnnouncements": "Thông báo trước đó",
-	"announcements": "Thông báo máy chủ",
 	"youHaveUnreadAnnouncements": "Có thông báo chưa đọc.",
-	"forYou": "Dành cho bạn",
-	"createdAt": "Ngày tạo",
-	"updatedAt": "Cập nhật lúc",
-	"gotIt": "Hiểu rồi!"
+	"forYou": "Dành cho bạn"
 }
 </locale>
 
@@ -534,12 +434,8 @@ definePage(() => ({
 	"readConfirmText": "阅读 “{title}” 的内容，并标记为已读。",
 	"currentAnnouncements": "现在的公告",
 	"pastAnnouncements": "过去的公告",
-	"announcements": "公告",
 	"youHaveUnreadAnnouncements": "您有未读的公告",
-	"forYou": "您的",
-	"createdAt": "创建日期",
-	"updatedAt": "更新日期",
-	"gotIt": "好"
+	"forYou": "您的"
 }
 </locale>
 
@@ -549,11 +445,7 @@ definePage(() => ({
 	"readConfirmText": "閱讀「{title}」的內容並標記為已讀。",
 	"currentAnnouncements": "最新公告",
 	"pastAnnouncements": "歷史公告",
-	"announcements": "公告",
 	"youHaveUnreadAnnouncements": "有未讀的公告。",
-	"forYou": "給您",
-	"createdAt": "建立於",
-	"updatedAt": "最後更新",
-	"gotIt": "知道了"
+	"forYou": "給您"
 }
 </locale>

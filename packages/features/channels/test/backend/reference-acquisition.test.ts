@@ -242,3 +242,18 @@ test.each(['inReplyTo', '_misskey_quote'] as const)('ordinary acquisition verifi
 	expect(f.savedChannels.size).toBe(1);
 	assertNoSubscription(f);
 });
+
+
+test('a frozen Group retains acquisition of a canonical previously public Note without accepting a new contribution', async () => {
+	const f = fixture();
+	f.group._misskey_channelFrozen = true;
+	const result = await f.importer.resolveNote(noteUri);
+	expect(result).toMatchObject({ uri: noteUri, channelId: 'remote-channel' });
+	expect(f.noteCreate.mock.calls[0][1]).toMatchObject({
+		approvedHistoricalChannelReference: true,
+		channel: { isFederationFrozen: true },
+		localOnly: false,
+	});
+	expect(f.requests).toContain(f.approval.id);
+	assertNoSubscription(f);
+});

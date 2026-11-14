@@ -13,6 +13,39 @@ const nullableString = { anyOf: [{ type: 'string' }, { type: 'null' }] };
 export function restoreChannelFederationOpenapiBaseline<T extends { paths?: Record<string, unknown>; components?: { schemas?: Record<string, unknown> } }>(spec: T): T {
 	// Normalize exactly as the frozen hash oracle does; preserve the caller's specification.
 	const restored = JSON.parse(JSON.stringify(spec)) as T;
+	// Reverse the separately reviewed freeze/role additions before replaying the
+	// existing federation proof. Validate their types, owners and requiredness.
+	const freezeCounts = { policy: 0, channel: 0, input: 0 };
+	function restoreFreezeFields(value: unknown): void {
+		if (Array.isArray(value)) { value.forEach(restoreFreezeFields); return; }
+		if (!record(value)) return;
+		const props = value.properties;
+		if (record(props) && 'canFederateChannel' in props) {
+			deepStrictEqual(props.canFederateChannel, { type: 'boolean' }, 'Channel eligibility policy differs');
+			ok('canCreateChannel' in props && 'canPublicNote' in props, 'Unexpected channel policy owner');
+			ok(Array.isArray(value.required) && value.required.filter(key => key === 'canFederateChannel').length === 1);
+			value.required = value.required.filter(key => key !== 'canFederateChannel');
+			delete props.canFederateChannel;
+			freezeCounts.policy++;
+		}
+		if (record(props) && 'isFederationFrozen' in props) {
+			deepStrictEqual(props.isFederationFrozen, { type: 'boolean' }, 'Channel freeze flag differs');
+			ok('isFederated' in props && 'name' in props, 'Unexpected freeze flag owner');
+			if ('createdAt' in props && 'bannerId' in props) {
+				ok(Array.isArray(value.required) && value.required.filter(key => key === 'isFederationFrozen').length === 1);
+				value.required = value.required.filter(key => key !== 'isFederationFrozen');
+				freezeCounts.channel++;
+			} else {
+				ok('channelId' in props && !('id' in props));
+				ok(!Array.isArray(value.required) || !value.required.includes('isFederationFrozen'));
+				freezeCounts.input++;
+			}
+			delete props.isFederationFrozen;
+		}
+		Object.values(value).forEach(restoreFreezeFields);
+	}
+	restoreFreezeFields(restored);
+	deepStrictEqual(freezeCounts, { policy: 39, channel: 10, input: 2 }, 'Documented channel freeze change inventory differs');
 	const counts = { input: 0, channel: 0, noteChannel: 0, error: 0 };
 	// Exploration adds exactly one optional enum in each input representation.
 	// Keep all existing frozen schemas and hashes after reversing these four fields.

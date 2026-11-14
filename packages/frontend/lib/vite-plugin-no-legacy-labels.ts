@@ -16,14 +16,13 @@ export function assertNoLegacyLabels(chunks: readonly { fileName: string; code: 
 	if (!entry) throw new Error('Missing legacy i18n entry for label validation');
 	const facade = detectI18nFacadeChunk(entry.code, basename(entryFile), logger);
 	const context = {
-		scriptsDir: 'scripts',
 		i18nFileName: facade?.fileName ?? basename(entryFile),
 		i18nSymbol: facade ? facade.nameMap.i18n : 'i18n',
 	};
 	if (!context.i18nSymbol) throw new Error('Missing legacy i18n facade export');
 	for (const chunk of chunks) {
 		if (facade && chunk === entry) continue;
-		const modifications = collectModifications(chunk.code, basename(chunk.fileName), logger.prefixed(chunk.fileName), { ...context, i18nSymbol: context.i18nSymbol });
+		const modifications = collectModifications(chunk.code, logger.prefixed(chunk.fileName), { ...context, i18nSymbol: context.i18nSymbol });
 		if (modifications.some(item => item.type === 'localized' || item.type === 'parameterized-function')) {
 			throw new Error(`Legacy labels remain in a VVI-only locale build: ${chunk.fileName}`);
 		}

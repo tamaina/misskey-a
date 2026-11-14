@@ -6,7 +6,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="ar-SA">
 {
 	"lookup": "البحث",
-	"somethingHappened": "حدث خطأ",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -36,7 +35,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="ca-ES">
 {
 	"lookup": "Cerca",
-	"somethingHappened": "S'ha produït un error",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "No es pot establir connexió amb aquest servidor",
@@ -66,7 +64,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="cs-CZ">
 {
 	"lookup": "Vyhledat",
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -96,7 +93,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="da-DK">
 {
 	"lookup": "Lookup",
-	"somethingHappened": "An error has occurred",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -126,7 +122,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="de-DE">
 {
 	"lookup": "Anfragen",
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Kommunikation mit diesem Server nicht möglich",
@@ -156,7 +151,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="en-US">
 {
 	"lookup": "Lookup",
-	"somethingHappened": "An error has occurred",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -186,7 +180,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="es-ES">
 {
 	"lookup": "Búsqueda",
-	"somethingHappened": "Ocurrió un error",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Incapaz de comunicarse con este servidor.",
@@ -216,7 +209,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="fr-FR">
 {
 	"lookup": "Recherche",
-	"somethingHappened": "Une erreur est survenue",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -246,7 +238,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="id-ID">
 {
 	"lookup": "Cari",
-	"somethingHappened": "Terjadi kesalahan",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -276,7 +267,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="it-IT">
 {
 	"lookup": "Ricerca remota",
-	"somethingHappened": "Si è verificato un problema",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Server irraggiungibile",
@@ -306,7 +296,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="ja-JP">
 {
 	"lookup": "照会",
-	"somethingHappened": "問題が発生しました",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "このサーバーとは通信できません",
@@ -336,7 +325,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="ja-KS">
 {
 	"lookup": "見てきて",
-	"somethingHappened": "なんかあかんわ",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "このサーバーと通信できん",
@@ -366,7 +354,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="kab-KAB">
 {
 	"lookup": "Lookup",
-	"somethingHappened": "An error has occurred",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -396,7 +383,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="kn-IN">
 {
 	"lookup": "Lookup",
-	"somethingHappened": "An error has occurred",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -426,7 +412,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="ko-KR">
 {
 	"lookup": "찾아보기",
-	"somethingHappened": "오류가 발생했습니다",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "이 서버와 통신할 수 없음",
@@ -456,7 +441,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="nl-NL">
 {
 	"lookup": "Opzoeken",
-	"somethingHappened": "Er is iets misgegaan.",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -486,7 +470,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="no-NO">
 {
 	"lookup": "Lookup",
-	"somethingHappened": "En feil har oppstått",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -516,7 +499,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="pl-PL">
 {
 	"lookup": "Zapytania",
-	"somethingHappened": "Coś poszło nie tak",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -546,7 +528,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="pt-PT">
 {
 	"lookup": "Consultar",
-	"somethingHappened": "Ocorreu um erro",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Não foi possível se comunicar com o servidor",
@@ -576,7 +557,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="ru-RU">
 {
 	"lookup": "Запрос",
-	"somethingHappened": "Что-то пошло не так",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -606,7 +586,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="sk-SK">
 {
 	"lookup": "Vyhľadať",
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -636,7 +615,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="th-TH">
 {
 	"lookup": "การค้นหา",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "ไม่สามารถสื่อสารกับเซิร์ฟเวอร์นี้ได้",
@@ -666,7 +644,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="tr-TR">
 {
 	"lookup": "Sorgu",
-	"somethingHappened": "Bir hata oluştu",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Bu sunucuyla iletişim kurulamıyor",
@@ -696,7 +673,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="ug-CN">
 {
 	"lookup": "Lookup",
-	"somethingHappened": "An error has occurred",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -726,7 +702,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="uk-UA">
 {
 	"lookup": "Пошук",
-	"somethingHappened": "Щось пішло не так",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -756,7 +731,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="vi-VN">
 {
 	"lookup": "Tra cứu",
-	"somethingHappened": "Xảy ra lỗi",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "Unable to communicate with this server",
@@ -786,7 +760,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="zh-CN">
 {
 	"lookup": "查找用户",
-	"somethingHappened": "出错了",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "无法与此服务器通信",
@@ -816,7 +789,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <locale lang="json" locale="zh-TW">
 {
 	"lookup": "查詢",
-	"somethingHappened": "發生錯誤",
 	"_remoteLookupErrors": {
 		"_federationNotAllowed": {
 			"title": "無法與這個伺服器通訊",

@@ -54,7 +54,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { i18n } from '@features/runtime/frontend/i18n.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';

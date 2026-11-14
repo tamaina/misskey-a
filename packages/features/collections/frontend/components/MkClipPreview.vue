@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<b>{{ clip.name }}</b>
 		<div :class="$style.description">
 			<div v-if="clip.description"><Mfm :text="clip.description" :plain="true" :nowrap="true"/></div>
-			<div v-if="clip.lastClippedAt">{{ $locale.sfc.updatedAt }}: <MkTime :time="clip.lastClippedAt" mode="detail"/></div>
+			<div v-if="clip.lastClippedAt">{{ globalLocale.env.updatedAt }}: <MkTime :time="clip.lastClippedAt" mode="detail"/></div>
 			<div v-if="clip.notesCount != null">{{ $locale.sfc.notesCount }}: {{ number(clip.notesCount) }} / {{ $i?.policies.noteEachClipsLimit }} ({{ $l.sfc.remainingN({ n: remaining }) }})</div>
 		</div>
 		<template v-if="!props.noUserInfo">
@@ -23,10 +23,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { computed } from 'vue';
 import { $i } from '@features/auth/frontend/i.js';
 import number from '@features/ui/frontend/filters/number.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	clip: Misskey.entities.Clip;
@@ -79,7 +83,6 @@ const remaining = computed(() => {
 
 <locale locale="ar-SA" lang="json">
 {
-	"updatedAt": "حُدّث في",
 	"notesCount": "عدد الملاحظات",
 	"remainingN": "Remaining: {n}",
 	"unknown": "مجهول"
@@ -88,7 +91,6 @@ const remaining = computed(() => {
 
 <locale locale="ca-ES" lang="json">
 {
-	"updatedAt": "Actualitzat el",
 	"notesCount": "Comptador de notes",
 	"remainingN": "Queden: {n}",
 	"unknown": "Desconegut"
@@ -97,7 +99,6 @@ const remaining = computed(() => {
 
 <locale locale="cs-CZ" lang="json">
 {
-	"updatedAt": "Upraveno",
 	"notesCount": "Počet poznámek",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Neznámý"
@@ -106,7 +107,6 @@ const remaining = computed(() => {
 
 <locale locale="da-DK" lang="json">
 {
-	"updatedAt": "Updated at",
 	"notesCount": "Number of notes",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Unknown"
@@ -115,7 +115,6 @@ const remaining = computed(() => {
 
 <locale locale="de-DE" lang="json">
 {
-	"updatedAt": "Zuletzt geändert am",
 	"notesCount": "Anzahl der Notizen",
 	"remainingN": "Verbleibend: {n}",
 	"unknown": "Unbekannt"
@@ -124,7 +123,6 @@ const remaining = computed(() => {
 
 <locale locale="en-US" lang="json">
 {
-	"updatedAt": "Updated at",
 	"notesCount": "Number of notes",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Unknown"
@@ -133,7 +131,6 @@ const remaining = computed(() => {
 
 <locale locale="es-ES" lang="json">
 {
-	"updatedAt": "Actualizado",
 	"notesCount": "Cantidad de notas",
 	"remainingN": "Faltan: {n}",
 	"unknown": "Desconocido"
@@ -142,7 +139,6 @@ const remaining = computed(() => {
 
 <locale locale="fr-FR" lang="json">
 {
-	"updatedAt": "Mis à jour le",
 	"notesCount": "Nombre de notes",
 	"remainingN": "Restants : {n}",
 	"unknown": "Inconnu"
@@ -151,7 +147,6 @@ const remaining = computed(() => {
 
 <locale locale="id-ID" lang="json">
 {
-	"updatedAt": "Diperbarui pada",
 	"notesCount": "Jumlah catatan",
 	"remainingN": "Sisa : {n}",
 	"unknown": "Tidak diketahui"
@@ -160,7 +155,6 @@ const remaining = computed(() => {
 
 <locale locale="it-IT" lang="json">
 {
-	"updatedAt": "Aggiornato il",
 	"notesCount": "Conteggio note",
 	"remainingN": "Rimangono: {n}",
 	"unknown": "Sconosciuto"
@@ -169,7 +163,6 @@ const remaining = computed(() => {
 
 <locale locale="ja-JP" lang="json">
 {
-	"updatedAt": "更新日時",
 	"notesCount": "ノートの数",
 	"remainingN": "残り: {n}",
 	"unknown": "不明"
@@ -178,7 +171,6 @@ const remaining = computed(() => {
 
 <locale locale="ja-KS" lang="json">
 {
-	"updatedAt": "更新日時",
 	"notesCount": "ノートの数やで",
 	"remainingN": "残り:{n}",
 	"unknown": "不明"
@@ -187,7 +179,6 @@ const remaining = computed(() => {
 
 <locale locale="kab-KAB" lang="json">
 {
-	"updatedAt": "Updated at",
 	"notesCount": "Number of notes",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Unknown"
@@ -196,7 +187,6 @@ const remaining = computed(() => {
 
 <locale locale="kn-IN" lang="json">
 {
-	"updatedAt": "Updated at",
 	"notesCount": "Number of notes",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Unknown"
@@ -205,7 +195,6 @@ const remaining = computed(() => {
 
 <locale locale="ko-KR" lang="json">
 {
-	"updatedAt": "수정한 날짜",
 	"notesCount": "노트 수",
 	"remainingN": "나머지: {n}",
 	"unknown": "알 수 없음"
@@ -214,7 +203,6 @@ const remaining = computed(() => {
 
 <locale locale="nl-NL" lang="json">
 {
-	"updatedAt": "Laatst gewijzigd at",
 	"notesCount": "Aantal notities",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Onbekend"
@@ -223,7 +211,6 @@ const remaining = computed(() => {
 
 <locale locale="no-NO" lang="json">
 {
-	"updatedAt": "Updated at",
 	"notesCount": "Number of notes",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Ukjent"
@@ -232,7 +219,6 @@ const remaining = computed(() => {
 
 <locale locale="pl-PL" lang="json">
 {
-	"updatedAt": "Zaktualizowano",
 	"notesCount": "Liczba wpisów",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Nieznane"
@@ -241,7 +227,6 @@ const remaining = computed(() => {
 
 <locale locale="pt-PT" lang="json">
 {
-	"updatedAt": "Última atualização",
 	"notesCount": "Número de notas",
 	"remainingN": "Restante: {n}",
 	"unknown": "Desconhecido"
@@ -250,7 +235,6 @@ const remaining = computed(() => {
 
 <locale locale="ru-RU" lang="json">
 {
-	"updatedAt": "Обновлено",
 	"notesCount": "Количество заметок",
 	"remainingN": "Остаётся: {n}",
 	"unknown": "Неизвестно"
@@ -259,7 +243,6 @@ const remaining = computed(() => {
 
 <locale locale="sk-SK" lang="json">
 {
-	"updatedAt": "Upravené",
 	"notesCount": "Počet poznámok",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Neznáme"
@@ -268,7 +251,6 @@ const remaining = computed(() => {
 
 <locale locale="th-TH" lang="json">
 {
-	"updatedAt": "อัปเดตล่าสุด",
 	"notesCount": "จำนวนของโน้ต",
 	"remainingN": "เหลือ : {n}",
 	"unknown": "ไม่ทราบสถานะ"
@@ -277,7 +259,6 @@ const remaining = computed(() => {
 
 <locale locale="tr-TR" lang="json">
 {
-	"updatedAt": "Güncellendi",
 	"notesCount": "Not sayısı",
 	"remainingN": "Kalan: {n}",
 	"unknown": "Bilinmiyor"
@@ -286,7 +267,6 @@ const remaining = computed(() => {
 
 <locale locale="ug-CN" lang="json">
 {
-	"updatedAt": "Updated at",
 	"notesCount": "Number of notes",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Unknown"
@@ -295,7 +275,6 @@ const remaining = computed(() => {
 
 <locale locale="uk-UA" lang="json">
 {
-	"updatedAt": "Останнє оновлення",
 	"notesCount": "Кількість нотаток",
 	"remainingN": "Залишилося: {n}",
 	"unknown": "Невідомо"
@@ -304,7 +283,6 @@ const remaining = computed(() => {
 
 <locale locale="vi-VN" lang="json">
 {
-	"updatedAt": "Cập nhật lúc",
 	"notesCount": "Số lượng tút",
 	"remainingN": "Remaining: {n}",
 	"unknown": "Chưa biết"
@@ -313,7 +291,6 @@ const remaining = computed(() => {
 
 <locale locale="zh-CN" lang="json">
 {
-	"updatedAt": "更新日期",
 	"notesCount": "帖子数量",
 	"remainingN": "剩余：{n}",
 	"unknown": "未知"
@@ -322,7 +299,6 @@ const remaining = computed(() => {
 
 <locale locale="zh-TW" lang="json">
 {
-	"updatedAt": "最後更新",
 	"notesCount": "貼文數量",
 	"remainingN": "剩餘：{n}",
 	"unknown": "未知"

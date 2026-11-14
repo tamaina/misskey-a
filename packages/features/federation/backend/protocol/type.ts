@@ -20,6 +20,7 @@ export interface IObject {
 	published?: string;
 	audience?: ApObject;
 	_misskey_channel?: boolean;
+	_misskey_channelFrozen?: boolean;
 	cc?: ApObject;
 	to?: ApObject;
 	attributedTo?: ApObject;

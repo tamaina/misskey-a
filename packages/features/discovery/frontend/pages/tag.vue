@@ -19,8 +19,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, markRaw, ref } from 'vue';
-import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
 import MkNotesTimeline from '@features/timelines/frontend/components/MkNotesTimeline.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { definePage } from '@features/navigation/frontend/page.js';
@@ -29,6 +29,10 @@ import { store } from '@features/preferences/frontend/store.js';
 import * as os from '@features/ui/frontend/os.js';
 import { genEmbedCode } from '@features/web/frontend/utility/get-embed-code.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { PageHeaderItem } from '@features/navigation/frontend/types/page-header.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	tag: string;
@@ -52,10 +56,10 @@ async function post() {
 
 const headerActions = computed<PageHeaderItem[]>(() => [{
 	icon: 'ti ti-dots',
-	text: $locale.value.sfc.more,
+	text: globalLocale.value.env.more,
 	handler: (ev) => {
 		os.popupMenu([{
-			text: $locale.value.sfc.embed,
+			text: globalLocale.value.env.embed,
 			icon: 'ti ti-code',
 			action: () => {
 				genEmbedCode('tags', props.tag);
@@ -88,224 +92,168 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"postToHashtag": "انشر بهذا الوسم",
-	"more": "المزيد!",
-	"embed": "Embed"
+	"postToHashtag": "انشر بهذا الوسم"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"postToHashtag": "Pública a aquesta etiqueta",
-	"more": "Més",
-	"embed": "Incrustar"
+	"postToHashtag": "Pública a aquesta etiqueta"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"postToHashtag": "Přidat příspěvek k tomuhle hastagu",
-	"more": "Více!",
-	"embed": "Embed"
+	"postToHashtag": "Přidat příspěvek k tomuhle hastagu"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"postToHashtag": "Post to this hashtag",
-	"more": "More!",
-	"embed": "Embed"
+	"postToHashtag": "Post to this hashtag"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"postToHashtag": "Mit diesem Hashtag senden",
-	"more": "Mehr!",
-	"embed": "Einbetten"
+	"postToHashtag": "Mit diesem Hashtag senden"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"postToHashtag": "Post to this hashtag",
-	"more": "More!",
-	"embed": "Embed"
+	"postToHashtag": "Post to this hashtag"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"postToHashtag": "Publicar a este hashtag",
-	"more": "¡Más!",
-	"embed": "Insertar"
+	"postToHashtag": "Publicar a este hashtag"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"postToHashtag": "Publier avec ce hashtag",
-	"more": "Plus !",
-	"embed": "Embed"
+	"postToHashtag": "Publier avec ce hashtag"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"postToHashtag": "Catat ke tagar ini",
-	"more": "Lainnya",
-	"embed": "Embed"
+	"postToHashtag": "Catat ke tagar ini"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"postToHashtag": "Pubblica a questo hashtag",
-	"more": "Di più!",
-	"embed": "Incorporare"
+	"postToHashtag": "Pubblica a questo hashtag"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"postToHashtag": "このハッシュタグで投稿",
-	"more": "もっと！",
-	"embed": "埋め込み"
+	"postToHashtag": "このハッシュタグで投稿"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"postToHashtag": "このハッシュタグで投稿",
-	"more": "他のん",
-	"embed": "埋め込み"
+	"postToHashtag": "このハッシュタグで投稿"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"postToHashtag": "Post to this hashtag",
-	"more": "More!",
-	"embed": "Embed"
+	"postToHashtag": "Post to this hashtag"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"postToHashtag": "Post to this hashtag",
-	"more": "More!",
-	"embed": "Embed"
+	"postToHashtag": "Post to this hashtag"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"postToHashtag": "이 해시태그에 게시",
-	"more": "더 보기!",
-	"embed": "임베드"
+	"postToHashtag": "이 해시태그에 게시"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"postToHashtag": "Post naar deze hashtag",
-	"more": "Meer!",
-	"embed": "Embed"
+	"postToHashtag": "Post naar deze hashtag"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"postToHashtag": "Post to this hashtag",
-	"more": "Mer!",
-	"embed": "Embed"
+	"postToHashtag": "Post to this hashtag"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"postToHashtag": "Postuj do tego hashtagu",
-	"more": "Więcej!",
-	"embed": "Embed"
+	"postToHashtag": "Postuj do tego hashtagu"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"postToHashtag": "Publicar nesta Hashtag",
-	"more": "Mais!",
-	"embed": "Embed"
+	"postToHashtag": "Publicar nesta Hashtag"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"postToHashtag": "Написать заметку с этим хештегом",
-	"more": "Ещё!",
-	"embed": "Вложение"
+	"postToHashtag": "Написать заметку с этим хештегом"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"postToHashtag": "Post to this hashtag",
-	"more": "Viac!",
-	"embed": "Embed"
+	"postToHashtag": "Post to this hashtag"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"postToHashtag": "โพสต์ไปที่แฮชแท็กนี้",
-	"more": "เพิ่มเติม!",
-	"embed": "ฝัง"
+	"postToHashtag": "โพสต์ไปที่แฮชแท็กนี้"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"postToHashtag": "Bu hashtag'e gönder",
-	"more": "Daha fazlası!",
-	"embed": "Göm"
+	"postToHashtag": "Bu hashtag'e gönder"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"postToHashtag": "Post to this hashtag",
-	"more": "More!",
-	"embed": "Embed"
+	"postToHashtag": "Post to this hashtag"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"postToHashtag": "Опублікувати з цим хештегом",
-	"more": "Бiльше!",
-	"embed": "Вбудувати"
+	"postToHashtag": "Опублікувати з цим хештегом"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"postToHashtag": "Đăng bài với hashtag này",
-	"more": "Thêm nữa!",
-	"embed": "Embed"
+	"postToHashtag": "Đăng bài với hashtag này"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"postToHashtag": "发布至该话题",
-	"more": "更多！",
-	"embed": "嵌入"
+	"postToHashtag": "发布至该话题"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"postToHashtag": "以此主題標籤發佈",
-	"more": "更多！",
-	"embed": "嵌入"
+	"postToHashtag": "以此主題標籤發佈"
 }
 </locale>

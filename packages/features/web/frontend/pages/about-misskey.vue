@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<button v-if="thereIsTreasure" class="_button treasure" @click="getTreasure"><img src="/fluent-emoji/1f3c6.png" class="treasureImg"></button>
 				</div>
 				<div style="text-align: center;">
-					{{ $locale.sfc.aboutMisskeyAbout }}<br><a href="https://misskey-hub.net/docs/about-misskey/" target="_blank" class="_link">{{ $locale.sfc.learnMore }}</a>
+					{{ $locale.sfc.aboutMisskeyAbout }}<br><a href="https://misskey-hub.net/docs/about-misskey/" target="_blank" class="_link">{{ globalLocale.env.learnMore }}</a>
 				</div>
 				<div v-if="$i != null" style="text-align: center;">
 					<MkButton primary rounded inline @click="iLoveMisskey">I <Mfm text="$[jelly ❤]"/> #Misskey</MkButton>
@@ -136,6 +136,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { nextTick, onBeforeUnmount, ref, useTemplateRef, computed } from 'vue';
 import { host, version, productName } from '@features/boot/frontend/shared/config.js';
 import { DEFAULT_EMOJIS } from '@features/emojis/frontend/shared/default-emojis.js';
@@ -151,6 +152,9 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { claimAchievement, claimedAchievements } from '@features/users/frontend/utility/achievements.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const patronsWithIcon = [{
 	name: 'カイヤン',
@@ -636,7 +640,6 @@ definePage(() => ({
 <locale lang="json" locale="ar-SA">
 {
 	"aboutMisskeyAbout": "ميسكي هو برمجية مفتوحة المصدر يطورها syuilo منذ 2014.",
-	"learnMore": "راجع المزيد",
 	"aboutMisskeySource": "الشفرة المصدرية",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "ترجم ميسكي",
@@ -653,7 +656,6 @@ definePage(() => ({
 <locale lang="json" locale="ca-ES">
 {
 	"aboutMisskeyAbout": "Misskey és un programa de codi obert desenvolupat des del 2014 per syuilo",
-	"learnMore": "Saber-ne més ",
 	"aboutMisskeySource": "Codi font",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Tradueix Misskey",
@@ -670,7 +672,6 @@ definePage(() => ({
 <locale lang="json" locale="cs-CZ">
 {
 	"aboutMisskeyAbout": "Misskey je open-source software vyvíjený syuilo od roku 2014.",
-	"learnMore": "Zjistit více",
 	"aboutMisskeySource": "Zdrojový kód",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Přeložit Misskey",
@@ -687,7 +688,6 @@ definePage(() => ({
 <locale lang="json" locale="da-DK">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -704,7 +704,6 @@ definePage(() => ({
 <locale lang="json" locale="de-DE">
 {
 	"aboutMisskeyAbout": "Misskey ist Open-Source-Software, welche von syuilo seit 2014 entwickelt wird.",
-	"learnMore": "Mehr erfahren",
 	"aboutMisskeySource": "Quellcode",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Misskey übersetzen",
@@ -721,7 +720,6 @@ definePage(() => ({
 <locale lang="json" locale="en-US">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -738,7 +736,6 @@ definePage(() => ({
 <locale lang="json" locale="es-ES">
 {
 	"aboutMisskeyAbout": "Misskey es un software de código abierto, desarrollado por syuilo desde 2014",
-	"learnMore": "Ver más",
 	"aboutMisskeySource": "Código fuente",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Traducir Misskey",
@@ -755,7 +752,6 @@ definePage(() => ({
 <locale lang="json" locale="fr-FR">
 {
 	"aboutMisskeyAbout": "Misskey est un logiciel libre et ouvert, développé par syuilo depuis 2014.",
-	"learnMore": "Plus d'informations",
 	"aboutMisskeySource": "Code source",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Traduire Misskey",
@@ -772,7 +768,6 @@ definePage(() => ({
 <locale lang="json" locale="id-ID">
 {
 	"aboutMisskeyAbout": "Misskey adalah perangkat lunak sumber terbuka yang sedang dikembangkan oleh syuilo sejak 2014.",
-	"learnMore": "Pelajari lebih lanjut",
 	"aboutMisskeySource": "Sumber kode",
 	"aboutMisskeyOriginal": "Asli",
 	"aboutMisskeyTranslation": "Terjemahkan Misskey",
@@ -789,7 +784,6 @@ definePage(() => ({
 <locale lang="json" locale="it-IT">
 {
 	"aboutMisskeyAbout": "Misskey è software libero, open source, sviluppato da Syuilo fin dal lontano 2014.",
-	"learnMore": "Per saperne di più",
 	"aboutMisskeySource": "Codice sorgente",
 	"aboutMisskeyOriginal": "Originale",
 	"aboutMisskeyTranslation": "Tradurre Misskey",
@@ -806,7 +800,6 @@ definePage(() => ({
 <locale lang="json" locale="ja-JP">
 {
 	"aboutMisskeyAbout": "Misskeyはsyuiloによって2014年から開発されている、オープンソースのソフトウェアです。",
-	"learnMore": "詳しく",
 	"aboutMisskeySource": "ソースコード",
 	"aboutMisskeyOriginal": "オリジナル",
 	"aboutMisskeyTranslation": "Misskeyを翻訳",
@@ -823,7 +816,6 @@ definePage(() => ({
 <locale lang="json" locale="ja-KS">
 {
 	"aboutMisskeyAbout": "Misskeyはsyuiloが2014年からずっと作ってはる、オープンソースなソフトウェアや。",
-	"learnMore": "詳しく",
 	"aboutMisskeySource": "ソースコード",
 	"aboutMisskeyOriginal": "オリジナル",
 	"aboutMisskeyTranslation": "Misskeyを翻訳",
@@ -840,7 +832,6 @@ definePage(() => ({
 <locale lang="json" locale="kab-KAB">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -857,7 +848,6 @@ definePage(() => ({
 <locale lang="json" locale="kn-IN">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -874,7 +864,6 @@ definePage(() => ({
 <locale lang="json" locale="ko-KR">
 {
 	"aboutMisskeyAbout": "Misskey는 syuilo가 2014년부터 개발한 오픈소스 소프트웨어입니다.",
-	"learnMore": "자세히",
 	"aboutMisskeySource": "소스 코드",
 	"aboutMisskeyOriginal": "원본",
 	"aboutMisskeyTranslation": "Misskey를 번역하기",
@@ -891,7 +880,6 @@ definePage(() => ({
 <locale lang="json" locale="nl-NL">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Meer leren",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -908,7 +896,6 @@ definePage(() => ({
 <locale lang="json" locale="no-NO">
 {
 	"aboutMisskeyAbout": "Misskey er programvare med åpen kildekode som har blitt utviklet av syuilo siden 2014.",
-	"learnMore": "Les mer",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Oversett Misskey",
@@ -925,7 +912,6 @@ definePage(() => ({
 <locale lang="json" locale="pl-PL">
 {
 	"aboutMisskeyAbout": "Misskey jest oprogramowanie open source rozwijanym przez syuilo od 2014.",
-	"learnMore": "Dowiedz się więcej",
 	"aboutMisskeySource": "Kod źródłowy",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Tłumacz Misskey",
@@ -942,7 +928,6 @@ definePage(() => ({
 <locale lang="json" locale="pt-PT">
 {
 	"aboutMisskeyAbout": "Misskey é um software de código aberto desenvolvido por syulio desde 2014.",
-	"learnMore": "Saiba mais",
 	"aboutMisskeySource": "Código-fonte",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Traduza o Misskey",
@@ -959,7 +944,6 @@ definePage(() => ({
 <locale lang="json" locale="ru-RU">
 {
 	"aboutMisskeyAbout": "Misskey — программа с открытым исходным кодом, которую разрабатывает syuilo с 2014 года.",
-	"learnMore": "Подробнее",
 	"aboutMisskeySource": "Исходный код",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Перевод Misskey",
@@ -976,7 +960,6 @@ definePage(() => ({
 <locale lang="json" locale="sk-SK">
 {
 	"aboutMisskeyAbout": "Misskey je open-source softvér, ktorý vyvíja syuilo od 2014.",
-	"learnMore": "Zistiť viac",
 	"aboutMisskeySource": "Zdrojový kód",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Preložiť Misskey",
@@ -993,7 +976,6 @@ definePage(() => ({
 <locale lang="json" locale="th-TH">
 {
 	"aboutMisskeyAbout": "Misskey เป็นซอฟต์แวร์โอเพ่นซอร์สที่ถูกพัฒนาโดย Syuilo ตั้งแต่ปี 2014",
-	"learnMore": "แสดงให้ดูหน่อย",
 	"aboutMisskeySource": "ซอร์สโค้ด",
 	"aboutMisskeyOriginal": "ต้นฉบับ",
 	"aboutMisskeyTranslation": "แปลภาษา Misskey",
@@ -1010,7 +992,6 @@ definePage(() => ({
 <locale lang="json" locale="tr-TR">
 {
 	"aboutMisskeyAbout": "Misskey, 2014 yılından beri syuilo tarafından geliştirilen açık kaynaklı bir yazılımdır.",
-	"learnMore": "Daha fazla bilgi edinin",
 	"aboutMisskeySource": "Kaynak kodu",
 	"aboutMisskeyOriginal": "Orijinal",
 	"aboutMisskeyTranslation": "Misskey'i çevir",
@@ -1027,7 +1008,6 @@ definePage(() => ({
 <locale lang="json" locale="ug-CN">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -1044,7 +1024,6 @@ definePage(() => ({
 <locale lang="json" locale="uk-UA">
 {
 	"aboutMisskeyAbout": "Misskey - це програмне забезпечення з відкритим кодом, яке розробляє syuilo з 2014 року.",
-	"learnMore": "Докладніше",
 	"aboutMisskeySource": "Вихідний код",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Перекладати Misskey",
@@ -1061,7 +1040,6 @@ definePage(() => ({
 <locale lang="json" locale="vi-VN">
 {
 	"aboutMisskeyAbout": "Misskey là phần mềm mã nguồn mở được phát triển bởi syuilo từ năm 2014.",
-	"learnMore": "Tìm hiểu thêm",
 	"aboutMisskeySource": "Mã nguồn",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Dịch Misskey",
@@ -1078,7 +1056,6 @@ definePage(() => ({
 <locale lang="json" locale="zh-CN">
 {
 	"aboutMisskeyAbout": "Misskey 是由 syuilo 于 2014 年开发的开源软件。",
-	"learnMore": "更多信息",
 	"aboutMisskeySource": "源代码",
 	"aboutMisskeyOriginal": "原版",
 	"aboutMisskeyTranslation": "翻译 Misskey",
@@ -1095,7 +1072,6 @@ definePage(() => ({
 <locale lang="json" locale="zh-TW">
 {
 	"aboutMisskeyAbout": "Misskey 是由 syuilo 自 2014 年起開發的開放原始碼軟體。",
-	"learnMore": "更多資訊",
 	"aboutMisskeySource": "原始碼",
 	"aboutMisskeyOriginal": "原始",
 	"aboutMisskeyTranslation": "翻譯 Misskey",

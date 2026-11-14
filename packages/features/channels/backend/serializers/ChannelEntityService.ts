@@ -110,6 +110,7 @@ export class ChannelEntityService {
 			notesCount: channel.notesCount,
 			isSensitive: channel.isSensitive,
 			isFederated: channel.isFederated,
+			isFederationFrozen: channel.isFederationFrozen,
 			uri: channel.uri,
 			host: channel.host,
 			allowRenoteToExternal: channel.isFederated || channel.allowRenoteToExternal,

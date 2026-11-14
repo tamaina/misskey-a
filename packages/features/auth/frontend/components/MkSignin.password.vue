@@ -31,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkCaptcha v-if="instance.enableTestcaptcha" ref="testcaptcha" v-model="testcaptchaResponse" provider="testcaptcha" :sitekey="null"/>
 			</div>
 
-			<MkButton type="submit" :disabled="needCaptcha && captchaFailed" large primary rounded style="margin: 0 auto;" data-testid="signin-page-password-continue">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+			<MkButton type="submit" :disabled="needCaptcha && captchaFailed" large primary rounded style="margin: 0 auto;" data-testid="signin-page-password-continue">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 		</form>
 	</div>
 </div>
@@ -51,6 +51,8 @@ export type PwResponse = {
 </script>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { ref, computed, useTemplateRef, defineAsyncComponent } from 'vue';
 import * as Misskey from 'misskey-js';
 
@@ -60,6 +62,8 @@ import * as os from '@features/ui/frontend/os.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkCaptcha from '@features/auth/frontend/components/MkCaptcha.vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	user: Misskey.entities.UserDetailed;
@@ -190,8 +194,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "مرحبًا بك مجددًا {name}",
 	"password": "الكلمة السرية",
-	"forgotPassword": "نسيتَ كلمة السر",
-	"continue": "متابعة"
+	"forgotPassword": "نسيتَ كلمة السر"
 }
 </locale>
 
@@ -199,8 +202,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Benvingut de nou, {name}",
 	"password": "Contrasenya",
-	"forgotPassword": "Restableix la contrasenya ",
-	"continue": "Continuar"
+	"forgotPassword": "Restableix la contrasenya "
 }
 </locale>
 
@@ -208,8 +210,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Vítejte zpět, {name}",
 	"password": "Heslo",
-	"forgotPassword": "Zapomenuté heslo",
-	"continue": "Pokračovat"
+	"forgotPassword": "Zapomenuté heslo"
 }
 </locale>
 
@@ -217,8 +218,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Welcome back, {name}",
 	"password": "Password",
-	"forgotPassword": "Forgot password",
-	"continue": "Continue"
+	"forgotPassword": "Forgot password"
 }
 </locale>
 
@@ -226,8 +226,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Willkommen zurück, {name}",
 	"password": "Passwort",
-	"forgotPassword": "Passwort vergessen",
-	"continue": "Fortfahren"
+	"forgotPassword": "Passwort vergessen"
 }
 </locale>
 
@@ -235,8 +234,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Welcome back, {name}",
 	"password": "Password",
-	"forgotPassword": "Forgot password",
-	"continue": "Continue"
+	"forgotPassword": "Forgot password"
 }
 </locale>
 
@@ -244,8 +242,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Bienvenido otra vez, {name}",
 	"password": "Contraseña",
-	"forgotPassword": "Olvidé mi contraseña",
-	"continue": "Continuar"
+	"forgotPassword": "Olvidé mi contraseña"
 }
 </locale>
 
@@ -253,8 +250,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Heureux de vous revoir, {name}",
 	"password": "Mot de passe",
-	"forgotPassword": "Mot de passe oublié",
-	"continue": "Continuer"
+	"forgotPassword": "Mot de passe oublié"
 }
 </locale>
 
@@ -262,8 +258,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Selamat datang kembali, {name}.",
 	"password": "Kata sandi",
-	"forgotPassword": "Lupa Kata Sandi",
-	"continue": "Lanjutkan"
+	"forgotPassword": "Lupa Kata Sandi"
 }
 </locale>
 
@@ -271,8 +266,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Ciao, {name}! Eccoti di nuovo!",
 	"password": "Password",
-	"forgotPassword": "Hai dimenticato la password?",
-	"continue": "Continua"
+	"forgotPassword": "Hai dimenticato la password?"
 }
 </locale>
 
@@ -280,8 +274,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "おかえりなさい、{name}さん",
 	"password": "パスワード",
-	"forgotPassword": "パスワードを忘れた",
-	"continue": "続ける"
+	"forgotPassword": "パスワードを忘れた"
 }
 </locale>
 
@@ -289,8 +282,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "まいど、{name}はん",
 	"password": "パスワード",
-	"forgotPassword": "パスワード忘れたん？",
-	"continue": "続けるで"
+	"forgotPassword": "パスワード忘れたん？"
 }
 </locale>
 
@@ -298,8 +290,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Welcome back, {name}",
 	"password": "Awal uffir",
-	"forgotPassword": "Forgot password",
-	"continue": "Continue"
+	"forgotPassword": "Forgot password"
 }
 </locale>
 
@@ -307,8 +298,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Welcome back, {name}",
 	"password": "ಗುಪ್ತಪದ",
-	"forgotPassword": "Forgot password",
-	"continue": "Continue"
+	"forgotPassword": "Forgot password"
 }
 </locale>
 
@@ -316,8 +306,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "{name}님, 환영합니다.",
 	"password": "비밀번호",
-	"forgotPassword": "비밀번호 재설정",
-	"continue": "계속"
+	"forgotPassword": "비밀번호 재설정"
 }
 </locale>
 
@@ -325,8 +314,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Welkom terug, {name}",
 	"password": "Wachtwoord",
-	"forgotPassword": "Wachtwoord vergeten",
-	"continue": "Continue"
+	"forgotPassword": "Wachtwoord vergeten"
 }
 </locale>
 
@@ -334,8 +322,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Welcome back, {name}",
 	"password": "Passord",
-	"forgotPassword": "Glemt passord",
-	"continue": "Fortsett"
+	"forgotPassword": "Glemt passord"
 }
 </locale>
 
@@ -343,8 +330,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Witaj z powrotem, {name}",
 	"password": "Hasło",
-	"forgotPassword": "Nie pamiętam hasła",
-	"continue": "Continue"
+	"forgotPassword": "Nie pamiętam hasła"
 }
 </locale>
 
@@ -352,8 +338,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Bem-vindo de volta, {name}",
 	"password": "Senha",
-	"forgotPassword": "Esqueci-me da senha",
-	"continue": "Continuar"
+	"forgotPassword": "Esqueci-me da senha"
 }
 </locale>
 
@@ -361,8 +346,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "С возвращением, {name}!",
 	"password": "Пароль",
-	"forgotPassword": "Забыли пароль?",
-	"continue": "Продолжить"
+	"forgotPassword": "Забыли пароль?"
 }
 </locale>
 
@@ -370,8 +354,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Vitajte späť, {name}",
 	"password": "Heslo",
-	"forgotPassword": "Zabudnuté heslo",
-	"continue": "Continue"
+	"forgotPassword": "Zabudnuté heslo"
 }
 </locale>
 
@@ -379,8 +362,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "ยินดีต้อนรับการกลับมานะคะ, คุณ{name}",
 	"password": "รหัสผ่าน",
-	"forgotPassword": "ลืมรหัสผ่าน",
-	"continue": "ดำเนินการต่อ"
+	"forgotPassword": "ลืมรหัสผ่าน"
 }
 </locale>
 
@@ -388,8 +370,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Hoş geldin, {name}",
 	"password": "Şifre",
-	"forgotPassword": "Şifremi unuttum",
-	"continue": "Devam et"
+	"forgotPassword": "Şifremi unuttum"
 }
 </locale>
 
@@ -397,8 +378,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Welcome back, {name}",
 	"password": "Password",
-	"forgotPassword": "Forgot password",
-	"continue": "Continue"
+	"forgotPassword": "Forgot password"
 }
 </locale>
 
@@ -406,8 +386,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "З поверненням, {name}!",
 	"password": "Пароль",
-	"forgotPassword": "Я забув пароль",
-	"continue": "Продовжити"
+	"forgotPassword": "Я забув пароль"
 }
 </locale>
 
@@ -415,8 +394,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "Chào mừng trở lại, {name}",
 	"password": "Mật khẩu",
-	"forgotPassword": "Quên mật khẩu",
-	"continue": "Tiếp tục"
+	"forgotPassword": "Quên mật khẩu"
 }
 </locale>
 
@@ -424,8 +402,7 @@ defineExpose({
 {
 	"welcomeBackWithName": "欢迎回来，{name}",
 	"password": "密码",
-	"forgotPassword": "忘记密码",
-	"continue": "继续"
+	"forgotPassword": "忘记密码"
 }
 </locale>
 
@@ -433,7 +410,6 @@ defineExpose({
 {
 	"welcomeBackWithName": "歡迎回來，{name}",
 	"password": "密碼",
-	"forgotPassword": "忘記密碼",
-	"continue": "繼續"
+	"forgotPassword": "忘記密碼"
 }
 </locale>

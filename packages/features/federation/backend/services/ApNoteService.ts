@@ -165,6 +165,7 @@ export class ApNoteService {
 			throw new Error('unexpected schema of note url: ' + url);
 		}
 
+		let approvedHistoricalReference = false;
 		if (!approvedChannel && note.audience != null) {
 			const membership = await this.moduleRef.get<ChannelFederationService>('ChannelFederationService', { strict: false }).resolveNoteMembership(note);
 			if (membership.kind === 'rejected') return null;
@@ -172,6 +173,7 @@ export class ApNoteService {
 				note = membership.note;
 				// eslint-disable-next-line no-param-reassign
 				approvedChannel = membership.channel;
+				approvedHistoricalReference = true;
 				// eslint-disable-next-line no-param-reassign
 				actor ??= membership.author;
 			}
@@ -206,7 +208,7 @@ export class ApNoteService {
 		} else if (typeof note._misskey_content !== 'undefined') {
 			text = note._misskey_content;
 		} else if (typeof note.content === 'string') {
-			text = this.apMfmService.htmlToMfm(note.content, note.tag);
+			text = this.apMfmService.htmlToMfm(note.content, { tag: note.tag, hasQuote: !!(note._misskey_quote ?? note.quoteUrl) });
 		}
 
 		const poll = await this.apQuestionService.extractPollFromQuestion(note, resolver).catch(() => undefined);
@@ -339,6 +341,7 @@ export class ApNoteService {
 				text,
 				localOnly: false,
 				channel: approvedChannel,
+				approvedHistoricalChannelReference: approvedHistoricalReference,
 				visibility,
 				visibleUsers,
 				apMentions,

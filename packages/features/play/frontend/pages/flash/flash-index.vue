@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkInput v-model="searchQuery" :large="true" type="search">
 					<template #prefix><i class="ti ti-search"></i></template>
 				</MkInput>
-				<MkButton large primary gradate rounded style="margin: 0 auto;" @click="search">{{ $locale.sfc.search }}</MkButton>
+				<MkButton large primary gradate rounded style="margin: 0 auto;" @click="search">{{ globalLocale.env.search }}</MkButton>
 				<MkPagination v-if="searchPaginator" v-slot="{items}" :key="searchKey" :paginator="searchPaginator">
 					<div class="_gaps_s">
 						<MkFlashPreview v-for="flash in items" :key="flash.id" :flash="flash"/>
@@ -51,8 +51,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, markRaw, ref, shallowRef } from 'vue';
-import type { IPaginator } from '@features/ui/frontend/utility/paginator.js';
 import MkFlashPreview from '@features/play/frontend/components/MkFlashPreview.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -60,6 +60,10 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { IPaginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -102,13 +106,13 @@ function search() {
 
 const headerActions = computed(() => [{
 	icon: 'ti ti-plus',
-	text: $locale.value.sfc.create,
+	text: globalLocale.value.env.create,
 	handler: create,
 }]);
 
 const headerTabs = computed(() => [{
 	key: 'search',
-	title: $locale.value.sfc.search,
+	title: globalLocale.value.env.search,
 	icon: 'ti ti-search',
 }, {
 	key: 'featured',
@@ -132,8 +136,6 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"search": "البحث",
-	"create": "أنشئ",
 	"featured": "الأكثر شعبية",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -142,8 +144,6 @@ definePage(() => ({
 
 <locale locale="ca-ES" lang="json">
 {
-	"search": "Cercar",
-	"create": "Crear",
 	"featured": "Popular",
 	"my": "Els meus guions",
 	"liked": "Guions que m'han agradat"
@@ -152,8 +152,6 @@ definePage(() => ({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"search": "Vyhledávání",
-	"create": "Vytvořit",
 	"featured": "Populární",
 	"my": "Moje Plays",
 	"liked": "To se mi líbí Plays"
@@ -162,8 +160,6 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
-	"search": "Search",
-	"create": "Create",
 	"featured": "Popular",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -172,8 +168,6 @@ definePage(() => ({
 
 <locale locale="de-DE" lang="json">
 {
-	"search": "Suchen",
-	"create": "Erstellen",
 	"featured": "Beliebt",
 	"my": "Meine Plays",
 	"liked": "Mit \"Gefällt mir\" markierte Plays"
@@ -182,8 +176,6 @@ definePage(() => ({
 
 <locale locale="en-US" lang="json">
 {
-	"search": "Search",
-	"create": "Create",
 	"featured": "Popular",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -192,8 +184,6 @@ definePage(() => ({
 
 <locale locale="es-ES" lang="json">
 {
-	"search": "Buscar",
-	"create": "Crear",
 	"featured": "Popular",
 	"my": "Mis guiones",
 	"liked": "Guiones que te gustaron"
@@ -202,8 +192,6 @@ definePage(() => ({
 
 <locale locale="fr-FR" lang="json">
 {
-	"search": "Rechercher",
-	"create": "Créer",
 	"featured": "Populaire",
 	"my": "Mes Play",
 	"liked": "Play aimés"
@@ -212,8 +200,6 @@ definePage(() => ({
 
 <locale locale="id-ID" lang="json">
 {
-	"search": "Cari",
-	"create": "Buat",
 	"featured": "Populer",
 	"my": "Permainan saya",
 	"liked": "Permainan Disukai"
@@ -222,8 +208,6 @@ definePage(() => ({
 
 <locale locale="it-IT" lang="json">
 {
-	"search": "Cerca",
-	"create": "Crea",
 	"featured": "Popolari",
 	"my": "I miei Play",
 	"liked": "Play piaciuti"
@@ -232,8 +216,6 @@ definePage(() => ({
 
 <locale locale="ja-JP" lang="json">
 {
-	"search": "検索",
-	"create": "作成",
 	"featured": "人気",
 	"my": "自分のPlay",
 	"liked": "いいねしたPlay"
@@ -242,8 +224,6 @@ definePage(() => ({
 
 <locale locale="ja-KS" lang="json">
 {
-	"search": "探す",
-	"create": "作成",
 	"featured": "人気",
 	"my": "自分のPlay",
 	"liked": "いいねしたPlay"
@@ -252,8 +232,6 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"search": "Nadi",
-	"create": "Create",
 	"featured": "Popular",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -262,8 +240,6 @@ definePage(() => ({
 
 <locale locale="kn-IN" lang="json">
 {
-	"search": "ಹುಡುಕು",
-	"create": "Create",
 	"featured": "Popular",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -272,8 +248,6 @@ definePage(() => ({
 
 <locale locale="ko-KR" lang="json">
 {
-	"search": "검색",
-	"create": "생성",
 	"featured": "인기",
 	"my": "나의 Play",
 	"liked": "좋아요 한 Play"
@@ -282,8 +256,6 @@ definePage(() => ({
 
 <locale locale="nl-NL" lang="json">
 {
-	"search": "Zoeken",
-	"create": "Creëer",
 	"featured": "Popular",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -292,8 +264,6 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
-	"search": "Søk",
-	"create": "Opprett",
 	"featured": "Populært",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -302,8 +272,6 @@ definePage(() => ({
 
 <locale locale="pl-PL" lang="json">
 {
-	"search": "Szukaj",
-	"create": "Utwórz",
 	"featured": "Wyróżnione",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -312,8 +280,6 @@ definePage(() => ({
 
 <locale locale="pt-PT" lang="json">
 {
-	"search": "Pesquisar",
-	"create": "Criar",
 	"featured": "Popular",
 	"my": "Meus Plays",
 	"liked": "Plays curtidos"
@@ -322,8 +288,6 @@ definePage(() => ({
 
 <locale locale="ru-RU" lang="json">
 {
-	"search": "Поиск",
-	"create": "Создать",
 	"featured": "Популярные",
 	"my": "Мои приложения ",
 	"liked": "Понравилось"
@@ -332,8 +296,6 @@ definePage(() => ({
 
 <locale locale="sk-SK" lang="json">
 {
-	"search": "Hľadať",
-	"create": "Vytvoriť",
 	"featured": "Význačné",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -342,8 +304,6 @@ definePage(() => ({
 
 <locale locale="th-TH" lang="json">
 {
-	"search": "ค้นหา",
-	"create": "สร้าง",
 	"featured": "เป็นที่นิยม",
 	"my": "Play ของฉัน",
 	"liked": "Play ที่ถูกใจไว้"
@@ -352,8 +312,6 @@ definePage(() => ({
 
 <locale locale="tr-TR" lang="json">
 {
-	"search": "Ara",
-	"create": "Oluştur",
 	"featured": "Popüler",
 	"my": "Oyunlarım",
 	"liked": "Beğenilen Oyunlar"
@@ -362,8 +320,6 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
-	"search": "ئىزدەش",
-	"create": "Create",
 	"featured": "Popular",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -372,8 +328,6 @@ definePage(() => ({
 
 <locale locale="uk-UA" lang="json">
 {
-	"search": "Пошук",
-	"create": "Створити",
 	"featured": "Популярні",
 	"my": "My Plays",
 	"liked": "Liked Plays"
@@ -382,8 +336,6 @@ definePage(() => ({
 
 <locale locale="vi-VN" lang="json">
 {
-	"search": "Tìm kiếm",
-	"create": "Tạo",
 	"featured": "Nổi tiếng",
 	"my": "Play của mình",
 	"liked": "Play đã thích"
@@ -392,8 +344,6 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
-	"search": "搜索",
-	"create": "创建",
 	"featured": "热门",
 	"my": "我的 Play",
 	"liked": "喜欢的 Play"
@@ -402,8 +352,6 @@ definePage(() => ({
 
 <locale locale="zh-TW" lang="json">
 {
-	"search": "搜尋",
-	"create": "新增",
 	"featured": "熱門",
 	"my": "自己的 Play",
 	"liked": "按讚的 Play"

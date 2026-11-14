@@ -806,6 +806,7 @@ export class ApInboxService {
 
 		if (isActor(object)) {
 			await this.apPersonService.updatePerson(actor.uri, resolver, object);
+			await this.channelFederationService.receiveUpdate(actor, object);
 			return 'ok: Person updated';
 		} else if (this.userEntityService.isSuspendedEither(actor)) {
 			return 'skip: suspended actor';

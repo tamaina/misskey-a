@@ -54,7 +54,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkDisableSection :disabled="realtimeMode">
 							<SearchMarker :keywords="['polling', 'interval']">
 								<MkPreferenceContainer k="pollingInterval">
-									<MkRange v-model="pollingInterval" :min="1" :max="3" :step="1" easing :showTicks="true" :textConverter="(v) => v === 1 ? $locale.sfc.low : v === 2 ? $locale.sfc.middle : v === 3 ? $locale.sfc.high : ''">
+									<MkRange v-model="pollingInterval" :min="1" :max="3" :step="1" easing :showTicks="true" :textConverter="(v) => v === 1 ? globalLocale.env.low : v === 2 ? $locale.sfc.middle : v === 3 ? globalLocale.env.high : ''">
 										<template #label><SearchLabel>{{ $locale.sfc.settingsContentsUpdateFrequency }}</SearchLabel></template>
 										<template #caption><SearchText>{{ $locale.sfc.settingsContentsUpdateFrequency_description }}</SearchText><br><SearchText>{{ $locale.sfc.settingsContentsUpdateFrequency_description2 }}</SearchText></template>
 										<template #prefix><i class="ti ti-player-play"></i></template>
@@ -179,8 +179,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkFolder>
 									<template #label><SearchLabel>{{ $locale.sfc.pinnedList }}</SearchLabel></template>
 									<!-- 複数ピン止め管理できるようにしたいけどめんどいので一旦ひとつのみ -->
-									<MkButton v-if="prefer.r.pinnedUserLists.value.length === 0" @click="setPinnedList()">{{ $locale.sfc.add }}</MkButton>
-									<MkButton v-else danger @click="removePinnedList()"><i class="ti ti-trash"></i> {{ $locale.sfc.remove }}</MkButton>
+									<MkButton v-if="prefer.r.pinnedUserLists.value.length === 0" @click="setPinnedList()">{{ globalLocale.env.add }}</MkButton>
+									<MkButton v-else danger @click="removePinnedList()"><i class="ti ti-trash"></i> {{ globalLocale.env.remove }}</MkButton>
 								</MkFolder>
 							</SearchMarker>
 						</div>
@@ -252,7 +252,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 										v-model="reactionsDisplaySize"
 										:options="[
 											{ value: 'small', label: $locale.sfc.small },
-											{ value: 'medium', label: $locale.sfc.medium },
+											{ value: 'medium', label: globalLocale.env.medium },
 											{ value: 'large', label: $locale.sfc.large },
 										]"
 									>
@@ -274,7 +274,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 									<MkRadios
 										v-model="mediaListWithOneImageAppearance"
 										:options="[
-											{ value: 'expand', label: $locale.sfc.default },
+											{ value: 'expand', label: globalLocale.env.default },
 											{ value: '16_9', label: interpolateLocaleParameters($locale.sfc.limitTo, { x: '16:9' }) },
 											{ value: '1_1', label: interpolateLocaleParameters($locale.sfc.limitTo, { x: '1:1' }) },
 											{ value: '2_3', label: interpolateLocaleParameters($locale.sfc.limitTo, { x: '2:3' }) },
@@ -385,7 +385,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 										</MkPreferenceContainer>
 
 										<MkPreferenceContainer k="defaultNoteLocalOnly">
-											<MkSwitch v-model="defaultNoteLocalOnly">{{ $locale.sfc.visibilityDisableFederation }}</MkSwitch>
+											<MkSwitch v-model="defaultNoteLocalOnly">{{ globalLocale.env.visibilityDisableFederation }}</MkSwitch>
 										</MkPreferenceContainer>
 									</div>
 								</MkFolder>
@@ -397,6 +397,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<SearchMarker v-slot="slotProps" :keywords="['notification']">
 				<MkFolder :defaultOpen="slotProps.isParentOfTarget">
+					<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
 					<template #label><SearchLabel>{{ $locale.sfc.notifications }}</SearchLabel></template>
 					<template #icon><SearchIcon><i class="ti ti-bell"></i></SearchIcon></template>
 
@@ -718,8 +719,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkInfo>{{ $locale.sfc.reloadRequiredToApplySettings }}</MkInfo>
 
 						<div class="_buttons">
-							<MkButton inline @click="enableAllDataSaver">{{ $locale.sfc.enableAll }}</MkButton>
-							<MkButton inline @click="disableAllDataSaver">{{ $locale.sfc.disableAll }}</MkButton>
+							<MkButton inline @click="enableAllDataSaver">{{ globalLocale.env.enableAll }}</MkButton>
+							<MkButton inline @click="disableAllDataSaver">{{ globalLocale.env.disableAll }}</MkButton>
 						</div>
 						<div class="_gaps_m">
 							<MkSwitch v-model="dataSaver.media">
@@ -758,6 +759,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkPreferenceContainer k="squareAvatars">
 									<MkSwitch v-model="squareAvatars">
 										<template #label><SearchLabel>{{ $locale.sfc.squareAvatars }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
+							<SearchMarker :keywords="['url', 'preview', 'autoplay', 'player', 'embed']">
+								<MkPreferenceContainer k="autoplayEmbededPlayerOfUrlPreview">
+									<MkSwitch v-model="autoplayEmbededPlayerOfUrlPreview">
+										<template #label><SearchLabel>{{ $locale.sfc.autoplayEmbededPlayerOfUrlPreview }}</SearchLabel></template>
 									</MkSwitch>
 								</MkPreferenceContainer>
 							</SearchMarker>
@@ -839,7 +848,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<template #label><SearchLabel>{{ $locale.sfc.additionalEmojiDictionary }}</SearchLabel></template>
 								<div class="_buttons">
 									<template v-for="lang in emojiIndexLangs" :key="lang">
-										<MkButton v-if="store.r.additionalUnicodeEmojiIndexes.value[lang]" danger @click="removeEmojiIndex(lang)"><i class="ti ti-trash"></i> {{ $locale.sfc.remove }} ({{ getEmojiIndexLangName(lang) }})</MkButton>
+										<MkButton v-if="store.r.additionalUnicodeEmojiIndexes.value[lang]" danger @click="removeEmojiIndex(lang)"><i class="ti ti-trash"></i> {{ globalLocale.env.remove }} ({{ getEmojiIndexLangName(lang) }})</MkButton>
 										<MkButton v-else @click="downloadEmojiIndex(lang)"><i class="ti ti-download"></i> {{ getEmojiIndexLangName(lang) }}{{ store.r.additionalUnicodeEmojiIndexes.value[lang] ? ` (${ $locale.sfc.installed })` : '' }}</MkButton>
 									</template>
 								</div>
@@ -863,6 +872,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, watch } from 'vue';
 import { langs } from '@features/boot/frontend/shared/config.js';
 import * as Misskey from 'misskey-js';
@@ -891,6 +901,9 @@ import { instance } from '@features/instance/frontend/instance.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import { suggestReload } from '@features/boot/frontend/utility/reload-suggest.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -935,6 +948,7 @@ const showMediaListByGridInWideArea = prefer.model('showMediaListByGridInWideAre
 const reactionsDisplaySize = prefer.model('reactionsDisplaySize');
 const limitWidthOfReaction = prefer.model('limitWidthOfReaction');
 const squareAvatars = prefer.model('squareAvatars');
+const autoplayEmbededPlayerOfUrlPreview = prefer.model('autoplayEmbededPlayerOfUrlPreview');
 const enableSeasonalScreenEffect = prefer.model('enableSeasonalScreenEffect');
 const showAvatarDecorations = prefer.model('showAvatarDecorations');
 const nsfw = prefer.model('nsfw');
@@ -1153,9 +1167,7 @@ definePage(() => ({
 	"overridedDeviceKind": "نوع الجهاز",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "منخفضة",
 	"middle": "متوسط",
-	"high": "عالية",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -1174,8 +1186,6 @@ definePage(() => ({
 	"collapseRenotes": "Collapse renotes you've already seen",
 	"collapseRenotesDescription": "Collapse notes that you've reacted to or renoted before.",
 	"pinnedList": "Pinned list",
-	"add": "إضافة",
-	"remove": "حذف",
 	"showNoteActionsOnlyHover": "أظهر الإجراءات عند التمرير فوق الملاحظة",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "See the number of reactions in notes",
@@ -1184,11 +1194,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "افتح منتقي التفاعلات عند النقر بالزر الأيمن",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "صغير",
-	"medium": "متوسط",
 	"large": "كبير",
 	"reactionsDisplaySize": "حجم التفاعلات",
 	"limitWidthOfReaction": "تصغير حجم التفاعلات",
-	"default": "افتراضي",
 	"limitTo": "سقفهُ لـ{x}",
 	"mediaListWithOneImageAppearance": "Height of media lists with one image only",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -1209,8 +1217,6 @@ definePage(() => ({
 	"visibilityHome": "الرئيسي",
 	"visibilityFollowers": "المتابِعون",
 	"visibilitySpecified": "مباشرة",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "الإشعارات",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "أعلى اليسار",
 	"rightTop": "أعلى اليمين",
@@ -1268,8 +1274,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "موفر البيانات",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "تشغيل الكل",
-	"disableAll": "تعطيل الكل",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -1302,7 +1306,8 @@ definePage(() => ({
 	"statusbar": "شريط الحالة",
 	"deck": "Deck",
 	"customCss": "CSS مخصصة",
-	"selectList": "اختر قائمة"
+	"selectList": "اختر قائمة",
+	"notifications": "الإشعارات"
 }
 </locale>
 
@@ -1320,9 +1325,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Tipus de dispositiu",
 	"realtimeMode": "Mode en temps real",
 	"settingsRealtimeMode_description": "Estableix una connexió amb el servidor i actualitza el contingut en temps real. Pot consumir més dades i bateria.",
-	"low": "Baixa",
 	"middle": "Mitjà",
-	"high": "Alta",
 	"settingsContentsUpdateFrequency": "Freqüència d'adquisició del contingut",
 	"settingsContentsUpdateFrequency_description": "Com més alt sigui l'adquisició de contingut en temps real, més baixa el rendiment i més consum de dades i bateria.",
 	"settingsContentsUpdateFrequency_description2": "Quan s'activa el mode en temps real, el contingut s'actualitza en temps real, independentment d'aquesta configuració.",
@@ -1341,8 +1344,6 @@ definePage(() => ({
 	"collapseRenotes": "Col·lapsar els impulsos que ja has vist",
 	"collapseRenotesDescription": "Col·lapse les notes a les quals ja has reaccionat o que ja has impulsat.",
 	"pinnedList": "Llista fixada",
-	"add": "Afegir",
-	"remove": "Eliminar",
 	"showNoteActionsOnlyHover": "Només mostra accions de la nota en passar amb el cursor",
 	"showClipButtonInNoteFooter": "Afegir \"Retall\" al menú d'acció de la nota",
 	"showReactionsCount": "Mostra el nombre de reaccions a les publicacions",
@@ -1351,11 +1352,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Fes clic al botó dret del ratolí per obrir el menú de reaccions",
 	"settingsShowAvailableReactionsFirstInNote": "Mostra les reacciones que pots fer servir al damunt",
 	"small": "Petit",
-	"medium": "Mitjà",
 	"large": "Gran",
 	"reactionsDisplaySize": "Mida de les reaccions",
 	"limitWidthOfReaction": "Limitar l'amplada màxima de la reacció i mostrar-les en una mida reduïda ",
-	"default": "Per defecte",
 	"limitTo": "Limita a {x}",
 	"mediaListWithOneImageAppearance": "Altura de la llista de fitxers amb una única imatge",
 	"showMediaListByGridInWideArea": "Mostra la llista de medis en vista quadrícula quan l'amplada de la pantalla ho permeti",
@@ -1376,8 +1375,6 @@ definePage(() => ({
 	"visibilityHome": "Inici",
 	"visibilityFollowers": "Seguidors",
 	"visibilitySpecified": "Directe",
-	"visibilityDisableFederation": "Sense federar",
-	"notifications": "Notificacions",
 	"useGroupedNotifications": "Mostrar les notificacions agrupades ",
 	"leftTop": "Dalt a l'esquerra ",
 	"rightTop": "Dalt a la dreta ",
@@ -1435,8 +1432,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Algunes extensions poden interferir en el comportament del client i afectar el rendiment. Desactiva les extensions del navegador i comprovar-ho.",
 	"dataSaver": "Economitzador de dades",
 	"reloadRequiredToApplySettings": "És necessari recarregar la pàgina per aplicar els canvis.",
-	"enableAll": "Habilita tot",
-	"disableAll": "Deshabilita tot",
 	"dataSaverMediaTitle": "Carregant multimèdia ",
 	"dataSaverMediaDescription": "Desactiva la càrrega automàtica d'imatges i vídeos. Les imatges i els vídeos amagats es carregaran quan es faci clic a sobre.",
 	"dataSaverAvatarTitle": "Avatars animats",
@@ -1469,7 +1464,8 @@ definePage(() => ({
 	"statusbar": "Barra d'estat",
 	"deck": "Escriptori",
 	"customCss": "CSS personalitzat",
-	"selectList": "Tria una llista"
+	"selectList": "Tria una llista",
+	"notifications": "Notificacions"
 }
 </locale>
 
@@ -1487,9 +1483,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Typ zařízení",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Nízká",
 	"middle": "Střední",
-	"high": "Vysoká",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -1508,8 +1502,6 @@ definePage(() => ({
 	"collapseRenotes": "Sbalit poznámky, které jste již viděli",
 	"collapseRenotesDescription": "Collapse notes that you've reacted to or renoted before.",
 	"pinnedList": "Pinned list",
-	"add": "Přidat",
-	"remove": "Smazat",
 	"showNoteActionsOnlyHover": "Zobrazit akce poznámky jenom při naběhnutí myši",
 	"showClipButtonInNoteFooter": "Přidat \"Připnout\" do akčního menu poznámky",
 	"showReactionsCount": "See the number of reactions in notes",
@@ -1518,11 +1510,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Otevřít výběr reakce na kliknutí pravého tlačítka myši",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Malé",
-	"medium": "Střední",
 	"large": "Velké",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Výchozí",
 	"limitTo": "Omezeno na {x}",
 	"mediaListWithOneImageAppearance": "Výška seznamu médií s jedním obrázkem",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -1543,8 +1533,6 @@ definePage(() => ({
 	"visibilityHome": "Domů",
 	"visibilityFollowers": "Sledující",
 	"visibilitySpecified": "Přímý",
-	"visibilityDisableFederation": "Defederace",
-	"notifications": "Oznámení",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Vlevo nahoře",
 	"rightTop": "Vpravo nahoře",
@@ -1602,8 +1590,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Spořič dat",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Povolit vše",
-	"disableAll": "Vypnout vše",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -1636,7 +1622,8 @@ definePage(() => ({
 	"statusbar": "Stavový řádek",
 	"deck": "Deck",
 	"customCss": "Vlastní CSS",
-	"selectList": "Vybrat seznam"
+	"selectList": "Vybrat seznam",
+	"notifications": "Oznámení"
 }
 </locale>
 
@@ -1654,9 +1641,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Device type",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Low",
 	"middle": "Medium",
-	"high": "High",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -1675,8 +1660,6 @@ definePage(() => ({
 	"collapseRenotes": "Collapse renotes you've already seen",
 	"collapseRenotesDescription": "Collapse notes that you've reacted to or renoted before.",
 	"pinnedList": "Pinned list",
-	"add": "Add",
-	"remove": "Delete",
 	"showNoteActionsOnlyHover": "Only show note actions on hover",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "See the number of reactions in notes",
@@ -1685,11 +1668,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Open reaction picker on right-click",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Default",
 	"limitTo": "Limit to {x}",
 	"mediaListWithOneImageAppearance": "Height of media lists with one image only",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -1710,8 +1691,6 @@ definePage(() => ({
 	"visibilityHome": "Home",
 	"visibilityFollowers": "Followers",
 	"visibilitySpecified": "Direct",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "Notifications",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Top left",
 	"rightTop": "Top right",
@@ -1769,8 +1748,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Data Saver",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Enable all",
-	"disableAll": "Disable all",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -1803,7 +1780,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Select a list"
+	"selectList": "Select a list",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -1821,9 +1799,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Gerätetyp",
 	"realtimeMode": "Echtzeit-Modus",
 	"settingsRealtimeMode_description": "Stellt eine Verbindung mit dem Server her und aktualisiert die Inhalte in Echtzeit. Kann zu mehr Datenverkehr einem höheren Akkuverbrauch führen.",
-	"low": "Niedrig",
 	"middle": "Mittel",
-	"high": "Hoch",
 	"settingsContentsUpdateFrequency": "Häufigkeit des Abrufs von Inhalten",
 	"settingsContentsUpdateFrequency_description": "Je höher der Wert, desto häufiger werden die Inhalte aktualisiert, aber die Leistung sinkt und der Datenverkehr und der Akkuverbrauch steigen.",
 	"settingsContentsUpdateFrequency_description2": "Wenn der Echtzeitmodus aktiviert ist, werden die Inhalte unabhängig von dieser Einstellung in Echtzeit aktualisiert.",
@@ -1842,8 +1818,6 @@ definePage(() => ({
 	"collapseRenotes": "Bereits gesehene Renotes verkürzt anzeigen",
 	"collapseRenotesDescription": "Klappe Notizen ein, auf die du bereits reagiert oder die du renoted hast.",
 	"pinnedList": "Angeheftete Liste",
-	"add": "Hinzufügen",
-	"remove": "Löschen",
 	"showNoteActionsOnlyHover": "Notizmenü nur bei Mouseover anzeigen",
 	"showClipButtonInNoteFooter": "\"Clip\" zum Notizmenu hinzufügen",
 	"showReactionsCount": "Zeige die Anzahl der Reaktionen auf Notizen an",
@@ -1852,11 +1826,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Reaktionsauswahl durch Rechtsklick öffnen",
 	"settingsShowAvailableReactionsFirstInNote": "Zeige die verfügbaren Reaktionen im oberen Bereich an.",
 	"small": "Klein",
-	"medium": "Mittel",
 	"large": "Groß",
 	"reactionsDisplaySize": "Reaktionsanzeigegröße",
 	"limitWidthOfReaction": "Begrenze die Breite der Reaktion und zeige sie verkleinert an",
-	"default": "Standard",
 	"limitTo": "Auf {x} begrenzen",
 	"mediaListWithOneImageAppearance": "Höhe von Medienlisten mit nur einem Bild",
 	"showMediaListByGridInWideArea": "Medienlisten auf breiteren Bildschirmen nebeneinander anzeigen",
@@ -1877,8 +1849,6 @@ definePage(() => ({
 	"visibilityHome": "Startseite",
 	"visibilityFollowers": "Follower",
 	"visibilitySpecified": "Direkt",
-	"visibilityDisableFederation": "Deföderieren",
-	"notifications": "Benachrichtigungen",
 	"useGroupedNotifications": "Benachrichtigungen gruppieren",
 	"leftTop": "Oben links",
 	"rightTop": "Oben rechts",
@@ -1936,8 +1906,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Einige Erweiterungen können das Verhalten des Clients stören und die Leistung beeinträchtigen. Deaktiviere die Browser-Erweiterungen und prüfe, ob sich die Situation dadurch verbessert.",
 	"dataSaver": "Datensparmodus",
 	"reloadRequiredToApplySettings": "Eine Aktualisierung ist erforderlich, um die Einstellungen zu übernehmen.",
-	"enableAll": "Alle aktivieren",
-	"disableAll": "Alle deaktivieren",
 	"dataSaverMediaTitle": "Laden von Medien verhindern",
 	"dataSaverMediaDescription": "Verhindert, dass Bilder/Videos automatisch geladen werden. Ausgeblendete Bilder/Videos werden geladen, wenn du auf sie tippst.",
 	"dataSaverAvatarTitle": "Animierte Profilbilder deaktivieren",
@@ -1970,7 +1938,8 @@ definePage(() => ({
 	"statusbar": "Statusleiste",
 	"deck": "Deck",
 	"customCss": "Benutzerdefiniertes CSS",
-	"selectList": "Liste auswählen"
+	"selectList": "Liste auswählen",
+	"notifications": "Benachrichtigungen"
 }
 </locale>
 
@@ -1988,9 +1957,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Device type",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Low",
 	"middle": "Medium",
-	"high": "High",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -2009,8 +1976,6 @@ definePage(() => ({
 	"collapseRenotes": "Collapse renotes you've already seen",
 	"collapseRenotesDescription": "Collapse notes that you've reacted to or renoted before.",
 	"pinnedList": "Pinned list",
-	"add": "Add",
-	"remove": "Delete",
 	"showNoteActionsOnlyHover": "Only show note actions on hover",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "See the number of reactions in notes",
@@ -2019,11 +1984,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Open reaction picker on right-click",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Default",
 	"limitTo": "Limit to {x}",
 	"mediaListWithOneImageAppearance": "Height of media lists with one image only",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -2044,8 +2007,6 @@ definePage(() => ({
 	"visibilityHome": "Home",
 	"visibilityFollowers": "Followers",
 	"visibilitySpecified": "Direct",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "Notifications",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Top left",
 	"rightTop": "Top right",
@@ -2103,8 +2064,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Data Saver",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Enable all",
-	"disableAll": "Disable all",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -2137,7 +2096,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Select a list"
+	"selectList": "Select a list",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -2155,9 +2115,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Tipo de dispositivo",
 	"realtimeMode": "Modo en tiempo real",
 	"settingsRealtimeMode_description": "Establece una conexión con el servidor y actualiza el contenido en tiempo real. Esto puede aumentar el tráfico y el consumo de memoria.",
-	"low": "Baja",
 	"middle": "Mediano",
-	"high": "Alta",
 	"settingsContentsUpdateFrequency": "Frecuencia de adquisición del contenido.",
 	"settingsContentsUpdateFrequency_description": "Cuanto mayor sea el valor, más se actualiza el contenido, pero disminuye el rendimiento y aumenta el tráfico y el consumo de memoria.",
 	"settingsContentsUpdateFrequency_description2": "Cuando el modo en tiempo real está activado, el contenido se actualiza en tiempo real independientemente de esta configuración.",
@@ -2176,8 +2134,6 @@ definePage(() => ({
 	"collapseRenotes": "Colapsar renotas que ya hayas visto",
 	"collapseRenotesDescription": "Contrae notas a las que  ya has reaccionado o renotado ",
 	"pinnedList": "Lista fijada",
-	"add": "Agregar",
-	"remove": "Borrar",
 	"showNoteActionsOnlyHover": "Mostrar acciones de la nota sólo al pasar el cursor",
 	"showClipButtonInNoteFooter": "Añadir \"Clip\" al menú de notas",
 	"showReactionsCount": "Mostrar el número de reacciones en las notas",
@@ -2186,11 +2142,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Haga clic con el botón derecho para abrir el menu de reacciones",
 	"settingsShowAvailableReactionsFirstInNote": "Mostrar las reacciones disponibles en la parte superior.",
 	"small": "Pequeño",
-	"medium": "Mediano",
 	"large": "Grande",
 	"reactionsDisplaySize": "Tamaño de las reacciones",
 	"limitWidthOfReaction": "Limitar ancho de las reacciones",
-	"default": "Predeterminado",
 	"limitTo": "{x} hasta un máximo de",
 	"mediaListWithOneImageAppearance": "Altura de la lista de medios con una sola imagen.",
 	"showMediaListByGridInWideArea": "Cuando el ancho de la pantalla sea grande, muestra la lista de multimedia uno al lado del otro.",
@@ -2211,8 +2165,6 @@ definePage(() => ({
 	"visibilityHome": "Inicio",
 	"visibilityFollowers": "Seguidores",
 	"visibilitySpecified": "Nota directa",
-	"visibilityDisableFederation": "No federado",
-	"notifications": "Notificaciones",
 	"useGroupedNotifications": "Mostrar notificaciones agrupadas",
 	"leftTop": "Arriba a la izquierda",
 	"rightTop": "Arriba a la derecha",
@@ -2270,8 +2222,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Algunas extensiones pueden interferir con el comportamiento del cliente y afectar al rendimiento. Por favor, deshabilita las extensiones de tu navegador y comprueba si esto mejora la situación.",
 	"dataSaver": "Ahorro de datos",
 	"reloadRequiredToApplySettings": "Es necesario recargar para que se aplique la configuración.",
-	"enableAll": "Activar todo",
-	"disableAll": "Desactivar todo",
 	"dataSaverMediaTitle": "Cargando Multimedia",
 	"dataSaverMediaDescription": "Desactiva la carga automática de imágenes y vídeos. Tendrás que tocar en las imágenes y vídeos ocultos para cargarlos.",
 	"dataSaverAvatarTitle": "Avatares animados",
@@ -2304,7 +2254,8 @@ definePage(() => ({
 	"statusbar": "Barra de estado",
 	"deck": "Deck",
 	"customCss": "CSS personalizado",
-	"selectList": "Selecciona una lista"
+	"selectList": "Selecciona una lista",
+	"notifications": "Notificaciones"
 }
 </locale>
 
@@ -2322,9 +2273,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Type d’appareil",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Basse",
 	"middle": "Moyen",
-	"high": "Haute",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -2343,8 +2292,6 @@ definePage(() => ({
 	"collapseRenotes": "Réduire les renotes déjà vues",
 	"collapseRenotesDescription": "Réduire les notes que vous avez renoté ou déjà réagi.",
 	"pinnedList": "Liste épinglée",
-	"add": "Ajouter",
-	"remove": "Supprimer",
 	"showNoteActionsOnlyHover": "Afficher les actions de note uniquement au survol",
 	"showClipButtonInNoteFooter": "Ajouter « Clip » au menu d'action de la note",
 	"showReactionsCount": "Afficher le nombre de réactions des notes",
@@ -2353,11 +2300,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Clic-droit pour ouvrir le panneau de réactions",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Petit",
-	"medium": "Moyen",
 	"large": "Grand",
 	"reactionsDisplaySize": "Taille de l'affichage des réactions",
 	"limitWidthOfReaction": "Limiter la largeur maximale des réactions et les afficher en taille réduite",
-	"default": "Par défaut",
 	"limitTo": "Limiter à {x}",
 	"mediaListWithOneImageAppearance": "Hauteur des listes de médias n'ayant qu'une image ",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -2378,8 +2323,6 @@ definePage(() => ({
 	"visibilityHome": "Principal",
 	"visibilityFollowers": "Abonné·e·s",
 	"visibilitySpecified": "Direct",
-	"visibilityDisableFederation": "Défédérer",
-	"notifications": "Notifications",
 	"useGroupedNotifications": "Grouper les notifications",
 	"leftTop": "En haut à gauche",
 	"rightTop": "En haut à droite",
@@ -2437,8 +2380,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Économiseur de données",
 	"reloadRequiredToApplySettings": "Le rafraîchissement est nécessaire pour que les paramètres prennent effet.",
-	"enableAll": "Tout activer",
-	"disableAll": "Tout désactiver",
 	"dataSaverMediaTitle": "Chargement des médias",
 	"dataSaverMediaDescription": "Empêche le chargement automatique des images et des vidéos. Appuyez sur les images et les vidéos cachées pour les charger.",
 	"dataSaverAvatarTitle": "Animation d'avatars",
@@ -2471,7 +2412,8 @@ definePage(() => ({
 	"statusbar": "Barre d’état",
 	"deck": "Deck",
 	"customCss": "CSS personnalisé",
-	"selectList": "Sélectionner une liste"
+	"selectList": "Sélectionner une liste",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -2489,9 +2431,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Tipe perangkat",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Rendah",
 	"middle": "Sedang",
-	"high": "Tinggi",
 	"settingsContentsUpdateFrequency": "Frekuensi pembaruan konten",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -2510,8 +2450,6 @@ definePage(() => ({
 	"collapseRenotes": "Tutup renote yang sudah kamu lihat",
 	"collapseRenotesDescription": "Tutup note yang sudah kamu beri reaksi atau direnote sebelumnya.",
 	"pinnedList": "Daftar yang dipin",
-	"add": "Tambahkan",
-	"remove": "Hapus",
 	"showNoteActionsOnlyHover": "Hanya tampilkan aksi catatan saat ditunjuk",
 	"showClipButtonInNoteFooter": "Tambahkan \"Klip\" ke menu aksi catatan",
 	"showReactionsCount": "Lihat jumlah reaksi dalam catatan",
@@ -2520,11 +2458,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Buka pemilih reaksi dengan klik-kanan",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Kecil",
-	"medium": "Sedang",
 	"large": "Besar",
 	"reactionsDisplaySize": "Ukuran tampilan reaksi",
 	"limitWidthOfReaction": "Batasi lebar maksimum reaksi dan tampilkan dalam ukuran terbatasi.",
-	"default": "Bawaan",
 	"limitTo": "Batasi pada {x}",
 	"mediaListWithOneImageAppearance": "Tinggi daftar media dengan satu gambar saja",
 	"showMediaListByGridInWideArea": "Tampilkan daftar media berupa kisi-kisi ketika lebar tampilan menjadi luas",
@@ -2545,8 +2481,6 @@ definePage(() => ({
 	"visibilityHome": "Beranda",
 	"visibilityFollowers": "Pengikut",
 	"visibilitySpecified": "Langsung",
-	"visibilityDisableFederation": "Matikan federasi",
-	"notifications": "Notifikasi",
 	"useGroupedNotifications": "Tampilkan notifikasi secara dikelompokkan",
 	"leftTop": "Kiri atas",
 	"rightTop": "Kanan atas",
@@ -2604,8 +2538,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Penghemat data",
 	"reloadRequiredToApplySettings": "Muat ulang diperlukan untuk menerapkan pengaturan.",
-	"enableAll": "Aktifkan semua",
-	"disableAll": "Nonaktifkan semua",
 	"dataSaverMediaTitle": "Memuat media",
 	"dataSaverMediaDescription": "Mencegah gambar/video dimuat secara otomatis. Menyembunyikan gambar/video dan akan dimuat ketika diketuk.",
 	"dataSaverAvatarTitle": "Gambar avatar",
@@ -2638,7 +2570,8 @@ definePage(() => ({
 	"statusbar": "Bilah status",
 	"deck": "Dek",
 	"customCss": "Custom CSS",
-	"selectList": "Pilih daftar"
+	"selectList": "Pilih daftar",
+	"notifications": "Notifikasi"
 }
 </locale>
 
@@ -2656,9 +2589,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Tipo di dispositivo",
 	"realtimeMode": "Modalità in tempo reale",
 	"settingsRealtimeMode_description": "Connette al server e aggiorna il contenuto in tempo reale. Potrebbe aumentare l'uso dei dati e il consumo della batteria.",
-	"low": "Bassa",
 	"middle": "Media",
-	"high": "Alta",
 	"settingsContentsUpdateFrequency": "Frequenza di ricezione contenuti",
 	"settingsContentsUpdateFrequency_description": "Se l'impostazione è alta, verranno aggiornati più frequentemente, consumando più dati e più batteria.",
 	"settingsContentsUpdateFrequency_description2": "Quando la modalità è in tempo reale, arriveranno a prescindere.",
@@ -2677,8 +2608,6 @@ definePage(() => ({
 	"collapseRenotes": "Comprimi le Rinota già viste",
 	"collapseRenotesDescription": "Comprimi le Note con cui hai già interagito.",
 	"pinnedList": "Lista in primo piano",
-	"add": "Aggiungi",
-	"remove": "Elimina",
 	"showNoteActionsOnlyHover": "Mostra le azioni delle Note solo al passaggio del mouse",
 	"showClipButtonInNoteFooter": "Aggiungi il bottone Clip tra le azioni delle Note",
 	"showReactionsCount": "Visualizza la quantità di reazioni su una nota",
@@ -2687,11 +2616,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Cliccare sul tasto destro per aprire il pannello di reazioni",
 	"settingsShowAvailableReactionsFirstInNote": "Mostra le reazioni disponibili in alto",
 	"small": "Piccolo",
-	"medium": "Medio",
 	"large": "Grande",
 	"reactionsDisplaySize": "Grandezza delle reazioni",
 	"limitWidthOfReaction": "Limita la larghezza delle reazioni e ridimensionale",
-	"default": "Predefinito",
 	"limitTo": "Limita a {x}",
 	"mediaListWithOneImageAppearance": "Altezza dell'elenco media con una sola immagine ",
 	"showMediaListByGridInWideArea": "Quando la larghezza dello schermo è ampia, mostra i media affiancati",
@@ -2712,8 +2639,6 @@ definePage(() => ({
 	"visibilityHome": "Home",
 	"visibilityFollowers": "Follower",
 	"visibilitySpecified": "Nota diretta",
-	"visibilityDisableFederation": "Gestisci la federazione",
-	"notifications": "Notifiche",
 	"useGroupedNotifications": "Mostra le notifiche raggruppate",
 	"leftTop": "In alto a sinistra",
 	"rightTop": "In alto a destra",
@@ -2771,8 +2696,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Alcune estensioni potrebbero interferire con il funzionamento del client e comprometterne le prestazioni. Prova a disattivare le estensioni del browser e vedi se il problema persiste.",
 	"dataSaver": "Risparmia dati",
 	"reloadRequiredToApplySettings": "Ricarica le impostazioni. ",
-	"enableAll": "Abilita tutto",
-	"disableAll": "Disabilitare tutto",
 	"dataSaverMediaTitle": "Caricamento dei media",
 	"dataSaverMediaDescription": "Impedire il caricamento automatico di immagini e video. Devi toccare le immagini o i video nascosti per caricarli.",
 	"dataSaverAvatarTitle": "Immagine del profilo",
@@ -2805,12 +2728,14 @@ definePage(() => ({
 	"statusbar": "Barra di stato",
 	"deck": "Deck",
 	"customCss": "CSS personalizzato",
-	"selectList": "Seleziona una lista"
+	"selectList": "Seleziona una lista",
+	"notifications": "Notifiche"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
+	"autoplayEmbededPlayerOfUrlPreview": "URLプレビューの埋め込みプレイヤーを自動再生",
 	"preferences": "環境設定",
 	"settingsPreferencesBanner": "好みに応じた、クライアントの全体的な動作の設定が行えます。",
 	"general": "全般",
@@ -2823,9 +2748,7 @@ definePage(() => ({
 	"overridedDeviceKind": "デバイスタイプ",
 	"realtimeMode": "リアルタイムモード",
 	"settingsRealtimeMode_description": "サーバーと接続を確立し、リアルタイムでコンテンツを更新します。通信量とバッテリーの消費が多くなる場合があります。",
-	"low": "低",
 	"middle": "中",
-	"high": "高",
 	"settingsContentsUpdateFrequency": "コンテンツの取得頻度",
 	"settingsContentsUpdateFrequency_description": "高いほどリアルタイムにコンテンツが更新されますが、パフォーマンスが低下し、通信量とバッテリーの消費が多くなります。",
 	"settingsContentsUpdateFrequency_description2": "リアルタイムモードがオンのときは、この設定に関わらずリアルタイムでコンテンツが更新されます。",
@@ -2844,8 +2767,6 @@ definePage(() => ({
 	"collapseRenotes": "リノートのスマート省略",
 	"collapseRenotesDescription": "リアクションやリノートをしたことがあるノートをたたんで表示します。",
 	"pinnedList": "ピン留めされたリスト",
-	"add": "追加",
-	"remove": "削除",
 	"showNoteActionsOnlyHover": "ノートのアクションをホバー時のみ表示する",
 	"showClipButtonInNoteFooter": "ノートのアクションにクリップを追加",
 	"showReactionsCount": "ノートのリアクション数を表示する",
@@ -2854,11 +2775,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "右クリックでリアクションピッカーを開く",
 	"settingsShowAvailableReactionsFirstInNote": "利用できるリアクションを先頭に表示",
 	"small": "小",
-	"medium": "中",
 	"large": "大",
 	"reactionsDisplaySize": "リアクションの表示サイズ",
 	"limitWidthOfReaction": "リアクションの最大横幅を制限し、縮小して表示する",
-	"default": "デフォルト",
 	"limitTo": "{x}を上限に",
 	"mediaListWithOneImageAppearance": "画像が1枚のみのメディアリストの高さ",
 	"showMediaListByGridInWideArea": "画面幅が広いときはメディアリストを横並びで表示する",
@@ -2879,8 +2798,6 @@ definePage(() => ({
 	"visibilityHome": "ホーム",
 	"visibilityFollowers": "フォロワー",
 	"visibilitySpecified": "指名",
-	"visibilityDisableFederation": "連合なし",
-	"notifications": "通知",
 	"useGroupedNotifications": "通知をグルーピング",
 	"leftTop": "左上",
 	"rightTop": "右上",
@@ -2938,8 +2855,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "一部の拡張機能はクライアントの動作に干渉しパフォーマンスに影響を及ぼすことがあります。ブラウザの拡張機能を無効にして改善するか確認してください。",
 	"dataSaver": "データセーバー",
 	"reloadRequiredToApplySettings": "設定の反映にはリロードが必要です。",
-	"enableAll": "全て有効にする",
-	"disableAll": "全て無効にする",
 	"dataSaverMediaTitle": "メディアの読み込みを無効化",
 	"dataSaverMediaDescription": "画像・動画が自動で読み込まれるのを防止します。隠れている画像・動画はタップすると読み込まれます。",
 	"dataSaverAvatarTitle": "アイコン画像のアニメーションを無効化",
@@ -2972,7 +2887,8 @@ definePage(() => ({
 	"statusbar": "ステータスバー",
 	"deck": "デッキ",
 	"customCss": "カスタムCSS",
-	"selectList": "リストを選択"
+	"selectList": "リストを選択",
+	"notifications": "通知"
 }
 </locale>
 
@@ -2990,9 +2906,7 @@ definePage(() => ({
 	"overridedDeviceKind": "デバイスタイプ",
 	"realtimeMode": "リアルタイムモード",
 	"settingsRealtimeMode_description": "サーバーと接続を確立して、リアルタイムでコンテンツを更新するで。通信量とバッテリーの消費が多くなるかもしれへん。",
-	"low": "低い",
 	"middle": "ふつう",
-	"high": "高い",
 	"settingsContentsUpdateFrequency": "コンテンツの取得頻度",
 	"settingsContentsUpdateFrequency_description": "高いほどリアルタイムにコンテンツが更新されるんやけど、そのぶんパフォーマンスが落ちるし、通信量とバッテリーの消費も増えるねん。",
 	"settingsContentsUpdateFrequency_description2": "リアルタイムモードをつけてるんやったら、この設定がどうであれリアルタイムでコンテンツが更新されるで。",
@@ -3011,8 +2925,6 @@ definePage(() => ({
 	"collapseRenotes": "見たことあるリノートは飛ばして表示するで",
 	"collapseRenotesDescription": "リアクションやリノートをしたことがあるノートをたたんで表示するで。",
 	"pinnedList": "ピン留めしはったリスト",
-	"add": "増やす",
-	"remove": "ほかす",
 	"showNoteActionsOnlyHover": "ノートの操作部をホバー時のみ表示するで",
 	"showClipButtonInNoteFooter": "ノートのアクションにクリップを追加",
 	"showReactionsCount": "ノートのリアクション数を表示する",
@@ -3021,11 +2933,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "右クリックでツッコミピッカーを開くようにする",
 	"settingsShowAvailableReactionsFirstInNote": "利用できるリアクションを先頭に表示",
 	"small": "ちいさい",
-	"medium": "ふつう",
 	"large": "でかい",
 	"reactionsDisplaySize": "ツッコミの表示のでかさ",
 	"limitWidthOfReaction": "ツッコミの最大横幅を制限して、ちっさく表示するで",
-	"default": "デフォルト",
 	"limitTo": "{x}をいっぱいに",
 	"mediaListWithOneImageAppearance": "画像が1枚のみのメディアリストの高さ",
 	"showMediaListByGridInWideArea": "画面幅が広いときはメディアリストを横並びで表示する",
@@ -3046,8 +2956,6 @@ definePage(() => ({
 	"visibilityHome": "ホーム",
 	"visibilityFollowers": "フォロワー",
 	"visibilitySpecified": "ダイレクト",
-	"visibilityDisableFederation": "連合なし",
-	"notifications": "通知",
 	"useGroupedNotifications": "通知をグループ分けして出すで",
 	"leftTop": "左上",
 	"rightTop": "右上",
@@ -3105,8 +3013,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "なんかの拡張機能がクライアントの動作にちょっかいをかけてパフォーマンスに影響を与えてるかもしれへん。ブラウザの拡張機能を無効にして良くなるか確認してや。",
 	"dataSaver": "データケチケチ",
 	"reloadRequiredToApplySettings": "設定を見るんにはリロードが必要やで。",
-	"enableAll": "全部使えるようにする",
-	"disableAll": "全部使えへんようにする",
 	"dataSaverMediaTitle": "メディアの読み込み",
 	"dataSaverMediaDescription": "絵・動画が自動で読まれるのをふせぐわ。隠れてる絵・動画はタップするとひょっこりはんしてくれんで。",
 	"dataSaverAvatarTitle": "アイコンの絵",
@@ -3139,7 +3045,8 @@ definePage(() => ({
 	"statusbar": "ステータスバー",
 	"deck": "デッキ",
 	"customCss": "カスタムCSS",
-	"selectList": "リストを選ぶ"
+	"selectList": "リストを選ぶ",
+	"notifications": "通知"
 }
 </locale>
 
@@ -3157,9 +3064,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Device type",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Low",
 	"middle": "Medium",
-	"high": "High",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -3178,8 +3083,6 @@ definePage(() => ({
 	"collapseRenotes": "Collapse renotes you've already seen",
 	"collapseRenotesDescription": "Collapse notes that you've reacted to or renoted before.",
 	"pinnedList": "Pinned list",
-	"add": "Add",
-	"remove": "Kkes",
 	"showNoteActionsOnlyHover": "Only show note actions on hover",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "See the number of reactions in notes",
@@ -3188,11 +3091,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Open reaction picker on right-click",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Default",
 	"limitTo": "Limit to {x}",
 	"mediaListWithOneImageAppearance": "Height of media lists with one image only",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -3213,8 +3114,6 @@ definePage(() => ({
 	"visibilityHome": "Home",
 	"visibilityFollowers": "Imeḍfaṛen",
 	"visibilitySpecified": "Direct",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "Ilɣuyen",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Top left",
 	"rightTop": "Top right",
@@ -3272,8 +3171,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Data Saver",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Enable all",
-	"disableAll": "Disable all",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -3306,7 +3203,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Fren tabdart"
+	"selectList": "Fren tabdart",
+	"notifications": "Ilɣuyen"
 }
 </locale>
 
@@ -3324,9 +3222,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Device type",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Low",
 	"middle": "Medium",
-	"high": "High",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -3345,8 +3241,6 @@ definePage(() => ({
 	"collapseRenotes": "Collapse renotes you've already seen",
 	"collapseRenotesDescription": "Collapse notes that you've reacted to or renoted before.",
 	"pinnedList": "Pinned list",
-	"add": "Add",
-	"remove": "ಅಳಿಸು",
 	"showNoteActionsOnlyHover": "Only show note actions on hover",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "See the number of reactions in notes",
@@ -3355,11 +3249,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Open reaction picker on right-click",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Default",
 	"limitTo": "Limit to {x}",
 	"mediaListWithOneImageAppearance": "Height of media lists with one image only",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -3380,8 +3272,6 @@ definePage(() => ({
 	"visibilityHome": "Home",
 	"visibilityFollowers": "Followers",
 	"visibilitySpecified": "ನೇರ ಟಿಪ್ಪಣಿಗಳು",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "ಅಧಿಸೂಚನೆಗಳು",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Top left",
 	"rightTop": "Top right",
@@ -3439,8 +3329,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Data Saver",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Enable all",
-	"disableAll": "Disable all",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -3473,7 +3361,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Select a list"
+	"selectList": "Select a list",
+	"notifications": "ಅಧಿಸೂಚನೆಗಳು"
 }
 </locale>
 
@@ -3491,9 +3380,7 @@ definePage(() => ({
 	"overridedDeviceKind": "장치 유형",
 	"realtimeMode": "실시간 모드",
 	"settingsRealtimeMode_description": "서버에 접속하고 실시간으로 콘텐츠를 업데이트합니다. 데이터 사용량과 배터리의 소비가 증가할 수 있습니다.",
-	"low": "낮음",
 	"middle": "보통",
-	"high": "높음",
 	"settingsContentsUpdateFrequency": "콘텐츠의 업데이트 빈도",
 	"settingsContentsUpdateFrequency_description": "높을수록 실시간으로 콘텐츠가 업데이트됩니다만, 성능이 저하되고 데이터 사용량과 배터리의 소비가 증가합니다.",
 	"settingsContentsUpdateFrequency_description2": "실시간 모드가 켜져 있을 때는 이 설정과 상관없이 실시간으로 콘텐츠가 업데이트됩니다.",
@@ -3512,8 +3399,6 @@ definePage(() => ({
 	"collapseRenotes": "이미 본 리노트를 간략화하기",
 	"collapseRenotesDescription": "리액션이나 리노트를 한 노트를 접어서 표시합니다.",
 	"pinnedList": "고정된 리스트",
-	"add": "추가",
-	"remove": "삭제",
 	"showNoteActionsOnlyHover": "마우스가 올라간 때에만 노트 동작 버튼을 표시하기",
 	"showClipButtonInNoteFooter": "노트 동작에 클립을 추가",
 	"showReactionsCount": "노트의 리액션 수를 표시하기",
@@ -3522,11 +3407,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "우클릭하여 리액션 선택기 열기",
 	"settingsShowAvailableReactionsFirstInNote": "이용 가능한 리액션을 선두로 표시",
 	"small": "작게",
-	"medium": "보통",
 	"large": "크게",
 	"reactionsDisplaySize": "리액션 표시 크기",
 	"limitWidthOfReaction": "리액션의 최대 폭을 제한하고 작게 표시하기",
-	"default": "기본값",
 	"limitTo": "{x}로 제한",
 	"mediaListWithOneImageAppearance": "이미지가 1개 뿐인 미디어 목록의 높이",
 	"showMediaListByGridInWideArea": "화면 폭이 넓을 때는 미디어 목록을 가로로 표시하기",
@@ -3547,8 +3430,6 @@ definePage(() => ({
 	"visibilityHome": "홈",
 	"visibilityFollowers": "팔로워",
 	"visibilitySpecified": "다이렉트",
-	"visibilityDisableFederation": "연합에 보내지 않기",
-	"notifications": "알림",
 	"useGroupedNotifications": "알림을 그룹화하고 표시",
 	"leftTop": "왼쪽 상단",
 	"rightTop": "오른쪽 상단",
@@ -3606,8 +3487,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "일부 확장 기능은 클라이언트의 동작에 간섭해 성능에 영향을 미칠 수 있습니다. 브라우저의 확장 기능을 비활성화해 개선할지 확인해주십시오.",
 	"dataSaver": "데이터 절약 모드",
 	"reloadRequiredToApplySettings": "설정을 적용하려면 새로고침을 해야 합니다.",
-	"enableAll": "전체 선택",
-	"disableAll": "전체 해제",
 	"dataSaverMediaTitle": "미디어 불러오기",
 	"dataSaverMediaDescription": "사진이나 동영상을 자동으로 불러오지 않습니다. 숨겨 놓은 사진이나 동영상은 누르면 불러옵니다.",
 	"dataSaverAvatarTitle": "아이콘 이미지",
@@ -3640,7 +3519,8 @@ definePage(() => ({
 	"statusbar": "상태바",
 	"deck": "덱",
 	"customCss": "CSS 사용자화",
-	"selectList": "리스트 선택"
+	"selectList": "리스트 선택",
+	"notifications": "알림"
 }
 </locale>
 
@@ -3658,9 +3538,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Device type",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Lage",
 	"middle": "Medium",
-	"high": "Hoge",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -3679,8 +3557,6 @@ definePage(() => ({
 	"collapseRenotes": "Renotes die je al gezien hebt, inklappen",
 	"collapseRenotesDescription": "Klapt notities in waar je al op gereageerd hebt of die je al gerenotet hebt.",
 	"pinnedList": "Pinned list",
-	"add": "Toevoegen",
-	"remove": "Verwijderen",
 	"showNoteActionsOnlyHover": "Toon notitiemenu alleen bij muisaanwijzer",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "Zie het aantal reacties op notities",
@@ -3689,11 +3565,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Open reactieselectie door rechts te klikken",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Klein",
-	"medium": "Medium",
 	"large": "Groot",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limiteert de maximale breedte van reacties en geef ze verkleind weer",
-	"default": "Standaard",
 	"limitTo": "Beperken tot {x}",
 	"mediaListWithOneImageAppearance": "Hoogte van medialijsten met slechts één afbeelding",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -3714,8 +3588,6 @@ definePage(() => ({
 	"visibilityHome": "Startpagina",
 	"visibilityFollowers": "Volgers",
 	"visibilitySpecified": "Directe notities",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "Meldingen",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Top left",
 	"rightTop": "Top right",
@@ -3773,8 +3645,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Data Saver",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Alle activeren",
-	"disableAll": "Alle deactiveren",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -3807,7 +3677,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Dek",
 	"customCss": "Aangepaste CSS",
-	"selectList": "Kies een lijst."
+	"selectList": "Kies een lijst.",
+	"notifications": "Meldingen"
 }
 </locale>
 
@@ -3825,9 +3696,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Device type",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Lav",
 	"middle": "Medium",
-	"high": "Høy",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -3846,8 +3715,6 @@ definePage(() => ({
 	"collapseRenotes": "Collapse renotes you've already seen",
 	"collapseRenotesDescription": "Collapse notes that you've reacted to or renoted before.",
 	"pinnedList": "Pinned list",
-	"add": "Legg til",
-	"remove": "Slett",
 	"showNoteActionsOnlyHover": "Only show note actions on hover",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "See the number of reactions in notes",
@@ -3856,11 +3723,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Open reaction picker on right-click",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Liten",
-	"medium": "Medium",
 	"large": "Stor",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Standard",
 	"limitTo": "Limit to {x}",
 	"mediaListWithOneImageAppearance": "Height of media lists with one image only",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -3881,8 +3746,6 @@ definePage(() => ({
 	"visibilityHome": "Hjem",
 	"visibilityFollowers": "Følgere",
 	"visibilitySpecified": "Direct",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "Varsler",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Top left",
 	"rightTop": "Top right",
@@ -3940,8 +3803,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Data Saver",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Enable all",
-	"disableAll": "Disable all",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -3974,7 +3835,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Velg en liste"
+	"selectList": "Velg en liste",
+	"notifications": "Varsler"
 }
 </locale>
 
@@ -3992,9 +3854,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Typ urządzenia",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Niski",
 	"middle": "Średnie",
-	"high": "Wysoki",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -4013,8 +3873,6 @@ definePage(() => ({
 	"collapseRenotes": "Zwiń wpisy, które już zobaczyłeś",
 	"collapseRenotesDescription": "Zwiń wpisy, na które już zareagowałeś lub udostępniłeś",
 	"pinnedList": "Pinned list",
-	"add": "Dodaj",
-	"remove": "Usuń",
 	"showNoteActionsOnlyHover": "Pokazuj akcje notatek tylko po najechaniu myszką",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "Wyświetl liczbę reakcji na notatkę",
@@ -4023,11 +3881,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Otwórz wybornik reakcji prawym kliknięciem",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Małe",
-	"medium": "Średnie",
 	"large": "Duże",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Domyślne",
 	"limitTo": "Limituj do {x}",
 	"mediaListWithOneImageAppearance": "Wysokość list multimediów z tylko jednym obrazem",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -4048,8 +3904,6 @@ definePage(() => ({
 	"visibilityHome": "Strona główna",
 	"visibilityFollowers": "Obserwujący",
 	"visibilitySpecified": "Bezpośredni",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "Powiadomienia",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Top left",
 	"rightTop": "Top right",
@@ -4107,8 +3961,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Data Saver",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Włącz wszystko",
-	"disableAll": "Wyłącz wszystko",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -4141,7 +3993,8 @@ definePage(() => ({
 	"statusbar": "Pasek stanu",
 	"deck": "Tablica",
 	"customCss": "Własny CSS",
-	"selectList": "Wybierz listę"
+	"selectList": "Wybierz listę",
+	"notifications": "Powiadomienia"
 }
 </locale>
 
@@ -4159,9 +4012,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Sobrepor dispositivo",
 	"realtimeMode": "Modo tempo-real",
 	"settingsRealtimeMode_description": "Estabelece uma conexão com o servidor e atualiza o conteúdo em tempo real. Isso pode aumentar o tráfego e uso de memória.",
-	"low": "Baixo",
 	"middle": "Meio",
-	"high": "Alto",
 	"settingsContentsUpdateFrequency": "Frequência da obtenção de conteúdo",
 	"settingsContentsUpdateFrequency_description": "Quanto maior o valor, mais o conteúdo atualiza. Porém, há uma diminuição do desempenho e aumento do tráfego e consumo de memória.",
 	"settingsContentsUpdateFrequency_description2": "Quando o modo tempo-real está ativado, o conteúdo é atualizado em tempo real, ignorando essa opção.",
@@ -4180,8 +4031,6 @@ definePage(() => ({
 	"collapseRenotes": "Ocultar repostagens já visualizadas",
 	"collapseRenotesDescription": "Colapsar notas em que você reagiu ou repostou.",
 	"pinnedList": "Lista fixada",
-	"add": "Adicionar",
-	"remove": "Remover",
 	"showNoteActionsOnlyHover": "Exibir as ações da nota somente ao passar o cursor sobre ela",
 	"showClipButtonInNoteFooter": "Adicionar \"Clip\" ao menu de ação de notas",
 	"showReactionsCount": "Ver o número de reações nas notas",
@@ -4190,11 +4039,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Clique com o botão direito do mouse para abrir o seletor de reações.",
 	"settingsShowAvailableReactionsFirstInNote": "Exibir reações disponíveis no topo.",
 	"small": "Pequeno",
-	"medium": "Médio",
 	"large": "Grande",
 	"reactionsDisplaySize": "Tamanho de exibição das reações",
 	"limitWidthOfReaction": "Limita o comprimento máximo de reações e as exibe em tamanho reduzido",
-	"default": "Predefinição",
 	"limitTo": "Até {x}",
 	"mediaListWithOneImageAppearance": "Altura da lista de mídias com apenas uma imagem",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -4215,8 +4062,6 @@ definePage(() => ({
 	"visibilityHome": "Início",
 	"visibilityFollowers": "Seguidores",
 	"visibilitySpecified": "Mensagem Direta",
-	"visibilityDisableFederation": "Defederar",
-	"notifications": "Notificações",
 	"useGroupedNotifications": "Agrupar notificações",
 	"leftTop": "Superior esquerdo",
 	"rightTop": "Superior direito",
@@ -4274,8 +4119,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Algumas extensões podem afetar comportamentos do cliente e afetar o desempenho. Por favor, desative as extensões do seu navegador e veja se isso melhora a situação.",
 	"dataSaver": "Economia de Dados",
 	"reloadRequiredToApplySettings": "É necessário reiniciar para aplicar as configurações.",
-	"enableAll": "Habilitar tudo",
-	"disableAll": "Desabilitar tudo",
 	"dataSaverMediaTitle": "Carregando mídia",
 	"dataSaverMediaDescription": "Previne que mídia seja carregada automaticamente. Mídias escondidas serão carregadas quando selecionadas.",
 	"dataSaverAvatarTitle": "Imagem do avatar",
@@ -4308,7 +4151,8 @@ definePage(() => ({
 	"statusbar": "Barra de status",
 	"deck": "Deck",
 	"customCss": "CSS Personalizado",
-	"selectList": "Selecione uma lista"
+	"selectList": "Selecione uma lista",
+	"notifications": "Notificações"
 }
 </locale>
 
@@ -4326,9 +4170,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Тип устройства",
 	"realtimeMode": "Режим реального времени",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Низкий",
 	"middle": "Средне",
-	"high": "Высокий",
 	"settingsContentsUpdateFrequency": "Частота получения данных",
 	"settingsContentsUpdateFrequency_description": "Чем больше значение тем больше обновляется контент, но производительность снижается и увеличивается трафик и потребление памяти.",
 	"settingsContentsUpdateFrequency_description2": "Когда режим реального времени включен, контент обновляется в реальном времени вне зависимости от этой настройки.",
@@ -4347,8 +4189,6 @@ definePage(() => ({
 	"collapseRenotes": "Сворачивать увиденные репосты",
 	"collapseRenotesDescription": "Сворачивать заметки с которыми вы взаимодействовали.",
 	"pinnedList": "Закреплённый список",
-	"add": "Добавить",
-	"remove": "Удалить",
 	"showNoteActionsOnlyHover": "Показывать кнопки у заметок только при наведении",
 	"showClipButtonInNoteFooter": "Показать кнопку добавления в подборку в меню действий с заметкой",
 	"showReactionsCount": "Видеть количество реакций на заметках",
@@ -4357,11 +4197,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Открывать палитру реакций правой кнопкой",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Мелко",
-	"medium": "Средне",
 	"large": "Крупно",
 	"reactionsDisplaySize": "Размер реакций",
 	"limitWidthOfReaction": "Ограничить максимальную ширину реакций и отображать их в уменьшенном размере.",
-	"default": "По умолчанию",
 	"limitTo": "Ограничить до {x}",
 	"mediaListWithOneImageAppearance": "Вид изображения, если оно единственное в списке",
 	"showMediaListByGridInWideArea": "Показывать медиа сеткой когда экран достаточно широкий",
@@ -4382,8 +4220,6 @@ definePage(() => ({
 	"visibilityHome": "Домашняя",
 	"visibilityFollowers": "Для подписчиков",
 	"visibilitySpecified": "Личное",
-	"visibilityDisableFederation": "Отключить федерацию",
-	"notifications": "Уведомления",
 	"useGroupedNotifications": "Отображать уведомления сгруппировано",
 	"leftTop": "Слева вверху",
 	"rightTop": "Справа сверху",
@@ -4441,8 +4277,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Экономия трафика",
 	"reloadRequiredToApplySettings": "Для применения настроек необходима обновить страницу.",
-	"enableAll": "Включить все",
-	"disableAll": "Выключить всё",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -4475,7 +4309,8 @@ definePage(() => ({
 	"statusbar": "Статусбар",
 	"deck": "Пульт",
 	"customCss": "Пользовательский CSS",
-	"selectList": "Выберите список"
+	"selectList": "Выберите список",
+	"notifications": "Уведомления"
 }
 </locale>
 
@@ -4493,9 +4328,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Typ zariadenia",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Málo",
 	"middle": "Stredné",
-	"high": "Vysoká",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -4514,8 +4347,6 @@ definePage(() => ({
 	"collapseRenotes": "Collapse renotes you've already seen",
 	"collapseRenotesDescription": "Collapse notes that you've reacted to or renoted before.",
 	"pinnedList": "Pinned list",
-	"add": "Pridať",
-	"remove": "Odstrániť",
 	"showNoteActionsOnlyHover": "Ovládacie prvky poznámky sa zobrazujú len po nabehnutí myši",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "See the number of reactions in notes",
@@ -4524,11 +4355,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Otvoriť výber reakcií na pravý klik",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Malé",
-	"medium": "Stredné",
 	"large": "Veľké",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Predvolené",
 	"limitTo": "Limit to {x}",
 	"mediaListWithOneImageAppearance": "Height of media lists with one image only",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -4549,8 +4378,6 @@ definePage(() => ({
 	"visibilityHome": "Domov",
 	"visibilityFollowers": "Sledujúci",
 	"visibilitySpecified": "Priame",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "Oznámenia",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Top left",
 	"rightTop": "Top right",
@@ -4608,8 +4435,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Data Saver",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Povoliť všetko",
-	"disableAll": "Vypnúť všetko",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -4642,7 +4467,8 @@ definePage(() => ({
 	"statusbar": "Stavový riadok",
 	"deck": "Deck",
 	"customCss": "Vlastné CSS",
-	"selectList": "Vyberte zoznam"
+	"selectList": "Vyberte zoznam",
+	"notifications": "Oznámenia"
 }
 </locale>
 
@@ -4660,9 +4486,7 @@ definePage(() => ({
 	"overridedDeviceKind": "ประเภทอุปกรณ์",
 	"realtimeMode": "โหมดเรียลไทม์",
 	"settingsRealtimeMode_description": "เชื่อมต่อกับเซิร์ฟเวอร์และอัปเดตเนื้อหาแบบเรียลไทม์ อาจทำให้ใช้ปริมาณข้อมูลและแบตเตอรี่มากขึ้นได้",
-	"low": "ต่ำ",
 	"middle": "ปานกลาง",
-	"high": "สูง",
 	"settingsContentsUpdateFrequency": "ความถี่ในการดึงข้อมูลเนื้อหา",
 	"settingsContentsUpdateFrequency_description": "ยิ่งตั้งค่าสูง เนื้อหาจะอัปเดตแบบเรียลไทม์มากขึ้น แต่ประสิทธิภาพอาจลดลง และการใช้ข้อมูลกับแบตเตอรี่จะเพิ่มมากขึ้น",
 	"settingsContentsUpdateFrequency_description2": "เมื่อโหมดเรียลไทม์เปิดอยู่ เนื้อหาจะอัปเดตแบบเรียลไทม์โดยไม่ขึ้นกับการตั้งค่านี้",
@@ -4681,8 +4505,6 @@ definePage(() => ({
 	"collapseRenotes": "ยุบรีโน้ตที่คุณเคยเห็นแล้ว",
 	"collapseRenotesDescription": "พับย่อโน้ตที่เคยตอบสนองหรือรีโน้ตแล้ว",
 	"pinnedList": "รายชื่อที่ปักหมุดไว้",
-	"add": "เพิ่ม",
-	"remove": "ลบ",
 	"showNoteActionsOnlyHover": "แสดงการดำเนินการโน้ตเมื่อโฮเวอร์(วางเมาส์เหนือ)เท่านั้น",
 	"showClipButtonInNoteFooter": "เพิ่ม “คลิป” ไปยังเมนูสั่งการของโน้ต",
 	"showReactionsCount": "แสดงจำนวนรีแอกชั่นในโน้ต",
@@ -4691,11 +4513,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "คลิกขวาเพื่อเปิดตัวจิ้มรีแอคชั่น",
 	"settingsShowAvailableReactionsFirstInNote": "แสดงรีแอคชั่นที่ใช้ได้ไว้หน้าสุด",
 	"small": "เล็ก",
-	"medium": "ปานกลาง",
 	"large": "ใหญ่",
 	"reactionsDisplaySize": "ขนาดของรีแอคชั่น",
 	"limitWidthOfReaction": "จำกัดความกว้างสูงสุดของรีแอคชั่นและแสดงให้เล็กลง",
-	"default": "ค่าเริ่มต้น",
 	"limitTo": "จำกัดไว้ที่ {x}",
 	"mediaListWithOneImageAppearance": "ความสูงของรายการสื่อที่มีเพียงรูปเดียว",
 	"showMediaListByGridInWideArea": "เมื่อหน้าจอกว้างยาวขึ้น ให้เรียงรายการสื่อเป็นแนวนอน",
@@ -4716,8 +4536,6 @@ definePage(() => ({
 	"visibilityHome": "หน้าหลัก",
 	"visibilityFollowers": "ผู้ติดตาม",
 	"visibilitySpecified": "ไดเร็ค",
-	"visibilityDisableFederation": "การปิดใช้งานสหพันธ์",
-	"notifications": "เเจ้งเตือน",
 	"useGroupedNotifications": "แสดงผลการแจ้งเตือนแบบกลุ่มแล้ว",
 	"leftTop": "บนซ้าย",
 	"rightTop": "บนขวา",
@@ -4775,8 +4593,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "ส่วนเสริมบางตัวอาจรบกวนการทำงานของไคลเอนต์และทำให้ประสิทธิภาพลดลง กรุณาลองปิดส่วนเสริมในเบราว์เซอร์แล้วตรวจสอบอีกครั้ง",
 	"dataSaver": "ประหยัดข้อมูล",
 	"reloadRequiredToApplySettings": "จำเป็นต้องมีการโหลดซ้ำเพื่อให้การตั้งค่ามีผล",
-	"enableAll": "เปิดใช้งานทั้งหมด",
-	"disableAll": "ปิดการใช้งานทั้งหมด",
 	"dataSaverMediaTitle": "ปิดใช้งานการโหลดสื่ออัตโนมัติ",
 	"dataSaverMediaDescription": "กันไม่ให้ภาพและวิดีโอโหลดโดยอัตโนมัติ แตะรูปภาพ/วิดีโอที่ซ่อนอยู่เพื่อโหลด",
 	"dataSaverAvatarTitle": "ปิดใช้งานภาพเคลื่อนไหวของไอคอนประจำตัว",
@@ -4809,7 +4625,8 @@ definePage(() => ({
 	"statusbar": "แถบสถานะ",
 	"deck": "เด็ค",
 	"customCss": "CSS แบบกำหนดเอง",
-	"selectList": "เลือกรายชื่อ"
+	"selectList": "เลือกรายชื่อ",
+	"notifications": "เเจ้งเตือน"
 }
 </locale>
 
@@ -4827,9 +4644,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Cihaz türü",
 	"realtimeMode": "Gerçek zamanlı mod",
 	"settingsRealtimeMode_description": "Sunucu ile bağlantı kurar ve içeriği gerçek zamanlı olarak günceller. Bu, trafik ve bellek tüketimini artırabilir.",
-	"low": "Düşük",
 	"middle": "Orta",
-	"high": "Yüksek",
 	"settingsContentsUpdateFrequency": "İçerik erişim sıklığı",
 	"settingsContentsUpdateFrequency_description": "Değer ne kadar yüksek olursa içerik o kadar sık güncellenir, ancak bu durum performansı düşürür ve trafik ile bellek tüketimini artırır.",
 	"settingsContentsUpdateFrequency_description2": "Gerçek zamanlı mod açık olduğunda, bu ayardan bağımsız olarak içerik gerçek zamanlı olarak güncellenir.",
@@ -4848,8 +4663,6 @@ definePage(() => ({
 	"collapseRenotes": "Daha önce görüntülenen Renote'lari kısaltılmış olarak göster",
 	"collapseRenotesDescription": "Zaten yanıtladığın veya renote aldığın notları kapat.",
 	"pinnedList": "Sabitlenmiş liste",
-	"add": "Ekle",
-	"remove": "Sil",
 	"showNoteActionsOnlyHover": "Not eylemlerini yalnızca üzerine gelindiğinde göster",
 	"showClipButtonInNoteFooter": "Not eylem menüsüne “Klip” ekle",
 	"showReactionsCount": "Notlardaki tepki sayısını gör",
@@ -4858,11 +4671,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Sağ tıklama ile tepki seçiciyi aç",
 	"settingsShowAvailableReactionsFirstInNote": "Mevcut tepkileri en üstte göster.",
 	"small": "Küçük",
-	"medium": "Orta",
 	"large": "Büyük",
 	"reactionsDisplaySize": "Tepki ekran boyutu",
 	"limitWidthOfReaction": "Tepkilerin maksimum genişliğini sınırla ve bunları küçültülmüş boyutta görüntüle.",
-	"default": "Varsayılan",
 	"limitTo": "{x} ile sınırlandır",
 	"mediaListWithOneImageAppearance": "Tek bir resim içeren medya listelerinin yüksekliği",
 	"showMediaListByGridInWideArea": "Ekran genişliği geniş olduğunda, medya listesi yatay olarak görüntülenecektir.",
@@ -4883,8 +4694,6 @@ definePage(() => ({
 	"visibilityHome": "Pano",
 	"visibilityFollowers": "Takipçiler",
 	"visibilitySpecified": "Doğrudan",
-	"visibilityDisableFederation": "Federasyon olmadan",
-	"notifications": "Bildirimler",
 	"useGroupedNotifications": "Gruplandırılmış bildirimleri göster",
 	"leftTop": "Sol üst",
 	"rightTop": "Sağ üst",
@@ -4942,8 +4751,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Bazı uzantılar istemci davranışını engelleyebilir ve performansı etkileyebilir. Lütfen tarayıcı uzantılarınızı devre dışı bırakın ve durumun düzelip düzelmediğini kontrol edin.",
 	"dataSaver": "Veri Tasarrufu",
 	"reloadRequiredToApplySettings": "Ayarları uygulamak için yeniden yükleme gereklidir.",
-	"enableAll": "Tümünü etkinleştir",
-	"disableAll": "Tümünü devre dışı bırak",
 	"dataSaverMediaTitle": "Medya yükleniyor",
 	"dataSaverMediaDescription": "Görüntülerin/videoların otomatik olarak yüklenmesini engeller. Gizli görüntüler/videolar dokunulduğunda yüklenir.",
 	"dataSaverAvatarTitle": "Avatar resmi",
@@ -4976,7 +4783,8 @@ definePage(() => ({
 	"statusbar": "Durum çubuğu",
 	"deck": "Deck",
 	"customCss": "Özel CSS",
-	"selectList": "Bir liste seç"
+	"selectList": "Bir liste seç",
+	"notifications": "Bildirimler"
 }
 </locale>
 
@@ -4994,9 +4802,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Device type",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Low",
 	"middle": "Medium",
-	"high": "High",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -5015,8 +4821,6 @@ definePage(() => ({
 	"collapseRenotes": "Collapse renotes you've already seen",
 	"collapseRenotesDescription": "Collapse notes that you've reacted to or renoted before.",
 	"pinnedList": "Pinned list",
-	"add": "Add",
-	"remove": "ئۆچۈرۈش",
 	"showNoteActionsOnlyHover": "Only show note actions on hover",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "See the number of reactions in notes",
@@ -5025,11 +4829,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Open reaction picker on right-click",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Small",
-	"medium": "Medium",
 	"large": "Big",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Default",
 	"limitTo": "Limit to {x}",
 	"mediaListWithOneImageAppearance": "Height of media lists with one image only",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -5050,8 +4852,6 @@ definePage(() => ({
 	"visibilityHome": "Home",
 	"visibilityFollowers": "Followers",
 	"visibilitySpecified": "Direct",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "Notifications",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Top left",
 	"rightTop": "Top right",
@@ -5109,8 +4909,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Data Saver",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Enable all",
-	"disableAll": "Disable all",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -5143,7 +4941,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Select a list"
+	"selectList": "Select a list",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -5161,9 +4960,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Тип пристрою",
 	"realtimeMode": "Режим реального часу",
 	"settingsRealtimeMode_description": "Стабілізує з'єднання з сервером й оновлює контент у реальному часі. Це може збільшити використання трафіку та споживання пам'яті.",
-	"low": "Низький",
 	"middle": "Середній",
-	"high": "Високий",
 	"settingsContentsUpdateFrequency": "Частота оновлення контенту",
 	"settingsContentsUpdateFrequency_description": "Більше значення спричиняє до швидшого оновлення контенту, але зменшує продуктивність й збільшує споживання трафіку як і використання пам'яті. ",
 	"settingsContentsUpdateFrequency_description2": "Коли режим реального часу увімкнуто, контент оновляється у реальному часі попри цього налаштування. ",
@@ -5182,8 +4979,6 @@ definePage(() => ({
 	"collapseRenotes": "Згортати поширення, які ви вже бачили",
 	"collapseRenotesDescription": "Згортати нотатки, на які ви вже відреагували або які поширили раніше.",
 	"pinnedList": "Закріплений список",
-	"add": "Додати",
-	"remove": "Видалити",
 	"showNoteActionsOnlyHover": "Показувати дії з нотаткою лише при наведенні",
 	"showClipButtonInNoteFooter": "Додати «Добірка» до меню дій нотатки",
 	"showReactionsCount": "Показувати кількість реакцій у нотатках",
@@ -5192,11 +4987,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Відкривати палітру реакцій правою кнопкою",
 	"settingsShowAvailableReactionsFirstInNote": "Показувати доступні реакції зверху.",
 	"small": "Маленький",
-	"medium": "Середній",
 	"large": "Крупний",
 	"reactionsDisplaySize": "Розмір відображення реакцій",
 	"limitWidthOfReaction": "Обмежити максимальну ширину реакцій і показувати їх у зменшеному розмірі.",
-	"default": "За умовчанням",
 	"limitTo": "Обмежити до {x}",
 	"mediaListWithOneImageAppearance": "Висота списків медіа лише з одним зображенням",
 	"showMediaListByGridInWideArea": "Відображати список медіа у вигляді сітки, коли екран достатньо широкий",
@@ -5217,8 +5010,6 @@ definePage(() => ({
 	"visibilityHome": "Домівка",
 	"visibilityFollowers": "Підписники",
 	"visibilitySpecified": "Особисто",
-	"visibilityDisableFederation": "Defederate",
-	"notifications": "Сповіщення",
 	"useGroupedNotifications": "Показувати згруповані сповіщення",
 	"leftTop": "Ліворуч зверху",
 	"rightTop": "Праворуч зверху",
@@ -5276,8 +5067,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Заощадження трафіку",
 	"reloadRequiredToApplySettings": "Щоб застосувати налаштування, потрібно перезавантажити сторінку.",
-	"enableAll": "Увімкнути все",
-	"disableAll": "Вимкнути все",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -5310,7 +5099,8 @@ definePage(() => ({
 	"statusbar": "Рядок стану",
 	"deck": "Дек",
 	"customCss": "Власний CSS",
-	"selectList": "Виберіть список"
+	"selectList": "Виберіть список",
+	"notifications": "Сповіщення"
 }
 </locale>
 
@@ -5328,9 +5118,7 @@ definePage(() => ({
 	"overridedDeviceKind": "Loại thiết bị",
 	"realtimeMode": "Real-time mode",
 	"settingsRealtimeMode_description": "Establishes a connection with the server and updates content in real time. This may increase traffic and memory consumption.",
-	"low": "Thấp",
 	"middle": "Vừa",
-	"high": "Cao",
 	"settingsContentsUpdateFrequency": "Frequency of content retrieval",
 	"settingsContentsUpdateFrequency_description": "The higher the value the more the content updates but it lowers the performance and increases the traffic and memory consumption.",
 	"settingsContentsUpdateFrequency_description2": "When real-time mode is on, content is updated in real time regardless of this setting.",
@@ -5349,8 +5137,6 @@ definePage(() => ({
 	"collapseRenotes": "Không hiển thị bài viết đã từng xem",
 	"collapseRenotesDescription": "Các bài đăng bị thu gọn mà bạn đã phản hồi hoặc đăng lại trước đây.",
 	"pinnedList": "Các mục đã được ghim",
-	"add": "Thêm",
-	"remove": "Xóa",
 	"showNoteActionsOnlyHover": "Chỉ hiển thị các hành động ghi chú khi di chuột",
 	"showClipButtonInNoteFooter": "Add \"Clip\" to note action menu",
 	"showReactionsCount": "Hiển thị số reaction trong bài đăng",
@@ -5359,11 +5145,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "Nhấn chuột phải để mở bộ chọn biểu cảm",
 	"settingsShowAvailableReactionsFirstInNote": "Show available reactions at the top.",
 	"small": "Nhỏ",
-	"medium": "Vừa",
 	"large": "Lớn",
 	"reactionsDisplaySize": "Reaction display size",
 	"limitWidthOfReaction": "Limit the maximum width of reactions and display them in reduced size.",
-	"default": "Mặc định",
 	"limitTo": "Giới hạn tỷ lệ {x}",
 	"mediaListWithOneImageAppearance": "Chiều cao của danh sách nội dung đã phương tiện mà chỉ có một hình ảnh",
 	"showMediaListByGridInWideArea": "Display the media list in a grid when the screen width is wide",
@@ -5384,8 +5168,6 @@ definePage(() => ({
 	"visibilityHome": "Trang chính",
 	"visibilityFollowers": "Người theo dõi",
 	"visibilitySpecified": "Nhắn riêng",
-	"visibilityDisableFederation": "Không liên hợp",
-	"notifications": "Thông báo",
 	"useGroupedNotifications": "Display grouped notifications",
 	"leftTop": "Phía trên bên tráí",
 	"rightTop": "Phía trên bên phải",
@@ -5443,8 +5225,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "Some extensions may interfere with client behavior and affect performance. Please disable your browser extensions and see if this improves the situation.",
 	"dataSaver": "Tiết kiệm dung lượng",
 	"reloadRequiredToApplySettings": "Reloading is required to apply the settings.",
-	"enableAll": "Bật toàn bộ",
-	"disableAll": "Tắt toàn bộ",
 	"dataSaverMediaTitle": "Loading Media",
 	"dataSaverMediaDescription": "Prevents images/videos from being loaded automatically. Hidden images/videos will be loaded when tapped.",
 	"dataSaverAvatarTitle": "Avatar image",
@@ -5477,7 +5257,8 @@ definePage(() => ({
 	"statusbar": "Thanh trạng thái",
 	"deck": "Deck",
 	"customCss": "Tùy chỉnh CSS",
-	"selectList": "Chọn danh sách"
+	"selectList": "Chọn danh sách",
+	"notifications": "Thông báo"
 }
 </locale>
 
@@ -5495,9 +5276,7 @@ definePage(() => ({
 	"overridedDeviceKind": "设备类型",
 	"realtimeMode": "实时模式",
 	"settingsRealtimeMode_description": "与服务器建立连接并实时更新内容。将会增加流量和电池消耗。",
-	"low": "低",
 	"middle": "中",
-	"high": "高",
 	"settingsContentsUpdateFrequency": "内容获取频率",
 	"settingsContentsUpdateFrequency_description": "设置越高，内容更新越实时，但性能会降低，并且会消耗更多的流量和电池。",
 	"settingsContentsUpdateFrequency_description2": "当实时模式开启时，无论此设置如何，内容都会实时更新。",
@@ -5516,8 +5295,6 @@ definePage(() => ({
 	"collapseRenotes": "折叠已经看过的转贴",
 	"collapseRenotesDescription": "折叠显示回应或转发过的帖文。",
 	"pinnedList": "已置顶的列表",
-	"add": "添加",
-	"remove": "删除",
 	"showNoteActionsOnlyHover": "仅在悬停时显示帖子操作",
 	"showClipButtonInNoteFooter": "在帖文下方显示便签按钮",
 	"showReactionsCount": "显示帖子的回应数",
@@ -5526,11 +5303,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "单击右键打开回应工具栏",
 	"settingsShowAvailableReactionsFirstInNote": "在顶部显示可用的回应",
 	"small": "小",
-	"medium": "中",
 	"large": "大",
 	"reactionsDisplaySize": "回应显示大小",
 	"limitWidthOfReaction": "限制回应的最大宽度，并将其缩小显示",
-	"default": "默认",
 	"limitTo": "上限为 {x}",
 	"mediaListWithOneImageAppearance": "仅一张图片的媒体列表高度",
 	"showMediaListByGridInWideArea": "在宽屏上并排显示媒体列表",
@@ -5551,8 +5326,6 @@ definePage(() => ({
 	"visibilityHome": "首页",
 	"visibilityFollowers": "仅关注者",
 	"visibilitySpecified": "指定用户",
-	"visibilityDisableFederation": "仅限本地",
-	"notifications": "通知",
 	"useGroupedNotifications": "分组显示通知",
 	"leftTop": "屏幕左上方",
 	"rightTop": "屏幕右上方",
@@ -5610,8 +5383,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "某些扩展可能会干扰客户端的运行并影响性能。尝试禁用浏览器扩展并查看是否有改善。",
 	"dataSaver": "省流量模式",
 	"reloadRequiredToApplySettings": "需要重新载入来使设置生效",
-	"enableAll": "启用全部",
-	"disableAll": "禁用全部",
 	"dataSaverMediaTitle": "加载媒体",
 	"dataSaverMediaDescription": "防止自动加载图像和视频。 点击隐藏的图像/视频即可加载它们。\n",
 	"dataSaverAvatarTitle": "头像",
@@ -5644,7 +5415,8 @@ definePage(() => ({
 	"statusbar": "状态栏",
 	"deck": "Deck",
 	"customCss": "自定义 CSS",
-	"selectList": "选择列表"
+	"selectList": "选择列表",
+	"notifications": "通知"
 }
 </locale>
 
@@ -5662,9 +5434,7 @@ definePage(() => ({
 	"overridedDeviceKind": "裝置類型",
 	"realtimeMode": "即時模式",
 	"settingsRealtimeMode_description": "已與伺服器建立連線，將即時更新內容。這可能會增加資料傳輸量與電池消耗。\n",
-	"low": "低",
 	"middle": "中",
-	"high": "高",
 	"settingsContentsUpdateFrequency": "內容取得頻率",
 	"settingsContentsUpdateFrequency_description": "頻率越高，內容更新越即時，但可能會降低效能，並增加資料傳輸量與電池消耗。\n",
 	"settingsContentsUpdateFrequency_description2": "當即時模式開啟時，不論此設定為何，內容都會即時更新。",
@@ -5683,8 +5453,6 @@ definePage(() => ({
 	"collapseRenotes": "省略顯示已看過的轉發貼文",
 	"collapseRenotesDescription": "將已做過反應和轉發的貼文折疊顯示。",
 	"pinnedList": "已置頂的清單",
-	"add": "新增",
-	"remove": "刪除",
 	"showNoteActionsOnlyHover": "僅於游標懸停時顯示貼文選項",
 	"showClipButtonInNoteFooter": "新增摘錄按鈕至貼文",
 	"showReactionsCount": "顯示貼文的反應數目",
@@ -5693,11 +5461,9 @@ definePage(() => ({
 	"useReactionPickerForContextMenu": "點擊右鍵開啟反應選擇器",
 	"settingsShowAvailableReactionsFirstInNote": "將可用的反應顯示在頂部",
 	"small": "小",
-	"medium": "中",
 	"large": "大",
 	"reactionsDisplaySize": "反應的顯示尺寸",
 	"limitWidthOfReaction": "限制反應的最大寬度，並縮小顯示尺寸。",
-	"default": "預設",
 	"limitTo": "上限為 {x}",
 	"mediaListWithOneImageAppearance": "只有一張圖片時的檔案列表高度",
 	"showMediaListByGridInWideArea": "當畫面寬度較寬時，將媒體清單以橫向排列顯示",
@@ -5718,8 +5484,6 @@ definePage(() => ({
 	"visibilityHome": "首頁",
 	"visibilityFollowers": "追隨者",
 	"visibilitySpecified": "指定使用者",
-	"visibilityDisableFederation": "停用聯邦",
-	"notifications": "通知",
 	"useGroupedNotifications": "分組顯示通知訊息",
 	"leftTop": "左上",
 	"rightTop": "右上",
@@ -5777,8 +5541,6 @@ definePage(() => ({
 	"clientPerformanceIssueTipMakeSureDisabledAddons_description": "部分擴充功能可能會干擾用戶端的運作並影響效能。請嘗試停用瀏覽器的擴充功能，以確認是否能改善情況",
 	"dataSaver": "數據節省模式",
 	"reloadRequiredToApplySettings": "需要重新載入頁面設定才能生效。",
-	"enableAll": "啟用全部",
-	"disableAll": "停用全部",
 	"dataSaverMediaTitle": "載入媒體檔案",
 	"dataSaverMediaDescription": "防止自動載入圖片和影片。點擊隱藏的圖片/影片即可載入。",
 	"dataSaverAvatarTitle": "大頭貼",
@@ -5811,6 +5573,7 @@ definePage(() => ({
 	"statusbar": "狀態列",
 	"deck": "多欄模式",
 	"customCss": "自定義 CSS",
-	"selectList": "選擇清單"
+	"selectList": "選擇清單",
+	"notifications": "通知"
 }
 </locale>

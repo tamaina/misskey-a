@@ -24,6 +24,7 @@ export const packedChannelSchema = v.strictObject({
 	"notesCount": v.pipe(v.number(), v.finite()),
 	"isSensitive": v.boolean(),
 	"isFederated": v.boolean(),
+	"isFederationFrozen": v.boolean(),
 	"uri": v.nullable(v.string()),
 	"host": v.nullable(v.string()),
 	"allowRenoteToExternal": v.boolean(),

@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div :class="$style.passkeyDescription">{{ $locale.sfc.useSecurityKey }}</div>
 		</div>
 
-		<MkButton large primary rounded :disabled="queryingKey" style="margin: 0 auto;" @click="queryKey">{{ $locale.sfc.retry }}</MkButton>
+		<MkButton large primary rounded :disabled="queryingKey" style="margin: 0 auto;" @click="queryKey">{{ globalLocale.env.retry }}</MkButton>
 
 		<MkButton v-if="isPerformingPasswordlessLogin !== true && canUseTotp !== false" transparent rounded :disabled="queryingKey" style="margin: 0 auto;" @click="emit('useTotp')">{{ $locale.sfc.useTotp }}</MkButton>
 	</div>
@@ -21,12 +21,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, onMounted } from 'vue';
 import { startAuthentication } from '@simplewebauthn/browser';
 
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
+import type { Locale } from 'i18n';
 
 import type { PublicKeyCredentialRequestOptionsJSON, AuthenticationResponseJSON } from '@simplewebauthn/browser';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	credentialRequest: PublicKeyCredentialRequestOptionsJSON;
@@ -93,7 +97,6 @@ onMounted(() => {
 <locale locale="ar-SA" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "حاول مجددًا",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -101,7 +104,6 @@ onMounted(() => {
 <locale locale="ca-ES" lang="json">
 {
   "useSecurityKey": "Segueix les instruccions del teu navegador O dispositiu per fer servir el teu passkey.",
-  "retry": "Torna-ho a provar",
   "useTotp": "Usa una contrasenya d'un sol ús"
 }
 </locale>
@@ -109,7 +111,6 @@ onMounted(() => {
 <locale locale="cs-CZ" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Opakovat",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -117,7 +118,6 @@ onMounted(() => {
 <locale locale="da-DK" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Retry",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -125,7 +125,6 @@ onMounted(() => {
 <locale locale="de-DE" lang="json">
 {
   "useSecurityKey": "Folge bitten den Anweisungen deines Browsers bzw. Gerätes und verwende deinen Hardware-Sicherheitsschlüssel oder Passkey.",
-  "retry": "Wiederholen",
   "useTotp": "Gib das Einmalpasswort ein"
 }
 </locale>
@@ -133,7 +132,6 @@ onMounted(() => {
 <locale locale="en-US" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Retry",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -141,7 +139,6 @@ onMounted(() => {
 <locale locale="es-ES" lang="json">
 {
   "useSecurityKey": "Por favor, sigue las instrucciones de tu dispositivo o navegador para usar tu clave de seguridad o tu clave de paso.",
-  "retry": "Reintentar",
   "useTotp": "Introduce la contraseña de un solo uso"
 }
 </locale>
@@ -149,7 +146,6 @@ onMounted(() => {
 <locale locale="fr-FR" lang="json">
 {
   "useSecurityKey": "Suivez les instructions de votre navigateur ou de votre appareil pour utiliser une clé de sécurité ou une clé d'accès.",
-  "retry": "Réessayer",
   "useTotp": "Entrer un mot de passe à usage unique"
 }
 </locale>
@@ -157,7 +153,6 @@ onMounted(() => {
 <locale locale="id-ID" lang="json">
 {
   "useSecurityKey": "Mohon ikuti instruksi peramban atau perangkat kamu untuk menggunakan kunci pengaman atau passkey.",
-  "retry": "Coba lagi",
   "useTotp": "Gunakan TOTP"
 }
 </locale>
@@ -165,7 +160,6 @@ onMounted(() => {
 <locale locale="it-IT" lang="json">
 {
   "useSecurityKey": "Per utilizzare la chiave di sicurezza o la passkey, segui le indicazioni del dispositivo",
-  "retry": "Riprova",
   "useTotp": "Usare il codice OTP"
 }
 </locale>
@@ -173,7 +167,6 @@ onMounted(() => {
 <locale locale="ja-JP" lang="json">
 {
   "useSecurityKey": "ブラウザまたはデバイスの指示に従って、セキュリティキーまたはパスキーを使用してください。",
-  "retry": "再試行",
   "useTotp": "ワンタイムパスワードを使う"
 }
 </locale>
@@ -181,7 +174,6 @@ onMounted(() => {
 <locale locale="ja-KS" lang="json">
 {
   "useSecurityKey": "ブラウザまたはデバイスの言う通りに、セキュリティキーまたはパスキーを使ってや。",
-  "retry": "もっぺんやる？",
   "useTotp": "ワンタイムパスワードを使う"
 }
 </locale>
@@ -189,7 +181,6 @@ onMounted(() => {
 <locale locale="kab-KAB" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Retry",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -197,7 +188,6 @@ onMounted(() => {
 <locale locale="kn-IN" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Retry",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -205,7 +195,6 @@ onMounted(() => {
 <locale locale="ko-KR" lang="json">
 {
   "useSecurityKey": "브라우저 또는 기기의 안내에 따라 보안 키 또는 패스키를 사용해 주십시오.",
-  "retry": "다시 시도",
   "useTotp": "일회용 비밀번호 사용"
 }
 </locale>
@@ -213,7 +202,6 @@ onMounted(() => {
 <locale locale="nl-NL" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Probeer opnieuw",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -221,7 +209,6 @@ onMounted(() => {
 <locale locale="no-NO" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Prøv igjen",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -229,7 +216,6 @@ onMounted(() => {
 <locale locale="pl-PL" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Spróbuj ponownie",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -237,7 +223,6 @@ onMounted(() => {
 <locale locale="pt-PT" lang="json">
 {
   "useSecurityKey": "Por favor, siga as instruções do seu navegador ou dispositivo para utilizar uma chave de acesso.",
-  "retry": "Tente novamente",
   "useTotp": "Digite a senha de uso único"
 }
 </locale>
@@ -245,7 +230,6 @@ onMounted(() => {
 <locale locale="ru-RU" lang="json">
 {
   "useSecurityKey": "Используйте ключ безопасности или Passkey, следуя подсказкам браузера",
-  "retry": "Повторить попытку",
   "useTotp": "Включить двухэтапную проверку"
 }
 </locale>
@@ -253,7 +237,6 @@ onMounted(() => {
 <locale locale="sk-SK" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Opakovať",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -261,7 +244,6 @@ onMounted(() => {
 <locale locale="th-TH" lang="json">
 {
   "useSecurityKey": "โปรดปฏิบัติตามคำแนะนำของเบราว์เซอร์หรืออุปกรณ์ของคุณเพื่อใช้ security key หรือ passkey",
-  "retry": "ลองใหม่อีกครั้ง",
   "useTotp": "ใช้รหัสผ่านแบบใช้ครั้งเดียว (TOTP)"
 }
 </locale>
@@ -269,7 +251,6 @@ onMounted(() => {
 <locale locale="tr-TR" lang="json">
 {
   "useSecurityKey": "Güvenlik anahtarını veya şifreni kullanmak için lütfen tarayıcının veya cihazının talimatlarını izle.",
-  "retry": "Tekrar dene",
   "useTotp": "Tek Kullanımlık Şifreyi Girin"
 }
 </locale>
@@ -277,7 +258,6 @@ onMounted(() => {
 <locale locale="ug-CN" lang="json">
 {
   "useSecurityKey": "Please follow your browser's or device's instructions to use your security- or passkey.",
-  "retry": "Retry",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -285,7 +265,6 @@ onMounted(() => {
 <locale locale="uk-UA" lang="json">
 {
   "useSecurityKey": "Дотримуйтеся інструкцій вашого браузера або пристрою, щоб скористатися ключем безпеки або passkey.",
-  "retry": "Спробувати знову",
   "useTotp": "Введіть одноразовий пароль"
 }
 </locale>
@@ -293,7 +272,6 @@ onMounted(() => {
 <locale locale="vi-VN" lang="json">
 {
   "useSecurityKey": "Làm theo hướng dẫn trên trình duyệt hoặc thiết bị của bạn để sử dụng khóa bảo mật hoặc mật mã.",
-  "retry": "Thử lại",
   "useTotp": "Enter the One-Time Password"
 }
 </locale>
@@ -301,7 +279,6 @@ onMounted(() => {
 <locale locale="zh-CN" lang="json">
 {
   "useSecurityKey": "请根据浏览器或设备的提示，使用安全密钥或通行密钥。",
-  "retry": "重试",
   "useTotp": "使用一次性代码"
 }
 </locale>
@@ -309,7 +286,6 @@ onMounted(() => {
 <locale locale="zh-TW" lang="json">
 {
   "useSecurityKey": "請按照瀏覽器或裝置上的說明來使用安全金鑰或通行金鑰。",
-  "retry": "重試",
   "useTotp": "使用一次性密碼"
 }
 </locale>

@@ -38,6 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { entities } from 'misskey-js';
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue';
 import XRecipient from '@features/moderation/frontend/pages/admin/abuse-report/notification-recipient.item.vue';
@@ -48,6 +49,9 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import MkDivider from '@features/ui/frontend/components/MkDivider.vue';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const recipients = ref<entities.AbuseReportNotificationRecipient[]>([]);
 
@@ -56,7 +60,7 @@ const {
 	def: filterMethodDef,
 } = useMkSelect({
 	items: [
-		{ label: $locale.value.sfc.all, value: null },
+		{ label: globalLocale.value.env.all, value: null },
 		{ label: $locale.value.sfc.mail, value: 'email' },
 		{ label: $locale.value.sfc.webhook, value: 'webhook' },
 	],
@@ -183,7 +187,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "الكل",
 	"mail": "البريد الإلكتروني ",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -195,7 +198,6 @@ onMounted(async () => {
 	"createRecipient": "Afegeix un destinatari a l'informe de moderació ",
 	"recipientType": "Tipus de notificació ",
 	"keywords": "Paraules clau",
-	"all": "Tot",
 	"mail": "Correu electrònic",
 	"webhook": "Webhook",
 	"deleteConfirm": "Segur que vols esborrar el destinatari de l'informe de moderació?"
@@ -207,7 +209,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "Vše",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -219,7 +220,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "All",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -231,7 +231,6 @@ onMounted(async () => {
 	"createRecipient": "Meldungsempfänger hinzufügen",
 	"recipientType": "Art der Benachrichtigung",
 	"keywords": "Schlüsselwort",
-	"all": "Alle",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Bist du sicher, dass du den Empfänger der Benachrichtigung entfernen möchtest?"
@@ -243,7 +242,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "All",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -255,7 +253,6 @@ onMounted(async () => {
 	"createRecipient": "Añadir destinatario a los informes",
 	"recipientType": "Tipo de notificación",
 	"keywords": "Palabras Clave",
-	"all": "Todo",
 	"mail": "Correo",
 	"webhook": "Webhook",
 	"deleteConfirm": "¿Estás seguro de que deseas borrar el destinatario del informe de moderación?"
@@ -267,7 +264,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Mots clés\u00a0",
-	"all": "Tous",
 	"mail": "E-mail ",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -279,7 +275,6 @@ onMounted(async () => {
 	"createRecipient": "Tambah penerima laporan",
 	"recipientType": "Notification type",
 	"keywords": "Kata kunci",
-	"all": "Semua",
 	"mail": "Surel",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -291,7 +286,6 @@ onMounted(async () => {
 	"createRecipient": "Aggiungi destinatario della segnalazione",
 	"recipientType": "Tipo di notifica",
 	"keywords": "Parole chiave",
-	"all": "Tutte",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Vuoi davvero rimuovere il destinatario della notifica?"
@@ -303,7 +297,6 @@ onMounted(async () => {
 	"createRecipient": "通報の通知先を追加",
 	"recipientType": "通知先の種類",
 	"keywords": "キーワード",
-	"all": "全て",
 	"mail": "メール",
 	"webhook": "Webhook",
 	"deleteConfirm": "通知先を削除しますか？"
@@ -315,7 +308,6 @@ onMounted(async () => {
 	"createRecipient": "通報の通知先を追加",
 	"recipientType": "通知先の種類",
 	"keywords": "キーワード",
-	"all": "みんな",
 	"mail": "メール",
 	"webhook": "Webhook",
 	"deleteConfirm": "通知先を削除してもええか？"
@@ -327,7 +319,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "All",
 	"mail": "Imayl",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -339,7 +330,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "All",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -351,7 +341,6 @@ onMounted(async () => {
 	"createRecipient": "신고 수신자 추가",
 	"recipientType": "알림 종류",
 	"keywords": "키워드",
-	"all": "전체",
 	"mail": "이메일",
 	"webhook": "Webhook",
 	"deleteConfirm": "수신자를 삭제하시겠습니까?"
@@ -363,7 +352,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "Alle",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -375,7 +363,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "Alle",
 	"mail": "E-post",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -387,7 +374,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "Wszystkie",
 	"mail": "Adres e-mail",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -399,7 +385,6 @@ onMounted(async () => {
 	"createRecipient": "Adicionar destinatário para relatórios de abuso",
 	"recipientType": "TIpo de notificação",
 	"keywords": "Palavras-chave",
-	"all": "Todos",
 	"mail": "E-mail",
 	"webhook": "Webhook",
 	"deleteConfirm": "Você tem certeza de que quer excluir o destinatário da notificação?"
@@ -411,7 +396,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "Все",
 	"mail": "Электронная почта",
 	"webhook": "Вебхук",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -423,7 +407,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "Všetko",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -435,7 +418,6 @@ onMounted(async () => {
 	"createRecipient": "เพิ่มปลายทางการแจ้งเตือนการรายงาน",
 	"recipientType": "ประเภทของปลายทางการแจ้งเตือน\n",
 	"keywords": "คีย์เวิร์ด",
-	"all": "ทั้งหมด",
 	"mail": "อีเมล",
 	"webhook": "Webhook",
 	"deleteConfirm": "ต้องการลบปลายทางการแจ้งเตือนใช่ไหม?"
@@ -447,7 +429,6 @@ onMounted(async () => {
 	"createRecipient": "Raporlar için alıcı ekle",
 	"recipientType": "Bildirim türü",
 	"keywords": "Anahtar kelimeler",
-	"all": "Tümü",
 	"mail": "E-Posta",
 	"webhook": "Webhook",
 	"deleteConfirm": "Bildirim alıcısını silmek istediğinden emin misin?"
@@ -459,7 +440,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "All",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -471,7 +451,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "Всі",
 	"mail": "E-mail",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -483,7 +462,6 @@ onMounted(async () => {
 	"createRecipient": "Add recipient for reports",
 	"recipientType": "Notification type",
 	"keywords": "Keywords",
-	"all": "Tất cả",
 	"mail": "Email",
 	"webhook": "Webhook",
 	"deleteConfirm": "Are you sure that you want to delete the notification recipient?"
@@ -495,7 +473,6 @@ onMounted(async () => {
 	"createRecipient": "新建举报通知",
 	"recipientType": "通知类型",
 	"keywords": "关键字",
-	"all": "全部",
 	"mail": "邮箱",
 	"webhook": "Webhook",
 	"deleteConfirm": "要删除通知吗？"
@@ -507,7 +484,6 @@ onMounted(async () => {
 	"createRecipient": "新增接收檢舉的通知對象",
 	"recipientType": "通知對象的種類",
 	"keywords": "關鍵字",
-	"all": "全部",
 	"mail": "電子郵件",
 	"webhook": "Webhook",
 	"deleteConfirm": "確定要刪除通知對象嗎？"

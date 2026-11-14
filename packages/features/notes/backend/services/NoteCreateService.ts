@@ -25,11 +25,12 @@ import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/
 import { assertFederatedChannelNote, CHANNEL_FEDERATION_REQUIRES_PUBLIC } from '@features/channels/backend/utility/federation-policy.js';
 import { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import type { MiChannel } from '@features/channels/backend/models/Channel.js';
-import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
+import { normalizeTag } from '@features/discovery/backend/utility/normalize-tag.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { NotesChart } from '@features/statistics/backend/charts/notes.js';
 import { PerUserNotesChart } from '@features/statistics/backend/charts/per-user-notes.js';
 import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
@@ -59,6 +60,7 @@ import { IdentifiableError } from '@features/runtime/backend/errors/identifiable
 import { CollapsedQueue } from '@features/runtime/backend/async/collapsed-queue.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { isQuote, isRenote } from '../utility/is-renote.js';
+import { extractUrlsForKeyWordCheck } from '../utility/extract-urls-for-keyword-check.js';
 import { isCreationQuote, isCreationRenote } from '@features/notes/shared';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
@@ -184,6 +186,8 @@ type Option = {
 	visibility?: string;
 	visibleUsers?: MinimumUser[] | null;
 	channel?: MiChannel | null;
+	/** Internal only: a canonical Group approval was fetched for an existing public Note. */
+	approvedHistoricalChannelReference?: boolean;
 	apMentions?: MinimumUser[] | null;
 	apMentionRawCount?: number | null;
 	apHashtags?: string[] | null;
@@ -478,28 +482,33 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (user.host == null && data.channel?.host != null) {
 			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Remote channel posting is not available in this pilot.');
 		}
-		if (data.channel?.isFederated && isCreationRenote(data) && !isCreationQuote(data)) {
+		if (data.channel) data.channel = await this.channelFederationService.refreshEligibility(data.channel);
+		if (user.host != null && data.channel?.isFederationFrozen && !data.approvedHistoricalChannelReference) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Frozen channels discard incoming contributions.');
+		}
+		if (data.channel?.isFederated && !data.channel.isFederationFrozen && isCreationRenote(data) && !isCreationQuote(data)) {
 			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Pure Renotes in federated channels are not available in this pilot.');
 		}
 
 		if (data.createdAt == null) data.createdAt = new Date();
 		if (data.visibility == null) data.visibility = 'public';
 		if (data.localOnly == null) data.localOnly = false;
-		if (data.channel?.isFederated) assertFederatedChannelNote(data, true);
+		if (data.channel?.isFederated && !data.channel.isFederationFrozen) assertFederatedChannelNote(data, true);
 		if (data.channel != null) data.visibility = 'public';
 		if (data.channel != null) data.visibleUsers = [];
-		if (data.channel?.isFederated) {
+		if (data.channel?.isFederated && !data.channel.isFederationFrozen) {
 			const publicAllowed = (await this.roleService.getUserPolicies(user.id)).canPublicNote !== false
 				&& !this.utilityService.isKeyWordIncluded(data.cw ?? '', this.meta.sensitiveWords)
 				&& !this.utilityService.isKeyWordIncluded(data.text ?? '', this.meta.sensitiveWords);
 			assertFederatedChannelNote(data, publicAllowed);
-		} else if (data.channel != null) {
+		} else if (data.channel != null && !(user.host != null && data.approvedHistoricalChannelReference)) {
 			data.localOnly = true;
 		}
 
 		if (data.visibility === 'public' && data.channel == null) {
 			const sensitiveWords = this.meta.sensitiveWords;
-			if (this.utilityService.isKeyWordIncluded(data.cw ?? data.text ?? '', sensitiveWords)) {
+			const sensitiveWordsTarget = data.cw ?? data.text ?? '';
+			if (sensitiveWords.length > 0 && this.utilityService.isKeyWordIncluded([sensitiveWordsTarget, ...extractUrlsForKeyWordCheck(sensitiveWordsTarget)].join('\n'), sensitiveWords)) {
 				data.visibility = 'home';
 			} else if ((await this.roleService.getUserPolicies(user.id)).canPublicNote === false) {
 				data.visibility = 'home';
@@ -598,7 +607,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
-		if (data.channel?.isFederated) assertFederatedChannelNote(data, true);
+		if (data.channel?.isFederated && !data.channel.isFederationFrozen) assertFederatedChannelNote(data, true);
 
 		if (data.text) {
 			if (data.text.length > DB_MAX_NOTE_TEXT_LENGTH) {
@@ -688,7 +697,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			text: data.text,
 			hasPoll: data.poll != null,
 			cw: data.cw ?? null,
-			tags: tags.map(tag => normalizeForSearch(tag)),
+			tags: tags.map(tag => normalizeTag(tag)),
 			emojis,
 			userId: user.id,
 			localOnly: data.localOnly!,
@@ -808,7 +817,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		this.pushToTl(note, user);
 
-		this.antennaService.addNoteToAntennas({
+		const matchedAntennas = this.antennaService.addNoteToAntennas({
 			...note,
 			channel: data.channel ?? null,
 		}, user);
@@ -874,6 +883,12 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 			this.roleService.addNoteToRoleTimeline(noteObj);
 
+			matchedAntennas.then(antennas => {
+				for (const antenna of antennas) {
+					this.globalEventService.publishAntennaStream(antenna.id, 'note', noteObj);
+				}
+			});
+
 			this.webhookService.enqueueUserWebhook(user.id, 'note', { note: noteObj });
 
 			const nm = new NotificationManager(this.mutingsRepository, this.notificationService, this.followingsRepository, user, note);
@@ -884,18 +899,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			if (data.reply) {
 				// 通知
 				if (data.reply.userHost === null) {
-					const isThreadMuted = await this.noteThreadMutingsRepository.exists({
-						where: {
-							userId: data.reply.userId,
-							threadId: data.reply.threadId ?? data.reply.id,
-						},
-					});
-
-					if (!isThreadMuted) {
-						nm.push(data.reply.userId, 'reply');
-						this.globalEventService.publishMainStream(data.reply.userId, 'reply', noteObj);
-						this.webhookService.enqueueUserWebhook(data.reply.userId, 'reply', { note: noteObj });
-					}
+					await this.createReplyEvent(data.reply, noteObj, nm);
 				}
 			}
 
@@ -911,7 +915,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 				// Publish event
 				if ((user.id !== data.renote.userId) && data.renote.userHost === null) {
 					this.globalEventService.publishMainStream(data.renote.userId, 'renote', noteObj);
-					this.webhookService.enqueueUserWebhook(data.renote.userId, 'renote', { note: noteObj });
 				}
 			}
 
@@ -1004,6 +1007,17 @@ export class NoteCreateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
+	private async createReplyEvent(reply: MiNote, note: Packed<'Note'>, nm: NotificationManager) {
+		const isThreadMuted = await this.noteThreadMutingsRepository.exists({
+			where: { userId: reply.userId, threadId: reply.threadId ?? reply.id },
+		});
+		if (!isThreadMuted) {
+			nm.push(reply.userId, 'reply');
+			this.globalEventService.publishMainStream(reply.userId, 'reply', note);
+		}
+	}
+
+	@bindThis
 	private async createMentionedEvents(mentionedUsers: MinimumUser[], note: MiNote, nm: NotificationManager) {
 		for (const u of mentionedUsers.filter(u => this.userEntityService.isLocalUser(u))) {
 			const isThreadMuted = await this.noteThreadMutingsRepository.exists({
@@ -1022,7 +1036,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 			});
 
 			this.globalEventService.publishMainStream(u.id, 'mention', detailPackedNote);
-			this.webhookService.enqueueUserWebhook(u.id, 'mention', { note: detailPackedNote });
 
 			// Create notification
 			nm.push(u.id, 'mention');
@@ -1264,9 +1277,20 @@ export class NoteCreateService implements OnApplicationShutdown {
 			prohibitedWords = this.meta.prohibitedWords;
 		}
 
+		if (prohibitedWords.length === 0) {
+			return false;
+		}
+
 		if (
 			this.utilityService.isKeyWordIncluded(
-				this.utilityService.concatNoteContentsForKeyWordCheck(content),
+				this.utilityService.concatNoteContentsForKeyWordCheck({
+					...content,
+					others: [
+						...(content.others ?? []),
+						...extractUrlsForKeyWordCheck(content.cw ?? ''),
+						...extractUrlsForKeyWordCheck(content.text ?? ''),
+					],
+				}),
 				prohibitedWords,
 			)
 		) {

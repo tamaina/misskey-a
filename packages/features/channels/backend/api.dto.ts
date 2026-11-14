@@ -22,6 +22,7 @@ export function toPackedChannel(value: Packed<'Channel'>): Packed<'Channel'> {
 		notesCount: value.notesCount,
 		isSensitive: value.isSensitive,
 		isFederated: value.isFederated,
+		isFederationFrozen: value.isFederationFrozen,
 		uri: value.uri,
 		host: value.host,
 		allowRenoteToExternal: value.allowRenoteToExternal,

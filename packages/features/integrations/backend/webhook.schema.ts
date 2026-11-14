@@ -4,6 +4,7 @@
 	*/
 
 import * as v from 'valibot';
+import { webhookEventTypes } from './webhook-events.schema.js';
 
 export const finiteNumber = v.pipe(v.number(), v.finite());
 
@@ -22,7 +23,7 @@ export const userWebhookSchema = v.strictObject({
 	"id": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"userId": v.pipe(v.string(), v.metadata({ "format": "id" })),
 	"name": v.string(),
-	"on": v.array(v.picklist(["mention", "unfollow", "follow", "followed", "note", "reply", "renote", "reaction"])),
+	"on": v.array(v.picklist(webhookEventTypes)),
 	"url": v.string(),
 	"secret": v.string(),
 	"active": v.boolean(),

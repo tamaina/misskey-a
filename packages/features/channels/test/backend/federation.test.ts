@@ -7,6 +7,7 @@ import { EventEmitter } from 'node:events';
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { assertFederatedChannelNote } from '../../backend/utility/federation-policy.js';
+import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { ChannelFederationService } from '../../backend/services/ChannelFederationService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { ApNoteService } from '@features/federation/backend/services/ApNoteService.js';
@@ -43,6 +44,8 @@ function fixture() {
 	const resolverService = mockDeep<ApResolverService>();
 	resolverService.createResolver.mockResolvedValue(resolver);
 	const moduleRef = mockDeep<ModuleRef>();
+	const getUserPolicies = vi.fn().mockResolvedValue({ canFederateChannel: true });
+	moduleRef.get.mockImplementation(token => token === 'RoleService' ? { getUserPolicies } as never : undefined as never);
 	const renderer = mockDeep<ApRendererService>();
 	renderer.addContext.mockImplementation(<T extends IObject>(object: T) => ({ ...object, id: object.id ?? 'fixture-activity', '@context': 'https://www.w3.org/ns/activitystreams' }));
 	const queue = mockDeep<QueueService>();
@@ -50,7 +53,7 @@ function fixture() {
 	ids.gen.mockReturnValue('created123');
 	const events = mockDeep<GlobalEventService>();
 	const service = new ChannelFederationService({ url: 'https://local.test' } as never, redis, channels, channelFollowings, users, notes, followings, ids, events, queue, renderer, resolverService, moduleRef);
-	return { service, channels, channelFollowings, users, notes, followings, redis, resolver, moduleRef, queue, events };
+	return { service, channels, channelFollowings, users, notes, followings, redis, resolver, moduleRef, queue, events, getUserPolicies, renderer };
 }
 
 function announcement(): IAnnounce {
@@ -92,7 +95,7 @@ describe('federated channel restrictions', () => {
 
 test('disabled Group refuses Follow; enabled Follow and Undo use channel relationships and no user key', async () => {
 	const f = fixture();
-	const channel = mockDeep<MiChannel>({ id: 'channel123', isFederated: false, isArchived: false, host: null, uri: null, federationPublicKey: 'public-key' });
+	const channel = mockDeep<MiChannel>({ id: 'channel123', userId: 'owner123', isFederated: false, isFederationFrozen: false, isArchived: false, host: null, uri: null, federationPublicKey: 'public-key' });
 	f.channels.findOneBy.mockResolvedValue(channel);
 	f.channels.findOneByOrFail.mockResolvedValue(channel);
 	const follow = { type: 'Follow' as const, actor: remote.uri, object: 'https://local.test/channels/channel123', id: 'https://remote.test/follow123' };
@@ -110,7 +113,7 @@ test.each(['audience', 'tampered-author-content', 'remote-submission', 'nonpubli
 	const f = fixture();
 	const activity = announcement();
 	const canonical = structuredClone(activity.object);
-	const channel = mockDeep<MiChannel>({ id: 'channel123', uri: groupUri, host: remote.host, isFederated: true });
+	const channel = mockDeep<MiChannel>({ id: 'channel123', uri: groupUri, host: remote.host, isFederated: true, isFederationFrozen: false });
 	f.channels.findOneBy.mockResolvedValue(channel);
 	f.followings.findBy.mockResolvedValue([]);
 	f.resolver.resolve.mockImplementation(async value => value === groupUri ? { type: 'Group', id: groupUri, _misskey_channel: true } : canonical as IObject);
@@ -125,7 +128,7 @@ test.each(['audience', 'tampered-author-content', 'remote-submission', 'nonpubli
 test('verified Create stores the channel through the author importer', async () => {
 	const f = fixture();
 	const activity = announcement();
-	const channel = mockDeep<MiChannel>({ id: 'channel123', uri: groupUri, host: remote.host, isFederated: true });
+	const channel = mockDeep<MiChannel>({ id: 'channel123', uri: groupUri, host: remote.host, isFederated: true, isFederationFrozen: false });
 	f.channels.findOneBy.mockResolvedValue(channel);
 	f.followings.findBy.mockResolvedValue([]);
 	f.resolver.resolve.mockImplementation(async value => value === groupUri ? { type: 'Group', id: groupUri, _misskey_channel: true } : activity.object as IObject);
@@ -155,7 +158,7 @@ test('a standalone public quote resolves as an ordinary author Note, without a f
 	const parentUri = 'https://remote.test/notes/standalone123';
 	const parent = { type: 'Note', id: parentUri, attributedTo: authorUri, to: [PUBLIC], content: 'standalone' };
 	((activity.object as IObject & { object: IObject }).object as IObject & { _misskey_quote: string })._misskey_quote = parentUri;
-	f.channels.findOneBy.mockResolvedValue(mockDeep<MiChannel>({ id: 'channel123', uri: groupUri, host: remote.host, isFederated: true }));
+	f.channels.findOneBy.mockResolvedValue(mockDeep<MiChannel>({ id: 'channel123', uri: groupUri, host: remote.host, isFederated: true, isFederationFrozen: false }));
 	f.resolver.resolve.mockImplementation(async value => value === groupUri ? { type: 'Group', id: groupUri, _misskey_channel: true } : value === parentUri ? parent : activity.object as IObject);
 	const resolvePerson = vi.fn().mockResolvedValue(mockDeep<MiRemoteUser>({ host: remote.host, uri: authorUri, isSuspended: false, isRemoteSuspended: false }));
 	const resolveNote = vi.fn(async (value: IObject, options: { resolver: Resolver; sentFrom: URL }) => {
@@ -244,4 +247,140 @@ test('native Accept consumption and channel cancellation are serialized before c
 	expect(unfollow).toHaveBeenCalledOnce();
 	expect(nativeFollowing).toBe(false);
 	expect(locks.size).toBe(0);
+});
+
+
+describe('channel federation freeze lifecycle', () => {
+	test('frozen Group discards Create before author import but preserves verified Delete', async () => {
+		const f = fixture();
+		const channel = mockDeep<MiChannel>({ id: 'channel123', uri: groupUri, host: remote.host, isFederated: true, isFederationFrozen: true });
+		const note = mockDeep<MiNote>({ id: 'note123', uri: noteUri, channelId: channel.id, userId: 'author123' });
+		const author = mockDeep<MiRemoteUser>({ id: 'author123', uri: authorUri });
+		f.channels.findOneBy.mockResolvedValue(channel);
+		f.notes.findOneBy.mockResolvedValue(note);
+		f.users.findOneByOrFail.mockResolvedValue(author);
+		f.resolver.resolve.mockImplementation(async value => {
+			if (value === groupUri) return { type: 'Group', id: groupUri, _misskey_channel: true, _misskey_channelFrozen: true };
+			throw new StatusError('Gone', 410);
+		});
+		expect(await f.service.receiveAnnounce(remote, announcement())).toBe('skip: Group frozen');
+		expect(f.moduleRef.get).not.toHaveBeenCalled();
+		expect(f.notes.existsBy).not.toHaveBeenCalled();
+		const deleteNote = vi.fn();
+		f.moduleRef.get.mockReturnValue({ delete: deleteNote });
+		const deletion: IAnnounce = {
+			type: 'Announce', actor: groupUri, audience: groupUri, to: [PUBLIC],
+			object: { type: 'Delete', actor: authorUri, audience: groupUri, object: noteUri },
+		};
+		expect(await f.service.receiveAnnounce(remote, deletion)).toBe('ok: Group note deleted');
+		expect(deleteNote).toHaveBeenCalledWith(author, note);
+	});
+
+	test('role loss persists freeze once and delivers Group Update through the channel signing identity', async () => {
+		const f = fixture();
+		const channel = mockDeep<MiChannel>({ id: 'channel123', userId: 'owner123', host: null, uri: null, isFederated: true, isFederationFrozen: false, isArchived: false, federationPublicKey: 'public-key' });
+		f.getUserPolicies.mockResolvedValue({ canFederateChannel: false });
+		f.channels.update.mockResolvedValue({ affected: 1, raw: [], generatedMaps: [] });
+		f.channels.findOneByOrFail.mockImplementation(async () => ({ ...channel, isFederationFrozen: true }));
+		f.channelFollowings.find.mockResolvedValue([{ followerId: remote.id }] as never);
+		f.users.findBy.mockResolvedValue([{ ...remote, sharedInbox: 'https://remote.test/inbox', inbox: 'https://remote.test/users/group/inbox' }]);
+		const frozen = await f.service.refreshEligibility(channel);
+		expect(frozen.isFederationFrozen).toBe(true);
+		expect(f.channels.update).toHaveBeenCalledWith({ id: channel.id, isFederationFrozen: false }, { isFederationFrozen: true });
+		expect(f.queue.deliverMany).toHaveBeenCalledOnce();
+		expect(f.queue.deliverMany.mock.calls[0][0]).toEqual({ id: channel.id, channelId: channel.id });
+		expect(f.queue.deliverMany.mock.calls[0][1]).toMatchObject({
+			type: 'Update', actor: 'https://local.test/channels/channel123',
+			object: { type: 'Group', id: 'https://local.test/channels/channel123', _misskey_channelFrozen: true },
+		});
+		f.getUserPolicies.mockResolvedValue({ canFederateChannel: true });
+		expect((await f.service.refreshEligibility(frozen)).isFederationFrozen).toBe(true);
+		expect(f.channels.update).toHaveBeenCalledOnce();
+		expect(f.queue.deliverMany).toHaveBeenCalledOnce();
+	});
+
+	test('frozen local Group refuses Follow but still accepts Undo', async () => {
+		const f = fixture();
+		const channel = mockDeep<MiChannel>({ id: 'channel123', host: null, isFederated: true, isFederationFrozen: true });
+		f.channels.findOneBy.mockResolvedValue(channel);
+		const follow = { type: 'Follow' as const, actor: groupUri, object: 'https://local.test/channels/channel123' };
+		expect(await f.service.follow(remote, follow)).toBe('skip: Group disabled');
+		expect(f.channelFollowings.upsert).not.toHaveBeenCalled();
+		expect(await f.service.follow(remote, follow, true)).toBe('ok: Group unfollowed');
+		expect(f.channelFollowings.delete).toHaveBeenCalledWith({ followeeId: channel.id, followerId: remote.id });
+	});
+
+	test('freeze-period localOnly posts are never delivered even after an explicit unfreeze', async () => {
+		const f = fixture();
+		await f.service.deliverNote(mockDeep<MiNote>({ channelId: 'channel123', localOnly: true, visibility: 'public', userHost: null }));
+		expect(f.channels.findOneByOrFail).not.toHaveBeenCalled();
+		expect(f.queue.deliverMany).not.toHaveBeenCalled();
+	});
+});
+
+
+test.each([false, true])('inherited frozen-channel remote replies require verified historical membership (%s)', async historical => {
+	const channel = mockDeep<MiChannel>({ id: 'channel123', host: 'remote.test', isFederated: true, isFederationFrozen: true });
+	const channels = mockDeep<ChannelsRepository>();
+	channels.findOneBy.mockResolvedValue(channel);
+	const stop = new Error('reached normal note validation');
+	const service = Object.assign(Object.create(NoteCreateService.prototype), {
+		channelsRepository: channels,
+		channelFederationService: { refreshEligibility: vi.fn(async value => value) },
+		meta: { prohibitedWords: [] },
+		checkProhibitedWordsContain: vi.fn(() => { throw stop; }),
+	}) as NoteCreateService;
+	const data = {
+		reply: mockDeep<MiNote>({ channelId: channel.id }), text: 'reply', visibility: 'public' as const, localOnly: false,
+		approvedHistoricalChannelReference: historical,
+	};
+	const creating = service.create({ id: 'author123', username: 'author', host: 'remote.test', isBot: false, isCat: false }, data);
+	await expect(creating).rejects.toThrow(historical ? stop : /Frozen channels discard/);
+	if (historical) expect(data.localOnly).toBe(false);
+});
+
+test('local frozen-channel posts are marked permanently localOnly before normal note validation', async () => {
+	const channel = mockDeep<MiChannel>({ id: 'channel123', host: null, isFederated: true, isFederationFrozen: true });
+	const stop = new Error('reached normal note validation');
+	const service = Object.assign(Object.create(NoteCreateService.prototype), {
+		channelFederationService: { refreshEligibility: vi.fn(async value => value) },
+		meta: { prohibitedWords: [] },
+		checkProhibitedWordsContain: vi.fn(() => { throw stop; }),
+	}) as NoteCreateService;
+	const data = { channel, text: 'local during freeze', visibility: 'public' as const, localOnly: false };
+	await expect(service.create({ id: 'author123', username: 'author', host: null, isBot: false, isCat: false }, data)).rejects.toThrow(stop);
+	expect(data.localOnly).toBe(true);
+});
+
+
+test('replayed Group Update cannot override the current canonical freeze state', async () => {
+	const f = fixture();
+	const channel = mockDeep<MiChannel>({ id: 'channel123', host: remote.host, uri: groupUri, isFederated: true, isFederationFrozen: true });
+	f.channels.findOneBy.mockResolvedValue(channel);
+	f.resolver.resolve.mockResolvedValue({ type: 'Group', id: groupUri, _misskey_channel: true, _misskey_channelFrozen: true });
+	await f.service.receiveUpdate(remote, { type: 'Group', id: groupUri, _misskey_channel: true, _misskey_channelFrozen: false });
+	expect(f.resolver.resolve).toHaveBeenCalledWith(groupUri);
+	expect(f.channels.update).not.toHaveBeenCalled();
+	f.resolver.resolve.mockResolvedValue({ type: 'Group', id: groupUri, _misskey_channel: true, _misskey_channelFrozen: false });
+	await f.service.receiveUpdate(remote, { type: 'Group', id: groupUri, _misskey_channel: true, _misskey_channelFrozen: true });
+	expect(f.channels.update).toHaveBeenCalledWith(channel.id, { isFederationFrozen: false });
+});
+
+
+test('an overlapping eligibility mutation scan is not skipped behind an earlier scan', async () => {
+	const f = fixture();
+	const channel = mockDeep<MiChannel>({ id: 'channel123', userId: 'owner123', host: null, isFederated: true, isFederationFrozen: false });
+	let releaseFirst!: (channels: MiChannel[]) => void;
+	f.channels.findBy.mockImplementationOnce(() => new Promise(resolve => { releaseFirst = resolve; }));
+	f.channels.findBy.mockResolvedValue([channel]);
+	f.getUserPolicies.mockResolvedValue({ canFederateChannel: false });
+	f.channels.update.mockResolvedValue({ affected: 1, generatedMaps: [], raw: [] });
+	const update = vi.spyOn(f.service, 'deliverUpdate').mockResolvedValue(undefined);
+	const first = f.service.reconcileEligibility();
+	await vi.waitFor(() => expect(releaseFirst).toBeTypeOf('function'));
+	await f.service.reconcileEligibility();
+	expect(f.channels.findBy).toHaveBeenCalledTimes(2);
+	expect(update).toHaveBeenCalledOnce();
+	releaseFirst([]);
+	await first;
 });

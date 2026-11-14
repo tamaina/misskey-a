@@ -46,6 +46,7 @@ export const packedRolePoliciesSchema = v.strictObject({
 	'canUseTranslator': v.boolean(),
 	'canHideAds': v.boolean(),
 	'canCreateChannel': v.boolean(),
+	'canFederateChannel': v.boolean(),
 	'driveCapacityMb': v.pipe(v.number(), v.integer()),
 	'maxFileSizeMb': v.pipe(v.number(), v.integer()),
 	'uploadableFileTypes': v.array(v.string()),

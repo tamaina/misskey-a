@@ -6,6 +6,8 @@
 import * as crypto from 'node:crypto';
 import { URL } from 'node:url';
 import { Inject, Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
+import type { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import * as htmlParser from 'node-html-parser';
 import type { CustomSigningKey } from '@misskey-dev/node-http-message-signatures';
 import { parseHttpSignatureImplementationLevel } from '../protocol/misc/http-signature-capabilities.js';
@@ -133,6 +135,7 @@ export class ApRequestService {
 		private httpRequestService: HttpRequestService,
 		private loggerService: LoggerService,
 		private utilityService: UtilityService,
+		private moduleRef: ModuleRef,
 	) {
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		this.logger = this.loggerService?.getLogger('ap-request'); // なぜか TypeError: Cannot read properties of undefined (reading 'getLogger') と言われる
@@ -142,14 +145,17 @@ export class ApRequestService {
 	public async signedPost(user: ThinUser, url: string, object: unknown, digest?: string, options: { level?: unknown; forceMainKey?: boolean } = {}): Promise<void> {
 		const body = typeof object === 'string' ? object : JSON.stringify(object);
 
-		const channel = user.channelId ? await this.channelsRepository.findOne({
+		let channel = user.channelId ? await this.channelsRepository.findOne({
 			where: { id: user.channelId },
-			select: { id: true, host: true, isFederated: true, isArchived: true, federationPrivateKey: true },
+			select: { id: true, userId: true, host: true, isFederated: true, isFederationFrozen: true, isArchived: true, federationPublicKey: true, federationPrivateKey: true },
 		}) : null;
 		if (user.channelId && (!channel || channel.host != null || !channel.federationPrivateKey)) throw new Error('Invalid channel signer');
 		const activity = user.channelId ? JSON.parse(body) as IActivity : null;
+		if (channel && activity?.type !== 'Update') {
+			channel = await this.moduleRef.get<ChannelFederationService>('ChannelFederationService', { strict: false }).refreshEligibility(channel);
+		}
 		// Recheck queued publications after OFF. Previously published deletions still propagate.
-		if (channel && (!channel.isFederated || channel.isArchived) && !(typeof activity?.object === 'object' && !Array.isArray(activity.object) && activity.object.type === 'Delete')) return;
+		if (channel && (!channel.isFederated || channel.isFederationFrozen || channel.isArchived) && activity?.type !== 'Update' && activity?.type !== 'Undo' && activity?.type !== 'Delete' && !(typeof activity?.object === 'object' && !Array.isArray(activity.object) && activity.object.type === 'Delete')) return;
 		const key = channel?.federationPrivateKey
 			? await this.userKeypairService.getLocalUserPrivateKey({ keyId: `${this.config.url}/channels/${channel.id}#main-key`, privateKeyPem: channel.federationPrivateKey })
 			: await this.userKeypairService.getLocalUserPrivateKey(user.id, options.forceMainKey ? 'main' : parseHttpSignatureImplementationLevel(options.level));
