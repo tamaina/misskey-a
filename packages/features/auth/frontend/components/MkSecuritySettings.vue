@@ -163,7 +163,7 @@ function removeKey(key: { id: string; name: string }) {
 
 function enableMfa() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.enableWarning + '\n' + $locale.value.sfc.otherSessionsWarning });
+		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.enableWarning });
 		if (!isCurrent() || confirmation.canceled) return;
 		const value = await misskeyApi('i/security/passkey/mfa/enable', { acknowledged: true });
 		if (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); }
@@ -261,7 +261,7 @@ onUnmounted(leave);
 <locale locale="ja-JP" lang="json">
 {
 	"title": "ログインと多要素認証",
-	"otherSessionsWarning": "パスキーの削除、認証アプリの設定・削除、多要素認証やパスキー単独ログイン、パスワードログインの設定を変更すると、この端末以外のログインはすべて無効になります。名前の変更や復旧コードの再生成では無効になりません。",
+	"otherSessionsWarning": "パスキーの削除、認証アプリの設定・削除、パスキーによる多要素認証の無効化、パスキー単独ログインやパスワードログインの設定変更では、この端末以外のログインはすべて無効になります。パスキーによる多要素認証の有効化、パスキーの登録・名前の変更、復旧コードの再生成では無効になりません。",
 	"explanation": "パスキーは端末やセキュリティキーで使う認証方法です。認証アプリを先に設定しなくても登録できます。登録するとすぐにパスキーによる多要素認証が有効になり、認証アプリの設定時と同じように復旧コードの初回発行時のみ表示されます。キーが残っていれば、ボタンでこの多要素認証を無効・有効に切り替えられます。再有効化時に復旧コードが残っていなければ、新しく発行して一度だけ表示します。重要な設定には、このログインで5分間有効な本人確認が必要です。",
 	"loading": "設定を読み込んでいます…",
 	"mfaActive": "パスキーによる多要素認証は有効です。",

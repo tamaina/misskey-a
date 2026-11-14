@@ -216,7 +216,8 @@ test.each([false, true])('explicit MFA enable uses sudo and confirmation, showin
 	});
 	click('パスキーによる多要素認証を有効にする');
 	await vi.waitFor(() => expect(element.textContent).toContain('パスキーによる多要素認証は有効です。'));
-	expect(ensureSudo).toHaveBeenCalledOnce(); expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ type: 'warning', text: expect.stringContaining('この端末以外のログインはすべて無効になります') }));
+	expect(ensureSudo).toHaveBeenCalledOnce(); expect(confirm).toHaveBeenCalledOnce();
+	expect(vi.mocked(confirm).mock.calls[0][0].text).not.toContain('この端末以外のログインはすべて無効になります');
 	expect(vi.mocked(confirm).mock.calls[0][0].text).toContain('パスキーによる多要素認証を有効にしますか');
 	expect(calls('i/security/passkey/mfa/enable')[0][1]).toEqual({ acknowledged: true });
 	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(confirm).mock.invocationCallOrder[0]);
@@ -237,4 +238,17 @@ test.each(['sudo', 'confirm'] as const)('cancelled %s prevents explicit MFA enab
 	await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledOnce()); await nextTick();
 	expect(calls('i/security/passkey/mfa/enable')).toHaveLength(0); expect(popup).not.toHaveBeenCalled();
 	if (kind === 'sudo') expect(confirm).not.toHaveBeenCalled();
+});
+
+test('explicit MFA disable keeps sudo and the session revocation warning', async () => {
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ ...state, passkeyMfaEnabled: true } as never);
+	show.value = false; await nextTick(); show.value = true; await nextTick();
+	await vi.waitFor(() => expect(element.textContent).toContain('パスキーによる多要素認証は有効です。'));
+	click('パスキーによる多要素認証を無効にする');
+	await vi.waitFor(() => expect(calls('i/security/passkey/mfa/disable')).toHaveLength(1));
+	expect(ensureSudo).toHaveBeenCalledOnce();
+	expect(confirm).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ type: 'warning', text: expect.stringContaining('この端末以外のログインはすべて無効になります') }));
+	expect(calls('i/security/passkey/mfa/disable')[0][1]).toEqual({ acknowledged: true });
+	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(confirm).mock.invocationCallOrder[0]);
+	expect(startAuthentication).not.toHaveBeenCalled();
 });

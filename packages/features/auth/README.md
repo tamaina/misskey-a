@@ -33,8 +33,9 @@ Existing unspent recovery codes are preserved and never returned when adding a f
 The 「パスキーによる多要素認証を無効にする」 button disables only
 `passkeyMfaEnabled`; TOTP and registered keys remain. When at least one key remains,
 「パスキーによる多要素認証を有効にする」 re-enables that same setting.
-Both buttons use common sudo and confirmation, revoke other browser sessions,
-and require no additional WebAuthn ceremony. Re-enabling issues recovery codes
+Both buttons use common sudo and confirmation and require no additional WebAuthn
+ceremony. Disabling warns about and revokes other browser sessions; enabling
+preserves them. Re-enabling issues recovery codes
 only if none remain, displaying the new codes once in the recovery-code modal.
 Existing codes are never replaced or returned by re-enabling.
 While passkey MFA is enabled, the last key cannot be removed unless a usable
