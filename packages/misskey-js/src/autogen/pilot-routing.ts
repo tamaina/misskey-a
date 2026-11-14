@@ -9525,6 +9525,80 @@ export default {
 				}
 			}
 		},
+		"i/security/passkey/mfa/enable": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/mfa/enable",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/mfa/enable",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
 		"i/security/passkey/mfa/disable": {
 			"~orpc": {
 				"errorMap": {
