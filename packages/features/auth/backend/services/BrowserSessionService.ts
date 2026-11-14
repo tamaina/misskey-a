@@ -4,7 +4,7 @@
  */
 
 import { createHash, randomBytes } from 'node:crypto';
-import { IsNull, LessThanOrEqual } from 'typeorm';
+import { In, IsNull, LessThanOrEqual } from 'typeorm';
 import type { FindOptionsSelect } from 'typeorm';
 import type { BrowserSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
@@ -84,9 +84,9 @@ export class BrowserSessionService {
 		await repository.update({ userId, revokedAt: IsNull() }, { revokedAt: new Date(), sudoUntil: null, sudoPolicyStamp: null });
 	}
 
-	public async listOwned(userId: string, limit = 100, offset = 0): Promise<(BrowserSessionMetadata & Pick<MiBrowserSession, 'lastUserAgent'> & { lastIp: string | null })[]> {
+	public async listOwned(userId: string, limit = 100, offset = 0, ids?: string[]): Promise<(BrowserSessionMetadata & Pick<MiBrowserSession, 'lastUserAgent'> & { lastIp: string | null })[]> {
 		const sessions = await this.browserSessionsRepository.find({
-			where: { userId }, select: { ...metadataSelect, lastUserAgent: true }, take: limit, skip: offset, order: { createdAt: 'DESC', id: 'DESC' },
+			where: { userId, ...(ids ? { id: In(ids) } : {}) }, select: { ...metadataSelect, lastUserAgent: true }, take: limit, skip: offset, order: { createdAt: 'DESC', id: 'DESC' },
 		});
 		if (sessions.length === 0) return [];
 		const latest = await this.browserSessionsRepository.manager.getRepository(MiUserIp).createQueryBuilder('ip')

@@ -18,7 +18,7 @@ import { packedJsonValueSchema, packedOptionalJsonValueSchema } from '../../user
 import { packedMeDetailedSchema, packedUserDetailedNotMeSchema } from '../../users/backend/user.schema.js';
 import { localUsernameSchema, passwordSchema } from '../../users/backend/user-validation.schema.js';
 import { webAuthnRegistrationOptionsSchema, webAuthnAuthenticationOptionsSchema, webAuthnAuthenticationResponseSchema } from './webauthn.schema.js';
-import { packedAppSchema, packedInviteCodeSchema, packedSigninSchema, supportedCaptchaProviders } from './auth.schema.js';
+import { packedAppSchema, packedInviteCodeSchema, packedSigninSchema, packedBrowserSessionSchema, supportedCaptchaProviders } from './auth.schema.js';
 import { sessionFailureSchema, fastifyFailureSchema } from './session-errors.schema.js';
 import { availableSigninFactorsSchema, finishedSigninSchema } from './session.schema.js';
 
@@ -358,6 +358,7 @@ export const ISigninHistoryContract = oc.$meta({
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/i/signin-history', tags: [] }).errors({ ...commonErrors }).input(objectInput({
 	"browserSessionId": v.exactOptional(misskeyId),
 	"unlinkedOnly": v.optional(v.boolean(), false),
+	"latestPerSession": v.optional(v.boolean(), false),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -496,13 +497,10 @@ export const I2faPasskeyRemoveContract = aliasTwoFactorContract(I2faRemoveKeyCon
 export const I2faPasskeyUpdateContract = aliasTwoFactorContract(I2faUpdateKeyContract, 'i/2fa/passkey/update');
 export const I2faPasskeyPasswordLessContract = aliasTwoFactorContract(I2faPasswordLessContract, 'i/2fa/passkey/password-less');
 
-const browserSessionResult = v.strictObject({
-	id: v.string(), createdAt: v.string(), lastUsedAt: v.string(), lastIp: v.nullable(v.string()), lastUserAgent: v.nullable(v.string()), revokedAt: v.nullable(v.string()), current: v.boolean(),
-});
 export const ISessionsContract = oc.$meta({ requestName: 'i/sessions', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/i/sessions', tags: ['account'] }).errors(commonErrors)
 	.input(objectInput({ limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100), offset: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0) }))
-	.output(v.array(browserSessionResult));
+	.output(v.array(packedBrowserSessionSchema));
 export const ISessionIpsContract = oc.$meta({ requestName: 'i/session-ips', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/i/session-ips', tags: ['account'] }).errors(commonErrors)
 	.input(objectInput({ sessionId: misskeyId, limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10), offset: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0) }))

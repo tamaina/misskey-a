@@ -4420,6 +4420,16 @@ export type components = {
             ip: string;
             headers: components['schemas']['OrpcDefinition169'];
             success: boolean;
+            browserSessionId: string | null;
+            browserSession: {
+                id: string;
+                createdAt: string;
+                lastUsedAt: string;
+                lastIp: string | null;
+                lastUserAgent: string | null;
+                revokedAt: string | null;
+                current: boolean;
+            } | null;
         };
         RoleCondFormulaLogics: {
             id: string;
@@ -86208,6 +86218,8 @@ export interface operations {
                     browserSessionId?: string;
                     /** @default false */
                     unlinkedOnly?: boolean;
+                    /** @default false */
+                    latestPerSession?: boolean;
                     /** @default 10 */
                     limit?: number;
                     sinceId?: string;
@@ -86218,6 +86230,8 @@ export interface operations {
                     browserSessionId?: string;
                     /** @default false */
                     unlinkedOnly?: boolean;
+                    /** @default false */
+                    latestPerSession?: boolean;
                     /** @default 10 */
                     limit?: number;
                     sinceId?: string;
@@ -86240,6 +86254,16 @@ export interface operations {
                         ip: string;
                         headers: components['schemas']['OrpcDefinition451'];
                         success: boolean;
+                        browserSessionId: string | null;
+                        browserSession: {
+                            id: string;
+                            createdAt: string;
+                            lastUsedAt: string;
+                            lastIp: string | null;
+                            lastUserAgent: string | null;
+                            revokedAt: string | null;
+                            current: boolean;
+                        } | null;
                     }[];
                 };
             };

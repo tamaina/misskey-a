@@ -17,6 +17,7 @@ function matches(row: object, criteria: unknown): boolean {
 	return Object.entries(criteria).every(([key, value]) => {
 		const actual = Reflect.get(row, key);
 		if (!(value instanceof FindOperator)) return value && typeof value === 'object' ? actual !== null && typeof actual === 'object' && matches(actual, value) : actual === value;
+		if (value.type === 'in') return value.value.includes(actual);
 		if (value.type === 'isNull') return actual === null;
 		if (value.type === 'lessThanOrEqual') return actual <= value.value;
 		throw new Error('unsupported synthetic operator');
@@ -210,4 +211,15 @@ test('list derives lastIp from the latest owned user_ip per session, with null f
 	expect(ips.where).toHaveBeenCalledWith('ip.userId = :userId', { userId: 'alice' });
 	expect(ips.distinctOn).toHaveBeenCalledWith(['ip.browserSessionId']);
 	expect(ips.addOrderBy).toHaveBeenCalledWith('ip.lastSeenAt', 'DESC');
+});
+
+test('history payload fetch selects only the requested owned sessions', async () => {
+	const { service, rows } = fixture();
+	const first = await service.issue('alice');
+	await service.issue('alice');
+	const other = await service.issue('bob');
+	const selected = await service.listOwned('alice', 2, 0, [first.session.id, other.session.id]);
+	expect(selected.map(row => row.id)).toEqual([first.session.id]);
+	expect(selected[0]).not.toHaveProperty('tokenHash');
+	expect(rows.size).toBe(3);
 });

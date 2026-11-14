@@ -35,8 +35,8 @@ function harness() {
 	return { services, operations, context, router: createAuthRouter(operations) };
 }
 
-test('all 82 native auth routes retain secure policy enforcement', async () => {
-	expect(Object.keys(authContract)).toHaveLength(82);
+test('all native auth routes retain secure policy enforcement', async () => {
+	expect(Object.keys(authContract)).toHaveLength(83);
 	expect(settingsPaths).toHaveLength(26);
 	for (const path of settingsPaths) expect(authContract[path as keyof typeof authContract]['~orpc'].meta).toMatchObject({ requestName: path, requireCredential: true, secure: true });
 	for (const path of ['i/regenerate-token/passkey/start', 'i/regenerate-token/passkey/complete'] as const) {
@@ -167,7 +167,7 @@ test.each([
 
 test('sign-in header business JSON retains reserved own keys at the wire boundary', () => {
 	const headers: Record<string, string> = Object.fromEntries([['constructor', 'retained'], ['__proto__', 'retained'], ['prototype', 'retained']]);
-	const output = toPackedSignin({ id: 'signin123', createdAt: '2026-10-09T00:00:00.000Z', ip: '127.0.0.1', success: true, headers });
+	const output = toPackedSignin({ id: 'signin123', createdAt: '2026-10-09T00:00:00.000Z', ip: '127.0.0.1', success: true, headers, browserSessionId: null, browserSession: null });
 	expect(output.headers).toEqual(headers);
 	expect(Object.keys(output.headers)).toEqual(['constructor', '__proto__', 'prototype']);
 });

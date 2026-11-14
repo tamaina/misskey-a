@@ -25,27 +25,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<MkSecuritySettings v-if="individualSession"/>
 		<X2fa v-else/>
-		<MkBrowserSessions/>
-
 		<SearchMarker :keywords="['signin', 'login', 'history', 'log']">
-			<FormSection>
-				<template #label><SearchLabel>{{ $locale.sfc.signinHistory }}</SearchLabel></template>
-				<MkPagination :paginator="paginator" withControl :forceDisableInfiniteScroll="true">
-					<template #default="{items}">
-						<div>
-							<div v-for="item in items" :key="item.id" v-panel class="timnmucd">
-								<header>
-									<i v-if="item.success" class="ti ti-check icon succ"></i>
-									<i v-else class="ti ti-circle-x icon fail"></i>
-									<code class="ip _monospace">{{ item.ip }}</code>
-									<MkTime :time="item.createdAt" class="time"/>
-									<span>{{ item.headers['user-agent'] }}</span>
-								</header>
-							</div>
-						</div>
-					</template>
-				</MkPagination>
-			</FormSection>
+			<MkBrowserSessions/>
 		</SearchMarker>
 
 		<SearchMarker :keywords="['regenerate', 'refresh', 'reset', 'token']">
@@ -61,29 +42,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw, onActivated, onDeactivated, onUnmounted, ref, watch } from 'vue';
+import { computed, onActivated, onDeactivated, onUnmounted, ref, watch } from 'vue';
 import MkBrowserSessions from '@features/auth/frontend/components/MkBrowserSessions.vue';
 import MkSecuritySettings from '@features/auth/frontend/components/MkSecuritySettings.vue';
 import X2fa from '@features/auth/frontend/pages/settings/2fa.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
-import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import { signout } from '@features/auth/frontend/signout.js';
 import { ownedInputText, ownedAuthenticateDialog } from '@features/auth/frontend/utility/owned-dialog.js';
 import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 
 const individualSession = computed(() => ensureSignin().token.startsWith('bs_'));
-
-const paginator = markRaw(new Paginator('i/signin-history', {
-	limit: 5,
-	params: { unlinkedOnly: true },
-}));
 
 const ownerId = ensureSignin().id;
 const ownerToken = ensureSignin().token;
@@ -193,58 +167,6 @@ definePage(() => ({
 	icon: 'ti ti-lock',
 }));
 </script>
-
-<style lang="scss" scoped>
-.timnmucd {
-	padding: 12px;
-
-	&:first-child {
-		border-top-left-radius: 6px;
-		border-top-right-radius: 6px;
-	}
-
-	&:last-child {
-		border-bottom-left-radius: 6px;
-		border-bottom-right-radius: 6px;
-	}
-
-	&:not(:last-child) {
-		border-bottom: solid 0.5px var(--MI_THEME-divider);
-	}
-
-	> header {
-		display: flex;
-		align-items: center;
-
-		> .icon {
-			width: 1em;
-			margin-right: 0.75em;
-
-			&.succ {
-				color: var(--MI_THEME-success);
-			}
-
-			&.fail {
-				color: var(--MI_THEME-error);
-			}
-		}
-
-		> .ip {
-			flex: 1;
-			min-width: 0;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			margin-right: 12px;
-		}
-
-		> .time {
-			margin-left: auto;
-			opacity: 0.7;
-		}
-	}
-}
-</style>
 
 <locale locale="ar-SA" lang="json">
 {

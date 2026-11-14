@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import type { BrowserSessionService } from '../../services/BrowserSessionService.js';
 import { toPackedSignin } from '../../auth.schema.js';
 
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
@@ -19,6 +20,7 @@ export const meta = {
 } as const;
 export interface ISigninHistoryDependencies {
 	signinsRepository: SigninsRepository;
+	browserSessionService: Pick<BrowserSessionService, 'listOwned'>;
 	signinEntityService: Pick<SigninEntityService, 'pack'>;
 	queryService: Pick<QueryService, 'makePaginationQuery'>;
 }
@@ -33,9 +35,27 @@ export function createISigninHistoryProcedure(deps: ISigninHistoryDependencies) 
 			if (ps.browserSessionId) query.andWhere('signin.browserSessionId = :sessionId', { sessionId: ps.browserSessionId });
 			if (ps.unlinkedOnly) query.andWhere('signin.browserSessionId IS NULL');
 
+			// Collapse before cursor pagination, comparing against all owned signins (not just this page).
+			if (ps.latestPerSession) query.andWhere(`NOT EXISTS (
+				SELECT 1 FROM "signin" newer
+				WHERE newer."userId" = signin."userId"
+				AND newer."browserSessionId" = signin."browserSessionId"
+				AND newer.id > signin.id
+			)`);
+
 			const history = await query.limit(ps.limit).getMany();
 
-			return await Promise.all(history.map(record => deps.signinEntityService.pack(record)));
+			const ids = [...new Set(history.flatMap(record => record.browserSessionId ? [record.browserSessionId] : []))];
+			const sessions = ids.length ? await deps.browserSessionService.listOwned(me.id, ids.length, 0, ids) : [];
+			const byId = new Map(sessions.map(session => [session.id, {
+				id: session.id, createdAt: session.createdAt.toISOString(), lastUsedAt: session.lastUsedAt.toISOString(),
+				lastIp: session.lastIp, lastUserAgent: session.lastUserAgent,
+				revokedAt: session.revokedAt?.toISOString() ?? null, current: session.id === context.browserSession?.id,
+			}]));
+			return await Promise.all(history.map(async record => ({
+				...await deps.signinEntityService.pack(record),
+				browserSession: record.browserSessionId ? byId.get(record.browserSessionId) ?? null : null,
+			})));
 		})();
 		return result.map(toPackedSignin);
 	});
