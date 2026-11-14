@@ -4447,6 +4447,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -11132,6 +11133,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -11185,6 +11187,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];
@@ -21943,6 +21946,7 @@ export type components = {
             canUseTranslator: boolean;
             canHideAds: boolean;
             canCreateChannel: boolean;
+            canFederateChannel: boolean;
             driveCapacityMb: number;
             maxFileSizeMb: number;
             uploadableFileTypes: string[];

@@ -94,7 +94,7 @@ import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
-import { $i } from '@features/auth/frontend/account.js';
+import { $i } from '@features/auth/frontend/i.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import type { Locale } from 'i18n';
 

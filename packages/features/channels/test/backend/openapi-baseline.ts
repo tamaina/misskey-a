@@ -47,7 +47,7 @@ export function restoreChannelFederationOpenapiBaseline<T extends { paths?: Reco
 	}
 
 	restoreFreezeFields(restored);
-	deepStrictEqual(freezeCounts, { policy: 39, channel: 10, input: 2 }, 'Documented channel freeze change inventory differs');
+	deepStrictEqual(freezeCounts, { policy: 43, channel: 10, input: 2 }, 'Documented channel freeze change inventory differs');
 	const counts = { input: 0, channel: 0, noteChannel: 0, error: 0 };
 	// Exploration adds exactly one optional enum in each input representation.
 	// Keep all existing frozen schemas and hashes after reversing these four fields.

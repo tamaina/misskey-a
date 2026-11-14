@@ -26,7 +26,7 @@
 	},
 	{
 		"file": "packages/features/channels/frontend/pages/channel-editor.vue",
-		"currentSha256": "cb2df82dbfadfc1a95e94d6bef2897440f16eae2416f3781a46038847ea78b82",
+		"currentSha256": "7349556b83afb9e44ab599ad9d8d09507c8fd383fd0adfedf5cd6953a1894f79",
 		"baselineSha256": "cbd379418a3d6d8ede064b7d1a450164b5158cbca56ce2006b76ec57339846bd",
 		"edits": [
 			{
@@ -37,37 +37,37 @@
 			},
 			{
 				"start": 4243,
-				"end": 4300,
-				"current": "import { $i } from '@features/auth/frontend/account.js';\n",
+				"end": 4294,
+				"current": "import { $i } from '@features/auth/frontend/i.js';\n",
 				"baseline": ""
 			},
 			{
-				"start": 4872,
-				"end": 5119,
+				"start": 4866,
+				"end": 5113,
 				"current": "const isFederated = ref(false);\nconst isFederationFrozen = ref(false);\nconst isOwner = computed(() => channel.value == null || channel.value.userId === $i?.id);\n\nwatch(isFederated, enabled => { if (enabled) allowRenoteToExternal.value = true; });\n",
 				"baseline": ""
 			},
 			{
-				"start": 5872,
-				"end": 5968,
+				"start": 5866,
+				"end": 5962,
 				"current": "\tisFederated.value = result.isFederated;\n\tisFederationFrozen.value = result.isFederationFrozen;\n",
 				"baseline": ""
 			},
 			{
-				"start": 6671,
-				"end": 7050,
+				"start": 6665,
+				"end": 7044,
 				"current": "\t\t...(isOwner.value && (channel.value == null || isFederated.value !== channel.value.isFederated) ? { isFederated: isFederated.value } : {}),\n\t\t...(channel.value && $i?.isModerator && isFederationFrozen.value !== channel.value.isFederationFrozen ? { isFederationFrozen: isFederationFrozen.value } : {}),\n\t\tallowRenoteToExternal: isFederated.value || allowRenoteToExternal.value,\n",
 				"baseline": "\t\tallowRenoteToExternal: allowRenoteToExternal.value,\n"
 			},
 			{
-				"start": 11933,
-				"end": 12154,
+				"start": 11927,
+				"end": 12148,
 				"current": "\t\"channelFederation\": \"Federate this channel\",\n\t\"channelFederationDescription\": \"New posts are public and federated. Local-only posts are rejected and renotes outside the channel are allowed. Existing posts stay local.\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 15381,
-				"end": 15672,
+				"start": 15375,
+				"end": 15666,
 				"current": "\t\"channelFederation\": \"チャンネルを連合する\",\n\t\"channelFederationFrozen\": \"チャンネル連合を凍結する\",\n\t\"channelFederationFrozenDescription\": \"連合は凍結されています。新しい投稿の送受信は停止し、凍結中のローカル投稿は解除後も公開されません。解除には所有者の連合権限が必要です。\",\n\t\"channelFederationDescription\": \"新規投稿は公開・連合されます。ローカル限定の投稿は作成できず、チャンネル外へのリノートを許可します。過去の投稿は公開されません。\",\n",
 				"baseline": ""
 			}

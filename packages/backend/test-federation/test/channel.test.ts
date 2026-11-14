@@ -6,7 +6,7 @@
 import { strictEqual } from 'node:assert';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 import type * as Misskey from 'misskey-js';
-import { createAccount, isFired, isNoteUpdatedEventFired, FEDERATION_TIMEOUT, WAIT_FOR_FEDERATION } from './utils.js';
+import { createAccount, createRole, fetchAdmin, isFired, isNoteUpdatedEventFired, FEDERATION_TIMEOUT, WAIT_FOR_FEDERATION } from './utils.js';
 import type { LoginUser } from './utils.js';
 
 describe('Channel Group federation pilot', () => {
@@ -18,6 +18,12 @@ describe('Channel Group federation pilot', () => {
 	beforeAll(async () => {
 		alice = await createAccount('a.test');
 		bob = await createAccount('b.test');
+		const role = await createRole('a.test', {
+			target: 'manual',
+			policies: { canFederateChannel: { useDefault: false, priority: 0, value: true } },
+		});
+		const admin = await fetchAdmin('a.test');
+		await admin.client.request('admin/roles/assign', { roleId: role.id, userId: alice.id });
 		channel = await alice.client.request('channels/create', { name: crypto.randomUUID(), isFederated: true, allowRenoteToExternal: false });
 		strictEqual(channel.isFederated, true);
 		strictEqual(channel.allowRenoteToExternal, true);
