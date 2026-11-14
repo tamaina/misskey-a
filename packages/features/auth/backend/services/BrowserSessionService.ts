@@ -8,6 +8,7 @@ import { IsNull, LessThanOrEqual } from 'typeorm';
 import type { FindOptionsSelect } from 'typeorm';
 import type { BrowserSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import { MiUserIp } from '../models/UserIp.js';
 import { MiBrowserSession } from '../models/BrowserSession.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
@@ -35,7 +36,7 @@ export class BrowserSessionService {
 			revokedAt: null, sudoUntil: null,
 		};
 		await repository.insert({
-			...session, lastIp: usage?.ip ?? null, lastUserAgent: usage?.userAgent?.slice(0, 1024) ?? null, tokenHash: createHash('sha256').update(token).digest('hex'),
+			...session, lastUserAgent: usage?.userAgent?.slice(0, 1024) ?? null, tokenHash: createHash('sha256').update(token).digest('hex'),
 		});
 		return { token, session };
 	}
@@ -55,17 +56,17 @@ export class BrowserSessionService {
 		if (!/^bs_[A-Za-z0-9_-]{43}$/.test(token)) return null;
 		const tokenHash = createHash('sha256').update(token).digest('hex');
 		const session = await this.browserSessionsRepository.findOne({
-			where: { tokenHash, revokedAt: IsNull() }, select: { ...metadataSelect, lastIp: true, lastUserAgent: true },
+			where: { tokenHash, revokedAt: IsNull() }, select: { ...metadataSelect, lastUserAgent: true },
 		});
 		if (!session) return null;
 		const lastUsedAt = new Date();
 		const cutoff = new Date(lastUsedAt.getTime() - 60_000);
 		const userAgent = usage?.userAgent?.slice(0, 1024) ?? null;
-		const changed = usage && (session.lastIp !== usage.ip || session.lastUserAgent !== userAgent);
+		const changed = usage && session.lastUserAgent !== userAgent;
 		if (changed || session.lastUsedAt <= cutoff) {
 			await this.browserSessionsRepository.update({
 				id: session.id, tokenHash, revokedAt: IsNull(), ...(changed ? {} : { lastUsedAt: LessThanOrEqual(cutoff) }),
-			}, { lastUsedAt, ...(usage ? { lastIp: usage.ip, lastUserAgent: userAgent } : {}) });
+			}, { lastUsedAt, ...(usage ? { lastUserAgent: userAgent } : {}) });
 		}
 		// Always re-read after the optional touch: concurrent revocation wins,
 		// and authorization never relies on a cached validity or sudo snapshot.
@@ -83,10 +84,18 @@ export class BrowserSessionService {
 		await repository.update({ userId, revokedAt: IsNull() }, { revokedAt: new Date(), sudoUntil: null, sudoPolicyStamp: null });
 	}
 
-	public async listOwned(userId: string, limit = 100, offset = 0): Promise<(BrowserSessionMetadata & Pick<MiBrowserSession, 'lastIp' | 'lastUserAgent'>)[]> {
-		return this.browserSessionsRepository.find({
-			where: { userId }, select: { ...metadataSelect, lastIp: true, lastUserAgent: true }, take: limit, skip: offset, order: { createdAt: 'DESC', id: 'DESC' },
+	public async listOwned(userId: string, limit = 100, offset = 0): Promise<(BrowserSessionMetadata & Pick<MiBrowserSession, 'lastUserAgent'> & { lastIp: string | null })[]> {
+		const sessions = await this.browserSessionsRepository.find({
+			where: { userId }, select: { ...metadataSelect, lastUserAgent: true }, take: limit, skip: offset, order: { createdAt: 'DESC', id: 'DESC' },
 		});
+		if (sessions.length === 0) return [];
+		const latest = await this.browserSessionsRepository.manager.getRepository(MiUserIp).createQueryBuilder('ip')
+			.select(['ip.browserSessionId', 'ip.ip']).distinctOn(['ip.browserSessionId'])
+			.where('ip.userId = :userId', { userId })
+			.andWhere('ip.browserSessionId IN (:...ids)', { ids: sessions.map(session => session.id) })
+			.orderBy('ip.browserSessionId').addOrderBy('ip.lastSeenAt', 'DESC').addOrderBy('ip.id', 'DESC').getMany();
+		const lastIps = new Map(latest.map(row => [row.browserSessionId, row.ip]));
+		return sessions.map(session => ({ ...session, lastIp: lastIps.get(session.id) ?? null }));
 	}
 
 	public async revokeOwned(userId: string, sessionId: string): Promise<boolean> {

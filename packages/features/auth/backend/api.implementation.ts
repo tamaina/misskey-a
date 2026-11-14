@@ -68,7 +68,8 @@ import type { RegenerateTokenPasskeyDependencies } from './endpoints/i/regenerat
 import type { IRegenerateTokenDependencies } from './endpoints/i/regenerate-token.js';
 import { createIRevokeTokenProcedure } from './endpoints/i/revoke-token.js';
 import type { IRevokeTokenDependencies } from './endpoints/i/revoke-token.js';
-import { createISessionsProcedure, createISessionsRevokeProcedure, createISignoutProcedure } from './endpoints/i/sessions.js';
+import type { SessionIpsDependencies } from './endpoints/i/sessions.js';
+import { createISessionIpsProcedure, createISessionsProcedure, createISessionsRevokeProcedure, createISignoutProcedure } from './endpoints/i/sessions.js';
 import type { BrowserSessionDependencies } from './endpoints/i/sessions.js';
 import { BrowserSessionService } from './services/BrowserSessionService.js';
 import { createISigninHistoryProcedure } from './endpoints/i/signin-history.js';
@@ -190,6 +191,7 @@ export interface AuthRouterDependencies {
 	'i/revoke-token': IRevokeTokenDependencies;
 	'i/signin-history': ISigninHistoryDependencies;
 	'i/sessions': BrowserSessionDependencies;
+	'i/session-ips': SessionIpsDependencies;
 	'i/sessions/revoke': BrowserSessionDependencies;
 	'i/signout': BrowserSessionDependencies;
 	'i/update-email': IUpdateEmailDependencies;
@@ -260,6 +262,7 @@ export function createAuthRouter(deps: AuthRouterDependencies) {
 		'i/revoke-token': createIRevokeTokenProcedure(deps['i/revoke-token']),
 		'i/signin-history': createISigninHistoryProcedure(deps['i/signin-history']),
 		'i/sessions': createISessionsProcedure(deps['i/sessions']),
+		'i/session-ips': createISessionIpsProcedure(deps['i/session-ips']),
 		'i/sessions/revoke': createISessionsRevokeProcedure(deps['i/sessions/revoke']),
 		'i/signout': createISignoutProcedure(deps['i/signout']),
 		'i/update-email': createIUpdateEmailProcedure(deps['i/update-email']),
@@ -317,6 +320,7 @@ export class AuthApiProvider {
 			'i/regenerate-token/passkey/start': { db: this.moduleRef.get<RegenerateTokenPasskeyDependencies['db']>(DI.db, { strict: false }), browserSessionService: this.moduleRef.get(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get(GlobalEventService, { strict: false }), freshReauthentication: this.moduleRef.get(FreshPasskeyReauthentication, { strict: false }) },
 			'i/regenerate-token/passkey/complete': { db: this.moduleRef.get<RegenerateTokenPasskeyDependencies['db']>(DI.db, { strict: false }), browserSessionService: this.moduleRef.get(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get(GlobalEventService, { strict: false }), freshReauthentication: this.moduleRef.get(FreshPasskeyReauthentication, { strict: false }) },
 			'i/revoke-token': { accessTokensRepository: this.moduleRef.get<IRevokeTokenDependencies['accessTokensRepository']>(DI.accessTokensRepository, { strict: false }) },
+			'i/session-ips': { userIpsRepository: this.moduleRef.get<SessionIpsDependencies['userIpsRepository']>(DI.userIpsRepository, { strict: false }) },
 			'i/sessions': { browserSessionService: this.moduleRef.get<BrowserSessionDependencies['browserSessionService']>(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get<BrowserSessionDependencies['globalEventService']>(GlobalEventService, { strict: false }) },
 			'i/sessions/revoke': { browserSessionService: this.moduleRef.get<BrowserSessionDependencies['browserSessionService']>(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get<BrowserSessionDependencies['globalEventService']>(GlobalEventService, { strict: false }) },
 			'i/signout': { browserSessionService: this.moduleRef.get<BrowserSessionDependencies['browserSessionService']>(BrowserSessionService, { strict: false }), globalEventService: this.moduleRef.get<BrowserSessionDependencies['globalEventService']>(GlobalEventService, { strict: false }) },

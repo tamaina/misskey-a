@@ -5,10 +5,11 @@
 
 import 'reflect-metadata';
 import { createHash } from 'node:crypto';
-import { FindOperator, IsNull } from 'typeorm';
+import { FindOperator, IsNull, type SelectQueryBuilder } from 'typeorm';
 import { describe, expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
+import type { MiUserIp } from '../../backend/models/UserIp.js';
 import type { BrowserSessionsRepository, MiBrowserSession, MiUser } from '@features/persistence/backend/repositories/models.js';
 
 function matches(row: object, criteria: unknown): boolean {
@@ -25,6 +26,10 @@ function matches(row: object, criteria: unknown): boolean {
 function fixture() {
 	const repository = mockDeep<BrowserSessionsRepository>();
 	const rows = new Map<string, MiBrowserSession>();
+	const ips = mockDeep<SelectQueryBuilder<MiUserIp>>();
+	repository.manager.getRepository.mockReturnValue({ createQueryBuilder: () => ips } as never);
+	ips.select.mockReturnValue(ips); ips.distinctOn.mockReturnValue(ips); ips.where.mockReturnValue(ips); ips.andWhere.mockReturnValue(ips);
+	ips.orderBy.mockReturnValue(ips); ips.addOrderBy.mockReturnValue(ips); ips.getMany.mockResolvedValue([]);
 	let sequence = 0;
 	repository.insert.mockImplementation(async entity => {
 		const row = entity as MiBrowserSession;
@@ -50,7 +55,7 @@ function fixture() {
 		});
 	});
 	const service = new BrowserSessionService(repository, { gen: () => `session-${++sequence}` });
-	return { service, repository, rows };
+	return { service, repository, rows, ips };
 }
 
 describe('individual browser session foundation (synthetic persistence only)', () => {
@@ -180,16 +185,29 @@ describe('individual browser session foundation (synthetic persistence only)', (
 	});
 });
 
-test('records latest HTTP IP and UA without merging sessions or touching a revoked session', async () => {
+test('records latest HTTP UA without merging sessions or touching a revoked session', async () => {
 	const { service, rows } = fixture();
 	const first = await service.issue('alice');
 	const second = await service.issue('alice');
 	await service.verify(first.token, { ip: '192.0.2.1', userAgent: 'First browser' });
 	await service.verify(second.token, { ip: '192.0.2.1', userAgent: 'Second browser' });
 	await service.verify(first.token, { ip: '192.0.2.2', userAgent: 'Updated browser' });
-	expect(rows.get(first.session.id)).toMatchObject({ lastIp: '192.0.2.2', lastUserAgent: 'Updated browser' });
-	expect(rows.get(second.session.id)).toMatchObject({ lastIp: '192.0.2.1', lastUserAgent: 'Second browser' });
+	expect(rows.get(first.session.id)).toMatchObject({ lastUserAgent: 'Updated browser' });
+	expect(rows.get(second.session.id)).toMatchObject({ lastUserAgent: 'Second browser' });
 	await service.revokeOwned('alice', first.session.id);
 	expect(await service.verify(first.token, { ip: '192.0.2.3', userAgent: 'Rejected' })).toBeNull();
-	expect(rows.get(first.session.id)?.lastIp).toBe('192.0.2.2');
+	expect(rows.get(first.session.id)?.lastUserAgent).toBe('Updated browser');
+	expect(rows.get(first.session.id)).not.toHaveProperty('lastIp');
+});
+
+test('list derives lastIp from the latest owned user_ip per session, with null for no history', async () => {
+	const { service, ips } = fixture();
+	const first = await service.issue('alice');
+	await service.issue('alice');
+	ips.getMany.mockResolvedValue([{ browserSessionId: first.session.id, ip: '192.0.2.4' }] as MiUserIp[]);
+	const rows = await service.listOwned('alice');
+	expect(rows.map(row => row.lastIp)).toEqual(['192.0.2.4', null]);
+	expect(ips.where).toHaveBeenCalledWith('ip.userId = :userId', { userId: 'alice' });
+	expect(ips.distinctOn).toHaveBeenCalledWith(['ip.browserSessionId']);
+	expect(ips.addOrderBy).toHaveBeenCalledWith('ip.lastSeenAt', 'DESC');
 });

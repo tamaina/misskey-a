@@ -26,7 +26,7 @@ test('browser session entity metadata matches the additive migrations without co
 	await source.prepare();
 	const metadata = source.getMetadata(MiBrowserSession);
 	expect(metadata.tableName).toBe('browser_session');
-	expect(metadata.columns.map(column => column.databaseName)).toEqual(['id', 'userId', 'tokenHash', 'createdAt', 'lastUsedAt', 'lastIp', 'lastUserAgent', 'revokedAt', 'sudoUntil', 'sudoGrantId', 'sudoPolicyStamp']);
+	expect(metadata.columns.map(column => column.databaseName)).toEqual(['id', 'userId', 'tokenHash', 'createdAt', 'lastUsedAt', 'lastUserAgent', 'revokedAt', 'sudoUntil', 'sudoGrantId', 'sudoPolicyStamp']);
 	expect(metadata.primaryColumns[0].primaryKeyConstraintName).toBe('PK_browser_session');
 	expect(metadata.foreignKeys[0]).toMatchObject({ name: 'FK_browser_session_userId', onDelete: 'CASCADE', referencedTablePath: 'user' });
 	expect(metadata.indices.map(index => ({ name: index.name, unique: index.isUnique }))).toEqual([
@@ -75,7 +75,7 @@ test('session history migration matches nullable metadata and reverses without a
 	const source = new MetadataSource({ type: 'postgres', entities, synchronize: false, dropSchema: false });
 	await source.prepare();
 	const session = source.getMetadata(MiBrowserSession);
-	expect(session.findColumnWithPropertyName('lastIp')).toMatchObject({ length: '128', isNullable: true });
+	expect(session.findColumnWithPropertyName('lastIp')).toBeUndefined();
 	expect(session.findColumnWithPropertyName('lastUserAgent')).toMatchObject({ length: '1024', isNullable: true });
 	const signin = source.getMetadata(MiSignin);
 	expect(signin.findColumnWithPropertyName('browserSessionId')).toMatchObject({ length: '32', isNullable: true });

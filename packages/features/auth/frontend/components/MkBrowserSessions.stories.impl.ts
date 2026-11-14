@@ -26,7 +26,7 @@ export const CurrentAndOther = {
 			template: '<div style="width: min(640px, 100vw); padding: 24px; box-sizing: border-box"><MkBrowserSessions /></div>',
 		};
 	},
-	parameters: { layout: 'centered', msw: { handlers: [http.post('*/api/i/sessions', () => HttpResponse.json(sessions)), http.post('*/api/i/signin-history', () => HttpResponse.json([{ id: 'synthetic-history', createdAt: sessions[0].createdAt, ip: '192.0.2.1', headers: { 'user-agent': sessions[1].lastUserAgent }, success: true }])), block] } },
+	parameters: { layout: 'centered', msw: { handlers: [http.post('*/api/i/sessions', () => HttpResponse.json(sessions)), http.post('*/api/i/session-ips', () => HttpResponse.json([{ id: 'synthetic-history', createdAt: sessions[0].createdAt, ip: '192.0.2.1', lastSeenAt: sessions[0].lastUsedAt }])), block] } },
 } satisfies StoryObj<typeof MkBrowserSessions>;
 export const LoadFailure = {
 	...CurrentAndOther,

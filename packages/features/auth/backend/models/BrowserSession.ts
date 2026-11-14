@@ -31,9 +31,6 @@ export class MiBrowserSession {
 	@Column('timestamp with time zone')
 	public lastUsedAt: Date;
 
-	@Column('varchar', { length: 128, nullable: true })
-	public lastIp: string | null;
-
 	@Column('varchar', { length: 1024, nullable: true })
 	public lastUserAgent: string | null;
 

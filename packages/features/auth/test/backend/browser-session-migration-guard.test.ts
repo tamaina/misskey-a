@@ -69,6 +69,8 @@ test('executes the actual migration down/up only on an empty fixture and checks 
 	const queries = runner.query.mock.calls.map(([sql]) => sql);
 	const drop = queries.indexOf('DROP TABLE "browser_session"');
 	const create = queries.findIndex(sql => sql.startsWith('CREATE TABLE "browser_session"'));
+	expect(queries.indexOf('ALTER TABLE "user_ip" DROP CONSTRAINT "FK_user_ip_browserSessionId"')).toBeLessThan(drop);
+	expect(queries.indexOf('ALTER TABLE "signin" DROP CONSTRAINT "FK_signin_browserSessionId"')).toBeLessThan(drop);
 	expect(queries).toContain('DROP TABLE "oauth_approval"');
 	expect(drop).toBeGreaterThan(queries.indexOf('DROP TABLE "oauth_approval"'));
 	expect(queries).toContain('ALTER TABLE "browser_session" DROP COLUMN "sudoGrantId"');

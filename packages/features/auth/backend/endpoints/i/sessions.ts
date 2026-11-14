@@ -9,11 +9,26 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { BrowserSessionService } from '../../services/BrowserSessionService.js';
-import { ISessionsContract, ISessionsRevokeContract, ISignoutContract } from '../../api.definition.js';
+import type { UserIpsRepository } from '@features/persistence/backend/repositories/models.js';
+import { ISessionIpsContract, ISessionsContract, ISessionsRevokeContract, ISignoutContract } from '../../api.definition.js';
 
 export interface BrowserSessionDependencies {
 	browserSessionService: Pick<BrowserSessionService, 'listOwned' | 'revokeOwned'>;
 	globalEventService: Pick<GlobalEventService, 'publishInternalEvent'>;
+}
+
+export interface SessionIpsDependencies {
+	userIpsRepository: UserIpsRepository;
+}
+
+export function createISessionIpsProcedure(deps: SessionIpsDependencies) {
+	return createApiProcedure<MiLocalUser>()(ISessionIpsContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const rows = await deps.userIpsRepository.find({
+			where: { userId: context.principal.id, browserSessionId: input.sessionId },
+			order: { id: 'DESC' }, take: input.limit, skip: input.offset,
+		});
+		return rows.map(row => ({ id: String(row.id), ip: row.ip, createdAt: row.createdAt.toISOString(), lastSeenAt: row.lastSeenAt.toISOString() }));
+	});
 }
 
 export function createISessionsProcedure(deps: BrowserSessionDependencies) {

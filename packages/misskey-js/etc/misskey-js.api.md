@@ -2025,6 +2025,8 @@ declare namespace entities {
         ISigninHistoryResponse,
         ISessionsRequest,
         ISessionsResponse,
+        ISessionIpsRequest,
+        ISessionIpsResponse,
         ISessionsRevokeRequest,
         ISignoutRequest,
         IUpdateEmailRequest,
@@ -4279,6 +4281,12 @@ type ISecurityTotpStartRequest = ContractRequest<'i/security/totp/start'>;
 
 // @public (undocumented)
 type ISecurityTotpStartResponse = ContractResponse<'i/security/totp/start'>;
+
+// @public (undocumented)
+type ISessionIpsRequest = ContractRequest<'i/session-ips'>;
+
+// @public (undocumented)
+type ISessionIpsResponse = ContractResponse<'i/session-ips'>;
 
 // @public (undocumented)
 type ISessionsRequest = ContractRequest<'i/sessions'>;

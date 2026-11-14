@@ -32,7 +32,7 @@ test('shared IP sessions keep separate folders, current/status markers, scoped h
 	const base = { createdAt: '2026-10-01T00:00:00.000Z', lastUsedAt: '2026-10-02T00:00:00.000Z', lastIp: '192.0.2.1', lastUserAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Gecko/20100101 Firefox/145.0', revokedAt: null };
 	vi.mocked(misskeyApi).mockImplementation(async (route, data) => {
 		if (route === 'i/sessions') return [{ ...base, id: 'other', current: false }, { ...base, id: 'current', current: true }, { ...base, id: 'revoked', current: false, revokedAt: base.lastUsedAt }] as never;
-		if (route === 'i/signin-history') return [{ id: 'history', createdAt: base.createdAt, ip: '192.0.2.2', headers: { 'user-agent': 'Mozilla/5.0 (Linux; Android 14) Chrome/140.0.0.0 Mobile Safari/537.36' }, success: true }] as never;
+		if (route === 'i/session-ips') return [{ id: 'history', createdAt: base.createdAt, lastSeenAt: base.lastUsedAt, ip: '192.0.2.2' }] as never;
 		if (route === 'i/sessions/revoke') { expect(data).toEqual({ sessionId: 'other' }); return undefined as never; }
 		throw new Error(`Unexpected synthetic route ${route}`);
 	});
@@ -52,16 +52,19 @@ test('shared IP sessions keep separate folders, current/status markers, scoped h
 	expect(folders[2].textContent).toContain('失効済み');
 	expect(misskeyApi).not.toHaveBeenCalledWith('i/signin-history', expect.anything());
 	folders[1].querySelector('button')!.click();
-	await vi.waitFor(() => expect(folders[1].textContent).toContain('Chrome 140 / Android'));
+	await vi.waitFor(() => expect(folders[1].textContent).toContain('192.0.2.2'));
 	expect(folders[1].textContent).toContain(base.lastUserAgent);
-	expect(folders[1].textContent).toContain('Mozilla/5.0 (Linux; Android 14) Chrome/140.0.0.0 Mobile Safari/537.36');
-	expect(misskeyApi).toHaveBeenCalledWith('i/signin-history', expect.objectContaining({ browserSessionId: 'other' }));
+	expect(folders[1].textContent).toContain('初回確認:');
+	expect(folders[1].textContent).toContain('最終確認:');
+	expect(folders[1].textContent).toContain(base.createdAt);
+	expect(folders[1].textContent).toContain(base.lastUsedAt);
+	expect(misskeyApi).toHaveBeenCalledWith('i/session-ips', expect.objectContaining({ sessionId: 'other' }));
 	[...folders[1].querySelectorAll('button')].find(button => button.textContent === 'このログインを失効')!.click();
 	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/sessions/revoke', { sessionId: 'other' }));
 	await vi.waitFor(() => expect(folders[1].querySelector('small')?.textContent).toBe('失効済み'));
 	expect(folders[1].querySelectorAll('button')).toHaveLength(1);
 	expect(signout).not.toHaveBeenCalled();
 	folders[2].querySelector('button')!.click();
-	await vi.waitFor(() => expect(folders[2].textContent).toContain('Chrome 140 / Android'));
+	await vi.waitFor(() => expect(folders[2].textContent).toContain('192.0.2.2'));
 	expect(folders[2].querySelectorAll('button')).toHaveLength(1);
 });

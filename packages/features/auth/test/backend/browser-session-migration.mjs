@@ -7,6 +7,8 @@ import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 import { BrowserSession1791849600000 } from '../../../../backend/migration/1791849600000-BrowserSession.js';
 import { SudoPolicy1792300000001 } from '../../../../backend/migration/1792300000001-SudoPolicy.js';
+import { SessionUserIp1794700800000 } from '../../../../backend/migration/1794700800000-SessionUserIp.js';
+import { BrowserSessionHistory1794614400000 } from '../../../../backend/migration/1794614400000-BrowserSessionHistory.js';
 import { AccessTokenExpiry1792300000004 } from '../../../../backend/migration/1792300000004-AccessTokenExpiry.js';
 
 /** @param {Record<string, string | undefined>} environment */
@@ -48,6 +50,8 @@ export async function verifyBrowserSessionMigration(source) {
 		// Later migrations own columns/FKs on this table. Revert those exact
 		// dependencies first and restore them afterward; never use DROP CASCADE.
 		await expiry.down(runner);
+		await new SessionUserIp1794700800000().down(runner);
+		await new BrowserSessionHistory1794614400000().down(runner);
 		await sudo.down(runner);
 		await migration.down(runner);
 		assert.equal(await runner.hasTable('browser_session'), false, 'down must remove the table.');
@@ -55,6 +59,8 @@ export async function verifyBrowserSessionMigration(source) {
 		assert.equal(await runner.hasTable('browser_session'), true, 'up must restore the table.');
 		await sudo.up(runner);
 		await expiry.up(runner);
+		await new BrowserSessionHistory1794614400000().up(runner);
+		await new SessionUserIp1794700800000().up(runner);
 		await runner.commitTransaction();
 		const pending = await source.driver.createSchemaBuilder().log();
 		assert.equal(pending.upQueries.length, 0, 'No pending up DDL is allowed after the round trip.');

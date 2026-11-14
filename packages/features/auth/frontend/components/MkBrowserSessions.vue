@@ -28,9 +28,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkPagination :paginator="sessionHistory(session.id)" withControl :forceDisableInfiniteScroll="true">
 						<template #default="{ items }">
 							<div v-for="item in items" :key="item.id" class="_gaps_s">
-								<div><MkTime :time="item.createdAt"/> · <code>{{ item.ip }}</code></div>
-								<div>{{ parseUserAgent(item.headers['user-agent']).label ?? $locale.sfc.unknownAgent }}</div>
-								<div :class="$style.agent">{{ item.headers['user-agent'] ?? $locale.sfc.unknown }}</div>
+								<div><code>{{ item.ip }}</code></div>
+								<div>{{ $locale.sfc.ipFirstSeen }} <MkTime :time="item.createdAt"/></div>
+								<div>{{ $locale.sfc.ipLastSeen }} <MkTime :time="item.lastSeenAt"/></div>
 							</div>
 						</template>
 					</MkPagination>
@@ -66,12 +66,12 @@ const sessions = ref<Session[]>([]);
 const displaySessions = computed(() => sessions.value
 	.map(session => ({ session, agent: parseUserAgent(session.lastUserAgent) }))
 	.sort((a, b) => Number(b.session.current) - Number(a.session.current)));
-const histories = new Map<string, Paginator<'i/signin-history'>>();
+const histories = new Map<string, Paginator<'i/session-ips'>>();
 
 function sessionHistory(sessionId: string) {
 	let history = histories.get(sessionId);
 	if (!history) {
-		history = markRaw(new Paginator('i/signin-history', { limit: 10, params: { browserSessionId: sessionId } }));
+		history = markRaw(new Paginator('i/session-ips', { limit: 10, offsetMode: true, params: { sessionId } }));
 		histories.set(sessionId, history);
 	}
 	return history;
@@ -135,7 +135,9 @@ onDeactivated(leave); onUnmounted(leave);
 	"revoked": "失効済み",
 	"active": "有効",
 	"unknown": "記録なし",
-	"history": "このセッションのログイン履歴（IP・User-Agent）",
+	"history": "このセッションの IP 履歴",
+	"ipFirstSeen": "初回確認:",
+	"ipLastSeen": "最終確認:",
 	"signout": "このログインからサインアウト",
 	"revoke": "このログインを失効",
 	"confirmCurrent": "このログインからサインアウトしますか。",

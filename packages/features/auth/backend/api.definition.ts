@@ -503,6 +503,10 @@ export const ISessionsContract = oc.$meta({ requestName: 'i/sessions', requireCr
 	.route({ method: 'POST', path: '/i/sessions', tags: ['account'] }).errors(commonErrors)
 	.input(objectInput({ limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 100), offset: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0) }))
 	.output(v.array(browserSessionResult));
+export const ISessionIpsContract = oc.$meta({ requestName: 'i/session-ips', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
+	.route({ method: 'POST', path: '/i/session-ips', tags: ['account'] }).errors(commonErrors)
+	.input(objectInput({ sessionId: misskeyId, limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10), offset: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0) }))
+	.output(v.array(v.strictObject({ id: v.string(), ip: v.string(), createdAt: v.string(), lastSeenAt: v.string() })));
 export const ISessionsRevokeContract = oc.$meta({ requestName: 'i/sessions/revoke', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/i/sessions/revoke', tags: ['account'] }).errors(commonErrors)
 	.input(objectInput({ sessionId: misskeyId })).output(v.void());
@@ -554,6 +558,7 @@ export const authContract = {
 	'i/revoke-token': IRevokeTokenContract,
 	'i/signin-history': ISigninHistoryContract,
 	'i/sessions': ISessionsContract,
+	'i/session-ips': ISessionIpsContract,
 	'i/sessions/revoke': ISessionsRevokeContract,
 	'i/signout': ISignoutContract,
 	'i/update-email': IUpdateEmailContract,
