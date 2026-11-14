@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { S3PrivateMailStorage } from '../../../backend/built/features/email/backend.js';
 
 const key = 'raw/00000000-0000-0000-0000-000000000001.eml';
+
 function client(overrides = {}) {
 	const calls = [];
 	return {
