@@ -35,6 +35,7 @@ export function createSecuritySettingsRouter(deps: SecuritySettingsDependencies)
 			return { ...result, options: toWebAuthnAuthenticationOptions(result.options) };
 		}),
 		'i/security/passkey/mfa/complete': procedure(contract['i/security/passkey/mfa/complete']).use(requirePrincipal<MiLocalUser>()).handler(({ input, context }) => security.activateComplete(sudoIdentity(context), input.ticket, input.credential, input.recoveryAcknowledged)),
+		'i/security/passkey/mfa/enable': procedure(contract['i/security/passkey/mfa/enable']).use(requirePrincipal<MiLocalUser>()).handler(({ input, context }) => security.enablePasskeyMfa(sudoIdentity(context), input.acknowledged)),
 		'i/security/passkey/mfa/disable': procedure(contract['i/security/passkey/mfa/disable']).use(requirePrincipal<MiLocalUser>()).handler(({ input, context }) => security.disablePasskeyMfa(sudoIdentity(context), input.acknowledged)),
 		'i/security/passkey/remove': procedure(contract['i/security/passkey/remove']).use(requirePrincipal<MiLocalUser>()).handler(({ input, context }) => security.removeKey(sudoIdentity(context), input.credentialId)),
 		'i/security/passkey/rename': procedure(contract['i/security/passkey/rename']).use(requirePrincipal<MiLocalUser>()).handler(({ input, context }) => security.renameKey(sudoIdentity(context), input.credentialId, input.name)),

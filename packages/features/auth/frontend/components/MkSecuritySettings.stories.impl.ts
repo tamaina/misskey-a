@@ -16,12 +16,19 @@ const initialState = {
 };
 const backupCodes = Array.from({ length: 5 }, (_, index) => `synthetic-recovery-${index + 1}`);
 
-function handlers(state: typeof initialState) {
+function handlers(initial: typeof initialState) {
+	const state = { ...initial };
 	return [
 		http.post('*/api/i/registry/keys', () => HttpResponse.json([])),
 		http.post('*/api/i/registry/get-all', () => HttpResponse.json({})),
 		http.post('*/api/i/security/state', () => HttpResponse.json(state)),
 		http.post('*/api/i/sudo/status', () => HttpResponse.json({ active: true, expiresAt: new Date(Date.now() + 300_000).toISOString() })),
+		http.post('*/api/i/security/passkey/mfa/enable', () => {
+			state.passkeyMfaEnabled = true;
+			const issued = state.recoveryCodesRemaining ? [] : backupCodes;
+			state.recoveryCodesRemaining ||= backupCodes.length;
+			return HttpResponse.json({ backupCodes: issued });
+		}),
 		http.post('*/api/i/security/keys/list', () => HttpResponse.json(state.passkeyCount ? [{ id: 'AQID', name: 'Synthetic security key', lastUsedAt: '2026-10-18T00:00:00.000Z' }] : [])),
 		http.post('*/api/i/security/totp/start', () => HttpResponse.json({ secret: 'JBSWY3DPEHPK3PXP', url: 'otpauth://totp/Storybook:synthetic?secret=JBSWY3DPEHPK3PXP&issuer=Storybook' })),
 		http.post('*/api/i/security/recovery-codes', () => HttpResponse.json({ backupCodes })),
@@ -43,6 +50,14 @@ export const Default = {
 		};
 	},
 	parameters: { layout: 'centered', msw: { handlers: handlers(initialState) } },
+} satisfies StoryObj<typeof MkSecuritySettings>;
+export const NoRegisteredKeys = {
+	...Default,
+	parameters: { layout: 'centered', msw: { handlers: handlers({ ...initialState, passkeyCount: 0, recoveryCodesRemaining: 0 }) } },
+} satisfies StoryObj<typeof MkSecuritySettings>;
+export const ReenableWithoutRecoveryCodes = {
+	...Default,
+	parameters: { layout: 'centered', msw: { handlers: handlers({ ...initialState, recoveryCodesRemaining: 0 }) } },
 } satisfies StoryObj<typeof MkSecuritySettings>;
 export const TotpWithLowRecoveryCodes = {
 	...Default,

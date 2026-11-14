@@ -294,3 +294,48 @@ test.each(['no-uv', 'policy', 'foreign-session', 'expired'] as const)('passwordl
 	await expect(f.service.passwordlessComplete(actor, started.ticket, credential)).rejects.toThrow();
 	expect(f.profiles.update).not.toHaveBeenCalled();
 });
+
+test.each([{ stored: null }, { stored: [] }, { stored: ['unspent-code'] }])('explicit MFA enable preserves TOTP and login policy with stored codes=$stored', async ({ stored }) => {
+	const f = fixture(); f.profile.twoFactorBackupSecret = stored;
+	f.profile.twoFactorEnabled = true; f.profile.twoFactorSecret = 'keep-totp';
+	f.profile.twoFactorTempSecret = 'keep-pending'; f.profile.usePasswordLessLogin = true; f.profile.passwordLoginDisabled = true;
+	const result = await f.service.enablePasskeyMfa(identity, true);
+	if (stored?.length) expect(result.backupCodes).toEqual([]);
+	else { expect(result.backupCodes).toHaveLength(5); expect(new Set(result.backupCodes).size).toBe(5); }
+	expect(f.deps.sudo.transaction).toHaveBeenCalledExactlyOnceWith(identity, expect.any(Function));
+	expect(f.profiles.update).toHaveBeenCalledExactlyOnceWith({ userId: identity.userId }, {
+		passkeyMfaEnabled: true, ...(stored?.length ? {} : { twoFactorBackupSecret: result.backupCodes }),
+	});
+	expect(f.keys.insert).not.toHaveBeenCalled(); expect(f.keys.update).not.toHaveBeenCalled(); expect(f.keys.delete).not.toHaveBeenCalled();
+	expect(f.users.update).not.toHaveBeenCalled(); expect(webauthn.verifyAuthenticationResponse).not.toHaveBeenCalled();
+	expect(f.deps.operations.create).not.toHaveBeenCalled();
+	expect(f.sessions.update).toHaveBeenCalledWith(expect.objectContaining({ userId: identity.userId }), { revokedAt: expect.any(Date), sudoUntil: null, sudoPolicyStamp: null });
+	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('browserSessionRevoked', { id: 'other-session', userId: identity.userId });
+	expect(f.committed.mock.invocationCallOrder[0]).toBeLessThan(f.deps.events.publishMainStream.mock.invocationCallOrder[0]);
+});
+
+test.each(['unacknowledged', 'no-key', 'already-enabled', 'sudo'] as const)('explicit MFA enable rejects %s without changing settings', async kind => {
+	const f = fixture();
+	if (kind === 'no-key') f.context.keys = [];
+	if (kind === 'already-enabled') f.profile.passkeyMfaEnabled = true;
+	if (kind === 'sudo') f.deps.sudo.transaction.mockRejectedValueOnce(Object.assign(new Error('Sudo required'), { code: 'SUDO_REQUIRED' }));
+	await expect(f.service.enablePasskeyMfa(identity, kind !== 'unacknowledged')).rejects.toMatchObject({ code: kind === 'sudo' ? 'SUDO_REQUIRED' : 'CONFIRMATION_FAILED' });
+	if (kind === 'unacknowledged') expect(f.deps.sudo.transaction).not.toHaveBeenCalled();
+	expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.sessions.update).not.toHaveBeenCalled();
+	expect(f.deps.events.publishMainStream).not.toHaveBeenCalled();
+});
+
+test.each([false, true])('disable then explicit enable retains keys and TOTP=%s, issuing codes only when needed', async totp => {
+	const f = fixture(); f.profile.passkeyMfaEnabled = true; f.profile.twoFactorEnabled = totp;
+	f.profile.twoFactorSecret = totp ? 'keep-totp' : null; f.profile.twoFactorBackupSecret = ['old-code'];
+	await f.service.disablePasskeyMfa(identity, true);
+	expect(f.profiles.update).toHaveBeenLastCalledWith({ userId: identity.userId }, { passkeyMfaEnabled: false, ...(totp ? {} : { twoFactorBackupSecret: null }) });
+	Object.assign(f.profile, f.profiles.update.mock.calls.at(-1)![1]);
+	const enabled = await f.service.enablePasskeyMfa(identity, true);
+	expect(enabled.backupCodes).toHaveLength(totp ? 0 : 5);
+	if (!totp) expect(enabled.backupCodes).not.toContain('old-code');
+	Object.assign(f.profile, f.profiles.update.mock.calls.at(-1)![1]);
+	expect(f.profile).toMatchObject({ passkeyMfaEnabled: true, twoFactorEnabled: totp, twoFactorSecret: totp ? 'keep-totp' : null });
+	expect(f.keys.delete).not.toHaveBeenCalled(); expect(f.sessions.find).toHaveBeenCalledTimes(2);
+	if (!totp) await expect(f.service.removeKey(identity, f.key.id)).rejects.toMatchObject({ code: 'LAST_AUTHENTICATION_FACTOR' });
+});

@@ -42,6 +42,7 @@ export const securitySettingsContract = {
 	'i/security/passkey/mfa/complete': route('i/security/passkey/mfa/complete').input(objectInput({
 		ticket, credential: webAuthnAuthenticationResponseSchema, recoveryAcknowledged: v.boolean(),
 	})).output(v.void()),
+	'i/security/passkey/mfa/enable': route('i/security/passkey/mfa/enable').input(objectInput({ acknowledged: v.boolean() })).output(codes),
 	'i/security/passkey/mfa/disable': route('i/security/passkey/mfa/disable').input(objectInput({ acknowledged: v.boolean() })).output(v.void()),
 	'i/security/passkey/remove': route('i/security/passkey/remove').input(objectInput({ credentialId: keyId })).output(v.void()),
 	'i/security/passkey/rename': route('i/security/passkey/rename').input(objectInput({ credentialId: keyId, name })).output(v.void()),

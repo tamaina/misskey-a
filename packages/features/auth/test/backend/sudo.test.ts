@@ -12,6 +12,8 @@ import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiBrowserSession } from '../../backend/models/BrowserSession.js';
 import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
 import { SudoService, sudoPolicyStamp } from '../../backend/sudo.js';
+import { SecuritySettings } from '../../backend/security-settings.js';
+import type { SecuritySettingsDependencies } from '../../backend/security-settings.js';
 import type { FreshPasskeyReauthentication } from '../../backend/fresh-passkey-reauthentication.js';
 import type { TotpService } from '../../backend/services/TotpService.js';
 
@@ -137,4 +139,17 @@ test.each([false, true])('passkey-only sudo remains available after key registra
 	f.fresh.begin.mockResolvedValue({ ticket: 'synthetic-ticket', options: { challenge: 'AQID', userVerification: 'required' } });
 	expect(await f.service.begin(identity, undefined)).toMatchObject({ status: 'passkey-required' });
 	expect(f.fresh.begin).toHaveBeenCalledWith(identity, 'sudo', undefined);
+});
+
+test.each(['missing', 'expired'] as const)('passkey MFA enable rejects %s elevation through the real sudo transaction', async mode => {
+	const f = fixture();
+	f.keys.findBy.mockResolvedValue([mockDeep<MiUserSecurityKey>({ id: 'owned-key', userId: identity.userId })]);
+	if (mode === 'expired') {
+		f.session.sudoUntil = new Date(Date.now() - 1); f.session.sudoGrantId = 'expired-grant';
+		f.session.sudoPolicyStamp = sudoPolicyStamp(f.user, f.profile, await f.keys.findBy({ userId: identity.userId }));
+	}
+	const deps = mockDeep<SecuritySettingsDependencies>(); deps.sudo = f.service;
+	await expect(new SecuritySettings(deps).enablePasskeyMfa(identity, true)).rejects.toMatchObject({ code: 'SUDO_REQUIRED' });
+	expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.sessions.update).not.toHaveBeenCalled();
+	expect(deps.events.publishMainStream).not.toHaveBeenCalled();
 });

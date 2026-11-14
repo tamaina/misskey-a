@@ -28,7 +28,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkButton :disabled="busy || !supportsPasskey" @click="registerKey">{{ $locale.sfc.registerKey }}</MkButton>
 				</div>
 			</MkFolder>
+			<MkButton v-if="!state.passkeyMfaEnabled && state.passkeyCount > 0" :disabled="busy" @click="enableMfa">{{ $locale.sfc.enableMfa }}</MkButton>
 			<MkButton v-if="state.passkeyMfaEnabled" danger :disabled="busy" @click="disableMfa">{{ $locale.sfc.disableMfa }}</MkButton>
+			<MkButton v-if="state.totpEnabled || state.passkeyMfaEnabled" :disabled="busy" @click="regenerateCodes">{{ $locale.sfc.regenerateCodes }}</MkButton>
 			<MkSwitch :modelValue="state.passwordlessEnabled" :disabled="busy || state.passkeyCount === 0 || state.passwordLoginDisabled" @update:modelValue="setPasswordless">
 				{{ $locale.sfc.passwordless }}
 				<template #caption>{{ $locale.sfc.passwordlessDescription }}</template>
@@ -52,7 +54,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkButton :disabled="busy" @click="clearPending">{{ $locale.sfc.cancel }}</MkButton>
 				</div>
 			</form>
-			<MkButton v-if="state.totpEnabled || state.passkeyMfaEnabled" :disabled="busy" @click="regenerateCodes">{{ $locale.sfc.regenerateCodes }}</MkButton>
 		</template>
 		<p v-if="error" role="alert">{{ $locale.sfc.failed }}</p>
 	</div>
@@ -160,6 +161,15 @@ function removeKey(key: { id: string; name: string }) {
 	});
 }
 
+function enableMfa() {
+	return run(async isCurrent => {
+		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.enableWarning + '\n' + $locale.value.sfc.otherSessionsWarning });
+		if (!isCurrent() || confirmation.canceled) return;
+		const value = await misskeyApi('i/security/passkey/mfa/enable', { acknowledged: true });
+		if (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); }
+	});
+}
+
 function disableMfa() {
 	return run(async isCurrent => {
 		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning + '\n' + $locale.value.sfc.otherSessionsWarning });
@@ -252,7 +262,7 @@ onUnmounted(leave);
 {
 	"title": "ログインと多要素認証",
 	"otherSessionsWarning": "パスキーの削除、認証アプリの設定・削除、多要素認証やパスキー単独ログイン、パスワードログインの設定を変更すると、この端末以外のログインはすべて無効になります。名前の変更や復旧コードの再生成では無効になりません。",
-	"explanation": "パスキーは端末やセキュリティキーで使う認証方法です。認証アプリを先に設定しなくても登録できます。登録するとすぐに多要素認証が有効になり、認証アプリの設定時と同じように初回のみ復旧コードが表示されます。重要な設定には、このログインで5分間有効な本人確認が必要です。",
+	"explanation": "パスキーは端末やセキュリティキーで使う認証方法です。認証アプリを先に設定しなくても登録できます。登録するとすぐにパスキーによる多要素認証が有効になり、認証アプリの設定時と同じように復旧コードの初回発行時のみ表示されます。キーが残っていれば、ボタンでこの多要素認証を無効・有効に切り替えられます。再有効化時に復旧コードが残っていなければ、新しく発行して一度だけ表示します。重要な設定には、このログインで5分間有効な本人確認が必要です。",
 	"loading": "設定を読み込んでいます…",
 	"mfaActive": "パスキーによる多要素認証は有効です。",
 	"mfaInactive": "パスキーによる多要素認証は無効です。",
@@ -262,7 +272,9 @@ onUnmounted(leave);
 	"keyName": "パスキーの名前",
 	"rename": "名前を変更",
 	"remove": "削除",
-	"removeKeyWarning": "このパスキーを削除しますか。最後の認証方法は、多要素認証を明示的に無効にするまで削除できません。",
+	"removeKeyWarning": "このパスキーを削除しますか。パスキーによる多要素認証が有効で、他に使える認証アプリがない場合は、最後のパスキーを削除する前に「パスキーによる多要素認証を無効にする」ボタンで無効にしてください。パスワードログインが無効な場合は最後のパスキーを削除できません。",
+	"enableMfa": "パスキーによる多要素認証を有効にする",
+	"enableWarning": "パスキーによる多要素認証を有効にしますか。パスワードでのログインに追加の認証が必要になります。復旧コードが残っていない場合は、新しいコードを発行して一度だけ表示します。",
 	"disableMfa": "パスキーによる多要素認証を無効にする",
 	"disableWarning": "この認証方法を無効にしますか。他に多要素認証が有効でなければ、パスワードだけでログインできるようになります。",
 	"passwordless": "パスキーだけでログインできるようにする",

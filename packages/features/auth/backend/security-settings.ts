@@ -280,6 +280,17 @@ export class SecuritySettings {
 		});
 		await this.published(identity.userId, revokedIds);
 	}
+	async enablePasskeyMfa(identity: SudoIdentity, acknowledged: boolean) {
+		if (!acknowledged) throw failure();
+		const result = await this.deps.sudo.transaction(identity, async context => {
+			if (context.profile.passkeyMfaEnabled || !context.keys.length) throw failure();
+			const backupCodes = context.profile.twoFactorBackupSecret?.length ? [] : newCodes();
+			const revokedIds = await this.updated(context, { passkeyMfaEnabled: true, ...(backupCodes.length ? { twoFactorBackupSecret: backupCodes } : {}) });
+			return { backupCodes, revokedIds };
+		});
+		await this.published(identity.userId, result.revokedIds);
+		return { backupCodes: result.backupCodes };
+	}
 	async disablePasskeyMfa(identity: SudoIdentity, acknowledged: boolean) {
 		let revokedIds: string[] = [];
 		if (!acknowledged) throw failure();

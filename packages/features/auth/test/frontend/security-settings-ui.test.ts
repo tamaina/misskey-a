@@ -6,6 +6,7 @@ import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import { createApp, defineComponent, h, KeepAlive, nextTick, reactive, ref } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import Settings from '../../frontend/components/MkSecuritySettings.vue';
+import MkRecoveryCodesDialog from '../../frontend/components/MkRecoveryCodesDialog.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { inputText, confirm, popup } from '@features/ui/frontend/os.js';
 import { ensureSudo } from '../../frontend/utility/ensure-sudo.js';
@@ -74,7 +75,7 @@ test('registration needs no TOTP or later enable step and displays five recovery
 	expect(startRegistration).toHaveBeenCalledWith({ optionsJSON: options }); expect(ensureSudo).toHaveBeenCalledOnce();
 	expect(calls('i/security/passkey/register/start')[0][1]).toEqual({ name: 'Synthetic key' });
 	expect(calls('i/security/passkey/register/complete')[0][1]).toEqual({ ticket: 'synthetic-ticket', credential });
-	expect(calls('i/security/passkey/mfa/start')).toHaveLength(0); expect(calls('i/security/totp/start')).toHaveLength(0);
+	expect(calls('i/security/passkey/mfa/enable')).toHaveLength(0); expect(calls('i/security/passkey/mfa/start')).toHaveLength(0); expect(calls('i/security/totp/start')).toHaveLength(0);
 	expect(startAuthentication).not.toHaveBeenCalled();
 	expect(element.textContent).not.toContain('パスキーによる多要素認証を有効にする');
 	[...modal.querySelectorAll('button')].find(button => button.textContent === '保存して閉じる')!.click(); await nextTick(); expect(modal.textContent).not.toContain(codes[0]); expect(element.textContent).not.toContain('復旧コードを表示');
@@ -139,13 +140,38 @@ test('passwordless enabling supplies exactly one UV ceremony without a separate 
 	expect(calls('i/security/passkey/passwordless/complete')[0][1]).toEqual({ ticket: 'enable-ticket', credential });
 });
 
+test.each([[true, false], [false, true], [true, true], [false, false]] as const)('recovery regeneration is reachable before TOTP with passkey MFA=%s and TOTP=%s', async (passkeyMfaEnabled, totpEnabled) => {
+	show.value = false; await nextTick();
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ ...state, passkeyMfaEnabled, totpEnabled } as never);
+	show.value = true; await nextTick(); await nextTick();
+	const buttons = [...element.querySelectorAll('button')].filter(button => button.textContent === '復旧コードを再生成');
+	expect(buttons).toHaveLength(passkeyMfaEnabled || totpEnabled ? 1 : 0);
+	if (passkeyMfaEnabled || totpEnabled) {
+		const regenerate = buttons[0];
+		await vi.waitFor(() => expect(regenerate.disabled).toBe(false));
+		expect(regenerate.compareDocumentPosition(element.querySelector('input[type=checkbox]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+		expect(regenerate.compareDocumentPosition(element.querySelector('hr')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+	}
+});
+
 test('regeneration confirms invalidation and shows newly issued codes only in the modal', async () => {
 	await registration(); [...modal.querySelectorAll('button')].find(button => button.textContent === '保存して閉じる')!.click(); await nextTick();
 	vi.mocked(misskeyApi).mockImplementation(async route => route === 'i/security/recovery-codes' ? { backupCodes: ['new-synthetic-code'] } as never : { ...state, passkeyMfaEnabled: true } as never);
+	vi.mocked(ensureSudo).mockClear(); vi.mocked(confirm).mockClear(); vi.mocked(popup).mockClear();
 	click('復旧コードを再生成');
 	await vi.waitFor(() => expect(modal.textContent).toContain('new-synthetic-code'));
 	expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ text: expect.stringContaining('以前の復旧コードは使えなくなります') }));
+	expect(ensureSudo).toHaveBeenCalledOnce(); expect(confirm).toHaveBeenCalledOnce();
+	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(confirm).mock.invocationCallOrder[0]);
+	const regenerateIndex = vi.mocked(misskeyApi).mock.calls.findIndex(([route]) => route === 'i/security/recovery-codes');
+	expect(vi.mocked(confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(misskeyApi).mock.invocationCallOrder[regenerateIndex]);
+	expect(calls('i/security/recovery-codes')).toHaveLength(1);
 	expect(calls('i/security/recovery-codes')[0][1]).toEqual({ regenerate: true });
+	expect(popup).toHaveBeenCalledExactlyOnceWith(MkRecoveryCodesDialog, { codes: ['new-synthetic-code'] }, expect.anything());
+	expect(modal.querySelector('[role=dialog]')).not.toBeNull();
+	expect(modal.querySelectorAll('code')).toHaveLength(1);
+	[...modal.querySelectorAll('button')].find(button => button.textContent === '保存して閉じる')!.click(); await nextTick();
+	expect(modal.textContent).not.toContain('new-synthetic-code');
 	expect(element.textContent).not.toContain('new-synthetic-code'); expect(element.textContent).not.toContain('復旧コードを表示');
 });
 
@@ -171,4 +197,44 @@ test('passwordless disabling uses sudo only and does not launch a passkey ceremo
 	await vi.waitFor(() => expect(calls('i/security/passkey/passwordless')).toHaveLength(1));
 	expect(calls('i/security/passkey/passwordless')[0][1]).toEqual({ enabled: false });
 	expect(ensureSudo).toHaveBeenCalledOnce(); expect(startAuthentication).not.toHaveBeenCalled();
+});
+
+test.each([[false, 0], [false, 1], [true, 1], [true, 0]] as const)('MFA buttons reflect enabled=%s and key count=%s', async (enabled, count) => {
+	show.value = false; await nextTick();
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ ...state, passkeyMfaEnabled: enabled, passkeyCount: count } as never);
+	show.value = true; await nextTick(); await nextTick();
+	const labels = [...element.querySelectorAll('button')].map(button => button.textContent);
+	expect(labels.includes('パスキーによる多要素認証を有効にする')).toBe(!enabled && count > 0);
+	expect(labels.includes('パスキーによる多要素認証を無効にする')).toBe(enabled);
+});
+
+test.each([false, true])('explicit MFA enable uses sudo and confirmation, showing only new codes=%s', async issueCodes => {
+	vi.mocked(misskeyApi).mockImplementation(async route => {
+		if (route === 'i/security/passkey/mfa/enable') return { backupCodes: issueCodes ? codes : [] } as never;
+		if (route === 'i/security/state') return { ...state, passkeyMfaEnabled: true } as never;
+		return undefined as never;
+	});
+	click('パスキーによる多要素認証を有効にする');
+	await vi.waitFor(() => expect(element.textContent).toContain('パスキーによる多要素認証は有効です。'));
+	expect(ensureSudo).toHaveBeenCalledOnce(); expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ type: 'warning', text: expect.stringContaining('この端末以外のログインはすべて無効になります') }));
+	expect(vi.mocked(confirm).mock.calls[0][0].text).toContain('パスキーによる多要素認証を有効にしますか');
+	expect(calls('i/security/passkey/mfa/enable')[0][1]).toEqual({ acknowledged: true });
+	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(confirm).mock.invocationCallOrder[0]);
+	expect(vi.mocked(confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(misskeyApi).mock.invocationCallOrder.at(-2)!);
+	expect(startAuthentication).not.toHaveBeenCalled(); expect(calls('i/security/passkey/mfa/start')).toHaveLength(0);
+	if (issueCodes) {
+		expect(modal.querySelectorAll('code')).toHaveLength(5); expect(popup).toHaveBeenCalledOnce();
+		[...modal.querySelectorAll('button')].find(button => button.textContent === '保存して閉じる')!.click(); await nextTick();
+		expect(modal.textContent).not.toContain(codes[0]);
+	} else expect(popup).not.toHaveBeenCalled();
+	expect(element.textContent).not.toContain('復旧コードを表示');
+});
+
+test.each(['sudo', 'confirm'] as const)('cancelled %s prevents explicit MFA enable', async kind => {
+	if (kind === 'sudo') vi.mocked(ensureSudo).mockResolvedValueOnce(false);
+	else vi.mocked(confirm).mockResolvedValueOnce({ canceled: true });
+	click('パスキーによる多要素認証を有効にする');
+	await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledOnce()); await nextTick();
+	expect(calls('i/security/passkey/mfa/enable')).toHaveLength(0); expect(popup).not.toHaveBeenCalled();
+	if (kind === 'sudo') expect(confirm).not.toHaveBeenCalled();
 });
