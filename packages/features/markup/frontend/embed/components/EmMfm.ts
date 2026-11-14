@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import '@features/markup/frontend/shared/mfm.css';
+import { host } from '@features/boot/frontend/shared/config.js';
 import { createMfmRenderer } from '@features/markup/frontend/shared/mfm-renderer.js';
 import EmUrl from '@features/markup/frontend/embed/components/EmUrl.vue';
 import EmTime from '@features/ui/frontend/embed/components/EmTime.vue';
@@ -14,6 +16,7 @@ import EmA from '@features/navigation/frontend/embed/components/EmA.vue';
 
 // eslint-disable-next-line import/no-default-export
 export default createMfmRenderer({
+	host,
 	components: () => ({
 		Url: EmUrl,
 		Link: EmLink,

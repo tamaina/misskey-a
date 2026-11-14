@@ -8045,7 +8045,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/navigation/frontend/ui/deck.vue",
-		"currentSha256": "19c11c581def4819b467ab1cb7d1b896971fd6a37bce2fb8e1b1918a07fe3c01",
+		"currentSha256": "5d42d42591fffbc16b34b6686ce6b777291ca8b8475710e423f4d5afac2d61ef",
 		"baselineSha256": "49d17eff41a3d99e90c53600a8fec778ccd4444a3dd166e7ee76e2df7e6d7949",
 		"keys": [
 			"settings",
@@ -8086,6 +8086,18 @@ export const globalCatalogPilotOwners = [
 				"start": 8064,
 				"end": 8203,
 				"current": ";\nimport XCommon from './_common_/common.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"baseline": ""
+			},
+			{
+				"start": 6824,
+				"end": 6903,
+				"current": "import XMailColumn from '@features/email/frontend/components/mail-column.vue';\n",
+				"baseline": ""
+			},
+			{
+				"start": 8574,
+				"end": 8594,
+				"current": "\tmail: XMailColumn,\n",
 				"baseline": ""
 			}
 		],

@@ -111,6 +111,8 @@ import { FederationChart } from '@features/statistics/backend/charts/federation.
 import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
+import { UserMailRuntime } from '@features/email/backend/services/UserMailRuntime.js';
+import { UserMailboxService } from '@features/email/backend/services/UserMailboxService.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 import { featureServiceProviders, featureServiceExports } from '@features/index/backend/feature-service-providers.js';
 import type { ExistingProvider } from '@nestjs/common';
@@ -134,6 +136,8 @@ const canonicalServices = {
 	DownloadService,
 	DriveService,
 	EmailService,
+	UserMailboxService,
+	UserMailRuntime,
 	FederatedInstanceService,
 	FetchInstanceMetadataService,
 	GlobalEventService,
