@@ -76,3 +76,12 @@ test('eligible owner enable does not clear sticky freeze', async () => {
 	await call(createChannelsUpdateProcedure(f.deps), { channelId: 'channel123', isFederated: true }, { context: f.context });
 	expect(f.deps.channelsRepository.update.mock.calls[0][1]).not.toHaveProperty('isFederationFrozen');
 });
+
+test('loss of eligibility does not prevent unrelated edits preserving the frozen owner preference', async () => {
+	const f = fixture('owner123', false, false);
+	f.channel.isFederated = true;
+	f.channel.isFederationFrozen = true;
+	await call(createChannelsUpdateProcedure(f.deps), { channelId: 'channel123', name: 'renamed', isFederated: true }, { context: f.context });
+	expect(f.deps.channelsRepository.update.mock.calls[0][1]).toMatchObject({ name: 'renamed', isFederated: true });
+	expect(f.deps.channelsRepository.update.mock.calls[0][1]).not.toHaveProperty('isFederationFrozen');
+});

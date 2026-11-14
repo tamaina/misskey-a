@@ -48,7 +48,7 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 				|| (ps.isFederationFrozen !== undefined && !iAmModerator)) {
 				throw apiError(channelsUpdateErrors.accessDenied);
 			}
-			if (ps.isFederated === true || ps.isFederationFrozen === false) {
+			if ((ps.isFederated === true && !channel.isFederated) || ps.isFederationFrozen === false) {
 				if (!channel.userId || !(await deps.roleService.getUserPolicies(channel.userId, true)).canFederateChannel) {
 					throw apiError(channelsUpdateErrors.accessDenied);
 				}
