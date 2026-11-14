@@ -17,7 +17,7 @@ vi.mock('@features/ui/frontend/components/MkInfo.vue', () => ({ default: defineC
 vi.mock('@features/ui/frontend/components/form/section.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('section', slots.default?.()) }) }));
 vi.mock('@features/ui/frontend/components/MkFolder.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => {
 	const opened = ref(false);
-	return () => h('article', [h('button', { onClick: () => { opened.value = !opened.value; } }, [slots.label?.(), slots.caption?.()]), opened.value ? slots.default?.() : null]);
+	return () => h('article', [h('button', { onClick: () => { opened.value = !opened.value; } }, [slots.icon?.(), h('strong', slots.label?.()), slots.caption?.(), h('small', slots.suffix?.())]), opened.value ? slots.default?.() : null]);
 } }) }));
 vi.mock('@features/ui/frontend/components/MkPagination.vue', () => ({ default: defineComponent({ props: ['paginator'], setup: (props, { slots }) => {
 	onMounted(() => props.paginator.init());
@@ -29,10 +29,10 @@ beforeAll(async () => { await internationalization.ready; await internationaliza
 afterEach(() => { app?.unmount(); vi.clearAllMocks(); });
 
 test('shared IP sessions keep separate folders, current/status markers, scoped history and owned revocation', async () => {
-	const base = { createdAt: '2026-10-01T00:00:00.000Z', lastUsedAt: '2026-10-02T00:00:00.000Z', lastIp: '192.0.2.1', lastUserAgent: 'Synthetic browser', revokedAt: null };
+	const base = { createdAt: '2026-10-01T00:00:00.000Z', lastUsedAt: '2026-10-02T00:00:00.000Z', lastIp: '192.0.2.1', lastUserAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Gecko/20100101 Firefox/145.0', revokedAt: null };
 	vi.mocked(misskeyApi).mockImplementation(async (route, data) => {
-		if (route === 'i/sessions') return [{ ...base, id: 'current', current: true }, { ...base, id: 'other', current: false }, { ...base, id: 'revoked', current: false, revokedAt: base.lastUsedAt }] as never;
-		if (route === 'i/signin-history') return [{ id: 'history', createdAt: base.createdAt, ip: '192.0.2.2', headers: { 'user-agent': 'Past browser' }, success: true }] as never;
+		if (route === 'i/sessions') return [{ ...base, id: 'other', current: false }, { ...base, id: 'current', current: true }, { ...base, id: 'revoked', current: false, revokedAt: base.lastUsedAt }] as never;
+		if (route === 'i/signin-history') return [{ id: 'history', createdAt: base.createdAt, ip: '192.0.2.2', headers: { 'user-agent': 'Mozilla/5.0 (Linux; Android 14) Chrome/140.0.0.0 Mobile Safari/537.36' }, success: true }] as never;
 		if (route === 'i/sessions/revoke') { expect(data).toEqual({ sessionId: 'other' }); return undefined as never; }
 		throw new Error(`Unexpected synthetic route ${route}`);
 	});
@@ -42,18 +42,26 @@ test('shared IP sessions keep separate folders, current/status markers, scoped h
 	app.mount(element);
 	await vi.waitFor(() => expect(element.querySelectorAll('article')).toHaveLength(3));
 	const folders = [...element.querySelectorAll('article')];
-	expect(folders[0].textContent).toContain('このログイン · 192.0.2.1 · 有効');
-	expect(folders[0].textContent).toContain(base.lastUserAgent);
+	expect(folders[0].querySelector('strong')?.textContent).toBe('Firefox 145 / Windows');
+	expect(folders[0].querySelector('small')?.textContent).toBe('このデバイス');
+	expect(folders[1].querySelector('small')?.textContent).toBe('有効');
+	expect(folders[0].querySelector('i')?.className).toBe('ti ti-device-desktop');
+	expect(folders[0].textContent).toContain('192.0.2.1');
+	expect(folders[0].textContent).not.toContain(base.lastUserAgent);
 	expect(folders[0].textContent).toContain(base.lastUsedAt);
 	expect(folders[2].textContent).toContain('失効済み');
 	expect(misskeyApi).not.toHaveBeenCalledWith('i/signin-history', expect.anything());
 	folders[1].querySelector('button')!.click();
-	await vi.waitFor(() => expect(folders[1].textContent).toContain('Past browser'));
+	await vi.waitFor(() => expect(folders[1].textContent).toContain('Chrome 140 / Android'));
+	expect(folders[1].textContent).toContain(base.lastUserAgent);
+	expect(folders[1].textContent).toContain('Mozilla/5.0 (Linux; Android 14) Chrome/140.0.0.0 Mobile Safari/537.36');
 	expect(misskeyApi).toHaveBeenCalledWith('i/signin-history', expect.objectContaining({ browserSessionId: 'other' }));
 	[...folders[1].querySelectorAll('button')].find(button => button.textContent === 'このログインを失効')!.click();
 	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/sessions/revoke', { sessionId: 'other' }));
+	await vi.waitFor(() => expect(folders[1].querySelector('small')?.textContent).toBe('失効済み'));
+	expect(folders[1].querySelectorAll('button')).toHaveLength(1);
 	expect(signout).not.toHaveBeenCalled();
 	folders[2].querySelector('button')!.click();
-	await vi.waitFor(() => expect(folders[2].textContent).toContain('Past browser'));
+	await vi.waitFor(() => expect(folders[2].textContent).toContain('Chrome 140 / Android'));
 	expect(folders[2].querySelectorAll('button')).toHaveLength(1);
 });

@@ -9,24 +9,32 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkInfo>{{ $locale.sfc.description }}</MkInfo>
 		<MkInfo v-if="!individual" warn>{{ $locale.sfc.legacy }}</MkInfo>
 		<p v-if="error" role="alert">{{ $locale.sfc.failed }}</p>
-		<MkFolder v-for="session in sessions" :key="session.id">
-			<template #label>{{ session.current ? $locale.sfc.current : $locale.sfc.other }} · {{ session.lastIp ?? $locale.sfc.unknown }} · {{ session.revokedAt ? $locale.sfc.revoked : $locale.sfc.active }}</template>
+		<MkFolder v-for="{ session, agent } in displaySessions" :key="session.id">
+			<template #icon><i :class="agent.icon"></i></template>
+			<template #label>{{ agent.label ?? $locale.sfc.unknownAgent }}</template>
 			<template #caption>
-				<div :class="$style.agent">{{ session.lastUserAgent ?? $locale.sfc.unknown }}</div>
-				{{ $locale.sfc.used }} <MkTime :time="session.lastUsedAt"/>
+				{{ session.lastIp ?? $locale.sfc.unknown }} · {{ $locale.sfc.used }} <MkTime :time="session.lastUsedAt"/>
 			</template>
-			<div class="_gaps_s">
+			<template #suffix>{{ session.current ? $locale.sfc.current : session.revokedAt ? $locale.sfc.revoked : $locale.sfc.active }}</template>
+			<div class="_gaps_m">
+				<FormSlot>
+					<template #label>{{ $locale.sfc.userAgent }}</template>
+					<div :class="$style.agent">{{ session.lastUserAgent ?? $locale.sfc.unknown }}</div>
+				</FormSlot>
 				<div>{{ $locale.sfc.created }} <MkTime :time="session.createdAt"/></div>
 				<MkButton v-if="!session.revokedAt" danger :disabled="busy" @click="revoke(session)">{{ session.current ? $locale.sfc.signout : $locale.sfc.revoke }}</MkButton>
-				<p>{{ $locale.sfc.history }}</p>
-				<MkPagination :paginator="sessionHistory(session.id)" withControl :forceDisableInfiniteScroll="true">
-					<template #default="{ items }">
-						<div v-for="item in items" :key="item.id" class="_gaps_s">
-							<div><MkTime :time="item.createdAt"/> · <code>{{ item.ip }}</code></div>
-							<div :class="$style.agent">{{ item.headers['user-agent'] ?? $locale.sfc.unknown }}</div>
-						</div>
-					</template>
-				</MkPagination>
+				<FormSection>
+					<template #label>{{ $locale.sfc.history }}</template>
+					<MkPagination :paginator="sessionHistory(session.id)" withControl :forceDisableInfiniteScroll="true">
+						<template #default="{ items }">
+							<div v-for="item in items" :key="item.id" class="_gaps_s">
+								<div><MkTime :time="item.createdAt"/> · <code>{{ item.ip }}</code></div>
+								<div>{{ parseUserAgent(item.headers['user-agent']).label ?? $locale.sfc.unknownAgent }}</div>
+								<div :class="$style.agent">{{ item.headers['user-agent'] ?? $locale.sfc.unknown }}</div>
+							</div>
+						</template>
+					</MkPagination>
+				</FormSection>
 			</div>
 		</MkFolder>
 		<MkButton v-if="hasMore" :disabled="busy" @click="load">{{ $locale.sfc.more }}</MkButton>
@@ -36,15 +44,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onActivated, onDeactivated, onMounted, onUnmounted, markRaw, ref, watch } from 'vue';
+import { computed, onActivated, onDeactivated, onMounted, onUnmounted, markRaw, ref, watch } from 'vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import * as os from '@features/ui/frontend/os.js';
+import { parseUserAgent } from '../utility/user-agent.js';
 import { ensureSignin } from '../i.js';
 import { signout } from '../signout.js';
 
@@ -53,6 +63,9 @@ const individual = ownerToken.startsWith('bs_');
 const read = (offset: number) => misskeyApi('i/sessions', { offset, limit: 20 });
 type Session = Awaited<ReturnType<typeof read>>[number];
 const sessions = ref<Session[]>([]);
+const displaySessions = computed(() => sessions.value
+	.map(session => ({ session, agent: parseUserAgent(session.lastUserAgent) }))
+	.sort((a, b) => Number(b.session.current) - Number(a.session.current)));
 const histories = new Map<string, Paginator<'i/signin-history'>>();
 
 function sessionHistory(sessionId: string) {
@@ -113,7 +126,9 @@ onDeactivated(leave); onUnmounted(leave);
 	"title": "ログイン中の端末",
 	"description": "ログインごとに個別のセッションを発行します。覚えのないログインを失効させると、そのログインの通信と重要操作の本人確認も無効になります。",
 	"legacy": "このログインは旧形式のため一覧の個別失効には対応していません。ログインし直すと新しい個別セッションになります。",
-	"current": "このログイン",
+	"current": "このデバイス",
+	"userAgent": "User-Agent",
+	"unknownAgent": "不明なブラウザー／端末",
 	"other": "別のログイン",
 	"created": "ログイン日時:",
 	"used": "最終利用:",
