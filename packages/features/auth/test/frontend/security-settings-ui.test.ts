@@ -104,8 +104,10 @@ test('authenticator Signal API runs only after owned removal has been accepted',
 	accept(); await vi.waitFor(() => expect(signal).toHaveBeenCalledOnce()); expect(signal).toHaveBeenCalledWith({ rpId: window.location.hostname, credentialId: 'synthetic-key' });
 });
 
-test('registration has no revocation warning while removal confirmation keeps it', async () => {
-	expect(element.textContent).toContain('この端末以外のログインはすべて無効になります');
+test('registration and key removal have no session revocation warning', async () => {
+	expect(element.textContent).toContain('パスワード変更では、他の端末のログインが無効になります。');
+	expect(element.textContent).toContain('他の端末のログインやログイントークンは無効になりません。');
+	expect(element.textContent).not.toContain('他の端末はサインアウトします');
 	button('パスキーを登録').click();
 	await vi.waitFor(() => expect(inputText).toHaveBeenCalledOnce());
 	expect(vi.mocked(inputText).mock.calls[0][0]).not.toHaveProperty('text');
@@ -114,7 +116,9 @@ test('registration has no revocation warning while removal confirmation keeps it
 	button('Synthetic key').click();
 	await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
 	button('削除').click();
-	await vi.waitFor(() => expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ text: expect.stringContaining('この端末以外のログインはすべて無効になります') })));
+	await vi.waitFor(() => expect(confirm).toHaveBeenCalledOnce());
+	expect(vi.mocked(confirm).mock.calls[0][0].text).toContain('このパスキーを削除しますか');
+	expect(vi.mocked(confirm).mock.calls[0][0].text).not.toMatch(/サインアウト|この端末以外|他の端末/);
 });
 
 test.each([false, true])('passwordless permits adding keys with passwordLoginDisabled=%s', async disabled => {
@@ -240,15 +244,49 @@ test.each(['sudo', 'confirm'] as const)('cancelled %s prevents explicit MFA enab
 	if (kind === 'sudo') expect(confirm).not.toHaveBeenCalled();
 });
 
-test('explicit MFA disable keeps sudo and the session revocation warning', async () => {
+test('explicit MFA disable keeps sudo and confirmation without a session revocation warning', async () => {
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ ...state, passkeyMfaEnabled: true } as never);
 	show.value = false; await nextTick(); show.value = true; await nextTick();
 	await vi.waitFor(() => expect(element.textContent).toContain('パスキーによる多要素認証は有効です。'));
 	click('パスキーによる多要素認証を無効にする');
 	await vi.waitFor(() => expect(calls('i/security/passkey/mfa/disable')).toHaveLength(1));
 	expect(ensureSudo).toHaveBeenCalledOnce();
-	expect(confirm).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ type: 'warning', text: expect.stringContaining('この端末以外のログインはすべて無効になります') }));
+	expect(confirm).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ type: 'warning', text: expect.not.stringMatching(/サインアウト|この端末以外|他の端末/) }));
+	expect(vi.mocked(confirm).mock.calls[0][0].text).toContain('この認証方法を無効にしますか');
 	expect(calls('i/security/passkey/mfa/disable')[0][1]).toEqual({ acknowledged: true });
 	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(confirm).mock.invocationCallOrder[0]);
 	expect(startAuthentication).not.toHaveBeenCalled();
+});
+
+test.each([false, true])('TOTP removal keeps sudo and operation warning with passkey MFA=%s without session revocation warning', async passkeyMfaEnabled => {
+	show.value = false; await nextTick();
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ ...state, totpEnabled: true, passkeyMfaEnabled } as never);
+	show.value = true;
+	await vi.waitFor(() => expect(element.textContent).toContain('認証アプリを削除'));
+	click('認証アプリを削除');
+	await vi.waitFor(() => expect(calls('i/security/totp/remove')).toHaveLength(1));
+	expect(ensureSudo).toHaveBeenCalledOnce();
+	expect(confirm).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ type: 'warning', text: expect.stringContaining(passkeyMfaEnabled ? '認証アプリを削除しますか' : 'この認証方法を無効にしますか') }));
+	expect(vi.mocked(confirm).mock.calls[0][0].text).not.toMatch(/サインアウト|この端末以外|他の端末/);
+	expect(calls('i/security/totp/remove')[0][1]).toEqual({ confirmDisableMfa: true });
+});
+
+test('password-login disable keeps sudo, recovery warning and UV ceremony without session revocation warning', async () => {
+	show.value = false; await nextTick();
+	vi.mocked(misskeyApi).mockImplementation(async route => {
+		if (route === 'i/security/state') return { ...state, passwordlessEnabled: true } as never;
+		if (route === 'i/security/password-login/disable/start') return { ticket: 'disable-ticket', options: { ...options, userVerification: 'required' } } as never;
+		return undefined as never;
+	});
+	show.value = true;
+	await vi.waitFor(() => expect(button('パスワードによるログインを無効にする').disabled).toBe(false));
+	click('パスワードによるログインを無効にする');
+	await vi.waitFor(() => expect(calls('i/security/password-login/disable/complete')).toHaveLength(1));
+	expect(ensureSudo).toHaveBeenCalledOnce(); expect(confirm).toHaveBeenCalledOnce();
+	const text = vi.mocked(confirm).mock.calls[0][0].text;
+	expect(text).toContain('パスワードによるログインを無効にしますか');
+	expect(text).toContain('パスキーを失った場合は確認済みメールへのパスワード再設定が必要です');
+	expect(text).not.toMatch(/他の端末|この端末以外|サインアウト/);
+	expect(startAuthentication).toHaveBeenCalledExactlyOnceWith({ optionsJSON: { ...options, userVerification: 'required' } });
+	expect(calls('i/security/password-login/disable/complete')[0][1]).toEqual({ ticket: 'disable-ticket', credential });
 });

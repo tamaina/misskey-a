@@ -58,6 +58,19 @@ function fixture() {
 	return { service: new SecuritySettings(deps), deps, context, user, profile, key, users, profiles, keys, sessions, committed, pending: () => pending };
 }
 
+function expectSessionsPreserved(f: ReturnType<typeof fixture>) {
+	expect(f.sessions.find).not.toHaveBeenCalled();
+	expect(f.sessions.update).toHaveBeenCalled();
+	for (const [where, patch] of f.sessions.update.mock.calls) {
+		expect(where).toEqual({ id: identity.browserSession.id, userId: identity.userId });
+		expect(patch).toEqual({ sudoPolicyStamp: expect.stringMatching(/^[a-f0-9]{64}$/) });
+	}
+	expect(f.users.update).not.toHaveBeenCalled();
+	expect(f.user.token).toBe('synthetic-native');
+	expect(f.deps.events.publishInternalEvent).not.toHaveBeenCalled();
+	expect(f.deps.events.publishMainStream.mock.calls.at(-1)?.slice(0, 2)).toEqual([identity.userId, 'meUpdated']);
+}
+
 beforeEach(() => {
 	vi.clearAllMocks();
 	vi.mocked(webauthn.verifyAuthenticationResponse).mockResolvedValue({ verified: true, authenticationInfo: { credentialID: 'AQID', newCounter: 2,
@@ -141,12 +154,11 @@ test.each([false, true])('registration can repeatedly add usable keys with passw
 	expect(f.deps.events.publishInternalEvent).not.toHaveBeenCalled();
 });
 
-test('removing a key still revokes other browser sessions', async () => {
+test('removing a key preserves other browser sessions and tokens', async () => {
 	const f = fixture(); f.context.keys.push({ ...f.key, id: 'BAUG' }); f.profile.passkeyMfaEnabled = true;
 	await f.service.removeKey(identity, f.key.id);
 	expect(f.keys.delete).toHaveBeenCalledWith({ id: f.key.id, userId: identity.userId });
-	expect(f.sessions.update).toHaveBeenCalledWith(expect.objectContaining({ userId: identity.userId }), { revokedAt: expect.any(Date), sudoUntil: null, sudoPolicyStamp: null });
-	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('browserSessionRevoked', { id: 'other-session', userId: identity.userId });
+	expectSessionsPreserved(f);
 });
 
 test('activation exposes codes for explicit acknowledgement before writing the policy', async () => {
@@ -157,7 +169,7 @@ test('activation exposes codes for explicit acknowledgement before writing the p
 	expect(f.deps.operations.consume).not.toHaveBeenCalled();
 	await f.service.activateComplete(identity, ticket, credential, true);
 	expect(webauthn.verifyAuthenticationResponse).toHaveBeenCalledWith(expect.objectContaining({ requireUserVerification: false, expectedChallenge: started.options.challenge }));
-	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('browserSessionRevoked', { id: 'other-session', userId: identity.userId });
+	expectSessionsPreserved(f);
 	expect(f.deps.events.publishInternalEvent).not.toHaveBeenCalledWith('browserSessionRevoked', { id: null, userId: identity.userId });
 	expect(f.profiles.update).toHaveBeenCalledExactlyOnceWith({ userId: identity.userId }, { passkeyMfaEnabled: true, twoFactorBackupSecret: started.backupCodes });
 	expect(f.sessions.update).toHaveBeenCalledWith({ id: identity.browserSession.id, userId: identity.userId }, { sudoPolicyStamp: expect.stringMatching(/^[a-f0-9]{64}$/) });
@@ -202,6 +214,7 @@ test('an enabled but unusable TOTP does not permit removal of the last independe
 test('TOTP removal preserves independent MFA and its recovery codes', async () => {
 	const f = fixture(); f.profile.passkeyMfaEnabled = true; f.profile.twoFactorEnabled = true; f.profile.twoFactorBackupSecret = ['keep'];
 	await f.service.removeTotp(identity, false);
+	expectSessionsPreserved(f);
 	expect(f.profiles.update).toHaveBeenCalledWith({ userId: identity.userId }, { twoFactorEnabled: false, twoFactorSecret: null, twoFactorTempSecret: null });
 });
 
@@ -215,7 +228,7 @@ test('password-login disable requires strict UV and cannot remove the final rema
 	await expect(f.service.passwordless(identity, false)).rejects.toThrow();
 });
 
-test('password-login disable rotates legacy credentials and keeps only this session with the old sudo deadline', async () => {
+test('password-login disable preserves sessions and legacy credentials with the old sudo deadline', async () => {
 	const f = fixture(); f.profile.usePasswordLessLogin = true;
 	const until = f.context.session.sudoUntil;
 	await f.service.disablePasswordStart(identity);
@@ -223,9 +236,8 @@ test('password-login disable rotates legacy credentials and keeps only this sess
 		credentialDeviceType: 'singleDevice', credentialBackedUp: false, origin: 'https://synthetic.example', rpID: 'synthetic.example' } });
 	await f.service.disablePasswordComplete(identity, ticket, credential);
 	expect(f.profiles.update).toHaveBeenCalledWith({ userId: identity.userId }, { passwordLoginDisabled: true });
-	expect(f.users.update).toHaveBeenCalledWith(identity.userId, { token: expect.any(String) });
+	expectSessionsPreserved(f);
 	expect(f.context.session.sudoUntil).toBe(until);
-	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('userTokenRegenerated', expect.objectContaining({ oldToken: 'synthetic-native', newToken: expect.any(String) }));
 });
 
 test('a consumed or foreign confirmation returns the declared client error while Redis failures remain server failures', async () => {
@@ -262,6 +274,7 @@ test('existing recovery codes cannot be read, including through factor setup', a
 	const activated = await f.service.activateStart(identity); expect(activated.backupCodes).toEqual([]);
 	f.profile.twoFactorTempSecret = 'synthetic-secret'; f.deps.totp.validateOtp.mockResolvedValue(true);
 	const completed = await f.service.totpComplete(identity, '123456'); expect(completed.backupCodes).toEqual([]);
+	expectSessionsPreserved(f);
 	expect(f.profiles.update).not.toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ twoFactorBackupSecret: expect.anything() }));
 });
 
@@ -279,6 +292,7 @@ test('one session-bound UV assertion enables passwordless without prior sudo', a
 	expect(started.options.userVerification).toBe('required'); expect(started.options.allowCredentials).toBeUndefined();
 	vi.mocked(webauthn.verifyAuthenticationResponse).mockResolvedValue({ verified: true, authenticationInfo: { userVerified: true, newCounter: 2 } } as never);
 	await f.service.passwordlessComplete(identity, started.ticket, credential);
+	expectSessionsPreserved(f);
 	expect(f.deps.sudo.status).not.toHaveBeenCalled();
 	expect(f.deps.sudo.transaction.mock.calls.every(call => call[2] === false)).toBe(true);
 	expect(webauthn.verifyAuthenticationResponse).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ requireUserVerification: true, expectedChallenge: started.options.challenge }));
@@ -332,20 +346,26 @@ test.each([false, true])('disable then explicit enable retains keys and TOTP=%s,
 	f.profile.twoFactorSecret = totp ? 'keep-totp' : null; f.profile.twoFactorBackupSecret = ['old-code'];
 	await f.service.disablePasskeyMfa(identity, true);
 	expect(f.profiles.update).toHaveBeenLastCalledWith({ userId: identity.userId }, { passkeyMfaEnabled: false, ...(totp ? {} : { twoFactorBackupSecret: null }) });
-	expect(f.sessions.find).toHaveBeenCalledOnce();
-	expect(f.sessions.update).toHaveBeenCalledTimes(2);
-	expect(f.sessions.update).toHaveBeenLastCalledWith(expect.objectContaining({ userId: identity.userId }), { revokedAt: expect.any(Date), sudoUntil: null, sudoPolicyStamp: null });
-	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledExactlyOnceWith('browserSessionRevoked', { id: 'other-session', userId: identity.userId });
+	expect(f.sessions.find).not.toHaveBeenCalled();
+	expect(f.sessions.update).toHaveBeenCalledTimes(1);
+	expectSessionsPreserved(f);
 	Object.assign(f.profile, f.profiles.update.mock.calls.at(-1)![1]);
 	const enabled = await f.service.enablePasskeyMfa(identity, true);
-	expect(f.sessions.update).toHaveBeenCalledTimes(3);
+	expect(f.sessions.update).toHaveBeenCalledTimes(2);
 	expect(f.sessions.update).toHaveBeenLastCalledWith({ id: identity.browserSession.id, userId: identity.userId }, { sudoPolicyStamp: expect.any(String) });
-	expect(f.sessions.update.mock.calls.filter(([, update]) => 'revokedAt' in update)).toHaveLength(1);
-	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledExactlyOnceWith('browserSessionRevoked', { id: 'other-session', userId: identity.userId });
+	expect(f.sessions.update.mock.calls.filter(([, update]) => 'revokedAt' in update)).toHaveLength(0);
+	expectSessionsPreserved(f);
 	expect(enabled.backupCodes).toHaveLength(totp ? 0 : 5);
 	if (!totp) expect(enabled.backupCodes).not.toContain('old-code');
 	Object.assign(f.profile, f.profiles.update.mock.calls.at(-1)![1]);
 	expect(f.profile).toMatchObject({ passkeyMfaEnabled: true, twoFactorEnabled: totp, twoFactorSecret: totp ? 'keep-totp' : null });
-	expect(f.keys.delete).not.toHaveBeenCalled(); expect(f.sessions.find).toHaveBeenCalledOnce();
+	expect(f.keys.delete).not.toHaveBeenCalled(); expect(f.sessions.find).not.toHaveBeenCalled();
 	if (!totp) await expect(f.service.removeKey(identity, f.key.id)).rejects.toMatchObject({ code: 'LAST_AUTHENTICATION_FACTOR' });
+});
+
+test('passwordless disable preserves other sessions and tokens', async () => {
+	const f = fixture(); f.profile.usePasswordLessLogin = true;
+	await f.service.passwordless(identity, false);
+	expect(f.profiles.update).toHaveBeenCalledWith({ userId: identity.userId }, { usePasswordLessLogin: false });
+	expectSessionsPreserved(f);
 });

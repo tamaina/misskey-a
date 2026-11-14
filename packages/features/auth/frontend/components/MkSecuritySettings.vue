@@ -150,7 +150,7 @@ function renameKey(key: { id: string; name: string }) {
 
 function removeKey(key: { id: string; name: string }) {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', title: key.name, text: $locale.value.sfc.removeKeyWarning + '\n' + $locale.value.sfc.otherSessionsWarning });
+		const confirmation = await os.confirm({ type: 'warning', title: key.name, text: $locale.value.sfc.removeKeyWarning });
 		if (!isCurrent() || confirmation.canceled) return;
 		await misskeyApi('i/security/passkey/remove', { credentialId: key.id });
 		if (!isCurrent()) return;
@@ -172,7 +172,7 @@ function enableMfa() {
 
 function disableMfa() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning + '\n' + $locale.value.sfc.otherSessionsWarning });
+		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning });
 		if (!isCurrent() || confirmation.canceled) return;
 		await misskeyApi('i/security/passkey/mfa/disable', { acknowledged: true });
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
@@ -196,7 +196,7 @@ function setPasswordless(enabled: boolean) {
 
 function disablePassword() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disablePasswordWarning + '\n' + $locale.value.sfc.otherSessionsWarning });
+		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disablePasswordWarning });
 		if (!isCurrent() || confirmation.canceled) return;
 		const pending = await misskeyApi('i/security/password-login/disable/start', {});
 		if (!isCurrent()) return;
@@ -223,7 +223,7 @@ function completeTotp() {
 
 function removeTotp() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: (state.value?.passkeyMfaEnabled ? $locale.value.sfc.removeTotpWarning : $locale.value.sfc.disableWarning) + '\n' + $locale.value.sfc.otherSessionsWarning });
+		const confirmation = await os.confirm({ type: 'warning', text: state.value?.passkeyMfaEnabled ? $locale.value.sfc.removeTotpWarning : $locale.value.sfc.disableWarning });
 		if (!isCurrent() || confirmation.canceled) return;
 		await misskeyApi('i/security/totp/remove', { confirmDisableMfa: true });
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
@@ -261,7 +261,7 @@ onUnmounted(leave);
 <locale locale="ja-JP" lang="json">
 {
 	"title": "ログインと多要素認証",
-	"otherSessionsWarning": "パスキーの削除、認証アプリの設定・削除、パスキーによる多要素認証の無効化、パスキー単独ログインやパスワードログインの設定変更では、この端末以外のログインはすべて無効になります。パスキーによる多要素認証の有効化、パスキーの登録・名前の変更、復旧コードの再生成では無効になりません。",
+	"otherSessionsWarning": "パスワード変更では、他の端末のログインが無効になります。パスキーの削除、認証アプリの設定・削除、パスキーによる多要素認証の有効化・無効化、パスキー単独ログインの有効化・無効化、パスワードログインの無効化、パスキーの登録・名前の変更、復旧コードの再生成では、他の端末のログインやログイントークンは無効になりません。",
 	"explanation": "パスキーは端末やセキュリティキーで使う認証方法です。認証アプリを先に設定しなくても登録できます。登録するとすぐにパスキーによる多要素認証が有効になり、認証アプリの設定時と同じように復旧コードの初回発行時のみ表示されます。キーが残っていれば、ボタンでこの多要素認証を無効・有効に切り替えられます。再有効化時に復旧コードが残っていなければ、新しく発行して一度だけ表示します。重要な設定には、このログインで5分間有効な本人確認が必要です。",
 	"loading": "設定を読み込んでいます…",
 	"mfaActive": "パスキーによる多要素認証は有効です。",
@@ -281,7 +281,7 @@ onUnmounted(leave);
 	"passwordlessDescription": "端末のロック解除を伴うパスキーでログインします。パスワードを使ったログイン方法も引き続き利用できます。",
 	"disablePassword": "パスワードによるログインを無効にする",
 	"disablePasswordDescription": "パスキー単独ログインと確認済みメールアドレスがある場合、端末ロック解除付きのパスキーで再確認してパスワードログインを無効にできます。重要な操作もそのパスキーで確認します。",
-	"disablePasswordWarning": "パスワードによるログインを無効にしますか。他の端末はサインアウトします。パスキーを失った場合は確認済みメールへのパスワード再設定が必要です。",
+	"disablePasswordWarning": "パスワードによるログインを無効にしますか。パスキーを失った場合は確認済みメールへのパスワード再設定が必要です。",
 	"passwordDisabled": "パスワードログインは無効です。有効に戻す場合は、上のパスワード変更から新しいパスワードを設定してください。最後のパスキーは削除できません。",
 	"totpActive": "認証アプリは設定済みです。",
 	"totpInactive": "認証アプリは未設定です。",

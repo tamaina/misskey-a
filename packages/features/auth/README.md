@@ -34,8 +34,8 @@ The 「パスキーによる多要素認証を無効にする」 button disables
 `passkeyMfaEnabled`; TOTP and registered keys remain. When at least one key remains,
 「パスキーによる多要素認証を有効にする」 re-enables that same setting.
 Both buttons use common sudo and confirmation and require no additional WebAuthn
-ceremony. Disabling warns about and revokes other browser sessions; enabling
-preserves them. Re-enabling issues recovery codes
+ceremony. Both disabling and enabling preserve other browser sessions and login
+tokens. Re-enabling issues recovery codes
 only if none remain, displaying the new codes once in the recovery-code modal.
 Existing codes are never replaced or returned by re-enabling.
 While passkey MFA is enabled, the last key cannot be removed unless a usable
@@ -46,9 +46,13 @@ login is enabled. Registration preserves those login settings and requires UV
 and a discoverable credential in passwordless mode. Each new key is immediately
 available for the enabled login methods. Passkey MFA applies to password login;
 explicit passwordless login continues to require an owned UV key. Registration
-preserves other browser sessions and login tokens; key removal and password
-changes still revoke sessions. Existing revocation on other security-setting
-changes is unchanged.
+preserves other browser sessions and login tokens, as do key removal, TOTP setup
+and removal, passkey MFA enable and disable (including retained-key activation),
+passwordless enable and disable, password-login disable, key rename and recovery-code
+regeneration. Among these security settings, only password change rotates the native
+user token and revokes all browser sessions. Explicit token regeneration, email change,
+password recovery, account deletion and individual session revocation retain their
+existing behavior.
 
 Password, email and login-token changes use fresh proof for their exact purpose.
 A passwordless account can disable password login only with a verified recovery

@@ -5,7 +5,6 @@
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import bcrypt from 'bcryptjs';
-import { IsNull, Not } from 'typeorm';
 import * as v from 'valibot';
 import * as OTPAuth from 'otpauth';
 import { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse } from '@simplewebauthn/server';
@@ -69,15 +68,6 @@ export class SecuritySettings {
 		// Keep the original deadline. Successful factor proof does not start a new window.
 		await context.manager.getRepository(MiBrowserSession).update({ id: context.session.id, userId: context.user.id }, { sudoPolicyStamp: sudoPolicyStamp(context.user, current, keys) });
 	}
-	private async updated(context: LockedSudoContext, update: Partial<Pick<MiUserProfile, 'passkeyMfaEnabled' | 'usePasswordLessLogin' | 'twoFactorBackupSecret' | 'twoFactorEnabled' | 'twoFactorTempSecret' | 'twoFactorSecret' | 'passwordLoginDisabled'>>, keys = context.keys) {
-		await this.savePolicy(context, update, keys);
-		const revoked = await context.manager.getRepository(MiBrowserSession).find({
-			where: { userId: context.user.id, id: Not(context.session.id), revokedAt: IsNull() }, select: { id: true },
-		});
-		// Existing destructive/settings operations revoke other browser sessions.
-		await context.manager.getRepository(MiBrowserSession).update({ userId: context.user.id, id: Not(context.session.id) }, { revokedAt: new Date(), sudoUntil: null, sudoPolicyStamp: null });
-		return revoked.map(session => session.id);
-	}
 	private async claim(identity: SudoIdentity, kind: SecurityOperation['kind'], ticket: string) {
 		if (identity.accessToken != null || !identity.browserSession || identity.browserSession.userId !== identity.userId) throw failure();
 		if (!(await this.deps.sudo.status(identity)).active) throw sudoRequired();
@@ -136,15 +126,14 @@ export class SecuritySettings {
 			if (error instanceof SecurityConfirmationRejected) throw failure();
 			throw error;
 		});
-		const revokedIds = await this.deps.sudo.transaction(identity, async context => {
+		await this.deps.sudo.transaction(identity, async context => {
 			if (operationStamp(context) !== row.policyStamp || performance.now() >= row.expiresAtMonotonic) throw failure();
 			if (context.profile.usePasswordLessLogin || !row.requireUV) throw failure();
 			await this.verifyKey(context, row, response);
-			const revokedIds = await this.updated(context, { usePasswordLessLogin: true });
+			await this.savePolicy(context, { usePasswordLessLogin: true });
 			if (performance.now() >= row.expiresAtMonotonic) throw failure();
-			return revokedIds;
 		}, false);
-		await this.published(identity.userId, revokedIds);
+		await this.published(identity.userId);
 	}
 
 	async disablePasswordStart(identity: SudoIdentity) {
@@ -161,23 +150,16 @@ export class SecuritySettings {
 		});
 	}
 	async disablePasswordComplete(identity: SudoIdentity, ticket: string, response: unknown) {
-		let revokedIds: string[] = [];
 		const row = await this.claim(identity, 'disable-password-login', ticket);
-		let rotated: { id: string; oldToken: string; newToken: string } | undefined;
 		await this.deps.sudo.transaction(identity, async context => {
 			this.check(context, row);
 			if (context.profile.passwordLoginDisabled || !context.profile.usePasswordLessLogin
 				|| !context.profile.email || !context.profile.emailVerified || !row.requireUV) throw failure();
 			await this.verifyKey(context, row, response);
-			const oldToken = context.user.token!; const newToken = generateNativeUserToken();
-			await context.manager.getRepository(MiUser).update(context.user.id, { token: newToken });
-			context.user.token = newToken;
-			revokedIds = await this.updated(context, { passwordLoginDisabled: true });
+			await this.savePolicy(context, { passwordLoginDisabled: true });
 			if (performance.now() >= row.expiresAtMonotonic) throw failure();
-			rotated = { id: context.user.id, oldToken, newToken };
 		});
-		if (rotated) this.deps.events.publishInternalEvent('userTokenRegenerated', rotated);
-		await this.published(identity.userId, revokedIds);
+		await this.published(identity.userId);
 	}
 	private async verifyKey(context: LockedSudoContext, row: SecurityOperation, response: unknown) {
 		const credential = v.parse(webAuthnAuthenticationResponseSchema, response);
@@ -267,7 +249,6 @@ export class SecuritySettings {
 		});
 	}
 	async activateComplete(identity: SudoIdentity, ticket: string, response: unknown, recoveryAcknowledged: boolean) {
-		let revokedIds: string[] = [];
 		if (!recoveryAcknowledged) throw failure();
 		const row = await this.claim(identity, 'activate-passkey-mfa', ticket);
 		const credential = v.parse(webAuthnAuthenticationResponseSchema, response);
@@ -275,10 +256,10 @@ export class SecuritySettings {
 			this.check(context, row);
 			if (context.profile.passkeyMfaEnabled || context.profile.usePasswordLessLogin || row.backupCodes === null) throw failure();
 			await this.verifyKey(context, row, credential);
-			revokedIds = await this.updated(context, { passkeyMfaEnabled: true, ...(row.backupCodes.length ? { twoFactorBackupSecret: row.backupCodes } : {}) });
+			await this.savePolicy(context, { passkeyMfaEnabled: true, ...(row.backupCodes.length ? { twoFactorBackupSecret: row.backupCodes } : {}) });
 			if (performance.now() >= row.expiresAtMonotonic) throw failure();
 		});
-		await this.published(identity.userId, revokedIds);
+		await this.published(identity.userId);
 	}
 	async enablePasskeyMfa(identity: SudoIdentity, acknowledged: boolean) {
 		if (!acknowledged) throw failure();
@@ -292,24 +273,22 @@ export class SecuritySettings {
 		return { backupCodes };
 	}
 	async disablePasskeyMfa(identity: SudoIdentity, acknowledged: boolean) {
-		let revokedIds: string[] = [];
 		if (!acknowledged) throw failure();
-		await this.deps.sudo.transaction(identity, async context => revokedIds = await this.updated(context, {
+		await this.deps.sudo.transaction(identity, async context => await this.savePolicy(context, {
 			passkeyMfaEnabled: false, ...(context.profile.twoFactorEnabled ? {} : { twoFactorBackupSecret: null }),
 		}));
-		await this.published(identity.userId, revokedIds);
+		await this.published(identity.userId);
 	}
 	async removeKey(identity: SudoIdentity, credentialId: string) {
-		let revokedIds: string[] = [];
 		await this.deps.sudo.transaction(identity, async context => {
 			if (!context.keys.some(key => key.id === credentialId)) throw failure();
 			const remaining = context.keys.filter(key => key.id !== credentialId);
 			if (remaining.length === 0 && context.profile.passwordLoginDisabled) throw lastFactor();
 			if (remaining.length === 0 && context.profile.passkeyMfaEnabled && !readMfaPolicy(context.profile, remaining.length).totp) throw lastFactor();
 			await context.manager.getRepository(MiUserSecurityKey).delete({ id: credentialId, userId: context.user.id });
-			revokedIds = await this.updated(context, remaining.length ? {} : { usePasswordLessLogin: false, passkeyMfaEnabled: false }, remaining);
+			await this.savePolicy(context, remaining.length ? {} : { usePasswordLessLogin: false, passkeyMfaEnabled: false }, remaining);
 		});
-		await this.published(identity.userId, revokedIds);
+		await this.published(identity.userId);
 	}
 	async renameKey(identity: SudoIdentity, credentialId: string, name: string) {
 		await this.deps.sudo.transaction(identity, async ({ manager, user }) => {
@@ -318,14 +297,13 @@ export class SecuritySettings {
 		await this.published(identity.userId);
 	}
 	async passwordless(identity: SudoIdentity, enabled: boolean) {
-		let revokedIds: string[] = [];
 		await this.deps.sudo.transaction(identity, async context => {
 			if (enabled && !context.profile.usePasswordLessLogin) throw failure();
 			if (!enabled && context.profile.passwordLoginDisabled) throw lastFactor();
 			if (enabled && context.keys.length === 0) throw lastFactor();
-			revokedIds = await this.updated(context, { usePasswordLessLogin: enabled });
+			await this.savePolicy(context, { usePasswordLessLogin: enabled });
 		});
-		await this.published(identity.userId, revokedIds);
+		await this.published(identity.userId);
 	}
 	async totpStart(identity: SudoIdentity) {
 		return this.deps.sudo.transaction(identity, async context => {
@@ -336,7 +314,6 @@ export class SecuritySettings {
 		});
 	}
 	async totpComplete(identity: SudoIdentity, token: string) {
-		let revokedIds: string[] = [];
 		const backupCodes = await this.deps.sudo.transaction(identity, async context => {
 			const secret = context.profile.twoFactorTempSecret;
 			if (!secret || !await this.deps.totp.validateOtp(context.user.id, secret, token).catch(error => {
@@ -344,20 +321,19 @@ export class SecuritySettings {
 				throw error;
 			})) throw failure();
 			const backupCodes = context.profile.twoFactorBackupSecret?.length ? [] : newCodes();
-			revokedIds = await this.updated(context, { twoFactorEnabled: true, twoFactorTempSecret: null, twoFactorSecret: secret, ...(backupCodes.length ? { twoFactorBackupSecret: backupCodes } : {}) });
+			await this.savePolicy(context, { twoFactorEnabled: true, twoFactorTempSecret: null, twoFactorSecret: secret, ...(backupCodes.length ? { twoFactorBackupSecret: backupCodes } : {}) });
 			return backupCodes;
 		});
-		await this.published(identity.userId, revokedIds);
+		await this.published(identity.userId);
 		return { backupCodes };
 	}
 	async removeTotp(identity: SudoIdentity, confirmDisableMfa: boolean) {
-		let revokedIds: string[] = [];
 		await this.deps.sudo.transaction(identity, async context => {
 			if (!context.profile.passkeyMfaEnabled && !confirmDisableMfa) throw lastFactor();
-			revokedIds = await this.updated(context, { twoFactorEnabled: false, twoFactorSecret: null, twoFactorTempSecret: null,
+			await this.savePolicy(context, { twoFactorEnabled: false, twoFactorSecret: null, twoFactorTempSecret: null,
 				...(context.profile.passkeyMfaEnabled ? {} : { twoFactorBackupSecret: null }) });
 		});
-		await this.published(identity.userId, revokedIds);
+		await this.published(identity.userId);
 	}
 	async recoveryCodes(identity: SudoIdentity, regenerate: boolean) {
 		if (!regenerate) throw failure();
