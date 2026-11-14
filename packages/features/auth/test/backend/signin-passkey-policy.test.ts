@@ -26,14 +26,14 @@ function harness(independent = true, passwordless = true) {
 	return { deps, user, profile, invoke: () => call(createSigninWithPasskeyProcedure(deps), { context: '00000000-0000-4000-8000-000000000000', credential: {} }, { context }) };
 }
 
-test.each([false, true])('independent policy returns named password flow without issuing a session, convenience=%s', async convenience => {
-	const h = harness(true, convenience);
+test('independent policy without passwordless returns named password flow without issuing a session', async () => {
+	const h = harness(true, false);
 	expect(await h.invoke()).toEqual({ passwordFlowRequired: true });
 	expect(h.deps.signinService.signin).not.toHaveBeenCalled();
 });
 
-test('legacy passwordless returns a server-owned proof to the shared issuer', async () => {
-	const h = harness(false);
+test.each([false, true])('explicit passwordless returns a server-owned proof with independent MFA=%s', async independent => {
+	const h = harness(independent);
 	expect(await h.invoke()).toEqual({ signinResponse: { finished: true, id: h.user.id, i: 'bs_synthetic' } });
 	expect(h.deps.signinService.signin).toHaveBeenCalledWith(expect.anything(), expect.anything(), h.user, expect.objectContaining({ mode: 'passwordless', passwordVerified: false, factor: 'passkey' }));
 });

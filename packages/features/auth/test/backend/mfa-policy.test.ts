@@ -8,7 +8,7 @@ import type { MfaPolicySnapshot } from '../../backend/mfa-policy.js';
 
 const inactive: MfaPolicySnapshot = { userId: 'synthetic', password: 'synthetic-hash', twoFactorEnabled: false, twoFactorSecret: null, passkeyMfaEnabled: false };
 
-test.each([0, 1, 3])('orphan registered keys never enable MFA (%s)', keyCount => {
+test.each([0, 1, 3])('an explicitly disabled passkey policy stays disabled despite retained keys (%s)', keyCount => {
 	expect(readMfaPolicy(inactive, keyCount)).toEqual({ required: false, totp: false, passkey: false, independentPasskeyEnabled: false });
 });
 

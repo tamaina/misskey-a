@@ -65,9 +65,9 @@ test('orphan keys and backup stock never activate MFA on password-only accounts'
 	expect(() => assertCurrentSigninAssurance(required.proof({ factor: 'none', key: undefined }), required.user, required.profile, required.keys)).toThrow();
 });
 
-test('independent policy needs password and an available second factor; disabled TOTP cannot substitute', () => {
+test('explicit passwordless coexists with MFA for password login; disabled TOTP cannot substitute', () => {
 	const f = fixture({ passkeyMfaEnabled: true, twoFactorEnabled: false, twoFactorSecret: null, usePasswordLessLogin: true });
-	expect(() => assertCurrentSigninAssurance(f.proof({ mode: 'passwordless', passwordVerified: false }), f.user, f.profile, f.keys)).toThrow();
+	expect(() => assertCurrentSigninAssurance(f.proof({ mode: 'passwordless', passwordVerified: false }), f.user, f.profile, f.keys)).not.toThrow();
 	expect(() => assertCurrentSigninAssurance(f.proof({ passwordVerified: false }), f.user, f.profile, f.keys)).toThrow();
 	expect(() => assertCurrentSigninAssurance(f.proof({ factor: 'totp', key: undefined }), f.user, f.profile, f.keys)).toThrow();
 	expect(() => assertCurrentSigninAssurance(f.proof(), f.user, f.profile, f.keys)).not.toThrow();
@@ -81,8 +81,8 @@ test('legacy enabled passwordless remains available only with an owned UV key', 
 	expect(() => assertCurrentSigninAssurance(f.proof({ mode: 'passwordless', factor: 'totp', key: undefined }), f.user, f.profile, f.keys)).toThrow();
 });
 
-test('a second-factor UP-only proof cannot become a passwordless primary proof', () => {
-	const f = fixture({ usePasswordLessLogin: true });
+test.each([false, true])('a second-factor UP-only proof cannot become a passwordless primary proof with MFA=%s', passkeyMfaEnabled => {
+	const f = fixture({ usePasswordLessLogin: true, passkeyMfaEnabled });
 	const key = { userId: f.user.id, id: 'AQID', publicKey: 'AQID', deadline: f.deadline, userVerified: false };
 	expect(() => assertCurrentSigninAssurance(f.proof({ key }), f.user, f.profile, f.keys)).not.toThrow();
 	expect(() => assertCurrentSigninAssurance(f.proof({ mode: 'passwordless', passwordVerified: false, key }), f.user, f.profile, f.keys)).toThrow('authentication failed');

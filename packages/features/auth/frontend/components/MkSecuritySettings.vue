@@ -24,24 +24,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkButton danger :disabled="busy" @click="removeKey(key)">{{ $locale.sfc.remove }}</MkButton>
 				</div>
 			</div>
-			<MkInfo v-if="state.passwordlessEnabled || state.passkeyMfaEnabled">{{ $locale.sfc.separateModes }}</MkInfo>
-			<MkButton v-if="!state.passkeyMfaEnabled" :disabled="busy || !supportsPasskey || state.passkeyCount === 0 || state.passwordlessEnabled" @click="prepareActivation">{{ $locale.sfc.activateMfa }}</MkButton>
-			<MkButton v-else danger :disabled="busy" @click="disableMfa">{{ $locale.sfc.disableMfa }}</MkButton>
-			<div v-if="activation" class="_gaps_s">
-				<MkInfo warn>{{ $locale.sfc.activationWarning }}</MkInfo>
-				<ul><li v-for="code in activation.backupCodes" :key="code"><code>{{ code }}</code></li></ul>
-				<MkSwitch v-model="recoveryAcknowledged" :disabled="busy">{{ $locale.sfc.savedCodes }}</MkSwitch>
-				<div class="_buttons">
-					<MkButton primary :disabled="busy || !recoveryAcknowledged" @click="completeActivation">{{ $locale.sfc.proveKey }}</MkButton>
-					<MkButton :disabled="busy" @click="clearPending">{{ $locale.sfc.cancel }}</MkButton>
-				</div>
-			</div>
-			<MkSwitch :modelValue="state.passwordlessEnabled" :disabled="busy || state.passkeyCount === 0 || state.passkeyMfaEnabled || state.passwordLoginDisabled" @update:modelValue="setPasswordless">
+			<MkButton v-if="state.passkeyMfaEnabled" danger :disabled="busy" @click="disableMfa">{{ $locale.sfc.disableMfa }}</MkButton>
+			<MkSwitch :modelValue="state.passwordlessEnabled" :disabled="busy || state.passkeyCount === 0 || state.passwordLoginDisabled" @update:modelValue="setPasswordless">
 				{{ $locale.sfc.passwordless }}
 				<template #caption>{{ $locale.sfc.passwordlessDescription }}</template>
 			</MkSwitch>
 			<MkInfo>{{ $locale.sfc.disablePasswordDescription }}</MkInfo>
-			<MkButton v-if="!state.passwordLoginDisabled" danger :disabled="busy || !supportsPasskey || !state.passwordlessEnabled || state.passkeyMfaEnabled || !state.hasVerifiedRecoveryEmail" @click="disablePassword">{{ $locale.sfc.disablePassword }}</MkButton>
+			<MkButton v-if="!state.passwordLoginDisabled" danger :disabled="busy || !supportsPasskey || !state.passwordlessEnabled || !state.hasVerifiedRecoveryEmail" @click="disablePassword">{{ $locale.sfc.disablePassword }}</MkButton>
 			<MkInfo v-else warn>{{ $locale.sfc.passwordDisabled }}</MkInfo>
 			<hr>
 			<p>{{ state.totpEnabled ? $locale.sfc.totpActive : $locale.sfc.totpInactive }}</p>
@@ -77,7 +66,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
 import { browserSupportsWebAuthn, startAuthentication, startRegistration, WebAuthnAbortService } from '@simplewebauthn/browser';
-import type { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -95,8 +83,6 @@ const ownerToken = owner.token;
 const supportsPasskey = browserSupportsWebAuthn();
 const state = ref<Awaited<ReturnType<typeof readState>> | null>(null);
 const keys = ref<{ id: string; name: string; lastUsedAt: string }[]>([]);
-const activation = ref<Awaited<ReturnType<typeof beginActivation>> | null>(null);
-const recoveryAcknowledged = ref(false);
 const totp = ref<{ secret: string; url: string } | null>(null);
 const totpCode = ref('');
 const codes = ref<string[] | null>(null);
@@ -108,10 +94,8 @@ let nativePending = false;
 let sudoAbort: AbortController | null = null;
 const currentActor = () => active && ensureSignin().id === ownerId && ensureSignin().token === ownerToken;
 const readState = () => misskeyApi('i/security/state', {});
-const beginActivation = () => misskeyApi('i/security/passkey/mfa/start', {});
 
 function clearPending() {
-	activation.value = null; recoveryAcknowledged.value = false;
 	totp.value = null; totpCode.value = ''; codes.value = null;
 }
 
@@ -143,7 +127,7 @@ function loadKeys() {
 
 function registerKey() {
 	return run(async isCurrent => {
-		const name = await os.inputText({ title: $locale.value.sfc.keyName, text: $locale.value.sfc.registerWarning, minLength: 1, maxLength: 30 });
+		const name = await os.inputText({ title: $locale.value.sfc.keyName, minLength: 1, maxLength: 30 });
 		if (!isCurrent() || name.canceled || !name.result) return;
 		const started = await misskeyApi('i/security/passkey/register/start', { name: name.result });
 		if (!isCurrent()) return;
@@ -151,8 +135,8 @@ function registerKey() {
 		const credential = await startRegistration({ optionsJSON: started.options });
 		nativePending = false;
 		if (!isCurrent()) return;
-		await misskeyApi('i/security/passkey/register/complete', { ticket: started.ticket, credential: registrationWire(credential) });
-		if (isCurrent()) { keys.value = []; clearPending(); await refresh(isCurrent); }
+		const value = await misskeyApi('i/security/passkey/register/complete', { ticket: started.ticket, credential: registrationWire(credential) });
+		if (isCurrent()) { keys.value = []; clearPending(); codes.value = value.backupCodes; await refresh(isCurrent); }
 	});
 }
 
@@ -175,23 +159,6 @@ function removeKey(key: { id: string; name: string }) {
 		const signal = (globalThis.PublicKeyCredential as unknown as { signalUnknownCredential?: (options: { rpId: string; credentialId: string }) => Promise<void> })?.signalUnknownCredential;
 		if (signal) await signal.call(globalThis.PublicKeyCredential, { rpId: window.location.hostname, credentialId: key.id }).catch(() => {});
 		if (isCurrent()) { keys.value = keys.value.filter(value => value.id !== key.id); clearPending(); await refresh(isCurrent); }
-	});
-}
-
-function prepareActivation() {
-	return run(async isCurrent => { clearPending(); const value = await beginActivation(); if (isCurrent()) activation.value = value; });
-}
-
-function completeActivation() {
-	return run(async isCurrent => {
-		const pending = activation.value;
-		if (!pending || !recoveryAcknowledged.value) return;
-		nativePending = true;
-		let credential: AuthenticationResponseJSON;
-		try { credential = await startAuthentication({ optionsJSON: pending.options }); } finally { nativePending = false; }
-		if (!isCurrent()) return;
-		await misskeyApi('i/security/passkey/mfa/complete', { ticket: pending.ticket, credential, recoveryAcknowledged: true });
-		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
 	});
 }
 
@@ -281,9 +248,8 @@ onUnmounted(leave);
 <locale locale="ja-JP" lang="json">
 {
 	"title": "ログインと多要素認証",
-	"otherSessionsWarning": "パスキーの登録・削除、認証アプリの設定・削除、多要素認証やパスキー単独ログイン、パスワードログインの設定を変更すると、この端末以外のログインはすべて無効になります。名前の変更や復旧コードの表示・再生成では無効になりません。",
-	"registerWarning": "登録すると、この端末以外のログインはすべて無効になります。",
-	"explanation": "パスキーは端末やセキュリティキーで使う認証方法です。認証アプリを先に設定しなくても登録できます。登録しただけでは多要素認証は有効になりません。重要な設定には、このログインで5分間有効な本人確認が必要です。",
+	"otherSessionsWarning": "パスキーの削除、認証アプリの設定・削除、多要素認証やパスキー単独ログイン、パスワードログインの設定を変更すると、この端末以外のログインはすべて無効になります。名前の変更や復旧コードの表示・再生成では無効になりません。",
+	"explanation": "パスキーは端末やセキュリティキーで使う認証方法です。認証アプリを先に設定しなくても登録できます。登録するとすぐに多要素認証が有効になり、認証アプリの設定時と同じように復旧コードが表示されます。重要な設定には、このログインで5分間有効な本人確認が必要です。",
 	"loading": "設定を読み込んでいます…",
 	"mfaActive": "パスキーによる多要素認証は有効です。",
 	"mfaInactive": "パスキーによる多要素認証は無効です。",
@@ -294,13 +260,8 @@ onUnmounted(leave);
 	"rename": "名前を変更",
 	"remove": "削除",
 	"removeKeyWarning": "このパスキーを削除しますか。最後の認証方法は、多要素認証を明示的に無効にするまで削除できません。",
-	"activateMfa": "パスキーによる多要素認証を有効にする",
 	"disableMfa": "パスキーによる多要素認証を無効にする",
-	"activationWarning": "復旧コードを安全な場所に保存してください。保存の確認後、登録済みパスキーで確認すると有効になります。中断した場合は、もう一度最初から開始してください。",
-	"savedCodes": "復旧コードを安全な場所に保存しました",
-	"proveKey": "パスキーで確認して有効にする",
 	"disableWarning": "この認証方法を無効にしますか。他に多要素認証が有効でなければ、パスワードだけでログインできるようになります。",
-	"separateModes": "パスキーだけのログインと、パスワードに追加するパスキーの多要素認証は、同時には有効にできません。切り替える場合は現在の設定を明示的に無効にしてください。",
 	"passwordless": "パスキーだけでログインできるようにする",
 	"passwordlessDescription": "端末のロック解除を伴うパスキーでログインします。パスワードを使ったログイン方法も引き続き利用できます。",
 	"disablePassword": "パスワードによるログインを無効にする",

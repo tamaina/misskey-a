@@ -24,9 +24,20 @@ MCP clientsが独自フラグを送る必要はなく、discovery metadataにも
 The completion stack covers individual browser sessions, current-policy login
 issuance, authentication progress, independent passkey MFA, strict passwordless
 login, recovery codes and operation-bound reauthentication. Security settings
-manage keys, factor activation, recovery-code acknowledgement and session
+manage keys, parallel TOTP and passkey second factors, recovery codes and session
 revocation. Sensitive changes recheck the current owner, policy and session under
-transaction locks. Registering a key does not activate MFA.
+transaction locks. Registering a passkey or security key immediately activates MFA,
+even without TOTP. Its registration completion displays recovery codes in the same
+flow as TOTP setup; no separate MFA activation or second key ceremony is required.
+Existing unspent recovery codes are preserved when adding a factor.
+Additional keys can be registered repeatedly while passwordless or passkey-only
+login is enabled. Registration preserves those login settings and requires UV
+and a discoverable credential in passwordless mode. Each new key is immediately
+available for the enabled login methods. Passkey MFA applies to password login;
+explicit passwordless login continues to require an owned UV key. Registration
+preserves other browser sessions and login tokens; key removal and password
+changes still revoke sessions. Existing revocation on other security-setting
+changes is unchanged.
 
 Password, email and login-token changes use fresh proof for their exact purpose.
 A passwordless account can disable password login only with a verified recovery

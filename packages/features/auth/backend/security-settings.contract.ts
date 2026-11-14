@@ -36,7 +36,7 @@ export const securitySettingsContract = {
 	'i/security/passkey/register/start': route('i/security/passkey/register/start').input(objectInput({ name }))
 		.output(v.strictObject({ ticket, options: webAuthnRegistrationOptionsSchema })),
 	'i/security/passkey/register/complete': route('i/security/passkey/register/complete').input(objectInput({ ticket, credential: webAuthnRegistrationResponseSchema }))
-		.output(v.strictObject({ id: v.string(), name: v.string() })),
+		.output(v.strictObject({ id: v.string(), name: v.string(), backupCodes: v.array(v.string()) })),
 	'i/security/passkey/mfa/start': route('i/security/passkey/mfa/start').input(objectInput({}))
 		.output(v.strictObject({ ticket, options: webAuthnAuthenticationOptionsSchema, backupCodes: v.array(v.string()) })),
 	'i/security/passkey/mfa/complete': route('i/security/passkey/mfa/complete').input(objectInput({

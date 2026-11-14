@@ -50,7 +50,7 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 	const request = (route: string, body: object = {}, token = current.token) => app.inject({ method: 'POST', url: `/api/${route}`, headers: { authorization: `Bearer ${token}` }, payload: body });
 	const clientData = (type: string, challenge: string) => Buffer.from(JSON.stringify({ type, challenge, origin: config.url, crossOrigin: false }));
 
-	function registration(challenge: string, uv = false) {
+	function registration(challenge: string, uv = false, keyId = 'AQID') {
 		const jwk = keys.publicKey.export({ format: 'jwk' });
 		const cose = encode(new Map<number, unknown>([[1, 2], [3, -7], [-1, 1], [-2, new Uint8Array(Buffer.from(jwk.x!, 'base64url'))], [-3, new Uint8Array(Buffer.from(jwk.y!, 'base64url'))]]));
 		const header = Buffer.alloc(37); createHash('sha256').update(config.hostname).digest().copy(header); header[32] = uv ? 0x45 : 0x41;
@@ -59,7 +59,7 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		return { id: keyId, rawId: keyId, type: 'public-key', response: { clientDataJSON: clientData('webauthn.create', challenge).toString('base64url'), attestationObject: Buffer.from(encode({ fmt: 'none', attStmt: {}, authData: new Uint8Array(authData) })).toString('base64url'), transports: ['usb'] }, clientExtensionResults: {} };
 	}
 
-	function assertion(challenge: string, uv = false) {
+	function assertion(challenge: string, uv = false, keyId = 'AQID') {
 		const client = clientData('webauthn.get', challenge); const authenticator = Buffer.alloc(37);
 		createHash('sha256').update(config.hostname).digest().copy(authenticator); authenticator[32] = uv ? 5 : 1; authenticator.writeUInt32BE(++counter, 33);
 		const signature = sign('sha256', Buffer.concat([authenticator, createHash('sha256').update(client).digest()]), keys.privateKey);
@@ -72,7 +72,8 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		await elevate(); const start = await request('i/security/passkey/register/start', { name: 'Synthetic key' }); expect(start.statusCode).toBe(200);
 		const row = start.json<Started>(); expect(row.options.authenticatorSelection).toMatchObject({ userVerification: 'preferred', residentKey: 'preferred' });
 		const body = { ticket: row.ticket, credential: registration(row.options.challenge) };
-		expect((await request('i/security/passkey/register/complete', body)).statusCode).toBe(200); return body;
+		const completed = await request('i/security/passkey/register/complete', body); expect(completed.statusCode).toBe(200);
+		return { body, backupCodes: completed.json<{ backupCodes: string[] }>().backupCodes };
 	}
 
 	beforeAll(async () => {
@@ -97,28 +98,24 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		await db.getRepository(MiUserProfile).insert({ userId: owner, password: bcrypt.hashSync(password, 4), email: 'synthetic@example.test', emailVerified: true, twoFactorBackupSecret: null });
 		keys = generateKeyPairSync('ec', { namedCurve: 'prime256v1' }); counter = 0; current = await sessions.issue(owner); other = await sessions.issue(owner);
 	});
-	test('UP-only registration without TOTP is committed once and does not activate MFA', async () => {
-		const body = await enroll(); expect((await profile()).passkeyMfaEnabled).toBe(false); expect((await profile()).twoFactorEnabled).toBe(false);
+	test('UP-only registration without TOTP commits a key, MFA and recovery codes once', async () => {
+		const { body, backupCodes } = await enroll(); expect((await profile()).passkeyMfaEnabled).toBe(true);
+		expect(new Set(backupCodes).size).toBe(5); expect((await profile()).twoFactorBackupSecret).toEqual(backupCodes); expect((await profile()).twoFactorEnabled).toBe(false);
 		expect(await db.getRepository(MiUserSecurityKey).countBy({ userId: owner })).toBe(1); expect((await request('i/security/passkey/register/complete', body)).statusCode).toBe(403);
-		expect(await sessions.verify(other.token)).toBeNull(); expect(await sessions.verify(current.token)).not.toBeNull();
+		expect(await sessions.verify(other.token)).not.toBeNull(); expect(await sessions.verify(current.token)).not.toBeNull();
 		const started = await request('i/security/passkey/register/start', { name: 'Malformed attestation' });
 		const bad = registration(started.json<Started>().options.challenge); bad.response.attestationObject = 'AQID';
 		expect((await request('i/security/passkey/register/complete', { ticket: started.json<Started>().ticket, credential: bad })).statusCode).toBe(403);
 		expect(await db.getRepository(MiUserSecurityKey).countBy({ userId: owner })).toBe(1);
 	});
-	test('five saved codes plus a real UP-only owned assertion activate independent MFA; one recovery code is consumed', async () => {
-		await enroll(); const response = await request('i/security/passkey/mfa/start'); expect(response.statusCode).toBe(200); const row = response.json<Started>();
-		expect(row.options.userVerification).toBe('preferred'); expect(new Set(row.backupCodes).size).toBe(5);
-		const body = { ticket: row.ticket, credential: assertion(row.options.challenge), recoveryAcknowledged: true };
-		expect((await request('i/security/passkey/mfa/complete', { ...body, recoveryAcknowledged: false })).statusCode).toBe(403);
-		expect((await profile()).passkeyMfaEnabled).toBe(false); expect((await request('i/security/passkey/mfa/complete', body)).statusCode).toBe(204);
-		expect((await profile()).passkeyMfaEnabled).toBe(true); expect((await profile()).twoFactorBackupSecret).toEqual(row.backupCodes);
-		expect((await request('i/security/passkey/mfa/complete', body)).statusCode).toBe(403);
-		await request('i/sudo/exit'); const recovery = await request('i/sudo/start', { password, token: row.backupCodes[0] }); expect(recovery.statusCode).toBe(200);
-		expect((await profile()).twoFactorBackupSecret).toEqual(row.backupCodes.slice(1)); expect((await request('i/sudo/start', { password, token: row.backupCodes[0] })).statusCode).toBe(403);
+	test('registration recovery codes are immediately usable without a separate MFA enable step', async () => {
+		const { backupCodes } = await enroll();
+		await request('i/sudo/exit'); const recovery = await request('i/sudo/start', { password, token: backupCodes[0] }); expect(recovery.statusCode).toBe(200);
+		expect((await profile()).twoFactorBackupSecret).toEqual(backupCodes.slice(1)); expect((await request('i/sudo/start', { password, token: backupCodes[0] })).statusCode).toBe(403);
 	});
 	test('strict discoverable primary proof rejects UP-only and accepts UV before disabling password login', async () => {
-		await enroll(); let response = await request('i/security/passkey/passwordless/start'); expect(response.statusCode).toBe(200); let row = response.json<Started>();
+		await enroll(); expect((await request('i/security/passkey/mfa/disable', { acknowledged: true })).statusCode).toBe(204);
+		let response = await request('i/security/passkey/passwordless/start'); expect(response.statusCode).toBe(200); let row = response.json<Started>();
 		expect(row.options.userVerification).toBe('required'); expect(row.options.allowCredentials).toBeUndefined();
 		expect((await request('i/security/passkey/passwordless/complete', { ticket: row.ticket, credential: assertion(row.options.challenge, false) })).statusCode).toBe(403); expect((await profile()).usePasswordLessLogin).toBe(false);
 		for (const handle of [null, Buffer.from('another-owner').toString('base64url')]) {
@@ -138,12 +135,35 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		const fresh = response.json<Started>(); expect(fresh.options.userVerification).toBe('required');
 		expect((await request('i/sudo/complete', { ticket: fresh.ticket, credential: assertion(fresh.options.challenge, true) })).statusCode).toBe(200);
 	});
-	test('another session cannot claim the pending proof and two completions have one winner', async () => {
-		await enroll(); const third = await sessions.issue(owner); expect((await request('i/sudo/start', { password }, third.token)).statusCode).toBe(200);
-		const start = await request('i/security/passkey/mfa/start'); const row = start.json<Started>(); const body = { ticket: row.ticket, credential: assertion(row.options.challenge), recoveryAcknowledged: true };
-		expect((await request('i/security/passkey/mfa/complete', body, third.token)).statusCode).toBe(403);
-		const results = await Promise.all([request('i/security/passkey/mfa/complete', body), request('i/security/passkey/mfa/complete', body)]);
-		expect(results.map(result => result.statusCode).sort()).toEqual([204, 403]); expect((await profile()).passkeyMfaEnabled).toBe(true);
+	test.each([false, true])('passwordless adds multiple immediately usable keys without revocation, passwordLoginDisabled=%s', async disabled => {
+		const { backupCodes } = await enroll();
+		await db.getRepository(MiUserProfile).update({ userId: owner }, { usePasswordLessLogin: true, passwordLoginDisabled: disabled });
+		const initialToken = (await db.getRepository(MiUser).findOneByOrFail({ id: owner })).token;
+		for (const keyId of ['BAUG', 'BwgJ']) {
+			const sudo = await request('i/sudo/start', { password, usePasskey: true }); expect(sudo.statusCode).toBe(200);
+			const grant = sudo.json<Started>();
+			expect((await request('i/sudo/complete', { ticket: grant.ticket, credential: assertion(grant.options.challenge, true) })).statusCode).toBe(200);
+			const start = await request('i/security/passkey/register/start', { name: keyId }); expect(start.statusCode).toBe(200);
+			const row = start.json<Started>(); expect(row.options.authenticatorSelection).toMatchObject({ userVerification: 'required', residentKey: 'required' });
+			const completed = await request('i/security/passkey/register/complete', { ticket: row.ticket, credential: registration(row.options.challenge, true, keyId) });
+			expect(completed.statusCode).toBe(200); expect(completed.json()).toMatchObject({ id: keyId, backupCodes });
+			expect(await profile()).toMatchObject({ usePasswordLessLogin: true, passwordLoginDisabled: disabled, passkeyMfaEnabled: true, twoFactorBackupSecret: backupCodes });
+			expect((await db.getRepository(MiUser).findOneByOrFail({ id: owner })).token).toBe(initialToken);
+			expect(await sessions.verify(other.token)).not.toBeNull(); expect(await sessions.verify(current.token)).not.toBeNull();
+			await request('i/sudo/exit');
+			const proof = (await request('i/sudo/start', { password, usePasskey: true })).json<Started>();
+			expect((await request('i/sudo/complete', { ticket: proof.ticket, credential: assertion(proof.options.challenge, true, keyId) })).statusCode).toBe(200);
+			await request('i/sudo/exit');
+		}
+		expect(await db.getRepository(MiUserSecurityKey).countBy({ userId: owner })).toBe(3);
+	});
+	test('another session cannot claim registration and two completions have one winner', async () => {
+		await elevate(); const third = await sessions.issue(owner); expect((await request('i/sudo/start', { password }, third.token)).statusCode).toBe(200);
+		const start = await request('i/security/passkey/register/start', { name: 'Synthetic key' }); const row = start.json<Started>();
+		const body = { ticket: row.ticket, credential: registration(row.options.challenge) };
+		expect((await request('i/security/passkey/register/complete', body, third.token)).statusCode).toBe(403);
+		const results = await Promise.all([request('i/security/passkey/register/complete', body), request('i/security/passkey/register/complete', body)]);
+		expect(results.map(result => result.statusCode).sort()).toEqual([200, 403]); expect((await profile()).passkeyMfaEnabled).toBe(true);
 	});
 	test('TOTP enrollment verifies the real secret once, preserves the sudo deadline and requires explicit last-factor removal', async () => {
 		const grant = await elevate(); const response = await request('i/security/totp/start'); expect(response.statusCode).toBe(200);
@@ -162,10 +182,10 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		expect((await request('i/security/totp/remove', { confirmDisableMfa: true })).statusCode).toBe(204);
 		expect(await profile()).toMatchObject({ twoFactorEnabled: false, twoFactorSecret: null, twoFactorBackupSecret: null });
 	});
-	test('a replaced sudo grant cannot revive an older pending activation', async () => {
-		await enroll(); const start = await request('i/security/passkey/mfa/start'); const row = start.json<Started>();
+	test('a replaced sudo grant cannot revive an older pending registration', async () => {
+		await elevate(); const start = await request('i/security/passkey/register/start', { name: 'Synthetic key' }); const row = start.json<Started>();
 		await request('i/sudo/exit'); await elevate();
-		expect((await request('i/security/passkey/mfa/complete', { ticket: row.ticket, credential: assertion(row.options.challenge), recoveryAcknowledged: true })).statusCode).toBe(403);
-		expect((await profile()).passkeyMfaEnabled).toBe(false); expect(Number((await db.getRepository(MiUserSecurityKey).findOneByOrFail({ id: keyId })).counter)).toBe(0);
+		expect((await request('i/security/passkey/register/complete', { ticket: row.ticket, credential: registration(row.options.challenge) })).statusCode).toBe(403);
+		expect((await profile()).passkeyMfaEnabled).toBe(false); expect(await db.getRepository(MiUserSecurityKey).countBy({ userId: owner })).toBe(0);
 	});
 });

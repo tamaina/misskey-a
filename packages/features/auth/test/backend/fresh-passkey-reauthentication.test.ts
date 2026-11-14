@@ -164,3 +164,15 @@ test.each([true, false])('real legacy P-256 signature: UV=%s is strictly enforce
 		expect(f.keys.update).not.toHaveBeenCalled();
 	}
 });
+
+test.each([false, true])('passkey-only sudo requires UV after registration enables MFA=%s', async passkeyMfaEnabled => {
+	const f = fixture();
+	f.profiles.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ ...f.profile, passwordLoginDisabled: true, usePasswordLessLogin: true, passkeyMfaEnabled }));
+	const started = await f.service.begin(identity, 'sudo', undefined);
+	expect(started.options.userVerification).toBe('required');
+	await expect(f.service.complete(identity, 'sudo', started.ticket, assertion)).resolves.toMatchObject({ userId: identity.userId });
+	expect(webauthn.verifyAuthenticationResponse).toHaveBeenCalledWith(expect.objectContaining({ requireUserVerification: true }));
+	const retry = await f.service.begin(identity, 'sudo', undefined);
+	vi.mocked(webauthn.verifyAuthenticationResponse).mockResolvedValue({ verified: true, authenticationInfo: { userVerified: false } } as never);
+	await expect(f.service.complete(identity, 'sudo', retry.ticket, assertion)).rejects.toThrow();
+});

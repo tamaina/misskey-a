@@ -71,7 +71,7 @@ export function assertCurrentSigninAssurance(proof: SigninAssurance, user: MiUse
 	const policy = readMfaPolicy(profile, keys.length);
 	if (proof.key && (proof.key.userId !== user.id || !keys.some(key => key.id === proof.key?.id && normalizedPasskeyPublicKey(key.publicKey) === proof.key.publicKey))) throw new SigninPolicyError();
 	if (proof.mode === 'passwordless') {
-		if (policy.independentPasskeyEnabled || !profile.usePasswordLessLogin || proof.factor !== 'passkey' || !proof.key || proof.key.userVerified !== true) throw new SigninPolicyError();
+		if (!profile.usePasswordLessLogin || proof.factor !== 'passkey' || !proof.key || proof.key.userVerified !== true) throw new SigninPolicyError();
 		return;
 	}
 	if (!proof.passwordVerified || !profile.password || ('passwordLoginDisabled' in profile && profile.passwordLoginDisabled === true)) throw new SigninPolicyError();

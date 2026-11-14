@@ -63,16 +63,19 @@ export class SecuritySettings {
 		if (revokedIds === 'all') this.deps.events.publishInternalEvent('browserSessionRevoked', { id: null, userId });
 		else for (const id of revokedIds) this.deps.events.publishInternalEvent('browserSessionRevoked', { id, userId });
 	}
-	private async updated(context: LockedSudoContext, update: Partial<Pick<MiUserProfile, 'passkeyMfaEnabled' | 'usePasswordLessLogin' | 'twoFactorBackupSecret' | 'twoFactorEnabled' | 'twoFactorTempSecret' | 'twoFactorSecret' | 'passwordLoginDisabled'>>, keys = context.keys) {
+	private async savePolicy(context: LockedSudoContext, update: Partial<Pick<MiUserProfile, 'passkeyMfaEnabled' | 'usePasswordLessLogin' | 'twoFactorBackupSecret' | 'twoFactorEnabled' | 'twoFactorTempSecret' | 'twoFactorSecret' | 'passwordLoginDisabled'>>, keys = context.keys) {
 		if (Object.keys(update).length) await context.manager.getRepository(MiUserProfile).update({ userId: context.user.id }, update);
 		const current = { ...context.profile, ...update };
+		// Keep the original deadline. Successful factor proof does not start a new window.
+		await context.manager.getRepository(MiBrowserSession).update({ id: context.session.id, userId: context.user.id }, { sudoPolicyStamp: sudoPolicyStamp(context.user, current, keys) });
+	}
+	private async updated(context: LockedSudoContext, update: Partial<Pick<MiUserProfile, 'passkeyMfaEnabled' | 'usePasswordLessLogin' | 'twoFactorBackupSecret' | 'twoFactorEnabled' | 'twoFactorTempSecret' | 'twoFactorSecret' | 'passwordLoginDisabled'>>, keys = context.keys) {
+		await this.savePolicy(context, update, keys);
 		const revoked = await context.manager.getRepository(MiBrowserSession).find({
 			where: { userId: context.user.id, id: Not(context.session.id), revokedAt: IsNull() }, select: { id: true },
 		});
-		// A newly active factor must be used on the next login on every other device.
+		// Existing destructive/settings operations revoke other browser sessions.
 		await context.manager.getRepository(MiBrowserSession).update({ userId: context.user.id, id: Not(context.session.id) }, { revokedAt: new Date(), sudoUntil: null, sudoPolicyStamp: null });
-		// Keep the original deadline. Successful factor proof does not start a new window.
-		await context.manager.getRepository(MiBrowserSession).update({ id: context.session.id, userId: context.user.id }, { sudoPolicyStamp: sudoPolicyStamp(context.user, current, keys) });
 		return revoked.map(session => session.id);
 	}
 	private async claim(identity: SudoIdentity, kind: SecurityOperation['kind'], ticket: string) {
@@ -117,7 +120,7 @@ export class SecuritySettings {
 
 	async passwordlessStart(identity: SudoIdentity) {
 		return this.deps.sudo.transaction(identity, async context => {
-			if (context.profile.usePasswordLessLogin || context.profile.passkeyMfaEnabled || !context.keys.length) throw failure();
+			if (context.profile.usePasswordLessLogin || !context.keys.length) throw failure();
 			const options = await generateAuthenticationOptions({ rpID: this.deps.config.hostname, userVerification: 'required' });
 			v.assert(nativeAuthenticationOptionsSchema, options);
 			const ticket = await this.deps.operations.create({ kind: 'enable-passwordless-login', userId: context.user.id,
@@ -130,7 +133,7 @@ export class SecuritySettings {
 		const row = await this.claim(identity, 'enable-passwordless-login', ticket);
 		const revokedIds = await this.deps.sudo.transaction(identity, async context => {
 			this.check(context, row);
-			if (context.profile.usePasswordLessLogin || context.profile.passkeyMfaEnabled || !row.requireUV) throw failure();
+			if (context.profile.usePasswordLessLogin || !row.requireUV) throw failure();
 			await this.verifyKey(context, row, response);
 			const revokedIds = await this.updated(context, { usePasswordLessLogin: true });
 			if (performance.now() >= row.expiresAtMonotonic) throw failure();
@@ -141,7 +144,7 @@ export class SecuritySettings {
 
 	async disablePasswordStart(identity: SudoIdentity) {
 		return this.deps.sudo.transaction(identity, async context => {
-			if (context.profile.passwordLoginDisabled || !context.profile.usePasswordLessLogin || context.profile.passkeyMfaEnabled
+			if (context.profile.passwordLoginDisabled || !context.profile.usePasswordLessLogin
 				|| !context.profile.email || !context.profile.emailVerified || !context.keys.length) throw failure();
 			// Request a discoverable ceremony; require an owned userHandle and strict UV on completion.
 			const options = await generateAuthenticationOptions({ rpID: this.deps.config.hostname, userVerification: 'required' });
@@ -158,7 +161,7 @@ export class SecuritySettings {
 		let rotated: { id: string; oldToken: string; newToken: string } | undefined;
 		await this.deps.sudo.transaction(identity, async context => {
 			this.check(context, row);
-			if (context.profile.passwordLoginDisabled || !context.profile.usePasswordLessLogin || context.profile.passkeyMfaEnabled
+			if (context.profile.passwordLoginDisabled || !context.profile.usePasswordLessLogin
 				|| !context.profile.email || !context.profile.emailVerified || !row.requireUV) throw failure();
 			await this.verifyKey(context, row, response);
 			const oldToken = context.user.token!; const newToken = generateNativeUserToken();
@@ -221,26 +224,29 @@ export class SecuritySettings {
 		});
 	}
 	async registerComplete(identity: SudoIdentity, ticket: string, response: unknown) {
-		let revokedIds: string[] = [];
 		const row = await this.claim(identity, 'register-passkey', ticket);
 		const credential = v.parse(webAuthnRegistrationResponseSchema, response);
 		const result = await verifyRegistrationResponse({ response: credential, expectedChallenge: row.challenge,
 			expectedOrigin: this.deps.config.url, expectedRPID: this.deps.config.hostname, requireUserVerification: row.requireUV }).catch(() => { throw failure(); });
 		if (!result.verified || !result.registrationInfo) throw failure();
 		const info = result.registrationInfo;
-		await this.deps.sudo.transaction(identity, async context => {
+		const backupCodes = await this.deps.sudo.transaction(identity, async context => {
 			this.check(context, row);
 			await context.manager.getRepository(MiUserSecurityKey).insert({ id: info.credential.id, userId: context.user.id,
 				name: row.name!, publicKey: Buffer.from(info.credential.publicKey).toString('base64url'), counter: info.credential.counter,
 				credentialDeviceType: info.credentialDeviceType, credentialBackedUp: info.credentialBackedUp,
 				transports: info.credential.transports ?? null });
 			const keys = await context.manager.getRepository(MiUserSecurityKey).findBy({ userId: context.user.id });
-			revokedIds = await this.updated(context, {}, keys);
+			// Registration is also MFA setup, just like completing TOTP setup.
+			const backupCodes = context.profile.twoFactorBackupSecret?.length ? context.profile.twoFactorBackupSecret : newCodes();
+			await this.savePolicy(context, { passkeyMfaEnabled: true, twoFactorBackupSecret: backupCodes }, keys);
 			if (performance.now() >= row.expiresAtMonotonic) throw failure();
+			return backupCodes;
 		});
-		await this.published(identity.userId, revokedIds);
-		return { id: info.credential.id, name: row.name! };
+		await this.published(identity.userId);
+		return { id: info.credential.id, name: row.name!, backupCodes };
 	}
+	// Retained-key reactivation for existing clients; registration never uses this ceremony.
 	async activateStart(identity: SudoIdentity) {
 		return this.deps.sudo.transaction(identity, async context => {
 			if (context.profile.passkeyMfaEnabled || context.profile.usePasswordLessLogin || context.keys.length === 0) throw failure();
@@ -300,7 +306,7 @@ export class SecuritySettings {
 		await this.deps.sudo.transaction(identity, async context => {
 			if (enabled && !context.profile.usePasswordLessLogin) throw failure();
 			if (!enabled && context.profile.passwordLoginDisabled) throw lastFactor();
-			if (enabled && (context.keys.length === 0 || context.profile.passkeyMfaEnabled)) throw lastFactor();
+			if (enabled && context.keys.length === 0) throw lastFactor();
 			revokedIds = await this.updated(context, { usePasswordLessLogin: enabled });
 		});
 		await this.published(identity.userId, revokedIds);

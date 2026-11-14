@@ -124,7 +124,7 @@ export function createSigninWithPasskeyProcedure(deps: SigninWithPasskeyDependen
 			if (!verified) return error(403, { id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c' });
 			const { user, policy, passwordless, policyStamp } = verified.expected;
 			if (user.isSuspended || user.isDeleted) return error(403, { id: 'e03a5f46-d309-4865-9b69-56282d94e1eb' });
-			if (policy.independentPasskeyEnabled) {
+			if (policy.independentPasskeyEnabled && !passwordless) {
 				// This UV identifies the account only. No proof/session is carried into the named password flow.
 				reply.code(200);
 				return { passwordFlowRequired: true };

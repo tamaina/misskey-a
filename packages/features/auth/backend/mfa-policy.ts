@@ -6,7 +6,7 @@ import type { MiUserProfile } from '@features/users/backend/models/UserProfile.j
 
 export type MfaPolicySnapshot = Pick<MiUserProfile, 'userId' | 'password' | 'twoFactorEnabled' | 'twoFactorSecret' | 'passkeyMfaEnabled'> & Partial<Pick<MiUserProfile, 'usePasswordLessLogin' | 'passwordLoginDisabled'>>;
 
-/** Policy and available factors are distinct; neither keys nor recovery codes activate MFA. */
+/** Registration enables passkey MFA; the explicit policy also supports disabling it. */
 export function readMfaPolicy(profile: MfaPolicySnapshot, keyCount: number) {
 	if (!Number.isSafeInteger(keyCount) || keyCount < 0) throw new Error('Invalid MFA factor count');
 	const totpEnabled = profile.twoFactorEnabled === true;

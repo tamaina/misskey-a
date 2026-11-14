@@ -249,7 +249,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				}
 				return finish(recovery ? 'recovery' : 'totp');
 			} else if (sessionField(body, 'credential')) {
-				if (!policy.passkey || (!same && (policy.independentPasskeyEnabled || !profile.usePasswordLessLogin))) {
+				if (!policy.passkey || (!same && !profile.usePasswordLessLogin)) {
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
@@ -273,7 +273,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				}
 				return fail(403, { id: '93b86c4b-72f9-40eb-9815-798928603d1e' });
 			} else if (policy.passkey) {
-				if (!same && (policy.independentPasskeyEnabled || !profile.usePasswordLessLogin)) {
+				if (!same && !profile.usePasswordLessLogin) {
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});

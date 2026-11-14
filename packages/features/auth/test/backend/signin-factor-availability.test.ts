@@ -85,10 +85,10 @@ test('independent passkey MFA advertises the enabled key without inventing a TOT
 	expect(h.deps.signinService.signin).not.toHaveBeenCalled();
 });
 
-test('independent policy disables the convenience wrong-password bypass', async () => {
+test('explicit passwordless still offers a strict-UV challenge with independent MFA', async () => {
 	const h = harness(false, true, true, true);
-	expect(await h.invoke({ username: 'synthetic', password: 'wrong' })).toHaveProperty('error');
-	expect(h.deps.webAuthnService.initiateAuthentication).not.toHaveBeenCalled();
+	expect(await h.invoke({ username: 'synthetic', password: 'wrong' })).toEqual({ finished: false, next: 'passkey', authRequest: option });
+	expect(h.deps.webAuthnService.initiateAuthentication).toHaveBeenCalledWith('synthetic', true);
 	expect(h.deps.signinService.signin).not.toHaveBeenCalled();
 });
 

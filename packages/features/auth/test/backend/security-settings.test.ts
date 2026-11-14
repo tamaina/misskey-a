@@ -12,13 +12,14 @@ import { MiUser } from '@features/users/backend/models/User.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
 import { MiBrowserSession } from '../../backend/models/BrowserSession.js';
+import { MiPasswordResetRequest } from '../../backend/models/PasswordResetRequest.js';
 import { SecuritySettings } from '../../backend/security-settings.js';
 import type { SecuritySettingsDependencies } from '../../backend/security-settings.js';
 import type { LockedSudoContext } from '../../backend/sudo.js';
 import type { SecurityOperation } from '../../backend/security-operation-store.js';
 import { SecurityConfirmationRejected } from '../../backend/security-operation-store.js';
 
-vi.mock('@simplewebauthn/server', async original => ({ ...await original<typeof import('@simplewebauthn/server')>(), verifyAuthenticationResponse: vi.fn() }));
+vi.mock('@simplewebauthn/server', async original => ({ ...await original<typeof import('@simplewebauthn/server')>(), verifyAuthenticationResponse: vi.fn(), verifyRegistrationResponse: vi.fn() }));
 const identity = { userId: 'synthetic-user', browserSession: { id: 'synthetic-session', userId: 'synthetic-user' } };
 const credential = { id: 'AQID', rawId: 'AQID', type: 'public-key', response: { clientDataJSON: 'AQID', authenticatorData: 'AQID', signature: 'AQID', userHandle: Buffer.from(identity.userId).toString('base64url') }, clientExtensionResults: {} };
 const ticket = 'x'.repeat(43);
@@ -29,11 +30,13 @@ function fixture() {
 	const manager = mockDeep<EntityManager>();
 	const users = mockDeep<Repository<MiUser>>(); const profiles = mockDeep<Repository<MiUserProfile>>();
 	const keys = mockDeep<Repository<MiUserSecurityKey>>(); const sessions = mockDeep<Repository<MiBrowserSession>>();
+	const resets = mockDeep<Repository<MiPasswordResetRequest>>();
 	manager.getRepository.mockImplementation(entity => {
 		if (entity === MiUser) return users as unknown as ReturnType<EntityManager['getRepository']>;
 		if (entity === MiUserProfile) return profiles as unknown as ReturnType<EntityManager['getRepository']>;
 		if (entity === MiUserSecurityKey) return keys as unknown as ReturnType<EntityManager['getRepository']>;
 		if (entity === MiBrowserSession) return sessions as unknown as ReturnType<EntityManager['getRepository']>;
+		if (entity === MiPasswordResetRequest) return resets as unknown as ReturnType<EntityManager['getRepository']>;
 		throw new Error('Unexpected repository');
 	});
 	const user = mockDeep<MiUser>({ id: identity.userId, token: 'synthetic-native', username: 'synthetic', name: null });
@@ -61,12 +64,89 @@ beforeEach(() => {
 		userVerified: false, credentialDeviceType: 'singleDevice', credentialBackedUp: false, origin: 'https://synthetic.example', rpID: 'synthetic.example' } });
 });
 
-test('registration is independent of TOTP and does not activate MFA', async () => {
+test('registration starts without TOTP and does not change policy before a verified credential', async () => {
 	const f = fixture(); f.context.keys = [];
 	const started = await f.service.registerStart(identity, 'New key');
 	expect(started.options).toMatchObject({ authenticatorSelection: { residentKey: 'preferred', userVerification: 'preferred' } });
 	expect(f.pending()).toMatchObject({ kind: 'register-passkey', name: 'New key', userId: identity.userId, sessionId: identity.browserSession.id });
 	expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.profile.passkeyMfaEnabled).toBe(false);
+});
+
+const registrationCredential = { id: 'AQID', rawId: 'AQID', type: 'public-key', response: { clientDataJSON: 'AQID', attestationObject: 'AQID', transports: ['usb'] }, clientExtensionResults: {} };
+
+function acceptRegistration() {
+	vi.mocked(webauthn.verifyRegistrationResponse).mockResolvedValue({ verified: true, registrationInfo: {
+		credential: { id: 'AQID', publicKey: new Uint8Array([1, 2, 3]), counter: 0, transports: ['usb'] },
+		credentialDeviceType: 'singleDevice', credentialBackedUp: false,
+	} } as Awaited<ReturnType<typeof webauthn.verifyRegistrationResponse>>);
+}
+
+test.each([false, true])('registration immediately enables MFA with TOTP=%s and returns saved recovery codes', async totp => {
+	const f = fixture(); f.context.keys = []; f.profile.twoFactorEnabled = totp;
+	f.profile.twoFactorSecret = totp ? 'synthetic-secret' : null;
+	f.profile.twoFactorBackupSecret = totp ? ['unspent-code'] : null;
+	f.keys.findBy.mockResolvedValue([f.key]); acceptRegistration();
+	const started = await f.service.registerStart(identity, 'New key');
+	const result = await f.service.registerComplete(identity, started.ticket, registrationCredential);
+	expect(result).toMatchObject({ id: 'AQID', name: 'New key' });
+	if (totp) expect(result.backupCodes).toEqual(['unspent-code']);
+	else { expect(result.backupCodes).toHaveLength(5); expect(new Set(result.backupCodes).size).toBe(5); }
+	expect(webauthn.verifyRegistrationResponse).toHaveBeenCalledWith(expect.objectContaining({ requireUserVerification: false, expectedChallenge: started.options.challenge }));
+	expect(f.profiles.update).toHaveBeenCalledExactlyOnceWith({ userId: identity.userId }, { passkeyMfaEnabled: true, twoFactorBackupSecret: result.backupCodes });
+	expect(f.deps.events.publishInternalEvent).not.toHaveBeenCalled();
+	expect(f.sessions.find).not.toHaveBeenCalled(); expect(f.sessions.update).toHaveBeenCalledOnce();
+	expect(f.users.update).not.toHaveBeenCalled();
+	expect(f.sessions.update).toHaveBeenCalledWith({ id: identity.browserSession.id, userId: identity.userId }, { sudoPolicyStamp: expect.stringMatching(/^[a-f0-9]{64}$/) });
+	expect(f.sessions.update.mock.calls.every(([, patch]) => !('sudoUntil' in patch) || patch.sudoUntil === null)).toBe(true);
+	expect(f.committed.mock.invocationCallOrder.at(-1)!).toBeLessThan(f.deps.events.publishMainStream.mock.invocationCallOrder[0]);
+	await expect(f.service.registerComplete(identity, started.ticket, registrationCredential)).rejects.toThrow();
+	expect(f.keys.insert).toHaveBeenCalledOnce();
+});
+
+test.each(['proof', 'policy', 'codes', 'grant', 'deadline'] as const)('registration rejects %s failure without saving a key or enabling MFA', async kind => {
+	const f = fixture(); const started = await f.service.registerStart(identity, 'New key'); acceptRegistration();
+	if (kind === 'proof') vi.mocked(webauthn.verifyRegistrationResponse).mockResolvedValue({ verified: false } as never);
+	if (kind === 'policy') f.profile.password = 'changed';
+	if (kind === 'codes') f.profile.twoFactorBackupSecret = ['changed'];
+	if (kind === 'grant') f.context.session.sudoGrantId = 'h'.repeat(43);
+	if (kind === 'deadline') f.context.session.sudoUntil = new Date(Date.now() + 5000);
+	await expect(f.service.registerComplete(identity, started.ticket, registrationCredential)).rejects.toThrow();
+	expect(f.keys.insert).not.toHaveBeenCalled(); expect(f.profiles.update).not.toHaveBeenCalled();
+	expect(f.deps.events.publishMainStream).not.toHaveBeenCalled();
+	await expect(f.service.registerComplete(identity, started.ticket, registrationCredential)).rejects.toThrow();
+});
+
+test.each([false, true])('registration can repeatedly add usable keys with passwordless and passwordLoginDisabled=%s', async disabled => {
+	const f = fixture(); f.profile.usePasswordLessLogin = true; f.profile.passwordLoginDisabled = disabled;
+	f.profile.twoFactorBackupSecret = ['keep']; acceptRegistration();
+	for (const id of ['BAUG', 'BwgJ']) {
+		const started = await f.service.registerStart(identity, id);
+		expect(started.options.authenticatorSelection).toMatchObject({ residentKey: 'required', userVerification: 'required' });
+		expect(started.options.excludeCredentials?.map(key => key.id)).toEqual(f.context.keys.map(key => key.id));
+		const added = { ...f.key, id };
+		f.keys.findBy.mockResolvedValue([...f.context.keys, added]);
+		vi.mocked(webauthn.verifyRegistrationResponse).mockResolvedValue({ verified: true, registrationInfo: {
+			credential: { id, publicKey: new Uint8Array([1, 2, 3]), counter: 0, transports: ['usb'] },
+			credentialDeviceType: 'singleDevice', credentialBackedUp: false,
+		} } as Awaited<ReturnType<typeof webauthn.verifyRegistrationResponse>>);
+		const completed = await f.service.registerComplete(identity, started.ticket, { ...registrationCredential, id, rawId: id });
+		expect(completed).toEqual({ id, name: id, backupCodes: ['keep'] });
+		expect(webauthn.verifyRegistrationResponse).toHaveBeenLastCalledWith(expect.objectContaining({ requireUserVerification: true }));
+		Object.assign(f.profile, f.profiles.update.mock.calls.at(-1)![1]); f.context.keys.push(added);
+	}
+	expect(f.profile).toMatchObject({ usePasswordLessLogin: true, passwordLoginDisabled: disabled, passkeyMfaEnabled: true });
+	expect(f.keys.insert).toHaveBeenCalledTimes(2);
+	expect(f.users.update).not.toHaveBeenCalled(); expect(f.sessions.find).not.toHaveBeenCalled();
+	expect(f.sessions.update.mock.calls.every(([where, patch]) => 'id' in where && where.id === identity.browserSession.id && !('revokedAt' in patch))).toBe(true);
+	expect(f.deps.events.publishInternalEvent).not.toHaveBeenCalled();
+});
+
+test('removing a key still revokes other browser sessions', async () => {
+	const f = fixture(); f.context.keys.push({ ...f.key, id: 'BAUG' }); f.profile.passkeyMfaEnabled = true;
+	await f.service.removeKey(identity, f.key.id);
+	expect(f.keys.delete).toHaveBeenCalledWith({ id: f.key.id, userId: identity.userId });
+	expect(f.sessions.update).toHaveBeenCalledWith(expect.objectContaining({ userId: identity.userId }), { revokedAt: expect.any(Date), sudoUntil: null, sudoPolicyStamp: null });
+	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('browserSessionRevoked', { id: 'other-session', userId: identity.userId });
 });
 
 test('activation exposes codes for explicit acknowledgement before writing the policy', async () => {
@@ -164,4 +244,12 @@ test.each(['missing', 'foreign'] as const)('primary activation rejects a %s user
 	else response.response.userHandle = Buffer.from('another-owner').toString('base64url');
 	await expect(f.service.passwordlessComplete(identity, started.ticket, response)).rejects.toMatchObject({ code: 'CONFIRMATION_FAILED' });
 	expect(webauthn.verifyAuthenticationResponse).not.toHaveBeenCalled();
+});
+
+test('password change still rotates legacy credentials and revokes all browser sessions', async () => {
+	const f = fixture(); await f.service.changePassword(identity, 'synthetic-new-password');
+	expect(f.users.update).toHaveBeenCalledWith(identity.userId, { token: expect.any(String) });
+	expect(f.sessions.update).toHaveBeenCalledExactlyOnceWith({ userId: identity.userId }, { revokedAt: expect.any(Date), sudoUntil: null, sudoPolicyStamp: null });
+	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('userTokenRegenerated', expect.objectContaining({ oldToken: 'synthetic-native', newToken: expect.any(String) }));
+	expect(f.deps.events.publishInternalEvent).toHaveBeenCalledWith('browserSessionRevoked', { id: null, userId: identity.userId });
 });

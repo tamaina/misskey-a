@@ -33,10 +33,11 @@ beforeEach(async () => {
 	vi.clearAllMocks(); fixture.actor.id = 'synthetic-owner'; fixture.actor.token = 'bs_synthetic'; show.value = true;
 	vi.mocked(ensureSudo).mockReset().mockResolvedValue(true);
 	vi.mocked(startAuthentication).mockReset().mockResolvedValue(credential as never); vi.mocked(startRegistration).mockReset().mockResolvedValue(credential as never);
+	let registered = false;
 	vi.mocked(misskeyApi).mockReset().mockImplementation(async route => {
-		if (route === 'i/security/state') return state as never;
+		if (route === 'i/security/state') return { ...state, passkeyMfaEnabled: registered } as never;
 		if (route === 'i/security/keys/list') return [{ id: 'synthetic-key', name: 'Synthetic key', lastUsedAt: new Date().toISOString() }] as never;
-		if (route === 'i/security/passkey/mfa/start') return { ticket: 'synthetic-ticket', options, backupCodes: codes } as never;
+		if (route === 'i/security/passkey/register/complete') { registered = true; return { id: 'synthetic-key', name: 'Synthetic key', backupCodes: codes } as never; }
 		if (route === 'i/security/passkey/register/start') return { ticket: 'synthetic-ticket', options } as never;
 		return undefined as never;
 	});
@@ -53,33 +54,34 @@ function click(text: string) { button(text).click(); }
 
 const calls = (route: string) => vi.mocked(misskeyApi).mock.calls.filter(([name]) => name === route);
 
-async function activation() { click('パスキーによる多要素認証を有効にする'); await vi.waitFor(() => expect(element.textContent).toContain(codes[0])); }
+async function registration() { click('パスキーを登録'); await vi.waitFor(() => expect(element.textContent).toContain(codes[0])); }
 
-test('registration needs no TOTP setup and never silently activates MFA', async () => {
-	click('パスキーを登録'); await vi.waitFor(() => expect(calls('i/security/passkey/register/complete')).toHaveLength(1));
+test('registration needs no TOTP or later enable step and displays five recovery codes in the registration flow', async () => {
+	await registration(); expect(element.querySelectorAll('code')).toHaveLength(5);
+	await vi.waitFor(() => expect(element.textContent).toContain('パスキーによる多要素認証は有効です。'));
 	expect(startRegistration).toHaveBeenCalledWith({ optionsJSON: options }); expect(ensureSudo).toHaveBeenCalledOnce();
 	expect(calls('i/security/passkey/register/start')[0][1]).toEqual({ name: 'Synthetic key' });
+	expect(calls('i/security/passkey/register/complete')[0][1]).toEqual({ ticket: 'synthetic-ticket', credential });
 	expect(calls('i/security/passkey/mfa/start')).toHaveLength(0); expect(calls('i/security/totp/start')).toHaveLength(0);
-});
-test('activation displays five codes and requires explicit acknowledgement before native proof', async () => {
-	await activation(); expect(element.querySelectorAll('code')).toHaveLength(5);
-	expect(button('パスキーで確認して有効にする').disabled).toBe(true); expect(startAuthentication).not.toHaveBeenCalled();
-	const checkbox = element.querySelector<HTMLInputElement>('input[type=checkbox]')!; checkbox.checked = true; checkbox.dispatchEvent(new Event('change')); await nextTick();
-	click('パスキーで確認して有効にする'); await vi.waitFor(() => expect(calls('i/security/passkey/mfa/complete')).toHaveLength(1));
-	expect(calls('i/security/passkey/mfa/complete')[0][1]).toEqual({ ticket: 'synthetic-ticket', credential, recoveryAcknowledged: true });
-	await vi.waitFor(() => expect(element.textContent).not.toContain(codes[0]));
+	expect(startAuthentication).not.toHaveBeenCalled();
+	expect(element.textContent).not.toContain('パスキーによる多要素認証を有効にする');
+	click('表示を閉じる'); await nextTick(); expect(element.textContent).not.toContain(codes[0]);
 });
 test('cancelled common sudo cannot start registration', async () => {
 	vi.mocked(ensureSudo).mockResolvedValue(false); click('パスキーを登録'); await nextTick();
 	expect(calls('i/security/passkey/register/start')).toHaveLength(0); expect(startRegistration).not.toHaveBeenCalled();
 });
-test.each(['leave', 'actor'] as const)('%s clears displayed codes and prevents a delayed native completion', async kind => {
-	await activation(); const checkbox = element.querySelector<HTMLInputElement>('input[type=checkbox]')!; checkbox.checked = true; checkbox.dispatchEvent(new Event('change')); await nextTick();
-	let release!: (value: never) => void; vi.mocked(startAuthentication).mockReturnValue(new Promise(resolve => { release = resolve; })); click('パスキーで確認して有効にする');
-	await vi.waitFor(() => expect(startAuthentication).toHaveBeenCalledOnce());
+test.each(['leave', 'actor'] as const)('%s clears registration recovery codes', async kind => {
+	await registration();
 	if (kind === 'leave') { show.value = false; await nextTick(); show.value = true; await nextTick(); } else reactive(fixture.actor).id = 'replacement-owner';
-	await nextTick(); expect(element.textContent).not.toContain(codes[0]); expect(WebAuthnAbortService.cancelCeremony).toHaveBeenCalledOnce();
-	release(credential as never); await nextTick(); expect(calls('i/security/passkey/mfa/complete')).toHaveLength(0);
+	await nextTick(); expect(element.textContent).not.toContain(codes[0]);
+});
+test.each(['leave', 'actor'] as const)('%s cancels native registration and prevents delayed completion', async kind => {
+	let release!: (value: never) => void; vi.mocked(startRegistration).mockReturnValue(new Promise(resolve => { release = resolve; })); click('パスキーを登録');
+	await vi.waitFor(() => expect(startRegistration).toHaveBeenCalledOnce());
+	if (kind === 'leave') { show.value = false; await nextTick(); show.value = true; await nextTick(); } else reactive(fixture.actor).id = 'replacement-owner';
+	await nextTick(); expect(WebAuthnAbortService.cancelCeremony).toHaveBeenCalledOnce();
+	release(credential as never); await nextTick(); expect(calls('i/security/passkey/register/complete')).toHaveLength(0);
 });
 test('authenticator Signal API runs only after owned removal has been accepted', async () => {
 	const signal = vi.fn(async () => undefined); vi.stubGlobal('PublicKeyCredential', { signalUnknownCredential: signal });
@@ -89,13 +91,24 @@ test('authenticator Signal API runs only after owned removal has been accepted',
 	accept(); await vi.waitFor(() => expect(signal).toHaveBeenCalledOnce()); expect(signal).toHaveBeenCalledWith({ rpId: window.location.hostname, credentialId: 'synthetic-key' });
 });
 
-test('factor changes warn before registration and in existing removal confirmation', async () => {
+test('registration has no revocation warning while removal confirmation keeps it', async () => {
 	expect(element.textContent).toContain('この端末以外のログインはすべて無効になります');
 	button('パスキーを登録').click();
-	await vi.waitFor(() => expect(inputText).toHaveBeenCalledWith(expect.objectContaining({ text: '登録すると、この端末以外のログインはすべて無効になります。' })));
+	await vi.waitFor(() => expect(inputText).toHaveBeenCalledOnce());
+	expect(vi.mocked(inputText).mock.calls[0][0]).not.toHaveProperty('text');
+	expect(element.textContent).not.toContain('パスキーの登録・削除');
 	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/security/passkey/register/complete', expect.anything()));
 	button('登録済みのパスキーを表示').click();
 	await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
 	button('削除').click();
 	await vi.waitFor(() => expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ text: expect.stringContaining('この端末以外のログインはすべて無効になります') })));
+});
+
+test.each([false, true])('passwordless permits adding keys with passwordLoginDisabled=%s', async disabled => {
+	show.value = false; await nextTick();
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ ...state, passwordlessEnabled: true, passwordLoginDisabled: disabled } as never);
+	show.value = true;
+	await vi.waitFor(() => expect(button('パスキーを登録').disabled).toBe(false));
+	expect(element.textContent).not.toContain('単独ログインを無効にしてから登録してください。');
+	await registration(); expect(calls('i/security/passkey/register/complete')).toHaveLength(1);
 });

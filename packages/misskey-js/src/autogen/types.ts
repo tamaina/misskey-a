@@ -76489,6 +76489,7 @@ export interface operations {
                     'application/json': {
                         id: string;
                         name: string;
+                        backupCodes: string[];
                     };
                 };
             };
@@ -86201,6 +86202,9 @@ export interface operations {
         requestBody: {
             content: {
                 'application/json': {
+                    browserSessionId?: string;
+                    /** @default false */
+                    unlinkedOnly?: boolean;
                     /** @default 10 */
                     limit?: number;
                     sinceId?: string;
@@ -86208,6 +86212,9 @@ export interface operations {
                     sinceDate?: number;
                     untilDate?: number;
                 } & ({
+                    browserSessionId?: string;
+                    /** @default false */
+                    unlinkedOnly?: boolean;
                     /** @default 10 */
                     limit?: number;
                     sinceId?: string;
@@ -86417,6 +86424,8 @@ export interface operations {
                         id: string;
                         createdAt: string;
                         lastUsedAt: string;
+                        lastIp: string | null;
+                        lastUserAgent: string | null;
                         revokedAt: string | null;
                         current: boolean;
                     }[];

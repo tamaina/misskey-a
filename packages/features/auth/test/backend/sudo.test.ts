@@ -129,3 +129,12 @@ test('a forged future deadline and a changed credential set cannot authorize an 
 	f.keys.findBy.mockResolvedValue([mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: f.user.id, publicKey: 'AQID' })]);
 	await expect(f.service.transaction(identity, async () => 'write')).rejects.toThrow();
 });
+
+test.each([false, true])('passkey-only sudo remains available after key registration enables MFA=%s', async passkeyMfaEnabled => {
+	const f = fixture(); Object.assign(f.profile, { passwordLoginDisabled: true, usePasswordLessLogin: true, passkeyMfaEnabled });
+	const keys = [mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: f.user.id, publicKey: 'AQID' })];
+	f.keys.findBy.mockResolvedValue(keys);
+	f.fresh.begin.mockResolvedValue({ ticket: 'synthetic-ticket', options: { challenge: 'AQID', userVerification: 'required' } });
+	expect(await f.service.begin(identity, undefined)).toMatchObject({ status: 'passkey-required' });
+	expect(f.fresh.begin).toHaveBeenCalledWith(identity, 'sudo', undefined);
+});

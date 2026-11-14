@@ -23,7 +23,6 @@ function handlers(state: typeof initialState) {
 		http.post('*/api/i/security/state', () => HttpResponse.json(state)),
 		http.post('*/api/i/sudo/status', () => HttpResponse.json({ active: true, expiresAt: new Date(Date.now() + 300_000).toISOString() })),
 		http.post('*/api/i/security/keys/list', () => HttpResponse.json(state.passkeyCount ? [{ id: 'AQID', name: 'Synthetic security key', lastUsedAt: '2026-10-18T00:00:00.000Z' }] : [])),
-		http.post('*/api/i/security/passkey/mfa/start', () => HttpResponse.json({ ticket: 't'.repeat(43), options: { challenge: 'c3ludGhldGlj', rpId: 'localhost', userVerification: 'preferred', allowCredentials: [{ id: 'AQID', type: 'public-key' }] }, backupCodes })),
 		http.post('*/api/i/security/totp/start', () => HttpResponse.json({ secret: 'JBSWY3DPEHPK3PXP', url: 'otpauth://totp/Storybook:synthetic?secret=JBSWY3DPEHPK3PXP&issuer=Storybook' })),
 		http.post('*/api/i/security/recovery-codes', () => HttpResponse.json({ backupCodes })),
 		// Completion and every unlisted API fail locally; no real changes or native ceremonies are exercised.
@@ -57,17 +56,12 @@ export const PasswordLoginDisabled = {
 	...Default,
 	parameters: { layout: 'centered', msw: { handlers: handlers({ ...initialState, passwordlessEnabled: true, passwordLoginDisabled: true }) } },
 } satisfies StoryObj<typeof MkSecuritySettings>;
-export const RecoveryAcknowledgement = {
-	...Default,
+export const RecoveryCodes = {
+	...IndependentPasskey,
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement);
-		await userEvent.click(await canvas.findByRole('button', { name: 'パスキーによる多要素認証を有効にする' }));
+		await userEvent.click(await canvas.findByRole('button', { name: '復旧コードを表示' }));
 		for (const code of backupCodes) await expect(canvas.findByText(code)).resolves.toBeVisible();
-		const prove = await canvas.findByRole('button', { name: 'パスキーで確認して有効にする' });
-		expect(prove).toBeDisabled();
-		await userEvent.click(await canvas.findByText('復旧コードを安全な場所に保存しました'));
-		expect(prove).toBeEnabled();
-		// Stop before the native authenticator: this story captures explicit acknowledgement only.
 	},
 } satisfies StoryObj<typeof MkSecuritySettings>;
 export const TotpSetup = {

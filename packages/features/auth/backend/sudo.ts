@@ -103,7 +103,7 @@ export class SudoService {
 		const profile = await this.db.getRepository(MiUserProfile).findOneByOrFail({ userId: identity.userId });
 		const keys = await this.db.getRepository(MiUserSecurityKey).findBy({ userId: identity.userId });
 		const expected = sudoPolicyStamp(user, profile, keys);
-		const strictPrimary = profile.passwordLoginDisabled === true && profile.usePasswordLessLogin === true && !profile.passkeyMfaEnabled && keys.length > 0;
+		const strictPrimary = profile.passwordLoginDisabled === true && profile.usePasswordLessLogin === true && keys.length > 0;
 		if (profile.passwordLoginDisabled === true && !strictPrimary) throw reauthenticationFailed();
 		if (!strictPrimary && (!profile.password || password === undefined || !await bcrypt.compare(password, profile.password))) throw reauthenticationFailed();
 		const policy = readMfaPolicy(profile, keys.length);
@@ -124,7 +124,7 @@ export class SudoService {
 	async complete(identity: SudoIdentity, ticket: string, credential: unknown) {
 		const proof = await this.fresh.complete(identity, 'sudo', ticket, credential);
 		return this.grant(identity, proof.expiresAtMonotonic, locked =>
-			(readMfaPolicy(locked.profile, locked.keys.length).passkey || (locked.profile.passwordLoginDisabled && locked.profile.usePasswordLessLogin && !locked.profile.passkeyMfaEnabled && locked.keys.length > 0))
+			(readMfaPolicy(locked.profile, locked.keys.length).passkey || (locked.profile.passwordLoginDisabled && locked.profile.usePasswordLessLogin && locked.keys.length > 0))
 			&& freshReauthenticationPolicyStamp(locked.profile, locked.keys) === proof.policyStamp);
 	}
 

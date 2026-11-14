@@ -71,7 +71,7 @@ export class FreshPasskeyReauthentication {
 		const expiresAt = await this.store.startDeadline();
 		const before = await this.snapshot(binding.userId);
 		if (before.profile.passwordLoginDisabled === true && purpose !== 'sudo') throw new Error('Fresh reauthentication failed');
-		const strictPrimary = purpose === 'sudo' && before.profile.passwordLoginDisabled === true && before.profile.usePasswordLessLogin === true && !before.profile.passkeyMfaEnabled;
+		const strictPrimary = purpose === 'sudo' && before.profile.passwordLoginDisabled === true && before.profile.usePasswordLessLogin === true;
 		if (!strictPrimary && (password === undefined || !await bcrypt.compare(password, before.profile.password!))) throw new Error('Fresh reauthentication failed');
 		const options = await generateAuthenticationOptions({
 			rpID: this.config.hostname, userVerification: purpose === 'sudo' && !before.profile.usePasswordLessLogin ? 'preferred' : 'required',
