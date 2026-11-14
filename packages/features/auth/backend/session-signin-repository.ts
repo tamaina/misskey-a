@@ -10,6 +10,7 @@ import type { MiSignin } from './models/Signin.js';
 export interface SigninHistoryRecord {
 	id: string;
 	userId: string;
+	browserSessionId?: string | null;
 	ip: string;
 	headers: Record<string, string | string[]>;
 	success: boolean;

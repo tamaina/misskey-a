@@ -9,13 +9,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkInfo>{{ $locale.sfc.description }}</MkInfo>
 		<MkInfo v-if="!individual" warn>{{ $locale.sfc.legacy }}</MkInfo>
 		<p v-if="error" role="alert">{{ $locale.sfc.failed }}</p>
-		<div v-for="session in sessions" :key="session.id" class="_gaps_s">
-			<strong>{{ session.current ? $locale.sfc.current : $locale.sfc.other }}</strong>
-			<div>{{ $locale.sfc.created }} <MkTime :time="session.createdAt"/></div>
-			<div>{{ $locale.sfc.used }} <MkTime :time="session.lastUsedAt"/></div>
-			<p v-if="session.revokedAt">{{ $locale.sfc.revoked }}</p>
-			<MkButton v-else danger :disabled="busy" @click="revoke(session)">{{ session.current ? $locale.sfc.signout : $locale.sfc.revoke }}</MkButton>
-		</div>
+		<MkFolder v-for="session in sessions" :key="session.id">
+			<template #label>{{ session.current ? $locale.sfc.current : $locale.sfc.other }} · {{ session.lastIp ?? $locale.sfc.unknown }} · {{ session.revokedAt ? $locale.sfc.revoked : $locale.sfc.active }}</template>
+			<template #caption>
+				<div :class="$style.agent">{{ session.lastUserAgent ?? $locale.sfc.unknown }}</div>
+				{{ $locale.sfc.used }} <MkTime :time="session.lastUsedAt"/>
+			</template>
+			<div class="_gaps_s">
+				<div>{{ $locale.sfc.created }} <MkTime :time="session.createdAt"/></div>
+				<MkButton v-if="!session.revokedAt" danger :disabled="busy" @click="revoke(session)">{{ session.current ? $locale.sfc.signout : $locale.sfc.revoke }}</MkButton>
+				<p>{{ $locale.sfc.history }}</p>
+				<MkPagination :paginator="sessionHistory(session.id)" withControl :forceDisableInfiniteScroll="true">
+					<template #default="{ items }">
+						<div v-for="item in items" :key="item.id" class="_gaps_s">
+							<div><MkTime :time="item.createdAt"/> · <code>{{ item.ip }}</code></div>
+							<div :class="$style.agent">{{ item.headers['user-agent'] ?? $locale.sfc.unknown }}</div>
+						</div>
+					</template>
+				</MkPagination>
+			</div>
+		</MkFolder>
 		<MkButton v-if="hasMore" :disabled="busy" @click="load">{{ $locale.sfc.more }}</MkButton>
 		<MkButton :disabled="busy" @click="reload">{{ $locale.sfc.reload }}</MkButton>
 	</div>
@@ -23,7 +36,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
+import { onActivated, onDeactivated, onMounted, onUnmounted, markRaw, ref, watch } from 'vue';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -37,6 +53,17 @@ const individual = ownerToken.startsWith('bs_');
 const read = (offset: number) => misskeyApi('i/sessions', { offset, limit: 20 });
 type Session = Awaited<ReturnType<typeof read>>[number];
 const sessions = ref<Session[]>([]);
+const histories = new Map<string, Paginator<'i/signin-history'>>();
+
+function sessionHistory(sessionId: string) {
+	let history = histories.get(sessionId);
+	if (!history) {
+		history = markRaw(new Paginator('i/signin-history', { limit: 10, params: { browserSessionId: sessionId } }));
+		histories.set(sessionId, history);
+	}
+	return history;
+}
+
 const busy = ref(false); const error = ref(false); const hasMore = ref(true);
 let active = true; let generation = 0; let offset = 0;
 const current = () => active && ensureSignin().id === ownerId && ensureSignin().token === ownerToken;
@@ -54,7 +81,7 @@ async function load() {
 	} catch { if (current() && turn === generation) error.value = true; } finally { busy.value = false; }
 }
 
-function reload() { offset = 0; sessions.value = []; hasMore.value = true; return load(); }
+function reload() { histories.clear(); offset = 0; sessions.value = []; hasMore.value = true; return load(); }
 
 async function revoke(session: Session) {
 	if (busy.value || !current() || session.revokedAt) return;
@@ -70,12 +97,16 @@ async function revoke(session: Session) {
 	} catch { if (current() && turn === generation) error.value = true; } finally { busy.value = false; }
 }
 
-const leave = () => { active = false; generation++; sessions.value = []; offset = 0; };
+const leave = () => { active = false; generation++; histories.clear(); sessions.value = []; offset = 0; };
 watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!current()) leave(); }, { flush: 'sync' });
 onMounted(load);
 onActivated(() => { if (!active) { active = true; void reload(); } });
 onDeactivated(leave); onUnmounted(leave);
 </script>
+
+<style lang="scss" module>
+.agent { overflow-wrap: anywhere; white-space: normal; }
+</style>
 
 <locale locale="ja-JP" lang="json">
 {
@@ -87,6 +118,9 @@ onDeactivated(leave); onUnmounted(leave);
 	"created": "ログイン日時:",
 	"used": "最終利用:",
 	"revoked": "失効済み",
+	"active": "有効",
+	"unknown": "記録なし",
+	"history": "このセッションのログイン履歴（IP・User-Agent）",
 	"signout": "このログインからサインアウト",
 	"revoke": "このログインを失効",
 	"confirmCurrent": "このログインからサインアウトしますか。",

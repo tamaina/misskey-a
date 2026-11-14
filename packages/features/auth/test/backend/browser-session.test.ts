@@ -179,3 +179,17 @@ describe('individual browser session foundation (synthetic persistence only)', (
 		await expect(service.issue('alice')).rejects.toThrow('synthetic DB failure');
 	});
 });
+
+test('records latest HTTP IP and UA without merging sessions or touching a revoked session', async () => {
+	const { service, rows } = fixture();
+	const first = await service.issue('alice');
+	const second = await service.issue('alice');
+	await service.verify(first.token, { ip: '192.0.2.1', userAgent: 'First browser' });
+	await service.verify(second.token, { ip: '192.0.2.1', userAgent: 'Second browser' });
+	await service.verify(first.token, { ip: '192.0.2.2', userAgent: 'Updated browser' });
+	expect(rows.get(first.session.id)).toMatchObject({ lastIp: '192.0.2.2', lastUserAgent: 'Updated browser' });
+	expect(rows.get(second.session.id)).toMatchObject({ lastIp: '192.0.2.1', lastUserAgent: 'Second browser' });
+	await service.revokeOwned('alice', first.session.id);
+	expect(await service.verify(first.token, { ip: '192.0.2.3', userAgent: 'Rejected' })).toBeNull();
+	expect(rows.get(first.session.id)?.lastIp).toBe('192.0.2.2');
+});

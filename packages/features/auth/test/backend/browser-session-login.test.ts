@@ -105,7 +105,7 @@ test('successful signin issues a fresh credential instead of returning the maste
 	h.sessions.issue.mockResolvedValue({ token: 'bs_synthetic', session: { id: 'session1', userId: 'alice', createdAt: new Date(0), lastUsedAt: new Date(0), revokedAt: null, sudoUntil: null } });
 	const result = await h.invoke();
 	expect(result).toEqual({ finished: true, id: 'alice', i: 'bs_synthetic' });
-	expect(h.sessions.issue).toHaveBeenCalledWith('alice', h.sessionRepo);
+	expect(h.sessions.issue).toHaveBeenCalledWith('alice', h.sessionRepo, { ip: '127.0.0.1', userAgent: null });
 	expect(h.effects.code).toHaveBeenCalledWith(200);
 });
 

@@ -5,6 +5,7 @@
 
 import { PrimaryColumn, Entity, Index, JoinColumn, Column, ManyToOne } from 'typeorm';
 import { id } from '@features/persistence/backend/models/util/id.js';
+import { MiBrowserSession } from './BrowserSession.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 
 @Entity('signin')
@@ -21,6 +22,14 @@ export class MiSignin {
 	})
 	@JoinColumn()
 	public user: MiUser | null;
+
+	@Index('IDX_signin_browserSessionId')
+	@Column({ ...id(), nullable: true })
+	public browserSessionId: MiBrowserSession['id'] | null;
+
+	@ManyToOne(() => MiBrowserSession, { onDelete: 'SET NULL' })
+	@JoinColumn({ foreignKeyConstraintName: 'FK_signin_browserSessionId' })
+	public browserSession: MiBrowserSession | null;
 
 	@Column('varchar', {
 		length: 128,

@@ -13,6 +13,8 @@ import { MiUser } from '@features/users/backend/models/User.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { SigninPolicyError } from '../signin-assurance.js';
 
+export type BrowserSessionUsage = { ip: string; userAgent: string | null };
+
 export type BrowserSessionMetadata = Pick<MiBrowserSession, 'id' | 'userId' | 'createdAt' | 'lastUsedAt' | 'revokedAt' | 'sudoUntil'>;
 
 const metadataSelect = { id: true, userId: true, createdAt: true, lastUsedAt: true, revokedAt: true, sudoUntil: true } satisfies FindOptionsSelect<MiBrowserSession>;
@@ -25,7 +27,7 @@ export class BrowserSessionService {
 		private idService: Pick<IdService, 'gen'>,
 	) {}
 
-	public async issue(userId: string, repository: Pick<BrowserSessionsRepository, 'insert'> = this.browserSessionsRepository): Promise<{ token: string; session: BrowserSessionMetadata }> {
+	public async issue(userId: string, repository: Pick<BrowserSessionsRepository, 'insert'> = this.browserSessionsRepository, usage?: BrowserSessionUsage): Promise<{ token: string; session: BrowserSessionMetadata }> {
 		const token = `bs_${randomBytes(32).toString('base64url')}`;
 		const now = new Date();
 		const session: BrowserSessionMetadata = {
@@ -33,35 +35,37 @@ export class BrowserSessionService {
 			revokedAt: null, sudoUntil: null,
 		};
 		await repository.insert({
-			...session, tokenHash: createHash('sha256').update(token).digest('hex'),
+			...session, lastIp: usage?.ip ?? null, lastUserAgent: usage?.userAgent?.slice(0, 1024) ?? null, tokenHash: createHash('sha256').update(token).digest('hex'),
 		});
 		return { token, session };
 	}
 
 	/** Only creation results from SignupService reach this path; it is not a login proof bypass. */
-	public async issueForNewAccount(account: Pick<MiUser, 'id' | 'token'>): Promise<{ token: string; session: BrowserSessionMetadata }> {
+	public async issueForNewAccount(account: Pick<MiUser, 'id' | 'token'>, usage?: BrowserSessionUsage): Promise<{ token: string; session: BrowserSessionMetadata }> {
 		return this.browserSessionsRepository.manager.transaction(async manager => {
 			const user = await manager.getRepository(MiUser).findOne({ where: { id: account.id }, lock: { mode: 'pessimistic_write' } });
 			if (!user || user.host !== null || user.isSuspended || user.isDeleted || !account.token || user.token !== account.token) throw new SigninPolicyError();
 			const profile = await manager.getRepository(MiUserProfile).findOne({ where: { userId: user.id }, lock: { mode: 'pessimistic_write' } });
 			if (!profile || profile.twoFactorEnabled || profile.passkeyMfaEnabled) throw new SigninPolicyError();
-			return this.issue(user.id, manager.getRepository(MiBrowserSession));
+			return this.issue(user.id, manager.getRepository(MiBrowserSession), usage);
 		});
 	}
 
-	public async verify(token: string): Promise<BrowserSessionMetadata | null> {
+	public async verify(token: string, usage?: BrowserSessionUsage): Promise<BrowserSessionMetadata | null> {
 		if (!/^bs_[A-Za-z0-9_-]{43}$/.test(token)) return null;
 		const tokenHash = createHash('sha256').update(token).digest('hex');
 		const session = await this.browserSessionsRepository.findOne({
-			where: { tokenHash, revokedAt: IsNull() }, select: metadataSelect,
+			where: { tokenHash, revokedAt: IsNull() }, select: { ...metadataSelect, lastIp: true, lastUserAgent: true },
 		});
 		if (!session) return null;
 		const lastUsedAt = new Date();
 		const cutoff = new Date(lastUsedAt.getTime() - 60_000);
-		if (session.lastUsedAt <= cutoff) {
+		const userAgent = usage?.userAgent?.slice(0, 1024) ?? null;
+		const changed = usage && (session.lastIp !== usage.ip || session.lastUserAgent !== userAgent);
+		if (changed || session.lastUsedAt <= cutoff) {
 			await this.browserSessionsRepository.update({
-				id: session.id, tokenHash, revokedAt: IsNull(), lastUsedAt: LessThanOrEqual(cutoff),
-			}, { lastUsedAt });
+				id: session.id, tokenHash, revokedAt: IsNull(), ...(changed ? {} : { lastUsedAt: LessThanOrEqual(cutoff) }),
+			}, { lastUsedAt, ...(usage ? { lastIp: usage.ip, lastUserAgent: userAgent } : {}) });
 		}
 		// Always re-read after the optional touch: concurrent revocation wins,
 		// and authorization never relies on a cached validity or sudo snapshot.
@@ -79,9 +83,9 @@ export class BrowserSessionService {
 		await repository.update({ userId, revokedAt: IsNull() }, { revokedAt: new Date(), sudoUntil: null, sudoPolicyStamp: null });
 	}
 
-	public async listOwned(userId: string, limit = 100, offset = 0): Promise<BrowserSessionMetadata[]> {
+	public async listOwned(userId: string, limit = 100, offset = 0): Promise<(BrowserSessionMetadata & Pick<MiBrowserSession, 'lastIp' | 'lastUserAgent'>)[]> {
 		return this.browserSessionsRepository.find({
-			where: { userId }, select: metadataSelect, take: limit, skip: offset, order: { createdAt: 'DESC', id: 'DESC' },
+			where: { userId }, select: { ...metadataSelect, lastIp: true, lastUserAgent: true }, take: limit, skip: offset, order: { createdAt: 'DESC', id: 'DESC' },
 		});
 	}
 

@@ -21,6 +21,7 @@ export function createISessionsProcedure(deps: BrowserSessionDependencies) {
 		const sessions = await deps.browserSessionService.listOwned(context.principal.id, input.limit, input.offset);
 		return sessions.map(session => ({
 			id: session.id, createdAt: session.createdAt.toISOString(), lastUsedAt: session.lastUsedAt.toISOString(),
+			lastIp: session.lastIp ?? null, lastUserAgent: session.lastUserAgent ?? null,
 			revokedAt: session.revokedAt?.toISOString() ?? null, current: session.id === context.browserSession?.id,
 		}));
 	});

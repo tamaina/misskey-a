@@ -356,6 +356,8 @@ export const ISigninHistoryContract = oc.$meta({
 	requireCredential: true,
 	secure: true,
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/i/signin-history', tags: [] }).errors({ ...commonErrors }).input(objectInput({
+	"browserSessionId": v.exactOptional(misskeyId),
+	"unlinkedOnly": v.optional(v.boolean(), false),
 	"limit": v.optional(v.pipe(v.pipe(v.number(), v.integer()), v.minValue(1), v.maxValue(100)), 10),
 	"sinceId": v.exactOptional(misskeyId),
 	"untilId": v.exactOptional(misskeyId),
@@ -495,7 +497,7 @@ export const I2faPasskeyUpdateContract = aliasTwoFactorContract(I2faUpdateKeyCon
 export const I2faPasskeyPasswordLessContract = aliasTwoFactorContract(I2faPasswordLessContract, 'i/2fa/passkey/password-less');
 
 const browserSessionResult = v.strictObject({
-	id: v.string(), createdAt: v.string(), lastUsedAt: v.string(), revokedAt: v.nullable(v.string()), current: v.boolean(),
+	id: v.string(), createdAt: v.string(), lastUsedAt: v.string(), lastIp: v.nullable(v.string()), lastUserAgent: v.nullable(v.string()), revokedAt: v.nullable(v.string()), current: v.boolean(),
 });
 export const ISessionsContract = oc.$meta({ requestName: 'i/sessions', requireCredential: true, secure: true } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/i/sessions', tags: ['account'] }).errors(commonErrors)

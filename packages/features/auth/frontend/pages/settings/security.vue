@@ -39,6 +39,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 									<i v-else class="ti ti-circle-x icon fail"></i>
 									<code class="ip _monospace">{{ item.ip }}</code>
 									<MkTime :time="item.createdAt" class="time"/>
+									<span>{{ item.headers['user-agent'] }}</span>
 								</header>
 							</div>
 						</div>
@@ -81,6 +82,7 @@ const individualSession = computed(() => ensureSignin().token.startsWith('bs_'))
 
 const paginator = markRaw(new Paginator('i/signin-history', {
 	limit: 5,
+	params: { unlinkedOnly: true },
 }));
 
 const ownerId = ensureSignin().id;
@@ -405,7 +407,7 @@ definePage(() => ({
 	"changePassword": "パスワードを変更",
 	"passwordSessionsWarning": "パスワードを変更すると、現在の端末を含むすべてのログインが無効になります。",
 	"changePasswordWithPasskey": "パスキーでパスワードを変更",
-	"signinHistory": "ログイン履歴",
+	"signinHistory": "セッションに紐付いていない過去のログイン履歴",
 	"regenerateLoginTokenWithPasskey": "パスキーでログイントークンを再生成",
 	"regenerateLoginToken": "ログイントークンを再生成",
 	"regenerateLoginTokenDescription": "ログインに使用される内部トークンを再生成します。通常この操作を行う必要はありません。再生成すると、全てのデバイスでログアウトされます。"

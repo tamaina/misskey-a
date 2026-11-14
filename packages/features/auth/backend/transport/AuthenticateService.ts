@@ -46,13 +46,13 @@ export class AuthenticateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	public async authenticate(token: string | null | undefined): Promise<[MiLocalUser | null, MiAccessToken | null, BrowserSessionIdentity?]> {
+	public async authenticate(token: string | null | undefined, usage?: { ip: string; userAgent: string | null }): Promise<[MiLocalUser | null, MiAccessToken | null, BrowserSessionIdentity?]> {
 		if (token == null) {
 			return [null, null];
 		}
 
 		if (token.startsWith('bs_')) {
-			const session = await this.browserSessionService.verify(token);
+			const session = await this.browserSessionService.verify(token, usage);
 			if (!session) throw new AuthenticationError('invalid browser session');
 			// Browser credentials never borrow the legacy user cache or app scopes.
 			const user = await this.usersRepository.findOneBy({ id: session.userId, host: IsNull(), isSuspended: false, isDeleted: false }) as MiLocalUser | null;

@@ -30,6 +30,9 @@ export function createISigninHistoryProcedure(deps: ISigninHistoryDependencies) 
 			const query = deps.queryService.makePaginationQuery(deps.signinsRepository.createQueryBuilder('signin'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
 				.andWhere('signin.userId = :meId', { meId: me.id });
 
+			if (ps.browserSessionId) query.andWhere('signin.browserSessionId = :sessionId', { sessionId: ps.browserSessionId });
+			if (ps.unlinkedOnly) query.andWhere('signin.browserSessionId IS NULL');
+
 			const history = await query.limit(ps.limit).getMany();
 
 			return await Promise.all(history.map(record => deps.signinEntityService.pack(record)));

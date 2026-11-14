@@ -25,10 +25,10 @@ const current = { id: 'session1', userId: 'alice' };
 
 test('bounded owned list returns only public metadata with current identity', async () => {
 	const { deps, context } = fixture(current);
-	deps.browserSessionService.listOwned.mockResolvedValue([{ ...current, createdAt: new Date(0), lastUsedAt: new Date(0), revokedAt: null, sudoUntil: new Date(1000) }]);
+	deps.browserSessionService.listOwned.mockResolvedValue([{ ...current, createdAt: new Date(0), lastUsedAt: new Date(0), lastIp: '192.0.2.1', lastUserAgent: 'Synthetic UA', revokedAt: null, sudoUntil: new Date(1000) }]);
 	const result = await call(createISessionsProcedure(deps), { limit: 10, offset: 3 }, { context });
 	expect(deps.browserSessionService.listOwned).toHaveBeenCalledWith('alice', 10, 3);
-	expect(result).toEqual([{ id: 'session1', createdAt: new Date(0).toISOString(), lastUsedAt: new Date(0).toISOString(), revokedAt: null, current: true }]);
+	expect(result).toEqual([{ id: 'session1', createdAt: new Date(0).toISOString(), lastUsedAt: new Date(0).toISOString(), lastIp: '192.0.2.1', lastUserAgent: 'Synthetic UA', revokedAt: null, current: true }]);
 });
 
 test('unowned/nonexistent revocation does not reveal or publish anything', async () => {

@@ -45,7 +45,7 @@ export class SigninService {
 	@bindThis
 	public async signin(request: AuthSessionRequest, reply: AuthSessionEffects, user: Pick<MiLocalUser, 'id' | 'token'>, proof: SigninAssurance): Promise<{ finished: true; id: string; i: string }> {
 		consumeSigninAssurance(proof, user.id);
-		const { token } = await this.userProfilesRepository.manager.transaction(async manager => {
+		const { token, session } = await this.userProfilesRepository.manager.transaction(async manager => {
 			// Match account deletion and token regeneration: user precedes profile/session locks.
 			const current = await manager.getRepository(MiUser).findOne({ where: { id: user.id }, lock: { mode: 'pessimistic_write' } });
 			if (!current) throw new SigninPolicyError();
@@ -53,20 +53,20 @@ export class SigninService {
 			if (!profile) throw new SigninPolicyError();
 			const keys = await manager.getRepository(MiUserSecurityKey).findBy({ userId: user.id });
 			assertCurrentSigninAssurance(proof, current, profile, keys);
-			const issued = await this.browserSessionService.issue(user.id, manager.getRepository(MiBrowserSession));
+			const issued = await this.browserSessionService.issue(user.id, manager.getRepository(MiBrowserSession), { ip: request.ip, userAgent: typeof request.headers['user-agent'] === 'string' ? request.headers['user-agent'] : null });
 			assertSigninDeadline(proof);
 			return issued;
 		});
-		return this.completeSignin(request, reply, user.id, token);
+		return this.completeSignin(request, reply, user.id, token, session.id);
 	}
 
 	@bindThis
 	public async signinSignup(request: AuthSessionRequest, reply: AuthSessionEffects, account: Pick<MiLocalUser, 'id' | 'token'>): Promise<{ finished: true; id: string; i: string }> {
-		const { token } = await this.browserSessionService.issueForNewAccount(account);
-		return this.completeSignin(request, reply, account.id, token);
+		const { token, session } = await this.browserSessionService.issueForNewAccount(account, { ip: request.ip, userAgent: typeof request.headers['user-agent'] === 'string' ? request.headers['user-agent'] : null });
+		return this.completeSignin(request, reply, account.id, token, session.id);
 	}
 
-	private completeSignin(request: AuthSessionRequest, reply: AuthSessionEffects, userId: string, token: string): { finished: true; id: string; i: string } {
+	private completeSignin(request: AuthSessionRequest, reply: AuthSessionEffects, userId: string, token: string, browserSessionId: string): { finished: true; id: string; i: string } {
 		// The transaction has committed before any login side effect is scheduled.
 		setImmediate(async () => {
 			this.notificationService.createNotification(userId, 'login', {});
@@ -74,6 +74,7 @@ export class SigninService {
 			const record = await this.signinsRepository.insertOne({
 				id: this.idService.gen(),
 				userId,
+				browserSessionId,
 				ip: request.ip,
 				headers: toSessionHeaders(request.headers),
 				success: true,
