@@ -42,7 +42,8 @@ export function historicalRawLocale(language: string): Dictionary {
 	if (!raw.has(language)) {
 		const production = (load(readFileSync(resolve(root, 'locales', `${language}.yml`), 'utf8').replaceAll('\b', '')) ?? {}) as Dictionary;
 		const pairs = new Map(flattenCatalog(production));
-		for (const key of history.promoted) pairs.delete(key);
+		// New feature labels must not change the independently pinned pre-pruning catalog.
+		for (const key of [...history.promoted, ...history.addedAfterBaseline]) pairs.delete(key);
 		const deleted = Reflect.get(history.deletedRaw, language) as Record<string, string> | undefined;
 		if (!deleted) throw new Error(`Unknown historical catalog: ${language}`);
 		for (const [key, value] of Object.entries(deleted)) pairs.set(key, value);
