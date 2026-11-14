@@ -20,6 +20,7 @@ export function getNavbarMessages() {
 		antennas: globalLocale.value.env.antennas,
 		default: globalLocale.value.env.default,
 		drive: globalLocale.value.env.drive,
+		mail: globalLocale.value.env._mail.title,
 		clip: globalLocale.value.env.clip,
 		announcements: globalLocale.value.env.announcements,
 		channel: globalLocale.value.env.channel,

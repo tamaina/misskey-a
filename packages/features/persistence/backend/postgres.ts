@@ -5,6 +5,7 @@
 
 // https://github.com/typeorm/typeorm/issues/2400
 import pg from 'pg';
+import { MiMailSubmission, MiMailForwarding } from '@features/email/backend/models/MailSubmission.js';
 import { MiMailAccount, MiMailRaw, MiMailDelivery, MiMailOutbox } from '@features/email/backend/models/Mail.js';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
@@ -180,6 +181,7 @@ class MyCustomLogger implements Logger {
 }
 
 export const entities = [
+	MiMailSubmission, MiMailForwarding,
 	MiMailAccount, MiMailRaw, MiMailDelivery, MiMailOutbox,
 	MiAnnouncement,
 	MiAnnouncementRead,

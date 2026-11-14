@@ -18,9 +18,9 @@ export class S3PrivateMailStorage implements PrivateMailStorage {
 	async verifyPrivacy(): Promise<void> {
 		this.verified = false;
 		const [block, policy, acl] = await Promise.all([
-			this.client.send(new GetPublicAccessBlockCommand({ Bucket: this.bucket })),
-			this.client.send(new GetBucketPolicyStatusCommand({ Bucket: this.bucket })),
-			this.client.send(new GetBucketAclCommand({ Bucket: this.bucket })),
+			this.client.send(new GetPublicAccessBlockCommand({ Bucket: this.bucket }), { abortSignal: AbortSignal.timeout(30_000) }),
+			this.client.send(new GetBucketPolicyStatusCommand({ Bucket: this.bucket }), { abortSignal: AbortSignal.timeout(30_000) }),
+			this.client.send(new GetBucketAclCommand({ Bucket: this.bucket }), { abortSignal: AbortSignal.timeout(30_000) }),
 		]);
 		const b = block.PublicAccessBlockConfiguration;
 		if (!b?.BlockPublicAcls || !b.IgnorePublicAcls || !b.BlockPublicPolicy || !b.RestrictPublicBuckets || policy.PolicyStatus?.IsPublic !== false ||

@@ -92,6 +92,12 @@ export class MiMailDelivery {
 	@Column('timestamp with time zone', { nullable: true })
 	public deletedAt: Date | null;
 
+	@Column('boolean', { default: true })
+	public localStored: boolean;
+
+	@Column('varchar', { length: 16, nullable: true })
+	public localError: 'quota' | 'disabled' | null;
+
 	@Column('varchar', { length: 16 })
 	public parseState: 'pending' | 'parsed' | 'failed';
 

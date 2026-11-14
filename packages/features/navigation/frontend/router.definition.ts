@@ -528,6 +528,11 @@ export const ROUTE_DEF = [{
 	component: page(() => import('@features/drive/frontend/pages/drive.vue')),
 	loginRequired: true,
 }, {
+	path: '/my/mail',
+	query: { verify: 'verify' },
+	component: page(() => import('@features/email/frontend/pages/mail.vue')),
+	loginRequired: true,
+}, {
 	path: '/my/drive',
 	component: page(() => import('@features/drive/frontend/pages/drive.vue')),
 	loginRequired: true,

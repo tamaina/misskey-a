@@ -33,6 +33,7 @@ export async function buildTextMail(
 	identity: { username: string; domain: string },
 	stable: { messageId: string; date: Date },
 	limits: MailLimits,
+	html?: string,
 ): Promise<PreparedMail> {
 	if (!/^[a-zA-Z0-9_]+$/u.test(identity.username)) throw new Error('Invalid local username');
 	const from = validateMailAddress(`${identity.username}@${identity.domain}`);
@@ -51,7 +52,7 @@ export async function buildTextMail(
 	const envelope = { from, to: recipients };
 	const composer = createTransport({ streamTransport: true, buffer: true, newline: 'windows' });
 	const result = await composer.sendMail({
-		from: { address: from, name }, to, cc, subject, text: input.text,
+		from: { address: from, name }, to, cc, subject, text: input.text, html,
 		messageId: stable.messageId, date: stable.date, envelope,
 		disableFileAccess: true, disableUrlAccess: true,
 		// Bcc lives exclusively in the envelope and the sender's private record.

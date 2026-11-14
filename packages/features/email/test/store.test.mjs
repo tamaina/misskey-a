@@ -8,6 +8,7 @@ import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { MailStore } from '../../../backend/built/features/email/backend.js';
 import { MailFoundation1794697200000 } from '../../../backend/migration/1794697200000-MailFoundation.js';
+import { MailSubmissions1794697200001 } from '../../../backend/migration/1794697200001-MailSubmissions.js';
 
 // Optional real SQL suite. No dependency is added for PGlite: point the variable
 // at a separately installed official package. It validates SQL, NOT concurrency.
@@ -55,6 +56,7 @@ test('mail persistence against PostgreSQL SQL semantics', { skip: !connectionStr
 	const deliveryId = 'trusted_mta_queue_12345';
 	const sender = 'sender@example.com';
 	const migration = new MailFoundation1794697200000();
+	const migration2 = new MailSubmissions1794697200001();
 	const store = new MailStore(db, storage, 'mail.example', BigInt(raw.length * 2));
 	const reset = async () => {
 		await query('TRUNCATE "user" CASCADE');
@@ -70,6 +72,7 @@ test('mail persistence against PostgreSQL SQL semantics', { skip: !connectionStr
 		await query(`SET search_path TO "${schema}"`);
 		await query('CREATE TABLE "user" ("id" varchar(32) PRIMARY KEY, "usernameLower" varchar(128), "host" varchar(128), "isSuspended" boolean NOT NULL DEFAULT false, "isDeleted" boolean NOT NULL DEFAULT false)');
 		await migration.up({ query });
+		await migration2.up({ query });
 
 		await t.test('recipient opt-in, account state, and owner-scoped raw/deletion', async () => {
 			await reset();
@@ -278,11 +281,59 @@ test('mail persistence against PostgreSQL SQL semantics', { skip: !connectionStr
 			assert.deepEqual(await store.readRaw('alice', accepted.id), Uint8Array.from(raw));
 		});
 
+		await t.test('verified forwarding without a local copy retains raw through the submission reference', async () => {
+			await reset();
+			const forwardingStore = new MailStore(db, storage, 'mail.example', 0n, 1000, 1000n, true);
+			await query('INSERT INTO "mail_forwarding" ("userId","address","enabled","keepLocalCopy","revision","verifiedAt","updatedAt") VALUES (\'alice\',\'verified@example.com\',true,false,3,now(),now())');
+			const staged = await forwardingStore.stage(raw);
+			const accepted = await forwardingStore.accept(staged.id, deliveryId, 'alice@mail.example', sender);
+			const [delivery] = await query('SELECT * FROM "mail_delivery" WHERE "id"=$1', [accepted.id]);
+			assert.equal(delivery.localStored, false);
+			assert.equal(delivery.localError, 'disabled');
+			assert.equal(delivery.rawId, null);
+			assert.equal(await usage('alice'), 0n);
+			await assert.rejects(forwardingStore.readRaw('alice', accepted.id), /NOT_FOUND/);
+			assert.equal((await query('SELECT * FROM "mail_outbox"')).length, 0);
+			const [submission] = await query('SELECT * FROM "mail_submission"');
+			assert.equal(submission.forwardingRevision, 3);
+			assert.deepEqual(submission.recipients, ['verified@example.com']);
+			assert.equal(submission.rawId, staged.id);
+			assert.equal(submission.envelopeFrom, sender);
+			assert.equal((await forwardingStore.accept(staged.id, deliveryId, 'alice@mail.example', sender)).duplicate, true);
+			assert.equal((await query('SELECT * FROM "mail_submission"')).length, 1);
+			await forwardingStore.remove('alice', accepted.id);
+			await query('UPDATE "mail_raw" SET "createdAt"=now()-interval \'2 days\'');
+			assert.equal(await forwardingStore.collect(), 0, 'active forwarding remains a raw owner after inbox deletion');
+			await query('UPDATE "mail_submission" SET "rawId"=NULL,"state"=\'submitted\'');
+			assert.equal(await forwardingStore.collect(), 1);
+		});
+
+		await t.test('verified forwarding survives local quota; unverified or disabled forwarding cannot bypass quota', async () => {
+			await reset();
+			const forwardingStore = new MailStore(db, storage, 'mail.example', 0n, 1000, 1000n, true);
+			await query('INSERT INTO "mail_forwarding" ("userId","address","enabled","keepLocalCopy","revision","verifiedAt","updatedAt") VALUES (\'alice\',\'verified@example.com\',true,true,7,now(),now())');
+			const staged = await forwardingStore.stage(raw);
+			const accepted = await forwardingStore.accept(staged.id, deliveryId, 'alice@mail.example', sender);
+			const [delivery] = await query('SELECT * FROM "mail_delivery" WHERE "id"=$1', [accepted.id]);
+			assert.equal(delivery.localError, 'quota');
+			assert.equal(delivery.localStored, false);
+			assert.equal(await usage('alice'), 0n);
+			await query('UPDATE "mail_forwarding" SET "verifiedAt"=NULL');
+			await assert.rejects(forwardingStore.accept(staged.id, `${deliveryId}_2`, 'alice@mail.example', sender), /QUOTA_EXCEEDED/);
+			await query('UPDATE "mail_forwarding" SET "verifiedAt"=now(),"enabled"=false');
+			await assert.rejects(forwardingStore.accept(staged.id, `${deliveryId}_3`, 'alice@mail.example', sender), /QUOTA_EXCEEDED/);
+			await query('UPDATE "mail_forwarding" SET "enabled"=true');
+			const globallyDisabled = new MailStore(db, storage, 'mail.example', 0n, 1000, 1000n, false);
+			await assert.rejects(globallyDisabled.accept(staged.id, `${deliveryId}_4`, 'alice@mail.example', sender), /QUOTA_EXCEEDED/);
+		});
+
 		await t.test('migration can roll back and be reapplied', async () => {
+			await migration2.down({ query });
 			await migration.down({ query });
 			assert.equal((await query('SELECT table_name FROM information_schema.tables WHERE table_schema=$1 AND table_name LIKE \'mail_%\'', [schema])).length, 0);
 			await migration.up({ query });
-			assert.equal((await query('SELECT table_name FROM information_schema.tables WHERE table_schema=$1 AND table_name LIKE \'mail_%\'', [schema])).length, 4);
+			await migration2.up({ query });
+			assert.equal((await query('SELECT table_name FROM information_schema.tables WHERE table_schema=$1 AND table_name LIKE \'mail_%\'', [schema])).length, 6);
 		});
 	} finally {
 		await query('SET search_path TO public');
@@ -323,6 +374,7 @@ test('mail concurrent retry and quota serialization on PostgreSQL', { skip: !con
 		};
 		await db.query('CREATE TABLE "user" ("id" varchar(32) PRIMARY KEY, "usernameLower" varchar(128), "host" varchar(128), "isSuspended" boolean NOT NULL DEFAULT false, "isDeleted" boolean NOT NULL DEFAULT false)');
 		await new MailFoundation1794697200000().up(db);
+		await new MailSubmissions1794697200001().up(db);
 		await db.query('INSERT INTO "user" ("id","usernameLower") VALUES (\'alice\',\'alice\')');
 		const objects = new Map();
 		const storage = {
