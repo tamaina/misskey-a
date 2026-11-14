@@ -6,7 +6,6 @@
 import { h } from 'vue';
 import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
-import { host } from '@features/boot/frontend/shared/config.js';
 import type { Component, VNode, SetupContext } from 'vue';
 
 function safeParseFloat(str: unknown): number | null {
@@ -49,6 +48,8 @@ export type MfmEvents = {
 };
 
 export type MfmRendererConfig = {
+	/** Instance host supplied by the application; never read browser state here. */
+	host: string;
 	/**
 	 * 描画時に呼ばれる
 	 * 循環インポートを防ぐために、単純なkey-valueではなく関数を採用
@@ -360,7 +361,7 @@ export function createMfmRenderer<P extends MfmBaseProps = MfmBaseProps>(config:
 						case 'clickable': {
 							return h('span', {
 								style: 'user-select: none;',
-								onClick(ev: PointerEvent): void {
+								onClick(ev: { stopPropagation(): void; preventDefault(): void }): void {
 									ev.stopPropagation();
 									ev.preventDefault();
 									const clickEv = typeof token.props.args.ev === 'string' ? token.props.args.ev : '';
@@ -410,7 +411,7 @@ export function createMfmRenderer<P extends MfmBaseProps = MfmBaseProps>(config:
 
 				case 'mention': {
 					return [h(Mention, {
-						host: (token.props.host == null && props.author && props.author.host != null ? props.author.host : token.props.host) ?? host,
+						host: (token.props.host == null && props.author && props.author.host != null ? props.author.host : token.props.host) ?? config.host,
 						username: token.props.username,
 						...linkProps,
 					})];
