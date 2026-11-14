@@ -153,6 +153,7 @@ export class ApRendererService {
 
 		if (object.to) activity.to = object.to;
 		if (object.cc) activity.cc = object.cc;
+		if (object.audience) activity.audience = object.audience;
 
 		return activity;
 	}
@@ -480,6 +481,7 @@ export class ApRendererService {
 			id: `${this.config.url}/notes/${note.id}`,
 			type: 'Note',
 			attributedTo,
+			...(note.channelId && !note.localOnly ? { audience: `${this.config.url}/channels/${note.channelId}` } : {}),
 			summary: summary ?? undefined,
 			content: content ?? undefined,
 			...(noMisskeyContent ? {} : {

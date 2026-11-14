@@ -30,6 +30,7 @@ test('notes/create keeps its credential and moved-account security policy', () =
 	expect(notesCreateContract['~orpc'].meta).toMatchObject({
 		requestName: 'notes/create', requireCredential: true, prohibitMoved: true, kind: 'write:notes',
 	});
+	expect(notesCreateErrors.channelFederationRequiresPublic).toMatchObject({ code: 'CHANNEL_FEDERATION_REQUIRES_PUBLIC', id: '10920128-46cd-4d5d-8e66-6ae1587fab75' });
 	expect(notesCreateContract['~orpc'].inputSchema).toBe(requiredSchema(notesCreateContract['~orpc'].inputSchema));
 	expect(notesCreateContract['~orpc'].outputSchema).toBe(requiredSchema(notesCreateContract['~orpc'].outputSchema));
 });
@@ -144,6 +145,15 @@ test('application operation retains file precedence, poll defaults, extraction c
 	expect(entities.pack).toHaveBeenCalledWith(note, actor);
 	create.fetchAndCreate.mockRejectedValue(new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99'));
 	await expect(createProcedureClient(operation, { context: apiTestContext(actor) })(input)).rejects.toMatchObject({ code: notesCreateErrors.containsProhibitedWords.code, data: { id: notesCreateErrors.containsProhibitedWords.id } });
+});
+
+test('native channel refusal preserves the posting restriction reason in the API response', async () => {
+	const { deps, client } = contextFixture();
+	deps.noteCreateService.fetchAndCreate.mockRejectedValue(new IdentifiableError('10920128-46cd-4d5d-8e66-6ae1587fab75', 'Local-only reply prevents federation.'));
+	await expect(client({ text: 'refused' })).rejects.toMatchObject({
+		code: 'CHANNEL_FEDERATION_REQUIRES_PUBLIC',
+		data: { id: '10920128-46cd-4d5d-8e66-6ae1587fab75', info: { reason: 'Local-only reply prevents federation.' } },
+	});
 });
 
 test('native OpenAPI generator documents notes/create auth, route errors and the 200 envelope', async () => {

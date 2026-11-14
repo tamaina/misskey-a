@@ -53,7 +53,9 @@ export function createNotesCreateProcedure(deps: NotesCreateDependencies) {
 					} catch (err) {
 						// TODO: 他のErrorもここでキャッチしてエラーメッセージを当てるようにしたい
 						if (err instanceof IdentifiableError) {
-							if (readErrorId(err) === '689ee33f-f97c-479a-ac49-1b9f8140af99') {
+							if (readErrorId(err) === '10920128-46cd-4d5d-8e66-6ae1587fab75') {
+								throw apiError(notesCreateErrors.channelFederationRequiresPublic, { reason: err.message });
+							} else if (readErrorId(err) === '689ee33f-f97c-479a-ac49-1b9f8140af99') {
 								throw apiError(notesCreateErrors.containsProhibitedWords);
 							} else if (readErrorId(err) === '9f466dab-c856-48cd-9e65-ff90ff750580') {
 								throw apiError(notesCreateErrors.containsTooManyMentions);

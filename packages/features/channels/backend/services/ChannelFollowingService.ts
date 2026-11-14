@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { ModuleRef } from '@nestjs/core';
+import type { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
+import type { ChannelFederationService } from './ChannelFederationService.js';
+import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
@@ -27,6 +31,9 @@ export class ChannelFollowingService implements OnModuleInit {
 		private redisForSub: Redis.Redis,
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
+		@Inject(DI.usersRepository)
+		private usersRepository: UsersRepository,
+		private moduleRef: ModuleRef,
 		@Inject(DI.channelFollowingsRepository)
 		private channelFollowingsRepository: ChannelFollowingsRepository,
 		private idService: IdService,
@@ -98,6 +105,17 @@ export class ChannelFollowingService implements OnModuleInit {
 		requestUser: MiLocalUser,
 		targetChannel: MiChannel,
 	): Promise<void> {
+		if (targetChannel.host != null && targetChannel.uri) {
+			const actor = await this.usersRepository.findOneByOrFail({ uri: targetChannel.uri });
+			try {
+				await this.moduleRef.get<UserFollowingService>('UserFollowingService', { strict: false }).follow(requestUser, actor);
+			} catch (error) {
+				if (!(error instanceof IdentifiableError) || error.id !== 'ec3f65c0-a9d1-47d9-8791-b2e7b9dcdced') throw error;
+				if (actor.host == null || actor.uri == null) throw new Error('Remote Group has local user identity');
+				await this.moduleRef.get<ChannelFederationService>('ChannelFederationService', { strict: false }).acceptRemoteFollow({ ...actor, host: actor.host, uri: actor.uri }, requestUser.id);
+			}
+			return; // The authenticated Accept creates the channel-follow relation.
+		}
 		try {
 			await this.channelFollowingsRepository.insert({
 				id: this.idService.gen(),
@@ -122,6 +140,12 @@ export class ChannelFollowingService implements OnModuleInit {
 		requestUser: MiLocalUser,
 		targetChannel: MiChannel,
 	): Promise<void> {
+		if (targetChannel.host != null && targetChannel.uri) {
+			const actor = await this.usersRepository.findOneByOrFail({ uri: targetChannel.uri });
+			const following = this.moduleRef.get<UserFollowingService>('UserFollowingService', { strict: false });
+			await following.cancelOrUnfollowChannel(requestUser, actor);
+			return;
+		}
 		await this.channelFollowingsRepository.delete({
 			followerId: requestUser.id,
 			followeeId: targetChannel.id,

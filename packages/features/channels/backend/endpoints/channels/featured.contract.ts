@@ -22,4 +22,4 @@ export const channelsFeaturedContract = oc.$meta({
 } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/channels/featured', tags: ['channels'], spec: current => ({ ...current, security }) })
 	.errors({ ...commonErrors })
-	.input(objectInput({})).output(v.array(packedChannelSchema));
+	.input(objectInput({ origin: v.exactOptional(v.picklist(['local', 'remote'])) })).output(v.array(packedChannelSchema));

@@ -14,6 +14,7 @@ import { packedChannelSchema } from '../../channel.schema.js';
 import { objectInput, misskeyId, jsonString } from '../../request.schema.js';
 
 export const channelsCreateErrors = {
+		accessDenied: { message: 'Channel federation is not permitted.', code: 'ACCESS_DENIED', id: '559dbd01-ab5c-4e4f-8c68-555c4ad540ca' },
 		noSuchFile: {
 			message: 'No such file.',
 			code: 'NO_SUCH_FILE',
@@ -34,12 +35,13 @@ export const channelsCreateContract = oc.$meta({
 	},
 } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/channels/create', tags: ['channels'], spec: current => ({ ...current, security }) })
-	.errors({ ...commonErrors, NO_SUCH_FILE: { status: 400, data: apiErrorData } })
+	.errors({ ...commonErrors, ACCESS_DENIED: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData } })
 	.input(objectInput({
 		"name": jsonString({ "minLength": 1, "maxLength": 128 }),
 		"description": v.exactOptional(v.nullable(jsonString({ "maxLength": 2048 }))),
 		"bannerId": v.exactOptional(v.nullable(misskeyId)),
 		"color": v.exactOptional(jsonString({ "minLength": 1, "maxLength": 16 })),
 		"isSensitive": v.exactOptional(v.nullable(v.boolean())),
+		"isFederated": v.exactOptional(v.boolean()),
 		"allowRenoteToExternal": v.exactOptional(v.nullable(v.boolean())),
 	})).output(packedChannelSchema);

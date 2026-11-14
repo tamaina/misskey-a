@@ -7,7 +7,7 @@ import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { rolesContract } from '../../../api.definition.js';
 import type { RolesDependencies } from '../../../api.implementation.js';
-export function createAdminRolesUpdateDefaultPoliciesProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'metaService' | 'globalEventService' | 'moderationLogService'>) {
+export function createAdminRolesUpdateDefaultPoliciesProcedure<Actor extends ApiActor>(deps: Pick<RolesDependencies<Actor>, 'roleService' | 'metaService' | 'globalEventService' | 'moderationLogService'>) {
 	return createApiProcedure<Actor>()(rolesContract.adminRolesUpdateDefaultPolicies).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
@@ -17,6 +17,7 @@ export function createAdminRolesUpdateDefaultPoliciesProcedure<Actor extends Api
 				policies: ps.policies,
 			});
 			const after = await deps.metaService.fetch(true);
+			await deps.roleService.onDefaultPoliciesUpdated(after.policies);
 			deps.globalEventService.publishInternalEvent('policiesUpdated', after.policies);
 			deps.moderationLogService.log(me, 'updateServerSettings', {
 				before: before.policies,

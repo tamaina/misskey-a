@@ -23,7 +23,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ globalLocale.env.sensitive }}</template>
 			</MkSwitch>
 
-			<MkSwitch v-model="allowRenoteToExternal">
+			<MkSwitch v-model="isFederated" :disabled="!isOwner || (!isFederated && !$i?.policies.canFederateChannel)">
+				<template #label>{{ $locale.sfc.channelFederation }}</template>
+				<template #caption>{{ $locale.sfc.channelFederationDescription }}</template>
+			</MkSwitch>
+
+			<MkSwitch v-if="channel && $i?.isModerator" v-model="isFederationFrozen">
+				<template #label>{{ $locale.sfc.channelFederationFrozen }}</template>
+				<template #caption>{{ $locale.sfc.channelFederationFrozenDescription }}</template>
+			</MkSwitch>
+			<p v-else-if="isFederationFrozen">{{ $locale.sfc.channelFederationFrozenDescription }}</p>
+
+			<MkSwitch v-model="allowRenoteToExternal" :disabled="isFederated">
 				<template #label>{{ $locale.sfc.channelAllowRenoteToExternal }}</template>
 			</MkSwitch>
 
@@ -83,6 +94,7 @@ import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
+import { $i } from '@features/auth/frontend/i.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import type { Locale } from 'i18n';
 
@@ -102,6 +114,11 @@ const bannerId = ref<string | null>(null);
 const color = ref('#000');
 const isSensitive = ref(false);
 const allowRenoteToExternal = ref(true);
+const isFederated = ref(false);
+const isFederationFrozen = ref(false);
+const isOwner = computed(() => channel.value == null || channel.value.userId === $i?.id);
+
+watch(isFederated, enabled => { if (enabled) allowRenoteToExternal.value = true; });
 const pinnedNoteIds = ref<Misskey.entities.Note['id'][]>([]);
 
 watch(() => bannerId.value, async () => {
@@ -129,6 +146,8 @@ async function fetchChannel() {
 	pinnedNoteIds.value = result.pinnedNoteIds;
 	color.value = result.color;
 	allowRenoteToExternal.value = result.allowRenoteToExternal;
+	isFederated.value = result.isFederated;
+	isFederationFrozen.value = result.isFederationFrozen;
 
 	channel.value = result;
 }
@@ -158,7 +177,9 @@ function save() {
 		bannerId: bannerId.value,
 		color: color.value,
 		isSensitive: isSensitive.value,
-		allowRenoteToExternal: allowRenoteToExternal.value,
+		...(isOwner.value && (channel.value == null || isFederated.value !== channel.value.isFederated) ? { isFederated: isFederated.value } : {}),
+		...(channel.value && $i?.isModerator && isFederationFrozen.value !== channel.value.isFederationFrozen ? { isFederationFrozen: isFederationFrozen.value } : {}),
+		allowRenoteToExternal: isFederated.value || allowRenoteToExternal.value,
 	} satisfies Misskey.entities.ChannelsCreateRequest;
 
 	if (props.channelId != null) {
@@ -331,6 +352,8 @@ definePage(() => ({
 
 <locale lang="json" locale="en-US">
 {
+	"channelFederation": "Federate this channel",
+	"channelFederationDescription": "New posts are public and federated. Local-only posts are rejected and renotes outside the channel are allowed. Existing posts stay local.",
 	"color": "Color",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Set banner",
@@ -411,6 +434,10 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-JP">
 {
+	"channelFederation": "チャンネルを連合する",
+	"channelFederationFrozen": "チャンネル連合を凍結する",
+	"channelFederationFrozenDescription": "連合は凍結されています。新しい投稿の送受信は停止し、凍結中のローカル投稿は解除後も公開されません。解除には所有者の連合権限が必要です。",
+	"channelFederationDescription": "新規投稿は公開・連合されます。ローカル限定の投稿は作成できず、チャンネル外へのリノートを許可します。過去の投稿は公開されません。",
 	"color": "色",
 	"channelAllowRenoteToExternal": "チャンネル外へのリノートと引用リノートを許可する",
 	"channelSetBanner": "バナーを設定",

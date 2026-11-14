@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { toPackedChannel } from '../../api.dto.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
@@ -17,6 +18,7 @@ import type { ChannelsRepository, DriveFilesRepository } from '@features/persist
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export interface ChannelsCreateDependencies {
+	roleService: RoleService;
 	driveFilesRepository: DriveFilesRepository;
 	channelsRepository: ChannelsRepository;
 	idService: IdService;
@@ -28,6 +30,9 @@ export function createChannelsCreateProcedure<Actor extends MiLocalUser>(deps: C
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
+			if (ps.isFederated && !(await deps.roleService.getUserPolicies(me.id, true)).canFederateChannel) {
+				throw apiError(channelsCreateErrors.accessDenied);
+			}
 			let banner = null;
 			if (ps.bannerId != null) {
 				banner = await deps.driveFilesRepository.findOneBy({
@@ -48,7 +53,8 @@ export function createChannelsCreateProcedure<Actor extends MiLocalUser>(deps: C
 				bannerId: banner ? banner.id : null,
 				isSensitive: ps.isSensitive ?? false,
 				...(ps.color !== undefined ? { color: ps.color } : {}),
-				allowRenoteToExternal: ps.allowRenoteToExternal ?? true,
+				isFederated: ps.isFederated ?? false,
+				allowRenoteToExternal: ps.isFederated ? true : ps.allowRenoteToExternal ?? true,
 			});
 			return toPackedChannel(await deps.channelEntityService.pack(channel, me));
 		});

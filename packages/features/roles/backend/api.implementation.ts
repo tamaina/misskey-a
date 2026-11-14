@@ -51,6 +51,7 @@ export interface RolesDependencies<Actor extends ApiActor> {
 	queryService: Pick<QueryService, 'makePaginationQuery' | 'generateVisibilityQuery' | 'generateBaseNoteFilteringQuery'>;
 	idService: Pick<IdService, 'gen' | 'parse'>;
 	roleService: {
+		onDefaultPoliciesUpdated(policies: Parameters<RoleService['onDefaultPoliciesUpdated']>[0]): Promise<void>;
 		isAdministrator: RoleService['isAdministrator'];
 		create(values: RoleWriteValues, actor: Actor): Promise<MiRole>;
 		update(role: MiRole, values: RoleWriteValues, actor: Actor): Promise<void>;

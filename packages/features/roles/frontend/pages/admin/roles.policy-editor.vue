@@ -171,6 +171,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</template>
 	</XFolder>
 
+	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsCanFederateChannel, 'canFederateChannel'])" v-model:policyMeta="policyMetaModel.canFederateChannel" :isBaseRole="isBaseRole" :readonly="readonly">
+		<template #label>{{ $locale.sfc.roleOptionsCanFederateChannel }}</template>
+		<template #valueText>{{ valuesModel.canFederateChannel ? globalLocale.env.yes : globalLocale.env.no }}</template>
+		<template #default="{ disabled }">
+			<MkSwitch v-model="valuesModel.canFederateChannel" :disabled="disabled">
+				<template #label>{{ $locale.sfc.enable }}</template>
+			</MkSwitch>
+		</template>
+	</XFolder>
+
 	<XFolder v-if="matchQuery([$locale.sfc.roleOptionsDriveCapacity, 'driveCapacityMb'])" v-model:policyMeta="policyMetaModel.driveCapacityMb" :isBaseRole="isBaseRole" :readonly="readonly">
 		<template #label>{{ $locale.sfc.roleOptionsDriveCapacity }}</template>
 		<template #valueText>{{ valuesModel.driveCapacityMb }}MB</template>
@@ -758,6 +768,7 @@ function updateAvatarDecorationLimit(value: string | number) {
 
 <locale lang="json" locale="en-US">
 {
+	"roleOptionsCanFederateChannel": "Allow channel federation",
 	"roleOptionsRateLimitFactor": "Rate limit",
 	"roleOptionsDescriptionOfRateLimitFactor": "Lower rate limits are less restrictive, higher ones more restrictive. ",
 	"roleOptionsGtlAvailable": "Can view the global timeline",
@@ -1028,6 +1039,7 @@ function updateAvatarDecorationLimit(value: string | number) {
 
 <locale lang="json" locale="ja-JP">
 {
+	"roleOptionsCanFederateChannel": "チャンネルの連合を許可",
 	"roleOptionsRateLimitFactor": "レートリミット",
 	"roleOptionsDescriptionOfRateLimitFactor": "小さいほど制限が緩和され、大きいほど制限が強化されます。",
 	"roleOptionsGtlAvailable": "グローバルタイムラインの閲覧",

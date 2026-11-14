@@ -394,7 +394,7 @@ if ($i.isSilenced && visibility.value === 'public') {
 
 if (targetChannel.value) {
 	visibility.value = 'public';
-	localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
+	localOnly.value = !targetChannel.value.isFederated;
 }
 
 // 公開以外へのリプライ時は元の公開範囲を引き継ぐ
@@ -532,7 +532,7 @@ function updateFileName(file: Misskey.entities.DriveFile, name: Misskey.entities
 function setVisibility() {
 	if (targetChannel.value) {
 		visibility.value = 'public';
-		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
+		localOnly.value = !targetChannel.value.isFederated;
 		return;
 	}
 
@@ -555,7 +555,7 @@ function setVisibility() {
 async function toggleLocalOnly() {
 	if (targetChannel.value) {
 		visibility.value = 'public';
-		localOnly.value = true; // TODO: チャンネルが連合するようになった折には消す
+		localOnly.value = !targetChannel.value.isFederated;
 		return;
 	}
 

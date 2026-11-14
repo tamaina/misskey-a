@@ -6,6 +6,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader v-model:tab="tab" :actions="headerActions" :tabs="headerTabs" :swipable="true">
 	<div class="_spacer" style="--MI_SPACER-w: 1200px;">
+		<MkTab
+			v-if="tab === 'featured' || tab === 'search'"
+			v-model="origin"
+			:tabs="[
+				{ key: 'local', label: $locale.sfc.local },
+				{ key: 'remote', label: $locale.sfc.remote },
+			]"
+			style="margin-bottom: var(--MI-margin);"
+		/>
 		<div v-if="tab === 'search'" :class="$style.searchRoot">
 			<div class="_gaps">
 				<MkInput v-model="searchQuery" :large="true" :autofocus="true" type="search" @enter="search">
@@ -29,7 +38,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFoldableSection>
 		</div>
 		<div v-if="tab === 'featured'">
-			<MkPagination v-slot="{items}" :paginator="featuredPaginator">
+			<MkPagination :key="origin" v-slot="{items}" :paginator="featuredPaginator">
 				<div :class="$style.root">
 					<MkChannelPreview v-for="channel in items" :key="channel.id" :channel="channel"/>
 				</div>
@@ -63,10 +72,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';
+import { computed, markRaw, onMounted, ref, shallowRef, watch } from 'vue';
 import MkChannelPreview from '@features/channels/frontend/components/MkChannelPreview.vue';
 import MkChannelList from '@features/channels/frontend/components/MkChannelList.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
+import MkTab from '@features/ui/frontend/components/MkTab.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -90,6 +100,7 @@ const props = defineProps<{
 
 const key = ref('');
 const tab = ref('featured');
+const origin = ref<'local' | 'remote'>('local');
 const searchQuery = ref('');
 const searchType = ref<SearchType>('nameAndDescription');
 const channelPaginator = shallowRef();
@@ -99,10 +110,15 @@ onMounted(() => {
 	searchType.value = props.type ?? 'nameAndDescription';
 });
 
-const featuredPaginator = markRaw(new Paginator('channels/featured', {
+const featuredPaginator = computed(() => markRaw(new Paginator('channels/featured', {
 	limit: 10,
 	noPaging: true,
-}));
+	params: { origin: origin.value },
+})));
+
+watch(origin, () => {
+	if (channelPaginator.value) search();
+});
 const favoritesPaginator = markRaw(new Paginator('channels/my-favorites', {
 	limit: 100,
 	noPaging: true,
@@ -131,10 +147,11 @@ async function search() {
 		params: {
 			query: searchQuery.value,
 			type: type,
+			origin: origin.value,
 		},
 	}));
 
-	key.value = query + type;
+	key.value = JSON.stringify([origin.value, query, type]);
 }
 
 const headerActions = computed(() => []);
@@ -183,6 +200,8 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
+	"local": "المحلي",
+	"remote": "بُعدي",
 	"featured": "المتداوَلة",
 	"following": "متابَع",
 	"owned": "قنواتي",
@@ -194,6 +213,8 @@ definePage(() => ({
 
 <locale locale="ca-ES" lang="json">
 {
+	"local": "Local",
+	"remote": "Remot",
 	"featured": "Popular",
 	"following": "Seguin",
 	"owned": "Propietat",
@@ -205,6 +226,8 @@ definePage(() => ({
 
 <locale locale="cs-CZ" lang="json">
 {
+	"local": "Lokální",
+	"remote": "Vzdálené",
 	"featured": "Trendy",
 	"following": "Sledovaný",
 	"owned": "Vlastněný",
@@ -216,6 +239,8 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
@@ -227,6 +252,8 @@ definePage(() => ({
 
 <locale locale="de-DE" lang="json">
 {
+	"local": "Lokal",
+	"remote": "Fremd",
 	"featured": "Trends",
 	"following": "Gefolgt",
 	"owned": "In Besitz",
@@ -238,6 +265,8 @@ definePage(() => ({
 
 <locale locale="en-US" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
@@ -249,6 +278,8 @@ definePage(() => ({
 
 <locale locale="es-ES" lang="json">
 {
+	"local": "Local",
+	"remote": "Remoto",
 	"featured": "Tendencias",
 	"following": "Siguiendo",
 	"owned": "Dueño",
@@ -260,6 +291,8 @@ definePage(() => ({
 
 <locale locale="fr-FR" lang="json">
 {
+	"local": "Local",
+	"remote": "Distant",
 	"featured": "Tendances",
 	"following": "Abonné·e",
 	"owned": "Mes canaux",
@@ -271,6 +304,8 @@ definePage(() => ({
 
 <locale locale="id-ID" lang="json">
 {
+	"local": "Lokal",
+	"remote": "Remote",
 	"featured": "Tren",
 	"following": "Mengikuti",
 	"owned": "Dimiliki",
@@ -282,6 +317,8 @@ definePage(() => ({
 
 <locale locale="it-IT" lang="json">
 {
+	"local": "Locale",
+	"remote": "Remota",
 	"featured": "Popolari nel canale",
 	"following": "Following",
 	"owned": "I miei canali",
@@ -293,6 +330,8 @@ definePage(() => ({
 
 <locale locale="ja-JP" lang="json">
 {
+	"local": "ローカル",
+	"remote": "リモート",
 	"featured": "トレンド",
 	"following": "フォロー中",
 	"owned": "管理中",
@@ -304,6 +343,8 @@ definePage(() => ({
 
 <locale locale="ja-KS" lang="json">
 {
+	"local": "ローカル",
+	"remote": "リモート",
 	"featured": "トレンド",
 	"following": "フォロー中やで",
 	"owned": "管理しとる",
@@ -315,6 +356,8 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
@@ -326,6 +369,8 @@ definePage(() => ({
 
 <locale locale="kn-IN" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
@@ -337,6 +382,8 @@ definePage(() => ({
 
 <locale locale="ko-KR" lang="json">
 {
+	"local": "로컬",
+	"remote": "리모트",
 	"featured": "트렌드",
 	"following": "팔로잉",
 	"owned": "관리중",
@@ -348,6 +395,8 @@ definePage(() => ({
 
 <locale locale="nl-NL" lang="json">
 {
+	"local": "Lokaal",
+	"remote": "Remote",
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
@@ -359,6 +408,8 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"featured": "Populært",
 	"following": "Følger",
 	"owned": "Owned",
@@ -370,6 +421,8 @@ definePage(() => ({
 
 <locale locale="pl-PL" lang="json">
 {
+	"local": "Lokalne",
+	"remote": "Zdalny",
 	"featured": "Na czasie",
 	"following": "Śledzeni",
 	"owned": "Własny",
@@ -381,6 +434,8 @@ definePage(() => ({
 
 <locale locale="pt-PT" lang="json">
 {
+	"local": "Local",
+	"remote": "Remoto",
 	"featured": "Destaques",
 	"following": "Seguindo",
 	"owned": "Autoral",
@@ -392,6 +447,8 @@ definePage(() => ({
 
 <locale locale="ru-RU" lang="json">
 {
+	"local": "С этого сайта",
+	"remote": "С других сайтов",
 	"featured": "Актуальные",
 	"following": "Подписки",
 	"owned": "Собственные",
@@ -403,6 +460,8 @@ definePage(() => ({
 
 <locale locale="sk-SK" lang="json">
 {
+	"local": "Lokálne",
+	"remote": "Vzdialené",
 	"featured": "Trendy",
 	"following": "Sledované",
 	"owned": "Vlastnené",
@@ -414,6 +473,8 @@ definePage(() => ({
 
 <locale locale="th-TH" lang="json">
 {
+	"local": "ท้องถิ่น",
+	"remote": "ระยะไกล",
 	"featured": "เทรนด์",
 	"following": "ติดตามแล้ว",
 	"owned": "เจ้าของ",
@@ -425,6 +486,8 @@ definePage(() => ({
 
 <locale locale="tr-TR" lang="json">
 {
+	"local": "Yerel",
+	"remote": "Uzak",
 	"featured": "Trend olan",
 	"following": "Takip edildi",
 	"owned": "Sahip olunan",
@@ -436,6 +499,8 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
+	"local": "Local",
+	"remote": "Remote",
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
@@ -447,6 +512,8 @@ definePage(() => ({
 
 <locale locale="uk-UA" lang="json">
 {
+	"local": "Локальні",
+	"remote": "Віддалені",
 	"featured": "Тренди",
 	"following": "Підписки",
 	"owned": "Owned",
@@ -458,6 +525,8 @@ definePage(() => ({
 
 <locale locale="vi-VN" lang="json">
 {
+	"local": "Máy chủ này",
+	"remote": "Máy chủ khác",
 	"featured": "Xu hướng",
 	"following": "Đang theo dõi",
 	"owned": "Do tôi quản lý",
@@ -469,6 +538,8 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
+	"local": "本地",
+	"remote": "远程",
 	"featured": "热门",
 	"following": "正在关注",
 	"owned": "我的频道",
@@ -480,6 +551,8 @@ definePage(() => ({
 
 <locale locale="zh-TW" lang="json">
 {
+	"local": "本地",
+	"remote": "遠端",
 	"featured": "熱門貼文",
 	"following": "追隨中",
 	"owned": "管理中",

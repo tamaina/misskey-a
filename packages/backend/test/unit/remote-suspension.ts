@@ -21,6 +21,7 @@ describe('suspended ActivityPub actors', () => {
 			userEntityService: { isSuspendedEither: (user: MiRemoteUser) => user.isSuspended || user.isRemoteSuspended },
 			apPersonService: { updatePerson },
 			apQuestionService: { updateQuestion },
+			channelFederationService: { receiveUpdate: vi.fn().mockResolvedValue(undefined) },
 		});
 		for (const type of ['Follow', 'Like', 'Block', 'Undo', 'Create', 'Delete', 'Accept', 'Reject', 'Announce', 'Move']) {
 			expect(await service.performOneActivity(actor, { type, actor: uri } as IActivity)).toBe('skip: suspended actor');

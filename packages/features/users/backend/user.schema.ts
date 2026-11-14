@@ -241,6 +241,7 @@ function toPackedUserPolicies(policies: v.InferOutput<typeof __ref_RolePolicies>
 		canUseTranslator: policies.canUseTranslator,
 		canHideAds: policies.canHideAds,
 		canCreateChannel: policies.canCreateChannel,
+		canFederateChannel: policies.canFederateChannel,
 		driveCapacityMb: policies.driveCapacityMb,
 		maxFileSizeMb: policies.maxFileSizeMb,
 		uploadableFileTypes: [...policies.uploadableFileTypes],

@@ -8,6 +8,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { MiUser, MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { MiNote, IMentionedRemoteUsers } from '../models/Note.js';
 import type { InstancesRepository, MiMeta, NotesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { DI } from '@/di-symbols.js';
@@ -45,6 +46,7 @@ export class NoteDeleteService {
 		private userEntityService: UserEntityService,
 		private globalEventService: GlobalEventService,
 		private relayService: RelayService,
+		private channelFederationService: ChannelFederationService,
 		private federatedInstanceService: FederatedInstanceService,
 		private apRendererService: ApRendererService,
 		private apDeliverManagerService: ApDeliverManagerService,
@@ -115,6 +117,10 @@ export class NoteDeleteService {
 			userId: user.id,
 		});
 
+		if (!quiet && this.userEntityService.isLocalUser(user) && note.channelId && !note.localOnly) {
+			await this.channelFederationService.deliverDelete(note, user);
+		}
+
 		if (deleter && (note.userId !== deleter.id)) {
 			const user = await this.usersRepository.findOneByOrFail({ id: note.userId });
 			this.moderationLogService.log(deleter, 'deleteNote', {
@@ -169,6 +175,7 @@ export class NoteDeleteService {
 
 	@bindThis
 	private async deliverToConcerned(user: { id: MiLocalUser['id']; host: null; }, note: MiNote, content: any) {
+		if (note.channelId) return;
 		this.apDeliverManagerService.deliverToFollowers(user, content);
 		this.relayService.deliverToRelays(user, content);
 		this.apDeliverManagerService.deliverToUsers(user, content, [

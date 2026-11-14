@@ -134,6 +134,7 @@ function fixture() {
 	});
 	const inbox: ApInboxService = Object.assign(Object.create(ApInboxService.prototype), {
 		logger, utilityService: utility, apResolverService: factory, apPersonService: person, apNoteService: noteService,
+		channelFederationService: { receiveAnnounce: vi.fn().mockResolvedValue(null) },
 		userEntityService: { isSuspendedEither: () => false }, relayService: { isRelayActor: async () => false },
 		noteEntityService: { isVisibleForMe: async () => true }, noteCreateService: { create: created },
 		apAudienceService: { parseAudience: async () => ({ visibility: 'public', visibleUsers: [] }) },

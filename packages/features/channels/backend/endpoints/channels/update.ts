@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { ChannelFederationService } from '../../services/ChannelFederationService.js';
 import { toPackedChannel } from '../../api.dto.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
@@ -17,6 +18,7 @@ import type { DriveFilesRepository, ChannelsRepository } from '@features/persist
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export interface ChannelsUpdateDependencies {
+	channelFederationService: ChannelFederationService;
 	channelsRepository: ChannelsRepository;
 	driveFilesRepository: DriveFilesRepository;
 	channelEntityService: ChannelEntityService;
@@ -28,7 +30,7 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
-			const channel = await deps.channelsRepository.findOneBy({
+			let channel = await deps.channelsRepository.findOneBy({
 				id: ps.channelId,
 			});
 
@@ -37,8 +39,19 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 			}
 
 			const iAmModerator = await deps.roleService.isModerator(me);
-			if (channel.userId !== me.id && !iAmModerator) {
+			if (channel.host != null || (channel.userId !== me.id && !iAmModerator)) {
 				throw apiError(channelsUpdateErrors.accessDenied);
+			}
+
+			channel = await deps.channelFederationService.refreshEligibility(channel);
+			if ((ps.isFederated !== undefined && ps.isFederated !== channel.isFederated && channel.userId !== me.id)
+				|| (ps.isFederationFrozen !== undefined && !iAmModerator)) {
+				throw apiError(channelsUpdateErrors.accessDenied);
+			}
+			if ((ps.isFederated === true && !channel.isFederated) || ps.isFederationFrozen === false) {
+				if (!channel.userId || !(await deps.roleService.getUserPolicies(channel.userId, true)).canFederateChannel) {
+					throw apiError(channelsUpdateErrors.accessDenied);
+				}
 			}
 
 			// eslint:disable-next-line:no-unnecessary-initializer
@@ -56,7 +69,10 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 				banner = null;
 			}
 
+			const isFederated = ps.isFederated ?? channel.isFederated;
 			await deps.channelsRepository.update(channel.id, {
+				...(ps.isFederated !== undefined ? { isFederated } : {}),
+				...(ps.isFederationFrozen !== undefined ? { isFederationFrozen: ps.isFederationFrozen } : {}),
 				...(ps.name !== undefined ? { name: ps.name } : {}),
 				...(ps.description !== undefined ? { description: ps.description } : {}),
 				...(ps.pinnedNoteIds !== undefined ? { pinnedNoteIds: ps.pinnedNoteIds } : {}),
@@ -64,8 +80,11 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 				...(typeof ps.isArchived === 'boolean' ? { isArchived: ps.isArchived } : {}),
 				...(banner ? { bannerId: banner.id } : {}),
 				...(typeof ps.isSensitive === 'boolean' ? { isSensitive: ps.isSensitive } : {}),
-				...(typeof ps.allowRenoteToExternal === 'boolean' ? { allowRenoteToExternal: ps.allowRenoteToExternal } : {}),
+				...(isFederated ? { allowRenoteToExternal: true } : typeof ps.allowRenoteToExternal === 'boolean' ? { allowRenoteToExternal: ps.allowRenoteToExternal } : {}),
 			});
+			if (ps.isFederated !== undefined || ps.isFederationFrozen !== undefined || ps.isArchived !== undefined) {
+				await deps.channelFederationService.deliverUpdate(await deps.channelsRepository.findOneByOrFail({ id: channel.id }));
+			}
 			return toPackedChannel(await deps.channelEntityService.pack(channel.id, me));
 		});
 }

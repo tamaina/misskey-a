@@ -51,6 +51,7 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { ActiveUsersChart } from '@features/statistics/backend/charts/active-users.js';
 import { FanoutTimelineEndpointService } from '@features/timelines/backend/services/FanoutTimelineEndpointService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
+import { ChannelFederationService } from './services/ChannelFederationService.js';
 import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
 
 export type ChannelsDependencies = ChannelsCreateDependencies & ChannelsFeaturedDependencies & ChannelsFollowedDependencies & ChannelsMuteListDependencies & ChannelsMyFavoritesDependencies & ChannelsOwnedDependencies & ChannelsSearchDependencies & ChannelsShowDependencies & ChannelsTimelineDependencies & ChannelsUpdateDependencies & ChannelsFavoriteDependencies & ChannelsFollowDependencies & ChannelsUnfavoriteDependencies & ChannelsUnfollowDependencies & ChannelsMuteCreateDependencies & ChannelsMuteDeleteDependencies;
@@ -101,6 +102,7 @@ export class ChannelsApiProvider {
 			activeUsersChart: this.moduleRef.get(ActiveUsersChart, { strict: false }),
 			roleService: this.moduleRef.get(RoleService, { strict: false }),
 			channelFollowingService: this.moduleRef.get(ChannelFollowingService, { strict: false }),
+			channelFederationService: this.moduleRef.get(ChannelFederationService, { strict: false }),
 		});
 		return this.router;
 	}
