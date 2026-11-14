@@ -108,13 +108,15 @@ async function refresh(isCurrent: () => boolean) {
 	if (isCurrent()) state.value = value;
 }
 
-async function run(action: (isCurrent: () => boolean) => Promise<void>, elevate = true) {
+async function run(action: (isCurrent: () => boolean) => Promise<void>, elevate = true, beforeSudo?: () => Promise<boolean>) {
 	if (!currentActor() || busy.value) return;
 	busy.value = true; error.value = false;
 	const turn = ++generation;
 	const controller = new AbortController(); sudoAbort = controller;
 	const isCurrent = () => currentActor() && generation === turn;
 	try {
+		if (beforeSudo && !await beforeSudo()) return;
+		if (!isCurrent()) return;
 		if (elevate && !await ensureSudo(isCurrent, controller.signal)) return;
 		if (isCurrent()) await action(isCurrent);
 	} catch { if (isCurrent()) error.value = true; } finally { controller.abort(); if (sudoAbort === controller) sudoAbort = null; busy.value = false; nativePending = false; }
@@ -125,10 +127,9 @@ function loadKeys() {
 }
 
 function registerKey() {
+	let name = '';
 	return run(async isCurrent => {
-		const name = await os.inputText({ title: $locale.value.sfc.keyName, minLength: 1, maxLength: 30 });
-		if (!isCurrent() || name.canceled || !name.result) return;
-		const started = await misskeyApi('i/security/passkey/register/start', { name: name.result });
+		const started = await misskeyApi('i/security/passkey/register/start', { name });
 		if (!isCurrent()) return;
 		nativePending = true;
 		const credential = await startRegistration({ optionsJSON: started.options });
@@ -136,47 +137,50 @@ function registerKey() {
 		if (!isCurrent()) return;
 		const value = await misskeyApi('i/security/passkey/register/complete', { ticket: started.ticket, credential: registrationWire(credential) });
 		if (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); if (isCurrent()) { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; } }
+	}, true, async () => {
+		const input = await os.inputText({ title: $locale.value.sfc.keyName, minLength: 1, maxLength: 30 });
+		if (input.canceled || !input.result) return false;
+		name = input.result;
+		return true;
 	});
 }
 
 function renameKey(key: { id: string; name: string }) {
+	let name = '';
 	return run(async isCurrent => {
-		const name = await os.inputText({ title: $locale.value.sfc.keyName, default: key.name, minLength: 1, maxLength: 30 });
-		if (!isCurrent() || name.canceled || !name.result) return;
-		await misskeyApi('i/security/passkey/rename', { credentialId: key.id, name: name.result });
-		if (isCurrent()) keys.value = keys.value.map(value => value.id === key.id ? { ...value, name: name.result! } : value);
+		await misskeyApi('i/security/passkey/rename', { credentialId: key.id, name });
+		if (isCurrent()) keys.value = keys.value.map(value => value.id === key.id ? { ...value, name } : value);
+	}, true, async () => {
+		const input = await os.inputText({ title: $locale.value.sfc.keyName, default: key.name, minLength: 1, maxLength: 30 });
+		if (input.canceled || !input.result) return false;
+		name = input.result;
+		return true;
 	});
 }
 
 function removeKey(key: { id: string; name: string }) {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', title: key.name, text: $locale.value.sfc.removeKeyWarning });
-		if (!isCurrent() || confirmation.canceled) return;
 		await misskeyApi('i/security/passkey/remove', { credentialId: key.id });
 		if (!isCurrent()) return;
 		// Inform a supporting authenticator only after committed removal of this owned key.
 		const signal = (globalThis.PublicKeyCredential as unknown as { signalUnknownCredential?: (options: { rpId: string; credentialId: string }) => Promise<void> })?.signalUnknownCredential;
 		if (signal) await signal.call(globalThis.PublicKeyCredential, { rpId: window.location.hostname, credentialId: key.id }).catch(() => {});
 		if (isCurrent()) { keys.value = keys.value.filter(value => value.id !== key.id); clearPending(); await refresh(isCurrent); }
-	});
+	}, true, async () => !(await os.confirm({ type: 'warning', title: key.name, text: $locale.value.sfc.removeKeyWarning })).canceled);
 }
 
 function enableMfa() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.enableWarning });
-		if (!isCurrent() || confirmation.canceled) return;
 		const value = await misskeyApi('i/security/passkey/mfa/enable', { acknowledged: true });
 		if (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); }
-	});
+	}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.enableWarning })).canceled);
 }
 
 function disableMfa() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning });
-		if (!isCurrent() || confirmation.canceled) return;
 		await misskeyApi('i/security/passkey/mfa/disable', { acknowledged: true });
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
-	});
+	}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning })).canceled);
 }
 
 function setPasswordless(enabled: boolean) {
@@ -196,8 +200,6 @@ function setPasswordless(enabled: boolean) {
 
 function disablePassword() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disablePasswordWarning });
-		if (!isCurrent() || confirmation.canceled) return;
 		const pending = await misskeyApi('i/security/password-login/disable/start', {});
 		if (!isCurrent()) return;
 		nativePending = true;
@@ -206,7 +208,7 @@ function disablePassword() {
 		if (!isCurrent()) return;
 		await misskeyApi('i/security/password-login/disable/complete', { ticket: pending.ticket, credential });
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
-	});
+	}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.disablePasswordWarning })).canceled);
 }
 
 function prepareTotp() {
@@ -223,11 +225,9 @@ function completeTotp() {
 
 function removeTotp() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: state.value?.passkeyMfaEnabled ? $locale.value.sfc.removeTotpWarning : $locale.value.sfc.disableWarning });
-		if (!isCurrent() || confirmation.canceled) return;
 		await misskeyApi('i/security/totp/remove', { confirmDisableMfa: true });
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
-	});
+	}, true, async () => !(await os.confirm({ type: 'warning', text: state.value?.passkeyMfaEnabled ? $locale.value.sfc.removeTotpWarning : $locale.value.sfc.disableWarning })).canceled);
 }
 
 function showCodes(codes: string[]) {
@@ -240,11 +240,9 @@ function showCodes(codes: string[]) {
 function regenerateCodes() {
 	return run(async isCurrent => {
 		clearPending();
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.regenerateWarning });
-		if (!isCurrent() || confirmation.canceled) return;
 		const value = await misskeyApi('i/security/recovery-codes', { regenerate: true });
 		if (isCurrent()) { showCodes(value.backupCodes); await refresh(isCurrent); }
-	});
+	}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.regenerateWarning })).canceled);
 }
 
 watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!currentActor()) leave(); }, { flush: 'sync' });

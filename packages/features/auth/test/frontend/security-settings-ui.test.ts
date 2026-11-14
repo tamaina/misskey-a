@@ -43,6 +43,8 @@ beforeEach(async () => {
 	});
 	vi.clearAllMocks(); fixture.actor.id = 'synthetic-owner'; fixture.actor.token = 'bs_synthetic'; show.value = true;
 	vi.mocked(ensureSudo).mockReset().mockResolvedValue(true);
+	vi.mocked(confirm).mockReset().mockResolvedValue({ canceled: false });
+	vi.mocked(inputText).mockReset().mockResolvedValue({ canceled: false, result: 'Synthetic key' });
 	vi.mocked(startAuthentication).mockReset().mockResolvedValue(credential as never); vi.mocked(startRegistration).mockReset().mockResolvedValue(credential as never);
 	let registered = false;
 	vi.mocked(misskeyApi).mockReset().mockImplementation(async route => {
@@ -166,7 +168,7 @@ test('regeneration confirms invalidation and shows newly issued codes only in th
 	await vi.waitFor(() => expect(modal.textContent).toContain('new-synthetic-code'));
 	expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ text: expect.stringContaining('以前の復旧コードは使えなくなります') }));
 	expect(ensureSudo).toHaveBeenCalledOnce(); expect(confirm).toHaveBeenCalledOnce();
-	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(confirm).mock.invocationCallOrder[0]);
+	expect(vi.mocked(confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
 	const regenerateIndex = vi.mocked(misskeyApi).mock.calls.findIndex(([route]) => route === 'i/security/recovery-codes');
 	expect(vi.mocked(confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(misskeyApi).mock.invocationCallOrder[regenerateIndex]);
 	expect(calls('i/security/recovery-codes')).toHaveLength(1);
@@ -212,7 +214,7 @@ test.each([[false, 0], [false, 1], [true, 1], [true, 0]] as const)('MFA buttons 
 	expect(labels.includes('パスキーによる多要素認証を無効にする')).toBe(enabled);
 });
 
-test.each([false, true])('explicit MFA enable uses sudo and confirmation, showing only new codes=%s', async issueCodes => {
+test.each([false, true])('explicit MFA enable confirms before sudo, showing only new codes=%s', async issueCodes => {
 	vi.mocked(misskeyApi).mockImplementation(async route => {
 		if (route === 'i/security/passkey/mfa/enable') return { backupCodes: issueCodes ? codes : [] } as never;
 		if (route === 'i/security/state') return { ...state, passkeyMfaEnabled: true } as never;
@@ -224,7 +226,7 @@ test.each([false, true])('explicit MFA enable uses sudo and confirmation, showin
 	expect(vi.mocked(confirm).mock.calls[0][0].text).not.toContain('この端末以外のログインはすべて無効になります');
 	expect(vi.mocked(confirm).mock.calls[0][0].text).toContain('パスキーによる多要素認証を有効にしますか');
 	expect(calls('i/security/passkey/mfa/enable')[0][1]).toEqual({ acknowledged: true });
-	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(confirm).mock.invocationCallOrder[0]);
+	expect(vi.mocked(confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
 	expect(vi.mocked(confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(misskeyApi).mock.invocationCallOrder.at(-2)!);
 	expect(startAuthentication).not.toHaveBeenCalled(); expect(calls('i/security/passkey/mfa/start')).toHaveLength(0);
 	if (issueCodes) {
@@ -239,9 +241,10 @@ test.each(['sudo', 'confirm'] as const)('cancelled %s prevents explicit MFA enab
 	if (kind === 'sudo') vi.mocked(ensureSudo).mockResolvedValueOnce(false);
 	else vi.mocked(confirm).mockResolvedValueOnce({ canceled: true });
 	click('パスキーによる多要素認証を有効にする');
-	await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledOnce()); await nextTick();
+	await vi.waitFor(() => expect(confirm).toHaveBeenCalledOnce()); await nextTick();
 	expect(calls('i/security/passkey/mfa/enable')).toHaveLength(0); expect(popup).not.toHaveBeenCalled();
-	if (kind === 'sudo') expect(confirm).not.toHaveBeenCalled();
+	if (kind === 'confirm') expect(ensureSudo).not.toHaveBeenCalled();
+	else expect(ensureSudo).toHaveBeenCalledOnce();
 });
 
 test('explicit MFA disable keeps sudo and confirmation without a session revocation warning', async () => {
@@ -254,7 +257,7 @@ test('explicit MFA disable keeps sudo and confirmation without a session revocat
 	expect(confirm).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ type: 'warning', text: expect.not.stringMatching(/サインアウト|この端末以外|他の端末/) }));
 	expect(vi.mocked(confirm).mock.calls[0][0].text).toContain('この認証方法を無効にしますか');
 	expect(calls('i/security/passkey/mfa/disable')[0][1]).toEqual({ acknowledged: true });
-	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(confirm).mock.invocationCallOrder[0]);
+	expect(vi.mocked(confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
 	expect(startAuthentication).not.toHaveBeenCalled();
 });
 
@@ -290,3 +293,74 @@ test('password-login disable keeps sudo, recovery warning and UV ceremony withou
 	expect(startAuthentication).toHaveBeenCalledExactlyOnceWith({ optionsJSON: { ...options, userVerification: 'required' } });
 	expect(calls('i/security/password-login/disable/complete')[0][1]).toEqual({ ticket: 'disable-ticket', credential });
 });
+
+const dialogActions = [
+	{ label: 'パスキーによる多要素認証を有効にする', route: 'i/security/passkey/mfa/enable', input: false, mfa: false },
+	{ label: 'パスキーによる多要素認証を無効にする', route: 'i/security/passkey/mfa/disable', input: false, mfa: true },
+	{ label: '削除', route: 'i/security/passkey/remove', input: false, mfa: true },
+	{ label: '認証アプリを削除', route: 'i/security/totp/remove', input: false, mfa: true },
+	{ label: 'パスワードによるログインを無効にする', route: 'i/security/password-login/disable/start', input: false, mfa: true },
+	{ label: '復旧コードを再生成', route: 'i/security/recovery-codes', input: false, mfa: true },
+	{ label: 'パスキーを登録', route: 'i/security/passkey/register/start', input: true, mfa: true },
+	{ label: '名前を変更', route: 'i/security/passkey/rename', input: true, mfa: true },
+];
+
+async function prepareDialogAction(action: typeof dialogActions[number]) {
+	show.value = false; await nextTick();
+	const implementation = vi.mocked(misskeyApi).getMockImplementation()!;
+	vi.mocked(misskeyApi).mockImplementation((route, ...args) => route === 'i/security/state'
+		? Promise.resolve({ ...state, passkeyMfaEnabled: action.mfa, totpEnabled: true, passwordlessEnabled: true }) as never
+		: implementation(route, ...args));
+	show.value = true; await nextTick();
+	await vi.waitFor(() => expect(button('パスキーを登録').disabled).toBe(false));
+	click('セキュリティキー・パスキー'); await nextTick();
+	click('セキュリティキー・パスキー');
+	await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
+	click('Synthetic key'); await nextTick();
+	vi.mocked(ensureSudo).mockClear(); vi.mocked(misskeyApi).mockClear();
+}
+
+test.each(dialogActions)('$label runs its dialog before sudo and the API', async action => {
+	await prepareDialogAction(action);
+	click(action.label);
+	await vi.waitFor(() => expect(calls(action.route)).toHaveLength(1));
+	const dialog = vi.mocked(action.input ? inputText : confirm);
+	expect(dialog).toHaveBeenCalledOnce(); expect(ensureSudo).toHaveBeenCalledOnce();
+	expect(dialog.mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
+	const index = vi.mocked(misskeyApi).mock.calls.findIndex(([route]) => route === action.route);
+	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(misskeyApi).mock.invocationCallOrder[index]);
+});
+
+for (const cancel of ['dialog', 'sudo'] as const) {
+	test.each(dialogActions)(`$label stops after cancelled ${cancel}`, async action => {
+		await prepareDialogAction(action);
+		if (cancel === 'sudo') vi.mocked(ensureSudo).mockResolvedValueOnce(false);
+		else if (action.input) vi.mocked(inputText).mockResolvedValueOnce({ canceled: true });
+		else vi.mocked(confirm).mockResolvedValueOnce({ canceled: true });
+		click(action.label); await nextTick();
+		if (cancel === 'sudo') await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledOnce());
+		await vi.waitFor(() => expect(button(action.label).disabled).toBe(false));
+		expect(action.input ? inputText : confirm).toHaveBeenCalledOnce();
+		if (cancel === 'dialog') expect(ensureSudo).not.toHaveBeenCalled();
+		else expect(ensureSudo).toHaveBeenCalledOnce();
+		expect(misskeyApi).not.toHaveBeenCalled();
+		expect(startRegistration).not.toHaveBeenCalled(); expect(startAuthentication).not.toHaveBeenCalled();
+	});
+}
+
+for (const input of [false, true]) {
+	test.each(['leave', 'actor', 'token'] as const)(`%s while ${input ? 'name input' : 'confirmation'} is open prevents sudo and submission`, async kind => {
+		let release!: () => void;
+		if (input) vi.mocked(inputText).mockImplementationOnce(() => new Promise(resolve => { release = () => resolve({ canceled: false, result: 'Delayed name' }); }));
+		else vi.mocked(confirm).mockImplementationOnce(() => new Promise(resolve => { release = () => resolve({ canceled: false }); }));
+		const label = input ? 'パスキーを登録' : 'パスキーによる多要素認証を有効にする';
+		vi.mocked(misskeyApi).mockClear();
+		click(label); click(label);
+		await nextTick(); expect(input ? inputText : confirm).toHaveBeenCalledOnce();
+		if (kind === 'leave') { show.value = false; await nextTick(); show.value = true; await nextTick(); } else if (kind === 'actor') reactive(fixture.actor).id = 'replacement-owner';
+		else reactive(fixture.actor).token = 'replacement-token';
+		await nextTick(); vi.mocked(misskeyApi).mockClear();
+		release(); await nextTick(); await nextTick();
+		expect(ensureSudo).not.toHaveBeenCalled(); expect(misskeyApi).not.toHaveBeenCalled();
+	});
+}
