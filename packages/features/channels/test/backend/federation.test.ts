@@ -250,6 +250,19 @@ test('native Accept consumption and channel cancellation are serialized before c
 });
 
 describe('channel federation freeze lifecycle', () => {
+	test('startup announces migration-frozen published Groups and shuts down its expiry timer', async () => {
+		const f = fixture();
+		const channel = mockDeep<MiChannel>({ id: 'channel123', host: null, isFederationFrozen: true, federationPublicKey: 'public-key' });
+		f.channels.findBy.mockResolvedValue([channel]);
+		const deliver = vi.spyOn(f.service, 'deliverUpdate').mockResolvedValue();
+		try {
+			await f.service.onModuleInit();
+			expect(deliver).toHaveBeenCalledWith(channel);
+		} finally {
+			f.service.onApplicationShutdown();
+		}
+	});
+
 	test('frozen Group discards Create before author import but preserves verified Delete', async () => {
 		const f = fixture();
 		const channel = mockDeep<MiChannel>({ id: 'channel123', uri: groupUri, host: remote.host, isFederated: true, isFederationFrozen: true });
