@@ -12,6 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ $locale.sfc.newPassword }}</template>
 			</MkInput>
 
+			<p>{{ $locale.sfc.resetSessionsWarning }}</p>
 			<MkButton primary @click="save">{{ globalLocale.env.save }}</MkButton>
 		</div>
 	</div>
@@ -137,7 +138,8 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"newPassword": "新しいパスワード",
-	"resetPassword": "パスワードをリセット"
+	"resetPassword": "パスワードをリセット",
+	"resetSessionsWarning": "パスワードを再設定すると、すべての端末のログインが無効になります。"
 }
 </locale>
 

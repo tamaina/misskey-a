@@ -151,11 +151,7 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 						// AUTHENTICATION_FAILED
 						// トークンが無効化されていたりアカウントが削除されたりしている
 						if (forceShowDialog || $i && (token === $i.token || id === $i.id)) {
-							await alert({
-								type: 'error',
-								title: FeatureLocaleMessages.$locale.tokenRevoked,
-								text: FeatureLocaleMessages.$locale.tokenRevokedDescription,
-							});
+							await showInvalidLoginNotice();
 						}
 					} else {
 						credentialRejected = false;
@@ -222,7 +218,31 @@ export function updateCurrentAccountPartial(accountData: Partial<Misskey.entitie
 	miLocalStorage.setItem('account', JSON.stringify($i));
 }
 
-export async function refreshCurrentAccount() {
+let invalidLoginNotice: Promise<void> | undefined;
+let rejectedAccountCleanup: Promise<void> | undefined;
+
+function showInvalidLoginNotice() {
+	return invalidLoginNotice ??= alert({
+		type: 'error',
+		title: FeatureLocaleMessages.$locale.tokenRevoked,
+		text: FeatureLocaleMessages.$locale.tokenRevokedDescription,
+	}).finally(() => { invalidLoginNotice = undefined; });
+}
+
+/** i/signout already confirmed invalid credentials; another network request is unnecessary. */
+export async function rejectCurrentAccount() {
+	await showInvalidLoginNotice();
+	await removeRejectedCurrentAccount();
+}
+
+let currentAccountRefresh: Promise<void> | undefined;
+
+export function refreshCurrentAccount() {
+	if (rejectedAccountCleanup) return rejectedAccountCleanup;
+	return currentAccountRefresh ??= refreshAccount().finally(() => { currentAccountRefresh = undefined; });
+}
+
+async function refreshAccount() {
 	if (!$i) return;
 	const me = $i;
 	return fetchAccount($i.token, $i.id).then(async account => {
@@ -233,17 +253,35 @@ export async function refreshCurrentAccount() {
 		if (currentAccount) await addAccount(host, currentAccount, me.token);
 	}).catch(async reason => {
 		if (reason === isCredentialRejected) {
-			rejectedCredentials.set(host + '/' + me.id, me.token);
-			// Load alternatives before removal so an IDB fallback cannot restore the rejected account.
-			await loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));
-			await removeAccount(host, me.id);
-			if (Object.keys(store.s.accountTokens).length > 0) {
-				await login(Object.values(store.s.accountTokens)[0]);
-			} else {
-				await signout('server-rejected-credential');
-			}
+			await removeRejectedCurrentAccount();
 		}
 	});
+}
+
+/** Shared cleanup after a precise rejection of the live credential. Never clear other accounts. */
+function removeRejectedCurrentAccount() {
+	return rejectedAccountCleanup ??= cleanRejectedCurrentAccount().finally(() => { rejectedAccountCleanup = undefined; });
+}
+
+async function cleanRejectedCurrentAccount() {
+	if (!$i) return;
+	const me = $i;
+	rejectedCredentials.set(host + '/' + me.id, me.token);
+	await loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));
+	await removeAccount(host, me.id);
+	window.document.cookie = 'token=; Path=/; Max-Age=0; SameSite=Lax';
+	const alternative = Object.entries(store.s.accountTokens).find(([key]) => key.startsWith(host + '/'));
+	if (alternative) {
+		try { await login(alternative[1]); return; } catch { /* Keep saved alternatives available on the login screen. */ }
+	}
+	if (prefer.s.accounts.length === 0 && Object.keys(store.s.accountTokens).length === 0) {
+		await signout('server-rejected-credential');
+	} else {
+		await clearSharedFiles();
+		miLocalStorage.removeItem('account');
+		window.document.cookie = 'token=; Path=/; Max-Age=0; SameSite=Lax';
+		unisonReload('/');
+	}
 }
 
 export async function login(token: AccountWithToken['token'], redirect?: string) {

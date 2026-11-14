@@ -19,6 +19,20 @@ import { lang } from '@features/boot/frontend/shared/config.js';
 
 const internationalization = await startComponentLocales(lang, createInternationalization, setActiveInternationalization);
 
+// Validate the cached account before authenticated UI initialization can fail.
+const { refreshCurrentAccount } = await import('@features/auth/frontend/accounts.js');
+const { isInvalidCredential } = await import('@features/auth/frontend/credential-rejection.js');
+const bootRejection = window.onunhandledrejection;
+window.onunhandledrejection = event => {
+	if (isInvalidCredential(event.reason)) {
+		event.preventDefault();
+		void refreshCurrentAccount().catch(() => {});
+		return;
+	}
+	bootRejection?.call(window, event);
+};
+void refreshCurrentAccount().catch(() => {});
+
 const subBootPaths = ['/share', '/auth', '/miauth', '/oauth', '/signup-complete', '/verify-email', '/install-extensions'];
 
 if (subBootPaths.some(i => window.location.pathname === i || window.location.pathname.startsWith(i + '/'))) {

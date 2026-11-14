@@ -7,6 +7,7 @@ import { createApp, defineComponent, h, KeepAlive, nextTick, reactive, ref } fro
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import Settings from '../../frontend/components/MkSecuritySettings.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { inputText, confirm } from '@features/ui/frontend/os.js';
 import { ensureSudo } from '../../frontend/utility/ensure-sudo.js';
 import { startAuthentication, startRegistration, WebAuthnAbortService } from '@simplewebauthn/browser';
 const fixture = vi.hoisted(() => ({ actor: { id: 'synthetic-owner', token: 'bs_synthetic' } }));
@@ -86,4 +87,15 @@ test('authenticator Signal API runs only after owned removal has been accepted',
 	let accept!: () => void; vi.mocked(misskeyApi).mockImplementationOnce(() => new Promise<void>(resolve => { accept = resolve; }) as never);
 	click('削除'); await vi.waitFor(() => expect(calls('i/security/passkey/remove')).toHaveLength(1)); expect(signal).not.toHaveBeenCalled();
 	accept(); await vi.waitFor(() => expect(signal).toHaveBeenCalledOnce()); expect(signal).toHaveBeenCalledWith({ rpId: window.location.hostname, credentialId: 'synthetic-key' });
+});
+
+test('factor changes warn before registration and in existing removal confirmation', async () => {
+	expect(element.textContent).toContain('この端末以外のログインはすべて無効になります');
+	button('パスキーを登録').click();
+	await vi.waitFor(() => expect(inputText).toHaveBeenCalledWith(expect.objectContaining({ text: '登録すると、この端末以外のログインはすべて無効になります。' })));
+	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/security/passkey/register/complete', expect.anything()));
+	button('登録済みのパスキーを表示').click();
+	await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
+	button('削除').click();
+	await vi.waitFor(() => expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ text: expect.stringContaining('この端末以外のログインはすべて無効になります') })));
 });

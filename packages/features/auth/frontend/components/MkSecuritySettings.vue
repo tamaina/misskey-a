@@ -7,6 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #label>{{ $locale.sfc.title }}</template>
 	<div class="_gaps_m">
 		<MkInfo>{{ $locale.sfc.explanation }}</MkInfo>
+		<MkInfo warn>{{ $locale.sfc.otherSessionsWarning }}</MkInfo>
 		<p v-if="!state">{{ $locale.sfc.loading }}</p>
 		<template v-else>
 			<p>{{ state.passkeyMfaEnabled ? $locale.sfc.mfaActive : $locale.sfc.mfaInactive }}</p>
@@ -142,7 +143,7 @@ function loadKeys() {
 
 function registerKey() {
 	return run(async isCurrent => {
-		const name = await os.inputText({ title: $locale.value.sfc.keyName, minLength: 1, maxLength: 30 });
+		const name = await os.inputText({ title: $locale.value.sfc.keyName, text: $locale.value.sfc.registerWarning, minLength: 1, maxLength: 30 });
 		if (!isCurrent() || name.canceled || !name.result) return;
 		const started = await misskeyApi('i/security/passkey/register/start', { name: name.result });
 		if (!isCurrent()) return;
@@ -166,7 +167,7 @@ function renameKey(key: { id: string; name: string }) {
 
 function removeKey(key: { id: string; name: string }) {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', title: key.name, text: $locale.value.sfc.removeKeyWarning });
+		const confirmation = await os.confirm({ type: 'warning', title: key.name, text: $locale.value.sfc.removeKeyWarning + '\n' + $locale.value.sfc.otherSessionsWarning });
 		if (!isCurrent() || confirmation.canceled) return;
 		await misskeyApi('i/security/passkey/remove', { credentialId: key.id });
 		if (!isCurrent()) return;
@@ -196,7 +197,7 @@ function completeActivation() {
 
 function disableMfa() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning });
+		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning + '\n' + $locale.value.sfc.otherSessionsWarning });
 		if (!isCurrent() || confirmation.canceled) return;
 		await misskeyApi('i/security/passkey/mfa/disable', { acknowledged: true });
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
@@ -220,7 +221,7 @@ function setPasswordless(enabled: boolean) {
 
 function disablePassword() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disablePasswordWarning });
+		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.disablePasswordWarning + '\n' + $locale.value.sfc.otherSessionsWarning });
 		if (!isCurrent() || confirmation.canceled) return;
 		const pending = await misskeyApi('i/security/password-login/disable/start', {});
 		if (!isCurrent()) return;
@@ -247,7 +248,7 @@ function completeTotp() {
 
 function removeTotp() {
 	return run(async isCurrent => {
-		const confirmation = await os.confirm({ type: 'warning', text: state.value?.passkeyMfaEnabled ? $locale.value.sfc.removeTotpWarning : $locale.value.sfc.disableWarning });
+		const confirmation = await os.confirm({ type: 'warning', text: (state.value?.passkeyMfaEnabled ? $locale.value.sfc.removeTotpWarning : $locale.value.sfc.disableWarning) + '\n' + $locale.value.sfc.otherSessionsWarning });
 		if (!isCurrent() || confirmation.canceled) return;
 		await misskeyApi('i/security/totp/remove', { confirmDisableMfa: true });
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
@@ -280,6 +281,8 @@ onUnmounted(leave);
 <locale locale="ja-JP" lang="json">
 {
 	"title": "ログインと多要素認証",
+	"otherSessionsWarning": "パスキーの登録・削除、認証アプリの設定・削除、多要素認証やパスキー単独ログイン、パスワードログインの設定を変更すると、この端末以外のログインはすべて無効になります。名前の変更や復旧コードの表示・再生成では無効になりません。",
+	"registerWarning": "登録すると、この端末以外のログインはすべて無効になります。",
 	"explanation": "パスキーは端末やセキュリティキーで使う認証方法です。認証アプリを先に設定しなくても登録できます。登録しただけでは多要素認証は有効になりません。重要な設定には、このログインで5分間有効な本人確認が必要です。",
 	"loading": "設定を読み込んでいます…",
 	"mfaActive": "パスキーによる多要素認証は有効です。",

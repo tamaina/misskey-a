@@ -4,7 +4,7 @@
  */
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { refreshCurrentAccount } from '@features/auth/frontend/accounts.js';
+import { refreshCurrentAccount, rejectCurrentAccount } from '@features/auth/frontend/accounts.js';
 
 const m = vi.hoisted(() => ({
 	account: { id: 'current', username: 'synthetic', token: 'synthetic-current' },
@@ -17,6 +17,7 @@ vi.mock('@features/preferences/frontend/store.js', () => ({ store: m.store }));
 vi.mock('@features/preferences/frontend/preferences.js', () => ({ prefer: m.prefer }));
 vi.mock('@features/preferences/frontend/local-storage.js', () => ({ miLocalStorage: {
 	setItem: (key: string, value: string) => localStorage.setItem(key, value),
+	removeItem: (key: string) => localStorage.removeItem(key),
 } }));
 vi.mock('@features/boot/frontend/shared/config.js', () => ({ apiUrl: '/api', host: 'synthetic.test' }));
 vi.mock('@features/auth/frontend/ts-messages.vue', () => ({ default: { $locale: {
@@ -129,6 +130,35 @@ describe('refresh after a confirmed credential rejection', () => {
 		finish();
 		await refresh;
 		expect(settled).toBe(true);
+	});
+
+	test('concurrent boot, API and stream checks share one dialog and cleanup', async () => {
+		vi.mocked(window.fetch).mockResolvedValue(new Response(JSON.stringify({ error: { id: known[0][1] } }), { status: 401 }));
+		await Promise.all([refreshCurrentAccount(), refreshCurrentAccount(), refreshCurrentAccount()]);
+		expect(window.fetch).toHaveBeenCalledOnce();
+		expect(m.alert).toHaveBeenCalledOnce();
+		expect(m.reload).toHaveBeenCalledOnce();
+	});
+
+	test('saved account without a token survives rejection and remains available on login screen', async () => {
+		m.prefer.s.accounts.push(['synthetic.test', { id: 'other', username: 'other' }]);
+		vi.mocked(window.fetch).mockResolvedValue(new Response(JSON.stringify({ error: { id: known[0][1] } }), { status: 401 }));
+		await refreshCurrentAccount();
+		expect(m.prefer.s.accounts).toEqual([['synthetic.test', { id: 'other', username: 'other' }]]);
+		expect(localStorage.getItem('account')).toBeNull();
+		expect(m.clear).not.toHaveBeenCalled();
+		expect(m.reload).toHaveBeenCalledWith('/');
+	});
+
+	test('signout rejection cleans the rejected account even if the network is now unavailable', async () => {
+		m.prefer.s.accounts.push(['synthetic.test', { id: 'other', username: 'other' }]);
+		vi.mocked(window.fetch).mockRejectedValue(new TypeError('synthetic offline after rejection'));
+		await rejectCurrentAccount();
+		expect(window.fetch).not.toHaveBeenCalled();
+		expect(m.alert).toHaveBeenCalledOnce();
+		expect(m.prefer.s.accounts).toEqual([['synthetic.test', { id: 'other', username: 'other' }]]);
+		expect(m.clear).not.toHaveBeenCalled();
+		expect(localStorage.getItem('account')).toBeNull();
 	});
 
 	test('remaining account is selected and its login is awaited without clearing all accounts', async () => {

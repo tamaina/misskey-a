@@ -226,7 +226,7 @@ test('session password change authorizes once before two new-password entries an
 	await vi.waitFor(() => expect(signout).toHaveBeenCalledWith('credentials-changed'));
 	expect(ensureSudo).toHaveBeenCalledOnce();
 	expect(os.inputText).toHaveBeenCalledTimes(2);
-	expect(os.inputText).toHaveBeenNthCalledWith(1, { title: 'New password', type: 'password', autocomplete: 'new-password', minLength: 1 });
+	expect(os.inputText).toHaveBeenNthCalledWith(1, { title: 'New password', text: 'パスワードを変更すると、現在の端末を含むすべてのログインが無効になります。', type: 'password', autocomplete: 'new-password', minLength: 1 });
 	expect(os.inputText).toHaveBeenNthCalledWith(2, { title: 'Retype new password', type: 'password', autocomplete: 'new-password', minLength: 1 });
 	expect(os.apiWithDialog).toHaveBeenCalledExactlyOnceWith('i/security/password', { newPassword: 'new-password' });
 	expect(os.authenticateDialog).not.toHaveBeenCalled(); expect(startAuthentication).not.toHaveBeenCalled();

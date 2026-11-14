@@ -14,6 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<FormSection first>
 				<template #label><SearchLabel>{{ $locale.sfc.password }}</SearchLabel></template>
 
+				<p v-if="individualSession">{{ $locale.sfc.passwordSessionsWarning }}</p>
 				<SearchMarker>
 					<MkButton primary :disabled="changingPassword" @click="change()">
 						<SearchLabel>{{ $locale.sfc.changePassword }}</SearchLabel>
@@ -106,7 +107,7 @@ async function change() {
 async function collectAndChangePassword(isCurrent: () => boolean) {
 	if (individualSession.value) {
 		if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
-		const password = await ownedInputText({ title: $locale.value.sfc.newPassword, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
+		const password = await ownedInputText({ title: $locale.value.sfc.newPassword, text: $locale.value.sfc.passwordSessionsWarning, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
 		if (!isCurrent() || password.canceled || !password.result) return;
 		const repeated = await ownedInputText({ title: $locale.value.sfc.newPasswordRetype, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
 		if (!isCurrent() || repeated.canceled || !repeated.result) return;
@@ -402,6 +403,7 @@ definePage(() => ({
 	"securityBanner": "パスワード、ログイン方法、認証アプリ、パスキーなどアカウントのセキュリティに関する設定を行えます。",
 	"password": "パスワード",
 	"changePassword": "パスワードを変更",
+	"passwordSessionsWarning": "パスワードを変更すると、現在の端末を含むすべてのログインが無効になります。",
 	"changePasswordWithPasskey": "パスキーでパスワードを変更",
 	"signinHistory": "ログイン履歴",
 	"regenerateLoginTokenWithPasskey": "パスキーでログイントークンを再生成",
