@@ -2,6 +2,7 @@
 	"compilerOptions": {
 		"paths": {
 			"vue": ["./node_modules/vue"],
+			"vue/server-renderer": ["./node_modules/vue/server-renderer/index.d.ts"],
 			"vue/*": ["./node_modules/vue/*"],
 			"postal-mime": ["./node_modules/postal-mime"],
 			"@modelcontextprotocol/sdk/server/index.js": ["./node_modules/@modelcontextprotocol/sdk/dist/esm/server/index.d.ts"],
