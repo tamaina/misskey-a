@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #icon><i :class="agent.icon"></i></template>
 							<template #label>{{ agent.label ?? $locale.sfc.unknownAgent }}</template>
 							<template #caption>
-								{{ (session ? session.lastIp : item.ip) || $locale.sfc.unknown }} ·
+								{{ (session?.lastIp ?? item.ip) || $locale.sfc.unknown }} ·
 								<template v-if="session">{{ $locale.sfc.used }} <MkTime :time="session.lastUsedAt"/></template>
 								<MkTime v-else :time="item.createdAt"/>
 							</template>
@@ -30,18 +30,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<div>{{ $locale.sfc.created }} <MkTime :time="item.createdAt"/></div>
 								<template v-if="session">
 									<MkButton v-if="!session.revokedAt" danger :disabled="busy" @click="revoke(session)">{{ session.current ? $locale.sfc.signout : $locale.sfc.revoke }}</MkButton>
-									<FormSection>
-										<template #label>{{ $locale.sfc.history }}</template>
-										<MkPagination :paginator="sessionHistory(session.id)" withControl :forceDisableInfiniteScroll="true">
-											<template #default="{ items: ips }">
+									<MkPagination :paginator="sessionHistory(session.id)" withControl :forceDisableInfiniteScroll="true">
+										<template #empty></template>
+										<template #default="{ items: ips }">
+											<FormSection v-if="ips.length">
+												<template #label>{{ $locale.sfc.history }}</template>
 												<div v-for="ip in ips" :key="ip.id" class="_gaps_s">
 													<div><code>{{ ip.ip }}</code></div>
 													<div>{{ $locale.sfc.ipFirstSeen }} <MkTime :time="ip.createdAt"/></div>
 													<div>{{ $locale.sfc.ipLastSeen }} <MkTime :time="ip.lastSeenAt"/></div>
 												</div>
-											</template>
-										</MkPagination>
-									</FormSection>
+											</FormSection>
+										</template>
+									</MkPagination>
 								</template>
 							</div>
 						</MkFolder>

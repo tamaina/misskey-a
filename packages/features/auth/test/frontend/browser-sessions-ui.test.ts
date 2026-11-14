@@ -15,7 +15,7 @@ vi.mock('@features/auth/frontend/signout.js', () => ({ signout: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({ confirm: vi.fn(async () => ({ canceled: false })) }));
 vi.mock('@features/ui/frontend/components/MkButton.vue', () => ({ default: defineComponent({ props: ['disabled'], setup: (props, { slots }) => () => h('button', { disabled: props.disabled }, slots.default?.()) }) }));
 vi.mock('@features/ui/frontend/components/MkInfo.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('aside', slots.default?.()) }) }));
-vi.mock('@features/ui/frontend/components/form/section.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('section', slots.default?.()) }) }));
+vi.mock('@features/ui/frontend/components/form/section.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('section', [slots.label?.(), slots.default?.()]) }) }));
 vi.mock('@features/ui/frontend/components/MkFolder.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => {
 	const opened = ref(false);
 	return () => h('article', [h('button', { onClick: () => { opened.value = !opened.value; } }, [slots.icon?.(), h('strong', slots.label?.()), slots.caption?.(), h('small', slots.suffix?.())]), opened.value ? slots.default?.() : null]);
@@ -113,4 +113,32 @@ test('one newest-first signin list renders session folders, UA folders and plain
 	await vi.waitFor(() => expect(folders[1].textContent).toContain('このログインからサインアウト'));
 	[...folders[1].querySelectorAll('button')].find(button => button.textContent === 'このログインからサインアウト')!.click();
 	await vi.waitFor(() => expect(signout).toHaveBeenCalledOnce());
+});
+
+test('session header falls back to signin IP and empty IP history has no heading or observation labels', async () => {
+	vi.mocked(misskeyApi).mockImplementation(async route => {
+		if (route === 'i/signin-history') return [{
+			id: 'signin1', createdAt: '2026-10-01T00:00:00.000Z', ip: '192.0.2.9', headers: {}, success: true,
+			browserSessionId: 'session1', browserSession: {
+				id: 'session1', current: true, createdAt: '2026-10-01T00:00:00.000Z', lastUsedAt: '2026-10-02T00:00:00.000Z',
+				lastIp: null, lastUserAgent: null, revokedAt: null,
+			},
+		}] as never;
+		if (route === 'i/session-ips') return [] as never;
+		throw new Error(`Unexpected synthetic route ${route}`);
+	});
+	const element = window.document.createElement('div');
+	app = createApp(Sessions); app.use(internationalization);
+	app.component('MkTime', defineComponent({ props: ['time'], setup: props => () => h('time', String(props.time)) }));
+	app.mount(element);
+	await vi.waitFor(() => expect(element.querySelector('article')).not.toBeNull());
+	const folder = element.querySelector('article')!;
+	expect(folder.querySelector('button')?.textContent).toContain('192.0.2.9');
+	expect(folder.querySelector('button')?.textContent).not.toContain('記録なし');
+	folder.querySelector('button')!.click();
+	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/session-ips', expect.objectContaining({ sessionId: 'session1' })));
+	expect(folder.textContent).not.toContain('このセッションの IP 履歴');
+	expect(folder.textContent).not.toContain('初回確認:');
+	expect(folder.textContent).not.toContain('最終確認:');
+	expect(folder.textContent).not.toContain('undefined');
 });

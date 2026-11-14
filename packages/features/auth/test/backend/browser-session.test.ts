@@ -9,6 +9,7 @@ import { FindOperator, IsNull, type SelectQueryBuilder } from 'typeorm';
 import { describe, expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
+import { MiSignin } from '../../backend/models/Signin.js';
 import type { MiUserIp } from '../../backend/models/UserIp.js';
 import type { BrowserSessionsRepository, MiBrowserSession, MiUser } from '@features/persistence/backend/repositories/models.js';
 
@@ -28,7 +29,10 @@ function fixture() {
 	const repository = mockDeep<BrowserSessionsRepository>();
 	const rows = new Map<string, MiBrowserSession>();
 	const ips = mockDeep<SelectQueryBuilder<MiUserIp>>();
-	repository.manager.getRepository.mockReturnValue({ createQueryBuilder: () => ips } as never);
+	const signins = mockDeep<SelectQueryBuilder<MiSignin>>();
+	repository.manager.getRepository.mockImplementation(entity => ({ createQueryBuilder: () => entity === MiSignin ? signins : ips }) as never);
+	signins.select.mockReturnValue(signins); signins.distinctOn.mockReturnValue(signins); signins.where.mockReturnValue(signins); signins.andWhere.mockReturnValue(signins);
+	signins.orderBy.mockReturnValue(signins); signins.addOrderBy.mockReturnValue(signins); signins.getMany.mockResolvedValue([]);
 	ips.select.mockReturnValue(ips); ips.distinctOn.mockReturnValue(ips); ips.where.mockReturnValue(ips); ips.andWhere.mockReturnValue(ips);
 	ips.orderBy.mockReturnValue(ips); ips.addOrderBy.mockReturnValue(ips); ips.getMany.mockResolvedValue([]);
 	let sequence = 0;
@@ -56,7 +60,7 @@ function fixture() {
 		});
 	});
 	const service = new BrowserSessionService(repository, { gen: () => `session-${++sequence}` });
-	return { service, repository, rows, ips };
+	return { service, repository, rows, ips, signins };
 }
 
 describe('individual browser session foundation (synthetic persistence only)', () => {
@@ -222,4 +226,19 @@ test('history payload fetch selects only the requested owned sessions', async ()
 	expect(selected.map(row => row.id)).toEqual([first.session.id]);
 	expect(selected[0]).not.toHaveProperty('tokenHash');
 	expect(rows.size).toBe(3);
+});
+
+test('missing user_ip falls back to the latest linked owned signin, preserving logged IPs and null without either', async () => {
+	const { service, ips, signins } = fixture();
+	const logged = await service.issue('alice');
+	const fallback = await service.issue('alice');
+	const empty = await service.issue('alice');
+	ips.getMany.mockResolvedValue([{ browserSessionId: logged.session.id, ip: '192.0.2.4' }] as MiUserIp[]);
+	signins.getMany.mockResolvedValue([{ browserSessionId: fallback.session.id, ip: '192.0.2.5' }] as MiSignin[]);
+	expect((await service.listOwned('alice')).map(row => row.lastIp)).toEqual(['192.0.2.4', '192.0.2.5', null]);
+	expect(signins.where).toHaveBeenCalledWith('signin.userId = :userId', { userId: 'alice' });
+	expect(signins.andWhere).toHaveBeenCalledWith('signin.browserSessionId IN (:...ids)', { ids: [fallback.session.id, empty.session.id] });
+	expect(signins.distinctOn).toHaveBeenCalledWith(['signin.browserSessionId']);
+	expect(signins.orderBy).toHaveBeenCalledWith('signin.browserSessionId');
+	expect(signins.addOrderBy).toHaveBeenCalledWith('signin.id', 'DESC');
 });

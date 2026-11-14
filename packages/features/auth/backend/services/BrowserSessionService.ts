@@ -8,6 +8,7 @@ import { In, IsNull, LessThanOrEqual } from 'typeorm';
 import type { FindOptionsSelect } from 'typeorm';
 import type { BrowserSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
+import { MiSignin } from '../models/Signin.js';
 import { MiUserIp } from '../models/UserIp.js';
 import { MiBrowserSession } from '../models/BrowserSession.js';
 import { MiUser } from '@features/users/backend/models/User.js';
@@ -95,6 +96,16 @@ export class BrowserSessionService {
 			.andWhere('ip.browserSessionId IN (:...ids)', { ids: sessions.map(session => session.id) })
 			.orderBy('ip.browserSessionId').addOrderBy('ip.lastSeenAt', 'DESC').addOrderBy('ip.id', 'DESC').getMany();
 		const lastIps = new Map(latest.map(row => [row.browserSessionId, row.ip]));
+		const missingIds = sessions.filter(session => !lastIps.has(session.id)).map(session => session.id);
+		if (missingIds.length > 0) {
+			// Signin IDs are chronological, matching latestPerSession in signin-history.
+			const signins = await this.browserSessionsRepository.manager.getRepository(MiSignin).createQueryBuilder('signin')
+				.select(['signin.browserSessionId', 'signin.ip']).distinctOn(['signin.browserSessionId'])
+				.where('signin.userId = :userId', { userId })
+				.andWhere('signin.browserSessionId IN (:...ids)', { ids: missingIds })
+				.orderBy('signin.browserSessionId').addOrderBy('signin.id', 'DESC').getMany();
+			for (const signin of signins) lastIps.set(signin.browserSessionId, signin.ip);
+		}
 		return sessions.map(session => ({ ...session, lastIp: lastIps.get(session.id) ?? null }));
 	}
 
