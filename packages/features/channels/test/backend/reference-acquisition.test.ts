@@ -157,7 +157,7 @@ test('the real ap/show procedure can acquire a public Note before resolving or f
 	const services = mockDeep<ApiServices<ApiActor>>();
 	services.authenticate.mockResolvedValue([{ id: 'viewer', isSuspended: false, movedToUri: null }, null]);
 	services.limitActor.mockReturnValue(null);
-	const client = createProcedureClient(createApShowProcedure({ utilityService: f.utility, userEntityService: mockDeep(), noteEntityService: serializer, apResolverService: f.resolvers, apDbResolverService: { getUserFromApId: async () => null, getNoteFromApId: async () => null }, apPersonService: mockDeep(), apNoteService: f.importer }), { context: { services, credential: 'fixture', ip: '127.0.0.1', headers: {} } });
+	const client = createProcedureClient(createApShowProcedure({ usersRepository: { findOneBy: async () => null }, utilityService: f.utility, userEntityService: mockDeep(), noteEntityService: serializer, apResolverService: f.resolvers, apDbResolverService: { getUserFromApId: async () => null, getNoteFromApId: async () => null }, apPersonService: mockDeep(), apNoteService: f.importer }), { context: { services, credential: 'fixture', ip: '127.0.0.1', headers: {} } });
 	expect(await client({ uri: noteUri })).toMatchObject({ type: 'Note', object: { channelId: 'remote-channel', userId: 'author' } });
 	assertNoSubscription(f);
 });

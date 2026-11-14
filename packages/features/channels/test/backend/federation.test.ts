@@ -17,7 +17,7 @@ import type { MiChannel } from '../../backend/models/Channel.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { ChannelsRepository, ChannelFollowingsRepository, UsersRepository, NotesRepository, FollowingsRepository } from '@features/persistence/backend/repositories/models.js';
-import type { IAnnounce, ICreate, IObject } from '@features/federation/backend/protocol/type.js';
+import type { IAnnounce, IDelete, ICreate, IObject } from '@features/federation/backend/protocol/type.js';
 import type { ApResolverService, Resolver } from '@features/federation/backend/services/ApResolverService.js';
 import type { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import type { QueueService } from '@features/runtime/backend/services/QueueService.js';
@@ -282,7 +282,7 @@ describe('channel federation freeze lifecycle', () => {
 		f.moduleRef.get.mockReturnValue({ delete: deleteNote });
 		const deletion: IAnnounce = {
 			type: 'Announce', actor: groupUri, audience: groupUri, to: [PUBLIC],
-			object: { type: 'Delete', actor: authorUri, audience: groupUri, object: noteUri },
+			object: { type: 'Delete', actor: authorUri, audience: groupUri, object: noteUri } as IDelete,
 		};
 		expect(await f.service.receiveAnnounce(remote, deletion)).toBe('ok: Group note deleted');
 		expect(deleteNote).toHaveBeenCalledWith(author, note);
