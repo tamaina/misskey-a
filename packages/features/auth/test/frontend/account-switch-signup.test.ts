@@ -20,7 +20,7 @@ const m = vi.hoisted(() => ({
 	},
 	prefer: { s: { accounts: [] as [string, { id: string; username: string }][] }, commit: vi.fn() },
 	local: new Map<string, string>(),
-	files: vi.fn(), get: vi.fn(), reload: vi.fn(), post: vi.fn(), popup: vi.fn(), signout: vi.fn(),
+	files: vi.fn(), get: vi.fn(), reload: vi.fn(), post: vi.fn(), popup: vi.fn(), signout: vi.fn(), alert: vi.fn(),
 }));
 vi.mock('@features/auth/frontend/i.js', () => ({ $i: m.account }));
 vi.mock('@features/preferences/frontend/store.js', () => ({ store: m.store }));
@@ -33,7 +33,7 @@ vi.mock('@@/js/shared-files.js', () => ({ clearSharedFiles: m.files }));
 vi.mock('@features/auth/frontend/signout.js', () => ({ signout: m.signout }));
 vi.mock('@features/runtime/frontend/utility/idb-proxy.js', () => ({ get: m.get }));
 vi.mock('@features/runtime/frontend/utility/unison-reload.js', () => ({ unisonReload: m.reload, reloadChannel: { postMessage: m.post } }));
-vi.mock('@features/ui/frontend/os.js', () => ({ popup: m.popup, waiting: vi.fn(), popupMenu: vi.fn(), success: vi.fn(), alert: vi.fn() }));
+vi.mock('@features/ui/frontend/os.js', () => ({ popup: m.popup, waiting: vi.fn(), popupMenu: vi.fn(), success: vi.fn(), alert: m.alert }));
 
 const KEY_MAIN = 'example.test/main';
 const SUB = { id: 'sub', username: 'sub' };
@@ -63,6 +63,7 @@ function setup(opts: { mainListed: boolean; mainTokenSaved: boolean }) {
 
 beforeEach(() => {
 	vi.resetAllMocks();
+	m.alert.mockResolvedValue(undefined);
 	m.local.clear();
 	m.files.mockResolvedValue(undefined);
 	m.get.mockImplementation(async () => structuredClone(m.idb));

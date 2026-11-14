@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { defineAsyncComponent, ref } from 'vue';
+import { defineAsyncComponent, nextTick, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { clearSharedFiles } from '@@/js/shared-files.js';
 import { apiUrl, host } from '@features/boot/frontend/shared/config.js';
@@ -104,7 +104,7 @@ export async function removeAccount(host: string, id: AccountWithToken['id']) {
 
 const isCredentialRejected = Symbol('isCredentialRejected');
 
-function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Promise<Misskey.entities.MeDetailed> {
+function fetchAccount(token: string, id?: string, forceShowDialog?: boolean, beforeError?: () => void | Promise<void>): Promise<Misskey.entities.MeDetailed> {
 	return new Promise((done, fail) => {
 		window.fetch(`${apiUrl}/i`, {
 			method: 'POST',
@@ -131,6 +131,7 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 			}))
 			.then(async res => {
 				if ('error' in res) {
+					await beforeError?.();
 					let credentialRejected = true;
 					if (res.error.id === 'a8c724b3-6e9c-4b46-b1a8-bc3ed6258370') {
 						// SUSPENDED
@@ -293,7 +294,7 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 		closed: () => dispose(),
 	});
 
-	const me = await fetchAccount(token, undefined, true).catch(reason => {
+	const me = await fetchAccount(token, undefined, true, async () => { showing.value = false; dispose(); await nextTick(); }).catch(reason => {
 		showing.value = false;
 		throw reason;
 	});
@@ -333,18 +334,29 @@ export async function switchAccount(host: string, id: string) {
 	const { tokens } = await loadAccountCredentials([host + '/' + id]);
 	const token = tokens[host + '/' + id];
 	if (token) {
-		await login(token);
-	} else {
-		const { dispose } = popup(defineAsyncComponent(() => import('@features/auth/frontend/components/MkSigninDialog.vue')), {}, {
-			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
-				await store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
-				await login(res.i);
-			},
-			closed: () => {
-				dispose();
-			},
-		});
+		try { await login(token); return; } catch (reason) {
+			if (reason !== isCredentialRejected) throw reason;
+			// The rejected saved credential says nothing about the live session.
+			const key = host + '/' + id;
+			rejectedCredentials.set(key, token);
+			if (store.s.accountTokens[key] === token) {
+				const tokens = { ...store.s.accountTokens };
+				const infos = { ...store.s.accountInfos };
+				delete tokens[key]; delete infos[key];
+				await store.set('accountTokens', tokens);
+				await store.set('accountInfos', infos);
+			}
+		}
 	}
+	const { dispose } = popup(defineAsyncComponent(() => import('@features/auth/frontend/components/MkSigninDialog.vue')), {}, {
+		done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
+			await store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
+			await login(res.i);
+		},
+		closed: () => {
+			dispose();
+		},
+	});
 }
 
 export async function getAccountMenu(opts: {

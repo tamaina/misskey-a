@@ -4,13 +4,13 @@
  */
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { refreshCurrentAccount, rejectCurrentAccount } from '@features/auth/frontend/accounts.js';
+import { refreshCurrentAccount, rejectCurrentAccount, switchAccount } from '@features/auth/frontend/accounts.js';
 
 const m = vi.hoisted(() => ({
 	account: { id: 'current', username: 'synthetic', token: 'synthetic-current' },
 	store: { r: { accountTokens: { value: {} }, accountInfos: { value: {} } }, s: { enablePreferencesAutoCloudBackup: true, accountTokens: {} as Record<string, string>, accountInfos: {} as Record<string, unknown> }, set: vi.fn() },
 	prefer: { s: { accounts: [] as [string, { id: string; username: string }][] }, commit: vi.fn() },
-	api: vi.fn(), backup: vi.fn(), files: vi.fn(), clear: vi.fn(), reload: vi.fn(), choice: vi.fn(), alert: vi.fn(), suspended: vi.fn(), finish: vi.fn(),
+	api: vi.fn(), backup: vi.fn(), files: vi.fn(), clear: vi.fn(), reload: vi.fn(), choice: vi.fn(), alert: vi.fn(), suspended: vi.fn(), finish: vi.fn(), popup: vi.fn(), dispose: vi.fn(),
 }));
 vi.mock('@features/auth/frontend/i.js', () => ({ $i: m.account }));
 vi.mock('@features/preferences/frontend/store.js', () => ({ store: m.store }));
@@ -32,7 +32,7 @@ vi.mock('@features/runtime/frontend/utility/idb-proxy.js', () => ({ clear: m.cle
 vi.mock('@features/runtime/frontend/utility/unison-reload.js', () => ({ unisonReload: m.reload, reloadChannel: { postMessage: vi.fn() } }));
 vi.mock('@features/notifications/frontend/utility/encode-push-subscription-key.js', () => ({ encodePushSubscriptionKey: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({
-	waiting: () => m.finish, alert: m.alert, popup: vi.fn(() => ({ dispose: vi.fn() })), popupMenu: vi.fn(), success: vi.fn(),
+	waiting: () => m.finish, alert: m.alert, popup: m.popup, popupMenu: vi.fn(), success: vi.fn(),
 }));
 
 beforeEach(() => {
@@ -49,6 +49,7 @@ beforeEach(() => {
 	m.clear.mockReset().mockResolvedValue(undefined);
 	m.backup.mockReset().mockRejectedValue(new Error('Rejected credential cannot back up'));
 	m.api.mockReset().mockRejectedValue(new Error('Rejected credential cannot sign out again'));
+	m.popup.mockReturnValue({ dispose: m.dispose });
 	m.alert.mockResolvedValue(undefined);
 	m.suspended.mockResolvedValue(undefined);
 	localStorage.clear();
@@ -177,4 +178,32 @@ describe('refresh after a confirmed credential rejection', () => {
 		expect(m.api).not.toHaveBeenCalled();
 		expect(m.reload).toHaveBeenCalledWith();
 	});
+});
+
+test('switching to a rejected saved account closes waiting before the notice and keeps the live account', async () => {
+	m.account.id = 'live'; m.account.token = 'synthetic-live';
+	m.store.s.accountTokens = { 'synthetic.test/live': 'synthetic-live' };
+	m.store.s.accountInfos = { 'synthetic.test/live': { id: 'live' } };
+	localStorage.setItem('account', 'synthetic-live'); window.document.cookie = 'token=synthetic-live; Path=/';
+	m.store.s.accountTokens['synthetic.test/revoked'] = 'synthetic-revoked';
+	m.store.s.accountInfos['synthetic.test/revoked'] = { id: 'revoked' };
+	m.store.s.accountTokens['synthetic.test/other'] = 'synthetic-other';
+	m.prefer.s.accounts.push(['synthetic.test', { id: 'revoked', username: 'revoked' }]);
+	vi.mocked(window.fetch).mockResolvedValue(new Response(JSON.stringify({ error: { id: known[0][1] } }), { status: 401 }));
+	m.alert.mockImplementationOnce(async () => {
+		expect(m.dispose).toHaveBeenCalledOnce();
+		expect(m.popup.mock.calls[0][1].showing.value).toBe(false);
+	});
+	await switchAccount('synthetic.test', 'revoked');
+	expect(m.alert).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ title: 'Rejected' }));
+	expect(m.store.s.accountTokens).toEqual({ 'synthetic.test/live': 'synthetic-live', 'synthetic.test/other': 'synthetic-other' });
+	expect(m.store.s.accountInfos).toEqual({ 'synthetic.test/live': { id: 'live' } });
+	expect(m.account).toMatchObject({ id: 'live', token: 'synthetic-live' });
+	expect(localStorage.getItem('account')).toBe('synthetic-live');
+	expect(window.document.cookie).toContain('synthetic-live');
+	expect(m.files).not.toHaveBeenCalled(); expect(m.reload).not.toHaveBeenCalled(); expect(m.api).not.toHaveBeenCalled();
+	// Waiting and then sign-in: the saved account stays selectable without its rejected token.
+	expect(m.popup).toHaveBeenCalledTimes(2);
+	expect(m.popup.mock.calls[1][2]).toHaveProperty('done');
+	expect(m.prefer.s.accounts.some(([, user]) => user.id === 'revoked')).toBe(true);
 });
