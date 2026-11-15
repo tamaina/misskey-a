@@ -355,7 +355,7 @@ test.each(['unacknowledged', 'no-key', 'already-enabled', 'sudo'] as const)('exp
 });
 
 test.each([false, true])('disable then explicit enable retains keys and TOTP=%s, issuing codes only when needed', async totp => {
-	const f = fixture(); f.profile.passkeyMfaEnabled = true; f.profile.twoFactorEnabled = totp;
+	const f = fixture(); f.profile.passkeyMfaEnabled = true; f.profile.twoFactorEnabled = totp; f.profile.usePasswordLessLogin = true;
 	f.profile.twoFactorSecret = totp ? 'keep-totp' : null; f.profile.twoFactorBackupSecret = ['old-code'];
 	await f.service.disablePasskeyMfa(identity, true);
 	expect(f.profiles.update).toHaveBeenLastCalledWith({ userId: identity.userId }, { passkeyMfaEnabled: false, ...(totp ? {} : { twoFactorBackupSecret: null }) });
@@ -363,6 +363,7 @@ test.each([false, true])('disable then explicit enable retains keys and TOTP=%s,
 	expect(f.sessions.update).toHaveBeenCalledTimes(1);
 	expectSessionsPreserved(f);
 	Object.assign(f.profile, f.profiles.update.mock.calls.at(-1)![1]);
+	expect(await f.service.state(identity)).toMatchObject({ passkeyMfaEnabled: false, totpEnabled: totp, passwordlessEnabled: true, passkeyCount: 1 });
 	const enabled = await f.service.enablePasskeyMfa(identity, true);
 	expect(f.sessions.update).toHaveBeenCalledTimes(2);
 	expect(f.sessions.update).toHaveBeenLastCalledWith({ id: identity.browserSession.id, userId: identity.userId }, { sudoPolicyStamp: expect.any(String) });

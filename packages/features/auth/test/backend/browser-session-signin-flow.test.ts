@@ -16,11 +16,11 @@ import type { AuthSessionContext } from '../../backend/session.effects.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import type { Logger } from '../../../runtime/backend/logging/logger.js';
 
-function fixture(twoFactorEnabled = true) {
+function fixture(twoFactorEnabled = true, passkeyMfaEnabled = false) {
 	const deps = mockDeep<SigninFlowDependencies>();
 	const user = mockDeep<MiLocalUser>({ id: 'alice', host: null, isSuspended: false, isDeleted: false });
 	deps.usersRepository.findOneBy.mockResolvedValue(user);
-	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled, twoFactorSecret: twoFactorEnabled ? 'synthetic-secret' : null, passkeyMfaEnabled: false, twoFactorBackupSecret: [], usePasswordLessLogin: false }));
+	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled, twoFactorSecret: twoFactorEnabled ? 'synthetic-secret' : null, passkeyMfaEnabled, twoFactorBackupSecret: [], usePasswordLessLogin: false }));
 	deps.userSecurityKeysRepository.findBy.mockResolvedValue([]);
 	deps.loggerService.getLogger.mockReturnValue(mockDeep<Logger>());
 	deps.rateLimiterService.limit.mockResolvedValue(null);
@@ -53,14 +53,14 @@ test('wrong password and rejected MFA never reach browser session issuance', asy
 });
 
 test('passkey completion also awaits the shared issuer, while rejected credentials issue nothing', async () => {
-	const h = fixture();
+	const h = fixture(true, true);
 	h.deps.userSecurityKeysRepository.findBy.mockResolvedValue([mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: 'alice', publicKey: 'AQID' })]);
 	h.deps.webAuthnService.verifyAuthenticationWithProof.mockImplementation(async (_id, _response, before) => {
 		const key = { id: 'AQID', userId: 'alice', publicKey: 'AQID', userVerified: true, deadline: performance.now() + 90_000 };
 		return { key, expected: await before(key) };
 	});
 	expect(await h.invoke({ password: 'synthetic-password', credential: {} })).toEqual({ finished: true, id: 'alice', i: 'bs_synthetic' });
-	const rejected = fixture();
+	const rejected = fixture(true, true);
 	rejected.deps.userSecurityKeysRepository.findBy.mockResolvedValue([mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: 'alice', publicKey: 'AQID' })]);
 	rejected.deps.webAuthnService.verifyAuthenticationWithProof.mockResolvedValue(null);
 	await rejected.invoke({ password: 'synthetic-password', credential: {} });

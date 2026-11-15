@@ -13,11 +13,11 @@ import type { AuthenticationProgressBinding, AuthenticationProgressMetadata } fr
 import type { SigninProgressChallenge } from '../../backend/signin-progress.schema.js';
 import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
 
-function harness(keys = false, totp = true) {
+function harness(keys = false, totp = true, passkeyMfaEnabled = keys && totp) {
 	const deps = mockDeep<SigninFlowDependencies>();
 	deps.config.enableIpRateLimit = false; deps.config.url = 'https://synthetic.example'; deps.config.hostname = 'synthetic.example';
 	const user = mockDeep<NonNullable<Awaited<ReturnType<typeof deps.usersRepository.findOneBy>>>>({ id: 'synthetic', host: null, isSuspended: false, isDeleted: false });
-	const profile = mockDeep<Awaited<ReturnType<typeof deps.userProfilesRepository.findOneByOrFail>>>({ userId: 'synthetic', twoFactorEnabled: totp, usePasswordLessLogin: false, password: bcrypt.hashSync('synthetic-password', 4), twoFactorSecret: 'synthetic-secret' });
+	const profile = mockDeep<Awaited<ReturnType<typeof deps.userProfilesRepository.findOneByOrFail>>>({ userId: 'synthetic', twoFactorEnabled: totp, passkeyMfaEnabled, usePasswordLessLogin: false, password: bcrypt.hashSync('synthetic-password', 4), twoFactorSecret: 'synthetic-secret' });
 	deps.usersRepository.findOneBy.mockResolvedValue(user); deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(profile); deps.userProfilesRepository.findOneBy.mockResolvedValue(profile);
 	deps.userSecurityKeysRepository.countBy.mockResolvedValue(keys ? 1 : 0); deps.userSecurityKeysRepository.findBy.mockResolvedValue(keys ? [{ id: 'AQID', userId: user.id, publicKey: 'AQID', counter: 0 } as never] : []);
 	deps.webAuthnService.initiateAuthentication.mockResolvedValue({ challenge: 'c3ludGhldGlj', rpId: 'synthetic.example', userVerification: 'required' });
@@ -79,4 +79,14 @@ test('factor selection reuses the same server password ticket rather than extend
 	const h = harness(true); await h.invoke(h.request);
 	expect(await h.invoke({ username: 'synthetic', progressMode: 'v1', authenticationProgress: h.challenge })).toMatchObject({ next: 'passkey', authenticationProgress: h.challenge });
 	expect(h.deps.progressStore.create).toHaveBeenCalledOnce(); expect(h.deps.progressStore.claim).not.toHaveBeenCalled();
+});
+
+test('TOTP progress with retained keys and passkey MFA off cannot request or submit passkey 2FA', async () => {
+	const h = harness(true, true, false);
+	expect(await h.invoke(h.request)).toMatchObject({ next: 'totp', availableFactors: ['totp'], authenticationProgress: h.challenge });
+	expect(await h.invoke({ username: 'synthetic', progressMode: 'v1', authenticationProgress: h.challenge, credential: { id: 'AQID' } })).toHaveProperty('error');
+	expect(h.deps.webAuthnService.initiateAuthentication).not.toHaveBeenCalled();
+	expect(h.deps.webAuthnService.verifyAuthenticationWithProof).not.toHaveBeenCalled();
+	expect(h.deps.signinService.signin).not.toHaveBeenCalled();
+	expect(await h.invoke({ username: 'synthetic', progressMode: 'v1', authenticationProgress: h.challenge, token: '123456' })).toHaveProperty('finished', true);
 });

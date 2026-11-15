@@ -14,8 +14,8 @@ export function readMfaPolicy(profile: MfaPolicySnapshot, keyCount: number) {
 	return {
 		required: totpEnabled || independentPasskeyEnabled,
 		totp: totpEnabled && typeof profile.twoFactorSecret === 'string' && profile.twoFactorSecret.length > 0,
-		// Preserve existing TOTP-enabled passkey fallback without promoting orphan keys.
-		passkey: (totpEnabled || independentPasskeyEnabled) && keyCount > 0,
+		// Retained keys are second factors only while passkey MFA is explicitly enabled.
+		passkey: independentPasskeyEnabled && keyCount > 0,
 		independentPasskeyEnabled,
 	};
 }

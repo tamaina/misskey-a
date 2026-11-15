@@ -47,13 +47,22 @@ test('TOTP is the initial choice and the common endpoint receives password plus 
 	expect(misskeyApi).toHaveBeenCalledWith('i/sudo/start', { password: 'synthetic-password', usePasskey: false, token: '123456' }); expect(startAuthentication).not.toHaveBeenCalled();
 	expect([...element.querySelectorAll('input:not([type=radio])')].every(field => !field.value)).toBe(true);
 });
+
+async function enablePasskeyMfa() {
+	app.unmount(); done.mockClear(); state.passkeyMfaEnabled = true;
+	app = createApp({ render: () => h(Dialog, { isCurrent: () => current.value, onDone: done }) }); app.use(internationalization); app.mount(element);
+	await vi.waitFor(() => expect(element.querySelector('form')).not.toBeNull());
+}
+
 test('passkey choice completes only the server-owned sudo ticket', async () => {
+	await enablePasskeyMfa();
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ status: 'passkey-required', ticket: 'synthetic-ticket', options } as never).mockResolvedValueOnce({ expiresAt, grantId } as never);
 	input('password', 'synthetic-password'); [...element.querySelectorAll<HTMLElement>('[aria-checked]')].find(option => option.textContent?.includes('パスキー・セキュリティキー'))!.click(); await nextTick(); submit();
 	await vi.waitFor(() => expect(done).toHaveBeenCalledWith(true)); expect(startAuthentication).toHaveBeenCalledWith({ optionsJSON: options });
 	expect(misskeyApi).toHaveBeenCalledWith('i/sudo/complete', { ticket: 'synthetic-ticket', credential });
 });
 test('cancellation while native proof waits aborts the ceremony and prevents completion', async () => {
+	await enablePasskeyMfa();
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ status: 'passkey-required', ticket: 'synthetic-ticket', options } as never);
 	let release!: (value: never) => void; vi.mocked(startAuthentication).mockReturnValue(new Promise(resolve => { release = resolve; }));
 	input('password', 'synthetic-password'); [...element.querySelectorAll<HTMLElement>('[aria-checked]')].find(option => option.textContent?.includes('パスキー・セキュリティキー'))!.click(); await nextTick(); submit();
@@ -126,4 +135,12 @@ test('a delayed native grant cannot replace the session adopted by a retry', asy
 	expect(adoptBrowserSession).not.toHaveBeenCalled();
 	expect(fixture.actor.token).toBe(replacement);
 	expect(done).toHaveBeenCalledExactlyOnceWith(false);
+});
+
+test('retained keys with passkey MFA off offer only TOTP and recovery for password sudo', () => {
+	const choices = [...element.querySelectorAll<HTMLElement>('[aria-checked]')].map(option => option.textContent);
+	expect(choices).toHaveLength(2);
+	expect(choices.some(text => text?.includes('認証アプリのコード'))).toBe(true);
+	expect(choices.some(text => text?.includes('復旧コード'))).toBe(true);
+	expect(choices.some(text => text?.includes('パスキー・セキュリティキー'))).toBe(false);
 });

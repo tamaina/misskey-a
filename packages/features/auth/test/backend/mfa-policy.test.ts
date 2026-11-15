@@ -12,8 +12,8 @@ test.each([0, 1, 3])('an explicitly disabled passkey policy stays disabled despi
 	expect(readMfaPolicy(inactive, keyCount)).toEqual({ required: false, totp: false, passkey: false, independentPasskeyEnabled: false });
 });
 
-test('legacy TOTP retains passkey fallback without enabling independent policy', () => {
-	expect(readMfaPolicy({ ...inactive, twoFactorEnabled: true, twoFactorSecret: 'synthetic-secret' }, 1)).toEqual({ required: true, totp: true, passkey: true, independentPasskeyEnabled: false });
+test('TOTP with retained keys does not reactivate explicitly disabled passkey MFA', () => {
+	expect(readMfaPolicy({ ...inactive, twoFactorEnabled: true, twoFactorSecret: 'synthetic-secret' }, 1)).toEqual({ required: true, totp: true, passkey: false, independentPasskeyEnabled: false });
 });
 
 test('explicit independent policy requires MFA even with no available key', () => {

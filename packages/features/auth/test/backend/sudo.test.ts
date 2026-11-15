@@ -236,3 +236,27 @@ test('native identity fingerprints the authenticated request credential, not cac
 	context.browserSession = undefined; context.token = null;
 	expect(sudoIdentity(context).nativeCredentialFingerprint).toBe(nativeCredentialFingerprint('authenticated-native'));
 });
+
+test.each([false, true])('TOTP with passkey MFA off rejects passkey sudo start and completion, passwordless=%s', async passwordless => {
+	const f = fixture();
+	Object.assign(f.profile, { twoFactorEnabled: true, twoFactorSecret: 'synthetic-secret', usePasswordLessLogin: passwordless, twoFactorBackupSecret: ['synthetic-backup'] });
+	const keys = [mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: identity.userId, publicKey: 'AQID' })];
+	f.keys.findBy.mockResolvedValue(keys);
+	await expect(f.service.begin(identity, 'password', undefined, true)).rejects.toThrow();
+	expect(f.fresh.begin).not.toHaveBeenCalled();
+	f.fresh.complete.mockResolvedValue({ userId: identity.userId, sessionId: identity.browserSession.id, purpose: 'sudo', policyStamp: freshReauthenticationPolicyStamp(f.profile, keys), expiresAtMonotonic: performance.now() + 90_000 });
+	await expect(f.service.complete(identity, 'ticket', {})).rejects.toThrow();
+	expect(f.sessions.update).not.toHaveBeenCalled();
+	for (const token of ['123456', 'synthetic-backup']) {
+		await expect(f.service.begin(identity, 'password', token)).resolves.toMatchObject({ status: 'elevated' });
+		expect(f.totp.twoFactorAuthenticate).toHaveBeenLastCalledWith(f.profile, token);
+	}
+});
+
+test('password-login-disabled sudo can complete a passwordless primary proof with passkey MFA off', async () => {
+	const f = fixture(); Object.assign(f.profile, { passwordLoginDisabled: true, usePasswordLessLogin: true });
+	const keys = [mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: identity.userId, publicKey: 'AQID' })];
+	f.keys.findBy.mockResolvedValue(keys);
+	f.fresh.complete.mockResolvedValue({ userId: identity.userId, sessionId: identity.browserSession.id, purpose: 'sudo', policyStamp: freshReauthenticationPolicyStamp(f.profile, keys), expiresAtMonotonic: performance.now() + 90_000 });
+	await expect(f.service.complete(identity, 'ticket', {})).resolves.toMatchObject({ status: 'elevated' });
+});

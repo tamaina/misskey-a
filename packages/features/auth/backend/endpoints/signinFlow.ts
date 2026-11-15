@@ -146,6 +146,8 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 			// Establish the server deadline before password verification; continuations never repeat bcrypt.
 			const progressExpiry = stateEnabled && !challenge ? await deps.progressStore.startDeadline(Math.floor(deadline - performance.now())) : undefined;
 			const same = !('passwordLoginDisabled' in profile && profile.passwordLoginDisabled === true) && typeof profile.password === 'string' && profile.password.length > 0 && (challenge !== undefined || (typeof password === 'string' && await bcrypt.compare(password, profile.password)));
+			// Passwordless primary authentication is controlled separately from passkey MFA.
+			const passwordlessPrimary = !same && profile.usePasswordLessLogin === true && keys.length > 0;
 			const fail = async (status?: number, failure?: { id: string; }) => {
 				// Append signin history
 				await deps.signinsRepository.insert({
@@ -192,7 +194,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 
 			async function startProgress() { return binding ? { authenticationProgress: challenge ?? await progress.begin(binding, progressExpiry) } : {}; }
 
-			if (!policy.required) {
+			if (!policy.required && !passwordlessPrimary) {
 				if (process.env.NODE_ENV !== 'test') {
 					if (deps.meta.enableHcaptcha && deps.meta.hcaptchaSecretKey) {
 						await deps.captchaService.verifyHcaptcha(deps.meta.hcaptchaSecretKey, sessionField(body, 'hcaptcha-response')).catch(err => {
@@ -249,7 +251,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 				}
 				return finish(recovery ? 'recovery' : 'totp');
 			} else if (sessionField(body, 'credential')) {
-				if (!policy.passkey || (!same && !profile.usePasswordLessLogin)) {
+				if (!(same ? policy.passkey : passwordlessPrimary)) {
 					return await fail(403, {
 						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
 					});
@@ -272,12 +274,7 @@ export function createSigninFlowProcedure(deps: SigninFlowDependencies) {
 					});
 				}
 				return fail(403, { id: '93b86c4b-72f9-40eb-9815-798928603d1e' });
-			} else if (policy.passkey) {
-				if (!same && !profile.usePasswordLessLogin) {
-					return await fail(403, {
-						id: '932c904e-9460-45b7-9ce6-7ed33be7eb2c',
-					});
-				}
+			} else if (same ? policy.passkey : passwordlessPrimary) {
 				const authRequest = toWebAuthnAuthenticationOptions(await deps.webAuthnService.initiateAuthentication(user.id, !same));
 				reply.code(200);
 				return {

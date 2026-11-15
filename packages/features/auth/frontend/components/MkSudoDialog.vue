@@ -56,7 +56,7 @@ const token = ref('');
 const factor = ref<'totp' | 'passkey' | 'recovery'>('totp');
 const factorOptions = computed<MkRadiosOption<'totp' | 'passkey' | 'recovery'>[]>(() => [
 	...(state.value?.totpEnabled ? [{ value: 'totp' as const, label: $locale.value.sfc.totp, icon: 'ti ti-device-mobile', disabled: busy.value }] : []),
-	...(state.value && state.value.passkeyCount > 0 && supportsPasskey ? [{ value: 'passkey' as const, label: $locale.value.sfc.passkey, icon: 'ti ti-key', disabled: busy.value }] : []),
+	...(state.value?.passkeyMfaEnabled && state.value.passkeyCount > 0 && supportsPasskey ? [{ value: 'passkey' as const, label: $locale.value.sfc.passkey, icon: 'ti ti-key', disabled: busy.value }] : []),
 	{ value: 'recovery', label: $locale.value.sfc.recovery, icon: 'ti ti-lifebuoy', disabled: busy.value },
 ]);
 const busy = ref(false);
@@ -124,7 +124,7 @@ onMounted(async () => {
 		const result = await misskeyApi('i/security/state', {});
 		if (!current()) return;
 		state.value = result;
-		factor.value = result.totpEnabled ? 'totp' : supportsPasskey && result.passkeyCount > 0 ? 'passkey' : 'recovery';
+		factor.value = result.totpEnabled ? 'totp' : result.passkeyMfaEnabled && supportsPasskey && result.passkeyCount > 0 ? 'passkey' : 'recovery';
 	} catch { if (current()) error.value = true; }
 });
 onUnmounted(() => { cancel(); disposed = true; });
