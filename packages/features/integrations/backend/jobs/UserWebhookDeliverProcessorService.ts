@@ -69,7 +69,9 @@ export class UserWebhookDeliverProcessorService {
 		if (job.data.mode === 'mcp') return this.processMcp(job.data);
 		// Older producers can serialize MCP rows as legacy jobs. Fail closed also
 		// when grant cascade deletion has removed the row.
-		const current = await this.webhooksRepository.findOne({ where: { id: job.data.webhookId } });
+		const current = await this.webhooksRepository.findOne({ where: { id: job.data.webhookId },
+			...(job.data.type !== 'chatMessage' ? { select: { mode: true } } : {}),
+		});
 		if (!current || current.mode !== 'legacy') return 'Suppressed';
 		if (job.data.type === 'chatMessage') {
 			if (!job.data.chatGeneration || current.chatGeneration !== job.data.chatGeneration
