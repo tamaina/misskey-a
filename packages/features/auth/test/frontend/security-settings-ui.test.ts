@@ -61,6 +61,28 @@ beforeEach(async () => {
 	click('セキュリティキー・パスキー'); await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
 	vi.mocked(ensureSudo).mockClear();
 });
+
+async function mountFresh(token: string) {
+	if (mounted) { app.unmount(); mounted = false; element.remove(); }
+	fixture.actor.id = 'synthetic-owner'; fixture.actor.token = token;
+	show.value = true;
+	vi.mocked(ensureSudo).mockReset().mockResolvedValue(true);
+	vi.mocked(misskeyApi).mockClear();
+	element = window.document.createElement('div');
+	app = createApp(defineComponent({ setup: () => () => h(KeepAlive, null, { default: () => show.value ? h(Settings) : h('div', 'Other page') }) }));
+	app.use(internationalization); app.component('MkTime', defineComponent({ render: () => null })); app.mount(element); mounted = true;
+	await vi.waitFor(() => expect(element.textContent).toContain('パスキーによる多要素認証は無効です。'));
+}
+
+test.each(['bs_synthetic', '0123456789abcdef'] as const)('opening the page and passkey list does not prompt for sudo with token=%s', async token => {
+	await mountFresh(token);
+	expect(ensureSudo).not.toHaveBeenCalled();
+	expect(calls('i/security/state')).toHaveLength(1);
+	click('セキュリティキー・パスキー');
+	await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
+	expect(ensureSudo).not.toHaveBeenCalled();
+	expect(calls('i/security/keys/list')).toHaveLength(1);
+});
 afterEach(() => { if (mounted) app.unmount(); element.remove(); vi.unstubAllGlobals(); });
 
 function button(text: string) { const value = [...element.querySelectorAll('button')].find(value => value.textContent === text); expect(value).toBeDefined(); return value!; }
@@ -144,6 +166,22 @@ test('passwordless enabling supplies exactly one UV ceremony without a separate 
 	expect(startAuthentication).toHaveBeenCalledExactlyOnceWith({ optionsJSON: { ...options, userVerification: 'required' } });
 	expect(ensureSudo).not.toHaveBeenCalled();
 	expect(calls('i/security/passkey/passwordless/complete')[0][1]).toEqual({ ticket: 'enable-ticket', credential });
+});
+
+test('passwordless enabling on a native token confirms identity first so a session can be issued', async () => {
+	await mountFresh('0123456789abcdef');
+	vi.mocked(misskeyApi).mockImplementation(async route => {
+		if (route === 'i/security/passkey/passwordless/start') return { ticket: 'enable-ticket', options: { ...options, userVerification: 'required' } } as never;
+		if (route === 'i/security/state') return { ...state, passwordlessEnabled: true } as never;
+		return undefined as never;
+	});
+	vi.mocked(ensureSudo).mockClear();
+	const toggle = element.querySelector<HTMLInputElement>('input[type=checkbox]')!;
+	toggle.checked = true; toggle.dispatchEvent(new Event('change'));
+	await vi.waitFor(() => expect(calls('i/security/passkey/passwordless/complete')).toHaveLength(1));
+	expect(ensureSudo).toHaveBeenCalledOnce();
+	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(startAuthentication).mock.invocationCallOrder[0]);
+	expect(startAuthentication).toHaveBeenCalledExactlyOnceWith({ optionsJSON: { ...options, userVerification: 'required' } });
 });
 
 test.each([[true, false], [false, true], [true, true], [false, false]] as const)('recovery regeneration is reachable before TOTP with passkey MFA=%s and TOTP=%s', async (passkeyMfaEnabled, totpEnabled) => {

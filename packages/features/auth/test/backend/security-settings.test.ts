@@ -77,6 +77,19 @@ beforeEach(() => {
 		userVerified: false, credentialDeviceType: 'singleDevice', credentialBackedUp: false, origin: 'https://synthetic.example', rpID: 'synthetic.example' } });
 });
 
+test('state and key list can be read without elevation', async () => {
+	const f = fixture();
+	await expect(f.service.state(identity)).resolves.toEqual({
+		totpEnabled: false, passkeyMfaEnabled: false, passwordlessEnabled: false, passwordLoginDisabled: false,
+		hasVerifiedRecoveryEmail: true, passkeyCount: 1, recoveryCodesRemaining: 0,
+	});
+	expect(f.deps.sudo.transaction).toHaveBeenLastCalledWith(identity, expect.any(Function), false);
+	await expect(f.service.listKeys(identity)).resolves.toEqual([
+		{ id: f.key.id, name: f.key.name, lastUsedAt: f.key.lastUsed.toISOString() },
+	]);
+	expect(f.deps.sudo.transaction.mock.calls.at(-1)).toEqual([identity, expect.any(Function), false]);
+});
+
 test('registration starts without TOTP and does not change policy before a verified credential', async () => {
 	const f = fixture(); f.context.keys = [];
 	const started = await f.service.registerStart(identity, 'New key');

@@ -118,14 +118,13 @@ async function run(action: (isCurrent: () => boolean) => Promise<void>, elevate 
 	try {
 		if (beforeSudo && !await beforeSudo()) return;
 		if (!isCurrent()) return;
-		const needsSession = !ensureSignin().token.startsWith('bs_');
-		if ((elevate || needsSession) && !await ensureSudo(isCurrent, controller.signal)) return;
+		if (elevate && !await ensureSudo(isCurrent, controller.signal)) return;
 		if (isCurrent()) await action(isCurrent);
 	} catch { if (isCurrent()) error.value = true; } finally { controller.abort(); if (sudoAbort === controller) sudoAbort = null; busy.value = false; nativePending = false; }
 }
 
 function loadKeys() {
-	return run(async isCurrent => { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; });
+	return run(async isCurrent => { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; }, false);
 }
 
 function registerKey() {
@@ -197,7 +196,7 @@ function setPasswordless(enabled: boolean) {
 			await misskeyApi('i/security/passkey/passwordless/complete', { ticket: pending.ticket, credential });
 		} else await misskeyApi('i/security/passkey/passwordless', { enabled: false });
 		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
-	}, !enabled);
+	}, !enabled || !ensureSignin().token.startsWith('bs_'));
 }
 
 function disablePassword() {

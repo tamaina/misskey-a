@@ -193,7 +193,7 @@ export class SecuritySettings {
 	async listKeys(identity: SudoIdentity) {
 		return this.deps.sudo.transaction(identity, async ({ keys }) => keys.map(key => ({
 			id: key.id, name: key.name, lastUsedAt: key.lastUsed.toISOString(),
-		})));
+		})), false);
 	}
 	async registerStart(identity: SudoIdentity, name: string) {
 		return this.deps.sudo.transaction(identity, async context => {
