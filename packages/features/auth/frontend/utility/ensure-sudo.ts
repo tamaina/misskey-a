@@ -17,14 +17,21 @@ export async function ensureSudo(isCurrent: () => boolean = () => true, signal?:
 	const status = await misskeyApi('i/sudo/status', {});
 	if (!current()) return false;
 	if (status.active) return true;
-	const confirmed = await new Promise<boolean>(resolve => {
-		const aborted = () => { resolve(false); dispose(); };
+	return await new Promise<boolean>(resolve => {
+		let settled = false;
+		const finish = (value: boolean) => {
+			if (settled) return;
+			settled = true;
+			signal?.removeEventListener('abort', onAbort);
+			resolve(value && current());
+			dispose();
+		};
+		const onAbort = () => finish(false);
 		const { dispose } = popup(defineAsyncComponent(() => import('../components/MkSudoDialog.vue')), { isCurrent: current }, {
-			done: value => { signal?.removeEventListener('abort', aborted); resolve(value); },
-			closed: () => { signal?.removeEventListener('abort', aborted); resolve(false); dispose(); },
+			done: value => finish(value),
+			closed: () => finish(false),
 		});
-		signal?.addEventListener('abort', aborted, { once: true });
-		if (signal?.aborted) aborted();
+		signal?.addEventListener('abort', onAbort, { once: true });
+		if (signal?.aborted) onAbort();
 	});
-	return confirmed && current();
 }

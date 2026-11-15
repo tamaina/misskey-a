@@ -15,7 +15,7 @@ vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: vi.fn(() =>
 import { ensureSudo } from '../../frontend/utility/ensure-sudo.js';
 import { signout } from '../../frontend/signout.js';
 vi.mock('@features/auth/frontend/utility/ensure-sudo.js', () => ({ ensureSudo: vi.fn() }));
-vi.mock('@features/auth/frontend/utility/owned-dialog.js', () => ({ ownedInputText: (props: Parameters<typeof os.inputText>[0]) => os.inputText(props), ownedAuthenticateDialog: (props: Parameters<typeof os.authenticateDialog>[0]) => os.authenticateDialog(props) }));
+vi.mock('@features/auth/frontend/utility/owned-dialog.js', () => ({ ownedInputText: (props: Parameters<typeof os.inputText>[0]) => os.inputText(props), ownedAuthenticateDialog: (props: Parameters<typeof os.authenticateDialog>[0]) => os.authenticateDialog(props), ownedConfirm: (props: Parameters<typeof os.confirm>[0]) => os.confirm(props) }));
 vi.mock('@features/auth/frontend/signout.js', () => ({ signout: vi.fn() }));
 // OIDC child behavior is covered by oidc-flow/api tests, independently of these password dialogs.
 vi.mock('@features/auth/frontend/components/MkSecuritySettings.vue', () => ({ default: defineComponent({ render: () => null }) }));
@@ -37,7 +37,7 @@ vi.mock('@features/ui/frontend/utility/paginator.js', () => ({ Paginator: class 
 vi.mock('@features/auth/frontend/pages/settings/2fa.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/ui/frontend/components/MkPagination.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/ui/frontend/components/MkButton.vue', () => ({
-	default: defineComponent({ setup: (_, { slots }) => () => h('button', slots.default?.()) }),
+	default: defineComponent({ props: ['disabled'], setup: (props, { slots }) => () => h('button', { disabled: props.disabled }, slots.default?.()) }),
 }));
 vi.mock('@features/ui/frontend/components/form/section.vue', () => ({
 	default: defineComponent({ setup: (_, { slots }) => () => h('section', slots.default?.()) }),
@@ -101,13 +101,25 @@ function startChange() {
 	button!.click();
 }
 
+function changeButton() {
+	const button = [...element.querySelectorAll('button')].find(item => item.textContent === 'Change password');
+	expect(button).toBeDefined();
+	return button!;
+}
+
+function expectPageUsable() {
+	expect(changeButton().disabled).toBe(false);
+}
+
 test('a native credential uses the same confirm-then-sudo password change path', async () => {
 	await nextTick();
 	startChange();
 	await vi.waitFor(() => expect(signout).toHaveBeenCalledWith('credentials-changed'));
-	expect(os.inputText).toHaveBeenCalledTimes(2);
+	expect(os.confirm).toHaveBeenCalledOnce();
 	expect(ensureSudo).toHaveBeenCalledOnce();
-	expect(vi.mocked(os.inputText).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
+	expect(os.inputText).toHaveBeenCalledTimes(2);
+	expect(vi.mocked(os.confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
+	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(os.inputText).mock.invocationCallOrder[0]);
 	expect(os.apiWithDialog).toHaveBeenCalledExactlyOnceWith('i/security/password', { newPassword: 'new-password' });
 	expect(os.authenticateDialog).not.toHaveBeenCalled();
 	expect(os.alert).not.toHaveBeenCalled();
@@ -125,27 +137,41 @@ async function startTokenRegeneration() {
 	expect(button).toBeDefined(); button!.click();
 }
 
-test('session password change authorizes once before two new-password entries and awaits accepted cleanup', async () => {
+test('session password change confirms, then authorizes, then collects two new-password entries', async () => {
 	enableSession(); await nextTick(); startChange();
 	await vi.waitFor(() => expect(signout).toHaveBeenCalledWith('credentials-changed'));
+	expect(os.confirm).toHaveBeenCalledExactlyOnceWith({ type: 'question', title: 'Change password', text: 'Do you want to change your password?' });
 	expect(ensureSudo).toHaveBeenCalledOnce();
 	expect(os.inputText).toHaveBeenCalledTimes(2);
-	expect(os.inputText).toHaveBeenNthCalledWith(1, { title: 'New password', text: 'パスワードを変更すると、現在の端末を含むすべてのログインが無効になります。', type: 'password', autocomplete: 'new-password', minLength: 1 });
+	expect(os.inputText).toHaveBeenNthCalledWith(1, { title: 'New password', type: 'password', autocomplete: 'new-password', minLength: 1 });
 	expect(os.inputText).toHaveBeenNthCalledWith(2, { title: 'Retype new password', type: 'password', autocomplete: 'new-password', minLength: 1 });
 	expect(os.apiWithDialog).toHaveBeenCalledExactlyOnceWith('i/security/password', { newPassword: 'new-password' });
 	expect(os.authenticateDialog).not.toHaveBeenCalled(); expect(startAuthentication).not.toHaveBeenCalled();
-	expect(vi.mocked(os.inputText).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
+	expect(vi.mocked(os.confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
+	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(os.inputText).mock.invocationCallOrder[0]);
 });
-test('cancelled common confirmation cannot submit or fall back', async () => {
+test('cancelled confirmation cannot start sudo or collect a password and leaves the page usable', async () => {
+	enableSession(); vi.mocked(os.confirm).mockResolvedValue({ canceled: true }); await nextTick(); startChange();
+	await vi.waitFor(() => expect(os.confirm).toHaveBeenCalledOnce());
+	expect(ensureSudo).not.toHaveBeenCalled(); expect(os.inputText).not.toHaveBeenCalled();
+	expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
+	await vi.waitFor(() => expectPageUsable());
+	startChange(); await vi.waitFor(() => expect(os.confirm).toHaveBeenCalledTimes(2));
+});
+test('cancelled common sudo cannot collect a password and leaves the page usable', async () => {
 	enableSession(); vi.mocked(ensureSudo).mockResolvedValue(false); await nextTick(); startChange();
 	await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledOnce());
-	expect(os.inputText).toHaveBeenCalledTimes(2); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
+	expect(os.confirm).toHaveBeenCalledOnce(); expect(os.inputText).not.toHaveBeenCalled();
+	expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
+	await vi.waitFor(() => expectPageUsable());
 });
-test.each([1, 2])('cancelled new password input %s cannot submit', async stage => {
+test.each([1, 2])('cancelled new password input %s cannot submit and leaves the page usable', async stage => {
 	enableSession(); if (stage === 2) vi.mocked(os.inputText).mockResolvedValueOnce({ canceled: false, result: 'new-password' });
 	vi.mocked(os.inputText).mockResolvedValueOnce({ canceled: true, result: undefined }); await nextTick(); startChange();
 	await vi.waitFor(() => expect(os.inputText).toHaveBeenCalledTimes(stage));
-	expect(ensureSudo).not.toHaveBeenCalled(); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
+	expect(os.confirm).toHaveBeenCalledOnce(); expect(ensureSudo).toHaveBeenCalledOnce();
+	expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
+	await vi.waitFor(() => expectPageUsable());
 });
 test('session mismatch is reported before mutation', async () => {
 	enableSession(); vi.mocked(os.inputText).mockResolvedValueOnce({ canceled: false, result: 'first' }).mockResolvedValueOnce({ canceled: false, result: 'second' });

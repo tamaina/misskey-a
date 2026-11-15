@@ -349,6 +349,8 @@ onMounted(() => {
 
 onUnmounted(() => {
 	alignObserver.disconnect();
+	releaseFocusTrap?.();
+	releaseFocusTrap = null;
 });
 
 defineExpose({

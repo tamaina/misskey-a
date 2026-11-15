@@ -41,3 +41,13 @@ export function ownedAuthenticateDialog(props: { currentPassword?: string } = {}
 		cancelled: () => finish({ canceled: true, result: undefined }), closed: () => finish({ canceled: true, result: undefined }),
 	}));
 }
+
+export function ownedConfirm(props: {
+	type: 'error' | 'info' | 'success' | 'warning' | 'waiting' | 'question';
+	title?: string; text?: string; okText?: string; cancelText?: string;
+}, signal?: AbortSignal): Promise<{ canceled: boolean }> {
+	return owned<true>(signal, finish => popup(MkDialog, { ...props, showCancelButton: true }, {
+		done: value => finish((value ?? { canceled: true, result: undefined }) as MkDialogReturnType<true>),
+		closed: () => finish({ canceled: true, result: undefined }),
+	})).then(value => ({ canceled: value.canceled }));
+}

@@ -129,7 +129,7 @@ test('authenticator Signal API runs only after owned removal has been accepted',
 });
 
 test('registration and key removal have no session revocation warning', async () => {
-	expect(element.textContent).toContain('パスワード変更では、他の端末のログインが無効になります。');
+	expect(element.textContent).not.toContain('パスワード変更では、他の端末のログインが無効になります。');
 	expect(element.textContent).toContain('他の端末のログインやログイントークンは無効になりません。');
 	expect(element.textContent).not.toContain('他の端末はサインアウトします');
 	button('パスキーを登録').click();

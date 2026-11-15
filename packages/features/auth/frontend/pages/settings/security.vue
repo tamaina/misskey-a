@@ -14,7 +14,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<FormSection first>
 				<template #label><SearchLabel>{{ $locale.sfc.password }}</SearchLabel></template>
 
-				<p>{{ $locale.sfc.passwordSessionsWarning }}</p>
 				<SearchMarker>
 					<MkButton primary :disabled="changingPassword" @click="change()">
 						<SearchLabel>{{ $locale.sfc.changePassword }}</SearchLabel>
@@ -51,7 +50,7 @@ import * as os from '@features/ui/frontend/os.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { signout } from '@features/auth/frontend/signout.js';
-import { ownedInputText } from '@features/auth/frontend/utility/owned-dialog.js';
+import { ownedConfirm, ownedInputText } from '@features/auth/frontend/utility/owned-dialog.js';
 import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { isSameLiveCredential } from '@features/auth/frontend/utility/live-account.js';
@@ -78,12 +77,14 @@ async function change() {
 }
 
 async function collectAndChangePassword(isCurrent: () => boolean) {
-	const password = await ownedInputText({ title: $locale.value.sfc.newPassword, text: $locale.value.sfc.passwordSessionsWarning, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
+	const confirmation = await ownedConfirm({ type: 'question', title: $locale.value.sfc.changePassword, text: $locale.value.sfc.confirmPasswordChange }, sudoAbort?.signal);
+	if (!isCurrent() || confirmation.canceled) return;
+	if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+	const password = await ownedInputText({ title: $locale.value.sfc.newPassword, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
 	if (!isCurrent() || password.canceled || !password.result) return;
 	const repeated = await ownedInputText({ title: $locale.value.sfc.newPasswordRetype, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
 	if (!isCurrent() || repeated.canceled || !repeated.result) return;
 	if (password.result !== repeated.result) { await os.alert({ type: 'error', text: $locale.value.sfc.retypedNotMatch }); return; }
-	if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
 	await os.apiWithDialog('i/security/password', { newPassword: password.result });
 	if (isCurrent()) await signout('credentials-changed');
 }
@@ -95,7 +96,7 @@ async function regenerateToken() {
 	sudoAbort = new AbortController();
 	const isCurrent = () => !disposed && generation === ceremonyGeneration && sameActor();
 	try {
-		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.regenerateLoginTokenDescription });
+		const confirmation = await ownedConfirm({ type: 'warning', text: $locale.value.sfc.regenerateLoginTokenDescription }, sudoAbort?.signal);
 		if (!isCurrent() || confirmation.canceled) return;
 		if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
 		await os.apiWithDialog('i/security/regenerate-token', {});
@@ -197,6 +198,7 @@ definePage(() => ({
 	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
 	"password": "Password",
 	"changePassword": "Change password",
+	"confirmPasswordChange": "Do you want to change your password?",
 	"passwordChangeRequiresSignin": "To change your password, please sign in again in the browser.",
 	"signinHistory": "Login history",
 	"regenerateLoginToken": "Regenerate login token",
@@ -273,7 +275,7 @@ definePage(() => ({
 	"securityBanner": "パスワード、ログイン方法、認証アプリ、パスキーなどアカウントのセキュリティに関する設定を行えます。",
 	"password": "パスワード",
 	"changePassword": "パスワードを変更",
-	"passwordSessionsWarning": "パスワードを変更すると、現在の端末を含むすべてのログインが無効になります。",
+	"confirmPasswordChange": "パスワードを変更しますか。",
 	"passwordChangeRequiresSignin": "パスワードを変更するには、ブラウザで再度ログインしてください。",
 	"signinHistory": "セッションに紐付いていない過去のログイン履歴",
 	"regenerateLoginTokenWithPasskey": "パスキーでログイントークンを再生成",

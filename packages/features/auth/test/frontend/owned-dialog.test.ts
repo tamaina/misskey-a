@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { beforeEach, expect, test, vi } from 'vitest';
-import { ownedAuthenticateDialog, ownedInputText } from '../../frontend/utility/owned-dialog.js';
+import { ownedAuthenticateDialog, ownedConfirm, ownedInputText } from '../../frontend/utility/owned-dialog.js';
 const fixture = vi.hoisted(() => ({ dispose: vi.fn(), events: null as null | { done: (value: unknown) => void; closed: () => void; cancelled?: () => void } }));
 vi.mock('@features/ui/frontend/components/MkDialog.vue', () => ({ default: {} }));
 vi.mock('@features/ui/frontend/os.js', () => ({ popup: vi.fn((_component, _props, events) => { fixture.events = events; return { dispose: fixture.dispose }; }) }));
@@ -28,3 +28,22 @@ test('legacy authentication popup follows the same owner cancellation boundary',
 	controller.abort(); fixture.events!.done({ password: 'late-synthetic-secret', token: '123456' });
 	expect(await pending).toEqual({ canceled: true, result: undefined }); expect(fixture.dispose).toHaveBeenCalledOnce();
 });
+
+test('closing the input dialog without done settles as canceled', async () => {
+	const pending = ownedInputText({ type: 'password' });
+	fixture.events!.closed();
+	expect(await pending).toEqual({ canceled: true, result: undefined });
+	expect(fixture.dispose).toHaveBeenCalledOnce();
+});
+
+test('owned confirm follows the same close and abort settlement', async () => {
+	const controller = new AbortController();
+	const pending = ownedConfirm({ type: 'question', text: 'synthetic' }, controller.signal);
+	fixture.events!.closed();
+	expect(await pending).toEqual({ canceled: true });
+	expect(fixture.dispose).toHaveBeenCalledOnce();
+	controller.abort();
+	expect(await ownedConfirm({ type: 'question', text: 'synthetic' }, controller.signal)).toEqual({ canceled: true });
+	expect(popup).toHaveBeenCalledOnce();
+});
+
