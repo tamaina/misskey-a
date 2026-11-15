@@ -7,8 +7,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #label>{{ $locale.sfc.title }}</template>
 	<div class="_gaps_m">
 		<MkInfo>{{ $locale.sfc.description }}</MkInfo>
+		<MkTab
+			v-model="tab"
+			:tabs="[
+				{ key: 'history', label: $locale.sfc.signinHistory },
+				{ key: 'unlinked', label: $locale.sfc.unlinkedSessions },
+			]"
+		/>
 		<p v-if="error" role="alert">{{ $locale.sfc.failed }}</p>
-		<MkPagination v-if="active" :key="generation" :paginator="paginator" withControl :forceDisableInfiniteScroll="true">
+		<MkPagination v-if="active && tab === 'history'" :key="generation" :paginator="paginator" withControl :forceDisableInfiniteScroll="true">
 			<template #default="{ items }">
 				<div class="_gaps_s">
 					<template v-for="{ item, session, userAgent, agent } in displayRows(items)" :key="item.id">
@@ -23,7 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</template>
 		</MkPagination>
-		<MkPagination v-if="active" :key="`unlinked-${generation}`" :paginator="unlinked" withControl :forceDisableInfiniteScroll="true">
+		<MkPagination v-if="active && tab === 'unlinked'" :key="`unlinked-${generation}`" :paginator="unlinked" withControl :forceDisableInfiniteScroll="true">
 			<template #empty></template>
 			<template #default="{ items }">
 				<div class="_gaps_s">
@@ -43,6 +50,7 @@ import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkTab from '@features/ui/frontend/components/MkTab.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import * as os from '@features/ui/frontend/os.js';
@@ -52,6 +60,7 @@ import { isSameLiveCredential } from '../utility/live-account.js';
 import { signout } from '../signout.js';
 
 const ownerId = ensureSignin().id; const ownerToken = ensureSignin().token;
+const tab = ref<'history' | 'unlinked'>('history');
 const createHistory = () => markRaw(new Paginator('i/signin-history', { limit: 5, params: { latestPerSession: true } }));
 let paginator = createHistory();
 const createUnlinked = () => markRaw(new Paginator('i/sessions', { limit: 5, offsetMode: true, params: { unlinkedOnly: true } }));
@@ -109,9 +118,18 @@ onDeactivated(leave); onUnmounted(leave);
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px; overflow-wrap: anywhere; }
 </style>
 
+<locale locale="en-US" lang="json">
+{
+	"signinHistory": "Sign-in history",
+	"unlinkedSessions": "Sessions without a sign-in record"
+}
+</locale>
+
 <locale locale="ja-JP" lang="json">
 {
 	"title": "ログイン履歴",
+	"signinHistory": "ログイン履歴",
+	"unlinkedSessions": "ログイン記録のないセッション",
 	"description": "ログインごとに個別のセッションを発行します。覚えのないログインを失効させると、そのログインの通信と重要操作の本人確認も無効になります。",
 	"legacy": "このログインは旧形式のため一覧の個別失効には対応していません。ログインし直すと新しい個別セッションになります。",
 	"success": "成功",

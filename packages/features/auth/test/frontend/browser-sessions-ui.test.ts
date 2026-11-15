@@ -29,7 +29,7 @@ let app: ReturnType<typeof createApp>;
 beforeAll(async () => { await internationalization.ready; await internationalization.loadLocale('ja-JP'); });
 afterEach(() => { app?.unmount(); vi.clearAllMocks(); });
 
-test('one newest-first signin list renders session folders, UA folders and plain rows with scoped revocation', async () => {
+test('the default signin-history tab renders session folders, UA folders and plain rows with paging and scoped revocation', async () => {
 	const base = { createdAt: '2026-10-01T00:00:00.000Z', lastUsedAt: '2026-10-02T00:00:00.000Z', lastIp: '192.0.2.1', lastUserAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Gecko/20100101 Firefox/145.0', revokedAt: null };
 	vi.mocked(misskeyApi).mockImplementation(async (route, data) => {
 		if (route === 'i/sessions') return [] as never;
@@ -69,7 +69,9 @@ test('one newest-first signin list renders session folders, UA folders and plain
 	expect(folders[0].textContent).toContain(base.lastUsedAt);
 	expect(folders[2].textContent).toContain('失効済み');
 	expect(misskeyApi).toHaveBeenCalledWith('i/signin-history', expect.objectContaining({ limit: 5, latestPerSession: true }));
-	expect(misskeyApi).toHaveBeenCalledWith('i/sessions', expect.objectContaining({ unlinkedOnly: true }));
+	expect([...element.querySelectorAll('button')].find(button => button.textContent?.trim() === 'ログイン履歴')?.disabled).toBe(true);
+	expect([...element.querySelectorAll('button')].find(button => button.textContent?.trim() === 'ログイン記録のないセッション')?.disabled).toBe(false);
+	expect(misskeyApi).not.toHaveBeenCalledWith('i/sessions', expect.anything());
 	expect(element.querySelector('table')).toBeNull();
 	expect(element.textContent).toContain('192.0.2.6');
 	const plain = [...element.querySelectorAll('code')].find(code => code.textContent === '192.0.2.6')!.parentElement!;
@@ -149,24 +151,65 @@ test('session header falls back to signin IP and empty IP history has no heading
 
 test('unlinked sessions with or without UA are independently paginated folders and revocable', async () => {
 	const date = '2026-10-01T00:00:00.000Z';
+	const unlinkedSessions = Array.from({ length: 6 }, (_, index) => ({
+		id: `unlinked${index}`, createdAt: date, lastUsedAt: date, lastIp: index === 0 ? null : `192.0.2.${index + 1}`,
+		lastUserAgent: index === 0 ? null : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Gecko/20100101 Firefox/145.0',
+		revokedAt: null, current: false,
+	}));
 	vi.mocked(misskeyApi).mockImplementation(async (route, data) => {
-		if (route === 'i/signin-history' || route === 'i/session-ips') return [] as never;
+		if (route === 'i/signin-history') return [{ id: 'signin1', createdAt: date, ip: '192.0.2.99', headers: {}, success: true, browserSessionId: null, browserSession: null }] as never;
+		if (route === 'i/session-ips') return [] as never;
 		if (route === 'i/sessions') {
 			expect(data).toMatchObject({ unlinkedOnly: true });
-			return [{ id: 'unlinked', createdAt: date, lastUsedAt: date, lastIp: null, lastUserAgent: null, revokedAt: null, current: false }] as never;
+			if (data && 'offset' in data && data.offset) {
+				expect(data.offset).toBe(5);
+				return unlinkedSessions.slice(5) as never;
+			}
+			return unlinkedSessions.slice(0, 5) as never;
 		}
 		if (route === 'i/sessions/revoke') return undefined as never;
 		throw new Error(`Unexpected route ${route}`);
 	});
 	const element = window.document.createElement('div');
-	app = createApp(Sessions); app.use(internationalization); app.component('MkTime', defineComponent({ render: () => null })); app.mount(element);
-	await vi.waitFor(() => expect(element.querySelectorAll('article')).toHaveLength(1));
+	app = createApp(Sessions); app.use(internationalization); app.component('MkTime', defineComponent({ render: () => null })); app.directive('panel', {}); app.mount(element);
+	await vi.waitFor(() => expect(element.textContent).toContain('192.0.2.99'));
+	expect(element.querySelectorAll('article')).toHaveLength(0);
+	expect(misskeyApi).not.toHaveBeenCalledWith('i/sessions', expect.anything());
+	const historyTab = [...element.querySelectorAll('button')].find(button => button.textContent?.trim() === 'ログイン履歴')!;
+	const unlinkedTab = [...element.querySelectorAll('button')].find(button => button.textContent?.trim() === 'ログイン記録のないセッション')!;
+	unlinkedTab.click();
+	await vi.waitFor(() => expect(element.querySelectorAll('article')).toHaveLength(5));
+	expect(unlinkedTab.disabled).toBe(true);
+	expect(historyTab.disabled).toBe(false);
+	expect(element.textContent).not.toContain('192.0.2.99');
+	expect([...element.querySelectorAll('button')].filter(button => button.textContent === 'older')).toHaveLength(1);
+	expect(vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'i/sessions')).toHaveLength(1);
+	expect(misskeyApi).toHaveBeenCalledWith('i/sessions', expect.objectContaining({ unlinkedOnly: true, limit: 5 }));
+	expect(element.querySelectorAll('article')[1].querySelector('strong')?.textContent).toBe('Firefox 145 / Windows');
+	[...element.querySelectorAll('button')].find(button => button.textContent === 'older')!.click();
+	await vi.waitFor(() => expect(element.querySelectorAll('article')).toHaveLength(6));
+	expect(misskeyApi).toHaveBeenCalledWith('i/sessions', expect.objectContaining({ unlinkedOnly: true, offset: 5, limit: 30 }));
+	expect(element.textContent).toContain('192.0.2.6');
 	const folder = element.querySelector('article')!;
-	expect(folder.textContent).toContain('不明なブラウザー／端末'); expect(folder.textContent).toContain('記録なし');
+	expect(folder.textContent).toContain('不明なブラウザー／端末');
+	expect(folder.textContent).toContain('記録なし');
 	folder.querySelector('button')!.click();
-	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/session-ips', expect.objectContaining({ sessionId: 'unlinked' })));
+	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/session-ips', expect.objectContaining({ sessionId: 'unlinked0' })));
 	[...folder.querySelectorAll('button')].find(button => button.textContent === 'このログインを失効')!.click();
-	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/sessions/revoke', { sessionId: 'unlinked' }));
+	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/sessions/revoke', { sessionId: 'unlinked0' }));
 	await vi.waitFor(() => expect(folder.textContent).toContain('失効済み'));
 	expect(signout).not.toHaveBeenCalled();
+	const historyRequests = vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'i/signin-history').length;
+	const sessionRequests = vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'i/sessions').length;
+	[...element.querySelectorAll('button')].find(button => button.textContent === '更新')!.click();
+	await vi.waitFor(() => expect(element.querySelectorAll('article')).toHaveLength(5));
+	expect(vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'i/signin-history')).toHaveLength(historyRequests + 1);
+	expect(vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'i/sessions')).toHaveLength(sessionRequests + 1);
+	expect(unlinkedTab.disabled).toBe(true);
+	expect(element.textContent).not.toContain('192.0.2.99');
+	historyTab.click();
+	await vi.waitFor(() => expect(element.textContent).toContain('192.0.2.99'));
+	expect(element.querySelectorAll('article')).toHaveLength(0);
+	expect(historyTab.disabled).toBe(true);
+	expect([...element.querySelectorAll('button')].filter(button => button.textContent === 'older')).toHaveLength(1);
 });
