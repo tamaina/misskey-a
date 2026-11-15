@@ -6,12 +6,13 @@
 import { EventEmitter } from 'node:events';
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import { assertFederatedChannelNote } from '../../backend/utility/federation-policy.js';
+import { assertFederatedChannelNote, CHANNEL_FEDERATION_REQUIRES_PUBLIC } from '../../backend/utility/federation-policy.js';
 import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { ChannelFederationService } from '../../backend/services/ChannelFederationService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
 import { ApNoteService } from '@features/federation/backend/services/ApNoteService.js';
 import { NoteCreateService } from '@features/notes/backend/services/NoteCreateService.js';
+import { UtilityService } from '@features/federation/backend/services/UtilityService.js';
 import Connection from '@features/api/backend/transport/stream/Connection.js';
 import type { MiChannel } from '../../backend/models/Channel.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
@@ -338,11 +339,13 @@ test.each([false, true])('inherited frozen-channel remote replies require verifi
 	const service = Object.assign(Object.create(NoteCreateService.prototype), {
 		channelsRepository: channels,
 		channelFederationService: { refreshEligibility: vi.fn(async value => value) },
-		meta: { prohibitedWords: [] },
+		meta: { prohibitedWords: [], sensitiveWords: [] },
+		roleService: { getUserPolicies: async () => ({ canPublicNote: true }) },
+		utilityService: { isKeyWordIncluded: UtilityService.prototype.isKeyWordIncluded },
 		checkProhibitedWordsContain: vi.fn(() => { throw stop; }),
 	}) as NoteCreateService;
 	const data = {
-		reply: mockDeep<MiNote>({ channelId: channel.id }), text: 'reply', visibility: 'public' as const, localOnly: false,
+		reply: mockDeep<MiNote>({ channelId: channel.id, visibility: 'public', localOnly: false }), text: 'reply', visibility: 'public' as const, localOnly: false,
 		approvedHistoricalChannelReference: historical,
 	};
 	const creating = service.create({ id: 'author123', username: 'author', host: 'remote.test', isBot: false, isCat: false }, data);
@@ -355,7 +358,9 @@ test('local frozen-channel posts are marked permanently localOnly before normal 
 	const stop = new Error('reached normal note validation');
 	const service = Object.assign(Object.create(NoteCreateService.prototype), {
 		channelFederationService: { refreshEligibility: vi.fn(async value => value) },
-		meta: { prohibitedWords: [] },
+		meta: { prohibitedWords: [], sensitiveWords: [] },
+		roleService: { getUserPolicies: async () => ({ canPublicNote: true }) },
+		utilityService: { isKeyWordIncluded: UtilityService.prototype.isKeyWordIncluded },
 		checkProhibitedWordsContain: vi.fn(() => { throw stop; }),
 	}) as NoteCreateService;
 	const data = { channel, text: 'local during freeze', visibility: 'public' as const, localOnly: false };
@@ -392,4 +397,95 @@ test('an overlapping eligibility mutation scan is not skipped behind an earlier 
 	expect(update).toHaveBeenCalledOnce();
 	releaseFirst([]);
 	await first;
+});
+
+describe.each(['local', 'remote', 'historical'] as const)('%s federated channel public policies', origin => {
+	function policyFixture() {
+		const channel = mockDeep<MiChannel>({ id: 'channel123', host: origin === 'local' ? null : 'remote.test', isFederated: true, isFederationFrozen: origin === 'historical' });
+		const stop = new Error('reached normal note validation');
+		const validation = vi.fn(() => { throw stop; });
+		const getUserPolicies = vi.fn(async () => ({ canPublicNote: true }));
+		const meta = { sensitiveWords: ['blocked.example', 'bücher.example', '機密'], prohibitedWords: [] };
+		const service = Object.assign(Object.create(NoteCreateService.prototype), {
+			channelFederationService: { refreshEligibility: vi.fn(async value => value) },
+			meta,
+			roleService: { getUserPolicies },
+			utilityService: { isKeyWordIncluded: UtilityService.prototype.isKeyWordIncluded },
+			checkProhibitedWordsContain: validation,
+		}) as NoteCreateService;
+		const author = { id: 'author123', username: 'author', host: channel.host, isBot: false, isCat: false };
+		const data: Parameters<NoteCreateService['create']>[1] = { channel, text: 'clean body', cw: 'clean warning', visibility: 'public' as const, localOnly: false, approvedHistoricalChannelReference: origin === 'historical' };
+		return { service, author, data, channel, stop, validation, getUserPolicies, meta };
+	}
+
+	test.each([
+		'http://%62locked.example/path',
+		'https://BLOCKED.example/',
+		'https://xn--bcher-kva.example/',
+		'https://safe.example/%E6%A9%9F%E5%AF%86',
+		'https://safe.example/?q=%E6%A9%9F%E5%AF%86',
+		'https://safe.example/#%E6%A9%9F%E5%AF%86',
+		'[innocent label](https://%62locked.example/)',
+	])('matches ordinary CW selection and normalized sensitive URL rules for %s', async url => {
+		for (const [cw, text, restricted] of [
+			[null, url, true],
+			['clean warning', url, false],
+			[url, 'clean body', true],
+			['', url, false],
+		] as const) {
+			const f = policyFixture();
+			Object.assign(f.data, { cw, text });
+			const result = f.service.create(f.author, f.data);
+			if (restricted) {
+				await expect(result).rejects.toMatchObject({ id: CHANNEL_FEDERATION_REQUIRES_PUBLIC });
+				expect(f.validation).not.toHaveBeenCalled();
+			} else {
+				await expect(result).rejects.toBe(f.stop);
+				expect(f.data).toMatchObject({ visibility: 'public', localOnly: false });
+			}
+			const ordinary = policyFixture();
+			Object.assign(ordinary.data, { channel: null, cw, text });
+			await expect(ordinary.service.create(ordinary.author, ordinary.data)).rejects.toBe(ordinary.stop);
+			expect(ordinary.data.visibility).toBe(restricted ? 'home' : 'public');
+		}
+	});
+
+	test.each([null, 'clean warning', '機密', ''] as const)('matches ordinary direct sensitive-word regex with CW=%s', async cw => {
+		const f = policyFixture();
+		f.meta.sensitiveWords = ['/^機密$/'];
+		Object.assign(f.data, { cw, text: '機密' });
+		const restricted = cw === null || cw === '機密';
+		if (restricted) {
+			await expect(f.service.create(f.author, f.data)).rejects.toMatchObject({ id: CHANNEL_FEDERATION_REQUIRES_PUBLIC });
+		} else {
+			await expect(f.service.create(f.author, f.data)).rejects.toBe(f.stop);
+		}
+		const ordinary = policyFixture();
+		ordinary.meta.sensitiveWords = f.meta.sensitiveWords;
+		Object.assign(ordinary.data, { channel: null, cw, text: '機密' });
+		await expect(ordinary.service.create(ordinary.author, ordinary.data)).rejects.toBe(ordinary.stop);
+		expect(ordinary.data.visibility).toBe(restricted ? 'home' : 'public');
+	});
+
+	test('does not exempt canonical historical references from canPublicNote', async () => {
+		const f = policyFixture();
+		f.getUserPolicies.mockResolvedValue({ canPublicNote: false });
+		await expect(f.service.create(f.author, f.data)).rejects.toMatchObject({ id: CHANNEL_FEDERATION_REQUIRES_PUBLIC });
+		expect(f.validation).not.toHaveBeenCalled();
+	});
+
+	test('keeps clean permitted posts public and federatable', async () => {
+		const f = policyFixture();
+		await expect(f.service.create(f.author, f.data)).rejects.toBe(f.stop);
+		expect(f.validation).toHaveBeenCalledOnce();
+		expect(f.data).toMatchObject({ visibility: 'public', localOnly: false });
+	});
+
+	test.each([
+		{ localOnly: true, visibility: 'public' },
+		{ localOnly: false, visibility: 'home' },
+	] as const)('does not widen referenced note restrictions: %j', reference => {
+		const f = policyFixture();
+		return expect(f.service.create(f.author, { ...f.data, reply: mockDeep<MiNote>({ channelId: f.channel.id, ...reference }) })).rejects.toMatchObject({ id: CHANNEL_FEDERATION_REQUIRES_PUBLIC });
+	});
 });

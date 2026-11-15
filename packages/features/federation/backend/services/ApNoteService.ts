@@ -26,6 +26,7 @@ import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { UtilityService } from './UtilityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { checkHttps } from '../utility/check-https.js';
+import { CHANNEL_FEDERATION_FROZEN } from '@features/channels/backend/utility/federation-policy.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { getOneApId, getApId, getOneApHrefNullable, validPost, isEmoji, getApType } from '../protocol/type.js';
 import { ApLoggerService } from './ApLoggerService.js';
@@ -284,6 +285,8 @@ export class ApNoteService {
 					if (res == null) return { status: 'permerror' };
 					return { status: 'ok', res };
 				} catch (e) {
+					// Preserve terminal channel rejection through nested quote resolution.
+					if (e instanceof IdentifiableError && e.id === CHANNEL_FEDERATION_FROZEN) throw e;
 					return {
 						status: (e instanceof StatusError && !e.isRetryable) ? 'permerror' : 'temperror',
 					};

@@ -22,7 +22,7 @@ import type { MiUser, MiLocalUser, MiRemoteUser } from '@features/users/backend/
 import type { IPoll } from '../models/Poll.js';
 import { MiPoll } from '../models/Poll.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
-import { assertFederatedChannelNote, CHANNEL_FEDERATION_REQUIRES_PUBLIC } from '@features/channels/backend/utility/federation-policy.js';
+import { assertFederatedChannelNote, CHANNEL_FEDERATION_FROZEN, CHANNEL_FEDERATION_REQUIRES_PUBLIC } from '@features/channels/backend/utility/federation-policy.js';
 import { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import { normalizeTag } from '@features/discovery/backend/utility/normalize-tag.js';
@@ -484,33 +484,35 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 		if (data.channel) data.channel = await this.channelFederationService.refreshEligibility(data.channel);
 		if (user.host != null && data.channel?.isFederationFrozen && !data.approvedHistoricalChannelReference) {
-			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Frozen channels discard incoming contributions.');
+			throw new IdentifiableError(CHANNEL_FEDERATION_FROZEN, 'Frozen channels discard incoming contributions.');
 		}
 		if (data.channel?.isFederated && !data.channel.isFederationFrozen && isCreationRenote(data) && !isCreationQuote(data)) {
 			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Pure Renotes in federated channels are not available in this pilot.');
 		}
 
+		// Historical membership permits acquisition during a freeze, not a bypass of
+		// local public-post policies or restrictions on referenced notes.
+		const requiresPublicChannelNote = data.channel?.isFederated
+			&& (!data.channel.isFederationFrozen || (user.host != null && data.approvedHistoricalChannelReference));
+
 		if (data.createdAt == null) data.createdAt = new Date();
 		if (data.visibility == null) data.visibility = 'public';
 		if (data.localOnly == null) data.localOnly = false;
-		if (data.channel?.isFederated && !data.channel.isFederationFrozen) assertFederatedChannelNote(data, true);
+		if (requiresPublicChannelNote) assertFederatedChannelNote(data, true);
 		if (data.channel != null) data.visibility = 'public';
 		if (data.channel != null) data.visibleUsers = [];
-		if (data.channel?.isFederated && !data.channel.isFederationFrozen) {
-			const publicAllowed = (await this.roleService.getUserPolicies(user.id)).canPublicNote !== false
-				&& !this.utilityService.isKeyWordIncluded(data.cw ?? '', this.meta.sensitiveWords)
-				&& !this.utilityService.isKeyWordIncluded(data.text ?? '', this.meta.sensitiveWords);
-			assertFederatedChannelNote(data, publicAllowed);
-		} else if (data.channel != null && !(user.host != null && data.approvedHistoricalChannelReference)) {
+		if (data.channel != null && !requiresPublicChannelNote && !(user.host != null && data.approvedHistoricalChannelReference)) {
 			data.localOnly = true;
 		}
 
-		if (data.visibility === 'public' && data.channel == null) {
-			const sensitiveWords = this.meta.sensitiveWords;
-			const sensitiveWordsTarget = data.cw ?? data.text ?? '';
-			if (sensitiveWords.length > 0 && this.utilityService.isKeyWordIncluded([sensitiveWordsTarget, ...extractUrlsForKeyWordCheck(sensitiveWordsTarget)].join('\n'), sensitiveWords)) {
-				data.visibility = 'home';
-			} else if ((await this.roleService.getUserPolicies(user.id)).canPublicNote === false) {
+		if (data.visibility === 'public' && (data.channel == null || requiresPublicChannelNote)) {
+			// Decide public eligibility once for both ordinary and channel notes.
+			const publicAllowed = !this.checkSensitiveWordsContain(data)
+				&& (await this.roleService.getUserPolicies(user.id)).canPublicNote !== false;
+			if (requiresPublicChannelNote) {
+				// Channels cannot silently change their public-only scope.
+				assertFederatedChannelNote(data, publicAllowed);
+			} else if (!publicAllowed) {
 				data.visibility = 'home';
 			}
 		}
@@ -607,7 +609,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
-		if (data.channel?.isFederated && !data.channel.isFederationFrozen) assertFederatedChannelNote(data, true);
+		if (requiresPublicChannelNote) assertFederatedChannelNote(data, true);
 
 		if (data.text) {
 			if (data.text.length > DB_MAX_NOTE_TEXT_LENGTH) {
@@ -1270,6 +1272,15 @@ export class NoteCreateService implements OnApplicationShutdown {
 				isFollowerHibernated: true,
 			});
 		}
+	}
+
+	private checkSensitiveWordsContain(data: Pick<Option, 'cw' | 'text'>): boolean {
+		// A CW intentionally hides the body from the public sensitive-word check.
+		// Share this predicate: ordinary posts become home-only, channels reject.
+		const target = data.cw ?? data.text ?? '';
+		return this.meta.sensitiveWords.length > 0 && this.utilityService.isKeyWordIncluded(
+			[target, ...extractUrlsForKeyWordCheck(target)].join('\n'), this.meta.sensitiveWords,
+		);
 	}
 
 	public checkProhibitedWordsContain(content: Parameters<UtilityService['concatNoteContentsForKeyWordCheck']>[0], prohibitedWords?: string[]) {

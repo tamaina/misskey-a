@@ -5,6 +5,8 @@
 
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 
+export const CHANNEL_FEDERATION_FROZEN = '621816a3-dc3b-4214-955a-bd2fa3834022';
+
 export const CHANNEL_FEDERATION_REQUIRES_PUBLIC = '10920128-46cd-4d5d-8e66-6ae1587fab75';
 
 export function assertFederatedChannelNote(data: {

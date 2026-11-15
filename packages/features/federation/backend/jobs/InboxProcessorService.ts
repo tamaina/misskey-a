@@ -22,6 +22,7 @@ import { UtilityService } from '../services/UtilityService.js';
 import { JsonLdError, JsonLdService } from '../services/JsonLdService.js';
 import { ApInboxService } from '../services/ApInboxService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
+import { CHANNEL_FEDERATION_FROZEN } from '@features/channels/backend/utility/federation-policy.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { CollapsedQueue } from '@features/runtime/backend/async/collapsed-queue.js';
 import { MiNote } from '@features/notes/backend/models/Note.js';
@@ -292,6 +293,11 @@ export class InboxProcessorService implements OnApplicationShutdown {
 			}
 		} catch (e) {
 			if (e instanceof IdentifiableError) {
+				if (e.id === CHANNEL_FEDERATION_FROZEN) {
+					// Complete this job: retrying it after an unfreeze would import a
+					// contribution that was rejected while the channel was frozen.
+					return 'skip: frozen channel contribution';
+				}
 				if (e.id === '689ee33f-f97c-479a-ac49-1b9f8140af99') {
 					return 'blocked notes with prohibited words';
 				}

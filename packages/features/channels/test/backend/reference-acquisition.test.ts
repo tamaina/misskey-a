@@ -3,12 +3,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { generateKeyPairSync, sign } from 'node:crypto';
+import type * as Bull from 'bullmq';
 import { createProcedureClient } from '@orpc/server';
 import { expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { ChannelFederationService } from '../../backend/services/ChannelFederationService.js';
 import { ApNoteService } from '@features/federation/backend/services/ApNoteService.js';
 import { ApInboxService } from '@features/federation/backend/services/ApInboxService.js';
+import { InboxProcessorService } from '@features/federation/backend/jobs/InboxProcessorService.js';
+import { NoteCreateService } from '@features/notes/backend/services/NoteCreateService.js';
+import { CHANNEL_FEDERATION_REQUIRES_PUBLIC } from '../../backend/utility/federation-policy.js';
+import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { createApShowProcedure } from '@features/federation/backend/endpoints/ap/show.js';
 import type { ApiActor, ApiServices } from '@features/api/backend/transport/context.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
@@ -255,4 +261,89 @@ test('a frozen Group retains acquisition of a canonical previously public Note w
 	});
 	expect(f.requests).toContain(f.approval.id);
 	assertNoSubscription(f);
+});
+
+/** Real signed inbox -> AP importer -> note creation; only I/O is faked. */
+function frozenReplyFixture() {
+	const f = fixture();
+	const channel = mockDeep<MiChannel>({ id: 'frozen-channel', host: 'a.test', isFederated: true, isFederationFrozen: true });
+	const parentUri = 'https://a.test/notes/parent';
+	f.savedNotes.set(parentUri, mockDeep<MiNote>({ id: 'parent', uri: parentUri, channelId: channel.id, visibility: 'public', localOnly: false, hasPoll: false }));
+	delete f.note.audience;
+	f.note.inReplyTo = parentUri;
+	Object.assign(f.author, { lastFetchedAt: new Date() });
+	f.channels.findOneBy.mockResolvedValue(channel);
+	const validation = vi.fn(() => false);
+	const creator = Object.assign(Object.create(NoteCreateService.prototype), {
+		channelsRepository: f.channels, channelFederationService: { refreshEligibility: async (value: MiChannel) => value },
+		checkProhibitedWordsContain: validation,
+	}) as NoteCreateService;
+	const create = vi.spyOn(creator, 'create');
+	Object.assign(f.importer, { noteCreateService: creator });
+	const inbox = Object.assign(f.inbox, { userEntityService: { isSuspendedEither: () => false } }) as unknown as ApInboxService;
+	const keyId = `${authorUri}#main-key`;
+	const keys = generateKeyPairSync('ed25519');
+	const signingString = '(request-target): post /inbox\nhost: c.test';
+	const signature = sign(null, Buffer.from(signingString), keys.privateKey).toString('base64');
+	const activity: ICreate = { type: 'Create', id: `${noteUri}/reply-activity`, actor: authorUri, object: noteUri };
+	const job = {
+		data: { activity, signature: { scheme: 'Signature', keyId, signingString, params: { keyId, signature, headers: ['(request-target)', 'host'], algorithm: 'hs2019' } } },
+		opts: { attempts: 8, backoff: { type: 'fixed', delay: 10 } },
+	} as Bull.Job<Parameters<InboxProcessorService['process']>[0]['data']>;
+	const processor = Object.assign(Object.create(InboxProcessorService.prototype), {
+		logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+		utilityService: { ...f.utility, toPuny: (value: string) => value, isFederationAllowedHost: () => true },
+		apDbResolverService: { getAuthUserFromApId: async () => ({ user: f.author, key: { keyId, keyPem: keys.publicKey.export({ type: 'spki', format: 'pem' }).toString() } }) },
+		apRequestChart: { inbox: vi.fn() }, federationChart: { inbox: vi.fn() }, meta: {},
+		federatedInstanceService: { fetch: async () => null }, apInboxService: inbox,
+	}) as InboxProcessorService;
+	return { ...f, channel, creator, createNote: create, validation, processor, job };
+}
+
+test('ordinary remote reply inheriting a frozen channel completes the inbox job instead of retrying', async () => {
+	const f = frozenReplyFixture();
+	// A fulfilled processor is terminal for BullMQ even when attempts remain.
+	await expect(f.processor.process(f.job)).resolves.toBe('skip: frozen channel contribution');
+	expect(f.createNote).toHaveBeenCalledOnce();
+	expect(f.createNote.mock.calls[0][1]).toMatchObject({ reply: { channelId: f.channel.id }, approvedHistoricalChannelReference: false });
+	expect(f.savedNotes.has(noteUri)).toBe(false);
+	// No note persistence/publication or normal validation occurred after inheritance.
+	expect(f.validation).toHaveBeenCalledOnce(); // AP content check only, not NoteCreate validation.
+	expect(f.noteCreate).not.toHaveBeenCalled();
+	expect(f.queue.deliverMany).not.toHaveBeenCalled();
+	await vi.waitFor(() => expect(f.locks.size).toBe(0));
+});
+
+test('frozen-channel terminal handling does not swallow transient lookup failures', async () => {
+	const f = frozenReplyFixture();
+	const transient = new Error('temporary channel database failure');
+	f.channels.findOneBy.mockRejectedValueOnce(transient);
+	await expect(f.processor.process(f.job)).rejects.toBe(transient);
+	await vi.waitFor(() => expect(f.locks.size).toBe(0));
+	await expect(f.processor.process(f.job)).resolves.toBe('skip: frozen channel contribution');
+	expect(f.savedNotes.has(noteUri)).toBe(false);
+});
+
+test('frozen-channel terminal handling is limited to the dedicated rejection ID', async () => {
+	const f = frozenReplyFixture();
+	const other = new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'unrelated public policy rejection');
+	f.createNote.mockRejectedValueOnce(other);
+	await expect(f.processor.process(f.job)).rejects.toBe(other);
+});
+
+test.each(['reply', 'quote', 'announce'] as const)('nested %s of a frozen-period ordinary reply also completes without retry', async kind => {
+	const f = frozenReplyFixture();
+	if (kind === 'announce') {
+		f.job.data.activity = { type: 'Announce', id: 'https://a.test/activities/wrapper', actor: authorUri, object: noteUri, to: [PUBLIC] };
+	} else {
+		const wrapperUri = 'https://a.test/notes/wrapper';
+		f.objects.set(wrapperUri, { type: 'Note', id: wrapperUri, attributedTo: authorUri, content: 'wrapper', to: [PUBLIC],
+			...(kind === 'reply' ? { inReplyTo: noteUri } : { _misskey_quote: noteUri }),
+		});
+		(f.job.data.activity as ICreate).object = wrapperUri;
+	}
+	await expect(f.processor.process(f.job)).resolves.toBe('skip: frozen channel contribution');
+	expect(f.savedNotes.size).toBe(1); // Only the pre-existing channel parent.
+	expect(f.noteCreate).not.toHaveBeenCalled();
+	await vi.waitFor(() => expect(f.locks.size).toBe(0));
 });
