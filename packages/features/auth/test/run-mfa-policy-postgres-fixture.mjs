@@ -42,7 +42,6 @@ try {
 		['MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE', 'fresh-email-change-postgres.test.ts'],
 		['MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE', 'fresh-token-regeneration-postgres.test.ts'],
 		['MISSKEY_AUTH_SIGNIN_FIXTURE', 'signin-policy-postgres.test.ts'],
-		['MISSKEY_AUTH_PASSWORD_CHANGE_FIXTURE', 'fresh-password-change-postgres.test.ts'],
 	].filter(([name]) => process.env[name] === '1');
 	if (suites.length > 1) throw new Error('Select only one owned PostgreSQL fixture suite');
 	const include = [suites[0]?.[1] ?? 'mfa-policy-postgres.test.ts'];

@@ -95,7 +95,7 @@ test.each(['session', 'user', 'policy', 'key', 'expired', 'purpose', 'target', '
 	if (kind === 'policy') f.profile.passkeyMfaEnabled = true;
 	if (kind === 'key') f.keys.findBy.mockResolvedValue([]);
 	if (kind === 'expired') f.fresh.complete.mockResolvedValue({ ...f.proof, expiresAtMonotonic: 0 });
-	if (kind === 'purpose') f.fresh.complete.mockResolvedValue({ ...f.proof, purpose: 'change-password' });
+	if (kind === 'purpose') f.fresh.complete.mockResolvedValue({ ...f.proof, purpose: 'regenerate-token' });
 	if (kind === 'target') f.fresh.complete.mockResolvedValue({ ...f.proof, targetStamp: 'a'.repeat(64) });
 	if (kind === 'previous-email') f.profile.email = 'other@example.test';
 	if (kind === 'verification') f.profile.emailVerified = false;

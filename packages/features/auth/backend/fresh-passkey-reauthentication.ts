@@ -36,7 +36,7 @@ export function freshReauthenticationPolicyStamp(profile: MfaPolicySnapshot & Pa
 	])).digest('hex');
 }
 
-/** Purpose-bound verifier; password change is its first runtime caller.
+/** Purpose-bound verifier.
  * Every mutation must recheck this session, policy and deadline under its DB locks.
  * The returned metadata is never a reusable sudo or activation credential.
  */

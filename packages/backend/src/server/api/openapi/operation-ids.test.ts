@@ -50,8 +50,6 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/i/sessions']?.post?.operationId).toBe('post___i___sessions');
 	expect(spec.paths?.['/i/sessions/revoke']?.post?.operationId).toBe('post___i___sessions___revoke');
 	expect(spec.paths?.['/i/signout']?.post?.operationId).toBe('post___i___signout');
-	expect(spec.paths?.['/i/change-password/passkey/start']?.post?.operationId).toBe('post___i___change-password___passkey___start');
-	expect(spec.paths?.['/i/change-password/passkey/complete']?.post?.operationId).toBe('post___i___change-password___passkey___complete');
 	expect(spec.paths?.['/i/regenerate-token/passkey/start']?.post?.operationId).toBe('post___i___regenerate-token___passkey___start');
 	expect(spec.paths?.['/i/regenerate-token/passkey/complete']?.post?.operationId).toBe('post___i___regenerate-token___passkey___complete');
 	expect(spec.paths?.['/i/update-email/passkey/start']?.post?.operationId).toBe('post___i___update-email___passkey___start');
@@ -91,6 +89,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		'/i/security/passkey/register/complete',
 		'/i/security/passkey/mfa/start',
 		'/i/security/passkey/mfa/complete',
+		'/i/security/passkey/mfa/enable',
 		'/i/security/passkey/mfa/disable',
 		'/i/security/passkey/remove',
 		'/i/security/passkey/rename',
@@ -105,13 +104,13 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		'/i/sudo/exit',
 	];
 	const addedSecurityIds = new Set(addedSecurityPaths.map(path => `post___${path.slice(1).replaceAll('/', '___')}`));
-	expect(addedSecurityIds.size).toBe(26);
+	expect(addedSecurityIds.size).toBe(27);
 	for (const path of addedSecurityPaths) {
 		expect(spec.paths?.[path]?.post?.operationId).toBe(`post___${path.slice(1).replaceAll('/', '___')}`);
 	}
 	// Exclude the fifteen deferred SSO routes from the preceding API count.
-	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(483);
-	expect(identifiers).toHaveLength(483 + 26);
+	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(481);
+	expect(identifiers).toHaveLength(481 + 27);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

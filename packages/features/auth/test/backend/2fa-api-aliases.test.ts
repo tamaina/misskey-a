@@ -295,7 +295,7 @@ test('actual portable generator preserves every legacy operation and public sche
 	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreWebhookSchemaBaseline(name, spec.components?.schemas?.[name])), name).toBe(hash);
 	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
 	expect(Object.keys(spec.components?.schemas ?? {}).filter(name => !(name in baseline.schemaHashes))).toEqual(['OrpcDefinition1038']);
-	expect(Object.keys(baseline.paths)).toHaveLength(444);
+	expect(Object.keys(baseline.paths)).toHaveLength(443);
 	for (const [path, operationId] of Object.entries(baseline.paths)) expect(spec.paths?.[path]?.post?.operationId).toBe(operationId);
 	const generatedIds = Object.values(spec.paths ?? {}).map(path => path?.post?.operationId);
 	expect(new Set(generatedIds).size).toBe(generatedIds.length);

@@ -36,8 +36,8 @@ function harness() {
 }
 
 test('all native auth routes retain secure policy enforcement', async () => {
-	expect(Object.keys(authContract)).toHaveLength(83);
-	expect(settingsPaths).toHaveLength(26);
+	expect(Object.keys(authContract)).toHaveLength(81);
+	expect(settingsPaths).toHaveLength(27);
 	for (const path of settingsPaths) expect(authContract[path as keyof typeof authContract]['~orpc'].meta).toMatchObject({ requestName: path, requireCredential: true, secure: true });
 	for (const path of ['i/regenerate-token/passkey/start', 'i/regenerate-token/passkey/complete'] as const) {
 		expect(authContract[path]['~orpc'].meta).toMatchObject({ requestName: path, requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-token-regeneration' } });
@@ -47,8 +47,8 @@ test('all native auth routes retain secure policy enforcement', async () => {
 	}
 	const h = harness();
 	h.services.authenticate.mockResolvedValue([actor, { permission: ['write:account'] }]);
-	await expect(call(h.router['i/change-password'], { currentPassword: 'old', newPassword: 'new' }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED', data: { id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
-	expect(h.operations['i/change-password'].userProfilesRepository.findOneByOrFail).not.toHaveBeenCalled();
+	await expect(call(h.router['i/regenerate-token'], { password: 'old' }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED', data: { id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
+	expect(h.operations['i/regenerate-token'].userProfilesRepository.findOneByOrFail).not.toHaveBeenCalled();
 	h.services.authenticate.mockResolvedValue([null, null]);
 	await expect(call(h.router['i/2fa/key-done'], { password: 'password', name: '', credential: null }, { context: h.context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
 	for (const value of [undefined, null, 5, true, ['ignored'], { ignored: { future: true } }]) expect(v.safeParse(requiredSchema(AdminCaptchaCurrentContract['~orpc'].inputSchema), value).success).toBe(true);
@@ -80,7 +80,7 @@ test('malformed HTTP inputs fail authentication and secure-token policy before i
 	}), { prefix: '/api' });
 	try {
 		h.services.authenticate.mockResolvedValue([actor, { permission: ['write:account'] }]);
-		const secure = await app.inject({ method: 'POST', url: '/api/i/change-password', payload: { currentPassword: 42, newPassword: null } });
+		const secure = await app.inject({ method: 'POST', url: '/api/i/regenerate-token', payload: { password: 42, token: null } });
 		expect(secure.statusCode).toBe(400);
 		expect(secure.json()).toMatchObject({ error: { code: 'ACCESS_DENIED', id: '56f35758-7dd5-468b-8439-5d6fb8ec9b8e' } });
 		for (const path of ['i/regenerate-token/passkey/start', 'i/regenerate-token/passkey/complete', 'i/update-email/passkey/start', 'i/update-email/passkey/complete', ...settingsPaths]) {
@@ -93,11 +93,11 @@ test('malformed HTTP inputs fail authentication and secure-token policy before i
 		expect(anonymous.statusCode).toBe(400);
 		expect(anonymous.json()).toMatchObject({ error: { code: 'ACCESS_DENIED' } });
 		h.services.authenticate.mockResolvedValue([actor, null]);
-		const authenticated = await app.inject({ method: 'POST', url: '/api/i/change-password', payload: { currentPassword: 42, newPassword: null } });
+		const authenticated = await app.inject({ method: 'POST', url: '/api/i/regenerate-token', payload: { password: 42, token: null } });
 		expect(authenticated.statusCode).toBe(400);
 		expect(authenticated.json()).toMatchObject({ error: { code: 'INVALID_PARAM' } });
-		expect(h.services.authenticate).toHaveBeenCalledTimes(33);
-		expect(h.operations['i/change-password'].userProfilesRepository.findOneByOrFail).not.toHaveBeenCalled();
+		expect(h.services.authenticate).toHaveBeenCalledTimes(34);
+		expect(h.operations['i/regenerate-token'].userProfilesRepository.findOneByOrFail).not.toHaveBeenCalled();
 		expect(h.operations['i/2fa/key-done'].userProfilesRepository.findOneByOrFail).not.toHaveBeenCalled();
 	} finally { await app.close(); }
 });

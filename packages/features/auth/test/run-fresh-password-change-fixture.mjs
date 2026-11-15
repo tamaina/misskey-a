@@ -9,9 +9,9 @@ import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
 const root = resolve(import.meta.dirname, '../../../..');
-const selected = ['MISSKEY_AUTH_PASSWORD_CHANGE_FIXTURE', 'MISSKEY_AUTH_SIGNIN_FIXTURE', 'MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE', 'MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE'].filter(name => process.env[name] === '1');
-if (selected.length > 1) throw new Error('Select only one fresh authentication fixture suite');
-const suiteFlag = selected[0] ?? 'MISSKEY_AUTH_PASSWORD_CHANGE_FIXTURE';
+const selected = ['MISSKEY_AUTH_SIGNIN_FIXTURE', 'MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE', 'MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE'].filter(name => process.env[name] === '1');
+if (selected.length !== 1) throw new Error('Select exactly one fresh authentication fixture suite');
+const suiteFlag = selected[0];
 const directory = mkdtempSync('/tmp/misskey-oauth-'); chmodSync(directory, 0o700);
 const socket = join(directory, 'redis.sock');
 const container = `misskey-fresh-password-${randomUUID()}`;

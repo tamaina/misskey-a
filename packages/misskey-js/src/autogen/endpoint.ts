@@ -333,10 +333,6 @@ import type {
 	IAppsResponse,
 	IAuthorizedAppsRequest,
 	IAuthorizedAppsResponse,
-	IChangePasswordRequest,
-	IChangePasswordPasskeyStartRequest,
-	IChangePasswordPasskeyStartResponse,
-	IChangePasswordPasskeyCompleteRequest,
 	IRegenerateTokenRequest,
 	IRegenerateTokenPasskeyStartRequest,
 	IRegenerateTokenPasskeyStartResponse,
@@ -1009,9 +1005,6 @@ export type Endpoints = {
 	'i/2fa/update-key': { req: I2faUpdateKeyRequest; res: I2faUpdateKeyResponse };
 	'i/apps': { req: IAppsRequest; res: IAppsResponse };
 	'i/authorized-apps': { req: IAuthorizedAppsRequest; res: IAuthorizedAppsResponse };
-	'i/change-password': { req: IChangePasswordRequest; res: EmptyResponse };
-	'i/change-password/passkey/start': { req: IChangePasswordPasskeyStartRequest; res: IChangePasswordPasskeyStartResponse };
-	'i/change-password/passkey/complete': { req: IChangePasswordPasskeyCompleteRequest; res: EmptyResponse };
 	'i/regenerate-token': { req: IRegenerateTokenRequest; res: EmptyResponse };
 	'i/regenerate-token/passkey/start': { req: IRegenerateTokenPasskeyStartRequest; res: IRegenerateTokenPasskeyStartResponse };
 	'i/regenerate-token/passkey/complete': { req: IRegenerateTokenPasskeyCompleteRequest; res: EmptyResponse };

@@ -299,26 +299,7 @@ export const IAuthorizedAppsContract = oc.$meta({
 		"isAuthorized": v.exactOptional(v.boolean()),
 	})));
 
-export const IChangePasswordContract = oc.$meta({
-	requestName: 'i/change-password',
-	requireCredential: true,
-	secure: true,
-} as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/i/change-password', tags: [] }).errors({ ...commonErrors }).input(objectInput({
-	"currentPassword": v.string(),
-	"newPassword": v.pipe(v.string(), v.minCodePoints(1)),
-	"token": v.exactOptional(v.nullable(v.string())),
-})).output(v.void());
-
-const freshPasswordMetadata = { requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-password-change' } } as const;
 const freshPasswordErrors = { ...commonErrors, FRESH_REAUTHENTICATION_FAILED: { status: 403, data: apiErrorData } } as const;
-export const IChangePasswordPasskeyStartContract = oc.$meta({ ...freshPasswordMetadata, requestName: 'i/change-password/passkey/start' } as const satisfies Meta & ApiProcedureMetadata)
-	.route({ method: 'POST', path: '/i/change-password/passkey/start', tags: ['account'] }).errors(freshPasswordErrors)
-	.input(objectInput({ currentPassword: v.pipe(v.string(), v.minLength(1), v.maxLength(1024)) }))
-	.output(v.strictObject({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), options: webAuthnAuthenticationOptionsSchema }));
-export const IChangePasswordPasskeyCompleteContract = oc.$meta({ ...freshPasswordMetadata, requestName: 'i/change-password/passkey/complete' } as const satisfies Meta & ApiProcedureMetadata)
-	.route({ method: 'POST', path: '/i/change-password/passkey/complete', tags: ['account'] }).errors(freshPasswordErrors)
-	.input(objectInput({ ticket: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), credential: webAuthnAuthenticationResponseSchema, newPassword: v.pipe(v.string(), v.minCodePoints(1), v.maxLength(1024)) })).output(v.void());
-
 const freshTokenMetadata = { requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'fresh-token-regeneration' } } as const;
 export const IRegenerateTokenPasskeyStartContract = oc.$meta({ ...freshTokenMetadata, requestName: 'i/regenerate-token/passkey/start' } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/i/regenerate-token/passkey/start', tags: ['account'] }).errors(freshPasswordErrors)
@@ -547,9 +528,6 @@ export const authContract = {
 	'i/2fa/passkey/password-less': I2faPasskeyPasswordLessContract,
 	'i/apps': IAppsContract,
 	'i/authorized-apps': IAuthorizedAppsContract,
-	'i/change-password': IChangePasswordContract,
-	'i/change-password/passkey/start': IChangePasswordPasskeyStartContract,
-	'i/change-password/passkey/complete': IChangePasswordPasskeyCompleteContract,
 	'i/regenerate-token': IRegenerateTokenContract,
 	'i/regenerate-token/passkey/start': IRegenerateTokenPasskeyStartContract,
 	'i/regenerate-token/passkey/complete': IRegenerateTokenPasskeyCompleteContract,

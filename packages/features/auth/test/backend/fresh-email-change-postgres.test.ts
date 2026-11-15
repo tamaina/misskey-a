@@ -84,7 +84,7 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh email change with real SQL,
 		const deps: AuthRouterDependencies = mockDeep<AuthRouterDependencies>();
 		const common = { db, config: relyingParty, serverSettings: settings, userProfilesRepository: db.getRepository(MiUserProfile) as unknown as UserProfilesRepository, userEntityService, emailService, globalEventService: events };
 		deps['i/update-email/passkey/start'] = deps['i/update-email/passkey/complete'] = { ...common, freshReauthentication: fresh };
-		deps['i/change-password/passkey/start'] = deps['i/change-password/passkey/complete'] = { db, freshReauthentication: fresh };
+		deps['i/regenerate-token/passkey/start'] = deps['i/regenerate-token/passkey/complete'] = { db, freshReauthentication: fresh, browserSessionService: sessions, globalEventService: events };
 		deps['i/update-email'] = { ...common, usersRepository: db.getRepository(MiUser) as AuthRouterDependencies['i/update-email']['usersRepository'], userAuthService: mockDeep() };
 		verifyProfiles = db.getRepository(MiUserProfile) as unknown as UserProfilesRepository;
 		deps['verify-email'] = { userProfilesRepository: verifyProfiles, userEntityService, globalEventService: events };
@@ -151,12 +151,12 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh email change with real SQL,
 		}
 		await unchanged(mode !== 'suspended');
 	});
-	test.each(['change-password', 'update-email'] as const)('%s ticket cannot cross the purpose boundary or be burned there', async origin => {
+	test.each(['regenerate-token', 'update-email'] as const)('%s ticket cannot cross the purpose boundary or be burned there', async origin => {
 		const isEmail = origin === 'update-email';
-		const started = isEmail ? await begin() : (await app.inject({ method: 'POST', url: '/api/i/change-password/passkey/start', headers: { authorization: `Bearer ${current.token}` }, payload: { currentPassword: oldPassword } })).json<{ ticket: string; options: { challenge: string } }>();
-		const password = () => app.inject({ method: 'POST', url: '/api/i/change-password/passkey/complete', headers: { authorization: `Bearer ${current.token}` }, payload: { ticket: started.ticket, credential: assertion(started.options.challenge), newPassword: 'synthetic-new-password' } });
-		expect((await (isEmail ? password() : finish(started))).statusCode).toBe(403); await unchanged();
-		expect((await (isEmail ? finish(started) : password())).statusCode).toBe(204);
+		const started = isEmail ? await begin() : (await app.inject({ method: 'POST', url: '/api/i/regenerate-token/passkey/start', headers: { authorization: `Bearer ${current.token}` }, payload: { currentPassword: oldPassword } })).json<{ ticket: string; options: { challenge: string } }>();
+		const rotate = () => app.inject({ method: 'POST', url: '/api/i/regenerate-token/passkey/complete', headers: { authorization: `Bearer ${current.token}` }, payload: { ticket: started.ticket, credential: assertion(started.options.challenge) } });
+		expect((await (isEmail ? rotate() : finish(started))).statusCode).toBe(403); await unchanged();
+		expect((await (isEmail ? finish(started) : rotate())).statusCode).toBe(204);
 	});
 	test.each(['policy', 'revocation', 'email', 'deadline'] as const)('%s while waiting for the profile lock refuses mutation', async mode => {
 		const started = await begin(); const blocker = db.createQueryRunner(); await blocker.connect(); await blocker.startTransaction(); let pending: ReturnType<typeof request> | undefined;

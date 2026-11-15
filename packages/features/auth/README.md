@@ -99,8 +99,8 @@ claims here.
 - `test/run-security-settings-fixture.mjs`: actual security HTTP and signed keys.
 - `test/run-credential-issuance-fixture.mjs`: owned PostgreSQL/Unix Redis and the
   real MiAuth, legacy approval and OAuth consent/issuance boundaries.
-- `test/run-fresh-password-change-fixture.mjs`: password, login-policy, token and
-  email operation fixtures selected by their documented environment flags.
+- `test/run-fresh-password-change-fixture.mjs`: login-policy, token and email
+  operation fixtures selected by their documented environment flags.
 - `test/run-oidc-fixture.mjs`: retained protocol adapters only, with owned Redis.
 - Frontend auth suites and strict source/locale inverse suites preserve frozen
   historical dictionaries and reject unreviewed source changes.

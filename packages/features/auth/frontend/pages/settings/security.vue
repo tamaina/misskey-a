@@ -92,48 +92,8 @@ async function collectAndChangePassword(isCurrent: () => boolean) {
 		if (isCurrent()) await signout('credentials-changed');
 		return;
 	}
-	const { canceled, result: currentPassword } = await ownedInputText({
-		title: $locale.value.sfc.password,
-		type: 'password',
-		autocomplete: 'current-password',
-		minLength: 1,
-	}, sudoAbort?.signal);
-	if (!isCurrent() || canceled || currentPassword == null || currentPassword === '') return;
-
-	const { canceled: canceled2, result: newPassword } = await ownedInputText({
-		title: $locale.value.sfc.newPassword,
-		type: 'password',
-		autocomplete: 'new-password',
-	}, sudoAbort?.signal);
-	if (!isCurrent() || canceled2 || newPassword == null) return;
-
-	const { canceled: canceled3, result: newPassword2 } = await ownedInputText({
-		title: $locale.value.sfc.newPasswordRetype,
-		type: 'password',
-		autocomplete: 'new-password',
-	}, sudoAbort?.signal);
-	if (!isCurrent() || canceled3 || newPassword2 == null) return;
-
-	if (newPassword !== newPassword2) {
-		os.alert({
-			type: 'error',
-			text: $locale.value.sfc.retypedNotMatch,
-		});
-		return;
-	}
-
-	let token: string | null = null;
-	if (ensureSignin().twoFactorEnabled) {
-		const auth = await ownedAuthenticateDialog({ currentPassword }, sudoAbort?.signal);
-		if (!isCurrent() || auth.canceled) return;
-		token = auth.result.token;
-	}
-
-	await os.apiWithDialog('i/change-password', {
-		currentPassword,
-		token,
-		newPassword,
-	});
+	// Password changes now require a browser session and sudo via i/security/password.
+	await os.alert({ type: 'warning', text: $locale.value.sfc.passwordChangeRequiresSignin });
 }
 
 async function regenerateToken() {
@@ -252,6 +212,7 @@ definePage(() => ({
 	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
 	"password": "Password",
 	"changePassword": "Change password",
+	"passwordChangeRequiresSignin": "To change your password, please sign in again in the browser.",
 	"signinHistory": "Login history",
 	"regenerateLoginToken": "Regenerate login token",
 	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
@@ -328,7 +289,7 @@ definePage(() => ({
 	"password": "パスワード",
 	"changePassword": "パスワードを変更",
 	"passwordSessionsWarning": "パスワードを変更すると、現在の端末を含むすべてのログインが無効になります。",
-	"changePasswordWithPasskey": "パスキーでパスワードを変更",
+	"passwordChangeRequiresSignin": "パスワードを変更するには、ブラウザで再度ログインしてください。",
 	"signinHistory": "セッションに紐付いていない過去のログイン履歴",
 	"regenerateLoginTokenWithPasskey": "パスキーでログイントークンを再生成",
 	"regenerateLoginToken": "ログイントークンを再生成",

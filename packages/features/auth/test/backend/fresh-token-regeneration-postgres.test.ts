@@ -77,7 +77,12 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh token regeneration with rea
 		const fresh = new FreshPasskeyReauthentication(new FreshReauthenticationStore(redis), sessions, db.getRepository(MiUserProfile) as unknown as UserProfilesRepository, db.getRepository(MiUserSecurityKey) as unknown as UserSecurityKeysRepository, relyingParty);
 		const deps: AuthRouterDependencies = mockDeep<AuthRouterDependencies>();
 		deps['i/regenerate-token/passkey/start'] = deps['i/regenerate-token/passkey/complete'] = { db, freshReauthentication: fresh, browserSessionService: sessions, globalEventService: events };
-		deps['i/change-password/passkey/start'] = deps['i/change-password/passkey/complete'] = { db, freshReauthentication: fresh };
+		const emailService = mockDeep<AuthRouterDependencies['i/update-email/passkey/complete']['emailService']>();
+		emailService.validateEmailForAccount.mockResolvedValue({ available: true, reason: null });
+		const userEntityService = mockDeep<AuthRouterDependencies['i/update-email/passkey/complete']['userEntityService']>();
+		type Packed = Awaited<ReturnType<typeof userEntityService.packSelf>>;
+		userEntityService.packSelf.mockResolvedValue(Object.assign(mockDeep<Packed>(), { id: owner, host: null, emojis: {}, badgeRoles: [], avatarDecorations: [], alsoKnownAs: [], fields: [], verifiedLinks: [], pinnedNoteIds: [], pinnedNotes: [], pinnedPage: null, roles: [], notificationRecieveConfig: {}, unreadAnnouncements: [], mutedWords: [], hardMutedWords: [], mutedInstances: [], mutingNotificationTypes: [], emailNotificationTypes: [], achievements: [], policies: {} as Packed['policies'], securityKeysList: [] }));
+		deps['i/update-email/passkey/start'] = deps['i/update-email/passkey/complete'] = { db, config: relyingParty, serverSettings: { emailRequiredForSignup: false }, userProfilesRepository: db.getRepository(MiUserProfile) as unknown as UserProfilesRepository, userEntityService, emailService, globalEventService: events, freshReauthentication: fresh };
 		deps['i/regenerate-token'] = { db, browserSessionService: sessions, globalEventService: events, usersRepository: db.getRepository(MiUser) as AuthRouterDependencies['i/regenerate-token']['usersRepository'], userProfilesRepository: db.getRepository(MiUserProfile) as AuthRouterDependencies['i/regenerate-token']['userProfilesRepository'], userAuthService: mockDeep() };
 		const handler = new OpenAPIHandler(createAuthRouter(deps), { customErrorResponseBodyEncoder: misskeyErrorBody, interceptors: [nullSuccessToNoContent()] });
 		app = Fastify(); await app.register(async api => registerPilotHttp(api, handler, {
@@ -89,7 +94,7 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh token regeneration with rea
 		vi.restoreAllMocks(); vi.clearAllMocks(); await redis.flushdb();
 		await db.getRepository(MiUser).delete({ id: owner }); await db.getRepository(MiUser).insert({ id: owner, username: 'synthetic', usernameLower: 'synthetic', host: null, isSuspended: false, isDeleted: false, token: 'syntheticnative1' });
 		user = await db.getRepository(MiUser).findOneByOrFail({ id: owner }) as MiLocalUser;
-		await db.getRepository(MiUserProfile).insert({ userId: owner, password: bcrypt.hashSync(oldPassword, 4), twoFactorEnabled: true, twoFactorSecret: 'synthetic-secret', passkeyMfaEnabled: false });
+		await db.getRepository(MiUserProfile).insert({ userId: owner, password: bcrypt.hashSync(oldPassword, 4), twoFactorEnabled: true, twoFactorSecret: 'synthetic-secret', passkeyMfaEnabled: false, email: 'old@example.test', emailVerified: true, emailVerifyCode: null });
 		keyPair = generateKeyPairSync('ec', { namedCurve: 'prime256v1' }); const jwk = keyPair.publicKey.export({ format: 'jwk' });
 		const raw = Buffer.concat([Buffer.from([4]), Buffer.from(jwk.x!, 'base64url'), Buffer.from(jwk.y!, 'base64url')]).toString('base64url');
 		await db.getRepository(MiUserSecurityKey).insert({ id: 'AQID', userId: owner, name: 'Synthetic', publicKey: raw, counter: 0 });
@@ -135,13 +140,13 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh token regeneration with rea
 		expect((await request('complete', { ticket: started.ticket, credential: assertion(started.options.challenge, mode !== 'no-uv') })).statusCode).toBe(403);
 		await expectUnchanged();
 	});
-	test.each(['change-password', 'regenerate-token'] as const)('%s ticket cannot cross the operation boundary', async origin => {
+	test.each(['update-email', 'regenerate-token'] as const)('%s ticket cannot cross the operation boundary', async origin => {
 		const isToken = origin === 'regenerate-token';
-		const started = isToken ? await begin() : (await app.inject({ method: 'POST', url: '/api/i/change-password/passkey/start', headers: { authorization: `Bearer ${current.token}` }, payload: { currentPassword: oldPassword } })).json<{ ticket: string; options: { challenge: string } }>();
+		const started = isToken ? await begin() : (await app.inject({ method: 'POST', url: '/api/i/update-email/passkey/start', headers: { authorization: `Bearer ${current.token}` }, payload: { currentPassword: oldPassword, email: 'new@example.test' } })).json<{ ticket: string; options: { challenge: string } }>();
 		const body = { ticket: started.ticket, credential: assertion(started.options.challenge) };
-		const change = () => app.inject({ method: 'POST', url: '/api/i/change-password/passkey/complete', headers: { authorization: `Bearer ${current.token}` }, payload: { ...body, newPassword: 'synthetic-new-password' } });
-		expect((await (isToken ? change() : request('complete', body))).statusCode).toBe(403); await expectUnchanged();
-		expect((await (isToken ? request('complete', body) : change())).statusCode).toBe(204);
+		const changeEmail = () => app.inject({ method: 'POST', url: '/api/i/update-email/passkey/complete', headers: { authorization: `Bearer ${current.token}` }, payload: { ...body, email: 'new@example.test' } });
+		expect((await (isToken ? changeEmail() : request('complete', body))).statusCode).toBe(403); await expectUnchanged();
+		expect((await (isToken ? request('complete', body) : changeEmail())).statusCode).toBe(204);
 	});
 	test.each(['policy', 'revocation', 'deadline'] as const)('%s while waiting for a row lock prevents rotation', async mode => {
 		const started = await begin(); const blocker = db.createQueryRunner(); await blocker.connect(); await blocker.startTransaction();
