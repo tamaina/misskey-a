@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</FormSection>
 		</SearchMarker>
 
-		<MkSecuritySettings/>
+		<X2fa/>
 		<SearchMarker :keywords="['signin', 'login', 'history', 'log']">
 			<MkBrowserSessions/>
 		</SearchMarker>
@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { computed, onActivated, onDeactivated, onUnmounted, ref, watch } from 'vue';
 import MkBrowserSessions from '@features/auth/frontend/components/MkBrowserSessions.vue';
-import MkSecuritySettings from '@features/auth/frontend/components/MkSecuritySettings.vue';
+import X2fa from './2fa.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';

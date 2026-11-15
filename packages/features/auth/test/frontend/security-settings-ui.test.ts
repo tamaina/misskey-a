@@ -5,7 +5,7 @@
 import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import { createApp, defineComponent, h, KeepAlive, nextTick, reactive, ref } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
-import Settings from '../../frontend/components/MkSecuritySettings.vue';
+import Settings from '../../frontend/pages/settings/2fa.vue';
 import MkRecoveryCodesDialog from '../../frontend/components/MkRecoveryCodesDialog.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { inputText, confirm, popup } from '@features/ui/frontend/os.js';
@@ -19,14 +19,27 @@ vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: () => true,
 vi.mock('@features/ui/frontend/os.js', () => ({ inputText: vi.fn(async () => ({ canceled: false, result: 'Synthetic key' })), confirm: vi.fn(async () => ({ canceled: false })), popup: vi.fn() }));
 vi.mock('@features/ui/frontend/components/MkButton.vue', () => ({ default: defineComponent({ props: ['disabled', 'type'], setup: (props, { slots }) => () => h('button', { disabled: props.disabled, type: props.type }, slots.default?.()) }) }));
 vi.mock('@features/ui/frontend/components/MkInfo.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('aside', slots.default?.()) }) }));
-vi.mock('@features/ui/frontend/components/form/section.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('section', slots.default?.()) }) }));
+vi.mock('@features/ui/frontend/components/form/section.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('section', [h('h2', slots.label?.()), slots.default?.()]) }) }));
 vi.mock('@features/ui/frontend/components/MkInput.vue', () => ({ default: defineComponent({ props: ['modelValue'], emits: ['update:modelValue'], setup: (props, { emit }) => () => h('input', { value: props.modelValue, onInput: (event: Event) => emit('update:modelValue', (event.target as HTMLInputElement).value) }) }) }));
-vi.mock('@features/ui/frontend/components/MkSwitch.vue', () => ({ default: defineComponent({ props: ['modelValue', 'disabled'], emits: ['update:modelValue'], setup: (props, { slots, emit }) => () => h('label', [h('input', { type: 'checkbox', checked: props.modelValue, disabled: props.disabled, onChange: (event: Event) => emit('update:modelValue', (event.target as HTMLInputElement).checked) }), slots.default?.()]) }) }));
-vi.mock('@features/ui/frontend/components/MkModalWindow.vue', () => ({ default: defineComponent({ emits: ['closed'], setup: (_, { slots, expose, emit }) => { expose({ close: () => emit('closed') }); return () => h('div', { role: 'dialog' }, slots.default?.()); } }) }));
-vi.mock('@features/ui/frontend/components/MkFolder.vue', () => ({ default: defineComponent({ emits: ['opened'], setup: (_, { slots, emit }) => {
-	const opened = ref(false);
+vi.mock('@features/ui/frontend/components/MkSwitch.vue', () => ({ default: defineComponent({ props: ['modelValue', 'disabled'], emits: ['update:modelValue'], setup: (props, { slots, emit }) => () => h('label', [h('input', { type: 'checkbox', checked: props.modelValue, disabled: props.disabled, onChange: (event: Event) => emit('update:modelValue', (event.target as HTMLInputElement).checked) }), slots.label?.(), slots.default?.()]) }) }));
+vi.mock('@features/ui/frontend/components/MkModalWindow.vue', () => ({ default: defineComponent({ emits: ['close', 'closed'], setup: (_, { slots, expose, emit }) => { expose({ close: () => emit('closed') }); return () => h('div', { role: 'dialog', onClose: () => emit('close') }, slots.default?.()); } }) }));
+vi.mock('@features/ui/frontend/components/MkFolder.vue', () => ({ default: defineComponent({ props: ['defaultOpen'], emits: ['opened'], setup: (props, { slots, emit }) => {
+	const opened = ref(props.defaultOpen ?? false);
 	return () => h('article', [h('button', { onClick: () => { opened.value = !opened.value; if (opened.value) emit('opened'); } }, [slots.label?.(), slots.suffix?.()]), opened.value ? slots.default?.() : null]);
 } }) }));
+vi.mock('@features/navigation/frontend/components/MkLink.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('a', slots.default?.()) }) }));
+vi.mock('@features/ui/frontend/components/MkKeyValue.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('div', [slots.key?.(), slots.value?.()]) }) }));
+vi.mock('@features/boot/frontend/shared/config.js', () => ({ hostname: 'synthetic.example', port: '' }));
+vi.mock('@features/share/frontend/utility/qr-code.js', () => ({ qrOptions: {} }));
+vi.mock('@features/ui/frontend/utility/confetti.js', () => ({ confetti: vi.fn() }));
+const slot = defineComponent({ inheritAttrs: false, setup: (_, { slots }) => () => h('div', slots.default?.()) });
+const i18nSlot = defineComponent({ props: ['src'], setup: (props, { slots }) => () => h('span', [props.src, slots.t?.()]) });
+
+function registerGlobals(instance: ReturnType<typeof createApp>) {
+	for (const name of ['SearchMarker', 'SearchLabel', 'SearchText']) instance.component(name, slot);
+	instance.component('I18n', i18nSlot);
+}
+
 const internationalization = createInternationalization({ initialLocale: 'ja-JP' });
 const state = { totpEnabled: false, passkeyMfaEnabled: false, passkeyCount: 1, passwordlessEnabled: false, passwordLoginDisabled: false, hasVerifiedRecoveryEmail: true, recoveryCodesRemaining: 5 };
 const options = { challenge: 'synthetic', rpId: 'synthetic.example', userVerification: 'preferred' as const };
@@ -38,7 +51,7 @@ const show = ref(true);
 beforeAll(async () => { await internationalization.ready; await internationalization.loadLocale('ja-JP'); });
 beforeEach(async () => {
 	vi.mocked(popup).mockImplementation((component, props, events) => {
-		const instance = createApp(component as never, { ...props, onClosed: events?.closed }); instance.use(internationalization); instance.mount(modal);
+		const instance = createApp(component as never, { ...props, onClosed: events?.closed, onCancel: events?.cancel }); instance.use(internationalization); registerGlobals(instance); instance.mount(modal);
 		return { dispose: () => instance.unmount() } as never;
 	});
 	vi.clearAllMocks(); fixture.actor.id = 'synthetic-owner'; fixture.actor.token = 'bs_synthetic'; show.value = true;
@@ -56,8 +69,8 @@ beforeEach(async () => {
 	});
 	element = window.document.createElement('div');
 	app = createApp(defineComponent({ setup: () => () => h(KeepAlive, null, { default: () => show.value ? h(Settings) : h('div', 'Other page') }) }));
-	app.use(internationalization); app.component('MkTime', defineComponent({ render: () => null })); app.mount(element); mounted = true;
-	await vi.waitFor(() => expect(element.textContent).toContain('パスキーによる多要素認証は無効です。'));
+	app.use(internationalization); registerGlobals(app); app.component('MkTime', defineComponent({ render: () => null })); app.mount(element); mounted = true;
+	await vi.waitFor(() => expect(element.textContent).toContain('セキュリティキー・パスキー'));
 	click('セキュリティキー・パスキー'); await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
 	vi.mocked(ensureSudo).mockClear();
 });
@@ -70,8 +83,8 @@ async function mountFresh(token: string) {
 	vi.mocked(misskeyApi).mockClear();
 	element = window.document.createElement('div');
 	app = createApp(defineComponent({ setup: () => () => h(KeepAlive, null, { default: () => show.value ? h(Settings) : h('div', 'Other page') }) }));
-	app.use(internationalization); app.component('MkTime', defineComponent({ render: () => null })); app.mount(element); mounted = true;
-	await vi.waitFor(() => expect(element.textContent).toContain('パスキーによる多要素認証は無効です。'));
+	app.use(internationalization); registerGlobals(app); app.component('MkTime', defineComponent({ render: () => null })); app.mount(element); mounted = true;
+	await vi.waitFor(() => expect(element.textContent).toContain('セキュリティキー・パスキー'));
 }
 
 test.each(['bs_synthetic', '0123456789abcdef'] as const)('opening the page and passkey list does not prompt for sudo with token=%s', async token => {
@@ -85,13 +98,15 @@ test.each(['bs_synthetic', '0123456789abcdef'] as const)('opening the page and p
 });
 afterEach(() => { if (mounted) app.unmount(); element.remove(); vi.unstubAllGlobals(); });
 
-function button(text: string) { const value = [...element.querySelectorAll('button')].find(value => value.textContent === text); expect(value).toBeDefined(); return value!; }
+function button(text: string) { const value = [...element.querySelectorAll('button')].reverse().find(value => value.textContent?.trim() === text || (text === 'Synthetic key' && value.textContent?.startsWith(text))); expect(value).toBeDefined(); return value!; }
 
 function click(text: string) { button(text).click(); }
 
+function modalButton(text: string) { return [...modal.querySelectorAll('button')].find(button => button.textContent?.trim() === text)!; }
+
 const calls = (route: string) => vi.mocked(misskeyApi).mock.calls.filter(([name]) => name === route);
 
-async function registration() { click('パスキーを登録'); await vi.waitFor(() => expect(modal.textContent).toContain(codes[0])); }
+async function registration() { click('セキュリティキー・パスキーを登録する'); await vi.waitFor(() => expect(modal.textContent).toContain(codes[0])); }
 
 test('registration needs no TOTP or later enable step and displays five recovery codes in the registration flow', async () => {
 	await registration(); expect(modal.querySelectorAll('code')).toHaveLength(5); expect(modal.querySelector('[role=dialog]')).not.toBeNull(); expect(element.querySelectorAll('code')).toHaveLength(0);
@@ -102,10 +117,10 @@ test('registration needs no TOTP or later enable step and displays five recovery
 	expect(calls('i/security/passkey/mfa/enable')).toHaveLength(0); expect(calls('i/security/passkey/mfa/start')).toHaveLength(0); expect(calls('i/security/totp/start')).toHaveLength(0);
 	expect(startAuthentication).not.toHaveBeenCalled();
 	expect(element.textContent).not.toContain('パスキーによる多要素認証を有効にする');
-	[...modal.querySelectorAll('button')].find(button => button.textContent === '保存して閉じる')!.click(); await nextTick(); expect(modal.textContent).not.toContain(codes[0]); expect(element.textContent).not.toContain('復旧コードを表示');
+	[...modal.querySelectorAll('button')].find(button => button.textContent === '完了')!.click(); await nextTick(); expect(modal.textContent).not.toContain(codes[0]); expect(element.textContent).not.toContain('復旧コードを表示');
 });
 test('cancelled common sudo cannot start registration', async () => {
-	vi.mocked(ensureSudo).mockResolvedValue(false); click('パスキーを登録'); await nextTick();
+	vi.mocked(ensureSudo).mockResolvedValue(false); click('セキュリティキー・パスキーを登録する'); await nextTick();
 	expect(calls('i/security/passkey/register/start')).toHaveLength(0); expect(startRegistration).not.toHaveBeenCalled();
 });
 test.each(['leave', 'actor'] as const)('%s clears registration recovery codes', async kind => {
@@ -114,7 +129,7 @@ test.each(['leave', 'actor'] as const)('%s clears registration recovery codes', 
 	await nextTick(); expect(modal.textContent).not.toContain(codes[0]);
 });
 test.each(['leave', 'actor'] as const)('%s cancels native registration and prevents delayed completion', async kind => {
-	let release!: (value: never) => void; vi.mocked(startRegistration).mockReturnValue(new Promise(resolve => { release = resolve; })); click('パスキーを登録');
+	let release!: (value: never) => void; vi.mocked(startRegistration).mockReturnValue(new Promise(resolve => { release = resolve; })); click('セキュリティキー・パスキーを登録する');
 	await vi.waitFor(() => expect(startRegistration).toHaveBeenCalledOnce());
 	if (kind === 'leave') { show.value = false; await nextTick(); show.value = true; await nextTick(); } else reactive(fixture.actor).id = 'replacement-owner';
 	await nextTick(); expect(WebAuthnAbortService.cancelCeremony).toHaveBeenCalledOnce();
@@ -124,22 +139,22 @@ test('authenticator Signal API runs only after owned removal has been accepted',
 	const signal = vi.fn(async () => undefined); vi.stubGlobal('PublicKeyCredential', { signalUnknownCredential: signal });
 	click('Synthetic key'); await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
 	let accept!: () => void; vi.mocked(misskeyApi).mockImplementationOnce(() => new Promise<void>(resolve => { accept = resolve; }) as never);
-	click('削除'); await vi.waitFor(() => expect(calls('i/security/passkey/remove')).toHaveLength(1)); expect(signal).not.toHaveBeenCalled();
+	click('登録を解除'); await vi.waitFor(() => expect(calls('i/security/passkey/remove')).toHaveLength(1)); expect(signal).not.toHaveBeenCalled();
 	accept(); await vi.waitFor(() => expect(signal).toHaveBeenCalledOnce()); expect(signal).toHaveBeenCalledWith({ rpId: window.location.hostname, credentialId: 'synthetic-key' });
 });
 
 test('registration and key removal have no session revocation warning', async () => {
 	expect(element.textContent).not.toContain('パスワード変更では、他の端末のログインが無効になります。');
-	expect(element.textContent).toContain('他の端末のログインやログイントークンは無効になりません。');
+	expect(element.textContent).not.toContain('他の端末のログインやログイントークンは無効になりません。');
 	expect(element.textContent).not.toContain('他の端末はサインアウトします');
-	button('パスキーを登録').click();
+	button('セキュリティキー・パスキーを登録する').click();
 	await vi.waitFor(() => expect(inputText).toHaveBeenCalledOnce());
-	expect(vi.mocked(inputText).mock.calls[0][0]).not.toHaveProperty('text');
+	expect(vi.mocked(inputText).mock.calls[0][0].text).toBe('キーの名前を入力');
 	expect(element.textContent).not.toContain('パスキーの登録・削除');
 	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/security/passkey/register/complete', expect.anything()));
 	button('Synthetic key').click();
 	await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
-	button('削除').click();
+	button('登録を解除').click();
 	await vi.waitFor(() => expect(confirm).toHaveBeenCalledOnce());
 	expect(vi.mocked(confirm).mock.calls[0][0].text).toContain('このパスキーを削除しますか');
 	expect(vi.mocked(confirm).mock.calls[0][0].text).not.toMatch(/サインアウト|この端末以外|他の端末/);
@@ -149,7 +164,7 @@ test.each([false, true])('passwordless permits adding keys with passwordLoginDis
 	show.value = false; await nextTick();
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ ...state, passwordlessEnabled: true, passwordLoginDisabled: disabled } as never);
 	show.value = true;
-	await vi.waitFor(() => expect(button('パスキーを登録').disabled).toBe(false));
+	await vi.waitFor(() => expect(button('セキュリティキー・パスキーを登録する').disabled).toBe(false));
 	expect(element.textContent).not.toContain('単独ログインを無効にしてから登録してください。');
 	await registration(); expect(calls('i/security/passkey/register/complete')).toHaveLength(1);
 });
@@ -184,7 +199,7 @@ test('passwordless enabling on a native token confirms identity first so a sessi
 	expect(startAuthentication).toHaveBeenCalledExactlyOnceWith({ optionsJSON: { ...options, userVerification: 'required' } });
 });
 
-test.each([[true, false], [false, true], [true, true], [false, false]] as const)('recovery regeneration is reachable before TOTP with passkey MFA=%s and TOTP=%s', async (passkeyMfaEnabled, totpEnabled) => {
+test.each([[true, false], [false, true], [true, true], [false, false]] as const)('recovery regeneration follows upstream controls with passkey MFA=%s and TOTP=%s', async (passkeyMfaEnabled, totpEnabled) => {
 	show.value = false; await nextTick();
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ ...state, passkeyMfaEnabled, totpEnabled } as never);
 	show.value = true; await nextTick(); await nextTick();
@@ -193,13 +208,13 @@ test.each([[true, false], [false, true], [true, true], [false, false]] as const)
 	if (passkeyMfaEnabled || totpEnabled) {
 		const regenerate = buttons[0];
 		await vi.waitFor(() => expect(regenerate.disabled).toBe(false));
-		expect(regenerate.compareDocumentPosition(element.querySelector('input[type=checkbox]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-		expect(regenerate.compareDocumentPosition(element.querySelector('hr')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+		expect(element.querySelector('input[type=checkbox]')!.compareDocumentPosition(regenerate) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+		expect(element.querySelector('article')!.compareDocumentPosition(regenerate) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 	}
 });
 
 test('regeneration confirms invalidation and shows newly issued codes only in the modal', async () => {
-	await registration(); [...modal.querySelectorAll('button')].find(button => button.textContent === '保存して閉じる')!.click(); await nextTick();
+	await registration(); [...modal.querySelectorAll('button')].find(button => button.textContent === '完了')!.click(); await nextTick();
 	vi.mocked(misskeyApi).mockImplementation(async route => route === 'i/security/recovery-codes' ? { backupCodes: ['new-synthetic-code'] } as never : { ...state, passkeyMfaEnabled: true } as never);
 	vi.mocked(ensureSudo).mockClear(); vi.mocked(confirm).mockClear(); vi.mocked(popup).mockClear();
 	click('復旧コードを再生成');
@@ -214,7 +229,7 @@ test('regeneration confirms invalidation and shows newly issued codes only in th
 	expect(popup).toHaveBeenCalledExactlyOnceWith(MkRecoveryCodesDialog, { codes: ['new-synthetic-code'] }, expect.anything());
 	expect(modal.querySelector('[role=dialog]')).not.toBeNull();
 	expect(modal.querySelectorAll('code')).toHaveLength(1);
-	[...modal.querySelectorAll('button')].find(button => button.textContent === '保存して閉じる')!.click(); await nextTick();
+	[...modal.querySelectorAll('button')].find(button => button.textContent === '完了')!.click(); await nextTick();
 	expect(modal.textContent).not.toContain('new-synthetic-code');
 	expect(element.textContent).not.toContain('new-synthetic-code'); expect(element.textContent).not.toContain('復旧コードを表示');
 });
@@ -226,10 +241,12 @@ test('first TOTP completion shows new codes in the same modal', async () => {
 		if (route === 'i/security/state') return { ...state, totpEnabled: true } as never;
 		return undefined as never;
 	});
-	click('認証アプリを設定');
-	await vi.waitFor(() => expect(element.querySelector('form input')).not.toBeNull());
-	const input = element.querySelector<HTMLInputElement>('form input')!; input.value = '123456'; input.dispatchEvent(new Event('input')); await nextTick();
-	element.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+	click('認証アプリの設定を開始');
+	await vi.waitFor(() => expect(modal.textContent).toContain('アプリを起動'));
+	modalButton('続ける').click();
+	await vi.waitFor(() => expect(modal.querySelector('input')).not.toBeNull());
+	const input = modal.querySelector<HTMLInputElement>('input')!; input.value = '123456'; input.dispatchEvent(new Event('input')); await nextTick();
+	modalButton('続ける').click();
 	await vi.waitFor(() => expect(modal.querySelectorAll('code')).toHaveLength(5));
 	expect(calls('i/security/totp/complete')[0][1]).toEqual({ token: '123456' });
 	expect(element.textContent).not.toContain(codes[0]);
@@ -269,7 +286,7 @@ test.each([false, true])('explicit MFA enable confirms before sudo, showing only
 	expect(startAuthentication).not.toHaveBeenCalled(); expect(calls('i/security/passkey/mfa/start')).toHaveLength(0);
 	if (issueCodes) {
 		expect(modal.querySelectorAll('code')).toHaveLength(5); expect(popup).toHaveBeenCalledOnce();
-		[...modal.querySelectorAll('button')].find(button => button.textContent === '保存して閉じる')!.click(); await nextTick();
+		[...modal.querySelectorAll('button')].find(button => button.textContent === '完了')!.click(); await nextTick();
 		expect(modal.textContent).not.toContain(codes[0]);
 	} else expect(popup).not.toHaveBeenCalled();
 	expect(element.textContent).not.toContain('復旧コードを表示');
@@ -303,8 +320,8 @@ test.each([false, true])('TOTP removal keeps sudo and operation warning with pas
 	show.value = false; await nextTick();
 	vi.mocked(misskeyApi).mockResolvedValueOnce({ ...state, totpEnabled: true, passkeyMfaEnabled } as never);
 	show.value = true;
-	await vi.waitFor(() => expect(element.textContent).toContain('認証アプリを削除'));
-	click('認証アプリを削除');
+	await vi.waitFor(() => expect(element.textContent).toContain('登録を解除'));
+	click('登録を解除');
 	await vi.waitFor(() => expect(calls('i/security/totp/remove')).toHaveLength(1));
 	expect(ensureSudo).toHaveBeenCalledOnce();
 	expect(confirm).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ type: 'warning', text: expect.stringContaining(passkeyMfaEnabled ? '認証アプリを削除しますか' : 'この認証方法を無効にしますか') }));
@@ -320,6 +337,8 @@ test('password-login disable keeps sudo, recovery warning and UV ceremony withou
 		return undefined as never;
 	});
 	show.value = true;
+	await vi.waitFor(() => expect(element.textContent).toContain('パスワード'));
+	click('パスワード'); await nextTick();
 	await vi.waitFor(() => expect(button('パスワードによるログインを無効にする').disabled).toBe(false));
 	click('パスワードによるログインを無効にする');
 	await vi.waitFor(() => expect(calls('i/security/password-login/disable/complete')).toHaveLength(1));
@@ -335,11 +354,11 @@ test('password-login disable keeps sudo, recovery warning and UV ceremony withou
 const dialogActions = [
 	{ label: 'パスキーによる多要素認証を有効にする', route: 'i/security/passkey/mfa/enable', input: false, mfa: false },
 	{ label: 'パスキーによる多要素認証を無効にする', route: 'i/security/passkey/mfa/disable', input: false, mfa: true },
-	{ label: '削除', route: 'i/security/passkey/remove', input: false, mfa: true },
-	{ label: '認証アプリを削除', route: 'i/security/totp/remove', input: false, mfa: true },
+	{ label: '登録を解除', route: 'i/security/passkey/remove', input: false, mfa: true },
+	{ label: '登録を解除', route: 'i/security/totp/remove', input: false, mfa: true },
 	{ label: 'パスワードによるログインを無効にする', route: 'i/security/password-login/disable/start', input: false, mfa: true },
 	{ label: '復旧コードを再生成', route: 'i/security/recovery-codes', input: false, mfa: true },
-	{ label: 'パスキーを登録', route: 'i/security/passkey/register/start', input: true, mfa: true },
+	{ label: 'セキュリティキー・パスキーを登録する', route: 'i/security/passkey/register/start', input: true, mfa: true },
 	{ label: '名前を変更', route: 'i/security/passkey/rename', input: true, mfa: true },
 ];
 
@@ -350,11 +369,13 @@ async function prepareDialogAction(action: typeof dialogActions[number]) {
 		? Promise.resolve({ ...state, passkeyMfaEnabled: action.mfa, totpEnabled: true, passwordlessEnabled: true }) as never
 		: implementation(route, ...args));
 	show.value = true; await nextTick();
-	await vi.waitFor(() => expect(button('パスキーを登録').disabled).toBe(false));
+	await vi.waitFor(() => expect(button('セキュリティキー・パスキーを登録する').disabled).toBe(false));
 	click('セキュリティキー・パスキー'); await nextTick();
 	click('セキュリティキー・パスキー');
 	await vi.waitFor(() => expect(element.textContent).toContain('Synthetic key'));
 	click('Synthetic key'); await nextTick();
+	if (action.route === 'i/security/totp/remove') { click('Synthetic key'); await nextTick(); }
+	if (action.route.startsWith('i/security/password-login')) { click('パスワード'); await nextTick(); }
 	vi.mocked(ensureSudo).mockClear(); vi.mocked(misskeyApi).mockClear();
 }
 
@@ -391,7 +412,7 @@ for (const input of [false, true]) {
 		let release!: () => void;
 		if (input) vi.mocked(inputText).mockImplementationOnce(() => new Promise(resolve => { release = () => resolve({ canceled: false, result: 'Delayed name' }); }));
 		else vi.mocked(confirm).mockImplementationOnce(() => new Promise(resolve => { release = () => resolve({ canceled: false }); }));
-		const label = input ? 'パスキーを登録' : 'パスキーによる多要素認証を有効にする';
+		const label = input ? 'セキュリティキー・パスキーを登録する' : 'パスキーによる多要素認証を有効にする';
 		vi.mocked(misskeyApi).mockClear();
 		click(label); click(label);
 		await nextTick(); expect(input ? inputText : confirm).toHaveBeenCalledOnce();
@@ -402,3 +423,83 @@ for (const input of [false, true]) {
 		expect(ensureSudo).not.toHaveBeenCalled(); expect(misskeyApi).not.toHaveBeenCalled();
 	});
 }
+
+async function openTotpCodeStep() {
+	click('認証アプリの設定を開始');
+	await vi.waitFor(() => expect(modal.textContent).toContain('アプリを起動'));
+	modalButton('続ける').click();
+	await vi.waitFor(() => expect(modal.querySelector('input')).not.toBeNull());
+	const input = modal.querySelector<HTMLInputElement>('input')!;
+	input.value = '123456'; input.dispatchEvent(new Event('input')); await nextTick();
+}
+
+function totpResponses() {
+	vi.mocked(misskeyApi).mockImplementation(async route => {
+		if (route === 'i/security/totp/start') return { secret: 'synthetic-secret', url: 'otpauth://totp/Synthetic?secret=synthetic-secret' } as never;
+		if (route === 'i/security/totp/complete') return { backupCodes: [] } as never;
+		if (route === 'i/security/state') return { ...state, totpEnabled: true } as never;
+		return undefined as never;
+	});
+}
+
+test('upstream composition has an initially open TOTP folder, then keys, then passwordless', () => {
+	const text = element.textContent!;
+	expect(element.querySelector('h2')?.textContent).toBe('二要素認証');
+	expect(text.indexOf('認証アプリの設定を開始')).toBeLessThan(text.indexOf('セキュリティキー・パスキー'));
+	expect(text.indexOf('セキュリティキー・パスキー')).toBeLessThan(text.indexOf('パスワードレスログイン'));
+	expect(button('セキュリティキー・パスキーを登録する').compareDocumentPosition(button('Synthetic key')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+	expect(text).toContain('最後の使用:');
+});
+
+test('TOTP wizard completion preserves existing recovery codes without displaying them again', async () => {
+	totpResponses(); await openTotpCodeStep();
+	modalButton('続ける').click();
+	await vi.waitFor(() => expect(modal.textContent).toContain('設定が完了しました'));
+	expect(modal.querySelectorAll('code')).toHaveLength(0);
+	expect(modal.textContent).not.toContain('バックアップコード');
+	expect(ensureSudo).toHaveBeenCalledTimes(2);
+});
+
+test.each(['leave', 'actor', 'token'] as const)('%s discards a delayed TOTP completion and closes its wizard', async kind => {
+	totpResponses(); await openTotpCodeStep();
+	let complete!: (value: never) => void;
+	vi.mocked(misskeyApi).mockImplementationOnce(() => new Promise(resolve => { complete = resolve; }));
+	modalButton('続ける').click();
+	await vi.waitFor(() => expect(calls('i/security/totp/complete')).toHaveLength(1));
+	if (kind === 'leave') { show.value = false; await nextTick(); } else if (kind === 'actor') reactive(fixture.actor).id = 'replacement-owner';
+	else reactive(fixture.actor).token = 'replacement-token';
+	await nextTick(); vi.mocked(misskeyApi).mockClear();
+	complete({ backupCodes: codes } as never); await nextTick(); await nextTick();
+	expect(modal.textContent).toBe(''); expect(misskeyApi).not.toHaveBeenCalled();
+});
+
+test('closing the TOTP wizard during sudo prevents completing enrollment', async () => {
+	totpResponses(); await openTotpCodeStep();
+	let release!: (value: boolean) => void;
+	vi.mocked(ensureSudo).mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+	modalButton('続ける').click();
+	await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledTimes(2));
+	modal.querySelector('[role=dialog]')!.dispatchEvent(new Event('close'));
+	await nextTick();
+	release(true); await nextTick(); await nextTick();
+	expect(calls('i/security/totp/complete')).toHaveLength(0);
+	expect(modal.textContent).toBe('');
+});
+
+test('TOTP API failure is visible inside the wizard and permits retry', async () => {
+	totpResponses(); await openTotpCodeStep();
+	vi.mocked(misskeyApi).mockRejectedValueOnce(new Error('Invalid code'));
+	modalButton('続ける').click();
+	await vi.waitFor(() => expect(modal.textContent).toContain('操作を完了できませんでした'));
+	expect(modalButton('続ける').disabled).toBe(false);
+	modalButton('続ける').click();
+	await vi.waitFor(() => expect(modal.textContent).toContain('設定が完了しました'));
+});
+
+test('new TOTP recovery codes remain visible if the following state refresh fails', async () => {
+	totpResponses(); await openTotpCodeStep();
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ backupCodes: codes } as never).mockRejectedValueOnce(new Error('Refresh failed'));
+	modalButton('続ける').click();
+	await vi.waitFor(() => expect(modal.querySelectorAll('code')).toHaveLength(5));
+	expect(modal.textContent).toContain(codes[0]);
+});

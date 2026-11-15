@@ -85,7 +85,8 @@ export const TotpSetup = {
 	...Default,
 	async play({ canvasElement }) {
 		const canvas = within(canvasElement);
-		await userEvent.click(await canvas.findByRole('button', { name: '認証アプリを設定' }));
-		await expect(canvas.findByText('JBSWY3DPEHPK3PXP')).resolves.toBeVisible();
+		await userEvent.click(await canvas.findByRole('button', { name: '認証アプリの設定を開始' }));
+		const body = within(canvasElement.ownerDocument.body);
+		await expect(body.findByText('otpauth://totp/Storybook:synthetic?secret=JBSWY3DPEHPK3PXP&issuer=Storybook')).resolves.toBeVisible();
 	},
 } satisfies StoryObj<typeof MkSecuritySettings>;
