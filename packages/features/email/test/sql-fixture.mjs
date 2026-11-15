@@ -23,7 +23,12 @@ export async function mailSqlFixture() {
 		connection = new PGlite();
 	}
 	const schema = `mail_submission_test_${randomUUID().replaceAll('-', '')}`;
-	const query = async (sql, params) => (await connection.query(sql, params)).rows;
+	// Match PostgresQueryRunner.query's default result, including UPDATE/DELETE
+	// tuples. A rows-only fixture masks production checks of affected rows.
+	const query = async (sql, params) => {
+		const result = await connection.query(sql, params);
+		return /^\s*(?:UPDATE|DELETE)\b/i.test(sql) ? [result.rows, result.rowCount ?? result.affectedRows] : result.rows;
+	};
 	const db = {
 		query,
 		async transaction(work) {

@@ -57,6 +57,9 @@ test('SMTP classifications never retry ambiguous DATA or missing phase', () => {
 	assert.deepEqual(classifySmtpFailure({ command: 'CONN', code: 'EDNS' }, recipients).retryableRecipients, recipients);
 	assert.deepEqual(classifySmtpFailure({ command: 'DATA', responseCode: 451 }, recipients).retryableRecipients, recipients);
 	assert.deepEqual(classifySmtpFailure({ command: 'DATA', responseCode: 550 }, recipients).retryableRecipients, []);
+	assert.deepEqual(classifySmtpFailure({ command: 'DATA', responseCode: 451, rejectedErrors: [{ recipient: recipients[1], responseCode: 550 }] }, recipients).retryableRecipients, [recipients[0]]);
+	assert.deepEqual(classifySmtpFailure({ command: 'DATA', responseCode: 550, rejectedErrors: [{ recipient: recipients[0], responseCode: 450 }] }, recipients).retryableRecipients, [recipients[0]]);
+	assert.deepEqual(classifySmtpFailure({ command: 'DATA', code: 'ECONNRESET', rejectedErrors: [{ recipient: recipients[0], responseCode: 450 }] }, recipients).retryableRecipients, []);
 	assert.deepEqual(classifySmtpFailure({ command: 'RCPT TO', responseCode: 550, rejectedErrors: [{ recipient: recipients[0], responseCode: 450 }, { recipient: recipients[1], responseCode: 550 }] }, recipients).retryableRecipients, [recipients[0]]);
 });
 
@@ -89,7 +92,9 @@ test('TLS relay: partial RCPT, explicit DATA failures, uncertain DATA disconnect
 	tls.setDefaultCACertificates([...previous, certificate]);
 	t.after(() => { tls.setDefaultCACertificates(previous); rmSync(directory, { recursive: true, force: true }); });
 	let mode = 'success';
+	let onHeldResponse;
 	const captures = [];
+	const transactions = [];
 	const sockets = new Set();
 	const server = tls.createServer({ key: readFileSync(keyPath), cert: certificate }, socket => {
 		sockets.add(socket);
@@ -98,6 +103,7 @@ test('TLS relay: partial RCPT, explicit DATA failures, uncertain DATA disconnect
 		let pending = '';
 		let body = null;
 		let acceptedCount = 0;
+		let recipients = [];
 		socket.write('220 localhost fixture\r\n');
 		socket.on('data', chunk => {
 			pending += chunk.toString('binary');
@@ -109,15 +115,20 @@ test('TLS relay: partial RCPT, explicit DATA failures, uncertain DATA disconnect
 					if (line !== '.') { body += `${line.startsWith('..') ? line.slice(1) : line}\r\n`; continue; }
 					captures.push(Buffer.from(body, 'binary'));
 					body = null;
-					if (mode === 'disconnect') socket.destroy();
+					if (mode === 'disconnect' || (mode === 'mixed' && recipients.includes('uncertain@example.org'))) socket.destroy();
+					else if (mode === 'hold') onHeldResponse(() => socket.write('250 queued FIXTURE-ID\r\n'));
 					else socket.write(mode === 'temporary' ? '451 later\r\n' : mode === 'permanent' ? '550 rejected\r\n' : '250 queued FIXTURE-ID\r\n');
 				} else if (line.startsWith('EHLO')) socket.write('250-localhost\r\n250 PIPELINING\r\n');
-				else if (line.startsWith('MAIL FROM')) { acceptedCount = 0; socket.write('250 sender ok\r\n'); } else if (line.startsWith('RCPT TO')) {
+				else if (line.startsWith('MAIL FROM')) { acceptedCount = 0; recipients = []; transactions.push(recipients); socket.write('250 sender ok\r\n'); } else if (line.startsWith('RCPT TO')) {
+					recipients.push(line.match(/<([^>]+)>/u)[1]);
 					if (line.includes('temporary@')) socket.write('450 temporary recipient\r\n');
 					else if (line.includes('permanent@')) socket.write('550 permanent recipient\r\n');
 					else { acceptedCount++; socket.write('250 recipient ok\r\n'); }
 				} else if (line === 'DATA') {
-					if (acceptedCount) { body = ''; socket.write('354 send data\r\n'); } else socket.write('554 no recipients\r\n');
+					if (!acceptedCount) socket.write('554 no recipients\r\n');
+					else if (mode === 'data-temporary') socket.write('451 cannot start data\r\n');
+					else if (mode === 'data-permanent') socket.write('550 cannot start data\r\n');
+					else { body = ''; socket.write('354 send data\r\n'); }
 				} else if (line === 'QUIT') socket.end('221 bye\r\n');
 				else socket.write('250 ok\r\n');
 			}
@@ -144,7 +155,60 @@ test('TLS relay: partial RCPT, explicit DATA failures, uncertain DATA disconnect
 		assert.equal(result.state, state);
 		assert.equal(result.retryableRecipients.length > 0, retry);
 	}
+	for (const failureMode of ['permanent', 'data-permanent', 'temporary', 'data-temporary']) {
+		mode = failureMode;
+		const mixedDataFailure = await transport.submit(prepared.raw, { from: prepared.envelope.from, to: ['ok@example.org', 'temporary@example.org', 'permanent@example.org'] });
+		assert.equal(mixedDataFailure.state, 'failed');
+		assert.deepEqual(mixedDataFailure.accepted, []);
+		assert.deepEqual(mixedDataFailure.retryableRecipients, failureMode.endsWith('temporary') ? ['ok@example.org', 'temporary@example.org'] : ['temporary@example.org']);
+		assert.deepEqual(new Set(mixedDataFailure.rejected), new Set(['ok@example.org', 'temporary@example.org', 'permanent@example.org']));
+	}
+	mode = 'mixed';
+	const mixedUnknown = await transport.submit(prepared.raw, { from: prepared.envelope.from, to: ['ok@example.org', 'temporary@example.org', 'permanent@example.org', 'uncertain@example.org', 'later@example.org'] });
+	assert.equal(mixedUnknown.state, 'unknown');
+	assert.deepEqual(mixedUnknown.accepted, ['ok@example.org']);
+	assert.deepEqual(mixedUnknown.rejected, ['temporary@example.org', 'permanent@example.org']);
+	assert.deepEqual(mixedUnknown.retryableRecipients, []);
+	assert.equal(transactions.some(recipients => recipients.includes('later@example.org')), false);
+	assert.equal(transactions.every(recipients => recipients.length === 1), true);
+	assert.equal(captures.every(raw => raw.equals(prepared.raw)), true);
 	mode = 'success';
+	for (const failure of ['denied', 'thrown']) {
+		const start = transactions.length;
+		let checks = 0;
+		const result = await transport.submit(prepared.raw, { from: prepared.envelope.from, to: ['guard-first@example.org', 'guard-denied@example.org', 'guard-later@example.org'] }, async () => {
+			if (++checks === 1) return true;
+			if (failure === 'thrown') throw Object.assign(new Error('claim check failed'), { code: 'EDNS' });
+			return false;
+		});
+		assert.equal(result.state, 'unknown');
+		assert.deepEqual(result.accepted, ['guard-first@example.org']);
+		assert.deepEqual(result.rejected, []);
+		assert.deepEqual(result.retryableRecipients, []);
+		assert.equal(checks, 2);
+		assert.deepEqual(transactions.slice(start), [['guard-first@example.org']]);
+	}
+	// A queued attempt must check its claim only after the prior transaction releases capacity.
+	const limited = new UserMailTransport({ host: 'localhost', port: server.address().port, tls: 'implicit', maxConnections: 1 });
+	t.after(() => limited.close());
+	mode = 'hold';
+	const held = Promise.withResolvers();
+	onHeldResponse = held.resolve;
+	const checks = [];
+	const first = limited.submit(prepared.raw, { from: prepared.envelope.from, to: ['holding@example.org'] }, async () => { checks.push('first'); return true; });
+	const release = await held.promise;
+	let secondClaimValid = true;
+	const second = limited.submit(prepared.raw, { from: prepared.envelope.from, to: ['queued@example.org'] }, async () => { checks.push('second'); return secondClaimValid; });
+	await new Promise(resolve => setImmediate(resolve));
+	assert.deepEqual(checks, ['first']);
+	secondClaimValid = false;
+	mode = 'success';
+	release();
+	assert.equal((await first).state, 'submitted');
+	assert.equal((await second).state, 'unknown');
+	assert.deepEqual(checks, ['first', 'second']);
+	assert.equal(transactions.some(recipients => recipients.includes('queued@example.org')), false);
+	assert.equal((await limited.submit(prepared.raw, { from: prepared.envelope.from, to: ['after-guard@example.org'] }, async () => true)).state, 'submitted');
 	const raw = Buffer.from('DKIM-Signature: v=1; b=fixture\r\nFrom: a@example.net\r\nContent-Type: multipart/mixed; boundary=abc\r\n\r\n--abc\r\nContent-Type: text/plain\r\n\r\n.dot\r\n--abc--\r\n');
 	const forwarded = buildForwardMail(raw, '', settings, ['mail.example.org'], mta, 1000);
 	assert.equal((await transport.submit(forwarded.raw, forwarded.envelope)).state, 'submitted');

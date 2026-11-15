@@ -5,7 +5,7 @@
 
 import { createHash, randomUUID } from 'node:crypto';
 import { parseEnvelopeRecipient } from './ingress.js';
-import type { DataSource } from 'typeorm';
+import type { DataSource, EntityManager } from 'typeorm';
 
 export interface PrivateMailStorage {
 	put(key: string, raw: Uint8Array): Promise<void>;
@@ -52,7 +52,7 @@ export class MailStore {
 	}
 
 	/** Staging row makes failed uploads/crashes discoverable without bucket listing. */
-	async stage(raw: Uint8Array): Promise<StoredMail> {
+	async stage(raw: Uint8Array, admit?: (manager: EntityManager, raw: StoredMail) => Promise<void>): Promise<StoredMail> {
 		if (raw.byteLength < 1 || raw.byteLength > this.maxBytes) throw new Error('Mail size out of bounds');
 		const bytes = Buffer.from(raw);
 		const item = { id: randomUUID(), objectKey: `raw/${randomUUID()}.eml`, sha256: createHash('sha256').update(bytes).digest('hex'), size: bytes.byteLength, state: 'staging' };
@@ -63,15 +63,37 @@ export class MailStore {
 			if (BigInt(usage.bytes) + BigInt(item.size) > this.spoolBytes) throw new MailStoreError('QUOTA_EXCEEDED');
 			await manager.query('INSERT INTO "mail_raw" ("id", "objectKey", "sha256", "size", "createdAt", "state") VALUES ($1,$2,$3,$4,now(),\'staging\')', [item.id, item.objectKey, item.sha256, item.size]);
 		});
-		await this.db.transaction(async manager => {
-			// Hold the same row lock as collection through upload/finalization. A slow
-			// upload cannot recreate an object after the collector has removed its row.
-			const [current] = await manager.query('SELECT "state" FROM "mail_raw" WHERE "id"=$1 FOR UPDATE', [item.id]);
-			if (current?.state !== 'staging') throw new MailStoreError('RAW_UNAVAILABLE');
-			await this.storage.put(item.objectKey, bytes);
-			await manager.query('UPDATE "mail_raw" SET "state" = \'ready\' WHERE "id" = $1', [item.id]);
-		});
+		let uploadStarted = false;
+		try {
+			await this.db.transaction(async manager => {
+				// Hold the raw lock through admission, upload and finalization. Admission
+				// commits its references/quota atomically with ready, never before upload.
+				const [current] = await manager.query('SELECT "state" FROM "mail_raw" WHERE "id"=$1 FOR UPDATE', [item.id]);
+				if (current?.state !== 'staging') throw new MailStoreError('RAW_UNAVAILABLE');
+				await admit?.(manager, item);
+				uploadStarted = true;
+				await this.storage.put(item.objectKey, bytes);
+				await manager.query('UPDATE "mail_raw" SET "state" = \'ready\' WHERE "id" = $1', [item.id]);
+			});
+		} catch (error) {
+			// A rejected/aborted PUT may still finish remotely. Once upload begins,
+			// retain its journal for delayed collection rather than racing it with DELETE.
+			if (!uploadStarted) {
+				try { await this.discardUnuploaded(item.id); } catch { /* The collector retries abandoned staging rows. */ }
+			}
+			throw error;
+		}
 		return { ...item, state: 'ready' };
+	}
+
+	private async discardUnuploaded(id: string): Promise<void> {
+		await this.db.transaction(async manager => {
+			const [row] = await manager.query('SELECT * FROM "mail_raw" WHERE "id"=$1 FOR UPDATE', [id]);
+			if (!row) return;
+			const refs = await manager.query('SELECT 1 FROM "mail_delivery" WHERE "rawId"=$1 UNION ALL SELECT 1 FROM "mail_submission" WHERE "rawId"=$1 LIMIT 1', [id]);
+			if (refs.length) return;
+			await manager.query('DELETE FROM "mail_raw" WHERE "id"=$1', [id]);
+		});
 	}
 
 	/** Per-recipient LMTP acceptance. Partial failures never undo other recipients. */

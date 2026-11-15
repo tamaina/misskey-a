@@ -88,12 +88,11 @@ export function classifySmtpFailure(error: unknown, recipients: string[]): MailS
 		failure.code === 'EDNS' || ['CONNECT_TIMEOUT', 'GREETING_TIMEOUT', 'UPGRADE_TIMEOUT'].includes(failure.timeoutType ?? '');
 	if (!explicitRejection && !beforeData) return { state: 'unknown', accepted: [], rejected: [], retryableRecipients: [], response: responseOf(failure) };
 	const temporary = explicitRejection ? code < 500 : true;
-	let retryableRecipients = temporary ? [...recipients] : [];
-	const rejectedErrors = failure.rejectedErrors;
-	if (rejectedErrors?.length) {
-		// All RCPT rejected: inspect each recipient's reply, rather than only the last SMTP reply.
-		retryableRecipients = recipients.filter(recipient => rejectedErrors.some(item => item.recipient === recipient && item.responseCode !== undefined && item.responseCode >= 400 && item.responseCode < 500));
-	}
+	const retryableRecipients = recipients.filter(recipient => {
+		// A RCPT refusal applies only to that recipient, not recipients rejected later at DATA.
+		const rejection = failure.rejectedErrors?.find(item => item.recipient === recipient);
+		return rejection ? rejection.responseCode !== undefined && rejection.responseCode >= 400 && rejection.responseCode < 500 : temporary;
+	});
 	return { state: 'failed', accepted: [], rejected: [...recipients], retryableRecipients, response: responseOf(failure) };
 }
 
@@ -109,11 +108,14 @@ export type UserMailSmtpConfig = {
 /** Singleton service-owned relay transport. Caller owns atomic claim, attempt ID and bounded retry scheduling. */
 export class UserMailTransport {
 	private readonly transport;
+	private availableConnections: number;
+	private readonly waitingConnections: (() => void)[] = [];
 
 	constructor(config: UserMailSmtpConfig) {
 		if (!config.host || !Number.isInteger(config.port) || config.port < 1 || config.port > 65535 || !['implicit', 'starttls'].includes(config.tls)) throw new Error('Invalid SMTP configuration');
 		const connections = config.maxConnections ?? 2;
 		if (!Number.isInteger(connections) || connections < 1 || connections > 10) throw new Error('Invalid SMTP connection limit');
+		this.availableConnections = connections;
 		this.transport = createTransport({
 			pool: true, host: config.host, port: config.port,
 			secure: config.tls === 'implicit', requireTLS: true, ignoreTLS: false,
@@ -124,12 +126,38 @@ export class UserMailTransport {
 		});
 	}
 
-	async submit(raw: Buffer, envelope: MailEnvelope): Promise<MailSubmissionResult> {
+	async submit(raw: Buffer, envelope: MailEnvelope, canSubmit?: () => Promise<boolean>): Promise<MailSubmissionResult> {
 		// Only durable internal buffers, never user-provided paths, URLs or arbitrary headers.
 		if (!Buffer.isBuffer(raw) || !raw.length || !envelope.to.length) throw new Error('Invalid prepared mail');
 		if (envelope.from !== '') validateMailAddress(envelope.from); // Null reverse path is required for forwarded DSNs.
 		envelope.to.forEach(validateMailAddress);
+		const result: MailSubmissionResult = { state: 'failed', accepted: [], rejected: [], retryableRecipients: [] };
+		// Nodemailer omits RCPT refusals from a later DATA error. Separate envelope transactions
+		// preserve those outcomes without inspecting private connection state or replaying DATA.
+		// Keep the identical raw MIME/Message-ID; the shared pool still bounds SMTP connections.
+		for (const recipient of new Set(envelope.to)) {
+			const submission = await this.submitRecipient(raw, { from: envelope.from, to: [recipient] }, canSubmit);
+			result.accepted.push(...submission.accepted);
+			result.rejected.push(...submission.rejected);
+			if (submission.state === 'unknown') {
+				// Do not start later recipients, or automatically retry any part of an ambiguous attempt.
+				return { ...result, state: 'unknown', retryableRecipients: [], response: submission.response };
+			}
+			result.retryableRecipients.push(...submission.retryableRecipients);
+			if (result.response === undefined || submission.state === 'failed') result.response = submission.response;
+		}
+		result.state = result.accepted.length ? 'submitted' : 'failed';
+		return result;
+	}
+
+	private async submitRecipient(raw: Buffer, envelope: MailEnvelope, canSubmit?: () => Promise<boolean>): Promise<MailSubmissionResult> {
+		// Check the durable claim after capacity is available, not before waiting in the pool queue.
+		if (this.availableConnections > 0) this.availableConnections--;
+		else await new Promise<void>(resolve => this.waitingConnections.push(resolve));
 		try {
+			let claimValid;
+			try { claimValid = !canSubmit || await canSubmit(); } catch { claimValid = false; }
+			if (!claimValid) return { state: 'unknown', accepted: [], rejected: [], retryableRecipients: [], response: 'Submission claim is no longer valid' };
 			const info = await this.transport.sendMail({ raw, envelope });
 			const accepted = info.accepted;
 			const rejected = info.rejected;
@@ -141,6 +169,10 @@ export class UserMailTransport {
 			};
 		} catch (error) {
 			return classifySmtpFailure(error, envelope.to);
+		} finally {
+			const next = this.waitingConnections.shift();
+			if (next) next();
+			else this.availableConnections++;
 		}
 	}
 

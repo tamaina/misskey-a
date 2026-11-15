@@ -9,6 +9,7 @@ import { renderStandaloneMfm } from '@features/markup/backend/standalone-mfm.js'
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import { buildTextMail, UserMailTransport } from '../mail/outgoing.js';
+import { MailStoreError } from '../mail/store.js';
 import { validateForwardDestination } from '../mail/forwarding.js';
 import { readMailAttachmentIsolated } from '../mail/isolated-parser.mjs';
 import { UserMailRuntime } from './UserMailRuntime.js';
@@ -20,6 +21,9 @@ import type { MiMailDelivery } from '../models/Mail.js';
 
 export class MailboxError extends Error {
 	constructor(public readonly code: 'DISABLED' | 'NOT_FOUND' | 'INVALID_INPUT' | 'QUOTA_EXCEEDED' | 'CONFLICT' | 'RATE_LIMITED' | 'UNAVAILABLE') { super(code); }
+}
+class DuplicateSubmission extends Error {
+	constructor(public readonly result: EmailOutputs['send']) { super('Duplicate submission'); }
 }
 const digest = (value: string) => createHash('sha256').update(value).digest('hex');
 const iso = (value: Date | string) => new Date(value).toISOString();
@@ -129,25 +133,28 @@ export class UserMailboxService implements EmailServicePort, OnModuleInit, OnApp
 		const preview = await this.preview(userId, input); const id = randomUUID(); const date = new Date();
 		let prepared;
 		try { prepared = await buildTextMail({ to: input.to, cc: input.cc, bcc: input.bcc, subject: input.subject, text: preview.text }, { username: user.username, domain: settings.domain }, { messageId: `<${id}@${settings.domain}>`, date }, { maxRecipients: settings.maxRecipients ?? 20, maxBytes: settings.maxBytes }, preview.html ?? undefined); } catch { throw new MailboxError('INVALID_INPUT'); }
-		const raw = await store.stage(prepared.raw);
-		return this.db.transaction(async manager => {
-			await manager.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [`mail-send:${userId}:${input.idempotencyKey}`]);
-			const [existing] = await manager.query('SELECT "id","state","contentHash" FROM "mail_submission" WHERE "userId"=$1 AND "idempotencyKey"=$2', [userId, `send:${input.idempotencyKey}`]);
-			if (existing) { if (existing.contentHash !== hash) throw new MailboxError('CONFLICT'); return { id: existing.id, state: existing.state }; }
-			const [ready] = await manager.query('SELECT "id" FROM "mail_raw" WHERE "id"=$1 AND "state"=\'ready\' FOR UPDATE', [raw.id]);
-			if (!ready) throw new MailboxError('UNAVAILABLE');
-			await manager.query('SELECT pg_advisory_xact_lock(hashtextextended(\'mail:send-rate\',0))');
-			const [instanceCount] = await manager.query('SELECT count(*)::int AS count FROM "mail_submission" WHERE "kind"=\'send\' AND "createdAt">now()-interval \'1 hour\'');
-			if (instanceCount.count >= 500) throw new MailboxError('RATE_LIMITED');
-			const [account] = await manager.query('SELECT m."usedBytes" FROM "mail_account" m JOIN "user" u ON u."id"=m."userId" WHERE m."userId"=$1 AND m."enabled" AND u."username"=$2 AND u."host" IS NULL AND u."movedToUri" IS NULL AND NOT u."isDeleted" AND NOT u."isSuspended" FOR UPDATE OF m,u', [userId, user.username]);
-			if (!account) throw new MailboxError('DISABLED');
-			const [count] = await manager.query('SELECT count(*)::int AS count FROM "mail_submission" WHERE "userId"=$1 AND "kind"=\'send\' AND "createdAt">now()-interval \'1 hour\'', [userId]);
-			if (count.count >= (settings.sendsPerHour ?? 20)) throw new MailboxError('RATE_LIMITED');
-			if (BigInt(account.usedBytes) + BigInt(raw.size) > BigInt(settings.quotaBytes)) throw new MailboxError('QUOTA_EXCEEDED');
-			await this.insertSubmission(manager, { id, userId, key: `send:${input.idempotencyKey}`, hash, rawId: raw.id, kind: 'send', from: prepared.envelope.from, to: prepared.envelope.to, metadata: { subject: input.subject, to: input.to, cc: input.cc ?? [], bcc: input.bcc ?? [] }, size: raw.size, charged: true });
-			await manager.query('UPDATE "mail_account" SET "usedBytes"="usedBytes"+$2 WHERE "userId"=$1', [userId, raw.size]);
-			return { id, state: 'queued' as const };
-		});
+		try {
+			await store.stage(prepared.raw, async (manager, raw) => {
+				await manager.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [`mail-send:${userId}:${input.idempotencyKey}`]);
+				const [existing] = await manager.query('SELECT "id","state","contentHash" FROM "mail_submission" WHERE "userId"=$1 AND "idempotencyKey"=$2', [userId, `send:${input.idempotencyKey}`]);
+				if (existing) { if (existing.contentHash !== hash) throw new MailboxError('CONFLICT'); throw new DuplicateSubmission({ id: existing.id, state: existing.state }); }
+				await manager.query('SELECT pg_advisory_xact_lock(hashtextextended(\'mail:send-rate\',0))');
+				const [instanceCount] = await manager.query('SELECT count(*)::int AS count FROM "mail_submission" WHERE "kind"=\'send\' AND "createdAt">now()-interval \'1 hour\'');
+				if (instanceCount.count >= 500) throw new MailboxError('RATE_LIMITED');
+				const [account] = await manager.query('SELECT m."usedBytes" FROM "mail_account" m JOIN "user" u ON u."id"=m."userId" WHERE m."userId"=$1 AND m."enabled" AND u."username"=$2 AND u."host" IS NULL AND u."movedToUri" IS NULL AND NOT u."isDeleted" AND NOT u."isSuspended" FOR UPDATE OF m,u', [userId, user.username]);
+				if (!account) throw new MailboxError('DISABLED');
+				const [count] = await manager.query('SELECT count(*)::int AS count FROM "mail_submission" WHERE "userId"=$1 AND "kind"=\'send\' AND "createdAt">now()-interval \'1 hour\'', [userId]);
+				if (count.count >= (settings.sendsPerHour ?? 20)) throw new MailboxError('RATE_LIMITED');
+				if (BigInt(account.usedBytes) + BigInt(raw.size) > BigInt(settings.quotaBytes)) throw new MailboxError('QUOTA_EXCEEDED');
+				await this.insertSubmission(manager, { id, userId, key: `send:${input.idempotencyKey}`, hash, rawId: raw.id, kind: 'send', from: prepared.envelope.from, to: prepared.envelope.to, metadata: { subject: input.subject, to: input.to, cc: input.cc ?? [], bcc: input.bcc ?? [] }, size: raw.size, charged: true });
+				await manager.query('UPDATE "mail_account" SET "usedBytes"="usedBytes"+$2 WHERE "userId"=$1', [userId, raw.size]);
+			});
+		} catch (error) {
+			if (error instanceof DuplicateSubmission) return error.result;
+			if (error instanceof MailStoreError && error.code === 'RAW_UNAVAILABLE') throw new MailboxError('UNAVAILABLE');
+			throw error;
+		}
+		return { id, state: 'queued' };
 	}
 	private async insertSubmission(manager: EntityManager, s: { id: string; userId: string; key: string; hash: string; rawId: string; kind: string; from: string; to: string[]; metadata: object; size: number; charged: boolean; revision?: number }) {
 		await manager.query('INSERT INTO "mail_submission" ("id","userId","idempotencyKey","contentHash","rawId","kind","forwardingRevision","envelopeFrom","recipients","metadata","state","createdAt","expiresAt","nextAttemptAt","size","charged") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,\'queued\',now(),now()+interval \'1 day\',now(),$11,$12)', [s.id, s.userId, s.key, s.hash, s.rawId, s.kind, s.revision ?? null, s.from, JSON.stringify(s.to), JSON.stringify(s.metadata), s.size, s.charged]);
@@ -164,18 +171,15 @@ export class UserMailboxService implements EmailServicePort, OnModuleInit, OnApp
 		let address: string | null = null;
 		try { if (input.address) address = validateForwardDestination(input.address, [settings.domain]); } catch { throw new MailboxError('INVALID_INPUT'); }
 		const token = randomBytes(32).toString('base64url'); const id = randomUUID();
-		let staged: { id: string; size: number } | null = null;
+		let prepared: Awaited<ReturnType<typeof buildTextMail>> | null = null;
 		if (address) {
 			const link = new URL('/my/mail', this.config.url); link.searchParams.set('verify', token);
-			const prepared = await buildTextMail({ to: [address], subject: 'Confirm mail forwarding', text: `Confirm forwarding for ${user.username}@${settings.domain}. This link expires in one hour. Sign in to the matching account, then open: ${link.href}\nOr enter this confirmation code in the mail settings: ${token}\nIf you did not request this, ignore it.` }, { username: user.username, domain: settings.domain }, { messageId: `<${id}@${settings.domain}>`, date: new Date() }, { maxRecipients: 1, maxBytes: settings.maxBytes });
-			staged = await store.stage(prepared.raw);
+			prepared = await buildTextMail({ to: [address], subject: 'Confirm mail forwarding', text: `Confirm forwarding for ${user.username}@${settings.domain}. This link expires in one hour. Sign in to the matching account, then open: ${link.href}\nOr enter this confirmation code in the mail settings: ${token}\nIf you did not request this, ignore it.` }, { username: user.username, domain: settings.domain }, { messageId: `<${id}@${settings.domain}>`, date: new Date() }, { maxRecipients: 1, maxBytes: settings.maxBytes });
 		}
-		await this.db.transaction(async manager => {
+		const admit = async (manager: EntityManager, staged?: { id: string; size: number }) => {
 			await manager.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [`mail-forwarding:${userId}`]);
 			// Match acceptance lock order: raw -> user -> forwarding -> submission.
 			if (address && staged) {
-				const [ready] = await manager.query('SELECT "id" FROM "mail_raw" WHERE "id"=$1 AND "state"=\'ready\' FOR UPDATE', [staged.id]);
-				if (!ready) throw new MailboxError('UNAVAILABLE');
 				const [identity] = await manager.query('SELECT "id" FROM "user" WHERE "id"=$1 AND "username"=$2 AND "host" IS NULL AND "movedToUri" IS NULL AND NOT "isDeleted" AND NOT "isSuspended" FOR SHARE', [userId, user.username]);
 				if (!identity) throw new MailboxError('DISABLED');
 			}
@@ -187,13 +191,21 @@ export class UserMailboxService implements EmailServicePort, OnModuleInit, OnApp
 				ON CONFLICT ("userId") DO UPDATE SET "address"=EXCLUDED."address","enabled"=false,"keepLocalCopy"=EXCLUDED."keepLocalCopy","revision"=EXCLUDED."revision","verifiedAt"=NULL,"tokenHash"=EXCLUDED."tokenHash","expiresAt"=EXCLUDED."expiresAt","updatedAt"=now()`, [userId, address, input.keepLocalCopy, revision, address ? digest(token) : null]);
 			await manager.query('UPDATE "mail_submission" SET "state"=\'cancelled\' WHERE "userId"=$1 AND "kind" IN (\'forward\',\'confirmation\') AND "state"=\'queued\'', [userId]);
 			if (address && staged) await this.insertSubmission(manager, { id, userId, key: `confirmation:${revision}`, hash: digest(address), rawId: staged.id, kind: 'confirmation', from: `${user.username}@${settings.domain}`, to: [address], metadata: { subject: 'Confirm mail forwarding', to: [address], cc: [], bcc: [] }, size: staged.size, charged: false, revision });
-		});
+		};
+		try {
+			if (prepared) await store.stage(prepared.raw, admit);
+			else await this.db.transaction(manager => admit(manager));
+		} catch (error) {
+			if (error instanceof MailStoreError && error.code === 'RAW_UNAVAILABLE') throw new MailboxError('UNAVAILABLE');
+			throw error;
+		}
 	}
 	async confirmForwarding(userId: string, input: EmailInputs['confirmForwarding']) {
 		const { settings } = await this.context(); await this.owner(userId, true);
 		if (!settings.forwarding?.enabled || !settings.forwarding.trustedIngress || !settings.forwarding.loopChecked || !settings.forwarding.forwardingRelay || !settings.outbound) throw new MailboxError('UNAVAILABLE');
-		const rows = await this.db.query(`UPDATE "mail_forwarding" SET "enabled"=true,"verifiedAt"=now(),"tokenHash"=NULL,"expiresAt"=NULL
-			WHERE "userId"=$1 AND "tokenHash"=$2 AND "expiresAt">now() AND "address" IS NOT NULL RETURNING "userId"`, [userId, digest(input.token)]);
+		// A SELECT result is rows-only; TypeORM returns UPDATE as [rows, affected].
+		const rows = await this.db.query(`WITH confirmed AS (UPDATE "mail_forwarding" SET "enabled"=true,"verifiedAt"=now(),"tokenHash"=NULL,"expiresAt"=NULL
+			WHERE "userId"=$1 AND "tokenHash"=$2 AND "expiresAt">now() AND "address" IS NOT NULL RETURNING "userId") SELECT "userId" FROM confirmed`, [userId, digest(input.token)]);
 		if (!rows.length) throw new MailboxError('INVALID_INPUT');
 	}
 
@@ -231,7 +243,15 @@ export class UserMailboxService implements EmailServicePort, OnModuleInit, OnApp
 		} catch { result = { state: 'failed' as const, accepted: [], rejected: row.recipients, retryableRecipients: row.recipients, response: 'Temporary storage failure' }; }
 		if (!result) {
 			this.transport ??= new UserMailTransport(settings.outbound);
-			try { result = await this.transport.submit(Buffer.from(raw!), { from: row.envelopeFrom, to: row.recipients }); } catch { result = { state: 'unknown' as const, accepted: [], rejected: [], retryableRecipients: [], response: 'Submission outcome unknown' }; }
+			try {
+				result = await this.transport.submit(Buffer.from(raw!), { from: row.envelopeFrom, to: row.recipients }, async () => {
+					// Each recipient starts only under a current claim. Refresh progress,
+					// but never revive an expired/unknown attempt after a slow SMTP reply.
+					const rows = await this.db.query(`WITH renewed AS (UPDATE "mail_submission" SET "leaseUntil"=now()+interval '5 minutes'
+						WHERE "id"=$1 AND "attemptId"=$2 AND "state"='sending' AND "leaseUntil">now() RETURNING "id") SELECT "id" FROM renewed`, [id, attemptId]);
+					return rows.length === 1;
+				});
+			} catch { result = { state: 'unknown' as const, accepted: [], rejected: [], retryableRecipients: [], response: 'Submission outcome unknown' }; }
 		}
 		const accepted = [...new Set([...(row.result.accepted ?? []), ...result.accepted])];
 		const retry = result.state !== 'unknown' && row.attempts < 7 && new Date(row.expiresAt).getTime() > Date.now() ? result.retryableRecipients : [];
