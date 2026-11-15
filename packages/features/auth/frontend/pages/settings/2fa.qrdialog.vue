@@ -77,23 +77,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<div style="text-align: center;">{{ $locale.sfc.twoFactorStep4 }}</div>
 							<div v-if="backupCodes?.length" style="text-align: center; font-weight: bold;">{{ $locale.sfc.twoFactorCheckBackupCodesBeforeCloseThisWizard }}</div>
 
-							<MkFolder v-if="backupCodes?.length" :defaultOpen="true">
-								<template #icon><i class="ti ti-key"></i></template>
-								<template #label>{{ $locale.sfc.twoFactorBackupCodes }}</template>
+							<div v-if="backupCodes?.length" class="_gaps">
+								<MkInfo warn>{{ $locale.sfc.twoFactorBackupCodesDescription }}</MkInfo>
 
-								<div class="_gaps">
-									<MkInfo warn>{{ $locale.sfc.twoFactorBackupCodesDescription }}</MkInfo>
-
-									<div v-for="(code, i) in backupCodes" :key="code" class="_gaps_s">
-										<MkKeyValue :copy="code">
-											<template #key>#{{ i + 1 }}</template>
-											<template #value><code class="_monospace">{{ code }}</code></template>
-										</MkKeyValue>
-									</div>
-
-									<MkButton primary rounded gradate @click="downloadBackupCodes"><i class="ti ti-download"></i> {{ globalLocale.env.download }}</MkButton>
+								<div v-for="(code, i) in backupCodes" :key="code" class="_gaps_s">
+									<MkKeyValue :copy="code">
+										<template #key>#{{ i + 1 }}</template>
+										<template #value><code class="_monospace">{{ code }}</code></template>
+									</MkKeyValue>
 								</div>
-							</MkFolder>
+
+								<MkButton primary rounded gradate @click="downloadBackupCodes"><i class="ti ti-download"></i> {{ globalLocale.env.download }}</MkButton>
+							</div>
 						</div>
 						<div class="_buttonsCenter" style="margin-top: 16px;">
 							<MkButton primary rounded gradate @click="allDone">{{ globalLocale.env.done }}</MkButton>
@@ -115,7 +110,6 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';

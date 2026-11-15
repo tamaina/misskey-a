@@ -91,6 +91,7 @@ import * as os from '@features/ui/frontend/os.js';
 import { ensureSignin } from '../../i.js';
 import { registrationWire } from '../../utility/registration-wire.js';
 import { ensureSudo } from '../../utility/ensure-sudo.js';
+import { ownedInputText } from '../../utility/owned-dialog.js';
 import { isSameLiveCredential } from '../../utility/live-account.js';
 
 withDefaults(defineProps<{ first?: boolean }>(), { first: false });
@@ -126,7 +127,7 @@ async function refresh(isCurrent: () => boolean) {
 	if (isCurrent()) state.value = value;
 }
 
-async function run(action: (isCurrent: () => boolean) => Promise<void>, elevate = true, beforeSudo?: () => Promise<boolean>) {
+async function run(action: (isCurrent: () => boolean, signal: AbortSignal) => Promise<void>, elevate = true, beforeSudo?: () => Promise<boolean>) {
 	if (!currentActor() || busy.value) return;
 	busy.value = true; error.value = false;
 	const turn = ++generation;
@@ -136,7 +137,7 @@ async function run(action: (isCurrent: () => boolean) => Promise<void>, elevate 
 		if (beforeSudo && !await beforeSudo()) return;
 		if (!isCurrent()) return;
 		if (elevate && !await ensureSudo(isCurrent, controller.signal)) return;
-		if (isCurrent()) await action(isCurrent);
+		if (isCurrent()) await action(isCurrent, controller.signal);
 	} catch { if (isCurrent()) error.value = true; } finally { controller.abort(); if (sudoAbort === controller) sudoAbort = null; busy.value = false; nativePending = false; }
 }
 
@@ -145,9 +146,10 @@ function loadKeys() {
 }
 
 function registerKey() {
-	let name = '';
-	return run(async isCurrent => {
-		const started = await misskeyApi('i/security/passkey/register/start', { name });
+	return run(async (isCurrent, signal) => {
+		const input = await ownedInputText({ title: $locale.value.sfc['2faRegisterSecurityKey'], text: $locale.value.sfc['2faSecurityKeyName'], minLength: 1, maxLength: 30 }, signal);
+		if (!isCurrent() || input.canceled || !input.result) return;
+		const started = await misskeyApi('i/security/passkey/register/start', { name: input.result });
 		if (!isCurrent()) return;
 		nativePending = true;
 		const credential = await startRegistration({ optionsJSON: started.options });
@@ -155,11 +157,6 @@ function registerKey() {
 		if (!isCurrent()) return;
 		const value = await misskeyApi('i/security/passkey/register/complete', { ticket: started.ticket, credential: registrationWire(credential) });
 		if (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); if (isCurrent()) { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; } }
-	}, true, async () => {
-		const input = await os.inputText({ title: $locale.value.sfc['2faRegisterSecurityKey'], text: $locale.value.sfc['2faSecurityKeyName'], minLength: 1, maxLength: 30 });
-		if (input.canceled || !input.result) return false;
-		name = input.result;
-		return true;
 	});
 }
 
