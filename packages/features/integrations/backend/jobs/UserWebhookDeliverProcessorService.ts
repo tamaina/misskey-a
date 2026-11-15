@@ -17,6 +17,7 @@ import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import { UserWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
+import { canDeliverLegacyChatWebhook } from '../legacy-chat-authorization.js';
 
 @Injectable()
 export class UserWebhookDeliverProcessorService {
@@ -67,9 +68,21 @@ export class UserWebhookDeliverProcessorService {
 	public async process(job: Bull.Job<UserWebhookDeliverJobData>): Promise<string> {
 		if (job.data.mode === 'mcp') return this.processMcp(job.data);
 		// Older producers can serialize MCP rows as legacy jobs. Fail closed also
-		// when grant cascade deletion has removed the row, without loading secrets.
-		const current = await this.webhooksRepository.findOne({ where: { id: job.data.webhookId }, select: { mode: true } });
+		// when grant cascade deletion has removed the row.
+		const current = await this.webhooksRepository.findOne({ where: { id: job.data.webhookId } });
 		if (!current || current.mode !== 'legacy') return 'Suppressed';
+		if (job.data.type === 'chatMessage') {
+			if (!job.data.chatGeneration || current.chatGeneration !== job.data.chatGeneration
+				|| current.userId !== job.data.userId || !current.active || !current.on.includes('chatMessage')
+				|| current.url !== job.data.to || current.secret !== job.data.secret
+				|| !await canDeliverLegacyChatWebhook(this.webhooksRepository.manager, current)) return 'Suppressed';
+			// Grant lookups await database reads. Do not send an earlier snapshot if
+			// the hook was disabled, removed or reauthorized while those were pending.
+			const latest = await this.webhooksRepository.findOneBy({ id: current.id });
+			if (!latest || latest.mode !== 'legacy' || !latest.active || !latest.on.includes('chatMessage')
+				|| latest.chatGeneration !== job.data.chatGeneration || latest.userId !== job.data.userId
+				|| latest.url !== job.data.to || latest.secret !== job.data.secret) return 'Suppressed';
+		}
 		try {
 			this.logger.debug(`delivering ${job.data.webhookId}`);
 

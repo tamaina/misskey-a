@@ -64,6 +64,18 @@ export class MiWebhook {
 	@Column('varchar', { length: 16, default: 'legacy' })
 	public mode: 'legacy' | 'mcp';
 
+	/** Null until chat delivery has been explicitly authorized after upgrade. */
+	@Column('uuid', { nullable: true })
+	public chatGeneration: string | null;
+
+	@Index('IDX_webhook_chatTokenId')
+	@Column({ ...id(), nullable: true })
+	public chatTokenId: string | null;
+
+	@ManyToOne(() => MiAccessToken, { onDelete: 'CASCADE', nullable: true })
+	@JoinColumn({ name: 'chatTokenId', foreignKeyConstraintName: 'FK_webhook_chatTokenId' })
+	public chatToken: MiAccessToken | null;
+
 	@Index('IDX_webhook_mcpTokenId')
 	@Column({ ...id(), nullable: true })
 	public mcpTokenId: string | null;

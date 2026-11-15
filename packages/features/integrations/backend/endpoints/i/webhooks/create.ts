@@ -6,6 +6,7 @@ import { IdService } from '../../../../../runtime/backend/services/IdService.js'
 import type { WebhooksRepository } from '../../../../../persistence/backend/repositories/models.js';
 import { MiWebhook } from '../../../models/Webhook.js';
 import { lockWebhookQuota } from '../../../webhook-quota.js';
+import { authorizeLegacyChatWebhook } from '../../../legacy-chat-authorization.js';
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { RoleService } from '../../../../../roles/backend/services/RoleService.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
@@ -25,6 +26,7 @@ export function createIWebhooksCreateProcedure(deps: IWebhooksCreateDependencies
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
+			const chatAuthorization = ps.on.includes('chatMessage') ? authorizeLegacyChatWebhook(context.token) : {};
 			const result = await (async () => {
 				const limit = (await deps.roleService.getUserPolicies(me.id)).webhookLimit;
 				// Share the MCP subscription lock so concurrent registrations cannot exceed the quota.
@@ -41,6 +43,7 @@ export function createIWebhooksCreateProcedure(deps: IWebhooksCreateDependencies
 						url: ps.url,
 						secret: ps.secret,
 						on: ps.on,
+						...chatAuthorization,
 					});
 					return repository.findOneByOrFail({ id });
 				});

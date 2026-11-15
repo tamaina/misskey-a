@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import type { WebhooksRepository } from '../../../../../persistence/backend/repositories/models.js';
+import { MiWebhook } from '../../../models/Webhook.js';
+import { authorizeLegacyChatWebhook } from '../../../legacy-chat-authorization.js';
 import { GlobalEventService } from '../../../../../runtime/backend/services/GlobalEventService.js';
 import { apiError } from '../../../../../api/backend/transport/orpc-error.js';
 import { iWebhooksUpdateErrors, iWebhooksUpdateContract } from './update.contract.js';
@@ -19,10 +21,21 @@ export function createIWebhooksUpdateProcedure(deps: IWebhooksUpdateDependencies
 		.handler(async ({ input, context }) => {
 			const ps = input;
 			const me = context.principal;
-			const webhook = await deps.webhooksRepository.findOneBy({ id: ps.webhookId, userId: me.id, mode: 'legacy' });
-			if (webhook === null) throw apiError(iWebhooksUpdateErrors.noSuchWebhook);
-			await deps.webhooksRepository.update(webhook.id, { name: ps.name, url: ps.url, secret: ps.secret === null ? '' : ps.secret, on: ps.on, active: ps.active });
-			const updated = await deps.webhooksRepository.findOneByOrFail({ id: ps.webhookId });
+			const updated = await deps.webhooksRepository.manager.transaction(async manager => {
+				const repository = manager.getRepository(MiWebhook);
+				// Serialize permission checks with changes to the event selection and destination.
+				const webhook = await repository.findOne({ where: { id: ps.webhookId, userId: me.id, mode: 'legacy' }, lock: { mode: 'pessimistic_write' } });
+				if (webhook === null) throw apiError(iWebhooksUpdateErrors.noSuchWebhook);
+				const on = ps.on ?? webhook.on;
+				// Even a partial URL/secret/active edit of a chat hook requires chat access.
+				const chatAuthorization = webhook.on.includes('chatMessage') || on.includes('chatMessage')
+					? authorizeLegacyChatWebhook(context.token) : {};
+				await repository.update(webhook.id, { name: ps.name, url: ps.url, secret: ps.secret === null ? '' : ps.secret, on: ps.on, active: ps.active,
+					...chatAuthorization,
+					...(!on.includes('chatMessage') ? { chatGeneration: null, chatTokenId: null } : {}),
+				});
+				return repository.findOneByOrFail({ id: ps.webhookId });
+			});
 			void deps.globalEventService.publishInternalEvent('webhookUpdated', updated);
 		});
 }
