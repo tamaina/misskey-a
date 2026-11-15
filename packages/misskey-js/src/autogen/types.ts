@@ -639,9 +639,6 @@ export type paths = {
     '/i/authorized-apps': {
         post: operations['i___authorized-apps'];
     };
-;
-;
-;
     '/i/regenerate-token': {
         post: operations['i___regenerate-token'];
     };
@@ -84597,9 +84594,6 @@ export interface operations {
             };
         };
     };
-;
-;
-;
     'i___regenerate-token': {
         requestBody: {
             content: {
