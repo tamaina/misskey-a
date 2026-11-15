@@ -216,8 +216,9 @@ export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
 }
 
 /** Swap a native credential for a newly issued browser session without leaving the account. */
-export async function adoptBrowserSession(token: string) {
-	if (!$i || !/^bs_[A-Za-z0-9_-]{43}$/.test(token) || $i.token === token) return;
+export async function adoptBrowserSession(token: string, expectedToken: string): Promise<boolean> {
+	if (!$i || $i.token !== expectedToken || !/^bs_[A-Za-z0-9_-]{43}$/.test(token)) return false;
+	if ($i.token === token) return true;
 	const previous = $i.token;
 	adoptLiveToken($i.id, previous, token);
 	$i.token = token;
@@ -226,6 +227,7 @@ export async function adoptBrowserSession(token: string) {
 	const currentAccount = getCurrentAccountInfo();
 	if (currentAccount) await addAccount(host, currentAccount, token);
 	reconnectStream();
+	return true;
 }
 
 /** Drop only the live credential after a password or token change; keep other saved accounts. */

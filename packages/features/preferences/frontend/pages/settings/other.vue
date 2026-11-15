@@ -168,6 +168,7 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { enableStoragePersistence, getStoragePersistenceStatusRef, storagePersistenceSupported } from '@features/runtime/frontend/utility/storage.js';
+import { isSameLiveCredential } from '@features/auth/frontend/utility/live-account.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -208,7 +209,7 @@ async function deleteAccount() {
 	const ownerId = $i.id; const ownerToken = $i.token;
 	const generation = ++deletionGeneration;
 	const controller = new AbortController(); deletionAbort = controller;
-	const isCurrent = () => deletionActive && generation === deletionGeneration && $i.id === ownerId && $i.token === ownerToken;
+	const isCurrent = () => deletionActive && generation === deletionGeneration && isSameLiveCredential(ownerId, ownerToken, $i.id, $i.token);
 	try {
 		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.deleteAccountConfirm });
 		if (!isCurrent() || confirmation.canceled) return;

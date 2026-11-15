@@ -82,7 +82,8 @@ async function discardElevation(expiresAt: string, grantId: string, token = owne
 }
 
 async function acceptGrant(expiresAt: string, grantId: string, token?: string) {
-	if (token) await adoptBrowserSession(token);
+	if (!current()) { await discardElevation(expiresAt, grantId, token ?? ownerToken); return false; }
+	if (token && !await adoptBrowserSession(token, ownerToken)) { await discardElevation(expiresAt, grantId, token); return false; }
 	if (!current() && token) { await discardElevation(expiresAt, grantId, token); return false; }
 	if (!current()) { await discardElevation(expiresAt, grantId); return false; }
 	return true;
@@ -104,6 +105,7 @@ async function confirm() {
 			dialog.value?.close();
 			return;
 		}
+		if (!current()) return;
 		nativePending = true;
 		const credential = await startAuthentication({ optionsJSON: started.options });
 		nativePending = false;

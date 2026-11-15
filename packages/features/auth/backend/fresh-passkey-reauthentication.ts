@@ -22,9 +22,12 @@ import type { Config } from '@/config.js';
 /** Redis ticket binding used when sudo starts from a native token that has no browser session yet. */
 export const nativeSudoBindingSessionId = 'native';
 
+export const nativeCredentialFingerprint = (token: string) => createHash('sha256').update(token).digest('hex');
+
 /** Server-owned API context only. No token or wire object is an identity proof. */
 export interface FreshReauthenticationIdentity {
 	userId: string;
+	nativeCredentialFingerprint?: string;
 	browserSession?: BrowserSessionIdentity;
 	accessToken?: unknown;
 }
@@ -60,8 +63,8 @@ export class FreshPasskeyReauthentication {
 			if (session.userId !== identity.userId || !await this.sessions.isActive(session.id, identity.userId)) throw new Error('Fresh reauthentication failed');
 			return v.parse(freshReauthenticationBindingSchema, { userId: identity.userId, sessionId: session.id, purpose, ...(targetStamp === undefined ? {} : { targetStamp }) });
 		}
-		if (purpose !== 'sudo') throw new Error('Fresh reauthentication failed');
-		return v.parse(freshReauthenticationBindingSchema, { userId: identity.userId, sessionId: nativeSudoBindingSessionId, purpose, ...(targetStamp === undefined ? {} : { targetStamp }) });
+		if (purpose !== 'sudo' || !identity.nativeCredentialFingerprint) throw new Error('Fresh reauthentication failed');
+		return v.parse(freshReauthenticationBindingSchema, { userId: identity.userId, sessionId: `${nativeSudoBindingSessionId}_${identity.nativeCredentialFingerprint}`, purpose, ...(targetStamp === undefined ? {} : { targetStamp }) });
 	}
 
 	private async snapshot(userId: string) {

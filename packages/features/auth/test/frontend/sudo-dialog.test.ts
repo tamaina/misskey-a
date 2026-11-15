@@ -10,7 +10,7 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { startAuthentication, WebAuthnAbortService } from '@simplewebauthn/browser';
 const fixture = vi.hoisted(() => ({ actor: { id: 'synthetic-owner', token: 'bs_synthetic' }, close: vi.fn() }));
 vi.mock('@features/auth/frontend/i.js', () => ({ ensureSignin: () => fixture.actor }));
-vi.mock('@features/auth/frontend/accounts.js', () => ({ adoptBrowserSession: vi.fn() }));
+vi.mock('@features/auth/frontend/accounts.js', () => ({ adoptBrowserSession: vi.fn().mockResolvedValue(true) }));
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
 vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: () => true, startAuthentication: vi.fn(), WebAuthnAbortService: { cancelCeremony: vi.fn() } }));
 vi.mock('@features/ui/frontend/components/MkModalWindow.vue', () => ({ default: defineComponent({ setup: (_, { slots, expose }) => { expose({ close: fixture.close }); return () => h('div', slots.default?.()); } }) }));
@@ -100,6 +100,30 @@ test('an issued session token is adopted before the dialog reports success', asy
 	const issued = `bs_${'A'.repeat(43)}`;
 	vi.mocked(misskeyApi).mockImplementation(async (endpoint: string) => endpoint === 'i/security/state' ? { ...state } : { status: 'elevated', expiresAt, grantId, token: issued });
 	input('password', 'synthetic-password'); input('text', '123456'); submit();
-	await vi.waitFor(() => expect(adoptBrowserSession).toHaveBeenCalledExactlyOnceWith(issued));
+	await vi.waitFor(() => expect(adoptBrowserSession).toHaveBeenCalledExactlyOnceWith(issued, 'bs_synthetic'));
 	expect(done).toHaveBeenCalledExactlyOnceWith(true);
+});
+
+test('a delayed passkey-required response after cancel cannot start WebAuthn', async () => {
+	let release!: (value: never) => void;
+	vi.mocked(misskeyApi).mockReturnValueOnce(new Promise(resolve => { release = resolve; }));
+	input('password', 'synthetic-password'); input('text', '123456'); submit(); cancel();
+	release({ status: 'passkey-required', ticket: 'late', options } as never);
+	await nextTick(); await nextTick();
+	expect(startAuthentication).not.toHaveBeenCalled();
+	expect(done).toHaveBeenCalledExactlyOnceWith(false);
+});
+
+test('a delayed native grant cannot replace the session adopted by a retry', async () => {
+	const { adoptBrowserSession } = await import('../../frontend/accounts.js');
+	let release!: (value: never) => void;
+	vi.mocked(misskeyApi).mockReturnValueOnce(new Promise(resolve => { release = resolve; }));
+	input('password', 'synthetic-password'); input('text', '123456'); submit(); cancel();
+	const replacement = `bs_${'B'.repeat(43)}`; fixture.actor.token = replacement;
+	const stale = `bs_${'A'.repeat(43)}`;
+	release({ status: 'elevated', expiresAt, grantId, token: stale } as never);
+	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/sudo/exit', { expiresAt, grantId }, stale));
+	expect(adoptBrowserSession).not.toHaveBeenCalled();
+	expect(fixture.actor.token).toBe(replacement);
+	expect(done).toHaveBeenCalledExactlyOnceWith(false);
 });

@@ -71,7 +71,7 @@ describe.skipIf(!socket)('real PostgreSQL locked MFA policy', () => {
 		await db.initialize();
 		const migrations = await db.runMigrations();
 		expect(migrations).toHaveLength(367);
-		expect(migrations.at(-1)?.name).toBe('AccessTokenExpiry1792300000004');
+		expect(migrations.at(-1)?.name).toBe('SessionUserIp1794700800000');
 		console.log('Production migrations applied:', migrations.length);
 	});
 	afterAll(async () => { if (db?.isInitialized) await db.destroy(); });

@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs';
 import { beforeEach, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import * as webauthn from '@simplewebauthn/server';
-import { FreshPasskeyReauthentication, freshReauthenticationPolicyStamp } from '../../backend/fresh-passkey-reauthentication.js';
+import { FreshPasskeyReauthentication, freshReauthenticationPolicyStamp, nativeCredentialFingerprint } from '../../backend/fresh-passkey-reauthentication.js';
 import type { FreshReauthenticationRecord } from '../../backend/fresh-reauthentication-store.js';
 import type { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import type { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
@@ -175,4 +175,15 @@ test.each([false, true])('passkey-only sudo requires UV after registration enabl
 	const retry = await f.service.begin(identity, 'sudo', undefined);
 	vi.mocked(webauthn.verifyAuthenticationResponse).mockResolvedValue({ verified: true, authenticationInfo: { userVerified: false } } as never);
 	await expect(f.service.complete(identity, 'sudo', retry.ticket, assertion)).rejects.toThrow();
+});
+
+test('native sudo tickets bind the authenticated native credential generation', async () => {
+	const f = fixture();
+	const native = { userId: identity.userId, nativeCredentialFingerprint: nativeCredentialFingerprint('synthetic-old') };
+	await f.service.begin(native, 'sudo', 'synthetic-password');
+	const first = f.store.create.mock.calls[0][0];
+	expect(first.sessionId).toBe(`native_${native.nativeCredentialFingerprint}`);
+	await f.service.begin({ ...native, nativeCredentialFingerprint: nativeCredentialFingerprint('synthetic-new') }, 'sudo', 'synthetic-password');
+	expect(f.store.create.mock.calls[1][0].sessionId).not.toBe(first.sessionId);
+	await expect(f.service.begin({ userId: identity.userId }, 'sudo', 'synthetic-password')).rejects.toThrow();
 });

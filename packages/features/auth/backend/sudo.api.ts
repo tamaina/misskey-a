@@ -8,12 +8,13 @@ import type { AuthenticatedContext } from '@features/api/backend/transport/middl
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { sudoContract } from './sudo.contract.js';
 import { toWebAuthnAuthenticationOptions } from './webauthn.schema.js';
+import { nativeCredentialFingerprint } from './fresh-passkey-reauthentication.js';
 import { reauthenticationFailed } from './sudo.js';
 import type { SudoService, SudoIdentity } from './sudo.js';
 import type { BrowserSessionUsage } from './services/BrowserSessionService.js';
 
 export function sudoIdentity(context: AuthenticatedContext<MiLocalUser>): SudoIdentity {
-	return { userId: context.principal!.id, browserSession: context.browserSession, accessToken: context.token };
+	return { userId: context.principal!.id, nativeCredentialFingerprint: !context.browserSession && context.token == null && context.credential ? nativeCredentialFingerprint(context.credential) : undefined, browserSession: context.browserSession, accessToken: context.token };
 }
 
 function requestUsage(context: AuthenticatedContext<MiLocalUser>): BrowserSessionUsage {

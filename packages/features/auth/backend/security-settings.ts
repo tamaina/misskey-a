@@ -20,7 +20,7 @@ import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiBrowserSession } from './models/BrowserSession.js';
 import { MiUserSecurityKey } from './models/UserSecurityKey.js';
 import { SudoService, sudoPolicyStamp, sudoRequired } from './sudo.js';
-import type { SudoIdentity, LockedSudoContext } from './sudo.js';
+import type { SudoIdentity, LockedSudoContext, SessionLockedSudoContext } from './sudo.js';
 import { SecurityOperationStore, SecurityConfirmationRejected } from './security-operation-store.js';
 import type { SecurityOperation } from './security-operation-store.js';
 import type { TotpService } from './services/TotpService.js';
@@ -77,7 +77,7 @@ export class SecuritySettings {
 			throw error;
 		});
 	}
-	private check(context: LockedSudoContext, row: SecurityOperation & { expiresAtMonotonic: number }) {
+	private check(context: SessionLockedSudoContext, row: SecurityOperation & { expiresAtMonotonic: number }) {
 		if (context.session.sudoUntil?.getTime() !== row.sudoUntil || context.session.sudoGrantId !== row.sudoGrantId || operationStamp(context) !== row.policyStamp || performance.now() >= row.expiresAtMonotonic) throw failure();
 	}
 
@@ -112,7 +112,7 @@ export class SecuritySettings {
 	async passwordlessStart(identity: SudoIdentity) {
 		// This operation supplies its own strict UV proof, bound to this live session.
 		return this.deps.sudo.transaction(identity, async context => {
-			if (context.profile.usePasswordLessLogin || !context.keys.length) throw failure();
+			if (!context.session || context.profile.usePasswordLessLogin || !context.keys.length) throw failure();
 			const options = await generateAuthenticationOptions({ rpID: this.deps.config.hostname, userVerification: 'required' });
 			v.assert(nativeAuthenticationOptionsSchema, options);
 			const ticket = await this.deps.operations.create({ kind: 'enable-passwordless-login', userId: context.user.id,

@@ -14,7 +14,7 @@ import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiBrowserSession } from './models/BrowserSession.js';
 import { MiUserSecurityKey } from './models/UserSecurityKey.js';
 import { readMfaPolicy } from './mfa-policy.js';
-import { freshReauthenticationPolicyStamp } from './fresh-passkey-reauthentication.js';
+import { freshReauthenticationPolicyStamp, nativeCredentialFingerprint } from './fresh-passkey-reauthentication.js';
 import type { FreshPasskeyReauthentication, FreshReauthenticationIdentity } from './fresh-passkey-reauthentication.js';
 import type { TotpService } from './services/TotpService.js';
 import type { BrowserSessionService, BrowserSessionUsage } from './services/BrowserSessionService.js';
@@ -33,6 +33,8 @@ export interface LockedSudoContext {
 	keys: MiUserSecurityKey[];
 	session: MiBrowserSession | null;
 }
+
+export type SessionLockedSudoContext = LockedSudoContext & { session: MiBrowserSession };
 
 /** Policy/credential fingerprint used by ceremony tickets, not to invalidate an already-granted sudo. */
 export function sudoPolicyStamp(user: Pick<MiUser, 'id' | 'token'>, profile: MiUserProfile, keys: MiUserSecurityKey[]) {
@@ -66,6 +68,7 @@ export class SudoService {
 		const kind = this.requireKnownIdentity(identity);
 		if (user.id !== identity.userId || user.host !== null || user.isDeleted || user.isSuspended || !user.token || profile.userId !== user.id) throw reauthenticationFailed();
 		if (kind === 'native') {
+			if (identity.nativeCredentialFingerprint !== nativeCredentialFingerprint(user.token)) throw reauthenticationFailed();
 			const keys = await manager.getRepository(MiUserSecurityKey).findBy({ userId: user.id });
 			return { manager, user, profile, session: null, keys };
 		}
@@ -85,14 +88,22 @@ export class SudoService {
 		return until;
 	}
 
-	async transaction<T>(identity: SudoIdentity, run: (context: LockedSudoContext) => Promise<T>, requireElevation = true): Promise<T> {
+	async transaction<T>(identity: SudoIdentity, run: (context: SessionLockedSudoContext) => Promise<T>, requireElevation?: true): Promise<T>;
+	async transaction<T>(identity: SudoIdentity, run: (context: LockedSudoContext) => Promise<T>, requireElevation: false): Promise<T>;
+	async transaction<T>(identity: SudoIdentity, run: (context: SessionLockedSudoContext) => Promise<T>, requireElevation = true): Promise<T> {
 		this.requireKnownIdentity(identity);
 		return this.db.transaction(async manager => {
 			const user = await manager.getRepository(MiUser).findOneOrFail({ where: { id: identity.userId }, lock: { mode: 'pessimistic_write' } });
 			const profile = await manager.getRepository(MiUserProfile).findOneOrFail({ where: { userId: identity.userId }, lock: { mode: 'pessimistic_write' } });
 			const locked = await this.lock(identity, manager, user, profile);
 			const until = requireElevation ? this.assert(locked) : null;
-			const result = await run(locked);
+			let result: T;
+			if (requireElevation) {
+				if (!locked.session) throw sudoRequired();
+				result = await run({ ...locked, session: locked.session });
+			} else {
+				result = await (run as (context: LockedSudoContext) => Promise<T>)(locked);
+			}
 			// Waiting for a write cannot extend the elevation. Throwing rolls it back.
 			if (until !== null && Date.now() >= until) throw sudoRequired();
 			return result;
@@ -162,6 +173,7 @@ export class SudoService {
 			const profile = await manager.getRepository(MiUserProfile).findOneOrFail({ where: { userId: identity.userId }, lock: { mode: 'pessimistic_write' } });
 			if (user.host !== null || user.isDeleted || user.isSuspended || !user.token || profile.userId !== user.id) throw reauthenticationFailed();
 			const keys = await manager.getRepository(MiUserSecurityKey).findBy({ userId: user.id });
+			if (identity.nativeCredentialFingerprint !== nativeCredentialFingerprint(user.token)) throw reauthenticationFailed();
 			const pending: LockedSudoContext = { manager, user, profile, keys, session: null };
 			if (performance.now() >= deadline || !proofMatches(pending)) throw reauthenticationFailed();
 			const issued = await this.sessions.issue(user.id, manager.getRepository(MiBrowserSession), usage);

@@ -39,7 +39,7 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		await db.initialize();
 		const applied = await db.runMigrations();
 		expect(applied).toHaveLength(367);
-		expect(applied.at(-1)?.name).toBe('AccessTokenExpiry1792300000004');
+		expect(applied.at(-1)?.name).toBe('SessionUserIp1794700800000');
 		const schema = await db.driver.createSchemaBuilder().log();
 		expect(schema.upQueries.map(query => query.query)).toEqual([]);
 		console.log('Production migrations / zero pending DDL:', applied.length);

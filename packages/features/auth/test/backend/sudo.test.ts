@@ -3,17 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import 'reflect-metadata';
+import { performance } from 'node:perf_hooks';
 import bcrypt from 'bcryptjs';
-import { afterEach, expect, test, vi } from 'vitest';
+import { afterEach, expect, expectTypeOf, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import type { DataSource, EntityManager, Repository } from 'typeorm';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
 import { MiBrowserSession } from '../../backend/models/BrowserSession.js';
 import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
+import { sudoIdentity } from '../../backend/sudo.api.js';
 import { SudoService, sudoPolicyStamp } from '../../backend/sudo.js';
 import { SecuritySettings } from '../../backend/security-settings.js';
 import type { SecuritySettingsDependencies } from '../../backend/security-settings.js';
+import { nativeCredentialFingerprint, freshReauthenticationPolicyStamp } from '../../backend/fresh-passkey-reauthentication.js';
 import type { FreshPasskeyReauthentication } from '../../backend/fresh-passkey-reauthentication.js';
 import type { TotpService } from '../../backend/services/TotpService.js';
 import type { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
@@ -153,22 +156,22 @@ test.each(['missing', 'expired'] as const)('passkey MFA enable rejects %s elevat
 		f.session.sudoUntil = new Date(Date.now() - 1); f.session.sudoGrantId = 'expired-grant';
 		f.session.sudoPolicyStamp = sudoPolicyStamp(f.user, f.profile, await f.keys.findBy({ userId: identity.userId }));
 	}
-	const deps = mockDeep<SecuritySettingsDependencies>(); deps.sudo = f.service;
+	const deps = Object.assign(mockDeep<SecuritySettingsDependencies>(), { sudo: f.service });
 	await expect(new SecuritySettings(deps).enablePasskeyMfa(identity, true)).rejects.toMatchObject({ code: 'SUDO_REQUIRED' });
 	expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.sessions.update).not.toHaveBeenCalled();
 	expect(deps.events.publishMainStream).not.toHaveBeenCalled();
 });
 
-const nativeIdentity = { userId: identity.userId };
+const nativeIdentity = { userId: identity.userId, nativeCredentialFingerprint: nativeCredentialFingerprint('synthetic-native') };
 
 test('a native token issues a browser session, attaches sudo and does not rotate user.token', async () => {
 	const f = fixture(); vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
 	const issuedToken = `bs_${'A'.repeat(43)}`;
 	const issued = { id: 'issued-session', userId: identity.userId, createdAt: new Date(), lastUsedAt: new Date(), revokedAt: null, sudoUntil: null, sudoPolicyStamp: null, sudoGrantId: null };
 	f.browserSessions.issue.mockResolvedValue({ token: issuedToken, session: issued });
-	f.sessions.findOne.mockImplementation(async (options: { where?: { id?: string } }) => options.where?.id === 'issued-session' ? issued as typeof f.session : f.session);
-	f.sessions.update.mockImplementation(async (where: { id?: string }, patch: object) => {
-		if (where.id === 'issued-session') Object.assign(issued, patch);
+	f.sessions.findOne.mockImplementation(async options => !Array.isArray(options.where) && options.where?.id === 'issued-session' ? issued as typeof f.session : f.session);
+	f.sessions.update.mockImplementation(async (where, patch) => {
+		if (typeof where === 'object' && 'id' in where && where.id === 'issued-session') Object.assign(issued, patch);
 		else Object.assign(f.session, patch);
 		return { affected: 1, generatedMaps: [], raw: [] };
 	});
@@ -184,4 +187,52 @@ test('an app token cannot start native sudo migration', async () => {
 	const f = fixture();
 	await expect(f.service.begin({ userId: identity.userId, accessToken: {} }, 'password')).rejects.toThrow();
 	expect(f.browserSessions.issue).not.toHaveBeenCalled();
+});
+
+// The request authenticated with the old native token before the revocation transaction.
+test.each([false, true])('native passkey completion respects token regeneration before issuance (rotated=%s)', async rotated => {
+	const f = fixture(); f.profile.passkeyMfaEnabled = true;
+	const keys = [mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: identity.userId, publicKey: 'AQID' })];
+	f.keys.findBy.mockResolvedValue(keys);
+	f.browserSessions.issue.mockResolvedValue({ token: `bs_${'A'.repeat(43)}`, session: f.session });
+	const stamp = freshReauthenticationPolicyStamp(f.profile, keys);
+	f.fresh.complete.mockImplementation(async () => {
+		// Proof has passed; regeneration acquires and releases the user lock first.
+		if (rotated) f.user.token = 'regenerated-native';
+		return { userId: identity.userId, sessionId: 'native', purpose: 'sudo', policyStamp: stamp, expiresAtMonotonic: performance.now() + 90_000 };
+	});
+	const completion = f.service.complete(nativeIdentity, 'ticket', {});
+	if (rotated) {
+		await expect(completion).rejects.toThrow();
+		expect(f.browserSessions.issue).not.toHaveBeenCalled();
+		expect(f.sessions.update).not.toHaveBeenCalled();
+	} else {
+		await expect(completion).resolves.toMatchObject({ status: 'elevated', token: `bs_${'A'.repeat(43)}` });
+		expect(f.browserSessions.issue).toHaveBeenCalledOnce();
+	}
+	expect(f.fresh.complete).toHaveBeenCalledOnce();
+});
+
+test('elevated callbacks require a session while native read-only transactions retain null', async () => {
+	const f = fixture();
+	await f.service.begin(identity, 'password');
+	await f.service.transaction(identity, async context => {
+		expectTypeOf(context.session).toEqualTypeOf<MiBrowserSession>();
+		expect(context.session.id).toBe(identity.browserSession.id);
+	});
+	await f.service.transaction(nativeIdentity, async context => {
+		expectTypeOf(context.session).toEqualTypeOf<MiBrowserSession | null>();
+		expect(context.session).toBeNull();
+	}, false);
+	await expect(f.service.transaction(nativeIdentity, async context => context.session.id)).rejects.toThrow();
+	await expect(new SecuritySettings(Object.assign(mockDeep<SecuritySettingsDependencies>(), { sudo: f.service })).passwordlessStart(nativeIdentity)).rejects.toThrow();
+});
+
+test('native identity fingerprints the authenticated request credential, not cached user data', () => {
+	const f = fixture();
+	const context = mockDeep<Parameters<typeof sudoIdentity>[0]>();
+	context.principal = { ...f.user, host: null, uri: null };
+	context.credential = 'authenticated-native';
+	context.browserSession = undefined; context.token = null;
+	expect(sudoIdentity(context).nativeCredentialFingerprint).toBe(nativeCredentialFingerprint('authenticated-native'));
 });

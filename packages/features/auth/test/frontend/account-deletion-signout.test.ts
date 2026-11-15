@@ -8,6 +8,8 @@ import { resolve } from 'node:path';
 import { runInNewContext } from 'node:vm';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { adoptLiveToken, isSameLiveCredential, resetLiveTokens } from '../../frontend/utility/live-account.js';
+
 // Execute the actual SFC's deletion action with synthetic dialogs/API effects only.
 const source = readFileSync(resolve(process.cwd(), '../features/preferences/frontend/pages/settings/other.vue'), 'utf8');
 const start = source.indexOf('async function deleteAccount() {');
@@ -20,7 +22,7 @@ const ensureSudo = vi.fn();
 const actor = { id: 'synthetic-owner', token: 'bs_synthetic' };
 const deletionState = { deletingAccount: { value: false }, deletionActive: true, deletionGeneration: 0, deletionAbort: null as AbortController | null };
 const deleteAccount: () => Promise<void> = runInNewContext(`${action}\ndeleteAccount`, {
-	os: dialogs, signout, ensureSudo, $i: actor, AbortController, ...deletionState, $locale: { value: { sfc: { deleteAccountConfirm: 'Synthetic confirmation', started: 'Synthetic started' } } },
+	os: dialogs, signout, ensureSudo, isSameLiveCredential, $i: actor, AbortController, ...deletionState, $locale: { value: { sfc: { deleteAccountConfirm: 'Synthetic confirmation', started: 'Synthetic started' } } },
 });
 
 beforeEach(() => {
@@ -32,6 +34,7 @@ beforeEach(() => {
 	signout.mockReset().mockResolvedValue(undefined);
 	ensureSudo.mockReset().mockResolvedValue(true);
 	actor.id = 'synthetic-owner'; actor.token = 'bs_synthetic';
+	resetLiveTokens(actor.id, actor.token);
 });
 
 describe('accepted account deletion cleanup contract', () => {
@@ -78,4 +81,15 @@ describe('accepted account deletion cleanup contract', () => {
 		await pending;
 		expect(signout).not.toHaveBeenCalled(); expect(dialogs.alert).not.toHaveBeenCalled();
 	});
+});
+
+test('native credential adoption during sudo still submits account deletion', async () => {
+	actor.token = 'synthetic-native'; resetLiveTokens(actor.id, actor.token);
+	ensureSudo.mockImplementation(async () => {
+		adoptLiveToken(actor.id, actor.token, 'bs_migrated'); actor.token = 'bs_migrated';
+		return true;
+	});
+	await deleteAccount();
+	expect(dialogs.apiWithDialog).toHaveBeenCalledExactlyOnceWith('i/security/account/delete', { acknowledged: true });
+	expect(signout).toHaveBeenCalledExactlyOnceWith('account-deletion-accepted');
 });
