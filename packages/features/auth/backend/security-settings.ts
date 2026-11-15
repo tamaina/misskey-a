@@ -63,6 +63,7 @@ export class SecuritySettings {
 		else for (const id of revokedIds) this.deps.events.publishInternalEvent('browserSessionRevoked', { id, userId });
 	}
 	private async savePolicy(context: LockedSudoContext, update: Partial<Pick<MiUserProfile, 'passkeyMfaEnabled' | 'usePasswordLessLogin' | 'twoFactorBackupSecret' | 'twoFactorEnabled' | 'twoFactorTempSecret' | 'twoFactorSecret' | 'passwordLoginDisabled'>>, keys = context.keys) {
+		if (!context.session) throw sudoRequired();
 		if (Object.keys(update).length) await context.manager.getRepository(MiUserProfile).update({ userId: context.user.id }, update);
 		const current = { ...context.profile, ...update };
 		// Keep the original deadline. Successful factor proof does not start a new window.

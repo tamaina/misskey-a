@@ -15,8 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label><i class="ti ti-api"></i> <SearchLabel>{{ $locale.sfc.api }}</SearchLabel></template>
 
 				<div class="_gaps_m">
-					<p v-if="!individualCredential">{{ $locale.sfc.individualCredentialRequired }}</p>
-					<MkButton primary :disabled="credentialBusy || !individualCredential" @click="generateToken">{{ globalLocale.env.generateAccessToken }}</MkButton>
+					<MkButton primary :disabled="credentialBusy" @click="generateToken">{{ globalLocale.env.generateAccessToken }}</MkButton>
 					<FormLink to="/settings/apps">{{ $locale.sfc.manageAccessTokens }}</FormLink>
 					<FormLink to="/api-console" :behavior="isDesktop ? 'window' : null">API console</FormLink>
 				</div>
@@ -77,7 +76,6 @@ import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import { ensureSudo } from '../../utility/ensure-sudo.js';
 import { useCredentialOperation } from '../../utility/use-credential-operation.js';
-import { $i } from '../../i.js';
 import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
@@ -89,11 +87,9 @@ const paginator = markRaw(new Paginator('i/webhooks/list', {
 	noPaging: true,
 }));
 
-const individualCredential = computed(() => $i?.token.startsWith('bs_'));
 const { run: runCredential, busy: credentialBusy } = useCredentialOperation();
 
 async function generateToken() {
-	if (!individualCredential.value) return;
 	await runCredential(async (current, signal) => {
 		let dispose: (() => void) | undefined; let onAbort: () => void = () => {};
 		type Selection = { name: string | null; permissions: string[]; expiresAt?: string };

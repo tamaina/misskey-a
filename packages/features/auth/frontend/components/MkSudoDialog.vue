@@ -7,8 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #header>{{ $locale.sfc.title }}</template>
 	<div class="_spacer _gaps_m">
 		<p>{{ $locale.sfc.description }}</p>
-		<MkInfo v-if="!individual" warn>{{ $locale.sfc.individualRequired }}</MkInfo>
-		<p v-else-if="!state && error" role="alert">{{ $locale.sfc.failed }}</p>
+		<p v-if="!state && error" role="alert">{{ $locale.sfc.failed }}</p>
 		<p v-else-if="!state">{{ $locale.sfc.loading }}</p>
 		<form v-else class="_gaps_m" @submit.prevent="confirm">
 			<MkInput v-if="!state.passwordLoginDisabled" v-model="password" type="password" autocomplete="current-password" :disabled="busy" required>
@@ -43,13 +42,13 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { adoptBrowserSession } from '../accounts.js';
 import { ensureSignin } from '../i.js';
 
 const props = defineProps<{ isCurrent: () => boolean }>();
 const emit = defineEmits<{ (event: 'done', confirmed: boolean): void; (event: 'closed'): void }>();
 const dialog = useTemplateRef('dialog');
 const ownerToken = ensureSignin().token;
-const individual = ownerToken.startsWith('bs_');
 const supportsPasskey = browserSupportsWebAuthn();
 const state = ref<{ totpEnabled: boolean; passkeyMfaEnabled: boolean; passkeyCount: number; passwordLoginDisabled: boolean } | null>(null);
 const password = ref('');
@@ -76,10 +75,17 @@ function cancel() {
 	dialog.value?.close();
 }
 
-async function discardElevation(expiresAt: string, grantId: string) {
-	// Bind cleanup to the original session, even after an account switch. The exact
+async function discardElevation(expiresAt: string, grantId: string, token = ownerToken) {
+	// Bind cleanup to the issued session, even after an account switch. The exact
 	// deadline comparison prevents an old dialog from clearing a newer elevation.
-	await misskeyApi('i/sudo/exit', { expiresAt, grantId }, ownerToken).catch(() => {});
+	await misskeyApi('i/sudo/exit', { expiresAt, grantId }, token).catch(() => {});
+}
+
+async function acceptGrant(expiresAt: string, grantId: string, token?: string) {
+	if (token) await adoptBrowserSession(token);
+	if (!current() && token) { await discardElevation(expiresAt, grantId, token); return false; }
+	if (!current()) { await discardElevation(expiresAt, grantId); return false; }
+	return true;
 }
 
 async function confirm() {
@@ -91,18 +97,19 @@ async function confirm() {
 			usePasskey: state.value.passwordLoginDisabled || (mfa && factor.value === 'passkey'),
 			...(!state.value.passwordLoginDisabled && mfa && factor.value !== 'passkey' ? { token: token.value } : {}),
 		});
-		if (!current()) { if (started.status === 'elevated') await discardElevation(started.expiresAt, started.grantId); return; }
-		let expiresAt = started.status === 'elevated' ? started.expiresAt : null;
-		let grantId = started.status === 'elevated' ? started.grantId : null;
-		if (started.status === 'passkey-required') {
-			nativePending = true;
-			const credential = await startAuthentication({ optionsJSON: started.options });
-			nativePending = false;
-			if (!current()) return;
-			const completed = await misskeyApi('i/sudo/complete', { ticket: started.ticket, credential });
-			expiresAt = completed.expiresAt; grantId = completed.grantId;
+		if (started.status === 'elevated') {
+			if (!await acceptGrant(started.expiresAt, started.grantId, started.token)) return;
+			settled = true;
+			emit('done', true);
+			dialog.value?.close();
+			return;
 		}
-		if (!current()) { if (expiresAt !== null && grantId !== null) await discardElevation(expiresAt, grantId); return; }
+		nativePending = true;
+		const credential = await startAuthentication({ optionsJSON: started.options });
+		nativePending = false;
+		if (!current()) return;
+		const completed = await misskeyApi('i/sudo/complete', { ticket: started.ticket, credential });
+		if (!await acceptGrant(completed.expiresAt, completed.grantId, completed.token)) return;
 		settled = true;
 		emit('done', true);
 		dialog.value?.close();
@@ -111,7 +118,6 @@ async function confirm() {
 
 watch(() => props.isCurrent(), value => { if (!value) cancel(); }, { flush: 'sync' });
 onMounted(async () => {
-	if (!individual) return;
 	try {
 		const result = await misskeyApi('i/security/state', {});
 		if (!current()) return;

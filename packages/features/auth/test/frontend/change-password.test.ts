@@ -71,9 +71,7 @@ beforeEach(() => {
 	vi.mocked(browserSupportsWebAuthn).mockReturnValue(true);
 	vi.mocked(os.promiseDialog).mockImplementation(promise => promise);
 	vi.mocked(os.authenticateDialog).mockResolvedValue({ canceled: false, result: { password: 'current-password', token: null } });
-	vi.mocked(os.inputText)
-		.mockResolvedValueOnce({ canceled: false, result: 'current-password' })
-		.mockResolvedValue({ canceled: false, result: 'new-password' });
+	vi.mocked(os.inputText).mockResolvedValue({ canceled: false, result: 'new-password' });
 	mountSecurity();
 });
 
@@ -103,16 +101,16 @@ function startChange() {
 	button!.click();
 }
 
-test('legacy login cannot change the password and asks the user to sign in again', async () => {
+test('a native credential uses the same confirm-then-sudo password change path', async () => {
 	await nextTick();
 	startChange();
-	await vi.waitFor(() => expect(os.alert).toHaveBeenCalledOnce());
-	expect(os.alert).toHaveBeenCalledWith({ type: 'warning', text: 'To change your password, please sign in again in the browser.' });
-	expect(os.inputText).not.toHaveBeenCalled();
+	await vi.waitFor(() => expect(signout).toHaveBeenCalledWith('credentials-changed'));
+	expect(os.inputText).toHaveBeenCalledTimes(2);
+	expect(ensureSudo).toHaveBeenCalledOnce();
+	expect(vi.mocked(os.inputText).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
+	expect(os.apiWithDialog).toHaveBeenCalledExactlyOnceWith('i/security/password', { newPassword: 'new-password' });
 	expect(os.authenticateDialog).not.toHaveBeenCalled();
-	expect(ensureSudo).not.toHaveBeenCalled();
-	expect(os.apiWithDialog).not.toHaveBeenCalled();
-	expect(signout).not.toHaveBeenCalled();
+	expect(os.alert).not.toHaveBeenCalled();
 });
 
 function enableSession() {
@@ -136,18 +134,18 @@ test('session password change authorizes once before two new-password entries an
 	expect(os.inputText).toHaveBeenNthCalledWith(2, { title: 'Retype new password', type: 'password', autocomplete: 'new-password', minLength: 1 });
 	expect(os.apiWithDialog).toHaveBeenCalledExactlyOnceWith('i/security/password', { newPassword: 'new-password' });
 	expect(os.authenticateDialog).not.toHaveBeenCalled(); expect(startAuthentication).not.toHaveBeenCalled();
-	expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(os.inputText).mock.invocationCallOrder[0]);
+	expect(vi.mocked(os.inputText).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
 });
 test('cancelled common confirmation cannot submit or fall back', async () => {
 	enableSession(); vi.mocked(ensureSudo).mockResolvedValue(false); await nextTick(); startChange();
 	await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledOnce());
-	expect(os.inputText).not.toHaveBeenCalled(); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
+	expect(os.inputText).toHaveBeenCalledTimes(2); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
 });
 test.each([1, 2])('cancelled new password input %s cannot submit', async stage => {
 	enableSession(); if (stage === 2) vi.mocked(os.inputText).mockResolvedValueOnce({ canceled: false, result: 'new-password' });
 	vi.mocked(os.inputText).mockResolvedValueOnce({ canceled: true, result: undefined }); await nextTick(); startChange();
 	await vi.waitFor(() => expect(os.inputText).toHaveBeenCalledTimes(stage));
-	expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
+	expect(ensureSudo).not.toHaveBeenCalled(); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
 });
 test('session mismatch is reported before mutation', async () => {
 	enableSession(); vi.mocked(os.inputText).mockResolvedValueOnce({ canceled: false, result: 'first' }).mockResolvedValueOnce({ canceled: false, result: 'second' });
@@ -168,7 +166,7 @@ test.each(['unmount', 'deactivate', 'actor'] as const)('%s invalidates delayed c
 	if (phase === 'unmount') { app.unmount(); mounted = false; } else if (phase === 'deactivate') { showSecurity.value = false; await nextTick(); showSecurity.value = true; await nextTick(); } else account.id = 'replacement-owner';
 	expect(current!()).toBe(false); if (phase !== 'actor') expect(signal?.aborted).toBe(true);
 	release(true); for (let index = 0; index < 10; index++) await Promise.resolve();
-	expect(os.inputText).not.toHaveBeenCalled(); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
+	expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
 });
 test('password and token operations share one busy owner during sudo', async () => {
 	enableSession(); let release!: (value: boolean) => void;
@@ -178,23 +176,25 @@ test('password and token operations share one busy owner during sudo', async () 
 });
 test('token regeneration uses common sudo, explicit warning and accepted cleanup without returning a token', async () => {
 	enableSession(); await startTokenRegeneration(); await vi.waitFor(() => expect(signout).toHaveBeenCalledWith('credentials-changed'));
-	expect(ensureSudo).toHaveBeenCalledOnce(); expect(os.confirm).toHaveBeenCalledOnce();
+	expect(os.confirm).toHaveBeenCalledOnce(); expect(ensureSudo).toHaveBeenCalledOnce();
+	expect(vi.mocked(os.confirm).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ensureSudo).mock.invocationCallOrder[0]);
 	expect(os.apiWithDialog).toHaveBeenCalledExactlyOnceWith('i/security/regenerate-token', {});
 	expect(os.inputText).not.toHaveBeenCalled(); expect(os.authenticateDialog).not.toHaveBeenCalled();
 });
 test('cancelled token regeneration warning submits nothing', async () => {
 	enableSession(); vi.mocked(os.confirm).mockResolvedValue({ canceled: true }); await startTokenRegeneration();
-	await vi.waitFor(() => expect(os.confirm).toHaveBeenCalledOnce()); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
+	await vi.waitFor(() => expect(os.confirm).toHaveBeenCalledOnce()); expect(ensureSudo).not.toHaveBeenCalled(); expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(signout).not.toHaveBeenCalled();
 });
 test('actor switch while password mutation waits cannot clean the replacement account', async () => {
 	enableSession(); let release!: () => void; vi.mocked(os.apiWithDialog).mockReturnValue(new Promise<Endpoints['i/security/password']['res']>(resolve => { release = () => resolve(null); }));
 	await nextTick(); startChange(); await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledOnce());
 	account.id = 'replacement-owner'; release(); for (let index = 0; index < 10; index++) await Promise.resolve(); expect(signout).not.toHaveBeenCalled();
 });
-test('legacy token regeneration preserves password/TOTP and ignores dialog results after unmount', async () => {
-	let release!: (value: Awaited<ReturnType<typeof os.authenticateDialog>>) => void;
-	vi.mocked(os.authenticateDialog).mockReturnValue(new Promise(resolve => { release = resolve; }));
-	await startTokenRegeneration(); expect(os.authenticateDialog).toHaveBeenCalledOnce();
-	app.unmount(); mounted = false; release({ canceled: false, result: { password: 'current-password', token: '123456' } });
+test('native token regeneration ignores delayed sudo after unmount', async () => {
+	let release!: (value: boolean) => void;
+	vi.mocked(ensureSudo).mockReturnValue(new Promise(resolve => { release = resolve; }));
+	await startTokenRegeneration(); await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledOnce());
+	expect(os.confirm).toHaveBeenCalledOnce();
+	app.unmount(); mounted = false; release(true);
 	for (let i = 0; i < 10; i++) await Promise.resolve(); expect(os.apiWithDialog).not.toHaveBeenCalled();
 });

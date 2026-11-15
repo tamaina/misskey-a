@@ -4,6 +4,7 @@
  */
 import { beforeEach, expect, test, vi } from 'vitest';
 import { ensureSudo } from '../../frontend/utility/ensure-sudo.js';
+import { adoptLiveToken } from '../../frontend/utility/live-account.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { popup } from '@features/ui/frontend/os.js';
 
@@ -61,7 +62,18 @@ test('an already aborted operation sends no status or credential request', async
 	expect(misskeyApi).not.toHaveBeenCalled(); expect(popup).not.toHaveBeenCalled();
 });
 
-test('the legacy credential path never creates elevation by reusing the old token', async () => {
+test('a native credential asks the server and can open confirmation', async () => {
 	fixture.actor.token = 'legacy-native'; const pending = ensureSudo();
-	expect(misskeyApi).not.toHaveBeenCalled(); fixture.events!.closed(); expect(await pending).toBe(false);
+	await vi.waitFor(() => expect(fixture.events).not.toBeNull());
+	expect(misskeyApi).toHaveBeenCalledWith('i/sudo/status', {});
+	fixture.events!.done(true); expect(await pending).toBe(true);
+});
+
+test('a session upgrade during confirmation still counts as the same actor', async () => {
+	fixture.actor.token = 'legacy-native'; const pending = ensureSudo();
+	await vi.waitFor(() => expect(fixture.events).not.toBeNull());
+	adoptLiveToken('synthetic-owner', 'legacy-native', 'bs_new');
+	fixture.actor.token = 'bs_new';
+	expect(fixture.props!.isCurrent()).toBe(true);
+	fixture.events!.done(true); expect(await pending).toBe(true);
 });

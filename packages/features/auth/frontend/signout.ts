@@ -20,7 +20,13 @@ import { encodePushSubscriptionKey } from '@features/notifications/frontend/util
 export async function signout(reason?: 'server-rejected-credential' | 'account-deletion-accepted' | 'credentials-changed') {
 	if (!$i) return;
 
-	const cleanupOnly = reason === 'server-rejected-credential' || reason === 'account-deletion-accepted' || reason === 'credentials-changed';
+	if (reason === 'credentials-changed') {
+		const finishWaiting = waiting();
+		try { await (await import('./accounts.js')).leaveCurrentAccountAfterCredentialChange(); } finally { finishWaiting(); }
+		return;
+	}
+
+	const cleanupOnly = reason === 'server-rejected-credential' || reason === 'account-deletion-accepted';
 	let finishWaiting = waiting();
 
 	try {

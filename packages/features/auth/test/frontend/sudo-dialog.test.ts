@@ -10,6 +10,7 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { startAuthentication, WebAuthnAbortService } from '@simplewebauthn/browser';
 const fixture = vi.hoisted(() => ({ actor: { id: 'synthetic-owner', token: 'bs_synthetic' }, close: vi.fn() }));
 vi.mock('@features/auth/frontend/i.js', () => ({ ensureSignin: () => fixture.actor }));
+vi.mock('@features/auth/frontend/accounts.js', () => ({ adoptBrowserSession: vi.fn() }));
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
 vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: () => true, startAuthentication: vi.fn(), WebAuthnAbortService: { cancelCeremony: vi.fn() } }));
 vi.mock('@features/ui/frontend/components/MkModalWindow.vue', () => ({ default: defineComponent({ setup: (_, { slots, expose }) => { expose({ close: fixture.close }); return () => h('div', slots.default?.()); } }) }));
@@ -92,4 +93,13 @@ test('password-login-disabled sudo keeps the strict passkey path without passwor
 	await vi.waitFor(() => expect(startAuthentication).toHaveBeenCalledOnce());
 	expect(misskeyApi).toHaveBeenCalledWith('i/sudo/start', { usePasskey: true });
 	await vi.waitFor(() => expect(done).toHaveBeenLastCalledWith(true));
+});
+
+test('an issued session token is adopted before the dialog reports success', async () => {
+	const { adoptBrowserSession } = await import('../../frontend/accounts.js');
+	const issued = `bs_${'A'.repeat(43)}`;
+	vi.mocked(misskeyApi).mockImplementation(async (endpoint: string) => endpoint === 'i/security/state' ? { ...state } : { status: 'elevated', expiresAt, grantId, token: issued });
+	input('password', 'synthetic-password'); input('text', '123456'); submit();
+	await vi.waitFor(() => expect(adoptBrowserSession).toHaveBeenCalledExactlyOnceWith(issued));
+	expect(done).toHaveBeenCalledExactlyOnceWith(true);
 });

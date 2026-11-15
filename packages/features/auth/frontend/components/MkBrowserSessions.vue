@@ -7,7 +7,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #label>{{ $locale.sfc.title }}</template>
 	<div class="_gaps_m">
 		<MkInfo>{{ $locale.sfc.description }}</MkInfo>
-		<MkInfo v-if="!individual" warn>{{ $locale.sfc.legacy }}</MkInfo>
 		<p v-if="error" role="alert">{{ $locale.sfc.failed }}</p>
 		<MkPagination v-if="active" :key="generation" :paginator="paginator" withControl :forceDisableInfiniteScroll="true">
 			<template #default="{ items }">
@@ -49,10 +48,10 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import * as os from '@features/ui/frontend/os.js';
 import { parseUserAgent } from '../utility/user-agent.js';
 import { ensureSignin } from '../i.js';
+import { isSameLiveCredential } from '../utility/live-account.js';
 import { signout } from '../signout.js';
 
 const ownerId = ensureSignin().id; const ownerToken = ensureSignin().token;
-const individual = ownerToken.startsWith('bs_');
 const createHistory = () => markRaw(new Paginator('i/signin-history', { limit: 5, params: { latestPerSession: true } }));
 let paginator = createHistory();
 const createUnlinked = () => markRaw(new Paginator('i/sessions', { limit: 5, offsetMode: true, params: { unlinkedOnly: true } }));
@@ -82,7 +81,7 @@ function sessionHistory(sessionId: string) {
 
 const busy = ref(false); const error = ref(false);
 const active = ref(true); const generation = ref(0);
-const current = () => active.value && ensureSignin().id === ownerId && ensureSignin().token === ownerToken;
+const current = () => active.value && isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token);
 
 function reload() { if (!current()) return; histories.clear(); return Promise.all([paginator.reload(), unlinked.reload()]); }
 
@@ -102,7 +101,7 @@ async function revoke(session: Session) {
 
 const leave = () => { active.value = false; generation.value++; histories.clear(); paginator = createHistory(); unlinked = createUnlinked(); };
 watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!current()) leave(); }, { flush: 'sync' });
-onActivated(() => { if (ensureSignin().id === ownerId && ensureSignin().token === ownerToken) active.value = true; });
+onActivated(() => { if (isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token)) active.value = true; });
 onDeactivated(leave); onUnmounted(leave);
 </script>
 

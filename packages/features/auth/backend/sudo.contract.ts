@@ -12,7 +12,7 @@ export const sudoErrors = { ...commonErrors,
 	SUDO_REQUIRED: { status: 403, data: apiErrorData },
 	REAUTHENTICATION_FAILED: { status: 403, data: apiErrorData },
 } as const;
-const elevated = v.strictObject({ status: v.literal('elevated'), expiresAt: v.string(), grantId: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)) });
+const elevated = v.strictObject({ status: v.literal('elevated'), expiresAt: v.string(), grantId: v.pipe(v.string(), v.regex(/^[A-Za-z0-9_-]{43}$/)), token: v.exactOptional(v.pipe(v.string(), v.regex(/^bs_[A-Za-z0-9_-]{43}$/))) });
 const metadata = { requireCredential: true, secure: true, limit: { duration: 60_000, max: 10, key: 'sudo' } } as const;
 const start = oc.$meta({ ...metadata, requestName: 'i/sudo/start' } as const)
 	.route({ method: 'POST', path: '/i/sudo/start', tags: ['account'] }).errors(sudoErrors)

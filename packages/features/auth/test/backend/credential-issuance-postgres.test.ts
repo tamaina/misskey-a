@@ -62,7 +62,7 @@ describe.skipIf(!socket || !redisSocket)('actual HTTP, committed OAuth approval,
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
 		await db.initialize(); const applied = await db.runMigrations(); expect(applied.map(row => row.name)).toEqual(expect.arrayContaining(['AccessTokenExpiry1792300000004', 'SudoPolicy1792300000001']));
 		redis = new Redis({ path: redisSocket }); sessions = new BrowserSessionService(db.getRepository(MiBrowserSession) as ConstructorParameters<typeof BrowserSessionService>[0], ids);
-		sudo = new SudoService(db, mockDeep(), mockDeep());
+		sudo = new SudoService(db, mockDeep(), mockDeep(), mockDeep());
 		const cache = mockDeep<ConstructorParameters<typeof AuthenticateService>[3]>(); cache.localUserByIdCache.fetch.mockImplementation(async (_id, load) => { if (!load) throw new Error('Missing synthetic loader'); return load(); }); cache.localUserByNativeTokenCache.fetch.mockImplementation(async (_token, load) => { if (!load) throw new Error('Missing synthetic loader'); return load(); });
 		authenticate = new AuthenticateService(db.getRepository(MiUser) as ConstructorParameters<typeof AuthenticateService>[0], tokens() as ConstructorParameters<typeof AuthenticateService>[1], db.getRepository(MiApp) as ConstructorParameters<typeof AuthenticateService>[2], cache, sessions);
 		const meta = mockDeep<ConstructorParameters<typeof ApiExecutionContextFactory>[1]>();

@@ -80,13 +80,13 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		if (!socket || !dirname(socket).startsWith('/tmp/misskey-auth-policy-') || readFileSync(join(dirname(socket), '.misskey-auth-policy-fixture'), 'utf8') !== 'auth_policy_synthetic') throw new Error('Owned PostgreSQL required');
 		if (!redisSocket || !/^\/tmp\/misskey-oauth-[^/]+\/redis\.sock$/.test(redisSocket) || lstatSync(dirname(redisSocket)).uid !== process.getuid?.() || (lstatSync(dirname(redisSocket)).mode & 0o077) !== 0 || !lstatSync(redisSocket).isSocket()) throw new Error('Owned Redis required');
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
-		await db.initialize(); expect(await db.runMigrations()).toHaveLength(365); expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
+		await db.initialize(); expect(await db.runMigrations()).toHaveLength(367); expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 		redis = new Redis({ path: redisSocket });
 		sessions = new BrowserSessionService(db.getRepository(MiBrowserSession) as ConstructorParameters<typeof BrowserSessionService>[0], { gen: () => `securitysession${++nextSession}` });
 		authenticate = new AuthenticateService(db.getRepository(MiUser) as ConstructorParameters<typeof AuthenticateService>[0], mockDeep(), mockDeep(), mockDeep(), sessions);
 		const totp = new TotpService(redis, mockDeep(), db.getRepository(MiUserProfile) as ConstructorParameters<typeof TotpService>[2]);
 		const fresh = new FreshPasskeyReauthentication(new FreshReauthenticationStore(redis), sessions, db.getRepository(MiUserProfile) as ConstructorParameters<typeof FreshPasskeyReauthentication>[2], db.getRepository(MiUserSecurityKey) as ConstructorParameters<typeof FreshPasskeyReauthentication>[3], config);
-		const sudo = new SudoService(db, fresh, totp); const deps: AuthRouterDependencies = mockDeep<AuthRouterDependencies>();
+		const sudo = new SudoService(db, fresh, totp, mockDeep()); const deps: AuthRouterDependencies = mockDeep<AuthRouterDependencies>();
 		deps.sudo = { sudoService: sudo }; deps.security = { sudo, operations: new SecurityOperationStore(redis), config, meta: { name: 'Synthetic', rootUserId: null }, totp, users: mockDeep(), events: mockDeep(), queue: mockDeep(), email: mockDeep(), tokens: mockDeep() };
 		const handler = new OpenAPIHandler(createAuthRouter(deps), { customErrorResponseBodyEncoder: misskeyErrorBody, interceptors: [nullSuccessToNoContent()] });
 		app = Fastify(); await app.register(async api => registerPilotHttp(api, handler, { maxFileSize: 1024, runSpan: (_name, run) => run(), context: req => ({ credential: req.headers.authorization?.replace(/^Bearer /, ''), ip: '127.0.0.1', headers: {}, services: { authenticate: token => authenticate.authenticate(token), limitActor: actor => actor?.id ?? null, rateLimitFactor: async () => 1, limit: async () => null } }) }), { prefix: '/api' });
@@ -146,7 +146,7 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 			const start = await request('i/security/passkey/register/start', { name: keyId }); expect(start.statusCode).toBe(200);
 			const row = start.json<Started>(); expect(row.options.authenticatorSelection).toMatchObject({ userVerification: 'required', residentKey: 'required' });
 			const completed = await request('i/security/passkey/register/complete', { ticket: row.ticket, credential: registration(row.options.challenge, true, keyId) });
-			expect(completed.statusCode).toBe(200); expect(completed.json()).toMatchObject({ id: keyId, backupCodes });
+			expect(completed.statusCode).toBe(200); expect(completed.json()).toMatchObject({ id: keyId, backupCodes: [] });
 			expect(await profile()).toMatchObject({ usePasswordLessLogin: true, passwordLoginDisabled: disabled, passkeyMfaEnabled: true, twoFactorBackupSecret: backupCodes });
 			expect((await db.getRepository(MiUser).findOneByOrFail({ id: owner })).token).toBe(initialToken);
 			expect(await sessions.verify(other.token)).not.toBeNull(); expect(await sessions.verify(current.token)).not.toBeNull();
@@ -175,7 +175,7 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		const codes = completed.json<{ backupCodes: string[] }>().backupCodes; expect(new Set(codes).size).toBe(5);
 		expect(await profile()).toMatchObject({ twoFactorEnabled: true, twoFactorSecret: setup.secret, twoFactorTempSecret: null, twoFactorBackupSecret: codes });
 		expect((await request('i/sudo/status')).json()).toEqual({ active: true, expiresAt: grant.expiresAt });
-		expect(await sessions.verify(other.token)).toBeNull();
+		expect(await sessions.verify(other.token)).not.toBeNull();
 		expect((await request('i/security/totp/complete', { token: otp.generate() })).statusCode).toBe(403);
 		expect((await request('i/security/totp/remove', { confirmDisableMfa: false })).statusCode).toBe(400);
 		expect((await profile()).twoFactorEnabled).toBe(true);

@@ -86,17 +86,19 @@ test.each(['deactivate', 'unmount', 'actor'] as const)('%s discards delayed auth
 	expect(current!()).toBe(false); if (mode !== 'actor') expect(signal?.aborted).toBe(true);
 	finish(true); await new Promise(resolve => window.setTimeout(resolve, 10)); expect(os.apiWithDialog).not.toHaveBeenCalled();
 });
-test('legacy retains password/TOTP and captured target', async () => {
+test('a native credential uses the same sudo path and captured target', async () => {
 	legacy(); edit('legacy@example.test'); save(); await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledOnce());
-	expect(os.apiWithDialog).toHaveBeenCalledWith('i/update-email', { password: 'current-password', token: 'totp', email: 'legacy@example.test' }); expect(ensureSudo).not.toHaveBeenCalled();
+	expect(os.apiWithDialog).toHaveBeenCalledWith('i/security/email', { email: 'legacy@example.test' }); expect(ensureSudo).toHaveBeenCalledOnce();
+	expect(os.authenticateDialog).not.toHaveBeenCalled();
 });
-test('legacy cancellation never calls either endpoint', async () => {
-	legacy(); vi.mocked(os.authenticateDialog).mockResolvedValue({ canceled: true, result: undefined }); save(); await nextTick(); expect(os.apiWithDialog).not.toHaveBeenCalled();
+test('cancelled sudo on a native credential never submits', async () => {
+	legacy(); vi.mocked(ensureSudo).mockResolvedValue(false); save(); await nextTick();
+	expect(os.apiWithDialog).not.toHaveBeenCalled(); expect(os.authenticateDialog).not.toHaveBeenCalled();
 });
-test('unmount while legacy dialog waits discards its result', async () => {
-	legacy(); let finish!: (value: Awaited<ReturnType<typeof os.authenticateDialog>>) => void;
-	vi.mocked(os.authenticateDialog).mockReturnValue(new Promise(resolve => { finish = resolve; })); save(); app.unmount(); mounted = false;
-	finish({ canceled: false, result: { password: 'current-password', token: 'totp' } }); await new Promise(resolve => window.setTimeout(resolve, 10)); expect(os.apiWithDialog).not.toHaveBeenCalled();
+test('unmount while native sudo waits discards its result', async () => {
+	legacy(); let finish!: (value: boolean) => void;
+	vi.mocked(ensureSudo).mockReturnValue(new Promise(resolve => { finish = resolve; })); save(); app.unmount(); mounted = false;
+	finish(true); await new Promise(resolve => window.setTimeout(resolve, 10)); expect(os.apiWithDialog).not.toHaveBeenCalled();
 });
 test.each(['legacy-token', 'no-key', 'unsupported'] as const)('%s renders one explicit save choice', async kind => {
 	app.unmount(); element.remove(); mounted = false;

@@ -18,6 +18,8 @@ import { store } from '@features/preferences/frontend/store.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { get } from '@features/runtime/frontend/utility/idb-proxy.js';
 import { signout } from '@features/auth/frontend/signout.js';
+import { reconnectStream } from '@features/api/frontend/stream.js';
+import { adoptLiveToken, resetLiveTokens } from './utility/live-account.js';
 
 type AccountWithToken = Misskey.entities.MeDetailed & { token: string };
 
@@ -196,16 +198,39 @@ async function persistCurrentAccountInfo() {
 export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
 	if (!$i) return;
 	const token = $i.token;
+	const id = $i.id;
+	// Keep identity fields intact for the whole refresh so sync watchers do not see a missing actor.
 	for (const key of Object.keys($i)) {
-		Reflect.deleteProperty($i, key);
+		if (key === 'id' || key === 'token') continue;
+		if (!(key in accountData)) Reflect.deleteProperty($i, key);
 	}
 	for (const [key, value] of Object.entries(accountData)) {
+		if (key === 'id' || key === 'token') continue;
 		Reflect.set($i, key, value);
 	}
+	$i.id = id;
 	$i.token = token;
 	const persisted = persistCurrentAccountInfo();
 	miLocalStorage.setItem('account', JSON.stringify($i));
 	return persisted;
+}
+
+/** Swap a native credential for a newly issued browser session without leaving the account. */
+export async function adoptBrowserSession(token: string) {
+	if (!$i || !/^bs_[A-Za-z0-9_-]{43}$/.test(token) || $i.token === token) return;
+	const previous = $i.token;
+	adoptLiveToken($i.id, previous, token);
+	$i.token = token;
+	persistCurrentAccountInfo();
+	miLocalStorage.setItem('account', JSON.stringify($i));
+	const currentAccount = getCurrentAccountInfo();
+	if (currentAccount) await addAccount(host, currentAccount, token);
+	reconnectStream();
+}
+
+/** Drop only the live credential after a password or token change; keep other saved accounts. */
+export function leaveCurrentAccountAfterCredentialChange() {
+	return removeRejectedCurrentAccount();
 }
 
 export function updateCurrentAccountPartial(accountData: Partial<Misskey.entities.MeDetailed>) {
@@ -312,6 +337,7 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 		await addAccount(host, currentAccount, $i.token);
 	}
 
+	resetLiveTokens(me.id, token);
 	miLocalStorage.setItem('account', JSON.stringify({
 		...me,
 		token,

@@ -43,6 +43,12 @@ export function useStream(): Misskey.IStream {
 	return stream;
 }
 
+/** Keep the singleton Stream instance, but reopen it with the live credential. */
+export function reconnectStream(): void {
+	if (!stream) return;
+	stream.reconnect($i ? { token: $i.token } : null);
+}
+
 function heartbeat(): void {
 	if (stream != null && window.document.visibilityState === 'visible') {
 		stream.heartbeat();

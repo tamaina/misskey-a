@@ -127,13 +127,14 @@ import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { $i } from '@features/auth/frontend/i.js';
-import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@features/auth/frontend/accounts.js';
+import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog, login } from '@features/auth/frontend/accounts.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import * as os from '@features/ui/frontend/os.js';
 import { getProxiedImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { ensureSudo } from '../utility/ensure-sudo.js';
+import { isSameLiveCredential } from '../utility/live-account.js';
 import { selectedCredentialExpiry, useCredentialOperation } from '../utility/use-credential-operation.js';
 import MkPermissionSelect from './MkPermissionSelect.vue';
 import MkTokenExpiry from './MkTokenExpiry.vue';
@@ -170,7 +171,7 @@ const selectedAdministrator = computed(() => {
 
 const selectedUser = ref<string | null>(null);
 
-const canAuthorize = computed(() => { const user = selectedUser.value ? users.value.get(selectedUser.value) : undefined; return !!user && $i?.id === user.id && $i.token === user.token && user.token.startsWith('bs_'); });
+const canAuthorize = computed(() => { const user = selectedUser.value ? users.value.get(selectedUser.value) : undefined; return !!user && isSameLiveCredential(user.id, user.token, $i?.id, $i?.token); });
 
 const users = ref(new Map<string, Misskey.entities.UserDetailed & { token: string; }>());
 
@@ -220,10 +221,7 @@ function clickAddAccount(ev: PointerEvent) {
 			getAccountWithSigninDialog().then(async (res) => {
 				if (res != null) {
 					os.success();
-					await init();
-					if (users.value.has(res.id)) {
-						selectedUser.value = res.id;
-					}
+					await login(res.token, window.location.href);
 				}
 			});
 		},
@@ -233,10 +231,7 @@ function clickAddAccount(ev: PointerEvent) {
 			getAccountWithSignupDialog().then(async (res) => {
 				if (res != null) {
 					os.success();
-					await init();
-					if (users.value.has(res.id)) {
-						selectedUser.value = res.id;
-					}
+					await login(res.token, window.location.href);
 				}
 			});
 		},
@@ -245,6 +240,11 @@ function clickAddAccount(ev: PointerEvent) {
 
 async function clickChooseAccount() {
 	if (selectedUser.value === null) return;
+	const selected = users.value.get(selectedUser.value);
+	if (selected && ($i?.id !== selected.id || !isSameLiveCredential(selected.id, selected.token, $i?.id, $i?.token))) {
+		await login(selected.token, window.location.href);
+		return;
+	}
 	if (props.selectablePermissions !== undefined) {
 		const user = users.value.get(selectedUser.value)!;
 		waiting.value = true;
@@ -283,8 +283,8 @@ async function clickAccept() {
 		waiting.value = true;
 		try {
 			const expiresAt = selectedCredentialExpiry(targetExpiry);
-			if (!await ensureSudo(current, signal) || !current() || !canAuthorize.value || selectedUser.value !== user.id) { if (current()) waiting.value = false; return; }
-			emit('accept', user.token, permissions, expiresAt);
+			if (!await ensureSudo(current, signal) || !current() || !canAuthorize.value || selectedUser.value !== user.id || !$i) { if (current()) waiting.value = false; return; }
+			emit('accept', $i.token, permissions, expiresAt);
 		} catch { if (current()) showUI('failed'); }
 	});
 }

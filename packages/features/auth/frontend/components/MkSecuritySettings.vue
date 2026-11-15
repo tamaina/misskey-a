@@ -75,6 +75,7 @@ import * as os from '@features/ui/frontend/os.js';
 import { ensureSignin } from '../i.js';
 import { registrationWire } from '../utility/registration-wire.js';
 import { ensureSudo } from '../utility/ensure-sudo.js';
+import { isSameLiveCredential } from '../utility/live-account.js';
 
 const owner = ensureSignin();
 const ownerId = owner.id;
@@ -91,7 +92,7 @@ let generation = 0;
 let active = true;
 let nativePending = false;
 let sudoAbort: AbortController | null = null;
-const currentActor = () => active && ensureSignin().id === ownerId && ensureSignin().token === ownerToken;
+const currentActor = () => active && isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token);
 const readState = () => misskeyApi('i/security/state', {});
 
 function clearPending() {
@@ -117,7 +118,8 @@ async function run(action: (isCurrent: () => boolean) => Promise<void>, elevate 
 	try {
 		if (beforeSudo && !await beforeSudo()) return;
 		if (!isCurrent()) return;
-		if (elevate && !await ensureSudo(isCurrent, controller.signal)) return;
+		const needsSession = !ensureSignin().token.startsWith('bs_');
+		if ((elevate || needsSession) && !await ensureSudo(isCurrent, controller.signal)) return;
 		if (isCurrent()) await action(isCurrent);
 	} catch { if (isCurrent()) error.value = true; } finally { controller.abort(); if (sudoAbort === controller) sudoAbort = null; busy.value = false; nativePending = false; }
 }

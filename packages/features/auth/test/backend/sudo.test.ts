@@ -16,6 +16,7 @@ import { SecuritySettings } from '../../backend/security-settings.js';
 import type { SecuritySettingsDependencies } from '../../backend/security-settings.js';
 import type { FreshPasskeyReauthentication } from '../../backend/fresh-passkey-reauthentication.js';
 import type { TotpService } from '../../backend/services/TotpService.js';
+import type { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
 
 const identity = { userId: 'synthetic-user', browserSession: { id: 'synthetic-session', userId: 'synthetic-user' } };
 
@@ -51,8 +52,9 @@ function fixture() {
 	});
 	const fresh = mockDeep<FreshPasskeyReauthentication>();
 	const totp = mockDeep<TotpService>();
-	const service = new SudoService(db, fresh, totp);
-	return { service, db, manager, user, profile, session, users, profiles, sessions, keys, totp, fresh };
+	const browserSessions = mockDeep<Pick<BrowserSessionService, 'issue'>>();
+	const service = new SudoService(db, fresh, totp, browserSessions);
+	return { service, db, manager, user, profile, session, users, profiles, sessions, keys, totp, fresh, browserSessions };
 }
 
 afterEach(() => vi.restoreAllMocks());
@@ -70,12 +72,12 @@ test('one server-owned session can repeat operations during five minutes without
 });
 
 test.each([
-	{ userId: identity.userId },
 	{ ...identity, browserSession: { ...identity.browserSession, userId: 'other' } },
 	{ ...identity, accessToken: {} },
-])('legacy, other-owner and app tokens cannot elevate (%j)', async invalid => {
+])('other-owner and app tokens cannot elevate (%j)', async invalid => {
 	const f = fixture(); await expect(f.service.begin(invalid, 'password')).rejects.toThrow();
 	expect(f.db.getRepository).not.toHaveBeenCalled();
+	expect(f.browserSessions.issue).not.toHaveBeenCalled();
 });
 
 test('wrong password and missing required MFA do not grant elevation', async () => {
@@ -94,12 +96,17 @@ test('independent passkey MFA accepts a consumed recovery code but never an ordi
 	expect((await f.service.status(identity)).active).toBe(true);
 });
 
-test('revocation, policy change and exact deadline reject the next operation', async () => {
-	const f = fixture(); const now = vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
+test('a later credential or policy change leaves an unexpired grant valid', async () => {
+	const f = fixture(); vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
 	await f.service.begin(identity, 'password');
 	f.user.token = 'changed';
-	await expect(f.service.transaction(identity, async () => 'write')).rejects.toThrow();
-	f.user.token = 'synthetic-native';
+	f.profile.passkeyMfaEnabled = true;
+	expect(await f.service.transaction(identity, async () => 'write')).toBe('write');
+});
+
+test('revocation and the exact deadline reject the next operation', async () => {
+	const f = fixture(); const now = vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
+	await f.service.begin(identity, 'password');
 	now.mockReturnValue(f.session.sudoUntil!.getTime());
 	await expect(f.service.transaction(identity, async () => 'write')).rejects.toThrow();
 	now.mockReturnValue(1_800_000_000_000);
@@ -123,12 +130,10 @@ test('same-millisecond reauthentication has a distinct grant; stale cleanup cann
 	expect(f.session.sudoUntil).toBeNull(); expect(f.session.sudoPolicyStamp).toBeNull(); expect(f.session.sudoGrantId).toBeNull();
 });
 
-test('a forged future deadline and a changed credential set cannot authorize an operation', async () => {
+test('a forged future deadline cannot authorize an operation', async () => {
 	const f = fixture(); vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000); f.session.sudoUntil = new Date(Date.now() + 300_001);
+	f.session.sudoGrantId = 'g'.repeat(43);
 	f.session.sudoPolicyStamp = sudoPolicyStamp(f.user, f.profile, []);
-	await expect(f.service.transaction(identity, async () => 'write')).rejects.toThrow();
-	f.session.sudoUntil = new Date(Date.now() + 10_000);
-	f.keys.findBy.mockResolvedValue([mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: f.user.id, publicKey: 'AQID' })]);
 	await expect(f.service.transaction(identity, async () => 'write')).rejects.toThrow();
 });
 
@@ -152,4 +157,31 @@ test.each(['missing', 'expired'] as const)('passkey MFA enable rejects %s elevat
 	await expect(new SecuritySettings(deps).enablePasskeyMfa(identity, true)).rejects.toMatchObject({ code: 'SUDO_REQUIRED' });
 	expect(f.profiles.update).not.toHaveBeenCalled(); expect(f.sessions.update).not.toHaveBeenCalled();
 	expect(deps.events.publishMainStream).not.toHaveBeenCalled();
+});
+
+const nativeIdentity = { userId: identity.userId };
+
+test('a native token issues a browser session, attaches sudo and does not rotate user.token', async () => {
+	const f = fixture(); vi.spyOn(Date, 'now').mockReturnValue(1_800_000_000_000);
+	const issuedToken = `bs_${'A'.repeat(43)}`;
+	const issued = { id: 'issued-session', userId: identity.userId, createdAt: new Date(), lastUsedAt: new Date(), revokedAt: null, sudoUntil: null, sudoPolicyStamp: null, sudoGrantId: null };
+	f.browserSessions.issue.mockResolvedValue({ token: issuedToken, session: issued });
+	f.sessions.findOne.mockImplementation(async (options: { where?: { id?: string } }) => options.where?.id === 'issued-session' ? issued as typeof f.session : f.session);
+	f.sessions.update.mockImplementation(async (where: { id?: string }, patch: object) => {
+		if (where.id === 'issued-session') Object.assign(issued, patch);
+		else Object.assign(f.session, patch);
+		return { affected: 1, generatedMaps: [], raw: [] };
+	});
+	const elevation = await f.service.begin(nativeIdentity, 'password', undefined, false, { ip: '203.0.113.1', userAgent: 'Synthetic' });
+	expect(elevation).toEqual({ status: 'elevated', expiresAt: new Date(Date.now() + 300_000).toISOString(), grantId: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/), token: issuedToken });
+	expect(f.browserSessions.issue).toHaveBeenCalledExactlyOnceWith(identity.userId, f.sessions, { ip: '203.0.113.1', userAgent: 'Synthetic' });
+	expect(f.user.token).toBe('synthetic-native');
+	expect(issued.sudoGrantId).toEqual(expect.stringMatching(/^[A-Za-z0-9_-]{43}$/));
+	expect((await f.service.status(nativeIdentity))).toEqual({ active: false, expiresAt: null });
+});
+
+test('an app token cannot start native sudo migration', async () => {
+	const f = fixture();
+	await expect(f.service.begin({ userId: identity.userId, accessToken: {} }, 'password')).rejects.toThrow();
+	expect(f.browserSessions.issue).not.toHaveBeenCalled();
 });

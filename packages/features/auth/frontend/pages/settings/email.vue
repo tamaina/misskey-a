@@ -69,9 +69,9 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkDisableSection from '@features/ui/frontend/components/MkDisableSection.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
-import { ownedAuthenticateDialog } from '@features/auth/frontend/utility/owned-dialog.js';
 import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
+import { isSameLiveCredential } from '@features/auth/frontend/utility/live-account.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { instance } from '@features/instance/frontend/instance.js';
 
@@ -85,7 +85,6 @@ function onChangeReceiveAnnouncementEmail(v: boolean) {
 	});
 }
 
-const individualSession = computed(() => $i.token.startsWith('bs_'));
 const ownerId = $i.id;
 const ownerToken = $i.token;
 const savingEmail = ref(false);
@@ -96,26 +95,19 @@ const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; sudoAb
 onDeactivated(invalidateCeremony);
 onUnmounted(invalidateCeremony);
 onActivated(() => { disposed = false; });
-watch(() => [ensureSignin().id, ensureSignin().token], () => { if (ensureSignin().id !== ownerId || ensureSignin().token !== ownerToken) invalidateCeremony(); }, { flush: 'sync' });
+watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token)) invalidateCeremony(); }, { flush: 'sync' });
 
 async function saveEmailAddress() {
 	if (savingEmail.value || disposed) return;
 	savingEmail.value = true;
 	const generation = ++ceremonyGeneration;
 	sudoAbort = new AbortController();
-	const isCurrent = () => !disposed && generation === ceremonyGeneration && ensureSignin().id === ownerId && ensureSignin().token === ownerToken;
+	const isCurrent = () => !disposed && generation === ceremonyGeneration && isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token);
 	// Bind the visible input once. Neither later edits nor native UI can replace it.
 	const email = emailAddress.value === '' ? null : emailAddress.value;
 	try {
-		if (individualSession.value) {
-			if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
-			await os.apiWithDialog('i/security/email', { email });
-			return;
-		}
-
-		const auth = await ownedAuthenticateDialog({}, sudoAbort?.signal);
-		if (!isCurrent() || auth.canceled) return;
-		await os.apiWithDialog('i/update-email', { password: auth.result.password, token: auth.result.token, email });
+		if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+		await os.apiWithDialog('i/security/email', { email });
 	} finally { savingEmail.value = false; }
 }
 

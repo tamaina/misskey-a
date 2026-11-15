@@ -32,7 +32,7 @@ export const authSecurityServices = defineServices({
 	BrowserSessionService: browserSessions,
 	FreshReauthenticationStore: freshStore,
 	FreshPasskeyReauthentication: freshVerifier,
-	SudoService: service(SudoService, [ports.db, freshVerifier, totp]),
+	SudoService: service(SudoService, [ports.db, freshVerifier, totp, browserSessions]),
 	UserAuthService: totp,
 	WebAuthnService: service(WebAuthnService, [ports.config, ports.meta, ports.redisClient, ports.userSecurityKeysRepository]),
 });
