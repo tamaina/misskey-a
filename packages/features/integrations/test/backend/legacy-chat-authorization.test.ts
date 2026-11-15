@@ -122,6 +122,25 @@ describe('legacy chat webhook registration', () => {
 });
 
 describe('legacy chat delivery authorization', () => {
+	it('keeps grandfathered subscriptions delivering without a historical grant or reconfiguration', async () => {
+		const f = fixture(accountToken);
+		f.tokens.findOneBy.mockResolvedValue(null as never);
+		expect(await f.deliver()).toBe('Success');
+		expect(f.tokens.findOneBy).not.toHaveBeenCalled();
+		await expect(f.update({ url: 'https://example.com/new' })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+		expect(f.repository.update).toHaveBeenCalledTimes(1); // delivery status only
+	});
+
+	it('binds grandfathered subscriptions to the current grant on an authorized edit', async () => {
+		const f = fixture(chatToken);
+		await f.update({ name: 'updated' });
+		expect(f.webhook.chatTokenId).toBe('grant');
+		f.job.chatGeneration = f.webhook.chatGeneration!;
+		expect(await f.deliver()).toBe('Success'); f.send.mockClear();
+		f.tokens.findOneBy.mockResolvedValue(null as never);
+		expect(await f.deliver()).toBe('Suppressed'); expect(f.send).not.toHaveBeenCalled();
+	});
+
 	it('delivers owner-authorized chat with the existing wire format', async () => {
 		const f = fixture();
 		expect(await f.deliver()).toBe('Success');
@@ -195,7 +214,7 @@ describe('legacy chat delivery authorization', () => {
 		expect(await f.deliver()).toBe('Success'); expect(f.users.findOneBy).not.toHaveBeenCalled();
 	});
 
-	it('never queues pre-upgrade chat hooks and propagates the current generation', () => {
+	it('never queues unmigrated chat hooks and propagates the current generation', () => {
 		const f = fixture(); const add = vi.fn();
 		const queue = Object.assign(Object.create(QueueService.prototype), { userWebhookDeliverQueue: { add } }) as QueueService;
 		f.setWebhook({ chatGeneration: null });

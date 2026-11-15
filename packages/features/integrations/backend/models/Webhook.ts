@@ -64,7 +64,7 @@ export class MiWebhook {
 	@Column('varchar', { length: 16, default: 'legacy' })
 	public mode: 'legacy' | 'mcp';
 
-	/** Null until chat delivery has been explicitly authorized after upgrade. */
+	/** Chat delivery generation, including grandfathered pre-upgrade subscriptions. */
 	@Column('uuid', { nullable: true })
 	public chatGeneration: string | null;
 

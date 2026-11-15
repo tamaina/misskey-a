@@ -733,7 +733,7 @@ export class QueueService {
 				backoff: { type: 'custom' }, removeOnComplete: { age: 86400, count: 1000 }, removeOnFail: { age: 86400, count: 1000 } });
 		}
 
-		// Old cached rows and pre-upgrade subscriptions must not enqueue chat content.
+		// Unmigrated cached rows must not enqueue chat without a delivery generation.
 		if (type === 'chatMessage' && !webhook.chatGeneration) return;
 		const data: UserWebhookDeliverJobData = {
 			type,

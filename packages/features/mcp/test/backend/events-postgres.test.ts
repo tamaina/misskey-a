@@ -14,6 +14,8 @@ import { entities } from '@features/persistence/backend/postgres.js';
 import { createRepositorySet } from '@features/persistence/backend/repositories/factory.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import { MiUser } from '@features/users/backend/models/User.js';
+import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
+import { LegacyChatWebhookAuthorization1794787200000 } from '../../../../backend/migration/1794787200000-LegacyChatWebhookAuthorization.js';
 import { McpEventsWebhook1791763200000 } from '../../../../backend/migration/1791763200000-McpEventsWebhook.js';
 import { McpAntennaEvents1791763200001 } from '../../../../backend/migration/1791763200001-McpAntennaEvents.js';
 import { McpStreamSubscriptions1791786439355 } from '../../../../backend/migration/1791786439355-McpStreamSubscriptions.js';
@@ -40,6 +42,53 @@ describe.skipIf(!socket)('isolated MCP Events PostgreSQL fixture', () => {
 		await db.initialize();
 	}, 30000);
 	afterAll(async () => { if (db?.isInitialized) await db.destroy(); });
+	it('grandfathers existing chat subscriptions without changing settings and preserves the policy on rollback', async () => {
+		const runner = db.createQueryRunner();
+		await runner.startTransaction();
+		try {
+			const user = await runner.manager.getRepository(MiUser).save(new MiUser({ id: 'legacy_chat_owner', host: null, username: 'legacy_chat_owner', usernameLower: 'legacy_chat_owner' }));
+			const tokens = runner.manager.getRepository(MiAccessToken);
+			const oldGrant = await tokens.save({ id: 'legacy_chat_old_grant', userId: user.id, token: 'SYNTHETIC_OLD_CHAT', hash: 'SYNTHETIC_OLD_CHAT', permission: ['write:account'] });
+			const newGrant = await tokens.save({ id: 'legacy_chat_new_grant', userId: user.id, token: 'SYNTHETIC_NEW_CHAT', hash: 'SYNTHETIC_NEW_CHAT', permission: ['write:account', 'read:chat'] });
+			const migration = new LegacyChatWebhookAuthorization1794787200000();
+			await migration.down(runner);
+			for (const [id, mode, on, active] of [
+				['legacy_chat_active', 'legacy', ['chatMessage', 'note'], true],
+				['legacy_chat_inactive', 'legacy', ['chatMessage'], false],
+				['legacy_nonchat', 'legacy', ['note'], true],
+				['mcp_chat', 'mcp', ['chatMessage'], true],
+			] as const) {
+				await runner.query('INSERT INTO "webhook" ("id", "userId", "name", "url", "secret", "mode", "on", "active") VALUES ($1, $2, $1, $3, $4, $5, $6, $7)',
+					[id, user.id, `https://callback.example/${id}`, `secret-${id}`, mode, on, active]);
+			}
+			const settings = () => runner.query('SELECT "id", "name", "url", "secret", "mode", "on", "active" FROM "webhook" WHERE "userId" = $1 ORDER BY "id"', [user.id]);
+			const before = await settings();
+			await migration.up(runner);
+			expect(await settings()).toEqual(before);
+			const webhooks = runner.manager.getRepository(MiWebhook);
+			const active = await webhooks.findOneByOrFail({ id: 'legacy_chat_active' });
+			const inactive = await webhooks.findOneByOrFail({ id: 'legacy_chat_inactive' });
+			expect(active.chatGeneration).toMatch(/^[0-9a-f-]{36}$/);
+			expect(inactive.chatGeneration).toMatch(/^[0-9a-f-]{36}$/);
+			expect(active.chatGeneration).not.toBe(inactive.chatGeneration);
+			expect(active.chatTokenId).toBeNull(); expect(inactive.chatTokenId).toBeNull();
+			for (const id of ['legacy_nonchat', 'mcp_chat']) {
+				expect(await webhooks.findOneByOrFail({ id })).toMatchObject({ chatGeneration: null, chatTokenId: null });
+			}
+			await tokens.delete(oldGrant.id);
+			expect(await settings()).toEqual(before); // historical grants cannot revoke grandfathered hooks
+			await webhooks.update(active.id, { chatTokenId: newGrant.id, chatGeneration: randomUUID() });
+			await tokens.delete(newGrant.id);
+			expect(await webhooks.findOneBy({ id: active.id })).toBeNull(); // newly bound grants still cascade
+			expect(await settings()).toEqual(before.filter((row: { id: string }) => row.id !== active.id));
+			const beforeRollback = await settings();
+			await migration.down(runner);
+			expect(await settings()).toEqual(beforeRollback);
+		} finally {
+			await runner.rollbackTransaction();
+			await runner.release();
+		}
+	});
 	it('persists native parameters/generation, restores future observation and round-trips the stream migration without pending DDL', async () => {
 		const repos = createRepositorySet(db);
 		const user = await repos.usersRepository.save(new MiUser({ id: 'stream_account', host: null, username: 'synthetic_stream', usernameLower: 'synthetic_stream' }));

@@ -9,10 +9,16 @@ and legacy subscriptions to other events keep their existing behavior.
    Do not use a mixed-version rolling deployment: old consumers do not enforce
    the new delivery authorization fields.
 2. Run the database migration, then start only the updated application/workers.
-3. Tell webhook owners to explicitly reselect `chatMessage` in webhook settings
-   if they still want chat delivery. The migration removes only that event from
-   existing legacy hooks, preserving their other event subscriptions. The old
-   registration does not establish a trustworthy chat authorization grant.
+3. Existing legacy `chatMessage` subscriptions continue without reconfiguration.
+   The migration gives each one a delivery generation and preserves its event
+   selection, destination, secret and active state. Other events are unchanged.
+
+This beta compatibility policy deliberately grandfathers existing subscriptions,
+including ones whose original token did not have chat access. Their original
+grant is unknown, so they are not token-bound: revoking that historical token
+does not stop them. The new scope and grant-binding rules apply when a webhook
+is created or edited after the upgrade. Owners can still disable or delete an
+existing hook, and current owner eligibility is checked at delivery time.
 
 Queued chat deliveries from before this upgrade are discarded, including after
 reauthorization. A change to a chat webhook invalidates its previous queued chat
@@ -38,6 +44,7 @@ authorization checks apply to each new delivery attempt, including retries.
 
 ## Rollback
 
-The down migration removes `chatMessage` from legacy hooks again rather than
-restoring historical subscriptions. Stop all workers before rollback as well;
-do not resume old pending chat deliveries with old application code.
+The down migration preserves event selections and removes the new authorization
+metadata. Stop all workers before rollback as well; do not resume pending chat
+deliveries with old application code, which cannot enforce the new generation
+and grant checks. Rolling back the code also removes the new registration checks.

@@ -26,6 +26,7 @@ export async function canDeliverLegacyChatWebhook(manager: EntityManager, webhoo
 	if (!webhook.chatGeneration) return false;
 	const user = await manager.getRepository(MiUser).findOneBy({ id: webhook.userId });
 	if (!user || user.host !== null || user.isSuspended || user.movedToUri) return false;
+	// Native owner authorization and grandfathered beta hooks are not token-bound.
 	if (webhook.chatTokenId === null) return true;
 	if (!webhook.chatTokenId) return false;
 	const token = await manager.getRepository(MiAccessToken).findOneBy({ id: webhook.chatTokenId, userId: webhook.userId });
