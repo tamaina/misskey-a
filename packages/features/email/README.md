@@ -235,3 +235,12 @@ The bridge reads bounded stdin without MIME parsing or newline rewriting. It sig
 An HTTP 200 alone is not success. Unknown or mismatched result sets always defer. Losing a response after a DB commit is safe to retry only because the MTA preserves the original delivery identity and bytes. The bridge emits no stdout and only a fixed generic refusal/defer message on stderr; raw, envelope, tokens and server responses are not logged. Any DSN policy remains at the trusted MTA, not this script.
 
 Local tests: `node --test packages/features/email/test/mta-handoff.test.mjs`. These use only loopback HTTP fixtures and subprocesses, checking byte/HMAC identity, repeated invocations, result mapping, malformed/oversized responses, disconnect/deadline handling, stdin bounds and the actual CLI exit. Production MTA queue persistence, authenticated tunnel deployment and end-to-end restart/retry tests remain required.
+
+
+## PostgreSQL concurrency regression tests
+
+After building the backend, run `node packages/features/email/test/run-postgres-fixture.mjs` from the repository root. This requires local PostgreSQL binaries (or `MISSKEY_PG_BINDIR`). The runner creates its own synthetic database and owner-only Unix socket with TCP disabled, runs the mail persistence/submission suites serially, and stops its own server in `finally`. It does not use application database configuration. The fixture directory and server log are retained at the printed path for diagnosis.
+
+The concurrency test uses a pool of independent server connections and a transaction rendezvous that checks distinct `pg_backend_pid()` values before releasing each pair. It covers retry deduplication, double deletion, mailbox quota, physical spool quota, send idempotency and competing submission-worker claims. Owner-only raw/deletion checks and both mail migration directions are included in the SQL suite. CI runs this fixture for both supported Node versions; email changes trigger backend CI.
+
+SMTP and private object storage are in-memory doubles: no external mail is sent. These tests do not establish live relay/S3/Redis interoperability, crash recovery across real external services, arbitrary concurrency schedules, or browser behavior. PGlite remains useful for sequential SQL checks but does not replace the PostgreSQL concurrency fixture.

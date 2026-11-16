@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
-import { MailStore } from '../../../backend/built/features/email/backend.js';
+import { MailStore, UserMailboxService } from '../../../backend/built/features/email/backend.js';
 import { MailFoundation1794697200000 } from '../../../backend/migration/1794697200000-MailFoundation.js';
 import { MailSubmissions1794697200001 } from '../../../backend/migration/1794697200001-MailSubmissions.js';
 
@@ -345,23 +345,53 @@ test('mail persistence against PostgreSQL SQL semantics', { skip: !connectionStr
 
 // These assertions need independent server connections. PGlite serializes its
 // transactions and therefore cannot validate the production row/advisory locks.
-test('mail concurrent retry and quota serialization on PostgreSQL', { skip: !connectionString }, async () => {
+test('mail admission, quotas and submission claims on independent PostgreSQL connections', { skip: !connectionString, timeout: 20_000 }, async t => {
 	const require = createRequire(new URL('../../../backend/package.json', import.meta.url));
 	const { Client, Pool } = require('pg');
 	const admin = new Client({ connectionString });
 	await admin.connect();
 	const schema = `mail_concurrent_${randomUUID().replaceAll('-', '')}`;
 	let pool;
+	let rendezvous;
+	// Start both transactions on independent backends before either acquires a
+	// production lock. No timing sleeps or single-connection pseudo-concurrency.
+
+	async function together(actions) {
+		const pids = new Set();
+		let release;
+		let reject;
+		const ready = new Promise((resolve, fail) => { release = resolve; reject = fail; });
+		const timer = setTimeout(() => reject(new Error('Independent PostgreSQL transactions did not rendezvous')), 5000);
+		rendezvous = async client => {
+			pids.add((await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+			if (pids.size === actions.length) { rendezvous = undefined; release(); }
+			await ready;
+		};
+		try {
+			const results = await Promise.allSettled(actions.map(action => action()));
+			assert.equal(pids.size, actions.length, `transactions used distinct PostgreSQL backends: ${results.filter(result => result.status === 'rejected').map(result => result.reason).join('; ')}`);
+			return results;
+		} finally { clearTimeout(timer); rendezvous = undefined; }
+	}
+
+	async function succeedTogether(actions) {
+		const results = await together(actions);
+		for (const result of results) assert.equal(result.status, 'fulfilled', String(result.reason));
+		return results.map(result => result.value);
+	}
+
 	try {
 		await admin.query(`CREATE SCHEMA "${schema}"`);
-		pool = new Pool({ connectionString, options: `-c search_path=${schema}`, max: 4 });
+		pool = new Pool({ connectionString, options: `-c search_path=${schema} -c statement_timeout=5000 -c lock_timeout=5000`, max: 4 });
+		const resultRows = (sql, result) => /^\s*(?:UPDATE|DELETE)\b/i.test(sql) ? [result.rows, result.rowCount] : result.rows;
 		const db = {
-			async query(sql, params) { return (await pool.query(sql, params)).rows; },
+			async query(sql, params) { return resultRows(sql, await pool.query(sql, params)); },
 			async transaction(work) {
 				const client = await pool.connect();
 				try {
 					await client.query('BEGIN');
-					const result = await work({ async query(sql, params) { return (await client.query(sql, params)).rows; } });
+					if (rendezvous) await rendezvous(client);
+					const result = await work({ async query(sql, params) { return resultRows(sql, await client.query(sql, params)); } });
 					await client.query('COMMIT');
 					return result;
 				} catch (error) {
@@ -372,7 +402,7 @@ test('mail concurrent retry and quota serialization on PostgreSQL', { skip: !con
 				}
 			},
 		};
-		await db.query('CREATE TABLE "user" ("id" varchar(32) PRIMARY KEY, "usernameLower" varchar(128), "host" varchar(128), "isSuspended" boolean NOT NULL DEFAULT false, "isDeleted" boolean NOT NULL DEFAULT false)');
+		await db.query('CREATE TABLE "user" ("id" varchar(32) PRIMARY KEY, "usernameLower" varchar(128), "username" varchar(128), "movedToUri" varchar(512), "host" varchar(128), "isSuspended" boolean NOT NULL DEFAULT false, "isDeleted" boolean NOT NULL DEFAULT false)');
 		await new MailFoundation1794697200000().up(db);
 		await new MailSubmissions1794697200001().up(db);
 		await db.query('INSERT INTO "user" ("id","usernameLower") VALUES (\'alice\',\'alice\')');
@@ -385,24 +415,68 @@ test('mail concurrent retry and quota serialization on PostgreSQL', { skip: !con
 		const raw = Buffer.from('Subject: concurrent\r\n\r\nbody');
 		const store = new MailStore(db, storage, 'mail.example', BigInt(raw.length));
 		await store.setEnabled('alice', true);
-		const [a, b] = await Promise.all([store.stage(raw), store.stage(raw)]);
-		const accepts = await Promise.all([
-			store.accept(a.id, 'concurrent_retry_id_123', 'alice@mail.example', 'sender@example.com'),
-			store.accept(b.id, 'concurrent_retry_id_123', 'alice@mail.example', 'sender@example.com'),
+		const [a, b] = await succeedTogether([() => store.stage(raw), () => store.stage(raw)]);
+		const accepts = await succeedTogether([
+			() => store.accept(a.id, 'concurrent_retry_id_123', 'alice@mail.example', 'sender@example.com'),
+			() => store.accept(b.id, 'concurrent_retry_id_123', 'alice@mail.example', 'sender@example.com'),
 		]);
 		assert.equal(accepts[0].id, accepts[1].id);
 		assert.deepEqual(accepts.map(result => result.duplicate).sort(), [false, true]);
 		assert.equal(BigInt((await db.query('SELECT "usedBytes" FROM "mail_account"'))[0].usedBytes), BigInt(raw.length));
-		await Promise.all([store.remove('alice', accepts[0].id), store.remove('alice', accepts[0].id)]);
+		await succeedTogether([() => store.remove('alice', accepts[0].id), () => store.remove('alice', accepts[0].id)]);
 		assert.equal(BigInt((await db.query('SELECT "usedBytes" FROM "mail_account"'))[0].usedBytes), 0n);
-		const quota = await Promise.allSettled([
-			store.accept(a.id, 'concurrent_new_id_123', 'alice@mail.example', 'sender@example.com'),
-			store.accept(b.id, 'concurrent_new_id_456', 'alice@mail.example', 'sender@example.com'),
+		const quota = await together([
+			() => store.accept(a.id, 'concurrent_new_id_123', 'alice@mail.example', 'sender@example.com'),
+			() => store.accept(b.id, 'concurrent_new_id_456', 'alice@mail.example', 'sender@example.com'),
 		]);
 		assert.equal(quota.filter(result => result.status === 'fulfilled').length, 1);
 		const rejected = quota.find(result => result.status === 'rejected');
 		assert.equal(rejected.reason.code, 'QUOTA_EXCEEDED');
 		assert.equal(BigInt((await db.query('SELECT "usedBytes" FROM "mail_account"'))[0].usedBytes), BigInt(raw.length));
+		assert.equal((await db.query('SELECT * FROM "mail_outbox"')).length, 1);
+		const liveId = quota.find(result => result.status === 'fulfilled').value.id;
+		assert.deepEqual(await store.readRaw('alice', liveId), raw);
+		await assert.rejects(store.readRaw('bob', liveId), /NOT_FOUND/);
+		await assert.rejects(store.remove('bob', liveId), /NOT_FOUND/);
+		const spool = new MailStore(db, storage, 'mail.example', 1000n, 1000, BigInt(raw.length * 3));
+		const stages = await together([() => spool.stage(raw), () => spool.stage(raw)]);
+		assert.equal(stages.filter(result => result.status === 'fulfilled').length, 1);
+		assert.equal(stages.find(result => result.status === 'rejected').reason.code, 'QUOTA_EXCEEDED');
+		assert.equal((await db.query('SELECT * FROM "mail_raw"')).length, 3);
+		t.diagnostic('Distinct PostgreSQL backends verified for staging, retry deduplication, deletion, mailbox quota and spool quota');
+
+		// API send admission and competing queue workers share the real pool.
+		// SMTP and private object storage remain explicit in-memory doubles.
+		await db.query('TRUNCATE "user" CASCADE');
+		await db.query('TRUNCATE "mail_raw" CASCADE');
+		objects.clear();
+		await db.query(`INSERT INTO "user" ("id","username","usernameLower") VALUES ('alice','alice','alice')`);
+		const settings = { enabled: true, domain: 'mail.example', quotaBytes: 100_000, maxBytes: 25_000, spoolBytes: 1_000_000, maxRecipients: 20, sendsPerHour: 20, outbound: { host: '127.0.0.1', port: 1, tls: 'implicit' } };
+		const sendingStore = new MailStore(db, storage, settings.domain, BigInt(settings.quotaBytes));
+		await sendingStore.setEnabled('alice', true);
+		const runtime = { settings, async getContext() { return { settings, store: sendingStore, storage }; }, async enqueueSubmission() {} };
+		const services = [0, 1].map(() => new UserMailboxService({ url: 'https://social.example' }, db, runtime));
+		const submitted = [];
+		for (const service of services) service.transport = {
+			async submit(bytes, envelope) {
+				submitted.push(envelope);
+				return { state: 'submitted', accepted: envelope.to, rejected: [], retryableRecipients: [] };
+			},
+			close() {},
+		};
+		const input = { idempotencyKey: 'concurrent-send-123', to: ['recipient@example.com'], subject: 'private', body: 'body', format: 'text' };
+		const sends = await succeedTogether(services.map(service => () => service.send('alice', input)));
+		assert.equal(sends[0].id, sends[1].id);
+		const [submission] = await db.query('SELECT * FROM "mail_submission"');
+		assert.equal((await db.query('SELECT * FROM "mail_submission"')).length, 1);
+		assert.equal((await db.query('SELECT * FROM "mail_raw"')).length, 1, 'losing admission discards its unuploaded staging row');
+		assert.equal(BigInt((await db.query('SELECT "usedBytes" FROM "mail_account"'))[0].usedBytes), BigInt(submission.size));
+		await succeedTogether(services.map(service => () => service.processSubmission(submission.id)));
+		assert.equal(submitted.length, 1, 'only one worker may submit to the mock transport');
+		const [completed] = await db.query('SELECT * FROM "mail_submission"');
+		assert.equal(completed.state, 'submitted');
+		assert.equal(completed.attempts, 1);
+		t.diagnostic('Distinct PostgreSQL backends verified for send idempotency and competing submission claims; no external SMTP');
 	} finally {
 		if (pool) await pool.end();
 		await admin.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
