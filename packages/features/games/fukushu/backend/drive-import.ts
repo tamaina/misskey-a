@@ -57,7 +57,7 @@ export class FukushuDriveImporter {
 			// MD5 checks that the persisted original has not changed at its URL. It is
 			// not a content-safety guarantee; parsing and schema bounds still apply.
 			if (bytes.length !== file.size || createHash('md5').update(bytes).digest('hex') !== file.md5) throw new Error('Original changed');
-			source = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+			source = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
 		} catch {
 			// Filesystem paths, object URLs, access keys and remote responses stay private.
 			throw new MaterialError('IMPORT_FAILED');

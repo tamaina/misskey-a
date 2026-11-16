@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createHash } from 'node:crypto';
+import { Readable } from 'node:stream';
+import { FukushuDriveImporter } from '../../backend/drive-import.js';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import type { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'vitest';
 import { DataSource } from 'typeorm';
 import { call } from '@orpc/server';
@@ -30,6 +35,20 @@ describe.skipIf(!socket)('Fukushu private PostgreSQL persistence and API', () =>
 	beforeEach(async () => {
 		await db.query('TRUNCATE "user", fukushu_deck, fukushu_question CASCADE');
 		await db.query('INSERT INTO "user" VALUES ($1), ($2)', ['alice', 'bob']);
+	});
+	test('imports a BOM source through the real parser and store without changing its hash or another owner', async () => {
+		const source = '\uFEFF#html:false\n#separator:Tab\n表\t裏';
+		const bytes = Buffer.from(source);
+		const file = { id: 'source', userId: 'alice', userHost: null, uri: null, isLink: false, storedInternal: true, accessKey: 'source.tsv', name: '教材.tsv', size: bytes.length, md5: createHash('md5').update(bytes).digest('hex') } as MiDriveFile;
+		const importer = new FukushuDriveImporter({ findOneBy: async where => where.userId === 'alice' ? file : null }, { read: () => Readable.from([bytes]) as ReturnType<InternalStorageService['read']> }, { downloadUrl: async () => { throw new Error('Must use the local original'); } }, store);
+		const saved = await importer.import('alice', 'source');
+		expect(saved.deck.sourceText).toBe(source);
+		expect(saved.deck.sourceHash).toBe(createHash('sha256').update(source).digest('hex'));
+		expect(saved.questions[0].payload.prompt.value).toBe('表');
+		expect(await store.show('alice', saved.deck.id)).toEqual(saved);
+		await expect(importer.import('alice', 'source')).rejects.toMatchObject({ code: 'MATERIAL_EXISTS' });
+		await expect(importer.import('bob', 'source')).rejects.toMatchObject({ code: 'NO_SUCH_FILE' });
+		expect(await store.list('bob')).toEqual([]);
 	});
 	test('round trips exact records across store instances and isolates owners sharing original IDs', async () => {
 		const original = material();
