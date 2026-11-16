@@ -2,21 +2,29 @@
 
 ゲーム、リバーシ、バブルゲーム、クリッカー、対局とゲームの設定。
 
-## ゲーム単位の分離: 最初の確認用変更
+## ゲーム単位の所有境界
 
 `frontend/pages/games.vue` を `index/frontend/pages/index.vue` に移動した。
 `index` はゲーム一覧の入口を所有する。`/games` の lazy loader だけを新しいパスへ向け、
 画面本体・ゲームへのリンク・ゲスト閲覧・既存 CSS module の識別子は維持する。
 
-| 今回の移動元 | 移動先 |
+| 移動元 | 移動先 |
 | --- | --- |
 | `frontend/pages/games.vue` | `index/frontend/pages/index.vue` |
+| `backend/{index.ts,api.implementation.ts,endpoints/games.contract.ts}` | `index/backend/`（ゲームの合成入口） |
+| `frontend/pages/reversi/*` | `reversi/frontend/pages/*` |
+| `backend/endpoints/reversi/*` | `reversi/backend/endpoints/*` |
+| Reversi の model/schema/serializer/service/stream/template と `backend/services.ts` | `reversi/backend/`（元の分類を維持） |
+| `frontend/pages/drop-and-fusion*.vue` | `bubble-game/frontend/pages/` |
+| `backend/endpoints/bubble-game/*` と `backend/models/BubbleGameRecord.ts` | `bubble-game/backend/endpoints/` と `bubble-game/backend/models/` |
+| clicker の page/component/widget/utility | `clicker/frontend/`（元の分類を維持） |
 
-Reversi、bubble-game、clicker のファイルはまだ移動していない。
-既存 `backend/index.ts`、`backend/services.ts`、API contract/implementation、モデル、
-serializer、stream、DI の登録と公開 URL はそのまま使う。
+`/games`・`/reversi`・`/reversi/g/:gameId`・`/bubble-game`・`/clicker` の URL、
+API 名、stream 名、保存する JSON / DB table / column、clicker の registry scope は変えない。
+既存クラスを移動し、ホストの import を一つの定義へ向けることで DI token と entity の
+constructor identity を維持する。旧場所に複製クラスや再登録は作らない。
 
-## 確認後の候補（未実装）
+## 構成と後続作業
 
 - `reversi/{frontend,backend}`: Reversi の画面・サービス・モデル・serializer・stream・endpoint。
 - `bubble-game/{frontend,backend}`: drop-and-fusion 画面とバブルゲーム記録・endpoint。
@@ -29,9 +37,10 @@ serializer、stream、DI の登録と公開 URL はそのまま使う。
 同一性を保つ。公開 contract や schema を移す場合は SDK の参照も合わせて検証する。
 ゲームごとの package.json、tsconfig、build 設定は作らない。
 
-今回、main frontend の VVI・アイコン・型・lint・unit test の探索は既存階層と `games/*` の入れ子を扱えるようにした。
-embed の除外は維持する。Storybook、settings/admin 検索、backend/shared/embed の探索は、
-該当ファイルを移す段階で別途対応する。全ゲームの展開と麻雀本実装は今回の小変更への確認後。
+main frontend の VVI・アイコン・型・lint・unit test、および backend の型・lint・bundle・watch と
+Storybook の探索は既存階層と `games/*` の入れ子を扱う。embed の除外は維持する。
+ゲームの settings/admin/shared/embed ファイルは今回存在しないため、その探索は広げていない。
+ユーザーの確認を受けて一覧から既存3ゲームへ展開した。麻雀は以下の境界と Issue #316 に従う。
 
 追跡: #316。JUICE #304 の盆栽も後続では独立したゲーム所有先を検討する。
 

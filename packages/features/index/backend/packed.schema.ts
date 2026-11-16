@@ -58,7 +58,7 @@ import {
 import {
 	packedReversiGameLiteSchema,
 	packedReversiGameDetailedSchema,
-} from '../../games/backend/reversi.schema.js';
+} from '../../games/reversi/backend/reversi.schema.js';
 
 import {
 	packedAdSchema,

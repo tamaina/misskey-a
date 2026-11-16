@@ -40,8 +40,8 @@ import { QueueStatsChannel } from '@features/operations/backend/stream/queue-sta
 import { AdminChannel } from '@features/operations/backend/stream/admin.js';
 import { ChatUserChannel } from '@features/chat/backend/stream/chat-user.js';
 import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
-import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
-import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
+import { ReversiChannel } from '@features/games/reversi/backend/stream/reversi.js';
+import { ReversiGameChannel } from '@features/games/reversi/backend/stream/reversi-game.js';
 import type { BrowserSessionIdentity } from '../context.js';
 import type { ChannelRequest } from './channel.js';
 import type { ChannelConstructor } from './channel.js';

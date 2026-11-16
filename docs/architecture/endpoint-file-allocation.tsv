@@ -106,8 +106,8 @@ packages/backend/src/server/api/endpoints/auth/session/userkey.ts	auth	packages/
 packages/backend/src/server/api/endpoints/blocking/create.ts	relationships	packages/features/relationships/backend/endpoints/blocking/create.ts	placed-with-bridge	Follow/block/mute/list graph state or relationship queries.
 packages/backend/src/server/api/endpoints/blocking/delete.ts	relationships	packages/features/relationships/backend/endpoints/blocking/delete.ts	placed-with-bridge	Follow/block/mute/list graph state or relationship queries.
 packages/backend/src/server/api/endpoints/blocking/list.ts	relationships	packages/features/relationships/backend/endpoints/blocking/list.ts	placed-with-bridge	Follow/block/mute/list graph state or relationship queries.
-packages/backend/src/server/api/endpoints/bubble-game/ranking.ts	games	packages/features/games/backend/endpoints/bubble-game/ranking.ts	placed-with-bridge	Reversi and bubble-game APIs.
-packages/backend/src/server/api/endpoints/bubble-game/register.ts	games	packages/features/games/backend/endpoints/bubble-game/register.ts	placed-with-bridge	Reversi and bubble-game APIs.
+packages/backend/src/server/api/endpoints/bubble-game/ranking.ts	games	packages/features/games/bubble-game/backend/endpoints/ranking.ts	placed-with-bridge	Reversi and bubble-game APIs.
+packages/backend/src/server/api/endpoints/bubble-game/register.ts	games	packages/features/games/bubble-game/backend/endpoints/register.ts	placed-with-bridge	Reversi and bubble-game APIs.
 packages/backend/src/server/api/endpoints/channels/create.ts	channels	packages/features/channels/backend/endpoints/channels/create.ts	placed-with-bridge	Channel content, membership, search, favorites, or channel mute state.
 packages/backend/src/server/api/endpoints/channels/featured.ts	channels	packages/features/channels/backend/endpoints/channels/featured.ts	placed-with-bridge	Channel content, membership, search, favorites, or channel mute state.
 packages/backend/src/server/api/endpoints/channels/followed.ts	channels	packages/features/channels/backend/endpoints/channels/followed.ts	placed-with-bridge	Channel content, membership, search, favorites, or channel mute state.
@@ -326,13 +326,13 @@ packages/backend/src/server/api/endpoints/request-reset-password.ts	auth	package
 packages/backend/src/server/api/endpoints/reset-db.ts	operations	packages/features/operations/backend/endpoints/reset-db.ts	placed-with-bridge	Test-only database reset/Redis flush endpoint; database maintenance belongs to operations.
 packages/backend/src/server/api/endpoints/reset-password.ts	auth	packages/features/auth/backend/endpoints/reset-password.ts	placed-with-bridge	Authentication, signup, credentials, sessions, OAuth/MiAuth, or app authorization.
 packages/backend/src/server/api/endpoints/retention.ts	statistics	packages/features/statistics/backend/endpoints/retention.ts	placed-with-bridge	Serves retention aggregation series used by statistics charts.
-packages/backend/src/server/api/endpoints/reversi/cancel-match.ts	games	packages/features/games/backend/endpoints/reversi/cancel-match.ts	placed-with-bridge	Reversi and bubble-game APIs.
-packages/backend/src/server/api/endpoints/reversi/games.ts	games	packages/features/games/backend/endpoints/reversi/games.ts	placed-with-bridge	Reversi and bubble-game APIs.
-packages/backend/src/server/api/endpoints/reversi/invitations.ts	games	packages/features/games/backend/endpoints/reversi/invitations.ts	placed-with-bridge	Reversi and bubble-game APIs.
-packages/backend/src/server/api/endpoints/reversi/match.ts	games	packages/features/games/backend/endpoints/reversi/match.ts	placed-with-bridge	Reversi and bubble-game APIs.
-packages/backend/src/server/api/endpoints/reversi/show-game.ts	games	packages/features/games/backend/endpoints/reversi/show-game.ts	placed-with-bridge	Reversi and bubble-game APIs.
-packages/backend/src/server/api/endpoints/reversi/surrender.ts	games	packages/features/games/backend/endpoints/reversi/surrender.ts	placed-with-bridge	Reversi and bubble-game APIs.
-packages/backend/src/server/api/endpoints/reversi/verify.ts	games	packages/features/games/backend/endpoints/reversi/verify.ts	placed-with-bridge	Reversi and bubble-game APIs.
+packages/backend/src/server/api/endpoints/reversi/cancel-match.ts	games	packages/features/games/reversi/backend/endpoints/cancel-match.ts	placed-with-bridge	Reversi and bubble-game APIs.
+packages/backend/src/server/api/endpoints/reversi/games.ts	games	packages/features/games/reversi/backend/endpoints/games.ts	placed-with-bridge	Reversi and bubble-game APIs.
+packages/backend/src/server/api/endpoints/reversi/invitations.ts	games	packages/features/games/reversi/backend/endpoints/invitations.ts	placed-with-bridge	Reversi and bubble-game APIs.
+packages/backend/src/server/api/endpoints/reversi/match.ts	games	packages/features/games/reversi/backend/endpoints/match.ts	placed-with-bridge	Reversi and bubble-game APIs.
+packages/backend/src/server/api/endpoints/reversi/show-game.ts	games	packages/features/games/reversi/backend/endpoints/show-game.ts	placed-with-bridge	Reversi and bubble-game APIs.
+packages/backend/src/server/api/endpoints/reversi/surrender.ts	games	packages/features/games/reversi/backend/endpoints/surrender.ts	placed-with-bridge	Reversi and bubble-game APIs.
+packages/backend/src/server/api/endpoints/reversi/verify.ts	games	packages/features/games/reversi/backend/endpoints/verify.ts	placed-with-bridge	Reversi and bubble-game APIs.
 packages/backend/src/server/api/endpoints/roles/list.ts	roles	packages/features/roles/backend/endpoints/roles/list.ts	placed-with-bridge	Role CRUD, capability policy, and assignment APIs.
 packages/backend/src/server/api/endpoints/roles/notes.ts	roles	packages/features/roles/backend/endpoints/roles/notes.ts	placed-with-bridge	Role CRUD, capability policy, and assignment APIs.
 packages/backend/src/server/api/endpoints/roles/show.ts	roles	packages/features/roles/backend/endpoints/roles/show.ts	placed-with-bridge	Role CRUD, capability policy, and assignment APIs.

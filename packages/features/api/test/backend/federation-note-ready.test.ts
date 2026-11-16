@@ -13,8 +13,8 @@ import type { StreamEventEmitter } from '@features/runtime/backend/services/Glob
 
 // These unrelated constructors require built game packages; dispatch and the
 // connection queue remain real, while the channel factory is isolated below.
-vi.mock('@features/games/backend/stream/reversi.js', () => ({ ReversiChannel: class {} }));
-vi.mock('@features/games/backend/stream/reversi-game.js', () => ({ ReversiGameChannel: class {} }));
+vi.mock('@features/games/reversi/backend/stream/reversi.js', () => ({ ReversiChannel: class {} }));
+vi.mock('@features/games/reversi/backend/stream/reversi-game.js', () => ({ ReversiGameChannel: class {} }));
 
 async function fixture(queue: 'legacy' | 'browser-session') {
 	const moduleRef = mockDeep<import('@nestjs/core').ModuleRef>();

@@ -85,8 +85,8 @@ import { MiChatMessage } from '@features/chat/backend/models/ChatMessage.js';
 import { MiChatRoom } from '@features/chat/backend/models/ChatRoom.js';
 import { MiChatRoomMembership } from '@features/chat/backend/models/ChatRoomMembership.js';
 import { MiChatRoomInvitation } from '@features/chat/backend/models/ChatRoomInvitation.js';
-import { MiBubbleGameRecord } from '@features/games/backend/models/BubbleGameRecord.js';
-import { MiReversiGame } from '@features/games/backend/models/ReversiGame.js';
+import { MiBubbleGameRecord } from '@features/games/bubble-game/backend/models/BubbleGameRecord.js';
+import { MiReversiGame } from '@features/games/reversi/backend/models/ReversiGame.js';
 import { MiChatApproval } from '@features/chat/backend/models/ChatApproval.js';
 import { MiSystemAccount } from '@features/users/backend/models/SystemAccount.js';
 

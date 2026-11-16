@@ -20,6 +20,7 @@ const config = {
 		'./index.mdx',
 		'../../features/*/frontend/**/*.mdx',
 		'../../features/*/frontend/**/*.stories.@(js|jsx|ts|tsx)',
+		'../../features/games/*/frontend/**/*.stories.@(js|jsx|ts|tsx)',
 	],
 	staticDirs: [{ from: '../assets', to: '/client-assets' }, '../public'],
 	addons: [getAbsolutePath('@storybook/addon-docs'), getAbsolutePath('@storybook/addon-links')],

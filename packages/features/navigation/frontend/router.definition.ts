@@ -573,7 +573,7 @@ export const ROUTE_DEF = [{
 	loginRequired: true,
 }, {
 	path: '/clicker',
-	component: page(() => import('@features/games/frontend/pages/clicker.vue')),
+	component: page(() => import('@features/games/clicker/frontend/pages/clicker.vue')),
 	loginRequired: true,
 }, {
 	path: '/games',
@@ -581,15 +581,15 @@ export const ROUTE_DEF = [{
 	loginRequired: false,
 }, {
 	path: '/bubble-game',
-	component: page(() => import('@features/games/frontend/pages/drop-and-fusion.vue')),
+	component: page(() => import('@features/games/bubble-game/frontend/pages/drop-and-fusion.vue')),
 	loginRequired: true,
 }, {
 	path: '/reversi',
-	component: page(() => import('@features/games/frontend/pages/reversi/index.vue')),
+	component: page(() => import('@features/games/reversi/frontend/pages/index.vue')),
 	loginRequired: false,
 }, {
 	path: '/reversi/g/:gameId',
-	component: page(() => import('@features/games/frontend/pages/reversi/game.vue')),
+	component: page(() => import('@features/games/reversi/frontend/pages/game.vue')),
 	loginRequired: false,
 }, {
 	path: '/qr',

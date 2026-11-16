@@ -22,7 +22,7 @@ import { chatApiContract } from '../../chat/backend/api.definition.js';
 import { channelsApiContract } from '../../channels/backend/api.definition.js';
 import { pagesContract } from '../../pages/backend/endpoints/pages.contract.js';
 import { playContract } from '../../play/backend/endpoints/play.contract.js';
-import { gamesContract } from '../../games/backend/endpoints/games.contract.js';
+import { gamesContract } from '../../games/index/backend/endpoints/games.contract.js';
 import { federationContract } from '../../federation/backend/api.definition.js';
 import { operationsApiContract } from '../../operations/backend/api.definition.js';
 import { integrationsContract } from '../../integrations/backend/api.definition.js';

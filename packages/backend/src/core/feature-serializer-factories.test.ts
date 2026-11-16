@@ -13,7 +13,7 @@ import { chatServices } from '@features/chat/backend/services.js';
 import { discoveryServices } from '@features/discovery/backend/services.js';
 import { driveServices } from '@features/drive/backend/services.js';
 import { emojiServices } from '@features/emojis/backend/services.js';
-import { gameServices } from '@features/games/backend/services.js';
+import { gameServices } from '@features/games/reversi/backend/services.js';
 import { instanceServices } from '@features/instance/backend/services.js';
 import { integrationServices } from '@features/integrations/backend/services.js';
 import { moderationServices } from '@features/moderation/backend/services.js';

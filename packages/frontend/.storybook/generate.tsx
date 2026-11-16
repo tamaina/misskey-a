@@ -146,7 +146,7 @@ function toStories(component: string): Promise<string> {
 	const dir = dirname(component);
 	const pagePath = dir + '/';
 	const isPage = pagePath.startsWith('src/pages/')
-		|| /^\.\.\/features\/[^/]+\/frontend\/pages\//.test(pagePath);
+		|| /^\.\.\/features\/(?:[^/]+|games\/[^/]+)\/frontend\/pages\//.test(pagePath);
 	const literal =
 		<literal
 			value={toStoryTitle(component)}
@@ -488,7 +488,7 @@ function toStories(component: string): Promise<string> {
 		globSync('../features/statistics/frontend/components/MkChartLegend.vue'),
 		globSync('../features/statistics/frontend/components/MkChartTooltip.vue'),
 		globSync('../features/chat/frontend/components/MkChatHistories.vue'),
-		globSync('../features/games/frontend/components/MkClickerGame.vue'),
+		globSync('../features/games/clicker/frontend/components/MkClickerGame.vue'),
 		globSync('../features/collections/frontend/components/MkClipPreview.vue'),
 		globSync('../features/markup/frontend/components/MkCode.core.vue'),
 		globSync('../features/markup/frontend/components/MkCode.vue'),

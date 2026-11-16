@@ -33,6 +33,8 @@
 		"../src/**/*.stories.ts",
 		"../features/*/frontend/**/*.stories.ts",
 		"../features/*/frontend/**/*.stories.impl.ts",
+		"../../features/games/*/frontend/**/*.stories.ts",
+		"../../features/games/*/frontend/**/*.stories.impl.ts",
 		"../features/*/frontend/**/*.msw.ts"
 	],
 	"exclude": [

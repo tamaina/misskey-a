@@ -98,7 +98,7 @@ the implementations are now in the assigned feature directories.
 - `announcements/backend/templates`: `announcement.tsx`.
 - `pages/backend/templates`: `page.tsx`.
 - `play/backend/templates`: `flash.tsx`.
-- `games/backend/templates`: `reversi-game.tsx`.
+- `games/reversi/backend/templates`: `reversi-game.tsx`.
 
 Email has no standalone template files in the current tree. Its common wrapper
 is inline in EmailService; auth/report message bodies belong to their calling

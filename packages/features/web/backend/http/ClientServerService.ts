@@ -38,7 +38,7 @@ import { handleRequestRedirectToOmitSearch } from '@features/runtime/backend/htt
 import { htmlSafeJsonStringify } from '@features/markup/backend/utility/json-stringify-html-safe.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { FlashEntityService } from '@features/play/backend/serializers/FlashEntityService.js';
-import { ReversiGameEntityService } from '@features/games/backend/serializers/ReversiGameEntityService.js';
+import { ReversiGameEntityService } from '@features/games/reversi/backend/serializers/ReversiGameEntityService.js';
 import { AnnouncementEntityService } from '@features/announcements/backend/serializers/AnnouncementEntityService.js';
 import { FeedService } from './FeedService.js';
 import { UrlPreviewService } from '@features/markup/backend/http/UrlPreviewService.js';
@@ -54,7 +54,7 @@ import { ClipPage } from '@features/collections/backend/templates/clip.js';
 import { FlashPage } from '@features/play/backend/templates/flash.js';
 import { GalleryPostPage } from '@features/collections/backend/templates/gallery-post.js';
 import { ChannelPage } from '@features/channels/backend/templates/channel.js';
-import { ReversiGamePage } from '@features/games/backend/templates/reversi-game.js';
+import { ReversiGamePage } from '@features/games/reversi/backend/templates/reversi-game.js';
 import { AnnouncementPage } from '@features/announcements/backend/templates/announcement.js';
 import { BaseEmbed } from '@features/web/backend/templates/base-embed.js';
 import { InfoCardPage } from '@features/web/backend/templates/info-card.js';
@@ -109,7 +109,7 @@ export class ClientServerService {
 		private flashsRepository: FlashsRepository,
 
 		@Inject(DI.reversiGamesRepository)
-		private reversiGamesRepository: { findOneBy(where: { id: string }): Promise<import('../../../games/backend/models/ReversiGame.js').MiReversiGame | null> },
+		private reversiGamesRepository: { findOneBy(where: { id: string }): Promise<import('../../../games/reversi/backend/models/ReversiGame.js').MiReversiGame | null> },
 
 		@Inject(DI.announcementsRepository)
 		private announcementsRepository: AnnouncementsRepository,
