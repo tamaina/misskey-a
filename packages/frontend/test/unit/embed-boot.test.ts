@@ -7,9 +7,9 @@ import { h, inject } from 'vue';
 import { expect, test, vi } from 'vitest';
 import { Window as HappyWindow } from 'happy-dom';
 import { createInternationalization, setActiveInternationalization, useInternationalization } from 'vite-vue-internationalization/runtime';
-import { locales } from './pruned-global-locale-baseline.js';
 import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import messages from '../../../features/boot/frontend/embed/boot-messages.json';
+import { locales } from './pruned-global-locale-baseline.js';
 
 test.each(['ja-JP', 'en-US', 'fr-FR', 'pt-PT'] as const)('real embed boot installs the supplied runtime and preserves boot errors, ready and self-XSS messages in %s', async language => {
 	vi.resetModules();
@@ -58,7 +58,9 @@ test.each(['ja-JP', 'en-US', 'fr-FR', 'pt-PT'] as const)('real embed boot instal
 		await vi.waitFor(() => expect(mounted).toHaveBeenCalledExactlyOnceWith(runtime, runtime, metadata, context));
 		expect(install).toHaveBeenCalledTimes(1);
 		expect(window.document.getElementById('embed-mounted')?.textContent).toBe('ready');
-		expect(JSON.parse(localStorage.getItem('bootloaderLocales')!)).toEqual({ ...dictionary._bootErrors, reload: dictionary.reload });
+		const bootloaderLocales = localStorage.getItem('bootloaderLocales');
+		if (bootloaderLocales === null) throw new Error('Embed boot did not persist bootloader locales');
+		expect(JSON.parse(bootloaderLocales)).toEqual({ ...dictionary._bootErrors, reload: dictionary.reload });
 		const legacy = new I18n(dictionary);
 		expect(log.mock.calls.slice(-5).map(call => call[0])).toEqual([
 			`%c${legacy.ts._selfXssPrevention.warning}`,
