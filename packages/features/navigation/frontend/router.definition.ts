@@ -4,13 +4,13 @@
  */
 
 import { defineAsyncComponent } from 'vue';
-import type { AsyncComponentLoader } from 'vue';
 import { loadNotFoundPage } from '@features/index/frontend';
-import type { RouteDef } from '@features/navigation/frontend/lib/nirax.js';
 import { $i, iAmModerator } from '@features/auth/frontend/i.js';
 import MkLoading from '@features/web/frontend/pages/_loading_.vue';
 import MkError from '@features/web/frontend/pages/_error_.vue';
 import PageTimeline from '@features/timelines/frontend/pages/timeline.vue';
+import type { RouteDef } from '@features/navigation/frontend/lib/nirax.js';
+import type { AsyncComponentLoader } from 'vue';
 
 export const page = (loader: AsyncComponentLoader) => defineAsyncComponent({
 	loader: loader,
@@ -582,6 +582,14 @@ export const ROUTE_DEF = [{
 }, {
 	path: '/bubble-game',
 	component: page(() => import('@features/games/bubble-game/frontend/pages/drop-and-fusion.vue')),
+	loginRequired: true,
+}, {
+	path: '/mahjong',
+	component: page(() => import('@features/games/mahjong/frontend/pages/index.vue')),
+	loginRequired: true,
+}, {
+	path: '/mahjong/:roomId',
+	component: page(() => import('@features/games/mahjong/frontend/pages/index.vue')),
 	loginRequired: true,
 }, {
 	path: '/reversi',

@@ -30,7 +30,7 @@ test('the public /games route lazily renders the existing game links and metadat
 	});
 	try {
 		await waitFor(() => {
-			expect(Array.from(wrapper.container.querySelectorAll('a'), link => link.getAttribute('href'))).toEqual(['/bubble-game', '/reversi']);
+			expect(Array.from(wrapper.container.querySelectorAll('a'), link => link.getAttribute('href'))).toEqual(['/mahjong', '/bubble-game', '/reversi']);
 		});
 		expect(Array.from(wrapper.container.querySelectorAll('img'), image => image.getAttribute('src'))).toEqual([
 			'/client-assets/drop-and-fusion/logo.png',

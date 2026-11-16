@@ -3337,6 +3337,390 @@ export default {
 		}
 	},
 	"games": {
+		"mahjongCreate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ROOM": {
+						"status": 404
+					},
+					"STALE_ACTION": {
+						"status": 409
+					},
+					"INVALID_ACTION": {
+						"status": 400
+					},
+					"ROOM_LIMIT": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "mahjong/create",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/mahjong/create",
+					"tags": [
+						"mahjong"
+					]
+				}
+			}
+		},
+		"mahjongRooms": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ROOM": {
+						"status": 404
+					},
+					"STALE_ACTION": {
+						"status": 409
+					},
+					"INVALID_ACTION": {
+						"status": 400
+					},
+					"ROOM_LIMIT": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "mahjong/rooms",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/mahjong/rooms",
+					"tags": [
+						"mahjong"
+					]
+				}
+			}
+		},
+		"mahjongShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ROOM": {
+						"status": 404
+					},
+					"STALE_ACTION": {
+						"status": 409
+					},
+					"INVALID_ACTION": {
+						"status": 400
+					},
+					"ROOM_LIMIT": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "mahjong/show",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/mahjong/show",
+					"tags": [
+						"mahjong"
+					]
+				}
+			}
+		},
+		"mahjongReady": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ROOM": {
+						"status": 404
+					},
+					"STALE_ACTION": {
+						"status": 409
+					},
+					"INVALID_ACTION": {
+						"status": 400
+					},
+					"ROOM_LIMIT": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "mahjong/ready",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/mahjong/ready",
+					"tags": [
+						"mahjong"
+					]
+				}
+			}
+		},
+		"mahjongCancel": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ROOM": {
+						"status": 404
+					},
+					"STALE_ACTION": {
+						"status": 409
+					},
+					"INVALID_ACTION": {
+						"status": 400
+					},
+					"ROOM_LIMIT": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "mahjong/cancel",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/mahjong/cancel",
+					"tags": [
+						"mahjong"
+					]
+				}
+			}
+		},
+		"mahjongSubmit": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_ROOM": {
+						"status": 404
+					},
+					"STALE_ACTION": {
+						"status": 409
+					},
+					"INVALID_ACTION": {
+						"status": 400
+					},
+					"ROOM_LIMIT": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "mahjong/submit",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/mahjong/submit",
+					"tags": [
+						"mahjong"
+					]
+				}
+			}
+		},
 		"bubbleGameRanking": {
 			"~orpc": {
 				"errorMap": {

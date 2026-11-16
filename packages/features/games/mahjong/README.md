@@ -1,83 +1,84 @@
-# Mahjong integration — #316
+# Mahjong — #316
 
-This is a server-boundary foundation, not a playable or published game. It has no API,
-stream registration, persistence, or game-list entry yet. The game split is tracked in #317.
+Invite-only four-player mahjong for local authenticated users. Presentation uses upstream
+PR #13112; rules/progression use **@kobalab/majiang-core 1.4.1**, pinned as a production dependency.
 
-## Chosen integration direction
+## Initial product policy
 
-- Presentation: reuse the Vue presentation from [upstream PR #13112](https://github.com/misskey-dev/misskey/pull/13112),
-  pinned for research to `03971bf98681c986991e13a8b5c11c5475bbeff3`.
-- Rules/progression: `@kobalab/majiang-core` 1.4.1 (MIT, Satoshi Kobayashi), researched at
-  [`7e964296dd8eb5ff5a32f8182acdc6a0c2a81cbb`](https://github.com/kobalab/majiang-core/tree/7e964296dd8eb5ff5a32f8182acdc6a0c2a81cbb).
-  It is currently a backend **test dependency** for conformance tests; production integration is pending.
-- Do not import upstream's `misskey-mahjong` engine. `shared/tiles.ts` converts core tile strings
-  into the upstream `tile.vue` face/red shape, including honors and red fives. Hidden tiles are `null`.
-  Tile faces are presentation values, not client-authorized moves.
+- Same-server invited four humans; no CPU, public matchmaking, federation, stakes, ranking or spectators.
+- All four must confirm the displayed rules before dealing. Any invitee can decline and cancel a waiting room.
+- `9k-invite-v1` explicitly records **every** core rule in `shared/rules.ts`: East–South,
+  25,000 initial / 30,000 return points, 20/10/-10/-20 placement points, one red five per suit,
+  open tanyao, no kuikae, double ron (triple ron aborts), tenpai dealer repeat, bankruptcy,
+  all-last stop, sudden-death extension, abortive draws and nagashi mangan. The file lists all
+  riichi, kan, yakuman and fu options; tests compare the complete pinned upstream profile.
+  The 30,000 return threshold is hard-coded in core 1.4.1, not an invented configurable rule.
+- Discard 30 seconds, reaction 8 seconds, result acknowledgment 10 seconds. Timeout chooses
+  the last **offered legal discard** (normally tsumogiri; after a call, the last legal discard),
+  passes reactions and acknowledges results. It never declares riichi, wins or calls a meld
+  for an absent player. Declining a win has core's normal furiten consequences.
+- Polling every 2 seconds replaces streaming in this first version. The first authenticated
+  participant request after a deadline processes that phase once. With everyone disconnected,
+  the room is dormant; reconnect expires the pending phase and gives the next phase its full
+  deadline. Restart never extends an already persisted deadline.
+- Three active rooms per creator, creation rate 5/minute. Waiting rooms can be cancelled;
+  started games continue using timeout actions. No automatic public result/paipu endpoint.
 
-## Implemented boundaries
+## Private engine and persistence
 
-`backend/seat-snapshot.ts` explicitly constructs a DTO from a small server-only model interface.
-It maps rotating seats through `player_id`, reveals only the authenticated participant's concealed
-hand, and gives spectators only counts. Public arrays are copied. The wall, ura indicators,
-raw model, raw messages and `_paipu` cannot be included by object spreading. This projection
-is also the intended reconnection projection. It does not grant room access: API/stream adapters
-must first enforce invitation/observer permissions and derive identity from authentication.
-Unknown identities are masked as spectators; they are not automatically allowed into a room.
+`backend/engine.ts` runs core synchronously with no core timers or network callbacks.
+Every hand receives a stored cryptographically shuffled wall; `kaiju` receives a separately
+selected crypto-random dealer. The default `Shan` constructor is never called. Its 1.4.1
+constructor fields are initialized explicitly with the pinned prototype; updates require
+conformance tests. No global Math.random override is used in production.
 
-`backend/reply-gate.ts` buffers one reply per authenticated player and phase. Clients submit
-an offered action ID, never a raw core reply. Server-generated menus must contain only legal
-core actions. A stale phase, duplicate response, unoffered action, spectator, or expired input
-does not invoke a callback. All four decisions are delivered as one callback batch. The host
-must supply a legal timeout action and call `expire(phaseId, now)` from a server-owned timer.
-Old timers cannot expire new phases; disconnection does not reset deadlines. Non-acting seats
-can be acknowledged by the host. Cancelled/restarted sessions must discard old phase IDs.
-Callback failures must abort/pause the host session, not retry an already delivered batch.
+`mahjong_room.state` stores a private versioned journal (dealer, every original wall, accepted
+four-player reply batches), current phase, ready state, private per-player projections and the
+last 64 operation receipts. A new engine replays this journal when advancing a phase, preserving
+furiten/riichi/kan state through the real core. Polls reuse cached projections. A future engine
+upgrade must retain a v1 reader until existing rooms finish; it must not silently reinterpret
+old journals. Long-game replay cost and retention require measurement before public matchmaking.
 
-`backend/random.ts` generates a 136-tile wall with explicit red counts using Fisher–Yates
-and `crypto.randomInt`, and chooses the initial dealer independently with `randomInt(4)`.
-There is no global `Math.random` override. The production core adapter must inject the wall
-into **every** `qipai` and pass the dealer to `kaiju`, rather than instantiate the core's
-default random wall. That adapter is not implemented here; these utilities alone do not
-make an unmodified `Game` cryptographically random.
+Every access uses a PostgreSQL `FOR UPDATE` transaction. Different workers therefore share a
+single writer per room. An action, its receipt and phase transition commit atomically; database
+failure rolls back all of them. A matching request ID retries without applying twice; a different
+request for an already answered or stale phase is rejected. After the 64-receipt window, old retries
+are stale rather than duplicated. Server-generated legal menus are the only accepted actions.
+Late/invalid input is never interpreted as the core's fallback. Timeout advances commit even when
+the accompanying late action is rejected.
 
-The conformance tests reproduce three properties of pinned core 1.4.1: an old callback can
-write into a later `_reply`, `next()` waits for four replies, and an invalid discard falls back
-to a legal discard. These are integration constraints, not claims about existing 9k behavior.
-The network host must reject invalid actions before core and must not rely on its timer or fallback.
+Only named participants may query a room. `projectRoom` is the sole public projection: it sends
+only that user's hand and legal actions, copied public rivers/melds/scores, and sanitized result
+names/points. The wall, other hands, ura indicators, raw model/messages, journal and `_paipu` are
+never returned, including after termination. API credentials determine identity, never request
+body seat/user IDs. No stream broadcasts or spectator channels are registered. Unknown rooms and
+nonmember requests share the same error. Room creation checks local/live users and pairwise blocks.
+The owner's account deletion cascades room deletion; general room-retention policy is future work.
 
-## Product decisions pending confirmation
+## Routes and UI
 
-No core default is an approved product rule. The questions sent for confirmation are:
+`/mahjong` lists a participant's latest 30 rooms and creates invitations; `/mahjong/:roomId`
+shows readiness, all rule settings, seats, concealed tile counts, dora, rivers, melds, scores,
+legal action buttons and remaining time. Keyboard buttons and a narrow-screen layout are included.
+Existing game URLs and DI identities are unchanged. Six authenticated `mahjong/*` POST endpoints
+are composed through the games API host; SDK routing is generated from portable contracts.
 
-| Decision | Proposed starting point, not adopted yet |
-| --- | --- |
-| Participants | Four logged-in users on the same server, invited room; CPU, matchmaking, federation and ranking later |
-| Main rules | East–South, 25,000 starting points, one red five per suit, open tanyao, double ron, tenpai dealer repeat, abortive draws and nagashi mangan |
-| Disclosure | Conceal every hand from spectators; no automatic full-paipu publication after the game |
+## Upstream sources and licenses
 
-Before a playable endpoint, record a complete versioned rule profile (not a partial override of
-`core.rule()`), show it before all players ready, and lock it for the game. Remaining rule choices
-include return points/uma, double-wind fu, kuikae, noten declaration/penalty, bankruptcy,
-all-last stopping/overtime, ippatsu/ura/kan-ura, kan-dora timing, last-draw riichi, post-riichi
-ankan, combined/double/counted yakuman, pao, and kiriage mangan.
+- Engine: [kobalab/majiang-core 1.4.1](https://github.com/kobalab/majiang-core/tree/7e964296dd8eb5ff5a32f8182acdc6a0c2a81cbb), MIT, Satoshi Kobayashi.
+- Display: [Misskey PR #13112](https://github.com/misskey-dev/misskey/pull/13112), pinned
+  `03971bf98681c986991e13a8b5c11c5475bbeff3`, AGPL-3.0-only, syuilo and misskey-project.
+  `frontend/components/Tile.vue` adapts `hand-tiles.vue`'s layered tile presentation.
+  `Table.vue` adapts the felt/seat presentation for the new DTO. The 37 face images are copied
+  unchanged from that commit's `packages/frontend/assets/mahjong/tiles`; see their provenance file.
+  No upstream game engine, sounds or unrelated artwork is imported.
 
-Timeout length and abandonment behavior also need a product policy: proposed starting point is
-30 seconds for a discard and 8 seconds for reactions, with an explicitly chosen legal discard/pass
-on timeout. Do not silently reinterpret invalid client input as that timeout action.
+## Validation
 
-## Next implementation sequence
-
-1. Confirm room/rule/disclosure policy; define legal-action menus and a complete rule profile.
-2. Connect core behind a private session object, snapshot projection and reply gate. Inject both
-   wall and dealer randomness, including later hands. Test phase transitions, furiten, kan,
-   multiple claims, riichi, draws and end-of-game fixtures against the fixed profile.
-3. Persist private wall/state and accepted actions atomically with a revision and idempotency key.
-   Specify single-writer ownership across workers and restart recovery before API/stream exposure.
-   A recovery must invalidate old phase IDs while preserving action history. Never pack private
-   persistence rows into public DTOs. Database migration and retention policy are not implemented.
-4. Add authorized oRPC/stream/reconnect paths. Fan out a separately projected view per recipient;
-   do not broadcast an unmasked room event and ask clients to filter it. Add secrecy tests at
-   each actual transport boundary, not just this projection's unit tests.
-5. Adapt upstream `tile.vue`, `hand-tiles.vue`, meld and room presentation to the DTO and action IDs.
-   Preserve AGPL source attribution, record asset provenance separately, and verify desktop/mobile
-   gameplay in the development browser. No images/audio have been imported in this change.
+Core conformance tests reproduce delayed callback contamination, four-reply waiting and illegal
+input fallback; these are integration constraints, not reports of defects in existing 9k.
+Room tests exercise consent, secrecy, expiry, riichi/kan/ron/tsumo/chi/pon menus, idempotency
+and deterministic complete multi-hand journal replay. PostgreSQL integration tests use `MAHJONG_TEST_SOCKET` in a dedicated disposable
+cluster and cover migration up/down/up, cross-worker concurrency, API authentication and recovery.
+Never point that fixture at a shared database. Development verification uses the shared validation
+lock and isolated dependencies. Browser harnesses use only synthetic users and a private test DB.
