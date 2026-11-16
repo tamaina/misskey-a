@@ -9,12 +9,14 @@ import { join } from 'node:path';
 import Fastify from 'fastify';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
+import type { Config } from '@/config.js';
 import { AuthenticationError } from '@features/auth/backend/transport/AuthenticateService.js';
 import type { AuthenticateService } from '@features/auth/backend/transport/AuthenticateService.js';
 import type { DriveFilesRepository, MiDriveFile } from '@features/persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import type { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
 import { FileServerService } from '../../backend/http/FileServerService.js';
 
 const authenticate = mockDeep<AuthenticateService>();
@@ -38,8 +40,8 @@ beforeEach(async () => {
 	const logger = mockDeep<LoggerService>();
 	logger.getLogger.mockReturnValue(mockDeep());
 	const server = new FileServerService(
-		mockDeep({ rootDir: directory }), files, mockDeep(), mockDeep(), mockDeep(), mockDeep(),
-		mockDeep({ resolvePath }), logger, authenticate,
+		mockDeep<Config>({ rootDir: directory }), files, mockDeep(), mockDeep(), mockDeep(), mockDeep(),
+		mockDeep<InternalStorageService>({ resolvePath }), logger, authenticate,
 	);
 	server.createServer(app, {}, () => {});
 });
