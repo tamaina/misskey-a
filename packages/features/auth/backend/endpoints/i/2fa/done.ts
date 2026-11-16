@@ -3,8 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { legacyManagementOnly } from '../../../legacy-management.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import * as OTPAuth from 'otpauth';
+import type { DataSource } from 'typeorm';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { assertLegacyMfaManagement } from '../../../mfa-policy.js';
+import { withLockedMfaProfile } from '../../../locked-mfa-profile.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -19,19 +24,21 @@ export const meta = {
 
 } as const;
 export interface I2faDoneDependencies {
+	db: DataSource;
 	userProfilesRepository: UserProfilesRepository;
 	userEntityService: Pick<UserEntityService, 'packSelf'>;
 	userAuthService: Pick<UserAuthService, 'validateOtp'>;
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createI2faDoneProcedure(deps: I2faDoneDependencies) {
-	return createApiProcedure<MiLocalUser>()(I2faDoneContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faDoneContract).use(requirePrincipal<MiLocalUser>()).use(legacyManagementOnly()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
 			const token = ps.token.replace(/\s/g, '');
 
 			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			assertLegacyMfaManagement(profile);
 
 			if (profile.twoFactorTempSecret == null) {
 				throw new Error('二段階認証の設定が開始されていません');
@@ -43,10 +50,16 @@ export function createI2faDoneProcedure(deps: I2faDoneDependencies) {
 
 			const backupCodes = Array.from({ length: 5 }, () => new OTPAuth.Secret().base32);
 
-			await deps.userProfilesRepository.update(me.id, {
-				twoFactorSecret: profile.twoFactorTempSecret,
-				twoFactorBackupSecret: backupCodes,
-				twoFactorEnabled: true,
+			const pendingSecret = profile.twoFactorTempSecret;
+			await withLockedMfaProfile(deps.db, me.id, profile, async (locked, manager) => {
+				assertLegacyMfaManagement(locked);
+				if (locked.twoFactorTempSecret !== pendingSecret) throw new Error('authentication failed');
+				await manager.getRepository(MiUserProfile).update({ userId: me.id }, {
+					twoFactorSecret: pendingSecret,
+					twoFactorTempSecret: null,
+					twoFactorBackupSecret: backupCodes,
+					twoFactorEnabled: true,
+				});
 			});
 
 			// Publish meUpdated event

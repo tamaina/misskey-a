@@ -8,7 +8,7 @@ process.env.NODE_ENV = 'test';
 import * as assert from 'assert';
 import { beforeAll, beforeEach, describe, test } from 'vitest';
 import { inspect } from 'node:util';
-import { api, failedApiCall, post, role, signup, successfulApiCall, uploadFile } from '../utils.js';
+import { api, deleteOwnAccount, failedApiCall, post, role, signup, successfulApiCall, uploadFile } from '../utils.js';
 import type * as misskey from 'misskey-js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
 
@@ -251,7 +251,7 @@ describe('ユーザー', () => {
 		userDeletedBySelf = await signup({ username: 'userDeletedBySelf', password: 'userDeletedBySelf' });
 		await post(userDeletedBySelf, { text: 'test' });
 		await successfulApiCall({ endpoint: 'i/update', parameters: { description: '#user_testuserDeletedBySelf' }, user: userDeletedBySelf });
-		await api('i/delete-account', { password: 'userDeletedBySelf' }, userDeletedBySelf);
+		await deleteOwnAccount(userDeletedBySelf, 'userDeletedBySelf');
 		userDeletedByAdmin = await signup({ username: 'userDeletedByAdmin' });
 		await post(userDeletedByAdmin, { text: 'test' });
 		await successfulApiCall({ endpoint: 'i/update', parameters: { description: '#user_testuserDeletedByAdmin' }, user: userDeletedByAdmin });

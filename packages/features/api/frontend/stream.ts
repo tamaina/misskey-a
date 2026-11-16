@@ -22,6 +22,11 @@ export function useStream(): Misskey.IStream {
 		token: $i.token,
 	} : null));
 
+	stream.on('_disconnected_', () => {
+		// A close can also mean offline: only /i's precise rejection authorizes cleanup.
+		if ($i) void import('@features/auth/frontend/accounts.js').then(({ refreshCurrentAccount }) => refreshCurrentAccount()).catch(() => {});
+	});
+
 	if (timeoutHeartBeat) window.clearTimeout(timeoutHeartBeat);
 	timeoutHeartBeat = window.setTimeout(heartbeat, HEART_BEAT_INTERVAL);
 
@@ -36,6 +41,12 @@ export function useStream(): Misskey.IStream {
 	});
 
 	return stream;
+}
+
+/** Keep the singleton Stream instance, but reopen it with the live credential. */
+export function reconnectStream(): void {
+	if (!stream) return;
+	stream.reconnect($i ? { token: $i.token } : null);
 }
 
 function heartbeat(): void {

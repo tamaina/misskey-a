@@ -54,7 +54,7 @@ afterEach(() => vi.unstubAllEnvs());
 function response(host: string | null) {
 	harness.fetch.mockResolvedValue({
 		status: 200, headers: { get: () => 'application/json; charset=utf-8' },
-		json: async () => ({ id: 'remote-fixture', host, token: browserToken }),
+		json: async () => ({ id: 'remote-fixture', host, token: host === null ? browserToken : '' }),
 	});
 }
 

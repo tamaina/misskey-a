@@ -18,11 +18,12 @@ const second = 'SYNTHETIC'.padEnd(32, 'B');
 const third = 'SYNTHETIC'.padEnd(32, 'C');
 // Only the production columns used by the repository UPDATE are represented.
 // This fixture tests actual TypeORM SQL on a task-owned PostgreSQL database.
-const entity = new EntitySchema<Pick<MiUserProfile, 'userId' | 'password' | 'twoFactorEnabled' | 'twoFactorSecret' | 'twoFactorBackupSecret'>>({
+const entity = new EntitySchema<Pick<MiUserProfile, 'userId' | 'password' | 'twoFactorEnabled' | 'passkeyMfaEnabled' | 'twoFactorSecret' | 'twoFactorBackupSecret'>>({
 	name: 'RecoveryProfile', tableName: 'user_profile', columns: {
 		userId: { type: 'varchar', primary: true },
 		password: { type: 'varchar', nullable: true },
 		twoFactorEnabled: { type: 'boolean', default: false },
+		passkeyMfaEnabled: { type: 'boolean', default: false },
 		twoFactorSecret: { type: 'varchar', nullable: true },
 		twoFactorBackupSecret: { type: 'varchar', array: true, nullable: true },
 	},
@@ -60,9 +61,9 @@ describe.skipIf(!socket)('real PostgreSQL recovery-code consumption', () => {
 		expect((await snapshot()).twoFactorBackupSecret).toEqual([third]);
 	});
 
-	test.each(['password', 'twoFactorSecret', 'twoFactorEnabled'] as const)('changed %s rejects the old proof without consuming it', async field => {
+	test.each(['password', 'twoFactorSecret', 'twoFactorEnabled', 'passkeyMfaEnabled'] as const)('changed %s rejects the old proof without consuming it', async field => {
 		const profile = await snapshot();
-		await profiles.update({ userId: 'synthetic' }, field === 'twoFactorEnabled' ? { twoFactorEnabled: false } : { [field]: 'changed-synthetic' });
+		await profiles.update({ userId: 'synthetic' }, field === 'twoFactorEnabled' ? { twoFactorEnabled: false } : field === 'passkeyMfaEnabled' ? { passkeyMfaEnabled: true } : { [field]: 'changed-synthetic' });
 		await expect(service.twoFactorAuthenticate(profile, first)).rejects.toThrow('authentication failed');
 		expect((await snapshot()).twoFactorBackupSecret).toEqual([first, second, third]);
 	});

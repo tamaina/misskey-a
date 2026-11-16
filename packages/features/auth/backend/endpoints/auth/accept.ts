@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { credentialIssuanceIdentity, type CredentialIssuanceAuthorization } from '../../credential-issuance.js';
+import { selectedTokenExpiry, accessTokenExpired } from '../../access-token-expiry.js';
+import { MiAccessToken } from '../../models/AccessToken.js';
+import { MiAuthSession } from '../../models/AuthSession.js';
+import { MiApp } from '../../models/App.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import * as crypto from 'node:crypto';
 import type { AuthSessionsRepository, AppsRepository, AccessTokensRepository } from '@features/persistence/backend/repositories/models.js';
@@ -27,6 +32,7 @@ export const meta = {
 	},
 } as const;
 export interface AuthAcceptDependencies {
+	local: CredentialIssuanceAuthorization;
 	appsRepository: AppsRepository;
 	authSessionsRepository: AuthSessionsRepository;
 	accessTokensRepository: AccessTokensRepository;
@@ -36,27 +42,28 @@ export function createAuthAcceptProcedure(deps: AuthAcceptDependencies) {
 	return createApiProcedure<MiLocalUser>()(AuthAcceptContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
-		const result = await (async () => {
+		const result = await deps.local.transaction(credentialIssuanceIdentity(context), async ({ manager }) => {
 			// Fetch token
-			const session = await deps.authSessionsRepository
-				.findOneBy({ token: ps.token });
+			const session = await manager.getRepository(MiAuthSession).findOne({ where: { token: ps.token }, lock: { mode: 'pessimistic_write' } });
 
-			if (session == null) {
+			if (session == null || (session.userId !== null && session.userId !== me.id)) {
 				throw apiError(meta.errors.noSuchSession);
 			}
 
 			const accessToken = secureRndstr(32);
 
 			// Fetch exist access token
-			const exist = await deps.accessTokensRepository.exists({
+			const existing = await manager.getRepository(MiAccessToken).findOne({
 				where: {
 					appId: session.appId,
 					userId: me.id,
 				},
 			});
 
-			if (!exist) {
-				const app = await deps.appsRepository.findOneByOrFail({ id: session.appId });
+			if (existing && !accessTokenExpired(existing) && ps.expiresAt !== undefined && (existing.expiresAt?.getTime() ?? null) !== (selectedTokenExpiry(ps.expiresAt)?.getTime() ?? null)) throw apiError({ code: 'INVALID_PARAM', status: 400, message: 'Revoke the existing app token before selecting a different expiry.', id: '4cccbf4a-1d28-4c63-8107-6bdef529c70f' });
+			if (!existing || accessTokenExpired(existing)) {
+				if (existing) await manager.getRepository(MiAccessToken).delete({ id: existing.id, userId: me.id });
+				const app = await manager.getRepository(MiApp).findOneByOrFail({ id: session.appId });
 
 				// Generate Hash
 				const sha256 = crypto.createHash('sha256');
@@ -65,9 +72,10 @@ export function createAuthAcceptProcedure(deps: AuthAcceptDependencies) {
 
 				const now = new Date();
 
-				await deps.accessTokensRepository.insert({
+				await manager.getRepository(MiAccessToken).insert({
 					id: deps.idService.gen(now.getTime()),
 					lastUsedAt: now,
+					expiresAt: selectedTokenExpiry(ps.expiresAt),
 					appId: session.appId,
 					userId: me.id,
 					token: accessToken,
@@ -76,10 +84,10 @@ export function createAuthAcceptProcedure(deps: AuthAcceptDependencies) {
 			}
 
 			// Update session
-			await deps.authSessionsRepository.update(session.id, {
+			await manager.getRepository(MiAuthSession).update(session.id, {
 				userId: me.id,
 			});
-		})();
+		});
 		return result;
 	});
 }

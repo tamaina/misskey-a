@@ -70,23 +70,35 @@ if row.version ~= tonumber(ARGV[6]) or row.nonceHash ~= ARGV[7] or row.version >
 `;
 const SAVE = `redis.call('SET', KEYS[1], cjson.encode(row), 'KEEPTTL'); return cjson.encode(row)`;
 
-/** Unconnected metadata storage, never an authentication verifier or grant issuer.
- * Callers must supply server-owned bindings and already verified proof metadata.
- * Before production use, a controller must reserve ONE verifier owner before
- * consuming backup codes/WebAuthn proofs; a CAS after verification alone can burn
- * multiple external proofs. That reservation protocol is not implemented here.
- * Redis fact timestamps record metadata arrival for audit; they are not
- * independent evidence of when a proof was verified or of its freshness.
- * The future controller must enforce current policy, proof freshness and active
- * BrowserSession ownership before claim. Consume deletes BEFORE any future grant;
- * a crash can burn the ticket. There is no Redis/DB exactly-once guarantee.
- * Read never recovers a plaintext nonce; losing a nonce requires a fresh start.
+/** Metadata storage, never an authentication verifier or grant issuer.
+ * Callers supply server-owned bindings and already verified proof metadata.
+ * A controller must claim BEFORE a consumable verifier; the claimed nonce is a
+ * private verifier-owner receipt, never returned to the browser. finishClaim
+ * records that owner's verified factor. Current policy/fresh proofs and active
+ * session ownership for non-signin purposes remain controller responsibilities.
+ * Redis timestamps audit metadata arrival rather than proof freshness. Consume
+ * deletes BEFORE the grant: a crash burns a ticket, without Redis/DB exactly-once.
+ * Losing a nonce requires a fresh start; expiry is never extended.
  */
 export class AuthenticationProgressStore {
 	constructor(private redis: Pick<Redis, 'eval'>) {}
 
-	async create(value: AuthenticationProgressBinding): Promise<AuthenticationProgressAccess & AuthenticationProgressStep & { metadata: AuthenticationProgressMetadata }> {
+	async startDeadline(lifetimeMs = 90_000): Promise<number> {
+		if (!Number.isSafeInteger(lifetimeMs) || lifetimeMs <= 0 || lifetimeMs > 90_000) throw new Error('Invalid authentication progress lifetime');
+		const time = await this.redis.eval("local t = redis.call('TIME'); return tonumber(t[1]) * 1000 + math.floor(tonumber(t[2]) / 1000) + tonumber(ARGV[1])", 0, lifetimeMs);
+		if (!Number.isSafeInteger(time)) throw new Error('Authentication progress clock unavailable');
+		return Number(time);
+	}
+
+	async remaining(context: AuthenticationProgressBinding, access: AuthenticationProgressAccess): Promise<number | null> {
+		const args = this.args(context, access); if (!args) return null;
+		const ttl = await this.redis.eval(CHECK + "return redis.call('PTTL', KEYS[1])", 1, key(access.ticket), ...args);
+		return typeof ttl === 'number' && Number.isSafeInteger(ttl) && ttl > 0 && ttl <= 90000 ? ttl : null;
+	}
+
+	async create(value: AuthenticationProgressBinding, expiresAt?: number): Promise<AuthenticationProgressAccess & AuthenticationProgressStep & { metadata: AuthenticationProgressMetadata }> {
 		const context = binding(value);
+		if (expiresAt !== undefined && (!Number.isSafeInteger(expiresAt) || expiresAt <= 0)) throw new Error('Invalid authentication progress deadline');
 		const access = { ticket: opaque(), browserSecret: opaque() };
 		const nonce = opaque();
 		const row = { v: 1, ...context, purposeKey: purposeKey(context.purpose), browserHash: hash(access.browserSecret), nonceHash: hash(nonce), version: 0, state: 'active', createdAt: 0, facts: {} };
@@ -94,9 +106,12 @@ export class AuthenticationProgressStore {
 local row = cjson.decode(ARGV[1]); local time = redis.call('TIME')
 row.createdAt = tonumber(time[1]) * 1000 + math.floor(tonumber(time[2]) / 1000)
 local encoded = cjson.encode(row)
-if not redis.call('SET', KEYS[1], encoded, 'EX', 600, 'NX') then return nil end
+if ARGV[2] ~= '' then
+ local deadline = tonumber(ARGV[2]); if deadline <= row.createdAt or deadline > row.createdAt + 90000 then return nil end
+ if not redis.call('SET', KEYS[1], encoded, 'PXAT', deadline, 'NX') then return nil end
+elseif not redis.call('SET', KEYS[1], encoded, 'EX', 600, 'NX') then return nil end
 return encoded
-`, 1, key(access.ticket), JSON.stringify(row));
+`, 1, key(access.ticket), JSON.stringify(row), expiresAt === undefined ? '' : String(expiresAt));
 		if (typeof raw !== 'string') throw new Error('Authentication progress collision');
 		return { ...access, nonce, version: 0, metadata: metadata(raw) };
 	}
@@ -113,9 +128,9 @@ return encoded
 		return [...args, String(step.version), hash(step.nonce)];
 	}
 
-	async read(context: AuthenticationProgressBinding, access: AuthenticationProgressAccess): Promise<AuthenticationProgressMetadata | null> {
-		const args = this.args(context, access); if (!args) return null;
-		const raw = await this.redis.eval(CHECK + 'return raw', 1, key(access.ticket), ...args);
+	async read(context: AuthenticationProgressBinding, access: AuthenticationProgressAccess, step?: AuthenticationProgressStep): Promise<AuthenticationProgressMetadata | null> {
+		const args = step ? this.casArgs(context, access, step) : this.args(context, access); if (!args) return null;
+		const raw = await this.redis.eval(CHECK + (step ? CAS : '') + 'return raw', 1, key(access.ticket), ...args);
 		return typeof raw === 'string' ? metadata(raw) : null;
 	}
 
@@ -142,6 +157,21 @@ row.version = row.version + 1; row.nonceHash = ARGV[11]
 if row.state ~= 'active' or row.userId == cjson.null then return nil end
 row.state = 'claimed'; row.version = row.version + 1; row.nonceHash = ARGV[8]
 ` + SAVE, 1, key(access.ticket), ...args, hash(nonce));
+		if (typeof raw !== 'string') return null;
+		const result = metadata(raw); return { nonce, version: result.version, metadata: result };
+	}
+
+	/** Only the private owner of a claimed step may finish a consumable verifier. */
+	async finishClaim(context: AuthenticationProgressBinding, access: AuthenticationProgressAccess, owner: AuthenticationProgressStep, verified: AuthenticationProgressProof): Promise<(AuthenticationProgressStep & { metadata: AuthenticationProgressMetadata }) | null> {
+		const proof = v.parse(proofSchema, verified);
+		const args = this.casArgs(context, access, owner); if (!args) return null;
+		const nonce = opaque();
+		const raw = await this.redis.eval(CHECK + CAS + `
+if row.state ~= 'claimed' or row.userId ~= ARGV[8] or row.userPolicyStamp ~= ARGV[9] then return nil end
+local time = redis.call('TIME')
+row.facts[ARGV[10]] = tonumber(time[1]) * 1000 + math.floor(tonumber(time[2]) / 1000)
+row.version = row.version + 1; row.nonceHash = ARGV[11]
+` + SAVE, 1, key(access.ticket), ...args, proof.verifiedForUserId, proof.userPolicyStamp, proof.factor, hash(nonce));
 		if (typeof raw !== 'string') return null;
 		const result = metadata(raw); return { nonce, version: result.version, metadata: result };
 	}

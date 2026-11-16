@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { Or, IsNull, MoreThan } from 'typeorm';
 import type { AccessTokensRepository, AppsRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { MiApp } from '../models/App.js';
@@ -45,6 +46,7 @@ export class AppEntityService {
 				isAuthorized: await this.accessTokensRepository.countBy({
 					appId: app.id,
 					userId: me.id,
+					expiresAt: Or(IsNull(), MoreThan(new Date())),
 				}).then(count => count > 0),
 			} : {}),
 		};

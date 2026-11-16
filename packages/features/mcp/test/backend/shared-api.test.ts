@@ -40,11 +40,16 @@ describe('inactive MCP application seam through shared native API', () => {
 	it('preserves MiAuth, app-derived permissions and master-token null tuple', async () => {
 		const f = await fixture(); const auth = f.module.get(AuthenticateService);
 		expect((await auth.authenticate(f.grant.token))[1]).toBe(f.grant);
-		expect((await auth.authenticate(f.appGrant.hash))[1]).toEqual({ id: f.appGrant.id, permission: f.app.permission });
+		expect((await auth.authenticate(f.appGrant.hash))[1]).toEqual({ id: f.appGrant.id, permission: f.app.permission, expiresAt: null });
+		const expiresAt = new Date(Date.now() + 60_000); f.appGrant.expiresAt = expiresAt;
+		expect((await auth.authenticate(f.appGrant.hash))[1]).toEqual({ id: f.appGrant.id, permission: f.app.permission, expiresAt });
 		expect(await auth.authenticate(f.own.token!)).toEqual([f.own, null]);
 		for (const credential of [f.grant.token, f.appGrant.hash]) expect(await f.invoke({}, credential)).toEqual((await f.ordinary({ userId: f.own.id }, credential)).json());
 		await expect(f.invoke({}, f.own.token!)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
 		expect((await f.ordinary({ userId: f.own.id }, f.own.token!)).statusCode).toBe(200);
+		f.appGrant.expiresAt = new Date(0);
+		const expired = await f.ordinary({ userId: f.own.id }, f.appGrant.hash); expect(expired.statusCode).toBe(401);
+		await expect(f.invoke({}, f.appGrant.hash)).rejects.toMatchObject({ code: expired.json().error.code });
 	});
 	it('applies native insufficient-permission errors on a protected endpoint without inventing a users/notes scope', async () => {
 		const f = await fixture(); const dispatch = createAllowedApiCaller(f.router, pilotContract, ['my/apps']);
