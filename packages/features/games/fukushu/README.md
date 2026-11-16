@@ -37,7 +37,7 @@ moving existing game files or changing their DI identities. It is independent
 of #313's grading core and does not call it. No grading result, numeric tolerance,
 FSRS schedule, review history, backup or existing IndexedDB state is changed.
 
-Follow-up: support additional upstream formats and Drive-backed import through
+Follow-up: extend the bounded Drive importer to additional upstream formats through
 explicit schemas; design source/media ownership, updates, deletion and server
 backup migration/merge with history preservation. Future FSRS integration must
 derive automatic ratings from `correct`, not `score` (100 can still be incorrect).

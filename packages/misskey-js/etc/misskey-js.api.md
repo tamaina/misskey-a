@@ -23,7 +23,6 @@ import type { InferContractRouterInputs } from '@orpc/contract';
 import type { InferContractRouterOutputs } from '@orpc/contract';
 import { IntegerAction } from 'valibot';
 import { IntersectSchema } from 'valibot';
-import { IsoTimestampAction } from 'valibot';
 import { LazySchema } from 'valibot';
 import { LiteralSchema } from 'valibot';
 import { MaxCodePointsAction } from 'valibot';
@@ -1784,6 +1783,10 @@ declare namespace entities {
         FlashSearchResponse,
         UsersFlashsRequest,
         UsersFlashsResponse,
+        FukushuMaterialsListRequest,
+        FukushuMaterialsListResponse,
+        FukushuMaterialsImportRequest,
+        FukushuMaterialsImportResponse,
         FukushuMaterialsCreateRequest,
         FukushuMaterialsCreateResponse,
         FukushuMaterialsShowRequest,
@@ -3775,6 +3778,18 @@ type FukushuMaterialsCreateRequest = ContractRequest<'fukushu/materials/create'>
 
 // @public (undocumented)
 type FukushuMaterialsCreateResponse = ContractResponse<'fukushu/materials/create'>;
+
+// @public (undocumented)
+type FukushuMaterialsImportRequest = ContractRequest<'fukushu/materials/import'>;
+
+// @public (undocumented)
+type FukushuMaterialsImportResponse = ContractResponse<'fukushu/materials/import'>;
+
+// @public (undocumented)
+type FukushuMaterialsListRequest = ContractRequest<'fukushu/materials/list'>;
+
+// @public (undocumented)
+type FukushuMaterialsListResponse = ContractResponse<'fukushu/materials/list'>;
 
 // @public (undocumented)
 type FukushuMaterialsShowRequest = ContractRequest<'fukushu/materials/show'>;
