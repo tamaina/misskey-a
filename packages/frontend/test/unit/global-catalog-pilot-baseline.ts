@@ -1585,7 +1585,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/2fa.vue",
-		"currentSha256": "6710101a3fd501f89bafa7b8f86c02e6702c1abe8b3176c4ec3767a030d943a3",
+		"currentSha256": "6848e22ebf726780ca3efa15540447296f623972074adc8431a8282e29e3d621",
 		"baselineSha256": "27c6f44fce8b2b8e8d05629bb00f8431cab3e7ea3b28d5a8b0cd2c903c24c068",
 		"keys": [
 			"learnMore",
@@ -1788,6 +1788,60 @@ export const globalCatalogPilotOwners = [
 				"end": 41148,
 				"current": "\t\"2fa\": \"二要素認証\",\n\t\"loading\": \"設定を読み込んでいます…\",\n\t\"mfaActive\": \"パスキーによる多要素認証は有効です。\",\n\t\"mfaInactive\": \"パスキーによる多要素認証は無効です。\",\n\t\"rename\": \"名前を変更\",\n\t\"removeKeyWarning\": \"このパスキーを削除しますか。パスキーによる多要素認証が有効で、他に使える認証アプリがない場合は、最後のパスキーを削除する前に「パスキーによる多要素認証を無効にする」ボタンで無効にしてください。パスワードログインが無効な場合は最後のパスキーを削除できません。\",\n\t\"enableMfa\": \"パスキーによる多要素認証を有効にする\",\n\t\"enableWarning\": \"パスキーによる多要素認証を有効にしますか。パスワードでのログインに追加の認証が必要になります。復旧コードが残っていない場合は、新しいコードを発行して一度だけ表示します。\",\n\t\"disableMfa\": \"パスキーによる多要素認証を無効にする\",\n\t\"disableWarning\": \"この認証方法を無効にしますか。他に多要素認証が有効でなければ、パスワードだけでログインできるようになります。\",\n\t\"disablePassword\": \"パスワードによるログインを無効にする\",\n\t\"disablePasswordDescription\": \"パスキー単独ログインと確認済みメールアドレスがある場合、端末ロック解除付きのパスキーで再確認してパスワードログインを無効にできます。重要な操作もそのパスキーで確認します。\",\n\t\"disablePasswordWarning\": \"パスワードによるログインを無効にしますか。パスキーを失った場合は確認済みメールへのパスワード再設定が必要です。\",\n\t\"passwordDisabled\": \"パスワードログインは無効です。有効に戻す場合は、上のパスワード変更から新しいパスワードを設定してください。最後のパスキーは削除できません。\",\n\t\"removeTotpWarning\": \"認証アプリを削除しますか。パスキーによる多要素認証は引き続き有効です。\",\n\t\"regenerateCodes\": \"復旧コードを再生成\",\n\t\"regenerateWarning\": \"復旧コードを再生成すると、以前の復旧コードは使えなくなります。続けますか。\",\n\t\"failed\": \"操作を完了できませんでした。本人確認の有効期限や設定を確認し、もう一度開始してください。\",\n\t\"learnMore\": \"詳しく\",\n\t\"password\": \"パスワード\",\n\t\"renewWarning\": \"今までの認証アプリの確認コードは使用できなくなります。バックアップコードは引き続き利用できます。\",\n\t\"passkeyPolicy\": \"認証アプリを先に設定しなくても登録できます。登録するとパスキーによる多要素認証が有効になります。無効にしても登録したキーは残り、再び有効にできます。\"\n",
 				"baseline": "\t\"2fa\": \"二要素認証\"\n"
+			},
+			{
+				"start": 1563,
+				"end": 1749,
+				"current": "\t\t\t\t\t\t\t<MkLink url=\"https://misskey-hub.net/docs/for-users/stepped-guides/how-to-enable-2fa/\" target=\"_blank\"><i class=\"ti ti-help-circle\"></i> {{ globalLocale.env.learnMore }}</MkLink>\n",
+				"baseline": "\t\t\t\t\t\t\t<MkLink url=\"https://misskey-hub.net/docs/for-users/stepped-guides/how-to-enable-2fa/\" target=\"_blank\"><i class=\"ti ti-help-circle\"></i> {{ $locale.sfc.learnMore }}</MkLink>\n"
+			},
+			{
+				"start": 2658,
+				"end": 2787,
+				"current": "\t\t\t\t\t\t\t\t\t<MkButton :disabled=\"busy\" @click=\"renameKey(key)\"><i class=\"ti ti-forms\"></i> {{ globalLocale.env.rename }}</MkButton>\n",
+				"baseline": "\t\t\t\t\t\t\t\t\t<MkButton :disabled=\"busy\" @click=\"renameKey(key)\"><i class=\"ti ti-forms\"></i> {{ $locale.sfc.rename }}</MkButton>\n"
+			},
+			{
+				"start": 4749,
+				"end": 4852,
+				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
+				"baseline": ""
+			},
+			{
+				"start": 6052,
+				"end": 6110,
+				"current": "\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"baseline": ""
+			},
+			{
+				"start": 9601,
+				"end": 9727,
+				"current": "\t\tconst input = await os.inputText({ title: globalLocale.value.env.rename, default: key.name, minLength: 1, maxLength: 30 });\n",
+				"baseline": "\t\tconst input = await os.inputText({ title: $locale.value.sfc.rename, default: key.name, minLength: 1, maxLength: 30 });\n"
+			},
+			{
+				"start": 27736,
+				"end": 27736,
+				"current": "",
+				"baseline": "\t\"rename\": \"Rename\",\n"
+			},
+			{
+				"start": 29321,
+				"end": 29321,
+				"current": "",
+				"baseline": "\t\"learnMore\": \"Learn more\",\n"
+			},
+			{
+				"start": 40081,
+				"end": 40081,
+				"current": "",
+				"baseline": "\t\"rename\": \"名前を変更\",\n"
+			},
+			{
+				"start": 41048,
+				"end": 41048,
+				"current": "",
+				"baseline": "\t\"learnMore\": \"詳しく\",\n"
 			}
 		],
 		"dictionaryEdits": [

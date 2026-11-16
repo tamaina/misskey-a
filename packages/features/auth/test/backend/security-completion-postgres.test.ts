@@ -13,6 +13,8 @@ import { mockDeep } from 'vitest-mock-extended';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { ApiIpLoggingService } from '@features/api/backend/transport/ApiIpLoggingService.js';
+import { MiUserIp } from '../../backend/models/UserIp.js';
 import { MiBrowserSession } from '../../backend/models/BrowserSession.js';
 import { MiPasswordResetRequest } from '../../backend/models/PasswordResetRequest.js';
 import { MiUserSecurityKey } from '../../backend/models/UserSecurityKey.js';
@@ -52,6 +54,32 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		await db.getRepository(MiUser).insert({ id: owner, username: 'synthetic', usernameLower: 'synthetic', host: null, token: 'synthetic-native' });
 		await db.getRepository(MiUserProfile).insert({ userId: owner, password: bcrypt.hashSync('password', 4), twoFactorBackupSecret: ['synthetic-code'], email: 'synthetic@example.test', emailVerified: true });
 		await db.getRepository(MiBrowserSession).insert({ id: identity.browserSession.id, userId: owner, tokenHash: 'x'.repeat(64), createdAt: new Date(), lastUsedAt: new Date() });
+	});
+	test('the real IP logger upserts session and NULL buckets without changing first-seen timestamps', async () => {
+		const rows = db.getRepository(MiUserIp);
+		// user_ip intentionally retains observations after user deletion.
+		await rows.delete({ userId: owner });
+		const firstSeen = new Date('2026-10-01T00:00:00.000Z');
+		const lastSeen = new Date('2026-10-02T00:00:00.000Z');
+		const meta = mockDeep<ConstructorParameters<typeof ApiIpLoggingService>[0]>({ enableIpLogging: true });
+		vi.useFakeTimers({ toFake: ['Date'] });
+		try {
+			for (const now of [firstSeen, lastSeen]) {
+				vi.setSystemTime(now);
+				// A new instance has an empty hourly deduplication cache.
+				const logging = new ApiIpLoggingService(meta, rows);
+				try {
+					for (const session of [null, identity.browserSession.id]) await logging.log('192.0.2.1', owner, session);
+				} finally { logging.onApplicationShutdown(); }
+			}
+			const saved = await rows.findBy({ userId: owner });
+			expect(saved).toHaveLength(2);
+			expect(new Set(saved.map(row => row.browserSessionId))).toEqual(new Set([null, identity.browserSession.id]));
+			for (const row of saved) {
+				expect(row.createdAt).toEqual(firstSeen);
+				expect(row.lastSeenAt).toEqual(lastSeen);
+			}
+		} finally { vi.useRealTimers(); await rows.delete({ userId: owner }); }
 	});
 	test('five-minute session elevation is repeatable, owner-bound and never renewed by mutation', async () => {
 		const grant = await sudo.begin(identity, 'password');

@@ -134,6 +134,19 @@ function restoreSigninSchema(name: string, schema: unknown): unknown {
 	return restored;
 }
 
+function restoreSessionIpOperation(path: string, operation: unknown): unknown {
+	if (path !== '/admin/get-user-ips') return operation;
+	expect(schemaHash(operation)).toBe('bb7fa220fb565f28d5bcb8c87a2fe35150e328c7e1bec61b01c81f52c2b9af4d');
+	const restored: unknown = structuredClone(operation);
+	const item = object(signinOutput(restored).items);
+	expect(item.required).toEqual(['id', 'lastSeenAt', 'ip', 'createdAt']);
+	const properties = object(item.properties);
+	delete properties.id;
+	delete properties.lastSeenAt;
+	item.required = ['ip', 'createdAt'];
+	return restored;
+}
+
 function signinBranches(operation: unknown): unknown[] {
 	const output = signinOutput(operation);
 	expect(Object.keys(output).sort()).toEqual(['$schema', 'anyOf']);
@@ -322,7 +335,7 @@ test('actual portable generator preserves every legacy operation and public sche
 	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
-		const operation = restoreSigninHistoryOperation(path, restorePreSigninPolicyOperation(path, restorePreExpiryOperation(path, spec.paths?.[path])));
+		const operation = restoreSessionIpOperation(path, restoreSigninHistoryOperation(path, restorePreSigninPolicyOperation(path, restorePreExpiryOperation(path, spec.paths?.[path]))));
 		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreClientQrOperationBaseline(path, restoreWebhookOperationBaseline(path, restoreAnnouncementOperationBaseline(path, operation)))), path).toBe(hash);
 	}
 	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreSigninSchema(name, restoreWebhookSchemaBaseline(name, spec.components?.schemas?.[name]))), name).toBe(hash);
@@ -356,6 +369,21 @@ test('signin history inverse rejects unrelated changes and changed session field
 	const schema = object(structuredClone(spec.components?.schemas?.Signin));
 	object(schema.properties).browserSession = { type: 'null' };
 	expect(() => restoreSigninSchema('Signin', schema)).toThrow();
+});
+
+test('session IP inverse rejects changed audit fields and unrelated metadata', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	const path = '/admin/get-user-ips';
+	const original = spec.paths?.[path];
+	expect(schemaHash(restoreSessionIpOperation(path, original))).toBe(baseline.operationHashes[path]);
+	for (const field of ['id', 'lastSeenAt', 'ip']) {
+		const changed: unknown = structuredClone(original);
+		object(object(signinOutput(changed).items).properties)[field] = { type: 'number' };
+		expect(() => restoreSessionIpOperation(path, changed)).toThrow();
+	}
+	const changed: unknown = structuredClone(original);
+	object(object(changed).post).operationId = 'unexpected';
+	expect(() => restoreSessionIpOperation(path, changed)).toThrow();
 });
 
 test('expiry inverse rejects changed constraints and unrelated operation metadata', async () => {

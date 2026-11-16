@@ -26,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 						<div v-else class="_gaps_s">
 							<MkButton primary gradate :disabled="busy" @click="prepareTotp">{{ $locale.sfc['2faRegisterTOTP'] }}</MkButton>
-							<MkLink url="https://misskey-hub.net/docs/for-users/stepped-guides/how-to-enable-2fa/" target="_blank"><i class="ti ti-help-circle"></i> {{ $locale.sfc.learnMore }}</MkLink>
+							<MkLink url="https://misskey-hub.net/docs/for-users/stepped-guides/how-to-enable-2fa/" target="_blank"><i class="ti ti-help-circle"></i> {{ globalLocale.env.learnMore }}</MkLink>
 						</div>
 					</MkFolder>
 				</SearchMarker>
@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<template #label>{{ key.name }}</template>
 								<template #suffix><I18n :src="$locale.sfc.lastUsedAt"><template #t><MkTime :time="key.lastUsedAt"/></template></I18n></template>
 								<div class="_buttons">
-									<MkButton :disabled="busy" @click="renameKey(key)"><i class="ti ti-forms"></i> {{ $locale.sfc.rename }}</MkButton>
+									<MkButton :disabled="busy" @click="renameKey(key)"><i class="ti ti-forms"></i> {{ globalLocale.env.rename }}</MkButton>
 									<MkButton danger :disabled="busy" @click="removeKey(key)"><i class="ti ti-trash"></i> {{ $locale.sfc.unregister }}</MkButton>
 								</div>
 							</MkFolder>
@@ -76,6 +76,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
 import { browserSupportsWebAuthn, startAuthentication, startRegistration, WebAuthnAbortService } from '@simplewebauthn/browser';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
@@ -93,6 +95,8 @@ import { registrationWire } from '../../utility/registration-wire.js';
 import { ensureSudo } from '../../utility/ensure-sudo.js';
 import { ownedInputText } from '../../utility/owned-dialog.js';
 import { isSameLiveCredential } from '../../utility/live-account.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 withDefaults(defineProps<{ first?: boolean }>(), { first: false });
 
@@ -166,7 +170,7 @@ function renameKey(key: { id: string; name: string }) {
 		await misskeyApi('i/security/passkey/rename', { credentialId: key.id, name });
 		if (isCurrent()) keys.value = keys.value.map(value => value.id === key.id ? { ...value, name } : value);
 	}, true, async () => {
-		const input = await os.inputText({ title: $locale.value.sfc.rename, default: key.name, minLength: 1, maxLength: 30 });
+		const input = await os.inputText({ title: globalLocale.value.env.rename, default: key.name, minLength: 1, maxLength: 30 });
 		if (input.canceled || !input.result) return false;
 		name = input.result;
 		return true;
@@ -461,7 +465,6 @@ onUnmounted(leave);
 	"loading": "Loading settings…",
 	"mfaActive": "Passkey multi-factor authentication is enabled.",
 	"mfaInactive": "Passkey multi-factor authentication is disabled.",
-	"rename": "Rename",
 	"removeKeyWarning": "Remove this passkey? Disable passkey multi-factor authentication before removing the last key if no authenticator app is available. The last key cannot be removed while password login is disabled.",
 	"enableMfa": "Enable passkey multi-factor authentication",
 	"enableWarning": "Enable passkey multi-factor authentication? Password login will require an additional factor. If no recovery codes remain, new codes will be issued and shown once.",
@@ -475,7 +478,6 @@ onUnmounted(leave);
 	"regenerateCodes": "Regenerate recovery codes",
 	"regenerateWarning": "Regenerating recovery codes invalidates the previous codes. Continue?",
 	"failed": "Could not complete the operation. Check your verification status and settings, then try again.",
-	"learnMore": "Learn more",
 	"password": "Password",
 	"renewWarning": "Codes from the previous authenticator app will no longer work. Your backup codes will remain valid.",
 	"passkeyPolicy": "You can register a key without setting up an authenticator app first. Registration enables passkey multi-factor authentication. Disabling it retains your keys and allows you to enable it again."
@@ -632,7 +634,6 @@ onUnmounted(leave);
 	"loading": "設定を読み込んでいます…",
 	"mfaActive": "パスキーによる多要素認証は有効です。",
 	"mfaInactive": "パスキーによる多要素認証は無効です。",
-	"rename": "名前を変更",
 	"removeKeyWarning": "このパスキーを削除しますか。パスキーによる多要素認証が有効で、他に使える認証アプリがない場合は、最後のパスキーを削除する前に「パスキーによる多要素認証を無効にする」ボタンで無効にしてください。パスワードログインが無効な場合は最後のパスキーを削除できません。",
 	"enableMfa": "パスキーによる多要素認証を有効にする",
 	"enableWarning": "パスキーによる多要素認証を有効にしますか。パスワードでのログインに追加の認証が必要になります。復旧コードが残っていない場合は、新しいコードを発行して一度だけ表示します。",
@@ -646,7 +647,6 @@ onUnmounted(leave);
 	"regenerateCodes": "復旧コードを再生成",
 	"regenerateWarning": "復旧コードを再生成すると、以前の復旧コードは使えなくなります。続けますか。",
 	"failed": "操作を完了できませんでした。本人確認の有効期限や設定を確認し、もう一度開始してください。",
-	"learnMore": "詳しく",
 	"password": "パスワード",
 	"renewWarning": "今までの認証アプリの確認コードは使用できなくなります。バックアップコードは引き続き利用できます。",
 	"passkeyPolicy": "認証アプリを先に設定しなくても登録できます。登録するとパスキーによる多要素認証が有効になります。無効にしても登録したキーは残り、再び有効にできます。"

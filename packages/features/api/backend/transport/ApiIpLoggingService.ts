@@ -22,8 +22,12 @@ export class ApiIpLoggingService implements OnApplicationShutdown {
   if (history) history.add(ip); else this.histories.set(key, new Set([ip]));
   try {
    const now = new Date();
-   await this.userIps.createQueryBuilder().insert().values({ createdAt: now, lastSeenAt: now, userId, ip, browserSessionId })
-    .onConflict(`("userId", "ip", (COALESCE("browserSessionId", ''))) DO UPDATE SET "lastSeenAt" = EXCLUDED."lastSeenAt"`).execute();
+   // The unique index contains an expression; TypeORM's orUpdate accepts only
+   // column/constraint names. Keep its NULL-session bucket in parameterized SQL.
+   await this.userIps.query(`INSERT INTO "user_ip" ("createdAt", "lastSeenAt", "userId", "ip", "browserSessionId")
+    VALUES ($1, $1, $2, $3, $4)
+    ON CONFLICT ("userId", "ip", (COALESCE("browserSessionId", ''))) DO UPDATE SET "lastSeenAt" = EXCLUDED."lastSeenAt"`,
+   [now, userId, ip, browserSessionId]);
   } catch {}
  }
  onApplicationShutdown() { clearInterval(this.clearIntervalId); }

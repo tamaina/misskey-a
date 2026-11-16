@@ -6,7 +6,7 @@ import 'reflect-metadata';
 import { call } from '@orpc/server';
 import { afterEach, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import { DataSource, type QueryRunner, type InsertQueryBuilder } from 'typeorm';
+import { DataSource, type QueryRunner } from 'typeorm';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { ApiIpLoggingService } from '@features/api/backend/transport/ApiIpLoggingService.js';
 import { ApiExecutionContextFactory } from '@features/api/backend/transport/ApiExecutionContextFactory.js';
@@ -27,26 +27,23 @@ test('IP logging keeps session/null buckets separate, refreshes hourly, and only
 	vi.useFakeTimers();
 	const meta = mockDeep<MiMeta>({ enableIpLogging: true });
 	const repository = mockDeep<UserIpsRepository>();
-	const query = mockDeep<InsertQueryBuilder<MiUserIp>>();
-	repository.createQueryBuilder.mockReturnValue({ insert: () => query } as never);
-	query.values.mockReturnValue(query); query.onConflict.mockReturnValue(query);
 	const service = new ApiIpLoggingService(meta, repository);
 	try {
 		for (const session of ['one', 'two', null]) {
 			await service.log('192.0.2.1', 'alice', session);
 			await service.log('192.0.2.1', 'alice', session);
 		}
-		expect(query.execute).toHaveBeenCalledTimes(3);
-		expect(query.values.mock.calls.map(([value]) => value)).toEqual(['one', 'two', null].map(browserSessionId => ({ createdAt: expect.any(Date), lastSeenAt: expect.any(Date), userId: 'alice', ip: '192.0.2.1', browserSessionId })));
-		expect(query.onConflict).toHaveBeenCalledWith(`("userId", "ip", (COALESCE("browserSessionId", ''))) DO UPDATE SET "lastSeenAt" = EXCLUDED."lastSeenAt"`);
+		expect(repository.query).toHaveBeenCalledTimes(3);
+		expect(repository.query.mock.calls.map(([, parameters]) => parameters)).toEqual(['one', 'two', null].map(session => [expect.any(Date), 'alice', '192.0.2.1', session]));
+		expect(repository.query.mock.calls[0][0]).toContain(`ON CONFLICT ("userId", "ip", (COALESCE("browserSessionId", ''))) DO UPDATE SET "lastSeenAt" = EXCLUDED."lastSeenAt"`);
 		await vi.advanceTimersByTimeAsync(3_600_000);
 		await service.log('192.0.2.1', 'alice', 'one');
-		expect(query.execute).toHaveBeenCalledTimes(4);
+		expect(repository.query).toHaveBeenCalledTimes(4);
 		meta.enableIpLogging = false;
 		await service.log('192.0.2.2', 'alice', 'one');
-		expect(query.execute).toHaveBeenCalledTimes(4);
+		expect(repository.query).toHaveBeenCalledTimes(4);
 		meta.enableIpLogging = true;
-		query.execute.mockRejectedValueOnce(new Error('synthetic failure'));
+		repository.query.mockRejectedValueOnce(new Error('synthetic failure'));
 		await expect(service.log('192.0.2.3', 'alice')).resolves.toBeUndefined();
 	} finally { service.onApplicationShutdown(); }
 });

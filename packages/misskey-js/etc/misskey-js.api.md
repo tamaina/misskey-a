@@ -1959,6 +1959,8 @@ declare namespace entities {
         ISecurityPasskeyMfaStartRequest,
         ISecurityPasskeyMfaStartResponse,
         ISecurityPasskeyMfaCompleteRequest,
+        ISecurityPasskeyMfaEnableRequest,
+        ISecurityPasskeyMfaEnableResponse,
         ISecurityPasskeyMfaDisableRequest,
         ISecurityPasskeyRemoveRequest,
         ISecurityPasskeyRenameRequest,
@@ -4189,6 +4191,12 @@ type ISecurityPasskeyMfaCompleteRequest = ContractRequest<'i/security/passkey/mf
 type ISecurityPasskeyMfaDisableRequest = ContractRequest<'i/security/passkey/mfa/disable'>;
 
 // @public (undocumented)
+type ISecurityPasskeyMfaEnableRequest = ContractRequest<'i/security/passkey/mfa/enable'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaEnableResponse = ContractResponse<'i/security/passkey/mfa/enable'>;
+
+// @public (undocumented)
 type ISecurityPasskeyMfaStartRequest = ContractRequest<'i/security/passkey/mfa/start'>;
 
 // @public (undocumented)
@@ -4305,6 +4313,10 @@ export interface IStream extends EventEmitter<StreamEvents> {
     heartbeat(): void;
     // (undocumented)
     ping(): void;
+    // (undocumented)
+    reconnect(user: {
+        token: string;
+    } | null): void;
     // Warning: (ae-forgotten-export) The symbol "SharedConnection" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -8237,6 +8249,10 @@ export class Stream extends EventEmitter<StreamEvents> implements IStream {
     // (undocumented)
     ping(): void;
     // (undocumented)
+    reconnect(user: {
+        token: string;
+    } | null): void;
+    // (undocumented)
     removeSharedConnection(connection: SharedConnection): void;
     // (undocumented)
     removeSharedConnectionPool(pool: Pool): void;
@@ -8507,7 +8523,7 @@ type VerifyEmailRequest = ContractRequest<'verify-email'>;
 
 // Warnings were encountered during analysis:
 //
-// src/streaming.ts:57:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
+// src/streaming.ts:63:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
 // src/streaming.types.ts:236:4 - (ae-forgotten-export) The symbol "ReversiUpdateKey" needs to be exported by the entry point index.d.ts
 // src/streaming.types.ts:251:4 - (ae-forgotten-export) The symbol "ReversiUpdateSettings" needs to be exported by the entry point index.d.ts
 
