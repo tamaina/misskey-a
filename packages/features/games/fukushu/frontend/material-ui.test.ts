@@ -85,7 +85,7 @@ test('an unfinished picker does not lock the page and an older selection cannot 
 test('shows duplicate-import guidance and releases controls after failure', async () => {
 	vi.mocked(misskeyApi).mockImplementation(async endpoint => {
 		if (endpoint === 'fukushu/materials/list') return [] as never;
-		throw { code: 'MATERIAL_EXISTS' };
+		throw Object.assign(new Error('Duplicate'), { code: 'MATERIAL_EXISTS' });
 	});
 	vi.mocked(chooseDriveFile).mockResolvedValue([{ id: 'file', name: 'cards.tsv' }] as never);
 	mount();

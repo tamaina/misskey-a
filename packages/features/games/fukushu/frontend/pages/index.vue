@@ -101,8 +101,7 @@ async function perform(action: () => Promise<void>) {
 	busy.value = true;
 	error.value = '';
 	notice.value = '';
-	try { await action(); } catch (cause) { if (!disposed) error.value = message(cause); }
-	finally { busy.value = false; importing.value = false; }
+	try { await action(); } catch (cause) { if (!disposed) error.value = message(cause); } finally { busy.value = false; importing.value = false; }
 }
 
 async function refresh() {

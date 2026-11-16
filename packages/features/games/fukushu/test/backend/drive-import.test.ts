@@ -19,12 +19,14 @@ import type { FukushuStore } from '../../backend/store.js';
 
 vi.mock('../../backend/anki-text.js', () => ({ buildAnkiTextMaterial: vi.fn() }));
 
-const bytes = Buffer.from('front\tback\n');
+const bytes = Buffer.from('#html:false\nfront\tback\n');
+
 function file(overrides: Partial<MiDriveFile> = {}) {
 	return mockDeep<MiDriveFile>({ id: 'file1', userId: 'alice', userHost: null, uri: null, isLink: false, storedInternal: true,
 		name: 'cards.tsv', size: bytes.length, md5: createHash('md5').update(bytes).digest('hex'),
 		accessKey: 'original.tsv', url: 'https://old-bucket.example/original.tsv', ...overrides });
 }
+
 function fixture(overrides: Partial<MiDriveFile> = {}) {
 	const files = mockDeep<DriveFilesRepository>();
 	const storage = mockDeep<InternalStorageService>();
