@@ -113,12 +113,14 @@ describe.skipIf(!socket || !redisSocket)('HTTP login with real SQL, Redis and si
 		const replies = await Promise.all([request('signin-flow', body), request('signin-flow', body)]); expect(replies.map(reply => reply.statusCode).sort()).toEqual([200, 403]); expect(await count()).toBe(1);
 	});
 	test('independent passkey-only returns explicit password flow and does not carry UV into it', async () => {
+		await profiles().update({ userId: owner }, { usePasswordLessLogin: false });
 		const started = await beginAnonymous();
 		const response = await request('signin-with-passkey', { context: started.context, credential: assertion(started.option.challenge) });
 		expect(response.statusCode).toBe(200); expect(response.json()).toEqual({ passwordFlowRequired: true }); expect(await count()).toBe(0);
 		expect((await named()).json()).toMatchObject({ finished: false, next: 'passkey', availableFactors: ['passkey', 'recovery'] }); expect(await count()).toBe(0);
 	});
 	test('independent policy rejects wrong-password convenience bypass and disabled-TOTP tokens', async () => {
+		await profiles().update({ userId: owner }, { usePasswordLessLogin: false });
 		expect((await named({ password: 'wrong' })).statusCode).toBe(403);
 		expect((await named({ token: '123456' })).statusCode).toBe(403); expect(await count()).toBe(0);
 	});
