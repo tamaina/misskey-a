@@ -122,7 +122,7 @@ export class UserWebhookService implements OnApplicationShutdown {
 						...body,
 						latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
 						mcpExpiresAt: null, mcpPreviousSecretUntil: null, mcpStream: null, mcpStreamSince: null,
-						mcpToken: null, mcpAntenna: null, // not joined
+						mcpToken: null, mcpAntenna: null, chatToken: null, // not joined
 						user: null, // joinなカラムは通常取ってこないので
 					});
 				}
@@ -136,7 +136,7 @@ export class UserWebhookService implements OnApplicationShutdown {
 							...body,
 							latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
 							mcpExpiresAt: null, mcpPreviousSecretUntil: null, mcpStream: null, mcpStreamSince: null,
-							mcpToken: null, mcpAntenna: null, // not joined
+							mcpToken: null, mcpAntenna: null, chatToken: null, // not joined
 							user: null, // joinなカラムは通常取ってこないので
 						};
 					} else {
@@ -144,7 +144,7 @@ export class UserWebhookService implements OnApplicationShutdown {
 							...body,
 							latestSentAt: body.latestSentAt ? new Date(body.latestSentAt) : null,
 							mcpExpiresAt: null, mcpPreviousSecretUntil: null, mcpStream: null, mcpStreamSince: null,
-							mcpToken: null, mcpAntenna: null, // not joined
+							mcpToken: null, mcpAntenna: null, chatToken: null, // not joined
 							user: null, // joinなカラムは通常取ってこないので
 						});
 					}
