@@ -3336,6 +3336,136 @@ export default {
 			}
 		}
 	},
+	"fukushu": {
+		"create": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/materials/create",
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/create",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"show": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/materials/show",
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/show",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		}
+	},
 	"games": {
 		"bubbleGameRanking": {
 			"~orpc": {

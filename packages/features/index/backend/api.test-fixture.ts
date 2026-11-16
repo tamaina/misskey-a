@@ -14,6 +14,7 @@ import { createDriveManagementRouter } from '@features/drive/backend/api.impleme
 import { createIntegrationsRouter } from '@features/integrations/backend/api.implementation.js';
 import { createOperationsRouter } from '@features/operations/backend/api.implementation.js';
 import { createFederationRouter } from '@features/federation/backend/api.implementation.js';
+import { createFukushuRouter } from '@features/games/fukushu/backend/api.implementation.js';
 import { createGamesRouter } from '@features/games/backend/api.implementation.js';
 import { createPlayRouter } from '@features/play/backend/api.implementation.js';
 import { createPagesRouter } from '@features/pages/backend/api.implementation.js';
@@ -44,6 +45,7 @@ export function createApiTestFeatures(): ApiRouterFeatures {
 		integrations: createIntegrationsRouter(mockDeep<Parameters<typeof createIntegrationsRouter>[0]>()),
 		operations: createOperationsRouter<MiLocalUser>(mockDeep<Parameters<typeof createOperationsRouter<MiLocalUser>>[0]>()),
 		federation: createFederationRouter<MiLocalUser>(mockDeep<Parameters<typeof createFederationRouter<MiLocalUser>>[0]>()),
+		fukushu: createFukushuRouter(mockDeep<Parameters<typeof createFukushuRouter>[0]>()),
 		games: createGamesRouter(mockDeep<Parameters<typeof createGamesRouter>[0]>()),
 		play: createPlayRouter(mockDeep<Parameters<typeof createPlayRouter>[0]>()),
 		pages: createPagesRouter(mockDeep<Parameters<typeof createPagesRouter>[0]>()),

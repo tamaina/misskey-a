@@ -128,7 +128,7 @@ export default defineConfig((args) => {
 				format: 'esm',
 			},
 			watch: {
-				include: ['src/**/*.{ts,mts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,mts,js,mjs,cjs,tsx,json}'],
+				include: ['src/**/*.{ts,mts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,mts,js,mjs,cjs,tsx,json}', '../features/games/*/{backend,contract,shared}/**/*.{ts,mts,js,mjs,cjs,tsx,json}'],
 				clearScreen: false,
 			},
 			experimental: { nativeMagicString: true },

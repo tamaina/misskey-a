@@ -23,6 +23,7 @@ import type { InferContractRouterInputs } from '@orpc/contract';
 import type { InferContractRouterOutputs } from '@orpc/contract';
 import { IntegerAction } from 'valibot';
 import { IntersectSchema } from 'valibot';
+import { IsoTimestampAction } from 'valibot';
 import { LazySchema } from 'valibot';
 import { LiteralSchema } from 'valibot';
 import { MaxCodePointsAction } from 'valibot';
@@ -1783,6 +1784,10 @@ declare namespace entities {
         FlashSearchResponse,
         UsersFlashsRequest,
         UsersFlashsResponse,
+        FukushuMaterialsCreateRequest,
+        FukushuMaterialsCreateResponse,
+        FukushuMaterialsShowRequest,
+        FukushuMaterialsShowResponse,
         BubbleGameRankingRequest,
         BubbleGameRankingResponse,
         BubbleGameRegisterRequest,
@@ -3764,6 +3769,18 @@ type FollowingUpdateResponse = ContractResponse<'following/update'>;
 
 // @public (undocumented)
 export const followingVisibilities: readonly ["public", "followers", "private"];
+
+// @public (undocumented)
+type FukushuMaterialsCreateRequest = ContractRequest<'fukushu/materials/create'>;
+
+// @public (undocumented)
+type FukushuMaterialsCreateResponse = ContractResponse<'fukushu/materials/create'>;
+
+// @public (undocumented)
+type FukushuMaterialsShowRequest = ContractRequest<'fukushu/materials/show'>;
+
+// @public (undocumented)
+type FukushuMaterialsShowResponse = ContractResponse<'fukushu/materials/show'>;
 
 // @public (undocumented)
 type GalleryFeaturedRequest = ContractRequest<'gallery/featured'>;

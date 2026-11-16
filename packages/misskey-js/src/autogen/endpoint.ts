@@ -103,6 +103,10 @@ import type {
 	FlashSearchResponse,
 	UsersFlashsRequest,
 	UsersFlashsResponse,
+	FukushuMaterialsCreateRequest,
+	FukushuMaterialsCreateResponse,
+	FukushuMaterialsShowRequest,
+	FukushuMaterialsShowResponse,
 	BubbleGameRankingRequest,
 	BubbleGameRankingResponse,
 	BubbleGameRegisterRequest,
@@ -862,6 +866,8 @@ export type Endpoints = {
 	'flash/update': { req: FlashUpdateRequest; res: EmptyResponse };
 	'flash/search': { req: FlashSearchRequest; res: FlashSearchResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
+	'fukushu/materials/create': { req: FukushuMaterialsCreateRequest; res: FukushuMaterialsCreateResponse };
+	'fukushu/materials/show': { req: FukushuMaterialsShowRequest; res: FukushuMaterialsShowResponse };
 	'bubble-game/ranking': { req: BubbleGameRankingRequest; res: BubbleGameRankingResponse };
 	'bubble-game/register': { req: BubbleGameRegisterRequest; res: EmptyResponse };
 	'reversi/cancel-match': { req: ReversiCancelMatchRequest; res: EmptyResponse };

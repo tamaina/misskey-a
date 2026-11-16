@@ -195,6 +195,12 @@ export type paths = {
     '/users/flashs': {
         post: operations['users___flashs'];
     };
+    '/fukushu/materials/create': {
+        post: operations['fukushu___materials___create'];
+    };
+    '/fukushu/materials/show': {
+        post: operations['fukushu___materials___show'];
+    };
     '/bubble-game/ranking': {
         post: operations['bubble-game___ranking'];
     };
@@ -51423,6 +51429,724 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    fukushu___materials___create: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    material: {
+                        deck: {
+                            id: string;
+                            name: string;
+                            description?: string;
+                            /** @constant */
+                            studyMode: 'flashcard';
+                            /** @enum {string} */
+                            sourceType: 'gift' | 'anki-text';
+                            sourceFileName?: string;
+                            sourceHash: string;
+                            sourceText?: string;
+                            /** Format: date-time */
+                            importedAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            questionCount: number;
+                            enabledQuestionCount: number;
+                        };
+                        questions: {
+                            id: string;
+                            deckId: string;
+                            sourceKey: string;
+                            sourceOrder: number;
+                            /** @constant */
+                            kind: 'flashcard';
+                            payload: {
+                                id: string;
+                                deckId: string;
+                                sourceKey: string;
+                                name?: string;
+                                prompt: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                categoryPath: string[];
+                                explanation?: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                shuffleChoices?: boolean;
+                                /** @constant */
+                                kind: 'flashcard';
+                                answer: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                typeAnswer?: boolean;
+                                acceptedAnswer?: string;
+                            };
+                            enabled: boolean;
+                            enabledKey: 0 | 1;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        }[];
+                    };
+                } & ({
+                    material: {
+                        deck: {
+                            id: string;
+                            name: string;
+                            description?: string;
+                            /** @constant */
+                            studyMode: 'flashcard';
+                            /** @enum {string} */
+                            sourceType: 'gift' | 'anki-text';
+                            sourceFileName?: string;
+                            sourceHash: string;
+                            sourceText?: string;
+                            /** Format: date-time */
+                            importedAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            questionCount: number;
+                            enabledQuestionCount: number;
+                        };
+                        questions: {
+                            id: string;
+                            deckId: string;
+                            sourceKey: string;
+                            sourceOrder: number;
+                            /** @constant */
+                            kind: 'flashcard';
+                            payload: {
+                                id: string;
+                                deckId: string;
+                                sourceKey: string;
+                                name?: string;
+                                prompt: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                categoryPath: string[];
+                                explanation?: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                shuffleChoices?: boolean;
+                                /** @constant */
+                                kind: 'flashcard';
+                                answer: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                typeAnswer?: boolean;
+                                acceptedAnswer?: string;
+                            };
+                            enabled: boolean;
+                            enabledKey: 0 | 1;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        }[];
+                    };
+                } & unknown);
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        deck: {
+                            id: string;
+                            name: string;
+                            description?: string;
+                            /** @constant */
+                            studyMode: 'flashcard';
+                            /** @enum {string} */
+                            sourceType: 'gift' | 'anki-text';
+                            sourceFileName?: string;
+                            sourceHash: string;
+                            sourceText?: string;
+                            /** Format: date-time */
+                            importedAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            questionCount: number;
+                            enabledQuestionCount: number;
+                        };
+                        questions: {
+                            id: string;
+                            deckId: string;
+                            sourceKey: string;
+                            sourceOrder: number;
+                            /** @constant */
+                            kind: 'flashcard';
+                            payload: {
+                                id: string;
+                                deckId: string;
+                                sourceKey: string;
+                                name?: string;
+                                prompt: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                categoryPath: string[];
+                                explanation?: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                shuffleChoices?: boolean;
+                                /** @constant */
+                                kind: 'flashcard';
+                                answer: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                typeAnswer?: boolean;
+                                acceptedAnswer?: string;
+                            };
+                            enabled: boolean;
+                            enabledKey: 0 | 1;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'MATERIAL_LIMIT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_MATERIAL';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'NO_SUCH_MATERIAL';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'MATERIAL_EXISTS';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    fukushu___materials___show: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    id: string;
+                } & ({
+                    id: string;
+                } & unknown);
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        deck: {
+                            id: string;
+                            name: string;
+                            description?: string;
+                            /** @constant */
+                            studyMode: 'flashcard';
+                            /** @enum {string} */
+                            sourceType: 'gift' | 'anki-text';
+                            sourceFileName?: string;
+                            sourceHash: string;
+                            sourceText?: string;
+                            /** Format: date-time */
+                            importedAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            questionCount: number;
+                            enabledQuestionCount: number;
+                        };
+                        questions: {
+                            id: string;
+                            deckId: string;
+                            sourceKey: string;
+                            sourceOrder: number;
+                            /** @constant */
+                            kind: 'flashcard';
+                            payload: {
+                                id: string;
+                                deckId: string;
+                                sourceKey: string;
+                                name?: string;
+                                prompt: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                categoryPath: string[];
+                                explanation?: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                shuffleChoices?: boolean;
+                                /** @constant */
+                                kind: 'flashcard';
+                                answer: {
+                                    /** @constant */
+                                    format: 'plain';
+                                    value: string;
+                                };
+                                typeAnswer?: boolean;
+                                acceptedAnswer?: string;
+                            };
+                            enabled: boolean;
+                            enabledKey: 0 | 1;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'MATERIAL_LIMIT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_MATERIAL';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'NO_SUCH_MATERIAL';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'MATERIAL_EXISTS';
                             message: string;
                         };
                     };

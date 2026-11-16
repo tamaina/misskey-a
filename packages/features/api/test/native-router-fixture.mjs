@@ -13,7 +13,7 @@ import { createApiRouter, createInstanceRouter, createNotesRouter, createDriveRo
 export function composeNativeTestRouter(dependencies) {
 	return createApiRouter({
 		roles: {}, moderation: {}, auth: {}, portability: {}, driveManagement: {}, integrations: {},
-		operations: {}, federation: {}, games: {}, play: {}, pages: {}, channels: {}, chat: {},
+		operations: {}, federation: {}, fukushu: {}, games: {}, play: {}, pages: {}, channels: {}, chat: {},
 		discovery: {}, announcements: {}, avatarDecorations: {}, preferences: {},
 		instance: createInstanceRouter(dependencies.instance),
 		notes: createNotesRouter(dependencies.notes),
