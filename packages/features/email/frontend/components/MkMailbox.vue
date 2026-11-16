@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template v-if="tab === 'inbox'">
 				<template v-if="selected">
 					<div :class="$style.toolbar">
-						<button type="button" @click="selected = null">{{ t.back }}</button>
+						<button type="button" :disabled="busy" @click="selected = null">{{ t.back }}</button>
 						<button type="button" :disabled="busy" @click="run(() => setRead(!selected?.readAt))">{{ selected.readAt ? t.markUnread : t.markRead }}</button>
 						<button type="button" :disabled="busy" @click="remove">{{ t.delete }}</button>
 						<button v-if="selected.localStored" type="button" :disabled="busy" @click="run(() => downloadRaw(selected!.id))">{{ t.raw }}</button>
@@ -61,7 +61,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<button v-if="moreSent" type="button" :disabled="busy" @click="run(() => loadSent(true))">{{ t.more }}</button>
 			</template>
 			<div v-else :class="$style.form">
-				<label><input :checked="state.enabled" type="checkbox" :disabled="busy" @change="run(() => configure(($event.target as HTMLInputElement).checked))"> {{ t.enabled }}</label>
+				<label><input :checked="state.enabled" type="checkbox" :disabled="busy" @change="changeEnabled"> {{ t.enabled }}</label>
 				<h3>{{ t.forwarding }}</h3>
 				<p>{{ state.forwarding.address || t.noForwarding }} · {{ state.forwarding.verified ? t.verified : t.unverified }}</p>
 				<p>{{ t.revision }}: {{ state.forwarding.revision }} · {{ state.forwarding.enabled ? t.forwardingEnabled : t.forwardingDisabled }}</p>
@@ -233,6 +233,14 @@ async function send() {
 }
 
 async function configure(enabled: boolean) { await misskeyApi('email/configure', { enabled }); await loadState(); }
+
+function changeEnabled(event: Event) {
+	const input = event.target as HTMLInputElement;
+	const enabled = input.checked;
+	// Keep the DOM aligned with confirmed state even if the request fails without a reactive update.
+	input.checked = state.value?.enabled ?? false;
+	void run(() => configure(enabled));
+}
 
 async function saveForwarding() {
 	await misskeyApi('email/forwarding/configure', { address: forwardAddress.value.trim() || null, keepLocalCopy: keepLocalCopy.value });

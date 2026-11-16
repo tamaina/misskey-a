@@ -244,3 +244,11 @@ After building the backend, run `node packages/features/email/test/run-postgres-
 The concurrency test uses a pool of independent server connections and a transaction rendezvous that checks distinct `pg_backend_pid()` values before releasing each pair. It covers retry deduplication, double deletion, mailbox quota, physical spool quota, send idempotency and competing submission-worker claims. Owner-only raw/deletion checks and both mail migration directions are included in the SQL suite. CI runs this fixture for both supported Node versions; email changes trigger backend CI.
 
 SMTP and private object storage are in-memory doubles: no external mail is sent. These tests do not establish live relay/S3/Redis interoperability, crash recovery across real external services, arbitrary concurrency schedules, or browser behavior. PGlite remains useful for sequential SQL checks but does not replace the PostgreSQL concurrency fixture.
+
+## Isolated browser regression tests
+
+Run `pnpm --filter frontend exec node --import tsx test/browser-feature/mail.mjs` after installing workspace dependencies and Playwright Chromium. This builds the real mail page/component and Japanese locale into a temporary browser fixture. The fixture binds only to loopback, replaces API/auth/dialog/router adapters with synthetic state, blocks external requests, and closes its browser/server in `finally`. It does not require an application server, database, SMTP relay or storage account. The feature frontend workflow runs it in CI.
+
+The scenarios cover signed-out/unavailable/disabled states, pagination, read/unread updates, attachment/raw downloads, deletion confirmation, sandboxed received HTML, MFM preview, same-key retries after an uncertain send response, forwarding-link cleanup, failed configuration rollback, pending-read navigation and mobile layout. Set `MISSKEY_MAIL_SCREENSHOTS` to an output directory for mobile/desktop captures; `MISSKEY_TEST_CHROMIUM` can select an existing browser executable.
+
+This verifies the actual Vue UI in Chromium with synthetic API responses, not deployed end-to-end delivery, the full application router/dialog stack, live forwarding verification, or rendering across external email clients. Those operational checks remain required before rollout.
