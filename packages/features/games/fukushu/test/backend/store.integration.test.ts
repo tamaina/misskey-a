@@ -56,6 +56,41 @@ describe.skipIf(!socket)('Fukushu private PostgreSQL persistence and API', () =>
 		await expect(store.show('alice', 'another-deck')).rejects.toThrow('NO_SUCH_MATERIAL');
 		expect(await store.show('alice', 'deck-original')).toEqual(material());
 	});
+	test('lists only owned summaries in stable ID order without source text', async () => {
+		const later = material('z-deck', 'z-card'); later.deck.sourceText = 'private raw source';
+		const earlier = material('a-deck', 'a-card');
+		await store.create('alice', later);
+		await store.create('alice', earlier);
+		await store.create('bob', material('bob-deck', 'bob-card'));
+		const summaries = await store.list('alice');
+		expect(summaries.map(deck => deck.id)).toEqual(['a-deck', 'z-deck']);
+		expect(summaries.every(deck => !('sourceText' in deck))).toBe(true);
+		expect((await store.list('bob')).map(deck => deck.id)).toEqual(['bob-deck']);
+		expect(await store.list('missing-owner')).toEqual([]);
+	});
+	test('deduplicates source hashes atomically across imports without consuming quota or changing saved cards', async () => {
+		const results = await Promise.allSettled(['a', 'b'].map(id => new FukushuStore(db).create('alice', material(id, id), { deduplicateSource: true })));
+		expect(results.filter(result => result.status === 'fulfilled')).toHaveLength(1);
+		expect(results.find(result => result.status === 'rejected')).toMatchObject({ reason: { code: 'MATERIAL_EXISTS' } });
+		expect(await db.query('SELECT id FROM fukushu_deck')).toHaveLength(1);
+		expect(await db.query('SELECT id FROM fukushu_question')).toHaveLength(1);
+		const saved = (await store.list('alice'))[0];
+		await expect(store.create('alice', material('retry', 'retry'), { deduplicateSource: true })).rejects.toThrow('MATERIAL_EXISTS');
+		expect(await store.show('alice', saved.id)).toEqual(material(saved.id, saved.id));
+		// Identical source data can still belong to independent users.
+		await expect(store.create('bob', material('other', 'other'), { deduplicateSource: true })).resolves.toEqual(material('other', 'other'));
+		// Manual create preserves its original ID-based semantics; source kind matters.
+		await store.create('alice', material('manual', 'manual'));
+		const otherKind = material('gift', 'gift'); otherKind.deck.sourceType = 'gift';
+		await expect(store.create('alice', otherKind, { deduplicateSource: true })).resolves.toEqual(otherKind);
+	});
+	test('a source retry at the quota is a duplicate and never consumes another slot', async () => {
+		await store.create('alice', material());
+		await db.query('INSERT INTO fukushu_deck ("ownerId", id, data) SELECT $1, n::text, $2::jsonb FROM generate_series(1,99) n', ['alice', JSON.stringify(material().deck)]);
+		await expect(store.create('alice', material('retry', 'retry'), { deduplicateSource: true })).rejects.toThrow('MATERIAL_EXISTS');
+		expect(await store.list('alice')).toHaveLength(100);
+		expect(await db.query('SELECT id FROM fukushu_question')).toHaveLength(1);
+	});
 	test('rejects invalid input before any write and cascades account deletion', async () => {
 		const invalid = material(); invalid.questions[0].payload.deckId = 'other';
 		await expect(store.create('alice', invalid)).rejects.toThrow('INVALID_MATERIAL');

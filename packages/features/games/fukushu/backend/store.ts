@@ -11,7 +11,7 @@ import { MiFukushuQuestion } from './models/FukushuQuestion.js';
 import type { DataSource } from 'typeorm';
 
 export class MaterialError extends Error {
-	constructor(public readonly code: 'NO_SUCH_MATERIAL' | 'MATERIAL_EXISTS' | 'MATERIAL_LIMIT' | 'INVALID_MATERIAL') {
+	constructor(public readonly code: 'NO_SUCH_MATERIAL' | 'MATERIAL_EXISTS' | 'MATERIAL_LIMIT' | 'INVALID_MATERIAL' | 'NO_SUCH_FILE' | 'IMPORT_FAILED') {
 		super(code);
 	}
 }
@@ -19,7 +19,7 @@ export class MaterialError extends Error {
 export class FukushuStore {
 	constructor(private readonly db: DataSource) {}
 
-	async create(ownerId: string, input: unknown) {
+	async create(ownerId: string, input: unknown, options: { deduplicateSource?: boolean } = {}) {
 		const parsed = v.safeParse(materialSchema, input);
 		if (!parsed.success) throw new MaterialError('INVALID_MATERIAL');
 		const material = parsed.output;
@@ -29,6 +29,11 @@ export class FukushuStore {
 				await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`fukushu:create:${ownerId}`]);
 				const decks = manager.getRepository(MiFukushuDeck);
 				if (await decks.existsBy({ ownerId, id: material.deck.id })) throw new MaterialError('MATERIAL_EXISTS');
+				if (options.deduplicateSource && await decks.createQueryBuilder('deck')
+					.where('deck.ownerId = :ownerId', { ownerId })
+					.andWhere("deck.data ->> 'sourceType' = :sourceType", { sourceType: material.deck.sourceType })
+					.andWhere("deck.data ->> 'sourceHash' = :sourceHash", { sourceHash: material.deck.sourceHash })
+					.getExists()) throw new MaterialError('MATERIAL_EXISTS');
 				if (await decks.countBy({ ownerId }) >= 100) throw new MaterialError('MATERIAL_LIMIT');
 				await decks.insert({ ownerId, id: material.deck.id, data: material.deck });
 				await manager.getRepository(MiFukushuQuestion).insert(material.questions.map((data, position) => ({
@@ -41,6 +46,11 @@ export class FukushuStore {
 			throw error;
 		}
 		return material;
+	}
+
+	async list(ownerId: string) {
+		const decks = await this.db.getRepository(MiFukushuDeck).find({ where: { ownerId }, order: { id: 'ASC' }, take: 100 });
+		return decks.map(({ data: { sourceText: _sourceText, ...summary } }) => summary);
 	}
 
 	async show(ownerId: string, id: string) {
