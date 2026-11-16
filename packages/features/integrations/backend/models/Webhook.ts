@@ -64,10 +64,6 @@ export class MiWebhook {
 	@Column('varchar', { length: 16, default: 'legacy' })
 	public mode: 'legacy' | 'mcp';
 
-	/** Chat delivery generation, including grandfathered pre-upgrade subscriptions. */
-	@Column('uuid', { nullable: true })
-	public chatGeneration: string | null;
-
 	@Index('IDX_webhook_chatTokenId')
 	@Column({ ...id(), nullable: true })
 	public chatTokenId: string | null;

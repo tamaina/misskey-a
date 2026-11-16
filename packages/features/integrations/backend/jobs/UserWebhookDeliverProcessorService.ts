@@ -74,15 +74,14 @@ export class UserWebhookDeliverProcessorService {
 		});
 		if (!current || current.mode !== 'legacy') return 'Suppressed';
 		if (job.data.type === 'chatMessage') {
-			if (!job.data.chatGeneration || current.chatGeneration !== job.data.chatGeneration
-				|| current.userId !== job.data.userId || !current.active || !current.on.includes('chatMessage')
+			if (current.userId !== job.data.userId || !current.active || !current.on.includes('chatMessage')
 				|| current.url !== job.data.to || current.secret !== job.data.secret
 				|| !await canDeliverLegacyChatWebhook(this.webhooksRepository.manager, current)) return 'Suppressed';
 			// Grant lookups await database reads. Do not send an earlier snapshot if
 			// the hook was disabled, removed or reauthorized while those were pending.
 			const latest = await this.webhooksRepository.findOneBy({ id: current.id });
 			if (!latest || latest.mode !== 'legacy' || !latest.active || !latest.on.includes('chatMessage')
-				|| latest.chatGeneration !== job.data.chatGeneration || latest.userId !== job.data.userId
+				|| latest.chatTokenId !== current.chatTokenId || latest.userId !== job.data.userId
 				|| latest.url !== job.data.to || latest.secret !== job.data.secret) return 'Suppressed';
 		}
 		try {

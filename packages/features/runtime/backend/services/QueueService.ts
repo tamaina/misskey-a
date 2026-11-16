@@ -733,11 +733,8 @@ export class QueueService {
 				backoff: { type: 'custom' }, removeOnComplete: { age: 86400, count: 1000 }, removeOnFail: { age: 86400, count: 1000 } });
 		}
 
-		// Unmigrated cached rows must not enqueue chat without a delivery generation.
-		if (type === 'chatMessage' && !webhook.chatGeneration) return;
 		const data: UserWebhookDeliverJobData = {
 			type,
-			...(type === 'chatMessage' ? { chatGeneration: webhook.chatGeneration! } : {}),
 			content,
 			webhookId: webhook.id,
 			userId: webhook.userId,

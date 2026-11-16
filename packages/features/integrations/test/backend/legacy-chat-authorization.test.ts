@@ -25,7 +25,7 @@ const input = { name: 'hook', url: 'https://example.com/hook', secret: 'secret',
 
 function fixture(token: ApiToken | null = null, on: MiWebhook['on'] = ['chatMessage']) {
 	let webhook = { id: 'hook1', userId: actor.id, ...input, on, active: true, mode: 'legacy',
-		chatGeneration: 'generation', chatTokenId: null, latestSentAt: null, latestStatus: null } as MiWebhook;
+		chatTokenId: null, latestSentAt: null, latestStatus: null } as MiWebhook;
 	const rowLock = { where: vi.fn().mockReturnThis(), setLock: vi.fn().mockReturnThis(), getOneOrFail: vi.fn(async () => actor) };
 	const users = { createQueryBuilder: () => rowLock, findOneBy: vi.fn(async () => actor) };
 	const tokens = { findOneBy: vi.fn(async () => ({ id: 'grant', userId: actor.id, appId: null, permission: chatToken.permission })) };
@@ -59,7 +59,7 @@ function fixture(token: ApiToken | null = null, on: MiWebhook['on'] = ['chatMess
 	const chatContent = { message: { id: 'message' } as never };
 	const job: LegacyUserWebhookDeliverJobData = { type: 'chatMessage', content: chatContent,
 		webhookId: webhook.id, userId: actor.id, to: webhook.url, secret: webhook.secret,
-		chatGeneration: 'generation', eventId: 'event', createdAt: 0 };
+		eventId: 'event', createdAt: 0 };
 	return { repository, manager, users, tokens, apps, send, events, rowLock,
 		chatContent, get webhook() { return webhook; },
 		setWebhook: (value: Partial<MiWebhook>) => { webhook = { ...webhook, ...value }; },
@@ -79,7 +79,6 @@ describe('legacy chat webhook registration', () => {
 	it.each([null, chatToken])('binds a fresh authorization to native owners and scoped grants', async token => {
 		const f = fixture(token);
 		await f.create();
-		expect(f.webhook.chatGeneration).toMatch(/^[0-9a-f-]{36}$/);
 		expect(f.webhook.chatTokenId).toBe(token?.id ?? null);
 	});
 
@@ -100,24 +99,23 @@ describe('legacy chat webhook registration', () => {
 		const f = fixture(accountToken, ['note']);
 		await f.create({ ...input, on: ['note'] as never });
 		await f.update({ url: 'https://example.com/new' });
-		expect(f.webhook.chatGeneration).toBeNull(); expect(f.webhook.chatTokenId).toBeNull();
+		expect(f.webhook.chatTokenId).toBeNull();
 	});
 
-	it('rotates authorization on changes and clears it when chat is removed', async () => {
+	it('binds authorization on changes and clears it when chat is removed', async () => {
 		const f = fixture(chatToken);
 		await f.update({ url: 'https://example.com/new' });
-		expect(f.webhook.chatGeneration).not.toBe('generation'); expect(f.webhook.chatTokenId).toBe('grant');
-		const previous = f.webhook.chatGeneration;
+		expect(f.webhook.chatTokenId).toBe('grant');
 		await f.update({ active: false });
-		expect(f.webhook.chatGeneration).not.toBe(previous);
+		expect(f.webhook.chatTokenId).toBe('grant');
 		await f.update({ on: ['note'] });
-		expect(f.webhook.chatGeneration).toBeNull(); expect(f.webhook.chatTokenId).toBeNull();
+		expect(f.webhook.chatTokenId).toBeNull();
 	});
 
-	it('an authorized update cannot revive an already queued generation', async () => {
+	it('a queued job can deliver after an authorized disable and re-enable', async () => {
 		const f = fixture(chatToken);
 		await f.update({ active: false }); await f.update({ active: true });
-		expect(await f.deliver()).toBe('Suppressed'); expect(f.send).not.toHaveBeenCalled();
+		expect(await f.deliver()).toBe('Success'); expect(f.send).toHaveBeenCalledOnce();
 	});
 });
 
@@ -135,7 +133,6 @@ describe('legacy chat delivery authorization', () => {
 		const f = fixture(chatToken);
 		await f.update({ name: 'updated' });
 		expect(f.webhook.chatTokenId).toBe('grant');
-		f.job.chatGeneration = f.webhook.chatGeneration!;
 		expect(await f.deliver()).toBe('Success'); f.send.mockClear();
 		f.tokens.findOneBy.mockResolvedValue(null as never);
 		expect(await f.deliver()).toBe('Suppressed'); expect(f.send).not.toHaveBeenCalled();
@@ -149,15 +146,30 @@ describe('legacy chat delivery authorization', () => {
 		expect(JSON.parse(request.body)).toMatchObject({ hookId: 'hook1', userId: 'owner', type: 'chatMessage', body: f.job.content });
 	});
 
-	it.each([{ chatGeneration: null }, { chatGeneration: 'new' }, { active: false }, { on: ['note'] }, { mode: 'mcp' },
+	it.each([{ active: false }, { on: ['note'] }, { mode: 'mcp' },
 		{ userId: 'other' }, { url: 'https://example.com/new' }, { secret: 'new' }])('suppresses stale or no-longer-authorized jobs: %j', async state => {
 		const f = fixture(); f.setWebhook(state as Partial<MiWebhook>);
 		expect(await f.deliver()).toBe('Suppressed'); expect(f.send).not.toHaveBeenCalled();
 	});
 
-	it('suppresses pre-upgrade jobs even after reauthorization', async () => {
-		const f = fixture(); delete f.job.chatGeneration;
+	it('delivers pre-upgrade queued jobs after an authorized name edit', async () => {
+		const f = fixture(chatToken);
+		await f.update({ name: 'renamed' });
+		expect(await f.deliver()).toBe('Success'); expect(f.send).toHaveBeenCalledOnce();
+	});
+
+	it.each([
+		{ edit: { active: false }, restore: { active: true } },
+		{ edit: { on: ['note'] }, restore: { on: ['chatMessage'] } },
+		{ edit: { url: 'https://example.com/new' }, restore: { url: input.url } },
+		{ edit: { secret: 'new' }, restore: { secret: input.secret } },
+	])('checks current settings for old queued jobs and permits delivery after restoration: %j', async ({ edit, restore }) => {
+		const f = fixture(chatToken);
+		await f.update(edit);
 		expect(await f.deliver()).toBe('Suppressed'); expect(f.send).not.toHaveBeenCalled();
+		// Simulate another still-pending job or retry with the same legacy payload.
+		await f.update(restore);
+		expect(await f.deliver()).toBe('Success'); expect(f.send).toHaveBeenCalledOnce();
 	});
 
 	it('suppresses deleted hooks', async () => {
@@ -165,7 +177,7 @@ describe('legacy chat delivery authorization', () => {
 		expect(await f.deliver()).toBe('Suppressed'); expect(f.send).not.toHaveBeenCalled();
 	});
 
-	it.each([{ active: false }, { chatGeneration: 'new' }, { url: 'https://example.com/new' }, { on: [] }])('rechecks hook changes while grant reads are pending: %j', async state => {
+	it.each([{ active: false }, { chatTokenId: 'replacement-grant' }, { chatTokenId: null }, { url: 'https://example.com/new' }, { secret: 'new' }, { userId: 'other' }, { mode: 'mcp' }, { on: [] }])('rechecks hook changes while grant reads are pending: %j', async state => {
 		const f = fixture(); f.setWebhook({ chatTokenId: 'grant' });
 		f.tokens.findOneBy.mockImplementationOnce(async () => {
 			f.setWebhook(state as Partial<MiWebhook>);
@@ -209,19 +221,18 @@ describe('legacy chat delivery authorization', () => {
 	});
 
 	it('retains non-chat legacy delivery compatibility', async () => {
-		const f = fixture(); f.setWebhook({ chatGeneration: null, chatTokenId: null });
-		f.job.type = 'note'; delete f.job.chatGeneration;
+		const f = fixture(); f.setWebhook({ chatTokenId: null });
+		f.job.type = 'note';
 		expect(await f.deliver()).toBe('Success'); expect(f.users.findOneBy).not.toHaveBeenCalled();
 	});
 
-	it('never queues unmigrated chat hooks and propagates the current generation', () => {
+	it('queues existing chat hooks in the legacy format without extra authorization metadata', () => {
 		const f = fixture(); const add = vi.fn();
 		const queue = Object.assign(Object.create(QueueService.prototype), { userWebhookDeliverQueue: { add } }) as QueueService;
-		f.setWebhook({ chatGeneration: null });
 		queue.userWebhookDeliver(f.webhook, 'chatMessage', f.chatContent);
-		expect(add).not.toHaveBeenCalled();
-		f.setWebhook({ chatGeneration: 'new' });
-		queue.userWebhookDeliver(f.webhook, 'chatMessage', f.chatContent);
-		expect(add).toHaveBeenCalledWith('hook1', expect.objectContaining({ chatGeneration: 'new', type: 'chatMessage' }), expect.anything());
+		expect(add).toHaveBeenCalledWith('hook1', {
+			type: 'chatMessage', content: f.chatContent, webhookId: 'hook1', userId: actor.id,
+			to: input.url, secret: input.secret, createdAt: expect.any(Number), eventId: expect.any(String),
+		}, expect.anything());
 	});
 });

@@ -34,7 +34,7 @@ test('native update scopes ownership, strips undeclared input and clears null se
 	const { calls, webhook, client } = fixture();
 	await client.iWebhooksUpdate({ webhookId: webhook.id, name: 'new', secret: null, future: true });
 	assert.deepEqual(calls[0], ['find', { id: webhook.id, userId: actor.id, mode: 'legacy' }]);
-	assert.deepEqual(calls[1], ['update', webhook.id, { name: 'new', url: undefined, secret: '', on: undefined, active: undefined, chatGeneration: null, chatTokenId: null }]);
+	assert.deepEqual(calls[1], ['update', webhook.id, { name: 'new', url: undefined, secret: '', on: undefined, active: undefined, chatTokenId: null }]);
 	assert.deepEqual(calls[2], ['reload', { id: webhook.id }]);
 	assert.deepEqual(calls[3], ['webhookUpdated', webhook]);
 });

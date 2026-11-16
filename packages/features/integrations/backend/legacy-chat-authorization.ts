@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { randomUUID } from 'node:crypto';
 import type { EntityManager } from 'typeorm';
 import type { ApiToken } from '@features/api/backend/transport/context.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -18,12 +17,11 @@ export function authorizeLegacyChatWebhook(token: ApiToken | null) {
 		code: 'PERMISSION_DENIED', message: 'Your app does not have the necessary permissions to use this endpoint.',
 		id: '1370e5b7-d4eb-4566-bb1d-7748ee6a1838', kind: 'permission',
 	});
-	return { chatGeneration: randomUUID(), chatTokenId: token?.id ?? null };
+	return { chatTokenId: token?.id ?? null };
 }
 
 /** Read live grants, not authentication or webhook caches, on every delivery attempt. */
 export async function canDeliverLegacyChatWebhook(manager: EntityManager, webhook: MiWebhook): Promise<boolean> {
-	if (!webhook.chatGeneration) return false;
 	const user = await manager.getRepository(MiUser).findOneBy({ id: webhook.userId });
 	if (!user || user.host !== null || user.isSuspended || user.movedToUri) return false;
 	// Native owner authorization and grandfathered beta hooks are not token-bound.

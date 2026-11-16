@@ -32,7 +32,7 @@ export function createIWebhooksUpdateProcedure(deps: IWebhooksUpdateDependencies
 					? authorizeLegacyChatWebhook(context.token) : {};
 				await repository.update(webhook.id, { name: ps.name, url: ps.url, secret: ps.secret === null ? '' : ps.secret, on: ps.on, active: ps.active,
 					...chatAuthorization,
-					...(!on.includes('chatMessage') ? { chatGeneration: null, chatTokenId: null } : {}),
+					...(!on.includes('chatMessage') ? { chatTokenId: null } : {}),
 				});
 				return repository.findOneByOrFail({ id: ps.webhookId });
 			});

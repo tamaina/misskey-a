@@ -68,16 +68,13 @@ describe.skipIf(!socket)('isolated MCP Events PostgreSQL fixture', () => {
 			const webhooks = runner.manager.getRepository(MiWebhook);
 			const active = await webhooks.findOneByOrFail({ id: 'legacy_chat_active' });
 			const inactive = await webhooks.findOneByOrFail({ id: 'legacy_chat_inactive' });
-			expect(active.chatGeneration).toMatch(/^[0-9a-f-]{36}$/);
-			expect(inactive.chatGeneration).toMatch(/^[0-9a-f-]{36}$/);
-			expect(active.chatGeneration).not.toBe(inactive.chatGeneration);
 			expect(active.chatTokenId).toBeNull(); expect(inactive.chatTokenId).toBeNull();
 			for (const id of ['legacy_nonchat', 'mcp_chat']) {
-				expect(await webhooks.findOneByOrFail({ id })).toMatchObject({ chatGeneration: null, chatTokenId: null });
+				expect(await webhooks.findOneByOrFail({ id })).toMatchObject({ chatTokenId: null });
 			}
 			await tokens.delete(oldGrant.id);
 			expect(await settings()).toEqual(before); // historical grants cannot revoke grandfathered hooks
-			await webhooks.update(active.id, { chatTokenId: newGrant.id, chatGeneration: randomUUID() });
+			await webhooks.update(active.id, { chatTokenId: newGrant.id });
 			await tokens.delete(newGrant.id);
 			expect(await webhooks.findOneBy({ id: active.id })).toBeNull(); // newly bound grants still cascade
 			expect(await settings()).toEqual(before.filter((row: { id: string }) => row.id !== active.id));

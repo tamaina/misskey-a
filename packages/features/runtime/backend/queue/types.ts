@@ -130,7 +130,6 @@ export type SystemWebhookDeliverJobData<T extends SystemWebhookEventType = Syste
 
 export type LegacyUserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEventTypes> = {
 	mode?: 'legacy';
-	chatGeneration?: string;
 	type: T;
 	content: UserWebhookPayload<T>;
 	webhookId: MiWebhook['id'];
