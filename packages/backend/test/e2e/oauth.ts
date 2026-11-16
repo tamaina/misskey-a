@@ -22,7 +22,7 @@ import {
 import pkceChallenge from 'pkce-challenge';
 import * as htmlParser from 'node-html-parser';
 import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
-import { api, port, sendEnvUpdateRequest, signup } from '../utils.js';
+import { api, confirmSessionSudo, origin as serverOrigin, port, sendEnvUpdateRequest, signup } from '../utils.js';
 import type * as misskey from 'misskey-js';
 
 const host = `http://127.0.0.1:${port}`;
@@ -84,7 +84,8 @@ function getMeta(html: string): { transactionId: string | undefined, clientName:
 	};
 }
 
-function fetchDecision(transactionId: string, user: misskey.entities.SignupResponse, { cancel, selectedScope }: { cancel?: boolean; selectedScope?: string } = {}): Promise<Response> {
+async function fetchDecision(transactionId: string, user: misskey.entities.SignupResponse, { cancel, selectedScope }: { cancel?: boolean; selectedScope?: string } = {}): Promise<Response> {
+	if (!cancel) await confirmSessionSudo(user);
 	return fetch(new URL('/oauth/decision', host), {
 		method: 'post',
 		body: new URLSearchParams({
@@ -96,6 +97,7 @@ function fetchDecision(transactionId: string, user: misskey.entities.SignupRespo
 		redirect: 'manual',
 		headers: {
 			'content-type': 'application/x-www-form-urlencoded',
+			origin: serverOrigin,
 		},
 	});
 }
@@ -777,6 +779,7 @@ describe('OAuth', () => {
 				redirect: 'manual',
 				headers: {
 					'content-type': 'application/x-www-form-urlencoded',
+					origin: serverOrigin,
 				},
 			});
 			await assertDirectError(decisionResponse, 400, 'invalid_request');
@@ -791,6 +794,7 @@ describe('OAuth', () => {
 				redirect: 'manual',
 				headers: {
 					'content-type': 'application/x-www-form-urlencoded',
+					origin: serverOrigin,
 				},
 			});
 			await assertDirectError(decisionResponse, 400, 'invalid_request');
@@ -806,6 +810,7 @@ describe('OAuth', () => {
 				redirect: 'manual',
 				headers: {
 					'content-type': 'application/x-www-form-urlencoded',
+					origin: serverOrigin,
 				},
 			});
 			await assertDirectError(decisionResponse, 403, 'access_denied');

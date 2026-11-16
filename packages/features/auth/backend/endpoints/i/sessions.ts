@@ -9,18 +9,34 @@ import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { BrowserSessionService } from '../../services/BrowserSessionService.js';
-import { ISessionsContract, ISessionsRevokeContract, ISignoutContract } from '../../api.definition.js';
+import type { UserIpsRepository } from '@features/persistence/backend/repositories/models.js';
+import { ISessionIpsContract, ISessionsContract, ISessionsRevokeContract, ISignoutContract } from '../../api.definition.js';
 
 export interface BrowserSessionDependencies {
 	browserSessionService: Pick<BrowserSessionService, 'listOwned' | 'revokeOwned'>;
 	globalEventService: Pick<GlobalEventService, 'publishInternalEvent'>;
 }
 
+export interface SessionIpsDependencies {
+	userIpsRepository: UserIpsRepository;
+}
+
+export function createISessionIpsProcedure(deps: SessionIpsDependencies) {
+	return createApiProcedure<MiLocalUser>()(ISessionIpsContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const rows = await deps.userIpsRepository.find({
+			where: { userId: context.principal.id, browserSessionId: input.sessionId },
+			order: { id: 'DESC' }, take: input.limit, skip: input.offset,
+		});
+		return rows.map(row => ({ id: String(row.id), ip: row.ip, createdAt: row.createdAt.toISOString(), lastSeenAt: row.lastSeenAt.toISOString() }));
+	});
+}
+
 export function createISessionsProcedure(deps: BrowserSessionDependencies) {
 	return createApiProcedure<MiLocalUser>()(ISessionsContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
-		const sessions = await deps.browserSessionService.listOwned(context.principal.id, input.limit, input.offset);
+		const sessions = await deps.browserSessionService.listOwned(context.principal.id, input.limit, input.offset, undefined, input.unlinkedOnly);
 		return sessions.map(session => ({
 			id: session.id, createdAt: session.createdAt.toISOString(), lastUsedAt: session.lastUsedAt.toISOString(),
+			lastIp: session.lastIp ?? null, lastUserAgent: session.lastUserAgent ?? null,
 			revokedAt: session.revokedAt?.toISOString() ?? null, current: session.id === context.browserSession?.id,
 		}));
 	});

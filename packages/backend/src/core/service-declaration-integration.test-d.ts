@@ -158,7 +158,7 @@ service(WebAuthnService, [ports.config, ports.meta, ports.redisClient, ports.use
 // @ts-expect-error Config cannot replace the Redis constructor input.
 service(UserAuthService, [ports.config, ports.usersRepository, ports.userProfilesRepository]);
 // @ts-expect-error Redis is a required borrowed input, never created by the feature factory.
-authSecurityServices.create({ browserSessionsRepository: security.browserSessionsRepository, idService: security.idService, config: security.config, meta: security.meta, usersRepository: security.usersRepository, userProfilesRepository: security.userProfilesRepository, userSecurityKeysRepository: security.userSecurityKeysRepository });
+authSecurityServices.create({ db: security.db, browserSessionsRepository: security.browserSessionsRepository, idService: security.idService, config: security.config, meta: security.meta, usersRepository: security.usersRepository, userProfilesRepository: security.userProfilesRepository, userSecurityKeysRepository: security.userSecurityKeysRepository });
 
 // Ranking keeps the former constructor types and excludes its local Featured edge from inputs.
 type RankingArgs = ConstructorParameters<typeof import('@features/discovery/backend/services/HashtagService.js').HashtagService>;

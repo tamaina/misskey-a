@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { defineAsyncComponent, ref } from 'vue';
+import { defineAsyncComponent, nextTick, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { clearSharedFiles } from '@@/js/shared-files.js';
 import { apiUrl, host } from '@features/boot/frontend/shared/config.js';
@@ -18,6 +18,8 @@ import { store } from '@features/preferences/frontend/store.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { get } from '@features/runtime/frontend/utility/idb-proxy.js';
 import { signout } from '@features/auth/frontend/signout.js';
+import { reconnectStream } from '@features/api/frontend/stream.js';
+import { adoptLiveToken, resetLiveTokens } from './utility/live-account.js';
 
 type AccountWithToken = Misskey.entities.MeDetailed & { token: string };
 
@@ -104,7 +106,7 @@ export async function removeAccount(host: string, id: AccountWithToken['id']) {
 
 const isCredentialRejected = Symbol('isCredentialRejected');
 
-function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Promise<Misskey.entities.MeDetailed> {
+function fetchAccount(token: string, id?: string, forceShowDialog?: boolean, beforeError?: () => void | Promise<void>): Promise<Misskey.entities.MeDetailed> {
 	return new Promise((done, fail) => {
 		window.fetch(`${apiUrl}/i`, {
 			method: 'POST',
@@ -131,6 +133,7 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 			}))
 			.then(async res => {
 				if ('error' in res) {
+					await beforeError?.();
 					let credentialRejected = true;
 					if (res.error.id === 'a8c724b3-6e9c-4b46-b1a8-bc3ed6258370') {
 						// SUSPENDED
@@ -151,11 +154,7 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 						// AUTHENTICATION_FAILED
 						// トークンが無効化されていたりアカウントが削除されたりしている
 						if (forceShowDialog || $i && (token === $i.token || id === $i.id)) {
-							await alert({
-								type: 'error',
-								title: FeatureLocaleMessages.$locale.tokenRevoked,
-								text: FeatureLocaleMessages.$locale.tokenRevokedDescription,
-							});
+							await showInvalidLoginNotice();
 						}
 					} else {
 						credentialRejected = false;
@@ -199,16 +198,41 @@ async function persistCurrentAccountInfo() {
 export function updateCurrentAccount(accountData: Misskey.entities.MeDetailed) {
 	if (!$i) return;
 	const token = $i.token;
+	const id = $i.id;
+	// Keep identity fields intact for the whole refresh so sync watchers do not see a missing actor.
 	for (const key of Object.keys($i)) {
-		Reflect.deleteProperty($i, key);
+		if (key === 'id' || key === 'token') continue;
+		if (!(key in accountData)) Reflect.deleteProperty($i, key);
 	}
 	for (const [key, value] of Object.entries(accountData)) {
+		if (key === 'id' || key === 'token') continue;
 		Reflect.set($i, key, value);
 	}
+	$i.id = id;
 	$i.token = token;
 	const persisted = persistCurrentAccountInfo();
 	miLocalStorage.setItem('account', JSON.stringify($i));
 	return persisted;
+}
+
+/** Swap a native credential for a newly issued browser session without leaving the account. */
+export async function adoptBrowserSession(token: string, expectedToken: string): Promise<boolean> {
+	if (!$i || $i.token !== expectedToken || !/^bs_[A-Za-z0-9_-]{43}$/.test(token)) return false;
+	if ($i.token === token) return true;
+	const previous = $i.token;
+	adoptLiveToken($i.id, previous, token);
+	$i.token = token;
+	persistCurrentAccountInfo();
+	miLocalStorage.setItem('account', JSON.stringify($i));
+	const currentAccount = getCurrentAccountInfo();
+	if (currentAccount) await addAccount(host, currentAccount, token);
+	reconnectStream();
+	return true;
+}
+
+/** Drop only the live credential after a password or token change; keep other saved accounts. */
+export function leaveCurrentAccountAfterCredentialChange() {
+	return removeRejectedCurrentAccount();
 }
 
 export function updateCurrentAccountPartial(accountData: Partial<Misskey.entities.MeDetailed>) {
@@ -222,7 +246,31 @@ export function updateCurrentAccountPartial(accountData: Partial<Misskey.entitie
 	miLocalStorage.setItem('account', JSON.stringify($i));
 }
 
-export async function refreshCurrentAccount() {
+let invalidLoginNotice: Promise<void> | undefined;
+let rejectedAccountCleanup: Promise<void> | undefined;
+
+function showInvalidLoginNotice() {
+	return invalidLoginNotice ??= alert({
+		type: 'error',
+		title: FeatureLocaleMessages.$locale.tokenRevoked,
+		text: FeatureLocaleMessages.$locale.tokenRevokedDescription,
+	}).finally(() => { invalidLoginNotice = undefined; });
+}
+
+/** i/signout already confirmed invalid credentials; another network request is unnecessary. */
+export async function rejectCurrentAccount() {
+	await showInvalidLoginNotice();
+	await removeRejectedCurrentAccount();
+}
+
+let currentAccountRefresh: Promise<void> | undefined;
+
+export function refreshCurrentAccount() {
+	if (rejectedAccountCleanup) return rejectedAccountCleanup;
+	return currentAccountRefresh ??= refreshAccount().finally(() => { currentAccountRefresh = undefined; });
+}
+
+async function refreshAccount() {
 	if (!$i) return;
 	const me = $i;
 	return fetchAccount($i.token, $i.id).then(async account => {
@@ -233,17 +281,35 @@ export async function refreshCurrentAccount() {
 		if (currentAccount) await addAccount(host, currentAccount, me.token);
 	}).catch(async reason => {
 		if (reason === isCredentialRejected) {
-			rejectedCredentials.set(host + '/' + me.id, me.token);
-			// Load alternatives before removal so an IDB fallback cannot restore the rejected account.
-			await loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));
-			await removeAccount(host, me.id);
-			if (Object.keys(store.s.accountTokens).length > 0) {
-				await login(Object.values(store.s.accountTokens)[0]);
-			} else {
-				await signout('server-rejected-credential');
-			}
+			await removeRejectedCurrentAccount();
 		}
 	});
+}
+
+/** Shared cleanup after a precise rejection of the live credential. Never clear other accounts. */
+function removeRejectedCurrentAccount() {
+	return rejectedAccountCleanup ??= cleanRejectedCurrentAccount().finally(() => { rejectedAccountCleanup = undefined; });
+}
+
+async function cleanRejectedCurrentAccount() {
+	if (!$i) return;
+	const me = $i;
+	rejectedCredentials.set(host + '/' + me.id, me.token);
+	await loadAccountCredentials(prefer.s.accounts.map(([host, user]) => host + '/' + user.id));
+	await removeAccount(host, me.id);
+	window.document.cookie = 'token=; Path=/; Max-Age=0; SameSite=Lax';
+	const alternative = Object.entries(store.s.accountTokens).find(([key]) => key.startsWith(host + '/'));
+	if (alternative) {
+		try { await login(alternative[1]); return; } catch { /* Keep saved alternatives available on the login screen. */ }
+	}
+	if (prefer.s.accounts.length === 0 && Object.keys(store.s.accountTokens).length === 0) {
+		await signout('server-rejected-credential');
+	} else {
+		await clearSharedFiles();
+		miLocalStorage.removeItem('account');
+		window.document.cookie = 'token=; Path=/; Max-Age=0; SameSite=Lax';
+		unisonReload('/');
+	}
 }
 
 export async function login(token: AccountWithToken['token'], redirect?: string) {
@@ -255,7 +321,7 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 		closed: () => dispose(),
 	});
 
-	const me = await fetchAccount(token, undefined, true).catch(reason => {
+	const me = await fetchAccount(token, undefined, true, async () => { showing.value = false; dispose(); await nextTick(); }).catch(reason => {
 		showing.value = false;
 		throw reason;
 	});
@@ -273,6 +339,7 @@ export async function login(token: AccountWithToken['token'], redirect?: string)
 		await addAccount(host, currentAccount, $i.token);
 	}
 
+	resetLiveTokens(me.id, token);
 	miLocalStorage.setItem('account', JSON.stringify({
 		...me,
 		token,
@@ -295,18 +362,29 @@ export async function switchAccount(host: string, id: string) {
 	const { tokens } = await loadAccountCredentials([host + '/' + id]);
 	const token = tokens[host + '/' + id];
 	if (token) {
-		await login(token);
-	} else {
-		const { dispose } = popup(defineAsyncComponent(() => import('@features/auth/frontend/components/MkSigninDialog.vue')), {}, {
-			done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
-				await store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
-				await login(res.i);
-			},
-			closed: () => {
-				dispose();
-			},
-		});
+		try { await login(token); return; } catch (reason) {
+			if (reason !== isCredentialRejected) throw reason;
+			// The rejected saved credential says nothing about the live session.
+			const key = host + '/' + id;
+			rejectedCredentials.set(key, token);
+			if (store.s.accountTokens[key] === token) {
+				const tokens = { ...store.s.accountTokens };
+				const infos = { ...store.s.accountInfos };
+				delete tokens[key]; delete infos[key];
+				await store.set('accountTokens', tokens);
+				await store.set('accountInfos', infos);
+			}
+		}
 	}
+	const { dispose } = popup(defineAsyncComponent(() => import('@features/auth/frontend/components/MkSigninDialog.vue')), {}, {
+		done: async (res: Misskey.entities.SigninFlowResponse & { finished: true }) => {
+			await store.set('accountTokens', { ...store.s.accountTokens, [host + '/' + res.id]: res.i });
+			await login(res.i);
+		},
+		closed: () => {
+			dispose();
+		},
+	});
 }
 
 export async function getAccountMenu(opts: {
