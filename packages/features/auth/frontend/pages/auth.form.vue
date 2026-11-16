@@ -12,21 +12,26 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</ul>
 	</div>
 	<div>{{ interpolateLocaleParameters($locale.sfc.authShareAccess, { name: `${name} (${app.id})` }) }}</div>
+	<p v-if="failed" role="alert">{{ $locale.sfc.issuanceFailed }}</p>
+	<MkTokenExpiry v-model="expiry" :disabled="busy"/>
 	<div :class="$style.buttons">
-		<MkButton inline @click="cancel">{{ globalLocale.env.cancel }}</MkButton>
-		<MkButton inline primary @click="accept">{{ globalLocale.env.accept }}</MkButton>
+		<MkButton inline :disabled="busy" @click="cancel">{{ globalLocale.env.cancel }}</MkButton>
+		<MkButton inline primary :disabled="busy" @click="accept">{{ globalLocale.env.accept }}</MkButton>
 	</div>
 </section>
 </template>
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
+import { ensureSudo } from '../utility/ensure-sudo.js';
+import { selectedCredentialExpiry, useCredentialOperation } from '../utility/use-credential-operation.js';
+import MkTokenExpiry from '../components/MkTokenExpiry.vue';
 import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
@@ -39,6 +44,9 @@ const emit = defineEmits<{
 	(event: 'accepted'): void;
 	(event: 'denied'): void;
 }>();
+
+const expiry = ref<string | null>(null); const failed = ref(false);
+const { run, busy } = useCredentialOperation(() => { expiry.value = null; failed.value = false; });
 
 const app = computed(() => props.session.app);
 
@@ -62,11 +70,17 @@ function cancel() {
 	emit('denied');
 }
 
-function accept() {
-	misskeyApi('auth/accept', {
-		token: props.session.token,
-	}).then(() => {
-		emit('accepted');
+async function accept() {
+	const target = props.session.token; const targetExpiry = expiry.value;
+	await run(async (current, signal) => {
+		const owns = () => current() && props.session.token === target;
+		failed.value = false;
+		try {
+		const expiresAt = selectedCredentialExpiry(targetExpiry);
+		if (!await ensureSudo(owns, signal) || !owns()) return;
+		await misskeyApi('auth/accept', { token: target, ...(expiresAt ? { expiresAt } : {}) });
+		if (owns()) emit('accepted');
+		} catch { if (owns()) failed.value = true; }
 	});
 }
 </script>
@@ -153,7 +167,8 @@ function accept() {
 <locale lang="json" locale="ja-JP">
 {
 	"authPermission": "{name}は次の権限を要求しています",
-	"authShareAccess": "「{name}」がアカウントにアクセスすることを許可しますか？"
+	"authShareAccess": "「{name}」がアカウントにアクセスすることを許可しますか？",
+	"issuanceFailed": "承認できませんでした。対象アカウント・再認証・有効期限を確認してやり直してください。"
 }
 </locale>
 

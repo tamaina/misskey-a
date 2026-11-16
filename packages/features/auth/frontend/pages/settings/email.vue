@@ -13,11 +13,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<SearchMarker :keywords="['email', 'address']">
 					<FormSection first>
 						<template #label><SearchLabel>{{ $locale.sfc.emailAddress }}</SearchLabel></template>
-						<MkInput v-model="emailAddress" type="email" manualSave>
+						<MkInput v-model="emailAddress" type="email" :disabled="savingEmail">
 							<template #prefix><i class="ti ti-mail"></i></template>
 							<template v-if="$i.email && !$i.emailVerified" #caption>{{ $locale.sfc.verificationEmailSent }}</template>
 							<template v-else-if="emailAddress === $i.email && $i.emailVerified" #caption><i class="ti ti-check" style="color: var(--MI_THEME-success);"></i> {{ $locale.sfc.emailVerified }}</template>
 						</MkInput>
+						<MkButton primary :disabled="savingEmail" @click="saveEmailAddress()">{{ $locale.sfc.saveEmail }}</MkButton>
 					</FormSection>
 				</SearchMarker>
 
@@ -59,7 +60,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch, computed } from 'vue';
+import { onActivated, onDeactivated, onUnmounted, ref, watch, computed } from 'vue';
+import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -67,7 +69,9 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkDisableSection from '@features/ui/frontend/components/MkDisableSection.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
+import { isSameLiveCredential } from '@features/auth/frontend/utility/live-account.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { instance } from '@features/instance/frontend/instance.js';
 
@@ -81,15 +85,30 @@ function onChangeReceiveAnnouncementEmail(v: boolean) {
 	});
 }
 
-async function saveEmailAddress() {
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
+const ownerId = $i.id;
+const ownerToken = $i.token;
+const savingEmail = ref(false);
+let disposed = false;
+let ceremonyGeneration = 0;
+let sudoAbort: AbortController | null = null;
+const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; sudoAbort?.abort(); sudoAbort = null; };
+onDeactivated(invalidateCeremony);
+onUnmounted(invalidateCeremony);
+onActivated(() => { disposed = false; });
+watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token)) invalidateCeremony(); }, { flush: 'sync' });
 
-	os.apiWithDialog('i/update-email', {
-		password: auth.result.password,
-		token: auth.result.token,
-		email: emailAddress.value,
-	});
+async function saveEmailAddress() {
+	if (savingEmail.value || disposed) return;
+	savingEmail.value = true;
+	const generation = ++ceremonyGeneration;
+	sudoAbort = new AbortController();
+	const isCurrent = () => !disposed && generation === ceremonyGeneration && isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token);
+	// Bind the visible input once. Neither later edits nor native UI can replace it.
+	const email = emailAddress.value === '' ? null : emailAddress.value;
+	try {
+		if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+		await os.apiWithDialog('i/security/email', { email });
+	} finally { savingEmail.value = false; }
 }
 
 const emailNotification_mention = ref($i.emailNotificationTypes.includes('mention'));
@@ -112,12 +131,6 @@ const saveNotificationSettings = () => {
 
 watch([emailNotification_mention, emailNotification_reply, emailNotification_quote, emailNotification_follow, emailNotification_receiveFollowRequest], () => {
 	saveNotificationSettings();
-});
-
-onMounted(() => {
-	watch(emailAddress, () => {
-		saveEmailAddress();
-	});
 });
 
 const headerActions = computed(() => []);
@@ -313,7 +326,10 @@ definePage(() => ({
 	"reply": "リプライ",
 	"quote": "引用",
 	"follow": "フォロー",
-	"receiveFollowRequest": "フォロー申請を受け取った"
+	"receiveFollowRequest": "フォロー申請を受け取った",
+	"saveEmail": "メールアドレスを保存",
+	"saveEmailWithPasskey": "パスキーでメールアドレスを保存",
+	"currentPasswordPrompt": "現在のパスワード"
 }
 </locale>
 

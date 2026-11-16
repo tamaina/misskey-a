@@ -7,76 +7,69 @@ SPDX-License-Identifier: AGPL-3.0-only
 <SearchMarker markerId="2fa" :keywords="['2fa']">
 	<FormSection :first="first">
 		<template #label><SearchLabel>{{ $locale.sfc['2fa'] }}</SearchLabel></template>
-
-		<div v-if="$i" class="_gaps_s">
-			<MkInfo v-if="$i.twoFactorEnabled && $i.twoFactorBackupCodesStock === 'partial'" warn>
-				{{ $locale.sfc['2faBackupCodeUsedWarning'] }}
-			</MkInfo>
-			<MkInfo v-if="$i.twoFactorEnabled && $i.twoFactorBackupCodesStock === 'none'" warn>
-				{{ $locale.sfc['2faBackupCodesExhaustedWarning'] }}
-			</MkInfo>
-
-			<SearchMarker :keywords="['totp', 'app']">
-				<MkFolder :defaultOpen="true">
-					<template #icon><i class="ti ti-shield-lock"></i></template>
-					<template #label><SearchLabel>{{ $locale.sfc.totp }}</SearchLabel></template>
-					<template #caption><SearchText>{{ $locale.sfc.totpDescription }}</SearchText></template>
-					<template #suffix><i v-if="$i.twoFactorEnabled" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
-
-					<div v-if="$i.twoFactorEnabled" class="_gaps_s">
-						<div>{{ $locale.sfc['2faAlreadyRegistered'] }}</div>
-						<template v-if="$i.securityKeysList!.length > 0">
-							<MkButton @click="renewTOTP">{{ $locale.sfc['2faRenewTOTP'] }}</MkButton>
-							<MkInfo>{{ $locale.sfc['2faWhyTOTPOnlyRenew'] }}</MkInfo>
-						</template>
-						<MkButton v-else danger @click="unregisterTOTP">{{ $locale.sfc.unregister }}</MkButton>
-					</div>
-
-					<div v-else-if="!$i.twoFactorEnabled" class="_gaps_s">
-						<MkButton primary gradate @click="registerTOTP">{{ $locale.sfc['2faRegisterTOTP'] }}</MkButton>
-						<MkLink url="https://misskey-hub.net/docs/for-users/stepped-guides/how-to-enable-2fa/" target="_blank"><i class="ti ti-help-circle"></i> {{ globalLocale.env.learnMore }}</MkLink>
-					</div>
-				</MkFolder>
-			</SearchMarker>
-
-			<SearchMarker :keywords="['security', 'key', 'passkey']">
-				<MkFolder>
-					<template #icon><i class="ti ti-key"></i></template>
-					<template #label><SearchLabel>{{ $locale.sfc.securityKeyAndPasskey }}</SearchLabel></template>
-					<div class="_gaps_s">
-						<MkInfo>
-							{{ $locale.sfc['2faSecurityKeyInfo'] }}
-						</MkInfo>
-
-						<MkInfo v-if="!browserSupportsWebAuthn()" warn>
-							{{ $locale.sfc['2faSecurityKeyNotSupported'] }}
-						</MkInfo>
-
-						<MkInfo v-else-if="browserSupportsWebAuthn() && !$i.twoFactorEnabled" warn>
-							{{ $locale.sfc['2faRegisterTOTPBeforeKey'] }}
-						</MkInfo>
-
-						<template v-else>
-							<MkButton primary @click="addSecurityKey">{{ $locale.sfc['2faRegisterSecurityKey'] }}</MkButton>
-							<MkFolder v-for="key in $i.securityKeysList!" :key="key.id">
+		<div class="_gaps_s">
+			<p v-if="!state">{{ $locale.sfc.loading }}</p>
+			<template v-else>
+				<MkInfo v-if="(state.totpEnabled || state.passkeyMfaEnabled) && state.recoveryCodesRemaining < 5" warn>
+					{{ state.recoveryCodesRemaining === 0 ? $locale.sfc['2faBackupCodesExhaustedWarning'] : $locale.sfc['2faBackupCodeUsedWarning'] }}
+				</MkInfo>
+				<SearchMarker :keywords="['totp', 'app']">
+					<MkFolder :defaultOpen="true">
+						<template #icon><i class="ti ti-shield-lock"></i></template>
+						<template #label><SearchLabel>{{ $locale.sfc.totp }}</SearchLabel></template>
+						<template #caption><SearchText>{{ $locale.sfc.totpDescription }}</SearchText></template>
+						<template #suffix><i v-if="state.totpEnabled" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
+						<div v-if="state.totpEnabled" class="_gaps_s">
+							<div>{{ $locale.sfc['2faAlreadyRegistered'] }}</div>
+							<MkButton :disabled="busy" @click="prepareTotp">{{ $locale.sfc['2faRenewTOTP'] }}</MkButton>
+							<MkButton danger :disabled="busy" @click="removeTotp">{{ $locale.sfc.unregister }}</MkButton>
+						</div>
+						<div v-else class="_gaps_s">
+							<MkButton primary gradate :disabled="busy" @click="prepareTotp">{{ $locale.sfc['2faRegisterTOTP'] }}</MkButton>
+							<MkLink url="https://misskey-hub.net/docs/for-users/stepped-guides/how-to-enable-2fa/" target="_blank"><i class="ti ti-help-circle"></i> {{ globalLocale.env.learnMore }}</MkLink>
+						</div>
+					</MkFolder>
+				</SearchMarker>
+				<SearchMarker :keywords="['security', 'key', 'passkey']">
+					<MkFolder @opened="loadKeys">
+						<template #icon><i class="ti ti-key"></i></template>
+						<template #label><SearchLabel>{{ $locale.sfc.securityKeyAndPasskey }}</SearchLabel></template>
+						<div class="_gaps_s">
+							<MkInfo>{{ $locale.sfc['2faSecurityKeyInfo'] }}</MkInfo>
+							<MkInfo v-if="!supportsPasskey" warn>{{ $locale.sfc['2faSecurityKeyNotSupported'] }}</MkInfo>
+							<MkButton primary :disabled="busy || !supportsPasskey" @click="registerKey">{{ $locale.sfc['2faRegisterSecurityKey'] }}</MkButton>
+							<MkFolder v-for="key in keys" :key="key.id">
 								<template #label>{{ key.name }}</template>
-								<template #suffix><I18n :src="$locale.sfc.lastUsedAt"><template #t><MkTime :time="key.lastUsed"/></template></I18n></template>
+								<template #suffix><I18n :src="$locale.sfc.lastUsedAt"><template #t><MkTime :time="key.lastUsedAt"/></template></I18n></template>
 								<div class="_buttons">
-									<MkButton @click="renameKey(key)"><i class="ti ti-forms"></i> {{ globalLocale.env.rename }}</MkButton>
-									<MkButton danger @click="unregisterKey(key)"><i class="ti ti-trash"></i> {{ $locale.sfc.unregister }}</MkButton>
+									<MkButton :disabled="busy" @click="renameKey(key)"><i class="ti ti-forms"></i> {{ globalLocale.env.rename }}</MkButton>
+									<MkButton danger :disabled="busy" @click="removeKey(key)"><i class="ti ti-trash"></i> {{ $locale.sfc.unregister }}</MkButton>
 								</div>
 							</MkFolder>
-						</template>
+							<MkInfo>{{ $locale.sfc.passkeyPolicy }}</MkInfo>
+							<div>{{ state.passkeyMfaEnabled ? $locale.sfc.mfaActive : $locale.sfc.mfaInactive }}</div>
+							<MkButton v-if="!state.passkeyMfaEnabled && state.passkeyCount > 0" :disabled="busy" @click="enableMfa">{{ $locale.sfc.enableMfa }}</MkButton>
+							<MkButton v-if="state.passkeyMfaEnabled" danger :disabled="busy" @click="disableMfa">{{ $locale.sfc.disableMfa }}</MkButton>
+						</div>
+					</MkFolder>
+				</SearchMarker>
+				<SearchMarker :keywords="['password', 'less', 'key', 'passkey', 'login', 'signin']">
+					<MkSwitch :modelValue="state.passwordlessEnabled" :disabled="busy || state.passkeyCount === 0 || state.passwordLoginDisabled" @update:modelValue="setPasswordless">
+						<template #label><SearchLabel>{{ $locale.sfc.passwordLessLogin }}</SearchLabel></template>
+						<template #caption><SearchText>{{ $locale.sfc.passwordLessLoginDescription }}</SearchText></template>
+					</MkSwitch>
+				</SearchMarker>
+				<MkButton v-if="state.totpEnabled || state.passkeyMfaEnabled" :disabled="busy" @click="regenerateCodes">{{ $locale.sfc.regenerateCodes }}</MkButton>
+				<MkFolder>
+					<template #label>{{ $locale.sfc.password }}</template>
+					<div class="_gaps_s">
+						<MkInfo>{{ $locale.sfc.disablePasswordDescription }}</MkInfo>
+						<MkButton v-if="!state.passwordLoginDisabled" danger :disabled="busy || !supportsPasskey || !state.passwordlessEnabled || !state.hasVerifiedRecoveryEmail" @click="disablePassword">{{ $locale.sfc.disablePassword }}</MkButton>
+						<MkInfo v-else warn>{{ $locale.sfc.passwordDisabled }}</MkInfo>
 					</div>
 				</MkFolder>
-			</SearchMarker>
-
-			<SearchMarker :keywords="['password', 'less', 'key', 'passkey', 'login', 'signin']">
-				<MkSwitch :disabled="!$i.twoFactorEnabled || $i.securityKeysList!.length === 0" :modelValue="usePasswordLessLogin" @update:modelValue="v => updatePasswordLessLogin(v)">
-					<template #label><SearchLabel>{{ $locale.sfc.passwordLessLogin }}</SearchLabel></template>
-					<template #caption><SearchText>{{ $locale.sfc.passwordLessLoginDescription }}</SearchText></template>
-				</MkSwitch>
-			</SearchMarker>
+			</template>
+			<p v-if="error" role="alert">{{ $locale.sfc.failed }}</p>
 		</div>
 	</FormSection>
 </SearchMarker>
@@ -84,160 +77,212 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import { computed } from 'vue';
-import { browserSupportsWebAuthn, startRegistration } from '@simplewebauthn/browser';
-import * as Misskey from 'misskey-js';
+import type { Locale } from 'i18n';
+import { onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
+import { browserSupportsWebAuthn, startAuthentication, startRegistration, WebAuthnAbortService } from '@simplewebauthn/browser';
+import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
+import MkRecoveryCodesDialog from '../../components/MkRecoveryCodesDialog.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import MkLink from '@features/navigation/frontend/components/MkLink.vue';
+import XQrDialog from './2fa.qrdialog.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
-import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
-import MkLink from '@features/navigation/frontend/components/MkLink.vue';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import * as os from '@features/ui/frontend/os.js';
-import { ensureSignin } from '@features/auth/frontend/i.js';
-import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
-import { updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';
-import type { Locale } from 'i18n';
+import { ensureSignin } from '../../i.js';
+import { registrationWire } from '../../utility/registration-wire.js';
+import { ensureSudo } from '../../utility/ensure-sudo.js';
+import { ownedInputText } from '../../utility/owned-dialog.js';
+import { isSameLiveCredential } from '../../utility/live-account.js';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
-const $i = ensureSignin();
+withDefaults(defineProps<{ first?: boolean }>(), { first: false });
 
-// メモ: 各エンドポイントはmeUpdatedを発行するため、refreshAccountは不要
+const owner = ensureSignin();
+const ownerId = owner.id;
+const ownerToken = owner.token;
+const supportsPasskey = browserSupportsWebAuthn();
+const state = ref<Awaited<ReturnType<typeof readState>> | null>(null);
+const keys = ref<{ id: string; name: string; lastUsedAt: string }[]>([]);
+let totpDialog: { dispose: () => void } | null = null;
+let codesDialog: { dispose: () => void } | null = null;
+const busy = ref(false);
+const error = ref(false);
+let generation = 0;
+let active = true;
+let nativePending = false;
+let sudoAbort: AbortController | null = null;
+const currentActor = () => active && isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token);
+const readState = () => misskeyApi('i/security/state', {});
 
-withDefaults(defineProps<{
-	first?: boolean;
-}>(), {
-	first: false,
-});
+function clearPending() {
+	totpDialog?.dispose(); totpDialog = null; codesDialog?.dispose(); codesDialog = null;
+}
 
-const usePasswordLessLogin = computed(() => $i.usePasswordLessLogin ?? false);
+function leave() {
+	active = false; generation++; sudoAbort?.abort(); sudoAbort = null; clearPending(); keys.value = [];
+	if (nativePending) { WebAuthnAbortService.cancelCeremony(); nativePending = false; }
+}
 
-async function registerTOTP(): Promise<void> {
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
+async function refresh(isCurrent: () => boolean) {
+	const value = await readState();
+	if (isCurrent()) state.value = value;
+}
 
-	const twoFactorData = await os.apiWithDialog('i/2fa/totp/register', {
-		password: auth.result.password,
-		token: auth.result.token,
-	});
+async function run(action: (isCurrent: () => boolean, signal: AbortSignal) => Promise<void>, elevate = true, beforeSudo?: () => Promise<boolean>) {
+	if (!currentActor() || busy.value) return;
+	busy.value = true; error.value = false;
+	const turn = ++generation;
+	const controller = new AbortController(); sudoAbort = controller;
+	const isCurrent = () => currentActor() && generation === turn;
+	try {
+		if (beforeSudo && !await beforeSudo()) return;
+		if (!isCurrent()) return;
+		if (elevate && !await ensureSudo(isCurrent, controller.signal)) return;
+		if (isCurrent()) await action(isCurrent, controller.signal);
+	} catch { if (isCurrent()) error.value = true; } finally { controller.abort(); if (sudoAbort === controller) sudoAbort = null; busy.value = false; nativePending = false; }
+}
 
-	const { dispose } = await os.popupAsyncWithDialog(import('@features/auth/frontend/pages/settings/2fa.qrdialog.vue').then(x => x.default), {
-		twoFactorData,
-	}, {
-		closed: () => dispose(),
+function loadKeys() {
+	return run(async isCurrent => { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; }, false);
+}
+
+function registerKey() {
+	return run(async (isCurrent, signal) => {
+		const input = await ownedInputText({ title: $locale.value.sfc['2faRegisterSecurityKey'], text: $locale.value.sfc['2faSecurityKeyName'], minLength: 1, maxLength: 30 }, signal);
+		if (!isCurrent() || input.canceled || !input.result) return;
+		const started = await misskeyApi('i/security/passkey/register/start', { name: input.result });
+		if (!isCurrent()) return;
+		nativePending = true;
+		const credential = await startRegistration({ optionsJSON: started.options });
+		nativePending = false;
+		if (!isCurrent()) return;
+		const value = await misskeyApi('i/security/passkey/register/complete', { ticket: started.ticket, credential: registrationWire(credential) });
+		if (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); if (isCurrent()) { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; } }
 	});
 }
 
-async function unregisterTOTP(): Promise<void> {
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
+function renameKey(key: { id: string; name: string }) {
+	let name = '';
+	return run(async isCurrent => {
+		await misskeyApi('i/security/passkey/rename', { credentialId: key.id, name });
+		if (isCurrent()) keys.value = keys.value.map(value => value.id === key.id ? { ...value, name } : value);
+	}, true, async () => {
+		const input = await os.inputText({ title: globalLocale.value.env.rename, default: key.name, minLength: 1, maxLength: 30 });
+		if (input.canceled || !input.result) return false;
+		name = input.result;
+		return true;
+	});
+}
 
-	os.apiWithDialog('i/2fa/totp/remove', {
-		password: auth.result.password,
-		token: auth.result.token,
-	}).then(res => {
-		updateCurrentAccountPartial({
-			twoFactorEnabled: false,
+function removeKey(key: { id: string; name: string }) {
+	return run(async isCurrent => {
+		await misskeyApi('i/security/passkey/remove', { credentialId: key.id });
+		if (!isCurrent()) return;
+		// Inform a supporting authenticator only after committed removal of this owned key.
+		const signal = (globalThis.PublicKeyCredential as unknown as { signalUnknownCredential?: (options: { rpId: string; credentialId: string }) => Promise<void> })?.signalUnknownCredential;
+		if (signal) await signal.call(globalThis.PublicKeyCredential, { rpId: window.location.hostname, credentialId: key.id }).catch(() => {});
+		if (isCurrent()) { keys.value = keys.value.filter(value => value.id !== key.id); clearPending(); await refresh(isCurrent); }
+	}, true, async () => !(await os.confirm({ type: 'warning', title: key.name, text: $locale.value.sfc.removeKeyWarning })).canceled);
+}
+
+function enableMfa() {
+	return run(async isCurrent => {
+		const value = await misskeyApi('i/security/passkey/mfa/enable', { acknowledged: true });
+		if (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); }
+	}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.enableWarning })).canceled);
+}
+
+function disableMfa() {
+	return run(async isCurrent => {
+		await misskeyApi('i/security/passkey/mfa/disable', { acknowledged: true });
+		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
+	}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning })).canceled);
+}
+
+function setPasswordless(enabled: boolean) {
+	return run(async isCurrent => {
+		if (enabled) {
+			const pending = await misskeyApi('i/security/passkey/passwordless/start', {});
+			if (!isCurrent()) return;
+			nativePending = true;
+			const credential = await startAuthentication({ optionsJSON: pending.options });
+			nativePending = false;
+			if (!isCurrent()) return;
+			await misskeyApi('i/security/passkey/passwordless/complete', { ticket: pending.ticket, credential });
+		} else await misskeyApi('i/security/passkey/passwordless', { enabled: false });
+		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
+	}, !enabled || !ensureSignin().token.startsWith('bs_'));
+}
+
+function disablePassword() {
+	return run(async isCurrent => {
+		const pending = await misskeyApi('i/security/password-login/disable/start', {});
+		if (!isCurrent()) return;
+		nativePending = true;
+		const credential = await startAuthentication({ optionsJSON: pending.options });
+		nativePending = false;
+		if (!isCurrent()) return;
+		await misskeyApi('i/security/password-login/disable/complete', { ticket: pending.ticket, credential });
+		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
+	}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.disablePasswordWarning })).canceled);
+}
+
+function prepareTotp() {
+	return run(async isCurrent => {
+		clearPending();
+		const twoFactorData = await misskeyApi('i/security/totp/start', {});
+		if (!isCurrent()) return;
+		const dialog = os.popup(XQrDialog, { twoFactorData, complete: completeTotp, errorText: () => error.value ? $locale.value.sfc.failed : null }, {
+			cancel: () => { if (totpDialog === dialog) { generation++; sudoAbort?.abort(); } },
+			closed: () => { if (totpDialog === dialog) { generation++; sudoAbort?.abort(); totpDialog = null; } dialog.dispose(); },
 		});
-	}).catch(error => {
-		os.alert({
-			type: 'error',
-			text: error,
-		});
-	});
+		totpDialog = dialog;
+	}, true, state.value?.totpEnabled ? async () => !(await os.confirm({
+		type: 'question', title: $locale.value.sfc['2faRenewTOTP'], text: $locale.value.sfc.renewWarning,
+		okText: $locale.value.sfc['2faRenewTOTPOk'], cancelText: $locale.value.sfc['2faRenewTOTPCancel'],
+	})).canceled : undefined);
 }
 
-function renewTOTP(): void {
-	os.confirm({
-		type: 'question',
-		title: $locale.value.sfc['2faRenewTOTP'],
-		text: $locale.value.sfc['2faRenewTOTPConfirm'],
-		okText: $locale.value.sfc['2faRenewTOTPOk'],
-		cancelText: $locale.value.sfc['2faRenewTOTPCancel'],
-	}).then(({ canceled }) => {
-		if (canceled) return;
-		registerTOTP();
+async function completeTotp(token: string): Promise<string[] | null> {
+	let codes: string[] | null = null;
+	let stillCurrent = () => false;
+	await run(async isCurrent => {
+		const value = await misskeyApi('i/security/totp/complete', { token });
+		if (isCurrent()) { stillCurrent = isCurrent; codes = value.backupCodes; await refresh(isCurrent); }
 	});
+	return stillCurrent() ? codes : null;
 }
 
-async function unregisterKey(key: NonNullable<Misskey.entities.MeDetailedOnly['securityKeysList']>[number]) {
-	const confirm = await os.confirm({
-		type: 'question',
-		title: $locale.value.sfc['2faRemoveKey'],
-		text: interpolateLocaleParameters($locale.value.sfc['2faRemoveKeyConfirm'], { name: key.name }),
-	});
-	if (confirm.canceled) return;
-
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
-
-	await os.apiWithDialog('i/2fa/passkey/remove', {
-		password: auth.result.password,
-		token: auth.result.token,
-		credentialId: key.id,
-	});
-	os.success();
+function removeTotp() {
+	return run(async isCurrent => {
+		await misskeyApi('i/security/totp/remove', { confirmDisableMfa: true });
+		if (isCurrent()) { clearPending(); await refresh(isCurrent); }
+	}, true, async () => !(await os.confirm({ type: 'warning', text: state.value?.passkeyMfaEnabled ? $locale.value.sfc.removeTotpWarning : $locale.value.sfc.disableWarning })).canceled);
 }
 
-async function renameKey(key: NonNullable<Misskey.entities.MeDetailedOnly['securityKeysList']>[number]) {
-	const name = await os.inputText({
-		title: globalLocale.value.env.rename,
-		default: key.name,
-		type: 'text',
-		minLength: 1,
-		maxLength: 30,
-	});
-	if (name.canceled) return;
-
-	await os.apiWithDialog('i/2fa/passkey/update', {
-		name: name.result,
-		credentialId: key.id,
-	});
+function showCodes(codes: string[]) {
+	if (!codes.length) return;
+	codesDialog?.dispose();
+	const dialog = os.popup(MkRecoveryCodesDialog, { codes }, { closed: () => { dialog.dispose(); if (codesDialog === dialog) codesDialog = null; } });
+	codesDialog = dialog;
 }
 
-async function addSecurityKey() {
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
-
-	const registrationOptions = await os.apiWithDialog('i/2fa/passkey/register', {
-		password: auth.result.password,
-		token: auth.result.token,
-	});
-
-	const name = await os.inputText({
-		title: $locale.value.sfc['2faRegisterSecurityKey'],
-		text: $locale.value.sfc['2faSecurityKeyName'],
-		type: 'text',
-		minLength: 1,
-		maxLength: 30,
-	});
-	if (name.canceled) return;
-
-	const credential = await os.promiseDialog(
-		startRegistration({ optionsJSON: registrationOptions }),
-		null,
-		() => {}, // ユーザーのキャンセルはrejectなのでエラーダイアログを出さない
-		$locale.value.sfc['2faTapSecurityKey'],
-	);
-	if (!credential) return;
-
-	const auth2 = await os.authenticateDialog({ currentPassword: auth.result.password });
-	if (auth2.canceled) return;
-
-	await os.apiWithDialog('i/2fa/passkey/done', {
-		password: auth2.result.password,
-		token: auth2.result.token,
-		name: name.result,
-		credential: credential,
-	});
+function regenerateCodes() {
+	return run(async isCurrent => {
+		clearPending();
+		const value = await misskeyApi('i/security/recovery-codes', { regenerate: true });
+		if (isCurrent()) { showCodes(value.backupCodes); await refresh(isCurrent); }
+	}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.regenerateWarning })).canceled);
 }
 
-async function updatePasswordLessLogin(value: boolean) {
-	await os.apiWithDialog('i/2fa/passkey/password-less', {
-		value,
-	});
-}
+watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!currentActor()) leave(); }, { flush: 'sync' });
+onMounted(() => run(refresh, false));
+onActivated(() => { if (!active) { active = true; void run(refresh, false); } });
+onDeactivated(leave);
+onUnmounted(leave);
 </script>
 
 <locale lang="json" locale="ar-SA">
@@ -392,8 +437,8 @@ async function updatePasswordLessLogin(value: boolean) {
 
 <locale lang="json" locale="en-US">
 {
-	"2faBackupCodeUsedWarning": "A backup code has been used. Please reconfigure two-factor authentification as soon as possible if you are no longer able to use it.",
-	"2faBackupCodesExhaustedWarning": "All backup codes have been used. Should you lose access to your two-factor authentification app, you will be unable to access this account. Please reconfigure two-factor authentification.",
+	"2faBackupCodeUsedWarning": "A backup code has been used. Regenerate recovery codes if needed and store them somewhere safe.",
+	"2faBackupCodesExhaustedWarning": "All backup codes have been used. Regenerate recovery codes before you lose access to your authenticator app or security key / passkey.",
 	"totp": "Authenticator App",
 	"totpDescription": "Use an authenticator app to enter one-time passwords",
 	"2faAlreadyRegistered": "You have already registered a 2-factor authentication device.",
@@ -416,7 +461,26 @@ async function updatePasswordLessLogin(value: boolean) {
 	"2faRemoveKeyConfirm": "Really delete the {name} key?",
 	"2faSecurityKeyName": "Enter a key name",
 	"2faTapSecurityKey": "Please follow your browser to register the security or pass key",
-	"2fa": "Two-factor authentication"
+	"2fa": "Two-factor authentication",
+	"loading": "Loading settings…",
+	"mfaActive": "Passkey multi-factor authentication is enabled.",
+	"mfaInactive": "Passkey multi-factor authentication is disabled.",
+	"removeKeyWarning": "Remove this passkey? Disable passkey multi-factor authentication before removing the last key if no authenticator app is available. The last key cannot be removed while password login is disabled.",
+	"enableMfa": "Enable passkey multi-factor authentication",
+	"enableWarning": "Enable passkey multi-factor authentication? Password login will require an additional factor. If no recovery codes remain, new codes will be issued and shown once.",
+	"disableMfa": "Disable passkey multi-factor authentication",
+	"disableWarning": "Disable this authentication method? If no other multi-factor authentication method is enabled, you will be able to log in with only your password.",
+	"disablePassword": "Disable password login",
+	"disablePasswordDescription": "With passwordless login and a verified recovery email, confirm a passkey with device unlock to disable password login. Important actions will also use that passkey.",
+	"disablePasswordWarning": "Disable password login? If you lose your passkeys, you will need to reset your password using your verified email.",
+	"passwordDisabled": "Password login is disabled. Set a new password above to enable it again. The last passkey cannot be removed.",
+	"removeTotpWarning": "Remove the authenticator app? Passkey multi-factor authentication will remain enabled.",
+	"regenerateCodes": "Regenerate recovery codes",
+	"regenerateWarning": "Regenerating recovery codes invalidates the previous codes. Continue?",
+	"failed": "Could not complete the operation. Check your verification status and settings, then try again.",
+	"password": "Password",
+	"renewWarning": "Codes from the previous authenticator app will no longer work. Your backup codes will remain valid.",
+	"passkeyPolicy": "You can register a key without setting up an authenticator app first. Registration enables passkey multi-factor authentication. Disabling it retains your keys and allows you to enable it again."
 }
 </locale>
 
@@ -542,8 +606,8 @@ async function updatePasswordLessLogin(value: boolean) {
 
 <locale lang="json" locale="ja-JP">
 {
-	"2faBackupCodeUsedWarning": "バックアップコードが使用されました。認証アプリが使えなくなっている場合、なるべく早く認証アプリを再設定してください。",
-	"2faBackupCodesExhaustedWarning": "バックアップコードが全て使用されました。認証アプリを利用できない場合、これ以上アカウントにアクセスできなくなります。認証アプリを再登録してください。",
+	"2faBackupCodeUsedWarning": "バックアップコードが使用されました。必要に応じて復旧コードを再生成し、安全な場所に保管してください。",
+	"2faBackupCodesExhaustedWarning": "バックアップコードが全て使用されました。認証アプリやセキュリティキー・パスキーが使えなくなる前に、復旧コードを再生成してください。",
 	"totp": "認証アプリ",
 	"totpDescription": "認証アプリを使ってワンタイムパスワードを入力",
 	"2faAlreadyRegistered": "既に設定は完了しています。",
@@ -566,7 +630,26 @@ async function updatePasswordLessLogin(value: boolean) {
 	"2faRemoveKeyConfirm": "{name}を削除しますか？",
 	"2faSecurityKeyName": "キーの名前を入力",
 	"2faTapSecurityKey": "ブラウザの指示に従い、セキュリティキーやパスキーを登録してください",
-	"2fa": "二要素認証"
+	"2fa": "二要素認証",
+	"loading": "設定を読み込んでいます…",
+	"mfaActive": "パスキーによる多要素認証は有効です。",
+	"mfaInactive": "パスキーによる多要素認証は無効です。",
+	"removeKeyWarning": "このパスキーを削除しますか。パスキーによる多要素認証が有効で、他に使える認証アプリがない場合は、最後のパスキーを削除する前に「パスキーによる多要素認証を無効にする」ボタンで無効にしてください。パスワードログインが無効な場合は最後のパスキーを削除できません。",
+	"enableMfa": "パスキーによる多要素認証を有効にする",
+	"enableWarning": "パスキーによる多要素認証を有効にしますか。パスワードでのログインに追加の認証が必要になります。復旧コードが残っていない場合は、新しいコードを発行して一度だけ表示します。",
+	"disableMfa": "パスキーによる多要素認証を無効にする",
+	"disableWarning": "この認証方法を無効にしますか。他に多要素認証が有効でなければ、パスワードだけでログインできるようになります。",
+	"disablePassword": "パスワードによるログインを無効にする",
+	"disablePasswordDescription": "パスキー単独ログインと確認済みメールアドレスがある場合、端末ロック解除付きのパスキーで再確認してパスワードログインを無効にできます。重要な操作もそのパスキーで確認します。",
+	"disablePasswordWarning": "パスワードによるログインを無効にしますか。パスキーを失った場合は確認済みメールへのパスワード再設定が必要です。",
+	"passwordDisabled": "パスワードログインは無効です。有効に戻す場合は、上のパスワード変更から新しいパスワードを設定してください。最後のパスキーは削除できません。",
+	"removeTotpWarning": "認証アプリを削除しますか。パスキーによる多要素認証は引き続き有効です。",
+	"regenerateCodes": "復旧コードを再生成",
+	"regenerateWarning": "復旧コードを再生成すると、以前の復旧コードは使えなくなります。続けますか。",
+	"failed": "操作を完了できませんでした。本人確認の有効期限や設定を確認し、もう一度開始してください。",
+	"password": "パスワード",
+	"renewWarning": "今までの認証アプリの確認コードは使用できなくなります。バックアップコードは引き続き利用できます。",
+	"passkeyPolicy": "認証アプリを先に設定しなくても登録できます。登録するとパスキーによる多要素認証が有効になります。無効にしても登録したキーは残り、再び有効にできます。"
 }
 </locale>
 

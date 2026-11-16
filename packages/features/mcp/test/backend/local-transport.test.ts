@@ -169,3 +169,13 @@ it('keeps legacy progress-token metadata on the SDK1 tool-call path', async () =
 	expect(response.json().result.structuredContent).toEqual({ notes: (await f.ordinary({ userId: f.own.id })).json() });
 	expect(response.json().result).not.toHaveProperty('resultType');
 });
+
+it('legacy output rechecks expiry after native work without waiting for the idle timer', async () => {
+	const now = vi.spyOn(Date, 'now').mockReturnValue(1000);
+	try {
+		const { invoke, f, p } = await pilot(); f.grant.expiresAt = new Date(2000); f.grant.permission = ['access:mcp', 'read:account'];
+		f.deps.fanoutTimelineEndpointService.timeline.mockImplementation(async () => { now.mockReturnValue(2000); return []; });
+		const result = await invoke(message('tools/call', { name: 'list_my_notes', arguments: {} })).catch(error => error);
+		expect(result).toBeInstanceOf(Error); expect(p.activeRequests()).toBe(0);
+	} finally { now.mockRestore(); }
+});

@@ -6,7 +6,8 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { signout } from '@features/auth/frontend/signout.js';
 
-const m = vi.hoisted(() => ({ api: vi.fn(), backup: vi.fn(), files: vi.fn(), clear: vi.fn(), reload: vi.fn(), select: vi.fn(), waiting: vi.fn(), finish: vi.fn() }));
+const m = vi.hoisted(() => ({ api: vi.fn(), backup: vi.fn(), files: vi.fn(), clear: vi.fn(), reload: vi.fn(), select: vi.fn(), waiting: vi.fn(), finish: vi.fn(), refresh: vi.fn() }));
+vi.mock('@features/auth/frontend/accounts.js', () => ({ rejectCurrentAccount: m.refresh }));
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: m.api }));
 vi.mock('@features/boot/frontend/shared/config.js', () => ({ apiUrl: '/api' }));
 vi.mock('@@/js/shared-files.js', () => ({ clearSharedFiles: m.files }));
@@ -67,6 +68,15 @@ describe('server-first signout', () => {
 		expect(window.document.cookie).toContain('token=synthetic-current');
 		expect(m.reload).not.toHaveBeenCalled();
 		expect(m.finish.mock.invocationCallOrder[0]).toBeLessThan(m.select.mock.invocationCallOrder[0]);
+	});
+
+	test.each(['backup', 'signout'])('already-revoked %s uses account rejection cleanup without revokeFailed', async source => {
+		const error = { code: 'AUTHENTICATION_FAILED', id: 'b0a7f5f8-dc2f-4171-b91f-de88ad238e14' };
+		(source === 'backup' ? m.backup : m.api).mockRejectedValue(error);
+		await signout();
+		expect(m.refresh).toHaveBeenCalledOnce();
+		expect(m.select).not.toHaveBeenCalled();
+		expect(m.files).not.toHaveBeenCalled();
 	});
 
 	test('legacy login offers only explicit device cleanup, with no revocation claim', async () => {

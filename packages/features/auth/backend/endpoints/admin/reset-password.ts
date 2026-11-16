@@ -4,6 +4,8 @@
  */
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import { recoverPassword } from '../../password-recovery.js';
+import type { PasswordRecoveryDependencies } from '../../password-recovery.js';
 
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import type { UsersRepository, UserProfilesRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
@@ -32,7 +34,7 @@ export const meta = {
 		},
 	},
 } as const;
-export interface AdminResetPasswordDependencies {
+export interface AdminResetPasswordDependencies extends PasswordRecoveryDependencies {
 	serverSettings: MiMeta;
 	usersRepository: UsersRepository;
 	userProfilesRepository: UserProfilesRepository;
@@ -59,11 +61,7 @@ export function createAdminResetPasswordProcedure(deps: AdminResetPasswordDepend
 			// Generate hash of password
 			const hash = bcrypt.hashSync(passwd);
 
-			await deps.userProfilesRepository.update({
-				userId: user.id,
-			}, {
-				password: hash,
-			});
+			await recoverPassword(deps, user.id, hash);
 
 			deps.moderationLogService.log(me, 'resetPassword', {
 				userId: user.id,
