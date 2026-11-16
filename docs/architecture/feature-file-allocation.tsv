@@ -292,7 +292,7 @@ packages/frontend/src/pages/gallery/edit.root.vue	collections	packages/features/
 packages/frontend/src/pages/gallery/edit.vue	collections	packages/features/collections/frontend/pages/gallery/edit.vue	placed	Vue page; routes unchanged (/gallery/:postId/edit, /gallery/new). Gallery post/like surface.
 packages/frontend/src/pages/gallery/index.vue	collections	packages/features/collections/frontend/pages/gallery/index.vue	placed	Vue page; routes unchanged (/gallery). Gallery post/like surface.
 packages/frontend/src/pages/gallery/post.vue	collections	packages/features/collections/frontend/pages/gallery/post.vue	placed	Vue page; routes unchanged (/gallery/:postId). Gallery post/like surface.
-packages/frontend/src/pages/games.vue	games	packages/features/games/frontend/pages/games.vue	placed	Vue page; routes unchanged (/games). Game API/UI surface.
+packages/frontend/src/pages/games.vue	games	packages/features/games/index/frontend/pages/index.vue	placed	Vue page; routes unchanged (/games). Game API/UI surface.
 packages/frontend/src/pages/install-extensions.vue	integrations	packages/features/integrations/frontend/pages/install-extensions.vue	placed	Verified external extension installation and lifecycle.
 packages/frontend/src/pages/instance-info.vue	federation	packages/features/federation/frontend/pages/instance-info.vue	placed	Vue page; routes unchanged (/instance-info/:host). Remote-instance detail; federation owns remote instance discovery/protocol state.
 packages/frontend/src/pages/invite.vue	auth	packages/features/auth/frontend/pages/invite.vue	placed	Vue page; routes unchanged (/invite). Sign-in, signup, verification, OAuth/MiAuth or password lifecycle.

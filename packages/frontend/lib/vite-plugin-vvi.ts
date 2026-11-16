@@ -19,7 +19,7 @@ export function pluginVvi(options: { embed?: boolean; buildStrategy?: VueInterna
 
 		scan: options.embed
 			? { include: ['features/*/frontend/embed/**/*.vue'] }
-			: { include: ['features/*/frontend/**/*.vue'], exclude: ['features/*/frontend/embed/**'] },
+			: { include: ['features/*/frontend/**/*.vue', 'features/games/*/frontend/**/*.vue'], exclude: ['features/*/frontend/embed/**', 'features/games/*/frontend/embed/**', 'features/**/test/**'] },
 	});
 	const configure = plugin.configResolved;
 	if (typeof configure !== 'function') throw new Error('Unexpected VVI config hook; review the feature scan root on upgrade.');

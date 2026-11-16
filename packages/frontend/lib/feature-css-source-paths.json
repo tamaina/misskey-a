@@ -185,7 +185,7 @@
 	"../features/games/frontend/pages/clicker.vue": "src/pages/clicker.vue",
 	"../features/games/frontend/pages/drop-and-fusion.game.vue": "src/pages/drop-and-fusion.game.vue",
 	"../features/games/frontend/pages/drop-and-fusion.vue": "src/pages/drop-and-fusion.vue",
-	"../features/games/frontend/pages/games.vue": "src/pages/games.vue",
+	"../features/games/index/frontend/pages/index.vue": "src/pages/games.vue",
 	"../features/games/frontend/pages/reversi/game.board.vue": "src/pages/reversi/game.board.vue",
 	"../features/games/frontend/pages/reversi/game.setting.vue": "src/pages/reversi/game.setting.vue",
 	"../features/games/frontend/pages/reversi/game.vue": "src/pages/reversi/game.vue",

@@ -577,7 +577,7 @@ export const ROUTE_DEF = [{
 	loginRequired: true,
 }, {
 	path: '/games',
-	component: page(() => import('@features/games/frontend/pages/games.vue')),
+	component: page(() => import('@features/games/index/frontend/pages/index.vue')),
 	loginRequired: false,
 }, {
 	path: '/bubble-game',
