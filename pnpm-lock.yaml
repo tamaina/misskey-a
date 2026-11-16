@@ -628,6 +628,9 @@ importers:
       '@kitajs/ts-html-plugin':
         specifier: 4.1.4
         version: 4.1.4(@kitajs/html@4.2.13)(@typescript/typescript6@6.0.2)
+      '@kobalab/majiang-core':
+        specifier: 1.4.1
+        version: 1.4.1
       '@nestjs/testing':
         specifier: 12.4.2
         version: 12.4.2(@nestjs/common@12.4.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2))(@nestjs/core@12.4.2(@nestjs/common@12.4.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2))(reflect-metadata@0.2.2)(rxjs@7.8.2))
@@ -2412,6 +2415,9 @@ packages:
     peerDependencies:
       '@kitajs/html': ^4.2.10
       typescript: ^5.9.3
+
+  '@kobalab/majiang-core@1.4.1':
+    resolution: {integrity: sha512-60jLSDCpSEy6gZK+uBoH7JRc1epzJWSzfh94LiZllLmPW8UJ+f9A8m74c8d9mMv+LVbnxKkg8TC86sKNqaD6VQ==}
 
   '@kurkle/color@0.3.4':
     resolution: {integrity: sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w==}
@@ -10038,6 +10044,8 @@ snapshots:
       tslib: 2.8.1
       typescript: '@typescript/typescript6@6.0.2'
       yargs: 18.1.0
+
+  '@kobalab/majiang-core@1.4.1': {}
 
   '@kurkle/color@0.3.4': {}
 
