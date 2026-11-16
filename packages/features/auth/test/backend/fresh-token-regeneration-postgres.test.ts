@@ -66,6 +66,7 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh token regeneration with rea
 		await db.initialize();
 		const migrations = await db.runMigrations();
 		expect(migrations.map(migration => migration.name)).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort((a, b) => Number(a.slice(-13)) - Number(b.slice(-13))));
+		expect(await db.showMigrations()).toBe(false);
 		expect(migrations.map(migration => migration.name)).toEqual(expect.arrayContaining(['AutoArchiveAnnouncements1791943550568', 'PasskeyMfaPolicy1791969900000', 'AccessTokenExpiry1792300000004']));
 		redis = new Redis({ path: redisSocket });
 		sessions = new BrowserSessionService(db.getRepository(MiBrowserSession) as ConstructorParameters<typeof BrowserSessionService>[0], { gen: () => `freshtokensession${++nextSession}` });

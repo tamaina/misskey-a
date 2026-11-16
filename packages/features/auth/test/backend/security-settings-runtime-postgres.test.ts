@@ -83,6 +83,7 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		await db.initialize();
 		const applied = await db.runMigrations();
 		expect(applied.map(migration => migration.name)).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort((a, b) => Number(a.slice(-13)) - Number(b.slice(-13))));
+		expect(await db.showMigrations()).toBe(false);
 		expect(applied.map(migration => migration.name)).toEqual(expect.arrayContaining(['PasskeyMfaPolicy1791969900000', 'SudoPolicy1792300000001', 'AccessTokenExpiry1792300000004', 'SessionUserIp1794700800000']));
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 		redis = new Redis({ path: redisSocket });

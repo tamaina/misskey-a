@@ -44,6 +44,7 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		await db.initialize();
 		const applied = await db.runMigrations();
 		expect(applied.map(migration => migration.name)).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort((a, b) => Number(a.slice(-13)) - Number(b.slice(-13))));
+		expect(await db.showMigrations()).toBe(false);
 		appliedMigrationNames = applied.map(migration => migration.name);
 		expect(appliedMigrationNames).toEqual(expect.arrayContaining(['PasskeyMfaPolicy1791969900000', 'SessionUserIp1794700800000']));
 		const schema = await db.driver.createSchemaBuilder().log();
@@ -161,6 +162,7 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		for (let index = 0; index < suffix.length; index++) await db.undoLastMigration();
 		const applied = await db.runMigrations();
 		expect(applied.map(migration => migration.name)).toEqual(suffix);
+		expect(await db.showMigrations()).toBe(false);
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
 	test('empty browser-session round trip restores sudo, approval and history dependencies', async () => {

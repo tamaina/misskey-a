@@ -71,6 +71,7 @@ describe.skipIf(!socket)('real PostgreSQL locked MFA policy', () => {
 		await db.initialize();
 		const migrations = await db.runMigrations();
 		expect(migrations.map(migration => migration.name)).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort((a, b) => Number(a.slice(-13)) - Number(b.slice(-13))));
+		expect(await db.showMigrations()).toBe(false);
 		expect(migrations.map(migration => migration.name)).toEqual(expect.arrayContaining(['PasskeyMfaPolicy1791969900000', 'SessionUserIp1794700800000']));
 		console.log('Production migrations applied:', migrations.length);
 	});
