@@ -38,7 +38,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</template>
 		</MkPagination>
-		<MkButton :disabled="busy" @click="reload">{{ $locale.sfc.reload }}</MkButton>
 	</div>
 </FormSection>
 </template>
@@ -48,7 +47,6 @@ import { onActivated, onDeactivated, onUnmounted, markRaw, ref, watch } from 'vu
 import MkLoginHistoryFolder from './MkLoginHistoryFolder.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
-import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkTab from '@features/ui/frontend/components/MkTab.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -92,8 +90,6 @@ const busy = ref(false); const error = ref(false);
 const active = ref(true); const generation = ref(0);
 const current = () => active.value && isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token);
 
-function reload() { if (!current()) return; histories.clear(); return Promise.all([paginator.reload(), unlinked.reload()]); }
-
 async function revoke(session: Session) {
 	if (busy.value || !current() || session.revokedAt) return;
 	busy.value = true; error.value = false;
@@ -135,7 +131,6 @@ onDeactivated(leave); onUnmounted(leave);
 	"success": "成功",
 	"failure": "失敗",
 	"unknown": "記録なし",
-	"reload": "更新",
 	"failed": "ログイン一覧の操作を完了できませんでした。もう一度お試しください。",
 	"confirmCurrent": "このログインからサインアウトしますか。",
 	"confirmOther": "選択したログインを失効させますか。他のログインは継続できます。"

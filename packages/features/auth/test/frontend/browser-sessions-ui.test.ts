@@ -72,6 +72,7 @@ test('the default signin-history tab renders session folders, UA folders and pla
 	expect([...element.querySelectorAll('button')].find(button => button.textContent?.trim() === 'ログイン履歴')?.disabled).toBe(true);
 	expect([...element.querySelectorAll('button')].find(button => button.textContent?.trim() === 'ログイン記録のないセッション')?.disabled).toBe(false);
 	expect(misskeyApi).not.toHaveBeenCalledWith('i/sessions', expect.anything());
+	expect([...element.querySelectorAll('button')].some(button => button.textContent === '更新')).toBe(false);
 	expect(element.querySelector('table')).toBeNull();
 	expect(element.textContent).toContain('192.0.2.6');
 	const plain = [...element.querySelectorAll('code')].find(code => code.textContent === '192.0.2.6')!.parentElement!;
@@ -199,14 +200,7 @@ test('unlinked sessions with or without UA are independently paginated folders a
 	await vi.waitFor(() => expect(misskeyApi).toHaveBeenCalledWith('i/sessions/revoke', { sessionId: 'unlinked0' }));
 	await vi.waitFor(() => expect(folder.textContent).toContain('失効済み'));
 	expect(signout).not.toHaveBeenCalled();
-	const historyRequests = vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'i/signin-history').length;
-	const sessionRequests = vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'i/sessions').length;
-	[...element.querySelectorAll('button')].find(button => button.textContent === '更新')!.click();
-	await vi.waitFor(() => expect(element.querySelectorAll('article')).toHaveLength(5));
-	expect(vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'i/signin-history')).toHaveLength(historyRequests + 1);
-	expect(vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'i/sessions')).toHaveLength(sessionRequests + 1);
-	expect(unlinkedTab.disabled).toBe(true);
-	expect(element.textContent).not.toContain('192.0.2.99');
+	expect([...element.querySelectorAll('button')].some(button => button.textContent === '更新')).toBe(false);
 	historyTab.click();
 	await vi.waitFor(() => expect(element.textContent).toContain('192.0.2.99'));
 	expect(element.querySelectorAll('article')).toHaveLength(0);
