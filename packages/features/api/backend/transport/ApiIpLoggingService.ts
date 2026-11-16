@@ -13,7 +13,7 @@ export class ApiIpLoggingService implements OnApplicationShutdown {
  private readonly histories = new Map<string, Set<string>>();
  private readonly clearIntervalId = setInterval(() => this.histories.clear(), 1000 * 60 * 60);
  constructor(@Inject(DI.meta) private readonly meta: MiMeta,
-  @Inject(DI.userIpsRepository) private readonly userIps: UserIpsRepository) {}
+  @Inject(DI.userIpsRepository) private readonly userIps: Pick<UserIpsRepository, 'query'>) {}
  async log(ip: string, userId: string, browserSessionId: string | null = null) {
   if (!this.meta.enableIpLogging) return;
   const key = JSON.stringify([userId, browserSessionId]);

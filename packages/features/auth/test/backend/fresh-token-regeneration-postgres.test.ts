@@ -16,7 +16,7 @@ import Fastify from 'fastify';
 import type { FastifyInstance } from 'fastify';
 import { OpenAPIHandler } from '@orpc/openapi/fastify';
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
-import { mockDeep } from 'vitest-mock-extended';
+import { mock, mockDeep } from 'vitest-mock-extended';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { MiUser } from '@features/users/backend/models/User.js';
 import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
@@ -81,7 +81,7 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh token regeneration with rea
 		emailService.validateEmailForAccount.mockResolvedValue({ available: true, reason: null });
 		const userEntityService = mockDeep<AuthRouterDependencies['i/update-email/passkey/complete']['userEntityService']>();
 		type Packed = Awaited<ReturnType<typeof userEntityService.packSelf>>;
-		userEntityService.packSelf.mockResolvedValue(Object.assign(mockDeep<Packed>(), { id: owner, host: null, emojis: {}, badgeRoles: [], avatarDecorations: [], alsoKnownAs: [], fields: [], verifiedLinks: [], pinnedNoteIds: [], pinnedNotes: [], pinnedPage: null, roles: [], notificationRecieveConfig: {}, unreadAnnouncements: [], mutedWords: [], hardMutedWords: [], mutedInstances: [], mutingNotificationTypes: [], emailNotificationTypes: [], achievements: [], policies: {} as Packed['policies'], securityKeysList: [] }));
+		userEntityService.packSelf.mockResolvedValue(Object.assign(mock<Packed>(), { id: owner, host: null, emojis: {}, badgeRoles: [], avatarDecorations: [], alsoKnownAs: [], fields: [], verifiedLinks: [], pinnedNoteIds: [], pinnedNotes: [], pinnedPage: null, roles: [], notificationRecieveConfig: {}, unreadAnnouncements: [], mutedWords: [], hardMutedWords: [], mutedInstances: [], mutingNotificationTypes: [], emailNotificationTypes: [], achievements: [], policies: mock<Packed['policies']>({ uploadableFileTypes: [] }), securityKeysList: [] }));
 		deps['i/update-email/passkey/start'] = deps['i/update-email/passkey/complete'] = { db, config: relyingParty, serverSettings: { emailRequiredForSignup: false }, userProfilesRepository: db.getRepository(MiUserProfile) as unknown as UserProfilesRepository, userEntityService, emailService, globalEventService: events, freshReauthentication: fresh };
 		deps['i/regenerate-token'] = { db, browserSessionService: sessions, globalEventService: events, usersRepository: db.getRepository(MiUser) as AuthRouterDependencies['i/regenerate-token']['usersRepository'], userProfilesRepository: db.getRepository(MiUserProfile) as AuthRouterDependencies['i/regenerate-token']['userProfilesRepository'], userAuthService: mockDeep() };
 		const handler = new OpenAPIHandler(createAuthRouter(deps), { customErrorResponseBodyEncoder: misskeyErrorBody, interceptors: [nullSuccessToNoContent()] });

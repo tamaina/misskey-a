@@ -47,7 +47,7 @@ describe.skipIf(!socket || !redisSocket)('HTTP fresh email change with real SQL,
 	let sessions: BrowserSessionService; let current: Awaited<ReturnType<BrowserSessionService['issue']>>;
 	let other: Awaited<ReturnType<BrowserSessionService['issue']>>; let unrelated: Awaited<ReturnType<BrowserSessionService['issue']>>;
 	let keyPair: { publicKey: KeyObject; privateKey: KeyObject }; let user: MiLocalUser; let nextSession = 0;
-	const events = mockDeep<AuthRouterDependencies['i/update-email/passkey/complete']['globalEventService']>();
+	const events = mockDeep<AuthRouterDependencies['i/regenerate-token/passkey/complete']['globalEventService']>();
 	const emailService = mockDeep<AuthRouterDependencies['i/update-email/passkey/complete']['emailService']>();
 	const userEntityService = mockDeep<AuthRouterDependencies['i/update-email/passkey/complete']['userEntityService']>();
 	const settings = { emailRequiredForSignup: false };

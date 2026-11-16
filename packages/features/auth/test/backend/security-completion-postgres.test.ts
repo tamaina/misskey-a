@@ -26,6 +26,8 @@ import { DeletionIntent1792300000003 } from '../../../../backend/migration/17923
 import { BrowserSession1791849600000 } from '../../../../backend/migration/1791849600000-BrowserSession.js';
 import { SudoPolicy1792300000001 } from '../../../../backend/migration/1792300000001-SudoPolicy.js';
 import { AccessTokenExpiry1792300000004 } from '../../../../backend/migration/1792300000004-AccessTokenExpiry.js';
+import { BrowserSessionHistory1794614400000 } from '../../../../backend/migration/1794614400000-BrowserSessionHistory.js';
+import { SessionUserIp1794700800000 } from '../../../../backend/migration/1794700800000-SessionUserIp.js';
 
 const socket = process.env.MISSKEY_AUTH_POLICY_TEST_SOCKET;
 const owner = 'syntheticcompletion';
@@ -154,7 +156,7 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		]);
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
-	test('empty browser-session round trip restores its newer sudo columns and approval foreign key', async () => {
+	test('empty browser-session round trip restores sudo, approval and history dependencies', async () => {
 		await db.getRepository(MiUser).delete({ id: owner });
 		expect(await db.getRepository(MiBrowserSession).count()).toBe(0);
 		await db.transaction(async manager => {
@@ -164,9 +166,14 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 			const session = new BrowserSession1791849600000();
 			const policy = new SudoPolicy1792300000001();
 			const expiry = new AccessTokenExpiry1792300000004();
+			const history = new BrowserSessionHistory1794614400000();
+			const ips = new SessionUserIp1794700800000();
+			// Remove dependent foreign keys and triggers before their session table.
+			await ips.down(runner); await history.down(runner);
 			await expiry.down(runner); await policy.down(runner); await session.down(runner);
 			expect(await runner.hasTable('browser_session')).toBe(false);
 			await session.up(runner); await policy.up(runner); await expiry.up(runner);
+			await history.up(runner); await ips.up(runner);
 			expect(await runner.hasTable('browser_session')).toBe(true);
 		});
 		const pending = await db.driver.createSchemaBuilder().log();

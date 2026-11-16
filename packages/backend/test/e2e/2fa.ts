@@ -266,11 +266,13 @@ describe('2要素認証（旧native credential互換）', () => {
 		// passkey policy. Reactivation requires the session's fresh sudo grant.
 		const beforeEnable = await api('signin-flow', signinParam());
 		assert.strictEqual(beforeEnable.status, 200);
-		assert.deepStrictEqual(beforeEnable.body.availableFactors, ['totp', 'recovery']);
+		assert.strictEqual(beforeEnable.body.finished, false);
 		assert.strictEqual(beforeEnable.body.next, 'totp');
+		assert.deepStrictEqual(beforeEnable.body.availableFactors, ['totp', 'recovery']);
 		const elevated = await api('i/sudo/start', { password, token: otpToken(registerResponse.body.secret) }, alice);
 		assert.strictEqual(elevated.status, 200);
 		assert.strictEqual(elevated.body.status, 'elevated');
+		assert.ok(typeof elevated.body.token === 'string');
 		assert.match(elevated.body.token, /^bs_[A-Za-z0-9_-]{43}$/);
 		const session = { token: elevated.body.token };
 		const enabled = await api('i/security/passkey/mfa/enable', { acknowledged: true }, session);
@@ -300,6 +302,8 @@ describe('2要素認証（旧native credential互換）', () => {
 		assert.strictEqual(disabled.status, 204);
 		const afterDisable = await api('signin-flow', signinParam());
 		assert.strictEqual(afterDisable.status, 200);
+		assert.strictEqual(afterDisable.body.finished, false);
+		assert.strictEqual(afterDisable.body.next, 'totp');
 		assert.deepStrictEqual(afterDisable.body.availableFactors, ['totp', 'recovery']);
 	});
 

@@ -15,7 +15,7 @@ import { MiBrowserSession } from '../../backend/models/BrowserSession.js';
 import { MiPasswordResetRequest } from '../../backend/models/PasswordResetRequest.js';
 import { SecuritySettings } from '../../backend/security-settings.js';
 import type { SecuritySettingsDependencies } from '../../backend/security-settings.js';
-import type { LockedSudoContext } from '../../backend/sudo.js';
+import type { SessionLockedSudoContext } from '../../backend/sudo.js';
 import type { SecurityOperation } from '../../backend/security-operation-store.js';
 import { SecurityConfirmationRejected } from '../../backend/security-operation-store.js';
 
@@ -43,7 +43,7 @@ function fixture() {
 	const profile = mockDeep<MiUserProfile>({ userId: identity.userId, password: 'synthetic-hash', twoFactorEnabled: false, twoFactorSecret: null, twoFactorTempSecret: null,
 		twoFactorBackupSecret: null, passkeyMfaEnabled: false, usePasswordLessLogin: false, passwordLoginDisabled: false, email: 'synthetic@example.test', emailVerified: true });
 	const key = mockDeep<MiUserSecurityKey>({ id: 'AQID', userId: identity.userId, publicKey: 'AQID', counter: 1, transports: ['usb'], name: 'Synthetic', lastUsed: new Date() });
-	const context: LockedSudoContext = { manager, user, profile, keys: [key], session: mockDeep<MiBrowserSession>({ id: identity.browserSession.id, userId: identity.userId, sudoGrantId: 'g'.repeat(43), sudoUntil: new Date(Date.now() + 300_000) }) };
+	const context: SessionLockedSudoContext = { manager, user, profile, keys: [key], session: mockDeep<MiBrowserSession>({ id: identity.browserSession.id, userId: identity.userId, sudoGrantId: 'g'.repeat(43), sudoUntil: new Date(Date.now() + 300_000) }) };
 	const committed = vi.fn();
 	deps.sudo.transaction.mockImplementation(async (_owner, run) => { const result = await run(context); committed(); return result; });
 	deps.sudo.status.mockResolvedValue({ active: true, expiresAt: context.session.sudoUntil!.toISOString() });
@@ -163,7 +163,7 @@ test.each([false, true])('registration can repeatedly add usable keys with passw
 	expect(f.profile).toMatchObject({ usePasswordLessLogin: true, passwordLoginDisabled: disabled, passkeyMfaEnabled: true });
 	expect(f.keys.insert).toHaveBeenCalledTimes(2);
 	expect(f.users.update).not.toHaveBeenCalled(); expect(f.sessions.find).not.toHaveBeenCalled();
-	expect(f.sessions.update.mock.calls.every(([where, patch]) => 'id' in where && where.id === identity.browserSession.id && !('revokedAt' in patch))).toBe(true);
+	expect(f.sessions.update.mock.calls.every(([where, patch]) => typeof where === 'object' && where !== null && 'id' in where && where.id === identity.browserSession.id && !('revokedAt' in patch))).toBe(true);
 	expect(f.deps.events.publishInternalEvent).not.toHaveBeenCalled();
 });
 

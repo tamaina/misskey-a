@@ -14,6 +14,7 @@ import type { MiMeta, UserIpsRepository } from '@features/persistence/backend/re
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import { createAdminGetUserIpsProcedure } from '@features/moderation/backend/endpoints/admin/get-user-ips.js';
 import { SessionUserIp1794700800000 } from '../../../../backend/migration/1794700800000-SessionUserIp.js';
+import type { MiAccessToken } from '../../backend/models/AccessToken.js';
 import { MiUserIp } from '../../backend/models/UserIp.js';
 import { createISessionIpsProcedure, type SessionIpsDependencies } from '../../backend/endpoints/i/sessions.js';
 import { testContext } from './native-context.js';
@@ -57,7 +58,7 @@ test.each([
 	const logging = mockDeep<ApiIpLoggingService>();
 	const factory = new ApiExecutionContextFactory(mockDeep(), mockDeep(), authenticate, mockDeep(), mockDeep(), mockDeep(), mockDeep(), logging);
 	const user = mockDeep<MiLocalUser>({ id: 'alice' });
-	authenticate.authenticate.mockResolvedValue([user, token, session]);
+	authenticate.authenticate.mockResolvedValue([user, token ? mockDeep<MiAccessToken>(token) : null, session]);
 	const request = mockDeep<Parameters<typeof factory.create>[0]>({ ip: '192.0.2.1', headers: {} });
 	await factory.create(request, 'i/sessions').services.authenticate('synthetic');
 	expect(logging.log).toHaveBeenCalledWith('192.0.2.1', 'alice', session?.id ?? null);
@@ -75,7 +76,7 @@ test('session IP endpoint reads only owned user_ip rows with first and last seen
 test('admin IP output includes stable row identity and both observation times', async () => {
 	const repository = mockDeep<UserIpsRepository>();
 	repository.find.mockResolvedValue([mockDeep<MiUserIp>({ id: '12', ip: '192.0.2.1', createdAt: new Date(0), lastSeenAt: new Date(1000) })]);
-	const context = testContext(mockDeep<MiLocalUser>({ id: 'admin', isAdmin: true, isSuspended: false }), null);
+	const context = testContext(mockDeep<MiLocalUser>({ id: 'admin', isSuspended: false }), null);
 	const result = await call(createAdminGetUserIpsProcedure({ userIpsRepository: repository }), { userId: 'alice' }, { context });
 	expect(result).toEqual([{ id: '12', ip: '192.0.2.1', createdAt: new Date(0).toISOString(), lastSeenAt: new Date(1000).toISOString() }]);
 });

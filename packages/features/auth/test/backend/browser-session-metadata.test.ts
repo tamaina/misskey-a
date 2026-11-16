@@ -101,13 +101,14 @@ test('unlinked session query excludes all linked owned signins before pagination
 	await source.prepare();
 	const repository = source.getRepository(MiBrowserSession);
 	let sql = ''; let values: unknown[] = [];
-	const service = new BrowserSessionService({
-		find: async options => {
-			const query = repository.createQueryBuilder('session').setFindOptions(options);
-			[sql, values] = query.getQueryAndParameters();
-			return [];
-		},
-	} as ConstructorParameters<typeof BrowserSessionService>[0], { gen: () => 'unused' });
+	const sessions = mockDeep<ConstructorParameters<typeof BrowserSessionService>[0]>();
+	sessions.find.mockImplementation(async options => {
+		if (!options) throw new Error('Expected session query options');
+		const query = repository.createQueryBuilder('session').setFindOptions(options);
+		[sql, values] = query.getQueryAndParameters();
+		return [];
+	});
+	const service = new BrowserSessionService(sessions, { gen: () => 'unused' });
 	expect(await service.listOwned('alice', 5, 10, undefined, true)).toEqual([]);
 	expect(sql).toContain('NOT EXISTS (SELECT 1 FROM "signin" linked');
 	expect(sql).toContain('linked."browserSessionId" = "session"."id"');
