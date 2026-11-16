@@ -34,6 +34,7 @@ const owner = 'syntheticcompletion';
 const identity = { userId: owner, browserSession: { id: 'synthetic-session', userId: owner } };
 describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 	let db: DataSource;
+	let appliedMigrationNames: string[];
 	let sudo: SudoService;
 	const events = mockDeep<Parameters<typeof recoverPassword>[0]['globalEventService']>();
 	const profile = () => db.getRepository(MiUserProfile).findOneByOrFail({ userId: owner });
@@ -42,8 +43,9 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
 		await db.initialize();
 		const applied = await db.runMigrations();
-		expect(applied).toHaveLength(367);
-		expect(applied.at(-1)?.name).toBe('SessionUserIp1794700800000');
+		expect(applied.map(migration => migration.name)).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort((a, b) => Number(a.slice(-13)) - Number(b.slice(-13))));
+		appliedMigrationNames = applied.map(migration => migration.name);
+		expect(appliedMigrationNames).toEqual(expect.arrayContaining(['PasskeyMfaPolicy1791969900000', 'SessionUserIp1794700800000']));
 		const schema = await db.driver.createSchemaBuilder().log();
 		expect(schema.upQueries.map(query => query.query)).toEqual([]);
 		console.log('Production migrations / zero pending DDL:', applied.length);
@@ -148,12 +150,17 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
 	test('the latest policy and session-history migrations down/up against production metadata leave no pending DDL', async () => {
-		for (let index = 0; index < 6; index++) await db.undoLastMigration();
-		const applied = await db.runMigrations();
-		expect(applied.map(migration => migration.name)).toEqual([
+		const policyStart = appliedMigrationNames.indexOf('SudoPolicy1792300000001');
+		expect(policyStart).toBeGreaterThanOrEqual(0);
+		// Include interleaved and later production migrations while reverting every policy dependency in order.
+		const suffix = appliedMigrationNames.slice(policyStart);
+		expect(suffix).toEqual(expect.arrayContaining([
 			'SudoPolicy1792300000001', 'PasswordLoginPolicy1792300000002', 'DeletionIntent1792300000003',
 			'AccessTokenExpiry1792300000004', 'BrowserSessionHistory1794614400000', 'SessionUserIp1794700800000',
-		]);
+		]));
+		for (let index = 0; index < suffix.length; index++) await db.undoLastMigration();
+		const applied = await db.runMigrations();
+		expect(applied.map(migration => migration.name)).toEqual(suffix);
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
 	test('empty browser-session round trip restores sudo, approval and history dependencies', async () => {
