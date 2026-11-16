@@ -101,6 +101,39 @@ function signinOutput(operation: unknown): Record<string, unknown> {
 	return object(object(content['application/json']).schema);
 }
 
+// PR #188 adds linked sessions and three session filters to signin history. Pin
+// the complete new boundaries, then reverse only those fields for the old oracle.
+function restoreSigninSessionFields(schema: Record<string, unknown>) {
+	const properties = object(schema.properties);
+	expect(schema.required).toEqual(['id', 'createdAt', 'ip', 'headers', 'success', 'browserSessionId', 'browserSession']);
+	delete properties.browserSessionId;
+	delete properties.browserSession;
+	schema.required = ['id', 'createdAt', 'ip', 'headers', 'success'];
+}
+
+function restoreSigninHistoryOperation(path: string, operation: unknown): unknown {
+	if (path !== '/i/signin-history') return operation;
+	expect(schemaHash(operation)).toBe('2e96a091dfc7c0ed55cb1720e8c9d846139f299d7881dbe54d75d8e798f218be');
+	const restored: unknown = structuredClone(operation);
+	restoreSigninSessionFields(object(signinOutput(restored).items));
+	const request = object(object(object(object(object(restored).post).requestBody).content)['application/json']);
+	const input = object(request.schema);
+	if (!Array.isArray(input.allOf)) throw new Error('Invalid signin history input');
+	for (const shape of [input, object(input.allOf[0])]) {
+		const properties = object(shape.properties);
+		for (const key of ['browserSessionId', 'unlinkedOnly', 'latestPerSession']) delete properties[key];
+	}
+	return restored;
+}
+
+function restoreSigninSchema(name: string, schema: unknown): unknown {
+	if (name !== 'Signin') return schema;
+	expect(schemaHash(schema)).toBe('b112a6ba856a034d3ff7fdab46d43d27de3c752adb46ec2107702df5282b475d');
+	const restored = object(structuredClone(schema));
+	restoreSigninSessionFields(restored);
+	return restored;
+}
+
 function signinBranches(operation: unknown): unknown[] {
 	const output = signinOutput(operation);
 	expect(Object.keys(output).sort()).toEqual(['$schema', 'anyOf']);
@@ -289,10 +322,10 @@ test('actual portable generator preserves every legacy operation and public sche
 	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
-		const operation = restorePreSigninPolicyOperation(path, restorePreExpiryOperation(path, spec.paths?.[path]));
+		const operation = restoreSigninHistoryOperation(path, restorePreSigninPolicyOperation(path, restorePreExpiryOperation(path, spec.paths?.[path])));
 		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreClientQrOperationBaseline(path, restoreWebhookOperationBaseline(path, restoreAnnouncementOperationBaseline(path, operation)))), path).toBe(hash);
 	}
-	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreWebhookSchemaBaseline(name, spec.components?.schemas?.[name])), name).toBe(hash);
+	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreSigninSchema(name, restoreWebhookSchemaBaseline(name, spec.components?.schemas?.[name]))), name).toBe(hash);
 	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
 	expect(Object.keys(spec.components?.schemas ?? {}).filter(name => !(name in baseline.schemaHashes))).toEqual(['OrpcDefinition1038']);
 	expect(Object.keys(baseline.paths)).toHaveLength(443);
@@ -305,6 +338,24 @@ test('actual portable generator preserves every legacy operation and public sche
 		expect(routes.filter(route => route.name === canonical)).toHaveLength(1);
 		expect(spec.paths?.[`/${canonical}`]?.post?.operationId).toBe(`post___${canonical.replaceAll('/', '___')}`);
 	}
+});
+
+test('signin history inverse rejects unrelated changes and changed session fields', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	const path = '/i/signin-history';
+	const original = spec.paths?.[path];
+	expect(schemaHash(restoreSigninHistoryOperation(path, original))).toBe(baseline.operationHashes[path]);
+	for (const field of ['browserSessionId', 'browserSession', 'headers']) {
+		const changed: unknown = structuredClone(original);
+		object(object(signinOutput(changed).items).properties)[field] = { type: 'string' };
+		expect(() => restoreSigninHistoryOperation(path, changed)).toThrow();
+	}
+	const changed: unknown = structuredClone(original);
+	object(object(changed).post).operationId = 'unexpected';
+	expect(() => restoreSigninHistoryOperation(path, changed)).toThrow();
+	const schema = object(structuredClone(spec.components?.schemas?.Signin));
+	object(schema.properties).browserSession = { type: 'null' };
+	expect(() => restoreSigninSchema('Signin', schema)).toThrow();
 });
 
 test('expiry inverse rejects changed constraints and unrelated operation metadata', async () => {

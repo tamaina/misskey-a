@@ -218,7 +218,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkAuthConfirm.vue",
-		"currentSha256": "44893dc863faef52c8f0864d4f6a3b4ea10f844c45af7e66940ede61f38eb778",
+		"currentSha256": "cb329c90d36db1c0e68859370abe9073448d09bbb92c89cef0c113614dc8ecd6",
 		"baselineSha256": "d36befd86c58d5f8f193dfba5dc43edaab4138f5dc9a535cfe517b16cc5f8245",
 		"keys": [
 			"somethingHappened",
@@ -324,6 +324,48 @@ export const globalCatalogPilotOwners = [
 				"end": 22676,
 				"current": "\t\"createAccount\": \"アカウントを作成\",\n\t\"currentAccountRequired\": \"対象アカウントへ切り替え、通常のログインで個別セッションを作成してから承認してください。保存済みの別アカウントや旧トークンでは承認できません。\"\n",
 				"baseline": "\t\"createAccount\": \"アカウントを作成\"\n"
+			},
+			{
+				"start": 5956,
+				"end": 6086,
+				"current": "import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog, login } from '@features/auth/frontend/accounts.js';\n",
+				"baseline": "import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@features/auth/frontend/accounts.js';\n"
+			},
+			{
+				"start": 6555,
+				"end": 6622,
+				"current": "import { isSameLiveCredential } from '../utility/live-account.js';\n",
+				"baseline": ""
+			},
+			{
+				"start": 7969,
+				"end": 8173,
+				"current": "const canAuthorize = computed(() => { const user = selectedUser.value ? users.value.get(selectedUser.value) : undefined; return !!user && isSameLiveCredential(user.id, user.token, $i?.id, $i?.token); });\n",
+				"baseline": "const canAuthorize = computed(() => { const user = selectedUser.value ? users.value.get(selectedUser.value) : undefined; return !!user && $i?.id === user.id && $i.token === user.token && user.token.startsWith('bs_'); });\n"
+			},
+			{
+				"start": 9192,
+				"end": 9243,
+				"current": "\t\t\t\t\tawait login(res.token, window.location.href);\n",
+				"baseline": "\t\t\t\t\tawait init();\n\t\t\t\t\tif (users.value.has(res.id)) {\n\t\t\t\t\t\tselectedUser.value = res.id;\n\t\t\t\t\t}\n"
+			},
+			{
+				"start": 9422,
+				"end": 9473,
+				"current": "\t\t\t\t\tawait login(res.token, window.location.href);\n",
+				"baseline": "\t\t\t\t\tawait init();\n\t\t\t\t\tif (users.value.has(res.id)) {\n\t\t\t\t\t\tselectedUser.value = res.id;\n\t\t\t\t\t}\n"
+			},
+			{
+				"start": 9611,
+				"end": 9850,
+				"current": "\tconst selected = users.value.get(selectedUser.value);\n\tif (selected && ($i?.id !== selected.id || !isSameLiveCredential(selected.id, selected.token, $i?.id, $i?.token))) {\n\t\tawait login(selected.token, window.location.href);\n\t\treturn;\n\t}\n",
+				"baseline": ""
+			},
+			{
+				"start": 11035,
+				"end": 11259,
+				"current": "\t\t\tif (!await ensureSudo(current, signal) || !current() || !canAuthorize.value || selectedUser.value !== user.id || !$i) { if (current()) waiting.value = false; return; }\n\t\t\temit('accept', $i.token, permissions, expiresAt);\n",
+				"baseline": "\t\t\tif (!await ensureSudo(current, signal) || !current() || !canAuthorize.value || selectedUser.value !== user.id) { if (current()) waiting.value = false; return; }\n\t\t\temit('accept', user.token, permissions, expiresAt);\n"
 			}
 		],
 		"groupOrders": {
@@ -1356,7 +1398,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/reset-password.vue",
-		"currentSha256": "f9d3857275d352e1f670797571eb52cebd8fbdad6d4389d8fa8b024998354433",
+		"currentSha256": "17b8b87f4e6ca5c63caaba56e1a4dec4c54a5b49fa04e8d8e60fc33d1fc125b3",
 		"baselineSha256": "21c9838538962a0d8035a08362af9d5572b6155a90e18d3f454e0d856527dffd",
 		"keys": [
 			"save"
@@ -1378,12 +1420,24 @@ export const globalCatalogPilotOwners = [
 				"end": 1198,
 				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 493,
+				"end": 542,
+				"current": "\t\t\t<p>{{ $locale.sfc.resetSessionsWarning }}</p>\n",
+				"baseline": ""
+			},
+			{
+				"start": 3291,
+				"end": 3384,
+				"current": "\t\"resetPassword\": \"パスワードをリセット\",\n\t\"resetSessionsWarning\": \"パスワードを再設定すると、すべての端末のログインが無効になります。\"\n",
+				"baseline": "\t\"resetPassword\": \"パスワードをリセット\"\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/2fa.qrdialog.vue",
-		"currentSha256": "dff0a032b822cb4ff5e65406c991f7e98302ad6856c4c148be134c1c9ff1f847",
+		"currentSha256": "74338d8d39d0e5ff0f7829069d3eaa6a66b3556f2c74dee52095ef1ff90396be",
 		"baselineSha256": "1fbfe1551acb011d45077e483b5b7980b94b430be924f8c7e27b15e853d3aaab",
 		"keys": [
 			"cancel",
@@ -1424,12 +1478,114 @@ export const globalCatalogPilotOwners = [
 				"end": 5634,
 				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 186,
+				"end": 201,
+				"current": "\t@esc=\"cancel\"\n",
+				"baseline": ""
+			},
+			{
+				"start": 2463,
+				"end": 2572,
+				"current": "\t\t\t\t\t\t\t<MkInput v-model=\"token\" :disabled=\"busy\" autocomplete=\"one-time-code\" inputmode=\"numeric\"></MkInput>\n",
+				"baseline": "\t\t\t\t\t\t\t<MkInput v-model=\"token\" autocomplete=\"one-time-code\" inputmode=\"numeric\"></MkInput>\n"
+			},
+			{
+				"start": 2623,
+				"end": 2693,
+				"current": "\t\t\t\t\t\t\t<MkInfo v-if=\"errorText?.()\" warn>{{ errorText?.() }}</MkInfo>\n",
+				"baseline": ""
+			},
+			{
+				"start": 2767,
+				"end": 3063,
+				"current": "\t\t\t\t\t\t\t<MkButton rounded :disabled=\"busy\" @click=\"page--\"><i class=\"ti ti-arrow-left\"></i> {{ globalLocale.env.goBack }}</MkButton>\n\t\t\t\t\t\t\t<MkButton primary rounded gradate :disabled=\"busy || !token\" @click=\"tokenDone\">{{ globalLocale.env.continue }} <i class=\"ti ti-arrow-right\"></i></MkButton>\n",
+				"baseline": "\t\t\t\t\t\t\t<MkButton rounded @click=\"page--\"><i class=\"ti ti-arrow-left\"></i> {{ globalLocale.env.goBack }}</MkButton>\n\t\t\t\t\t\t\t<MkButton primary rounded gradate @click=\"tokenDone\">{{ globalLocale.env.continue }} <i class=\"ti ti-arrow-right\"></i></MkButton>\n"
+			},
+			{
+				"start": 3477,
+				"end": 3634,
+				"current": "\t\t\t\t\t\t\t<div v-if=\"backupCodes?.length\" style=\"text-align: center; font-weight: bold;\">{{ $locale.sfc.twoFactorCheckBackupCodesBeforeCloseThisWizard }}</div>\n",
+				"baseline": "\t\t\t\t\t\t\t<div style=\"text-align: center; font-weight: bold;\">{{ $locale.sfc.twoFactorCheckBackupCodesBeforeCloseThisWizard }}</div>\n"
+			},
+			{
+				"start": 3635,
+				"end": 3769,
+				"current": "\t\t\t\t\t\t\t<div v-if=\"backupCodes?.length\" class=\"_gaps\">\n\t\t\t\t\t\t\t\t<MkInfo warn>{{ $locale.sfc.twoFactorBackupCodesDescription }}</MkInfo>\n",
+				"baseline": "\t\t\t\t\t\t\t<MkFolder :defaultOpen=\"true\">\n\t\t\t\t\t\t\t\t<template #icon><i class=\"ti ti-key\"></i></template>\n\t\t\t\t\t\t\t\t<template #label>{{ $locale.sfc.twoFactorBackupCodes }}</template>\n"
+			},
+			{
+				"start": 3770,
+				"end": 4048,
+				"current": "\t\t\t\t\t\t\t\t<div v-for=\"(code, i) in backupCodes\" :key=\"code\" class=\"_gaps_s\">\n\t\t\t\t\t\t\t\t\t<MkKeyValue :copy=\"code\">\n\t\t\t\t\t\t\t\t\t\t<template #key>#{{ i + 1 }}</template>\n\t\t\t\t\t\t\t\t\t\t<template #value><code class=\"_monospace\">{{ code }}</code></template>\n\t\t\t\t\t\t\t\t\t</MkKeyValue>\n\t\t\t\t\t\t\t\t</div>\n",
+				"baseline": "\t\t\t\t\t\t\t\t<div class=\"_gaps\">\n\t\t\t\t\t\t\t\t\t<MkInfo warn>{{ $locale.sfc.twoFactorBackupCodesDescription }}</MkInfo>\n"
+			},
+			{
+				"start": 4049,
+				"end": 4208,
+				"current": "\t\t\t\t\t\t\t\t<MkButton primary rounded gradate @click=\"downloadBackupCodes\"><i class=\"ti ti-download\"></i> {{ globalLocale.env.download }}</MkButton>\n\t\t\t\t\t\t\t</div>\n",
+				"baseline": "\t\t\t\t\t\t\t\t\t<div v-for=\"(code, i) in backupCodes\" :key=\"code\" class=\"_gaps_s\">\n\t\t\t\t\t\t\t\t\t\t<MkKeyValue :copy=\"code\">\n\t\t\t\t\t\t\t\t\t\t\t<template #key>#{{ i + 1 }}</template>\n\t\t\t\t\t\t\t\t\t\t\t<template #value><code class=\"_monospace\">{{ code }}</code></template>\n\t\t\t\t\t\t\t\t\t\t</MkKeyValue>\n\t\t\t\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t\t\t\t<MkButton primary rounded gradate @click=\"downloadBackupCodes\"><i class=\"ti ti-download\"></i> {{ globalLocale.env.download }}</MkButton>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</MkFolder>\n"
+			},
+			{
+				"start": 4651,
+				"end": 4651,
+				"current": "",
+				"baseline": "import * as Misskey from 'misskey-js';\n"
+			},
+			{
+				"start": 4687,
+				"end": 4757,
+				"current": "import { useTemplateRef, computed, onBeforeUnmount, ref } from 'vue';\n",
+				"baseline": "import { useTemplateRef, computed, ref } from 'vue';\n"
+			},
+			{
+				"start": 5049,
+				"end": 5049,
+				"current": "",
+				"baseline": "import * as os from '@features/ui/frontend/os.js';\nimport MkFolder from '@features/ui/frontend/components/MkFolder.vue';\n"
+			},
+			{
+				"start": 5544,
+				"end": 5667,
+				"current": "\ttwoFactorData: { url: string };\n\tcomplete: (token: string) => Promise<string[] | null>;\n\terrorText?: () => string | null;\n",
+				"baseline": "\ttwoFactorData: Misskey.entities.I2faRegisterResponse;\n"
+			},
+			{
+				"start": 5724,
+				"end": 5747,
+				"current": "\t(ev: 'cancel'): void;\n",
+				"baseline": ""
+			},
+			{
+				"start": 6020,
+				"end": 6159,
+				"current": "const busy = ref(false);\nlet active = true;\nonBeforeUnmount(() => { active = false; token.value = null; backupCodes.value = undefined; });\n",
+				"baseline": ""
+			},
+			{
+				"start": 6180,
+				"end": 6265,
+				"current": "\tactive = false; token.value = null; backupCodes.value = undefined;\n\temit('cancel');\n",
+				"baseline": ""
+			},
+			{
+				"start": 6321,
+				"end": 6641,
+				"current": "\tif (!token.value || busy.value || !active) return;\n\tbusy.value = true;\n\ttry {\n\t\tconst codes = await props.complete(token.value.toString());\n\t\tif (!active || codes === null) return;\n\t\tbackupCodes.value = codes;\n\t\ttoken.value = null;\n\t\tpage.value++;\n\t\tconfetti({ duration: 1000 * 3 });\n\t} finally { busy.value = false; }\n",
+				"baseline": "\tif (token.value == null) return;\n\tconst res = await os.apiWithDialog('i/2fa/totp/done', {\n\t\ttoken: token.value.toString(), // 実装ミスなどでnumberが入る可能性を払拭できないため念のためtoString\n\t});\n\n\tbackupCodes.value = res.backupCodes;\n\n\tpage.value++;\n\n\tconfetti({\n\t\tduration: 1000 * 3,\n\t});\n"
+			},
+			{
+				"start": 7055,
+				"end": 7066,
+				"current": "\tcancel();\n",
+				"baseline": "\tdialog.value?.close();\n"
 			}
 		]
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/2fa.vue",
-		"currentSha256": "94744730037de5c0a7630d10936b5e6894ced4af05bcba6727e336c5a66dae99",
+		"currentSha256": "6710101a3fd501f89bafa7b8f86c02e6702c1abe8b3176c4ec3767a030d943a3",
 		"baselineSha256": "27c6f44fce8b2b8e8d05629bb00f8431cab3e7ea3b28d5a8b0cd2c903c24c068",
 		"keys": [
 			"learnMore",
@@ -1476,6 +1632,188 @@ export const globalCatalogPilotOwners = [
 				"end": 4896,
 				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 273,
+				"end": 4556,
+				"current": "\t\t<div class=\"_gaps_s\">\n\t\t\t<p v-if=\"!state\">{{ $locale.sfc.loading }}</p>\n\t\t\t<template v-else>\n\t\t\t\t<MkInfo v-if=\"(state.totpEnabled || state.passkeyMfaEnabled) && state.recoveryCodesRemaining < 5\" warn>\n\t\t\t\t\t{{ state.recoveryCodesRemaining === 0 ? $locale.sfc['2faBackupCodesExhaustedWarning'] : $locale.sfc['2faBackupCodeUsedWarning'] }}\n\t\t\t\t</MkInfo>\n\t\t\t\t<SearchMarker :keywords=\"['totp', 'app']\">\n\t\t\t\t\t<MkFolder :defaultOpen=\"true\">\n\t\t\t\t\t\t<template #icon><i class=\"ti ti-shield-lock\"></i></template>\n\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.totp }}</SearchLabel></template>\n\t\t\t\t\t\t<template #caption><SearchText>{{ $locale.sfc.totpDescription }}</SearchText></template>\n\t\t\t\t\t\t<template #suffix><i v-if=\"state.totpEnabled\" class=\"ti ti-check\" style=\"color: var(--MI_THEME-success)\"></i></template>\n\t\t\t\t\t\t<div v-if=\"state.totpEnabled\" class=\"_gaps_s\">\n\t\t\t\t\t\t\t<div>{{ $locale.sfc['2faAlreadyRegistered'] }}</div>\n\t\t\t\t\t\t\t<MkButton :disabled=\"busy\" @click=\"prepareTotp\">{{ $locale.sfc['2faRenewTOTP'] }}</MkButton>\n\t\t\t\t\t\t\t<MkButton danger :disabled=\"busy\" @click=\"removeTotp\">{{ $locale.sfc.unregister }}</MkButton>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div v-else class=\"_gaps_s\">\n\t\t\t\t\t\t\t<MkButton primary gradate :disabled=\"busy\" @click=\"prepareTotp\">{{ $locale.sfc['2faRegisterTOTP'] }}</MkButton>\n\t\t\t\t\t\t\t<MkLink url=\"https://misskey-hub.net/docs/for-users/stepped-guides/how-to-enable-2fa/\" target=\"_blank\"><i class=\"ti ti-help-circle\"></i> {{ $locale.sfc.learnMore }}</MkLink>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</MkFolder>\n\t\t\t\t</SearchMarker>\n\t\t\t\t<SearchMarker :keywords=\"['security', 'key', 'passkey']\">\n\t\t\t\t\t<MkFolder @opened=\"loadKeys\">\n\t\t\t\t\t\t<template #icon><i class=\"ti ti-key\"></i></template>\n\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.securityKeyAndPasskey }}</SearchLabel></template>\n\t\t\t\t\t\t<div class=\"_gaps_s\">\n\t\t\t\t\t\t\t<MkInfo>{{ $locale.sfc['2faSecurityKeyInfo'] }}</MkInfo>\n\t\t\t\t\t\t\t<MkInfo v-if=\"!supportsPasskey\" warn>{{ $locale.sfc['2faSecurityKeyNotSupported'] }}</MkInfo>\n\t\t\t\t\t\t\t<MkButton primary :disabled=\"busy || !supportsPasskey\" @click=\"registerKey\">{{ $locale.sfc['2faRegisterSecurityKey'] }}</MkButton>\n\t\t\t\t\t\t\t<MkFolder v-for=\"key in keys\" :key=\"key.id\">\n\t\t\t\t\t\t\t\t<template #label>{{ key.name }}</template>\n\t\t\t\t\t\t\t\t<template #suffix><I18n :src=\"$locale.sfc.lastUsedAt\"><template #t><MkTime :time=\"key.lastUsedAt\"/></template></I18n></template>\n\t\t\t\t\t\t\t\t<div class=\"_buttons\">\n\t\t\t\t\t\t\t\t\t<MkButton :disabled=\"busy\" @click=\"renameKey(key)\"><i class=\"ti ti-forms\"></i> {{ $locale.sfc.rename }}</MkButton>\n\t\t\t\t\t\t\t\t\t<MkButton danger :disabled=\"busy\" @click=\"removeKey(key)\"><i class=\"ti ti-trash\"></i> {{ $locale.sfc.unregister }}</MkButton>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</MkFolder>\n\t\t\t\t\t\t\t<MkInfo>{{ $locale.sfc.passkeyPolicy }}</MkInfo>\n\t\t\t\t\t\t\t<div>{{ state.passkeyMfaEnabled ? $locale.sfc.mfaActive : $locale.sfc.mfaInactive }}</div>\n\t\t\t\t\t\t\t<MkButton v-if=\"!state.passkeyMfaEnabled && state.passkeyCount > 0\" :disabled=\"busy\" @click=\"enableMfa\">{{ $locale.sfc.enableMfa }}</MkButton>\n\t\t\t\t\t\t\t<MkButton v-if=\"state.passkeyMfaEnabled\" danger :disabled=\"busy\" @click=\"disableMfa\">{{ $locale.sfc.disableMfa }}</MkButton>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</MkFolder>\n\t\t\t\t</SearchMarker>\n\t\t\t\t<SearchMarker :keywords=\"['password', 'less', 'key', 'passkey', 'login', 'signin']\">\n\t\t\t\t\t<MkSwitch :modelValue=\"state.passwordlessEnabled\" :disabled=\"busy || state.passkeyCount === 0 || state.passwordLoginDisabled\" @update:modelValue=\"setPasswordless\">\n\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.passwordLessLogin }}</SearchLabel></template>\n\t\t\t\t\t\t<template #caption><SearchText>{{ $locale.sfc.passwordLessLoginDescription }}</SearchText></template>\n\t\t\t\t\t</MkSwitch>\n\t\t\t\t</SearchMarker>\n\t\t\t\t<MkButton v-if=\"state.totpEnabled || state.passkeyMfaEnabled\" :disabled=\"busy\" @click=\"regenerateCodes\">{{ $locale.sfc.regenerateCodes }}</MkButton>\n\t\t\t\t<MkFolder>\n\t\t\t\t\t<template #label>{{ $locale.sfc.password }}</template>\n\t\t\t\t\t<div class=\"_gaps_s\">\n\t\t\t\t\t\t<MkInfo>{{ $locale.sfc.disablePasswordDescription }}</MkInfo>\n\t\t\t\t\t\t<MkButton v-if=\"!state.passwordLoginDisabled\" danger :disabled=\"busy || !supportsPasskey || !state.passwordlessEnabled || !state.hasVerifiedRecoveryEmail\" @click=\"disablePassword\">{{ $locale.sfc.disablePassword }}</MkButton>\n\t\t\t\t\t\t<MkInfo v-else warn>{{ $locale.sfc.passwordDisabled }}</MkInfo>\n",
+				"baseline": "\n\t\t<div v-if=\"$i\" class=\"_gaps_s\">\n\t\t\t<MkInfo v-if=\"$i.twoFactorEnabled && $i.twoFactorBackupCodesStock === 'partial'\" warn>\n\t\t\t\t{{ $locale.sfc['2faBackupCodeUsedWarning'] }}\n\t\t\t</MkInfo>\n\t\t\t<MkInfo v-if=\"$i.twoFactorEnabled && $i.twoFactorBackupCodesStock === 'none'\" warn>\n\t\t\t\t{{ $locale.sfc['2faBackupCodesExhaustedWarning'] }}\n\t\t\t</MkInfo>\n\n\t\t\t<SearchMarker :keywords=\"['totp', 'app']\">\n\t\t\t\t<MkFolder :defaultOpen=\"true\">\n\t\t\t\t\t<template #icon><i class=\"ti ti-shield-lock\"></i></template>\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.totp }}</SearchLabel></template>\n\t\t\t\t\t<template #caption><SearchText>{{ $locale.sfc.totpDescription }}</SearchText></template>\n\t\t\t\t\t<template #suffix><i v-if=\"$i.twoFactorEnabled\" class=\"ti ti-check\" style=\"color: var(--MI_THEME-success)\"></i></template>\n\n\t\t\t\t\t<div v-if=\"$i.twoFactorEnabled\" class=\"_gaps_s\">\n\t\t\t\t\t\t<div>{{ $locale.sfc['2faAlreadyRegistered'] }}</div>\n\t\t\t\t\t\t<template v-if=\"$i.securityKeysList!.length > 0\">\n\t\t\t\t\t\t\t<MkButton @click=\"renewTOTP\">{{ $locale.sfc['2faRenewTOTP'] }}</MkButton>\n\t\t\t\t\t\t\t<MkInfo>{{ $locale.sfc['2faWhyTOTPOnlyRenew'] }}</MkInfo>\n\t\t\t\t\t\t</template>\n\t\t\t\t\t\t<MkButton v-else danger @click=\"unregisterTOTP\">{{ $locale.sfc.unregister }}</MkButton>\n\t\t\t\t\t</div>\n\n\t\t\t\t\t<div v-else-if=\"!$i.twoFactorEnabled\" class=\"_gaps_s\">\n\t\t\t\t\t\t<MkButton primary gradate @click=\"registerTOTP\">{{ $locale.sfc['2faRegisterTOTP'] }}</MkButton>\n\t\t\t\t\t\t<MkLink url=\"https://misskey-hub.net/docs/for-users/stepped-guides/how-to-enable-2fa/\" target=\"_blank\"><i class=\"ti ti-help-circle\"></i> {{ globalLocale.env.learnMore }}</MkLink>\n"
+			},
+			{
+				"start": 4584,
+				"end": 4660,
+				"current": "\t\t\t</template>\n\t\t\t<p v-if=\"error\" role=\"alert\">{{ $locale.sfc.failed }}</p>\n",
+				"baseline": "\t\t\t</SearchMarker>\n\n\t\t\t<SearchMarker :keywords=\"['security', 'key', 'passkey']\">\n\t\t\t\t<MkFolder>\n\t\t\t\t\t<template #icon><i class=\"ti ti-key\"></i></template>\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.securityKeyAndPasskey }}</SearchLabel></template>\n\t\t\t\t\t<div class=\"_gaps_s\">\n\t\t\t\t\t\t<MkInfo>\n\t\t\t\t\t\t\t{{ $locale.sfc['2faSecurityKeyInfo'] }}\n\t\t\t\t\t\t</MkInfo>\n\n\t\t\t\t\t\t<MkInfo v-if=\"!browserSupportsWebAuthn()\" warn>\n\t\t\t\t\t\t\t{{ $locale.sfc['2faSecurityKeyNotSupported'] }}\n\t\t\t\t\t\t</MkInfo>\n\n\t\t\t\t\t\t<MkInfo v-else-if=\"browserSupportsWebAuthn() && !$i.twoFactorEnabled\" warn>\n\t\t\t\t\t\t\t{{ $locale.sfc['2faRegisterTOTPBeforeKey'] }}\n\t\t\t\t\t\t</MkInfo>\n\n\t\t\t\t\t\t<template v-else>\n\t\t\t\t\t\t\t<MkButton primary @click=\"addSecurityKey\">{{ $locale.sfc['2faRegisterSecurityKey'] }}</MkButton>\n\t\t\t\t\t\t\t<MkFolder v-for=\"key in $i.securityKeysList!\" :key=\"key.id\">\n\t\t\t\t\t\t\t\t<template #label>{{ key.name }}</template>\n\t\t\t\t\t\t\t\t<template #suffix><I18n :src=\"$locale.sfc.lastUsedAt\"><template #t><MkTime :time=\"key.lastUsed\"/></template></I18n></template>\n\t\t\t\t\t\t\t\t<div class=\"_buttons\">\n\t\t\t\t\t\t\t\t\t<MkButton @click=\"renameKey(key)\"><i class=\"ti ti-forms\"></i> {{ globalLocale.env.rename }}</MkButton>\n\t\t\t\t\t\t\t\t\t<MkButton danger @click=\"unregisterKey(key)\"><i class=\"ti ti-trash\"></i> {{ $locale.sfc.unregister }}</MkButton>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</MkFolder>\n\t\t\t\t\t\t</template>\n\t\t\t\t\t</div>\n\t\t\t\t</MkFolder>\n\t\t\t</SearchMarker>\n\n\t\t\t<SearchMarker :keywords=\"['password', 'less', 'key', 'passkey', 'login', 'signin']\">\n\t\t\t\t<MkSwitch :disabled=\"!$i.twoFactorEnabled || $i.securityKeysList!.length === 0\" :modelValue=\"usePasswordLessLogin\" @update:modelValue=\"v => updatePasswordLessLogin(v)\">\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.passwordLessLogin }}</SearchLabel></template>\n\t\t\t\t\t<template #caption><SearchText>{{ $locale.sfc.passwordLessLoginDescription }}</SearchText></template>\n\t\t\t\t</MkSwitch>\n\t\t\t</SearchMarker>\n"
+			},
+			{
+				"start": 4739,
+				"end": 5104,
+				"current": "import { onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';\nimport { browserSupportsWebAuthn, startAuthentication, startRegistration, WebAuthnAbortService } from '@simplewebauthn/browser';\nimport MkFolder from '@features/ui/frontend/components/MkFolder.vue';\nimport MkRecoveryCodesDialog from '../../components/MkRecoveryCodesDialog.vue';\n",
+				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport { computed } from 'vue';\nimport { browserSupportsWebAuthn, startRegistration } from '@simplewebauthn/browser';\nimport * as Misskey from 'misskey-js';\n"
+			},
+			{
+				"start": 5240,
+				"end": 5358,
+				"current": "import MkLink from '@features/navigation/frontend/components/MkLink.vue';\nimport XQrDialog from './2fa.qrdialog.vue';\n",
+				"baseline": ""
+			},
+			{
+				"start": 5505,
+				"end": 5581,
+				"current": "import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';\n",
+				"baseline": "import MkFolder from '@features/ui/frontend/components/MkFolder.vue';\nimport MkLink from '@features/navigation/frontend/components/MkLink.vue';\n"
+			},
+			{
+				"start": 5632,
+				"end": 5939,
+				"current": "import { ensureSignin } from '../../i.js';\nimport { registrationWire } from '../../utility/registration-wire.js';\nimport { ensureSudo } from '../../utility/ensure-sudo.js';\nimport { ownedInputText } from '../../utility/owned-dialog.js';\nimport { isSameLiveCredential } from '../../utility/live-account.js';\n",
+				"baseline": "import { ensureSignin } from '@features/auth/frontend/i.js';\nimport { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';\nimport { updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';\nimport type { Locale } from 'i18n';\n"
+			},
+			{
+				"start": 5940,
+				"end": 6008,
+				"current": "withDefaults(defineProps<{ first?: boolean }>(), { first: false });\n",
+				"baseline": "const globalLocale = useLocale<Locale>(import.meta.url);\n"
+			},
+			{
+				"start": 6009,
+				"end": 6748,
+				"current": "const owner = ensureSignin();\nconst ownerId = owner.id;\nconst ownerToken = owner.token;\nconst supportsPasskey = browserSupportsWebAuthn();\nconst state = ref<Awaited<ReturnType<typeof readState>> | null>(null);\nconst keys = ref<{ id: string; name: string; lastUsedAt: string }[]>([]);\nlet totpDialog: { dispose: () => void } | null = null;\nlet codesDialog: { dispose: () => void } | null = null;\nconst busy = ref(false);\nconst error = ref(false);\nlet generation = 0;\nlet active = true;\nlet nativePending = false;\nlet sudoAbort: AbortController | null = null;\nconst currentActor = () => active && isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token);\nconst readState = () => misskeyApi('i/security/state', {});\n",
+				"baseline": "const $i = ensureSignin();\n"
+			},
+			{
+				"start": 6749,
+				"end": 6864,
+				"current": "function clearPending() {\n\ttotpDialog?.dispose(); totpDialog = null; codesDialog?.dispose(); codesDialog = null;\n}\n",
+				"baseline": "// メモ: 各エンドポイントはmeUpdatedを発行するため、refreshAccountは不要\n"
+			},
+			{
+				"start": 6865,
+				"end": 7074,
+				"current": "function leave() {\n\tactive = false; generation++; sudoAbort?.abort(); sudoAbort = null; clearPending(); keys.value = [];\n\tif (nativePending) { WebAuthnAbortService.cancelCeremony(); nativePending = false; }\n}\n",
+				"baseline": "withDefaults(defineProps<{\n\tfirst?: boolean;\n}>(), {\n\tfirst: false,\n});\n"
+			},
+			{
+				"start": 7075,
+				"end": 7201,
+				"current": "async function refresh(isCurrent: () => boolean) {\n\tconst value = await readState();\n\tif (isCurrent()) state.value = value;\n}\n",
+				"baseline": "const usePasswordLessLogin = computed(() => $i.usePasswordLessLogin ?? false);\n"
+			},
+			{
+				"start": 7202,
+				"end": 7990,
+				"current": "async function run(action: (isCurrent: () => boolean, signal: AbortSignal) => Promise<void>, elevate = true, beforeSudo?: () => Promise<boolean>) {\n\tif (!currentActor() || busy.value) return;\n\tbusy.value = true; error.value = false;\n\tconst turn = ++generation;\n\tconst controller = new AbortController(); sudoAbort = controller;\n\tconst isCurrent = () => currentActor() && generation === turn;\n\ttry {\n\t\tif (beforeSudo && !await beforeSudo()) return;\n\t\tif (!isCurrent()) return;\n\t\tif (elevate && !await ensureSudo(isCurrent, controller.signal)) return;\n\t\tif (isCurrent()) await action(isCurrent, controller.signal);\n\t} catch { if (isCurrent()) error.value = true; } finally { controller.abort(); if (sudoAbort === controller) sudoAbort = null; busy.value = false; nativePending = false; }\n}\n",
+				"baseline": "async function registerTOTP(): Promise<void> {\n\tconst auth = await os.authenticateDialog();\n\tif (auth.canceled) return;\n"
+			},
+			{
+				"start": 7991,
+				"end": 8156,
+				"current": "function loadKeys() {\n\treturn run(async isCurrent => { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; }, false);\n}\n",
+				"baseline": "\tconst twoFactorData = await os.apiWithDialog('i/2fa/totp/register', {\n\t\tpassword: auth.result.password,\n\t\ttoken: auth.result.token,\n\t});\n"
+			},
+			{
+				"start": 8157,
+				"end": 9105,
+				"current": "function registerKey() {\n\treturn run(async (isCurrent, signal) => {\n\t\tconst input = await ownedInputText({ title: $locale.value.sfc['2faRegisterSecurityKey'], text: $locale.value.sfc['2faSecurityKeyName'], minLength: 1, maxLength: 30 }, signal);\n\t\tif (!isCurrent() || input.canceled || !input.result) return;\n\t\tconst started = await misskeyApi('i/security/passkey/register/start', { name: input.result });\n\t\tif (!isCurrent()) return;\n\t\tnativePending = true;\n\t\tconst credential = await startRegistration({ optionsJSON: started.options });\n\t\tnativePending = false;\n\t\tif (!isCurrent()) return;\n\t\tconst value = await misskeyApi('i/security/passkey/register/complete', { ticket: started.ticket, credential: registrationWire(credential) });\n\t\tif (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); if (isCurrent()) { const value = await misskeyApi('i/security/keys/list', {}); if (isCurrent()) keys.value = value; } }\n",
+				"baseline": "\tconst { dispose } = await os.popupAsyncWithDialog(import('@features/auth/frontend/pages/settings/2fa.qrdialog.vue').then(x => x.default), {\n\t\ttwoFactorData,\n\t}, {\n\t\tclosed: () => dispose(),\n"
+			},
+			{
+				"start": 9113,
+				"end": 9642,
+				"current": "function renameKey(key: { id: string; name: string }) {\n\tlet name = '';\n\treturn run(async isCurrent => {\n\t\tawait misskeyApi('i/security/passkey/rename', { credentialId: key.id, name });\n\t\tif (isCurrent()) keys.value = keys.value.map(value => value.id === key.id ? { ...value, name } : value);\n\t}, true, async () => {\n\t\tconst input = await os.inputText({ title: $locale.value.sfc.rename, default: key.name, minLength: 1, maxLength: 30 });\n\t\tif (input.canceled || !input.result) return false;\n\t\tname = input.result;\n\t\treturn true;\n",
+				"baseline": "async function unregisterTOTP(): Promise<void> {\n\tconst auth = await os.authenticateDialog();\n\tif (auth.canceled) return;\n\n\tos.apiWithDialog('i/2fa/totp/remove', {\n\t\tpassword: auth.result.password,\n\t\ttoken: auth.result.token,\n\t}).then(res => {\n\t\tupdateCurrentAccountPartial({\n\t\t\ttwoFactorEnabled: false,\n\t\t});\n\t}).catch(error => {\n\t\tos.alert({\n\t\t\ttype: 'error',\n\t\t\ttext: error,\n\t\t});\n"
+			},
+			{
+				"start": 9650,
+				"end": 10515,
+				"current": "function removeKey(key: { id: string; name: string }) {\n\treturn run(async isCurrent => {\n\t\tawait misskeyApi('i/security/passkey/remove', { credentialId: key.id });\n\t\tif (!isCurrent()) return;\n\t\t// Inform a supporting authenticator only after committed removal of this owned key.\n\t\tconst signal = (globalThis.PublicKeyCredential as unknown as { signalUnknownCredential?: (options: { rpId: string; credentialId: string }) => Promise<void> })?.signalUnknownCredential;\n\t\tif (signal) await signal.call(globalThis.PublicKeyCredential, { rpId: window.location.hostname, credentialId: key.id }).catch(() => {});\n\t\tif (isCurrent()) { keys.value = keys.value.filter(value => value.id !== key.id); clearPending(); await refresh(isCurrent); }\n\t}, true, async () => !(await os.confirm({ type: 'warning', title: key.name, text: $locale.value.sfc.removeKeyWarning })).canceled);\n",
+				"baseline": "function renewTOTP(): void {\n\tos.confirm({\n\t\ttype: 'question',\n\t\ttitle: $locale.value.sfc['2faRenewTOTP'],\n\t\ttext: $locale.value.sfc['2faRenewTOTPConfirm'],\n\t\tokText: $locale.value.sfc['2faRenewTOTPOk'],\n\t\tcancelText: $locale.value.sfc['2faRenewTOTPCancel'],\n\t}).then(({ canceled }) => {\n\t\tif (canceled) return;\n\t\tregisterTOTP();\n\t});\n"
+			},
+			{
+				"start": 10518,
+				"end": 10873,
+				"current": "function enableMfa() {\n\treturn run(async isCurrent => {\n\t\tconst value = await misskeyApi('i/security/passkey/mfa/enable', { acknowledged: true });\n\t\tif (isCurrent()) { clearPending(); showCodes(value.backupCodes); await refresh(isCurrent); }\n\t}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.enableWarning })).canceled);\n",
+				"baseline": "async function unregisterKey(key: NonNullable<Misskey.entities.MeDetailedOnly['securityKeysList']>[number]) {\n\tconst confirm = await os.confirm({\n\t\ttype: 'question',\n\t\ttitle: $locale.value.sfc['2faRemoveKey'],\n\t\ttext: interpolateLocaleParameters($locale.value.sfc['2faRemoveKeyConfirm'], { name: key.name }),\n\t});\n\tif (confirm.canceled) return;\n\n\tconst auth = await os.authenticateDialog();\n\tif (auth.canceled) return;\n\n\tawait os.apiWithDialog('i/2fa/passkey/remove', {\n\t\tpassword: auth.result.password,\n\t\ttoken: auth.result.token,\n\t\tcredentialId: key.id,\n\t});\n\tos.success();\n"
+			},
+			{
+				"start": 10876,
+				"end": 11190,
+				"current": "function disableMfa() {\n\treturn run(async isCurrent => {\n\t\tawait misskeyApi('i/security/passkey/mfa/disable', { acknowledged: true });\n\t\tif (isCurrent()) { clearPending(); await refresh(isCurrent); }\n\t}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.disableWarning })).canceled);\n",
+				"baseline": "async function renameKey(key: NonNullable<Misskey.entities.MeDetailedOnly['securityKeysList']>[number]) {\n\tconst name = await os.inputText({\n\t\ttitle: globalLocale.value.env.rename,\n\t\tdefault: key.name,\n\t\ttype: 'text',\n\t\tminLength: 1,\n\t\tmaxLength: 30,\n\t});\n\tif (name.canceled) return;\n\n\tawait os.apiWithDialog('i/2fa/passkey/update', {\n\t\tname: name.result,\n\t\tcredentialId: key.id,\n\t});\n"
+			},
+			{
+				"start": 11193,
+				"end": 11872,
+				"current": "function setPasswordless(enabled: boolean) {\n\treturn run(async isCurrent => {\n\t\tif (enabled) {\n\t\t\tconst pending = await misskeyApi('i/security/passkey/passwordless/start', {});\n\t\t\tif (!isCurrent()) return;\n\t\t\tnativePending = true;\n\t\t\tconst credential = await startAuthentication({ optionsJSON: pending.options });\n\t\t\tnativePending = false;\n\t\t\tif (!isCurrent()) return;\n\t\t\tawait misskeyApi('i/security/passkey/passwordless/complete', { ticket: pending.ticket, credential });\n\t\t} else await misskeyApi('i/security/passkey/passwordless', { enabled: false });\n\t\tif (isCurrent()) { clearPending(); await refresh(isCurrent); }\n\t}, !enabled || !ensureSignin().token.startsWith('bs_'));\n",
+				"baseline": "async function addSecurityKey() {\n\tconst auth = await os.authenticateDialog();\n\tif (auth.canceled) return;\n\n\tconst registrationOptions = await os.apiWithDialog('i/2fa/passkey/register', {\n\t\tpassword: auth.result.password,\n\t\ttoken: auth.result.token,\n\t});\n\n\tconst name = await os.inputText({\n\t\ttitle: $locale.value.sfc['2faRegisterSecurityKey'],\n\t\ttext: $locale.value.sfc['2faSecurityKeyName'],\n\t\ttype: 'text',\n\t\tminLength: 1,\n\t\tmaxLength: 30,\n\t});\n\tif (name.canceled) return;\n\n\tconst credential = await os.promiseDialog(\n\t\tstartRegistration({ optionsJSON: registrationOptions }),\n\t\tnull,\n\t\t() => {}, // ユーザーのキャンセルはrejectなのでエラーダイアログを出さない\n\t\t$locale.value.sfc['2faTapSecurityKey'],\n\t);\n\tif (!credential) return;\n\n\tconst auth2 = await os.authenticateDialog({ currentPassword: auth.result.password });\n\tif (auth2.canceled) return;\n\n\tawait os.apiWithDialog('i/2fa/passkey/done', {\n\t\tpassword: auth2.result.password,\n\t\ttoken: auth2.result.token,\n\t\tname: name.result,\n\t\tcredential: credential,\n\t});\n"
+			},
+			{
+				"start": 11875,
+				"end": 13712,
+				"current": "function disablePassword() {\n\treturn run(async isCurrent => {\n\t\tconst pending = await misskeyApi('i/security/password-login/disable/start', {});\n\t\tif (!isCurrent()) return;\n\t\tnativePending = true;\n\t\tconst credential = await startAuthentication({ optionsJSON: pending.options });\n\t\tnativePending = false;\n\t\tif (!isCurrent()) return;\n\t\tawait misskeyApi('i/security/password-login/disable/complete', { ticket: pending.ticket, credential });\n\t\tif (isCurrent()) { clearPending(); await refresh(isCurrent); }\n\t}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.disablePasswordWarning })).canceled);\n}\n\nfunction prepareTotp() {\n\treturn run(async isCurrent => {\n\t\tclearPending();\n\t\tconst twoFactorData = await misskeyApi('i/security/totp/start', {});\n\t\tif (!isCurrent()) return;\n\t\tconst dialog = os.popup(XQrDialog, { twoFactorData, complete: completeTotp, errorText: () => error.value ? $locale.value.sfc.failed : null }, {\n\t\t\tcancel: () => { if (totpDialog === dialog) { generation++; sudoAbort?.abort(); } },\n\t\t\tclosed: () => { if (totpDialog === dialog) { generation++; sudoAbort?.abort(); totpDialog = null; } dialog.dispose(); },\n\t\t});\n\t\ttotpDialog = dialog;\n\t}, true, state.value?.totpEnabled ? async () => !(await os.confirm({\n\t\ttype: 'question', title: $locale.value.sfc['2faRenewTOTP'], text: $locale.value.sfc.renewWarning,\n\t\tokText: $locale.value.sfc['2faRenewTOTPOk'], cancelText: $locale.value.sfc['2faRenewTOTPCancel'],\n\t})).canceled : undefined);\n}\n\nasync function completeTotp(token: string): Promise<string[] | null> {\n\tlet codes: string[] | null = null;\n\tlet stillCurrent = () => false;\n\tawait run(async isCurrent => {\n\t\tconst value = await misskeyApi('i/security/totp/complete', { token });\n\t\tif (isCurrent()) { stillCurrent = isCurrent; codes = value.backupCodes; await refresh(isCurrent); }\n",
+				"baseline": "async function updatePasswordLessLogin(value: boolean) {\n\tawait os.apiWithDialog('i/2fa/passkey/password-less', {\n\t\tvalue,\n"
+			},
+			{
+				"start": 13717,
+				"end": 13756,
+				"current": "\treturn stillCurrent() ? codes : null;\n",
+				"baseline": ""
+			},
+			{
+				"start": 13758,
+				"end": 15052,
+				"current": "\nfunction removeTotp() {\n\treturn run(async isCurrent => {\n\t\tawait misskeyApi('i/security/totp/remove', { confirmDisableMfa: true });\n\t\tif (isCurrent()) { clearPending(); await refresh(isCurrent); }\n\t}, true, async () => !(await os.confirm({ type: 'warning', text: state.value?.passkeyMfaEnabled ? $locale.value.sfc.removeTotpWarning : $locale.value.sfc.disableWarning })).canceled);\n}\n\nfunction showCodes(codes: string[]) {\n\tif (!codes.length) return;\n\tcodesDialog?.dispose();\n\tconst dialog = os.popup(MkRecoveryCodesDialog, { codes }, { closed: () => { dialog.dispose(); if (codesDialog === dialog) codesDialog = null; } });\n\tcodesDialog = dialog;\n}\n\nfunction regenerateCodes() {\n\treturn run(async isCurrent => {\n\t\tclearPending();\n\t\tconst value = await misskeyApi('i/security/recovery-codes', { regenerate: true });\n\t\tif (isCurrent()) { showCodes(value.backupCodes); await refresh(isCurrent); }\n\t}, true, async () => !(await os.confirm({ type: 'warning', text: $locale.value.sfc.regenerateWarning })).canceled);\n}\n\nwatch(() => [ensureSignin().id, ensureSignin().token], () => { if (!currentActor()) leave(); }, { flush: 'sync' });\nonMounted(() => run(refresh, false));\nonActivated(() => { if (!active) { active = true; void run(refresh, false); } });\nonDeactivated(leave);\nonUnmounted(leave);\n",
+				"baseline": ""
+			},
+			{
+				"start": 25574,
+				"end": 25875,
+				"current": "\t\"2faBackupCodeUsedWarning\": \"A backup code has been used. Regenerate recovery codes if needed and store them somewhere safe.\",\n\t\"2faBackupCodesExhaustedWarning\": \"All backup codes have been used. Regenerate recovery codes before you lose access to your authenticator app or security key / passkey.\",\n",
+				"baseline": "\t\"2faBackupCodeUsedWarning\": \"A backup code has been used. Please reconfigure two-factor authentification as soon as possible if you are no longer able to use it.\",\n\t\"2faBackupCodesExhaustedWarning\": \"All backup codes have been used. Should you lose access to your two-factor authentification app, you will be unable to access this account. Please reconfigure two-factor authentification.\",\n"
+			},
+			{
+				"start": 27357,
+				"end": 29553,
+				"current": "\t\"2fa\": \"Two-factor authentication\",\n\t\"loading\": \"Loading settings…\",\n\t\"mfaActive\": \"Passkey multi-factor authentication is enabled.\",\n\t\"mfaInactive\": \"Passkey multi-factor authentication is disabled.\",\n\t\"rename\": \"Rename\",\n\t\"removeKeyWarning\": \"Remove this passkey? Disable passkey multi-factor authentication before removing the last key if no authenticator app is available. The last key cannot be removed while password login is disabled.\",\n\t\"enableMfa\": \"Enable passkey multi-factor authentication\",\n\t\"enableWarning\": \"Enable passkey multi-factor authentication? Password login will require an additional factor. If no recovery codes remain, new codes will be issued and shown once.\",\n\t\"disableMfa\": \"Disable passkey multi-factor authentication\",\n\t\"disableWarning\": \"Disable this authentication method? If no other multi-factor authentication method is enabled, you will be able to log in with only your password.\",\n\t\"disablePassword\": \"Disable password login\",\n\t\"disablePasswordDescription\": \"With passwordless login and a verified recovery email, confirm a passkey with device unlock to disable password login. Important actions will also use that passkey.\",\n\t\"disablePasswordWarning\": \"Disable password login? If you lose your passkeys, you will need to reset your password using your verified email.\",\n\t\"passwordDisabled\": \"Password login is disabled. Set a new password above to enable it again. The last passkey cannot be removed.\",\n\t\"removeTotpWarning\": \"Remove the authenticator app? Passkey multi-factor authentication will remain enabled.\",\n\t\"regenerateCodes\": \"Regenerate recovery codes\",\n\t\"regenerateWarning\": \"Regenerating recovery codes invalidates the previous codes. Continue?\",\n\t\"failed\": \"Could not complete the operation. Check your verification status and settings, then try again.\",\n\t\"learnMore\": \"Learn more\",\n\t\"password\": \"Password\",\n\t\"renewWarning\": \"Codes from the previous authenticator app will no longer work. Your backup codes will remain valid.\",\n\t\"passkeyPolicy\": \"You can register a key without setting up an authenticator app first. Registration enables passkey multi-factor authentication. Disabling it retains your keys and allows you to enable it again.\"\n",
+				"baseline": "\t\"2fa\": \"Two-factor authentication\"\n"
+			},
+			{
+				"start": 38631,
+				"end": 38818,
+				"current": "\t\"2faBackupCodeUsedWarning\": \"バックアップコードが使用されました。必要に応じて復旧コードを再生成し、安全な場所に保管してください。\",\n\t\"2faBackupCodesExhaustedWarning\": \"バックアップコードが全て使用されました。認証アプリやセキュリティキー・パスキーが使えなくなる前に、復旧コードを再生成してください。\",\n",
+				"baseline": "\t\"2faBackupCodeUsedWarning\": \"バックアップコードが使用されました。認証アプリが使えなくなっている場合、なるべく早く認証アプリを再設定してください。\",\n\t\"2faBackupCodesExhaustedWarning\": \"バックアップコードが全て使用されました。認証アプリを利用できない場合、これ以上アカウントにアクセスできなくなります。認証アプリを再登録してください。\",\n"
+			},
+			{
+				"start": 39835,
+				"end": 41148,
+				"current": "\t\"2fa\": \"二要素認証\",\n\t\"loading\": \"設定を読み込んでいます…\",\n\t\"mfaActive\": \"パスキーによる多要素認証は有効です。\",\n\t\"mfaInactive\": \"パスキーによる多要素認証は無効です。\",\n\t\"rename\": \"名前を変更\",\n\t\"removeKeyWarning\": \"このパスキーを削除しますか。パスキーによる多要素認証が有効で、他に使える認証アプリがない場合は、最後のパスキーを削除する前に「パスキーによる多要素認証を無効にする」ボタンで無効にしてください。パスワードログインが無効な場合は最後のパスキーを削除できません。\",\n\t\"enableMfa\": \"パスキーによる多要素認証を有効にする\",\n\t\"enableWarning\": \"パスキーによる多要素認証を有効にしますか。パスワードでのログインに追加の認証が必要になります。復旧コードが残っていない場合は、新しいコードを発行して一度だけ表示します。\",\n\t\"disableMfa\": \"パスキーによる多要素認証を無効にする\",\n\t\"disableWarning\": \"この認証方法を無効にしますか。他に多要素認証が有効でなければ、パスワードだけでログインできるようになります。\",\n\t\"disablePassword\": \"パスワードによるログインを無効にする\",\n\t\"disablePasswordDescription\": \"パスキー単独ログインと確認済みメールアドレスがある場合、端末ロック解除付きのパスキーで再確認してパスワードログインを無効にできます。重要な操作もそのパスキーで確認します。\",\n\t\"disablePasswordWarning\": \"パスワードによるログインを無効にしますか。パスキーを失った場合は確認済みメールへのパスワード再設定が必要です。\",\n\t\"passwordDisabled\": \"パスワードログインは無効です。有効に戻す場合は、上のパスワード変更から新しいパスワードを設定してください。最後のパスキーは削除できません。\",\n\t\"removeTotpWarning\": \"認証アプリを削除しますか。パスキーによる多要素認証は引き続き有効です。\",\n\t\"regenerateCodes\": \"復旧コードを再生成\",\n\t\"regenerateWarning\": \"復旧コードを再生成すると、以前の復旧コードは使えなくなります。続けますか。\",\n\t\"failed\": \"操作を完了できませんでした。本人確認の有効期限や設定を確認し、もう一度開始してください。\",\n\t\"learnMore\": \"詳しく\",\n\t\"password\": \"パスワード\",\n\t\"renewWarning\": \"今までの認証アプリの確認コードは使用できなくなります。バックアップコードは引き続き利用できます。\",\n\t\"passkeyPolicy\": \"認証アプリを先に設定しなくても登録できます。登録するとパスキーによる多要素認証が有効になります。無効にしても登録したキーは残り、再び有効にできます。\"\n",
+				"baseline": "\t\"2fa\": \"二要素認証\"\n"
+			}
+		],
+		"dictionaryEdits": [
+			{
+				"language": "en-US",
+				"key": "2faBackupCodeUsedWarning",
+				"current": "A backup code has been used. Regenerate recovery codes if needed and store them somewhere safe.",
+				"baseline": "A backup code has been used. Please reconfigure two-factor authentification as soon as possible if you are no longer able to use it."
+			},
+			{
+				"language": "en-US",
+				"key": "2faBackupCodesExhaustedWarning",
+				"current": "All backup codes have been used. Regenerate recovery codes before you lose access to your authenticator app or security key / passkey.",
+				"baseline": "All backup codes have been used. Should you lose access to your two-factor authentification app, you will be unable to access this account. Please reconfigure two-factor authentification."
+			},
+			{
+				"language": "ja-JP",
+				"key": "2faBackupCodeUsedWarning",
+				"current": "バックアップコードが使用されました。必要に応じて復旧コードを再生成し、安全な場所に保管してください。",
+				"baseline": "バックアップコードが使用されました。認証アプリが使えなくなっている場合、なるべく早く認証アプリを再設定してください。"
+			},
+			{
+				"language": "ja-JP",
+				"key": "2faBackupCodesExhaustedWarning",
+				"current": "バックアップコードが全て使用されました。認証アプリやセキュリティキー・パスキーが使えなくなる前に、復旧コードを再生成してください。",
+				"baseline": "バックアップコードが全て使用されました。認証アプリを利用できない場合、これ以上アカウントにアクセスできなくなります。認証アプリを再登録してください。"
 			}
 		]
 	},
@@ -1661,7 +1999,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/pages/settings/connect.vue",
-		"currentSha256": "e10f08b17169917619fbe8393f13f676e9f50396e47c8257cb3c9dd63c482ad7",
+		"currentSha256": "2a96b38e3806632b3e7706be1323d8c266c4b26c4c3dba9fe35ca47c551293ca",
 		"baselineSha256": "d2e031de7854a1707a347f36b5f3b2104c2b8aa6f377f1bf19737e1d988eb3ed",
 		"keys": [
 			"generateAccessToken"
@@ -1719,6 +2057,30 @@ export const globalCatalogPilotOwners = [
 				"end": 10560,
 				"current": "\t\"manage\": \"管理\",\n\t\"individualCredentialRequired\": \"トークンを発行するには通常のログインで個別セッションを作成し、発行時に再認証してください。\",\n\t\"issuanceFailed\": \"発行できませんでした。現在のアカウント・再認証・有効期限を確認してやり直してください。\"\n",
 				"baseline": "\t\"manage\": \"管理\"\n"
+			},
+			{
+				"start": 678,
+				"end": 805,
+				"current": "\t\t\t\t\t<MkButton primary :disabled=\"credentialBusy\" @click=\"generateToken\">{{ globalLocale.env.generateAccessToken }}</MkButton>\n",
+				"baseline": "\t\t\t\t\t<p v-if=\"!individualCredential\">{{ $locale.sfc.individualCredentialRequired }}</p>\n\t\t\t\t\t<MkButton primary :disabled=\"credentialBusy || !individualCredential\" @click=\"generateToken\">{{ globalLocale.env.generateAccessToken }}</MkButton>\n"
+			},
+			{
+				"start": 3561,
+				"end": 3561,
+				"current": "",
+				"baseline": "import { $i } from '../../i.js';\n"
+			},
+			{
+				"start": 3804,
+				"end": 3804,
+				"current": "",
+				"baseline": "const individualCredential = computed(() => $i?.token.startsWith('bs_'));\n"
+			},
+			{
+				"start": 3917,
+				"end": 3917,
+				"current": "",
+				"baseline": "\tif (!individualCredential.value) return;\n"
 			}
 		]
 	},
@@ -7527,7 +7889,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/moderation/frontend/pages/admin-user.vue",
-		"currentSha256": "36b1d5d5f165a987161b823f7a647dd74a8fab0872240b67431317ac48f51b98",
+		"currentSha256": "f2b0301b1dc11ec05a388bdf0a063f47bf200aa9ebbb2f646be75cbd1f64326a",
 		"baselineSha256": "0ad6550df9a130897f4edffec30afde01df2461f829d05c1921226a75c21d9c0",
 		"keys": [
 			"notes",
@@ -7616,6 +7978,24 @@ export const globalCatalogPilotOwners = [
 				"start": 11663,
 				"end": 11843,
 				"current": ";\nimport type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"baseline": ""
+			},
+			{
+				"start": 5178,
+				"end": 5465,
+				"current": "\t\t\t\t\t\t\t<div v-for=\"record in ips\" :key=\"record.id\" class=\"_monospace\" :class=\"$style.ip\" style=\"margin: 1em 0;\">\n\t\t\t\t\t\t\t\t<span class=\"date\">{{ $locale.sfc.ipFirstSeen }} {{ record.createdAt }}</span>\n\t\t\t\t\t\t\t\t<span class=\"date\">{{ $locale.sfc.ipLastSeen }} {{ record.lastSeenAt }}</span>\n",
+				"baseline": "\t\t\t\t\t\t\t<div v-for=\"record in ips\" :key=\"record.ip\" class=\"_monospace\" :class=\"$style.ip\" style=\"margin: 1em 0;\">\n\t\t\t\t\t\t\t\t<span class=\"date\">{{ record.createdAt }}</span>\n"
+			},
+			{
+				"start": 22385,
+				"end": 22416,
+				"current": "\tflex-wrap: wrap;\n\tgap: 0.5em;\n",
+				"baseline": ""
+			},
+			{
+				"start": 40877,
+				"end": 40926,
+				"current": "\t\"ipFirstSeen\": \"初回確認:\",\n\t\"ipLastSeen\": \"最終確認:\",\n",
 				"baseline": ""
 			}
 		],
@@ -16287,7 +16667,15 @@ export function restoreGlobalCatalogPilotDictionary(file: string, language: stri
 	for (const key of owner.keys) {
 		if (JSON.stringify(globalValue(global, key)) !== JSON.stringify(globalValue(locales[language], key))) throw new Error(`Global catalog pilot shared label differs: ${language}:${key}`);
 	}
-	const restored = Object.fromEntries(historicalOrder(owner, language).map(key => [key, Object.hasOwn(dictionary, key) ? dictionary[key] : historicalValue(owner, global, key)]));
+	const beforeFollowup = { ...dictionary };
+	if ('dictionaryEdits' in owner) {
+		for (const edit of owner.dictionaryEdits) {
+			if (edit.language !== language) continue;
+			if ((beforeFollowup[edit.key] ?? null) !== edit.current) throw new Error(`Global catalog pilot dictionary follow-up differs: ${file}:${language}:${edit.key}`);
+			beforeFollowup[edit.key] = edit.baseline;
+		}
+	}
+	const restored = Object.fromEntries(historicalOrder(owner, language).map(key => [key, Object.hasOwn(beforeFollowup, key) ? beforeFollowup[key] : historicalValue(owner, global, key)]));
 	if (JSON.stringify(restored) !== JSON.stringify(collect(baseline))) throw new Error(`Global catalog pilot historical dictionary differs: ${file}:${language}`);
 	return restored;
 }

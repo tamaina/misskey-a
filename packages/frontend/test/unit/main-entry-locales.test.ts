@@ -12,6 +12,8 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { createInternationalization, setActiveInternationalization, useLocale } from 'vite-vue-internationalization/runtime';
 import type { InternationalizationInstance } from 'vite-vue-internationalization/runtime';
 
+const originalRejectionHandler = window.onunhandledrejection;
+
 function deferred() {
 	let resolve!: () => void;
 	const promise = new Promise<void>(done => { resolve = done; });
@@ -39,6 +41,8 @@ async function prepare(path: string, language: string | null, load?: () => Promi
 		return runtime;
 	});
 	const activate = vi.fn(setActiveInternationalization);
+	vi.doMock('@features/auth/frontend/accounts.js', () => ({ refreshCurrentAccount: vi.fn().mockResolvedValue(undefined) }));
+	vi.doMock('@features/auth/frontend/credential-rejection.js', () => ({ isInvalidCredential: () => false }));
 	vi.doMock('virtual:vite-vue-internationalization', () => ({ createInternationalization: create, setActiveInternationalization: activate }));
 	for (const kind of ['main', 'sub']) {
 		vi.doMock(`@features/boot/frontend/boot/${kind}-boot.js`, () => {
@@ -58,6 +62,9 @@ async function prepare(path: string, language: string | null, load?: () => Promi
 }
 
 afterEach(() => {
+	window.onunhandledrejection = originalRejectionHandler;
+	vi.doUnmock('@features/auth/frontend/accounts.js');
+	vi.doUnmock('@features/auth/frontend/credential-rejection.js');
 	vi.doUnmock('virtual:vite-vue-internationalization');
 	vi.doUnmock('@features/boot/frontend/boot/main-boot.js');
 	vi.doUnmock('@features/boot/frontend/boot/sub-boot.js');

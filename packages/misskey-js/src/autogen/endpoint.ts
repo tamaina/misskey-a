@@ -279,6 +279,8 @@ import type {
 	ISecurityPasskeyMfaStartRequest,
 	ISecurityPasskeyMfaStartResponse,
 	ISecurityPasskeyMfaCompleteRequest,
+	ISecurityPasskeyMfaEnableRequest,
+	ISecurityPasskeyMfaEnableResponse,
 	ISecurityPasskeyMfaDisableRequest,
 	ISecurityPasskeyRemoveRequest,
 	ISecurityPasskeyRenameRequest,
@@ -973,6 +975,7 @@ export type Endpoints = {
 	'i/security/passkey/register/complete': { req: ISecurityPasskeyRegisterCompleteRequest; res: ISecurityPasskeyRegisterCompleteResponse };
 	'i/security/passkey/mfa/start': { req: ISecurityPasskeyMfaStartRequest; res: ISecurityPasskeyMfaStartResponse };
 	'i/security/passkey/mfa/complete': { req: ISecurityPasskeyMfaCompleteRequest; res: EmptyResponse };
+	'i/security/passkey/mfa/enable': { req: ISecurityPasskeyMfaEnableRequest; res: ISecurityPasskeyMfaEnableResponse };
 	'i/security/passkey/mfa/disable': { req: ISecurityPasskeyMfaDisableRequest; res: EmptyResponse };
 	'i/security/passkey/remove': { req: ISecurityPasskeyRemoveRequest; res: EmptyResponse };
 	'i/security/passkey/rename': { req: ISecurityPasskeyRenameRequest; res: EmptyResponse };

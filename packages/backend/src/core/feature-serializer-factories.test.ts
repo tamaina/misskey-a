@@ -71,7 +71,7 @@ describe('annotation-free feature serializers', () => {
 		const deps = mockDeep<Inputs<typeof authServices>>();
 		deps.idService.parse.mockReturnValue({ date });
 		const pack = authServices.create(deps).SigninEntityService.pack;
-		expect(await pack(fixture<MiSignin>({ id: 'signin', ip: '127.0.0.1', headers: { accept: 'application/json' }, success: false }))).toEqual({ id: 'signin', createdAt: date.toISOString(), ip: '127.0.0.1', headers: { accept: 'application/json' }, success: false });
+		expect(await pack(fixture<MiSignin>({ id: 'signin', ip: '127.0.0.1', headers: { accept: 'application/json' }, success: false }))).toEqual({ id: 'signin', createdAt: date.toISOString(), ip: '127.0.0.1', headers: { accept: 'application/json' }, success: false, browserSessionId: null, browserSession: null });
 	});
 
 	test('channels preserve viewer hints, banner URLs, and pinned-note order', async () => {

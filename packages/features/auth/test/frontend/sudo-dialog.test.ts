@@ -45,7 +45,7 @@ test('TOTP is the initial choice and the common endpoint receives password plus 
 	expect(element.querySelector('select')).toBeNull(); expect(element.querySelector('[aria-checked=true]')?.textContent).toContain('認証アプリのコード'); expect(element.querySelector('form ._buttons')?.textContent).toContain('キャンセル'); input('password', 'synthetic-password'); input('text', '123456'); submit();
 	await vi.waitFor(() => expect(done).toHaveBeenCalledWith(true));
 	expect(misskeyApi).toHaveBeenCalledWith('i/sudo/start', { password: 'synthetic-password', usePasskey: false, token: '123456' }); expect(startAuthentication).not.toHaveBeenCalled();
-	expect([...element.querySelectorAll('input:not([type=radio])')].every(field => !field.value)).toBe(true);
+	expect([...element.querySelectorAll<HTMLInputElement>('input:not([type=radio])')].every(field => !field.value)).toBe(true);
 });
 
 async function enablePasskeyMfa() {
@@ -80,7 +80,7 @@ test('an abandoned start cleans only its exact elevation using the original sess
 test('server rejection clears entered secrets and never changes authentication purpose', async () => {
 	vi.mocked(misskeyApi).mockRejectedValueOnce(new Error('Synthetic rejected proof')); input('password', 'synthetic-password'); input('text', '123456'); submit();
 	await vi.waitFor(() => expect(element.querySelector('[role=alert]')).not.toBeNull());
-	expect([...element.querySelectorAll('input:not([type=radio])')].every(field => !field.value)).toBe(true); expect(done).not.toHaveBeenCalled(); expect(startAuthentication).not.toHaveBeenCalled();
+	expect([...element.querySelectorAll<HTMLInputElement>('input:not([type=radio])')].every(field => !field.value)).toBe(true); expect(done).not.toHaveBeenCalled(); expect(startAuthentication).not.toHaveBeenCalled();
 	expect(vi.mocked(misskeyApi).mock.calls.map(([route]) => route)).toEqual(['i/security/state', 'i/sudo/start']);
 });
 

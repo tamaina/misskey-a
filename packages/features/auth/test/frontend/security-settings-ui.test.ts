@@ -37,6 +37,14 @@ vi.mock('@features/ui/frontend/utility/confetti.js', () => ({ confetti: vi.fn() 
 const slot = defineComponent({ inheritAttrs: false, setup: (_, { slots }) => () => h('div', slots.default?.()) });
 const i18nSlot = defineComponent({ props: ['src'], setup: (props, { slots }) => () => h('span', [props.src, slots.t?.()]) });
 
+// popup is generic over the component's emits; a mock receives several dialogs.
+function emitPopupEvent(events: unknown, name: string, ...args: unknown[]) {
+	if (events === null || typeof events !== 'object') throw new Error('Missing popup events');
+	const callback: unknown = Reflect.get(events, name);
+	if (typeof callback !== 'function') throw new Error(`Missing popup event: ${name}`);
+	callback(...args);
+}
+
 function registerGlobals(instance: ReturnType<typeof createApp>) {
 	for (const name of ['SearchMarker', 'SearchLabel', 'SearchText']) instance.component(name, slot);
 	instance.component('I18n', i18nSlot);
@@ -54,7 +62,7 @@ beforeAll(async () => { await internationalization.ready; await internationaliza
 beforeEach(async () => {
 	vi.mocked(popup).mockImplementation((component, props, events) => {
 		if (component === MkDialog) {
-			queueMicrotask(() => events?.done?.({ canceled: false, result: 'Synthetic key' }));
+			queueMicrotask(() => emitPopupEvent(events, 'done', { canceled: false, result: 'Synthetic key' }));
 			return { dispose: vi.fn() } as never;
 		}
 		const instance = createApp(component as never, { ...props, onClosed: events?.closed, onCancel: events?.cancel }); instance.use(internationalization); registerGlobals(instance); instance.mount(modal);
@@ -134,7 +142,7 @@ test.each(['sudo', 'name', 'closed', 'webauthn'] as const)('cancelled %s settles
 	if (stage === 'sudo') vi.mocked(ensureSudo).mockResolvedValueOnce(false);
 	if (stage === 'name' || stage === 'closed') {
 		vi.mocked(popup).mockImplementationOnce((_component, _props, events) => {
-			queueMicrotask(() => stage === 'closed' ? events?.closed?.() : events?.done?.({ canceled: true }));
+			queueMicrotask(() => stage === 'closed' ? emitPopupEvent(events, 'closed') : emitPopupEvent(events, 'done', { canceled: true }));
 			return { dispose: vi.fn() } as never;
 		});
 	}
@@ -182,7 +190,7 @@ test.each(['leave', 'actor', 'token', 'unmount'] as const)('%s disposes pending 
 	let finish!: () => void;
 	const dispose = vi.fn();
 	vi.mocked(popup).mockImplementationOnce((_component, _props, events) => {
-		finish = () => events?.done?.({ canceled: false, result: 'Late name' });
+		finish = () => emitPopupEvent(events, 'done', { canceled: false, result: 'Late name' });
 		return { dispose } as never;
 	});
 	click('セキュリティキー・パスキーを登録する');
@@ -492,7 +500,7 @@ for (const cancel of ['dialog', 'sudo'] as const) {
 	test.each(dialogActions)(`$label stops after cancelled ${cancel}`, async action => {
 		await prepareDialogAction(action);
 		if (cancel === 'sudo') vi.mocked(ensureSudo).mockResolvedValueOnce(false);
-		else if (action.input) vi.mocked(inputText).mockResolvedValueOnce({ canceled: true });
+		else if (action.input) vi.mocked(inputText).mockResolvedValueOnce({ canceled: true, result: undefined });
 		else vi.mocked(confirm).mockResolvedValueOnce({ canceled: true });
 		click(action.label); await nextTick();
 		if (cancel === 'sudo') await vi.waitFor(() => expect(ensureSudo).toHaveBeenCalledOnce());
