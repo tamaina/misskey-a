@@ -4,7 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<SearchMarker path="/settings/notifications" :label="globalLocale.env.notifications" :keywords="['notifications']" icon="ti ti-bell">
+<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
+<SearchMarker path="/settings/notifications" :label="$locale.sfc.notifications" :keywords="['notifications']" icon="ti ti-bell">
 	<div class="_gaps_m">
 		<MkFeatureBanner icon="/fluent-emoji/1f514.png" color="#ffff00">
 			<SearchText>{{ $locale.sfc.settingsNotificationsBanner }}</SearchText>
@@ -237,7 +238,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "احذف الإشعارات فور قراءتها",
 	"sendPushNotificationReadMessageCaption": "هذا قد يزيد من معدل استهلاك الطاقة لجهازك.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "الإشعارات"
 }
 </locale>
 
@@ -257,7 +259,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Esborrar les notificacions enviades quan s'hagin llegit",
 	"sendPushNotificationReadMessageCaption": "Això pot fer que el teu dispositiu consumeixi més bateria",
 	"unnotifyNotes": "Deixar de notificar quan hi hagi notes noves",
-	"notifyNotes": "Notificar quan hi hagi notes noves"
+	"notifyNotes": "Notificar quan hi hagi notes noves",
+	"notifications": "Notificacions"
 }
 </locale>
 
@@ -277,7 +280,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Odstraněnit oznámení push po jejich přečtení",
 	"sendPushNotificationReadMessageCaption": "Tohle může zvýšit spotřebu energie vašeho zařízení.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Oznámení"
 }
 </locale>
 
@@ -297,7 +301,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Delete push notifications once they have been read",
 	"sendPushNotificationReadMessageCaption": "This may increase the power consumption of your device.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -317,7 +322,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Push-Benachrichtigungen löschen, sobald sie gelesen wurden",
 	"sendPushNotificationReadMessageCaption": "Dies kann gegebenenfalls den Batterieverbrauch deines Gerätes erhöhen.",
 	"unnotifyNotes": "Nicht über neue Notizen benachrichtigen",
-	"notifyNotes": "Über neue Notizen benachrichtigen"
+	"notifyNotes": "Über neue Notizen benachrichtigen",
+	"notifications": "Benachrichtigungen"
 }
 </locale>
 
@@ -337,7 +343,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Delete push notifications once they have been read",
 	"sendPushNotificationReadMessageCaption": "This may increase the power consumption of your device.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -357,7 +364,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Eliminar las notificaciones push después de leer las notificaciones y los mensajes",
 	"sendPushNotificationReadMessageCaption": "La notificación \"{emptyPushNotificationMessage}\" aparecerá momentáneamente. Esto puede aumentar el consumo de batería del dispositivo.",
 	"unnotifyNotes": "Dejar de notificar nuevas notas",
-	"notifyNotes": "Notificar nuevas notas"
+	"notifyNotes": "Notificar nuevas notas",
+	"notifications": "Notificaciones"
 }
 </locale>
 
@@ -377,7 +385,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Supprimer les notifications push une fois que les notifications ou messages pertinents ont été lus.",
 	"sendPushNotificationReadMessageCaption": "Cela peut augmenter la consommation de batterie de votre appareil.",
 	"unnotifyNotes": "Ne pas notifier pour la publication des notes",
-	"notifyNotes": "Notifier à propos des nouvelles notes"
+	"notifyNotes": "Notifier à propos des nouvelles notes",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -397,7 +406,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Hapus notifikasi dorong ketika notifikasi relevan atau pesan telah dibaca",
 	"sendPushNotificationReadMessageCaption": "Notifikasi berisi teks「{emptyPushNotificationMessage}」akan ditampilkan dalam waktu pendek. Ini mungkin dapat menambah pemakaian baterai pada perangkat kamu.",
 	"unnotifyNotes": "Berhenti memberitahu mengenai catatan baru",
-	"notifyNotes": "Beritahu mengenai catatan baru"
+	"notifyNotes": "Beritahu mengenai catatan baru",
+	"notifications": "Notifikasi"
 }
 </locale>
 
@@ -417,7 +427,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Eliminare le notifiche push dopo la relativa lettura",
 	"sendPushNotificationReadMessageCaption": "Se possibile, verrà mostrata brevemente una notifica con il testo \"{emptyPushNotificationMessage}\". Potrebbe influire negativamente sulla durata della batteria.",
 	"unnotifyNotes": "Interrompi le notifiche di nuove Note",
-	"notifyNotes": "Notifica nuove Note"
+	"notifyNotes": "Notifica nuove Note",
+	"notifications": "Notifiche"
 }
 </locale>
 
@@ -437,7 +448,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "通知が既読になったらプッシュ通知を削除する",
 	"sendPushNotificationReadMessageCaption": "端末の電池消費量が増加する可能性があります。",
 	"unnotifyNotes": "投稿の通知を解除",
-	"notifyNotes": "投稿を通知"
+	"notifyNotes": "投稿を通知",
+	"notifications": "通知"
 }
 </locale>
 
@@ -457,7 +469,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "通知やメッセージが既読になったらプッシュ通知を消すで",
 	"sendPushNotificationReadMessageCaption": "あんたの端末の電池使う量が増えるかもしれん。",
 	"unnotifyNotes": "投稿の通知やめる",
-	"notifyNotes": "投稿を通知"
+	"notifyNotes": "投稿を通知",
+	"notifications": "通知"
 }
 </locale>
 
@@ -477,7 +490,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Delete push notifications once they have been read",
 	"sendPushNotificationReadMessageCaption": "This may increase the power consumption of your device.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Ilɣuyen"
 }
 </locale>
 
@@ -497,7 +511,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Delete push notifications once they have been read",
 	"sendPushNotificationReadMessageCaption": "This may increase the power consumption of your device.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "ಅಧಿಸೂಚನೆಗಳು"
 }
 </locale>
 
@@ -517,7 +532,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "푸시 알림이나 메시지를 읽은 뒤 푸시 알림을 삭제",
 	"sendPushNotificationReadMessageCaption": "「{emptyPushNotificationMessage}」이라는 알림이 잠깐 표시됩니다. 기기의 전력 소비량이 증가할 수 있습니다.",
 	"unnotifyNotes": "새 노트 알림 끄기",
-	"notifyNotes": "새 노트 알림 켜기"
+	"notifyNotes": "새 노트 알림 켜기",
+	"notifications": "알림"
 }
 </locale>
 
@@ -537,7 +553,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Delete push notifications once they have been read",
 	"sendPushNotificationReadMessageCaption": "This may increase the power consumption of your device.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Meldingen"
 }
 </locale>
 
@@ -557,7 +574,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Delete push notifications once they have been read",
 	"sendPushNotificationReadMessageCaption": "This may increase the power consumption of your device.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Varsler"
 }
 </locale>
 
@@ -577,7 +595,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Usuń powiadomienia push po przeczytaniu powiadomień i wiadomości.",
 	"sendPushNotificationReadMessageCaption": "Chwilowo pojawi się powiadomienie \"{emptyPushNotificationMessage}\". Może wzrosnąć zużycie baterii urządzenia.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Powiadomienia"
 }
 </locale>
 
@@ -597,7 +616,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Apagar notificações push quando elas foram lidas",
 	"sendPushNotificationReadMessageCaption": "Pode aumentar o consumo de energia do dispositivo.",
 	"unnotifyNotes": "Deixar de notificar sobre novas notas",
-	"notifyNotes": "Notificar sobre novas notas"
+	"notifyNotes": "Notificar sobre novas notas",
+	"notifications": "Notificações"
 }
 </locale>
 
@@ -617,7 +637,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Удалять push-уведомления когда сообщение или прочитано",
 	"sendPushNotificationReadMessageCaption": "На мгновение появится уведомление \"{emptyPushNotificationMessage}\". Расход заряда батареи может увеличиться ",
 	"unnotifyNotes": "Отписаться от сообщений",
-	"notifyNotes": "Оповещать о публикациях"
+	"notifyNotes": "Оповещать о публикациях",
+	"notifications": "Уведомления"
 }
 </locale>
 
@@ -637,7 +658,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Odstrániť push notifikácie po ich prečítaní",
 	"sendPushNotificationReadMessageCaption": "Na chvíľu sa zobrazí oznámenie \"{emptyPushNotificationMessage}\". Môže to zvýšiť spotrebu batérie zariadenia.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Oznámenia"
 }
 </locale>
 
@@ -657,7 +679,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "ลบการแจ้งเตือนแบบพุชเมื่ออ่านการแจ้งเตือนหรือข้อความที่เกี่ยวข้องแล้ว",
 	"sendPushNotificationReadMessageCaption": "อาจทำให้อุปกรณ์ของคุณใช้พลังงานมากขึ้น",
 	"unnotifyNotes": "หยุดการแจ้งเตือนเกี่ยวกับโน้ตใหม่",
-	"notifyNotes": "แจ้งเตือนเกี่ยวกับโพสต์ใหม่"
+	"notifyNotes": "แจ้งเตือนเกี่ยวกับโพสต์ใหม่",
+	"notifications": "เเจ้งเตือน"
 }
 </locale>
 
@@ -677,7 +700,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Okunduktan sonra push bildirimlerini silin",
 	"sendPushNotificationReadMessageCaption": "Bu, cihazınızın güç tüketimini artırabilir.",
 	"unnotifyNotes": "Yeni notlar hakkında bildirim almayı durdur",
-	"notifyNotes": "Yeni notlar hakkında bildirimde bulun"
+	"notifyNotes": "Yeni notlar hakkında bildirimde bulun",
+	"notifications": "Bildirimler"
 }
 </locale>
 
@@ -697,7 +721,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Delete push notifications once they have been read",
 	"sendPushNotificationReadMessageCaption": "This may increase the power consumption of your device.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -717,7 +742,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Видаляти push-сповіщення після прочитання",
 	"sendPushNotificationReadMessageCaption": "Це може збільшити споживання енергії вашим пристроєм.",
 	"unnotifyNotes": "Припинити сповіщати про нові нотатки",
-	"notifyNotes": "Сповіщати про нові нотатки"
+	"notifyNotes": "Сповіщати про нові нотатки",
+	"notifications": "Сповіщення"
 }
 </locale>
 
@@ -737,7 +763,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "Xóa thông báo đẩy sau khi đọc thông báo hay tin nhắn",
 	"sendPushNotificationReadMessageCaption": "Thông báo như {emptyPushNotificationMessage} sẽ hiển thị trong giây phút. Tiêu tốn pin của máy bạn có thể tăng lên hơn nữa.",
 	"unnotifyNotes": "Stop notifying about new notes",
-	"notifyNotes": "Notify about new notes"
+	"notifyNotes": "Notify about new notes",
+	"notifications": "Thông báo"
 }
 </locale>
 
@@ -757,7 +784,8 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "删除已读推送通知消息",
 	"sendPushNotificationReadMessageCaption": "您终端设备的电池消耗可能会增加。",
 	"unnotifyNotes": "关闭发帖通知",
-	"notifyNotes": "开启发帖通知"
+	"notifyNotes": "开启发帖通知",
+	"notifications": "通知"
 }
 </locale>
 
@@ -777,6 +805,7 @@ definePage(() => ({
 	"sendPushNotificationReadMessage": "如果已閱讀通知與訊息，就刪除推播通知",
 	"sendPushNotificationReadMessageCaption": "可能會導致裝置的電池消耗量增加。",
 	"unnotifyNotes": "關閉貼文通知",
-	"notifyNotes": "開啟貼文通知"
+	"notifyNotes": "開啟貼文通知",
+	"notifications": "通知"
 }
 </locale>

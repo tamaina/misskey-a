@@ -226,15 +226,25 @@ it.each([false, true])('filters call tools by fresh grants and roles (modern pro
 		const params = modern ? { _meta: { 'io.modelcontextprotocol/protocolVersion': '2026-07-28', 'io.modelcontextprotocol/clientCapabilities': {} } } : {};
 		const response = await invoke(message('tools/list', params), modern ? { 'mcp-method': 'tools/list', 'mcp-protocol-version': '2026-07-28' } : {});
 		expect(response.statusCode).toBe(200);
-		return response.json().result.tools as { name: string; annotations: { readOnlyHint: boolean } }[];
+		return response.json().result.tools as { name: string; annotations: { readOnlyHint: boolean }; inputSchema: { properties: { endpoint: { enum: string[] } } } }[];
 	};
 	const names = async () => (await list()).map(tool => tool.name);
+	const general = (await list()).find(tool => tool.name === 'call_api_general');
+	expect(general?.inputSchema.properties.endpoint.enum).toContain('users/notes');
+	for (const endpoint of ['reset-db', 'test', 'my/apps', 'admin/ad/list', 'notes/reactions/create']) {
+		expect(general?.inputSchema.properties.endpoint.enum).not.toContain(endpoint);
+	}
 	expect(await names()).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general']);
 	f.grant.permission.push('write:reactions', 'read:admin:ad', 'write:admin:ad');
 	expect(await names()).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general', 'call_api_write_reactions']);
 	f.roles.getUserRoles.mockResolvedValue([{ isAdministrator: true, isModerator: false } as MiRole]);
 	expect(await names()).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general', 'call_api_read_admin_ad', 'call_api_write_admin_ad', 'call_api_write_reactions']);
-	expect((await list()).find(tool => tool.name === 'call_api_read_admin_ad')?.annotations.readOnlyHint).toBe(true);
+	const adminRead = (await list()).find(tool => tool.name === 'call_api_read_admin_ad');
+	expect(adminRead?.annotations.readOnlyHint).toBe(true);
+	expect(adminRead?.inputSchema.properties.endpoint.enum).toEqual(['admin/ad/list']);
+	const reactionWrite = (await list()).find(tool => tool.name === 'call_api_write_reactions');
+	expect(reactionWrite?.inputSchema.properties.endpoint.enum).toContain('notes/reactions/create');
+	expect(reactionWrite?.inputSchema.properties.endpoint.enum).not.toContain('users/notes');
 	f.roles.getUserRoles.mockResolvedValue([]);
 	f.grant.permission = ['access:mcp'];
 	expect(await names()).toEqual(['list_my_notes', 'list_api_endpoints', 'call_api_general']);

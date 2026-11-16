@@ -7,10 +7,22 @@ import { parseAst } from 'rolldown/parseAst';
 import { walk } from 'oxc-walker';
 import { assertNever } from '../utils.js';
 import type { ESTree } from 'rolldown/utils';
-import type { LocaleInliner, TextModification } from '../locale-inliner.js';
 import type { Logger } from '../logger.js';
 
-export function collectModifications(sourceCode: string, fileName: string, fileLogger: Logger, inliner: Pick<LocaleInliner, 'scriptsDir' | 'i18nFileName' | 'i18nSymbol'>): TextModification[] {
+interface LegacyI18nContext {
+	i18nFileName: string;
+	i18nSymbol: string;
+}
+
+export interface LegacyLabelReference {
+	type: 'localized' | 'parameterized-function';
+	begin: number;
+	end: number;
+	localizationKey: string[];
+}
+
+/** Collect legacy label references for build validation without rewriting code. */
+export function collectModifications(sourceCode: string, fileLogger: Logger, context: LegacyI18nContext): LegacyLabelReference[] {
 	if (sourceCode === '') return [];
 	let programNode: ESTree.Program;
 	try {
@@ -24,82 +36,15 @@ export function collectModifications(sourceCode: string, fileName: string, fileL
 		return [];
 	}
 
-	const modifications: TextModification[] = [];
-
-	// first
-	// 1) replace all `scripts/` path literals with locale code
-	// 2) replace all `localStorage.getItem("lang")` with `localeName` variable
-	// 3) replace all `await window.fetch(`/assets/locales/${d}.${x}.json`).then(u=>u.json())` with `localeJson` variable
-	walk(programNode, {
-		enter(this, node) {
-			if (node.type === 'Literal' && typeof node.value === 'string' && node.raw) {
-				if (node.raw.substring(1).startsWith(inliner.scriptsDir)) {
-					// we find `scripts/\w+\.js` literal and replace 'scripts' part with locale code
-					fileLogger.debug(`${lineCol(sourceCode, node)}: found ${inliner.scriptsDir}/ path literal ${node.raw}`);
-					modifications.push({
-						type: 'locale-name',
-						begin: node.start + 1,
-						end: node.start + 1 + inliner.scriptsDir.length,
-						literal: false,
-						localizedOnly: true,
-					});
-				}
-				if (node.raw.substring(1, node.raw.length - 1) === `${inliner.scriptsDir}/${inliner.i18nFileName}`) {
-					// we find `scripts/i18n.ts` literal.
-					// This is tipically in depmap and replace with this file name to avoid unnecessary loading i18n script
-					fileLogger.debug(`${lineCol(sourceCode, node)}: found ${inliner.i18nFileName} path literal ${node.raw}`);
-					modifications.push({
-						type: 'replace',
-						begin: node.end - 1 - inliner.i18nFileName.length,
-						end: node.end - 1,
-						text: fileName,
-						localizedOnly: true,
-					});
-				}
-			}
-
-			if (isLocalStorageGetItemLang(node)) {
-				fileLogger.debug(`${lineCol(sourceCode, node)}: found localStorage.getItem("lang") call`);
-				modifications.push({
-					type: 'locale-name',
-					begin: node.start,
-					end: node.end,
-					literal: true,
-					localizedOnly: true,
-				});
-			}
-
-			if (isAwaitFetchLocaleThenJson(node)) {
-				// await window.fetch(`/assets/locales/${d}.${x}.json`).then(u=>u.json(), () => null)
-				fileLogger.debug(`${lineCol(sourceCode, node)}: found await window.fetch(\`/assets/locales/\${d}.\${x}.json\`).then(u=>u.json()) call`);
-				modifications.push({
-					type: 'locale-json',
-					begin: node.start,
-					end: node.end,
-					localizedOnly: true,
-				});
-			}
-		},
-	});
-
-	const importSpecifierResult = findImportSpecifier(programNode, inliner.i18nFileName, inliner.i18nSymbol);
+	const importSpecifierResult = findImportSpecifier(programNode, context.i18nFileName, context.i18nSymbol);
 
 	switch (importSpecifierResult.type) {
 		case 'no-import':
-			fileLogger.debug('No import of i18n found, skipping inlining.');
-			return modifications;
 		case 'no-specifiers':
-			fileLogger.debug('Importing i18n without specifiers, removing the import.');
-			modifications.push({
-				type: 'delete',
-				begin: importSpecifierResult.importNode.start,
-				end: importSpecifierResult.importNode.end,
-				localizedOnly: false,
-			});
-			return modifications;
+			return [];
 		case 'unexpected-specifiers':
-			fileLogger.error(`Importing ${inliner.i18nFileName} found but with unexpected specifiers. Skipping inlining.`);
-			return modifications;
+			fileLogger.error(`Importing ${context.i18nFileName} found but with unexpected specifiers. Cannot validate legacy labels.`);
+			return [];
 		case 'specifier':
 			fileLogger.debug(`Found import i18n as ${importSpecifierResult.localI18nIdentifier}`);
 			break;
@@ -108,14 +53,9 @@ export function collectModifications(sourceCode: string, fileName: string, fileL
 	const i18nImport = importSpecifierResult.importNode;
 	const localI18nIdentifier = importSpecifierResult.localI18nIdentifier;
 
-	fileLogger.debug(`imports ${inliner.i18nSymbol} /*i18n*/ as ${localI18nIdentifier}`);
+	fileLogger.debug(`imports ${context.i18nSymbol} /*i18n*/ as ${localI18nIdentifier}`);
 
-	// In case of substitution failure, we will preserve the import statement
-	// otherwise we will remove it.
-	// A shared chunk may also export VVI owners or unrelated runtime helpers.
-	let preserveI18nImport = i18nImport.specifiers.length > 1;
-
-	const codeModifications: TextModification[] = [];
+	const codeModifications: LegacyLabelReference[] = [];
 
 	const toSkip = new Set();
 	toSkip.add(i18nImport);
@@ -139,8 +79,7 @@ export function collectModifications(sourceCode: string, fileName: string, fileL
 				if (parent.type === 'ExportSpecifier' && property === 'exported') return; // we don't care 'id' part of { id: expr }
 				if (node.name === localI18nIdentifier) {
 					// the use of identifier is either direct reference to i18n, or unsupported conflict of the identifier, which should report error.
-					fileLogger.error(`${lineCol(sourceCode, node)}: Using i18n identifier "${localI18nIdentifier}" directly. Skipping inlining.`);
-					preserveI18nImport = true;
+					fileLogger.error(`${lineCol(sourceCode, node)}: Using i18n identifier "${localI18nIdentifier}" directly. Cannot validate legacy labels.`);
 				}
 			} else if (node.type === 'MemberExpression') {
 				const i18nPath = parseI18nPropertyAccess(node);
@@ -155,19 +94,16 @@ export function collectModifications(sourceCode: string, fileName: string, fileL
 						begin: node.start,
 						end: node.end,
 						localizationKey: i18nPath.slice(1), // remove 'ts' prefix
-						localizedOnly: true,
 					});
 					this.skip();
 				} else if (i18nPath != null && i18nPath.length >= 2 && i18nPath[0] === 'tsx') {
-					// it's parameterized locale substitution (`i18n.tsx.property(parameters)`)
-					// we expect the parameter to be an object literal
+					// Detect formatter references as well as calls (`i18n.tsx.property(parameters)`).
 					fileLogger.debug(`${lineCol(sourceCode, node)}: found i18n function access (object) ${i18nPath.join('.')}`);
 					codeModifications.push({
 						type: 'parameterized-function',
 						begin: node.start,
 						end: node.end,
 						localizationKey: i18nPath.slice(1), // remove 'tsx' prefix
-						localizedOnly: true,
 					});
 					this.skip();
 				}
@@ -210,17 +146,6 @@ export function collectModifications(sourceCode: string, fileName: string, fileL
 		},
 	});
 
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	if (!preserveI18nImport) {
-		fileLogger.debug('removing i18n import statement');
-		codeModifications.push({
-			type: 'delete',
-			begin: i18nImport.start,
-			end: i18nImport.end,
-			localizedOnly: true,
-		});
-	}
-
 	function parseI18nPropertyAccess(node: ESTree.Expression | ESTree.Super): string[] | null {
 		if (node.type === 'Identifier' && node.name === localI18nIdentifier) return []; // i18n itself
 		if (node.type !== 'MemberExpression') return null;
@@ -251,7 +176,7 @@ export function collectModifications(sourceCode: string, fileName: string, fileL
 		return [...parentAccess, id];
 	}
 
-	return [...modifications, ...codeModifications];
+	return codeModifications;
 }
 
 function declsOfPattern(pattern: ESTree.BindingPattern | ESTree.ParamPattern | ESTree.ArrayAssignmentTarget | ESTree.ObjectAssignmentTarget | ESTree.AssignmentTargetMaybeDefault | ESTree.AssignmentTargetRest | null): string[] {
@@ -352,67 +277,6 @@ function findBlockScopeDecls(block: ESTree.BlockStatement): string[] {
 	return decls;
 }
 
-//region checker functions
-
-// localStorage.getItem("lang")
-function isLocalStorageGetItemLang(getItemCall: ESTree.Node): boolean {
-	if (getItemCall.type !== 'CallExpression') return false;
-	if (getItemCall.arguments.length !== 1) return false;
-
-	const langLiteral = getItemCall.arguments[0];
-	if (!isStringLiteral(langLiteral, 'lang')) return false;
-
-	const getItemFunction = getItemCall.callee;
-	if (!isMemberExpression(getItemFunction, 'getItem')) return false;
-
-	const localStorageObject = getItemFunction.object;
-	if (!isIdentifier(localStorageObject, 'localStorage')) return false;
-
-	return true;
-}
-
-// await window.fetch(`/assets/locales/${d}.${x}.json`).then(u => u.json(), ....)
-function isAwaitFetchLocaleThenJson(awaitNode: ESTree.Node): boolean {
-	if (awaitNode.type !== 'AwaitExpression') return false;
-
-	const thenCall = awaitNode.argument;
-	if (thenCall.type !== 'CallExpression') return false;
-	if (thenCall.arguments.length < 1) return false;
-
-	const arrowFunction = thenCall.arguments[0];
-	if (arrowFunction.type !== 'ArrowFunctionExpression') return false;
-	if (arrowFunction.params.length !== 1) return false;
-
-	const arrowBodyCall = arrowFunction.body;
-	if (arrowBodyCall.type !== 'CallExpression') return false;
-
-	const jsonFunction = arrowBodyCall.callee;
-	if (!isMemberExpression(jsonFunction, 'json')) return false;
-
-	const thenFunction = thenCall.callee;
-	if (!isMemberExpression(thenFunction, 'then')) return false;
-
-	const fetchCall = thenFunction.object;
-	if (fetchCall.type !== 'CallExpression') return false;
-	if (fetchCall.arguments.length !== 1 && fetchCall.arguments.length !== 2) return false;
-
-	// `/assets/locales/${d}.${x}.json`
-	const assetLocaleTemplate = fetchCall.arguments[0];
-	if (assetLocaleTemplate.type !== 'TemplateLiteral') return false;
-	if (assetLocaleTemplate.quasis.length !== 3) return false;
-	if (assetLocaleTemplate.expressions.length !== 2) return false;
-	if (assetLocaleTemplate.quasis[0].value.cooked !== '/assets/locales/') return false;
-	if (assetLocaleTemplate.quasis[1].value.cooked !== '.') return false;
-	if (assetLocaleTemplate.quasis[2].value.cooked !== '.json') return false;
-
-	const fetchFunction = fetchCall.callee;
-	if (!isMemberExpression(fetchFunction, 'fetch')) return false;
-	const windowObject = fetchFunction.object;
-	if (!isIdentifier(windowObject, 'window')) return false;
-
-	return true;
-}
-
 type SpecifierResult =
 	| { type: 'no-import' }
 	| { type: 'no-specifiers', importNode: ESTree.ImportDeclaration }
@@ -438,18 +302,3 @@ function findImportSpecifier(programNode: ESTree.Program, i18nFileName: string, 
 	const localI18nIdentifier = i18nImportSpecifier.local.name;
 	return { type: 'specifier', localI18nIdentifier, importNode };
 }
-
-// checker helpers
-function isMemberExpression(node: ESTree.Node, property: string): node is ESTree.MemberExpression {
-	return node.type === 'MemberExpression' && !node.computed && node.property.type === 'Identifier' && node.property.name === property;
-}
-
-function isStringLiteral(node: ESTree.Node, value: string): node is ESTree.StringLiteral {
-	return node.type === 'Literal' && typeof node.value === 'string' && node.value === value;
-}
-
-function isIdentifier(node: ESTree.Node, name: string): node is ESTree.IdentifierReference {
-	return node.type === 'Identifier' && node.name === name;
-}
-
-//endregion

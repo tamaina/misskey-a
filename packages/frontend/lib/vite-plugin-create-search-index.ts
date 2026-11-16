@@ -18,6 +18,7 @@ import {
 import fs from 'node:fs';
 import JSON5 from 'json5';
 import { evaluateStaticSearchExpression } from './static-search-expression.js';
+import { generateSearchIndexModule } from './search-index-codegen.js';
 import { RolldownMagicString } from 'rolldown';
 import type { TransformResult } from 'rolldown';
 import path from 'node:path';
@@ -149,31 +150,6 @@ function findEndOfStartTagAttributes(node: ElementNode): number {
 }
 
 //endregion
-
-/**
- * TypeScriptコード生成
- */
-function generateJavaScriptCode(resolvedRootMarkers: SearchIndexItem[]): string {
-	const componentLocaleImport = JSON.stringify(resolvedRootMarkers).includes('${createComponentLocale(')
-		? `import { createComponentLocale } from 'vite-vue-internationalization/runtime';\n`
-		: '';
-	return componentLocaleImport
-		+ `import { i18n } from '@features/runtime/frontend/i18n.js';\n`
-		+ `export const searchIndexes = ${customStringify(resolvedRootMarkers)};\n`;
-}
-
-/**
- * オブジェクトを特殊な形式の文字列に変換する
- * i18n参照を保持しつつ適切な形式に変換
- */
-function customStringify(obj: unknown): string {
-	return JSON.stringify(obj).replaceAll(/"(.*?)"/g, (all, group) => {
-		// 静的解析が i18n 参照を "${i18n.xxx}"のような形に変換してるので、これをそのまま`${i18n.xxx}`
-		// のような形にすると、実行時にi18nのプロパティにアクセスするようになる。
-		// objectのkeyでは``が使えないので、${ が使われている場合にのみ``に置き換えるようにする
-		return group.includes('${') ? '`' + group + '`' : all;
-	});
-}
 
 // region extractElementText
 
@@ -711,7 +687,7 @@ export function pluginCreateSearchIndexVirtualModule(options: Options, asigner: 
 				this.addWatchFile(searchIndexFilePath);
 
 				const code = await asigner.getOrLoad(searchIndexFilePath);
-				return generateJavaScriptCode(collectFileMarkers(searchIndexFilePath, code, options.componentLocaleRoot));
+				return generateSearchIndexModule(collectFileMarkers(searchIndexFilePath, code, options.componentLocaleRoot));
 			}
 			return null;
 		},

@@ -10,13 +10,13 @@ import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { ApPersonService } from '../../backend/services/ApPersonService.js';
 import { RemoteUserResolveService } from '../../backend/services/RemoteUserResolveService.js';
-import { WebfingerService } from '../../backend/services/WebfingerService.js';
+import { WebfingerResponseError, WebfingerService } from '../../backend/services/WebfingerService.js';
 import { UtilityService } from '../../backend/services/UtilityService.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 
 const uri = 'https://remote.example/users/alice';
-const discovery = (href = uri) => new Response(JSON.stringify({ links: [{ rel: 'self', href }] }));
+const discovery = (href = uri) => new Response(JSON.stringify({ links: [{ rel: 'self', href }] }), { headers: { 'Content-Type': 'application/jrd+json' } });
 const networkError = (code: string) => new FetchError('request failed', 'system', { code });
 
 function fixture(existing = true, stale = true) {
@@ -44,7 +44,7 @@ function fixture(existing = true, stale = true) {
 		usersRepository: { findOneBy: vi.fn(async () => row), update },
 		webfingerService: webfinger, apPersonService: { createPerson, updatePerson },
 	});
-	return { service, row, send, update, createPerson, updatePerson, logger, fetchInstance, meta };
+	return { service, webfinger, row, send, update, createPerson, updatePerson, logger, fetchInstance, meta };
 }
 
 describe('cached remote user refresh', () => {
@@ -88,14 +88,6 @@ describe('cached remote user refresh', () => {
 		f.send.mockRejectedValue(failure);
 		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toMatchObject({ cause: failure });
 		expect(f.updatePerson).not.toHaveBeenCalled();
-	});
-
-	test.each(['{}', '{', '<?xml version="1.0"?><XRD/>', '{"links":[]}'])('rejects malformed or missing self discovery: %s', async body => {
-		const f = fixture();
-		f.send.mockResolvedValue(new Response(body));
-		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toThrow();
-		expect(f.updatePerson).not.toHaveBeenCalled();
-		expect(f.logger.warn).not.toHaveBeenCalled();
 	});
 
 	test('rejects URI recovery to another host', async () => {
@@ -203,5 +195,114 @@ describe('cached remote user refresh', () => {
 		f.update.mockRejectedValue(failure);
 		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toBe(failure);
 		expect(f.send).not.toHaveBeenCalled();
+	});
+});
+
+describe('WebFinger JRD discovery', () => {
+	test.each(['application/jrd+json', 'application/json', 'Application/JRD+JSON; charset=utf-8', 'APPLICATION/JSON; charset=UTF-8'])('accepts JRD/JSON media types: %s', async contentType => {
+		for (const existing of [true, false]) {
+			const f = fixture(existing);
+			const created = { id: 'created-alice' };
+			f.createPerson.mockResolvedValue(created);
+			f.send.mockResolvedValue(new Response(JSON.stringify({ links: [{ rel: 'self', href: uri }] }), {
+				headers: { 'Content-Type': contentType },
+			}));
+			await expect(f.service.resolveUser('alice', 'remote.example')).resolves.toBe(existing ? f.row : created);
+			expect(existing ? f.updatePerson : f.createPerson).toHaveBeenCalledExactlyOnceWith(uri);
+			expect(f.logger.warn).not.toHaveBeenCalled();
+			expect(f.send).toHaveBeenCalledExactlyOnceWith('https://remote.example/.well-known/webfinger?resource=acct%3Aalice%40remote.example', {
+				method: 'GET', headers: { Accept: 'application/jrd+json, application/json' },
+				timeout: 5000, size: 1024 * 256,
+			});
+		}
+	});
+
+	const unsupportedTypes = [undefined, '', 'application/xrd+xml; charset=utf-8', 'application/xml', 'text/xml', 'text/plain', 'text/html', 'application/activity+json'];
+	const xml = '<?xml version="1.0"?><XRD><Link rel="self" href="https://remote.example/users/alice"/></XRD>';
+	const validJrd = JSON.stringify({ links: [{ rel: 'self', href: uri }] });
+
+	test.each(unsupportedTypes)('rejects unsupported Content-Type before reading any body: %s', async contentType => {
+		for (const body of [xml, validJrd]) {
+			const f = fixture();
+			const response = new Response(body);
+			response.headers.delete('content-type');
+			if (contentType !== undefined) response.headers.set('content-type', contentType);
+			const read = vi.spyOn(response, 'text');
+			f.send.mockResolvedValue(response);
+			await expect(f.webfinger.webfinger('alice@remote.example')).rejects.toMatchObject({
+				constructor: WebfingerResponseError,
+				message: expect.stringContaining('not JRD/JSON'),
+			});
+			await expect(f.webfinger.webfinger('alice@remote.example')).rejects.toThrow(`Content-Type: ${contentType ?? 'missing'}`);
+			expect(read).not.toHaveBeenCalled();
+		}
+	});
+
+	const invalidResponses = [
+		...unsupportedTypes.map(contentType => ({ contentType, body: xml })),
+		...['application/jrd+json', 'application/json'].flatMap(contentType =>
+			[xml, '{', '', 'garbage'].map(body => ({ contentType, body }))),
+	];
+
+	test.each(invalidResponses)('only cached users tolerate invalid discovery: %s', async ({ contentType, body }) => {
+		const response = () => {
+			const result = new Response(body);
+			result.headers.delete('content-type');
+			if (contentType !== undefined) result.headers.set('content-type', contentType);
+			return result;
+		};
+		const cached = fixture();
+		cached.send.mockImplementation(async () => response());
+		await expect(cached.webfinger.webfinger('alice@remote.example')).rejects.toBeInstanceOf(WebfingerResponseError);
+		cached.send.mockClear();
+		const before = Date.now();
+		await expect(cached.service.resolveUser('alice', 'remote.example')).resolves.toBe(cached.row);
+		expect(cached.logger.warn).toHaveBeenCalledWith(expect.stringContaining('after failed WebFinger'), {
+			err: expect.objectContaining({ cause: expect.any(WebfingerResponseError) }),
+		});
+		expect(cached.update).toHaveBeenCalledExactlyOnceWith('remote-alice', { lastFetchedAt: expect.any(Date) });
+		expect(cached.row?.lastFetchedAt?.getTime()).toBeGreaterThanOrEqual(before);
+		expect(cached.updatePerson).not.toHaveBeenCalled();
+		expect(cached.createPerson).not.toHaveBeenCalled();
+		await cached.service.resolveUser('alice', 'remote.example');
+		expect(cached.send).toHaveBeenCalledOnce();
+
+		const first = fixture(false);
+		first.send.mockImplementation(async () => response());
+		await expect(first.service.resolveUser('alice', 'remote.example')).rejects.toMatchObject({ cause: expect.any(WebfingerResponseError) });
+		expect(first.createPerson).not.toHaveBeenCalled();
+		expect(first.update).not.toHaveBeenCalled();
+		expect(first.logger.warn).not.toHaveBeenCalled();
+	});
+
+	test.each([true, false])('valid JRD without a self link still fails (existing=%s)', async existing => {
+		const f = fixture(existing);
+		f.send.mockResolvedValue(new Response('{"links":[]}', { headers: { 'Content-Type': 'application/jrd+json' } }));
+		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toThrow('self link not found');
+		expect(f.logger.warn).not.toHaveBeenCalled();
+		expect(f.createPerson).not.toHaveBeenCalled();
+		expect(f.updatePerson).not.toHaveBeenCalled();
+	});
+
+	test.each([true, false])('parsed JSON without links is not a parse failure (existing=%s)', async existing => {
+		const f = fixture(existing);
+		f.send.mockResolvedValue(new Response('{}', { headers: { 'Content-Type': 'application/json' } }));
+		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toThrow(TypeError);
+		expect(f.logger.warn).not.toHaveBeenCalled();
+		expect(f.createPerson).not.toHaveBeenCalled();
+		expect(f.updatePerson).not.toHaveBeenCalled();
+	});
+
+	test.each([true, false])('does not classify response-size errors as parse failures (existing=%s)', async existing => {
+		const f = fixture(existing);
+		const failure = new FetchError('too large', 'max-size');
+		const response = discovery();
+		vi.spyOn(response, 'text').mockRejectedValue(failure);
+		f.send.mockResolvedValue(response);
+		await expect(f.webfinger.webfinger('alice@remote.example')).rejects.toBe(failure);
+		await expect(f.service.resolveUser('alice', 'remote.example')).rejects.toMatchObject({ cause: failure });
+		expect(f.logger.warn).not.toHaveBeenCalled();
+		expect(f.updatePerson).not.toHaveBeenCalled();
+		expect(f.createPerson).not.toHaveBeenCalled();
 	});
 });

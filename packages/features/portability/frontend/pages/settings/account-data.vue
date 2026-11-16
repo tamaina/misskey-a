@@ -137,7 +137,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<SearchMarker :keywords="['antennas']">
 				<MkFolder>
 					<template #icon><i class="ti ti-antenna"></i></template>
-					<template #label><SearchLabel>{{ globalLocale.env.antennas }}</SearchLabel></template>
+					<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
+					<template #label><SearchLabel>{{ $locale.sfc.antennas }}</SearchLabel></template>
 					<div class="_gaps_s">
 						<MkFolder :defaultOpen="true">
 							<template #label>{{ $locale.sfc.export }}</template>
@@ -158,7 +159,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
@@ -170,9 +170,6 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { $i } from '@features/auth/frontend/i.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
-import type { Locale } from 'i18n';
-
-const globalLocale = useLocale<Locale>(import.meta.url);
 
 const excludeMutingUsers = ref(false);
 const excludeInactiveUsers = ref(false);
@@ -311,7 +308,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "القوائم",
 	"muteList": "المستخدمون المكتومون",
-	"blockingList": "المستخدمون المحجوبون"
+	"blockingList": "المستخدمون المحجوبون",
+	"antennas": "الهوائيات"
 }
 </locale>
 
@@ -332,7 +330,8 @@ definePage(() => ({
 	"withReplies": "Inclou a la línia de temps les respostes d'usuaris importats",
 	"userLists": "Llistes",
 	"muteList": "Silencia",
-	"blockingList": "Bloqueja"
+	"blockingList": "Bloqueja",
+	"antennas": "Antena"
 }
 </locale>
 
@@ -353,7 +352,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "Seznamy",
 	"muteList": "Ztlumit",
-	"blockingList": "Zablokovat"
+	"blockingList": "Zablokovat",
+	"antennas": "Antény"
 }
 </locale>
 
@@ -374,7 +374,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "User lists",
 	"muteList": "Muted users",
-	"blockingList": "Blocked users"
+	"blockingList": "Blocked users",
+	"antennas": "Antennas"
 }
 </locale>
 
@@ -395,7 +396,8 @@ definePage(() => ({
 	"withReplies": "Antworten von importierten Benutzern in der Chronik beinhalten",
 	"userLists": "Listen",
 	"muteList": "Stummschaltungen",
-	"blockingList": "Blockierungen"
+	"blockingList": "Blockierungen",
+	"antennas": "Antennen"
 }
 </locale>
 
@@ -416,7 +418,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "User lists",
 	"muteList": "Muted users",
-	"blockingList": "Blocked users"
+	"blockingList": "Blocked users",
+	"antennas": "Antennas"
 }
 </locale>
 
@@ -437,7 +440,8 @@ definePage(() => ({
 	"withReplies": "Si el archivo no incluye información sobre si las respuestas deben incluirse en la línea de tiempo, las respuestas realizadas por el importador deben incluirse en la línea de tiempo.",
 	"userLists": "Listas",
 	"muteList": "Silenciados",
-	"blockingList": "Bloqueados"
+	"blockingList": "Bloqueados",
+	"antennas": "Antenas"
 }
 </locale>
 
@@ -458,7 +462,8 @@ definePage(() => ({
 	"withReplies": "Inclure les réponses des utilisateur·rice·s importé·e·s dans le fil",
 	"userLists": "Listes",
 	"muteList": "Comptes masqués",
-	"blockingList": "Comptes bloqués"
+	"blockingList": "Comptes bloqués",
+	"antennas": "Antennes"
 }
 </locale>
 
@@ -479,7 +484,8 @@ definePage(() => ({
 	"withReplies": "Termasuk balasan dari pengguna yang diimpor ke dalam lini masa",
 	"userLists": "Daftar",
 	"muteList": "Bisukan",
-	"blockingList": "Blokir"
+	"blockingList": "Blokir",
+	"antennas": "Antena"
 }
 </locale>
 
@@ -500,7 +506,8 @@ definePage(() => ({
 	"withReplies": "Includere le risposte da profili importati nella Timeline",
 	"userLists": "Liste",
 	"muteList": "Elenco profili silenziati",
-	"blockingList": "Elenco profili bloccati"
+	"blockingList": "Elenco profili bloccati",
+	"antennas": "Antenne"
 }
 </locale>
 
@@ -521,7 +528,8 @@ definePage(() => ({
 	"withReplies": "返信をTLに含むかの情報がファイルにない場合に、インポートした人による返信をTLに含むようにする",
 	"userLists": "リスト",
 	"muteList": "ミュート",
-	"blockingList": "ブロック"
+	"blockingList": "ブロック",
+	"antennas": "アンテナ"
 }
 </locale>
 
@@ -542,7 +550,8 @@ definePage(() => ({
 	"withReplies": "インポートした人による返信をTLに含むようにすんで。",
 	"userLists": "リスト",
 	"muteList": "ミュート",
-	"blockingList": "ブロック"
+	"blockingList": "ブロック",
+	"antennas": "アンテナ"
 }
 </locale>
 
@@ -563,7 +572,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "Tibdarin",
 	"muteList": "Sgugem",
-	"blockingList": "Seḥbes"
+	"blockingList": "Seḥbes",
+	"antennas": "Antennas"
 }
 </locale>
 
@@ -584,7 +594,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "User lists",
 	"muteList": "Muted users",
-	"blockingList": "Blocked users"
+	"blockingList": "Blocked users",
+	"antennas": "Antennas"
 }
 </locale>
 
@@ -605,7 +616,8 @@ definePage(() => ({
 	"withReplies": "가져오기한 유저에 의한 답글을 타임라인에 포함",
 	"userLists": "리스트",
 	"muteList": "뮤트",
-	"blockingList": "차단"
+	"blockingList": "차단",
+	"antennas": "안테나"
 }
 </locale>
 
@@ -626,7 +638,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "Lijsten",
 	"muteList": "Dempen",
-	"blockingList": "Blokkeren"
+	"blockingList": "Blokkeren",
+	"antennas": "Antennes"
 }
 </locale>
 
@@ -647,7 +660,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "Lister",
 	"muteList": "Skjul",
-	"blockingList": "Blokker"
+	"blockingList": "Blokker",
+	"antennas": "Antenner"
 }
 </locale>
 
@@ -668,7 +682,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "Listy",
 	"muteList": "Wycisz",
-	"blockingList": "Zablokuj"
+	"blockingList": "Zablokuj",
+	"antennas": "Anteny"
 }
 </locale>
 
@@ -689,7 +704,8 @@ definePage(() => ({
 	"withReplies": "Incluir respostas de usuários importados na linha do tempo",
 	"userLists": "Listas",
 	"muteList": "Silenciar",
-	"blockingList": "Bloquear"
+	"blockingList": "Bloquear",
+	"antennas": "Antenas"
 }
 </locale>
 
@@ -710,7 +726,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "Списки",
 	"muteList": "Скрытые",
-	"blockingList": "Заблокированные"
+	"blockingList": "Заблокированные",
+	"antennas": "Антенны"
 }
 </locale>
 
@@ -731,7 +748,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "Zoznamy",
 	"muteList": "Vypnúť zvuk",
-	"blockingList": "Zablokovať"
+	"blockingList": "Zablokovať",
+	"antennas": "Antény"
 }
 </locale>
 
@@ -752,7 +770,8 @@ definePage(() => ({
 	"withReplies": "รวมการตอบกลับจากผู้ใช้ที่ถูกนำเข้า ลงไทม์ไลน์",
 	"userLists": "รายชื่อ",
 	"muteList": "ปิดเสียง",
-	"blockingList": "บล็อก"
+	"blockingList": "บล็อก",
+	"antennas": "เสาอากาศ"
 }
 </locale>
 
@@ -773,7 +792,8 @@ definePage(() => ({
 	"withReplies": "İçe aktarılan kullanıcıların yanıtlarını panoya dahil edin",
 	"userLists": "Kullanıcı listeleri",
 	"muteList": "Sessize alınan kullanıcılar",
-	"blockingList": "Engellenen kullanıcılar"
+	"blockingList": "Engellenen kullanıcılar",
+	"antennas": "Antenler"
 }
 </locale>
 
@@ -794,7 +814,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "User lists",
 	"muteList": "Muted users",
-	"blockingList": "Blocked users"
+	"blockingList": "Blocked users",
+	"antennas": "Antennas"
 }
 </locale>
 
@@ -815,7 +836,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "Списки",
 	"muteList": "Ігнорувати",
-	"blockingList": "Заблокувати"
+	"blockingList": "Заблокувати",
+	"antennas": "Антени"
 }
 </locale>
 
@@ -836,7 +858,8 @@ definePage(() => ({
 	"withReplies": "Include replies from imported users in the timeline",
 	"userLists": "Danh sách",
 	"muteList": "Ẩn",
-	"blockingList": "Chặn"
+	"blockingList": "Chặn",
+	"antennas": "Trạm phát sóng"
 }
 </locale>
 
@@ -857,7 +880,8 @@ definePage(() => ({
 	"withReplies": "在时间线中包含导入用户的回复",
 	"userLists": "列表",
 	"muteList": "隐藏",
-	"blockingList": "屏蔽列表"
+	"blockingList": "屏蔽列表",
+	"antennas": "天线"
 }
 </locale>
 
@@ -878,6 +902,7 @@ definePage(() => ({
 	"withReplies": "將被匯入的追隨中清單的貼文回覆包含在時間軸",
 	"userLists": "清單",
 	"muteList": "靜音",
-	"blockingList": "封鎖"
+	"blockingList": "封鎖",
+	"antennas": "天線"
 }
 </locale>

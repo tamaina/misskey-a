@@ -42,18 +42,36 @@ test('keeps independently pinned raw and effective catalog history for every lan
 	expect(flattenCatalog(locales['ja-JP']).map(([key]) => key).sort()).toEqual(retention.retainedPaths);
 });
 
+/** Promoted keys kept in the SFC so the settings-search static indexer can resolve `$locale.sfc.*`. */
+const settingsSearchLocalKeys: Record<string, readonly string[]> = {
+	'packages/features/drive/frontend/pages/settings/drive.vue': ['drive'],
+	'packages/features/notifications/frontend/pages/settings/notifications.vue': ['notifications'],
+	'packages/features/instance/frontend/pages/admin/branding.vue': ['somethingHappened'],
+	'packages/features/instance/frontend/pages/admin/settings.vue': ['info'],
+	'packages/features/portability/frontend/pages/settings/account-data.vue': ['antennas'],
+	'packages/features/preferences/frontend/pages/settings/preferences.vue': ['notifications'],
+	'packages/features/relationships/frontend/pages/settings/mute-block.vue': ['mutedUsers', 'renote', 'blockedUsers'],
+};
+
 test.each(globalCatalogPilotOwners)('preserves all 28 translations and removes promoted copies: $file', owner => {
 	const source = readFileSync(resolve(root, owner.file), 'utf8');
 	const baseline = restoreGlobalCatalogPilotSource(owner.file, source);
 	const collect = (text: string) => new Map(parse(text).descriptor.customBlocks.filter(block => block.type === 'locale').map(block => [String(block.attrs.locale), JSON.parse(block.content) as Record<string, unknown>]));
 	const before = collect(baseline);
 	const after = collect(source);
+	const localKeys = settingsSearchLocalKeys[owner.file] ?? [];
 	for (const language of languages) {
 		for (const key of owner.keys) {
-			expect(after.get(language), `${owner.file}:${language}:${key}`).not.toHaveProperty(key);
 			const value = valueAt(locales[language], paths[key] ?? key);
 			const order = 'groupOrders' in owner ? (owner.groupOrders as Record<string, readonly string[]>)[key] : undefined;
-			expect(order ? Object.fromEntries(order.map(part => [part, Reflect.get(value as object, part)])) : value, `${owner.file}:${language}:${key}`).toEqual(before.get(language)?.[key]);
+			const historical = order ? Object.fromEntries(order.map(part => [part, Reflect.get(value as object, part)])) : value;
+			expect(historical, `${owner.file}:${language}:${key}`).toEqual(before.get(language)?.[key]);
+			if (localKeys.includes(key)) {
+				expect(after.get(language), `${owner.file}:${language}:${key}`).toHaveProperty(key);
+				expect(after.get(language)?.[key], `${owner.file}:${language}:${key}`).toEqual(before.get(language)?.[key]);
+			} else {
+				expect(after.get(language), `${owner.file}:${language}:${key}`).not.toHaveProperty(key);
+			}
 		}
 	}
 });

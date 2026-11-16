@@ -397,7 +397,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<SearchMarker v-slot="slotProps" :keywords="['notification']">
 				<MkFolder :defaultOpen="slotProps.isParentOfTarget">
-					<template #label><SearchLabel>{{ globalLocale.env.notifications }}</SearchLabel></template>
+					<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
+					<template #label><SearchLabel>{{ $locale.sfc.notifications }}</SearchLabel></template>
 					<template #icon><SearchIcon><i class="ti ti-bell"></i></SearchIcon></template>
 
 					<div class="_gaps_m">
@@ -1305,7 +1306,8 @@ definePage(() => ({
 	"statusbar": "شريط الحالة",
 	"deck": "Deck",
 	"customCss": "CSS مخصصة",
-	"selectList": "اختر قائمة"
+	"selectList": "اختر قائمة",
+	"notifications": "الإشعارات"
 }
 </locale>
 
@@ -1462,7 +1464,8 @@ definePage(() => ({
 	"statusbar": "Barra d'estat",
 	"deck": "Escriptori",
 	"customCss": "CSS personalitzat",
-	"selectList": "Tria una llista"
+	"selectList": "Tria una llista",
+	"notifications": "Notificacions"
 }
 </locale>
 
@@ -1619,7 +1622,8 @@ definePage(() => ({
 	"statusbar": "Stavový řádek",
 	"deck": "Deck",
 	"customCss": "Vlastní CSS",
-	"selectList": "Vybrat seznam"
+	"selectList": "Vybrat seznam",
+	"notifications": "Oznámení"
 }
 </locale>
 
@@ -1776,7 +1780,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Select a list"
+	"selectList": "Select a list",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -1933,7 +1938,8 @@ definePage(() => ({
 	"statusbar": "Statusleiste",
 	"deck": "Deck",
 	"customCss": "Benutzerdefiniertes CSS",
-	"selectList": "Liste auswählen"
+	"selectList": "Liste auswählen",
+	"notifications": "Benachrichtigungen"
 }
 </locale>
 
@@ -2090,7 +2096,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Select a list"
+	"selectList": "Select a list",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -2247,7 +2254,8 @@ definePage(() => ({
 	"statusbar": "Barra de estado",
 	"deck": "Deck",
 	"customCss": "CSS personalizado",
-	"selectList": "Selecciona una lista"
+	"selectList": "Selecciona una lista",
+	"notifications": "Notificaciones"
 }
 </locale>
 
@@ -2404,7 +2412,8 @@ definePage(() => ({
 	"statusbar": "Barre d’état",
 	"deck": "Deck",
 	"customCss": "CSS personnalisé",
-	"selectList": "Sélectionner une liste"
+	"selectList": "Sélectionner une liste",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -2561,7 +2570,8 @@ definePage(() => ({
 	"statusbar": "Bilah status",
 	"deck": "Dek",
 	"customCss": "Custom CSS",
-	"selectList": "Pilih daftar"
+	"selectList": "Pilih daftar",
+	"notifications": "Notifikasi"
 }
 </locale>
 
@@ -2718,7 +2728,8 @@ definePage(() => ({
 	"statusbar": "Barra di stato",
 	"deck": "Deck",
 	"customCss": "CSS personalizzato",
-	"selectList": "Seleziona una lista"
+	"selectList": "Seleziona una lista",
+	"notifications": "Notifiche"
 }
 </locale>
 
@@ -2876,7 +2887,8 @@ definePage(() => ({
 	"statusbar": "ステータスバー",
 	"deck": "デッキ",
 	"customCss": "カスタムCSS",
-	"selectList": "リストを選択"
+	"selectList": "リストを選択",
+	"notifications": "通知"
 }
 </locale>
 
@@ -3033,7 +3045,8 @@ definePage(() => ({
 	"statusbar": "ステータスバー",
 	"deck": "デッキ",
 	"customCss": "カスタムCSS",
-	"selectList": "リストを選ぶ"
+	"selectList": "リストを選ぶ",
+	"notifications": "通知"
 }
 </locale>
 
@@ -3190,7 +3203,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Fren tabdart"
+	"selectList": "Fren tabdart",
+	"notifications": "Ilɣuyen"
 }
 </locale>
 
@@ -3347,7 +3361,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Select a list"
+	"selectList": "Select a list",
+	"notifications": "ಅಧಿಸೂಚನೆಗಳು"
 }
 </locale>
 
@@ -3504,7 +3519,8 @@ definePage(() => ({
 	"statusbar": "상태바",
 	"deck": "덱",
 	"customCss": "CSS 사용자화",
-	"selectList": "리스트 선택"
+	"selectList": "리스트 선택",
+	"notifications": "알림"
 }
 </locale>
 
@@ -3661,7 +3677,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Dek",
 	"customCss": "Aangepaste CSS",
-	"selectList": "Kies een lijst."
+	"selectList": "Kies een lijst.",
+	"notifications": "Meldingen"
 }
 </locale>
 
@@ -3818,7 +3835,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Velg en liste"
+	"selectList": "Velg en liste",
+	"notifications": "Varsler"
 }
 </locale>
 
@@ -3975,7 +3993,8 @@ definePage(() => ({
 	"statusbar": "Pasek stanu",
 	"deck": "Tablica",
 	"customCss": "Własny CSS",
-	"selectList": "Wybierz listę"
+	"selectList": "Wybierz listę",
+	"notifications": "Powiadomienia"
 }
 </locale>
 
@@ -4132,7 +4151,8 @@ definePage(() => ({
 	"statusbar": "Barra de status",
 	"deck": "Deck",
 	"customCss": "CSS Personalizado",
-	"selectList": "Selecione uma lista"
+	"selectList": "Selecione uma lista",
+	"notifications": "Notificações"
 }
 </locale>
 
@@ -4289,7 +4309,8 @@ definePage(() => ({
 	"statusbar": "Статусбар",
 	"deck": "Пульт",
 	"customCss": "Пользовательский CSS",
-	"selectList": "Выберите список"
+	"selectList": "Выберите список",
+	"notifications": "Уведомления"
 }
 </locale>
 
@@ -4446,7 +4467,8 @@ definePage(() => ({
 	"statusbar": "Stavový riadok",
 	"deck": "Deck",
 	"customCss": "Vlastné CSS",
-	"selectList": "Vyberte zoznam"
+	"selectList": "Vyberte zoznam",
+	"notifications": "Oznámenia"
 }
 </locale>
 
@@ -4603,7 +4625,8 @@ definePage(() => ({
 	"statusbar": "แถบสถานะ",
 	"deck": "เด็ค",
 	"customCss": "CSS แบบกำหนดเอง",
-	"selectList": "เลือกรายชื่อ"
+	"selectList": "เลือกรายชื่อ",
+	"notifications": "เเจ้งเตือน"
 }
 </locale>
 
@@ -4760,7 +4783,8 @@ definePage(() => ({
 	"statusbar": "Durum çubuğu",
 	"deck": "Deck",
 	"customCss": "Özel CSS",
-	"selectList": "Bir liste seç"
+	"selectList": "Bir liste seç",
+	"notifications": "Bildirimler"
 }
 </locale>
 
@@ -4917,7 +4941,8 @@ definePage(() => ({
 	"statusbar": "Status bar",
 	"deck": "Deck",
 	"customCss": "Custom CSS",
-	"selectList": "Select a list"
+	"selectList": "Select a list",
+	"notifications": "Notifications"
 }
 </locale>
 
@@ -5074,7 +5099,8 @@ definePage(() => ({
 	"statusbar": "Рядок стану",
 	"deck": "Дек",
 	"customCss": "Власний CSS",
-	"selectList": "Виберіть список"
+	"selectList": "Виберіть список",
+	"notifications": "Сповіщення"
 }
 </locale>
 
@@ -5231,7 +5257,8 @@ definePage(() => ({
 	"statusbar": "Thanh trạng thái",
 	"deck": "Deck",
 	"customCss": "Tùy chỉnh CSS",
-	"selectList": "Chọn danh sách"
+	"selectList": "Chọn danh sách",
+	"notifications": "Thông báo"
 }
 </locale>
 
@@ -5388,7 +5415,8 @@ definePage(() => ({
 	"statusbar": "状态栏",
 	"deck": "Deck",
 	"customCss": "自定义 CSS",
-	"selectList": "选择列表"
+	"selectList": "选择列表",
+	"notifications": "通知"
 }
 </locale>
 
@@ -5545,6 +5573,7 @@ definePage(() => ({
 	"statusbar": "狀態列",
 	"deck": "多欄模式",
 	"customCss": "自定義 CSS",
-	"selectList": "選擇清單"
+	"selectList": "選擇清單",
+	"notifications": "通知"
 }
 </locale>

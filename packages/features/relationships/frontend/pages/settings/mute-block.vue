@@ -78,7 +78,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			>
 				<MkFolder>
 					<template #icon><i class="ti ti-repeat-off"></i></template>
-					<template #label><SearchLabel>{{ globalLocale.env.mutedUsers }} ({{ globalLocale.env.renote }})</SearchLabel></template>
+					<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
+					<template #label><SearchLabel>{{ $locale.sfc.mutedUsers }} ({{ $locale.sfc.renote }})</SearchLabel></template>
 
 					<MkPagination :paginator="renoteMutingPaginator" withControl>
 						<template #empty><MkResult type="empty" :text="$locale.sfc.noUsers"/></template>
@@ -103,8 +104,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 			</SearchMarker>
 
+			<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
 			<SearchMarker
-				:label="globalLocale.env.mutedUsers"
+				:label="$locale.sfc.mutedUsers"
 				:keywords="['note', 'mute', 'hide', 'user']"
 			>
 				<MkFolder>
@@ -136,8 +138,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkFolder>
 			</SearchMarker>
 
+			<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
 			<SearchMarker
-				:label="globalLocale.env.blockedUsers"
+				:label="$locale.sfc.blockedUsers"
 				:keywords="['block', 'user']"
 			>
 				<MkFolder>
@@ -351,7 +354,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "المثلاء المكتومون",
-	"noUsers": "ليس هناك مستخدمون"
+	"noUsers": "ليس هناك مستخدمون",
+	"mutedUsers": "الحسابات المكتومة",
+	"renote": "أعد النشر",
+	"blockedUsers": "الحسابات المحجوبة"
 }
 </locale>
 
@@ -369,7 +375,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Oculta les notes que contenen la paraula o frase especificada. A diferència de Silenciar paraula, la nota quedarà completament oculta a la vista.",
 	"emojiMute": "Silenciar emojis",
 	"instanceMute": "Silenciar servidor",
-	"noUsers": "No hi ha usuaris"
+	"noUsers": "No hi ha usuaris",
+	"mutedUsers": "Usuaris silenciats",
+	"renote": "Impulsar",
+	"blockedUsers": "Usuaris bloquejats"
 }
 </locale>
 
@@ -387,7 +396,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Ztlumené instance",
-	"noUsers": "Žádní uživatelé"
+	"noUsers": "Žádní uživatelé",
+	"mutedUsers": "Zltumení uživatelé",
+	"renote": "Přeposlat",
+	"blockedUsers": "Blokovaní uživatelé"
 }
 </locale>
 
@@ -405,7 +417,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Instance Mutes",
-	"noUsers": "There are no users"
+	"noUsers": "There are no users",
+	"mutedUsers": "Muted users",
+	"renote": "Renote",
+	"blockedUsers": "Blocked users"
 }
 </locale>
 
@@ -423,7 +438,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Blendet Notizen aus, die das angegebene Wort oder die angegebene Phrase enthalten. Im Gegensatz zur Wortstummschaltung wird die Notiz vollständig ausgeblendet.",
 	"emojiMute": "Emoji stummschalten",
 	"instanceMute": "Instanzstummschaltungen",
-	"noUsers": "Keine Benutzer gefunden"
+	"noUsers": "Keine Benutzer gefunden",
+	"mutedUsers": "Stummgeschaltete Benutzer",
+	"renote": "Renote",
+	"blockedUsers": "Blockierte Benutzer"
 }
 </locale>
 
@@ -441,7 +459,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Instance Mutes",
-	"noUsers": "There are no users"
+	"noUsers": "There are no users",
+	"mutedUsers": "Muted users",
+	"renote": "Renote",
+	"blockedUsers": "Blocked users"
 }
 </locale>
 
@@ -459,7 +480,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Oculta las notas que contienen la palabra o frase especificada. A diferencia de Silenciar palabra, la nota quedará completamente oculta a la vista.",
 	"emojiMute": "Silenciar emoji",
 	"instanceMute": "Instancias silenciadas",
-	"noUsers": "No hay usuarios"
+	"noUsers": "No hay usuarios",
+	"mutedUsers": "Usuarios silenciados",
+	"renote": "Renotar",
+	"blockedUsers": "Usuarios bloqueados"
 }
 </locale>
 
@@ -477,7 +501,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Instance en sourdine",
-	"noUsers": "Il n’y a pas d’utilisateur·rice·s"
+	"noUsers": "Il n’y a pas d’utilisateur·rice·s",
+	"mutedUsers": "Utilisateur·rice·s en sourdine",
+	"renote": "Renoter",
+	"blockedUsers": "Utilisateur·rice·s bloqué·e·s"
 }
 </locale>
 
@@ -495,7 +522,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Sembunyikan note yang mengandung kata atau frasa yang dicantumkan. Berbeda dengan pembisuan kata, note tersebut akan disembunyikan sepenuhnya dari tampilan.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Bisukan instansi",
-	"noUsers": "Tidak ada pengguna"
+	"noUsers": "Tidak ada pengguna",
+	"mutedUsers": "Pengguna yang dibisukan",
+	"renote": "Renote",
+	"blockedUsers": "Pengguna yang diblokir"
 }
 </locale>
 
@@ -513,7 +543,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Ignora le Note con la parola o la regola specificata. A differenza delle \"Parole Silenziate\", queste Note non ti verranno proprio recapitate.",
 	"emojiMute": "Silenzia emoji",
 	"instanceMute": "Silenziare l'istanza",
-	"noUsers": "Non ci sono profili"
+	"noUsers": "Non ci sono profili",
+	"mutedUsers": "Profili silenziati",
+	"renote": "Rinota",
+	"blockedUsers": "Profili bloccati"
 }
 </locale>
 
@@ -531,7 +564,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "指定した語句を含むノートを隠します。ワードミュートとは異なり、ノートは完全に表示されなくなります。",
 	"emojiMute": "絵文字ミュート",
 	"instanceMute": "サーバーミュート",
-	"noUsers": "ユーザーはいません"
+	"noUsers": "ユーザーはいません",
+	"mutedUsers": "ミュートしたユーザー",
+	"renote": "リノート",
+	"blockedUsers": "ブロックしたユーザー"
 }
 </locale>
 
@@ -549,7 +585,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "指定した語句が入ってるノートを隠すで。ワードミュートとちゃうて、ノートは完全に表示されんようになるで。",
 	"emojiMute": "絵文字ミュート",
 	"instanceMute": "サーバーミュート",
-	"noUsers": "ユーザーはおらん"
+	"noUsers": "ユーザーはおらん",
+	"mutedUsers": "ミュートしとるユーザー",
+	"renote": "リノート",
+	"blockedUsers": "ブロックしとるユーザー"
 }
 </locale>
 
@@ -567,7 +606,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Instance Mutes",
-	"noUsers": "There are no users"
+	"noUsers": "There are no users",
+	"mutedUsers": "Muted users",
+	"renote": "Renote",
+	"blockedUsers": "Blocked users"
 }
 </locale>
 
@@ -585,7 +627,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Instance Mutes",
-	"noUsers": "There are no users"
+	"noUsers": "There are no users",
+	"mutedUsers": "Muted users",
+	"renote": "Renote",
+	"blockedUsers": "Blocked users"
 }
 </locale>
 
@@ -603,7 +648,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "정한 단어가 들어간 노트를 숨깁니다. 단어 뮤트와 차이점은 노트가 아예 보이지 않습니다.",
 	"emojiMute": "이모티콘 뮤트",
 	"instanceMute": "서버 뮤트",
-	"noUsers": "아무도 없습니다"
+	"noUsers": "아무도 없습니다",
+	"mutedUsers": "뮤트한 유저",
+	"renote": "리노트",
+	"blockedUsers": "차단한 유저"
 }
 </locale>
 
@@ -621,7 +669,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Verbert notities die het gespecificeerde woord of zin bevatten. In tegenstelling tot woorddemping wordt de notitie volledig verborgen.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Instantie dempers",
-	"noUsers": "Er zijn geen gebruikers."
+	"noUsers": "Er zijn geen gebruikers.",
+	"mutedUsers": "Gedempte gebruikers",
+	"renote": "Herdelen",
+	"blockedUsers": "Geblokkeerde gebruikers"
 }
 </locale>
 
@@ -639,7 +690,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Instance Mutes",
-	"noUsers": "Det er ingen brukere"
+	"noUsers": "Det er ingen brukere",
+	"mutedUsers": "Skjulte brukere",
+	"renote": "Renote",
+	"blockedUsers": "Blokkerte brukere"
 }
 </locale>
 
@@ -657,7 +711,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Wyciszone instancje",
-	"noUsers": "Brak użytkowników"
+	"noUsers": "Brak użytkowników",
+	"mutedUsers": "Wyciszeni użytkownicy",
+	"renote": "Udostępnij",
+	"blockedUsers": "Zablokowani użytkownicy"
 }
 </locale>
 
@@ -675,7 +732,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Esconder notas que contêm a palavra ou frase especificada. Diferente do silenciamento de palavras, a nota será completamente escondida.",
 	"emojiMute": "Silenciar emoji",
 	"instanceMute": "Instâncias silenciadas",
-	"noUsers": "Sem usuários"
+	"noUsers": "Sem usuários",
+	"mutedUsers": "Usuários silenciados",
+	"renote": "Repostar",
+	"blockedUsers": "Usuários bloqueados"
 }
 </locale>
 
@@ -693,7 +753,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Скрыть заметки, содержащие указанное слово или фразу. В отличие от word mute, заметка будет полностью скрыта от просмотра.",
 	"emojiMute": "Скрыть эмодзи",
 	"instanceMute": "Глушение инстансов",
-	"noUsers": "Нет ни одного пользователя"
+	"noUsers": "Нет ни одного пользователя",
+	"mutedUsers": "Скрытые пользователи",
+	"renote": "Репост",
+	"blockedUsers": "Заблокированные пользователи"
 }
 </locale>
 
@@ -711,7 +774,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Stíšené servery",
-	"noUsers": "Žiadni používatelia"
+	"noUsers": "Žiadni používatelia",
+	"mutedUsers": "Umlčaní používatelia",
+	"renote": "Preposlať",
+	"blockedUsers": "Blokovaní používatelia"
 }
 </locale>
 
@@ -729,7 +795,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "จะซ่อนโน้ตที่มีคำที่ระบุไว้ ซึ่งไม่เหมือนการปิดเสียงคำ ในกรณีนี้โน้ตจะไม่แสดงเลย",
 	"emojiMute": "ปิดเสียงเอโมจิ",
 	"instanceMute": "ปิดเสียงเซิร์ฟเวอร์",
-	"noUsers": "ไม่พบผู้ใช้งาน"
+	"noUsers": "ไม่พบผู้ใช้งาน",
+	"mutedUsers": "ผู้ใช้ที่ถูกปิดเสียง",
+	"renote": "รีโน้ต",
+	"blockedUsers": "ผู้ใช้ที่ถูกบล็อก"
 }
 </locale>
 
@@ -747,7 +816,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Belirtilen kelime veya kelime öbeğini içeren notları gizle. Kelime sessize alma özelliğinden farklı olarak, not tamamen görünmez hale gelir.",
 	"emojiMute": "Emoji ses kapat",
 	"instanceMute": "Sunucu Sessizleştirme",
-	"noUsers": "Kullanıcı yok"
+	"noUsers": "Kullanıcı yok",
+	"mutedUsers": "Sessize alınan kullanıcılar",
+	"renote": "Renote",
+	"blockedUsers": "Engellenen kullanıcılar"
 }
 </locale>
 
@@ -765,7 +837,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Hide notes that contain the specified word or phrase. Unlike word mute, the note will be completely hidden from view.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Instance Mutes",
-	"noUsers": "There are no users"
+	"noUsers": "There are no users",
+	"mutedUsers": "Muted users",
+	"renote": "Renote",
+	"blockedUsers": "Blocked users"
 }
 </locale>
 
@@ -783,7 +858,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Приховувати нотатки, що містять указане слово або фразу. На відміну від приховування слів, нотатку буде повністю приховано з перегляду.",
 	"emojiMute": "Приховати емодзі",
 	"instanceMute": "Приглушення інстансів",
-	"noUsers": "Немає користувачів"
+	"noUsers": "Немає користувачів",
+	"mutedUsers": "Заглушені користувачі",
+	"renote": "Поширити",
+	"blockedUsers": "Заблоковані користувачі"
 }
 </locale>
 
@@ -801,7 +879,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "Ẩn hoàn toàn các bài đăng chứa từ hoặc cụm từ. Khác với mute, bài đăng sẽ bị ẩn hoàn toàn.",
 	"emojiMute": "Mute emoji",
 	"instanceMute": "Những máy chủ ẩn",
-	"noUsers": "Chưa có ai"
+	"noUsers": "Chưa có ai",
+	"mutedUsers": "Người đã ẩn",
+	"renote": "Đăng lại",
+	"blockedUsers": "Người đã chặn"
 }
 </locale>
 
@@ -819,7 +900,10 @@ definePage(() => ({
 	"hardWordMuteDescription": "屏蔽包含指定关键词的帖子。与折叠关键词不同，帖子将完全不会被显示。",
 	"emojiMute": "屏蔽表情符号",
 	"instanceMute": "已隐藏的服务器",
-	"noUsers": "无用户"
+	"noUsers": "无用户",
+	"mutedUsers": "已隐藏的用户",
+	"renote": "转发",
+	"blockedUsers": "已屏蔽的用户"
 }
 </locale>
 
@@ -837,6 +921,9 @@ definePage(() => ({
 	"hardWordMuteDescription": "隱藏含有指定語句的貼文。 與詞彙靜音不同的是，貼文將完全隱藏不見。",
 	"emojiMute": "表情符號靜音",
 	"instanceMute": "被靜音的實例",
-	"noUsers": "沒有任何使用者"
+	"noUsers": "沒有任何使用者",
+	"mutedUsers": "被靜音的使用者",
+	"renote": "轉發",
+	"blockedUsers": "被封鎖的使用者"
 }
 </locale>

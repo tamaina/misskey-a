@@ -14,7 +14,7 @@ afterEach(async () => { vi.restoreAllMocks(); for (const callback of close.splic
 async function pilot(expiresAt?: Date) {
 	const invoke = vi.fn(async (tool: string) => tool === 'list_api_endpoints' ? { endpoints: ['users/notes'] } : []);
 	const events = vi.fn(async (method: string): Promise<unknown> => method === 'events/subscribe' ? { id: 'synthetic-sub', refreshBefore: '2026-10-12T00:00:00Z', cursor: null, truncated: false } : method === 'events/list' ? { events: [] } : {});
-	const service = { callTools: () => [callToolDefinition(null)], prepare: vi.fn(async () => ({ invoke, events, expiresAt })), requiredScopes: () => ['access:mcp'] } as unknown as McpApiService;
+	const service = { callTools: () => [callToolDefinition(null, ['users/notes'])], prepare: vi.fn(async () => ({ invoke, events, expiresAt })), requiredScopes: () => ['access:mcp'] } as unknown as McpApiService;
 	const p = createLocalMcpPilot(service, { enabled: true, resource: 'http://127.0.0.1:61836/mcp' }); await p.app.ready(); close.push(() => p.app.close());
 	const request = (method: string, params: object = {}, extra: Record<string, string> = {}) => p.app.inject({ method: 'POST', url: '/mcp', headers: {
 		host: '127.0.0.1:61836', authorization: 'Bearer synthetic', 'content-type': 'application/json', accept: 'application/json, text/event-stream',
