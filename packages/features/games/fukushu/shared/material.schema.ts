@@ -44,6 +44,7 @@ const payload = v.strictObject({
 	shuffleChoices: v.optional(v.boolean()),
 	kind: v.literal('flashcard'),
 	answer: content,
+	ankiNoteType: v.optional(v.literal('Basic')),
 	typeAnswer: v.optional(v.boolean()),
 	acceptedAnswer: v.optional(text(16_384)),
 });
