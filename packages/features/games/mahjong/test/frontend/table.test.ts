@@ -20,7 +20,7 @@ const view: MahjongView = {
 };
 
 test('renders only the supplied private hand, emits the offered action, and disables expired or submitted input', async () => {
-	const intl = createInternationalization({ locale: 'ja-JP' });
+	const intl = createInternationalization({ initialLocale: 'ja-JP' });
 	await intl.ready;
 	const wrapper = render(Table, { global: { plugins: [intl] }, props: { view, userId: 'alice', names: {}, busy: false, seconds: 30 } });
 	try {

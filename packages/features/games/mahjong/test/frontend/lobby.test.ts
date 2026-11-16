@@ -27,7 +27,7 @@ test('creating an invitation navigates through the real router to the returned r
 	const roomId = '5824be9f-8b3c-45d0-af07-d7099dcb478c';
 	mocks.api.mockImplementation(async endpoint => endpoint === 'mahjong/create' ? { id: roomId } : []);
 	for (const id of ['bob', 'carol', 'dave']) mocks.selectUser.mockResolvedValueOnce({ id, username: id });
-	const intl = createInternationalization({ locale: 'ja-JP' });
+	const intl = createInternationalization({ initialLocale: 'ja-JP' });
 	await intl.ready;
 	const pushed = vi.fn();
 	router.init();

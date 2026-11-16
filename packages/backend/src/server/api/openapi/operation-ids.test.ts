@@ -108,9 +108,14 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	for (const path of addedSecurityPaths) {
 		expect(spec.paths?.[path]?.post?.operationId).toBe(`post___${path.slice(1).replaceAll('/', '___')}`);
 	}
-	// Exclude the fifteen deferred SSO routes from the preceding API count.
-	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(481);
-	expect(identifiers).toHaveLength(481 + 27);
+	const mahjongIds = new Set(['create', 'rooms', 'show', 'ready', 'cancel', 'submit'].map(action => {
+		const id = `post___mahjong___${action}`;
+		expect(spec.paths?.[`/mahjong/${action}`]?.post?.operationId).toBe(id);
+		return id;
+	}));
+	// Keep the pre-security/pre-mahjong API count, excluding deferred SSO routes.
+	expect(identifiers.filter(id => !addedSecurityIds.has(id!) && !mahjongIds.has(id!))).toHaveLength(481);
+	expect(identifiers).toHaveLength(481 + 27 + 6);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 
