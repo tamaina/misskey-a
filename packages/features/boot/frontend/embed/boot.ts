@@ -81,6 +81,8 @@ export async function embedBoot(internationalization: InternationalizationInstan
 
 	// iframeIdの設定
 	function setIframeIdHandler(event: MessageEvent) {
+		// The parent may be cross-origin, but another window must not register its ID.
+		if (event.source !== window.parent) return;
 		if (event.data?.type === 'misskey:embedParent:registerIframeId' && event.data.payload?.iframeId != null) {
 			setIframeId(event.data.payload.iframeId);
 			window.removeEventListener('message', setIframeIdHandler);
