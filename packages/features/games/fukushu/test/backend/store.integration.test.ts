@@ -40,7 +40,7 @@ describe.skipIf(!socket)('Fukushu private PostgreSQL persistence and API', () =>
 		const source = '\uFEFF#html:false\n#separator:Tab\n表\t裏';
 		const bytes = Buffer.from(source);
 		const file = { id: 'source', userId: 'alice', userHost: null, uri: null, isLink: false, storedInternal: true, accessKey: 'source.tsv', name: '教材.tsv', size: bytes.length, md5: createHash('md5').update(bytes).digest('hex') } as MiDriveFile;
-		const importer = new FukushuDriveImporter({ findOneBy: async where => where.userId === 'alice' ? file : null }, { read: () => Readable.from([bytes]) as ReturnType<InternalStorageService['read']> }, { downloadUrl: async () => { throw new Error('Must use the local original'); } }, store);
+		const importer = new FukushuDriveImporter({ findOneBy: async where => !Array.isArray(where) && where.userId === 'alice' ? file : null }, { read: () => Readable.from([bytes]) as ReturnType<InternalStorageService['read']> }, { downloadUrl: async () => { throw new Error('Must use the local original'); } }, store);
 		const saved = await importer.import('alice', 'source');
 		expect(saved.deck.sourceText).toBe(source);
 		expect(saved.deck.sourceHash).toBe(createHash('sha256').update(source).digest('hex'));

@@ -3390,13 +3390,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "fukushu/materials/list",
 					"requireCredential": true,
 					"kind": "read:account",
 					"limit": {
 						"duration": 60000,
 						"max": 60
-					}
+					},
+					"requestName": "fukushu/materials/list"
 				},
 				"route": {
 					"method": "POST",
@@ -3460,13 +3460,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "fukushu/materials/import",
 					"requireCredential": true,
 					"kind": "write:account",
 					"limit": {
 						"duration": 60000,
 						"max": 5
-					}
+					},
+					"requestName": "fukushu/materials/import"
 				},
 				"route": {
 					"method": "POST",
@@ -3530,13 +3530,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "fukushu/materials/create",
 					"requireCredential": true,
 					"kind": "write:account",
 					"limit": {
 						"duration": 60000,
 						"max": 5
-					}
+					},
+					"requestName": "fukushu/materials/create"
 				},
 				"route": {
 					"method": "POST",
@@ -3600,13 +3600,13 @@ export default {
 					}
 				},
 				"meta": {
-					"requestName": "fukushu/materials/show",
 					"requireCredential": true,
 					"kind": "read:account",
 					"limit": {
 						"duration": 60000,
 						"max": 60
-					}
+					},
+					"requestName": "fukushu/materials/show"
 				},
 				"route": {
 					"method": "POST",

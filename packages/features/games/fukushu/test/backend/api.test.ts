@@ -4,10 +4,11 @@
  */
 
 import { call } from '@orpc/server';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, expectTypeOf, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { testContext } from '@features/auth/test/backend/native-context.js';
 import { createFukushuRouter } from '../../backend/api.implementation.js';
+import { fukushuContract } from '../../backend/material.contract.js';
 import { MaterialError } from '../../backend/store.js';
 import { material } from './fixture.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -57,4 +58,11 @@ describe('Fukushu import and list authorization', () => {
 		expect(await call(f.api.list, { ownerId: 'bob' } as never, { context: testContext(f.user, { permission: ['read:account'] }) })).toEqual([material().deck]);
 		expect(f.store.list).toHaveBeenCalledWith('alice');
 	});
+});
+
+test('preserves each literal request name for native SDK response inference', () => {
+	expectTypeOf(fukushuContract.list['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/list'>();
+	expectTypeOf(fukushuContract.import['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/import'>();
+	expectTypeOf(fukushuContract.show['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/show'>();
+	expectTypeOf(fukushuContract.create['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/create'>();
 });

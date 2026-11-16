@@ -52,7 +52,7 @@ test('renders material as text, paginates cards and never submits a grade', asyn
 
 test('requires a Drive choice and sends only its ID once while saving', async () => {
 	let finish!: (value: unknown) => void;
-	vi.mocked(misskeyApi).mockImplementation(async endpoint => endpoint === 'fukushu/materials/list' ? [] as never : await new Promise(resolve => { finish = resolve; }) as never);
+	vi.mocked(misskeyApi).mockImplementation(async endpoint => endpoint === 'fukushu/materials/list' ? [] as never : await new Promise<unknown>(resolve => { finish = resolve; }) as never);
 	vi.mocked(chooseDriveFile).mockResolvedValue([{ id: 'file-1', name: 'cards.tsv', url: 'https://example.invalid/public' }] as never);
 	mount();
 	await screen.findByText(/教材はまだありません/);
@@ -70,7 +70,7 @@ test('requires a Drive choice and sends only its ID once while saving', async ()
 test('an unfinished picker does not lock the page and an older selection cannot replace the newest', async () => {
 	let oldPick!: (value: unknown) => void;
 	vi.mocked(misskeyApi).mockResolvedValue([] as never);
-	vi.mocked(chooseDriveFile).mockImplementationOnce(async () => await new Promise(resolve => { oldPick = resolve; }) as never)
+	vi.mocked(chooseDriveFile).mockImplementationOnce(async () => await new Promise<unknown>(resolve => { oldPick = resolve; }) as never)
 		.mockResolvedValueOnce([{ id: 'new', name: 'new.tsv' }] as never);
 	mount();
 	await screen.findByText(/教材はまだありません/);

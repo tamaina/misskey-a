@@ -21,17 +21,22 @@ export const materialErrors = {
 	INVALID_MATERIAL: { code: 'INVALID_MATERIAL', message: 'Unsupported or invalid material.', id: 'e850d217-1d44-4647-909a-f5a2a8eea394' },
 } as const;
 
-function contract<const Name extends 'create' | 'show' | 'list' | 'import'>(name: Name) {
-	const write = name === 'create' || name === 'import';
-	const requestName = `fukushu/materials/${name}` as const;
-	return oc.$meta({ requestName, requireCredential: true, kind: write ? 'write:account' : 'read:account', limit: { duration: 60_000, max: write ? 5 : 60 } } as const satisfies Meta & ApiProcedureMetadata)
-		.route({ method: 'POST', path: `/${requestName}`, tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-		.errors({ ...commonErrors, NO_SUCH_FILE: { status: 404, data: apiErrorData }, IMPORT_FAILED: { status: 400, data: apiErrorData }, NO_SUCH_MATERIAL: { status: 404, data: apiErrorData }, MATERIAL_EXISTS: { status: 409, data: apiErrorData }, MATERIAL_LIMIT: { status: 400, data: apiErrorData }, INVALID_MATERIAL: { status: 400, data: apiErrorData } });
-}
+const base = oc.errors({ ...commonErrors, NO_SUCH_FILE: { status: 404, data: apiErrorData }, IMPORT_FAILED: { status: 400, data: apiErrorData }, NO_SUCH_MATERIAL: { status: 404, data: apiErrorData }, MATERIAL_EXISTS: { status: 409, data: apiErrorData }, MATERIAL_LIMIT: { status: 400, data: apiErrorData }, INVALID_MATERIAL: { status: 400, data: apiErrorData } });
+const read = { requireCredential: true, kind: 'read:account', limit: { duration: 60_000, max: 60 } } as const;
+const write = { requireCredential: true, kind: 'write:account', limit: { duration: 60_000, max: 5 } } as const;
 
+// Keep requestName literal at each declaration: SDK endpoints are keyed by this metadata.
 export const fukushuContract = {
-	list: contract('list').input(objectInput({})).output(v.pipe(v.array(v.omit(deckSchema, ['sourceText'])), v.maxLength(100))),
-	import: contract('import').input(objectInput({ fileId: misskeyId })).output(materialSchema),
-	create: contract('create').input(objectInput({ material: materialSchema })).output(materialSchema),
-	show: contract('show').input(objectInput({ id: sourceIdSchema })).output(materialSchema),
+	list: base.$meta({ ...read, requestName: 'fukushu/materials/list' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/materials/list', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+		.input(objectInput({})).output(v.pipe(v.array(v.omit(deckSchema, ['sourceText'])), v.maxLength(100))),
+	import: base.$meta({ ...write, requestName: 'fukushu/materials/import' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/materials/import', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+		.input(objectInput({ fileId: misskeyId })).output(materialSchema),
+	create: base.$meta({ ...write, requestName: 'fukushu/materials/create' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/materials/create', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+		.input(objectInput({ material: materialSchema })).output(materialSchema),
+	show: base.$meta({ ...read, requestName: 'fukushu/materials/show' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/materials/show', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+		.input(objectInput({ id: sourceIdSchema })).output(materialSchema),
 };
