@@ -29,6 +29,7 @@ cp .github/misskey/test.yml .config/
 docker compose -f packages/backend/test/compose.yml up
 ```
 Instead, you can prepare an empty (data can be erased) DB and edit `.config/test.yml` appropriately.
+Test resets and schema initialization require `NODE_ENV=test` and an explicit PostgreSQL database name containing a separate `test` component, delimited by `-` or `_` (for example, the supplied `test-misskey`, or `misskey_test`). Names such as `contest` and `latest` are rejected. URL/replication settings and `extra.database` / `extra.connectionString` overrides are also rejected because they can select a different database. Keep using a disposable database: the name check is a safeguard against configuration mistakes, not proof that its data can be discarded.
 
 3. Run all tests:
 ```sh

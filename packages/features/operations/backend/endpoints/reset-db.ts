@@ -9,7 +9,7 @@ import { resetDbContract } from './reset-db.contract.js';
 import type { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
 import type { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
-import { resetDb } from '../utility/reset-db.js';
+import { assertTestDatabase, resetDb } from '../utility/reset-db.js';
 import type { MetaService } from '../../../instance/backend/services/MetaService.js';
 import type { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
 export interface ResetDbDependencies {
@@ -24,6 +24,7 @@ export function createResetDbProcedure<Actor extends ApiActor>(deps: ResetDbDepe
 		.handler(async () => {
 			const result = await (async () => {
 				if (process.env.NODE_ENV !== 'test') throw new Error('NODE_ENV is not a test');
+				assertTestDatabase(deps.db);
 				const logger = deps.loggerService.getLogger('reset-db');
 				logger.info('---- Resetting database...');
 				await deps.redisClient.flushdb();

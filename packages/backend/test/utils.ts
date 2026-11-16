@@ -15,6 +15,7 @@ import * as htmlParser from 'node-html-parser';
 import { DataSource, IsNull } from 'typeorm';
 import Fastify from 'fastify';
 import { entities } from '@features/persistence/backend/postgres.js';
+import { assertTestDatabase } from '@features/operations/backend/utility/reset-db.js';
 import { loadConfig } from '@/config.js';
 import type * as misskey from 'misskey-js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
@@ -667,6 +668,7 @@ export async function initTestDb(justBorrow = false, initEntities?: any[]) {
 		entities: initEntities ?? entities,
 	});
 
+	assertTestDatabase(db);
 	await db.initialize();
 
 	return db;
