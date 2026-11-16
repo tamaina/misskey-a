@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs';
 import { readFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { userInfo } from 'node:os';
-import { DataSource } from 'typeorm';
+import { DataSource, MigrationExecutor } from 'typeorm';
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { entities } from '@features/persistence/backend/postgres.js';
@@ -42,8 +42,9 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
 		await db.initialize();
 		const applied = await db.runMigrations();
-		expect(applied).toHaveLength(367);
-		expect(applied.at(-1)?.name).toBe('SessionUserIp1794700800000');
+		expect(applied.map(migration => migration.name).sort()).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort());
+		expect(applied.map(migration => migration.name)).toContain('SessionUserIp1794700800000');
+		expect(await db.showMigrations()).toBe(false);
 		const schema = await db.driver.createSchemaBuilder().log();
 		expect(schema.upQueries.map(query => query.query)).toEqual([]);
 		console.log('Production migrations / zero pending DDL:', applied.length);
@@ -147,13 +148,20 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		});
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
-	test('the latest policy and session-history migrations down/up against production metadata leave no pending DDL', async () => {
-		for (let index = 0; index < 6; index++) await db.undoLastMigration();
-		const applied = await db.runMigrations();
-		expect(applied.map(migration => migration.name)).toEqual([
+	test('policy and session-history migrations plus later dependencies down/up leave no pending DDL', async () => {
+		const chain = (await new MigrationExecutor(db).getExecutedMigrations()).sort((a, b) => a.timestamp - b.timestamp);
+		const firstPolicy = chain.findIndex(migration => migration.name === new SudoPolicy1792300000001().name);
+		expect(firstPolicy).toBeGreaterThanOrEqual(0);
+		const roundTripNames = chain.slice(firstPolicy).map(migration => migration.name);
+		expect(roundTripNames).toEqual(expect.arrayContaining([
 			'SudoPolicy1792300000001', 'PasswordLoginPolicy1792300000002', 'DeletionIntent1792300000003',
 			'AccessTokenExpiry1792300000004', 'BrowserSessionHistory1794614400000', 'SessionUserIp1794700800000',
-		]);
+		]));
+		// Undo any newer dependents first, then all policies under test.
+		for (let index = 0; index < roundTripNames.length; index++) await db.undoLastMigration();
+		const applied = await db.runMigrations();
+		expect(applied.map(migration => migration.name)).toEqual(roundTripNames);
+		expect(await db.showMigrations()).toBe(false);
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
 	test('empty browser-session round trip restores sudo, approval and history dependencies', async () => {
