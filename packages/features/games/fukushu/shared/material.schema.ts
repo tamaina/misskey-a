@@ -33,6 +33,13 @@ export const deckSchema = v.strictObject({
 	enabledQuestionCount: v.pipe(integer, v.maxValue(1000)),
 });
 
+// Listing deliberately omits source text/hash and every question payload.
+export const materialSummarySchema = v.pick(deckSchema, [
+	'id', 'name', 'description', 'studyMode', 'sourceType', 'sourceFileName',
+	'importedAt', 'updatedAt', 'questionCount', 'enabledQuestionCount',
+]);
+export type FukushuMaterialSummary = v.InferOutput<typeof materialSummarySchema>;
+
 const payload = v.strictObject({
 	id: sourceIdSchema,
 	deckId: sourceIdSchema,

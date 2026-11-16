@@ -48,6 +48,52 @@ describe.skipIf(!socket)('Fukushu private PostgreSQL persistence and API', () =>
 		expect(await new FukushuStore(db).show('alice', original.deck.id)).toEqual(original);
 		expect(await new FukushuStore(db).show('bob', original.deck.id)).toEqual(other);
 	});
+	test('lists only metadata, preserves opaque IDs and leaves exact material records intact', async () => {
+		expect(await store.list('alice')).toEqual([]);
+		const original = material('教材/😀', 'card/😀');
+		original.deck.sourceText = 'private import body';
+		original.deck.sourceHash = 'private source hash';
+		original.deck.description = 'plain <b>description</b>';
+		original.deck.sourceFileName = 'original.txt';
+		await store.create('alice', original);
+		const expected = {
+			id: original.deck.id, name: original.deck.name, description: original.deck.description,
+			studyMode: original.deck.studyMode, sourceType: original.deck.sourceType,
+			sourceFileName: original.deck.sourceFileName, importedAt: original.deck.importedAt,
+			updatedAt: original.deck.updatedAt, questionCount: 1, enabledQuestionCount: 1,
+		};
+		expect(await new FukushuStore(db).list('alice')).toEqual([expected]);
+		expect(await store.list('bob')).toEqual([]);
+		expect(await store.show('alice', original.deck.id)).toEqual(original);
+		await store.create('bob', material(original.deck.id, original.questions[0].id));
+		expect((await store.list('bob'))[0]).not.toHaveProperty('description');
+		expect(await store.list('alice')).toEqual([expected]);
+	});
+	test('returns the entire bounded library in deterministic source-ID order', async () => {
+		const ids = ['z', 'A', 'é', 'あ', '😀', ...Array.from({ length: 95 }, (_, i) => `deck-${String(i).padStart(2, '0')}`)];
+		for (const id of ids) await store.create('alice', material(id, `card-${id}`));
+		const list = await store.list('alice');
+		expect(list).toHaveLength(100);
+		expect(list.map(deck => deck.id)).toEqual([...ids].sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b))));
+		expect(await new FukushuStore(db).list('alice')).toEqual(list);
+		await expect(store.create('alice', material('extra', 'extra'))).rejects.toThrow('MATERIAL_LIMIT');
+		expect(await store.list('alice')).toEqual(list);
+	});
+	test('list API authenticates and scopes by principal even with spoofed selectors', async () => {
+		const api = createFukushuRouter(store);
+		const alice = mockDeep<MiLocalUser>({ id: 'alice', isSuspended: false, movedToUri: null });
+		const bob = mockDeep<MiLocalUser>({ id: 'bob', isSuspended: false, movedToUri: null });
+		await store.create('alice', material());
+		await expect(call(api.list, {}, { context: testContext(null) })).rejects.toThrow();
+		await expect(call(api.list, {}, { context: testContext(alice, { permission: ['write:account'] }) })).rejects.toThrow();
+		const result = await call(api.list, {}, { context: testContext(alice, { permission: ['read:account'] }) });
+		expect(result.map(deck => deck.id)).toEqual(['deck-original']);
+		expect(result[0]).not.toHaveProperty('sourceText');
+		expect(result[0]).not.toHaveProperty('sourceHash');
+		expect(result[0]).not.toHaveProperty('questions');
+		expect(await call(api.list, { ownerId: 'alice', id: 'deck-original' }, { context: testContext(bob) })).toEqual([]);
+		expect(await store.show('alice', 'deck-original')).toEqual(material());
+	});
 	test('serializes concurrent creates without overwrite and rolls back a duplicate card in another deck', async () => {
 		const results = await Promise.allSettled([store.create('alice', material()), new FukushuStore(db).create('alice', material())]);
 		expect(results.filter(result => result.status === 'fulfilled')).toHaveLength(1);

@@ -5,6 +5,7 @@
 
 import * as v from 'valibot';
 import { QueryFailedError } from 'typeorm';
+import type { FukushuMaterialSummary } from '../shared/material.schema.js';
 import { materialSchema } from '../shared/material.schema.js';
 import { MiFukushuDeck } from './models/FukushuDeck.js';
 import { MiFukushuQuestion } from './models/FukushuQuestion.js';
@@ -41,6 +42,24 @@ export class FukushuStore {
 			throw error;
 		}
 		return material;
+	}
+
+	async list(ownerId: string): Promise<FukushuMaterialSummary[]> {
+		// Explicit projection keeps source text/hash and card contents out of this query.
+		// The create quota bounds the complete list; no unstable offset cursor is needed.
+		const rows = await this.db.getRepository(MiFukushuDeck).createQueryBuilder('deck')
+			.select(`jsonb_strip_nulls(jsonb_build_object(
+				'id', deck.id, 'name', deck.data->'name', 'description', deck.data->'description',
+				'studyMode', deck.data->'studyMode', 'sourceType', deck.data->'sourceType',
+				'sourceFileName', deck.data->'sourceFileName', 'importedAt', deck.data->'importedAt',
+				'updatedAt', deck.data->'updatedAt', 'questionCount', deck.data->'questionCount',
+				'enabledQuestionCount', deck.data->'enabledQuestionCount'
+			))`, 'summary')
+			.where('deck.ownerId = :ownerId', { ownerId })
+			.orderBy('deck.id COLLATE "C"', 'ASC')
+			.take(100)
+			.getRawMany<{ summary: FukushuMaterialSummary }>();
+		return rows.map(row => row.summary);
 	}
 
 	async show(ownerId: string, id: string) {

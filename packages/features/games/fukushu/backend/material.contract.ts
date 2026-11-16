@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import * as v from 'valibot';
 import { oc } from '@orpc/contract';
 import { commonErrors, apiErrorData } from '../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
-import { materialSchema, sourceIdSchema } from '../shared/material.schema.js';
+import { materialSchema, materialSummarySchema, sourceIdSchema } from '../shared/material.schema.js';
 import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import type { Meta } from '@orpc/contract';
 
@@ -17,7 +18,7 @@ export const materialErrors = {
 	INVALID_MATERIAL: { code: 'INVALID_MATERIAL', message: 'Unsupported or invalid material.', id: 'e850d217-1d44-4647-909a-f5a2a8eea394' },
 } as const;
 
-function contract<const Name extends 'create' | 'show'>(name: Name) {
+function contract<const Name extends 'create' | 'show' | 'list'>(name: Name) {
 	const requestName = `fukushu/materials/${name}` as const;
 	return oc.$meta({ requestName, requireCredential: true, kind: name === 'create' ? 'write:account' : 'read:account', limit: { duration: 60_000, max: name === 'create' ? 5 : 60 } } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: `/${requestName}`, tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
@@ -25,6 +26,7 @@ function contract<const Name extends 'create' | 'show'>(name: Name) {
 }
 
 export const fukushuContract = {
+	list: contract('list').input(objectInput({})).output(v.pipe(v.array(materialSummarySchema), v.maxLength(100))),
 	create: contract('create').input(objectInput({ material: materialSchema })).output(materialSchema),
 	show: contract('show').input(objectInput({ id: sourceIdSchema })).output(materialSchema),
 };

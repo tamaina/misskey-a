@@ -1,7 +1,7 @@
 # Fukushu material persistence (pilot)
 
 Refs #310. `fukushu/materials/create` and `fukushu/materials/show` store and return
-the authenticated user's private material. Both are POST endpoints, using the
+the authenticated user's private material. These two are POST endpoints, using the
 existing `write:account` and `read:account` permissions respectively. There is no
 public material URL or other-user access. Missing and foreign IDs both return
 `NO_SUCH_MATERIAL`. Ownership comes only from the authenticated principal.
@@ -42,3 +42,22 @@ backup migration/merge with history preservation. Future FSRS integration must
 derive automatic ratings from `correct`, not `score` (100 can still be incorrect).
 Do not independently change the inherited decimal tolerance boundary or replay
 existing history with new grading semantics.
+
+## Material list
+
+`POST fukushu/materials/list` accepts an empty object and requires `read:account`.
+It returns only the principal's material summaries: original ID, name, optional
+description and source filename, study mode/source type, original timestamps and
+question/enabled counts. Source text/hash, questions/answers, review state and
+other owners' records are not returned. Input cannot select another owner.
+This provides the server equivalent of upstream `deckRepository.all()` for a
+future material library; it does not compute study queues or review counts.
+
+The response is the complete current list (0–100 entries under the create quota),
+ordered by opaque source ID in PostgreSQL C collation. It deliberately does not
+interpret imported IDs as Misskey IDs or reorder by caller-supplied timestamps.
+There is no pagination token, filtering, write or schema migration. Increasing
+the quota later requires a corresponding bounded pagination design. Listing
+and then `show` preserves the stored material verbatim; no history is replaced.
+
+Based on #321, with UI and Drive import left to later independent changes.
