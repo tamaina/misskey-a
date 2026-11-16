@@ -5,7 +5,7 @@
 
 import assert from 'node:assert/strict';
 import { afterEach, beforeEach, test } from 'node:test';
-import { assertTestDatabase, assertTestDatabaseName, resetDb } from '../backend/utility/reset-db.ts';
+import { assertTestDatabase, assertTestDatabaseName, assertTestDatabaseOptions, resetDb } from '../backend/utility/reset-db.ts';
 
 const originalNodeEnv = process.env.NODE_ENV;
 beforeEach(() => { process.env.NODE_ENV = 'test'; });
@@ -70,18 +70,21 @@ test('alternative connection options cannot override an approved test database n
 		await assert.rejects(resetDb(db), /ambiguous database target/);
 		assert.deepEqual(queries, []);
 	}
+	const { db, queries } = fixture('test-misskey');
+	delete db.options;
+	await assert.rejects(resetDb(db));
+	assert.deepEqual(queries, []);
 });
 
-test('the guard can reject before initialization with dropSchema and synchronize enabled', async () => {
+test('the options guard rejects before construction with dropSchema and synchronize enabled', () => {
 	const { db, queries } = fixture('misskey');
 	Object.assign(db.options, { dropSchema: true, synchronize: true });
-	let initialized = false;
-	db.initialize = async () => { initialized = true; };
-	await assert.rejects(async () => {
-		assertTestDatabase(db);
-		await db.initialize();
+	let constructed = false;
+	assert.throws(() => {
+		assertTestDatabaseOptions(db.options);
+		constructed = true;
 	}, /refusing to reset\/sync/);
-	assert.equal(initialized, false);
+	assert.equal(constructed, false);
 	assert.deepEqual(queries, []);
 });
 
