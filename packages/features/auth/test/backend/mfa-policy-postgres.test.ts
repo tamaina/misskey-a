@@ -27,7 +27,7 @@ import { createI2faRemoveKeyProcedure } from '../../backend/endpoints/i/2fa/remo
 import { createI2faPasswordLessProcedure } from '../../backend/endpoints/i/2fa/password-less.js';
 import { createAdminUnsetMfaProcedure } from '../../backend/endpoints/admin/unset-mfa.js';
 import { testContext } from './native-context.js';
-import { assertMfaFactorRetained, assertPasswordRecoveryPossible } from '../../backend/mfa-policy.js';
+import { assertMfaFactorRetained, assertPasswordRecoveryPossible, readMfaPolicy } from '../../backend/mfa-policy.js';
 import { PasskeyMfaPolicy1791969900000 } from '../../../../backend/migration/1791969900000-PasskeyMfaPolicy.js';
 
 const socket = process.env.MISSKEY_AUTH_POLICY_TEST_SOCKET;
@@ -92,6 +92,50 @@ describe.skipIf(!socket)('real PostgreSQL locked MFA policy', () => {
 		});
 		expect((await snapshot()).passkeyMfaEnabled).toBe(false);
 		expect(await keys().countBy({ userId: owner })).toBe(2);
+	});
+
+	test('initial migration preserves legacy owned-key MFA without enabling orphan or other users keys', async () => {
+		await source().transaction(async manager => {
+			if (!manager.queryRunner) throw new Error('Missing migration transaction');
+			// Connection-local tables model the old schema without disturbing the
+			// fully migrated fixture. PostgreSQL executes the production SQL.
+			await manager.query(`CREATE TEMP TABLE "user_profile" (
+				"userId" text PRIMARY KEY, "twoFactorEnabled" boolean NOT NULL,
+				"twoFactorSecret" text, "password" text NOT NULL DEFAULT 'synthetic-hash'
+			) ON COMMIT DROP`);
+			await manager.query('CREATE TEMP TABLE "user_security_key" ("id" text PRIMARY KEY, "userId" text NOT NULL) ON COMMIT DROP');
+			await manager.query(`INSERT INTO "user_profile" ("userId", "twoFactorEnabled", "twoFactorSecret") VALUES
+				('active', true, 'synthetic-secret'), ('key-only-factor', true, NULL),
+				('orphan', false, NULL), ('totp-only', true, 'synthetic-secret'),
+				('other-key', true, 'synthetic-secret'), ('inactive', false, NULL)`);
+			await manager.query(`INSERT INTO "user_security_key" ("id", "userId") VALUES
+				('active-1', 'active'), ('active-2', 'active'),
+				('key-only', 'key-only-factor'), ('orphan-1', 'orphan'), ('foreign', 'missing-profile')`);
+			const before = await manager.query('SELECT * FROM "user_profile" ORDER BY "userId"');
+			const beforeKeys = await manager.query('SELECT * FROM "user_security_key" ORDER BY "id"');
+			await new PasskeyMfaPolicy1791969900000().up(manager.queryRunner);
+			const rows = await manager.query('SELECT * FROM "user_profile" ORDER BY "userId"');
+			expect(rows).toEqual(before.map((profile: { userId: string }) => ({
+				...profile, passkeyMfaEnabled: ['active', 'key-only-factor'].includes(profile.userId),
+			})));
+			expect(await manager.query('SELECT * FROM "user_security_key" ORDER BY "id"')).toEqual(beforeKeys);
+			for (const row of rows) {
+				const keyCount = beforeKeys.filter((key: { userId: string }) => key.userId === row.userId).length;
+				expect(readMfaPolicy(row, keyCount).passkey).toBe(['active', 'key-only-factor'].includes(row.userId));
+			}
+			// New registrations still start disabled until explicitly enrolled.
+			await manager.query(`INSERT INTO "user_profile" ("userId", "twoFactorEnabled") VALUES ('new-user', false)`);
+			expect(await manager.query(`SELECT "passkeyMfaEnabled" FROM "user_profile" WHERE "userId" = 'new-user'`)).toEqual([{ passkeyMfaEnabled: false }]);
+		});
+	});
+
+	test('an already applied migration never reactivates an explicitly disabled policy', async () => {
+		await profiles().update({ userId: owner }, { twoFactorEnabled: true, twoFactorSecret: 'synthetic-secret', passkeyMfaEnabled: false });
+		const before = await snapshot();
+		expect(await source().runMigrations()).toEqual([]);
+		expect(await snapshot()).toEqual(before);
+		expect(await keys().countBy({ userId: owner })).toBe(2);
+		expect(readMfaPolicy(await snapshot(), 2).passkey).toBe(false);
 	});
 
 	test('rollback rejects an enabled policy without erasing it or its keys', async () => {
