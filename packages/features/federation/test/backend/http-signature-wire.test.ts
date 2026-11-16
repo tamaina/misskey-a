@@ -172,7 +172,7 @@ describe('Draft RSA interoperability on captured Node HTTP requests', () => {
 	test('malformed Date is rejected at the inbox boundary before enqueueing', async () => {
 		const { incoming } = await capture('/inbox', 'new');
 		replaceHeader(incoming, 'date', 'invalid-date');
-		expect(() => parseRequestSignature(incoming, { requiredComponents: { draft: required }, clockSkew: { forward: 300_000, delay: 300_000 } })).not.toThrow();
+		expect(() => parseRequestSignature(incoming, { requiredComponents: { draft: required }, clockSkew: { forward: 300_000, delay: 300_000 } })).toThrow('Clock skew is invalid');
 		const result = inbox(incoming);
 		expect(result.reply.code).toHaveBeenCalledWith(401);
 		expect(result.queue.inbox).not.toHaveBeenCalled();

@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { isSameLiveCredential } from '../../frontend/utility/live-account.js';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { getAccounts, getAccountMenu, login, refreshCurrentAccount, switchAccount } from '@features/auth/frontend/accounts.js';
+import { adoptBrowserSession, getAccounts, getAccountMenu, login, refreshCurrentAccount, switchAccount } from '@features/auth/frontend/accounts.js';
 
 const m = vi.hoisted(() => ({
 	account: { id: 'current', username: 'current', token: 'current-token' },
@@ -15,8 +16,9 @@ const m = vi.hoisted(() => ({
 		set: vi.fn(),
 	},
 	prefer: { s: { accounts: [] as [string, { id: string; username: string }][] }, commit: vi.fn() },
-	files: vi.fn(), get: vi.fn(), reload: vi.fn(), popup: vi.fn(), signout: vi.fn(),
+	files: vi.fn(), get: vi.fn(), reload: vi.fn(), popup: vi.fn(), signout: vi.fn(), alert: vi.fn(),
 }));
+vi.mock('@features/api/frontend/stream.js', () => ({ reconnectStream: vi.fn() }));
 vi.mock('@features/auth/frontend/i.js', () => ({ $i: m.account }));
 vi.mock('@features/preferences/frontend/store.js', () => ({ store: m.store }));
 vi.mock('@features/preferences/frontend/preferences.js', () => ({ prefer: m.prefer }));
@@ -28,10 +30,11 @@ vi.mock('@@/js/shared-files.js', () => ({ clearSharedFiles: m.files }));
 vi.mock('@features/auth/frontend/signout.js', () => ({ signout: m.signout }));
 vi.mock('@features/runtime/frontend/utility/idb-proxy.js', () => ({ get: m.get }));
 vi.mock('@features/runtime/frontend/utility/unison-reload.js', () => ({ unisonReload: m.reload, reloadChannel: { postMessage: vi.fn() } }));
-vi.mock('@features/ui/frontend/os.js', () => ({ popup: m.popup, waiting: vi.fn(), popupMenu: vi.fn(), success: vi.fn(), alert: vi.fn() }));
+vi.mock('@features/ui/frontend/os.js', () => ({ popup: m.popup, waiting: vi.fn(), popupMenu: vi.fn(), success: vi.fn(), alert: m.alert }));
 
 beforeEach(() => {
 	vi.resetAllMocks();
+	m.alert.mockResolvedValue(undefined);
 	m.files.mockResolvedValue(undefined);
 	m.store.s.accountTokens = { 'example.test/current': 'current-token' };
 	m.store.s.accountInfos = { 'example.test/current': { ...m.account } };
@@ -191,4 +194,25 @@ describe('account credential recovery', () => {
 		expect(m.signout).not.toHaveBeenCalled();
 		expect(m.reload).toHaveBeenCalledOnce();
 	});
+});
+
+test('native session adoption refuses credentials superseded by a newer session', async () => {
+	const original = m.account.token;
+	m.account.token = `bs_${'B'.repeat(43)}`;
+	try {
+		expect(await adoptBrowserSession(`bs_${'A'.repeat(43)}`, original)).toBe(false);
+		expect(m.account.token).toBe(`bs_${'B'.repeat(43)}`);
+		expect(m.store.set).not.toHaveBeenCalled();
+	} finally { m.account.token = original; }
+});
+
+test('native session adoption persists the replacement and preserves live credential ownership', async () => {
+	const original = m.account.token;
+	const issued = `bs_${'A'.repeat(43)}`;
+	try {
+		expect(await adoptBrowserSession(issued, original)).toBe(true);
+		expect(m.account.token).toBe(issued);
+		expect(m.store.s.accountTokens['example.test/current']).toBe(issued);
+		expect(isSameLiveCredential(m.account.id, original, m.account.id, issued)).toBe(true);
+	} finally { m.account.token = original; }
 });

@@ -18,7 +18,9 @@ export function createAdminGetUserIpsProcedure<Actor extends ApiActor>(deps: Pic
 				take: 30,
 			});
 			return ips.map(x => ({
+				id: String(x.id),
 				ip: x.ip,
+				lastSeenAt: x.lastSeenAt.toISOString(),
 				createdAt: x.createdAt.toISOString(),
 			}));
 		});

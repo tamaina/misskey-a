@@ -9,7 +9,7 @@ export { sessionFailureSchema, sessionErrorDataSchema, fastifyFailureSchema } fr
 // These handlers deliberately validate field values in their original domain order.
 // The wire admits finite JSON protocol data, rather than claiming it is a verified credential.
 
-export const availableSigninFactorsSchema = v.pipe(v.array(v.picklist(['totp', 'passkey'])), v.minLength(1), v.maxLength(2));
+export const availableSigninFactorsSchema = v.pipe(v.array(v.picklist(['totp', 'passkey', 'recovery'])), v.minLength(1), v.maxLength(3), v.check(factors => new Set(factors).size === factors.length, 'Duplicate signin factor'));
 
 export const finishedSigninSchema = v.strictObject({ finished: v.literal(true), id: v.string(), i: v.string() });
 

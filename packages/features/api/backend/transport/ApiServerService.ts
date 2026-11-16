@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { accessTokenExpired } from '@features/auth/backend/access-token-expiry.js';
 import { Inject, Injectable } from '@nestjs/common';
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
@@ -73,10 +74,11 @@ export class ApiServerService {
 				session: request.params.session,
 			});
 
-			if (token && token.session != null && !token.fetched) {
-				this.accessTokensRepository.update(token.id, {
+			if (token && token.session != null && !token.fetched && !accessTokenExpired(token)) {
+				const claimed = await this.accessTokensRepository.update({ id: token.id, fetched: false }, {
 					fetched: true,
 				});
+				if (claimed.affected !== 1 || accessTokenExpired(token)) return { ok: false };
 
 				return {
 					ok: true,

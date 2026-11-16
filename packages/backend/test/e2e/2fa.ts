@@ -10,7 +10,7 @@ import * as crypto from 'node:crypto';
 import { encode as encodeToCbor } from 'cbor2';
 import * as OTPAuth from 'otpauth';
 import { loadConfig } from '@/config.js';
-import { api, signup, sendEnvUpdateRequest } from '../utils.js';
+import { api, legacySignup, sendEnvUpdateRequest } from '../utils.js';
 import type {
 	AuthenticationResponseJSON,
 	AuthenticatorAssertionResponseJSON,
@@ -20,14 +20,14 @@ import type {
 	RegistrationResponseJSON,
 } from '@simplewebauthn/server';
 import type * as misskey from 'misskey-js';
-import { describe, beforeAll, beforeEach, test } from 'vitest';
+import { describe, afterEach, beforeEach, test } from 'vitest';
 
-describe('2要素認証', () => {
+describe('2要素認証（旧native credential互換）', () => {
 	let alice: misskey.entities.SignupResponse;
 
 	const config = loadConfig();
 	const password = 'test';
-	const username = 'alice';
+	let username: string;
 
 	// https://datatracker.ietf.org/doc/html/rfc8152
 	// 各値の定義は上記規格に基づく。鍵ペアは適当に生成したやつ
@@ -179,11 +179,14 @@ describe('2要素認証', () => {
 		};
 	};
 
-	beforeAll(async () => {
-		alice = await signup({ username, password });
+	beforeEach(async () => {
+		await sendEnvUpdateRequest({ key: 'MISSKEY_TEST_CHECK_DUPLICATED_TOTP', value: '' });
+		// A failed assertion must not leave the next case's account enrolled in MFA.
+		alice = await legacySignup({ password });
+		username = alice.username;
 	}, 1000 * 60 * 2);
 
-	beforeEach(async () => {
+	afterEach(async () => {
 		await sendEnvUpdateRequest({ key: 'MISSKEY_TEST_CHECK_DUPLICATED_TOTP', value: '' });
 	});
 
@@ -201,6 +204,7 @@ describe('2要素認証', () => {
 			token: otpToken(registerResponse.body.secret),
 		}, alice);
 		assert.strictEqual(doneResponse.status, 200);
+		assert.strictEqual(doneResponse.body.backupCodes.length, 5);
 
 		const signinWithoutTokenResponse = await api('signin-flow', {
 			...signinParam(),
@@ -209,7 +213,7 @@ describe('2要素認証', () => {
 		assert.deepStrictEqual(signinWithoutTokenResponse.body, {
 			finished: false,
 			next: 'totp',
-			availableFactors: ['totp'],
+			availableFactors: ['totp', 'recovery'],
 		});
 
 		const signinResponse = await api('signin-flow', {
@@ -258,6 +262,22 @@ describe('2要素認証', () => {
 		assert.strictEqual(keyDoneResponse.body.id, credentialId.toString('base64url'));
 		assert.strictEqual(keyDoneResponse.body.name, keyName);
 
+		// Legacy enrollment retains the key without overriding an explicitly off
+		// passkey policy. Reactivation requires the session's fresh sudo grant.
+		const beforeEnable = await api('signin-flow', signinParam());
+		assert.strictEqual(beforeEnable.status, 200);
+		assert.strictEqual(beforeEnable.body.finished, false);
+		assert.strictEqual(beforeEnable.body.next, 'totp');
+		assert.deepStrictEqual(beforeEnable.body.availableFactors, ['totp', 'recovery']);
+		const elevated = await api('i/sudo/start', { password, token: otpToken(registerResponse.body.secret) }, alice);
+		assert.strictEqual(elevated.status, 200);
+		assert.strictEqual(elevated.body.status, 'elevated');
+		assert.ok(typeof elevated.body.token === 'string');
+		assert.match(elevated.body.token, /^bs_[A-Za-z0-9_-]{43}$/);
+		const session = { token: elevated.body.token };
+		const enabled = await api('i/security/passkey/mfa/enable', { acknowledged: true }, session);
+		assert.strictEqual(enabled.status, 200);
+
 		const signinResponse = await api('signin-flow', {
 			...signinParam(),
 		});
@@ -277,11 +297,14 @@ describe('2要素認証', () => {
 		assert.strictEqual(signinResponse2.body.finished, true);
 		assert.notEqual(signinResponse2.body.i, undefined);
 
-		// 後片付け
-		await api('i/2fa/totp/remove', {
-			password,
-			token: otpToken(registerResponse.body.secret),
-		}, alice);
+		// The session management API preserves TOTP while disabling passkey MFA.
+		const disabled = await api('i/security/passkey/mfa/disable', { acknowledged: true }, session);
+		assert.strictEqual(disabled.status, 204);
+		const afterDisable = await api('signin-flow', signinParam());
+		assert.strictEqual(afterDisable.status, 200);
+		assert.strictEqual(afterDisable.body.finished, false);
+		assert.strictEqual(afterDisable.body.next, 'totp');
+		assert.deepStrictEqual(afterDisable.body.availableFactors, ['totp', 'recovery']);
 	});
 
 	test('が設定でき、セキュリティキーでパスワードレスログインできる。', async () => {
@@ -426,7 +449,7 @@ describe('2要素認証', () => {
 		} as any) as any, alice);
 		assert.strictEqual(keyDoneResponse.status, 200);
 
-		// テストの実行順によっては複数残ってるので全部消す
+		// Remove only keys owned by this case's isolated account.
 		const beforeIResponse = await api('i', {
 		}, alice);
 		assert.strictEqual(beforeIResponse.status, 200);

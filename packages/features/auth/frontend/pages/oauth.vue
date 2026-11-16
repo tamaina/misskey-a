@@ -40,7 +40,7 @@ const permissions = window.document.querySelector<HTMLMetaElement>('meta[name="m
 const selectableMeta = window.document.querySelector<HTMLMetaElement>('meta[name="misskey:oauth:selectable-permissions"]');
 const selectablePermissions = selectableMeta ? selectableMeta.content.split(' ').filter(p => (Misskey.permissions as readonly string[]).includes(p)) : undefined;
 
-function doPost(token: string, decision: 'accept' | 'deny', selected?: string[]) {
+function doPost(token: string, decision: 'accept' | 'deny', selected?: string[], expiresAt?: string) {
 	const form = window.document.createElement('form');
 	form.action = '/oauth/decision';
 	form.method = 'post';
@@ -66,6 +66,10 @@ function doPost(token: string, decision: 'accept' | 'deny', selected?: string[])
 		form.appendChild(scope);
 	}
 
+	if (decision === 'accept' && expiresAt) {
+		const expiry = window.document.createElement('input'); expiry.type = 'hidden'; expiry.name = 'expires_at'; expiry.value = expiresAt; form.appendChild(expiry);
+	}
+
 	if (decision === 'deny') {
 		const cancel = window.document.createElement('input');
 		cancel.type = 'hidden';
@@ -78,8 +82,8 @@ function doPost(token: string, decision: 'accept' | 'deny', selected?: string[])
 	form.submit();
 }
 
-function onAccept(token: string, selected?: string[]) {
-	doPost(token, 'accept', selected);
+function onAccept(token: string, selected?: string[], expiresAt?: string) {
+	doPost(token, 'accept', selected, expiresAt);
 }
 
 function onDeny(token: string) {

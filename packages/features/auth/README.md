@@ -19,48 +19,114 @@ requested scopeを任意追加欄に重ねず、`access:mcp`は通常OAuthでは
 この拡張を利用しない明示scope付き通常OAuthは従来の固定scope同意のまま。
 MCP clientsが独自フラグを送る必要はなく、discovery metadataにも変更を加えない。
 
-## OIDC SP foundation (unconnected pilot)
+## Current authentication scope
 
-The ID token verifier, discovery adapter, and transaction store do not register
-HTTP endpoints or issue sessions. Providers must be explicitly enabled by a
-future server-owned configuration. Discovery accepts public HTTPS only, with
-pinned DNS/TLS, no redirects, JSON, and same-origin authorization/token/JWKS
-endpoints. Internal IdPs and cross-origin provider endpoints are unsupported in
-this finite pilot. Identity is issuer + subject, never email matching.
+The completion stack covers individual browser sessions, current-policy login
+issuance, authentication progress, independent passkey MFA, strict passwordless
+login, recovery codes and operation-bound reauthentication. Security settings
+manage keys, parallel TOTP and passkey second factors, recovery codes and session
+revocation. Sensitive changes recheck the current owner, policy and session under
+transaction locks. Registering a passkey or security key immediately activates MFA,
+even without TOTP. Its registration completion displays newly issued recovery codes in a modal,
+as does TOTP setup; no separate MFA activation or second key ceremony is required.
+Existing unspent recovery codes are preserved and never returned when adding a factor.
+The 「パスキーによる多要素認証を無効にする」 button disables only
+`passkeyMfaEnabled`; TOTP and registered keys remain. When at least one key remains,
+「パスキーによる多要素認証を有効にする」 re-enables that same setting.
+Both buttons use common sudo and confirmation and require no additional WebAuthn
+ceremony. Both disabling and enabling preserve other browser sessions and login
+tokens. Re-enabling issues recovery codes
+only if none remain, displaying the new codes once in the recovery-code modal.
+Existing codes are never replaced or returned by re-enabling.
+While passkey MFA is enabled, the last key cannot be removed unless a usable
+TOTP factor remains. Disabling passkey MFA with its button permits removal when
+password login is available; disabling password login still protects the last key.
+Additional keys can be registered repeatedly while passwordless or passkey-only
+login is enabled. Registration preserves those login settings and requires UV
+and a discoverable credential in passwordless mode. Each new key is immediately
+available for the enabled login methods. Passkey MFA applies to password login;
+explicit passwordless login continues to require an owned UV key. Registration
+preserves other browser sessions and login tokens, as do key removal, TOTP setup
+and removal, passkey MFA enable and disable (including retained-key activation),
+passwordless enable and disable, password-login disable, key rename and recovery-code
+regeneration. Among these security settings, only password change rotates the native
+user token and revokes all browser sessions. Explicit token regeneration, email change,
+password recovery, account deletion and individual session revocation retain their
+existing behavior.
 
-Link transaction context must come from fresh local authentication and a live
-individually revocable session. A stored context alone is not authentication;
-future completion must recheck session/account state and require local MFA.
+Password, email and login-token changes use fresh proof for their exact purpose.
+A passwordless account can disable password login only with a verified recovery
+email and a usable strict-UV passkey. The last required factor cannot be removed
+without explicitly changing that policy. Recovery-code consumption is atomic;
+parallel consumption does not restore another code from an old snapshot.
 
-Run synthetic network and real atomic Redis tests with
-`node packages/features/auth/test/run-oidc-fixture.mjs` from the repository root.
-It requires the existing `redis:8` image and task-local installed dependencies,
-uses a temporary Unix socket with no network/published ports/persistence, and
-removes only its own container and temporary directory. Ordinary unit runs skip
-the Redis cases unless this task-owned fixture socket is explicitly supplied.
-The current-Node backend unit CI job runs the explicit fixture so actual Lua
-atomicity is checked independently of those ordinary unit runs.
+Common sudo is bound to the individual browser session, expires after five
+minutes without sliding extension, and does not replace operation-specific proof
+where the operation requires it. Account deletion records a transaction-owned
+intent before queue delivery. Failures do not authorize deletion.
 
-The unconnected token exchange adapter accepts a server-owned provider snapshot
-and a transaction additionally bound to the exact redirect URI and S256 challenge.
-The current transaction store does not produce these extra bindings; there is no
-runtime bridge. Callback integration must add them before using the adapter.
-It supports client_secret_basic only, form-encodes each credential before Basic
-encoding, and shares one five-second monotonic deadline from before DNS through
-token POST, JWKS GET, and verification. HTTP is created only after authenticated
-TLS and the pinned public peer are checked. Redirects, proxies, compression, and
-connection reuse are unsupported. Each JSON response is limited to 64 KiB, and
-JWKS has at most 32 keys with bounded public RSA fields. Only configured-origin
-JWKS is used; token/key URLs never trigger additional fetches. Errors retain no
-provider body or credential cause. Access/refresh tokens are discarded, email
-claims are not trusted, and the result cannot create a local session or grant.
+MiAuth, legacy application approval and the local OAuth authorization server
+remain in scope. They require explicit consent and current-session authorization.
+Token expiry is enforced on HTTP, WebSocket and MCP, including pending work and
+replay. Existing tokens without an expiry retain compatibility. OAuth consent
+receipts and token expiry are independent of external-provider SSO.
 
-### Recovery-code consumption
+### SSO deferred by user decision
 
-`TotpService.twoFactorAuthenticate` consumes a matching backup code with one
-PostgreSQL compare-and-remove update. It binds the row owner and the loaded
-password/TOTP policy, and authorizes only when exactly one row was changed.
-A persistence rejection does not fall back to OTP validation. Other concurrently
-consumed codes are not written back from the caller's snapshot. Credential or
-session mutation remains a later operation; failures do not restore a used code.
-This does not enable independent passkey MFA or change recovery-code storage.
+OIDC SSO, generic OAuth2 **login to this server**, provider-managed usernames,
+provider-enforced local-authentication prohibition and external registration
+prompts are outside this completion scope by explicit user request. They are
+not complete features or pending configuration questions. New SSO routes, screens,
+provider/identity tables and their unmerged migration have been removed.
+
+Existing protocol verification, discovery, pinned transport, token exchange and
+transaction-store adapters remain byte-identical to the stack base. They are not
+connected to a login route. Historical frontend source projections retain exact
+old source strings only in tests so the original locale oracles stay unchanged;
+production code does not import those fixtures. The unmerged SSO implementation
+and unpublished username follow-up are preserved on local hold branches.
+
+### Validation
+
+Use the coordinated local validation slot; do not run heavy suites concurrently.
+Final commit results belong in the PR body rather than in historical checkpoint
+claims here.
+
+- Backend unit: `packages/backend/vitest.config.unit.ts` with the auth test path.
+- `test/run-mfa-policy-postgres-fixture.mjs`: production metadata, current MFA
+  policy and migration rollback/reapply checks. Completion selects
+  `MISSKEY_AUTH_COMPLETION_FIXTURE=1`.
+- `test/run-security-settings-fixture.mjs`: actual security HTTP and signed keys.
+- `test/run-credential-issuance-fixture.mjs`: owned PostgreSQL/Unix Redis and the
+  real MiAuth, legacy approval and OAuth consent/issuance boundaries.
+- `test/run-fresh-password-change-fixture.mjs`: login-policy, token and email
+  operation fixtures selected by their documented environment flags.
+- `test/run-oidc-fixture.mjs`: retained protocol adapters only, with owned Redis.
+- Frontend auth suites and strict source/locale inverse suites preserve frozen
+  historical dictionaries and reject unreviewed source changes.
+- Formal API/SDK generation, backend and frontend types, build, changed-file lint,
+  SPDX and locale safety are required for the completion stack.
+
+`MkSecuritySettings` and `MkSudoDialog` have real-component Storybook stories with
+synthetic accounts and intercepted APIs. No story may contact a real auth server.
+Storybook screenshots document rendered states; native PIN/biometric prompts,
+physical and cross-device authenticators and Conditional autofill still require
+the separate manual acceptance in `test/manual/auth-completion.md`.
+
+The authentication stories (`MkSignin`, `MkSecuritySettings`, `MkBrowserSessions`,
+`MkTokenExpiry`, `MkSudoDialog`) are part of the regular Storybook build. The MSW
+worker is generated by `msw init` during preparation; do not commit it.
+
+### セッションのIP履歴
+
+`user_ip` は `(userId, ip, browserSessionId)` ごとに初回確認 `createdAt` と最終確認 `lastSeenAt` を保持します。NULL の session ID は APIキー・トークン利用や従来の記録の共通枠です。`enableIpLogging` が有効な場合だけ、同じキーを最長 1 時間に一度 upsert します。最終確認時刻はこの間隔の精度であり、リクエストごとの記録ではありません。90 日の削除期限も最終確認を基準にします。
+
+`i/sessions.lastIp` と `i/signin-history.browserSession.lastIp` はそのセッションの最新 `user_ip` から取得し、記録がない場合は同じユーザー・セッションの最新 signin（ID 降順）の IP で補完します。フォルダーは `i/session-ips` で本人のセッションのIP・初回確認・最終確認を表示します。`enableIpLogging` が無効の間は新しい IP を記録しないため、展開内のIP履歴は空になる場合がありますが、見出しには取得できるログインIPを表示します。セキュリティページは `i/signin-history` を起点に、新しい順のログイン履歴として表示します。`latestPerSession: true` は全履歴を対象に各セッションの最新 signin だけを残してから ID カーソルでページングし、MkPagination / Paginator（初回5件、コントロール付き）で取得します。セッションのペイロードはページ内のリンク先だけを本人に限定して取得し、先頭への現在端末の並べ替えはしません。
+
+リンク付き signin はセッション管理の MkFolder になり、`lastUserAgent` の解析ラベル、最新IP・最終利用・現在／有効／失効を表示します。展開時は確認付きの個別失効・生 UA・セッションのIP履歴を表示します。リンクのない UA 付き signin は日時・IP・成功／失敗を示す MkFolder（生 UA のみ、失効操作なし）、UA のない履歴は展開できない通常行です。signinのないセッションは`i/sessions`の`unlinkedOnly: true`で別にページングし、UAの有無にかかわらず同じセッション管理フォルダーで失効できます。IPの記録がない場合は「記録なし」と表示します。展開内のIP履歴はIP・初回確認・最終確認の表で表示します。セッションに紐付かない `user_ip`（token/API-key の IP）は管理者専用で、ユーザー向けリストには取得も表示もしません。
+
+`1794700800000-SessionUserIp.js` は既存の `lastIp` を `lastUsedAt` 時点の観測として移してから保存列を削除します。セッション削除時は履歴を NULL 枠に統合し、初回・最終確認を保持します。down はセッションの最新IP と従来の一意性を復元しますが、旧形式ではセッション別の履歴と最終確認を保持できません。
+
+復旧コードは新規発行時と再生成時だけモーダルに表示します。既存コードの再表示はできず、鍵やTOTPの追加設定でも既存コードを返しません。「復旧コードを再生成」ボタンはパスキーMFAまたは認証アプリが有効な場合に表示され、両方が無効なら非表示です。「二要素認証」では、認証アプリ、セキュリティキー・パスキー、パスワードレスログインの順で表示し、その下から再生成できます。TOTP設定はQRウィザード内で新規発行されたバックアップコードだけを表示します。パスキーMFAの切替はパスキーフォルダー内、パスワードログインの無効化は下部のパスワードフォルダー内にあります。同じ共通本人確認（sudo）と警告の確認を経て以前のコードを無効にし、新しいコードだけを一度MkRecoveryCodesDialogに表示します。保存形式とログイン・本人確認時の一回消費は従来どおりです。
+
+パスキー単独ログインの有効化は専用のUV必須の確認を一度だけ行います。この確認は本人・現在のセッション・認証設定・90秒以内の使い捨てticketに結び付き、別のsudo確認は要求しません。他の重要操作に対するsudo昇格は付与せず、無効化には従来どおりsudoを要求します。

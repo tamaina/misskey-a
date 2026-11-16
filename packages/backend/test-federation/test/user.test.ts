@@ -397,7 +397,9 @@ describe('User', () => {
 				await bob.client.request('following/create', { userId: aliceInB.id });
 				await waitForFollowRelation(bob, alice, 1); // followed by Bob
 
-				await alice.client.request('i/delete-account', { password: alice.password });
+				const sudo = await alice.client.request('i/sudo/start', { password: alice.password });
+				strictEqual(sudo.status, 'elevated');
+				await alice.client.request('i/security/account/delete', { acknowledged: true });
 				await waitForFollowing(bob, 0, WAIT_FOR_SLOW_FEDERATION); // no following relation
 
 				await rejects(

@@ -129,7 +129,7 @@ describe('feature service composition adapter', () => {
 			collections: ['serializers/ClipEntityService', 'serializers/NoteFavoriteEntityService', 'services/ClipService', 'services/gallery', 'serializers/GalleryPostEntityService', 'serializers/GalleryLikeEntityService'],
 			pages: ['serializers/PageEntityService', 'serializers/PageLikeEntityService', 'services/PageService'],
 			play: ['serializers/FlashEntityService', 'serializers/FlashLikeEntityService', 'services/FlashService'],
-			auth: ['services/BrowserSessionService', 'services/TotpService', 'services/WebAuthnService', 'serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],
+			auth: ['fresh-reauthentication-store', 'fresh-passkey-reauthentication', 'services/BrowserSessionService', 'services/TotpService', 'services/WebAuthnService', 'serializers/AppEntityService', 'serializers/AuthSessionEntityService', 'serializers/InviteCodeEntityService', 'serializers/SigninEntityService'],
 			channels: ['serializers/ChannelEntityService'],
 			chat: ['serializers/ChatEntityService'],
 			discovery: ['services/UserSearchService', 'serializers/HashtagEntityService'],
