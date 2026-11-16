@@ -80,7 +80,11 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		if (!socket || !dirname(socket).startsWith('/tmp/misskey-auth-policy-') || readFileSync(join(dirname(socket), '.misskey-auth-policy-fixture'), 'utf8') !== 'auth_policy_synthetic') throw new Error('Owned PostgreSQL required');
 		if (!redisSocket || !/^\/tmp\/misskey-oauth-[^/]+\/redis\.sock$/.test(redisSocket) || lstatSync(dirname(redisSocket)).uid !== process.getuid?.() || (lstatSync(dirname(redisSocket)).mode & 0o077) !== 0 || !lstatSync(redisSocket).isSocket()) throw new Error('Owned Redis required');
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
-		await db.initialize(); expect(await db.runMigrations()).toHaveLength(367); expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
+		await db.initialize();
+		const applied = await db.runMigrations();
+		expect(applied.map(migration => migration.name)).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort((a, b) => Number(a.slice(-13)) - Number(b.slice(-13))));
+		expect(applied.map(migration => migration.name)).toEqual(expect.arrayContaining(['PasskeyMfaPolicy1791969900000', 'SudoPolicy1792300000001', 'AccessTokenExpiry1792300000004', 'SessionUserIp1794700800000']));
+		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 		redis = new Redis({ path: redisSocket });
 		sessions = new BrowserSessionService(db.getRepository(MiBrowserSession) as ConstructorParameters<typeof BrowserSessionService>[0], { gen: () => `securitysession${++nextSession}` });
 		authenticate = new AuthenticateService(db.getRepository(MiUser) as ConstructorParameters<typeof AuthenticateService>[0], mockDeep(), mockDeep(), mockDeep(), sessions);

@@ -4,6 +4,7 @@
  */
 // @vitest-environment node
 import { readFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { h } from 'vue';
 import { mfmStyles } from '../../frontend/shared/mfm-styles.js';
@@ -77,8 +78,8 @@ test('keeps the configured scheme and IPv6 authority for local mention links', a
 	expect(result.html).toContain('href="http://[::1]:3000/@alice"');
 });
 
-test('Node stylesheet exactly matches the canonical static browser stylesheet', async () => {
-	const css = await readFile(new URL('../../frontend/shared/mfm.css', import.meta.url), 'utf8');
+test('Node stylesheet exactly matches the canonical static browser stylesheet', async ({ task }) => {
+	const css = await readFile(resolve(dirname(task.file.filepath), '../../frontend/shared/mfm.css'), 'utf8');
 	expect(mfmStyles).toBe(css);
 });
 

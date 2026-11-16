@@ -70,8 +70,8 @@ describe.skipIf(!socket)('real PostgreSQL locked MFA policy', () => {
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
 		await db.initialize();
 		const migrations = await db.runMigrations();
-		expect(migrations).toHaveLength(367);
-		expect(migrations.at(-1)?.name).toBe('SessionUserIp1794700800000');
+		expect(migrations.map(migration => migration.name)).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort((a, b) => Number(a.slice(-13)) - Number(b.slice(-13))));
+		expect(migrations.map(migration => migration.name)).toEqual(expect.arrayContaining(['PasskeyMfaPolicy1791969900000', 'SessionUserIp1794700800000']));
 		console.log('Production migrations applied:', migrations.length);
 	});
 	afterAll(async () => { if (db?.isInitialized) await db.destroy(); });
