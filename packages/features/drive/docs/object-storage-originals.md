@@ -79,4 +79,3 @@ type S3LocationEvidence = {
 | migration /保存復元 | nullable legacy、up/down、pack への非露出、同じ identity/key の round trip |
 
 現在はこれらの object storage 回帰テストを実装・実行していない。S3 相当 backend と実ソケットのテスト、型・lint・CI が通るまで接続完了としない。Node の mock だけでは実 HTTP の切断時の資源解放や SDK transport 互換性を保証できない。
-
