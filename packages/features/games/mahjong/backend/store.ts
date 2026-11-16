@@ -38,7 +38,11 @@ export class MahjongStore {
 	async list(user: string) {
 		const rows = await this.db.getRepository(MiMahjongRoom).createQueryBuilder('room')
 			.select(['room.id', 'room.userIds', 'room.status', 'room.createdAt'])
-			.where(':user = ANY(room."userIds")', { user }).orderBy('room.createdAt', 'DESC').take(30).getMany();
+			.where(':user = ANY(room."userIds")', { user })
+			// Always expose the creator's three occupied slots, even beneath newer invitations.
+			.orderBy('CASE WHEN room.status IN (\'waiting\', \'playing\') THEN 0 ELSE 1 END', 'ASC')
+			.addOrderBy('CASE WHEN room."ownerId" = :user THEN 0 ELSE 1 END', 'ASC')
+			.addOrderBy('room.createdAt', 'DESC').take(30).getMany();
 		return rows.map(row => ({ id: row.id, users: row.userIds, status: row.status, createdAt: row.createdAt.toISOString() }));
 	}
 
@@ -53,7 +57,8 @@ export class MahjongStore {
 			const before = row.state.revision;
 			// Timeouts are system decisions, processed before a participant's next request.
 			// A disconnected room consumes no background timers; a newly opened phase gets a full deadline.
-			expireRoom(row.state, now);
+			// Explicit cancellation must not advance a timed-out hand first.
+			if (operation !== 'cancel') expireRoom(row.state, now);
 			let rejected: RoomError | null = null;
 			try {
 				if (operation === 'ready') readyRoom(row.state, user, now);

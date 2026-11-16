@@ -63,8 +63,11 @@ export function readyRoom(room: RoomState, user: string, now: number): void {
 }
 export function cancelRoom(room: RoomState, user: string): void {
 	participant(room, user);
-	if (room.status !== 'waiting') throw new RoomError('INVALID_ACTION');
-	room.status = 'cancelled'; room.revision++;
+	if (room.status === 'cancelled') return;
+	if (room.status === 'ended') throw new RoomError('INVALID_ACTION');
+	// Unrated invitations may be ended by any participant, without assigning a winner.
+	// Keep the private journal and seat projections, but retire every outstanding action.
+	room.status = 'cancelled'; room.phase = null; room.outcome = null; room.revision++;
 }
 
 function advance(room: RoomState, now: number): void {

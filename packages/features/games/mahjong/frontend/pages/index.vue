@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<p v-if="error" role="alert" :class="$style.error">{{ error }} <button type="button" class="_textButton" @click="refresh">{{ $locale.sfc.retry }}</button></p>
 			<details class="_panel" :class="$style.rules">
 				<summary>{{ $locale.sfc.rulesTitle }} · {{ ruleVersion }}</summary>
-				<p>{{ $locale.sfc.timeouts }}</p><p>{{ $locale.sfc.points }}</p>
+				<p>{{ $locale.sfc.timeouts }}</p><p>{{ $locale.sfc.points }}</p><p>{{ $locale.sfc.abortPolicy }}</p>
 				<dl><template v-for="(value, key) in rules" :key="key"><dt>{{ key }}</dt><dd>{{ typeof value === 'object' ? JSON.stringify(value) : String(value) }}</dd></template></dl>
 			</details>
 			<template v-if="!roomId">
@@ -32,8 +32,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<ul><li v-for="(id, i) in view.users" :key="id">{{ names[id] ?? id }} · {{ view.ready[i] ? $locale.sfc.ready : $locale.sfc.notReady }}</li></ul>
 					<div class="_buttons"><MkButton primary :disabled="busy || view.ready[view.users.indexOf($i!.id)]" @click="ready">{{ $locale.sfc.agree }}</MkButton><MkButton :disabled="busy" @click="cancel">{{ $locale.sfc.decline }}</MkButton></div>
 				</section>
-				<p v-else-if="view.status === 'cancelled'">{{ $locale.sfc.cancelled }}</p>
+				<p v-else-if="view.status === 'cancelled'">{{ $locale.sfc.cancelledNotice }}</p>
 				<Table v-else :view="view" :userId="$i!.id" :names="names" :busy="busy" :seconds="seconds" @action="submit"/>
+				<MkButton v-if="view.status === 'playing'" danger :disabled="busy" @click="abort">{{ $locale.sfc.abort }}</MkButton>
 			</template>
 			<p v-else>{{ $locale.sfc.loading }}</p>
 		</div>
@@ -116,6 +117,15 @@ function ready() { void perform(async () => accept(await misskeyApi('mahjong/rea
 
 function cancel() { void perform(async () => accept(await misskeyApi('mahjong/cancel', { roomId: props.roomId! }))); }
 
+function abort() {
+	const roomId = props.roomId;
+	const current = generation;
+	void perform(async () => {
+		const { canceled } = await os.confirm({ type: 'warning', title: $locale.value.sfc.abort, text: $locale.value.sfc.abortConfirm });
+		if (!canceled && !disposed && current === generation && roomId) accept(await misskeyApi('mahjong/cancel', { roomId }));
+	});
+}
+
 function submit(actionId: string) {
 	const phaseId = view.value?.phase?.id;
 	if (!phaseId) return;
@@ -130,7 +140,7 @@ useInterval(() => { clock.value = Date.now(); }, 250, { immediate: true, afterMo
 definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 </script>
 <locale locale="ja-JP" lang="json">
-{"title":"麻雀","description":"同じサーバーの4人で遊ぶ招待制の東南戦。観戦・牌譜の公開はありません。","rulesTitle":"対局ルールを確認","timeouts":"打牌30秒・反応8秒・局結果10秒。時間切れはツモ切り（不可なら最後の合法牌）、反応は見送り。全員切断時は次の接続で処理します。","points":"25,000点持ち・30,000点返し、ウマ20/10/-10/-20。同点は起家に近い順。ランキングへの反映はありません。","invite":"3人を招待","select":"参加者を選ぶ","create":"部屋を作る","rooms":"参加中・招待された部屋","noRooms":"招待された部屋はまだありません。","waiting":"準備中","playing":"対局中","ended":"終了","cancelled":"取り消し済み","consent":"上のルールと時間切れ方針を確認して、全員が準備完了すると開始します。","ready":"準備完了","notReady":"確認待ち","agree":"確認して準備完了","decline":"辞退して部屋を閉じる","loading":"読み込み中…","retry":"再接続","connectionError":"部屋を取得できません。招待と接続状態を確認してください。","actionError":"操作を送信できませんでした。最新の状態を取得します。"}
+{"title":"麻雀","description":"同じサーバーの4人で遊ぶ招待制の東南戦。観戦・牌譜の公開はありません。","rulesTitle":"対局ルールを確認","timeouts":"打牌30秒・反応8秒・局結果10秒。時間切れはツモ切り（不可なら最後の合法牌）、反応は見送り。全員切断時は次の接続で処理します。","points":"25,000点持ち・30,000点返し、ウマ20/10/-10/-20。同点は起家に近い順。ランキングへの反映はありません。","invite":"3人を招待","select":"参加者を選ぶ","create":"部屋を作る","rooms":"参加中・招待された部屋","noRooms":"招待された部屋はまだありません。","waiting":"準備中","playing":"対局中","ended":"終了","cancelled":"取り消し・中断","consent":"上のルールと時間切れ方針を確認して、全員が準備完了すると開始します。","ready":"準備完了","notReady":"確認待ち","agree":"確認して準備完了","decline":"辞退して部屋を閉じる","loading":"読み込み中…","retry":"再接続","connectionError":"部屋を取得できません。招待と接続状態を確認してください。","actionError":"操作を送信できませんでした。最新の状態を取得します。","abort":"対局を中断する","abortPolicy":"参加者は誰でも対局全体を中断できます。中断すると全員の操作が終了し、再開や勝敗の確定は行いません。","abortConfirm":"他の3人も含めてこの対局を終了します。元の対局は再開できません。勝敗は付かず、新しい部屋を作れます。中断しますか？","cancelledNotice":"この部屋は参加者により取り消し・中断されました。再開はできません。新しい部屋で対局してください。"}
 </locale>
 <style module>
 .rules, .lobby { padding: 20px; }

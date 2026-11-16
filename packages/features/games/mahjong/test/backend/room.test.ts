@@ -30,6 +30,37 @@ describe('durable invite-only mahjong', () => {
 		readyRoom(room, users[3], 0);
 		expect(room.status).toBe('cancelled');
 	});
+	test.each(users)('%s can abort a started game without exposing hands or restarting it', user => {
+		const room = started();
+		const phase = room.phase!;
+		const journal = structuredClone(room.journal);
+		expect(() => cancelRoom(room, 'outsider')).toThrow('NO_SUCH_ROOM');
+		cancelRoom(room, user);
+		expect(room.status).toBe('cancelled');
+		expect(room.phase).toBeNull();
+		expect(room.outcome).toBeNull();
+		expect(room.journal).toEqual(journal);
+		const revision = room.revision;
+		for (const participant of users) {
+			cancelRoom(room, participant);
+			readyRoom(room, participant, phase.deadline + 1000);
+			const view = projectRoom('room', room, participant, phase.deadline + 1000);
+			expect(view.status).toBe('cancelled');
+			expect(view.phase).toBeNull();
+			expect(view.snapshot!.seats.filter(seat => seat.concealedHand !== null).map(seat => seat.userId)).toEqual([participant]);
+			expect(JSON.stringify(view)).not.toMatch(/journal|walls|reply|_paipu/);
+		}
+		expect(expireRoom(room, phase.deadline + 1000)).toBe(false);
+		expect(() => submitRoom(room, user, phase.id, 'pass:', 'after-abort', 1001)).toThrow('STALE_ACTION');
+		expect(room.revision).toBe(revision);
+	});
+	test('an already finished game cannot be changed into an aborted one', () => {
+		const room = started();
+		room.status = 'ended'; room.phase = null;
+		const before = structuredClone(room);
+		expect(() => cancelRoom(room, users[0])).toThrow('INVALID_ACTION');
+		expect(room).toEqual(before);
+	});
 	test('all projections conceal other hands, journal, wall and unoffered actions, including reconnect', () => {
 		const room = JSON.parse(JSON.stringify(started()));
 		for (const user of users) {

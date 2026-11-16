@@ -7,6 +7,8 @@ PR #13112; rules/progression use **@kobalab/majiang-core 1.4.1**, pinned as a pr
 
 - Same-server invited four humans; no CPU, public matchmaking, federation, stakes, ranking or spectators.
 - All four must confirm the displayed rules before dealing. Any invitee can decline and cancel a waiting room.
+  Any participant may also explicitly abort a started, unrated game after a confirmation dialog.
+  This ends play for all four without assigning a winner; it cannot be resumed.
 - `9k-invite-v1` explicitly records **every** core rule in `shared/rules.ts`: East–South,
   25,000 initial / 30,000 return points, 20/10/-10/-20 placement points, one red five per suit,
   open tanyao, no kuikae, double ron (triple ron aborts), tenpai dealer repeat, bankruptcy,
@@ -21,8 +23,9 @@ PR #13112; rules/progression use **@kobalab/majiang-core 1.4.1**, pinned as a pr
   participant request after a deadline processes that phase once. With everyone disconnected,
   the room is dormant; reconnect expires the pending phase and gives the next phase its full
   deadline. Restart never extends an already persisted deadline.
-- Three active rooms per creator, creation rate 5/minute. Waiting rooms can be cancelled;
-  started games continue using timeout actions. No automatic public result/paipu endpoint.
+- Three active rooms per creator, creation rate 5/minute. Cancellation/abortion immediately
+  frees a creator slot, including abandoned games with everyone disconnected. Private journals
+  remain stored; no automatic expiry deletes or finishes an active game. No public result/paipu endpoint.
 
 ## Private engine and persistence
 
@@ -44,6 +47,10 @@ single writer per room. An action, its receipt and phase transition commit atomi
 failure rolls back all of them. A matching request ID retries without applying twice; a different
 request for an already answered or stale phase is rejected. After the 64-receipt window, old retries
 are stale rather than duplicated. Server-generated legal menus are the only accepted actions.
+Cancellation takes the same row lock, retires the phase without running timeout actions, and is
+idempotent. Racing actions either commit before cancellation or are rejected after it; finished
+games cannot be cancelled. All participants observe the terminal cancelled state on their next poll,
+with no outstanding actions or winner. Ready/timeout requests cannot restart it.
 Late/invalid input is never interpreted as the core's fallback. Timeout advances commit even when
 the accompanying late action is rejected.
 
@@ -57,7 +64,8 @@ The owner's account deletion cascades room deletion; general room-retention poli
 
 ## Routes and UI
 
-`/mahjong` lists a participant's latest 30 rooms and creates invitations; `/mahjong/:roomId`
+`/mahjong` lists up to 30 participant rooms, prioritizing active rooms and the creator's own
+occupied slots before other invitations/history, and creates invitations; `/mahjong/:roomId`
 shows readiness, all rule settings, seats, concealed tile counts, dora, rivers, melds, scores,
 legal action buttons and remaining time. Keyboard buttons and a narrow-screen layout are included.
 Existing game URLs and DI identities are unchanged. Six authenticated `mahjong/*` POST endpoints
