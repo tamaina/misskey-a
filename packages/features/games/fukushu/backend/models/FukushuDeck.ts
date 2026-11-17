@@ -19,6 +19,12 @@ export class MiFukushuDeck {
 	@JoinColumn({ name: 'ownerId', foreignKeyConstraintName: 'FK_fukushu_deck_owner' })
 	public owner: MiUser | null;
 
+	@Column('integer', { default: 1 })
+	public revision: number;
+
+	@Column('timestamp with time zone', { nullable: true })
+	public archivedAt: Date | null;
+
 	@Column('jsonb')
 	public data: FukushuMaterial['deck'];
 }

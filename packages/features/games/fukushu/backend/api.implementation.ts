@@ -25,11 +25,11 @@ async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list'>, importer?: Pick<FukushuDriveImporter, 'import'>) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive'>, importer?: Pick<FukushuDriveImporter, 'import'>) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
 	return implement(fukushuContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
-		list: procedure(fukushuContract.list).use(principal).handler(({ context }) => invoke(() => store.list(context.principal.id))),
+		list: procedure(fukushuContract.list).use(principal).handler(({ input, context }) => invoke(() => store.list(context.principal.id, { archived: input.archived }))),
 		import: procedure(fukushuContract.import).use(principal).handler(async ({ input, context }) => {
 			await assertApiAuthorization({ name: 'fukushu/materials/import', requireCredential: true, kind: 'read:drive' }, context);
 			return invoke(() => {
@@ -37,6 +37,8 @@ export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' 
 				return importer.import(context.principal.id, input.fileId);
 			});
 		}),
+		update: procedure(fukushuContract.update).use(principal).handler(({ input, context }) => invoke(() => store.update(context.principal.id, input.id, input.expectedRevision, input.name, input.description))),
+		archive: procedure(fukushuContract.archive).use(principal).handler(({ input, context }) => invoke(() => store.archive(context.principal.id, input.id, input.expectedRevision, input.archived))),
 		create: procedure(fukushuContract.create).use(principal).handler(({ input, context }) => invoke(() => store.create(context.principal.id, input.material))),
 		show: procedure(fukushuContract.show).use(principal).handler(({ input, context }) => invoke(() => store.show(context.principal.id, input.id))),
 	});

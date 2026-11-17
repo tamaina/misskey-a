@@ -21,6 +21,9 @@ function fixture() {
 	const user = mockDeep<MiLocalUser>({ id: 'alice', isSuspended: false, movedToUri: null });
 	importer.import.mockResolvedValue(material());
 	store.list.mockResolvedValue([material().deck]);
+	store.show.mockResolvedValue({ ...material(), revision: 1, archivedAt: null });
+	store.update.mockResolvedValue({ revision: 2, archivedAt: null });
+	store.archive.mockResolvedValue({ revision: 2, archivedAt: '2026-11-17T00:00:00.000Z' });
 	return { store, importer, user, api: createFukushuRouter(store, importer) };
 }
 
@@ -56,7 +59,7 @@ describe('Fukushu import and list authorization', () => {
 		await expect(call(f.api.list, {}, { context: testContext(f.user, { permission: ['write:account'] }) })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
 		expect(f.store.list).not.toHaveBeenCalled();
 		expect(await call(f.api.list, { ownerId: 'bob' } as never, { context: testContext(f.user, { permission: ['read:account'] }) })).toEqual([material().deck]);
-		expect(f.store.list).toHaveBeenCalledWith('alice');
+		expect(f.store.list).toHaveBeenCalledWith('alice', { archived: false });
 	});
 });
 
@@ -64,5 +67,43 @@ test('preserves each literal request name for native SDK response inference', ()
 	expectTypeOf(fukushuContract.list['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/list'>();
 	expectTypeOf(fukushuContract.import['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/import'>();
 	expectTypeOf(fukushuContract.show['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/show'>();
+	expectTypeOf(fukushuContract.update['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/update'>();
+	expectTypeOf(fukushuContract.archive['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/archive'>();
 	expectTypeOf(fukushuContract.create['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/create'>();
+});
+
+describe('Fukushu metadata and archive authorization', () => {
+	test('requires write:account and derives the owner from the principal', async () => {
+		const f = fixture();
+		const update = { id: 'deck-original', expectedRevision: 1, name: 'renamed', description: 'description' };
+		const archive = { id: 'deck-original', expectedRevision: 1, archived: true };
+		await expect(call(f.api.update, update, { context: testContext(null) })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
+		await expect(call(f.api.archive, archive, { context: testContext(null) })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
+		await expect(call(f.api.update, update, { context: testContext(f.user, { permission: ['read:account'] }) })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+		await expect(call(f.api.archive, archive, { context: testContext(f.user, { permission: ['read:account'] }) })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+		expect(f.store.update).not.toHaveBeenCalled();
+		expect(f.store.archive).not.toHaveBeenCalled();
+		await call(f.api.update, { ...update, ownerId: 'bob' } as never, { context: testContext(f.user, { permission: ['write:account'] }) });
+		await call(f.api.archive, { ...archive, ownerId: 'bob' } as never, { context: testContext(f.user) });
+		expect(f.store.update).toHaveBeenCalledWith('alice', update.id, 1, 'renamed', 'description');
+		expect(f.store.archive).toHaveBeenCalledWith('alice', archive.id, 1, true);
+	});
+	test('exposes concurrency state separately and selects the archived owner list explicitly', async () => {
+		const f = fixture();
+		expect(await call(f.api.show, { id: 'deck-original' }, { context: testContext(f.user) })).toEqual({ ...material(), revision: 1, archivedAt: null });
+		await call(f.api.list, { archived: true }, { context: testContext(f.user) });
+		expect(f.store.list).toHaveBeenCalledWith('alice', { archived: true });
+	});
+	test('maps stale revisions and missing materials without exposing storage details', async () => {
+		const f = fixture();
+		for (const code of ['MATERIAL_CONFLICT', 'NO_SUCH_MATERIAL', 'INVALID_MATERIAL'] as const) {
+			f.store.update.mockRejectedValueOnce(new MaterialError(code));
+			await expect(call(f.api.update, { id: 'deck-original', expectedRevision: 1, name: 'name' }, { context: testContext(f.user) })).rejects.toMatchObject({ code });
+		}
+	});
+	test.each([0, -1, 1.5, 2_147_483_648])('rejects an invalid expected revision %s before storage', async expectedRevision => {
+		const f = fixture();
+		await expect(call(f.api.archive, { id: 'deck-original', expectedRevision, archived: false }, { context: testContext(f.user) })).rejects.toThrow();
+		expect(f.store.archive).not.toHaveBeenCalled();
+	});
 });
