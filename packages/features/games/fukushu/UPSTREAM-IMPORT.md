@@ -78,3 +78,16 @@ The normal-login-only `fukushu/backup/inspect-upstream` endpoint checks ownershi
 before opening the Drive original, reuses original size/MD5/storage handling, and
 has no database write or queue dependency. It cannot call native restore. The
 checksum is an integrity check, not authentication of an archive's author.
+
+## Drive upload policy limitation
+
+The actual Drive uploader classifies this binary format as
+`application/octet-stream`. The default ordinary-user policy rejects it; existing
+moderator/admin exemptions allow it. This pilot does not expand that policy,
+mislabel the file as text, or add a feature-specific upload bypass. It is usable
+only when the account can already store the original under its existing policy.
+The real HTTP check asserts ordinary-user rejection and then exercises inspection
+with a synthetic administrator's own upload; Chrome uses that same account.
+Making upstream migration available to every default-policy user needs a separate
+explicit file-type/permission design. The inspector itself still checks ownership
+and does not grant administrators access to another owner's Drive file.

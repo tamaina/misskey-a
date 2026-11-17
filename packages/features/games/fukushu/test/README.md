@@ -114,8 +114,10 @@ snapshots. The archive bytes are synthetic and do not establish APKG compatibili
 `backend/upstream-backup.test.ts` checks that fixture, framing, checksums, strict
 schemas, reference/identity consistency, bounded counts, binary integrity and
 explicitly unavailable historical snapshots. The HTTP scenario uploads this
-fixture through actual Drive as a synthetic owner, inspects with a real normal
-login, rejects anonymous/scoped/foreign access, and checks that both that owner's
+fixture through actual Drive as a synthetic administrator, inspects with a real
+normal login, rejects anonymous/scoped/foreign access, and checks that both that owner's
 empty library and the existing source library/history are unchanged.
-`credentials.upstreamOwner` identifies this synthetic account for Chrome. This
+The default ordinary-user binary-upload rejection is asserted first; no role
+policy is changed. `credentials.upstreamOwner` identifies the synthetic
+administrator account for Chrome. This
 is inspection only; it does not assert that upstream history was imported.

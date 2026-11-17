@@ -76,6 +76,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 	await step('bootstrap and password signin use production authentication', async () => {
 		const password = `Fukushu-${randomUUID()}`;
 		const admin = ok(await call('admin/accounts/create', { username: 'fukushu_admin', password, setupPassword: credentials.setupPassword }));
+		credentials.admin = { username: 'fukushu_admin', password, token: admin.token, id: admin.id };
 		for (const username of ['fukushu_alice', 'fukushu_bob', 'fukushu_carol', 'fukushu_dana']) {
 			ok(await call('admin/accounts/create', { username, password }, admin.token));
 			// Keep the real IP rate limiter enabled: password logins are at least 1s apart.
@@ -531,7 +532,13 @@ test('real authentication, Drive, material maintenance and explanation versions'
 	});
 	await step('upstream binary inspection uses owned Drive and reports unknown history without importing or changing schedules', async () => {
 		const bytes = await readFile(new URL('./backend/fixtures/upstream-backup.fukushu', import.meta.url));
-		const owner = credentials.dana; const form = new FormData();
+		// Preserve the default Drive policy: ordinary users cannot upload unknown binary MIME.
+		const deniedForm = new FormData(); deniedForm.set('i', credentials.dana.token);
+		deniedForm.set('file', new Blob([bytes], { type: 'application/octet-stream' }), 'upstream-history.fukushu');
+		const denied = await readResponse(await fetch(`${origin}/api/drive/files/create`, { method: 'POST', body: deniedForm, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000) }));
+		assert.equal(denied.status, 400); assert.equal(denied.body.error.code, 'UNALLOWED_FILE_TYPE');
+		// The synthetic administrator already has the existing moderator upload exemption.
+		const owner = credentials.admin; const form = new FormData();
 		form.set('i', owner.token); form.set('file', new Blob([bytes], { type: 'application/octet-stream' }), 'upstream-history.fukushu');
 		const uploaded = ok(await readResponse(await fetch(`${origin}/api/drive/files/create`, { method: 'POST', body: form, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000) })));
 		const before = ok(await call('fukushu/materials/list', {}, owner.token));
@@ -550,7 +557,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.deepEqual(ok(await call('fukushu/materials/list', {}, owner.token)), before);
 		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
 		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
-		credentials.upstreamOwner = 'dana'; credentials.dana.upstreamFileId = uploaded.id;
+		credentials.upstreamOwner = 'admin'; credentials.admin.upstreamFileId = uploaded.id;
 		await writeFile(credentialsPath, JSON.stringify(credentials, null, 2), { mode: 0o600 });
 	});
 });
