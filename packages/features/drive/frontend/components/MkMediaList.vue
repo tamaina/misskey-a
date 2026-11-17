@@ -172,10 +172,16 @@ async function openGallery(id?: string) {
 		.filter(content => mediaComponents.get(content.id)?.isRevealed() === true)
 		.map(content => content.id);
 
+	// Preserve manually hidden files even when they are not sensitive.
+	const initiallyHiddenContentIds = contents
+		.filter(content => mediaComponents.get(content.id)?.isRevealed() === false)
+		.map(content => content.id);
+
 	const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkLightbox.vue').then(x => x.default), {
 		defaultIndex: contents.findIndex(conten => conten.id === id),
 		contents: contents,
 		initiallyRevealedContentIds,
+		initiallyHiddenContentIds,
 		user: props.user,
 	}, {
 		closed: () => dispose(),
