@@ -147,3 +147,14 @@ not a backup/restore procedure.
 
 See [the real-application test notes](test/README.md) for isolated authentication,
 Drive upload, ownership, metadata conflict and archive/restore checks.
+
+
+## Card-content version pilot
+
+See [the card-version design](CARD-VERSIONS.md) for upstream compatibility,
+retention rules and the boundary with future study history. The first slice lets
+the owner update a plain-text explanation and inspect saved content versions.
+Prompt, answer, original IDs/source and scheduling are unchanged. An edit retains
+the original card before replacing its current explanation; no prior version is
+automatically pruned, restored over another version, or regraded. Existing material
+JSON remains in the upstream record shape; version metadata is outside it.
