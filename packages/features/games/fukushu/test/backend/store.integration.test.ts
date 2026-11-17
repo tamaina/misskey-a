@@ -447,8 +447,8 @@ describe.skipIf(!socket)('Fukushu private PostgreSQL persistence and API', () =>
 			const spy = vi.spyOn(db, 'createQueryRunner').mockImplementation(mode => {
 				const runner = createRunner(mode);
 				const query = runner.query.bind(runner);
-				vi.spyOn(runner, 'query').mockImplementation(async (sql, parameters, structured) => {
-					const result = await query(sql, parameters, structured);
+				vi.spyOn(runner, 'query').mockImplementation(async (sql: string, parameters?: Parameters<typeof runner.query>[1], structured?: boolean) => {
+					const result = structured ? await query(sql, parameters, true) : await query(sql, parameters);
 					if (!gated && sql.startsWith('SELECT') && sql.includes('FROM "fukushu_deck"')) {
 						gated = true; signalRead(); await suspended;
 					}

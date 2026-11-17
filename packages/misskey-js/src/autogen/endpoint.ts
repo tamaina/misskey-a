@@ -113,6 +113,12 @@ import type {
 	FukushuMaterialsShowResponse,
 	FukushuMaterialsUpdateRequest,
 	FukushuMaterialsUpdateResponse,
+	FukushuMaterialsUpdateCardExplanationRequest,
+	FukushuMaterialsUpdateCardExplanationResponse,
+	FukushuMaterialsCardVersionsRequest,
+	FukushuMaterialsCardVersionsResponse,
+	FukushuMaterialsCardVersionRequest,
+	FukushuMaterialsCardVersionResponse,
 	FukushuMaterialsArchiveRequest,
 	FukushuMaterialsArchiveResponse,
 	BubbleGameRankingRequest,
@@ -879,6 +885,9 @@ export type Endpoints = {
 	'fukushu/materials/create': { req: FukushuMaterialsCreateRequest; res: FukushuMaterialsCreateResponse };
 	'fukushu/materials/show': { req: FukushuMaterialsShowRequest; res: FukushuMaterialsShowResponse };
 	'fukushu/materials/update': { req: FukushuMaterialsUpdateRequest; res: FukushuMaterialsUpdateResponse };
+	'fukushu/materials/update-card-explanation': { req: FukushuMaterialsUpdateCardExplanationRequest; res: FukushuMaterialsUpdateCardExplanationResponse };
+	'fukushu/materials/card-versions': { req: FukushuMaterialsCardVersionsRequest; res: FukushuMaterialsCardVersionsResponse };
+	'fukushu/materials/card-version': { req: FukushuMaterialsCardVersionRequest; res: FukushuMaterialsCardVersionResponse };
 	'fukushu/materials/archive': { req: FukushuMaterialsArchiveRequest; res: FukushuMaterialsArchiveResponse };
 	'bubble-game/ranking': { req: BubbleGameRankingRequest; res: BubbleGameRankingResponse };
 	'bubble-game/register': { req: BubbleGameRegisterRequest; res: EmptyResponse };

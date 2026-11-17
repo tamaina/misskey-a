@@ -109,6 +109,9 @@ Later work must make explicit choices before changing prompt/answer content:
 
 1. Store immutable question-version references on new review logs, while preserving
    their original answers, rating, correct and FSRS log. Never regrade old reviews.
+   A first review of an unedited card must materialize its virtual baseline in the
+   same transaction before recording that version reference; it cannot reference
+   only the mutable current-card row.
    `correct`, not percentage score, determines upstream automatic FSRS ratings.
 2. Define scheduling continuity for changed answers and imported historical logs;
    do not copy upstream reset behavior implicitly or label unknown old payloads

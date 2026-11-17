@@ -1793,6 +1793,12 @@ declare namespace entities {
         FukushuMaterialsShowResponse,
         FukushuMaterialsUpdateRequest,
         FukushuMaterialsUpdateResponse,
+        FukushuMaterialsUpdateCardExplanationRequest,
+        FukushuMaterialsUpdateCardExplanationResponse,
+        FukushuMaterialsCardVersionsRequest,
+        FukushuMaterialsCardVersionsResponse,
+        FukushuMaterialsCardVersionRequest,
+        FukushuMaterialsCardVersionResponse,
         FukushuMaterialsArchiveRequest,
         FukushuMaterialsArchiveResponse,
         BubbleGameRankingRequest,
@@ -3784,6 +3790,18 @@ type FukushuMaterialsArchiveRequest = ContractRequest<'fukushu/materials/archive
 type FukushuMaterialsArchiveResponse = ContractResponse<'fukushu/materials/archive'>;
 
 // @public (undocumented)
+type FukushuMaterialsCardVersionRequest = ContractRequest<'fukushu/materials/card-version'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionResponse = ContractResponse<'fukushu/materials/card-version'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionsRequest = ContractRequest<'fukushu/materials/card-versions'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionsResponse = ContractResponse<'fukushu/materials/card-versions'>;
+
+// @public (undocumented)
 type FukushuMaterialsCreateRequest = ContractRequest<'fukushu/materials/create'>;
 
 // @public (undocumented)
@@ -3806,6 +3824,12 @@ type FukushuMaterialsShowRequest = ContractRequest<'fukushu/materials/show'>;
 
 // @public (undocumented)
 type FukushuMaterialsShowResponse = ContractResponse<'fukushu/materials/show'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateCardExplanationRequest = ContractRequest<'fukushu/materials/update-card-explanation'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateCardExplanationResponse = ContractResponse<'fukushu/materials/update-card-explanation'>;
 
 // @public (undocumented)
 type FukushuMaterialsUpdateRequest = ContractRequest<'fukushu/materials/update'>;

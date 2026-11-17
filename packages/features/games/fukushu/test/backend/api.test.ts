@@ -114,7 +114,6 @@ describe('Fukushu metadata and archive authorization', () => {
 	});
 });
 
-
 describe('Fukushu explanation-only versions authorization and input boundary', () => {
 	const ids = { id: material().deck.id, questionId: material().questions[0].id };
 	const update = { ...ids, expectedRevision: 1, explanation: 'Additional context' };

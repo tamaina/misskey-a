@@ -191,11 +191,14 @@ test('real authentication, Drive, material maintenance and explanation versions'
 	const ids = { id: material.deck.id, questionId: material.questions[0].id };
 	const originalQuestion = structuredClone(current.questions[0]);
 	const withoutExplanationAndUpdateTime = question => {
-		const { updatedAt: _updatedAt, payload: { explanation: _explanation, ...payload }, ...record } = question;
-		return { ...record, payload };
+		const record = structuredClone(question);
+		delete record.updatedAt;
+		delete record.payload.explanation;
+		return record;
 	};
 	const stableDeck = deck => {
-		const { updatedAt: _updatedAt, ...stable } = deck;
+		const stable = structuredClone(deck);
+		delete stable.updatedAt;
 		return stable;
 	};
 	let explainedQuestion;
