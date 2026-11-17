@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { restoreMfmSearchBaseline } from './mfm-search-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -31,6 +32,7 @@ const sha256 = (source: string): string => createHash('sha256').update(source).d
 export function restoreUpstreamDevelopBaseline(file: string, source: string): string {
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase || sha256(source) === rebase.baselineSha256 || sha256(source) === rebase.historicalSha256) return source;
+	if (file === 'packages/features/integrations/frontend/components/MkGoogle.vue') source = restoreMfmSearchBaseline(file, source);
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from reviewed upstream develop: ${file}`);
 	for (const edit of [...rebase.edits].reverse()) {
 		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Upstream develop boundary differs: ${file}`);
@@ -49,7 +51,8 @@ export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBund
 	for (const rebase of rebases.filter(entry => !entry.sourceOnly && entry.file.endsWith('.vue'))) {
 		const moduleId = rebase.file.replace('packages/', '/');
 		if (!Object.hasOwn(modules, moduleId)) continue;
-		const source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');
+		let source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');
+		if (rebase.file === 'packages/features/integrations/frontend/components/MkGoogle.vue') source = restoreMfmSearchBaseline(rebase.file, source);
 		if (sha256(source) !== rebase.currentSha256) throw new Error(`Locale source differs from reviewed upstream develop: ${rebase.file}`);
 		let dictionaries = localeCache.get(rebase.file);
 		if (!dictionaries) {
