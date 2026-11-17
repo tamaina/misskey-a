@@ -29,7 +29,8 @@ The Unix-socket proxy must replace the forwarded client IP, and the private
 application must trust that proxy. Password signins are spaced to respect the
 real IP rate limiter; API limits are not disabled.
 
-After building the current backend and frontend, applying migrations to that
+After building the current backend, frontend and frontend-embed (both manifests
+are required for static asset serving), applying migrations to that
 owned DB, and waiting for readiness, run under the same validation lock as the
 application:
 
@@ -82,3 +83,22 @@ the upstream serialized output into the next call. `fsrs.test.ts` compares full
 card/log outputs and checks that inputs are not mutated. This intentionally
 retains the upstream adapter's omitted `learning_steps` field. These are scheduler
 compatibility cases, not a command to replay a user's history.
+
+## Native backup restore extension
+
+The HTTP scenario also exports through the real queue into Drive, inspects the
+owned original, and restores it into a separate synthetic owner's empty library.
+It compares materials, saved versions, review history and idempotent review retry
+results, rejects a second restore, and verifies the source owner's data is unchanged.
+`credentials.restoreOwner` identifies the synthetic account whose empty library and
+owned `native-restore.json` are reserved for the Chrome confirmation/restore check.
+This verifies the 9k native v1 format, not upstream `.fukushu` import.
+
+`backend/restore.integration.test.ts` is opt-in through `FUKUSHU_TEST_SOCKET`. Use
+a fresh disposable PostgreSQL cluster with a Unix socket at that directory, TCP
+disabled, port 55474, username `fukushu`, database `postgres`. Never point this
+variable at an existing development or production cluster. The suite creates its
+own `fukushu_restore_test` schema and removes it only if this run created it; an
+existing schema makes setup fail without dropping it. Run the feature backend
+Vitest tests with one worker under the same global validation lock, then stop only
+the fixture cluster. These PostgreSQL cases are skipped without the opt-in variable.

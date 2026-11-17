@@ -25,6 +25,7 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 	// All raw migrations and queries stay in this suite-owned schema, independent
 	// of the material tests' public tables and nondeterministic test-file order.
 	const db = new DataSource({ type: 'postgres', host: socket, port: 55474, username: 'fukushu', database: 'postgres', schema: 'fukushu_restore_test', extra: { options: '-c search_path=fukushu_restore_test', max: 4 }, entities, synchronize: false });
+	let schemaCreated = false;
 	let now = new Date('2026-11-17T00:00:00.000Z');
 	let sequence = 0;
 	const materials = new FukushuStore(db);
@@ -38,6 +39,7 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 	beforeAll(async () => {
 		await db.initialize();
 		await db.query('CREATE SCHEMA fukushu_restore_test');
+		schemaCreated = true;
 		await db.query('CREATE TABLE "user" (id varchar(32) PRIMARY KEY)');
 		await db.query('CREATE TABLE drive_file (id varchar(32) PRIMARY KEY, "userId" varchar(32) REFERENCES "user"(id), "userHost" text, uri text, "isLink" boolean NOT NULL DEFAULT false, size integer NOT NULL, md5 text NOT NULL)');
 		const runner = db.createQueryRunner();
@@ -49,7 +51,9 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 		} finally { await runner.release(); }
 	});
 	afterAll(async () => {
-		if (db.isInitialized) { await db.query('DROP SCHEMA fukushu_restore_test CASCADE'); await db.destroy(); }
+		if (db.isInitialized) {
+			try { if (schemaCreated) await db.query('DROP SCHEMA fukushu_restore_test CASCADE'); } finally { await db.destroy(); }
+		}
 	});
 	beforeEach(async () => {
 		await db.query('TRUNCATE "user" CASCADE');
