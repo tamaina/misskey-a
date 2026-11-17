@@ -63,3 +63,43 @@ pilot was verified with small text posts, public replies and author deletion.
 Regression cases are in `test/backend/federation.test.ts` and
 `packages/backend/test-federation/test/channel.test.ts`. No merge or deployment
 is part of this pilot.
+
+## Isolated three-server and explore regressions
+
+After building the backend, run
+`node packages/features/channels/test/run-three-server-fixture.mjs` from the repo
+root. This requires PostgreSQL binaries (`MISSKEY_PG_BINDIR` overrides discovery),
+OpenSSL, Docker, and an already available `redis:8` image. It creates three actual
+backend processes with separate PostgreSQL databases and Redis namespaces, sends
+signed federation traffic over HTTPS, and checks the real API, database and home
+stream. Its per-process DNS/TLS socket mapping routes `a.test`, `b.test`, and
+`c.test` to an ephemeral loopback proxy while retaining canonical origins, SNI,
+Host and certificate verification. It does not modify host DNS or use a live
+service. Only disposable accounts and data are created; the fixture removes its
+own processes, database data and Redis container, retaining logs in its printed
+temporary directory. Run it alone under the development machine's shared
+validation lock; do not overlap builds, typechecks, browser tests or other servers.
+
+The seven scenarios cover A Group delivery to B and B's ordinary Renote to C,
+canonical author/channel retention without an automatic Group follow or GTL leak,
+concurrent URL acquisition of an unknown channel, the Actor/Note-only `ap/show`
+boundary, explicit C subscription and subsequent publication/author deletion,
+Undo isolation, and local-only publication/quote/retrieval refusal. A reference-only
+non-subscriber is not promised subsequent push delivery or deletion. Direct
+`ap/show` of an arbitrary Announce activity URL remains unsupported.
+
+`pnpm --filter frontend exec node --import tsx test/browser-feature/channel.mjs`
+builds a browser fixture for the actual Channels page, tabs, paginator, pagination
+controls, channel cards, VVI translations and shared styles. Chromium checks local
+and remote filtering, late responses, search/cursor resets, personal lists and
+mobile layout. API responses, authentication and the surrounding page header/router
+are synthetic; this is a rendered component integration test, not a full signed-in
+application or live federation UI test. Install Playwright Chromium first, or set
+`MISSKEY_TEST_CHROMIUM` to an installed executable. Set
+`MISSKEY_CHANNEL_SCREENSHOTS` to save desktop/search/mobile screenshots. Both
+fixtures are exercised by their corresponding backend/frontend CI workflows.
+
+The browser regression also protects the optional channel-list extractor: the
+identity fallback is handled inside the component, avoiding Vue treating a
+generic callback prop default as a factory. The grid can shrink below its 360px
+desktop card minimum on narrow screens, preserving both edges within the viewport.

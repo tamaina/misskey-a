@@ -8,6 +8,7 @@ on:
     paths:
       - packages/backend/**
       - packages/features/federation/**
+      - packages/features/channels/**
       - packages/features/auth/**
       - packages/features/mcp/**
       - packages/features/relationships/**
@@ -21,6 +22,7 @@ on:
     paths:
       - packages/backend/**
       - packages/features/federation/**
+      - packages/features/channels/**
       - packages/features/auth/**
       - packages/features/mcp/**
       - packages/features/relationships/**
@@ -121,6 +123,9 @@ jobs:
       run: MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs
     - name: Test MCP with disposable PostgreSQL
       run: node packages/features/mcp/test/run-postgres-fixture.mjs
+    - name: Test channel acquisition across three isolated HTTPS servers
+      if: ${{ matrix.node-version-file == '.node-version' }}
+      run: node packages/features/channels/test/run-three-server-fixture.mjs
     - name: Upload to Codecov
       if: ${{ matrix.coverage }}
       uses: codecov/codecov-action@v7
