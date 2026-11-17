@@ -4,7 +4,7 @@ This isolated fixture renders the production antenna editor, select menu, switch
 and light theme. API calls are captured locally; it does not contact a Misskey
 server or modify real antennas. Saved synthetic data lasts for the tab session.
 
-From `packages/frontend`, run `node test/browser-feature/antenna.mjs --serve` and
+From `packages/frontend`, run `node --import tsx test/browser-feature/antenna.mjs --serve` and
 open the printed loopback URL in Chrome. Omit `--serve` for a build-only check.
 Use the repository dependencies and built icon font. Stop the preview with SIGTERM
 or Ctrl-C; its temporary output is removed on exit.
