@@ -44,12 +44,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</section>
 			</template>
 			<template v-else>
-				<MkButton :disabled="busy || editing" @click="backToList">← {{ $locale.sfc.library }}</MkButton>
+				<MkButton :disabled="busy || editing || studyLocked" @click="backToList">← {{ $locale.sfc.library }}</MkButton>
 				<section class="_panel _gaps" :class="$style.panel">
 					<h2 :class="$style.wrap">{{ material.deck.name }}</h2>
 					<p v-if="material.deck.description" :class="$style.content">{{ material.deck.description }}</p>
 					<p>{{ material.deck.questionCount }} {{ $locale.sfc.cards }} · {{ $locale.sfc.private }}</p>
-					<p>{{ $locale.sfc.previewOnly }}</p>
+					<p v-if="!studyActive">{{ $locale.sfc.previewOnly }}</p>
 					<MkInfo v-if="material.archivedAt">{{ $locale.sfc.archivedInfo }}</MkInfo>
 					<template v-if="editing">
 						<p>{{ $locale.sfc.metadataOnly }}</p>
@@ -66,20 +66,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</div>
 					</template>
 					<div v-else class="_buttons">
-						<MkButton :disabled="busy || reloadRequired" @click="editMetadata">{{ $locale.sfc.edit }}</MkButton>
-						<MkButton :disabled="busy || reloadRequired" @click="changeArchive">{{ material.archivedAt ? $locale.sfc.restore : $locale.sfc.archive }}</MkButton>
+						<MkButton :disabled="busy || reloadRequired || studyActive || studyLocked" @click="editMetadata">{{ $locale.sfc.edit }}</MkButton>
+						<MkButton :disabled="busy || reloadRequired || studyActive || studyLocked" @click="changeArchive">{{ material.archivedAt ? $locale.sfc.restore : $locale.sfc.archive }}</MkButton>
 					</div>
 					<p v-if="reloadRequired">{{ $locale.sfc.reloadNeeded }}</p>
-					<MkButton :disabled="busy" @click="reloadMaterial">{{ $locale.sfc.reloadMaterial }}</MkButton>
+					<MkButton :disabled="busy || studyActive || studyLocked" @click="reloadMaterial">{{ $locale.sfc.reloadMaterial }}</MkButton>
 				</section>
-				<ol :class="$style.questions">
+				<StudyPanel :key="material.deck.id" :deckId="material.deck.id" :archived="material.archivedAt !== null" :disabled="busy || editing" @active="studyActive = $event" @locked="studyLocked = $event"/>
+				<ol v-if="!studyActive" :class="$style.questions">
 					<li v-for="question in visibleQuestions" :key="question.id" class="_panel _gaps_s" :class="$style.panel">
 						<span v-if="!question.enabled" :class="$style.muted">{{ $locale.sfc.disabled }}</span>
 						<p :class="$style.content">{{ question.payload.prompt.value }}</p>
 						<details :class="$style.answer"><summary>{{ $locale.sfc.answer }}</summary><p :class="$style.content">{{ question.payload.answer.value }}</p><p v-if="question.payload.explanation" :class="$style.content">{{ question.payload.explanation.value }}</p></details>
 					</li>
 				</ol>
-				<div :class="$style.heading">
+				<div v-if="!studyActive" :class="$style.heading">
 					<MkButton :disabled="pageIndex === 0" @click="pageIndex--">{{ $locale.sfc.previous }}</MkButton>
 					<span>{{ pageIndex + 1 }} / {{ pageCount }}</span>
 					<MkButton :disabled="pageIndex + 1 >= pageCount" @click="pageIndex++">{{ $locale.sfc.next }}</MkButton>
@@ -100,6 +101,7 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import * as os from '@features/ui/frontend/os.js';
+import StudyPanel from '../components/StudyPanel.vue';
 import type { FukushuMaterial } from '../../shared/material.schema.js';
 
 const decks = ref<Omit<FukushuMaterial['deck'], 'sourceText'>[]>([]);
@@ -107,6 +109,8 @@ type ManagedMaterial = FukushuMaterial & { revision: number; archivedAt: string 
 const material = ref<ManagedMaterial | null>(null);
 const archivedList = ref(false);
 const editing = ref(false);
+const studyActive = ref(false);
+const studyLocked = ref(false);
 const draftName = ref('');
 const draftDescription = ref('');
 const reloadRequired = ref(false);
@@ -157,7 +161,7 @@ async function showMaterial(id: string) {
 	});
 }
 
-function backToList() { if (busy.value || editing.value) return; material.value = null; void refresh(); }
+function backToList() { if (busy.value || editing.value || studyLocked.value) return; material.value = null; void refresh(); }
 
 function filterList(archived: boolean) {
 	if (busy.value) return;
@@ -168,7 +172,7 @@ function filterList(archived: boolean) {
 }
 
 function editMetadata() {
-	if (!material.value || busy.value || reloadRequired.value) return;
+	if (!material.value || busy.value || reloadRequired.value || studyActive.value || studyLocked.value) return;
 	draftName.value = material.value.deck.name;
 	draftDescription.value = material.value.deck.description ?? '';
 	editing.value = true;
@@ -177,6 +181,7 @@ function editMetadata() {
 function cancelEdit() { if (!busy.value) editing.value = false; }
 
 async function reloadMaterial() {
+	if (studyActive.value || studyLocked.value) return;
 	const current = material.value;
 	if (!current) return;
 	await perform(async () => {
@@ -211,7 +216,7 @@ async function saveMetadata() {
 
 async function changeArchive() {
 	const current = material.value;
-	if (!current || editing.value || reloadRequired.value) return;
+	if (!current || editing.value || reloadRequired.value || studyActive.value || studyLocked.value) return;
 	await perform(async () => {
 		const archived = current.archivedAt === null;
 		const { canceled } = await os.confirm({ type: 'question', title: archived ? $locale.value.sfc.archive : $locale.value.sfc.restore, text: archived ? $locale.value.sfc.archiveConfirm : $locale.value.sfc.restoreConfirm });
@@ -299,7 +304,7 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 	"empty": "教材はまだありません。Drive のテキストファイルから取り込めます。",
 	"cards": "枚",
 	"private": "自分だけに表示",
-	"previewOnly": "ここで答えを開いても採点や復習予定・履歴は変わりません。",
+	"previewOnly": "カードのプレビューで答えを開いても、採点や復習予定・履歴は変わりません。",
 	"disabled": "無効なカード",
 	"answer": "答えを見る",
 	"previous": "前へ",
@@ -360,7 +365,7 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 	"empty": "No materials yet. Import a text file from Drive.",
 	"cards": "cards",
 	"private": "Visible only to you",
-	"previewOnly": "Revealing answers here does not change grades, review schedules or history.",
+	"previewOnly": "Revealing answers in the card preview does not change grades, review schedules or history.",
 	"disabled": "Disabled card",
 	"answer": "Show answer",
 	"previous": "Previous",

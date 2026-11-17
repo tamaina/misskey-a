@@ -257,3 +257,32 @@ test('does not change archive state optimistically when its revision is stale', 
 	await screen.findByText('最新状態を表示しました。');
 	expect((screen.getByText('教材を保管').closest('button') as HTMLButtonElement).disabled).toBe(false);
 });
+
+
+test('separates study from preview and guards material navigation while a review result is unknown', async () => {
+	const original = data();
+	let reject!: (cause: unknown) => void;
+	vi.mocked(misskeyApi).mockImplementation(async endpoint => {
+		if (endpoint === 'fukushu/materials/list') return [original.deck] as never;
+		if (endpoint === 'fukushu/materials/show') return original as never;
+		if (endpoint === 'fukushu/study/queue') return {
+			deckId: original.deck.id, serverTime: original.deck.updatedAt,
+			items: original.questions.slice(0, 2).map(question => ({ question, questionVersion: 1, stateRevision: 0, isNew: true, due: question.createdAt })),
+		} as never;
+		return await new Promise((_, rejectPromise) => { reject = rejectPromise; }) as never;
+	});
+	const { container } = mount();
+	await fireEvent.click(await screen.findByText('教材A'));
+	await fireEvent.click(await screen.findByRole('button', { name: '復習を始める' }));
+	await screen.findByText('新規カード');
+	expect(container.querySelectorAll('ol > li')).toHaveLength(0);
+	expect((screen.getByText('名前・説明を編集').closest('button') as HTMLButtonElement).disabled).toBe(true);
+	await fireEvent.click(screen.getByRole('button', { name: '答えを開く' }));
+	await fireEvent.click(screen.getByRole('button', { name: 'わかった' }));
+	expect((screen.getByText('← 保存した教材').closest('button') as HTMLButtonElement).disabled).toBe(true);
+	reject(new TypeError('Offline'));
+	await screen.findByRole('alert');
+	expect((screen.getByText('← 保存した教材').closest('button') as HTMLButtonElement).disabled).toBe(true);
+	expect((screen.getByText('教材を保管').closest('button') as HTMLButtonElement).disabled).toBe(true);
+	expect(screen.getByRole('button', { name: '同じ記録を再確認' })).toBeTruthy();
+});
