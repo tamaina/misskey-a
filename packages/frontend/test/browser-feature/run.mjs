@@ -64,7 +64,8 @@ try {
 					assert.equal(await page.locator('#not-found').innerText(), locales[locale].notFoundDescription);
 					assert.equal(await page.title(), locales[locale].notFound);
 					assert.equal(await page.locator('#empty').innerText(), locales[locale].nothing);
-					assert.equal((await page.locator('#local-search button').innerText()).trim(), locales[locale].searchByGoogle);
+					// New local messages use the existing primary ja-JP fallback when untranslated.
+					assert.equal((await page.locator('#local-search button').innerText()).trim(), locale === 'en-US' ? 'Search with Google' : 'Google で検索');
 					assert.equal(await page.locator('#local-search input').inputValue(), 'fixture query');
 					assert.equal(await page.locator('#error button').innerText(), locales[locale].retry);
 					assert.ok((await page.locator('#error').innerText()).includes(locales[locale].somethingHappened));
@@ -102,6 +103,32 @@ try {
 				assert.deepEqual(errors, []);
 			} finally { await page.close(); }
 		}
+		for (const scenario of [
+			{ engine: 'custom', customUrl: 'https://search.example/find?q={query}', name: 'search.example', origin: 'https://search.example', path: '/find' },
+			{ engine: 'custom', customUrl: 'javascript:alert({query})', name: 'Google', origin: 'https://www.google.com', path: '/search' },
+		]) {
+			const page = await browser.newPage();
+			const errors = [];
+			page.on('pageerror', error => errors.push(error.message));
+			try {
+				// Observe the navigation contract without contacting an external search service.
+				await page.addInitScript(() => { globalThis.window.open = (...args) => { globalThis.window.__searchOpened = args; return null; }; });
+				await page.goto(`${origin}/${html.fileName}?${new URLSearchParams({ locale: 'en-US', engine: scenario.engine, customUrl: scenario.customUrl })}`);
+				await page.waitForFunction(() => globalThis.document.querySelector('#status')?.textContent === 'ready');
+				const query = '日本語 &admin=true#fragment';
+				await page.locator('#local-search input').fill(query);
+				await page.getByRole('button', { name: `Search with ${scenario.name}`, exact: true }).click();
+				const [url, target, features] = await page.evaluate(() => globalThis.window.__searchOpened);
+				const parsed = new URL(url);
+				assert.equal(parsed.origin, scenario.origin);
+				assert.equal(parsed.pathname, scenario.path);
+				assert.deepEqual([...parsed.searchParams], [['q', query]]);
+				assert.equal(parsed.hash, '');
+				assert.equal(target, '_blank');
+				assert.equal(features, 'noopener');
+				assert.deepEqual(errors, []);
+			} finally { await page.close(); }
+		}
 		for (const role of ['moderator', 'manager', 'admin', 'member']) {
 			const page = await browser.newPage();
 			try {
@@ -132,7 +159,7 @@ try {
 			assert.ok(blocked > 0, 'The locale chunk request must have been blocked');
 			assert.equal(await page.locator('#app').innerHTML(), '', 'Failed locale load must not mount the view');
 		} finally { await page.close(); }
-		console.log('Chromium feature smoke passed: four locales, reload, retry, login prompt, emoji search/menu permissions/dialog cleanup and failed locale loading.');
+		console.log('Chromium feature smoke passed: four locales, reload, safe custom search/invalid URL fallback, retry, login prompt, emoji search/menu permissions/dialog cleanup and failed locale loading.');
 	}
 } finally {
 	await browser?.close();
