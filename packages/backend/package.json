@@ -142,6 +142,7 @@
 		"systeminformation": "5.33.19",
 		"tinycolor2": "1.6.0",
 		"tmp": "0.2.7",
+		"ts-fsrs": "5.4.1",
 		"typeorm": "1.1.2",
 		"ulid": "3.0.2",
 		"vary": "1.1.2",

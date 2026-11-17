@@ -1,6 +1,6 @@
 # Private flashcard study: first vertical slice
 
-Refs #310; builds on #325. Design recorded before implementation. This slice
+Refs #326 / #310; builds on #325. Design recorded before implementation. This slice
 adds owner-only flashcard review and history; it does not import, reset, replay,
 replace or regrade existing upstream browser histories.
 
@@ -17,7 +17,9 @@ Reference commit: `tamaina/fukushu@0efee271a13f15096beb8cbaaea25092c5927b29`:
   snapshots the queue at session start, due reviews first then up to 20 new cards.
   Again advances to the next queued card; it is not immediately reinserted.
   The default is no daily review cap. The 20-new-card setting is a queue bound,
-  not a guaranteed total daily limit in the upstream implementation.
+  not a guaranteed total daily limit in the upstream implementation. New cards
+  use question-ID order. Unlike upstream, this first slice does not automatically
+  switch an empty queue to early-review cram mode; it shows that nothing is due.
 - [adapter](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/infrastructure/fsrs/adapter.ts)
   and lockfile use ts-fsrs 5.4.1. Retention 0.9 and fuzz false are initial values.
   Preserve its stored Card/ReviewLog field mapping, including the fields it

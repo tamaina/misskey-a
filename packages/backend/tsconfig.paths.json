@@ -119,7 +119,8 @@
 			"sanitize-html": ["./node_modules/@types/sanitize-html/index.d.ts"],
 			"mime-types": ["./node_modules/@types/mime-types/index.d.ts"],
 			"jsonld": ["./node_modules/@types/jsonld/index.d.ts"],
-			"systeminformation": ["./node_modules/systeminformation/lib/index.d.ts"]
+			"systeminformation": ["./node_modules/systeminformation/lib/index.d.ts"],
+			"ts-fsrs": ["./node_modules/ts-fsrs/dist/index.d.ts"]
 		}
 	}
 }

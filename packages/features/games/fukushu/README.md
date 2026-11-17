@@ -1,5 +1,11 @@
 # Fukushu material persistence (pilot)
 
+The owner-only study slice now adds flashcard self-ratings, FSRS schedules and
+immutable review records. See [STUDY.md](STUDY.md) for the upstream mapping,
+concurrency/retry protocol, capacity limits and the intentionally bounded UI.
+The earlier sections below describe the material/import boundaries; previews
+still never record a review. Existing browser history is not imported or reset.
+
 Refs #310. `fukushu/materials/create` and `fukushu/materials/show` store and return
 the authenticated user's private material. Both are POST endpoints, using the
 existing `write:account` and `read:account` permissions respectively. There is no

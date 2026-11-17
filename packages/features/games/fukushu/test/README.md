@@ -56,8 +56,12 @@ separate production limit without waiting for a rate-window reset or disabling
 the rate limiter. Do not add
 more same-owner writes to these endpoints without budgeting their rate window.
 
-The slice has no FSRS/review-history tables yet. Retained versions are card-content
-records, not study attempts, grades or schedules. No old version is regraded or
-used to replay FSRS history; these assertions do not claim that upstream study
-history was imported. PostgreSQL tests separately cover concurrent mutations, total quota (including archived materials), source
+The study extension uses the same real application to record self-rated flashcard
+reviews, retry the same request UUID, reject stale/different requests, race two
+tabs, read paginated historical snapshots, and edit an explanation after its first
+review. It checks archived history and retries without accepting new archived
+reviews. No old version is regraded or used to replay FSRS history; these assertions
+do not claim that upstream study history was imported. Bob retains one new typed
+card for a subsequent real-browser study check; `credentials.studyOwner` records
+the owned test account for that check. PostgreSQL tests separately cover concurrent mutations, total quota (including archived materials), source
 deduplication and migration round trips.

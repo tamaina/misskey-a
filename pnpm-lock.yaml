@@ -603,6 +603,9 @@ importers:
       tmp:
         specifier: 0.2.7
         version: 0.2.7
+      ts-fsrs:
+        specifier: 5.4.1
+        version: 5.4.1
       typeorm:
         specifier: 1.1.2
         version: 1.1.2(ioredis@5.11.1(supports-color@10.2.2))(pg@8.23.1)(supports-color@10.2.2)
@@ -8424,6 +8427,10 @@ packages:
 
   ts-map@1.0.3:
     resolution: {integrity: sha512-vDWbsl26LIcPGmDpoVzjEP6+hvHZkBkLW7JpvwbCv/5IYPJlsbzCVXY3wsCeAxAUeTclNOUZxnLdGh3VBD/J6w==}
+
+  ts-fsrs@5.4.1:
+    resolution: {integrity: sha512-mOp9+oexJexBTkwjg/jQI1aSUQRLIAvbimeKHLSmVdNJPwObugFNKmZkoggH5d6kZ0uaWLboP1Al1DnXAfIb9w==}
+    engines: {node: '>=20.0.0'}
 
   tsc-alias@1.9.10:
     resolution: {integrity: sha512-dsZvDB/wgAtRPFDHPYy7X7uqKFR4jJ7VB/2ndPGZQkIMQREz8q74fFsMZL4UmCbUztXhxoA1brKfqW7XzQeMqA==}
@@ -16976,6 +16983,8 @@ snapshots:
       typescript: '@typescript/typescript6@6.0.2'
 
   ts-map@1.0.3: {}
+
+  ts-fsrs@5.4.1: {}
 
   tsc-alias@1.9.10:
     dependencies:
