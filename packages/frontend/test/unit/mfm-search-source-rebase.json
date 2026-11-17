@@ -1,0 +1,52 @@
+[
+  {
+    "file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+    "currentSha256": "caad9503d9bee21f20e242a91956ec13dc37cf9f260e430fbcdee973952d1597",
+    "baselineSha256": "29749ad8071bdf46376d8f2de1de901371d6a262e6586e58ea3e39d783428593",
+    "edits": [
+      {
+        "start": 5226,
+        "end": 5259,
+        "current": "\n\t\t\t\t\t\t\t<MkMfmSearchPreference/>\n",
+        "baseline": ""
+      },
+      {
+        "start": 41926,
+        "end": 42031,
+        "current": "import MkMfmSearchPreference from '@features/preferences/frontend/components/MkMfmSearchPreference.vue';\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/integrations/frontend/components/MkGoogle.vue",
+    "currentSha256": "b4c29cda627bc288d3d4d5dc5c24777af5d25286e78dd0c972914ae37ad60c30",
+    "baselineSha256": "5a4a2682a70f3854475eb0a1996503b2919fb07c3c1b4c865e6730e41fd02f4f",
+    "edits": [
+      {
+        "start": 138,
+        "end": 368,
+        "current": "\t<input v-model=\"query\" :class=\"$style.input\" type=\"search\" :placeholder=\"q\" :aria-label=\"engineName\">\n\t<button :class=\"$style.button\" @click=\"search\"><i class=\"ti ti-search\"></i> <MkMfmSearchLabel :engine=\"engineName\"/></button>\n",
+        "baseline": "\t<input v-model=\"query\" :class=\"$style.input\" type=\"search\" :placeholder=\"q\">\n\t<button :class=\"$style.button\" @click=\"search\"><i class=\"ti ti-search\"></i> {{ $locale.sfc.searchByGoogle }}</button>\n"
+      },
+      {
+        "start": 413,
+        "end": 698,
+        "current": "import { computed, ref, watch } from 'vue';\nimport { prefer } from '@features/preferences/frontend/preferences.js';\nimport { buildSearchUrl, searchEngineName } from '@features/integrations/frontend/utility/mfm-search-engines.js';\nimport MkMfmSearchLabel from './MkMfmSearchLabel.vue';\n",
+        "baseline": "import { ref, watch } from 'vue';\n"
+      },
+      {
+        "start": 774,
+        "end": 900,
+        "current": "const engineName = computed(() => searchEngineName(prefer.r.mfmSearchEngine.value, prefer.r.mfmSearchEngineCustomUrl.value));\n",
+        "baseline": ""
+      },
+      {
+        "start": 977,
+        "end": 1103,
+        "current": "\twindow.open(buildSearchUrl(prefer.s.mfmSearchEngine, prefer.s.mfmSearchEngineCustomUrl, query.value), '_blank', 'noopener');\n",
+        "baseline": "\tconst sp = new URLSearchParams();\n\tsp.append('q', query.value);\n\twindow.open(`https://www.google.com/search?${sp.toString()}`, '_blank', 'noopener');\n"
+      }
+    ]
+  }
+]

@@ -5,28 +5,30 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div :class="$style.root">
-	<input v-model="query" :class="$style.input" type="search" :placeholder="q">
-	<button :class="$style.button" @click="search"><i class="ti ti-search"></i> {{ $locale.sfc.searchByGoogle }}</button>
+	<input v-model="query" :class="$style.input" type="search" :placeholder="q" :aria-label="engineName">
+	<button :class="$style.button" @click="search"><i class="ti ti-search"></i> <MkMfmSearchLabel :engine="engineName"/></button>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { prefer } from '@features/preferences/frontend/preferences.js';
+import { buildSearchUrl, searchEngineName } from '@features/integrations/frontend/utility/mfm-search-engines.js';
+import MkMfmSearchLabel from './MkMfmSearchLabel.vue';
 
 const props = defineProps<{
 	q: string;
 }>();
 
 const query = ref(props.q);
+const engineName = computed(() => searchEngineName(prefer.r.mfmSearchEngine.value, prefer.r.mfmSearchEngineCustomUrl.value));
 
 watch(() => props.q, (v) => {
 	query.value = v;
 });
 
 const search = () => {
-	const sp = new URLSearchParams();
-	sp.append('q', query.value);
-	window.open(`https://www.google.com/search?${sp.toString()}`, '_blank', 'noopener');
+	window.open(buildSearchUrl(prefer.s.mfmSearchEngine, prefer.s.mfmSearchEngineCustomUrl, query.value), '_blank', 'noopener');
 };
 </script>
 
