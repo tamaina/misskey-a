@@ -7,9 +7,10 @@ import { restoreMfmIntegrationBaseline } from './mfm-integration-source-rebase.j
 import rebases from './formula-source-rebase.json';
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
 export function restoreFormulaBaseline(file: string, source: string): string {
-	source = restoreMfmIntegrationBaseline(file, source);
 	const rebase = rebases.find(entry => entry.file === file);
-	if (!rebase || sha256(source) === rebase.baselineSha256) return source;
+	if (!rebase) return source;
+	source = restoreMfmIntegrationBaseline(file, source);
+	if (sha256(source) === rebase.baselineSha256) return source;
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Unreviewed formula source: ${file}`);
 	for (const edit of [...rebase.edits].reverse()) {
 		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`formula boundary differs: ${file}`);
