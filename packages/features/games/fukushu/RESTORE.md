@@ -49,7 +49,7 @@ the library/history rather than automatically retrying.
 The backup panel requires a fresh successful inspection with no reported conflicts
 and an explicit restore confirmation. Changing the selected file clears inspection
 and confirmation. Server checks remain authoritative if data changes afterwards.
-After success reload the library, preserve the archive flag and show counts. This
+After success reload the library, preserve the archive flag and show completion. This
 does not make a Drive download URL private or prove the backup's authorship.
 
 Use only disposable PostgreSQL/Redis and synthetic accounts/files: verify exact
@@ -59,3 +59,13 @@ all quotas; malformed/unsupported input; foreign/missing/changed Drive originals
 concurrent restore/create; forced late failure rollback; and actual authenticated
 HTTP/Drive plus Chrome flow. All host-heavy checks share the global validation
 lock and check host processes/memory first. No live data, merge or deployment.
+
+## API
+
+`POST /api/fukushu/backup/restore` accepts `{ fileId, confirmRestore: true }` under
+normal login only. Success returns `restored: true`, `deckId`, `archived`, and the
+inserted question/version/state/review counts. `BACKUP_CONFLICT` is HTTP 409;
+`BACKUP_LIMIT` is HTTP 400. Missing/foreign originals are indistinguishable 404.
+The body cannot select another owner, provide a URL or bypass the bounded reader.
+This bounded first slice is synchronous, like the existing Drive material import;
+there is no background partial import and no restore operation on export jobs.

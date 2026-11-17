@@ -3547,6 +3547,82 @@ export default {
 				}
 			}
 		},
+		"backupRestore": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"UPSTREAM_BACKUP_UNSUPPORTED": {
+						"status": 400
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/backup/restore",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/backup/restore",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
 		"backupExport": {
 			"~orpc": {
 				"errorMap": {
@@ -3579,6 +3655,12 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
 					},
 					"NO_SUCH_MATERIAL": {
 						"status": 404
@@ -3650,6 +3732,12 @@ export default {
 					},
 					"INTERNAL_ERROR": {
 						"status": 500
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
 					},
 					"NO_SUCH_MATERIAL": {
 						"status": 404

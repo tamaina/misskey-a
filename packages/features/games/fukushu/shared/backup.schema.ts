@@ -36,3 +36,9 @@ export const backupInspectionSchema = v.strictObject({
 });
 export type BackupPayload = v.InferOutput<typeof backupPayloadSchema>;
 export type BackupInspection = v.InferOutput<typeof backupInspectionSchema>;
+
+export const backupRestoreResultSchema = v.strictObject({
+	restored: v.literal(true), deckId: sourceIdSchema, archived: v.boolean(),
+	questions: v.number(), versions: v.number(), studyStates: v.number(), reviews: v.number(),
+});
+export type BackupRestoreResult = v.InferOutput<typeof backupRestoreResultSchema>;

@@ -31,6 +31,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<p v-if="report.archived">{{ $locale.sfc.archived }}</p>
 			<p>{{ $locale.sfc.conflicts }}: {{ report.conflicts.deck ? 1 : 0 }} / {{ report.conflicts.questions }} / {{ report.conflicts.reviews }}</p>
 			<p>{{ $locale.sfc.noWrite }}</p>
+			<template v-if="!hasConflicts">
+				<label :class="$style.ack"><input v-model="restoreConfirmed" type="checkbox" :disabled="disabled || busy"> {{ $locale.sfc.restoreAck }}</label>
+				<MkButton primary :disabled="disabled || busy || !restoreConfirmed" :wait="restoring" @click="restore">{{ $locale.sfc.restore }}</MkButton>
+			</template>
+			<p v-else>{{ $locale.sfc.conflict }}</p>
 		</section>
 	</div>
 </details>
@@ -42,16 +47,20 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
-import type { BackupInspection } from '../../shared/backup.schema.js';
+import type { BackupInspection, BackupRestoreResult } from '../../shared/backup.schema.js';
 
+const emit = defineEmits<{ locked: [value: boolean]; restored: [value: BackupRestoreResult] }>();
 const props = defineProps<{ deckId?: string; disabled?: boolean }>();
 const acknowledged = ref(false);
 const accepted = ref(false);
 const exporting = ref(false);
 const inspecting = ref(false);
-const busy = computed(() => exporting.value || inspecting.value);
+const restoring = ref(false);
+const restoreConfirmed = ref(false);
+const busy = computed(() => exporting.value || inspecting.value || restoring.value);
 const selected = ref<{ id: string; name: string } | null>(null);
 const report = ref<BackupInspection | null>(null);
+const hasConflicts = computed(() => !report.value || report.value.conflicts.deck || report.value.conflicts.questions > 0 || report.value.conflicts.reviews > 0);
 const error = ref('');
 let disposed = false;
 let selection = 0;
@@ -73,14 +82,14 @@ async function pick() {
 	try {
 		const [file] = await chooseDriveFile({ multiple: false });
 		if (file && current === selection && !disposed && !props.disabled && !busy.value) {
-			selected.value = { id: file.id, name: file.name }; report.value = null; error.value = '';
+			selected.value = { id: file.id, name: file.name }; report.value = null; restoreConfirmed.value = false; error.value = '';
 		}
 	} catch { if (!disposed && current === selection) error.value = $locale.value.sfc.failed; }
 }
 
 async function inspect() {
 	if (!selected.value || props.disabled || busy.value) return;
-	selection++; inspecting.value = true; error.value = ''; report.value = null;
+	selection++; inspecting.value = true; error.value = ''; report.value = null; restoreConfirmed.value = false;
 	try {
 		const result = await misskeyApi('fukushu/backup/inspect', { fileId: selected.value.id }, undefined, AbortSignal.timeout(20_000));
 		if (!disposed) report.value = result;
@@ -92,7 +101,25 @@ async function inspect() {
 	} finally { if (!disposed) inspecting.value = false; }
 }
 
-onBeforeUnmount(() => { disposed = true; selection++; });
+async function restore() {
+	if (!selected.value || props.disabled || busy.value || hasConflicts.value || !restoreConfirmed.value) return;
+	const fileId = selected.value.id;
+	restoring.value = true; emit('locked', true); error.value = '';
+	let result: BackupRestoreResult | undefined;
+	try {
+		result = await misskeyApi('fukushu/backup/restore', { fileId, confirmRestore: true }, undefined, AbortSignal.timeout(60_000));
+	} catch (cause) {
+		if (!disposed) {
+			const code = typeof cause === 'object' && cause !== null && 'code' in cause ? cause.code : null;
+			error.value = code === 'BACKUP_CONFLICT' ? $locale.value.sfc.conflict : code === 'BACKUP_LIMIT' ? $locale.value.sfc.limit : $locale.value.sfc.restoreUnknown;
+		}
+	} finally {
+		if (!disposed) { restoring.value = false; report.value = null; restoreConfirmed.value = false; emit('locked', false); }
+	}
+	if (!disposed && result) emit('restored', result);
+}
+
+onBeforeUnmount(() => { disposed = true; selection++; emit('locked', false); });
 </script>
 
 <style lang="scss" module>
@@ -129,7 +156,12 @@ onBeforeUnmount(() => { disposed = true; selection++; });
 	"reviews": "復習記録",
 	"archived": "保管済みの教材です。",
 	"conflicts": "現在の自分のデータと重複するID（教材 / カード / 復習記録）",
-	"noWrite": "検査のみ完了しました。教材や履歴への書き込み・置換はしていません。復元の実行は今後対応します。",
+	"restoreAck": "この教材・保存版・復習履歴を追加します。既存IDと重複した場合は全体を拒否することを確認しました",
+	"restore": "教材全体を復元",
+	"conflict": "既存データとIDが重複しています。復元による書き込み・置換は行いません。",
+	"limit": "保存先の教材数・保存版または履歴の上限を超えるため、全体を復元できません。既存データは変更していません。",
+	"restoreUnknown": "復元の結果を確認できませんでした。再実行する前に教材一覧と復習履歴を確認してください。自動では再実行しません。",
+	"noWrite": "検査のみ完了しました。教材や履歴への書き込み・置換はしていません。重複がなければ、確認後に教材全体を復元できます。",
 	"upstream": "本家 Fukushu のバックアップです。媒体や過去のカード版の扱いを確認する必要があるため、この機能では復元しません。",
 	"tooLarge": "初回対応の上限8 MiBを超えています。データの一部だけを読み込むことはありません。",
 	"failed": "バックアップを検査できませんでした。ファイルの取得・形式・整合性を確認してください。教材や履歴は変更していません。"
@@ -159,7 +191,12 @@ onBeforeUnmount(() => { disposed = true; selection++; });
 	"reviews": "Reviews",
 	"archived": "This deck was archived.",
 	"conflicts": "IDs already in your data (decks / cards / reviews)",
-	"noWrite": "Inspection complete. No materials or history were written or replaced. Applying a restore is a future step.",
+	"restoreAck": "Add this deck, retained versions and review history. I understand that any existing ID rejects the entire restore.",
+	"restore": "Restore the entire deck",
+	"conflict": "Some IDs already exist. Restore will not write or replace data.",
+	"limit": "The full restore exceeds the destination deck, version or review quota. Existing data has not changed.",
+	"restoreUnknown": "The restore outcome is unknown. Check your library and review history before trying again. This request is not retried automatically.",
+	"noWrite": "Inspection complete. No materials or history were written or replaced. If no IDs conflict, you can confirm and restore the entire deck.",
 	"upstream": "This is an upstream Fukushu backup. Media and historical card versions require a separate migration design; this feature does not restore it.",
 	"tooLarge": "The backup exceeds this pilot's 8 MiB limit. No partial import is performed.",
 	"failed": "Could not inspect the backup. Check file availability, format and integrity. Your materials and history have not changed."

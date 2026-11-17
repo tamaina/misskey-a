@@ -12,12 +12,13 @@ import { backupContract } from '../../backend/backup.contract.js';
 import { BackupError } from '../../backend/backup-codec.js';
 import { MaterialError } from '../../backend/store.js';
 import type { FukushuStore } from '../../backend/store.js';
+import type { FukushuBackupRestorer } from '../../backend/backup-restore.js';
 import type { FukushuBackupStore } from '../../backend/backup-store.js';
 import type { FukushuBackupInspector } from '../../backend/backup-drive.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 function fixture() {
-	const backup = { store: mockDeep<FukushuBackupStore>(), inspector: mockDeep<FukushuBackupInspector>(), enqueue: vi.fn(async () => {}) };
+	const backup = { restorer: mockDeep<FukushuBackupRestorer>(), store: mockDeep<FukushuBackupStore>(), inspector: mockDeep<FukushuBackupInspector>(), enqueue: vi.fn(async () => {}) };
 	const api = createFukushuRouter(mockDeep<FukushuStore>(), undefined, undefined, backup);
 	const user = mockDeep<MiLocalUser>({ id: 'alice', isSuspended: false, movedToUri: null });
 	return { backup, api, user };
@@ -59,4 +60,19 @@ test('does not enqueue foreign decks and maps bounded validation failures', asyn
 		await expect(call(api.backupInspect, { fileId: '9x5n8yd9' }, { context: testContext(user) })).rejects.toMatchObject({ code, status: 400 });
 	}
 	expect(backupContract.backupExport['~orpc'].meta.limit).toEqual({ duration: 86400000, max: 5 });
+});
+
+test('restore requires normal login, explicit confirmation and server-owned identity', async () => {
+	const { api, backup, user } = fixture();
+	const value = { fileId: '9x5n8yd9', confirmRestore: true as const };
+	await expect(call(api.backupRestore, value, { context: testContext(null) })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+	await expect(call(api.backupRestore, value, { context: testContext(user, { permission: ['read:account', 'write:account', 'read:drive', 'write:drive'] }) })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+	await expect(call(api.backupRestore, { fileId: value.fileId } as never, { context: testContext(user) })).rejects.toThrow();
+	expect(backup.restorer.restore).not.toHaveBeenCalled();
+	await call(api.backupRestore, { ...value, ownerId: 'bob' } as never, { context: testContext(user) });
+	expect(backup.restorer.restore).toHaveBeenCalledWith('alice', value.fileId);
+	for (const [code, status] of [['BACKUP_CONFLICT', 409], ['BACKUP_LIMIT', 400]] as const) {
+		backup.restorer.restore.mockRejectedValueOnce(new BackupError(code));
+		await expect(call(api.backupRestore, value, { context: testContext(user) })).rejects.toMatchObject({ code, status });
+	}
 });

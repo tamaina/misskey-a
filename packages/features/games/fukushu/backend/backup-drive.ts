@@ -22,6 +22,10 @@ export class FukushuBackupInspector {
 	) {}
 
 	async inspect(ownerId: string, fileId: string) {
+		return this.store.inspect(ownerId, decodeBackup(await this.read(ownerId, fileId)));
+	}
+
+	async read(ownerId: string, fileId: string): Promise<Buffer> {
 		const file = await this.files.findOneBy({ id: fileId, userId: ownerId });
 		if (!file || file.userId !== ownerId) throw new MaterialError('NO_SUCH_FILE');
 		if (file.userHost !== null || file.uri !== null || file.isLink || !/\.(json|fukushu)$/i.test(file.name)
@@ -32,6 +36,6 @@ export class FukushuBackupInspector {
 			bytes = await readDriveOriginal(file, this.storage, this.download, MAX_BACKUP_BYTES);
 			if (bytes.length !== file.size || createHash('md5').update(bytes).digest('hex') !== file.md5) throw new Error('Original changed');
 		} catch { throw new BackupError('BACKUP_FAILED'); }
-		return this.store.inspect(ownerId, decodeBackup(bytes));
+		return bytes;
 	}
 }

@@ -285,3 +285,29 @@ test('separates study from preview and guards material navigation while a review
 	expect((screen.getByText('教材を保管').closest('button') as HTMLButtonElement).disabled).toBe(true);
 	expect(screen.getByRole('button', { name: '同じ記録を再確認' })).toBeTruthy();
 });
+
+test('locks the library during restore, then reloads the archived destination and retains success notice', async () => {
+	let finish!: (value: unknown) => void; let restored = false;
+	const source = data();
+	vi.mocked(misskeyApi).mockImplementation(async endpoint => {
+		if (endpoint === 'fukushu/materials/list') return (restored ? [source.deck] : []) as never;
+		if (endpoint === 'fukushu/backup/inspect') return { format: 'misskey-fukushu-deck-backup', version: 1, restored: false, deckId: 'deck', deckName: '復元する教材', exportedAt: '2026-11-17T00:00:00.000Z', archived: true, questions: 21, versions: 0, studyStates: 0, reviews: 0, conflicts: { deck: false, questions: 0, reviews: 0 } } as never;
+		return await new Promise<unknown>(resolve => { finish = resolve; }) as never;
+	});
+	vi.mocked(chooseDriveFile).mockResolvedValueOnce([{ id: 'backup', name: 'backup.json' }] as never);
+	mount(); await screen.findByText(/教材はまだありません/);
+	await fireEvent.click(screen.getByText('バックアップ・復元前の確認'));
+	await fireEvent.click(screen.getByRole('button', { name: 'Drive のバックアップを選ぶ' }));
+	await screen.findByText('backup.json');
+	await fireEvent.click(screen.getByRole('button', { name: '書き込まずに検査' }));
+	await screen.findByText('復元する教材');
+	await fireEvent.click(screen.getByRole('checkbox'));
+	await fireEvent.click(screen.getByRole('button', { name: '教材全体を復元' }));
+	expect((screen.getByRole('button', { name: '再読み込み' }) as HTMLButtonElement).disabled).toBe(true);
+	expect((screen.getByRole('button', { name: 'Drive のファイルを選ぶ' }) as HTMLButtonElement).disabled).toBe(true);
+	restored = true; finish({ restored: true, deckId: 'deck', archived: true, questions: 21, versions: 0, studyStates: 0, reviews: 0 });
+	await screen.findByText('教材・保存した版・復習履歴を復元しました。既存の教材は変更していません。');
+	expect(misskeyApi).toHaveBeenLastCalledWith('fukushu/materials/list', { archived: true });
+	expect(await screen.findByText('教材A')).toBeTruthy();
+	expect((screen.getByRole('button', { name: '再読み込み' }) as HTMLButtonElement).disabled).toBe(false);
+});

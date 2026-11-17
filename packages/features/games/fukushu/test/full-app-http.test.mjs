@@ -76,7 +76,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 	await step('bootstrap and password signin use production authentication', async () => {
 		const password = `Fukushu-${randomUUID()}`;
 		const admin = ok(await call('admin/accounts/create', { username: 'fukushu_admin', password, setupPassword: credentials.setupPassword }));
-		for (const username of ['fukushu_alice', 'fukushu_bob']) {
+		for (const username of ['fukushu_alice', 'fukushu_bob', 'fukushu_carol', 'fukushu_dana']) {
 			ok(await call('admin/accounts/create', { username, password }, admin.token));
 			// Keep the real IP rate limiter enabled: password logins are at least 1s apart.
 			await setTimeout(1100);
@@ -410,6 +410,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		await writeFile(credentialsPath, JSON.stringify(credentials, null, 2), { mode: 0o600 });
 	});
 	let backupFile;
+	let backupBytes;
 	let beforeBackup;
 	let beforeHistory;
 	await step('backup uses normal login, requires Drive visibility acknowledgement and denies scoped tokens', async () => {
@@ -418,7 +419,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.equal(anonymous.status, 400);
 		assert.equal(anonymous.body.error.code, 'ACCESS_DENIED');
 		const delegated = ok(await call('miauth/gen-token', { session: randomUUID(), permission: ['read:account', 'write:account', 'read:drive', 'write:drive'] }, alice.token)).token;
-		for (const denied of [await call('fukushu/backup/export', input, delegated, true), await call('fukushu/backup/inspect', { fileId: file.id }, delegated, true)]) {
+		for (const denied of [await call('fukushu/backup/export', input, delegated, true), await call('fukushu/backup/inspect', { fileId: file.id }, delegated, true), await call('fukushu/backup/restore', { fileId: file.id, confirmRestore: true }, delegated, true)]) {
 			assert.equal(denied.status, 400);
 			assert.equal(denied.body.error.code, 'ACCESS_DENIED');
 		}
@@ -443,6 +444,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		const response = await fetch(backupFile.url, { redirect: 'error', signal: AbortSignal.timeout(10_000) });
 		assert.equal(response.status, 200);
 		const bytes = Buffer.from(await response.arrayBuffer());
+		backupBytes = bytes;
 		const envelope = JSON.parse(bytes.toString());
 		assert.equal(envelope.format, 'misskey-fukushu-deck-backup');
 		assert.equal(envelope.sha256, createHash('sha256').update(JSON.stringify(envelope.payload)).digest('hex'));
@@ -484,6 +486,46 @@ test('real authentication, Drive, material maintenance and explanation versions'
 			assert.equal(rejected.status, 400);
 			assert.equal(rejected.body.error.code, code);
 		}
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
+		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
+	});
+	await step('restore rejects anonymous, foreign originals, absent confirmation and existing IDs without writes', async () => {
+		const input = { fileId: backupFile.id, confirmRestore: true };
+		const anonymous = await call('fukushu/backup/restore', input);
+		assert.equal(anonymous.status, 400); assert.equal(anonymous.body.error.code, 'ACCESS_DENIED');
+		assert.equal((await call('fukushu/backup/restore', { fileId: backupFile.id }, alice.token)).status, 400);
+		const foreign = await call('fukushu/backup/restore', input, bob.token);
+		assert.equal(foreign.status, 404); assert.equal(foreign.body.error.code, 'NO_SUCH_FILE');
+		const collision = await call('fukushu/backup/restore', input, alice.token);
+		assert.equal(collision.status, 409); assert.equal(collision.body.error.code, 'BACKUP_CONFLICT');
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
+		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
+	});
+	await step('owned backup restores all versions and history to the authenticated destination exactly once', async () => {
+		for (const name of ['carol', 'dana']) {
+			const owner = credentials[name]; const form = new FormData();
+			form.set('i', owner.token); form.set('file', new Blob([backupBytes], { type: 'application/json' }), 'native-restore.json');
+			const uploaded = ok(await readResponse(await fetch(`${origin}/api/drive/files/create`, { method: 'POST', body: form, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000) })));
+			owner.backupFileId = uploaded.id;
+			const inspection = ok(await call('fukushu/backup/inspect', { fileId: uploaded.id }, owner.token));
+			assert.deepEqual(inspection.conflicts, { deck: false, questions: 0, reviews: 0 });
+			if (name === 'dana') continue; // Fresh synthetic destination for Chrome verification.
+			const input = { fileId: uploaded.id, confirmRestore: true, ownerId: alice.id };
+			const result = ok(await call('fukushu/backup/restore', input, owner.token));
+			assert.deepEqual(result, { restored: true, deckId: ids.id, archived: false, questions: 2, versions: 5, studyStates: 2, reviews: 2 });
+			assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, owner.token)), beforeBackup);
+			assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, owner.token)), beforeHistory);
+			assert.deepEqual(ok(await call('fukushu/study/review', submitted, owner.token)), savedReview);
+			for (const item of beforeHistory) {
+				const questionId = item.record.questionId;
+				assert.deepEqual(ok(await call('fukushu/materials/card-versions', { id: ids.id, questionId }, owner.token)), ok(await call('fukushu/materials/card-versions', { id: ids.id, questionId }, alice.token)));
+			}
+			const retry = await call('fukushu/backup/restore', input, owner.token);
+			assert.equal(retry.status, 409); assert.equal(retry.body.error.code, 'BACKUP_CONFLICT');
+			assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, owner.token)), beforeHistory);
+		}
+		credentials.restoreOwner = 'dana';
+		await writeFile(credentialsPath, JSON.stringify(credentials, null, 2), { mode: 0o600 });
 		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
 		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
 	});

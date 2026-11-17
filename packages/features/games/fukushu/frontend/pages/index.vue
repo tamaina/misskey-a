@@ -86,7 +86,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkButton :disabled="pageIndex + 1 >= pageCount" @click="pageIndex++">{{ $locale.sfc.next }}</MkButton>
 				</div>
 			</template>
-			<BackupPanel :key="material?.deck.id ?? 'library'" :deckId="material?.deck.id" :disabled="busy || editing || studyActive || studyLocked"/>
+			<BackupPanel :key="material?.deck.id ?? 'library'" :deckId="material?.deck.id" :disabled="busy || editing || studyActive || studyLocked" @locked="backupLocked = $event" @restored="restoredBackup"/>
 		</div>
 	</div>
 </PageWithHeader>
@@ -119,7 +119,9 @@ const reloadRequired = ref(false);
 const pendingImportedId = ref<string | null>(null);
 const validDraft = computed(() => draftName.value.trim().length > 0 && draftName.value.length <= 256 && draftDescription.value.length <= 4096);
 const selectedFile = ref<{ id: string; name: string } | null>(null);
-const busy = ref(false);
+const operationBusy = ref(false);
+const backupLocked = ref(false);
+const busy = computed(() => operationBusy.value || backupLocked.value);
 const importing = ref(false);
 const loaded = ref(false);
 const error = ref('');
@@ -143,10 +145,16 @@ function message(cause: unknown) {
 
 async function perform(action: () => Promise<void>) {
 	if (busy.value || disposed) return;
-	busy.value = true;
+	operationBusy.value = true;
 	error.value = '';
 	notice.value = '';
-	try { await action(); } catch (cause) { if (!disposed) error.value = message(cause); } finally { busy.value = false; importing.value = false; }
+	try { await action(); } catch (cause) { if (!disposed) error.value = message(cause); } finally { operationBusy.value = false; importing.value = false; }
+}
+
+async function restoredBackup(result: { archived: boolean }) {
+	material.value = null; archivedList.value = result.archived;
+	await refresh();
+	if (!disposed) notice.value = $locale.value.sfc.backupRestored;
 }
 
 async function refresh() {
@@ -301,6 +309,7 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 	"import": "教材として保存",
 	"selected": "選択中",
 	"library": "保存した教材",
+	"backupRestored": "教材・保存した版・復習履歴を復元しました。既存の教材は変更していません。",
 	"reload": "再読み込み",
 	"loading": "読み込み中…",
 	"empty": "教材はまだありません。Drive のテキストファイルから取り込めます。",
@@ -362,6 +371,7 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 	"import": "Save as a material",
 	"selected": "Selected",
 	"library": "Saved materials",
+	"backupRestored": "Restored the deck, retained versions and review history. Existing materials were not changed.",
 	"reload": "Reload",
 	"loading": "Loading…",
 	"empty": "No materials yet. Import a text file from Drive.",

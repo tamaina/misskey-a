@@ -13,6 +13,7 @@ import { createApiProcedure } from '@features/api/backend/transport/api-procedur
 import { assertApiAuthorization, requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
+import { FukushuBackupRestorer } from './backup-restore.js';
 import { FukushuBackupInspector } from './backup-drive.js';
 import { FukushuBackupStore } from './backup-store.js';
 import { backupErrors } from './backup.contract.js';
@@ -34,11 +35,15 @@ async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect'>; enqueue(ownerId: string, deckId: string): Promise<void> }) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect'>; enqueue(ownerId: string, deckId: string): Promise<void> }) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
 	const studyStore = () => { if (!study) throw new StudyError('STUDY_UNAVAILABLE'); return study; };
 	return implement(fukushuContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
+		backupRestore: procedure(fukushuContract.backupRestore).use(principal).handler(({ input, context }) => invoke(async () => {
+			if (!backup?.restorer) throw new BackupError('BACKUP_FAILED');
+			return backup.restorer.restore(context.principal.id, input.fileId);
+		})),
 		backupExport: procedure(fukushuContract.backupExport).use(principal).handler(({ input, context }) => invoke(async () => {
 			if (!backup) throw new BackupError('BACKUP_FAILED');
 			await backup.store.assertOwned(context.principal.id, input.id);
@@ -83,9 +88,11 @@ export class FukushuApiProvider {
 				store,
 			);
 			const backupStore = new FukushuBackupStore(this.moduleRef.get(DI.db, { strict: false }));
+			const inspector = new FukushuBackupInspector(this.moduleRef.get(DI.driveFilesRepository, { strict: false }), this.moduleRef.get(InternalStorageService, { strict: false }), this.moduleRef.get(DownloadService, { strict: false }), backupStore);
 			this.router = createFukushuRouter(store, importer, new FukushuStudyStore(this.moduleRef.get(DI.db, { strict: false })), {
 				store: backupStore,
-				inspector: new FukushuBackupInspector(this.moduleRef.get(DI.driveFilesRepository, { strict: false }), this.moduleRef.get(InternalStorageService, { strict: false }), this.moduleRef.get(DownloadService, { strict: false }), backupStore),
+				inspector,
+				restorer: new FukushuBackupRestorer(this.moduleRef.get(DI.db, { strict: false }), inspector),
 				enqueue: async (ownerId, deckId) => { await this.moduleRef.get(QueueService, { strict: false }).createExportFukushuJob({ id: ownerId }, deckId); },
 			});
 		}

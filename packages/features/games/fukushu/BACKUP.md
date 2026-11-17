@@ -2,6 +2,10 @@
 
 Refs #310; depends on #328. Design recorded before implementation.
 
+This document describes the #330 export/inspection pilot. The subsequent
+[atomic native restore](RESTORE.md) adds conflict-free insertion without changing
+this file format or enabling upstream full-database replacement.
+
 ## Scope and existing convention
 
 Misskey's notes export uses a secure authenticated request, a database queue job,
