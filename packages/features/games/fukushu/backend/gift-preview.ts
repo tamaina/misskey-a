@@ -126,7 +126,6 @@ export interface ImportPreview {
 	sourceHash: string
 	diagnostics: GiftDiagnostic[]
 	questions: QuizQuestion[]
-	counts: Record<string, number>
 }
 export function previewGift(source: string, deckId: string): ImportPreview {
 	const parsed = parseGift(source);
