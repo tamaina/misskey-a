@@ -9,6 +9,7 @@ import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
 import { locales } from 'i18n';
 import escapes from './shared-global-locale-escapes.json';
+import { restoreJuiceMediaBaseline } from './juice-media-source-rebase.js';
 import type { RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
 
 // Independently pinned source hashes; translation values remain in locales/*.yml.
@@ -16676,6 +16677,7 @@ const globalValue = (dictionary: unknown, key: string): unknown => {
 export function restoreGlobalCatalogPilotSource(file: string, source: string): string {
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
 	if (!owner || sha256(source) === owner.baselineSha256) return source;
+	source = restoreJuiceMediaBaseline(file, source);
 	if (sha256(source) !== owner.currentSha256) throw new Error(`Global catalog pilot source differs: ${file}`);
 	// Reverse exact reviewed upstream follow-up edits made after the pilot before replaying it.
 	if ('edits' in owner) {
