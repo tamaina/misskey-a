@@ -45,7 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, useTemplateRef, watch, ref } from 'vue';
+import { computed, nextTick, useTemplateRef, watch, ref, onUnmounted } from 'vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkBlurhash from '@features/drive/frontend/components/MkBlurhash.vue';
 
@@ -102,13 +102,30 @@ function waitForDecode() {
 	}
 }
 
-watch([() => props.width, () => props.height, root], () => {
+function updateSize() {
 	const ratio = props.width / props.height;
-	const clientWidth = root.value?.clientWidth ?? 300;
+	const clientWidth = root.value?.clientWidth || 300;
 	imgWidth.value = clientWidth;
 	imgHeight.value = Math.round(clientWidth / ratio);
-}, {
+}
+
+watch([() => props.width, () => props.height, root], updateSize, {
 	immediate: true,
+});
+
+// CW uses v-show: recalculate when the previously hidden container gains a size.
+let resizeObserver: ResizeObserver | null = null;
+watch(root, (element) => {
+	resizeObserver?.disconnect();
+	resizeObserver = null;
+	if (element == null || typeof ResizeObserver === 'undefined') return;
+	resizeObserver = new ResizeObserver(updateSize);
+	resizeObserver.observe(element);
+}, { immediate: true });
+
+onUnmounted(() => {
+	resizeObserver?.disconnect();
+	resizeObserver = null;
 });
 
 watch(() => props.src, () => {

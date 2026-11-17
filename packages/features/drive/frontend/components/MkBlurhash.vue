@@ -95,9 +95,10 @@ watch([() => props.width, () => props.height, canvas], () => {
 	immediate: true,
 });
 
-watch(() => props.blurhash, () => {
+// Changing canvas dimensions clears its pixels; draw after Vue updates the DOM.
+watch([canvasWidth, canvasHeight, canvas, () => props.blurhash], () => {
 	draw();
-});
+}, { flush: 'post' });
 
 function drawImage(bitmap: CanvasImageSource) {
 	// canvasがない（mountedされていない）場合はTmpに保存しておく
