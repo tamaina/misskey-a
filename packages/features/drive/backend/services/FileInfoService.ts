@@ -77,7 +77,7 @@ export class FileInfoService {
 		let type = await this.detectType(path);
 
 		if (type.mime === TYPE_OCTET_STREAM.mime && opts.fileName != null) {
-			const ext = opts.fileName.split('.').pop();
+			const ext = opts.fileName.split('.').pop()?.toLowerCase();
 			if (ext === 'txt') {
 				type = {
 					mime: 'text/plain',
@@ -87,6 +87,11 @@ export class FileInfoService {
 				type = {
 					mime: 'text/csv',
 					ext: 'csv',
+				};
+			} else if (ext === 'tsv') {
+				type = {
+					mime: 'text/tab-separated-values',
+					ext: 'tsv',
 				};
 			} else if (ext === 'json') {
 				type = {
