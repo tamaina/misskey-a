@@ -1789,6 +1789,8 @@ declare namespace entities {
         FukushuStudyReviewResponse,
         FukushuStudyHistoryRequest,
         FukushuStudyHistoryResponse,
+        FukushuBackupInspectUpstreamRequest,
+        FukushuBackupInspectUpstreamResponse,
         FukushuBackupRestoreRequest,
         FukushuBackupRestoreResponse,
         FukushuBackupExportRequest,
@@ -3802,6 +3804,12 @@ type FukushuBackupInspectRequest = ContractRequest<'fukushu/backup/inspect'>;
 
 // @public (undocumented)
 type FukushuBackupInspectResponse = ContractResponse<'fukushu/backup/inspect'>;
+
+// @public (undocumented)
+type FukushuBackupInspectUpstreamRequest = ContractRequest<'fukushu/backup/inspect-upstream'>;
+
+// @public (undocumented)
+type FukushuBackupInspectUpstreamResponse = ContractResponse<'fukushu/backup/inspect-upstream'>;
 
 // @public (undocumented)
 type FukushuBackupRestoreRequest = ContractRequest<'fukushu/backup/restore'>;

@@ -129,3 +129,18 @@ test('retains the Drive file when notification fails and still removes temporary
 	await expect(f.execute()).rejects.toThrow('Notification unavailable');
 	expect(f.drive.addFile).toHaveBeenCalledTimes(1); await expect(access(f.path())).rejects.toThrow();
 });
+
+test('upstream inspection reuses the owned bounded reader without calling native inspection or any writer', async () => {
+	const f = inspectorFixture();
+	const bytes = await readFile('../features/games/fukushu/test/backend/fixtures/upstream-backup.fukushu');
+	Object.assign(f.file, { name: 'original.fukushu', size: bytes.length, md5: createHash('md5').update(bytes).digest('hex') });
+	f.storage.read.mockImplementation(() => Readable.from([bytes]));
+	expect(await f.inspector.inspectUpstream('alice', 'owned-file')).toMatchObject({ imported: false, canImport: false, counts: { reviewLogs: 2 } });
+	expect(f.files.findOneBy).toHaveBeenCalledWith({ id: 'owned-file', userId: 'alice' });
+	expect(f.store.inspect).not.toHaveBeenCalled();
+	f.file.userId = 'bob'; f.storage.read.mockClear();
+	await expect(f.inspector.inspectUpstream('alice', 'owned-file')).rejects.toThrow('NO_SUCH_FILE');
+	expect(f.storage.read).not.toHaveBeenCalled();
+	f.file.userId = 'alice'; f.file.md5 = 'changed';
+	await expect(f.inspector.inspectUpstream('alice', 'owned-file')).rejects.toThrow('BACKUP_FAILED');
+});

@@ -109,6 +109,8 @@ import type {
 	FukushuStudyReviewResponse,
 	FukushuStudyHistoryRequest,
 	FukushuStudyHistoryResponse,
+	FukushuBackupInspectUpstreamRequest,
+	FukushuBackupInspectUpstreamResponse,
 	FukushuBackupRestoreRequest,
 	FukushuBackupRestoreResponse,
 	FukushuBackupExportRequest,
@@ -894,6 +896,7 @@ export type Endpoints = {
 	'fukushu/study/queue': { req: FukushuStudyQueueRequest; res: FukushuStudyQueueResponse };
 	'fukushu/study/review': { req: FukushuStudyReviewRequest; res: FukushuStudyReviewResponse };
 	'fukushu/study/history': { req: FukushuStudyHistoryRequest; res: FukushuStudyHistoryResponse };
+	'fukushu/backup/inspect-upstream': { req: FukushuBackupInspectUpstreamRequest; res: FukushuBackupInspectUpstreamResponse };
 	'fukushu/backup/restore': { req: FukushuBackupRestoreRequest; res: FukushuBackupRestoreResponse };
 	'fukushu/backup/export': { req: FukushuBackupExportRequest; res: EmptyResponse };
 	'fukushu/backup/inspect': { req: FukushuBackupInspectRequest; res: FukushuBackupInspectResponse };

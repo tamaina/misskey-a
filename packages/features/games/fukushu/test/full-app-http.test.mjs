@@ -419,7 +419,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.equal(anonymous.status, 400);
 		assert.equal(anonymous.body.error.code, 'ACCESS_DENIED');
 		const delegated = ok(await call('miauth/gen-token', { session: randomUUID(), permission: ['read:account', 'write:account', 'read:drive', 'write:drive'] }, alice.token)).token;
-		for (const denied of [await call('fukushu/backup/export', input, delegated, true), await call('fukushu/backup/inspect', { fileId: file.id }, delegated, true), await call('fukushu/backup/restore', { fileId: file.id, confirmRestore: true }, delegated, true)]) {
+		for (const denied of [await call('fukushu/backup/inspect-upstream', { fileId: file.id }, delegated, true), await call('fukushu/backup/export', input, delegated, true), await call('fukushu/backup/inspect', { fileId: file.id }, delegated, true), await call('fukushu/backup/restore', { fileId: file.id, confirmRestore: true }, delegated, true)]) {
 			assert.equal(denied.status, 400);
 			assert.equal(denied.body.error.code, 'ACCESS_DENIED');
 		}
@@ -528,5 +528,29 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		await writeFile(credentialsPath, JSON.stringify(credentials, null, 2), { mode: 0o600 });
 		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
 		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
+	});
+	await step('upstream binary inspection uses owned Drive and reports unknown history without importing or changing schedules', async () => {
+		const bytes = await readFile(new URL('./backend/fixtures/upstream-backup.fukushu', import.meta.url));
+		const owner = credentials.dana; const form = new FormData();
+		form.set('i', owner.token); form.set('file', new Blob([bytes], { type: 'application/octet-stream' }), 'upstream-history.fukushu');
+		const uploaded = ok(await readResponse(await fetch(`${origin}/api/drive/files/create`, { method: 'POST', body: form, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000) })));
+		const before = ok(await call('fukushu/materials/list', {}, owner.token));
+		const input = { fileId: uploaded.id };
+		const anonymous = await call('fukushu/backup/inspect-upstream', input);
+		assert.equal(anonymous.status, 400); assert.equal(anonymous.body.error.code, 'ACCESS_DENIED');
+		const foreign = await call('fukushu/backup/inspect-upstream', input, alice.token);
+		assert.equal(foreign.status, 404); assert.equal(foreign.body.error.code, 'NO_SUCH_FILE');
+		const report = ok(await call('fukushu/backup/inspect-upstream', { ...input, ownerId: alice.id }, owner.token));
+		assert.equal(report.imported, false); assert.equal(report.canImport, false); assert.equal(report.exportedAt, null);
+		assert.deepEqual(report.counts, { decks: 1, questions: 2, studyStates: 1, reviewLogs: 2, importSources: 1, media: 1, imports: 1 });
+		for (const row of report.history) {
+			assert.equal(row.questionSnapshot, 'unavailable'); assert.equal(row.cardBefore, null); assert.equal(row.cardAfter, null); assert.equal(row.scheduler, null);
+			assert.equal(Object.hasOwn(row, 'question'), false); assert.equal(Object.hasOwn(row, 'questionVersion'), false);
+		}
+		assert.deepEqual(ok(await call('fukushu/materials/list', {}, owner.token)), before);
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
+		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
+		credentials.upstreamOwner = 'dana'; credentials.dana.upstreamFileId = uploaded.id;
+		await writeFile(credentialsPath, JSON.stringify(credentials, null, 2), { mode: 0o600 });
 	});
 });

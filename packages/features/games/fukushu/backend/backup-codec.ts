@@ -10,7 +10,7 @@ import { backupEnvelopeSchema, backupPayloadSchema, MAX_BACKUP_BYTES } from '../
 import type { BackupPayload } from '../shared/backup.schema.js';
 
 export class BackupError extends Error {
-	constructor(public readonly code: 'BACKUP_CONFLICT' | 'BACKUP_LIMIT' | 'INVALID_BACKUP' | 'BACKUP_TOO_LARGE' | 'UPSTREAM_BACKUP_UNSUPPORTED' | 'BACKUP_FAILED') { super(code); }
+	constructor(public readonly code: 'UPSTREAM_INSPECTION_LIMIT' | 'BACKUP_CONFLICT' | 'BACKUP_LIMIT' | 'INVALID_BACKUP' | 'BACKUP_TOO_LARGE' | 'UPSTREAM_BACKUP_UNSUPPORTED' | 'BACKUP_FAILED') { super(code); }
 }
 
 const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');

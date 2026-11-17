@@ -5,6 +5,7 @@
 
 import { createHash } from 'node:crypto';
 import { MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
+import { inspectUpstreamBackup } from './upstream-backup.js';
 import { BackupError, decodeBackup } from './backup-codec.js';
 import { readDriveOriginal } from './drive-original.js';
 import { MaterialError } from './store.js';
@@ -23,6 +24,10 @@ export class FukushuBackupInspector {
 
 	async inspect(ownerId: string, fileId: string) {
 		return this.store.inspect(ownerId, decodeBackup(await this.read(ownerId, fileId)));
+	}
+
+	async inspectUpstream(ownerId: string, fileId: string) {
+		return inspectUpstreamBackup(await this.read(ownerId, fileId));
 	}
 
 	async read(ownerId: string, fileId: string): Promise<Buffer> {

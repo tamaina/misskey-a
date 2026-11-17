@@ -5,16 +5,16 @@ Refs #310. Depends on #332. Design recorded before implementation.
 ## Evidence
 
 Pinned upstream: `tamaina/fukushu@0efee271a13f15096beb8cbaaea25092c5927b29`.
-`application/backupArchive.ts` writes `FUKUSHU-BACKUP-1\n`, little-endian uint32
+[`application/backupArchive.ts`](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/application/backupArchive.ts) writes `FUKUSHU-BACKUP-1\n`, little-endian uint32
 JSON lengths, strict store/value metadata and optional raw binary, followed by
 64 lowercase ASCII hex bytes of SHA-256 over everything before the checksum.
 There is no archive export timestamp or application commit in the binary header.
-`backup.ts` validates records/references, then replaces eight IndexedDB stores
+[`backup.ts`](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/application/backup.ts) validates records/references, then replaces eight IndexedDB stores
 in one transaction. That replacement policy must not be carried into 9k.
 
 `ReviewLogRecord` retains rating/correct, answers, duration and `fsrsLog`, but no
 historical question snapshot/version, scheduler retention/fuzz/version, request
-UUID semantics, or full before/after card. `HistoryView.vue` resolves the current
+UUID semantics, or full before/after card. [`HistoryView.vue`](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/views/HistoryView.vue) resolves the current
 question for its label. `StudyStateRecord` is a current state, not proof of the
 state after any particular historical review. Settings are also current values.
 Never use them to invent missing historical facts, replay FSRS, or regrade answers.
@@ -54,3 +54,27 @@ regrading. On any unsupported component, reject the whole import and retain the
 source. Binary/media storage requires its own failure/cleanup boundary before
 APKG imports can be enabled. Review this representation as a small follow-up
 before extending to full upstream migration.
+
+## Supported inspection limits and evidence
+
+The pilot accepts at most 8 MiB and 20,000 total records: exactly one settings
+record, at most 100 decks, 1,000 questions, 1,000 study states, and 10,000 each of
+reviews, import sources, media and import operations. The total limit can reject
+an archive even if every per-store limit passes. Requiring a settings record is
+stricter than the upstream reader's fallback; missing settings are not fabricated.
+Missing source order is reported, not normalized. The response returns counts and
+the newest 20 history summaries, not question bodies, answers or raw media.
+
+The binary fixture and provenance in `test/backend/fixtures` were produced by the
+unchanged pinned upstream writer using synthetic cursor/hash adapters. It includes
+all eight stores, current cards updated after two reviews, a current FSRS state
+with more repetitions than saved logs, SVG bytes and synthetic archive bytes.
+This establishes writer framing/schema compatibility for these cases, not a full
+upstream browser export/restore round trip or valid APKG/media import. No real
+user archive has been read or changed. Older JSON, arbitrary historical writer
+versions and production-sized collections remain unverified.
+
+The normal-login-only `fukushu/backup/inspect-upstream` endpoint checks ownership
+before opening the Drive original, reuses original size/MD5/storage handling, and
+has no database write or queue dependency. It cannot call native restore. The
+checksum is an integrity check, not authentication of an archive's author.

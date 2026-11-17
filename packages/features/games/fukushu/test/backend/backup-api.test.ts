@@ -76,3 +76,20 @@ test('restore requires normal login, explicit confirmation and server-owned iden
 		await expect(call(api.backupRestore, value, { context: testContext(user) })).rejects.toMatchObject({ code, status });
 	}
 });
+
+test('upstream inspection is normal-login only, binds the owner and has no write or restore calls', async () => {
+	const { api, backup, user } = fixture();
+	const input = { fileId: '9x5n8yd9' };
+	await expect(call(api.upstreamInspect, input, { context: testContext(null) })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+	await expect(call(api.upstreamInspect, input, { context: testContext(user, { permission: ['read:account', 'write:account', 'read:drive', 'write:drive'] }) })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+	expect(backup.inspector.inspectUpstream).not.toHaveBeenCalled();
+	await call(api.upstreamInspect, { ...input, ownerId: 'bob' } as never, { context: testContext(user) });
+	expect(backup.inspector.inspectUpstream).toHaveBeenCalledWith('alice', input.fileId);
+	expect(backup.enqueue).not.toHaveBeenCalled(); expect(backup.restorer.restore).not.toHaveBeenCalled(); expect(backup.store.assertOwned).not.toHaveBeenCalled();
+	for (const code of ['INVALID_BACKUP', 'BACKUP_TOO_LARGE', 'UPSTREAM_INSPECTION_LIMIT', 'BACKUP_FAILED'] as const) {
+		backup.inspector.inspectUpstream.mockRejectedValueOnce(new BackupError(code));
+		await expect(call(api.upstreamInspect, input, { context: testContext(user) })).rejects.toMatchObject({ code, status: 400 });
+	}
+	backup.inspector.inspectUpstream.mockRejectedValueOnce(new MaterialError('NO_SUCH_FILE'));
+	await expect(call(api.upstreamInspect, input, { context: testContext(user) })).rejects.toMatchObject({ code: 'NO_SUCH_FILE', status: 404 });
+});

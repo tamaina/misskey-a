@@ -87,6 +87,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 			</template>
 			<BackupPanel :key="material?.deck.id ?? 'library'" :deckId="material?.deck.id" :disabled="busy || editing || studyActive || studyLocked" @locked="backupLocked = $event" @restored="restoredBackup"/>
+			<UpstreamBackupPanel :disabled="busy || editing || studyActive || studyLocked"/>
 		</div>
 	</div>
 </PageWithHeader>
@@ -102,6 +103,7 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import * as os from '@features/ui/frontend/os.js';
+import UpstreamBackupPanel from '../components/UpstreamBackupPanel.vue';
 import BackupPanel from '../components/BackupPanel.vue';
 import StudyPanel from '../components/StudyPanel.vue';
 import type { FukushuMaterial } from '../../shared/material.schema.js';

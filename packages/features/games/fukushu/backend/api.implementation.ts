@@ -35,11 +35,15 @@ async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect'>; enqueue(ownerId: string, deckId: string): Promise<void> }) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
 	const studyStore = () => { if (!study) throw new StudyError('STUDY_UNAVAILABLE'); return study; };
 	return implement(fukushuContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
+		upstreamInspect: procedure(fukushuContract.upstreamInspect).use(principal).handler(({ input, context }) => invoke(async () => {
+			if (!backup) throw new BackupError('BACKUP_FAILED');
+			return backup.inspector.inspectUpstream(context.principal.id, input.fileId);
+		})),
 		backupRestore: procedure(fukushuContract.backupRestore).use(principal).handler(({ input, context }) => invoke(async () => {
 			if (!backup?.restorer) throw new BackupError('BACKUP_FAILED');
 			return backup.restorer.restore(context.principal.id, input.fileId);

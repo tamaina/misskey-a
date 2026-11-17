@@ -102,3 +102,20 @@ own `fukushu_restore_test` schema and removes it only if this run created it; an
 existing schema makes setup fail without dropping it. Run the feature backend
 Vitest tests with one worker under the same global validation lock, then stop only
 the fixture cluster. These PostgreSQL cases are skipped without the opt-in variable.
+
+## Upstream binary inspection extension
+
+`backend/fixtures/upstream-backup.fukushu` contains synthetic data from all eight
+upstream stores. Its adjacent provenance JSON pins the original writer source
+commit, source hash, fixture hash and adapter-based generation method. Current
+cards postdate its review records; the inspector must not use them as historical
+snapshots. The archive bytes are synthetic and do not establish APKG compatibility.
+
+`backend/upstream-backup.test.ts` checks that fixture, framing, checksums, strict
+schemas, reference/identity consistency, bounded counts, binary integrity and
+explicitly unavailable historical snapshots. The HTTP scenario uploads this
+fixture through actual Drive as a synthetic owner, inspects with a real normal
+login, rejects anonymous/scoped/foreign access, and checks that both that owner's
+empty library and the existing source library/history are unchanged.
+`credentials.upstreamOwner` identifies this synthetic account for Chrome. This
+is inspection only; it does not assert that upstream history was imported.
