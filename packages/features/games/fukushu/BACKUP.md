@@ -23,8 +23,10 @@ this feature does not introduce public links, access keys, or a new privacy mode
 
 ## Upstream compatibility
 
-Reference: tamaina/fukushu@0efee271a13f15096beb8cbaaea25092c5927b29,
-`docs/backup-support.md`, `application/backup.ts`, `backupArchive.ts`, and DB schema.
+Reference: tamaina/fukushu@0efee271a13f15096beb8cbaaea25092c5927b29:
+[backup format](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/docs/backup-support.md),
+[validation and replacement](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/application/backup.ts),
+[archive records](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/application/backupArchive.ts).
 
 - Current `.fukushu` starts with `FUKUSHU-BACKUP-1\n`, contains length-prefixed
   store records and optional raw media/source binaries, and ends in a SHA-256
@@ -82,6 +84,24 @@ or merge. Preserve upstream records whose exact historical card content is unkno
 with truthful provenance instead of fabricating version snapshots. Media/APKG,
 settings, quiz, cross-owner mapping and full-account restore remain unimplemented.
 
+### Follow-up import boundary
+
+| Source data | Preserve | Decision before apply support |
+| --- | --- | --- |
+| Native 9k snapshot | All original IDs, current and saved question versions, before/after state, request UUID and scheduler parameters | Conflict-free insertion only in one owner-scoped transaction; collisions fail as a whole, with no silent remapping or upsert |
+| Upstream studyStates | Saved due, stability, difficulty, repetitions, suspension/bury flags and timestamps | Keep the saved state directly; never derive it by replaying review logs |
+| Upstream reviewLogs | Original IDs, rating, correct, response, FSRS log, duration and optional Anki origin | Add explicit imported provenance and unavailable historical-question evidence; do not attach current question text as if it were the reviewed version |
+| Upstream deck/questions and attachments | Stable deck/question/source identities, source APKG and media references | Validate all referenced sources/media before writing; reject unsupported records together rather than stripping them |
+
+A native restore cannot be authorized merely by this inspection result. Re-read
+and validate the original bytes, limits and all collisions at apply time, then
+insert the entire selected deck atomically under the existing owner lock. Repeated
+imports must detect existing IDs instead of duplicating history. No replace/merge,
+owner-wide clear, regrading or scheduler reset is part of the initial policy.
+Upstream history may use non-UUID IDs and lack 9k's request/revision chain; accepting
+it through the native schema would silently misrepresent that data. A separate
+imported-history representation is needed before upstream apply can be implemented.
+
 ## Verification
 
 Test consistent export during concurrent review/edit, owner isolation, archived
@@ -90,3 +110,12 @@ size/count bounds, collisions and no database changes after inspection. Cover
 Drive original validation, failures and notification ordering. Exercise real
 PostgreSQL, queue/Drive/API wiring and the actual Chrome UI in an isolated instance.
 All heavy checks share the host validation lock; existing dependencies stay read-only.
+
+The PostgreSQL regression suites are opt-in through `FUKUSHU_TEST_SOCKET`, using
+an owned disposable PostgreSQL server on Unix socket port 55474 with user
+`fukushu` and database `postgres`. They create/drop only their dedicated test
+schemas and must not be pointed at a shared or production database. The full
+application HTTP regression is separately opt-in through `FUKUSHU_E2E_RUN_DIR`
+and checks its private directory, owner marker, loopback URL and isolated DB/
+Redis configuration before using synthetic accounts. Neither opt-in test should
+be represented as having run merely because the default CI suite passed.

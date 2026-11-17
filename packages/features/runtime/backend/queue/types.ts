@@ -50,6 +50,7 @@ export type DbJobMap = {
 	exportCustomEmojis: DbJobDataWithUser;
 	exportAntennas: DBExportAntennasData;
 	exportNotes: DbJobDataWithUser;
+	exportFukushu: DbExportFukushuData;
 	exportFavorites: DbJobDataWithUser;
 	exportFollowing: DbExportFollowingData;
 	exportMuting: DbJobDataWithUser;
@@ -65,6 +66,8 @@ export type DbJobMap = {
 	importCustomEmojis: DbUserImportJobData;
 	deleteAccount: DbUserDeleteJobData;
 };
+
+export type DbExportFukushuData = { user: ThinUser; deckId: string };
 
 export type DbJobDataWithUser = {
 	user: ThinUser;

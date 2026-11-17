@@ -4,7 +4,7 @@
  */
 
 import assert from 'node:assert/strict';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { lstat, readFile, realpath, writeFile } from 'node:fs/promises';
 import { isAbsolute, join, resolve } from 'node:path';
 import { test } from 'node:test';
@@ -408,5 +408,83 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.equal(remaining.items[0].question.payload.typeAnswer, true);
 		credentials.studyOwner = 'bob';
 		await writeFile(credentialsPath, JSON.stringify(credentials, null, 2), { mode: 0o600 });
+	});
+	let backupFile;
+	let beforeBackup;
+	let beforeHistory;
+	await step('backup uses normal login, requires Drive visibility acknowledgement and denies scoped tokens', async () => {
+		const input = { id: ids.id, acknowledgeDriveVisibility: true };
+		const anonymous = await call('fukushu/backup/export', input);
+		assert.equal(anonymous.status, 400);
+		assert.equal(anonymous.body.error.code, 'ACCESS_DENIED');
+		const delegated = ok(await call('miauth/gen-token', { session: randomUUID(), permission: ['read:account', 'write:account', 'read:drive', 'write:drive'] }, alice.token)).token;
+		for (const denied of [await call('fukushu/backup/export', input, delegated, true), await call('fukushu/backup/inspect', { fileId: file.id }, delegated, true)]) {
+			assert.equal(denied.status, 400);
+			assert.equal(denied.body.error.code, 'ACCESS_DENIED');
+		}
+		assert.equal((await call('fukushu/backup/export', { id: ids.id }, alice.token)).status, 400);
+		assert.equal((await call('fukushu/backup/export', { id: 'missing-deck', acknowledgeDriveVisibility: true }, alice.token)).status, 404);
+	});
+	await step('real queue exports the full deck and pinned history into Drive then sends exportCompleted', async () => {
+		beforeBackup = ok(await call('fukushu/materials/show', { id: ids.id }, alice.token));
+		beforeHistory = ok(await call('fukushu/study/history', { id: ids.id }, alice.token));
+		ok(await call('fukushu/backup/export', { id: ids.id, acknowledgeDriveVisibility: true }, alice.token), 204);
+		const deadline = Date.now() + 30_000;
+		while (!backupFile && Date.now() < deadline) {
+			const notifications = ok(await call('i/notifications', { includeTypes: ['exportCompleted'], limit: 10 }, alice.token));
+			const completed = notifications.find(n => n.exportedEntity === 'fukushu');
+			if (completed) backupFile = ok(await call('drive/files/show', { fileId: completed.fileId }, alice.token));
+			else await setTimeout(300);
+		}
+		assert.ok(backupFile, 'Queue must produce a Drive file and a completion notification');
+		assert.match(backupFile.name, /^fukushu-backup-.*\.json$/);
+		assert.ok(backupFile.size > 0);
+		assert.equal(new URL(backupFile.url).origin, origin, 'Synthetic test artifact must remain on the owned application');
+		const response = await fetch(backupFile.url, { redirect: 'error', signal: AbortSignal.timeout(10_000) });
+		assert.equal(response.status, 200);
+		const bytes = Buffer.from(await response.arrayBuffer());
+		const envelope = JSON.parse(bytes.toString());
+		assert.equal(envelope.format, 'misskey-fukushu-deck-backup');
+		assert.equal(envelope.sha256, createHash('sha256').update(JSON.stringify(envelope.payload)).digest('hex'));
+		assert.deepEqual(envelope.payload.material, { deck: beforeBackup.deck, questions: beforeBackup.questions });
+		assert.equal(envelope.payload.reviews.length, 2);
+		assert.equal(envelope.payload.versions.length, 5);
+		assert.equal(envelope.payload.states.length, 2);
+		for (const item of beforeHistory) {
+			const saved = envelope.payload.reviews.find(row => row.id === item.id);
+			assert.deepEqual(saved.data, item.record);
+			assert.deepEqual(saved.after, item.card);
+			assert.deepEqual(envelope.payload.versions.find(row => row.questionId === saved.questionId && row.version === saved.questionVersion).data, item.question);
+			assert.equal(saved.request.requestId, item.id);
+		}
+		assert.equal(JSON.stringify(envelope).includes(alice.id), false);
+		credentials.backupFileId = backupFile.id;
+		await writeFile(credentialsPath, JSON.stringify(credentials, null, 2), { mode: 0o600 });
+	});
+	await step('restore inspection reads an owned Drive original without changing materials, versions or schedules', async () => {
+		const report = ok(await call('fukushu/backup/inspect', { fileId: backupFile.id }, alice.token));
+		assert.equal(report.restored, false);
+		assert.equal(report.questions, 2);
+		assert.equal(report.versions, 5);
+		assert.equal(report.reviews, 2);
+		assert.deepEqual(report.conflicts, { deck: true, questions: 2, reviews: 2 });
+		const foreign = await call('fukushu/backup/inspect', { fileId: backupFile.id }, bob.token);
+		assert.equal(foreign.status, 404);
+		assert.equal(foreign.body.error.code, 'NO_SUCH_FILE');
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
+		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
+	});
+	await step('corrupt and upstream files are refused explicitly without partially importing history', async () => {
+		for (const [data, code] of [['{}', 'INVALID_BACKUP'], [JSON.stringify({ format: 'gift-fsrs-learning-backup', version: 3 }), 'UPSTREAM_BACKUP_UNSUPPORTED']]) {
+			const form = new FormData();
+			form.set('i', alice.token);
+			form.set('file', new Blob([data], { type: 'application/json' }), `${code}.json`);
+			const uploaded = ok(await readResponse(await fetch(`${origin}/api/drive/files/create`, { method: 'POST', body: form, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000) })));
+			const rejected = await call('fukushu/backup/inspect', { fileId: uploaded.id }, alice.token);
+			assert.equal(rejected.status, 400);
+			assert.equal(rejected.body.error.code, code);
+		}
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
+		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
 	});
 });

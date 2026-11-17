@@ -212,6 +212,7 @@ const exportEntityName = {
 	blocking: globalLocale.value.env.blockedUsers,
 	clip: globalLocale.value.env.clips,
 	customEmoji: globalLocale.value.env.customEmojis,
+	fukushu: 'Fukushu',
 	favorite: globalLocale.value.env.favorites,
 	following: globalLocale.value.env.following,
 	muting: globalLocale.value.env.mutedUsers,

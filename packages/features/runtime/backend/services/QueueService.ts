@@ -332,6 +332,15 @@ export class QueueService {
 	}
 
 	@bindThis
+	public createExportFukushuJob(user: ThinUser, deckId: string) {
+		return this.dbQueue.add('exportFukushu', { user: { id: user.id }, deckId }, {
+			attempts: 1,
+			removeOnComplete: { age: 3600 * 24 * 7, count: 30 },
+			removeOnFail: { age: 3600 * 24 * 7, count: 100 },
+		});
+	}
+
+	@bindThis
 	public createExportNotesJob(user: ThinUser) {
 		return this.dbQueue.add('exportNotes', {
 			user: { id: user.id },

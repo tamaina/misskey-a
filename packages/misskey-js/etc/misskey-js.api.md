@@ -1789,6 +1789,9 @@ declare namespace entities {
         FukushuStudyReviewResponse,
         FukushuStudyHistoryRequest,
         FukushuStudyHistoryResponse,
+        FukushuBackupExportRequest,
+        FukushuBackupInspectRequest,
+        FukushuBackupInspectResponse,
         FukushuMaterialsListRequest,
         FukushuMaterialsListResponse,
         FukushuMaterialsImportRequest,
@@ -3788,6 +3791,15 @@ type FollowingUpdateResponse = ContractResponse<'following/update'>;
 
 // @public (undocumented)
 export const followingVisibilities: readonly ["public", "followers", "private"];
+
+// @public (undocumented)
+type FukushuBackupExportRequest = ContractRequest<'fukushu/backup/export'>;
+
+// @public (undocumented)
+type FukushuBackupInspectRequest = ContractRequest<'fukushu/backup/inspect'>;
+
+// @public (undocumented)
+type FukushuBackupInspectResponse = ContractResponse<'fukushu/backup/inspect'>;
 
 // @public (undocumented)
 type FukushuMaterialsArchiveRequest = ContractRequest<'fukushu/materials/archive'>;

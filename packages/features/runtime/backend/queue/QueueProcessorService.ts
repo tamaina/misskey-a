@@ -24,6 +24,7 @@ import { DeliverProcessorService } from '@features/federation/backend/jobs/Deliv
 import { InboxProcessorService } from '@features/federation/backend/jobs/InboxProcessorService.js';
 import { DeleteDriveFilesProcessorService } from '@features/drive/backend/jobs/DeleteDriveFilesProcessorService.js';
 import { ExportCustomEmojisProcessorService } from '@features/emojis/backend/jobs/ExportCustomEmojisProcessorService.js';
+import { ExportFukushuProcessorService } from '@features/games/fukushu/backend/jobs/ExportFukushuProcessorService.js';
 import { ExportNotesProcessorService } from '@features/notes/backend/jobs/ExportNotesProcessorService.js';
 import { ExportClipsProcessorService } from '@features/collections/backend/jobs/ExportClipsProcessorService.js';
 import { ExportFollowingProcessorService } from '@features/relationships/backend/jobs/ExportFollowingProcessorService.js';
@@ -113,6 +114,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		private inboxProcessorService: InboxProcessorService,
 		private deleteDriveFilesProcessorService: DeleteDriveFilesProcessorService,
 		private exportCustomEmojisProcessorService: ExportCustomEmojisProcessorService,
+		private exportFukushuProcessorService: ExportFukushuProcessorService,
 		private exportNotesProcessorService: ExportNotesProcessorService,
 		private exportClipsProcessorService: ExportClipsProcessorService,
 		private exportFavoritesProcessorService: ExportFavoritesProcessorService,
@@ -224,6 +226,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 				switch (job.name) {
 					case 'deleteDriveFiles': return this.deleteDriveFilesProcessorService.process(job);
 					case 'exportCustomEmojis': return this.exportCustomEmojisProcessorService.process(job);
+					case 'exportFukushu': return this.exportFukushuProcessorService.process(job);
 					case 'exportNotes': return this.exportNotesProcessorService.process(job);
 					case 'exportClips': return this.exportClipsProcessorService.process(job);
 					case 'exportFavorites': return this.exportFavoritesProcessorService.process(job);

@@ -4,8 +4,6 @@
  */
 
 import { Module } from '@nestjs/common';
-import { CoreModule } from './CoreModule.js';
-import { GlobalModule } from './GlobalModule.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import { QueueProcessorService } from '@features/runtime/backend/queue/QueueProcessorService.js';
 import { DeliverProcessorService } from '@features/federation/backend/jobs/DeliverProcessorService.js';
@@ -30,6 +28,7 @@ import { ExportBlockingProcessorService } from '@features/relationships/backend/
 import { ExportCustomEmojisProcessorService } from '@features/emojis/backend/jobs/ExportCustomEmojisProcessorService.js';
 import { ExportFollowingProcessorService } from '@features/relationships/backend/jobs/ExportFollowingProcessorService.js';
 import { ExportMutingProcessorService } from '@features/relationships/backend/jobs/ExportMutingProcessorService.js';
+import { ExportFukushuProcessorService } from '@features/games/fukushu/backend/jobs/ExportFukushuProcessorService.js';
 import { ExportNotesProcessorService } from '@features/notes/backend/jobs/ExportNotesProcessorService.js';
 import { ExportClipsProcessorService } from '@features/collections/backend/jobs/ExportClipsProcessorService.js';
 import { ExportUserListsProcessorService } from '@features/relationships/backend/jobs/ExportUserListsProcessorService.js';
@@ -45,6 +44,8 @@ import { TickChartsProcessorService } from '@features/statistics/backend/jobs/Ti
 import { AggregateRetentionProcessorService } from '@features/statistics/backend/jobs/AggregateRetentionProcessorService.js';
 import { ExportFavoritesProcessorService } from '@features/collections/backend/jobs/ExportFavoritesProcessorService.js';
 import { RelationshipProcessorService } from '@features/relationships/backend/jobs/RelationshipProcessorService.js';
+import { GlobalModule } from './GlobalModule.js';
+import { CoreModule } from './CoreModule.js';
 
 @Module({
 	imports: [
@@ -63,6 +64,7 @@ import { RelationshipProcessorService } from '@features/relationships/backend/jo
 		DeleteDriveFilesProcessorService,
 		ExportCustomEmojisProcessorService,
 		ExportNotesProcessorService,
+		ExportFukushuProcessorService,
 		ExportClipsProcessorService,
 		ExportFavoritesProcessorService,
 		ExportFollowingProcessorService,
