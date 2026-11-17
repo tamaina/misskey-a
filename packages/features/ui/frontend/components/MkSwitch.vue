@@ -8,6 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<input
 		ref="input"
 		type="checkbox"
+		:checked="checked"
 		:disabled="disabled"
 		:class="$style.input"
 		@click="toggle"

@@ -29,10 +29,13 @@ test('selects followed users with the real editor/select and saves the home sour
 });
 
 test('an existing or imported home antenna retains its source on re-edit', async () => {
-	render(MkAntennaEditor, { props: { antenna: { id: 'antenna', src: 'home', name: 'Following', keywords: [['needle']] } }, global });
+	render(MkAntennaEditor, { props: { antenna: { id: 'antenna', src: 'home', name: 'Following', withReplies: true, keywords: [['needle']] } }, global });
 	await screen.findByText('Notes from followed users');
+	expect((screen.getAllByRole('checkbox')[1] as HTMLInputElement).checked).toBe(true);
+	await fireEvent.click(screen.getAllByRole('checkbox')[1]);
+	expect((screen.getAllByRole('checkbox')[1] as HTMLInputElement).checked).toBe(false);
 	await fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-	await waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledWith('antennas/update', expect.objectContaining({ antennaId: 'antenna', src: 'home', keywords: [['needle']] })));
+	await waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledWith('antennas/update', expect.objectContaining({ antennaId: 'antenna', src: 'home', withReplies: false, keywords: [['needle']] })));
 });
 
 test('new antennas still default to all notes', async () => {
