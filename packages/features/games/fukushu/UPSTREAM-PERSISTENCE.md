@@ -4,7 +4,7 @@ This follow-up to #339 connects the pinned upstream binary format to an owner
 store, authenticated API, continued review and the existing Misskey export queue.
 It does not adopt the experimental base64 v2 format from #338. Native v1 backup,
 native history and the inspection-only endpoint keep their existing behavior.
-There is no new material/study UI in this slice.
+Open **Decks from Fukushu** on `/fukushu` to import from your Drive, browse decks and review cards.
 
 ## Contract and representation
 
@@ -106,9 +106,47 @@ Use the common validation lock and host process check before the harness; do not
 run it against a user's browser context or disable Chrome sandbox protections.
 See the PR for exact completed results and the final head's CI.
 
-Next: connect source-backed materials/media/study UI and source-equivalent updates
-without forcing native history constraints. Consider larger collections and
-incremental import only as separate reviewed changes. Export preserves source
+## Using imported decks
+
+The deck view reads the authenticated owner's source records. Normal study uses
+the source's 4 am local rollover, daily limits, due ordering and reset history.
+Cram includes active cards outside the due queue. Quiz grading retains the
+separate score and correct flag. Flashcards use self-assessment. An unconfirmed
+save retries its original request ID and revision. Read the current card in the
+deck view and the historical result in the review list.
+
+Images and audio in supported formats are fetched by the owner's media ID.
+The renderer supports basic HTML, ruby, lists, tables, raster images and audio.
+External assets, custom Anki CSS/scripts and active templates do not run here.
+Markdown and math source remain readable as text. The original content, CSS,
+package and binary media remain available in the upstream export.
+
+For a GIFT deck, choose an owned UTF-8 .gift or .txt file (up to 256 KiB).
+Preview the counts before applying. Source keys match existing IDs. Incompatible
+answers or substantial prompt changes reset the current schedule as in the
+pinned app. Missing questions are disabled; their history stays attached.
+The owner transaction rejects a changed preview or a stale review. Empty
+imports are refused. Direct updates from Anki text or a new APKG are pending.
+
+## Collection size and old backups
+
+The pinned app streams the binary archive and allows JSON metadata frames up to
+64 MiB. 9k's current adapter reconstructs a bounded archive for review, update
+and export. Its whole-file limit is 8 MiB, including media and the original
+APKG, with separate limits of 100 decks, 1,000 questions, 1,000 study states
+and 20,000 total frames. When a new review would exceed a limit it rolls back.
+Handling large collections requires incremental reads/writes and a streaming
+export. Raising just the upload limit would leave later reviews unable to save.
+
+The pinned app accepts legacy JSON versions 1–3, reconstructs missing source
+metadata and repairs legacy APKG data for versions below 3. Direct JSON restore
+in the 9k source UI is pending. To convert, restore into a *fresh, empty*
+upstream browser profile, verify the cards and history there, then export a
+binary .fukushu. Upstream restore replaces that profile's whole learning DB.
+A converted file must still meet the 9k size and record limits.
+See [upstream backup support](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/docs/backup-support.md).
+
+ Export preserves source
 values and binaries, not a promise that JSON serialization/order is byte-identical
 to the original whole input after DB persistence. Migration rollback drops these
 new tables; do not run `down` on populated production data. No merge/deployment

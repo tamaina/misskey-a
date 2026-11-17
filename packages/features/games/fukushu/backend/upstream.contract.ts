@@ -14,13 +14,21 @@ import type { Meta } from '@orpc/contract';
 const integer = v.pipe(v.number(), v.safeInteger(), v.minValue(0), v.maxValue(2_147_483_647));
 const backup = { requireCredential: true, secure: true, limit: { duration: 60000, max: 5 } } as const;
 const base = oc.errors({ ...commonErrors,
-	NO_SUCH_FILE: { status: 404, data: apiErrorData }, NO_SUCH_MATERIAL: { status: 404, data: apiErrorData },
-	BACKUP_FAILED: { status: 400, data: apiErrorData }, INVALID_BACKUP: { status: 400, data: apiErrorData },
-	BACKUP_TOO_LARGE: { status: 400, data: apiErrorData }, BACKUP_CONFLICT: { status: 409, data: apiErrorData },
-	UPSTREAM_INSPECTION_LIMIT: { status: 400, data: apiErrorData },
-	STUDY_CONFLICT: { status: 409, data: apiErrorData }, STUDY_UNAVAILABLE: { status: 409, data: apiErrorData },
+																									NO_SUCH_FILE: { status: 404, data: apiErrorData }, NO_SUCH_MATERIAL: { status: 404, data: apiErrorData },
+																									BACKUP_FAILED: { status: 400, data: apiErrorData }, INVALID_BACKUP: { status: 400, data: apiErrorData },
+																									BACKUP_TOO_LARGE: { status: 400, data: apiErrorData }, BACKUP_CONFLICT: { status: 409, data: apiErrorData },
+																									UPSTREAM_INSPECTION_LIMIT: { status: 400, data: apiErrorData },
+																									STUDY_CONFLICT: { status: 409, data: apiErrorData }, STUDY_UNAVAILABLE: { status: 409, data: apiErrorData },
 });
 export const upstreamContract = {
+	upstreamMedia: base.$meta({ requireCredential: true, kind: 'read:account', requestName: 'fukushu/upstream/media', limit: { duration: 60000, max: 120 } } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/upstream/media', tags: ['fukushu'] })
+		.input(objectInput({ id: v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/)) }))
+		.output(v.object({ mimeType: v.string(), base64: v.string() })),
+	upstreamUpdateGift: base.$meta({ ...backup, requestName: 'fukushu/upstream/update-gift' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/upstream/update-gift', tags: ['fukushu'] })
+		.input(objectInput({ deckId: v.string(), fileId: v.string(), confirmToken: v.optional(v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/))) }))
+		.output(v.object({ token: v.string(), applied: v.boolean(), added: integer, changed: integer, disabled: integer, reset: integer })),
 	upstreamRestore: base.$meta({ ...backup, requestName: 'fukushu/upstream/restore' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/upstream/restore', tags: ['fukushu'] })
 		.input(objectInput({ fileId: v.pipe(v.string(), v.metadata({ format: 'misskey:id' })), requestId: studyRequestIdSchema, confirmRestore: v.literal(true) }))

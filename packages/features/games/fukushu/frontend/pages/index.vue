@@ -12,36 +12,39 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<p v-if="notice" role="status">{{ notice }}</p>
 			<MkButton v-if="pendingImportedId" :disabled="busy" @click="showMaterial(pendingImportedId)">{{ $locale.sfc.openImported }}</MkButton>
 			<template v-if="!material">
-				<section class="_panel _gaps" :class="$style.panel">
-					<h2>{{ $locale.sfc.importTitle }}</h2>
-					<p>{{ $locale.sfc.importDescription }} <MkA to="/my/drive">{{ $locale.sfc.openDrive }}</MkA></p>
-					<details>
-						<summary>{{ $locale.sfc.formatTitle }}</summary>
-						<p>{{ $locale.sfc.formatDescription }}</p>
-						<pre :class="$style.sample">{{ sample }}</pre>
-						<p>{{ $locale.sfc.unsupported }}</p>
-					</details>
-					<MkInfo>{{ $locale.sfc.privacy }}</MkInfo>
-					<div class="_buttons">
-						<MkButton :disabled="busy" @click="pickFile">{{ $locale.sfc.choose }}</MkButton>
-						<MkButton primary :disabled="busy || !selectedFile" :wait="importing" @click="importFile">{{ $locale.sfc.import }}</MkButton>
-					</div>
-					<p v-if="selectedFile" :class="$style.wrap">{{ $locale.sfc.selected }}: {{ selectedFile.name }}</p>
-				</section>
-				<section class="_gaps" :aria-busy="busy">
-					<div :class="$style.heading"><h2>{{ $locale.sfc.library }}</h2><MkButton small :disabled="busy" @click="refresh">{{ $locale.sfc.reload }}</MkButton></div>
-					<div class="_buttons" role="group" :aria-label="$locale.sfc.libraryFilter">
-						<MkButton :disabled="busy" :primary="!archivedList" :aria-pressed="!archivedList" @click="filterList(false)">{{ $locale.sfc.activeList }}</MkButton>
-						<MkButton :disabled="busy" :primary="archivedList" :aria-pressed="archivedList" @click="filterList(true)">{{ $locale.sfc.archivedList }}</MkButton>
-					</div>
-					<p>{{ $locale.sfc.quota }}</p>
-					<p v-if="busy && !importing" role="status">{{ $locale.sfc.loading }}</p>
-					<p v-else-if="loaded && decks.length === 0" class="_panel" :class="$style.panel">{{ archivedList ? $locale.sfc.emptyArchive : $locale.sfc.empty }}</p>
-					<button v-for="deck in decks" :key="deck.id" type="button" class="_button _panel" :class="$style.deck" :disabled="busy" @click="showMaterial(deck.id)">
-						<strong :class="$style.wrap">{{ deck.name }}</strong>
-						<span>{{ deck.questionCount }} {{ $locale.sfc.cards }} <i class="ti ti-chevron-right" aria-hidden="true"></i></span>
-					</button>
-				</section>
+				<SourceLibrary @active="sourceActive = $event"/>
+				<template v-if="!sourceActive">
+					<section class="_panel _gaps" :class="$style.panel">
+						<h2>{{ $locale.sfc.importTitle }}</h2>
+						<p>{{ $locale.sfc.importDescription }} <MkA to="/my/drive">{{ $locale.sfc.openDrive }}</MkA></p>
+						<details>
+							<summary>{{ $locale.sfc.formatTitle }}</summary>
+							<p>{{ $locale.sfc.formatDescription }}</p>
+							<pre :class="$style.sample">{{ sample }}</pre>
+							<p>{{ $locale.sfc.unsupported }}</p>
+						</details>
+						<MkInfo>{{ $locale.sfc.privacy }}</MkInfo>
+						<div class="_buttons">
+							<MkButton :disabled="busy" @click="pickFile">{{ $locale.sfc.choose }}</MkButton>
+							<MkButton primary :disabled="busy || !selectedFile" :wait="importing" @click="importFile">{{ $locale.sfc.import }}</MkButton>
+						</div>
+						<p v-if="selectedFile" :class="$style.wrap">{{ $locale.sfc.selected }}: {{ selectedFile.name }}</p>
+					</section>
+					<section class="_gaps" :aria-busy="busy">
+						<div :class="$style.heading"><h2>{{ $locale.sfc.library }}</h2><MkButton small :disabled="busy" @click="refresh">{{ $locale.sfc.reload }}</MkButton></div>
+						<div class="_buttons" role="group" :aria-label="$locale.sfc.libraryFilter">
+							<MkButton :disabled="busy" :primary="!archivedList" :aria-pressed="!archivedList" @click="filterList(false)">{{ $locale.sfc.activeList }}</MkButton>
+							<MkButton :disabled="busy" :primary="archivedList" :aria-pressed="archivedList" @click="filterList(true)">{{ $locale.sfc.archivedList }}</MkButton>
+						</div>
+						<p>{{ $locale.sfc.quota }}</p>
+						<p v-if="busy && !importing" role="status">{{ $locale.sfc.loading }}</p>
+						<p v-else-if="loaded && decks.length === 0" class="_panel" :class="$style.panel">{{ archivedList ? $locale.sfc.emptyArchive : $locale.sfc.empty }}</p>
+						<button v-for="deck in decks" :key="deck.id" type="button" class="_button _panel" :class="$style.deck" :disabled="busy" @click="showMaterial(deck.id)">
+							<strong :class="$style.wrap">{{ deck.name }}</strong>
+							<span>{{ deck.questionCount }} {{ $locale.sfc.cards }} <i class="ti ti-chevron-right" aria-hidden="true"></i></span>
+						</button>
+					</section>
+				</template>
 			</template>
 			<template v-else>
 				<MkButton :disabled="busy || editing || studyLocked" @click="backToList">← {{ $locale.sfc.library }}</MkButton>
@@ -86,8 +89,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkButton :disabled="pageIndex + 1 >= pageCount" @click="pageIndex++">{{ $locale.sfc.next }}</MkButton>
 				</div>
 			</template>
-			<BackupPanel :key="material?.deck.id ?? 'library'" :deckId="material?.deck.id" :disabled="busy || editing || studyActive || studyLocked" @locked="backupLocked = $event" @restored="restoredBackup"/>
-			<UpstreamBackupPanel :disabled="busy || editing || studyActive || studyLocked"/>
+			<BackupPanel v-if="!sourceActive" :key="material?.deck.id ?? 'library'" :deckId="material?.deck.id" :disabled="busy || editing || studyActive || studyLocked" @locked="backupLocked = $event" @restored="restoredBackup"/>
+			<UpstreamBackupPanel v-if="!sourceActive" :disabled="busy || editing || studyActive || studyLocked"/>
 		</div>
 	</div>
 </PageWithHeader>
@@ -103,6 +106,7 @@ import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import * as os from '@features/ui/frontend/os.js';
+import SourceLibrary from '../components/SourceLibrary.vue';
 import UpstreamBackupPanel from '../components/UpstreamBackupPanel.vue';
 import BackupPanel from '../components/BackupPanel.vue';
 import StudyPanel from '../components/StudyPanel.vue';
@@ -112,6 +116,7 @@ const decks = ref<Omit<FukushuMaterial['deck'], 'sourceText'>[]>([]);
 type ManagedMaterial = FukushuMaterial & { revision: number; archivedAt: string | null };
 const material = ref<ManagedMaterial | null>(null);
 const archivedList = ref(false);
+const sourceActive = ref(false);
 const editing = ref(false);
 const studyActive = ref(false);
 const studyLocked = ref(false);

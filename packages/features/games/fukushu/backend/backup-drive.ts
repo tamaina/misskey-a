@@ -31,14 +31,22 @@ export class FukushuBackupInspector {
 	}
 
 	async read(ownerId: string, fileId: string): Promise<Buffer> {
+		return this.readOwned(ownerId, fileId, /\.(json|fukushu)$/i, MAX_BACKUP_BYTES);
+	}
+
+	async readGift(ownerId: string, fileId: string): Promise<Buffer> {
+		return this.readOwned(ownerId, fileId, /\.(gift|txt)$/i, 256 * 1024);
+	}
+
+	private async readOwned(ownerId: string, fileId: string, extension: RegExp, maximum: number): Promise<Buffer> {
 		const file = await this.files.findOneBy({ id: fileId, userId: ownerId });
 		if (!file || file.userId !== ownerId) throw new MaterialError('NO_SUCH_FILE');
-		if (file.userHost !== null || file.uri !== null || file.isLink || !/\.(json|fukushu)$/i.test(file.name)
+		if (file.userHost !== null || file.uri !== null || file.isLink || !extension.test(file.name)
 			|| !Number.isSafeInteger(file.size) || file.size < 1) throw new BackupError('INVALID_BACKUP');
-		if (file.size > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+		if (file.size > maximum) throw new BackupError('BACKUP_TOO_LARGE');
 		let bytes: Buffer;
 		try {
-			bytes = await readDriveOriginal(file, this.storage, this.download, MAX_BACKUP_BYTES);
+			bytes = await readDriveOriginal(file, this.storage, this.download, maximum);
 			if (bytes.length !== file.size || createHash('md5').update(bytes).digest('hex') !== file.md5) throw new Error('Original changed');
 		} catch { throw new BackupError('BACKUP_FAILED'); }
 		return bytes;

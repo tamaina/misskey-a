@@ -8,6 +8,7 @@ import * as v from 'valibot';
 import { readUpstreamArchive } from '../shared/upstream-reader.js';
 import { studyRequestIdSchema } from '../shared/study.schema.js';
 import { MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
+import { planGiftUpdate } from './gift-update.js';
 import { BackupError } from './backup-codec.js';
 import { MaterialError } from './store.js';
 import { StudyError } from './study-store.js';
@@ -81,6 +82,52 @@ export class FukushuUpstreamStore {
 		const rows = await manager.getRepository(MiFukushuUpstreamRecord).find({ where: { ownerId }, order: { position: 'ASC', store: 'ASC', key: 'ASC' } });
 		const frames: UpstreamFrame[] = rows.map(row => ({ store: row.store as UpstreamFrame['store'], value: JSON.parse(row.data), ...(row.blob === null ? {} : { blob: new Uint8Array(row.blob) }) }));
 		return { archive: await encodeUpstreamFrames(frames), rows };
+	}
+
+	async media(ownerId: string, id: string) {
+		const row = await this.db.getRepository(MiFukushuUpstreamRecord).findOneBy({ ownerId, store: 'media', key: key(id) });
+		if (!row?.blob) throw new MaterialError('NO_SUCH_MATERIAL');
+		const { mimeType } = JSON.parse(row.data);
+		return { mimeType: String(mimeType), base64: row.blob.toString('base64') };
+	}
+
+	async updateGift(ownerId: string, deckId: string, fileId: string, readGift: () => Promise<Buffer>, expected?: string) {
+		const bytes = await readGift();
+		let source: string;
+		try { source = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch { throw new BackupError('INVALID_BACKUP'); }
+		return this.db.transaction(async manager => {
+			await this.lock(manager, ownerId);
+			const { archive, rows } = await this.read(manager, ownerId);
+			const token = hash(JSON.stringify([ownerId, deckId, fileId, hash(bytes), archive.fileSha256]));
+			if (expected !== undefined && token !== expected) throw new StudyError('STUDY_CONFLICT');
+			const [file] = await manager.query('SELECT md5, size FROM drive_file WHERE id = $1 AND "userId" = $2 AND "userHost" IS NULL AND uri IS NULL AND NOT "isLink" FOR SHARE', [fileId, ownerId]);
+			if (!file || file.size !== bytes.length || file.md5 !== createHash('md5').update(bytes).digest('hex')) throw new BackupError('BACKUP_FAILED');
+			const { writes, summary } = planGiftUpdate(archive, deckId, source, this.clock());
+			const identity = (frame: UpstreamFrame) => frame.store + ':' + key(frame.value.id ?? frame.value.questionId);
+			const frames = new Map(archive.frames().map(frame => [identity(frame), frame]));
+			for (const frame of writes) {
+				if (frame.store === 'imports' && frames.has(identity(frame))) throw new BackupError('BACKUP_CONFLICT');
+				frames.set(identity(frame), frame);
+			}
+			await encodeUpstreamFrames([...frames.values()]);
+			if (expected !== undefined) {
+				const repo = manager.getRepository(MiFukushuUpstreamRecord);
+				const existing = new Map(rows.map(row => [row.store + ':' + row.key, row]));
+				let position = Math.max(...rows.map(row => row.position));
+				for (const frame of writes) {
+					const id = key(frame.value.id ?? frame.value.questionId);
+					const old = existing.get(identity(frame));
+					const data = JSON.stringify(frame.value);
+					if (old) {
+						await repo.update({ ownerId, store: frame.store, key: id }, { data, revision: old.revision + 1 });
+					} else {
+						if (frame.store === 'questions' && (await manager.query('SELECT 1 FROM fukushu_question WHERE "ownerId" = $1 AND id = $2', [ownerId, frame.value.id])).length) throw new BackupError('BACKUP_CONFLICT');
+						await repo.insert({ ownerId, store: frame.store, key: id, data, revision: 0, blob: null, position: ++position, sourceHash: hash(bytes) });
+					}
+				}
+			}
+			return { ...summary, token, applied: expected !== undefined };
+		});
 	}
 
 	async show(ownerId: string) {

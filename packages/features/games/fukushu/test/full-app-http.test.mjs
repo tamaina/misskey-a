@@ -655,4 +655,28 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.deepEqual(ok(await call('fukushu/study/history', { id: own.deck.id }, alice.token)), []);
 		assert.deepEqual(ok(await call('fukushu/study/queue', { id: own.deck.id }, alice.token)).items, before.items);
 	});
+	await step('owner reads imported media and confirms a GIFT update without replacing history', async () => {
+		const { records } = sourceBefore;
+		for (const m of records.media) {
+			const result = ok(await call('fukushu/upstream/media', { id: m.id }, alice.token));
+			assert.equal(result.mimeType, m.mimeType);
+			assert.equal(createHash('sha256').update(Buffer.from(result.base64, 'base64')).digest('hex'), m.id);
+			assert.equal((await call('fukushu/upstream/media', { id: m.id, ownerId: alice.id }, bob.token)).status, 404);
+		}
+		const form = new FormData();
+		form.set('i', alice.token);
+		form.set('file', new Blob(['::stable-name:: Sky is blue. {TRUE}'], { type: 'text/plain' }), 'updated.gift.txt');
+		const gift = ok(await readResponse(await fetch(origin + '/api/drive/files/create', { method: 'POST', body: form, headers: { origin }, redirect: 'error' })));
+		const deck = records.decks.find(d => d.sourceType === 'gift');
+		const input = { deckId: deck.id, fileId: gift.id };
+		const preview = ok(await call('fukushu/upstream/update-gift', input, alice.token));
+		assert.equal(preview.reset, 1); assert.equal(preview.applied, false);
+		const apply = { ...input, confirmToken: preview.token };
+		assert.equal(ok(await call('fukushu/upstream/update-gift', apply, alice.token)).applied, true);
+		assert.equal((await call('fukushu/upstream/update-gift', apply, alice.token)).status, 409);
+		const after = ok(await call('fukushu/upstream/show', {}, alice.token));
+		assert.equal(after.records.reviewLogs.length, 38);
+		assert.equal(after.records.studyStates.find(s => s.questionId === sourceReview.state.questionId).card.reps, 0);
+		assert.equal(after.records.questions.find(q => q.id === sourceReview.state.questionId).payload.correctAnswer, true);
+	});
 });

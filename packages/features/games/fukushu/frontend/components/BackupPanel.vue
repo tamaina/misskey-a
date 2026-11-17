@@ -136,7 +136,7 @@ onBeforeUnmount(() => { disposed = true; selection++; emit('locked', false); });
 <locale locale="ja-JP" lang="json">
 {
 	"title": "バックアップ・復元前の確認",
-	"scope": "9k 用の教材バックアップを扱います。初回は1教材・8 MiBまでです。本家 Fukushu の .fukushu ファイルや旧JSONは、まだ復元できません。",
+	"scope": "9k 用の教材バックアップを扱います。初回は1教材・8 MiBまでです。本家の .fukushu は「Fukushu からの教材」で取り込めます。",
 	"exportTitle": "この教材をバックアップ",
 	"exportDescription": "現在のカード、保存した版、復習予定と履歴をまとめて Drive に保存します。大きすぎる場合も履歴を切り捨てません。",
 	"visibility": "教材と学習記録がファイルに含まれます。Drive のファイルは、URLを知っている人が取得できる場合があります。バックアップのURLは共有しないでください。",
@@ -162,7 +162,7 @@ onBeforeUnmount(() => { disposed = true; selection++; emit('locked', false); });
 	"limit": "保存先の教材数・保存版または履歴の上限を超えるため、全体を復元できません。既存データは変更していません。",
 	"restoreUnknown": "復元の結果を確認できませんでした。再実行する前に教材一覧と復習履歴を確認してください。自動では再実行しません。",
 	"noWrite": "検査のみ完了しました。教材や履歴への書き込み・置換はしていません。重複がなければ、確認後に教材全体を復元できます。",
-	"upstream": "本家 Fukushu のバックアップです。媒体や過去のカード版の扱いを確認する必要があるため、この機能では復元しません。",
+	"upstream": "本家 Fukushu のバックアップです。対応する .fukushu は「Fukushu からの教材」で取り込めます。",
 	"tooLarge": "初回対応の上限8 MiBを超えています。データの一部だけを読み込むことはありません。",
 	"failed": "バックアップを検査できませんでした。ファイルの取得・形式・整合性を確認してください。教材や履歴は変更していません。"
 }
@@ -171,7 +171,7 @@ onBeforeUnmount(() => { disposed = true; selection++; emit('locked', false); });
 <locale locale="en-US" lang="json">
 {
 	"title": "Backup and restore inspection",
-	"scope": "This pilot supports one 9k deck backup up to 8 MiB. Upstream .fukushu and legacy JSON backups cannot be restored yet.",
+	"scope": "This pilot supports one 9k deck backup up to 8 MiB. Open Decks from Fukushu to import a supported .fukushu file.",
 	"exportTitle": "Back up this deck",
 	"exportDescription": "Save current cards, retained versions, study schedules and review history to Drive. Oversized backups fail without truncating history.",
 	"visibility": "The file contains material and study history. Anyone with a Drive file URL may be able to download it. Do not share the backup URL.",
@@ -197,7 +197,7 @@ onBeforeUnmount(() => { disposed = true; selection++; emit('locked', false); });
 	"limit": "The full restore exceeds the destination deck, version or review quota. Existing data has not changed.",
 	"restoreUnknown": "The restore outcome is unknown. Check your library and review history before trying again. This request is not retried automatically.",
 	"noWrite": "Inspection complete. No materials or history were written or replaced. If no IDs conflict, you can confirm and restore the entire deck.",
-	"upstream": "This is an upstream Fukushu backup. Media and historical card versions require a separate migration design; this feature does not restore it.",
+	"upstream": "This is an upstream Fukushu backup. Open Decks from Fukushu to import a supported .fukushu file.",
 	"tooLarge": "The backup exceeds this pilot's 8 MiB limit. No partial import is performed.",
 	"failed": "Could not inspect the backup. Check file availability, format and integrity. Your materials and history have not changed."
 }

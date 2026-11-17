@@ -69,6 +69,71 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		expect(await store.show('alice')).toEqual(await store.show('bob'));
 	});
 
+	test('serves owned media and atomically updates a GIFT deck without rewriting history or APKG data', async () => {
+		await store.restore('alice', await upload('alice'), randomUUID());
+		const { reviewedAt: _time, ...request } = expected.reset.request;
+		await store.review('alice', request);
+		const before = await readUpstreamArchive(await store.export('alice'), sha);
+		const records = before.normalizedRecords();
+		const deck = records.decks.find(d => d.sourceType === 'gift')!;
+		const original = records.questions.find(q => q.deckId === deck.id)!;
+		for (const medium of before.frames().filter(f => f.store === 'media')) {
+			const result = await store.media('alice', String(medium.value.id));
+			expect(result.mimeType).toBe(medium.value.mimeType);
+			expect(Buffer.from(result.base64, 'base64')).toEqual(Buffer.from(medium.blob!));
+			await expect(store.media('bob', String(medium.value.id))).rejects.toThrow('NO_SUCH_MATERIAL');
+		}
+		const bytes = Buffer.from('::stable-name:: Sky is blue. {TRUE}\n\n::added:: New question. {FALSE}');
+		const file = await upload('alice', bytes);
+		const preview = () => store.updateGift('alice', deck.id, file, async () => bytes);
+		const apply = (token: string) => store.updateGift('alice', deck.id, file, async () => bytes, token);
+		const plan = await preview();
+		expect(plan).toMatchObject({ added: 1, changed: 1, disabled: 0, reset: 1, applied: false });
+		expect(await store.export('alice')).toEqual(Buffer.from(before.originalBytes()));
+		await expect(store.updateGift('alice', deck.id, await upload('bob', bytes), async () => bytes)).rejects.toThrow('BACKUP_FAILED');
+		expect(await apply(plan.token)).toMatchObject({ applied: true });
+		await expect(apply(plan.token)).rejects.toThrow('STUDY_CONFLICT');
+		const after = await readUpstreamArchive(await store.export('alice'), sha);
+		expect(after.normalizedRecords().questions.find(q => q.id === original.id)?.payload).toMatchObject({ correctAnswer: true });
+		expect(after.normalizedRecords().studyStates.find(q => q.questionId === original.id)?.card.reps).toBe(0);
+		expect(after.normalizedRecords().reviewLogs).toEqual(records.reviewLogs);
+		expect(after.frames().filter(f => f.blob !== undefined)).toEqual(before.frames().filter(f => f.blob !== undefined));
+		expect(after.normalizedRecords().imports.at(-1)).toMatchObject({ added: 1, changed: 1 });
+		const second = await preview();
+		expect(second).toMatchObject({ reset: 0, changed: 0, added: 0 });
+	});
+
+	test('a later review invalidates a GIFT preview; disabling a missing card retains its last schedule and all logs', async () => {
+		await store.restore('alice', await upload('alice'), randomUUID());
+		const before = (await store.show('alice')).records;
+		const deck = before.decks.find(d => d.sourceType === 'gift')!;
+		const question = before.questions.find(q => q.deckId === deck.id)!;
+		const bytes = Buffer.from('::other:: Rain is wet. {TRUE}');
+		const file = await upload('alice', bytes);
+		const update = (token?: string) => store.updateGift('alice', deck.id, file, async () => bytes, token);
+		const preview = await update();
+		expect(preview).toMatchObject({ added: 1, disabled: 1, reset: 0 });
+		const { reviewedAt: _time, ...request } = expected.reset.request;
+		const reviewed = await store.review('alice', request);
+		await expect(update(preview.token)).rejects.toThrow('STUDY_CONFLICT');
+		const current = await update();
+		const baseline = await store.export('alice');
+		await db.query('CREATE FUNCTION fail_gift_import() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION \'injected update rollback\'; END $$');
+		await db.query('CREATE TRIGGER fail_gift BEFORE INSERT ON fukushu_upstream_record FOR EACH ROW WHEN (NEW.store = \'imports\') EXECUTE FUNCTION fail_gift_import()');
+		try {
+			await expect(update(current.token)).rejects.toThrow('injected update rollback');
+			expect(await store.export('alice')).toEqual(baseline);
+		} finally {
+			await db.query('DROP TRIGGER fail_gift ON fukushu_upstream_record');
+			await db.query('DROP FUNCTION fail_gift_import()');
+		}
+		await update(current.token);
+		const after = (await store.show('alice')).records;
+		expect(after.questions.find(q => q.id === question.id)).toMatchObject({ enabled: false });
+		expect(after.studyStates.find(q => q.questionId === question.id)).toMatchObject({ suspended: true, card: reviewed.state.card });
+		expect(after.reviewLogs).toContainEqual(reviewed.record);
+	});
+
 	test('concurrent import retry commits once, receipt survives a new service and changed requests conflict', async () => {
 		const file = await upload('alice'); const id = randomUUID();
 		const result = await Promise.all([store.restore('alice', file, id), store.restore('alice', file, id)]);
@@ -97,7 +162,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 	});
 
 	test('late receipt insert failure rolls back every source record and binary', async () => {
-		await db.query("CREATE FUNCTION fail_receipt() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'injected rollback'; END $$");
+		await db.query('CREATE FUNCTION fail_receipt() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION \'injected rollback\'; END $$');
 		await db.query('CREATE TRIGGER injected BEFORE INSERT ON fukushu_operation_receipt FOR EACH ROW EXECUTE FUNCTION fail_receipt()');
 		try { await expect(store.restore('alice', await upload('alice'), randomUUID())).rejects.toThrow('injected rollback'); expect(await counts()).toEqual({ records: 0, receipts: 0 }); } finally { await db.query('DROP TRIGGER injected ON fukushu_operation_receipt'); await db.query('DROP FUNCTION fail_receipt()'); }
 	});
@@ -128,7 +193,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await store.restore('alice', await upload('alice'), randomUUID());
 		const before = await store.export('alice'); const totals = await counts();
 		const { reviewedAt: _time, ...request } = expected.reset.request;
-		await db.query("CREATE FUNCTION fail_review_receipt() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'injected review rollback'; END $$");
+		await db.query('CREATE FUNCTION fail_review_receipt() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION \'injected review rollback\'; END $$');
 		await db.query('CREATE TRIGGER injected BEFORE INSERT ON fukushu_operation_receipt FOR EACH ROW EXECUTE FUNCTION fail_review_receipt()');
 		try {
 			await expect(store.review('alice', request)).rejects.toThrow('injected review rollback');
