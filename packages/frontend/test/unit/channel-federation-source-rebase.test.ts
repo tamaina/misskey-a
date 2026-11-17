@@ -9,21 +9,29 @@ import { resolve } from 'node:path';
 import { expect, test } from 'vitest';
 import { parse } from 'vue/compiler-sfc';
 import rebases from './channel-federation-source-rebase.json';
-import { restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
+import { restoreChannelExploreLayoutBaseline, restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
 
 const root = resolve(import.meta.dirname, '../../../..');
 
-test.each(rebases)('$file restores the exact pre-federation source, preserves CSS and rejects unreviewed changes', proof => {
+test.each(rebases)('$file restores the exact pre-federation source, preserves unmodified CSS and rejects unreviewed changes', proof => {
 	const source = readFileSync(resolve(root, proof.file), 'utf8');
 	const restored = restoreChannelFederationSourceBaseline(proof.file, source);
 	expect(createHash('sha256').update(restored).digest('hex')).toBe(proof.baselineSha256);
-	const current = parse(source, { filename: proof.file });
+	const current = parse(restoreChannelExploreLayoutBaseline(proof.file, source), { filename: proof.file });
 	const baseline = parse(restored, { filename: proof.file });
 	expect(current.errors).toEqual([]);
 	expect(baseline.errors).toEqual([]);
 	expect(current.descriptor.styles.map(block => ({ attrs: block.attrs, content: block.content }))).toEqual(baseline.descriptor.styles.map(block => ({ attrs: block.attrs, content: block.content })));
 	expect(() => restoreChannelFederationSourceBaseline(proof.file, '// unreviewed\n' + source)).toThrow('Source differs');
 	expect(() => restoreChannelFederationSourceBaseline(proof.file, source + '\n')).toThrow('Source differs');
+});
+
+test('the layout proof permits only the reviewed responsive grid change', () => {
+	const file = 'packages/features/channels/frontend/pages/channels.vue';
+	const source = readFileSync(resolve(root, file), 'utf8');
+	const previous = restoreChannelExploreLayoutBaseline(file, source);
+	expect(previous.replace('minmax(360px, 1fr)', 'minmax(min(100%, 360px), 1fr)')).toBe(source);
+	expect(() => restoreChannelExploreLayoutBaseline(file, source.replace('360px', '400px'))).toThrow('Source differs');
 });
 
 test('channel exploration reuses user Explore local/remote labels in every existing locale', () => {
