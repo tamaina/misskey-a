@@ -4,6 +4,9 @@
  */
 
 import { createMfmRenderer } from '@features/markup/frontend/shared/mfm-renderer.js';
+import MkFormula from '@features/markup/frontend/shared/MkFormula.vue';
+import { isLatexEnabled } from '@features/markup/frontend/shared/formula-safety.js';
+import { serverMetadata } from '@features/instance/frontend/embed/server-metadata.js';
 import EmUrl from '@features/markup/frontend/embed/components/EmUrl.vue';
 import EmTime from '@features/ui/frontend/embed/components/EmTime.vue';
 import EmLink from '@features/navigation/frontend/embed/components/EmLink.vue';
@@ -15,6 +18,7 @@ import EmA from '@features/navigation/frontend/embed/components/EmA.vue';
 // eslint-disable-next-line import/no-default-export
 export default createMfmRenderer({
 	components: () => ({
+		Formula: MkFormula,
 		Url: EmUrl,
 		Link: EmLink,
 		Mention: EmMention,
@@ -23,4 +27,5 @@ export default createMfmRenderer({
 		Emoji: EmEmoji,
 		CustomEmoji: EmCustomEmoji,
 	}),
+	getOptions: () => ({ advancedMfm: true, animatedMfm: true, latexEnabled: isLatexEnabled(serverMetadata.clientOptions) }),
 });

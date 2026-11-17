@@ -5,6 +5,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { restoreFormulaBaseline } from './formula-source-rebase.js';
 import { parse } from 'vue/compiler-sfc';
 import type { LocaleBundle, RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
 
@@ -31,6 +32,7 @@ const sha256 = (source: string): string => createHash('sha256').update(source).d
 export function restoreUpstreamDevelopBaseline(file: string, source: string): string {
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase || sha256(source) === rebase.baselineSha256 || sha256(source) === rebase.historicalSha256) return source;
+	source = restoreFormulaBaseline(file, source);
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from reviewed upstream develop: ${file}`);
 	for (const edit of [...rebase.edits].reverse()) {
 		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Upstream develop boundary differs: ${file}`);
@@ -49,7 +51,7 @@ export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBund
 	for (const rebase of rebases.filter(entry => !entry.sourceOnly && entry.file.endsWith('.vue'))) {
 		const moduleId = rebase.file.replace('packages/', '/');
 		if (!Object.hasOwn(modules, moduleId)) continue;
-		const source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');
+		const source = restoreFormulaBaseline(rebase.file, readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8'));
 		if (sha256(source) !== rebase.currentSha256) throw new Error(`Locale source differs from reviewed upstream develop: ${rebase.file}`);
 		let dictionaries = localeCache.get(rebase.file);
 		if (!dictionaries) {
