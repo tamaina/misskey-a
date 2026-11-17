@@ -8,11 +8,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_gaps" :class="$style.body" :aria-busy="busy">
 		<p>{{ $locale.sfc.scope }}</p>
 		<MkInfo>{{ $locale.sfc.noWrite }}</MkInfo>
+		<p>{{ $locale.sfc.localDescription }}</p>
+		<MkButton :disabled="disabled || busy" @click="localInput?.click()">{{ $locale.sfc.localChoose }}</MkButton>
+		<input ref="localInput" type="file" accept=".fukushu" hidden :disabled="disabled || busy" data-testid="upstream-local-file" @change="inspectLocal">
 		<p>{{ $locale.sfc.drive }} <MkA to="/my/drive">{{ $locale.sfc.openDrive }}</MkA></p>
 		<div class="_buttons">
 			<MkButton :disabled="disabled || busy" @click="pick">{{ $locale.sfc.choose }}</MkButton>
 			<MkButton :disabled="disabled || busy || !selected" :wait="busy" @click="inspect">{{ $locale.sfc.inspect }}</MkButton>
 		</div>
+		<p v-if="localName">{{ localName }} · {{ $locale.sfc.localOnly }}</p>
 		<p v-if="selected">{{ selected.name }}</p>
 		<p v-if="error" role="alert" :class="$style.error">{{ error }}</p>
 		<section v-if="report" class="_gaps" role="status">
@@ -46,9 +50,12 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import { inspectLocalUpstream } from '../upstream-local.js';
 import type { UpstreamInspection } from '../../shared/upstream-backup.schema.js';
 
 const props = defineProps<{ disabled?: boolean }>();
+const localInput = ref<HTMLInputElement>();
+const localName = ref('');
 const selected = ref<{ id: string; name: string } | null>(null);
 const report = ref<UpstreamInspection | null>(null);
 const busy = ref(false);
@@ -62,9 +69,26 @@ async function pick() {
 	try {
 		const [file] = await chooseDriveFile({ multiple: false });
 		if (file && current === selection && !disposed && !props.disabled && !busy.value) {
-			selected.value = { id: file.id, name: file.name }; report.value = null; error.value = '';
+			selected.value = { id: file.id, name: file.name }; localName.value = ''; report.value = null; error.value = '';
 		}
 	} catch { if (!disposed && current === selection) error.value = $locale.value.sfc.failed; }
+}
+
+function inspectionError(cause: unknown) {
+	const code = typeof cause === 'object' && cause !== null && 'code' in cause ? cause.code : null;
+	return code === 'BACKUP_TOO_LARGE' || code === 'UPSTREAM_INSPECTION_LIMIT' ? $locale.value.sfc.limit : $locale.value.sfc.failed;
+}
+
+async function inspectLocal(event: Event) {
+	const input = event.target as HTMLInputElement;
+	const file = input.files?.[0];
+	input.value = '';
+	if (!file || props.disabled || busy.value) return;
+	selection++; busy.value = true; report.value = null; error.value = ''; selected.value = null; localName.value = file.name;
+	try {
+		const result = await inspectLocalUpstream(file);
+		if (!disposed) report.value = result;
+	} catch (cause) { if (!disposed) error.value = inspectionError(cause); } finally { if (!disposed) busy.value = false; }
 }
 
 async function inspect() {
@@ -75,8 +99,7 @@ async function inspect() {
 		if (!disposed) report.value = result;
 	} catch (cause) {
 		if (!disposed) {
-			const code = typeof cause === 'object' && cause !== null && 'code' in cause ? cause.code : null;
-			error.value = code === 'BACKUP_TOO_LARGE' || code === 'UPSTREAM_INSPECTION_LIMIT' ? $locale.value.sfc.limit : $locale.value.sfc.failed;
+			error.value = inspectionError(cause);
 		}
 	} finally { if (!disposed) busy.value = false; }
 }
@@ -98,6 +121,9 @@ onBeforeUnmount(() => { disposed = true; selection++; });
 	"title": "本家 Fukushu のバックアップを調べる",
 	"scope": "本家の .fukushu バイナリ形式を読み込みます。初回は8 MiB・100教材・1,000カード・10,000履歴まで。旧JSONは対象外です。",
 	"noWrite": "移行前の検査だけを行います。教材・予定・履歴は取り込まず、既存データも変更しません。",
+	"localDescription": "端末内で検査できます。ファイルの内容はサーバーへ送信せず、Drive やブラウザにも保存しません。",
+	"localChoose": "端末の .fukushu を検査",
+	"localOnly": "端末内で検査・未送信",
 	"drive": "本人の Drive に保存した原本を選んでください。Drive がバイナリファイルのアップロードを許可しているアカウントで利用できます。公開URLや公開状態は変わりません。",
 	"openDrive": "Drive を開く",
 	"choose": "本家 .fukushu を Drive から選ぶ",
@@ -132,6 +158,9 @@ onBeforeUnmount(() => { disposed = true; selection++; });
 	"title": "Inspect an upstream Fukushu backup",
 	"scope": "Read the upstream .fukushu binary format. This pilot allows 8 MiB, 100 decks, 1,000 cards and 10,000 reviews. Legacy JSON is excluded.",
 	"noWrite": "Pre-import inspection only. No materials, schedules or history are imported, and existing data is unchanged.",
+	"localDescription": "Inspect on this device. File contents are not sent to the server or saved in Drive or browser storage.",
+	"localChoose": "Inspect a .fukushu on this device",
+	"localOnly": "Inspected locally · not uploaded",
 	"drive": "Choose an original in your own Drive. Your account must already be allowed to upload binary files. Its public URL and visibility remain unchanged.",
 	"openDrive": "Open Drive",
 	"choose": "Choose an upstream .fukushu from Drive",

@@ -21,8 +21,10 @@ Never use them to invent missing historical facts, replay FSRS, or regrade answe
 
 ## First implementation
 
-Read and inspect an authenticated owner's Drive original, using the existing
-bounded reader. Support the binary version above only, up to 8 MiB and bounded
+Inspect a user-selected local file entirely in browser memory, or read an
+authenticated owner's Drive original using the existing bounded reader. Both
+paths use the same portable parser; the local path uses Web Crypto SHA-256 and
+the Drive path uses Node SHA-256. Support the binary version above only, up to 8 MiB and bounded
 record counts. Validate framing, checksum, UTF-8, pinned record schemas, unique
 IDs and references, and media size/hash. Unknown formats/fields and malformed
 archives fail as a whole. Legacy JSON v1–3, large archives and actual database
@@ -84,10 +86,35 @@ checksum is an integrity check, not authentication of an archive's author.
 The actual Drive uploader classifies this binary format as
 `application/octet-stream`. The default ordinary-user policy rejects it; existing
 moderator/admin exemptions allow it. This pilot does not expand that policy,
-mislabel the file as text, or add a feature-specific upload bypass. It is usable
+mislabel the file as text, or add a feature-specific upload bypass. The Drive path is usable
 only when the account can already store the original under its existing policy.
 The real HTTP check asserts ordinary-user rejection and then exercises inspection
 with a synthetic administrator's own upload; Chrome uses that same account.
-Making upstream migration available to every default-policy user needs a separate
-explicit file-type/permission design. The inspector itself still checks ownership
+Making server-side upstream migration available to every default-policy user
+needs a separate explicit file-type/permission design. The inspector itself still checks ownership
 and does not grant administrators access to another owner's Drive file.
+
+## Ordinary-user input choice
+
+The default-policy upload denial was reproduced through actual HTTP. A dedicated
+MIME detector plus a new default upload permission would expand server storage
+policy and require a separate review of file serving and MIME spoofing. A new
+multipart import endpoint would create another server upload boundary (body limits,
+rate limits, temporary storage and cleanup). Neither is necessary for inspection.
+
+The small ordinary-user path therefore uses a native local-file chooser and
+`File.arrayBuffer()` only after checking the 8 MiB cap and `.fukushu` extension.
+It runs the same framing/schema/reference/media-integrity checks in memory and
+waits for Web Crypto hashes before showing a report. It sends no file or result
+to the server, writes no Drive/IndexedDB/localStorage data, and has no automatic
+network fallback. Web Crypto must be available (HTTPS or trusted localhost).
+Malformed/unsupported files fail with no partial report. Native restore and
+actual upstream persistence remain separate, unimplemented for this format.
+
+Tests cover the upstream-writer fixture through Web Crypto, corruption and early
+size rejection, no network/storage calls, and UI handling without Drive/API use.
+The real ordinary-account Chrome check with the synthetic fixture is pending
+after a storage-pressure pause. Local tests passed; final frontend typecheck
+was interrupted by the user-requested pause, and rebuild/E2E have not run for
+this local-file addition. This does not establish real upstream IndexedDB/APKG round-trip
+compatibility, historical card reconstruction or actual migration success.

@@ -38,10 +38,10 @@ function frame(rows: Frame[], store: string) {
 	const result = rows.find(row => row.meta.store === store); if (!result) throw new Error('Missing fixture frame'); return result;
 }
 
-test('reads the unchanged pinned upstream writer fixture without inventing missing historical facts', () => {
+test('reads the unchanged pinned upstream writer fixture without inventing missing historical facts', async () => {
 	expect(hash(golden)).toBe(provenance.fixtureSha256);
 	const before = Buffer.from(golden);
-	const result = inspectUpstreamBackup(golden);
+	const result = await inspectUpstreamBackup(golden);
 	expect(result).toMatchObject({ format: 'FUKUSHU-BACKUP-1', imported: false, canImport: false, exportedAt: null, currentDesiredRetention: 0.93,
 																																counts: { decks: 1, questions: 2, studyStates: 1, reviewLogs: 2, importSources: 1, media: 1, imports: 1 } });
 	expect(result.decks[0]).toMatchObject({ name: '本家の合成教材', questions: 2, reviewLogs: 2 });
@@ -56,24 +56,24 @@ test('reads the unchanged pinned upstream writer fixture without inventing missi
 	expect(() => decodeBackup(golden)).toThrow('UPSTREAM_BACKUP_UNSUPPORTED');
 });
 
-test('does not derive correctness, full state or scheduler evidence from a rating or current settings', () => {
+test('does not derive correctness, full state or scheduler evidence from a rating or current settings', async () => {
 	const rows = frames(); frame(rows, 'reviewLogs').meta.value.rating = 'easy';
-	const result = inspectUpstreamBackup(pack(rows));
+	const result = await inspectUpstreamBackup(pack(rows));
 	expect(result.history.find(row => row.id === 'source-review-1')).toMatchObject({ rating: 'easy', correct: false, scheduler: null, cardAfter: null });
 });
 
-test('reports absent source ordering without assigning fabricated positions', () => {
+test('reports absent source ordering without assigning fabricated positions', async () => {
 	const rows = frames(); delete frame(rows, 'questions').meta.value.sourceOrder;
-	expect(inspectUpstreamBackup(pack(rows)).missingQuestionOrders).toBe(1);
+	expect((await inspectUpstreamBackup(pack(rows))).missingQuestionOrders).toBe(1);
 });
 
-test('can inspect a valid empty snapshot without inventing settings or history', () => {
-	const result = inspectUpstreamBackup(pack(frames().filter(row => row.meta.store === 'settings')));
+test('can inspect a valid empty snapshot without inventing settings or history', async () => {
+	const result = await inspectUpstreamBackup(pack(frames().filter(row => row.meta.store === 'settings')));
 	expect(result.counts.decks).toBe(0); expect(result.history).toEqual([]);
-	expect(() => inspectUpstreamBackup(pack([]))).toThrow('INVALID_BACKUP');
+	await expect(inspectUpstreamBackup(pack([]))).rejects.toThrow('INVALID_BACKUP');
 });
 
-test.each(['checksum', 'truncated', 'legacy-json', 'native-json', 'unknown-version', 'trailing', 'utf8', 'zero-length', 'oversized-length'])('rejects invalid framing or unsupported format: %s', kind => {
+test.each(['checksum', 'truncated', 'legacy-json', 'native-json', 'unknown-version', 'trailing', 'utf8', 'zero-length', 'oversized-length'])('rejects invalid framing or unsupported format: %s', async kind => {
 	let bad: Buffer;
 	if (kind === 'checksum') { bad = Buffer.from(golden); bad[bad.length - 1] = bad.at(-1) === 48 ? 49 : 48; } else if (kind === 'truncated') bad = golden.subarray(0, golden.length - 1);
 	else if (kind === 'legacy-json') bad = Buffer.from('{"format":"gift-fsrs-learning-backup","version":3}');
@@ -86,10 +86,10 @@ test.each(['checksum', 'truncated', 'legacy-json', 'native-json', 'unknown-versi
 		else body.writeUInt32LE(kind === 'zero-length' ? 0 : 0xffffffff, UPSTREAM_MAGIC.length);
 		bad = Buffer.concat([body, Buffer.from(hash(body))]);
 	}
-	expect(() => inspectUpstreamBackup(bad)).toThrow('INVALID_BACKUP');
+	await expect(inspectUpstreamBackup(bad)).rejects.toThrow('INVALID_BACKUP');
 });
 
-test.each(['duplicate', 'unknown-store', 'unknown-field', 'missing-settings', 'missing-question', 'missing-deck', 'missing-source', 'duplicate-source-key', 'duplicate-order', 'question-payload', 'foreign-state', 'foreign-review', 'foreign-import'])('rejects schemas or references as a whole: %s', kind => {
+test.each(['duplicate', 'unknown-store', 'unknown-field', 'missing-settings', 'missing-question', 'missing-deck', 'missing-source', 'duplicate-source-key', 'duplicate-order', 'question-payload', 'foreign-state', 'foreign-review', 'foreign-import'])('rejects schemas or references as a whole: %s', async kind => {
 	let rows = frames();
 	if (kind === 'duplicate') rows.push(frame(rows, 'reviewLogs'));
 	if (kind === 'unknown-store') frame(rows, 'imports').meta.store = 'unknown';
@@ -107,10 +107,10 @@ test.each(['duplicate', 'unknown-store', 'unknown-field', 'missing-settings', 'm
 	if (kind === 'foreign-state') frame(rows, 'studyStates').meta.value.deckId = 'other';
 	if (kind === 'foreign-review') frame(rows, 'reviewLogs').meta.value.deckId = 'other';
 	if (kind === 'foreign-import') frame(rows, 'imports').meta.value.deckId = 'other';
-	expect(() => inspectUpstreamBackup(pack(rows))).toThrow('INVALID_BACKUP');
+	await expect(inspectUpstreamBackup(pack(rows))).rejects.toThrow('INVALID_BACKUP');
 });
 
-test.each(['missing-size', 'large-size', 'negative-size', 'media-hash', 'media-length', 'inline-media', 'inline-source', 'illegal-blob', 'missing-media-reference'])('rejects binary boundary or integrity failure: %s', kind => {
+test.each(['missing-size', 'large-size', 'negative-size', 'media-hash', 'media-length', 'inline-media', 'inline-source', 'illegal-blob', 'missing-media-reference'])('rejects binary boundary or integrity failure: %s', async kind => {
 	let rows = frames(); const media = frame(rows, 'media');
 	if (kind === 'missing-size') delete media.meta.blobSize;
 	if (kind === 'large-size') media.meta.blobSize = Number.MAX_SAFE_INTEGER;
@@ -121,28 +121,28 @@ test.each(['missing-size', 'large-size', 'negative-size', 'media-hash', 'media-l
 	if (kind === 'inline-source') frame(rows, 'importSources').meta.value.sourceArchiveBase64 = '';
 	if (kind === 'illegal-blob') frame(rows, 'decks').meta.blobSize = 0;
 	if (kind === 'missing-media-reference') rows = rows.filter(row => row.meta.store !== 'media');
-	expect(() => inspectUpstreamBackup(pack(rows))).toThrow('INVALID_BACKUP');
+	await expect(inspectUpstreamBackup(pack(rows))).rejects.toThrow('INVALID_BACKUP');
 });
 
-test.each([['decks', 101], ['questions', 1001], ['studyStates', 1001], ['reviewLogs', 10_001]] as const)('refuses the complete archive above the %s record limit', (store, count) => {
+test.each([['decks', 101], ['questions', 1001], ['studyStates', 1001], ['reviewLogs', 10_001]] as const)('refuses the complete archive above the %s record limit', async (store, count) => {
 	const rows = frames(); const template = frame(rows, store);
 	const many = Array.from({ length: count }, (_, index) => ({ meta: { ...template.meta, value: { ...template.meta.value, [store === 'studyStates' ? 'questionId' : 'id']: `unique-${index}` } }, blob: template.blob }));
-	expect(() => inspectUpstreamBackup(pack([...rows.filter(row => row.meta.store !== store), ...many]))).toThrow('UPSTREAM_INSPECTION_LIMIT');
+	await expect(inspectUpstreamBackup(pack([...rows.filter(row => row.meta.store !== store), ...many]))).rejects.toThrow('UPSTREAM_INSPECTION_LIMIT');
 });
 
-test('rejects oversized files before parsing', () => {
-	expect(() => inspectUpstreamBackup(Buffer.alloc(MAX_BACKUP_BYTES + 1))).toThrow('BACKUP_TOO_LARGE');
+test('rejects oversized files before parsing', async () => {
+	await expect(inspectUpstreamBackup(Buffer.alloc(MAX_BACKUP_BYTES + 1))).rejects.toThrow('BACKUP_TOO_LARGE');
 });
 
-test('limits the history sample without changing total counts or claiming that missing reviews were restored', () => {
+test('limits the history sample without changing total counts or claiming that missing reviews were restored', async () => {
 	const rows = frames(); const template = frame(rows, 'reviewLogs');
 	const logs = Array.from({ length: 25 }, (_, index) => ({ meta: { ...template.meta, value: { ...template.meta.value, id: `review-${index}`, reviewedAt: new Date(Date.UTC(2026, 0, index + 1)).toISOString() } }, blob: Buffer.alloc(0) }));
-	const result = inspectUpstreamBackup(pack([...rows.filter(row => row.meta.store !== 'reviewLogs'), ...logs]));
+	const result = await inspectUpstreamBackup(pack([...rows.filter(row => row.meta.store !== 'reviewLogs'), ...logs]));
 	expect(result.counts.reviewLogs).toBe(25); expect(result.history).toHaveLength(20);
 	expect(result.history[0].id).toBe('review-24'); expect(result.canImport).toBe(false);
 });
 
-test('rejects the combined record limit even when every store fits its own limit', () => {
+test('rejects the combined record limit even when every store fits its own limit', async () => {
 	const rows = frames().filter(row => row.meta.store !== 'reviewLogs' && row.meta.store !== 'imports');
 	for (const store of ['reviewLogs', 'imports']) {
 		const template = frame(frames(), store);
@@ -150,5 +150,5 @@ test('rejects the combined record limit even when every store fits its own limit
 	}
 	const bytes = pack(rows);
 	expect(bytes.length).toBeLessThan(MAX_BACKUP_BYTES);
-	expect(() => inspectUpstreamBackup(bytes)).toThrow('UPSTREAM_INSPECTION_LIMIT');
+	await expect(inspectUpstreamBackup(bytes)).rejects.toThrow('UPSTREAM_INSPECTION_LIMIT');
 });

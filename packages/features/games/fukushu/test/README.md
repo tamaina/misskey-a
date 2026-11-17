@@ -121,3 +121,12 @@ The default ordinary-user binary-upload rejection is asserted first; no role
 policy is changed. `credentials.upstreamOwner` identifies the synthetic
 administrator account for Chrome. This
 is inspection only; it does not assert that upstream history was imported.
+
+`frontend/upstream-local.test.ts` runs the same pinned writer fixture through the
+portable parser and Web Crypto, with network calls forbidden and storage writes
+observed. It checks early file-size/extension rejection and checksum corruption.
+UI tests verify that choosing a local file calls no Drive or API method. The
+planned separate Chrome check signs in as an ordinary synthetic user, selects
+that local fixture, and verifies the unavailable-history report without a Drive
+upload. This local-file Chrome check is pending after the storage-pressure pause.
+Neither path imports upstream data into the database.

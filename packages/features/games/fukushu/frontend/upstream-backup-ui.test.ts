@@ -7,11 +7,13 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/vu
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
+import { inspectLocalUpstream } from './upstream-local.js';
 import UpstreamBackupPanel from './components/UpstreamBackupPanel.vue';
 import type { UpstreamInspection } from '../shared/upstream-backup.schema.js';
 
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
 vi.mock('@features/drive/frontend/utility/drive.js', () => ({ chooseDriveFile: vi.fn() }));
+vi.mock('./upstream-local.js', () => ({ inspectLocalUpstream: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({}));
 const internationalization = createInternationalization({ initialLocale: 'ja-JP' });
 beforeAll(async () => { await internationalization.ready; });
@@ -73,4 +75,33 @@ test('blocks duplicate reads, clears state on unmount and never follows up with 
 test('respects the parent operation lock', async () => {
 	mount(true); await expand(); expect(button(chooseLabel).disabled).toBe(true); expect(button(inspectLabel).disabled).toBe(true);
 	await fireEvent.click(button(chooseLabel)); expect(chooseDriveFile).not.toHaveBeenCalled();
+});
+
+test('local selection inspects only in memory without any Drive or API request', async () => {
+	vi.mocked(inspectLocalUpstream).mockResolvedValue(output);
+	mount(); await expand();
+	const file = new File(['synthetic'], 'local.fukushu');
+	await fireEvent.change(screen.getByTestId('upstream-local-file'), { target: { files: [file] } });
+	await screen.findByText('読み込めた内容');
+	expect(inspectLocalUpstream).toHaveBeenCalledWith(file);
+	expect(screen.getByText(/端末内で検査・未送信/)).toBeTruthy();
+	expect(screen.getByText(/回答時のカード内容: 不明/)).toBeTruthy();
+	expect(misskeyApi).not.toHaveBeenCalled(); expect(chooseDriveFile).not.toHaveBeenCalled();
+	expect(button(inspectLabel).disabled).toBe(true);
+});
+
+test('local read errors do not fall back to uploading or leave an old report', async () => {
+	vi.mocked(inspectLocalUpstream).mockRejectedValue({ code: 'INVALID_BACKUP' });
+	mount(); await expand();
+	await fireEvent.change(screen.getByTestId('upstream-local-file'), { target: { files: [new File(['bad'], 'bad.fukushu')] } });
+	await screen.findByRole('alert');
+	expect(screen.queryByText('読み込めた内容')).toBeNull();
+	expect(misskeyApi).not.toHaveBeenCalled(); expect(chooseDriveFile).not.toHaveBeenCalled();
+});
+
+test('parent operation lock also blocks local inspection', async () => {
+	mount(true); await expand();
+	expect(button('端末の .fukushu を検査').disabled).toBe(true);
+	await fireEvent.change(screen.getByTestId('upstream-local-file'), { target: { files: [new File(['x'], 'x.fukushu')] } });
+	expect(inspectLocalUpstream).not.toHaveBeenCalled(); expect(misskeyApi).not.toHaveBeenCalled();
 });
