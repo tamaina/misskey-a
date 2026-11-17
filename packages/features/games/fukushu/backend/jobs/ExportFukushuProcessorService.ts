@@ -10,6 +10,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DriveService } from '@features/drive/backend/services/DriveService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { DI } from '@/di-symbols.js';
+import { FukushuUpstreamStore } from '../upstream-store.js';
 import { FukushuBackupStore } from '../backup-store.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { DbExportFukushuData } from '@features/runtime/backend/queue/types.js';
@@ -20,19 +21,22 @@ import type * as Bull from 'bullmq';
 export async function exportFukushuBackup(data: DbExportFukushuData, deps: {
 	users: Pick<UsersRepository, 'findOneBy'>;
 	store: Pick<FukushuBackupStore, 'export'>;
+	upstream?: Pick<FukushuUpstreamStore, 'export'>;
 	drive: Pick<DriveService, 'addFile'>;
 	notifications: Pick<NotificationService, 'createNotification'>;
 }) {
 	const user = await deps.users.findOneBy({ id: data.user.id });
 	if (!user || user.host !== null || user.isDeleted) return;
-	const bytes = await deps.store.export(user.id, data.deckId);
+	if (data.upstream && !deps.upstream) throw new Error('Upstream export unavailable');
+	const bytes = data.upstream ? await deps.upstream!.export(user.id) : await deps.store.export(user.id, data.deckId);
+	const ext = data.upstream ? 'fukushu' : 'json';
 	const directory = await mkdtemp(join(tmpdir(), 'fukushu-backup-'));
-	const path = join(directory, 'backup.json');
+	const path = join(directory, `backup.${ext}`);
 	try {
 		await writeFile(path, bytes, { mode: 0o600 });
 		const current = await deps.users.findOneBy({ id: user.id });
 		if (!current || current.isDeleted) return;
-		const file = await deps.drive.addFile({ user: current, path, name: `fukushu-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.json`, ext: 'json', force: true });
+		const file = await deps.drive.addFile({ user: current, path, name: `fukushu-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.${ext}`, ext, force: true });
 		await deps.notifications.createNotification(user.id, 'exportCompleted', { exportedEntity: 'fukushu', fileId: file.id });
 	} finally { await rm(directory, { recursive: true, force: true }); }
 }
@@ -47,7 +51,7 @@ export class ExportFukushuProcessorService {
 	) {}
 
 	async process(job: Bull.Job<DbExportFukushuData>): Promise<void> {
-		await exportFukushuBackup(job.data, { users: this.users, store: new FukushuBackupStore(this.db), drive: this.drive, notifications: this.notifications });
+		await exportFukushuBackup(job.data, { users: this.users, store: new FukushuBackupStore(this.db), upstream: new FukushuUpstreamStore(this.db, { read: async () => { throw new Error('Export does not read Drive'); } }), drive: this.drive, notifications: this.notifications });
 		await job.updateProgress(100);
 	}
 }

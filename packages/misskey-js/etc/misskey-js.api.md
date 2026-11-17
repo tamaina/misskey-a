@@ -1796,6 +1796,13 @@ declare namespace entities {
         FukushuBackupExportRequest,
         FukushuBackupInspectRequest,
         FukushuBackupInspectResponse,
+        FukushuUpstreamRestoreRequest,
+        FukushuUpstreamRestoreResponse,
+        FukushuUpstreamShowRequest,
+        FukushuUpstreamShowResponse,
+        FukushuUpstreamReviewRequest,
+        FukushuUpstreamReviewResponse,
+        FukushuUpstreamExportRequest,
         FukushuMaterialsListRequest,
         FukushuMaterialsListResponse,
         FukushuMaterialsImportRequest,
@@ -3888,6 +3895,27 @@ type FukushuStudyReviewRequest = ContractRequest<'fukushu/study/review'>;
 
 // @public (undocumented)
 type FukushuStudyReviewResponse = ContractResponse<'fukushu/study/review'>;
+
+// @public (undocumented)
+type FukushuUpstreamExportRequest = ContractRequest<'fukushu/upstream/export'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreRequest = ContractRequest<'fukushu/upstream/restore'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreResponse = ContractResponse<'fukushu/upstream/restore'>;
+
+// @public (undocumented)
+type FukushuUpstreamReviewRequest = ContractRequest<'fukushu/upstream/review'>;
+
+// @public (undocumented)
+type FukushuUpstreamReviewResponse = ContractResponse<'fukushu/upstream/review'>;
+
+// @public (undocumented)
+type FukushuUpstreamShowRequest = ContractRequest<'fukushu/upstream/show'>;
+
+// @public (undocumented)
+type FukushuUpstreamShowResponse = ContractResponse<'fukushu/upstream/show'>;
 
 // @public (undocumented)
 type GalleryFeaturedRequest = ContractRequest<'gallery/featured'>;

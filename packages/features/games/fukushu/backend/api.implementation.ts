@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { FukushuUpstreamStore } from './upstream-store.js';
+import { UpstreamBackupError } from '../shared/upstream-reader.js';
+import { CompatibilitySessionError } from './pilot/upstream-session.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { implement } from '@orpc/server';
+import { QueryFailedError } from 'typeorm';
 import { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
@@ -28,18 +32,29 @@ import type { ApiContext } from '@features/api/backend/transport/context.js';
 
 async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	try { return await operation(); } catch (error) {
+		if (error instanceof UpstreamBackupError) throw apiError(backupErrors[error.code]);
+		if (error instanceof CompatibilitySessionError) throw apiError(studyErrors[error.code === 'NOT_STUDYABLE' ? 'STUDY_UNAVAILABLE' : 'STUDY_CONFLICT']);
 		if (error instanceof MaterialError) throw apiError(materialErrors[error.code]);
 		if (error instanceof BackupError) throw apiError(backupErrors[error.code]);
 		if (error instanceof StudyError) throw apiError(studyErrors[error.code]);
+		if (error instanceof QueryFailedError && error.driverError.code === '23505' && error.driverError.constraint === 'fukushu_source_collision') throw apiError(studyErrors.STUDY_CONFLICT);
 		throw error;
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }, upstream?: { store: Pick<FukushuUpstreamStore, 'restore' | 'show' | 'review'>; enqueue(ownerId: string): Promise<void> }) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
+	const upstreamStore = () => { if (!upstream) throw new BackupError('BACKUP_FAILED'); return upstream.store; };
 	const studyStore = () => { if (!study) throw new StudyError('STUDY_UNAVAILABLE'); return study; };
 	return implement(fukushuContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
+		upstreamRestore: procedure(fukushuContract.upstreamRestore).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().restore(context.principal.id, input.fileId, input.requestId))),
+		upstreamShow: procedure(fukushuContract.upstreamShow).use(principal).handler(({ context }) => invoke(() => upstreamStore().show(context.principal.id))),
+		upstreamReview: procedure(fukushuContract.upstreamReview).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().review(context.principal.id, input))),
+		upstreamExport: procedure(fukushuContract.upstreamExport).use(principal).handler(({ context }) => invoke(async () => {
+			await upstreamStore().show(context.principal.id);
+			await upstream!.enqueue(context.principal.id);
+		})),
 		upstreamInspect: procedure(fukushuContract.upstreamInspect).use(principal).handler(({ input, context }) => invoke(async () => {
 			if (!backup) throw new BackupError('BACKUP_FAILED');
 			return backup.inspector.inspectUpstream(context.principal.id, input.fileId);
@@ -98,7 +113,7 @@ export class FukushuApiProvider {
 				inspector,
 				restorer: new FukushuBackupRestorer(this.moduleRef.get(DI.db, { strict: false }), inspector),
 				enqueue: async (ownerId, deckId) => { await this.moduleRef.get(QueueService, { strict: false }).createExportFukushuJob({ id: ownerId }, deckId); },
-			});
+			}, { store: new FukushuUpstreamStore(this.moduleRef.get(DI.db, { strict: false }), inspector), enqueue: async ownerId => { await this.moduleRef.get(QueueService, { strict: false }).createExportFukushuJob({ id: ownerId }, '', true); } });
 		}
 		return this.router;
 	}

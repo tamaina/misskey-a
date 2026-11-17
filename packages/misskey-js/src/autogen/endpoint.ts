@@ -116,6 +116,13 @@ import type {
 	FukushuBackupExportRequest,
 	FukushuBackupInspectRequest,
 	FukushuBackupInspectResponse,
+	FukushuUpstreamRestoreRequest,
+	FukushuUpstreamRestoreResponse,
+	FukushuUpstreamShowRequest,
+	FukushuUpstreamShowResponse,
+	FukushuUpstreamReviewRequest,
+	FukushuUpstreamReviewResponse,
+	FukushuUpstreamExportRequest,
 	FukushuMaterialsListRequest,
 	FukushuMaterialsListResponse,
 	FukushuMaterialsImportRequest,
@@ -900,6 +907,10 @@ export type Endpoints = {
 	'fukushu/backup/restore': { req: FukushuBackupRestoreRequest; res: FukushuBackupRestoreResponse };
 	'fukushu/backup/export': { req: FukushuBackupExportRequest; res: EmptyResponse };
 	'fukushu/backup/inspect': { req: FukushuBackupInspectRequest; res: FukushuBackupInspectResponse };
+	'fukushu/upstream/restore': { req: FukushuUpstreamRestoreRequest; res: FukushuUpstreamRestoreResponse };
+	'fukushu/upstream/show': { req: FukushuUpstreamShowRequest; res: FukushuUpstreamShowResponse };
+	'fukushu/upstream/review': { req: FukushuUpstreamReviewRequest; res: FukushuUpstreamReviewResponse };
+	'fukushu/upstream/export': { req: FukushuUpstreamExportRequest; res: EmptyResponse };
 	'fukushu/materials/list': { req: FukushuMaterialsListRequest; res: FukushuMaterialsListResponse };
 	'fukushu/materials/import': { req: FukushuMaterialsImportRequest; res: FukushuMaterialsImportResponse };
 	'fukushu/materials/create': { req: FukushuMaterialsCreateRequest; res: FukushuMaterialsCreateResponse };

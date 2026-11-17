@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { upstreamContract } from './upstream.contract.js';
 import * as v from 'valibot';
 import { oc } from '@orpc/contract';
 import { misskeyId } from '../../../users/backend/users.input.schema.js';
@@ -50,6 +51,7 @@ const cardVersionSummarySchema = v.strictObject({
 export const fukushuContract = {
 	...studyContract,
 	...backupContract,
+	...upstreamContract,
 	list: base.$meta({ ...read, requestName: 'fukushu/materials/list' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/materials/list', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.input(objectInput({ archived: v.optional(v.boolean(), false) })).output(v.pipe(v.array(v.omit(deckSchema, ['sourceText'])), v.maxLength(100))),

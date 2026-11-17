@@ -1,0 +1,15 @@
+{
+  "upstreamCommit": "0efee271a13f15096beb8cbaaea25092c5927b29",
+  "chrome": "157.0.8103.78",
+  "chromiumSandbox": true,
+  "realIndexedDB": true,
+  "syntheticDataOnly": true,
+  "persistedExportSha256": "1d2f3ff90f1b528290841d9ba40283a842f50426bcd5092c2c287a2841222f5c",
+  "originalLogsUnchanged": 38,
+  "finalLogCount": 39,
+  "beforeReps": 1,
+  "afterReps": 2,
+  "binaryPreserved": true,
+  "verification": "isolated HTTP auth/Drive/PostgreSQL/export -> unchanged pinned upstream IndexedDB",
+  "verifiedAt": "2026-11-17T18:51:26Z"
+}

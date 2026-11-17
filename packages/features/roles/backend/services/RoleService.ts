@@ -128,6 +128,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	uploadableFileTypes: [
 		'text/*',
 		'application/json',
+		'application/x-fukushu-backup',
 		'image/*',
 		'video/*',
 		'audio/*',

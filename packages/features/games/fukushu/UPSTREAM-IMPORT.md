@@ -1,3 +1,7 @@
+> Historical inspection-only design for #334. The separately reviewed persistence
+> follow-up and narrow default MIME change are documented in [UPSTREAM-PERSISTENCE.md](UPSTREAM-PERSISTENCE.md).
+> The limitations below describe the earlier inspector, not the persistence API.
+
 # Upstream backup import boundary
 
 Refs #310. Depends on #332. Design recorded before implementation.

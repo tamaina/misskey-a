@@ -7,10 +7,10 @@ import * as v from 'valibot';
 import { MAX_BACKUP_BYTES } from '../../shared/backup.schema.js';
 import { readUpstreamArchive, UPSTREAM_MAGIC, UpstreamBackupError } from '../../shared/upstream-reader.js';
 import { studyRatingSchema, studyRequestIdSchema } from '../../shared/study.schema.js';
-import { upstreamStoreSchemas } from '../../shared/upstream-records.js';
+import { upstreamStoreSchemas } from '../../shared/upstream-records.schema.js';
 import { review } from '../fsrs.js';
 import type { UpstreamArchive, UpstreamFrame } from '../../shared/upstream-reader.js';
-import type { UpstreamRecords } from '../../shared/upstream-records.js';
+import type { UpstreamRecords } from '../../shared/upstream-records.schema.js';
 
 const sha256 = async (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
 const inputSchema = v.strictObject({
@@ -30,7 +30,7 @@ export class CompatibilitySessionError extends Error {
 }
 
 /** Existing upstream binary framing, not a new backup version. Never writes schema defaults. */
-async function encode(frames: UpstreamFrame[]): Promise<UpstreamArchive> {
+export async function encodeUpstreamFrames(frames: UpstreamFrame[]): Promise<UpstreamArchive> {
 	const parts: Uint8Array[] = [new TextEncoder().encode(UPSTREAM_MAGIC)];
 	let size = parts[0].length + 64;
 	for (const frame of frames) {
@@ -49,9 +49,9 @@ async function encode(frames: UpstreamFrame[]): Promise<UpstreamArchive> {
 	return readUpstreamArchive(bytes, sha256);
 }
 
-/** Unregistered, in-memory compatibility pilot. No API, owner store or native-v1 mutation.
+/** In-memory source compatibility engine, also used by the persistent owner adapter.
  * Imported log IDs/reps are independent of this session's optimistic revision counters.
- * A future persistent adapter must commit records and retry receipts in one owner transaction.
+ * The persistent adapter commits records and retry receipts in one owner transaction.
  */
 export class UpstreamCompatibilitySession {
 	private readonly revisions = new Map<string, number>();
@@ -97,7 +97,7 @@ export class UpstreamCompatibilitySession {
 		// Preserve original optional source values; replace only the reviewed state and append one log.
 		frames[index] = { ...frames[index], value: { ...frames[index].value, card: nextState.card, updatedAt: nextState.updatedAt } };
 		frames.push({ store: 'reviewLogs', value: record });
-		const candidate = await encode(frames);
+		const candidate = await encodeUpstreamFrames(frames);
 		const concurrentReplay = replay();
 		if (concurrentReplay) return concurrentReplay;
 		if (this.archive !== baseline) throw new CompatibilitySessionError('STALE_STATE');

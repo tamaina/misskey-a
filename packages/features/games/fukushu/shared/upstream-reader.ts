@@ -9,8 +9,8 @@
  */
 import * as v from 'valibot';
 import { MAX_BACKUP_BYTES } from './backup.schema.js';
-import { upstreamStoreSchemas } from './upstream-records.js';
-import type { UpstreamRecords } from './upstream-records.js';
+import { upstreamStoreSchemas } from './upstream-records.schema.js';
+import type { UpstreamRecords } from './upstream-records.schema.js';
 import type { UpstreamInspection } from './upstream-backup.schema.js';
 
 export const UPSTREAM_MAGIC = 'FUKUSHU-BACKUP-1\n';

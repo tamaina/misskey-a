@@ -48,13 +48,15 @@ for (const [url, entry] of [['/scenario.js', join(here, 'scenario.mjs')], ['/apk
 files.set('/sql-wasm.wasm', { body: await readFile(require.resolve('sql.js/dist/sql-wasm.wasm')), type: 'application/wasm' });
 files.set('/', { body: '<!doctype html><title>Disposable upstream compatibility test</title><input id="fixture" type="file"><script type="module" src="/scenario.js"></script>', type: 'text/html' });
 // Build the unregistered 9k adapter before starting Chrome (no overlapping build/browser work).
-const adapter = join(here, '../../backend/pilot/upstream-session.ts');
-await build({ entryPoints: [adapter], outfile: join(out, 'session.mjs'), bundle: true, platform: 'node', format: 'esm', packages: 'bundle', plugins: [{ name: 'private-deps', setup(api) {
+for (const [entry, output] of [['../../backend/pilot/upstream-session.ts', 'session.mjs'], ['../../shared/upstream-reader.ts', 'reader.mjs']]) {
+const adapter = join(here, entry);
+await build({ entryPoints: [adapter], outfile: join(out, output), bundle: true, platform: 'node', format: 'esm', packages: 'bundle', plugins: [{ name: 'private-deps', setup(api) {
 	api.onResolve({ filter: /^[^./]/ }, async args => {
 		if (args.path.startsWith('node:') || args.pluginData?.resolved) return;
 		return api.resolve(args.path, { resolveDir: args.importer.includes('node_modules') ? args.resolveDir : deps, kind: args.kind, pluginData: { resolved: true } });
 	});
 } }], logLevel: 'warning' });
+}
 const { UpstreamCompatibilitySession } = await import(pathToFileURL(join(out, 'session.mjs')));
 const server = createServer((req, res) => {
 	const file = files.get(req.url);
@@ -70,51 +72,82 @@ try {
 	page.on('pageerror', error => console.error(error));
 	await page.goto(`http://127.0.0.1:${server.address().port}/`);
 	await page.waitForFunction(() => window.compatibility);
-	const fixture = join(upstream, 'packages/anki-import/tests/fixtures/official-21b.apkg');
-	await page.locator('#fixture').setInputFiles(fixture);
-	const generated = await page.evaluate(() => window.compatibility.generate());
-	const archive = Buffer.from(generated.archive);
-	await writeFile(join(out, 'actual-upstream.fukushu'), archive);
-	const session = await UpstreamCompatibilitySession.open(archive);
-	assert.deepEqual(session.export(), new Uint8Array(archive));
-	const before = session.snapshot();
-	// Genuine non-UUID IDs are retained; local optimistic counters start at zero independently.
-	assert.equal(before.reviewLogs.filter(row => row.id.startsWith('anki:')).length, 36);
-	const request = { requestId: '36da1285-9941-4b4d-ad17-55c19c38eca5', questionId: generated.resetQuestionId, expectedRevision: 0, rating: 'easy', correct: true, answers: ['continued'], durationMs: 500, reviewedAt: '2026-11-18T13:00:00.000Z' };
-	const expected = await page.evaluate(({ raw, id, at }) => window.compatibility.restoreAndContinue(raw, id, at), { raw: generated.archive, id: generated.resetQuestionId, at: request.reviewedAt });
-	const result = await session.recordReview(request);
-	assert.deepEqual(result.state, expected.after);
-	assert.deepEqual({ ...result.record, id: expected.record.id }, expected.record);
-	assert.equal(result.revision, 1);
-	assert.equal(result.state.card.reps, 1);
-	assert.deepEqual(session.snapshot().reviewLogs.slice(0, before.reviewLogs.length), before.reviewLogs);
-	// Continue an APKG card from its current imported FSRS state as well as the reset card.
-	const apkgQuestion = before.reviewLogs.find(row => row.id.startsWith('anki:')).questionId;
-	const apkgRequest = { ...request, requestId: 'c5e772eb-78e7-44b1-8cdb-736dff7a270b', questionId: apkgQuestion };
-	const apkgExpected = await page.evaluate(({ raw, id, at }) => window.compatibility.restoreAndContinue(raw, id, at), { raw: Array.from(session.export()), id: apkgQuestion, at: request.reviewedAt });
-	const apkgResult = await session.recordReview(apkgRequest);
-	assert.deepEqual(apkgResult.state, apkgExpected.after);
-	assert.deepEqual({ ...apkgResult.record, id: apkgExpected.record.id }, apkgExpected.record);
-	assert.equal(apkgResult.revision, 1);
-	assert.equal(apkgResult.state.card.reps, apkgExpected.before.card.reps + 1);
-	await writeFile(join(out, 'expected-continuation.json'), JSON.stringify({ reset: { request, result }, apkg: { request: apkgRequest, result: apkgResult } }, null, 2) + '\n');
-	const after = session.export();
-	assert.deepEqual(await session.recordReview(request), result);
-	assert.deepEqual(session.export(), after);
-	await assert.rejects(session.recordReview({ ...request, rating: 'hard' }), { code: 'REQUEST_CONFLICT' });
-	const continued = await page.evaluate(({ raw, id }) => window.compatibility.restoreAndContinue(raw, id, '2026-11-19T13:00:00.000Z'), { raw: Array.from(after), id: generated.resetQuestionId });
-	assert.deepEqual(continued.before, result.state);
-	assert.equal(continued.logCountBefore, before.reviewLogs.length + 2);
-	assert.equal(continued.logCountAfter, before.reviewLogs.length + 3);
-	const returned = await UpstreamCompatibilitySession.open(new Uint8Array(continued.archive));
-	for (const store of ['decks', 'questions', 'settings', 'importSources', 'media', 'imports']) assert.deepEqual(returned.snapshot()[store], before[store]);
-	assert.deepEqual(returned.snapshot().studyStates.find(row => row.questionId === generated.resetQuestionId), continued.after);
-	for (const row of before.reviewLogs) assert.deepEqual(returned.snapshot().reviewLogs.find(log => log.id === row.id), row);
-	await writeFile(join(out, 'after-9k.fukushu'), after);
-	await writeFile(join(out, 'after-return-to-upstream.fukushu'), new Uint8Array(continued.archive));
-	const report = { continuation: { nineKMatchesUpstreamStateAndLog: true, originalLogsUnchanged: before.reviewLogs.length, retryIdempotent: true, returnedToUpstream: true, finalLogCount: continued.logCountAfter, finalReps: continued.after.card.reps, apkgBeforeReps: apkgExpected.before.card.reps, apkgAfterReps: apkgResult.state.card.reps }, upstreamCommit: pinned, chrome: browser.version(), chromiumSandbox: true, realIndexedDB: true, syntheticDataOnly: true, apkgSha256: createHash('sha256').update(await readFile(fixture)).digest('hex'), backupSha256: createHash('sha256').update(archive).digest('hex'), resetQuestionId: generated.resetQuestionId, ...generated.report };
-	await writeFile(join(out, 'provenance.json'), JSON.stringify(report, null, 2) + '\n');
-	console.log(JSON.stringify(report));
+	if (process.env.FUKUSHU_PERSISTED_EXPORT) {
+		// Explicit test artifact from full-app-http in its fresh, isolated owner DB.
+		const archive = await readFile(process.env.FUKUSHU_PERSISTED_EXPORT);
+		const session = await UpstreamCompatibilitySession.open(archive);
+		const before = session.snapshot();
+		const saved = JSON.parse(await readFile(process.env.FUKUSHU_PERSISTED_STATE, 'utf8'));
+		assert.deepEqual(before.studyStates.find(row => row.questionId === saved.state.questionId), saved.state);
+		assert.equal(before.reviewLogs.length, 38);
+		assert.equal(before.reviewLogs.filter(row => row.id.startsWith('anki:')).length, 36);
+		const continued = await page.evaluate(({ raw, id, at }) => window.compatibility.restoreAndContinue(raw, id, at), {
+			raw: Array.from(archive), id: saved.state.questionId,
+			at: new Date(Date.parse(saved.record.reviewedAt) + 86400000).toISOString(),
+		});
+		assert.deepEqual(continued.before, saved.state);
+		assert.equal(continued.after.card.reps, saved.state.card.reps + 1);
+		assert.equal(continued.logCountBefore, 38); assert.equal(continued.logCountAfter, 39);
+		const returned = await UpstreamCompatibilitySession.open(new Uint8Array(continued.archive));
+		for (const store of ['decks', 'questions', 'settings', 'importSources', 'media', 'imports']) assert.deepEqual(returned.snapshot()[store], before[store]);
+		for (const row of before.reviewLogs) assert.deepEqual(returned.snapshot().reviewLogs.find(log => log.id === row.id), row);
+		// Read the source framing as well: normalized records intentionally omit binary payloads.
+		const { readUpstreamArchive } = await import(pathToFileURL(join(out, 'reader.mjs')));
+		const sha = async bytes => createHash('sha256').update(bytes).digest('hex');
+		const sourceFrames = (await readUpstreamArchive(archive, sha)).frames();
+		const returnedFrames = (await readUpstreamArchive(new Uint8Array(continued.archive), sha)).frames();
+		assert.deepEqual(returnedFrames.filter(row => row.blob !== undefined), sourceFrames.filter(row => row.blob !== undefined));
+		await writeFile(join(out, 'persisted-return-to-upstream.fukushu'), new Uint8Array(continued.archive));
+		const report = { upstreamCommit: pinned, chrome: browser.version(), chromiumSandbox: true, realIndexedDB: true, syntheticDataOnly: true, persistedExportSha256: createHash('sha256').update(archive).digest('hex'), originalLogsUnchanged: 38, finalLogCount: 39, beforeReps: saved.state.card.reps, afterReps: continued.after.card.reps, binaryPreserved: true };
+		await writeFile(join(out, 'persisted-provenance.json'), JSON.stringify(report, null, 2) + '\n');
+		console.log(JSON.stringify(report));
+	} else {
+		const fixture = join(upstream, 'packages/anki-import/tests/fixtures/official-21b.apkg');
+		await page.locator('#fixture').setInputFiles(fixture);
+		const generated = await page.evaluate(() => window.compatibility.generate());
+		const archive = Buffer.from(generated.archive);
+		await writeFile(join(out, 'actual-upstream.fukushu'), archive);
+		const session = await UpstreamCompatibilitySession.open(archive);
+		assert.deepEqual(session.export(), new Uint8Array(archive));
+		const before = session.snapshot();
+		// Genuine non-UUID IDs are retained; local optimistic counters start at zero independently.
+		assert.equal(before.reviewLogs.filter(row => row.id.startsWith('anki:')).length, 36);
+		const request = { requestId: '36da1285-9941-4b4d-ad17-55c19c38eca5', questionId: generated.resetQuestionId, expectedRevision: 0, rating: 'easy', correct: true, answers: ['continued'], durationMs: 500, reviewedAt: '2026-11-18T13:00:00.000Z' };
+		const expected = await page.evaluate(({ raw, id, at }) => window.compatibility.restoreAndContinue(raw, id, at), { raw: generated.archive, id: generated.resetQuestionId, at: request.reviewedAt });
+		const result = await session.recordReview(request);
+		assert.deepEqual(result.state, expected.after);
+		assert.deepEqual({ ...result.record, id: expected.record.id }, expected.record);
+		assert.equal(result.revision, 1);
+		assert.equal(result.state.card.reps, 1);
+		assert.deepEqual(session.snapshot().reviewLogs.slice(0, before.reviewLogs.length), before.reviewLogs);
+		// Continue an APKG card from its current imported FSRS state as well as the reset card.
+		const apkgQuestion = before.reviewLogs.find(row => row.id.startsWith('anki:')).questionId;
+		const apkgRequest = { ...request, requestId: 'c5e772eb-78e7-44b1-8cdb-736dff7a270b', questionId: apkgQuestion };
+		const apkgExpected = await page.evaluate(({ raw, id, at }) => window.compatibility.restoreAndContinue(raw, id, at), { raw: Array.from(session.export()), id: apkgQuestion, at: request.reviewedAt });
+		const apkgResult = await session.recordReview(apkgRequest);
+		assert.deepEqual(apkgResult.state, apkgExpected.after);
+		assert.deepEqual({ ...apkgResult.record, id: apkgExpected.record.id }, apkgExpected.record);
+		assert.equal(apkgResult.revision, 1);
+		assert.equal(apkgResult.state.card.reps, apkgExpected.before.card.reps + 1);
+		await writeFile(join(out, 'expected-continuation.json'), JSON.stringify({ reset: { request, result }, apkg: { request: apkgRequest, result: apkgResult } }, null, 2) + '\n');
+		const after = session.export();
+		assert.deepEqual(await session.recordReview(request), result);
+		assert.deepEqual(session.export(), after);
+		await assert.rejects(session.recordReview({ ...request, rating: 'hard' }), { code: 'REQUEST_CONFLICT' });
+		const continued = await page.evaluate(({ raw, id }) => window.compatibility.restoreAndContinue(raw, id, '2026-11-19T13:00:00.000Z'), { raw: Array.from(after), id: generated.resetQuestionId });
+		assert.deepEqual(continued.before, result.state);
+		assert.equal(continued.logCountBefore, before.reviewLogs.length + 2);
+		assert.equal(continued.logCountAfter, before.reviewLogs.length + 3);
+		const returned = await UpstreamCompatibilitySession.open(new Uint8Array(continued.archive));
+		for (const store of ['decks', 'questions', 'settings', 'importSources', 'media', 'imports']) assert.deepEqual(returned.snapshot()[store], before[store]);
+		assert.deepEqual(returned.snapshot().studyStates.find(row => row.questionId === generated.resetQuestionId), continued.after);
+		for (const row of before.reviewLogs) assert.deepEqual(returned.snapshot().reviewLogs.find(log => log.id === row.id), row);
+		await writeFile(join(out, 'after-9k.fukushu'), after);
+		await writeFile(join(out, 'after-return-to-upstream.fukushu'), new Uint8Array(continued.archive));
+		const report = { continuation: { nineKMatchesUpstreamStateAndLog: true, originalLogsUnchanged: before.reviewLogs.length, retryIdempotent: true, returnedToUpstream: true, finalLogCount: continued.logCountAfter, finalReps: continued.after.card.reps, apkgBeforeReps: apkgExpected.before.card.reps, apkgAfterReps: apkgResult.state.card.reps }, upstreamCommit: pinned, chrome: browser.version(), chromiumSandbox: true, realIndexedDB: true, syntheticDataOnly: true, apkgSha256: createHash('sha256').update(await readFile(fixture)).digest('hex'), backupSha256: createHash('sha256').update(archive).digest('hex'), resetQuestionId: generated.resetQuestionId, ...generated.report };
+		await writeFile(join(out, 'provenance.json'), JSON.stringify(report, null, 2) + '\n');
+		console.log(JSON.stringify(report));
+	}
 } finally {
 	await browser?.close();
 	await new Promise(resolve => server.close(resolve));

@@ -144,3 +144,14 @@ test('upstream inspection reuses the owned bounded reader without calling native
 	f.file.userId = 'alice'; f.file.md5 = 'changed';
 	await expect(f.inspector.inspectUpstream('alice', 'owned-file')).rejects.toThrow('BACKUP_FAILED');
 });
+
+test('source export uses the source store, original extension and the existing private temporary lifecycle', async () => {
+	const f = exportFixture();
+	const bytes = await readFile('../features/games/fukushu/test/backend/fixtures/actual-upstream/actual-upstream.fukushu');
+	const upstream = { export: vi.fn(async () => bytes) }; let path = '';
+	f.drive.addFile.mockImplementation(async input => { path = input.path; expect(await readFile(path)).toEqual(bytes); return { id: 'saved-backup' }; });
+	await exportFukushuBackup({ user: { id: 'alice' }, deckId: '', upstream: true }, { users: f.users, store: f.store, upstream, drive: f.drive, notifications: f.notifications } as never);
+	expect(upstream.export).toHaveBeenCalledWith('alice'); expect(f.store.export).not.toHaveBeenCalled();
+	expect(f.drive.addFile).toHaveBeenCalledWith(expect.objectContaining({ ext: 'fukushu', name: expect.stringMatching(/\.fukushu$/) }));
+	await expect(access(path)).rejects.toThrow();
+});

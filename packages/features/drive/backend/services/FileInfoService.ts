@@ -17,6 +17,7 @@ import * as fileType from 'file-type';
 import { createTempDir } from '@features/runtime/backend/io/create-temp.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
+import { FUKUSHU_MIME, isFukushuBackupFile } from '../utility/fukushu-file-type.js';
 import { isMimeImage } from '../utility/is-mime-image.js';
 import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
 import type { SensitiveMediaDetectionService } from './SensitiveMediaDetectionService.js';
@@ -78,7 +79,9 @@ export class FileInfoService {
 
 		if (type.mime === TYPE_OCTET_STREAM.mime && opts.fileName != null) {
 			const ext = opts.fileName.split('.').pop()?.toLowerCase();
-			if (ext === 'txt') {
+			if (ext === 'fukushu' && await isFukushuBackupFile(path)) {
+				type = { mime: FUKUSHU_MIME, ext: 'fukushu' };
+			} else if (ext === 'txt') {
 				type = {
 					mime: 'text/plain',
 					ext: 'txt',

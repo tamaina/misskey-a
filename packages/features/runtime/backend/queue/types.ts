@@ -67,7 +67,7 @@ export type DbJobMap = {
 	deleteAccount: DbUserDeleteJobData;
 };
 
-export type DbExportFukushuData = { user: ThinUser; deckId: string };
+export type DbExportFukushuData = { user: ThinUser; deckId: string; upstream?: boolean };
 
 export type DbJobDataWithUser = {
 	user: ThinUser;

@@ -332,8 +332,8 @@ export class QueueService {
 	}
 
 	@bindThis
-	public createExportFukushuJob(user: ThinUser, deckId: string) {
-		return this.dbQueue.add('exportFukushu', { user: { id: user.id }, deckId }, {
+	public createExportFukushuJob(user: ThinUser, deckId: string, upstream = false) {
+		return this.dbQueue.add('exportFukushu', { user: { id: user.id }, deckId, ...(upstream ? { upstream: true } : {}) }, {
 			attempts: 1,
 			removeOnComplete: { age: 3600 * 24 * 7, count: 30 },
 			removeOnFail: { age: 3600 * 24 * 7, count: 100 },

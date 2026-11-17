@@ -532,13 +532,13 @@ test('real authentication, Drive, material maintenance and explanation versions'
 	});
 	await step('upstream binary inspection uses owned Drive and reports unknown history without importing or changing schedules', async () => {
 		const bytes = await readFile(new URL('./backend/fixtures/upstream-backup.fukushu', import.meta.url));
-		// Preserve the default Drive policy: ordinary users cannot upload unknown binary MIME.
+		// Only the verified Fukushu envelope receives a dedicated allowed MIME.
+		const damaged = Buffer.from(bytes); damaged[damaged.length - 1] ^= 1;
 		const deniedForm = new FormData(); deniedForm.set('i', credentials.dana.token);
-		deniedForm.set('file', new Blob([bytes], { type: 'application/octet-stream' }), 'upstream-history.fukushu');
+		deniedForm.set('file', new Blob([damaged], { type: 'application/octet-stream' }), 'damaged.fukushu');
 		const denied = await readResponse(await fetch(`${origin}/api/drive/files/create`, { method: 'POST', body: deniedForm, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000) }));
 		assert.equal(denied.status, 400); assert.equal(denied.body.error.code, 'UNALLOWED_FILE_TYPE');
-		// The synthetic administrator already has the existing moderator upload exemption.
-		const owner = credentials.admin; const form = new FormData();
+		const owner = credentials.dana; const form = new FormData();
 		form.set('i', owner.token); form.set('file', new Blob([bytes], { type: 'application/octet-stream' }), 'upstream-history.fukushu');
 		const uploaded = ok(await readResponse(await fetch(`${origin}/api/drive/files/create`, { method: 'POST', body: form, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000) })));
 		const before = ok(await call('fukushu/materials/list', {}, owner.token));
@@ -557,7 +557,102 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.deepEqual(ok(await call('fukushu/materials/list', {}, owner.token)), before);
 		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
 		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
-		credentials.upstreamOwner = 'admin'; credentials.admin.upstreamFileId = uploaded.id;
+		credentials.upstreamOwner = 'dana'; credentials.dana.upstreamFileId = uploaded.id;
 		await writeFile(credentialsPath, JSON.stringify(credentials, null, 2), { mode: 0o600 });
+	});
+	let sourceFile;
+	let sourceBefore;
+	let sourceReview;
+	const sourceRequestId = randomUUID();
+	const sourceFrames = bytes => {
+		const magic = Buffer.from('FUKUSHU-BACKUP-1\n');
+		assert.deepEqual(bytes.subarray(0, magic.length), magic);
+		assert.equal(createHash('sha256').update(bytes.subarray(0, -64)).digest('hex'), bytes.subarray(-64).toString());
+		const frames = [];
+		for (let offset = magic.length; offset < bytes.length - 64;) {
+			const length = bytes.readUInt32LE(offset); offset += 4;
+			const row = JSON.parse(bytes.subarray(offset, offset + length).toString()); offset += length;
+			const binary = row.blobSize === undefined ? undefined : bytes.subarray(offset, offset + row.blobSize);
+			offset += row.blobSize ?? 0;
+			frames.push({ ...row, ...(binary === undefined ? {} : { binary }) });
+		}
+		return frames;
+	};
+	await step('ordinary user imports real source-generated APKG/reset records through authenticated Drive', async () => {
+		const bytes = await readFile(new URL('./backend/fixtures/actual-upstream/actual-upstream.fukushu', import.meta.url));
+		const form = new FormData(); form.set('i', alice.token);
+		form.set('file', new Blob([bytes], { type: 'application/octet-stream' }), 'actual-upstream.fukushu');
+		sourceFile = ok(await readResponse(await fetch(`${origin}/api/drive/files/create`, { method: 'POST', body: form, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000) })));
+		assert.equal(sourceFile.type, 'application/x-fukushu-backup');
+		const input = { fileId: sourceFile.id, requestId: sourceRequestId, confirmRestore: true };
+		const delegated = ok(await call('miauth/gen-token', { session: randomUUID(), permission: ['read:account', 'write:account', 'read:drive'] }, alice.token)).token;
+		for (const denied of [await call('fukushu/upstream/restore', input), await call('fukushu/upstream/restore', input, delegated, true)]) {
+			assert.equal(denied.status, 400); assert.equal(denied.body.error.code, 'ACCESS_DENIED');
+		}
+		assert.equal((await call('fukushu/upstream/restore', { fileId: sourceFile.id, requestId: sourceRequestId }, alice.token)).status, 400);
+		assert.equal((await call('fukushu/upstream/restore', input, bob.token)).status, 404);
+		const restored = ok(await call('fukushu/upstream/restore', { ...input, ownerId: bob.id }, alice.token));
+		assert.equal(restored.sha256, createHash('sha256').update(bytes).digest('hex'));
+		assert.deepEqual(ok(await call('fukushu/upstream/restore', input, alice.token)), restored);
+		assert.equal((await call('fukushu/upstream/restore', { ...input, requestId: randomUUID() }, alice.token)).status, 409);
+		sourceBefore = ok(await call('fukushu/upstream/show', {}, alice.token));
+		assert.equal(sourceBefore.records.reviewLogs.length, 37);
+		assert.equal(sourceBefore.records.reviewLogs.filter(row => row.id.startsWith('anki:')).length, 36);
+		assert.equal(sourceBefore.records.settings[0].desiredRetention, 0.87);
+		assert.equal((await call('fukushu/upstream/show', { ownerId: alice.id }, bob.token)).status, 404);
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), beforeBackup);
+		assert.deepEqual(ok(await call('fukushu/study/history', { id: ids.id }, alice.token)), beforeHistory);
+	});
+	await step('persistent source review keeps reset history and rejects duplicate changes or stale tabs', async () => {
+		const expected = JSON.parse(await readFile(new URL('./backend/fixtures/actual-upstream/expected-continuation.json', import.meta.url), 'utf8'));
+		const input = { ...expected.reset.request }; delete input.reviewedAt;
+		const before = sourceBefore.records.studyStates.find(row => row.questionId === input.questionId);
+		assert.equal(before.card.reps, 0);
+		assert.equal(sourceBefore.records.reviewLogs.filter(row => row.questionId === input.questionId).length, 1);
+		sourceReview = ok(await call('fukushu/upstream/review', input, alice.token));
+		assert.equal(sourceReview.state.card.reps, 1); assert.equal(sourceReview.revision, 1);
+		assert.deepEqual(ok(await call('fukushu/upstream/review', input, alice.token)), sourceReview);
+		assert.equal((await call('fukushu/upstream/review', { ...input, rating: 'hard' }, alice.token)).status, 409);
+		assert.equal((await call('fukushu/upstream/review', { ...input, requestId: randomUUID() }, alice.token)).status, 409);
+		assert.equal((await call('fukushu/upstream/review', input, bob.token)).status, 404);
+		const after = ok(await call('fukushu/upstream/show', {}, alice.token));
+		assert.equal(after.records.reviewLogs.length, 38);
+		for (const log of sourceBefore.records.reviewLogs) assert.deepEqual(after.records.reviewLogs.find(row => row.id === log.id), log);
+	});
+	await step('source export uses the real queue and preserves source IDs, current state and all binary payloads', async () => {
+		assert.equal((await call('fukushu/upstream/export', {}, alice.token)).status, 400);
+		ok(await call('fukushu/upstream/export', { acknowledgeDriveVisibility: true }, alice.token), 204);
+		let outputFile;
+		const deadline = Date.now() + 30_000;
+		while (!outputFile && Date.now() < deadline) {
+			const notifications = ok(await call('i/notifications', { includeTypes: ['exportCompleted'], limit: 10 }, alice.token));
+			const completed = notifications.find(n => n.exportedEntity === 'fukushu' && n.fileId !== backupFile.id);
+			if (completed) outputFile = ok(await call('drive/files/show', { fileId: completed.fileId }, alice.token));
+			else await setTimeout(300);
+		}
+		assert.ok(outputFile); assert.match(outputFile.name, /\.fukushu$/);
+		assert.equal(new URL(outputFile.url).origin, origin);
+		const response = await fetch(outputFile.url, { redirect: 'error', signal: AbortSignal.timeout(10_000) });
+		assert.equal(response.status, 200);
+		const output = Buffer.from(await response.arrayBuffer());
+		const frames = sourceFrames(output);
+		const original = sourceFrames(await readFile(new URL('./backend/fixtures/actual-upstream/actual-upstream.fukushu', import.meta.url)));
+		assert.deepEqual(frames.filter(row => row.binary), original.filter(row => row.binary));
+		for (const row of original.filter(row => row.store !== 'studyStates')) assert.deepEqual(frames.find(item => item.store === row.store && item.value.id === row.value.id), row);
+		assert.deepEqual(frames.find(row => row.store === 'studyStates' && row.value.questionId === sourceReview.state.questionId).value, sourceReview.state);
+		assert.deepEqual(frames.find(row => row.store === 'reviewLogs' && row.value.id === sourceReview.record.id).value, sourceReview.record);
+		await writeFile(join(directory, 'persisted-export.fukushu'), output, { mode: 0o600 });
+		await writeFile(join(directory, 'persisted-state.json'), JSON.stringify(sourceReview), { mode: 0o600 });
+	});
+	await step('native review cannot reuse an imported/source review ID and rolls back its schedule', async () => {
+		const own = structuredClone(material); own.deck.id = 'collision-probe';
+		own.questions.forEach((question, index) => { question.id = `collision-question-${index}`; question.deckId = own.deck.id; question.payload.id = question.id; question.payload.deckId = own.deck.id; });
+		ok(await call('fukushu/materials/create', { material: own }, alice.token));
+		const before = ok(await call('fukushu/study/queue', { id: own.deck.id }, alice.token));
+		const item = before.items[0];
+		const conflict = await call('fukushu/study/review', { id: own.deck.id, questionId: item.question.id, questionVersion: 1, expectedStateRevision: 0, requestId: sourceReview.record.id, rating: 'good', durationMs: 500 }, alice.token);
+		assert.equal(conflict.status, 409); assert.equal(conflict.body.error.code, 'STUDY_CONFLICT');
+		assert.deepEqual(ok(await call('fukushu/study/history', { id: own.deck.id }, alice.token)), []);
+		assert.deepEqual(ok(await call('fukushu/study/queue', { id: own.deck.id }, alice.token)).items, before.items);
 	});
 });
