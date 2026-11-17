@@ -10123,7 +10123,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/notifications/frontend/components/MkNotification.vue",
-		"currentSha256": "7b77d03b660aa58084fd40d8a93f5060beded5959c526e13ea51bd3f765961a4",
+		"currentSha256": "ced01a2b480f7c5ac6ee9b532c704e12e43b00e6fde2524b79b3102869c865c9",
 		"baselineSha256": "3ec05f2de99a4e5e50f12711f19e90e3457913568130f20874305842c9a92c61",
 		"keys": [
 			"favorites",
@@ -10184,6 +10184,12 @@ export const globalCatalogPilotOwners = [
 				"start": 14037,
 				"end": 14131,
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"baseline": ""
+			},
+			{
+				"start": 14699,
+				"end": 14720,
+				"current": "\tfukushu: 'Fukushu',\n",
 				"baseline": ""
 			}
 		]
