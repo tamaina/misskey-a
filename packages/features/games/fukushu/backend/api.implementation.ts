@@ -25,7 +25,7 @@ async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive'>, importer?: Pick<FukushuDriveImporter, 'import'>) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
 	return implement(fukushuContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
@@ -38,6 +38,9 @@ export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' 
 			});
 		}),
 		update: procedure(fukushuContract.update).use(principal).handler(({ input, context }) => invoke(() => store.update(context.principal.id, input.id, input.expectedRevision, input.name, input.description))),
+		updateCardExplanation: procedure(fukushuContract.updateCardExplanation).use(principal).handler(({ input, context }) => invoke(() => store.updateCardExplanation(context.principal.id, input.id, input.questionId, input.expectedRevision, input.explanation))),
+		listCardVersions: procedure(fukushuContract.listCardVersions).use(principal).handler(({ input, context }) => invoke(() => store.listCardVersions(context.principal.id, input.id, input.questionId, { before: input.before, limit: input.limit }))),
+		showCardVersion: procedure(fukushuContract.showCardVersion).use(principal).handler(({ input, context }) => invoke(() => store.showCardVersion(context.principal.id, input.id, input.questionId, input.version))),
 		archive: procedure(fukushuContract.archive).use(principal).handler(({ input, context }) => invoke(() => store.archive(context.principal.id, input.id, input.expectedRevision, input.archived))),
 		create: procedure(fukushuContract.create).use(principal).handler(({ input, context }) => invoke(() => store.create(context.principal.id, input.material))),
 		show: procedure(fukushuContract.show).use(principal).handler(({ input, context }) => invoke(() => store.show(context.principal.id, input.id))),

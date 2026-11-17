@@ -29,6 +29,9 @@ export class MiFukushuQuestion {
 	@Column('integer')
 	public position: number;
 
+	@Column('integer', { default: 1 })
+	public currentVersion: number;
+
 	@Column('jsonb')
 	public data: FukushuMaterial['questions'][number];
 }

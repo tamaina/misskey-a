@@ -16,7 +16,7 @@ const text = (max: number) => v.pipe(v.string(), v.maxLength(max), v.check(value
 export const sourceIdSchema = v.pipe(text(256), v.minLength(1));
 const timestamp = v.pipe(v.string(), v.isoTimestamp());
 const integer = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(1_000_000));
-const content = v.strictObject({ format: v.literal('plain'), value: text(16_384) });
+export const plainContentSchema = v.strictObject({ format: v.literal('plain'), value: text(16_384) });
 
 export const deckSchema = v.strictObject({
 	id: sourceIdSchema,
@@ -38,12 +38,12 @@ const payload = v.strictObject({
 	deckId: sourceIdSchema,
 	sourceKey: sourceIdSchema,
 	name: v.optional(text(256)),
-	prompt: content,
+	prompt: plainContentSchema,
 	categoryPath: v.pipe(v.array(text(256)), v.maxLength(32)),
-	explanation: v.optional(content),
+	explanation: v.optional(plainContentSchema),
 	shuffleChoices: v.optional(v.boolean()),
 	kind: v.literal('flashcard'),
-	answer: content,
+	answer: plainContentSchema,
 	ankiNoteType: v.optional(v.literal('Basic')),
 	typeAnswer: v.optional(v.boolean()),
 	acceptedAnswer: v.optional(text(16_384)),
