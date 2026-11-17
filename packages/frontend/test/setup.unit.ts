@@ -62,6 +62,7 @@ export const preferState: Record<string, unknown> = {
 
 	// なんかtestがうまいこと動かないのでここに書く
 	autoplayEmbededPlayerOfUrlPreview: true,
+	disableNoteNyaize: false,
 	dataSaver: {
 		media: false,
 		avatar: false,
