@@ -6,9 +6,9 @@ existing `write:account` and `read:account` permissions respectively. There is n
 public material URL or other-user access. Missing and foreign IDs both return
 `NO_SUCH_MATERIAL`. Ownership comes only from the authenticated principal.
 
-This is a **create-only material API**, not a `.fukushu` backup restore.
-The UI and bounded Drive importer described below add a way to create new decks;
-they never replace or update existing decks. It preserves a bounded subset of the upstream `DeckRecord` and
+This is a bounded material API with metadata edits and recoverable archiving,
+not a `.fukushu` backup restore. The Drive importer creates new decks; it never
+replaces existing decks or their cards. It preserves a bounded subset of the upstream `DeckRecord` and
 `QuestionRecord` formats from
 [tamaina/fukushu, 0efee271](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/infrastructure/db/schema.ts).
 The source IDs, card payload IDs, deck references, source keys, timestamps,
@@ -27,8 +27,8 @@ as text, never as trusted HTML.
 Limits: 1–1,000 cards and at most 1 MiB of UTF-8 JSON per material; 256-character
 opaque source IDs; 16,384-character prompt/answer content. Each owner may create
 100 materials, with an atomic quota across workers and a 5/minute create rate.
-This pilot has no update/delete API: the quota cannot be reclaimed through it.
-Those operations need an explicit history-preserving design before expansion.
+Archived materials count toward the same total quota: archiving does not reclaim
+a slot. Permanent deletion and card replacement remain outside this pilot.
 Account deletion cascades to the owner's new tables. Migration rollback drops
 these tables and their data, so export before downgrading.
 
@@ -38,7 +38,7 @@ of #313's grading core and does not call it. No grading result, numeric toleranc
 FSRS schedule, review history, backup or existing IndexedDB state is changed.
 
 Follow-up: extend the bounded Drive importer to additional upstream formats through
-explicit schemas; design source/media ownership, updates, deletion and server
+explicit schemas; design source/media ownership, card replacement, permanent deletion and server
 backup migration/merge with history preservation. Future FSRS integration must
 derive automatic ratings from `correct`, not `score` (100 can still be incorrect).
 Do not independently change the inherited decimal tolerance boundary or replay
@@ -50,7 +50,9 @@ existing history with new grading semantics.
 shows plain-text cards, 20 at a time. Revealing an answer is a preview only: it
 writes no grading, FSRS or review state. `fukushu/materials/list` requires
 `read:account`, returns at most the existing owner quota of 100 decks in ID order,
-and excludes source text. `show` retains the original records and ordering.
+and excludes source text. It returns active decks by default; `{archived: true}`
+selects archived decks. `show` retains card records and ordering and adds
+`revision` and nullable `archivedAt` outside the upstream material JSON.
 
 Upload a source to Drive using the existing Drive UI, then choose that Drive file
 in Fukushu. `fukushu/materials/import` accepts only `fileId`; both `write:account`
@@ -82,7 +84,7 @@ metadata are retained. Same-owner imports with the same source type and SHA256
 are rejected atomically under the existing owner lock, including concurrent
 requests or a retry after losing the response. Other owners can independently
 import the same source. A changed source creates a new deck; it does not update
-or merge an existing deck or its future history. There is still no deletion API.
+or merge an existing deck or its future history. There is no permanent deletion API.
 
 Local originals use existing internal storage. Object-storage originals use the
 **recorded URL** and the existing SSRF-aware DownloadService, with its redirect
@@ -98,10 +100,50 @@ This imports content reachable at an existing original URL; it does **not**
 implement #319's authenticated S3 original-delivery design or create private S3
 access. Drive source URL visibility is unchanged, as the UI explicitly states.
 Stored material access is owner-only. No public sharing, APKG/GIFT import,
-backup replacement, media, update/delete or study scheduling is added.
+backup replacement, media, card replacement or study scheduling is added.
 
 This slice builds on #321. Keep `games/fukushu` as its owner boundary when
 composing with #317/#318: retain the `/fukushu` route/link, move the games landing
 link to `games/index` with that PR, preserve every API operation, and regenerate
 the combined SDK/OpenAPI expectations. Do not replace the games provider or DI
 identities with Fukushu's provider.
+
+
+## Metadata changes and recoverable archive
+
+`fukushu/materials/update` changes only the deck name (1–256 characters), optional
+description (up to 4,096 characters), and deck `updatedAt`. Omitting `description`
+removes that optional field; the UI submits an empty string to clear its text.
+`fukushu/materials/archive` accepts an explicit `archived` boolean. Both require
+`write:account`, the material `id` and `expectedRevision`; each has the existing
+5/minute write limit. Missing and foreign IDs return the same 404.
+
+The owner advisory lock serializes create/update/archive across workers. A stale
+revision returns `MATERIAL_CONFLICT` (409) without writing. Every accepted
+mutation increments the integer revision; clients must reload after a conflict
+or uncertain response before deciding to retry. The UI preserves edit drafts,
+shows the newly loaded server metadata separately, and requires another explicit
+save. It never automatically retries a rejected mutation.
+
+Archive/restore change only management columns, retaining the exact deck JSON,
+cards, source text/hash, imported time, IDs and source keys. Archived materials
+remain accessible to their owner through `show`, remain in source deduplication,
+and can be restored from the archived list. No public visibility changes.
+The metadata update also retains all those fields except name/description and
+deck `updatedAt`; the full stored material must still satisfy the 1 MiB bound.
+
+This differs deliberately from upstream `deckRepository.remove`, which deletes
+cards, study states, review logs and import records, and from source replacement,
+which can reset scheduling for incompatible answers. Neither behavior is copied.
+The current server slice has no FSRS/review tables, so retention tests prove card
+and source identity, not migration of upstream study history. Future source
+replacement needs versioned card payloads and an explicit history migration plan.
+
+The management migration adds columns with active/revision-1 defaults to existing
+decks. Its `down` preserves deck/card JSON but discards archive/revision state;
+reapplying it makes every retained deck active at revision 1. The earlier material
+migration still drops its tables when reverted. These are development migrations,
+not a backup/restore procedure.
+
+See [the real-application test notes](test/README.md) for isolated authentication,
+Drive upload, ownership, metadata conflict and archive/restore checks.

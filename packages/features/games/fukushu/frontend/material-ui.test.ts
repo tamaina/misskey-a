@@ -238,7 +238,6 @@ test('reopens a successfully imported material after a failed show without impor
 	expect(vi.mocked(misskeyApi).mock.calls.filter(([endpoint]) => endpoint.endsWith('/import'))).toHaveLength(1);
 });
 
-
 test('does not change archive state optimistically when its revision is stale', async () => {
 	const original = data();
 	vi.mocked(misskeyApi).mockImplementation(async endpoint => {

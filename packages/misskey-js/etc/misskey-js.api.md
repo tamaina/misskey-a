@@ -1791,6 +1791,10 @@ declare namespace entities {
         FukushuMaterialsCreateResponse,
         FukushuMaterialsShowRequest,
         FukushuMaterialsShowResponse,
+        FukushuMaterialsUpdateRequest,
+        FukushuMaterialsUpdateResponse,
+        FukushuMaterialsArchiveRequest,
+        FukushuMaterialsArchiveResponse,
         BubbleGameRankingRequest,
         BubbleGameRankingResponse,
         BubbleGameRegisterRequest,
@@ -3774,6 +3778,12 @@ type FollowingUpdateResponse = ContractResponse<'following/update'>;
 export const followingVisibilities: readonly ["public", "followers", "private"];
 
 // @public (undocumented)
+type FukushuMaterialsArchiveRequest = ContractRequest<'fukushu/materials/archive'>;
+
+// @public (undocumented)
+type FukushuMaterialsArchiveResponse = ContractResponse<'fukushu/materials/archive'>;
+
+// @public (undocumented)
 type FukushuMaterialsCreateRequest = ContractRequest<'fukushu/materials/create'>;
 
 // @public (undocumented)
@@ -3796,6 +3806,12 @@ type FukushuMaterialsShowRequest = ContractRequest<'fukushu/materials/show'>;
 
 // @public (undocumented)
 type FukushuMaterialsShowResponse = ContractResponse<'fukushu/materials/show'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateRequest = ContractRequest<'fukushu/materials/update'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateResponse = ContractResponse<'fukushu/materials/update'>;
 
 // @public (undocumented)
 type GalleryFeaturedRequest = ContractRequest<'gallery/featured'>;

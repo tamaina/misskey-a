@@ -111,6 +111,10 @@ import type {
 	FukushuMaterialsCreateResponse,
 	FukushuMaterialsShowRequest,
 	FukushuMaterialsShowResponse,
+	FukushuMaterialsUpdateRequest,
+	FukushuMaterialsUpdateResponse,
+	FukushuMaterialsArchiveRequest,
+	FukushuMaterialsArchiveResponse,
 	BubbleGameRankingRequest,
 	BubbleGameRankingResponse,
 	BubbleGameRegisterRequest,
@@ -874,6 +878,8 @@ export type Endpoints = {
 	'fukushu/materials/import': { req: FukushuMaterialsImportRequest; res: FukushuMaterialsImportResponse };
 	'fukushu/materials/create': { req: FukushuMaterialsCreateRequest; res: FukushuMaterialsCreateResponse };
 	'fukushu/materials/show': { req: FukushuMaterialsShowRequest; res: FukushuMaterialsShowResponse };
+	'fukushu/materials/update': { req: FukushuMaterialsUpdateRequest; res: FukushuMaterialsUpdateResponse };
+	'fukushu/materials/archive': { req: FukushuMaterialsArchiveRequest; res: FukushuMaterialsArchiveResponse };
 	'bubble-game/ranking': { req: BubbleGameRankingRequest; res: BubbleGameRankingResponse };
 	'bubble-game/register': { req: BubbleGameRegisterRequest; res: EmptyResponse };
 	'reversi/cancel-match': { req: ReversiCancelMatchRequest; res: EmptyResponse };

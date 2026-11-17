@@ -155,9 +155,8 @@ test('real authentication, Drive and recoverable material maintenance', { skip: 
 		assert.equal(current.deck.name, input.name);
 		assert.equal(current.deck.description, input.description);
 		assert.ok(Date.parse(current.deck.updatedAt) >= Date.parse(material.deck.updatedAt));
-		const { name: _name, description: _description, updatedAt: _updatedAt, ...unchanged } = current.deck;
-		const { name: _originalName, description: _originalDescription, updatedAt: _originalUpdatedAt, ...original } = material.deck;
-		assert.deepEqual(unchanged, original);
+		const preserved = deck => Object.fromEntries(Object.entries(deck).filter(([key]) => !['name', 'description', 'updatedAt'].includes(key)));
+		assert.deepEqual(preserved(current.deck), preserved(material.deck));
 		assert.deepEqual(current.questions, material.questions);
 	});
 	await step('stale and foreign-owner mutations leave the stored records unchanged', async () => {
