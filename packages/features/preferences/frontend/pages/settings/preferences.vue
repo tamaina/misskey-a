@@ -105,6 +105,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<MkNyaizePreference/>
+
 							<SearchMarker :keywords="['mfm', 'enable', 'show', 'advanced']">
 								<MkPreferenceContainer k="advancedMfm">
 									<MkSwitch v-model="advancedMfm">
@@ -894,6 +896,7 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkPreferenceContainer from '@features/preferences/frontend/components/MkPreferenceContainer.vue';
+import MkNyaizePreference from '@features/preferences/frontend/components/MkNyaizePreference.vue';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { globalEvents } from '@features/runtime/frontend/events.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { restoreNyaizePreferencesBaseline } from './nyaize-preferences-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -16676,6 +16677,7 @@ const globalValue = (dictionary: unknown, key: string): unknown => {
 export function restoreGlobalCatalogPilotSource(file: string, source: string): string {
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
 	if (!owner || sha256(source) === owner.baselineSha256) return source;
+	source = restoreNyaizePreferencesBaseline(file, source);
 	if (sha256(source) !== owner.currentSha256) throw new Error(`Global catalog pilot source differs: ${file}`);
 	// Reverse exact reviewed upstream follow-up edits made after the pilot before replaying it.
 	if ('edits' in owner) {

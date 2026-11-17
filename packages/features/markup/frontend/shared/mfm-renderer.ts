@@ -74,6 +74,7 @@ export type MfmRendererConfig = {
 	getOptions?: () => {
 		advancedMfm: boolean;
 		animatedMfm: boolean;
+		disableNyaize?: boolean;
 	};
 	/** 子コンポーネントが対応している追加の props */
 	supports?: {
@@ -96,7 +97,8 @@ export function createMfmRenderer<P extends MfmBaseProps = MfmBaseProps>(config:
 		const { Url, Link, Mention, A, Time, Emoji, CustomEmoji, Code, CodeInline, Search, Sparkle } = config.components();
 
 		const isNote = props.isNote ?? true;
-		const shouldNyaize = props.nyaize ? props.nyaize === 'respect' ? props.author?.isCat : false : false;
+		const { advancedMfm, animatedMfm, disableNyaize } = config.getOptions?.() ?? { advancedMfm: true, animatedMfm: true };
+		const shouldNyaize = disableNyaize ? false : props.nyaize ? props.nyaize === 'respect' ? props.author?.isCat : false : false;
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (props.text == null || props.text === '') return;
@@ -114,7 +116,6 @@ export function createMfmRenderer<P extends MfmBaseProps = MfmBaseProps>(config:
 			return c.match(/^[0-9a-f]{3,6}$/i) ? c : null;
 		};
 
-		const { advancedMfm, animatedMfm } = config.getOptions?.() ?? { advancedMfm: true, animatedMfm: true };
 		const useAnim = advancedMfm && animatedMfm;
 
 		const linkProps = supportsNavigationBehavior ? { navigationBehavior: props.linkNavigationBehavior } : {};

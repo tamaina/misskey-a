@@ -43,6 +43,7 @@ export default createMfmRenderer<MfmProps>({
 	getOptions: () => ({
 		advancedMfm: prefer.s.advancedMfm,
 		animatedMfm: prefer.s.animatedMfm,
+		disableNyaize: prefer.r.disableNoteNyaize.value,
 	}),
 	supports: {
 		navigationBehavior: true,

@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { restoreNyaizeMfmBaseline } from './nyaize-preferences-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -31,6 +32,7 @@ const sha256 = (source: string): string => createHash('sha256').update(source).d
 export function restoreUpstreamDevelopBaseline(file: string, source: string): string {
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase || sha256(source) === rebase.baselineSha256 || sha256(source) === rebase.historicalSha256) return source;
+	source = restoreNyaizeMfmBaseline(file, source);
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from reviewed upstream develop: ${file}`);
 	for (const edit of [...rebase.edits].reverse()) {
 		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Upstream develop boundary differs: ${file}`);
