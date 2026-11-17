@@ -42,7 +42,7 @@ test('requires explicit Drive visibility acknowledgement and queues once without
 	expect(misskeyApi).toHaveBeenCalledTimes(1);
 	expect(vi.mocked(misskeyApi).mock.calls[0].slice(0, 2)).toEqual(['fukushu/backup/export', { id: 'deck', acknowledgeDriveVisibility: true }]);
 	finish();
-	await screen.findByText(/まだ保存完了ではありません/);
+	await screen.findByText(/保存結果は通知または Drive/);
 	expect(button('バックアップを Drive に保存').disabled).toBe(true);
 });
 
@@ -53,7 +53,7 @@ test('failed or uncertain export explicitly requires checking Drive and notifica
 	await fireEvent.click(button('バックアップを Drive に保存'));
 	await screen.findByRole('alert');
 	expect(screen.getByText(/再実行する前に通知と Drive を確認/)).toBeTruthy();
-	expect(screen.queryByText(/まだ保存完了ではありません/)).toBeNull();
+	expect(screen.queryByText(/保存結果は通知または Drive/)).toBeNull();
 	expect(misskeyApi).toHaveBeenCalledTimes(1);
 });
 

@@ -224,6 +224,7 @@ async function composeNotification(data: PushNotificationDataMap[keyof PushNotif
 						customEmoji: i18n.ts.customEmojis,
 						favorite: i18n.ts.favorites,
 						following: i18n.ts.following,
+						fukushu: 'Fukushu',
 						muting: i18n.ts.mutedUsers,
 						note: i18n.ts.notes,
 						userList: i18n.ts.lists,
