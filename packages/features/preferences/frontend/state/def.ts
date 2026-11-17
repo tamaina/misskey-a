@@ -222,6 +222,9 @@ export const PREF_DEF = definePreferences({
 	advancedMfm: {
 		default: true,
 	},
+	disableNoteNyaize: {
+		default: false,
+	},
 	showReactionsCount: {
 		default: false,
 	},
