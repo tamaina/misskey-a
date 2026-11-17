@@ -104,7 +104,7 @@ const {
 } = useMkSelect({
 	items: [
 		{ value: 'all', label: $locale.value.sfc.antennaSourcesAll },
-		//{ value: 'home', label: $locale.value.sfc.antennaSourcesHomeTimeline },
+		{ value: 'home', label: $locale.value.sfc.antennaSourcesHomeTimeline },
 		{ value: 'users', label: $locale.value.sfc.antennaSourcesUsers },
 		//{ value: 'list', label: $locale.value.sfc.antennaSourcesUserList },
 		{ value: 'users_blacklist', label: $locale.value.sfc.antennaSourcesUserBlacklist },

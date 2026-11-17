@@ -111,8 +111,6 @@ export class AntennaService implements OnApplicationShutdown {
 		return matchedAntennas;
 	}
 
-	// NOTE: フォローしているユーザーのノート、リストのユーザーのノート、グループのユーザーのノート指定はパフォーマンス上の理由で無効になっている
-
 	@bindThis
 	public async checkHitAntenna(antenna: MiAntenna, note: (MiNote | Packed<'Note'>), noteUser: { id: MiUser['id']; username: string; host: string | null; isBot: boolean; }): Promise<boolean> {
 		if (antenna.excludeNotesInSensitiveChannel && note.channel?.isSensitive) return false;
@@ -136,7 +134,8 @@ export class AntennaService implements OnApplicationShutdown {
 		}
 
 		if (antenna.src === 'home') {
-			// TODO
+			const isFollowing = Object.hasOwn(await this.cacheService.userFollowingsCache.fetch(antenna.userId), note.userId);
+			if (!isFollowing) return false;
 		} else if (antenna.src === 'list') {
 			if (antenna.userListId == null) return false;
 			const exists = await this.userListMembershipsRepository.exists({
