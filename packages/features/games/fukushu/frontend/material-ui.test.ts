@@ -258,7 +258,6 @@ test('does not change archive state optimistically when its revision is stale', 
 	expect((screen.getByText('教材を保管').closest('button') as HTMLButtonElement).disabled).toBe(false);
 });
 
-
 test('separates study from preview and guards material navigation while a review result is unknown', async () => {
 	const original = data();
 	let reject!: (cause: unknown) => void;

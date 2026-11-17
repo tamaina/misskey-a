@@ -39,6 +39,7 @@ export function review(card: StoredFsrsCard, now: Date, rating: StudyRating, ret
 	const result = scheduler.next(deserializeCard(card), now, ratingMap[rating]);
 	return { card: serializeCard(result.card), log: serializeLog(result.log) };
 }
+
 function serializeLog(log: ReviewLog): StoredFsrsReviewLog {
 	return {
 		rating: log.rating, state: log.state, due: log.due.toISOString(), stability: log.stability,

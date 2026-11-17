@@ -3337,6 +3337,216 @@ export default {
 		}
 	},
 	"fukushu": {
+		"studyQueue": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/queue"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/queue",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyReview": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/review"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/review",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyHistory": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/history"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/history",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
 		"list": {
 			"~orpc": {
 				"errorMap": {

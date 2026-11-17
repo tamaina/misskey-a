@@ -123,13 +123,13 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		['/fukushu/study/history', 'post___fukushu___study___history'],
 	]);
 	const addedFukushuIds = new Set(addedFukushuOperations.values());
-	expect(addedFukushuIds.size).toBe(9);
+	expect(addedFukushuIds.size).toBe(12);
 	for (const [path, operationId] of addedFukushuOperations) {
 		expect(spec.paths?.[path]?.post?.operationId).toBe(operationId);
 		expect(spec.paths?.[path]?.get).toBeUndefined();
 	}
 	// Exclude the fifteen deferred SSO routes from the preceding API count.
-	// The nine explicitly verified Fukushu IDs do not change the historical baseline.
+	// The twelve explicitly verified Fukushu IDs do not change the historical baseline.
 	expect(identifiers.filter(id => !addedSecurityIds.has(id!) && !addedFukushuIds.has(id!))).toHaveLength(481);
 	expect(identifiers).toHaveLength(481 + 27 + 12);
 	expect(new Set(identifiers).size).toBe(identifiers.length);

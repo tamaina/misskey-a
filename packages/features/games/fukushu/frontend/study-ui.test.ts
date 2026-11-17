@@ -31,12 +31,14 @@ function question(id = 'card-a', typeAnswer = false): FukushuMaterial['questions
 		},
 	};
 }
+
 function queue(typeAnswer = false): StudyQueue {
 	return {
 		deckId: 'deck', serverTime: time,
 		items: ['card-a', 'card-b'].map(id => ({ question: question(id, typeAnswer), questionVersion: 2, stateRevision: 0, isNew: true, due: time })),
 	};
 }
+
 function result(input: StudyReviewInput): StudyReviewResult {
 	return {
 		id: input.requestId, questionVersion: input.questionVersion, stateRevision: input.expectedStateRevision + 1,
@@ -48,6 +50,7 @@ function result(input: StudyReviewInput): StudyReviewResult {
 		},
 	};
 }
+
 function historyEntry(index: number): StudyHistoryItem {
 	const input: StudyReviewInput = { id: 'deck', questionId: 'card-a', questionVersion: 1, expectedStateRevision: 0, requestId: `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`, rating: 'good', durationMs: 1000 };
 	const saved = question();
@@ -56,15 +59,20 @@ function historyEntry(index: number): StudyHistoryItem {
 	saved.payload.explanation!.value = `回答時の解説 ${index}`;
 	return { ...result(input), question: saved };
 }
+
 function mount(archived = false, events: Record<string, unknown> = {}) {
 	return render(StudyPanel, { props: { deckId: 'deck', archived, ...events }, global: { plugins: [internationalization] } });
 }
+
 function requests() { return vi.mocked(misskeyApi).mock.calls.filter(([endpoint]) => endpoint === 'fukushu/study/review'); }
+
 function button(name: string) { return screen.getByRole('button', { name }) as HTMLButtonElement; }
+
 async function begin() {
 	await fireEvent.click(button('復習を始める'));
 	await screen.findByText('<img src=x onerror=alert(1)>');
 }
+
 function simpleApi(typeAnswer = false) {
 	vi.mocked(misskeyApi).mockImplementation(async (endpoint, input) => {
 		if (endpoint === 'fukushu/study/queue') return queue(typeAnswer) as never;
@@ -143,7 +151,7 @@ test('blocks duplicate clicks and retains the exact request after an uncertain r
 	const payloads: StudyReviewInput[] = [];
 	vi.mocked(misskeyApi).mockImplementation(async (endpoint, input) => {
 		if (endpoint === 'fukushu/study/queue') return queue() as never;
-		payloads.push({ ...input } as StudyReviewInput);
+		payloads.push({ ...input as StudyReviewInput });
 		if (attempt++ === 0) {
 			// The production API helper appends credentials to its argument. It must
 			// receive a copy, not contaminate the retained logical review request.
@@ -183,7 +191,7 @@ test('a definite conflict requires a fresh queue and never silently retries the 
 			value.items[0].stateRevision = loads === 1 ? 0 : 1;
 			return value as never;
 		}
-		if ((input as StudyReviewInput).questionVersion === 2) throw { code: 'STUDY_CONFLICT' };
+		if ((input as StudyReviewInput).questionVersion === 2) throw Object.assign(new Error('Conflict'), { code: 'STUDY_CONFLICT' });
 		return result(input as StudyReviewInput) as never;
 	});
 	mount();
@@ -285,7 +293,6 @@ test('an unmounted panel ignores a late successful write and makes no follow-up 
 	expect(locked).not.toHaveBeenCalled();
 	expect(misskeyApi).toHaveBeenCalledTimes(2);
 });
-
 
 test('a history refresh failure cannot turn a saved review back into a pending submission', async () => {
 	vi.mocked(misskeyApi).mockImplementation(async (endpoint, input) => {

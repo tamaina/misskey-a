@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { readFileSync } from 'node:fs';
 import { expect, test } from 'vitest';
 import { emptyStoredCard, review, schedulerVersion, desiredRetention, enableFuzz } from '../../backend/fsrs.js';
+import fixtureData from './fixtures/upstream-fsrs.json';
 import type { StoredFsrsCard, StoredFsrsReviewLog, StudyRating } from '../../shared/study.schema.js';
 
 // Generated independently by running the pinned upstream adapter against its
 // SHA-512-verified official ts-fsrs 5.4.1 tarball, not by this implementation.
-const fixtures = JSON.parse(readFileSync(new URL('./fixtures/upstream-fsrs.json', import.meta.url), 'utf8')) as {
+const fixtures = fixtureData as {
 	scheduler: string; retention: number; fuzz: boolean;
 	cases: { name: string; before: StoredFsrsCard; now: string; rating: StudyRating; result: { card: StoredFsrsCard; log: StoredFsrsReviewLog } }[];
 };

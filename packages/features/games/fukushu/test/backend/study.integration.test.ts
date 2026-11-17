@@ -203,6 +203,7 @@ describe.skipIf(!socket)('private flashcard study PostgreSQL', () => {
 			FROM fukushu_review_log l CROSS JOIN (SELECT '22222222-2222-4222-8222-' || lpad(n::text, 12, '0') AS id FROM generate_series(1, $3::integer) n) generated
 			WHERE l."ownerId" = $1 AND l.id = $2`, [owner, originalId, count]);
 	}
+
 	test('retains idempotent retries at the 10000-row cap and rolls back every new write', async () => {
 		await materials.create('alice', material());
 		const input = request(); const saved = await study.review('alice', input);
@@ -256,7 +257,7 @@ describe.skipIf(!socket)('private flashcard study PostgreSQL', () => {
 	});
 	test('a database failure after baseline capture rolls back the baseline, state and log together', async () => {
 		await materials.create('alice', material());
-		await db.query(`CREATE FUNCTION reject_test_review() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'injected review failure'; END $$`);
+		await db.query('CREATE FUNCTION reject_test_review() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION \'injected review failure\'; END $$');
 		await db.query('CREATE TRIGGER reject_test_review BEFORE INSERT ON fukushu_review_log FOR EACH ROW EXECUTE FUNCTION reject_test_review()');
 		try {
 			await expect(study.review('alice', request())).rejects.toThrow('injected review failure');

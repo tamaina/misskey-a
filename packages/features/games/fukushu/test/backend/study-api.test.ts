@@ -15,12 +15,14 @@ import type { FukushuStore } from '../../backend/store.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 const request = { id: 'deck', questionId: 'card', questionVersion: 1, expectedStateRevision: 0, requestId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', rating: 'good' as const, durationMs: 0 };
+
 function fixture() {
 	const study = mockDeep<FukushuStudyStore>();
 	const api = createFukushuRouter(mockDeep<FukushuStore>(), undefined, study);
 	const user = mockDeep<MiLocalUser>({ id: 'alice', isSuspended: false, movedToUri: null });
 	return { study, api, user };
 }
+
 describe('private flashcard study contract', () => {
 	test('requires a principal and separates account read/write scopes', async () => {
 		const { study, api, user } = fixture();

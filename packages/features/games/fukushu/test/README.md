@@ -65,3 +65,20 @@ do not claim that upstream study history was imported. Bob retains one new typed
 card for a subsequent real-browser study check; `credentials.studyOwner` records
 the owned test account for that check. PostgreSQL tests separately cover concurrent mutations, total quota (including archived materials), source
 deduplication and migration round trips.
+
+## Pinned FSRS compatibility fixture
+
+`backend/fixtures/upstream-fsrs.json` was generated independently from the exact
+upstream `infrastructure/fsrs/adapter.ts` at commit
+`0efee271a13f15096beb8cbaaea25092c5927b29`, using its locked ts-fsrs 5.4.1 package.
+The official npm tarball SHA-512 was checked against the upstream lockfile:
+`sha512-mOp9+oexJexBTkwjg/jQI1aSUQRLIAvbimeKHLSmVdNJPwObugFNKmZkoggH5d6kZ0uaWLboP1Al1DnXAfIb9w==`.
+
+Start with `emptyStoredCard(2026-11-16T00:00:00.000Z)`. The four independent new-card
+cases review at `2026-11-17T00:00:00.000Z`. The separate sequence uses Again at
+Nov 17 00:00 UTC, Good at Nov 17 00:02, Hard at Nov 18 00:00, Easy at Nov 20 00:00,
+and Again at Dec 1 00:00. Every call uses retention 0.9 and fuzz false, and feeds
+the upstream serialized output into the next call. `fsrs.test.ts` compares full
+card/log outputs and checks that inputs are not mutated. This intentionally
+retains the upstream adapter's omitted `learning_steps` field. These are scheduler
+compatibility cases, not a command to replay a user's history.

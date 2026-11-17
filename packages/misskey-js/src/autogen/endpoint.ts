@@ -103,6 +103,12 @@ import type {
 	FlashSearchResponse,
 	UsersFlashsRequest,
 	UsersFlashsResponse,
+	FukushuStudyQueueRequest,
+	FukushuStudyQueueResponse,
+	FukushuStudyReviewRequest,
+	FukushuStudyReviewResponse,
+	FukushuStudyHistoryRequest,
+	FukushuStudyHistoryResponse,
 	FukushuMaterialsListRequest,
 	FukushuMaterialsListResponse,
 	FukushuMaterialsImportRequest,
@@ -880,6 +886,9 @@ export type Endpoints = {
 	'flash/update': { req: FlashUpdateRequest; res: EmptyResponse };
 	'flash/search': { req: FlashSearchRequest; res: FlashSearchResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
+	'fukushu/study/queue': { req: FukushuStudyQueueRequest; res: FukushuStudyQueueResponse };
+	'fukushu/study/review': { req: FukushuStudyReviewRequest; res: FukushuStudyReviewResponse };
+	'fukushu/study/history': { req: FukushuStudyHistoryRequest; res: FukushuStudyHistoryResponse };
 	'fukushu/materials/list': { req: FukushuMaterialsListRequest; res: FukushuMaterialsListResponse };
 	'fukushu/materials/import': { req: FukushuMaterialsImportRequest; res: FukushuMaterialsImportResponse };
 	'fukushu/materials/create': { req: FukushuMaterialsCreateRequest; res: FukushuMaterialsCreateResponse };

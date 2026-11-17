@@ -1783,6 +1783,12 @@ declare namespace entities {
         FlashSearchResponse,
         UsersFlashsRequest,
         UsersFlashsResponse,
+        FukushuStudyQueueRequest,
+        FukushuStudyQueueResponse,
+        FukushuStudyReviewRequest,
+        FukushuStudyReviewResponse,
+        FukushuStudyHistoryRequest,
+        FukushuStudyHistoryResponse,
         FukushuMaterialsListRequest,
         FukushuMaterialsListResponse,
         FukushuMaterialsImportRequest,
@@ -3836,6 +3842,24 @@ type FukushuMaterialsUpdateRequest = ContractRequest<'fukushu/materials/update'>
 
 // @public (undocumented)
 type FukushuMaterialsUpdateResponse = ContractResponse<'fukushu/materials/update'>;
+
+// @public (undocumented)
+type FukushuStudyHistoryRequest = ContractRequest<'fukushu/study/history'>;
+
+// @public (undocumented)
+type FukushuStudyHistoryResponse = ContractResponse<'fukushu/study/history'>;
+
+// @public (undocumented)
+type FukushuStudyQueueRequest = ContractRequest<'fukushu/study/queue'>;
+
+// @public (undocumented)
+type FukushuStudyQueueResponse = ContractResponse<'fukushu/study/queue'>;
+
+// @public (undocumented)
+type FukushuStudyReviewRequest = ContractRequest<'fukushu/study/review'>;
+
+// @public (undocumented)
+type FukushuStudyReviewResponse = ContractResponse<'fukushu/study/review'>;
 
 // @public (undocumented)
 type GalleryFeaturedRequest = ContractRequest<'gallery/featured'>;

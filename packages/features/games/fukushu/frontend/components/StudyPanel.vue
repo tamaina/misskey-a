@@ -130,10 +130,13 @@ watch(locked, value => emit('locked', value), { immediate: true, flush: 'sync' }
 watch(active, value => emit('active', value), { immediate: true, flush: 'sync' });
 
 function ratingLabel(rating: StudyRating) { return $locale.value.sfc[rating]; }
+
 function localDate(value: string) { return new Date(value).toLocaleString(); }
+
 function errorCode(cause: unknown): string | null {
 	return typeof cause === 'object' && cause !== null && 'code' in cause && typeof cause.code === 'string' ? cause.code : null;
 }
+
 function resetCard() { revealed.value = false; typedAnswer.value = ''; saved.value = null; started = performance.now(); }
 
 async function start() {
@@ -165,6 +168,7 @@ function reveal() {
 	if (!item.value || props.disabled || props.archived || locked.value || needsReload.value || !canReveal.value) return;
 	revealed.value = true;
 }
+
 function revealOnEnter(event: KeyboardEvent) {
 	if (event.key !== 'Enter' || event.isComposing || event.keyCode === 229) return;
 	event.preventDefault();
