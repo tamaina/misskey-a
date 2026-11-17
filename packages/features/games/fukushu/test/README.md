@@ -126,7 +126,9 @@ is inspection only; it does not assert that upstream history was imported.
 portable parser and Web Crypto, with network calls forbidden and storage writes
 observed. It checks early file-size/extension rejection and checksum corruption.
 UI tests verify that choosing a local file calls no Drive or API method. The
-planned separate Chrome check signs in as an ordinary synthetic user, selects
-that local fixture, and verifies the unavailable-history report without a Drive
-upload. This local-file Chrome check is pending after the storage-pressure pause.
+separate Chrome check reached the local-file button as an ordinary synthetic
+user, but selecting the fixture was blocked by extension file-URL permissions.
+An isolated Playwright Chrome fallback stopped at sandbox initialization. No
+permission or sandbox setting was weakened. Post-selection browser rendering
+is unverified; final frontend types, builds and 25 real HTTP cases passed.
 Neither path imports upstream data into the database.

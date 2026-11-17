@@ -113,8 +113,11 @@ actual upstream persistence remain separate, unimplemented for this format.
 
 Tests cover the upstream-writer fixture through Web Crypto, corruption and early
 size rejection, no network/storage calls, and UI handling without Drive/API use.
-The real ordinary-account Chrome check with the synthetic fixture is pending
-after a storage-pressure pause. Local tests passed; final frontend typecheck
-was interrupted by the user-requested pause, and rebuild/E2E have not run for
-this local-file addition. This does not establish real upstream IndexedDB/APKG round-trip
+Final frontend typecheck, shipping checks, backend/frontend builds and 25 real
+HTTP cases passed after the storage pause. The ordinary-account Chrome login
+and local-file button were verified, but the extension could not select the
+fixture without file-URL permission. An isolated Playwright Chrome alternative
+also stopped at sandbox initialization, before exercising the page. No extension
+permission or sandbox protection was changed. The post-selection browser render
+therefore remains unverified; Web Crypto and component unit tests passed. This does not establish real upstream IndexedDB/APKG round-trip
 compatibility, historical card reconstruction or actual migration success.
