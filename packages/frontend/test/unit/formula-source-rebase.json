@@ -1,0 +1,138 @@
+[
+  {
+    "file": "packages/features/instance/frontend/pages/admin/branding.vue",
+    "currentSha256": "2072842b426e3bf1f99e6442b5ffd4e568b667e480cbcd017b64fe681432954d",
+    "baselineSha256": "8034f4e174eb867b6d09ef350a285b0a9dc7c872e163141baac95687cb2601a8",
+    "edits": [
+      {
+        "start": 385,
+        "end": 432,
+        "current": "\t\t\t\t<MkFormulaSetting v-model=\"latexEnabled\"/>\n",
+        "baseline": ""
+      },
+      {
+        "start": 7804,
+        "end": 7979,
+        "current": "import MkFormulaSetting from '@features/markup/frontend/components/MkFormulaSetting.vue';\nimport { isLatexEnabled } from '@features/markup/frontend/shared/formula-safety.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 8119,
+        "end": 8181,
+        "current": "const latexEnabled = ref(isLatexEnabled(meta.clientOptions));\n",
+        "baseline": ""
+      },
+      {
+        "start": 9374,
+        "end": 9411,
+        "current": "\t\t\tlatexEnabled: latexEnabled.value,\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/markup/frontend/shared/mfm-renderer.ts",
+    "currentSha256": "3033e1f961632b9971a55ae621d6f60390567baf8644937903463b529f44cdaa",
+    "baselineSha256": "fea540f7251299411be142842333bbbf58f31fdb3aeceb7bbe50360f95759d45",
+    "edits": [
+      {
+        "start": 1662,
+        "end": 1759,
+        "current": "\t\t/** Disabled or omitted Formula preserves the escaped code fallback. */\n\t\tFormula?: Component;\n",
+        "baseline": ""
+      },
+      {
+        "start": 1763,
+        "end": 1841,
+        "current": "\t/** 描画のたびに呼ばれる (設定の変更をリアクティブに反映するため) 。省略時は advancedMfm / animatedMfm のみ有効 */\n",
+        "baseline": "\t/** 描画のたびに呼ばれる (設定の変更をリアクティブに反映するため) 。省略時はすべて有効 */\n"
+      },
+      {
+        "start": 1911,
+        "end": 1937,
+        "current": "\t\tlatexEnabled?: boolean;\n",
+        "baseline": ""
+      },
+      {
+        "start": 2682,
+        "end": 2809,
+        "current": "\t\tconst { Url, Link, Mention, A, Time, Emoji, CustomEmoji, Code, CodeInline, Search, Sparkle, Formula } = config.components();\n",
+        "baseline": "\t\tconst { Url, Link, Mention, A, Time, Emoji, CustomEmoji, Code, CodeInline, Search, Sparkle } = config.components();\n"
+      },
+      {
+        "start": 3528,
+        "end": 3648,
+        "current": "\t\tconst { advancedMfm, animatedMfm, latexEnabled } = config.getOptions?.() ?? { advancedMfm: true, animatedMfm: true };\n",
+        "baseline": "\t\tconst { advancedMfm, animatedMfm } = config.getOptions?.() ?? { advancedMfm: true, animatedMfm: true };\n"
+      },
+      {
+        "start": 16347,
+        "end": 16459,
+        "current": "\t\t\t\t\tif (Formula && latexEnabled === true) return [h(Formula, { formula: token.props.formula, block: false })];\n",
+        "baseline": ""
+      },
+      {
+        "start": 16536,
+        "end": 16647,
+        "current": "\t\t\t\t\tif (Formula && latexEnabled === true) return [h(Formula, { formula: token.props.formula, block: true })];\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/markup/frontend/components/global/MkMfm.ts",
+    "currentSha256": "35eccc4cfc88de9853492aa8e60689ba407fa0c02c02f7e47a327c087ef3e9f9",
+    "baselineSha256": "be76c96b093e9410c1fb21ae07c339a22e1c169e48eb86ee8cfe1491c9c92a98",
+    "edits": [
+      {
+        "start": 190,
+        "end": 415,
+        "current": "import MkFormula from '@features/markup/frontend/shared/MkFormula.vue';\nimport { isLatexEnabled } from '@features/markup/frontend/shared/formula-safety.js';\nimport { instance } from '@features/instance/frontend/instance.js';\n",
+        "baseline": "import type { MfmBaseProps } from '@features/markup/frontend/shared/mfm-renderer.js';\nimport type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';\n"
+      },
+      {
+        "start": 1333,
+        "end": 1511,
+        "current": "import type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';\nimport type { MfmBaseProps } from '@features/markup/frontend/shared/mfm-renderer.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 1772,
+        "end": 1794,
+        "current": "\t\tFormula: MkFormula,\n",
+        "baseline": ""
+      },
+      {
+        "start": 2033,
+        "end": 2089,
+        "current": "\t\tlatexEnabled: isLatexEnabled(instance.clientOptions),\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/markup/frontend/embed/components/EmMfm.ts",
+    "currentSha256": "64f69e12e9a8d7f47260e24eccf8a55125206dbe057e8cae3eb923bdd8096196",
+    "baselineSha256": "c1f72d0f94470f75c263a696bd534c0a3f2c93e77282d31426b705f2fa897f29",
+    "edits": [
+      {
+        "start": 190,
+        "end": 434,
+        "current": "import MkFormula from '@features/markup/frontend/shared/MkFormula.vue';\nimport { isLatexEnabled } from '@features/markup/frontend/shared/formula-safety.js';\nimport { serverMetadata } from '@features/instance/frontend/embed/server-metadata.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 1094,
+        "end": 1116,
+        "current": "\t\tFormula: MkFormula,\n",
+        "baseline": ""
+      },
+      {
+        "start": 1247,
+        "end": 1370,
+        "current": "\tgetOptions: () => ({ advancedMfm: true, animatedMfm: true, latexEnabled: isLatexEnabled(serverMetadata.clientOptions) }),\n",
+        "baseline": ""
+      }
+    ]
+  }
+]
