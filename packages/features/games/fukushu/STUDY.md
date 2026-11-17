@@ -37,6 +37,9 @@ Add a study-state table keyed by owner/question, with upstream state JSON and a
 monotonic revision. Existing cards have a virtual empty state at revision 0;
 the initial empty card uses the question creation timestamp. Import/create do
 not bulk-create states or modify material JSON. State is persisted on first review.
+Future-dated creation records are retained and excluded until their time arrives;
+they are not silently rewritten. A clock earlier than a saved review/state time
+rejects another review rather than producing a negative elapsed interval.
 
 Append-only review rows are keyed by owner/client UUID request ID. They retain
 the upstream review record, exact before/after FSRS cards, scheduler version,

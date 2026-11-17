@@ -2,7 +2,8 @@
 
 Refs #310; follows #323 and #324. This document fixes the boundary before the
 implementation. It separates **saved card content** from **study/review history**.
-The current server has no FSRS state or review-log table.
+This originally defined #325 before study-state/history tables existed.
+[STUDY.md](STUDY.md) extends it with private review records pinned to these versions.
 
 ## Upstream behavior and compatibility
 
@@ -46,10 +47,12 @@ sourceText/sourceHash remain intact. Original source fields describe the importe
 source, not a promise that edited cards still exactly match it.
 
 A new migration adds the column and an empty version table; it does not duplicate
-all existing cards at deployment. Before its first edit, version 1 is read from
+all existing cards at deployment. Before its first edit or review, version 1 is read from
 the unchanged current card as a virtual baseline with `recordedAt: null`. The
 first edit stores that baseline and version 2 in the same transaction as the
-current-card/deck update. Later edits append monotonically numbered versions.
+current-card/deck update. If a first review already captured version 1, the edit
+keeps it and inserts only version 2. Version reads return the captured baseline's
+real timestamp even while currentVersion is still 1. Later edits append monotonically numbered versions.
 The first captured baseline is the existing server record at this boundary, not
 an assertion about earlier upstream states. A no-op creates no new version and
 changes no timestamp/revision; stale requests are still rejected first.
@@ -107,11 +110,11 @@ and mount existing dependencies read-only. No installation in another checkout.
 
 Later work must make explicit choices before changing prompt/answer content:
 
-1. Store immutable question-version references on new review logs, while preserving
+1. The first study slice now stores immutable question-version references on new review logs, preserving
    their original answers, rating, correct and FSRS log. Never regrade old reviews.
-   A first review of an unedited card must materialize its virtual baseline in the
+   A first review of an unedited card materializes its virtual baseline in the
    same transaction before recording that version reference; it cannot reference
-   only the mutable current-card row.
+   only the mutable current-card row. Extend this invariant to future quiz formats.
    `correct`, not percentage score, determines upstream automatic FSRS ratings.
 2. Define scheduling continuity for changed answers and imported historical logs;
    do not copy upstream reset behavior implicitly or label unknown old payloads
