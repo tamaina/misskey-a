@@ -110,14 +110,15 @@ export class FukushuStore {
 			if (!v.safeParse(materialSchema, { deck: deckData, questions: questions.map(row => row.id === questionId ? data : row.data) }).success) {
 				throw new MaterialError('INVALID_MATERIAL');
 			}
+			const versions = manager.getRepository(MiFukushuQuestionVersion);
+			const hasBaseline = question.currentVersion === 1 && await versions.existsBy({ ownerId, questionId, version: 1 });
 			const snapshots = [
-				...(question.currentVersion === 1 ? [{ version: 1, kind: 'baseline' as const, data: question.data }] : []),
+				...(question.currentVersion === 1 && !hasBaseline ? [{ version: 1, kind: 'baseline' as const, data: question.data }] : []),
 				{ version: question.currentVersion + 1, kind: 'explanation' as const, data },
 			].map(snapshot => {
 				if (!v.safeParse(questionSchema, snapshot.data).success) throw new MaterialError('INVALID_MATERIAL');
 				return { ...snapshot, ownerId, questionId, recordedAt: now, byteSize: Buffer.byteLength(JSON.stringify(snapshot.data), 'utf8') };
 			});
-			const versions = manager.getRepository(MiFukushuQuestionVersion);
 			const count = await versions.countBy({ ownerId, questionId });
 			const [{ bytes }] = await manager.query('SELECT COALESCE(SUM("byteSize"), 0)::text AS bytes FROM "fukushu_question_version" WHERE "ownerId" = $1', [ownerId]) as { bytes: string }[];
 			if (question.currentVersion >= 64 || count + snapshots.length > 64
@@ -138,7 +139,7 @@ export class FukushuStore {
 		const { before, limit } = parsed.output;
 		return this.db.transaction('REPEATABLE READ', async manager => {
 			const { question } = await this.ownedCard(manager, ownerId, id, questionId);
-			if (question.currentVersion === 1) {
+			if (question.currentVersion === 1 && !await manager.getRepository(MiFukushuQuestionVersion).existsBy({ ownerId, questionId, version: 1 })) {
 				return { currentVersion: 1, versions: before === 1 ? [] : [{ version: 1, recordedAt: null, kind: 'baseline' as const }] };
 			}
 			const rows = await manager.getRepository(MiFukushuQuestionVersion).find({
@@ -155,11 +156,11 @@ export class FukushuStore {
 		if (!v.safeParse(revisionSchema, version).success) throw new MaterialError('INVALID_MATERIAL');
 		return this.db.transaction('REPEATABLE READ', async manager => {
 			const { question } = await this.ownedCard(manager, ownerId, id, questionId);
-			if (question.currentVersion === 1 && version === 1) {
-				return { version: 1, recordedAt: null, kind: 'baseline' as const, question: question.data };
-			}
 			if (version > question.currentVersion) throw new MaterialError('NO_SUCH_MATERIAL');
 			const row = await manager.getRepository(MiFukushuQuestionVersion).findOneBy({ ownerId, questionId, version });
+			if (!row && question.currentVersion === 1 && version === 1) {
+				return { version: 1, recordedAt: null, kind: 'baseline' as const, question: question.data };
+			}
 			if (!row) throw new MaterialError('NO_SUCH_MATERIAL');
 			return { ...this.versionSummary(row), question: row.data };
 		});

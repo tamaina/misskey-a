@@ -7,6 +7,8 @@
 import { MiFukushuDeck } from '@features/games/fukushu/backend/models/FukushuDeck.js';
 import { MiFukushuQuestion } from '@features/games/fukushu/backend/models/FukushuQuestion.js';
 import { MiFukushuQuestionVersion } from '@features/games/fukushu/backend/models/FukushuQuestionVersion.js';
+import { MiFukushuStudyState } from '@features/games/fukushu/backend/models/FukushuStudyState.js';
+import { MiFukushuReviewLog } from '@features/games/fukushu/backend/models/FukushuReviewLog.js';
 import pg from 'pg';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
@@ -263,6 +265,8 @@ export const entities = [
 	MiFukushuDeck,
 	MiFukushuQuestion,
 	MiFukushuQuestionVersion,
+	MiFukushuStudyState,
+	MiFukushuReviewLog,
 	MiReversiGame,
 	...charts,
 ];

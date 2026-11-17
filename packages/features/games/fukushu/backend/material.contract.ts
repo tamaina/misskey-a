@@ -11,6 +11,7 @@ import { objectInput } from '../../../api/backend/transport/input.schema.js';
 import { materialSchema, deckSchema, sourceIdSchema, questionSchema, plainContentSchema } from '../shared/material.schema.js';
 import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import type { Meta } from '@orpc/contract';
+import { studyContract } from './study.contract.js';
 
 export const materialErrors = {
 	CARD_HISTORY_LIMIT: { code: 'CARD_HISTORY_LIMIT', message: 'Card version history limit reached.', id: '628ad4f5-c799-4ebd-b65e-81be7e8601bd' },
@@ -46,6 +47,7 @@ const cardVersionSummarySchema = v.strictObject({
 
 // Keep requestName literal at each declaration: SDK endpoints are keyed by this metadata.
 export const fukushuContract = {
+	...studyContract,
 	list: base.$meta({ ...read, requestName: 'fukushu/materials/list' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/materials/list', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.input(objectInput({ archived: v.optional(v.boolean(), false) })).output(v.pipe(v.array(v.omit(deckSchema, ['sourceText'])), v.maxLength(100))),

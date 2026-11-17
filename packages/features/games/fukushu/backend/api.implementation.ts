@@ -14,6 +14,8 @@ import { assertApiAuthorization, requirePrincipal } from '@features/api/backend/
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { fukushuContract, materialErrors } from './material.contract.js';
 import { FukushuStore, MaterialError } from './store.js';
+import { FukushuStudyStore, StudyError } from './study-store.js';
+import { studyErrors } from './study.contract.js';
 import { FukushuDriveImporter } from './drive-import.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { ApiContext } from '@features/api/backend/transport/context.js';
@@ -21,14 +23,19 @@ import type { ApiContext } from '@features/api/backend/transport/context.js';
 async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	try { return await operation(); } catch (error) {
 		if (error instanceof MaterialError) throw apiError(materialErrors[error.code]);
+		if (error instanceof StudyError) throw apiError(studyErrors[error.code]);
 		throw error;
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
+	const studyStore = () => { if (!study) throw new StudyError('STUDY_UNAVAILABLE'); return study; };
 	return implement(fukushuContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
+		studyQueue: procedure(fukushuContract.studyQueue).use(principal).handler(({ input, context }) => invoke(() => studyStore().queue(context.principal.id, input.id))),
+		studyReview: procedure(fukushuContract.studyReview).use(principal).handler(({ input, context }) => invoke(() => studyStore().review(context.principal.id, input))),
+		studyHistory: procedure(fukushuContract.studyHistory).use(principal).handler(({ input, context }) => invoke(() => studyStore().history(context.principal.id, input.id, { beforeId: input.beforeId, limit: input.limit }))),
 		list: procedure(fukushuContract.list).use(principal).handler(({ input, context }) => invoke(() => store.list(context.principal.id, { archived: input.archived }))),
 		import: procedure(fukushuContract.import).use(principal).handler(async ({ input, context }) => {
 			await assertApiAuthorization({ name: 'fukushu/materials/import', requireCredential: true, kind: 'read:drive' }, context);
@@ -60,7 +67,7 @@ export class FukushuApiProvider {
 				this.moduleRef.get(DownloadService, { strict: false }),
 				store,
 			);
-			this.router = createFukushuRouter(store, importer);
+			this.router = createFukushuRouter(store, importer, new FukushuStudyStore(this.moduleRef.get(DI.db, { strict: false })));
 		}
 		return this.router;
 	}

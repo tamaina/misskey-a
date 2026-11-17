@@ -1,0 +1,364 @@
+{
+  "upstream": "tamaina/fukushu@0efee271a13f15096beb8cbaaea25092c5927b29",
+  "adapter": "packages/app/src/infrastructure/fsrs/adapter.ts",
+  "scheduler": "ts-fsrs@5.4.1",
+  "retention": 0.9,
+  "fuzz": false,
+  "cases": [
+    {
+      "name": "new-again",
+      "before": {
+        "due": "2026-11-16T00:00:00.000Z",
+        "stability": 0,
+        "difficulty": 0,
+        "elapsedDays": 0,
+        "scheduledDays": 0,
+        "reps": 0,
+        "lapses": 0,
+        "state": 0
+      },
+      "now": "2026-11-17T00:00:00.000Z",
+      "rating": "again",
+      "result": {
+        "card": {
+          "due": "2026-11-17T00:01:00.000Z",
+          "stability": 0.212,
+          "difficulty": 6.4133,
+          "elapsedDays": 0,
+          "scheduledDays": 0,
+          "reps": 1,
+          "lapses": 0,
+          "state": 1,
+          "lastReview": "2026-11-17T00:00:00.000Z"
+        },
+        "log": {
+          "rating": 1,
+          "state": 0,
+          "due": "2026-11-16T00:00:00.000Z",
+          "stability": 0,
+          "difficulty": 0,
+          "elapsedDays": 0,
+          "lastElapsedDays": 0,
+          "scheduledDays": 0,
+          "review": "2026-11-17T00:00:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "new-hard",
+      "before": {
+        "due": "2026-11-16T00:00:00.000Z",
+        "stability": 0,
+        "difficulty": 0,
+        "elapsedDays": 0,
+        "scheduledDays": 0,
+        "reps": 0,
+        "lapses": 0,
+        "state": 0
+      },
+      "now": "2026-11-17T00:00:00.000Z",
+      "rating": "hard",
+      "result": {
+        "card": {
+          "due": "2026-11-17T00:06:00.000Z",
+          "stability": 1.2931,
+          "difficulty": 5.11217071,
+          "elapsedDays": 0,
+          "scheduledDays": 0,
+          "reps": 1,
+          "lapses": 0,
+          "state": 1,
+          "lastReview": "2026-11-17T00:00:00.000Z"
+        },
+        "log": {
+          "rating": 2,
+          "state": 0,
+          "due": "2026-11-16T00:00:00.000Z",
+          "stability": 0,
+          "difficulty": 0,
+          "elapsedDays": 0,
+          "lastElapsedDays": 0,
+          "scheduledDays": 0,
+          "review": "2026-11-17T00:00:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "new-good",
+      "before": {
+        "due": "2026-11-16T00:00:00.000Z",
+        "stability": 0,
+        "difficulty": 0,
+        "elapsedDays": 0,
+        "scheduledDays": 0,
+        "reps": 0,
+        "lapses": 0,
+        "state": 0
+      },
+      "now": "2026-11-17T00:00:00.000Z",
+      "rating": "good",
+      "result": {
+        "card": {
+          "due": "2026-11-17T00:10:00.000Z",
+          "stability": 2.3065,
+          "difficulty": 2.11810397,
+          "elapsedDays": 0,
+          "scheduledDays": 0,
+          "reps": 1,
+          "lapses": 0,
+          "state": 1,
+          "lastReview": "2026-11-17T00:00:00.000Z"
+        },
+        "log": {
+          "rating": 3,
+          "state": 0,
+          "due": "2026-11-16T00:00:00.000Z",
+          "stability": 0,
+          "difficulty": 0,
+          "elapsedDays": 0,
+          "lastElapsedDays": 0,
+          "scheduledDays": 0,
+          "review": "2026-11-17T00:00:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "new-easy",
+      "before": {
+        "due": "2026-11-16T00:00:00.000Z",
+        "stability": 0,
+        "difficulty": 0,
+        "elapsedDays": 0,
+        "scheduledDays": 0,
+        "reps": 0,
+        "lapses": 0,
+        "state": 0
+      },
+      "now": "2026-11-17T00:00:00.000Z",
+      "rating": "easy",
+      "result": {
+        "card": {
+          "due": "2026-11-25T00:00:00.000Z",
+          "stability": 8.2956,
+          "difficulty": 1,
+          "elapsedDays": 0,
+          "scheduledDays": 8,
+          "reps": 1,
+          "lapses": 0,
+          "state": 2,
+          "lastReview": "2026-11-17T00:00:00.000Z"
+        },
+        "log": {
+          "rating": 4,
+          "state": 0,
+          "due": "2026-11-16T00:00:00.000Z",
+          "stability": 0,
+          "difficulty": 0,
+          "elapsedDays": 0,
+          "lastElapsedDays": 0,
+          "scheduledDays": 0,
+          "review": "2026-11-17T00:00:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "sequence-4",
+      "before": {
+        "due": "2026-11-16T00:00:00.000Z",
+        "stability": 0,
+        "difficulty": 0,
+        "elapsedDays": 0,
+        "scheduledDays": 0,
+        "reps": 0,
+        "lapses": 0,
+        "state": 0
+      },
+      "now": "2026-11-17T00:00:00.000Z",
+      "rating": "again",
+      "result": {
+        "card": {
+          "due": "2026-11-17T00:01:00.000Z",
+          "stability": 0.212,
+          "difficulty": 6.4133,
+          "elapsedDays": 0,
+          "scheduledDays": 0,
+          "reps": 1,
+          "lapses": 0,
+          "state": 1,
+          "lastReview": "2026-11-17T00:00:00.000Z"
+        },
+        "log": {
+          "rating": 1,
+          "state": 0,
+          "due": "2026-11-16T00:00:00.000Z",
+          "stability": 0,
+          "difficulty": 0,
+          "elapsedDays": 0,
+          "lastElapsedDays": 0,
+          "scheduledDays": 0,
+          "review": "2026-11-17T00:00:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "sequence-5",
+      "before": {
+        "due": "2026-11-17T00:01:00.000Z",
+        "stability": 0.212,
+        "difficulty": 6.4133,
+        "elapsedDays": 0,
+        "scheduledDays": 0,
+        "reps": 1,
+        "lapses": 0,
+        "state": 1,
+        "lastReview": "2026-11-17T00:00:00.000Z"
+      },
+      "now": "2026-11-17T00:02:00.000Z",
+      "rating": "good",
+      "result": {
+        "card": {
+          "due": "2026-11-17T00:12:00.000Z",
+          "stability": 0.24668919,
+          "difficulty": 6.40211507,
+          "elapsedDays": 0,
+          "scheduledDays": 0,
+          "reps": 2,
+          "lapses": 0,
+          "state": 1,
+          "lastReview": "2026-11-17T00:02:00.000Z"
+        },
+        "log": {
+          "rating": 3,
+          "state": 1,
+          "due": "2026-11-17T00:00:00.000Z",
+          "stability": 0.212,
+          "difficulty": 6.4133,
+          "elapsedDays": 0,
+          "lastElapsedDays": 0,
+          "scheduledDays": 0,
+          "review": "2026-11-17T00:02:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "sequence-6",
+      "before": {
+        "due": "2026-11-17T00:12:00.000Z",
+        "stability": 0.24668919,
+        "difficulty": 6.40211507,
+        "elapsedDays": 0,
+        "scheduledDays": 0,
+        "reps": 2,
+        "lapses": 0,
+        "state": 1,
+        "lastReview": "2026-11-17T00:02:00.000Z"
+      },
+      "now": "2026-11-18T00:00:00.000Z",
+      "rating": "hard",
+      "result": {
+        "card": {
+          "due": "2026-11-18T00:06:00.000Z",
+          "stability": 1.31404672,
+          "difficulty": 7.59678469,
+          "elapsedDays": 1,
+          "scheduledDays": 0,
+          "reps": 3,
+          "lapses": 0,
+          "state": 1,
+          "lastReview": "2026-11-18T00:00:00.000Z"
+        },
+        "log": {
+          "rating": 2,
+          "state": 1,
+          "due": "2026-11-17T00:02:00.000Z",
+          "stability": 0.24668919,
+          "difficulty": 6.40211507,
+          "elapsedDays": 1,
+          "lastElapsedDays": 0,
+          "scheduledDays": 0,
+          "review": "2026-11-18T00:00:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "sequence-7",
+      "before": {
+        "due": "2026-11-18T00:06:00.000Z",
+        "stability": 1.31404672,
+        "difficulty": 7.59678469,
+        "elapsedDays": 1,
+        "scheduledDays": 0,
+        "reps": 3,
+        "lapses": 0,
+        "state": 1,
+        "lastReview": "2026-11-18T00:00:00.000Z"
+      },
+      "now": "2026-11-20T00:00:00.000Z",
+      "rating": "easy",
+      "result": {
+        "card": {
+          "due": "2026-11-27T00:00:00.000Z",
+          "stability": 7.0492961,
+          "difficulty": 6.7789705,
+          "elapsedDays": 2,
+          "scheduledDays": 7,
+          "reps": 4,
+          "lapses": 0,
+          "state": 2,
+          "lastReview": "2026-11-20T00:00:00.000Z"
+        },
+        "log": {
+          "rating": 4,
+          "state": 1,
+          "due": "2026-11-18T00:00:00.000Z",
+          "stability": 1.31404672,
+          "difficulty": 7.59678469,
+          "elapsedDays": 2,
+          "lastElapsedDays": 1,
+          "scheduledDays": 0,
+          "review": "2026-11-20T00:00:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "sequence-8",
+      "before": {
+        "due": "2026-11-27T00:00:00.000Z",
+        "stability": 7.0492961,
+        "difficulty": 6.7789705,
+        "elapsedDays": 2,
+        "scheduledDays": 7,
+        "reps": 4,
+        "lapses": 0,
+        "state": 2,
+        "lastReview": "2026-11-20T00:00:00.000Z"
+      },
+      "now": "2026-12-01T00:00:00.000Z",
+      "rating": "again",
+      "result": {
+        "card": {
+          "due": "2026-12-01T00:10:00.000Z",
+          "stability": 1.20010051,
+          "difficulty": 8.92649788,
+          "elapsedDays": 11,
+          "scheduledDays": 0,
+          "reps": 5,
+          "lapses": 1,
+          "state": 3,
+          "lastReview": "2026-12-01T00:00:00.000Z"
+        },
+        "log": {
+          "rating": 1,
+          "state": 2,
+          "due": "2026-11-20T00:00:00.000Z",
+          "stability": 7.0492961,
+          "difficulty": 6.7789705,
+          "elapsedDays": 11,
+          "lastElapsedDays": 2,
+          "scheduledDays": 7,
+          "review": "2026-12-01T00:00:00.000Z"
+        }
+      }
+    }
+  ]
+}
