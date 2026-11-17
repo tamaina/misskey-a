@@ -8,6 +8,7 @@ import { restoreMfmSearchBaseline } from './mfm-search-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { restoreFormulaBaseline } from './formula-source-rebase.js';
 import { parse } from 'vue/compiler-sfc';
 import { locales } from 'i18n';
 import escapes from './shared-global-locale-escapes.json';
@@ -16680,6 +16681,7 @@ export function restoreGlobalCatalogPilotSource(file: string, source: string): s
 	if (!owner || sha256(source) === owner.baselineSha256) return source;
 	source = restoreNyaizePreferencesBaseline(file, source);
 	if (file === 'packages/features/preferences/frontend/pages/settings/preferences.vue') source = restoreMfmSearchBaseline(file, source);
+	source = restoreFormulaBaseline(file, source);
 	if (sha256(source) !== owner.currentSha256) throw new Error(`Global catalog pilot source differs: ${file}`);
 	// Reverse exact reviewed upstream follow-up edits made after the pilot before replaying it.
 	if ('edits' in owner) {

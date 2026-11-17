@@ -1,0 +1,128 @@
+[
+  {
+    "file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+    "currentSha256": "b592f2193153d14c062a30ed3a00151195269cd58f50835616ef6a232b13c775",
+    "baselineSha256": "29749ad8071bdf46376d8f2de1de901371d6a262e6586e58ea3e39d783428593",
+    "edits": [
+      {
+        "start": 5226,
+        "end": 5289,
+        "current": "\n\t\t\t\t\t\t\t<MkNyaizePreference/>\n\n\t\t\t\t\t\t\t<MkMfmSearchPreference/>\n",
+        "baseline": ""
+      },
+      {
+        "start": 41956,
+        "end": 42160,
+        "current": "import MkNyaizePreference from '@features/preferences/frontend/components/MkNyaizePreference.vue';\nimport MkMfmSearchPreference from '@features/preferences/frontend/components/MkMfmSearchPreference.vue';\n",
+        "baseline": ""
+      }
+    ],
+    "individualSha256": [
+      "29749ad8071bdf46376d8f2de1de901371d6a262e6586e58ea3e39d783428593",
+      "373bc0d91c0dceeea741b45edadcdd61e3be96033a785713632bda0561517e74",
+      "caad9503d9bee21f20e242a91956ec13dc37cf9f260e430fbcdee973952d1597"
+    ]
+  },
+  {
+    "file": "packages/features/markup/frontend/components/global/MkMfm.ts",
+    "currentSha256": "6bb0f6b961e25fed767511b030629f22d3f5980c9977e2f6d05346178fad5e1c",
+    "baselineSha256": "be76c96b093e9410c1fb21ae07c339a22e1c169e48eb86ee8cfe1491c9c92a98",
+    "edits": [
+      {
+        "start": 190,
+        "end": 415,
+        "current": "import MkFormula from '@features/markup/frontend/shared/MkFormula.vue';\nimport { isLatexEnabled } from '@features/markup/frontend/shared/formula-safety.js';\nimport { instance } from '@features/instance/frontend/instance.js';\n",
+        "baseline": "import type { MfmBaseProps } from '@features/markup/frontend/shared/mfm-renderer.js';\nimport type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';\n"
+      },
+      {
+        "start": 1333,
+        "end": 1511,
+        "current": "import type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';\nimport type { MfmBaseProps } from '@features/markup/frontend/shared/mfm-renderer.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 1772,
+        "end": 1794,
+        "current": "\t\tFormula: MkFormula,\n",
+        "baseline": ""
+      },
+      {
+        "start": 2033,
+        "end": 2089,
+        "current": "\t\tlatexEnabled: isLatexEnabled(instance.clientOptions),\n",
+        "baseline": ""
+      },
+      {
+        "start": 2163,
+        "end": 2214,
+        "current": "\t\tdisableNyaize: prefer.r.disableNoteNyaize.value,\n",
+        "baseline": ""
+      }
+    ],
+    "individualSha256": [
+      "35eccc4cfc88de9853492aa8e60689ba407fa0c02c02f7e47a327c087ef3e9f9",
+      "4ba65da292a78ce76b51b3683fb14d37793e18bef448fffa3c7b17500fcedaf3",
+      "be76c96b093e9410c1fb21ae07c339a22e1c169e48eb86ee8cfe1491c9c92a98"
+    ]
+  },
+  {
+    "file": "packages/features/markup/frontend/shared/mfm-renderer.ts",
+    "currentSha256": "d8fc7a485fbf7549fd65e513f688d712f5a5bf989908b32de9663f1e454b9d60",
+    "baselineSha256": "fea540f7251299411be142842333bbbf58f31fdb3aeceb7bbe50360f95759d45",
+    "edits": [
+      {
+        "start": 1662,
+        "end": 1759,
+        "current": "\t\t/** Disabled or omitted Formula preserves the escaped code fallback. */\n\t\tFormula?: Component;\n",
+        "baseline": ""
+      },
+      {
+        "start": 1763,
+        "end": 1841,
+        "current": "\t/** 描画のたびに呼ばれる (設定の変更をリアクティブに反映するため) 。省略時は advancedMfm / animatedMfm のみ有効 */\n",
+        "baseline": "\t/** 描画のたびに呼ばれる (設定の変更をリアクティブに反映するため) 。省略時はすべて有効 */\n"
+      },
+      {
+        "start": 1911,
+        "end": 1964,
+        "current": "\t\tlatexEnabled?: boolean;\n\t\tdisableNyaize?: boolean;\n",
+        "baseline": ""
+      },
+      {
+        "start": 2709,
+        "end": 2836,
+        "current": "\t\tconst { Url, Link, Mention, A, Time, Emoji, CustomEmoji, Code, CodeInline, Search, Sparkle, Formula } = config.components();\n",
+        "baseline": "\t\tconst { Url, Link, Mention, A, Time, Emoji, CustomEmoji, Code, CodeInline, Search, Sparkle } = config.components();\n"
+      },
+      {
+        "start": 2876,
+        "end": 3139,
+        "current": "\t\tconst { advancedMfm, animatedMfm, latexEnabled, disableNyaize } = config.getOptions?.() ?? { advancedMfm: true, animatedMfm: true };\n\t\tconst shouldNyaize = disableNyaize ? false : props.nyaize ? props.nyaize === 'respect' ? props.author?.isCat : false : false;\n",
+        "baseline": "\t\tconst shouldNyaize = props.nyaize ? props.nyaize === 'respect' ? props.author?.isCat : false : false;\n"
+      },
+      {
+        "start": 3714,
+        "end": 3714,
+        "current": "",
+        "baseline": "\t\tconst { advancedMfm, animatedMfm } = config.getOptions?.() ?? { advancedMfm: true, animatedMfm: true };\n"
+      },
+      {
+        "start": 16413,
+        "end": 16525,
+        "current": "\t\t\t\t\tif (Formula && latexEnabled === true) return [h(Formula, { formula: token.props.formula, block: false })];\n",
+        "baseline": ""
+      },
+      {
+        "start": 16602,
+        "end": 16713,
+        "current": "\t\t\t\t\tif (Formula && latexEnabled === true) return [h(Formula, { formula: token.props.formula, block: true })];\n",
+        "baseline": ""
+      }
+    ],
+    "individualSha256": [
+      "163cbb78352869c8d23922eb353c1cf565a2c6cddcfbea16c5ac476658248c46",
+      "3033e1f961632b9971a55ae621d6f60390567baf8644937903463b529f44cdaa",
+      "fea540f7251299411be142842333bbbf58f31fdb3aeceb7bbe50360f95759d45"
+    ]
+  }
+]

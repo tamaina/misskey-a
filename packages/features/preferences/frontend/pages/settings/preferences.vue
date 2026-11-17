@@ -106,6 +106,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							</SearchMarker>
 
 							<MkNyaizePreference/>
+
 							<MkMfmSearchPreference/>
 
 							<SearchMarker :keywords="['mfm', 'enable', 'show', 'advanced']">

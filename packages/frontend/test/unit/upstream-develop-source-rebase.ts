@@ -7,6 +7,7 @@ import { restoreMfmSearchBaseline } from './mfm-search-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { restoreFormulaBaseline } from './formula-source-rebase.js';
 import { parse } from 'vue/compiler-sfc';
 import type { LocaleBundle, RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
 
@@ -35,6 +36,7 @@ export function restoreUpstreamDevelopBaseline(file: string, source: string): st
 	if (!rebase || sha256(source) === rebase.baselineSha256 || sha256(source) === rebase.historicalSha256) return source;
 	source = restoreNyaizeMfmBaseline(file, source);
 	if (file === 'packages/features/integrations/frontend/components/MkGoogle.vue') source = restoreMfmSearchBaseline(file, source);
+	source = restoreFormulaBaseline(file, source);
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from reviewed upstream develop: ${file}`);
 	for (const edit of [...rebase.edits].reverse()) {
 		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Upstream develop boundary differs: ${file}`);
@@ -55,6 +57,7 @@ export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBund
 		if (!Object.hasOwn(modules, moduleId)) continue;
 		let source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');
 		if (rebase.file === 'packages/features/integrations/frontend/components/MkGoogle.vue') source = restoreMfmSearchBaseline(rebase.file, source);
+		source = restoreFormulaBaseline(rebase.file, source);
 		if (sha256(source) !== rebase.currentSha256) throw new Error(`Locale source differs from reviewed upstream develop: ${rebase.file}`);
 		let dictionaries = localeCache.get(rebase.file);
 		if (!dictionaries) {

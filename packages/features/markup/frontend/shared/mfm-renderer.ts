@@ -69,11 +69,14 @@ export type MfmRendererConfig = {
 		Search?: Component;
 		/** 省略時は sparkle を無視して子要素のみ描画する */
 		Sparkle?: Component;
+		/** Disabled or omitted Formula preserves the escaped code fallback. */
+		Formula?: Component;
 	};
-	/** 描画のたびに呼ばれる (設定の変更をリアクティブに反映するため) 。省略時はすべて有効 */
+	/** 描画のたびに呼ばれる (設定の変更をリアクティブに反映するため) 。省略時は advancedMfm / animatedMfm のみ有効 */
 	getOptions?: () => {
 		advancedMfm: boolean;
 		animatedMfm: boolean;
+		latexEnabled?: boolean;
 		disableNyaize?: boolean;
 	};
 	/** 子コンポーネントが対応している追加の props */
@@ -94,10 +97,10 @@ export function createMfmRenderer<P extends MfmBaseProps = MfmBaseProps>(config:
 		//provide('linkNavigationBehavior', props.linkNavigationBehavior);
 
 		const props = _props as P & MfmOptionalProps;
-		const { Url, Link, Mention, A, Time, Emoji, CustomEmoji, Code, CodeInline, Search, Sparkle } = config.components();
+		const { Url, Link, Mention, A, Time, Emoji, CustomEmoji, Code, CodeInline, Search, Sparkle, Formula } = config.components();
 
 		const isNote = props.isNote ?? true;
-		const { advancedMfm, animatedMfm, disableNyaize } = config.getOptions?.() ?? { advancedMfm: true, animatedMfm: true };
+		const { advancedMfm, animatedMfm, latexEnabled, disableNyaize } = config.getOptions?.() ?? { advancedMfm: true, animatedMfm: true };
 		const shouldNyaize = disableNyaize ? false : props.nyaize ? props.nyaize === 'respect' ? props.author?.isCat : false : false;
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -495,10 +498,12 @@ export function createMfmRenderer<P extends MfmBaseProps = MfmBaseProps>(config:
 				}
 
 				case 'mathInline': {
+					if (Formula && latexEnabled === true) return [h(Formula, { formula: token.props.formula, block: false })];
 					return [h('code', token.props.formula)];
 				}
 
 				case 'mathBlock': {
+					if (Formula && latexEnabled === true) return [h(Formula, { formula: token.props.formula, block: true })];
 					return [h('code', token.props.formula)];
 				}
 

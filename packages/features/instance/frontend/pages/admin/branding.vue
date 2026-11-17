@@ -8,6 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<SearchMarker path="/admin/branding" :label="$locale.sfc.branding" :keywords="['branding']" icon="ti ti-paint">
 			<div class="_gaps_m">
+				<MkFormulaSetting v-model="latexEnabled"/>
 				<SearchMarker :keywords="['entrance', 'welcome', 'landing', 'front', 'home', 'page', 'style']">
 					<MkRadios
 						v-model="entrancePageStyle"
@@ -170,11 +171,14 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkColorInput from '@features/ui/frontend/components/MkColorInput.vue';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
+import MkFormulaSetting from '@features/markup/frontend/components/MkFormulaSetting.vue';
+import { isLatexEnabled } from '@features/markup/frontend/shared/formula-safety.js';
 import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
 const meta = await misskeyApi('admin/meta');
+const latexEnabled = ref(isLatexEnabled(meta.clientOptions));
 
 const entrancePageStyle = ref<NonNullable<Misskey.entities.MetaClientOptions['entrancePageStyle']>>(meta.clientOptions.entrancePageStyle ?? 'classic');
 const showTimelineForVisitor = ref<boolean>(meta.clientOptions.showTimelineForVisitor ?? true);
@@ -198,6 +202,7 @@ const manifestJsonOverride = ref(meta.manifestJsonOverride === '' ? '{}' : JSON.
 function save() {
 	os.apiWithDialog('admin/update-meta', {
 		clientOptions: {
+			latexEnabled: latexEnabled.value,
 			entrancePageStyle: entrancePageStyle.value,
 			showTimelineForVisitor: showTimelineForVisitor.value,
 			showActivitiesForVisitor: showActivitiesForVisitor.value,
