@@ -2,8 +2,9 @@
 
 `full-app-http.test.mjs` is an opt-in integration check against a **new, disposable,
 owned application**. It creates accounts, uploads a synthetic UTF-8 TSV, imports a
-material, edits its name/description, then archives and restores it. It never
-physically deletes a material or changes its cards, source text or grading.
+material, edits its name/description, archives and restores it, then updates only
+a card’s explanation while retaining its original and later versions. It never
+physically deletes a material or changes prompts, answers, source identity or grading.
 
 Do not run it against an existing development or production instance. The test
 requires `FUKUSHU_E2E_RUN_DIR` pointing to an absolute, private directory owned by
@@ -46,8 +47,17 @@ and Fukushu HTTP handlers; those paths are not mocked. The data and services are
 disposable test fixtures. The UI login, native file chooser and Drive picker need
 a separate browser check against this same application.
 
-The small maintenance slice has no FSRS/review-history tables yet. Its retention
-assertions prove unchanged card/source records and identity; they do not claim
-that upstream study history was imported or replayed. PostgreSQL tests separately
-cover concurrent mutations, total quota (including archived materials), source
+Card-version checks cover the virtual baseline, exact retained records,
+explanation-only edits, stale-before-no-op behavior, explicit null removal,
+exclusive version pagination, owner separation and edits while archived. The
+scenario uses five explanation-write requests and five archive requests for Alice,
+including rejected stale writes and the accepted no-op, respecting each endpoint’s
+separate production limit without waiting for a rate-window reset or disabling
+the rate limiter. Do not add
+more same-owner writes to these endpoints without budgeting their rate window.
+
+The slice has no FSRS/review-history tables yet. Retained versions are card-content
+records, not study attempts, grades or schedules. No old version is regraded or
+used to replay FSRS history; these assertions do not claim that upstream study
+history was imported. PostgreSQL tests separately cover concurrent mutations, total quota (including archived materials), source
 deduplication and migration round trips.

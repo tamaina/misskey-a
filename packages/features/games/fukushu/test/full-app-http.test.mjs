@@ -12,7 +12,7 @@ import { setTimeout } from 'node:timers/promises';
 
 // Opt-in only: an owned, freshly migrated full application, never an existing instance.
 const directory = process.env.FUKUSHU_E2E_RUN_DIR;
-test('real authentication, Drive and recoverable material maintenance', { skip: !directory, timeout: 120_000 }, async t => {
+test('real authentication, Drive, material maintenance and explanation versions', { skip: !directory, timeout: 120_000 }, async t => {
 	assert.ok(isAbsolute(directory), 'An absolute owned run directory is required');
 	assert.equal(await realpath(directory), resolve(directory), 'Run directory must not contain symlinks');
 	const directoryStat = await lstat(directory);
@@ -183,6 +183,142 @@ test('real authentication, Drive and recoverable material maintenance', { skip: 
 		assert.deepEqual(restored, { revision: 4, archivedAt: null });
 		assert.deepEqual(ok(await call('fukushu/materials/list', {}, alice.token)).map(deck => deck.id), [material.deck.id]);
 		assert.deepEqual(ok(await call('fukushu/materials/list', { archived: true }, alice.token)), []);
-		assert.deepEqual(ok(await call('fukushu/materials/show', { id: material.deck.id }, alice.token)), { ...current, ...restored });
+		const reloaded = ok(await call('fukushu/materials/show', { id: material.deck.id }, alice.token));
+		assert.deepEqual(reloaded, { ...current, ...restored });
+		current = reloaded;
+	});
+
+	const ids = { id: material.deck.id, questionId: material.questions[0].id };
+	const originalQuestion = structuredClone(current.questions[0]);
+	const withoutExplanationAndUpdateTime = question => {
+		const { updatedAt: _updatedAt, payload: { explanation: _explanation, ...payload }, ...record } = question;
+		return { ...record, payload };
+	};
+	const stableDeck = deck => {
+		const { updatedAt: _updatedAt, ...stable } = deck;
+		return stable;
+	};
+	let explainedQuestion;
+	await step('unedited cards expose a private virtual baseline without changing the material', async () => {
+		const baseline = ok(await call('fukushu/materials/card-versions', ids, alice.token));
+		assert.deepEqual(baseline, { currentVersion: 1, versions: [{ version: 1, recordedAt: null, kind: 'baseline' }] });
+		assert.deepEqual(ok(await call('fukushu/materials/card-version', { ...ids, version: 1 }, alice.token)), { version: 1, recordedAt: null, kind: 'baseline', question: originalQuestion });
+		assert.equal((await call('fukushu/materials/card-versions', ids)).status, 401);
+		assert.equal((await call('fukushu/materials/card-version', { ...ids, version: 1 })).status, 401);
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), current);
+	});
+	await step('explanation updates retain the exact old record and cannot alter prompt, answer or source identity', async () => {
+		// Alice write 1/5 for this endpoint; unsupported fields must not enter the store.
+		const explanation = '日本の首都についての補足です。\n<b>This remains plain text.</b>';
+		const changed = ok(await call('fukushu/materials/update-card-explanation', {
+			...ids, expectedRevision: current.revision, explanation,
+			ownerId: bob.id, prompt: 'tampered prompt', answer: 'tampered answer', sourceKey: 'tampered key', typeAnswer: true, acceptedAnswer: 'tampered answer',
+		}, alice.token));
+		assert.deepEqual(changed, { revision: current.revision + 1, archivedAt: null, version: 2 });
+		const next = ok(await call('fukushu/materials/show', { id: ids.id }, alice.token));
+		assert.equal(next.revision, changed.revision);
+		assert.equal(next.archivedAt, null);
+		assert.deepEqual(stableDeck(next.deck), stableDeck(current.deck));
+		assert.ok(Date.parse(next.deck.updatedAt) >= Date.parse(current.deck.updatedAt));
+		assert.deepEqual(next.questions.slice(1), current.questions.slice(1));
+		assert.deepEqual(withoutExplanationAndUpdateTime(next.questions[0]), withoutExplanationAndUpdateTime(originalQuestion));
+		assert.deepEqual(next.questions[0].payload.explanation, { format: 'plain', value: explanation });
+		assert.ok(Date.parse(next.questions[0].updatedAt) >= Date.parse(originalQuestion.updatedAt));
+		explainedQuestion = structuredClone(next.questions[0]);
+		const old = ok(await call('fukushu/materials/card-version', { ...ids, version: 1 }, alice.token));
+		assert.equal(old.kind, 'baseline');
+		assert.ok(typeof old.recordedAt === 'string' && Number.isFinite(Date.parse(old.recordedAt)));
+		assert.deepEqual(old.question, originalQuestion);
+		const saved = ok(await call('fukushu/materials/card-version', { ...ids, version: 2 }, alice.token));
+		assert.equal(saved.kind, 'explanation');
+		assert.ok(typeof saved.recordedAt === 'string' && Number.isFinite(Date.parse(saved.recordedAt)));
+		assert.deepEqual(saved.question, explainedQuestion);
+		const firstPage = ok(await call('fukushu/materials/card-versions', { ...ids, limit: 1 }, alice.token));
+		assert.equal(firstPage.currentVersion, 2);
+		assert.deepEqual(firstPage.versions.map(item => item.version), [2]);
+		const secondPage = ok(await call('fukushu/materials/card-versions', { ...ids, before: 2, limit: 1 }, alice.token));
+		assert.equal(secondPage.currentVersion, 2);
+		assert.deepEqual(secondPage.versions.map(item => item.version), [1]);
+		assert.deepEqual(ok(await call('fukushu/materials/card-versions', { ...ids, before: 1 }, alice.token)).versions, []);
+		// Alice write 2/5: identical text with a stale revision still conflicts.
+		const stale = await call('fukushu/materials/update-card-explanation', { ...ids, expectedRevision: current.revision, explanation }, alice.token);
+		assert.equal(stale.status, 409);
+		assert.equal(stale.body.error.code, 'MATERIAL_CONFLICT');
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), next);
+		current = next;
+	});
+	await step('card versions conceal foreign, missing and mismatched material identities', async () => {
+		for (const input of [ids, { ...ids, id: 'missing-deck' }]) {
+			const rejected = await call('fukushu/materials/update-card-explanation', { ...input, expectedRevision: current.revision, explanation: 'foreign' }, bob.token);
+			assert.equal(rejected.status, 404);
+			assert.equal(rejected.body.error.code, 'NO_SUCH_MATERIAL');
+		}
+		for (const token of [alice.token, bob.token]) {
+			const inaccessible = token === alice.token
+				? [{ ...ids, questionId: 'missing-card' }, { ...ids, id: 'missing-deck' }]
+				: [ids, { ...ids, id: 'missing-deck' }];
+			for (const input of inaccessible) {
+				for (const endpoint of ['fukushu/materials/card-versions', 'fukushu/materials/card-version']) {
+					const response = await call(endpoint, { ...input, ...(endpoint.endsWith('/card-version') ? { version: 1 } : {}) }, token);
+					assert.equal(response.status, 404);
+					assert.equal(response.body.error.code, 'NO_SUCH_MATERIAL');
+				}
+			}
+		}
+		const missingVersion = await call('fukushu/materials/card-version', { ...ids, version: 99 }, alice.token);
+		assert.equal(missingVersion.status, 404);
+		assert.equal(missingVersion.body.error.code, 'NO_SUCH_MATERIAL');
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), current);
+	});
+	await step('clearing an explanation adds a version, while repeating null is a no-op', async () => {
+		// Alice writes 3/5 and 4/5; no-op still passes the real limiter.
+		const changed = ok(await call('fukushu/materials/update-card-explanation', { ...ids, expectedRevision: current.revision, explanation: null }, alice.token));
+		assert.deepEqual(changed, { revision: current.revision + 1, archivedAt: null, version: 3 });
+		const next = ok(await call('fukushu/materials/show', { id: ids.id }, alice.token));
+		assert.equal(next.revision, changed.revision);
+		assert.deepEqual(stableDeck(next.deck), stableDeck(current.deck));
+		assert.deepEqual(next.questions.slice(1), current.questions.slice(1));
+		assert.deepEqual(withoutExplanationAndUpdateTime(next.questions[0]), withoutExplanationAndUpdateTime(originalQuestion));
+		assert.equal(Object.hasOwn(next.questions[0].payload, 'explanation'), false);
+		assert.deepEqual(ok(await call('fukushu/materials/card-version', { ...ids, version: 1 }, alice.token)).question, originalQuestion);
+		assert.deepEqual(ok(await call('fukushu/materials/card-version', { ...ids, version: 2 }, alice.token)).question, explainedQuestion);
+		assert.deepEqual(ok(await call('fukushu/materials/card-version', { ...ids, version: 3 }, alice.token)).question, next.questions[0]);
+		const versions = ok(await call('fukushu/materials/card-versions', ids, alice.token));
+		assert.equal(versions.currentVersion, 3);
+		assert.deepEqual(versions.versions.map(item => item.version), [3, 2, 1]);
+		assert.deepEqual(ok(await call('fukushu/materials/update-card-explanation', { ...ids, expectedRevision: next.revision, explanation: null }, alice.token)), changed);
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), next);
+		assert.deepEqual(ok(await call('fukushu/materials/card-versions', ids, alice.token)), versions);
+		current = next;
+	});
+	await step('archived material explanation updates keep the archive state and old versions after restore', async () => {
+		// Archive endpoint writes 4/5 and 5/5 overall; it has a separate rate budget.
+		const archived = ok(await call('fukushu/materials/archive', { id: ids.id, expectedRevision: current.revision, archived: true }, alice.token));
+		assert.ok(typeof archived.archivedAt === 'string');
+		assert.equal(archived.revision, current.revision + 1);
+		// Alice explanation write 5/5.
+		const changed = ok(await call('fukushu/materials/update-card-explanation', { ...ids, expectedRevision: archived.revision, explanation: '保管中の追記' }, alice.token));
+		assert.deepEqual(changed, { revision: archived.revision + 1, archivedAt: archived.archivedAt, version: 4 });
+		const next = ok(await call('fukushu/materials/show', { id: ids.id }, alice.token));
+		assert.equal(next.archivedAt, archived.archivedAt);
+		assert.equal(next.revision, changed.revision);
+		assert.deepEqual(stableDeck(next.deck), stableDeck(current.deck));
+		assert.deepEqual(next.questions.slice(1), current.questions.slice(1));
+		assert.deepEqual(withoutExplanationAndUpdateTime(next.questions[0]), withoutExplanationAndUpdateTime(originalQuestion));
+		assert.deepEqual(next.questions[0].payload.explanation, { format: 'plain', value: '保管中の追記' });
+		assert.deepEqual(ok(await call('fukushu/materials/list', {}, alice.token)), []);
+		assert.deepEqual(ok(await call('fukushu/materials/list', { archived: true }, alice.token)).map(deck => deck.id), [ids.id]);
+		const restored = ok(await call('fukushu/materials/archive', { id: ids.id, expectedRevision: next.revision, archived: false }, alice.token));
+		assert.deepEqual(restored, { revision: next.revision + 1, archivedAt: null });
+		assert.deepEqual(ok(await call('fukushu/materials/show', { id: ids.id }, alice.token)), { ...next, ...restored });
+		const versions = ok(await call('fukushu/materials/card-versions', ids, alice.token));
+		assert.equal(versions.currentVersion, 4);
+		assert.deepEqual(versions.versions.map(item => item.version), [4, 3, 2, 1]);
+		assert.deepEqual(ok(await call('fukushu/materials/card-version', { id: ids.id, questionId: material.questions[1].id, version: 1 }, alice.token)), { version: 1, recordedAt: null, kind: 'baseline', question: material.questions[1] });
+		assert.deepEqual(ok(await call('fukushu/materials/card-version', { ...ids, version: 1 }, alice.token)).question, originalQuestion);
+		assert.deepEqual(ok(await call('fukushu/materials/card-version', { ...ids, version: 2 }, alice.token)).question, explainedQuestion);
+		assert.deepEqual(ok(await call('fukushu/materials/card-version', { ...ids, version: 4 }, alice.token)).question, next.questions[0]);
+		credentials.questionId = ids.questionId;
+		await writeFile(credentialsPath, JSON.stringify(credentials, null, 2), { mode: 0o600 });
 	});
 });

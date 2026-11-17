@@ -24,6 +24,9 @@ function fixture() {
 	store.show.mockResolvedValue({ ...material(), revision: 1, archivedAt: null });
 	store.update.mockResolvedValue({ revision: 2, archivedAt: null });
 	store.archive.mockResolvedValue({ revision: 2, archivedAt: '2026-11-17T00:00:00.000Z' });
+	store.updateCardExplanation.mockResolvedValue({ revision: 2, archivedAt: null, version: 2 });
+	store.listCardVersions.mockResolvedValue({ currentVersion: 1, versions: [{ version: 1, recordedAt: null, kind: 'baseline' }] });
+	store.showCardVersion.mockResolvedValue({ version: 1, recordedAt: null, kind: 'baseline', question: material().questions[0] });
 	return { store, importer, user, api: createFukushuRouter(store, importer) };
 }
 
@@ -70,6 +73,9 @@ test('preserves each literal request name for native SDK response inference', ()
 	expectTypeOf(fukushuContract.update['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/update'>();
 	expectTypeOf(fukushuContract.archive['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/archive'>();
 	expectTypeOf(fukushuContract.create['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/create'>();
+	expectTypeOf(fukushuContract.updateCardExplanation['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/update-card-explanation'>();
+	expectTypeOf(fukushuContract.listCardVersions['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/card-versions'>();
+	expectTypeOf(fukushuContract.showCardVersion['~orpc'].meta.requestName).toEqualTypeOf<'fukushu/materials/card-version'>();
 });
 
 describe('Fukushu metadata and archive authorization', () => {
@@ -105,5 +111,118 @@ describe('Fukushu metadata and archive authorization', () => {
 		const f = fixture();
 		await expect(call(f.api.archive, { id: 'deck-original', expectedRevision, archived: false }, { context: testContext(f.user) })).rejects.toThrow();
 		expect(f.store.archive).not.toHaveBeenCalled();
+	});
+});
+
+
+describe('Fukushu explanation-only versions authorization and input boundary', () => {
+	const ids = { id: material().deck.id, questionId: material().questions[0].id };
+	const update = { ...ids, expectedRevision: 1, explanation: 'Additional context' };
+
+	test('authenticates before storage and separates account read/write scopes', async () => {
+		const f = fixture();
+		await expect(call(f.api.updateCardExplanation, update, { context: testContext(null) })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
+		await expect(call(f.api.listCardVersions, ids, { context: testContext(null) })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
+		await expect(call(f.api.showCardVersion, { ...ids, version: 1 }, { context: testContext(null) })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
+		await expect(call(f.api.updateCardExplanation, update, { context: testContext(f.user, { permission: ['read:account'] }) })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+		await expect(call(f.api.listCardVersions, ids, { context: testContext(f.user, { permission: ['write:account'] }) })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+		await expect(call(f.api.showCardVersion, { ...ids, version: 1 }, { context: testContext(f.user, { permission: ['write:account'] }) })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+		expect(f.store.updateCardExplanation).not.toHaveBeenCalled();
+		expect(f.store.listCardVersions).not.toHaveBeenCalled();
+		expect(f.store.showCardVersion).not.toHaveBeenCalled();
+	});
+
+	test('routes only explanation and authenticated owner; unsupported mutations cannot reach storage', async () => {
+		const f = fixture();
+		const input = { ...update, ownerId: 'bob', prompt: 'Changed question', answer: 'Changed answer', sourceKey: 'changed', typeAnswer: true, acceptedAnswer: 'changed' };
+		for (const token of [null, { permission: ['write:account'] }]) {
+			expect(await call(f.api.updateCardExplanation, input, { context: testContext(f.user, token) })).toEqual({ revision: 2, archivedAt: null, version: 2 });
+		}
+		expect(f.store.updateCardExplanation).toHaveBeenCalledTimes(2);
+		expect(f.store.updateCardExplanation).toHaveBeenLastCalledWith('alice', ids.id, ids.questionId, 1, 'Additional context');
+		await call(f.api.updateCardExplanation, { ...update, explanation: null }, { context: testContext(f.user) });
+		expect(f.store.updateCardExplanation).toHaveBeenLastCalledWith('alice', ids.id, ids.questionId, 1, null);
+	});
+
+	test('returns owner-only baseline records and applies pagination defaults', async () => {
+		const f = fixture();
+		const context = testContext(f.user, { permission: ['read:account'] });
+		expect(await call(f.api.listCardVersions, { ...ids, ownerId: 'bob' } as never, { context })).toEqual({ currentVersion: 1, versions: [{ version: 1, recordedAt: null, kind: 'baseline' }] });
+		expect(f.store.listCardVersions).toHaveBeenLastCalledWith('alice', ids.id, ids.questionId, { before: undefined, limit: 20 });
+		await call(f.api.listCardVersions, { ...ids, before: 3, limit: 1 }, { context });
+		expect(f.store.listCardVersions).toHaveBeenLastCalledWith('alice', ids.id, ids.questionId, { before: 3, limit: 1 });
+		expect(await call(f.api.showCardVersion, { ...ids, version: 1, ownerId: 'bob' } as never, { context })).toEqual({ version: 1, recordedAt: null, kind: 'baseline', question: material().questions[0] });
+		expect(f.store.showCardVersion).toHaveBeenLastCalledWith('alice', ids.id, ids.questionId, 1);
+	});
+
+	test.each([
+		{ label: 'missing', explanation: undefined },
+		{ label: 'number', explanation: 42 },
+		{ label: 'object', explanation: { format: 'plain', value: 'text' } },
+		{ label: 'too long', explanation: 'x'.repeat(16_385) },
+		{ label: 'NUL', explanation: 'before\0after' },
+		{ label: 'unpaired high surrogate', explanation: '\uD800' },
+		{ label: 'unpaired low surrogate', explanation: '\uDC00' },
+	])('rejects $label explanation before calling storage', async ({ explanation }) => {
+		const f = fixture();
+		await expect(call(f.api.updateCardExplanation, { ...update, explanation } as never, { context: testContext(f.user) })).rejects.toThrow();
+		expect(f.store.updateCardExplanation).not.toHaveBeenCalled();
+	});
+
+	test('accepts empty, maximum-length and Unicode plain explanations without changing their text', async () => {
+		const f = fixture();
+		for (const explanation of ['', 'x'.repeat(16_384), '日本語\n😀 <b>plain text</b>']) {
+			await call(f.api.updateCardExplanation, { ...update, explanation }, { context: testContext(f.user) });
+			expect(f.store.updateCardExplanation).toHaveBeenLastCalledWith('alice', ids.id, ids.questionId, 1, explanation);
+		}
+	});
+
+	test.each([0, -1, 1.5, 2_147_483_648])('rejects invalid revision, cursor and version %s before storage', async invalid => {
+		const f = fixture();
+		const context = testContext(f.user);
+		await expect(call(f.api.updateCardExplanation, { ...update, expectedRevision: invalid }, { context })).rejects.toThrow();
+		await expect(call(f.api.listCardVersions, { ...ids, before: invalid }, { context })).rejects.toThrow();
+		await expect(call(f.api.showCardVersion, { ...ids, version: invalid }, { context })).rejects.toThrow();
+		expect(f.store.updateCardExplanation).not.toHaveBeenCalled();
+		expect(f.store.listCardVersions).not.toHaveBeenCalled();
+		expect(f.store.showCardVersion).not.toHaveBeenCalled();
+	});
+
+	test.each([0, -1, 1.5, 21])('rejects page size %s before storage', async limit => {
+		const f = fixture();
+		await expect(call(f.api.listCardVersions, { ...ids, limit }, { context: testContext(f.user) })).rejects.toThrow();
+		expect(f.store.listCardVersions).not.toHaveBeenCalled();
+	});
+
+	test.each(['id', 'questionId'] as const)('rejects invalid %s identities before storage', async key => {
+		const f = fixture();
+		for (const value of ['', 'x'.repeat(257), '\0', '\uD800']) {
+			const invalid = { ...ids, [key]: value };
+			await expect(call(f.api.updateCardExplanation, { ...update, ...invalid }, { context: testContext(f.user) })).rejects.toThrow();
+			await expect(call(f.api.listCardVersions, invalid, { context: testContext(f.user) })).rejects.toThrow();
+			await expect(call(f.api.showCardVersion, { ...invalid, version: 1 }, { context: testContext(f.user) })).rejects.toThrow();
+		}
+		expect(f.store.updateCardExplanation).not.toHaveBeenCalled();
+		expect(f.store.listCardVersions).not.toHaveBeenCalled();
+		expect(f.store.showCardVersion).not.toHaveBeenCalled();
+	});
+
+	test('maps stale, capacity and ownership failures without replacing them with generic errors', async () => {
+		const f = fixture();
+		for (const [code, status] of [['MATERIAL_CONFLICT', 409], ['CARD_HISTORY_LIMIT', 400], ['NO_SUCH_MATERIAL', 404], ['INVALID_MATERIAL', 400]] as const) {
+			f.store.updateCardExplanation.mockRejectedValueOnce(new MaterialError(code));
+			await expect(call(f.api.updateCardExplanation, update, { context: testContext(f.user) })).rejects.toMatchObject({ code, status });
+		}
+		f.store.listCardVersions.mockRejectedValueOnce(new MaterialError('NO_SUCH_MATERIAL'));
+		f.store.showCardVersion.mockRejectedValueOnce(new MaterialError('NO_SUCH_MATERIAL'));
+		await expect(call(f.api.listCardVersions, ids, { context: testContext(f.user) })).rejects.toMatchObject({ code: 'NO_SUCH_MATERIAL' });
+		await expect(call(f.api.showCardVersion, { ...ids, version: 1 }, { context: testContext(f.user) })).rejects.toMatchObject({ code: 'NO_SUCH_MATERIAL' });
+	});
+
+	test('keeps the established read/write permissions and endpoint rate budgets', () => {
+		expect(fukushuContract.updateCardExplanation['~orpc'].meta).toMatchObject({ requireCredential: true, kind: 'write:account', limit: { duration: 60_000, max: 5 } });
+		for (const contract of [fukushuContract.listCardVersions, fukushuContract.showCardVersion]) {
+			expect(contract['~orpc'].meta).toMatchObject({ requireCredential: true, kind: 'read:account', limit: { duration: 60_000, max: 60 } });
+		}
 	});
 });
