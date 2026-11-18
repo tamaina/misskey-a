@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkButton :disabled="disabled || busy" @click="pick">{{ $locale.sfc.choose }}</MkButton>
 			<MkButton :disabled="disabled || busy || !selected" :wait="busy" @click="inspect">{{ $locale.sfc.inspect }}</MkButton>
 		</div>
-		<p v-if="localName">{{ localName }} · {{ $locale.sfc.localOnly }}</p>
+		<p v-if="localName">{{ localName }} · {{ localScan ? $locale.sfc.scanning : $locale.sfc.localOnly }}</p>
 		<p v-if="selected">{{ selected.name }}</p>
 		<p v-if="error" role="alert" :class="$style.error">{{ error }}</p>
 		<section v-if="report" class="_gaps" role="status">
@@ -134,8 +134,9 @@ onBeforeUnmount(() => { disposed = true; selection++; localScan.value?.abort(); 
 	"localDescription": "端末内では 1 GiB まで検査できます。教材・履歴などの JSON は合計 8 MiB、全体で 20,000 件、カードは 10,000 件までです。ファイルは送信されません。",
 	"cancelScan": "検査を中止",
 	"localChoose": "端末の .fukushu を検査",
-	"localOnly": "端末内で検査・未送信",
-	"drive": "本人の Drive に保存した原本を選んでください。Drive がバイナリファイルのアップロードを許可しているアカウントで利用できます。公開URLや公開状態は変わりません。",
+	"scanning": "端末内で検査中",
+	"localOnly": "端末のファイル・未送信",
+	"drive": "自分の Drive に保存した .fukushu 原本を選んでください。",
 	"openDrive": "Drive を開く",
 	"choose": "本家 .fukushu を Drive から選ぶ",
 	"inspect": "本家バックアップを書き込まずに検査",
@@ -172,8 +173,9 @@ onBeforeUnmount(() => { disposed = true; selection++; localScan.value?.abort(); 
 	"localDescription": "Inspect up to 1 GiB on this device, with 8 MiB of JSON, 20,000 records in total and up to 10,000 cards. The file stays on your device.",
 	"cancelScan": "Cancel inspection",
 	"localChoose": "Inspect a .fukushu on this device",
-	"localOnly": "Inspected locally · not uploaded",
-	"drive": "Choose an original in your own Drive. Your account must already be allowed to upload binary files. Its public URL and visibility remain unchanged.",
+	"scanning": "Inspecting on this device",
+	"localOnly": "Local file · not uploaded",
+	"drive": "Choose an original .fukushu file from your Drive.",
 	"openDrive": "Open Drive",
 	"choose": "Choose an upstream .fukushu from Drive",
 	"inspect": "Inspect upstream backup without writing",

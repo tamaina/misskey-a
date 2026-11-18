@@ -84,7 +84,7 @@ test('local selection inspects only in memory without any Drive or API request',
 	await fireEvent.change(screen.getByTestId('upstream-local-file'), { target: { files: [file] } });
 	await screen.findByText('読み込めた内容');
 	expect(inspectLocalUpstream).toHaveBeenCalledWith(file, expect.any(AbortSignal));
-	expect(screen.getByText(/端末内で検査・未送信/)).toBeTruthy();
+	expect(screen.getByText(/端末のファイル・未送信/)).toBeTruthy();
 	expect(screen.getByText(/回答時のカード内容: 不明/)).toBeTruthy();
 	expect(misskeyApi).not.toHaveBeenCalled(); expect(chooseDriveFile).not.toHaveBeenCalled();
 	expect(button(inspectLabel).disabled).toBe(true);
